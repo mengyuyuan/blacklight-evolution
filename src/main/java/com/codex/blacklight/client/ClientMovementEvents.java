@@ -71,8 +71,15 @@ public final class ClientMovementEvents {
             if(mc.player==event.getEntity()&&isPrototype(mc)
                     &&com.codex.blacklight.client.camera.PrototypeChaseCamera.ownsView()
                     &&(Math.abs(event.getInput().forwardImpulse)>1e-5F||Math.abs(event.getInput().leftImpulse)>1e-5F)
-                    &&!event.getEntity().getData(ModAttachments.CONSUMING))
-                event.getEntity().setYRot(cameraYaw(mc));
+                    &&(event.getEntity().getData(ModAttachments.GRAB_STAGE)==com.codex.blacklight.combat.ConsumeVisual.NONE&&!event.getEntity().getData(ModAttachments.CONSUMING)
+                        ||event.getEntity().getData(ModAttachments.GRAB_STAGE)==com.codex.blacklight.combat.ConsumeVisual.HOLD)) {
+                if(event.getEntity().getData(ModAttachments.GRAB_STAGE)==com.codex.blacklight.combat.ConsumeVisual.HOLD) {
+                    var input=event.getInput();var player=event.getEntity();
+                    var step=com.codex.blacklight.movement.CarrySteering.steer(cameraYaw(mc),player.getYRot(),input.forwardImpulse,input.leftImpulse);
+                    player.setYRot(step.yaw());player.setYHeadRot(step.yaw());player.yBodyRot=step.yaw();
+                    input.forwardImpulse=step.forward();input.leftImpulse=step.left();
+                } else event.getEntity().setYRot(cameraYaw(mc));
+            }
             return;
         }
         // Suppress vanilla walking/jumping as well as our traversal prediction.

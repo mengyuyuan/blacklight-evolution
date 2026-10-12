@@ -41,13 +41,16 @@ public final class ClientCarryPlacement {
     /** Render-time pairing avoids the receiver's network interpolation trailing the actor. */
     public static Vec3 consumeOffset(LivingEntity victim,float partial){
         var visual=victim.getData(ModAttachments.CONSUME_VISUAL);
-        if(visual.stage()!=ConsumeVisual.CONSUME)return Vec3.ZERO;
-        var owner=victim.level().getEntity(visual.consumerId());if(owner==null)return Vec3.ZERO;
+        if(visual.stage()!=ConsumeVisual.CONSUME&&visual.stage()!=ConsumeVisual.HOLD)return Vec3.ZERO;
+        var carrier=victim.level().getEntity(visual.consumerId());if(!(carrier instanceof LivingEntity owner))return Vec3.ZERO;
         var form=PowerForm.values()[Math.clamp(visual.form(),0,PowerForm.values().length-1)];
         Vec3 current=victim.getPosition(partial);
-        Vec3 goal=ConsumePlacementTrack.anchor(visual.origin(),visual.facing(),victim,form,visual.motionProgress(victim.level().getGameTime(),partial)).orElse(current);
+        Vec3 goal=visual.stage()==ConsumeVisual.HOLD
+                ?carryAnchor(owner.getPosition(partial),GrappleMotion.facing(victim,visual,partial),
+                    net.minecraft.util.Mth.lerp(partial,owner.xRotO,owner.getXRot()),owner,victim,visual,partial)
+                :ConsumePlacementTrack.anchor(visual.origin(),visual.facing(),victim,form,visual.motionProgress(victim.level().getGameTime(),partial)).orElse(current);
         float motion=visual.motionProgress(victim.level().getGameTime(),partial);
-        if(form==PowerForm.CLAWS&&motion<ConsumePlacementTrack.gripEnd(form))
+        if(visual.stage()==ConsumeVisual.CONSUME&&form==PowerForm.CLAWS&&motion<ConsumePlacementTrack.gripEnd(form))
             goal=goal.add(owner.getPosition(partial).subtract(ConsumePlacementTrack.actorAnchor(visual.origin(),visual.facing(),form,motion,false)));
         Vec3 delta=goal.subtract(current);if(delta.lengthSqr()>4)return Vec3.ZERO;
         var hit=victim.level().clip(new net.minecraft.world.level.ClipContext(current.add(0,victim.getBbHeight()*.5,0),goal.add(0,victim.getBbHeight()*.5,0),net.minecraft.world.level.ClipContext.Block.COLLIDER,net.minecraft.world.level.ClipContext.Fluid.NONE,victim));

@@ -1,6 +1,6 @@
 # 独立开发版安装
 
-适用：Blacklight: Ascension 0.3.0-standalone-dev.7 · Minecraft 1.21.1 · NeoForge 21.1.244 · Java 21。
+适用：Blacklight: Ascension 0.3.0-standalone-dev.8 · Minecraft 1.21.1 · NeoForge 21.1.244 · Java 21。
 
 这是从 RC59 迁移的独立开发版。黑光现在使用自身的动作、玩家渲染、输入、镜头、目标锁定与服务端同步。Epic Fight、Epic ParCool 和 Weapons of Miracles 已不是前置，首次验证使用仅含黑光与 GeckoLib 的实例。
 
@@ -8,7 +8,7 @@ dev.6 新增五种攻击武器的液态变形，重点展示第三人称的组�
 
 ## 安装文件
 
-- `Blacklight-Ascension-MC1.21.1-NeoForge-0.3.0-standalone-dev.7-bundled.jar`：当前含完整动作、装甲、镜头与 HUD 资料的试玩 JAR。
+- `Blacklight-Ascension-MC1.21.1-NeoForge-0.3.0-standalone-dev.8-bundled.jar`：当前含完整动作、装甲、镜头与 HUD 资料的试玩 JAR。
 - `geckolib-neoforge-1.21.1-4.9.2.jar`：唯一额外的必需 Mod；其原始 JAR 和完整 MIT 许可一起保留。
 - 默认 `assemble` 已携带仓库中的全部 224 个资料文件，无需指定本机路径。
 

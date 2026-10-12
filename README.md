@@ -1,16 +1,17 @@
 # Blacklight: Ascension
 
-> **独立开发版 `0.3.0-standalone-dev.7`。** 基于现有 RC59 工作区，核心、动作、模型、输入、镜头和服务端同步已改由黑光自身驱动，运行不再要求 Epic Fight、Epic ParCool 或 Weapons of Miracles。无这些模组的客户端和 GameTestServer 已实际启动。当前仍在检查脱离前置后的姿态与移动回归，结果见 [独立化记录](docs/STANDALONE_MIGRATION.md)。
+> **独立开发版 `0.3.0-standalone-dev.8`。** 基于现有 RC59 工作区，核心、动作、模型、输入、镜头和服务端同步已改由黑光自身驱动，运行不再要求 Epic Fight、Epic ParCool 或 Weapons of Miracles。无这些模组的客户端和 GameTestServer 已实际启动。当前仍在检查脱离前置后的姿态与移动回归，结果见 [独立化记录](docs/STANDALONE_MIGRATION.md)。
 
 **黑光：进化 · 作者：末者**
 Minecraft 1.21.1 / NeoForge 的黑光病毒同人 Mod，包含生物武器、抓取吸收、伪装、强化移动、感染生物与组织蜂巢。
 
 ## 当前版本与发布状态
 
-当前为 **0.3.0-standalone-dev.7，独立开发版**，尚未公开发行，也未将完整人工验收标记为通过。项目按现有黑光能力与感染生存玩法收尾，不宣称完整复刻原游戏。
+当前为 **0.3.0-standalone-dev.8，独立开发版**，尚未公开发行，也未将完整人工验收标记为通过。项目按现有黑光能力与感染生存玩法收尾，不宣称完整复刻原游戏。
 
 **dev.7 已将完整运行资料纳入源码。** `art/motion-profile/` 包含 224 个动作、装甲、受害者、镜头与 HUD 文件，默认构建会完整打包；无需本机外部资料目录。所有文件保持此前试玩版内容，构建会检查包内文件与仓库 SHA-256 清单一致。此版整合 dev.6 液态武器变形和 80 种原版贴图结合感染结构的修复。
 
+- [dev.8 持有生物转向修复](docs/CARRY_STEERING_DEV8.md)
 - [dev.7 完整资料与感染模型](docs/BUNDLED_PROFILE_DEV7.md)
 - [安装、依赖与故障排除](docs/INSTALL_ZH.md)
 - [液态武器变形的源依据与适配范围](docs/LIQUID_WEAPON_MORPH_SOURCE.md)
@@ -103,8 +104,8 @@ gradlew.bat clean assemble --no-daemon
 
 文件保留 Minecraft 和 Mod 两个版本号：
 
-- 默认完整构建：`Blacklight-Ascension-MC1.21.1-NeoForge-0.3.0-standalone-dev.7-bundled.jar` / `.zip`。
+- 默认完整构建：`Blacklight-Ascension-MC1.21.1-NeoForge-0.3.0-standalone-dev.8-bundled.jar` / `.zip`。
 - 外部开发资料构建：对应 `-external-profile.jar` / `.zip`。
-- 原始源码快照：`Blacklight-Ascension-MC1.21.1-NeoForge-0.3.0-standalone-dev.7-sources.zip`。
+- 原始源码快照：`Blacklight-Ascension-MC1.21.1-NeoForge-0.3.0-standalone-dev.8-sources.zip`。
 
 这些名称区分用途，不表示完成全部玩法验收。代码许可见 [LICENSE](LICENSE)，资源记录见 [资源来源说明](THIRD_PARTY_ASSETS.md)。[公开仓库](https://github.com/mengyuyuan/blacklight-evolution) · [贡献说明](CONTRIBUTING.md)。
