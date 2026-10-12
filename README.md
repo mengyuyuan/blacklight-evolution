@@ -1,19 +1,27 @@
 # Blacklight: Ascension
 
-> **独立开发版 `0.3.0-standalone-dev.6`。** 基于现有 RC59 工作区，核心、动作、模型、输入、镜头和服务端同步已改由黑光自身驱动，运行不再要求 Epic Fight、Epic ParCool 或 Weapons of Miracles。无这些模组的客户端和 GameTestServer 已实际启动。当前仍在检查脱离前置后的姿态与移动回归，结果见 [独立化记录](docs/STANDALONE_MIGRATION.md)。
+> **独立开发版 `0.3.0-standalone-dev.9`。** 整合最新感染生物模型、持有生物转向、临界质量、正式毁灭技和子弹俯冲。核心、动作、模型、输入、镜头与服务端同步由黑光自身驱动，运行不再要求 Epic Fight、Epic ParCool 或 Weapons of Miracles。当前验证范围见 [独立化记录](docs/STANDALONE_MIGRATION.md)。
 
 **黑光：进化 · 作者：末者**
 Minecraft 1.21.1 / NeoForge 的黑光病毒同人 Mod，包含生物武器、抓取吸收、伪装、强化移动、感染生物与组织蜂巢。
 
 ## 当前版本与发布状态
 
-当前为 **0.3.0-standalone-dev.7，本地独立开发版**，尚未公开发行，也未将完整人工验收标记为通过。项目按现有黑光能力与感染生存玩法收尾，不宣称完整复刻原游戏。
+项目按 Minecraft / 加载器维护独立分支：`main` 为 NeoForge 1.21.1，[`forge-1.20.1`](https://github.com/mengyuyuan/blacklight-evolution/tree/forge-1.20.1) 为 Forge 1.20.1。各版本独立构建、同步和发布；开发贡献请先阅读 [多版本协作规范](docs/MULTIVERSION_WORKFLOW_ZH.md)，可用 [快捷工具](docs/VERSION_TOOLS_ZH.md) 自动准备贡献分支和 PR 说明。
 
-**公开资源方案仍是发布阻塞。** 普通源码构建不含本地解包动作；当前动画初始化又要求完整动作资料，缺失时会报错。因此 source-only 构建只用于源码编译，不能当作可直接游玩的公开成品。含私有资料的 local-preview 包仅供本地预览，授权尚未明确，不公开上传。
+当前为 **0.3.0-standalone-dev.9，独立开发版**，尚未公开发行，也未将完整人工验收标记为通过。项目按现有黑光能力与感染生存玩法收尾，不宣称完整复刻原游戏。以下新增技能的整合针对 NeoForge 1.21.1；Forge 分支的同步范围以其记录为准。
 
+**仓库默认资料与完整毁灭技资料分开核对。** `art/motion-profile/` 保留上游的 224 个动作、装甲、受害者、镜头与 HUD 文件，默认 `bundled` 构建打包并检查仓库 SHA-256 清单。它覆盖既有移动、战斗及液态变形，但没有本轮新增的 20 份正式毁灭技、俯冲与垂直瞄准动作。完整新技能使用经过逐文件核对的 **244 文件**资料，通过 `-PbundleMotionDirectory=<完整资料目录>` 整套替换，产物标为 `external-profile`。本机完整技能验证使用 `D:/Blacklight-Standalone/motion-profile-dev7`。原创地刺和组织束三维模型在公开源码资源中，不依赖解包特效网格或贴图。
+
+dev.9 同时保留上游的 80 种原版生物贴图与感染结构组合、新的原生模型部件绑定，以及 dev.8 持有生物时按镜头方向移动的修复。
+
+- [dev.8 持有生物转向修复](docs/CARRY_STEERING_DEV8.md)
+- [dev.7 完整资料与感染模型](docs/BUNDLED_PROFILE_DEV7.md)
 - [安装、依赖与故障排除](docs/INSTALL_ZH.md)
 - [液态武器变形的源依据与适配范围](docs/LIQUID_WEAPON_MORPH_SOURCE.md)
 - [临界值、子弹俯冲与毁灭技的源依据](docs/CRITICAL_MASS_SOURCE.md)
+- [正式毁灭技、临界质量与地形冲击实机检查](docs/CRITICAL_MASS_QA.md)
+- [80 种感染体的原生贴图与感染结构](docs/STANDALONE_INFECTED_MODELS.md)
 - [dev.6 液态变形实机检查](docs/LIQUID_WEAPON_MORPH_QA.md)
 - [当前已知问题与发布阻塞](docs/KNOWN_ISSUES_AND_SLOTS_ZH.md)
 - [0.2.0 人工验收表](docs/ACCEPTANCE_0.2.0.md)
@@ -32,7 +40,7 @@ Minecraft 1.21.1 / NeoForge 的黑光病毒同人 Mod，包含生物武器、抓
 
 Blacklight JAR 不内置前置 Mod。请使用上表的明确版本，不以“最新版”代替；可选模组装入后也要满足兼容范围。安装包不是完整游戏或完整整合包。多人客户端和服务端需要匹配的 Mod 版本、依赖与动作资料；联机行为仍待验收。
 
-退出游戏并备份存档、配置，把对应 NeoForge 版本的依赖与 Blacklight JAR 放入实例的 mods 目录，移除旧的 Blacklight JAR，只保留一份。当前本地试玩使用资料完整的 local-preview 包；不要用 source-only JAR 替换后直接试玩。具体步骤见 [安装文档](docs/INSTALL_ZH.md)。
+退出游戏并备份存档、配置，把对应 NeoForge 版本的依赖与 Blacklight JAR 放入实例的 mods 目录，移除旧的 Blacklight JAR，只保留一份。试玩本轮完整毁灭技时使用包含 244 文件资料的 `external-profile` 包；默认 `bundled` 的范围见上文。具体步骤见 [安装文档](docs/INSTALL_ZH.md)。
 
 ## 生存开始
 
@@ -54,6 +62,7 @@ Blacklight JAR 不内置前置 Mod。请使用上表的明确版本，不以“�
 | 左键 / 右键 | 当前形态的普通 / 特殊攻击 |
 | E | 抓取；持有时再次按下投掷 |
 | 持有时右键 / 左键 | 吸收 / 投掷 |
+| 持有时 W/A/S/D | 普通持有阶段按实际控制镜头方向移动与转身 |
 | X | 本体与最近一次成功吸收的可用身份切换 |
 | G / H | 已解锁的防御能力 / 感知能力切换 |
 | 空格 / 奔跑键 | 跳跃、蓄力及移动能力，取决于状态和升级 |
@@ -62,6 +71,8 @@ Blacklight JAR 不内置前置 Mod。请使用上表的明确版本，不以“�
 以控制设置中的实际绑定为准。黑光模式中的 E 抓取可能与原背包键冲突，需要时重新绑定。未感染或普通模式保留 Minecraft 生存交互。
 
 抓取需要目标可吸收、距离和视线有效。弱目标可直接抓取；强目标需削弱至最大生命的 15% 或以下。强弱分界使用**排除本 Mod 五倍生命单位后的最大生命 50**，不是把显示的放大生命数直接与 50 比较。大型目标使用攀附流程；宠物、载客、无敌等限制仍存在。
+
+持有转向沿用 dev.8 修复：普通 HOLD 阶段的 W/A/S/D 按镜头解释，人物每 tick 最多转 45 度，握持点与受害者同步跟随。捕获、吸收、投掷和攀附仍遵守各自的动作朝向约束，见 [持有转向说明](docs/CARRY_STEERING_DEV8.md)。
 
 ## 临界值与正式毁灭技
 
@@ -93,13 +104,13 @@ Blacklight JAR 不内置前置 Mod。请使用上表的明确版本，不以“�
 
 ## 当前内容与边界
 
-已接入利爪、刀锋、拳套、鞭拳、肌肉增强及空手战斗，抓取吸收与受害者表现，护盾、装甲、两种感知，强化移动，最近吸收身份切换，研究站开局、感染传播、巨型组织蜂巢与实际吞噬成长。完整私有资料可提供当前接入的原作派生动作、镜头与 HUD；这些实现不代表原游戏全部机制已移植。
+已接入利爪、刀锋、拳套、鞭拳、肌肉增强及空手战斗，抓取吸收与受害者表现，护盾、装甲、两种感知，强化移动，最近吸收身份切换，研究站开局、感染传播、巨型组织蜂巢与实际吞噬成长。包内资料提供当前接入的动作、镜头与 HUD；这些实现不代表原游戏全部机制已移植。
 
 dev.6 为五种攻击武器加入液态变形，以第三人称为主要展示：组织沿手臂推进，波形几何鼓动并逐渐塑形，附着四股组织流，湿材质随光照和观察角度产生细微反光。第一人称沿用现有原版手部位置。这是依据本地原作资料重建的效果，尚未一比一还原原版全部碎片、蓄势和爆发特效，详见 [源依据与适配范围](docs/LIQUID_WEAPON_MORPH_SOURCE.md)。
 
-感染僵尸保留专属模型；其他普通感染体主要是在原生物外形上叠加破损、啃食和组织变化。四类巨构及其成长形态使用专属模型、基础动作与分段判定，**完整破茧演出和巨构专属战斗连招尚未完成**。
+80 种普通感染体将已确认的感染结构、啃食缺口和局部腐败血痕结合到实际原版模型及当前变种／资源包贴图，保留原版像素风格。新部件绑定跟随原生行走、飞行与游泳姿态；羊毛染色、史莱姆外层、潜影贝开合等各自保留原生部件表现，见 [感染模型说明](docs/STANDALONE_INFECTED_MODELS.md)。四类巨构及其成长形态使用专属模型、基础动作与分段判定，**完整破茧演出和巨构专属战斗连招尚未完成**。
 
-军事科技、可建实验室、黑色守望与超级士兵、城市与载具、记忆网和剧情任务尚未完成。伪装只保存最近的可用身份，使用玩家碰撞体与视点，不获得目标技能。攻击裂纹和碎块主要是视觉反馈，不代表通用地形破坏。多人、性能和完整生存平衡仍待验收。
+军事科技、可建实验室、黑色守望与超级士兵、城市与载具、记忆网和剧情任务尚未完成。伪装只保存最近的可用身份，使用玩家碰撞体与视点，不获得目标技能。普通攻击裂纹和碎块主要是视觉反馈；正式子弹俯冲按上述高度与保护规则进行实际方块破坏。多人、性能和完整生存平衡仍待验收。
 
 ## 构建与命名
 
@@ -107,12 +118,18 @@ dev.6 为五种攻击武器加入液态变形，以第三人称为主要展示�
 gradlew.bat clean assemble --no-daemon
 ~~~
 
-默认只编译打包，不运行单元测试、碰撞测试、GameTest 或自动游戏验收。上面的 source-only 构建目前不能作为可运行成品。获准的本地资料构建使用 `-PbundleMotionDirectory=<完整资料目录>`，产物标为 local-preview。
+默认编译打包并检查独立运行边界及仓库的 224 文件资料，不运行单元测试、碰撞测试、GameTest 或自动游戏验收。完整新增技能需要整套 244 文件资料；本机开发构建示例：
+
+~~~powershell
+.\gradlew.bat clean assemble "-PbundleMotionDirectory=D:/Blacklight-Standalone/motion-profile-dev7" --no-daemon
+~~~
+
+外部资料整套替代默认资料，不按单个文件混用。完整毁灭技及 20 份新增动作的依据、此前实机验证范围见 [源依据](docs/CRITICAL_MASS_SOURCE.md) 与 [实机检查](docs/CRITICAL_MASS_QA.md)；dev.9 合并后的启动和回归另行记录。
 
 文件保留 Minecraft 和 Mod 两个版本号：
 
-- 源码编译产物：`Blacklight-Ascension-MC1.21.1-NeoForge-0.3.0-standalone-dev.6-source-only.jar` / `.zip`。
-- 私有本地预览：`Blacklight-Ascension-MC1.21.1-NeoForge-0.3.0-standalone-dev.6-local-preview.jar` / `.zip`。
-- 原始源码快照：`Blacklight-Ascension-MC1.21.1-NeoForge-0.3.0-standalone-dev.6-sources.zip`。
+- 默认 224 文件构建：`Blacklight-Ascension-MC1.21.1-NeoForge-0.3.0-standalone-dev.9-bundled.jar` / `.zip`。
+- 本轮完整 244 文件构建：`Blacklight-Ascension-MC1.21.1-NeoForge-0.3.0-standalone-dev.9-external-profile.jar` / `.zip`。
+- 原始源码快照：`Blacklight-Ascension-MC1.21.1-NeoForge-0.3.0-standalone-dev.9-sources.zip`。
 
-这些名称区分用途，不表示已经发布。原创代码与原创资源的许可见 [LICENSE](LICENSE)；私有派生资源不随该声明取得分发授权，见 [资源来源说明](THIRD_PARTY_ASSETS.md)。[公开仓库](https://github.com/mengyuyuan/blacklight-evolution) · [贡献说明](CONTRIBUTING.md)。
+这些名称区分用途，不表示完成全部玩法验收。代码许可见 [LICENSE](LICENSE)，资源记录见 [资源来源说明](THIRD_PARTY_ASSETS.md)。[公开仓库](https://github.com/mengyuyuan/blacklight-evolution) · [贡献说明](CONTRIBUTING.md)。

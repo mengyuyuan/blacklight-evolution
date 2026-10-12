@@ -136,7 +136,7 @@ public final class InfectedSpeciesMesh {
     }
 
     @SubscribeEvent public static void reload(RegisterClientReloadListenersEvent event) {
-        event.registerReloadListener((net.minecraft.server.packs.resources.ResourceManagerReloadListener) manager -> CACHE.clear());
+        event.registerReloadListener((net.minecraft.server.packs.resources.ResourceManagerReloadListener) manager -> {CACHE.clear();com.codex.blacklight.client.renderer.AuthoredInfectionParts.reload();});
     }
 
     public AABB bounds() { return bounds; }

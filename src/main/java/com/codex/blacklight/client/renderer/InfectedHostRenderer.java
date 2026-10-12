@@ -18,7 +18,7 @@ import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.EquipmentSlot;
 
-/** Native species bodies with wounds, plus the approved zombie and colossal meshes. */
+/** Native species skins with approved infection geometry, plus distinct colossal meshes. */
 public final class InfectedHostRenderer extends EntityRenderer<BlacklightInfectedHost> {
     public InfectedHostRenderer(EntityRendererProvider.Context context){super(context);shadowRadius=.6F;}
     @Override public ResourceLocation getTextureLocation(BlacklightInfectedHost entity){return ConsumedMobVisuals.WHITE;}
@@ -51,7 +51,7 @@ public final class InfectedHostRenderer extends EntityRenderer<BlacklightInfecte
         stack.pushPose();DevourerFeedingFx.applyVictim(entity,partial,stack);stack.scale(1.12F,1.12F,1.12F);
         try{
             if(renderer instanceof net.minecraft.client.renderer.entity.LivingEntityRenderer living){
-                try(var morphology=new InfectedMorphology(entity,proxy,living.getModel())){
+                try(var morphology=new InfectedMorphology(entity,proxy,living.getModel(),renderer.getTextureLocation(proxy))){
                     renderer.render(proxy,yaw,partial,stack,skin,light);
                 }
             }else renderer.render(proxy,yaw,partial,stack,skin,light);
@@ -78,10 +78,11 @@ public final class InfectedHostRenderer extends EntityRenderer<BlacklightInfecte
     }
 
     private static InfectedSpeciesMesh authoredMesh(BlacklightInfectedHost host){
-        // The zombie was already approved as a dedicated infected design. Other
-        // ordinary species retain their native bodies, variants and local wounds.
+        // Ordinary hosts combine native skins with their approved species geometry.
+        // Growing/mature colossal encounters keep the distinct boss body.
         String species=host.speciesId();
-        return host.hasMultipartBody()||species.equals("minecraft:zombie")?InfectedSpeciesMesh.get(species):null;
+        return host.hasMultipartBody()&&(host.giantBoss()||host.evolutionTicks()>0||host.devourerIdentity()
+                ||species.equals("minecraft:wither")||species.equals("minecraft:ender_dragon"))?InfectedSpeciesMesh.get(species):null;
     }
 
     private static float scale(BlacklightInfectedHost host,InfectedSpeciesMesh mesh){

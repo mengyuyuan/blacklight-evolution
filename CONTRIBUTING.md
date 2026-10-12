@@ -4,7 +4,13 @@
 
 项目原创内容采用 [GPL-3.0-only](LICENSE)。公开协作仓库：https://github.com/mengyuyuan/blacklight-evolution 。提交贡献时，请确认你有权按此许可证提供这些内容；第三方文件保留原有许可和署名。
 
+## 多版本协作
+
+`main` 维护 NeoForge 1.21.1 / Java 21，`forge-1.20.1` 维护 Forge 1.20.1 / Java 17。新增版本、功能分支、跨版本同步、PR 目标、发布与清理遵循 [多版本规范](docs/MULTIVERSION_WORKFLOW_ZH.md)，支持分支登记在 [versions.json](docs/versions.json)。一个目标版本一个 PR，跨版本同步记录原 PR / SHA 并在跟踪 Issue 中逐版本确认；不把整套平台移植合入 `main`。
+
 ## 开发环境
+
+准备贡献时可使用 [多版本快捷工具](docs/VERSION_TOOLS_ZH.md)，自动填写 PR 平台信息与同步候选，或在干净工作区建立目标版本功能分支。
 
 - Java 21，使用仓库内的 Gradle Wrapper。
 - Minecraft 1.21.1、NeoForge 21.1.244；GeckoLib 由 Gradle 获取；独立版不要求 Epic Fight、Epic ParCool 或 Weapons of Miracles。
@@ -12,9 +18,9 @@
 - 用户明确要求启动试玩时，使用 `./gradlew.bat runClient`；Linux/macOS 替换为 `bash ./gradlew`。
 - 第一轮构建需要网络下载依赖。不要提交 `.gradle/`、`build/`、`run/`、存档或个人账户配置。
 
-普通源码构建是 source-only，缺少完整运行所需的本地动作资料，不能直接作为可玩发行包。私有 local-preview 资料不提交到仓库，详见 `THIRD_PARTY_ASSETS.md`。
+默认源码构建使用 `art/motion-profile/` 的完整 224 个动作、HUD 和镜头资料，生成 bundled 包并校验成品清单，无需本机外部资料目录。source-only / local-preview 属于旧构建历史；资源说明见 `THIRD_PARTY_ASSETS.md`，当前打包说明见 [完整资料打包](docs/BUNDLED_PROFILE_DEV7.md)。
 
-默认构建与 CI 不运行单元测试、碰撞测试、GameTest 或游戏内验收；这些检查仅在用户明确要求时运行。编译打包成功不代表真人试玩已通过。
+默认构建与 Build CI 不运行游戏单元测试、碰撞测试、GameTest 或游戏内验收；这些检查仅在用户明确要求时运行。Version policy CI 只运行轻量协作工具回归和静态平台核对。编译打包成功不代表真人试玩已通过。
 
 ## 目前适合参与的工作
 
@@ -34,7 +40,7 @@
 
 ## 提交改动
 
-1. 从主分支建立自己的功能分支；一个改动集中解决一个问题。
+1. 从对应长期版本分支建立自己的功能分支；一个改动集中解决一个问题，PR 的 base 选择该长期分支。跨版本适配另开目标版本 PR，并引用来源 PR / SHA。
 2. 描述修改前后的行为，附复现步骤。动作和模型改动提供可编辑源文件和导出结果；已有正面、侧面或运动视频可附在 PR 中，没有游戏内验收材料时如实说明。
 3. 运行 `assemble` 编译打包。只有用户明确要求时才运行相应测试；如要求墙面碰撞测试，可执行 `runGameTestServer -PwallTraversalTest`，使用独立的 `run-wall-gametest/` 世界。
 4. 在 PR 中填写验证结果、未验证项和素材来源。服务端裁定伤害与移动规则，不能只改客户端表现而遗漏同步。

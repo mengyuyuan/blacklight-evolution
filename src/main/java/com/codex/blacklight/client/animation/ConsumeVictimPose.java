@@ -54,7 +54,7 @@ public final class ConsumeVictimPose {
             var projected=com.codex.blacklight.combat.ConsumePlacementTrack.projection(GrappleMotion.sceneKey(entity,visual),GrappleMotion.sceneProgress(entity,visual,partial));
             if(projected.isPresent()){
                 double[] frame=projected.get();float scale=com.codex.blacklight.combat.ConsumeSequence.humanoid(entity)?(entity.isBaby()?.5F:1F):Math.clamp(h/1.8F,.3F,1.5F);
-                float yaw=(float)Math.toRadians(180-GrappleMotion.facing(entity,visual));
+                float yaw=(float)Math.toRadians(180-GrappleMotion.facing(entity,visual,partial));
                 if(com.codex.blacklight.combat.ConsumePlacementTrack.rigidReceiver(entity))return matrix.rotateY(yaw)
                         .mul(com.codex.blacklight.combat.ConsumePlacementTrack.rigidBody(entity,GrappleMotion.sceneKey(entity,visual),GrappleMotion.sceneProgress(entity,visual,partial))).rotateY(-yaw);
                 return matrix.rotateY(yaw).translate((float)frame[0]*scale,(float)frame[1]*scale,(float)frame[2]*scale)
@@ -92,8 +92,8 @@ public final class ConsumeVictimPose {
         var frame=com.codex.blacklight.combat.ConsumePlacementTrack.projection(key,t).orElse(null);
         var contact=com.codex.blacklight.combat.ConsumePlacementTrack.contactFrame(key,t).orElse(null);
         if(frame==null||contact==null)return bodyTransform(entity,partial);
-        float scale=entity.isBaby()?.5F:1F,yaw=(float)Math.toRadians(180-GrappleMotion.facing(entity,visual));
-        var forward=net.minecraft.world.phys.Vec3.directionFromRotation(0,GrappleMotion.facing(entity,visual));
+        float scale=entity.isBaby()?.5F:1F,yaw=(float)Math.toRadians(180-GrappleMotion.facing(entity,visual,partial));
+        var forward=net.minecraft.world.phys.Vec3.directionFromRotation(0,GrappleMotion.facing(entity,visual,partial));
         var right=new net.minecraft.world.phys.Vec3(-forward.z,0,forward.x);
         var center=right.scale(contact[10]*scale).add(forward.scale(contact[12]*scale)).add(0,contact[11]*scale,0);
         var chest=com.codex.blacklight.combat.ConsumePlacementTrack.quaternion(frame,11);

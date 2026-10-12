@@ -234,7 +234,7 @@ public final class BlacklightInfectedHost extends Monster {
         // Only visual variants cross into the detached proxy, never inventory/brain/UUID.
         CompoundTag saved=new CompoundTag(),visual=new CompoundTag();source.saveWithoutId(saved);
         for(String key:new String[]{"Age","IsBaby","Variant","variant","Color","Sheared","CollarColor","CatType",
-                "RabbitType","Size","Type","Profession","VillagerData","PuffState","MooshroomType","MainGene","HiddenGene"})
+                "RabbitType","Size","Type","Profession","VillagerData","PuffState","MooshroomType","MainGene","HiddenGene","Peek","AttachFace"})
             if(saved.contains(key))visual.put(key,saved.get(key).copy());
         data.put("Visual",visual);
         // Summoned draft dragons must never claim or finish the natural End encounter.
@@ -303,7 +303,9 @@ public final class BlacklightInfectedHost extends Monster {
     }
     public void advanceAppearanceAnimation() {
         if(appearance==null||appearanceAnimationTick==tickCount)return;
-        appearanceAnimationTick=tickCount;appearance.walkAnimation.update(walkAnimation.speed(),.4F);
+        appearanceAnimationTick=tickCount;
+        if(level().isClientSide&&appearance instanceof net.minecraft.world.entity.monster.Shulker shulker)shulker.tick();
+        appearance.walkAnimation.update(walkAnimation.speed(),.4F);
     }
     @Override protected Component getTypeName() {
         if(devourerIdentity()||DevourerFeedingSystem.isDevourer(this))return Component.translatable("entity.blacklight.devourer");

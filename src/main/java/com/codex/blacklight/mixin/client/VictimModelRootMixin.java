@@ -12,7 +12,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin({QuadrupedModel.class, ChickenModel.class, HorseModel.class, WolfModel.class,
         OcelotModel.class, FoxModel.class, RabbitModel.class, LlamaModel.class,
-        BeeModel.class, AxolotlModel.class, HoglinModel.class})
+        BeeModel.class, AxolotlModel.class, HoglinModel.class, ShulkerModel.class, TadpoleModel.class})
 public abstract class VictimModelRootMixin implements VictimModelRoot {
     @Unique private ModelPart blacklight$receiverRoot;
 

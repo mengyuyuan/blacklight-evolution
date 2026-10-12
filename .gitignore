@@ -58,3 +58,5 @@ __pycache__/
 *.pyc
 
 /run-standalone-gametest/
+/run-model-qa/
+/model-qa*/

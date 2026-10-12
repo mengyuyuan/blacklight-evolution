@@ -30,6 +30,7 @@
     "client.LivingConsumePoseMixin",
     "client.ConsumeModelPartMixin",
     "client.ConsumeLayerPoseMixin",
+    "client.InfectedSlimeCoatMixin",
     "client.ModelPartChildrenAccessor",
     "client.DragonConsumePoseMixin",
     "client.VictimModelRootMixin"

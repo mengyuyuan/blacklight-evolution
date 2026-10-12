@@ -55,9 +55,9 @@ read third-party skeleton files. BoneTransform, BlacklightPose,
 BlacklightSkeleton, MatrixMotionClip, the CPU skin renderer, and the action
 clock are project-authored code covered by the project's license.
 
-This does not relicense the private Prototype profiles listed in
-`THIRD_PARTY_ASSETS.md`. Historical RC59 packages and archived Epic Fight
-adapters remain historical development inputs, not contents of this runtime.
+The included runtime profile inventory is recorded in `THIRD_PARTY_ASSETS.md`.
+Historical RC59 packages and archived Epic Fight adapters remain historical
+development inputs, not code dependencies of this runtime.
 
 ## Optional ParCool compatibility
 

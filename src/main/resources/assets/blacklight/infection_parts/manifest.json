@@ -1,0 +1,405 @@
+{
+  "format": 1,
+  "species": {
+    "allay": {
+      "sourceSha256": "401cb052ecfa583ad9f1db4b4dbe17a0e6f566b3de37bb21b8d7e56a83487a01",
+      "bones": 8,
+      "growthParts": 24
+    },
+    "armadillo": {
+      "sourceSha256": "3f59874a75a830941e2001ff950650326938aed265c6dfc90f3ebd1c5ba3f9fa",
+      "bones": 7,
+      "growthParts": 27
+    },
+    "axolotl": {
+      "sourceSha256": "81466a729eb49e8cc1c26b1b359b395f4e768aac5f608733561817802fce5654",
+      "bones": 7,
+      "growthParts": 26
+    },
+    "bat": {
+      "sourceSha256": "5a6fa0623af3c687017f59285e4d5fa8be5f8cd5a264c83586a4d884ca9f2554",
+      "bones": 6,
+      "growthParts": 23
+    },
+    "bee": {
+      "sourceSha256": "e6970f79e2b9c2a6be9dbba52ffc28c9312554a33811085a67f298f5bcc3e9e3",
+      "bones": 10,
+      "growthParts": 34
+    },
+    "blaze": {
+      "sourceSha256": "a43ccc29d6932bbe70daa1d6bdf83f244595cc4c092ef29f5bf333cb18c207f6",
+      "bones": 14,
+      "growthParts": 24
+    },
+    "bogged": {
+      "sourceSha256": "daf739a9f2fdf651f53776d3f55140e10ac06eae1119d84898b476507d434684",
+      "bones": 6,
+      "growthParts": 34
+    },
+    "breeze": {
+      "sourceSha256": "ac0332d35273ce70e126783083fd6f10c8d2247bfd3e319a6da0dec480498a34",
+      "bones": 5,
+      "growthParts": 16
+    },
+    "camel": {
+      "sourceSha256": "3572ca52e2a18abe48b2a7ad3b11c2d37eedb873bd03be6cd1e2ffc518f5017a",
+      "bones": 7,
+      "growthParts": 45
+    },
+    "cat": {
+      "sourceSha256": "d56d8f077309b1e617b4581d2d0c30eee5bc9da15a380caae7bf1c36871f24d7",
+      "bones": 7,
+      "growthParts": 41
+    },
+    "cave_spider": {
+      "sourceSha256": "747e6d2d5c1faa3a5415dfc5e8ac25a6fbcf7b848dcdb71bb3e0cdc9a4226418",
+      "bones": 11,
+      "growthParts": 70
+    },
+    "chicken": {
+      "sourceSha256": "5a2181822e7c0538f9f7f6b2749c46ce3ed6a85dee9259705e4d137ed192a69f",
+      "bones": 6,
+      "growthParts": 32
+    },
+    "cod": {
+      "sourceSha256": "d419cae6efaa55ad8b4df6caf6fef2519d08b18f5a2b94c5c6b962f479903622",
+      "bones": 6,
+      "growthParts": 29
+    },
+    "cow": {
+      "sourceSha256": "2cbb9ccdb653fabb3cc19e24f0e59ebf592f35c9a2dd27fe0c64ee2d6e5213f5",
+      "bones": 6,
+      "growthParts": 43
+    },
+    "creeper": {
+      "sourceSha256": "2b27ab8ae097713bb951f239d16f30396674c92aff23cc7a6d924c41cab9d41c",
+      "bones": 6,
+      "growthParts": 51
+    },
+    "dolphin": {
+      "sourceSha256": "949830ea1f1c044e0af8a78d55d1edd527e4b116f7ac2037eb4f570feb0fae41",
+      "bones": 5,
+      "growthParts": 24
+    },
+    "donkey": {
+      "sourceSha256": "0331850af2fb9ad80b7f4e3da2b172b4c3047112887af852e5bb2d623c141224",
+      "bones": 8,
+      "growthParts": 44
+    },
+    "drowned": {
+      "sourceSha256": "aaf88b27427a846663b884b32c88275caeacd99a45b25841b8c071399fdd07f3",
+      "bones": 6,
+      "growthParts": 59
+    },
+    "elder_guardian": {
+      "sourceSha256": "89e6f8755b4b0e634805d8398bb22fbb541c5e5e0cf055a91bdfb5dc8a947f36",
+      "bones": 3,
+      "growthParts": 38
+    },
+    "enderman": {
+      "sourceSha256": "67ddc858fdfd3a93f54e5240f64118565cff76cd0c43f75810b3b4fd5acb0b0a",
+      "bones": 6,
+      "growthParts": 32
+    },
+    "endermite": {
+      "sourceSha256": "7e5a913c6edc5d3c61eaed2df8c3e325e9516ce2220bfb777a8673e267b2ef61",
+      "bones": 13,
+      "growthParts": 25
+    },
+    "evoker": {
+      "sourceSha256": "605688334dcf2da0db4bb44a329baadf170069238e52633a8fddffb00a3be7dd",
+      "bones": 6,
+      "growthParts": 36
+    },
+    "fox": {
+      "sourceSha256": "a0b8d0c91ca82d88aa8d885ed2449725489d712bb8f7344e23a7513714cae844",
+      "bones": 7,
+      "growthParts": 42
+    },
+    "frog": {
+      "sourceSha256": "182533ce8f8d1357cb841b55a9d74db59bab0db6c6da4503be0961ea74d8119b",
+      "bones": 6,
+      "growthParts": 20
+    },
+    "ghast": {
+      "sourceSha256": "950140c87bc168da2b10ce080bebcc9e3f7eb9182fb0ab39e89962aec4d73f34",
+      "bones": 11,
+      "growthParts": 33
+    },
+    "giant": {
+      "sourceSha256": "7e113a9ada13503ddbc757cd02be951eaf5f9253345ccaf28a62abe197243017",
+      "bones": 6,
+      "growthParts": 56
+    },
+    "glow_squid": {
+      "sourceSha256": "00313217a34ad2201b6dd7d32a21fdf81328fd57a65dd1cf4453bacc9bf9d0d8",
+      "bones": 10,
+      "growthParts": 44
+    },
+    "goat": {
+      "sourceSha256": "417c518642ef77bbf6e39f8ff9c75d3ff64f05c320fe0de813bad3110684155a",
+      "bones": 7,
+      "growthParts": 43
+    },
+    "guardian": {
+      "sourceSha256": "ee878bc9c65db47538e5da17c6aa88a128e4344971f2987b4f967f52cd8d5e5a",
+      "bones": 3,
+      "growthParts": 28
+    },
+    "hoglin": {
+      "sourceSha256": "47f2754547aae5908024a49e2d8e1d2eeaaad440ed19723ac5bd20921bd7a11e",
+      "bones": 7,
+      "growthParts": 42
+    },
+    "horse": {
+      "sourceSha256": "484eb87dc3f90868f98b38484c05f7670804d7e6c218b90b0688cdeb72a87d33",
+      "bones": 8,
+      "growthParts": 44
+    },
+    "husk": {
+      "sourceSha256": "7013a36485b9a18332a69feade0f9d81f9a25da8aa3eb1ebd917892ed773e6b6",
+      "bones": 6,
+      "growthParts": 56
+    },
+    "illusioner": {
+      "sourceSha256": "24f0d1ccd0a8d2a6cf9fc78e0c21effdfc5a2c85e9a3f8a035ccff01554b2bcd",
+      "bones": 5,
+      "growthParts": 35
+    },
+    "iron_golem": {
+      "sourceSha256": "0a1e92edbc248c3bedc2476f505dad5e3a871df19407e991aeb4f55e8d2c236e",
+      "bones": 6,
+      "growthParts": 35
+    },
+    "llama": {
+      "sourceSha256": "c24702af438ac75a099a984d87bad9a9581823f98eb63f93a2c9f932b25b0a5c",
+      "bones": 7,
+      "growthParts": 41
+    },
+    "magma_cube": {
+      "sourceSha256": "8aa2315f3db0853d9b4942fa0805bd60b00c96af692c70735020a0ebaf71442b",
+      "bones": 8,
+      "growthParts": 29
+    },
+    "mooshroom": {
+      "sourceSha256": "a56394add6abaf4c3a98663358f7b91956c37431a1abde4331393bcd7015db0e",
+      "bones": 6,
+      "growthParts": 52
+    },
+    "mule": {
+      "sourceSha256": "732c2bb5baf46f5685445e61f081633e0aa037deb39d9a6d247e425e99624127",
+      "bones": 8,
+      "growthParts": 44
+    },
+    "ocelot": {
+      "sourceSha256": "e16774dd4292df1af8bfc74990b7bd0c65c31f3b305a840a469dd4dabd7a9f27",
+      "bones": 7,
+      "growthParts": 41
+    },
+    "panda": {
+      "sourceSha256": "40638b870ea4f907d9f8df5f4945761bd0e11de52350674d833edeb6418fd94f",
+      "bones": 7,
+      "growthParts": 44
+    },
+    "parrot": {
+      "sourceSha256": "b5733a799dcd35996a3caa79c6789b508432ac70cd2179b7c27bc7bf61378edc",
+      "bones": 7,
+      "growthParts": 32
+    },
+    "phantom": {
+      "sourceSha256": "0cf8b813c5999c089dc114d4fda3db1de3b462a58a969b00153d596ef24ce66f",
+      "bones": 5,
+      "growthParts": 26
+    },
+    "pig": {
+      "sourceSha256": "cc61b89e84c83256dd8dea79bd9b73ee1c418292aed333bbf04f642aed9c73f8",
+      "bones": 6,
+      "growthParts": 44
+    },
+    "piglin": {
+      "sourceSha256": "3e465e740570cf96ed6d00f4f2ee28223ecf039074e58c71dcfd3d0b4af609f5",
+      "bones": 6,
+      "growthParts": 44
+    },
+    "piglin_brute": {
+      "sourceSha256": "c9553ff45790957472016a6b1e978091efee569ea418226ff97c8466f0e0c5f5",
+      "bones": 6,
+      "growthParts": 47
+    },
+    "pillager": {
+      "sourceSha256": "e9cd027530e3836dbda792069efc8301fa29e76b21961ac433d02a9035cfa0a0",
+      "bones": 6,
+      "growthParts": 42
+    },
+    "polar_bear": {
+      "sourceSha256": "483dd176e7973e93bcf12c7a00f3623e2216c7ce40384d189dc9368742330d9c",
+      "bones": 7,
+      "growthParts": 41
+    },
+    "pufferfish": {
+      "sourceSha256": "eeb8cb236923248dd93f46808aa86b3e873f6f9153d11dc9aa817dae8aabd6ef",
+      "bones": 5,
+      "growthParts": 24
+    },
+    "rabbit": {
+      "sourceSha256": "39631e9297f5e5339cf0bb7987f37a7c39765cef4742a2e69ee4eea9a104189e",
+      "bones": 7,
+      "growthParts": 42
+    },
+    "ravager": {
+      "sourceSha256": "6202b9878cc8524fcf482ee1675aca203a9c940aea2e77aac8b699d4706e886c",
+      "bones": 7,
+      "growthParts": 55
+    },
+    "salmon": {
+      "sourceSha256": "bbe79408125558e197b46f385d64513118803a12ba81e1a86cf52eeed1341a2c",
+      "bones": 6,
+      "growthParts": 29
+    },
+    "sheep": {
+      "sourceSha256": "802596a066b53789c27daaa9c762e3f81744f1bbf24eea73b87148b155be7c16",
+      "bones": 6,
+      "growthParts": 53
+    },
+    "shulker": {
+      "sourceSha256": "5bb4a222272aa9b81162cb56db1c3f359bde75f74e668d18845cf3bbc024d4d8",
+      "bones": 3,
+      "growthParts": 23
+    },
+    "silverfish": {
+      "sourceSha256": "45013ced7ead1ee097de53eed0a1479e818357e9859eeba5accfa4ce129a2949",
+      "bones": 12,
+      "growthParts": 24
+    },
+    "skeleton": {
+      "sourceSha256": "4669220d348c88b3a167b6bc5d5c83925a6c3914914252bc7501f61bfed1917c",
+      "bones": 6,
+      "growthParts": 27
+    },
+    "skeleton_horse": {
+      "sourceSha256": "3364f95d3523daff9da33a83ecbe340a0173fae7e606eac7d92502dcfdf8e2fa",
+      "bones": 8,
+      "growthParts": 55
+    },
+    "slime": {
+      "sourceSha256": "0aa0c9beefa605f4f49f210af5ed83187def89609a18a9f96deb53e89f4985a0",
+      "bones": 2,
+      "growthParts": 29
+    },
+    "sniffer": {
+      "sourceSha256": "9c68cedcdd01197ff97371b1416c3bee2666b9e042d42a7f12c3291174709c58",
+      "bones": 7,
+      "growthParts": 56
+    },
+    "snow_golem": {
+      "sourceSha256": "1a8662576d6c661112185a76ab094429f26eaaf496f75342f5c72458e992736e",
+      "bones": 4,
+      "growthParts": 25
+    },
+    "spider": {
+      "sourceSha256": "7e0280cd20aa5825d2f3c7afa99c4b5014f809790d139c08851cb78f504eebbb",
+      "bones": 11,
+      "growthParts": 68
+    },
+    "squid": {
+      "sourceSha256": "a219767f1159d2a711558c980875ae4178304a7d2c9547e16ee072ce3b1059c5",
+      "bones": 10,
+      "growthParts": 38
+    },
+    "stray": {
+      "sourceSha256": "dc216c047added6b72f241a59de88ec739dc6baf8350a7b4ca02c6b4269b00b9",
+      "bones": 6,
+      "growthParts": 30
+    },
+    "strider": {
+      "sourceSha256": "1ef6e02b85daf6f847fc329a3a94d67563423aa49191bf5952382657e0201483",
+      "bones": 4,
+      "growthParts": 33
+    },
+    "tadpole": {
+      "sourceSha256": "75f8a2e904ebd132b7bf59830d0f86523242355da5919ffe5376e8d01a2e7976",
+      "bones": 3,
+      "growthParts": 17
+    },
+    "trader_llama": {
+      "sourceSha256": "674d25685cf2f642c1407336fa36cfdc74a7aaf8540dfbf97602771e3e297477",
+      "bones": 7,
+      "growthParts": 41
+    },
+    "tropical_fish": {
+      "sourceSha256": "644dd458ba682d53dcca8f47f25ec0913810ae076df160d50f1ba1685de8f82f",
+      "bones": 6,
+      "growthParts": 40
+    },
+    "turtle": {
+      "sourceSha256": "2257ccf55f6dd2d9458990d3e60d5b603565012371abcab2e810771625244660",
+      "bones": 10,
+      "growthParts": 25
+    },
+    "vex": {
+      "sourceSha256": "229caafd536bebabf715a86b948dc16dfba2271a7bff7d51d0771f159128cb78",
+      "bones": 8,
+      "growthParts": 24
+    },
+    "villager": {
+      "sourceSha256": "d075e95682bb97fbad45325dbbcb725f2d5d587280951744a6adee3e04a99426",
+      "bones": 5,
+      "growthParts": 35
+    },
+    "vindicator": {
+      "sourceSha256": "e806e50e091616e8ce19a955b5395f5c4c1d5ff971aa5b04fd4c70334edad88c",
+      "bones": 6,
+      "growthParts": 55
+    },
+    "wandering_trader": {
+      "sourceSha256": "d99a71e461d791259c1f4c0fc4318769b287bcda018a8c92c2ae9bf6556731f4",
+      "bones": 5,
+      "growthParts": 36
+    },
+    "warden": {
+      "sourceSha256": "a42a7e4d4e2862ceb3b35c5c9606ad31306241cf4aab3716dba2ed07b2312acc",
+      "bones": 6,
+      "growthParts": 33
+    },
+    "witch": {
+      "sourceSha256": "93b4fee6eb7909ff74d89265f3aa332988faa3bb4d2cefbf0c712caca4796d77",
+      "bones": 5,
+      "growthParts": 35
+    },
+    "wither_skeleton": {
+      "sourceSha256": "ac12d075bc93c2bb0b70cb853189a7ae484e4166fb698d020a302a1c032976d9",
+      "bones": 6,
+      "growthParts": 28
+    },
+    "wolf": {
+      "sourceSha256": "8a3987aac217b7b08f88cb9afb2b6ef23b95b278c1adcb9e427fd6c347535f86",
+      "bones": 7,
+      "growthParts": 52
+    },
+    "zoglin": {
+      "sourceSha256": "1dd38f665ad2435c9b16e9e9964433f93d3553f7ec20f352c28cd14e7c6de178",
+      "bones": 7,
+      "growthParts": 62
+    },
+    "zombie": {
+      "sourceSha256": "9421c65b7a1315f9e15ea34159f23a1315a1fa3747d15ba97266fdcdc6fb1b79",
+      "bones": 6,
+      "growthParts": 39
+    },
+    "zombie_horse": {
+      "sourceSha256": "e01ecf0c1ca58b16780acbd6c30c72e07128c87c8de41311bad94bb518305099",
+      "bones": 8,
+      "growthParts": 51
+    },
+    "zombie_villager": {
+      "sourceSha256": "44d0edb5fa3896de0f7e18e6650d8f079405cc5b85c286720f314cb573d9a7de",
+      "bones": 6,
+      "growthParts": 52
+    },
+    "zombified_piglin": {
+      "sourceSha256": "b08fdc55af5fae1043d28ee4f0aab45b0e0242195be26a4ee0b663f0b8ff261f",
+      "bones": 6,
+      "growthParts": 58
+    }
+  }
+}

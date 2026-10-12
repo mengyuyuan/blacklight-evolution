@@ -10,3 +10,7 @@ src/generated/**/*.json text eol=lf
 
 # Keep the shell wrapper executable by bash on Linux CI.
 gradlew text eol=lf
+
+# Preserve the checked motion/profile bytes on Windows and Linux checkouts.
+art/motion-profile/*.json -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
+art/motion-profile/*.data -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol

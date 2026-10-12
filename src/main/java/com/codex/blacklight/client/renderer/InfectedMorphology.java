@@ -28,8 +28,13 @@ public final class InfectedMorphology implements AutoCloseable {
     private record Attachment(int anatomy,List<Box> boxes,InfectedBite wound) { }
     private record Pending(Attachment attachment,PoseStack.Pose pose,int light,int overlay,int color) { }
     private final LivingEntity proxy;
+    private final String speciesId;
+    private final AuthoredInfectionParts.Binding authored;
+    private final java.util.Set<AuthoredInfectionParts.Binding> coats=java.util.Collections.newSetFromMap(new java.util.IdentityHashMap<>());
     private final String profile;
     private final InfectedMorphology previous;
+    private final java.util.Set<AuthoredInfectionParts.Binding> coatGrowth=java.util.Collections.newSetFromMap(new java.util.IdentityHashMap<>());
+    private final Map<ResourceLocation,ResourceLocation> skins=new HashMap<>();
     private final Map<ModelPart,Attachment> attachments;
     private final Map<ModelPart,Pending> pending = new IdentityHashMap<>();
 
@@ -39,9 +44,11 @@ public final class InfectedMorphology implements AutoCloseable {
             return JsonParser.parseReader(new InputStreamReader(stream,StandardCharsets.UTF_8)).getAsJsonObject();
         }catch(Exception e){throw new IllegalStateException("Cannot load infection morphology",e);}
     }
-    public InfectedMorphology(BlacklightInfectedHost host,LivingEntity proxy,EntityModel<?> model){
+    public InfectedMorphology(BlacklightInfectedHost host,LivingEntity proxy,EntityModel<?> model,ResourceLocation nativeTexture){
         this.proxy=proxy;previous=ACTIVE.get();
-        String type=host.hostData().getString("Type");
+        String type=host.hostData().getString("Type");speciesId=type;
+        authored=AuthoredInfectionParts.bind(type,model);
+        skins.put(nativeTexture,InfectedWoundTextures.get(nativeTexture,type,authored.wounds()));
         var species=DEFINITIONS.getAsJsonObject("species");
         profile=species.has(type)?species.get(type).getAsString():switch(type){
             case "minecraft:skeleton_horse","minecraft:zombie_horse"->"equine";
@@ -52,18 +59,23 @@ public final class InfectedMorphology implements AutoCloseable {
             default->host.family().equals("air")?"winged":host.family().equals("water")?"aquatic":
                     host.humanoid()?"humanoid":host.quadruped()?"bovine":"generic";
         };
-        attachments=new IdentityHashMap<>(CACHE.computeIfAbsent(model,k->new HashMap<>()).computeIfAbsent(profile,k->bind(model,k)));
+        attachments=authored.available()?new IdentityHashMap<>():new IdentityHashMap<>(CACHE.computeIfAbsent(model,k->new HashMap<>()).computeIfAbsent(profile,k->bind(model,k)));
         ACTIVE.set(this);
     }
-    @Override public void close(){pending.clear();if(previous==null)ACTIVE.remove();else ACTIVE.set(previous);}
+    @Override public void close(){pending.clear();authored.clear();coats.forEach(AuthoredInfectionParts.Binding::clear);if(previous==null)ACTIVE.remove();else ACTIVE.set(previous);}
     /** Fur must reveal the same bite instead of covering it with an intact outer coat.
      * Only clip the copied coat; do not emit a second set of body mutations. */
     public static void copiedSkinLayer(LivingEntity entity,EntityModel<?> model,ResourceLocation texture){
         var context=ACTIVE.get();
         if(context==null||context.proxy!=entity)return;
         String path=texture.getPath();
-        if(!path.contains("sheep_fur")&&!path.contains("drowned_outer_layer")
+        if(!path.contains("sheep_fur")&&!path.contains("slime")&&!path.contains("drowned_outer_layer")
                 &&!path.contains("stray_overlay")&&!path.contains("bogged_overlay"))return;
+        if(context.authored.available()){
+            var coat=AuthoredInfectionParts.bind(context.speciesId,model,path.contains("sheep_fur"));context.coats.add(coat);
+            if(path.contains("sheep_fur")||path.contains("slime"))context.coatGrowth.add(coat);
+            context.skins.put(texture,InfectedWoundTextures.get(texture,context.speciesId,coat.wounds()));return;
+        }
         var layer=CACHE.computeIfAbsent(model,k->new HashMap<>()).computeIfAbsent(context.profile,k->bind(model,k));
         layer.forEach((part,attachment)->context.attachments.putIfAbsent(part,
                 new Attachment(attachment.anatomy,List.of(),attachment.wound)));
@@ -174,6 +186,8 @@ public final class InfectedMorphology implements AutoCloseable {
     /** Compile only selected native cubes through a local face cutter. No shared model mutation. */
     public static boolean renderWounded(ModelPart part,PoseStack.Pose pose,VertexConsumer out,int light,int overlay,int color){
         var context=ACTIVE.get();if(context==null)return false;
+        if(context.authored.renderSkin(part,pose,out,light,overlay,color))return true;
+        for(var coat:context.coats)if(coat.renderSkin(part,pose,out,light,overlay,color)){if(!context.coatGrowth.contains(coat))coat.clear();return true;}
         Attachment attachment=context.attachments.get(part);
         // Slime's translucent shell bypasses RenderLayer's copied-cutout helper.
         // Its full cuboid is still a ModelPart: open the matching recess there,
@@ -198,6 +212,8 @@ public final class InfectedMorphology implements AutoCloseable {
     /** Called inside ModelPart.compile, after its complete animated transform. */
     public static void capture(ModelPart part,PoseStack.Pose pose,int light,int overlay,int color){
         var context=ACTIVE.get();if(context==null||context.pending.containsKey(part))return;
+        context.authored.capture(part,pose,light,overlay,color);
+        for(var coat:context.coatGrowth)coat.capture(part,pose,light,overlay,color);
         Attachment attachment=context.attachments.get(part);if(attachment==null||attachment.boxes.isEmpty())return;
         PoseStack copy=new PoseStack();copy.last().pose().set(pose.pose());copy.last().normal().set(pose.normal());
         context.pending.put(part,new Pending(attachment,copy.last(),light,overlay,color));
@@ -206,13 +222,28 @@ public final class InfectedMorphology implements AutoCloseable {
      * Deferred emission avoids switching a live vanilla BufferBuilder midway
      * through its model; context never mutates the shared species skeleton. */
     public static void flush(LivingEntity entity,MultiBufferSource buffers){
-        var context=ACTIVE.get();if(context==null||context.proxy!=entity||context.pending.isEmpty())return;
+        var context=ACTIVE.get();if(context==null||context.proxy!=entity)return;
+        context.authored.flush(buffers,!context.coatGrowth.isEmpty(),false);
+        context.coatGrowth.forEach(coat->coat.flush(buffers,false,true));
+        if(context.pending.isEmpty())return;
         var out=buffers.getBuffer(TYPE);
         for(var p:context.pending.values()){
             if(out instanceof ConsumeAnatomy.Consumer consumer)consumer.anatomy(p.attachment.anatomy);
             for(var box:p.attachment.boxes)draw(box,p,out);
         }
         context.pending.clear();
+    }
+    public static RenderType skinType(RenderType type){
+        var context=ACTIVE.get();if(context==null)return type;
+        for(var entry:context.skins.entrySet()){
+            var a=entry.getKey();var b=entry.getValue();if(a.equals(b))continue;
+            if(type==RenderType.entityCutoutNoCull(a))return RenderType.entityCutoutNoCull(b);
+            if(type==RenderType.entityCutoutNoCull(a,false))return RenderType.entityCutoutNoCull(b,false);
+            if(type==RenderType.entityCutout(a))return RenderType.entityCutout(b);
+            if(type==RenderType.entityTranslucent(a))return RenderType.entityTranslucent(b);
+            if(type==RenderType.entityTranslucentCull(a))return RenderType.entityTranslucentCull(b);
+        }
+        return type;
     }
     private static final int[][] FACES={{0,3,2,1},{4,5,6,7},{1,2,6,5},{0,4,7,3},{3,7,6,2},{0,1,5,4}};
     private static final float[][] NORMALS={{0,0,-1},{0,0,1},{1,0,0},{-1,0,0},{0,1,0},{0,-1,0}};

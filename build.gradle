@@ -27,31 +27,12 @@ sourceSets.main.resources {
     exclude("src/generated/**/.cache") // datagen cache files
 }
 
-// Private inputs remain outside versioned resources. Neither current profile is
-// an approved public release; source-only also lacks required runtime motions.
-def bundledMotionDirectory = providers.gradleProperty('bundleMotionDirectory')
-def releaseProfile = bundledMotionDirectory.isPresent() ? 'local-preview' : 'source-only'
+// A normal clone includes the complete runtime profile. An explicit developer
+// directory replaces it as one profile, preserving the runtime override contract.
+def bundledMotionDirectory = providers.gradleProperty('bundleMotionDirectory').orElse('art/motion-profile')
+def releaseProfile = providers.gradleProperty('bundleMotionDirectory').isPresent() ? 'external-profile' : 'bundled'
 def releaseNotices = ['LICENSE', 'THIRD_PARTY_ASSETS.md', 'THIRD_PARTY_NOTICES.md']
-def privateMotionOutputs = [layout.buildDirectory.dir('generated/bundledMotionResources'),
-                            layout.buildDirectory.dir('resources/main/blacklight/bundled_motions'),
-                            layout.buildDirectory.dir('resources/main/assets/blacklight/textures/private_devfx')]
-// Sync's empty-source handling is not a packaging boundary. Clear both generated
-// and previously processed copies explicitly before a source-only resource build.
-def clearPrivateMotionOutputs = tasks.register('clearPrivateMotionOutputs', Delete) {
-    onlyIf { !bundledMotionDirectory.isPresent() }
-    delete privateMotionOutputs
-    doFirst {
-        def buildRoot = layout.buildDirectory.get().asFile.toPath().toAbsolutePath().normalize()
-        privateMotionOutputs.each { output ->
-            def target = output.get().asFile.toPath().toAbsolutePath().normalize()
-            if (target == buildRoot || !target.startsWith(buildRoot)) {
-                throw new GradleException("Refusing to clear private staging outside build directory: ${target}")
-            }
-        }
-    }
-}
 def stageBundledMotions = tasks.register('stageBundledMotions', Sync) {
-    dependsOn clearPrivateMotionOutputs
     into layout.buildDirectory.dir('generated/bundledMotionResources')
     if (bundledMotionDirectory.isPresent()) {
         from(bundledMotionDirectory.get()) {
@@ -66,7 +47,9 @@ def stageBundledMotions = tasks.register('stageBundledMotions', Sync) {
             ['utility_shield_deploy.json', 'utility_shield_hit.json', 'utility_shield_run.json', 'utility_shield_sprint.json', 'utility_armor_transform.json', 'utility_armor_idle.json', 'basic_idle.json', 'basic_wall_top.json', 'basic_parkour_small.json', 'combat-motion-tuning.data', 'consume-placement.data', 'receiver-poses.data', 'hunter-consume.data', 'hammer-scales.data', 'armor-growth.data', 'camera-profile.data', 'camera-events.data'].each {
                 if (!new File(profile, it).isFile()) throw new GradleException("Incomplete bundled motion profile: ${it}")
             }
-            ['dev_groundspike','dev_air_groundspike','dev_tendril','dev_air_tendril','dev_critical_pain','dev_air_critical_pain','bulletdive_drop'].each {
+            // The public baseline and the private skill extension are separate
+            // inventories. An explicit extension must include every skill clip.
+            if (releaseProfile == 'external-profile') ['dev_groundspike','dev_air_groundspike','dev_tendril','dev_air_tendril','dev_critical_pain','dev_air_critical_pain','bulletdive_drop'].each {
                 if (!new File(profile, it + '.json').isFile() || !new File(profile, it + '_charge.json').isFile())
                     throw new GradleException("Incomplete source skill profile: ${it}")
             }
@@ -75,10 +58,7 @@ def stageBundledMotions = tasks.register('stageBundledMotions', Sync) {
 }
 sourceSets.main.resources.srcDir(stageBundledMotions)
 tasks.named('processResources', ProcessResources).configure {
-    dependsOn clearPrivateMotionOutputs
     inputs.property('blacklightReleaseProfile', releaseProfile)
-    if (!bundledMotionDirectory.isPresent()) exclude 'blacklight/bundled_motions/**'
-    if (!bundledMotionDirectory.isPresent()) exclude 'assets/blacklight/textures/private_devfx/**'
 }
 
 repositories {
@@ -106,7 +86,7 @@ base {
 // Keep both version numbers in every release; never hand-name the install ZIP.
 def distributionZip = tasks.register('distributionZip', Zip) {
     group = 'distribution'
-    description = 'Packages a local-preview or source-only candidate with notices; not a public release.'
+    description = 'Packages the complete standalone candidate with bundled motions and notices.'
     archiveBaseName = base.archivesName
     archiveVersion = project.version.toString()
     archiveClassifier = releaseProfile
@@ -122,7 +102,7 @@ def distributionZip = tasks.register('distributionZip', Zip) {
 }
 tasks.named('assemble') { dependsOn(distributionZip) }
 tasks.named('assemble') {
-    description = 'Compiles and packages a candidate. Source-only lacks required runtime assets; neither profile is cleared for public release.'
+    description = 'Compiles and packages a complete standalone candidate with runtime motion data.'
 }
 
 // Mojang ships Java 21 to end users in 1.21.1, so mods should target Java 21.
@@ -136,6 +116,9 @@ if (project.hasProperty('hiveFeedingTest')) {
 if (project.hasProperty('wallTraversalTest')) {
     sourceSets.main.java.srcDir('src/traversalTest/java')
     sourceSets.main.resources.srcDir('src/traversalTest/resources')
+}
+if (project.hasProperty('standaloneInfected')) {
+    sourceSets.main.java.srcDir('src/infectedVisualTest/java')
 }
 if (project.hasProperty('standaloneVisual') || project.hasProperty('standaloneGait') || project.hasProperty('standaloneLock') || project.hasProperty('standaloneMorph') || project.hasProperty('standaloneSkill')) {
     sourceSets.main.java.srcDir('src/standaloneVisualTest/java')
@@ -152,17 +135,14 @@ tasks.named('jar', Jar).configure {
     exclude 'blacklight/bundled_motions/devastator-fx.data', 'assets/blacklight/textures/private_devfx/**'
     exclude 'assets/blacklight/shaders/core/source_biomass.*', 'com/codex/blacklight/client/renderer/DevastatorSourceMesh*.class'
     manifest.attributes('Blacklight-Build-Profile': releaseProfile,
-            'Blacklight-Private-Assets': bundledMotionDirectory.isPresent().toString(),
-            'Blacklight-Public-Release-Ready': 'false',
+            'Blacklight-Motion-Source': releaseProfile == 'bundled' ? 'repository' : 'external',
+            'Blacklight-Bundled-Motions': 'true',
             'Blacklight-Asset-Notice': 'THIRD_PARTY_ASSETS.md')
-    // Even if stale generated resources exist or tasks are skipped, source-only
-    // artifacts cannot acquire the private namespace from an earlier local build.
-    if (!bundledMotionDirectory.isPresent()) exclude 'blacklight/bundled_motions/**'
-    if (!bundledMotionDirectory.isPresent()) exclude 'assets/blacklight/textures/private_devfx/**'
     exclude 'com/codex/blacklight/gametest/**'
     exclude 'com/codex/blacklight/client/Standalone*Smoke*.class'
     exclude 'com/codex/blacklight/client/StandaloneCriticalMassChecks*.class'
     exclude 'com/codex/blacklight/client/StandaloneBulletTerrainChecks*.class'
+    exclude 'com/codex/blacklight/client/InfectedCompositionSmoke*.class'
     exclude 'data/blacklight/structure/wall_test.nbt'
 }
 
@@ -183,6 +163,10 @@ neoForge {
     runs {
         client {
             client()
+            if (project.hasProperty('standaloneInfected')) {
+                systemProperty 'blacklight.test.infectedComposition', file(project.property('standaloneInfected')).absolutePath
+                programArguments.addAll '--width', '1440', '--height', '1000'
+            }
             if (project.hasProperty('clientRunDirectory')) gameDirectory = file(project.property('clientRunDirectory'))
             if (project.hasProperty('standaloneVisual')) {
                 systemProperty 'blacklight.test.standaloneVisual', file(project.property('standaloneVisual')).absolutePath
@@ -367,12 +351,10 @@ publishing {
         }
     }
 }
-// Current candidates have unresolved asset clearance/runtime readiness. Block
-// both repository publishing and publishToMavenLocal until a reviewed public
-// release profile is deliberately implemented; ordinary assemble still works.
+// No Maven publication target has been configured for this development repo.
 tasks.withType(org.gradle.api.publish.maven.tasks.AbstractPublishToMaven).configureEach {
     doFirst {
-        throw new GradleException("Publishing is disabled for ${releaseProfile}: current candidates are not cleared for public release.")
+        throw new GradleException('Maven publication is not configured. Use the GitHub JAR/ZIP artifacts.')
     }
 }
 
@@ -410,7 +392,7 @@ tasks.register('verifyStandaloneMotionAssets', JavaExec) {
     maxHeapSize = '1G'
     doFirst {
         def archive = providers.gradleProperty('motionProbeArchive')
-        if (!archive.isPresent()) throw new GradleException('Supply -PmotionProbeArchive=<RC59 local-preview jar>')
+        if (!archive.isPresent()) throw new GradleException('Supply -PmotionProbeArchive=<standalone bundled jar>')
         args = [archive.get()]
     }
 }
@@ -440,3 +422,39 @@ tasks.register('verifyStandaloneBoundary') {
 
 // Every installable artifact must pass the independent runtime boundary.
 tasks.named('jar') { dependsOn tasks.named('verifyStandaloneBoundary') }
+
+// CI and a fresh clone must never produce another motion-less installable JAR.
+tasks.register('verifyBundledMotionResources') {
+    group = 'verification'
+    dependsOn tasks.named('jar')
+    doLast {
+        def source = file(bundledMotionDirectory.get())
+        def profile = fileTree(source).matching {
+            include '*.json', '*.data'
+            exclude 'devastator-fx.data'
+        }.files
+        if (profile.empty || !new File(source, 'basic_idle.json').isFile())
+            throw new GradleException('A complete runtime motion profile is required')
+        def manifest = releaseProfile == 'bundled'
+                ? new groovy.json.JsonSlurper().parse(file('art/motion-profile-manifest.json')).files : null
+        if (manifest != null && profile.collect { it.name }.toSet() != manifest.keySet())
+            throw new GradleException('Repository motion inventory does not match its manifest')
+        def archive = new java.util.zip.ZipFile(tasks.named('jar', Jar).get().archiveFile.get().asFile)
+        try {
+            profile.each { input ->
+                def entry = archive.getEntry("blacklight/bundled_motions/${input.name}")
+                if (entry == null) throw new GradleException("Missing bundled motion: ${input.name}")
+                def packed = archive.getInputStream(entry).withCloseable { it.readAllBytes() }
+                if (!java.util.Arrays.equals(packed, input.bytes))
+                    throw new GradleException("Bundled motion changed: ${input.name}")
+                if (manifest != null) {
+                    def hash = java.security.MessageDigest.getInstance('SHA-256').digest(packed).encodeHex().toString()
+                    if (hash != manifest[input.name].sha256)
+                        throw new GradleException("Motion manifest mismatch: ${input.name}")
+                }
+            }
+            logger.lifecycle("Verified ${profile.size()} unchanged bundled motion/profile files")
+        } finally { archive.close() }
+    }
+}
+tasks.named('assemble') { dependsOn tasks.named('verifyBundledMotionResources') }
