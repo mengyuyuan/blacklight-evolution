@@ -1,5 +1,7 @@
 ## 目标版本与分支
 
+可先运行 `python tools/version_workflow.py prepare --target 目标分支 --topic 简短主题` 自动生成平台、base 与同步清单；将生成文件替换整份正文，再填写问题和验证结果。
+
 - Minecraft / 加载器 / Java：
 - 目标 base 分支：
 - [ ] 从对应长期版本分支开发，base 正确；本 PR 的差异仅包含本次改动。
@@ -31,3 +33,7 @@
 ## 素材来源与许可（如涉及）
 
 协作流程：[多版本开发、同步与 PR 规范](https://github.com/mengyuyuan/blacklight-evolution/blob/main/docs/MULTIVERSION_WORKFLOW_ZH.md)。
+
+<!-- blacklight-sync
+{"scope":"review"}
+-->
