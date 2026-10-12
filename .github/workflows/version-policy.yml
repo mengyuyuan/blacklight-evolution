@@ -1,0 +1,43 @@
+name: Version policy
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, edited, ready_for_review, closed]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: version-policy-${{ github.event.pull_request.number }}-${{ github.event.action == 'closed' }}
+  cancel-in-progress: true
+
+jobs:
+  platform-and-sync:
+    if: github.event.action != 'closed' || github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout PR or merged version
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Check workflow helper regressions
+        run: python -m unittest discover -s tools/tests -p test_version_workflow.py -v
+
+      - name: Check target platform and generate sync record
+        run: python tools/version_workflow.py ci --event "$GITHUB_EVENT_PATH" --output version-report
+
+      - name: Upload platform and sync record
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: version-report-pr-${{ github.event.pull_request.number }}-${{ github.run_id }}
+          path: version-report/
+          if-no-files-found: ignore
+          retention-days: 30
