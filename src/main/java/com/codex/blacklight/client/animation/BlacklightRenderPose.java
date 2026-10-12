@@ -54,7 +54,7 @@ public final class BlacklightRenderPose {
     public static float facing(LivingEntity entity,float partial) {
         float body=net.minecraft.util.Mth.rotLerp(partial,entity.yBodyRotO,entity.yBodyRot);
         var weapon=entity.getData(ModAttachments.WEAPON_VISUAL);
-        float facing=NativeConsumePose.facing(entity,weapon.spec()==null?entity.getYRot():weapon.yaw());
+        float facing=NativeConsumePose.facing(entity,weapon.spec()==null?entity.getYRot():weapon.yaw(),partial);
         if(entity instanceof net.minecraft.client.player.AbstractClientPlayer player) {
             Float movement=com.codex.blacklight.client.PrototypeAnimationController.movementFacing(player,partial);
             var morph=player.getData(ModAttachments.POWER_MORPH);

@@ -31,5 +31,10 @@ public final class GrappleMotion {
     public static float sceneProgress(LivingEntity entity,ConsumeVisual visual,float partial){
         return active(visual)?progress(owner(entity,visual),visual,partial):visual.motionProgress(entity.level().getGameTime(),partial);
     }
-    public static float facing(LivingEntity entity,ConsumeVisual visual){return active(visual)?owner(entity,visual).getYRot():visual.facing();}
+    public static float facing(LivingEntity entity,ConsumeVisual visual){return facing(entity,visual,1);}
+    public static float facing(LivingEntity entity,ConsumeVisual visual,float partial){
+        if(!active(visual))return visual.facing();
+        var carrier=owner(entity,visual);
+        return net.minecraft.util.Mth.rotLerp(partial,carrier.yRotO,carrier.getYRot());
+    }
 }
