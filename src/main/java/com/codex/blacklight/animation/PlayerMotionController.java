@@ -384,6 +384,7 @@ public final class PlayerMotionController {
         lastRootTick = packet.gameTime(); lastRootRevision = packet.revision();
         // Keep previous-tick coordinates for render interpolation and preserve the player's freely moving view.
         player.setPos(packet.x(), packet.y(), packet.z());
+        com.codex.blacklight.client.ClientDevastatorMovement.acceptRoot(player);
     }
     @SubscribeEvent(priority=net.neoforged.bus.api.EventPriority.LOWEST)
     public static void tick(ClientTickEvent.Post event) {

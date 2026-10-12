@@ -23,12 +23,13 @@ class AuthoredGpuTransformsTest {
                 var model=entry.getValue().getAsJsonObject();var p=model.getAsJsonArray("positions");var n=model.getAsJsonArray("normals");
                 for(double growth:new double[]{0,.005,.2,.67,1})for(float yaw:new float[]{-2.1F,0,1.7F}){
                     var base=new Vec3(40.5,67.2,-16.75);double size=.73;
-                    var pose=AuthoredDevastatorMesh.rigidPose(stack,base,yaw,growth,size);
-                    var normal=AuthoredDevastatorMesh.rigidNormal(stack,yaw,growth);
-                    double vertical=Math.max(.001,growth),horizontal=Math.sqrt(vertical),c=Math.cos(yaw),s=Math.sin(yaw);
+                    float top=model.getAsJsonObject("bounds").getAsJsonArray("max").get(1).getAsFloat();
+                    var pose=AuthoredDevastatorMesh.rigidPose(stack,base,yaw,growth,size,top);
+                    var normal=AuthoredDevastatorMesh.rigidNormal(stack,yaw);
+                    double underground=(1-growth)*top*size,c=Math.cos(yaw),s=Math.sin(yaw);
                     for(int i=0;i<p.size();i+=3){
                         var local=new Vector3f(p.get(i).getAsFloat(),p.get(i+1).getAsFloat(),p.get(i+2).getAsFloat());
-                        double x=local.x*size*horizontal,y=local.y*size*vertical,z=local.z*size*horizontal;
+                        double x=local.x*size,y=local.y*size-underground,z=local.z*size;
                         // Independent former CPU consumer, including its Y-up
                         // yaw sign and root translation before the world pose.
                         var expected=new Vector3f((float)(base.x+x*c-z*s),(float)(base.y+y),(float)(base.z+x*s+z*c));
@@ -37,7 +38,7 @@ class AuthoredGpuTransformsTest {
                         assertEquals(expected.x,actual.x,2e-5,entry.getKey()+" x");
                         assertEquals(expected.y,actual.y,2e-5,entry.getKey()+" y");
                         assertEquals(expected.z,actual.z,2e-5,entry.getKey()+" z");
-                        double nx=n.get(i).getAsDouble()/horizontal,ny=n.get(i+1).getAsDouble()/vertical,nz=n.get(i+2).getAsDouble()/horizontal;
+                        double nx=n.get(i).getAsDouble(),ny=n.get(i+1).getAsDouble(),nz=n.get(i+2).getAsDouble();
                         var expectedNormal=new Vector3f((float)(nx*c-nz*s),(float)ny,(float)(nx*s+nz*c)).normalize();
                         stack.last().normal().transform(expectedNormal).normalize();
                         var actualNormal=normal.transform(new Vector3f(n.get(i).getAsFloat(),n.get(i+1).getAsFloat(),n.get(i+2).getAsFloat())).normalize();

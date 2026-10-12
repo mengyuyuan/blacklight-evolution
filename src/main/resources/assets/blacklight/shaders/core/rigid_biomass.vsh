@@ -29,6 +29,7 @@ uniform vec3 Light1_Direction;
 
 out float vertexDistance;
 out float wetness;
+out vec2 texCoord;
 out vec4 vertexColor;
 out vec4 lightMapColor;
 out vec4 overlayColor;
@@ -71,7 +72,8 @@ void main() {
                                      vec4(Color.rgb, Color.a * InstanceAlpha));
     lightMapColor = texelFetch(Sampler2, ivec2(InstanceLight) / 16, 0);
     overlayColor = texelFetch(Sampler1, UV1, 0);
-    wetness = clamp(UV0.x, 0.0, 1.0);
+    wetness = 0.72;
+    texCoord = UV0;
     viewPosition = position.xyz;
     mat3 viewRotation = mat3(ModelViewMat);
     viewNormal = viewRotation * normal;

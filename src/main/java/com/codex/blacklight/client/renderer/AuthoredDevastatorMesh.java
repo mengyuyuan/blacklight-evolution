@@ -49,7 +49,7 @@ public final class AuthoredDevastatorMesh {
                     for(int index:indices)if(index<0||index>=p.length/3)throw new IllegalStateException("Model index outside vertices");
                     var bounds=m.getAsJsonObject("bounds");
                     result.put(entry.getKey(),new Mesh(p,n,uv,indices,array(bounds.getAsJsonArray("min")),array(bounds.getAsJsonArray("max")),
-                            1,ConsumedMobVisuals.WHITE,colors,new float[p.length*2]));
+                            1,m.has("textureName")?ResourceLocation.parse(m.get("textureName").getAsString()):ConsumedMobVisuals.WHITE,colors,new float[p.length*2]));
                 }
             }catch(java.io.IOException error){throw new IllegalStateException("Cannot read authored model "+resource,error);}
         }
@@ -92,23 +92,24 @@ public final class AuthoredDevastatorMesh {
             // The sculpted positions, normals and colors stay on the GPU. Only
             // an instance transform and lighting change during growth/retraction.
             var buffer=RIGID_BUFFERS.computeIfAbsent(id,key->uploadRigid(m));
-            RIGID_DRAWS.add(new RigidDraw(buffer,m.texture,rigidPose(stack,base,yaw,growth,m.scale*size),
-                    rigidNormal(stack,yaw,growth),light,alpha,null));
+            RIGID_DRAWS.add(new RigidDraw(buffer,m.texture,rigidPose(stack,base,yaw,growth,m.scale*size,m.max[1]),
+                    rigidNormal(stack,yaw),light,alpha,null));
             return m.indices.length;
         }
-        var material=LiquidBiomassMaterial.mesh(m.texture);
+        var material=net.minecraft.client.renderer.RenderType.entityCutoutNoCull(m.texture);
         var out=buffers.getBuffer(material);double sine=Math.sin(yaw),cosine=Math.cos(yaw);
         double scale=m.scale*size;
-        // Grow the real irregular silhouette from its root; retain X/Z width.
-        double vertical=Math.max(.001,growth),horizontal=Math.sqrt(Math.max(.001,growth));
+        // Source GroundSpikeClusterDescendTrack translates whole cuboids back
+        // underground. Their dimensions/normals stay intact during emergence.
+        double underground=(1-Math.clamp(growth,0,1))*m.max[1]*scale;
         for(int face=0;face<m.indices.length;face+=3)for(int corner=0;corner<4;corner++){
             int index=m.indices[face+Math.min(corner,2)],p=index*3,u=index*2;
-            double x=m.p[p]*scale*horizontal,z=m.p[p+2]*scale*horizontal;
-            double y=m.p[p+1]*scale*vertical;
-            double nx=m.n[p]/horizontal,nz=m.n[p+2]/horizontal,ny=m.n[p+1]/vertical;
+            double x=m.p[p]*scale,z=m.p[p+2]*scale;
+            double y=m.p[p+1]*scale-underground;
+            double nx=m.n[p],nz=m.n[p+2],ny=m.n[p+1];
             double len=Math.sqrt(nx*nx+ny*ny+nz*nz);
             out.addVertex(stack.last(),(float)(base.x+x*cosine-z*sine),(float)(base.y+y),(float)(base.z+x*sine+z*cosine))
-                    .setColor((alpha<<24)|(m.colors[index]&0xFFFFFF)).setUv(.8F,.5F).setOverlay(OverlayTexture.NO_OVERLAY).setLight(light)
+                    .setColor((alpha<<24)|(m.colors[index]&0xFFFFFF)).setUv(m.uv[u],m.uv[u+1]).setOverlay(OverlayTexture.NO_OVERLAY).setLight(light)
                     .setNormal(stack.last(),(float)((nx*cosine-nz*sine)/len),(float)(ny/len),(float)((nx*sine+nz*cosine)/len));
         }
         return m.indices.length/3*4;
@@ -127,7 +128,7 @@ public final class AuthoredDevastatorMesh {
             for(int index=0;index<vertices;index++){
                 int p=index*3;
                 out.addVertex(mesh.p[p],mesh.p[p+1],mesh.p[p+2],0xFF000000|(mesh.colors[index]&0xFFFFFF),
-                        .8F,.5F,OverlayTexture.NO_OVERLAY,0,mesh.n[p],mesh.n[p+1],mesh.n[p+2]);
+                        mesh.uv[index*2],mesh.uv[index*2+1],OverlayTexture.NO_OVERLAY,0,mesh.n[p],mesh.n[p+1],mesh.n[p+2]);
             }
             // The full-format addVertex writes all attributes immediately. Use
             // its bytes with the authored index count instead of sequential
@@ -150,16 +151,14 @@ public final class AuthoredDevastatorMesh {
         finally{VertexBuffer.unbind();}
     }
     // Package-visible for differential tests against the previous CPU path.
-    static Matrix4f rigidPose(PoseStack stack,Vec3 base,float yaw,double growth,double size){
-        double vertical=Math.max(.001,growth),horizontal=Math.sqrt(vertical);
+    static Matrix4f rigidPose(PoseStack stack,Vec3 base,float yaw,double growth,double size,float top){
+        double underground=(1-Math.clamp(growth,0,1))*top*size;
         // JOML's Y rotation has the opposite sign to the authored X/Z convention.
-        return new Matrix4f(stack.last().pose()).translate((float)base.x,(float)base.y,(float)base.z)
-                .rotateY(-yaw).scale((float)(size*horizontal),(float)(size*vertical),(float)(size*horizontal));
+        return new Matrix4f(stack.last().pose()).translate((float)base.x,(float)(base.y-underground),(float)base.z)
+                .rotateY(-yaw).scale((float)size);
     }
-    static Matrix3f rigidNormal(PoseStack stack,float yaw,double growth){
-        double vertical=Math.max(.001,growth),horizontal=Math.sqrt(vertical);
-        return new Matrix3f(stack.last().normal()).rotateY(-yaw)
-                .scale((float)(1/horizontal),(float)(1/vertical),(float)(1/horizontal));
+    static Matrix3f rigidNormal(PoseStack stack,float yaw){
+        return new Matrix3f(stack.last().normal()).rotateY(-yaw);
     }
     static void clearRigidBuffers(){
         if(!RenderSystem.isOnRenderThread()){

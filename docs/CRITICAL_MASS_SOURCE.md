@@ -1,6 +1,16 @@
 <!-- Current runtime decision: reference-based authored models, no original FX meshes/textures. -->
 # 临界质量、毁灭技与 Bulletdive 的本地源依据
 
+## dev.9 当前实现及历史记录范围
+
+本轮进一步读取了原 DLL 健康回调、直接碰撞的完整字段及具名 FX 轨道。当前实现以 [伤害和临界回调依据](DEVASTATOR_DAMAGE_RESEARCH.md)、[身体恢复和空间扭曲依据](DEVASTATOR_EFFECT_SOURCE.md)、[俯冲方块算法](BULLETDIVE_ALGORITHM.md) 为准。以下保留 dev.7 的研究过程；其中“满一份储量”“巨型有机地刺”“高度 512/半径 12/深度 10/数量 4096 截断”等描述已经由 dev.9 取代。
+
+dev.9 使用任意正临界储量许可，在控制轨道启动时支付完整一招花费；蓝血不足扣红血，退出临界另收半次花费损失。墓地地刺复用既有爪子 `ground_spike.geo.json` 和 `claw_biomass.png`，为方块式结构，地上最高 1.8–3.4 格，按独立实例时钟平移收回地面。组织回收、真实身体收招、目标伤害和场景扭曲分开计时，身体结束后视觉尾迹不再锁定动作和移动。
+
+子弹俯冲实际速度持续加速，真实落差、伤害与破坏能量不沿用旧硬上限；只对每 tick 工作量、已加载区块及真实世界边界设处理范围。完整本机 profile 为 `motion-profile-dev9` 的 251 个运行资料（原 224、20 个技能和瞄准资料、7 个独立恢复资料）；研究 FX 文件仍不进入 JAR。
+
+主目标在控制开始时一次选择并同步接触计划，画面不能每帧另挑敌人。主目标与各直接碰撞轨道分开记账，分别每目标一次；Pain 生物使用伸长胶囊，静态碰撞的 sibling 不能再对同一生物加一次伤害。原通用 sequencer 的目标绝对时钟、各 receiver 的最后生命结算和若干原生回收回调未全部还原，当前调度和 Minecraft 单位换算明确属于适配，不宣称完整原引擎复刻。
+
 核查日期：2026-10-12 至 2026-10-13。对象为用户本机 2009 年《Prototype》的 Alex Mercer。使用现有私有解包文件和原游戏只读数据，不以普通砸地、普通拍掌、普通 Critical Pain 的现有 Mod 动作充当正式毁灭技。
 
 原始身体曲线与派生 MATRIX 动作继续保存在仓库外。公开的 `tools/export_devastator_motions.py` 只包含可编辑的导出逻辑、资源名称、FIG 节点编号和时序元信息，没有原版网格、纹理或关键帧数组。程序化组织特效与 Minecraft 的伤害、目标筛选和移动物理分别实现，不能称为完整原引擎移植。

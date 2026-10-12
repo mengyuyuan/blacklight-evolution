@@ -8,6 +8,7 @@ not invent spike/tendril geometry or copy an original shader implementation.
 from __future__ import annotations
 
 import argparse
+import importlib.util
 from dataclasses import dataclass
 import hashlib
 import io
@@ -289,16 +290,109 @@ def export_mesh(node, mesh_id, shader_map, rigs):
                 sourceScale=WORLD_SCALE, primitiveCount=primitive_count)
 
 
+def audit_effect_events(private_source, parser_path, track_definitions, game_art=None):
+    """Audit fixed FIG fields against the supplied primary C# serialization.
+
+    The Effect record is deliberately decoded only through CloneTint. Its
+    particle biases, original material program and callback code are not implied
+    by this prefix. No animation curves, meshes or texture bytes are emitted.
+    """
+    spec=importlib.util.spec_from_file_location("reviewed_fig_audit",parser_path)
+    audit=importlib.util.module_from_spec(spec);spec.loader.exec_module(audit)
+    reader,fig=audit.load_parser()
+    blocks=audit.blocks_from_file(reader,private_source/"startup_fig.p3d")
+    blocks.update(audit.blocks_from_file(reader,private_source/"alex_fig.p3d"))
+    vocabulary="store bank node tracks conditions ground_spike devastator devastator_cluster_shard charge ground_pound sonic_clap critical critical_pain attack retract effects target random small mid large start extend hold stop return abort transition_to_idle antic finish upper_hold arms_hold skydive cycle charged default"
+    names={fig.hash64(n.encode()):n for n in vocabulary.split()}
+    for blob in blocks.values():
+        for match in re.finditer(rb"[A-Za-z_][A-Za-z_0-9./\\ -]{2,200}",blob):
+            value=match.group().decode("ascii")
+            for name in (value,*value.replace("\\","/").split("/")):
+                if name:names.setdefault(fig.hash64(name.encode()),name)
+    if game_art:
+        # Names are proven by hash equality, not proximity in a binary file.
+        raw=decompress(game_art/"startup_effects.p3d.rz")
+        for match in re.finditer(rb"[A-Za-z_][A-Za-z0-9_./\\ ]{3,180}",raw):
+            value=match.group()
+            for name in (value,*value.split(b"/")):
+                names.setdefault(fig.hash64(name),name.decode("ascii"))
+    hashes={n:int(v) for n,v in re.findall(r"(\w+) = (\d+)UL",(track_definitions/"TrackHash.cs").read_text())}
+    definitions={}
+    for name in ("RadialBlur","PunchinCamera","CameraShakeRequest","DramaticCamera","AbortEffect","Effect","Tendril","GroundSpikeClusterDescend","GroundSpikeSpawnCluster"):
+        cs=track_definitions/"Prototype1"/"Track"/(name+"Track.cs")
+        text=cs.read_text();tag=re.search(r"KnownTrack\(([^)]+)\)",text).group(1)
+        key=int(tag[:-2]) if tag.endswith("UL") else hashes[tag.split(".")[1]]
+        definitions[key]=(name,text)
+        for enum,number in re.findall(r"(\w+) = (\d+)UL",text):names.setdefault(int(number),enum)
+    def decode(name,text,raw):
+        section=text.split("public override void Serialize(Stream output, Endian endianess)")[1].split("public override")[0]
+        cursor=4;values={}
+        for line in section.splitlines():
+            scalar=re.search(r"WriteValue([USFB]\d+)\(this\.(\w+)",line)
+            enum=re.search(r"SerializePropertyEnum[^\n]+this\.(\w+)",line)
+            vector=re.search(r"this\.(\w+)\.Serialize\(",line)
+            aligned_string=re.search(r"WriteStringAlignedU32\(this\.(\w+)",line)
+            if scalar or enum:
+                kind,field=scalar.groups() if scalar else ("U64",enum.group(1))
+                fmt={"U64":"Q","S32":"i","U32":"I","F32":"f","B32":"I"}[kind]
+                value=struct.unpack_from("<"+fmt,raw,cursor)[0];cursor+=struct.calcsize(fmt)
+                if kind=="U64":value=dict(hash=f"0x{value:016x}",name=names.get(value))
+                if kind=="F32" and not math.isfinite(value):raise ValueError("Non-finite source event field")
+                values[field]=value
+            elif vector:
+                field=vector.group(1);count=4 if field=="CloneTint" else 3
+                values[field]=struct.unpack_from("<"+"f"*count,raw,cursor);cursor+=count*4
+            elif aligned_string:
+                field=aligned_string.group(1);size=struct.unpack_from("<I",raw,cursor)[0];cursor+=4
+                values[field]=raw[cursor:cursor+size].rstrip(b"\0").decode("ascii");cursor+=(size+3)//4*4
+            elif "output.WriteBytes" in line:break
+        if cursor!=len(raw) and name!="Effect":raise ValueError(f"{name}: unsupported payload boundary")
+        values.update(decodedBytes=cursor,payloadBytes=len(raw))
+        return values
+    structural={fig.hash64(n.encode()) for n in ("store","bank","node")}
+    rows=[]
+    def visit(block,blob,nodes,path):
+        for node in nodes:
+            owner=node.key in structural and node.size>=8
+            key=struct.unpack_from("<Q",blob,node.voff)[0] if owner else 0
+            here=path+[dict(offset=node.off,name=names.get(key,f"0x{key:016x}"))] if owner else path
+            if node.key in definitions:
+                name,text=definitions[node.key]
+                rows.append(dict(block=block,ownerPath=here,offset=node.off,track=name,
+                                 fields=decode(name,text,blob[node.voff:node.voff+node.size])))
+            visit(block,blob,node.children,here)
+    for block,blob in blocks.items():visit(block,blob,fig._parse_blob(blob),[])
+    return dict(schema="blacklight-private-fig-effect-audit/v1",tracks=rows,
+                sourceSha256={name:hashlib.sha256(blob).hexdigest() for name,blob in blocks.items()},
+                boundary="Owner-local fields only. No sequencer arbitration, original shader, particle lifetime callback or negative-sentinel semantics inferred.")
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--game-art", required=True, type=Path)
-    parser.add_argument("--output", required=True, type=Path)
+    parser.add_argument("--game-art", type=Path)
+    parser.add_argument("--output", type=Path)
     parser.add_argument("--audit-output", required=True, type=Path)
+    parser.add_argument("--fig-audit-only", action="store_true", help="Read event fields without exporting geometry/textures")
+    parser.add_argument("--private-source", type=Path)
+    parser.add_argument("--fig-parser", type=Path, help="Reviewed audit_weapon_fig.py pure-parser wrapper")
+    parser.add_argument("--track-definitions", type=Path, help="Nixson.Prototype.Fight directory containing TrackHash.cs")
     args = parser.parse_args()
     repository = Path(__file__).resolve().parents[1]
     for destination in (args.output, args.audit_output):
+        if destination is None:continue
         if destination.resolve().is_relative_to(repository):
             raise ValueError("Private derived geometry/textures cannot be exported inside the public repository")
+    if args.fig_audit_only:
+        if not all((args.private_source,args.fig_parser,args.track_definitions)):
+            parser.error("FIG audit requires --private-source, --fig-parser and --track-definitions")
+        args.audit_output.mkdir(parents=True,exist_ok=True)
+        report=audit_effect_events(args.private_source,args.fig_parser,args.track_definitions,args.game_art)
+        target=args.audit_output/"devastator-effect-events_PRIVATE.json"
+        target.write_text(json.dumps(report,indent=2,allow_nan=False),encoding="utf8")
+        print("Audited",len(report["tracks"]),"event records; no geometry/textures exported:",target)
+        return
+    if args.game_art is None or args.output is None:
+        parser.error("Geometry export requires --game-art and --output")
     args.output.mkdir(parents=True, exist_ok=True)
     args.audit_output.mkdir(parents=True, exist_ok=True)
     result = dict(version=1, worldScale=WORLD_SCALE, coordinateSystem="source_Y_up",

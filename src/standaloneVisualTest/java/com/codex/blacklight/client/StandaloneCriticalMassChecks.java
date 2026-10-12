@@ -22,6 +22,7 @@ import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.entity.living.LivingHealEvent;
 import net.neoforged.neoforge.event.entity.living.LivingDamageEvent;
+import net.neoforged.neoforge.event.entity.living.LivingDeathEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.tick.PlayerTickEvent;
 
@@ -115,6 +116,27 @@ public final class StandaloneCriticalMassChecks {
             near(mass().reserve(),before,"canceled healing created reserve");
             record("canceled_consume_heal_does_not_create_reserve");
 
+            p.setData(ModAttachments.CRITICAL_MASS,new CriticalMassState(.001F,true));p.setHealth(maximum);
+            require(CriticalMassSystem.ready(p)&&CriticalMassSystem.spend(p),"tiny positive reserve did not permit a formal release");
+            near(mass().reserve(),0,"tiny release retained depleted reserve");
+            near(p.getHealth(),maximum-maximum*.25F*1.499F,"tiny release did not charge red health shortfall and source exit loss");
+            float afterSpend=p.getHealth();
+            require(!CriticalMassSystem.spend(p),"zero reserve allowed another release");
+            near(p.getHealth(),afterSpend,"rejected zero-reserve release charged health again");
+            record("positive_reserve_release_charges_shortfall_and_exit_once");
+
+            p.setData(ModAttachments.CRITICAL_MASS,new CriticalMassState(1,true));p.setHealth(maximum);
+            require(CriticalMassSystem.spend(p),"exact-cost release was rejected");
+            near(p.getHealth(),maximum*.875F,"exact-cost release omitted source exit loss");
+            require(mass().reserve()==0,"exact-cost release kept reserve");
+            record("exact_cost_release_charges_exit_loss");
+
+            p.setData(ModAttachments.CRITICAL_MASS,new CriticalMassState(1.25F,true));p.setHealth(maximum);
+            require(CriticalMassSystem.spend(p),"greater-than-cost release was rejected");
+            near(p.getHealth(),maximum,"non-exiting release charged red health");
+            near(mass().reserve(),.25F,"non-exiting release did not subtract exactly one cost");
+            record("above_cost_release_keeps_red_health_and_positive_remainder");
+
             p.setData(ModAttachments.CRITICAL_MASS,new CriticalMassState(1,true));
             p.setHealth(maximum*.75F);float health=p.getHealth();
             hurt(.2F);
@@ -125,8 +147,8 @@ public final class StandaloneCriticalMassChecks {
             p.setData(ModAttachments.CRITICAL_MASS,new CriticalMassState(.1F,true));p.setHealth(maximum*.75F);
             health=p.getHealth();hurt(maximum*.05F/units);
             require(mass().reserve()==0,"overflow damage retained depleted reserve");
-            near(p.getHealth(),health-maximum*.025F,"reserve overflow removed more than the health remainder");
-            record("reserve_overflow_only_reduces_health_by_remainder");
+            near(p.getHealth(),health-maximum*.15F,"reserve overflow omitted health remainder or source exit loss");
+            record("damage_crossing_reserve_charges_remainder_and_exit_loss");
 
             p.setData(ModAttachments.CRITICAL_MASS,new CriticalMassState(1,true));
             p.getAttribute(Attributes.MAX_ABSORPTION).setBaseValue(Math.max(originalAbsorptionBase,2/units));
@@ -144,7 +166,21 @@ public final class StandaloneCriticalMassChecks {
             near(mass().reserve(),1,"late zero-damage decision consumed reserve");
             record("late_pre_zero_damage_does_not_consume_reserve");
 
+            final int[] costDeaths={0};
+            Consumer<LivingDeathEvent> observeCostDeath=e->{if(e.getEntity()==p)costDeaths[0]++;};
+            NeoForge.EVENT_BUS.addListener(EventPriority.LOWEST,true,LivingDeathEvent.class,observeCostDeath);
+            try {
+                p.setData(ModAttachments.CRITICAL_MASS,new CriticalMassState(.001F,true));
+                p.setData(ModAttachments.ADRENALINE,AdrenalineState.EMPTY);p.setHealth(maximum*.1F);
+                require(CriticalMassSystem.spend(p),"lethal resource subtraction was rejected");
+                require(costDeaths[0]==1,"lethal resource subtraction bypassed or duplicated the real death event");
+                require(p.isAlive()&&adrenaline().active(now()),"lethal resource subtraction did not follow the Minecraft Adrenaline death policy");
+                require(mass().reserve()==0,"lethal resource subtraction retained Critical Mass");
+                record("lethal_cost_dispatches_death_event_and_adapted_adrenaline_policy");
+            } finally { NeoForge.EVENT_BUS.unregister(observeCostDeath); }
+
             p.setData(ModAttachments.CRITICAL_MASS,CriticalMassState.EMPTY);
+            p.setData(ModAttachments.ADRENALINE,AdrenalineState.EMPTY);
             triggerSurge();surgeStarted=now();
             require(p.isAlive()&&adrenaline().active(now()),"lethal damage did not trigger Adrenaline");
             require(adrenaline().undamageableUntil()-now()==36,"source 1.8-second grace is not 36 ticks");
@@ -167,7 +203,7 @@ public final class StandaloneCriticalMassChecks {
                 require(!CriticalMassSystem.spend(p),"one Adrenaline opportunity allowed two free releases");
                 record("free_release_is_single_use");
 
-                p.setData(ModAttachments.CRITICAL_MASS,new CriticalMassState(1,false,firstRelease));
+                p.setData(ModAttachments.CRITICAL_MASS,new CriticalMassState(1,false,firstRelease));p.setHealth(p.getMaxHealth());
                 require(CriticalMassSystem.spend(p),"Adrenaline interval blocked an ordinary Critical Mass release");
                 require(mass().reserve()==0&&mass().lastAdrenalineDevastatorAt()==firstRelease,"reserve release altered the free-release interval");
                 record("adrenaline_interval_does_not_block_reserve_release");

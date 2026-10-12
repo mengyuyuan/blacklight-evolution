@@ -23,6 +23,11 @@ public record DevastatorTiming(float effectStart,float effectEnd,float damageSta
         damageStart=value(f,"damageStart",damageStart);
         float damageEnd=value(f,"damageEnd",end);
         float targetStart=value(f,"targetBeginStart",damageStart),targetStop=value(f,"targetBeginStop",damageStart+.666667F);
+        // MC schedules selected target wrappers relative to controller start.
+        // Native wrapper+0x10 stores AttackBegin, but its inherited sequencer
+        // epoch is not fully decoded: this .433333 offset is an explicit clock
+        // bridge, not a claim that the original scheduler necessarily adds it.
+        if(kind==1){targetStart+=.433333F;targetStop+=.433333F;}
         // Bullet's zero fields are undecoded source sentinels, not zero damage.
         // These three values are explicitly Minecraft tuning until decoded.
         float sourceRadius=value(f,"radiusSource",radiusSource), sourceDamage=value(f,"damageSource",damageSource);

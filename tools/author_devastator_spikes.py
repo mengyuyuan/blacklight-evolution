@@ -250,6 +250,10 @@ def main():
     parser.add_argument("--output", type=Path, default=REPOSITORY / "src/main/resources/assets/blacklight/models/devastators/spikes.json")
     parser.add_argument("--obj-output", type=Path, default=REPOSITORY / "art/devastators")
     args = parser.parse_args(); recipe = json.loads(args.recipe.read_text(encoding="utf-8"))
+    if recipe['format'] == 'blacklight-shared-claw-cuboids-v1':
+        from author_block_spikes import generate
+        generate(args, recipe)
+        return
     result = dict(version=1, coordinateSystem="world_Y_up", worldScale=1, authored=True,
                   provenance=recipe["provenance"], meshes={})
     args.output.parent.mkdir(parents=True, exist_ok=True); args.obj_output.mkdir(parents=True, exist_ok=True)

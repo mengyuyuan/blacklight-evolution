@@ -1,6 +1,6 @@
 {
   "vertex": "blacklight:rigid_biomass",
-  "fragment": "blacklight:liquid_biomass",
+  "fragment": "blacklight:rigid_biomass",
   "samplers": [
     { "name": "Sampler0" },
     { "name": "Sampler1" },

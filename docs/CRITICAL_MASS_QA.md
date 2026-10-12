@@ -1,5 +1,7 @@
 # 毁灭技、临界质量与落地冲击验证
 
+> 本文保留的是 **dev.7 / 244 文件**的历史结果，包含当时的储量门槛和有界俯冲实现，不能作为 dev.9 的验收。dev.9 的 251 文件资料、任意正蓝储量许可、退出损耗、独立回收、场景后处理、持续加速与流式地形结果见 [本轮验证](DEVASTATOR_DEV9_QA.md)。
+
 核查日期：2026-10-13。以下证据来自本机 Minecraft 1.21.1 / NeoForge 单人集成服务器，使用专用 `Blacklight Standalone QA v4` 存档。最终报告 `complete=true`、`passed=true`、`violations=[]`，完成 13 个案例、13,911 个原生渲染帧和 49 张实际 framebuffer PNG。
 
 原始报告与截图：`D:/Blacklight-Standalone/skills-dev7-final-gpu-v3/native-skills-report.json` 及同目录 PNG。本文只记录验证汇总，不包含私有原版曲线、网格或纹理数据。

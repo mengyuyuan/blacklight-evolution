@@ -48,7 +48,19 @@ public final class CriticalMassSystem {
             publish(p, adrenaline.spend());
             publish(p, mass.adrenalineSpent(now));
         }
-        else publish(p, p.getData(ModAttachments.CRITICAL_MASS).spend());
+        else {
+            var spent=mass.spend(p.getMaxHealth());
+            // This is a resource subtraction, not an incoming weapon hit: armor,
+            // golden hearts and invulnerability must not erase the native cost.
+            publish(p,spent.state());
+            if(spent.healthLoss()>0) {
+                p.setHealth(Math.max(0,p.getHealth()-spent.healthLoss()));
+                // ServerPlayer.die dispatches the real NeoForge death event. A
+                // lethal resource cost follows normal death/our Adrenaline policy
+                // instead of leaving a zero-health player without a death event.
+                if(p.isDeadOrDying())p.die(p.damageSources().generic());
+            }
+        }
         return true;
     }
     /** Amount is in the old healing units; CombatScale converts LivingHealEvent exactly once. */

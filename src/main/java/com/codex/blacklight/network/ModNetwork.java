@@ -19,7 +19,7 @@ public final class ModNetwork {
     }
 
     public static void register(RegisterPayloadHandlersEvent event) {
-        event.registrar("standalone-3")
+        event.registrar("standalone-4")
                 .playToClient(NativeRootMotionPayload.TYPE, NativeRootMotionPayload.STREAM_CODEC, (payload, context) ->
                     context.enqueueWork(() -> com.codex.blacklight.animation.PlayerMotionController.acceptRootMotion(payload)))
                 .playToServer(DisguiseTogglePayload.TYPE,DisguiseTogglePayload.CODEC,(payload,context)->

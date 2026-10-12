@@ -27,6 +27,7 @@ public final class BlacklightPlayerModel extends PlayerModel<AbstractClientPlaye
     private Matrix4f[] skinMatrices;
     private Matrix3f[] skinNormals;
     private boolean rightBiological,leftBiological;
+    private AbstractClientPlayer renderedPlayer;
     public BlacklightPlayerModel(ModelPart root, boolean slim) {
         super(root, slim);
         var skeleton = PlayerMotionController.skeleton();
@@ -55,6 +56,7 @@ public final class BlacklightPlayerModel extends PlayerModel<AbstractClientPlaye
         add(lower,visible,x,y,z,w,h,d,u,v,h/2,h,inflation,anatomy);
     }
     @Override public void setupAnim(AbstractClientPlayer player,float swing,float amount,float age,float yaw,float pitch) {
+        renderedPlayer=player;
         super.setupAnim(player,swing,amount,age,yaw,pitch);
         float partial=Minecraft.getInstance().getTimer().getGameTimeDeltaPartialTick(false);
         matrices=PlayerMotionController.skeleton().getPoseMatrices(BlacklightRenderPose.sample(player,partial));
@@ -107,6 +109,8 @@ public final class BlacklightPlayerModel extends PlayerModel<AbstractClientPlaye
         }
         stack.pushPose();BlacklightBoneRendering.skeletonFrame(stack);
         try {
+            if(renderedPlayer!=null&&renderedPlayer.getData(com.codex.blacklight.registry.ModAttachments.DEVASTATOR_VISUAL).kind()>=0)
+                com.codex.blacklight.client.renderer.DevastatorEffectRenderer.captureBody(renderedPlayer,stack,matrices);
             for(var piece:pieces) {
                 SkinPiece drawn=piece;
                 if(!piece.visibility.visible) {

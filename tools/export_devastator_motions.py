@@ -169,6 +169,44 @@ def recipes():
                                                "Radius/damage/count 0 mark unknown controller values and must not be interpreted as original zero damage."])))
     configs.append(dict(id="bulletdive_drop_land", stages=land, visualOnly=True))
     configs.append(dict(id="bulletdive_drop_flight", stages=flight[1:], visualOnly=True))
+    # Effect teardown and body recovery use independent clocks. Metadata retains
+    # the original hit/controller lease; a later visual return must not prolong
+    # damage. Negative native reverse sentinels are never converted to seconds.
+    recoveries = []
+    for cfg in configs:
+        if cfg.get("visualOnly") or "_aim_" in cfg["id"]:
+            continue
+        body = cfg["stages"]
+        if cfg["kind"] == "bulletdive":
+            recovery = land
+            recovery_first = cfg["landing"]["impactTime"]
+        else:
+            count = 2 if cfg["kind"] in ("groundspike", "tendril") and not (cfg["kind"] == "tendril" and cfg["air"]) else 1
+            recovery = body[-count:]
+            recovery_first = sum(s["seconds"] for s in body[:-count])
+        extra = cfg["devastator"]
+        extra.update(recoveryStart=recovery_first-cfg["releaseTime"],
+                     recoveryEnd=sum(s["seconds"] for s in body)-cfg["releaseTime"],
+                     recoveryAnimation=cfg["id"]+"_recovery",
+                     recoverySourceConfirmed=not (cfg["kind"] == "tendril" and cfg["air"]))
+        if cfg["kind"] == "tendril":
+            attack = extra["effectStart"]-.4
+            extra.update(attackStart=attack, retractStart=attack+7/3,
+                         retractEnd=attack+10/3, reverseVelocitySource=350,
+                         radialBlur=[dict(begin=attack+.4,duration=.5,intensityStart=100,intensityEnd=0,sizeStart=0,sizeEnd=2,falloffStart=0,falloffEnd=10,sourceTrack=138880),
+                                     dict(begin=attack+7/3,duration=1,intensityStart=30,intensityEnd=30,sizeStart=2,sizeEnd=0,falloffStart=10,falloffEnd=0,sourceTrack=147684)])
+        elif cfg["kind"] == "groundspike":
+            attack=extra["effectStart"]
+            extra.update(attackStart=attack, retractDurationSource=.2,
+                         retractTriggerConfirmed=False,
+                         radialBlur=[dict(begin=attack,duration=.5,intensityStart=100,intensityEnd=0,sizeStart=0,sizeEnd=2,falloffStart=0,falloffEnd=10,sourceTrack=155644),
+                                     dict(begin=attack+1/6,duration=.5,intensityStart=20,intensityEnd=0,sizeStart=0,sizeEnd=2,falloffStart=0,falloffEnd=10,sourceTrack=155816)])
+        elif cfg["kind"] == "critical_pain":
+            extra.update(attackStart=1.5,reverseVelocitySource=200,
+                         retractTriggerConfirmed=False,
+                         notes=extra["notes"]+["TendrilTrack.TimeReverse is 0/-1, TimeEnd is -1; runtime contact-to-return scheduling is an adaptation until the native controller callback is decoded."])
+        recoveries.append(dict(id=cfg["id"]+"_recovery", stages=[dict(s) for s in recovery], visualOnly=True))
+    configs.extend(recoveries)
     return configs
 
 

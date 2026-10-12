@@ -1,6 +1,7 @@
 {
-  "format": "blacklight-authored-organic-lofts-v2",
-  "provenance": "Original topology and control curves authored for Blacklight. Local game assets were viewed only as proportion and structure reference; no source vertex, UV, triangle, texture or deformation array is imported.",
+  "format": "blacklight-shared-claw-cuboids-v1",
+  "sourceGeometry": "src/main/resources/assets/blacklight/geo/ground_spike.geo.json",
+  "provenance": "Shared Blacklight claw groundspike cuboids and claw_biomass texture, baked into GPU indexed meshes. Original project-authored Minecraft geometry; no Prototype topology, UVs or textures imported. Legacy loft construction below is retained only as design history and is not used by this format.",
   "coordinateSystem": "world_Y_up",
   "palette": {
     "root": [18, 15, 19],
@@ -11,12 +12,12 @@
     "veinShadow": [53, 3, 8]
   },
   "variants": {
-    "groundspike_small": {"height": 2.9, "seed": 11, "cluster": false},
-    "groundspike_mid": {"height": 4.15, "seed": 29, "cluster": false},
-    "groundspike_large": {"height": 6.95, "seed": 43, "cluster": false},
-    "groundspike_cluster_small": {"height": 3.45, "seed": 71, "cluster": true},
-    "groundspike_cluster_mid": {"height": 6.35, "seed": 97, "cluster": true},
-    "groundspike_cluster_large": {"height": 7.75, "seed": 131, "cluster": true}
+    "groundspike_small": {"height": 1.8, "seed": 11, "cluster": false},
+    "groundspike_mid": {"height": 2.5, "seed": 29, "cluster": false},
+    "groundspike_large": {"height": 3.2, "seed": 43, "cluster": false},
+    "groundspike_cluster_small": {"height": 2.0, "seed": 71, "cluster": true},
+    "groundspike_cluster_mid": {"height": 2.7, "seed": 97, "cluster": true},
+    "groundspike_cluster_large": {"height": 3.4, "seed": 131, "cluster": true}
   },
   "lod": {
     "single": {"rootRings": 6, "rootSides": 8, "bladeRings": 12, "splitRings": 9, "bladeSectionIndices": [0, 1, 2, 3, 4, 5, 6, 7], "spurRings": 6, "spurSectionIndices": [0, 2, 4, 6], "muscleCount": 2, "muscleRings": 7, "muscleSides": 6, "veinCount": 1, "veinRings": 11, "veinSides": 5},

@@ -1,0 +1,69 @@
+package com.codex.blacklight.combat;
+
+/** Source tissue clocks, separate from the authoritative damage lease.
+ * Only the velocity and named retract event are recovered; contact dwell and
+ * controller-driven graveyard teardown remain explicit Minecraft scheduling. */
+public final class DevastatorEffectTimeline {
+    public static final double WORLD_SCALE=.8176232451;
+    public static final double TENDRIL_RETRACT_START=7D/3, TENDRIL_RETRACT_END=10D/3;
+    public static final double GRAVEYARD_DESCEND=.2;
+    public static final double PAIN_CONTACT_DWELL=.20;
+    private DevastatorEffectTimeline() { }
+    public static double smooth(double value) {double t=Math.clamp(value,0,1);return t*t*(3-2*t);}
+    public static double strand(double age,double launch,double reverseAt,double distance,double forward,double reverse) {
+        if(!Double.isFinite(age+launch+reverseAt+distance+forward+reverse)||distance<=0||forward<=0||reverse<=0)return 0;
+        if(age<=launch)return 0;
+        if(age<reverseAt)return Math.clamp((age-launch)*forward/distance,0,1);
+        double formed=Math.clamp((reverseAt-launch)*forward/distance,0,1);
+        return Math.clamp(formed-(age-reverseAt)*reverse/distance,0,1);
+    }
+    /** Positive occupancy drives translation into the soil, never height scaling. */
+    public static double spike(double age,double launch,double rise,double reverseAt) {
+        if(!Double.isFinite(age+launch+rise+reverseAt)||rise<=0)return 0;
+        if(age<=launch)return 0;
+        double formed=smooth((Math.min(age,reverseAt)-launch)/rise);
+        return age<reverseAt?formed:formed*(1-smooth((age-reverseAt)/GRAVEYARD_DESCEND));
+    }
+    public static double visibleEnd(int kind,double effectStart,double effectEnd) {
+        if(kind==1)return Math.max(effectEnd,effectStart-.4+TENDRIL_RETRACT_END);
+        // Tissue can return through 4.2s; the distortion emitter starts at
+        // 2/3s, emits for 7/3s and has a separate configured 2s fade.
+        if(kind==2)return Math.max(effectEnd,effectStart+5);
+        return effectEnd;
+    }
+    /** Source RadialBlur is a screen-space lens envelope, not rotation lock. */
+    public record Lens(double burst,double retract,double flight) {
+        public boolean active(){return burst>1e-5||retract>1e-5||flight>1e-5;}
+    }
+    public static Lens lens(int kind,int phase,double age,double effectStart,double fallHeight,double downSpeed) {
+        double burst=0,retract=0,flight=0;
+        if(kind==1) {
+            double attack=effectStart-.4;
+            burst=pulse(age-effectStart,.5);
+            double r=age-attack-TENDRIL_RETRACT_START;
+            if(r>=0&&r<1)retract=.3*(1-smooth(r));
+        }else if(kind==0&&phase==3||kind==0&&phase==1) {
+            burst=Math.max(pulse(age-effectStart,.5),.2*pulse(age-effectStart-1D/6,.5));
+        }else if(kind==2) {
+            // FIG critical/effects effect163500 is distortionObject004, local
+            // 0..2.333333, spawned by the actor at .666667. Its native shader
+            // amplitude is unknown; the .35 screen response is MC presentation.
+            double local=age-effectStart-2D/3;
+            if(local>=0&&local<7D/3)burst=.35*smooth(local/.12);
+            else if(local>=7D/3&&local<13D/3)burst=.35*(1-smooth((local-7D/3)/2));
+        }else if(kind==3) {
+            if(phase==2)flight=flightStrength(fallHeight,downSpeed);
+            else if(phase==3)burst=pulse(age-effectStart,.5);
+        }
+        return new Lens(burst,retract,flight);
+    }
+    public static double flightStrength(double height,double speed) {
+        if(!Double.isFinite(height+speed))return 0;
+        // Visual response is bounded, while authoritative fall physics is not.
+        return Math.clamp((1-Math.exp(-Math.max(0,height)/64))*.60
+                +(1-Math.exp(-Math.max(0,speed)/12))*.40,0,1);
+    }
+    private static double pulse(double age,double duration) {
+        return age>=0&&age<duration?1-smooth(age/duration):0;
+    }
+}
