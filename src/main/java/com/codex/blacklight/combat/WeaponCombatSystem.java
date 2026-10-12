@@ -38,7 +38,8 @@ public final class WeaponCombatSystem {
         Session(ServerPlayer p,WeaponMove m,float offset,float heading){move=m;clipOffset=offset;started=p.tickCount-Math.round(offset*20);created=p.tickCount;form=p.getData(ModAttachments.PLAYER_STATE).getActivePower();yaw=heading;previousYaw=yaw;direction=Vec3.directionFromRotation(0,yaw);previousFeet=p.position();}
     }
     private WeaponCombatSystem(){}
-    public static boolean busy(ServerPlayer p){return ACTIVE.containsKey(p);}
+    public static boolean busy(ServerPlayer p){return ACTIVE.containsKey(p)||DevastatorSystem.busy(p);}
+    public static boolean canSkillInterrupt(ServerPlayer p){var s=ACTIVE.get(p);return s==null||s.hit.isEmpty()&&(s.charging||p.tickCount-s.created<=2);}
     /** Physical traversal input remains available even while EF suppresses Input.jumping. */
     public static void movementInput(ServerPlayer p,boolean jumpPressed){
         var s=ACTIVE.get(p);
@@ -53,6 +54,7 @@ public final class WeaponCombatSystem {
         if(queued!=null)beginInput(p,WeaponMove.choose(s.form,queued,true,false,false),queued,held);
     }
     private static boolean canRequest(ServerPlayer p){
+        if(DevastatorSystem.busy(p))return false;
         var state=p.getData(ModAttachments.PLAYER_STATE);var movement=p.getData(ModAttachments.MOVEMENT_STATE);
         return p.isAlive()&&!p.isSpectator()&&!p.isPassenger()&&state.isInfected()&&state.isPrototypeMode()&&WeaponMove.controls(state.getActivePower(),p.getMainHandItem().isEmpty()&&p.getOffhandItem().isEmpty())&&!p.getData(ModAttachments.CONSUMING)&&!movement.wallTraversal().attached()&&movement.chargeTicks()==0;
     }
@@ -64,6 +66,7 @@ public final class WeaponCombatSystem {
         acceptInput(p,attack,special,false,false);
     }
     public static void acceptInput(ServerPlayer p,boolean attack,boolean special,boolean action,boolean jump){
+        if(DevastatorSystem.acceptInput(p,attack,special,action,jump))return;
         var empty=new WeaponButtons(false,false,false,false);
         var old=BUTTONS.getOrDefault(p,new Buttons(empty,p.tickCount));
         var keys=new WeaponButtons(attack,special,action,jump);
@@ -82,6 +85,7 @@ public final class WeaponCombatSystem {
         if(intent!=null&&keys.pressedSince(old.keys)&&!(old.keys.intent()!=null&&old.keys.intent().chord()))requestInternal(p,intent,true);
     }
     public static void cancelHeldInput(ServerPlayer p){
+        DevastatorSystem.cancel(p);
         BUTTONS.remove(p);
         var active=ACTIVE.get(p);if(active!=null&&active.charging)cancel(p);
     }
@@ -667,6 +671,7 @@ public final class WeaponCombatSystem {
         return false;
     }
     public static void cancel(ServerPlayer p){
+        DevastatorSystem.cancel(p);
         CHAINS.remove(p);
         finish(p);
     }

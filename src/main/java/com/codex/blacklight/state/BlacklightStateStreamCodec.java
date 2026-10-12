@@ -19,7 +19,8 @@ public final class BlacklightStateStreamCodec {
                     buffer.readVarInt(),
                     buffer.readVarInt(),
                     buffer.readVarInt(),
-                    buffer.readBoolean()
+                    buffer.readBoolean(),
+                    buffer.readVarInt()
             );
         }
 
@@ -36,6 +37,7 @@ public final class BlacklightStateStreamCodec {
             buffer.writeVarInt(state.getClawUpgradeMask());
             buffer.writeVarInt(state.getMovementUpgradeMask());
             buffer.writeBoolean(state.isPrototypeMode());
+            buffer.writeVarInt(state.getCombatSkillMask());
         }
     };
 

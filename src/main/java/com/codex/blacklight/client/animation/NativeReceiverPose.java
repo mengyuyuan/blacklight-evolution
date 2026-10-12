@@ -5,6 +5,7 @@ import com.codex.blacklight.entity.BlacklightHunter;
 import com.codex.blacklight.registry.ModAttachments;
 import net.minecraft.world.entity.LivingEntity;
 import org.joml.Quaternionf;
+import org.joml.Matrix4f;
 import org.joml.Vector3f;
 import software.bernie.geckolib.cache.object.GeoBone;
 import software.bernie.geckolib.model.GeoModel;
@@ -77,8 +78,33 @@ public final class NativeReceiverPose {
         var hit=entity.getData(ModAttachments.HIT_REACTION);float weight=hit.weight(entity.level().getGameTime(),partial);if(weight<=0)return false;
         float[] row=ReceiverMotions.sample(ReceiverMotions.hitKey(entity,hit.kind(),hit.motion()),hit.progress(entity.level().getGameTime(),partial));if(row==null)return false;
         if(model instanceof HumanoidModel<?> h){
+            // These parts are flat siblings in vanilla, whereas the source
+            // receiver is hierarchical. Keep setupAnim's actual reference pose
+            // (including slim pivots/crouching), then rebuild its joint positions.
+            var referenceRotation=rotation(h.body);
+            var referenceBody=renderPosition(h.body.x,h.body.y,h.body.z,h.young,false);
+            var referenceHead=renderPosition(h.head.x,h.head.y,h.head.z,h.young,true);
+            var referenceHat=renderPosition(h.hat.x,h.hat.y,h.hat.z,h.young,false);
+            var referenceRightArm=renderPosition(h.rightArm.x,h.rightArm.y,h.rightArm.z,h.young,false);
+            var referenceLeftArm=renderPosition(h.leftArm.x,h.leftArm.y,h.leftArm.z,h.young,false);
+            var referenceRightLeg=renderPosition(h.rightLeg.x,h.rightLeg.y,h.rightLeg.z,h.young,false);
+            var referenceLeftLeg=renderPosition(h.leftLeg.x,h.leftLeg.y,h.leftLeg.z,h.young,false);
+            var bindBody=h.body.getInitialPose();var bindRight=h.rightLeg.getInitialPose();var bindLeft=h.leftLeg.getInitialPose();
+            var waistOffset=new Vector3f((bindRight.x+bindLeft.x)*.5F-bindBody.x,
+                    (bindRight.y+bindLeft.y)*.5F-bindBody.y,(bindRight.z+bindLeft.z)*.5F-bindBody.z)
+                    .mul(h.body.xScale,h.body.yScale,h.body.zScale).mul(h.young?.5F:1F);
             part(h.head,3,row,weight,saved);part(h.hat,3,row,weight,saved);part(h.body,2,row,weight,saved);
-            part(h.rightArm,5,row,weight,saved);part(h.leftArm,6,row,weight,saved);part(h.rightLeg,9,row,weight,saved);part(h.leftLeg,10,row,weight,saved);return true;
+            part(h.rightArm,5,row,weight,saved);part(h.leftArm,6,row,weight,saved);part(h.rightLeg,9,row,weight,saved);part(h.leftLeg,10,row,weight,saved);
+            var hips=new Quaternionf().slerp(sourceRotation(row,1),weight);
+            var linked=linkHumanoid(referenceBody,referenceRotation,waistOffset,rotation(h.body),hips,
+                    referenceHead,referenceHat,referenceRightArm,referenceLeftArm,referenceRightLeg,referenceLeftLeg);
+            position(h.body,linked.body,h.young,false);position(h.head,linked.head,h.young,true);position(h.hat,linked.hat,h.young,false);
+            position(h.rightArm,linked.rightArm,h.young,false);position(h.leftArm,linked.leftArm,h.young,false);
+            position(h.rightLeg,linked.rightLeg,h.young,false);position(h.leftLeg,linked.leftLeg,h.young,false);
+            if(h instanceof PlayerModel<?> player){
+                copyPart(player.jacket,h.body,saved);copyPart(player.rightSleeve,h.rightArm,saved);copyPart(player.leftSleeve,h.leftArm,saved);
+                copyPart(player.rightPants,h.rightLeg,saved);copyPart(player.leftPants,h.leftLeg,saved);
+            }return true;
         }
         if(model instanceof HierarchicalModel<?> h){
             var mapping=Map.of("head",3,"body",2,"right_arm",5,"left_arm",6,"arms",5,"right_leg",9,"left_leg",10,"right_hind_leg",9,"left_hind_leg",10);
@@ -93,11 +119,47 @@ public final class NativeReceiverPose {
         return false;
     }
     private static void part(ModelPart p,int index,float[] row,float weight,Map<ModelPart,PartPose> saved){
-        saved.putIfAbsent(p,p.storePose());int k=3+index*4;
-        Quaternionf q=new Quaternionf(row[3],row[4],row[5],row[6]).invert().mul(new Quaternionf(row[k],row[k+1],row[k+2],row[k+3]));
-        q.set(-q.x,-q.y,q.z,q.w);var bind=p.getInitialPose();
+        saved.putIfAbsent(p,p.storePose());var q=sourceRotation(row,index);var bind=p.getInitialPose();
         q.mul(new Quaternionf().rotationZYX(bind.zRot,bind.yRot,bind.xRot));
         Vector3f angles=new Quaternionf().rotationZYX(p.zRot,p.yRot,p.xRot).slerp(q,weight).getEulerAnglesZYX(new Vector3f());p.xRot=angles.x;p.yRot=angles.y;p.zRot=angles.z;
+    }
+    private static Quaternionf sourceRotation(float[] row,int index){
+        int k=3+index*4;var q=new Quaternionf(row[3],row[4],row[5],row[6]).invert().mul(new Quaternionf(row[k],row[k+1],row[k+2],row[k+3]));
+        return q.set(-q.x,-q.y,q.z,q.w);
+    }
+    private static Quaternionf rotation(ModelPart p){return new Quaternionf().rotationZYX(p.zRot,p.yRot,p.xRot);}
+    private static void copyPart(ModelPart to,ModelPart from,Map<ModelPart,PartPose> saved){
+        saved.putIfAbsent(to,to.storePose());to.setPos(from.x,from.y,from.z);to.xRot=from.xRot;to.yRot=from.yRot;to.zRot=from.zRot;
+    }
+    private static void position(ModelPart part,Vector3f rendered,boolean young,boolean head){
+        var local=modelPosition(rendered,young,head);part.setPos(local.x,local.y,local.z);
+    }
+    // HumanoidModel's AgeableListModel render groups: only head is scaled by
+    // .75; hat and the body group use .5. Both render origins are +12 pixels.
+    static Vector3f renderPosition(float x,float y,float z,boolean young,boolean head){
+        return young?new Vector3f(x,y+(head?16:24),z).mul(head?.75F:.5F):new Vector3f(x,y,z);
+    }
+    static Vector3f modelPosition(Vector3f rendered,boolean young,boolean head){
+        return young?new Vector3f(rendered).div(head?.75F:.5F).sub(0,head?16:24,0):new Vector3f(rendered);
+    }
+    record LinkedHumanoid(Vector3f body,Vector3f head,Vector3f hat,Vector3f rightArm,Vector3f leftArm,Vector3f rightLeg,Vector3f leftLeg){}
+    /** Minecraft adaptation using target reference pivots and the decoded source
+     * world rotations; receiver rows do not contain full source joint positions.
+     * Forward kinematics in common rendered model pixels. Root translation and
+     * support placement remain with HitBodyPose; source hips/torso orientation
+     * defines the relative joint chain, never detached part translations. */
+    static LinkedHumanoid linkHumanoid(Vector3f referenceBody,Quaternionf referenceRotation,Vector3f waistOffset,
+                                      Quaternionf bodyRotation,Quaternionf hipsRotation,Vector3f head,Vector3f hat,
+                                      Vector3f rightArm,Vector3f leftArm,Vector3f rightLeg,Vector3f leftLeg){
+        var waist=referenceRotation.transform(new Vector3f(waistOffset)).add(referenceBody);
+        var bodyWorld=new Matrix4f().translation(waist).rotate(bodyRotation).translate(-waistOffset.x,-waistOffset.y,-waistOffset.z);
+        var referenceInverse=new Matrix4f().translation(referenceBody).rotate(referenceRotation).invert();
+        var upperDelta=new Matrix4f(bodyWorld).mul(referenceInverse);
+        var hipsDelta=new Matrix4f().translation(waist).rotate(hipsRotation).translate(-waist.x,-waist.y,-waist.z);
+        return new LinkedHumanoid(bodyWorld.transformPosition(new Vector3f()),upperDelta.transformPosition(new Vector3f(head)),
+                upperDelta.transformPosition(new Vector3f(hat)),upperDelta.transformPosition(new Vector3f(rightArm)),
+                upperDelta.transformPosition(new Vector3f(leftArm)),hipsDelta.transformPosition(new Vector3f(rightLeg)),
+                hipsDelta.transformPosition(new Vector3f(leftLeg)));
     }
     private static Quaternionf bindWorld(GeoBone bone){var bind=bone.getInitialSnapshot();var q=new Quaternionf().rotationZYX(bind.getRotZ(),bind.getRotY(),bind.getRotX());return bone.getParent()==null?q:bindWorld(bone.getParent()).mul(q);}
 }

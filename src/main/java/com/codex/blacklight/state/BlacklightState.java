@@ -1,6 +1,7 @@
 package com.codex.blacklight.state;
 
 import com.codex.blacklight.power.ClawUpgrade;
+import com.codex.blacklight.power.CombatSkill;
 import com.codex.blacklight.power.MovementUpgrade;
 import com.codex.blacklight.power.PowerForm;
 import com.mojang.serialization.Codec;
@@ -19,7 +20,8 @@ public final class BlacklightState {
             Codec.INT.optionalFieldOf("alert", 0).forGetter(BlacklightState::getAlert),
             Codec.INT.optionalFieldOf("claw_upgrades", 0).forGetter(BlacklightState::getClawUpgradeMask),
             Codec.INT.optionalFieldOf("movement_upgrades", 0).forGetter(BlacklightState::getMovementUpgradeMask),
-            Codec.BOOL.optionalFieldOf("prototype_mode", false).forGetter(BlacklightState::isPrototypeMode)
+            Codec.BOOL.optionalFieldOf("prototype_mode", false).forGetter(BlacklightState::isPrototypeMode),
+            Codec.INT.optionalFieldOf("combat_skill_mask", 0).forGetter(BlacklightState::getCombatSkillMask)
     ).apply(instance, BlacklightState::new));
 
     private boolean infected;
@@ -33,6 +35,7 @@ public final class BlacklightState {
     private int clawUpgradeMask;
     private int movementUpgradeMask;
     private boolean prototypeMode;
+    private int combatSkillMask;
 
     public BlacklightState() {
         this(false, 0, 0, 0, "none", "", false, 0, 0, 0, false);
@@ -41,6 +44,13 @@ public final class BlacklightState {
     BlacklightState(boolean infected, int biomass, int evolutionPoints, int unlockedMask,
                     String activePower, String disguiseIdentity, boolean disguised, int alert,
                     int clawUpgradeMask, int movementUpgradeMask, boolean prototypeMode) {
+        this(infected, biomass, evolutionPoints, unlockedMask, activePower, disguiseIdentity,
+                disguised, alert, clawUpgradeMask, movementUpgradeMask, prototypeMode, 0);
+    }
+
+    BlacklightState(boolean infected, int biomass, int evolutionPoints, int unlockedMask,
+                    String activePower, String disguiseIdentity, boolean disguised, int alert,
+                    int clawUpgradeMask, int movementUpgradeMask, boolean prototypeMode, int combatSkillMask) {
         this.infected = infected;
         this.biomass = clamp(biomass, 0, MAX_BIOMASS);
         this.evolutionPoints = Math.max(0, evolutionPoints);
@@ -52,6 +62,7 @@ public final class BlacklightState {
         this.alert = clamp(alert, 0, 100);
         this.clawUpgradeMask = Math.max(0, clawUpgradeMask);
         this.movementUpgradeMask = Math.max(0, movementUpgradeMask);
+        this.combatSkillMask = Math.max(0, combatSkillMask) & CombatSkill.validMask();
     }
 
     public void infect() {
@@ -74,6 +85,7 @@ public final class BlacklightState {
         alert = 0;
         clawUpgradeMask = 0;
         movementUpgradeMask = 0;
+        combatSkillMask = 0;
         prototypeMode = false;
     }
 
@@ -137,6 +149,19 @@ public final class BlacklightState {
         return upgrade != null && (movementUpgradeMask & upgrade.bit()) != 0;
     }
 
+    public boolean buyCombatSkill(CombatSkill skill) {
+        if (!infected || skill == null || hasCombatSkill(skill) || evolutionPoints < skill.epCost()
+                || skill.requires() != null && !hasCombatSkill(skill.requires())
+                || skill.movementRequires() != null && !hasMovementUpgrade(skill.movementRequires())) return false;
+        evolutionPoints -= skill.epCost();
+        combatSkillMask |= skill.bit();
+        return true;
+    }
+
+    public boolean hasCombatSkill(CombatSkill skill) {
+        return skill != null && (combatSkillMask & skill.bit()) != 0;
+    }
+
     public void captureIdentity(String identity) {
         disguiseIdentity = identity == null ? "" : identity;
     }
@@ -178,6 +203,7 @@ public final class BlacklightState {
     public int getClawUpgradeMask() { return clawUpgradeMask; }
     public int getMovementUpgradeMask() { return movementUpgradeMask; }
     public boolean isPrototypeMode() { return prototypeMode; }
+    public int getCombatSkillMask() { return combatSkillMask; }
 
     private static int clamp(int value, int min, int max) {
         return Math.max(min, Math.min(max, value));

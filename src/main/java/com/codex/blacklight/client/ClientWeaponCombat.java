@@ -15,6 +15,9 @@ public final class ClientWeaponCombat {
     private static int sentAt;
     private static com.codex.blacklight.power.PowerForm inputForm;
     private static net.minecraft.client.player.LocalPlayer inputOwner;
+    private static boolean fixtureOwnsInput;
+    /** Installed only after the disposable native skill QA validates its literal directory/save. */
+    static void setFixtureOwnsInput(boolean owns){fixtureOwnsInput=owns;}
     private ClientWeaponCombat(){}
     public static boolean active(){
         var mc=Minecraft.getInstance();if(mc.player==null||mc.screen!=null)return false;
@@ -22,6 +25,7 @@ public final class ClientWeaponCombat {
         return state.isPrototypeMode()&&state.isInfected()&&WeaponMove.controls(state.getActivePower(),mc.player.getMainHandItem().isEmpty()&&mc.player.getOffhandItem().isEmpty())&&!mc.player.getData(ModAttachments.CONSUMING);
     }
     public static void poll(){
+        if(fixtureOwnsInput)return;
         var mc=Minecraft.getInstance();if(mc.getWindow()==null)return;
         long window=mc.getWindow().getWindow();
         boolean l=GLFW.glfwGetMouseButton(window,0)==GLFW.GLFW_PRESS,r=GLFW.glfwGetMouseButton(window,1)==GLFW.GLFW_PRESS;

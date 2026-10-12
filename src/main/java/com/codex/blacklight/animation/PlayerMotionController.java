@@ -175,6 +175,9 @@ public final class PlayerMotionController {
         var action=entity.getData(ModAttachments.PLAYER_ACTION);
         BlacklightPose base = locomotion(entity, runtime, now, partial);
         if (runtime.preview != null) return samplePose(runtime.preview.key, runtime.preview.time(now), false);
+        var activeWeapon=entity.getData(ModAttachments.WEAPON_VISUAL).spec();
+        if(activeWeapon!=null&&(activeWeapon.id.startsWith("dev_")||activeWeapon==com.codex.blacklight.combat.WeaponMove.BULLETDIVE_DROP))
+            runtime.override=null; // The synchronized skill owns airborne holds and aim blending.
         if (runtime.override != null) {
             var clock = runtime.override;
             float time = clock.time(now);
@@ -194,6 +197,16 @@ public final class PlayerMotionController {
         var weapon=WeaponMotionClock.sample(entity.getData(ModAttachments.WEAPON_VISUAL),now);
         if(weapon!=null){
             var sampled=samplePose(weapon.key(),weapon.seconds(),weapon.looping());
+            var dev=entity.getData(ModAttachments.DEVASTATOR_VISUAL);
+            if(dev.kind()==2&&!entity.getData(ModAttachments.WEAPON_VISUAL).charging()){
+                // The decoded vertical-aim track supplies actual up/down clips.
+                // Blend their source poses using the authoritative release ray.
+                var direction=dev.direction();
+                float weight=(float)Math.clamp(Math.abs(Math.atan2(direction.y,direction.horizontalDistance()))/(Math.PI/2),0,1);
+                String variant=weapon.key()+(direction.y>=0?"_aim_up":"_aim_down");
+                if(weight>.001F&&MotionLibrary.find(variant).isPresent())
+                    sampled=BlacklightPose.interpolatePose(sampled,samplePose(variant,weapon.seconds(),false),weight);
+            }
             return weapon.blend()>=1?sampled:BlacklightPose.interpolatePose(base,sampled,weapon.blend());
         }
         if (action.revision() != runtime.suppressedRevision && action.active(now)

@@ -33,7 +33,8 @@ def bundledMotionDirectory = providers.gradleProperty('bundleMotionDirectory')
 def releaseProfile = bundledMotionDirectory.isPresent() ? 'local-preview' : 'source-only'
 def releaseNotices = ['LICENSE', 'THIRD_PARTY_ASSETS.md', 'THIRD_PARTY_NOTICES.md']
 def privateMotionOutputs = [layout.buildDirectory.dir('generated/bundledMotionResources'),
-                            layout.buildDirectory.dir('resources/main/blacklight/bundled_motions')]
+                            layout.buildDirectory.dir('resources/main/blacklight/bundled_motions'),
+                            layout.buildDirectory.dir('resources/main/assets/blacklight/textures/private_devfx')]
 // Sync's empty-source handling is not a packaging boundary. Clear both generated
 // and previously processed copies explicitly before a source-only resource build.
 def clearPrivateMotionOutputs = tasks.register('clearPrivateMotionOutputs', Delete) {
@@ -65,6 +66,10 @@ def stageBundledMotions = tasks.register('stageBundledMotions', Sync) {
             ['utility_shield_deploy.json', 'utility_shield_hit.json', 'utility_shield_run.json', 'utility_shield_sprint.json', 'utility_armor_transform.json', 'utility_armor_idle.json', 'basic_idle.json', 'basic_wall_top.json', 'basic_parkour_small.json', 'combat-motion-tuning.data', 'consume-placement.data', 'receiver-poses.data', 'hunter-consume.data', 'hammer-scales.data', 'armor-growth.data', 'camera-profile.data', 'camera-events.data'].each {
                 if (!new File(profile, it).isFile()) throw new GradleException("Incomplete bundled motion profile: ${it}")
             }
+            ['dev_groundspike','dev_air_groundspike','dev_tendril','dev_air_tendril','dev_critical_pain','dev_air_critical_pain','bulletdive_drop'].each {
+                if (!new File(profile, it + '.json').isFile() || !new File(profile, it + '_charge.json').isFile())
+                    throw new GradleException("Incomplete source skill profile: ${it}")
+            }
         }
     }
 }
@@ -73,6 +78,7 @@ tasks.named('processResources', ProcessResources).configure {
     dependsOn clearPrivateMotionOutputs
     inputs.property('blacklightReleaseProfile', releaseProfile)
     if (!bundledMotionDirectory.isPresent()) exclude 'blacklight/bundled_motions/**'
+    if (!bundledMotionDirectory.isPresent()) exclude 'assets/blacklight/textures/private_devfx/**'
 }
 
 repositories {
@@ -108,6 +114,8 @@ def distributionZip = tasks.register('distributionZip', Zip) {
     from(tasks.named('jar')) { into 'mods' }
     from('README.md')
     from(releaseNotices)
+    exclude 'blacklight/bundled_motions/devastator-fx.data', 'assets/blacklight/textures/private_devfx/**'
+    exclude 'assets/blacklight/shaders/core/source_biomass.*', 'com/codex/blacklight/client/renderer/DevastatorSourceMesh*.class'
     from('docs') { into 'docs' }
     preserveFileTimestamps = false
     reproducibleFileOrder = true
@@ -129,7 +137,7 @@ if (project.hasProperty('wallTraversalTest')) {
     sourceSets.main.java.srcDir('src/traversalTest/java')
     sourceSets.main.resources.srcDir('src/traversalTest/resources')
 }
-if (project.hasProperty('standaloneVisual') || project.hasProperty('standaloneGait') || project.hasProperty('standaloneLock') || project.hasProperty('standaloneMorph')) {
+if (project.hasProperty('standaloneVisual') || project.hasProperty('standaloneGait') || project.hasProperty('standaloneLock') || project.hasProperty('standaloneMorph') || project.hasProperty('standaloneSkill')) {
     sourceSets.main.java.srcDir('src/standaloneVisualTest/java')
 }
 if (project.hasProperty('standaloneTest')) {
@@ -141,6 +149,8 @@ if (project.hasProperty('standaloneTest')) {
 tasks.named('jar', Jar).configure {
     archiveClassifier = releaseProfile
     from(releaseNotices)
+    exclude 'blacklight/bundled_motions/devastator-fx.data', 'assets/blacklight/textures/private_devfx/**'
+    exclude 'assets/blacklight/shaders/core/source_biomass.*', 'com/codex/blacklight/client/renderer/DevastatorSourceMesh*.class'
     manifest.attributes('Blacklight-Build-Profile': releaseProfile,
             'Blacklight-Private-Assets': bundledMotionDirectory.isPresent().toString(),
             'Blacklight-Public-Release-Ready': 'false',
@@ -148,8 +158,11 @@ tasks.named('jar', Jar).configure {
     // Even if stale generated resources exist or tasks are skipped, source-only
     // artifacts cannot acquire the private namespace from an earlier local build.
     if (!bundledMotionDirectory.isPresent()) exclude 'blacklight/bundled_motions/**'
+    if (!bundledMotionDirectory.isPresent()) exclude 'assets/blacklight/textures/private_devfx/**'
     exclude 'com/codex/blacklight/gametest/**'
     exclude 'com/codex/blacklight/client/Standalone*Smoke*.class'
+    exclude 'com/codex/blacklight/client/StandaloneCriticalMassChecks*.class'
+    exclude 'com/codex/blacklight/client/StandaloneBulletTerrainChecks*.class'
     exclude 'data/blacklight/structure/wall_test.nbt'
 }
 
@@ -189,6 +202,11 @@ neoForge {
                 systemProperty 'blacklight.test.standaloneMorph', file(project.property('standaloneMorph')).absolutePath
                 if (project.hasProperty('standaloneMorphCases')) systemProperty 'blacklight.test.standaloneMorph.cases', project.property('standaloneMorphCases').toString()
                 programArguments.addAll '--width', '960', '--height', '640'
+            }
+            if (project.hasProperty('standaloneSkill')) {
+                systemProperty 'blacklight.test.standaloneSkill', file(project.property('standaloneSkill')).absolutePath
+                if (project.hasProperty('standaloneSkillCases')) systemProperty 'blacklight.test.standaloneSkill.cases', project.property('standaloneSkillCases').toString()
+                programArguments.addAll '--width', '1280', '--height', '900'
             }
             if (project.hasProperty('localWeaponMotions')) {
                 systemProperty 'blacklight.localWeaponMotions', file(project.property('localWeaponMotions')).absolutePath

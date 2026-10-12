@@ -19,7 +19,7 @@ public final class ModNetwork {
     }
 
     public static void register(RegisterPayloadHandlersEvent event) {
-        event.registrar("standalone-2")
+        event.registrar("standalone-3")
                 .playToClient(NativeRootMotionPayload.TYPE, NativeRootMotionPayload.STREAM_CODEC, (payload, context) ->
                     context.enqueueWork(() -> com.codex.blacklight.animation.PlayerMotionController.acceptRootMotion(payload)))
                 .playToServer(DisguiseTogglePayload.TYPE,DisguiseTogglePayload.CODEC,(payload,context)->
@@ -131,6 +131,14 @@ public final class ModNetwork {
         if (event.getEntity() instanceof ServerPlayer player) synchronizePersistentState(player);
     }
 
+    @SubscribeEvent public static void onPlayerTracking(PlayerEvent.StartTracking event) {
+        if (event.getTarget() instanceof ServerPlayer target) {
+            target.syncData(com.codex.blacklight.registry.ModAttachments.CRITICAL_MASS);
+            target.syncData(com.codex.blacklight.registry.ModAttachments.ADRENALINE);
+            target.syncData(com.codex.blacklight.registry.ModAttachments.DEVASTATOR_VISUAL);
+        }
+    }
+
     private static void synchronizePersistentState(ServerPlayer player) {
         com.codex.blacklight.animation.NativePlayerActionBackend.clear(player);
         com.codex.blacklight.power.GrowthSystem.updateHealth(player);
@@ -141,5 +149,8 @@ public final class ModNetwork {
         player.syncData(com.codex.blacklight.registry.ModAttachments.UTILITY_STATE);
         player.syncData(com.codex.blacklight.registry.ModAttachments.DISGUISE_IDENTITY);
         player.syncData(com.codex.blacklight.registry.ModAttachments.DISGUISE_MORPH);
+        player.syncData(com.codex.blacklight.registry.ModAttachments.CRITICAL_MASS);
+        player.syncData(com.codex.blacklight.registry.ModAttachments.ADRENALINE);
+        player.syncData(com.codex.blacklight.registry.ModAttachments.DEVASTATOR_VISUAL);
     }
 }

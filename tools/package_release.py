@@ -67,6 +67,7 @@ def main() -> None:
     parser.add_argument('--build-dir', type=Path, help='Defaults to <repo>/build')
     parser.add_argument('--output', type=Path, help='Defaults to release/local-<version>, with -source-only for that profile')
     parser.add_argument('--profile', choices=('local-preview', 'source-only'), default='local-preview')
+    parser.add_argument('--private-motion-directory', type=Path, help='Exact private inputs used by this local-preview build; verify every bundled SHA-256')
     args = parser.parse_args()
     repo = args.repo.resolve()
     build = (args.build_dir or repo / 'build').resolve()
@@ -96,11 +97,22 @@ def main() -> None:
                    if name.startswith(motion_prefix) and not name.endswith('/')}
         require(bool(motions) == private, 'Private resources leaked or local preview has none')
         if private:
-            require(len(motions) == 224, f'Unexpected motion profile: {len(motions)} files')
+            require(args.private_motion_directory is not None, 'Provide the exact --private-motion-directory used for this build')
+            profile=args.private_motion_directory.resolve()
+            data_names={'combat-motion-tuning.data','consume-placement.data','consume-receiver-events.data',
+                        'receiver-poses.data','hunter-consume.data','hammer-scales.data','armor-growth.data',
+                        'camera-profile.data','camera-events.data','camera-film.data','health-hud.data'}
+            expected={p.name: digest(p.read_bytes()) for p in profile.iterdir()
+                      if p.is_file() and (p.suffix == '.json' or p.name in data_names)}
+            require(motions == expected, 'Bundled resources differ from the exact private input profile')
+            require(not any(name.startswith('assets/blacklight/textures/private_devfx/') for name in names), 'Reference textures must not be bundled')
             for name in ('armor-growth.data', 'health-hud.data', 'camera-film.data', 'basic_idle.json',
-                         'basic_run.json', 'basic_wall_top.json', 'utility_armor_transform.json'):
+                         'basic_run.json', 'basic_wall_top.json', 'utility_armor_transform.json',
+                         'dev_groundspike.json','dev_air_groundspike.json','dev_tendril.json','dev_air_tendril.json',
+                         'dev_critical_pain.json','dev_air_critical_pain.json','bulletdive_drop.json'):
                 require(name in motions, f'Missing motion resource: {name}')
         classes = list((build / 'classes/java/main').rglob('*.class'))
+        if not private:require(not any(name.startswith('assets/blacklight/textures/private_devfx/') for name in names),'Private effect textures leaked into source-only build')
         require(bool(classes), 'No compiled classes to verify')
         for path in classes:
             name = path.relative_to(build / 'classes/java/main').as_posix()

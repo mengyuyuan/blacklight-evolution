@@ -145,6 +145,7 @@ public final class MotionLibrary {
                     .flatMap(com.codex.blacklight.combat.LocalWeaponMotion.Definition::charge)
                     .ifPresent(charge -> clip(charge.animation()));
         }
-        for (String key : new String[]{"utility_armor_transform", "utility_armor_idle", "utility_shield_deploy", "utility_shield_hit", "basic_wall_top", "basic_parkour_small"}) clip(key);
+        for (String key : new String[]{"utility_armor_transform", "utility_armor_idle", "utility_shield_deploy", "utility_shield_hit", "basic_wall_top", "basic_parkour_small",
+                "dev_critical_pain_aim_up","dev_critical_pain_aim_down","dev_air_critical_pain_aim_up","dev_air_critical_pain_aim_down"}) clip(key);
     }
 }
