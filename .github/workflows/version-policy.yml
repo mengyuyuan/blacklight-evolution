@@ -37,7 +37,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: version-report-pr-${{ github.event.pull_request.number }}-${{ github.run_id }}
+          name: version-report-pr-${{ github.event.pull_request.number }}-${{ github.run_id }}-${{ github.run_attempt }}
           path: version-report/
           if-no-files-found: ignore
           retention-days: 30
