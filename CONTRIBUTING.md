@@ -10,6 +10,8 @@
 
 ## 开发环境
 
+准备贡献时可使用 [多版本快捷工具](docs/VERSION_TOOLS_ZH.md)，自动填写 PR 平台信息与同步候选，或在干净工作区建立目标版本功能分支。
+
 - Java 21，使用仓库内的 Gradle Wrapper。
 - Minecraft 1.21.1、NeoForge 21.1.244；GeckoLib 由 Gradle 获取；独立版不要求 Epic Fight、Epic ParCool 或 Weapons of Miracles。
 - 默认只编译打包：Windows 使用 `./gradlew.bat assemble --no-daemon`；Linux/macOS 使用 `bash ./gradlew assemble --no-daemon`。
@@ -18,7 +20,7 @@
 
 默认源码构建使用 `art/motion-profile/` 的完整 224 个动作、HUD 和镜头资料，生成 bundled 包并校验成品清单，无需本机外部资料目录。source-only / local-preview 属于旧构建历史；资源说明见 `THIRD_PARTY_ASSETS.md`，当前打包说明见 [完整资料打包](docs/BUNDLED_PROFILE_DEV7.md)。
 
-默认构建与 CI 不运行单元测试、碰撞测试、GameTest 或游戏内验收；这些检查仅在用户明确要求时运行。编译打包成功不代表真人试玩已通过。
+默认构建与 Build CI 不运行游戏单元测试、碰撞测试、GameTest 或游戏内验收；这些检查仅在用户明确要求时运行。Version policy CI 只运行轻量协作工具回归和静态平台核对。编译打包成功不代表真人试玩已通过。
 
 ## 目前适合参与的工作
 
