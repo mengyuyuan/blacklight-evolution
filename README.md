@@ -7,6 +7,8 @@ Minecraft 1.21.1 / NeoForge 的黑光病毒同人 Mod，包含生物武器、抓
 
 ## 当前版本与发布状态
 
+项目按 Minecraft / 加载器维护独立分支：`main` 为 NeoForge 1.21.1，[`forge-1.20.1`](https://github.com/mengyuyuan/blacklight-evolution/tree/forge-1.20.1) 为 Forge 1.20.1。各版本独立构建、同步和发布；开发贡献请先阅读 [多版本协作规范](docs/MULTIVERSION_WORKFLOW_ZH.md)。
+
 当前为 **0.3.0-standalone-dev.8，独立开发版**，尚未公开发行，也未将完整人工验收标记为通过。项目按现有黑光能力与感染生存玩法收尾，不宣称完整复刻原游戏。
 
 **dev.7 已将完整运行资料纳入源码。** `art/motion-profile/` 包含 224 个动作、装甲、受害者、镜头与 HUD 文件，默认构建会完整打包；无需本机外部资料目录。所有文件保持此前试玩版内容，构建会检查包内文件与仓库 SHA-256 清单一致。此版整合 dev.6 液态武器变形和 80 种原版贴图结合感染结构的修复。
