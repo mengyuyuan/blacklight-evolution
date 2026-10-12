@@ -29,7 +29,7 @@
 | 跨版本同步 | `backport/forge-1.20.1-pr123-held-turning` |
 | 文档 | `docs/neoforge-1.21.1-version-workflow` |
 
-`main` 的临时分支也写出 Minecraft / 加载器，避免几年后无法判断目标。个人 fork 可以保留自己的长期版本分支；向主仓库提交 PR 时，base 必须选择主仓库对应的长期分支。
+玩法、修复和移植的临时分支（含 `main` 的贡献）写出 Minecraft / 加载器，避免几年后无法判断目标。纯通用文档分支可简化为 `docs/version-workflow-neoforge` 等名称，PR 仍须明确实际 base。个人 fork 可以保留自己的长期版本分支；向主仓库提交 PR 时，base 必须选择主仓库对应的长期分支。
 
 从 fork 开始 Forge 修复的示例（已配置 `upstream` 为主仓库、`origin` 为自己的 fork）：
 
@@ -74,7 +74,7 @@ git push -u origin fix/forge-1.20.1-held-turning
 
 ## 4. PR 必填信息
 
-使用仓库 [PR 模板](../.github/pull_request_template.md)。标题写明目标，例如 `[MC1.20.1 Forge] fix: 持有生物时自由转向`。
+使用仓库 [PR 模板](../.github/pull_request_template.md)。玩法、修复和移植 PR 的标题写明目标，例如 `[MC1.20.1 Forge] fix: 持有生物时自由转向`；通用文档 PR 可用 `docs:` 标题，在正文明确 base。
 
 - Minecraft、加载器、Java、目标 base 分支。
 - 问题、触发条件与修改后行为。
