@@ -13,8 +13,12 @@ import java.util.concurrent.CompletableFuture;
 
 /** Only the selected clip is decoded. One GPU texture, released when leaving the page. */
 final class TutorialGif implements AutoCloseable {
+    private static final java.util.concurrent.Executor DECODER=java.util.concurrent.Executors.newSingleThreadExecutor(task->{
+        var thread=new Thread(task,"blacklight-tutorial-decoder");thread.setDaemon(true);return thread;
+    });
     private record Frames(int width,int height,List<int[]> pixels,int[] ends,int duration){}
     private CompletableFuture<Frames> loading;
+    private java.util.concurrent.atomic.AtomicBoolean cancelled;
     private Frames frames;
     private DynamicTexture texture;
     private ResourceLocation textureId;
@@ -27,15 +31,17 @@ final class TutorialGif implements AutoCloseable {
         close(); selected=family;failed=false;started=System.nanoTime();
         var manager=Minecraft.getInstance().getResourceManager();
         var resource=ResourceLocation.fromNamespaceAndPath("blacklight","tutorials/"+family+".gif");
+        var cancellation=new java.util.concurrent.atomic.AtomicBoolean();cancelled=cancellation;
         loading=CompletableFuture.supplyAsync(()->{
             try(var stream=manager.open(resource)){
                 byte[] bytes=stream.readNBytes(16*1024*1024+1);
                 if(bytes.length>16*1024*1024)throw new IllegalArgumentException("Tutorial too large");
-                return decode(bytes);
+                return decode(bytes,cancellation::get);
             }catch(Exception e){return null;}
-        },net.minecraft.Util.backgroundExecutor());
+        },DECODER);
     }
-    private static Frames decode(byte[] bytes)throws Exception {
+    static Frames decode(byte[] bytes,java.util.function.BooleanSupplier cancelled)throws Exception {
+        if(cancelled.getAsBoolean())throw new java.util.concurrent.CancellationException();
         try(var input=ImageIO.createImageInputStream(new ByteArrayInputStream(bytes))){
             var reader=ImageIO.getImageReadersByFormatName("gif").next();
             try {
@@ -46,6 +52,11 @@ final class TutorialGif implements AutoCloseable {
                 // support GIF optimizers that store only the changed rectangle.
                 var canvas=new java.awt.image.BufferedImage(w,h,java.awt.image.BufferedImage.TYPE_INT_ARGB);
                 for(int i=0;i<count;i++){
+                    if(cancelled.getAsBoolean())throw new java.util.concurrent.CancellationException();
+                    // An optimized GIF may change frame dimensions. Validate each
+                    // descriptor before ImageIO allocates that frame's raster.
+                    if(reader.getWidth(i)>w||reader.getHeight(i)>h)
+                        throw new IllegalArgumentException("Tutorial frame exceeds canvas");
                     var meta=reader.getImageMetadata(i).getAsTree("javax_imageio_gif_image_1.0");
                     int delay=67,x=0,y=0;
                     for(var node=meta.getFirstChild();node!=null;node=node.getNextSibling()){
@@ -78,6 +89,7 @@ final class TutorialGif implements AutoCloseable {
         g.blit(textureId,x,y,0,0,w,h,w,h);return true;
     }
     @Override public void close(){
+        if(cancelled!=null)cancelled.set(true);cancelled=null;
         if(loading!=null)loading.cancel(false);loading=null;frames=null;last=-1;
         if(textureId!=null)Minecraft.getInstance().getTextureManager().release(textureId);
         texture=null;textureId=null;selected="";

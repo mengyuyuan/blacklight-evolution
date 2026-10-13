@@ -115,11 +115,11 @@ public final class BlacklightState {
     }
 
     public void addBiomass(int amount) {
-        biomass = clamp(biomass + amount, 0, MAX_BIOMASS);
+        biomass = (int)Math.clamp((long)biomass + amount, 0, MAX_BIOMASS);
     }
 
     public void addEvolutionPoints(int amount) {
-        evolutionPoints = Math.max(0, evolutionPoints + amount);
+        evolutionPoints = (int)Math.clamp((long)evolutionPoints + amount, 0, Integer.MAX_VALUE);
     }
 
     public boolean buyClawUpgrade(ClawUpgrade upgrade) {
@@ -177,7 +177,7 @@ public final class BlacklightState {
     }
 
     public void raiseAlert(int amount) {
-        alert = clamp(alert + amount, 0, 100);
+        alert = (int)Math.clamp((long)alert + amount, 0, 100);
     }
 
     public boolean hasUnlocked(PowerForm form) {

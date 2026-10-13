@@ -47,11 +47,14 @@ def stageBundledMotions = tasks.register('stageBundledMotions', Sync) {
             ['utility_shield_deploy.json', 'utility_shield_hit.json', 'utility_shield_run.json', 'utility_shield_sprint.json', 'utility_armor_transform.json', 'utility_armor_idle.json', 'basic_idle.json', 'basic_wall_top.json', 'basic_parkour_small.json', 'combat-motion-tuning.data', 'consume-placement.data', 'receiver-poses.data', 'hunter-consume.data', 'hammer-scales.data', 'armor-growth.data', 'camera-profile.data', 'camera-events.data'].each {
                 if (!new File(profile, it).isFile()) throw new GradleException("Incomplete bundled motion profile: ${it}")
             }
-            // The public baseline and the private skill extension are separate
-            // inventories. An explicit extension must include every skill clip.
-            if (releaseProfile == 'external-profile') ['dev_groundspike','dev_air_groundspike','dev_tendril','dev_air_tendril','dev_critical_pain','dev_air_critical_pain','bulletdive_drop'].each {
-                if (!new File(profile, it + '.json').isFile() || !new File(profile, it + '_charge.json').isFile())
-                    throw new GradleException("Incomplete source skill profile: ${it}")
+            ['dev_groundspike','dev_air_groundspike','dev_tendril','dev_air_tendril','dev_critical_pain','dev_air_critical_pain','bulletdive_drop'].each { skill ->
+                ['', '_charge', '_recovery'].each { suffix ->
+                    if (!new File(profile, skill + suffix + '.json').isFile())
+                        throw new GradleException("Incomplete source skill profile: ${skill}${suffix}")
+                }
+            }
+            ['dev_critical_pain_aim_up','dev_critical_pain_aim_down','dev_air_critical_pain_aim_up','dev_air_critical_pain_aim_down','bulletdive_drop_land','bulletdive_drop_flight'].each {
+                if (!new File(profile, it + '.json').isFile()) throw new GradleException("Incomplete source skill profile: ${it}")
             }
         }
     }
@@ -113,11 +116,9 @@ if (project.hasProperty('weaponModelPreview')) sourceSets.main.java.srcDir('src/
 if (project.hasProperty('leanArmorPreview')) sourceSets.main.java.srcDir('src/armorVisualTest/java')
 if (project.hasProperty('hiveFeedingTest')) {
     sourceSets.main.java.srcDir('src/hiveTest/java')
-    sourceSets.main.resources.srcDir('src/traversalTest/resources')
 }
 if (project.hasProperty('wallTraversalTest')) {
     sourceSets.main.java.srcDir('src/traversalTest/java')
-    sourceSets.main.resources.srcDir('src/traversalTest/resources')
 }
 if (project.hasProperty('standaloneInfected')) {
     sourceSets.main.java.srcDir('src/infectedVisualTest/java')
@@ -128,9 +129,12 @@ if (project.hasProperty('standaloneBulletExtreme') || project.hasProperty('stand
 }
 if (project.hasProperty('standaloneTest')) {
     sourceSets.main.java.srcDir('src/standaloneTest/java')
-    if (!project.hasProperty('wallTraversalTest') && !project.hasProperty('hiveFeedingTest')) {
-        sourceSets.main.resources.srcDir('src/traversalTest/resources')
-    }
+}
+if (project.hasProperty('releaseAuditTest')) {
+    sourceSets.main.java.srcDir('src/releaseAuditTest/java')
+}
+if (['standaloneTest','wallTraversalTest','hiveFeedingTest','releaseAuditTest'].any { project.hasProperty(it) }) {
+    sourceSets.main.resources.srcDir('src/traversalTest/resources')
 }
 tasks.named('jar', Jar).configure {
     archiveClassifier = releaseProfile
@@ -251,6 +255,7 @@ neoForge {
         gameTestServer {
             type = "gameTestServer"
             gameDirectory = project.file(project.hasProperty('standaloneTest') && !project.hasProperty('wallTraversalTest') ? 'run-standalone-gametest' : project.hasProperty('hiveFeedingTest') ? 'run-hive-feeding-gametest' : 'run-wall-gametest')
+            if (project.hasProperty('gameTestRunDirectory')) gameDirectory = file(project.property('gameTestRunDirectory'))
             jvmArgument '-Xmx2G'
             systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
             if (project.hasProperty('localWeaponMotions')) {

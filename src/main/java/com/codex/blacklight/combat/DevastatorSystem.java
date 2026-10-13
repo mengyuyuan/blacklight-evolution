@@ -169,7 +169,7 @@ public final class DevastatorSystem {
                 if(s.move==WeaponMove.BULLETDIVE_DROP){
                     var terrain=BulletdiveTerrain.begin(p,s.id,s.origin,Math.max(0,s.highest-s.origin.y));
                     s.timing=new DevastatorTiming(s.timing.effectStart(),s.timing.effectEnd(),s.timing.damageStart(),s.timing.damageEnd(),
-                            s.timing.targetStart(),s.timing.targetStop(),Math.max(6,terrain.radius()+2),s.timing.damage(),s.timing.targets());
+                            s.timing.targetStart(),s.timing.targetStop(),Math.max(6F,(float)terrain.radius()+2F),s.timing.damage(),s.timing.targets());
                 }
                 float begin=s.timing.effectStart();s.timing=new DevastatorTiming(0,s.timing.effectEnd()-begin,
                         Math.max(0,s.timing.damageStart()-begin),Math.max(.1F,s.timing.damageEnd()-begin),

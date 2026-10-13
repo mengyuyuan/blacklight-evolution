@@ -48,6 +48,18 @@ class BlacklightStateTest {
     }
 
     @Test
+    void rewardsAndAlertSaturateWithoutIntegerOverflow() {
+        BlacklightState state=new BlacklightState();state.infect();
+        state.addBiomass(Integer.MAX_VALUE);
+        assertEquals(BlacklightState.MAX_BIOMASS,state.getBiomass());
+        state.addEvolutionPoints(100);state.addEvolutionPoints(Integer.MAX_VALUE);
+        assertEquals(Integer.MAX_VALUE,state.getEvolutionPoints());
+        state.raiseAlert(30);state.raiseAlert(Integer.MAX_VALUE);assertEquals(100,state.getAlert());
+        state.addBiomass(Integer.MIN_VALUE);state.addEvolutionPoints(Integer.MIN_VALUE);state.raiseAlert(Integer.MIN_VALUE);
+        assertEquals(0,state.getBiomass());assertEquals(0,state.getEvolutionPoints());assertEquals(0,state.getAlert());
+    }
+
+    @Test
     void purchasesRequireInfectionAndEnoughEvolutionPoints() {
         BlacklightState state = new BlacklightState();
         assertFalse(state.buy(PowerForm.HAMMERFISTS));
@@ -60,15 +72,18 @@ class BlacklightStateTest {
     }
 
     @Test
-    void alertBreaksAndBlocksDisguise() {
+    void alertTracksExposureWithoutForcingAnAppearanceChange() {
         BlacklightState state = new BlacklightState();
         state.infect();
         state.setPrototypeMode(true);
         state.captureIdentity("minecraft:villager");
         assertTrue(state.toggleDisguise());
         state.raiseAlert(30);
+        assertEquals(30,state.getAlert());
+        assertTrue(state.isDisguised());
+        assertTrue(state.toggleDisguise());
         assertFalse(state.isDisguised());
-        assertFalse(state.toggleDisguise());
+        assertTrue(state.toggleDisguise());
     }
 
     @Test

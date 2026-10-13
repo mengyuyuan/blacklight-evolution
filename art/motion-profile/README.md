@@ -1,6 +1,8 @@
 # Complete Blacklight runtime profile
 
-These 224 files are the unchanged profile used by the latest standalone client.
+These 251 runtime files include the 27 Devastator/Bulletdive skill clips added
+on 2026-10-13. Skill clips retain their tested bytes and provenance; existing
+branch-specific armor and weapon data is preserved.
 The inventory and original byte hashes are in `../motion-profile-manifest.json`.
 JSON motions contain editable named tracks, times and transform matrices;
 `.data` files also use JSON and contain timing, placement, camera and HUD data.

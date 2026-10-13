@@ -19,8 +19,12 @@ class WeaponSpecialRoutingTest {
     @Test void bladeDashIsOneContactWithForwardMovementAndACompleteRecovery() {
         var move = WeaponMove.BLADE_RUSH;
         assertFalse(move.frenzy(), "dash must not replay the old three-cut attack");
-        for (int tick = 0; tick <= move.duration; tick++)
-            assertEquals(tick >= move.start && tick < move.end ? 0 : -1, move.contactIndex(tick));
+        var windows=LocalWeaponMotion.find(move.id).map(LocalWeaponMotion.Definition::contactWindows).orElse(java.util.List.of());
+        for (int tick = 0; tick <= move.duration; tick++) {
+            final int t=tick;
+            boolean active=windows.isEmpty()?tick>=move.start&&tick<move.end:windows.stream().anyMatch(w->w.contains(t));
+            assertEquals(active?0:-1,move.contactIndex(tick),"source gaps cannot inflict damage");
+        }
         var profile = WeaponMotionProfile.forMove(move);
         assertNotNull(profile, "ordinary launch also needs an advancing dash");
         assertTrue(profile.distanceAt(move, (move.duration - 1) / 20F) > 2);

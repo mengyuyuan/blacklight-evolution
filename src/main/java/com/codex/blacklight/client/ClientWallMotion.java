@@ -7,8 +7,14 @@ import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.player.AbstractClientPlayer;
 import java.util.HashMap;
 import java.util.Map;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.client.event.ClientPlayerNetworkEvent;
+import net.neoforged.neoforge.client.event.ClientTickEvent;
 
 /** Explicit wall modes for observers; the controlling client predicts the same state machine. */
+@EventBusSubscriber(modid="blacklight", value=Dist.CLIENT)
 public final class ClientWallMotion {
     private record Entry(WallTraversal.Mode mode, long expires) { }
     private static final Map<Integer,Entry> MODES=new HashMap<>();
@@ -16,6 +22,13 @@ public final class ClientWallMotion {
     private ClientWallMotion() { }
     private static void checkLevel() {
         if(level!=Minecraft.getInstance().level) { MODES.clear();level=Minecraft.getInstance().level; }
+    }
+    @SubscribeEvent public static void tick(ClientTickEvent.Post event) {
+        checkLevel();
+        if(level!=null)MODES.entrySet().removeIf(entry -> level.getGameTime()>entry.getValue().expires());
+    }
+    @SubscribeEvent public static void logout(ClientPlayerNetworkEvent.LoggingOut event) {
+        MODES.clear();level=null;
     }
     public static void accept(WallMotionPayload payload) {
         checkLevel();if(level==null)return;

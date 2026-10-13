@@ -65,6 +65,7 @@ public final class PrototypeMovementSystem {
                                    int forward, int sideways, boolean sprinting, boolean detach) {
         if (!PrototypeModeSystem.isActive(player) || !player.isAlive()
                 || player.isSpectator() || player.isDeadOrDying()
+                || player.isPassenger() || player.isFallFlying() || player.getAbilities().flying
                 || player.isInLava()) {
             // Inactive/dead/lava movement never arms traversal.
             return;
