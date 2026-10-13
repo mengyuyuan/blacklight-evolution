@@ -87,6 +87,13 @@ public final class DevastatorEffectTimeline {
     public record Flight(double strength,double tangentGain,double streakLength,double airAlpha,double shock) {
         public boolean active(){return strength>1e-5;}
     }
+    /** Separate high-speed channel: normal dives keep their readable onset,
+     * while 20/200/2000-block-per-tick falls no longer look identical. */
+    public static double flightRush(double speed) {
+        if(!Double.isFinite(speed)||speed<=0)return 0;
+        double pressure=Math.log1p(speed/8);
+        return pressure/(pressure+2);
+    }
     /** Source flight fades in .1s; cycle zoom .6 ramps over 2.5s, without ReAim.
      * The short-dive pressure response and visible air widths are MC adaptation.
      * Long falls keep their presentation until real landing, not a timed impact. */
@@ -95,16 +102,17 @@ public final class DevastatorEffectTimeline {
         double seconds=Math.max(0,releaseAge-1D/6);
         double response=flightStrength(height,speed),onset=smooth(seconds/.1),strength=response*onset;
         double sourceZoom=smooth(seconds/2.5);
-        double gain=strength*(.22+(1D/.6-1-.22)*sourceZoom);
+        double rush=flightRush(speed);
+        double gain=strength*(.22+(1D/.6-1-.22)*sourceZoom+.3*rush);
         double shockAge=releaseAge-1D/30;
         double shock=shockAge<0?0:smooth(shockAge/.1)*(1-smooth((releaseAge-2D/3)/.5));
-        return new Flight(strength,gain,.55+3.2*strength,strength*(.08+.18*strength),shock);
+        return new Flight(strength,gain,.55+3.2*strength+6*rush,strength*(.10+.22*strength+.12*rush),shock);
     }
     /** The hand projection uses a different event and never calls this mapping. */
     public static double flightFov(double original,double tangentGain,double userEffectScale) {
         if(!Double.isFinite(original+tangentGain+userEffectScale)||tangentGain<=0||userEffectScale<=0)return original;
         double safe=Math.clamp(original,1,175);
-        double tangent=Math.tan(Math.toRadians(safe)*.5)*(1+Math.clamp(tangentGain,0,2D/3)*Math.clamp(userEffectScale,0,1));
+        double tangent=Math.tan(Math.toRadians(safe)*.5)*(1+Math.clamp(tangentGain,0,1)*Math.clamp(userEffectScale,0,1));
         return Math.max(original,Math.min(175,Math.toDegrees(2*Math.atan(tangent))));
     }
     private static double pulse(double age,double duration) {

@@ -1,8 +1,10 @@
 # 独立开发版安装
 
+高空俯冲：本版加强持续加速度、气流、风压圈与镜头反馈，见 [高空俯冲说明](HIGH_ALTITUDE_BULLETDIVE.md)。
+
 技能与教学：默认按 **U** 打开「能力与教程」。点击技能查看当前按键组合及循环 GIF；用上方「修改按键」改键后，教程立即同步。查看教程不扣点；通过右下方按钮购买。详细说明见 [SKILL_TUTORIALS.md](SKILL_TUTORIALS.md)。
 
-适用：Blacklight: Ascension 0.3.0-standalone-dev.14 · Minecraft 1.21.1 · NeoForge 21.1.244 · Java 21。
+适用：Blacklight: Ascension 0.3.0-standalone-dev.15 · Minecraft 1.21.1 · NeoForge 21.1.244 · Java 21。
 
 这是从 RC59 迁移的独立开发版。黑光现在使用自身的动作、玩家渲染、输入、镜头、目标锁定与服务端同步。Epic Fight、Epic ParCool 和 Weapons of Miracles 已不是前置，首次验证使用仅含黑光与 GeckoLib 的实例。
 
@@ -14,8 +16,8 @@ dev.9 合并上游的 80 种感染体原版模型、变种／资源包贴图与�
 
 ## 安装文件
 
-- `Blacklight-Ascension-MC1.21.1-NeoForge-0.3.0-standalone-dev.14-external-profile.jar`：本轮使用精确 251 文件运行资料构建，即旧 224 份、20 份正式毁灭技／俯冲／垂直瞄准动作与 7 份身体恢复动作；完整试玩应选这一类资料。
-- `Blacklight-Ascension-MC1.21.1-NeoForge-0.3.0-standalone-dev.14-bundled.jar`：默认构建，包含仓库 `art/motion-profile/` 的 224 个既有动作、装甲、镜头与 HUD 文件；没有本轮新增 27 份动作，不能当作完整毁灭技资料。
+- `Blacklight-Ascension-MC1.21.1-NeoForge-0.3.0-standalone-dev.15-external-profile.jar`：本轮使用精确 251 文件运行资料构建，即旧 224 份、20 份正式毁灭技／俯冲／垂直瞄准动作与 7 份身体恢复动作；完整试玩应选这一类资料。
+- `Blacklight-Ascension-MC1.21.1-NeoForge-0.3.0-standalone-dev.15-bundled.jar`：默认构建，包含仓库 `art/motion-profile/` 的 224 个既有动作、装甲、镜头与 HUD 文件；没有本轮新增 27 份动作，不能当作完整毁灭技资料。
 - `geckolib-neoforge-1.21.1-4.9.2.jar`：唯一额外的必需 Mod；其原始 JAR 和完整 MIT 许可一起保留。
 
 默认 `assemble` 不需要本机路径，会按仓库清单核对 224 文件。完整新技能及身体恢复通过 `-PbundleMotionDirectory=<完整资料目录>` 整套替换为 251 文件；本机使用 `D:/Blacklight-Standalone/motion-profile-dev9`。两套资料的技能动作范围不同，不要按单个文件混装。原始 FX 研究资料、网格和贴图不属于这 251 份运行资料，也不能混入 JAR。

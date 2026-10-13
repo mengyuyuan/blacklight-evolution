@@ -120,7 +120,7 @@ if (project.hasProperty('wallTraversalTest')) {
 if (project.hasProperty('standaloneInfected')) {
     sourceSets.main.java.srcDir('src/infectedVisualTest/java')
 }
-if (project.hasProperty('standaloneTutorialInspect') || project.hasProperty('standaloneTutorial') || project.hasProperty('standaloneVisual') || project.hasProperty('standaloneGait') || project.hasProperty('standaloneLock') || project.hasProperty('standaloneMorph') || project.hasProperty('standaloneSkill') || project.hasProperty('standaloneSync')) {
+if (project.hasProperty('standaloneBulletExtreme') || project.hasProperty('standaloneTutorialInspect') || project.hasProperty('standaloneTutorial') || project.hasProperty('standaloneVisual') || project.hasProperty('standaloneGait') || project.hasProperty('standaloneLock') || project.hasProperty('standaloneMorph') || project.hasProperty('standaloneSkill') || project.hasProperty('standaloneSync')) {
     sourceSets.main.java.srcDir('src/standaloneVisualTest/java')
     if (!project.hasProperty('standaloneSync')) sourceSets.main.java.exclude '**/StandaloneSyncClientSmoke.java', '**/StandaloneSyncServerChecks.java'
 }
@@ -170,6 +170,7 @@ neoForge {
                 programArguments.addAll '--width', '1440', '--height', '1000'
             }
             if (project.hasProperty('clientRunDirectory')) gameDirectory = file(project.property('clientRunDirectory'))
+            if (project.hasProperty('standaloneBulletExtreme')) systemProperty 'blacklight.test.bulletExtreme', file(project.property('standaloneBulletExtreme')).absolutePath
             if (project.hasProperty('tutorialFinalOnly')) systemProperty 'blacklight.test.tutorialInspect.finalOnly', 'true'
             if (project.hasProperty('standaloneTutorialInspect')) systemProperty 'blacklight.test.tutorialInspect', file(project.property('standaloneTutorialInspect')).absolutePath
             if (project.hasProperty('tutorialFilter')) systemProperty 'blacklight.test.tutorialFilter', project.property('tutorialFilter').toString()

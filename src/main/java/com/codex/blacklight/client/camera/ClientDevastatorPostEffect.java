@@ -117,6 +117,8 @@ public final class ClientDevastatorPostEffect {
             effect.setUniform("CentreX",centreX);effect.setUniform("CentreY",centreY);
             effect.setUniform("FlowX",lastFlowX);effect.setUniform("FlowY",lastFlowY);
             effect.setUniform("FlightAxis",lastFlightAxis);
+            effect.setUniform("Rush",flight==null?0:(float)DevastatorEffectTimeline.flightRush(flight.speed()));
+            effect.setUniform("FlightTime",flight==null?0:(float)(flight.seconds()%4096));
             effect.process(partial);passes++;
         }catch(Exception exception){
             failed=true;BlacklightNeoMod.LOGGER.error("Devastator scene lens unavailable; reload resources to retry",exception);

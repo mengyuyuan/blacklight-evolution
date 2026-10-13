@@ -19,6 +19,7 @@
   ],
   "client": [
     "client.KeyboardInputMixin",
+    "client.BulletFlightCullingMixin",
     "client.NativeHandRendererAccess",
     "client.LocalPlayerMixin",
     "client.PrototypeTargetLockMixin",
