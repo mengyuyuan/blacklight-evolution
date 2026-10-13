@@ -53,6 +53,9 @@ public final class PlayerMotionController {
         net.minecraft.world.phys.Vec3 committedPosition;
         final LocomotionClock gait=new LocomotionClock();
         final ChargePoseClock charge=new ChargePoseClock();
+        final CombatPoseTransition combat=new CombatPoseTransition();
+        final CommittedPoseInterval interval=new CommittedPoseInterval();
+        final CombatFacingTransition facing=new CombatFacingTransition();
         BlacklightPose from,last;
     }
     private PlayerMotionController() {}
@@ -179,6 +182,22 @@ public final class PlayerMotionController {
     }
 
     public static BlacklightPose pose(LivingEntity entity, float partial) {
+        var runtime=state(entity);
+        if(runtime.preview!=null)return utilityPose(entity,partial);
+        var raw=runtime.interval.ready()?runtime.interval.sample(partial):utilityPose(entity,partial);
+        return runtime.combat.sample(raw,partial);
+    }
+    public static float facing(LivingEntity entity,float partial) {
+        var facing=state(entity).facing;
+        return facing.ready()?facing.sample(partial)
+                :com.codex.blacklight.client.animation.BlacklightRenderPose.rawFacing(entity,partial);
+    }
+    private static BlacklightPose utilityPose(LivingEntity entity,float partial) {
+        var pose=rawPose(entity,partial);
+        com.codex.blacklight.client.animation.NativeUtilityPose.apply(entity,pose,partial);
+        return pose;
+    }
+    private static BlacklightPose rawPose(LivingEntity entity, float partial) {
         var runtime = state(entity); double now = now(entity, partial);
         reconcileAction(entity,runtime);
         var action=entity.getData(ModAttachments.PLAYER_ACTION);
@@ -218,7 +237,7 @@ public final class PlayerMotionController {
                 if(weight>.001F&&MotionLibrary.find(variant).isPresent())
                     sampled=BlacklightPose.interpolatePose(sampled,samplePose(variant,weapon.seconds(),false),weight);
             }
-            return weapon.blend()>=1?sampled:BlacklightPose.interpolatePose(base,sampled,weapon.blend());
+            return SourceClawRecovery.apply(weapon.key(),weapon.seconds(),sampled);
         }
         if (action.revision() != runtime.suppressedRevision && action.active(now)
                 && !isLocomotionAction(action.clipId())) {
@@ -248,7 +267,7 @@ public final class PlayerMotionController {
                 sampled=upper;
             }
             float blend = Math.clamp((float)((now - action.started()) / 20 / Math.max(.001, action.transition())), 0, 1);
-            return BlacklightPose.interpolatePose(base, sampled, blend);
+            return action.clipId().startsWith("legacy_claw_") ? sampled : BlacklightPose.interpolatePose(base, sampled, blend);
         }
         return base;
     }
@@ -396,6 +415,25 @@ public final class PlayerMotionController {
         }
         return pose;
     }
+    private record WeaponPoseIdentity(int move,long started,String key) {}
+    private record LegacyPoseIdentity(long revision,String key) {}
+    private static void commitCombat(LivingEntity entity,Runtime runtime) {
+        var visual=entity.getData(ModAttachments.WEAPON_VISUAL);
+        var sample=WeaponMotionClock.sample(visual,now(entity,0));
+        Object identity=sample==null?null:new WeaponPoseIdentity(visual.move(),visual.started(),sample.key());
+        double transition=sample==null?2.4:Math.max(1,MotionLibrary.transition(sample.key())*20);
+        var action=entity.getData(ModAttachments.PLAYER_ACTION);
+        if(sample==null&&action.revision()!=runtime.suppressedRevision&&action.active(now(entity,0))
+                &&action.clipId().startsWith("legacy_claw_")) {
+            identity=new LegacyPoseIdentity(action.revision(),action.clipId());
+            transition=Math.max(1,action.transition()*20);
+        }
+        runtime.facing.commit(identity,entity.tickCount,
+                com.codex.blacklight.client.animation.BlacklightRenderPose.rawFacing(entity,0),
+                com.codex.blacklight.client.animation.BlacklightRenderPose.rawFacing(entity,1),transition);
+        runtime.interval.commit(entity.tickCount,partial->utilityPose(entity,(float)partial));
+        runtime.combat.commit(identity,entity.tickCount,renderLocomotion(entity,runtime,0),runtime.interval.sample(1),transition);
+    }
     public static void acceptRootMotion(NativeRootMotionPayload packet) {
         var minecraft = Minecraft.getInstance(); var player = minecraft.player;
         if (player == null || packet.gameTime() < lastRootTick || packet.gameTime() == lastRootTick && packet.revision() <= lastRootRevision) return;
@@ -413,8 +451,8 @@ public final class PlayerMotionController {
         if(current==null)return;
         // Input prediction and phase snapshots run at normal priority. Commit the
         // resulting displacement once, after them, before any renderer queries it.
-        for(var player:current.players())commitLocomotion(player,state(player));
+        for(var player:current.players()){commitLocomotion(player,state(player));commitCombat(player,state(player));}
         for(var entity:java.util.List.copyOf(STATES.keySet()))
-            if(!(entity instanceof AbstractClientPlayer))commitLocomotion(entity,state(entity));
+            if(!(entity instanceof AbstractClientPlayer)){commitLocomotion(entity,state(entity));commitCombat(entity,state(entity));}
     }
 }
