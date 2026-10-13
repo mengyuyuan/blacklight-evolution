@@ -2,6 +2,8 @@
 
 2026-10-13。该文件保存失败事实，不把所有失败等同于已确认的游戏缺陷。定因和范围见 [审计报告](RELEASE_AUDIT_1.21.1.md)。
 
+后续逐项原因、隔离复现和待验证边界见 [失败诊断](RELEASE_FAILURE_DIAGNOSIS_1.21.1.md)。以下原始失败列表保留，不以诊断替代完整复测。
+
 ## 单元测试（2 项）
 
 - `com.codex.blacklight.resource.MvpResourceTest.sizedBladeKeepsHeadClearanceBetweenGrabKeys()`：org.opentest4j.AssertionFailedError: grab_blade interpolated clearance=0.0 at 0.0 ==> expected: <true> but was: <false>
