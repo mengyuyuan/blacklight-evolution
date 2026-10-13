@@ -146,6 +146,19 @@ public final class ModAttachments {
                 .orElseThrow(() -> new IllegalStateException("Missing Blacklight entity capability"));
     }
 
+    /** Passive hooks must not create/sync state or revive missing/invalid capabilities. */
+    public static <T> T peekData(Entity entity, Supplier<AttachmentType<T>> key) {
+        AttachmentType<T> type = key.get();
+        if (entity.isRemoved()) return type.createDefault();
+        return entity.getCapability(BlacklightAttachments.CAPABILITY).resolve()
+                .filter(storage -> storage.has(type)).map(storage -> storage.get(type))
+                .orElseGet(type::createDefault);
+    }
+
+    public static boolean available(Entity entity) {
+        return !entity.isRemoved() && entity.getCapability(BlacklightAttachments.CAPABILITY).isPresent();
+    }
+
     public static <T> T getData(Entity entity, Supplier<AttachmentType<T>> key) {
         AttachmentType<T> type = key.get();
         BlacklightAttachments storage = storage(entity);
@@ -193,6 +206,7 @@ public final class ModAttachments {
     }
 
     public static void syncAll(Entity entity, ServerPlayer observer) {
+        if (!available(entity)) return;
         Map<String, byte[]> fields = new LinkedHashMap<>();
         ATTACHMENTS.types.forEach((name, type) -> {
             if (type.syncCodec() != null && (entity instanceof Player || storage(entity).has(type)))

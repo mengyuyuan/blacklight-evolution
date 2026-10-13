@@ -14,7 +14,7 @@ public abstract class ConsumePairPushMixin {
     @Inject(method="push(Lnet/minecraft/world/entity/Entity;)V",at=@At("HEAD"),cancellable=true)
     private void blacklight$pairedPush(Entity other,CallbackInfo ci){
         Entity self=(Entity)(Object)this;
-        if(self instanceof LivingEntity living&&com.codex.blacklight.registry.ModAttachments.getData(living, ModAttachments.CONSUME_VISUAL).consumerId()==other.getId()
-                ||other instanceof LivingEntity livingOther&&com.codex.blacklight.registry.ModAttachments.getData(livingOther, ModAttachments.CONSUME_VISUAL).consumerId()==self.getId())ci.cancel();
+        if(self instanceof LivingEntity living&&ModAttachments.peekData(living, ModAttachments.CONSUME_VISUAL).consumerId()==other.getId()
+                ||other instanceof LivingEntity livingOther&&ModAttachments.peekData(livingOther, ModAttachments.CONSUME_VISUAL).consumerId()==self.getId())ci.cancel();
     }
 }

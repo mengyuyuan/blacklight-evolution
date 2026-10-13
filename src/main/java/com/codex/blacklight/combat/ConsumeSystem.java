@@ -87,11 +87,12 @@ public final class ConsumeSystem {
         phase(player,s,ConsumeVisual.THROW);play(player,s.form==PowerForm.BLADE?PlayerAction.GRAB_BLADE_THROW:PlayerAction.GRAB_THROW);
     }
     private static boolean valid(ServerPlayer p,Session s) {
+        if (!ModAttachments.available(p) || !ModAttachments.available(s.victim)) return false;
         var v=s.victim;var state=com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.PLAYER_STATE);
         return p.isAlive()&&!p.isSpectator()&&!p.isPassenger()&&state.isInfected()&&state.isPrototypeMode()
                 &&state.getActivePower()==s.form&&v.isAlive()&&!v.isRemoved()&&v.level()==p.level()
                 &&!v.isInvulnerable()&&!v.isPassenger()&&!v.isVehicle()&&!v.isLeashed()
-                &&com.codex.blacklight.registry.ModAttachments.getData(v, ModAttachments.CONSUME_VISUAL).consumerId()==p.getId()
+                &&ModAttachments.peekData(v, ModAttachments.CONSUME_VISUAL).consumerId()==p.getId()
                 &&(s.committed() || (s.large ? p.position().distanceToSqr(ConsumeSequence.mount(v))<=196 && hasGrabSight(p,v) : grabInReach(p,v,s.form==PowerForm.WHIPFIST && (s.stage==ConsumeVisual.CAPTURE||s.stage==ConsumeVisual.WHIP_PULL) ? WHIP_GRAB_RANGE+.5 : s.stage==ConsumeVisual.CONSUME&&ConsumeSequence.paired(s.form,false)?10:3.5)&&hasGrabSight(p,v)));
     }
     private static boolean hasGrabSight(ServerPlayer player,Mob target) {
@@ -126,7 +127,7 @@ public final class ConsumeSystem {
     }
     private static Vec3 anchor(ServerPlayer p,Mob victim) {
         var s=ACTIVE.get(p);
-        var visual=com.codex.blacklight.registry.ModAttachments.getData(victim, ModAttachments.CONSUME_VISUAL);
+        var visual=ModAttachments.peekData(victim, ModAttachments.CONSUME_VISUAL);
         if(GrappleMotion.active(visual)){
             var nativeAnchor=ConsumePlacementTrack.carryAnchor(p.position(),p.getYRot(),victim,GrappleMotion.key(p,visual),GrappleMotion.progress(p,visual,0));
             if(nativeAnchor.isPresent())return nativeAnchor.get();
@@ -141,7 +142,7 @@ public final class ConsumeSystem {
         Vec3 delta=anchor(p,v).subtract(v.position());
         v.move(MoverType.SELF,delta.length()>speed?delta.normalize().scale(speed):delta);
         v.setDeltaMovement(Vec3.ZERO);v.fallDistance=0;
-        v.setYRot(p.getYRot()+(GrappleMotion.active(com.codex.blacklight.registry.ModAttachments.getData(v, ModAttachments.CONSUME_VISUAL))?0:180));v.setYHeadRot(v.getYRot());v.yBodyRot=v.getYRot();
+        v.setYRot(p.getYRot()+(GrappleMotion.active(ModAttachments.peekData(v, ModAttachments.CONSUME_VISUAL))?0:180));v.setYHeadRot(v.getYRot());v.yBodyRot=v.getYRot();
     }
 
     /** Use maximum health for the tier, current health only for the weakening threshold. */
@@ -153,10 +154,10 @@ public final class ConsumeSystem {
 
     public static boolean eligible(Mob mob) {
         if(mob instanceof com.codex.blacklight.entity.HiveTendril)return false;
-        return !THROWN.containsKey(mob) && mob.isAlive() && !mob.isRemoved() && !mob.isInvulnerable() && mob.getType().is(CONSUMABLE)
+        return ModAttachments.available(mob) && !THROWN.containsKey(mob) && mob.isAlive() && !mob.isRemoved() && !mob.isInvulnerable() && mob.getType().is(CONSUMABLE)
                 && !(mob instanceof net.minecraft.world.entity.boss.wither.WitherBoss wither && wither.getInvulnerableTicks()>0)
                 && !(mob instanceof net.minecraft.world.entity.boss.enderdragon.EnderDragon dragon && dragon.getPhaseManager().getCurrentPhase().getPhase()==net.minecraft.world.entity.boss.enderdragon.phases.EnderDragonPhase.DYING)
-                && !com.codex.blacklight.registry.ModAttachments.getData(mob, ModAttachments.CONSUME_VISUAL).active()
+                && !ModAttachments.peekData(mob, ModAttachments.CONSUME_VISUAL).active()
                 && !(mob instanceof BlacklightHunter h && h.isBeingConsumed())
                 && !mob.isPassenger() && !mob.isVehicle() && !mob.isLeashed()
                 && !(mob instanceof TamableAnimal pet && pet.isTame())
@@ -217,7 +218,7 @@ public final class ConsumeSystem {
         var recovery=com.codex.blacklight.registry.ModAttachments.getData(player, ModAttachments.CONSUME_RECOVERY);
         if(recovery.active() && (recovery.phaseProgress(player.level().getGameTime(),0)>=1
                 ||!player.isAlive()||!com.codex.blacklight.registry.ModAttachments.getData(player, ModAttachments.PLAYER_STATE).isPrototypeMode()
-                ||com.codex.blacklight.registry.ModAttachments.getData(player, ModAttachments.WEAPON_VISUAL).spec()!=null||com.codex.blacklight.registry.ModAttachments.getData(player, ModAttachments.CONSUMING)))clearRecovery(player);
+                ||com.codex.blacklight.registry.ModAttachments.getData(player, ModAttachments.WEAPON_VISUAL).spec()!=null||ModAttachments.peekData(player, ModAttachments.CONSUMING)))clearRecovery(player);
         Session session = ACTIVE.get(player); if (session == null) return;
         Mob target = session.victim();
         if (!valid(player,session) || (!session.large && session.stage!=ConsumeVisual.CONSUME && ConsumeVisual.blocksTravel(session.stage) && player.position().distanceToSqr(session.start)>1)) {
@@ -333,7 +334,7 @@ public final class ConsumeSystem {
     private static boolean mountTick(ServerPlayer player,Session session,int elapsed) {
         Mob target=session.victim;
         Vec3 goal=ConsumeSequence.mount(target);
-        if(session.committed())goal=ConsumePlacementTrack.actorAnchor(goal,session.facing,session.animationForm(),com.codex.blacklight.registry.ModAttachments.getData(target, ModAttachments.CONSUME_VISUAL).motionProgress(player.level().getGameTime(),0),true);
+        if(session.committed())goal=ConsumePlacementTrack.actorAnchor(goal,session.facing,session.animationForm(),ModAttachments.peekData(target, ModAttachments.CONSUME_VISUAL).motionProgress(player.level().getGameTime(),0),true);
         Vec3 delta=goal.subtract(player.position());
         if(delta.lengthSqr()>196){cancel(player);return false;}
         // Collision-aware ascent, never teleport through blocks or tow a giant to the hand.
@@ -417,7 +418,7 @@ public final class ConsumeSystem {
         var identity=com.codex.blacklight.disguise.DisguiseIdentity.capture(target);
         com.codex.blacklight.BlacklightNeoMod.LOGGER.info("Consume scene finished: form={} target={} large={} elapsed={}",session.form,target.getType(),session.large,player.tickCount-session.started);
         // Release before death callbacks; rewards are only paid once after successful completion.
-        var recovery=com.codex.blacklight.registry.ModAttachments.getData(target, ModAttachments.CONSUME_VISUAL);
+        var recovery=ModAttachments.peekData(target, ModAttachments.CONSUME_VISUAL);
         ACTIVE.remove(player);
         release(target);unlock(player);
         if(ConsumeSequence.boss(target)) {
@@ -447,19 +448,22 @@ public final class ConsumeSystem {
         player.displayClientMessage(Component.translatable("message.blacklight.consume_complete", session.heal()*com.codex.blacklight.power.CombatScale.units(player), session.biomass(), session.ep()), true);
     }
     private static void clearRecovery(ServerPlayer player) {
+        if (!ModAttachments.available(player)) return;
         if(!com.codex.blacklight.registry.ModAttachments.getData(player, ModAttachments.CONSUME_RECOVERY).active())return;
         com.codex.blacklight.registry.ModAttachments.setData(player, ModAttachments.CONSUME_RECOVERY,ConsumeVisual.EMPTY);com.codex.blacklight.registry.ModAttachments.syncData(player, ModAttachments.CONSUME_RECOVERY);
     }
     /** Super armor starts when a target is claimed, not only after consume confirmation. */
     public static boolean grappleProtected(LivingEntity entity) {
-        int stage=com.codex.blacklight.registry.ModAttachments.getData(entity, ModAttachments.GRAB_STAGE);
-        return entity.isAlive() && com.codex.blacklight.registry.ModAttachments.getData(entity, ModAttachments.CONSUMING)
+        if (!entity.isAlive() || entity.isRemoved()) return false;
+        int stage=ModAttachments.peekData(entity, ModAttachments.GRAB_STAGE);
+        return ModAttachments.peekData(entity, ModAttachments.CONSUMING)
                 && (ConsumeVisual.acquiring(stage)||ConsumeVisual.holding(stage)
                     ||ConsumeVisual.consumeStage(stage)||stage==ConsumeVisual.THROW);
     }
     public static boolean committed(LivingEntity entity) {
-        int stage=com.codex.blacklight.registry.ModAttachments.getData(entity, ModAttachments.GRAB_STAGE);
-        return com.codex.blacklight.registry.ModAttachments.getData(entity, ModAttachments.CONSUMING)&&ConsumeVisual.consumeStage(stage);
+        if (!entity.isAlive() || entity.isRemoved()) return false;
+        int stage=ModAttachments.peekData(entity, ModAttachments.GRAB_STAGE);
+        return ModAttachments.peekData(entity, ModAttachments.CONSUMING)&&ConsumeVisual.consumeStage(stage);
     }
     public static void cancel(ServerPlayer player) {
         clearRecovery(player);
@@ -467,16 +471,18 @@ public final class ConsumeSystem {
         if (session == null) return;
         release(session.victim());
         unlock(player);
-        if (player.isAlive() && com.codex.blacklight.registry.ModAttachments.getData(player, ModAttachments.PLAYER_STATE).isPrototypeMode())
+        if (ModAttachments.available(player) && player.isAlive() && com.codex.blacklight.registry.ModAttachments.getData(player, ModAttachments.PLAYER_STATE).isPrototypeMode())
             play(player, PlayerAction.CLAW_IDLE);
         message(player, "consume_cancelled");
     }
     private static void release(Mob victim) {
+        if (!ModAttachments.available(victim)) return;
         if(victim instanceof BlacklightHunter hunter)hunter.release();
         com.codex.blacklight.registry.ModAttachments.setData(victim, ModAttachments.CONSUME_VISUAL,ConsumeVisual.EMPTY);
         if(!victim.isRemoved())com.codex.blacklight.registry.ModAttachments.syncData(victim, ModAttachments.CONSUME_VISUAL);
     }
     private static void unlock(ServerPlayer p) {
+        if (!ModAttachments.available(p)) return;
         com.codex.blacklight.registry.ModAttachments.setData(p, ModAttachments.CONSUMING,false);com.codex.blacklight.registry.ModAttachments.syncData(p, ModAttachments.CONSUMING);
         com.codex.blacklight.registry.ModAttachments.setData(p, ModAttachments.GRAB_STAGE,ConsumeVisual.NONE);com.codex.blacklight.registry.ModAttachments.syncData(p, ModAttachments.GRAB_STAGE);
     }
@@ -509,7 +515,7 @@ public final class ConsumeSystem {
         if (event.getNewDamage() <= 0) return;
         // Ordinary damage cannot silently discard capture/hold. Death still ends it.
         if (event.getEntity() instanceof ServerPlayer p && !p.isAlive()) cancel(p);
-        if (com.codex.blacklight.registry.ModAttachments.getData(event.getEntity(), ModAttachments.CONSUME_VISUAL).active()) {
+        if (ModAttachments.peekData(event.getEntity(), ModAttachments.CONSUME_VISUAL).active()) {
             for (var entry : List.copyOf(ACTIVE.entrySet())) if (entry.getValue().victim() == event.getEntity() && !event.getEntity().isAlive()) cancel(entry.getKey());
         }
     }
@@ -526,7 +532,7 @@ public final class ConsumeSystem {
     /** Freeze the captured mob without writing NoAI, gravity, or invulnerability into its saved NBT. */
     @SubscribeEvent public static void freeze(com.codex.blacklight.combat.ForgeEntityTickEvent.Pre event) {
         if (event.getEntity().level().isClientSide || !(event.getEntity() instanceof Mob mob)) return;
-        var visual = com.codex.blacklight.registry.ModAttachments.getData(mob, ModAttachments.CONSUME_VISUAL);
+        var visual = ModAttachments.peekData(mob, ModAttachments.CONSUME_VISUAL);
         if(visual.stage()==ConsumeVisual.FLIGHT) return;
         if (!visual.active()) return;
         boolean claimed = ACTIVE.values().stream().anyMatch(session -> session.victim() == mob);
