@@ -896,6 +896,114 @@
     "whip_sweep_charged.json": {
       "bytes": 413648,
       "sha256": "c138d848342c04bd09f0ad9ad3b561ce76ccf285d1c04cc7044defa458cb2e3b"
+    },
+    "bulletdive_drop.json": {
+      "bytes": 1086196,
+      "sha256": "7eb840a1943581ab2a18805a59568ae563dd27fcefb40b75599da62efa044a70"
+    },
+    "bulletdive_drop_charge.json": {
+      "bytes": 238819,
+      "sha256": "3246ee23c5e52cc2c60d756e83970c3c4c656dbe032cba8188b7eb8e493916bb"
+    },
+    "bulletdive_drop_flight.json": {
+      "bytes": 439834,
+      "sha256": "ca447c6b9d309da789a6ce8326ba7e81603934db3f5baf04bfe0f726681c5ce6"
+    },
+    "bulletdive_drop_land.json": {
+      "bytes": 382432,
+      "sha256": "a3a5a1e15b25983525534f5306891b45afcfe13e68129300cb808fbde335282d"
+    },
+    "bulletdive_drop_recovery.json": {
+      "bytes": 382432,
+      "sha256": "a3a5a1e15b25983525534f5306891b45afcfe13e68129300cb808fbde335282d"
+    },
+    "dev_air_critical_pain.json": {
+      "bytes": 2012227,
+      "sha256": "edbce1e1769b38e0b2a7191b1dce47450a3520fa930f0ee7487f81b5cbbc5ad5"
+    },
+    "dev_air_critical_pain_aim_down.json": {
+      "bytes": 2000044,
+      "sha256": "d894d8e19f388af49cba0139c4c23f7fdf949183b969637ece7e7e571a6487b6"
+    },
+    "dev_air_critical_pain_aim_up.json": {
+      "bytes": 2001027,
+      "sha256": "66785d475512a9f863f55c9505708af25477117cf8108c8982454fa79ab717c5"
+    },
+    "dev_air_critical_pain_charge.json": {
+      "bytes": 343822,
+      "sha256": "7aee71438f772f9fac1d1bbc1a11a2b49ea354792524e50de3c33ab806c1c86a"
+    },
+    "dev_air_critical_pain_recovery.json": {
+      "bytes": 222566,
+      "sha256": "52194a86663d8eb4e6ea47f03be08554d5090e4a467c4cb4e86bfc76580c837a"
+    },
+    "dev_air_groundspike.json": {
+      "bytes": 2088248,
+      "sha256": "ceca7f252d3a48244565b99d01c3232aedea817899b490b73bd95af173f7da77"
+    },
+    "dev_air_groundspike_charge.json": {
+      "bytes": 326826,
+      "sha256": "9a3cef7d54098d412cb00b77ff1d91f9767168e01b8a1702cc836462e0091c40"
+    },
+    "dev_air_groundspike_recovery.json": {
+      "bytes": 653062,
+      "sha256": "f66a310cf5f4a867f35fc1dc4b578f833051c087b063837cb3b7ab21e4813b77"
+    },
+    "dev_air_tendril.json": {
+      "bytes": 1812426,
+      "sha256": "95a1627b8cc2e62f82ef0e107fb0e899cc6ff99c2af8f05c0f06c6ad5e98b1ff"
+    },
+    "dev_air_tendril_charge.json": {
+      "bytes": 345562,
+      "sha256": "bebc4240f994c222daf22c10e72cc426a673c2d5926a882807660c08ee703e0f"
+    },
+    "dev_air_tendril_recovery.json": {
+      "bytes": 199231,
+      "sha256": "5db606a045153f6612941b021e183187a6e746127214dd6f6e6915120eb459c6"
+    },
+    "dev_critical_pain.json": {
+      "bytes": 2199307,
+      "sha256": "4605127a2005da510d57ce1a90d796063638a2f394ea200506f12f4b01faa470"
+    },
+    "dev_critical_pain_aim_down.json": {
+      "bytes": 2203985,
+      "sha256": "27029cfe2eb733962faeebfb89777ecba6d8bf05836df24a4206acfccec22d50"
+    },
+    "dev_critical_pain_aim_up.json": {
+      "bytes": 2210385,
+      "sha256": "464f331459ee52f8817b7870a12a71f498b7a912f9794679e70b4eedd1591425"
+    },
+    "dev_critical_pain_charge.json": {
+      "bytes": 326530,
+      "sha256": "c631a94960d6719826d255a2d2e36b0018b5a32cf43e296de13e47fe128741a2"
+    },
+    "dev_critical_pain_recovery.json": {
+      "bytes": 694472,
+      "sha256": "fe893ec86524135d90ec99b981ac8813ab9e90025cf6b8d9a7e6cecb5ca0be1e"
+    },
+    "dev_groundspike.json": {
+      "bytes": 2259751,
+      "sha256": "bc0c1ad74db3ee2e764e98a164ea8d8c683990b4b1c826c35ccfb2ebe991562d"
+    },
+    "dev_groundspike_charge.json": {
+      "bytes": 350347,
+      "sha256": "cbda33c7128def2c5d1cbe04d4313edf78d6ffaf4a961ba6cfff74e1f62f96c8"
+    },
+    "dev_groundspike_recovery.json": {
+      "bytes": 653062,
+      "sha256": "f66a310cf5f4a867f35fc1dc4b578f833051c087b063837cb3b7ab21e4813b77"
+    },
+    "dev_tendril.json": {
+      "bytes": 1799451,
+      "sha256": "4a4fdf295330ef1101be869776a42526c9cf665c1641a9dcc59cf83df0d6497d"
+    },
+    "dev_tendril_charge.json": {
+      "bytes": 339589,
+      "sha256": "56c992a1d47de40274cb975032ebd1c432c6e55d33f8c3d5e5477f56e1a906ca"
+    },
+    "dev_tendril_recovery.json": {
+      "bytes": 272841,
+      "sha256": "ccc7ad6a1ca0b2fa5aeb094f195bd15e1bc9811a075a011dec12ec04e2e326f1"
     }
   }
 }
