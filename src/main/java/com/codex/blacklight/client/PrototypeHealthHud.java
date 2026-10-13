@@ -44,8 +44,7 @@ public final class PrototypeHealthHud {
     public static int utilityTop(){
         var p=Minecraft.getInstance().player;
         if(!active())return 10;
-        if(!p.getData(ModAttachments.PLAYER_STATE).hasCombatSkill(com.codex.blacklight.power.CombatSkill.CRITICAL_MASS))return 40;
-        return Minecraft.getInstance().level!=null&&p.getData(ModAttachments.ADRENALINE).active(Minecraft.getInstance().level.getGameTime())?60:48;
+        return Minecraft.getInstance().level!=null&&p.getData(ModAttachments.ADRENALINE).active(Minecraft.getInstance().level.getGameTime())?48:40;
     }
     @SubscribeEvent public static void hideHearts(RenderGuiLayerEvent.Pre event){
         if(active()&&event.getName().equals(VanillaGuiLayers.PLAYER_HEALTH))event.setCanceled(true);
@@ -67,7 +66,7 @@ public final class PrototypeHealthHud {
         int x=10,y=10,w=Math.min(180,mc.getWindow().getGuiScaledWidth()-20);
         if(SourceBar.VALUE!=null)renderCriticalMassBacking(g,p,x,y,w,true);
         if(NativeHealthHud.render(g,x,y,w,health/maximum,trail/maximum,p.getAbsorptionAmount()/maximum)){
-            renderCriticalMassText(g,p,x,y+24,w,mc.level.getGameTime());return;
+            renderAdrenalineStatus(g,p,x,y+24,w,mc.level.getGameTime());return;
         }
         boolean critical=health>0&&health/maximum<.25F;
         int accent=critical?0xFFFF5948:0xFFDB352E;
@@ -88,7 +87,7 @@ public final class PrototypeHealthHud {
             g.fill(bx,by+bh+3,bx+bw,by+bh+5,0xFF302419);
             g.fill(bx,by+bh+3,bx+Math.max(1,Math.round(bw*Math.min(1,absorb/maximum))),by+bh+5,0xFFF1C66D);
         }
-        renderCriticalMassText(g,p,x,y+24,w,mc.level.getGameTime());
+        renderAdrenalineStatus(g,p,x,y+24,w,mc.level.getGameTime());
     }
     private static void renderCriticalMassBacking(GuiGraphics g,LocalPlayer p,int x,int y,int w,boolean source){
         var state=p.getData(ModAttachments.PLAYER_STATE);
@@ -115,15 +114,9 @@ public final class PrototypeHealthHud {
             if(mark<start+extension)g.fill(mark,top+1,mark+1,top+height,0x7020394B);
         }
     }
-    private static void renderCriticalMassText(GuiGraphics g, LocalPlayer p, int x, int y, int w, long now) {
-        if (!p.getData(ModAttachments.PLAYER_STATE).hasCombatSkill(com.codex.blacklight.power.CombatSkill.CRITICAL_MASS)) return;
+    private static void renderAdrenalineStatus(GuiGraphics g, LocalPlayer p, int x, int y, int w, long now) {
         var mass=p.getData(ModAttachments.CRITICAL_MASS);
         var surge=p.getData(ModAttachments.ADRENALINE);
-        int capacity=com.codex.blacklight.power.CombatSkill.criticalMassCapacity(p.getData(ModAttachments.PLAYER_STATE).getCombatSkillMask());
-        var label=net.minecraft.network.chat.Component.translatable(mass.ready()?"hud.blacklight.critical_mass_ready":"hud.blacklight.critical_mass_charging",
-                Math.round(mass.reserve()/capacity*100),
-                (int)Math.floor(mass.reserve()),capacity);
-        drawStatus(g,label,x+6,y,w-10,mass.ready()?0xFF77DFF0:0xFF53BADB);
         if(surge.active(now)){
             boolean blocked=surge.ready(now)&&!mass.adrenalineReleaseAllowed(now);
             var hint=net.minecraft.network.chat.Component.translatable(surge.undamageable(now)?"hud.blacklight.adrenaline_grace"
@@ -131,7 +124,7 @@ public final class PrototypeHealthHud {
                     :"hud.blacklight.adrenaline_recover",
                     (int)Math.ceil((surge.undamageable(now)?surge.undamageableUntil()-now
                             :blocked?mass.adrenalineWaitTicks(now):surge.until()-now)/20D));
-            drawStatus(g,hint,x+6,y+11,w-10,0xFFFFBD53);
+            drawStatus(g,hint,x+6,y,w-10,0xFFFFBD53);
         }
     }
     private static void drawStatus(GuiGraphics g,net.minecraft.network.chat.Component label,int x,int y,int available,int color){

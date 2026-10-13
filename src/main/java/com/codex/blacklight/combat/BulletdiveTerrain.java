@@ -3,11 +3,12 @@ package com.codex.blacklight.combat;
 import com.codex.blacklight.power.CombatSkill;
 import com.codex.blacklight.registry.ModAttachments;
 import java.util.*;
+import java.util.function.LongSupplier;
+import java.util.function.Consumer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.gameevent.GameEvent;
+import net.minecraft.world.level.block.LiquidBlock;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
@@ -23,8 +24,10 @@ import net.neoforged.neoforge.event.tick.ServerTickEvent;
  */
 @EventBusSubscriber(modid="blacklight")
 public final class BulletdiveTerrain {
-    public static final int MAX_WORK_PER_TICK=192, MAX_FEEDBACK_PER_TICK=8;
-    private static final int MAX_ACTIVE=16, MAX_HISTORY=128;
+    public static final int MAX_WORK_PER_TICK=192, MAX_BREAKS_PER_TICK=32;
+    /** Every successful break now has feedback and vanilla drops. */
+    public static final int MAX_FEEDBACK_PER_TICK=MAX_BREAKS_PER_TICK;
+    private static final int MAX_HISTORY=128;
     private static final long TICK_NANOS=3_000_000;
     /** budget is the theoretical unit-hardness-zero block count, not a work/candidate cutoff. */
     public record Plan(double height,int radius,int depth,long budget,double energy) { }
@@ -33,6 +36,7 @@ public final class BulletdiveTerrain {
     private record Key(UUID owner,long session) { }
     record Column(int x,int z,long distanceSquared) { }
     private static final Map<Key,Job> JOBS=new LinkedHashMap<>();
+    private static final OwnerTasks<Job> ACTIVE_OWNERS=new OwnerTasks<>();
     private static final ThreadLocal<BlockEvent.BreakEvent> OWN_BREAK=new ThreadLocal<>();
     private static int nextJob;
     private BulletdiveTerrain() { }
@@ -59,7 +63,9 @@ public final class BulletdiveTerrain {
     public static double hardnessCost(float hardness) { return Float.isFinite(hardness)&&hardness>=0?1D+hardness*3D:Double.POSITIVE_INFINITY; }
     public static boolean canBreak(Plan plan,long distanceSquared,int layer,float hardness,float resistance,boolean blockEntity) {
         return distanceSquared>=0&&layer>=0&&layer<columnDepth(plan,distanceSquared)
-                &&!blockEntity&&Float.isFinite(hardness)&&hardness>=0&&Float.isFinite(resistance)&&resistance<1200
+                // Containers and positive-hardness blast-resistant blocks are
+                // ordinary break candidates. Negative hardness is unbreakable.
+                &&Float.isFinite(hardness)&&hardness>=0&&Float.isFinite(resistance)
                 &&hardness<=localStrength(plan,distanceSquared,layer)&&hardnessCost(hardness)<=plan.energy;
     }
     /** Only this exact event bypasses Blacklight's vanilla-mining lock, never external protection. */
@@ -72,14 +78,31 @@ public final class BulletdiveTerrain {
     }
     public static Plan begin(ServerPlayer p,long session,Vec3 impact,double fallHeight) {
         if(!p.server.isSameThread())throw new IllegalStateException("Bulletdive terrain must start on the server thread");
-        var key=new Key(p.getUUID(),session);var prior=JOBS.get(key);if(prior!=null)return prior.plan;
+        var key=new Key(p.getUUID(),session);var prior=JOBS.get(key);
+        if(!blockBreakingEnabled(p)){
+            var active=ACTIVE_OWNERS.current(p.getUUID());
+            if(active!=null)active.finish("block_breaking_disabled");
+            return prior==null?plan(fallHeight):prior.plan;
+        }
+        if(prior!=null)return prior.plan;
         var plan=plan(fallHeight);
         var job=new Job(p,key,plan,impact);JOBS.put(key,job);
         if(!eligible(p)||!Double.isFinite(impact.x)||!Double.isFinite(impact.y)||!Double.isFinite(impact.z)
                 ||!job.level.isInWorldBounds(job.center))job.finish("ineligible");
         else if(plan.radius==0)job.finish("below_height_threshold");
-        else if(JOBS.values().stream().filter(j->!j.complete).count()>MAX_ACTIVE)job.finish("queue_full");
+        else ACTIVE_OWNERS.install(p.getUUID(),job,old->old.finish("superseded"));
         trimHistory();return plan;
+    }
+    private static boolean blockBreakingEnabled(ServerPlayer p) {
+        return p.getData(ModAttachments.SKILL_SETTINGS).bulletdiveBlockBreaking();
+    }
+    /** Invalidate now, even if an OFF and ON request arrive in the same tick. */
+    public static void settingsChanged(ServerPlayer p){
+        if(!p.server.isSameThread())throw new IllegalStateException("Terrain preference changes require the server thread");
+        if(!blockBreakingEnabled(p)){
+            var job=ACTIVE_OWNERS.current(p.getUUID());
+            if(job!=null)job.finish("block_breaking_disabled");
+        }
     }
     private static boolean eligible(ServerPlayer p) {
         var state=p.getData(ModAttachments.PLAYER_STATE);
@@ -87,20 +110,21 @@ public final class BulletdiveTerrain {
                 &&state.hasCombatSkill(CombatSkill.BULLETDIVE_DROP);
     }
     @SubscribeEvent public static void tick(ServerTickEvent.Post event) {
-        int work=0,feedback=0;long until=System.nanoTime()+TICK_NANOS;
+        var budget=new TickBudget(MAX_WORK_PER_TICK,MAX_BREAKS_PER_TICK,TICK_NANOS,System::nanoTime);
         var active=new ArrayList<Job>();
-        for(var job:JOBS.values()) {
+        for(var job:ACTIVE_OWNERS.snapshot()) {
             if(job.complete)continue;
+            if(!blockBreakingEnabled(job.owner)){job.finish("block_breaking_disabled");continue;}
             if(!eligible(job.owner)||job.owner.isRemoved()||job.owner.level()!=job.level){job.finish("owner_unavailable");continue;}
             active.add(job);
         }
         int cursor=active.isEmpty()?0:Math.floorMod(nextJob,active.size()),idle=0;
-        while(!active.isEmpty()&&work<MAX_WORK_PER_TICK&&System.nanoTime()<until&&idle<active.size()){
+        while(!active.isEmpty()&&idle<active.size()){
             var job=active.get(cursor);cursor=(cursor+1)%active.size();
             if(job.complete){idle++;continue;}
             idle=0;
-            if(job.next(feedback<MAX_FEEDBACK_PER_TICK))feedback++;
-            work++;
+            if(!budget.tryCandidate())break;
+            if(job.next())budget.recordBreak();
         }
         nextJob=cursor;
         trimHistory();
@@ -110,11 +134,55 @@ public final class BulletdiveTerrain {
         var iterator=JOBS.entrySet().iterator();
         while(JOBS.size()>MAX_HISTORY&&iterator.hasNext())if(iterator.next().getValue().complete)iterator.remove();
     }
-    private static void cancel(ServerPlayer p) { for(var job:JOBS.values())if(job.owner==p&&!job.complete)job.finish("owner_unavailable"); }
+    private static void cancel(ServerPlayer p) {
+        var job=ACTIVE_OWNERS.current(p.getUUID());if(job!=null&&job.owner==p)job.finish("owner_unavailable");
+    }
     @SubscribeEvent public static void logout(PlayerEvent.PlayerLoggedOutEvent event){if(event.getEntity() instanceof ServerPlayer p)cancel(p);}
     @SubscribeEvent public static void dimension(PlayerEvent.PlayerChangedDimensionEvent event){if(event.getEntity() instanceof ServerPlayer p)cancel(p);}
     @SubscribeEvent public static void death(LivingDeathEvent event){if(event.getEntity() instanceof ServerPlayer p)cancel(p);}
-    @SubscribeEvent public static void stopping(ServerStoppingEvent event){JOBS.clear();OWN_BREAK.remove();nextJob=0;}
+    @SubscribeEvent public static void stopping(ServerStoppingEvent event){JOBS.clear();ACTIVE_OWNERS.clear();OWN_BREAK.remove();nextJob=0;}
+
+    /** One pending terrain attack per online owner. Superseding is an explicit
+     * new attack, not a per-tick power cutoff. Completion of an old session must
+     * never remove the replacement from its owner's active slot.
+     */
+    static final class OwnerTasks<T> {
+        private final Map<UUID,T> tasks=new LinkedHashMap<>();
+        T current(UUID owner){return tasks.get(owner);}
+        void install(UUID owner,T task,Consumer<T> cancelPrevious){
+            var previous=tasks.put(owner,task);
+            if(previous!=null&&previous!=task)cancelPrevious.accept(previous);
+        }
+        void complete(UUID owner,T task){tasks.remove(owner,task);}
+        List<T> snapshot(){return List.copyOf(tasks.values());}
+        int size(){return tasks.size();}
+        void clear(){tasks.clear();}
+    }
+
+    /** Global slice limits include actual drop-producing destruction, rather
+     * than silently removing the remainder without loot. Pending work resumes
+     * next tick; the limits never reduce a job's physical energy or shape.
+     */
+    static final class TickBudget {
+        private final int maximumCandidates,maximumBreaks;
+        private final long duration,started;
+        private final LongSupplier clock;
+        private int candidates,breaks;
+        TickBudget(int maximumCandidates,int maximumBreaks,long duration,LongSupplier clock){
+            if(maximumCandidates<1||maximumBreaks<1||duration<0)throw new IllegalArgumentException("Invalid terrain slice");
+            this.maximumCandidates=maximumCandidates;this.maximumBreaks=maximumBreaks;this.duration=duration;this.clock=clock;
+            started=clock.getAsLong();
+        }
+        boolean tryCandidate(){
+            long elapsed=clock.getAsLong()-started;
+            if(candidates>=maximumCandidates||breaks>=maximumBreaks||elapsed<0||elapsed>=duration)return false;
+            candidates++;return true;
+        }
+        void recordBreak(){
+            if(breaks>=maximumBreaks||breaks>=candidates)throw new IllegalStateException("Unbudgeted block destruction");
+            breaks++;
+        }
+    }
 
     @FunctionalInterface interface LoadedChunkLookup { boolean loaded(int x,int z); }
     private record ChunkProbe(int x,int z,long distanceSquared) { }
@@ -193,7 +261,8 @@ public final class BulletdiveTerrain {
             columns=new ColumnCursor(plan,center.getX(),center.getZ(),(x,z)->level.getChunkSource().getChunkNow(x,z)!=null);
         }
         boolean loaded(BlockPos pos){return level.getChunkSource().getChunkNow(pos.getX()>>4,pos.getZ()>>4)!=null;}
-        boolean next(boolean feedback) {
+        boolean next() {
+            if(!blockBreakingEnabled(owner)){finish("block_breaking_disabled");return false;}
             if(energy<1){finish("energy_exhausted");return false;}
             if(column==null){
                 column=columns.step();
@@ -211,28 +280,33 @@ public final class BulletdiveTerrain {
             if(!level.isInWorldBounds(pos)||!loaded(pos)){skipped++;column=null;return false;}
             if(!level.mayInteract(owner,pos)||!owner.mayBuild()){protectedBlocks++;column=null;return false;}
             var state=level.getBlockState(pos);
-            if(state.isAir()||!state.getFluidState().isEmpty()){skipped++;return false;}
+            // A waterlogged solid is still a real breakable block; destroyBlock
+            // restores its fluid naturally. Pure fluid cells are not mining.
+            if(state.isAir()||state.getBlock() instanceof LiquidBlock){skipped++;return false;}
             float hardness=state.getDestroySpeed(level,pos),resistance=state.getBlock().getExplosionResistance();
-            if(state.hasBlockEntity()||level.getBlockEntity(pos)!=null||hardness<0||resistance>=1200){protectedBlocks++;column=null;return false;}
+            if(hardness<0){protectedBlocks++;column=null;return false;}
             double cost=hardnessCost(hardness);
             if(!canBreak(plan,current.distanceSquared,currentLayer,hardness,resistance,false)||cost>energy){skipped++;column=null;return false;}
             var event=new BlockEvent.BreakEvent(level,pos,state,owner);var previous=OWN_BREAK.get();OWN_BREAK.set(event);
             try { NeoForge.EVENT_BUS.post(event); } finally { if(previous==null)OWN_BREAK.remove();else OWN_BREAK.set(previous); }
-            if(complete||!eligible(owner)||owner.level()!=level){finish("owner_unavailable");return false;}
+            if(!blockBreakingEnabled(owner)){finish("block_breaking_disabled");return false;}
+            if(complete)return false;
+            if(!eligible(owner)||owner.isRemoved()||owner.level()!=level){finish("owner_unavailable");return false;}
             if(event.isCanceled()||!loaded(pos)||!level.mayInteract(owner,pos)){protectedBlocks++;column=null;return false;}
             if(!level.getBlockState(pos).equals(state)){skipped++;column=null;return false;}
-            boolean broken;
-            if(feedback)broken=level.destroyBlock(pos,false,owner);
-            else {
-                broken=level.setBlockAndUpdate(pos,Blocks.AIR.defaultBlockState());
-                if(broken)level.gameEvent(GameEvent.BLOCK_DESTROY,pos,GameEvent.Context.of(owner,state));
-            }
+            // Vanilla handles loot (including the block entity), removal hooks,
+            // tileDrops and break feedback once. Do not also drop inventory or
+            // call playerDestroy: that would duplicate container/loot handling.
+            boolean broken=level.destroyBlock(pos,true,owner);
             if(!broken){skipped++;column=null;return false;}
             energy=Math.max(0,energy-cost);destroyed++;
             maxRadius=Math.max(maxRadius,Math.sqrt(current.distanceSquared));maxDepth=Math.max(maxDepth,currentLayer+1);
-            return feedback;
+            return true;
         }
-        void finish(String reason){complete=true;this.reason=reason;column=null;columns.clear();}
+        void finish(String reason){
+            if(complete)return;
+            complete=true;this.reason=reason;column=null;columns.clear();ACTIVE_OWNERS.complete(key.owner,this);
+        }
         Snapshot snapshot(){return new Snapshot(plan,complete,visited,destroyed,protectedBlocks,skipped,energy,maxRadius,maxDepth,reason);}
     }
 }

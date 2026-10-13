@@ -6,6 +6,9 @@ uniform float Retract;
 uniform float Flight;
 uniform float CentreX;
 uniform float CentreY;
+uniform float FlowX;
+uniform float FlowY;
+uniform float FlightAxis;
 in vec2 texCoord;
 out vec4 fragColor;
 void main() {
@@ -14,20 +17,24 @@ void main() {
     vec2 axis=texCoord-centre;
     vec2 radial=axis*vec2(aspect,1.0);
     float radius=length(radial);
-    float strength=clamp(Burst+Retract+Flight*0.55,0.0,1.0);
+    float strength=clamp(max(Burst+Retract,Flight),0.0,1.0);
     // Positive blast pushes the lens out; recovery draws it back into the
     // actor. The recovered source envelopes drive this original shader.
     float direction=Burst-Retract*1.6;
     float ring=exp(-pow((radius-0.24-0.10*Burst)/0.15,2.0));
-    float displacement=(direction*0.024*ring+Flight*0.007*radius);
+    float peripheral=smoothstep(0.14,0.65,radius);
+    float displacement=(direction*0.024*ring+Flight*0.012*radius*peripheral);
     vec2 warped=clamp(texCoord+axis*displacement,vec2(0.001),vec2(0.999));
     vec4 colour=texture(DiffuseSampler,warped);
     vec3 sum=colour.rgb;float total=1.0;
     // Radial scene streaks, no bright overlay, tint or HUD modification.
-    float blur=(Burst*0.025+Retract*0.012+Flight*0.014)*smoothstep(0.03,0.45,radius);
+    vec2 blur=axis*(Burst*0.025+Retract*0.012)*smoothstep(0.03,0.45,radius);
+    // Looking along the drop yields radial flow; looking across it yields
+    // upward world flow. Keep the aim/actor centre legible in either view.
+    blur+=(axis*FlightAxis*0.055+vec2(FlowX,FlowY)*0.040)*Flight*peripheral;
     for(int i=1;i<=6;i++) {
-        float offset=(float(i)/6.0-0.5)*blur;
-        vec2 uv=clamp(warped+axis*offset,vec2(0.001),vec2(0.999));
+        float offset=float(i)/6.0-0.5;
+        vec2 uv=clamp(warped+blur*offset,vec2(0.001),vec2(0.999));
         float weight=1.0-float(i)*0.08;
         sum+=texture(DiffuseSampler,uv).rgb*weight;total+=weight;
     }

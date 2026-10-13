@@ -6,6 +6,7 @@ import com.codex.blacklight.power.CriticalMassState;
 import com.codex.blacklight.power.AdrenalineState;
 import com.codex.blacklight.power.MovementUpgrade;
 import com.codex.blacklight.power.PowerForm;
+import com.codex.blacklight.power.SkillSettings;
 import com.codex.blacklight.registry.ModAttachments;
 import com.codex.blacklight.state.BlacklightState;
 import com.google.gson.JsonObject;
@@ -17,6 +18,12 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.entity.ChestBlockEntity;
+import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.level.GameRules;
+import net.minecraft.world.phys.AABB;
 import net.minecraft.world.level.storage.LevelResource;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.api.distmarker.Dist;
@@ -54,25 +61,37 @@ public final class StandaloneBulletTerrainChecks {
         final BlacklightState originalState;
         final CriticalMassState originalMass;
         final AdrenalineState originalAdrenaline;
-        final BlockPos low,high,protectedLane;
-        final long lowId,highId,protectedId,jumpId,began;
+        final SkillSettings originalSettings;
+        final boolean originalDrops;
+        final Set<UUID> originalItems=new HashSet<>();
+        final BlockPos low,high,protectedLane,disabledLane,canceledLane,noDropsLane;
+        final long lowId,highId,protectedId,jumpId,disabledId,canceledId,noDropsId,began;
+        int stage;
+        boolean fixtureTouched;
+        long stageAt,disabledAir;
         final JsonObject report=new JsonObject();
         Consumer<BlockEvent.BreakEvent> protector;
         BlockPos protectedCell,bedrock,container;
         Run(ServerPlayer p) {
             this.p=p;originalState=p.getData(ModAttachments.PLAYER_STATE);
             originalMass=p.getData(ModAttachments.CRITICAL_MASS);originalAdrenaline=p.getData(ModAttachments.ADRENALINE);
+            originalSettings=p.getData(ModAttachments.SKILL_SETTINGS);
+            originalDrops=p.level().getGameRules().getBoolean(GameRules.RULE_DOBLOCKDROPS);
             began=p.level().getGameTime();
             int y=Math.clamp(p.getBlockY()-1,p.level().getMinBuildHeight()+10,p.level().getMaxBuildHeight()-10);
             low=new BlockPos(p.getBlockX()-24,y,p.getBlockZ()+24);
             high=new BlockPos(p.getBlockX(),y,p.getBlockZ()+24);
             protectedLane=new BlockPos(p.getBlockX()+24,y,p.getBlockZ()+24);
-            long first=-10_000_000-began*4;lowId=first;highId=first-1;protectedId=first-2;jumpId=first-3;
+            disabledLane=new BlockPos(p.getBlockX()-24,y,p.getBlockZ()-24);
+            canceledLane=new BlockPos(p.getBlockX(),y,p.getBlockZ()-24);
+            noDropsLane=new BlockPos(p.getBlockX()+24,y,p.getBlockZ()-24);
+            long first=-10_000_000-began*8;lowId=first;highId=first-1;protectedId=first-2;jumpId=first-3;
+            disabledId=first-4;canceledId=first-5;noDropsId=first-6;
         }
         void begin() {
             // Validate the complete region before the first write: no chunk loading
             // and no replacing a pre-existing block entity even in the QA save.
-            for(var center:new BlockPos[]{low,high,protectedLane})
+            for(var center:lanes())
                 for(int x=-9;x<=9;x++)for(int z=-9;z<=9;z++)for(int y=0;y<6;y++) {
                     var pos=center.offset(x,-y,z);
                     require(p.serverLevel().getChunkSource().getChunkNow(pos.getX()>>4,pos.getZ()>>4)!=null,"terrain fixture chunk is unloaded");
@@ -82,13 +101,20 @@ public final class StandaloneBulletTerrainChecks {
                 }
             var state=new BlacklightState();state.infect();state.setPrototypeMode(true);state.activate(PowerForm.NONE);
             state.addEvolutionPoints(10_000);state.buyMovementUpgrade(MovementUpgrade.GLIDE_1);state.buyCombatSkill(CombatSkill.BULLETDIVE_DROP);
+            for(var center:lanes())for(var item:items(center))originalItems.add(item.getUUID());
             p.setData(ModAttachments.PLAYER_STATE,state);p.syncData(ModAttachments.PLAYER_STATE);
+            fixtureTouched=true;
+            settings(true);
+            p.level().getGameRules().getRule(GameRules.RULE_DOBLOCKDROPS).set(true,p.server);
             for(var pos:originalBlocks.keySet())p.serverLevel().setBlockAndUpdate(pos,Blocks.DIRT.defaultBlockState());
             p.serverLevel().setBlockAndUpdate(low,Blocks.IRON_BLOCK.defaultBlockState());
             p.serverLevel().setBlockAndUpdate(high,Blocks.IRON_BLOCK.defaultBlockState());
             bedrock=high.offset(1,0,0);container=high.offset(0,0,1);protectedCell=high.offset(-1,0,0);
             p.serverLevel().setBlockAndUpdate(bedrock,Blocks.BEDROCK.defaultBlockState());
             p.serverLevel().setBlockAndUpdate(container,Blocks.CHEST.defaultBlockState());
+            var chest=(ChestBlockEntity)p.serverLevel().getBlockEntity(container);
+            require(chest!=null,"fixture chest entity missing");
+            chest.setItem(0,new ItemStack(Items.DIAMOND,2));chest.setItem(1,new ItemStack(Items.DIAMOND,4));
             p.serverLevel().setBlockAndUpdate(protectedCell,Blocks.GOLD_BLOCK.defaultBlockState());
             protector=event->{if(event.getPlayer()==p&&(event.getPos().equals(protectedCell)
                     ||Math.abs(event.getPos().getX()-protectedLane.getX())<=9&&Math.abs(event.getPos().getZ()-protectedLane.getZ())<=9))event.setCanceled(true);};
@@ -98,32 +124,75 @@ public final class StandaloneBulletTerrainChecks {
             var lowPlan=BulletdiveTerrain.begin(p,lowId,impact(low),12);
             BulletdiveTerrain.begin(p,lowId,impact(low),80);
             require(BulletdiveTerrain.snapshot(p,lowId).plan().equals(lowPlan),"duplicate session changed its plan");
-            BulletdiveTerrain.begin(p,highId,impact(high),80);
-            BulletdiveTerrain.begin(p,protectedId,impact(protectedLane),80);
-            report.addProperty("source","actual BulletdiveTerrain.begin, live ServerTick batches, real block states and canceled BlockEvent.BreakEvent");
+            stageAt=p.level().getGameTime();
+            report.addProperty("source","sequential actual BulletdiveTerrain.begin, live ServerTick batches, real loot/container inventory, gamerule and cancellation");
         }
         void advance() {
-            var lowStats=BulletdiveTerrain.snapshot(p,lowId);var highStats=BulletdiveTerrain.snapshot(p,highId);
-            var protectedStats=BulletdiveTerrain.snapshot(p,protectedId);
-            if(lowStats==null||highStats==null||protectedStats==null)return;
-            require(p.level().getGameTime()-began<160,"terrain work exceeded bounded QA timeout");
-            if(!lowStats.complete()||!highStats.complete()||!protectedStats.complete())return;
-            require(lowStats.destroyed()>0,"low-height soil lane did not break any terrain");
-            require(highStats.destroyed()>lowStats.destroyed(),"high fall did not destroy more actual blocks");
-            require(highStats.maximumRadius()>lowStats.maximumRadius(),"high fall did not widen the actual crater");
-            require(highStats.maximumDepth()>lowStats.maximumDepth(),"high fall did not deepen the actual crater");
-            require(p.level().getBlockState(low).is(Blocks.IRON_BLOCK),"low fall broke the hard center block");
-            require(p.level().getBlockState(high).isAir(),"high fall did not break the hard center block");
-            require(p.level().getBlockState(bedrock).is(Blocks.BEDROCK),"bedrock was destroyed");
-            require(p.level().getBlockState(container).is(Blocks.CHEST)&&p.level().getBlockEntity(container)!=null,"container was destroyed");
-            require(p.level().getBlockState(protectedCell).is(Blocks.GOLD_BLOCK),"canceled protected block was destroyed");
-            require(protectedStats.destroyed()==0&&protectedStats.protectedBlocks()>0,"region cancellation did not protect actual terrain");
-            int lowCount=countAir(low),highCount=countAir(high);
-            require(lowCount==lowStats.destroyed()&&highCount==highStats.destroyed(),"destroyed count differs from actual removed blocks");
-            report.add("low",stats(lowStats));report.add("high",stats(highStats));report.add("protected",stats(protectedStats));
-            report.addProperty("lowActualAir",lowCount);report.addProperty("highActualAir",highCount);
-            finish(null);
+            long now=p.level().getGameTime();
+            require(now-began<1800,"terrain work exceeded bounded QA timeout");
+            if(stage==0){
+                var lowStats=BulletdiveTerrain.snapshot(p,lowId);if(lowStats==null||!lowStats.complete())return;
+                require(lowStats.destroyed()>0,"low-height soil lane did not break any terrain");
+                require(p.level().getBlockState(low).is(Blocks.IRON_BLOCK),"low fall broke the hard center block");
+                require(countAir(low)==lowStats.destroyed(),"low destroyed count differs from actual blocks");
+                require(itemCount(low,Items.DIRT)>0,"real low-height block drops missing");
+                report.add("low",stats(lowStats));report.addProperty("lowActualAir",countAir(low));
+                BulletdiveTerrain.begin(p,highId,impact(high),80);stage=1;stageAt=now;
+            }else if(stage==1){
+                var lowStats=BulletdiveTerrain.snapshot(p,lowId);var highStats=BulletdiveTerrain.snapshot(p,highId);
+                if(highStats==null||!highStats.complete())return;
+                require(highStats.destroyed()>lowStats.destroyed(),"high fall did not destroy more actual blocks");
+                require(highStats.maximumRadius()>lowStats.maximumRadius(),"high fall did not widen crater");
+                require(highStats.maximumDepth()>lowStats.maximumDepth(),"high fall did not deepen crater");
+                require(p.level().getBlockState(high).isAir(),"high fall did not break hard center");
+                require(p.level().getBlockState(bedrock).is(Blocks.BEDROCK),"bedrock was destroyed");
+                require(p.level().getBlockState(container).isAir()&&p.level().getBlockEntity(container)==null,"container was not genuinely broken");
+                require(p.level().getBlockState(protectedCell).is(Blocks.GOLD_BLOCK),"canceled protected block was destroyed");
+                require(countAir(high)==highStats.destroyed(),"high destroyed count differs from real blocks");
+                require(itemCount(high,Items.DIAMOND)==6,"chest inventory must drop once, exactly six diamonds");
+                require(itemCount(high,Items.CHEST)==1,"chest block loot must drop once");
+                require(itemCount(high,Items.DIRT)>0,"real high-height block drops missing");
+                report.add("high",stats(highStats));report.addProperty("highActualAir",countAir(high));
+                report.addProperty("chestDropped",itemCount(high,Items.CHEST));report.addProperty("inventoryDiamondsDropped",itemCount(high,Items.DIAMOND));
+                report.addProperty("highDirtDropped",itemCount(high,Items.DIRT));report.addProperty("highCompletionTicks",now-stageAt);
+                BulletdiveTerrain.begin(p,protectedId,impact(protectedLane),80);stage=2;stageAt=now;
+            }else if(stage==2){
+                var s=BulletdiveTerrain.snapshot(p,protectedId);if(s==null||!s.complete())return;
+                require(s.destroyed()==0&&s.protectedBlocks()>0,"region event did not protect real terrain");
+                report.add("protected",stats(s));settings(false);
+                BulletdiveTerrain.begin(p,disabledId,impact(disabledLane),80);stage=3;stageAt=now;
+            }else if(stage==3){
+                if(now-stageAt<4)return;
+                require(BulletdiveTerrain.snapshot(p,disabledId)==null&&countAir(disabledLane)==0,"disabled preference queued/destructed terrain");
+                report.addProperty("disabledActualAir",countAir(disabledLane));settings(true);
+                BulletdiveTerrain.begin(p,canceledId,impact(canceledLane),80);stage=4;stageAt=now;
+            }else if(stage==4){
+                var s=BulletdiveTerrain.snapshot(p,canceledId);if(s==null||s.destroyed()==0)return;
+                require(!s.complete(),"cancellation fixture completed before preference changed");
+                settings(false);settings(true);disabledAir=countAir(canceledLane);stage=5;stageAt=now;
+            }else if(stage==5){
+                if(now-stageAt<4)return;var s=BulletdiveTerrain.snapshot(p,canceledId);
+                require(s!=null&&s.complete()&&s.reason().equals("block_breaking_disabled"),"pending work did not stop after toggle off");
+                require(countAir(canceledLane)==disabledAir,"disabled pending work continued breaking");
+                report.add("canceledBySetting",stats(s));report.addProperty("sameTickOffOnCanceledOldWork",true);settings(true);
+                p.level().getGameRules().getRule(GameRules.RULE_DOBLOCKDROPS).set(false,p.server);
+                BulletdiveTerrain.begin(p,noDropsId,impact(noDropsLane),80);stage=6;stageAt=now;
+            }else if(stage==6){
+                var s=BulletdiveTerrain.snapshot(p,noDropsId);if(s==null||!s.complete())return;
+                require(s.destroyed()>0&&countAir(noDropsLane)==s.destroyed(),"tileDrops=false did not genuinely break blocks");
+                require(items(noDropsLane).stream().noneMatch(item->!originalItems.contains(item.getUUID())),"tileDrops=false generated block loot");
+                report.add("tileDropsOff",stats(s));report.addProperty("tileDropsOffNewItems",0);finish(null);
+            }
         }
+        BlockPos[] lanes(){return new BlockPos[]{low,high,protectedLane,disabledLane,canceledLane,noDropsLane};}
+        void settings(boolean enabled){p.setData(ModAttachments.SKILL_SETTINGS,new SkillSettings(enabled));
+            BulletdiveTerrain.settingsChanged(p);p.syncData(ModAttachments.SKILL_SETTINGS);}
+        List<ItemEntity> items(BlockPos center){return p.serverLevel().getEntitiesOfClass(ItemEntity.class,
+                new AABB(center.getX()-11,center.getY()-9,center.getZ()-11,
+                        center.getX()+12,center.getY()+12,center.getZ()+12));}
+        int itemCount(BlockPos center,net.minecraft.world.item.Item kind){return items(center).stream()
+                .filter(item->!originalItems.contains(item.getUUID())&&item.getItem().is(kind))
+                .mapToInt(item->item.getItem().getCount()).sum();}
         int countAir(BlockPos center) {
             int count=0;for(int x=-9;x<=9;x++)for(int z=-9;z<=9;z++)for(int y=0;y<6;y++)
                 if(p.level().getBlockState(center.offset(x,-y,z)).isAir())count++;
@@ -141,8 +210,13 @@ public final class StandaloneBulletTerrainChecks {
             try {
                 if(protector!=null)NeoForge.EVENT_BUS.unregister(protector);
                 // Cancel any unfinished owner jobs before restoring the disposable terrain.
-                for(long session:new long[]{lowId,highId,protectedId,jumpId})BulletdiveTerrain.cancel(p,session);
-                for(var entry:originalBlocks.entrySet())p.serverLevel().setBlockAndUpdate(entry.getKey(),entry.getValue());
+                for(long session:new long[]{lowId,highId,protectedId,jumpId,disabledId,canceledId,noDropsId})BulletdiveTerrain.cancel(p,session);
+                if(fixtureTouched){
+                    for(var center:lanes())for(var item:items(center))if(!originalItems.contains(item.getUUID()))item.discard();
+                    for(var entry:originalBlocks.entrySet())p.serverLevel().setBlockAndUpdate(entry.getKey(),entry.getValue());
+                    p.level().getGameRules().getRule(GameRules.RULE_DOBLOCKDROPS).set(originalDrops,p.server);
+                }
+                p.setData(ModAttachments.SKILL_SETTINGS,originalSettings);p.syncData(ModAttachments.SKILL_SETTINGS);
                 p.setData(ModAttachments.PLAYER_STATE,originalState);p.syncData(ModAttachments.PLAYER_STATE);
                 p.setData(ModAttachments.CRITICAL_MASS,originalMass);p.syncData(ModAttachments.CRITICAL_MASS);
                 p.setData(ModAttachments.ADRENALINE,originalAdrenaline);p.syncData(ModAttachments.ADRENALINE);

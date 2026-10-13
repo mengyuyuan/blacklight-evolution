@@ -24,6 +24,12 @@ public final class ModAttachments {
                     .sync(BlacklightStateStreamCodec.CODEC)
                     .build());
 
+    public static final Supplier<AttachmentType<com.codex.blacklight.power.SkillSettings>> SKILL_SETTINGS=
+            ATTACHMENTS.register("skill_settings",()->AttachmentType.builder(
+                    ()->com.codex.blacklight.power.SkillSettings.DEFAULT)
+                    .serialize(com.codex.blacklight.power.SkillSettings.CODEC).copyOnDeath()
+                    .sync(com.codex.blacklight.power.SkillSettings.STREAM_CODEC).build());
+
     public static final Supplier<AttachmentType<ClawCombatState>> CLAW_COMBAT = ATTACHMENTS.register(
             "claw_combat",
             () -> AttachmentType.builder(ClawCombatState::new).build());

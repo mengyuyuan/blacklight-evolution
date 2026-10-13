@@ -60,3 +60,5 @@ __pycache__/
 /run-standalone-gametest/
 /run-model-qa/
 /model-qa*/
+# Native game and unit-test logging is local runtime output.
+/logs/

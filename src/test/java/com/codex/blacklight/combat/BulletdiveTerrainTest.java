@@ -2,7 +2,9 @@ package com.codex.blacklight.combat;
 
 import java.time.Duration;
 import java.util.HashSet;
+import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -37,20 +39,77 @@ class BulletdiveTerrainTest {
         assertEquals(plan.depth(),BulletdiveTerrain.columnDepth(plan,0));
         assertEquals(0,BulletdiveTerrain.columnDepth(plan,(long)plan.radius()*plan.radius()));
     }
-    @Test void hardMaterialRequiresHigherEnergyWhileProtectedMaterialNeverQualifies() {
+    @Test void hardnessLimitsStrengthButContainersAndMineableBlastResistantBlocksQualify() {
         var low=BulletdiveTerrain.plan(12);var high=BulletdiveTerrain.plan(80);
         assertTrue(BulletdiveTerrain.canBreak(low,0,0,.5F,2,false));
         assertFalse(BulletdiveTerrain.canBreak(low,0,0,5,6,false));
         assertTrue(BulletdiveTerrain.canBreak(high,0,0,5,6,false));
         assertFalse(BulletdiveTerrain.canBreak(high,0,0,-1,0,false));
-        assertFalse(BulletdiveTerrain.canBreak(high,0,0,.1F,1200,false));
-        assertFalse(BulletdiveTerrain.canBreak(high,0,0,.1F,1,true));
+        assertTrue(BulletdiveTerrain.canBreak(high,0,0,.1F,1200,false));
+        assertTrue(BulletdiveTerrain.canBreak(high,0,0,2.5F,12.5F,true));
+        assertFalse(BulletdiveTerrain.canBreak(high,0,0,50,1200,false));
+        assertTrue(BulletdiveTerrain.canBreak(BulletdiveTerrain.plan(500),0,0,50,1200,false));
         assertFalse(BulletdiveTerrain.canBreak(high,0,0,Float.NaN,1,false));
         assertFalse(BulletdiveTerrain.canBreak(high,0,0,.1F,Float.NaN,false));
         assertTrue(BulletdiveTerrain.hardnessCost(5)>BulletdiveTerrain.hardnessCost(.5F));
         assertTrue(Double.isFinite(BulletdiveTerrain.hardnessCost(Float.MAX_VALUE)));
         assertFalse(BulletdiveTerrain.canBreak(high,0,0,1000,6,false));
         assertTrue(BulletdiveTerrain.canBreak(BulletdiveTerrain.plan(1_000_000),0,0,1000,6,false));
+    }
+    @Test void dropProducingBreaksHaveASeparateGlobalSliceLimitAndResumeNextTick() {
+        var clock=new AtomicLong();int remaining=35,total=0,ticks=0;
+        while(remaining>0){
+            var budget=new BulletdiveTerrain.TickBudget(BulletdiveTerrain.MAX_WORK_PER_TICK,
+                    BulletdiveTerrain.MAX_BREAKS_PER_TICK,3_000_000,clock::get);
+            int thisTick=0;
+            while(remaining>0&&budget.tryCandidate()){
+                // Each operation represents one indivisible vanilla destroyBlock
+                // call with loot; no silent remainder-removal branch is needed.
+                budget.recordBreak();thisTick++;total++;remaining--;
+            }
+            assertTrue(thisTick<=32);ticks++;
+        }
+        assertEquals(35,total);assertEquals(2,ticks);
+    }
+    @Test void nonBreakingCandidatesCannotRunPastTheCandidateOrTimeBudget() {
+        var clock=new AtomicLong(10);
+        var candidates=new BulletdiveTerrain.TickBudget(192,8,3_000_000,clock::get);
+        int visited=0;while(candidates.tryCandidate())visited++;
+        assertEquals(192,visited);
+        var deadline=new BulletdiveTerrain.TickBudget(192,8,3_000_000,clock::get);
+        assertTrue(deadline.tryCandidate());deadline.recordBreak();
+        // A vanilla loot/protection callback may overrun; finish that atomic
+        // break, then stop before starting any additional block or chunk probe.
+        clock.addAndGet(3_000_001);
+        assertFalse(deadline.tryCandidate());
+    }
+    @Test void nanotimeWrapDoesNotTurnTheWorkSliceIntoAnUnlimitedLoop() {
+        var clock=new AtomicLong(Long.MAX_VALUE-10);
+        var budget=new BulletdiveTerrain.TickBudget(192,8,30,clock::get);
+        clock.set(Long.MIN_VALUE+10);
+        assertTrue(budget.tryCandidate());
+        clock.set(Long.MIN_VALUE+20);
+        assertFalse(budget.tryCandidate());
+    }
+    @Test void repeatedSessionsCannotAccumulateActiveJobsOrRemoveTheirReplacement() {
+        var tasks=new BulletdiveTerrain.OwnerTasks<Integer>();
+        var first=UUID.randomUUID();var second=UUID.randomUUID();
+        var canceled=new AtomicInteger();
+        tasks.install(first,0,old->fail("empty owner canceled a task"));
+        tasks.install(second,-1,old->fail("other owner canceled a task"));
+        for(int session=1;session<=10_000;session++){
+            int expectedPrevious=session-1;
+            tasks.install(first,session,old->{
+                assertEquals(expectedPrevious,old);
+                // The old task's finish() callback runs during installation.
+                tasks.complete(first,old);canceled.incrementAndGet();
+            });
+            assertEquals(2,tasks.size());assertEquals(session,tasks.current(first));
+            assertEquals(-1,tasks.current(second));
+        }
+        assertEquals(10_000,canceled.get());
+        tasks.complete(first,10_000);assertEquals(1,tasks.size());
+        tasks.clear();assertTrue(tasks.snapshot().isEmpty());
     }
     @Test void loadedColumnStreamIsUniqueCircularAndNearToFarAcrossChunkBoundaries() {
         var plan=BulletdiveTerrain.plan(80);

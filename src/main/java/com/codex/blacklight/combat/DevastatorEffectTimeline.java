@@ -52,16 +52,41 @@ public final class DevastatorEffectTimeline {
             if(local>=0&&local<7D/3)burst=.35*smooth(local/.12);
             else if(local>=7D/3&&local<13D/3)burst=.35*(1-smooth((local-7D/3)/2));
         }else if(kind==3) {
-            if(phase==2)flight=flightStrength(fallHeight,downSpeed);
+            if(phase==2)flight=flight(fallHeight,downSpeed,age).strength();
             else if(phase==3)burst=pulse(age-effectStart,.5);
         }
         return new Lens(burst,retract,flight);
     }
     public static double flightStrength(double height,double speed) {
         if(!Double.isFinite(height+speed))return 0;
-        // Visual response is bounded, while authoritative fall physics is not.
-        return Math.clamp((1-Math.exp(-Math.max(0,height)/64))*.60
-                +(1-Math.exp(-Math.max(0,speed)/12))*.40,0,1);
+        // speed is Minecraft blocks/tick. The previous /12 response barely
+        // moved at a normal 1-3 blocks/tick dive. Optics may saturate; physics
+        // and terrain energy continue to use the full actual values.
+        return Math.clamp((1-Math.exp(-Math.max(0,height)/20))*.35
+                +(1-Math.exp(-Math.max(0,speed)/2.4))*.65,0,1);
+    }
+    public record Flight(double strength,double tangentGain,double streakLength,double airAlpha,double shock) {
+        public boolean active(){return strength>1e-5;}
+    }
+    /** Source flight fades in .1s; cycle zoom .6 ramps over 2.5s, without ReAim.
+     * The short-dive pressure response and visible air widths are MC adaptation.
+     * Long falls keep their presentation until real landing, not a timed impact. */
+    public static Flight flight(double height,double speed,double releaseAge) {
+        if(!Double.isFinite(height+speed+releaseAge)||releaseAge<0)return new Flight(0,0,0,0,0);
+        double seconds=Math.max(0,releaseAge-1D/6);
+        double response=flightStrength(height,speed),onset=smooth(seconds/.1),strength=response*onset;
+        double sourceZoom=smooth(seconds/2.5);
+        double gain=strength*(.22+(1D/.6-1-.22)*sourceZoom);
+        double shockAge=releaseAge-1D/30;
+        double shock=shockAge<0?0:smooth(shockAge/.1)*(1-smooth((releaseAge-2D/3)/.5));
+        return new Flight(strength,gain,.55+3.2*strength,strength*(.08+.18*strength),shock);
+    }
+    /** The hand projection uses a different event and never calls this mapping. */
+    public static double flightFov(double original,double tangentGain,double userEffectScale) {
+        if(!Double.isFinite(original+tangentGain+userEffectScale)||tangentGain<=0||userEffectScale<=0)return original;
+        double safe=Math.clamp(original,1,175);
+        double tangent=Math.tan(Math.toRadians(safe)*.5)*(1+Math.clamp(tangentGain,0,2D/3)*Math.clamp(userEffectScale,0,1));
+        return Math.max(original,Math.min(175,Math.toDegrees(2*Math.atan(tangent))));
     }
     private static double pulse(double age,double duration) {
         return age>=0&&age<duration?1-smooth(age/duration):0;

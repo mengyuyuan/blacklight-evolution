@@ -7,14 +7,15 @@ package com.codex.blacklight.combat;
 public final class BulletdivePhysics {
     public static final double INITIAL_SPEED=.45, ACCELERATION=.22;
     private BulletdivePhysics() { }
+    private static double nonNegativeFinite(double value){return Double.isFinite(value)?Math.max(0,value):0;}
     public static double downSpeed(double flightTicks) {
-        return INITIAL_SPEED+ACCELERATION*Math.max(0,Double.isFinite(flightTicks)?flightTicks:0);
+        return INITIAL_SPEED+ACCELERATION*nonNegativeFinite(flightTicks);
     }
     public static double damageMultiplier(double actualDrop) {
-        return 1+Math.sqrt(Math.max(0,Double.isFinite(actualDrop)?actualDrop:0)/30);
+        return 1+Math.sqrt(nonNegativeFinite(actualDrop)/30);
     }
     /** Optical response may saturate for legibility; physical energy never uses it. */
     public static double visualIntensity(double speed,double drop) {
-        return Math.log1p(Math.max(0,speed)+Math.sqrt(Math.max(0,drop))*.15);
+        return Math.log1p(nonNegativeFinite(speed)+Math.sqrt(nonNegativeFinite(drop))*.15);
     }
 }

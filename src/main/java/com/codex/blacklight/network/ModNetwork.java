@@ -19,7 +19,16 @@ public final class ModNetwork {
     }
 
     public static void register(RegisterPayloadHandlersEvent event) {
-        event.registrar("standalone-4")
+        event.registrar("standalone-5")
+                .playToServer(SkillSettingsPayload.TYPE,SkillSettingsPayload.STREAM_CODEC,(payload,context)->
+                    context.enqueueWork(()->{
+                        if(context.player() instanceof ServerPlayer player){
+                            player.setData(com.codex.blacklight.registry.ModAttachments.SKILL_SETTINGS,
+                                    new com.codex.blacklight.power.SkillSettings(payload.bulletdiveBlockBreaking()));
+                            com.codex.blacklight.combat.BulletdiveTerrain.settingsChanged(player);
+                            player.syncData(com.codex.blacklight.registry.ModAttachments.SKILL_SETTINGS);
+                        }
+                    }))
                 .playToClient(NativeRootMotionPayload.TYPE, NativeRootMotionPayload.STREAM_CODEC, (payload, context) ->
                     context.enqueueWork(() -> com.codex.blacklight.animation.PlayerMotionController.acceptRootMotion(payload)))
                 .playToServer(DisguiseTogglePayload.TYPE,DisguiseTogglePayload.CODEC,(payload,context)->
@@ -145,6 +154,7 @@ public final class ModNetwork {
         // Copy-on-death restores server data; explicitly publish it for the new client
         // entity as well. Client mode reconciliation tolerates either packet order.
         player.syncData(com.codex.blacklight.registry.ModAttachments.PLAYER_STATE);
+        player.syncData(com.codex.blacklight.registry.ModAttachments.SKILL_SETTINGS);
         player.syncData(com.codex.blacklight.registry.ModAttachments.GROWTH);
         player.syncData(com.codex.blacklight.registry.ModAttachments.UTILITY_STATE);
         player.syncData(com.codex.blacklight.registry.ModAttachments.DISGUISE_IDENTITY);

@@ -7,6 +7,8 @@ import com.codex.blacklight.client.renderer.AuthoredDevastatorMesh;
 import com.codex.blacklight.client.renderer.DevastatorEffectRenderer;
 import com.codex.blacklight.combat.DevastatorEffectTimeline;
 import com.codex.blacklight.client.camera.ClientDevastatorPostEffect;
+import com.codex.blacklight.client.camera.ClientDevastatorCamera;
+import com.codex.blacklight.client.renderer.BulletFlightVisualRenderer;
 import com.codex.blacklight.client.renderer.LiquidBiomassMaterial;
 import com.codex.blacklight.client.renderer.RigidBiomassMaterial;
 import com.codex.blacklight.client.renderer.WhipTetherRenderer;
@@ -119,6 +121,12 @@ public final class StandaloneSkillSmoke {
     private static boolean observedRetraction,observedBodyRecovery;
     private static long postPassesBefore;
     private static boolean observedPostGpu;
+    private static boolean observedFlightGeometry,observedWorldFov,observedContrastFlight;
+    private static final Map<BlockPos,net.minecraft.world.level.block.state.BlockState> flightSceneBlocks=new LinkedHashMap<>();
+    private static volatile boolean flightSceneCleaned;
+    private static long terrainWaitStartedNanos;
+    private static double terrainWaitSeconds;
+    private static boolean flightScene(){return Boolean.getBoolean(PROPERTY+".flightScene");}
     private static volatile boolean injectionScheduled;
     private static volatile JsonObject ordinaryInjection;
     private static volatile int primaryTargetId=-1;
@@ -212,7 +220,7 @@ public final class StandaloneSkillSmoke {
             if(imageError!=null)throw new IllegalStateException(imageError);
             stageTicks++;if(stageTicks%20==0)write(false,null);
             int watchdog=stage==Stage.CHECKS?1200:current()!=null&&current().kind()==3?420+(int)Math.ceil(current().fallHeight()/4):420;
-            if(stage==Stage.TAIL&&current()!=null&&current().kind()==3)watchdog=Math.max(1200,watchdog);
+            if(stage==Stage.TAIL&&current()!=null&&current().kind()==3)watchdog=Math.max(1800,watchdog);
             if(stageTicks>watchdog)throw new IllegalStateException("Skill QA timed out: "+stage+" / "+(current()==null?"done":current().name())+" / "+serverSample);
             recordClient(mc);
             switch(stage) {
@@ -261,12 +269,18 @@ public final class StandaloneSkillSmoke {
                     }
                 }
                 case TAIL -> {
-                    if(current().kind()==3&&observedRelease&&(lastTerrainSnapshot==null||!lastTerrainSnapshot.complete()))break;
+                    if(current().kind()==3&&observedRelease&&(lastTerrainSnapshot==null||!lastTerrainSnapshot.complete())){
+                        if(terrainWaitStartedNanos==0)terrainWaitStartedNanos=System.nanoTime();
+                        terrainWaitSeconds=(System.nanoTime()-terrainWaitStartedNanos)/1e9;
+                        if(terrainWaitSeconds>60)throw new IllegalStateException("Bullet real terrain job exceeded 60 seconds: "+lastTerrainSnapshot);
+                        break;
+                    }
+                    if(terrainWaitStartedNanos>0)terrainWaitSeconds=(System.nanoTime()-terrainWaitStartedNanos)/1e9;
                     if(stageTicks>=35)advance(Stage.VERIFY);
                 }
                 case VERIFY -> {verify(mc);advance(Stage.NEXT);}
-                case NEXT -> {index++;if(index<CASES.size())prepare(mc);else{send(mc,false,true);advance(Stage.DRAIN);writer.shutdown();}}
-                case DRAIN -> {if(writer.isTerminated()){completed=true;restore(mc);write(true,null);mc.stop();}}
+                case NEXT -> {index++;if(index<CASES.size())prepare(mc);else{send(mc,false,true);advance(Stage.DRAIN);writer.shutdown();flightSceneCleaned=false;mc.getSingleplayerServer().execute(()->{clearFlightScene(mc.getSingleplayerServer().overworld());flightSceneCleaned=true;});}}
+                case DRAIN -> {if(writer.isTerminated()&&flightSceneCleaned){completed=true;restore(mc);write(true,null);mc.stop();}}
                 default -> { }
             }
         }catch(Exception error){fail(error);}
@@ -310,9 +324,14 @@ public final class StandaloneSkillSmoke {
         healthBeforeSpend=maximumBeforeSpend=healthAfterSpend=expectedSpendHealthLoss=Float.NaN;spendHealthObserved=false;
         observedRetraction=observedBodyRecovery=false;lastFormalSourceClip="";lastFormalSourceSeconds=lastFormalSourceDuration=0;lastFormalHeldTime=-1;
         postPassesBefore=ClientDevastatorPostEffect.statistics().passes();observedPostGpu=false;bulletClientLandingAt=Long.MIN_VALUE;
+        observedFlightGeometry=observedWorldFov=observedContrastFlight=false;
+        terrainWaitStartedNanos=0;terrainWaitSeconds=0;
         send(mc,false,true);var server=mc.getSingleplayerServer();var uuid=mc.player.getUUID();int caseId=index;Case c=current();
         server.execute(()->{try {
             var level=server.overworld();var p=server.getPlayerList().getPlayer(uuid);DevastatorSystem.cancel(p);WeaponCombatSystem.cancel(p);NativePlayerActionBackend.clear(p);CombatTargeting.requestLock(p,-1);
+            // Remove only our preceding contrast columns, never the footprint
+            // support or target lane. All edits remain behind the literal QA guard.
+            clearFlightScene(level);
             // Remove the preceding case's one protected support before restoring the substrate.
             var previousAnchor=landingAnchor;
             if(previousAnchor!=null&&level.getBlockState(previousAnchor.position()).is(Blocks.BEDROCK))
@@ -329,6 +348,15 @@ public final class StandaloneSkillSmoke {
                 for(int x=-extent;x<=extent;x++)for(int z=-extent;z<=extent;z++){
                     if(level.getChunkSource().getChunkNow(x>>4,z>>4)==null)throw new IllegalStateException("Bullet fixture refused an unloaded substrate chunk");
                     for(int y=247;y<=250;y++)level.setBlockAndUpdate(new BlockPos(x,y,z),Blocks.DIRT.defaultBlockState());
+                }
+                if(flightScene()&&c.fallHeight()==80){
+                    for(int x:new int[]{-5,5})for(int z:new int[]{-2,2})for(int y=251;y<=318;y++){
+                        var pos=new BlockPos(x,y,z);
+                        if(level.getChunkSource().getChunkNow(x>>4,z>>4)==null)throw new IllegalStateException("Flight contrast refused an unloaded chunk");
+                        if(!level.getBlockState(pos).isAir())throw new IllegalStateException("Flight contrast refused a non-air fixture position "+pos);
+                        var block=(y%8<2?Blocks.WHITE_CONCRETE:y%8<4?Blocks.BLUE_CONCRETE:y%8<6?Blocks.RED_CONCRETE:Blocks.STONE).defaultBlockState();
+                        level.setBlockAndUpdate(pos,block);flightSceneBlocks.put(pos,block);
+                    }
                 }
             }
             level.setDayTime(6000);level.setWeatherParameters(6000,0,false,false);
@@ -556,6 +584,15 @@ public final class StandaloneSkillSmoke {
                 if(Double.isFinite(frameMs)&&frameMs>0){effectFrameDeltasMs.add(frameMs);caseFrameDeltasMs.add(frameMs);}
             }
             var post=ClientDevastatorPostEffect.statistics();
+            var flight=BulletFlightVisualRenderer.statistics();var worldFov=ClientDevastatorCamera.statistics();
+            if(c.kind()==3&&visual.kind()==3&&visual.phase()==DevastatorSystem.FLIGHT){
+                observedFlightGeometry|=flight.active()&&flight.airQuads()>0&&flight.vertices()>0;
+                observedWorldFov|=worldFov.flying()&&worldFov.outputFov()>worldFov.inputFov()+.001;
+                if(flight.active()&&flight.nearEnvironmentDistance()>0&&worldFov.flying()){
+                    observedContrastFlight=true;
+                    if(flightScene()&&c.fallHeight()==80)capture(mc,c.name()+"_flight_contrast",stats);
+                }
+            }
             require(!post.failed(),"native screen-space shader failed "+c.name());
             boolean postActive=visual.kind()==c.kind()&&visual.phase()>0&&post.passes()>postPassesBefore&&(post.burst()>0||post.retract()>0||post.flight()>0);
             if(postActive)observedPostGpu=true;
@@ -738,6 +775,9 @@ public final class StandaloneSkillSmoke {
                 require(maximumControllerFallHeight>c.fallHeight()*.80,"actual fall was far shorter than the isolated takeoff height "+c.name());
                 require(maximumClientFallHeight>c.fallHeight()*.75,"large fall height was not synchronized to actual rendering client "+c.name());
                 require(captures.contains(c.name()+"_flight"),"missing actual screen-space flight framebuffer "+c.name());
+                require(observedFlightGeometry,"no real world-space flight geometry "+c.name());
+                require(observedWorldFov,"no measured world-only FOV change "+c.name());
+                if(flightScene()&&c.fallHeight()==80)require(observedContrastFlight&&captures.contains(c.name()+"_flight_contrast"),"flight contrast scene remained sky-only");
                 if(c.fallHeight()>=640){
                     require(maximumControllerFallHeight>512&&maximumControllerPeakDown>5&&maximumActualDownSpeed>5,"high drop retained the old height/speed cap "+c.name());
                     require(maximumClientDownSpeed>5,"high down-speed was not synchronized to client "+c.name());
@@ -781,6 +821,9 @@ public final class StandaloneSkillSmoke {
         }
         row.addProperty("observedLateRetraction",observedRetraction);row.addProperty("observedBodyRecovery",observedBodyRecovery);
         row.addProperty("observedPostGpu",observedPostGpu);row.addProperty("postGpuPasses",post.passes()-postPassesBefore);
+        row.addProperty("observedFlightGeometry",observedFlightGeometry);row.addProperty("observedWorldFov",observedWorldFov);row.addProperty("observedContrastFlight",observedContrastFlight);
+        row.addProperty("flightSceneEnabled",flightScene());
+        row.addProperty("terrainWaitSeconds",terrainWaitSeconds);row.addProperty("terrainCompleteBeforeNextCase",lastTerrainSnapshot!=null&&lastTerrainSnapshot.complete());
         row.addProperty("postCleared",post.burst()==0&&post.retract()==0&&post.flight()==0);row.addProperty("duplicateLedger","target + lane + sourceTrack");
         row.addProperty("maximumControllerFallHeight",maximumControllerFallHeight);row.addProperty("maximumControllerPeakDown",maximumControllerPeakDown);
         row.addProperty("maximumActualDownSpeed",maximumActualDownSpeed);row.addProperty("maximumClientFallHeight",maximumClientFallHeight);row.addProperty("maximumClientDownSpeed",maximumClientDownSpeed);
@@ -792,9 +835,18 @@ public final class StandaloneSkillSmoke {
         var clips=new JsonArray();sourceClips.forEach(clips::add);row.add("clips",clips);results.add(row);write(false,null);
     }
     private static void addClientPosition(JsonObject row,Minecraft mc){
+        var flight=BulletFlightVisualRenderer.statistics();var fov=ClientDevastatorCamera.statistics();
+        var presentation=new JsonObject();presentation.addProperty("actualRenderFrame",flight.frame());presentation.addProperty("active",flight.active());
+        presentation.addProperty("airQuads",flight.airQuads());presentation.addProperty("tissueQuads",flight.tissueQuads());presentation.addProperty("shockQuads",flight.shockQuads());presentation.addProperty("vertices",flight.vertices());
+        presentation.addProperty("nearEnvironmentDistance",flight.nearEnvironmentDistance());presentation.addProperty("worldFovBefore",fov.inputFov());presentation.addProperty("worldFovAfter",fov.outputFov());presentation.addProperty("worldFovFlying",fov.flying());
+        row.add("flightPresentation",presentation);
         row.addProperty("actualX",mc.player.getX());row.addProperty("actualY",mc.player.getY());row.addProperty("actualZ",mc.player.getZ());
         row.addProperty("prevRenderY",mc.player.yo);row.addProperty("playerYo",mc.player.yo);row.addProperty("previousTickY",mc.player.yOld);row.addProperty("ground",mc.player.onGround());
         row.addProperty("actualInterpolatedPositionY",mc.player.getPosition(mc.getTimer().getGameTimeDeltaPartialTick(false)).y);
+    }
+    private static void clearFlightScene(net.minecraft.server.level.ServerLevel level){
+        for(var entry:flightSceneBlocks.entrySet())if(level.getBlockState(entry.getKey()).equals(entry.getValue()))level.setBlockAndUpdate(entry.getKey(),Blocks.AIR.defaultBlockState());
+        flightSceneBlocks.clear();
     }
     private static void addVisualClock(JsonObject row,com.codex.blacklight.combat.DevastatorVisual visual,
                                        com.codex.blacklight.animation.NativeActionState action,double worldTicks){

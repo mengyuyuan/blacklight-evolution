@@ -274,11 +274,11 @@
   "entity.blacklight.hive_tendril": "蜂巢捕食触手",
   "screen.blacklight.section.combat": "毁灭技能",
   "upgrade.blacklight.critical_mass": "临界质量",
-  "upgrade.blacklight.critical_mass.desc": "吸收回满生命后的溢出会积蓄临界质量。积蓄达到一次用量后可释放已学会的毁灭技，受伤会消耗积蓄。",
+  "upgrade.blacklight.critical_mass.desc": "吸收回满生命后的溢出会积蓄蓝色临界储备。有蓝储备即可释放已学会的毁灭技，不足的花费会消耗生命；受伤先扣蓝储备。",
   "upgrade.blacklight.adrenaline_surge": "肾上腺素激增",
   "upgrade.blacklight.adrenaline_surge.desc": "致命伤触发 1.8 秒保命和一次毁灭技机会。赠送的大招至少间隔 22.5 秒；窗口结束且生命恢复到一半后重新武装。虚空与强制死亡不触发。",
   "upgrade.blacklight.bulletdive_drop": "子弹俯冲",
-  "upgrade.blacklight.bulletdive_drop.desc": "高空发动向下俯冲，落地制造范围冲击。需要先学会初级滑翔；不消耗临界质量。",
+  "upgrade.blacklight.bulletdive_drop.desc": "滑翔中按住右键蓄势，释放后持续加速。落差越大，伤害和地形冲击越强。设置页可关闭方块破坏；不消耗临界质量。",
   "upgrade.blacklight.groundspike_graveyard": "地刺墓地",
   "upgrade.blacklight.groundspike_graveyard.desc": "在地面释放大量骨刺，攻击周围目标。消耗一次临界质量或肾上腺素机会。",
   "upgrade.blacklight.tendril_barrage": "触须弹幕",
@@ -297,5 +297,10 @@
   "upgrade.blacklight.critical_mass_boost_2": "临界质量强化 II",
   "upgrade.blacklight.critical_mass_boost_2.desc": "总储备容量提升至三次毁灭技，需要先学习临界质量强化 I。",
   "upgrade.blacklight.critical_mass_boost_3": "临界质量强化 III",
-  "upgrade.blacklight.critical_mass_boost_3.desc": "总储备容量提升至四次毁灭技，需要先学习临界质量强化 II。"
+  "upgrade.blacklight.critical_mass_boost_3.desc": "总储备容量提升至四次毁灭技，需要先学习临界质量强化 II。",
+  "screen.blacklight.section.settings": "设置",
+  "screen.blacklight.setting_on": "已开启 · 点击关闭",
+  "screen.blacklight.setting_off": "已关闭 · 点击开启",
+  "setting.blacklight.bulletdive_blocks": "子弹俯冲 · 方块破坏",
+  "setting.blacklight.bulletdive_blocks.desc": "落地按真实落差破坏方块，并产生破碎效果和掉落。关闭后保留伤害与冲击。遵循世界掉落规则，选择会保存。"
 }

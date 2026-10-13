@@ -87,6 +87,10 @@ public final class DevastatorSystem {
         if(!eligible(p)||!keys.pressedSince(before)||!WeaponCombatSystem.canSkillInterrupt(p))return false;
         var state=p.getData(ModAttachments.PLAYER_STATE);var movement=p.getData(ModAttachments.MOVEMENT_STATE);
         boolean glide=movement.mode()==MovementState.Mode.GLIDE||p.getData(ModAttachments.GLIDE_UNTIL)>p.level().getGameTime();
+        if(special&&!attack&&!action&&!p.onGround()&&before.special()!=special)
+            com.codex.blacklight.BlacklightNeoMod.LOGGER.debug("Air special routing for {}: glide={}, mode={}, glideUntil={}, now={}, bulletUnlocked={}, power={}",
+                    p.getGameProfile().getName(),glide,movement.mode(),p.getData(ModAttachments.GLIDE_UNTIL),p.level().getGameTime(),
+                    state.hasCombatSkill(CombatSkill.BULLETDIVE_DROP),state.getActivePower());
         WeaponMove move=null;WeaponMove.Input input=keys.intent();
         if(special&&!attack&&!action&&!p.onGround()&&glide&&state.hasCombatSkill(CombatSkill.BULLETDIVE_DROP)){
             move=WeaponMove.BULLETDIVE_DROP;input=WeaponMove.Input.SPECIAL;
@@ -96,6 +100,8 @@ public final class DevastatorSystem {
         // cancel does not retain uncommitted ordinary input or traversal leases.
         INPUT.put(p,new Held(keys,p.tickCount));
         var s=new Session(p,move,input);ACTIVE.put(p,s);
+        com.codex.blacklight.BlacklightNeoMod.LOGGER.debug("Devastator begin {} session={} actor={} y={} onGround={}",
+                move.id,s.id,p.getGameProfile().getName(),p.getY(),p.onGround());
         movement.cancelCharge();movement.consumeDashRequest();movement.clearSprintDrive();
         p.setData(ModAttachments.GLIDE_UNTIL,-1L);p.syncData(ModAttachments.GLIDE_UNTIL);
         play(p,s,true,0,-1);publish(p,s);return true;
@@ -133,6 +139,8 @@ public final class DevastatorSystem {
             }
             if(age>=minimum&&(s.move==WeaponMove.BULLETDIVE_DROP?s.requestedRelease||age>=full:age>=full)){
                 s.phase=RELEASE;s.phaseTick=p.tickCount;s.released=p.level().getGameTime();s.origin=p.position();
+                com.codex.blacklight.BlacklightNeoMod.LOGGER.debug("Devastator release {} session={} chargeTicks={} released={}",
+                        s.move.id,s.id,age,s.released);
                 if(kind(s.move)==2&&s.target!=null&&s.target.isAlive()&&CombatTargeting.visibleWithinRange(p,s.target,s.timing.radius()))
                     s.direction=CombatTargeting.positionNear(p.getEyePosition(),s.target).subtract(p.getEyePosition()).normalize();
                 play(p,s,false,charge.releaseTime(),-1);publish(p,s);
@@ -149,11 +157,15 @@ public final class DevastatorSystem {
                     p.setDeltaMovement(0,p.onGround()?0:-.015,0);p.hurtMarked=true;return;
                 }
                 s.phase=FLIGHT;s.phaseTick=p.tickCount;
+                com.codex.blacklight.BlacklightNeoMod.LOGGER.debug("Devastator flight {} session={} y={} released={} flightTick={}",
+                        s.move.id,s.id,p.getY(),s.released,p.level().getGameTime());
                 float offset=s.definition.charge().orElseThrow().releaseTime()+(float)((p.level().getGameTime()-s.released)/20D);
                 play(p,s,false,offset,l.holdTime());publish(p,s);
             }
             if(p.onGround()&&com.codex.blacklight.movement.TerrainTraversal.supportBelow(p,.05)){
                 s.landed=true;s.phase=LAND;s.phaseTick=p.tickCount;s.released=p.level().getGameTime();s.origin=p.position();
+                com.codex.blacklight.BlacklightNeoMod.LOGGER.debug("Devastator land {} session={} y={} onGround={} fallHeight={} peakDown={}",
+                        s.move.id,s.id,p.getY(),p.onGround(),Math.max(0,s.highest-s.origin.y),s.peakDown);
                 if(s.move==WeaponMove.BULLETDIVE_DROP){
                     var terrain=BulletdiveTerrain.begin(p,s.id,s.origin,Math.max(0,s.highest-s.origin.y));
                     s.timing=new DevastatorTiming(s.timing.effectStart(),s.timing.effectEnd(),s.timing.damageStart(),s.timing.damageEnd(),

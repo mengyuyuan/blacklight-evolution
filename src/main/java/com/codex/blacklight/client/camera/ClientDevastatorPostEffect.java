@@ -3,6 +3,8 @@ package com.codex.blacklight.client.camera;
 import com.codex.blacklight.BlacklightNeoMod;
 import com.codex.blacklight.combat.DevastatorEffectTimeline;
 import com.codex.blacklight.registry.ModAttachments;
+import com.codex.blacklight.client.renderer.BulletFlightVisualRenderer;
+import com.codex.blacklight.client.renderer.DevastatorEffectRenderer;
 import com.mojang.blaze3d.pipeline.RenderTarget;
 import com.mojang.blaze3d.pipeline.TextureTarget;
 import net.minecraft.client.Minecraft;
@@ -16,6 +18,8 @@ import net.neoforged.neoforge.client.event.ClientTickEvent;
 import net.neoforged.neoforge.client.event.RegisterClientReloadListenersEvent;
 import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
 import org.joml.Vector4f;
+import com.mojang.blaze3d.systems.RenderSystem;
+import org.lwjgl.opengl.GL11;
 
 /** Scene-only radial lens response to source explosion/retract events.
  * The scene is copied through a PostChain swap target; its depth is restored.
@@ -29,14 +33,17 @@ public final class ClientDevastatorPostEffect {
     private static boolean failed;
     private static long passes;
     private static float lastBurst,lastRetract,lastFlight;
+    private static float lastFlowX,lastFlowY,lastFlightAxis;
     private ClientDevastatorPostEffect() { }
-    public record Statistics(long passes,float burst,float retract,float flight,boolean failed) { }
-    public static Statistics statistics(){return new Statistics(passes,lastBurst,lastRetract,lastFlight,failed);}
+    public record Statistics(long passes,float burst,float retract,float flight,boolean failed,
+                             float flowX,float flowY,float flightAxis) { }
+    public static Statistics statistics(){return new Statistics(passes,lastBurst,lastRetract,lastFlight,failed,lastFlowX,lastFlowY,lastFlightAxis);}
     private static void close(){
         boolean destroyed=effect!=null||savedDepth!=null;
         if(effect!=null){effect.close();effect=null;}
         if(savedDepth!=null){savedDepth.destroyBuffers();savedDepth=null;}
         lastBurst=lastRetract=lastFlight=0;
+        lastFlowX=lastFlowY=lastFlightAxis=0;
         // Target destruction unbinds its FBO. Native hands are drawn after
         // AFTER_LEVEL, before vanilla binds the main target again for the HUD.
         if(destroyed)Minecraft.getInstance().getMainRenderTarget().bindWrite(false);
@@ -59,9 +66,14 @@ public final class ClientDevastatorPostEffect {
         float partial=event.getPartialTick().getGameTimeDeltaPartialTick(false);
         var lens=DevastatorEffectTimeline.lens(visual.kind(),visual.phase(),visual.age(player,partial),
                 visual.effectStart(),visual.fallHeight(),visual.downSpeed());
+        var flight=BulletFlightVisualRenderer.sample(player,partial);
+        if(visual.kind()==3&&visual.phase()==2)lens=new DevastatorEffectTimeline.Lens(0,0,
+                flight==null?0:flight.optics().strength()*mc.options.screenEffectScale().get());
         if(!lens.active()){close();return;}
         if(failed)return;
         boolean copied=false;
+        boolean wasBlend=GL11.glIsEnabled(GL11.GL_BLEND);
+        boolean wasDepth=GL11.glIsEnabled(GL11.GL_DEPTH_TEST);
         try {
             mc.renderBuffers().bufferSource().endBatch();
             var main=mc.getMainRenderTarget();
@@ -78,7 +90,8 @@ public final class ClientDevastatorPostEffect {
             float centreX=.5F,centreY=.5F;
             if(!mc.options.getCameraType().isFirstPerson()){
                 var camera=event.getCamera().getPosition();
-                var origin=player.getPosition(partial).add(0,player.getBbHeight()*.58,0).subtract(camera);
+                var attached=DevastatorEffectRenderer.capturedChest(player.getId());
+                var origin=(attached==null?player.getPosition(partial).add(0,player.getBbHeight()*.58,0):attached).subtract(camera);
                 var projected=new Vector4f((float)origin.x,(float)origin.y,(float)origin.z,1);
                 projected.mul(event.getModelViewMatrix()).mul(event.getProjectionMatrix());
                 if(projected.w>.001F){
@@ -88,16 +101,27 @@ public final class ClientDevastatorPostEffect {
             }
             savedDepth.copyDepthFrom(main);copied=true;
             lastBurst=(float)lens.burst();lastRetract=(float)lens.retract();lastFlight=(float)lens.flight();
+            lastFlowX=lastFlowY=0;lastFlightAxis=1;
+            if(flight!=null){
+                var flow=flight.airflow();
+                var viewed=new Vector4f((float)flow.x,(float)flow.y,(float)flow.z,0).mul(event.getModelViewMatrix());
+                float aspect=width/(float)Math.max(1,height);
+                lastFlowX=viewed.x/aspect;lastFlowY=viewed.y;lastFlightAxis=Math.abs(viewed.z);
+            }
             effect.setUniform("Burst",lastBurst);
             effect.setUniform("Retract",lastRetract);
             effect.setUniform("Flight",lastFlight);
             effect.setUniform("CentreX",centreX);effect.setUniform("CentreY",centreY);
+            effect.setUniform("FlowX",lastFlowX);effect.setUniform("FlowY",lastFlowY);
+            effect.setUniform("FlightAxis",lastFlightAxis);
             effect.process(partial);passes++;
         }catch(Exception exception){
             failed=true;BlacklightNeoMod.LOGGER.error("Devastator scene lens unavailable; reload resources to retry",exception);
         }finally{
             if(copied&&savedDepth!=null)mc.getMainRenderTarget().copyDepthFrom(savedDepth);
             mc.getMainRenderTarget().bindWrite(false);if(failed)close();
+            if(wasDepth)RenderSystem.enableDepthTest();else RenderSystem.disableDepthTest();
+            if(wasBlend)RenderSystem.enableBlend();else RenderSystem.disableBlend();
         }
     }
 }

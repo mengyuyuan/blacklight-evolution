@@ -39,7 +39,8 @@ public final class UpgradeScreen extends Screen {
         FORMS("screen.blacklight.section.forms"),
         BIOLOGY("screen.blacklight.section.biology"),
         UTILITY("screen.blacklight.section.utility"),
-        COMBAT("screen.blacklight.section.combat");
+        COMBAT("screen.blacklight.section.combat"),
+        SETTINGS("screen.blacklight.section.settings");
 
         private final String langKey;
         Category(String langKey) { this.langKey = langKey; }
@@ -76,6 +77,8 @@ public final class UpgradeScreen extends Screen {
         int y = 0;
         if(category==Category.ATTRIBUTES){
             y=attributeHeight();
+        } else if(category==Category.SETTINGS){
+            y=addSettingRow(y,"bulletdive_blocks");
         } else if(category==Category.BIOLOGY){
             for(var growth:com.codex.blacklight.power.GrowthUpgrade.values())y=addRow(y,growth.id,growth.cost,growth.requires()==null?null:growth.requires().id);
         } else if(category==Category.UTILITY){
@@ -114,6 +117,22 @@ public final class UpgradeScreen extends Screen {
         button.setTooltip(Tooltip.create(Component.translatable("upgrade.blacklight."+id+".desc")));
         addRenderableWidget(button);
         rows.add(new Row(id,cost,requiresId,button,y,rowHeight,buttonOffset,titleLines,description));
+        return y+rowHeight+6;
+    }
+
+    private int addSettingRow(int y,String id){
+        var titleLines=font.split(Component.translatable("setting.blacklight."+id),textWidth);
+        var description=font.split(Component.translatable("setting.blacklight."+id+".desc"),textWidth);
+        int rowHeight=Math.max(44,titleLines.size()*11+4+description.size()*11+16+(stacked?26:0));
+        int buttonOffset=stacked?rowHeight-27:Math.max(8,(rowHeight-20)/2);
+        var button=Button.builder(Component.empty(),clicked->{
+            var player=Minecraft.getInstance().player;
+            if(player!=null)PacketDistributor.sendToServer(new com.codex.blacklight.network.SkillSettingsPayload(
+                    !player.getData(ModAttachments.SKILL_SETTINGS).bulletdiveBlockBreaking()));
+        }).bounds(contentX+contentWidth-buttonWidth-8,0,buttonWidth,20).build();
+        button.setTooltip(Tooltip.create(Component.translatable("setting.blacklight."+id+".desc")));
+        addRenderableWidget(button);
+        rows.add(new Row(id,0,null,button,y,rowHeight,buttonOffset,titleLines,description));
         return y+rowHeight+6;
     }
 
@@ -212,6 +231,13 @@ public final class UpgradeScreen extends Screen {
     }
 
     private void refreshRow(Row row, BlacklightState state) {
+        if(category==Category.SETTINGS){
+            var player=Minecraft.getInstance().player;
+            row.button.active=player!=null;
+            boolean enabled=player!=null&&player.getData(ModAttachments.SKILL_SETTINGS).bulletdiveBlockBreaking();
+            row.button.setMessage(Component.translatable(enabled?"screen.blacklight.setting_on":"screen.blacklight.setting_off"));
+            return;
+        }
         if (state == null) {row.button.active=false;return;}
         boolean owned = owned(state, row.id);
         boolean prereqMet = row.requiresId == null || owned(state, row.requiresId);

@@ -67,10 +67,11 @@ public final class DevastatorEffectRenderer {
     @SubscribeEvent(priority=EventPriority.HIGHEST)
     public static void beforeFrame(RenderFrameEvent.Pre event) {
         renderedFrame++;renderedEffects=renderedBranches=renderedQuads=renderedVertices=0;
+        BulletFlightVisualRenderer.beforeFrame(renderedFrame);
     }
     @SubscribeEvent
     public static void resetHands(RenderLevelStageEvent event) {
-        if(event.getStage()==RenderLevelStageEvent.Stage.AFTER_SKY){HANDS.clear();BODIES.clear();}
+        if(event.getStage()==RenderLevelStageEvent.Stage.AFTER_SKY){HANDS.clear();BODIES.clear();BulletFlightVisualRenderer.resetBodies();}
     }
     /** Hook after a hand has its native third-person joint transform. No transform is modified. */
     public static void captureHand(AbstractClientPlayer player,PoseStack hand,boolean left) {
@@ -86,6 +87,8 @@ public final class DevastatorEffectRenderer {
         if(StandalonePlayerRendering.nativeHandPass()||VisionPowerRenderer.drawingSilhouettes())return;
         BODIES.put(player.getId(),bodyRoots(poses,skeletonFrame.last().pose(),
                 Minecraft.getInstance().gameRenderer.getMainCamera().getPosition()));
+        BulletFlightVisualRenderer.capture(player,skeletonFrame.last().pose(),poses,
+                Minecraft.getInstance().gameRenderer.getMainCamera().getPosition());
     }
     public static Vec3 capturedChest(int entityId){var roots=BODIES.get(entityId);return roots==null?null:roots.chest;}
     static BodyRoots bodyRoots(Matrix4f[] poses,Matrix4f frame,Vec3 offset){
@@ -146,6 +149,11 @@ public final class DevastatorEffectRenderer {
             if(!(entity instanceof Player player))continue;
             var visual=player.getData(ModAttachments.DEVASTATOR_VISUAL);
             if(visual.kind()<0||visual.phase()==0||visual.released()<0)continue;
+            if(visual.kind()==3&&visual.phase()==2){
+                var drawn=BulletFlightVisualRenderer.draw(event,player,MAX_VERTICES_PER_FRAME-renderedVertices);
+                if(drawn.vertices()>0){renderedEffects++;renderedVertices+=drawn.vertices();renderedQuads+=drawn.quads();}
+                continue;
+            }
             var move=player.getData(ModAttachments.WEAPON_VISUAL).spec();
             boolean landing=visual.kind()==3||move==WeaponMove.DEV_AIR_GROUNDSPIKE;
             if(landing&&visual.phase()!=3||visual.phase()==2&&(visual.kind()==0||visual.kind()==3))continue;

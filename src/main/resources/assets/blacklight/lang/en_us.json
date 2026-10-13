@@ -274,11 +274,11 @@
   "entity.blacklight.hive_tendril": "Hive Feeding Tendril",
   "screen.blacklight.section.combat": "Devastators",
   "upgrade.blacklight.critical_mass": "Critical Mass",
-  "upgrade.blacklight.critical_mass.desc": "Consume healing beyond full health builds Critical Mass. Each full charge permits a learned Devastator; taking damage depletes the reserve.",
+  "upgrade.blacklight.critical_mass.desc": "Consume overflow builds the blue Critical Mass reserve. Any positive reserve permits a learned Devastator; missing cost consumes health. Incoming damage spends the reserve first.",
   "upgrade.blacklight.adrenaline_surge": "Adrenaline Surge",
   "upgrade.blacklight.adrenaline_surge.desc": "Lethal damage grants 1.8 seconds of survival and one Devastator opportunity. Free releases must be 22.5 seconds apart. Rearms after the window ends and health returns above half. Void and forced death bypass it.",
   "upgrade.blacklight.bulletdive_drop": "Bulletdive Drop",
-  "upgrade.blacklight.bulletdive_drop.desc": "Dive down from high in the air and strike nearby targets on landing. Requires Glide I; does not consume Critical Mass.",
+  "upgrade.blacklight.bulletdive_drop.desc": "Hold right-click while gliding, then release into an accelerating dive. Greater actual falls increase damage and terrain impact. Disable block breaking in Settings. No Critical Mass cost.",
   "upgrade.blacklight.groundspike_graveyard": "Groundspike Graveyard",
   "upgrade.blacklight.groundspike_graveyard.desc": "Erupt bone spikes across the ground around you. Spends one Critical Mass or Adrenaline opportunity.",
   "upgrade.blacklight.tendril_barrage": "Tendril Barrage",
@@ -297,5 +297,10 @@
   "upgrade.blacklight.critical_mass_boost_2": "Critical Mass Boost II",
   "upgrade.blacklight.critical_mass_boost_2.desc": "Store up to three Devastator releases. Requires Critical Mass Boost I.",
   "upgrade.blacklight.critical_mass_boost_3": "Critical Mass Boost III",
-  "upgrade.blacklight.critical_mass_boost_3.desc": "Store up to four Devastator releases. Requires Critical Mass Boost II."
+  "upgrade.blacklight.critical_mass_boost_3.desc": "Store up to four Devastator releases. Requires Critical Mass Boost II.",
+  "screen.blacklight.section.settings": "Settings",
+  "screen.blacklight.setting_on": "On · turn off",
+  "screen.blacklight.setting_off": "Off · turn on",
+  "setting.blacklight.bulletdive_blocks": "Bulletdive · block breaking",
+  "setting.blacklight.bulletdive_blocks.desc": "Breaks blocks with debris and drops based on the actual fall. Turning this off preserves damage and impact effects. World drop rules apply. Your choice is saved."
 }

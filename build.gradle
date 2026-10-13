@@ -120,8 +120,9 @@ if (project.hasProperty('wallTraversalTest')) {
 if (project.hasProperty('standaloneInfected')) {
     sourceSets.main.java.srcDir('src/infectedVisualTest/java')
 }
-if (project.hasProperty('standaloneVisual') || project.hasProperty('standaloneGait') || project.hasProperty('standaloneLock') || project.hasProperty('standaloneMorph') || project.hasProperty('standaloneSkill')) {
+if (project.hasProperty('standaloneVisual') || project.hasProperty('standaloneGait') || project.hasProperty('standaloneLock') || project.hasProperty('standaloneMorph') || project.hasProperty('standaloneSkill') || project.hasProperty('standaloneSync')) {
     sourceSets.main.java.srcDir('src/standaloneVisualTest/java')
+    if (!project.hasProperty('standaloneSync')) sourceSets.main.java.exclude '**/StandaloneSyncClientSmoke.java', '**/StandaloneSyncServerChecks.java'
 }
 if (project.hasProperty('standaloneTest')) {
     sourceSets.main.java.srcDir('src/standaloneTest/java')
@@ -142,6 +143,7 @@ tasks.named('jar', Jar).configure {
     exclude 'com/codex/blacklight/client/Standalone*Smoke*.class'
     exclude 'com/codex/blacklight/client/StandaloneCriticalMassChecks*.class'
     exclude 'com/codex/blacklight/client/StandaloneBulletTerrainChecks*.class'
+    exclude 'com/codex/blacklight/client/StandaloneSyncServerChecks*.class'
     exclude 'com/codex/blacklight/client/InfectedCompositionSmoke*.class'
     exclude 'data/blacklight/structure/wall_test.nbt'
 }
@@ -180,6 +182,8 @@ neoForge {
             if (project.hasProperty('standaloneGait')) {
                 systemProperty 'blacklight.test.standaloneGait', file(project.property('standaloneGait')).absolutePath
                 if (project.hasProperty('standaloneGaitJump')) systemProperty 'blacklight.test.standaloneGait.jumpOnly', 'true'
+                if (project.hasProperty('standaloneGaitClaws')) systemProperty 'blacklight.test.standaloneGait.claws', 'true'
+                if (project.hasProperty('standaloneGaitStandingCharge')) systemProperty 'blacklight.test.standaloneGait.standingCharge', 'true'
                 programArguments.addAll '--width', '1280', '--height', '900'
             }
             if (project.hasProperty('standaloneMorph')) {
@@ -190,6 +194,11 @@ neoForge {
             if (project.hasProperty('standaloneSkill')) {
                 systemProperty 'blacklight.test.standaloneSkill', file(project.property('standaloneSkill')).absolutePath
                 if (project.hasProperty('standaloneSkillCases')) systemProperty 'blacklight.test.standaloneSkill.cases', project.property('standaloneSkillCases').toString()
+                if (project.hasProperty('standaloneSkillFlightScene')) systemProperty 'blacklight.test.standaloneSkill.flightScene', 'true'
+                programArguments.addAll '--width', '1280', '--height', '900'
+            }
+            if (project.hasProperty('standaloneSync')) {
+                systemProperty 'blacklight.test.standaloneSync', file(project.property('standaloneSync')).absolutePath
                 programArguments.addAll '--width', '1280', '--height', '900'
             }
             if (project.hasProperty('localWeaponMotions')) {
@@ -204,6 +213,9 @@ neoForge {
                 programArguments.addAll '--quickPlaySingleplayer',
                         project.property('quickPlayWorld').toString()
             }
+            if (project.hasProperty('quickPlayMultiplayer')) {
+                programArguments.addAll '--quickPlayMultiplayer', project.property('quickPlayMultiplayer').toString()
+            }
             // Developer-only visual acceptance hook. Normal launches never set it.
             if (project.hasProperty('openAnimationTuner')) {
                 systemProperty 'blacklight.test.openAnimationTuner', 'true'
@@ -214,6 +226,9 @@ neoForge {
 
         server {
             server()
+            if (project.hasProperty('serverRunDirectory')) gameDirectory = file(project.property('serverRunDirectory'))
+            if (project.hasProperty('standaloneSync')) systemProperty 'blacklight.test.standaloneSync', file(project.property('standaloneSync')).absolutePath
+            jvmArgument '-Xmx2G'
             programArgument '--nogui'
             systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
         }
