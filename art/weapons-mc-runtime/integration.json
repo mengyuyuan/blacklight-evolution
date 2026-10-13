@@ -1,0 +1,58 @@
+{
+  "claws": {
+    "source": "art/weapons-mc-v4/layout.json",
+    "sha256": "1cbeca416578d0766c76e50e8ba6db282313612006b0ffb330b4958adc32ae43",
+    "triangles": 4216,
+    "joints": [
+      "Arm_R",
+      "Hand_R",
+      "Arm_L",
+      "Hand_L"
+    ],
+    "file": "claw_blender"
+  },
+  "blade": {
+    "source": "art/blade-mc-v6/layout.json",
+    "sha256": "a4175aecd8726fe1f8e93441bce9f52cdbc9f838f0ff11682476810f2f91ab33",
+    "triangles": 2148,
+    "joints": [
+      "Arm_R",
+      "Hand_R"
+    ],
+    "file": "form_blade"
+  },
+  "hammerfists": {
+    "source": "art/weapons-mc-v4/layout.json",
+    "sha256": "1cbeca416578d0766c76e50e8ba6db282313612006b0ffb330b4958adc32ae43",
+    "triangles": 3820,
+    "joints": [
+      "Arm_R",
+      "Hand_R",
+      "Arm_L",
+      "Hand_L"
+    ],
+    "file": "form_hammerfists"
+  },
+  "whipfist": {
+    "source": "art/weapons-mc-v4/layout.json",
+    "sha256": "1cbeca416578d0766c76e50e8ba6db282313612006b0ffb330b4958adc32ae43",
+    "triangles": 1942,
+    "joints": [
+      "Arm_R",
+      "Hand_R"
+    ],
+    "file": "form_whipfist"
+  },
+  "muscle_mass": {
+    "source": "art/weapons-mc-v4/layout.json",
+    "sha256": "1cbeca416578d0766c76e50e8ba6db282313612006b0ffb330b4958adc32ae43",
+    "triangles": 3676,
+    "joints": [
+      "Arm_R",
+      "Hand_R",
+      "Arm_L",
+      "Hand_L"
+    ],
+    "file": "form_muscle_mass"
+  }
+}

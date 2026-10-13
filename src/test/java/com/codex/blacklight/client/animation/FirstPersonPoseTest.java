@@ -157,7 +157,7 @@ class FirstPersonPoseTest {
                     if(bone.endsWith("_L")&&(form.form==PowerForm.BLADE||form.form==PowerForm.WHIPFIST))continue;
                     for(var face:entry.getValue().getAsJsonArray())for(var value:face.getAsJsonObject().getAsJsonArray("p")) {
                         var p=vector(value.getAsJsonArray());
-                        if(form.form==PowerForm.BLADE&&bone.equals("Hand_R")) {
+                        if(!mesh.has("approvedProportions")&&form.form==PowerForm.BLADE&&bone.equals("Hand_R")) {
                             p.x*=BladeShape.WIDTH;p.z*=BladeShape.WIDTH;p.y=BladeShape.length(p.y);
                         }
                         // Tip_R is rendered in the forearm's stack in BlacklightClawLayer.
