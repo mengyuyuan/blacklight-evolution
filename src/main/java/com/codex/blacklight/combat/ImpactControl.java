@@ -15,7 +15,8 @@ public final class ImpactControl {
     private static final Map<Mob,Control> ACTIVE=new IdentityHashMap<>();
     private ImpactControl(){}
     public static void begin(LivingEntity entity,ImpactProfile profile,float yaw){
-        if(ConsumeSystem.grappleProtected(entity)||entity.getData(ModAttachments.CONSUME_VISUAL).active())return;
+        if(entity.isRemoved()){if(entity instanceof Mob mob)ACTIVE.remove(mob);return;}
+        if(ConsumeSystem.grappleProtected(entity)||ModAttachments.peekData(entity, ModAttachments.CONSUME_VISUAL, ConsumeVisual.EMPTY).active())return;
         cancel(entity);
         if(!entity.isAlive()){
             publish(entity,new HitReaction(entity.level().getGameTime(),20,HitReaction.DEATH,yaw,ImpactProfile.FALL));return;
@@ -37,15 +38,17 @@ public final class ImpactControl {
     private static void publish(LivingEntity entity,HitReaction state){entity.setData(ModAttachments.HIT_REACTION,state);entity.syncData(ModAttachments.HIT_REACTION);}
     public static void cancel(LivingEntity entity){
         if(entity instanceof Mob mob)ACTIVE.remove(mob);
-        if(entity.getData(ModAttachments.HIT_REACTION).duration()>0)publish(entity,HitReaction.EMPTY);
+        if(entity.isRemoved())return;
+        if(ModAttachments.peekData(entity, ModAttachments.HIT_REACTION, HitReaction.EMPTY).duration()>0)publish(entity,HitReaction.EMPTY);
     }
     public static boolean stunned(Mob mob){return !mob.level().isClientSide&&ACTIVE.containsKey(mob);}
     @SubscribeEvent public static void tick(EntityTickEvent.Post event){
         if(!(event.getEntity() instanceof Mob mob)||mob.level().isClientSide)return;
+        if(mob.isRemoved()){ACTIVE.remove(mob);return;}
         var control=ACTIVE.get(mob);if(control==null)return;
         if(!mob.onGround()&&!control.airborne()){control=new Control(control.knockdown(),control.flightStarted(),true);ACTIVE.put(mob,control);}
-        var hit=mob.getData(ModAttachments.HIT_REACTION);long now=mob.level().getGameTime(),age=now-hit.started();
-        if(mob.isRemoved()||mob.getData(ModAttachments.CONSUME_VISUAL).active()){cancel(mob);return;}
+        var hit=ModAttachments.peekData(mob, ModAttachments.HIT_REACTION, HitReaction.EMPTY);long now=mob.level().getGameTime(),age=now-hit.started();
+        if(ModAttachments.peekData(mob, ModAttachments.CONSUME_VISUAL, ConsumeVisual.EMPTY).active()){cancel(mob);return;}
         if(!mob.isAlive()){
             float yaw=hit.yaw();cancel(mob);publish(mob,new HitReaction(now,20,HitReaction.DEATH,yaw,ImpactProfile.FALL));return;
         }

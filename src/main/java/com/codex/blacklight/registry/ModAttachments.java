@@ -115,6 +115,12 @@ public final class ModAttachments {
             "disguise_morph",()->AttachmentType.builder(()->com.codex.blacklight.disguise.DisguiseMorph.EMPTY)
                     .sync(com.codex.blacklight.disguise.DisguiseMorph.CODEC).build());
 
+    /** Observe transient state without allocating or syncing attachments on unrelated entities. */
+    public static <T> T peekData(net.minecraft.world.entity.Entity entity,
+                                 Supplier<AttachmentType<T>> key, T fallback) {
+        return !entity.isRemoved() && entity.hasData(key) ? entity.getData(key) : fallback;
+    }
+
     public static void register(IEventBus bus) {
         ATTACHMENTS.register(bus);
     }
