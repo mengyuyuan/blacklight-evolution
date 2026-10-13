@@ -47,20 +47,25 @@ public final class HiveFeedingGameTest {
         prey.getAttribute(Attributes.MOVEMENT_SPEED).setBaseValue(0);level.addFreshEntity(prey);
         return new Scene(host,core,prey,home);
     }
-    @GameTest(template="wall_test",timeoutTicks=220)
+    @GameTest(template="wall_test",timeoutTicks=600)
     public static void fixedHiveFeedsOnceWithoutMovingBoss(GameTestHelper h){
         var s=scene(h,0);Vec3 start=s.host.position();
-        h.runAfterDelay(35,()->{
+        // Forced chunk/entity activation is asynchronous. Phase assertions use
+        // feedingStarted, never the unrelated test-fixture creation time.
+        h.startSequence().thenWaitUntil(()->h.assertTrue(DevourerFeedingSystem.active(s.host)&&s.host.feedingStarted()>=0,"waiting for feed start"))
+            .thenExecute(()->{
+        h.runAfterDelay(32,()->{
             h.assertTrue(s.host.feedingNode()==0&&s.prey.isNoGravity(),"fixed western port must capture its nearby prey");
             h.assertTrue(DevourerFeedingSystem.biomass(s.host)==0,"no early biomass during capture");
             h.assertTrue(s.prey.getY()>s.home.getY()+.3,"prey must lift before the horizontal pull");
         });
-        h.runAfterDelay(155,()->{
+        h.runAfterDelay(140,()->{
             h.assertTrue(!s.prey.isAlive(),"absorption must finish");
             h.assertTrue(DevourerFeedingSystem.meals(s.host)==1&&DevourerFeedingSystem.biomass(s.host)==2,"one cow credits exactly one meal and two biomass units");
             h.assertTrue(s.host.position().distanceToSqr(start)<.01,"boss must not chase or lift prey");
             h.assertTrue(!DevourerFeedingSystem.active(s.host),"session must be released after completion");s.cleanup();h.succeed();
         });
+            });
     }
     @GameTest(template="wall_test",timeoutTicks=160)
     public static void severedTendrilReleasesPreyWithoutReward(GameTestHelper h){

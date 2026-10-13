@@ -38,7 +38,8 @@ public final class ImpactAndReachGameTest {
                 if(i<13)h.assertTrue(mob.position().distanceToSqr(start)<1e-8,"cannot pull before whip reaches target");
             }
             h.assertTrue(ConsumeSystem.holding(p),"complete 12-block reel, not merely select: "+type+" / "+distance);
-            h.assertTrue(mob.position().distanceTo(GrabPlacement.anchor(p.position(),0,0,mob.getBbWidth(),mob.getBbHeight()))<.08,"arrive at animated hand");
+            p.tickCount++;ConsumeSystem.tick(new net.neoforged.neoforge.event.tick.PlayerTickEvent.Post(p));
+            h.assertTrue(mob.position().distanceTo(ConsumePlacementTrack.carryAnchor(p.position(),p.getYRot(),mob,GrappleMotion.key(p,mob.getData(ModAttachments.CONSUME_VISUAL)),GrappleMotion.progress(p,mob.getData(ModAttachments.CONSUME_VISUAL),0)).orElseThrow())<.08,"arrive at animated hand");
             ConsumeSystem.cancel(p);mob.discard();
         }
         h.succeed();

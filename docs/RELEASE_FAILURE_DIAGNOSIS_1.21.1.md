@@ -4,6 +4,8 @@
 
 ## 结论
 
+后续收口校准与完整复测已完成，见 [0.3.0 发布记录](RELEASE_0.3.0.md)。以下保留定位时的证据边界，并修正复测发现的描述误差。
+
 上一轮的 33 项服务端失败不是 33 个已确认的游戏 bug。逐项追踪后，主要原因是旧用例仍采用早期抓取时长、伤害单位、目标种类和动作规则；另有蜂巢用例把测试开场时间当作捕食开始时间。不能为了让这些测试通过而恢复旧玩法。
 
 两项模型单测指向同一个待验收问题：新刀臂模型与旧抓取/投掷资源姿态有重叠。它们没有执行游戏中的原生配对姿态和 IK 修正，所以还不能断言最终画面已经穿头，也不能据此忽略风险。
@@ -30,11 +32,11 @@
 | 用例 | 首个失败的原因及处理方向 | 证据 |
 | --- | --- | --- |
 | `everyFormConsumesPassiveAndRewardsOnce` | 用完整演员动作时长判断奖励时间。当前 `completionTick` 是吸收结算点，早于演员收回动画结束；应分别检查结算和动作恢复。 | 静态：`ConsumeSequence.duration/completionTick`、`ConsumeSystem.finish` |
-| `consumptionClaimsAndPaysOnlyOnce` | 猎杀者走大型攀附及专用吸收，仍按通用旧 `DURATION=46` 判断完成；专用完成点为 50 tick，演员尾段 71 tick。旧治疗值也没有换算。 | 静态：`ConsumeSequence.large`、`HunterConsume`；RC24、RC40 |
-| `petsConstructsAndMountedAnimalsAreExcluded` | 把铁傀儡和骷髅一概列为不可吸收；当前可吸收标签已纳入它们。宠物和骑乘保护应单独保留。 | 静态：实体标签、`ConsumeSystem.eligible`；RC16 |
+| `consumptionClaimsAndPaysOnlyOnce` | 猎杀者走大型攀附及专用吸收，仍按通用旧 `DURATION=46` 判断完成；专用完成点为 50 tick，演员尾段 71 tick。结束后猎杀者先进入遗骸状态，不会立即移除；该 FakePlayer 未应用生命单位属性，治疗仍应按其实际单位验证。 | 静态：`ConsumeSequence.large`、`HunterConsume`；RC24、RC40 |
+| `petsConstructsAndMountedAnimalsAreExcluded` | 把铁傀儡和骷髅一概列为不可吸收；当前标签纳入铁傀儡，仍排除骷髅。宠物和骑乘保护应单独保留。 | 静态：实体标签、`ConsumeSystem.eligible`；RC16 |
 | `bladeSpecialUsesDashOnceFromStandingAndSprintAndWhipReachesBehind` | 首次冲刺命中一次，实际 70 对比旧期望 14。后续横扫等分支尚未跑到。 | 日志实测；`CombatScale`；RC40 |
 | `committedSpecialOwnsMovementUntilRecovery` | “只测试疾跑互斥”的循环同时输入新的跳跃按下沿；地面蓄力允许跳跃取消，产生跳跃位移。应将普通移动互斥与合法跳跃取消分开测试。 | 静态：`WeaponCombatSystem.movementInput/jumpOut`；RC20 |
-| `whipPullsOwnerToHeavyVictimBeforeHolding` | 猎杀者如今属于大型目标，优先选择 MOUNT，而不是普通重型目标的 WHIP_PULL。 | 静态：`ConsumeSystem.request`、`ConsumeSequence.large`；RC24 |
+| `whipPullsOwnerToHeavyVictimBeforeHolding` | 该夹具使用嗅探兽，体积达到大型目标门槛，优先选择 MOUNT，而不是普通重型目标的 WHIP_PULL。 | 静态：`ConsumeSystem.request`、`ConsumeSequence.large`；RC24 |
 | `survivalRecipeAndGuidanceAreLoaded` | 要求旧病毒样本合成配方；RC18 已取消该配方并改用感染开局。 | 静态：资源目录；RC18 |
 | `primaryAndRepeatedGrabThrowAtReleaseFrameWithoutRewards` | 只等待 12 tick 就投掷，此时仍在 CAPTURE；当前普通抓取是 26 tick，尚未进入可投掷 HOLD。 | 静态：`ConsumeVisual.captureDuration`、`ConsumeSystem.throwTarget` |
 | `basicHammerHasContactSplash` | 对已换算生命的实体使用名义伤害上限，误判主目标受到重复溅射。应同时核对命中次数和换算后的扣血。 | 静态：`HammerImpactGameTest`、`CombatScale`；RC40 |

@@ -19,7 +19,10 @@ public final class CombatTravelGameTest {
         var pos=h.absolutePos(new net.minecraft.core.BlockPos(3,0,3));int cx=pos.getX()>>4,cz=pos.getZ()>>4;
         for(int x=cx-1;x<=cx+1;x++)for(int z=cz-1;z<=cz+4;z++)h.getLevel().getChunkSource().addRegionTicket(net.minecraft.server.level.TicketType.PORTAL,new net.minecraft.world.level.ChunkPos(x,z),2,pos);
         // Entity-section visibility updates on server ticks after the ticket.
-        h.runAfterDelay(12,()->{
+        h.startSequence().thenWaitUntil(()->{
+            for(int x=cx-1;x<=cx+1;x++)for(int z=cz-1;z<=cz+4;z++)
+                h.assertTrue(h.getLevel().isPositionEntityTicking(new net.minecraft.core.BlockPos(x<<4,80,z<<4)),"waiting for remote target entity sections");
+        }).thenExecute(()->{
             try{checkTravel(h,air,special);}finally{for(int x=cx-1;x<=cx+1;x++)for(int z=cz-1;z<=cz+4;z++)h.getLevel().getChunkSource().removeRegionTicket(net.minecraft.server.level.TicketType.PORTAL,new net.minecraft.world.level.ChunkPos(x,z),2,pos);}
         });
     }
@@ -38,6 +41,17 @@ public final class CombatTravelGameTest {
                 for(int x=cx-1;x<=cx+1;x++)for(int z=cz-1;z<=cz+4;z++)h.getLevel().getChunk(x,z);
                 var mob=victim(h,origin.add(0,0,distance));float hp=mob.getHealth();
                 WeaponCombatSystem.request(p,special);var move=p.getData(ModAttachments.WEAPON_VISUAL).spec();
+                // RC45: ordinary aerial attacks and whip heavy attacks remain local.
+                if(air&&(!special||form==PowerForm.WHIPFIST)) {
+                    for(int t=0;t<260&&WeaponCombatSystem.busy(p);t++) {
+                        h.assertTrue(!p.getData(ModAttachments.WEAPON_VISUAL).traveling(),"local aerial action cannot start remote pursuit");
+                        p.move(MoverType.SELF,p.getDeltaMovement());p.setOnGround(false);
+                        p.tickCount++;WeaponCombatSystem.tick(new PlayerTickEvent.Post(p));
+                    }
+                    h.assertTrue(Math.hypot(p.getX()-origin.x,p.getZ()-origin.z)<1,"local aerial action cannot tow the player toward a remote target");
+                    h.assertTrue((form==PowerForm.WHIPFIST&&special||mob.getHealth()==hp)&&!WeaponCombatSystem.busy(p),"local aerial action recovers; only the long whip may hit remotely: "+form);
+                    WeaponCombatSystem.cancel(p);mob.discard();continue;
+                }
                 h.assertTrue(move!=null&&p.getData(ModAttachments.WEAPON_VISUAL).targetId()==mob.getId(),"acquire visible distant "+form+" "+distance+" selected="+p.getData(ModAttachments.WEAPON_VISUAL).targetId()+" expected="+mob.getId()+" range="+CombatTargeting.viewRange(p));
                 int hits=0;double hitDistance=999;boolean traveled=false;
                 for(int t=0;t<260&&WeaponCombatSystem.busy(p);t++){
@@ -58,8 +72,8 @@ public final class CombatTravelGameTest {
             }
         }h.succeed();
     }
-    @GameTest(template="wall_test",timeoutTicks=80,batch="combat_travel") public static void allAirSpecialsChaseDistantMovingTargets(GameTestHelper h){prepareTravel(h,true,true);}
-    @GameTest(template="wall_test",timeoutTicks=80,batch="combat_travel") public static void allAirOpenersChaseDistantMovingTargets(GameTestHelper h){prepareTravel(h,true,false);}
+    @GameTest(template="wall_test",timeoutTicks=600,batch="combat_travel") public static void aerialSpecialsRespectPursuitAndStationaryWhipRules(GameTestHelper h){prepareTravel(h,true,true);}
+    @GameTest(template="wall_test",timeoutTicks=600,batch="combat_travel") public static void ordinaryAirOpenersDoNotChaseRemoteTargets(GameTestHelper h){prepareTravel(h,true,false);}
     @GameTest(template="wall_test",timeoutTicks=80) public static void groundAttacksNeverRunToDistantTargets(GameTestHelper h){
         for(var form:new PowerForm[]{PowerForm.NONE,PowerForm.CLAWS,PowerForm.BLADE,PowerForm.HAMMERFISTS,PowerForm.WHIPFIST,PowerForm.MUSCLE_MASS})
             for(var input:WeaponMove.Input.values())for(boolean locked:new boolean[]{false,true}){
@@ -108,10 +122,10 @@ public final class CombatTravelGameTest {
         var origin=p.position();var mob=h.spawn(EntityType.SNIFFER,3,180,13);mob.setNoAi(true);mob.setNoGravity(true);mob.setHealth(10);var targetStart=mob.position();
         CombatTargeting.requestLock(p,mob.getId());
         ConsumeSystem.request(p);
-        h.assertTrue(p.getData(ModAttachments.GRAB_STAGE)==ConsumeVisual.WHIP_PULL,"heavy target selects owner-pull branch");
+        h.assertTrue(p.getData(ModAttachments.GRAB_STAGE)==ConsumeVisual.MOUNT,"large sniffer selects mounted owner approach");
         for(int t=0;t<160&&p.getData(ModAttachments.CONSUMING)&&!ConsumeSystem.holding(p);t++){
             p.move(MoverType.SELF,p.getDeltaMovement());p.tickCount++;ConsumeSystem.tick(new PlayerTickEvent.Post(p));
-            if(p.getData(ModAttachments.GRAB_STAGE)==ConsumeVisual.WHIP_PULL)
+            if(p.getData(ModAttachments.GRAB_STAGE)==ConsumeVisual.MOUNT)
                 h.assertTrue(mob.position().distanceTo(targetStart)<.01,"heavy target stays grounded while owner approaches");
         }
         h.assertTrue(ConsumeSystem.holding(p)&&p.position().distanceTo(origin)>7,"owner physically travels then captures heavy target: "+p.position().subtract(origin));

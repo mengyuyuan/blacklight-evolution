@@ -34,7 +34,7 @@ public final class HammerImpactGameTest {
         float hp=main.getHealth(),sideHp=side.getHealth();WeaponCombatSystem.request(p,false);
         for(int t=0;t<WeaponMove.HAMMER_JAB.duration+2;t++){p.tickCount++;WeaponCombatSystem.tick(new PlayerTickEvent.Post(p));}
         h.assertTrue(main.getHealth()<hp&&side.getHealth()<sideHp,"ordinary hammer hit must disperse adjacent crowd");
-        h.assertTrue(hp-main.getHealth()<=WeaponMove.HAMMER_JAB.damage+.01,"splash must not double damage primary victim");
+        h.assertTrue(hp-main.getHealth()<=WeaponMove.HAMMER_JAB.damage*5+.01,"splash must not double damage primary victim");
         WeaponCombatSystem.cancel(p);main.discard();side.discard();h.succeed();
     }
     @GameTest(template="wall_test",timeoutTicks=40)
