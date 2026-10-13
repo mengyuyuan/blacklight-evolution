@@ -57,7 +57,7 @@ class BulletdiveTerrainTest {
         assertTrue(BulletdiveTerrain.canBreak(BulletdiveTerrain.plan(1_000_000),0,0,1000,6,false));
     }
     @Test void dropProducingBreaksHaveASeparateGlobalSliceLimitAndResumeNextTick() {
-        var clock=new AtomicLong();int remaining=35,total=0,ticks=0;
+        var clock=new AtomicLong();int remaining=BulletdiveTerrain.MAX_BREAKS_PER_TICK+3,total=0,ticks=0;
         while(remaining>0){
             var budget=new BulletdiveTerrain.TickBudget(BulletdiveTerrain.MAX_WORK_PER_TICK,
                     BulletdiveTerrain.MAX_BREAKS_PER_TICK,3_000_000,clock::get);
@@ -67,9 +67,28 @@ class BulletdiveTerrainTest {
                 // call with loot; no silent remainder-removal branch is needed.
                 budget.recordBreak();thisTick++;total++;remaining--;
             }
-            assertTrue(thisTick<=32);ticks++;
+            assertTrue(thisTick<=BulletdiveTerrain.MAX_BREAKS_PER_TICK);ticks++;
         }
-        assertEquals(35,total);assertEquals(2,ticks);
+        assertEquals(BulletdiveTerrain.MAX_BREAKS_PER_TICK+3,total);assertEquals(2,ticks);
+    }
+    @Test void impactFrontOpensNeighboursBeforeFinishingTheCentralShaftAndRespectsBlockedColumns(){
+        var plan=BulletdiveTerrain.plan(80);
+        var wave=new BulletdiveTerrain.WaveCursor(plan,0,0,plan.depth(),(x,z)->x>=-1&&x<=0&&z>=-1&&z<=0);
+        var cells=new HashSet<String>();double previous=-1;boolean neighbour=false,deep=false;
+        int steps=0;
+        while(!wave.exhausted()){
+            assertTrue(++steps<4000);
+            var cell=wave.step();if(cell==null)continue;
+            assertTrue(cell.distance()>=previous);previous=cell.distance();
+            int x=cell.column().x(),z=cell.column().z();
+            assertTrue(cells.add(x+","+z+","+cell.layer()));
+            if(cell.layer()==0&&x*x+z*z==1)neighbour=true;
+            if(x==0&&z==0&&cell.layer()==plan.depth()-1){assertTrue(neighbour);deep=true;}
+            // Rejecting a protected surface never exposes the cells below it.
+            if(x==1&&z==0){assertEquals(0,cell.layer());continue;}
+            wave.advance(cell);
+        }
+        assertTrue(deep);assertFalse(cells.contains("1,0,1"));
     }
     @Test void nonBreakingCandidatesCannotRunPastTheCandidateOrTimeBudget() {
         var clock=new AtomicLong(10);

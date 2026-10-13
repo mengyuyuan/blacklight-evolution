@@ -24,15 +24,15 @@ import net.neoforged.neoforge.event.tick.ServerTickEvent;
  */
 @EventBusSubscriber(modid="blacklight")
 public final class BulletdiveTerrain {
-    public static final int MAX_WORK_PER_TICK=192, MAX_BREAKS_PER_TICK=32;
-    /** Every successful break now has feedback and vanilla drops. */
-    public static final int MAX_FEEDBACK_PER_TICK=MAX_BREAKS_PER_TICK;
+    public static final int MAX_WORK_PER_TICK=8192, MAX_BREAKS_PER_TICK=2048;
+    /** Shared crack audio/particles; every successful block still has vanilla loot. */
+    public static final int MAX_FEEDBACK_PER_TICK=2;
     private static final int MAX_HISTORY=128;
-    private static final long TICK_NANOS=3_000_000;
+    private static final long TICK_NANOS=16_000_000;
     /** budget is the theoretical unit-hardness-zero block count, not a work/candidate cutoff. */
     public record Plan(double height,int radius,int depth,long budget,double energy) { }
     public record Snapshot(Plan plan,boolean complete,long visited,long destroyed,long protectedBlocks,
-                           long skipped,double energyRemaining,double maximumRadius,int maximumDepth,String reason) { }
+                           long skipped,double energyRemaining,double maximumRadius,int maximumDepth,String reason, long elapsedTicks,long firstTickDestroyed,int peakBreaksPerTick,double peakSliceMillis) { }
     private record Key(UUID owner,long session) { }
     record Column(int x,int z,long distanceSquared) { }
     private static final Map<Key,Job> JOBS=new LinkedHashMap<>();
@@ -47,7 +47,7 @@ public final class BulletdiveTerrain {
         double excess=height-6;
         // Only Java coordinate/count representation saturates, not a gameplay height cap.
         int radius=(int)Math.min(Integer.MAX_VALUE,2+Math.floor(Math.sqrt(excess*.5)));
-        int depth=(int)Math.min(Integer.MAX_VALUE,1+Math.floor(Math.cbrt(excess)));
+        int depth=(int)Math.min(Integer.MAX_VALUE,2+Math.floor(Math.sqrt(excess)*.75));
         double energy=excess>Double.MAX_VALUE/8?Double.MAX_VALUE:excess*8;
         long budget=energy>=Long.MAX_VALUE?Long.MAX_VALUE:(long)Math.floor(energy);
         return new Plan(height,radius,depth,budget,energy);
@@ -110,6 +110,7 @@ public final class BulletdiveTerrain {
                 &&state.hasCombatSkill(CombatSkill.BULLETDIVE_DROP);
     }
     @SubscribeEvent public static void tick(ServerTickEvent.Post event) {
+        long sliceStart=System.nanoTime();
         var budget=new TickBudget(MAX_WORK_PER_TICK,MAX_BREAKS_PER_TICK,TICK_NANOS,System::nanoTime);
         var active=new ArrayList<Job>();
         for(var job:ACTIVE_OWNERS.snapshot()) {
@@ -126,6 +127,8 @@ public final class BulletdiveTerrain {
             if(!budget.tryCandidate())break;
             if(job.next())budget.recordBreak();
         }
+        double sliceMillis=(System.nanoTime()-sliceStart)/1e6;
+        for(var job:active)job.peakSliceMillis=Math.max(job.peakSliceMillis,sliceMillis);
         nextJob=cursor;
         trimHistory();
     }
@@ -230,6 +233,8 @@ public final class BulletdiveTerrain {
             long key=(x&0xffffffffL)|(z&0xffffffffL)<<32;
             if(discovered.add(key))probes.add(new ChunkProbe((int)x,(int)z,distance));
         }
+        double nextDistance(){return Math.min(probes.isEmpty()?Double.POSITIVE_INFINITY:probes.peek().distanceSquared,
+                columns.isEmpty()?Double.POSITIVE_INFINITY:columns.peek().peek().distanceSquared);}
         boolean exhausted(){return probes.isEmpty()&&columns.isEmpty();}
         int trackedChunks(){return discovered.size();}
         void clear(){probes.clear();columns.clear();discovered.clear();}
@@ -251,62 +256,90 @@ public final class BulletdiveTerrain {
         }
     }
 
+    record WaveCell(Column column,int layer) {
+        double distance(){return column.distanceSquared+layer*(double)layer*.12;}
+    }
+    /** Expand a downward-biased front, rather than drilling one complete shaft
+     * before its neighbour. Rejected columns never enqueue cells below them. */
+    static final class WaveCursor {
+        final ColumnCursor columns;final Plan plan;final int maximumDepth;
+        final PriorityQueue<WaveCell> pending=new PriorityQueue<>(Comparator.comparingDouble(WaveCell::distance)
+                .thenComparingInt(WaveCell::layer).thenComparingInt(c->c.column.x).thenComparingInt(c->c.column.z));
+        WaveCursor(Plan plan,int x,int z,int maximumDepth,LoadedChunkLookup loaded){
+            this.plan=plan;this.maximumDepth=maximumDepth;columns=new ColumnCursor(plan,x,z,loaded);
+        }
+        WaveCell step(){
+            if(!columns.exhausted()&&(pending.isEmpty()||columns.nextDistance()<=pending.peek().distance())){
+                var column=columns.step();
+                if(column!=null&&maximumDepth>0)pending.add(new WaveCell(column,0));
+                return null;
+            }
+            return pending.poll();
+        }
+        void advance(WaveCell cell){
+            int next=cell.layer+1;
+            if(next<maximumDepth&&next<columnDepth(plan,cell.column.distanceSquared))pending.add(new WaveCell(cell.column,next));
+        }
+        boolean exhausted(){return columns.exhausted()&&pending.isEmpty();}
+        void clear(){columns.clear();pending.clear();}
+    }
+
     private static final class Job {
+        final BulletdiveBreakEffects effects=new BulletdiveBreakEffects();
         final ServerPlayer owner;final Key key;final ServerLevel level;final Plan plan;final BlockPos center;
-        final ColumnCursor columns;Column column;int layer,columnLayers;
+        final WaveCursor wave;final int startedTick;
+        int endedTick,firstBreakTick=-1,lastBreakTick=-1,breaksThisTick,peakBreaksPerTick;
+        long firstTickDestroyed;double peakSliceMillis;
         boolean complete;String reason="running";long visited,destroyed,protectedBlocks,skipped;int maxDepth;double energy,maxRadius;
         Job(ServerPlayer p,Key key,Plan plan,Vec3 impact) {
-            owner=p;this.key=key;level=p.serverLevel();this.plan=plan;energy=plan.energy;
+            owner=p;this.key=key;level=p.serverLevel();this.plan=plan;energy=plan.energy;startedTick=p.server.getTickCount();
             center=BlockPos.containing(impact.x,impact.y-.075,impact.z);
-            columns=new ColumnCursor(plan,center.getX(),center.getZ(),(x,z)->level.getChunkSource().getChunkNow(x,z)!=null);
+            wave=new WaveCursor(plan,center.getX(),center.getZ(),
+                    (int)Math.min(Integer.MAX_VALUE,Math.max(0,(long)center.getY()-level.getMinBuildHeight()+1)),
+                    (x,z)->level.getChunkSource().getChunkNow(x,z)!=null);
         }
         boolean loaded(BlockPos pos){return level.getChunkSource().getChunkNow(pos.getX()>>4,pos.getZ()>>4)!=null;}
         boolean next() {
             if(!blockBreakingEnabled(owner)){finish("block_breaking_disabled");return false;}
             if(energy<1){finish("energy_exhausted");return false;}
-            if(column==null){
-                column=columns.step();
-                if(column==null){if(columns.exhausted())finish("complete");return false;}
-                layer=0;columnLayers=(int)Math.min(columnDepth(plan,column.distanceSquared),
-                        Math.max(0,(long)center.getY()-level.getMinBuildHeight()+1));
-                if(columnLayers==0){column=null;return false;}
-            }
-            var current=column;int currentLayer=layer++;
-            if(layer>=columnLayers)column=null;
+            var cell=wave.step();
+            if(cell==null){if(wave.exhausted())finish("complete");return false;}
+            var current=cell.column;int currentLayer=cell.layer;
             visited++;
             long x=(long)center.getX()+current.x,y=(long)center.getY()-currentLayer,z=(long)center.getZ()+current.z;
-            if(x<Integer.MIN_VALUE||x>Integer.MAX_VALUE||y<Integer.MIN_VALUE||y>Integer.MAX_VALUE||z<Integer.MIN_VALUE||z>Integer.MAX_VALUE){skipped++;column=null;return false;}
+            if(x<Integer.MIN_VALUE||x>Integer.MAX_VALUE||y<Integer.MIN_VALUE||y>Integer.MAX_VALUE||z<Integer.MIN_VALUE||z>Integer.MAX_VALUE){skipped++;return false;}
             var pos=new BlockPos((int)x,(int)y,(int)z);
-            if(!level.isInWorldBounds(pos)||!loaded(pos)){skipped++;column=null;return false;}
-            if(!level.mayInteract(owner,pos)||!owner.mayBuild()){protectedBlocks++;column=null;return false;}
+            if(!level.isInWorldBounds(pos)||!loaded(pos)){skipped++;return false;}
+            if(!level.mayInteract(owner,pos)||!owner.mayBuild()){protectedBlocks++;return false;}
             var state=level.getBlockState(pos);
-            // A waterlogged solid is still a real breakable block; destroyBlock
-            // restores its fluid naturally. Pure fluid cells are not mining.
-            if(state.isAir()||state.getBlock() instanceof LiquidBlock){skipped++;return false;}
+            if(state.isAir()||state.getBlock() instanceof LiquidBlock){skipped++;wave.advance(cell);return false;}
             float hardness=state.getDestroySpeed(level,pos),resistance=state.getBlock().getExplosionResistance();
-            if(hardness<0){protectedBlocks++;column=null;return false;}
+            if(hardness<0){protectedBlocks++;return false;}
             double cost=hardnessCost(hardness);
-            if(!canBreak(plan,current.distanceSquared,currentLayer,hardness,resistance,false)||cost>energy){skipped++;column=null;return false;}
+            if(!canBreak(plan,current.distanceSquared,currentLayer,hardness,resistance,false)||cost>energy){skipped++;return false;}
             var event=new BlockEvent.BreakEvent(level,pos,state,owner);var previous=OWN_BREAK.get();OWN_BREAK.set(event);
             try { NeoForge.EVENT_BUS.post(event); } finally { if(previous==null)OWN_BREAK.remove();else OWN_BREAK.set(previous); }
             if(!blockBreakingEnabled(owner)){finish("block_breaking_disabled");return false;}
             if(complete)return false;
             if(!eligible(owner)||owner.isRemoved()||owner.level()!=level){finish("owner_unavailable");return false;}
-            if(event.isCanceled()||!loaded(pos)||!level.mayInteract(owner,pos)){protectedBlocks++;column=null;return false;}
-            if(!level.getBlockState(pos).equals(state)){skipped++;column=null;return false;}
-            // Vanilla handles loot (including the block entity), removal hooks,
-            // tileDrops and break feedback once. Do not also drop inventory or
-            // call playerDestroy: that would duplicate container/loot handling.
-            boolean broken=level.destroyBlock(pos,true,owner);
-            if(!broken){skipped++;column=null;return false;}
-            energy=Math.max(0,energy-cost);destroyed++;
+            if(event.isCanceled()||!loaded(pos)||!level.mayInteract(owner,pos)){protectedBlocks++;return false;}
+            if(!level.getBlockState(pos).equals(state)){skipped++;return false;}
+            boolean broken=effects.destroy(level,pos,owner);
+            if(!broken){skipped++;return false;}
+            energy=Math.max(0,energy-cost);destroyed++;wave.advance(cell);
+            int tick=owner.server.getTickCount();
+            if(firstBreakTick<0)firstBreakTick=tick;
+            if(tick==firstBreakTick)firstTickDestroyed++;
+            if(tick!=lastBreakTick){lastBreakTick=tick;breaksThisTick=0;}
+            peakBreaksPerTick=Math.max(peakBreaksPerTick,++breaksThisTick);
             maxRadius=Math.max(maxRadius,Math.sqrt(current.distanceSquared));maxDepth=Math.max(maxDepth,currentLayer+1);
             return true;
         }
         void finish(String reason){
             if(complete)return;
-            complete=true;this.reason=reason;column=null;columns.clear();ACTIVE_OWNERS.complete(key.owner,this);
+            complete=true;endedTick=owner.server.getTickCount();this.reason=reason;wave.clear();effects.clear();ACTIVE_OWNERS.complete(key.owner,this);
         }
-        Snapshot snapshot(){return new Snapshot(plan,complete,visited,destroyed,protectedBlocks,skipped,energy,maxRadius,maxDepth,reason);}
+        Snapshot snapshot(){return new Snapshot(plan,complete,visited,destroyed,protectedBlocks,skipped,energy,maxRadius,maxDepth,reason,
+                (complete?endedTick:owner.server.getTickCount())-(long)startedTick,firstTickDestroyed,peakBreaksPerTick,peakSliceMillis);}
     }
 }

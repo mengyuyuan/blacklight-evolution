@@ -52,6 +52,7 @@ public final class PlayerMotionController {
         boolean contactStrideTransition;
         net.minecraft.world.phys.Vec3 committedPosition;
         final LocomotionClock gait=new LocomotionClock();
+        final ChargePoseClock charge=new ChargePoseClock();
         BlacklightPose from,last;
     }
     private PlayerMotionController() {}
@@ -183,6 +184,8 @@ public final class PlayerMotionController {
         var action=entity.getData(ModAttachments.PLAYER_ACTION);
         BlacklightPose base = locomotion(entity, runtime, now, partial);
         if (runtime.preview != null) return samplePose(runtime.preview.key, runtime.preview.time(now), false);
+        if(runtime.phase==LocomotionPhase.CHARGING&&entity.getData(ModAttachments.WEAPON_VISUAL).spec()==null)
+            return base;
         var activeWeapon=entity.getData(ModAttachments.WEAPON_VISUAL).spec();
         if(activeWeapon!=null&&(activeWeapon.id.startsWith("dev_")||activeWeapon==com.codex.blacklight.combat.WeaponMove.BULLETDIVE_DROP))
             runtime.override=null; // The synchronized skill owns airborne holds and aim blending.
@@ -267,8 +270,12 @@ public final class PlayerMotionController {
             var clock=runtime.override;
             if(clock.finished(now(entity,0),MotionLibrary.looping(clock.key),duration(clock.key)))runtime.override=null;
         }
-        long tick=entity.level().getGameTime();
+        // World time can be corrected backwards by a server time packet. Entity
+        // ticks own local interpolation; a time correction must not freeze gait.
+        long tick=entity.tickCount;
         if(runtime.gait.key()!=null&&tick<=runtime.gait.tick())return;
+        runtime.charge.commit(entity==Minecraft.getInstance().player?ClientMovementEvents.visualJumpCharge()
+                :entity.getData(ModAttachments.JUMP_CHARGE),MovementTuningSettings.jumpChargeTicks());
         var previous=runtime.last;
         var velocity=entity.getDeltaMovement();
         var travel=runtime.committedPosition==null?net.minecraft.world.phys.Vec3.ZERO:entity.position().subtract(runtime.committedPosition);
@@ -356,7 +363,7 @@ public final class PlayerMotionController {
         if(runtime.gait.key()==null) {
             // Initial rendering can precede the first client tick. Establish one
             // idle interval; subsequent render passes cannot advance or reroute it.
-            runtime.gait.commit(entity.level().getGameTime(),"basic_idle",duration("basic_idle"),true,false,0,0);
+            runtime.gait.commit(entity.tickCount,"basic_idle",duration("basic_idle"),true,false,0,0);
             runtime.locomotion="basic_idle";runtime.committedPosition=entity.position();
         }
         return renderLocomotion(entity,runtime,partial);
@@ -367,8 +374,7 @@ public final class PlayerMotionController {
         float clipDuration=runtime.gait.duration();
         float time=runtime.gait.sampleTime(partial);
         if (key.equals("basic_jump_charge")) {
-            int charge = entity == Minecraft.getInstance().player ? ClientMovementEvents.visualJumpCharge() : entity.getData(ModAttachments.JUMP_CHARGE);
-            time = duration(key) * Math.clamp(charge / (float)MovementTuningSettings.jumpChargeTicks(), 0, 1);
+            time = duration(key)*runtime.charge.ratio(partial,MovementTuningSettings.jumpChargeTicks());
         }
         var pose=samplePose(key,time,looping);
         if(looping&&clipDuration>0) {

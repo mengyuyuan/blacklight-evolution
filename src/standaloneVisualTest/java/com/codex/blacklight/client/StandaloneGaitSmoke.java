@@ -43,6 +43,12 @@ public final class StandaloneGaitSmoke {
     private static long firstJumpAirTick=-1,jumpContactTick=-1;
     private static int jumpAirTicks,jumpHoldTicks=2;
     private static boolean movingLandingObserved,standingChargeObserved;
+    private static Vec3 plantedClient,plantedServer;
+    private static final java.util.Map<KeyMapping,com.mojang.blaze3d.platform.InputConstants.Key> savedBindings=new java.util.IdentityHashMap<>();
+    private static double maximumChargeClientDrift;
+    private static volatile double maximumChargeServerDrift;
+    private static int chargeClientSamples;
+    private static volatile int chargeServerSamples;
     private static boolean jumpOnly(){return Boolean.getBoolean(PROPERTY+".jumpOnly");}
     private static boolean claws(){return Boolean.getBoolean(PROPERTY+".claws");}
     private static boolean standingCharge(){return Boolean.getBoolean(PROPERTY+".standingCharge");}
@@ -90,10 +96,22 @@ public final class StandaloneGaitSmoke {
             mc.player.setYRot(0);mc.player.yRotO=0;mc.player.setXRot(0);mc.player.xRotO=0;
         }
         boolean run=serverReady&&sprinting()&&!(standingCharge()&&stage==Stage.JUMP_SPRINT);
-        mc.options.keyUp.setDown(run);mc.options.keySprint.setDown(run);
-        mc.options.keyDown.setDown(false);mc.options.keyLeft.setDown(false);mc.options.keyRight.setDown(false);
+        boolean probe=serverReady&&standingCharge()&&stage==Stage.JUMP_SPRINT&&stageTicks>=25&&stageTicks<20+jumpHoldTicks;
+        mc.options.keyUp.setDown(run||probe);mc.options.keySprint.setDown(run||probe);
+        if(probe&&mc.player!=null)mc.player.setDeltaMovement(.3,mc.player.getDeltaMovement().y,.2);
+        mc.options.keyDown.setDown(false);mc.options.keyLeft.setDown(false);mc.options.keyRight.setDown(probe);
         mc.options.keyJump.setDown(serverReady&&stage==Stage.JUMP_SPRINT&&stageTicks>=20&&stageTicks<20+jumpHoldTicks);mc.options.keyShift.setDown(false);
         mc.options.keyAttack.setDown(false);mc.options.keyUse.setDown(false);
+    }
+    @SubscribeEvent(priority=EventPriority.LOWEST)
+    public static void observePlantedServer(net.neoforged.neoforge.event.tick.PlayerTickEvent.Post event){
+        if(!active()||!serverReady||!standingCharge()||!(event.getEntity() instanceof ServerPlayer p))return;
+        var movement=p.getData(ModAttachments.MOVEMENT_STATE);
+        if(movement.chargeTicks()>3&&!movement.runningCharge()&&movement.jumpHeld()&&p.onGround()){
+            if(plantedServer==null)plantedServer=p.position();
+            maximumChargeServerDrift=Math.max(maximumChargeServerDrift,p.position().subtract(plantedServer).horizontalDistance());
+            chargeServerSamples++;
+        }
     }
     @SubscribeEvent(priority=EventPriority.HIGHEST)
     public static void humanPerspective(InputEvent.Key event) {
@@ -129,6 +147,13 @@ public final class StandaloneGaitSmoke {
                 previousMouseGrabbed=mc.mouseHandler.isMouseGrabbed();previousYaw=mc.player.getYRot();previousPitch=mc.player.getXRot();
                 for(var key:List.of(mc.options.keyUp,mc.options.keySprint,mc.options.keyDown,mc.options.keyLeft,mc.options.keyRight,
                         mc.options.keyJump,mc.options.keyShift,mc.options.keyAttack,mc.options.keyUse,mc.options.keyTogglePerspective))savedKeys.put(key,key.isDown());
+                // Physical GLFW fallback must not inject human/stale key presses
+                // into this explicit disposable fixture. Feed native KeyMappings
+                // below; restore all bindings before saving options on exit.
+                for(var key:savedKeys.keySet()){
+                    savedBindings.put(key,key.getKey());key.setKey(com.mojang.blaze3d.platform.InputConstants.UNKNOWN);
+                }
+                KeyMapping.resetMapping();
                 mc.options.pauseOnLostFocus=false;mc.options.hideGui=false;mc.options.fov().set(60);mc.options.setCameraType(CameraType.THIRD_PERSON_FRONT);mc.setScreen(null);mc.mouseHandler.releaseMouse();mc.getWindow().setTitle("Blacklight · 自动跑跳 QA（请勿操作测试窗口）");
                 statesField=PlayerMotionController.class.getDeclaredField("STATES");statesField.setAccessible(true);
                 previousPngLevel=STBImageWrite.stbi_write_png_compression_level.get(0);
@@ -142,8 +167,8 @@ public final class StandaloneGaitSmoke {
                 initialized=true;var uuid=mc.player.getUUID();
                 // Exercise a real light moving impact, rather than a tiny jump with
                 // no landing action. Derive hold from the configured native physics.
-                int maxCharge=MovementTuningSettings.jumpChargeTicks();jumpHoldTicks=maxCharge;
-                for(int held=1;held<=maxCharge;held++)
+                int maxCharge=MovementTuningSettings.jumpChargeTicks();jumpHoldTicks=maxCharge+(standingCharge()?12:0);
+                for(int held=1;!standingCharge()&&held<=maxCharge;held++)
                     if(MovementTuningSettings.estimatedJumpHeight(held/(double)maxCharge,0)>=5.5){jumpHoldTicks=held;break;}
                 server.execute(()->{
                     try {
@@ -239,6 +264,11 @@ public final class StandaloneGaitSmoke {
         if(root!=null){row.addProperty("bodyRootX",root.translation().x);row.addProperty("bodyRootY",root.translation().y);row.addProperty("bodyRootZ",root.translation().z);}
         if(standingCharge()&&stage==Stage.JUMP_SPRINT&&"basic_jump_charge".equals(clock.key())
                 &&mc.player.onGround()&&mc.player.getDeltaMovement().horizontalDistance()<.001)standingChargeObserved=true;
+        if(standingCharge()&&stage==Stage.JUMP_SPRINT&&stageTicks>=24&&stageTicks<20+jumpHoldTicks){
+            if(plantedClient==null)plantedClient=mc.player.position();
+            maximumChargeClientDrift=Math.max(maximumChargeClientDrift,mc.player.position().subtract(plantedClient).horizontalDistance());
+            chargeClientSamples++;
+        }
         if(stage==Stage.JUMP_SPRINT&&stageTicks>=20+jumpHoldTicks) {
             if(nativeAction.clipId().equals("basic_land_moving")||nativeAction.clipId().equals("basic_land_light"))movingLandingObserved=true;
             if(!mc.player.onGround()){if(firstJumpAirTick<0)firstJumpAirTick=clock.tick();jumpAirTicks++;}
@@ -387,6 +417,9 @@ public final class StandaloneGaitSmoke {
         }
         if(!standingCharge()&&!movingLandingObserved)violation("native jump did not exercise the moving/light landing action");
         if(standingCharge()&&!standingChargeObserved)violation("native standing jump did not exercise grounded stationary charge");
+        if(standingCharge()&&(chargeClientSamples<20||chargeServerSamples<20))violation("insufficient planted charge samples");
+        if(standingCharge()&&(maximumChargeClientDrift>.001||maximumChargeServerDrift>.001))
+            violation("planted charge drifted under held directional keys/residual velocity: client="+maximumChargeClientDrift+" server="+maximumChargeServerDrift);
         if(jumpAirTicks<5)violation("native Space input did not produce an observed jump: "+jumpAirTicks+" airborne ticks");
         if(jumpContactTick<0)violation("native jump never returned to real ground contact");
         else if(latestTick-jumpContactTick<30)violation("jump QA ended before 30 post-contact ticks");
@@ -395,6 +428,7 @@ public final class StandaloneGaitSmoke {
         mc.stop();
     }
     private static void restore(Minecraft mc) {
+        savedBindings.forEach(KeyMapping::setKey);KeyMapping.resetMapping();
         savedKeys.forEach(KeyMapping::setDown);
         if(mc.player!=null){mc.player.setYRot(previousYaw);mc.player.yRotO=previousYaw;mc.player.setXRot(previousPitch);mc.player.xRotO=previousPitch;}
         if(previousMouseGrabbed)mc.mouseHandler.grabMouse();else mc.mouseHandler.releaseMouse();
@@ -429,7 +463,9 @@ public final class StandaloneGaitSmoke {
             report.addProperty("jumpOnly",jumpOnly());report.addProperty("firstJumpAirTick",firstJumpAirTick);report.addProperty("jumpContactTick",jumpContactTick);report.addProperty("jumpAirTicks",jumpAirTicks);
             report.addProperty("jumpHoldTicks",jumpHoldTicks);report.addProperty("movingLandingObserved",movingLandingObserved);
             report.addProperty("standingChargeObserved",standingChargeObserved);
-            report.addProperty("jumpInput",standingCharge()?"stationary native Space charge from tick20; no W/sprint; real takeoff and ground contact":"W+sprint140 ticks; Space held from tick20 for configured charge yielding a light impact, then released; actual airborne and real ground contact observed");
+            report.addProperty("chargeClientSamples",chargeClientSamples);report.addProperty("chargeServerSamples",chargeServerSamples);
+            report.addProperty("maximumChargeClientDrift",maximumChargeClientDrift);report.addProperty("maximumChargeServerDrift",maximumChargeServerDrift);
+            report.addProperty("jumpInput",standingCharge()?"stationary Space charge from tick20 including 12-tick full hold; inject W/D/sprint and residual XZ velocity from tick25; verify client/server planted position, then actual takeoff/contact":"W+sprint140 ticks; Space held from tick20 for configured charge yielding a light impact, then released; actual airborne and real ground contact observed");
             report.add("committedTicks",ticks);report.add("renderFrames",frames);report.add("violations",violations);if(error!=null)report.addProperty("error",error);
             var images=new JsonArray();captureNames.stream().sorted().forEach(images::add);report.add("images",images);
             Path pending=output.resolve("continuous-gait-report.pending.json");Files.writeString(pending,new GsonBuilder().setPrettyPrinting().create().toJson(report));

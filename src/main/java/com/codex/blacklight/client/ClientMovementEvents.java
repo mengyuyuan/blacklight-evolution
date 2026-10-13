@@ -43,7 +43,6 @@ public final class ClientMovementEvents {
     private static final JumpInputState JUMP_INPUT = new JumpInputState();
     private static boolean wasPrototype;
     private static boolean wasHoldingFinalChargePose;
-    private static boolean chargeDriverEngaged;
     private static final WallTraversal CLIENT_WALL = new WallTraversal();
     private static int lastForwardInput, lastSidewaysInput;
     private static boolean lastDetach, lastSprintKey;
@@ -68,6 +67,14 @@ public final class ClientMovementEvents {
         if(event.getEntity().getData(ModAttachments.WEAPON_VISUAL).spec()==null
                 && !pendingWeaponMovement(event.getEntity())) {
             var mc=Minecraft.getInstance();
+            if(mc.player==event.getEntity()&&isPrototype(mc)&&isChargingJump()
+                    &&mappingDown(mc,mc.options.keyJump)&&mc.player.onGround()&&!CLIENT_WALL.attached()){
+                // Keep physical key mappings available to charge/release and wall
+                // traversal, but do not let vanilla travel slide the planted pose.
+                clearWeaponTravelInput(event.getInput());
+                mc.player.setDeltaMovement(0,mc.player.getDeltaMovement().y,0);
+                return;
+            }
             if(mc.player==event.getEntity()&&isPrototype(mc)
                     &&com.codex.blacklight.client.camera.PrototypeChaseCamera.ownsView()
                     &&(Math.abs(event.getInput().forwardImpulse)>1e-5F||Math.abs(event.getInput().leftImpulse)>1e-5F)
@@ -249,7 +256,6 @@ public final class ClientMovementEvents {
             PrototypeAnimationController.tickLevel(minecraft, false, false, false);
             wasPrototype = false;
             wasHoldingFinalChargePose = false;
-            chargeDriverEngaged = false;
             runningCharge = false;
             lastCameraYaw = Float.NaN;
             resetClientWallRun();
@@ -289,7 +295,6 @@ public final class ClientMovementEvents {
             lastSprinting = false;
             lastChargingAnimation = false;
             clientChargeTicks = 0;
-            chargeDriverEngaged = false;
             runningCharge = false;
             clientOffGroundTicks = 0;
             JUMP_INPUT.reset();
@@ -318,7 +323,6 @@ public final class ClientMovementEvents {
             beginWeaponMovementOwnership(minecraft.player);
             lastChargingAnimation = false;
             clientChargeTicks = 0;
-            chargeDriverEngaged = false;
             releaseFinalChargedJumpPose(minecraft);
         }
         // Latch charging across a brief terrain correction. The server authorizes
@@ -329,7 +333,6 @@ public final class ClientMovementEvents {
             lastChargingAnimation = true;
             runningCharge=sprinting&&forwardHeld;
             clientChargeTicks = 0;
-            chargeDriverEngaged = false;
         }
         if (lastChargingAnimation) {
             if (clientOffGroundTicks > PrototypeLocomotion.CHARGE_GROUND_GRACE_TICKS) {
@@ -382,6 +385,9 @@ public final class ClientMovementEvents {
         // Resolve wall attachment before pose sampling to avoid an intermediate jump.
         boolean wallHandled = predictWallRun(minecraft, forwardInput, sidewaysInput, sprinting, jumpHeld, detach);
 
+        if(!wallHandled&&minecraft.player.onGround()&&isChargingJump()&&jumpHeld)
+            minecraft.player.setDeltaMovement(0,minecraft.player.getDeltaMovement().y,0);
+
         // Release the previous action hold before the next phase is sampled.
         updateFinalChargedJumpPose(minecraft);
 
@@ -393,7 +399,7 @@ public final class ClientMovementEvents {
         // Match the server acceleration locally.  Without this prediction the integrated
         // server repeatedly corrects the vanilla-speed client, which looks like a ghost
         // copy or stuttering trail behind the player.
-        if (!wallHandled && (minecraft.player.onGround() || WaterRunning.onSurface(minecraft.player)) && forwardHeld && sprinting
+        if (!wallHandled && !isChargingJump() && (minecraft.player.onGround() || WaterRunning.onSurface(minecraft.player)) && forwardHeld && sprinting
                 && !ClientClawEvents.isGroundSpikeActionActive()) {
             minecraft.player.setSprinting(true);
             var forward = com.codex.blacklight.movement.TraversalSteering.forward(minecraft.player);
@@ -421,24 +427,14 @@ public final class ClientMovementEvents {
         PlayerMotionController.request(minecraft.player,PlayerAction.JUMP_RISE,0);
     }
     private static void updateFinalChargedJumpPose(Minecraft minecraft) {
-        int maximum=Math.max(1,MovementTuningSettings.jumpChargeTicks());
-        if(!lastChargingAnimation||runningCharge){releaseFinalChargedJumpPose(minecraft);return;}
-        var player=minecraft.player;
-        if(player==null||!PlayerMotionController.isPlaying(player,PlayerAction.CHARGED_JUMP))return;
-        chargeDriverEngaged=true;
-        float ratio=Math.min(1F,clientChargeTicks/(float)maximum);
-        float duration=PlayerMotionController.duration(PlayerAction.CHARGED_JUMP);
-        PlayerMotionController.seek(player,Math.max(0,Math.min(duration*ratio,duration-.001F)));
-        boolean full=clientChargeTicks>=maximum;
-        PlayerMotionController.pause(player,full);
-        wasHoldingFinalChargePose=full;
+        // PlayerMotionController interpolates the committed charge interval.
+        // Re-seeking a freely advancing override every tick produces a sawtooth
+        // whenever clip duration differs from the configured charging duration.
+        wasHoldingFinalChargePose=lastChargingAnimation&&!runningCharge
+                &&clientChargeTicks>=Math.max(1,MovementTuningSettings.jumpChargeTicks());
     }
     private static void releaseFinalChargedJumpPose(Minecraft minecraft) {
-        var player=minecraft.player;
-        // Holds belong to individual actions. Releasing jump must not unpause a
-        // groundspike contact hold or a combat hit-stop on another action.
-        if(player!=null&&PlayerMotionController.isPlaying(player,PlayerAction.CHARGED_JUMP))
-            PlayerMotionController.pause(player,false);
+        // ChargePoseClock holds the final sample without a mutable playback override.
         wasHoldingFinalChargePose=false;
     }
 
@@ -513,7 +509,7 @@ public final class ClientMovementEvents {
     private static boolean mappingDown(Minecraft minecraft, KeyMapping mapping) {
         if (mapping.isDown()) return true;
         InputConstants.Key key = mapping.getKey();
-        if (key.getType() == InputConstants.Type.KEYSYM) {
+        if (key.getType() == InputConstants.Type.KEYSYM && key.getValue() >= 0) {
             return InputConstants.isKeyDown(minecraft.getWindow().getWindow(), key.getValue());
         }
         if (key.getType() == InputConstants.Type.MOUSE) {

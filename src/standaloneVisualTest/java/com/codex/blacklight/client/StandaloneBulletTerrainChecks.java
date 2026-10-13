@@ -56,6 +56,7 @@ public final class StandaloneBulletTerrainChecks {
         try { run.advance(); } catch(Throwable error) { run.finish(error); }
     }
     private static final class Run {
+        static final int FIXTURE_DEPTH=BulletdiveTerrain.plan(80).depth()+2;
         final ServerPlayer p;final CompletableFuture<JsonObject> completion=new CompletableFuture<>();
         final Map<BlockPos,BlockState> originalBlocks=new LinkedHashMap<>();
         final BlacklightState originalState;
@@ -67,7 +68,7 @@ public final class StandaloneBulletTerrainChecks {
         final BlockPos low,high,protectedLane,disabledLane,canceledLane,noDropsLane;
         final long lowId,highId,protectedId,jumpId,disabledId,canceledId,noDropsId,began;
         int stage;
-        boolean fixtureTouched;
+        boolean fixtureTouched,cancelTriggered;
         long stageAt,disabledAir;
         final JsonObject report=new JsonObject();
         Consumer<BlockEvent.BreakEvent> protector;
@@ -92,7 +93,7 @@ public final class StandaloneBulletTerrainChecks {
             // Validate the complete region before the first write: no chunk loading
             // and no replacing a pre-existing block entity even in the QA save.
             for(var center:lanes())
-                for(int x=-9;x<=9;x++)for(int z=-9;z<=9;z++)for(int y=0;y<6;y++) {
+                for(int x=-9;x<=9;x++)for(int z=-9;z<=9;z++)for(int y=0;y<FIXTURE_DEPTH;y++) {
                     var pos=center.offset(x,-y,z);
                     require(p.serverLevel().getChunkSource().getChunkNow(pos.getX()>>4,pos.getZ()>>4)!=null,"terrain fixture chunk is unloaded");
                     var state=p.level().getBlockState(pos);
@@ -116,7 +117,13 @@ public final class StandaloneBulletTerrainChecks {
             require(chest!=null,"fixture chest entity missing");
             chest.setItem(0,new ItemStack(Items.DIAMOND,2));chest.setItem(1,new ItemStack(Items.DIAMOND,4));
             p.serverLevel().setBlockAndUpdate(protectedCell,Blocks.GOLD_BLOCK.defaultBlockState());
-            protector=event->{if(event.getPlayer()==p&&(event.getPos().equals(protectedCell)
+            protector=event->{
+                if(event.getPlayer()==p&&!cancelTriggered&&Math.abs(event.getPos().getX()-canceledLane.getX())<=9
+                        &&Math.abs(event.getPos().getZ()-canceledLane.getZ())<=9){
+                    var pending=BulletdiveTerrain.snapshot(p,canceledId);
+                    if(pending!=null&&pending.destroyed()>=16){cancelTriggered=true;settings(false);settings(true);}
+                }
+                if(event.getPlayer()==p&&(event.getPos().equals(protectedCell)
                     ||Math.abs(event.getPos().getX()-protectedLane.getX())<=9&&Math.abs(event.getPos().getZ()-protectedLane.getZ())<=9))event.setCanceled(true);};
             NeoForge.EVENT_BUS.addListener(EventPriority.HIGH,false,BlockEvent.BreakEvent.class,protector);
             var jump=BulletdiveTerrain.begin(p,jumpId,impact(low),3);
@@ -149,6 +156,7 @@ public final class StandaloneBulletTerrainChecks {
                 require(p.level().getBlockState(container).isAir()&&p.level().getBlockEntity(container)==null,"container was not genuinely broken");
                 require(p.level().getBlockState(protectedCell).is(Blocks.GOLD_BLOCK),"canceled protected block was destroyed");
                 require(countAir(high)==highStats.destroyed(),"high destroyed count differs from real blocks");
+                report.addProperty("chestDiamondsBeforeAssertion",itemCount(high,Items.DIAMOND));
                 require(itemCount(high,Items.DIAMOND)==6,"chest inventory must drop once, exactly six diamonds");
                 require(itemCount(high,Items.CHEST)==1,"chest block loot must drop once");
                 require(itemCount(high,Items.DIRT)>0,"real high-height block drops missing");
@@ -168,8 +176,8 @@ public final class StandaloneBulletTerrainChecks {
                 BulletdiveTerrain.begin(p,canceledId,impact(canceledLane),80);stage=4;stageAt=now;
             }else if(stage==4){
                 var s=BulletdiveTerrain.snapshot(p,canceledId);if(s==null||s.destroyed()==0)return;
-                require(!s.complete(),"cancellation fixture completed before preference changed");
-                settings(false);settings(true);disabledAir=countAir(canceledLane);stage=5;stageAt=now;
+                require(cancelTriggered&&s.complete()&&s.reason().equals("block_breaking_disabled"),"mid-burst preference change did not cancel pending terrain");
+                disabledAir=countAir(canceledLane);stage=5;stageAt=now;
             }else if(stage==5){
                 if(now-stageAt<4)return;var s=BulletdiveTerrain.snapshot(p,canceledId);
                 require(s!=null&&s.complete()&&s.reason().equals("block_breaking_disabled"),"pending work did not stop after toggle off");
@@ -188,13 +196,13 @@ public final class StandaloneBulletTerrainChecks {
         void settings(boolean enabled){p.setData(ModAttachments.SKILL_SETTINGS,new SkillSettings(enabled));
             BulletdiveTerrain.settingsChanged(p);p.syncData(ModAttachments.SKILL_SETTINGS);}
         List<ItemEntity> items(BlockPos center){return p.serverLevel().getEntitiesOfClass(ItemEntity.class,
-                new AABB(center.getX()-11,center.getY()-9,center.getZ()-11,
+                new AABB(center.getX()-11,center.getY()-FIXTURE_DEPTH-4,center.getZ()-11,
                         center.getX()+12,center.getY()+12,center.getZ()+12));}
         int itemCount(BlockPos center,net.minecraft.world.item.Item kind){return items(center).stream()
                 .filter(item->!originalItems.contains(item.getUUID())&&item.getItem().is(kind))
                 .mapToInt(item->item.getItem().getCount()).sum();}
         int countAir(BlockPos center) {
-            int count=0;for(int x=-9;x<=9;x++)for(int z=-9;z<=9;z++)for(int y=0;y<6;y++)
+            int count=0;for(int x=-9;x<=9;x++)for(int z=-9;z<=9;z++)for(int y=0;y<FIXTURE_DEPTH;y++)
                 if(p.level().getBlockState(center.offset(x,-y,z)).isAir())count++;
             return count;
         }
@@ -203,7 +211,7 @@ public final class StandaloneBulletTerrainChecks {
             obj.addProperty("depth",s.plan().depth());obj.addProperty("budget",s.plan().budget());obj.addProperty("visited",s.visited());
             obj.addProperty("destroyed",s.destroyed());obj.addProperty("protected",s.protectedBlocks());
             obj.addProperty("maximumRadius",s.maximumRadius());obj.addProperty("maximumDepth",s.maximumDepth());
-            obj.addProperty("reason",s.reason());return obj;
+            obj.addProperty("reason",s.reason());obj.addProperty("elapsedTicks",s.elapsedTicks());obj.addProperty("firstTickDestroyed",s.firstTickDestroyed());obj.addProperty("peakBreaksPerTick",s.peakBreaksPerTick());obj.addProperty("peakSliceMillis",s.peakSliceMillis());return obj;
         }
         void finish(Throwable error) {
             active=null;report.addProperty("passed",error==null);if(error!=null)report.addProperty("error",error.toString());

@@ -172,7 +172,7 @@ public final class StandaloneSkillSmoke {
         cases.add(new Case("ground_pain_far",2,false,Mode.RELEASE));
         cases.add(new Case("ground_pain_up",2,false,Mode.RELEASE));
         cases.add(new Case("bulletdive",3,true,Mode.RELEASE));
-        for(double height:new double[]{80,640,2000})cases.add(new Case("bulletdive_"+(int)height,3,true,Mode.RELEASE,height));
+        for(double height:new double[]{20,50,52,80,640,2000})cases.add(new Case("bulletdive_"+(int)height,3,true,Mode.RELEASE,height));
         cases.add(new Case("graveyard_low_reserve",0,false,Mode.LOW_RESERVE));
         cases.add(new Case("graveyard_zero_reserve",0,false,Mode.ZERO_RESERVE));
         cases.add(new Case("barrage_locked",1,false,Mode.LOCKED));
@@ -347,7 +347,8 @@ public final class StandaloneSkillSmoke {
                 int extent=BulletdiveTerrain.plan(c.fallHeight()).radius()+2;
                 for(int x=-extent;x<=extent;x++)for(int z=-extent;z<=extent;z++){
                     if(level.getChunkSource().getChunkNow(x>>4,z>>4)==null)throw new IllegalStateException("Bullet fixture refused an unloaded substrate chunk");
-                    for(int y=247;y<=250;y++)level.setBlockAndUpdate(new BlockPos(x,y,z),Blocks.DIRT.defaultBlockState());
+                    int substrateDepth=Math.abs(x)<=4&&Math.abs(z)<=4?BulletdiveTerrain.plan(c.fallHeight()).depth()+2:4;
+                    for(int y=251-substrateDepth;y<=250;y++)level.setBlockAndUpdate(new BlockPos(x,y,z),Blocks.DIRT.defaultBlockState());
                 }
                 if(flightScene()&&c.fallHeight()==80){
                     for(int x:new int[]{-5,5})for(int z:new int[]{-2,2})for(int y=251;y<=318;y++){
@@ -577,6 +578,8 @@ public final class StandaloneSkillSmoke {
             boolean effect=stats.effects()>0&&visual.kind()==c.kind();
             boolean returning=effect&&stats.vertices()>0&&(c.kind()==2?painReturn(mc,c,visual,age)!=null:age>=retractionThreshold(c,visual));
             if(effect){
+                if(c.kind()==3&&visual.phase()!=DevastatorSystem.FLIGHT)
+                    require(com.codex.blacklight.client.renderer.BulletImpactMist.ready(),"Bullet impact mist shader unavailable");
                 observedEffect=true;require(LiquidBiomassMaterial.ready(),"active skill lost its actual GPU wet material");
                 authoredModelAvailable=AuthoredDevastatorMesh.available();require(authoredModelAvailable,"active skill lost its authored three-dimensional effect model");
                 gpuMeshesReady=RigidBiomassMaterial.ready();require(gpuMeshesReady,"active authored effect did not use the actual indexed GPU mesh material");
@@ -630,6 +633,7 @@ public final class StandaloneSkillSmoke {
             if(c.formal()&&landedPostEligible)scheduleShot(c.name()+"_landed_post_close",ShotPurpose.LANDED_POST,5.5);
             if(effect){
                 double progress=(age-visual.effectStart())/Math.max(.001,visual.effectEnd()-visual.effectStart());
+                if(c.kind()==3&&visual.phase()==3&&age-visual.effectStart()>.06&&age-visual.effectStart()<.3)capture(mc,c.name()+"_impact_clusters",stats);
                 if(progress>.28&&progress<.65){capture(mc,c.name()+"_effect",stats);if(c.formal()&&!c.air())scheduleSide(c.name()+"_effect_side");}
             }
             if(c.kind()==3&&visual.kind()==3&&visual.phase()==DevastatorSystem.FLIGHT&&post.flight()>0)
@@ -816,7 +820,7 @@ public final class StandaloneSkillSmoke {
         row.addProperty("mode",c.mode().name());row.addProperty("initialReserve",c.initialReserve());row.addProperty("requestedFallHeight",c.fallHeight());
         if(c.kind()==3){
             row.addProperty("landingAnchorBlock","isolated platform Y250 / one BEDROCK block follows real X/Z during FLIGHT only; actual onGround required");
-            row.addProperty("substrate","4 real DIRT layers Y247..250 / radius plan+2 / already loaded chunks");addLandingAnchor(row);
+            row.addProperty("substrate","center |x|,|z| <= 4: plan.depth+2 real DIRT layers; outer 4 layers / radius plan+2 / already loaded chunks");addLandingAnchor(row);
             var placements=new JsonArray();synchronized(landingAnchorPlacements){for(var anchor:landingAnchorPlacements){var placed=new JsonObject();placed.addProperty("caseIndex",anchor.caseIndex());placed.addProperty("x",anchor.position().getX());placed.addProperty("y",anchor.position().getY());placed.addProperty("z",anchor.position().getZ());placed.addProperty("placedAtTick",anchor.placedAt());placed.addProperty("phase",anchor.phase());placed.addProperty("actorX",anchor.actorX());placed.addProperty("actorY",anchor.actorY());placed.addProperty("actorZ",anchor.actorZ());placements.add(placed);}}row.add("landingAnchorPlacements",placements);
         }
         row.addProperty("observedLateRetraction",observedRetraction);row.addProperty("observedBodyRecovery",observedBodyRecovery);
@@ -888,7 +892,7 @@ public final class StandaloneSkillSmoke {
         }return out;
     }
     private static JsonObject terrainEvidence(BulletdiveTerrain.Snapshot snapshot) {
-        var plan=snapshot.plan();var out=new JsonObject();out.addProperty("height",plan.height());out.addProperty("radius",plan.radius());out.addProperty("depth",plan.depth());out.addProperty("budget",plan.budget());out.addProperty("destroyed",snapshot.destroyed());out.addProperty("visited",snapshot.visited());out.addProperty("protectedBlocks",snapshot.protectedBlocks());out.addProperty("complete",snapshot.complete());out.addProperty("maximumRadius",snapshot.maximumRadius());out.addProperty("maximumDepth",snapshot.maximumDepth());out.addProperty("reason",snapshot.reason());return out;
+        var plan=snapshot.plan();var out=new JsonObject();out.addProperty("height",plan.height());out.addProperty("radius",plan.radius());out.addProperty("depth",plan.depth());out.addProperty("budget",plan.budget());out.addProperty("destroyed",snapshot.destroyed());out.addProperty("visited",snapshot.visited());out.addProperty("protectedBlocks",snapshot.protectedBlocks());out.addProperty("complete",snapshot.complete());out.addProperty("maximumRadius",snapshot.maximumRadius());out.addProperty("maximumDepth",snapshot.maximumDepth());out.addProperty("reason",snapshot.reason());out.addProperty("elapsedTicks",snapshot.elapsedTicks());out.addProperty("firstTickDestroyed",snapshot.firstTickDestroyed());out.addProperty("peakBreaksPerTick",snapshot.peakBreaksPerTick());out.addProperty("peakSliceMillis",snapshot.peakSliceMillis());var fx=com.codex.blacklight.combat.DevastatorEffectTimeline.impact(plan.height());out.addProperty("mistEnabled",fx.mist());out.addProperty("clusterRadius",fx.clusterRadius());return out;
     }
     private static void require(boolean condition,String reason){if(!condition)synchronized(violations){violations.add(reason);}}
     private static void restore(Minecraft mc) {

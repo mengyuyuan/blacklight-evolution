@@ -25,11 +25,30 @@ public final class DevastatorEffectTimeline {
         return age<reverseAt?formed:formed*(1-smooth((age-reverseAt)/GRAVEYARD_DESCEND));
     }
     public static double visibleEnd(int kind,double effectStart,double effectEnd) {
+        // Residual mist outlives the body recovery, without extending damage.
+        if(kind==3)return Math.max(effectEnd,effectStart+3.3);
         if(kind==1)return Math.max(effectEnd,effectStart-.4+TENDRIL_RETRACT_END);
         // Tissue can return through 4.2s; the distortion emitter starts at
         // 2/3s, emits for 7/3s and has a separate configured 2s fade.
         if(kind==2)return Math.max(effectEnd,effectStart+5);
         return effectEnd;
+    }
+    /** Presentation thresholds use the server's actual fall, never crater radius. */
+    public record Impact(double clusterRadius,double clusterHeight,boolean mist,double mistGain) { }
+    public static Impact impact(double height){
+        double h=Double.isFinite(height)?Math.max(0,height):0;
+        double root=Math.sqrt(h);
+        return new Impact(Math.min(6,.45+root*.28),Math.min(5,.45+root*.22),h>50,
+                h>50?.3+.7*(1-Math.exp(-(h-50)/40)):0);
+    }
+    public static double impactClusterOpacity(double age){
+        if(!Double.isFinite(age)||age<0||age>=.8)return 0;
+        return smooth(age/.045)*(1-smooth((age-.12)/.68));
+    }
+    public static double impactMistOpacity(double age,double delay){
+        double local=age-delay;
+        if(!Double.isFinite(local)||local<0||local>=3)return 0;
+        return Math.min(1,local/.09)*Math.pow(Math.max(0,1-local/3),1.3);
     }
     /** Source RadialBlur is a screen-space lens envelope, not rotation lock. */
     public record Lens(double burst,double retract,double flight) {

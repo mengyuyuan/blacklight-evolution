@@ -35,11 +35,15 @@ public final class DevastatorEffectRenderer {
     public record Frame(Style style, long session, double elapsedSeconds,
                         double effectStartSeconds, double effectEndSeconds,
                         Vec3 origin, Vec3 direction, int targetId, double radius,
-                        List<DevastatorVisual.Contact> contacts) {
+                        List<DevastatorVisual.Contact> contacts,double fallHeight) {
         public Frame {contacts=List.copyOf(contacts);}
         public Frame(Style style,long session,double elapsedSeconds,double effectStartSeconds,double effectEndSeconds,
                      Vec3 origin,Vec3 direction,int targetId,double radius){
-            this(style,session,elapsedSeconds,effectStartSeconds,effectEndSeconds,origin,direction,targetId,radius,List.of());
+            this(style,session,elapsedSeconds,effectStartSeconds,effectEndSeconds,origin,direction,targetId,radius,List.of(),0);
+        }
+        public Frame(Style style,long session,double elapsedSeconds,double effectStartSeconds,double effectEndSeconds,
+                     Vec3 origin,Vec3 direction,int targetId,double radius,List<DevastatorVisual.Contact> contacts){
+            this(style,session,elapsedSeconds,effectStartSeconds,effectEndSeconds,origin,direction,targetId,radius,contacts,0);
         }
         public boolean visible() {
             return style!=null && finite(origin) && finite(direction)
@@ -48,7 +52,7 @@ public final class DevastatorEffectRenderer {
                     && effectEndSeconds>effectStartSeconds && elapsedSeconds>=effectStartSeconds
                     && elapsedSeconds<visualEnd() && radius>0;
         }
-        public double visualEnd(){return DevastatorEffectTimeline.visibleEnd(style==Style.TENDRIL?1:style==Style.PAIN?2:0,effectStartSeconds,effectEndSeconds);}
+        public double visualEnd(){return DevastatorEffectTimeline.visibleEnd(style==Style.TENDRIL?1:style==Style.PAIN?2:style==Style.BULLETDIVE?3:0,effectStartSeconds,effectEndSeconds);}
         public double progress() {
             return Math.clamp((elapsedSeconds-effectStartSeconds)/(effectEndSeconds-effectStartSeconds),0,1);
         }
@@ -156,7 +160,7 @@ public final class DevastatorEffectRenderer {
             }
             var move=player.getData(ModAttachments.WEAPON_VISUAL).spec();
             boolean landing=visual.kind()==3||move==WeaponMove.DEV_AIR_GROUNDSPIKE;
-            if(landing&&visual.phase()!=3||visual.phase()==2&&(visual.kind()==0||visual.kind()==3))continue;
+            if(landing&&visual.phase()!=3&&!(visual.kind()==3&&visual.phase()==4)||visual.phase()==2&&(visual.kind()==0||visual.kind()==3))continue;
             Style style=switch(visual.kind()) {
                 case 0 -> Style.GRAVEYARD;
                 case 1 -> Style.TENDRIL;
@@ -166,7 +170,7 @@ public final class DevastatorEffectRenderer {
             };
             draw(event,player,new Frame(style,visual.session(),visual.age(player,partial),
                     visual.effectStart(),visual.effectEnd(),visual.origin(),visual.direction(),
-                    visual.targetId(),visual.radius(),visual.contacts()));
+                    visual.targetId(),visual.radius(),visual.contacts(),visual.fallHeight()));
         }
     }
 
@@ -335,13 +339,8 @@ public final class DevastatorEffectRenderer {
     }
     private static void dive(PoseStack stack,VertexConsumer ignored,LivingEntity owner,float partial,
                              Frame frame,int light,double envelope,int alpha) {
-        // Landing energy also controls this impulse's scale. Terrain sends real
-        // block fragments; sculpted clusters provide a short ground-level tissue burst.
-        for(int branch=0;branch<6;branch++){
-            double angle=branch*Math.PI/3+frame.session()*.01;
-            Vec3 base=frame.origin().add(Math.cos(angle)*frame.radius()*.20,0,Math.sin(angle)*frame.radius()*.20);
-            nativeSpike(stack,light,"groundspike_cluster_small",base,(float)angle,envelope,.28+frame.radius()*.04,alpha);
-        }
+        int count=BulletImpactMist.draw(stack,frame,MAX_VERTICES_PER_FRAME-renderedVertices);
+        renderedVertices+=count;renderedQuads+=count/4;
     }
     private static void nativeStrand(PoseStack stack,int light,String id,Vec3 root,Vec3 control,Vec3 tip,double width,int alpha,double twist){
         if(renderedVertices+AuthoredDevastatorMesh.vertices(id)>MAX_VERTICES_PER_FRAME)return;
