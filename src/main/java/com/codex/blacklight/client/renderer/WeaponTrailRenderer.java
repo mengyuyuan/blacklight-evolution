@@ -21,6 +21,15 @@ import java.util.*;
 public final class WeaponTrailRenderer {
     private record Sample(double time,long action,int move,Vec3 inner,Vec3 tip){}
     private static final Map<Player,List<ArrayDeque<Sample>>> TRAILS=new WeakHashMap<>();
+    public static void capture(AbstractClientPlayer p,PoseStack stack,boolean left,com.codex.blacklight.client.model.ClawArmModel model){
+        if(p.getData(ModAttachments.PLAYER_STATE).getActivePower()!=PowerForm.BLADE){capture(p,stack,left);return;}
+        for(int i=0;i<2;i++){
+            String prefix=i==0?"trail":"reverse";
+            var root=model.anchor(prefix+"Root_R",new Vector3f(0,.3F,0));
+            var tip=model.anchor(prefix+"Tip_R",new Vector3f(0,1.1F,0));
+            captureWorld(p,i==0?0:4,BlacklightBoneRendering.worldPoint(stack,root),BlacklightBoneRendering.worldPoint(stack,tip));
+        }
+    }
     public static void capture(AbstractClientPlayer p,PoseStack stack,boolean left){
         var form=p.getData(ModAttachments.PLAYER_STATE).getActivePower();
         if(form==PowerForm.WHIPFIST)return;

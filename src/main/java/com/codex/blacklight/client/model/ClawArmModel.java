@@ -23,13 +23,23 @@ import org.joml.Matrix4f;
 public final class ClawArmModel extends Model {
     public static final ModelLayerLocation LAYER = new ModelLayerLocation(
             ResourceLocation.fromNamespaceAndPath(BlacklightNeoMod.MOD_ID, "claw_arm"), "main");
-    private record Triangle(float[][] points, float[][] normals, int color, int[] vertices) { }
+    private record Triangle(float[][] points, float[][] normals, int color, int[] vertices, float[][] uv, boolean emissive) { }
     private record Position(int x, int y, int z) {
         Position(float[] p) { this(Float.floatToIntBits(p[0]), Float.floatToIntBits(p[1]), Float.floatToIntBits(p[2])); }
     }
     private record Surface(BiomassSurface.Vertex[] vertices, float[] posed,float[] opacity) { }
     private final Map<String, Triangle[]> joints = new HashMap<>();
     private final Map<String, Surface> surfaces = new HashMap<>();
+    private final Map<String, org.joml.Vector3f> anchors = new HashMap<>();
+    private ResourceLocation texture = ResourceLocation.fromNamespaceAndPath("blacklight", "textures/entity/claw_white.png");
+    private ResourceLocation emissiveTexture = texture;
+    private boolean textured;
+
+    public ResourceLocation texture() { return texture; }
+    public ResourceLocation emissiveTexture() { return emissiveTexture; }
+    public org.joml.Vector3f anchor(String name, org.joml.Vector3f fallback) {
+        return new org.joml.Vector3f(anchors.getOrDefault(name, fallback));
+    }
 
     public ClawArmModel(ModelPart unused) {
         this("claw_blender");
@@ -40,6 +50,13 @@ public final class ClawArmModel extends Model {
         try (var stream = ClawArmModel.class.getResourceAsStream("/assets/blacklight/models/" + asset + ".json")) {
             if (stream == null) throw new IllegalStateException("Missing authored claw mesh");
             var root = JsonParser.parseReader(new InputStreamReader(stream, StandardCharsets.UTF_8)).getAsJsonObject();
+            textured = root.has("texture");
+            if (textured) texture = ResourceLocation.fromNamespaceAndPath("blacklight", root.get("texture").getAsString());
+            if (root.has("emissiveTexture")) emissiveTexture = ResourceLocation.fromNamespaceAndPath("blacklight", root.get("emissiveTexture").getAsString());
+            if (root.has("anchors")) for (var entry : root.getAsJsonObject("anchors").entrySet()) {
+                var p = entry.getValue().getAsJsonArray();
+                anchors.put(entry.getKey(), new org.joml.Vector3f(p.get(0).getAsFloat(), p.get(1).getAsFloat(), p.get(2).getAsFloat()));
+            }
             for (var entry : root.getAsJsonObject("joints").entrySet()) {
                 var source = entry.getValue().getAsJsonArray();
                 Triangle[] triangles = new Triangle[source.size()];
@@ -64,7 +81,7 @@ public final class ClawArmModel extends Model {
                             for(int axis=0;axis<3;axis++)normals[v][axis]=n.get(axis).getAsFloat();
                         } else normals[v]=new float[]{nx/len,ny/len,nz/len};
                     }
-                    if(asset.equals("form_blade")&&entry.getKey().equals("Hand_R"))for(int v=0;v<3;v++){
+                    if(!root.has("approvedProportions")&&asset.equals("form_blade")&&entry.getKey().equals("Hand_R"))for(int v=0;v<3;v++){
                         float sy=BladeShape.lengthScale(p[v][1]);
                         p[v][0]*=BladeShape.WIDTH;p[v][2]*=BladeShape.WIDTH;p[v][1]=BladeShape.length(p[v][1]);
                         var n=normals[v];n[0]/=BladeShape.WIDTH;n[1]/=sy;n[2]/=BladeShape.WIDTH;
@@ -78,7 +95,10 @@ public final class ClawArmModel extends Model {
                         if (index == null) { index = unique.size(); indices.put(position, index); unique.add(p[v]); }
                         vertices[v] = index;
                     }
-                    triangles[i] = new Triangle(p,normals,color,vertices);
+                    float[][] uv = new float[3][2];
+                    for (int v=0;v<3;v++) for(int axis=0;axis<2;axis++)
+                        uv[v][axis] = face.has("uv") ? face.getAsJsonArray("uv").get(v).getAsJsonArray().get(axis).getAsFloat() : .5F;
+                    triangles[i] = new Triangle(p,normals,color,vertices,uv,face.has("emissive")&&face.get("emissive").getAsBoolean());
                 }
                 joints.put(entry.getKey(), triangles);
                 float length = .08F;
@@ -153,6 +173,11 @@ public final class ClawArmModel extends Model {
     public void renderJoint(String joint, PoseStack stack, VertexConsumer consumer,
                              int light, int overlay, float progress, float talonLength,Matrix4f wristDelta,float distalLimit,
                              com.codex.blacklight.combat.HammerScales.Shape hammer, BiomassSurface.Frame liquid, float time) {
+        renderJoint(joint,stack,consumer,light,overlay,progress,talonLength,wristDelta,distalLimit,hammer,liquid,time,false);
+    }
+    public void renderJoint(String joint, PoseStack stack, VertexConsumer consumer,
+                             int light, int overlay, float progress, float talonLength,Matrix4f wristDelta,float distalLimit,
+                             com.codex.blacklight.combat.HammerScales.Shape hammer, BiomassSurface.Frame liquid, float time, boolean emissivePass) {
         Triangle[] faces = joints.get(joint);
         if (faces == null || progress <= .001F || liquid != null && !liquid.visible()) return;
         if (liquid == null) liquid = BiomassSurface.Frame.stable(progress);
@@ -174,6 +199,7 @@ public final class ClawArmModel extends Model {
         }
         PoseStack.Pose pose=stack.last();
         for (Triangle face : faces) {
+            if (face.emissive != emissivePass) continue;
             if(forearm&&Math.max(face.points[0][1],Math.max(face.points[1][1],face.points[2][1]))>distalLimit)continue;
             // QUADS require a repeated final vertex for triangular authored surfaces.
             for (int v=0;v<4;v++) {
@@ -219,9 +245,12 @@ public final class ClawArmModel extends Model {
                     if(length>1e-6F){nx/=length;ny/=length;nz/=length;}
                 }
                 int color = BiomassSurface.color(face.color, wet, posed[offset+4], posed[offset+5]);
+                boolean useAtlas = textured && (emissivePass || !liquid.liquid());
+                if (useAtlas) color = 0xFFFFFFFF;
                 color=(Math.round(surface.opacity[index]*255)<<24)|(color&0xFFFFFF);
                 consumer.addVertex(pose,x,y,z).setColor(color)
-                        .setUv(liquid.liquid()?wet:.5F,.5F).setOverlay(overlay).setLight(light)
+                        .setUv(useAtlas?face.uv[corner][0]:liquid.liquid()?wet:.5F,useAtlas?face.uv[corner][1]:.5F)
+                        .setOverlay(overlay).setLight(emissivePass?0xF000F0:light)
                         .setNormal(pose,nx,ny,nz);
             }
         }

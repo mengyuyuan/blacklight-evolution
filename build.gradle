@@ -109,6 +109,8 @@ tasks.named('assemble') {
 java.toolchain.languageVersion = JavaLanguageVersion.of(21)
 
 // Opt-in screenshot harness is excluded from normal builds and distributable JARs.
+if (project.hasProperty('weaponModelPreview')) sourceSets.main.java.srcDir('src/weaponVisualTest/java')
+if (project.hasProperty('leanArmorPreview')) sourceSets.main.java.srcDir('src/armorVisualTest/java')
 if (project.hasProperty('hiveFeedingTest')) {
     sourceSets.main.java.srcDir('src/hiveTest/java')
     sourceSets.main.resources.srcDir('src/traversalTest/resources')
@@ -170,6 +172,11 @@ neoForge {
                 programArguments.addAll '--width', '1440', '--height', '1000'
             }
             if (project.hasProperty('clientRunDirectory')) gameDirectory = file(project.property('clientRunDirectory'))
+            if (project.hasProperty('leanArmorPreview')) systemProperty 'blacklight.test.leanArmor', 'true'
+            if (project.hasProperty('weaponModelPreview')) {
+                systemProperty 'blacklight.test.weaponModels', file(project.property('weaponModelPreview')).absolutePath
+                programArguments.addAll '--width', '1280', '--height', '900'
+            }
             if (project.hasProperty('standaloneVisual')) {
                 systemProperty 'blacklight.test.standaloneVisual', file(project.property('standaloneVisual')).absolutePath
                 if (project.hasProperty('standaloneVisualShots')) systemProperty 'blacklight.test.standaloneVisual.shots', project.property('standaloneVisualShots').toString()

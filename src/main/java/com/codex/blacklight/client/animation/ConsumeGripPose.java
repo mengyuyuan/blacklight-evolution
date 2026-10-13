@@ -35,6 +35,7 @@ public final class ConsumeGripPose {
             Vec3 contact=target.add(left.scale((side.equals("L")?1:-1)*Math.clamp(victim.getBbWidth()*.22,.09,.22)));
             org.joml.Vector3f desired=new org.joml.Vector3f((float)(-contact.dot(left)/.9375),(float)(contact.y/.9375),(float)(-contact.dot(forward)/.9375));
             var palm=new org.joml.Vector3f(side.equals("L")?.00267F:-.00267F,.32362F,.07666F);
+            palm=WeaponModelAnchors.get(PowerForm.CLAWS,"palm_"+side,palm);
             var endpoint=new org.joml.Matrix4f(wrist.getLocalTransform()).invert().transformPosition(palm);
             BlacklightBoneIk.reach(armature,pose,side,desired,endpoint,12);
         }

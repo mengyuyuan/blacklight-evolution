@@ -1,0 +1,14 @@
+{
+  "base": "old Minecraft cuboid armor",
+  "reference": "native unpacked armor torso contour",
+  "previewOnly": true,
+  "runtimeInstalled": false,
+  "heightBlocks": 1.2,
+  "cuboids": 123,
+  "waistCoreWidthBefore": 8,
+  "waistCoreWidthAfter": 4.9,
+  "chestCoreWidthAfter": 8,
+  "originalPixelAtlasUnchanged": true,
+  "collarSpikesRemoved": true,
+  "design": "Broad pectorals and shoulders; tapered connected waist core, inclined abdominal and hip plates."
+}
