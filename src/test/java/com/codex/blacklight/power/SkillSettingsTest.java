@@ -10,13 +10,14 @@ import static org.junit.jupiter.api.Assertions.*;
 class SkillSettingsTest {
     @Test void existingSavesWithoutPreferencesEnableBlockBreaking() {
         assertTrue(SkillSettings.DEFAULT.bulletdiveBlockBreaking());
+        assertFalse(SkillSettings.DEFAULT.shieldBorerBlockBreaking());
         assertEquals(SkillSettings.DEFAULT, SkillSettings.CODEC.parse(JsonOps.INSTANCE,
                 JsonParser.parseString("{}")).getOrThrow());
     }
 
     @Test void disablingBlockBreakingSurvivesSaveAndNetworkRoundTrips() {
-        for (boolean enabled : new boolean[]{false, true}) {
-            var settings = new SkillSettings(enabled);
+        for (boolean enabled : new boolean[]{false, true}) for(boolean borer:new boolean[]{false,true}) {
+            var settings = new SkillSettings(enabled,borer);
             var saved = SkillSettings.CODEC.encodeStart(JsonOps.INSTANCE, settings).getOrThrow();
             assertEquals(settings, SkillSettings.CODEC.parse(JsonOps.INSTANCE, saved).getOrThrow());
             var packet = Unpooled.buffer();
@@ -27,6 +28,34 @@ class SkillSettingsTest {
             } finally {
                 packet.release();
             }
+        }
+    }
+
+    @Test void oldSavesKeepBulletdiveChoiceButDoNotAutoEnableBorer(){
+        var settings=SkillSettings.CODEC.parse(JsonOps.INSTANCE,
+                JsonParser.parseString("{\"bulletdive_block_breaking\":false}")).getOrThrow();
+        assertEquals(new SkillSettings(false,false),settings);
+    }
+
+    @Test void independentSettingRequestsNeverOverwriteOtherPreferences(){
+        var borer=new com.codex.blacklight.network.SkillSettingsPayload(
+                com.codex.blacklight.network.SkillSettingsPayload.Setting.SHIELD_BORER_BLOCKS,true);
+        var bullet=new com.codex.blacklight.network.SkillSettingsPayload(false);
+        var first=borer.apply(SkillSettings.DEFAULT);
+        assertEquals(new SkillSettings(true,true),first);
+        assertEquals(new SkillSettings(false,true),bullet.apply(first));
+        assertEquals(bullet.apply(first),borer.apply(bullet.apply(SkillSettings.DEFAULT)));
+    }
+
+    @Test void settingRequestsRoundTripWithTheirOwnIdentity(){
+        for(var setting:com.codex.blacklight.network.SkillSettingsPayload.Setting.values())for(boolean enabled:new boolean[]{false,true}){
+            var expected=new com.codex.blacklight.network.SkillSettingsPayload(setting,enabled);
+            var buffer=new net.minecraft.network.RegistryFriendlyByteBuf(Unpooled.buffer(),net.minecraft.core.RegistryAccess.EMPTY);
+            try{
+                com.codex.blacklight.network.SkillSettingsPayload.STREAM_CODEC.encode(buffer,expected);
+                assertEquals(expected,com.codex.blacklight.network.SkillSettingsPayload.STREAM_CODEC.decode(buffer));
+                assertFalse(buffer.isReadable());
+            }finally{buffer.release();}
         }
     }
 

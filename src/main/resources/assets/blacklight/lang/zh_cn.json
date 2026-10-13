@@ -31,7 +31,7 @@
   "message.blacklight.prototype_mode_required": "需要先启用黑光模式",
   "message.blacklight.prototype_mode_enabled": "虐杀原型模式：已启用；原版生存交互已锁定",
   "message.blacklight.prototype_mode_disabled": "原版模式：已恢复全部原版操作",
-  "message.blacklight.survival_locked": "黑光模式下无法进行生存交互",
+  "message.blacklight.survival_locked": "虐杀模式下无法进行采掘、放置和使用物品；可以拾取掉落物与经验。",
   "key.blacklight.upgrades": "打开升级面板",
   "screen.blacklight.upgrades": "能力与教程",
   "screen.blacklight.ep_balance": "进化点：%s EP",
@@ -382,5 +382,15 @@
   "tutorial.blacklight.barrage.steps": "已学习且有蓝色储备或肾上腺素机会时发动。按住组合键完成蓄力再松开，触须向四周释放并收回。空中也可发动。",
   "tutorial.blacklight.pain.controls": "同时按住 [%1$s] + [%2$s] 蓄力 → 松开",
   "tutorial.blacklight.pain.steps": "已学习且有蓝色储备或肾上腺素机会时发动。先朝向目标，按住组合键完成蓄力后松开，向前方集中攻击并收回。",
-  "tutorial.blacklight.diagram": "机制示意 · 点击暂停"
+  "tutorial.blacklight.diagram": "机制示意 · 点击暂停",
+  "upgrade.blacklight.shield_borer": "盾构机",
+  "upgrade.blacklight.shield_borer.desc": "展开盾牌向前疾跑，破坏前方约 1.5 格内的方块，每刻最多 6 块，保留正常掉落。需在设置中开启「盾构机方块破坏」；保留脚下支撑，遵守服务器保护。",
+  "tutorial.blacklight.shield_borer.controls": "展开盾牌 [%1$s] · 前进 [%2$s] + 疾跑 [%3$s]",
+  "tutorial.blacklight.shield_borer.steps": "先解锁盾牌与盾构机，在设置页开启「盾构机方块破坏」，选择并展开盾牌，在地面向前疾跑即可开路。强化 I、II 逐级增加距离和破块速度。关闭开关、松开疾跑、收盾或盾牌破损时停止。示范展示持盾跑步姿态；破坏由服务端判定，繁忙时会暂缓。",
+  "upgrade.blacklight.shield_borer_boost_1": "盾构机强化 I",
+  "upgrade.blacklight.shield_borer_boost_1.desc": "前方开路距离提高至约 2 格，每刻最多破坏 9 块。需要先学会盾构机。不会扩大通道高度或挖掉脚下地面。",
+  "upgrade.blacklight.shield_borer_boost_2": "盾构机强化 II",
+  "upgrade.blacklight.shield_borer_boost_2.desc": "前方开路距离提高至约 2.5 格，每刻最多破坏 12 块。需要先学会强化 I。服务器繁忙时会暂缓，不影响保护规则。",
+  "setting.blacklight.shield_borer_blocks": "盾构机方块破坏",
+  "setting.blacklight.shield_borer_blocks.desc": "默认关闭。开启后，已学习盾构机的玩家可展开盾牌向前疾跑破块。关闭后持盾疾跑不再挖地，保留技能等级；不影响子弹俯冲设置。此偏好按玩家保存。"
 }

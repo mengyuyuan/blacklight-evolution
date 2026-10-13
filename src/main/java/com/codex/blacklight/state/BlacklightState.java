@@ -152,7 +152,8 @@ public final class BlacklightState {
     public boolean buyCombatSkill(CombatSkill skill) {
         if (!infected || skill == null || hasCombatSkill(skill) || evolutionPoints < skill.epCost()
                 || skill.requires() != null && !hasCombatSkill(skill.requires())
-                || skill.movementRequires() != null && !hasMovementUpgrade(skill.movementRequires())) return false;
+                || skill.movementRequires() != null && !hasMovementUpgrade(skill.movementRequires())
+                || skill.powerRequires() != null && !hasUnlocked(skill.powerRequires())) return false;
         evolutionPoints -= skill.epCost();
         combatSkillMask |= skill.bit();
         return true;

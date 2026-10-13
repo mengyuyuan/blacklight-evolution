@@ -9,6 +9,22 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 class BulletdiveTerrainTest {
+    @Test void lootPressureStopsFurtherDestructionAcrossOwnersAndResumesAfterCleanup(){
+        var load=new BulletdiveTerrain.LoadBudget(767,0,0);
+        assertTrue(load.available());
+        load.spawnedItems(1);
+        assertFalse(load.available(),"the next owner's attack must share this exhausted dimension budget");
+        assertFalse(new BulletdiveTerrain.LoadBudget(11173,2,704).available(),"66k-height incident load must not create more loot");
+        assertTrue(new BulletdiveTerrain.LoadBudget(600,0,0).available(),"a fresh sample resumes after pickup/despawn");
+        assertFalse(new BulletdiveTerrain.LoadBudget(0,128,0).available());
+        assertFalse(new BulletdiveTerrain.LoadBudget(0,0,512).available());
+    }
+    @Test void delayedVanillaWorkReducesTheFollowingDestructionSlice(){
+        assertEquals(8_000_000,BulletdiveTerrain.availableNanos(10_000_000));
+        assertEquals(2_000_000,BulletdiveTerrain.availableNanos(38_000_000));
+        assertEquals(0,BulletdiveTerrain.availableNanos(200_000_000_000L));
+        assertEquals(0,BulletdiveTerrain.availableNanos(-1));
+    }
     @Test void actualHeightContinuesGrowingBeyondFormerPowerCaps() {
         var prior=BulletdiveTerrain.plan(0);
         for(int height=1;height<=20_000;height++) {

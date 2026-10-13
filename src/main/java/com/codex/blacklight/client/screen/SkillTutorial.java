@@ -6,7 +6,7 @@ import net.minecraft.network.chat.Component;
 import java.util.List;
 
 /** Tutorials describe existing server actions; opening a page never sends an action. */
-public record SkillTutorial(String family,String clip,PowerForm form,String... bindings) {
+public record SkillTutorial(String family,String clip,PowerForm form,String instructionFamily,String... bindings) {
     public static SkillTutorial forSkill(String id) {
         if(id.startsWith("jump_"))return of("jump","basic_jump_charge",PowerForm.NONE,"key.jump");
         if(id.startsWith("sprint_"))return of("sprint","basic_run",PowerForm.NONE,"key.forward","key.sprint");
@@ -29,6 +29,7 @@ public record SkillTutorial(String family,String clip,PowerForm form,String... b
             case "whipfist" -> of("whip","whip_lash",PowerForm.WHIPFIST,"key.blacklight.cycle_form","key.attack","key.use","key.blacklight.grab");
             case "muscle_mass" -> of("muscle","muscle_jab",PowerForm.MUSCLE_MASS,"key.blacklight.cycle_form","key.attack","key.use");
             case "armor","shield" -> of(id,"basic_run",PowerForm.NONE,"key.blacklight.cycle_form","key.blacklight.defense");
+            case "shield_borer","shield_borer_boost_1","shield_borer_boost_2" -> new SkillTutorial("shield","basic_run",PowerForm.NONE,"shield_borer","key.blacklight.defense","key.forward","key.sprint");
             case "thermal_vision","infected_vision" -> of("vision","basic_idle",PowerForm.NONE,"key.blacklight.cycle_form","key.blacklight.senses");
             case "adrenaline_surge" -> of("adrenaline","basic_idle",PowerForm.NONE);
             case "bulletdive_drop" -> of("dive","bulletdive_drop",PowerForm.NONE,"key.jump","key.use");
@@ -38,9 +39,9 @@ public record SkillTutorial(String family,String clip,PowerForm form,String... b
             default -> throw new IllegalArgumentException("Missing tutorial: "+id);
         };
     }
-    private static SkillTutorial of(String family,String clip,PowerForm form,String... keys){return new SkillTutorial(family,clip,form,keys);}
-    public Component controls(){return Component.translatable("tutorial.blacklight."+family+".controls",labels());}
-    public Component steps(){return Component.translatable("tutorial.blacklight."+family+".steps",labels());}
+    private static SkillTutorial of(String family,String clip,PowerForm form,String... keys){return new SkillTutorial(family,clip,form,family,keys);}
+    public Component controls(){return Component.translatable("tutorial.blacklight."+instructionFamily+".controls",labels());}
+    public Component steps(){return Component.translatable("tutorial.blacklight."+instructionFamily+".steps",labels());}
     private Object[] labels(){return java.util.Arrays.stream(bindings).map(SkillBindings::label).toArray();}
     public List<Component> keyLabels(){return java.util.Arrays.stream(bindings).map(key->
             (Component)Component.translatable("tutorial.blacklight.binding",Component.translatable(key),SkillBindings.label(key))).toList();}

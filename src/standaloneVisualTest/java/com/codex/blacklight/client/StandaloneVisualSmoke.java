@@ -92,7 +92,13 @@ public final class StandaloneVisualSmoke {
             fps("52_whip_native_idle",PowerForm.WHIPFIST,null,null,.6F,0),
             fps("53_whip_native_attack",PowerForm.WHIPFIST,null,WeaponMove.WHIP_LASH,.48F,0),
             fps("54_muscle_native_idle",PowerForm.MUSCLE_MASS,null,null,.6F,0),
-            fps("55_muscle_native_attack",PowerForm.MUSCLE_MASS,null,WeaponMove.MUSCLE_JAB,.25F,0))
+            fps("55_muscle_native_attack",PowerForm.MUSCLE_MASS,null,WeaponMove.MUSCLE_JAB,.25F,0),
+            new Shot("56_vision_baseline",PowerForm.NONE,null,null,.6F,false,false,false),
+            new Shot("57_thermal_alignment",PowerForm.NONE,PowerForm.THERMAL_VISION,null,.6F,false,false,false),
+            new Shot("58_whip_attachment",PowerForm.WHIPFIST,null,WeaponMove.WHIP_LASH,.45F,false,false,false),
+            new Shot("59_hammer_ram_impact",PowerForm.HAMMERFISTS,null,WeaponMove.HAMMER_RAM,1.466667F,false,false,false),
+            new Shot("60_hammer_ram_recovery",PowerForm.HAMMERFISTS,null,WeaponMove.HAMMER_RAM,1.95F,false,false,false),
+            new Shot("61_hammer_ram_stand",PowerForm.HAMMERFISTS,null,WeaponMove.HAMMER_RAM,2.4F,false,false,false))
             .stream().filter(StandaloneVisualSmoke::selected).toList();
     private static final String PROPERTY="blacklight.test.standaloneVisual";
     private static Path output;
@@ -191,6 +197,7 @@ public final class StandaloneVisualSmoke {
         if(tick<stageAt||!serverReady)return;
         if(client.player.getData(ModAttachments.PLAYER_STATE).getActivePower()!=shot.form())return;
         if(!preview) {
+            client.options.setCameraType(camera(shot));
             String key=key(shot);
             PlayerMotionController.preview(client.player,key,shot.seconds());
             PlayerMotionController.seekPreview(client.player,shot.seconds());
@@ -218,6 +225,12 @@ public final class StandaloneVisualSmoke {
         return shot.charge()?LocalWeaponMotion.find(shot.move().id).flatMap(LocalWeaponMotion.Definition::charge).map(LocalWeaponMotion.Charge::animation).orElseThrow():shot.move().id;
     }
     private static void configure(ServerPlayer p,Shot shot) {
+        if(shot.name().equals("56_vision_baseline")){
+            for(double x:new double[]{-1.2,1.8}){
+                var sheep=net.minecraft.world.entity.EntityType.SHEEP.create(p.serverLevel());
+                sheep.setPos(x,251,2.5);sheep.setNoAi(true);sheep.setPersistenceRequired();p.serverLevel().addFreshEntity(sheep);
+            }
+        }
         var state=p.getData(ModAttachments.PLAYER_STATE);if(!state.isInfected())state.infect();
         state.setPrototypeMode(true);for(var form:PowerForm.values())state.unlock(form);state.activate(shot.form());state.addBiomass(1000);state.addEvolutionPoints(100000);
         for(var upgrade:ClawUpgrade.values())state.buyClawUpgrade(upgrade);
@@ -261,6 +274,7 @@ public final class StandaloneVisualSmoke {
             var forward=net.minecraft.world.phys.Vec3.directionFromRotation(0,player.getYRot());
             var right=new net.minecraft.world.phys.Vec3(-forward.z,0,forward.x);
             camera=target.add(forward.scale(3.8)).add(right.scale(1.3)).add(0,.35,0);
+            if(shot.name().equals("58_whip_attachment"))camera=target.add(forward.scale(1.5)).add(right.scale(8)).add(0,2,0);
         }
         var look=target.subtract(camera);
         float yaw=(float)Math.toDegrees(Math.atan2(-look.x,look.z));

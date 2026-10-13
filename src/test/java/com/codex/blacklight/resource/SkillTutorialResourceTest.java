@@ -25,7 +25,7 @@ class SkillTutorialResourceTest {
             for(var language:List.of(zh,en)){
                 assertTrue(language.has("upgrade.blacklight."+id),id);
                 for(String field:List.of("controls","steps")){
-                    String key="tutorial.blacklight."+tutorial.family()+"."+field;
+                    String key="tutorial.blacklight."+tutorial.instructionFamily()+"."+field;
                     assertTrue(language.has(key),id+": "+key);
                     var matcher=java.util.regex.Pattern.compile("%(\\d+)\\$s").matcher(language.get(key).getAsString());
                     while(matcher.find())assertTrue(Integer.parseInt(matcher.group(1))<=tutorial.bindings().length,"Unresolved binding in "+id);

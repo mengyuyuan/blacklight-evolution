@@ -31,7 +31,7 @@
   "message.blacklight.prototype_mode_required": "Blacklight mode is required",
   "message.blacklight.prototype_mode_enabled": "Prototype mode enabled; vanilla survival interactions are locked",
   "message.blacklight.prototype_mode_disabled": "Vanilla mode enabled; all vanilla controls are restored",
-  "message.blacklight.survival_locked": "Survival interactions are unavailable in Blacklight mode",
+  "message.blacklight.survival_locked": "Mining, placement and item use are unavailable in Blacklight mode; item and experience pickup remain available.",
   "key.blacklight.upgrades": "Open upgrade panel",
   "screen.blacklight.upgrades": "Abilities & Tutorials",
   "screen.blacklight.ep_balance": "Evolution points: %s EP",
@@ -382,5 +382,15 @@
   "tutorial.blacklight.barrage.steps": "Requires this skill and reserve or an adrenaline opportunity. Hold through the charge and release; tendrils expand in all directions and retract. Also usable airborne.",
   "tutorial.blacklight.pain.controls": "Hold [%1$s] + [%2$s] together → release",
   "tutorial.blacklight.pain.steps": "Requires this skill and reserve or an adrenaline opportunity. Aim first, hold through the charge and release a focused forward attack, followed by retraction.",
-  "tutorial.blacklight.diagram": "Mechanic diagram · Click to pause"
+  "tutorial.blacklight.diagram": "Mechanic diagram · Click to pause",
+  "upgrade.blacklight.shield_borer": "Shield Borer",
+  "upgrade.blacklight.shield_borer.desc": "Sprint forward with a deployed shield to break blocks about 1.5 blocks ahead, up to 6 per tick, with normal drops. Enable Shield Borer Block Breaking in Settings. Preserves support surfaces and respects server protection.",
+  "tutorial.blacklight.shield_borer.controls": "Deploy shield [%1$s] · Forward [%2$s] + Sprint [%3$s]",
+  "tutorial.blacklight.shield_borer.steps": "Unlock Shield and Shield Borer, enable Shield Borer Block Breaking in Settings, then select and deploy your shield and sprint forward on the ground. Boosts I and II increase reach and break rate. Stops when disabled, sprint released or shield retracted/broken. The demo shows the shield-running stance; destruction is server-authoritative and pauses under load.",
+  "upgrade.blacklight.shield_borer_boost_1": "Shield Borer Boost I",
+  "upgrade.blacklight.shield_borer_boost_1.desc": "Increases forward excavation reach to about 2 blocks and the limit to 9 breaks per tick. Requires Shield Borer. Does not increase corridor height or excavate the floor.",
+  "upgrade.blacklight.shield_borer_boost_2": "Shield Borer Boost II",
+  "upgrade.blacklight.shield_borer_boost_2.desc": "Increases forward excavation reach to about 2.5 blocks and the limit to 12 breaks per tick. Requires Boost I. Pauses under server load and continues to respect protection.",
+  "setting.blacklight.shield_borer_blocks": "Shield Borer Block Breaking",
+  "setting.blacklight.shield_borer_blocks.desc": "Off by default. Enable to excavate while sprinting forward with a deployed shield and the learned Shield Borer skill. Disable to sprint without excavation; learned levels are retained. Saved per player, independently of Bulletdive settings."
 }
