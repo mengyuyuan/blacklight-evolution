@@ -1,338 +1,198 @@
 package com.codex.blacklight.client.screen;
 
-import com.codex.blacklight.network.UpgradePurchasePayload;
-import com.codex.blacklight.power.ClawUpgrade;
-import com.codex.blacklight.power.CombatSkill;
-import com.codex.blacklight.power.MovementUpgrade;
+import com.codex.blacklight.client.SkillBindings;
+import com.codex.blacklight.network.*;
+import com.codex.blacklight.power.*;
 import com.codex.blacklight.registry.ModAttachments;
 import com.codex.blacklight.state.BlacklightState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
-import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.gui.screens.options.controls.KeyBindsScreen;
 import net.minecraft.network.chat.Component;
 import net.neoforged.neoforge.network.PacketDistributor;
 import org.lwjgl.glfw.GLFW;
-
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * The upgrade menu in the original game's shape: a full-screen dark command-console
- * panel with a left category rail, the upgrade list of the selected category in the
- * center and the EP balance up top. Purchases are server-authoritative.
- */
+/** Category / skill / demonstration. Selecting and learning are separate actions. */
 public final class UpgradeScreen extends Screen {
-    private static final int BG = 0xFF10131A;
-    private static final int RAIL_BG = 0xFF0D0F16;
-    private static final int RED = 0xFFE23A3A;
-    private static final int RED_SOFT = 0xFF7A2026;
-    private static final int TEXT = 0xFFE4E8EF;
-    private static final int TEXT_DIM = 0xFFBDC6D4;
-    private static final int ROW_HOVER = 0x2EE23A3A;
+    private static final int BG=0xFF101114, PANEL=0xFF1A1C20, RED=0xFFE94B42, TEXT=0xFFE9E5DF, DIM=0xFFABA9A7;
+    private static final int TOP=48,ROW=31;
+    private enum Category { BASIC, MOVEMENT, CLAW, FORMS, COMBAT, UTILITY, BIOLOGY, ATTRIBUTES, SETTINGS;
+        Component label(){return Component.translatable("screen.blacklight.section."+name().toLowerCase(java.util.Locale.ROOT));}}
+    private record Entry(String id,int cost,String required,boolean free) {}
+    private Category category=Category.BASIC;
+    private final List<Entry> entries=new ArrayList<>();
+    private String selected="mode";
+    private int rail,listX,listWidth,detailX,detailWidth,bottom,listScroll,detailScroll,detailHeight;
+    private Button purchase;
+    private final TutorialGif gif=new TutorialGif();
+    private long selectedAt=System.nanoTime(),pausedAt;
+    private boolean paused;
 
-    private enum Category {
-        ATTRIBUTES("screen.blacklight.section.attributes"),
-        MOVEMENT("screen.blacklight.section.movement"),
-        CLAW("screen.blacklight.section.claw"),
-        FORMS("screen.blacklight.section.forms"),
-        BIOLOGY("screen.blacklight.section.biology"),
-        UTILITY("screen.blacklight.section.utility"),
-        COMBAT("screen.blacklight.section.combat"),
-        SETTINGS("screen.blacklight.section.settings");
-
-        private final String langKey;
-        Category(String langKey) { this.langKey = langKey; }
-    }
-
-    private Category category = Category.ATTRIBUTES;
-    private final List<Row> rows = new ArrayList<>();
-    private int railWidth;
-    private int contentX;
-    private int contentWidth;
-    private int scrollOffset,totalHeight,listBottom,buttonWidth,textWidth;
-    private boolean stacked;
-    private static final int LIST_TOP=58;
-
-    public UpgradeScreen() {
-        super(Component.translatable("screen.blacklight.upgrades"));
-    }
-
-    @Override
-    protected void init() {
-        railWidth = Math.clamp(width / 5,80,124);
-        contentX = railWidth + 14;
-        contentWidth = width - contentX - 14;
-        listBottom=Math.max(LIST_TOP+35,height-23);
-        buttonWidth=Math.min(108,contentWidth-16);
-        stacked=contentWidth<285;
-        textWidth=Math.max(40,contentWidth-20-(stacked?0:buttonWidth+12));
-        rebuildRows();
-    }
-
-    private void rebuildRows() {
-        rows.clear();
+    public UpgradeScreen(){super(Component.translatable("screen.blacklight.upgrades"));}
+    @Override protected void init(){
+        rail=Math.clamp(width/6,62,108);listX=rail+7;
+        listWidth=Math.clamp((width-rail)/3,85,170);detailX=listX+listWidth+10;
+        detailWidth=width-detailX-12;bottom=height-31;
         clearWidgets();
-        int y = 0;
-        if(category==Category.ATTRIBUTES){
-            y=attributeHeight();
-        } else if(category==Category.SETTINGS){
-            y=addSettingRow(y,"bulletdive_blocks");
-        } else if(category==Category.BIOLOGY){
-            for(var growth:com.codex.blacklight.power.GrowthUpgrade.values())y=addRow(y,growth.id,growth.cost,growth.requires()==null?null:growth.requires().id);
-        } else if(category==Category.UTILITY){
-            for(var form:new com.codex.blacklight.power.PowerForm[]{com.codex.blacklight.power.PowerForm.SHIELD,com.codex.blacklight.power.PowerForm.ARMOR,com.codex.blacklight.power.PowerForm.THERMAL_VISION,com.codex.blacklight.power.PowerForm.INFECTED_VISION})y=addRow(y,form.id(),form.epCost(),null);
-        } else if (category == Category.COMBAT) {
-            for (var skill : CombatSkill.values()) y = addRow(y, skill.id(), skill.epCost(),
-                    skill.requires() != null ? skill.requires().id()
-                            : skill.movementRequires() == null ? null : skill.movementRequires().id());
-        } else if (category == Category.MOVEMENT) {
-            for (MovementUpgrade upgrade : MovementUpgrade.values()) {
-                y = addRow(y, upgrade.id(), upgrade.epCost(),
-                        upgrade.requires() == null ? null : upgrade.requires().id());
-            }
-        } else if (category == Category.FORMS) {
-            for (var form : new com.codex.blacklight.power.PowerForm[]{com.codex.blacklight.power.PowerForm.HAMMERFISTS, com.codex.blacklight.power.PowerForm.BLADE, com.codex.blacklight.power.PowerForm.WHIPFIST,com.codex.blacklight.power.PowerForm.MUSCLE_MASS}) {
-                y = addRow(y, form.id(), form.epCost(), null);
-            }
-        } else {
-            for (ClawUpgrade upgrade : ClawUpgrade.values()) {
-                y = addRow(y, upgrade.id(), upgrade.epCost(), null);
-            }
+        addRenderableWidget(new TutorialButton(width-114,8,78,20,Component.translatable("tutorial.blacklight.configure"),b->minecraft.setScreen(new KeyBindsScreen(this,minecraft.options))));
+        addRenderableWidget(new TutorialButton(width-31,8,22,20,Component.literal("×"),b->onClose()));
+        purchase=addRenderableWidget(new TutorialButton(detailX,height-25,Math.max(60,detailWidth),20,Component.empty(),b->activate()));
+        rebuild();
+        if(!selected.isEmpty()&&category!=Category.SETTINGS&&category!=Category.ATTRIBUTES)gif.select(SkillTutorial.forSkill(selected).family());
+    }
+    private void rebuild(){
+        entries.clear();
+        switch(category){
+            case BASIC -> {for(String id:List.of("mode","grab","target_lock","disguise"))entries.add(new Entry(id,0,null,true));}
+            case MOVEMENT -> {for(var u:MovementUpgrade.values())entries.add(new Entry(u.id(),u.epCost(),u.requires()==null?null:u.requires().id(),false));}
+            case CLAW -> {entries.add(new Entry("groundspike",0,null,true));for(var u:ClawUpgrade.values())entries.add(new Entry(u.id(),u.epCost(),null,false));}
+            case FORMS -> {for(var u:List.of(PowerForm.CLAWS,PowerForm.HAMMERFISTS,PowerForm.BLADE,PowerForm.WHIPFIST,PowerForm.MUSCLE_MASS))entries.add(new Entry(u.id(),u.epCost(),null,u==PowerForm.CLAWS));}
+            case COMBAT -> {for(var u:CombatSkill.values())if(!u.shieldBorer())entries.add(new Entry(u.id(),u.epCost(),u.requires()!=null?u.requires().id():u.movementRequires()!=null?u.movementRequires().id():null,false));}
+            case UTILITY -> {for(var u:List.of(PowerForm.SHIELD,PowerForm.ARMOR,PowerForm.THERMAL_VISION,PowerForm.INFECTED_VISION))entries.add(new Entry(u.id(),u.epCost(),null,false));for(var u:CombatSkill.values())if(u.shieldBorer())entries.add(new Entry(u.id(),u.epCost(),u.requires()==null?PowerForm.SHIELD.id():u.requires().id(),false));}
+            case BIOLOGY -> {for(var u:GrowthUpgrade.values())entries.add(new Entry(u.id,u.cost,u.requires()==null?null:u.requires().id,false));}
+            case SETTINGS -> {for(String id:List.of("bulletdive_blocks","shield_borer_blocks"))entries.add(new Entry(id,0,null,true));}
+            default -> {}
         }
-        totalHeight=y;
-        scrollOffset=Math.clamp(scrollOffset,0,maxScroll());
-        layoutRows();
+        if(entries.stream().noneMatch(e->e.id.equals(selected)))select(entries.isEmpty()?"":entries.get(0).id);
+        listScroll=Math.clamp(listScroll,0,maxListScroll());purchase.visible=category!=Category.ATTRIBUTES;refreshButton();
     }
-
-    private int addRow(int y, String id, int cost, String requiresId) {
-        var titleLines=font.split(Component.translatable("upgrade.blacklight."+id),textWidth);
-        var description=font.split(Component.translatable("upgrade.blacklight."+id+".desc"),textWidth);
-        int textHeight=titleLines.size()*11+4+description.size()*11;
-        int rowHeight=Math.max(44,textHeight+16+(stacked?26:0));
-        int buttonOffset=stacked?rowHeight-27:Math.max(8,(rowHeight-20)/2);
-        Button button = Button.builder(Component.empty(), clicked -> buy(id))
-                .bounds(contentX+contentWidth-buttonWidth-8,0,buttonWidth,20).build();
-        button.setTooltip(Tooltip.create(Component.translatable("upgrade.blacklight."+id+".desc")));
-        addRenderableWidget(button);
-        rows.add(new Row(id,cost,requiresId,button,y,rowHeight,buttonOffset,titleLines,description));
-        return y+rowHeight+6;
+    private void select(String id){
+        selected=id;detailScroll=0;selectedAt=System.nanoTime();paused=false;
+        if(!id.isEmpty()&&category!=Category.SETTINGS)gif.select(SkillTutorial.forSkill(id).family());else gif.close();
     }
-
-    private int addSettingRow(int y,String id){
-        var titleLines=font.split(Component.translatable("setting.blacklight."+id),textWidth);
-        var description=font.split(Component.translatable("setting.blacklight."+id+".desc"),textWidth);
-        int rowHeight=Math.max(44,titleLines.size()*11+4+description.size()*11+16+(stacked?26:0));
-        int buttonOffset=stacked?rowHeight-27:Math.max(8,(rowHeight-20)/2);
-        var button=Button.builder(Component.empty(),clicked->{
-            var player=Minecraft.getInstance().player;
-            if(player!=null)PacketDistributor.sendToServer(new com.codex.blacklight.network.SkillSettingsPayload(
-                    !player.getData(ModAttachments.SKILL_SETTINGS).bulletdiveBlockBreaking()));
-        }).bounds(contentX+contentWidth-buttonWidth-8,0,buttonWidth,20).build();
-        button.setTooltip(Tooltip.create(Component.translatable("setting.blacklight."+id+".desc")));
-        addRenderableWidget(button);
-        rows.add(new Row(id,0,null,button,y,rowHeight,buttonOffset,titleLines,description));
-        return y+rowHeight+6;
-    }
-
-    private int maxScroll(){return Math.max(0,totalHeight-(listBottom-LIST_TOP));}
-    private void layoutRows(){
-        for(var row:rows){
-            int y=LIST_TOP+row.y-scrollOffset;
-            row.button.setY(y+row.buttonOffset);
-            row.button.visible=row.button.getY()>=LIST_TOP&&row.button.getBottom()<=listBottom;
-        }
-    }
-
-    @Override public void renderBackground(GuiGraphics graphics,int mouseX,int mouseY,float partialTick){
-        // Screen.render invokes this before its widgets. The opaque panel below owns
-        // its background; invoking vanilla blur here would blur our already drawn text.
-    }
-
-    private void buy(String id) {
-        PacketDistributor.sendToServer(new UpgradePurchasePayload(id));
-    }
-
-    @Override
-    public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
-        graphics.fill(0, 0, width, height, BG);
-        graphics.fill(0, 0, railWidth, height, RAIL_BG);
-        graphics.fill(railWidth, 0, railWidth + 1, height, RED_SOFT);
-        graphics.fill(0, 44, width, 45, RED_SOFT);
-
-        graphics.drawString(font,title,12,9,TEXT,false);
-        BlacklightState state = currentState();
-        Component ep = Component.translatable(category==Category.BIOLOGY?"screen.blacklight.biomass_balance":"screen.blacklight.ep_balance",
-                state == null ? 0 : category==Category.BIOLOGY?state.getBiomass():state.getEvolutionPoints());
-        graphics.drawString(font,ep,width-12-font.width(ep),font.width(title)+font.width(ep)+36>width?27:9,0xFFFFD796,false);
-        graphics.drawString(font,Component.translatable("screen.blacklight.upgrades_hint"),12,29,TEXT_DIM,false);
-
-        int railY = 64;
-        for (Category entry : Category.values()) {
-            boolean selected = entry == category;
-            int railHeight = Math.min(22, railStep() - 2);
-            if (mouseX >= 8 && mouseX < railWidth - 8 && mouseY >= railY && mouseY < railY + railHeight) {
-                graphics.fill(8, railY, railWidth - 8, railY + railHeight, ROW_HOVER);
-            }
-            var label=font.split(Component.translatable(entry.langKey),railWidth-24);
-            int labelY=railY+(label.size()>1?2:7);
-            for(var line:label){graphics.drawString(font,line,16,labelY,selected?RED:TEXT_DIM,false);labelY+=10;}
-            if (selected) graphics.fill(8, railY + 4, 10, railY + 18, RED);
-            railY += railStep();
-        }
-
-        layoutRows();
-        graphics.enableScissor(contentX,LIST_TOP,width-10,listBottom);
-        if(category==Category.ATTRIBUTES)renderAttributes(graphics);
-        for (Row row : rows) {
-            refreshRow(row, state);
-            int y=LIST_TOP+row.y-scrollOffset;
-            if(y+row.height<LIST_TOP||y>=listBottom)continue;
-            boolean hover=mouseX>=contentX&&mouseX<contentX+contentWidth&&mouseY>=y&&mouseY<y+row.height;
-            graphics.fill(contentX,y,contentX+contentWidth,y+row.height,hover?0xFF2D2027:0xFF1B202B);
-            graphics.fill(contentX,y,contentX+2,y+row.height,hover?RED:RED_SOFT);
-            int textY=y+8;
-            for(var line:row.titleLines){graphics.drawString(font,line,contentX+10,textY,TEXT,false);textY+=11;}
-            textY+=4;
-            for(var line:row.description){graphics.drawString(font,line,contentX+10,textY,TEXT_DIM,false);textY+=11;}
-        }
-        super.render(graphics, mouseX, mouseY, partialTick);
-        graphics.disableScissor();
-        if(maxScroll()>0){
-            int viewport=listBottom-LIST_TOP,thumb=Math.max(16,viewport*viewport/Math.max(1,totalHeight));
-            int thumbY=LIST_TOP+(viewport-thumb)*scrollOffset/maxScroll();
-            graphics.fill(width-8,LIST_TOP,width-5,listBottom,0xFF303744);
-            graphics.fill(width-8,thumbY,width-5,thumbY+thumb,0xFFCF6A70);
-            graphics.drawString(font,Component.translatable("screen.blacklight.scroll_hint"),contentX,height-15,TEXT_DIM,false);
-        }
-    }
-
-    private int attributeHeight(){
-        int height=0;
-        for(var entry:PlayerAttributesView.entries())
-            height+=27+11*font.split(entry.value(),Math.max(40,contentWidth-20)).size();
-        return height;
-    }
-
-    private void renderAttributes(GuiGraphics graphics){
-        totalHeight=attributeHeight();scrollOffset=Math.clamp(scrollOffset,0,maxScroll());
-        int y=LIST_TOP-scrollOffset;
-        for(var entry:PlayerAttributesView.entries()){
-            var lines=font.split(entry.value(),Math.max(40,contentWidth-20));
-            int height=21+11*lines.size();
-            graphics.fill(contentX,y,contentX+contentWidth,y+height,0xFF1B202B);
-            graphics.fill(contentX,y,contentX+2,y+height,RED_SOFT);
-            graphics.drawString(font,entry.label(),contentX+10,y+5,TEXT_DIM,false);
-            int textY=y+17;
-            for(var line:lines){graphics.drawString(font,line,contentX+10,textY,TEXT,false);textY+=11;}
-            y+=height+6;
-        }
-    }
-
-    private void refreshRow(Row row, BlacklightState state) {
+    private Entry entry(){return entries.stream().filter(e->e.id.equals(selected)).findFirst().orElse(null);}
+    private Component label(String id){return Component.translatable((category==Category.SETTINGS?"setting.blacklight.":"upgrade.blacklight.")+id);}
+    private static BlacklightState state(){var p=Minecraft.getInstance().player;return p==null?null:p.getData(ModAttachments.PLAYER_STATE);}
+    private boolean owns(Entry e){return e.free||owned(state(),e.id);}
+    private boolean prerequisite(Entry e){return e.required==null||owned(state(),e.required);}
+    private int balance(){var s=state();return s==null?0:category==Category.BIOLOGY?s.getBiomass():s.getEvolutionPoints();}
+    private void activate(){
+        var e=entry();if(e==null||minecraft.player==null)return;
         if(category==Category.SETTINGS){
-            var player=Minecraft.getInstance().player;
-            row.button.active=player!=null;
-            boolean enabled=player!=null&&player.getData(ModAttachments.SKILL_SETTINGS).bulletdiveBlockBreaking();
-            row.button.setMessage(Component.translatable(enabled?"screen.blacklight.setting_on":"screen.blacklight.setting_off"));
-            return;
+            var setting=e.id.equals("shield_borer_blocks")?SkillSettingsPayload.Setting.SHIELD_BORER_BLOCKS:SkillSettingsPayload.Setting.BULLETDIVE_BLOCKS;
+            PacketDistributor.sendToServer(new SkillSettingsPayload(setting,!settingEnabled(e.id)));return;
         }
-        if (state == null) {row.button.active=false;return;}
-        boolean owned = owned(state, row.id);
-        boolean prereqMet = row.requiresId == null || owned(state, row.requiresId);
-        boolean affordable = (category==Category.BIOLOGY?state.getBiomass():state.getEvolutionPoints()) >= row.cost;
-        if (owned) {
-            row.button.active = false;
-            row.button.setMessage(Component.translatable("screen.blacklight.state_owned"));
-        } else if (!prereqMet) {
-            row.button.active = false;
-            row.button.setMessage(Component.translatable("screen.blacklight.requires_short"));
-            row.button.setTooltip(Tooltip.create(Component.translatable("screen.blacklight.state_requires",Component.translatable("upgrade.blacklight."+row.requiresId))));
-        } else {
-            row.button.setTooltip(Tooltip.create(Component.translatable("upgrade.blacklight."+row.id+".desc")));
-            row.button.active = affordable;
-            row.button.setMessage(Component.translatable(category==Category.BIOLOGY?"screen.blacklight.biomass_cost":"screen.blacklight.state_cost", row.cost));
-        }
+        if(!owns(e)&&prerequisite(e)&&balance()>=e.cost)PacketDistributor.sendToServer(new UpgradePurchasePayload(e.id));
     }
-
-    @Override
-    public boolean mouseClicked(double mouseX, double mouseY, int button) {
-        int railY = 64;
-        for (Category entry : Category.values()) {
-            if (mouseX >= 8 && mouseX < railWidth - 8
-                    && mouseY >= railY && mouseY < railY + Math.min(22, railStep() - 2)) {
-                if (entry != category) {
-                    category = entry;
-                    scrollOffset=0;
-                    rebuildRows();
-                }
-                return true;
+    private boolean settingEnabled(String id){
+        if(minecraft.player==null)return false;
+        var settings=minecraft.player.getData(ModAttachments.SKILL_SETTINGS);
+        return id.equals("shield_borer_blocks")?settings.shieldBorerBlockBreaking():settings.bulletdiveBlockBreaking();
+    }
+    private void refreshButton(){
+        var e=entry();if(e==null)return;
+        if(category==Category.SETTINGS){
+            boolean on=settingEnabled(e.id);
+            purchase.setMessage(Component.translatable(on?"screen.blacklight.setting_on":"screen.blacklight.setting_off"));purchase.active=minecraft.player!=null;return;
+        }
+        purchase.active=minecraft.player!=null&&!owns(e)&&prerequisite(e)&&balance()>=e.cost;
+        purchase.setMessage(Component.translatable(owns(e)?"screen.blacklight.state_owned":!prerequisite(e)?"screen.blacklight.requires_short":category==Category.BIOLOGY?"screen.blacklight.biomass_cost":"screen.blacklight.state_cost",e.cost));
+    }
+    @Override public void renderBackground(GuiGraphics g,int x,int y,float partial){}
+    @Override public void render(GuiGraphics g,int mx,int my,float partial){
+        g.fill(0,0,width,height,BG);g.fill(0,0,rail,height,0xFF0B0C0E);g.fill(0,37,width,38,0xFF74302D);
+        g.fill(10,10,13,27,RED);g.drawString(font,title,20,13,TEXT,false);
+        var ep=Component.translatable(category==Category.BIOLOGY?"screen.blacklight.biomass_balance":"screen.blacklight.ep_balance",balance());
+        if(width>460)g.drawString(font,ep,width-126-font.width(ep),14,0xFFE6C68A,false);
+        int step=Math.max(14,Math.min(27,(height-54)/Category.values().length)),y=TOP;
+        for(var c:Category.values()){
+            if(c==category){g.fill(4,y,rail-3,y+step-2,0xFF4A2020);g.fill(4,y,6,y+step-2,RED);}
+            g.drawString(font,font.plainSubstrByWidth(c.label().getString(),rail-15),11,y+(step-10)/2,c==category?TEXT:DIM,false);y+=step;
+        }
+        if(category==Category.ATTRIBUTES)renderAttributes(g);
+        else {
+            g.enableScissor(listX,TOP,listX+listWidth,bottom);y=TOP-listScroll;
+            for(var e:entries){
+                boolean chosen=e.id.equals(selected),hover=mx>=listX&&mx<listX+listWidth&&my>=y&&my<y+ROW-3;
+                g.fill(listX,y,listX+listWidth,y+ROW-3,chosen?0xFF682C29:hover?0xFF302627:PANEL);
+                if(chosen)g.fill(listX,y,listX+2,y+ROW-3,RED);
+                g.drawString(font,font.plainSubstrByWidth(label(e.id).getString(),listWidth-12),listX+7,y+5,TEXT,false);
+                var status=Component.translatable(category==Category.SETTINGS?(settingEnabled(e.id)?"screen.blacklight.setting_on":"screen.blacklight.setting_off"):owns(e)?"tutorial.blacklight.learned":prerequisite(e)?"tutorial.blacklight.available":"tutorial.blacklight.locked");
+                g.drawString(font,status,listX+7,y+17,owns(e)?0xFFB1BEAE:0xFFD6A089,false);y+=ROW;
             }
-            railY += railStep();
+            g.disableScissor();bar(g,listX+listWidth-2,TOP,bottom,listScroll,entries.size()*ROW);
+            renderDetail(g,mx,my);refreshButton();
+            if(width<=460)g.drawString(font,ep,listX,height-19,0xFFE6C68A,false);
         }
-        return mouseY>=LIST_TOP&&mouseY<listBottom&&super.mouseClicked(mouseX, mouseY, button);
+        super.render(g,mx,my,partial);
     }
-
-    @Override public boolean mouseScrolled(double mouseX,double mouseY,double horizontal,double vertical){
-        if(mouseX<contentX||mouseY<LIST_TOP||mouseY>listBottom)return false;
-        scrollOffset=Math.clamp(scrollOffset-(int)(vertical*30),0,maxScroll());layoutRows();return true;
-    }
-
-    private static boolean owned(BlacklightState state, String id) {
-        var combat = CombatSkill.byId(id);
-        if (combat != null) return state.hasCombatSkill(combat);
-        var growth=com.codex.blacklight.power.GrowthUpgrade.byId(id);
-        if(growth!=null){var p=Minecraft.getInstance().player;return p!=null&&p.getData(ModAttachments.GROWTH).owns(growth);}
-        var form = com.codex.blacklight.power.PowerForm.byId(id);
-        if (form != com.codex.blacklight.power.PowerForm.NONE) return state.hasUnlocked(form);
-        ClawUpgrade claw = ClawUpgrade.byId(id);
-        if (claw != null) return state.hasClawUpgrade(claw);
-        MovementUpgrade movement = MovementUpgrade.byId(id);
-        return movement != null && state.hasMovementUpgrade(movement);
-    }
-
-    private int railStep() { return Math.clamp((height - 72) / Category.values().length, 20, 26); }
-
-    private static BlacklightState currentState() {
-        Minecraft minecraft = Minecraft.getInstance();
-        return minecraft.player == null ? null
-                : minecraft.player.getData(ModAttachments.PLAYER_STATE);
-    }
-
-    @Override
-    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-        if(keyCode==GLFW.GLFW_KEY_PAGE_DOWN||keyCode==GLFW.GLFW_KEY_PAGE_UP||keyCode==GLFW.GLFW_KEY_HOME||keyCode==GLFW.GLFW_KEY_END){
-            int page=Math.max(30,listBottom-LIST_TOP-20);
-            scrollOffset=keyCode==GLFW.GLFW_KEY_HOME?0:keyCode==GLFW.GLFW_KEY_END?maxScroll():Math.clamp(scrollOffset+(keyCode==GLFW.GLFW_KEY_PAGE_DOWN?page:-page),0,maxScroll());
-            layoutRows();return true;
+    private void renderDetail(GuiGraphics g,int mx,int my){
+        var e=entry();if(e==null)return;
+        g.fill(detailX-3,TOP-4,width-8,bottom,0xFF16181B);g.enableScissor(detailX,TOP,width-10,bottom);
+        int y=paragraph(g,label(e.id),TOP-detailScroll,TEXT)+6;
+        if(category!=Category.SETTINGS){
+            var tutorial=SkillTutorial.forSkill(e.id);int previewHeight=previewHeight();
+            g.fill(detailX,y,detailX+detailWidth,y+previewHeight,0xFF22262B);
+            long elapsed=((paused?pausedAt:System.nanoTime())-selectedAt)/1_000_000;
+            if(!gif.render(g,detailX+(detailWidth-previewHeight*16/9)/2,y,previewHeight*16/9,previewHeight,elapsed))
+                g.drawCenteredString(font,Component.translatable(gif.failed?"tutorial.blacklight.preview_missing":"tutorial.blacklight.loading"),detailX+detailWidth/2,y+previewHeight/2,DIM);
+            y+=previewHeight+4;y=paragraph(g,Component.translatable(paused?"tutorial.blacklight.paused":List.of("vision","critical","health","adrenaline").contains(tutorial.family())?"tutorial.blacklight.diagram":"tutorial.blacklight.playing"),y,DIM)+8;
+            y=paragraph(g,Component.translatable("tutorial.blacklight.controls"),y,RED)+4;
+            y=paragraph(g,tutorial.controls(),y,TEXT)+6;y=paragraph(g,tutorial.steps(),y,DIM)+10;
+            for(var key:tutorial.keyLabels())y=paragraph(g,key,y,0xFFD6C5AE)+3;y+=5;
         }
-        if (keyCode == GLFW.GLFW_KEY_U) {
-            onClose();
-            return true;
-        }
-        return super.keyPressed(keyCode, scanCode, modifiers);
+        y=paragraph(g,Component.translatable("tutorial.blacklight.effect"),y,RED)+4;
+        y=paragraph(g,Component.translatable((category==Category.SETTINGS?"setting.blacklight.":"upgrade.blacklight.")+e.id+".desc"),y,DIM)+8;
+        if(e.required!=null)y=paragraph(g,Component.translatable("screen.blacklight.state_requires",Component.translatable("upgrade.blacklight."+e.required)),y,0xFFD6A089)+8;
+        detailHeight=y-(TOP-detailScroll);g.disableScissor();detailScroll=Math.clamp(detailScroll,0,maxDetailScroll());bar(g,width-10,TOP,bottom,detailScroll,detailHeight);
     }
-
-    @Override
-    public boolean isPauseScreen() { return false; }
-
-    private static final class Row {
-        private final String id;
-        private final int cost;
-        private final String requiresId;
-        private final Button button;
-        private final int y;
-        private final int height,buttonOffset;
-        private final List<net.minecraft.util.FormattedCharSequence> titleLines,description;
-
-        private Row(String id,int cost,String requiresId,Button button,int y,int height,int buttonOffset,List<net.minecraft.util.FormattedCharSequence> titleLines,List<net.minecraft.util.FormattedCharSequence> description) {
-            this.id = id;
-            this.cost = cost;
-            this.requiresId = requiresId;
-            this.button = button;
-            this.y = y;
-            this.height=height;this.buttonOffset=buttonOffset;this.titleLines=titleLines;this.description=description;
+    private int previewHeight(){return Math.min(detailWidth*9/16,Math.max(48,Math.min(120,(bottom-TOP)*46/100)));}
+    private int paragraph(GuiGraphics g,Component text,int y,int color){
+        for(var line:font.split(text,Math.max(50,detailWidth-6))){g.drawString(font,line,detailX,y,color,false);y+=11;}return y;
+    }
+    private void renderAttributes(GuiGraphics g){
+        g.enableScissor(listX,TOP,width-12,bottom);int y=TOP-listScroll;
+        for(var a:PlayerAttributesView.entries()){
+            g.drawString(font,a.label(),listX+5,y,DIM,false);y+=13;
+            for(var line:font.split(a.value(),width-listX-20)){g.drawString(font,line,listX+5,y,TEXT,false);y+=11;}y+=12;
         }
+        detailHeight=y-(TOP-listScroll);g.disableScissor();bar(g,width-12,TOP,bottom,listScroll,detailHeight);
+    }
+    private void bar(GuiGraphics g,int x,int top,int end,int offset,int total){
+        int view=end-top;if(total<=view)return;int size=Math.max(12,view*view/total),y=top+(view-size)*offset/Math.max(1,total-view);
+        g.fill(x,top,x+2,end,0xFF303034);g.fill(x,y,x+2,y+size,RED);
+    }
+    private int maxListScroll(){return Math.max(0,(category==Category.ATTRIBUTES?detailHeight:entries.size()*ROW)-(bottom-TOP));}
+    private int maxDetailScroll(){return Math.max(0,detailHeight-(bottom-TOP));}
+    @Override public boolean mouseClicked(double x,double y,int button){
+        var binding=SkillBindings.find("key.blacklight.upgrades");
+        if(binding!=null&&SkillBindings.mouse(binding,button)){onClose();return true;}
+        if(button==0){
+            int step=Math.max(14,Math.min(27,(height-54)/Category.values().length));
+            if(x>=4&&x<rail&&y>=TOP&&y<TOP+step*Category.values().length){category=Category.values()[(int)(y-TOP)/step];listScroll=detailScroll=0;rebuild();return true;}
+            if(x>=listX&&x<listX+listWidth&&y>=TOP&&y<bottom){int index=((int)y-TOP+listScroll)/ROW;if(index<entries.size()){select(entries.get(index).id);return true;}}
+            if(category!=Category.ATTRIBUTES&&category!=Category.SETTINGS&&x>=detailX&&x<detailX+detailWidth&&y>=TOP&&y<bottom){
+                int start=TOP-detailScroll+font.split(label(selected),Math.max(50,detailWidth-6)).size()*11+6;
+                if(y>=start&&y<start+previewHeight()+15){if(paused){selectedAt+=System.nanoTime()-pausedAt;paused=false;}else{pausedAt=System.nanoTime();paused=true;}return true;}
+            }
+        }
+        return super.mouseClicked(x,y,button);
+    }
+    @Override public boolean mouseScrolled(double x,double y,double horizontal,double vertical){
+        if(y<TOP||y>bottom)return false;
+        if(x>=detailX&&category!=Category.ATTRIBUTES)detailScroll=Math.clamp(detailScroll-(int)(vertical*26),0,maxDetailScroll());
+        else if(x>=listX)listScroll=Math.clamp(listScroll-(int)(vertical*26),0,maxListScroll());else return false;return true;
+    }
+    @Override public boolean keyPressed(int key,int scan,int mods){
+        if(SkillBindings.matches("key.blacklight.upgrades",key,scan)){onClose();return true;}
+        if(key==GLFW.GLFW_KEY_PAGE_DOWN||key==GLFW.GLFW_KEY_PAGE_UP){detailScroll=Math.clamp(detailScroll+(key==GLFW.GLFW_KEY_PAGE_DOWN?1:-1)*(bottom-TOP-15),0,maxDetailScroll());return true;}
+        if((key==GLFW.GLFW_KEY_DOWN||key==GLFW.GLFW_KEY_UP)&&!entries.isEmpty()){
+            int i=entries.indexOf(entry()),next=Math.clamp(i+(key==GLFW.GLFW_KEY_DOWN?1:-1),0,entries.size()-1);select(entries.get(next).id);listScroll=Math.clamp(next*ROW-(bottom-TOP)/2,0,maxListScroll());return true;
+        }
+        return super.keyPressed(key,scan,mods);
+    }
+    @Override public void removed(){gif.close();}
+    @Override public boolean isPauseScreen(){return false;}
+    private static boolean owned(BlacklightState state,String id){
+        if(state==null)return false;
+        var c=CombatSkill.byId(id);if(c!=null)return state.hasCombatSkill(c);
+        var g=GrowthUpgrade.byId(id);if(g!=null){var p=Minecraft.getInstance().player;return p!=null&&p.getData(ModAttachments.GROWTH).owns(g);}
+        var f=PowerForm.byId(id);if(f!=PowerForm.NONE)return state.hasUnlocked(f);
+        var claw=ClawUpgrade.byId(id);if(claw!=null)return state.hasClawUpgrade(claw);
+        var movement=MovementUpgrade.byId(id);return movement!=null&&state.hasMovementUpgrade(movement);
     }
 }

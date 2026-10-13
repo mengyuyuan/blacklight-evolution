@@ -36,10 +36,22 @@ class DevastatorEffectTimelineTest {
         assertTrue(ordinary.strength()>.5,"A normal Minecraft dive must not need 12 blocks/tick to become visible");
         assertTrue(DevastatorEffectTimeline.flightFov(70,ordinary.tangentGain(),1)>77);
         var longFlight=DevastatorEffectTimeline.flight(10000,1000,4);
-        assertEquals(2D/3,longFlight.tangentGain(),1e-8);
-        assertEquals(98.8149,DevastatorEffectTimeline.flightFov(70,longFlight.tangentGain(),1),.02);
+        assertTrue(longFlight.tangentGain()>2D/3);
+        assertTrue(DevastatorEffectTimeline.flightFov(70,longFlight.tangentGain(),1)>99);
         assertTrue(DevastatorEffectTimeline.flight(100,5,4).tangentGain()
                 >DevastatorEffectTimeline.flight(100,5,2.15).tangentGain(),"Body hold time is not the flight clock");
+    }
+    @Test void extremePressureKeepsGrowingAfterOrdinaryFlightSaturates() {
+        double gain=0,length=0,rush=0;
+        for(double speed:new double[]{2,20,200,2000,20_000,200_000}){
+            var optics=DevastatorEffectTimeline.flight(9_999_999,speed,60);
+            assertTrue(optics.tangentGain()>gain);assertTrue(optics.streakLength()>length);
+            assertTrue(DevastatorEffectTimeline.flightRush(speed)>rush);
+            gain=optics.tangentGain();length=optics.streakLength();rush=DevastatorEffectTimeline.flightRush(speed);
+            assertTrue(DevastatorEffectTimeline.flightFov(70,gain,1)<110);
+        }
+        assertEquals(0,DevastatorEffectTimeline.flightRush(Double.NaN));
+        assertEquals(0,DevastatorEffectTimeline.flightRush(-10));
     }
     @Test void flightOpticsPreserveUserSettingsAndStopAtRealLanding() {
         for(double fov:new double[]{30,70,110,150,170}){

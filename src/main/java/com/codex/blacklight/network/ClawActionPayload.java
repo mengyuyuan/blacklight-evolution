@@ -47,6 +47,7 @@ public record ClawActionPayload(Action action) implements CustomPacketPayload {
 
         public static Action byId(int id) {
             return switch (id) {
+                case 0 -> TOGGLE_CLAWS;
                 case 1 -> ATTACK;
                 case 2 -> GROUND_SPIKE;
                 case 3 -> DASHING_SLICE;
@@ -58,13 +59,7 @@ public record ClawActionPayload(Action action) implements CustomPacketPayload {
                 case 9 -> GRAB;
                 case 10 -> THROW;
                 case 11 -> WEAPON_SPECIAL;
-                default -> {
-                    // Unknown ids fall back to the least powerful action so a corrupt
-                    // or malicious packet cannot silently map to a stronger one.
-                    BlacklightNeoMod.LOGGER.warn(
-                            "Unknown claw action id {}; defaulting to TOGGLE_CLAWS", id);
-                    yield TOGGLE_CLAWS;
-                }
+                default -> throw new IllegalArgumentException("Invalid claw action id: " + id);
             };
         }
     }

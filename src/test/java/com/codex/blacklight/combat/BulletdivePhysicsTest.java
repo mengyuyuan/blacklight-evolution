@@ -7,7 +7,20 @@ class BulletdivePhysicsTest {
     @Test void continuedFallNeverFlattensAtOldTerminalSpeed() {
         assertTrue(BulletdivePhysics.downSpeed(30)>5);
         assertTrue(BulletdivePhysics.downSpeed(600)>BulletdivePhysics.downSpeed(200));
-        assertEquals(.22,BulletdivePhysics.downSpeed(601)-BulletdivePhysics.downSpeed(600),1e-10);
+        assertTrue(BulletdivePhysics.downSpeed(601)-BulletdivePhysics.downSpeed(600)
+                >BulletdivePhysics.downSpeed(201)-BulletdivePhysics.downSpeed(200),"Acceleration itself must keep growing");
+    }
+    @Test void extremeDropDoesNotRequireMinutesOfConstantAcceleration() {
+        double distance=0,previous=0,previousGain=0;int ticks=0;
+        while(distance<9_999_999&&ticks<1600){
+            double speed=BulletdivePhysics.downSpeed(ticks++);
+            assertTrue(Double.isFinite(speed));assertTrue(speed>previous);
+            if(ticks>2)assertTrue(speed-previous>previousGain);
+            previousGain=speed-previous;previous=speed;distance+=speed;
+        }
+        assertTrue(ticks<1200,"Ten-million-block dive should take under a simulated minute");
+        assertTrue(previous>10_000);
+        assertTrue(BulletdivePhysics.downSpeed(ticks+200)>previous);
     }
     @Test void damageContinuesGrowingBeyondOldHeightCaps() {
         assertTrue(BulletdivePhysics.damageMultiplier(1024)>BulletdivePhysics.damageMultiplier(512));

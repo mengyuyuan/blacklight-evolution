@@ -1,6 +1,6 @@
 # Blacklight: Ascension
 
-> **独立开发版 `0.3.0-standalone-dev.10`。** 整合最新感染生物模型、持有生物转向、临界质量、正式毁灭技和子弹俯冲。核心、动作、模型、输入、镜头与服务端同步由黑光自身驱动，运行不再要求 Epic Fight、Epic ParCool 或 Weapons of Miracles。当前验证范围见 [独立化记录](docs/STANDALONE_MIGRATION.md)。
+> **正式版 `0.3.0` · NeoForge 1.21.1。** 整合最新感染生物模型、持有生物转向、临界质量、正式毁灭技和子弹俯冲。核心、动作、模型、输入、镜头与服务端同步由黑光自身驱动，运行不再要求 Epic Fight、Epic ParCool 或 Weapons of Miracles。当前验证范围见 [独立化记录](docs/STANDALONE_MIGRATION.md)。
 
 **黑光：进化 · 作者：末者**
 Minecraft 1.21.1 / NeoForge 的黑光病毒同人 Mod，包含生物武器、抓取吸收、伪装、强化移动、感染生物与组织蜂巢。
@@ -9,9 +9,9 @@ Minecraft 1.21.1 / NeoForge 的黑光病毒同人 Mod，包含生物武器、抓
 
 项目按 Minecraft / 加载器维护独立分支：`main` 为 NeoForge 1.21.1，[`forge-1.20.1`](https://github.com/mengyuyuan/blacklight-evolution/tree/forge-1.20.1) 为 Forge 1.20.1。各版本独立构建、同步和发布；开发贡献请先阅读 [多版本协作规范](docs/MULTIVERSION_WORKFLOW_ZH.md)，可用 [快捷工具](docs/VERSION_TOOLS_ZH.md) 自动准备贡献分支和 PR 说明。
 
-当前为 **0.3.0-standalone-dev.10，独立开发版**，尚未公开发行，也未将完整人工验收标记为通过。项目按现有黑光能力与感染生存玩法收尾，不宣称完整复刻原游戏。以下新增技能的整合针对 NeoForge 1.21.1；Forge 分支的同步范围以其记录为准。
+当前正式版为 **0.3.0 · NeoForge 1.21.1**。包含独立战斗与移动、新武器模型、液态变形、毁灭技、子弹俯冲、技能教程与当前按键显示。构建与验证记录见 [0.3.0 发布说明](docs/RELEASE_0.3.0.md)。本地打包不等同于已上传 GitHub 或其它平台；多人实机、长期性能和整合包兼容性没有全量验收。
 
-**仓库默认资料与完整毁灭技资料分开核对。** `art/motion-profile/` 保留上游的 224 个动作、装甲、受害者、镜头与 HUD 文件，默认 `bundled` 构建打包并检查仓库 SHA-256 清单。它覆盖既有移动、战斗及液态变形，不含本轮完整毁灭技动作。dev.9 完整运行资料为 **251 文件：旧 224 份＋20 份正式毁灭技、俯冲和垂直瞄准动作＋7 份身体恢复动作**，通过 `-PbundleMotionDirectory=<完整资料目录>` 整套替换，产物标为 `external-profile`。本机目录为 `D:/Blacklight-Standalone/motion-profile-dev9`。两类构建的技能动作范围不同；原始 FX 研究资料、网格和贴图不打入运行包。
+默认 `bundled` 包包含完整 **251 份动作与配套数据**，包括大招、俯冲、瞄准、恢复、镜头、HUD 和装甲资料。直接从仓库构建即可获得完整运行资料，不再要求本机外部目录。额外必需 Mod 只有 GeckoLib；不依赖 Epic Fight。原始 FX 研究网格和贴图不进入运行包。
 
 dev.9 同时保留上游的 80 种原版生物贴图与感染结构组合、新的原生模型部件绑定，以及 dev.8 持有生物时按镜头方向移动的修复。
 
@@ -45,7 +45,7 @@ dev.9 同时保留上游的 80 种原版生物贴图与感染结构组合、新�
 
 Blacklight JAR 不内置前置 Mod。请使用上表的明确版本，不以“最新版”代替；可选模组装入后也要满足兼容范围。安装包不是完整游戏或完整整合包。多人客户端和服务端需要匹配的 Mod 版本、依赖与动作资料；联机行为仍待验收。
 
-退出游戏并备份存档、配置，把对应 NeoForge 版本的依赖与 Blacklight JAR 放入实例的 mods 目录，移除旧的 Blacklight JAR，只保留一份。试玩本轮完整毁灭技时使用包含 251 文件资料的 `external-profile` 包；默认 `bundled` 的范围见上文。具体步骤见 [安装文档](docs/INSTALL_ZH.md)。
+退出游戏并备份存档、配置，把对应 NeoForge 版本的依赖与 Blacklight JAR 放入实例的 mods 目录，移除旧的 Blacklight JAR，只保留一份。正式版默认 `bundled` 包包含完整 251 文件资料。具体步骤见 [安装文档](docs/INSTALL_ZH.md)。
 
 ## 生存开始
 

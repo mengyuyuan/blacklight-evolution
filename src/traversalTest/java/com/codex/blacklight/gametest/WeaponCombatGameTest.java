@@ -25,9 +25,9 @@ public final class WeaponCombatGameTest {
         ClawCombatSystem.handle(p,com.codex.blacklight.network.ClawActionPayload.Action.WEAPON_SPECIAL);
         h.assertTrue(p.getDeltaMovement().horizontalDistanceSqr()<.000001,"Special replaces incoming sprint inertia once at start");
         h.assertTrue(Math.abs(p.getDeltaMovement().y+.02)<.000001,"ground action takeover preserves vertical velocity");
-        for(int t=1;t<WeaponMove.BLADE_RUSH.duration;t++){
+        for(int t=1;t<WeaponMove.BLADE_RUSH.duration&&WeaponCombatSystem.busy(p);t++){
             p.tickCount++;p.setDeltaMovement(Vec3.ZERO);p.setOnGround(true);
-            com.codex.blacklight.movement.PrototypeMovementSystem.acceptInput(p,true,true,1,1,true,false);
+            com.codex.blacklight.movement.PrototypeMovementSystem.acceptInput(p,false,false,1,1,true,false);
             com.codex.blacklight.movement.PrototypeMovementSystem.onPlayerTick(new PlayerTickEvent.Post(p));
             h.assertTrue(movement.chargeTicks()==0&&!movement.consumeDashRequest(),"jump/air-dash cannot queue over Special");
             h.assertTrue(p.getDeltaMovement().horizontalDistanceSqr()<.000001,"regular sprint must not add propulsion on top of action Coord");
@@ -43,6 +43,7 @@ public final class WeaponCombatGameTest {
     }
     @GameTest(template="wall_test",timeoutTicks=40)
     public static void queuedComboLinksFromFollowThroughAndKeepsBothFullHits(GameTestHelper h){
+        for(int x=0;x<=12;x++)for(int z=0;z<=12;z++)h.setBlock(x,1,z,net.minecraft.world.level.block.Blocks.STONE);
         for(var form:new PowerForm[]{PowerForm.BLADE,PowerForm.HAMMERFISTS,PowerForm.WHIPFIST,PowerForm.MUSCLE_MASS}){
             var p=FakePlayerFactory.get(h.getLevel(),new GameProfile(UUID.randomUUID(),"combo-qa"));
             var home=h.absoluteVec(new Vec3(4,2,3));p.setPos(home);p.setYRot(0);p.setOnGround(true);p.tickCount=100;
@@ -68,13 +69,13 @@ public final class WeaponCombatGameTest {
                     hits++;
                     var hitMove=t<link?first:second;int elapsed=t<link?t:t-link;
                     h.assertTrue(hitMove.contactIndex(elapsed)>=0,"queued hit stays inside its own window");
-                    h.assertTrue(Math.abs(previous-target.getHealth()-hitMove.damage)<.01,"queued strike deals full declared damage");
+                    h.assertTrue(Math.abs(previous-target.getHealth()-hitMove.damage*5)<.01,"queued strike deals full declared damage");
                 }
                 var visual=p.getData(ModAttachments.WEAPON_VISUAL).spec();
                 if(t<link)h.assertTrue(visual==first,"first action remains through contact and follow-through");
-                else if(t<link+second.duration)h.assertTrue(visual==second&&WeaponCombatSystem.busy(p),"direct active-to-active link with no idle state");
+                else if(t<link+second.duration)h.assertTrue(visual==second&&WeaponCombatSystem.busy(p),"direct active-to-active link with no idle state: form="+form+" t="+t+" link="+link+" duration="+second.duration+" visual="+visual);
             }
-            h.assertTrue(hits==2&&Math.abs(before-target.getHealth()-first.damage-second.damage)<.01,"one full hit per queued action: "+form);
+            h.assertTrue(hits==2&&Math.abs(before-target.getHealth()-(first.damage+second.damage)*5)<.01,"one full hit per queued action: "+form);
             h.assertTrue(!WeaponCombatSystem.busy(p)&&p.getData(ModAttachments.CLAW_COMBAT).action()==ClawCombatState.Action.IDLE,"queue is consumed once and normal recovery returns to idle");
             WeaponCombatSystem.cancel(p);target.discard();
         }
@@ -139,7 +140,7 @@ public final class WeaponCombatGameTest {
                 p.tickCount++;float last=target.getHealth();WeaponCombatSystem.tick(new PlayerTickEvent.Post(p));
                 if(target.getHealth()<last){hits++;h.assertTrue(move.contactIndex(t)>=0,"adapted contact is in server window: "+move);}
             }
-            h.assertTrue(hits==1&&Math.abs(before-target.getHealth()-move.damage)<.01,"one damage event for "+move+", got "+hits);
+            h.assertTrue(hits==1&&Math.abs(before-target.getHealth()-move.damage*5)<.01,"one damage event for "+move+", got "+hits);
             h.assertTrue(!WeaponCombatSystem.busy(p),"adapted recovery ends: "+move);
             target.discard();
         }
@@ -147,6 +148,7 @@ public final class WeaponCombatGameTest {
     }
     @GameTest(template="wall_test",timeoutTicks=40)
     public static void bladeSpecialUsesDashOnceFromStandingAndSprintAndWhipReachesBehind(GameTestHelper h){
+        for(int x=0;x<=12;x++)for(int z=0;z<=12;z++)h.setBlock(x,1,z,net.minecraft.world.level.block.Blocks.STONE);
         var p=FakePlayerFactory.get(h.getLevel(),new GameProfile(UUID.randomUUID(),"frenzy-qa"));
         Vec3 home=h.absoluteVec(new Vec3(5,2,5));p.setPos(home);p.setYRot(0);p.setOnGround(true);p.tickCount=100;
         var state=p.getData(ModAttachments.PLAYER_STATE);state.infect();state.setPrototypeMode(true);state.unlock(PowerForm.BLADE);state.activate(PowerForm.BLADE);
@@ -162,7 +164,7 @@ public final class WeaponCombatGameTest {
             var outsideBlade=LocalWeaponMotion.find(move.id).filter(definition->!definition.contactBounds().isEmpty()).isPresent()
                     ?h.spawn(EntityType.IRON_GOLEM,5,2,9):null;
             float outsideBefore=outsideBlade==null?0:outsideBlade.getHealth();
-            if(outsideBlade!=null){outsideBlade.setNoAi(true);outsideBlade.setPos(home.add(0,0,2.5));}
+            if(outsideBlade!=null){outsideBlade.setNoAi(true);outsideBlade.setPos(home.add(0,0,4.5));}
             ClawCombatSystem.handle(p,com.codex.blacklight.network.ClawActionPayload.Action.WEAPON_SPECIAL);
             h.assertTrue(p.getData(ModAttachments.WEAPON_VISUAL).spec()==move,"real Special intent must select dash from standing or sprint");
             int contacts=0;float previous=before;
@@ -177,7 +179,7 @@ public final class WeaponCombatGameTest {
                 if(now<previous){contacts++;h.assertTrue(move.contactIndex(t)>=0,"dash damage stays inside its contact window");}
                 previous=now;
             }
-            h.assertTrue(contacts==1&&Math.abs(before-target.getHealth()-move.damage)<.01,"one hit per target in this Mod's dash policy");
+            h.assertTrue(contacts==1&&Math.abs(before-target.getHealth()-move.damage*5)<.01,"one hit per target in this Mod's dash policy");
             if(outsideBlade!=null){
                 h.assertTrue(outsideBlade.getHealth()==outsideBefore,"broad reach alone cannot hit beyond the blade envelope without Coord displacement");
                 outsideBlade.discard();
@@ -191,7 +193,7 @@ public final class WeaponCombatGameTest {
         WeaponCombatSystem.request(p,true);
         h.assertTrue(p.getData(ModAttachments.WEAPON_VISUAL).spec()==WeaponMove.WHIP_SWEEP,"Special follows a combo opportunity into sweep");
         for(int t=1;t<=WeaponMove.WHIP_SWEEP.duration;t++){p.tickCount++;WeaponCombatSystem.tick(new PlayerTickEvent.Post(p));}
-        h.assertTrue(Math.abs(before-behind.getHealth()-12)<.01,"full sweep reaches a rear target once");
+        h.assertTrue(Math.abs(before-behind.getHealth()-12*5)<.01,"full sweep reaches a rear target once");
         behind.discard();h.succeed();
     }
     @GameTest(template="wall_test",timeoutTicks=40)

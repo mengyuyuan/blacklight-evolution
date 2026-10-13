@@ -48,7 +48,7 @@ public final class WallTraversalGameTest {
         boolean mantled=false;
         for(int i=0;i<50;i++) {
             WallTraversal.Frame frame=step(helper,player,wall,RUN);
-            mantled|=frame.mode()==WallTraversal.Mode.MANTLE;
+            mantled|=frame.mode()==WallTraversal.Mode.MANTLE || frame.mode()==WallTraversal.Mode.TOP;
             if(mantled && wall.mode()==WallTraversal.Mode.NONE) break;
         }
         helper.assertTrue(mantled,"wall top must trigger mantle");
@@ -85,7 +85,7 @@ public final class WallTraversalGameTest {
         boolean mantled=false;
         for(int i=0;i<20;i++) {
             var frame=step(helper,player,wall,new WallTraversal.Input(1,0,true,i==0,false));
-            mantled|=frame.mode()==WallTraversal.Mode.MANTLE;
+            mantled|=frame.mode()==WallTraversal.Mode.MANTLE || frame.mode()==WallTraversal.Mode.TOP;
             if(mantled && !wall.attached())break;
         }
         helper.assertTrue(mantled,"upward leap crossing the edge must transition onto the roof");

@@ -21,8 +21,8 @@ public final class GameplayProgressionGameTest {
         var p=FakePlayerFactory.get(h.getLevel(),new GameProfile(UUID.randomUUID(),"growth-qa"));
         var state=p.getData(ModAttachments.PLAYER_STATE);state.infect();state.addBiomass(750);
         GrowthSystem.purchase(p,GrowthUpgrade.VITALITY);int balance=state.getBiomass();
-        h.assertTrue(balance==800&&p.getMaxHealth()==24,"vitality spends biomass and increases max health");
-        GrowthSystem.purchase(p,GrowthUpgrade.VITALITY);h.assertTrue(state.getBiomass()==balance&&p.getMaxHealth()==24,"repeat purchase cannot spend or stack");
+        h.assertTrue(balance==800&&p.getMaxHealth()==150,"vitality spends biomass and increases max health");
+        GrowthSystem.purchase(p,GrowthUpgrade.VITALITY);h.assertTrue(state.getBiomass()==balance&&p.getMaxHealth()==150,"repeat purchase cannot spend or stack");
         var types=java.util.List.of(ModEntities.BLACKLIGHT_STALKER,ModEntities.BLACKLIGHT_SPITTER,ModEntities.BLACKLIGHT_BRUTE);
         for(var type:types){var mob=type.get().create(h.getLevel());GrowthSystem.consumed(p,mob);mob.discard();}
         h.assertTrue(state.hasUnlocked(PowerForm.BLADE)&&state.hasUnlocked(PowerForm.WHIPFIST)&&state.hasUnlocked(PowerForm.HAMMERFISTS),"three genes unlock three weapons");
@@ -41,7 +41,7 @@ public final class GameplayProgressionGameTest {
         h.assertTrue(WeaponCombatSystem.busy(p)&&mob.getHealth()==hp,"long descent stays committed without early damage");
         p.setPos(h.absoluteVec(new Vec3(4,2,4)));p.setOnGround(true);
         for(int t=0;t<WeaponMove.HAMMER_DROP.duration+2;t++){p.tickCount++;WeaponCombatSystem.tick(new PlayerTickEvent.Post(p));}
-        h.assertTrue(mob.getHealth()==hp-WeaponMove.HAMMER_DROP.damage,"landing contacts exactly once");
+        h.assertTrue(mob.getHealth()==hp-WeaponMove.HAMMER_DROP.damage*5,"landing contacts exactly once");
         h.assertTrue(!WeaponCombatSystem.busy(p),"landing recovery ends");mob.discard();h.succeed();
     }
     @GameTest(template="wall_test",timeoutTicks=40)
@@ -57,7 +57,7 @@ public final class GameplayProgressionGameTest {
     @GameTest(template="wall_test",timeoutTicks=40)
     public static void survivalRecipeAndGuidanceAreLoaded(GameTestHelper h){
         var id=net.minecraft.resources.ResourceLocation.fromNamespaceAndPath("blacklight","blacklight_sample");
-        h.assertTrue(h.getLevel().getRecipeManager().byKey(id).isPresent(),"virus sample survival recipe loads");
+        h.assertTrue(h.getLevel().getRecipeManager().byKey(id).isEmpty(),"RC18 removes the obsolete virus sample crafting recipe");
         for(String name:new String[]{"root","awakening","first_consume","first_evolution","hive_breaker"})h.assertTrue(h.getLevel().getServer().getAdvancements().get(net.minecraft.resources.ResourceLocation.fromNamespaceAndPath("blacklight",name))!=null,"growth guide loads "+name);
         h.succeed();
     }
@@ -68,7 +68,7 @@ public final class GameplayProgressionGameTest {
         h.assertTrue(!PowerFormSystem.select(p,PowerForm.ARMOR,false),"locked defence cannot be selected");
         s.unlock(PowerForm.ARMOR);s.unlock(PowerForm.SHIELD);s.unlock(PowerForm.INFECTED_VISION);
         h.assertTrue(PowerFormSystem.select(p,PowerForm.ARMOR,false),"unlocked armour equips");p.tickCount+=20;
-        h.assertTrue(s.getActivePower()==PowerForm.BLADE&&p.getArmorValue()==12,"armour preserves weapon and adds defence");
+        h.assertTrue(s.getActivePower()==PowerForm.BLADE&&UtilityPowerSystem.active(p,PowerForm.ARMOR)&&p.getArmorValue()==0,"armour preserves weapon without adding legacy vanilla armour");
         PowerFormSystem.select(p,PowerForm.INFECTED_VISION,false);p.tickCount+=20;
         h.assertTrue(UtilityPowerSystem.active(p,PowerForm.ARMOR)&&UtilityPowerSystem.active(p,PowerForm.INFECTED_VISION),"vision and armour coexist");
         PowerFormSystem.select(p,PowerForm.SHIELD,false);

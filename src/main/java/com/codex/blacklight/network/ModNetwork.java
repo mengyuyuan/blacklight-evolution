@@ -19,13 +19,14 @@ public final class ModNetwork {
     }
 
     public static void register(RegisterPayloadHandlersEvent event) {
-        event.registrar("standalone-5")
+        event.registrar("standalone-6")
                 .playToServer(SkillSettingsPayload.TYPE,SkillSettingsPayload.STREAM_CODEC,(payload,context)->
                     context.enqueueWork(()->{
                         if(context.player() instanceof ServerPlayer player){
                             player.setData(com.codex.blacklight.registry.ModAttachments.SKILL_SETTINGS,
-                                    new com.codex.blacklight.power.SkillSettings(payload.bulletdiveBlockBreaking()));
-                            com.codex.blacklight.combat.BulletdiveTerrain.settingsChanged(player);
+                                    payload.apply(player.getData(com.codex.blacklight.registry.ModAttachments.SKILL_SETTINGS)));
+                            if(payload.setting()==SkillSettingsPayload.Setting.BULLETDIVE_BLOCKS)
+                                com.codex.blacklight.combat.BulletdiveTerrain.settingsChanged(player);
                             player.syncData(com.codex.blacklight.registry.ModAttachments.SKILL_SETTINGS);
                         }
                     }))

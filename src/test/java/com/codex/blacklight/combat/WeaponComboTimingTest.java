@@ -4,15 +4,16 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 class WeaponComboTimingTest {
-    @Test void basicLinksKeepActiveFramesAndVanillaHurtResistance() {
+    @Test void basicLinksKeepEveryActiveContactAndACompleteNextAttack() {
         for(var move:WeaponMove.values()) {
             assertTrue(move.comboBufferTick()>0&&move.comboBufferTick()<=move.start,move.id);
             assertTrue(move.comboLinkTick()>=move.end,move.id+" cannot skip contact");
             var next=move.nextAttack()!=null?move.nextAttack():move.nextSpecial();
             if(next==null){assertEquals(move.duration,move.comboLinkTick());continue;}
             assertTrue(move.comboLinkTick()<=move.duration,move.id+" link cannot outlive recovery");
-            assertTrue(move.comboLinkTick()+next.start-(move.end-1)>=10,
-                    move.id+" late hit must permit the next full-damage contact");
+            // Same-owner combos have their own hit ledger; they deliberately
+            // bypass that owner's preceding hurt cooldown (covered in GameTests).
+            assertTrue(move.comboLinkTick()+next.start>move.end,move.id+" contacts cannot overlap");
             assertNotEquals(move,next);
             assertTrue(move.form==next.form||next.form==com.codex.blacklight.power.PowerForm.NONE
                             ||move==WeaponMove.COMBO_KICK1&&next==WeaponMove.MUSCLE_COMBO_C,

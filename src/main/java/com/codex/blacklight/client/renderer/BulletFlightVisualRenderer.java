@@ -42,7 +42,8 @@ public final class BulletFlightVisualRenderer {
         Vec3 origin=owner.getPosition(partial),motion=owner.getDeltaMovement();
         double seconds=Math.max(0,(owner.level().getGameTime()-visual.released()+partial)/20D-1D/6);
         double height=Math.max(visual.fallHeight(),Math.max(0,visual.origin().y-origin.y));
-        double speed=Math.max(visual.downSpeed(),Math.max(0,-motion.y));
+        double speed=Math.max(com.codex.blacklight.combat.BulletdivePhysics.downSpeed(seconds*20),
+                Math.max(visual.downSpeed(),Math.max(0,-motion.y)));
         var optics=DevastatorEffectTimeline.flight(height,speed,seconds+1D/6);
         var airflow=new Vec3(-motion.x,Math.max(.01,speed),-motion.z).normalize();
         return new Frame(visual.session(),seconds,height,speed,origin,airflow,optics);
@@ -65,7 +66,9 @@ public final class BulletFlightVisualRenderer {
         var mc=Minecraft.getInstance();var camera=event.getCamera().getPosition();
         if(flight.origin.distanceToSqr(camera)>96*96)return EMPTY;
         var buffers=mc.renderBuffers().bufferSource();var stack=event.getPoseStack();
-        stack.pushPose();stack.translate(-camera.x,-camera.y,-camera.z);
+        // Subtract the camera in double precision BEFORE the vertex float cast.
+        // At y=9,999,999 absolute float vertices otherwise snap by whole blocks.
+        stack.pushPose();
         int air=0,tissue=0,shock=0;
         var airMaterial=RenderType.entityTranslucentEmissive(ConsumedMobVisuals.WHITE);
         int light=mc.getEntityRenderDispatcher().getPackedLightCoords(owner,event.getPartialTick().getGameTimeDeltaPartialTick(false));
@@ -82,10 +85,38 @@ public final class BulletFlightVisualRenderer {
                 Vec3 start=airStart(flight,i);
                 Vec3 end=start.add(flight.airflow.scale(flight.optics.streakLength()*(.65+.35*noise(i+3,flight.session))));
                 Vec3 across=new Vec3(-Math.sin(angle),0,Math.cos(angle)).scale(.013+.019*flight.optics.strength());
-                int alpha=(int)(255*flight.optics.airAlpha()*edge);
-                quad(stack,out,start.subtract(across),start.add(across),end.add(across),end.subtract(across),
+                int alpha=(int)(255*flight.optics.airAlpha()*edge/(1+flight.speed/20));
+                quad(stack,out,camera,start.subtract(across),start.add(across),end.add(across),end.subtract(across),
                         alpha<<24|0xD5DEE2,light,.65F);
                 air++;
+            }
+            double rush=DevastatorEffectTimeline.flightRush(flight.speed);
+            // A second pressure shell has a continuous optical clock: using
+            // height modulo six at thousands of blocks/tick aliases into flashes.
+            // This bounds optical frequency and geometry, never physical speed.
+            for(int i=0;i<32&&4*(air+shock)+4<=budget;i++){
+                double angle=i*2.3999632297,phase=mod(flight.seconds*(1.5+2*rush)+i*.618033989,1);
+                double radius=1.15+1.5*noise(i+31,flight.session),edge=Math.sin(Math.PI*phase);
+                Vec3 start=flight.origin.add(Math.cos(angle)*radius,-2+phase*14,Math.sin(angle)*radius);
+                Vec3 end=start.add(flight.airflow.scale(1+6*rush));
+                Vec3 side=new Vec3(-Math.sin(angle),0,Math.cos(angle)).scale(.02+.035*rush);
+                quad(stack,out,camera,start.subtract(side),start.add(side),end.add(side),end.subtract(side),
+                        (int)(125*rush*edge)<<24|0xD5E2E7,light,.7F);air++;
+            }
+            // Repeated pressure waves trail the actor throughout a long dive.
+            for(int ring=0;ring<3&&rush>.08;ring++){
+                double phase=mod(flight.seconds*(.9+1.8*rush)+ring/3D,1);
+                double radius=.65+phase*(1.7+1.8*rush),thickness=.055+.06*rush;
+                Vec3 centre=flight.origin.add(flight.airflow.scale(.3+phase*8));
+                int colour=(int)(100*rush*Math.sin(Math.PI*phase))<<24|0xD2E2E8;
+                for(int i=0;i<12&&4*(air+shock)+4<=budget;i++){
+                    double a=i*Math.PI/6,b=(i+1)*Math.PI/6;
+                    quad(stack,out,camera,centre.add(Math.cos(a)*radius,0,Math.sin(a)*radius),
+                            centre.add(Math.cos(b)*radius,0,Math.sin(b)*radius),
+                            centre.add(Math.cos(b)*(radius+thickness),0,Math.sin(b)*(radius+thickness)),
+                            centre.add(Math.cos(a)*(radius+thickness),0,Math.sin(a)*(radius+thickness)),colour,light,.8F);
+                    shock++;
+                }
             }
             // shockWave001: entry .033333.. .666667 plus .5s fade, recreated as
             // a thin square/octagonal world ring rather than a colored screen bar.
@@ -94,7 +125,7 @@ public final class BulletFlightVisualRenderer {
                 Vec3 centre=flight.origin.add(0,.18,0);
                 for(int i=0;i<8&&4*(air+shock)+4<=budget;i++){
                     double a=i*Math.PI/4,b=(i+1)*Math.PI/4;
-                    quad(stack,out,centre.add(Math.cos(a)*radius,0,Math.sin(a)*radius),
+                    quad(stack,out,camera,centre.add(Math.cos(a)*radius,0,Math.sin(a)*radius),
                             centre.add(Math.cos(b)*radius,0,Math.sin(b)*radius),
                             centre.add(Math.cos(b)*(radius+thickness),0,Math.sin(b)*(radius+thickness)),
                             centre.add(Math.cos(a)*(radius+thickness),0,Math.sin(a)*(radius+thickness)),
@@ -113,7 +144,7 @@ public final class BulletFlightVisualRenderer {
                 out=buffers.getBuffer(material);
                 for(int joint=0;joint<points.length;joint++){
                     double phase=flight.seconds*Math.PI*2/(joint<3?1.666667:.91)+joint*.73;
-                    double length=.45+1.4*flight.optics.strength(),width=(joint<3?.036:.024)*(1+.12*Math.sin(phase));
+                    double length=.45+1.4*flight.optics.strength()+4*rush,width=(joint<3?.036:.024)*(1+.12*Math.sin(phase));
                     Vec3 side=new Vec3(Math.cos(joint*2.2),0,Math.sin(joint*2.2));
                     for(int segment=0;segment<5&&4*(air+shock+tissue)+4<=budget;segment++){
                         double a=segment/5D,b=(segment+1)/5D;
@@ -121,7 +152,7 @@ public final class BulletFlightVisualRenderer {
                         Vec3 end=points[joint].add(flight.airflow.scale(length*b)).add(side.scale(Math.sin(phase+b*4)*.045*b));
                         Vec3 spread=side.scale(width*(1-.65*a));
                         int alpha=(int)(210*flight.optics.strength()*(1-b*.8));
-                        quad(stack,out,start.subtract(spread),start.add(spread),end.add(spread.scale(1-.12)),end.subtract(spread.scale(1-.12)),
+                        quad(stack,out,camera,start.subtract(spread),start.add(spread),end.add(spread.scale(1-.12)),end.subtract(spread.scale(1-.12)),
                                 alpha<<24|(segment%3==1?0x500D17:0x19212B),light,.92F);
                         tissue++;
                     }
@@ -136,9 +167,9 @@ public final class BulletFlightVisualRenderer {
                 flight.optics.strength(),air,tissue,shock,quads*4,nearEnvironment(owner,flight.origin));
         return new Draw(quads*4,quads);
     }
-    private static void quad(PoseStack stack,VertexConsumer out,Vec3 a,Vec3 b,Vec3 c,Vec3 d,int colour,int light,float wet){
+    private static void quad(PoseStack stack,VertexConsumer out,Vec3 camera,Vec3 a,Vec3 b,Vec3 c,Vec3 d,int colour,int light,float wet){
         var normal=b.subtract(a).cross(d.subtract(a)).normalize();
-        for(var point:new Vec3[]{a,b,c,d})out.addVertex(stack.last(),(float)point.x,(float)point.y,(float)point.z)
+        for(var point:new Vec3[]{a,b,c,d})out.addVertex(stack.last(),(float)(point.x-camera.x),(float)(point.y-camera.y),(float)(point.z-camera.z))
                 .setColor(colour).setUv(wet,.5F).setOverlay(OverlayTexture.NO_OVERLAY).setLight(light)
                 .setNormal(stack.last(),(float)normal.x,(float)normal.y,(float)normal.z);
     }

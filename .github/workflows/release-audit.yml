@@ -1,0 +1,40 @@
+name: Release audit (NeoForge 1.21.1)
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        suite: [unit, server]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+      - uses: gradle/actions/setup-gradle@v4
+      - name: Unit tests, standalone boundary and distribution
+        if: matrix.suite == 'unit'
+        run: bash ./gradlew test verifyStandaloneBoundary assemble --continue --no-daemon
+      - name: Dedicated GameTest server
+        if: matrix.suite == 'server'
+        run: >-
+          bash ./gradlew runGameTestServer
+          -PstandaloneTest -PwallTraversalTest -PhiveFeedingTest -PreleaseAuditTest
+          -PgameTestRunDirectory=build/release-audit-server --no-daemon
+      - name: Keep audit evidence even on failure
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-audit-${{ matrix.suite }}
+          path: |
+            build/reports/
+            build/test-results/
+            build/release-audit-server/logs/

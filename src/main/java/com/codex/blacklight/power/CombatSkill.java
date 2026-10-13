@@ -10,7 +10,10 @@ public enum CombatSkill {
     CRITICAL_PAIN("critical_pain", 1 << 5, 650, CRITICAL_MASS),
     CRITICAL_MASS_BOOST_1("critical_mass_boost_1", 1 << 6, 350, CRITICAL_MASS),
     CRITICAL_MASS_BOOST_2("critical_mass_boost_2", 1 << 7, 500, CRITICAL_MASS_BOOST_1),
-    CRITICAL_MASS_BOOST_3("critical_mass_boost_3", 1 << 8, 700, CRITICAL_MASS_BOOST_2);
+    CRITICAL_MASS_BOOST_3("critical_mass_boost_3", 1 << 8, 700, CRITICAL_MASS_BOOST_2),
+    SHIELD_BORER("shield_borer", 1 << 9, 350, null),
+    SHIELD_BORER_BOOST_1("shield_borer_boost_1", 1 << 10, 250, SHIELD_BORER),
+    SHIELD_BORER_BOOST_2("shield_borer_boost_2", 1 << 11, 450, SHIELD_BORER_BOOST_1);
 
     private final String id;
     private final int bit, epCost;
@@ -23,6 +26,8 @@ public enum CombatSkill {
     public int bit() { return bit; }
     public int epCost() { return epCost; }
     public CombatSkill requires() { return requires; }
+    public boolean shieldBorer() { return this==SHIELD_BORER||this==SHIELD_BORER_BOOST_1||this==SHIELD_BORER_BOOST_2; }
+    public PowerForm powerRequires() { return shieldBorer() ? PowerForm.SHIELD : null; }
     public MovementUpgrade movementRequires() { return this == BULLETDIVE_DROP ? MovementUpgrade.GLIDE_1 : null; }
     /** Each verified +400 source-health boost adds one base Devastator cost of storage. */
     public static int criticalMassCapacity(int mask) {

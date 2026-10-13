@@ -93,6 +93,8 @@ public final class VisionPowerRenderer {
         float partial = e.getPartialTick().getGameTimeDeltaPartialTick(false);
         int mode = transition(mc, partial);
         if (mode == 0 || strength <= 0) return;
+        var savedProjection = new org.joml.Matrix4f(com.mojang.blaze3d.systems.RenderSystem.getProjectionMatrix());
+        var savedSorting = com.mojang.blaze3d.systems.RenderSystem.getVertexSorting();
         mc.renderBuffers().bufferSource().endBatch();
         colourWorld(mc, mode, partial);
         double radius = mode == 2 ? 32 : 24;
@@ -102,6 +104,14 @@ public final class VisionPowerRenderer {
         targets.sort(java.util.Comparator.comparingDouble(mc.player::distanceToSqr));
         var buffer = mc.renderBuffers().bufferSource();
         var camera = e.getCamera().getPosition();
+        // AFTER_LEVEL runs after LevelRenderer has popped the camera matrix.
+        // PostChain also replaces projection state. Re-establish both while
+        // drawing silhouettes, then return the caller's state even on failure.
+        var view = com.mojang.blaze3d.systems.RenderSystem.getModelViewStack();
+        view.pushMatrix();
+        view.set(e.getModelViewMatrix());
+        com.mojang.blaze3d.systems.RenderSystem.applyModelViewMatrix();
+        com.mojang.blaze3d.systems.RenderSystem.setProjectionMatrix(e.getProjectionMatrix(), VertexSorting.DISTANCE_TO_ORIGIN);
         drawing = true;
         try {
             for (var target : targets.subList(0, Math.min(48, targets.size()))) {
@@ -115,10 +125,23 @@ public final class VisionPowerRenderer {
                 // Non-entity buffers include labels, fire and debug effects; omit them from this pass.
                 var discard = new Tint(null, 0, 0, false, 0, 1, false);
                 MultiBufferSource colored = type -> type.format() == DefaultVertexFormat.NEW_ENTITY && type.mode() == VertexFormat.Mode.QUADS ? tint : discard;
-                mc.getEntityRenderDispatcher().render(target, pos.x, pos.y, pos.z, target.getYRot(), partial, e.getPoseStack(), colored, LightTexture.FULL_BRIGHT);
+                // Render only the model. Dispatcher.render also submits its
+                // shadow as NEW_ENTITY quads, which turned the floor orange.
+                var renderer=mc.getEntityRenderDispatcher().getRenderer(target);
+                var offset=renderer.getRenderOffset(target,partial);
+                var stack=e.getPoseStack();stack.pushPose();
+                try{
+                    stack.translate(pos.x+offset.x,pos.y+offset.y,pos.z+offset.z);
+                    renderer.render(target,target.getYRot(),partial,stack,colored,LightTexture.FULL_BRIGHT);
+                }finally{stack.popPose();}
             }
         } finally {
-            try { buffer.endBatch(); } finally { drawing = false; }
+            try { buffer.endBatch(); } finally {
+                drawing = false;
+                view.popMatrix();
+                com.mojang.blaze3d.systems.RenderSystem.applyModelViewMatrix();
+                com.mojang.blaze3d.systems.RenderSystem.setProjectionMatrix(savedProjection,savedSorting);
+            }
         }
     }
     private static final class Tint implements VertexConsumer {

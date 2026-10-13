@@ -25,13 +25,13 @@ public final class HunterGameTest {
         z.setCustomName(Component.literal("conversion-check"));z.setHealth(10);z.setItemSlot(EquipmentSlot.MAINHAND,Items.IRON_SWORD.getDefaultInstance());
         var box=z.getBoundingBox().inflate(3);
         h.assertTrue(BlacklightInfectionSystem.infect(z,null),"infection must start");
-        float expectedHealth = 48 * z.getHealth() / z.getMaxHealth();
+        float expectedRatio = z.getHealth() / z.getMaxHealth();
         h.runAfterDelay(35,()->h.assertTrue(!z.isRemoved(),"must wait for infection animation"));
         h.runAfterDelay(65,()->{
-            var list=h.getLevel().getEntitiesOfClass(BlacklightHunter.class,box);
+            var list=h.getLevel().getEntitiesOfClass(com.codex.blacklight.entity.BlacklightInfectedHost.class,box);
             h.assertTrue(z.isRemoved() && list.size()==1,"must replace zombie exactly once");
             var hunter=list.getFirst();
-            h.assertTrue(Math.abs(hunter.getHealth()-expectedHealth)<.01 && hunter.isPersistenceRequired(),"conversion must preserve health ratio and persistence");
+            h.assertTrue(Math.abs(hunter.getHealth()/hunter.getMaxHealth()-expectedRatio)<.01 && hunter.isPersistenceRequired(),"conversion must preserve health ratio and persistence");
             h.assertTrue(hunter.getMainHandItem().is(Items.IRON_SWORD) && hunter.getName().getString().equals("conversion-check"),"name and equipment must survive");
             h.assertTrue(BlacklightInfectionSystem.isInfected(hunter) && !hunter.hasEffect(ModEffects.BLACKLIGHT_INFECTION),"new species is inherently infected, without buff");
             h.assertTrue(!BlacklightInfectionSystem.infect(hunter,null),"hunter cannot be reinfected");h.succeed();
@@ -60,17 +60,18 @@ public final class HunterGameTest {
         h.assertTrue(!other.getData(ModAttachments.CONSUMING),"second player cannot steal claim");
         for(int i=0;i<com.codex.blacklight.combat.ConsumeVisual.captureDuration(p.getData(ModAttachments.PLAYER_STATE).getActivePower());i++){p.tickCount++;ConsumeSystem.tick(new PlayerTickEvent.Post(p));}
         ConsumeSystem.consume(p);ConsumeSystem.consume(p);
-        for(int i=0;i<ConsumeSystem.DURATION-1;i++){p.tickCount++;ConsumeSystem.tick(new PlayerTickEvent.Post(p));}
+        for(int i=0;i<com.codex.blacklight.combat.HunterConsume.COMPLETE_TICKS-1;i++){p.tickCount++;ConsumeSystem.tick(new PlayerTickEvent.Post(p));}
         h.assertTrue(!target.isRemoved()&&p.getHealth()==10,"no early removal or reward");
         p.tickCount++;ConsumeSystem.tick(new PlayerTickEvent.Post(p));ConsumeSystem.tick(new PlayerTickEvent.Post(p));
-        h.assertTrue(target.isRemoved()&&p.getHealth()==18,"completed consumption removes victim and heals");
+        h.assertTrue(target.isConsumeRemains()&&p.getHealth()==18,"completed consumption removes victim and heals");
         h.assertTrue(p.getData(ModAttachments.PLAYER_STATE).getBiomass()==biomass+120 && p.getData(ModAttachments.PLAYER_STATE).getEvolutionPoints()==30,"reward exactly once");
         h.assertTrue(!p.getData(ModAttachments.CONSUMING),"action lock must clear");h.succeed();
     }
     @GameTest(template="wall_test", timeoutTicks=30)
     public static void healthyFarAndInterruptedTargetsGiveNoReward(GameTestHelper h) {
         var p=player(h);var target=victim(h);target.setNoAi(false);target.setHealth(48);
-        ConsumeSystem.request(p);h.assertTrue(!target.isBeingConsumed(),"healthy hunter cannot be consumed");
+        ConsumeSystem.request(p);h.assertTrue(target.isBeingConsumed(),"RC16 hunter original health below 50 allows direct capture");
+        ConsumeSystem.cancel(p);
         target.setHealth(10);ConsumeSystem.request(p);h.assertTrue(target.isBeingConsumed(),"weak target can be claimed");
         var saved=new net.minecraft.nbt.CompoundTag();target.addAdditionalSaveData(saved);
         h.assertTrue(!saved.getBoolean("NoAI"),"transient grab must not persist disabled AI");
@@ -86,7 +87,7 @@ public final class HunterGameTest {
         var hunter=h.spawn(ModEntities.BLACKLIGHT_HUNTER.get(),3,2,3);
         var victim=h.spawn(EntityType.VILLAGER,3,2,4);victim.setNoAi(true);hunter.setTarget(victim);
         h.runAfterDelay(30,()->{
-            h.assertTrue(victim.getHealth()==13,"heavy swipe must deal one 7-point hit, without the old infection tick double-hit: "+victim.getHealth());
+            h.assertTrue(victim.getHealth()==65,"heavy swipe must deal one 7-point hit, without the old infection tick double-hit: "+victim.getHealth());
             hunter.discard();victim.discard();h.succeed();
         });
     }
@@ -117,7 +118,9 @@ public final class HunterGameTest {
         var restored=ModEntities.BLACKLIGHT_HUNTER.get().create(h.getLevel());restored.load(tag);
         h.assertTrue(!restored.isBeingConsumed()&&!restored.isNoAi(),"reload clears transient capture and restores original AI");
         h.assertTrue(target.hurt(target.damageSources().generic(),1),"real damage must reach the victim");
-        h.assertTrue(!target.isBeingConsumed()&&!target.isNoAi()&&!p.getData(ModAttachments.CONSUMING),"damage must cancel capture immediately");
+        h.assertTrue(target.isBeingConsumed()&&p.getData(ModAttachments.CONSUMING),"RC49 nonlethal damage keeps the claim");
+        target.kill();p.tickCount++;ConsumeSystem.tick(new PlayerTickEvent.Post(p));
+        h.assertTrue(!p.getData(ModAttachments.CONSUMING),"death releases capture without rewards");
         h.assertTrue(p.getData(ModAttachments.PLAYER_STATE).getEvolutionPoints()==0,"interrupted consumption must not pay");h.succeed();
     }
 }

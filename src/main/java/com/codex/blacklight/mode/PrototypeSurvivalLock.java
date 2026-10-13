@@ -4,11 +4,8 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.neoforge.common.util.TriState;
 import net.neoforged.neoforge.event.entity.player.AttackEntityEvent;
-import net.neoforged.neoforge.event.entity.player.ItemEntityPickupEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
-import net.neoforged.neoforge.event.entity.player.PlayerXpEvent;
 import net.neoforged.neoforge.event.level.BlockEvent;
 
 import java.util.Map;
@@ -79,7 +76,8 @@ public final class PrototypeSurvivalLock {
     /** Server-side backstop for packets or other mods that bypass normal interaction events. */
     @SubscribeEvent
     public static void onBreakBlock(BlockEvent.BreakEvent event) {
-        if (isLocked(event.getPlayer())&&!com.codex.blacklight.combat.BulletdiveTerrain.ownsBreakEvent(event)) event.setCanceled(true);
+        if (isLocked(event.getPlayer())&&!com.codex.blacklight.combat.BulletdiveTerrain.ownsBreakEvent(event)
+                &&!com.codex.blacklight.combat.ShieldBorerSystem.ownsBreakEvent(event)) event.setCanceled(true);
     }
 
     /** Server-side backstop for direct placement paths. */
@@ -94,16 +92,6 @@ public final class PrototypeSurvivalLock {
     public static void onModifyBlockWithTool(BlockEvent.BlockToolModificationEvent event) {
         Player player = event.getPlayer();
         if (player != null && isLocked(player)) event.setCanceled(true);
-    }
-
-    @SubscribeEvent
-    public static void onPickupItem(ItemEntityPickupEvent.Pre event) {
-        if (isLocked(event.getPlayer())) event.setCanPickup(TriState.FALSE);
-    }
-
-    @SubscribeEvent
-    public static void onPickupExperience(PlayerXpEvent.PickupXp event) {
-        if (isLocked(event.getEntity())) event.setCanceled(true);
     }
 
     public static boolean isLocked(Player player) {

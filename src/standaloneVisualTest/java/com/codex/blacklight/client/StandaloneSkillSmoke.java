@@ -289,7 +289,7 @@ public final class StandaloneSkillSmoke {
         output=Path.of(System.getProperty(PROPERTY)).toAbsolutePath().normalize();Files.createDirectories(output);
         previousCamera=mc.options.getCameraType();previousGui=mc.options.hideGui;previousPause=mc.options.pauseOnLostFocus;previousMouse=mc.mouseHandler.isMouseGrabbed();previousFov=mc.options.fov().get();previousYaw=mc.player.getYRot();previousPitch=mc.player.getXRot();
         for(var key:List.of(mc.options.keyUp,mc.options.keyDown,mc.options.keyLeft,mc.options.keyRight,mc.options.keyJump,mc.options.keyShift,mc.options.keySprint,mc.options.keyAttack,mc.options.keyUse,mc.options.keyTogglePerspective))savedKeys.put(key,key.isDown());
-        mc.options.pauseOnLostFocus=false;mc.options.hideGui=false;mc.options.fov().set(70);mc.options.setCameraType(CameraType.THIRD_PERSON_FRONT);mc.setScreen(null);mc.mouseHandler.releaseMouse();
+        mc.options.pauseOnLostFocus=false;mc.options.hideGui=Boolean.getBoolean("blacklight.test.skillTutorialCapture");mc.options.fov().set(70);mc.options.setCameraType(CameraType.THIRD_PERSON_FRONT);mc.setScreen(null);mc.mouseHandler.releaseMouse();
         pngLevel=STBImageWrite.stbi_write_png_compression_level.get(0);pngFilter=STBImageWrite.stbi_write_force_png_filter.get(0);STBImageWrite.stbi_write_png_compression_level.put(0,1);STBImageWrite.stbi_write_force_png_filter.put(0,0);
         writer=new ThreadPoolExecutor(1,1,0,TimeUnit.MILLISECONDS,new ArrayBlockingQueue<>(6),r->{var t=new Thread(r,"skill-qa-png");t.setDaemon(true);return t;});
         ClientWeaponCombat.setFixtureOwnsInput(true);
@@ -570,6 +570,7 @@ public final class StandaloneSkillSmoke {
     public static void frame(RenderFrameEvent.Post event) {
         if(!active())return;var mc=Minecraft.getInstance();if(mc.player==null||mc.level==null)return;
         try {
+            captureTutorial(mc);
             long now=System.nanoTime();double frameMs=lastNativeFrameNanos==0?Double.NaN:(now-lastNativeFrameNanos)/1_000_000D;lastNativeFrameNanos=now;
             if(Double.isFinite(frameMs)&&frameMs>0)nativeFrameDeltasMs.add(frameMs);
             totalFrames++;var stats=DevastatorEffectRenderer.statistics();maximumVertices=Math.max(maximumVertices,stats.vertices());require(stats.vertices()<=DevastatorEffectRenderer.MAX_VERTICES_PER_FRAME,"devastator geometry exceeded global budget");
@@ -710,6 +711,21 @@ public final class StandaloneSkillSmoke {
             if(progress>=.12&&progress<.9&&extent>=.01)
                 return new TissueReturn(branch,length,reverseAt,duration,progress,extent,planned,hand.source());
         }return null;
+    }
+    private static final Map<String,Integer> tutorialFrames=new HashMap<>();
+    private static long tutorialAt;
+    private static void captureTutorial(Minecraft mc) {
+        if(!Boolean.getBoolean("blacklight.test.skillTutorialCapture")||sideCameraActive||current()==null
+                ||!(stage==Stage.START||stage==Stage.CHARGE||stage==Stage.RELEASE||stage==Stage.TAIL)
+                ||System.nanoTime()-tutorialAt<83_333_333L||writer.getQueue().remainingCapacity()<2)return;
+        String name=current().name();int frame=tutorialFrames.getOrDefault(name,0);if(frame>=170)return;
+        tutorialAt=System.nanoTime();tutorialFrames.put(name,frame+1);
+        var image=new com.mojang.blaze3d.platform.NativeImage(320,180,false);
+        try(var full=Screenshot.takeScreenshot(mc.getMainRenderTarget())){
+            for(int y=0;y<180;y++)for(int x=0;x<320;x++)image.setPixelRGBA(x,y,full.getPixelRGBA(x*full.getWidth()/320,y*full.getHeight()/180));
+        }
+        var file=output.resolve("tutorials").resolve(name).resolve(String.format(java.util.Locale.ROOT,"%03d.png",frame));
+        writer.execute(()->{try(image){Files.createDirectories(file.getParent());image.writeToFile(file);}catch(Exception error){imageError=error.toString();}});
     }
     private static void capture(Minecraft mc,String name,DevastatorEffectRenderer.Statistics stats) {
         if(captures.contains(name)||writer.getQueue().remainingCapacity()==0)return;
