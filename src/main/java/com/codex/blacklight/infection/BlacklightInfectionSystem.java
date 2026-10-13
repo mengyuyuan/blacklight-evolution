@@ -37,7 +37,7 @@ public final class BlacklightInfectionSystem {
         // same mutation timeline; immunity must not prevent the dedicated boss replacement.
         boolean dedicatedBoss=com.codex.blacklight.entity.InfectedBossProfile.forSpecies(
                 net.minecraft.core.registries.BuiltInRegistries.ENTITY_TYPE.getKey(target.getType()).toString())!=null;
-        if (applied || dedicatedBoss) {
+        if ((applied || dedicatedBoss) && !target.isRemoved()) {
             target.setData(ModAttachments.INFECTION_START, target.level().getGameTime());
             target.syncData(ModAttachments.INFECTION_START);
         }
@@ -46,7 +46,7 @@ public final class BlacklightInfectionSystem {
 
     /** Eligibility is checked before random exposure/cooldown; players awaken voluntarily. */
     public static boolean canInfect(LivingEntity target) {
-        return target != null && !target.level().isClientSide && target.isAlive()
+        return target != null && !target.isRemoved() && !target.level().isClientSide && target.isAlive()
                 && target instanceof Mob && !(target instanceof com.codex.blacklight.entity.HiveTendril) && !isInfected(target);
     }
 
@@ -67,10 +67,11 @@ public final class BlacklightInfectionSystem {
 
     public static boolean isInfected(LivingEntity entity) {
         if (entity instanceof Player player) {
-            return player.getData(ModAttachments.PLAYER_STATE).isInfected();
+            return !player.isRemoved() && player.hasData(ModAttachments.PLAYER_STATE)
+                    && player.getData(ModAttachments.PLAYER_STATE).isInfected();
         }
         return entity instanceof com.codex.blacklight.entity.HiveTendril || entity instanceof com.codex.blacklight.entity.BlacklightInfectedHost || entity instanceof com.codex.blacklight.entity.BlacklightHunter || entity instanceof com.codex.blacklight.entity.BlacklightMutant || entity instanceof com.codex.blacklight.entity.BlacklightHive || entity.hasEffect(ModEffects.BLACKLIGHT_INFECTION)
-                || (entity.getData(ModAttachments.INFECTION_START)>=0
+                || (ModAttachments.peekData(entity, ModAttachments.INFECTION_START, -1L)>=0
                     && com.codex.blacklight.entity.InfectedBossProfile.forSpecies(net.minecraft.core.registries.BuiltInRegistries.ENTITY_TYPE.getKey(entity.getType()).toString())!=null);
     }
 
@@ -105,14 +106,14 @@ public final class BlacklightInfectionSystem {
     public static void onInfectedMobTick(EntityTickEvent.Post event) {
         if (!(event.getEntity() instanceof Mob mob)
                 || !(mob.level() instanceof ServerLevel serverLevel)
-                || !mob.isAlive() || mob instanceof com.codex.blacklight.entity.HiveTendril || mob instanceof com.codex.blacklight.entity.BlacklightInfectedHost || mob instanceof com.codex.blacklight.entity.BlacklightHunter || mob instanceof com.codex.blacklight.entity.BlacklightMutant || mob instanceof com.codex.blacklight.entity.BlacklightHive || !isInfected(mob)) return;
-        long onset=mob.getData(ModAttachments.INFECTION_START);
+                || mob.isRemoved() || !mob.isAlive() || mob instanceof com.codex.blacklight.entity.HiveTendril || mob instanceof com.codex.blacklight.entity.BlacklightInfectedHost || mob instanceof com.codex.blacklight.entity.BlacklightHunter || mob instanceof com.codex.blacklight.entity.BlacklightMutant || mob instanceof com.codex.blacklight.entity.BlacklightHive || !isInfected(mob)) return;
+        long onset=ModAttachments.peekData(mob, ModAttachments.INFECTION_START, -1L);
         // Migrate existing saved infections too, without removing infection or other effects.
         var infection=mob.getEffect(ModEffects.BLACKLIGHT_INFECTION);
         if(infection!=null&&infection.isVisible())mob.addEffect(new MobEffectInstance(
                 infection.getEffect(),infection.getDuration(),infection.getAmplifier(),infection.isAmbient(),false,false));
         if(com.codex.blacklight.combat.ImpactControl.stunned(mob)
-                || mob.getData(ModAttachments.CONSUME_VISUAL).active())return;
+                || ModAttachments.peekData(mob, ModAttachments.CONSUME_VISUAL, com.codex.blacklight.combat.ConsumeVisual.EMPTY).active())return;
         if(onset>=0 && serverLevel.getGameTime()-onset<InfectionTimeline.DURATION) {
             mob.getNavigation().stop();
             return;

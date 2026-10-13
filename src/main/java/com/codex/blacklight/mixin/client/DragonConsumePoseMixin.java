@@ -20,7 +20,7 @@ public abstract class DragonConsumePoseMixin {
     @Shadow @Final private ModelPart rightWing;
     @WrapOperation(method={"renderToBuffer","renderSide"},at=@At(value="INVOKE",target="Lnet/minecraft/client/model/geom/ModelPart;render(Lcom/mojang/blaze3d/vertex/PoseStack;Lcom/mojang/blaze3d/vertex/VertexConsumer;III)V"))
     private void blacklight$react(ModelPart part,PoseStack stack,VertexConsumer vertices,int light,int overlay,int color,Operation<Void> original) {
-        var visual=entity==null?ConsumeVisual.EMPTY:entity.getData(ModAttachments.CONSUME_VISUAL);
+        var visual=entity==null?ConsumeVisual.EMPTY:ModAttachments.peekData(entity, ModAttachments.CONSUME_VISUAL, ConsumeVisual.EMPTY);
         if(!visual.active()){original.call(part,stack,vertices,light,overlay,color);return;}
         var saved=part.storePose();float sx=part.xScale,sy=part.yScale,sz=part.zScale;
         try {
