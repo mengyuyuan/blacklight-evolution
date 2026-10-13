@@ -48,9 +48,12 @@ public final class ClientDevastatorPostEffect {
         // AFTER_LEVEL, before vanilla binds the main target again for the HUD.
         if(destroyed)Minecraft.getInstance().getMainRenderTarget().bindWrite(false);
     }
+    @EventBusSubscriber(modid="blacklight",value=Dist.CLIENT,bus=EventBusSubscriber.Bus.MOD)
+    public static final class ReloadEvents {
     @SubscribeEvent public static void reload(RegisterClientReloadListenersEvent event){
         event.registerReloadListener((net.minecraft.server.packs.resources.ResourceManagerReloadListener)manager->
                 Minecraft.getInstance().execute(()->{close();failed=false;}));
+    }
     }
     @SubscribeEvent public static void tick(ClientTickEvent.Post event){
         var current=Minecraft.getInstance().level;

@@ -47,10 +47,13 @@ public final class ClientSpeedPostEffect {
     private ClientSpeedPostEffect() {
     }
 
+    @EventBusSubscriber(modid="blacklight",value=Dist.CLIENT,bus=EventBusSubscriber.Bus.MOD)
+    public static final class ReloadEvents {
     @SubscribeEvent
     public static void onReload(RegisterClientReloadListenersEvent event){
         event.registerReloadListener((net.minecraft.server.packs.resources.ResourceManagerReloadListener)manager->
                 Minecraft.getInstance().execute(()->{closeChain();failed=false;}));
+    }
     }
 
     @SubscribeEvent
