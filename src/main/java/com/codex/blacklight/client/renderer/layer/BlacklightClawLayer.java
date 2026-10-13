@@ -24,6 +24,7 @@ import net.minecraft.world.InteractionHand;
 public final class BlacklightClawLayer extends net.minecraft.client.renderer.entity.layers.RenderLayer<AbstractClientPlayer,PlayerModel<AbstractClientPlayer>> {
     public BlacklightClawLayer(net.minecraft.client.renderer.entity.RenderLayerParent<AbstractClientPlayer,PlayerModel<AbstractClientPlayer>> parent){
         super(parent);
+        com.codex.blacklight.client.renderer.AuthoredDevastatorMesh.available();
         // Parse authored surfaces during renderer setup, rather than hitching the
         // first visible liquid frame each time a weapon is selected.
         for(var form:PowerForm.values())if(WeaponMorphTiming.weapon(form))
@@ -65,6 +66,13 @@ public final class BlacklightClawLayer extends net.minecraft.client.renderer.ent
                                float partialTicks) {
         var state = player.getData(com.codex.blacklight.registry.ModAttachments.PLAYER_STATE);
         var form = state.getActivePower();
+        if(player.getData(com.codex.blacklight.registry.ModAttachments.DEVASTATOR_VISUAL).kind()>=0){
+            for(int side=0;side<2;side++){
+                var bone=com.codex.blacklight.animation.PlayerMotionController.skeleton().searchJointByName(side==0?"Tool_R":"Tool_L");
+                poseStack.pushPose();applyJoint(poseStack,poses[bone.getId()]);
+                com.codex.blacklight.client.renderer.DevastatorEffectRenderer.captureHand(player,poseStack,side==1);poseStack.popPose();
+            }
+        }
         if(state.isPrototypeMode()) {
             int charge=player==Minecraft.getInstance().player?com.codex.blacklight.client.ClientMovementEvents.visualJumpCharge():player.getData(com.codex.blacklight.registry.ModAttachments.JUMP_CHARGE);
             float now=player.tickCount+partialTicks;

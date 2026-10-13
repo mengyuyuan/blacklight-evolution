@@ -76,7 +76,14 @@ public enum WeaponMove {
     AIR_PAIN(PowerForm.NONE,"air_pain",30,12,15,20,4,90),
     WHIP_AIR_CHARGED(PowerForm.WHIPFIST,"whip_air_charged",24,9,14,14,7,35),
     AIR_LAUNCH_FOLLOW(PowerForm.NONE,"air_launch_follow",26,6,10,14,3,90),
-    CLAW_POUNCE(PowerForm.CLAWS,"claw_pounce",26,11,15,15,2.8,100);
+    CLAW_POUNCE(PowerForm.CLAWS,"claw_pounce",26,11,15,15,2.8,100),
+    DEV_GROUNDSPIKE(PowerForm.NONE,"dev_groundspike",120,40,85,20,10,360),
+    DEV_AIR_GROUNDSPIKE(PowerForm.NONE,"dev_air_groundspike",120,40,85,20,10,360),
+    DEV_TENDRIL(PowerForm.NONE,"dev_tendril",120,40,85,16,7.5,360),
+    DEV_AIR_TENDRIL(PowerForm.NONE,"dev_air_tendril",120,40,85,16,7.5,360),
+    DEV_CRITICAL_PAIN(PowerForm.NONE,"dev_critical_pain",120,40,85,50,50,30),
+    DEV_AIR_CRITICAL_PAIN(PowerForm.NONE,"dev_air_critical_pain",120,40,85,50,50,30),
+    BULLETDIVE_DROP(PowerForm.NONE,"bulletdive_drop",90,32,40,22,6,360);
     public final PowerForm form;
     public final String id;
     public final int duration,start,end;
@@ -101,7 +108,7 @@ public enum WeaponMove {
     }
     public boolean shared(){return form==PowerForm.NONE;}
     public boolean accepts(PowerForm active){return form==active||shared()&&supports(active)||active==PowerForm.NONE&&form==PowerForm.MUSCLE_MASS;}
-    public boolean aerial(){return name().startsWith("AIR_")||this==CLAW_POUNCE||this==BLADE_DIVE||this==HAMMER_DROP||uncharged()==WHIP_AIR||this==MUSCLE_AIR||this==HAMMER_RAM||uncharged()==HAMMER_COMBO_SPECIAL;}
+    public boolean aerial(){return name().startsWith("AIR_")||name().startsWith("DEV_AIR_")||this==BULLETDIVE_DROP||this==CLAW_POUNCE||this==BLADE_DIVE||this==HAMMER_DROP||uncharged()==WHIP_AIR||this==MUSCLE_AIR||this==HAMMER_RAM||uncharged()==HAMMER_COMBO_SPECIAL;}
     public boolean airCombo(){return this==AIR_AUTO1||this==AIR_AUTO2||this==AIR_AUTO3||this==AIR_AUTO4;}
     public boolean landingAttack(){return this==BLADE_DIVE||this==HAMMER_DROP||this==HAMMER_RAM||this==AIR_GROUND_POUND||uncharged()==HAMMER_COMBO_SPECIAL;}
     public boolean groundSpike(){return this==CLAW_GROUNDSPIKE;}

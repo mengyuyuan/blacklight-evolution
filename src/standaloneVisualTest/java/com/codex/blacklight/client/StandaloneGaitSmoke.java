@@ -3,6 +3,9 @@ package com.codex.blacklight.client;
 import com.codex.blacklight.BlacklightNeoMod;
 import com.codex.blacklight.animation.*;
 import com.codex.blacklight.client.animation.BlacklightRenderPose;
+import com.codex.blacklight.client.model.BlacklightPlayerModel;
+import com.codex.blacklight.client.renderer.BlacklightPlayerRenderer;
+import com.codex.blacklight.client.renderer.StandalonePlayerRendering;
 import com.codex.blacklight.movement.*;
 import com.codex.blacklight.power.*;
 import com.codex.blacklight.registry.ModAttachments;
@@ -11,6 +14,8 @@ import com.google.gson.*;
 import java.lang.reflect.Field;
 import java.nio.file.*;
 import java.util.*;
+import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicInteger;
 import net.minecraft.client.*;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerPlayer;
@@ -24,20 +29,29 @@ import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.client.event.*;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
+import org.lwjgl.stb.STBImageWrite;
 
 /** Opt-in continuous native-input QA; refuses every save outside the disposable QA copy. */
 @EventBusSubscriber(modid=BlacklightNeoMod.MOD_ID,value=Dist.CLIENT)
 public final class StandaloneGaitSmoke {
     private static final String PROPERTY="blacklight.test.standaloneGait";
-    private enum Stage { SETTLE,SPRINT,STOP,ARMOR_SETTLE,ARMOR_SPRINT,ARMOR_STOP,JUMP_SETTLE,JUMP_SPRINT,JUMP_STOP,DONE }
+    private enum Stage { SETTLE,SPRINT,STOP,ARMOR_SETTLE,ARMOR_SPRINT,ARMOR_STOP,JUMP_SETTLE,JUMP_SPRINT,JUMP_STOP,DRAIN,DONE }
     private static Stage stage=Stage.SETTLE;
     private static boolean initialized,disabled,completed,capturePending;
     private static volatile boolean serverReady;
     private static int stageTicks;
     private static long firstJumpAirTick=-1,jumpContactTick=-1;
     private static int jumpAirTicks,jumpHoldTicks=2;
-    private static boolean movingLandingObserved;
+    private static boolean movingLandingObserved,standingChargeObserved;
+    private static Vec3 plantedClient,plantedServer;
+    private static final java.util.Map<KeyMapping,com.mojang.blaze3d.platform.InputConstants.Key> savedBindings=new java.util.IdentityHashMap<>();
+    private static double maximumChargeClientDrift;
+    private static volatile double maximumChargeServerDrift;
+    private static int chargeClientSamples;
+    private static volatile int chargeServerSamples;
     private static boolean jumpOnly(){return Boolean.getBoolean(PROPERTY+".jumpOnly");}
+    private static boolean claws(){return Boolean.getBoolean(PROPERTY+".claws");}
+    private static boolean standingCharge(){return Boolean.getBoolean(PROPERTY+".standingCharge");}
     private static long latestTick=Long.MIN_VALUE;
     private static Path output;
     private static CameraType previousCamera;
@@ -50,6 +64,17 @@ public final class StandaloneGaitSmoke {
     private static Field statesField,gaitField,positionField;
     private static JsonObject previousTick;
     private static final Set<String> captureNames=new HashSet<>();
+    private static Field renderersField,renderedPlayerField,renderPartialField;
+    private static final Map<String,Integer> sequenceFrames=new LinkedHashMap<>();
+    private static String captureSequence;
+    private static long renderFrame;
+    private static double observerDistance=12;
+    private static ThreadPoolExecutor writer;
+    private static final AtomicInteger submittedImages=new AtomicInteger(),writtenImages=new AtomicInteger();
+    private static final Map<String,AtomicInteger> writtenSequences=new ConcurrentHashMap<>();
+    private static volatile String imageError;
+    private static int previousPngLevel,previousPngFilter,queueMisses;
+    private static long drainStartedNanos;
     private StandaloneGaitSmoke() {}
     private static boolean active(){return initialized&&!disabled&&!completed;}
     private static boolean sprinting(){return stage==Stage.SPRINT||stage==Stage.ARMOR_SPRINT||stage==Stage.JUMP_SPRINT;}
@@ -70,11 +95,23 @@ public final class StandaloneGaitSmoke {
             yawBeforeInputLock=mc.player.getYRot();
             mc.player.setYRot(0);mc.player.yRotO=0;mc.player.setXRot(0);mc.player.xRotO=0;
         }
-        boolean run=serverReady&&sprinting();
-        mc.options.keyUp.setDown(run);mc.options.keySprint.setDown(run);
-        mc.options.keyDown.setDown(false);mc.options.keyLeft.setDown(false);mc.options.keyRight.setDown(false);
-        mc.options.keyJump.setDown(run&&stage==Stage.JUMP_SPRINT&&stageTicks>=20&&stageTicks<20+jumpHoldTicks);mc.options.keyShift.setDown(false);
+        boolean run=serverReady&&sprinting()&&!(standingCharge()&&stage==Stage.JUMP_SPRINT);
+        boolean probe=serverReady&&standingCharge()&&stage==Stage.JUMP_SPRINT&&stageTicks>=25&&stageTicks<20+jumpHoldTicks;
+        mc.options.keyUp.setDown(run||probe);mc.options.keySprint.setDown(run||probe);
+        if(probe&&mc.player!=null)mc.player.setDeltaMovement(.3,mc.player.getDeltaMovement().y,.2);
+        mc.options.keyDown.setDown(false);mc.options.keyLeft.setDown(false);mc.options.keyRight.setDown(probe);
+        mc.options.keyJump.setDown(serverReady&&stage==Stage.JUMP_SPRINT&&stageTicks>=20&&stageTicks<20+jumpHoldTicks);mc.options.keyShift.setDown(false);
         mc.options.keyAttack.setDown(false);mc.options.keyUse.setDown(false);
+    }
+    @SubscribeEvent(priority=EventPriority.LOWEST)
+    public static void observePlantedServer(net.neoforged.neoforge.event.tick.PlayerTickEvent.Post event){
+        if(!active()||!serverReady||!standingCharge()||!(event.getEntity() instanceof ServerPlayer p))return;
+        var movement=p.getData(ModAttachments.MOVEMENT_STATE);
+        if(movement.chargeTicks()>3&&!movement.runningCharge()&&movement.jumpHeld()&&p.onGround()){
+            if(plantedServer==null)plantedServer=p.position();
+            maximumChargeServerDrift=Math.max(maximumChargeServerDrift,p.position().subtract(plantedServer).horizontalDistance());
+            chargeServerSamples++;
+        }
     }
     @SubscribeEvent(priority=EventPriority.HIGHEST)
     public static void humanPerspective(InputEvent.Key event) {
@@ -110,13 +147,28 @@ public final class StandaloneGaitSmoke {
                 previousMouseGrabbed=mc.mouseHandler.isMouseGrabbed();previousYaw=mc.player.getYRot();previousPitch=mc.player.getXRot();
                 for(var key:List.of(mc.options.keyUp,mc.options.keySprint,mc.options.keyDown,mc.options.keyLeft,mc.options.keyRight,
                         mc.options.keyJump,mc.options.keyShift,mc.options.keyAttack,mc.options.keyUse,mc.options.keyTogglePerspective))savedKeys.put(key,key.isDown());
+                // Physical GLFW fallback must not inject human/stale key presses
+                // into this explicit disposable fixture. Feed native KeyMappings
+                // below; restore all bindings before saving options on exit.
+                for(var key:savedKeys.keySet()){
+                    savedBindings.put(key,key.getKey());key.setKey(com.mojang.blaze3d.platform.InputConstants.UNKNOWN);
+                }
+                KeyMapping.resetMapping();
                 mc.options.pauseOnLostFocus=false;mc.options.hideGui=false;mc.options.fov().set(60);mc.options.setCameraType(CameraType.THIRD_PERSON_FRONT);mc.setScreen(null);mc.mouseHandler.releaseMouse();mc.getWindow().setTitle("Blacklight · 自动跑跳 QA（请勿操作测试窗口）");
                 statesField=PlayerMotionController.class.getDeclaredField("STATES");statesField.setAccessible(true);
+                previousPngLevel=STBImageWrite.stbi_write_png_compression_level.get(0);
+                previousPngFilter=STBImageWrite.stbi_write_force_png_filter.get(0);
+                STBImageWrite.stbi_write_png_compression_level.put(0,0);
+                STBImageWrite.stbi_write_force_png_filter.put(0,0);
+                writer=new ThreadPoolExecutor(1,1,0,TimeUnit.MILLISECONDS,new ArrayBlockingQueue<>(12),r->{var t=new Thread(r,"gait-qa-png");t.setDaemon(true);return t;},new ThreadPoolExecutor.AbortPolicy());
+                renderersField=StandalonePlayerRendering.class.getDeclaredField("RENDERERS");renderersField.setAccessible(true);
+                renderedPlayerField=BlacklightPlayerModel.class.getDeclaredField("renderedPlayer");renderedPlayerField.setAccessible(true);
+                renderPartialField=BlacklightPlayerModel.class.getDeclaredField("renderPartial");renderPartialField.setAccessible(true);
                 initialized=true;var uuid=mc.player.getUUID();
                 // Exercise a real light moving impact, rather than a tiny jump with
                 // no landing action. Derive hold from the configured native physics.
-                int maxCharge=MovementTuningSettings.jumpChargeTicks();jumpHoldTicks=maxCharge;
-                for(int held=1;held<=maxCharge;held++)
+                int maxCharge=MovementTuningSettings.jumpChargeTicks();jumpHoldTicks=maxCharge+(standingCharge()?12:0);
+                for(int held=1;!standingCharge()&&held<=maxCharge;held++)
                     if(MovementTuningSettings.estimatedJumpHeight(held/(double)maxCharge,0)>=5.5){jumpHoldTicks=held;break;}
                 server.execute(()->{
                     try {
@@ -127,7 +179,7 @@ public final class StandaloneGaitSmoke {
                             for(int y=251;y<=255;y++)level.setBlockAndUpdate(new BlockPos(x,y,z),Blocks.AIR.defaultBlockState());
                         }
                         var p=server.getPlayerList().getPlayer(uuid);if(p==null)throw new IllegalStateException("QA actor missing");
-                        var state=new BlacklightState();state.infect();state.setPrototypeMode(true);state.unlock(PowerForm.NONE);state.unlock(PowerForm.ARMOR);state.activate(PowerForm.NONE);state.addBiomass(1000);
+                        var state=new BlacklightState();state.infect();state.setPrototypeMode(true);state.unlock(PowerForm.NONE);state.unlock(PowerForm.CLAWS);state.unlock(PowerForm.ARMOR);state.activate(claws()?PowerForm.CLAWS:PowerForm.NONE);state.addBiomass(1000);
                         p.setData(ModAttachments.PLAYER_STATE,state);p.syncData(ModAttachments.PLAYER_STATE);
                         p.setData(ModAttachments.UTILITY_POWERS,0);p.syncData(ModAttachments.UTILITY_POWERS);
                         p.setData(ModAttachments.UTILITY_STATE,new UtilityState(UtilityState.SHIELD_CAPACITY,0,level.getGameTime()-200,0,-1000));p.syncData(ModAttachments.UTILITY_STATE);
@@ -141,6 +193,14 @@ public final class StandaloneGaitSmoke {
                     }catch(Exception e){fail(e);}
                 });
             }catch(Exception e){fail(e);}return;
+        }
+        if(imageError!=null){fail(new IllegalStateException("Asynchronous gait image write failed: "+imageError));return;}
+        if(stage==Stage.DRAIN){
+            if(writer.isTerminated()){
+                if(submittedImages.get()!=writtenImages.get())violation("not every framebuffer image reached disk");
+                stage=Stage.DONE;finish(mc);
+            }else if((System.nanoTime()-drainStartedNanos)/1e9>60)fail(new IllegalStateException("Gait PNG writer drain exceeded 60 seconds"));
+            return;
         }
         try {recordTick(mc);}catch(Exception e){fail(e);return;}
         if(!serverReady)return;
@@ -170,7 +230,7 @@ public final class StandaloneGaitSmoke {
             });
         } else if(stage==Stage.JUMP_SETTLE&&stageTicks>=20)advance(Stage.JUMP_SPRINT);
         else if(stage==Stage.JUMP_SPRINT&&stageTicks>=140)advance(Stage.JUMP_STOP);
-        else if(stage==Stage.JUMP_STOP&&stageTicks>=30){stage=Stage.DONE;capturePending=true;}
+        else if(stage==Stage.JUMP_STOP&&stageTicks>=30){stage=Stage.DRAIN;capturePending=false;drainStartedNanos=System.nanoTime();writer.shutdown();}
     }
     private static void advance(Stage next){stage=next;stageTicks=0;}
     private static Object runtime(Minecraft mc)throws Exception {
@@ -202,17 +262,25 @@ public final class StandaloneGaitSmoke {
         row.addProperty("nativeAction",nativeAction.clipId());row.addProperty("nativeActionSeconds",nativeAction.seconds(mc.level.getGameTime()));
         var sampled=PlayerMotionController.pose(mc.player,1);var root=sampled.get("Root");
         if(root!=null){row.addProperty("bodyRootX",root.translation().x);row.addProperty("bodyRootY",root.translation().y);row.addProperty("bodyRootZ",root.translation().z);}
+        if(standingCharge()&&stage==Stage.JUMP_SPRINT&&"basic_jump_charge".equals(clock.key())
+                &&mc.player.onGround()&&mc.player.getDeltaMovement().horizontalDistance()<.001)standingChargeObserved=true;
+        if(standingCharge()&&stage==Stage.JUMP_SPRINT&&stageTicks>=24&&stageTicks<20+jumpHoldTicks){
+            if(plantedClient==null)plantedClient=mc.player.position();
+            maximumChargeClientDrift=Math.max(maximumChargeClientDrift,mc.player.position().subtract(plantedClient).horizontalDistance());
+            chargeClientSamples++;
+        }
         if(stage==Stage.JUMP_SPRINT&&stageTicks>=20+jumpHoldTicks) {
             if(nativeAction.clipId().equals("basic_land_moving")||nativeAction.clipId().equals("basic_land_light"))movingLandingObserved=true;
             if(!mc.player.onGround()){if(firstJumpAirTick<0)firstJumpAirTick=clock.tick();jumpAirTicks++;}
             else if(firstJumpAirTick>=0&&jumpContactTick<0){jumpContactTick=clock.tick();capturePending=true;}
             row.addProperty("ticksSinceJumpContact",jumpContactTick<0?-1:clock.tick()-jumpContactTick);
-            if(jumpContactTick>=0&&mc.player.onGround()&&clock.tick()-jumpContactTick<=30
+            if(!standingCharge()&&jumpContactTick>=0&&mc.player.onGround()&&clock.tick()-jumpContactTick<=30
                     &&(!LandingMotionPolicy.isLanding(nativeAction.clipId())||LandingMotionPolicy.permitsStride(nativeAction.clipId(),nativeAction.seconds(mc.level.getGameTime())))
                     &&!(clock.key().equals("basic_walk")||clock.key().equals("basic_run")||clock.key().startsWith("basic_sprint")))
                 violation("landing stole ground stride at "+clock.tick()+": "+clock.key());
         }
         row.addProperty("armor",UtilityPowerSystem.active(mc.player,PowerForm.ARMOR));row.addProperty("onGround",mc.player.onGround());
+        row.addProperty("activePower",mc.player.getData(ModAttachments.PLAYER_STATE).getActivePower().name());
         double nominal=MotionLibrary.nominalSpeed(clock.key())*mc.player.getScale();row.addProperty("nominalBlocksPerTick",nominal);
         if(previousTick!=null) {
             double dx=position.x-previousTick.get("x").getAsDouble(),dy=position.y-previousTick.get("y").getAsDouble(),dz=position.z-previousTick.get("z").getAsDouble();
@@ -238,7 +306,8 @@ public final class StandaloneGaitSmoke {
     public static void camera(ViewportEvent.ComputeCameraAngles event) {
         if(!active())return;var mc=Minecraft.getInstance();if(mc.player==null)return;
         var actor=mc.player.getPosition((float)event.getPartialTick());
-        var eye=actor.add(5,2.2,4);var target=actor.add(0,.9,0);var look=target.subtract(eye);
+        var direction=new Vec3(5,1.3,4).normalize();var target=actor.add(0,.9,0);
+        var eye=target.add(direction.scale(observerDistance));var look=target.subtract(eye);
         ((com.codex.blacklight.mixin.client.PrototypeCameraAccess)event.getCamera()).blacklight$setPosition(eye);
         event.setYaw((float)Math.toDegrees(Math.atan2(-look.x,look.z)));
         event.setPitch((float)-Math.toDegrees(Math.atan2(look.y,look.horizontalDistance())));event.setRoll(0);
@@ -247,36 +316,92 @@ public final class StandaloneGaitSmoke {
         if(!active()||!serverReady)return;var mc=Minecraft.getInstance();if(mc.player==null||mc.level==null)return;
         mc.mouseHandler.releaseMouse();
         try {
-            recordTick(mc);var runtime=runtime(mc);if(runtime==null)return;var clock=(LocomotionClock)gaitField.get(runtime);
-            var partial=mc.getTimer().getGameTimeDeltaPartialTick(false);
-            var pose=BlacklightRenderPose.sample(mc.player,partial);var skeleton=PlayerMotionController.skeleton();
-            var model=new Matrix4f().rotationY((float)Math.toRadians(180-BlacklightRenderPose.facing(mc.player,partial))).scale(.9375F*mc.player.getScale());
-            var row=new JsonObject();row.addProperty("stage",stage.name());row.addProperty("stageTick",stageTicks);row.addProperty("tick",clock.tick());row.addProperty("partial",partial);
-            row.addProperty("key",clock.key());row.addProperty("sampleSeconds",clock.sampleTime(partial));
-            row.addProperty("playerYaw",mc.player.getYRot());row.addProperty("playerPitch",mc.player.getXRot());
-            var anchor=mc.player.getPosition(partial);row.add("actor",vector(anchor));
-            for(String side:new String[]{"R","L"}) {
-                var local=skeleton.getBoundTransformFor(pose,skeleton.searchJointByName("Leg_"+side)).transformPosition(new Vector3f(0,.37472F,0));
-                model.transformPosition(local);row.add("foot_"+side,vector(anchor.add(local.x,local.y,local.z)));
+            recordTick(mc);renderFrame++;captureSequence=null;
+            if((stage==Stage.SPRINT||stage==Stage.ARMOR_SPRINT)&&stageTicks>=25)captureSequence=stage.name().toLowerCase(Locale.ROOT);
+            if(stage==Stage.JUMP_SPRINT&&stageTicks>=20){
+                if(stageTicks<20+jumpHoldTicks)captureSequence="jump_charge";
+                else if(!mc.player.onGround())captureSequence="jump_flight";
+                else if(jumpContactTick>=0&&latestTick-jumpContactTick<=40)captureSequence="jump_landing";
             }
-            frames.add(row);
-            if(sprinting()&&(stageTicks==30||stageTicks==75||stageTicks==115))capturePending=true;
-            if(stage==Stage.JUMP_SPRINT&&jumpContactTick>=0) {
-                long age=clock.tick()-jumpContactTick;if(age==4||age==10||age==25)capturePending=true;
-            }
+            int ordinal=captureSequence==null?16:sequenceFrames.getOrDefault(captureSequence,0);
+            // Compare early frames with a later close view: armor must finish
+            // hardening, and landing smoke must clear before inspecting limbs.
+            if(ordinal>=8&&((stage==Stage.SPRINT||stage==Stage.ARMOR_SPRINT)&&stageTicks<75
+                    ||"jump_landing".equals(captureSequence)&&latestTick-jumpContactTick<22))captureSequence=null;
+            if(ordinal>=16)captureSequence=null;
+            observerDistance=ordinal<8?12:5;
+            if(captureSequence!=null&&writer.getQueue().remainingCapacity()>0)capturePending=true;
+            else if(captureSequence!=null){queueMisses++;captureSequence=null;}
             if(stage==Stage.DONE)capturePending=true;
         }catch(Exception e){fail(e);}
     }
     private static JsonArray vector(Vec3 v){var a=new JsonArray();a.add(v.x);a.add(v.y);a.add(v.z);return a;}
+    @SubscribeEvent public static void actualBody(RenderLevelStageEvent event) {
+        if(!active()||!serverReady||event.getStage()!=RenderLevelStageEvent.Stage.AFTER_LEVEL)return;
+        var mc=Minecraft.getInstance();if(mc.player==null||mc.level==null)return;
+        try {
+            var renderer=((Map<?,?>)renderersField.get(null)).get(mc.player.getSkin().model());
+            // Current rendering uses the renderer directly. Permit a future wrapper
+            // only by following its actual parent, never by creating a test model.
+            if(!(renderer instanceof BlacklightPlayerRenderer)){
+                if(renderer==null)return;var parent=renderer.getClass().getDeclaredField("parent");parent.setAccessible(true);renderer=parent.get(renderer);
+            }
+            if(!(renderer instanceof BlacklightPlayerRenderer nativeRenderer)||!(nativeRenderer.getModel() instanceof BlacklightPlayerModel model))return;
+            if(renderedPlayerField.get(model)!=mc.player)return;
+            var matrices=model.matrices();if(matrices==null)return;
+            var runtime=runtime(mc);if(runtime==null)return;var clock=(LocomotionClock)gaitField.get(runtime);
+            float partial=renderPartialField.getFloat(model);
+            var row=new JsonObject();row.addProperty("frame",renderFrame);row.addProperty("stage",stage.name());row.addProperty("stageTick",stageTicks);
+            row.addProperty("tick",clock.tick());row.addProperty("partial",partial);row.addProperty("key",clock.key());row.addProperty("sampleSeconds",clock.sampleTime(partial));
+            row.addProperty("actualRenderedPlayerId",mc.player.getId());row.addProperty("actualModelIdentity",System.identityHashCode(model));row.addProperty("observerDistance",observerDistance);
+            row.addProperty("activePower",mc.player.getData(ModAttachments.PLAYER_STATE).getActivePower().name());row.addProperty("armor",UtilityPowerSystem.active(mc.player,PowerForm.ARMOR));
+            row.addProperty("nativeAction",mc.player.getData(ModAttachments.PLAYER_ACTION).clipId());
+            var sample=new JsonObject();var skeleton=PlayerMotionController.skeleton();
+            for(String boneName:new String[]{"Root","Head","Arm_R","Hand_R","Tool_R","Arm_L","Hand_L","Tool_L","Leg_R","Leg_L"}){
+                var bone=skeleton.searchJointByName(boneName);if(bone==null||bone.getId()>=matrices.length)continue;
+                var matrix=matrices[bone.getId()];var values=new float[16];matrix.get(values);var data=new JsonObject();var array=new JsonArray();boolean finite=true;
+                for(float value:values){finite&=Float.isFinite(value);array.add(Float.isFinite(value)?value:0);}
+                float determinant=matrix.determinant();finite&=Float.isFinite(determinant);data.addProperty("finite",finite);data.addProperty("determinant",Float.isFinite(determinant)?determinant:0);data.add("matrix",array);sample.add(boneName,data);
+                if(!finite)violation("non-finite actual rendered "+boneName+" at frame "+renderFrame);
+            }
+            row.add("actualBodyMatrices",sample);
+            double before=clock.current();float high=PlayerMotionController.elapsed(mc.player,.8F),low=PlayerMotionController.elapsed(mc.player,.2F),again=PlayerMotionController.elapsed(mc.player,.8F);
+            row.addProperty("elapsedHigh",high);row.addProperty("elapsedLow",low);row.addProperty("elapsedHighRepeated",again);row.addProperty("committedGaitBeforeQueries",before);row.addProperty("committedGaitAfterQueries",clock.current());
+            if(high!=again||before!=clock.current())violation("same-tick elapsed query changed actual playback at frame "+renderFrame);
+            row.addProperty("elapsedPartialMonotonic",high>=low); // Evidence; reverse source clips are legitimate.
+            var anchor=mc.player.getPosition(partial);row.add("actor",vector(anchor));
+            var modelToWorld=new Matrix4f().rotationY((float)Math.toRadians(180-BlacklightRenderPose.facing(mc.player,partial))).scale(.9375F*mc.player.getScale());
+            for(String side:new String[]{"R","L"}){
+                var leg=skeleton.searchJointByName("Leg_"+side);if(leg==null)continue;
+                var local=new Matrix4f(matrices[leg.getId()]).transformPosition(new Vector3f(0,.37472F,0));modelToWorld.transformPosition(local);
+                row.add("foot_"+side,vector(anchor.add(local.x,local.y,local.z)));
+            }
+            if(captureSequence!=null){int ordinal=sequenceFrames.getOrDefault(captureSequence,0);row.addProperty("captureSequence",captureSequence);row.addProperty("sequenceFrame",ordinal);row.addProperty("image",captureSequence+"_"+stageTicks+"_frame"+renderFrame+".png");sequenceFrames.put(captureSequence,ordinal+1);}
+            frames.add(row);
+        }catch(Exception e){fail(e);}
+    }
     @SubscribeEvent public static void frame(RenderFrameEvent.Post event) {
         if(!active()||!capturePending)return;capturePending=false;var mc=Minecraft.getInstance();
-        String name=stage.name().toLowerCase(Locale.ROOT)+"_"+stageTicks+".png";
+        String name=(captureSequence==null?stage.name().toLowerCase(Locale.ROOT):captureSequence)+"_"+stageTicks+"_frame"+renderFrame+".png";
         try {
-            if(captureNames.add(name))try(var image=Screenshot.takeScreenshot(mc.getMainRenderTarget())){image.writeToFile(output.resolve(name));}
-            write(false,null);if(stage==Stage.DONE)finish(mc);
+            if(writer.isShutdown()||writer.getQueue().remainingCapacity()==0){queueMisses++;return;}
+            if(captureNames.add(name)){
+                // OpenGL readback stays on the render thread. Encoding, I/O and
+                // NativeImage ownership transfer to one bounded background worker.
+                var image=Screenshot.takeScreenshot(mc.getMainRenderTarget());
+                String sequenceAtCapture=captureSequence;
+                try{
+                    writer.execute(()->{try(image){image.writeToFile(output.resolve(name));writtenImages.incrementAndGet();if(sequenceAtCapture!=null)writtenSequences.computeIfAbsent(sequenceAtCapture,key->new AtomicInteger()).incrementAndGet();}catch(Exception e){imageError=e.toString();}});
+                    submittedImages.incrementAndGet();
+                }catch(RejectedExecutionException e){image.close();captureNames.remove(name);queueMisses++;}
+            }
         }catch(Exception e){fail(e);}
     }
     private static void finish(Minecraft mc) {
+        for(String sequence:jumpOnly()?new String[]{"jump_charge","jump_flight","jump_landing"}:new String[]{"sprint","armor_sprint","jump_charge","jump_flight","jump_landing"}){
+            if(sequenceFrames.getOrDefault(sequence,0)<8)violation("fewer than 8 actual rendered body frames for "+sequence);
+            if(writtenSequences.getOrDefault(sequence,new AtomicInteger()).get()<8)violation("fewer than 8 actual framebuffer images written for "+sequence);
+        }
         for(Stage phase:jumpOnly()?new Stage[]{}:new Stage[]{Stage.SPRINT,Stage.ARMOR_SPRINT}) {
             int count=0,running=0,grounded=0;double distance=0;
             for(var element:ticks) {
@@ -290,7 +415,11 @@ public final class StandaloneGaitSmoke {
             if(running<60)violation(phase+" never established running gait: "+running+" ticks");
             if(grounded<count*.8)violation(phase+" left the flat lane: "+grounded+"/"+count+" grounded");
         }
-        if(!movingLandingObserved)violation("native jump did not exercise the moving/light landing action");
+        if(!standingCharge()&&!movingLandingObserved)violation("native jump did not exercise the moving/light landing action");
+        if(standingCharge()&&!standingChargeObserved)violation("native standing jump did not exercise grounded stationary charge");
+        if(standingCharge()&&(chargeClientSamples<20||chargeServerSamples<20))violation("insufficient planted charge samples");
+        if(standingCharge()&&(maximumChargeClientDrift>.001||maximumChargeServerDrift>.001))
+            violation("planted charge drifted under held directional keys/residual velocity: client="+maximumChargeClientDrift+" server="+maximumChargeServerDrift);
         if(jumpAirTicks<5)violation("native Space input did not produce an observed jump: "+jumpAirTicks+" airborne ticks");
         if(jumpContactTick<0)violation("native jump never returned to real ground contact");
         else if(latestTick-jumpContactTick<30)violation("jump QA ended before 30 post-contact ticks");
@@ -299,27 +428,44 @@ public final class StandaloneGaitSmoke {
         mc.stop();
     }
     private static void restore(Minecraft mc) {
+        savedBindings.forEach(KeyMapping::setKey);KeyMapping.resetMapping();
         savedKeys.forEach(KeyMapping::setDown);
         if(mc.player!=null){mc.player.setYRot(previousYaw);mc.player.yRotO=previousYaw;mc.player.setXRot(previousPitch);mc.player.xRotO=previousPitch;}
         if(previousMouseGrabbed)mc.mouseHandler.grabMouse();else mc.mouseHandler.releaseMouse();
         if(previousCamera!=null){mc.options.setCameraType(previousCamera);mc.options.fov().set(previousFov);mc.options.hideGui=previousGui;mc.options.pauseOnLostFocus=previousPause;}
+        // Changing STB globals while a worker encodes would corrupt its settings.
+        if(writer==null||writer.isTerminated()){
+            STBImageWrite.stbi_write_png_compression_level.put(0,previousPngLevel);
+            STBImageWrite.stbi_write_force_png_filter.put(0,previousPngFilter);
+        }
         mc.updateTitle();
     }
     private static void fail(Exception e) {
         if(disabled)return;disabled=true;BlacklightNeoMod.LOGGER.error("Continuous gait QA failed",e);
+        if(writer!=null)writer.shutdown();
         var mc=Minecraft.getInstance();mc.execute(()->{restore(mc);write(false,e.toString());mc.stop();});
     }
     private static synchronized void write(boolean complete,String error) {
         if(output==null)return;
         try {
             var report=new JsonObject();report.addProperty("complete",complete);report.addProperty("source","real native KeyMapping input, packet/physics and Minecraft framebuffer");
+            report.addProperty("imageWriteMode","OpenGL readback only on render thread; single bounded asynchronous PNG worker");
+            report.addProperty("pngCompressionLevel",0);report.addProperty("pngFilter",0);report.addProperty("imageQueueCapacity",12);report.addProperty("imageQueueMisses",queueMisses);
+            report.addProperty("submittedImages",submittedImages.get());report.addProperty("writtenImages",writtenImages.get());report.addProperty("writerDrained",writer!=null&&writer.isTerminated());
+            report.addProperty("schema",2);report.addProperty("matrixSource","StandalonePlayerRendering.RENDERERS actual BlacklightPlayerModel.matrices after world rendering; renderedPlayer identity checked");
+            report.addProperty("claws",claws());report.addProperty("standingCharge",standingCharge());
+            var sequences=new JsonObject();sequenceFrames.forEach(sequences::addProperty);report.add("sequenceFrames",sequences);
+            var written=new JsonObject();writtenSequences.forEach((key,count)->written.addProperty(key,count.get()));report.add("sequenceImagesWritten",written);
             report.addProperty("passed",complete&&violations.isEmpty());report.addProperty("epicfightLoaded",ModList.get().isLoaded("epicfight"));report.addProperty("womLoaded",ModList.get().isLoaded("wom"));
             report.addProperty("fixedFov",60);report.addProperty("camera","constant actor-relative observer; own chase disabled by front perspective");
             report.addProperty("controls","native W/sprint; QA player yaw/pitch locked to zero before physics; pointer released and click recapture suppressed");
             report.addProperty("suppressedMouseEvents",suppressedMouseEvents);report.addProperty("suppressedPerspectiveClicks",suppressedPerspectiveClicks);
             report.addProperty("jumpOnly",jumpOnly());report.addProperty("firstJumpAirTick",firstJumpAirTick);report.addProperty("jumpContactTick",jumpContactTick);report.addProperty("jumpAirTicks",jumpAirTicks);
             report.addProperty("jumpHoldTicks",jumpHoldTicks);report.addProperty("movingLandingObserved",movingLandingObserved);
-            report.addProperty("jumpInput","W+sprint140 ticks; Space held from tick20 for configured charge yielding a light impact, then released; actual airborne and real ground contact observed");
+            report.addProperty("standingChargeObserved",standingChargeObserved);
+            report.addProperty("chargeClientSamples",chargeClientSamples);report.addProperty("chargeServerSamples",chargeServerSamples);
+            report.addProperty("maximumChargeClientDrift",maximumChargeClientDrift);report.addProperty("maximumChargeServerDrift",maximumChargeServerDrift);
+            report.addProperty("jumpInput",standingCharge()?"stationary Space charge from tick20 including 12-tick full hold; inject W/D/sprint and residual XZ velocity from tick25; verify client/server planted position, then actual takeoff/contact":"W+sprint140 ticks; Space held from tick20 for configured charge yielding a light impact, then released; actual airborne and real ground contact observed");
             report.add("committedTicks",ticks);report.add("renderFrames",frames);report.add("violations",violations);if(error!=null)report.addProperty("error",error);
             var images=new JsonArray();captureNames.stream().sorted().forEach(images::add);report.add("images",images);
             Path pending=output.resolve("continuous-gait-report.pending.json");Files.writeString(pending,new GsonBuilder().setPrettyPrinting().create().toJson(report));

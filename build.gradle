@@ -47,6 +47,12 @@ def stageBundledMotions = tasks.register('stageBundledMotions', Sync) {
             ['utility_shield_deploy.json', 'utility_shield_hit.json', 'utility_shield_run.json', 'utility_shield_sprint.json', 'utility_armor_transform.json', 'utility_armor_idle.json', 'basic_idle.json', 'basic_wall_top.json', 'basic_parkour_small.json', 'combat-motion-tuning.data', 'consume-placement.data', 'receiver-poses.data', 'hunter-consume.data', 'hammer-scales.data', 'armor-growth.data', 'camera-profile.data', 'camera-events.data'].each {
                 if (!new File(profile, it).isFile()) throw new GradleException("Incomplete bundled motion profile: ${it}")
             }
+            // The public baseline and the private skill extension are separate
+            // inventories. An explicit extension must include every skill clip.
+            if (releaseProfile == 'external-profile') ['dev_groundspike','dev_air_groundspike','dev_tendril','dev_air_tendril','dev_critical_pain','dev_air_critical_pain','bulletdive_drop'].each {
+                if (!new File(profile, it + '.json').isFile() || !new File(profile, it + '_charge.json').isFile())
+                    throw new GradleException("Incomplete source skill profile: ${it}")
+            }
         }
     }
 }
@@ -88,6 +94,8 @@ def distributionZip = tasks.register('distributionZip', Zip) {
     from(tasks.named('jar')) { into 'mods' }
     from('README.md')
     from(releaseNotices)
+    exclude 'blacklight/bundled_motions/devastator-fx.data', 'assets/blacklight/textures/private_devfx/**'
+    exclude 'assets/blacklight/shaders/core/source_biomass.*', 'com/codex/blacklight/client/renderer/DevastatorSourceMesh*.class'
     from('docs') { into 'docs' }
     preserveFileTimestamps = false
     reproducibleFileOrder = true
@@ -112,8 +120,9 @@ if (project.hasProperty('wallTraversalTest')) {
 if (project.hasProperty('standaloneInfected')) {
     sourceSets.main.java.srcDir('src/infectedVisualTest/java')
 }
-if (project.hasProperty('standaloneVisual') || project.hasProperty('standaloneGait') || project.hasProperty('standaloneLock') || project.hasProperty('standaloneMorph')) {
+if (project.hasProperty('standaloneVisual') || project.hasProperty('standaloneGait') || project.hasProperty('standaloneLock') || project.hasProperty('standaloneMorph') || project.hasProperty('standaloneSkill') || project.hasProperty('standaloneSync')) {
     sourceSets.main.java.srcDir('src/standaloneVisualTest/java')
+    if (!project.hasProperty('standaloneSync')) sourceSets.main.java.exclude '**/StandaloneSyncClientSmoke.java', '**/StandaloneSyncServerChecks.java'
 }
 if (project.hasProperty('standaloneTest')) {
     sourceSets.main.java.srcDir('src/standaloneTest/java')
@@ -124,12 +133,17 @@ if (project.hasProperty('standaloneTest')) {
 tasks.named('jar', Jar).configure {
     archiveClassifier = releaseProfile
     from(releaseNotices)
+    exclude 'blacklight/bundled_motions/devastator-fx.data', 'assets/blacklight/textures/private_devfx/**'
+    exclude 'assets/blacklight/shaders/core/source_biomass.*', 'com/codex/blacklight/client/renderer/DevastatorSourceMesh*.class'
     manifest.attributes('Blacklight-Build-Profile': releaseProfile,
             'Blacklight-Motion-Source': releaseProfile == 'bundled' ? 'repository' : 'external',
             'Blacklight-Bundled-Motions': 'true',
             'Blacklight-Asset-Notice': 'THIRD_PARTY_ASSETS.md')
     exclude 'com/codex/blacklight/gametest/**'
     exclude 'com/codex/blacklight/client/Standalone*Smoke*.class'
+    exclude 'com/codex/blacklight/client/StandaloneCriticalMassChecks*.class'
+    exclude 'com/codex/blacklight/client/StandaloneBulletTerrainChecks*.class'
+    exclude 'com/codex/blacklight/client/StandaloneSyncServerChecks*.class'
     exclude 'com/codex/blacklight/client/InfectedCompositionSmoke*.class'
     exclude 'data/blacklight/structure/wall_test.nbt'
 }
@@ -168,12 +182,24 @@ neoForge {
             if (project.hasProperty('standaloneGait')) {
                 systemProperty 'blacklight.test.standaloneGait', file(project.property('standaloneGait')).absolutePath
                 if (project.hasProperty('standaloneGaitJump')) systemProperty 'blacklight.test.standaloneGait.jumpOnly', 'true'
+                if (project.hasProperty('standaloneGaitClaws')) systemProperty 'blacklight.test.standaloneGait.claws', 'true'
+                if (project.hasProperty('standaloneGaitStandingCharge')) systemProperty 'blacklight.test.standaloneGait.standingCharge', 'true'
                 programArguments.addAll '--width', '1280', '--height', '900'
             }
             if (project.hasProperty('standaloneMorph')) {
                 systemProperty 'blacklight.test.standaloneMorph', file(project.property('standaloneMorph')).absolutePath
                 if (project.hasProperty('standaloneMorphCases')) systemProperty 'blacklight.test.standaloneMorph.cases', project.property('standaloneMorphCases').toString()
                 programArguments.addAll '--width', '960', '--height', '640'
+            }
+            if (project.hasProperty('standaloneSkill')) {
+                systemProperty 'blacklight.test.standaloneSkill', file(project.property('standaloneSkill')).absolutePath
+                if (project.hasProperty('standaloneSkillCases')) systemProperty 'blacklight.test.standaloneSkill.cases', project.property('standaloneSkillCases').toString()
+                if (project.hasProperty('standaloneSkillFlightScene')) systemProperty 'blacklight.test.standaloneSkill.flightScene', 'true'
+                programArguments.addAll '--width', '1280', '--height', '900'
+            }
+            if (project.hasProperty('standaloneSync')) {
+                systemProperty 'blacklight.test.standaloneSync', file(project.property('standaloneSync')).absolutePath
+                programArguments.addAll '--width', '1280', '--height', '900'
             }
             if (project.hasProperty('localWeaponMotions')) {
                 systemProperty 'blacklight.localWeaponMotions', file(project.property('localWeaponMotions')).absolutePath
@@ -187,6 +213,9 @@ neoForge {
                 programArguments.addAll '--quickPlaySingleplayer',
                         project.property('quickPlayWorld').toString()
             }
+            if (project.hasProperty('quickPlayMultiplayer')) {
+                programArguments.addAll '--quickPlayMultiplayer', project.property('quickPlayMultiplayer').toString()
+            }
             // Developer-only visual acceptance hook. Normal launches never set it.
             if (project.hasProperty('openAnimationTuner')) {
                 systemProperty 'blacklight.test.openAnimationTuner', 'true'
@@ -197,6 +226,9 @@ neoForge {
 
         server {
             server()
+            if (project.hasProperty('serverRunDirectory')) gameDirectory = file(project.property('serverRunDirectory'))
+            if (project.hasProperty('standaloneSync')) systemProperty 'blacklight.test.standaloneSync', file(project.property('standaloneSync')).absolutePath
+            jvmArgument '-Xmx2G'
             programArgument '--nogui'
             systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
         }
@@ -412,7 +444,10 @@ tasks.register('verifyBundledMotionResources') {
     dependsOn tasks.named('jar')
     doLast {
         def source = file(bundledMotionDirectory.get())
-        def profile = fileTree(source).matching { include '*.json', '*.data' }.files
+        def profile = fileTree(source).matching {
+            include '*.json', '*.data'
+            exclude 'devastator-fx.data'
+        }.files
         if (profile.empty || !new File(source, 'basic_idle.json').isFile())
             throw new GradleException('A complete runtime motion profile is required')
         def manifest = releaseProfile == 'bundled'

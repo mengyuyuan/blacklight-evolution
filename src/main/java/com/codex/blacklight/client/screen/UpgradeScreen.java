@@ -2,6 +2,7 @@ package com.codex.blacklight.client.screen;
 
 import com.codex.blacklight.network.UpgradePurchasePayload;
 import com.codex.blacklight.power.ClawUpgrade;
+import com.codex.blacklight.power.CombatSkill;
 import com.codex.blacklight.power.MovementUpgrade;
 import com.codex.blacklight.registry.ModAttachments;
 import com.codex.blacklight.state.BlacklightState;
@@ -37,7 +38,9 @@ public final class UpgradeScreen extends Screen {
         CLAW("screen.blacklight.section.claw"),
         FORMS("screen.blacklight.section.forms"),
         BIOLOGY("screen.blacklight.section.biology"),
-        UTILITY("screen.blacklight.section.utility");
+        UTILITY("screen.blacklight.section.utility"),
+        COMBAT("screen.blacklight.section.combat"),
+        SETTINGS("screen.blacklight.section.settings");
 
         private final String langKey;
         Category(String langKey) { this.langKey = langKey; }
@@ -74,10 +77,16 @@ public final class UpgradeScreen extends Screen {
         int y = 0;
         if(category==Category.ATTRIBUTES){
             y=attributeHeight();
+        } else if(category==Category.SETTINGS){
+            y=addSettingRow(y,"bulletdive_blocks");
         } else if(category==Category.BIOLOGY){
             for(var growth:com.codex.blacklight.power.GrowthUpgrade.values())y=addRow(y,growth.id,growth.cost,growth.requires()==null?null:growth.requires().id);
         } else if(category==Category.UTILITY){
             for(var form:new com.codex.blacklight.power.PowerForm[]{com.codex.blacklight.power.PowerForm.SHIELD,com.codex.blacklight.power.PowerForm.ARMOR,com.codex.blacklight.power.PowerForm.THERMAL_VISION,com.codex.blacklight.power.PowerForm.INFECTED_VISION})y=addRow(y,form.id(),form.epCost(),null);
+        } else if (category == Category.COMBAT) {
+            for (var skill : CombatSkill.values()) y = addRow(y, skill.id(), skill.epCost(),
+                    skill.requires() != null ? skill.requires().id()
+                            : skill.movementRequires() == null ? null : skill.movementRequires().id());
         } else if (category == Category.MOVEMENT) {
             for (MovementUpgrade upgrade : MovementUpgrade.values()) {
                 y = addRow(y, upgrade.id(), upgrade.epCost(),
@@ -108,6 +117,22 @@ public final class UpgradeScreen extends Screen {
         button.setTooltip(Tooltip.create(Component.translatable("upgrade.blacklight."+id+".desc")));
         addRenderableWidget(button);
         rows.add(new Row(id,cost,requiresId,button,y,rowHeight,buttonOffset,titleLines,description));
+        return y+rowHeight+6;
+    }
+
+    private int addSettingRow(int y,String id){
+        var titleLines=font.split(Component.translatable("setting.blacklight."+id),textWidth);
+        var description=font.split(Component.translatable("setting.blacklight."+id+".desc"),textWidth);
+        int rowHeight=Math.max(44,titleLines.size()*11+4+description.size()*11+16+(stacked?26:0));
+        int buttonOffset=stacked?rowHeight-27:Math.max(8,(rowHeight-20)/2);
+        var button=Button.builder(Component.empty(),clicked->{
+            var player=Minecraft.getInstance().player;
+            if(player!=null)PacketDistributor.sendToServer(new com.codex.blacklight.network.SkillSettingsPayload(
+                    !player.getData(ModAttachments.SKILL_SETTINGS).bulletdiveBlockBreaking()));
+        }).bounds(contentX+contentWidth-buttonWidth-8,0,buttonWidth,20).build();
+        button.setTooltip(Tooltip.create(Component.translatable("setting.blacklight."+id+".desc")));
+        addRenderableWidget(button);
+        rows.add(new Row(id,0,null,button,y,rowHeight,buttonOffset,titleLines,description));
         return y+rowHeight+6;
     }
 
@@ -146,14 +171,15 @@ public final class UpgradeScreen extends Screen {
         int railY = 64;
         for (Category entry : Category.values()) {
             boolean selected = entry == category;
-            if (mouseX >= 8 && mouseX < railWidth - 8 && mouseY >= railY && mouseY < railY + 22) {
-                graphics.fill(8, railY, railWidth - 8, railY + 22, ROW_HOVER);
+            int railHeight = Math.min(22, railStep() - 2);
+            if (mouseX >= 8 && mouseX < railWidth - 8 && mouseY >= railY && mouseY < railY + railHeight) {
+                graphics.fill(8, railY, railWidth - 8, railY + railHeight, ROW_HOVER);
             }
             var label=font.split(Component.translatable(entry.langKey),railWidth-24);
             int labelY=railY+(label.size()>1?2:7);
             for(var line:label){graphics.drawString(font,line,16,labelY,selected?RED:TEXT_DIM,false);labelY+=10;}
             if (selected) graphics.fill(8, railY + 4, 10, railY + 18, RED);
-            railY += 26;
+            railY += railStep();
         }
 
         layoutRows();
@@ -205,6 +231,13 @@ public final class UpgradeScreen extends Screen {
     }
 
     private void refreshRow(Row row, BlacklightState state) {
+        if(category==Category.SETTINGS){
+            var player=Minecraft.getInstance().player;
+            row.button.active=player!=null;
+            boolean enabled=player!=null&&player.getData(ModAttachments.SKILL_SETTINGS).bulletdiveBlockBreaking();
+            row.button.setMessage(Component.translatable(enabled?"screen.blacklight.setting_on":"screen.blacklight.setting_off"));
+            return;
+        }
         if (state == null) {row.button.active=false;return;}
         boolean owned = owned(state, row.id);
         boolean prereqMet = row.requiresId == null || owned(state, row.requiresId);
@@ -228,7 +261,7 @@ public final class UpgradeScreen extends Screen {
         int railY = 64;
         for (Category entry : Category.values()) {
             if (mouseX >= 8 && mouseX < railWidth - 8
-                    && mouseY >= railY && mouseY < railY + 22) {
+                    && mouseY >= railY && mouseY < railY + Math.min(22, railStep() - 2)) {
                 if (entry != category) {
                     category = entry;
                     scrollOffset=0;
@@ -236,7 +269,7 @@ public final class UpgradeScreen extends Screen {
                 }
                 return true;
             }
-            railY += 26;
+            railY += railStep();
         }
         return mouseY>=LIST_TOP&&mouseY<listBottom&&super.mouseClicked(mouseX, mouseY, button);
     }
@@ -247,6 +280,8 @@ public final class UpgradeScreen extends Screen {
     }
 
     private static boolean owned(BlacklightState state, String id) {
+        var combat = CombatSkill.byId(id);
+        if (combat != null) return state.hasCombatSkill(combat);
         var growth=com.codex.blacklight.power.GrowthUpgrade.byId(id);
         if(growth!=null){var p=Minecraft.getInstance().player;return p!=null&&p.getData(ModAttachments.GROWTH).owns(growth);}
         var form = com.codex.blacklight.power.PowerForm.byId(id);
@@ -256,6 +291,8 @@ public final class UpgradeScreen extends Screen {
         MovementUpgrade movement = MovementUpgrade.byId(id);
         return movement != null && state.hasMovementUpgrade(movement);
     }
+
+    private int railStep() { return Math.clamp((height - 72) / Category.values().length, 20, 26); }
 
     private static BlacklightState currentState() {
         Minecraft minecraft = Minecraft.getInstance();

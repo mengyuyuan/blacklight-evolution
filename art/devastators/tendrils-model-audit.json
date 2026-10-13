@@ -1,0 +1,71 @@
+{
+  "tendril_segment": {
+    "triangles": 1080,
+    "runtimeQuadVertices": 4320,
+    "bounds": {
+      "min": [
+        -0.154955,
+        0.0,
+        -0.147507
+      ],
+      "max": [
+        0.156799,
+        1.0,
+        0.146081
+      ]
+    },
+    "exportedGeometryValidated": true,
+    "maximumNormalLengthDeviation": 7.5e-07,
+    "maximumSideBarbNormalizedAxialSpan": 0.0024000000000000687,
+    "maximumSideBarbAxialSpanAt164Blocks": 0.3936000000000113,
+    "roundVolumeNormals": true,
+    "transverseTissueRibs": 3,
+    "tissueColorVertices": 648
+  },
+  "tendril_spike": {
+    "triangles": 328,
+    "runtimeQuadVertices": 1312,
+    "bounds": {
+      "min": [
+        -0.039287,
+        0.0,
+        -0.037381
+      ],
+      "max": [
+        0.076885,
+        0.3,
+        0.04636
+      ]
+    },
+    "exportedGeometryValidated": true,
+    "maximumNormalLengthDeviation": 6.3e-07,
+    "maximumSideBarbNormalizedAxialSpan": 0.002399999999999995,
+    "maximumSideBarbAxialSpanAt164Blocks": 0.3935999999999992,
+    "roundVolumeNormals": true,
+    "transverseTissueRibs": 0,
+    "tissueColorVertices": 192
+  },
+  "whipfist_segment": {
+    "triangles": 848,
+    "runtimeQuadVertices": 3392,
+    "bounds": {
+      "min": [
+        -0.08531,
+        0.0,
+        -0.083896
+      ],
+      "max": [
+        0.120891,
+        1.0,
+        0.082255
+      ]
+    },
+    "exportedGeometryValidated": true,
+    "maximumNormalLengthDeviation": 6.8e-07,
+    "maximumSideBarbNormalizedAxialSpan": 0.0024000000000000687,
+    "maximumSideBarbAxialSpanAt164Blocks": 0.3936000000000113,
+    "roundVolumeNormals": true,
+    "transverseTissueRibs": 3,
+    "tissueColorVertices": 432
+  }
+}

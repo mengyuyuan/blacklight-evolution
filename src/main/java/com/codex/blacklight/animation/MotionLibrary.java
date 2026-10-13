@@ -138,13 +138,27 @@ public final class MotionLibrary {
     }
     /** Validate required independent runtime assets at setup rather than silently substituting missing actions. */
     public static void requireInstalled() {
+        boolean extension = skillExtensionInstalled();
         for (var action : PlayerAction.values()) clip(resolve(action));
         for (var move : com.codex.blacklight.combat.WeaponMove.values()) {
+            if (!extension && skillMotion(move.id)) continue;
             clip(move.id);
             com.codex.blacklight.combat.LocalWeaponMotion.find(move.id)
                     .flatMap(com.codex.blacklight.combat.LocalWeaponMotion.Definition::charge)
                     .ifPresent(charge -> clip(charge.animation()));
         }
         for (String key : new String[]{"utility_armor_transform", "utility_armor_idle", "utility_shield_deploy", "utility_shield_hit", "basic_wall_top", "basic_parkour_small"}) clip(key);
+        if (extension) for (String key : new String[]{"dev_critical_pain_aim_up","dev_critical_pain_aim_down","dev_air_critical_pain_aim_up","dev_air_critical_pain_aim_down"}) clip(key);
+        else com.codex.blacklight.BlacklightNeoMod.LOGGER.info("Base motion profile installed; formal Devastators and Bulletdive require the complete skill extension");
+    }
+    private static boolean skillMotion(String id) { return id.startsWith("dev_") || id.equals("bulletdive_drop"); }
+    /** Absence is a supported baseline; a partially supplied extension is an installation error. */
+    public static boolean skillExtensionInstalled() {
+        String[] keys={"dev_groundspike","dev_air_groundspike","dev_tendril","dev_air_tendril","dev_critical_pain","dev_air_critical_pain","bulletdive_drop"};
+        boolean any=false;
+        for (String key:keys) any |= find(key).isPresent();
+        if (!any) return false;
+        for (String key:keys) { clip(key); clip(key+"_charge"); }
+        return true;
     }
 }

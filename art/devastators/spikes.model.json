@@ -1,0 +1,37 @@
+{
+  "format": "blacklight-shared-claw-cuboids-v1",
+  "sourceGeometry": "src/main/resources/assets/blacklight/geo/ground_spike.geo.json",
+  "provenance": "Blacklight's project-authored claw groundspike cuboids with independently widened spire cross sections and eruption footprints, baked into GPU indexed meshes. The claw_biomass texture and original cube UV nets are unchanged. Prototype geometry bounds inform a documented size comparison only; no Prototype topology, UVs or textures are imported. Legacy loft construction below is design history and is not used by this format.",
+  "coordinateSystem": "world_Y_up",
+  "palette": {
+    "root": [18, 15, 19],
+    "muscle": [29, 22, 28],
+    "bone": [35, 34, 38],
+    "edge": [68, 66, 70],
+    "vein": [107, 7, 13],
+    "veinShadow": [53, 3, 8]
+  },
+  "variants": {
+    "groundspike_small": {"height": 2.6, "coreWidth": 0.60, "rootFootprint": 0.85, "seed": 11, "cluster": false},
+    "groundspike_mid": {"height": 3.6, "coreWidth": 0.82, "rootFootprint": 1.15, "seed": 29, "cluster": false},
+    "groundspike_large": {"height": 4.8, "coreWidth": 1.04, "rootFootprint": 1.45, "seed": 43, "cluster": false},
+    "groundspike_cluster_small": {"height": 2.9, "coreWidth": 0.64, "rootFootprint": 0.95, "seed": 71, "cluster": true},
+    "groundspike_cluster_mid": {"height": 4.0, "coreWidth": 0.88, "rootFootprint": 1.25, "seed": 97, "cluster": true},
+    "groundspike_cluster_large": {"height": 5.2, "coreWidth": 1.12, "rootFootprint": 1.60, "seed": 131, "cluster": true}
+  },
+  "lod": {
+    "single": {"rootRings": 6, "rootSides": 8, "bladeRings": 12, "splitRings": 9, "bladeSectionIndices": [0, 1, 2, 3, 4, 5, 6, 7], "spurRings": 6, "spurSectionIndices": [0, 2, 4, 6], "muscleCount": 2, "muscleRings": 7, "muscleSides": 6, "veinCount": 1, "veinRings": 11, "veinSides": 5},
+    "satellite": {"rootRings": 4, "rootSides": 6, "bladeRings": 7, "splitRings": 6, "bladeSectionIndices": [0, 2, 4, 6], "spurRings": 4, "spurSectionIndices": [0, 2, 4, 6], "muscleCount": 1, "muscleRings": 5, "muscleSides": 4, "veinCount": 1, "veinRings": 6, "veinSides": 4},
+    "bridgeRings": 5,
+    "bridgeSides": 6,
+    "singleTriangleBudget": 1000,
+    "clusterTriangleBudget": 2500
+  },
+  "construction": {
+    "mainBladeRings": 25,
+    "bladeSection": [[-1, 0], [-0.6, -0.72], [0, -1], [0.62, -0.7], [1, 0], [0.55, 0.64], [0, 1], [-0.57, 0.61]],
+    "primarySpine": [[0, 0.12, 0, 0.145, 0.067], [-0.035, 0.29, 0.009, 0.118, 0.052], [0.017, 0.49, -0.014, 0.085, 0.035], [0.064, 0.67, -0.013, 0.062, 0.025], [0.116, 0.83, -0.04, 0.036, 0.012], [0.166, 0.945, -0.073, 0.013, 0.005], [0.171, 1, -0.111, 0.0003, 0.0003]],
+    "splitSpine": [[0.012, 0.425, -0.016, 0.083, 0.033], [-0.073, 0.545, -0.026, 0.071, 0.029], [-0.146, 0.683, -0.006, 0.047, 0.019], [-0.172, 0.802, 0.018, 0.019, 0.009], [-0.143, 0.899, 0.009, 0.0003, 0.0003]],
+    "clusterSatellites": [[0.27, 0.07, 0.67, 24, -16], [-0.21, -0.2, 0.61, 151, 19], [-0.24, 0.21, 0.48, 247, -18], [0.1, -0.3, 0.57, 322, 14]]
+  }
+}

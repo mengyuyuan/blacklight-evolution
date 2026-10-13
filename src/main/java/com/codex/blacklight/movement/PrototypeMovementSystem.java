@@ -105,6 +105,10 @@ public final class PrototypeMovementSystem {
         // relies on — the controlling client's living-motion hooks otherwise race
         // the ordinary animator sync packet and the action never sticks locally.
         if(!movement.runningCharge()) {
+            if(player.onGround()){
+                player.setDeltaMovement(0,player.getDeltaMovement().y,0);
+                player.hurtMarked=true;
+            }
             play(player, PlayerAction.CHARGED_JUMP);
             PacketDistributor.sendToPlayer(player, new ClawAnimationPayload(ClawAnimationPayload.Animation.CHARGED_JUMP));
         }
@@ -348,7 +352,9 @@ public final class PrototypeMovementSystem {
             if(!movement.runningCharge()) {
                 holdServerChargePose(player, movement, maximum);
                 Vec3 velocity = player.getDeltaMovement();
-                player.setDeltaMovement(velocity.x * 0.72D, 0.0D, velocity.z * 0.72D);
+                // A stationary charge is planted, not a slowly braking walk.
+                // Preserve vertical physics so removed support still causes a fall.
+                player.setDeltaMovement(0.0D, velocity.y, 0.0D);
                 player.hurtMarked = true;
             }
             if (movement.isFullyCharged(maximum)) {

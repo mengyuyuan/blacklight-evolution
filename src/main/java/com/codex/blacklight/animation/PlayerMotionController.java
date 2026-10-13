@@ -23,15 +23,23 @@ public final class PlayerMotionController {
     private static final Map<LivingEntity, Runtime> STATES = new WeakHashMap<>();
     private static Object level;
     private static long lastRootTick = Long.MIN_VALUE, lastRootRevision = Long.MIN_VALUE;
-    private static final class Clock {
+    static final class Clock {
         String key;
         double at;
         float seconds;
         boolean paused, reverse;
         float time(double now) {
-            if (!paused) seconds = Math.max(0, seconds + (float)Math.max(0, now - at) / 20 * (reverse ? -1 : 1));
-            at = Math.max(at, now);
-            return seconds;
+            // Render passes may ask for another partial tick in either order.
+            // Sampling must never move the command's time origin or cursor.
+            return paused ? seconds : Math.max(0,
+                    seconds + (float)Math.max(0, now - at) / 20 * (reverse ? -1 : 1));
+        }
+        void commit(double now) {
+            seconds=time(now);at=now;
+        }
+        boolean finished(double now,boolean looping,float duration) {
+            float time=time(now);
+            return !paused&&(reverse?time<=.0001F:!looping&&time>=duration);
         }
     }
     private static final class Runtime {
@@ -44,6 +52,7 @@ public final class PlayerMotionController {
         boolean contactStrideTransition;
         net.minecraft.world.phys.Vec3 committedPosition;
         final LocomotionClock gait=new LocomotionClock();
+        final ChargePoseClock charge=new ChargePoseClock();
         BlacklightPose from,last;
     }
     private PlayerMotionController() {}
@@ -135,11 +144,11 @@ public final class PlayerMotionController {
     }
     public static void pause(LivingEntity player, boolean paused) {
         if (player == null) return;
-        var clock = mutableClock(player); clock.time(now(player, 0)); clock.paused = paused;
+        var clock = mutableClock(player); clock.commit(now(player, 0)); clock.paused = paused;
     }
     public static void reverse(LivingEntity player, boolean reversed) {
         if (player == null) return;
-        var clock = mutableClock(player); clock.time(now(player, 0)); clock.reverse = reversed;
+        var clock = mutableClock(player); clock.commit(now(player, 0)); clock.reverse = reversed;
     }
     public static void clear(LivingEntity player) {
         if (player == null) return;
@@ -175,12 +184,17 @@ public final class PlayerMotionController {
         var action=entity.getData(ModAttachments.PLAYER_ACTION);
         BlacklightPose base = locomotion(entity, runtime, now, partial);
         if (runtime.preview != null) return samplePose(runtime.preview.key, runtime.preview.time(now), false);
+        if(runtime.phase==LocomotionPhase.CHARGING&&entity.getData(ModAttachments.WEAPON_VISUAL).spec()==null)
+            return base;
+        var activeWeapon=entity.getData(ModAttachments.WEAPON_VISUAL).spec();
+        if(activeWeapon!=null&&(activeWeapon.id.startsWith("dev_")||activeWeapon==com.codex.blacklight.combat.WeaponMove.BULLETDIVE_DROP))
+            runtime.override=null; // The synchronized skill owns airborne holds and aim blending.
         if (runtime.override != null) {
             var clock = runtime.override;
             float time = clock.time(now);
-            if (clock.reverse && time <= .0001 || !clock.paused && !clock.reverse && !MotionLibrary.looping(clock.key) && time >= duration(clock.key)) {
-                runtime.override = null;
-            } else {
+            // An end sample does not retire the clock: another pass can ask for
+            // an earlier partial in this same interval. Retirement owns a tick.
+            if (!clock.finished(now,MotionLibrary.looping(clock.key),duration(clock.key))) {
                 var sampled=samplePose(clock.key,time,MotionLibrary.looping(clock.key));
                 if(LandingMotionPolicy.isLanding(clock.key)){
                     if(!entity.onGround())return base;
@@ -194,6 +208,16 @@ public final class PlayerMotionController {
         var weapon=WeaponMotionClock.sample(entity.getData(ModAttachments.WEAPON_VISUAL),now);
         if(weapon!=null){
             var sampled=samplePose(weapon.key(),weapon.seconds(),weapon.looping());
+            var dev=entity.getData(ModAttachments.DEVASTATOR_VISUAL);
+            if(dev.kind()==2&&!entity.getData(ModAttachments.WEAPON_VISUAL).charging()){
+                // The decoded vertical-aim track supplies actual up/down clips.
+                // Blend their source poses using the authoritative release ray.
+                var direction=dev.direction();
+                float weight=(float)Math.clamp(Math.abs(Math.atan2(direction.y,direction.horizontalDistance()))/(Math.PI/2),0,1);
+                String variant=weapon.key()+(direction.y>=0?"_aim_up":"_aim_down");
+                if(weight>.001F&&MotionLibrary.find(variant).isPresent())
+                    sampled=BlacklightPose.interpolatePose(sampled,samplePose(variant,weapon.seconds(),false),weight);
+            }
             return weapon.blend()>=1?sampled:BlacklightPose.interpolatePose(base,sampled,weapon.blend());
         }
         if (action.revision() != runtime.suppressedRevision && action.active(now)
@@ -241,8 +265,17 @@ public final class PlayerMotionController {
         return duration<=0?0:(float)(Math.max(0,seconds)%duration);
     }
     private static void commitLocomotion(LivingEntity entity,Runtime runtime) {
-        long tick=entity.level().getGameTime();
+        reconcileAction(entity,runtime);
+        if(runtime.override!=null) {
+            var clock=runtime.override;
+            if(clock.finished(now(entity,0),MotionLibrary.looping(clock.key),duration(clock.key)))runtime.override=null;
+        }
+        // World time can be corrected backwards by a server time packet. Entity
+        // ticks own local interpolation; a time correction must not freeze gait.
+        long tick=entity.tickCount;
         if(runtime.gait.key()!=null&&tick<=runtime.gait.tick())return;
+        runtime.charge.commit(entity==Minecraft.getInstance().player?ClientMovementEvents.visualJumpCharge()
+                :entity.getData(ModAttachments.JUMP_CHARGE),MovementTuningSettings.jumpChargeTicks());
         var previous=runtime.last;
         var velocity=entity.getDeltaMovement();
         var travel=runtime.committedPosition==null?net.minecraft.world.phys.Vec3.ZERO:entity.position().subtract(runtime.committedPosition);
@@ -330,7 +363,7 @@ public final class PlayerMotionController {
         if(runtime.gait.key()==null) {
             // Initial rendering can precede the first client tick. Establish one
             // idle interval; subsequent render passes cannot advance or reroute it.
-            runtime.gait.commit(entity.level().getGameTime(),"basic_idle",duration("basic_idle"),true,false,0,0);
+            runtime.gait.commit(entity.tickCount,"basic_idle",duration("basic_idle"),true,false,0,0);
             runtime.locomotion="basic_idle";runtime.committedPosition=entity.position();
         }
         return renderLocomotion(entity,runtime,partial);
@@ -341,8 +374,7 @@ public final class PlayerMotionController {
         float clipDuration=runtime.gait.duration();
         float time=runtime.gait.sampleTime(partial);
         if (key.equals("basic_jump_charge")) {
-            int charge = entity == Minecraft.getInstance().player ? ClientMovementEvents.visualJumpCharge() : entity.getData(ModAttachments.JUMP_CHARGE);
-            time = duration(key) * Math.clamp(charge / (float)MovementTuningSettings.jumpChargeTicks(), 0, 1);
+            time = duration(key)*runtime.charge.ratio(partial,MovementTuningSettings.jumpChargeTicks());
         }
         var pose=samplePose(key,time,looping);
         if(looping&&clipDuration>0) {
@@ -371,6 +403,7 @@ public final class PlayerMotionController {
         lastRootTick = packet.gameTime(); lastRootRevision = packet.revision();
         // Keep previous-tick coordinates for render interpolation and preserve the player's freely moving view.
         player.setPos(packet.x(), packet.y(), packet.z());
+        com.codex.blacklight.client.ClientDevastatorMovement.acceptRoot(player);
     }
     @SubscribeEvent(priority=net.neoforged.bus.api.EventPriority.LOWEST)
     public static void tick(ClientTickEvent.Post event) {

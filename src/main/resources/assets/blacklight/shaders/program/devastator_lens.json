@@ -1,0 +1,17 @@
+{
+  "vertex":"minecraft:blit","fragment":"blacklight:devastator_lens","attributes":["Position"],
+  "samplers":[{"name":"DiffuseSampler"}],
+  "uniforms":[
+    {"name":"ProjMat","type":"matrix4x4","count":16,"values":[1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1]},
+    {"name":"OutSize","type":"float","count":2,"values":[1,1]},
+    {"name":"InSize","type":"float","count":2,"values":[1,1]},
+    {"name":"Burst","type":"float","count":1,"values":[0]},
+    {"name":"Retract","type":"float","count":1,"values":[0]},
+    {"name":"Flight","type":"float","count":1,"values":[0]},
+    {"name":"CentreX","type":"float","count":1,"values":[0.5]},
+    {"name":"CentreY","type":"float","count":1,"values":[0.5]},
+    {"name":"FlowX","type":"float","count":1,"values":[0]},
+    {"name":"FlowY","type":"float","count":1,"values":[0]},
+    {"name":"FlightAxis","type":"float","count":1,"values":[1]}
+  ]
+}

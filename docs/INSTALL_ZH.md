@@ -1,26 +1,54 @@
 # 独立开发版安装
 
-适用：Blacklight: Ascension 0.3.0-standalone-dev.8 · Minecraft 1.21.1 · NeoForge 21.1.244 · Java 21。
+适用：Blacklight: Ascension 0.3.0-standalone-dev.10 · Minecraft 1.21.1 · NeoForge 21.1.244 · Java 21。
 
 这是从 RC59 迁移的独立开发版。黑光现在使用自身的动作、玩家渲染、输入、镜头、目标锁定与服务端同步。Epic Fight、Epic ParCool 和 Weapons of Miracles 已不是前置，首次验证使用仅含黑光与 GeckoLib 的实例。
 
 dev.6 新增五种攻击武器的液态变形，重点展示第三人称的组织推进、波形塑形、附着四股组织流和湿润反光；第一人称保留现有原版手部位置。效果由程序化几何与湿材质重建，原版全部软组织碎片、charge/burst 和 Shader 尚未一比一还原。源依据与具体范围见 [液态武器变形说明](LIQUID_WEAPON_MORPH_SOURCE.md)。
 
+dev.7 接入临界储备及容量升级、肾上腺激增、三种正式毁灭技及其空中版本、子弹俯冲；dev.9 补充正蓝储备许可、完整花费及退出损耗、身体恢复、组织回收、场景扭曲与持续加速的俯冲。临界储备显示为红血条后方延伸的蓝色额外血量。按键、资源与适配边界见 [源依据](CRITICAL_MASS_SOURCE.md)、[花费与伤害研究](DEVASTATOR_DAMAGE_RESEARCH.md)、[效果依据](DEVASTATOR_EFFECT_SOURCE.md) 和包内 README。
+
+dev.9 合并上游的 80 种感染体原版模型、变种／资源包贴图与感染结构组合，以及新的原生模型部件绑定，见 [感染模型说明](STANDALONE_INFECTED_MODELS.md)。同时保留 dev.8 普通持有阶段的镜头相对 W/A/S/D 转向：人物、握持点和受害者同步转身，捕获、吸收、投掷与攀附仍遵守各自朝向约束，见 [持有转向说明](CARRY_STEERING_DEV8.md)。
+
 ## 安装文件
 
-- `Blacklight-Ascension-MC1.21.1-NeoForge-0.3.0-standalone-dev.8-bundled.jar`：当前含完整动作、装甲、镜头与 HUD 资料的试玩 JAR。
+- `Blacklight-Ascension-MC1.21.1-NeoForge-0.3.0-standalone-dev.10-external-profile.jar`：本轮使用精确 251 文件运行资料构建，即旧 224 份、20 份正式毁灭技／俯冲／垂直瞄准动作与 7 份身体恢复动作；完整试玩应选这一类资料。
+- `Blacklight-Ascension-MC1.21.1-NeoForge-0.3.0-standalone-dev.10-bundled.jar`：默认构建，包含仓库 `art/motion-profile/` 的 224 个既有动作、装甲、镜头与 HUD 文件；没有本轮新增 27 份动作，不能当作完整毁灭技资料。
 - `geckolib-neoforge-1.21.1-4.9.2.jar`：唯一额外的必需 Mod；其原始 JAR 和完整 MIT 许可一起保留。
-- 默认 `assemble` 已携带仓库中的全部 224 个资料文件，无需指定本机路径。
+
+默认 `assemble` 不需要本机路径，会按仓库清单核对 224 文件。完整新技能及身体恢复通过 `-PbundleMotionDirectory=<完整资料目录>` 整套替换为 251 文件；本机使用 `D:/Blacklight-Standalone/motion-profile-dev9`。两套资料的技能动作范围不同，不要按单个文件混装。原始 FX 研究资料、网格和贴图不属于这 251 份运行资料，也不能混入 JAR。
+
+```powershell
+.\gradlew.bat clean assemble "-PbundleMotionDirectory=D:/Blacklight-Standalone/motion-profile-dev9" --no-daemon
+```
 
 ## 安装步骤
 
 1. 退出游戏，在启动器建立 Minecraft 1.21.1 / NeoForge 21.1.244 实例，并使用 Java 21。
-2. 把 Blacklight JAR 和单独下载的 GeckoLib JAR 放入实例的 `mods` 文件夹。黑光只保留一个版本。
+2. 把对应范围的 Blacklight JAR 和 GeckoLib JAR 放入实例的 `mods` 文件夹。黑光只保留一个版本；本轮完整新技能选择 251 文件的 `external-profile` 包。
 3. 首次验证先使用独立实例或已有存档副本。不要在 RC59 常用实例中混装旧黑光、新黑光与旧动作前置。
 4. 删除旧的 `-Dblacklight.localWeaponMotions=...` 参数，除非正在有意使用完整的外部开发资料目录。该目录会替代包内资料。
 5. 检查模组菜单中的版本和控制设置，先确认普通模式、B 黑光模式、五种攻击形态、装甲、盾牌、抓取吞噬和墙面动作。
 
 ParCool 3.4.3.3 的兼容 API 仍可选；黑光原生移动不要求安装。其他版本和额外动作 Mod 尚未作为此独立开发版的兼容组合验收。
+
+本页只适用于 NeoForge 1.21.1。Forge 1.20.1 使用 [`forge-1.20.1` 分支](https://github.com/mengyuyuan/blacklight-evolution/tree/forge-1.20.1) 的依赖、Java 版本与安装文档；各版本同步情况见 [多版本规范](MULTIVERSION_WORKFLOW_ZH.md)，贡献工具见 [快捷工具](VERSION_TOOLS_ZH.md)。
+
+## 新技能操作
+
+感染后按 **B** 进入黑光模式，在 **U** 面板学习临界质量、对应毁灭技及容量升级。满血成功吸收的溢出按源配置 0.55 因子形成红血条后方的蓝色储备；受伤先消耗蓝血。容量升级增加可存份数，**有任意正蓝储备即可出招，不必等一格全满**。
+
+正式控制器开始时扣一份完整花费：储备不足的差额扣红血，耗尽蓝血退出临界时另扣半份花费；受伤耗尽蓝血也会产生退出损耗。一份花费按最大生命的 25% 换算，属 Minecraft 单位适配。不要把很短的蓝血当作无代价的完整大招。
+
+按住组合至满蓄：**左键＋右键**为地刺墓地，**右键＋E**为触须弹幕，**左键＋E**为致命痛楚。离地时使用相应空中版本；提前松键接普通招式，不扣临界。满蓄后先进入正式动作，花费等待各招实际控制器起点；支出前取消不扣，支出后取消不返还。E 有绑定冲突时在控制设置调整抓取键，组合中的 E 以实际抓取键绑定为准。**F5** 保留原版第一人称／第三人称背面／正面切换，大招不固定视角。
+
+子弹俯冲先在 U 学滑翔 I，再学子弹俯冲，不要求临界质量。真实滑翔中按住右键蓄势，松开或满蓄释放；持续加速并累计真实落差，只在实际接地后结算伤害和地形效果。dev.9 移除了旧高度、速度及地形威力的固定上限；超过 6 格才破坏方块，落差继续增加坑的宽度、深度、能量与材料能力。
+
+地形冲击只沿落点连通的已加载区块流式处理，不强行加载区块，也不跨未加载空隙影响远处区域。每 tick 的工作预算只限制处理速度；世界高度、材料、交互权限和逐块破坏保护决定实际可破坏范围。dev.10 走原生方块破坏与掉落，基岩保留，箱子等可破坏方块实体会正常破碎并散落库存。`doTileDrops` 控制方块掉落，库存按原版容器规则处理。**U → 设置 → 子弹俯冲 · 方块破坏**默认开启，关闭后保留伤害和冲击，取消待处理的地形任务；选择由服务端保存并同步，死亡后保留。全服共用逐 tick 的候选、破块与耗时预算，每人同时最多一个破坏任务。具体规则见 [俯冲算法](BULLETDIVE_ALGORITHM.md)。
+
+肾上腺激增提供 1.8 秒保命和一次限时免费毁灭技机会，免费释放间隔为 22.5 秒；保命窗口用独立黄色文字提示。墓地复用项目现有利爪几何与贴图生成单根 2.6／3.6／4.8 格、簇高 2.9／4.0／5.2 格的方块地刺，主根约粗 3.8 倍，以整体上下平移生成、回收，不压扁模型。组织束分别按传播、返回时钟收回；原创场景扭曲在手臂和 HUD 之前处理世界画面。身体收招结束后可恢复操作，视觉尾迹单独淡出。
+
+主目标在控制器启动时一次选批，主轨和直接碰撞各自去重、分别记账；原最终 receiver、部分原引擎时钟及跨通道记录仍未完全闭环，当前伤害与组织调度为明确的 Minecraft 适配。源依据和待验收范围见 [伤害研究](DEVASTATOR_DAMAGE_RESEARCH.md)、[效果依据](DEVASTATOR_EFFECT_SOURCE.md) 与 [dev.9 清单](DEVASTATOR_REFINEMENT_PLAN.md)。
 
 ## 升级与回退
 
@@ -34,8 +62,11 @@ ParCool 3.4.3.3 的兼容 API 仍可选；黑光原生移动不要求安装。�
 | --- | --- |
 | 提示缺 GeckoLib | 是否放进正确实例；必须是 NeoForge 1.21.1 的版本 |
 | 提示缺 Epic Fight | 是否仍在运行 RC59 旧 JAR，或存在另一个附属模组 |
-| Missing Blacklight motion / Incomplete motion profile | 是否仍装了 dev.6 以前的 source-only 包，或设置了不完整的外部动作目录 |
+| Missing Blacklight motion / Incomplete motion profile | 是否误装旧 source-only 包，或设置了不完整的外部动作目录；完整新增技能与恢复需要 251 文件资料 |
+| 能启动但新增毁灭技／俯冲／收招动作缺失 | 检查是否使用默认 224 文件 bundled 包，或旧的外部目录覆盖了 251 文件资料 |
 | E 打开背包 | 抓取与背包绑定冲突，检查控制设置 |
 | 装甲、墙跑或跑步画面异常 | 保存截图、具体动作、完整文件名及 latest.log，以同一状态复现 |
 
-dev.7 源码已携带完整运行资料，普通构建产物为 bundled。完整清单与构建方式见 [dev.7 说明](BUNDLED_PROFILE_DEV7.md)。
+上游 dev.7 的 224 文件仓库清单与默认构建方式见 [资料整合说明](BUNDLED_PROFILE_DEV7.md)，此前 dev.7 的 244 文件结果见 [历史实机检查](CRITICAL_MASS_QA.md)。dev.9 最终 59 项单元检查、17 个实机用例及 20 项真实健康事件检查通过，原生图和明确验证范围见 [本轮最终结果](DEVASTATOR_DEV9_QA.md)。本包供本地测试，未进行远程多人、生存全流程或用户真人验收。
+
+本轮 dev.10 验证范围与联机结果以 [当前修正记录](DEV10_GAMEPLAY_QA.md) 为准，dev.9 的旧地形检查不证明新增掉落已经通过。

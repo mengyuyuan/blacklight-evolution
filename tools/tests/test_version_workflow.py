@@ -33,6 +33,20 @@ class VersionWorkflowTest(unittest.TestCase):
         self.write_platform('1.20.1', 'forge_version', 17)
         policy.check_platform(self.repo, self.data['branches'][1])
 
+    def test_gradle_globs_and_urls_do_not_hide_toolchain(self):
+        path = self.repo / 'build.gradle'
+        path.write_text("exclude 'assets/private_fx/**'\nurl \"https://example.invalid/maven\"\n"
+                        + path.read_text(encoding='utf-8') + "\nexclude '**/*.class'", encoding='utf-8')
+        policy.check_platform(self.repo, self.data['branches'][0])
+
+    def test_comments_and_strings_cannot_claim_a_toolchain(self):
+        (self.repo / 'build.gradle').write_text(
+            "// languageVersion = JavaLanguageVersion.of(21)\n"
+            "def note = 'languageVersion = JavaLanguageVersion.of(21)'\n"
+            "/* languageVersion = JavaLanguageVersion.of(21) */", encoding='utf-8')
+        with self.assertRaisesRegex(ValueError, 'Java toolchain'):
+            policy.check_platform(self.repo, self.data['branches'][0])
+
     def test_whole_forge_port_cannot_target_main(self):
         self.write_platform('1.20.1', 'forge_version', 17)
         with self.assertRaisesRegex(ValueError, 'Minecraft.*1.21.1'):

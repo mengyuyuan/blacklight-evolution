@@ -19,7 +19,8 @@ public abstract class NativeRootMovementMixin {
     @Inject(method = "handleMovePlayer", at = @At("HEAD"), cancellable = true)
     private void blacklight$serverRootPosition(ServerboundMovePlayerPacket packet, CallbackInfo ci) {
         // Vanilla schedules this handler onto the server thread; never mutate entities on Netty.
-        if (!player.server.isSameThread() || !NativeRootMotion.controlsGroundRoot(player)) return;
+        if (!player.server.isSameThread() || !(NativeRootMotion.controlsGroundRoot(player)
+                ||com.codex.blacklight.combat.DevastatorSystem.controlsLandingPosition(player))) return;
         float yaw = packet.getYRot(player.getYRot()), pitch = packet.getXRot(player.getXRot());
         // Preserve vanilla's malformed-packet disconnect path.
         if (!Double.isFinite(packet.getX(0)) || !Double.isFinite(packet.getY(0))

@@ -24,6 +24,12 @@ public final class ModAttachments {
                     .sync(BlacklightStateStreamCodec.CODEC)
                     .build());
 
+    public static final Supplier<AttachmentType<com.codex.blacklight.power.SkillSettings>> SKILL_SETTINGS=
+            ATTACHMENTS.register("skill_settings",()->AttachmentType.builder(
+                    ()->com.codex.blacklight.power.SkillSettings.DEFAULT)
+                    .serialize(com.codex.blacklight.power.SkillSettings.CODEC).copyOnDeath()
+                    .sync(com.codex.blacklight.power.SkillSettings.STREAM_CODEC).build());
+
     public static final Supplier<AttachmentType<ClawCombatState>> CLAW_COMBAT = ATTACHMENTS.register(
             "claw_combat",
             () -> AttachmentType.builder(ClawCombatState::new).build());
@@ -80,6 +86,18 @@ public final class ModAttachments {
             ()->AttachmentType.builder(()->com.codex.blacklight.combat.HitReaction.EMPTY).sync(com.codex.blacklight.combat.HitReaction.CODEC).build());
     public static final Supplier<AttachmentType<Integer>> UTILITY_POWERS=ATTACHMENTS.register("utility_powers",()->AttachmentType.builder(()->0).sync(net.minecraft.network.codec.ByteBufCodecs.VAR_INT).build());
     public static final Supplier<AttachmentType<com.codex.blacklight.power.PowerMorph>> POWER_MORPH=ATTACHMENTS.register("power_morph",()->AttachmentType.builder(()->com.codex.blacklight.power.PowerMorph.NONE).sync(com.codex.blacklight.power.PowerMorph.CODEC).build());
+
+    /** Successful consume overflow persists through logout, but is lost on death. */
+    public static final Supplier<AttachmentType<com.codex.blacklight.power.CriticalMassState>> CRITICAL_MASS =
+            ATTACHMENTS.register("critical_mass", () -> AttachmentType.builder(() -> com.codex.blacklight.power.CriticalMassState.EMPTY)
+                    .serialize(com.codex.blacklight.power.CriticalMassState.CODEC)
+                    .sync(com.codex.blacklight.power.CriticalMassState.STREAM_CODEC).build());
+    public static final Supplier<AttachmentType<com.codex.blacklight.power.AdrenalineState>> ADRENALINE =
+            ATTACHMENTS.register("adrenaline", () -> AttachmentType.builder(() -> com.codex.blacklight.power.AdrenalineState.EMPTY)
+                    .sync(com.codex.blacklight.power.AdrenalineState.STREAM_CODEC).build());
+    public static final Supplier<AttachmentType<com.codex.blacklight.combat.DevastatorVisual>> DEVASTATOR_VISUAL =
+            ATTACHMENTS.register("devastator_visual", () -> AttachmentType.builder(() -> com.codex.blacklight.combat.DevastatorVisual.EMPTY)
+                    .sync(com.codex.blacklight.combat.DevastatorVisual.CODEC).build());
 
     public static final Supplier<AttachmentType<com.codex.blacklight.combat.ConsumeVisual>> CONSUME_RECOVERY = ATTACHMENTS.register(
             "consume_recovery", () -> AttachmentType.builder(() -> com.codex.blacklight.combat.ConsumeVisual.EMPTY)

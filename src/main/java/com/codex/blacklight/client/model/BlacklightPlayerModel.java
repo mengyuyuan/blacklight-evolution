@@ -7,7 +7,6 @@ import com.codex.blacklight.client.renderer.ConsumeAnatomy;
 import com.mojang.blaze3d.vertex.*;
 import java.util.ArrayList;
 import java.util.List;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.PlayerModel;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.player.AbstractClientPlayer;
@@ -27,6 +26,8 @@ public final class BlacklightPlayerModel extends PlayerModel<AbstractClientPlaye
     private Matrix4f[] skinMatrices;
     private Matrix3f[] skinNormals;
     private boolean rightBiological,leftBiological;
+    private AbstractClientPlayer renderedPlayer;
+    private float renderPartial;
     public BlacklightPlayerModel(ModelPart root, boolean slim) {
         super(root, slim);
         var skeleton = PlayerMotionController.skeleton();
@@ -54,9 +55,16 @@ public final class BlacklightPlayerModel extends PlayerModel<AbstractClientPlaye
         add(upper,visible,x,y,z,w,h,d,u,v,0,h/2,inflation,anatomy);
         add(lower,visible,x,y,z,w,h,d,u,v,h/2,h,inflation,anatomy);
     }
+    @Override public void prepareMobModel(AbstractClientPlayer player,float swing,float amount,float partial) {
+        // This is the exact interpolation interval passed to this entity render,
+        // including paused/frozen rendering; the global timer can be different.
+        renderPartial=partial;
+        super.prepareMobModel(player,swing,amount,partial);
+    }
     @Override public void setupAnim(AbstractClientPlayer player,float swing,float amount,float age,float yaw,float pitch) {
+        renderedPlayer=player;
         super.setupAnim(player,swing,amount,age,yaw,pitch);
-        float partial=Minecraft.getInstance().getTimer().getGameTimeDeltaPartialTick(false);
+        float partial=renderPartial;
         matrices=PlayerMotionController.skeleton().getPoseMatrices(BlacklightRenderPose.sample(player,partial));
         // Ordinary equipment layers copy ModelPart transforms. Project the same
         // authored pose into their native frame so equipment follows the body.
@@ -107,6 +115,8 @@ public final class BlacklightPlayerModel extends PlayerModel<AbstractClientPlaye
         }
         stack.pushPose();BlacklightBoneRendering.skeletonFrame(stack);
         try {
+            if(renderedPlayer!=null&&renderedPlayer.getData(com.codex.blacklight.registry.ModAttachments.DEVASTATOR_VISUAL).kind()>=0)
+                com.codex.blacklight.client.renderer.DevastatorEffectRenderer.captureBody(renderedPlayer,stack,matrices);
             for(var piece:pieces) {
                 SkinPiece drawn=piece;
                 if(!piece.visibility.visible) {
