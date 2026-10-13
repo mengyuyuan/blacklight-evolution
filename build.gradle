@@ -120,7 +120,7 @@ if (project.hasProperty('wallTraversalTest')) {
 if (project.hasProperty('standaloneInfected')) {
     sourceSets.main.java.srcDir('src/infectedVisualTest/java')
 }
-if (project.hasProperty('standaloneVisual') || project.hasProperty('standaloneGait') || project.hasProperty('standaloneLock') || project.hasProperty('standaloneMorph') || project.hasProperty('standaloneSkill') || project.hasProperty('standaloneSync')) {
+if (project.hasProperty('standaloneTutorialInspect') || project.hasProperty('standaloneTutorial') || project.hasProperty('standaloneVisual') || project.hasProperty('standaloneGait') || project.hasProperty('standaloneLock') || project.hasProperty('standaloneMorph') || project.hasProperty('standaloneSkill') || project.hasProperty('standaloneSync')) {
     sourceSets.main.java.srcDir('src/standaloneVisualTest/java')
     if (!project.hasProperty('standaloneSync')) sourceSets.main.java.exclude '**/StandaloneSyncClientSmoke.java', '**/StandaloneSyncServerChecks.java'
 }
@@ -170,6 +170,10 @@ neoForge {
                 programArguments.addAll '--width', '1440', '--height', '1000'
             }
             if (project.hasProperty('clientRunDirectory')) gameDirectory = file(project.property('clientRunDirectory'))
+            if (project.hasProperty('tutorialFinalOnly')) systemProperty 'blacklight.test.tutorialInspect.finalOnly', 'true'
+            if (project.hasProperty('standaloneTutorialInspect')) systemProperty 'blacklight.test.tutorialInspect', file(project.property('standaloneTutorialInspect')).absolutePath
+            if (project.hasProperty('tutorialFilter')) systemProperty 'blacklight.test.tutorialFilter', project.property('tutorialFilter').toString()
+            if (project.hasProperty('standaloneTutorial')) systemProperty 'blacklight.test.standaloneTutorial', file(project.property('standaloneTutorial')).absolutePath
             if (project.hasProperty('standaloneVisual')) {
                 systemProperty 'blacklight.test.standaloneVisual', file(project.property('standaloneVisual')).absolutePath
                 if (project.hasProperty('standaloneVisualShots')) systemProperty 'blacklight.test.standaloneVisual.shots', project.property('standaloneVisualShots').toString()
@@ -191,6 +195,7 @@ neoForge {
                 if (project.hasProperty('standaloneMorphCases')) systemProperty 'blacklight.test.standaloneMorph.cases', project.property('standaloneMorphCases').toString()
                 programArguments.addAll '--width', '960', '--height', '640'
             }
+            if (project.hasProperty('standaloneSkillTutorialCapture')) systemProperty 'blacklight.test.skillTutorialCapture', 'true'
             if (project.hasProperty('standaloneSkill')) {
                 systemProperty 'blacklight.test.standaloneSkill', file(project.property('standaloneSkill')).absolutePath
                 if (project.hasProperty('standaloneSkillCases')) systemProperty 'blacklight.test.standaloneSkill.cases', project.property('standaloneSkillCases').toString()
