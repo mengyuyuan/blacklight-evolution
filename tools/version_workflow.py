@@ -88,7 +88,10 @@ def check_platform(repo: Path, expected: dict) -> None:
     if foreign:
         errors.append(f'Mixed loader properties: {", ".join(foreign)}')
     build = (repo / 'build.gradle').read_text(encoding='utf-8')
-    build = re.sub(r'/\*.*?\*/|//[^\n]*', '', build, flags=re.S)
+    # Consume quoted strings before comments: a Gradle glob such as 'fx/**'
+    # is not a block-comment opener, and quoted Java declarations are not code.
+    build = re.sub(r"'(?:\\.|[^'\\])*'|\"(?:\\.|[^\"\\])*\"|/\*.*?\*/|//[^\n]*",
+                   lambda match: '\n' * match.group().count('\n'), build, flags=re.S)
     versions = re.findall(r'languageVersion\s*(?:=|\.set\()\s*JavaLanguageVersion\.of\(\s*(\d+)\s*\)', build)
     if not versions or set(versions) != {str(expected['java'])}:
         errors.append(f'Java toolchain: expected {expected["java"]}, found {versions or "undetected"}')
