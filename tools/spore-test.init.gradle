@@ -1,0 +1,10 @@
+// Explicit mixed-mod test only; downloaded Spore JAR is not bundled or published.
+allprojects { afterEvaluate { p ->
+    def sporeJar = p.findProperty('sporeTestJar')
+    def qaDir = p.findProperty('sporeTestDirectory')
+    if (!sporeJar || !qaDir) throw new GradleException('Supply -PsporeTestJar and -PsporeTestDirectory')
+    sourceSets.main.java.srcDir('src/sporeTest/java')
+    sourceSets.main.resources.srcDir('src/traversalTest/resources')
+    dependencies.add('localRuntime', files(sporeJar))
+    minecraft.runs.gameTestServer.workingDirectory file(qaDir)
+} }
