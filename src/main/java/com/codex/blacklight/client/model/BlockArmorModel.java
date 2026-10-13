@@ -21,7 +21,7 @@ public final class BlockArmorModel {
     public static final ResourceLocation TEXTURE = ResourceLocation.fromNamespaceAndPath("blacklight", "textures/entity/armor_block.png");
     private static final ResourceLocation WHITE = ResourceLocation.fromNamespaceAndPath("blacklight", "textures/entity/claw_white.png");
     private record Part(String joint, String region, boolean core, boolean shoulder, int material, Vector3f[] points,
-                        Vector3f center, Vector3f[] normals, float[] growth) { }
+                        Vector3f center, Vector3f[] normals, float[] growth, float[][][] uv) { }
     private static final class Transition {
         long stamp = Long.MIN_VALUE;
         boolean active;
@@ -34,6 +34,7 @@ public final class BlockArmorModel {
     private final int[][] faces;
     private final float fps, duration;
     private final int materialCount;
+    private final float renderScale;
 
     public static BlockArmorModel get() {
         if (instance == null) instance = new BlockArmorModel();
@@ -49,6 +50,8 @@ public final class BlockArmorModel {
         try (var input = getClass().getResourceAsStream("/assets/blacklight/models/armor_block.json")) {
             if (input == null) throw new IllegalStateException("Missing approved armor model");
             var root = JsonParser.parseReader(new InputStreamReader(input, StandardCharsets.UTF_8)).getAsJsonObject();
+            renderScale = root.has("renderScale") ? root.get("renderScale").getAsFloat() : 1;
+            if (!Float.isFinite(renderScale) || renderScale < .25F || renderScale > 3) throw new IllegalStateException("Invalid armor render scale");
             materialCount = root.getAsJsonArray("materials").size();
             var faceData = root.getAsJsonArray("faces"); faces = new int[faceData.size()][4];
             for (int f = 0; f < faces.length; f++) for (int v = 0; v < 4; v++) faces[f][v] = faceData.get(f).getAsJsonArray().get(v).getAsInt();
@@ -71,8 +74,27 @@ public final class BlockArmorModel {
                     if (!Float.isFinite(curve[i]) || curve[i] < 0 || curve[i] > 1) throw new IllegalStateException("Invalid armor curve: " + name);
                 }
                 if (curve.length != Math.round(duration * fps) + 1) throw new IllegalStateException("Incomplete armor curve: " + name);
+                float[][][] uv = null;
+                if (part.has("uv")) {
+                    var data = part.getAsJsonArray("uv");
+                    if (data.size() != faces.length) throw new IllegalStateException("Incomplete armor UV: " + name);
+                    uv = new float[faces.length][4][2];
+                    for (int f = 0; f < faces.length; f++) {
+                        var face = data.get(f).getAsJsonArray();
+                        if (face.size() != 4) throw new IllegalStateException("Invalid armor UV face: " + name);
+                        for (int v = 0; v < 4; v++) {
+                            var point = face.get(v).getAsJsonArray();
+                            if (point.size() != 2) throw new IllegalStateException("Invalid armor UV point: " + name);
+                            for (int axis = 0; axis < 2; axis++) {
+                                float value = point.get(axis).getAsFloat();
+                                if (!Float.isFinite(value) || value < 0 || value > 1) throw new IllegalStateException("Invalid armor UV coordinate: " + name);
+                                uv[f][v][axis] = value;
+                            }
+                        }
+                    }
+                }
                 parts.add(new Part(part.get("joint").getAsString(), part.get("region").getAsString(), part.get("core").getAsBoolean(), part.get("shoulder").getAsBoolean(),
-                        part.get("material").getAsInt(), points, center, normals, curve));
+                        part.get("material").getAsInt(), points, center, normals, curve, uv));
             }
         } catch (Exception e) { throw new IllegalStateException("Cannot load approved block armor", e); }
     }
@@ -119,6 +141,14 @@ public final class BlockArmorModel {
     public Set<String> joints() {
         Set<String> joints = new LinkedHashSet<>(); for (var part : parts) joints.add(part.joint); return joints;
     }
+    /** Keep skeleton, weapons and equipment in one frame while the taller armor grows. */
+    public float bodyScale(AbstractClientPlayer player, float partial) {
+        var state = state(player, partial);
+        if (state == null || renderScale == 1) return 1;
+        float weight = 0;
+        for (float value : state.values) weight += value;
+        return 1 + (renderScale - 1) * weight / state.values.length;
+    }
     public boolean visible(AbstractClientPlayer player, float partial) {
         var state = state(player, partial); if (state == null) return false;
         for (float value : state.values) if (value > .005F) return true;
@@ -137,6 +167,7 @@ public final class BlockArmorModel {
                     var point = part.points[faces[f][v]]; var center = part.center;
                     float u = (part.material + ((v == 1 || v == 2) ? .969F : .031F)) / materialCount;
                     float tv = v < 2 ? .031F : .969F;
+                    if (part.uv != null) { u = part.uv[f][v][0]; tv = part.uv[f][v][1]; }
                     out.addVertex(pose, center.x + (point.x - center.x) * growth, center.y + (point.y - center.y) * growth, center.z + (point.z - center.z) * growth)
                             .setColor(0xFFFFFFFF).setUv(u, tv).setOverlay(OverlayTexture.pack(0, player.hurtTime > 0)).setLight(light).setNormal(pose, normal.x, normal.y, normal.z);
                 }

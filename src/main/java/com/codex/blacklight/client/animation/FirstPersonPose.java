@@ -79,7 +79,7 @@ public final class FirstPersonPose {
             for(var entry:mesh.getAsJsonObject("joints").entrySet()) {
                 String bone=entry.getKey();if(bone.equals("Tip_R"))bone="Hand_R";if(!bone.startsWith("Arm_")&&!bone.startsWith("Hand_"))continue;
                 for(var face:entry.getValue().getAsJsonArray())for(var vertex:face.getAsJsonObject().getAsJsonArray("p")) {
-                    var p=vector(vertex.getAsJsonArray());if(form==PowerForm.BLADE&&bone.equals("Hand_R")){p.x*=BladeShape.WIDTH;p.z*=BladeShape.WIDTH;p.y=BladeShape.length(p.y);}
+                    var p=vector(vertex.getAsJsonArray());if(!mesh.has("approvedProportions")&&form==PowerForm.BLADE&&bone.equals("Hand_R")){p.x*=BladeShape.WIDTH;p.z*=BladeShape.WIDTH;p.y=BladeShape.length(p.y);}
                     vertices.add(new Surface(bone,p,entry.getKey().equals("Tip_R")||bone.startsWith("Hand_")&&p.y>.30F));
                 }
             }

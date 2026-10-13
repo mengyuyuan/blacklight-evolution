@@ -29,6 +29,9 @@ public final class WhipTetherRenderer {
         // LevelRenderer puts view rotation in RenderSystem's global matrix. Entity stacks are already camera-relative world space.
         HANDS.put(player.getId(),BlacklightBoneRendering.worldPoint(handStack,new Vector3f(0,.30F,.05F)));
     }
+    public static void capture(AbstractClientPlayer player,PoseStack stack,Vector3f anchor) {
+        HANDS.put(player.getId(),BlacklightBoneRendering.worldPoint(stack,anchor));
+    }
     public static Vec3 capturedHand(int entityId) { return HANDS.get(entityId); }
     public static boolean extended(AbstractClientPlayer player){
         if(player.getData(ModAttachments.PLAYER_STATE).getActivePower()!=PowerForm.WHIPFIST)return false;
@@ -38,6 +41,9 @@ public final class WhipTetherRenderer {
     /** Actual rendered claw palm, also used by the opt-in contact acceptance harness. */
     public static void captureGrip(AbstractClientPlayer player,PoseStack stack) {
         GRIPS.put(player.getId(),BlacklightBoneRendering.worldPoint(stack,new Vector3f(.00267F,.32362F,.07666F)));
+    }
+    public static void captureGrip(AbstractClientPlayer player,PoseStack stack,Vector3f anchor) {
+        GRIPS.put(player.getId(),BlacklightBoneRendering.worldPoint(stack,anchor));
     }
     public static void captureBlade(AbstractClientPlayer player,PoseStack stack) {
         GRIPS.put(player.getId(),BlacklightBoneRendering.worldPoint(stack,new Vector3f(-.0636396F,.68F,-.0636396F)));
