@@ -1,12 +1,27 @@
-# dev.5 最新状态
+# dev.5 本维护仓同步状态
 
-红雾颜色与透明度修正见 [FORGE_DEV5_MIST_FIX.md](FORGE_DEV5_MIST_FIX.md)。
+2026-10-13 已同步作者 `forge-1.20.1` 至 `2a8c6930d8eb570ef7a3c83c32cedc9135b8315a`，包含 PR #10、#13、#17、#18 的版本协作工具、新技能、红雾修复及感染实体删除后停止访问 capability；另接入作者 PR #21 资源分支 `8145022db150253fb152eb0f9cac780a58f40654`。Minecraft 1.20.1 / Java 17 / Forge 47.4.10 / GeckoLib 4.8.4 目标保持不变。
 
-本轮技能/冲击/蓄力防滑同步及验证见 [FORGE_DEV4_SKILLS.md](FORGE_DEV4_SKILLS.md)。下文保留先前版本历史。
+默认 bundled 已补齐 27 个新技能动作 JSON，共 251 份运行资料（240 个 JSON、11 个 `.data`），保留 Forge 的 `armor-growth.data`。不再要求作者另行提供 external-profile 路径；本次资源接入未修改玩法代码。开发预发布保留版本号 `0.3.0-forge-1.20.1-dev.5`。
+
+本仓完整 251 文件包验证结果：
+
+- `clean assemble`、Forge Jar-in-Jar 重混淆、非空 refmap、独立依赖边界和 251 文件集合/字节数/SHA-256 校验通过。旧 224 文件保持不变，新增 27 文件共 27,844,474 字节；逐文件 JSON 解析通过。
+- 全量 Java 测试 276 项：272 通过、4 失败、0 跳过。此前缺资料导致的 `WeaponContentTest.eachMoveHasFiniteFullBodyAnimationWithMatchingDuration` 已通过；5 项 `DevastatorSourceTest` 本轮实际执行并通过。剩余失败仍是移动预设、两项移动升级和警戒/伪装差异，未为迁就断言修改玩法；完整测试命令因这 4 项失败返回非零。
+- 成品动作采样：240 片段、5,040 轨道、996,870 次采样、0 失败；装甲变形与待机检查通过，Epic Fight 依赖缺席检查通过。使用 `--continue` 保留测试失败并继续执行采样，不能把整条命令记为全绿。
+- Python 资产/版本工作流测试 18 项全部通过。
+
+独立客户端加载检查完成：21:56:23 模组初始化，21:56:24 开始资源重载，21:56:30～31 完成 OpenAL 与全部图集加载；日志未见缺动作、Mixin 注入、着色器编译失败或 FATAL。本次仅验证客户端加载，未执行新技能或死亡删除游戏场景；专用服务端、多人和完整生存验收尚未完成，构建与动作采样不能替代这些场景。
+
+证据：`JB/dev5-complete-build-tests.log`、`JB/dev5-complete-resource-verification.log`、`JB/dev5-complete-python-tests.log`、`JB/dev5-complete-client.log`。
+
+资源补齐前的基础包验证（历史）：Java 测试 276 项，266 通过、5 失败、5 跳过；除 4 项继承差异外，`WeaponContentTest.eachMoveHasFiniteFullBodyAnimationWithMatchingDuration` 因缺动作失败，5 项 `DevastatorSourceTest` 因无扩展资料跳过。Python 资产/版本工作流测试 18 项全部通过（`JB/dev5-python-tests.log`）。224 文件基础包编译、重混淆、非空 refmap 和资源校验通过，动作采样 213 片段、4,473 轨道、780,381 次采样、0 失败，装甲变形/待机通过（`JB/dev5-base-motion-verify.log`）；首次漏传采样成品路径的失败未记为通过。实体删除 GameTest 的 7 个场景仅编译通过（`JB/dev5-lifecycle-compile.log`），未运行游戏场景。上述数字不作为完整 251 文件包的验证结果。
+
+上游红雾修复和实机报告见 [FORGE_DEV5_MIST_FIX.md](FORGE_DEV5_MIST_FIX.md)、[FORGE_DEV4_SKILLS.md](FORGE_DEV4_SKILLS.md)。这些报告不等于本维护仓重新进行了实机、服务端或多人验收。下文保留先前版本历史。
 
 # Forge 1.20.1 维护与验收状态
 
-更新时间：2026-10-12。当前版本：0.3.0-forge-1.20.1-dev.2。完整安装包已构建，作为 Forge 1.20.1 开发预发布提供。
+dev.3 历史记录（2026-10-13）：版本 0.3.0-forge-1.20.1-dev.3 的完整基础安装包已构建并作为开发预发布提供。
 
 本分支独立维护 Minecraft 1.20.1 Forge 版本。原作者末者继续维护上游 1.21.1 NeoForge。移植基于上游提交 `d43aa4bf4263ad5ebf1de799cee06f48a0f8c018`，保留 GPL、作者署名及第三方资源声明。
 
@@ -23,7 +38,18 @@
 | ForgeGradle | 6.0.54 |
 | MixinExtras | Forge 0.4.1，内嵌 |
 
-## dev.2 验证与发布范围
+## dev.3 同步与验证
+
+作者已将移植 PR #6 合并到专用 `forge-1.20.1` 分支。本次同步该分支提交 `c8da065758a682a0b5422e8729c770a98abe92ea`，包含 PR #7 的抓取 HOLD 阶段转向及持有者、握持位置、受抓生物的朝向插值修复；没有合入 NeoForge 主线或改动旧移动/警戒规则。
+
+- 干净实际编译、Forge Jar-in-Jar 重混淆、非空 Mixin refmap 和 224 文件字节数/SHA-256 验证通过。
+- 全量单元测试：209 项，205 通过、4 失败、0 跳过。新增 CarrySteeringTest 三项全部通过，覆盖 270 组朝向/输入组合、后退与侧向转身、无输入保持姿态。
+- 四项失败与 dev.2 相同：移动预设与当前默认值不同、两项移动升级倍率断言、警戒/伪装断言。没有为了测试绿灯改动继承玩法或预设；历史预设还存在超出当前参数加载范围后被夹取的数值，发布不将这些差异记为通过。
+- 成品动作采样与源码/分发包核验分别记录。dev.3 抓取实机试玩、专用服务端和多人验收未完成；dev.2 客户端记录只作为历史证据。
+
+用户明确选择保留作者 dev.3 版本号、发布完整安装包；`publicReleaseReady=false` 保留稳定版验收含义。[dev.3 历史下载](https://github.com/lingweiliang2510579032/blacklight-evolution/releases/tag/v0.3.0-forge-1.20.1-dev.3)不含 dev.5 新技能；新增行为见 [抓取转向说明](FORGE_CARRY_STEERING_DEV3.md)。
+
+## dev.2 验证与发布范围（历史）
 
 已整合上游提交 `9ba910fb23e812fbad4fd5649f29a6026f7e9bfb` 的 6 个提交；默认 bundled 构建从 art/motion-profile 包含 224 个动作、镜头和 HUD 文件，显式外部整套资料使用 external-profile。版本、元数据、README、安装与默认构建均保持 Minecraft 1.20.1 Forge。
 
