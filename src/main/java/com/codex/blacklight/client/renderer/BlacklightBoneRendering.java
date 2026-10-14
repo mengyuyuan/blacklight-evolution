@@ -16,12 +16,16 @@ public final class BlacklightBoneRendering {
         stack.scale(-1, -1, 1);
         stack.translate(0, -1.501F, 0);
     }
-    /** Entity stacks are world-relative; native first-person stacks are camera-relative. */
+    /** Forge 1.20.1 entity stacks include the view rotation (unlike 1.21.1). */
     public static net.minecraft.world.phys.Vec3 worldPoint(PoseStack stack,Vector3f local) {
         var camera=net.minecraft.client.Minecraft.getInstance().gameRenderer.getMainCamera();
         var point=stack.last().pose().transformPosition(new Vector3f(local));
         if(StandalonePlayerRendering.nativeHandPass())camera.rotation().transform(point);
+        else point=entityWorldRelative(stack.last().pose(),local,com.mojang.blaze3d.systems.RenderSystem.getInverseViewRotationMatrix());
         return new net.minecraft.world.phys.Vec3(point.x,point.y,point.z).add(camera.getPosition());
+    }
+    static Vector3f entityWorldRelative(Matrix4f modelView,Vector3f local,org.joml.Matrix3fc inverseView) {
+        return inverseView.transform(modelView.transformPosition(new Vector3f(local)));
     }
     public static void apply(PoseStack stack, Matrix4f matrix) {
         Vector3f scale = matrix.getScale(new Vector3f());

@@ -5,12 +5,15 @@ continues to maintain the upstream platform separately.
 
 ## Repository runtime profile
 
-At the author's request, standalone dev.7 includes the previously local complete
-runtime profile in `art/motion-profile/`: 213 JSON motion files and 11 JSON-based
+At the author's request, the release audit extends standalone dev.7's previously local
+runtime profile in `art/motion-profile/`: 240 JSON motion files and 11 JSON-based
 `.data` files. It includes movement, combat, weapon and utility transformation,
-consume actor/victim choreography, armor growth, camera and HUD data. At initial import, the files
-were preserved byte-for-byte from the standalone development profile; subsequent
-project changes are recorded in Git and the current manifest.
+consume actor/victim choreography, armor growth, camera and HUD data. At initial import,
+the files were preserved byte-for-byte from the standalone development profile;
+subsequent project changes are recorded in Git and the current manifest.
+The 2026-10-13 addition contains 27 Devastator and Bulletdive release, charge,
+recovery, aiming and landing clips. Existing branch-specific armor data is retained;
+reference FX textures and source shaders are not added.
 `art/motion-profile-manifest.json` records every current profile file hash and byte count.
 
 The project uses Prototype as a design/animation reference. Existing source
@@ -19,7 +22,7 @@ Git does not change those provenance records. The GPL code license does not
 relicense separately owned dependency assets. This inventory describes the
 actual build contents rather than making a commercial release certification.
 
-A normal clone and `assemble` now include all 224 files in
+A normal clone and `assemble` now include all 251 files in
 `blacklight/bundled_motions/`. The `bundled` JAR/ZIP is the complete default build.
 An explicit `-PbundleMotionDirectory=<directory>` replaces the whole profile;
 that build uses the `external-profile` classifier. Build verification checks
