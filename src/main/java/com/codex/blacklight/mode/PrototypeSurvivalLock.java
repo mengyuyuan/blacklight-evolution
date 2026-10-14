@@ -76,7 +76,7 @@ public final class PrototypeSurvivalLock {
     /** Server-side backstop for packets or other mods that bypass normal interaction events. */
     @SubscribeEvent
     public static void onBreakBlock(BlockEvent.BreakEvent event) {
-        if (isLocked(event.getPlayer())&&!com.codex.blacklight.combat.BulletdiveTerrain.ownsBreakEvent(event)
+        if (isLocked(event.getPlayer())&&!com.codex.blacklight.combat.BulletdiveTerrain.ownsBreakEvent(event)&&!com.codex.blacklight.combat.BlockThrowSystem.ownsBreakEvent(event)
                 &&!com.codex.blacklight.combat.ShieldBorerSystem.ownsBreakEvent(event)) event.setCanceled(true);
     }
 

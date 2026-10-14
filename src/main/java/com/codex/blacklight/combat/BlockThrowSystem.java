@@ -17,7 +17,10 @@ import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 /** Server owns the source block and the single recoverable projectile. */
 public final class BlockThrowSystem {
     public static final TagKey<Block> THROWABLE=TagKey.create(Registries.BLOCK,ResourceLocation.fromNamespaceAndPath("blacklight","throwable_blocks"));
+    private static final ThreadLocal<net.neoforged.neoforge.event.level.BlockEvent.BreakEvent> OWN_BREAK = new ThreadLocal<>();
     private BlockThrowSystem(){}
+    /** Only our exact grab event bypasses the vanilla-interaction lock. Other protection listeners still run. */
+    public static boolean ownsBreakEvent(net.neoforged.neoforge.event.level.BlockEvent.BreakEvent event){return OWN_BREAK.get()==event;}
     public static ThrownBlock held(Player p){
         return p.level().getEntitiesOfClass(ThrownBlock.class,p.getBoundingBox().inflate(4),e->e.holderId()==p.getId()&&!e.isRemoved()).stream().findFirst().orElse(null);
     }
@@ -33,7 +36,10 @@ public final class BlockThrowSystem {
                 ||block.hasBlockEntity()||!block.getFluidState().isEmpty()||!block.isCollisionShapeFullBlock(level,pos)
                 ||block.getDestroySpeed(level,pos)<0||block.getDestroySpeed(level,pos)>5||block.getBlock().asItem()==net.minecraft.world.item.Items.AIR)return false;
         var event=new net.neoforged.neoforge.event.level.BlockEvent.BreakEvent(level,pos,block,p);
-        if(net.neoforged.neoforge.common.NeoForge.EVENT_BUS.post(event).isCanceled()||level.getBlockState(pos)!=block)return false;
+        var previous=OWN_BREAK.get();OWN_BREAK.set(event);
+        try{net.neoforged.neoforge.common.NeoForge.EVENT_BUS.post(event);}
+        finally{if(previous==null)OWN_BREAK.remove();else OWN_BREAK.set(previous);}
+        if(event.isCanceled()||!p.isAlive()||p.isRemoved()||p.level()!=level||!level.mayInteract(p,pos)||level.getBlockState(pos)!=block)return false;
         var projectile=new ThrownBlock(level,p,block);projectile.setPos(p.position());
         // Spawn cancellation leaves the world unchanged. Neighbor hooks run only after acceptance.
         if(!level.addFreshEntity(projectile))return false;
