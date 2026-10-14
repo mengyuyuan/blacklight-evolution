@@ -470,5 +470,6 @@
   "upgrade.blacklight.slime_decay_2": "黏液稳定性 2",
   "upgrade.blacklight.slime_decay_2.desc": "自然衰减时间延长到 120 秒。消耗 600 进化点。",
   "upgrade.blacklight.slime_decay_3": "黏液稳定性 3",
-  "upgrade.blacklight.slime_decay_3.desc": "不再自然衰减；仍会受到攻击伤害。消耗 1200 进化点。"
+  "upgrade.blacklight.slime_decay_3.desc": "不再自然衰减；仍会受到攻击伤害。消耗 1200 进化点。",
+  "hud.blacklight.slime_shattering": "身体碎裂 · 碎块液化汇聚"
 }

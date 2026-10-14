@@ -7,13 +7,13 @@ import net.minecraft.network.codec.StreamCodec;
 
 /** Persist the player's form; transient victim IDs are cleared on login/dimension changes. */
 public record BiomassState(int phase, long changedAt, boolean fatal, String shell, String previousPower, int victim, int age) {
-    public static final int HUMAN=0, CRAWLING=1, ABSORBING=2, REFORMING=3, READY=4;
-    public static final int ABSORB_TICKS=40, REFORM_TICKS=24;
+    public static final int HUMAN=0, CRAWLING=1, ABSORBING=2, REFORMING=3, READY=4, SHATTERING=5;
+    public static final int ABSORB_TICKS=40, REFORM_TICKS=24, SHATTER_TICKS=28;
     public static final BiomassState EMPTY=new BiomassState(HUMAN,0,false,"","none",-1);
     public BiomassState(int phase,long at,boolean fatal,String shell,String power,int victim){this(phase,at,fatal,shell,power,victim,0);}
     public BiomassState {
         age=Math.max(0,age);
-        phase=Math.max(HUMAN,Math.min(READY,phase));
+        phase=Math.max(HUMAN,Math.min(SHATTERING,phase));
         shell=shell==null?"":shell;
         previousPower=previousPower==null?"none":previousPower;
     }
@@ -23,7 +23,7 @@ public record BiomassState(int phase, long changedAt, boolean fatal, String shel
         return consumed()?reform(now):crawl(now);
     }
     public boolean active(){return phase!=HUMAN;}
-    public boolean immobilized(){return phase==ABSORBING||phase==REFORMING;}
+    public boolean immobilized(){return phase==ABSORBING||phase==REFORMING||phase==SHATTERING;}
     public BiomassState crawl(long now){return new BiomassState(CRAWLING,now,fatal,shell,previousPower,-1,age);}
     public BiomassState absorb(int id,long now){return new BiomassState(ABSORBING,now,fatal,shell,previousPower,id,age);}
     public BiomassState reform(long now){return new BiomassState(REFORMING,now,fatal,shell,previousPower,-1,age);}

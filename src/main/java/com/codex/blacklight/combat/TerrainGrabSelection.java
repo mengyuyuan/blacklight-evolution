@@ -12,7 +12,7 @@ public final class TerrainGrabSelection {
   var s=new Selection(p,hit.getBlockPos());ACTIVE.put(p,s);preview(p,s);return true;
  }
  private static BlockHitResult pick(ServerPlayer p){
-  var a=p.getEyePosition();return p.level().clip(new ClipContext(a,a.add(Vec3.directionFromRotation(p.getXRot(),com.codex.blacklight.movement.TraversalSteering.cameraYaw(p)).scale(3.5)),ClipContext.Block.COLLIDER,ClipContext.Fluid.NONE,p));
+  var a=p.getEyePosition();return p.level().clip(new ClipContext(a,a.add(Vec3.directionFromRotation(p.getXRot(),com.codex.blacklight.movement.TraversalSteering.cameraYaw(p)).scale(3.5)),ClipContext.Block.OUTLINE,ClipContext.Fluid.NONE,p));
  }
  /** Report the terrain rejection instead of claiming there was no creature target. */
  public static String failureMessage(ServerPlayer p){

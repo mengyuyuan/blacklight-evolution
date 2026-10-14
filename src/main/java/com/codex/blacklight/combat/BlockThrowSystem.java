@@ -17,6 +17,7 @@ import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 /** Server owns the source block and the single recoverable projectile. */
 public final class BlockThrowSystem {
     public static final TagKey<Block> THROWABLE=TagKey.create(Registries.BLOCK,ResourceLocation.fromNamespaceAndPath("blacklight","throwable_blocks"));
+    public static final TagKey<Block> UNGRABBABLE=TagKey.create(Registries.BLOCK,ResourceLocation.fromNamespaceAndPath("blacklight","ungrabbable_blocks"));
     private static final ThreadLocal<net.neoforged.neoforge.event.level.BlockEvent.BreakEvent> OWN_BREAK = new ThreadLocal<>();
     private BlockThrowSystem(){}
     /** Only our exact grab event bypasses the vanilla-interaction lock. Other protection listeners still run. */
@@ -40,15 +41,13 @@ public final class BlockThrowSystem {
         var state=p.getData(ModAttachments.PLAYER_STATE);
         if(!canUse(p))return false;
         Vec3 start=p.getEyePosition(),direction=Vec3.directionFromRotation(p.getXRot(),com.codex.blacklight.movement.TraversalSteering.cameraYaw(p));
-        var hit=p.level().clip(new ClipContext(start,start.add(direction.scale(3.5)),ClipContext.Block.COLLIDER,ClipContext.Fluid.NONE,p));
+        var hit=p.level().clip(new ClipContext(start,start.add(direction.scale(3.5)),ClipContext.Block.OUTLINE,ClipContext.Fluid.NONE,p));
         if(selected==null&&hit.getType()!=HitResult.Type.BLOCK)return false;
         BlockPos pos=selected==null?hit.getBlockPos():selected;
         if(start.distanceToSqr(Vec3.atCenterOf(pos))>25)return false;
-        if(selected!=null){var sight=p.level().clip(new ClipContext(start,Vec3.atCenterOf(pos),ClipContext.Block.COLLIDER,ClipContext.Fluid.NONE,p));if(sight.getType()!=HitResult.Type.BLOCK||!sight.getBlockPos().equals(pos))return false;}
+        if(selected!=null&&!hasGrabSight(p,pos))return false;
         var level=p.serverLevel();var block=level.getBlockState(pos);
-        if(!level.mayInteract(p,pos)||!level.getWorldBorder().isWithinBounds(pos)||!block.is(THROWABLE)
-                ||block.hasBlockEntity()||!block.getFluidState().isEmpty()||!block.isCollisionShapeFullBlock(level,pos)
-                ||block.getDestroySpeed(level,pos)<0||block.getDestroySpeed(level,pos)>5||block.getBlock().asItem()==net.minecraft.world.item.Items.AIR)return false;
+        if(!selectable(p,pos))return false;
         var selection=new java.util.LinkedHashMap<BlockPos,net.minecraft.world.level.block.state.BlockState>();
         for(var at:TerrainGrabShape.grow(pos,limit,seed,q->selectable(p,q))){
             var candidate=level.getBlockState(at);var event=new net.neoforged.neoforge.event.level.BlockEvent.BreakEvent(level,at,candidate,p);var previous=OWN_BREAK.get();OWN_BREAK.set(event);
@@ -79,9 +78,26 @@ public final class BlockThrowSystem {
         level.playSound(null,pos,block.getSoundType().getBreakSound(),net.minecraft.sounds.SoundSource.PLAYERS,1,.8F);
         return true;
     }
+    private static boolean hasGrabSight(ServerPlayer p,BlockPos pos){
+        // A slab/stair/plant need not contain the center of its block cell.
+        // Check actual outline pieces, with world occlusion still enforced.
+        var state=p.level().getBlockState(pos);
+        for(var piece:state.getShape(p.level(),pos).toAabbs()){
+            var target=piece.getCenter().add(pos.getX(),pos.getY(),pos.getZ());
+            var hit=p.level().clip(new ClipContext(p.getEyePosition(),target,ClipContext.Block.OUTLINE,ClipContext.Fluid.NONE,p));
+            if(hit.getType()==HitResult.Type.BLOCK&&hit.getBlockPos().equals(pos))return true;
+        }
+        return false;
+    }
     public static boolean selectable(ServerPlayer p,BlockPos at){
         var level=p.serverLevel();if(!level.hasChunkAt(at)||!level.mayInteract(p,at)||!level.getWorldBorder().isWithinBounds(at))return false;
-        var s=level.getBlockState(at);return s.is(THROWABLE)&&!s.hasBlockEntity()&&s.getFluidState().isEmpty()&&s.isCollisionShapeFullBlock(level,at)&&s.getDestroySpeed(level,at)>=0&&s.getDestroySpeed(level,at)<=5&&s.getBlock().asItem()!=net.minecraft.world.item.Items.AIR;
+        var s=level.getBlockState(at);
+        // Default-compatible: IDs and mining-tool tags do not grant permission.
+        // Data-bearing and multi-part structures need a lossless cargo adapter first.
+        return !s.isAir()&&!s.is(UNGRABBABLE)&&!s.hasBlockEntity()&&s.getFluidState().isEmpty()
+                &&s.getDestroySpeed(level,at)>=0&&s.getBlock().asItem()!=net.minecraft.world.item.Items.AIR
+                &&!s.hasProperty(net.minecraft.world.level.block.state.properties.BlockStateProperties.DOUBLE_BLOCK_HALF)
+                &&!s.hasProperty(net.minecraft.world.level.block.state.properties.BlockStateProperties.BED_PART);
     }
     public static void clear(ServerPlayer p){
         p.setData(ModAttachments.CONSUMING,false);p.syncData(ModAttachments.CONSUMING);

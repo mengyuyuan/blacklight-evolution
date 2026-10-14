@@ -187,6 +187,10 @@ public final class PlayerMotionController {
         var raw=runtime.interval.ready()?runtime.interval.sample(partial):utilityPose(entity,partial);
         return runtime.combat.sample(raw,partial);
     }
+    /** Read the already committed distance-driven gait without action overlays. */
+    public static BlacklightPose locomotionPose(LivingEntity entity,float partial) {
+        return locomotion(entity,state(entity),now(entity,partial),partial);
+    }
     public static float facing(LivingEntity entity,float partial) {
         var facing=state(entity).facing;
         return facing.ready()?facing.sample(partial)

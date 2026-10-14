@@ -41,6 +41,7 @@ public final class BlacklightInfectionSystem {
             target.setData(ModAttachments.INFECTION_START, target.level().getGameTime());
             target.syncData(ModAttachments.INFECTION_START);
         }
+        if((applied||dedicatedBoss)&&target instanceof Mob mob)com.codex.blacklight.power.CombatScale.synchronizeMob(mob);
         return applied || dedicatedBoss;
     }
 

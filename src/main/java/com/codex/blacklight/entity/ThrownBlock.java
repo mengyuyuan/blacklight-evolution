@@ -99,13 +99,17 @@ public final class ThrownBlock extends Projectile {
         entityData.set(HOLDER,-1);entityData.set(SETTLED,true);settled=true;setDeltaMovement(Vec3.ZERO);
         recover();
     }
+    private static int recoveryCount(net.minecraft.world.level.block.state.BlockState state){
+        var slab=net.minecraft.world.level.block.state.properties.BlockStateProperties.SLAB_TYPE;
+        return state.hasProperty(slab)&&state.getValue(slab)==net.minecraft.world.level.block.state.properties.SlabType.DOUBLE?2:1;
+    }
     private void recover(){
         if(!armed){discard();return;}
         if(!level().getGameRules().getBoolean(GameRules.RULE_DOBLOCKDROPS)){discard();return;}
         // A cancelled item spawn retains the saved projectile, retrying without duplicating.
         var cells=cargo().cells();
         while(recoveryIndex<cells.size()){
-            var item=new net.minecraft.world.entity.item.ItemEntity(level(),getX(),getY(),getZ(),new net.minecraft.world.item.ItemStack(cells.get(recoveryIndex).state().getBlock().asItem()));item.setDefaultPickUpDelay();
+            var item=new net.minecraft.world.entity.item.ItemEntity(level(),getX(),getY(),getZ(),new net.minecraft.world.item.ItemStack(cells.get(recoveryIndex).state().getBlock().asItem(), recoveryCount(cells.get(recoveryIndex).state())));item.setDefaultPickUpDelay();
             if(!level().addFreshEntity(item))return;recoveryIndex++;
         }
         armed=false;discard();

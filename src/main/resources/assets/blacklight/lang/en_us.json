@@ -470,5 +470,6 @@
   "upgrade.blacklight.slime_decay_2": "Liquid stability 2",
   "upgrade.blacklight.slime_decay_2.desc": "Natural decay lasts 120 seconds. Costs 600 EP.",
   "upgrade.blacklight.slime_decay_3": "Liquid stability 3",
-  "upgrade.blacklight.slime_decay_3.desc": "No natural decay; incoming damage still applies. Costs 1200 EP."
+  "upgrade.blacklight.slime_decay_3.desc": "No natural decay; incoming damage still applies. Costs 1200 EP.",
+  "hud.blacklight.slime_shattering": "Body shattering · fragments melting into liquid"
 }

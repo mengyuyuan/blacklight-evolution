@@ -90,6 +90,11 @@ public final class StandalonePlayerRendering {
             if(player==net.minecraft.client.Minecraft.getInstance().player&&net.minecraft.client.Minecraft.getInstance().gameRenderer.getMainCamera().getPosition().distanceToSqr(player.getPosition(partial).add(0,.15,0))<.16)return;
             BiomassPlayerRendering.render(player,partial,event.getPoseStack(),event.getMultiBufferSource(),event.getPackedLight());
             var slime=com.codex.blacklight.power.BiomassSystem.state(player);
+            if(slime.phase()==com.codex.blacklight.power.BiomassState.SHATTERING){
+                float f=slime.progress(player.level().getGameTime()+partial,com.codex.blacklight.power.BiomassState.SHATTER_TICKS);
+                var renderer=RENDERERS.get(player.getSkin().model());
+                if(renderer!=null&&f<.99F){var stack=event.getPoseStack();var fragments=new BiomassShatterBuffers(player,stack,event.getMultiBufferSource(),f,0,player.tickCount+partial);renderer.render(player,player.getYRot(),partial,stack,fragments,event.getPackedLight());fragments.finish();}
+            }
             if(slime.phase()==com.codex.blacklight.power.BiomassState.REFORMING){
                 float f=slime.progress(player.level().getGameTime()+partial,com.codex.blacklight.power.BiomassState.REFORM_TICKS);
                 var renderer=RENDERERS.get(player.getSkin().model());
