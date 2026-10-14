@@ -107,10 +107,29 @@ def export(decoded, contract, motions):
                 for i in range(cut,end):
                     w = (i-cut)/(end-cut); w = w*w*(3-2*w)
                     frames[i] = [a*(1-w)+b*w for a,b in zip(charge,frames[end])]
+            # Retain reference timing while adapting ordinary blows to the
+            # larger MC fist mesh. A held charge grows from that same size,
+            # reaching the unchanged charged attack at the end of the hold.
+            strength = cfg.get('basicGrowthStrength', 1)
+            if not math.isfinite(strength) or not 0 <= strength <= 1:
+                raise ValueError('Basic growth strength must be within [0, 1]')
+            if strength != 1 and suffix != '_charged':
+                for i, time in enumerate(times):
+                    weight = strength
+                    if suffix == '_charge':
+                        start = cfg['release']
+                        if times[-1] <= start:
+                            raise ValueError('Charge growth needs time after anticipation')
+                        u = max(0, min(1, (time-start)/(times[-1]-start)))
+                        weight += (1-strength)*u*u*(3-2*u)
+                    # Preserve any reference contraction and the resting size.
+                    frames[i] = [1+(v-1)*weight if v > 1 else v for v in frames[i]]
             clips[name+suffix] = dict(times=times, frames=frames)
     result = dict(schema=1, bones=list(bones), axisMapping=config['axisMapping'], clips=clips,
                   inheritedForearmLength=[name for name,cfg in config['moves'].items()
                                            if cfg.get('inheritForearmLength')],
+                  basicGrowthStrength={name: cfg['basicGrowthStrength']
+                                       for name,cfg in config['moves'].items() if 'basicGrowthStrength' in cfg},
                   projectAdaptations={name: cfg['projectScaleEnvelope']['evidence']
                                       for name,cfg in config['moves'].items() if 'projectScaleEnvelope' in cfg},
                   sources=sources, contractSha256=hashlib.sha256(contract.read_bytes()).hexdigest(),
