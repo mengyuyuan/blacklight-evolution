@@ -24,12 +24,13 @@ public final class AdaptivePassiveSystem {
                 flag == AdaptivePassiveState.ADAPTATION ? CombatSkill.ADAPTATION : CombatSkill.TISSUE_REGENERATION);
     }
     public static boolean percentBased(Player p) {
-        return p.getData(ModAttachments.PLAYER_STATE).hasCombatSkill(CombatSkill.ADAPTATION_PERCENT);
+        var powers = p.getData(ModAttachments.PLAYER_STATE);
+        return powers.isInfected() && powers.isPrototypeMode()
+                && powers.hasCombatSkill(CombatSkill.ADAPTATION_PERCENT);
     }
     private static void publish(ServerPlayer p, AdaptivePassiveState data) {
         if (data.equals(state(p))) return;
         p.setData(ModAttachments.ADAPTIVE_PASSIVES, data);
-        p.syncData(ModAttachments.ADAPTIVE_PASSIVES);
     }
     public static boolean grant(ServerPlayer p, int flag) {
         if ((flag != AdaptivePassiveState.ADAPTATION && flag != AdaptivePassiveState.REGENERATION)
