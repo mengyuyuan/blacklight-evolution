@@ -132,7 +132,9 @@ public final class CriticalMassSystem {
                 now + AdrenalineState.UNDAMAGEABLE_TICKS, true));
         p.displayClientMessage(Component.translatable("message.blacklight.adrenaline_started"), true);
     }
-    @SubscribeEvent public static void tick(PlayerTickEvent event){if(event.phase!=net.minecraftforge.event.TickEvent.Phase.END)return;
+    @SubscribeEvent public static void tick(PlayerTickEvent event){
+        if (!com.codex.blacklight.registry.ModAttachments.available(event.player)) { return; }
+        if(event.phase!=net.minecraftforge.event.TickEvent.Phase.END)return;
         if (!(event.player instanceof ServerPlayer p)) return;
         var state = com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.PLAYER_STATE);
         var adrenaline = com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.ADRENALINE);
@@ -147,7 +149,7 @@ public final class CriticalMassSystem {
             if (!mass.adrenalineArmed() && p.getHealth() >= p.getMaxHealth() * .5F) publish(p, mass.armed(true));
         }
     }
-    public static void clearTransient(ServerPlayer p) { publish(p, AdrenalineState.EMPTY); }
+    public static void clearTransient(ServerPlayer p) { if (ModAttachments.available(p)) publish(p, AdrenalineState.EMPTY); }
     @SubscribeEvent public static void logout(PlayerEvent.PlayerLoggedOutEvent event) {
         if (event.getEntity() instanceof ServerPlayer p) clearTransient(p);
     }

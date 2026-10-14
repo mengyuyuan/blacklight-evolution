@@ -61,7 +61,9 @@ public final class UtilityPowerSystem {
         modifier(p, Attributes.MOVEMENT_SPEED, "armor_weight", -.25, AttributeModifier.Operation.MULTIPLY_TOTAL, armor);
         modifier(p, Attributes.KNOCKBACK_RESISTANCE, "armor_stability", .6, AttributeModifier.Operation.ADDITION, armor);
     }
-    @SubscribeEvent public static void tick(PlayerTickEvent e) {if(e.phase != net.minecraftforge.event.TickEvent.Phase.END)return;
+    @SubscribeEvent public static void tick(PlayerTickEvent e) {
+        if (!com.codex.blacklight.registry.ModAttachments.available(e.player)) { return; }
+        if(e.phase != net.minecraftforge.event.TickEvent.Phase.END)return;
         if (!(e.player instanceof ServerPlayer p)) return;
         var state = com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.PLAYER_STATE);
         if (!p.isAlive() || !state.isInfected() || !state.isPrototypeMode()) {

@@ -1,0 +1,191 @@
+{
+  "adrenaline": {
+    "file": "adrenaline.gif",
+    "frames": 60,
+    "duration_ms": 4200,
+    "source": "native model motion / mechanic diagram",
+    "sha256": "68e4830d830b1c04372e7e5ed5d42545161e995a855bf38ef8107f46953936df"
+  },
+  "armor": {
+    "file": "armor.gif",
+    "frames": 60,
+    "duration_ms": 4200,
+    "source": "native model motion / mechanic diagram",
+    "sha256": "3e7598f4f3c6bb4d5cb278122e011bf53e7378003d4a3e023a9573eb1c47a5f1"
+  },
+  "barrage": {
+    "file": "barrage.gif",
+    "frames": 95,
+    "duration_ms": 7600,
+    "source": "native game effect",
+    "sha256": "c4a8e3320ae2b175d49f313ea848c9b753b73a192d50c1fe9f23f8c63aca59f4"
+  },
+  "blade": {
+    "file": "blade.gif",
+    "frames": 60,
+    "duration_ms": 4200,
+    "source": "native model motion / mechanic diagram",
+    "sha256": "2c206917943a0dbe30fdaab12283bfa1379c6dcbf3dd30b9c528aecfb16d8d9a"
+  },
+  "claws": {
+    "file": "claws.gif",
+    "frames": 60,
+    "duration_ms": 4200,
+    "source": "native model motion / mechanic diagram",
+    "sha256": "ec05256e9f0f052c7712e46021a83103cfdc4aebdf0b58496d2af493df946e4b"
+  },
+  "consume": {
+    "file": "consume.gif",
+    "frames": 60,
+    "duration_ms": 4200,
+    "source": "native model motion / mechanic diagram",
+    "sha256": "a04c84e9060b00e3cd7a03abbe3b86af89a4033cb0d52b78793168fd4fb0fb5f"
+  },
+  "critical": {
+    "file": "critical.gif",
+    "frames": 60,
+    "duration_ms": 4200,
+    "source": "native model motion / mechanic diagram",
+    "sha256": "18ad1d4018183decee872beed3e50891d82ba62ccac441bc895df97e5f3f0ed8"
+  },
+  "dash": {
+    "file": "dash.gif",
+    "frames": 60,
+    "duration_ms": 4200,
+    "source": "native model motion / mechanic diagram",
+    "sha256": "346c6aa9aa03387ebbaff79dcd034d4c40e8eb194fe9b79ec2aa58477e25a576"
+  },
+  "disguise": {
+    "file": "disguise.gif",
+    "frames": 60,
+    "duration_ms": 4200,
+    "source": "native model motion / mechanic diagram",
+    "sha256": "cac596b789cd67e97960565c7f5f5df1a4e3f9288524c00ec84c6d1557bb25b5"
+  },
+  "dive": {
+    "file": "dive.gif",
+    "frames": 85,
+    "duration_ms": 6800,
+    "source": "native game effect",
+    "sha256": "2d9af4816ccb1cefb98524a993ef7730104db5c01e1f4a7db6792bc83d02a767"
+  },
+  "glide": {
+    "file": "glide.gif",
+    "frames": 60,
+    "duration_ms": 4200,
+    "source": "native model motion / mechanic diagram",
+    "sha256": "28a0db812bcd11485bf5c6a20775d1b649f925c7d231317a8f02cd905a15cba1"
+  },
+  "graveyard": {
+    "file": "graveyard.gif",
+    "frames": 111,
+    "duration_ms": 8880,
+    "source": "native game effect",
+    "sha256": "25cf832952addbea9ad309068bdd3232f045599e81b3cd180615cff416fe6bd0"
+  },
+  "groundspike": {
+    "file": "groundspike.gif",
+    "frames": 60,
+    "duration_ms": 4200,
+    "source": "native model motion / mechanic diagram",
+    "sha256": "14be5b812607ea051dd2066db50914e44ce6da426ce4fcaf33923ad7f5d4cc78"
+  },
+  "hammer": {
+    "file": "hammer.gif",
+    "frames": 60,
+    "duration_ms": 4200,
+    "source": "native model motion / mechanic diagram",
+    "sha256": "0693bc0c21d55be764d8906d0ce7083fb61497ebc0d5751e2045c0699774b477"
+  },
+  "health": {
+    "file": "health.gif",
+    "frames": 60,
+    "duration_ms": 4200,
+    "source": "native model motion / mechanic diagram",
+    "sha256": "68e4830d830b1c04372e7e5ed5d42545161e995a855bf38ef8107f46953936df"
+  },
+  "jump": {
+    "file": "jump.gif",
+    "frames": 60,
+    "duration_ms": 4200,
+    "source": "native model motion / mechanic diagram",
+    "sha256": "005826bd44b7df75b480f5c9f84c41331f21681d0fc134d64762c6cb4a1b9055"
+  },
+  "lock": {
+    "file": "lock.gif",
+    "frames": 60,
+    "duration_ms": 4200,
+    "source": "native model motion / mechanic diagram",
+    "sha256": "fa656723963921e277bd815f94d0130ca691fbe57afdbc5521d97a6342ff2c79"
+  },
+  "mode": {
+    "file": "mode.gif",
+    "frames": 60,
+    "duration_ms": 4200,
+    "source": "native model motion / mechanic diagram",
+    "sha256": "af7b8f369ae7cdcfdd93e10f05d286d591ad0d706c0c18f061558c8e90d4fd09"
+  },
+  "muscle": {
+    "file": "muscle.gif",
+    "frames": 60,
+    "duration_ms": 4200,
+    "source": "native model motion / mechanic diagram",
+    "sha256": "84c20ceef3b17af7302ab8d80b016f1d3c5bf671a070141c0a27ff9e4cec28d6"
+  },
+  "pain": {
+    "file": "pain.gif",
+    "frames": 111,
+    "duration_ms": 8880,
+    "source": "native game effect",
+    "sha256": "10bd5adda1c5565e1daaefbc31dd5ae73ba86329f0b265831115a944aa6c602d"
+  },
+  "reach": {
+    "file": "reach.gif",
+    "frames": 60,
+    "duration_ms": 4200,
+    "source": "native model motion / mechanic diagram",
+    "sha256": "2c206917943a0dbe30fdaab12283bfa1379c6dcbf3dd30b9c528aecfb16d8d9a"
+  },
+  "shield": {
+    "file": "shield.gif",
+    "frames": 60,
+    "duration_ms": 4200,
+    "source": "native model motion / mechanic diagram",
+    "sha256": "75cda4aa5bd28aaa1be0e073283ca770daaa96865e2a3171dd12269621450b61"
+  },
+  "slice": {
+    "file": "slice.gif",
+    "frames": 60,
+    "duration_ms": 4200,
+    "source": "native model motion / mechanic diagram",
+    "sha256": "feda3e598f7959a51d329c0ecb0120658720c8404378be52d48838872fd891e4"
+  },
+  "sprint": {
+    "file": "sprint.gif",
+    "frames": 60,
+    "duration_ms": 4200,
+    "source": "native model motion / mechanic diagram",
+    "sha256": "c3b79238281259cc412f2bb6d6949059e706004ea4f899ce3611c0fda074651e"
+  },
+  "vision": {
+    "file": "vision.gif",
+    "frames": 60,
+    "duration_ms": 4200,
+    "source": "native model motion / mechanic diagram",
+    "sha256": "d0b7124f8a3488cce57a61bff36671ceb4f8447722cb9e8e7ec284cfa857de0d"
+  },
+  "wall": {
+    "file": "wall.gif",
+    "frames": 60,
+    "duration_ms": 4200,
+    "source": "native model motion / mechanic diagram",
+    "sha256": "cf5b1a92afcf3dadcb7244b87d09eebf7d14a317925e7476fd61e472aa036c3d"
+  },
+  "whip": {
+    "file": "whip.gif",
+    "frames": 60,
+    "duration_ms": 4200,
+    "source": "native model motion / mechanic diagram",
+    "sha256": "83ebd223d0e85ed1e1ba9d630016ff1f9b61949ef40e4a66bd2f9bffc4b02c33"
+  }
+}

@@ -192,7 +192,7 @@ public final class ConsumeSystem {
                             .thenComparingDouble(h->CombatTargeting.distanceSquared(player.getEyePosition(),h))
                             .thenComparingInt(Mob::getId)).orElse(null);
         }
-        if (target == null) { message(player, "consume_no_target"); return; }
+        if (target == null) { if(locked==null&&BlockThrowSystem.request(player))return; message(player, "consume_no_target"); return; }
         if (!healthReady(target)) { message(player, "consume_weaken"); return; }
         if(!canStartGroundGrab(player)&&!ConsumeSequence.large(target)) {
             message(player,"grab_ground");return;
@@ -213,7 +213,9 @@ public final class ConsumeSystem {
         player.level().playSound(null, target.blockPosition(), SoundEvents.SCULK_CATALYST_BLOOM, SoundSource.PLAYERS, .9F, .65F);
     }
 
-    @SubscribeEvent public static void tick(PlayerTickEvent event) {if(event.phase != net.minecraftforge.event.TickEvent.Phase.END)return;
+    @SubscribeEvent public static void tick(PlayerTickEvent event) {
+        if (!com.codex.blacklight.registry.ModAttachments.available(event.player)) { if (event.player instanceof net.minecraft.server.level.ServerPlayer removed) cancel(removed); return; }
+        if(event.phase != net.minecraftforge.event.TickEvent.Phase.END)return;
         if (!(event.player instanceof ServerPlayer player)) return;
         var recovery=com.codex.blacklight.registry.ModAttachments.getData(player, ModAttachments.CONSUME_RECOVERY);
         if(recovery.active() && (recovery.phaseProgress(player.level().getGameTime(),0)>=1

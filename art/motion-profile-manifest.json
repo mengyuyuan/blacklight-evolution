@@ -66,8 +66,8 @@
       "sha256": "df88237927366ce1be53430ab8e1d3e2d3a104c2c21a4db4c3ff9f767eb836a6"
     },
     "armor-growth.data": {
-      "bytes": 100869,
-      "sha256": "10eb450bf41a4310bc0ef61782219af1c92c3a634068ddfbfabc5be4bde03cfb"
+      "bytes": 103216,
+      "sha256": "1223488be6803ab8a25877d9d03233feb67143e9808f76f5e4b899f2e4472b26"
     },
     "basic_air_dash.json": {
       "bytes": 298243,
@@ -928,6 +928,10 @@
     "utility_shield_sprint.json": {
       "bytes": 207556,
       "sha256": "c9156074b76a3d62b4ae189a93e6dfe3c666cafcca8da24069030049eaca27ca"
+    },
+    "weapon-attack-scales.data": {
+      "bytes": 342895,
+      "sha256": "b8fc7c312adc2effd8b94dbf8ae6a5e7728527cfe2775b600a04f8165f1cfbab"
     },
     "whip_air.json": {
       "bytes": 383499,

@@ -84,5 +84,6 @@ public final class PowerWheelScreen extends Screen {
     }
     @Override public boolean keyPressed(int key,int scan,int mods){if(key==org.lwjgl.glfw.GLFW.GLFW_KEY_TAB){utility=!utility;selected=-1;return true;}return super.keyPressed(key,scan,mods);}
     @Override public boolean keyReleased(int key,int scan,int mods){if(binding.matches(key,scan)){confirm();return true;}return super.keyReleased(key,scan,mods);}
+    @Override public boolean mouseReleased(double x,double y,int button){if(binding.matchesMouse(button)){confirm();return true;}return super.mouseReleased(x,y,button);}
     @Override public boolean mouseClicked(double x,double y,int button){if(button==0){if(y>=8&&y<28)return super.mouseClicked(x,y,button);confirm();return true;}if(button==1){onClose();return true;}return super.mouseClicked(x,y,button);}
 }

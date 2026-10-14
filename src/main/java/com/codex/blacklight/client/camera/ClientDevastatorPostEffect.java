@@ -117,6 +117,8 @@ public final class ClientDevastatorPostEffect {
             com.codex.blacklight.client.ClientPostUniforms.set(effect,"CentreX",centreX);com.codex.blacklight.client.ClientPostUniforms.set(effect,"CentreY",centreY);
             com.codex.blacklight.client.ClientPostUniforms.set(effect,"FlowX",lastFlowX);com.codex.blacklight.client.ClientPostUniforms.set(effect,"FlowY",lastFlowY);
             com.codex.blacklight.client.ClientPostUniforms.set(effect,"FlightAxis",lastFlightAxis);
+            com.codex.blacklight.client.ClientPostUniforms.set(effect,"Rush",flight==null?0:(float)DevastatorEffectTimeline.flightRush(flight.speed()));
+            com.codex.blacklight.client.ClientPostUniforms.set(effect,"FlightTime",flight==null?0:(float)(flight.seconds()%4096));
             effect.process(partial);passes++;
         }catch(Exception exception){
             failed=true;BlacklightNeoMod.LOGGER.error("Devastator scene lens unavailable; reload resources to retry",exception);

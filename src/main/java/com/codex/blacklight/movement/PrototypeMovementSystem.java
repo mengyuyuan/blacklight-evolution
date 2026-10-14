@@ -65,6 +65,7 @@ public final class PrototypeMovementSystem {
                                    int forward, int sideways, boolean sprinting, boolean detach) {
         if (!PrototypeModeSystem.isActive(player) || !player.isAlive()
                 || player.isSpectator() || player.isDeadOrDying()
+                || player.isPassenger() || player.isFallFlying() || player.getAbilities().flying
                 || player.isInLava()) {
             // Inactive/dead/lava movement never arms traversal.
             return;
@@ -118,7 +119,9 @@ public final class PrototypeMovementSystem {
     }
 
     @SubscribeEvent
-    public static void onPlayerTick(PlayerTickEvent event) {if(event.phase != net.minecraftforge.event.TickEvent.Phase.END)return;
+    public static void onPlayerTick(PlayerTickEvent event) {
+        if (!com.codex.blacklight.registry.ModAttachments.available(event.player)) { return; }
+        if(event.phase != net.minecraftforge.event.TickEvent.Phase.END)return;
         if (!(event.player instanceof ServerPlayer player)) return;
         if (com.codex.blacklight.registry.ModAttachments.getData(player, ModAttachments.CONSUMING)&&com.codex.blacklight.combat.ConsumeVisual.blocksInput(com.codex.blacklight.registry.ModAttachments.getData(player, ModAttachments.GRAB_STAGE))) return;
         MovementState movement = com.codex.blacklight.registry.ModAttachments.getData(player, ModAttachments.MOVEMENT_STATE);
@@ -137,8 +140,8 @@ public final class PrototypeMovementSystem {
             // Infected but not in Prototype mode right now: restore vanilla stepping.
             if (blacklight.isInfected()) {
                 var stepHeight = player.getAttribute(net.minecraftforge.common.ForgeMod.STEP_HEIGHT_ADDITION.get());
-                if (stepHeight != null && stepHeight.getBaseValue() != 0.6D) {
-                    stepHeight.setBaseValue(0.6D);
+                if (stepHeight != null && stepHeight.getBaseValue() != 0.0D) {
+                    stepHeight.setBaseValue(0.0D);
                 }
             }
             var waterInput=movement.wallInput();
@@ -159,7 +162,8 @@ public final class PrototypeMovementSystem {
 
         // Prototype physiology steps straight over curbs, cars and one-block ledges.
         var stepHeight = player.getAttribute(net.minecraftforge.common.ForgeMod.STEP_HEIGHT_ADDITION.get());
-        double terrainStepHeight = com.codex.blacklight.power.UtilityPowerSystem.parkourAllowed(player) ? 1.0D : .6D;
+        // Forge adds this attribute to vanilla maxUpStep; preserve other modifiers.
+        double terrainStepHeight = com.codex.blacklight.power.UtilityPowerSystem.parkourAllowed(player) ? .4D : 0D;
         if (stepHeight != null && stepHeight.getBaseValue() != terrainStepHeight) {
             stepHeight.setBaseValue(terrainStepHeight);
         }
@@ -396,6 +400,9 @@ public final class PrototypeMovementSystem {
                                        Vec3 forward, int upgradeMask) {
         WallTraversal wall = movement.wallTraversal();
         WallTraversal.Mode previous = wall.mode();
+        if(com.codex.blacklight.combat.ShieldBorerSystem.groundDrive(player,movement.wallInput().sprint(),movement.wallInput().forward())){
+            wall.reset();syncWallMotion(player,wall);return false;
+        }
         WallTraversal.Frame frame = wall.tick(movement.wallInput(), WallContacts.sample(player, wall),
                 player.getY(), player.getDeltaMovement().horizontalDistance(),
                 MovementTuningSettings.wallClimbVelocity(), MovementUpgrade.wallMultiplier(upgradeMask));

@@ -15,7 +15,7 @@ public final class BlacklightRenderPose {
         NativeHeadLook.apply(entity,pose,partial);
         if (!NativeHitPose.apply(entity, skeleton, pose, partial)) ConsumeVictimPose.epic(entity, pose, partial);
         if (com.codex.blacklight.registry.ModAttachments.getData(entity, ModAttachments.GRAB_STAGE) == ConsumeVisual.HOLD) {
-            String key = com.codex.blacklight.registry.ModAttachments.getData(entity, ModAttachments.PLAYER_STATE).getActivePower() == PowerForm.BLADE ? "grab_blade_hold" : "grab_hold";
+            String key = com.codex.blacklight.registry.ModAttachments.getData(entity, ModAttachments.PLAYER_STATE).getActivePower() == PowerForm.BLADE && (!(entity instanceof net.minecraft.world.entity.player.Player p)||com.codex.blacklight.combat.BlockThrowSystem.held(p)==null) ? "grab_blade_hold" : "grab_hold";
             var held = MotionLibrary.pose(key, (entity.tickCount + partial) / 20F, true);
             for (String joint : new String[]{"Torso", "Chest", "Head", "Shoulder_R", "Arm_R", "Elbow_R", "Hand_R", "Tool_R", "Shoulder_L", "Arm_L", "Elbow_L", "Hand_L", "Tool_L"})
                 pose.getJointTransformData().put(joint, held.orElseEmpty(joint).copy());
@@ -48,6 +48,9 @@ public final class BlacklightRenderPose {
                     .rotationY((float)Math.toRadians(180-facing(entity,partial))).scale(.9375F),wall.normalX(),wall.normalZ());
         }
         WallContactPose.apply(entity, skeleton, pose, partial);
+        var weapon=ModAttachments.getData(entity,ModAttachments.WEAPON_VISUAL);
+        if(wall==null&&entity.onGround()&&weapon.spec()==com.codex.blacklight.combat.WeaponMove.HAMMER_RAM
+                &&!weapon.charging())HammerGroundContact.apply(pose);
         return pose;
     }
     public static float facing(LivingEntity entity,float partial) {

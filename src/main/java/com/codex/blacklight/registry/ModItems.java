@@ -34,11 +34,17 @@ public final class ModItems {
     public static final RegistryObject<BlockItem> HIVE_BONE = ITEMS.register("hive_bone", () -> new BlockItem(ModBlocks.HIVE_BONE.get(), new Item.Properties()));
     public static final RegistryObject<BlockItem> NUTRIENT_NODE = ITEMS.register("nutrient_node", () -> new BlockItem(ModBlocks.NUTRIENT_NODE.get(), new Item.Properties()));
 
+    public static final RegistryObject<net.minecraftforge.common.ForgeSpawnEggItem> BLACKWATCH_SOLDIER_SPAWN_EGG=ITEMS.register("blackwatch_soldier_spawn_egg",()->new net.minecraftforge.common.ForgeSpawnEggItem(ModEntities.BLACKWATCH_SOLDIER,0x20262a,0x8a2222,new Item.Properties()));
+    public static final RegistryObject<net.minecraftforge.common.ForgeSpawnEggItem> BLACKWATCH_HEAVY_SPAWN_EGG=ITEMS.register("blackwatch_heavy_spawn_egg",()->new net.minecraftforge.common.ForgeSpawnEggItem(ModEntities.BLACKWATCH_HEAVY,0x20262a,0xb0a285,new Item.Properties()));
+    public static final RegistryObject<Item> MILITARY_CIRCUIT=ITEMS.register("military_circuit",()->new Item(new Item.Properties()));
+    public static final RegistryObject<com.codex.blacklight.item.FieldScannerItem> FIELD_SCANNER=ITEMS.register("field_scanner",()->new com.codex.blacklight.item.FieldScannerItem(new Item.Properties().stacksTo(1)));
+
     public static final RegistryObject<CreativeModeTab> TAB = TABS.register(
             "blacklight", () -> CreativeModeTab.builder()
                     .title(Component.translatable("itemGroup.blacklight"))
                     .icon(() -> BLACKLIGHT_SAMPLE.get().getDefaultInstance())
                     .displayItems((parameters, output) -> {
+                        output.accept(BLACKWATCH_SOLDIER_SPAWN_EGG.get()); output.accept(BLACKWATCH_HEAVY_SPAWN_EGG.get()); output.accept(MILITARY_CIRCUIT.get()); output.accept(FIELD_SCANNER.get());
                         output.accept(BLACKLIGHT_SAMPLE.get()); output.accept(HUNTER_SPAWN_EGG.get());
                         output.accept(INFECTED_SOIL.get()); output.accept(INFECTED_STONE.get());
                         output.accept(TISSUE_FIBER.get()); output.accept(HIVE_FLESH.get());

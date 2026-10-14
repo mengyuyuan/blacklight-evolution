@@ -8,6 +8,8 @@
     {"name":"Burst","type":"float","count":1,"values":[0]},
     {"name":"Retract","type":"float","count":1,"values":[0]},
     {"name":"Flight","type":"float","count":1,"values":[0]},
+    {"name":"Rush","type":"float","count":1,"values":[0]},
+    {"name":"FlightTime","type":"float","count":1,"values":[0]},
     {"name":"CentreX","type":"float","count":1,"values":[0.5]},
     {"name":"CentreY","type":"float","count":1,"values":[0.5]},
     {"name":"FlowX","type":"float","count":1,"values":[0]},

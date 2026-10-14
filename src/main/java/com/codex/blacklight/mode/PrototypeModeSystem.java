@@ -46,13 +46,16 @@ public final class PrototypeModeSystem {
     }
 
     public static boolean isActive(net.minecraft.world.entity.player.Player player) {
+        if (player == null || !player.isAlive() || !ModAttachments.available(player)) return false;
         BlacklightState state = com.codex.blacklight.registry.ModAttachments.getData(player, ModAttachments.PLAYER_STATE);
         return state.isInfected() && state.isPrototypeMode();
     }
 
     /** Keeps the presentation engine aligned so B is the only authoritative mode switch. */
     @SubscribeEvent
-    public static void onPlayerTick(PlayerTickEvent event) {if(event.phase != net.minecraftforge.event.TickEvent.Phase.END)return;
+    public static void onPlayerTick(PlayerTickEvent event) {
+        if (!com.codex.blacklight.registry.ModAttachments.available(event.player)) { return; }
+        if(event.phase != net.minecraftforge.event.TickEvent.Phase.END)return;
         if (!(event.player instanceof ServerPlayer player)) return;
         BlacklightState state = com.codex.blacklight.registry.ModAttachments.getData(player, ModAttachments.PLAYER_STATE);
         synchronizePresentationMode(player, state.isInfected() && state.isPrototypeMode());

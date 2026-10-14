@@ -1,4 +1,5 @@
 package com.codex.blacklight.client;
+import net.minecraftforge.event.TickEvent.ClientTickEvent;
 
 import com.codex.blacklight.power.*;
 import com.codex.blacklight.registry.ModAttachments;
@@ -23,7 +24,7 @@ public final class UtilityPowerControls {
     private static int senseHeld;
     private static boolean senseConsumed;
     @SubscribeEvent public static void keys(RegisterKeyMappingsEvent e) { e.register(DEFENSE); e.register(SENSE); }
-    @SubscribeEvent public static void tick(net.minecraftforge.event.TickEvent.ClientTickEvent e){if(e.phase != net.minecraftforge.event.TickEvent.Phase.END)return;
+    @SubscribeEvent public static void tick(ClientTickEvent e){if(e.phase!=net.minecraftforge.event.TickEvent.Phase.END)return;
         var mc = Minecraft.getInstance();
         if (mc.player == null || mc.screen != null || !com.codex.blacklight.registry.ModAttachments.getData(mc.player, ModAttachments.PLAYER_STATE).isPrototypeMode()) {
             while (DEFENSE.consumeClick()) { } while (SENSE.consumeClick()) { }

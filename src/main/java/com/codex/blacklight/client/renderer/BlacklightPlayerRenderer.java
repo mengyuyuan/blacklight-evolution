@@ -82,6 +82,11 @@ public final class BlacklightPlayerRenderer extends PlayerRenderer {
             handShield.render(player,stack,buffers,light,partial);
         }finally{stack.popPose();}
     }
+    @Override protected void scale(AbstractClientPlayer player,PoseStack stack,float partial) {
+        super.scale(player,stack,partial);
+        float armorScale=com.codex.blacklight.client.model.BlockArmorModel.get().bodyScale(player,partial);
+        stack.scale(armorScale,armorScale,armorScale);
+    }
     @Override protected void setupRotations(AbstractClientPlayer player,PoseStack stack,float bob,float bodyYaw,float partial) {
         float facing=com.codex.blacklight.client.animation.BlacklightRenderPose.facing(player,partial);
         super.setupRotations(player,stack,bob,facing,partial);

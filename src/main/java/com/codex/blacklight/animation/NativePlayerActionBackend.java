@@ -64,6 +64,7 @@ public final class NativePlayerActionBackend implements PlayerActionBackend {
     }
 
     public static void clear(ServerPlayer player) {
+        if (!ModAttachments.available(player)) return;
         var old = com.codex.blacklight.registry.ModAttachments.getData(player, ModAttachments.PLAYER_ACTION);
         if (old.clipId().isEmpty()) return;
         com.codex.blacklight.registry.ModAttachments.setData(player, ModAttachments.PLAYER_ACTION,
@@ -71,7 +72,9 @@ public final class NativePlayerActionBackend implements PlayerActionBackend {
         if (!player.isRemoved()) com.codex.blacklight.registry.ModAttachments.syncData(player, ModAttachments.PLAYER_ACTION);
     }
 
-    @SubscribeEvent public static void tick(PlayerTickEvent event) {if(event.phase != net.minecraftforge.event.TickEvent.Phase.END)return;
+    @SubscribeEvent public static void tick(PlayerTickEvent event) {
+        if (!com.codex.blacklight.registry.ModAttachments.available(event.player)) { return; }
+        if(event.phase != net.minecraftforge.event.TickEvent.Phase.END)return;
         if (!(event.player instanceof ServerPlayer player)) return;
         var state = com.codex.blacklight.registry.ModAttachments.getData(player, ModAttachments.PLAYER_ACTION);
         if (state.clipId().isEmpty()) return;

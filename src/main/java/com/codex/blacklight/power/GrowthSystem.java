@@ -51,7 +51,9 @@ public final class GrowthSystem {
         CombatScale.attributes(p,infected);
         CombatScale.preserveHealthFraction(p,before,health);
     }
-    @SubscribeEvent public static void tick(PlayerTickEvent event){if(event.phase != net.minecraftforge.event.TickEvent.Phase.END)return;
+    @SubscribeEvent public static void tick(PlayerTickEvent event){
+        if (!com.codex.blacklight.registry.ModAttachments.available(event.player)) { return; }
+        if(event.phase != net.minecraftforge.event.TickEvent.Phase.END)return;
         if(!(event.player instanceof ServerPlayer p))return;updateHealth(p);
         if(p.tickCount%20!=0)return;
         if(!com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.PLAYER_STATE).isInfected())return;

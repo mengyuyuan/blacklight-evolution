@@ -119,7 +119,9 @@ public final class DevastatorSystem {
                 s.targets.stream().map(plan->new DevastatorVisual.Contact(plan.target().getId(),(float)plan.contact())).toList()));
         com.codex.blacklight.registry.ModAttachments.syncData(p, ModAttachments.DEVASTATOR_VISUAL);
     }
-    @SubscribeEvent public static void tick(PlayerTickEvent event){if(event.phase!=net.minecraftforge.event.TickEvent.Phase.END)return;
+    @SubscribeEvent public static void tick(PlayerTickEvent event){
+        if (!com.codex.blacklight.registry.ModAttachments.available(event.player)) { if (event.player instanceof net.minecraft.server.level.ServerPlayer removed) cancel(removed); return; }
+        if(event.phase!=net.minecraftforge.event.TickEvent.Phase.END)return;
         if(!(event.player instanceof ServerPlayer p))return;var s=ACTIVE.get(p);if(s==null)return;
         // A fall can legitimately take arbitrarily long. Source landing is
         // SupportingSurface-driven; only leaving the world cancels a void dive.
@@ -169,7 +171,7 @@ public final class DevastatorSystem {
                 if(s.move==WeaponMove.BULLETDIVE_DROP){
                     var terrain=BulletdiveTerrain.begin(p,s.id,s.origin,Math.max(0,s.highest-s.origin.y));
                     s.timing=new DevastatorTiming(s.timing.effectStart(),s.timing.effectEnd(),s.timing.damageStart(),s.timing.damageEnd(),
-                            s.timing.targetStart(),s.timing.targetStop(),Math.max(6,terrain.radius()+2),s.timing.damage(),s.timing.targets());
+                            s.timing.targetStart(),s.timing.targetStop(),Math.max(6F,(float)terrain.radius()+2F),s.timing.damage(),s.timing.targets());
                 }
                 float begin=s.timing.effectStart();s.timing=new DevastatorTiming(0,s.timing.effectEnd()-begin,
                         Math.max(0,s.timing.damageStart()-begin),Math.max(.1F,s.timing.damageEnd()-begin),
@@ -346,7 +348,7 @@ public final class DevastatorSystem {
         }
     }
     public static void cancel(ServerPlayer p){
-        INPUT.remove(p);var s=ACTIVE.remove(p);if(s==null)return;
+        INPUT.remove(p);var s=ACTIVE.remove(p);if(s==null || !ModAttachments.available(p))return;
         com.codex.blacklight.registry.ModAttachments.setData(p, ModAttachments.DEVASTATOR_VISUAL,DevastatorVisual.EMPTY);com.codex.blacklight.registry.ModAttachments.syncData(p, ModAttachments.DEVASTATOR_VISUAL);
         if(com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.WEAPON_VISUAL).move()==s.move.ordinal()){
             com.codex.blacklight.registry.ModAttachments.setData(p, ModAttachments.WEAPON_VISUAL,WeaponVisual.EMPTY);com.codex.blacklight.registry.ModAttachments.syncData(p, ModAttachments.WEAPON_VISUAL);

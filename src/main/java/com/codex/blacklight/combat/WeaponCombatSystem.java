@@ -184,10 +184,14 @@ public final class WeaponCombatSystem {
     }
     /** Both logical sides arrest the whip strike before travel applies gravity.
      * No persistent noGravity flag can leak into the next action/life. */
-    @SubscribeEvent public static void beforeTravel(PlayerTickEvent event){if(event.phase != net.minecraftforge.event.TickEvent.Phase.START)return;
+    @SubscribeEvent public static void beforeTravel(PlayerTickEvent event){
+        if (!com.codex.blacklight.registry.ModAttachments.available(event.player)) { if (event.player instanceof net.minecraft.server.level.ServerPlayer removed) { cancel(removed); BUTTONS.remove(removed); AIR_HITS.remove(removed); } return; }
+        if(event.phase != net.minecraftforge.event.TickEvent.Phase.START)return;
         holdWhip(event.player);
     }
-    @SubscribeEvent public static void afterTravel(PlayerTickEvent event){if(event.phase != net.minecraftforge.event.TickEvent.Phase.END)return;
+    @SubscribeEvent public static void afterTravel(PlayerTickEvent event){
+        if (!com.codex.blacklight.registry.ModAttachments.available(event.player)) { if (event.player instanceof net.minecraft.server.level.ServerPlayer removed) { cancel(removed); BUTTONS.remove(removed); AIR_HITS.remove(removed); } return; }
+        if(event.phase != net.minecraftforge.event.TickEvent.Phase.END)return;
         holdWhip(event.player);
     }
     private static void holdWhip(Player player){
@@ -202,7 +206,9 @@ public final class WeaponCombatSystem {
         if(elapsed<0||elapsed>=(visual.charging()?60:move.end))return;
         player.setDeltaMovement(Vec3.ZERO);player.resetFallDistance();
     }
-    @SubscribeEvent public static void tick(PlayerTickEvent event){if(event.phase != net.minecraftforge.event.TickEvent.Phase.END)return;
+    @SubscribeEvent public static void tick(PlayerTickEvent event){
+        if (!com.codex.blacklight.registry.ModAttachments.available(event.player)) { if (event.player instanceof net.minecraft.server.level.ServerPlayer removed) { cancel(removed); BUTTONS.remove(removed); AIR_HITS.remove(removed); } return; }
+        if(event.phase != net.minecraftforge.event.TickEvent.Phase.END)return;
         if(!(event.player instanceof ServerPlayer p))return;
         if(p.onGround())AIR_HITS.remove(p);
         var s=ACTIVE.get(p);if(s==null)return;
@@ -677,7 +683,7 @@ public final class WeaponCombatSystem {
         finish(p);
     }
     private static void finish(ServerPlayer p){
-        var old=ACTIVE.remove(p);if(old==null)return;
+        var old=ACTIVE.remove(p);if(old==null || !ModAttachments.available(p))return;
         com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.CLAW_COMBAT).reset();com.codex.blacklight.registry.ModAttachments.setData(p, ModAttachments.WEAPON_VISUAL,WeaponVisual.EMPTY);com.codex.blacklight.registry.ModAttachments.syncData(p, ModAttachments.WEAPON_VISUAL);
         PlayerActions.get().resume(p);
         PlayerActions.get().play(p, !p.onGround()&&!p.isInWater()&&!p.isInLava()

@@ -112,7 +112,7 @@ public final class DisguiseSystem {
         if(newlyExposed&&disguised)message(p,"disguise_exposed");
     }
     private static boolean recognizer(Mob mob){
-        return mob instanceof Monster&&BuiltInRegistries.ENTITY_TYPE.getKey(mob.getType()).getNamespace().equals("minecraft");
+        return mob instanceof com.codex.blacklight.entity.BlackwatchSoldier || mob instanceof Monster&&BuiltInRegistries.ENTITY_TYPE.getKey(mob.getType()).getNamespace().equals("minecraft");
     }
     private static boolean sees(Mob mob,ServerPlayer p){
         if(!mob.isAlive()||mob.isNoAi()||!recognizer(mob)||!mob.hasLineOfSight(p))return false;
@@ -134,6 +134,10 @@ public final class DisguiseSystem {
                 ?mob.getBrain().getMemory(type):java.util.Optional.empty();
     }
     private static boolean factionMatches(Mob mob,Player p){
+        if(mob instanceof com.codex.blacklight.entity.BlackwatchSoldier){
+            var identity=ModAttachments.getData(p,ModAttachments.DISGUISE_IDENTITY);
+            return identity.family().equals("blackwatch")||identity.family().equals("civilian")||identity.family().equals("animal");
+        }
         if(!BuiltInRegistries.ENTITY_TYPE.getKey(mob.getType()).getNamespace().equals("minecraft"))return false;
         var id=com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.DISGUISE_IDENTITY);
         return switch(id.family()){
@@ -186,7 +190,9 @@ public final class DisguiseSystem {
                 &&e.getEntity() instanceof Projectile shot&&shot.getOwner() instanceof ServerPlayer p)
             DisguiseAwareness.shot(shot,p);
     }
-    @SubscribeEvent public static void tick(PlayerTickEvent e){if(e.phase != net.minecraftforge.event.TickEvent.Phase.END)return;
+    @SubscribeEvent public static void tick(PlayerTickEvent e){
+        if (!com.codex.blacklight.registry.ModAttachments.available(e.player)) { return; }
+        if(e.phase != net.minecraftforge.event.TickEvent.Phase.END)return;
         if(!(e.player instanceof ServerPlayer p))return;
         var s=com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.PLAYER_STATE);var m=com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.DISGUISE_MORPH);
         long now=p.level().getGameTime();

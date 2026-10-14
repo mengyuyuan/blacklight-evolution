@@ -26,12 +26,12 @@ public final class WeaponAttackRenderer {
             if(visual.traveling())continue;
             double tick=visual.attackPose()>=0?visual.attackPose()*20:mc.level.getGameTime()+partial-visual.started();
             var definition=LocalWeaponMotion.find(move.id);
-            WhipCurve sourceCurve=null;float transition=.05f;
+            WhipCurve sourceCurve=null;
             if(definition.isPresent()){
-                var local=definition.get();transition=local.transitionSeconds();
+                var local=definition.get();
                 if(visual.charging()&&local.charge().isPresent()){
                     var charge=LocalVisualMotion.find(local.charge().get().animation());
-                    if(charge.isPresent()){sourceCurve=charge.get().whipCurve().orElse(null);transition=charge.get().transitionSeconds();}
+                    if(charge.isPresent())sourceCurve=charge.get().whipCurve().orElse(null);
                 }else sourceCurve=local.whipCurve().orElse(null);
             }
             double attackTick=tick;
@@ -40,15 +40,13 @@ public final class WeaponAttackRenderer {
             stack.pushPose();stack.translate(-camera.x,-camera.y,-camera.z);
             if(move.form==PowerForm.WHIPFIST){
                 if(sourceCurve!=null){
-                    // started is already rebased to the release point by the server.
-                    double correction=visual.clipOffset()-Math.round(visual.clipOffset()*20)/20.0;
-                    double time=Math.max(visual.clipOffset(),tick/20-transition+correction);
+                    // Use the exact skeletal clock, including charge holds and
+                    // attackPose. Re-applying transition to a held pose detached it.
+                    var clock=com.codex.blacklight.animation.WeaponMotionClock.sample(visual,mc.level.getGameTime()+partial);
+                    double time=clock.seconds();
                     var points=new java.util.ArrayList<>(WhipCurveContact.worldPoints(sourceCurve,time,pos,visual.yaw(),player));
                     var hand=WhipTetherRenderer.capturedHand(player.getId());
-                    if(hand!=null){
-                        var offset=hand.subtract(points.get(0));
-                        for(int i=0;i<Math.min(4,points.size());i++)points.set(i,points.get(i).add(offset.scale(1-i/4.)));
-                    }
+                    if(hand!=null)points=new java.util.ArrayList<>(WhipCurveContact.attachHand(points,hand));
                     var visible=WhipCurveContact.visiblePoints(points,mc.level,player);
                     WhipArmSurface.render(stack,out,light,visible,Math.max(.105,sourceCurve.radius()));
                     if(visible.size()>1)WeaponTrailRenderer.captureWorld(player,false,visible.get(visible.size()-2),visible.get(visible.size()-1));
@@ -57,7 +55,7 @@ public final class WeaponAttackRenderer {
                 tick=attackTick;
                 var forward=WeaponCombatSystem.strikeDirection(move,visual.yaw(),tick);
                 var hand=WhipTetherRenderer.capturedHand(player.getId());if(hand==null)hand=pos.add(0,1.1,0).add(forward.scale(.4));
-                double extent=net.minecraft.util.Mth.clamp((tick-move.start+4)/4,0,1)*net.minecraft.util.Mth.clamp((move.end+5-tick)/5,0,1);
+                double extent=com.codex.blacklight.util.MathCompat.clamp((tick-move.start+4)/4,0,1)*com.codex.blacklight.util.MathCompat.clamp((move.end+5-tick)/5,0,1);
                 var end=pos.add(0,1.15,0).add(forward.scale(AttackReach.reach(player,move)*extent));
                 // The middle of a flexible lash trails behind its cutting tip.
                 // Keep the tip on the same swept ray used by server hit detection.
