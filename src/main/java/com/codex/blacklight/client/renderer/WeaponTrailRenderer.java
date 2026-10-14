@@ -32,17 +32,20 @@ public final class WeaponTrailRenderer {
         float tip=form==PowerForm.BLADE?1.10F:form==PowerForm.CLAWS?1.05F:form==PowerForm.HAMMERFISTS?.79F:form==PowerForm.NONE?.53F:.67F;
         captureLocal(p,stack,left?1:0,form==PowerForm.HAMMERFISTS?.30F:.40F,tip);
     }
+    private static Vector3f grown(AbstractClientPlayer p,Vector3f point,boolean left){
+        return WeaponScaleRenderer.sample(p,net.minecraft.client.Minecraft.getInstance().getFrameTime())[left?1:0].point(point);
+    }
     private static void captureBlade(AbstractClientPlayer p,PoseStack stack,int slot,float x,float y,float z,float tx,float ty,float tz){
         var root=com.codex.blacklight.client.model.BladeShape.point(x,y,z);
         var tip=com.codex.blacklight.client.model.BladeShape.point(tx,ty,tz);
-        var a=BlacklightBoneRendering.worldPoint(stack,new Vector3f((float)root.x,(float)root.y,(float)root.z));
-        var b=BlacklightBoneRendering.worldPoint(stack,new Vector3f((float)tip.x,(float)tip.y,(float)tip.z));
+        var a=BlacklightBoneRendering.worldPoint(stack,grown(p,new Vector3f((float)root.x,(float)root.y,(float)root.z),false));
+        var b=BlacklightBoneRendering.worldPoint(stack,grown(p,new Vector3f((float)tip.x,(float)tip.y,(float)tip.z),false));
         captureWorld(p,slot,a,b);
     }
     public static void captureLocal(AbstractClientPlayer p,PoseStack stack,int slot,float inner,float tip){
         var form=com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.PLAYER_STATE).getActivePower();
-        var a=BlacklightBoneRendering.worldPoint(stack,new Vector3f(0,inner,0));
-        var b=BlacklightBoneRendering.worldPoint(stack,new Vector3f(form==PowerForm.BLADE?-.08F:0,tip,form==PowerForm.BLADE?-.08F:.1F));
+        var a=BlacklightBoneRendering.worldPoint(stack,slot<2?grown(p,new Vector3f(0,inner,0),slot==1):new Vector3f(0,inner,0));
+        var b=BlacklightBoneRendering.worldPoint(stack,slot<2?grown(p,new Vector3f(form==PowerForm.BLADE?-.08F:0,tip,form==PowerForm.BLADE?-.08F:.1F),slot==1):new Vector3f(form==PowerForm.BLADE?-.08F:0,tip,form==PowerForm.BLADE?-.08F:.1F));
         captureWorld(p,slot,a,b);
     }
     public static void captureWorld(Player p,boolean left,Vec3 inner,Vec3 tip){

@@ -24,6 +24,7 @@ import net.minecraft.world.InteractionHand;
 public final class BlacklightClawLayer extends net.minecraft.client.renderer.entity.layers.RenderLayer<AbstractClientPlayer,PlayerModel<AbstractClientPlayer>> {
     public BlacklightClawLayer(net.minecraft.client.renderer.entity.RenderLayerParent<AbstractClientPlayer,PlayerModel<AbstractClientPlayer>> parent){
         super(parent);
+        com.codex.blacklight.combat.WeaponAttackScales.preload();
         com.codex.blacklight.client.renderer.AuthoredDevastatorMesh.available();
         // Parse authored surfaces during renderer setup, rather than hitching the
         // first visible liquid frame each time a weapon is selected.
@@ -113,7 +114,7 @@ public final class BlacklightClawLayer extends net.minecraft.client.renderer.ent
         var parts=morph.parts();
         if(ClawTransformSettings.preview()&&(morph.target()==PowerForm.NONE||morph.target()==PowerForm.CLAWS))
             parts=java.util.List.of(new WeaponMorphTracker.Part(PowerForm.CLAWS,BiomassSurface.Frame.stable(1)));
-        var hammer=com.codex.blacklight.client.renderer.HammerScaleRenderer.sample(player,partial);
+        var hammer=com.codex.blacklight.client.renderer.WeaponScaleRenderer.sample(player,partial);
         // All wave frequencies repeat after 50,000 ticks. Reduce before casting
         // to float so old worlds retain sub-tick liquid motion.
         float materialTime=(float)(morph.materialTime()%50_000D);
@@ -122,9 +123,9 @@ public final class BlacklightClawLayer extends net.minecraft.client.renderer.ent
             var form=part.form();var mesh=forms.computeIfAbsent(form,
                     f->new ClawArmModel(f==PowerForm.CLAWS?"claw_blender":"form_"+f.id()));
             if(side!=1)renderHand(player,InteractionHand.MAIN_HAND,poses,false,stack,buffer,light,mesh,form,part.surface(),partial,materialTime,
-                    form==PowerForm.HAMMERFISTS?hammer[0]:null);
+                    form==morph.target()?hammer[0]:null);
             if(side!=0&&WeaponMorphTiming.arm(form,true))renderHand(player,InteractionHand.OFF_HAND,poses,true,stack,buffer,light,mesh,form,part.surface(),partial,materialTime,
-                    form==PowerForm.HAMMERFISTS?hammer[1]:null);
+                    form==morph.target()?hammer[1]:null);
         }
     }
 
@@ -136,7 +137,7 @@ public final class BlacklightClawLayer extends net.minecraft.client.renderer.ent
                             MultiBufferSource buffer,
                             int packedLight,
                             ClawArmModel model,PowerForm form,BiomassSurface.Frame surface,float partial,float time,
-                            com.codex.blacklight.combat.HammerScales.Shape hammer) {
+                            com.codex.blacklight.combat.WeaponAttackScales.Shape hammer) {
         float morphProgress=surface.growth();
         if (morphProgress <= 0.001F) return;
         com.codex.blacklight.animation.BlacklightSkeleton armature = com.codex.blacklight.animation.PlayerMotionController.skeleton();

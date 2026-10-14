@@ -1,0 +1,965 @@
+{
+  "schema": 1,
+  "axisMapping": "source bone X -> mesh longitudinal Y; source Y -> mesh X; source Z -> mesh Z",
+  "moves": {
+    "hammer_jab": {
+      "folder": "alex_hammerfist",
+      "source": "alex_hammer_4hit_combo",
+      "stages": [
+        {
+          "start": 4,
+          "end": 8,
+          "seconds": 0.1,
+          "blend": 0
+        },
+        {
+          "start": 25,
+          "end": 50,
+          "seconds": 0.5,
+          "blend": 0.05
+        },
+        {
+          "start": 50,
+          "end": 60,
+          "seconds": 0.5,
+          "blend": 0
+        }
+      ],
+      "chargeStages": [
+        {
+          "start": 4,
+          "end": 8,
+          "seconds": 0.1,
+          "blend": 0
+        },
+        {
+          "start": 8,
+          "end": 25,
+          "seconds": 0.4,
+          "blend": 0.03333333333333333
+        }
+      ],
+      "chargedBlendFrames": 3,
+      "release": 0.1
+    },
+    "hammer_hook": {
+      "folder": "alex_hammerfist",
+      "source": "alex_hammer_4hit_combo",
+      "stages": [
+        {
+          "start": 62,
+          "end": 85,
+          "seconds": 0.3333333333333333,
+          "blend": 0
+        },
+        {
+          "start": 103,
+          "end": 131,
+          "seconds": 0.6666666666666666,
+          "blend": 0.05
+        },
+        {
+          "start": 44,
+          "end": 65,
+          "seconds": 0.6666666666666666,
+          "blend": 0.066667,
+          "source": "alex_hammer_4hit_combo_trans2"
+        }
+      ],
+      "chargeStages": [
+        {
+          "start": 62,
+          "end": 85,
+          "seconds": 0.3333333333333333,
+          "blend": 0
+        },
+        {
+          "start": 96,
+          "end": 103,
+          "seconds": 0.5,
+          "blend": 0.03333333333333333
+        }
+      ],
+      "chargedBlendFrames": 3,
+      "release": 0.3333333333333333
+    },
+    "hammer_combo_c": {
+      "folder": "alex_hammerfist",
+      "source": "alex_hammer_4hit_combo",
+      "stages": [
+        {
+          "start": 148,
+          "end": 157,
+          "seconds": 0.3333333333333333,
+          "blend": 0
+        },
+        {
+          "start": 171,
+          "end": 186,
+          "seconds": 0.6,
+          "blend": 0.05
+        },
+        {
+          "start": 34,
+          "end": 54,
+          "seconds": 0.6666666666666666,
+          "blend": 0.066667,
+          "source": "alex_hammer_4hit_combo_trans3"
+        }
+      ],
+      "chargeStages": [
+        {
+          "start": 148,
+          "end": 157,
+          "seconds": 0.3333333333333333,
+          "blend": 0
+        },
+        {
+          "start": 157,
+          "end": 171,
+          "seconds": 0.5,
+          "blend": 0.03333333333333333
+        }
+      ],
+      "chargedBlendFrames": 3,
+      "release": 0.3333333333333333
+    },
+    "hammer_combo_d": {
+      "folder": "alex_hammerfist",
+      "source": "alex_hammer_3hit_combo",
+      "stages": [
+        {
+          "start": 100,
+          "end": 115,
+          "seconds": 0.3,
+          "blend": 0
+        },
+        {
+          "start": 120,
+          "end": 140,
+          "seconds": 0.6666666666666666,
+          "blend": 0.05
+        },
+        {
+          "start": 140,
+          "end": 180,
+          "seconds": 1,
+          "blend": 0
+        }
+      ],
+      "chargeStages": [
+        {
+          "start": 100,
+          "end": 115,
+          "seconds": 0.3,
+          "blend": 0
+        },
+        {
+          "start": 115,
+          "end": 120,
+          "seconds": 0.6666666666666666,
+          "blend": 0.03333333333333333
+        }
+      ],
+      "chargedBlendFrames": 3,
+      "release": 0.3
+    },
+    "hammer_quake": {
+      "folder": "alex_hammerfist",
+      "source": "alex_hammer_devastator",
+      "stages": [
+        {
+          "start": 0,
+          "end": 3,
+          "seconds": 0.1,
+          "blend": 0
+        },
+        {
+          "start": 10,
+          "end": 55,
+          "seconds": 0.5,
+          "blend": 0.03333333333333333
+        },
+        {
+          "start": 55,
+          "end": 96,
+          "seconds": 0.8333333333333334,
+          "blend": 0
+        },
+        {
+          "start": 96,
+          "end": 120,
+          "seconds": 0.6666666666666666,
+          "blend": 0
+        },
+        {
+          "start": 120,
+          "end": 170,
+          "seconds": 1.1666666666666667,
+          "blend": 0
+        }
+      ],
+      "chargeStages": [
+        {
+          "start": 0,
+          "end": 3,
+          "seconds": 0.1,
+          "blend": 0
+        },
+        {
+          "start": 3,
+          "end": 10,
+          "seconds": 0.6666666666666666,
+          "blend": 0.03333333333333333
+        }
+      ],
+      "chargedBlendFrames": 3,
+      "release": 0.1
+    },
+    "hammer_combo_special": {
+      "folder": "alex_hammerfist",
+      "source": "alex_hammer_4hit_combo",
+      "stages": [
+        {
+          "start": 211,
+          "end": 220,
+          "seconds": 0.3333333333333333,
+          "blend": 0
+        },
+        {
+          "start": 235,
+          "end": 242,
+          "seconds": 0.5,
+          "blend": 0.03333333333333333
+        },
+        {
+          "start": 243,
+          "end": 255,
+          "seconds": 0.3333333333333333,
+          "blend": 0.03333333333333333
+        },
+        {
+          "start": 255,
+          "end": 270,
+          "seconds": 0.5,
+          "blend": 0
+        }
+      ],
+      "chargeStages": [
+        {
+          "start": 211,
+          "end": 220,
+          "seconds": 0.3333333333333333,
+          "blend": 0
+        },
+        {
+          "start": 220,
+          "end": 230,
+          "seconds": 0.6666666666666666,
+          "blend": 0.03333333333333333
+        }
+      ],
+      "chargedBlendFrames": 3,
+      "release": 0.3333333333333333
+    },
+    "blade_cut": {
+      "folder": "alex_blades",
+      "source": "alex_blades_attack_A",
+      "stages": [
+        {
+          "start": 0.0,
+          "end": 2.0,
+          "seconds": 0.16666666666666666,
+          "blend": 0.06666669994592667,
+          "stage": "windup",
+          "owner": 12256,
+          "animationOffset": 12320
+        },
+        {
+          "start": 5.0,
+          "end": 20.0,
+          "seconds": 0.5,
+          "blend": 0.0,
+          "stage": "release",
+          "owner": 13748,
+          "animationOffset": 13812
+        },
+        {
+          "start": 20.0,
+          "end": 50.0,
+          "seconds": 0.6666666666666666,
+          "blend": 0.0,
+          "stage": "transition_to_idle",
+          "owner": 15468,
+          "animationOffset": 15532
+        }
+      ],
+      "chargeStages": [
+        {
+          "start": 0.0,
+          "end": 2.0,
+          "seconds": 0.16666666666666666,
+          "blend": 0.06666669994592667,
+          "stage": "windup",
+          "owner": 12256,
+          "animationOffset": 12320
+        },
+        {
+          "start": 2.0,
+          "end": 4.0,
+          "seconds": 0.3333333333333333,
+          "blend": 0.0
+        }
+      ],
+      "release": 0.16666666666666666
+    },
+    "blade_return": {
+      "folder": "alex_blades",
+      "source": "alex_blades_attack_B",
+      "stages": [
+        {
+          "start": 0.0,
+          "end": 6.0,
+          "seconds": 0.13333333333333333,
+          "blend": 0.10000000149011612,
+          "stage": "windup",
+          "owner": 16648,
+          "animationOffset": 16712
+        },
+        {
+          "start": 10.0,
+          "end": 14.0,
+          "seconds": 0.16666666666666666,
+          "blend": 0.03333330154418945,
+          "stage": "release",
+          "owner": 18024,
+          "animationOffset": 18088
+        },
+        {
+          "start": 14.0,
+          "end": 33.0,
+          "seconds": 0.4,
+          "blend": 0.0,
+          "stage": "release",
+          "owner": 18024,
+          "animationOffset": 18216
+        },
+        {
+          "start": 36.0,
+          "end": 46.0,
+          "seconds": 0.23333333333333334,
+          "blend": 0.10000000149011612,
+          "stage": "transition_to_idle",
+          "owner": 19900,
+          "animationOffset": 19964
+        },
+        {
+          "start": 46.0,
+          "end": 59.0,
+          "seconds": 0.43333333333333335,
+          "blend": 0.0,
+          "stage": "transition_to_idle",
+          "owner": 19900,
+          "animationOffset": 20092
+        }
+      ],
+      "chargeStages": [
+        {
+          "start": 0.0,
+          "end": 6.0,
+          "seconds": 0.13333333333333333,
+          "blend": 0.10000000149011612,
+          "stage": "windup",
+          "owner": 16648,
+          "animationOffset": 16712
+        },
+        {
+          "start": 6.0,
+          "end": 9.0,
+          "seconds": 0.3333333333333333,
+          "blend": 0.0
+        }
+      ],
+      "release": 0.13333333333333333
+    },
+    "blade_combo_c": {
+      "folder": "alex_blades",
+      "source": "alex_blades_attack_C",
+      "stages": [
+        {
+          "start": 0.0,
+          "end": 2.0,
+          "seconds": 0.1,
+          "blend": 0.1,
+          "stage": "windup",
+          "owner": 21048,
+          "animationOffset": 21112
+        },
+        {
+          "start": 3.0,
+          "end": 20.0,
+          "seconds": 0.36666666666666664,
+          "blend": 0.03333330154418945,
+          "stage": "release",
+          "owner": 22424,
+          "animationOffset": 22488
+        },
+        {
+          "start": 20.0,
+          "end": 39.0,
+          "seconds": 0.6666666666666666,
+          "blend": 0.10000000149011612,
+          "stage": "transition_to_idle",
+          "owner": 24300,
+          "animationOffset": 24364
+        }
+      ],
+      "chargeStages": [
+        {
+          "start": 0.0,
+          "end": 2.0,
+          "seconds": 0.1,
+          "blend": 0.1,
+          "stage": "windup",
+          "owner": 21048,
+          "animationOffset": 21112
+        },
+        {
+          "start": 2.0,
+          "end": 3.0,
+          "seconds": 0.3333333333333333,
+          "blend": 0.0
+        }
+      ],
+      "release": 0.1
+    },
+    "blade_combo_c2": {
+      "folder": "alex_blades",
+      "source": "alex_blades_attack_C",
+      "stages": [
+        {
+          "start": 40.0,
+          "end": 41.0,
+          "seconds": 0.06666666666666667,
+          "blend": 0.06666666666666667,
+          "stage": "windup",
+          "owner": 25320,
+          "animationOffset": 25384
+        },
+        {
+          "start": 41.0,
+          "end": 49.0,
+          "seconds": 0.26666666666666666,
+          "blend": 0.03333330154418945,
+          "stage": "release",
+          "owner": 26696,
+          "animationOffset": 26760
+        },
+        {
+          "start": 49.0,
+          "end": 70.0,
+          "seconds": 0.5,
+          "blend": 0.0,
+          "stage": "transition_to_idle",
+          "owner": 28364,
+          "animationOffset": 28428
+        }
+      ],
+      "chargeStages": [
+        {
+          "start": 40.0,
+          "end": 41.0,
+          "seconds": 0.06666666666666667,
+          "blend": 0.06666666666666667,
+          "stage": "windup",
+          "owner": 25320,
+          "animationOffset": 25384
+        },
+        {
+          "start": 41.0,
+          "end": 42.0,
+          "seconds": 0.3333333333333333,
+          "blend": 0.0
+        }
+      ],
+      "release": 0.06666666666666667
+    },
+    "blade_combo_d": {
+      "folder": "alex_blades",
+      "source": "alex_blades_attack_D",
+      "stages": [
+        {
+          "start": 0.0,
+          "end": 2.0,
+          "seconds": 0.06666666666666667,
+          "blend": 0.06666666666666667,
+          "stage": "windup",
+          "owner": 29384,
+          "animationOffset": 29448
+        },
+        {
+          "start": 3.0,
+          "end": 24.0,
+          "seconds": 0.4666666666666667,
+          "blend": 0.03333330154418945,
+          "stage": "release",
+          "owner": 30760,
+          "animationOffset": 30824
+        },
+        {
+          "start": 24.0,
+          "end": 50.0,
+          "seconds": 0.6666666666666666,
+          "blend": 0.10000000149011612,
+          "stage": "transition_to_idle",
+          "owner": 32592,
+          "animationOffset": 32656
+        }
+      ],
+      "chargeStages": [
+        {
+          "start": 0.0,
+          "end": 2.0,
+          "seconds": 0.06666666666666667,
+          "blend": 0.06666666666666667,
+          "stage": "windup",
+          "owner": 29384,
+          "animationOffset": 29448
+        },
+        {
+          "start": 2.0,
+          "end": 3.0,
+          "seconds": 0.3333333333333333,
+          "blend": 0.0
+        }
+      ],
+      "release": 0.06666666666666667
+    },
+    "claw_auto1": {
+      "folder": "alex_claws",
+      "source": "alex_claw_4hitcombo",
+      "stages": [
+        {
+          "start": 5,
+          "end": 8,
+          "seconds": 0.03333333333333333,
+          "blend": 0
+        },
+        {
+          "start": 10,
+          "end": 28,
+          "seconds": 0.6,
+          "blend": 0.03333333333333333
+        },
+        {
+          "start": 28,
+          "end": 30,
+          "seconds": 0.3333333333333333,
+          "blend": 0
+        }
+      ],
+      "chargeStages": [
+        {
+          "start": 5,
+          "end": 8,
+          "seconds": 0.03333333333333333,
+          "blend": 0
+        },
+        {
+          "start": 8,
+          "end": 9.666666666666666,
+          "seconds": 0.3333333333333333,
+          "blend": 0
+        }
+      ],
+      "chargedBlendFrames": 2,
+      "release": 0.03333333333333333
+    },
+    "claw_auto2": {
+      "folder": "alex_claws",
+      "source": "alex_claw_4hitcombo",
+      "stages": [
+        {
+          "start": 25,
+          "end": 30,
+          "seconds": 0.03333333333333333,
+          "blend": 0
+        },
+        {
+          "start": 40,
+          "end": 55,
+          "seconds": 0.5,
+          "blend": 0.03333333333333333
+        },
+        {
+          "start": 55,
+          "end": 60,
+          "seconds": 0.4,
+          "blend": 0
+        }
+      ],
+      "chargeStages": [
+        {
+          "start": 25,
+          "end": 30,
+          "seconds": 0.03333333333333333,
+          "blend": 0
+        },
+        {
+          "start": 30,
+          "end": 38.33333333333333,
+          "seconds": 0.3333333333333333,
+          "blend": 0
+        }
+      ],
+      "chargedBlendFrames": 2,
+      "release": 0.03333333333333333
+    },
+    "claw_auto3": {
+      "folder": "alex_claws",
+      "source": "alex_claw_4hitcombo",
+      "stages": [
+        {
+          "start": 60,
+          "end": 70,
+          "seconds": 0.05,
+          "blend": 0
+        },
+        {
+          "start": 77,
+          "end": 95,
+          "seconds": 0.6,
+          "blend": 0.03333333333333333
+        },
+        {
+          "start": 95,
+          "end": 100,
+          "seconds": 0.4,
+          "blend": 0
+        }
+      ],
+      "chargeStages": [
+        {
+          "start": 60,
+          "end": 70,
+          "seconds": 0.05,
+          "blend": 0
+        },
+        {
+          "start": 70,
+          "end": 75.83333333333333,
+          "seconds": 0.3333333333333333,
+          "blend": 0
+        }
+      ],
+      "chargedBlendFrames": 2,
+      "release": 0.05
+    },
+    "blade_dive": {
+      "folder": "alex_blades",
+      "source": "alex_blades_air_attack",
+      "stages": [
+        {
+          "start": 0,
+          "end": 4,
+          "seconds": 0.2,
+          "blend": 0
+        },
+        {
+          "start": 4,
+          "end": 10,
+          "seconds": 0.4666666666666667,
+          "blend": 0
+        },
+        {
+          "start": 16,
+          "end": 29,
+          "seconds": 0.26666666666666666,
+          "blend": 0
+        },
+        {
+          "start": 29,
+          "end": 36,
+          "seconds": 0.5666666666666667,
+          "blend": 0
+        },
+        {
+          "start": 36,
+          "end": 51,
+          "seconds": 0.6666666666666666,
+          "blend": 0
+        },
+        {
+          "start": 51,
+          "end": 69,
+          "seconds": 1.0,
+          "blend": 0
+        }
+      ],
+      "chargeStages": [
+        {
+          "start": 0,
+          "end": 4,
+          "seconds": 0.2,
+          "blend": 0
+        },
+        {
+          "start": 4,
+          "end": 10,
+          "seconds": 0.4666666666666667,
+          "blend": 0
+        },
+        {
+          "start": 10,
+          "end": 16,
+          "seconds": 0.6666666666666666,
+          "blend": 0
+        }
+      ],
+      "release": 0.6666666666666667
+    },
+    "hammer_drop": {
+      "folder": "alex",
+      "source": "alex_hammer_air_elbow",
+      "stages": [
+        {
+          "start": 0,
+          "end": 12,
+          "seconds": 0.4,
+          "blend": 0
+        },
+        {
+          "start": 12,
+          "end": 20,
+          "seconds": 0.26666666666666666,
+          "blend": 0
+        },
+        {
+          "start": 36,
+          "end": 63,
+          "seconds": 0.9,
+          "blend": 0
+        },
+        {
+          "start": 63,
+          "end": 67,
+          "seconds": 0.13333333333333333,
+          "blend": 0
+        },
+        {
+          "start": 67,
+          "end": 67,
+          "seconds": 0.5,
+          "blend": 0
+        },
+        {
+          "start": 67,
+          "end": 98,
+          "seconds": 1.3333333333333333,
+          "blend": 0
+        },
+        {
+          "start": 98,
+          "end": 104,
+          "seconds": 0.2,
+          "blend": 0
+        }
+      ],
+      "chargeStages": [
+        {
+          "start": 0,
+          "end": 12,
+          "seconds": 0.4,
+          "blend": 0
+        },
+        {
+          "start": 12,
+          "end": 20,
+          "seconds": 0.26666666666666666,
+          "blend": 0
+        },
+        {
+          "start": 20,
+          "end": 36,
+          "seconds": 0.6666666666666666,
+          "blend": 0
+        }
+      ],
+      "release": 0.6666666666666667
+    },
+    "hammer_ram": {
+      "folder": "alex_hammerfist",
+      "source": "alex_hammer_air_toss",
+      "stages": [
+        {
+          "start": 0,
+          "end": 15,
+          "seconds": 0.1,
+          "blend": 0
+        },
+        {
+          "start": 96,
+          "end": 137,
+          "seconds": 1.3666666666666667,
+          "blend": 0
+        },
+        {
+          "start": 139,
+          "end": 145,
+          "seconds": 0.3333333333333333,
+          "blend": 0
+        },
+        {
+          "start": 145,
+          "end": 188,
+          "seconds": 0.8333333333333334,
+          "blend": 0
+        },
+        {
+          "start": 188,
+          "end": 207,
+          "seconds": 0.5,
+          "blend": 0
+        }
+      ],
+      "chargeStages": [
+        {
+          "start": 0,
+          "end": 15,
+          "seconds": 0.1,
+          "blend": 0
+        },
+        {
+          "start": 15,
+          "end": 96,
+          "seconds": 1.1666666666666667,
+          "blend": 0
+        }
+      ],
+      "release": 0.1
+    },
+    "claw_sprint": {
+      "folder": "alex_claws",
+      "source": "alex_claw_4hitcombo",
+      "stages": [
+        {
+          "start": 25,
+          "end": 30,
+          "seconds": 0.1,
+          "blend": 0
+        },
+        {
+          "start": 40,
+          "end": 55,
+          "seconds": 0.5,
+          "blend": 0
+        },
+        {
+          "start": 55,
+          "end": 60,
+          "seconds": 0.3333333333333333,
+          "blend": 0
+        }
+      ],
+      "chargeStages": [
+        {
+          "start": 25,
+          "end": 30,
+          "seconds": 0.1,
+          "blend": 0
+        },
+        {
+          "start": 30,
+          "end": 40,
+          "seconds": 0.5,
+          "blend": 0
+        }
+      ],
+      "release": 0.1
+    },
+    "claw_groundspike": {
+      "folder": "alex_claws",
+      "source": "alex_claw_groundspike",
+      "stages": [
+        {
+          "start": 1,
+          "end": 7,
+          "seconds": 0.4,
+          "blend": 0
+        },
+        {
+          "start": 24,
+          "end": 62,
+          "seconds": 1.2666666666666666,
+          "blend": 0
+        },
+        {
+          "start": 62,
+          "end": 83,
+          "seconds": 0.7,
+          "blend": 0
+        },
+        {
+          "start": 165,
+          "end": 205,
+          "seconds": 1.0,
+          "blend": 0
+        }
+      ],
+      "chargeStages": [
+        {
+          "start": 1,
+          "end": 7,
+          "seconds": 0.4,
+          "blend": 0
+        },
+        {
+          "start": 7,
+          "end": 24,
+          "seconds": 1.0,
+          "blend": 0
+        }
+      ],
+      "release": 0.4
+    },
+    "blade_rush": {
+      "folder": "alex_blades",
+      "source": "alex_blades_dash",
+      "stages": [
+        {
+          "start": 0,
+          "end": 2,
+          "seconds": 0.06666666666666667,
+          "blend": 0
+        },
+        {
+          "start": 11,
+          "end": 39,
+          "seconds": 0.9333333333333333,
+          "blend": 0.03333333333333333
+        },
+        {
+          "start": 44,
+          "end": 86,
+          "seconds": 1.5,
+          "blend": 0.06666666666666667
+        }
+      ],
+      "chargeStages": [
+        {
+          "start": 0,
+          "end": 2,
+          "seconds": 0.06666666666666667,
+          "blend": 0
+        },
+        {
+          "start": 2,
+          "end": 11,
+          "seconds": 0.6666666666666666,
+          "blend": 0
+        }
+      ],
+      "release": 0.06666666666666667
+    }
+  }
+}

@@ -137,12 +137,12 @@ public final class ClawArmModel extends Model {
     }
     public void renderJoint(String joint, PoseStack stack, VertexConsumer consumer,
                              int light, int overlay, float progress, float talonLength,Matrix4f wristDelta,float distalLimit,
-                             com.codex.blacklight.combat.HammerScales.Shape hammer) {
+                             com.codex.blacklight.combat.WeaponAttackScales.Shape hammer) {
         renderJoint(joint,stack,consumer,light,overlay,progress,talonLength,wristDelta,distalLimit,hammer,BiomassSurface.Frame.stable(progress),0);
     }
     public void renderJoint(String joint, PoseStack stack, VertexConsumer consumer,
                              int light, int overlay, float progress, float talonLength,Matrix4f wristDelta,float distalLimit,
-                             com.codex.blacklight.combat.HammerScales.Shape hammer, BiomassSurface.Frame liquid) {
+                             com.codex.blacklight.combat.WeaponAttackScales.Shape hammer, BiomassSurface.Frame liquid) {
         float time = 0;
         if (liquid != null && liquid.liquid()) {
             var minecraft = net.minecraft.client.Minecraft.getInstance();
@@ -152,7 +152,7 @@ public final class ClawArmModel extends Model {
     }
     public void renderJoint(String joint, PoseStack stack, VertexConsumer consumer,
                              int light, int overlay, float progress, float talonLength,Matrix4f wristDelta,float distalLimit,
-                             com.codex.blacklight.combat.HammerScales.Shape hammer, BiomassSurface.Frame liquid, float time) {
+                             com.codex.blacklight.combat.WeaponAttackScales.Shape hammer, BiomassSurface.Frame liquid, float time) {
         Triangle[] faces = joints.get(joint);
         if (faces == null || progress <= .001F || liquid != null && !liquid.visible()) return;
         if (liquid == null) liquid = BiomassSurface.Frame.stable(progress);
@@ -172,6 +172,7 @@ public final class ClawArmModel extends Model {
             surface.opacity[i]=1-liquid.flow()+liquid.flow()*coating;
             BiomassSurface.deform(vertex, liquid, time, vertex.x() * tissueWidth, y, vertex.z() * tissueWidth, posed, i * 6);
         }
+        var growthPoint=new org.joml.Vector3f();var growthNormal=new org.joml.Vector3f();
         PoseStack.Pose pose=stack.last();
         for (Triangle face : faces) {
             if(forearm&&Math.max(face.points[0][1],Math.max(face.points[1][1],face.points[2][1]))>distalLimit)continue;
@@ -192,16 +193,11 @@ public final class ClawArmModel extends Model {
                     if (normalLength > 1E-6F) { nx /= normalLength; ny /= normalLength; nz /= normalLength; }
                 }
                 if(hammer!=null&&forearm) {
-                    // The authored mesh combines forearm and fist in one joint. Blend
-                    // their source scales along its length, keeping the elbow seam fixed.
-                    float fore=hammer.forearm()-1,fist=hammer.fist()-hammer.forearm();
-                    float s=1+fore*smooth(y/.30F)+fist*smooth((y-.28F)/.12F);
-                    float derivative=fore*slope(y,.30F)+fist*slope(y-.28F,.12F);
-                    float nyScaled=(ny-derivative*(x*nx+z*nz)/s)/s;
-                    nx/=s;nz/=s;ny=nyScaled;
-                    float length=(float)Math.sqrt(nx*nx+ny*ny+nz*nz);
-                    if(length>1e-6F){nx/=length;ny/=length;nz/=length;}
-                    x*=s;z*=s;y+=fore*integral(y,.30F)+fist*integral(y-.28F,.12F);
+                    growthNormal.set(nx,ny,nz);
+                    hammer.normal(x,y,z,growthNormal);
+                    growthPoint.set(x,y,z);hammer.point(growthPoint);
+                    x=growthPoint.x;y=growthPoint.y;z=growthPoint.z;
+                    nx=growthNormal.x;ny=growthNormal.y;nz=growthNormal.z;
                 }
                 if(wristDelta!=null&&forearm){
                     // Blend only the wrist/palm and talons; the forearm keeps its elbow

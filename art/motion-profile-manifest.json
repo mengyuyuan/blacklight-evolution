@@ -929,6 +929,10 @@
       "bytes": 207556,
       "sha256": "c9156074b76a3d62b4ae189a93e6dfe3c666cafcca8da24069030049eaca27ca"
     },
+    "weapon-attack-scales.data": {
+      "bytes": 342895,
+      "sha256": "b8fc7c312adc2effd8b94dbf8ae6a5e7728527cfe2775b600a04f8165f1cfbab"
+    },
     "whip_air.json": {
       "bytes": 383499,
       "sha256": "1ae5a178d30208cd967fcd98b5c6e35ea79fbf5cd751b0922af330bee6049f0d"

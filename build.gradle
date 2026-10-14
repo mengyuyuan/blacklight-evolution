@@ -38,14 +38,14 @@ def stageBundledMotions = tasks.register('stageBundledMotions', Sync) {
     if (bundledMotionDirectory.isPresent()) {
         from(bundledMotionDirectory.get()) {
             into 'blacklight/bundled_motions'
-            include '*.json', 'combat-motion-tuning.data', 'consume-placement.data', 'consume-receiver-events.data', 'receiver-poses.data', 'hunter-consume.data', 'hammer-scales.data', 'armor-growth.data', 'camera-profile.data', 'camera-events.data', 'camera-film.data', 'health-hud.data'
+            include '*.json', 'combat-motion-tuning.data', 'consume-placement.data', 'consume-receiver-events.data', 'receiver-poses.data', 'hunter-consume.data', 'hammer-scales.data', 'weapon-attack-scales.data', 'armor-growth.data', 'camera-profile.data', 'camera-events.data', 'camera-film.data', 'health-hud.data'
         }
         doFirst {
             def profile = file(bundledMotionDirectory.get())
             ['health-hud.data', 'camera-film.data', 'morph_claws.json', 'morph_blade.json', 'morph_hammerfists.json', 'morph_muscle_mass.json', 'morph_whipfist.json', 'morph_thermal_vision.json'].each {
                 if (!new File(profile, it).isFile()) throw new GradleException("Incomplete cinematic motion profile: ${it}")
             }
-            ['utility_shield_deploy.json', 'utility_shield_hit.json', 'utility_shield_run.json', 'utility_shield_sprint.json', 'utility_armor_transform.json', 'utility_armor_idle.json', 'basic_idle.json', 'basic_wall_top.json', 'basic_parkour_small.json', 'combat-motion-tuning.data', 'consume-placement.data', 'receiver-poses.data', 'hunter-consume.data', 'hammer-scales.data', 'armor-growth.data', 'camera-profile.data', 'camera-events.data'].each {
+            ['utility_shield_deploy.json', 'utility_shield_hit.json', 'utility_shield_run.json', 'utility_shield_sprint.json', 'utility_armor_transform.json', 'utility_armor_idle.json', 'basic_idle.json', 'basic_wall_top.json', 'basic_parkour_small.json', 'combat-motion-tuning.data', 'consume-placement.data', 'receiver-poses.data', 'hunter-consume.data', 'hammer-scales.data', 'weapon-attack-scales.data', 'armor-growth.data', 'camera-profile.data', 'camera-events.data'].each {
                 if (!new File(profile, it).isFile()) throw new GradleException("Incomplete bundled motion profile: ${it}")
             }
         }
