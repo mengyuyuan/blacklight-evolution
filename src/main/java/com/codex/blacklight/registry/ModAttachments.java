@@ -79,6 +79,11 @@ public final class ModAttachments {
                     .serialize(com.codex.blacklight.power.UtilityState.CODEC)
                     .sync(com.codex.blacklight.power.UtilityState.STREAM_CODEC).build());
     public static final Supplier<AttachmentType<com.codex.blacklight.power.BiomassState>> BIOMASS_FORM = ATTACHMENTS.register("biomass_form", () -> AttachmentType.builder(() -> com.codex.blacklight.power.BiomassState.EMPTY).serialize(com.codex.blacklight.power.BiomassState.CODEC).copyOnDeath().sync(com.codex.blacklight.power.BiomassState.STREAM_CODEC).build());
+    public static final Supplier<AttachmentType<com.codex.blacklight.power.AdaptivePassiveState>> ADAPTIVE_PASSIVES =
+            ATTACHMENTS.register("adaptive_passives", () -> AttachmentType.builder(() -> com.codex.blacklight.power.AdaptivePassiveState.EMPTY)
+                    .serialize(com.codex.blacklight.power.AdaptivePassiveState.CODEC).copyOnDeath()
+                    .sync(com.codex.blacklight.power.AdaptivePassiveState.STREAM_CODEC).build());
+
     private ModAttachments() {
     }
     public static final Supplier<AttachmentType<Integer>> JUMP_CHARGE=ATTACHMENTS.register("jump_charge",

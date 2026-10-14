@@ -26,6 +26,9 @@ public final class ModEffects {
 
     public static final DeferredHolder<MobEffect, MobEffect> BIOMASS_CONTACT=EFFECTS.register("biomass_contact",()->new com.codex.blacklight.effect.BiomassContactEffect().addAttributeModifier(Attributes.MOVEMENT_SPEED,id("biomass_contact"),-.45D,AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL));
 
+    public static final DeferredHolder<MobEffect, MobEffect> ADAPTATION = EFFECTS.register("adaptation", () -> new com.codex.blacklight.effect.PassiveMarkerEffect(0x48B3D1));
+    public static final DeferredHolder<MobEffect, MobEffect> TISSUE_REGENERATION = EFFECTS.register("tissue_regeneration", () -> new com.codex.blacklight.effect.PassiveMarkerEffect(0xC54859));
+
     private ModEffects() {
     }
 
