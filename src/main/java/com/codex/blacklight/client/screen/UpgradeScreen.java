@@ -51,9 +51,9 @@ public final class UpgradeScreen extends Screen {
             case MOVEMENT -> {for(var u:MovementUpgrade.values())entries.add(new Entry(u.id(),u.epCost(),u.requires()==null?null:u.requires().id(),false));}
             case CLAW -> {entries.add(new Entry("groundspike",0,null,true));for(var u:ClawUpgrade.values())entries.add(new Entry(u.id(),u.epCost(),null,false));}
             case FORMS -> {for(var u:List.of(PowerForm.CLAWS,PowerForm.HAMMERFISTS,PowerForm.BLADE,PowerForm.WHIPFIST,PowerForm.MUSCLE_MASS))entries.add(new Entry(u.id(),u.epCost(),null,u==PowerForm.CLAWS));}
-            case COMBAT -> {for(var u:CombatSkill.values())if(!u.shieldBorer())entries.add(new Entry(u.id(),u.epCost(),u.requires()!=null?u.requires().id():u.movementRequires()!=null?u.movementRequires().id():u.powerRequires()!=null?u.powerRequires().id():null,false));}
+            case COMBAT -> {for(var u:CombatSkill.values())if(!u.shieldBorer()&&!u.adaptivePassive())entries.add(new Entry(u.id(),u.epCost(),u.requires()!=null?u.requires().id():u.movementRequires()!=null?u.movementRequires().id():u.powerRequires()!=null?u.powerRequires().id():null,false));}
             case UTILITY -> {for(var u:List.of(PowerForm.SHIELD,PowerForm.ARMOR,PowerForm.THERMAL_VISION,PowerForm.INFECTED_VISION,PowerForm.BIOMASS))entries.add(new Entry(u.id(),u.epCost(),null,false));for(var u:CombatSkill.values())if(u.shieldBorer())entries.add(new Entry(u.id(),u.epCost(),u.requires()==null?PowerForm.SHIELD.id():u.requires().id(),false));}
-            case BIOLOGY -> {for(var u:GrowthUpgrade.values())entries.add(new Entry(u.id,u.cost,u.requires()==null?null:u.requires().id,false));}
+            case BIOLOGY -> {for(var u:CombatSkill.values())if(u.adaptivePassive())entries.add(new Entry(u.id(),u.epCost(),u.requires()==null?null:u.requires().id(),false));for(var u:GrowthUpgrade.values())entries.add(new Entry(u.id,u.cost,u.requires()==null?null:u.requires().id,false));}
             case SETTINGS -> {for(String id:List.of("bulletdive_blocks","shield_borer_blocks"))entries.add(new Entry(id,0,null,true));}
             default -> {}
         }

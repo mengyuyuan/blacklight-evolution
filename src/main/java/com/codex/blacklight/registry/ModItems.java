@@ -42,12 +42,16 @@ public final class ModItems {
     public static final DeferredItem<Item> MILITARY_CIRCUIT=ITEMS.registerItem("military_circuit",Item::new,new Item.Properties());
     public static final DeferredItem<com.codex.blacklight.item.FieldScannerItem> FIELD_SCANNER=ITEMS.registerItem("field_scanner",com.codex.blacklight.item.FieldScannerItem::new,new Item.Properties().stacksTo(1));
 
+    public static final DeferredItem<com.codex.blacklight.item.PassiveSerumItem> ADAPTATION_SERUM = ITEMS.registerItem("adaptation_serum", props -> new com.codex.blacklight.item.PassiveSerumItem(props, 1), new Item.Properties().stacksTo(1).rarity(Rarity.RARE));
+    public static final DeferredItem<com.codex.blacklight.item.PassiveSerumItem> TISSUE_REGENERATION_SERUM = ITEMS.registerItem("tissue_regeneration_serum", props -> new com.codex.blacklight.item.PassiveSerumItem(props, 2), new Item.Properties().stacksTo(1).rarity(Rarity.RARE));
+
     public static final DeferredHolder<CreativeModeTab, CreativeModeTab> TAB = TABS.register(
             "blacklight", () -> CreativeModeTab.builder()
                     .title(Component.translatable("itemGroup.blacklight"))
                     .icon(() -> BLACKLIGHT_SAMPLE.get().getDefaultInstance())
                     .displayItems((parameters, output) -> {
                         output.accept(BLACKWATCH_SOLDIER_SPAWN_EGG.get()); output.accept(BLACKWATCH_HEAVY_SPAWN_EGG.get()); output.accept(MILITARY_CIRCUIT.get()); output.accept(FIELD_SCANNER.get());
+                        output.accept(ADAPTATION_SERUM.get()); output.accept(TISSUE_REGENERATION_SERUM.get());
                         output.accept(BLACKLIGHT_SAMPLE.get()); output.accept(HUNTER_SPAWN_EGG.get());
                         output.accept(INFECTED_SOIL.get()); output.accept(INFECTED_STONE.get());
                         output.accept(TISSUE_FIBER.get()); output.accept(HIVE_FLESH.get());
@@ -56,6 +60,7 @@ public final class ModItems {
                         output.accept(HIVE_SAC.get()); output.accept(NUTRIENT_NODE.get());
                     })
                     .build());
+
 
     private ModItems() {
     }
