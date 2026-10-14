@@ -8,10 +8,14 @@ import net.minecraft.world.phys.Vec3;
  * World displacement advects the masses, so corners bend the tail instead of rotating a rigid mesh.
  */
 public final class BiomassFluidSurface {
-    private static final int N=25,COUNT=9;
+    private static final int N=73,COUNT=9;
     private static final double CELL=1D/16,VOLUME=.052;
     private final double[] x=new double[COUNT],z=new double[COUNT],vx=new double[COUNT],vz=new double[COUNT];
     private final double[] height=new double[N*N],target=new double[N*N];
+    // World-space samples preserve the actual bend after changing movement direction.
+    private record TrailPoint(Vec3 position,double time) {}
+    private final java.util.ArrayDeque<TrailPoint> trail=new java.util.ArrayDeque<>();
+    private double lastTravel;
     private Vec3 previous;
     private double stamp=Double.NaN, directionX, directionZ=1, moving, cycle;
     public void update(Vec3 position,double time,float scale){
@@ -19,6 +23,7 @@ public final class BiomassFluidSurface {
         double dt=reset?1:Math.max(0,Math.min(2,time-stamp));
         if(dt==0)return;
         double dx=reset?0:(position.x-previous.x)/scale,dz=reset?0:(position.z-previous.z)/scale;
+        updateTrail(position,time,scale,reset,dx,dz,dt);
         previous=position;stamp=time;
         if(reset){java.util.Arrays.fill(vx,0);java.util.Arrays.fill(vz,0);for(int i=0;i<COUNT;i++){double a=i*Math.PI*.25;x[i]=i==0?0:Math.cos(a)*.16;z[i]=i==0?0:Math.sin(a)*.16;}}
         double speed=Math.hypot(dx,dz)/dt;
@@ -51,8 +56,9 @@ public final class BiomassFluidSurface {
             vx[i]=(vx[i]+(tx-x[i])*spring*h)*damping;vz[i]=(vz[i]+(tz-z[i])*spring*h)*damping;
             x[i]=Math.max(-.49,Math.min(.49,x[i]+vx[i]*h));z[i]=Math.max(-.49,Math.min(.49,z[i]+vz[i]*h));
         }
-        double sum=0;
-        for(int ix=0;ix<N;ix++)for(int iz=0;iz<N;iz++){
+        java.util.Arrays.fill(target,0);
+        rasterTrail(position,time,scale);
+        for(int ix=N/2-12;ix<=N/2+12;ix++)for(int iz=N/2-12;iz<=N/2+12;iz++){
             double px=(ix-N/2)*CELL,pz=(iz-N/2)*CELL,density=0;
             for(int i=0;i<COUNT;i++){
                 double radius=i==0?.34:.235+.018*Math.sin(time*.12+i),q=((px-x[i])*(px-x[i])+(pz-z[i])*(pz-z[i]))/(radius*radius);
@@ -77,13 +83,61 @@ public final class BiomassFluidSurface {
             // not just the texture, while the density normalization preserves total volume.
             density*=1+moving*.55*Math.sin(cycle-along*10+side*3)
                 +.12*Math.sin(px*15+pz*10-time*.30)*Math.sin(pz*12-time*.17);
-            target[ix*N+iz]=density;sum+=density;
+            target[ix*N+iz]=Math.max(target[ix*N+iz],density);
         }
+        double sum=0;for(double density:target)sum+=density;
         double gain=VOLUME/(Math.max(.00001,sum)*CELL*CELL),blend=reset?1:1-Math.exp(-dt*.55),total=0;
         for(int i=0;i<height.length;i++){height[i]+=(target[i]*gain-height[i])*blend;total+=height[i];}
         // The footprint spreads and contracts but its apparent material volume stays constant.
         double conserve=VOLUME/(Math.max(.00001,total)*CELL*CELL);
         for(int i=0;i<height.length;i++)height[i]*=conserve;
+    }
+    private void updateTrail(Vec3 position,double time,float scale,boolean reset,double dx,double dz,double dt){
+        if(reset){trail.clear();lastTravel=time;directionX=0;directionZ=1;}
+        if(Math.hypot(dx,dz)/dt>.002)lastTravel=time;
+        TrailPoint newest=trail.peekFirst();
+        // Do not suspend a ribbon across a jump, a ledge, or a teleport.
+        if(newest!=null&&Math.abs(position.y-newest.position.y)>.25*scale)trail.clear();
+        newest=trail.peekFirst();
+        if(newest==null||position.distanceToSqr(newest.position)>.06*.06*scale*scale){
+            trail.addFirst(new TrailPoint(position,time));
+        }
+        while(trail.size()>64||!trail.isEmpty()&&time-trail.peekLast().time>36)trail.removeLast();
+    }
+    private void rasterTrail(Vec3 position,double time,float scale){
+        // A readable 1.85-block tail at base size, retracting tip-first after release.
+        double limit=1.85*Math.max(0,1-Math.max(0,time-lastTravel-3)/22);
+        if(limit<.04||trail.isEmpty())return;
+        Vec3 from=position;double travelled=0;
+        for(TrailPoint sample:trail){
+            Vec3 delta=sample.position.subtract(from).scale(1/scale);
+            double length=Math.hypot(delta.x,delta.z);
+            if(Math.abs(sample.position.y-position.y)>.25*scale)break;
+            if(length>.0001){
+                double use=Math.min(length,limit-travelled);
+                int steps=Math.max(1,(int)Math.ceil(use/.04));
+                for(int step=0;step<=steps;step++){
+                    double d=use*step/steps,along=travelled+d;
+                    Vec3 center=from.subtract(position).scale(1/scale).add(delta.scale(d/length));
+                    double taper=Math.max(0,1-along/limit);
+                    // Unequal contractions move toward the body while the path stays anchored.
+                    double pulse=.5+.5*Math.sin(time*.38+along*9);
+                    double radius=.035+(.145+.045*pulse)*Math.pow(taper,.65);
+                    double density=(.65+.35*pulse)*Math.min(1,taper*5);
+                    int minX=Math.max(0,(int)Math.floor((center.x-radius)/CELL)+N/2);
+                    int maxX=Math.min(N-1,(int)Math.ceil((center.x+radius)/CELL)+N/2);
+                    int minZ=Math.max(0,(int)Math.floor((center.z-radius)/CELL)+N/2);
+                    int maxZ=Math.min(N-1,(int)Math.ceil((center.z+radius)/CELL)+N/2);
+                    for(int ix=minX;ix<=maxX;ix++)for(int iz=minZ;iz<=maxZ;iz++){
+                        double rx=(ix-N/2)*CELL-center.x,rz=(iz-N/2)*CELL-center.z;
+                        double q=1-(rx*rx+rz*rz)/(radius*radius);
+                        if(q>0)target[ix*N+iz]=Math.max(target[ix*N+iz],density*q);
+                    }
+                }
+                travelled+=use;if(travelled>=limit)break;
+            }
+            from=sample.position;
+        }
     }
     public void render(PoseStack stack,VertexConsumer out,int light,double time){
         for(int ix=0;ix<N;ix++)for(int iz=0;iz<N;iz++){
