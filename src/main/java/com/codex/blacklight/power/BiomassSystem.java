@@ -52,7 +52,7 @@ public final class BiomassSystem {
         p.stopRiding();p.stopUsingItem();p.getAbilities().flying=false;p.onUpdateAbilities();p.setSprinting(false);p.setDeltaMovement(Vec3.ZERO);p.fallDistance=0;
         if(fatal){p.setHealth(Math.max(1,p.getMaxHealth()*.05F));p.clearFire();p.invulnerableTime=40;}
         p.getPersistentData().remove("blacklightSlimeTrail");
-        publish(p,new BiomassState(BiomassState.CRAWLING,p.level().getGameTime(),fatal,shell,oldPower,-1));
+        publish(p,new BiomassState(fatal?BiomassState.SHATTERING:BiomassState.CRAWLING,p.level().getGameTime(),fatal,shell,oldPower,-1));
         return true;
     }
     /** Recall a voluntary separation. No healing, kill, reward or eruption occurs. */
@@ -103,6 +103,11 @@ public final class BiomassSystem {
         if(!p.isAlive())return;
         if(!com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.PLAYER_STATE).isInfected()) {publish(p,BiomassState.EMPTY);return;}
         var s=state(p);long now=p.level().getGameTime();
+        if(s.phase()==BiomassState.SHATTERING){
+            p.setDeltaMovement(0,Math.min(0,p.getDeltaMovement().y),0);p.fallDistance=0;p.invulnerableTime=Math.max(p.invulnerableTime,10);
+            if(now-s.changedAt()>=BiomassState.SHATTER_TICKS)publish(p,s.crawl(now));
+            return;
+        }
         if(!s.consumed()){
             float before=BiomassEvolution.scale(p);
             s=s.aged();ModAttachments.setData(p,ModAttachments.BIOMASS_FORM,s);
@@ -172,7 +177,7 @@ public final class BiomassSystem {
         var s=state(p);
         if(s.active()){
             // A committed kill must never need a second victim after relogging.
-            publish(p,s.consumed()?s.reform(p.level().getGameTime()):s.crawl(p.level().getGameTime()));
+            publish(p,s.phase()==BiomassState.SHATTERING?new BiomassState(s.phase(),p.level().getGameTime(),s.fatal(),s.shell(),s.previousPower(),-1,s.age()):s.consumed()?s.reform(p.level().getGameTime()):s.crawl(p.level().getGameTime()));
             p.refreshDimensions();
         }
     }

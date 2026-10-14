@@ -60,4 +60,20 @@ class LocomotionClockTest {
         clock.commit(20_000_001,"sprint",.53333336F,true,false,.1,.1);
         assertNotEquals(clock.sampleTime(.1F),clock.sampleTime(.43333334F));
     }
+    @Test void upgradedSprintCannotCompressSourceCycleIntoAStrobe() {
+        var clock=new LocomotionClock();
+        clock.commit(0,"basic_sprint_fastest",.4F,true,false,0,.484);
+        for(int tick=1;tick<=20;tick++)
+            clock.commit(tick,"basic_sprint_fastest",.4F,true,false,3,.484);
+        assertEquals(1,clock.current(),.000001);
+        double stopped=clock.current();
+        clock.commit(21,"basic_sprint_fastest",.4F,true,false,0,.484);
+        assertEquals(stopped,clock.current());
+    }
+    @Test void slowerSprintStillTracksTravelBelowAuthoredCadence() {
+        var clock=new LocomotionClock();
+        clock.commit(0,"basic_sprint",.53333336F,true,false,0,.333);
+        clock.commit(1,"basic_sprint",.53333336F,true,false,.1665,.333);
+        assertEquals(.025,clock.current(),.000001);
+    }
 }

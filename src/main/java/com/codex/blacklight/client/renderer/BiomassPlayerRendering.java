@@ -9,31 +9,26 @@ import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.world.phys.Vec3;
 /** Visual motion follows actual displacement; it never writes player rotation or input. */
 public final class BiomassPlayerRendering {
-    private static final java.util.Map<Player,Flow> FLOWS=new java.util.WeakHashMap<>();
-    private static final class Flow {double stamp,speed;float heading;Flow(double t,float h){stamp=t;heading=h;}}
+    private static final java.util.Map<Player,BiomassFluidSurface> FLOWS=new java.util.WeakHashMap<>();
     private BiomassPlayerRendering(){}
     public static void render(Player p,float partial,PoseStack stack,MultiBufferSource buffers,int light){
         var state=BiomassSystem.state(p);
         if(!state.active()||state.phase()==BiomassState.REFORMING){FLOWS.remove(p);return;}
         double now=p.level().getGameTime()+partial,time=p.tickCount+partial;
-        var flow=FLOWS.computeIfAbsent(p,k->new Flow(time,p.getYRot()));
-        double dt=Math.max(0,Math.min(2,time-flow.stamp));flow.stamp=time;
-        double dx=p.getX()-p.xo,dz=p.getZ()-p.zo,velocity=Math.sqrt(dx*dx+dz*dz);
-        double desired=velocity>1?0:Math.min(1,velocity*7);
-        flow.speed+=(desired-flow.speed)*(1-Math.exp(-dt*.35));
-        if(velocity>.002&&velocity<1)flow.heading+=Mth.wrapDegrees((float)Math.toDegrees(Math.atan2(-dx,dz))-flow.heading)*(float)(1-Math.exp(-dt*.24));
+        float size=BiomassEvolution.scale(p);
+        var flow=FLOWS.computeIfAbsent(p,k->new BiomassFluidSurface());
+        flow.update(p.getPosition(partial),time,size);
         var victim=p.level().getEntity(state.victim());
         boolean absorbing=state.phase()==BiomassState.ABSORBING&&victim!=null;
         double f=absorbing?state.progress(now,BiomassState.ABSORB_TICKS):0;
         Vec3 delta=absorbing?victim.getPosition(partial).subtract(p.getPosition(partial)):Vec3.ZERO;
         double transfer=Math.min(1,f/.68),remaining=1-transfer;
+        if(state.phase()==BiomassState.SHATTERING)remaining=Math.max(0,(state.progress(now,BiomassState.SHATTER_TICKS)-.55)/.45);
         var out=buffers.getBuffer(RenderType.entityCutoutNoCull(ConsumedMobVisuals.WHITE));
-        float size=BiomassEvolution.scale(p);
         if(remaining>.005){
             stack.pushPose();stack.translate(delta.x*transfer,delta.y*transfer,delta.z*transfer);
-            stack.mulPose(Axis.YP.rotationDegrees(-flow.heading));
             float scale=size*(float)Math.sqrt(remaining);stack.scale(scale,size*(float)remaining,scale);
-            BiomassGeometry.crawler(stack,out,light,now,absorbing?1:flow.speed,state.fatal(),null,p.getPosition(partial),flow.heading,1+Math.sin(transfer*Math.PI)*.3);
+            flow.render(stack,out,light,time);
             stack.popPose();
         }
         if(absorbing&&f>.02&&f<.72){

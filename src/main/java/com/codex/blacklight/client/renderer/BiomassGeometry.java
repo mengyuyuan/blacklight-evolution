@@ -102,6 +102,14 @@ public final class BiomassGeometry {
         Vec3 normal=b.subtract(a).cross(c.subtract(a)).normalize();
         vertex(s,out,light,a,normal,color);vertex(s,out,light,b,normal,color);vertex(s,out,light,c,normal,color);vertex(s,out,light,d,normal,color);
     }
+    public static void liquidCell(PoseStack s,VertexConsumer out,int light,double x,double z,double cell,double base,double h,int color,double west,double east,double north,double south){
+        double y=base+h;
+        quad(s,out,light,new Vec3(x,y,z),new Vec3(x,y,z+cell),new Vec3(x+cell,y,z+cell),new Vec3(x+cell,y,z),color);
+        if(h>west)quad(s,out,light,new Vec3(x,base+west,z),new Vec3(x,base+west,z+cell),new Vec3(x,y,z+cell),new Vec3(x,y,z),color);
+        if(h>east)quad(s,out,light,new Vec3(x+cell,base+east,z+cell),new Vec3(x+cell,base+east,z),new Vec3(x+cell,y,z),new Vec3(x+cell,y,z+cell),color);
+        if(h>north)quad(s,out,light,new Vec3(x+cell,base+north,z),new Vec3(x,base+north,z),new Vec3(x,y,z),new Vec3(x+cell,y,z),color);
+        if(h>south)quad(s,out,light,new Vec3(x,base+south,z+cell),new Vec3(x+cell,base+south,z+cell),new Vec3(x+cell,y,z+cell),new Vec3(x,y,z+cell),color);
+    }
     public static void box(PoseStack s,VertexConsumer out,int light,double x0,double y0,double z0,double x1,double y1,double z1,int color){
         Vec3[] v={new Vec3(x0,y0,z0),new Vec3(x1,y0,z0),new Vec3(x1,y1,z0),new Vec3(x0,y1,z0),new Vec3(x0,y0,z1),new Vec3(x1,y0,z1),new Vec3(x1,y1,z1),new Vec3(x0,y1,z1)};
         int[][] faces={{0,3,2,1},{4,5,6,7},{0,4,7,3},{1,2,6,5},{3,7,6,2},{0,1,5,4}};

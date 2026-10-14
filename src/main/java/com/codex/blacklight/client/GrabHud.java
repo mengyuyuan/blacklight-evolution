@@ -19,9 +19,9 @@ public final class GrabHud {
         if(mc.player==null||mc.screen!=null||mc.options.hideGui)return;
         var slime=com.codex.blacklight.power.BiomassSystem.state(mc.player);
         if(slime.active()){
-            int x=mc.getWindow().getGuiScaledWidth()/2,y=mc.getWindow().getGuiScaledHeight()-74;
+            int x=mc.getWindow().getGuiScaledWidth()/2,y=mc.getWindow().getGuiScaledHeight()-110;
             var g=event.getGuiGraphics();float integrity=com.codex.blacklight.power.BiomassEvolution.integrity(mc.player);
-            String stage=slime.consumed()?"reforming":slime.phase()==com.codex.blacklight.power.BiomassState.ABSORBING?"absorbing":slime.fatal()?"fatal":"voluntary";
+            String stage=slime.phase()==com.codex.blacklight.power.BiomassState.SHATTERING?"shattering":slime.consumed()?"reforming":slime.phase()==com.codex.blacklight.power.BiomassState.ABSORBING?"absorbing":slime.fatal()?"fatal":"voluntary";
             g.drawCenteredString(mc.font,Component.translatable("hud.blacklight.slime_"+stage),x,y,0xffe5ddd7);
             float amount=slime.phase()==com.codex.blacklight.power.BiomassState.ABSORBING?slime.progress(mc.level.getGameTime(),com.codex.blacklight.power.BiomassState.ABSORB_TICKS):integrity;
             g.fill(x-50,y+12,x+50,y+16,0xb0202020);g.fill(x-50,y+12,x-50+(int)(100*amount),y+16,0xffa53142);

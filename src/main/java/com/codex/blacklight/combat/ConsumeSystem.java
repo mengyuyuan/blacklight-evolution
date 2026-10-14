@@ -27,6 +27,7 @@ public final class ConsumeSystem {
     public static final float DIRECT_GRAB_MAX_HEALTH = 50F;
     private static final Map<ServerPlayer, Session> ACTIVE = new HashMap<>();
     public static final TagKey<EntityType<?>> CONSUMABLE = TagKey.create(Registries.ENTITY_TYPE, new ResourceLocation("blacklight", "consumable"));
+    public static final TagKey<EntityType<?>> UNCONSUMABLE = TagKey.create(Registries.ENTITY_TYPE, new ResourceLocation("blacklight", "unconsumable"));
     public static final TagKey<EntityType<?>> PASSIVE = TagKey.create(Registries.ENTITY_TYPE, new ResourceLocation("blacklight", "consumable_without_weakening"));
     private static final Map<Mob, Thrown> THROWN = new HashMap<>();
     private record Thrown(ServerPlayer owner, int remaining, Vec3 velocity,float damage) {}
@@ -155,7 +156,7 @@ public final class ConsumeSystem {
     public static boolean eligible(Mob mob) {return com.codex.blacklight.power.BiomassSystem.claimant(mob)==null&&eligibleBiomass(mob);}
     public static boolean eligibleBiomass(Mob mob) {
         if(mob instanceof com.codex.blacklight.entity.HiveTendril)return false;
-        return ModAttachments.available(mob) && !THROWN.containsKey(mob) && mob.isAlive() && !mob.isRemoved() && !mob.isInvulnerable() && mob.getType().is(CONSUMABLE)
+        return ModAttachments.available(mob) && !THROWN.containsKey(mob) && mob.isAlive() && !mob.isRemoved() && !mob.isInvulnerable() && !mob.getType().is(UNCONSUMABLE)
                 && !(mob instanceof net.minecraft.world.entity.boss.wither.WitherBoss wither && wither.getInvulnerableTicks()>0)
                 && !(mob instanceof net.minecraft.world.entity.boss.enderdragon.EnderDragon dragon && dragon.getPhaseManager().getCurrentPhase().getPhase()==net.minecraft.world.entity.boss.enderdragon.phases.EnderDragonPhase.DYING)
                 && !ModAttachments.peekData(mob, ModAttachments.CONSUME_VISUAL).active()

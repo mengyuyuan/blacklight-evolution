@@ -27,10 +27,15 @@ public final class BlockThrowPose {
     }
    }
   }
+  var stride=PlayerMotionController.locomotionPose(p,partial);
+  boolean carrying=a.clipId().endsWith("_hold")||a.clipId().endsWith("_charge");
+  double speed=Math.max(p.getDeltaMovement().horizontalDistance(),com.codex.blacklight.movement.LocomotionVisualState.get(p.getId()).speed());
+  float strideWeight=carrying?1:(float)Math.min(1,speed/.08);
+  pose=CarryPoseLayer.apply(pose,stride,strideWeight);
   // Let the current gait take over progressively during the authored follow-through.
   if(a.clipId().endsWith("_release")){
    float end=Math.max(0,Math.min(1,(a.duration()-a.seconds(p.level().getGameTime()+partial))/.22F));
-   if(end<1)pose=BlacklightPose.interpolatePose(MotionLibrary.pose(p.getDeltaMovement().horizontalDistance()>.02?"basic_run":"basic_idle",(p.tickCount+partial)/20F,true),pose,end);
+   if(end<1)pose=BlacklightPose.interpolatePose(stride,pose,end);
   }
   return pose;
  }
