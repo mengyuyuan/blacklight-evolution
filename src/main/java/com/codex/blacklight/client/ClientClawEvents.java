@@ -26,7 +26,7 @@ import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 import net.minecraftforge.client.event.EntityRenderersEvent;
-import net.minecraftforge.event.TickEvent;
+import net.minecraftforge.event.TickEvent.ClientTickEvent;
 import net.minecraftforge.client.event.InputEvent;
 import net.minecraftforge.client.event.RegisterKeyMappingsEvent;
 import net.minecraftforge.client.event.ScreenEvent;
@@ -127,52 +127,59 @@ public final class ClientClawEvents {
     @SubscribeEvent
     public static void onKey(InputEvent.Key event) {
         Minecraft minecraft = Minecraft.getInstance();
+        if(minecraft.screen==null && (minecraft.options.keyAttack.matches(event.getKey(),event.getScanCode()) || minecraft.options.keyUse.matches(event.getKey(),event.getScanCode()))){
+            ClientWeaponCombat.poll();tickGrabButtons();
+        }
         if (event.getAction() == GLFW.GLFW_RELEASE && GRAB.matches(event.getKey(),event.getScanCode())) lastGrabDown=false;
         if (event.getAction() != GLFW.GLFW_PRESS || minecraft.player == null
                 || minecraft.getConnection() == null) return;
 
+        handleKeyPress(minecraft, key->key.matches(event.getKey(),event.getScanCode()) && key.getKeyModifier().isActive(key.getKeyConflictContext()));
+    }
+
+    private static void handleKeyPress(Minecraft minecraft,java.util.function.Predicate<KeyMapping> matches){
         var state = com.codex.blacklight.registry.ModAttachments.getData(minecraft.player, ModAttachments.PLAYER_STATE);
-        if (minecraft.screen == null && PROTOTYPE_MODE.matches(event.getKey(), event.getScanCode())) {
+        if (minecraft.screen == null && matches.test(PROTOTYPE_MODE)) {
             PacketDistributor.sendToServer(new PrototypeModePayload(!state.isPrototypeMode()));
             return;
         }
-        if (minecraft.screen == null && UPGRADE_PANEL.matches(event.getKey(), event.getScanCode())) {
-            if (state.isInfected()) minecraft.setScreen(new UpgradeScreen());
+        if (minecraft.screen == null && matches.test(UPGRADE_PANEL)) {
+            minecraft.setScreen(new UpgradeScreen());
             return;
         }
         if (!state.isPrototypeMode()) return;
         ClientTargetLock.sync();
-        if (minecraft.screen == null && CYCLE_FORM.matches(event.getKey(), event.getScanCode())) {
+        if (minecraft.screen == null && matches.test(CYCLE_FORM)) {
             if(!com.codex.blacklight.registry.ModAttachments.getData(minecraft.player, ModAttachments.CONSUMING))minecraft.setScreen(new com.codex.blacklight.client.screen.PowerWheelScreen(CYCLE_FORM)); return;
         }
-        if (minecraft.screen == null && GRAB.matches(event.getKey(), event.getScanCode())) {
+        if (minecraft.screen == null && matches.test(GRAB)) {
             pollGrabPress(true);
             return;
         }
 
-        if (minecraft.screen == null && CLAW_TUNER.matches(event.getKey(), event.getScanCode())) {
+        if (minecraft.screen == null && matches.test(CLAW_TUNER)) {
             minecraft.setScreen(new ClawTunerScreen());
             return;
         }
-        if (minecraft.screen == null && ANIMATION_TUNER.matches(event.getKey(), event.getScanCode())) {
+        if (minecraft.screen == null && matches.test(ANIMATION_TUNER)) {
             minecraft.setScreen(new AnimationTunerScreen());
             return;
         }
         if (minecraft.screen != null) return;
 
-        if (TARGET_LOCK.matches(event.getKey(), event.getScanCode())) {
+        if (matches.test(TARGET_LOCK)) {
             toggleTargetLock(minecraft);
             return;
         }
 
-        if (TOGGLE_CLAWS.matches(event.getKey(), event.getScanCode())) {
+        if (matches.test(TOGGLE_CLAWS)) {
             PacketDistributor.sendToServer(new ClawActionPayload(ClawActionPayload.Action.TOGGLE_CLAWS));
         }
     }
 
     /** Opens the timeline once for repeatable development screenshots and nothing else. */
     @SubscribeEvent
-    public static void onClientTick(net.minecraftforge.event.TickEvent.ClientTickEvent event){if(event.phase != net.minecraftforge.event.TickEvent.Phase.END)return;
+    public static void onClientTick(ClientTickEvent event){if(event.phase!=net.minecraftforge.event.TickEvent.Phase.END)return;
         resetInputOwner();
         pollGrabPress(physicalGrabDown());
         suppressPrototypePlayerList();
@@ -193,11 +200,16 @@ public final class ClientClawEvents {
     public static void onRawMouseButton(InputEvent.MouseButton.Pre event) {
         Minecraft minecraft = Minecraft.getInstance();
         if (minecraft.player == null || minecraft.screen != null) return;
+        if(event.getAction()==GLFW.GLFW_PRESS){
+            boolean mapped=java.util.stream.Stream.of(PROTOTYPE_MODE,UPGRADE_PANEL,CYCLE_FORM,GRAB,TARGET_LOCK,TOGGLE_CLAWS,CLAW_TUNER,ANIMATION_TUNER)
+                    .anyMatch(key->SkillBindings.mouse(key,event.getButton()));
+            if(mapped){handleKeyPress(minecraft,key->SkillBindings.mouse(key,event.getButton()));event.setCanceled(true);return;}
+        }
         var state = com.codex.blacklight.registry.ModAttachments.getData(minecraft.player, ModAttachments.PLAYER_STATE);
-        if(ClientWeaponCombat.active()&&(event.getButton()==0||event.getButton()==1)){
+        if(ClientWeaponCombat.active()&&(SkillBindings.mouse(minecraft.options.keyAttack,event.getButton())||SkillBindings.mouse(minecraft.options.keyUse,event.getButton()))){
             event.setCanceled(true);ClientWeaponCombat.poll();return;
         }
-        if (event.getButton() == GLFW.GLFW_MOUSE_BUTTON_LEFT
+        if (SkillBindings.mouse(minecraft.options.keyAttack,event.getButton())
                 && event.getAction() == GLFW.GLFW_PRESS) {
             BlacklightNeoMod.LOGGER.debug(
                     "Observed physical left press infected={} prototype={} power={} ground={}",
@@ -205,13 +217,13 @@ public final class ClientClawEvents {
                     minecraft.player.onGround());
         }
         if(state.isPrototypeMode() && com.codex.blacklight.registry.ModAttachments.getData(minecraft.player, ModAttachments.CONSUMING)
-                && (event.getButton()==GLFW.GLFW_MOUSE_BUTTON_LEFT||event.getButton()==GLFW.GLFW_MOUSE_BUTTON_RIGHT)) {
+                && (SkillBindings.mouse(minecraft.options.keyAttack,event.getButton())||SkillBindings.mouse(minecraft.options.keyUse,event.getButton()))) {
             event.setCanceled(true);tickGrabButtons();return;
         }
         if (!state.isInfected() || !state.isPrototypeMode()
                 || state.getActivePower() != PowerForm.CLAWS) return;
 
-        if (event.getButton() == GLFW.GLFW_MOUSE_BUTTON_LEFT
+        if (SkillBindings.mouse(minecraft.options.keyAttack,event.getButton())
                 && (event.getAction() == GLFW.GLFW_PRESS
                 || event.getAction() == GLFW.GLFW_RELEASE)) {
             // Callbacks cover short taps; tick polling covers held inputs.
@@ -226,7 +238,7 @@ public final class ClientClawEvents {
             return;
         }
 
-        if (event.getButton() == GLFW.GLFW_MOUSE_BUTTON_RIGHT
+        if (SkillBindings.mouse(minecraft.options.keyUse,event.getButton())
                 && (event.getAction() == GLFW.GLFW_PRESS
                 || event.getAction() == GLFW.GLFW_RELEASE)) {
             // Groundspike is a one-shot planted action. RMB-down starts the authored
@@ -249,9 +261,9 @@ public final class ClientClawEvents {
     private static void tickGrabButtons() {
         var mc=Minecraft.getInstance();if(mc.getWindow()==null)return;
         long window=mc.getWindow().getWindow();
-        boolean left=GLFW.glfwGetMouseButton(window,GLFW.GLFW_MOUSE_BUTTON_LEFT)==GLFW.GLFW_PRESS;
-        boolean right=GLFW.glfwGetMouseButton(window,GLFW.GLFW_MOUSE_BUTTON_RIGHT)==GLFW.GLFW_PRESS;
-        if(mc.player!=null&&mc.screen==null&&com.codex.blacklight.registry.ModAttachments.getData(mc.player, ModAttachments.CONSUMING)) {
+        boolean left=SkillBindings.down(mc.options.keyAttack);
+        boolean right=SkillBindings.down(mc.options.keyUse);
+        if(mc.player!=null&&mc.screen==null&&mc.isWindowActive()&&com.codex.blacklight.registry.ModAttachments.getData(mc.player, ModAttachments.CONSUMING)) {
             clearLeftAttackHold();
             mc.options.keyAttack.setDown(false);mc.options.keyUse.setDown(false);
             int stage=com.codex.blacklight.registry.ModAttachments.getData(mc.player, ModAttachments.GRAB_STAGE);
@@ -296,20 +308,14 @@ public final class ClientClawEvents {
         ClientTargetLock.sync();
         PacketDistributor.sendToServer(new ClawActionPayload(ClawActionPayload.Action.GRAB));
     }
-    static boolean physicalGrabDown(){
-        var mc=Minecraft.getInstance();if(mc.getWindow()==null)return false;
-        var key=GRAB.getKey();long window=mc.getWindow().getWindow();
-        return key.getType()==InputConstants.Type.MOUSE
-                ? GLFW.glfwGetMouseButton(window,key.getValue())==GLFW.GLFW_PRESS
-                : key.getValue()>=0&&GLFW.glfwGetKey(window,key.getValue())==GLFW.GLFW_PRESS;
-    }
+    static boolean physicalGrabDown(){return SkillBindings.down(GRAB);}
     private static void tickDeferredGrab(){
         if(deferredGrabTick<0)return;
         var mc=Minecraft.getInstance();
         if(mc.player==null||!mc.player.isAlive()||mc.screen!=null||!mc.isWindowActive()
                 ||!com.codex.blacklight.mode.PrototypeModeSystem.isActive(mc.player)){deferredGrabTick=-1;return;}
         long window=mc.getWindow().getWindow();
-        if(GLFW.glfwGetMouseButton(window,0)==GLFW.GLFW_PRESS||GLFW.glfwGetMouseButton(window,1)==GLFW.GLFW_PRESS){deferredGrabTick=-1;return;}
+        if(SkillBindings.down(mc.options.keyAttack)||SkillBindings.down(mc.options.keyUse)){deferredGrabTick=-1;return;}
         if(mc.player.tickCount>=deferredGrabTick){
             deferredGrabTick=-1;
             sendGrab(mc);
@@ -342,8 +348,7 @@ public final class ClientClawEvents {
     private static void tickPhysicalLeftAttack() {
         Minecraft minecraft = Minecraft.getInstance();
         boolean physicallyDown = minecraft.getWindow() != null
-                && GLFW.glfwGetMouseButton(minecraft.getWindow().getWindow(),
-                GLFW.GLFW_MOUSE_BUTTON_LEFT) == GLFW.GLFW_PRESS;
+                && SkillBindings.down(minecraft.options.keyAttack);
         if (minecraft.player == null || minecraft.level == null || minecraft.screen != null) {
             clearLeftAttackHold();
             lastPhysicalLeftDown = physicallyDown;

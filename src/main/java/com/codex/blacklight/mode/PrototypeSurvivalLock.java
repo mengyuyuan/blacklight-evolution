@@ -5,9 +5,7 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.event.entity.player.AttackEntityEvent;
-import net.minecraftforge.event.entity.player.EntityItemPickupEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
-import net.minecraftforge.event.entity.player.PlayerXpEvent;
 import net.minecraftforge.event.level.BlockEvent;
 
 import java.util.Map;
@@ -78,7 +76,7 @@ public final class PrototypeSurvivalLock {
     /** Server-side backstop for packets or other mods that bypass normal interaction events. */
     @SubscribeEvent
     public static void onBreakBlock(BlockEvent.BreakEvent event) {
-        if (isLocked(event.getPlayer())&&!com.codex.blacklight.combat.BulletdiveTerrain.ownsBreakEvent(event)&&!com.codex.blacklight.combat.BlockThrowSystem.ownsBreakEvent(event)) event.setCanceled(true);
+        if (isLocked(event.getPlayer())&&!com.codex.blacklight.combat.BulletdiveTerrain.ownsBreakEvent(event)&&!com.codex.blacklight.combat.ShieldBorerSystem.ownsBreakEvent(event)&&!com.codex.blacklight.combat.BlockThrowSystem.ownsBreakEvent(event)) event.setCanceled(true);
     }
 
     /** Server-side backstop for direct placement paths. */
@@ -93,16 +91,6 @@ public final class PrototypeSurvivalLock {
     public static void onModifyBlockWithTool(BlockEvent.BlockToolModificationEvent event) {
         Player player = event.getPlayer();
         if (player != null && isLocked(player)) event.setCanceled(true);
-    }
-
-    @SubscribeEvent
-    public static void onPickupItem(EntityItemPickupEvent event) {
-        if (isLocked(event.getEntity())) event.setCanceled(true);
-    }
-
-    @SubscribeEvent
-    public static void onPickupExperience(PlayerXpEvent.PickupXp event) {
-        if (isLocked(event.getEntity())) event.setCanceled(true);
     }
 
     public static boolean isLocked(Player player) {

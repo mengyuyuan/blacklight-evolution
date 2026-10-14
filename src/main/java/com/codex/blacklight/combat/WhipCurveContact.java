@@ -13,6 +13,19 @@ import net.minecraft.world.phys.Vec3;
 public final class WhipCurveContact {
     private WhipCurveContact() {}
 
+    /** Correct the attachment over the first physical metre, independent of
+     * exported node density. The damaging distant path stays authoritative. */
+    public static List<Vec3> attachHand(List<Vec3> points,Vec3 hand){
+        if(points.isEmpty())return points;
+        var result=new ArrayList<Vec3>(points.size());var offset=hand.subtract(points.get(0));double length=0;
+        for(int i=0;i<points.size();i++){
+            if(i>0)length+=points.get(i).distanceTo(points.get(i-1));
+            double weight=com.codex.blacklight.util.MathCompat.clamp(1-length/1.25,0,1);weight=weight*weight*(3-2*weight);
+            result.add(points.get(i).add(offset.scale(weight)));
+        }
+        return List.copyOf(result);
+    }
+
     public static List<Vec3> worldPoints(WhipCurve curve, double time, Vec3 feet, float yaw) {
         return worldPoints(curve,time,feet,yaw,1);
     }

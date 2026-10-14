@@ -12,7 +12,7 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 import net.minecraftforge.client.event.RenderLevelStageEvent;
-import net.minecraftforge.event.TickEvent;
+import net.minecraftforge.event.TickEvent.ClientTickEvent;
 import net.minecraftforge.client.event.RegisterClientReloadListenersEvent;
 
 /** Real posed silhouettes over a world colour pass. Does not change entity glowing flags. */
@@ -38,11 +38,14 @@ public final class VisionPowerRenderer {
         if (depthCopy != null) { depthCopy.destroyBuffers(); depthCopy = null; }
         effectMode = 0;
     }
+    @EventBusSubscriber(modid="blacklight",value=Dist.CLIENT,bus=EventBusSubscriber.Bus.MOD)
+    public static final class Reload {
     @SubscribeEvent public static void reload(RegisterClientReloadListenersEvent e) {
         e.registerReloadListener((net.minecraft.server.packs.resources.ResourceManagerReloadListener) manager ->
                 Minecraft.getInstance().execute(() -> { closeEffect(); failed = false; }));
     }
-    @SubscribeEvent public static void tick(net.minecraftforge.event.TickEvent.ClientTickEvent e){if(e.phase != net.minecraftforge.event.TickEvent.Phase.END)return;
+    }
+    @SubscribeEvent public static void tick(ClientTickEvent e){if(e.phase!=net.minecraftforge.event.TickEvent.Phase.END)return;
         var current = Minecraft.getInstance().level;
         if (current != previousLevel) {
             closeEffect(); previousLevel = current; displayedMode = 0; strength = 0; lastFrame = -1; failed = false;
@@ -50,11 +53,11 @@ public final class VisionPowerRenderer {
     }
     private static int transition(Minecraft mc, float partial) {
         int wanted = mode(); double now = mc.level.getGameTime() + partial;
-        float elapsed = lastFrame < 0 ? 0 : (float)net.minecraft.util.Mth.clamp((now - lastFrame) / 20, 0, .25);
+        float elapsed = lastFrame < 0 ? 0 : (float)com.codex.blacklight.util.MathCompat.clamp((now - lastFrame) / 20, 0, .25);
         lastFrame = now;
         if (displayedMode == 0) displayedMode = wanted;
         boolean entering = wanted != 0 && wanted == displayedMode;
-        strength = net.minecraft.util.Mth.clamp(strength + elapsed * (entering ? 5 : -5), 0, 1);
+        strength = com.codex.blacklight.util.MathCompat.clamp(strength + elapsed * (entering ? 5 : -5), 0, 1);
         if (strength == 0 && !entering) { closeEffect(); displayedMode = wanted; }
         return displayedMode;
     }
@@ -93,6 +96,8 @@ public final class VisionPowerRenderer {
         float partial = e.getPartialTick();
         int mode = transition(mc, partial);
         if (mode == 0 || strength <= 0) return;
+        var savedProjection = new org.joml.Matrix4f(com.mojang.blaze3d.systems.RenderSystem.getProjectionMatrix());
+        var savedSorting = com.mojang.blaze3d.systems.RenderSystem.getVertexSorting();
         mc.renderBuffers().bufferSource().endBatch();
         colourWorld(mc, mode, partial);
         double radius = mode == 2 ? 32 : 24;
@@ -102,6 +107,14 @@ public final class VisionPowerRenderer {
         targets.sort(java.util.Comparator.comparingDouble(mc.player::distanceToSqr));
         var buffer = mc.renderBuffers().bufferSource();
         var camera = e.getCamera().getPosition();
+        // Forge supplies view rotation in the event PoseStack. Use an identity
+        // shader model-view to avoid applying it twice after PostChain; restore
+        // both global matrices when the silhouette pass ends.
+        var view = com.mojang.blaze3d.systems.RenderSystem.getModelViewStack();
+        view.pushPose();
+        view.setIdentity();
+        com.mojang.blaze3d.systems.RenderSystem.applyModelViewMatrix();
+        com.mojang.blaze3d.systems.RenderSystem.setProjectionMatrix(e.getProjectionMatrix(), VertexSorting.DISTANCE_TO_ORIGIN);
         drawing = true;
         try {
             for (var target : targets.subList(0, Math.min(48, targets.size()))) {
@@ -115,10 +128,23 @@ public final class VisionPowerRenderer {
                 // Non-entity buffers include labels, fire and debug effects; omit them from this pass.
                 var discard = new Tint(null, 0, 0, false, 0, 1, false);
                 MultiBufferSource colored = type -> type.format() == DefaultVertexFormat.NEW_ENTITY && type.mode() == VertexFormat.Mode.QUADS ? tint : discard;
-                mc.getEntityRenderDispatcher().render(target, pos.x, pos.y, pos.z, target.getYRot(), partial, e.getPoseStack(), colored, LightTexture.FULL_BRIGHT);
+                // Render only the model. Dispatcher.render also submits its
+                // shadow as NEW_ENTITY quads, which turned the floor orange.
+                var renderer=mc.getEntityRenderDispatcher().getRenderer(target);
+                var offset=renderer.getRenderOffset(target,partial);
+                var stack=e.getPoseStack();stack.pushPose();
+                try{
+                    stack.translate(pos.x+offset.x,pos.y+offset.y,pos.z+offset.z);
+                    renderer.render(target,target.getYRot(),partial,stack,colored,LightTexture.FULL_BRIGHT);
+                }finally{stack.popPose();}
             }
         } finally {
-            try { buffer.endBatch(); } finally { drawing = false; }
+            try { buffer.endBatch(); } finally {
+                drawing = false;
+                view.popPose();
+                com.mojang.blaze3d.systems.RenderSystem.applyModelViewMatrix();
+                com.mojang.blaze3d.systems.RenderSystem.setProjectionMatrix(savedProjection,savedSorting);
+            }
         }
     }
     private static final class Tint implements VertexConsumer {

@@ -199,6 +199,9 @@ public final class ClientMovementEvents {
                 || player.isInWater() || player.isInLava() || ClientClawEvents.isGroundSpikeActionActive()) {
             resetClientWallRun();return false;
         }
+        if(com.codex.blacklight.combat.ShieldBorerSystem.groundDrive(player,sprinting,forward)){
+            resetClientWallRun();return false;
+        }
         var frame=CLIENT_WALL.tick(new WallTraversal.Input(forward,sideways,sprinting,jump,detach),
                 WallContacts.sample(player,CLIENT_WALL),player.getY(),player.getDeltaMovement().horizontalDistance(),
                 MovementTuningSettings.wallClimbVelocity(),MovementUpgrade.wallMultiplier(

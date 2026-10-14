@@ -19,7 +19,7 @@ import net.minecraftforge.network.NetworkRegistry;
 import net.minecraftforge.network.simple.SimpleChannel;
 
 public final class ModNetwork {
-    private static final String PROTOCOL = "forge-1.20.1-2";
+    private static final String PROTOCOL = "forge-1.20.1-3";
     private static final SimpleChannel CHANNEL = NetworkRegistry.newSimpleChannel(
             new ResourceLocation(BlacklightNeoMod.MOD_ID, "main"), () -> PROTOCOL, PROTOCOL::equals, PROTOCOL::equals);
     private static boolean registered;
@@ -35,8 +35,9 @@ public final class ModNetwork {
                 .playToServer(SkillSettingsPayload.class,SkillSettingsPayload.STREAM_CODEC,(payload,context)->
                     context.enqueueWork(()->{
                         if(context.player() instanceof ServerPlayer player){
-                            com.codex.blacklight.registry.ModAttachments.setData(player, com.codex.blacklight.registry.ModAttachments.SKILL_SETTINGS,new com.codex.blacklight.power.SkillSettings(payload.bulletdiveBlockBreaking()));
-                            com.codex.blacklight.combat.BulletdiveTerrain.settingsChanged(player);
+                            com.codex.blacklight.registry.ModAttachments.setData(player, com.codex.blacklight.registry.ModAttachments.SKILL_SETTINGS,payload.apply(com.codex.blacklight.registry.ModAttachments.getData(player, com.codex.blacklight.registry.ModAttachments.SKILL_SETTINGS)));
+                            if(payload.setting()==SkillSettingsPayload.Setting.BULLETDIVE_BLOCKS)
+                                com.codex.blacklight.combat.BulletdiveTerrain.settingsChanged(player);
                             com.codex.blacklight.registry.ModAttachments.syncData(player, com.codex.blacklight.registry.ModAttachments.SKILL_SETTINGS);
                         }
                     }))

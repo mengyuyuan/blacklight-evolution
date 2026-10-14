@@ -81,6 +81,16 @@ public final class CombatTargeting {
      * intersect a real limb. The large search margin never becomes weapon reach. */
     public static List<LivingEntity> candidates(Player player,AABB query,Predicate<LivingEntity> predicate) {
         var result=new LinkedHashSet<LivingEntity>();
+        // Uncapped dive energy can span thousands of chunks. Walking the spatial
+        // index's coordinate range scales with empty space. Visit loaded actors
+        // once instead, retaining the same real hitbox/predicate contract.
+        if(player.level() instanceof net.minecraft.server.level.ServerLevel level
+                && Math.max(query.getXsize(),Math.max(query.getYsize(),query.getZsize()))>512) {
+            for(var entity:level.getAllEntities())
+                if(entity instanceof LivingEntity target && hitboxes(target).stream().anyMatch(query::intersects)
+                        && predicate.test(target))result.add(target);
+            return new ArrayList<>(result);
+        }
         for(var target:player.level().getEntitiesOfClass(LivingEntity.class,query,predicate))
             if(!multipart(target)||hitboxes(target).stream().anyMatch(query::intersects))result.add(target);
         for(var target:player.level().getEntitiesOfClass(BlacklightInfectedHost.class,query.inflate(80),
@@ -163,7 +173,25 @@ public final class CombatTargeting {
         return false;
     }
     private static boolean clearRay(Player player,Vec3 from,Vec3 to) {
-        return player.level().clip(new ClipContext(from,to,ClipContext.Block.COLLIDER,ClipContext.Fluid.NONE,player)).getType()==HitResult.Type.MISS;
+        net.minecraft.world.level.BlockGetter blocks=player.level();
+        if(player.level() instanceof net.minecraft.server.level.ServerLevel level) {
+            // A visibility check must not synchronously generate chunks between
+            // distant loaded players. Treat missing terrain as an opaque boundary.
+            blocks=new net.minecraft.world.level.BlockGetter() {
+                public net.minecraft.world.level.block.state.BlockState getBlockState(net.minecraft.core.BlockPos pos) {
+                    var chunk=level.getChunkSource().getChunkNow(pos.getX()>>4,pos.getZ()>>4);
+                    return chunk==null?net.minecraft.world.level.block.Blocks.BEDROCK.defaultBlockState():chunk.getBlockState(pos);
+                }
+                public net.minecraft.world.level.material.FluidState getFluidState(net.minecraft.core.BlockPos pos) {return getBlockState(pos).getFluidState();}
+                public net.minecraft.world.level.block.entity.BlockEntity getBlockEntity(net.minecraft.core.BlockPos pos) {
+                    var chunk=level.getChunkSource().getChunkNow(pos.getX()>>4,pos.getZ()>>4);
+                    return chunk==null?null:chunk.getBlockEntity(pos);
+                }
+                public int getHeight(){return level.getHeight();}
+                public int getMinBuildHeight(){return level.getMinBuildHeight();}
+            };
+        }
+        return blocks.clip(new ClipContext(from,to,ClipContext.Block.COLLIDER,ClipContext.Fluid.NONE,player)).getType()==HitResult.Type.MISS;
     }
     public static boolean visible(Player player,LivingEntity target) {
         if(target==null||target.level()!=player.level())return false;

@@ -24,11 +24,36 @@ import net.minecraftforge.event.TickEvent.ServerTickEvent;
  */
 @EventBusSubscriber(modid="blacklight")
 public final class BulletdiveTerrain {
-    public static final int MAX_WORK_PER_TICK=8192, MAX_BREAKS_PER_TICK=2048;
+    public static final int MAX_WORK_PER_TICK=8192, MAX_BREAKS_PER_TICK=512;
     /** Shared crack audio/particles; every successful block still has vanilla loot. */
     public static final int MAX_FEEDBACK_PER_TICK=2;
     private static final int MAX_HISTORY=128;
-    private static final long TICK_NANOS=16_000_000;
+    private static final long TICK_NANOS=8_000_000;
+    private static long tickStarted;
+    /** The destruction slice alone does not include next tick's loot physics,
+     * fluid/falling-block updates or chunk tracking. Leave time for that work. */
+    @SubscribeEvent public static void beforeTick(ServerTickEvent event){if(event.phase!=net.minecraftforge.event.TickEvent.Phase.START)return;tickStarted=System.nanoTime();}
+
+    static long availableNanos(long elapsed){
+        return elapsed<0?0:Math.min(TICK_NANOS,Math.max(0,40_000_000-elapsed));
+    }
+    static long remainingTickNanos(){return availableNanos(System.nanoTime()-tickStarted);}
+    static final class LoadBudget {
+        static final int MAX_ITEMS=768, MAX_FALLING=128, MAX_XP=512;
+        int items,falling,xp;
+        LoadBudget(int items,int falling,int xp){this.items=items;this.falling=falling;this.xp=xp;}
+        boolean available(){return items<MAX_ITEMS&&falling<MAX_FALLING&&xp<MAX_XP;}
+        void spawnedItems(int count){items+=Math.max(0,count);}
+        static LoadBudget sample(ServerLevel level){
+            var result=new LoadBudget(0,0,0);
+            for(var entity:level.getAllEntities())if(entity.isAlive()){
+                if(entity instanceof net.minecraft.world.entity.item.ItemEntity)result.items++;
+                else if(entity instanceof net.minecraft.world.entity.item.FallingBlockEntity)result.falling++;
+                else if(entity instanceof net.minecraft.world.entity.ExperienceOrb)result.xp++;
+            }
+            return result;
+        }
+    }
     /** budget is the theoretical unit-hardness-zero block count, not a work/candidate cutoff. */
     public record Plan(double height,int radius,int depth,long budget,double energy) { }
     public record Snapshot(Plan plan,boolean complete,long visited,long destroyed,long protectedBlocks,
@@ -94,7 +119,7 @@ public final class BulletdiveTerrain {
         trimHistory();return plan;
     }
     private static boolean blockBreakingEnabled(ServerPlayer p) {
-        return com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.SKILL_SETTINGS).bulletdiveBlockBreaking();
+        return ModAttachments.available(p)&&ModAttachments.getData(p, ModAttachments.SKILL_SETTINGS).bulletdiveBlockBreaking();
     }
     /** Invalidate now, even if an OFF and ON request arrive in the same tick. */
     public static void settingsChanged(ServerPlayer p){
@@ -105,13 +130,15 @@ public final class BulletdiveTerrain {
         }
     }
     private static boolean eligible(ServerPlayer p) {
+        if(!ModAttachments.available(p))return false;
         var state=com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.PLAYER_STATE);
         return p.isAlive()&&!p.isSpectator()&&p.mayBuild()&&state.isInfected()&&state.isPrototypeMode()
                 &&state.hasCombatSkill(CombatSkill.BULLETDIVE_DROP);
     }
     @SubscribeEvent public static void tick(ServerTickEvent event){if(event.phase!=net.minecraftforge.event.TickEvent.Phase.END)return;
         long sliceStart=System.nanoTime();
-        var budget=new TickBudget(MAX_WORK_PER_TICK,MAX_BREAKS_PER_TICK,TICK_NANOS,System::nanoTime);
+        var budget=new TickBudget(MAX_WORK_PER_TICK,MAX_BREAKS_PER_TICK,availableNanos(sliceStart-tickStarted),System::nanoTime);
+        var loads=new IdentityHashMap<ServerLevel,LoadBudget>();
         var active=new ArrayList<Job>();
         for(var job:ACTIVE_OWNERS.snapshot()) {
             if(job.complete)continue;
@@ -123,9 +150,13 @@ public final class BulletdiveTerrain {
         while(!active.isEmpty()&&idle<active.size()){
             var job=active.get(cursor);cursor=(cursor+1)%active.size();
             if(job.complete){idle++;continue;}
+            var load=loads.computeIfAbsent(job.level,LoadBudget::sample);
+            // Pause without consuming energy/candidates. All owners share the
+            // same dimension budget, including loot left by completed attacks.
+            if(!load.available()){idle++;continue;}
             idle=0;
             if(!budget.tryCandidate())break;
-            if(job.next())budget.recordBreak();
+            if(job.next()){budget.recordBreak();load.spawnedItems(job.effects.newItems());}
         }
         double sliceMillis=(System.nanoTime()-sliceStart)/1e6;
         for(var job:active)job.peakSliceMillis=Math.max(job.peakSliceMillis,sliceMillis);

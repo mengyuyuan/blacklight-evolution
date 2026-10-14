@@ -10,7 +10,6 @@
     "ForgeCriticalMassDamageMixin",
     "BulletdiveBlockFeedbackMixin",
     "BulletdiveItemMergeAccess",
-
     "HealthAttributeLimitAccessor",
     "ScaledAbsorptionMixin",
     "InfectedDragonFightMixin",
@@ -41,7 +40,8 @@
     "client.InfectedSlimeCoatMixin",
     "client.ModelPartChildrenAccessor",
     "client.DragonConsumePoseMixin",
-    "client.VictimModelRootMixin"
+    "client.VictimModelRootMixin",
+    "client.BulletFlightCullingMixin"
   ],
   "injectors": {
     "defaultRequire": 1

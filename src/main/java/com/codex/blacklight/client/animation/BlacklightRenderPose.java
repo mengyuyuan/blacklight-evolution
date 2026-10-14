@@ -48,6 +48,9 @@ public final class BlacklightRenderPose {
                     .rotationY((float)Math.toRadians(180-facing(entity,partial))).scale(.9375F),wall.normalX(),wall.normalZ());
         }
         WallContactPose.apply(entity, skeleton, pose, partial);
+        var weapon=ModAttachments.getData(entity,ModAttachments.WEAPON_VISUAL);
+        if(wall==null&&entity.onGround()&&weapon.spec()==com.codex.blacklight.combat.WeaponMove.HAMMER_RAM
+                &&!weapon.charging())HammerGroundContact.apply(pose);
         return pose;
     }
     public static float facing(LivingEntity entity,float partial) {
