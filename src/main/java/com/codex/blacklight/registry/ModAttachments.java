@@ -183,7 +183,8 @@ public final class ModAttachments {
         AttachmentType<T> type = key.get();
         T previous = storage(entity).set(type, value);
         // Preserve AttachmentHolder#setData: callers replacing a value need no explicit syncData call.
-        if (!entity.level().isClientSide && !entity.isRemoved()) publish(entity, type);
+        if (!entity.level().isClientSide && !entity.isRemoved()
+                && (type != BIOMASS_FORM.get() || com.codex.blacklight.power.BiomassSync.shouldSync(entity))) publish(entity, type);
         return previous;
     }
 

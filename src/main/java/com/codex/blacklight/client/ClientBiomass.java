@@ -14,22 +14,30 @@ import net.minecraftforge.client.event.MovementInputUpdateEvent;
 @EventBusSubscriber(modid="blacklight",value=Dist.CLIENT)
 public final class ClientBiomass {
     private static final java.util.Map<Player,Float> SIZES=new java.util.WeakHashMap<>();
-    private static Player cameraOwner;
+    private static java.util.UUID cameraOwner;
+    private static boolean cameraChangedByPlayer;
     private static CameraType previousCamera;
     @SubscribeEvent public static void tick(net.minecraftforge.event.TickEvent.ClientTickEvent e){if(e.phase!=net.minecraftforge.event.TickEvent.Phase.END)return;
         var mc=Minecraft.getInstance();
-        if(mc.level==null){SIZES.clear();cameraOwner=null;previousCamera=null;return;}
+        if(mc.level==null){SIZES.clear();restoreCamera(mc);return;}
+        if(cameraOwner!=null&&mc.options.getCameraType()!=CameraType.THIRD_PERSON_BACK)cameraChangedByPlayer=true;
         for(var p:mc.level.players()){
             boolean active=BiomassSystem.active(p);
             float size=active?com.codex.blacklight.power.BiomassEvolution.scale(p):0;
             if(SIZES.getOrDefault(p,0F)!=size){p.refreshDimensions();SIZES.put(p,size);}
         }
         if(mc.player!=null&&BiomassSystem.active(mc.player)){
-            if(cameraOwner!=mc.player){cameraOwner=mc.player;previousCamera=mc.options.getCameraType();mc.options.setCameraType(CameraType.THIRD_PERSON_BACK);}
-        }else if(cameraOwner!=null){
-            if(cameraOwner==mc.player&&mc.options.getCameraType()==CameraType.THIRD_PERSON_BACK&&previousCamera!=null)mc.options.setCameraType(previousCamera);
-            cameraOwner=null;previousCamera=null;
-        }
+            if(!mc.player.getUUID().equals(cameraOwner)){
+                restoreCamera(mc);
+                cameraOwner=mc.player.getUUID();previousCamera=mc.options.getCameraType();cameraChangedByPlayer=false;
+                mc.options.setCameraType(CameraType.THIRD_PERSON_BACK);
+            }
+        }else restoreCamera(mc);
+    }
+    private static void restoreCamera(Minecraft mc){
+        if(cameraOwner!=null&&!cameraChangedByPlayer&&previousCamera!=null
+                &&mc.options.getCameraType()==CameraType.THIRD_PERSON_BACK)mc.options.setCameraType(previousCamera);
+        cameraOwner=null;previousCamera=null;cameraChangedByPlayer=false;
     }
     public static void camera(net.minecraft.client.Camera camera,float partial){
         var mc=Minecraft.getInstance();var p=mc.player;
