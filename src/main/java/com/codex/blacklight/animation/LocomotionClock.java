@@ -27,8 +27,13 @@ public final class LocomotionClock {
         }
         previous=current;
         double advance=looping&&nominalBlocksPerTick>0?distance/(nominalBlocksPerTick*20):ticks/20;
-        // Reject correction-sized phase leaps while leaving normal upgraded speed exact.
-        if(!fresh)current+=Math.min(advance,ticks/20*8);
+        // The three extracted sprint clips already shorten their cycles (16/14/12
+        // source frame intervals at 30 Hz). Multiplying them by up to eight again
+        // turns the limbs into a strobe. Keep their authored fast cadence while
+        // still allowing distance-driven slowing/stopping and phase-continuous swaps.
+        boolean sourceSprint=nextKey.equals("basic_sprint") || nextKey.equals("basic_sprint_fast")
+                || nextKey.equals("basic_sprint_fastest");
+        if(!fresh)current+=Math.min(advance,ticks/20*(sourceSprint?1:8));
         tick=nextTick;
         return changed;
     }

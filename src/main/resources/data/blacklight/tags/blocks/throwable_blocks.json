@@ -13,6 +13,8 @@
     "minecraft:netherrack",
     "minecraft:end_stone",
     "#minecraft:logs",
-    "#minecraft:planks"
+    "#minecraft:planks",
+    "#minecraft:mineable/pickaxe",
+    "#minecraft:mineable/shovel"
   ]
 }

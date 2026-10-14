@@ -8,6 +8,7 @@ import java.util.List;
 /** Tutorials describe existing server actions; opening a page never sends an action. */
 public record SkillTutorial(String family,String clip,PowerForm form,String instructionFamily,String... bindings) {
     public static SkillTutorial forSkill(String id) {
+        if(id.startsWith("block_throw_"))return of("block_throw","block_throw_two_release",PowerForm.MUSCLE_MASS,"key.blacklight.grab","key.attack","key.use","key.sneak");
         if(id.startsWith("jump_"))return of("jump","basic_jump_charge",PowerForm.NONE,"key.jump");
         if(id.startsWith("sprint_"))return of("sprint","basic_run",PowerForm.NONE,"key.forward","key.sprint");
         if(id.startsWith("wall_"))return of("wall","basic_wall_run_up",PowerForm.NONE,"key.forward","key.sprint","key.sneak");
@@ -16,6 +17,7 @@ public record SkillTutorial(String family,String clip,PowerForm form,String inst
         if(id.startsWith("vitality")||id.equals("regeneration"))return of("health","basic_idle",PowerForm.NONE);
         if(id.startsWith("reach_"))return of("reach","blade_cut",PowerForm.BLADE,"key.attack");
         return switch(id) {
+            case "biomass" -> of("biomass","basic_idle",PowerForm.BIOMASS,"key.blacklight.disguise","key.forward");
             case "mode" -> of("mode","basic_idle",PowerForm.NONE,"key.blacklight.prototype_mode","key.blacklight.upgrades");
             case "grab","assimilation" -> of("consume","consume_normal_actor",PowerForm.NONE,"key.blacklight.grab","key.use","key.attack");
             case "target_lock" -> of("lock","claw_auto1",PowerForm.CLAWS,"key.blacklight.target_lock");

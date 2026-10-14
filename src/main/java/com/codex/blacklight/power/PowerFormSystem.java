@@ -10,11 +10,13 @@ public final class PowerFormSystem {
     private static final PowerForm[] FORMS = {PowerForm.NONE, PowerForm.CLAWS, PowerForm.HAMMERFISTS, PowerForm.BLADE, PowerForm.WHIPFIST,PowerForm.MUSCLE_MASS};
     private PowerFormSystem() {}
     public static boolean supported(PowerForm form) {
-        if(UtilityPowerSystem.supported(form))return true;
+        if(form==PowerForm.BIOMASS||UtilityPowerSystem.supported(form))return true;
         for (var candidate : FORMS) if (form == candidate) return true;
         return false;
     }
     public static boolean select(ServerPlayer player, PowerForm form, boolean purchase) {
+        if(BiomassSystem.active(player))return false;
+        if(form==PowerForm.BIOMASS)return BiomassSystem.begin(player,false);
         var state = com.codex.blacklight.registry.ModAttachments.getData(player, ModAttachments.PLAYER_STATE);
         var combat = com.codex.blacklight.registry.ModAttachments.getData(player, ModAttachments.CLAW_COMBAT);
         if (!state.isInfected() || !state.isPrototypeMode() || com.codex.blacklight.registry.ModAttachments.getData(player, ModAttachments.CONSUMING)

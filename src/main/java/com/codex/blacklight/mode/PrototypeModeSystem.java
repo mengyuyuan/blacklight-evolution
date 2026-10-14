@@ -15,6 +15,7 @@ public final class PrototypeModeSystem {
     }
 
     public static void handle(ServerPlayer player, boolean enabled) {
+        if(com.codex.blacklight.power.BiomassSystem.active(player))return;
         BlacklightState state = com.codex.blacklight.registry.ModAttachments.getData(player, ModAttachments.PLAYER_STATE);
         if (!state.isInfected()) {
             player.displayClientMessage(Component.translatable(
@@ -47,7 +48,7 @@ public final class PrototypeModeSystem {
 
     public static boolean isActive(net.minecraft.world.entity.player.Player player) {
         if (player == null || !player.isAlive() || !ModAttachments.available(player)) return false;
-        BlacklightState state = com.codex.blacklight.registry.ModAttachments.getData(player, ModAttachments.PLAYER_STATE);
+        BlacklightState state = com.codex.blacklight.registry.ModAttachments.peekData(player, ModAttachments.PLAYER_STATE);
         return state.isInfected() && state.isPrototypeMode();
     }
 

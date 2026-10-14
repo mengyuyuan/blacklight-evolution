@@ -54,6 +54,7 @@ public final class WeaponCombatSystem {
         if(queued!=null)beginInput(p,WeaponMove.choose(s.form,queued,true,false,false),queued,held);
     }
     private static boolean canRequest(ServerPlayer p){
+        if(com.codex.blacklight.power.BiomassSystem.active(p))return false;
         if(DevastatorSystem.busy(p))return false;
         var state=com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.PLAYER_STATE);var movement=com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.MOVEMENT_STATE);
         return p.isAlive()&&!p.isSpectator()&&!p.isPassenger()&&state.isInfected()&&state.isPrototypeMode()&&WeaponMove.controls(state.getActivePower(),p.getMainHandItem().isEmpty()&&p.getOffhandItem().isEmpty())&&!com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.CONSUMING)&&!movement.wallTraversal().attached()&&movement.chargeTicks()==0;
@@ -67,6 +68,7 @@ public final class WeaponCombatSystem {
         acceptInput(p,attack,special,false,false);
     }
     public static void acceptInput(ServerPlayer p,boolean attack,boolean special,boolean action,boolean jump){
+        if(com.codex.blacklight.power.BiomassSystem.active(p))return;
         if(DevastatorSystem.acceptInput(p,attack,special,action,jump))return;
         var empty=new WeaponButtons(false,false,false,false);
         var old=BUTTONS.getOrDefault(p,new Buttons(empty,p.tickCount));
@@ -195,6 +197,8 @@ public final class WeaponCombatSystem {
         holdWhip(event.player);
     }
     private static void holdWhip(Player player){
+        // Removal can invalidate capabilities during Player.tick before END fires.
+        if(!ModAttachments.available(player))return;
         var visual=com.codex.blacklight.registry.ModAttachments.getData(player, ModAttachments.WEAPON_VISUAL);var move=visual.spec();
         if(!CombatMotion.stationaryWhip(move)||player.onGround()||!player.isAlive()
                 ||player.isSpectator()||player.isPassenger()||player.getAbilities().flying

@@ -82,7 +82,8 @@ public final class PrototypeSurvivalLock {
     /** Server-side backstop for direct placement paths. */
     @SubscribeEvent
     public static void onPlaceBlock(BlockEvent.EntityPlaceEvent event) {
-        if (event.getEntity() instanceof Player player && isLocked(player)) {
+        if (event.getEntity() instanceof Player player && isLocked(player)
+                && !com.codex.blacklight.power.BiomassTerrain.ownsPlaceEvent(event)) {
             event.setCanceled(true);
         }
     }

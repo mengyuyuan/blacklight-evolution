@@ -12,6 +12,7 @@ public final class BlacklightRenderPose {
     public static BlacklightPose sample(LivingEntity entity, float partial) {
         var skeleton = PlayerMotionController.skeleton();
         var pose = PlayerMotionController.pose(entity, partial);
+        if(entity instanceof net.minecraft.world.entity.player.Player p){var throwing=BlockThrowPose.sample(p,partial);if(throwing!=null)return throwing;}
         NativeHeadLook.apply(entity,pose,partial);
         if (!NativeHitPose.apply(entity, skeleton, pose, partial)) ConsumeVictimPose.epic(entity, pose, partial);
         if (com.codex.blacklight.registry.ModAttachments.getData(entity, ModAttachments.GRAB_STAGE) == ConsumeVisual.HOLD) {
@@ -54,6 +55,7 @@ public final class BlacklightRenderPose {
         return pose;
     }
     public static float facing(LivingEntity entity,float partial) {
+        if(entity instanceof net.minecraft.world.entity.player.Player p&&com.codex.blacklight.combat.BlockThrowMotion.active(p))return com.codex.blacklight.combat.BlockThrowMotion.yaw(p,partial);
         return PlayerMotionController.facing(entity,partial);
     }
     public static float rawFacing(LivingEntity entity,float partial) {
