@@ -44,7 +44,8 @@ public record PowerMorph(int formId,long started,float facing,Vec3 origin) {
         com.codex.blacklight.registry.ModAttachments.setData(player, ModAttachments.POWER_MORPH,morph);com.codex.blacklight.registry.ModAttachments.syncData(player, ModAttachments.POWER_MORPH);
     }
     @SubscribeEvent public static void tick(PlayerTickEvent event) {
-        if (!com.codex.blacklight.registry.ModAttachments.available(event.player)) { return; }if(event.phase != net.minecraftforge.event.TickEvent.Phase.END)return;
+        if (!com.codex.blacklight.registry.ModAttachments.available(event.player)) { return; }
+        if(event.phase != net.minecraftforge.event.TickEvent.Phase.END)return;
         if(event.player instanceof ServerPlayer p) {
             var morph=com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.POWER_MORPH);
             if(morph.formId>=0&&!morph.visible(p,0)){com.codex.blacklight.registry.ModAttachments.setData(p, ModAttachments.POWER_MORPH,NONE);com.codex.blacklight.registry.ModAttachments.syncData(p, ModAttachments.POWER_MORPH);}

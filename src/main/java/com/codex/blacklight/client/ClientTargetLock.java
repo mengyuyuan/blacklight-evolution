@@ -114,7 +114,7 @@ public final class ClientTargetLock {
     }
     public static void sync(){
         var mc=Minecraft.getInstance();var p=mc.player;
-        if(p==null){
+        if(p==null || !p.isAlive() || !ModAttachments.available(p)){
             if(previousPlayer!=null)REQUEST.resetOwner();
             previousPlayer=null;cachedFocus=null;lockedTarget=null;notice="";return;
         }

@@ -42,6 +42,10 @@ public final class WeaponMorphTracker {
     private WeaponMorphTracker() { }
     public static Sample sample(AbstractClientPlayer player,float partial) {
         double now=player.level().getGameTime()+partial;
+        if (!player.isAlive() || !ModAttachments.available(player)) {
+            STATES.remove(player);
+            return new Sample(PowerForm.NONE, PowerForm.NONE, 1, 0, false, false, List.of(), now);
+        }
         var state=com.codex.blacklight.registry.ModAttachments.getData(player, ModAttachments.PLAYER_STATE);
         boolean enabled=state.isInfected()&&state.isPrototypeMode()&&player.isAlive()&&!player.isSpectator();
         var form=enabled&&WeaponMorphTiming.weapon(state.getActivePower())?state.getActivePower():PowerForm.NONE;
@@ -78,6 +82,8 @@ public final class WeaponMorphTracker {
     }
     @SubscribeEvent public static void tick(TickEvent.ClientTickEvent event) {
         if (event.phase != TickEvent.Phase.END) return;
-        var mc=net.minecraft.client.Minecraft.getInstance();if(mc.player!=null)sample(mc.player,0);
+        var mc=net.minecraft.client.Minecraft.getInstance();
+        STATES.keySet().removeIf(p -> p.level()!=mc.level || !p.isAlive() || !ModAttachments.available(p));
+        if(mc.player!=null && mc.level!=null)sample(mc.player,0);
     }
 }

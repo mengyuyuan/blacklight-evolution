@@ -37,7 +37,8 @@ public final class ClientDevastatorMovement {
     }
     @SubscribeEvent(priority=EventPriority.LOWEST)
     public static void tick(PlayerTickEvent event){
-        if (!com.codex.blacklight.registry.ModAttachments.available(event.player)) { return; }if(event.phase!=net.minecraftforge.event.TickEvent.Phase.START)return;
+        if (!com.codex.blacklight.registry.ModAttachments.available(event.player)) { return; }
+        if(event.phase!=net.minecraftforge.event.TickEvent.Phase.START)return;
         var mc=Minecraft.getInstance();var p=mc.player;
         if(p==null||event.player!=p||mc.level==null||!p.isAlive())return;
         var v=com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.DEVASTATOR_VISUAL);

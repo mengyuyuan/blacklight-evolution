@@ -73,7 +73,8 @@ public final class NativePlayerActionBackend implements PlayerActionBackend {
     }
 
     @SubscribeEvent public static void tick(PlayerTickEvent event) {
-        if (!com.codex.blacklight.registry.ModAttachments.available(event.player)) { return; }if(event.phase != net.minecraftforge.event.TickEvent.Phase.END)return;
+        if (!com.codex.blacklight.registry.ModAttachments.available(event.player)) { return; }
+        if(event.phase != net.minecraftforge.event.TickEvent.Phase.END)return;
         if (!(event.player instanceof ServerPlayer player)) return;
         var state = com.codex.blacklight.registry.ModAttachments.getData(player, ModAttachments.PLAYER_ACTION);
         if (state.clipId().isEmpty()) return;

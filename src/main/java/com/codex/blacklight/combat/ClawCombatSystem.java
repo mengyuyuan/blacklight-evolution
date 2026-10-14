@@ -210,7 +210,8 @@ public final class ClawCombatSystem {
 
     @SubscribeEvent
     public static void onPlayerTick(PlayerTickEvent event) {
-        if (!com.codex.blacklight.registry.ModAttachments.available(event.player)) { return; }if(event.phase != net.minecraftforge.event.TickEvent.Phase.END)return;
+        if (!com.codex.blacklight.registry.ModAttachments.available(event.player)) { return; }
+        if(event.phase != net.minecraftforge.event.TickEvent.Phase.END)return;
         if (!(event.player instanceof ServerPlayer player)) return;
         if(WeaponCombatSystem.busy(player))return;
 

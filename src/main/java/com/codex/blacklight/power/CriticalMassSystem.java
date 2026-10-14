@@ -133,7 +133,8 @@ public final class CriticalMassSystem {
         p.displayClientMessage(Component.translatable("message.blacklight.adrenaline_started"), true);
     }
     @SubscribeEvent public static void tick(PlayerTickEvent event){
-        if (!com.codex.blacklight.registry.ModAttachments.available(event.player)) { return; }if(event.phase!=net.minecraftforge.event.TickEvent.Phase.END)return;
+        if (!com.codex.blacklight.registry.ModAttachments.available(event.player)) { return; }
+        if(event.phase!=net.minecraftforge.event.TickEvent.Phase.END)return;
         if (!(event.player instanceof ServerPlayer p)) return;
         var state = com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.PLAYER_STATE);
         var adrenaline = com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.ADRENALINE);

@@ -161,6 +161,10 @@ public final class ModAttachments {
 
     public static <T> T getData(Entity entity, Supplier<AttachmentType<T>> key) {
         AttachmentType<T> type = key.get();
+        // Minecraft retains its removed LocalPlayer/camera until respawn or disconnect.
+        // Read-only presentation during that interval sees an empty snapshot, never a
+        // resurrected capability. Live client prediction and all server access stay strict.
+        if (entity.level().isClientSide && entity.isRemoved()) return type.createDefault();
         BlacklightAttachments storage = storage(entity);
         boolean created = !storage.has(type);
         T value = storage.get(type);
@@ -231,6 +235,7 @@ public final class ModAttachments {
     /** Invoked solely by the registered PLAY_TO_CLIENT message consumer. */
     public static void applyClientUpdate(Entity entity, Map<String, byte[]> fields) {
         if (!entity.level().isClientSide) throw new IllegalStateException("Client attachment update on server");
+        if (!available(entity)) return; // A late packet cannot repopulate a removed player's state.
         fields.forEach((name, bytes) -> {
             AttachmentType<?> type = ATTACHMENTS.types.get(name);
             if (type == null || type.syncCodec() == null) throw new DecoderException("Unknown Blacklight attachment");

@@ -214,7 +214,8 @@ public final class ConsumeSystem {
     }
 
     @SubscribeEvent public static void tick(PlayerTickEvent event) {
-        if (!com.codex.blacklight.registry.ModAttachments.available(event.player)) { if (event.player instanceof net.minecraft.server.level.ServerPlayer removed) cancel(removed); return; }if(event.phase != net.minecraftforge.event.TickEvent.Phase.END)return;
+        if (!com.codex.blacklight.registry.ModAttachments.available(event.player)) { if (event.player instanceof net.minecraft.server.level.ServerPlayer removed) cancel(removed); return; }
+        if(event.phase != net.minecraftforge.event.TickEvent.Phase.END)return;
         if (!(event.player instanceof ServerPlayer player)) return;
         var recovery=com.codex.blacklight.registry.ModAttachments.getData(player, ModAttachments.CONSUME_RECOVERY);
         if(recovery.active() && (recovery.phaseProgress(player.level().getGameTime(),0)>=1

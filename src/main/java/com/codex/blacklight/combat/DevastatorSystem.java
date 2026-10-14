@@ -120,7 +120,8 @@ public final class DevastatorSystem {
         com.codex.blacklight.registry.ModAttachments.syncData(p, ModAttachments.DEVASTATOR_VISUAL);
     }
     @SubscribeEvent public static void tick(PlayerTickEvent event){
-        if (!com.codex.blacklight.registry.ModAttachments.available(event.player)) { if (event.player instanceof net.minecraft.server.level.ServerPlayer removed) cancel(removed); return; }if(event.phase!=net.minecraftforge.event.TickEvent.Phase.END)return;
+        if (!com.codex.blacklight.registry.ModAttachments.available(event.player)) { if (event.player instanceof net.minecraft.server.level.ServerPlayer removed) cancel(removed); return; }
+        if(event.phase!=net.minecraftforge.event.TickEvent.Phase.END)return;
         if(!(event.player instanceof ServerPlayer p))return;var s=ACTIVE.get(p);if(s==null)return;
         // A fall can legitimately take arbitrarily long. Source landing is
         // SupportingSurface-driven; only leaving the world cancels a void dive.
