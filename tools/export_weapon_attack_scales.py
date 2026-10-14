@@ -7,6 +7,7 @@ import argparse
 import bisect
 import hashlib
 import json
+import math
 from pathlib import Path
 from motion_provenance import motion_notice, motion_provenance
 
@@ -40,6 +41,12 @@ def export(decoded, contract, motions):
             xyz = [c['values'][i][a]*(1-t)+c['values'][j][a]*t for a in range(3)]
             # Target meshes extend from the elbow along +Y, source bones along X.
             row.extend([xyz[1], xyz[0], xyz[2]])
+        # A blade spans the forearm and distal mesh in one draw group. Keep
+        # its parent length in the distal scale instead of fading it back to
+        # the wrist's almost-unit scale before the aerial impact.
+        if cfg.get('inheritForearmLength'):
+            row[4] *= row[1]
+            row[10] *= row[7]
         return row
 
     def generate(cfg, stages, times):
@@ -61,6 +68,26 @@ def export(decoded, contract, motions):
                 clock = end
         return frames
 
+    def authored_curve(keys, times):
+        """Project adaptation for clips whose body source has no weapon SCL track."""
+        if len(keys) < 2 or keys[0]['time'] != 0 or abs(keys[-1]['time']-times[-1]) > .025:
+            raise ValueError('Project scale envelope must cover the complete body clock')
+        previous = -1
+        for key in keys:
+            if not math.isfinite(key['time']) or key['time'] <= previous:
+                raise ValueError('Project scale times must increase')
+            previous = key['time']
+            if len(key['values']) != 12 or any(not math.isfinite(v) or not .1 <= v <= 8 for v in key['values']):
+                raise ValueError('Invalid project scale values')
+        result = []
+        for time in times:
+            a = max(0, bisect.bisect_right([k['time'] for k in keys], time)-1)
+            b = min(a+1, len(keys)-1)
+            u = max(0, min(1, (time-keys[a]['time'])/(keys[b]['time']-keys[a]['time']))) if a != b else 0
+            u = u*u*(3-2*u)
+            result.append([x+(y-x)*u for x,y in zip(keys[a]['values'], keys[b]['values'])])
+        return result
+
     for name, cfg in config['moves'].items():
         for suffix, stage_key in [('', 'stages'), ('_charge', 'chargeStages'), ('_charged', 'stages')]:
             path = motions / (name+suffix+'.json')
@@ -71,6 +98,9 @@ def export(decoded, contract, motions):
             if abs(times[-1]-sum(s['seconds'] for s in stages)) > .025:
                 raise ValueError('Body clock and scale contract disagree: '+name+suffix)
             frames = generate(cfg, stages, times)
+            envelope = cfg.get('projectScaleEnvelope')
+            if envelope:
+                frames = authored_curve(envelope['charge' if suffix == '_charge' else 'attack'], times)
             if suffix == '_charged':
                 charge = clips[name+'_charge']['frames'][-1]
                 cut = round(cfg['release']*60); end = min(len(frames)-1, cut+cfg['chargedBlendFrames'])
@@ -79,6 +109,10 @@ def export(decoded, contract, motions):
                     frames[i] = [a*(1-w)+b*w for a,b in zip(charge,frames[end])]
             clips[name+suffix] = dict(times=times, frames=frames)
     result = dict(schema=1, bones=list(bones), axisMapping=config['axisMapping'], clips=clips,
+                  inheritedForearmLength=[name for name,cfg in config['moves'].items()
+                                           if cfg.get('inheritForearmLength')],
+                  projectAdaptations={name: cfg['projectScaleEnvelope']['evidence']
+                                      for name,cfg in config['moves'].items() if 'projectScaleEnvelope' in cfg},
                   sources=sources, contractSha256=hashlib.sha256(contract.read_bytes()).hexdigest(),
                   privateNotice=motion_notice('Source SCL timing adapted to the existing Blacklight weapon meshes; local segment scales are not cumulative world-space multipliers.'),
                   provenance=motion_provenance())
