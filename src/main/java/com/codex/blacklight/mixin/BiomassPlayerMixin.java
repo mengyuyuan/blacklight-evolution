@@ -1,0 +1,25 @@
+package com.codex.blacklight.mixin;
+
+import com.codex.blacklight.power.BiomassSystem;
+import net.minecraft.world.entity.EntityDimensions;
+import net.minecraft.world.entity.Pose;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.phys.Vec3;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+
+@Mixin(Player.class)
+public abstract class BiomassPlayerMixin {
+    @Inject(method="getDefaultDimensions",at=@At("HEAD"),cancellable=true)
+    private void blacklight$liquidSize(Pose pose,CallbackInfoReturnable<EntityDimensions> ci){
+        if(BiomassSystem.active((Player)(Object)this))ci.setReturnValue(EntityDimensions.scalable(.8F,.3F).withEyeHeight(.23F));
+    }
+    @Inject(method="getSpeed",at=@At("HEAD"),cancellable=true)
+    private void blacklight$liquidSpeed(CallbackInfoReturnable<Float> ci){
+        var state=BiomassSystem.state((Player)(Object)this);
+        if(state.active())ci.setReturnValue(state.immobilized()?0F:.085F);
+    }
+}

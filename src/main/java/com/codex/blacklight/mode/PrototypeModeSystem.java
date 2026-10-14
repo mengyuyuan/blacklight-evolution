@@ -15,6 +15,7 @@ public final class PrototypeModeSystem {
     }
 
     public static void handle(ServerPlayer player, boolean enabled) {
+        if(com.codex.blacklight.power.BiomassSystem.active(player))return;
         BlacklightState state = player.getData(ModAttachments.PLAYER_STATE);
         if (!state.isInfected()) {
             player.displayClientMessage(Component.translatable(

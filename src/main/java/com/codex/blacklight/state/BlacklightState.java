@@ -182,7 +182,7 @@ public final class BlacklightState {
     }
 
     public boolean hasUnlocked(PowerForm form) {
-        return form != PowerForm.NONE && (unlockedMask & form.bit()) != 0;
+        return form == PowerForm.BIOMASS ? infected : form != PowerForm.NONE && (unlockedMask & form.bit()) != 0;
     }
 
     public boolean setPrototypeMode(boolean enabled) {

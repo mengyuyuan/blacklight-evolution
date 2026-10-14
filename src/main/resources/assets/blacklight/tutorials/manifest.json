@@ -187,5 +187,19 @@
     "duration_ms": 4200,
     "source": "native model motion / mechanic diagram",
     "sha256": "83ebd223d0e85ed1e1ba9d630016ff1f9b61949ef40e4a66bd2f9bffc4b02c33"
+  },
+  "biomass": {
+    "file": "biomass.gif",
+    "frames": 120,
+    "duration_ms": 8000,
+    "source": "native game models, liquid coating and biomass renderer",
+    "sha256": "f2abb4057a9dcf2a55bfd955c7da8bd81de8b8ce6330aca20dc7adcd1e13fdff"
+  },
+  "block_throw": {
+    "file": "block_throw.gif",
+    "frames": 76,
+    "duration_ms": 4500,
+    "source": "original mechanic diagram: charged Musclemass block throw tiers",
+    "sha256": "640abbbfa40e860252a4a24c88aa0fcf39c03f736367bc6435be913d7c0328b9"
   }
 }

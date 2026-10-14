@@ -15,7 +15,9 @@
     "WaterRunningEntityMixin",
     "WaterRunningBlockMixin",
     "NativeRootMovementMixin",
-    "ConsumeStunMixin"
+    "ConsumeStunMixin",
+    "BiomassPlayerMixin",
+    "BiomassPreyMixin"
   ],
   "client": [
     "client.KeyboardInputMixin",
@@ -36,7 +38,8 @@
     "client.InfectedSlimeCoatMixin",
     "client.ModelPartChildrenAccessor",
     "client.DragonConsumePoseMixin",
-    "client.VictimModelRootMixin"
+    "client.VictimModelRootMixin",
+    "client.BlockCarryItemMixin"
   ],
   "injectors": {
     "defaultRequire": 1

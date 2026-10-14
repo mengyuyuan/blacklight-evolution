@@ -88,7 +88,7 @@ public final class PrototypeChaseCamera {
     }
     public static boolean ownsView() {
         var mc=Minecraft.getInstance();var p=mc.player;
-        return p!=null&&mc.level!=null&&mc.getCameraEntity()==p&&PrototypeModeSystem.isActive(p)
+        return p!=null&&!com.codex.blacklight.power.BiomassSystem.active(p)&&mc.level!=null&&mc.getCameraEntity()==p&&PrototypeModeSystem.isActive(p)
                 &&p.isAlive()&&!p.isSpectator()&&!p.isSleeping()&&!p.isUsingItem()
                 &&mc.options.getCameraType()==CameraType.THIRD_PERSON_BACK&&!mc.player.isScoping()
                 &&ChaseCameraProfile.get("Ground")!=null&&SourceCameraEvents.available();
@@ -161,6 +161,7 @@ public final class PrototypeChaseCamera {
                 ||mc.options.getCameraType()!=CameraType.THIRD_PERSON_BACK) {
             reset();return;
         }
+        if(com.codex.blacklight.power.BiomassSystem.active(player)){reset();return;}
         String state=select(player);var profile=ChaseCameraProfile.get(state);
         if(profile==null){reset();return;}
         Vec3 eye=player.getEyePosition(partial);

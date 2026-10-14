@@ -138,6 +138,7 @@ public final class MotionLibrary {
     }
     /** Validate required independent runtime assets at setup rather than silently substituting missing actions. */
     public static void requireInstalled() {
+        for(String hand:new String[]{"one","two"})for(String phase:new String[]{"pickup","hold","charge","release"})clip("block_throw_"+hand+"_"+phase);
         boolean extension = skillExtensionInstalled();
         for (var action : PlayerAction.values()) clip(resolve(action));
         for (var move : com.codex.blacklight.combat.WeaponMove.values()) {

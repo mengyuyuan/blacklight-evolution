@@ -77,13 +77,15 @@ public final class PrototypeSurvivalLock {
     @SubscribeEvent
     public static void onBreakBlock(BlockEvent.BreakEvent event) {
         if (isLocked(event.getPlayer())&&!com.codex.blacklight.combat.BulletdiveTerrain.ownsBreakEvent(event)&&!com.codex.blacklight.combat.BlockThrowSystem.ownsBreakEvent(event)
-                &&!com.codex.blacklight.combat.ShieldBorerSystem.ownsBreakEvent(event)) event.setCanceled(true);
+                &&!com.codex.blacklight.combat.ShieldBorerSystem.ownsBreakEvent(event)
+                &&!com.codex.blacklight.power.BiomassTerrain.ownsBreakEvent(event)) event.setCanceled(true);
     }
 
     /** Server-side backstop for direct placement paths. */
     @SubscribeEvent
     public static void onPlaceBlock(BlockEvent.EntityPlaceEvent event) {
-        if (event.getEntity() instanceof Player player && isLocked(player)) {
+        if (event.getEntity() instanceof Player player && isLocked(player)
+                && !com.codex.blacklight.power.BiomassTerrain.ownsPlaceEvent(event)) {
             event.setCanceled(true);
         }
     }

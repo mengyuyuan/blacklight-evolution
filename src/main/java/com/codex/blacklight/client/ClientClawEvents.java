@@ -84,8 +84,8 @@ public final class ClientClawEvents {
         event.register(CYCLE_FORM);
         event.register(TOGGLE_CLAWS);
         event.register(PROTOTYPE_MODE);
-        event.register(CLAW_TUNER);
-        event.register(ANIMATION_TUNER);
+        if (DeveloperTools.enabled()) event.register(CLAW_TUNER);
+        if (DeveloperTools.enabled()) event.register(ANIMATION_TUNER);
         event.register(TARGET_LOCK);
         event.register(UPGRADE_PANEL);
     }
@@ -95,6 +95,7 @@ public final class ClientClawEvents {
         event.registerEntityRenderer(ModEntities.BLACKWATCH_SOLDIER.get(),context->new com.codex.blacklight.client.renderer.BlackwatchRenderer(context,false));
         event.registerEntityRenderer(ModEntities.BLACKWATCH_HEAVY.get(),context->new com.codex.blacklight.client.renderer.BlackwatchRenderer(context,true));
         event.registerEntityRenderer(ModEntities.THROWN_BLOCK.get(),com.codex.blacklight.client.renderer.ThrownBlockRenderer::new);
+        event.registerEntityRenderer(ModEntities.BIOMASS_HUSK.get(),com.codex.blacklight.client.renderer.BiomassHuskRenderer::new);
         event.registerEntityRenderer(ModEntities.INFECTED_HOST.get(), com.codex.blacklight.client.renderer.InfectedHostRenderer::new);
         event.registerEntityRenderer(ModEntities.GROUND_SPIKE.get(), GroundSpikeRenderer::new);
         for(var type:java.util.List.of(ModEntities.BLACKLIGHT_STALKER,ModEntities.BLACKLIGHT_SPITTER,ModEntities.BLACKLIGHT_BRUTE))
@@ -153,11 +154,11 @@ public final class ClientClawEvents {
             return;
         }
 
-        if (minecraft.screen == null && matches.test(CLAW_TUNER)) {
+        if (DeveloperTools.enabled() && minecraft.screen == null && matches.test(CLAW_TUNER)) {
             minecraft.setScreen(new ClawTunerScreen());
             return;
         }
-        if (minecraft.screen == null && matches.test(ANIMATION_TUNER)) {
+        if (DeveloperTools.enabled() && minecraft.screen == null && matches.test(ANIMATION_TUNER)) {
             minecraft.setScreen(new AnimationTunerScreen());
             return;
         }
@@ -178,6 +179,7 @@ public final class ClientClawEvents {
     public static void onClientTick(ClientTickEvent.Post event) {
         resetInputOwner();
         pollGrabPress(physicalGrabDown());
+        ClientTerrainGrab.tick();
         suppressPrototypePlayerList();
         tickGrabButtons();
         ClientWeaponCombat.poll();
@@ -198,6 +200,7 @@ public final class ClientClawEvents {
         if (minecraft.player == null || minecraft.screen != null) return;
         if(event.getAction()==GLFW.GLFW_PRESS){
             boolean mapped=java.util.stream.Stream.of(PROTOTYPE_MODE,UPGRADE_PANEL,CYCLE_FORM,GRAB,TARGET_LOCK,TOGGLE_CLAWS,CLAW_TUNER,ANIMATION_TUNER)
+                    .filter(key->DeveloperTools.enabled() || key!=CLAW_TUNER && key!=ANIMATION_TUNER)
                     .anyMatch(key->SkillBindings.mouse(key,event.getButton()));
             if(mapped){handleKeyPress(minecraft,key->SkillBindings.mouse(key,event.getButton()));event.setCanceled(true);return;}
         }
@@ -259,6 +262,7 @@ public final class ClientClawEvents {
         long window=mc.getWindow().getWindow();
         boolean left=SkillBindings.down(mc.options.keyAttack);
         boolean right=SkillBindings.down(mc.options.keyUse);
+        if(ClientBlockThrowInput.poll(left,right)){lastGrabLeft=left;lastGrabRight=right;return;}
         if(mc.player!=null&&mc.screen==null&&mc.isWindowActive()&&mc.player.getData(ModAttachments.CONSUMING)) {
             clearLeftAttackHold();
             mc.options.keyAttack.setDown(false);mc.options.keyUse.setDown(false);
@@ -302,7 +306,9 @@ public final class ClientClawEvents {
     private static void sendGrab(Minecraft mc){
         ClientMovementEvents.sendAttackDirection(mc);
         ClientTargetLock.sync();
+        if(com.codex.blacklight.combat.BlockThrowSystem.canUse(mc.player)&&com.codex.blacklight.combat.BlockThrowSystem.held(mc.player)==null)ClientTerrainGrab.arm();
         PacketDistributor.sendToServer(new ClawActionPayload(ClawActionPayload.Action.GRAB));
+        ClientTerrainGrab.tick();
     }
     static boolean physicalGrabDown(){return SkillBindings.down(GRAB);}
     private static void tickDeferredGrab(){
