@@ -23,7 +23,10 @@ public final class BiomassSystem {
     public static BiomassState state(Entity p){return ModAttachments.peekData(p,ModAttachments.BIOMASS_FORM,BiomassState.EMPTY);}
     public static boolean active(Entity p){return state(p).active();}
     private static void publish(ServerPlayer p,BiomassState value){
-        boolean resize=active(p)!=value.active();
+        var previous=state(p);
+        boolean resize=previous.active()!=value.active();
+        if(previous.victim()!=value.victim()&&p.level().getEntity(previous.victim()) instanceof Mob oldTarget)
+            oldTarget.removeEffect(com.codex.blacklight.registry.ModEffects.BIOMASS_CONTACT);
         p.setData(ModAttachments.BIOMASS_FORM,value);p.syncData(ModAttachments.BIOMASS_FORM);
         if(resize)p.refreshDimensions();
     }
@@ -32,6 +35,7 @@ public final class BiomassSystem {
         if(active(p)||!power.isInfected()||!power.isPrototypeMode()||p.isSpectator()||p.isRemoved())return false;
         if(!fatal&&(!p.isAlive()||p.isPassenger()||p.isSleeping()||p.isFallFlying()
                 ||p.getData(ModAttachments.CONSUMING)||WeaponCombatSystem.busy(p)||DevastatorSystem.busy(p)))return false;
+        if(fatal&&!power.spendBiomass(Math.max(0,Math.min(1000,p.level().getGameRules().getInt(BiomassRules.COST)))))return false;
         String oldPower=power.getActivePower().id(),shell="";
         if(!fatal){
             var husk=new BiomassHusk(ModEntities.BIOMASS_HUSK.get(),p.level());
@@ -47,6 +51,7 @@ public final class BiomassSystem {
         p.setData(ModAttachments.UTILITY_POWERS,0);p.syncData(ModAttachments.UTILITY_POWERS);
         p.stopRiding();p.stopUsingItem();p.getAbilities().flying=false;p.onUpdateAbilities();p.setSprinting(false);p.setDeltaMovement(Vec3.ZERO);p.fallDistance=0;
         if(fatal){p.setHealth(Math.max(1,p.getMaxHealth()*.05F));p.clearFire();p.invulnerableTime=40;}
+        p.getPersistentData().remove("blacklightSlimeTrail");
         publish(p,new BiomassState(BiomassState.CRAWLING,p.level().getGameTime(),fatal,shell,oldPower,-1));
         return true;
     }
@@ -75,9 +80,10 @@ public final class BiomassSystem {
         p.displayClientMessage(Component.translatable("message.blacklight.biomass_recalled"),true);
         return true;
     }
-    @SubscribeEvent public static void death(LivingDeathEvent e){
-        if(e.getEntity() instanceof ServerPlayer p&&!e.getSource().is(DamageTypeTags.BYPASSES_INVULNERABILITY)
-                &&begin(p,true))e.setCanceled(true);
+    @SubscribeEvent(priority=net.neoforged.bus.api.EventPriority.LOWEST) public static void death(LivingDeathEvent e){
+        if(e.isCanceled()||!(e.getEntity() instanceof ServerPlayer p))return;
+        if(active(p)){publish(p,BiomassState.EMPTY);return;}
+        if(!e.getSource().is(DamageTypeTags.BYPASSES_INVULNERABILITY)&&begin(p,true))e.setCanceled(true);
     }
     public static boolean edible(ServerPlayer p,Mob victim){
         return !(victim instanceof BiomassHusk)&&ConsumeSystem.eligibleBiomass(victim)
@@ -96,6 +102,20 @@ public final class BiomassSystem {
         if(!p.isAlive())return;
         if(!p.getData(ModAttachments.PLAYER_STATE).isInfected()) {publish(p,BiomassState.EMPTY);return;}
         var s=state(p);long now=p.level().getGameTime();
+        if(!s.consumed()){
+            float before=BiomassEvolution.scale(p);
+            s=s.aged();p.setData(ModAttachments.BIOMASS_FORM,s);
+            if(s.age()%10==0)p.syncData(ModAttachments.BIOMASS_FORM);
+            if(before!=BiomassEvolution.scale(p))p.refreshDimensions();
+            int lifetime=BiomassEvolution.lifetime(p);
+            if(lifetime>=0&&s.age()>=lifetime){
+                if(s.recallable()&&cancel(p))return;
+                p.displayClientMessage(Component.translatable("message.blacklight.biomass_expired"),true);
+                // Real damage/death events preserve other mods' resurrection and death vetoes.
+                p.hurt(p.damageSources().genericKill(),Float.MAX_VALUE);return;
+            }
+            if(s.fatal()&&s.phase()==BiomassState.CRAWLING)BiomassTerrain.trail(p);
+        }
         p.fallDistance=0;p.setSprinting(false);p.stopUsingItem();
         p.getData(ModAttachments.MOVEMENT_STATE).reset();
         if(s.immobilized())p.setDeltaMovement(0,p.getDeltaMovement().y,0);
@@ -107,12 +127,14 @@ public final class BiomassSystem {
                 Mob target=prey.get(0);
                 boolean claimed=p.server.getPlayerList().getPlayers().stream().anyMatch(other->other!=p&&other.level()==p.level()
                     &&state(other).phase()==BiomassState.ABSORBING&&state(other).victim()==target.getId());
-                if(!claimed)publish(p,s.absorb(target.getId(),now));
+                if(!claimed&&now-s.changedAt()>=12){publish(p,s.absorb(target.getId(),now));
+                    p.displayClientMessage(Component.translatable("message.blacklight.biomass_contact",target.getDisplayName()),true);}
             }
         }else if(s.phase()==BiomassState.ABSORBING){
             Entity entity=p.level().getEntity(s.victim());
             if(!(entity instanceof Mob target)||!edible(p,target)){publish(p,s.crawl(now));return;}
             target.getNavigation().stop();target.setDeltaMovement(Vec3.ZERO);
+            target.addEffect(new net.minecraft.world.effect.MobEffectInstance(com.codex.blacklight.registry.ModEffects.BIOMASS_CONTACT,8,0,false,true,true));
             if(now-s.changedAt()<BiomassState.ABSORB_TICKS)return;
             target.invulnerableTime=0;
             boolean accepted=target.hurt(target.damageSources().playerAttack(p),Math.max(1000,target.getMaxHealth()*20));

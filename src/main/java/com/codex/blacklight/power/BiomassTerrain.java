@@ -73,6 +73,35 @@ public final class BiomassTerrain {
         }
         debris.putInt("count",kept);return debris;
     }
+    public static void trail(ServerPlayer p){
+        var level=p.serverLevel();var rules=level.getGameRules();
+        if(!p.onGround()||!p.mayBuild()||!rules.getBoolean(BiomassRules.TERRAIN)||!rules.getBoolean(GameRules.RULE_MOBGRIEFING))return;
+        var root=p.getPersistentData();var history=root.getCompound("blacklightSlimeTrail");
+        int limit=Math.max(0,Math.min(256,rules.getInt(BiomassRules.LIMIT)));
+        if(history.getInt("count")>=limit)return;
+        BlockPos pos=BlockPos.containing(p.getX(),p.getY()-.05,p.getZ());
+        String key=level.dimension().location()+":"+pos.asLong();var visited=history.getCompound("visited");
+        if(visited.contains(key)||visited.getAllKeys().size()>=256)return;
+        visited.putBoolean(key,true);history.put("visited",visited);root.put("blacklightSlimeTrail",history);
+        if(!level.hasChunkAt(pos)||!level.mayInteract(p,pos)||level.random.nextInt(100)>=Math.max(0,Math.min(100,rules.getInt(BiomassRules.CHANCE))))return;
+        var before=level.getBlockState(pos);
+        if(before.hasBlockEntity()||!before.getFluidState().isEmpty())return;
+        boolean soil=before.is(net.minecraft.world.level.block.Blocks.GRASS_BLOCK)||before.is(net.minecraft.world.level.block.Blocks.DIRT)||before.is(net.minecraft.world.level.block.Blocks.COARSE_DIRT)||before.is(net.minecraft.world.level.block.Blocks.ROOTED_DIRT)||before.is(net.minecraft.world.level.block.Blocks.PODZOL)||before.is(net.minecraft.world.level.block.Blocks.MYCELIUM);
+        boolean stone=before.is(net.minecraft.world.level.block.Blocks.STONE)||before.is(net.minecraft.world.level.block.Blocks.DEEPSLATE)||before.is(net.minecraft.world.level.block.Blocks.ANDESITE)||before.is(net.minecraft.world.level.block.Blocks.DIORITE)||before.is(net.minecraft.world.level.block.Blocks.GRANITE)||before.is(net.minecraft.world.level.block.Blocks.TUFF);
+        if(!soil&&!stone)return;
+        var broken=new BlockEvent.BreakEvent(level,pos,before,p);var previous=OWN_BREAK.get();OWN_BREAK.set(broken);
+        try{NeoForge.EVENT_BUS.post(broken);}finally{if(previous==null)OWN_BREAK.remove();else OWN_BREAK.set(previous);}
+        if(broken.isCanceled()||!level.getBlockState(pos).equals(before))return;
+        var tissue=(soil?ModBlocks.INFECTED_SOIL:ModBlocks.INFECTED_STONE).get().defaultBlockState();
+        var snapshot=BlockSnapshot.create(level.dimension(),level,pos);
+        if(!level.setBlock(pos,tissue,2))return;
+        var placed=new BlockEvent.EntityPlaceEvent(snapshot,level.getBlockState(pos.below()),p);var old=OWN_PLACE.get();OWN_PLACE.set(placed);
+        try{NeoForge.EVENT_BUS.post(placed);}finally{if(old==null)OWN_PLACE.remove();else OWN_PLACE.set(old);}
+        if(placed.isCanceled()){if(level.getBlockState(pos).equals(tissue))level.setBlock(pos,before,3);return;}
+        if(!level.getBlockState(pos).equals(tissue))return;
+        level.blockUpdated(pos,tissue.getBlock());history.putInt("count",history.getInt("count")+1);root.put("blacklightSlimeTrail",history);
+        level.sendParticles(new net.minecraft.core.particles.BlockParticleOption(net.minecraft.core.particles.ParticleTypes.BLOCK,tissue),pos.getX()+.5,pos.getY()+1.03,pos.getZ()+.5,5,.3,.02,.3,.02);
+    }
     private static BlockPos anchor(ServerPlayer owner,net.minecraft.world.phys.Vec3 from,net.minecraft.world.phys.Vec3 to,BiomassHusk husk){
         var level=owner.serverLevel();
         // Check the entire short ray before clipping: never force-load a neighbor chunk.

@@ -108,7 +108,7 @@ public final class BlacklightState {
     }
 
     public boolean spendBiomass(int amount) {
-        // Progression purchase only. Learned combat skills never consume biomass on release.
+        // Death conversion reserve only. Upgrades spend EP; learned actions do not spend biomass.
         if (amount < 0 || biomass < amount) return false;
         biomass -= amount;
         return true;

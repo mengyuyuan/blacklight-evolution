@@ -8,6 +8,7 @@ import java.util.List;
 /** Tutorials describe existing server actions; opening a page never sends an action. */
 public record SkillTutorial(String family,String clip,PowerForm form,String instructionFamily,String... bindings) {
     public static SkillTutorial forSkill(String id) {
+        if(id.startsWith("slime_"))return new SkillTutorial("health","basic_idle",PowerForm.NONE,"slime");
         if(id.startsWith("block_throw_"))return of("block_throw","block_throw_two_release",PowerForm.MUSCLE_MASS,"key.blacklight.grab","key.attack","key.use","key.sneak");
         if(id.startsWith("jump_"))return of("jump","basic_jump_charge",PowerForm.NONE,"key.jump");
         if(id.startsWith("sprint_"))return of("sprint","basic_run",PowerForm.NONE,"key.forward","key.sprint");

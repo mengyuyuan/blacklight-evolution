@@ -17,6 +17,18 @@ public final class GrabHud {
     @SubscribeEvent public static void render(RenderGuiEvent.Post event) {
         var mc=Minecraft.getInstance();
         if(mc.player==null||mc.screen!=null||mc.options.hideGui)return;
+        var slime=com.codex.blacklight.power.BiomassSystem.state(mc.player);
+        if(slime.active()){
+            int x=mc.getWindow().getGuiScaledWidth()/2,y=mc.getWindow().getGuiScaledHeight()-74;
+            var g=event.getGuiGraphics();float integrity=com.codex.blacklight.power.BiomassEvolution.integrity(mc.player);
+            String stage=slime.consumed()?"reforming":slime.phase()==com.codex.blacklight.power.BiomassState.ABSORBING?"absorbing":slime.fatal()?"fatal":"voluntary";
+            g.drawCenteredString(mc.font,Component.translatable("hud.blacklight.slime_"+stage),x,y,0xffe5ddd7);
+            float amount=slime.phase()==com.codex.blacklight.power.BiomassState.ABSORBING?slime.progress(mc.level.getGameTime(),com.codex.blacklight.power.BiomassState.ABSORB_TICKS):integrity;
+            g.fill(x-50,y+12,x+50,y+16,0xb0202020);g.fill(x-50,y+12,x-50+(int)(100*amount),y+16,0xffa53142);
+            int life=com.codex.blacklight.power.BiomassEvolution.lifetime(mc.player);
+            g.drawCenteredString(mc.font,Component.translatable(life<0?"hud.blacklight.slime_stable":"hud.blacklight.slime_decay",Math.max(0,(life-slime.age()+19)/20)),x,y+20,0xffc6b4b8);
+            return;
+        }
         var selected=ClientTerrainGrab.preview();
         if(!selected.isEmpty()){event.getGuiGraphics().drawCenteredString(mc.font,Component.translatable("hud.blacklight.terrain_select",selected.size()),mc.getWindow().getGuiScaledWidth()/2,mc.getWindow().getGuiScaledHeight()/2+42,0xffe5ddd7);}
         int stage=mc.player.getData(ModAttachments.GRAB_STAGE);

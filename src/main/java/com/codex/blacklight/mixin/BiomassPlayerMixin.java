@@ -15,7 +15,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 public abstract class BiomassPlayerMixin {
     @Inject(method="getDefaultDimensions",at=@At("HEAD"),cancellable=true)
     private void blacklight$liquidSize(Pose pose,CallbackInfoReturnable<EntityDimensions> ci){
-        if(BiomassSystem.active((Player)(Object)this))ci.setReturnValue(EntityDimensions.scalable(.8F,.3F).withEyeHeight(.23F));
+        if(BiomassSystem.active((Player)(Object)this))ci.setReturnValue(EntityDimensions.scalable(com.codex.blacklight.power.BiomassEvolution.width((Player)(Object)this),com.codex.blacklight.power.BiomassEvolution.height((Player)(Object)this)).withEyeHeight(com.codex.blacklight.power.BiomassEvolution.height((Player)(Object)this)*.77F));
     }
     @Inject(method="getSpeed",at=@At("HEAD"),cancellable=true)
     private void blacklight$liquidSpeed(CallbackInfoReturnable<Float> ci){

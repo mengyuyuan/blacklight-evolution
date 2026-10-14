@@ -12,7 +12,7 @@ import net.neoforged.neoforge.event.tick.PlayerTickEvent;
 import net.neoforged.neoforge.event.entity.living.LivingDamageEvent;
 import java.util.*;
 
-/** Biomass buys biology; EP buys combat and movement. Learned actions remain free. */
+/** EP buys upgrades; biomass is reserved for death recovery. Learned actions remain free. */
 public final class GrowthSystem {
     private static final ResourceLocation HEALTH=ResourceLocation.fromNamespaceAndPath("blacklight","vitality");
     private static final Map<ServerPlayer,Integer> LAST_HURT=new WeakHashMap<>();
@@ -20,9 +20,10 @@ public final class GrowthSystem {
     public static void purchase(ServerPlayer p,GrowthUpgrade upgrade){
         var state=p.getData(ModAttachments.PLAYER_STATE);var progress=p.getData(ModAttachments.GROWTH);
         if(upgrade.requires()!=null&&!progress.owns(upgrade.requires()))return;
-        if(!p.isAlive()||p.isSpectator()||!state.isInfected()||progress.owns(upgrade)||!state.spendBiomass(upgrade.cost))return;
+        if(!p.isAlive()||p.isSpectator()||!state.isInfected()||progress.owns(upgrade)||state.getEvolutionPoints()<upgrade.cost)return;
+        state.addEvolutionPoints(-upgrade.cost);
         p.setData(ModAttachments.PLAYER_STATE,state);p.syncData(ModAttachments.PLAYER_STATE);
-        p.setData(ModAttachments.GROWTH,progress.buy(upgrade));p.syncData(ModAttachments.GROWTH);updateHealth(p);
+        p.setData(ModAttachments.GROWTH,progress.buy(upgrade));p.syncData(ModAttachments.GROWTH);updateHealth(p);if(BiomassSystem.active(p))p.refreshDimensions();
         award(p,"first_evolution");p.displayClientMessage(Component.translatable("message.blacklight.growth_bought",Component.translatable("upgrade.blacklight."+upgrade.id)),true);
     }
     public static void consumed(ServerPlayer p,Mob mob){
@@ -56,7 +57,7 @@ public final class GrowthSystem {
         if(p.tickCount%20!=0)return;
         if(!p.getData(ModAttachments.PLAYER_STATE).isInfected())return;
         award(p,"awakening");
-        if(p.isAlive()&&p.tickCount%100==0&&p.tickCount-LAST_HURT.getOrDefault(p,p.tickCount-200)>=160&&p.getData(ModAttachments.GROWTH).owns(GrowthUpgrade.REGENERATION))p.heal(1);
+        if(!BiomassSystem.active(p)&&p.isAlive()&&p.tickCount%100==0&&p.tickCount-LAST_HURT.getOrDefault(p,p.tickCount-200)>=160&&p.getData(ModAttachments.GROWTH).owns(GrowthUpgrade.REGENERATION))p.heal(1);
     }
     @SubscribeEvent public static void hurt(LivingDamageEvent.Post e){if(e.getNewDamage()>0&&e.getEntity() instanceof ServerPlayer p)LAST_HURT.put(p,p.tickCount);}
 }

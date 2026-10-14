@@ -24,6 +24,8 @@ public final class ModEffects {
                     .addAttributeModifier(Attributes.MAX_HEALTH, id("infection_health"),
                             6.0D, AttributeModifier.Operation.ADD_VALUE));
 
+    public static final DeferredHolder<MobEffect, MobEffect> BIOMASS_CONTACT=EFFECTS.register("biomass_contact",()->new com.codex.blacklight.effect.BiomassContactEffect().addAttributeModifier(Attributes.MOVEMENT_SPEED,id("biomass_contact"),-.45D,AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL));
+
     private ModEffects() {
     }
 
