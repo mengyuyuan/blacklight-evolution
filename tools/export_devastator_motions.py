@@ -1,11 +1,11 @@
-"""Export reviewed Prototype devastator/Bulletdive body tracks for private use.
+"""Export Blacklight motion data with separate initial-source and project-adaptation metadata.
 
-Inputs and outputs stay outside the repository. This script contains only source
-names, FIG owner references and scheduling metadata, never game curves or meshes.
-The shared numeric retarget engine and its private skeleton calibration are local
-inputs; no old game executable or Blender process is launched.
+Reads decoded source inputs and adapts them to Minecraft. This script does not
+claim the resulting motion was wholly authored from scratch, and does not upload files.
 """
 from __future__ import annotations
+
+from motion_provenance import motion_notice, motion_provenance
 
 import argparse
 import hashlib
@@ -423,7 +423,7 @@ def main():
                     meta["landing"] = cfg["landing"]
             payload = dict(format="MATRIX", animation=tracks, blacklight=meta,
                            source=[dict(animation=s["sourceName"], sha256=records[s["sourceName"]]["fileSha256"], start=s["start"], end=s["end"], seconds=s["seconds"], owner=s["owner"], track=s.get("track"), note=s.get("note", "")) for s in stages],
-                           privateNotice="Original-derived local-only. Source 67-joint curves retargeted to the shared native biped. Coord is diagnostic; authoritative movement must not apply it twice.")
+                           privateNotice=motion_notice('Original-derived local-only. Source 67-joint curves retargeted to the shared native biped. Coord is diagnostic; authoritative movement must not apply it twice.'), provenance=motion_provenance())
             validate(payload)
             encoded = json.dumps(payload, separators=(",", ":"), allow_nan=False).encode()
             out = args.output / (key + ".json")

@@ -1,8 +1,10 @@
-"""Private scale-channel export, using the same verified FIG segments as body retargeting.
+"""Export Blacklight motion data with separate initial-source and project-adaptation metadata.
 
-No game launch or tests. Input contract is the local hammer_contract.py used by
-the existing retarget pipeline. Output contains original-derived data: keep it private.
+Reads decoded source inputs and adapts them to Minecraft. This script does not
+claim the resulting motion was wholly authored from scratch, and does not upload files.
 """
+
+from motion_provenance import motion_notice, motion_provenance
 import argparse
 import bisect
 import copy
@@ -81,7 +83,7 @@ for name,cfg in configs.items():
 payload=dict(schema=1,bones=list(bones),clips=clips,
              sources={n:sha for n,(_,sha) in sources.items()},
              contractSha256=hashlib.sha256(args.contract.read_bytes()).hexdigest(),
-             privateNotice='Original-derived scale channels mapped to local clip time; private local use only.')
+             privateNotice=motion_notice('Original-derived scale channels mapped to local clip time; private local use only.'), provenance=motion_provenance())
 output=args.motions/'hammer-scales.data'
 output.write_text(json.dumps(payload,separators=(',',':'),allow_nan=False),encoding='utf8')
 print(f'Exported {len(clips)} synchronized hammer scale tracks to {output}')
