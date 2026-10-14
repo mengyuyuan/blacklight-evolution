@@ -35,4 +35,46 @@ class BiomassFluidSurfaceTest {
         var fresh=new BiomassFluidSurface();fresh.update(new Vec3(10000,90,-10000),100,1);
         assertArrayEquals(heights(fresh),heights(moved),1e-9);
     }
+    private static boolean visibleNear(BiomassFluidSurface fluid,double x,double z,double radius) throws Exception {
+        double[] surface=heights(fluid);int n=(int)Math.sqrt(surface.length);
+        for(int ix=0;ix<n;ix++)for(int iz=0;iz<n;iz++){
+            double dx=(ix-n/2)/16D-x,dz=(iz-n/2)/16D-z;
+            if(dx*dx+dz*dz<radius*radius&&surface[ix*n+iz]>=.004)return true;
+        }
+        return false;
+    }
+    @Test void steadyTravelLeavesVisibleTailBeyondBodyAndRetractsOnStop() throws Exception {
+        var fluid=new BiomassFluidSurface();
+        for(int t=0;t<=100;t++)fluid.update(new Vec3(0,0,t*.10),t,1);
+        assertTrue(visibleNear(fluid,0,-1.3,.15),"Tail must extend visibly behind the local body");
+        assertFalse(visibleNear(fluid,0,1.3,.15),"Tail belongs behind the travelled path");
+        for(int t=101;t<=140;t++)fluid.update(new Vec3(0,0,10),t,1);
+        assertFalse(visibleNear(fluid,0,-1.3,.15),"Stop must retract the distant tip");
+    }
+    @Test void cornerRetainsPreviousLegOfActualPath() throws Exception {
+        var fluid=new BiomassFluidSurface();
+        for(int t=0;t<=40;t++)fluid.update(new Vec3(0,0,t*.10),t,1);
+        for(int t=41;t<=46;t++)fluid.update(new Vec3((t-40)*.10,0,4),t,1);
+        assertTrue(visibleNear(fluid,-.6,-.65,.15),"Old leg must stay around the corner");
+        assertFalse(visibleNear(fluid,-1.3,0,.15),"Tail must not rotate rigidly behind the new heading");
+    }
+    @Test void tailScalesWithBodyAndDoesNotSpanVerticalLedges() throws Exception {
+        var small=new BiomassFluidSurface();var large=new BiomassFluidSurface();
+        for(int t=0;t<=80;t++){
+            small.update(new Vec3(0,0,t*.10),t,1);
+            large.update(new Vec3(0,0,t*.18),t,1.8f);
+        }
+        assertTrue(visibleNear(large,0,-1.3,.15));
+        small.update(new Vec3(0,2,8.1),81,1);
+        for(int t=82;t<100;t++)small.update(new Vec3(0,2,8.1),t,1);
+        assertFalse(visibleNear(small,0,-1.3,.15),"Old lower path must not float beside the player");
+    }
+    @Test void highFrameRateSlowTravelStillKeepsTailExtended() throws Exception {
+        var fluid=new BiomassFluidSurface();
+        for(int frame=0;frame<=1200;frame++){
+            double tick=frame/20D;
+            fluid.update(new Vec3(0,0,tick*.03),tick,1);
+        }
+        assertTrue(visibleNear(fluid,0,-.7,.15),"Small per-frame motion must not be treated as stopping");
+    }
 }
