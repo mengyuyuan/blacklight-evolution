@@ -18,9 +18,11 @@
 - 用户明确要求启动试玩时，使用 `./gradlew.bat runClient`；Linux/macOS 替换为 `bash ./gradlew`。
 - 第一轮构建需要网络下载依赖。不要提交 `.gradle/`、`build/`、`run/`、存档或个人账户配置。
 
-默认源码构建使用 `art/motion-profile/` 的完整 224 个动作、HUD 和镜头资料，生成 bundled 包并校验成品清单，无需本机外部资料目录。source-only / local-preview 属于旧构建历史；资源说明见 `THIRD_PARTY_ASSETS.md`，当前打包说明见 [完整资料打包](docs/BUNDLED_PROFILE_DEV7.md)。
+默认源码构建使用 `art/motion-profile/` 的完整 251 个动作、HUD 和镜头资料，生成 bundled 包并校验成品清单，无需本机外部资料目录。source-only / local-preview 属于旧构建历史；资源说明见 `THIRD_PARTY_ASSETS.md`，当前打包说明见 [完整资料打包](docs/BUNDLED_PROFILE_DEV7.md)。
 
 默认构建与 Build CI 不运行游戏单元测试、碰撞测试、GameTest 或游戏内验收；这些检查仅在用户明确要求时运行。Version policy CI 只运行轻量协作工具回归和静态平台核对。编译打包成功不代表真人试玩已通过。
+
+动作修改与来源说明遵循 [动作来源与本项目修改](docs/MOTION_PROVENANCE_ZH.md)。区分初始来源与后续修改，不依据旧标记统计原创或未修改动作的数量。
 
 ## 目前适合参与的工作
 
