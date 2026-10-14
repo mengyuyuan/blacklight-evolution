@@ -8,12 +8,13 @@ continues to maintain the upstream platform separately.
 At the author's request, the release audit extends standalone dev.7's previously local
 runtime profile in `art/motion-profile/`: 240 JSON motion files and 11 JSON-based
 `.data` files. It includes movement, combat, weapon and utility transformation,
-consume actor/victim choreography, armor growth, camera and HUD data. The files
-retain their source provenance. The 2026-10-13 addition contains 27 Devastator
-and Bulletdive release, charge, recovery, aiming and landing clips, copied
-byte-for-byte from the tested dev.9 skill profile. Existing branch-specific armor
-data is retained; reference FX textures and source shaders are not added.
-`art/motion-profile-manifest.json` records every source hash and byte count.
+consume actor/victim choreography, armor growth, camera and HUD data. At initial import,
+the files were preserved byte-for-byte from the standalone development profile;
+subsequent project changes are recorded in Git and the current manifest.
+The 2026-10-13 addition contains 27 Devastator and Bulletdive release, charge,
+recovery, aiming and landing clips. Existing branch-specific armor data is retained;
+reference FX textures and source shaders are not added.
+`art/motion-profile-manifest.json` records every current profile file hash and byte count.
 
 The project uses Prototype as a design/animation reference. Existing source
 metadata and source-analysis documentation remain intact; adding a profile to
@@ -29,6 +30,22 @@ presence and byte equality; repository builds additionally check the manifest
 SHA-256 values. The former source-only/local-preview distinction is historical.
 No original game archives, installers, dependency JARs or audio banks are included
 in this commit.
+
+## Current motion authorship and initial lineage
+
+The current motions include the project's ongoing modification, tuning and
+Minecraft adaptation work. Initial-source names, hashes and old provenance
+labels do not establish that a current clip is an untouched conversion.
+The metadata separates `provenance.currentStatus` (project-modified/adapted)
+from existing `source` records (initial lineage). The legacy `privateNotice`
+key remains for packaging compatibility, but obsolete local-build restrictions
+have been replaced with descriptive metadata. This is not a per-keyframe
+authorship audit or a claim that every keyframe was authored from scratch.
+See [动作来源与本项目修改](docs/MOTION_PROVENANCE_ZH.md).
+
+The 2026-10-14 metadata update preserves all animation and gameplay values.
+The manifest contains current file hashes, which change when metadata changes;
+source hashes continue to identify the original inputs. License files are unchanged.
 
 ## Independent runtime and authored resources
 

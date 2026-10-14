@@ -1,9 +1,10 @@
-"""Export the omitted receiver scale channel into a private motion directory.
+"""Export Blacklight motion data with separate initial-source and project-adaptation metadata.
 
-Inputs are locally decoded P3D JSON and the existing retargeted actor clip.
-This exports animation data; it does not run tests or launch Minecraft.
-Never commit the output or redistribute the original-derived motion library.
+Reads decoded source inputs and adapts them to Minecraft. This script does not
+claim the resulting motion was wholly authored from scratch, and does not upload files.
 """
+
+from motion_provenance import motion_notice, motion_provenance
 import argparse
 import hashlib
 import json
@@ -28,7 +29,7 @@ actor = json.loads((args.motion_directory / "consume_large_actor.json").read_tex
 payload = dict(schema=1, source=source["name"], sourceSha256=hashlib.sha256(raw).hexdigest(),
                actorClipSeconds=max(t for track in actor["animation"] for t in track["time"]),
                jawScale=[[t, *v] for t, v in zip(channel["times"], channel["values"])],
-               privateNotice="Original-derived animation channel. Private local use only.")
+               privateNotice=motion_notice('Original-derived animation channel. Private local use only.'), provenance=motion_provenance())
 output = args.motion_directory / "hunter-consume.data"
 output.write_text(json.dumps(payload, separators=(",", ":"), allow_nan=False), encoding="utf8")
 print(f"Exported {len(payload['jawScale'])} Jaw scale keys to {output}")

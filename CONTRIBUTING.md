@@ -18,9 +18,11 @@
 - 用户明确要求启动试玩时，使用 `./gradlew.bat runClient`；Linux/macOS 替换为 `bash ./gradlew`。
 - 第一轮构建需要网络下载依赖。不要提交 `.gradle/`、`build/`、`run/`、存档或个人账户配置。
 
-普通构建是 bundled，包含仓库中完整的 224 个资料文件，并验证最终 Forge 重混淆成品。外部整套资料使用 external-profile；不提交个人导出、测试存档、解包原始文件或凭证。构建和完整玩法验收分开记录，资源出处见 `THIRD_PARTY_ASSETS.md`。
+普通构建是 bundled，包含仓库中完整的 251 个资料文件，并验证最终 Forge 重混淆成品。外部整套资料使用 external-profile；不提交个人导出、测试存档、解包原始文件或凭证。构建和完整玩法验收分开记录，资源出处见 `THIRD_PARTY_ASSETS.md`。
 
 默认构建与 Build CI 不运行游戏单元测试、碰撞测试、GameTest 或游戏内验收；这些检查仅在用户明确要求时运行。Version policy CI 只运行轻量协作工具回归和静态平台核对。编译打包成功不代表真人试玩已通过。
+
+动作修改与来源说明遵循 [动作来源与本项目修改](docs/MOTION_PROVENANCE_ZH.md)。区分初始来源与后续修改，不依据旧标记统计原创或未修改动作的数量。
 
 ## 目前适合参与的工作
 
