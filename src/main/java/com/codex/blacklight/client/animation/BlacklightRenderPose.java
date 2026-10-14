@@ -13,7 +13,6 @@ public final class BlacklightRenderPose {
         var skeleton = PlayerMotionController.skeleton();
         var pose = PlayerMotionController.pose(entity, partial);
         NativeHeadLook.apply(entity,pose,partial);
-        NativeUtilityPose.apply(entity, pose, partial);
         if (!NativeHitPose.apply(entity, skeleton, pose, partial)) ConsumeVictimPose.epic(entity, pose, partial);
         if (entity.getData(ModAttachments.GRAB_STAGE) == ConsumeVisual.HOLD) {
             String key = entity.getData(ModAttachments.PLAYER_STATE).getActivePower() == PowerForm.BLADE ? "grab_blade_hold" : "grab_hold";
@@ -55,6 +54,9 @@ public final class BlacklightRenderPose {
         return pose;
     }
     public static float facing(LivingEntity entity,float partial) {
+        return PlayerMotionController.facing(entity,partial);
+    }
+    public static float rawFacing(LivingEntity entity,float partial) {
         float body=net.minecraft.util.Mth.rotLerp(partial,entity.yBodyRotO,entity.yBodyRot);
         var weapon=entity.getData(ModAttachments.WEAPON_VISUAL);
         float facing=NativeConsumePose.facing(entity,weapon.spec()==null?entity.getYRot():weapon.yaw(),partial);
