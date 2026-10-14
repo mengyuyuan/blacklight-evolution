@@ -29,7 +29,7 @@ public final class CriticalMassSystem {
     private CriticalMassSystem() { }
     private static boolean enabled(Player p) {
         var state = com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.PLAYER_STATE);
-        return p.isAlive() && !p.isSpectator() && state.isInfected() && state.isPrototypeMode();
+        return !BiomassSystem.active(p) && p.isAlive() && !p.isSpectator() && state.isInfected() && state.isPrototypeMode();
     }
     public static boolean ready(ServerPlayer p) {
         if (!enabled(p) || !com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.PLAYER_STATE).hasCombatSkill(CombatSkill.CRITICAL_MASS)) return false;
@@ -122,7 +122,7 @@ public final class CriticalMassSystem {
         var state = com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.PLAYER_STATE);
         var mass = com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.CRITICAL_MASS);
         // A death callback has health zero, so use mode/skill flags directly here.
-        if (!state.isInfected() || !state.isPrototypeMode() || !state.hasCombatSkill(CombatSkill.ADRENALINE_SURGE)
+        if (BiomassSystem.active(p) || !state.isInfected() || !state.isPrototypeMode() || !state.hasCombatSkill(CombatSkill.ADRENALINE_SURGE)
                 || !mass.adrenalineArmed()) return;
         event.setCanceled(true);
         p.setHealth(Math.max(1, p.getMaxHealth() * .01F));

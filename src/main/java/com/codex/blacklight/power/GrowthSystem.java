@@ -12,7 +12,7 @@ import net.minecraftforge.event.TickEvent.PlayerTickEvent;
 import com.codex.blacklight.combat.ForgeDamageEvent;
 import java.util.*;
 
-/** Biomass buys biology; EP buys combat and movement. Learned actions remain free. */
+/** EP buys upgrades; biomass is reserved for death recovery. Learned actions remain free. */
 public final class GrowthSystem {
     private static final ResourceLocation HEALTH=new ResourceLocation("blacklight","vitality");
     private static final Map<ServerPlayer,Integer> LAST_HURT=new WeakHashMap<>();
@@ -20,9 +20,10 @@ public final class GrowthSystem {
     public static void purchase(ServerPlayer p,GrowthUpgrade upgrade){
         var state=com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.PLAYER_STATE);var progress=com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.GROWTH);
         if(upgrade.requires()!=null&&!progress.owns(upgrade.requires()))return;
-        if(!p.isAlive()||p.isSpectator()||!state.isInfected()||progress.owns(upgrade)||!state.spendBiomass(upgrade.cost))return;
+        if(!p.isAlive()||p.isSpectator()||!state.isInfected()||progress.owns(upgrade)||state.getEvolutionPoints()<upgrade.cost)return;
+        state.addEvolutionPoints(-upgrade.cost);
         com.codex.blacklight.registry.ModAttachments.setData(p, ModAttachments.PLAYER_STATE,state);com.codex.blacklight.registry.ModAttachments.syncData(p, ModAttachments.PLAYER_STATE);
-        com.codex.blacklight.registry.ModAttachments.setData(p, ModAttachments.GROWTH,progress.buy(upgrade));com.codex.blacklight.registry.ModAttachments.syncData(p, ModAttachments.GROWTH);updateHealth(p);
+        com.codex.blacklight.registry.ModAttachments.setData(p, ModAttachments.GROWTH,progress.buy(upgrade));com.codex.blacklight.registry.ModAttachments.syncData(p, ModAttachments.GROWTH);updateHealth(p);if(BiomassSystem.active(p))p.refreshDimensions();
         award(p,"first_evolution");p.displayClientMessage(Component.translatable("message.blacklight.growth_bought",Component.translatable("upgrade.blacklight."+upgrade.id)),true);
     }
     public static void consumed(ServerPlayer p,Mob mob){
@@ -58,7 +59,7 @@ public final class GrowthSystem {
         if(p.tickCount%20!=0)return;
         if(!com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.PLAYER_STATE).isInfected())return;
         award(p,"awakening");
-        if(p.isAlive()&&p.tickCount%100==0&&p.tickCount-LAST_HURT.getOrDefault(p,p.tickCount-200)>=160&&com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.GROWTH).owns(GrowthUpgrade.REGENERATION))p.heal(1);
+        if(!BiomassSystem.active(p)&&p.isAlive()&&p.tickCount%100==0&&p.tickCount-LAST_HURT.getOrDefault(p,p.tickCount-200)>=160&&com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.GROWTH).owns(GrowthUpgrade.REGENERATION))p.heal(1);
     }
     @SubscribeEvent public static void hurt(ForgeDamageEvent.Post e){if(e.getNewDamage()>0&&e.getEntity() instanceof ServerPlayer p)LAST_HURT.put(p,p.tickCount);}
 }

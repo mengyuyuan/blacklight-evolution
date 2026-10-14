@@ -14,24 +14,25 @@ public final class BiomassGeometry {
     }
     public static void crawler(PoseStack s,VertexConsumer out,int light,double time,double movement,boolean fatal,
                                TentacleGait gait,Vec3 worldBody,float yaw,double stretch){
-        double phase=gait==null?0:gait.swingProgress(time),pull=Math.sin(phase*Math.PI)*.025*movement;
-        double rx=fatal?.18:.32,ry=fatal?.115:.16,rz=(fatal?.23:.42)*stretch;
-        ellipsoid(s,out,light,new Vec3(0,ry+.025+pull,0),rx,ry,rz,time,0xffffffff);
-        for(int arm=0;arm<8;arm++){
-            double a=arm*Math.PI*2/8;
-            Vec3 root=new Vec3(Math.cos(a)*rx*.65,.11+pull,Math.sin(a)*rz*.65);
-            Vec3 end=gait==null?new Vec3(Math.cos(a)*(fatal?.95:.82),.025,Math.sin(a)*(fatal?.95:.82))
-                    :gait.tip(arm).subtract(worldBody).yRot((float)Math.toRadians(yaw));
-            Vec3 d=end.subtract(root),side=new Vec3(-d.z,0,d.x).normalize();
-            boolean stepping=gait!=null&&gait.swinging(arm);
-            Vec3[] points=new Vec3[17];
-            for(int j=0;j<points.length;j++){
-                double t=j/16D,envelope=Math.sin(t*Math.PI);
-                // All waves vanish at the contact point: planted tips cannot skate.
-                double curl=(.10*Math.sin(t*Math.PI*2+arm*.85)+(.04+(stepping?.09:0))*Math.sin(time*.12-arm*.7-t*5))*envelope;
-                points[j]=root.lerp(end,t).add(side.scale(curl)).add(0,envelope*(stepping?.12:.035),0);
-            }
-            strand(s,out,light,points,fatal?.062:.09,.009);
+        // A single connected stepped liquid surface. Motion deforms its volume;
+        // these are broad pixel lobes, not eight independently walking tentacles.
+        double length=(1+movement*.65)*stretch,width=1/Math.sqrt(length);
+        for(int x=-4;x<=4;x++)for(int z=-4;z<=4;z++){
+            double nx=x/4.4,nz=z/4.4,edge=nx*nx+nz*nz;
+            double ripple=.06*Math.sin(time*.10+x*.8+z*.55);
+            if(edge>1+ripple)continue;
+            double height=.045+.22*Math.pow(Math.max(0,1-edge),.65)+.012*Math.sin(time*.16-z*.7+x*.4);
+            double cx=x*.085*width,cz=z*.085*length-movement*.055;
+            int color=(x+z)%3==0?0xff343034:(x-z)%4==0?0xff29272b:0xff201e23;
+            box(s,out,light,cx-.044*width,.015,cz-.044*length,cx+.044*width,height,cz+.044*length,color);
+            if(edge<.65&&(x*7+z*3)%11==0)
+                box(s,out,light,cx-.018,height,cz-.035,cx+.018,height+.009,cz+.035,0xff80313b);
+        }
+        // Short overlapping tail cells flatten as the body accelerates and fold back when stopped.
+        for(int i=0;movement>.01&&i<5;i++){
+            double tail=movement*(1-i*.14),z=-.28*length-i*.075*movement;
+            double half=.11*tail+.025,side=Math.sin(time*.11-i*.6)*.045*movement;
+            box(s,out,light,side-half,.016,z-.06,side+half,.035+tail*.035,z+.06,0xff282329);
         }
     }
     public static void ellipsoid(PoseStack s,VertexConsumer out,int light,Vec3 c,double rx,double ry,double rz,double time,int color){

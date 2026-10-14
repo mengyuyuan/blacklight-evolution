@@ -36,6 +36,7 @@ public final class BlacklightNeoMod {
         ModParticles.register(modBus);
         ModNetwork.register();
         modBus.addListener((net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent event)->event.enqueueWork(()->{
+            com.codex.blacklight.power.BiomassRules.initialize();
             com.codex.blacklight.animation.MotionLibrary.requireInstalled();
             var health=(net.minecraft.world.entity.ai.attributes.RangedAttribute)net.minecraft.world.entity.ai.attributes.Attributes.MAX_HEALTH;
             ((com.codex.blacklight.mixin.HealthAttributeLimitAccessor)health).blacklight$setMaximum(Math.max(health.getMaxValue(),1000000));

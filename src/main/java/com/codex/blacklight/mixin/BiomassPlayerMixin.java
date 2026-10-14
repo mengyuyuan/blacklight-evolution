@@ -15,10 +15,10 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 public abstract class BiomassPlayerMixin {
     @Inject(method="getDimensions",at=@At("HEAD"),cancellable=true)
     private void blacklight$liquidSize(Pose pose,CallbackInfoReturnable<EntityDimensions> ci){
-        if(BiomassSystem.active((Player)(Object)this))ci.setReturnValue(EntityDimensions.scalable(.8F,.3F));
+        if(BiomassSystem.active((Player)(Object)this))ci.setReturnValue(EntityDimensions.scalable(com.codex.blacklight.power.BiomassEvolution.width((Player)(Object)this),com.codex.blacklight.power.BiomassEvolution.height((Player)(Object)this)));
     }
     @Inject(method="getStandingEyeHeight",at=@At("HEAD"),cancellable=true)
-    private void blacklight$liquidEye(Pose pose,EntityDimensions size,CallbackInfoReturnable<Float> ci){if(BiomassSystem.active((Player)(Object)this))ci.setReturnValue(.23F);}
+    private void blacklight$liquidEye(Pose pose,EntityDimensions size,CallbackInfoReturnable<Float> ci){if(BiomassSystem.active((Player)(Object)this))ci.setReturnValue(com.codex.blacklight.power.BiomassEvolution.height((Player)(Object)this)*.77F);}
     @Inject(method="getSpeed",at=@At("HEAD"),cancellable=true)
     private void blacklight$liquidSpeed(CallbackInfoReturnable<Float> ci){
         var state=BiomassSystem.state((Player)(Object)this);

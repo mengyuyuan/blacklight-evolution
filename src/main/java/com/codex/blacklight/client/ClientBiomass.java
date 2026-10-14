@@ -13,7 +13,7 @@ import net.minecraftforge.client.event.MovementInputUpdateEvent;
 
 @EventBusSubscriber(modid="blacklight",value=Dist.CLIENT)
 public final class ClientBiomass {
-    private static final java.util.Map<Player,Boolean> SIZES=new java.util.WeakHashMap<>();
+    private static final java.util.Map<Player,Float> SIZES=new java.util.WeakHashMap<>();
     private static Player cameraOwner;
     private static CameraType previousCamera;
     @SubscribeEvent public static void tick(net.minecraftforge.event.TickEvent.ClientTickEvent e){if(e.phase!=net.minecraftforge.event.TickEvent.Phase.END)return;
@@ -21,7 +21,8 @@ public final class ClientBiomass {
         if(mc.level==null){SIZES.clear();cameraOwner=null;previousCamera=null;return;}
         for(var p:mc.level.players()){
             boolean active=BiomassSystem.active(p);
-            if(SIZES.getOrDefault(p,false)!=active){p.refreshDimensions();SIZES.put(p,active);}
+            float size=active?com.codex.blacklight.power.BiomassEvolution.scale(p):0;
+            if(SIZES.getOrDefault(p,0F)!=size){p.refreshDimensions();SIZES.put(p,size);}
         }
         if(mc.player!=null&&BiomassSystem.active(mc.player)){
             if(cameraOwner!=mc.player){cameraOwner=mc.player;previousCamera=mc.options.getCameraType();mc.options.setCameraType(CameraType.THIRD_PERSON_BACK);}

@@ -5,7 +5,7 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.network.FriendlyByteBuf;
 import com.codex.blacklight.forge.codec.*;
 public record GrowthProgress(int upgrades,int absorbed) {
-    public GrowthProgress {upgrades&=511;absorbed=com.codex.blacklight.util.MathCompat.clamp(absorbed,0,1000000);}
+    public GrowthProgress {upgrades&=32767;absorbed=com.codex.blacklight.util.MathCompat.clamp(absorbed,0,1000000);}
     public static final GrowthProgress EMPTY=new GrowthProgress(0,0);
     public static final Codec<GrowthProgress> CODEC=RecordCodecBuilder.create(i->i.group(Codec.INT.optionalFieldOf("upgrades",0).forGetter(GrowthProgress::upgrades),Codec.INT.optionalFieldOf("absorbed",0).forGetter(GrowthProgress::absorbed)).apply(i,GrowthProgress::new));
     public static final StreamCodec<FriendlyByteBuf,GrowthProgress> STREAM_CODEC=StreamCodec.composite(ByteBufCodecs.VAR_INT,GrowthProgress::upgrades,ByteBufCodecs.VAR_INT,GrowthProgress::absorbed,GrowthProgress::new);
