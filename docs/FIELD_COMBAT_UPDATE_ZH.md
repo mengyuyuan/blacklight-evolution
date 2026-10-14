@@ -37,3 +37,7 @@
 2026-10-14：NeoForge 1.21.1（0.3.4-dev.1）和 Forge 1.20.1（0.3.0-forge-1.20.1-dev.6）均通过离线 assemble；每版252个动作／配置资源通过完整性检查。已逐字节核对成品中20个本轮新增或修改的资源，并确认新增运行类、据点NBT版本、25×9×25尺寸和4名步兵＋1名重装兵配置。未运行游戏内试玩、专用服务器或多人验收；模型手感、据点生成与整合包兼容需要实际试玩确认。属于开发包，不作为正式稳定版发布。
 
 可编辑源：`tools/build_blackwatch_outpost.py`（结构NBT）、`tools/build_blackwatch_assets.py`（像素图集）、`BlackwatchModel.java`（方块几何与姿态）。
+
+## Forge dev.7：玩家移除后的崩溃修复
+
+本机 dev.6 试玩日志显示，执行清除实体（包含玩家）后，Forge 已移除玩家并使 capability 失效，PlayerTickEvent 仍进入利爪更新，触发 Missing Blacklight entity capability；退出清理也访问同一个失效对象。dev.7 在玩家更新入口检查数据是否可用，并先释放抓取／攻击会话，再跳过旧玩家数据读写；动画、锁定、肾上腺素及方块持有状态的退出清理同样检查生命周期。不复活已移除玩家的 capability，不用临时默认存储掩盖持久数据问题。此问题来自 Forge capability 生命周期，NeoForge 没有相同的存储实现。

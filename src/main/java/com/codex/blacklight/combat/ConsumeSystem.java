@@ -213,7 +213,8 @@ public final class ConsumeSystem {
         player.level().playSound(null, target.blockPosition(), SoundEvents.SCULK_CATALYST_BLOOM, SoundSource.PLAYERS, .9F, .65F);
     }
 
-    @SubscribeEvent public static void tick(PlayerTickEvent event) {if(event.phase != net.minecraftforge.event.TickEvent.Phase.END)return;
+    @SubscribeEvent public static void tick(PlayerTickEvent event) {
+        if (!com.codex.blacklight.registry.ModAttachments.available(event.player)) { if (event.player instanceof net.minecraft.server.level.ServerPlayer removed) cancel(removed); return; }if(event.phase != net.minecraftforge.event.TickEvent.Phase.END)return;
         if (!(event.player instanceof ServerPlayer player)) return;
         var recovery=com.codex.blacklight.registry.ModAttachments.getData(player, ModAttachments.CONSUME_RECOVERY);
         if(recovery.active() && (recovery.phaseProgress(player.level().getGameTime(),0)>=1

@@ -190,7 +190,8 @@ public final class DisguiseSystem {
                 &&e.getEntity() instanceof Projectile shot&&shot.getOwner() instanceof ServerPlayer p)
             DisguiseAwareness.shot(shot,p);
     }
-    @SubscribeEvent public static void tick(PlayerTickEvent e){if(e.phase != net.minecraftforge.event.TickEvent.Phase.END)return;
+    @SubscribeEvent public static void tick(PlayerTickEvent e){
+        if (!com.codex.blacklight.registry.ModAttachments.available(e.player)) { return; }if(e.phase != net.minecraftforge.event.TickEvent.Phase.END)return;
         if(!(e.player instanceof ServerPlayer p))return;
         var s=com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.PLAYER_STATE);var m=com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.DISGUISE_MORPH);
         long now=p.level().getGameTime();

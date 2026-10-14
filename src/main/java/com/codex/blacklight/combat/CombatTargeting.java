@@ -46,6 +46,7 @@ public final class CombatTargeting {
         } else {LOCKS.remove(player);syncLock(player,-1);}
     }
     private static void syncLock(ServerPlayer player,int id) {
+        if (!ModAttachments.available(player)) return;
         if(com.codex.blacklight.registry.ModAttachments.getData(player, ModAttachments.TARGET_LOCK_ID)==id)return;
         com.codex.blacklight.registry.ModAttachments.setData(player, ModAttachments.TARGET_LOCK_ID,id);
         if(!player.isRemoved())com.codex.blacklight.registry.ModAttachments.syncData(player, ModAttachments.TARGET_LOCK_ID);

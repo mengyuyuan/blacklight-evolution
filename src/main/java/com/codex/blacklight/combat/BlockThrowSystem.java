@@ -47,6 +47,7 @@ public final class BlockThrowSystem {
         return true;
     }
     public static void clear(ServerPlayer p){
+        if (!ModAttachments.available(p)) return;
         ModAttachments.setData(p,ModAttachments.CONSUMING,false);ModAttachments.syncData(p,ModAttachments.CONSUMING);
         ModAttachments.setData(p,ModAttachments.GRAB_STAGE,ConsumeVisual.NONE);ModAttachments.syncData(p,ModAttachments.GRAB_STAGE);
     }

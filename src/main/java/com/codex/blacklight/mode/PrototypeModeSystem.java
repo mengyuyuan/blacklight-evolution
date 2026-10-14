@@ -52,7 +52,8 @@ public final class PrototypeModeSystem {
 
     /** Keeps the presentation engine aligned so B is the only authoritative mode switch. */
     @SubscribeEvent
-    public static void onPlayerTick(PlayerTickEvent event) {if(event.phase != net.minecraftforge.event.TickEvent.Phase.END)return;
+    public static void onPlayerTick(PlayerTickEvent event) {
+        if (!com.codex.blacklight.registry.ModAttachments.available(event.player)) { return; }if(event.phase != net.minecraftforge.event.TickEvent.Phase.END)return;
         if (!(event.player instanceof ServerPlayer player)) return;
         BlacklightState state = com.codex.blacklight.registry.ModAttachments.getData(player, ModAttachments.PLAYER_STATE);
         synchronizePresentationMode(player, state.isInfected() && state.isPrototypeMode());

@@ -118,7 +118,8 @@ public final class PrototypeMovementSystem {
     }
 
     @SubscribeEvent
-    public static void onPlayerTick(PlayerTickEvent event) {if(event.phase != net.minecraftforge.event.TickEvent.Phase.END)return;
+    public static void onPlayerTick(PlayerTickEvent event) {
+        if (!com.codex.blacklight.registry.ModAttachments.available(event.player)) { return; }if(event.phase != net.minecraftforge.event.TickEvent.Phase.END)return;
         if (!(event.player instanceof ServerPlayer player)) return;
         if (com.codex.blacklight.registry.ModAttachments.getData(player, ModAttachments.CONSUMING)&&com.codex.blacklight.combat.ConsumeVisual.blocksInput(com.codex.blacklight.registry.ModAttachments.getData(player, ModAttachments.GRAB_STAGE))) return;
         MovementState movement = com.codex.blacklight.registry.ModAttachments.getData(player, ModAttachments.MOVEMENT_STATE);
