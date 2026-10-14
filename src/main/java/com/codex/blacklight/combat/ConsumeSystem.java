@@ -192,7 +192,7 @@ public final class ConsumeSystem {
                             .thenComparingDouble(h->CombatTargeting.distanceSquared(player.getEyePosition(),h))
                             .thenComparingInt(Mob::getId)).orElse(null);
         }
-        if (target == null) { message(player, "consume_no_target"); return; }
+        if (target == null) { if(locked==null&&BlockThrowSystem.request(player))return; message(player, "consume_no_target"); return; }
         if (!healthReady(target)) { message(player, "consume_weaken"); return; }
         if(!canStartGroundGrab(player)&&!ConsumeSequence.large(target)) {
             message(player,"grab_ground");return;

@@ -40,7 +40,7 @@ public record DisguiseIdentity(String type, String family, CompoundTag appearanc
     public static DisguiseIdentity capture(Mob mob) {
         var id=BuiltInRegistries.ENTITY_TYPE.getKey(mob.getType());
         // Bosses, giants and custom infected bodies are not civilian identities.
-        if(!id.getNamespace().equals("minecraft")||mob.getBbHeight()>3||mob.getBbWidth()>2.5
+        if((!id.getNamespace().equals("minecraft")&&!(mob instanceof com.codex.blacklight.entity.BlackwatchSoldier))||mob.getBbHeight()>3||mob.getBbWidth()>2.5
                 ||mob.getType()==EntityType.WITHER||mob.getType()==EntityType.ENDER_DRAGON
                 ||mob.getType()==EntityType.WARDEN||mob.getType()==EntityType.IRON_GOLEM
                 ||mob.getType()==EntityType.RAVAGER)return EMPTY;
@@ -50,7 +50,7 @@ public record DisguiseIdentity(String type, String family, CompoundTag appearanc
         if(mob instanceof net.minecraft.world.entity.animal.Sheep sheep){
             appearance.putByte("Color",(byte)sheep.getColor().getId());appearance.putBoolean("Sheared",sheep.isSheared());
         }
-        String family=mob instanceof Zombie||mob instanceof AbstractSkeleton?"undead":
+        String family=mob instanceof com.codex.blacklight.entity.BlackwatchSoldier?"blackwatch":mob instanceof Zombie||mob instanceof AbstractSkeleton?"undead":
                 mob instanceof AbstractIllager?"illager":mob instanceof AbstractVillager?"civilian":
                 mob instanceof Animal?"animal":"other";
         return new DisguiseIdentity(id.toString(),family,appearance);

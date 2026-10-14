@@ -19,7 +19,7 @@ public final class GrabHud {
         if(mc.player==null||mc.screen!=null||mc.options.hideGui)return;
         int stage=com.codex.blacklight.registry.ModAttachments.getData(mc.player, ModAttachments.GRAB_STAGE);
         if(!ConsumeVisual.holding(stage))return;
-        event.getGuiGraphics().drawCenteredString(mc.font,Component.translatable(stage==ConsumeVisual.MOUNT_HOLD?"message.blacklight.grab_mounted":"message.blacklight.grab_held"),
+        event.getGuiGraphics().drawCenteredString(mc.font,Component.translatable(com.codex.blacklight.combat.BlockThrowSystem.held(mc.player)!=null?"message.blacklight.block_held":stage==ConsumeVisual.MOUNT_HOLD?"message.blacklight.grab_mounted":"message.blacklight.grab_held"),
                 mc.getWindow().getGuiScaledWidth()/2,mc.getWindow().getGuiScaledHeight()/2+42,0xffe5ddd7);
     }
 }

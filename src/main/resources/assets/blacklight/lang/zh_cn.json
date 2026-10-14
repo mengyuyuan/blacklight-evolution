@@ -302,5 +302,19 @@
   "screen.blacklight.setting_on": "已开启 · 点击关闭",
   "screen.blacklight.setting_off": "已关闭 · 点击开启",
   "setting.blacklight.bulletdive_blocks": "子弹俯冲 · 方块破坏",
-  "setting.blacklight.bulletdive_blocks.desc": "落地按真实落差破坏方块，并产生破碎效果和掉落。关闭后保留伤害与冲击。遵循世界掉落规则，选择会保存。"
+  "setting.blacklight.bulletdive_blocks.desc": "落地按真实落差破坏方块，并产生破碎效果和掉落。关闭后保留伤害与冲击。遵循世界掉落规则，选择会保存。",
+  "message.blacklight.block_held": "搬运方块 · [左键 / E] 投掷  [右键] 放下",
+  "entity.blacklight.blackwatch_soldier": "黑色守望步兵",
+  "item.blacklight.blackwatch_soldier_spawn_egg": "黑色守望步兵刷怪蛋",
+  "entity.blacklight.blackwatch_heavy": "黑色守望重装兵",
+  "item.blacklight.blackwatch_heavy_spawn_egg": "黑色守望重装兵刷怪蛋",
+  "item.blacklight.military_circuit": "军用电路模块",
+  "entity.blacklight.thrown_block": "投掷方块",
+  "item.blacklight.field_scanner": "野战感染探测器",
+  "message.blacklight.scan_clear": "48 格内未检测到感染生命",
+  "message.blacklight.scan_found": "感染信号：%1$s · %2$s 米 · %3$s",
+  "direction.blacklight.east": "东",
+  "direction.blacklight.west": "西",
+  "direction.blacklight.south": "南",
+  "direction.blacklight.north": "北"
 }

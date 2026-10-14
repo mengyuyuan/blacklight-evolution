@@ -302,5 +302,19 @@
   "screen.blacklight.setting_on": "On · turn off",
   "screen.blacklight.setting_off": "Off · turn on",
   "setting.blacklight.bulletdive_blocks": "Bulletdive · block breaking",
-  "setting.blacklight.bulletdive_blocks.desc": "Breaks blocks with debris and drops based on the actual fall. Turning this off preserves damage and impact effects. World drop rules apply. Your choice is saved."
+  "setting.blacklight.bulletdive_blocks.desc": "Breaks blocks with debris and drops based on the actual fall. Turning this off preserves damage and impact effects. World drop rules apply. Your choice is saved.",
+  "message.blacklight.block_held": "Carrying block · [Attack / Grab] Throw  [Use] Drop",
+  "entity.blacklight.blackwatch_soldier": "Blackwatch Rifleman",
+  "item.blacklight.blackwatch_soldier_spawn_egg": "Blackwatch Rifleman Spawn Egg",
+  "entity.blacklight.blackwatch_heavy": "Blackwatch Heavy",
+  "item.blacklight.blackwatch_heavy_spawn_egg": "Blackwatch Heavy Spawn Egg",
+  "item.blacklight.military_circuit": "Military Circuit",
+  "entity.blacklight.thrown_block": "Thrown Block",
+  "item.blacklight.field_scanner": "Field Infection Scanner",
+  "message.blacklight.scan_clear": "No infected life within 48 blocks",
+  "message.blacklight.scan_found": "Infected: %1$s · %2$s m · %3$s",
+  "direction.blacklight.east": "East",
+  "direction.blacklight.west": "West",
+  "direction.blacklight.south": "South",
+  "direction.blacklight.north": "North"
 }

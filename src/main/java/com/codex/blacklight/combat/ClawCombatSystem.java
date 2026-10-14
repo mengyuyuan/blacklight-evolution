@@ -49,6 +49,12 @@ public final class ClawCombatSystem {
     }
 
     public static void handle(ServerPlayer player, ClawActionPayload.Action request) {
+        var heldBlock=BlockThrowSystem.held(player);
+        if(heldBlock!=null){
+            if(request==ClawActionPayload.Action.GRAB||request==ClawActionPayload.Action.THROW||request==ClawActionPayload.Action.ATTACK)heldBlock.throwFrom(player);
+            else if(request==ClawActionPayload.Action.CONSUME)heldBlock.drop();
+            return;
+        }
         if (request == ClawActionPayload.Action.GRAB) { ConsumeSystem.request(player); return; }
         if (request == ClawActionPayload.Action.CONSUME) { ConsumeSystem.consume(player); return; }
         if (request == ClawActionPayload.Action.THROW) { ConsumeSystem.throwTarget(player); return; }

@@ -15,23 +15,26 @@ public final class GrabHoldPose {
     public static void apply(LivingEntity player,com.codex.blacklight.animation.BlacklightSkeleton armature,BlacklightPose pose,float partial) {
         int stage=com.codex.blacklight.registry.ModAttachments.getData(player, ModAttachments.GRAB_STAGE);
         if(stage==ConsumeVisual.NONE||stage==ConsumeVisual.CONSUME||com.codex.blacklight.combat.ConsumeSequence.mountedStage(stage))return;
-        boolean blade=com.codex.blacklight.registry.ModAttachments.getData(player, ModAttachments.PLAYER_STATE).getActivePower()==PowerForm.BLADE;
+        boolean blade=com.codex.blacklight.registry.ModAttachments.getData(player, ModAttachments.PLAYER_STATE).getActivePower()==PowerForm.BLADE&&(!(player instanceof net.minecraft.world.entity.player.Player p)||com.codex.blacklight.combat.BlockThrowSystem.held(p)==null);
         var held=player.level().getEntitiesOfClass(LivingEntity.class,player.getBoundingBox().inflate(4),e->{
             var visual=com.codex.blacklight.registry.ModAttachments.getData(e, ModAttachments.CONSUME_VISUAL);
             return visual.consumerId()==player.getId()&&(visual.stage()==ConsumeVisual.HOLD || blade &&
                     (visual.stage()==ConsumeVisual.CONSUME || visual.stage()==ConsumeVisual.THROW || visual.stage()==ConsumeVisual.CAPTURE &&
                      visual.phaseProgress(player.level().getGameTime(),partial)>=.6F));
         });
-        if(held.isEmpty())return;
-        var mob=held.get(0);
+        var carried=player instanceof net.minecraft.world.entity.player.Player p?com.codex.blacklight.combat.BlockThrowSystem.held(p):null;
+        if(carried!=null&&carried.throwing())return;
+        if(held.isEmpty()&&carried==null)return;
+        var mob=held.isEmpty()?null:held.get(0);
         float yaw=Mth.rotLerp(partial,player.yRotO,player.getYRot());
         float pitch=Mth.lerp(partial,player.xRotO,player.getXRot());
         var forward=Vec3.directionFromRotation(0,yaw);
         var left=new Vec3(forward.z,0,-forward.x);
-        var ownerPos=player.getPosition(partial);var mobPos=mob.getPosition(partial);
+        var ownerPos=player.getPosition(partial);var mobPos=mob==null?ownerPos:mob.getPosition(partial);
         double gripHeight=net.minecraft.util.Mth.clamp(GrabPlacement.palm(ownerPos,yaw,pitch).y-mobPos.y,
-                mob.getBbHeight()*.15,mob.getBbHeight()*.85);
-        var target=mobPos.add(0,gripHeight,0).subtract(forward.scale(mob.getBbWidth()*.4)).subtract(ownerPos);
+                mob==null?0:mob.getBbHeight()*.15,mob==null?2:mob.getBbHeight()*.85);
+        var target=mobPos.add(0,gripHeight,0).subtract(forward.scale((mob==null?0:mob.getBbWidth()*.4))).subtract(ownerPos);
+        if(carried!=null)target=GrabPlacement.palm(ownerPos,yaw,pitch).subtract(ownerPos);
         if(blade) {
             var visual=com.codex.blacklight.registry.ModAttachments.getData(mob, ModAttachments.CONSUME_VISUAL);
             float progress=visual.consuming()?visual.progress(player.level().getGameTime(),partial):0;
