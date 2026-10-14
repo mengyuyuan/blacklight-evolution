@@ -51,8 +51,8 @@ public final class UpgradeScreen extends Screen {
             case MOVEMENT -> {for(var u:MovementUpgrade.values())entries.add(new Entry(u.id(),u.epCost(),u.requires()==null?null:u.requires().id(),false));}
             case CLAW -> {entries.add(new Entry("groundspike",0,null,true));for(var u:ClawUpgrade.values())entries.add(new Entry(u.id(),u.epCost(),null,false));}
             case FORMS -> {for(var u:List.of(PowerForm.CLAWS,PowerForm.HAMMERFISTS,PowerForm.BLADE,PowerForm.WHIPFIST,PowerForm.MUSCLE_MASS))entries.add(new Entry(u.id(),u.epCost(),null,u==PowerForm.CLAWS));}
-            case COMBAT -> {for(var u:CombatSkill.values())if(!u.shieldBorer())entries.add(new Entry(u.id(),u.epCost(),u.requires()!=null?u.requires().id():u.movementRequires()!=null?u.movementRequires().id():null,false));}
-            case UTILITY -> {for(var u:List.of(PowerForm.SHIELD,PowerForm.ARMOR,PowerForm.THERMAL_VISION,PowerForm.INFECTED_VISION))entries.add(new Entry(u.id(),u.epCost(),null,false));for(var u:CombatSkill.values())if(u.shieldBorer())entries.add(new Entry(u.id(),u.epCost(),u.requires()==null?PowerForm.SHIELD.id():u.requires().id(),false));}
+            case COMBAT -> {for(var u:CombatSkill.values())if(!u.shieldBorer())entries.add(new Entry(u.id(),u.epCost(),u.requires()!=null?u.requires().id():u.movementRequires()!=null?u.movementRequires().id():u.powerRequires()!=null?u.powerRequires().id():null,false));}
+            case UTILITY -> {for(var u:List.of(PowerForm.SHIELD,PowerForm.ARMOR,PowerForm.THERMAL_VISION,PowerForm.INFECTED_VISION,PowerForm.BIOMASS))entries.add(new Entry(u.id(),u.epCost(),null,false));for(var u:CombatSkill.values())if(u.shieldBorer())entries.add(new Entry(u.id(),u.epCost(),u.requires()==null?PowerForm.SHIELD.id():u.requires().id(),false));}
             case BIOLOGY -> {for(var u:GrowthUpgrade.values())entries.add(new Entry(u.id,u.cost,u.requires()==null?null:u.requires().id,false));}
             case SETTINGS -> {for(String id:List.of("bulletdive_blocks","shield_borer_blocks"))entries.add(new Entry(id,0,null,true));}
             default -> {}
@@ -69,7 +69,7 @@ public final class UpgradeScreen extends Screen {
     private static BlacklightState state(){var p=Minecraft.getInstance().player;return p==null?null:com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.PLAYER_STATE);}
     private boolean owns(Entry e){return e.free||owned(state(),e.id);}
     private boolean prerequisite(Entry e){return e.required==null||owned(state(),e.required);}
-    private int balance(){var s=state();return s==null?0:category==Category.BIOLOGY?s.getBiomass():s.getEvolutionPoints();}
+    private int balance(){var s=state();return s==null?0:s.getEvolutionPoints();}
     private void activate(){
         var e=entry();if(e==null||minecraft.player==null)return;
         if(category==Category.SETTINGS){
@@ -90,13 +90,13 @@ public final class UpgradeScreen extends Screen {
             purchase.setMessage(Component.translatable(on?"screen.blacklight.setting_on":"screen.blacklight.setting_off"));purchase.active=minecraft.player!=null;return;
         }
         purchase.active=minecraft.player!=null&&!owns(e)&&prerequisite(e)&&balance()>=e.cost;
-        purchase.setMessage(Component.translatable(owns(e)?"screen.blacklight.state_owned":!prerequisite(e)?"screen.blacklight.requires_short":category==Category.BIOLOGY?"screen.blacklight.biomass_cost":"screen.blacklight.state_cost",e.cost));
+        purchase.setMessage(Component.translatable(owns(e)?"screen.blacklight.state_owned":!prerequisite(e)?"screen.blacklight.requires_short":"screen.blacklight.state_cost",e.cost));
     }
     @Override public void renderBackground(GuiGraphics g){}
     @Override public void render(GuiGraphics g,int mx,int my,float partial){
         g.fill(0,0,width,height,BG);g.fill(0,0,rail,height,0xFF0B0C0E);g.fill(0,37,width,38,0xFF74302D);
         g.fill(10,10,13,27,RED);g.drawString(font,title,20,13,TEXT,false);
-        var ep=Component.translatable(category==Category.BIOLOGY?"screen.blacklight.biomass_balance":"screen.blacklight.ep_balance",balance());
+        var ep=Component.translatable("screen.blacklight.ep_balance",balance());
         if(width>460)g.drawString(font,ep,width-126-font.width(ep),14,0xFFE6C68A,false);
         int step=Math.max(14,Math.min(27,(height-54)/Category.values().length)),y=TOP;
         for(var c:Category.values()){

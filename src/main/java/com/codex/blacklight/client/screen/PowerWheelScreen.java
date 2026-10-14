@@ -16,7 +16,7 @@ import com.codex.blacklight.forge.PacketDistributor;
 public final class PowerWheelScreen extends Screen {
     private final KeyMapping binding;
     private int selected=-1;
-    private boolean submitted,utility;
+    private boolean submitted,utility,scrollSelection;
     private PowerForm heldForm;
     private int heldTicks;
     public PowerWheelScreen(KeyMapping binding){super(Component.translatable("screen.blacklight.wheel"));this.binding=binding;}
@@ -39,7 +39,7 @@ public final class PowerWheelScreen extends Screen {
         var state=com.codex.blacklight.registry.ModAttachments.getData(minecraft.player, ModAttachments.PLAYER_STATE);
         int cx=width/2,cy=height/2;
         float outer=Math.min(125,Math.min(width*.34F,height*.36F)),inner=outer*.39F;
-        selected=PowerWheel.sector(mouseX-cx,mouseY-cy,inner,outer+12,utility);
+        if(!scrollSelection)selected=PowerWheel.sector(mouseX-cx,mouseY-cy,inner,outer+12,utility);
         g.fill(0,0,width,height,0x6506090d);g.flush();
         RenderSystem.enableBlend();RenderSystem.defaultBlendFunc();RenderSystem.disableCull();RenderSystem.setShader(GameRenderer::getPositionColorShader);
         var mesh=Tesselator.getInstance().getBuilder();mesh.begin(VertexFormat.Mode.TRIANGLES,DefaultVertexFormat.POSITION_COLOR);
@@ -82,6 +82,7 @@ public final class PowerWheelScreen extends Screen {
         }
         onClose();
     }
+    @Override public boolean mouseScrolled(double x,double y,double vertical){if(vertical==0)return false;scrollSelection=true;selected=Math.floorMod(selected+(vertical>0?-1:1),PowerWheel.size(utility));return true;}
     @Override public boolean keyPressed(int key,int scan,int mods){if(key==org.lwjgl.glfw.GLFW.GLFW_KEY_TAB){utility=!utility;selected=-1;return true;}return super.keyPressed(key,scan,mods);}
     @Override public boolean keyReleased(int key,int scan,int mods){if(binding.matches(key,scan)){confirm();return true;}return super.keyReleased(key,scan,mods);}
     @Override public boolean mouseReleased(double x,double y,int button){if(binding.matchesMouse(button)){confirm();return true;}return super.mouseReleased(x,y,button);}

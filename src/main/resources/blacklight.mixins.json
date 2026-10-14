@@ -19,7 +19,9 @@
     "WaterRunningEntityMixin",
     "WaterRunningBlockMixin",
     "NativeRootMovementMixin",
-    "ConsumeStunMixin"
+    "ConsumeStunMixin",
+    "BiomassPlayerMixin",
+    "BiomassPreyMixin"
   ],
   "client": [
     "client.PostChainAccess",
@@ -41,7 +43,8 @@
     "client.ModelPartChildrenAccessor",
     "client.DragonConsumePoseMixin",
     "client.VictimModelRootMixin",
-    "client.BulletFlightCullingMixin"
+    "client.BulletFlightCullingMixin",
+    "client.BlockCarryItemMixin"
   ],
   "injectors": {
     "defaultRequire": 1

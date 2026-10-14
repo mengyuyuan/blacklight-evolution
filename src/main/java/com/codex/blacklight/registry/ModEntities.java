@@ -54,11 +54,13 @@ public final class ModEntities {
     public static final RegistryObject<EntityType<com.codex.blacklight.entity.ThrownBlock>> THROWN_BLOCK=ENTITIES.register("thrown_block",()->EntityType.Builder.<com.codex.blacklight.entity.ThrownBlock>of(com.codex.blacklight.entity.ThrownBlock::new,MobCategory.MISC).sized(.9F,.9F).clientTrackingRange(10).updateInterval(1).build("thrown_block"));
     public static final RegistryObject<EntityType<com.codex.blacklight.entity.BlackwatchSoldier>> BLACKWATCH_SOLDIER=ENTITIES.register("blackwatch_soldier",()->EntityType.Builder.<com.codex.blacklight.entity.BlackwatchSoldier>of(com.codex.blacklight.entity.BlackwatchSoldier::new,MobCategory.MONSTER).sized(.6F,1.95F).clientTrackingRange(10).updateInterval(2).build("blackwatch_soldier"));
     public static final RegistryObject<EntityType<com.codex.blacklight.entity.BlackwatchSoldier>> BLACKWATCH_HEAVY=ENTITIES.register("blackwatch_heavy",()->EntityType.Builder.<com.codex.blacklight.entity.BlackwatchSoldier>of(com.codex.blacklight.entity.BlackwatchSoldier::new,MobCategory.MONSTER).sized(.6F,1.95F).clientTrackingRange(10).updateInterval(2).build("blackwatch_heavy"));
+    public static final RegistryObject<EntityType<com.codex.blacklight.entity.BiomassHusk>> BIOMASS_HUSK=ENTITIES.register("biomass_husk",()->EntityType.Builder.<com.codex.blacklight.entity.BiomassHusk>of(com.codex.blacklight.entity.BiomassHusk::new,MobCategory.MISC).sized(.6F,1.8F).clientTrackingRange(10).updateInterval(2).build("biomass_husk"));
     private ModEntities() {
     }
 
     public static void register(IEventBus bus) {
         ENTITIES.register(bus);
+        bus.addListener((net.minecraftforge.event.entity.EntityAttributeCreationEvent e)->e.put(BIOMASS_HUSK.get(),com.codex.blacklight.entity.BiomassHusk.attributes().build()));
         bus.addListener((net.minecraftforge.event.entity.EntityAttributeCreationEvent event)->{
             event.put(BLACKWATCH_SOLDIER.get(),com.codex.blacklight.entity.BlackwatchSoldier.attributes(false).build());
             event.put(BLACKWATCH_HEAVY.get(),com.codex.blacklight.entity.BlackwatchSoldier.attributes(true).build());
