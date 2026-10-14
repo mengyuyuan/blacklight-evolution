@@ -1,8 +1,10 @@
-"""Export two private traversal clips; source assets and generated JSON stay local.
+"""Export Blacklight motion data with separate initial-source and project-adaptation metadata.
 
-Uses the existing local numpy_retarget engine. Does not reconstruct source engine
-collision, obstacle thresholds, random variants or movement state arbitration.
+Reads decoded source inputs and adapts them to Minecraft. This script does not
+claim the resulting motion was wholly authored from scratch, and does not upload files.
 """
+
+from motion_provenance import motion_notice, motion_provenance
 import argparse
 import hashlib
 import json
@@ -53,7 +55,7 @@ for name, source, end, seconds, owner in specs:
     tracks.append(dict(name="Coord", time=times, transform=[m.reshape(-1).tolist() for m in coords]))
     result = dict(format="MATRIX", animation=tracks,
                   blacklight=dict(durationTicks=math.ceil((times[-1] + .05) * 20 - .00001), transitionSeconds=.05),
-                  privateNotice="Original-derived, local only. Gameplay never applies diagnostic Coord.",
+                  privateNotice=motion_notice('Original-derived, local only. Gameplay never applies diagnostic Coord.'), provenance=motion_provenance(),
                   source=dict(animation=source, sha256=hashlib.sha256(raw).hexdigest(), owner=owner))
     (args.output / (name + ".json")).write_text(json.dumps(result, separators=(",", ":"), allow_nan=False), encoding="utf-8")
     print(name, "seconds", times[-1], "foot error", audit["footEndpointMaxError"])
