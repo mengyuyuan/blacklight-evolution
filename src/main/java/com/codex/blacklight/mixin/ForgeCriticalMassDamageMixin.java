@@ -15,6 +15,7 @@ public abstract class ForgeCriticalMassDamageMixin {
     @Inject(method="onLivingDamage",at=@At("RETURN"),cancellable=true)
     private static void blacklight$absorbFinal(LivingEntity entity,DamageSource source,float damage,
                                               CallbackInfoReturnable<Float> callback){
-        callback.setReturnValue(CriticalMassSystem.absorbFinalDamage(entity,source,callback.getReturnValue()));
+        float remaining = CriticalMassSystem.absorbFinalDamage(entity,source,callback.getReturnValue());
+        callback.setReturnValue(com.codex.blacklight.power.AdaptivePassiveSystem.finalDamage(entity,source,remaining));
     }
 }
