@@ -716,7 +716,8 @@
           "blend": 0
         }
       ],
-      "release": 0.6666666666666667
+      "release": 0.6666666666666667,
+      "inheritForearmLength": true
     },
     "hammer_drop": {
       "folder": "alex",
@@ -785,7 +786,206 @@
           "blend": 0
         }
       ],
-      "release": 0.6666666666666667
+      "release": 0.6666666666666667,
+      "projectScaleEnvelope": {
+        "evidence": {
+          "status": "project_authored_adaptation",
+          "bodyReference": "alex/alex_hammer_air_elbow has no SCL channels; FIG elbow_drop defines windup, charge, release, contact and recovery.",
+          "amplitudeReference": "Right Forarm_R 1.92578125 and Wrist_R 2.435546875 peaks verified in alex_hammerfist/alex_hammer_devastator; amplitudes reused as a visual reference, not claimed as native elbow-drop scaling.",
+          "scope": "Right striking arm only. Grow during windup/charge, hold through descent and contact, recover with body. No hitbox or damage changes."
+        },
+        "charge": [
+          {
+            "time": 0,
+            "values": [
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1
+            ]
+          },
+          {
+            "time": 0.4,
+            "values": [
+              1.2,
+              1.2,
+              1.2,
+              1.4,
+              1.4,
+              1.4,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1
+            ]
+          },
+          {
+            "time": 0.6666666666666666,
+            "values": [
+              1.92578125,
+              1.92578125,
+              1.92578125,
+              2.435546875,
+              2.435546875,
+              2.435546875,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1
+            ]
+          },
+          {
+            "time": 1.3333333333333333,
+            "values": [
+              1.92578125,
+              1.92578125,
+              1.92578125,
+              2.435546875,
+              2.435546875,
+              2.435546875,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1
+            ]
+          }
+        ],
+        "attack": [
+          {
+            "time": 0,
+            "values": [
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1
+            ]
+          },
+          {
+            "time": 0.4,
+            "values": [
+              1.2,
+              1.2,
+              1.2,
+              1.4,
+              1.4,
+              1.4,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1
+            ]
+          },
+          {
+            "time": 0.6666666666666666,
+            "values": [
+              1.92578125,
+              1.92578125,
+              1.92578125,
+              2.435546875,
+              2.435546875,
+              2.435546875,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1
+            ]
+          },
+          {
+            "time": 1.05,
+            "values": [
+              1.92578125,
+              1.92578125,
+              1.92578125,
+              2.435546875,
+              2.435546875,
+              2.435546875,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1
+            ]
+          },
+          {
+            "time": 2.2,
+            "values": [
+              1.92578125,
+              1.92578125,
+              1.92578125,
+              2.435546875,
+              2.435546875,
+              2.435546875,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1
+            ]
+          },
+          {
+            "time": 3.533333333333333,
+            "values": [
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1
+            ]
+          },
+          {
+            "time": 3.733333333333333,
+            "values": [
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1
+            ]
+          }
+        ]
+      }
     },
     "hammer_ram": {
       "folder": "alex_hammerfist",
