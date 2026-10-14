@@ -30,6 +30,7 @@ public final class StandalonePlayerRendering {
     @SubscribeEvent public static void hand(RenderHandEvent event) {
         var mc=net.minecraft.client.Minecraft.getInstance();var player=mc.player;
         if(player==null||player.isScoping()||!player.getData(ModAttachments.PLAYER_STATE).isPrototypeMode())return;
+        if(com.codex.blacklight.power.BiomassSystem.active(player)){event.setCanceled(true);return;}
         var form=player.getData(ModAttachments.PLAYER_STATE).getActivePower();
         var morph=WeaponMorphTracker.sample(player,event.getPartialTick());
         boolean biological=com.codex.blacklight.client.animation.WeaponMorphTiming.weapon(form)||morph.visible(false)||morph.visible(true);
@@ -84,6 +85,23 @@ public final class StandalonePlayerRendering {
         if(event.getRenderer() instanceof BlacklightPlayerRenderer)return;
         if(!(event.getEntity() instanceof AbstractClientPlayer player))return;
         float partial=event.getPartialTick();
+        if(com.codex.blacklight.power.BiomassSystem.active(player)){
+            event.setCanceled(true);
+            if(player==net.minecraft.client.Minecraft.getInstance().player&&net.minecraft.client.Minecraft.getInstance().gameRenderer.getMainCamera().getPosition().distanceToSqr(player.getPosition(partial).add(0,.15,0))<.16)return;
+            BiomassPlayerRendering.render(player,partial,event.getPoseStack(),event.getMultiBufferSource(),event.getPackedLight());
+            var slime=com.codex.blacklight.power.BiomassSystem.state(player);
+            if(slime.phase()==com.codex.blacklight.power.BiomassState.SHATTERING){
+                float f=slime.progress(player.level().getGameTime()+partial,com.codex.blacklight.power.BiomassState.SHATTER_TICKS);
+                var renderer=RENDERERS.get(player.getSkin().model());
+                if(renderer!=null&&f<.99F){var stack=event.getPoseStack();var fragments=new BiomassShatterBuffers(player,stack,event.getMultiBufferSource(),f,0,player.tickCount+partial);renderer.render(player,player.getYRot(),partial,stack,fragments,event.getPackedLight());fragments.finish();}
+            }
+            if(slime.phase()==com.codex.blacklight.power.BiomassState.REFORMING){
+                float f=slime.progress(player.level().getGameTime()+partial,com.codex.blacklight.power.BiomassState.REFORM_TICKS);
+                var renderer=RENDERERS.get(player.getSkin().model());
+                if(renderer!=null){var stack=event.getPoseStack();var coat=new BiomassCoatBuffers(player,stack,event.getMultiBufferSource(),1-f,0,player.tickCount+partial);renderer.render(player,player.getYRot(),partial,stack,coat,event.getPackedLight());coat.finish();}
+            }
+            return;
+        }
         var state=player.getData(ModAttachments.PLAYER_STATE);
         boolean active=state.isPrototypeMode()
                 ||UtilityPowerSystem.visualWeight(player,PowerForm.ARMOR,partial)>0

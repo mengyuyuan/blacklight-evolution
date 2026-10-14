@@ -35,6 +35,7 @@ public final class BlacklightNeoMod {
         ModParticles.register(modBus);
         modBus.addListener(ModNetwork::register);
         modBus.addListener((net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent event)->event.enqueueWork(()->{
+            com.codex.blacklight.power.BiomassRules.initialize();
             com.codex.blacklight.animation.MotionLibrary.requireInstalled();
             var health=(net.minecraft.world.entity.ai.attributes.RangedAttribute)net.minecraft.world.entity.ai.attributes.Attributes.MAX_HEALTH.value();
             ((com.codex.blacklight.mixin.HealthAttributeLimitAccessor)health).blacklight$setMaximum(Math.max(health.getMaxValue(),1000000));
@@ -55,6 +56,7 @@ public final class BlacklightNeoMod {
         NeoForge.EVENT_BUS.register(com.codex.blacklight.world.SurvivalGuide.class);
         NeoForge.EVENT_BUS.register(com.codex.blacklight.combat.ConsumeSystem.class);
         NeoForge.EVENT_BUS.register(com.codex.blacklight.combat.BlockThrowSystem.class);
+        NeoForge.EVENT_BUS.register(com.codex.blacklight.power.BiomassSystem.class);
         NeoForge.EVENT_BUS.register(ModNetwork.class);
         NeoForge.EVENT_BUS.register(com.codex.blacklight.disguise.DisguiseSystem.class);
         if (net.neoforged.fml.ModList.get().isLoaded("parcool")) {

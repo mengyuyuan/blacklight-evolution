@@ -1,0 +1,7 @@
+{
+  "replace": false,
+  "values": [
+    "blacklight:hive_tendril",
+    "blacklight:biomass_husk"
+  ]
+}

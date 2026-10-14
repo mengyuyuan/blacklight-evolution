@@ -16,5 +16,7 @@ public abstract class PrototypeChaseCameraMixin {
             boolean reverse,float partial,Operation<Void> original) {
         original.call(level,entity,detached,reverse,partial);
         PrototypeChaseCamera.apply((Camera)(Object)this,partial);
+        com.codex.blacklight.client.ClientBiomass.camera((Camera)(Object)this,partial);
+        com.codex.blacklight.client.BlockThrowCamera.apply((Camera)(Object)this,partial);
     }
 }

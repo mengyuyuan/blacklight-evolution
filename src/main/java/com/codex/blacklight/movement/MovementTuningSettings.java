@@ -14,7 +14,7 @@ import java.util.Properties;
 public final class MovementTuningSettings {
     private static final String FILE_NAME = "blacklight-movement-engine.properties";
     public static final MovementTuningSnapshot MVP_DEFAULTS = new MovementTuningSnapshot(
-            0.23968446601941748D, 2.0645631067961165D,
+            0.055D, 0.95D,
             0.55D, 1.25D, 24.0D,
             0.48D, 0.36D, 0.085D, 0.82D, 1.45D, 7.0D, 0.16D);
 
@@ -42,6 +42,7 @@ public final class MovementTuningSettings {
         Properties values = new Properties();
         try (Reader reader = Files.newBufferedReader(path)) {
             values.load(reader);
+            migrateLegacySprint(values);
             setSprintAcceleration(read(values, "sprint_acceleration", sprintAcceleration));
             setSprintMaxSpeed(read(values, "sprint_max_speed", sprintMaxSpeed));
             setJumpMinVelocity(read(values, "jump_min_velocity", jumpMinVelocity));
@@ -153,6 +154,19 @@ public final class MovementTuningSettings {
     public static synchronized void setAirDashSpeed(double value) { airDashSpeed = clamp(value, 0.2D, 3.0D); }
     public static synchronized void setAirDashTicks(double value) { airDashTicks = clamp(value, 1.0D, 20.0D); }
     public static synchronized void setFovBoost(double value) { fovBoost = clamp(value, 0.0D, 0.5D); }
+
+    /** Old shipped defaults were a debug-speed preset. Preserve deliberately custom values. */
+    static boolean migrateLegacySprint(Properties values) {
+        double acceleration=read(values,"sprint_acceleration",Double.NaN);
+        double maximum=read(values,"sprint_max_speed",Double.NaN);
+        if(Math.abs(acceleration-0.23968446601941748D)<1e-12
+                && Math.abs(maximum-2.0645631067961165D)<1e-12) {
+            put(values,"sprint_acceleration",MVP_DEFAULTS.sprintAcceleration());
+            put(values,"sprint_max_speed",MVP_DEFAULTS.sprintMaxSpeed());
+            return true;
+        }
+        return false;
+    }
 
     private static Path path() { return FMLPaths.CONFIGDIR.get().resolve(FILE_NAME); }
     private static double read(Properties values, String key, double fallback) {

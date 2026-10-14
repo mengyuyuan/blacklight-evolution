@@ -27,6 +27,7 @@ public final class ConsumeSystem {
     public static final float DIRECT_GRAB_MAX_HEALTH = 50F;
     private static final Map<ServerPlayer, Session> ACTIVE = new HashMap<>();
     public static final TagKey<EntityType<?>> CONSUMABLE = TagKey.create(Registries.ENTITY_TYPE, ResourceLocation.fromNamespaceAndPath("blacklight", "consumable"));
+    public static final TagKey<EntityType<?>> UNCONSUMABLE = TagKey.create(Registries.ENTITY_TYPE, ResourceLocation.fromNamespaceAndPath("blacklight", "unconsumable"));
     public static final TagKey<EntityType<?>> PASSIVE = TagKey.create(Registries.ENTITY_TYPE, ResourceLocation.fromNamespaceAndPath("blacklight", "consumable_without_weakening"));
     private static final Map<Mob, Thrown> THROWN = new HashMap<>();
     private record Thrown(ServerPlayer owner, int remaining, Vec3 velocity,float damage) {}
@@ -152,8 +153,11 @@ public final class ConsumeSystem {
     }
 
     public static boolean eligible(Mob mob) {
+        return com.codex.blacklight.power.BiomassSystem.claimant(mob)==null&&eligibleBiomass(mob);
+    }
+    public static boolean eligibleBiomass(Mob mob) {
         if(mob instanceof com.codex.blacklight.entity.HiveTendril)return false;
-        return !THROWN.containsKey(mob) && mob.isAlive() && !mob.isRemoved() && !mob.isInvulnerable() && mob.getType().is(CONSUMABLE)
+        return !THROWN.containsKey(mob) && mob.isAlive() && !mob.isRemoved() && !mob.isInvulnerable() && !mob.getType().is(UNCONSUMABLE)
                 && !(mob instanceof net.minecraft.world.entity.boss.wither.WitherBoss wither && wither.getInvulnerableTicks()>0)
                 && !(mob instanceof net.minecraft.world.entity.boss.enderdragon.EnderDragon dragon && dragon.getPhaseManager().getCurrentPhase().getPhase()==net.minecraft.world.entity.boss.enderdragon.phases.EnderDragonPhase.DYING)
                 && !ModAttachments.peekData(mob, ModAttachments.CONSUME_VISUAL, ConsumeVisual.EMPTY).active()
@@ -165,6 +169,7 @@ public final class ConsumeSystem {
     private ConsumeSystem() {}
 
     public static void request(ServerPlayer player) {
+        if(com.codex.blacklight.power.BiomassSystem.active(player))return;
         if (holding(player)) { throwTarget(player); return; }
         var state = player.getData(ModAttachments.PLAYER_STATE);
         if (!player.isAlive() || player.isSpectator() || !state.isInfected() || !state.isPrototypeMode()
@@ -191,7 +196,13 @@ public final class ConsumeSystem {
                             .thenComparingDouble(h->CombatTargeting.distanceSquared(player.getEyePosition(),h))
                             .thenComparingInt(Mob::getId)).orElse(null);
         }
-        if (target == null) { if(locked==null&&BlockThrowSystem.request(player))return; message(player, "consume_no_target"); return; }
+        if (target == null) {
+            if(locked==null&&BlockThrowSystem.canUse(player)){
+                if(TerrainGrabSelection.start(player))return;
+                message(player,TerrainGrabSelection.failureMessage(player));
+            }else message(player,"consume_no_target");
+            return;
+        }
         if (!healthReady(target)) { message(player, "consume_weaken"); return; }
         if(!canStartGroundGrab(player)&&!ConsumeSequence.large(target)) {
             message(player,"grab_ground");return;

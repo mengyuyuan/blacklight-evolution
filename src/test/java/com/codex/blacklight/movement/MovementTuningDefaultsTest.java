@@ -38,4 +38,24 @@ class MovementTuningDefaultsTest {
     private static void assertProperty(Properties properties, String key, double expected) {
         assertEquals(expected, Double.parseDouble(properties.getProperty(key)), 1.0E-12D, key);
     }
+    @Test void oldShippedSprintPresetIsMigratedWithoutChangingOtherSettings() {
+        Properties values=new Properties();
+        values.setProperty("sprint_acceleration","0.23968446601941748");
+        values.setProperty("sprint_max_speed","2.0645631067961165");
+        values.setProperty("jump_max_velocity","1.5");
+        org.junit.jupiter.api.Assertions.assertTrue(MovementTuningSettings.migrateLegacySprint(values));
+        assertProperty(values,"sprint_acceleration",.055);
+        assertProperty(values,"sprint_max_speed",.95);
+        assertProperty(values,"jump_max_velocity",1.5);
+        org.junit.jupiter.api.Assertions.assertFalse(MovementTuningSettings.migrateLegacySprint(values));
+    }
+    @Test void customSprintAndMissingPresetsRemainUserOwned() {
+        Properties values=new Properties();
+        org.junit.jupiter.api.Assertions.assertFalse(MovementTuningSettings.migrateLegacySprint(values));
+        values.setProperty("sprint_acceleration","0.1");
+        values.setProperty("sprint_max_speed","2.0645631067961165");
+        org.junit.jupiter.api.Assertions.assertFalse(MovementTuningSettings.migrateLegacySprint(values));
+        assertProperty(values,"sprint_acceleration",.1);
+        assertProperty(values,"sprint_max_speed",2.0645631067961165);
+    }
 }

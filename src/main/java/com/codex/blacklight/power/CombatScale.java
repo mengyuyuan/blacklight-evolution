@@ -22,6 +22,7 @@ public final class CombatScale {
     private static final ResourceLocation SPEED=ResourceLocation.fromNamespaceAndPath("blacklight","combat_speed");
     private static final ResourceLocation ABSORPTION=ResourceLocation.fromNamespaceAndPath("blacklight","absorption_units");
     private static final ResourceLocation ATTACK_SPEED=ResourceLocation.fromNamespaceAndPath("blacklight","combat_attack_speed");
+    private static final java.util.Map<Mob,Boolean> INFECTION_STATE=new java.util.WeakHashMap<>();
     private CombatScale(){}
     public static float units(LivingEntity entity){
         var attribute=entity.getAttribute(Attributes.MAX_HEALTH);
@@ -41,7 +42,7 @@ public final class CombatScale {
         modifier(entity.getAttribute(Attributes.MAX_HEALTH),HEALTH,scaled?UNITS-1:0,AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL);
         modifier(entity.getAttribute(Attributes.MAX_ABSORPTION),ABSORPTION,scaled?UNITS-1:0,AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL);
         if(oldUnits!=units(entity))entity.setAbsorptionAmount(absorption*units(entity)/oldUnits);
-        boolean enhanced=entity instanceof Mob || entity instanceof Player p && PrototypeMetabolism.active(p);
+        boolean enhanced=scaled && (entity instanceof Mob || entity instanceof Player p && PrototypeMetabolism.active(p));
         modifier(entity.getAttribute(Attributes.MOVEMENT_SPEED),SPEED,enhanced?.08:0,AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL);
         modifier(entity.getAttribute(Attributes.ATTACK_SPEED),ATTACK_SPEED,enhanced?.15:0,AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL);
     }
@@ -49,10 +50,23 @@ public final class CombatScale {
         if(previousMaximum>0&&previousMaximum!=entity.getMaxHealth())
             entity.setHealth(Math.clamp(previousHealth/previousMaximum*entity.getMaxHealth(),0,entity.getMaxHealth()));
     }
+    /** Also migrates saved ordinary mobs that carry the old global modifiers. */
+    public static void synchronizeMob(Mob mob){
+        if(mob.level().isClientSide||mob.isRemoved())return;
+        boolean infected=com.codex.blacklight.infection.BlacklightInfectionSystem.isInfected(mob);
+        float before=mob.getMaxHealth(),health=mob.getHealth();
+        attributes(mob,infected);preserveHealthFraction(mob,before,health);
+        INFECTION_STATE.put(mob,infected);
+    }
+    @SubscribeEvent public static void tick(net.neoforged.neoforge.event.tick.EntityTickEvent.Post event){
+        if(!(event.getEntity() instanceof Mob mob)||mob.level().isClientSide||mob.isRemoved())return;
+        boolean infected=com.codex.blacklight.infection.BlacklightInfectionSystem.isInfected(mob);
+        Boolean previous=INFECTION_STATE.get(mob);
+        if(previous==null||previous!=infected)synchronizeMob(mob);
+    }
     @SubscribeEvent public static void join(EntityJoinLevelEvent event){
         if(event.getLevel().isClientSide()||!(event.getEntity() instanceof Mob mob))return;
-        float before=mob.getMaxHealth(),health=mob.getHealth();
-        attributes(mob,true);preserveHealthFraction(mob,before,health);
+        synchronizeMob(mob);
     }
     @SubscribeEvent(priority=EventPriority.LOWEST)
     public static void damage(LivingDamageEvent.Pre event){

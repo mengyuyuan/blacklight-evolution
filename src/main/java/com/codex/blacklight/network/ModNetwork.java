@@ -19,7 +19,11 @@ public final class ModNetwork {
     }
 
     public static void register(RegisterPayloadHandlersEvent event) {
-        event.registrar("standalone-6")
+        event.registrar("standalone-12")
+                .playToClient(TerrainGrabPreviewPayload.TYPE,TerrainGrabPreviewPayload.STREAM_CODEC,(payload,context)->context.enqueueWork(()->com.codex.blacklight.client.ClientTerrainGrab.accept(payload)))
+                .playToServer(BlockThrowAimPayload.TYPE,BlockThrowAimPayload.STREAM_CODEC,(payload,context)->context.enqueueWork(()->{
+                    if(context.player() instanceof ServerPlayer p){var held=com.codex.blacklight.combat.BlockThrowSystem.held(p);if(held!=null)held.acceptAim(p,new net.minecraft.world.phys.Vec3(payload.x(),payload.y(),payload.z()),payload.assist());}
+                }))
                 .playToServer(SkillSettingsPayload.TYPE,SkillSettingsPayload.STREAM_CODEC,(payload,context)->
                     context.enqueueWork(()->{
                         if(context.player() instanceof ServerPlayer player){
@@ -34,8 +38,10 @@ public final class ModNetwork {
                     context.enqueueWork(() -> com.codex.blacklight.animation.PlayerMotionController.acceptRootMotion(payload)))
                 .playToServer(DisguiseTogglePayload.TYPE,DisguiseTogglePayload.CODEC,(payload,context)->
                     context.enqueueWork(()->{
-                        if(context.player() instanceof ServerPlayer player && canAct(player))
-                            com.codex.blacklight.disguise.DisguiseSystem.request(player);
+                        if(context.player() instanceof ServerPlayer player){
+                            if(com.codex.blacklight.power.BiomassSystem.active(player))com.codex.blacklight.power.BiomassSystem.cancel(player);
+                            else if(canAct(player))com.codex.blacklight.disguise.DisguiseSystem.request(player);
+                        }
                     }))
                 .playToServer(TargetLockPayload.TYPE,TargetLockPayload.STREAM_CODEC,(payload,context)->
                     context.enqueueWork(()->{
@@ -60,7 +66,7 @@ public final class ModNetwork {
                             var forms=com.codex.blacklight.power.PowerForm.values();
                             if(payload.formId()>=0 && payload.formId()<forms.length) {
                                 var form=forms[payload.formId()];
-                                if(com.codex.blacklight.power.PowerFormSystem.select(player,form,false)&&payload.longTransform())
+                                if(com.codex.blacklight.power.PowerFormSystem.select(player,form,false)&&form!=com.codex.blacklight.power.PowerForm.BIOMASS&&payload.longTransform())
                                     com.codex.blacklight.power.PowerMorph.begin(player,form);
                             }
                         }
@@ -113,7 +119,7 @@ public final class ModNetwork {
     }
 
     private static boolean canAct(ServerPlayer player) {
-        return player != null && player.isAlive() && !player.isSpectator() && !player.isDeadOrDying();
+        return player != null && !com.codex.blacklight.power.BiomassSystem.active(player) && player.isAlive() && !player.isSpectator() && !player.isDeadOrDying();
     }
 
     @SubscribeEvent

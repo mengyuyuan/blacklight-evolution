@@ -49,12 +49,22 @@ public final class ClawCombatSystem {
     }
 
     public static void handle(ServerPlayer player, ClawActionPayload.Action request) {
+        if(com.codex.blacklight.power.BiomassSystem.active(player))return;
+        if(request==ClawActionPayload.Action.TERRAIN_GRAB_KEEPALIVE){TerrainGrabSelection.keepAlive(player);return;}
+        if(request==ClawActionPayload.Action.TERRAIN_GRAB_RELEASE){TerrainGrabSelection.release(player);return;}
+        if(request==ClawActionPayload.Action.TERRAIN_GRAB_CANCEL){TerrainGrabSelection.cancel(player);return;}
         var heldBlock=BlockThrowSystem.held(player);
         if(heldBlock!=null){
-            if(request==ClawActionPayload.Action.GRAB||request==ClawActionPayload.Action.THROW||request==ClawActionPayload.Action.ATTACK)heldBlock.throwFrom(player);
+            if(!BlockThrowSystem.canUse(player)){heldBlock.drop();return;}
+            if(request==ClawActionPayload.Action.BLOCK_THROW_START)heldBlock.startCharge(player);
+            else if(request==ClawActionPayload.Action.BLOCK_THROW_RELEASE)heldBlock.releaseCharge(player);
+            else if(request==ClawActionPayload.Action.BLOCK_THROW_CANCEL)heldBlock.cancelInput(player);
+            else if(request==ClawActionPayload.Action.GRAB||request==ClawActionPayload.Action.THROW||request==ClawActionPayload.Action.ATTACK)heldBlock.throwFrom(player);
             else if(request==ClawActionPayload.Action.CONSUME)heldBlock.drop();
             return;
         }
+        if(request==ClawActionPayload.Action.BLOCK_THROW_START||request==ClawActionPayload.Action.BLOCK_THROW_RELEASE||request==ClawActionPayload.Action.BLOCK_THROW_CANCEL)return;
+
         if (request == ClawActionPayload.Action.GRAB) { ConsumeSystem.request(player); return; }
         if (request == ClawActionPayload.Action.CONSUME) { ConsumeSystem.consume(player); return; }
         if (request == ClawActionPayload.Action.THROW) { ConsumeSystem.throwTarget(player); return; }

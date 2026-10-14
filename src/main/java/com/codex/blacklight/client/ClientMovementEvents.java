@@ -58,7 +58,7 @@ public final class ClientMovementEvents {
 
     @SubscribeEvent
     public static void registerKeys(RegisterKeyMappingsEvent event) {
-        event.register(ENGINE_TUNER);
+        if (DeveloperTools.enabled()) event.register(ENGINE_TUNER);
     }
 
     @SubscribeEvent(priority = net.neoforged.bus.api.EventPriority.LOWEST)
@@ -177,7 +177,7 @@ public final class ClientMovementEvents {
     public static void onKey(InputEvent.Key event) {
         Minecraft minecraft = Minecraft.getInstance();
         if (event.getAction() != GLFW.GLFW_PRESS || minecraft.player == null) return;
-        if (ENGINE_TUNER.matches(event.getKey(), event.getScanCode())) {
+        if (DeveloperTools.enabled() && ENGINE_TUNER.matches(event.getKey(), event.getScanCode())) {
             if (!isPrototype(minecraft)) return;
             if (minecraft.screen == null && canTuneMovement(minecraft)) {
                 minecraft.setScreen(new MovementTunerScreen());
@@ -239,6 +239,7 @@ public final class ClientMovementEvents {
     @SubscribeEvent
     public static void onClientTick(ClientTickEvent.Post event) {
         Minecraft minecraft = Minecraft.getInstance();
+        if(minecraft.player!=null&&com.codex.blacklight.power.BiomassSystem.active(minecraft.player)){JUMP_INPUT.reset();lastJumpHeld=false;clientChargeTicks=0;resetClientWallRun();return;}
         // Respawn can replace LocalPlayer without a tick in which player is null.
         // Charge/wall latches belong to the old entity, never the next life.
         if (inputOwner != minecraft.player || minecraft.player == null || minecraft.getConnection() == null) {
