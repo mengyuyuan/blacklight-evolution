@@ -51,12 +51,17 @@ public final class ModEntities {
     public static final DeferredHolder<EntityType<?>,EntityType<com.codex.blacklight.entity.BlacklightHive>> BLACKLIGHT_HIVE=ENTITIES.register("blacklight_hive",()->EntityType.Builder.<com.codex.blacklight.entity.BlacklightHive>of(com.codex.blacklight.entity.BlacklightHive::new,MobCategory.MONSTER).sized(4,3.5F).clientTrackingRange(12).build("blacklight_hive"));
     public static final DeferredHolder<EntityType<?>,EntityType<com.codex.blacklight.entity.BlacklightSpit>> BLACKLIGHT_SPIT=ENTITIES.register("blacklight_spit",()->EntityType.Builder.<com.codex.blacklight.entity.BlacklightSpit>of(com.codex.blacklight.entity.BlacklightSpit::new,MobCategory.MISC).sized(.25F,.25F).clientTrackingRange(8).updateInterval(1).build("blacklight_spit"));
     public static final DeferredHolder<EntityType<?>,EntityType<com.codex.blacklight.entity.HiveTendril>> HIVE_TENDRIL=ENTITIES.register("hive_tendril",()->EntityType.Builder.<com.codex.blacklight.entity.HiveTendril>of(com.codex.blacklight.entity.HiveTendril::new,MobCategory.MISC).sized(.8F,.8F).clientTrackingRange(12).updateInterval(1).noSave().noSummon().build("hive_tendril"));
+    public static final DeferredHolder<EntityType<?>,EntityType<com.codex.blacklight.entity.ThrownBlock>> THROWN_BLOCK=ENTITIES.register("thrown_block",()->EntityType.Builder.<com.codex.blacklight.entity.ThrownBlock>of(com.codex.blacklight.entity.ThrownBlock::new,MobCategory.MISC).sized(.9F,.9F).clientTrackingRange(10).updateInterval(1).build("thrown_block"));
+    public static final DeferredHolder<EntityType<?>,EntityType<com.codex.blacklight.entity.BlackwatchSoldier>> BLACKWATCH_SOLDIER=ENTITIES.register("blackwatch_soldier",()->EntityType.Builder.<com.codex.blacklight.entity.BlackwatchSoldier>of(com.codex.blacklight.entity.BlackwatchSoldier::new,MobCategory.MONSTER).sized(.6F,1.95F).clientTrackingRange(10).updateInterval(2).build("blackwatch_soldier"));
+    public static final DeferredHolder<EntityType<?>,EntityType<com.codex.blacklight.entity.BlackwatchSoldier>> BLACKWATCH_HEAVY=ENTITIES.register("blackwatch_heavy",()->EntityType.Builder.<com.codex.blacklight.entity.BlackwatchSoldier>of(com.codex.blacklight.entity.BlackwatchSoldier::new,MobCategory.MONSTER).sized(.6F,1.95F).clientTrackingRange(10).updateInterval(2).build("blackwatch_heavy"));
     private ModEntities() {
     }
 
     public static void register(IEventBus bus) {
         ENTITIES.register(bus);
         bus.addListener((net.neoforged.neoforge.event.entity.EntityAttributeCreationEvent event)->{
+            event.put(BLACKWATCH_SOLDIER.get(),com.codex.blacklight.entity.BlackwatchSoldier.attributes(false).build());
+            event.put(BLACKWATCH_HEAVY.get(),com.codex.blacklight.entity.BlackwatchSoldier.attributes(true).build());
             event.put(HIVE_TENDRIL.get(),com.codex.blacklight.entity.HiveTendril.attributes().build());
             event.put(INFECTED_HOST.get(),com.codex.blacklight.entity.BlacklightInfectedHost.attributes().build());
             event.put(BLACKLIGHT_STALKER.get(),com.codex.blacklight.entity.BlacklightMutant.attributes(com.codex.blacklight.entity.BlacklightMutant.Kind.STALKER).build());

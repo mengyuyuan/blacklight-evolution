@@ -392,5 +392,19 @@
   "upgrade.blacklight.shield_borer_boost_2": "盾构机强化 II",
   "upgrade.blacklight.shield_borer_boost_2.desc": "前方开路距离提高至约 2.5 格，每刻最多破坏 12 块。需要先学会强化 I。服务器繁忙时会暂缓，不影响保护规则。",
   "setting.blacklight.shield_borer_blocks": "盾构机方块破坏",
-  "setting.blacklight.shield_borer_blocks.desc": "默认关闭。开启后，已学习盾构机的玩家可展开盾牌向前疾跑破块。关闭后持盾疾跑不再挖地，保留技能等级；不影响子弹俯冲设置。此偏好按玩家保存。"
+  "setting.blacklight.shield_borer_blocks.desc": "默认关闭。开启后，已学习盾构机的玩家可展开盾牌向前疾跑破块。关闭后持盾疾跑不再挖地，保留技能等级；不影响子弹俯冲设置。此偏好按玩家保存。",
+  "message.blacklight.block_held": "搬运方块 · [左键 / E] 投掷  [右键] 放下",
+  "entity.blacklight.blackwatch_soldier": "黑色守望步兵",
+  "item.blacklight.blackwatch_soldier_spawn_egg": "黑色守望步兵刷怪蛋",
+  "entity.blacklight.blackwatch_heavy": "黑色守望重装兵",
+  "item.blacklight.blackwatch_heavy_spawn_egg": "黑色守望重装兵刷怪蛋",
+  "item.blacklight.military_circuit": "军用电路模块",
+  "entity.blacklight.thrown_block": "投掷方块",
+  "item.blacklight.field_scanner": "野战感染探测器",
+  "message.blacklight.scan_clear": "48 格内未检测到感染生命",
+  "message.blacklight.scan_found": "感染信号：%1$s · %2$s 米 · %3$s",
+  "direction.blacklight.east": "东",
+  "direction.blacklight.west": "西",
+  "direction.blacklight.south": "南",
+  "direction.blacklight.north": "北"
 }

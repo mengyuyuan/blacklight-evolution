@@ -92,6 +92,9 @@ public final class ClientClawEvents {
 
     @SubscribeEvent
     public static void registerRenderers(EntityRenderersEvent.RegisterRenderers event) {
+        event.registerEntityRenderer(ModEntities.BLACKWATCH_SOLDIER.get(),context->new com.codex.blacklight.client.renderer.BlackwatchRenderer(context,false));
+        event.registerEntityRenderer(ModEntities.BLACKWATCH_HEAVY.get(),context->new com.codex.blacklight.client.renderer.BlackwatchRenderer(context,true));
+        event.registerEntityRenderer(ModEntities.THROWN_BLOCK.get(),com.codex.blacklight.client.renderer.ThrownBlockRenderer::new);
         event.registerEntityRenderer(ModEntities.INFECTED_HOST.get(), com.codex.blacklight.client.renderer.InfectedHostRenderer::new);
         event.registerEntityRenderer(ModEntities.GROUND_SPIKE.get(), GroundSpikeRenderer::new);
         for(var type:java.util.List.of(ModEntities.BLACKLIGHT_STALKER,ModEntities.BLACKLIGHT_SPITTER,ModEntities.BLACKLIGHT_BRUTE))

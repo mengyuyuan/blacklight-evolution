@@ -392,5 +392,19 @@
   "upgrade.blacklight.shield_borer_boost_2": "Shield Borer Boost II",
   "upgrade.blacklight.shield_borer_boost_2.desc": "Increases forward excavation reach to about 2.5 blocks and the limit to 12 breaks per tick. Requires Boost I. Pauses under server load and continues to respect protection.",
   "setting.blacklight.shield_borer_blocks": "Shield Borer Block Breaking",
-  "setting.blacklight.shield_borer_blocks.desc": "Off by default. Enable to excavate while sprinting forward with a deployed shield and the learned Shield Borer skill. Disable to sprint without excavation; learned levels are retained. Saved per player, independently of Bulletdive settings."
+  "setting.blacklight.shield_borer_blocks.desc": "Off by default. Enable to excavate while sprinting forward with a deployed shield and the learned Shield Borer skill. Disable to sprint without excavation; learned levels are retained. Saved per player, independently of Bulletdive settings.",
+  "message.blacklight.block_held": "Carrying block · [Attack / Grab] Throw  [Use] Drop",
+  "entity.blacklight.blackwatch_soldier": "Blackwatch Rifleman",
+  "item.blacklight.blackwatch_soldier_spawn_egg": "Blackwatch Rifleman Spawn Egg",
+  "entity.blacklight.blackwatch_heavy": "Blackwatch Heavy",
+  "item.blacklight.blackwatch_heavy_spawn_egg": "Blackwatch Heavy Spawn Egg",
+  "item.blacklight.military_circuit": "Military Circuit",
+  "entity.blacklight.thrown_block": "Thrown Block",
+  "item.blacklight.field_scanner": "Field Infection Scanner",
+  "message.blacklight.scan_clear": "No infected life within 48 blocks",
+  "message.blacklight.scan_found": "Infected: %1$s · %2$s m · %3$s",
+  "direction.blacklight.east": "East",
+  "direction.blacklight.west": "West",
+  "direction.blacklight.south": "South",
+  "direction.blacklight.north": "North"
 }

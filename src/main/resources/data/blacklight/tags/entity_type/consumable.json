@@ -68,6 +68,8 @@
     "minecraft:iron_golem",
     "minecraft:snow_golem",
     "minecraft:wither",
-    "minecraft:ender_dragon"
+    "minecraft:ender_dragon",
+    "blacklight:blackwatch_soldier",
+    "blacklight:blackwatch_heavy"
   ]
 }

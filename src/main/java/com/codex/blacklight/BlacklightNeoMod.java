@@ -54,6 +54,7 @@ public final class BlacklightNeoMod {
         NeoForge.EVENT_BUS.register(com.codex.blacklight.world.ResearchStationTrades.class);
         NeoForge.EVENT_BUS.register(com.codex.blacklight.world.SurvivalGuide.class);
         NeoForge.EVENT_BUS.register(com.codex.blacklight.combat.ConsumeSystem.class);
+        NeoForge.EVENT_BUS.register(com.codex.blacklight.combat.BlockThrowSystem.class);
         NeoForge.EVENT_BUS.register(ModNetwork.class);
         NeoForge.EVENT_BUS.register(com.codex.blacklight.disguise.DisguiseSystem.class);
         if (net.neoforged.fml.ModList.get().isLoaded("parcool")) {
