@@ -14,6 +14,8 @@ public final class BiomassShatterBuffers implements MultiBufferSource {
     private final float coverage,morph,height,width;
     private final double time;
     private final Map<RenderType,Collector> streams=new LinkedHashMap<>();
+    private record Cell(int x,int y,int z) {}
+    private final Set<Cell> cells=new HashSet<>();
     public BiomassShatterBuffers(LivingEntity mob,PoseStack stack,MultiBufferSource target,float coverage,float morph,double time){
         this.target=target;this.coverage=coverage;this.morph=morph;this.time=time;
         height=mob instanceof net.minecraft.world.entity.player.Player?1.8F:Math.max(.1F,mob.getBbHeight());width=Math.max(.1F,mob.getBbWidth());
@@ -26,7 +28,10 @@ public final class BiomassShatterBuffers implements MultiBufferSource {
     }
     private void quad(RenderType type,V a,V b,V c,V d){
         var center=new Vector3f(a.p).add(b.p).add(c.p).add(d.p).mul(.25F);
-        double seed=Math.floor(center.x*9)*17+Math.floor(center.y*9)*31+Math.floor(center.z*9)*47;
+        var cell=new Cell(Math.round(center.x*6),Math.round(center.y*6),Math.round(center.z*6));
+        if(!cells.add(cell)||cells.size()>512)return;
+        center.set(cell.x/6F,cell.y/6F,cell.z/6F);
+        double seed=cell.x*17+cell.y*31+cell.z*47;
         float t=coverage,burst=Math.min(1,Math.max(0,(t-.10F)/.40F)),melt=Math.min(1,Math.max(0,(t-.48F)/.52F));
         double angle=seed*2.39996,radial=.16+.40*(.5+.5*Math.sin(seed));
         float cx=(float)(center.x+Math.cos(angle)*radial*burst)*(1-melt*.65F);
@@ -36,20 +41,28 @@ public final class BiomassShatterBuffers implements MultiBufferSource {
         var out=target.getBuffer(coated?RenderType.entityCutoutNoCull(ConsumedMobVisuals.WHITE):type);
         float shrink=Math.max(0,1-Math.max(0,(t-.75F)/.25F));
         var rotation=new org.joml.Quaternionf().rotationXYZ((float)Math.sin(seed)*burst*1.6F,(float)Math.cos(seed)*burst*2,(float)Math.sin(seed+2)*burst);
-        // Each original face cell becomes a shallow solid fragment; its skin UV remains attached.
-        V[] corners={a,b,c,d};Vector3f[] front=new Vector3f[4],back=new Vector3f[4];
-        var normal=new Vector3f(b.p).sub(a.p).cross(new Vector3f(c.p).sub(a.p)).normalize();
-        for(int i=0;i<4;i++){
-            var q=new Vector3f(corners[i].p).sub(center).mul(shrink).rotate(rotation);q.y*=1-melt*.85F;
-            front[i]=new Vector3f(q).add(cx,cy,cz);back[i]=new Vector3f(front[i]).sub(new Vector3f(normal).mul(.085F*shrink));
+        // Quantize the posed silhouette into solid blocks. Shared surface/outer-layer cells
+        // emit once, avoiding overlapping flakes and z-fighting from skin/weapon surfaces.
+        V[] corners={a,b,c,d};Vector3f[] points=new Vector3f[8];
+        int[][] signs={{-1,-1,-1},{1,-1,-1},{1,1,-1},{-1,1,-1},{-1,-1,1},{1,-1,1},{1,1,1},{-1,1,1}};
+        float radius=.079F*shrink;
+        for(int i=0;i<8;i++){
+            var q=new Vector3f(signs[i][0]*radius,signs[i][1]*radius,signs[i][2]*radius).rotate(rotation);q.y*=1-melt*.92F;
+            points[i]=q.add(cx,cy,cz);points[i].y=Math.max(.01F,points[i].y);
         }
-        int[][] faces={{0,1,2,3},{7,6,5,4},{0,4,5,1},{1,5,6,2},{2,6,7,3},{3,7,4,0}};
-        for(var face:faces)for(int i:face){
-            V v=corners[i%4];var p=new Vector3f(i<4?front[i]:back[i-4]);p.y=Math.max(.01F,p.y);frame.transformPosition(p);
-            int r=coated?32:v.r,g=coated?26:v.g,blue=coated?33:v.b;
-            out.vertex(p.x,p.y,p.z).color(r,g,blue,v.a).uv(coated?.5F:v.u,coated?.5F:v.v).overlayCoords(v.overlay).uv2(v.light).normal(v.nx,v.ny,v.nz).endVertex();
+        int[][] faces={{0,3,2,1},{4,5,6,7},{0,4,7,3},{1,2,6,5},{3,7,6,2},{0,1,5,4}};
+        for(var face:faces){
+            var normal=new Vector3f(points[face[1]]).sub(points[face[0]]).cross(new Vector3f(points[face[2]]).sub(points[face[0]]));
+            if(normal.lengthSquared()<1e-12F)continue;
+            frame.transformDirection(normal).normalize();
+            for(int j=0;j<4;j++){
+                V v=corners[j];var p=frame.transformPosition(new Vector3f(points[face[j]]));
+                int r=coated?32:v.r,g=coated?26:v.g,blue=coated?33:v.b;
+                out.vertex(p.x,p.y,p.z).color(r,g,blue,v.a).uv(coated?.5F:v.u,coated?.5F:v.v).overlayCoords(net.minecraft.client.renderer.texture.OverlayTexture.NO_OVERLAY).uv2(v.light).normal(normal.x,normal.y,normal.z).endVertex();
+            }
         }
     }
+
     private final class Collector implements VertexConsumer {
         final RenderType type;final List<V> vertices=new ArrayList<>();Vector3f p;int r=255,g=255,b=255,a=255,overlay,light;float u,v,nx,ny=1,nz;
         Collector(RenderType type){this.type=type;}
