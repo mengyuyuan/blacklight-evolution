@@ -40,7 +40,8 @@
         }
       ],
       "chargedBlendFrames": 3,
-      "release": 0.1
+      "release": 0.1,
+      "basicGrowthStrength": 0.3
     },
     "hammer_hook": {
       "folder": "alex_hammerfist",
@@ -81,7 +82,8 @@
         }
       ],
       "chargedBlendFrames": 3,
-      "release": 0.3333333333333333
+      "release": 0.3333333333333333,
+      "basicGrowthStrength": 0.3
     },
     "hammer_combo_c": {
       "folder": "alex_hammerfist",
@@ -122,7 +124,8 @@
         }
       ],
       "chargedBlendFrames": 3,
-      "release": 0.3333333333333333
+      "release": 0.3333333333333333,
+      "basicGrowthStrength": 0.3
     },
     "hammer_combo_d": {
       "folder": "alex_hammerfist",
@@ -162,7 +165,8 @@
         }
       ],
       "chargedBlendFrames": 3,
-      "release": 0.3
+      "release": 0.3,
+      "basicGrowthStrength": 0.3
     },
     "hammer_quake": {
       "folder": "alex_hammerfist",
