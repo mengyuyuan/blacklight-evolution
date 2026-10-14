@@ -45,6 +45,7 @@ public final class GrabHoldPose {
         String side=blade?"R":"L",tool="Tool_"+side;
         boolean claws=com.codex.blacklight.registry.ModAttachments.getData(player, ModAttachments.PLAYER_STATE).getActivePower()==PowerForm.CLAWS;
         var palmLocal=blade?new org.joml.Vector3f(-.0636396F,.68F,-.0636396F):claws?new org.joml.Vector3f(.00267F,.32362F,.07666F):new org.joml.Vector3f(0,.28F,0);
+        palmLocal=WeaponModelAnchors.get(com.codex.blacklight.registry.ModAttachments.getData(player, ModAttachments.PLAYER_STATE).getActivePower(),blade?"bladeGrip_R":"palm_L",palmLocal);
         var wrist=armature.searchJointByName(tool);
         if(wrist==null)return;
         var endpoint=new org.joml.Matrix4f(wrist.getLocalTransform()).invert().transformPosition(palmLocal);

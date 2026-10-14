@@ -77,9 +77,9 @@ public final class BlacklightClawLayer extends net.minecraft.client.renderer.ent
         if(state.isPrototypeMode()) {
             int charge=player==Minecraft.getInstance().player?com.codex.blacklight.client.ClientMovementEvents.visualJumpCharge():com.codex.blacklight.registry.ModAttachments.getData(player, com.codex.blacklight.registry.ModAttachments.JUMP_CHARGE);
             float now=player.tickCount+partialTicks;
-            if(charge>0)coils.put(player,new Coil(net.minecraft.util.Mth.clamp(charge/(float)com.codex.blacklight.movement.MovementTuningSettings.jumpChargeTicks(),0,1),now));
+            if(charge>0)coils.put(player,new Coil(com.codex.blacklight.util.MathCompat.clamp(charge/(float)com.codex.blacklight.movement.MovementTuningSettings.jumpChargeTicks(),0,1),now));
             var coil=coils.get(player);
-            float intensity=coil==null?0:coil.intensity()*net.minecraft.util.Mth.clamp(1-(now-coil.lastCharged())/6,0,1);
+            float intensity=coil==null?0:coil.intensity()*com.codex.blacklight.util.MathCompat.clamp(1-(now-coil.lastCharged())/6,0,1);
             if(intensity>.001F){
                 var out=buffer.getBuffer(RenderType.entityCutoutNoCull(TEXTURE));
                 for(String joint:new String[]{"Thigh_R","Leg_R","Thigh_L","Leg_L"}) {
@@ -152,25 +152,20 @@ public final class BlacklightClawLayer extends net.minecraft.client.renderer.ent
         // Pose matrices already contain the complete animated hierarchy. Applying an
         // inverse bind-hand offset and arbitrary tuner translations detached the limb.
         // Keep both segment origins on their real joints and overlap their end rings.
-        RenderType material=surface.liquid()?LiquidBiomassMaterial.mesh(TEXTURE):RenderType.entityCutoutNoCull(TEXTURE);
-        VertexConsumer consumer = buffer.getBuffer(material);
         poseStack.pushPose();
         applyJoint(poseStack, poses[armJoint.getId()]);
         poseStack.scale(width, 1.0F, width);
-        model.renderJoint(mirror ? "Arm_L" : "Arm_R", poseStack, consumer, packedLight,
-                OverlayTexture.NO_OVERLAY, morphProgress, 1.0F,null,Float.POSITIVE_INFINITY,null,surface,time);
+        renderMesh(model,mirror ? "Arm_L" : "Arm_R",poseStack,buffer,packedLight,morphProgress,1,null,Float.POSITIVE_INFINITY,null,surface,time);
         LiquidBiomassRenderer.render(poseStack,buffer,packedLight,surface,.34F,time,false);
         poseStack.popPose();
 
         poseStack.pushPose();
         applyJoint(poseStack, poses[handJoint.getId()]);
         poseStack.scale(width, 1.0F, width);
-        // A different RenderType may finish the previous non-fixed buffer.
-        consumer=buffer.getBuffer(material);
         var visual=com.codex.blacklight.registry.ModAttachments.getData(player, com.codex.blacklight.registry.ModAttachments.WEAPON_VISUAL);
         if(authoritative&&!mirror&&visual.charging()&&visual.spec()!=null&&visual.spec().form==com.codex.blacklight.power.PowerForm.BLADE){
             float age=player.level().getGameTime()-visual.started();
-            BiomassTendrils.charge(poseStack,consumer,packedLight,net.minecraft.util.Mth.clamp(.35F+age/18F,0,1),.68F,player.tickCount);
+            BiomassTendrils.charge(poseStack,buffer.getBuffer(RenderType.entityCutoutNoCull(TEXTURE)),packedLight,com.codex.blacklight.util.MathCompat.clamp(.35F+age/18F,0,1),.68F,player.tickCount);
         }
         org.joml.Matrix4f wristDelta=null;
         boolean traversal=com.codex.blacklight.movement.WallPoseState.get(player)!=null||!player.onGround();
@@ -183,20 +178,32 @@ public final class BlacklightClawLayer extends net.minecraft.client.renderer.ent
             wristDelta=new org.joml.Matrix4f(relative).mul(new org.joml.Matrix4f(wrist.getLocalTransform()).invert());
         }
         boolean extendingWhip=authoritative&&!mirror&&com.codex.blacklight.client.renderer.WhipTetherRenderer.extended(player);
-        model.renderJoint(mirror ? "Hand_L" : "Hand_R", poseStack, consumer, packedLight,
-                 OverlayTexture.NO_OVERLAY, morphProgress, claw ? (float) ClawTransformSettings.talonLength(side) : 1,wristDelta,extendingWhip?.32F:Float.POSITIVE_INFINITY,hammer,surface,time);
+        float whipLimit=model.anchor("tether_R",new org.joml.Vector3f(0,.30F,.05F)).y+.02F;
+        renderMesh(model,mirror ? "Hand_L" : "Hand_R",poseStack,buffer,packedLight,morphProgress,
+                claw ? (float) ClawTransformSettings.talonLength(side) : 1,wristDelta,extendingWhip?whipLimit:Float.POSITIVE_INFINITY,hammer,surface,time);
         if(!mirror&&!extendingWhip&&form==PowerForm.WHIPFIST)
-            model.renderJoint("Tip_R",poseStack,consumer,packedLight,OverlayTexture.NO_OVERLAY,morphProgress,1,null,Float.POSITIVE_INFINITY,null,surface,time);
+            renderMesh(model,"Tip_R",poseStack,buffer,packedLight,morphProgress,1,null,Float.POSITIVE_INFINITY,null,surface,time);
         if(authoritative&&mirror && claw && com.codex.blacklight.registry.ModAttachments.getData(player, com.codex.blacklight.registry.ModAttachments.GRAB_STAGE)
                 ==com.codex.blacklight.combat.ConsumeVisual.HOLD)
-            com.codex.blacklight.client.renderer.WhipTetherRenderer.captureGrip(player,poseStack);
+            com.codex.blacklight.client.renderer.WhipTetherRenderer.captureGrip(player,poseStack,model.anchor("palm_L",new org.joml.Vector3f(.00267F,.32362F,.07666F)));
         if(authoritative&&!mirror && form==PowerForm.BLADE)
-            com.codex.blacklight.client.renderer.WhipTetherRenderer.captureBlade(player,poseStack);
+            com.codex.blacklight.client.renderer.WhipTetherRenderer.captureGrip(player,poseStack,model.anchor("bladeGrip_R",new org.joml.Vector3f(-.0636396F,.68F,-.0636396F)));
         if (authoritative&&!mirror && form==PowerForm.WHIPFIST)
-            com.codex.blacklight.client.renderer.WhipTetherRenderer.capture(player, poseStack);
-        if(authoritative)com.codex.blacklight.client.renderer.WeaponTrailRenderer.capture(player,poseStack,mirror);
+            com.codex.blacklight.client.renderer.WhipTetherRenderer.capture(player, poseStack,model.anchor("tether_R",new org.joml.Vector3f(0,.30F,.05F)));
+        if(authoritative)com.codex.blacklight.client.renderer.WeaponTrailRenderer.capture(player,poseStack,mirror,model);
         LiquidBiomassRenderer.render(poseStack,buffer,packedLight,surface,.44F,time,true);
         poseStack.popPose();
+    }
+
+    private static void renderMesh(ClawArmModel model,String joint,PoseStack stack,MultiBufferSource buffers,int light,
+                                   float progress,float length,org.joml.Matrix4f wrist,float limit,
+                                   com.codex.blacklight.combat.WeaponAttackScales.Shape hammer,BiomassSurface.Frame surface,float time) {
+        var material=surface.liquid()?LiquidBiomassMaterial.mesh(TEXTURE):RenderType.entityCutoutNoCull(model.texture());
+        model.renderJoint(joint,stack,buffers.getBuffer(material),light,OverlayTexture.NO_OVERLAY,progress,length,wrist,limit,hammer,surface,time);
+        // Draw only the raised vein faces. Both passes sample identical deformation,
+        // clipping and wrist/hammer transforms, so the glow cannot lag behind the limb.
+        model.renderJoint(joint,stack,buffers.getBuffer(RenderType.entityTranslucentEmissive(model.emissiveTexture())),
+                light,OverlayTexture.NO_OVERLAY,progress,length,wrist,limit,hammer,surface,time,true);
     }
 
     private static void applyJoint(PoseStack stack, org.joml.Matrix4f joint) {

@@ -1,0 +1,29 @@
+{
+  "claws": {
+    "exportedParts": 152,
+    "rightMasterParts": 76,
+    "validFaceReferencesAndUV": true
+  },
+  "blade": {
+    "exportedParts": 40,
+    "rightMasterParts": 40,
+    "validFaceReferencesAndUV": true
+  },
+  "hammerfists": {
+    "exportedParts": 102,
+    "rightMasterParts": 51,
+    "validFaceReferencesAndUV": true
+  },
+  "whipfist": {
+    "exportedParts": 45,
+    "rightMasterParts": 45,
+    "validFaceReferencesAndUV": true
+  },
+  "muscle_mass": {
+    "exportedParts": 88,
+    "rightMasterParts": 44,
+    "validFaceReferencesAndUV": true
+  },
+  "approvedClawUnchanged": true,
+  "atlasAndEmissionMaskMatch": true
+}

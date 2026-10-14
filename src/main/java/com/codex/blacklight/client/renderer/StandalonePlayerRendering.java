@@ -98,6 +98,7 @@ public final class StandalonePlayerRendering {
     public static final class Registration {
         private Registration() { }
         @SubscribeEvent public static void layers(EntityRenderersEvent.AddLayers event) {
+            com.codex.blacklight.client.model.BlockArmorModel.invalidate();
             RENDERERS.clear();
             for(var skin:event.getSkins())RENDERERS.put(skin,new BlacklightPlayerRenderer(event.getContext(),"slim".equals(skin)));
         }

@@ -1,0 +1,14 @@
+{
+  "retainedRuntimeParts": 120,
+  "removedCollarSpikes": [
+    "Neck flange -1",
+    "Neck flange tip -1",
+    "Neck flange 1",
+    "Neck flange tip 1"
+  ],
+  "originalTextureUnchanged": true,
+  "originalPartsAndGrowthUnchanged": true,
+  "sourceVisualHeightBlocks": 1.89018675,
+  "uniformRenderScale": 1.5871447622834092,
+  "targetVisualHeightBlocks": 3
+}
