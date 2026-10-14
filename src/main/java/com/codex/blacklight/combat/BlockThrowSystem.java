@@ -1,0 +1,62 @@
+package com.codex.blacklight.combat;
+
+import com.codex.blacklight.entity.ThrownBlock;
+import com.codex.blacklight.registry.ModAttachments;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.tags.TagKey;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.ClipContext;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.phys.*;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.neoforge.event.entity.player.PlayerEvent;
+
+/** Server owns the source block and the single recoverable projectile. */
+public final class BlockThrowSystem {
+    public static final TagKey<Block> THROWABLE=TagKey.create(Registries.BLOCK,ResourceLocation.fromNamespaceAndPath("blacklight","throwable_blocks"));
+    private static final ThreadLocal<net.neoforged.neoforge.event.level.BlockEvent.BreakEvent> OWN_BREAK = new ThreadLocal<>();
+    private BlockThrowSystem(){}
+    /** Only our exact grab event bypasses the vanilla-interaction lock. Other protection listeners still run. */
+    public static boolean ownsBreakEvent(net.neoforged.neoforge.event.level.BlockEvent.BreakEvent event){return OWN_BREAK.get()==event;}
+    public static ThrownBlock held(Player p){
+        return p.level().getEntitiesOfClass(ThrownBlock.class,p.getBoundingBox().inflate(4),e->e.holderId()==p.getId()&&!e.isRemoved()).stream().findFirst().orElse(null);
+    }
+    public static boolean request(ServerPlayer p){
+        if(!p.mayBuild()||!p.isAlive()||p.isSpectator()||p.isPassenger()||p.getData(ModAttachments.CONSUMING))return false;
+        var state=p.getData(ModAttachments.PLAYER_STATE);
+        if(!state.isInfected()||!state.isPrototypeMode())return false;
+        Vec3 start=p.getEyePosition(),direction=Vec3.directionFromRotation(p.getXRot(),com.codex.blacklight.movement.TraversalSteering.cameraYaw(p));
+        var hit=p.level().clip(new ClipContext(start,start.add(direction.scale(3.5)),ClipContext.Block.COLLIDER,ClipContext.Fluid.NONE,p));
+        if(hit.getType()!=HitResult.Type.BLOCK)return false;
+        BlockPos pos=hit.getBlockPos();var level=p.serverLevel();var block=level.getBlockState(pos);
+        if(!level.mayInteract(p,pos)||!level.getWorldBorder().isWithinBounds(pos)||!block.is(THROWABLE)
+                ||block.hasBlockEntity()||!block.getFluidState().isEmpty()||!block.isCollisionShapeFullBlock(level,pos)
+                ||block.getDestroySpeed(level,pos)<0||block.getDestroySpeed(level,pos)>5||block.getBlock().asItem()==net.minecraft.world.item.Items.AIR)return false;
+        var event=new net.neoforged.neoforge.event.level.BlockEvent.BreakEvent(level,pos,block,p);
+        var previous=OWN_BREAK.get();OWN_BREAK.set(event);
+        try{net.neoforged.neoforge.common.NeoForge.EVENT_BUS.post(event);}
+        finally{if(previous==null)OWN_BREAK.remove();else OWN_BREAK.set(previous);}
+        if(event.isCanceled()||!p.isAlive()||p.isRemoved()||p.level()!=level||!level.mayInteract(p,pos)||level.getBlockState(pos)!=block)return false;
+        var projectile=new ThrownBlock(level,p,block);projectile.setPos(p.position());
+        // Spawn cancellation leaves the world unchanged. Neighbor hooks run only after acceptance.
+        if(!level.addFreshEntity(projectile))return false;
+        if(level.getBlockState(pos)!=block||!level.removeBlock(pos,false)){projectile.discard();return false;}
+        projectile.arm();
+        p.setData(ModAttachments.CONSUMING,true);p.syncData(ModAttachments.CONSUMING);
+        p.setData(ModAttachments.GRAB_STAGE,ConsumeVisual.HOLD);p.syncData(ModAttachments.GRAB_STAGE);
+        com.codex.blacklight.disguise.DisguiseSystem.visiblePower(p);
+        com.codex.blacklight.animation.PlayerActions.get().play(p,com.codex.blacklight.animation.PlayerAction.GRAB_REACH,.1F);
+        level.playSound(null,pos,block.getSoundType().getBreakSound(),net.minecraft.sounds.SoundSource.PLAYERS,1,.8F);
+        return true;
+    }
+    public static void clear(ServerPlayer p){
+        p.setData(ModAttachments.CONSUMING,false);p.syncData(ModAttachments.CONSUMING);
+        p.setData(ModAttachments.GRAB_STAGE,ConsumeVisual.NONE);p.syncData(ModAttachments.GRAB_STAGE);
+    }
+    @SubscribeEvent public static void logout(PlayerEvent.PlayerLoggedOutEvent event){if(event.getEntity() instanceof ServerPlayer p)release(p);}
+    @SubscribeEvent public static void dimension(PlayerEvent.PlayerChangedDimensionEvent event){if(event.getEntity() instanceof ServerPlayer p)clear(p);}
+    private static void release(ServerPlayer p){var block=held(p);if(block!=null)block.drop();}
+}

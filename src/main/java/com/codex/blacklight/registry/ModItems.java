@@ -37,11 +37,17 @@ public final class ModItems {
     public static final DeferredItem<BlockItem> HIVE_BONE = ITEMS.registerSimpleBlockItem(ModBlocks.HIVE_BONE);
     public static final DeferredItem<BlockItem> NUTRIENT_NODE = ITEMS.registerSimpleBlockItem(ModBlocks.NUTRIENT_NODE);
 
+    public static final DeferredItem<net.neoforged.neoforge.common.DeferredSpawnEggItem> BLACKWATCH_SOLDIER_SPAWN_EGG=ITEMS.registerItem("blackwatch_soldier_spawn_egg",p->new net.neoforged.neoforge.common.DeferredSpawnEggItem(ModEntities.BLACKWATCH_SOLDIER,0x20262a,0x8a2222,p),new Item.Properties());
+    public static final DeferredItem<net.neoforged.neoforge.common.DeferredSpawnEggItem> BLACKWATCH_HEAVY_SPAWN_EGG=ITEMS.registerItem("blackwatch_heavy_spawn_egg",p->new net.neoforged.neoforge.common.DeferredSpawnEggItem(ModEntities.BLACKWATCH_HEAVY,0x20262a,0xb0a285,p),new Item.Properties());
+    public static final DeferredItem<Item> MILITARY_CIRCUIT=ITEMS.registerItem("military_circuit",Item::new,new Item.Properties());
+    public static final DeferredItem<com.codex.blacklight.item.FieldScannerItem> FIELD_SCANNER=ITEMS.registerItem("field_scanner",com.codex.blacklight.item.FieldScannerItem::new,new Item.Properties().stacksTo(1));
+
     public static final DeferredHolder<CreativeModeTab, CreativeModeTab> TAB = TABS.register(
             "blacklight", () -> CreativeModeTab.builder()
                     .title(Component.translatable("itemGroup.blacklight"))
                     .icon(() -> BLACKLIGHT_SAMPLE.get().getDefaultInstance())
                     .displayItems((parameters, output) -> {
+                        output.accept(BLACKWATCH_SOLDIER_SPAWN_EGG.get()); output.accept(BLACKWATCH_HEAVY_SPAWN_EGG.get()); output.accept(MILITARY_CIRCUIT.get()); output.accept(FIELD_SCANNER.get());
                         output.accept(BLACKLIGHT_SAMPLE.get()); output.accept(HUNTER_SPAWN_EGG.get());
                         output.accept(INFECTED_SOIL.get()); output.accept(INFECTED_STONE.get());
                         output.accept(TISSUE_FIBER.get()); output.accept(HIVE_FLESH.get());

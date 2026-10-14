@@ -88,13 +88,7 @@ public final class BlacklightPlayerRenderer extends PlayerRenderer {
         stack.scale(armorScale,armorScale,armorScale);
     }
     @Override protected void setupRotations(AbstractClientPlayer player,PoseStack stack,float bob,float bodyYaw,float partial,float scale) {
-        var weapon=player.getData(ModAttachments.WEAPON_VISUAL);
-        Float movement=PrototypeAnimationController.movementFacing(player,partial);
-        var morph=player.getData(ModAttachments.POWER_MORPH);
-        if(morph.visible(player,partial))movement=morph.facing();
-        float facing=NativeConsumePose.facing(player,weapon.spec()==null?player.getYRot():weapon.yaw(),partial);
-        if(player.getData(ModAttachments.GRAB_STAGE)==0&&weapon.spec()==null&&movement!=null)facing=movement;
-        else if(player.getData(ModAttachments.GRAB_STAGE)==0&&weapon.spec()==null&&!morph.visible(player,partial))facing=bodyYaw;
+        float facing=com.codex.blacklight.client.animation.BlacklightRenderPose.facing(player,partial);
         super.setupRotations(player,stack,bob,facing,partial,scale);
     }
 }
