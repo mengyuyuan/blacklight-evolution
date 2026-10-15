@@ -111,13 +111,17 @@ public final class ProjectileDefenseSystem {
     }
     private static void feedback(ServerPlayer p,Vec3 point,Vec3 incoming,Vec3 outgoing,double power,double capacity,double speed,boolean shield,boolean reflected){
         float strength=RicochetRules.strength(power,capacity);long now=p.level().getGameTime();
+        var previous=p.getData(ModAttachments.DEFENSE_IMPACT);
+        long age=now-previous.at();boolean fresh=age<0||age>=3;
+        // Batch a short volley into its strongest contact. Reflection and damage still run for every projectile.
+        if(!fresh&&strength<=previous.strength()*1.4F)return;
         p.setData(ModAttachments.DEFENSE_IMPACT,new DefenseImpact(now,strength,(float)incoming.x,(float)incoming.y,(float)incoming.z,shield,(float)(point.x-p.getX()),(float)(point.y-p.getY()),(float)(point.z-p.getZ())));
-        // Small additive impulse, never a stun or a replacement for the current action/movement.
-        if(!p.getData(ModAttachments.CONSUMING)){
-            double push=Math.min(.12,.025*strength)*(shield?1:.55);
+        // Failed blocks already receive ordinary damage knockback. Never add a second push to those hits.
+        if(fresh&&reflected&&!p.getData(ModAttachments.CONSUMING)){
+            double push=Math.min(.035,.018*strength)*(shield?1:.5);
             p.push(incoming.x*push,0,incoming.z*push);p.hurtMarked=true;
         }
-        // Directional sparks are emitted client-side from the synced real contact point.
-        p.level().playSound(null,point.x,point.y,point.z,SoundEvents.ANVIL_HIT,SoundSource.PLAYERS,Math.min(1,.3F+strength*.35F),Math.max(.65F,1.8F-strength*.55F));
+        if(fresh)p.level().playSound(null,point.x,point.y,point.z,SoundEvents.ANVIL_HIT,SoundSource.PLAYERS,
+                Math.min(.55F,.10F+strength*.25F),Math.max(.75F,1.9F-strength*.65F));
     }
 }

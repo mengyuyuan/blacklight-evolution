@@ -7,14 +7,14 @@ import net.minecraft.network.codec.StreamCodec;
 public record DefenseImpact(long at,float strength,float x,float y,float z,boolean shield,float hitX,float hitY,float hitZ) {
     public static final DefenseImpact EMPTY=new DefenseImpact(-1000,0,0,0,0,false,0,0,0);
     public float spring(double now){
-        double age=now-at;if(age<0||age>14)return 0;
-        // Fast compression, a brief loaded hold, then a small settling overshoot.
-        // This holds only the additive recoil offset, never the player's action clock.
-        double envelope;
-        if(age<1)envelope=age;
-        else if(age<2.5)envelope=1;
-        else if(age<7){double t=(age-2.5)/4.5;envelope=1-1.16*t*t*(3-2*t);}
-        else {double t=(age-7)/7;envelope=-.16*(1-t*t*(3-2*t));}
+        double intensity=Math.min(1,Math.max(0,strength));
+        double duration=7+6*intensity,age=now-at;
+        if(age<0||age>=duration)return 0;
+        double hold=1+intensity,release=duration*.55,envelope;
+        if(age<1)envelope=age*age*(3-2*age);
+        else if(age<hold)envelope=1;
+        else if(age<release){double t=(age-hold)/(release-hold);envelope=1-1.12*t*t*(3-2*t);}
+        else {double t=(age-release)/(duration-release);envelope=-.12*(1-t*t*(3-2*t));}
         return (float)envelope*Math.min(1.25F,strength);
     }
     public static final StreamCodec<RegistryFriendlyByteBuf,DefenseImpact> CODEC=new StreamCodec<>() {
