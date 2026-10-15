@@ -52,4 +52,4 @@
 
 `gradlew test --tests '*CityLayoutTest'` 检查布局边界、种子变化和入口保留。
 
-`gradlew runGameTestServer -PcityTest` 检查真实维度生成、跨区块高度、母巢孵化口、通行路径与状态保存。GameTest 原生测试世界不读取额外维度，所以专用测试资源在 flat 测试预设中加入城市；该预设和测试类不进入发行包。
+`gradlew runGameTestServer -PcityTest` 检查真实维度生成、跨区块高度、母巢孵化口、通行路径与状态保存。NeoForge 的专用测试资源在 flat 测试预设中加入城市；Forge 使用独立的 city_futian / city_legacy 测试维度。测试预设、额外测试维度和测试类不进入发行包。

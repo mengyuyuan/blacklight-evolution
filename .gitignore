@@ -68,3 +68,6 @@ __pycache__/
 /model-qa*/
 
 /run-forge-qa/
+
+# Local game launcher logs.
+/logs/
