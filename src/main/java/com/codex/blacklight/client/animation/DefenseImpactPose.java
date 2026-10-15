@@ -22,14 +22,17 @@ public final class DefenseImpactPose {
         var s=impact(p);if(Math.abs(s.spring(p.level().getGameTime()+partial))<.0001)return original;
         if(!UtilityPowerSystem.active(p,s.shield()?PowerForm.SHIELD:PowerForm.ARMOR))return original;
         var pose=original.copy();var v=local(p,partial);
-        pose.orElseEmpty("Torso").rotation().rotateX(v[0]*.24F).rotateZ(-v[1]*.30F);
-        pose.orElseEmpty("Chest").rotation().rotateX(v[0]*.26F).rotateY(v[1]*.28F).rotateX(v[2]*.18F);
-        pose.orElseEmpty("Head").rotation().rotateX(-v[0]*.10F);
+        // Brace through the arm while moving; keep the pelvis and leg cycle readable.
+        float moving=(float)Math.min(1,p.getDeltaMovement().horizontalDistance()/.22);
+        float body=1-.55F*moving;
+        pose.orElseEmpty("Torso").rotation().rotateX(v[0]*.16F*body).rotateZ(-v[1]*.18F*body);
+        pose.orElseEmpty("Chest").rotation().rotateX(v[0]*.22F*body).rotateY(v[1]*.20F*body);
+        pose.orElseEmpty("Head").rotation().rotateX(-v[0]*.07F*body);
         if(s.shield()){
-            pose.orElseEmpty("Shoulder_L").rotation().rotateY(v[1]*.28F).rotateX(v[2]*.18F);
-            pose.orElseEmpty("Elbow_L").rotation().rotateX(v[2]*.46F);
+            pose.orElseEmpty("Shoulder_L").rotation().rotateY(v[1]*.30F).rotateX(v[2]*.25F);
+            pose.orElseEmpty("Elbow_L").rotation().rotateX(v[2]*.55F);
         }else{
-            pose.orElseEmpty(v[1]>0?"Shoulder_R":"Shoulder_L").rotation().rotateZ(-v[1]*.32F);
+            pose.orElseEmpty(v[1]>0?"Shoulder_R":"Shoulder_L").rotation().rotateZ(-v[1]*.26F).rotateX(v[0]*.16F);
         }
         return pose;
     }
