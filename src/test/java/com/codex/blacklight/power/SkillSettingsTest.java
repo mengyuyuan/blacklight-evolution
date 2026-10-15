@@ -11,13 +11,14 @@ class SkillSettingsTest {
     @Test void existingSavesWithoutPreferencesEnableBlockBreaking() {
         assertTrue(SkillSettings.DEFAULT.bulletdiveBlockBreaking());
         assertFalse(SkillSettings.DEFAULT.shieldBorerBlockBreaking());
+        assertTrue(SkillSettings.DEFAULT.prototypeItemPickup());
         assertEquals(SkillSettings.DEFAULT, SkillSettings.CODEC.parse(JsonOps.INSTANCE,
                 JsonParser.parseString("{}")).getOrThrow());
     }
 
     @Test void disablingBlockBreakingSurvivesSaveAndNetworkRoundTrips() {
-        for (boolean enabled : new boolean[]{false, true}) for(boolean borer:new boolean[]{false,true}) {
-            var settings = new SkillSettings(enabled,borer);
+        for (boolean enabled : new boolean[]{false, true}) for(boolean borer:new boolean[]{false,true}) for(boolean pickup:new boolean[]{false,true}) {
+            var settings = new SkillSettings(enabled,borer,pickup);
             var saved = SkillSettings.CODEC.encodeStart(JsonOps.INSTANCE, settings).getOrThrow();
             assertEquals(settings, SkillSettings.CODEC.parse(JsonOps.INSTANCE, saved).getOrThrow());
             var packet = Unpooled.buffer();
@@ -45,6 +46,10 @@ class SkillSettingsTest {
         assertEquals(new SkillSettings(true,true),first);
         assertEquals(new SkillSettings(false,true),bullet.apply(first));
         assertEquals(bullet.apply(first),borer.apply(bullet.apply(SkillSettings.DEFAULT)));
+        var pickup=new com.codex.blacklight.network.SkillSettingsPayload(
+                com.codex.blacklight.network.SkillSettingsPayload.Setting.PROTOTYPE_ITEM_PICKUP,false);
+        assertEquals(new SkillSettings(false,true,false),pickup.apply(bullet.apply(first)));
+        assertEquals(pickup.apply(bullet.apply(first)),bullet.apply(borer.apply(pickup.apply(SkillSettings.DEFAULT))));
     }
 
     @Test void settingRequestsRoundTripWithTheirOwnIdentity(){

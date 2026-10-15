@@ -145,3 +145,7 @@ gradlew.bat clean assemble --no-daemon
 - 原始源码快照：`Blacklight-Ascension-MC1.21.1-NeoForge-0.3.0-standalone-dev.9-sources.zip`。
 
 这些名称区分用途，不表示完成全部玩法验收。代码许可见 [LICENSE](LICENSE)，资源记录见 [资源来源说明](THIRD_PARTY_ASSETS.md)。[公开仓库](https://github.com/mengyuyuan/blacklight-evolution) · [贡献说明](CONTRIBUTING.md)。
+
+## 独立被动药水
+
+永久被动药水和击杀成长已拆为 [Adaptive Passives](standalone-passives/README.md)，独立构建与安装。黑光保留进化点技能，两者同装不会重复结算。
