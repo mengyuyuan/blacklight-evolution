@@ -118,8 +118,9 @@ public final class ProjectileDefenseSystem {
         // Batch a short volley into its strongest contact. Reflection and damage still run for every projectile.
         if(!fresh&&strength<=previous.strength()*1.4F)return;
         ModAttachments.setData(p,ModAttachments.DEFENSE_IMPACT,new DefenseImpact(now,strength,(float)incoming.x,(float)incoming.y,(float)incoming.z,shield,(float)(point.x-p.getX()),(float)(point.y-p.getY()),(float)(point.z-p.getZ())));
-        // Failed blocks already receive ordinary damage knockback. Never add a second push to those hits.
-        if(fresh&&reflected&&!ModAttachments.getData(p,ModAttachments.CONSUMING)){
+        // Light deflections are visual only: syncing tiny server velocity can overwrite client walking momentum.
+        // Near-capacity impacts can push; failed blocks already receive ordinary damage knockback.
+        if(fresh&&reflected&&strength>=.85F&&!ModAttachments.getData(p,ModAttachments.CONSUMING)){
             double push=Math.min(.035,.018*strength)*(shield?1:.5);
             p.push(incoming.x*push,0,incoming.z*push);p.hurtMarked=true;
         }
