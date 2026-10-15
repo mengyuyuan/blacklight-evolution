@@ -32,6 +32,9 @@ public final class FutianLayout {
     public static BlockState state(long seed,int x,int y,int z){return overlay(seed,x,y,z,FutianMap.state(x,y,z));}
     public static BlockState overlay(long seed,int x,int y,int z,BlockState base){
         base=FutianCivicCentre.state(x,y,z,base);
+        return finishOverlay(seed,x,y,z,base);
+    }
+    private static BlockState finishOverlay(long seed,int x,int y,int z,BlockState base){
         base=FutianPublicSpace.state(x,y,z,base);
         if(y<63||y>72||!FutianMap.inside(x,z)||sanctuary(x,z))return base;
         for(int i=0;i<2;i++){
@@ -49,6 +52,30 @@ public final class FutianLayout {
             return (Math.floorMod(hash,17)==0?CityBlocks.SAC:Math.floorMod(hash,9)==0?CityBlocks.VEIN:CityBlocks.FLESH).get().defaultBlockState();
         }
         return base;
+    }
+    /** Resolve the tile and costly roof geometry once for a vertical column, not once per block. */
+    static final class Column {
+        private final long seed;
+        private final int x,z;
+        private final FutianMap.Tile tile;
+        private final FutianCivicCentre.Geometry geometry;
+        final int top;
+        Column(long seed,int x,int z,FutianMap.Tile tile){
+            this.seed=seed;this.x=x;this.z=z;this.tile=tile;
+            geometry=FutianCivicCentre.geometry(x,z);
+            top=Math.max(72,Math.max(tile==null?63:tile.top(x&15,z&15),
+                Math.max(geometry.inside()?geometry.cover()+2:63,FutianPublicSpace.top(x,z))));
+        }
+        BlockState state(int y){
+            if(y<0||y>=FutianMap.HEIGHT)return Blocks.VOID_AIR.defaultBlockState();
+            if(y>top)return Blocks.AIR.defaultBlockState();
+            var base=y<63||tile==null?FutianMap.state(x,y,z):tile.state(x&15,y,z&15);
+            if(y<63)return base;
+            return finishOverlay(seed,x,y,z,FutianCivicCentre.state(x,y,z,base,geometry));
+        }
+    }
+    static Column column(long seed,int x,int z){
+        return new Column(seed,x,z,FutianMap.inside(x,z)?FutianMap.tile(x>>4,z>>4):null);
     }
     private static List<Site> load(){
         try(var stream=FutianLayout.class.getResourceAsStream("/data/blacklight/city/futian/hives.json")){

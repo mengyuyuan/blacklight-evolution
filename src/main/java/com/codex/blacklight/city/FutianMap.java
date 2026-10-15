@@ -15,18 +15,17 @@ import net.minecraft.world.level.block.state.properties.Property;
 public final class FutianMap {
     public static final int WIDTH=1440, DEPTH=1232, HEIGHT=320, CELL=192;
     private static final String ROOT="/data/blacklight/city/futian/";
-    private static final Map<Long,Tile> CACHE=new LinkedHashMap<>(32,.75f,true){
-        @Override protected boolean removeEldestEntry(Map.Entry<Long,Tile> entry){return size()>32;}
-    };
+    // Each decoded tile uses about 129 KiB; default 64 tiles is approximately 8 MiB.
+    private static final BoundedLoadingCache<Long,Tile> CACHE=new BoundedLoadingCache<>(()->CityConfig.TILE_CACHE.get());
     private static final class Palette { static final BlockState[] STATES=loadPalette(); }
     public record Tile(short[] blocks,short[] tops){
         public BlockState state(int x,int y,int z){return y<63||y>=HEIGHT?Blocks.AIR.defaultBlockState():Palette.STATES[Short.toUnsignedInt(blocks[(y-63)*256+z*16+x])];}
         public int top(int x,int z){return tops[z*16+x];}
     }
     public static boolean inside(int x,int z){return x>=0&&z>=0&&x<WIDTH&&z<DEPTH;}
-    public static synchronized Tile tile(int cx,int cz){
+    public static Tile tile(int cx,int cz){
         long key=((long)cx<<32)^(cz&0xffffffffL);
-        return CACHE.computeIfAbsent(key,k->load(cx,cz));
+        return CACHE.get(key,k->load(cx,cz));
     }
     public static BlockState state(int x,int y,int z){
         if(y<0||y>=HEIGHT)return Blocks.VOID_AIR.defaultBlockState();

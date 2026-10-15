@@ -150,7 +150,7 @@ tasks.named('jar', Jar).configure {
             'Blacklight-Bundled-Motions': 'true',
             'Blacklight-Asset-Notice': 'THIRD_PARTY_ASSETS.md')
     exclude 'com/codex/blacklight/gametest/**'
-    exclude 'com/codex/blacklight/city/HiveLifecycleGameTest.class'
+    exclude 'com/codex/blacklight/city/*GameTest*.class'
     exclude 'data/minecraft/worldgen/world_preset/flat.json'
     exclude 'com/codex/blacklight/client/Standalone*Smoke*.class'
     exclude 'com/codex/blacklight/client/StandaloneCriticalMassChecks*.class'
