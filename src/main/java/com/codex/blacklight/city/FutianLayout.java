@@ -32,6 +32,7 @@ public final class FutianLayout {
     public static BlockState state(long seed,int x,int y,int z){return overlay(seed,x,y,z,FutianMap.state(x,y,z));}
     public static BlockState overlay(long seed,int x,int y,int z,BlockState base){
         base=FutianCivicCentre.state(x,y,z,base);
+        base=FutianPublicSpace.state(x,y,z,base);
         if(y<63||y>72||!FutianMap.inside(x,z)||sanctuary(x,z))return base;
         for(int i=0;i<2;i++){
             var h=hive(seed,i);

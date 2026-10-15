@@ -62,7 +62,7 @@ public final class CityChunkGenerator extends FlatLevelSource {
         var surface=chunk.getOrCreateHeightmapUnprimed(Heightmap.Types.WORLD_SURFACE_WG);
         var floor=chunk.getOrCreateHeightmapUnprimed(Heightmap.Types.OCEAN_FLOOR_WG);
         for(int z=0;z<16;z++)for(int x=0;x<16;x++){
-            int top=Math.max(tile==null?63:tile.top(x,z),FutianCivicCentre.top(bx+x,bz+z));
+            int top=Math.max(tile==null?63:tile.top(x,z),Math.max(FutianCivicCentre.top(bx+x,bz+z),FutianPublicSpace.top(bx+x,bz+z)));
             for(int y=Math.max(0,chunk.getMinBuildHeight());y<=Math.min(top,chunk.getMaxBuildHeight()-1);y++){
                 var base=y<63||tile==null?FutianMap.state(bx+x,y,bz+z):tile.state(x,y,z);
                 var state=FutianLayout.overlay(seed,bx+x,y,bz+z,base);

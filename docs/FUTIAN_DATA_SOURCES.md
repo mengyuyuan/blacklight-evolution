@@ -51,4 +51,9 @@ raised pedestrian deck and accessible office wings replace Arnis's extruded
 roof volumes. Colours and silhouette also reference the Shenzhen Archives
 photograph: https://www.szdag.gov.cn/gzdt/gzdt/content/post_1590841.html
 This remains a block-scale interpretation, not a survey-accurate architectural
-model. Surrounding landmark facades and interiors still use the OSM/Arnis base.
+model. The library and concert hall east entrances now have a separate curtain-wall
+and tree-support detail pass in `FutianPublicSpace.java`. The south pedestrian
+axis includes paving, benches and lighting. Other building volumes and most
+interiors retain the OSM/Arnis base; the furniture is a playable adaptation.
+Reference: Shenzhen Housing and Construction Bureau architectural archive:
+https://zjj.sz.gov.cn/gkmlpt/content/12/12270/post_12270322.html

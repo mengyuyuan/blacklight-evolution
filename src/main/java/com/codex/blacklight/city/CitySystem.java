@@ -56,6 +56,9 @@ public final class CitySystem {
     @SubscribeEvent public static void tick(LevelTickEvent.Post event){
         if(!(event.getLevel() instanceof ServerLevel level)||!level.dimension().equals(CityTravel.CITY)||level.players().isEmpty())return;
         long time=level.getGameTime();if(time%20!=0)return;
+        updateLoadedCity(level,time);
+    }
+    static void updateLoadedCity(ServerLevel level,long time){
         CityData data=CityData.get(level);
         for(int hive=0;hive<2;hive++){
             inspectHive(level,data,hive);

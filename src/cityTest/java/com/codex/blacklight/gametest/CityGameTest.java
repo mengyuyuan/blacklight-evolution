@@ -9,6 +9,14 @@ import net.neoforged.neoforge.gametest.*;
 
 @GameTestHolder("blacklight") @PrefixGameTestTemplate(false)
 public class CityGameTest {
+    @GameTest(template="wall_test") public static void publicAxisRemainsWalkable(GameTestHelper h){
+        h.assertTrue(FutianLayout.state(42,668,63,820).is(Blocks.SMOOTH_QUARTZ),"central pedestrian paving missing");
+        h.assertTrue(FutianLayout.state(42,668,64,820).isAir(),"arrival path obstructed");
+        h.assertTrue(FutianLayout.state(42,648,69,800).is(Blocks.SEA_LANTERN),"plaza lighting missing");
+        h.assertTrue(FutianLayout.state(42,463,70,171).is(Blocks.YELLOW_CONCRETE),"concert hall tree support missing");
+        h.assertTrue(FutianLayout.state(42,463,70,341).is(Blocks.QUARTZ_BLOCK),"library tree support missing");
+        h.succeed();
+    }
     @GameTest(template="wall_test") public static void civicCentreHasThinRoofAndOpenAtrium(GameTestHelper h){
         h.assertTrue(FutianLayout.state(42,638,100,625).is(Blocks.YELLOW_CONCRETE),"yellow cylindrical tower missing");
         h.assertTrue(FutianLayout.state(42,706,100,625).is(Blocks.RED_CONCRETE),"red square tower missing");
