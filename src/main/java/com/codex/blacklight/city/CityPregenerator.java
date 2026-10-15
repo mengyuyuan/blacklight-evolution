@@ -16,6 +16,9 @@ public final class CityPregenerator {
         var data=CityGenerationData.get(level);
         if(!data.initialized){data.initialized=true;data.running=CityConfig.WARMUP.get();data.setDirty();}
         var work=WORK.computeIfAbsent(level,l->new Work());
+        if(data.running&&data.mode==3&&!data.atlasFingerprint.equals(WorldAtlas.fingerprint())){
+            data.running=false;data.failure="地图数据已更新，请用 start full 重新建立预生成计划";data.setDirty();release(level,work);return;
+        }
         if(!data.running){release(level,work);return;}
         int now=level.getServer().getTickCount();
         if(work.pending!=null){
@@ -40,7 +43,7 @@ public final class CityPregenerator {
     static void unload(ServerLevel level){var work=WORK.remove(level);if(work!=null)release(level,work);}
     static void start(ServerLevel level,int mode){
         unload(level);var d=CityGenerationData.get(level);d.initialized=true;d.mode=mode;d.cursor=0;
-        d.running=true;d.failure="";d.setDirty();
+        d.running=true;d.failure="";d.atlasFingerprint=mode==3?WorldAtlas.fingerprint():"";d.setDirty();
     }
     static void pause(ServerLevel level){
         var d=CityGenerationData.get(level);d.initialized=true;d.running=false;d.setDirty();unload(level);
@@ -52,7 +55,7 @@ public final class CityPregenerator {
     static boolean hasTicket(ServerLevel level){var w=WORK.get(level);return w!=null&&w.pending!=null;}
     public static String status(ServerLevel level){
         var d=CityGenerationData.get(level);int total=CityGenerationPlan.cells(d.mode).size();
-        return "城市预生成："+(d.mode==2?"完整福田":"出生点周边")+" "+d.cursor+"/"+total+"，"
+        return "城市预生成："+(d.mode==3?"黑光维度已收录地图":d.mode==2?"完整福田":"出生点周边")+" "+d.cursor+"/"+total+"，"
             +(d.cursor>=total?"完成":d.running?"运行中（繁忙时自动等待）":"已暂停")+(d.failure.isEmpty()?"":"；"+d.failure);
     }
     public static com.mojang.brigadier.builder.LiteralArgumentBuilder<CommandSourceStack> command(){
@@ -65,9 +68,9 @@ public final class CityPregenerator {
         return root;
     }
     private static int execute(CommandSourceStack source,String action){
-        var level=source.getServer().getLevel(CityTravel.CITY);
+        var level=CityTravel.commandLevel(source);
         if(level==null||!CitySystem.futian(level)){source.sendFailure(Component.literal("当前存档没有福田城市维度"));return 0;}
-        switch(action){case "near"->start(level,1);case "full"->start(level,2);case "pause"->pause(level);case "resume"->resume(level);default->{}}
+        switch(action){case "near"->start(level,1);case "full"->start(level,level.dimension().equals(CityTravel.WORLD)?3:2);case "pause"->pause(level);case "resume"->resume(level);default->{}}
         source.sendSuccess(()->Component.literal(status(level)),false);return 1;
     }
     private CityPregenerator(){}

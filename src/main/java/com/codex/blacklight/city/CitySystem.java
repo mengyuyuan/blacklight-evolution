@@ -21,7 +21,7 @@ public final class CitySystem {
     private static final int[][] PORTS=CityLayout.HATCHES;
     private CitySystem(){}
     @SubscribeEvent public static void placed(net.neoforged.neoforge.event.level.BlockEvent.EntityPlaceEvent event){
-        if(!(event.getLevel() instanceof ServerLevel level)||!level.dimension().equals(CityTravel.CITY))return;
+        if(!(event.getLevel() instanceof ServerLevel level)||!CityTravel.isCity(level.dimension()))return;
         if(event instanceof net.neoforged.neoforge.event.level.BlockEvent.EntityMultiPlaceEvent multi){
             for(var snapshot:multi.getReplacedBlockSnapshots())protect(level,snapshot.getPos());
         }else protect(level,event.getPos());
@@ -30,7 +30,7 @@ public final class CitySystem {
         if(inside(level,p.getX(),p.getZ())&&p.getY()>=63&&p.getY()<=72){var data=CityData.get(level);if(data.editedBlocks.add(p.asLong()))data.setDirty();}
     }
     public static BlockPos port(long seed,int hive,int index){return new BlockPos(CityLayout.hiveX(seed,hive)*64+PORTS[index][0],65,CityLayout.hiveZ(seed,hive)*64+PORTS[index][1]);}
-    public static boolean futian(ServerLevel level){return level.getChunkSource().getGenerator() instanceof CityChunkGenerator g&&g.futian();}
+    public static boolean futian(ServerLevel level){return level.getChunkSource().getGenerator() instanceof BlacklightWorldGenerator||level.getChunkSource().getGenerator() instanceof CityChunkGenerator g&&g.futian();}
     public static BlockPos port(ServerLevel level,int hive,int index){return futian(level)?FutianLayout.hive(level.getSeed(),hive).ports().get(index).pos():port(level.getSeed(),hive,index);}
     private static int cell(ServerLevel level){return futian(level)?FutianMap.CELL:64;}
     private static boolean inside(ServerLevel level,int x,int z){return futian(level)?FutianMap.inside(x,z):CityLayout.inside(x,z);}
@@ -54,11 +54,12 @@ public final class CitySystem {
     }
     private static boolean loaded(ServerLevel level,BlockPos pos){return level.hasChunkAt(pos)&&level.isPositionEntityTicking(pos);}
     @SubscribeEvent public static void tick(LevelTickEvent.Post event){
-        if(!(event.getLevel() instanceof ServerLevel level)||!level.dimension().equals(CityTravel.CITY))return;
+        if(!(event.getLevel() instanceof ServerLevel level)||!CityTravel.isCity(level.dimension()))return;
         CityPregenerator.tick(level);
         if(level.players().isEmpty())return;
         long time=level.getGameTime();if(time%20!=0)return;
         updateLoadedCity(level,time);
+        if(level.dimension().equals(CityTravel.WORLD)&&time%100==0)populateWorld(level);
     }
     @SubscribeEvent public static void unloaded(net.neoforged.neoforge.event.level.LevelEvent.Unload event){
         if(event.getLevel() instanceof ServerLevel level)CityPregenerator.unload(level);
@@ -113,6 +114,24 @@ public final class CitySystem {
         if(infected)BlacklightInfectionSystem.infect(mob,null);
         if(mob instanceof Zombie zombie)zombie.setBaby(false);
         return level.addFreshEntity(mob);
+    }
+    private static void populateWorld(ServerLevel level){
+        if(!CityConfig.SPAWNS.get()||!CityData.get(level).population||count(level)>=CityConfig.MOB_LIMIT.get())return;
+        // One spawn attempt per five seconds for the entire dimension, only in ticking chunks.
+        var player=level.players().get(level.random.nextInt(level.players().size()));
+        int x=player.getBlockX()+level.random.nextInt(129)-64,z=player.getBlockZ()+level.random.nextInt(129)-64;
+        if(FutianMap.inside(x,z)||!level.isPositionEntityTicking(new BlockPos(x,64,z)))return;
+        var column=WorldTerrain.column(level.getSeed(),x,z);
+        if(column.road==0||column.water>0||!column.parts.isEmpty())return;
+        var chunk=level.getChunkSource().getChunkNow(Math.floorDiv(x,16),Math.floorDiv(z,16));if(chunk==null)return;
+        int y=chunk.getHeight(net.minecraft.world.level.levelgen.Heightmap.Types.MOTION_BLOCKING_NO_LEAVES,x&15,z&15)+1;
+        var p=new BlockPos(x,y,z);
+        if(level.getEntitiesOfClass(Mob.class,new AABB(p).inflate(48)).size()>=8)return;
+        var zone=WorldTerrain.zone(level.getSeed(),x,z);
+        if(zone!=CityLayout.Zone.NORMAL&&level.getDifficulty()==net.minecraft.world.Difficulty.PEACEFUL)return;
+        EntityType<? extends Mob> type=zone==CityLayout.Zone.NORMAL?EntityType.VILLAGER:
+            zone==CityLayout.Zone.CONFLICT?ModEntities.BLACKWATCH_SOLDIER.get():EntityType.ZOMBIE;
+        spawn(level,type,p,type==EntityType.ZOMBIE);
     }
     private static void spawnHive(ServerLevel level,CityData data,int hive){
         if(level.getDifficulty()==net.minecraft.world.Difficulty.PEACEFUL)return;
