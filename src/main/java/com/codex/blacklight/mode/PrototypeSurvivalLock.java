@@ -18,6 +18,15 @@ public final class PrototypeSurvivalLock {
     private PrototypeSurvivalLock() {
     }
 
+    /** Disabling pickup leaves the dropped item intact; enabling it keeps vanilla ownership/delay rules. */
+    @SubscribeEvent
+    public static void onItemPickup(net.neoforged.neoforge.event.entity.player.ItemEntityPickupEvent.Pre event) {
+        if (isLocked(event.getPlayer()) && !event.getPlayer().getData(
+                com.codex.blacklight.registry.ModAttachments.SKILL_SETTINGS).prototypeItemPickup()) {
+            event.setCanPickup(net.neoforged.neoforge.common.util.TriState.FALSE);
+        }
+    }
+
     @SubscribeEvent
     public static void onLeftClickBlock(PlayerInteractEvent.LeftClickBlock event) {
         if (!isLocked(event.getEntity())) return;

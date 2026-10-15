@@ -8,12 +8,13 @@ import net.minecraft.resources.ResourceLocation;
 
 /** Changes only the sending player's preferences, not their unlocks or power. */
 public record SkillSettingsPayload(Setting setting,boolean enabled) implements CustomPacketPayload {
-    public enum Setting { BULLETDIVE_BLOCKS, SHIELD_BORER_BLOCKS }
+    public enum Setting { BULLETDIVE_BLOCKS, SHIELD_BORER_BLOCKS, PROTOTYPE_ITEM_PICKUP }
     public SkillSettingsPayload(boolean enabled){this(Setting.BULLETDIVE_BLOCKS,enabled);}
     public com.codex.blacklight.power.SkillSettings apply(com.codex.blacklight.power.SkillSettings current){
         return switch(setting){
             case BULLETDIVE_BLOCKS -> current.withBulletdive(enabled);
             case SHIELD_BORER_BLOCKS -> current.withShieldBorer(enabled);
+            case PROTOTYPE_ITEM_PICKUP -> current.withPrototypeItemPickup(enabled);
         };
     }
     public static final Type<SkillSettingsPayload> TYPE=new Type<>(

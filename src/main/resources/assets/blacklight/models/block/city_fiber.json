@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:block/cube_column",
+  "textures": {
+    "end": "blacklight:block/city_fiber",
+    "side": "blacklight:block/city_fiber"
+  }
+}

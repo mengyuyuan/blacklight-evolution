@@ -54,7 +54,7 @@ public final class UpgradeScreen extends Screen {
             case COMBAT -> {for(var u:CombatSkill.values())if(!u.shieldBorer()&&!u.adaptivePassive())entries.add(new Entry(u.id(),u.epCost(),u.requires()!=null?u.requires().id():u.movementRequires()!=null?u.movementRequires().id():u.powerRequires()!=null?u.powerRequires().id():null,false));}
             case UTILITY -> {for(var u:List.of(PowerForm.SHIELD,PowerForm.ARMOR,PowerForm.THERMAL_VISION,PowerForm.INFECTED_VISION,PowerForm.BIOMASS))entries.add(new Entry(u.id(),u.epCost(),null,false));for(var u:CombatSkill.values())if(u.shieldBorer())entries.add(new Entry(u.id(),u.epCost(),u.requires()==null?PowerForm.SHIELD.id():u.requires().id(),false));}
             case BIOLOGY -> {for(var u:CombatSkill.values())if(u.adaptivePassive())entries.add(new Entry(u.id(),u.epCost(),u.requires()==null?null:u.requires().id(),false));for(var u:GrowthUpgrade.values())entries.add(new Entry(u.id,u.cost,u.requires()==null?null:u.requires().id,false));}
-            case SETTINGS -> {for(String id:List.of("bulletdive_blocks","shield_borer_blocks"))entries.add(new Entry(id,0,null,true));}
+            case SETTINGS -> {for(String id:List.of("bulletdive_blocks","shield_borer_blocks","prototype_item_pickup","passive_stacks"))entries.add(new Entry(id,0,null,true));}
             default -> {}
         }
         if(entries.stream().noneMatch(e->e.id.equals(selected)))select(entries.isEmpty()?"":entries.get(0).id);
@@ -73,15 +73,25 @@ public final class UpgradeScreen extends Screen {
     private void activate(){
         var e=entry();if(e==null||minecraft.player==null)return;
         if(category==Category.SETTINGS){
-            var setting=e.id.equals("shield_borer_blocks")?SkillSettingsPayload.Setting.SHIELD_BORER_BLOCKS:SkillSettingsPayload.Setting.BULLETDIVE_BLOCKS;
+            if (e.id.equals("passive_stacks")) { com.codex.blacklight.config.PassiveHudConfig.toggle(); refreshButton(); return; }
+            var setting=switch(e.id){
+                case "shield_borer_blocks" -> SkillSettingsPayload.Setting.SHIELD_BORER_BLOCKS;
+                case "prototype_item_pickup" -> SkillSettingsPayload.Setting.PROTOTYPE_ITEM_PICKUP;
+                default -> SkillSettingsPayload.Setting.BULLETDIVE_BLOCKS;
+            };
             PacketDistributor.sendToServer(new SkillSettingsPayload(setting,!settingEnabled(e.id)));return;
         }
         if(!owns(e)&&prerequisite(e)&&balance()>=e.cost)PacketDistributor.sendToServer(new UpgradePurchasePayload(e.id));
     }
     private boolean settingEnabled(String id){
+        if (id.equals("passive_stacks")) return com.codex.blacklight.config.PassiveHudConfig.SHOW_STACKS.get();
         if(minecraft.player==null)return false;
         var settings=minecraft.player.getData(ModAttachments.SKILL_SETTINGS);
-        return id.equals("shield_borer_blocks")?settings.shieldBorerBlockBreaking():settings.bulletdiveBlockBreaking();
+        return switch(id){
+            case "shield_borer_blocks" -> settings.shieldBorerBlockBreaking();
+            case "prototype_item_pickup" -> settings.prototypeItemPickup();
+            default -> settings.bulletdiveBlockBreaking();
+        };
     }
     private void refreshButton(){
         var e=entry();if(e==null)return;

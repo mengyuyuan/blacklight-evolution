@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/orientable",
+  "textures": {
+    "front": "blacklight:block/city_hatch",
+    "side": "blacklight:block/city_shell",
+    "top": "blacklight:block/city_flesh"
+  }
+}

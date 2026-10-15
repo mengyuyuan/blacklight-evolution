@@ -26,6 +26,12 @@ public final class BlacklightNeoMod {
     public static final Logger LOGGER = LogUtils.getLogger();
 
     public BlacklightNeoMod(IEventBus modBus, ModContainer container) {
+        container.registerConfig(net.neoforged.fml.config.ModConfig.Type.CLIENT, com.codex.blacklight.config.PassiveHudConfig.SPEC, "blacklight-client.toml");
+        container.registerConfig(net.neoforged.fml.config.ModConfig.Type.SERVER, com.codex.blacklight.city.CityConfig.SPEC, "blacklight-city-server.toml");
+        com.codex.blacklight.city.CityBlocks.register(modBus);
+        com.codex.blacklight.city.CityWorldgen.register(modBus);
+        NeoForge.EVENT_BUS.register(com.codex.blacklight.city.CitySystem.class);
+        NeoForge.EVENT_BUS.register(com.codex.blacklight.city.CityTravel.class);
         ModAttachments.register(modBus);
         ModEntities.register(modBus);
         ModEffects.register(modBus);

@@ -1,0 +1,29 @@
+modLoader="javafml"
+loaderVersion="[4,)"
+license="GPL-3.0-only"
+[[mods]]
+modId="adaptive_passives"
+version="0.1.0-dev.1"
+displayName="Adaptive Passives"
+authors="末者"
+description="Independent permanent passive potions and capped per-kill health growth. No Blacklight dependency."
+[[mixins]]
+config="adaptive_passives.mixins.json"
+[[dependencies.adaptive_passives]]
+modId="neoforge"
+type="required"
+versionRange="[21.1.244,)"
+ordering="NONE"
+side="BOTH"
+[[dependencies.adaptive_passives]]
+modId="minecraft"
+type="required"
+versionRange="[1.21.1]"
+ordering="NONE"
+side="BOTH"
+[[dependencies.adaptive_passives]]
+modId="blacklight"
+type="optional"
+versionRange="[0.3.4-dev.8,)"
+ordering="NONE"
+side="BOTH"
