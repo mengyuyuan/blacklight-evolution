@@ -11,7 +11,8 @@ import net.neoforged.neoforge.gametest.*;
 public class CityGameTest {
     @GameTest(template="wall_test") public static void publicAxisRemainsWalkable(GameTestHelper h){
         h.assertTrue(FutianLayout.state(42,668,63,820).is(Blocks.SMOOTH_QUARTZ),"central pedestrian paving missing");
-        h.assertTrue(FutianLayout.state(42,668,64,820).isAir(),"arrival path obstructed");
+        for(int x=658;x<=678;x++)for(int z=725;z<=945;z++)for(int y=64;y<=67;y++)
+            h.assertTrue(FutianLayout.state(42,x,y,z).isAir(),"pedestrian axis obstructed at "+x+","+y+","+z);
         h.assertTrue(FutianLayout.state(42,648,69,800).is(Blocks.SEA_LANTERN),"plaza lighting missing");
         h.assertTrue(FutianLayout.state(42,463,70,171).is(Blocks.YELLOW_CONCRETE),"concert hall tree support missing");
         h.assertTrue(FutianLayout.state(42,463,70,341).is(Blocks.QUARTZ_BLOCK),"library tree support missing");
