@@ -14,7 +14,7 @@ public final class FutianPublicSpace {
         if(x>=642&&x<=694&&z>=725&&z<=945){
             if(x>=658&&x<=678){
                 if(y==63)return b(x==658||x==678?Blocks.POLISHED_ANDESITE:Blocks.SMOOTH_QUARTZ);
-                if(y<=66&&(original.is(Blocks.GRASS)||original.is(Blocks.TALL_GRASS)||original.is(Blocks.FERN)))return b(Blocks.AIR);
+                if(y<=67)return b(Blocks.AIR); // Keep the full pedestrian clearance free of imported hedges and walls.
             }
             int along=Math.floorMod(z-760,40);
             if((x==648||x==688)&&z>=760&&z<=920&&along==0){
