@@ -1,0 +1,7 @@
+{
+  "variants": {
+    "": {
+      "model": "blacklight:block/city_shell"
+    }
+  }
+}

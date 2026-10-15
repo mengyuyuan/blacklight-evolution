@@ -17,33 +17,27 @@ public final class AdaptivePassiveSystem {
     private AdaptivePassiveSystem() {}
     public static AdaptivePassiveState state(Player p) { return ModAttachments.getData(p, ModAttachments.ADAPTIVE_PASSIVES); }
     public static boolean active(Player p, int flag) {
-        var data = state(p);
-        if (data.permanent(flag)) return true;
+        if (IndependentPassives.owns(p, flag)) return false;
         var powers = ModAttachments.getData(p, ModAttachments.PLAYER_STATE);
         return powers.isInfected() && powers.isPrototypeMode() && powers.hasCombatSkill(
                 flag == AdaptivePassiveState.ADAPTATION ? CombatSkill.ADAPTATION : CombatSkill.TISSUE_REGENERATION);
     }
     public static boolean percentBased(Player p) {
-        return ModAttachments.getData(p, ModAttachments.PLAYER_STATE).hasCombatSkill(CombatSkill.ADAPTATION_PERCENT);
+        return active(p, AdaptivePassiveState.ADAPTATION) && ModAttachments.getData(p, ModAttachments.PLAYER_STATE).hasCombatSkill(CombatSkill.ADAPTATION_PERCENT);
     }
     private static void publish(ServerPlayer p, AdaptivePassiveState data) {
         if (data.equals(state(p))) return;
         ModAttachments.setData(p, ModAttachments.ADAPTIVE_PASSIVES, data);
-        ModAttachments.syncData(p, ModAttachments.ADAPTIVE_PASSIVES);
     }
     public static boolean grant(ServerPlayer p, int flag) {
-        if ((flag != AdaptivePassiveState.ADAPTATION && flag != AdaptivePassiveState.REGENERATION)
-                || !p.isAlive() || p.isSpectator() || state(p).permanent(flag)) return false;
-        publish(p, state(p).grant(flag));
-        refreshEffects(p);
-        return true;
+        return IndependentPassives.grant(p, flag);
     }
     /** Called exactly once after armor, scale conversion, absorption and critical reserve, before HP loss. */
     public static float finalDamage(LivingEntity entity, DamageSource source, float damage) {
         if (!(entity instanceof ServerPlayer p) || !p.isAlive() || p.isSpectator()
                 || !Float.isFinite(damage) || damage <= 0 || source.is(DamageTypeTags.BYPASSES_INVULNERABILITY)) return damage;
         boolean adaptive = active(p, AdaptivePassiveState.ADAPTATION), regen = active(p, AdaptivePassiveState.REGENERATION);
-        if (!adaptive && !regen) return damage;
+        if (!adaptive && !regen) return IndependentPassives.damage(p, source, damage);
         var before = state(p);
         float actual = adaptive ? (float)(damage * AdaptivePassiveRules.remainingFraction(before.adaptation(),
                 p.getHealth(), p.getMaxHealth(), percentBased(p))) : damage;
@@ -52,7 +46,7 @@ public final class AdaptivePassiveSystem {
         long next = before.nextHealAt();
         if (regen && tissue > 0 && (before.regeneration() == 0 || next == 0)) next = p.level().getGameTime() + 20;
         publish(p, new AdaptivePassiveState(before.permanentMask(), layers, tissue, next));
-        return actual;
+        return IndependentPassives.damage(p, source, actual);
     }
     private static void refreshEffects(ServerPlayer p) {
         if (active(p, AdaptivePassiveState.ADAPTATION)) {
@@ -65,6 +59,9 @@ public final class AdaptivePassiveSystem {
     @SubscribeEvent public static void tick(PlayerTickEvent event) {
         if (event.phase != net.minecraftforge.event.TickEvent.Phase.END || !ModAttachments.available(event.player)) return;
         if (!(event.player instanceof ServerPlayer p) || !p.isAlive() || p.isSpectator()) return;
+        var legacy = state(p);
+        if (IndependentPassives.migrate(p, legacy))
+            publish(p, new AdaptivePassiveState(0, legacy.adaptation(), legacy.regeneration(), legacy.nextHealAt()));
         refreshEffects(p);
         var before = state(p);
         if (!active(p, AdaptivePassiveState.REGENERATION) || before.regeneration() <= 0) return;

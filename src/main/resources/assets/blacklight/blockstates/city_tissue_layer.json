@@ -1,0 +1,13 @@
+{
+  "variants": {
+    "type=bottom": {
+      "model": "blacklight:block/city_tissue_layer"
+    },
+    "type=top": {
+      "model": "blacklight:block/city_tissue_layer_top"
+    },
+    "type=double": {
+      "model": "blacklight:block/city_flesh"
+    }
+  }
+}

@@ -185,7 +185,7 @@ public final class PlayerMotionController {
         var runtime=state(entity);
         if(runtime.preview!=null)return utilityPose(entity,partial);
         var raw=runtime.interval.ready()?runtime.interval.sample(partial):utilityPose(entity,partial);
-        return runtime.combat.sample(raw,partial);
+        return com.codex.blacklight.client.animation.DefenseImpactPose.apply(entity,runtime.combat.sample(raw,partial),partial);
     }
     /** Read the already committed distance-driven gait without action overlays. */
     public static BlacklightPose locomotionPose(LivingEntity entity,float partial) {

@@ -435,12 +435,13 @@ public final class ConsumeSystem {
         if(ConsumeSequence.boss(target)) {
             var source=target.damageSources().playerAttack(player);
             target.invulnerableTime=0;
-            if(target instanceof net.minecraft.world.entity.boss.enderdragon.EnderDragon dragon)
-                dragon.hurt(dragon.head,source,Math.max(1000,dragon.getMaxHealth()*20));
-            else target.hurt(source,Math.max(1000,target.getMaxHealth()*20));
-            boolean dying=target.isDeadOrDying() || target instanceof net.minecraft.world.entity.boss.enderdragon.EnderDragon dragon
-                    && dragon.getPhaseManager().getCurrentPhase().getPhase()==net.minecraft.world.entity.boss.enderdragon.phases.EnderDragonPhase.DYING;
-            if(!dying){message(player,"consume_cancelled");return;}
+            boolean accepted=target instanceof net.minecraft.world.entity.boss.enderdragon.EnderDragon dragon
+                    ? dragon.hurt(dragon.head,source,Math.max(1000,dragon.getMaxHealth()*20))
+                    : target.hurt(source,Math.max(1000,target.getMaxHealth()*20));
+            // Zero HP (or the dragon's DYING phase) alone does not prove death was accepted.
+            if(!accepted||!((com.codex.blacklight.mixin.LivingDeathAccess)target).blacklight$deathAccepted()){
+                message(player,"consume_cancelled");return;
+            }
         } else if(target instanceof BlacklightHunter hunter)hunter.beginConsumeRemains();
         else target.discard();
         com.codex.blacklight.registry.ModAttachments.setData(player, ModAttachments.CONSUME_RECOVERY,recovery);com.codex.blacklight.registry.ModAttachments.syncData(player, ModAttachments.CONSUME_RECOVERY);

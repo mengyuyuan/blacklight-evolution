@@ -74,6 +74,7 @@ public final class CombatScale {
     }
     @SubscribeEvent(priority=EventPriority.LOWEST)
     public static void heal(LivingHealEvent event){
+        if (event.getEntity().getPersistentData().getBoolean("adaptive_passives:healing")) return;
         if(!event.getEntity().level().isClientSide&&event.getAmount()>0)
             event.setAmount(event.getAmount()*units(event.getEntity()));
     }

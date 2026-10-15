@@ -52,9 +52,9 @@ public final class UpgradeScreen extends Screen {
             case CLAW -> {entries.add(new Entry("groundspike",0,null,true));for(var u:ClawUpgrade.values())entries.add(new Entry(u.id(),u.epCost(),null,false));}
             case FORMS -> {for(var u:List.of(PowerForm.CLAWS,PowerForm.HAMMERFISTS,PowerForm.BLADE,PowerForm.WHIPFIST,PowerForm.MUSCLE_MASS))entries.add(new Entry(u.id(),u.epCost(),null,u==PowerForm.CLAWS));}
             case COMBAT -> {for(var u:CombatSkill.values())if(!u.shieldBorer()&&!u.adaptivePassive())entries.add(new Entry(u.id(),u.epCost(),u.requires()!=null?u.requires().id():u.movementRequires()!=null?u.movementRequires().id():u.powerRequires()!=null?u.powerRequires().id():null,false));}
-            case UTILITY -> {for(var u:List.of(PowerForm.SHIELD,PowerForm.ARMOR,PowerForm.THERMAL_VISION,PowerForm.INFECTED_VISION,PowerForm.BIOMASS))entries.add(new Entry(u.id(),u.epCost(),null,false));for(var u:CombatSkill.values())if(u.shieldBorer())entries.add(new Entry(u.id(),u.epCost(),u.requires()==null?PowerForm.SHIELD.id():u.requires().id(),false));}
+            case UTILITY -> {entries.add(new Entry(RicochetRules.ID,0,null,false));for(var u:List.of(PowerForm.SHIELD,PowerForm.ARMOR,PowerForm.THERMAL_VISION,PowerForm.INFECTED_VISION,PowerForm.BIOMASS))entries.add(new Entry(u.id(),u.epCost(),null,false));for(var u:CombatSkill.values())if(u.shieldBorer())entries.add(new Entry(u.id(),u.epCost(),u.requires()==null?PowerForm.SHIELD.id():u.requires().id(),false));}
             case BIOLOGY -> {for(var u:CombatSkill.values())if(u.adaptivePassive())entries.add(new Entry(u.id(),u.epCost(),u.requires()==null?null:u.requires().id(),false));for(var u:GrowthUpgrade.values())entries.add(new Entry(u.id,u.cost,u.requires()==null?null:u.requires().id,false));}
-            case SETTINGS -> {for(String id:List.of("bulletdive_blocks","shield_borer_blocks"))entries.add(new Entry(id,0,null,true));}
+            case SETTINGS -> {for(String id:List.of("bulletdive_blocks","shield_borer_blocks","prototype_item_pickup","passive_stacks"))entries.add(new Entry(id,0,null,true));}
             default -> {}
         }
         if(entries.stream().noneMatch(e->e.id.equals(selected)))select(entries.isEmpty()?"":entries.get(0).id);
@@ -68,20 +68,31 @@ public final class UpgradeScreen extends Screen {
     private Component label(String id){return Component.translatable((category==Category.SETTINGS?"setting.blacklight.":"upgrade.blacklight.")+id);}
     private static BlacklightState state(){var p=Minecraft.getInstance().player;return p==null?null:com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.PLAYER_STATE);}
     private boolean owns(Entry e){return e.free||owned(state(),e.id);}
-    private boolean prerequisite(Entry e){return e.required==null||owned(state(),e.required);}
+    private boolean prerequisite(Entry e){return e.id.equals(RicochetRules.ID)?minecraft.player!=null&&ProjectileDefenseSystem.unlocked(minecraft.player):e.required==null||owned(state(),e.required);}
+    private int cost(Entry e){return e.id.equals(RicochetRules.ID)&&minecraft.player!=null?RicochetRules.cost(ProjectileDefenseSystem.level(minecraft.player)):e.cost;}
     private int balance(){var s=state();return s==null?0:s.getEvolutionPoints();}
     private void activate(){
         var e=entry();if(e==null||minecraft.player==null)return;
         if(category==Category.SETTINGS){
-            var setting=e.id.equals("shield_borer_blocks")?SkillSettingsPayload.Setting.SHIELD_BORER_BLOCKS:SkillSettingsPayload.Setting.BULLETDIVE_BLOCKS;
+            if (e.id.equals("passive_stacks")) { com.codex.blacklight.config.PassiveHudConfig.toggle(); refreshButton(); return; }
+            var setting=switch(e.id){
+                case "shield_borer_blocks" -> SkillSettingsPayload.Setting.SHIELD_BORER_BLOCKS;
+                case "prototype_item_pickup" -> SkillSettingsPayload.Setting.PROTOTYPE_ITEM_PICKUP;
+                default -> SkillSettingsPayload.Setting.BULLETDIVE_BLOCKS;
+            };
             PacketDistributor.sendToServer(new SkillSettingsPayload(setting,!settingEnabled(e.id)));return;
         }
-        if(!owns(e)&&prerequisite(e)&&balance()>=e.cost)PacketDistributor.sendToServer(new UpgradePurchasePayload(e.id));
+        if(!owns(e)&&prerequisite(e)&&balance()>=cost(e))PacketDistributor.sendToServer(new UpgradePurchasePayload(e.id));
     }
     private boolean settingEnabled(String id){
+        if (id.equals("passive_stacks")) return com.codex.blacklight.config.PassiveHudConfig.SHOW_STACKS.get();
         if(minecraft.player==null)return false;
-        var settings=com.codex.blacklight.registry.ModAttachments.getData(minecraft.player, ModAttachments.SKILL_SETTINGS);
-        return id.equals("shield_borer_blocks")?settings.shieldBorerBlockBreaking():settings.bulletdiveBlockBreaking();
+        var settings=com.codex.blacklight.registry.ModAttachments.getData(minecraft.player,ModAttachments.SKILL_SETTINGS);
+        return switch(id){
+            case "shield_borer_blocks" -> settings.shieldBorerBlockBreaking();
+            case "prototype_item_pickup" -> settings.prototypeItemPickup();
+            default -> settings.bulletdiveBlockBreaking();
+        };
     }
     private void refreshButton(){
         var e=entry();if(e==null)return;
@@ -89,8 +100,8 @@ public final class UpgradeScreen extends Screen {
             boolean on=settingEnabled(e.id);
             purchase.setMessage(Component.translatable(on?"screen.blacklight.setting_on":"screen.blacklight.setting_off"));purchase.active=minecraft.player!=null;return;
         }
-        purchase.active=minecraft.player!=null&&!owns(e)&&prerequisite(e)&&balance()>=e.cost;
-        purchase.setMessage(Component.translatable(owns(e)?"screen.blacklight.state_owned":!prerequisite(e)?"screen.blacklight.requires_short":"screen.blacklight.state_cost",e.cost));
+        purchase.active=minecraft.player!=null&&!owns(e)&&prerequisite(e)&&balance()>=cost(e);
+        purchase.setMessage(Component.translatable(owns(e)?"screen.blacklight.state_owned":!prerequisite(e)?"screen.blacklight.requires_short":"screen.blacklight.state_cost",cost(e)));
     }
     @Override public void renderBackground(GuiGraphics g){}
     @Override public void render(GuiGraphics g,int mx,int my,float partial){
@@ -124,7 +135,7 @@ public final class UpgradeScreen extends Screen {
         var e=entry();if(e==null)return;
         g.fill(detailX-3,TOP-4,width-8,bottom,0xFF16181B);g.enableScissor(detailX,TOP,width-10,bottom);
         int y=paragraph(g,label(e.id),TOP-detailScroll,TEXT)+6;
-        if(category!=Category.SETTINGS){
+        if(category!=Category.SETTINGS&&!e.id.equals(RicochetRules.ID)){
             var tutorial=SkillTutorial.forSkill(e.id);int previewHeight=previewHeight();
             g.fill(detailX,y,detailX+detailWidth,y+previewHeight,0xFF22262B);
             long elapsed=((paused?pausedAt:System.nanoTime())-selectedAt)/1_000_000;
@@ -137,6 +148,13 @@ public final class UpgradeScreen extends Screen {
         }
         y=paragraph(g,Component.translatable("tutorial.blacklight.effect"),y,RED)+4;
         y=paragraph(g,Component.translatable((category==Category.SETTINGS?"setting.blacklight.":"upgrade.blacklight.")+e.id+".desc"),y,DIM)+8;
+        if(e.id.equals(RicochetRules.ID)&&minecraft.player!=null){
+            long level=ProjectileDefenseSystem.level(minecraft.player);
+            y=paragraph(g,Component.translatable("screen.blacklight.ricochet_stats",level,
+                    String.format(java.util.Locale.ROOT,"%.1f",RicochetRules.capacity(level,true)),
+                    String.format(java.util.Locale.ROOT,"%.1f",RicochetRules.capacity(level,false)),
+                    String.format(java.util.Locale.ROOT,"%.2f",RicochetRules.multiplier(level)),cost(e)),y,TEXT)+8;
+        }
         if(e.required!=null)y=paragraph(g,Component.translatable("screen.blacklight.state_requires",Component.translatable("upgrade.blacklight."+e.required)),y,0xFFD6A089)+8;
         detailHeight=y-(TOP-detailScroll);g.disableScissor();detailScroll=com.codex.blacklight.util.MathCompat.clamp(detailScroll,0,maxDetailScroll());bar(g,width-10,TOP,bottom,detailScroll,detailHeight);
     }

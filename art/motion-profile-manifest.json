@@ -118,8 +118,8 @@
       "sha256": "3ed0111bba80eb6f23532f3a1719833ef15240abdd1c969ba44088e73c0937b1"
     },
     "basic_idle_whip.json": {
-      "bytes": 457967,
-      "sha256": "bb8732468e853f1db9bbc1fae9e47c591eaf1c0956fdae0a85eed806548b6b36"
+      "bytes": 456055,
+      "sha256": "463f5127b13ec0559f119af0ce7cb77b96d2108b3aa950cd650e94a08f39a17b"
     },
     "basic_jump_charge.json": {
       "bytes": 486448,
@@ -130,8 +130,8 @@
       "sha256": "6e261fb335441adfd3ddb1f8c18d6354a6ae249e4225bbf86bffeb127bdb231f"
     },
     "basic_jump_running.json": {
-      "bytes": 243386,
-      "sha256": "10c16c2fea25733a2f52b8fc362c2149423a78c5b7942ed72c52d2436f9ee3af"
+      "bytes": 242876,
+      "sha256": "ab786798c055dd31c09eb003bdb200518ccffa557248a9b75ae485fc4f45f88a"
     },
     "basic_jump_tactical.json": {
       "bytes": 274364,
@@ -162,8 +162,8 @@
       "sha256": "0b077f79dc7ef8e3d8f967257a607b134117d149cffc63abfc4283a4430d2372"
     },
     "basic_sprint.json": {
-      "bytes": 178108,
-      "sha256": "6840cd553cd6392e91c1986419766672c4aac6cbe113f6600e773bea33209090"
+      "bytes": 178405,
+      "sha256": "3ba37eccbc10c8e813ff903188b1616178173cb84a508cf9a776b252e562f9c9"
     },
     "basic_sprint_brake.json": {
       "bytes": 277830,
@@ -182,8 +182,8 @@
       "sha256": "f749e83544e56190719358a7969dc6045856aa91dcd656593f63e7e2537f54b7"
     },
     "basic_walk.json": {
-      "bytes": 397882,
-      "sha256": "871d6e141f0a3c645d9c3894d88ac7a7d0e530945f7fc82096f76a6082a61196"
+      "bytes": 395729,
+      "sha256": "2960c6c0b502498269f69af6b8b067c29c59843923e538252073e86288862430"
     },
     "basic_wall_climb_down.json": {
       "bytes": 328015,

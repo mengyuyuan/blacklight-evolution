@@ -14,6 +14,7 @@ public final class UpgradeSystem {
     }
 
     public static void purchase(ServerPlayer player, String upgradeId) {
+        if(RicochetRules.ID.equals(upgradeId)){ProjectileDefenseSystem.purchase(player);return;}
         var growth=GrowthUpgrade.byId(upgradeId);
         if(growth!=null){GrowthSystem.purchase(player,growth);return;}
         BlacklightState state = com.codex.blacklight.registry.ModAttachments.getData(player, ModAttachments.PLAYER_STATE);

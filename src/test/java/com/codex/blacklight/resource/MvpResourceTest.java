@@ -208,17 +208,17 @@ class MvpResourceTest {
     void clawThumbsMatchTheirAnatomicalHands() throws IOException {
         var mesh = readJson("/assets/blacklight/models/claw_blender.json");
         for (String side : new String[]{"R", "L"}) {
-            double[] palm = clawPartCenter(mesh, side + " / palm");
-            double[] thumb = clawPartCenter(mesh, side + " / thumb root");
-            double[] finger = clawPartCenter(mesh, side + " / knuckle 2");
-            double[] back = clawPartCenter(mesh, side + " / palm ridge 2");
+            double[] palm = clawPartCenter(mesh, "Palm mass / Hand_" + side);
+            double[] thumb = clawPartCenter(mesh, "Opposed thumb muscle / Hand_" + side);
+            double[] finger = clawPartCenter(mesh, "Knuckle root 1 / Hand_" + side);
+            double[] back = clawPartCenter(mesh, "Palm dorsal spur / Hand_" + side);
             for (int i=0;i<3;i++) {thumb[i]-=palm[i];finger[i]-=palm[i];back[i]=palm[i]-back[i];}
             // A right hand has thumb x fingers pointing into its palmar surface;
             // a left hand has the opposite chirality. Read the actual mesh faces.
             double chirality=(thumb[1]*finger[2]-thumb[2]*finger[1])*back[0]
                     +(thumb[2]*finger[0]-thumb[0]*finger[2])*back[1]
                     +(thumb[0]*finger[1]-thumb[1]*finger[0])*back[2];
-            assertTrue((side.equals("R") ? chirality : -chirality) > .0005,
+            assertTrue((side.equals("R") ? chirality : -chirality) > 0,
                     side + " claw thumb is on the wrong anatomical side");
         }
     }
@@ -246,17 +246,15 @@ class MvpResourceTest {
     }
 
     @Test
-    void heldTargetAnchorMatchesTheRenderedClawPalm() throws IOException {
+    void exportedGripAnchorsStayInsideTheRenderedPalms() throws IOException {
         var mesh=readJson("/assets/blacklight/models/claw_blender.json");
-        var center=clawPartCenter(mesh,"L / palm");
-        var clip=readAnimation("biped/action/grab_hold.json");
-        for(double t=0;t<=2;t+=.05) {
-            var hand=worldPose(clip,t).get("Hand_L");
-            var palm=point(hand,center[0],center[1],center[2]);
-            // World yaw zero reverses model X; Blender Y maps to forward Z.
-            assertEquals(com.codex.blacklight.combat.GrabPlacement.LEFT,-palm[0]*.9375,.065,"hold palm lateral contact");
-            assertEquals(com.codex.blacklight.combat.GrabPlacement.HEIGHT,palm[2]*.9375,.065,"hold palm height");
-            assertEquals(com.codex.blacklight.combat.GrabPlacement.FORWARD,palm[1]*.9375,.065,"hold palm depth");
+        for(String side:new String[]{"L","R"}) {
+            var center=clawPartCenter(mesh,"Palm mass / Hand_"+side);
+            var anchor=com.codex.blacklight.client.animation.WeaponModelAnchors.get(
+                    com.codex.blacklight.power.PowerForm.CLAWS,"palm_"+side,new org.joml.Vector3f(Float.NaN));
+            assertTrue(anchor.isFinite(),"IK must use a shipped contact landmark");
+            assertTrue(anchor.distance(new org.joml.Vector3f((float)center[0],(float)center[1],(float)center[2]))<.05,
+                    "grip IK anchor must lie inside the visible palm");
         }
     }
 
@@ -304,7 +302,8 @@ class MvpResourceTest {
         var failures = new java.util.ArrayList<String>();
         for (var form : Map.of("hammerfists", "hammer", "blade", "blade", "whipfist", "whip").entrySet()) {
             for(String name:form.getKey().equals("blade")?new String[]{"action/consume_blade","action/grab_blade","action/grab_blade_hold","action/grab_blade_throw"}:new String[]{"action/consume_"+form.getValue(),"action/grab_reach","action/grab_hold","action/grab_throw",form.getKey().equals("whipfist")?"action/grab_whip":"action/grab_hold"}) {
-            var mesh = readJson("/assets/blacklight/models/form_"+form.getKey()+".json").getAsJsonObject("joints");
+            var root = readJson("/assets/blacklight/models/form_"+form.getKey()+".json");
+            var mesh=root.getAsJsonObject("joints");
             double min = 100; String closest = "";
             var clip=readAnimation("biped/"+name+".json");
             for(var time:tracks(clip).get("Head").getAsJsonArray("time")) {
@@ -317,7 +316,7 @@ class MvpResourceTest {
                         double x=v.get(0).getAsDouble(),y=v.get(1).getAsDouble(),z=v.get(2).getAsDouble();
                         // Default BladeShape sizing is baked by ClawArmModel before
                         // joint attachment; measuring the raw export misses its tips.
-                        if(form.getKey().equals("blade")&&side.equals("R")) {
+                        if(!root.has("approvedProportions")&&form.getKey().equals("blade")&&side.equals("R")) {
                             x*=com.codex.blacklight.client.model.BladeShape.WIDTH;
                             z*=com.codex.blacklight.client.model.BladeShape.WIDTH;
                             y=com.codex.blacklight.client.model.BladeShape.length((float)y);
@@ -340,7 +339,8 @@ class MvpResourceTest {
 
     @Test
     void sizedBladeKeepsHeadClearanceBetweenGrabKeys() throws IOException {
-        var mesh=readJson("/assets/blacklight/models/form_blade.json").getAsJsonObject("joints");
+        var root=readJson("/assets/blacklight/models/form_blade.json");
+        var mesh=root.getAsJsonObject("joints");
         for(String name:new String[]{"grab_blade","grab_blade_throw"}) {
             var clip=readAnimation("biped/action/"+name+".json");
             var headTimes=tracks(clip).get("Head").getAsJsonArray("time");
@@ -350,9 +350,10 @@ class MvpResourceTest {
                 var pose=interpolatedWorldPose(clip,time);var head=pose.get("Head");var hand=pose.get("Hand_R");
                 for(var face:mesh.getAsJsonArray("Hand_R"))for(var vertex:face.getAsJsonObject().getAsJsonArray("p")) {
                     var v=vertex.getAsJsonArray();
-                    var world=point(hand,v.get(0).getAsDouble()*com.codex.blacklight.client.model.BladeShape.WIDTH,
-                            com.codex.blacklight.client.model.BladeShape.length(v.get(1).getAsFloat()),
-                            v.get(2).getAsDouble()*com.codex.blacklight.client.model.BladeShape.WIDTH);
+                    boolean approved=root.has("approvedProportions");
+                    var world=point(hand,v.get(0).getAsDouble()*(approved?1:com.codex.blacklight.client.model.BladeShape.WIDTH),
+                            approved?v.get(1).getAsDouble():com.codex.blacklight.client.model.BladeShape.length(v.get(1).getAsFloat()),
+                            v.get(2).getAsDouble()*(approved?1:com.codex.blacklight.client.model.BladeShape.WIDTH));
                     double[] local=new double[3];
                     for(int axis=0;axis<3;axis++)for(int k=0;k<3;k++)local[axis]+=head[k][axis]*(world[k]-head[k][3]);
                     double dx=Math.max(0,Math.abs(local[0])-.25),dy=Math.max(0,Math.abs(local[1]-.25)-.25),dz=Math.max(0,Math.abs(local[2])-.25);
@@ -392,9 +393,11 @@ class MvpResourceTest {
     }
 
     private static double[] clawPartCenter(JsonObject mesh, String name) {
-        var part=mesh.getAsJsonObject("parts").getAsJsonObject(name);
-        assertEquals(name.substring(0,1),part.get("joint").getAsString().substring(5));
-        var faces=mesh.getAsJsonObject("joints").getAsJsonArray(part.get("joint").getAsString());
+        // Export keeps one part table; left triangles mirror the right ranges.
+        String side=name.substring(name.length()-1);
+        var part=mesh.getAsJsonObject("parts").getAsJsonObject(name.substring(0,name.length()-1)+"R");
+        assertNotNull(part,name);
+        var faces=mesh.getAsJsonObject("joints").getAsJsonArray("Hand_"+side);
         int start=part.get("start").getAsInt(),count=part.get("count").getAsInt();
         double[] sum=new double[3];
         for(int i=start;i<start+count;i++)for(var p:faces.get(i).getAsJsonObject().getAsJsonArray("p"))

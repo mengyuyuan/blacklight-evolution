@@ -101,6 +101,8 @@ public final class BlockShieldModel {
         }
         state.hp=utility.shield();state.stage=stage;
         if(state.strength<=.001F && !(active&&utility.broken()))return;
+        stack.pushPose();
+        com.codex.blacklight.client.ClientPoseMatrices.multiply(stack,com.codex.blacklight.client.animation.DefenseImpactPose.shield(player,partial));
         var out=buffers.getBuffer(RenderType.entityCutoutNoCull(BlockArmorModel.TEXTURE));var pose=stack.last();
         for(Part p:parts) {
             if(p.maxStage<stage)continue;
@@ -126,5 +128,6 @@ public final class BlockShieldModel {
                 veins.vertex((pose).pose(),point.x,point.y,point.z).color(111,27,28,180).uv(.5F,.5F).overlayCoords(OverlayTexture.NO_OVERLAY).uv2(light).normal((pose).normal(),front.x,front.y,front.z).endVertex();
             }
         }
+        stack.popPose();
     }
 }

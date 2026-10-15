@@ -12,6 +12,7 @@ import net.minecraftforge.client.event.RenderGuiEvent;
 public final class AdaptivePassiveHud {
     private AdaptivePassiveHud() {}
     @SubscribeEvent public static void render(RenderGuiEvent.Post event) {
+        if (!com.codex.blacklight.config.PassiveHudConfig.SHOW_STACKS.get()) return;
         var mc = Minecraft.getInstance();
         var p = mc.player;
         if (p == null || !p.isAlive() || p.isSpectator() || mc.options.hideGui || mc.screen != null) return;

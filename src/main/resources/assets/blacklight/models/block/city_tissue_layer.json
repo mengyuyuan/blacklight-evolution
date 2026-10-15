@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/slab",
+  "textures": {
+    "bottom": "blacklight:block/city_flesh",
+    "top": "blacklight:block/city_flesh",
+    "side": "blacklight:block/city_flesh"
+  }
+}

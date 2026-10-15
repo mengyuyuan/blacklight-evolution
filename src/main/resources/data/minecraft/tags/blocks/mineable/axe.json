@@ -1,0 +1,13 @@
+{
+  "replace": false,
+  "values": [
+    "blacklight:city_flesh",
+    "blacklight:city_fiber",
+    "blacklight:city_vein",
+    "blacklight:city_shell",
+    "blacklight:city_wounded",
+    "blacklight:city_tissue_layer",
+    "blacklight:city_hatch",
+    "blacklight:city_sac"
+  ]
+}

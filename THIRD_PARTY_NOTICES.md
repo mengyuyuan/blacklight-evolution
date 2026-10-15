@@ -72,3 +72,11 @@ development inputs, not code dependencies of this runtime.
 ParCool 3.4.3.3 is an optional installed mod and compile-only compatibility API
 (LGPL-3.0). Blacklight's native traversal does not require it. Its JAR and assets
 are not embedded. The former Epic ParCool animation lookup has been removed.
+
+## Shenzhen Futian map database
+
+Map data © OpenStreetMap contributors (ODbL 1.0), generated with Arnis 3.3.0
+(Apache-2.0). The derived database under `data/blacklight/city/futian/` remains
+under ODbL 1.0. See `docs/FUTIAN_DATA_SOURCES.md` for attribution, source links,
+generation parameters and accuracy limits. In-game attribution is available
+through `/blacklightcity credits`.

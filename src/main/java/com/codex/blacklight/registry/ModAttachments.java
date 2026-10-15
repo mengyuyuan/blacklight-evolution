@@ -101,6 +101,11 @@ public final class ModAttachments {
                     .serialize(com.codex.blacklight.power.AdaptivePassiveState.CODEC).copyOnDeath()
                     .sync(com.codex.blacklight.power.AdaptivePassiveState.STREAM_CODEC).build());
 
+    public static final Supplier<AttachmentType<Long>> RICOCHET_LEVEL=ATTACHMENTS.register("ricochet_level",
+            ()->AttachmentType.builder(()->0L).serialize(com.mojang.serialization.Codec.LONG).copyOnDeath().sync(com.codex.blacklight.forge.codec.ByteBufCodecs.VAR_LONG).build());
+    public static final Supplier<AttachmentType<com.codex.blacklight.power.DefenseImpact>> DEFENSE_IMPACT=ATTACHMENTS.register("defense_impact",
+            ()->AttachmentType.builder(()->com.codex.blacklight.power.DefenseImpact.EMPTY).sync(com.codex.blacklight.power.DefenseImpact.CODEC).build());
+
     private ModAttachments() {
     }
     public static final Supplier<AttachmentType<Integer>> JUMP_CHARGE=ATTACHMENTS.register("jump_charge",
@@ -183,7 +188,8 @@ public final class ModAttachments {
         AttachmentType<T> type = key.get();
         T previous = storage(entity).set(type, value);
         // Preserve AttachmentHolder#setData: callers replacing a value need no explicit syncData call.
-        if (!entity.level().isClientSide && !entity.isRemoved()) publish(entity, type);
+        if (!entity.level().isClientSide && !entity.isRemoved()
+                && (type != BIOMASS_FORM.get() || com.codex.blacklight.power.BiomassSync.shouldSync(entity))) publish(entity, type);
         return previous;
     }
 

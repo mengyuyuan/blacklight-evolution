@@ -1,0 +1,15 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "com.codex.passives.mixin",
+  "compatibilityLevel": "JAVA_17",
+  "refmap": "adaptive_passives.refmap.json",
+  "mixins": [
+    "PlayerDamageMixin",
+    "HealthLimitAccessor"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  },
+  "plugin": "com.codex.passives.mixin.CompatibilityPlugin"
+}
