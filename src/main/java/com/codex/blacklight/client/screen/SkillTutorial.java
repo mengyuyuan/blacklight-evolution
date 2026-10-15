@@ -9,6 +9,7 @@ import java.util.List;
 public record SkillTutorial(String family,String clip,PowerForm form,String instructionFamily,String... bindings) {
     public static SkillTutorial forSkill(String id) {
         if(id.equals("adaptation")||id.equals("tissue_regeneration")||id.equals("adaptation_percent"))return new SkillTutorial("health","basic_idle",PowerForm.NONE,id);
+        if(id.equals("kinetic_reflection"))return of("shield","basic_run",PowerForm.NONE,"key.blacklight.defense");
         if(id.startsWith("slime_"))return new SkillTutorial("health","basic_idle",PowerForm.NONE,"slime");
         if(id.startsWith("block_throw_"))return of("block_throw","block_throw_two_release",PowerForm.MUSCLE_MASS,"key.blacklight.grab","key.attack","key.use","key.sneak");
         if(id.startsWith("jump_"))return of("jump","basic_jump_charge",PowerForm.NONE,"key.jump");

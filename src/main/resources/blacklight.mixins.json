@@ -4,6 +4,7 @@
   "package": "com.codex.blacklight.mixin",
   "compatibilityLevel": "JAVA_21",
   "mixins": [
+    "ShulkerReflectionAccess",
     "LivingDeathAccess",
     "BulletdiveBlockFeedbackMixin",
     "BulletdiveItemMergeAccess",

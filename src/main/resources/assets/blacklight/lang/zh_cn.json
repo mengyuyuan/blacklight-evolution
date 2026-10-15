@@ -491,5 +491,12 @@
   "tutorial.blacklight.adaptation_percent.controls": "被动，无需按键。",
   "tutorial.blacklight.adaptation_percent.steps": "替换适应性的分母：减伤＝层数÷（层数＋当前生命百分数）。1000点上限、当前10点生命，百分数为1；99层对应99%减伤。百分数不提前取整；加层与扣层规则不变。",
   "tutorial.blacklight.tissue_regeneration.controls": "被动，无需按键。",
-  "tutorial.blacklight.tissue_regeneration.steps": "被动：每次受伤，按适应性减伤前的伤害÷6增加层数（四舍五入）。每20刻回复当前层数对应的生命值，再扣除20%层数（四舍五入）。从0层开始；剩1或2层时按此公式不再衰减。学习后在虐杀模式生效。"
+  "tutorial.blacklight.tissue_regeneration.steps": "被动：每次受伤，按适应性减伤前的伤害÷6增加层数（四舍五入）。每20刻回复当前层数对应的生命值，再扣除20%层数（四舍五入）。从0层开始；剩1或2层时按此公式不再衰减。学习后在虐杀模式生效。",
+  "upgrade.blacklight.kinetic_reflection": "动能反射 · 无限进化",
+  "upgrade.blacklight.kinetic_reflection.desc": "反复消耗进化点升级，无预设等级上限。提高护盾正面和装甲全身的弹射物反弹承载力及反击伤害；超过承载力或护盾耐久不足时，仍按原防御规则承伤。速度影响冲击强度；回弹速度有界，伤害继续成长。需要先解锁护盾或装甲。",
+  "message.blacklight.ricochet_upgrade": "动能反射已提升至 %s 级",
+  "screen.blacklight.ricochet_stats": "当前等级：%s\n护盾承载力：%s\n装甲承载力：%s\n反击伤害：×%s\n下一级：%s EP",
+  "screen.blacklight.stats.ricochet_level": "动能反射等级",
+  "screen.blacklight.stats.ricochet_power": "反弹承载力（盾 / 甲）",
+  "screen.blacklight.stats.ricochet_damage": "反弹伤害倍率"
 }
