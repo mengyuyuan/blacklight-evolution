@@ -57,7 +57,7 @@ public class CityGameTest {
         h.assertTrue(choices.size()>=8,"infection layout not varying");h.succeed();
     }
     @GameTest(template="wall_test",timeoutTicks=400) public static void dimensionAndChunkSeams(GameTestHelper h){
-        var city=h.getLevel().getServer().getLevel(CityTravel.CITY);
+        var city=h.getLevel().getServer().getLevel(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.DIMENSION,new net.minecraft.resources.ResourceLocation("blacklight","city_legacy")));
         h.assertTrue(city!=null,"city dimension missing");
         h.assertTrue(city.getChunkSource().getGenerator() instanceof CityChunkGenerator,"wrong generator");
         long seed=city.getSeed();
@@ -71,7 +71,7 @@ public class CityGameTest {
         h.succeed();
     }
     @GameTest(template="wall_test",timeoutTicks=400) public static void hivePortsAndAccess(GameTestHelper h){
-        var city=h.getLevel().getServer().getLevel(CityTravel.CITY);long seed=city.getSeed();
+        var city=h.getLevel().getServer().getLevel(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.DIMENSION,new net.minecraft.resources.ResourceLocation("blacklight","city_legacy")));long seed=city.getSeed();
         for(int hive=0;hive<2;hive++){
             for(int i=0;i<7;i++){
                 BlockPos p=CitySystem.port(seed,hive,i);city.getChunkAt(p);
