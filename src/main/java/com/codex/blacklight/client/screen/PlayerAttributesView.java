@@ -24,6 +24,12 @@ final class PlayerAttributesView {
         add(values,"absorption",Component.literal(number(p.getAbsorptionAmount())));
         add(values,"form",Component.translatable("power.blacklight."+form.id()));
         if(state.hasUnlocked(PowerForm.SHIELD))add(values,"shield",Component.literal(number(com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.UTILITY_STATE).shield())+" / "+number(UtilityState.SHIELD_CAPACITY)));
+        if(ProjectileDefenseSystem.unlocked(p)){
+            long reflection=ProjectileDefenseSystem.level(p);
+            add(values,"ricochet_level",Component.literal(Long.toString(reflection)));
+            add(values,"ricochet_power",Component.literal(number(RicochetRules.capacity(reflection,true))+" / "+number(RicochetRules.capacity(reflection,false))));
+            add(values,"ricochet_damage",Component.literal("×"+number(RicochetRules.multiplier(reflection))));
+        }
         var move=WeaponMove.choose(form,WeaponMove.Input.ATTACK,false,false,false);
         add(values,"damage",move==null?Component.literal("—"):Component.literal(number(move.damageFor(form)*CombatScale.UNITS)));
         add(values,"attack_speed",Component.translatable("screen.blacklight.stats.per_second",number(p.getAttributeValue(Attributes.ATTACK_SPEED))));

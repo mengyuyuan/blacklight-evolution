@@ -491,5 +491,12 @@
   "tutorial.blacklight.adaptation_percent.controls": "Passive; no key binding required.",
   "tutorial.blacklight.adaptation_percent.steps": "Replaces the denominator with current health percentage: stacks / (stacks + health / max health * 100). At 10/1000 HP, use 1: 99 stacks reduce damage by 99%. Do not round the percentage before calculation. Stack gains and losses are unchanged.",
   "tutorial.blacklight.tissue_regeneration.controls": "Passive; no key binding required.",
-  "tutorial.blacklight.tissue_regeneration.steps": "Each hit adds round(damage before Adaptation / 6) stacks. Every 20 ticks, heal HP equal to the stack count, then lose round(20% of stacks). Starts at zero. The specified rounding leaves 1 or 2 stacks stable. Learned skills operate in Prototype mode."
+  "tutorial.blacklight.tissue_regeneration.steps": "Each hit adds round(damage before Adaptation / 6) stacks. Every 20 ticks, heal HP equal to the stack count, then lose round(20% of stacks). Starts at zero. The specified rounding leaves 1 or 2 stacks stable. Learned skills operate in Prototype mode.",
+  "upgrade.blacklight.kinetic_reflection": "Kinetic Reflection · Endless Evolution",
+  "upgrade.blacklight.kinetic_reflection.desc": "Repeatable EP upgrade with no designed tier cap. Raises frontal shield / full-body armor reflection capacity and reflected damage. Overpowered hits or insufficient shield durability use normal defense. Flight speed is bounded while damage grows. Requires Shield or Armor.",
+  "message.blacklight.ricochet_upgrade": "Kinetic Reflection upgraded to level %s",
+  "screen.blacklight.ricochet_stats": "Level: %s\nShield capacity: %s\nArmor capacity: %s\nReflected damage: ×%s\nNext level: %s EP",
+  "screen.blacklight.stats.ricochet_level": "Reflection level",
+  "screen.blacklight.stats.ricochet_power": "Reflection capacity (shield / armor)",
+  "screen.blacklight.stats.ricochet_damage": "Reflected damage multiplier"
 }

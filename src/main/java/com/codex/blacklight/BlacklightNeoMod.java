@@ -45,6 +45,7 @@ public final class BlacklightNeoMod {
         MinecraftForge.EVENT_BUS.register(ClawCombatSystem.class);
         MinecraftForge.EVENT_BUS.register(com.codex.blacklight.power.GrowthSystem.class);
         MinecraftForge.EVENT_BUS.register(com.codex.blacklight.power.UtilityPowerSystem.class);
+        MinecraftForge.EVENT_BUS.register(com.codex.blacklight.power.ProjectileDefenseSystem.class);
         MinecraftForge.EVENT_BUS.register(com.codex.blacklight.combat.WeaponCombatSystem.class);
         MinecraftForge.EVENT_BUS.register(PrototypeMovementSystem.class);
         MinecraftForge.EVENT_BUS.register(LandingDebrisSystem.class);

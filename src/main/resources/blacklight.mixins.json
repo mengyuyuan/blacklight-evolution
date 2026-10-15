@@ -4,6 +4,7 @@
   "package": "com.codex.blacklight.mixin",
   "compatibilityLevel": "JAVA_17",
   "mixins": [
+    "ShulkerReflectionAccess",
     "LivingDeathAccess",
     "ServerEntityTickMixin",
     "ScaledLivingDamageMixin",

@@ -33,6 +33,21 @@ public final class UtilityPowerSystem {
         if (form == PowerForm.SHIELD && s.broken()) weight *= 1 - com.codex.blacklight.util.MathCompat.clamp((p.level().getGameTime() - s.hitAt() + partial) / 5F, 0, 1);
         return weight;
     }
+    public static Vec3 shieldForward(Player p){
+        Vec3 velocity=p.getDeltaMovement().multiply(1,0,1);
+        var weapon=ModAttachments.getData(p,ModAttachments.WEAPON_VISUAL);
+        float facing=weapon.spec()!=null?weapon.yaw():p.onGround()&&velocity.lengthSqr()>.0064
+                ?(float)Math.toDegrees(Math.atan2(-velocity.x,velocity.z)):p.yBodyRot;
+        return Vec3.directionFromRotation(0,facing);
+    }
+    public static boolean shieldFaces(Player p,Vec3 toward){
+        Vec3 flat=toward.multiply(1,0,1);return flat.lengthSqr()>1e-6&&shieldForward(p).dot(flat.normalize())>=.35;
+    }
+    public static void spendShield(ServerPlayer p,float amount){
+        var s=ModAttachments.getData(p,ModAttachments.UTILITY_STATE);long now=p.level().getGameTime();float hp=Math.max(0,s.shield()-amount);
+        publish(p,new UtilityState(hp,hp<=0?now+UtilityState.REBUILD_TICKS:0,s.changedAt(),s.previousDefense(),now));
+        if(hp<=0)p.level().playSound(null,p.blockPosition(),SoundEvents.SHIELD_BREAK,SoundSource.PLAYERS,1,.7F);
+    }
     public static boolean parkourAllowed(Player p) { return !active(p, PowerForm.ARMOR); }
     public static void toggle(ServerPlayer p, PowerForm form) {
         if (!supported(form)) return;
@@ -92,11 +107,7 @@ public final class UtilityPowerSystem {
         Vec3 pos = source.getSourcePosition(); if (pos == null) return;
         Vec3 toward = pos.subtract(p.position()).multiply(1, 0, 1);
         if (toward.lengthSqr() < 1.0e-6) return;
-        Vec3 velocity = p.getDeltaMovement().multiply(1, 0, 1);
-        var weapon = com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.WEAPON_VISUAL);
-        float facing = weapon.spec() != null ? weapon.yaw() : p.onGround() && velocity.lengthSqr() > .0064
-                ? (float)Math.toDegrees(Math.atan2(-velocity.x, velocity.z)) : p.yBodyRot;
-        if (Vec3.directionFromRotation(0, facing).dot(toward.normalize()) < .35) return;
+        if (!shieldFaces(p,toward)) return;
         var s = com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.UTILITY_STATE);
         float units=CombatScale.units(p);
         float incoming=e.getAmount()*units;
