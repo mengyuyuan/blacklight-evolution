@@ -54,7 +54,7 @@ public final class ProjectileDefenseSystem {
         double damage=estimate(projectile,speed)*(Double.isFinite(previous)&&previous>0?previous:1);
         if(!Double.isFinite(damage)||damage<=0)return;
         double power=RicochetRules.power(damage,speed),capacity=RicochetRules.capacity(level(p),shield);
-        Vec3 point=hit.getLocation();
+        Vec3 point=p.getBoundingBox().inflate(.05).clip(projectile.position(),projectile.position().add(velocity)).orElse(projectile.position());
         boolean canReflect=Double.isFinite(power)&&power<=capacity&&projectile.getPersistentData().getInt(BOUNCES)<8;
         if(shield&&RicochetRules.shieldCost(damage,CombatScale.units(p),level(p))>p.getData(ModAttachments.UTILITY_STATE).shield())canReflect=false;
         Vec3 normal=shield?UtilityPowerSystem.shieldForward(p):point.subtract(p.getBoundingBox().getCenter()).normalize();
@@ -104,25 +104,20 @@ public final class ProjectileDefenseSystem {
         var wall=p.level().clip(new ClipContext(start,end,ClipContext.Block.COLLIDER,ClipContext.Fluid.NONE,p));
         if(wall.getType()!=HitResult.Type.MISS)end=wall.getLocation();
         var hit=ProjectileUtil.getEntityHitResult(p.level(),p,start,end,new AABB(start,end).inflate(.2),e->e!=p&&e instanceof LivingEntity living&&living.isAlive()&&e.isPickable()&&!p.isAlliedTo(e));
-        if(hit!=null){end=hit.getLocation();if(!(hit.getEntity() instanceof Player other)||p.canHarmPlayer(other))
+        if(hit!=null){end=hit.getEntity().getBoundingBox().clip(start,end).orElse(hit.getLocation());if(!(hit.getEntity() instanceof Player other)||p.canHarmPlayer(other))
             hit.getEntity().hurt(p.damageSources().mobProjectile(p,p),(float)Math.min(Float.MAX_VALUE/16D,damage*RicochetRules.multiplier(level(p))));}
         for(double d=0;d<start.distanceTo(end);d+=1){var q=start.add(outgoing.scale(d));p.serverLevel().sendParticles(ParticleTypes.ELECTRIC_SPARK,q.x,q.y,q.z,1,0,0,0,0);}
         return true;
     }
     private static void feedback(ServerPlayer p,Vec3 point,Vec3 incoming,Vec3 outgoing,double power,double capacity,double speed,boolean shield,boolean reflected){
         float strength=RicochetRules.strength(power,capacity);long now=p.level().getGameTime();
-        p.setData(ModAttachments.DEFENSE_IMPACT,new DefenseImpact(now,strength,(float)incoming.x,(float)incoming.y,(float)incoming.z,shield));
+        p.setData(ModAttachments.DEFENSE_IMPACT,new DefenseImpact(now,strength,(float)incoming.x,(float)incoming.y,(float)incoming.z,shield,(float)(point.x-p.getX()),(float)(point.y-p.getY()),(float)(point.z-p.getZ())));
         // Small additive impulse, never a stun or a replacement for the current action/movement.
         if(!p.getData(ModAttachments.CONSUMING)){
             double push=Math.min(.12,.025*strength)*(shield?1:.55);
             p.push(incoming.x*push,0,incoming.z*push);p.hurtMarked=true;
         }
-        int count=(int)Math.min(24,4+strength*7+Math.min(speed,6)*1.5);
-        for(int i=0;i<count;i++){
-            var r=p.getRandom();Vec3 scatter=outgoing.scale(.12+.08*Math.min(speed,5)).add((r.nextDouble()-.5)*.22,(r.nextDouble()-.3)*.2,(r.nextDouble()-.5)*.22);
-            p.serverLevel().sendParticles(ParticleTypes.ELECTRIC_SPARK,point.x,point.y,point.z,0,scatter.x,scatter.y,scatter.z,1);
-        }
-        if(strength>.85)p.serverLevel().sendParticles(ParticleTypes.FLASH,point.x,point.y,point.z,1,0,0,0,0);
+        // Directional sparks are emitted client-side from the synced real contact point.
         p.level().playSound(null,point.x,point.y,point.z,SoundEvents.ANVIL_HIT,SoundSource.PLAYERS,Math.min(1,.3F+strength*.35F),Math.max(.65F,1.8F-strength*.55F));
     }
 }
