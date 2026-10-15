@@ -513,7 +513,7 @@
   "block.blacklight.city_hatch": "Hive Hatchery",
   "block.blacklight.city_sac": "Infected Sac",
   "upgrade.blacklight.kinetic_reflection": "Kinetic Reflection · Endless Evolution",
-  "upgrade.blacklight.kinetic_reflection.desc": "Repeatable EP upgrade with no designed tier cap. Raises frontal shield / full-body armor reflection capacity and reflected damage. Overpowered hits or insufficient shield durability use normal defense. Flight speed is bounded while damage grows. Requires Shield or Armor.",
+  "upgrade.blacklight.kinetic_reflection.desc": "Spend EP repeatedly with no designed level cap to increase frontal shield and full-body armor reflection capacity and reflected damage. Successful deflections deal no health damage and cause only local vibration. Overloads trigger a loaded guard: shields absorb damage using durability, with only overflow reaching health; armor retains 47.5% resistance. Speed affects impact strength. Unlock shield or armor first.",
   "message.blacklight.ricochet_upgrade": "Kinetic Reflection upgraded to level %s",
   "screen.blacklight.ricochet_stats": "Level: %s\nShield capacity: %s\nArmor capacity: %s\nReflected damage: ×%s\nNext level: %s EP",
   "screen.blacklight.stats.ricochet_level": "Reflection level",

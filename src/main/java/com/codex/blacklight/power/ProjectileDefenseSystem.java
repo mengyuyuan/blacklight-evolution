@@ -61,7 +61,7 @@ public final class ProjectileDefenseSystem {
         if(normal.lengthSqr()<.1||incoming.dot(normal)>-.08)normal=incoming.scale(-1);
         Vec3 outgoing=incoming.subtract(normal.scale(2*incoming.dot(normal))).normalize();
         feedback(p,point,incoming,outgoing,power,capacity,speed,shield,canReflect);
-        if(!canReflect)return; // Existing shield overflow / armor resistance processes the hit normally.
+        if(!canReflect)return; // Shield durability absorbs the hit; only overflow reaches health. Armor retains resistance.
         if(shield)UtilityPowerSystem.spendShield(p,RicochetRules.shieldCost(damage,CombatScale.units(p),level(p)));
         event.setCanceled(true);
         Vec3 reflected=outgoing.scale(Math.max(.15,Math.min(4,speed*(.72+.18*Math.min(1,capacity/Math.max(1,power))))));
@@ -98,7 +98,7 @@ public final class ProjectileDefenseSystem {
         Vec3 normal=shield?UtilityPowerSystem.shieldForward(p):incoming.scale(-1);
         Vec3 outgoing=incoming.subtract(normal.scale(2*incoming.dot(normal))).normalize();
         feedback(p,point,incoming,outgoing,power,capacity,speed,shield,accepted);
-        if(!accepted)return false;
+        if(!accepted)return false; // Existing shield durability / armor resistance handles the damage.
         if(shield)UtilityPowerSystem.spendShield(p,RicochetRules.shieldCost(damage,CombatScale.units(p),level(p)));
         Vec3 start=point.add(outgoing.scale(.2)),end=start.add(outgoing.scale(28));
         var wall=p.level().clip(new ClipContext(start,end,ClipContext.Block.COLLIDER,ClipContext.Fluid.NONE,p));
@@ -113,15 +113,13 @@ public final class ProjectileDefenseSystem {
         float strength=RicochetRules.strength(power,capacity);long now=p.level().getGameTime();
         var previous=p.getData(ModAttachments.DEFENSE_IMPACT);
         long age=now-previous.at();boolean fresh=age<0||age>=3;
+        boolean braced=!reflected;
+        // A harmless follow-up must not interrupt the loaded guard's return stroke.
+        if(previous.braced()&&!braced&&age>=0&&age<18)return;
         // Batch a short volley into its strongest contact. Reflection and damage still run for every projectile.
-        if(!fresh&&strength<=previous.strength()*1.4F)return;
-        p.setData(ModAttachments.DEFENSE_IMPACT,new DefenseImpact(now,strength,(float)incoming.x,(float)incoming.y,(float)incoming.z,shield,(float)(point.x-p.getX()),(float)(point.y-p.getY()),(float)(point.z-p.getZ())));
-        // Light deflections are visual only: syncing tiny server velocity can overwrite client walking momentum.
-        // Near-capacity impacts can push; failed blocks already receive ordinary damage knockback.
-        if(fresh&&reflected&&strength>=.85F&&!p.getData(ModAttachments.CONSUMING)){
-            double push=Math.min(.035,.018*strength)*(shield?1:.5);
-            p.push(incoming.x*push,0,incoming.z*push);p.hurtMarked=true;
-        }
+        if(!fresh&&previous.braced()==braced&&strength<=previous.strength()*1.4F)return;
+        p.setData(ModAttachments.DEFENSE_IMPACT,new DefenseImpact(now,strength,(float)incoming.x,(float)incoming.y,(float)incoming.z,shield,(float)(point.x-p.getX()),(float)(point.y-p.getY()),(float)(point.z-p.getZ()),braced));
+        // Successful deflections stand firm. Overloads use the existing reduced-damage knockback only.
         if(fresh)p.level().playSound(null,point.x,point.y,point.z,SoundEvents.ANVIL_HIT,SoundSource.PLAYERS,
                 Math.min(.55F,.10F+strength*.25F),Math.max(.75F,1.9F-strength*.65F));
     }
