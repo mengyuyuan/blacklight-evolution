@@ -48,12 +48,20 @@ public final class CityChunkGenerator extends FlatLevelSource {
         return CompletableFuture.completedFuture(chunk);
     }
     @Override public int getBaseHeight(int x,int z,Heightmap.Types type,LevelHeightAccessor h,RandomState random){
-        if(futian){for(int y=Math.min(319,h.getMaxBuildHeight()-1);y>=h.getMinBuildHeight();y--)if(type.isOpaque().test(FutianLayout.state(seed,x,y,z)))return y+1;return h.getMinBuildHeight();}
+        if(futian){
+            var column=FutianLayout.column(seed,x,z);
+            for(int y=Math.min(column.top,h.getMaxBuildHeight()-1);y>=h.getMinBuildHeight();y--)
+                if(type.isOpaque().test(column.state(y)))return y+1;
+            return h.getMinBuildHeight();
+        }
         for(int y=top(seed,x,z);y>=h.getMinBuildHeight();y--)if(type.isOpaque().test(state(seed,x,y,z)))return y+1;
         return h.getMinBuildHeight();
     }
     @Override public NoiseColumn getBaseColumn(int x,int z,LevelHeightAccessor h,RandomState random){
-        BlockState[] a=new BlockState[h.getHeight()];for(int i=0;i<a.length;i++)a[i]=futian?FutianLayout.state(seed,x,h.getMinBuildHeight()+i,z):state(seed,x,h.getMinBuildHeight()+i,z);return new NoiseColumn(h.getMinBuildHeight(),a);
+        BlockState[] a=new BlockState[h.getHeight()];
+        var column=futian?FutianLayout.column(seed,x,z):null;
+        for(int i=0;i<a.length;i++)a[i]=column!=null?column.state(h.getMinBuildHeight()+i):state(seed,x,h.getMinBuildHeight()+i,z);
+        return new NoiseColumn(h.getMinBuildHeight(),a);
     }
     private CompletableFuture<ChunkAccess> fillFutian(ChunkAccess chunk){
         int bx=chunk.getPos().getMinBlockX(),bz=chunk.getPos().getMinBlockZ();
@@ -62,10 +70,10 @@ public final class CityChunkGenerator extends FlatLevelSource {
         var surface=chunk.getOrCreateHeightmapUnprimed(Heightmap.Types.WORLD_SURFACE_WG);
         var floor=chunk.getOrCreateHeightmapUnprimed(Heightmap.Types.OCEAN_FLOOR_WG);
         for(int z=0;z<16;z++)for(int x=0;x<16;x++){
-            int top=Math.max(tile==null?63:tile.top(x,z),Math.max(FutianCivicCentre.top(bx+x,bz+z),FutianPublicSpace.top(bx+x,bz+z)));
+            var column=new FutianLayout.Column(seed,bx+x,bz+z,tile);
+            int top=column.top;
             for(int y=Math.max(0,chunk.getMinBuildHeight());y<=Math.min(top,chunk.getMaxBuildHeight()-1);y++){
-                var base=y<63||tile==null?FutianMap.state(bx+x,y,bz+z):tile.state(x,y,z);
-                var state=FutianLayout.overlay(seed,bx+x,y,bz+z,base);
+                var state=column.state(y);
                 if(state.isAir())continue;
                 chunk.setBlockState(position.set(bx+x,y,bz+z),state,false);surface.update(x,y,z,state);floor.update(x,y,z,state);
             }

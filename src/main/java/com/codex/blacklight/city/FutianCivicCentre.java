@@ -21,17 +21,24 @@ public final class FutianCivicCentre {
     }
     public static int top(int x,int z){return inside(x,z)?roof(x,z)+2:63;}
     private static BlockState b(net.minecraft.world.level.block.Block block){return block.defaultBlockState();}
+    record Geometry(boolean inside,boolean roof,int cover,double cylinder){}
+    static Geometry geometry(int x,int z){
+        return inside(x,z)?new Geometry(true,roofFootprint(x,z),roof(x,z),Math.hypot(x-614,z-625)):new Geometry(false,false,63,0);
+    }
     public static BlockState state(int x,int y,int z,BlockState original){
-        if(!inside(x,z)||y<63)return original;
+        return state(x,y,z,original,geometry(x,z));
+    }
+    static BlockState state(int x,int y,int z,BlockState original,Geometry geometry){
+        if(!geometry.inside||y<63)return original;
         if(y==63)return b(Blocks.SMOOTH_STONE);
-        boolean roof=roofFootprint(x,z);int cover=roof(x,z);
+        boolean roof=geometry.roof;int cover=geometry.cover;
         if(roof&&y>=cover-2&&y<=cover){
             boolean rib=(x-425)%12==0||(z-548)%16==0;
             return b(y==cover?(rib?Blocks.LIGHT_GRAY_CONCRETE:Blocks.LIGHT_BLUE_CONCRETE):Blocks.LIGHT_GRAY_CONCRETE);
         }
         // Structural underside grid is airy and separated from the occupied wings.
         if(roof&&y==cover-3&&((x-425)%12==0||(z-548)%16==0))return b(Blocks.IRON_BARS);
-        double cylinder=Math.hypot(x-614,z-625);
+        double cylinder=geometry.cylinder;
         boolean yellow=cylinder<=25,red=x>=706&&x<=752&&z>=600&&z<=650;
         if((yellow||red)&&y>=69&&y<cover-3){
             boolean wall=yellow?cylinder>=23:x<=707||x>=751||z<=601||z>=649;

@@ -50,6 +50,7 @@ public final class CityTravel {
                     return 1;
                 })));
         }
+        root.then(CityPregenerator.command());
         event.getDispatcher().register(root);
     }
 

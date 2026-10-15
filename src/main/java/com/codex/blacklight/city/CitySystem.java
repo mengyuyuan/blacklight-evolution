@@ -55,9 +55,14 @@ public final class CitySystem {
     private static boolean loaded(ServerLevel level,BlockPos pos){return level.hasChunkAt(pos)&&level.isPositionEntityTicking(pos);}
     @SubscribeEvent public static void tick(TickEvent.LevelTickEvent event){
         if(event.phase!=TickEvent.Phase.END)return;
-        if(!(event.level instanceof ServerLevel level)||!level.dimension().equals(CityTravel.CITY)||level.players().isEmpty())return;
+        if(!(event.level instanceof ServerLevel level)||!level.dimension().equals(CityTravel.CITY))return;
+        CityPregenerator.tick(level);
+        if(level.players().isEmpty())return;
         long time=level.getGameTime();if(time%20!=0)return;
         updateLoadedCity(level,time);
+    }
+    @SubscribeEvent public static void unloaded(net.minecraftforge.event.level.LevelEvent.Unload event){
+        if(event.getLevel() instanceof ServerLevel level)CityPregenerator.unload(level);
     }
     static void updateLoadedCity(ServerLevel level,long time){
         CityData data=CityData.get(level);

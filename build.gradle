@@ -154,7 +154,7 @@ tasks.withType(Jar).configureEach {
             'Blacklight-Public-Release-Ready': 'false',
             'Blacklight-Asset-Notice': 'THIRD_PARTY_ASSETS.md')
     exclude 'com/codex/blacklight/gametest/**'
-    exclude 'com/codex/blacklight/city/HiveLifecycleGameTest.class'
+    exclude 'com/codex/blacklight/city/*GameTest*.class'
     exclude 'com/codex/blacklight/client/Standalone*Smoke*.class'
     exclude 'com/codex/blacklight/client/Standalone*Checks*.class'
     exclude 'com/codex/blacklight/client/InfectedCompositionSmoke*.class'
