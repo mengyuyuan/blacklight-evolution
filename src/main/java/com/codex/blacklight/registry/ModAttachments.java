@@ -78,11 +78,16 @@ public final class ModAttachments {
             "utility_state", () -> AttachmentType.builder(() -> com.codex.blacklight.power.UtilityState.EMPTY)
                     .serialize(com.codex.blacklight.power.UtilityState.CODEC)
                     .sync(com.codex.blacklight.power.UtilityState.STREAM_CODEC).build());
-    public static final Supplier<AttachmentType<com.codex.blacklight.power.BiomassState>> BIOMASS_FORM = ATTACHMENTS.register("biomass_form", () -> AttachmentType.builder(() -> com.codex.blacklight.power.BiomassState.EMPTY).serialize(com.codex.blacklight.power.BiomassState.CODEC).copyOnDeath().sync(com.codex.blacklight.power.BiomassState.STREAM_CODEC).build());
+    public static final Supplier<AttachmentType<com.codex.blacklight.power.BiomassState>> BIOMASS_FORM = ATTACHMENTS.register("biomass_form", () -> AttachmentType.builder(() -> com.codex.blacklight.power.BiomassState.EMPTY).serialize(com.codex.blacklight.power.BiomassState.CODEC).copyOnDeath().sync((holder, observer) -> com.codex.blacklight.power.BiomassSync.shouldSync(holder), com.codex.blacklight.power.BiomassState.STREAM_CODEC).build());
     public static final Supplier<AttachmentType<com.codex.blacklight.power.AdaptivePassiveState>> ADAPTIVE_PASSIVES =
             ATTACHMENTS.register("adaptive_passives", () -> AttachmentType.builder(() -> com.codex.blacklight.power.AdaptivePassiveState.EMPTY)
                     .serialize(com.codex.blacklight.power.AdaptivePassiveState.CODEC).copyOnDeath()
                     .sync(com.codex.blacklight.power.AdaptivePassiveState.STREAM_CODEC).build());
+
+    public static final Supplier<AttachmentType<Long>> RICOCHET_LEVEL=ATTACHMENTS.register("ricochet_level",
+            ()->AttachmentType.builder(()->0L).serialize(com.mojang.serialization.Codec.LONG).copyOnDeath().sync(net.minecraft.network.codec.ByteBufCodecs.VAR_LONG).build());
+    public static final Supplier<AttachmentType<com.codex.blacklight.power.DefenseImpact>> DEFENSE_IMPACT=ATTACHMENTS.register("defense_impact",
+            ()->AttachmentType.builder(()->com.codex.blacklight.power.DefenseImpact.EMPTY).sync(com.codex.blacklight.power.DefenseImpact.CODEC).build());
 
     private ModAttachments() {
     }

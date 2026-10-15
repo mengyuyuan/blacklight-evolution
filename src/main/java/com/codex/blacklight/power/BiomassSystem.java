@@ -27,7 +27,7 @@ public final class BiomassSystem {
         boolean resize=previous.active()!=value.active();
         if(previous.victim()!=value.victim()&&p.level().getEntity(previous.victim()) instanceof Mob oldTarget)
             oldTarget.removeEffect(com.codex.blacklight.registry.ModEffects.BIOMASS_CONTACT);
-        p.setData(ModAttachments.BIOMASS_FORM,value);p.syncData(ModAttachments.BIOMASS_FORM);
+        p.setData(ModAttachments.BIOMASS_FORM,value);
         if(resize)p.refreshDimensions();
     }
     public static boolean begin(ServerPlayer p,boolean fatal){
@@ -109,8 +109,7 @@ public final class BiomassSystem {
         }
         if(!s.consumed()){
             float before=BiomassEvolution.scale(p);
-            s=s.aged();p.setData(ModAttachments.BIOMASS_FORM,s);
-            if(s.age()%10==0)p.syncData(ModAttachments.BIOMASS_FORM);
+            s=s.aged();BiomassSync.storeAge(p,s);
             if(before!=BiomassEvolution.scale(p))p.refreshDimensions();
             int lifetime=BiomassEvolution.lifetime(p);
             if(lifetime>=0&&s.age()>=lifetime){
@@ -144,7 +143,7 @@ public final class BiomassSystem {
             target.invulnerableTime=0;
             boolean accepted=target.hurt(target.damageSources().playerAttack(p),Math.max(1000,target.getMaxHealth()*20));
             // Respect invulnerability, region protections, death vetoes and resurrection mods.
-            if(!accepted||!target.isDeadOrDying()){publish(p,s.crawl(now));return;}
+            if(!accepted||!((com.codex.blacklight.mixin.LivingDeathAccess)target).blacklight$deathAccepted()){publish(p,s.crawl(now));return;}
             target.setInvisible(true);
             p.teleportTo(target.getX(),target.getY(),target.getZ());
             p.setHealth(p.getMaxHealth());p.clearFire();p.invulnerableTime=40;

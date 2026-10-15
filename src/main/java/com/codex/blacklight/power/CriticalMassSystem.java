@@ -111,13 +111,16 @@ public final class CriticalMassSystem {
             float damage=container.getNewDamage();
             if (!Float.isFinite(damage) || damage <= 0 || !enabled(p)
                     || !p.getData(ModAttachments.PLAYER_STATE).hasCombatSkill(CombatSkill.CRITICAL_MASS)) return vanillaAbsorption;
-            var result=p.getData(ModAttachments.CRITICAL_MASS).absorb(damage, p.getMaxHealth());
+            // Match Forge: golden hearts protect first; reserve covers only the remainder.
+            float golden=Math.clamp(vanillaAbsorption,0,damage);
+            float afterGolden=damage-golden;
+            if(afterGolden<=0)return golden;
+            var result=p.getData(ModAttachments.CRITICAL_MASS).absorb(afterGolden, p.getMaxHealth());
             if (result.absorbed() <= 0) return vanillaAbsorption;
             publish(p,result.state());
-            container.setNewDamage(result.remaining());
-            // Vanilla subtracts this returned reduction from both damage and its
-            // golden-heart pool. Reserve protection must not steal golden hearts.
-            return Math.clamp(vanillaAbsorption, 0, result.remaining());
+            // setReduction subtracts the returned gold value after this callback.
+            container.setNewDamage(golden+result.remaining());
+            return golden;
         });
     }
     @SubscribeEvent(priority=EventPriority.HIGHEST)

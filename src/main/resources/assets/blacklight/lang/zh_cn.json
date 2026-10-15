@@ -511,5 +511,12 @@
   "block.blacklight.city_wounded": "坏死组织",
   "block.blacklight.city_tissue_layer": "蔓延组织薄层",
   "block.blacklight.city_hatch": "母巢孵化口",
-  "block.blacklight.city_sac": "感染囊泡"
+  "block.blacklight.city_sac": "感染囊泡",
+  "upgrade.blacklight.kinetic_reflection": "动能反射 · 无限进化",
+  "upgrade.blacklight.kinetic_reflection.desc": "反复消耗进化点升级，无预设等级上限。提高护盾正面和装甲全身的弹射物反弹承载力及反击伤害；超过承载力或护盾耐久不足时，仍按原防御规则承伤。速度影响冲击强度；回弹速度有界，伤害继续成长。需要先解锁护盾或装甲。",
+  "message.blacklight.ricochet_upgrade": "动能反射已提升至 %s 级",
+  "screen.blacklight.ricochet_stats": "当前等级：%s\n护盾承载力：%s\n装甲承载力：%s\n反击伤害：×%s\n下一级：%s EP",
+  "screen.blacklight.stats.ricochet_level": "动能反射等级",
+  "screen.blacklight.stats.ricochet_power": "反弹承载力（盾 / 甲）",
+  "screen.blacklight.stats.ricochet_damage": "反弹伤害倍率"
 }

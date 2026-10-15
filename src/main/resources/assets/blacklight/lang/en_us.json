@@ -511,5 +511,12 @@
   "block.blacklight.city_wounded": "Necrotic Tissue",
   "block.blacklight.city_tissue_layer": "Spreading Tissue Slab",
   "block.blacklight.city_hatch": "Hive Hatchery",
-  "block.blacklight.city_sac": "Infected Sac"
+  "block.blacklight.city_sac": "Infected Sac",
+  "upgrade.blacklight.kinetic_reflection": "Kinetic Reflection · Endless Evolution",
+  "upgrade.blacklight.kinetic_reflection.desc": "Repeatable EP upgrade with no designed tier cap. Raises frontal shield / full-body armor reflection capacity and reflected damage. Overpowered hits or insufficient shield durability use normal defense. Flight speed is bounded while damage grows. Requires Shield or Armor.",
+  "message.blacklight.ricochet_upgrade": "Kinetic Reflection upgraded to level %s",
+  "screen.blacklight.ricochet_stats": "Level: %s\nShield capacity: %s\nArmor capacity: %s\nReflected damage: ×%s\nNext level: %s EP",
+  "screen.blacklight.stats.ricochet_level": "Reflection level",
+  "screen.blacklight.stats.ricochet_power": "Reflection capacity (shield / armor)",
+  "screen.blacklight.stats.ricochet_damage": "Reflected damage multiplier"
 }
