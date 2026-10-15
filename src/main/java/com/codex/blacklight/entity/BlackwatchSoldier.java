@@ -70,7 +70,7 @@ public final class BlackwatchSoldier extends Monster {
         var wall=level.clip(new ClipContext(start,end,ClipContext.Block.COLLIDER,ClipContext.Fluid.NONE,this));
         if(wall.getType()!=HitResult.Type.MISS)end=wall.getLocation();
         var hit=ProjectileUtil.getEntityHitResult(level,this,start,end,new AABB(start,end).inflate(.3),e->e!=this&&e instanceof LivingEntity living&&living.isAlive()&&e.isPickable());
-        if(hit!=null){end=hit.getLocation();if(hit.getEntity() instanceof LivingEntity living&&!isAlliedTo(living)&&!(living instanceof Player p&&(p.isCreative()||p.isSpectator()))){
+        if(hit!=null){end=hit.getEntity().getBoundingBox().clip(start,end).orElse(hit.getLocation());if(hit.getEntity() instanceof LivingEntity living&&!isAlliedTo(living)&&!(living instanceof Player p&&(p.isCreative()||p.isSpectator()))){
             float damage=heavy()?2.2F:1.6F;
             if(!(living instanceof net.minecraft.server.level.ServerPlayer defender)
                     ||!com.codex.blacklight.power.ProjectileDefenseSystem.hitscan(defender,start,end,damage,heavy()?5:4))
