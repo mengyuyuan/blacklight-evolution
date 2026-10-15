@@ -1,0 +1,16 @@
+{
+  "variants": {
+    "axis=y": {
+      "model": "blacklight:block/city_vein"
+    },
+    "axis=x": {
+      "model": "blacklight:block/city_vein",
+      "x": 90,
+      "y": 90
+    },
+    "axis=z": {
+      "model": "blacklight:block/city_vein",
+      "x": 90
+    }
+  }
+}

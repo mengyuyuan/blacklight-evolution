@@ -17,7 +17,11 @@ public final class PassiveSerumItem extends Item {
     public PassiveSerumItem(Properties properties, int flag) { super(properties); this.flag = flag; }
     @Override public InteractionResultHolder<ItemStack> use(Level level, Player p, InteractionHand hand) {
         var stack = p.getItemInHand(hand);
-        if (AdaptivePassiveSystem.state(p).permanent(flag)) {
+        if (!com.codex.blacklight.power.IndependentPassives.installed()) {
+            if (!level.isClientSide) p.displayClientMessage(Component.translatable("message.blacklight.passive_moved"), true);
+            return InteractionResultHolder.fail(stack);
+        }
+        if (com.codex.blacklight.power.IndependentPassives.owns(p, flag)) {
             if (!level.isClientSide) p.displayClientMessage(Component.translatable("message.blacklight.passive_already_owned"), true);
             return InteractionResultHolder.fail(stack);
         }

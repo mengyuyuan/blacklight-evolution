@@ -19,6 +19,13 @@ public final class PrototypeSurvivalLock {
     }
 
     @SubscribeEvent
+    public static void onItemPickup(net.minecraftforge.event.entity.player.EntityItemPickupEvent event) {
+        if(isLocked(event.getEntity())&&!com.codex.blacklight.registry.ModAttachments.getData(
+                event.getEntity(),com.codex.blacklight.registry.ModAttachments.SKILL_SETTINGS).prototypeItemPickup())
+            event.setCanceled(true);
+    }
+
+    @SubscribeEvent
     public static void onLeftClickBlock(PlayerInteractEvent.LeftClickBlock event) {
         if (!isLocked(event.getEntity())) return;
         event.setCanceled(true);

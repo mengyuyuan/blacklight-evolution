@@ -1,0 +1,15 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    {
+      "item": "adaptive_passives:regeneration_serum"
+    },
+    {
+      "item": "minecraft:nether_star"
+    }
+  ],
+  "result": {
+    "item": "adaptive_passives:regeneration_ii_serum",
+    "count": 1
+  }
+}

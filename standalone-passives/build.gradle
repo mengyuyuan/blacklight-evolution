@@ -1,0 +1,55 @@
+plugins { id 'java'; id 'net.minecraftforge.gradle' version '6.0.54'; id 'org.spongepowered.mixin' version '0.7.38' }
+version = '0.1.0-dev.1'
+group = 'com.codex.passives'
+base { archivesName = 'Adaptive-Passives-MC1.20.1-Forge' }
+java.toolchain.languageVersion = JavaLanguageVersion.of(17)
+repositories { mavenCentral() }
+minecraft {
+    mappings channel: 'official', version: '1.20.1'
+    runs {
+        configureEach { workingDirectory project.file('run'); mods { adaptive_passives { source sourceSets.main } } }
+        client { if (project.hasProperty('clientRunDirectory')) workingDirectory file(project.property('clientRunDirectory')); if (project.hasProperty('quickPlayWorld')) args '--quickPlaySingleplayer', project.property('quickPlayWorld').toString() }
+        server { args '--nogui'; if (project.hasProperty('serverRunDirectory')) workingDirectory file(project.property('serverRunDirectory')) }
+        gameTestServer { jvmArgs '-Xmx1G'; property 'forge.enabledGameTestNamespaces', 'adaptive_passives' }
+    }
+}
+mixin { add sourceSets.main, 'adaptive_passives.refmap.json'; config 'adaptive_passives.mixins.json' }
+if (project.hasProperty('passiveGameTest')) { sourceSets.main.java.srcDir('src/gameTest/java'); sourceSets.main.resources.srcDir('src/gameTest/resources') }
+dependencies {
+    minecraft 'net.minecraftforge:forge:1.20.1-47.4.10'
+    annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.11.4'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+tasks.named('test') { useJUnitPlatform() }
+tasks.withType(JavaCompile).configureEach { options.encoding = 'UTF-8' }
+tasks.named('jar') { from 'LICENSE'; exclude '**/gametest/**'; manifest.attributes('MixinConfigs': 'adaptive_passives.mixins.json'); finalizedBy 'reobfJar' }
+tasks.named('assemble') { dependsOn 'reobfJar' }
+
+// Optional integration fixtures use the parent's already-built classes; not a production dependency.
+if (project.hasProperty('passiveCompat')) {
+    sourceSets {
+        blacklightCompat {
+            java.srcDirs = []; resources.srcDirs = []
+            output.classesDirs.setFrom(file('../build/classes/java/main'))
+            output.resourcesDir = file('../build/resources/main')
+        }
+    }
+    tasks.named('compileBlacklightCompatJava') { enabled = false }
+    tasks.named('processBlacklightCompatResources') { enabled = false }
+    sourceSets.main.java.srcDir('src/compatTest/java')
+    dependencies { runtimeOnly files(sourceSets.blacklightCompat.output) }
+    repositories { maven { url = 'https://dl.cloudsmith.io/public/geckolib3/geckolib/maven/' } }
+    minecraft.runs.configureEach { mods { blacklight { source sourceSets.blacklightCompat } }; args '--mixin.config', 'blacklight.mixins.json' }
+    dependencies {
+        runtimeOnly fg.deobf('software.bernie.geckolib:geckolib-forge-1.20.1:4.8.4')
+        runtimeOnly 'io.github.llamalad7:mixinextras-forge:0.4.1'
+    }
+}
+tasks.named('jar') { exclude 'data/adaptive_passives/structure/empty.nbt', 'data/adaptive_passives/structures/empty.nbt' }
+
+if (project.hasProperty('passiveNetworkTest')) {
+    sourceSets.main.java.srcDir('src/networkTest/java')
+    minecraft.runs.configureEach { property 'passive.qa.dir', file(project.property('passiveNetworkTest')).absolutePath; jvmArgs '-Xmx1G' }
+    if (project.hasProperty('qaAddress')) minecraft.runs.client.args '--quickPlayMultiplayer', project.property('qaAddress').toString()
+}

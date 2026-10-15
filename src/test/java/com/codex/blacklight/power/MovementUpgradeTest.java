@@ -8,17 +8,17 @@ class MovementUpgradeTest {
     @Test
     void jumpMultiplierPicksTheHighestOwnedTier() {
         assertEquals(1.0D, MovementUpgrade.jumpMultiplier(0), 0.0001D);
-        assertEquals(1.20D, MovementUpgrade.jumpMultiplier(MovementUpgrade.JUMP_1.bit()), 0.0001D);
+        assertEquals(1.10D, MovementUpgrade.jumpMultiplier(MovementUpgrade.JUMP_1.bit()), 0.0001D);
         int tier2 = MovementUpgrade.JUMP_1.bit() | MovementUpgrade.JUMP_2.bit();
-        assertEquals(1.45D, MovementUpgrade.jumpMultiplier(tier2), 0.0001D);
+        assertEquals(1.20D, MovementUpgrade.jumpMultiplier(tier2), 0.0001D);
         int tier3 = tier2 | MovementUpgrade.JUMP_3.bit();
-        assertEquals(1.75D, MovementUpgrade.jumpMultiplier(tier3), 0.0001D);
+        assertEquals(1.30D, MovementUpgrade.jumpMultiplier(tier3), 0.0001D);
     }
 
     @Test
     void sprintWallAndGlideScalesFollowOwnedTiers() {
-        assertEquals(1.0D, MovementUpgrade.sprintMultiplier(0), 0.0001D);
-        assertEquals(1.30D, MovementUpgrade.sprintMultiplier(
+        assertEquals(1.08D, MovementUpgrade.sprintMultiplier(0), 0.0001D);
+        assertEquals(1.45D, MovementUpgrade.sprintMultiplier(
                 MovementUpgrade.SPRINT_1.bit() | MovementUpgrade.SPRINT_2.bit()), 0.0001D);
         assertEquals(1.0D, MovementUpgrade.wallMultiplier(0), 0.0001D);
         assertEquals(1.60D, MovementUpgrade.wallMultiplier(
