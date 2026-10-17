@@ -20,7 +20,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 /** Disposable single-player route: real inputs, upgrade packets, collision and server telemetry. */
 @EventBusSubscriber(modid="blacklight",value=Dist.CLIENT)
 public final class WingSupersonicSmoke {
-    static final Path ROOT=Path.of("E:/Blacklight-Wings-20261016/qa");
+    static final Path ROOT=Path.of(System.getProperty("blacklight.test.wingDirectory","run-wing-qa"));
     static final String RUN="wings12-sonic-"+System.currentTimeMillis();
     static final ConcurrentLinkedQueue<String> ROWS=new ConcurrentLinkedQueue<>();
     static final boolean CLIMB=Boolean.getBoolean("blacklight.test.wingSonicClimb");
