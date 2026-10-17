@@ -16,6 +16,20 @@ public final class ClientWeaponCombat {
     private static com.codex.blacklight.power.PowerForm inputForm;
     private static net.minecraft.client.player.LocalPlayer inputOwner;
     private static boolean fixtureOwnsInput;
+    private static boolean wheelAttack,wheelSpecial,resumeAttack,resumeSpecial;
+    private static com.codex.blacklight.power.PowerForm resumeForm;
+    private static int resumeUntil;
+    public static void beginWeaponWheel(){
+        var mc=Minecraft.getInstance();
+        wheelAttack=SkillBindings.down(mc.options.keyAttack)&&!requireLeftRelease;
+        wheelSpecial=SkillBindings.down(mc.options.keyUse)&&!requireRightRelease;
+        resumeForm=null;
+    }
+    public static void finishWeaponWheel(com.codex.blacklight.power.PowerForm form){
+        var mc=Minecraft.getInstance();
+        if(mc.player==null||com.codex.blacklight.power.UtilityPowerSystem.supported(form))return;
+        resumeForm=form;resumeAttack=wheelAttack;resumeSpecial=wheelSpecial;resumeUntil=mc.player.tickCount+40;
+    }
     /** Installed only after the disposable native skill QA validates its literal directory/save. */
     static void setFixtureOwnsInput(boolean owns){fixtureOwnsInput=owns;}
     private ClientWeaponCombat(){}
@@ -30,7 +44,11 @@ public final class ClientWeaponCombat {
         long window=mc.getWindow().getWindow();
         boolean l=SkillBindings.down(mc.options.keyAttack),r=SkillBindings.down(mc.options.keyUse);
         boolean a=ClientClawEvents.physicalGrabDown(),j=mc.options.keyJump.isDown();
+        wheelAttack&=l;wheelSpecial&=r;resumeAttack&=l;resumeSpecial&=r;
+        if(!mc.isWindowActive()||mc.getCameraEntity()!=mc.player
+                ||mc.screen!=null&&!(mc.screen instanceof com.codex.blacklight.client.screen.PowerWheelScreen)){resumeForm=null;wheelAttack=false;wheelSpecial=false;}
         if(inputOwner!=mc.player){
+            resumeForm=null;wheelAttack=false;wheelSpecial=false;
             inputOwner=mc.player;controlling=false;inputForm=null;sentAt=0;
             left=l;right=r;action=a;jump=j;requireLeftRelease=l;requireRightRelease=r;
         }
@@ -42,15 +60,20 @@ public final class ClientWeaponCombat {
         }
         if(active()){
             var form=com.codex.blacklight.registry.ModAttachments.getData(mc.player, ModAttachments.PLAYER_STATE).getActivePower();
-            if(inputForm!=null&&inputForm!=form){
-                PacketDistributor.sendToServer(new WeaponInputPayload(false,false,true));
-                requireLeftRelease=l;requireRightRelease=r;
-            }
+            boolean resume=resumeForm==form&&mc.player.tickCount<=resumeUntil;
+            if(resume){
+                if(resumeAttack)requireLeftRelease=false;
+                if(resumeSpecial)requireRightRelease=false;
+                resumeForm=null;
+            }else if(mc.player.tickCount>resumeUntil)resumeForm=null;
+            boolean formChanged=inputForm!=null&&inputForm!=form;
+            // The server already discarded the old action. Forward physical input
+            // immediately; preserve GUI/focus release guards, not a new swap guard.
             inputForm=form;
             if(!l)requireLeftRelease=false;if(!r)requireRightRelease=false;
-            if(r&&!right&&!requireRightRelease)prepareSpecialMovement();
-            if(l!=left||r!=right||a!=action||j!=jump||mc.player.tickCount-sentAt>=10){
-                if(l&&!left&&!requireLeftRelease||r&&!right&&!requireRightRelease)
+            if(r&&(!right||formChanged||resume)&&!requireRightRelease)prepareSpecialMovement();
+            if(resume||formChanged||l!=left||r!=right||a!=action||j!=jump||mc.player.tickCount-sentAt>=10){
+                if(l&&(!left||formChanged)&&!requireLeftRelease||r&&(!right||formChanged)&&!requireRightRelease)
                     ClientMovementEvents.sendAttackDirection(mc);
                 ClientTargetLock.sync();
                 PacketDistributor.sendToServer(new WeaponInputPayload(l&&!requireLeftRelease,r&&!requireRightRelease,a,j,false));sentAt=mc.player.tickCount;

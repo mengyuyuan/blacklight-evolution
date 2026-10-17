@@ -138,6 +138,16 @@ public final class BlockArmorModel {
         return found;
     }
 
+    /** Core coverage is shared by both armor renderers and the clothing masks. */
+    public float regionGrowth(AbstractClientPlayer player,String region,float partial) {
+        var state=state(player,partial);if(state==null)return 0;
+        float value=1;boolean found=false;
+        for(int i=0;i<parts.size();i++)if(parts.get(i).core&&parts.get(i).region.equals(region)) {
+            found=true;value=Math.min(value,state.values[i]);
+        }
+        return found?value:0;
+    }
+
     public Set<String> joints() {
         Set<String> joints = new LinkedHashSet<>(); for (var part : parts) joints.add(part.joint); return joints;
     }

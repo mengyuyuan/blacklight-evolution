@@ -40,6 +40,7 @@ public final class BlacklightNeoMod {
         com.codex.blacklight.registry.ModBlocks.register(modBus);
         com.codex.blacklight.registry.ModWorldgen.register(modBus);
         ModParticles.register(modBus);
+        com.codex.blacklight.registry.ModWeaponSounds.register(modBus);
         ModNetwork.register();
         modBus.addListener((net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent event)->event.enqueueWork(()->{
             com.codex.blacklight.power.BiomassRules.initialize();

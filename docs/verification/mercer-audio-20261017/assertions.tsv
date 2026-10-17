@@ -1,0 +1,149 @@
+80	SOUND blacklight:defense.armor.deploy
+365	SOUND blacklight:weapon.blade.morph
+449	SOUND blacklight:weapon.blade.swing
+449	PASS sound bank matches equipped BLADE
+470	SOUND blacklight:weapon.none.morph
+490	SOUND blacklight:defense.armor.retract
+495	SOUND blacklight:defense.armor.deploy
+590	SOUND blacklight:defense.armor.retract
+680	PASS select CLAWS
+680	PASS attack starts CLAWS
+680	SOUND blacklight:weapon.claws.morph
+682	PASS old attack still active
+682	PASS swap during attack to HAMMERFISTS
+682	PASS old attack cleared
+682	PASS old contact clock cleared
+682	PASS held attack starts new form HAMMERFISTS
+682	PASS same form preserves attack
+682	SOUND blacklight:weapon.hammerfists.morph
+691	SOUND blacklight:weapon.hammerfists.swing
+691	PASS sound bank matches equipped HAMMERFISTS
+691	SOUND blacklight:weapon.hammerfists.heavy
+691	PASS sound bank matches equipped HAMMERFISTS
+691	SOUND blacklight:weapon.hammerfists.ground
+740	PASS select HAMMERFISTS
+740	PASS attack starts HAMMERFISTS
+742	PASS old attack still active
+742	PASS swap during attack to BLADE
+742	PASS old attack cleared
+742	PASS old contact clock cleared
+742	PASS held attack starts new form BLADE
+742	PASS same form preserves attack
+742	SOUND blacklight:weapon.blade.morph
+751	SOUND blacklight:weapon.blade.swing
+751	PASS sound bank matches equipped BLADE
+751	SOUND blacklight:weapon.blade.hit
+751	PASS sound bank matches equipped BLADE
+800	PASS select BLADE
+800	PASS attack starts BLADE
+802	PASS old attack still active
+802	PASS swap during attack to WHIPFIST
+802	PASS old attack cleared
+802	PASS old contact clock cleared
+802	PASS held attack starts new form WHIPFIST
+802	PASS same form preserves attack
+802	SOUND blacklight:weapon.whipfist.morph
+811	SOUND blacklight:weapon.whipfist.swing
+811	PASS sound bank matches equipped WHIPFIST
+811	SOUND blacklight:weapon.whipfist.heavy
+811	PASS sound bank matches equipped WHIPFIST
+860	PASS select WHIPFIST
+860	PASS attack starts WHIPFIST
+862	PASS old attack still active
+862	PASS swap during attack to MUSCLE_MASS
+862	PASS old attack cleared
+862	PASS old contact clock cleared
+862	PASS held attack starts new form MUSCLE_MASS
+862	PASS same form preserves attack
+862	SOUND blacklight:weapon.muscle_mass.morph
+868	SOUND blacklight:weapon.muscle_mass.swing
+868	PASS sound bank matches equipped MUSCLE_MASS
+868	SOUND blacklight:weapon.muscle_mass.hit
+868	PASS sound bank matches equipped MUSCLE_MASS
+920	PASS select MUSCLE_MASS
+920	PASS attack starts MUSCLE_MASS
+922	PASS old attack still active
+922	PASS swap during attack to NONE
+922	PASS old attack cleared
+922	PASS old contact clock cleared
+922	PASS held attack starts new form NONE
+922	PASS same form preserves attack
+922	SOUND blacklight:weapon.none.morph
+928	SOUND blacklight:weapon.none.swing
+928	PASS sound bank matches equipped NONE
+928	SOUND blacklight:weapon.none.hit
+928	PASS sound bank matches equipped NONE
+980	PASS select NONE
+980	PASS attack starts NONE
+982	PASS old attack still active
+982	PASS swap during attack to CLAWS
+982	SOUND blacklight:weapon.claws.morph
+982	PASS old attack cleared
+982	PASS old contact clock cleared
+982	PASS held attack starts new form CLAWS
+982	PASS same form preserves attack
+988	SOUND blacklight:weapon.claws.swing
+988	PASS sound bank matches equipped CLAWS
+988	SOUND blacklight:weapon.claws.hit
+988	PASS sound bank matches equipped CLAWS
+1042	PASS air swap to bare hands
+1042	PASS air attack 0
+1042	PASS air swap clears action
+1042	PASS air swap to bare hands
+1042	PASS air attack 1
+1042	PASS air swap clears action
+1042	PASS air swap to bare hands
+1042	PASS air attack 2
+1042	PASS air swap clears action
+1042	PASS air swap to bare hands
+1042	PASS air attack 3
+1042	SOUND blacklight:weapon.none.morph
+1042	PASS air swap clears action
+1042	PASS switch cannot reset airborne combo limit
+1042	SOUND blacklight:weapon.hammerfists.morph
+1042	SOUND blacklight:weapon.none.morph
+1042	SOUND blacklight:weapon.hammerfists.morph
+1042	SOUND blacklight:weapon.none.morph
+1042	SOUND blacklight:weapon.hammerfists.morph
+1042	SOUND blacklight:weapon.none.morph
+1042	SOUND blacklight:weapon.hammerfists.morph
+1042	SOUND blacklight:weapon.none.morph
+1050	PASS grab is not interrupted
+1050	PASS consume is not interrupted
+1050	SOUND blacklight:defense.armor.deploy
+1080	SOUND blacklight:weapon.whipfist.morph
+1091	SOUND blacklight:weapon.whipfist.swing
+1091	PASS sound bank matches equipped WHIPFIST
+1200	SOUND blacklight:weapon.none.morph
+1220	PASS armor sound preserves resistance
+1220	SOUND blacklight:defense.armor.hit
+1240	PASS armor sound preserves resistance
+1240	SOUND blacklight:defense.armor.heavy
+1260	PASS armor deflection and overload sound paths
+1260	SOUND blacklight:defense.armor.deflect
+1280	PASS armor deflection and overload sound paths
+1280	SOUND blacklight:defense.armor.heavy
+1300	SOUND blacklight:defense.armor.retract
+1300	SOUND blacklight:defense.shield.deploy
+1320	PASS shield contact still absorbs damage
+1320	SOUND blacklight:defense.shield.hit
+1340	PASS shield contact still absorbs damage
+1340	SOUND blacklight:defense.shield.heavy
+1360	SOUND blacklight:defense.shield.hit
+1380	SOUND blacklight:defense.shield.deflect
+1400	SOUND blacklight:defense.shield.break
+1420	SOUND blacklight:defense.shield.retract
+1440	SOUND blacklight:defense.armor.deploy
+1460	PASS whip attack audio reached client
+1460	PASS defense audio reached client armor.deploy
+1460	PASS defense audio reached client armor.retract
+1460	PASS defense audio reached client armor.hit
+1460	PASS defense audio reached client armor.heavy
+1460	PASS defense audio reached client armor.deflect
+1460	PASS defense audio reached client shield.deploy
+1460	PASS defense audio reached client shield.retract
+1460	PASS defense audio reached client shield.hit
+1460	PASS defense audio reached client shield.heavy
+1460	PASS defense audio reached client shield.deflect
+1460	PASS defense audio reached client shield.break
+1460	PASS ten same-tick contacts play one sound
