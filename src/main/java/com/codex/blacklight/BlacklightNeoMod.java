@@ -53,6 +53,7 @@ public final class BlacklightNeoMod {
         NeoForge.EVENT_BUS.register(com.codex.blacklight.power.ProjectileDefenseSystem.class);
         NeoForge.EVENT_BUS.register(com.codex.blacklight.combat.WeaponCombatSystem.class);
         NeoForge.EVENT_BUS.register(PrototypeMovementSystem.class);
+        NeoForge.EVENT_BUS.register(com.codex.blacklight.movement.WingFlightSystem.class);
         NeoForge.EVENT_BUS.register(LandingDebrisSystem.class);
         NeoForge.EVENT_BUS.register(PrototypeSurvivalLock.class);
         NeoForge.EVENT_BUS.register(PrototypeModeSystem.class);

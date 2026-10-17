@@ -112,6 +112,7 @@ tasks.named('assemble') {
 java.toolchain.languageVersion = JavaLanguageVersion.of(21)
 
 // Opt-in screenshot harness is excluded from normal builds and distributable JARs.
+if (project.hasProperty('wingTest')) sourceSets.main.java.srcDir('src/wingTest/java')
 if (project.hasProperty('weaponModelPreview')) sourceSets.main.java.srcDir('src/weaponVisualTest/java')
 if (project.hasProperty('leanArmorPreview')) sourceSets.main.java.srcDir('src/armorVisualTest/java')
 if (project.hasProperty('hiveFeedingTest')) {
@@ -153,6 +154,8 @@ tasks.named('jar', Jar).configure {
     exclude 'com/codex/blacklight/city/*GameTest*.class'
     exclude 'data/minecraft/worldgen/world_preset/flat.json'
     exclude 'com/codex/blacklight/client/Standalone*Smoke*.class'
+    exclude 'com/codex/blacklight/client/WingFlightSmoke*.class'
+    exclude 'com/codex/blacklight/client/WingSupersonicSmoke*.class'
     exclude 'com/codex/blacklight/client/StandaloneCriticalMassChecks*.class'
     exclude 'com/codex/blacklight/client/StandaloneBulletTerrainChecks*.class'
     exclude 'com/codex/blacklight/client/StandaloneSyncServerChecks*.class'
@@ -177,6 +180,13 @@ neoForge {
     runs {
         client {
             client()
+            if (project.hasProperty('wingTest')) {
+                systemProperty 'blacklight.test.wings', 'true'
+                if (project.hasProperty('wingSonicTest')) systemProperty 'blacklight.test.wingSonic', 'true'
+                if (project.hasProperty('wingSonicClimbTest')) systemProperty 'blacklight.test.wingSonicClimb', 'true'
+                if (project.hasProperty('wingArmorTest')) systemProperty 'blacklight.test.wingArmor', 'true'
+                programArguments.addAll '--width', '960', '--height', '540'
+            }
             if (project.hasProperty('standaloneInfected')) {
                 systemProperty 'blacklight.test.infectedComposition', file(project.property('standaloneInfected')).absolutePath
                 programArguments.addAll '--width', '1440', '--height', '1000'

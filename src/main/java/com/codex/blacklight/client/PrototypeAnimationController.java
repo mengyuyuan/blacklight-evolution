@@ -76,6 +76,7 @@ public final class PrototypeAnimationController {
 
     /** Free locomotion faces travel independently of the camera; action owners stay authoritative. */
     public static Float movementFacing(AbstractClientPlayer player, float partial) {
+        if(com.codex.blacklight.movement.WingFlightSystem.flying(player))return null;
         var state=STATES.get(player);
         return state==null||!(state.freeFacing||state.targetFacing)?null:net.minecraft.util.Mth.rotLerp(partial,state.previousFacing,state.facing);
     }

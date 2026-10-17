@@ -15,7 +15,7 @@ import net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent;
 /** One defence and one sense coexist with the selected offensive power. */
 public final class UtilityPowerSystem {
     public static final int DEFENSE = PowerForm.SHIELD.bit() | PowerForm.ARMOR.bit();
-    public static boolean supported(PowerForm f) { return f == PowerForm.SHIELD || f == PowerForm.ARMOR || f == PowerForm.THERMAL_VISION || f == PowerForm.INFECTED_VISION; }
+    public static boolean supported(PowerForm f) { return f == PowerForm.SOVEREIGN_WINGS || f == PowerForm.SHIELD || f == PowerForm.ARMOR || f == PowerForm.THERMAL_VISION || f == PowerForm.INFECTED_VISION; }
     public static boolean active(Player p, PowerForm form) {
         var state = p.getData(ModAttachments.PLAYER_STATE);
         return p.isAlive() && state.isInfected() && state.isPrototypeMode() && (p.getData(ModAttachments.UTILITY_POWERS) & form.bit()) != 0;
@@ -52,13 +52,14 @@ public final class UtilityPowerSystem {
     public static void toggle(ServerPlayer p, PowerForm form) {
         if (!supported(form)) return;
         int old = p.getData(ModAttachments.UTILITY_POWERS);
-        int group = (form.bit() & DEFENSE) != 0 ? DEFENSE : PowerForm.THERMAL_VISION.bit() | PowerForm.INFECTED_VISION.bit();
+        int group = form==PowerForm.SOVEREIGN_WINGS ? form.bit() : (form.bit() & DEFENSE) != 0 ? DEFENSE : PowerForm.THERMAL_VISION.bit() | PowerForm.INFECTED_VISION.bit();
         int mask = (old & form.bit()) != 0 ? old & ~form.bit() : (old & ~group) | form.bit();
         if (group == DEFENSE) {
             var s = p.getData(ModAttachments.UTILITY_STATE);
             publish(p, new UtilityState(s.shield(), s.recoverAt(), p.level().getGameTime(), old & DEFENSE, s.hitAt()));
         }
         p.setData(ModAttachments.UTILITY_POWERS, mask); p.syncData(ModAttachments.UTILITY_POWERS); attributes(p);
+        if(form==PowerForm.SOVEREIGN_WINGS)com.codex.blacklight.movement.WingFlightSystem.transform(p,(mask&form.bit())!=0);
         p.level().playSound(null, p.blockPosition(), SoundEvents.SCULK_CATALYST_BLOOM, SoundSource.PLAYERS, .5F, (mask & form.bit()) != 0 ? .8F : 1.3F);
     }
     private static void publish(ServerPlayer p, UtilityState s) { p.setData(ModAttachments.UTILITY_STATE, s); p.syncData(ModAttachments.UTILITY_STATE); }

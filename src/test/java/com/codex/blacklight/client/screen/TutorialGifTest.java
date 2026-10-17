@@ -8,7 +8,7 @@ class TutorialGifTest {
     @Test void allShippedTutorialsDecodeWithinTheMemoryBudget() throws Exception {
         try(var files=Files.list(Path.of("src/main/resources/assets/blacklight/tutorials"))) {
             var clips=files.filter(p->p.toString().endsWith(".gif")).toList();
-            assertEquals(29,clips.size());
+            assertEquals(30,clips.size());
             for(var path:clips)assertNotNull(TutorialGif.decode(Files.readAllBytes(path),()->false),path.toString());
         }
     }

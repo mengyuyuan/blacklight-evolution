@@ -3,7 +3,7 @@ package com.codex.blacklight.power;
 /** Shared wheel order and dead-zone geometry; selection never purchases a power. */
 public final class PowerWheel {
     private static final PowerForm[] FORMS={PowerForm.CLAWS,PowerForm.BLADE,PowerForm.HAMMERFISTS,PowerForm.WHIPFIST,PowerForm.MUSCLE_MASS,PowerForm.NONE};
-    private static final PowerForm[] UTILITIES={PowerForm.SHIELD,PowerForm.ARMOR,PowerForm.THERMAL_VISION,PowerForm.INFECTED_VISION};
+    private static final PowerForm[] UTILITIES={PowerForm.SHIELD,PowerForm.ARMOR,PowerForm.THERMAL_VISION,PowerForm.INFECTED_VISION,PowerForm.SOVEREIGN_WINGS};
     private PowerWheel() {}
     public static int size(){return FORMS.length;}
     public static PowerForm form(int index){return FORMS[index];}

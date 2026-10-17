@@ -11,9 +11,9 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-/** Vanilla tests the current tick's box against an interpolated camera. A
- * local actor moving thousands of blocks/tick can be culled before rendering
- * its perfectly nearby interpolated pose. Scope the exemption to that actor. */
+/** Vanilla tests the current tick's box against an interpolated camera. Fast
+ * dives and powered wing flight can cull a perfectly nearby interpolated pose.
+ * Scope the exemption to the local third-person actor and a bounded distance. */
 @Mixin(EntityRenderer.class)
 public abstract class BulletFlightCullingMixin {
     @Inject(method="shouldRender",at=@At("HEAD"),cancellable=true)
@@ -21,7 +21,8 @@ public abstract class BulletFlightCullingMixin {
         var mc=Minecraft.getInstance();
         if(entity!=mc.player||mc.options.getCameraType().isFirstPerson())return;
         var visual=mc.player.getData(ModAttachments.DEVASTATOR_VISUAL);
-        if(visual.kind()!=3||visual.phase()!=DevastatorSystem.FLIGHT)return;
+        boolean dive=visual.kind()==3&&visual.phase()==DevastatorSystem.FLIGHT;
+        if(!dive&&!com.codex.blacklight.movement.WingFlightSystem.flying(mc.player))return;
         var point=entity.getPosition(mc.getTimer().getGameTimeDeltaPartialTick(false));
         if(point.distanceToSqr(x,y,z)<128*128)result.setReturnValue(true);
     }
