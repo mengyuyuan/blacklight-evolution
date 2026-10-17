@@ -183,8 +183,8 @@ public final class SovereignWingModel {
     public void render(PoseStack stack,VertexConsumer output,int light){
         int at=0;
         for(var v:mesh){
-            output.addVertex(viewPrepared[at],viewPrepared[at+1],viewPrepared[at+2]).setColor(255,255,255,255).setUv(v.u,v.v)
-                    .setOverlay(OverlayTexture.NO_OVERLAY).setLight(light).setNormal(viewPrepared[at+3],viewPrepared[at+4],viewPrepared[at+5]);at+=6;
+            output.addVertex(viewPrepared[at],viewPrepared[at+1],viewPrepared[at+2],-1,v.u,v.v,
+                    OverlayTexture.NO_OVERLAY,light,viewPrepared[at+3],viewPrepared[at+4],viewPrepared[at+5]);at+=6;
         }
     }
 }
