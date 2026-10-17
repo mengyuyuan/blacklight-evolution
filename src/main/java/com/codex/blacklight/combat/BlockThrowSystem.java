@@ -22,8 +22,20 @@ public final class BlockThrowSystem {
     private BlockThrowSystem(){}
     /** Only our exact grab event bypasses the vanilla-interaction lock. Other protection listeners still run. */
     public static boolean ownsBreakEvent(net.neoforged.neoforge.event.level.BlockEvent.BreakEvent event){return OWN_BREAK.get()==event;}
+    private static final HeldObjectIndex<Player,ThrownBlock> HELD = new HeldObjectIndex<>();
+    private static boolean heldBy(Player p,ThrownBlock block){
+        return !p.isRemoved()&&!block.isRemoved()&&block.level()==p.level()&&block.holderId()==p.getId();
+    }
+    /** Register before evaluating the animated grip, which itself asks for the held cargo. */
+    public static void trackHeld(Player p,ThrownBlock block){if(heldBy(p,block))HELD.remember(p,block);}
     public static ThrownBlock held(Player p){
-        return p.level().getEntitiesOfClass(ThrownBlock.class,p.getBoundingBox().inflate(4),e->e.holderId()==p.getId()&&!e.isRemoved()).stream().findFirst().orElse(null);
+        if(p==null)return null;
+        var tracked=HELD.get(p,block->heldBy(p,block));
+        if(tracked!=null)return tracked;
+        // Bootstrap only: subsequent lookups follow identity, not an animation-dependent radius.
+        var found=p.level().getEntitiesOfClass(ThrownBlock.class,p.getBoundingBox().inflate(4),e->heldBy(p,e)).stream().findFirst().orElse(null);
+        if(found!=null)trackHeld(p,found);
+        return found;
     }
     public static int level(Player p){
         if(p==null||p.isRemoved())return 0;

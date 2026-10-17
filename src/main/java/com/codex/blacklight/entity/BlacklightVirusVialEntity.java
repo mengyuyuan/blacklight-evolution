@@ -47,6 +47,7 @@ public final class BlacklightVirusVialEntity extends ThrowableItemProjectile {
         super.onHit(result);
         if (!(level() instanceof ServerLevel serverLevel)) return;
 
+        if (isRemoved()) return;
         Entity owner = getOwner();
         int infected = 0;
         Entity hitEntity = result instanceof EntityHitResult hit ? hit.getEntity() : null;
@@ -54,11 +55,17 @@ public final class BlacklightVirusVialEntity extends ThrowableItemProjectile {
         LivingEntity directTarget = hitEntity instanceof LivingEntity living ? living : null;
         if (directTarget != null && BlacklightInfectionSystem.infect(directTarget, this)) infected++;
         // A direct creature hit is intentional and guaranteed when eligible.
-        // Splash is local, probabilistic and cannot pass through solid walls.
+        // A deliberately shattered vial seeds a wide outbreak, respecting solid walls.
         Vec3 burst = result.getLocation();
         if (result instanceof BlockHitResult block)
             burst = burst.add(Vec3.atLowerCornerOf(block.getDirection().getNormal()).scale(.02));
         setPos(burst);
+        // Throwing at your feet is voluntary awakening; never infect bystanders in PvP.
+        if (owner instanceof net.minecraft.world.entity.player.Player player
+                && player.distanceToSqr(burst) <= INFECTION_RADIUS * INFECTION_RADIUS
+                && serverLevel.clip(new ClipContext(burst, player.getEyePosition(), ClipContext.Block.COLLIDER,
+                    ClipContext.Fluid.NONE, this)).getType() == HitResult.Type.MISS)
+            BlacklightInfectionSystem.awaken(player);
         for (LivingEntity target : serverLevel.getEntitiesOfClass(
                 LivingEntity.class, new AABB(burst, burst).inflate(INFECTION_RADIUS),
                 BlacklightInfectionSystem::canInfect)) {
@@ -77,7 +84,7 @@ public final class BlacklightVirusVialEntity extends ThrowableItemProjectile {
         serverLevel.sendParticles(ParticleTypes.LARGE_SMOKE,
                 getX(), getY() + 0.15D, getZ(), 30, 1.0D, 0.65D, 1.0D, 0.025D);
         serverLevel.sendParticles(ParticleTypes.CRIMSON_SPORE,
-                getX(), getY() + 0.3D, getZ(), 70, 1.25D, 0.75D, 1.25D, 0.015D);
+                getX(), getY() + 0.3D, getZ(), 120, INFECTION_RADIUS * .45D, 1.5D, INFECTION_RADIUS * .45D, 0.025D);
         serverLevel.playSound(null, blockPosition(), SoundEvents.GLASS_BREAK,
                 SoundSource.PLAYERS, 1.35F, 0.72F);
         serverLevel.playSound(null, blockPosition(), SoundEvents.SCULK_CATALYST_BLOOM,

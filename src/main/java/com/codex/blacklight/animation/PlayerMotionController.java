@@ -368,7 +368,10 @@ public final class PlayerMotionController {
                 ||key.startsWith("basic_wall_climb")&&runtime.locomotion.startsWith("basic_wall_climb")
                 ||key.startsWith("basic_glide")&&runtime.locomotion.startsWith("basic_glide"));
         double nominal=MotionLibrary.nominalSpeed(key)*entity.getScale();
-        if(runtime.gait.commit(tick,key,duration(key),MotionLibrary.looping(key),sameFamily,distance,nominal)) {
+        boolean armored=entity instanceof net.minecraft.world.entity.player.Player p
+                &&com.codex.blacklight.power.UtilityPowerSystem.active(p,com.codex.blacklight.power.PowerForm.ARMOR);
+        nominal=GroundGaitPose.nominal(key,nominal,entity.getScale(),armored);
+        if(runtime.gait.commit(tick,key,duration(key),MotionLibrary.looping(key),sameFamily,distance,nominal,GroundGaitPose.rateLimit(key,armored))) {
             runtime.from=previous;runtime.changed=tick;runtime.contactStrideTransition=groundContactStride;
         }
         runtime.locomotion=key;
@@ -409,6 +412,9 @@ public final class PlayerMotionController {
             var airborne=samplePose("basic_fall",age,true);
             pose=BlacklightPose.interpolatePose(pose,airborne,Math.clamp(age/.16F,0,1));
         }
+        boolean armored=entity instanceof net.minecraft.world.entity.player.Player p
+                &&com.codex.blacklight.power.UtilityPowerSystem.active(p,com.codex.blacklight.power.PowerForm.ARMOR);
+        GroundGaitPose.apply(pose,key,armored);
         double blendAge=runtime.gait.tick()-runtime.changed+(double)Math.clamp(partial,0,1);
         if(runtime.from!=null&&blendAge<2.4) {
             float weight=(float)Math.clamp(blendAge/2.4,0,1);
