@@ -20,7 +20,9 @@
     "ConsumeStunMixin",
     "BiomassPlayerMixin",
     "BiomassPreyMixin",
-    "AdaptivePlayerDamageMixin"
+    "AdaptivePlayerDamageMixin",
+    "WingFlightTravelMixin",
+    "WingFlightFloatingMixin"
   ],
   "client": [
     "client.KeyboardInputMixin",

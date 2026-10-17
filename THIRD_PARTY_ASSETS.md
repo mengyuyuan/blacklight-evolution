@@ -73,3 +73,28 @@ not required, but is retained here to preserve provenance.
 ## Weapon and defense audio (2026-10-17)
 
 Recorded source packs: StarNinjas sword sounds (CC0), artisticdude Swishes (CC0), and Philippe Groarke / Socapex combat sounds (CC BY-SA 3.0). Source URLs, archives and full upstream attribution are in `art/weapon-audio/`. Edited/mixed derivatives are distributed under CC BY-SA 3.0 separately from the code license. Packaged credits: `META-INF/licenses/blacklight-audio/`. See `docs/WEAPON_DEFENSE_AUDIO_ZH.md` for the 41 events / 123 variants and validation scope. No Prototype unpacked audio is added.
+
+## Rokoko free superhero motion capture
+
+The Sovereign Wings body animation adapts two FBX captures from Rokoko's
+official free superhero resource, credited to Sam Lazarus. The publisher
+permits use in games and commercial projects; this resource is not relabeled
+CC0 or covered by the project's code license. Source URL, hashes, exact
+conversion steps and project edits are documented in
+`art/sovereign-wings/FLIGHT_SOURCES.md`. Raw FBX files are not bundled.
+
+## GreyFrogGames Flying Bat v1.0 — wingbeat animation
+
+- Author: GreyFrogGames, 2024
+- Source: https://greyfroggames.itch.io/flying-bat-character
+- License: CC BY 4.0, https://creativecommons.org/licenses/by/4.0/
+- Original license: `art/sovereign-wings/GreyFrogGames-License.txt`
+- Download: `Tier1__FlyingBat.zip`, SHA-256
+  `faedcc1eae288bf08a4680e53260616e3994f2ab09c0bd2bc215bc64ce9f4af7`
+- Used: sampled `Fly` action, left Arm1–Arm4 rotational curves, in
+  `assets/blacklight/animation/sovereign_wingbeat.json`.
+- Changes: mirrored for the paired wing rig, retargeted axes and amplitudes,
+  slower cadence for large wings, outboard finger spread, directional steering
+  and continuous transitions. The original bat mesh and textures are not bundled.
+- Reproduction: `art/sovereign-wings/extract_bat_wingbeat.py` with the original
+  `FlyingBat.glb` as input. This animation retains its CC BY 4.0 license.

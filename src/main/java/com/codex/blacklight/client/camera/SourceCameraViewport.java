@@ -38,6 +38,8 @@ public final class SourceCameraViewport {
             double ratio=com.codex.blacklight.movement.PrototypeLocomotion.cinematicSpeedRatio(p.getDeltaMovement().horizontalDistance(),
                     com.codex.blacklight.movement.MovementTuningSettings.sprintMaxSpeed()
                     *com.codex.blacklight.power.MovementUpgrade.sprintMultiplier(p.getData(com.codex.blacklight.registry.ModAttachments.PLAYER_STATE).getMovementUpgradeMask()));
+            // Wing flight supplies its own bounded velocity/acceleration lens response.
+            if(com.codex.blacklight.movement.WingFlightSystem.flying(p))ratio=0;
             if(lastTime<0||now<lastTime-.1)speedRatio=ratio;
             else speedRatio+=(ratio-speedRatio)*(1-Math.exp(-dt/.12));
             double configured=event.getFOV()*(1+com.codex.blacklight.movement.MovementTuningSettings.fovBoost()*speedRatio*mc.options.fovEffectScale().get());

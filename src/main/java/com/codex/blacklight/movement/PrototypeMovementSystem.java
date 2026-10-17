@@ -72,6 +72,7 @@ public final class PrototypeMovementSystem {
         }
         if (player.getData(ModAttachments.CONSUMING)&&com.codex.blacklight.combat.ConsumeVisual.blocksInput(player.getData(ModAttachments.GRAB_STAGE))) return;
         if(player.getData(ModAttachments.GRAB_STAGE)==com.codex.blacklight.combat.ConsumeVisual.THROW){jumpHeld=false;dashPressed=false;}
+        if(WingFlightSystem.eligible(player)){WingFlightSystem.input(player,jumpHeld,forward,sideways,sprinting,detach);return;}
         MovementState movement = player.getData(ModAttachments.MOVEMENT_STATE);
         boolean wasJumpHeld = movement.jumpHeld();
         if(player.isInWater()&&!WaterRunning.onSurface(player)) {
@@ -121,7 +122,7 @@ public final class PrototypeMovementSystem {
     @SubscribeEvent
     public static void onPlayerTick(PlayerTickEvent.Post event) {
         if (!(event.getEntity() instanceof ServerPlayer player)) return;
-        if(com.codex.blacklight.power.BiomassSystem.active(player))return;
+        if(com.codex.blacklight.power.BiomassSystem.active(player)||WingFlightSystem.eligible(player))return;
         if (player.getData(ModAttachments.CONSUMING)&&com.codex.blacklight.combat.ConsumeVisual.blocksInput(player.getData(ModAttachments.GRAB_STAGE))) return;
         MovementState movement = player.getData(ModAttachments.MOVEMENT_STATE);
         BlacklightState blacklight = player.getData(ModAttachments.PLAYER_STATE);

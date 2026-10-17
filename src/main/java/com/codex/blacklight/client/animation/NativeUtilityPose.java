@@ -48,6 +48,15 @@ public final class NativeUtilityPose {
     }
     public static void apply(net.minecraft.world.entity.LivingEntity entity, BlacklightPose pose, float partial) {
         if(entity instanceof Player p) {
+            var wing=p.getData(ModAttachments.WING_FLIGHT);
+            double wingAge=p.level().getGameTime()+partial-wing.transformedAt();
+            float wingWeight=wing.transformedAt()>0?com.codex.blacklight.animation.WingMorphTimeline.bodyWeight(wing.deployed(),wingAge):0;
+            if(wingWeight>0&&p.onGround()&&p.getData(ModAttachments.WEAPON_VISUAL).spec()==null
+                    &&!p.getData(ModAttachments.CONSUMING)&&p.getData(ModAttachments.GRAB_STAGE)==0
+                    &&com.codex.blacklight.mode.PrototypeModeSystem.isActive(p)) {
+                com.codex.blacklight.animation.WingTransformationPose.apply(pose,wing.deployed(),wingAge);
+                return;
+            }
             var morph=p.getData(ModAttachments.POWER_MORPH);
             var animation=morph.key().isEmpty()?null:MotionLibrary.find(morph.key()).orElse(null);
             if(animation!=null&&com.codex.blacklight.movement.WallPoseState.get(p)==null&&morph.visible(p,partial)) {

@@ -40,6 +40,7 @@ public final class PowerFormSystem {
         boolean visible=UtilityPowerSystem.supported(form)
                 ?(form==PowerForm.SHIELD||form==PowerForm.ARMOR)&&!UtilityPowerSystem.active(player,form)
                 :form!=PowerForm.NONE;
+        if(form==PowerForm.SOVEREIGN_WINGS)visible=true;
         if(visible)com.codex.blacklight.disguise.DisguiseSystem.visiblePower(player);
         if(UtilityPowerSystem.supported(form))UtilityPowerSystem.toggle(player,form);
         else if (!state.activate(form)) return false;
