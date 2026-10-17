@@ -138,6 +138,7 @@ public final class BlacklightState {
     public boolean buyMovementUpgrade(MovementUpgrade upgrade) {
         if (!infected || upgrade == null || hasMovementUpgrade(upgrade)
                 || evolutionPoints < upgrade.epCost()) return false;
+        if (upgrade.wingUpgrade() && !hasUnlocked(PowerForm.SOVEREIGN_WINGS)) return false;
         MovementUpgrade requires = upgrade.requires();
         if (requires != null && !hasMovementUpgrade(requires)) return false;
         evolutionPoints -= upgrade.epCost();

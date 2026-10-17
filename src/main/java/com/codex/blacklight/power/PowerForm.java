@@ -13,7 +13,8 @@ public enum PowerForm {
     ARMOR("armor", 1 << 6, 600),
     THERMAL_VISION("thermal_vision", 1 << 7, 250),
     INFECTED_VISION("infected_vision", 1 << 8, 300),
-    BIOMASS("biomass",1 << 9,0);
+    BIOMASS("biomass",1 << 9,0),
+    SOVEREIGN_WINGS("sovereign_wings",1 << 10,1000);
 
     private final String id;
     private final int bit;

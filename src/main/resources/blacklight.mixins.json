@@ -23,7 +23,9 @@
     "NativeRootMovementMixin",
     "ConsumeStunMixin",
     "BiomassPlayerMixin",
-    "BiomassPreyMixin"
+    "BiomassPreyMixin",
+    "WingFlightTravelMixin",
+    "WingFlightFloatingMixin"
   ],
   "client": [
     "client.PostChainAccess",

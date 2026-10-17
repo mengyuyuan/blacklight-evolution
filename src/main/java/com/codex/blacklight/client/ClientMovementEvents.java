@@ -63,6 +63,10 @@ public final class ClientMovementEvents {
 
     @SubscribeEvent(priority = net.minecraftforge.eventbus.api.EventPriority.LOWEST)
     public static void lockWeaponMovement(net.minecraftforge.client.event.MovementInputUpdateEvent event) {
+        if(com.codex.blacklight.movement.WingFlightSystem.eligible(event.getEntity())){
+            // Suppress vanilla jumping, but still apply weapon ownership below.
+            event.getInput().jumping=false;
+        }
         beginWeaponMovementOwnership(event.getEntity());
         if(com.codex.blacklight.registry.ModAttachments.getData(event.getEntity(), ModAttachments.WEAPON_VISUAL).spec()==null
                 && !pendingWeaponMovement(event.getEntity())) {
@@ -264,6 +268,10 @@ public final class ClientMovementEvents {
             lastCameraYaw = Float.NaN;
             resetClientWallRun();
             if (minecraft.player == null || minecraft.getConnection() == null) return;
+        }
+        if(ClientWingFlight.tick(minecraft)){
+            lastChargingAnimation=false;clientChargeTicks=0;JUMP_INPUT.reset();
+            releaseFinalChargedJumpPose(minecraft);resetClientWallRun();return;
         }
         // Hardware state and remapped KeyMappings share one input latch so visual
         // ownership does not lose releases during a combat or traversal action.
@@ -486,7 +494,7 @@ public final class ClientMovementEvents {
                 && com.codex.blacklight.registry.ModAttachments.getData(minecraft.player, ModAttachments.PLAYER_STATE).isPrototypeMode();
     }
 
-    private static boolean weaponOwnsMovement(Minecraft minecraft) {
+    static boolean weaponOwnsMovement(Minecraft minecraft) {
         return minecraft.player != null
                 && (com.codex.blacklight.registry.ModAttachments.getData(minecraft.player, ModAttachments.WEAPON_VISUAL).spec() != null
                 ||pendingWeaponMovement(minecraft.player));

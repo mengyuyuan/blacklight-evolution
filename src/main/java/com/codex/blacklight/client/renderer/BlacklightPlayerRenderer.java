@@ -29,7 +29,7 @@ public final class BlacklightPlayerRenderer extends PlayerRenderer {
         slimHands=slim;handModel=new net.minecraft.client.model.PlayerModel<>(context.bakeLayer(slim?ModelLayers.PLAYER_SLIM:ModelLayers.PLAYER),slim);
         this.model=new BlacklightPlayerModel(context.bakeLayer(slim?ModelLayers.PLAYER_SLIM:ModelLayers.PLAYER),slim);
         biological=new BlacklightClawLayer(this);utility=new UtilityPowerLayer(this);
-        addLayer(biological);addLayer(utility);
+        addLayer(biological);addLayer(utility);addLayer(new com.codex.blacklight.client.renderer.layer.SovereignWingLayer(this));
     }
     public void renderPoweredArm(AbstractClientPlayer player,PoseStack stack,net.minecraft.client.renderer.MultiBufferSource buffers,int light,float partial,boolean left) {
         // A plain vanilla model is isolated from the third-person animated skin.

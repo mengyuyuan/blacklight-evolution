@@ -113,6 +113,8 @@ tasks.named('assemble') {
 // Minecraft 1.20.1 and Forge 47 target Java 17.
 java.toolchain.languageVersion = JavaLanguageVersion.of(17)
 
+if (project.hasProperty('wingTest')) sourceSets.main.java.srcDir('src/wingTest/java')
+
 // Opt-in screenshot harness is excluded from normal builds and distributable JARs.
 if (project.hasProperty('entityLifecycleTest')) {
     sourceSets.main.java.srcDir('src/entityLifecycleTest/java')
@@ -156,6 +158,8 @@ tasks.withType(Jar).configureEach {
     exclude 'com/codex/blacklight/gametest/**'
     exclude 'com/codex/blacklight/city/*GameTest*.class'
     exclude 'com/codex/blacklight/client/Standalone*Smoke*.class'
+    exclude 'com/codex/blacklight/client/WingFlightSmoke*.class'
+    exclude 'com/codex/blacklight/client/WingSupersonicSmoke*.class'
     exclude 'com/codex/blacklight/client/Standalone*Checks*.class'
     exclude 'com/codex/blacklight/client/InfectedCompositionSmoke*.class'
     exclude 'data/blacklight/structures/wall_test.nbt'
@@ -179,6 +183,14 @@ minecraft {
             }
         }
         client {
+            if (project.hasProperty('wingTest')) {
+                property 'blacklight.test.wings', 'true'
+                if(project.hasProperty('wingQaDirectory')) property 'blacklight.test.wingDirectory', file(project.property('wingQaDirectory')).absolutePath
+                if (project.hasProperty('wingSonicTest')) property 'blacklight.test.wingSonic', 'true'
+                if (project.hasProperty('wingSonicClimbTest')) property 'blacklight.test.wingSonicClimb', 'true'
+                if (project.hasProperty('wingArmorTest')) property 'blacklight.test.wingArmor', 'true'
+                args '--width', '960', '--height', '540'
+            }
             if (project.hasProperty('clientRunDirectory')) workingDirectory file(project.property('clientRunDirectory'))
             else if (project.hasProperty('standaloneMorph')) workingDirectory project.file('run-forge-qa')
             jvmArgs '-Xmx3G'

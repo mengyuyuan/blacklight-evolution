@@ -72,6 +72,7 @@ public final class PrototypeMovementSystem {
         }
         if (com.codex.blacklight.registry.ModAttachments.getData(player, ModAttachments.CONSUMING)&&com.codex.blacklight.combat.ConsumeVisual.blocksInput(com.codex.blacklight.registry.ModAttachments.getData(player, ModAttachments.GRAB_STAGE))) return;
         if(com.codex.blacklight.registry.ModAttachments.getData(player, ModAttachments.GRAB_STAGE)==com.codex.blacklight.combat.ConsumeVisual.THROW){jumpHeld=false;dashPressed=false;}
+        if(WingFlightSystem.eligible(player)&&!WeaponCombatSystem.busy(player)){WingFlightSystem.input(player,jumpHeld,forward,sideways,sprinting,detach);return;}
         MovementState movement = com.codex.blacklight.registry.ModAttachments.getData(player, ModAttachments.MOVEMENT_STATE);
         boolean wasJumpHeld = movement.jumpHeld();
         if(player.isInWater()&&!WaterRunning.onSurface(player)) {
@@ -123,7 +124,7 @@ public final class PrototypeMovementSystem {
         if (!com.codex.blacklight.registry.ModAttachments.available(event.player)) { return; }
         if(event.phase != net.minecraftforge.event.TickEvent.Phase.END)return;
         if (!(event.player instanceof ServerPlayer player)) return;
-        if(com.codex.blacklight.power.BiomassSystem.active(player))return;
+        if(com.codex.blacklight.power.BiomassSystem.active(player)||WingFlightSystem.flying(player))return;
         if (com.codex.blacklight.registry.ModAttachments.getData(player, ModAttachments.CONSUMING)&&com.codex.blacklight.combat.ConsumeVisual.blocksInput(com.codex.blacklight.registry.ModAttachments.getData(player, ModAttachments.GRAB_STAGE))) return;
         MovementState movement = com.codex.blacklight.registry.ModAttachments.getData(player, ModAttachments.MOVEMENT_STATE);
         BlacklightState blacklight = com.codex.blacklight.registry.ModAttachments.getData(player, ModAttachments.PLAYER_STATE);
@@ -305,7 +306,7 @@ public final class PrototypeMovementSystem {
 
         // Prototype-style traversal gives an encountered wall priority over jump
         // charging, so sprinting into a facade never freezes at the wall.
-        boolean wallRunning = tickWallRun(player, movement, forward, upgradeMask);
+        boolean wallRunning = !WingFlightSystem.eligible(player)&&tickWallRun(player, movement, forward, upgradeMask);
         if (!wallRunning) tickChargedJump(player, movement);
         syncCharge(player,Math.max(movement.chargeTicks(),movement.wallTraversal().visualChargeTicks()));
         if (!wallRunning && movement.chargeTicks() > 0 && !movement.runningCharge()) {
