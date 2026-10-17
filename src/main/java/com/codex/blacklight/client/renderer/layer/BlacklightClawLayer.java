@@ -53,7 +53,7 @@ public final class BlacklightClawLayer extends net.minecraft.client.renderer.ent
         renderFirstPerson(player,stack,buffer,light,poses,partial,-1);
     }
     public void renderFirstPerson(AbstractClientPlayer player,PoseStack stack,MultiBufferSource buffer,int light,org.joml.Matrix4f[] poses,float partial,int side) {
-        renderParts(player,stack,buffer,light,poses,partial,side);
+        renderParts(player,stack,buffer,light,poses,partial,side,false);
     }
 
     private void renderSkeleton(AbstractClientPlayer player,
@@ -105,11 +105,11 @@ public final class BlacklightClawLayer extends net.minecraft.client.renderer.ent
                 com.codex.blacklight.client.renderer.WeaponTrailRenderer.captureLocal(player,poseStack,side+2,.23F,.56F);poseStack.popPose();
             }
         }
-        renderParts(player,poseStack,buffer,packedLight,poses,partialTicks,-1);
+        renderParts(player,poseStack,buffer,packedLight,poses,partialTicks,-1,true);
     }
 
     private void renderParts(AbstractClientPlayer player,PoseStack stack,MultiBufferSource buffer,int light,
-                             org.joml.Matrix4f[] poses,float partial,int side) {
+                             org.joml.Matrix4f[] poses,float partial,int side,boolean thirdPerson) {
         var morph=WeaponMorphTracker.sample(player,partial);
         var parts=morph.parts();
         if(ClawTransformSettings.preview()&&(morph.target()==PowerForm.NONE||morph.target()==PowerForm.CLAWS))
@@ -118,14 +118,21 @@ public final class BlacklightClawLayer extends net.minecraft.client.renderer.ent
         // All wave frequencies repeat after 50,000 ticks. Reduce before casting
         // to float so old worlds retain sub-tick liquid motion.
         float materialTime=(float)(morph.materialTime()%50_000D);
+        // Fit only this character's third-person weapons. Keep attachment positions,
+        // first-person projections and the existing armour's proportions unchanged.
+        float fit=1F;
+        if(thirdPerson&&com.codex.blacklight.client.model.MercerPlayerMesh.active(player)) {
+            float armor=com.codex.blacklight.power.UtilityPowerSystem.visualWeight(player,PowerForm.ARMOR,partial);
+            fit=net.minecraft.util.Mth.lerp(net.minecraft.util.Mth.clamp(armor,0F,1F),.82F,1F);
+        }
         for(var part:parts) {
             if(part.surface().growth()<=.001F)continue;
             var form=part.form();var mesh=forms.computeIfAbsent(form,
                     f->new ClawArmModel(f==PowerForm.CLAWS?"claw_blender":"form_"+f.id()));
             if(side!=1)renderHand(player,InteractionHand.MAIN_HAND,poses,false,stack,buffer,light,mesh,form,part.surface(),partial,materialTime,
-                    form==morph.target()?hammer[0]:null);
+                    form==morph.target()?hammer[0]:null,fit);
             if(side!=0&&WeaponMorphTiming.arm(form,true))renderHand(player,InteractionHand.OFF_HAND,poses,true,stack,buffer,light,mesh,form,part.surface(),partial,materialTime,
-                    form==morph.target()?hammer[1]:null);
+                    form==morph.target()?hammer[1]:null,fit);
         }
     }
 
@@ -137,7 +144,7 @@ public final class BlacklightClawLayer extends net.minecraft.client.renderer.ent
                             MultiBufferSource buffer,
                             int packedLight,
                             ClawArmModel model,PowerForm form,BiomassSurface.Frame surface,float partial,float time,
-                            com.codex.blacklight.combat.WeaponAttackScales.Shape hammer) {
+                            com.codex.blacklight.combat.WeaponAttackScales.Shape hammer,float fit) {
         float morphProgress=surface.growth();
         if (morphProgress <= 0.001F) return;
         com.codex.blacklight.animation.BlacklightSkeleton armature = com.codex.blacklight.animation.PlayerMotionController.skeleton();
@@ -154,14 +161,14 @@ public final class BlacklightClawLayer extends net.minecraft.client.renderer.ent
         // Keep both segment origins on their real joints and overlap their end rings.
         poseStack.pushPose();
         applyJoint(poseStack, poses[armJoint.getId()]);
-        poseStack.scale(width, 1.0F, width);
+        poseStack.scale(width*fit, 1.0F, width*fit);
         renderMesh(model,mirror ? "Arm_L" : "Arm_R",poseStack,buffer,packedLight,morphProgress,1,null,Float.POSITIVE_INFINITY,null,surface,time);
         LiquidBiomassRenderer.render(poseStack,buffer,packedLight,surface,.34F,time,false);
         poseStack.popPose();
 
         poseStack.pushPose();
         applyJoint(poseStack, poses[handJoint.getId()]);
-        poseStack.scale(width, 1.0F, width);
+        poseStack.scale(width*fit, fit, width*fit);
         var visual=player.getData(com.codex.blacklight.registry.ModAttachments.WEAPON_VISUAL);
         if(authoritative&&!mirror&&visual.charging()&&visual.spec()!=null&&visual.spec().form==com.codex.blacklight.power.PowerForm.BLADE){
             float age=player.level().getGameTime()-visual.started();

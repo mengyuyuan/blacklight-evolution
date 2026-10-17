@@ -17,7 +17,7 @@ public final class CombatImpactEffects {
     public static void swing(ServerPlayer p,WeaponMove move,Vec3 forward){
         boolean hammer=move.form==PowerForm.HAMMERFISTS;
         boolean blade=move.form==PowerForm.BLADE;
-        p.level().playSound(null,p.blockPosition(),SoundEvents.PLAYER_ATTACK_SWEEP,SoundSource.PLAYERS,hammer?1.3F:blade?1.05F:.65F,hammer?.55F:blade?(BladeEffects.heavy(move)?.58F:.78F):1.1F);
+        com.codex.blacklight.registry.ModWeaponSounds.play(p,com.codex.blacklight.registry.ModWeaponSounds.equipped(p),"swing",p.position(),.75F,WeaponImpact.finisher(move)?.86F:1F);
         if(hammer){
             var c=p.position().add(0,1.05,0).add(forward.scale(.8));
             p.serverLevel().sendParticles(ParticleTypes.POOF,c.x,c.y,c.z,5,.24,.2,.24,.035);
@@ -47,7 +47,7 @@ public final class CombatImpactEffects {
             }
         }
         CombatEnvironmentEffects.disturbLooseItems(p,center,radius,move.quake()?.35:.18);
-        level.playSound(null,hit.getBlockPos(),SoundEvents.MACE_SMASH_GROUND_HEAVY,SoundSource.PLAYERS,move.quake()?1.4F:1F,move.quake()?.57F:.8F);
+        com.codex.blacklight.registry.ModWeaponSounds.play(p,com.codex.blacklight.registry.ModWeaponSounds.equipped(p),"ground",center,1F,move.quake()?.9F:1F);
         PacketDistributor.sendToPlayer(p,new PhysicalFeedbackPayload(move.quake()?PhysicalFeedbackPayload.Effect.GROUND_SPIKE:PhysicalFeedbackPayload.Effect.CLAW_HEAVY,move.quake()?1:.42F));
     }
     public static void target(ServerPlayer p,LivingEntity v,WeaponMove move){
@@ -58,6 +58,6 @@ public final class CombatImpactEffects {
         var c=v.getBoundingBox().getCenter();
         PacketDistributor.sendToPlayersTrackingEntityAndSelf(p,new CombatImpactPayload(c.x,c.y,c.z,hammer?.8F:.38F,false));
         p.serverLevel().sendParticles(ParticleTypes.CRIT,c.x,c.y,c.z,hammer?12:5,.18,.24,.18,.08);
-        p.level().playSound(null,v.blockPosition(),SoundEvents.PLAYER_ATTACK_KNOCKBACK,SoundSource.PLAYERS,hammer?1.1F:.7F,hammer?.55F:1.15F);
+
     }
 }

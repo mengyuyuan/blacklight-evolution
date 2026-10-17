@@ -1,0 +1,40 @@
+[
+  {
+    "name": "swords",
+    "page": "https://opengameart.org/content/20-sword-sound-effects-attacks-and-clashes",
+    "downloads": [
+      {
+        "url": "https://opengameart.org/sites/default/files/sword_-_starninjas_1.zip",
+        "file": "swords-0.zip",
+        "bytes": 149512
+      },
+      {
+        "url": "https://opengameart.org/sites/default/files/sword_clash_-_starninjas_0.zip",
+        "file": "swords-1.zip",
+        "bytes": 144575
+      }
+    ]
+  },
+  {
+    "name": "combat",
+    "page": "https://opengameart.org/content/punches-hits-swords-and-squishes",
+    "downloads": [
+      {
+        "url": "https://opengameart.org/sites/default/files/Socapex%20-%20Evol%20Online%20SFX%20-%20Punches%20and%20hits.zip",
+        "file": "combat-0.zip",
+        "bytes": 5802196
+      }
+    ]
+  },
+  {
+    "name": "swishes",
+    "page": "https://opengameart.org/content/swishes-sound-pack",
+    "downloads": [
+      {
+        "url": "https://opengameart.org/sites/default/files/swishes.zip",
+        "file": "swishes-0.zip",
+        "bytes": 385150
+      }
+    ]
+  }
+]

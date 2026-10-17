@@ -36,7 +36,7 @@ public final class WeaponMorphTracker {
     }
     private static final Map<AbstractClientPlayer,Observed> STATES=new WeakHashMap<>();
     private static final class Observed {
-        WeaponMorphTimeline timeline;long lastLong=Long.MIN_VALUE;boolean longVisible;double lastTime;
+        WeaponMorphTimeline timeline;long lastLong=Long.MIN_VALUE;boolean longVisible,combatVisible;double lastTime;
         Observed(PowerForm form,double now){timeline=new WeaponMorphTimeline(form,now);lastTime=now;}
     }
     private WeaponMorphTracker() { }
@@ -57,17 +57,24 @@ public final class WeaponMorphTracker {
         observed.lastTime=now;
         var morph=player.getData(ModAttachments.POWER_MORPH);
         boolean longVisible=enabled&&WeaponMorphTiming.weapon(form)&&morph.formId()==form.ordinal()&&morph.visible(player,partial);
+        boolean combatVisible=player.getData(ModAttachments.WEAPON_VISUAL).spec()!=null;
         boolean changed=observed.timeline.target()!=form;
         boolean newLong=longVisible&&observed.lastLong!=morph.started();
         if(changed||newLong) {
             float ticks=longVisible?WeaponMorphTiming.SWITCH_TICKS:form==PowerForm.NONE?WeaponMorphTiming.RETRACT_TICKS
                     :observed.timeline.target()==PowerForm.NONE?WeaponMorphTiming.QUICK_TICKS:WeaponMorphTiming.SWITCH_TICKS;
+            if(!longVisible&&player.getData(ModAttachments.WEAPON_VISUAL).spec()!=null)ticks=Math.min(ticks,5F);
             double onset=longVisible?morph.started()+WeaponMorphTiming.onset(form):now;
             observed.timeline.retarget(form,now,onset,ticks,longVisible);
             if(longVisible)observed.lastLong=morph.started();
         }else if(observed.longVisible&&!longVisible&&observed.timeline.transitioning(now)) {
             observed.timeline.retarget(form,now,now,WeaponMorphTiming.QUICK_TICKS,false);
         }
+        // A state-sync packet may precede the action packet by one frame. Accelerate
+        // the existing material blend once when combat takes over, without restarting it.
+        if(!longVisible&&combatVisible&&!observed.combatVisible&&!changed&&observed.timeline.transitioning(now))
+            observed.timeline.retarget(form,now,now,5F,false);
+        observed.combatVisible=combatVisible;
         observed.longVisible=longVisible;
         var timeline=observed.timeline;float phase=timeline.phase(now);
         float flow=timeline.flow(now);

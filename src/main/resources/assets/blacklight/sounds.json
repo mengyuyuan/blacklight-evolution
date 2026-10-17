@@ -1,0 +1,945 @@
+{
+  "weapon.none.swing": {
+    "subtitle": "subtitle.blacklight.weapon.none.swing",
+    "sounds": [
+      {
+        "name": "blacklight:weapons/none_swing_1",
+        "volume": 1,
+        "pitch": 1,
+        "attenuation_distance": 20
+      },
+      {
+        "name": "blacklight:weapons/none_swing_2",
+        "volume": 1,
+        "pitch": 1,
+        "attenuation_distance": 20
+      },
+      {
+        "name": "blacklight:weapons/none_swing_3",
+        "volume": 1,
+        "pitch": 1,
+        "attenuation_distance": 20
+      }
+    ]
+  },
+  "weapon.none.hit": {
+    "subtitle": "subtitle.blacklight.weapon.none.hit",
+    "sounds": [
+      {
+        "name": "blacklight:weapons/none_hit_1",
+        "volume": 1,
+        "pitch": 1,
+        "attenuation_distance": 24
+      },
+      {
+        "name": "blacklight:weapons/none_hit_2",
+        "volume": 1,
+        "pitch": 1,
+        "attenuation_distance": 24
+      },
+      {
+        "name": "blacklight:weapons/none_hit_3",
+        "volume": 1,
+        "pitch": 1,
+        "attenuation_distance": 24
+      }
+    ]
+  },
+  "weapon.none.heavy": {
+    "subtitle": "subtitle.blacklight.weapon.none.heavy",
+    "sounds": [
+      {
+        "name": "blacklight:weapons/none_heavy_1",
+        "volume": 1,
+        "pitch": 1,
+        "attenuation_distance": 24
+      },
+      {
+        "name": "blacklight:weapons/none_heavy_2",
+        "volume": 1,
+        "pitch": 1,
+        "attenuation_distance": 24
+      },
+      {
+        "name": "blacklight:weapons/none_heavy_3",
+        "volume": 1,
+        "pitch": 1,
+        "attenuation_distance": 24
+      }
+    ]
+  },
+  "weapon.none.ground": {
+    "subtitle": "subtitle.blacklight.weapon.none.ground",
+    "sounds": [
+      {
+        "name": "blacklight:weapons/none_ground_1",
+        "volume": 1,
+        "pitch": 1,
+        "attenuation_distance": 24
+      },
+      {
+        "name": "blacklight:weapons/none_ground_2",
+        "volume": 1,
+        "pitch": 1,
+        "attenuation_distance": 24
+      },
+      {
+        "name": "blacklight:weapons/none_ground_3",
+        "volume": 1,
+        "pitch": 1,
+        "attenuation_distance": 24
+      }
+    ]
+  },
+  "weapon.none.morph": {
+    "subtitle": "subtitle.blacklight.weapon.none.morph",
+    "sounds": [
+      {
+        "name": "blacklight:weapons/none_morph_1",
+        "volume": 1,
+        "pitch": 1,
+        "attenuation_distance": 24
+      },
+      {
+        "name": "blacklight:weapons/none_morph_2",
+        "volume": 1,
+        "pitch": 1,
+        "attenuation_distance": 24
+      },
+      {
+        "name": "blacklight:weapons/none_morph_3",
+        "volume": 1,
+        "pitch": 1,
+        "attenuation_distance": 24
+      }
+    ]
+  },
+  "weapon.claws.swing": {
+    "subtitle": "subtitle.blacklight.weapon.claws.swing",
+    "sounds": [
+      {
+        "name": "blacklight:weapons/claws_swing_1",
+        "volume": 1,
+        "pitch": 1,
+        "attenuation_distance": 20
+      },
+      {
+        "name": "blacklight:weapons/claws_swing_2",
+        "volume": 1,
+        "pitch": 1,
+        "attenuation_distance": 20
+      },
+      {
+        "name": "blacklight:weapons/claws_swing_3",
+        "volume": 1,
+        "pitch": 1,
+        "attenuation_distance": 20
+      }
+    ]
+  },
+  "weapon.claws.hit": {
+    "subtitle": "subtitle.blacklight.weapon.claws.hit",
+    "sounds": [
+      {
+        "name": "blacklight:weapons/claws_hit_1",
+        "volume": 1,
+        "pitch": 1,
+        "attenuation_distance": 24
+      },
+      {
+        "name": "blacklight:weapons/claws_hit_2",
+        "volume": 1,
+        "pitch": 1,
+        "attenuation_distance": 24
+      },
+      {
+        "name": "blacklight:weapons/claws_hit_3",
+        "volume": 1,
+        "pitch": 1,
+        "attenuation_distance": 24
+      }
+    ]
+  },
+  "weapon.claws.heavy": {
+    "subtitle": "subtitle.blacklight.weapon.claws.heavy",
+    "sounds": [
+      {
+        "name": "blacklight:weapons/claws_heavy_1",
+        "volume": 1,
+        "pitch": 1,
+        "attenuation_distance": 24
+      },
+      {
+        "name": "blacklight:weapons/claws_heavy_2",
+        "volume": 1,
+        "pitch": 1,
+        "attenuation_distance": 24
+      },
+      {
+        "name": "blacklight:weapons/claws_heavy_3",
+        "volume": 1,
+        "pitch": 1,
+        "attenuation_distance": 24
+      }
+    ]
+  },
+  "weapon.claws.ground": {
+    "subtitle": "subtitle.blacklight.weapon.claws.ground",
+    "sounds": [
+      {
+        "name": "blacklight:weapons/claws_ground_1",
+        "volume": 1,
+        "pitch": 1,
+        "attenuation_distance": 24
+      },
+      {
+        "name": "blacklight:weapons/claws_ground_2",
+        "volume": 1,
+        "pitch": 1,
+        "attenuation_distance": 24
+      },
+      {
+        "name": "blacklight:weapons/claws_ground_3",
+        "volume": 1,
+        "pitch": 1,
+        "attenuation_distance": 24
+      }
+    ]
+  },
+  "weapon.claws.morph": {
+    "subtitle": "subtitle.blacklight.weapon.claws.morph",
+    "sounds": [
+      {
+        "name": "blacklight:weapons/claws_morph_1",
+        "volume": 1,
+        "pitch": 1,
+        "attenuation_distance": 24
+      },
+      {
+        "name": "blacklight:weapons/claws_morph_2",
+        "volume": 1,
+        "pitch": 1,
+        "attenuation_distance": 24
+      },
+      {
+        "name": "blacklight:weapons/claws_morph_3",
+        "volume": 1,
+        "pitch": 1,
+        "attenuation_distance": 24
+      }
+    ]
+  },
+  "weapon.blade.swing": {
+    "subtitle": "subtitle.blacklight.weapon.blade.swing",
+    "sounds": [
+      {
+        "name": "blacklight:weapons/blade_swing_1",
+        "volume": 1,
+        "pitch": 1,
+        "attenuation_distance": 20
+      },
+      {
+        "name": "blacklight:weapons/blade_swing_2",
+        "volume": 1,
+        "pitch": 1,
+        "attenuation_distance": 20
+      },
+      {
+        "name": "blacklight:weapons/blade_swing_3",
+        "volume": 1,
+        "pitch": 1,
+        "attenuation_distance": 20
+      }
+    ]
+  },
+  "weapon.blade.hit": {
+    "subtitle": "subtitle.blacklight.weapon.blade.hit",
+    "sounds": [
+      {
+        "name": "blacklight:weapons/blade_hit_1",
+        "volume": 1,
+        "pitch": 1,
+        "attenuation_distance": 24
+      },
+      {
+        "name": "blacklight:weapons/blade_hit_2",
+        "volume": 1,
+        "pitch": 1,
+        "attenuation_distance": 24
+      },
+      {
+        "name": "blacklight:weapons/blade_hit_3",
+        "volume": 1,
+        "pitch": 1,
+        "attenuation_distance": 24
+      }
+    ]
+  },
+  "weapon.blade.heavy": {
+    "subtitle": "subtitle.blacklight.weapon.blade.heavy",
+    "sounds": [
+      {
+        "name": "blacklight:weapons/blade_heavy_1",
+        "volume": 1,
+        "pitch": 1,
+        "attenuation_distance": 24
+      },
+      {
+        "name": "blacklight:weapons/blade_heavy_2",
+        "volume": 1,
+        "pitch": 1,
+        "attenuation_distance": 24
+      },
+      {
+        "name": "blacklight:weapons/blade_heavy_3",
+        "volume": 1,
+        "pitch": 1,
+        "attenuation_distance": 24
+      }
+    ]
+  },
+  "weapon.blade.ground": {
+    "subtitle": "subtitle.blacklight.weapon.blade.ground",
+    "sounds": [
+      {
+        "name": "blacklight:weapons/blade_ground_1",
+        "volume": 1,
+        "pitch": 1,
+        "attenuation_distance": 24
+      },
+      {
+        "name": "blacklight:weapons/blade_ground_2",
+        "volume": 1,
+        "pitch": 1,
+        "attenuation_distance": 24
+      },
+      {
+        "name": "blacklight:weapons/blade_ground_3",
+        "volume": 1,
+        "pitch": 1,
+        "attenuation_distance": 24
+      }
+    ]
+  },
+  "weapon.blade.morph": {
+    "subtitle": "subtitle.blacklight.weapon.blade.morph",
+    "sounds": [
+      {
+        "name": "blacklight:weapons/blade_morph_1",
+        "volume": 1,
+        "pitch": 1,
+        "attenuation_distance": 24
+      },
+      {
+        "name": "blacklight:weapons/blade_morph_2",
+        "volume": 1,
+        "pitch": 1,
+        "attenuation_distance": 24
+      },
+      {
+        "name": "blacklight:weapons/blade_morph_3",
+        "volume": 1,
+        "pitch": 1,
+        "attenuation_distance": 24
+      }
+    ]
+  },
+  "weapon.hammerfists.swing": {
+    "subtitle": "subtitle.blacklight.weapon.hammerfists.swing",
+    "sounds": [
+      {
+        "name": "blacklight:weapons/hammerfists_swing_1",
+        "volume": 1,
+        "pitch": 1,
+        "attenuation_distance": 20
+      },
+      {
+        "name": "blacklight:weapons/hammerfists_swing_2",
+        "volume": 1,
+        "pitch": 1,
+        "attenuation_distance": 20
+      },
+      {
+        "name": "blacklight:weapons/hammerfists_swing_3",
+        "volume": 1,
+        "pitch": 1,
+        "attenuation_distance": 20
+      }
+    ]
+  },
+  "weapon.hammerfists.hit": {
+    "subtitle": "subtitle.blacklight.weapon.hammerfists.hit",
+    "sounds": [
+      {
+        "name": "blacklight:weapons/hammerfists_hit_1",
+        "volume": 1,
+        "pitch": 1,
+        "attenuation_distance": 24
+      },
+      {
+        "name": "blacklight:weapons/hammerfists_hit_2",
+        "volume": 1,
+        "pitch": 1,
+        "attenuation_distance": 24
+      },
+      {
+        "name": "blacklight:weapons/hammerfists_hit_3",
+        "volume": 1,
+        "pitch": 1,
+        "attenuation_distance": 24
+      }
+    ]
+  },
+  "weapon.hammerfists.heavy": {
+    "subtitle": "subtitle.blacklight.weapon.hammerfists.heavy",
+    "sounds": [
+      {
+        "name": "blacklight:weapons/hammerfists_heavy_1",
+        "volume": 1,
+        "pitch": 1,
+        "attenuation_distance": 24
+      },
+      {
+        "name": "blacklight:weapons/hammerfists_heavy_2",
+        "volume": 1,
+        "pitch": 1,
+        "attenuation_distance": 24
+      },
+      {
+        "name": "blacklight:weapons/hammerfists_heavy_3",
+        "volume": 1,
+        "pitch": 1,
+        "attenuation_distance": 24
+      }
+    ]
+  },
+  "weapon.hammerfists.ground": {
+    "subtitle": "subtitle.blacklight.weapon.hammerfists.ground",
+    "sounds": [
+      {
+        "name": "blacklight:weapons/hammerfists_ground_1",
+        "volume": 1,
+        "pitch": 1,
+        "attenuation_distance": 24
+      },
+      {
+        "name": "blacklight:weapons/hammerfists_ground_2",
+        "volume": 1,
+        "pitch": 1,
+        "attenuation_distance": 24
+      },
+      {
+        "name": "blacklight:weapons/hammerfists_ground_3",
+        "volume": 1,
+        "pitch": 1,
+        "attenuation_distance": 24
+      }
+    ]
+  },
+  "weapon.hammerfists.morph": {
+    "subtitle": "subtitle.blacklight.weapon.hammerfists.morph",
+    "sounds": [
+      {
+        "name": "blacklight:weapons/hammerfists_morph_1",
+        "volume": 1,
+        "pitch": 1,
+        "attenuation_distance": 24
+      },
+      {
+        "name": "blacklight:weapons/hammerfists_morph_2",
+        "volume": 1,
+        "pitch": 1,
+        "attenuation_distance": 24
+      },
+      {
+        "name": "blacklight:weapons/hammerfists_morph_3",
+        "volume": 1,
+        "pitch": 1,
+        "attenuation_distance": 24
+      }
+    ]
+  },
+  "weapon.whipfist.swing": {
+    "subtitle": "subtitle.blacklight.weapon.whipfist.swing",
+    "sounds": [
+      {
+        "name": "blacklight:weapons/whipfist_swing_1",
+        "volume": 1,
+        "pitch": 1,
+        "attenuation_distance": 20
+      },
+      {
+        "name": "blacklight:weapons/whipfist_swing_2",
+        "volume": 1,
+        "pitch": 1,
+        "attenuation_distance": 20
+      },
+      {
+        "name": "blacklight:weapons/whipfist_swing_3",
+        "volume": 1,
+        "pitch": 1,
+        "attenuation_distance": 20
+      }
+    ]
+  },
+  "weapon.whipfist.hit": {
+    "subtitle": "subtitle.blacklight.weapon.whipfist.hit",
+    "sounds": [
+      {
+        "name": "blacklight:weapons/whipfist_hit_1",
+        "volume": 1,
+        "pitch": 1,
+        "attenuation_distance": 24
+      },
+      {
+        "name": "blacklight:weapons/whipfist_hit_2",
+        "volume": 1,
+        "pitch": 1,
+        "attenuation_distance": 24
+      },
+      {
+        "name": "blacklight:weapons/whipfist_hit_3",
+        "volume": 1,
+        "pitch": 1,
+        "attenuation_distance": 24
+      }
+    ]
+  },
+  "weapon.whipfist.heavy": {
+    "subtitle": "subtitle.blacklight.weapon.whipfist.heavy",
+    "sounds": [
+      {
+        "name": "blacklight:weapons/whipfist_heavy_1",
+        "volume": 1,
+        "pitch": 1,
+        "attenuation_distance": 24
+      },
+      {
+        "name": "blacklight:weapons/whipfist_heavy_2",
+        "volume": 1,
+        "pitch": 1,
+        "attenuation_distance": 24
+      },
+      {
+        "name": "blacklight:weapons/whipfist_heavy_3",
+        "volume": 1,
+        "pitch": 1,
+        "attenuation_distance": 24
+      }
+    ]
+  },
+  "weapon.whipfist.ground": {
+    "subtitle": "subtitle.blacklight.weapon.whipfist.ground",
+    "sounds": [
+      {
+        "name": "blacklight:weapons/whipfist_ground_1",
+        "volume": 1,
+        "pitch": 1,
+        "attenuation_distance": 24
+      },
+      {
+        "name": "blacklight:weapons/whipfist_ground_2",
+        "volume": 1,
+        "pitch": 1,
+        "attenuation_distance": 24
+      },
+      {
+        "name": "blacklight:weapons/whipfist_ground_3",
+        "volume": 1,
+        "pitch": 1,
+        "attenuation_distance": 24
+      }
+    ]
+  },
+  "weapon.whipfist.morph": {
+    "subtitle": "subtitle.blacklight.weapon.whipfist.morph",
+    "sounds": [
+      {
+        "name": "blacklight:weapons/whipfist_morph_1",
+        "volume": 1,
+        "pitch": 1,
+        "attenuation_distance": 24
+      },
+      {
+        "name": "blacklight:weapons/whipfist_morph_2",
+        "volume": 1,
+        "pitch": 1,
+        "attenuation_distance": 24
+      },
+      {
+        "name": "blacklight:weapons/whipfist_morph_3",
+        "volume": 1,
+        "pitch": 1,
+        "attenuation_distance": 24
+      }
+    ]
+  },
+  "weapon.muscle_mass.swing": {
+    "subtitle": "subtitle.blacklight.weapon.muscle_mass.swing",
+    "sounds": [
+      {
+        "name": "blacklight:weapons/muscle_mass_swing_1",
+        "volume": 1,
+        "pitch": 1,
+        "attenuation_distance": 20
+      },
+      {
+        "name": "blacklight:weapons/muscle_mass_swing_2",
+        "volume": 1,
+        "pitch": 1,
+        "attenuation_distance": 20
+      },
+      {
+        "name": "blacklight:weapons/muscle_mass_swing_3",
+        "volume": 1,
+        "pitch": 1,
+        "attenuation_distance": 20
+      }
+    ]
+  },
+  "weapon.muscle_mass.hit": {
+    "subtitle": "subtitle.blacklight.weapon.muscle_mass.hit",
+    "sounds": [
+      {
+        "name": "blacklight:weapons/muscle_mass_hit_1",
+        "volume": 1,
+        "pitch": 1,
+        "attenuation_distance": 24
+      },
+      {
+        "name": "blacklight:weapons/muscle_mass_hit_2",
+        "volume": 1,
+        "pitch": 1,
+        "attenuation_distance": 24
+      },
+      {
+        "name": "blacklight:weapons/muscle_mass_hit_3",
+        "volume": 1,
+        "pitch": 1,
+        "attenuation_distance": 24
+      }
+    ]
+  },
+  "weapon.muscle_mass.heavy": {
+    "subtitle": "subtitle.blacklight.weapon.muscle_mass.heavy",
+    "sounds": [
+      {
+        "name": "blacklight:weapons/muscle_mass_heavy_1",
+        "volume": 1,
+        "pitch": 1,
+        "attenuation_distance": 24
+      },
+      {
+        "name": "blacklight:weapons/muscle_mass_heavy_2",
+        "volume": 1,
+        "pitch": 1,
+        "attenuation_distance": 24
+      },
+      {
+        "name": "blacklight:weapons/muscle_mass_heavy_3",
+        "volume": 1,
+        "pitch": 1,
+        "attenuation_distance": 24
+      }
+    ]
+  },
+  "weapon.muscle_mass.ground": {
+    "subtitle": "subtitle.blacklight.weapon.muscle_mass.ground",
+    "sounds": [
+      {
+        "name": "blacklight:weapons/muscle_mass_ground_1",
+        "volume": 1,
+        "pitch": 1,
+        "attenuation_distance": 24
+      },
+      {
+        "name": "blacklight:weapons/muscle_mass_ground_2",
+        "volume": 1,
+        "pitch": 1,
+        "attenuation_distance": 24
+      },
+      {
+        "name": "blacklight:weapons/muscle_mass_ground_3",
+        "volume": 1,
+        "pitch": 1,
+        "attenuation_distance": 24
+      }
+    ]
+  },
+  "weapon.muscle_mass.morph": {
+    "subtitle": "subtitle.blacklight.weapon.muscle_mass.morph",
+    "sounds": [
+      {
+        "name": "blacklight:weapons/muscle_mass_morph_1",
+        "volume": 1,
+        "pitch": 1,
+        "attenuation_distance": 24
+      },
+      {
+        "name": "blacklight:weapons/muscle_mass_morph_2",
+        "volume": 1,
+        "pitch": 1,
+        "attenuation_distance": 24
+      },
+      {
+        "name": "blacklight:weapons/muscle_mass_morph_3",
+        "volume": 1,
+        "pitch": 1,
+        "attenuation_distance": 24
+      }
+    ]
+  },
+  "defense.armor.deploy": {
+    "subtitle": "subtitle.blacklight.defense.armor.deploy",
+    "sounds": [
+      {
+        "name": "blacklight:defense/armor_deploy_1",
+        "volume": 1,
+        "pitch": 1,
+        "attenuation_distance": 24
+      },
+      {
+        "name": "blacklight:defense/armor_deploy_2",
+        "volume": 1,
+        "pitch": 1,
+        "attenuation_distance": 24
+      },
+      {
+        "name": "blacklight:defense/armor_deploy_3",
+        "volume": 1,
+        "pitch": 1,
+        "attenuation_distance": 24
+      }
+    ]
+  },
+  "defense.armor.retract": {
+    "subtitle": "subtitle.blacklight.defense.armor.retract",
+    "sounds": [
+      {
+        "name": "blacklight:defense/armor_retract_1",
+        "volume": 1,
+        "pitch": 1,
+        "attenuation_distance": 24
+      },
+      {
+        "name": "blacklight:defense/armor_retract_2",
+        "volume": 1,
+        "pitch": 1,
+        "attenuation_distance": 24
+      },
+      {
+        "name": "blacklight:defense/armor_retract_3",
+        "volume": 1,
+        "pitch": 1,
+        "attenuation_distance": 24
+      }
+    ]
+  },
+  "defense.armor.hit": {
+    "subtitle": "subtitle.blacklight.defense.armor.hit",
+    "sounds": [
+      {
+        "name": "blacklight:defense/armor_hit_1",
+        "volume": 1,
+        "pitch": 1,
+        "attenuation_distance": 24
+      },
+      {
+        "name": "blacklight:defense/armor_hit_2",
+        "volume": 1,
+        "pitch": 1,
+        "attenuation_distance": 24
+      },
+      {
+        "name": "blacklight:defense/armor_hit_3",
+        "volume": 1,
+        "pitch": 1,
+        "attenuation_distance": 24
+      }
+    ]
+  },
+  "defense.armor.heavy": {
+    "subtitle": "subtitle.blacklight.defense.armor.heavy",
+    "sounds": [
+      {
+        "name": "blacklight:defense/armor_heavy_1",
+        "volume": 1,
+        "pitch": 1,
+        "attenuation_distance": 24
+      },
+      {
+        "name": "blacklight:defense/armor_heavy_2",
+        "volume": 1,
+        "pitch": 1,
+        "attenuation_distance": 24
+      },
+      {
+        "name": "blacklight:defense/armor_heavy_3",
+        "volume": 1,
+        "pitch": 1,
+        "attenuation_distance": 24
+      }
+    ]
+  },
+  "defense.armor.deflect": {
+    "subtitle": "subtitle.blacklight.defense.armor.deflect",
+    "sounds": [
+      {
+        "name": "blacklight:defense/armor_deflect_1",
+        "volume": 1,
+        "pitch": 1,
+        "attenuation_distance": 24
+      },
+      {
+        "name": "blacklight:defense/armor_deflect_2",
+        "volume": 1,
+        "pitch": 1,
+        "attenuation_distance": 24
+      },
+      {
+        "name": "blacklight:defense/armor_deflect_3",
+        "volume": 1,
+        "pitch": 1,
+        "attenuation_distance": 24
+      }
+    ]
+  },
+  "defense.shield.deploy": {
+    "subtitle": "subtitle.blacklight.defense.shield.deploy",
+    "sounds": [
+      {
+        "name": "blacklight:defense/shield_deploy_1",
+        "volume": 1,
+        "pitch": 1,
+        "attenuation_distance": 24
+      },
+      {
+        "name": "blacklight:defense/shield_deploy_2",
+        "volume": 1,
+        "pitch": 1,
+        "attenuation_distance": 24
+      },
+      {
+        "name": "blacklight:defense/shield_deploy_3",
+        "volume": 1,
+        "pitch": 1,
+        "attenuation_distance": 24
+      }
+    ]
+  },
+  "defense.shield.retract": {
+    "subtitle": "subtitle.blacklight.defense.shield.retract",
+    "sounds": [
+      {
+        "name": "blacklight:defense/shield_retract_1",
+        "volume": 1,
+        "pitch": 1,
+        "attenuation_distance": 24
+      },
+      {
+        "name": "blacklight:defense/shield_retract_2",
+        "volume": 1,
+        "pitch": 1,
+        "attenuation_distance": 24
+      },
+      {
+        "name": "blacklight:defense/shield_retract_3",
+        "volume": 1,
+        "pitch": 1,
+        "attenuation_distance": 24
+      }
+    ]
+  },
+  "defense.shield.hit": {
+    "subtitle": "subtitle.blacklight.defense.shield.hit",
+    "sounds": [
+      {
+        "name": "blacklight:defense/shield_hit_1",
+        "volume": 1,
+        "pitch": 1,
+        "attenuation_distance": 24
+      },
+      {
+        "name": "blacklight:defense/shield_hit_2",
+        "volume": 1,
+        "pitch": 1,
+        "attenuation_distance": 24
+      },
+      {
+        "name": "blacklight:defense/shield_hit_3",
+        "volume": 1,
+        "pitch": 1,
+        "attenuation_distance": 24
+      }
+    ]
+  },
+  "defense.shield.heavy": {
+    "subtitle": "subtitle.blacklight.defense.shield.heavy",
+    "sounds": [
+      {
+        "name": "blacklight:defense/shield_heavy_1",
+        "volume": 1,
+        "pitch": 1,
+        "attenuation_distance": 24
+      },
+      {
+        "name": "blacklight:defense/shield_heavy_2",
+        "volume": 1,
+        "pitch": 1,
+        "attenuation_distance": 24
+      },
+      {
+        "name": "blacklight:defense/shield_heavy_3",
+        "volume": 1,
+        "pitch": 1,
+        "attenuation_distance": 24
+      }
+    ]
+  },
+  "defense.shield.deflect": {
+    "subtitle": "subtitle.blacklight.defense.shield.deflect",
+    "sounds": [
+      {
+        "name": "blacklight:defense/shield_deflect_1",
+        "volume": 1,
+        "pitch": 1,
+        "attenuation_distance": 24
+      },
+      {
+        "name": "blacklight:defense/shield_deflect_2",
+        "volume": 1,
+        "pitch": 1,
+        "attenuation_distance": 24
+      },
+      {
+        "name": "blacklight:defense/shield_deflect_3",
+        "volume": 1,
+        "pitch": 1,
+        "attenuation_distance": 24
+      }
+    ]
+  },
+  "defense.shield.break": {
+    "subtitle": "subtitle.blacklight.defense.shield.break",
+    "sounds": [
+      {
+        "name": "blacklight:defense/shield_break_1",
+        "volume": 1,
+        "pitch": 1,
+        "attenuation_distance": 24
+      },
+      {
+        "name": "blacklight:defense/shield_break_2",
+        "volume": 1,
+        "pitch": 1,
+        "attenuation_distance": 24
+      },
+      {
+        "name": "blacklight:defense/shield_break_3",
+        "volume": 1,
+        "pitch": 1,
+        "attenuation_distance": 24
+      }
+    ]
+  }
+}

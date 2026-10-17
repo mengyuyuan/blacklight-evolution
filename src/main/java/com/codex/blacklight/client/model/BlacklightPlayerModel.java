@@ -22,6 +22,7 @@ public final class BlacklightPlayerModel extends PlayerModel<AbstractClientPlaye
                              float w, float h, float d, float u, float v, float from, float to, float inflation, int anatomy) { }
     private final List<SkinPiece> pieces = new ArrayList<>();
     private Matrix4f[] matrices;
+    private MercerRig.Frame mercerFrame;
     private final Matrix4f[] bindInverse;
     private Matrix4f[] skinMatrices;
     private Matrix3f[] skinNormals;
@@ -66,6 +67,7 @@ public final class BlacklightPlayerModel extends PlayerModel<AbstractClientPlaye
         super.setupAnim(player,swing,amount,age,yaw,pitch);
         float partial=renderPartial;
         matrices=PlayerMotionController.skeleton().getPoseMatrices(BlacklightRenderPose.sample(player,partial));
+        mercerFrame=MercerPlayerMesh.active(player)?MercerPlayerMesh.get().sample(player,partial,matrices):null;
         // Ordinary equipment layers copy ModelPart transforms. Project the same
         // authored pose into their native frame so equipment follows the body.
         project(head,"Head");project(hat,"Head");project(body,"Chest");project(jacket,"Chest");
@@ -98,25 +100,32 @@ public final class BlacklightPlayerModel extends PlayerModel<AbstractClientPlaye
         var bone=PlayerMotionController.skeleton().searchJointByName(name);
         var bind=part.getInitialPose();
         var conversion=new Matrix4f().translation(0,1.501F,0).scale(-1,-1,1);
-        var matrix=new Matrix4f(conversion).invert().mul(matrices[bone.getId()]).mul(bindInverse[bone.getId()]).mul(conversion)
+        var matrix=new Matrix4f(conversion).invert().mul(matrices()[bone.getId()]).mul(bindInverse[bone.getId()]).mul(conversion)
                 .translate(bind.x/16,bind.y/16,bind.z/16);
         var rotation=matrix.getUnnormalizedRotation(new Quaternionf()).normalize().getEulerAnglesZYX(new Vector3f());
         part.x=matrix.m30()*16;part.y=matrix.m31()*16;part.z=matrix.m32()*16;
         part.xRot=rotation.x;part.yRot=rotation.y;part.zRot=rotation.z;
         var scale=matrix.getScale(new Vector3f());part.xScale=scale.x;part.yScale=scale.y;part.zScale=scale.z;
     }
-    public Matrix4f[] matrices() { return matrices; }
+    public MercerRig.Frame mercerFrame() { return mercerFrame; }
+    public Matrix4f[] matrices() { return mercerFrame==null?matrices:mercerFrame.attachments(); }
     @Override public void renderToBuffer(PoseStack stack,VertexConsumer out,int light,int overlay,int color) {
         if(matrices==null){super.renderToBuffer(stack,out,light,overlay,color);return;}
-        skinMatrices=new Matrix4f[matrices.length];skinNormals=new Matrix3f[matrices.length];
-        for(int i=0;i<matrices.length;i++) {
-            skinMatrices[i]=new Matrix4f(matrices[i]).mul(bindInverse[i]);
+        int count=mercerFrame==null?matrices.length:mercerFrame.skin().length;
+        skinMatrices=new Matrix4f[count];skinNormals=new Matrix3f[count];
+        for(int i=0;i<count;i++) {
+            skinMatrices[i]=mercerFrame==null?new Matrix4f(matrices[i]).mul(bindInverse[i]):mercerFrame.skin()[i];
             skinNormals[i]=new Matrix3f(skinMatrices[i]).invert().transpose();
         }
         stack.pushPose();BlacklightBoneRendering.skeletonFrame(stack);
         try {
             if(renderedPlayer!=null&&renderedPlayer.getData(com.codex.blacklight.registry.ModAttachments.DEVASTATOR_VISUAL).kind()>=0)
-                com.codex.blacklight.client.renderer.DevastatorEffectRenderer.captureBody(renderedPlayer,stack,matrices);
+                com.codex.blacklight.client.renderer.DevastatorEffectRenderer.captureBody(renderedPlayer,stack,matrices());
+            if(mercerFrame!=null) {
+                MercerPlayerMesh.get().render(this,renderedPlayer,renderPartial,stack,out,light,overlay,color,
+                        skinMatrices,skinNormals,rightBiological,leftBiological);
+                return;
+            }
             for(var piece:pieces) {
                 SkinPiece drawn=piece;
                 if(!piece.visibility.visible) {
@@ -135,7 +144,7 @@ public final class BlacklightPlayerModel extends PlayerModel<AbstractClientPlaye
         if(matrices==null){super.translateToHand(arm,stack);return;}
         var bone=PlayerMotionController.skeleton().searchJointByName(arm==HumanoidArm.RIGHT?"Tool_R":"Tool_L");
         BlacklightBoneRendering.skeletonFrame(stack);
-        BlacklightBoneRendering.apply(stack,matrices[bone.getId()]);
+        BlacklightBoneRendering.apply(stack,matrices()[bone.getId()]);
         // ItemInHandLayer expects a vanilla arm frame at the wrist.
         stack.scale(-1,-1,1);
     }
