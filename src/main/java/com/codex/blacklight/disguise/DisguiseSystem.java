@@ -58,7 +58,9 @@ public final class DisguiseSystem {
         boolean entering=!s.isDisguised();
         if(entering){
             s.activate(PowerForm.NONE);
-            int mask=com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.UTILITY_POWERS)&~UtilityPowerSystem.DEFENSE;
+            com.codex.blacklight.movement.WingFlightSystem.transform(p,false);
+            com.codex.blacklight.movement.WingFlightSystem.stop(p);
+            int mask=com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.UTILITY_POWERS)&~(UtilityPowerSystem.DEFENSE|PowerForm.SOVEREIGN_WINGS.bit());
             com.codex.blacklight.registry.ModAttachments.setData(p, ModAttachments.UTILITY_POWERS,mask);com.codex.blacklight.registry.ModAttachments.syncData(p, ModAttachments.UTILITY_POWERS);
             com.codex.blacklight.registry.ModAttachments.setData(p, ModAttachments.POWER_MORPH,com.codex.blacklight.power.PowerMorph.NONE);com.codex.blacklight.registry.ModAttachments.syncData(p, ModAttachments.POWER_MORPH);
         }

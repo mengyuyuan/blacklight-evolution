@@ -199,7 +199,7 @@ public final class PlayerMotionController {
     private static BlacklightPose utilityPose(LivingEntity entity,float partial) {
         var pose=rawPose(entity,partial);
         com.codex.blacklight.client.animation.NativeUtilityPose.apply(entity,pose,partial);
-        return pose;
+        return com.codex.blacklight.client.animation.SovereignFlightPose.apply(entity,pose,partial);
     }
     private static BlacklightPose rawPose(LivingEntity entity, float partial) {
         var runtime = state(entity); double now = now(entity, partial);

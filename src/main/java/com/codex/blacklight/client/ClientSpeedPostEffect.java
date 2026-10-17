@@ -101,6 +101,10 @@ public final class ClientSpeedPostEffect {
             }
         }
 
+        if(minecraft.player!=null&&com.codex.blacklight.movement.WingFlightSystem.flying(minecraft.player)){
+            var flight=com.codex.blacklight.client.animation.WingFlightVisuals.sample(minecraft.player,1);
+            target=Math.max(target,flight.flow()*.42F+flight.thrust()*flight.flow()*.16F);
+        }
         float riseOrFall = target > intensity ? 0.34F : 0.20F;
         intensity += (target - intensity) * riseOrFall;
         biasX += (targetBiasX - biasX) * 0.28F;
