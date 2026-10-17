@@ -14,6 +14,11 @@ public final class LocomotionClock {
     public double current(){return current;}
     public boolean commit(long nextTick,String nextKey,float nextDuration,boolean nextLoop,
                           boolean preserveCycle,double distance,double nominalBlocksPerTick) {
+        return commit(nextTick,nextKey,nextDuration,nextLoop,preserveCycle,distance,nominalBlocksPerTick,8);
+    }
+    public boolean commit(long nextTick,String nextKey,float nextDuration,boolean nextLoop,
+                          boolean preserveCycle,double distance,double nominalBlocksPerTick,double maxRate) {
+        if(!Double.isFinite(maxRate)||maxRate<=0)throw new IllegalArgumentException("Invalid gait rate limit");
         if(nextTick<=tick)return false;
         if(nextKey==null||nextDuration<=0||!Float.isFinite(nextDuration)
                 ||!Double.isFinite(distance)||distance<0||!Double.isFinite(nominalBlocksPerTick)||nominalBlocksPerTick<0)
@@ -33,7 +38,7 @@ public final class LocomotionClock {
         // still allowing distance-driven slowing/stopping and phase-continuous swaps.
         boolean sourceSprint=nextKey.equals("basic_sprint") || nextKey.equals("basic_sprint_fast")
                 || nextKey.equals("basic_sprint_fastest");
-        if(!fresh)current+=Math.min(advance,ticks/20*(sourceSprint?1:8));
+        if(!fresh)current+=Math.min(advance,ticks/20*(sourceSprint?Math.min(1,maxRate):maxRate));
         tick=nextTick;
         return changed;
     }
