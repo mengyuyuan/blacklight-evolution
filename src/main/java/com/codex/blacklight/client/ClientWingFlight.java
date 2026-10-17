@@ -8,7 +8,7 @@ import net.neoforged.neoforge.network.PacketDistributor;
 
 public final class ClientWingFlight {
     public static boolean tick(Minecraft mc){
-        var p=mc.player;if(p==null||!WingFlightSystem.eligible(p))return false;
+        var p=mc.player;if(p==null||!WingFlightSystem.eligible(p)||ClientMovementEvents.weaponOwnsMovement(mc))return false;
         boolean input=mc.screen==null&&mc.isWindowActive();
         int forward=input?(SkillBindings.down(mc.options.keyUp)?1:0)-(SkillBindings.down(mc.options.keyDown)?1:0):0;
         int side=input?(SkillBindings.down(mc.options.keyRight)?1:0)-(SkillBindings.down(mc.options.keyLeft)?1:0):0;
@@ -27,7 +27,14 @@ public final class ClientWingFlight {
             p.setYRot(yaw);p.setYHeadRot(yaw);
             p.yBodyRot=net.minecraft.util.Mth.rotLerp(.25F,p.yBodyRot,yaw);
         }
-        if(p.onGround()&&!WingFlightSystem.flying(p))p.setSprinting(boost&&forward>0&&!down);
+        if(p.onGround()&&!WingFlightSystem.flying(p)){
+            boolean sprint=boost&&forward>0&&!down;p.setSprinting(sprint);
+            if(sprint&&!ClientClawEvents.isGroundSpikeActionActive()){
+                double max=MovementTuningSettings.sprintMaxSpeed()*com.codex.blacklight.power.MovementUpgrade.sprintMultiplier(p.getData(ModAttachments.PLAYER_STATE).getMovementUpgradeMask());
+                if(com.codex.blacklight.power.UtilityPowerSystem.active(p,com.codex.blacklight.power.PowerForm.ARMOR))max*=.75;
+                p.setDeltaMovement(TraversalSteering.sprint(p,p.getDeltaMovement(),max,MovementTuningSettings.sprintAcceleration(),forward,side));
+            }
+        }
         // Equipping wings must not freeze the shared gait/facing snapshot. This
         // also updates remote players instead of leaving their last ground pose.
         PrototypeAnimationController.tickLevel(mc,false,forward!=0||side!=0,boost);

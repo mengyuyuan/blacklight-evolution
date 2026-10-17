@@ -3,6 +3,7 @@
 NeoForge 1.21.1 is based on main after PR #51 (Mercer model, weapon handoff and combat audio).
 
 - `gradlew test build --offline`: passed, 402 tests, zero failures/errors/skips.
+- Final integration also preserves grounded weapon movement ownership, restores ground sprint prediction while wings are equipped, and retracts/stops flight before disguise.
 - Standalone boundary and complete bundled-motion checks: passed as part of build.
 - Opt-in client fixtures are excluded from the distributable JAR.
 - Before the main integration, actual-client wings.13 side-view testing reached 403.2 blocks/s, triggered client/server sonic state, stopped at the wall and braked after input release. Sampled frames showed wing-edge mist/tip wakes and the forward open bow membrane.

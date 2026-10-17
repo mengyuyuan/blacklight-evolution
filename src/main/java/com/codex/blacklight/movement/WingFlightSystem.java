@@ -18,7 +18,7 @@ public final class WingFlightSystem {
         long received,lastMotion;boolean jump,launch;Vec3 lastPosition;
         final WingFlightTuning.SonicGate sonic=new WingFlightTuning.SonicGate();
     }
-    public static boolean equipped(Player p){return UtilityPowerSystem.active(p,PowerForm.SOVEREIGN_WINGS)&&!BiomassSystem.active(p);}
+    public static boolean equipped(Player p){return UtilityPowerSystem.active(p,PowerForm.SOVEREIGN_WINGS)&&!BiomassSystem.active(p)&&!p.getData(ModAttachments.PLAYER_STATE).isDisguised()&&!com.codex.blacklight.disguise.DisguiseSystem.morphing(p);}
     public static boolean eligible(Player p){return equipped(p)&&!p.isPassenger()&&!p.isSpectator()&&!p.isInWater()&&!p.isInLava()&&!p.isFallFlying()&&!p.getAbilities().flying;}
     public static boolean flying(Player p){return eligible(p)&&p.getData(ModAttachments.WING_FLIGHT).flying();}
     public static boolean ownsTravel(Player p){return flying(p)&&p.getData(ModAttachments.WEAPON_VISUAL).spec()==null&&!p.getData(ModAttachments.CONSUMING);}
@@ -78,6 +78,9 @@ public final class WingFlightSystem {
         if(!eligible(p)){stop(p);return;}
         long now=p.level().getGameTime();var s=p.getData(ModAttachments.WING_FLIGHT);
         var c=INPUTS.get(p);var move=p.getData(ModAttachments.MOVEMENT_STATE);
+        if(com.codex.blacklight.combat.WeaponCombatSystem.busy(p)){
+            if(c!=null){c.launch=false;c.lastPosition=p.position();}return;
+        }
         if(c!=null){
             double distance=c.lastPosition==null?0:p.position().distanceTo(c.lastPosition);c.lastPosition=p.position();
             // Actual displacement, never a sprint key or a teleport, causes the shared sound.
