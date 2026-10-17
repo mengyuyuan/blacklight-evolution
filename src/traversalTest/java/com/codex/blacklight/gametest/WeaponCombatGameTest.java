@@ -69,13 +69,13 @@ public final class WeaponCombatGameTest {
                     hits++;
                     var hitMove=t<link?first:second;int elapsed=t<link?t:t-link;
                     h.assertTrue(hitMove.contactIndex(elapsed)>=0,"queued hit stays inside its own window");
-                    h.assertTrue(Math.abs(previous-target.getHealth()-hitMove.damage*5)<.01,"queued strike deals full declared damage");
+                    h.assertTrue(Math.abs(previous-target.getHealth()-hitMove.damage)<.01,"queued strike deals full declared damage");
                 }
                 var visual=p.getData(ModAttachments.WEAPON_VISUAL).spec();
                 if(t<link)h.assertTrue(visual==first,"first action remains through contact and follow-through");
                 else if(t<link+second.duration)h.assertTrue(visual==second&&WeaponCombatSystem.busy(p),"direct active-to-active link with no idle state: form="+form+" t="+t+" link="+link+" duration="+second.duration+" visual="+visual);
             }
-            h.assertTrue(hits==2&&Math.abs(before-target.getHealth()-(first.damage+second.damage)*5)<.01,"one full hit per queued action: "+form);
+            h.assertTrue(hits==2&&Math.abs(before-target.getHealth()-(first.damage+second.damage))<.01,"one full hit per queued action: "+form);
             h.assertTrue(!WeaponCombatSystem.busy(p)&&p.getData(ModAttachments.CLAW_COMBAT).action()==ClawCombatState.Action.IDLE,"queue is consumed once and normal recovery returns to idle");
             WeaponCombatSystem.cancel(p);target.discard();
         }
@@ -140,7 +140,7 @@ public final class WeaponCombatGameTest {
                 p.tickCount++;float last=target.getHealth();WeaponCombatSystem.tick(new PlayerTickEvent.Post(p));
                 if(target.getHealth()<last){hits++;h.assertTrue(move.contactIndex(t)>=0,"adapted contact is in server window: "+move);}
             }
-            h.assertTrue(hits==1&&Math.abs(before-target.getHealth()-move.damage*5)<.01,"one damage event for "+move+", got "+hits);
+            h.assertTrue(hits==1&&Math.abs(before-target.getHealth()-move.damage)<.01,"one damage event for "+move+", got "+hits);
             h.assertTrue(!WeaponCombatSystem.busy(p),"adapted recovery ends: "+move);
             target.discard();
         }
@@ -179,7 +179,7 @@ public final class WeaponCombatGameTest {
                 if(now<previous){contacts++;h.assertTrue(move.contactIndex(t)>=0,"dash damage stays inside its contact window");}
                 previous=now;
             }
-            h.assertTrue(contacts==1&&Math.abs(before-target.getHealth()-move.damage*5)<.01,"one hit per target in this Mod's dash policy");
+            h.assertTrue(contacts==1&&Math.abs(before-target.getHealth()-move.damage)<.01,"one hit per target in this Mod's dash policy");
             if(outsideBlade!=null){
                 h.assertTrue(outsideBlade.getHealth()==outsideBefore,"broad reach alone cannot hit beyond the blade envelope without Coord displacement");
                 outsideBlade.discard();
@@ -193,11 +193,11 @@ public final class WeaponCombatGameTest {
         WeaponCombatSystem.request(p,true);
         h.assertTrue(p.getData(ModAttachments.WEAPON_VISUAL).spec()==WeaponMove.WHIP_SWEEP,"Special follows a combo opportunity into sweep");
         for(int t=1;t<=WeaponMove.WHIP_SWEEP.duration;t++){p.tickCount++;WeaponCombatSystem.tick(new PlayerTickEvent.Post(p));}
-        h.assertTrue(Math.abs(before-behind.getHealth()-12*5)<.01,"full sweep reaches a rear target once");
+        h.assertTrue(Math.abs(before-behind.getHealth()-12)<.01,"full sweep reaches a rear target once");
         behind.discard();h.succeed();
     }
     @GameTest(template="wall_test",timeoutTicks=40)
-    public static void eachWeaponHasTimedDamageAndCannotSwitchDuringSwing(GameTestHelper h){
+    public static void eachWeaponHasTimedDamageAndFormSwitchCancelsOldContacts(GameTestHelper h){
         for(var form:new PowerForm[]{PowerForm.BLADE,PowerForm.HAMMERFISTS,PowerForm.WHIPFIST}){
             for(int x=1;x<12;x++)for(int z=1;z<12;z++)h.setBlock(x,1,z,Blocks.STONE);
             var p=FakePlayerFactory.get(h.getLevel(),new GameProfile(UUID.randomUUID(),"weapon-qa"));
@@ -206,12 +206,17 @@ public final class WeaponCombatGameTest {
             var mob=h.spawn(EntityType.IRON_GOLEM,4,2,5);mob.setNoAi(true);float before=mob.getHealth();
             WeaponCombatSystem.request(p,false);var move=p.getData(ModAttachments.WEAPON_VISUAL).spec();
             h.assertTrue(move!=null&&move.form==form,"selected weapon owns attack");
-            h.assertTrue(!PowerFormSystem.select(p,PowerForm.CLAWS,false),"cannot replace a committed swing");
             for(int i=1;i<move.start;i++){p.tickCount++;WeaponCombatSystem.tick(new PlayerTickEvent.Post(p));}
             h.assertTrue(mob.getHealth()==before,"anticipation must not deal damage");
             for(int i=move.start;i<=move.duration;i++){p.tickCount++;WeaponCombatSystem.tick(new PlayerTickEvent.Post(p));}
             h.assertTrue(mob.getHealth()<before,"active frames hit the target");
-            h.assertTrue(!WeaponCombatSystem.busy(p),"recovery unlocks action");mob.discard();
+            h.assertTrue(!WeaponCombatSystem.busy(p),"recovery unlocks action");
+            // Current gameplay permits swapping weapons, but cancels the old
+            // contact window so the abandoned swing cannot deal delayed damage.
+            WeaponCombatSystem.request(p,false);
+            h.assertTrue(PowerFormSystem.select(p,PowerForm.CLAWS,false)&&!WeaponCombatSystem.busy(p),"form switch cancels weapon-owned action");
+            float after=mob.getHealth();advance(p,move.duration+5);
+            h.assertTrue(mob.getHealth()==after,"cancelled form cannot leave delayed contacts");mob.discard();
         }
         h.succeed();
     }

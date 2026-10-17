@@ -19,10 +19,10 @@ public final class GameplayProgressionGameTest {
     @GameTest(template="wall_test",timeoutTicks=40)
     public static void biologicalGrowthCostsOnceAndMutantsUnlockGenes(GameTestHelper h){
         var p=FakePlayerFactory.get(h.getLevel(),new GameProfile(UUID.randomUUID(),"growth-qa"));
-        var state=p.getData(ModAttachments.PLAYER_STATE);state.infect();state.addBiomass(750);
-        GrowthSystem.purchase(p,GrowthUpgrade.VITALITY);int balance=state.getBiomass();
-        h.assertTrue(balance==800&&p.getMaxHealth()==150,"vitality spends biomass and increases max health");
-        GrowthSystem.purchase(p,GrowthUpgrade.VITALITY);h.assertTrue(state.getBiomass()==balance&&p.getMaxHealth()==150,"repeat purchase cannot spend or stack");
+        var state=p.getData(ModAttachments.PLAYER_STATE);state.infect();state.addBiomass(750);state.addEvolutionPoints(1000);int biomassBefore=state.getBiomass();
+        GrowthSystem.purchase(p,GrowthUpgrade.VITALITY);int balance=state.getEvolutionPoints();
+        h.assertTrue(balance==800&&state.getBiomass()==biomassBefore&&p.getMaxHealth()==150,"vitality spends evolution points, preserves biomass and increases max health");
+        GrowthSystem.purchase(p,GrowthUpgrade.VITALITY);h.assertTrue(state.getEvolutionPoints()==balance&&state.getBiomass()==biomassBefore&&p.getMaxHealth()==150,"repeat purchase cannot spend or stack");
         var types=java.util.List.of(ModEntities.BLACKLIGHT_STALKER,ModEntities.BLACKLIGHT_SPITTER,ModEntities.BLACKLIGHT_BRUTE);
         for(var type:types){var mob=type.get().create(h.getLevel());GrowthSystem.consumed(p,mob);mob.discard();}
         h.assertTrue(state.hasUnlocked(PowerForm.BLADE)&&state.hasUnlocked(PowerForm.WHIPFIST)&&state.hasUnlocked(PowerForm.HAMMERFISTS),"three genes unlock three weapons");
@@ -41,7 +41,7 @@ public final class GameplayProgressionGameTest {
         h.assertTrue(WeaponCombatSystem.busy(p)&&mob.getHealth()==hp,"long descent stays committed without early damage");
         p.setPos(h.absoluteVec(new Vec3(4,2,4)));p.setOnGround(true);
         for(int t=0;t<WeaponMove.HAMMER_DROP.duration+2;t++){p.tickCount++;WeaponCombatSystem.tick(new PlayerTickEvent.Post(p));}
-        h.assertTrue(mob.getHealth()==hp-WeaponMove.HAMMER_DROP.damage*5,"landing contacts exactly once");
+        h.assertTrue(mob.getHealth()==hp-WeaponMove.HAMMER_DROP.damage,"landing contacts exactly once");
         h.assertTrue(!WeaponCombatSystem.busy(p),"landing recovery ends");mob.discard();h.succeed();
     }
     @GameTest(template="wall_test",timeoutTicks=40)

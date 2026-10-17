@@ -15,6 +15,8 @@ import java.util.function.Supplier;
 public final class ModAttachments {
     private static final DeferredRegister<AttachmentType<?>> ATTACHMENTS =
             DeferredRegister.create(NeoForgeRegistries.ATTACHMENT_TYPES, BlacklightNeoMod.MOD_ID);
+    public static final Supplier<AttachmentType<Integer>> HYDRA_CARRIER=ATTACHMENTS.register("hydra_carrier",()->AttachmentType.builder(()->-1).sync(net.minecraft.network.codec.ByteBufCodecs.VAR_INT).build());
+    public static final Supplier<AttachmentType<Long>> HYDRA_THROWN_AT=ATTACHMENTS.register("hydra_thrown_at",()->AttachmentType.builder(()->-1000L).sync(net.minecraft.network.codec.ByteBufCodecs.VAR_LONG).build());
 
     public static final Supplier<AttachmentType<BlacklightState>> PLAYER_STATE = ATTACHMENTS.register(
             "player_state",

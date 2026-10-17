@@ -103,7 +103,7 @@ public final class StandalonePlayerRendering {
             return;
         }
         var state=player.getData(ModAttachments.PLAYER_STATE);
-        boolean active=state.isPrototypeMode()
+        boolean active=com.codex.blacklight.client.animation.HydraPlayerPose.visible(player)||state.isPrototypeMode()
                 ||UtilityPowerSystem.visualWeight(player,PowerForm.ARMOR,partial)>0
                 ||UtilityPowerSystem.visualWeight(player,PowerForm.SHIELD,partial)>0
                 ||player.getData(ModAttachments.CONSUME_VISUAL).active();

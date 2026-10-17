@@ -36,6 +36,14 @@ public final class MovementState {
     public void clearSprintDrive() { sprintDriveTick=Integer.MIN_VALUE;sprintDrive=net.minecraft.world.phys.Vec3.ZERO; }
 
     private int chargeTicks;
+    private int hopCooldown,hopTicks;
+    public boolean canHop(){return hopCooldown==0&&hopTicks==0;}
+    /** First six server ticks of takeoff. MC tuning, not a decoded original frame count. */
+    public boolean hopInvulnerable(){return hopTicks>13;}
+    public void beginHop(){hopCooldown=24;hopTicks=19;cancelCharge();jumpInput.cancelPendingCharge();clearSprintDrive();}
+    public boolean hopping(){return hopTicks>0;}
+    public void tickHop(){if(hopCooldown>0)hopCooldown--;if(hopTicks>0)hopTicks--;}
+    public void cancelHop(){hopTicks=0;}
     private boolean runningCharge;
     public boolean runningCharge(){return chargeTicks>0&&runningCharge;}
     public void beginRunningCharge(){beginCharge();runningCharge=true;}
@@ -244,5 +252,5 @@ public final class MovementState {
     }
     public Mode mode() { return mode; }
     public void setMode(Mode mode) { if (dashTicks == 0 && chargeTicks == 0) this.mode = mode; }
-    public void reset() { clearSprintDrive(); cameraYaw=Float.NaN; jumpInput.reset(); wallTraversal.reset();forwardInput=sidewaysInput=0;detachHeld=false; jumpHeld = false; previousJumpHeld = false; dashRequested = false; forwardHeld = false; sprinting = false; chargeTicks = 0; chargeOffGroundTicks = 0; dashTicks = 0; airDashes = maxAirDashes; dashDirectionX = 0.0D; dashDirectionZ = 0.0D; runningAnimation = false; sprintColliding = false; wallNormalX = 0.0D; wallNormalZ = 0.0D; airborne = false; peakFallSpeed = 0.0D; airborneApexY = Double.NaN; landingRecoveryTicks = 0; landingStrength = LandingImpact.Strength.NONE; wallStallTicks = 0; lastWallY = Double.NaN; wallJumpCooldownTicks = 0; wallChargeTicks = 0; wallVaultTicks = 0; mode = Mode.NORMAL; }
+    public void reset() { hopTicks=hopCooldown=0; clearSprintDrive(); cameraYaw=Float.NaN; jumpInput.reset(); wallTraversal.reset();forwardInput=sidewaysInput=0;detachHeld=false; jumpHeld = false; previousJumpHeld = false; dashRequested = false; forwardHeld = false; sprinting = false; chargeTicks = 0; chargeOffGroundTicks = 0; dashTicks = 0; airDashes = maxAirDashes; dashDirectionX = 0.0D; dashDirectionZ = 0.0D; runningAnimation = false; sprintColliding = false; wallNormalX = 0.0D; wallNormalZ = 0.0D; airborne = false; peakFallSpeed = 0.0D; airborneApexY = Double.NaN; landingRecoveryTicks = 0; landingStrength = LandingImpact.Strength.NONE; wallStallTicks = 0; lastWallY = Double.NaN; wallJumpCooldownTicks = 0; wallChargeTicks = 0; wallVaultTicks = 0; mode = Mode.NORMAL; }
 }

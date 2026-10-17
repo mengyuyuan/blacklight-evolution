@@ -26,8 +26,9 @@ public final class WeaponImpact {
         // Large, resistant creatures flinch but are not tossed like a chicken.
         boolean canFall=profile.knockdown()&&resistance>.05&&volume<4;
         if(!canFall&&profile.knockdown())profile=new ImpactProfile(HitReaction.HEAVY,ImpactProfile.BODY,12,profile.push(),0,false);
-        boolean protectedAttack=v.isAlive()&&(v instanceof com.codex.blacklight.entity.BlacklightHunter hunter&&hunter.committedAttack()
-                ||v instanceof com.codex.blacklight.entity.BlacklightInfectedHost host&&host.giantBoss());
+        // Hunter flinches are bounded by ImpactControl's cooldown. Blocking the
+        // entire committed attack here bypassed both light flinches and heavy control.
+        boolean protectedAttack=v.isAlive()&&v instanceof com.codex.blacklight.entity.BlacklightInfectedHost host&&host.giantBoss();
         if(!protectedAttack){
             ImpactControl.begin(v,profile,p.getYRot());
             double force=profile.push()*mass*resistance;

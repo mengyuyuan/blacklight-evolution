@@ -14,7 +14,7 @@ public record SkillTutorial(String family,String clip,PowerForm form,String inst
         if(id.startsWith("slime_"))return new SkillTutorial("health","basic_idle",PowerForm.NONE,"slime");
         if(id.startsWith("block_throw_"))return of("block_throw","block_throw_two_release",PowerForm.MUSCLE_MASS,"key.blacklight.grab","key.attack","key.use","key.sneak");
         if(id.startsWith("jump_"))return of("jump","basic_jump_charge",PowerForm.NONE,"key.jump");
-        if(id.startsWith("sprint_"))return of("sprint","basic_run",PowerForm.NONE,"key.forward","key.sprint");
+        if(id.startsWith("sprint_"))return of("sprint","basic_run",PowerForm.NONE,"key.forward","key.sprint","key.blacklight.dodge");
         if(id.startsWith("wall_"))return of("wall","basic_wall_run_up",PowerForm.NONE,"key.forward","key.sprint","key.sneak");
         if(id.startsWith("glide_"))return of("glide","basic_glide_forward",PowerForm.NONE,"key.jump");
         if(id.startsWith("critical_mass"))return of("critical","basic_idle",PowerForm.NONE,"key.blacklight.grab","key.use");

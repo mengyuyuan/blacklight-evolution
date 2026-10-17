@@ -125,7 +125,8 @@ public final class CitySystem {
             BlockPos outside=port.relative(facing,3).below();
             if(level.getEntitiesOfClass(Mob.class,new AABB(port).inflate(48)).size()>=12)return;
             boolean hunter=level.random.nextInt(5)==0;
-            if(spawn(level,hunter?ModEntities.BLACKLIGHT_HUNTER.get():EntityType.ZOMBIE,outside,!hunter)){
+            boolean hydra=level.random.nextInt(12)==0&&level.getEntitiesOfClass(com.codex.blacklight.entity.BlacklightHydra.class,new AABB(port).inflate(64)).isEmpty();
+            if(spawn(level,hydra?ModEntities.BLACKLIGHT_HYDRA.get():hunter?ModEntities.BLACKLIGHT_HUNTER.get():EntityType.ZOMBIE,outside,!hunter&&!hydra)){
                 level.setBlock(port,level.getBlockState(port).setValue(CityHatchBlock.OPEN,true),3);
                 level.sendParticles(ParticleTypes.CRIMSON_SPORE,outside.getX()+.5,65,outside.getZ()+.5,16,.7,.6,.7,.02);
                 level.playSound(null,port,SoundEvents.SLIME_SQUISH,SoundSource.HOSTILE,1,.6f);

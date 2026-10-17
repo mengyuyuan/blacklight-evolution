@@ -1,6 +1,7 @@
 package com.codex.blacklight.power;
 
 import com.codex.blacklight.entity.BlacklightHunter;
+import com.codex.blacklight.combat.HunterBalance;
 import com.codex.blacklight.entity.BlacklightMutant;
 import com.codex.blacklight.entity.BlacklightHive;
 import com.codex.blacklight.registry.ModAttachments;
@@ -21,10 +22,21 @@ public final class InfectedCombatBalance {
     private InfectedCombatBalance() {}
     @SubscribeEvent(priority=EventPriority.HIGH)
     public static void incoming(LivingIncomingDamageEvent event){
-        if(!(event.getEntity() instanceof Player player)||player.level().isClientSide
+        if(event.getEntity().level().isClientSide||event.isCanceled()||event.getAmount()<=0)return;
+        var source=event.getSource();
+        if(event.getEntity() instanceof BlacklightHunter && source.getEntity() instanceof Player
+                && !source.is(DamageTypeTags.BYPASSES_INVULNERABILITY))
+            event.setAmount(event.getAmount()*HunterBalance.PLAYER_ATTACK_FACTOR);
+        var hunter=source.getEntity() instanceof BlacklightHunter h&&source.getDirectEntity()==h?h:null;
+        if(hunter!=null&&!source.is(DamageTypeTags.BYPASSES_INVULNERABILITY))
+            event.setAmount(event.getAmount()*com.codex.blacklight.combat.HunterBalance.damageMultiplier(hunter.attackMove()));
+        if(hunter!=null && event.getEntity() instanceof Player ordinary
+                && !ordinary.getData(ModAttachments.PLAYER_STATE).isInfected()
+                && !source.is(DamageTypeTags.BYPASSES_INVULNERABILITY))
+            event.setAmount(event.getAmount()*HunterBalance.ORDINARY_PLAYER_HURT_FACTOR);
+        if(!(event.getEntity() instanceof Player player)
                 ||!player.getData(ModAttachments.PLAYER_STATE).isInfected()
                 ||event.getAmount()<=0||event.isCanceled())return;
-        var source=event.getSource();
         // Projectile DamageSources retain their mob owner. Player attacks, void,
         // commands and environmental damage do not acquire a creature budget.
         if(!(source.getEntity() instanceof Mob attacker)
@@ -46,6 +58,10 @@ public final class InfectedCombatBalance {
         float difficulty=switch(player.level().getDifficulty()){
             case EASY -> .75F;case HARD -> 1.5F;default -> 1;
         };
+        if(hunter!=null){
+            event.setAmount(com.codex.blacklight.combat.HunterBalance.infectedDamage(event.getAmount(),hunter.attackMove(),difficulty));
+            return;
+        }
         // Cap in the old units; the later conversion occurs exactly once. Both
         // shield consumption and armored HP loss see the same balanced attack.
         event.setAmount(Math.min(event.getAmount()*factor,budget*difficulty/CombatScale.UNITS));
