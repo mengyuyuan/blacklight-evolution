@@ -15,7 +15,10 @@ public enum MovementUpgrade {
     WALL_2("wall_2", 1 << 6, 200, WALL_1),
     GLIDE_1("glide_1", 1 << 7, 100, null),
     GLIDE_2("glide_2", 1 << 8, 200, GLIDE_1),
-    AIR_DASH_PLUS("air_dash_plus", 1 << 9, 250, null);
+    AIR_DASH_PLUS("air_dash_plus", 1 << 9, 250, null),
+    WING_SPEED_1("wing_speed_1", 1 << 10, 600, null),
+    WING_SPEED_2("wing_speed_2", 1 << 11, 1200, WING_SPEED_1),
+    WING_SPEED_3("wing_speed_3", 1 << 12, 2400, WING_SPEED_2);
 
     private final String id;
     private final int bit;
@@ -33,6 +36,14 @@ public enum MovementUpgrade {
     public int bit() { return bit; }
     public int epCost() { return epCost; }
     public MovementUpgrade requires() { return requires; }
+    public boolean wingUpgrade() { return this == WING_SPEED_1 || this == WING_SPEED_2 || this == WING_SPEED_3; }
+    public String prerequisiteId() { return requires != null ? requires.id : wingUpgrade() ? PowerForm.SOVEREIGN_WINGS.id() : null; }
+    public static int wingTier(int mask) {
+        // A broken/partial chain must never grant a higher flight speed.
+        if ((mask & WING_SPEED_1.bit) == 0) return 0;
+        if ((mask & WING_SPEED_2.bit) == 0) return 1;
+        return (mask & WING_SPEED_3.bit) == 0 ? 2 : 3;
+    }
 
     public static MovementUpgrade byId(String id) {
         for (MovementUpgrade upgrade : values()) {

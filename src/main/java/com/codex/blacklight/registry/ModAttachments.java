@@ -55,6 +55,8 @@ public final class ModAttachments {
             "movement_state",
             () -> AttachmentType.builder(MovementState::new).build());
 
+    public static final Supplier<AttachmentType<com.codex.blacklight.movement.WingFlightState>> WING_FLIGHT=ATTACHMENTS.register("wing_flight",()->AttachmentType.builder(()->com.codex.blacklight.movement.WingFlightState.EMPTY).sync(com.codex.blacklight.movement.WingFlightState.CODEC).build());
+
     /** Action playback belongs to Blacklight and survives a new observer's tracking handshake. */
     public static final Supplier<AttachmentType<com.codex.blacklight.animation.NativeActionState>> PLAYER_ACTION =
             ATTACHMENTS.register("player_action", () -> AttachmentType.builder(
