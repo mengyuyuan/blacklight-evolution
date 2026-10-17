@@ -134,7 +134,7 @@ public final class ModNetwork {
     }
 
     private static boolean canAct(ServerPlayer player) {
-        return player != null && !com.codex.blacklight.power.BiomassSystem.active(player) && player.isAlive() && !player.isSpectator() && !player.isDeadOrDying();
+        return player != null && !com.codex.blacklight.city.HydraTransport.active(player) && !com.codex.blacklight.power.BiomassSystem.active(player) && player.isAlive() && !player.isSpectator() && !player.isDeadOrDying();
     }
 
     @SubscribeEvent

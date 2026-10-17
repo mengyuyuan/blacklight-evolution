@@ -113,20 +113,24 @@ tasks.named('assemble') {
 // Minecraft 1.20.1 and Forge 47 target Java 17.
 java.toolchain.languageVersion = JavaLanguageVersion.of(17)
 
+if (['hydraReleaseTest','entityLifecycleTest','hiveFeedingTest','wallTraversalTest','standaloneTest','cityTest'].any { project.hasProperty(it) }) {
+    sourceSets.main.resources.srcDir('src/traversalTest/resources')
+}
+if (project.hasProperty('hydraReleaseTest')) {
+    sourceSets.main.java.srcDir('src/hydraTest/java')
+}
+if (project.hasProperty('hydraVisualTest')) sourceSets.main.java.srcDir('src/hydraVisualTest/java')
 if (project.hasProperty('wingTest')) sourceSets.main.java.srcDir('src/wingTest/java')
 
 // Opt-in screenshot harness is excluded from normal builds and distributable JARs.
 if (project.hasProperty('entityLifecycleTest')) {
     sourceSets.main.java.srcDir('src/entityLifecycleTest/java')
-    sourceSets.main.resources.srcDir('src/traversalTest/resources')
 }
 if (project.hasProperty('hiveFeedingTest')) {
     sourceSets.main.java.srcDir('src/hiveTest/java')
-    sourceSets.main.resources.srcDir('src/traversalTest/resources')
 }
 if (project.hasProperty('wallTraversalTest')) {
     sourceSets.main.java.srcDir('src/traversalTest/java')
-    sourceSets.main.resources.srcDir('src/traversalTest/resources')
 }
 if (project.hasProperty('standaloneVisual') || project.hasProperty('standaloneGait') || project.hasProperty('standaloneLock') || project.hasProperty('standaloneMorph') || project.hasProperty('standaloneSkill') || project.hasProperty('standaloneSync')) {
     sourceSets.main.java.srcDir('src/standaloneVisualTest/java')
@@ -137,14 +141,10 @@ if (project.hasProperty('standaloneInfected')) {
 }
 if (project.hasProperty('standaloneTest')) {
     sourceSets.main.java.srcDir('src/standaloneTest/java')
-    if (!project.hasProperty('wallTraversalTest') && !project.hasProperty('hiveFeedingTest')) {
-        sourceSets.main.resources.srcDir('src/traversalTest/resources')
-    }
 }
 if (project.hasProperty('cityTest')) {
     sourceSets.main.java.srcDir('src/cityTest/java')
     sourceSets.main.resources.srcDir('src/cityTest/resources')
-    sourceSets.main.resources.srcDir('src/traversalTest/resources')
 }
 tasks.withType(Jar).configureEach {
     archiveClassifier = releaseProfile
@@ -156,6 +156,7 @@ tasks.withType(Jar).configureEach {
             'Blacklight-Public-Release-Ready': 'false',
             'Blacklight-Asset-Notice': 'THIRD_PARTY_ASSETS.md')
     exclude 'com/codex/blacklight/gametest/**'
+    exclude 'com/codex/blacklight/client/HydraReleaseSmoke*.class', 'com/codex/blacklight/client/CreatureCombatSmoke*.class'
     exclude 'com/codex/blacklight/city/*GameTest*.class'
     exclude 'com/codex/blacklight/client/Standalone*Smoke*.class'
     exclude 'com/codex/blacklight/client/WingFlightSmoke*.class'
@@ -193,7 +194,8 @@ minecraft {
             }
             if (project.hasProperty('clientRunDirectory')) workingDirectory file(project.property('clientRunDirectory'))
             else if (project.hasProperty('standaloneMorph')) workingDirectory project.file('run-forge-qa')
-            jvmArgs '-Xmx3G'
+            jvmArgs '-Xmx'+(project.findProperty('clientMaxHeap') ?: '3G')
+            if(project.hasProperty('hydraVisualTest')) { property 'blacklight.hydraVisual', 'true'; args '--width', '960', '--height', '640' }
             if (project.hasProperty('quickPlayWorld')) args '--quickPlaySingleplayer', project.property('quickPlayWorld').toString()
             if (project.hasProperty('standaloneInfected')) property 'blacklight.test.infectedComposition', file(project.property('standaloneInfected')).absolutePath
             if (project.hasProperty('standaloneMorph')) {
@@ -215,11 +217,11 @@ minecraft {
         server {
             if (project.hasProperty('serverRunDirectory')) workingDirectory file(project.property('serverRunDirectory'))
             args '--nogui'
-            jvmArgs '-Xmx2G'
+            jvmArgs '-Xmx'+(project.findProperty('gameTestMaxHeap') ?: '2G')
         }
         gameTestServer {
             workingDirectory project.file(project.findProperty('gameTestRunDirectory') ?: 'run-standalone-gametest')
-            jvmArgs '-Xmx2G'
+            jvmArgs '-Xmx'+(project.findProperty('gameTestMaxHeap') ?: '2G')
         }
         data {
             workingDirectory project.file('run-data')

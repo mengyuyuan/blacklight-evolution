@@ -1,0 +1,22 @@
+{
+  "emerge": {
+    "previousHighestVertex": -14.860027932037974,
+    "buriedHighestVertex": -14.860027932037974,
+    "extraRootDepth": 0
+  },
+  "arrival": {
+    "previousHighestVertex": -14.860027932037974,
+    "buriedHighestVertex": -14.860027932037974,
+    "extraRootDepth": 0
+  },
+  "retract": {
+    "previousHighestVertex": -14.298666632685821,
+    "buriedHighestVertex": -14.298666632685821,
+    "extraRootDepth": 0
+  },
+  "dive": {
+    "previousHighestVertex": -14.298666632685821,
+    "buriedHighestVertex": -14.298666632685821,
+    "extraRootDepth": 0
+  }
+}

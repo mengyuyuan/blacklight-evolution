@@ -105,7 +105,7 @@ public final class PrototypeChaseCamera {
     }
     public static boolean ownsView() {
         var mc=Minecraft.getInstance();var p=mc.player;
-        return p!=null&&!com.codex.blacklight.power.BiomassSystem.active(p)&&mc.level!=null&&mc.getCameraEntity()==p&&PrototypeModeSystem.isActive(p)
+        return !HydraCinematicCamera.active()&&p!=null&&!com.codex.blacklight.power.BiomassSystem.active(p)&&mc.level!=null&&mc.getCameraEntity()==p&&PrototypeModeSystem.isActive(p)
                 &&p.isAlive()&&!p.isSpectator()&&!p.isSleeping()&&!p.isUsingItem()
                 &&mc.options.getCameraType()==CameraType.THIRD_PERSON_BACK&&!mc.player.isScoping()
                 &&ChaseCameraProfile.get("Ground")!=null&&SourceCameraEvents.available();

@@ -247,6 +247,13 @@ public final class PlayerMotionController {
                 && !isLocomotionAction(action.clipId())) {
             float actionSeconds=action.seconds(now);
             var sampled=samplePose(action.clipId(),actionSeconds,action.looping());
+            if(action.clipId().equals("basic_dodge_roll")){
+                NativeLandingPose.stripHorizontalRoot(sampled);
+                float enter=net.minecraft.util.Mth.clamp(actionSeconds/.1F,0,1),exit=net.minecraft.util.Mth.clamp((action.duration()-actionSeconds)/.2F,0,1);
+                if(entity.onGround()&&actionSeconds>.7F)
+                    return NativeLandingPose.blendUpper(base,sampled,Math.min(enter,exit));
+                return BlacklightPose.interpolatePose(base,sampled,Math.min(enter,exit));
+            }
             if(LandingMotionPolicy.isLanding(action.clipId())) {
                 // An old landing packet cannot plant a character who has jumped again.
                 if(!entity.onGround())return base;
@@ -280,8 +287,8 @@ public final class PlayerMotionController {
                 ||entity.getDeltaMovement().horizontalDistance()>.018
                 ||LocomotionVisualState.get(entity.getId()).speed()>.018);
     }
-    private static boolean isLocomotionAction(String key) {
-        return key.startsWith("basic_") && !key.equals("basic_jump_charge") && !key.startsWith("basic_land_") && !key.startsWith("basic_air_dash");
+    static boolean isLocomotionAction(String key) {
+        return key.startsWith("basic_") && !key.equals("basic_dodge_roll") && !key.equals("basic_jump_charge") && !key.startsWith("basic_land_") && !key.startsWith("basic_air_dash");
     }
     /** Reduce the double session clock before converting to the float clip API. */
     static float loopSampleTime(double seconds,float duration) {

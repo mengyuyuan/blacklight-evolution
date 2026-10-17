@@ -17,6 +17,9 @@ public final class ImpactControl {
     public static void begin(LivingEntity entity,ImpactProfile profile,float yaw){
         if (!ModAttachments.available(entity)) { if (entity instanceof Mob mob) ACTIVE.remove(mob); return; }
         if(ConsumeSystem.grappleProtected(entity)||ModAttachments.peekData(entity, ModAttachments.CONSUME_VISUAL).active())return;
+        boolean hunterLight=entity instanceof com.codex.blacklight.entity.BlacklightHunter
+                &&profile.kind()==HitReaction.STAGGER&&!profile.knockdown()&&entity.isAlive();
+        if(hunterLight&&!((com.codex.blacklight.entity.BlacklightHunter)entity).acceptLightStagger())return;
         cancel(entity);
         if(!entity.isAlive()){
             publish(entity,new HitReaction(entity.level().getGameTime(),20,HitReaction.DEATH,yaw,ImpactProfile.FALL));return;
@@ -31,7 +34,8 @@ public final class ImpactControl {
         int duration=profile.stun();
         if(entity instanceof com.codex.blacklight.entity.BlacklightHunter){
             var source=ReceiverMotions.clip(ReceiverMotions.hitKey(entity,profile.kind(),profile.motion()));
-            if(source!=null)duration=Math.max(duration,com.codex.blacklight.util.MathCompat.clamp(Math.round(source.seconds()*20),10,70));
+            if(hunterLight)duration=HunterBalance.LIGHT_STAGGER_TICKS;
+            else if(source!=null)duration=Math.max(duration,net.minecraft.util.Mth.clamp(Math.round(source.seconds()*20),10,70));
         }
         publish(entity,new HitReaction(entity.level().getGameTime(),duration,profile.kind(),yaw,profile.motion()));
     }

@@ -70,7 +70,7 @@ public final class BlacklightInfectionSystem {
         if (entity instanceof Player player) {
             return ModAttachments.peekData(player, ModAttachments.PLAYER_STATE).isInfected();
         }
-        return entity instanceof com.codex.blacklight.entity.HiveTendril || entity instanceof com.codex.blacklight.entity.BlacklightInfectedHost || entity instanceof com.codex.blacklight.entity.BlacklightHunter || entity instanceof com.codex.blacklight.entity.BlacklightMutant || entity instanceof com.codex.blacklight.entity.BlacklightHive || entity.hasEffect(ModEffects.BLACKLIGHT_INFECTION.get())
+        return entity instanceof com.codex.blacklight.entity.BlacklightHydra || entity instanceof com.codex.blacklight.entity.HiveTendril || entity instanceof com.codex.blacklight.entity.BlacklightInfectedHost || entity instanceof com.codex.blacklight.entity.BlacklightHunter || entity instanceof com.codex.blacklight.entity.BlacklightMutant || entity instanceof com.codex.blacklight.entity.BlacklightHive || entity.hasEffect(ModEffects.BLACKLIGHT_INFECTION.get())
                 || (ModAttachments.peekData(entity, ModAttachments.INFECTION_START)>=0
                     && com.codex.blacklight.entity.InfectedBossProfile.forSpecies(net.minecraft.core.registries.BuiltInRegistries.ENTITY_TYPE.getKey(entity.getType()).toString())!=null);
     }
@@ -106,7 +106,7 @@ public final class BlacklightInfectionSystem {
     public static void onInfectedMobTick(ForgeEntityTickEvent.Post event) {
         if (!(event.getEntity() instanceof Mob mob)
                 || !(mob.level() instanceof ServerLevel serverLevel)
-                || !ModAttachments.available(mob) || !mob.isAlive() || mob instanceof com.codex.blacklight.entity.HiveTendril || mob instanceof com.codex.blacklight.entity.BlacklightInfectedHost || mob instanceof com.codex.blacklight.entity.BlacklightHunter || mob instanceof com.codex.blacklight.entity.BlacklightMutant || mob instanceof com.codex.blacklight.entity.BlacklightHive || !isInfected(mob)) return;
+                || !ModAttachments.available(mob) || !mob.isAlive() || mob instanceof com.codex.blacklight.entity.BlacklightHydra || mob instanceof com.codex.blacklight.entity.HiveTendril || mob instanceof com.codex.blacklight.entity.BlacklightInfectedHost || mob instanceof com.codex.blacklight.entity.BlacklightHunter || mob instanceof com.codex.blacklight.entity.BlacklightMutant || mob instanceof com.codex.blacklight.entity.BlacklightHive || !isInfected(mob)) return;
         long onset=ModAttachments.peekData(mob, ModAttachments.INFECTION_START);
         // Migrate existing saved infections too, without removing infection or other effects.
         var infection=mob.getEffect(ModEffects.BLACKLIGHT_INFECTION.get());

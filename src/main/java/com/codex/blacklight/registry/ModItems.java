@@ -23,6 +23,8 @@ public final class ModItems {
     public static final RegistryObject<net.minecraftforge.common.ForgeSpawnEggItem> HUNTER_SPAWN_EGG = ITEMS.register("blacklight_hunter_spawn_egg", () -> new net.minecraftforge.common.ForgeSpawnEggItem(
                     ModEntities.BLACKLIGHT_HUNTER, 0x242626, 0x9d302b, new Item.Properties()));
 
+    public static final RegistryObject<com.codex.blacklight.item.HiveTissueItem> LIVING_HIVE_TISSUE=ITEMS.register("living_hive_tissue",()->new com.codex.blacklight.item.HiveTissueItem(new Item.Properties().stacksTo(16).rarity(Rarity.RARE)));
+    public static final RegistryObject<net.minecraftforge.common.ForgeSpawnEggItem> HYDRA_SPAWN_EGG=ITEMS.register("blacklight_hydra_spawn_egg",()->new net.minecraftforge.common.ForgeSpawnEggItem(ModEntities.BLACKLIGHT_HYDRA,0x361b22,0xcba886,new Item.Properties()));
     public static final RegistryObject<BlockItem> HIVE_FLESH = ITEMS.register("hive_flesh", () -> new BlockItem(ModBlocks.HIVE_FLESH.get(), new Item.Properties()));
     public static final RegistryObject<BlockItem> HIVE_CARAPACE = ITEMS.register("hive_carapace", () -> new BlockItem(ModBlocks.HIVE_CARAPACE.get(), new Item.Properties()));
     public static final RegistryObject<BlockItem> HIVE_SAC = ITEMS.register("hive_sac", () -> new BlockItem(ModBlocks.HIVE_SAC.get(), new Item.Properties()));
@@ -50,6 +52,7 @@ public final class ModItems {
                     .displayItems((parameters, output) -> {
                         output.accept(BLACKWATCH_SOLDIER_SPAWN_EGG.get()); output.accept(BLACKWATCH_HEAVY_SPAWN_EGG.get()); output.accept(MILITARY_CIRCUIT.get()); output.accept(FIELD_SCANNER.get());
                         output.accept(BLACKLIGHT_SAMPLE.get()); output.accept(HUNTER_SPAWN_EGG.get());
+                        output.accept(LIVING_HIVE_TISSUE.get());output.accept(HYDRA_SPAWN_EGG.get());
                         output.accept(INFECTED_SOIL.get()); output.accept(INFECTED_STONE.get());
                         output.accept(TISSUE_FIBER.get()); output.accept(HIVE_FLESH.get());
                         output.accept(HIVE_CARAPACE.get()); output.accept(HIVE_VEIN.get());

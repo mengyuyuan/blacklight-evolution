@@ -25,7 +25,9 @@
     "BiomassPlayerMixin",
     "BiomassPreyMixin",
     "WingFlightTravelMixin",
-    "WingFlightFloatingMixin"
+    "WingFlightFloatingMixin",
+    "HydraTransportMixin",
+    "HydraServerMovementMixin"
   ],
   "client": [
     "client.PostChainAccess",

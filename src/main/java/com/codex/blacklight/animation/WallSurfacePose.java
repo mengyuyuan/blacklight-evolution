@@ -13,16 +13,32 @@ public final class WallSurfacePose {
     }
     public static void orientRun(BlacklightPose pose,BlacklightSkeleton skeleton,double right,double up,float distance) {
         float angle=(float)-Math.atan2(right,Math.abs(up)+Math.abs(right)<.001?1:up);
+        // Treat the wall as the ground: authored +Y (height above the feet)
+        // becomes outward +Z, and authored -Z travel becomes wall-local +Y.
+        // Keep the pelvis at the body's bind height along the wall: rotating the
+        // origin at the entity's feet drops the trailing stride through the floor.
+        // Only the original ground height becomes wall-normal clearance.
         var hip=skeleton.getBoundTransformFor(pose,skeleton.rootJoint).getTranslation(new Vector3f());
-        var axis=skeleton.getBoundTransformFor(pose,skeleton.head).getTranslation(new Vector3f()).sub(hip);
-        // The authored sprint leans 40..65 degrees into its original travel plane.
-        // Align that actual torso axis to the wall tangent around the hips. Using
-        // a fixed quarter turn rotates both the stance and its world-space origin.
-        float tilt=Math.abs(axis.y)+Math.abs(axis.z)<.001F?0:(float)Math.atan2(-axis.z,axis.y);
-        tilt=com.codex.blacklight.util.MathCompat.clamp(tilt,-(float)Math.PI/2,(float)Math.PI/2);
-        var surface=new Matrix4f().translation(hip.x,hip.y,-distance/PLAYER_SCALE)
-                .rotateZ(angle).rotateX(tilt).translate(-hip.x,-hip.y,-hip.z);
+        var torso=skeleton.getBoundTransformFor(pose,skeleton.head).getTranslation(new Vector3f()).sub(hip);
+        // These wall-run clips already carry a deep forward root lean. A bare
+        // quarter turn leaves that lean almost parallel to the wall even with
+        // no climbing clip involved. Keep up to 35 degrees of running lean,
+        // rotating the whole stance so shoulders, hips and feet stay connected.
+        float excessiveLean=Math.max(0,(float)Math.atan2(-torso.z,torso.y)-(float)Math.toRadians(35));
+        float anchorHeight=skeleton.rootJoint.getLocalTransform().m31();
+        var surface=new Matrix4f().translation(hip.x,anchorHeight,hip.y-distance/PLAYER_SCALE)
+                .rotateZ(angle).rotateX((float)Math.PI/2+excessiveLean).translate(-hip.x,-hip.y,-hip.z);
         transformRoot(pose,skeleton,surface);
+        // Plant the nearest sole at the wall plane rather than moving the body
+        // outward and leaving both feet floating. Final skin clearance can still
+        // move the whole pose away from a wall if an extremity intersects it.
+        float soleZ=Float.POSITIVE_INFINITY;
+        for(var foot:new BlacklightSkeleton.Bone[]{skeleton.legR,skeleton.legL}) {
+            var matrix=skeleton.getBoundTransformFor(pose,foot);
+            for(float x:new float[]{-.155F,.155F})for(float z:new float[]{-.155F,.155F})
+                soleZ=Math.min(soleZ,matrix.transformPosition(new Vector3f(x,.43F,z)).z);
+        }
+        translate(pose,skeleton,0,0,-distance/PLAYER_SCALE+.025F-soleZ);
     }
     public static float headMinimumZ(BlacklightPose pose,BlacklightSkeleton skeleton) {
         var head=skeleton.getBoundTransformFor(pose,skeleton.head);

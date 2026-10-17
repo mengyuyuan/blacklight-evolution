@@ -32,7 +32,10 @@ public final class ClientMovementEvents {
     private static final String CATEGORY = "key.categories.blacklight";
     private static final KeyMapping ENGINE_TUNER = new KeyMapping(
             "key.blacklight.engine_tuner", InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_F8, CATEGORY);
+    private static final KeyMapping DODGE = new KeyMapping(
+            "key.blacklight.dodge", InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_LEFT_ALT, CATEGORY);
     private static boolean lastJumpHeld;
+    private static final com.codex.blacklight.movement.SprintTap DODGE_TAP=new com.codex.blacklight.movement.SprintTap();
     private static boolean lastForwardHeld;
     private static boolean lastMovingHeld;
     private static boolean lastSprinting;
@@ -58,11 +61,15 @@ public final class ClientMovementEvents {
 
     @SubscribeEvent
     public static void registerKeys(RegisterKeyMappingsEvent event) {
+        event.register(DODGE);
         if (DeveloperTools.enabled()) event.register(ENGINE_TUNER);
     }
 
     @SubscribeEvent(priority = net.minecraftforge.eventbus.api.EventPriority.LOWEST)
     public static void lockWeaponMovement(net.minecraftforge.client.event.MovementInputUpdateEvent event) {
+        var hop=com.codex.blacklight.registry.ModAttachments.getData(event.getEntity(),ModAttachments.PLAYER_ACTION);
+        if(hop.clipId().equals("basic_dodge_roll")&&hop.active(event.getEntity().level().getGameTime())
+                &&hop.seconds(event.getEntity().level().getGameTime())<.7F){clearWeaponTravelInput(event.getInput());return;}
         if(com.codex.blacklight.movement.WingFlightSystem.eligible(event.getEntity())){
             // Suppress vanilla jumping, but still apply weapon ownership below.
             event.getInput().jumping=false;
@@ -243,7 +250,10 @@ public final class ClientMovementEvents {
     @SubscribeEvent
     public static void onClientTick(net.minecraftforge.event.TickEvent.ClientTickEvent event){if(event.phase != net.minecraftforge.event.TickEvent.Phase.END)return;
         Minecraft minecraft = Minecraft.getInstance();
-        if(minecraft.player!=null&&com.codex.blacklight.power.BiomassSystem.active(minecraft.player)){JUMP_INPUT.reset();lastJumpHeld=false;clientChargeTicks=0;resetClientWallRun();return;}
+        // Consume queued clicks even in menus or another form; never dodge later from a stale press.
+        boolean directDodge=false;
+        while(DODGE.consumeClick()) directDodge=true;
+        if(minecraft.player!=null&&com.codex.blacklight.power.BiomassSystem.active(minecraft.player)){DODGE_TAP.reset();JUMP_INPUT.reset();lastJumpHeld=false;clientChargeTicks=0;resetClientWallRun();return;}
         // Respawn can replace LocalPlayer without a tick in which player is null.
         // Charge/wall latches belong to the old entity, never the next life.
         if (inputOwner != minecraft.player || minecraft.player == null || minecraft.getConnection() == null) {
@@ -252,6 +262,7 @@ public final class ClientMovementEvents {
                     PlayerMotionController.pause(inputOwner,false);
             }
             inputOwner=minecraft.player;
+            DODGE_TAP.reset();directDodge=false;
             weaponMovementOwner=null;ownedWeaponVisual=null;pendingWeaponOwner=null;
             lastJumpHeld = false;
             lastForwardHeld = false;
@@ -270,12 +281,14 @@ public final class ClientMovementEvents {
             if (minecraft.player == null || minecraft.getConnection() == null) return;
         }
         if(ClientWingFlight.tick(minecraft)){
+            DODGE_TAP.reset();
             lastChargingAnimation=false;clientChargeTicks=0;JUMP_INPUT.reset();
             releaseFinalChargedJumpPose(minecraft);resetClientWallRun();return;
         }
         // Hardware state and remapped KeyMappings share one input latch so visual
         // ownership does not lose releases during a combat or traversal action.
-        if (com.codex.blacklight.registry.ModAttachments.getData(minecraft.player, ModAttachments.CONSUMING)&&com.codex.blacklight.combat.ConsumeVisual.blocksInput(com.codex.blacklight.registry.ModAttachments.getData(minecraft.player, ModAttachments.GRAB_STAGE))) {
+        if (com.codex.blacklight.registry.ModAttachments.getData(minecraft.player,ModAttachments.CONSUMING)&&com.codex.blacklight.combat.ConsumeVisual.blocksInput(com.codex.blacklight.registry.ModAttachments.getData(minecraft.player,ModAttachments.GRAB_STAGE))) {
+            DODGE_TAP.reset();
             lastJumpHeld=false;lastForwardHeld=false;lastMovingHeld=false;lastSprinting=false;
             lastChargingAnimation=false;clientChargeTicks=0;
             clientOffGroundTicks=0;JUMP_INPUT.reset();
@@ -285,17 +298,23 @@ public final class ClientMovementEvents {
             return;
         }
         boolean prototype = isPrototype(minecraft);
-        boolean jumpHeld = minecraft.screen == null && mappingDown(minecraft, minecraft.options.keyJump)&&com.codex.blacklight.registry.ModAttachments.getData(minecraft.player, ModAttachments.GRAB_STAGE)!=com.codex.blacklight.combat.ConsumeVisual.THROW;
+        var hop=com.codex.blacklight.registry.ModAttachments.getData(minecraft.player,ModAttachments.PLAYER_ACTION);
+        boolean dodging=hop.clipId().equals("basic_dodge_roll")&&hop.active(minecraft.level.getGameTime());
+        boolean jumpHeld = minecraft.screen == null && mappingDown(minecraft, minecraft.options.keyJump)&&com.codex.blacklight.registry.ModAttachments.getData(minecraft.player,ModAttachments.GRAB_STAGE)!=com.codex.blacklight.combat.ConsumeVisual.THROW;
         int forwardInput=minecraft.screen==null ? (mappingDown(minecraft,minecraft.options.keyUp)?1:0)-(mappingDown(minecraft,minecraft.options.keyDown)?1:0) : 0;
         int sidewaysInput=minecraft.screen==null ? (mappingDown(minecraft,minecraft.options.keyRight)?1:0)-(mappingDown(minecraft,minecraft.options.keyLeft)?1:0) : 0;
         boolean forwardHeld=forwardInput>0;
         boolean movingHeld=forwardInput!=0 || sidewaysInput!=0;
         boolean sprintKey=minecraft.screen==null && mappingDown(minecraft,minecraft.options.keySprint);
+        boolean dodgeEligible=prototype&&minecraft.screen==null&&minecraft.player.onGround()&&!CLIENT_WALL.attached()
+                &&!dodging&&!jumpHeld&&!weaponOwnsMovement(minecraft)&&com.codex.blacklight.registry.ModAttachments.getData(minecraft.player,ModAttachments.GRAB_STAGE)==0;
+        boolean sprintDodge=DODGE_TAP.update(sprintKey,dodgeEligible);
+        boolean dodgePressed=dodgeEligible&&(directDodge||sprintDodge);
         boolean detach=minecraft.screen==null && mappingDown(minecraft,minecraft.options.keyShift);
         // Double-tap momentum can enter the wall. Releasing W stops it; releasing
-        // an explicitly held sprint key also returns to the slower climbing mode.
+        // an explicitly held sprint key returns to the slower climbing mode.
         boolean sprinting=minecraft.screen==null && !detach && (CLIENT_WALL.attached()
-                ? movingHeld && !detach && (sprintKey || (lastSprinting && !lastSprintKey))
+                ? movingHeld && (sprintKey || (lastSprinting && !lastSprintKey))
                 : physicalSprint(minecraft) || (forwardHeld && lastSprinting));
         // The server also suspends traversal in fluids. Cancel the local charge,
         // including its frozen pose, and resend held inputs when leaving the water.
@@ -339,7 +358,7 @@ public final class ClientMovementEvents {
         }
         // Latch charging across a brief terrain correction. The server authorizes
         // the action and synchronizes Blacklight's clock to observers.
-        if (!weaponAction && !lastChargingAnimation && !CLIENT_WALL.attached()
+        if (!weaponAction && !dodging && !lastChargingAnimation && !CLIENT_WALL.attached()
                 && !minecraft.player.getAbilities().flying
                 && JUMP_INPUT.consumeChargeRequest(minecraft.player)) {
             lastChargingAnimation = true;
@@ -369,9 +388,9 @@ public final class ClientMovementEvents {
                 || sidewaysInput != lastSidewaysInput || detach != lastDetach || sprinting != lastSprinting;
         boolean keysChanged=inputChanged;
         inputChanged|=Math.abs(net.minecraft.util.Mth.wrapDegrees(viewYaw-lastCameraYaw))>.1F||minecraft.player.tickCount%10==0;
-        if (!wasPrototype || inputChanged) {
+        if (!wasPrototype || inputChanged || dodgePressed) {
             PacketDistributor.sendToServer(new MovementInputPayload(
-                    jumpHeld, false, forwardInput, sidewaysInput, sprinting, detach,viewYaw));
+                    jumpHeld, dodgePressed, forwardInput, sidewaysInput, sprinting, detach,viewYaw));
             if(keysChanged||!wasPrototype)BlacklightNeoMod.LOGGER.debug(
                     "Movement input sent jump={} forward={} sprint={}",
                     jumpHeld, forwardHeld, sprinting);
@@ -383,6 +402,10 @@ public final class ClientMovementEvents {
         lastMovingHeld = movingHeld;
         lastSprinting = sprinting;
         wasPrototype = true;
+        if(dodging){
+            clientChargeTicks=0;lastChargingAnimation=false;JUMP_INPUT.cancelPendingCharge();CLIENT_WALL.reset();
+            PrototypeAnimationController.tickLevel(minecraft,false,false,false);return;
+        }
 
         if (weaponAction) {
             // The input latches above continue tracking releases and sprint intent.

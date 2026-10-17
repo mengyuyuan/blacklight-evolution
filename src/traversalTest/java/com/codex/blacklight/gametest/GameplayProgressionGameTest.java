@@ -19,21 +19,21 @@ public final class GameplayProgressionGameTest {
     @GameTest(template="wall_test",timeoutTicks=40)
     public static void biologicalGrowthCostsOnceAndMutantsUnlockGenes(GameTestHelper h){
         var p=FakePlayerFactory.get(h.getLevel(),new GameProfile(UUID.randomUUID(),"growth-qa"));
-        var state=com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.PLAYER_STATE);state.infect();state.addBiomass(750);
-        GrowthSystem.purchase(p,GrowthUpgrade.VITALITY);int balance=state.getBiomass();
-        h.assertTrue(balance==800&&p.getMaxHealth()==24,"vitality spends biomass and increases max health");
-        GrowthSystem.purchase(p,GrowthUpgrade.VITALITY);h.assertTrue(state.getBiomass()==balance&&p.getMaxHealth()==24,"repeat purchase cannot spend or stack");
+        var state=com.codex.blacklight.registry.ModAttachments.getData(p,ModAttachments.PLAYER_STATE);state.infect();state.addBiomass(750);state.addEvolutionPoints(1000);int biomassBefore=state.getBiomass();
+        GrowthSystem.purchase(p,GrowthUpgrade.VITALITY);int balance=state.getEvolutionPoints();
+        h.assertTrue(balance==800&&state.getBiomass()==biomassBefore&&p.getMaxHealth()==150,"vitality spends evolution points, preserves biomass and increases max health");
+        GrowthSystem.purchase(p,GrowthUpgrade.VITALITY);h.assertTrue(state.getEvolutionPoints()==balance&&state.getBiomass()==biomassBefore&&p.getMaxHealth()==150,"repeat purchase cannot spend or stack");
         var types=java.util.List.of(ModEntities.BLACKLIGHT_STALKER,ModEntities.BLACKLIGHT_SPITTER,ModEntities.BLACKLIGHT_BRUTE);
         for(var type:types){var mob=type.get().create(h.getLevel());GrowthSystem.consumed(p,mob);mob.discard();}
         h.assertTrue(state.hasUnlocked(PowerForm.BLADE)&&state.hasUnlocked(PowerForm.WHIPFIST)&&state.hasUnlocked(PowerForm.HAMMERFISTS),"three genes unlock three weapons");
-        h.assertTrue(com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.GROWTH).absorbed()==3,"absorption count is retained");
+        h.assertTrue(com.codex.blacklight.registry.ModAttachments.getData(p,ModAttachments.GROWTH).absorbed()==3,"absorption count is retained");
         state.cure();p.tickCount=200;GrowthSystem.tick(new TickEvent.PlayerTickEvent(TickEvent.Phase.END,p));h.assertTrue(p.getMaxHealth()==20,"cured player loses active bonus");h.succeed();
     }
     @GameTest(template="wall_test",timeoutTicks=40)
     public static void airborneHammerWaitsForLandingAndHitsOnce(GameTestHelper h){
         var p=FakePlayerFactory.get(h.getLevel(),new GameProfile(UUID.randomUUID(),"slam-qa"));
         p.setPos(h.absoluteVec(new Vec3(4,8,4)));p.setYRot(0);p.setOnGround(false);p.tickCount=100;
-        var state=com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.PLAYER_STATE);state.infect();state.setPrototypeMode(true);state.unlock(PowerForm.HAMMERFISTS);state.activate(PowerForm.HAMMERFISTS);
+        var state=com.codex.blacklight.registry.ModAttachments.getData(p,ModAttachments.PLAYER_STATE);state.infect();state.setPrototypeMode(true);state.unlock(PowerForm.HAMMERFISTS);state.activate(PowerForm.HAMMERFISTS);
         for(int x=1;x<10;x++)for(int z=1;z<10;z++)h.setBlock(x,1,z,Blocks.STONE);
         var mob=h.spawn(EntityType.IRON_GOLEM,4,2,6);mob.setNoAi(true);float hp=mob.getHealth();
         WeaponCombatSystem.request(p,true);
@@ -46,7 +46,7 @@ public final class GameplayProgressionGameTest {
     }
     @GameTest(template="wall_test",timeoutTicks=40)
     public static void hiveRewardIsSingleAndWaveBudgetSurvivesReload(GameTestHelper h){
-        var p=FakePlayerFactory.get(h.getLevel(),new GameProfile(UUID.randomUUID(),"hive-qa"));var state=com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.PLAYER_STATE);state.infect();
+        var p=FakePlayerFactory.get(h.getLevel(),new GameProfile(UUID.randomUUID(),"hive-qa"));var state=com.codex.blacklight.registry.ModAttachments.getData(p,ModAttachments.PLAYER_STATE);state.infect();
         var hive=ModEntities.BLACKLIGHT_HIVE.get().create(h.getLevel());hive.setPos(h.absoluteVec(new Vec3(5,2,5)));h.getLevel().addFreshEntity(hive);
         var tag=new CompoundTag();hive.addAdditionalSaveData(tag);tag.putInt("BlacklightWaves",3);tag.putInt("BlacklightWaveCooldown",0);hive.readAdditionalSaveData(tag);
         var saved=new CompoundTag();hive.addAdditionalSaveData(saved);var restored=ModEntities.BLACKLIGHT_HIVE.get().create(h.getLevel());restored.readAdditionalSaveData(saved);
@@ -57,23 +57,23 @@ public final class GameplayProgressionGameTest {
     @GameTest(template="wall_test",timeoutTicks=40)
     public static void survivalRecipeAndGuidanceAreLoaded(GameTestHelper h){
         var id=new net.minecraft.resources.ResourceLocation("blacklight","blacklight_sample");
-        h.assertTrue(h.getLevel().getRecipeManager().byKey(id).isPresent(),"virus sample survival recipe loads");
+        h.assertTrue(h.getLevel().getRecipeManager().byKey(id).isEmpty(),"RC18 removes the obsolete virus sample crafting recipe");
         for(String name:new String[]{"root","awakening","first_consume","first_evolution","hive_breaker"})h.assertTrue(h.getLevel().getServer().getAdvancements().getAdvancement(new net.minecraft.resources.ResourceLocation("blacklight",name))!=null,"growth guide loads "+name);
         h.succeed();
     }
     @GameTest(template="wall_test",timeoutTicks=60)
     public static void utilityPowersCoexistAndResetWithNormalMode(GameTestHelper h){
         var p=FakePlayerFactory.get(h.getLevel(),new GameProfile(UUID.randomUUID(),"utility-qa"));p.tickCount=100;
-        var s=com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.PLAYER_STATE);s.infect();s.setPrototypeMode(true);s.unlock(PowerForm.BLADE);s.activate(PowerForm.BLADE);
+        var s=com.codex.blacklight.registry.ModAttachments.getData(p,ModAttachments.PLAYER_STATE);s.infect();s.setPrototypeMode(true);s.unlock(PowerForm.BLADE);s.activate(PowerForm.BLADE);
         h.assertTrue(!PowerFormSystem.select(p,PowerForm.ARMOR,false),"locked defence cannot be selected");
         s.unlock(PowerForm.ARMOR);s.unlock(PowerForm.SHIELD);s.unlock(PowerForm.INFECTED_VISION);
         h.assertTrue(PowerFormSystem.select(p,PowerForm.ARMOR,false),"unlocked armour equips");p.tickCount+=20;
-        h.assertTrue(s.getActivePower()==PowerForm.BLADE&&p.getArmorValue()==12,"armour preserves weapon and adds defence");
+        h.assertTrue(s.getActivePower()==PowerForm.BLADE&&UtilityPowerSystem.active(p,PowerForm.ARMOR)&&p.getArmorValue()==0,"armour preserves weapon without adding legacy vanilla armour");
         PowerFormSystem.select(p,PowerForm.INFECTED_VISION,false);p.tickCount+=20;
         h.assertTrue(UtilityPowerSystem.active(p,PowerForm.ARMOR)&&UtilityPowerSystem.active(p,PowerForm.INFECTED_VISION),"vision and armour coexist");
         PowerFormSystem.select(p,PowerForm.SHIELD,false);
         h.assertTrue(!UtilityPowerSystem.active(p,PowerForm.ARMOR)&&UtilityPowerSystem.active(p,PowerForm.SHIELD)&&p.getArmorValue()==0,"shield replaces armour and removes its attributes");
-        s.setPrototypeMode(false);p.tickCount=200;UtilityPowerSystem.tick(new TickEvent.PlayerTickEvent(TickEvent.Phase.END,p));h.assertTrue(com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.UTILITY_POWERS)==0,"normal mode clears utility powers");h.succeed();
+        s.setPrototypeMode(false);p.tickCount=200;UtilityPowerSystem.tick(new TickEvent.PlayerTickEvent(TickEvent.Phase.END,p));h.assertTrue(com.codex.blacklight.registry.ModAttachments.getData(p,ModAttachments.UTILITY_POWERS)==0,"normal mode clears utility powers");h.succeed();
     }
     @GameTest(template="wall_test",timeoutTicks=100)
     public static void hiveGeneratesBuildingAndStopsAfterThreeWaves(GameTestHelper h){

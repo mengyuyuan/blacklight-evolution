@@ -102,8 +102,8 @@ public final class StandalonePlayerRendering {
             }
             return;
         }
-        var state=com.codex.blacklight.registry.ModAttachments.getData(player, ModAttachments.PLAYER_STATE);
-        boolean active=state.isPrototypeMode()
+        var state=com.codex.blacklight.registry.ModAttachments.getData(player,ModAttachments.PLAYER_STATE);
+        boolean active=com.codex.blacklight.client.animation.HydraPlayerPose.visible(player)||state.isPrototypeMode()
                 ||UtilityPowerSystem.visualWeight(player,PowerForm.ARMOR,partial)>0
                 ||UtilityPowerSystem.visualWeight(player,PowerForm.SHIELD,partial)>0
                 ||com.codex.blacklight.registry.ModAttachments.getData(player, ModAttachments.CONSUME_VISUAL).active();

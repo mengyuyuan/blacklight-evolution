@@ -50,6 +50,18 @@ public final class PrototypeMovementSystem {
 
     private PrototypeMovementSystem() { }
 
+    @SubscribeEvent(priority=net.minecraftforge.eventbus.api.EventPriority.HIGHEST)
+    public static void onHopDamage(net.minecraftforge.event.entity.living.LivingAttackEvent event) {
+        if (!(event.getEntity() instanceof ServerPlayer player) || !PrototypeModeSystem.isActive(player)
+                || !player.isAlive() || player.isPassenger() || player.isSpectator()
+                || event.getSource().is(net.minecraft.tags.DamageTypeTags.BYPASSES_INVULNERABILITY)) return;
+        var action=com.codex.blacklight.registry.ModAttachments.getData(player,ModAttachments.PLAYER_ACTION);
+        if (com.codex.blacklight.registry.ModAttachments.getData(player,ModAttachments.MOVEMENT_STATE).hopInvulnerable()
+                && action.clipId().equals("basic_dodge_roll") && action.active(player.level().getGameTime())
+                && !WeaponCombatSystem.busy(player) && !com.codex.blacklight.city.HydraTransport.active(player))
+            event.setCanceled(true);
+    }
+
     /** Prototype physiology converts a hard fall into the outward landing impact. */
     @SubscribeEvent
     public static void onLivingFall(LivingFallEvent event) {
@@ -63,7 +75,7 @@ public final class PrototypeMovementSystem {
     /** Handles edge-triggered inputs immediately instead of waiting for a later player tick. */
     public static void acceptInput(ServerPlayer player, boolean jumpHeld, boolean dashPressed,
                                    int forward, int sideways, boolean sprinting, boolean detach) {
-        if (com.codex.blacklight.power.BiomassSystem.active(player) || !PrototypeModeSystem.isActive(player) || !player.isAlive()
+        if (com.codex.blacklight.city.HydraTransport.active(player)||com.codex.blacklight.power.BiomassSystem.active(player) || !PrototypeModeSystem.isActive(player) || !player.isAlive()
                 || player.isSpectator() || player.isDeadOrDying()
                 || player.isPassenger() || player.isFallFlying() || player.getAbilities().flying
                 || player.isInLava()) {
@@ -90,6 +102,11 @@ public final class PrototypeMovementSystem {
             // traversal edges that would replace its animation or movement track.
             movement.consumeDashRequest();
             return;
+        }
+        if(movement.hopping()){movement.jumpInput().cancelPendingCharge();return;}
+        if(dashPressed&&player.onGround()&&movement.canHop()&&!jumpHeld
+                &&!movement.wallTraversal().attached()&&com.codex.blacklight.registry.ModAttachments.getData(player,ModAttachments.GRAB_STAGE)==0){
+            startTacticalHop(player,movement);movement.consumeDashRequest();return;
         }
         if (!movement.wallTraversal().attached() && movement.chargeTicks() == 0
                 && movement.jumpInput().consumeChargeRequest(player)) {
@@ -170,6 +187,7 @@ public final class PrototypeMovementSystem {
             stepHeight.setBaseValue(terrainStepHeight);
         }
         int upgradeMask = blacklight.getMovementUpgradeMask();
+        movement.tickHop();
         movement.setMaxAirDashes(MovementUpgrade.airDashCharges(upgradeMask));
         movement.tickWallJumpCooldown();
         MovementTuningSettings.load();
@@ -181,6 +199,7 @@ public final class PrototypeMovementSystem {
         LandingImpact.Observation landing = movement.observeLanding(
                 player.onGround(), player.getDeltaMovement().y, player.getY());
         if (WeaponCombatSystem.busy(player)) {
+            movement.cancelHop();
             movement.jumpInput().cancelPendingCharge();
             // Weapon actions own their Coord (or their explicit airborne velocity).
             // Consume landing/input edges without a delayed jump, air dash, landing
@@ -222,6 +241,10 @@ public final class PrototypeMovementSystem {
         }
 
         Vec3 forward = horizontalForward(player);
+        if(movement.hopping()){
+            movement.consumeDashRequest();movement.wallTraversal().reset();syncWallMotion(player,movement.wallTraversal());
+            movement.finishInputTick();return;
+        }
         // The groundspike action owns the body from charge to eruption: no traversal
         // impulses may fight the planted pose, or a sprinting player would keep
         // sliding forward while the spikes erupt around a moving center.
@@ -381,6 +404,15 @@ public final class PrototypeMovementSystem {
         unpauseServerAnimator(player);
         int held = movement.releaseCharge();
         syncCharge(player,0);
+        // MC tap threshold; the original FIG charge unit is not claimed to be seconds.
+        if(held<=3){
+            // Jump remains jump. Evasion is a separate short Run release.
+            player.setDeltaMovement(player.getDeltaMovement().x,.42,player.getDeltaMovement().z);
+            player.setOnGround(false);player.hurtMarked=true;
+            play(player,PlayerAction.JUMP_RISE);
+            player.connection.send(new net.minecraft.network.protocol.game.ClientboundSetEntityMotionPacket(player));
+            return;
+        }
         double charge = Math.min(1.0D, held / (double) MovementTuningSettings.jumpChargeTicks());
         double jumpVelocity = MovementTuningSettings.jumpLaunchVelocity(charge,
                 com.codex.blacklight.registry.ModAttachments.getData(player, ModAttachments.PLAYER_STATE).getMovementUpgradeMask());
@@ -394,6 +426,23 @@ public final class PrototypeMovementSystem {
         PrototypeMovementEffects.onChargedJumpReleased(player, charge);
         BlacklightNeoMod.LOGGER.debug("Released charged jump for {} at {} ticks (velocity={})",
                 player.getGameProfile().getName(), held, jumpVelocity);
+    }
+
+    private static void startTacticalHop(ServerPlayer player,MovementState movement){
+        var input=movement.wallInput();double yaw=Math.toRadians(movement.cameraYaw(player.getYRot()));
+        double x=-Math.sin(yaw)*input.forward()-Math.cos(yaw)*input.sideways();
+        double z=Math.cos(yaw)*input.forward()-Math.sin(yaw)*input.sideways();
+        var direction=new Vec3(x,0,z);
+        if(direction.lengthSqr()>.01)direction=direction.normalize();
+        else direction=new Vec3(Math.sin(yaw),0,-Math.cos(yaw));
+        movement.beginHop();movement.endDash();movement.wallTraversal().reset();unpauseServerAnimator(player);syncCharge(player,0);
+        player.setYRot((float)Math.toDegrees(Math.atan2(-direction.x,direction.z)));
+        player.yBodyRot=player.getYRot();
+        // Low forward dive: ~0.32 blocks of rise, not the vanilla 1.25-block jump.
+        player.setDeltaMovement(direction.scale(.62).add(0,.19,0));
+        player.setOnGround(false);player.hurtMarked=true;
+        play(player,PlayerAction.TACTICAL_HOP);
+        player.connection.send(new net.minecraft.network.protocol.game.ClientboundSetEntityMotionPacket(player));
     }
 
     private static final Map<ServerPlayer, WallTraversal.Mode> WALL_MODES = new WeakHashMap<>();

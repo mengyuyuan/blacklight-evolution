@@ -47,9 +47,11 @@ public final class HiveFeedingGameTest {
         prey.getAttribute(Attributes.MOVEMENT_SPEED).setBaseValue(0);level.addFreshEntity(prey);
         return new Scene(host,core,prey,home);
     }
-    @GameTest(template="wall_test",timeoutTicks=220)
+    @GameTest(template="wall_test",timeoutTicks=600)
     public static void fixedHiveFeedsOnceWithoutMovingBoss(GameTestHelper h){
         var s=scene(h,0);Vec3 start=s.host.position();
+        h.startSequence().thenWaitUntil(()->h.assertTrue(DevourerFeedingSystem.active(s.host)&&s.host.feedingStarted()>=0,"waiting for actual feeding before timing stages"))
+            .thenExecute(()->{
         h.runAfterDelay(35,()->{
             h.assertTrue(s.host.feedingNode()==0&&s.prey.isNoGravity(),"fixed western port must capture its nearby prey");
             h.assertTrue(DevourerFeedingSystem.biomass(s.host)==0,"no early biomass during capture");
@@ -61,20 +63,24 @@ public final class HiveFeedingGameTest {
             h.assertTrue(s.host.position().distanceToSqr(start)<.01,"boss must not chase or lift prey");
             h.assertTrue(!DevourerFeedingSystem.active(s.host),"session must be released after completion");s.cleanup();h.succeed();
         });
+        });
     }
     @GameTest(template="wall_test",timeoutTicks=160)
     public static void severedTendrilReleasesPreyWithoutReward(GameTestHelper h){
         var s=scene(h,1);
-        h.runAfterDelay(45,()->{
+        // Forced chunks can activate after fixture creation. Cut during actual
+        // feeding, not at an arbitrary global tick before the cable exists.
+        h.startSequence().thenWaitUntil(()->h.assertTrue(DevourerFeedingSystem.active(s.host)&&s.host.feedingStarted()>=0,"waiting for live feeding cable"))
+            .thenExecute(()->h.runAfterDelay(30,()->{
             var parts=h.getLevel().getEntitiesOfClass(HiveTendril.class,s.host.getBoundingBox().inflate(40));
-            h.assertTrue(parts.size()==3,"three damageable tissue knots must exist");
+            h.assertTrue(parts.size()==3,"three damageable tissue knots must exist: actual="+parts.size()+" feedingStarted="+s.host.feedingStarted()+" now="+h.getLevel().getGameTime());
             h.assertTrue(parts.get(0).hurt(parts.get(0).damageSources().generic(),2),"tendril hit must be accepted");
             h.assertTrue(s.prey.isAlive()&&!s.prey.isNoGravity(),"cut cable restores living prey gravity");
             h.assertTrue(!DevourerFeedingSystem.active(s.host)&&DevourerFeedingSystem.meals(s.host)==0,"cut must release claim without rewards");
             h.assertTrue(parts.stream().allMatch(HiveTendril::isRemoved),"all temporary hitboxes must be discarded");s.cleanup();h.succeed();
-        });
+        }));
     }
-    @GameTest(template="wall_test",timeoutTicks=150)
+    @GameTest(template="wall_test",timeoutTicks=600)
     public static void brokenActivePortAbortsEvenWithOtherNodes(GameTestHelper h){
         var s=scene(h,2);
         h.runAfterDelay(45,()->h.getLevel().setBlock(HiveFeedingMotion.node(s.home,0),Blocks.AIR.defaultBlockState(),3));

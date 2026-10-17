@@ -78,6 +78,7 @@ public final class BlacklightHive extends Monster implements GeoEntity {
         // Vanilla calls this inside doMobLoot and Forge's captured LivingDrops flow.
         if(!rewarded){
             spawnAtLocation(ModItems.BLACKLIGHT_SAMPLE.get(),2);
+            spawnAtLocation(ModItems.LIVING_HIVE_TISSUE.get());
             spawnAtLocation(net.minecraft.world.item.Items.EMERALD,3);
         }
     }

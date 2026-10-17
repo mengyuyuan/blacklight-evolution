@@ -22,6 +22,7 @@ public final class ClientDevastatorCamera {
     private ClientDevastatorCamera() { }
     @SubscribeEvent(priority=EventPriority.LOWEST)
     public static void fov(ViewportEvent.ComputeFov event){
+        if(HydraCinematicCamera.active())return;
         var mc=Minecraft.getInstance();var player=mc.player;
         // GameRenderer requests false for native renderItemInHand's projection.
         // Flight optics affect the world only, leaving both hand anchors intact.
