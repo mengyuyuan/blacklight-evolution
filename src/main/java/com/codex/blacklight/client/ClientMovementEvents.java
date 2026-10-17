@@ -64,10 +64,8 @@ public final class ClientMovementEvents {
     @SubscribeEvent(priority = net.neoforged.bus.api.EventPriority.LOWEST)
     public static void lockWeaponMovement(net.neoforged.neoforge.client.event.MovementInputUpdateEvent event) {
         if(com.codex.blacklight.movement.WingFlightSystem.eligible(event.getEntity())){
-            var input=event.getInput();input.jumping=false;
-            if(Math.abs(input.forwardImpulse)>1e-5F||Math.abs(input.leftImpulse)>1e-5F)
-                event.getEntity().setYRot(cameraYaw(Minecraft.getInstance()));
-            return;
+            // Suppress vanilla jumping, but still apply weapon ownership below.
+            event.getInput().jumping=false;
         }
         beginWeaponMovementOwnership(event.getEntity());
         if(event.getEntity().getData(ModAttachments.WEAPON_VISUAL).spec()==null
@@ -496,7 +494,7 @@ public final class ClientMovementEvents {
                 && minecraft.player.getData(ModAttachments.PLAYER_STATE).isPrototypeMode();
     }
 
-    private static boolean weaponOwnsMovement(Minecraft minecraft) {
+    static boolean weaponOwnsMovement(Minecraft minecraft) {
         return minecraft.player != null
                 && (minecraft.player.getData(ModAttachments.WEAPON_VISUAL).spec() != null
                 ||pendingWeaponMovement(minecraft.player));
