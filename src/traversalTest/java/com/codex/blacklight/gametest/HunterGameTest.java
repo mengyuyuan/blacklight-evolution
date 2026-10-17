@@ -75,7 +75,8 @@ public final class HunterGameTest {
         target.setHealth(10);ConsumeSystem.request(p);h.assertTrue(target.isBeingConsumed(),"weak target can be claimed");
         var saved=new net.minecraft.nbt.CompoundTag();target.addAdditionalSaveData(saved);
         h.assertTrue(!saved.getBoolean("NoAI"),"transient grab must not persist disabled AI");
-        p.setPos(p.position().add(8,0,0));ConsumeSystem.tick(new PlayerTickEvent.Post(p));
+        // Large-target mounting tolerates 14 blocks; interrupt outside that actual bound.
+        p.setPos(p.position().add(20,0,0));ConsumeSystem.tick(new PlayerTickEvent.Post(p));
         h.assertTrue(target.isAlive()&&!target.isBeingConsumed()&&!target.isNoAi(),"interruption must release AI");
         ConsumeSystem.request(p);h.assertTrue(!target.isBeingConsumed(),"cannot consume across distance");
         h.assertTrue(p.getHealth()==10&&p.getData(ModAttachments.PLAYER_STATE).getEvolutionPoints()==0,"interruption gives no reward");h.succeed();

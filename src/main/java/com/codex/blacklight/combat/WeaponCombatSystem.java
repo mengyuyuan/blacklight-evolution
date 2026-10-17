@@ -439,6 +439,11 @@ public final class WeaponCombatSystem {
         var aim=CombatTargeting.multipart(s.target)?CombatTargeting.closestPoint(p.getBoundingBox().getCenter(),s.target):s.target.getBoundingBox().getCenter();
         var delta=aim.subtract(p.getBoundingBox().getCenter());
         double distance=delta.horizontalDistance();if(distance<.25)return;
+        // Ordinary ground auto-assist cannot reverse a committed attack when
+        // its victim escapes behind. Explicit locks and aerial pursuit keep steering.
+        if(!s.locked&&!s.move.aerial()&&delta.multiply(1,0,1).dot(s.direction)<0){
+            s.target=null;syncHeading(p,s,s.yaw);return;
+        }
         float desired=(float)Math.toDegrees(Math.atan2(-delta.x,delta.z));
         boolean aerialPursuit=s.locked&&s.move.aerial()||s.move==WeaponMove.CLAW_POUNCE;
         float next=CombatPursuit.turnToward(s.yaw,desired,(float)CombatMotion.turn(s.move,windup));

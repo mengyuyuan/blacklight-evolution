@@ -16,15 +16,7 @@ public final class CombatTravelGameTest {
         var mob=h.spawn(EntityType.IRON_GOLEM,3,25,6);mob.setNoAi(true);mob.setNoGravity(true);mob.setPos(pos);return mob;
     }
     private static void prepareTravel(GameTestHelper h,boolean air,boolean special){
-        var pos=h.absolutePos(new net.minecraft.core.BlockPos(3,0,3));int cx=pos.getX()>>4,cz=pos.getZ()>>4;
-        for(int x=cx-1;x<=cx+1;x++)for(int z=cz-1;z<=cz+4;z++)h.getLevel().getChunkSource().addRegionTicket(net.minecraft.server.level.TicketType.PORTAL,new net.minecraft.world.level.ChunkPos(x,z),2,pos);
-        // Entity-section visibility updates on server ticks after the ticket.
-        h.startSequence().thenWaitUntil(()->{
-            for(int x=cx-1;x<=cx+1;x++)for(int z=cz-1;z<=cz+4;z++)
-                h.assertTrue(h.getLevel().isPositionEntityTicking(new net.minecraft.core.BlockPos(x<<4,80,z<<4)),"waiting for remote target entity sections");
-        }).thenExecute(()->{
-            try{checkTravel(h,air,special);}finally{for(int x=cx-1;x<=cx+1;x++)for(int z=cz-1;z<=cz+4;z++)h.getLevel().getChunkSource().removeRegionTicket(net.minecraft.server.level.TicketType.PORTAL,new net.minecraft.world.level.ChunkPos(x,z),2,pos);}
-        });
+        AerialSpecialGameTest.loadedFlight(h,()->checkTravel(h,air,special));
     }
     private static void checkTravel(GameTestHelper h,boolean air,boolean special){
         h.getLevel().getServer().getPlayerList().setViewDistance(8);
@@ -72,9 +64,16 @@ public final class CombatTravelGameTest {
             }
         }h.succeed();
     }
-    @GameTest(template="wall_test",timeoutTicks=600,batch="combat_travel") public static void aerialSpecialsRespectPursuitAndStationaryWhipRules(GameTestHelper h){prepareTravel(h,true,true);}
-    @GameTest(template="wall_test",timeoutTicks=600,batch="combat_travel") public static void ordinaryAirOpenersDoNotChaseRemoteTargets(GameTestHelper h){prepareTravel(h,true,false);}
-    @GameTest(template="wall_test",timeoutTicks=80) public static void groundAttacksNeverRunToDistantTargets(GameTestHelper h){
+    @GameTest(template="wall_test",timeoutTicks=600,batch="combat_travel_aerial") public static void aerialSpecialsRespectPursuitAndStationaryWhipRules(GameTestHelper h){prepareTravel(h,true,true);}
+    @GameTest(template="wall_test",timeoutTicks=600,batch="combat_travel_local") public static void ordinaryAirOpenersDoNotChaseRemoteTargets(GameTestHelper h){prepareTravel(h,true,false);}
+    @GameTest(template="wall_test",timeoutTicks=600,batch="isolated_groundAttacksNeverRunToDistantTargets")
+    public static void groundAttacksNeverRunToDistantTargets(GameTestHelper h){
+        AerialSpecialGameTest.loadedFlight(h,()->{
+            AerialSpecialGameTest.clearFlightLane(h);
+            check_groundAttacksNeverRunToDistantTargets(h);
+        });
+    }
+    private static void check_groundAttacksNeverRunToDistantTargets(GameTestHelper h){
         for(var form:new PowerForm[]{PowerForm.NONE,PowerForm.CLAWS,PowerForm.BLADE,PowerForm.HAMMERFISTS,PowerForm.WHIPFIST,PowerForm.MUSCLE_MASS})
             for(var input:WeaponMove.Input.values())for(boolean locked:new boolean[]{false,true}){
                 var p=MovingCombatGameTest.player(h,form);p.setPos(h.absoluteVec(new Vec3(3,180,3)));p.setOnGround(true);p.setNoGravity(true);
@@ -94,7 +93,14 @@ public final class CombatTravelGameTest {
             }
         h.succeed();
     }
-    @GameTest(template="wall_test",timeoutTicks=40) public static void nearestVisibleTargetAndExplicitLockAreSeparate(GameTestHelper h){
+    @GameTest(template="wall_test",timeoutTicks=600,batch="isolated_nearestVisibleTargetAndExplicitLockAreSeparate")
+    public static void nearestVisibleTargetAndExplicitLockAreSeparate(GameTestHelper h){
+        AerialSpecialGameTest.loadedFlight(h,()->{
+            AerialSpecialGameTest.clearFlightLane(h);
+            check_nearestVisibleTargetAndExplicitLockAreSeparate(h);
+        });
+    }
+    private static void check_nearestVisibleTargetAndExplicitLockAreSeparate(GameTestHelper h){
         var p=MovingCombatGameTest.player(h,PowerForm.NONE);p.setPos(h.absoluteVec(new Vec3(3,180,3)));p.setOnGround(false);
         var near=victim(h,p.position().add(2,0,8));var far=victim(h,p.position().add(0,0,22));var behind=victim(h,p.position().add(0,0,-2));
         WeaponCombatSystem.request(p,true);h.assertTrue(p.getData(ModAttachments.WEAPON_VISUAL).targetId()==near.getId(),"nearest in front wins over crosshair-center farther target and closer rear target");WeaponCombatSystem.cancel(p);
@@ -102,7 +108,14 @@ public final class CombatTravelGameTest {
         WeaponCombatSystem.request(p,true);h.assertTrue(p.getData(ModAttachments.WEAPON_VISUAL).targetId()==far.getId(),"manual lock must win");WeaponCombatSystem.cancel(p);CombatTargeting.requestLock(p,-1);
         near.discard();far.discard();behind.discard();h.succeed();
     }
-    @GameTest(template="wall_test",timeoutTicks=40) public static void chaseCancelsOnOcclusionRemovalAndTeleport(GameTestHelper h){
+    @GameTest(template="wall_test",timeoutTicks=600,batch="isolated_chaseCancelsOnOcclusionRemovalAndTeleport")
+    public static void chaseCancelsOnOcclusionRemovalAndTeleport(GameTestHelper h){
+        AerialSpecialGameTest.loadedFlight(h,()->{
+            AerialSpecialGameTest.clearFlightLane(h);
+            check_chaseCancelsOnOcclusionRemovalAndTeleport(h);
+        });
+    }
+    private static void check_chaseCancelsOnOcclusionRemovalAndTeleport(GameTestHelper h){
         for(int kind=0;kind<3;kind++){
             var p=MovingCombatGameTest.player(h,PowerForm.CLAWS);p.setPos(h.absoluteVec(new Vec3(3,180,3)));p.setOnGround(false);var origin=p.position();
             var mob=victim(h,origin.add(0,0,24));float hp=mob.getHealth();
@@ -117,7 +130,14 @@ public final class CombatTravelGameTest {
             mob.discard();WeaponCombatSystem.cancel(p);
         }h.succeed();
     }
-    @GameTest(template="wall_test",timeoutTicks=40) public static void whipPullsOwnerToHeavyVictimBeforeHolding(GameTestHelper h){
+    @GameTest(template="wall_test",timeoutTicks=600,batch="isolated_whipPullsOwnerToHeavyVictimBeforeHolding")
+    public static void whipPullsOwnerToHeavyVictimBeforeHolding(GameTestHelper h){
+        AerialSpecialGameTest.loadedFlight(h,()->{
+            AerialSpecialGameTest.clearFlightLane(h);
+            check_whipPullsOwnerToHeavyVictimBeforeHolding(h);
+        });
+    }
+    private static void check_whipPullsOwnerToHeavyVictimBeforeHolding(GameTestHelper h){
         var p=MovingCombatGameTest.player(h,PowerForm.WHIPFIST);p.setPos(h.absoluteVec(new Vec3(3,180,3)));p.setOnGround(true);p.setNoGravity(true);
         var origin=p.position();var mob=h.spawn(EntityType.SNIFFER,3,180,13);mob.setNoAi(true);mob.setNoGravity(true);mob.setHealth(10);var targetStart=mob.position();
         CombatTargeting.requestLock(p,mob.getId());

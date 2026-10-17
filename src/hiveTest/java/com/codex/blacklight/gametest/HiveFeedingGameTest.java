@@ -72,10 +72,10 @@ public final class HiveFeedingGameTest {
         var s=scene(h,1);
         // Forced chunks can activate after fixture creation. Cut during actual
         // feeding, not at an arbitrary global tick before the cable exists.
-        h.startSequence().thenWaitUntil(()->h.assertTrue(DevourerFeedingSystem.active(s.host),"waiting for live feeding cable"))
+        h.startSequence().thenWaitUntil(()->h.assertTrue(DevourerFeedingSystem.active(s.host)&&s.host.feedingStarted()>=0,"waiting for live feeding cable"))
             .thenExecute(()->h.runAfterDelay(30,()->{
             var parts=h.getLevel().getEntitiesOfClass(HiveTendril.class,s.host.getBoundingBox().inflate(40));
-            h.assertTrue(parts.size()==3,"three damageable tissue knots must exist");
+            h.assertTrue(parts.size()==3,"three damageable tissue knots must exist: actual="+parts.size()+" feedingStarted="+s.host.feedingStarted()+" now="+h.getLevel().getGameTime());
             h.assertTrue(parts.getFirst().hurt(parts.getFirst().damageSources().generic(),2),"tendril hit must be accepted");
             h.assertTrue(s.prey.isAlive()&&!s.prey.isNoGravity(),"cut cable restores living prey gravity");
             h.assertTrue(!DevourerFeedingSystem.active(s.host)&&DevourerFeedingSystem.meals(s.host)==0,"cut must release claim without rewards");
