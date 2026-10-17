@@ -39,6 +39,15 @@ public final class WeaponCombatSystem {
     }
     private WeaponCombatSystem(){}
     public static boolean busy(ServerPlayer p){return ACTIVE.containsKey(p)||DevastatorSystem.busy(p);}
+    /** A form swap cancels only a weapon-owned action, never a grab or devastator. */
+    public static boolean canSwitchForm(ServerPlayer p){
+        return !DevastatorSystem.busy(p) && (ACTIVE.containsKey(p)
+                || p.getData(ModAttachments.CLAW_COMBAT).action()==ClawCombatState.Action.IDLE);
+    }
+    /** Remove old contacts/charge/queued combo; airborne combo budget intentionally survives. */
+    public static void prepareFormSwitch(ServerPlayer p){
+        cancel(p);BUTTONS.remove(p);
+    }
     public static boolean canSkillInterrupt(ServerPlayer p){var s=ACTIVE.get(p);return s==null||s.hit.isEmpty()&&(s.charging||p.tickCount-s.created<=2);}
     /** Physical traversal input remains available even while EF suppresses Input.jumping. */
     public static void movementInput(ServerPlayer p,boolean jumpPressed){

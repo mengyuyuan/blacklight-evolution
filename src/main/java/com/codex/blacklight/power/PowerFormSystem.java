@@ -21,19 +21,21 @@ public final class PowerFormSystem {
         var combat = player.getData(ModAttachments.CLAW_COMBAT);
         if (!state.isInfected() || !state.isPrototypeMode() || player.getData(ModAttachments.CONSUMING)
                 || !supported(form)) return false;
-        // Stowing a weapon must take effect even during its action. Previously the
-        // wheel closed while this request silently failed, leaving claws active.
-        if (form == PowerForm.NONE) {
-            com.codex.blacklight.combat.WeaponCombatSystem.cancel(player);
-            com.codex.blacklight.combat.WeaponCombatSystem.cancelHeldInput(player);
-            combat.reset();
-        } else if (combat.action() != ClawCombatState.Action.IDLE || !combat.canToggleTransform(player.tickCount)) {
-            player.displayClientMessage(Component.literal("当前动作尚未结束，能力未切换；选择无能力可收起武器。"), true);
-            return false;
-        }
+        if(!player.isAlive() || player.isSpectator() || player.getData(ModAttachments.GRAB_STAGE)!=0)return false;
+        boolean weapon=!UtilityPowerSystem.supported(form);
+        // Selecting the current form is a no-op: it must not reset an attack or charge.
+        if(weapon && state.getActivePower()==form)return true;
+        if(weapon ? !com.codex.blacklight.combat.WeaponCombatSystem.canSwitchForm(player)
+                : combat.action()!=ClawCombatState.Action.IDLE || !combat.canToggleTransform(player.tickCount))return false;
+        // Validate the requested form before touching the current attack.
         if (form != PowerForm.NONE && !state.hasUnlocked(form) && !(purchase && state.buy(form))) {
             player.displayClientMessage(Component.translatable("message.blacklight.form_locked", Component.translatable("power.blacklight." + form.id()), form.epCost()), true);
             return false;
+        }
+        if(weapon){
+            com.codex.blacklight.combat.WeaponCombatSystem.prepareFormSwitch(player);
+            player.setData(ModAttachments.POWER_MORPH,PowerMorph.NONE);
+            player.syncData(ModAttachments.POWER_MORPH);
         }
         boolean visible=UtilityPowerSystem.supported(form)
                 ?(form==PowerForm.SHIELD||form==PowerForm.ARMOR)&&!UtilityPowerSystem.active(player,form)
@@ -43,6 +45,7 @@ public final class PowerFormSystem {
         if(UtilityPowerSystem.supported(form))UtilityPowerSystem.toggle(player,form);
         else if (!state.activate(form)) return false;
         combat.markTransformToggled(player.tickCount);
+        if(weapon)com.codex.blacklight.registry.ModWeaponSounds.play(player,form,"morph",player.position(),.7F,1F);
         player.setData(ModAttachments.PLAYER_STATE, state); player.syncData(ModAttachments.PLAYER_STATE);
         String message = UtilityPowerSystem.supported(form) && !UtilityPowerSystem.active(player, form)
                 ? "message.blacklight.form_disabled" : "message.blacklight.form_selected";

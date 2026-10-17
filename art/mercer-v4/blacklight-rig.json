@@ -1,0 +1,597 @@
+{
+  "bones": [
+    {
+      "name": "Root",
+      "parent": null,
+      "pivot": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "driver": null
+    },
+    {
+      "name": "AllBody",
+      "parent": "Root",
+      "pivot": [
+        0.0,
+        0.96875,
+        0.0
+      ],
+      "driver": "Root"
+    },
+    {
+      "name": "UpBody",
+      "parent": "AllBody",
+      "pivot": [
+        0.0,
+        1.0125,
+        0.0
+      ],
+      "driver": "Chest"
+    },
+    {
+      "name": "DownBody",
+      "parent": "AllBody",
+      "pivot": [
+        0.0,
+        0.96875,
+        0.0
+      ],
+      "driver": "Root"
+    },
+    {
+      "name": "LeftLeg",
+      "parent": "DownBody",
+      "pivot": [
+        -0.096875,
+        0.975,
+        0.0
+      ],
+      "driver": "Thigh_L"
+    },
+    {
+      "name": "LeftLowerLeg",
+      "parent": "LeftLeg",
+      "pivot": [
+        -0.096875,
+        0.56875,
+        0.0
+      ],
+      "driver": "Leg_L"
+    },
+    {
+      "name": "LeftFoot",
+      "parent": "LeftLowerLeg",
+      "pivot": [
+        -0.096875,
+        0.2125,
+        0.0
+      ],
+      "driver": "Leg_L"
+    },
+    {
+      "name": "RightLeg",
+      "parent": "DownBody",
+      "pivot": [
+        0.096875,
+        0.975,
+        0.0
+      ],
+      "driver": "Thigh_R"
+    },
+    {
+      "name": "RightLowerLeg",
+      "parent": "RightLeg",
+      "pivot": [
+        0.096875,
+        0.56875,
+        0.0
+      ],
+      "driver": "Leg_R"
+    },
+    {
+      "name": "RightFoot",
+      "parent": "RightLowerLeg",
+      "pivot": [
+        0.096875,
+        0.2125,
+        0.0
+      ],
+      "driver": "Leg_R"
+    },
+    {
+      "name": "LeftArm",
+      "parent": "UpBody",
+      "pivot": [
+        -0.2125,
+        1.521875,
+        0.0
+      ],
+      "driver": "Arm_L"
+    },
+    {
+      "name": "LeftForeArm",
+      "parent": "LeftArm",
+      "pivot": [
+        -0.24375,
+        1.184375,
+        0.0
+      ],
+      "driver": "Hand_L"
+    },
+    {
+      "name": "LeftHandLocator",
+      "parent": "LeftForeArm",
+      "pivot": [
+        -0.24375,
+        0.928125,
+        0.0
+      ],
+      "driver": "Tool_L"
+    },
+    {
+      "name": "RightArm",
+      "parent": "UpBody",
+      "pivot": [
+        0.2125,
+        1.521875,
+        0.0
+      ],
+      "driver": "Arm_R"
+    },
+    {
+      "name": "RightForeArm",
+      "parent": "RightArm",
+      "pivot": [
+        0.24375,
+        1.184375,
+        0.0
+      ],
+      "driver": "Hand_R"
+    },
+    {
+      "name": "RightHandLocator",
+      "parent": "RightForeArm",
+      "pivot": [
+        0.24375,
+        0.928125,
+        0.0
+      ],
+      "driver": "Tool_R"
+    },
+    {
+      "name": "Head",
+      "parent": "UpBody",
+      "pivot": [
+        0.0,
+        1.6125,
+        0.0
+      ],
+      "driver": "Head"
+    },
+    {
+      "name": "Fringe0",
+      "parent": "Head",
+      "pivot": [
+        -0.101875,
+        1.8404867,
+        -0.153889
+      ],
+      "driver": null
+    },
+    {
+      "name": "Fringe1",
+      "parent": "Head",
+      "pivot": [
+        -0.07,
+        1.8496569,
+        -0.1558381
+      ],
+      "driver": null
+    },
+    {
+      "name": "Fringe2",
+      "parent": "Head",
+      "pivot": [
+        -0.03,
+        1.8441548,
+        -0.1546686
+      ],
+      "driver": null
+    },
+    {
+      "name": "Fringe3",
+      "parent": "Head",
+      "pivot": [
+        0.0175,
+        1.8521022,
+        -0.1563579
+      ],
+      "driver": null
+    },
+    {
+      "name": "Fringe4",
+      "parent": "Head",
+      "pivot": [
+        0.059375,
+        1.8466002,
+        -0.1551884
+      ],
+      "driver": null
+    },
+    {
+      "name": "Fringe5",
+      "parent": "Head",
+      "pivot": [
+        0.095,
+        1.8404867,
+        -0.153889
+      ],
+      "driver": null
+    },
+    {
+      "name": "Fringe6",
+      "parent": "Head",
+      "pivot": [
+        0.115,
+        1.8160331,
+        -0.1486912
+      ],
+      "driver": null
+    },
+    {
+      "name": "LeftEye",
+      "parent": "Head",
+      "pivot": [
+        -0.056875,
+        1.6769453,
+        -0.1146544
+      ],
+      "driver": null
+    },
+    {
+      "name": "LeftLid",
+      "parent": "Head",
+      "pivot": [
+        -0.056875,
+        1.6914492,
+        -0.1215711
+      ],
+      "driver": null
+    },
+    {
+      "name": "LeftBrow",
+      "parent": "Head",
+      "pivot": [
+        -0.056875,
+        1.7027132,
+        -0.1226874
+      ],
+      "driver": null
+    },
+    {
+      "name": "RightEye",
+      "parent": "Head",
+      "pivot": [
+        0.056875,
+        1.6769453,
+        -0.1146544
+      ],
+      "driver": null
+    },
+    {
+      "name": "RightLid",
+      "parent": "Head",
+      "pivot": [
+        0.056875,
+        1.6914492,
+        -0.1215711
+      ],
+      "driver": null
+    },
+    {
+      "name": "RightBrow",
+      "parent": "Head",
+      "pivot": [
+        0.056875,
+        1.7027132,
+        -0.1226874
+      ],
+      "driver": null
+    },
+    {
+      "name": "MouthInterior",
+      "parent": "Head",
+      "pivot": [
+        -0.0,
+        1.6283362,
+        -0.0998495
+      ],
+      "driver": null
+    },
+    {
+      "name": "LowerLip",
+      "parent": "Head",
+      "pivot": [
+        -0.0,
+        1.625501,
+        -0.1011637
+      ],
+      "driver": null
+    },
+    {
+      "name": "CoatFrontLeft",
+      "parent": "UpBody",
+      "pivot": [
+        -0.09375,
+        1.0625,
+        0.0
+      ],
+      "driver": null
+    },
+    {
+      "name": "CoatFrontRight",
+      "parent": "UpBody",
+      "pivot": [
+        0.09375,
+        1.0625,
+        0.0
+      ],
+      "driver": null
+    },
+    {
+      "name": "CoatBack",
+      "parent": "UpBody",
+      "pivot": [
+        0.0,
+        1.0625,
+        0.0625
+      ],
+      "driver": null
+    }
+  ],
+  "motionKeys": [
+    "air_auto1",
+    "air_auto1_charge",
+    "air_auto2",
+    "air_auto2_charge",
+    "air_auto3",
+    "air_auto3_charge",
+    "air_auto4",
+    "air_auto4_charge",
+    "air_clap",
+    "air_ground_pound",
+    "air_kick",
+    "air_kick_charge",
+    "air_launch_follow",
+    "air_launch_follow_charge",
+    "air_pain",
+    "air_pain_charge",
+    "basic_air_dash",
+    "basic_air_dash_brake",
+    "basic_brake",
+    "basic_fall",
+    "basic_glide_backward",
+    "basic_glide_forward",
+    "basic_glide_left",
+    "basic_glide_right",
+    "basic_idle",
+    "basic_idle_blade",
+    "basic_idle_claw",
+    "basic_idle_hammer",
+    "basic_idle_whip",
+    "basic_jump_charge",
+    "basic_jump_rise",
+    "basic_jump_running",
+    "basic_jump_tactical",
+    "basic_land_devastating",
+    "basic_land_heavy",
+    "basic_land_light",
+    "basic_land_moving",
+    "basic_parkour_small",
+    "basic_run",
+    "basic_sprint",
+    "basic_sprint_brake",
+    "basic_sprint_fast",
+    "basic_sprint_fastest",
+    "basic_turn",
+    "basic_walk",
+    "basic_wall_climb_down",
+    "basic_wall_climb_left",
+    "basic_wall_climb_right",
+    "basic_wall_climb_up",
+    "basic_wall_cling",
+    "basic_wall_leap",
+    "basic_wall_mantle",
+    "basic_wall_run_diag_left",
+    "basic_wall_run_diag_right",
+    "basic_wall_run_left",
+    "basic_wall_run_right",
+    "basic_wall_run_up",
+    "basic_wall_top",
+    "basic_wall_vault",
+    "blade_combo_c",
+    "blade_combo_c2",
+    "blade_combo_c2_charge",
+    "blade_combo_c_charge",
+    "blade_combo_d",
+    "blade_combo_d_charge",
+    "blade_cut",
+    "blade_cut_charge",
+    "blade_dive",
+    "blade_dive_charge",
+    "blade_return",
+    "blade_return_charge",
+    "blade_rush",
+    "blade_rush_charge",
+    "bulletdive_drop",
+    "bulletdive_drop_charge",
+    "bulletdive_drop_flight",
+    "bulletdive_drop_land",
+    "bulletdive_drop_recovery",
+    "claw_auto1",
+    "claw_auto1_charge",
+    "claw_auto1_charged",
+    "claw_auto2",
+    "claw_auto2_charge",
+    "claw_auto2_charged",
+    "claw_auto3",
+    "claw_auto3_charge",
+    "claw_auto3_charged",
+    "claw_groundspike",
+    "claw_groundspike_charge",
+    "claw_sprint",
+    "claw_sprint_charge",
+    "combo_axe",
+    "combo_axe_charge",
+    "combo_axe_handle",
+    "combo_axe_handle_charge",
+    "combo_backhand",
+    "combo_backhand_charge",
+    "combo_clap",
+    "combo_clap_charge",
+    "combo_float",
+    "combo_ground_pound",
+    "combo_ground_pound_charge",
+    "combo_kick1",
+    "combo_kick1_charge",
+    "combo_kick2",
+    "combo_kick2_charge",
+    "combo_knee",
+    "combo_knee_charge",
+    "combo_mach",
+    "combo_mach_charge",
+    "combo_pain",
+    "combo_pain_charge",
+    "combo_spin",
+    "combo_spin_charge",
+    "combo_spin_left",
+    "combo_spin_left_charge",
+    "consume_blade_actor",
+    "consume_blade_victim",
+    "consume_capture_actor",
+    "consume_capture_victim",
+    "consume_carry_run_actor",
+    "consume_carry_run_victim",
+    "consume_carry_walk_actor",
+    "consume_carry_walk_victim",
+    "consume_claws_actor",
+    "consume_claws_victim",
+    "consume_hammer_actor",
+    "consume_hammer_victim",
+    "consume_hold_actor",
+    "consume_hold_victim",
+    "consume_large_actor",
+    "consume_large_hammer_actor",
+    "consume_large_hammer_victim",
+    "consume_large_muscle_actor",
+    "consume_large_muscle_victim",
+    "consume_large_victim",
+    "consume_large_whip_actor",
+    "consume_large_whip_victim",
+    "consume_muscle_actor",
+    "consume_muscle_victim",
+    "consume_normal_actor",
+    "consume_normal_victim",
+    "consume_whip_actor",
+    "consume_whip_victim",
+    "dev_air_critical_pain",
+    "dev_air_critical_pain_aim_down",
+    "dev_air_critical_pain_aim_up",
+    "dev_air_critical_pain_charge",
+    "dev_air_critical_pain_recovery",
+    "dev_air_groundspike",
+    "dev_air_groundspike_charge",
+    "dev_air_groundspike_recovery",
+    "dev_air_tendril",
+    "dev_air_tendril_charge",
+    "dev_air_tendril_recovery",
+    "dev_critical_pain",
+    "dev_critical_pain_aim_down",
+    "dev_critical_pain_aim_up",
+    "dev_critical_pain_charge",
+    "dev_critical_pain_recovery",
+    "dev_groundspike",
+    "dev_groundspike_charge",
+    "dev_groundspike_recovery",
+    "dev_tendril",
+    "dev_tendril_charge",
+    "dev_tendril_recovery",
+    "grab_whip_native",
+    "hammer_combo_c",
+    "hammer_combo_c_charge",
+    "hammer_combo_c_charged",
+    "hammer_combo_d",
+    "hammer_combo_d_charge",
+    "hammer_combo_d_charged",
+    "hammer_combo_special",
+    "hammer_combo_special_charge",
+    "hammer_combo_special_charged",
+    "hammer_drop",
+    "hammer_drop_charge",
+    "hammer_hook",
+    "hammer_hook_charge",
+    "hammer_hook_charged",
+    "hammer_jab",
+    "hammer_jab_charge",
+    "hammer_jab_charged",
+    "hammer_quake",
+    "hammer_quake_charge",
+    "hammer_quake_charged",
+    "hammer_ram",
+    "hammer_ram_charge",
+    "morph_blade",
+    "morph_claws",
+    "morph_hammerfists",
+    "morph_muscle_mass",
+    "morph_thermal_vision",
+    "morph_whipfist",
+    "muscle_air",
+    "muscle_combo_c",
+    "muscle_combo_c_charge",
+    "muscle_cross",
+    "muscle_cross_charge",
+    "muscle_jab",
+    "muscle_jab_charge",
+    "muscle_rush",
+    "muscle_rush_charge",
+    "muscle_superman",
+    "muscle_superman_charge",
+    "muscle_uppercut",
+    "reaction_backhand",
+    "reaction_body",
+    "reaction_down",
+    "reaction_fall",
+    "reaction_left",
+    "reaction_right",
+    "reaction_rise",
+    "reaction_up",
+    "utility_armor_idle",
+    "utility_armor_transform",
+    "utility_shield_deploy",
+    "utility_shield_hit",
+    "utility_shield_run",
+    "utility_shield_sprint",
+    "whip_air",
+    "whip_air_charge",
+    "whip_air_charged",
+    "whip_combo_c",
+    "whip_combo_c_charge",
+    "whip_combo_c_charged",
+    "whip_lash",
+    "whip_lash_charge",
+    "whip_lash_charged",
+    "whip_longshot",
+    "whip_longshot_charge",
+    "whip_longshot_charged",
+    "whip_lunge",
+    "whip_return",
+    "whip_return_charge",
+    "whip_return_charged",
+    "whip_sweep",
+    "whip_sweep_charge",
+    "whip_sweep_charged"
+  ],
+  "runtime": "Blacklight native pose adapter; YSM alone does not dispatch Blacklight skill states."
+}

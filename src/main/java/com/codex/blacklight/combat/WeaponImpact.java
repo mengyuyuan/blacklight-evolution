@@ -40,8 +40,7 @@ public final class WeaponImpact {
         boolean blade=move.form==PowerForm.BLADE;
         if(!blade)ClawPhysicalEffects.onComboTargetHit(p,v,heavy||slam);
         CombatImpactEffects.target(p,v,move);
-        if(!blade)p.level().playSound(null,v.blockPosition(),heavy||slam?SoundEvents.PLAYER_ATTACK_STRONG:SoundEvents.PLAYER_ATTACK_CRIT,
-                SoundSource.PLAYERS,heavy?1.1F:.8F,heavy?.6F:1.0F);
+        if(first)com.codex.blacklight.registry.ModWeaponSounds.play(p,com.codex.blacklight.registry.ModWeaponSounds.equipped(p),heavy||slam?"heavy":"hit",v.position(),.9F,1F);
         if(first&&blade){
             var effect=BladeEffects.heavy(move)?PhysicalFeedbackPayload.Effect.BLADE_HEAVY
                 :move==WeaponMove.BLADE_RETURN||move==WeaponMove.BLADE_COMBO_C2?PhysicalFeedbackPayload.Effect.BLADE_RETURN:PhysicalFeedbackPayload.Effect.BLADE_CUT;

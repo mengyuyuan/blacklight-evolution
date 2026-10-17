@@ -1,0 +1,34 @@
+{
+  "spec": 2,
+  "metadata": {
+    "name": "A哥 · V4.4 三格高比例修正版",
+    "tips": "参考三视图重建 / 独立表情层 / 翅膀独立",
+    "authors": [
+      {
+        "name": "末者",
+        "role": "模型"
+      }
+    ]
+  },
+  "properties": {
+    "height_scale": 1.5,
+    "width_scale": 1.5,
+    "preview_animation": "gui",
+    "default_texture": "mercer",
+    "free": true
+  },
+  "files": {
+    "player": {
+      "model": {
+        "main": "main.json",
+        "arm": "arm.json"
+      },
+      "animation": {
+        "main": "main.animation.json"
+      },
+      "texture": [
+        "mercer.png"
+      ]
+    }
+  }
+}
