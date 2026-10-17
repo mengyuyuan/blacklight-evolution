@@ -14,6 +14,8 @@ public final class ClientWingFlight {
         int side=input?(SkillBindings.down(mc.options.keyRight)?1:0)-(SkillBindings.down(mc.options.keyLeft)?1:0):0;
         boolean up=input&&SkillBindings.down(mc.options.keyJump),down=input&&SkillBindings.down(mc.options.keyShift),boost=input&&SkillBindings.down(mc.options.keySprint);
         float yaw=com.codex.blacklight.client.camera.PrototypeChaseCamera.ownsView()?com.codex.blacklight.client.camera.PrototypeChaseCamera.controlYaw():p.getYRot();
+        if(WingFlightSystem.flying(p)&&com.codex.blacklight.client.camera.PrototypeChaseCamera.ownsView())
+            p.setXRot(com.codex.blacklight.client.camera.PrototypeChaseCamera.controlPitch());
         applyInput(mc,forward,side,up,down,boost,yaw);
         return true;
     }

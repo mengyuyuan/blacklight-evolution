@@ -11,7 +11,7 @@ import java.util.*;
 public final class SovereignFlightPose {
     private static final class State {
         final SovereignFlightMotion.Transition transition=new SovereignFlightMotion.Transition();
-        int phase;boolean braking;double time=-1;float speed,forward,side,vertical,bank;
+        int phase;boolean braking;double time=-1;float speed,forward,side,vertical,bank,pathPitch;
     }
     private static final Map<Player,State> STATES=new WeakHashMap<>();
     public static BlacklightPose apply(LivingEntity entity,BlacklightPose original,float partial) {
@@ -31,11 +31,13 @@ public final class SovereignFlightPose {
         // Use the same tick turn for all four committed pose samples. Updating a
         // yaw baseline on the first sample erased banking in the next three.
         float turn=net.minecraft.util.Mth.wrapDegrees(p.getYRot()-p.yRotO)*1.6F;
-        s.speed+=((float)length-s.speed)*alpha;s.forward+=(forward-s.forward)*alpha;s.side+=(side-s.side)*alpha;
+        s.speed+=((float)velocity.length()-s.speed)*alpha;s.forward+=(forward-s.forward)*alpha;s.side+=(side-s.side)*alpha;
         s.vertical+=((float)com.codex.blacklight.forge.WingMath.clamp(velocity.y/.52,-1,1)-s.vertical)*alpha;s.bank+=(com.codex.blacklight.forge.WingMath.clamp(turn,-22,22)-s.bank)*alpha;
+        s.pathPitch+=(SovereignFlightMotion.pathPitch(length,velocity.y)-s.pathPitch)*alpha;
         if(now>s.time)s.time=now;
         if(s.phase!=flight.phase()){s.braking=flight.phase()==WingFlightState.HOVER&&(s.phase==WingFlightState.CRUISE||s.phase==WingFlightState.BOOST)&&s.speed>.12;s.phase=flight.phase();}
         var air=SovereignFlightMotion.airborne(now,s.speed,s.forward,s.side,s.vertical,s.bank,s.phase==WingFlightState.BOOST);
+        SovereignFlightMotion.followFlightPath(air,s.pathPitch,s.speed,s.forward,s.vertical);
         BlacklightPose target=air;float blend=.32F;
         if(s.phase==WingFlightState.TAKEOFF){
             target=FlightAnimationClips.sample("takeoff",age);
