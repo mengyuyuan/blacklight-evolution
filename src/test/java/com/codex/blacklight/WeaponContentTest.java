@@ -30,7 +30,7 @@ class WeaponContentTest {
         }
     }
     @Test void utilitySectorsResolveToTheirDisplayedCenters(){
-        var expected=java.util.List.of(PowerForm.SHIELD,PowerForm.ARMOR,PowerForm.THERMAL_VISION,PowerForm.INFECTED_VISION);
+        var expected=java.util.List.of(PowerForm.SHIELD,PowerForm.ARMOR,PowerForm.THERMAL_VISION,PowerForm.INFECTED_VISION,PowerForm.SOVEREIGN_WINGS);
         for(int i=0;i<PowerWheel.size(true);i++){double angle=-Math.PI/2+i*Math.PI*2/PowerWheel.size(true);assertEquals(i,PowerWheel.sector(Math.cos(angle)*80,Math.sin(angle)*80,30,120,true));assertEquals(expected.get(i),PowerWheel.form(true,i));}
     }
 }
