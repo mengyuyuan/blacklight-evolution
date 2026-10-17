@@ -70,10 +70,6 @@ existing visual documentation.
 The source pack explicitly permits use in personal and commercial projects. Attribution is
 not required, but is retained here to preserve provenance.
 
-## Weapon and defense audio (2026-10-17)
-
-Recorded source packs: StarNinjas sword sounds (CC0), artisticdude Swishes (CC0), and Philippe Groarke / Socapex combat sounds (CC BY-SA 3.0). Source URLs, archives and full upstream attribution are in `art/weapon-audio/`. Edited/mixed derivatives are distributed under CC BY-SA 3.0 separately from the code license. Packaged credits: `META-INF/licenses/blacklight-audio/`. See `docs/WEAPON_DEFENSE_AUDIO_ZH.md` for the 41 events / 123 variants and validation scope. No Prototype unpacked audio is added.
-
 ## Rokoko free superhero motion capture
 
 The Sovereign Wings body animation adapts two FBX captures from Rokoko's
@@ -98,3 +94,6 @@ conversion steps and project edits are documented in
   and continuous transitions. The original bat mesh and textures are not bundled.
 - Reproduction: `art/sovereign-wings/extract_bat_wingbeat.py` with the original
   `FlyingBat.glb` as input. This animation retains its CC BY 4.0 license.
+## Weapon and defense audio (2026-10-17)
+
+Recorded source packs: StarNinjas sword sounds (CC0), artisticdude Swishes (CC0), and Philippe Groarke / Socapex combat sounds (CC BY-SA 3.0). Source URLs, archives and full upstream attribution are in `art/weapon-audio/`. Edited/mixed derivatives are distributed under CC BY-SA 3.0 separately from the code license. Packaged credits: `META-INF/licenses/blacklight-audio/`. See `docs/WEAPON_DEFENSE_AUDIO_ZH.md` for the 41 events / 123 variants and validation scope. No Prototype unpacked audio is added.

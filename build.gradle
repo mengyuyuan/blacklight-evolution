@@ -182,6 +182,7 @@ neoForge {
             client()
             if (project.hasProperty('wingTest')) {
                 systemProperty 'blacklight.test.wings', 'true'
+                if(project.hasProperty('wingQaDirectory')) systemProperty 'blacklight.test.wingDirectory', file(project.property('wingQaDirectory')).absolutePath
                 if (project.hasProperty('wingSonicTest')) systemProperty 'blacklight.test.wingSonic', 'true'
                 if (project.hasProperty('wingSonicClimbTest')) systemProperty 'blacklight.test.wingSonicClimb', 'true'
                 if (project.hasProperty('wingArmorTest')) systemProperty 'blacklight.test.wingArmor', 'true'

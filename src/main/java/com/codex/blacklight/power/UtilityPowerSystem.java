@@ -63,6 +63,7 @@ public final class UtilityPowerSystem {
         if(form==PowerForm.SOVEREIGN_WINGS)com.codex.blacklight.movement.WingFlightSystem.transform(p,(mask&form.bit())!=0);
         if(group==DEFENSE)ModWeaponSounds.defense(p,form,(mask & form.bit()) != 0 ? "deploy" : "retract",p.position(),1);
         else p.level().playSound(null, p.blockPosition(), SoundEvents.SCULK_CATALYST_BLOOM, SoundSource.PLAYERS, .5F, (mask & form.bit()) != 0 ? .8F : 1.3F);
+
     }
     private static void publish(ServerPlayer p, UtilityState s) { p.setData(ModAttachments.UTILITY_STATE, s); p.syncData(ModAttachments.UTILITY_STATE); }
     private static void modifier(ServerPlayer p, net.minecraft.core.Holder<Attribute> type, String name, double value, AttributeModifier.Operation operation, boolean enabled) {

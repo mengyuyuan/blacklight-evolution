@@ -25,7 +25,7 @@ public final class WingFlightSmoke {
     private static final boolean ARMOR=Boolean.getBoolean("blacklight.test.wingArmor");
     private static final String RUN="wings11-"+System.currentTimeMillis()+"-"+(ARMOR?"armor":"plain");
     private static int tick;private static boolean initialized,finished;private static int lastFrame=-1;
-    private static final Path ROOT=Path.of("E:/Blacklight-Wings-20261016/qa");
+    private static final Path ROOT=Path.of(System.getProperty("blacklight.test.wingDirectory","run-wing-qa"));
     private static final List<String> samples=new ArrayList<>();
     private static final java.util.concurrent.ExecutorService WRITER=java.util.concurrent.Executors.newFixedThreadPool(3,r->{var t=new Thread(r,"Wing-QA-frames");t.setDaemon(true);return t;});
     private static final java.util.concurrent.atomic.AtomicInteger pending=new java.util.concurrent.atomic.AtomicInteger();
