@@ -82,10 +82,15 @@ public final class BlacklightPlayerRenderer extends PlayerRenderer {
             handShield.render(player,stack,buffers,light,partial);
         }finally{stack.popPose();}
     }
+    @Override public net.minecraft.resources.ResourceLocation getTextureLocation(AbstractClientPlayer player) {
+        return com.codex.blacklight.client.model.MercerPlayerMesh.active(player)
+                ?com.codex.blacklight.client.model.MercerPlayerMesh.TEXTURE:super.getTextureLocation(player);
+    }
     @Override protected void scale(AbstractClientPlayer player,PoseStack stack,float partial) {
         super.scale(player,stack,partial);
-        float armorScale=com.codex.blacklight.client.model.BlockArmorModel.get().bodyScale(player,partial);
-        stack.scale(armorScale,armorScale,armorScale);
+        float armorScale=com.codex.blacklight.client.model.MercerArmorMesh.active(player)?1F:com.codex.blacklight.client.model.BlockArmorModel.get().bodyScale(player,partial);
+        float characterScale=com.codex.blacklight.client.model.MercerPlayerMesh.displayScale(player,partial);
+        stack.scale(armorScale*characterScale,armorScale*characterScale,armorScale*characterScale);
     }
     @Override protected void setupRotations(AbstractClientPlayer player,PoseStack stack,float bob,float bodyYaw,float partial,float scale) {
         float facing=com.codex.blacklight.client.animation.BlacklightRenderPose.facing(player,partial);

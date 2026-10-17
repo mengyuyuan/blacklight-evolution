@@ -75,6 +75,11 @@ public final class AnimationTunerScreen extends Screen {
     }
 
     private void buildTopControls() {
+        addRenderableWidget(Button.builder(com.codex.blacklight.client.tuning.MercerAppearance.label(), button -> {
+            com.codex.blacklight.client.tuning.MercerAppearance.toggle();
+            button.setMessage(com.codex.blacklight.client.tuning.MercerAppearance.label());
+            status="外观设置已切换，感染后的本机角色生效";
+        }).bounds(6,69,188,17).build());
         addRenderableWidget(Button.builder(actionLabel(Action.CHARGED_JUMP),
                         button -> selectAction(Action.CHARGED_JUMP))
                 .bounds(6, 6, 92, 17).build());

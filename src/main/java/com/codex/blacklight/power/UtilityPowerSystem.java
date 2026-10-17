@@ -1,6 +1,7 @@
 package com.codex.blacklight.power;
 
 import com.codex.blacklight.registry.ModAttachments;
+import com.codex.blacklight.registry.ModWeaponSounds;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.ai.attributes.*;
@@ -46,7 +47,7 @@ public final class UtilityPowerSystem {
     public static void spendShield(ServerPlayer p,float amount){
         var s=p.getData(ModAttachments.UTILITY_STATE);long now=p.level().getGameTime();float hp=Math.max(0,s.shield()-amount);
         publish(p,new UtilityState(hp,hp<=0?now+UtilityState.REBUILD_TICKS:0,s.changedAt(),s.previousDefense(),now));
-        if(hp<=0)p.level().playSound(null,p.blockPosition(),SoundEvents.SHIELD_BREAK,SoundSource.PLAYERS,1,.7F);
+        if(hp<=0)ModWeaponSounds.defense(p,PowerForm.SHIELD,"break",p.position(),1);
     }
     public static boolean parkourAllowed(Player p) { return !active(p, PowerForm.ARMOR); }
     public static void toggle(ServerPlayer p, PowerForm form) {
@@ -59,7 +60,8 @@ public final class UtilityPowerSystem {
             publish(p, new UtilityState(s.shield(), s.recoverAt(), p.level().getGameTime(), old & DEFENSE, s.hitAt()));
         }
         p.setData(ModAttachments.UTILITY_POWERS, mask); p.syncData(ModAttachments.UTILITY_POWERS); attributes(p);
-        p.level().playSound(null, p.blockPosition(), SoundEvents.SCULK_CATALYST_BLOOM, SoundSource.PLAYERS, .5F, (mask & form.bit()) != 0 ? .8F : 1.3F);
+        if(group==DEFENSE)ModWeaponSounds.defense(p,form,(mask & form.bit()) != 0 ? "deploy" : "retract",p.position(),1);
+        else p.level().playSound(null, p.blockPosition(), SoundEvents.SCULK_CATALYST_BLOOM, SoundSource.PLAYERS, .5F, (mask & form.bit()) != 0 ? .8F : 1.3F);
     }
     private static void publish(ServerPlayer p, UtilityState s) { p.setData(ModAttachments.UTILITY_STATE, s); p.syncData(ModAttachments.UTILITY_STATE); }
     private static void modifier(ServerPlayer p, net.minecraft.core.Holder<Attribute> type, String name, double value, AttributeModifier.Operation operation, boolean enabled) {
@@ -87,7 +89,7 @@ public final class UtilityPowerSystem {
         var s = p.getData(ModAttachments.UTILITY_STATE);
         if (s.broken() && p.level().getGameTime() >= s.recoverAt()) {
             publish(p, new UtilityState(UtilityState.SHIELD_CAPACITY, 0, active(p, PowerForm.SHIELD) ? p.level().getGameTime() : s.changedAt(), active(p, PowerForm.SHIELD) ? 0 : s.previousDefense(), s.hitAt()));
-            if (active(p, PowerForm.SHIELD)) p.level().playSound(null, p.blockPosition(), SoundEvents.SCULK_CATALYST_BLOOM, SoundSource.PLAYERS, .6F, 1.1F);
+            if (active(p, PowerForm.SHIELD)) ModWeaponSounds.defense(p,PowerForm.SHIELD,"deploy",p.position(),1);
         }
         // Native states 0/1 heal only while retracting/retracted. Deployed state 3 does not.
         else if (!s.broken() && !active(p, PowerForm.SHIELD) && s.shield() < UtilityState.SHIELD_CAPACITY
@@ -100,7 +102,13 @@ public final class UtilityPowerSystem {
         if (!(e.getEntity() instanceof ServerPlayer p) || e.getAmount() <= 0 || e.isCanceled()) return;
         var source = e.getSource();
         if (source.is(DamageTypeTags.BYPASSES_INVULNERABILITY) || source.is(DamageTypeTags.BYPASSES_ARMOR)) return;
-        if (active(p, PowerForm.ARMOR)) { e.setAmount(e.getAmount() * .525F); return; }
+        if (active(p, PowerForm.ARMOR)) {
+            if(source.getDirectEntity()!=null){
+                float force=Math.min(1,e.getAmount()*CombatScale.units(p)/20F);
+                ModWeaponSounds.defense(p,PowerForm.ARMOR,force>=.5F?"heavy":"hit",p.position(),force);
+            }
+            e.setAmount(e.getAmount() * .525F); return;
+        }
         if (!shieldReady(p) || p.getData(ModAttachments.CONSUMING)) return;
         Vec3 pos = source.getSourcePosition(); if (pos == null) return;
         Vec3 toward = pos.subtract(p.position()).multiply(1, 0, 1);
@@ -117,7 +125,7 @@ public final class UtilityPowerSystem {
         // armor pipeline's original units; CombatScale converts once after armor.
         float remaining = Math.max(0, incoming - s.shield())/units;
         if (remaining == 0) e.setCanceled(true); else e.setAmount(remaining);
-        p.level().playSound(null, p.blockPosition(), hp <= 0 ? SoundEvents.SHIELD_BREAK : SoundEvents.SHIELD_BLOCK, SoundSource.PLAYERS, 1, .7F);
+        ModWeaponSounds.defense(p,PowerForm.SHIELD,hp<=0?"break":incoming>=10?"heavy":"hit",p.position(),Math.min(1,incoming/20));
         // Surface debris is emitted once by each client from the posed shield,
         // instead of spawning unrelated critical-hit particles inside the torso.
     }
