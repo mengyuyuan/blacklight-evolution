@@ -20,17 +20,22 @@ public final class AerialSpecialGameTest {
     static void loadedFlight(GameTestHelper h, Runnable check) {
         var pos=h.absolutePos(new net.minecraft.core.BlockPos(5,0,1));
         int cx=pos.getX()>>4,cz=pos.getZ()>>4;
-        for(int x=cx-1;x<=cx+1;x++)for(int z=cz-1;z<=cz+3;z++)
-            h.getLevel().getChunkSource().addRegionTicket(net.minecraft.server.level.TicketType.PORTAL,new net.minecraft.world.level.ChunkPos(x,z),2,pos);
+        var owned=new java.util.ArrayList<net.minecraft.world.level.ChunkPos>();
+        // NeoForge GameTest runs accelerated ticks. Non-expiring fixture tickets
+        // prevent asynchronous entity sections from losing a short portal ticket.
+        for(int x=cx-1;x<=cx+1;x++)for(int z=cz-1;z<=cz+4;z++) {
+            var chunk=new net.minecraft.world.level.ChunkPos(x,z);
+            if(!h.getLevel().getForcedChunks().contains(chunk.toLong())) {
+                h.getLevel().setChunkForced(x,z,true);owned.add(chunk);
+            }
+            h.getLevel().getChunk(x,z);
+        }
         h.startSequence().thenWaitUntil(()->{
-            for(int x=cx-1;x<=cx+1;x++)for(int z=cz-1;z<=cz+3;z++)
-                h.assertTrue(h.getLevel().isPositionEntityTicking(new net.minecraft.core.BlockPos(x<<4,80,z<<4)),"waiting for pounce flight chunks");
+            for(int x=cx-1;x<=cx+1;x++)for(int z=cz-1;z<=cz+4;z++)
+                h.assertTrue(h.getLevel().isPositionEntityTicking(new net.minecraft.core.BlockPos(x<<4,80,z<<4)),"waiting for loaded flight entity section "+x+","+z);
         }).thenExecute(()->{
             try { check.run(); }
-            finally {
-                for(int x=cx-1;x<=cx+1;x++)for(int z=cz-1;z<=cz+3;z++)
-                    h.getLevel().getChunkSource().removeRegionTicket(net.minecraft.server.level.TicketType.PORTAL,new net.minecraft.world.level.ChunkPos(x,z),2,pos);
-            }
+            finally { for(var chunk:owned)h.getLevel().setChunkForced(chunk.x,chunk.z,false); }
         });
     }
     @GameTest(template="wall_test",timeoutTicks=600,batch="pounce_release")

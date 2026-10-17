@@ -39,3 +39,10 @@
 - Forge 初轮 17 项独立服务端测试通过；Forge 分支的最终扩展回归与构建结果另记录在对应 PR 和同步 Issue #58。
 - 证据在本机 `E:/Blacklight-Wings-20261016/qa/hydra-neo-final/hydra-close-frames`、`qa/hydra-forge-final/hydra-close-frames`；日志分别为 `hydra-neo-final-client.log`、`hydra-forge-final2-client.log`、`hydra-neo-regression-final.log`。
 - 尚未完成两个真实客户端同时观看的网络画面验收；序列化、专用服务端测试不能代替这项。也不宣称已通过所有第三方整合包。
+
+### 补充回归与跨版本收口
+
+- #60 修复未锁定地面攻击反向追击后，NeoForge 438 项单元测试、145 项独立服务端测试与 assemble 通过。最后完整服务端日志为 `hydra-neo-followup-regression5.log`。
+- Forge #61 已合并；439 项单元测试、137 项独立服务端测试与 reobfJarJar / assemble 通过，对应日志 `hydra-forge-regression-final10.log`、`hydra-forge-package-final.log`。
+- NeoForge 加速运行的测试使用不自动过期的临时区块加载、独立追击批次和通道清理；这仅改变测试准备，不改变实际游戏的区块加载或传送策略。
+- 双版本候选安装包（含各自 GeckoLib）位于本机 `E:/Blacklight-Wings-20261016/release/hydra-candidate-20261018`；并未创建正式 GitHub Release。

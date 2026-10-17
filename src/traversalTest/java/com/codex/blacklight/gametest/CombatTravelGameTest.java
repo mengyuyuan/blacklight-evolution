@@ -16,15 +16,7 @@ public final class CombatTravelGameTest {
         var mob=h.spawn(EntityType.IRON_GOLEM,3,25,6);mob.setNoAi(true);mob.setNoGravity(true);mob.setPos(pos);return mob;
     }
     private static void prepareTravel(GameTestHelper h,boolean air,boolean special){
-        var pos=h.absolutePos(new net.minecraft.core.BlockPos(3,0,3));int cx=pos.getX()>>4,cz=pos.getZ()>>4;
-        for(int x=cx-1;x<=cx+1;x++)for(int z=cz-1;z<=cz+4;z++)h.getLevel().getChunkSource().addRegionTicket(net.minecraft.server.level.TicketType.PORTAL,new net.minecraft.world.level.ChunkPos(x,z),2,pos);
-        // Entity-section visibility updates on server ticks after the ticket.
-        h.startSequence().thenWaitUntil(()->{
-            for(int x=cx-1;x<=cx+1;x++)for(int z=cz-1;z<=cz+4;z++)
-                h.assertTrue(h.getLevel().isPositionEntityTicking(new net.minecraft.core.BlockPos(x<<4,80,z<<4)),"waiting for remote target entity sections");
-        }).thenExecute(()->{
-            try{checkTravel(h,air,special);}finally{for(int x=cx-1;x<=cx+1;x++)for(int z=cz-1;z<=cz+4;z++)h.getLevel().getChunkSource().removeRegionTicket(net.minecraft.server.level.TicketType.PORTAL,new net.minecraft.world.level.ChunkPos(x,z),2,pos);}
-        });
+        AerialSpecialGameTest.loadedFlight(h,()->checkTravel(h,air,special));
     }
     private static void checkTravel(GameTestHelper h,boolean air,boolean special){
         h.getLevel().getServer().getPlayerList().setViewDistance(8);
@@ -72,8 +64,8 @@ public final class CombatTravelGameTest {
             }
         }h.succeed();
     }
-    @GameTest(template="wall_test",timeoutTicks=600,batch="combat_travel") public static void aerialSpecialsRespectPursuitAndStationaryWhipRules(GameTestHelper h){prepareTravel(h,true,true);}
-    @GameTest(template="wall_test",timeoutTicks=600,batch="combat_travel") public static void ordinaryAirOpenersDoNotChaseRemoteTargets(GameTestHelper h){prepareTravel(h,true,false);}
+    @GameTest(template="wall_test",timeoutTicks=600,batch="combat_travel_aerial") public static void aerialSpecialsRespectPursuitAndStationaryWhipRules(GameTestHelper h){prepareTravel(h,true,true);}
+    @GameTest(template="wall_test",timeoutTicks=600,batch="combat_travel_local") public static void ordinaryAirOpenersDoNotChaseRemoteTargets(GameTestHelper h){prepareTravel(h,true,false);}
     @GameTest(template="wall_test",timeoutTicks=600,batch="isolated_groundAttacksNeverRunToDistantTargets")
     public static void groundAttacksNeverRunToDistantTargets(GameTestHelper h){
         AerialSpecialGameTest.loadedFlight(h,()->{
