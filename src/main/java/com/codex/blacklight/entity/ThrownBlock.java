@@ -49,7 +49,7 @@ public final class ThrownBlock extends Projectile {
     public int phase(){return entityData.get(PHASE);}
     public int aimTarget(){return entityData.get(TARGET);}
     public Vec3 aimedVelocity(){return new Vec3(entityData.get(AIM_X),entityData.get(AIM_Y),entityData.get(AIM_Z));}
-    public void beginPickup(ServerPlayer p,net.minecraft.core.BlockPos source){entityData.set(SOURCE,source);setPhase(p,0,"pickup");}
+    public void beginPickup(ServerPlayer p,net.minecraft.core.BlockPos source){BlockThrowSystem.trackHeld(p,this);entityData.set(SOURCE,source);setPhase(p,0,"pickup");}
     public Vec3 carryCenter(Player p,Vec3 grip,float partial){
         if(phase()!=0)return grip;
         var action=p.getData(ModAttachments.PLAYER_ACTION);
@@ -119,6 +119,7 @@ public final class ThrownBlock extends Projectile {
         if(holderId()>=0){
             var entity=level().getEntity(holderId());
             if(entity instanceof Player p&&p.isAlive()&&!p.isSpectator()&&!p.isPassenger()&&(level().isClientSide||getOwner()==p)){
+                BlockThrowSystem.trackHeld(p,this);
                 setPos(anchor(p));setDeltaMovement(Vec3.ZERO);
                 if(!level().isClientSide&&p instanceof ServerPlayer server){
                     if(!BlockThrowSystem.canUse(server)){drop();return;}

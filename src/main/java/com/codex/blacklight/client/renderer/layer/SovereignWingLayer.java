@@ -52,6 +52,7 @@ public final class SovereignWingLayer extends RenderLayer<AbstractClientPlayer,P
         // not the attachment/model, so a downstroke still pushes down in that pose.
         var strokeAxis=SovereignWingMotion.strokeAxis(chest.getUnnormalizedRotation(new Quaternionf()));
         model.prepare(wingPose,strokeAxis,deployment,air,flight.foldVariant());
+        model.prepareRender(stack);
         model.render(stack,buffer.getBuffer(RenderType.entityCutoutNoCull(COLOR)),light);
         model.render(stack,buffer.getBuffer(RenderType.eyes(GLOW)),LightTexture.FULL_BRIGHT);
         if(airborne&&deployment>.95F)com.codex.blacklight.client.renderer.WingFlightEffects.capture(p,stack,model,partial);

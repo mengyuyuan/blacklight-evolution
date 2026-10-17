@@ -23,7 +23,7 @@ public final class SovereignWingModel {
     private final Map<String,Bone> bones=new LinkedHashMap<>();
     private final Map<String,List<Vector3f>> roots=new HashMap<>();
     private final List<Vertex> mesh=new ArrayList<>();
-    private float[] prepared;
+    private float[] prepared, viewPrepared;
     private static final int[][] FACES={{0,3,2,1},{4,5,6,7},{0,4,7,3},{1,2,6,5},{0,1,5,4},{3,7,6,2}};
     private static final String[] DIRECTIONS={"north","south","west","east","down","up"};
     public SovereignWingModel(){
@@ -88,7 +88,7 @@ public final class SovereignWingModel {
                         mesh.add(new Vertex(point.x,point.y,point.z,(u0+(u1-u0)*fu)/256,(v1-(v1-v0)*fv)/256,n.x,n.y,n.z,first,second,blend));}
                 }
             }
-            prepared=new float[mesh.size()*6];
+            prepared=new float[mesh.size()*6];viewPrepared=new float[prepared.length];
         }catch(Exception ex){throw new IllegalStateException("Could not load Sovereign Wings",ex);}
     }
     private void addSurface(JsonObject element){
@@ -170,11 +170,21 @@ public final class SovereignWingModel {
         }
         return points.toArray(Vector3f[]::new);
     }
+    /** Same camera-space surface for both passes; do not allocate vectors per emitted vertex. */
+    public void prepareRender(PoseStack stack){
+        var pose=stack.last();var p=new Vector3f();var n=new Vector3f();
+        for(int at=0;at<prepared.length;at+=6){
+            pose.pose().transformPosition(prepared[at],prepared[at+1],prepared[at+2],p);
+            pose.transformNormal(prepared[at+3],prepared[at+4],prepared[at+5],n);
+            viewPrepared[at]=p.x;viewPrepared[at+1]=p.y;viewPrepared[at+2]=p.z;
+            viewPrepared[at+3]=n.x;viewPrepared[at+4]=n.y;viewPrepared[at+5]=n.z;
+        }
+    }
     public void render(PoseStack stack,VertexConsumer output,int light){
-        var pose=stack.last();int at=0;
+        int at=0;
         for(var v:mesh){
-            output.addVertex(pose,prepared[at],prepared[at+1],prepared[at+2]).setColor(255,255,255,255).setUv(v.u,v.v)
-                    .setOverlay(OverlayTexture.NO_OVERLAY).setLight(light).setNormal(pose,prepared[at+3],prepared[at+4],prepared[at+5]);at+=6;
+            output.addVertex(viewPrepared[at],viewPrepared[at+1],viewPrepared[at+2],-1,v.u,v.v,
+                    OverlayTexture.NO_OVERLAY,light,viewPrepared[at+3],viewPrepared[at+4],viewPrepared[at+5]);at+=6;
         }
     }
 }
