@@ -72,6 +72,7 @@ public final class PrototypeMovementSystem {
         }
         if (player.getData(ModAttachments.CONSUMING)&&com.codex.blacklight.combat.ConsumeVisual.blocksInput(player.getData(ModAttachments.GRAB_STAGE))) return;
         if(player.getData(ModAttachments.GRAB_STAGE)==com.codex.blacklight.combat.ConsumeVisual.THROW){jumpHeld=false;dashPressed=false;}
+        if(WingFlightSystem.eligible(player)&&!WeaponCombatSystem.busy(player)){WingFlightSystem.input(player,jumpHeld,forward,sideways,sprinting,detach);return;}
         MovementState movement = player.getData(ModAttachments.MOVEMENT_STATE);
         boolean wasJumpHeld = movement.jumpHeld();
         if(player.isInWater()&&!WaterRunning.onSurface(player)) {
@@ -121,7 +122,7 @@ public final class PrototypeMovementSystem {
     @SubscribeEvent
     public static void onPlayerTick(PlayerTickEvent.Post event) {
         if (!(event.getEntity() instanceof ServerPlayer player)) return;
-        if(com.codex.blacklight.power.BiomassSystem.active(player))return;
+        if(com.codex.blacklight.power.BiomassSystem.active(player)||WingFlightSystem.flying(player))return;
         if (player.getData(ModAttachments.CONSUMING)&&com.codex.blacklight.combat.ConsumeVisual.blocksInput(player.getData(ModAttachments.GRAB_STAGE))) return;
         MovementState movement = player.getData(ModAttachments.MOVEMENT_STATE);
         BlacklightState blacklight = player.getData(ModAttachments.PLAYER_STATE);
@@ -302,7 +303,7 @@ public final class PrototypeMovementSystem {
 
         // Prototype-style traversal gives an encountered wall priority over jump
         // charging, so sprinting into a facade never freezes at the wall.
-        boolean wallRunning = tickWallRun(player, movement, forward, upgradeMask);
+        boolean wallRunning = !WingFlightSystem.eligible(player)&&tickWallRun(player, movement, forward, upgradeMask);
         if (!wallRunning) tickChargedJump(player, movement);
         syncCharge(player,Math.max(movement.chargeTicks(),movement.wallTraversal().visualChargeTicks()));
         if (!wallRunning && movement.chargeTicks() > 0 && !movement.runningCharge()) {

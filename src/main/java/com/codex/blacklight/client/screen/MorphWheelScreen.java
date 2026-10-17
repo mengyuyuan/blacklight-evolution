@@ -44,7 +44,7 @@ public final class MorphWheelScreen extends Screen {
         var mesh=Tesselator.getInstance().begin(VertexFormat.Mode.TRIANGLES,DefaultVertexFormat.POSITION_COLOR);var matrix=g.pose().last().pose();
         for(int slot=0;slot<2;slot++){
             int color=!enabled(slot)?0xc8202228:selected==slot?0xef8c2638:0xdc292e36;
-            double middle=slot==0?Math.PI:0,span=Math.PI/2-.07;
+            double middle=-Math.PI/2+slot*Math.PI,span=Math.PI/2-.07;
             for(int j=0;j<32;j++){
                 double a=middle-span+2*span*j/32,b=middle-span+2*span*(j+1)/32;
                 float ax=(float)Math.cos(a),ay=(float)Math.sin(a),bx=(float)Math.cos(b),by=(float)Math.sin(b);
@@ -53,7 +53,7 @@ public final class MorphWheelScreen extends Screen {
             }
         }
         BufferUploader.drawWithShader(mesh.buildOrThrow());RenderSystem.enableCull();RenderSystem.disableBlend();
-        for(int slot=0;slot<2;slot++)g.drawCenteredString(font,label(slot),cx+(int)(outer*.72)*(slot==0?-1:1),cy-4,enabled(slot)?0xfff1e7e9:0xff88888d);
+        for(int slot=0;slot<2;slot++)g.drawCenteredString(font,label(slot),cx+(int)(Math.cos(-Math.PI/2+slot*Math.PI)*outer*.72),cy+(int)(Math.sin(-Math.PI/2+slot*Math.PI)*outer*.72)-4,enabled(slot)?0xfff1e7e9:0xff88888d);
         g.drawCenteredString(font,title,cx,cy-(int)outer-24,0xffff899a);
         g.drawCenteredString(font,binding.getTranslatedKeyMessage(),cx,cy-4,0xffeee4e6);
         String hint=BiomassSystem.state(minecraft.player).fatal()?"screen.blacklight.morph_fatal":!enabled(selected)?"screen.blacklight.morph_unavailable":"screen.blacklight.morph_hint";
@@ -71,7 +71,7 @@ public final class MorphWheelScreen extends Screen {
         onClose();
     }
     @Override public void onClose(){submitted=true;super.onClose();}
-    @Override public boolean mouseScrolled(double x,double y,double horizontal,double vertical){if(vertical==0)return false;selected=1-selected;return true;}
+    @Override public boolean mouseScrolled(double x,double y,double horizontal,double vertical){if(vertical==0)return false;selected=Math.floorMod(selected+(vertical>0?-1:1),2);return true;}
     @Override public boolean keyReleased(int key,int scan,int mods){if(binding.matches(key,scan)){confirm();return true;}return super.keyReleased(key,scan,mods);}
     @Override public boolean mouseReleased(double x,double y,int button){if(binding.matchesMouse(button)){confirm();return true;}return super.mouseReleased(x,y,button);}
     @Override public boolean mouseClicked(double x,double y,int button){if(button==1){onClose();return true;}return super.mouseClicked(x,y,button);}

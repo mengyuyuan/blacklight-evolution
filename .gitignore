@@ -62,3 +62,9 @@ __pycache__/
 /model-qa*/
 # Native game and unit-test logging is local runtime output.
 /logs/
+
+# Local wing iterations and generated previews; current authoring sources are explicit.
+/art/sovereign-wings/model-*/
+/art/sovereign-wings/*.png
+/art/sovereign-wings/*.glb
+/art/sovereign-wings/*.blend
