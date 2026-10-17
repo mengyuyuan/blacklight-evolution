@@ -8,6 +8,7 @@ import java.util.List;
 /** Tutorials describe existing server actions; opening a page never sends an action. */
 public record SkillTutorial(String family,String clip,PowerForm form,String instructionFamily,String... bindings) {
     public static SkillTutorial forSkill(String id) {
+        if(id.startsWith("wing_speed_"))return of("sovereign_wings","basic_glide_forward",PowerForm.NONE,"key.blacklight.cycle_form","key.jump","key.sneak","key.sprint","key.forward");
         if(id.equals("adaptation")||id.equals("tissue_regeneration")||id.equals("adaptation_percent"))return new SkillTutorial("health","basic_idle",PowerForm.NONE,id);
         if(id.equals("kinetic_reflection"))return of("shield","basic_run",PowerForm.NONE,"key.blacklight.defense");
         if(id.startsWith("slime_"))return new SkillTutorial("health","basic_idle",PowerForm.NONE,"slime");
@@ -20,6 +21,7 @@ public record SkillTutorial(String family,String clip,PowerForm form,String inst
         if(id.startsWith("vitality")||id.equals("regeneration"))return of("health","basic_idle",PowerForm.NONE);
         if(id.startsWith("reach_"))return of("reach","blade_cut",PowerForm.BLADE,"key.attack");
         return switch(id) {
+            case "sovereign_wings" -> of("sovereign_wings","basic_glide_forward",PowerForm.NONE,"key.blacklight.cycle_form","key.jump","key.sneak","key.sprint","key.forward");
             case "biomass" -> of("biomass","basic_idle",PowerForm.BIOMASS,"key.blacklight.disguise","key.forward");
             case "mode" -> of("mode","basic_idle",PowerForm.NONE,"key.blacklight.prototype_mode","key.blacklight.upgrades");
             case "grab","assimilation" -> of("consume","consume_normal_actor",PowerForm.NONE,"key.blacklight.grab","key.use","key.attack");

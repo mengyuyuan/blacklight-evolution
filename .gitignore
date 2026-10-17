@@ -71,3 +71,9 @@ __pycache__/
 
 # Local game launcher logs.
 /logs/
+
+# Local wing iterations and generated previews; current authoring sources are explicit.
+/art/sovereign-wings/model-*/
+/art/sovereign-wings/*.png
+/art/sovereign-wings/*.glb
+/art/sovereign-wings/*.blend

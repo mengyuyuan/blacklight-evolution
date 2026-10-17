@@ -201,5 +201,12 @@
     "duration_ms": 4500,
     "source": "original mechanic diagram: charged Musclemass block throw tiers",
     "sha256": "640abbbfa40e860252a4a24c88aa0fcf39c03f736367bc6435be913d7c0328b9"
+  },
+  "sovereign_wings": {
+    "file": "sovereign_wings.gif",
+    "frames": 160,
+    "duration_ms": 17000,
+    "source": "actual NeoForge 1.21.1 wings.11 integrated-client capture: continuous model-v15, independent back attachment, takeoff, cruise, acceleration, landing and retraction; original gameplay timing within each selected segment; current run frame inventory verified",
+    "sha256": "01b22118758008af42d1a1021154946f7202d39709f539438380c66bdedd5309"
   }
 }
