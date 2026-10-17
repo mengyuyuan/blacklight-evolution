@@ -73,3 +73,7 @@ existing visual documentation.
 
 The source pack explicitly permits use in personal and commercial projects. Attribution is
 not required, but is retained here to preserve provenance.
+
+## Weapon and defense audio (2026-10-17)
+
+Recorded source packs: StarNinjas sword sounds (CC0), artisticdude Swishes (CC0), and Philippe Groarke / Socapex combat sounds (CC BY-SA 3.0). Source URLs, archives and full upstream attribution are in `art/weapon-audio/`. Edited/mixed derivatives are distributed under CC BY-SA 3.0 separately from the code license. Packaged credits: `META-INF/licenses/blacklight-audio/`. See `docs/WEAPON_DEFENSE_AUDIO_ZH.md` for the 41 events / 123 variants and validation scope. No Prototype unpacked audio is added.

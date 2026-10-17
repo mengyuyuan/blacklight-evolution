@@ -19,7 +19,7 @@ public final class PowerWheelScreen extends Screen {
     private boolean submitted,utility,scrollSelection;
     private PowerForm heldForm;
     private int heldTicks;
-    public PowerWheelScreen(KeyMapping binding){super(Component.translatable("screen.blacklight.wheel"));this.binding=binding;}
+    public PowerWheelScreen(KeyMapping binding){super(Component.translatable("screen.blacklight.wheel"));this.binding=binding;com.codex.blacklight.client.ClientWeaponCombat.beginWeaponWheel();}
     @Override protected void init() {
         int buttonWidth=Math.min(140,(width-28)/2);
         addRenderableWidget(net.minecraft.client.gui.components.Button.builder(Component.translatable("screen.blacklight.wheel.weapons"), b->{utility=false;selected=-1;})
@@ -78,7 +78,7 @@ public final class PowerWheelScreen extends Screen {
     private void confirm(){
         if(!submitted&&selected>=0&&minecraft.player!=null){
             var form=PowerWheel.form(utility,selected);var state=com.codex.blacklight.registry.ModAttachments.getData(minecraft.player, ModAttachments.PLAYER_STATE);
-            if(form==PowerForm.NONE||state.hasUnlocked(form)){submitted=true;PacketDistributor.sendToServer(new PowerSelectPayload(form.ordinal(),form==heldForm&&heldTicks>=10));}
+            if(form==PowerForm.NONE||state.hasUnlocked(form)){submitted=true;com.codex.blacklight.client.ClientWeaponCombat.finishWeaponWheel(form);PacketDistributor.sendToServer(new PowerSelectPayload(form.ordinal(),form==heldForm&&heldTicks>=10));}
         }
         onClose();
     }

@@ -122,7 +122,7 @@ public final class ProjectileDefenseSystem {
         if(!fresh&&previous.braced()==braced&&strength<=previous.strength()*1.4F)return;
         ModAttachments.setData(p,ModAttachments.DEFENSE_IMPACT,new DefenseImpact(now,strength,(float)incoming.x,(float)incoming.y,(float)incoming.z,shield,(float)(point.x-p.getX()),(float)(point.y-p.getY()),(float)(point.z-p.getZ()),braced));
         // Successful deflections stand firm. Overloads use the existing reduced-damage knockback only.
-        if(fresh)p.level().playSound(null,point.x,point.y,point.z,SoundEvents.ANVIL_HIT,SoundSource.PLAYERS,
-                Math.min(.55F,.10F+strength*.25F),Math.max(.75F,1.9F-strength*.65F));
+        if(fresh)com.codex.blacklight.registry.ModWeaponSounds.defense(p,shield?PowerForm.SHIELD:PowerForm.ARMOR,
+                reflected?"deflect":"heavy",point,strength);
     }
 }

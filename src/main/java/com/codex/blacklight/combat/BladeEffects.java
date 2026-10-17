@@ -32,7 +32,7 @@ public final class BladeEffects {
             com.codex.blacklight.movement.LandingDebrisSystem.fragment(player.serverLevel(),ground.getLocation().add(0,.19,0),state,side.add(0,.26+Math.abs(i)*.025,0),.25F,12);
         }
         CombatEnvironmentEffects.disturbLooseItems(player,at,1.6,.2);
-        player.level().playSound(null,surface.getBlockPos(),SoundEvents.PLAYER_ATTACK_STRONG,SoundSource.PLAYERS,1,.6F);
+        com.codex.blacklight.registry.ModWeaponSounds.play(player,com.codex.blacklight.power.PowerForm.BLADE,"ground",at,1F,1F);
     }
     public static void hit(ServerPlayer player,LivingEntity target,WeaponMove move){
         boolean heavy=heavy(move);
@@ -54,7 +54,6 @@ public final class BladeEffects {
             var velocity=cut.scale(.12+player.getRandom().nextDouble()*.2).add(forward.scale(.04)).add(0,player.getRandom().nextDouble()*.1,0);
             player.serverLevel().sendParticles(metal?ParticleTypes.CRIT:(i%3==0?DARK:RED),point.x,point.y,point.z,0,velocity.x,velocity.y,velocity.z,1);
         }
-        player.level().playSound(null,target.blockPosition(),SoundEvents.PLAYER_ATTACK_SWEEP,SoundSource.PLAYERS,heavy?1.25F:.95F,heavy?.56F:.8F);
-        player.level().playSound(null,target.blockPosition(),metal?SoundEvents.ANVIL_HIT:SoundEvents.PLAYER_ATTACK_STRONG,SoundSource.PLAYERS,metal?.35F:.85F,heavy?.7F:.9F);
+        if(metal)player.level().playSound(null,target.blockPosition(),SoundEvents.ANVIL_HIT,SoundSource.PLAYERS,.18F,heavy?.7F:.9F);
     }
 }

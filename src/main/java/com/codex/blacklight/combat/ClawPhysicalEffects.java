@@ -36,8 +36,7 @@ public final class ClawPhysicalEffects {
                     point.x, point.y + Math.abs(i) * 0.055D, point.z,
                     2, 0.045D, 0.10D, 0.045D, 0.035D);
         }
-        level.playSound(null, player.blockPosition(), SoundEvents.PLAYER_ATTACK_SWEEP,
-                SoundSource.PLAYERS, 0.8F, 0.64F);
+        com.codex.blacklight.registry.ModWeaponSounds.play(player,com.codex.blacklight.power.PowerForm.CLAWS,"swing",player.position(),.75F,1F);
     }
 
     public static void onComboTargetHit(ServerPlayer player, LivingEntity target, boolean heavy) {
@@ -69,8 +68,7 @@ public final class ClawPhysicalEffects {
         level.sendParticles(ModParticles.BIOMASS_SLASH.get(),
                 center.x, center.y, center.z, heavy ? 2 : 1,
                 heavy ? 0.28D : 0.08D, 0.14D, heavy ? 0.28D : 0.08D, 0.015D);
-        level.playSound(null, player.blockPosition(), SoundEvents.PLAYER_ATTACK_SWEEP,
-                SoundSource.PLAYERS, heavy ? 1.1F : 0.86F, heavy ? 0.58F : 0.84F);
+        com.codex.blacklight.registry.ModWeaponSounds.play(player,com.codex.blacklight.power.PowerForm.CLAWS,"swing",player.position(),.75F,1F);
         if (hitCount > 0) {
             feedback(player, heavy ? PhysicalFeedbackPayload.Effect.CLAW_HEAVY
                             : PhysicalFeedbackPayload.Effect.CLAW_HIT,
@@ -87,8 +85,7 @@ public final class ClawPhysicalEffects {
                 16, 0.92D, 0.62D, 0.92D, 0.065D);
         level.sendParticles(ModParticles.BIOMASS_SLASH.get(), center.x, center.y, center.z,
                 3, 0.65D, 0.45D, 0.65D, 0.025D);
-        level.playSound(null, player.blockPosition(), SoundEvents.PLAYER_ATTACK_SWEEP,
-                SoundSource.PLAYERS, 1.15F, 0.56F);
+        com.codex.blacklight.registry.ModWeaponSounds.play(player,com.codex.blacklight.power.PowerForm.CLAWS,"swing",player.position(),.75F,1F);
         if (hitCount > 0) {
             feedback(player, PhysicalFeedbackPayload.Effect.CLAW_HEAVY,
                     Math.min(1.35F, 0.9F + hitCount * 0.1F));
