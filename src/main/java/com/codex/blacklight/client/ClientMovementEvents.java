@@ -63,6 +63,12 @@ public final class ClientMovementEvents {
 
     @SubscribeEvent(priority = net.neoforged.bus.api.EventPriority.LOWEST)
     public static void lockWeaponMovement(net.neoforged.neoforge.client.event.MovementInputUpdateEvent event) {
+        if(com.codex.blacklight.movement.WingFlightSystem.eligible(event.getEntity())){
+            var input=event.getInput();input.jumping=false;
+            if(Math.abs(input.forwardImpulse)>1e-5F||Math.abs(input.leftImpulse)>1e-5F)
+                event.getEntity().setYRot(cameraYaw(Minecraft.getInstance()));
+            return;
+        }
         beginWeaponMovementOwnership(event.getEntity());
         if(event.getEntity().getData(ModAttachments.WEAPON_VISUAL).spec()==null
                 && !pendingWeaponMovement(event.getEntity())) {
@@ -264,6 +270,10 @@ public final class ClientMovementEvents {
             lastCameraYaw = Float.NaN;
             resetClientWallRun();
             if (minecraft.player == null || minecraft.getConnection() == null) return;
+        }
+        if(ClientWingFlight.tick(minecraft)){
+            lastChargingAnimation=false;clientChargeTicks=0;JUMP_INPUT.reset();
+            releaseFinalChargedJumpPose(minecraft);resetClientWallRun();return;
         }
         // Hardware state and remapped KeyMappings share one input latch so visual
         // ownership does not lose releases during a combat or traversal action.
