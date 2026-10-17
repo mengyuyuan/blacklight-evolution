@@ -34,4 +34,4 @@ NeoForge 1.21.1，Java 21，i7-10870H / 16 GB RAM。隔离的单人测试世界�
 
 此前 NeoForge 隔离世界投掷验收通过：单块轻按、地形轻按、移动蓄力释放和取消。没有使用用户存档。Forge 未做对应的实际客户端投掷回归，未完成独立多人服务器、YSM／Epic Fight／光影组合验收。优化用自动测试夹具不进入发行 JAR。
 
-双平台最终构建结果和 PR 记录随本次提交补充；旧版 `INTEGRATION_AUDIT_20261017_ZH.md` 记录的是 integration.1，不代表本次性能实测。
+NeoForge 最终 `test assemble` 通过，411 项测试零失败、零跳过；252 个捆绑动作资源校验通过，发行 JAR 不包含测试夹具。Forge 最终验证结果在其适配 PR 中记录。跨版本跟踪：#55。旧版 `INTEGRATION_AUDIT_20261017_ZH.md` 记录的是 integration.1，不代表本次性能实测。
