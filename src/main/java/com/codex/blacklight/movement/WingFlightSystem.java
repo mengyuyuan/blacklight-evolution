@@ -21,6 +21,7 @@ public final class WingFlightSystem {
     public static boolean equipped(Player p){return UtilityPowerSystem.active(p,PowerForm.SOVEREIGN_WINGS)&&!BiomassSystem.active(p)&&!p.getData(ModAttachments.PLAYER_STATE).isDisguised()&&!com.codex.blacklight.disguise.DisguiseSystem.morphing(p);}
     public static boolean eligible(Player p){return equipped(p)&&!p.isPassenger()&&!p.isSpectator()&&!p.isInWater()&&!p.isInLava()&&!p.isFallFlying()&&!p.getAbilities().flying;}
     public static boolean flying(Player p){return eligible(p)&&p.getData(ModAttachments.WING_FLIGHT).flying();}
+    public static boolean consumeOwnsMovement(Player p){return p.getData(ModAttachments.CONSUMING)&&com.codex.blacklight.combat.ConsumeVisual.blocksInput(p.getData(ModAttachments.GRAB_STAGE));}
     public static boolean ownsTravel(Player p){return flying(p)&&p.getData(ModAttachments.WEAPON_VISUAL).spec()==null&&!p.getData(ModAttachments.CONSUMING);}
     public static int tier(Player p){return MovementUpgrade.wingTier(p.getData(ModAttachments.PLAYER_STATE).getMovementUpgradeMask());}
     public static void acceptedMotion(ServerPlayer p){var c=INPUTS.get(p);if(c!=null)c.lastMotion=p.level().getGameTime();}
@@ -78,7 +79,7 @@ public final class WingFlightSystem {
         if(!eligible(p)){stop(p);return;}
         long now=p.level().getGameTime();var s=p.getData(ModAttachments.WING_FLIGHT);
         var c=INPUTS.get(p);var move=p.getData(ModAttachments.MOVEMENT_STATE);
-        if(com.codex.blacklight.combat.WeaponCombatSystem.busy(p)){
+        if(com.codex.blacklight.combat.WeaponCombatSystem.busy(p)||consumeOwnsMovement(p)){
             if(c!=null){c.launch=false;c.lastPosition=p.position();}return;
         }
         if(c!=null){
