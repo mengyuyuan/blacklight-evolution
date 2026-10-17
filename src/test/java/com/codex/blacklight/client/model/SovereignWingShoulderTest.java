@@ -42,7 +42,8 @@ class SovereignWingShoulderTest {
         for(int order=0;order<2;order++)for(float air:new float[]{0,.5F,1})for(int step=0;step<12;step++) {
             var motion=SovereignWingMotion.sample(step/12.,1,air,1,1,.5F,1,.5F,0);
             model.prepare(motion,new Vector3f(0,0,1),1,air,order);
-            var drawn=new Vertices();model.render(new PoseStack(),drawn,0);
+            var stack=new PoseStack();model.prepareRender(stack);
+            var drawn=new Vertices();model.render(stack,drawn,0);
             if(rest==null)rest=drawn;
             for(int index:caps)assertTrue(rest.points.get(index).distance(drawn.points.get(index))<.00001F,"Shoulder vertex moved: "+index);
             for(int i=0;i<drawn.points.size();i+=24)wingTravel=Math.max(wingTravel,rest.points.get(i).distance(drawn.points.get(i)));
