@@ -1,6 +1,7 @@
 package com.codex.blacklight.animation;
 
 import org.joml.Matrix4f;
+import org.joml.Vector3f;
 
 /** Distance-driven feet with the authored upper body kept in the same grip space. */
 public final class CarryPoseLayer {
@@ -10,9 +11,10 @@ public final class CarryPoseLayer {
         if (weight <= 0) return action.copy();
         var skeleton = BlacklightSkeleton.get();
         var result = BlacklightPose.interpolatePose(action, stride, Math.min(1, weight));
-        // Torso is the common parent of the head, shoulders, hands and tools.
-        // Rebase it after replacing the root so neither palm drifts off its cargo.
+        // Keep the torso anchored to the moving pelvis. Preserving the action's
+        // absolute torso position here used to detach it from the walking legs.
         var torso = skeleton.torso;
+        var anchor = skeleton.getBoundTransformFor(result, torso).getTranslation(new Vector3f());
         for (var bone : skeleton.bones()) {
             var ancestor = bone;
             while (ancestor != null && ancestor != torso) ancestor = ancestor.parent();
@@ -23,8 +25,8 @@ public final class CarryPoseLayer {
             }
         }
         var parent = skeleton.getBoundTransformFor(result, torso.parent());
-        var local = new Matrix4f(parent).mul(torso.getLocalTransform()).invert()
-                .mul(skeleton.getBoundTransformFor(action, torso));
+        var attached = skeleton.getBoundTransformFor(action, torso).setTranslation(anchor);
+        var local = new Matrix4f(parent).mul(torso.getLocalTransform()).invert().mul(attached);
         result.getJointTransformData().put(torso.getName(), BoneTransform.fromMatrix(local));
         return result;
     }

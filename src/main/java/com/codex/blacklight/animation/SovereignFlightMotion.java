@@ -12,8 +12,21 @@ public final class SovereignFlightMotion {
         pose.orElseEmpty("Root").rotation().premul(new org.joml.Quaternionf().rotationZ((float)Math.toRadians(roll)));
         // Climbing tilts the actor as one frame; it must not hinge the shoulder
         // attachment separately from the torso or flap the player's upper body.
-        pose.orElseEmpty("Root").rotation().rotateX((float)Math.toRadians(-vertical*5));
+        pose.orElseEmpty("Root").rotation().rotateX((float)Math.toRadians(vertical*5));
         return pose;
+    }
+    /** Signed climb angle of actual travel, in degrees; stationary hover has no heading. */
+    public static float pathPitch(double horizontal,double vertical) {
+        if(!Double.isFinite(horizontal)||!Double.isFinite(vertical)||horizontal<0
+                ||Math.hypot(horizontal,vertical)<.04)return 0;
+        return (float)Math.max(-80,Math.min(80,Math.toDegrees(Math.atan2(vertical,horizontal))));
+    }
+    /** Rotate the entire flight frame so the chest, attachments and legs climb together. */
+    public static void followFlightPath(BlacklightPose pose,float pitch,float speed,float forward,float vertical) {
+        float travel=smooth(Math.max(0,Math.min(1,speed/.52F)))*Math.max(0,Math.min(1,forward));
+        // Replace the small hover lift with real path pitch as forward flight takes over.
+        float degrees=(pitch-vertical*5)*travel;
+        pose.orElseEmpty("Root").rotation().premul(new org.joml.Quaternionf().rotationX((float)Math.toRadians(degrees)));
     }
     /** Small muscular response to the actual wing stroke, never camera/entity movement. */
     public static void followWingbeat(BlacklightPose pose,SovereignWingMotion.Pose wings,float weight) {

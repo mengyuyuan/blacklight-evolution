@@ -16,10 +16,10 @@ public final class BlacklightSkeleton {
         private final String name;
         private final int id;
         private final Bone parent;
-        private final Matrix4f local;
+        private final Matrix4f local, inverseLocal;
         private final List<Bone> children = new ArrayList<>();
         private Bone(String name, int id, Bone parent, Matrix4f local) {
-            this.name = name; this.id = id; this.parent = parent; this.local = new Matrix4f(local);
+            this.name = name; this.id = id; this.parent = parent; this.local = new Matrix4f(local); this.inverseLocal = new Matrix4f(local).invert();
         }
         public String getName() { return name; }
         public int getId() { return id; }
@@ -72,7 +72,15 @@ public final class BlacklightSkeleton {
     }
     public Matrix4f[] getPoseMatrices(BlacklightPose pose) {
         var result = new Matrix4f[size()];
-        for (var bone : bones.values()) result[bone.id] = getBoundTransformFor(pose, bone);
+        // read() inserts parents before children; evaluate each chain link exactly once.
+        var scratch = new Matrix4f();
+        for (var bone : bones.values()) {
+            var matrix = bone.parent == null ? new Matrix4f() : new Matrix4f(result[bone.parent.id]);
+            matrix.mul(bone.local);
+            var delta = pose.get(bone.name);
+            if (delta != null) matrix.mul(scratch.translationRotateScale(delta.translation(), delta.rotation(), delta.scale()));
+            result[bone.id] = matrix;
+        }
         return result;
     }
     public BlacklightPose localPose(MatrixMotionClip clip, float seconds, boolean loop) {
@@ -82,7 +90,7 @@ public final class BlacklightSkeleton {
             var bone = searchJointByName(name); if (bone == null) continue;
             var authored = clip.sample(name, seconds, loop);
             if (bone.parent == null) authored = new Matrix4f().rotateX(-(float)Math.PI / 2).mul(authored);
-            var delta = new Matrix4f(bone.local).invert().mul(authored);
+            var delta = new Matrix4f(bone.inverseLocal).mul(authored);
             pose.getJointTransformData().put(name, BoneTransform.fromMatrix(delta));
         }
         return pose;

@@ -14,6 +14,15 @@ public final class ClientBlockThrowInput {
         if(action==ClawActionPayload.Action.BLOCK_THROW_RELEASE){ClientMovementEvents.sendAttackDirection(Minecraft.getInstance());ClientBlockThrowAim.update(true);}
         PacketDistributor.sendToServer(new ClawActionPayload(action));
     }
+    /** Use the callback edge itself: a short click may end before the next tick polls GLFW. */
+    public static boolean mouseEdge(int button,int action){
+        var mc=Minecraft.getInstance();
+        if(mc.player==null||BlockThrowSystem.held(mc.player)==null)return false;
+        boolean attack=SkillBindings.mouse(mc.options.keyAttack,button),use=SkillBindings.mouse(mc.options.keyUse,button);
+        if(!attack&&!use)return false;
+        boolean down=action==org.lwjgl.glfw.GLFW.GLFW_PRESS;
+        return poll(attack?down:SkillBindings.down(mc.options.keyAttack),use?down:SkillBindings.down(mc.options.keyUse));
+    }
     public static boolean poll(boolean left,boolean right){
         var mc=Minecraft.getInstance();
         if(owner!=mc.player){owner=mc.player;blockId=-1;charging=false;previousLeft=left;previousRight=right;}
@@ -30,7 +39,12 @@ public final class ClientBlockThrowInput {
         else if(!right){
             if(left&&!previousLeft&&!block.throwing()){send(ClawActionPayload.Action.BLOCK_THROW_START);charging=true;sentAt=mc.player.tickCount;}
             else if(left&&charging&&mc.player.tickCount-sentAt>=10){send(ClawActionPayload.Action.BLOCK_THROW_START);sentAt=mc.player.tickCount;}
-            if(!left&&previousLeft&&charging){send(ClawActionPayload.Action.BLOCK_THROW_RELEASE);charging=false;}
+            if(!left&&previousLeft&&charging){
+                // Renew before release so a stalled client cannot silently lose a valid throw.
+                // An expired server charge restarts at zero; it never grants an unearned bonus.
+                send(ClawActionPayload.Action.BLOCK_THROW_START);
+                send(ClawActionPayload.Action.BLOCK_THROW_RELEASE);charging=false;
+            }
         }
         previousLeft=left;previousRight=right;return true;
     }

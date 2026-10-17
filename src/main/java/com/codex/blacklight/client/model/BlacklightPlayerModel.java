@@ -29,6 +29,7 @@ public final class BlacklightPlayerModel extends PlayerModel<AbstractClientPlaye
     private boolean rightBiological,leftBiological;
     private AbstractClientPlayer renderedPlayer;
     private float renderPartial;
+    private final Vector3f vertexPoint=new Vector3f(), vertexOther=new Vector3f(), vertexPosition=new Vector3f(), vertexNormal=new Vector3f(), vertexFirstNormal=new Vector3f();
     public BlacklightPlayerModel(ModelPart root, boolean slim) {
         super(root, slim);
         var skeleton = PlayerMotionController.skeleton();
@@ -174,19 +175,24 @@ public final class BlacklightPlayerModel extends PlayerModel<AbstractClientPlaye
         }
     }
     private void vertex(SkinPiece piece,PoseStack stack,VertexConsumer out,int light,int overlay,int color,float[][] points,float nx,float ny,float nz,float u,float v,float textureU,float textureV) {
-        Vector3f p=new Vector3f(points[0]).lerp(new Vector3f(points[1]),u);
-        p.lerp(new Vector3f(points[3]).lerp(new Vector3f(points[2]),u),v);
+        Vector3f p=vertexPoint.set(points[0]).lerp(vertexOther.set(points[1]),u);
+        float bottomX=points[3][0]+(points[2][0]-points[3][0])*u;
+        float bottomY=points[3][1]+(points[2][1]-points[3][1])*u;
+        float bottomZ=points[3][2]+(points[2][2]-points[3][2])*u;
+        p.lerp(vertexOther.set(bottomX,bottomY,bottomZ),v);
         // Clothing inflation uses the base skin's weight, keeping copied layers attached.
         float modelY=piece.y+net.minecraft.util.Mth.clamp(p.y*16-piece.y,piece.from,piece.to);
         var weight=BlacklightSkinWeights.sample(piece.anatomy,modelY,piece.bone.equals("neck"));
         var skeleton=PlayerMotionController.skeleton();
         int first=skeleton.searchJointByName(weight.first()).getId(),second=skeleton.searchJointByName(weight.second()).getId();
         p.set(-p.x,1.501F-p.y,p.z);
-        var position=skinMatrices[first].transformPosition(new Vector3f(p)).lerp(skinMatrices[second].transformPosition(new Vector3f(p)),weight.secondWeight());
-        var firstNormal=skinNormals[first].transform(new Vector3f(-nx,-ny,nz));
-        var normal=new Vector3f(firstNormal).lerp(skinNormals[second].transform(new Vector3f(-nx,-ny,nz)),weight.secondWeight());
+        var position=skinMatrices[first].transformPosition(vertexPosition.set(p)).lerp(skinMatrices[second].transformPosition(vertexOther.set(p)),weight.secondWeight());
+        var firstNormal=skinNormals[first].transform(vertexFirstNormal.set(-nx,-ny,nz));
+        var normal=vertexNormal.set(firstNormal).lerp(skinNormals[second].transform(vertexOther.set(-nx,-ny,nz)),weight.secondWeight());
         if(normal.lengthSquared()<1e-8F)normal.set(firstNormal);
         normal.normalize();
+        stack.last().pose().transformPosition(position);
+        stack.last().normal().transform(normal);
         out.vertex((stack.last()).pose(),position.x,position.y,position.z).color(color).uv(textureU/64,textureV/64).overlayCoords(overlay).uv2(light).normal((stack.last()).normal(),normal.x,normal.y,normal.z).endVertex();
     }
 }
