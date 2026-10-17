@@ -48,6 +48,12 @@ public final class PrototypeChaseCamera {
         if(previousPlayer!=mc.player||!(wasOwned||inputSeeded))return mc.gameRenderer.getMainCamera().getYRot();
         return !orbit.manual()&&lastOffset!=null&&filmFrame==null?lastYaw:orbit.controlYaw();
     }
+    /** Flight uses the same unshaken orbit pitch as mouse aiming, even between mouse events. */
+    public static float controlPitch() {
+        var mc=Minecraft.getInstance();
+        if(previousPlayer!=mc.player||!(wasOwned||inputSeeded))return mc.gameRenderer.getMainCamera().getXRot();
+        return !orbit.manual()&&lastOffset!=null&&filmFrame==null?lastPitch:orbit.controlPitch();
+    }
     public static boolean mouse(double x,double y) {
         if(!ownsView()) {
             // Seed the external owner BEFORE its first mouse delta, not after it.
