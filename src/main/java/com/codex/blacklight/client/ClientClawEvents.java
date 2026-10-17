@@ -207,6 +207,9 @@ public final class ClientClawEvents {
                     .anyMatch(key->SkillBindings.mouse(key,event.getButton()));
             if(mapped){handleKeyPress(minecraft,key->SkillBindings.mouse(key,event.getButton()));event.setCanceled(true);return;}
         }
+        if(ClientBlockThrowInput.mouseEdge(event.getButton(),event.getAction())){
+            event.setCanceled(true);return;
+        }
         var state = com.codex.blacklight.registry.ModAttachments.getData(minecraft.player, ModAttachments.PLAYER_STATE);
         if(ClientWeaponCombat.active()&&(SkillBindings.mouse(minecraft.options.keyAttack,event.getButton())||SkillBindings.mouse(minecraft.options.keyUse,event.getButton()))){
             event.setCanceled(true);ClientWeaponCombat.poll();return;

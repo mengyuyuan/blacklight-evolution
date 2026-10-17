@@ -17,12 +17,21 @@ class GroundGaitPoseTest {
  }
  @Test void armorWalkingSlowsShortStepsWithoutChangingSprintOrStoppingClock() {
   double nominal=GroundGaitPose.nominal("basic_walk",MotionLibrary.nominalSpeed("basic_walk"),1,true);
-  var clock=new LocomotionClock();clock.commit(0,"basic_walk",1.2F,true,false,0,nominal,1.65);
-  for(int t=1;t<=20;t++)clock.commit(t,"basic_walk",1.2F,true,true,.16,nominal,1.65);
-  assertEquals(1.6,clock.current(),.0001);
-  double previous=clock.current();clock.commit(21,"basic_walk",1.2F,true,true,0,nominal,1.65);assertEquals(previous,clock.current());
+  double rate=GroundGaitPose.rateLimit("basic_walk",true);
+  var clock=new LocomotionClock();clock.commit(0,"basic_walk",1.2F,true,false,0,nominal,rate);
+  for(int t=1;t<=20;t++)clock.commit(t,"basic_walk",1.2F,true,true,.16,nominal,rate);
+  assertEquals(.16/.14,clock.current(),.0001);
+  double previous=clock.current();clock.commit(21,"basic_walk",1.2F,true,true,0,nominal,rate);assertEquals(previous,clock.current());
   assertEquals(.3,GroundGaitPose.nominal("basic_run",.3,1,true));
   assertEquals(.056,GroundGaitPose.nominal("basic_walk",.056,1,false));
+ }
+ @Test void armorWalkRetainsAuthoredKneeAndHipRotationsAcrossTheEntireCycle() {
+  for(int i=0;i<=240;i++) {
+   var pose=MotionLibrary.pose("basic_walk",MotionLibrary.duration("basic_walk")*i/240F,false);
+   var before=pose.copy();GroundGaitPose.apply(pose,"basic_walk",true);
+   for(String bone:new String[]{"Thigh_R","Thigh_L","Leg_R","Leg_L","Knee_R","Knee_L","Torso","Chest","Arm_R","Arm_L","Hand_R","Hand_L"})
+    assertEquals(before.get(bone).toMatrix(),pose.get(bone).toMatrix(),bone+"/"+i);
+  }
  }
  @Test void combatAndAirborneAuthoredOrientationsAreUntouched() {
   for(String key:new String[]{"basic_turn","basic_jump_running","basic_fall","basic_wall_run_up"}){
