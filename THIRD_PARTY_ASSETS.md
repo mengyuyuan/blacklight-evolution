@@ -1,19 +1,15 @@
 # Resource inventory and third-party assets
 
-Target platform of this maintenance fork: Minecraft 1.20.1 Forge. The author
-continues to maintain the upstream platform separately.
-
 ## Repository runtime profile
 
 At the author's request, the release audit extends standalone dev.7's previously local
 runtime profile in `art/motion-profile/`: 240 JSON motion files and 11 JSON-based
 `.data` files. It includes movement, combat, weapon and utility transformation,
-consume actor/victim choreography, armor growth, camera and HUD data. At initial import,
-the files were preserved byte-for-byte from the standalone development profile;
-subsequent project changes are recorded in Git and the current manifest.
-The 2026-10-13 addition contains 27 Devastator and Bulletdive release, charge,
-recovery, aiming and landing clips. Existing branch-specific armor data is retained;
-reference FX textures and source shaders are not added.
+consume actor/victim choreography, armor growth, camera and HUD data. The files
+retain their source provenance. The 2026-10-13 addition contains 27 Devastator
+and Bulletdive release, charge, recovery, aiming and landing clips, copied
+byte-for-byte from the tested dev.9 skill profile. Existing branch-specific armor
+data is retained; reference FX textures and source shaders are not added.
 `art/motion-profile-manifest.json` records every current profile file hash and byte count.
 
 The project uses Prototype as a design/animation reference. Existing source
@@ -98,7 +94,51 @@ conversion steps and project edits are documented in
   and continuous transitions. The original bat mesh and textures are not bundled.
 - Reproduction: `art/sovereign-wings/extract_bat_wingbeat.py` with the original
   `FlyingBat.glb` as input. This animation retains its CC BY 4.0 license.
-
 ## Weapon and defense audio (2026-10-17)
 
 Recorded source packs: StarNinjas sword sounds (CC0), artisticdude Swishes (CC0), and Philippe Groarke / Socapex combat sounds (CC BY-SA 3.0). Source URLs, archives and full upstream attribution are in `art/weapon-audio/`. Edited/mixed derivatives are distributed under CC BY-SA 3.0 separately from the code license. Packaged credits: `META-INF/licenses/blacklight-audio/`. See `docs/WEAPON_DEFENSE_AUDIO_ZH.md` for the 41 events / 123 variants and validation scope. No Prototype unpacked audio is added.
+
+
+### Hydra and Hunter continuous skins and motion
+
+`tools/author_connected_creatures.py` authors the runtime shared-vertex surfaces,
+smooth joint weights and pixel atlases. The older cuboid authoring scripts supply
+editable proportions and rig pivots; their flesh cubes are removed from the final
+Gecko geometry. Hydra neck/body and Hunter torso/limbs are connected skins. Teeth,
+and the paired mandibles remain separately articulated anatomical parts. The old
+capture strand is removed; capture uses the two articulated horns.
+The design uses first-Prototype creatures and generated concept sheets as visual
+references. Extracted commercial mesh or texture files are not embedded in these
+new skin assets.
+
+The animations are **not all authored from scratch**.
+`tools/retarget_creature_motion.py` adapts locally decoded Prototype 1 Hydra and
+Brawler animation rotations to the project rigs. Hydra idle/emerge/slam/retract/grab/toss
+and Hunter idle/walk/run/swipe retain source clip timing, with axis conversion,
+retargeted joints and removed horizontal root motion. Emergence/exit vertical
+motion is scaled to the authored body height. Exact clip names, input hashes and
+joint maps are recorded in `art/hydra/motion-retarget-provenance.json`.
+The carrying phases overlay `hyd_act_partitioned_grab` on `hyd_exit` and `hyd_enter`.
+`hyd_grab_concrete` supplies the pickup and `hyd_ped_toss` the release motion.
+The portal sequence, carrying socket, six-tick blends, and 3.1-second toss release
+are project gameplay adaptations, not an original-game dimension travel sequence.
+The player response combines the existing source-derived `reaction_body`,
+`reaction_fall` and `basic_fall` poses with newly authored bracing, asymmetric
+leg recoil, torso contact correction and hand IK. It is not a verified original
+Hydra receiver animation. Player transport uses a synchronized animation
+constraint, not Minecraft's riding or seated pose.
+Hydra feeding and combat damage
+windows are server-side adaptations, not a claim of verified original FIG events.
+Existing source-derived motion notices and licenses remain applicable.
+
+### Hunter rig calibration and player evade (2026-10-18)
+
+`tools/hunter_retarget.py` calibrates the authored rest axes to the decoded
+Brawler joints, corrects support height against Ball joints, and retains
+source-derived rotation/timing. `art/hunter/rig-calibration.json` records the
+rest-axis differences. These fixes do not change the source-motion lineage.
+`tools/export_dodge_motion.py` adapts `alex_loco_diveroll` (FIG owner 7080) to the
+independent player skeleton. `art/motion-profile/basic_dodge_roll.json` includes
+source hash and frame segments. The source's end frame 55 is clamped to the
+actual last frame 52. Six invulnerability ticks and MC displacement are gameplay
+adaptations, not verified original values.

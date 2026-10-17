@@ -193,6 +193,7 @@ public final class BlacklightPlayerModel extends PlayerModel<AbstractClientPlaye
         normal.normalize();
         stack.last().pose().transformPosition(position);
         stack.last().normal().transform(normal);
-        out.vertex((stack.last()).pose(),position.x,position.y,position.z).color(color).uv(textureU/64,textureV/64).overlayCoords(overlay).uv2(light).normal((stack.last()).normal(),normal.x,normal.y,normal.z).endVertex();
+        // Position and normal are already in the entity render frame.
+        out.vertex(position.x,position.y,position.z).color(color).uv(textureU/64,textureV/64).overlayCoords(overlay).uv2(light).normal(normal.x,normal.y,normal.z).endVertex();
     }
 }

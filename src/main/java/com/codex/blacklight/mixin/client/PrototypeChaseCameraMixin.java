@@ -14,7 +14,9 @@ public abstract class PrototypeChaseCameraMixin {
     @WrapMethod(method="setup")
     private void blacklight$finishCamera(BlockGetter level,Entity entity,boolean detached,
             boolean reverse,float partial,Operation<Void> original) {
-        original.call(level,entity,detached,reverse,partial);
+        boolean cinematic=com.codex.blacklight.client.camera.HydraCinematicCamera.update();
+        original.call(level,entity,cinematic||detached,cinematic?false:reverse,partial);
+        if(cinematic){com.codex.blacklight.client.camera.HydraCinematicCamera.apply((Camera)(Object)this);return;}
         PrototypeChaseCamera.apply((Camera)(Object)this,partial);
         com.codex.blacklight.client.ClientBiomass.camera((Camera)(Object)this,partial);
         com.codex.blacklight.client.BlockThrowCamera.apply((Camera)(Object)this,partial);

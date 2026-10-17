@@ -81,6 +81,10 @@
       "bytes": 233311,
       "sha256": "18aa4c909e506db7f1d9408391269d1e66bd038c7bfb430f1abab4bbb8087aa2"
     },
+    "basic_dodge_roll.json": {
+      "bytes": 180173,
+      "sha256": "043b287ceffcd7590d6f3df9bfafa578020d373f58beaf866731d8de4704f09d"
+    },
     "basic_fall.json": {
       "bytes": 199315,
       "sha256": "92e7c1f929289a589b253ebf25d8784e93cb2db9e52254f5c6744202ceb0bcc7"

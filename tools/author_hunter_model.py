@@ -54,11 +54,7 @@ def tile(w,h,kind,face,seed):
         for u in range(w):
             for v in range(h):
                 c=None
-                eye_col=2<=u<=4 or w-5<=u<=w-3
-                if v in (4,5) and eye_col:c=(29,21,19)
-                if v==3 and eye_col:c=(60,40,33)
-                if v==5 and u in (2,w-3):c=(154,98,45)
-                if v in (6,7,8) and u in (w//2-1,w//2):c=(75,49,38)
+                # Reference: continuous eyeless head shell, no eyes or human nose.
                 if v>=h-2 and 1<u<w-2:c=(40,21,20)
                 if c:put(x+u,y+v,c)
     if kind=='jaw' and face=='north':
@@ -101,11 +97,9 @@ for s in (-1,1):
 box('Neck bridge','head',(0,25,-9),(7,5,5),'back')
 box('Low bald head','head',(0,24,-12),(6,6,7),'head')
 box('Crown plane','head',(0,27,-11.5),(5,1,5),'back')
-box('Nasal bridge','head',(0,22.3,-15.7),(2,2,1),'nose')
 box('Dark mouth recess','head',(0,20.6,-14.4),(5,1,3),'mouth')
 box('Open lower jaw','jaw',(0,19.5,-13.3),(5,2,5),'jaw')
 for s in (-1,1):
-    box('Angled brow','head',(s*1.8,25.8,-15.7),(3,1,1),'brow',(0,0,s*-9))
     box('Cheek plane','head',(s*3,22,-13.8),(1,3,4),'head')
     box('Jaw hinge','jaw',(s*2.5,20,-11.5),(1,3,2),'jaw')
     for j in range(2):
@@ -118,8 +112,8 @@ for side,s in [('right',1),('left',-1)]:
     box(side+' biceps plane',arm,(s*10.1,20,-7.5),(3,7,1.2),'muscle',(5,0,s*15))
     box(side+' triceps plane',arm,(s*11,21,-1.5),(4,7,1.5),'back',(5,0,s*15))
     box(side+' elbow',fore,(s*12,14,-5),(4,4,5),'arm')
-    box(side+' long forearm',fore,(s*13,8.2,-8),(5,12,5),'arm',(25,0,s*9))
-    box(side+' forearm tendon',fore,(s*13,8.7,-10.3),(2,8,.8),'tendon',(25,0,s*9))
+    box(side+' long forearm',fore,(s*13,8.2,-8),(6,12,6),'hand',(25,0,s*9))
+    box(side+' forearm tendon',fore,(s*13,8.7,-10.3),(2,8,.8),'back',(25,0,s*9))
     box(side+' elbow cap',fore,(s*12,14,-7.4),(3,3,1),'back')
     box(side+' wrist',fore,(s*14,3,-11),(4,4,4),'hand')
     box(side+' broad palm',fore,(s*14,1.5,-13.6),(7,3,5),'hand')

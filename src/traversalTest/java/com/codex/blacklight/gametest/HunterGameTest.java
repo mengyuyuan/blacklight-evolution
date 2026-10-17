@@ -25,13 +25,13 @@ public final class HunterGameTest {
         z.setCustomName(Component.literal("conversion-check"));z.setHealth(10);z.setItemSlot(EquipmentSlot.MAINHAND,Items.IRON_SWORD.getDefaultInstance());
         var box=z.getBoundingBox().inflate(3);
         h.assertTrue(BlacklightInfectionSystem.infect(z,null),"infection must start");
-        float expectedHealth = 48 * z.getHealth() / z.getMaxHealth();
+        float expectedRatio = z.getHealth() / z.getMaxHealth();
         h.runAfterDelay(35,()->h.assertTrue(!z.isRemoved(),"must wait for infection animation"));
         h.runAfterDelay(65,()->{
-            var list=h.getLevel().getEntitiesOfClass(BlacklightHunter.class,box);
+            var list=h.getLevel().getEntitiesOfClass(com.codex.blacklight.entity.BlacklightInfectedHost.class,box);
             h.assertTrue(z.isRemoved() && list.size()==1,"must replace zombie exactly once");
             var hunter=list.get(0);
-            h.assertTrue(Math.abs(hunter.getHealth()-expectedHealth)<.01 && hunter.isPersistenceRequired(),"conversion must preserve health ratio and persistence");
+            h.assertTrue(Math.abs(hunter.getHealth()/hunter.getMaxHealth()-expectedRatio)<.01 && hunter.isPersistenceRequired(),"conversion must preserve health ratio and persistence");
             h.assertTrue(hunter.getMainHandItem().is(Items.IRON_SWORD) && hunter.getName().getString().equals("conversion-check"),"name and equipment must survive");
             h.assertTrue(BlacklightInfectionSystem.isInfected(hunter) && !hunter.hasEffect(ModEffects.BLACKLIGHT_INFECTION.get()),"new species is inherently infected, without buff");
             h.assertTrue(!BlacklightInfectionSystem.infect(hunter,null),"hunter cannot be reinfected");h.succeed();
@@ -46,7 +46,7 @@ public final class HunterGameTest {
     private static ServerPlayer player(GameTestHelper h) {
         var p=FakePlayerFactory.get(h.getLevel(),new GameProfile(UUID.randomUUID(),"consume-test"));
         p.setPos(h.absoluteVec(new Vec3(3,2,3)));p.setYRot(0);p.setXRot(0);p.setOnGround(true);p.tickCount=100;
-        var state=com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.PLAYER_STATE);state.infect();state.setPrototypeMode(true);com.codex.blacklight.registry.ModAttachments.setData(p, ModAttachments.PLAYER_STATE,state);p.setHealth(10);
+        var state=com.codex.blacklight.registry.ModAttachments.getData(p,ModAttachments.PLAYER_STATE);state.infect();state.setPrototypeMode(true);com.codex.blacklight.registry.ModAttachments.setData(p,ModAttachments.PLAYER_STATE,state);p.setHealth(10);
         return p;
     }
     private static BlacklightHunter victim(GameTestHelper h) {
@@ -54,59 +54,71 @@ public final class HunterGameTest {
     }
     @GameTest(template="wall_test", timeoutTicks=30)
     public static void consumptionClaimsAndPaysOnlyOnce(GameTestHelper h) {
-        var p=player(h);var target=victim(h);int biomass=com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.PLAYER_STATE).getBiomass();
+        var p=player(h);var target=victim(h);int biomass=com.codex.blacklight.registry.ModAttachments.getData(p,ModAttachments.PLAYER_STATE).getBiomass();
         ConsumeSystem.request(p);h.assertTrue(target.isBeingConsumed(),"weakened nearby target must be grabbed");
         var other=player(h);ConsumeSystem.request(other);
-        h.assertTrue(!com.codex.blacklight.registry.ModAttachments.getData(other, ModAttachments.CONSUMING),"second player cannot steal claim");
-        for(int i=0;i<com.codex.blacklight.combat.ConsumeVisual.captureDuration(com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.PLAYER_STATE).getActivePower());i++){p.tickCount++;ConsumeSystem.tick(new TickEvent.PlayerTickEvent(TickEvent.Phase.END,p));}
+        h.assertTrue(!com.codex.blacklight.registry.ModAttachments.getData(other,ModAttachments.CONSUMING),"second player cannot steal claim");
+        for(int i=0;i<com.codex.blacklight.combat.ConsumeVisual.captureDuration(com.codex.blacklight.registry.ModAttachments.getData(p,ModAttachments.PLAYER_STATE).getActivePower());i++){p.tickCount++;ConsumeSystem.tick(new TickEvent.PlayerTickEvent(TickEvent.Phase.END,p));}
         ConsumeSystem.consume(p);ConsumeSystem.consume(p);
-        for(int i=0;i<ConsumeSystem.DURATION-1;i++){p.tickCount++;ConsumeSystem.tick(new TickEvent.PlayerTickEvent(TickEvent.Phase.END,p));}
+        for(int i=0;i<com.codex.blacklight.combat.HunterConsume.COMPLETE_TICKS-1;i++){p.tickCount++;ConsumeSystem.tick(new TickEvent.PlayerTickEvent(TickEvent.Phase.END,p));}
         h.assertTrue(!target.isRemoved()&&p.getHealth()==10,"no early removal or reward");
         p.tickCount++;ConsumeSystem.tick(new TickEvent.PlayerTickEvent(TickEvent.Phase.END,p));ConsumeSystem.tick(new TickEvent.PlayerTickEvent(TickEvent.Phase.END,p));
-        h.assertTrue(target.isRemoved()&&p.getHealth()==18,"completed consumption removes victim and heals");
-        h.assertTrue(com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.PLAYER_STATE).getBiomass()==biomass+120 && com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.PLAYER_STATE).getEvolutionPoints()==30,"reward exactly once");
-        h.assertTrue(!com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.CONSUMING),"action lock must clear");h.succeed();
+        h.assertTrue(target.isConsumeRemains()&&p.getHealth()==18,"completed consumption removes victim and heals");
+        h.assertTrue(com.codex.blacklight.registry.ModAttachments.getData(p,ModAttachments.PLAYER_STATE).getBiomass()==biomass+120 && com.codex.blacklight.registry.ModAttachments.getData(p,ModAttachments.PLAYER_STATE).getEvolutionPoints()==30,"reward exactly once");
+        h.assertTrue(!com.codex.blacklight.registry.ModAttachments.getData(p,ModAttachments.CONSUMING),"action lock must clear");h.succeed();
     }
     @GameTest(template="wall_test", timeoutTicks=30)
     public static void healthyFarAndInterruptedTargetsGiveNoReward(GameTestHelper h) {
         var p=player(h);var target=victim(h);target.setNoAi(false);target.setHealth(48);
-        ConsumeSystem.request(p);h.assertTrue(!target.isBeingConsumed(),"healthy hunter cannot be consumed");
+        ConsumeSystem.request(p);h.assertTrue(target.isBeingConsumed(),"RC16 hunter original health below 50 allows direct capture");
+        ConsumeSystem.cancel(p);
         target.setHealth(10);ConsumeSystem.request(p);h.assertTrue(target.isBeingConsumed(),"weak target can be claimed");
         var saved=new net.minecraft.nbt.CompoundTag();target.addAdditionalSaveData(saved);
         h.assertTrue(!saved.getBoolean("NoAI"),"transient grab must not persist disabled AI");
-        p.setPos(p.position().add(8,0,0));ConsumeSystem.tick(new TickEvent.PlayerTickEvent(TickEvent.Phase.END,p));
+        // Large-target mounting tolerates 14 blocks; interrupt outside that actual bound.
+        p.setPos(p.position().add(20,0,0));ConsumeSystem.tick(new TickEvent.PlayerTickEvent(TickEvent.Phase.END,p));
         h.assertTrue(target.isAlive()&&!target.isBeingConsumed()&&!target.isNoAi(),"interruption must release AI");
         ConsumeSystem.request(p);h.assertTrue(!target.isBeingConsumed(),"cannot consume across distance");
-        h.assertTrue(p.getHealth()==10&&com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.PLAYER_STATE).getEvolutionPoints()==0,"interruption gives no reward");h.succeed();
+        h.assertTrue(p.getHealth()==10&&com.codex.blacklight.registry.ModAttachments.getData(p,ModAttachments.PLAYER_STATE).getEvolutionPoints()==0,"interruption gives no reward");h.succeed();
     }
 
     @GameTest(template="wall_test", timeoutTicks=60)
     public static void heavySwipeHasOneServerImpact(GameTestHelper h) {
         for(int x=1;x<8;x++)for(int z=1;z<8;z++)h.setBlock(x,1,z,net.minecraft.world.level.block.Blocks.STONE);
         var hunter=h.spawn(ModEntities.BLACKLIGHT_HUNTER.get(),3,2,3);
-        var victim=h.spawn(EntityType.VILLAGER,3,2,4);victim.setNoAi(true);hunter.setTarget(victim);
+        var victim=h.spawn(EntityType.VILLAGER,3,2,4);victim.setNoAi(true);
+        hunter.getAttribute(net.minecraft.world.entity.ai.attributes.Attributes.FOLLOW_RANGE).setBaseValue(3);
+        var hits=new java.util.concurrent.atomic.AtomicInteger();var total=new java.util.concurrent.atomic.AtomicReference<Float>(0F);
+        java.util.function.Consumer<net.minecraftforge.event.entity.living.LivingDamageEvent> listener=e->{
+            if(e.getEntity()==victim&&e.getSource().getEntity()==hunter&&e.getAmount()>0){hits.incrementAndGet();total.set(total.get()+e.getAmount());}
+        };
+        net.minecraftforge.common.MinecraftForge.EVENT_BUS.addListener(listener);
+        hunter.setTarget(victim);h.assertTrue(hunter.beginAttack(com.codex.blacklight.combat.CreatureAttack.SWIPE,victim),"explicit swipe starts");
         h.runAfterDelay(30,()->{
-            h.assertTrue(victim.getHealth()==13,"heavy swipe must deal one 7-point hit, without the old infection tick double-hit: "+victim.getHealth());
+            net.minecraftforge.common.MinecraftForge.EVENT_BUS.unregister(listener);
+            h.assertTrue(hits.get()==1&&Math.abs(total.get()-14)<.001,"one declared 14-point swipe, independent of subsequent infection HP rescaling: hits="+hits+" damage="+total);
             hunter.discard();victim.discard();h.succeed();
         });
     }
 
     @GameTest(template="wall_test", timeoutTicks=60)
-    public static void hunterAttackResistsInterruptionButRecoveryCanBePunished(GameTestHelper h){
+    public static void hunterLightStaggerIsBoundedAndHeavyControlStillWorks(GameTestHelper h){
         for(int x=1;x<8;x++)for(int z=1;z<8;z++)h.setBlock(x,1,z,net.minecraft.world.level.block.Blocks.STONE);
         var hunter=h.spawn(ModEntities.BLACKLIGHT_HUNTER.get(),3,2,3);
-        var victim=h.spawn(EntityType.VILLAGER,3,2,4);victim.setNoAi(true);hunter.setTarget(victim);var p=player(h);
+        var victim=h.spawn(EntityType.VILLAGER,3,2,4);victim.setNoAi(true);var p=player(h);
+        h.assertTrue(hunter.beginAttack(com.codex.blacklight.combat.CreatureAttack.SWIPE,victim),"hunter begins committed attack");
         h.runAfterDelay(5,()->{
-            h.assertTrue(hunter.committedAttack(),"hunter entered its telegraphed swipe");
             com.codex.blacklight.combat.WeaponImpact.apply(p,hunter,com.codex.blacklight.combat.WeaponMove.CLAW_AUTO1,new Vec3(0,0,1),false);
-            h.assertTrue(hunter.committedAttack()&&!com.codex.blacklight.combat.ImpactControl.stunned(hunter),"light hit does not erase committed hunter attack");
+            h.assertTrue(com.codex.blacklight.combat.ImpactControl.stunned(hunter),"first light hit gets the bounded stagger");
         });
-        h.runAfterDelay(30,()->{
-            h.assertTrue(!hunter.committedAttack(),"attack enters recovery before next swing");
+        h.runAfterDelay(17,()->{
+            h.assertTrue(!com.codex.blacklight.combat.ImpactControl.stunned(hunter),"short light stagger recovers");
+            com.codex.blacklight.combat.WeaponImpact.apply(p,hunter,com.codex.blacklight.combat.WeaponMove.CLAW_AUTO1,new Vec3(0,0,1),false);
+            h.assertTrue(!com.codex.blacklight.combat.ImpactControl.stunned(hunter),"repeated light hits cannot permanently stun-lock the hunter");
             com.codex.blacklight.combat.WeaponImpact.apply(p,hunter,com.codex.blacklight.combat.WeaponMove.MUSCLE_UPPERCUT,new Vec3(0,0,1),false);
-            h.assertTrue(com.codex.blacklight.combat.ImpactControl.stunned(hunter),"recovery can be punished with launch");
+            h.assertTrue(com.codex.blacklight.combat.ImpactControl.stunned(hunter),"heavy launch still interrupts within the light-hit cooldown");
         });
-        h.runAfterDelay(35,()->{h.assertTrue(!hunter.committedAttack(),"stunned hunter cannot start a custom tick attack");hunter.discard();victim.discard();h.succeed();});
+        h.runAfterDelay(20,()->{h.assertTrue(!hunter.committedAttack(),"stunned hunter cannot restart an attack");hunter.discard();victim.discard();h.succeed();});
     }
 
     @GameTest(template="wall_test", timeoutTicks=30)
@@ -117,7 +129,9 @@ public final class HunterGameTest {
         var restored=ModEntities.BLACKLIGHT_HUNTER.get().create(h.getLevel());restored.load(tag);
         h.assertTrue(!restored.isBeingConsumed()&&!restored.isNoAi(),"reload clears transient capture and restores original AI");
         h.assertTrue(target.hurt(target.damageSources().generic(),1),"real damage must reach the victim");
-        h.assertTrue(!target.isBeingConsumed()&&!target.isNoAi()&&!com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.CONSUMING),"damage must cancel capture immediately");
-        h.assertTrue(com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.PLAYER_STATE).getEvolutionPoints()==0,"interrupted consumption must not pay");h.succeed();
+        h.assertTrue(target.isBeingConsumed()&&com.codex.blacklight.registry.ModAttachments.getData(p,ModAttachments.CONSUMING),"RC49 nonlethal damage keeps the claim");
+        target.kill();p.tickCount++;ConsumeSystem.tick(new TickEvent.PlayerTickEvent(TickEvent.Phase.END,p));
+        h.assertTrue(!com.codex.blacklight.registry.ModAttachments.getData(p,ModAttachments.CONSUMING),"death releases capture without rewards");
+        h.assertTrue(com.codex.blacklight.registry.ModAttachments.getData(p,ModAttachments.PLAYER_STATE).getEvolutionPoints()==0,"interrupted consumption must not pay");h.succeed();
     }
 }

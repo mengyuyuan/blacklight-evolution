@@ -1,0 +1,31 @@
+{
+  "parent": "blacklight:hive_breaker",
+  "display": {
+    "icon": {
+      "item": "blacklight:living_hive_tissue"
+    },
+    "title": {
+      "translate": "advancement.blacklight.hydra_tissue"
+    },
+    "description": {
+      "translate": "advancement.blacklight.hydra_tissue.desc"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": false
+  },
+  "criteria": {
+    "tissue": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "blacklight:living_hive_tissue"
+            ]
+          }
+        ]
+      }
+    }
+  }
+}
