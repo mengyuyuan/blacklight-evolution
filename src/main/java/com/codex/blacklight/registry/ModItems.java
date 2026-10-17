@@ -26,6 +26,8 @@ public final class ModItems {
             "blacklight_hunter_spawn_egg", props -> new net.neoforged.neoforge.common.DeferredSpawnEggItem(
                     ModEntities.BLACKLIGHT_HUNTER, 0x242626, 0x9d302b, props), new Item.Properties());
 
+    public static final DeferredItem<com.codex.blacklight.item.HiveTissueItem> LIVING_HIVE_TISSUE = ITEMS.registerItem("living_hive_tissue",com.codex.blacklight.item.HiveTissueItem::new,new Item.Properties().stacksTo(16).rarity(Rarity.RARE));
+    public static final DeferredItem<net.neoforged.neoforge.common.DeferredSpawnEggItem> HYDRA_SPAWN_EGG = ITEMS.registerItem("blacklight_hydra_spawn_egg",p->new net.neoforged.neoforge.common.DeferredSpawnEggItem(ModEntities.BLACKLIGHT_HYDRA,0x361b22,0xcba886,p),new Item.Properties());
     public static final DeferredItem<BlockItem> HIVE_FLESH = ITEMS.registerSimpleBlockItem(ModBlocks.HIVE_FLESH);
     public static final DeferredItem<BlockItem> HIVE_CARAPACE = ITEMS.registerSimpleBlockItem(ModBlocks.HIVE_CARAPACE);
     public static final DeferredItem<BlockItem> HIVE_SAC = ITEMS.registerSimpleBlockItem(ModBlocks.HIVE_SAC);
@@ -53,6 +55,7 @@ public final class ModItems {
                     .displayItems((parameters, output) -> {
                         output.accept(BLACKWATCH_SOLDIER_SPAWN_EGG.get()); output.accept(BLACKWATCH_HEAVY_SPAWN_EGG.get()); output.accept(MILITARY_CIRCUIT.get()); output.accept(FIELD_SCANNER.get());
                         output.accept(BLACKLIGHT_SAMPLE.get()); output.accept(HUNTER_SPAWN_EGG.get());
+                        output.accept(LIVING_HIVE_TISSUE.get());output.accept(HYDRA_SPAWN_EGG.get());
                         output.accept(INFECTED_SOIL.get()); output.accept(INFECTED_STONE.get());
                         output.accept(TISSUE_FIBER.get()); output.accept(HIVE_FLESH.get());
                         output.accept(HIVE_CARAPACE.get()); output.accept(HIVE_VEIN.get());

@@ -17,12 +17,14 @@
     "WaterRunningEntityMixin",
     "WaterRunningBlockMixin",
     "NativeRootMovementMixin",
+    "HydraTransportMixin",
     "ConsumeStunMixin",
     "BiomassPlayerMixin",
     "BiomassPreyMixin",
     "AdaptivePlayerDamageMixin",
     "WingFlightTravelMixin",
-    "WingFlightFloatingMixin"
+    "WingFlightFloatingMixin",
+    "HydraServerMovementMixin"
   ],
   "client": [
     "client.KeyboardInputMixin",

@@ -58,8 +58,11 @@ public final class ModEntities {
     private ModEntities() {
     }
 
+    public static final DeferredHolder<EntityType<?>,EntityType<com.codex.blacklight.entity.BlacklightHydra>> BLACKLIGHT_HYDRA=ENTITIES.register("blacklight_hydra",()->EntityType.Builder.<com.codex.blacklight.entity.BlacklightHydra>of(com.codex.blacklight.entity.BlacklightHydra::new,MobCategory.MONSTER).sized(2.4F,5.0F).clientTrackingRange(12).updateInterval(1).build("blacklight_hydra"));
+
     public static void register(IEventBus bus) {
         ENTITIES.register(bus);
+        bus.addListener((net.neoforged.neoforge.event.entity.EntityAttributeCreationEvent e)->e.put(BLACKLIGHT_HYDRA.get(),com.codex.blacklight.entity.BlacklightHydra.attributes().build()));
         bus.addListener((net.neoforged.neoforge.event.entity.EntityAttributeCreationEvent e)->e.put(BIOMASS_HUSK.get(),com.codex.blacklight.entity.BiomassHusk.attributes().build()));
         bus.addListener((net.neoforged.neoforge.event.entity.EntityAttributeCreationEvent event)->{
             event.put(BLACKWATCH_SOLDIER.get(),com.codex.blacklight.entity.BlackwatchSoldier.attributes(false).build());

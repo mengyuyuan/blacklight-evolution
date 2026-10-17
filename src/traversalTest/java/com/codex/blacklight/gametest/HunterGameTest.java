@@ -85,29 +85,39 @@ public final class HunterGameTest {
     public static void heavySwipeHasOneServerImpact(GameTestHelper h) {
         for(int x=1;x<8;x++)for(int z=1;z<8;z++)h.setBlock(x,1,z,net.minecraft.world.level.block.Blocks.STONE);
         var hunter=h.spawn(ModEntities.BLACKLIGHT_HUNTER.get(),3,2,3);
-        var victim=h.spawn(EntityType.VILLAGER,3,2,4);victim.setNoAi(true);hunter.setTarget(victim);
+        var victim=h.spawn(EntityType.VILLAGER,3,2,4);victim.setNoAi(true);
+        hunter.getAttribute(net.minecraft.world.entity.ai.attributes.Attributes.FOLLOW_RANGE).setBaseValue(3);
+        var hits=new java.util.concurrent.atomic.AtomicInteger();var total=new java.util.concurrent.atomic.AtomicReference<Float>(0F);
+        java.util.function.Consumer<net.neoforged.neoforge.event.entity.living.LivingDamageEvent.Post> listener=e->{
+            if(e.getEntity()==victim&&e.getSource().getEntity()==hunter&&e.getNewDamage()>0){hits.incrementAndGet();total.set(total.get()+e.getNewDamage());}
+        };
+        net.neoforged.neoforge.common.NeoForge.EVENT_BUS.addListener(listener);
+        hunter.setTarget(victim);h.assertTrue(hunter.beginAttack(com.codex.blacklight.combat.CreatureAttack.SWIPE,victim),"explicit swipe starts");
         h.runAfterDelay(30,()->{
-            h.assertTrue(victim.getHealth()==65,"heavy swipe must deal one 7-point hit, without the old infection tick double-hit: "+victim.getHealth());
+            net.neoforged.neoforge.common.NeoForge.EVENT_BUS.unregister(listener);
+            h.assertTrue(hits.get()==1&&Math.abs(total.get()-14)<.001,"one declared 14-point swipe, independent of subsequent infection HP rescaling: hits="+hits+" damage="+total);
             hunter.discard();victim.discard();h.succeed();
         });
     }
 
     @GameTest(template="wall_test", timeoutTicks=60)
-    public static void hunterAttackResistsInterruptionButRecoveryCanBePunished(GameTestHelper h){
+    public static void hunterLightStaggerIsBoundedAndHeavyControlStillWorks(GameTestHelper h){
         for(int x=1;x<8;x++)for(int z=1;z<8;z++)h.setBlock(x,1,z,net.minecraft.world.level.block.Blocks.STONE);
         var hunter=h.spawn(ModEntities.BLACKLIGHT_HUNTER.get(),3,2,3);
-        var victim=h.spawn(EntityType.VILLAGER,3,2,4);victim.setNoAi(true);hunter.setTarget(victim);var p=player(h);
+        var victim=h.spawn(EntityType.VILLAGER,3,2,4);victim.setNoAi(true);var p=player(h);
+        h.assertTrue(hunter.beginAttack(com.codex.blacklight.combat.CreatureAttack.SWIPE,victim),"hunter begins committed attack");
         h.runAfterDelay(5,()->{
-            h.assertTrue(hunter.committedAttack(),"hunter entered its telegraphed swipe");
             com.codex.blacklight.combat.WeaponImpact.apply(p,hunter,com.codex.blacklight.combat.WeaponMove.CLAW_AUTO1,new Vec3(0,0,1),false);
-            h.assertTrue(hunter.committedAttack()&&!com.codex.blacklight.combat.ImpactControl.stunned(hunter),"light hit does not erase committed hunter attack");
+            h.assertTrue(com.codex.blacklight.combat.ImpactControl.stunned(hunter),"first light hit gets the bounded stagger");
         });
-        h.runAfterDelay(30,()->{
-            h.assertTrue(!hunter.committedAttack(),"attack enters recovery before next swing");
+        h.runAfterDelay(17,()->{
+            h.assertTrue(!com.codex.blacklight.combat.ImpactControl.stunned(hunter),"short light stagger recovers");
+            com.codex.blacklight.combat.WeaponImpact.apply(p,hunter,com.codex.blacklight.combat.WeaponMove.CLAW_AUTO1,new Vec3(0,0,1),false);
+            h.assertTrue(!com.codex.blacklight.combat.ImpactControl.stunned(hunter),"repeated light hits cannot permanently stun-lock the hunter");
             com.codex.blacklight.combat.WeaponImpact.apply(p,hunter,com.codex.blacklight.combat.WeaponMove.MUSCLE_UPPERCUT,new Vec3(0,0,1),false);
-            h.assertTrue(com.codex.blacklight.combat.ImpactControl.stunned(hunter),"recovery can be punished with launch");
+            h.assertTrue(com.codex.blacklight.combat.ImpactControl.stunned(hunter),"heavy launch still interrupts within the light-hit cooldown");
         });
-        h.runAfterDelay(35,()->{h.assertTrue(!hunter.committedAttack(),"stunned hunter cannot start a custom tick attack");hunter.discard();victim.discard();h.succeed();});
+        h.runAfterDelay(20,()->{h.assertTrue(!hunter.committedAttack(),"stunned hunter cannot restart an attack");hunter.discard();victim.discard();h.succeed();});
     }
 
     @GameTest(template="wall_test", timeoutTicks=30)

@@ -173,7 +173,7 @@ public final class StandaloneCoreGameTest {
         h.succeed();
     }
     @GameTest(template="wall_test",timeoutTicks=100)
-    public static void wallRunRetainsUprightStrideAndWallPlaneClearance(GameTestHelper h) {
+    public static void wallRunStandsOnWallWithAuthoredStrideAndPlaneClearance(GameTestHelper h) {
         String run=com.codex.blacklight.movement.TraversalMotionSelector.wall(true,.55,0);
         String climb=com.codex.blacklight.movement.TraversalMotionSelector.wall(false,.14,0);
         h.assertTrue(run.equals("basic_wall_run_up")&&climb.equals("basic_wall_climb_up")&&!run.equals(climb),
@@ -185,19 +185,20 @@ public final class StandaloneCoreGameTest {
             var pose=MotionLibrary.pose(run,runClip.duration()*phase,false);
             var beforeHead=skeleton.getBoundTransformFor(pose,skeleton.head);
             var beforeRoot=skeleton.getBoundTransformFor(pose,skeleton.rootJoint);
-            double height=Math.hypot(beforeHead.m31()-beforeRoot.m31(),beforeHead.m32()-beforeRoot.m32());
+            var originalAxis=beforeHead.getTranslation(new org.joml.Vector3f()).sub(beforeRoot.getTranslation(new org.joml.Vector3f()));
             WallSurfacePose.orientRun(pose,skeleton,0,.55,.3F);
             var head=skeleton.getBoundTransformFor(pose,skeleton.head);
             var root=skeleton.getBoundTransformFor(pose,skeleton.rootJoint);
-            h.assertTrue(height>.6&&Math.abs(head.m31()-root.m31()-height)<.002
-                            &&Math.abs(head.m32()-root.m32())<.002&&Math.abs(root.m31()-beforeRoot.m31())<.002,
-                    "head remains above hips through the running cycle, not a horizontal plank: phase="+phase+" height="+(head.m31()-root.m31()));
+            var axis=head.getTranslation(new org.joml.Vector3f()).sub(root.getTranslation(new org.joml.Vector3f()));
+            h.assertTrue(axis.z/axis.length()>.72F&&Math.abs(axis.length()-originalAxis.length())<.002
+                            &&Math.abs(root.m31()-skeleton.rootJoint.getLocalTransform().m31())<.002,
+                    "wall-running torso stands away from the wall without stretching or sinking: phase="+phase);
             var stopped=MotionLibrary.pose(run,runClip.duration()*phase,false);
             WallSurfacePose.orientRun(stopped,skeleton,0,
                     WallSurfacePose.normalizeRunVertical(0,-.0784,true,false),.3F);
             var stoppedHead=skeleton.getBoundTransformFor(stopped,skeleton.head);
             var stoppedRoot=skeleton.getBoundTransformFor(stopped,skeleton.rootJoint);
-            h.assertTrue(stoppedHead.m31()-stoppedRoot.m31()>.6,
+            h.assertTrue(stoppedHead.m31()-stoppedRoot.m31()>0&&stoppedHead.m32()-stoppedRoot.m32()>.2,
                     "stopped gravity cannot turn the complete runtime RUN pose upside down: phase="+phase);
             var foot=skeleton.getBoundTransformFor(pose,skeleton.legR).transformPosition(new org.joml.Vector3f(0,.43F,0));
             if(firstFoot==null)firstFoot=new org.joml.Vector3f(foot);

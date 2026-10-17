@@ -12,6 +12,7 @@ public final class PrototypeModeCamera {
     private static final ModePerspective perspective=new ModePerspective();
     @SubscribeEvent public static void tick(ClientTickEvent.Post event){
         var mc=Minecraft.getInstance();var p=mc.player;
+        if(HydraCinematicCamera.active())return;
         var before=mc.options.getCameraType();
         var after=perspective.update(before,p!=null&&PrototypeModeSystem.isActive(p),mc.options.keyTogglePerspective.isDown());
         if(after!=before)mc.options.setCameraType(after);

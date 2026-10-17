@@ -58,6 +58,7 @@ public final class MotionLibrary {
             case LAND_LIGHT -> "basic_land_light";
             case LAND_HEAVY -> "basic_land_heavy";
             case LAND_DEVASTATING -> "basic_land_devastating";
+            case TACTICAL_HOP -> "basic_dodge_roll";
             default -> action.name().toLowerCase(java.util.Locale.ROOT);
         };
     }

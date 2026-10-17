@@ -127,11 +127,11 @@ public final class OrdinaryConsumeGameTest {
         h.succeed();
     }
     @GameTest(template="wall_test", timeoutTicks=30)
-    public static void petsConstructsAndMountedAnimalsAreExcluded(GameTestHelper h) {
+    public static void petsAndMountedAnimalsAreProtectedWithoutSpeciesWhitelist(GameTestHelper h) {
         var wolf=h.spawn(EntityType.WOLF,3,2,5);wolf.setTame(true,true);
         var golem=h.spawn(EntityType.IRON_GOLEM,5,2,5);var skeleton=h.spawn(EntityType.SKELETON,6,2,5);
         var cow=h.spawn(EntityType.COW,3,2,6);var chicken=h.spawn(EntityType.CHICKEN,3,2,6);chicken.startRiding(cow,true);
-        h.assertTrue(!ConsumeSystem.eligible(wolf)&&ConsumeSystem.eligible(golem)&&!ConsumeSystem.eligible(skeleton)
+        h.assertTrue(!ConsumeSystem.eligible(wolf)&&ConsumeSystem.eligible(golem)&&ConsumeSystem.eligible(skeleton)
                 &&!ConsumeSystem.eligible(cow)&&!ConsumeSystem.eligible(chicken),"protect pets and mounted pairs while accepting current consumable species");
         wolf.discard();golem.discard();skeleton.discard();chicken.discard();cow.discard();h.succeed();
     }

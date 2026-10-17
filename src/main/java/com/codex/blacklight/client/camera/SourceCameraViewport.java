@@ -24,6 +24,7 @@ public final class SourceCameraViewport {
     }
     @SubscribeEvent
     public static void fov(ViewportEvent.ComputeFov event) {
+        if(HydraCinematicCamera.active())return;
         var mc=Minecraft.getInstance();
         if(event.getCamera()!=mc.gameRenderer.getMainCamera())return;
         var p=mc.player;

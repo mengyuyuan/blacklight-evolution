@@ -151,6 +151,7 @@ public final class WingFlightEffects {
         p.level().playLocalSound(p.getX(),p.getY(),p.getZ(),SoundEvents.ENDER_DRAGON_FLAP,SoundSource.PLAYERS,volume,pitch,false);
     }
     @SubscribeEvent(priority=EventPriority.LOWEST) public static void fov(ViewportEvent.ComputeFov event){
+        if(com.codex.blacklight.client.camera.HydraCinematicCamera.active())return;
         var mc=Minecraft.getInstance();
         if(mc.player==null||mc.getCameraEntity()!=mc.player||mc.player.isScoping()||!WingFlightSystem.flying(mc.player))return;
         var v=WingFlightVisuals.sample(mc.player,(float)event.getPartialTick());

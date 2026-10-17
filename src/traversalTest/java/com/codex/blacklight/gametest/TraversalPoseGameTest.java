@@ -58,10 +58,11 @@ public final class TraversalPoseGameTest {
                     WallSurfacePose.orientRun(pose,armature,0,1,.3F);
                     var after=armature.getBoundTransformFor(pose,armature.searchJointByName("Head"));
                     var placedHip=armature.getBoundTransformFor(pose,armature.rootJoint);
-                    h.assertTrue(Math.abs(placedHip.m31()-hip.m31())<.002,"Wall run must preserve its hip height instead of moving the whole actor's origin: "+id);
-                    h.assertTrue(Math.abs(after.m31()-placedHip.m31()-Math.hypot(before.m31()-hip.m31(),before.m32()-hip.m32()))<.002,
-                            "Authored torso axis must point along wall-up: "+id);
-                    h.assertTrue(Math.abs(after.m32()-placedHip.m32())<.002,"Torso cannot form a plank away from the wall: "+id);
+                    var originalAxis=before.getTranslation(new org.joml.Vector3f()).sub(hip.getTranslation(new org.joml.Vector3f()));
+                    var axis=after.getTranslation(new org.joml.Vector3f()).sub(placedHip.getTranslation(new org.joml.Vector3f()));
+                    h.assertTrue(Math.abs(placedHip.m31()-armature.rootJoint.getLocalTransform().m31())<.002,"Wall-run height anchor cannot sink below the entry floor: "+id);
+                    h.assertTrue(axis.z/axis.length()>.72F,"Torso must stand away from the wall rather than retain the source clip's deep crouch: "+id);
+                    h.assertTrue(Math.abs(axis.length()-originalAxis.length())<.002,"Wall correction cannot stretch the torso: "+id);
                 }
                 WallSurfacePose.clearHead(pose,armature,.3F);
                 h.assertTrue(WallSurfacePose.headMinimumZ(pose,armature)>=-.296F,"Head skin crossed wall: "+id+" frame "+frame);
