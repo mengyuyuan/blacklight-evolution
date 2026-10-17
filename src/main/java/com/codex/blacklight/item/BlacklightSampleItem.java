@@ -1,9 +1,6 @@
 package com.codex.blacklight.item;
 
 import com.codex.blacklight.entity.BlacklightVirusVialEntity;
-import com.codex.blacklight.infection.BlacklightInfectionSystem;
-import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.item.UseAnim;
 import net.minecraft.network.chat.Component;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Position;
@@ -30,16 +27,6 @@ public final class BlacklightSampleItem extends Item implements ProjectileItem {
     @Override
     public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
         ItemStack stack = player.getItemInHand(hand);
-        if (!BlacklightInfectionSystem.isInfected(player)) {
-            player.startUsingItem(hand);
-            return InteractionResultHolder.consume(stack);
-        }
-        if (!player.isShiftKeyDown()) {
-            if (!level.isClientSide()) {
-                player.displayClientMessage(Component.translatable("message.blacklight.sample_already_infected"), true);
-            }
-            return InteractionResultHolder.fail(stack);
-        }
         level.playSound(null, player.getX(), player.getY(), player.getZ(),
                 SoundEvents.SPLASH_POTION_THROW, SoundSource.PLAYERS, 0.55F,
                 0.82F + level.getRandom().nextFloat() * 0.12F);
@@ -47,39 +34,13 @@ public final class BlacklightSampleItem extends Item implements ProjectileItem {
             BlacklightVirusVialEntity vial = new BlacklightVirusVialEntity(level, player);
             vial.setItem(stack);
             vial.shootFromRotation(player, player.getXRot(), player.getYRot(), -7.5F, 1.2F, 0.6F);
-            level.addFreshEntity(vial);
+            if (!level.addFreshEntity(vial)) return InteractionResultHolder.fail(stack);
         }
 
         player.awardStat(Stats.ITEM_USED.get(this));
         player.getCooldowns().addCooldown(this, 12);
         stack.consume(1, player);
         return InteractionResultHolder.sidedSuccess(stack, level.isClientSide());
-    }
-
-    @Override
-    public int getUseDuration(ItemStack stack, LivingEntity entity) {
-        return 40;
-    }
-
-    @Override
-    public UseAnim getUseAnimation(ItemStack stack) {
-        return UseAnim.DRINK;
-    }
-
-    @Override
-    public ItemStack finishUsingItem(ItemStack stack, Level level, LivingEntity entity) {
-        if (entity instanceof Player player && BlacklightInfectionSystem.awaken(player)) {
-            player.awardStat(Stats.ITEM_USED.get(this));
-            player.getCooldowns().addCooldown(this, 20);
-            stack.consume(1, player);
-            level.playSound(null, player.blockPosition(), SoundEvents.SCULK_CATALYST_BLOOM,
-                    SoundSource.PLAYERS, 1.0F, 0.6F);
-            if (level instanceof net.minecraft.server.level.ServerLevel server) {
-                server.sendParticles(net.minecraft.core.particles.ParticleTypes.CRIMSON_SPORE,
-                        player.getX(), player.getY() + 1, player.getZ(), 40, .4, .7, .4, .02);
-            }
-        }
-        return stack;
     }
 
     @Override
