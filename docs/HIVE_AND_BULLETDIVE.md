@@ -23,6 +23,8 @@ Potentia is a separate revival/reimagining, not the same implementation as TheTi
 
 Potentia beta 0.12.2 also ships required `thetitans:*` damage IDs which do not exist in its registry. They invalidate several vanilla damage tags. The Forge bridge makes only unresolved legacy element entries from that mod's own damage-tag resources optional. Valid entries, other packs, tag references, and removal flags are preserved. Installed tests verify that Bulletdive's armor, shield and enchantment bypass tags load again.
 
+TheTitansNeo 1.0.8 also lists two unregistered pig-zombie entity types in its undead tag. The NeoForge bridge makes only those missing element IDs from that mod's own entity-tag resources optional. Installed tests verify that vanilla undead, smite and inverted-healing tags remain available. Other packs and valid IDs are unchanged.
+
 The bridges are optional and do not add a runtime dependency. They do not set target health, discard live targets, bypass creative/admin invulnerability, or cancel third-party death events. Third-party binaries are test inputs only, not redistributed in Blacklight packages.
 
 ### Reproducing installed tests

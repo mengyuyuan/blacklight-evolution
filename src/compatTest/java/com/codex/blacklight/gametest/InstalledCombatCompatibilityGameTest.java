@@ -91,4 +91,11 @@ public final class InstalledCombatCompatibilityGameTest {
         h.assertTrue(!titan.isRemoved(),"damage must preserve native death sequence");
         titan.discard();h.succeed();
     }
+    @GameTest(template="wall_test",timeoutTicks=80,batch="compat_tags")
+    public static void installedTitanPreservesUndeadTags(GameTestHelper h) {
+        h.assertTrue(EntityType.ZOMBIE.is(net.minecraft.tags.EntityTypeTags.UNDEAD),"installed Titan invalidated vanilla undead tag");
+        h.assertTrue(EntityType.ZOMBIE.is(net.minecraft.tags.EntityTypeTags.SENSITIVE_TO_SMITE),"installed Titan invalidated smite tag");
+        h.assertTrue(EntityType.ZOMBIE.is(net.minecraft.tags.EntityTypeTags.INVERTED_HEALING_AND_HARM),"installed Titan invalidated healing inversion tag");
+        h.succeed();
+    }
 }
