@@ -69,6 +69,8 @@ public final class BlacklightPlayerModel extends PlayerModel<AbstractClientPlaye
         float partial=renderPartial;
         matrices=PlayerMotionController.skeleton().getPoseMatrices(BlacklightRenderPose.sample(player,partial));
         mercerFrame=MercerPlayerMesh.active(player)?MercerPlayerMesh.get().sample(player,partial,matrices):null;
+        var ysmFrame=com.codex.blacklight.client.compat.YsmAppearanceBridge.frame(player);
+        if(ysmFrame!=null)mercerFrame=ysmFrame;
         // Ordinary equipment layers copy ModelPart transforms. Project the same
         // authored pose into their native frame so equipment follows the body.
         project(head,"Head");project(hat,"Head");project(body,"Chest");project(jacket,"Chest");
