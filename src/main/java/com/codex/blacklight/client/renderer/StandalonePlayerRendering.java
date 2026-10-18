@@ -95,10 +95,10 @@ public final class StandalonePlayerRendering {
                 var renderer=RENDERERS.get(player.getModelName());
                 if(renderer!=null&&f<.99F){var stack=event.getPoseStack();var fragments=new BiomassShatterBuffers(player,stack,event.getMultiBufferSource(),f,0,player.tickCount+partial);renderer.render(player,player.getYRot(),partial,stack,fragments,event.getPackedLight());fragments.finish();}
             }
-            if(slime.phase()==com.codex.blacklight.power.BiomassState.REFORMING){
-                float f=slime.progress(player.level().getGameTime()+partial,com.codex.blacklight.power.BiomassState.REFORM_TICKS);
+            if(slime.consumed()){
+                float f=slime.phase()==com.codex.blacklight.power.BiomassState.READY?1:slime.progress(player.level().getGameTime()+partial,com.codex.blacklight.power.BiomassState.REFORM_TICKS);
                 var renderer=RENDERERS.get(player.getModelName());
-                if(renderer!=null){var stack=event.getPoseStack();var coat=new BiomassCoatBuffers(player,stack,event.getMultiBufferSource(),1-f,0,player.tickCount+partial);renderer.render(player,player.getYRot(),partial,stack,coat,event.getPackedLight());coat.finish();}
+                if(renderer!=null){var stack=event.getPoseStack();var coat=new BiomassCoatBuffers(player,stack,event.getMultiBufferSource(),1-BiomassSurfaceBounds.ease((f-.55F)/.45F),1-BiomassSurfaceBounds.ease(f/.8F),player.tickCount+partial);renderer.render(player,player.getYRot(),partial,stack,coat,event.getPackedLight());coat.finish();}
             }
             return;
         }

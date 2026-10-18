@@ -3,8 +3,8 @@ import org.junit.jupiter.api.Test;
 import org.joml.Vector3f;
 import static org.junit.jupiter.api.Assertions.*;
 class GroundGaitPoseTest {
- @Test void authoredWalkStopAndIdleKeepTheSameWorldHeading() {
-  for(String key:new String[]{"basic_walk","basic_run","basic_brake","basic_sprint_brake","basic_idle","basic_idle_claw","basic_idle_hammer"})
+ @Test void stopAndIdleKeepTheSameWorldHeading() {
+  for(String key:new String[]{"basic_brake","basic_sprint_brake","basic_idle","basic_idle_claw","basic_idle_hammer"})
    for(int i=0;i<=20;i++) {
     var pose=MotionLibrary.pose(key,MotionLibrary.duration(key)*i/20F,false);
     float height=pose.get("Root").translation().y;
@@ -13,6 +13,18 @@ class GroundGaitPoseTest {
     var forward=pose.get("Root").rotation().transform(new Vector3f(0,0,1));
     assertEquals(0,Math.atan2(forward.x,forward.z),.0001,key+"/"+i);
     assertEquals(height,pose.get("Root").translation().y);assertEquals(lean,forward.y,.0001);
+   }
+ }
+ @Test void ordinaryAndArmoredStridesPreserveAuthoredWorldBoneTransforms() {
+  var skeleton=BlacklightSkeleton.get();
+  for(String key:new String[]{"basic_walk","basic_run","basic_sprint","basic_sprint_fast","basic_sprint_fastest"})
+   for(boolean armor:new boolean[]{false,true})for(int i=0;i<=120;i++) {
+    var pose=MotionLibrary.pose(key,MotionLibrary.duration(key)*i/120F,false);
+    var expected=skeleton.getPoseMatrices(pose);
+    GroundGaitPose.apply(pose,key,armor);
+    var actual=skeleton.getPoseMatrices(pose);
+    for(int bone=0;bone<actual.length;bone++)
+     assertEquals(expected[bone],actual[bone],key+"/armor="+armor+"/frame="+i+"/bone="+bone);
    }
  }
  @Test void armorWalkingSlowsShortStepsWithoutChangingSprintOrStoppingClock() {
