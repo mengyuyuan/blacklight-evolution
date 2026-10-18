@@ -16,7 +16,14 @@ public final class BulletdivePhysics {
         return Math.min(Double.MAX_VALUE,INITIAL_SPEED+t*(ACCELERATION+.5*JERK*t));
     }
     public static double damageMultiplier(double actualDrop) {
-        return 1+Math.sqrt(nonNegativeFinite(actualDrop)/30);
+        // Impact energy grows with actual vertical travel. Square-root scaling
+        // made extreme dives barely stronger than ordinary rooftop attacks.
+        return 1+nonNegativeFinite(actualDrop)/30;
+    }
+    public static float impactDamage(float base,double actualDrop) {
+        if(!Float.isFinite(base)||base<=0)return 0;
+        // Saturate only at the network/health numeric representation, never at a gameplay height.
+        return (float)Math.min(Float.MAX_VALUE,(double)base*damageMultiplier(actualDrop));
     }
     /** Optical response may saturate for legibility; physical energy never uses it. */
     public static double visualIntensity(double speed,double drop) {

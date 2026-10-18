@@ -45,4 +45,13 @@ class BulletdivePhysicsTest {
         }
         assertTrue(Double.isFinite(BulletdivePhysics.visualIntensity(Double.MAX_VALUE,Double.MAX_VALUE)));
     }
+    @Test void highDropsHaveEnergyToKillLargeHealthPoolsWithoutNumericOverflow() {
+        assertEquals(44F,BulletdivePhysics.impactDamage(22,30),.001F);
+        assertEquals(66F,BulletdivePhysics.impactDamage(22,60),.001F);
+        assertEquals(44022F,BulletdivePhysics.impactDamage(22,60000),.01F);
+        assertTrue(BulletdivePhysics.impactDamage(22,9_999_999)>7_000_000);
+        assertTrue(Float.isFinite(BulletdivePhysics.impactDamage(22,Double.MAX_VALUE)));
+        assertEquals(22F,BulletdivePhysics.impactDamage(22,Double.NaN));
+        assertEquals(0F,BulletdivePhysics.impactDamage(Float.NaN,100));
+    }
 }

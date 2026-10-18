@@ -139,6 +139,7 @@ public final class CityTravel {
         for(int x=-1;x<=1;x++)for(int z=-1;z<=1;z++)
             if(target.getChunkSource().getChunkNow(centre.x+x,centre.z+z)==null)return false;
         var safe=link==null?arrivalPosition(target,origin,bodySize):safePosition(target,origin);if(safe==null)return false;
+        if(!target.areEntitiesLoaded(new net.minecraft.world.level.ChunkPos(safe).toLong())||!target.isPositionEntityTicking(safe))return false;
         com.codex.blacklight.entity.BlacklightHydra carrier=null;
         if(link!=null){
             var entity=target.getEntity(link.endpoint());

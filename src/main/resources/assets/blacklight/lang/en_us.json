@@ -587,5 +587,6 @@
   "hydra.blacklight.tooltip.2": "Feed 5 creatures and allow 2 minutes of loaded growth.",
   "hydra.blacklight.tooltip.3": "Approach when mature to travel; the other Hydra brings you back.",
   "advancement.blacklight.hydra_tissue": "A Living Passage",
-  "advancement.blacklight.hydra_tissue.desc": "Plant hive tissue, feed five creatures and let it mature into a two-way Hydra passage."
+  "advancement.blacklight.hydra_tissue.desc": "Plant hive tissue, feed five creatures and let it mature into a two-way Hydra passage.",
+  "death.attack.blacklight.bulletdive": "%1$s was crushed by %2$s's Bulletdive"
 }

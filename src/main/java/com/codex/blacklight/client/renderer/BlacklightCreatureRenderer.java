@@ -18,7 +18,7 @@ public final class BlacklightCreatureRenderer<T extends LivingEntity & GeoEntity
         stack.pushPose();if(visual.active())stack.translate(placement.x,placement.y,placement.z);
         ConsumeFracture fragments=ConsumeFracture.visible(entity,partial)?new ConsumeFracture(entity,partial,stack,buffer,ConsumeAbsorptionFx.destination(entity,partial,placement)):null;
         if(visual.active())ConsumeVictimPose.body(entity,stack,partial);
-        else if(!com.codex.blacklight.client.animation.NativeReceiverPose.available(entity,partial))com.codex.blacklight.client.animation.HitBodyPose.apply(entity,stack,partial);
+        else if(!(entity instanceof com.codex.blacklight.entity.BlacklightHive)&&!com.codex.blacklight.client.animation.NativeReceiverPose.available(entity,partial))com.codex.blacklight.client.animation.HitBodyPose.apply(entity,stack,partial);
         try{if(progress<.995F)super.render(entity,yaw,partial,stack,fragments==null?buffer:fragments,light);if(fragments!=null)fragments.finish();}finally{stack.popPose();}
         var owner=entity.level().getEntity(visual.consumerId());
         if(owner!=null&&visual.active()){
