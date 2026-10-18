@@ -17,7 +17,11 @@ public final class GroundGaitPose {
         return armor&&key.equals("basic_walk")?1.2:8;
     }
     public static void apply(BlacklightPose pose,String key,boolean armor) {
-        if(!ground(key))return;
+        // A stride's root carries the authored pelvis twist and lateral weight
+        // transfer. Removing its instantaneous heading straightens the whole gait,
+        // even when every child joint is preserved. Only stationary/stop clips
+        // need scene-heading correction; world movement never comes from Root.
+        if(!key.startsWith("basic_idle")&&!key.equals("basic_brake")&&!key.equals("basic_sprint_brake"))return;
         var root=pose.get("Root");
         if(root!=null) {
             // World-facing is already owned by movement/targeting. Source idle and

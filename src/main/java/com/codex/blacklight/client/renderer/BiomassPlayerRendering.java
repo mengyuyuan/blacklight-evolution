@@ -13,7 +13,7 @@ public final class BiomassPlayerRendering {
     private BiomassPlayerRendering(){}
     public static void render(Player p,float partial,PoseStack stack,MultiBufferSource buffers,int light){
         var state=BiomassSystem.state(p);
-        if(!state.active()||state.phase()==BiomassState.REFORMING){FLOWS.remove(p);return;}
+        if(!state.active()||state.consumed()){FLOWS.remove(p);return;}
         double now=p.level().getGameTime()+partial,time=p.tickCount+partial;
         float size=BiomassEvolution.scale(p);
         var flow=FLOWS.computeIfAbsent(p,k->new BiomassFluidSurface());
@@ -32,23 +32,11 @@ public final class BiomassPlayerRendering {
             stack.popPose();
         }
         if(absorbing&&f>.02&&f<.72){
-            // Connected pixel ribbons reach the host's feet, then climb its real silhouette.
-            // The existing coat renderer takes over behind this leading edge.
-            double front=Math.min(1,f/.68),width=victim.getBbWidth()*.48;
+            // Ground transfer ends at the prey; the posed surface renderer handles all climbing.
             Vec3 source=delta.scale(transfer),path=delta.subtract(source);
             int cells=Math.max(1,Math.min(40,(int)Math.ceil(path.length()/.08)));
             for(int i=0;i<=cells;i++){var at=source.add(path.scale(i/(double)cells));double r=.075*size*(1-transfer*.6);
                 BiomassGeometry.box(stack,out,light,at.x-r,at.y+.018,at.z-r,at.x+r,at.y+.085,at.z+r,0xff29262b);
-            }
-            for(int arm=0;arm<5;arm++){
-                double angle=arm*Math.PI*2/5;
-                int steps=Math.max(2,Math.min(64,(int)Math.ceil(victim.getBbHeight()*front/.09)));
-                for(int i=0;i<=steps;i++){
-                    double y=victim.getBbHeight()*front*i/steps;
-                    double curl=.025*Math.sin(time*.15-i*.6+arm),r=.065+(1-i/(double)steps)*.025;
-                    double x=delta.x+Math.cos(angle)*(width+curl),z=delta.z+Math.sin(angle)*(width+curl);
-                    BiomassGeometry.box(stack,out,light,x-r,delta.y+y,z-r,x+r,delta.y+y+.10,z+r,i%5==0?0xff63303a:0xff29262b);
-                }
             }
         }else if(state.phase()==BiomassState.CRAWLING){
             // A small surface lobe points at nearby edible prey before contact.
