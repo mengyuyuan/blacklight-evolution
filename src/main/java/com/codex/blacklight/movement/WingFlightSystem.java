@@ -19,7 +19,7 @@ public final class WingFlightSystem {
         final WingFlightTuning.SonicGate sonic=new WingFlightTuning.SonicGate();
     }
     public static boolean equipped(Player p){return UtilityPowerSystem.active(p,PowerForm.SOVEREIGN_WINGS)&&!BiomassSystem.active(p)&&!p.getData(ModAttachments.PLAYER_STATE).isDisguised()&&!com.codex.blacklight.disguise.DisguiseSystem.morphing(p);}
-    public static boolean eligible(Player p){return equipped(p)&&!p.isPassenger()&&!p.isSpectator()&&!p.isInWater()&&!p.isInLava()&&!p.isFallFlying()&&!p.getAbilities().flying;}
+    public static boolean eligible(Player p){return equipped(p)&&!com.codex.blacklight.city.HydraTransport.active(p)&&!p.isPassenger()&&!p.isSpectator()&&!p.isInWater()&&!p.isInLava()&&!p.isFallFlying()&&!p.getAbilities().flying;}
     public static boolean flying(Player p){return eligible(p)&&p.getData(ModAttachments.WING_FLIGHT).flying();}
     public static boolean consumeOwnsMovement(Player p){return p.getData(ModAttachments.CONSUMING)&&com.codex.blacklight.combat.ConsumeVisual.blocksInput(p.getData(ModAttachments.GRAB_STAGE));}
     public static boolean ownsTravel(Player p){return flying(p)&&p.getData(ModAttachments.WEAPON_VISUAL).spec()==null&&!p.getData(ModAttachments.CONSUMING);}

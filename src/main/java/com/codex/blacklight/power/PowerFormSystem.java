@@ -15,7 +15,7 @@ public final class PowerFormSystem {
         return false;
     }
     public static boolean select(ServerPlayer player, PowerForm form, boolean purchase) {
-        if(BiomassSystem.active(player))return false;
+        if(BiomassSystem.active(player)||com.codex.blacklight.city.HydraTransport.active(player))return false;
         if(form==PowerForm.BIOMASS)return BiomassSystem.begin(player,false);
         var state = player.getData(ModAttachments.PLAYER_STATE);
         var combat = player.getData(ModAttachments.CLAW_COMBAT);
