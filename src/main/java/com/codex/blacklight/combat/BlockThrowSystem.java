@@ -42,7 +42,7 @@ public final class BlockThrowSystem {
         return BlockThrowTuning.level(com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.PLAYER_STATE).getCombatSkillMask());
     }
     public static boolean canUse(Player p){
-        if(p==null||!p.isAlive()||p.isRemoved()||p.isSpectator()||p.isPassenger()||level(p)==0||com.codex.blacklight.power.BiomassSystem.active(p))return false;
+        if(p==null||com.codex.blacklight.city.HydraTransport.active(p)||!p.isAlive()||p.isRemoved()||p.isSpectator()||p.isPassenger()||level(p)==0||com.codex.blacklight.power.BiomassSystem.active(p))return false;
         var state=com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.PLAYER_STATE);
         return state.isInfected()&&state.isPrototypeMode()&&state.getActivePower()==com.codex.blacklight.power.PowerForm.MUSCLE_MASS;
     }

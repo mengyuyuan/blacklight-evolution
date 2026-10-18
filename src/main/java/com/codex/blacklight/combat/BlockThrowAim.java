@@ -35,7 +35,7 @@ public final class BlockThrowAim {
   Vec3 a=origin;var held=BlockThrowSystem.held(p);Vec3 half=held==null?new Vec3(.45,.45,.45):held.cargo().half();
   for(int t=1;t<=Math.ceil(shot.ticks());t++){
    Vec3 b=BlockThrowBallistics.at(origin,shot.velocity(),Math.min(t,shot.ticks()));
-   if(p.level().getFluidState(net.minecraft.core.BlockPos.containing(b)).is(net.minecraft.tags.FluidTags.WATER)||!p.level().hasChunkAt(net.minecraft.core.BlockPos.containing(b))||BlockThrowCollision.block(p.level(),p,a,b,half)!=null)return false;
+   if(!BlockThrowCollision.loaded(p.level(),a,b,half)||p.level().getFluidState(net.minecraft.core.BlockPos.containing(b)).is(net.minecraft.tags.FluidTags.WATER)||!p.level().hasChunkAt(net.minecraft.core.BlockPos.containing(b))||BlockThrowCollision.block(p.level(),p,a,b,half)!=null)return false;
    a=b;
   }
   return true;

@@ -36,7 +36,7 @@ public final class ClientWeaponCombat {
     public static boolean active(){
         var mc=Minecraft.getInstance();if(mc.player==null||mc.screen!=null)return false;
         var state=com.codex.blacklight.registry.ModAttachments.getData(mc.player, ModAttachments.PLAYER_STATE);
-        return state.isPrototypeMode()&&state.isInfected()&&WeaponMove.controls(state.getActivePower(),mc.player.getMainHandItem().isEmpty()&&mc.player.getOffhandItem().isEmpty())&&!com.codex.blacklight.registry.ModAttachments.getData(mc.player, ModAttachments.CONSUMING);
+        return !com.codex.blacklight.city.HydraTransport.active(mc.player)&&state.isPrototypeMode()&&state.isInfected()&&WeaponMove.controls(state.getActivePower(),mc.player.getMainHandItem().isEmpty()&&mc.player.getOffhandItem().isEmpty())&&!com.codex.blacklight.registry.ModAttachments.getData(mc.player, ModAttachments.CONSUMING);
     }
     public static void poll(){
         if(fixtureOwnsInput)return;

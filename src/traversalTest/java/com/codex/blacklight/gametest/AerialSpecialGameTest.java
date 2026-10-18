@@ -23,6 +23,8 @@ public final class AerialSpecialGameTest {
         for(int x=cx-1;x<=cx+1;x++)for(int z=cz-1;z<=cz+3;z++)
             h.getLevel().getChunkSource().addRegionTicket(net.minecraft.server.level.TicketType.PORTAL,new net.minecraft.world.level.ChunkPos(x,z),2,pos);
         h.startSequence().thenWaitUntil(()->{
+            // Accelerated GameTest ticks must leave wall-clock time for entity-section I/O.
+            java.util.concurrent.locks.LockSupport.parkNanos(10_000_000L);
             for(int x=cx-1;x<=cx+1;x++)for(int z=cz-1;z<=cz+3;z++)
                 h.assertTrue(h.getLevel().isPositionEntityTicking(new net.minecraft.core.BlockPos(x<<4,80,z<<4)),"waiting for pounce flight chunks");
         }).thenExecute(()->{

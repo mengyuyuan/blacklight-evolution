@@ -21,8 +21,8 @@ public final class BiomassTerrain {
     public static boolean ownsPlaceEvent(BlockEvent.EntityPlaceEvent event){return OWN_PLACE.get()==event;}
     public static boolean ownsBreakEvent(BlockEvent.BreakEvent event){return OWN_BREAK.get()==event;}
     public static CompoundTag erupt(ServerPlayer owner,BiomassHusk husk){
-        CompoundTag debris=new CompoundTag();debris.putBoolean("tissueWorld",true);var level=owner.serverLevel();
-        if(level!=husk.level()||!owner.mayBuild()||!level.getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING))return debris;
+        CompoundTag debris=new CompoundTag();debris.putBoolean("tissueWorld",true);var level=(net.minecraft.server.level.ServerLevel)husk.level();
+        if(!owner.mayBuild()||!level.getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING))return debris;
         BlockPos center=husk.blockPosition().below();int broken=0,kept=0;
         // A shallow radial crater is resolved in this tick, with no unbounded job
         // or chunk loading. Containers, liquids and unbreakable blocks stay intact.
@@ -42,8 +42,8 @@ public final class BiomassTerrain {
         }
         // A small real tissue base supports the strands; it is not a flat rendered puddle.
         for(int x=-1;x<=1;x++)for(int z=-1;z<=1;z++)if(x*x+z*z<=1)
-            place(owner,center.offset(x,0,z),(x==0&&z==0?ModBlocks.HIVE_FLESH:ModBlocks.TISSUE_FIBER).get().defaultBlockState());
-        place(owner,center.below(),ModBlocks.HIVE_FLESH.get().defaultBlockState());
+            place(level,owner,center.offset(x,0,z),(x==0&&z==0?ModBlocks.HIVE_FLESH:ModBlocks.TISSUE_FIBER).get().defaultBlockState());
+        place(level,owner,center.below(),ModBlocks.HIVE_FLESH.get().defaultBlockState());
         long seed=husk.getUUID().getMostSignificantBits()^husk.getUUID().getLeastSignificantBits();
         var random=net.minecraft.util.RandomSource.create(seed);
         int planned=6+random.nextInt(7);debris.putInt("planned",planned);debris.putLong("seed",seed);
@@ -56,18 +56,18 @@ public final class BiomassTerrain {
             // Most strands latch onto actual nearby walls, terrain or placed blocks.
             // A few grow new tissue masses so the rupture still has its own biomass.
             if(arm%3!=0){
-                pos=anchor(owner,husk.position().add(0,1,0),target,husk);
-                if(pos==null)pos=anchor(owner,target.add(0,3,0),target.add(0,-8,0),husk);
+                pos=anchor(level,owner,husk.position().add(0,1,0),target,husk);
+                if(pos==null)pos=anchor(level,owner,target.add(0,3,0),target.add(0,-8,0),husk);
                 existing=pos!=null;
             }
             BlockState core;
             if(existing){core=level.getBlockState(pos);if(!used.add(pos))continue;}
             else{
                 pos=BlockPos.containing(target);core=arm%2==0?ModBlocks.TISSUE_FIBER.get().defaultBlockState():ModBlocks.HIVE_FLESH.get().defaultBlockState();
-                if(!used.add(pos)||!place(owner,pos,core))continue;
-                place(owner,pos.above(),ModBlocks.TISSUE_FIBER.get().defaultBlockState());
-                place(owner,pos.offset(arm%2==0?1:-1,0,0),ModBlocks.HIVE_VEIN.get().defaultBlockState());
-                place(owner,pos.offset(0,0,arm%2==0?1:-1),ModBlocks.HIVE_FLESH.get().defaultBlockState());
+                if(!used.add(pos)||!place(level,owner,pos,core))continue;
+                place(level,owner,pos.above(),ModBlocks.TISSUE_FIBER.get().defaultBlockState());
+                place(level,owner,pos.offset(arm%2==0?1:-1,0,0),ModBlocks.HIVE_VEIN.get().defaultBlockState());
+                place(level,owner,pos.offset(0,0,arm%2==0?1:-1),ModBlocks.HIVE_FLESH.get().defaultBlockState());
             }
             debris.put("block"+kept,NbtUtils.writeBlockState(core));debris.putLong("pos"+kept,pos.asLong());debris.putBoolean("existing"+kept,existing);kept++;
         }
@@ -102,8 +102,7 @@ public final class BiomassTerrain {
         level.blockUpdated(pos,tissue.getBlock());history.putInt("count",history.getInt("count")+1);root.put("blacklightSlimeTrail",history);
         level.sendParticles(new net.minecraft.core.particles.BlockParticleOption(net.minecraft.core.particles.ParticleTypes.BLOCK,tissue),pos.getX()+.5,pos.getY()+1.03,pos.getZ()+.5,5,.3,.02,.3,.02);
     }
-    private static BlockPos anchor(ServerPlayer owner,net.minecraft.world.phys.Vec3 from,net.minecraft.world.phys.Vec3 to,BiomassHusk husk){
-        var level=owner.serverLevel();
+    private static BlockPos anchor(net.minecraft.server.level.ServerLevel level,ServerPlayer owner,net.minecraft.world.phys.Vec3 from,net.minecraft.world.phys.Vec3 to,BiomassHusk husk){
         // Check the entire short ray before clipping: never force-load a neighbor chunk.
         for(int i=0;i<=16;i++)if(!level.hasChunkAt(BlockPos.containing(from.lerp(to,i/16D))))return null;
         var hit=level.clip(new net.minecraft.world.level.ClipContext(from,to,net.minecraft.world.level.ClipContext.Block.COLLIDER,net.minecraft.world.level.ClipContext.Fluid.NONE,husk));
@@ -112,8 +111,7 @@ public final class BiomassTerrain {
         if(pos.distSqr(husk.blockPosition())<9||!level.mayInteract(owner,pos)||state.isAir()||!state.getFluidState().isEmpty())return null;
         return pos;
     }
-    private static boolean place(ServerPlayer owner,BlockPos pos,BlockState tissue){
-        var level=owner.serverLevel();
+    private static boolean place(net.minecraft.server.level.ServerLevel level,ServerPlayer owner,BlockPos pos,BlockState tissue){
         if(!level.isInWorldBounds(pos)||!level.hasChunkAt(pos)||!level.mayInteract(owner,pos))return false;
         var before=level.getBlockState(pos);
         if(!before.isAir()||!level.getEntities((net.minecraft.world.entity.Entity)null,new AABB(pos),e->e instanceof net.minecraft.world.entity.LivingEntity||e.isPickable()).isEmpty())return false;

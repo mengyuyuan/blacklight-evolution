@@ -67,6 +67,7 @@ public final class ClientMovementEvents {
 
     @SubscribeEvent(priority = net.minecraftforge.eventbus.api.EventPriority.LOWEST)
     public static void lockWeaponMovement(net.minecraftforge.client.event.MovementInputUpdateEvent event) {
+        if(com.codex.blacklight.city.HydraTransport.active(event.getEntity())){clearWeaponTravelInput(event.getInput());return;}
         var hop=com.codex.blacklight.registry.ModAttachments.getData(event.getEntity(),ModAttachments.PLAYER_ACTION);
         if(hop.clipId().equals("basic_dodge_roll")&&hop.active(event.getEntity().level().getGameTime())
                 &&hop.seconds(event.getEntity().level().getGameTime())<.7F){clearWeaponTravelInput(event.getInput());return;}
@@ -512,13 +513,13 @@ public final class ClientMovementEvents {
     }
 
     private static boolean isPrototype(Minecraft minecraft) {
-        return minecraft.player != null
+        return minecraft.player != null && !com.codex.blacklight.city.HydraTransport.active(minecraft.player)
                 && com.codex.blacklight.registry.ModAttachments.getData(minecraft.player, ModAttachments.PLAYER_STATE).isInfected()
                 && com.codex.blacklight.registry.ModAttachments.getData(minecraft.player, ModAttachments.PLAYER_STATE).isPrototypeMode();
     }
 
     static boolean weaponOwnsMovement(Minecraft minecraft) {
-        return minecraft.player != null
+        return minecraft.player != null && !com.codex.blacklight.city.HydraTransport.active(minecraft.player)
                 && (com.codex.blacklight.registry.ModAttachments.getData(minecraft.player, ModAttachments.WEAPON_VISUAL).spec() != null
                 ||pendingWeaponMovement(minecraft.player));
     }

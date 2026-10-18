@@ -68,7 +68,7 @@ public final class DevastatorSystem {
     };}
     private static boolean eligible(ServerPlayer p){
         var state=com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.PLAYER_STATE);var movement=com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.MOVEMENT_STATE);
-        return p.isAlive()&&!p.isSpectator()&&!p.isPassenger()&&!p.isFallFlying()&&!p.isInWater()&&!p.isInLava()
+        return !com.codex.blacklight.city.HydraTransport.active(p)&&p.isAlive()&&!p.isSpectator()&&!p.isPassenger()&&!p.isFallFlying()&&!p.isInWater()&&!p.isInLava()
                 &&state.isInfected()&&state.isPrototypeMode()&&!com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.CONSUMING)
                 &&!movement.wallTraversal().attached()&&movement.chargeTicks()==0
                 &&WeaponMove.controls(state.getActivePower(),p.getMainHandItem().isEmpty()&&p.getOffhandItem().isEmpty());
@@ -76,6 +76,7 @@ public final class DevastatorSystem {
     /** True claims only a formal skill or its existing session; ordinary chords
      * retain their old behavior when the upgrade/resource gate is not satisfied. */
     public static boolean acceptInput(ServerPlayer p,boolean attack,boolean special,boolean action,boolean jump){
+        if(com.codex.blacklight.city.HydraTransport.active(p)){cancel(p);return false;}
         var keys=new WeaponButtons(attack,special,action,jump);var prior=INPUT.put(p,new Held(keys,p.tickCount));
         var before=prior==null?new WeaponButtons(false,false,false,false):prior.buttons();
         var running=ACTIVE.get(p);
