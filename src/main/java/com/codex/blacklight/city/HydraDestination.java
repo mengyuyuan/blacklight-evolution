@@ -20,13 +20,18 @@ public final class HydraDestination {
         if(next==null){release();return false;}
         var nextCentre=new ChunkPos(position);
         if(target!=next||!nextCentre.equals(centre)){release();target=next;centre=nextCentre;}
-        target.getChunkSource().addRegionTicket(TICKET,centre,1,id);
+        // FULL terrain alone is insufficient: pending entity storage may save/reload
+        // a newly created carrier and erase its transient grip/animation state.
+        // Level 30 keeps the prepared 3x3 centre entity-ticking until handoff.
+        target.getChunkSource().addRegionTicket(TICKET,centre,3,id);
         for(int x=-1;x<=1;x++)for(int z=-1;z<=1;z++)
-            if(target.getChunkSource().getChunkNow(centre.x+x,centre.z+z)==null)return false;
+            if(target.getChunkSource().getChunkNow(centre.x+x,centre.z+z)==null
+                    ||!target.areEntitiesLoaded(new ChunkPos(centre.x+x,centre.z+z).toLong())
+                    ||!target.isPositionEntityTicking(new BlockPos((centre.x+x)*16,position.getY(),(centre.z+z)*16)))return false;
         return true;
     }
     public void release() {
-        if(target!=null)target.getChunkSource().removeRegionTicket(TICKET,centre,1,id);
+        if(target!=null)target.getChunkSource().removeRegionTicket(TICKET,centre,3,id);
         target=null;centre=null;
     }
 }

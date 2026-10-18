@@ -267,8 +267,8 @@ public final class DevastatorSystem {
             }
             if(age<contact||age>Math.min(s.timing.damageEnd(),contact+DevastatorCollision.targetDuration(s.move)))continue;
             float damage=s.timing.damage();
-            if(kind==3)damage*=(float)BulletdivePhysics.damageMultiplier(s.highest-s.origin.y);
-            if(hurt(p,target,damage,new HitContext("target_control",0,contact,damage))){
+            if(kind==3)damage=BulletdivePhysics.impactDamage(damage,s.highest-s.origin.y);
+            if(hurt(p,target,damage,s.move==WeaponMove.BULLETDIVE_DROP,new HitContext("target_control",0,contact,damage))){
                 s.struck.add(target.getUUID());s.hits++;var outward=point.subtract(s.origin).multiply(1,0,1);
                 if(outward.lengthSqr()<.0001)outward=s.direction;else outward=outward.normalize();
                 ImpactControl.begin(target,new ImpactProfile(kind==0?HitReaction.LAUNCH:HitReaction.HEAVY,kind==0?ImpactProfile.UP:ImpactProfile.FALL,40,.6,kind==0?.8:.15,true),s.yaw);
@@ -306,9 +306,9 @@ public final class DevastatorSystem {
         return hit.getType()==net.minecraft.world.phys.HitResult.Type.BLOCK&&hit.getDirection()==net.minecraft.core.Direction.UP
                 &&point.y>=hit.getLocation().y-.1&&point.y-hit.getLocation().y<=1.8;
     }
-    private static boolean hurt(ServerPlayer p,LivingEntity target,float damage,HitContext context){
+    private static boolean hurt(ServerPlayer p,LivingEntity target,float damage,boolean bulletdive,HitContext context){
         var prior=HIT_CONTEXT.get();HIT_CONTEXT.set(context);
-        try{return target.hurt(p.damageSources().playerAttack(p),damage);}
+        try{return target.hurt(bulletdive?BulletdiveDamage.source(p):p.damageSources().playerAttack(p),damage);}
         finally{if(prior==null)HIT_CONTEXT.remove();else HIT_CONTEXT.set(prior);}
     }
     private static void directStrike(ServerPlayer p,Session s,double age){
@@ -339,7 +339,7 @@ public final class DevastatorSystem {
                 if(track.arc()>0&&track.arc()<360&&delta.lengthSqr()>.000001
                         &&delta.normalize().dot(forward)<Math.cos(Math.toRadians(track.arc()/2)))continue;
                 float damage=track.damage()*.04F;
-                if(hurt(p,target,damage,new HitContext("direct_"+track.sourceTrack(),track.sourceTrack(),
+                if(hurt(p,target,damage,s.move==WeaponMove.BULLETDIVE_DROP,new HitContext("direct_"+track.sourceTrack(),track.sourceTrack(),
                         DevastatorCollision.activeStart(s.move,s.timing)+track.begin(),damage))){
                     struck.add(target.getUUID());s.hits++;CombatImpactEffects.target(p,target,s.move);
                 }
