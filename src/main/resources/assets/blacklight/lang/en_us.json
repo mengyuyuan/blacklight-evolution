@@ -588,5 +588,8 @@
   "hydra.blacklight.tooltip.3": "Approach when mature to travel; the other Hydra brings you back.",
   "advancement.blacklight.hydra_tissue": "A Living Passage",
   "advancement.blacklight.hydra_tissue.desc": "Plant hive tissue, feed five creatures and let it mature into a two-way Hydra passage.",
-  "death.attack.blacklight.bulletdive": "%1$s was crushed by %2$s's Bulletdive"
+  "death.attack.blacklight.bulletdive": "%1$s was crushed by %2$s's Bulletdive",
+  "city.blacklight.hive_location": "Hive building: %s · Entrance [%s, %s, %s] · %s",
+  "city.blacklight.hive_inactive": "Destroyed",
+  "city.blacklight.hive_active": "Active (approach to hatch hunters)"
 }

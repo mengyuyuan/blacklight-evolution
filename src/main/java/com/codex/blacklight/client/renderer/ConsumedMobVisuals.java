@@ -27,14 +27,8 @@ public final class ConsumedMobVisuals {
     public static void before(RenderLivingEvent.Pre<?, ?> event) {
         var mob = event.getEntity();
         if (RENDERING.contains(mob)) return;
-        var slime=com.codex.blacklight.power.BiomassSystem.claimant(mob);
-        if(slime!=null){
-            float f=com.codex.blacklight.power.BiomassSystem.state(slime).progress(mob.level().getGameTime()+event.getPartialTick(),com.codex.blacklight.power.BiomassState.ABSORB_TICKS);
-            var coat=new BiomassCoatBuffers(mob,event.getPoseStack(),event.getMultiBufferSource(),Math.min(1,f*1.45F),Math.max(0,(f-.68F)/.32F),mob.tickCount+event.getPartialTick());
-            event.setCanceled(true);
-            try{RENDERING.add(mob);renderVanilla(event,mob,coat);coat.finish();}finally{RENDERING.remove(mob);}
-            return;
-        }
+        // The dispatcher coats vanilla and custom renderers once, after their posed mesh is emitted.
+        if(com.codex.blacklight.power.BiomassSystem.claimant(mob)!=null)return;
         if (mob instanceof BlacklightHunter) return;
         var data = mob.getData(ModAttachments.CONSUME_VISUAL);
         if (!data.active()) {

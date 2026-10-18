@@ -123,9 +123,12 @@ public final class CitySystem {
             if(level.players().stream().noneMatch(p->p.distanceToSqr(port.getX(),65,port.getZ())<96*96))continue;
             var facing=level.getBlockState(port).getValue(CityHatchBlock.FACING);
             BlockPos outside=port.relative(facing,3).below();
-            if(level.getEntitiesOfClass(Mob.class,new AABB(port).inflate(48)).size()>=12)return;
-            boolean hunter=level.random.nextInt(5)==0;
-            boolean hydra=level.random.nextInt(12)==0&&level.getEntitiesOfClass(com.codex.blacklight.entity.BlacklightHydra.class,new AABB(port).inflate(64)).isEmpty();
+            var guards=level.getEntitiesOfClass(Mob.class,new AABB(port).inflate(48),Entity::isAlive);
+            boolean hasHunter=guards.stream().anyMatch(e->e instanceof com.codex.blacklight.entity.BlacklightHunter);
+            // Reserve one brood slot for a hunter: surrounding infected must not fill every slot first.
+            if(guards.size()>=(hasHunter?12:13))return;
+            boolean hunter=!hasHunter||level.random.nextInt(5)==0;
+            boolean hydra=!hunter&&level.random.nextInt(12)==0&&level.getEntitiesOfClass(com.codex.blacklight.entity.BlacklightHydra.class,new AABB(port).inflate(64)).isEmpty();
             if(spawn(level,hydra?ModEntities.BLACKLIGHT_HYDRA.get():hunter?ModEntities.BLACKLIGHT_HUNTER.get():EntityType.ZOMBIE,outside,!hunter&&!hydra)){
                 level.setBlock(port,level.getBlockState(port).setValue(CityHatchBlock.OPEN,true),3);
                 level.sendParticles(ParticleTypes.CRIMSON_SPORE,outside.getX()+.5,65,outside.getZ()+.5,16,.7,.6,.7,.02);
