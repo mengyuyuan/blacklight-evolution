@@ -22,12 +22,25 @@ public final class BlacklightHive extends Monster implements GeoEntity {
     private final ServerBossEvent boss=new ServerBossEvent(Component.translatable("entity.blacklight.blacklight_hive"),BossEvent.BossBarColor.RED,BossEvent.BossBarOverlay.NOTCHED_10);
     private int waves,hunterWaves,cooldown=80;
     private boolean rewarded;
+    private long nextConventionalHit;
     public BlacklightHive(EntityType<? extends BlacklightHive> type,Level level){super(type,level);setPersistenceRequired();xpReward=40;}
     public static AttributeSupplier.Builder attributes(){return Monster.createMonsterAttributes().add(Attributes.MAX_HEALTH,160).add(Attributes.MOVEMENT_SPEED,0).add(Attributes.KNOCKBACK_RESISTANCE,1);}
     @Override protected void registerGoals(){}
     @Override protected boolean shouldDespawnInPeaceful(){return false;}
     @Override public boolean isPushable(){return false;}
     @Override public void knockback(double strength,double x,double z){}
+    @Override public void push(double x,double y,double z){}
+    @Override public boolean hurt(DamageSource source,float amount){
+        if(com.codex.blacklight.combat.HiveDefense.fullDamage(source))return super.hurt(source,amount);
+        if(level().isClientSide||level().getGameTime()<nextConventionalHit)return false;
+        float chip=com.codex.blacklight.combat.HiveDefense.chipDamage(amount);
+        if(chip<=0)return false;
+        boolean accepted=super.hurt(source,chip);
+        // TaCZ clears vanilla invulnerableTime between normal/AP damage and
+        // every bullet. Keep a separate server-owned structural hit interval.
+        if(accepted)nextConventionalHit=level().getGameTime()+com.codex.blacklight.combat.HiveDefense.CHIP_INTERVAL;
+        return accepted;
+    }
     @Override public void tick(){
         super.tick();if(level().isClientSide)return;
         boss.setProgress(getHealth()/getMaxHealth());

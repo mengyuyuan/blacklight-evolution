@@ -113,6 +113,12 @@ tasks.named('assemble') {
 // Minecraft 1.20.1 and Forge 47 target Java 17.
 java.toolchain.languageVersion = JavaLanguageVersion.of(17)
 
+// Real optional-mod integration tests, never bundled into release jars.
+if (project.hasProperty('compatLiveTest')) {
+    sourceSets.main.java.srcDir('src/compatTest/java')
+    sourceSets.main.resources.srcDir('src/traversalTest/resources')
+}
+
 if (['hydraReleaseTest','entityLifecycleTest','hiveFeedingTest','wallTraversalTest','standaloneTest','cityTest'].any { project.hasProperty(it) }) {
     sourceSets.main.resources.srcDir('src/traversalTest/resources')
 }

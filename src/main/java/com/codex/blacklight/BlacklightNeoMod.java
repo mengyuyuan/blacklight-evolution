@@ -29,6 +29,7 @@ public final class BlacklightNeoMod {
         IEventBus modBus = FMLJavaModLoadingContext.get().getModEventBus();
         net.minecraftforge.fml.ModLoadingContext.get().registerConfig(net.minecraftforge.fml.config.ModConfig.Type.CLIENT,com.codex.blacklight.config.PassiveHudConfig.SPEC,"blacklight-client.toml");
         net.minecraftforge.fml.ModLoadingContext.get().registerConfig(net.minecraftforge.fml.config.ModConfig.Type.SERVER,com.codex.blacklight.city.CityConfig.SPEC,"blacklight-city-server.toml");
+        net.minecraftforge.fml.ModLoadingContext.get().registerConfig(net.minecraftforge.fml.config.ModConfig.Type.SERVER,com.codex.blacklight.config.CrossModCombatConfig.SPEC,"blacklight-combat-server.toml");
         com.codex.blacklight.city.CityBlocks.register(modBus);
         com.codex.blacklight.city.CityWorldgen.register(modBus);
         MinecraftForge.EVENT_BUS.register(com.codex.blacklight.city.CitySystem.class);
