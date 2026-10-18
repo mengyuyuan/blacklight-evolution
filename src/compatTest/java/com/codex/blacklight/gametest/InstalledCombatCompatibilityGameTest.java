@@ -94,7 +94,9 @@ public final class InstalledCombatCompatibilityGameTest {
         h.assertTrue(titan.getHealth()==protectedHealth,"compatibility bypassed invulnerability");
         titan.setInvulnerable(false);
         if(entityName.equals("spider_titan")) {
+            ModAttachments.getData(p,ModAttachments.PLAYER_STATE).setPrototypeMode(false);
             titan.hurt(p.damageSources().playerAttack(p),10000000);
+            ModAttachments.getData(p,ModAttachments.PLAYER_STATE).setPrototypeMode(true);
             h.assertTrue(titan.getHealth()>protectedHealth*.5F,"ordinary attacks lost Titan cap");
         }
         float before=titan.getHealth();
@@ -105,5 +107,96 @@ public final class InstalledCombatCompatibilityGameTest {
         h.assertTrue(hit&&titan.getHealth()<=0,"height-scaled dive capped by installed Titan: "+titan.getHealth()+" / "+before);
         h.assertTrue(!titan.isRemoved(),"damage must preserve native death sequence");
         titan.discard();h.succeed();
+    }
+
+    private static LivingEntity externalTitan(GameTestHelper h) throws Exception {
+        var key=BuiltInRegistries.ENTITY_TYPE.keySet().stream().filter(k ->
+                (k.getNamespace().equals("thetitansneo") || k.getNamespace().equals("potentia"))
+                && k.getPath().equals("zombie_titan")).findFirst().orElseThrow();
+        var titan=(LivingEntity)BuiltInRegistries.ENTITY_TYPE.get(key).create(h.getLevel());
+        titan.moveTo(h.absolutePos(new BlockPos(5,3,5)).getCenter());
+        if(titan instanceof Mob mob)mob.setNoAi(true);
+        for(String name:new String[]{"setInvulTime","setAnimationID"})try{titan.getClass().getMethod(name,int.class).invoke(titan,0);}catch(NoSuchMethodException ignored){}
+        try{titan.getClass().getMethod("setWaiting",boolean.class).invoke(titan,false);}catch(NoSuchMethodException ignored){}
+        return titan;
+    }
+    @GameTest(template="wall_test",timeoutTicks=60,batch="compat_general_defense")
+    public static void externalBurstSharesBudgetAndDroppedItemsSurvive(GameTestHelper h) throws Exception {
+        var attacker=externalTitan(h);
+        var source=h.getLevel().damageSources().mobAttack((LivingEntity)attacker);
+        var hunter=h.spawn(ModEntities.BLACKLIGHT_HUNTER.get(),3,2,3);hunter.setNoAi(true);
+        float maximum=hunter.getMaxHealth(),before=hunter.getHealth();
+        for(int i=0;i<30;i++){hunter.invulnerableTime=0;hunter.hurt(source,1000000);}
+        h.assertTrue(hunter.isAlive() && Math.abs(before-hunter.getHealth()-maximum*.15F)<.1F,"external burst bypassed final HP budget: "+hunter.getHealth());
+        var item=new net.minecraft.world.entity.item.ItemEntity(h.getLevel(),hunter.getX(),hunter.getY()+2,hunter.getZ(),ModItems.LIVING_HIVE_TISSUE.get().getDefaultInstance());
+        h.getLevel().addFreshEntity(item);
+        for(int i=0;i<30;i++)item.hurt(source,1000000);
+        h.assertTrue(item.isAlive() && item.saveWithoutId(new net.minecraft.nbt.CompoundTag()).getShort("Health")==4,"item burst bypassed integral damage budget");
+        var ordinary=h.spawn(EntityType.COW,8,2,8);ordinary.setNoAi(true);ordinary.hurt(source,1000000);
+        h.assertTrue(!ordinary.isAlive(),"external protection leaked into ordinary vanilla mobs");
+        h.runAfterDelay(11,()->{
+            hunter.invulnerableTime=0;float previous=hunter.getHealth();hunter.hurt(source,1000000);
+            h.assertTrue(Math.abs(previous-hunter.getHealth()-maximum*.15F)<.1F,"budget did not refresh after configured window");
+            item.hurt(source,1000000);
+            h.assertTrue(item.isAlive() && item.saveWithoutId(new net.minecraft.nbt.CompoundTag()).getShort("Health")==3,"item became immortal");
+            hunter.hurt(h.getLevel().damageSources().genericKill(),10000000);
+            h.assertTrue(!hunter.isAlive(),"administrative kill was blocked");
+            item.discard();attacker.discard();h.succeed();
+        });
+    }
+    @GameTest(template="wall_test",timeoutTicks=60,batch="compat_general_offense")
+    public static void nativeMeleeIgnoresArmorAndKillsTitanAtSufficientDamage(GameTestHelper h) throws Exception {
+        var p=player(h);var titan=externalTitan(h);h.getLevel().addFreshEntity(titan);
+        titan.getAttribute(net.minecraft.world.entity.ai.attributes.Attributes.ARMOR).setBaseValue(30);
+        titan.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.DAMAGE_RESISTANCE,600,4));
+        float before=titan.getHealth();titan.invulnerableTime=0;titan.hurt(p.damageSources().playerAttack(p),1500);
+        h.assertTrue(Math.abs(before-titan.getHealth()-3000)<.2F,"native melee was capped, not doubled, or absorbed: "+(before-titan.getHealth()));
+        var cow=h.spawn(EntityType.COW,3,2,3);cow.setNoAi(true);float cowBefore=cow.getHealth();cow.hurt(p.damageSources().playerAttack(p),2);
+        h.assertTrue(Math.abs(cowBefore-cow.getHealth()-2)<.01F,"external offense changed vanilla combat");
+        titan.invulnerableTime=0;titan.hurt(p.damageSources().playerAttack(p),titan.getHealth()/2+1);
+        h.assertTrue(!titan.isAlive() && !titan.isRemoved(),"sufficient native damage did not enter normal Titan death");
+        BlacklightNeoMod.LOGGER.info("COMPAT_NATIVE_KILL_PASS hp={} firstHit=3000 remaining={} owner={}",before,titan.getHealth(),titan.getLastDamageSource().getEntity()==p);
+        h.assertTrue(titan.getLastDamageSource().getEntity()==p,"native kill lost player attribution");
+        titan.discard();cow.discard();h.succeed();
+    }
+    @GameTest(template="wall_test",timeoutTicks=60,batch="compat_general_switches")
+    public static void externalWeaponsDoNotGainNativeDamageAndDefenseCanBeDisabled(GameTestHelper h) throws Exception {
+        var p=player(h);
+        var gunId=BuiltInRegistries.ITEM.keySet().stream().filter(k->k.getNamespace().equals("tacz")&&k.getPath().equals("modern_kinetic_gun")).findFirst().orElseThrow();
+        p.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND,BuiltInRegistries.ITEM.get(gunId).getDefaultInstance());
+        var source=p.damageSources().playerAttack(p);
+        h.assertTrue(!CrossModCombat.nativeAttack(source) && CrossModCombat.externalAttack(source),"foreign held item inherited native offense");
+        var hunter=h.spawn(ModEntities.BLACKLIGHT_HUNTER.get(),3,2,3);hunter.setNoAi(true);
+        com.codex.blacklight.config.CrossModCombatConfig.DEFENSE.set(false);
+        try {hunter.hurt(source,1000000);h.assertTrue(!hunter.isAlive(),"defense config did not disable protection");}
+        finally {com.codex.blacklight.config.CrossModCombatConfig.DEFENSE.set(true);}
+        var target=externalTitan(h);
+        p.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND,net.minecraft.world.item.ItemStack.EMPTY);
+        com.codex.blacklight.config.CrossModCombatConfig.OFFENSE.set(false);
+        try {h.assertTrue(!CrossModCombat.enhanced(target,p.damageSources().playerAttack(p)),"offense config did not disable enhancement");}
+        finally {com.codex.blacklight.config.CrossModCombatConfig.OFFENSE.set(true);}
+        com.codex.blacklight.config.CrossModCombatConfig.TRUE_DAMAGE.set(false);
+        try {var melee=p.damageSources().playerAttack(p);h.assertTrue(!CrossModCombat.offensiveSource(melee).is(net.minecraft.tags.DamageTypeTags.BYPASSES_ARMOR),"true damage toggle still replaced source");}
+        finally {com.codex.blacklight.config.CrossModCombatConfig.TRUE_DAMAGE.set(true);}
+        target.discard();h.succeed();
+    }
+
+    @GameTest(template="wall_test",timeoutTicks=60,batch="compat_general_player")
+    public static void activePrototypeAlsoSharesFinalDamageBudget(GameTestHelper h) throws Exception {
+        var profile=new GameProfile(UUID.randomUUID(),"DamageableQA");
+        var p=new ServerPlayer(h.getLevel().getServer(),h.getLevel(),profile);
+        p.connection=FakePlayerFactory.get(h.getLevel(),profile).connection;
+        for(int i=0;i<61;i++)p.tick();
+        p.moveTo(h.absolutePos(new BlockPos(3,3,3)).getCenter());
+        var state=ModAttachments.getData(p,ModAttachments.PLAYER_STATE);state.infect();state.setPrototypeMode(true);
+        p.setGameMode(net.minecraft.world.level.GameType.SURVIVAL);
+        p.getAbilities().invulnerable=false;
+        CombatScale.attributes(p,true);p.setHealth(p.getMaxHealth());
+        var attacker=externalTitan(h);var source=h.getLevel().damageSources().mobAttack(attacker);
+        float before=p.getHealth();
+        for(int i=0;i<30;i++){p.invulnerableTime=0;p.hurt(source,1000000);}
+        float lost=before-p.getHealth();
+        h.assertTrue(lost>0 && lost<=p.getMaxHealth()*.15F+.01F && p.isAlive(),"Prototype final HP budget failed: "+lost);
+        attacker.discard();h.succeed();
     }
 }
