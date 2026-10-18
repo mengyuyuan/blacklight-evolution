@@ -81,7 +81,7 @@ public final class BlacklightHydra extends Monster implements GeoEntity {
     }
     public void plant(UUID player){owner=player;entityData.set(PLANTED,true);entityData.set(GROWTH,0F);}
     @Override public boolean canBeLeashed(){return false;}
-    private void action(int value){if(value==0||value==11)entityData.set(SCENE_PLAYER,-1);entityData.set(PREVIOUS,action());entityData.set(PREVIOUS_TIME,actionTime());entityData.set(ACTION,value);entityData.set(TIME,0);}
+    private void action(int value){if(value==0||value==11){if(scenePlayerId()>=0)destination.release();entityData.set(SCENE_PLAYER,-1);}entityData.set(PREVIOUS,action());entityData.set(PREVIOUS_TIME,actionTime());entityData.set(ACTION,value);entityData.set(TIME,0);}
     public float[][] motionPose(float partial){return HydraMotion.INSTANCE.pose(action(),actionTime()+partial,entityData.get(PREVIOUS),entityData.get(PREVIOUS_TIME));}
     public boolean transporting(){return action()==2||action()==6||action()==7||action()==8;}
     public int scenePlayerId(){return entityData.get(SCENE_PLAYER);}
@@ -109,6 +109,9 @@ public final class BlacklightHydra extends Monster implements GeoEntity {
     }
     public boolean beginArrival(ServerPlayer player){
         if(heldId()>=0||!isAlive()||player.level()!=level())return false;
+        // Retain the destination while the real client loads terrain and begins
+        // tracking the carrier; the departure hydra releases its own ticket.
+        destination.prepare((ServerLevel)level(),blockPosition());
         arrivalOnly=link==null;owner=player.getUUID();pickupPosition=player.position();waitForDeparture=true;action(7);entityData.set(SCENE_PLAYER,player.getId());
         // Arrival starts already buried; don't blend from standing idle across the dimension boundary.
         entityData.set(PREVIOUS,-1);if(!hold(player)){discard();return false;}player.fallDistance=0;return true;
@@ -122,6 +125,8 @@ public final class BlacklightHydra extends Monster implements GeoEntity {
         if(tickCount==1&&!planted()&&action()==0&&!isNoAi()){action(5);entityData.set(PREVIOUS,-1);}
         if(cooldown>0)cooldown--;
         if(action()!=0){
+            if(scenePlayerId()>=0&&(action()==7||action()==8||action()==4)&&tickCount%20==0)
+                destination.prepare(level,blockPosition());
             // Keep the prepared destination alive throughout the source cinematic.
             // Maturation + grab + burrow can outlast the short arrival ticket.
             if(planted()&&(action()==2||action()==6)&&tickCount%20==0)prepareDestination(level);

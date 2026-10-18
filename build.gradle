@@ -111,6 +111,12 @@ tasks.named('assemble') {
 // Mojang ships Java 21 to end users in 1.21.1, so mods should target Java 21.
 java.toolchain.languageVersion = JavaLanguageVersion.of(21)
 
+// Real optional-mod integration tests, never bundled into release jars.
+if (project.hasProperty('compatLiveTest')) {
+    sourceSets.main.java.srcDir('src/compatTest/java')
+    sourceSets.main.resources.srcDir('src/traversalTest/resources')
+}
+
 // Opt-in screenshot harness is excluded from normal builds and distributable JARs.
 if (project.hasProperty('hydraReleaseTest')) {
     sourceSets.main.java.srcDir('src/hydraTest/java')

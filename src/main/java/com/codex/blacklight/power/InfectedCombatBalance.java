@@ -25,6 +25,7 @@ public final class InfectedCombatBalance {
         if(event.getEntity().level().isClientSide||event.isCanceled()||event.getAmount()<=0)return;
         var source=event.getSource();
         if(event.getEntity() instanceof BlacklightHunter && source.getEntity() instanceof Player
+                && !source.is(com.codex.blacklight.combat.BulletdiveDamage.TYPE)
                 && !source.is(DamageTypeTags.BYPASSES_INVULNERABILITY))
             event.setAmount(event.getAmount()*HunterBalance.PLAYER_ATTACK_FACTOR);
         var hunter=source.getEntity() instanceof BlacklightHunter h&&source.getDirectEntity()==h?h:null;

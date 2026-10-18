@@ -16,6 +16,7 @@ public final class ImpactControl {
     private ImpactControl(){}
     public static void begin(LivingEntity entity,ImpactProfile profile,float yaw){
         if(entity.isRemoved()){if(entity instanceof Mob mob)ACTIVE.remove(mob);return;}
+        if(entity instanceof com.codex.blacklight.entity.BlacklightHive){cancel(entity);return;}
         if(ConsumeSystem.grappleProtected(entity)||ModAttachments.peekData(entity, ModAttachments.CONSUME_VISUAL, ConsumeVisual.EMPTY).active())return;
         boolean hunterLight=entity instanceof com.codex.blacklight.entity.BlacklightHunter
                 &&profile.kind()==HitReaction.STAGGER&&!profile.knockdown()&&entity.isAlive();

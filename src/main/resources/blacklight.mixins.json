@@ -4,6 +4,10 @@
   "package": "com.codex.blacklight.mixin",
   "compatibilityLevel": "JAVA_21",
   "mixins": [
+    "CrossModLivingDamageMixin",
+    "CrossModItemDamageMixin",
+    "TheTitansNeoDiveMixin",
+    "TheTitansNeoTagsMixin",
     "ShulkerReflectionAccess",
     "LivingDeathAccess",
     "BulletdiveBlockFeedbackMixin",
