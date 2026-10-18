@@ -42,7 +42,8 @@ public final class BiomassCoatBuffers implements MultiBufferSource {
         Collector(RenderType type){this.type=type;}
         void flush(){if(p!=null){vertices.add(new V(p,r,g,b,a,u,v,overlay,light,nx,ny,nz));p=null;}}
         void finish(){flush();for(int q=0;q+3<vertices.size();q+=4){V a=vertices.get(q),b=vertices.get(q+1),c=vertices.get(q+2),d=vertices.get(q+3);
-            for(int x=0;x<4;x++)for(int y=0;y<4;y++){float u=x/4F,v=y/4F,un=(x+1)/4F,vn=(y+1)/4F;quad(type,a.mix(b,u).mix(d.mix(c,u),v),a.mix(b,un).mix(d.mix(c,un),v),a.mix(b,un).mix(d.mix(c,un),vn),a.mix(b,u).mix(d.mix(c,u),vn));}}
+            int grid=vertices.size()<=256?4:vertices.size()<=1024?2:1;
+            for(int x=0;x<grid;x++)for(int y=0;y<grid;y++){float u=x/(float)grid,v=y/(float)grid,un=(x+1)/(float)grid,vn=(y+1)/(float)grid;quad(type,a.mix(b,u).mix(d.mix(c,u),v),a.mix(b,un).mix(d.mix(c,un),v),a.mix(b,un).mix(d.mix(c,un),vn),a.mix(b,u).mix(d.mix(c,u),vn));}}
             vertices.clear();
         }
         public VertexConsumer addVertex(float x,float y,float z){flush();p=inverse.transformPosition(new Vector3f(x,y,z));return this;}

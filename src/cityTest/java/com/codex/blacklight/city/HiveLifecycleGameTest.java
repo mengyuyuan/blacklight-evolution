@@ -10,7 +10,7 @@ import net.neoforged.neoforge.gametest.*;
 
 @GameTestHolder("blacklight") @PrefixGameTestTemplate(false)
 public class HiveLifecycleGameTest {
-    @GameTest(template="wall_test",timeoutTicks=500)
+    @GameTest(template="wall_test",timeoutTicks=500,batch="city_hive_mutation")
     public static void sevenPortsStopProductionAndSpread(GameTestHelper h){
         var key=ResourceKey.create(Registries.DIMENSION,ResourceLocation.fromNamespaceAndPath("blacklight","city_futian"));
         var level=h.getLevel().getServer().getLevel(key);
@@ -43,6 +43,12 @@ public class HiveLifecycleGameTest {
             h.assertTrue(mobs(level)==alive,"destroyed hives produced mobs or removed existing survivors");
             level.removePlayerImmediately(player,Entity.RemovalReason.DISCARDED);
             for(var cp:forced)level.setChunkForced(cp.x,cp.z,false);
+            // Restore the generated ports so a repeated suite does not inherit our destruction.
+            for(int hive=0;hive<2;hive++)for(int i=0;i<7;i++){
+                var pos=CitySystem.port(level,hive,i);
+                level.setBlock(pos,FutianLayout.state(level.getSeed(),pos.getX(),pos.getY(),pos.getZ()),3);
+            }
+            data.destroyedMask=0;java.util.Arrays.fill(data.brokenPorts,0);data.population=false;data.spread=false;data.setDirty();
             h.succeed();
         });
     }

@@ -63,7 +63,7 @@ public final class WeaponCombatSystem {
         if(queued!=null)beginInput(p,WeaponMove.choose(s.form,queued,true,false,false),queued,held);
     }
     private static boolean canRequest(ServerPlayer p){
-        if(com.codex.blacklight.power.BiomassSystem.active(p))return false;
+        if(com.codex.blacklight.power.BiomassSystem.active(p)||com.codex.blacklight.city.HydraTransport.active(p))return false;
         if(DevastatorSystem.busy(p))return false;
         var state=p.getData(ModAttachments.PLAYER_STATE);var movement=p.getData(ModAttachments.MOVEMENT_STATE);
         return p.isAlive()&&!p.isSpectator()&&!p.isPassenger()&&state.isInfected()&&state.isPrototypeMode()&&WeaponMove.controls(state.getActivePower(),p.getMainHandItem().isEmpty()&&p.getOffhandItem().isEmpty())&&!p.getData(ModAttachments.CONSUMING)&&!movement.wallTraversal().attached()&&movement.chargeTicks()==0;
@@ -76,7 +76,7 @@ public final class WeaponCombatSystem {
         acceptInput(p,attack,special,false,false);
     }
     public static void acceptInput(ServerPlayer p,boolean attack,boolean special,boolean action,boolean jump){
-        if(com.codex.blacklight.power.BiomassSystem.active(p))return;
+        if(com.codex.blacklight.power.BiomassSystem.active(p)||com.codex.blacklight.city.HydraTransport.active(p))return;
         if(DevastatorSystem.acceptInput(p,attack,special,action,jump))return;
         var empty=new WeaponButtons(false,false,false,false);
         var old=BUTTONS.getOrDefault(p,new Buttons(empty,p.tickCount));
@@ -214,6 +214,7 @@ public final class WeaponCombatSystem {
     }
     @SubscribeEvent public static void tick(PlayerTickEvent.Post event){
         if(!(event.getEntity() instanceof ServerPlayer p))return;
+        if(com.codex.blacklight.city.HydraTransport.active(p)){cancel(p);cancelHeldInput(p);return;}
         if(p.onGround())AIR_HITS.remove(p);
         var s=ACTIVE.get(p);if(s==null)return;
         var state=p.getData(ModAttachments.PLAYER_STATE);

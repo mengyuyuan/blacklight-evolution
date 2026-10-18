@@ -88,7 +88,15 @@ public final class BlacklightHydra extends Monster implements GeoEntity {
     public int heldId(){return entityData.get(HELD);}
     public ServerPlayer heldPlayer(){return level().getEntity(heldId()) instanceof ServerPlayer p?p:null;}
     public boolean hold(ServerPlayer p){
-        if(!transporting()||heldId()>=0||p.level()!=level()||p.isPassenger()||!p.isAlive()||HydraTransport.active(p))return false;
+        if(!transporting()||heldId()>=0||p.level()!=level()||p.isPassenger()||!p.isAlive()||HydraTransport.active(p)||com.codex.blacklight.power.BiomassSystem.active(p))return false;
+        // Capture is an exclusive action: discard queued attacks and their movement leases.
+        com.codex.blacklight.combat.WeaponCombatSystem.cancel(p);
+        com.codex.blacklight.combat.DevastatorSystem.cancel(p);
+        com.codex.blacklight.combat.WeaponCombatSystem.cancelHeldInput(p);
+        com.codex.blacklight.combat.ConsumeSystem.cancel(p);
+        com.codex.blacklight.movement.WingFlightSystem.stop(p);
+        com.codex.blacklight.movement.PrototypeMovementSystem.suspendForTransport(p);
+        var cargo=com.codex.blacklight.combat.BlockThrowSystem.held(p);if(cargo!=null)cargo.drop();
         var rescue=new CompoundTag();rescue.putString("Dimension",level().dimension().location().toString());
         rescue.putLong("Position",BlockPos.containing(pickupPosition==null?p.position():pickupPosition).asLong());
         p.getPersistentData().put("BlacklightHydraRescue",rescue);
@@ -96,7 +104,7 @@ public final class BlacklightHydra extends Monster implements GeoEntity {
         p.setData(com.codex.blacklight.registry.ModAttachments.HYDRA_CARRIER,getId());p.syncData(com.codex.blacklight.registry.ModAttachments.HYDRA_CARRIER);return true;
     }
     private void releaseHeld(){
-        var p=heldPlayer();if(p!=null)p.getPersistentData().remove("BlacklightHydraRescue");if(p!=null&&p.getData(com.codex.blacklight.registry.ModAttachments.HYDRA_CARRIER)==getId()){p.setData(com.codex.blacklight.registry.ModAttachments.HYDRA_CARRIER,-1);p.syncData(com.codex.blacklight.registry.ModAttachments.HYDRA_CARRIER);}
+        var p=heldPlayer();if(p!=null&&p.getData(com.codex.blacklight.registry.ModAttachments.HYDRA_CARRIER)==getId()){p.setData(com.codex.blacklight.registry.ModAttachments.HYDRA_CARRIER,-1);p.syncData(com.codex.blacklight.registry.ModAttachments.HYDRA_CARRIER);}
         entityData.set(HELD,-1);
     }
     public boolean beginArrival(ServerPlayer player){
@@ -196,6 +204,7 @@ public final class BlacklightHydra extends Monster implements GeoEntity {
             if(t==62&&heldPlayer()!=null){
                 var p=heldPlayer();
                 Vec3 release=gripPosition(p,0);releaseHeld();p.teleportTo(release.x,release.y,release.z);
+                p.getPersistentData().remove("BlacklightHydraRescue");
                 double yaw=Math.toRadians(getYRot());Vec3 velocity=new Vec3(-Math.sin(yaw)*.9,.65,Math.cos(yaw)*.9);
                 p.setData(com.codex.blacklight.registry.ModAttachments.HYDRA_THROWN_AT,level.getGameTime());p.syncData(com.codex.blacklight.registry.ModAttachments.HYDRA_THROWN_AT);
                 p.setDeltaMovement(velocity);p.setOnGround(false);p.hurtMarked=true;p.fallDistance=0;
@@ -287,9 +296,11 @@ public final class BlacklightHydra extends Monster implements GeoEntity {
     private void finishAction(){food=null;entityData.set(FEED_TARGET,-1);action(0);}
     private void restorePassenger(ServerPlayer p){
         if(heldId()==p.getId())releaseHeld();var safe=CityTravel.safePosition((ServerLevel)level(),BlockPos.containing(pickupPosition==null?position().add(3,0,0):pickupPosition));
-        if(safe!=null)p.teleportTo(safe.getX()+.5,safe.getY(),safe.getZ()+.5);
+        if(safe!=null){p.teleportTo(safe.getX()+.5,safe.getY(),safe.getZ()+.5);p.setDeltaMovement(Vec3.ZERO);p.getPersistentData().remove("BlacklightHydraRescue");}
         p.fallDistance=0;p.getPersistentData().putLong("BlacklightHydraLanding",level().getGameTime()+200);
     }
+    /** A fatal slime transformation must release the paired animation before changing body shape. */
+    public void abortTransport(ServerPlayer p){if(heldPlayer()==p)abortTravel();}
     private void abortTravel(){
         entityData.set(SCENE_PLAYER,-1);
         if(heldPlayer()!=null)restorePassenger(heldPlayer());
