@@ -8,16 +8,18 @@ Both loaders use the same gameplay rules.
 - Bulletdive uses the player-owned `blacklight:bulletdive` damage type. It bypasses vanilla armor, shields, enchantment protection, resistance/effect reduction, and ordinary hit cooldown. Damage/death events, creative/admin invulnerability, PvP/target eligibility and loot ownership remain intact. It never removes targets or writes their health directly.
 - Main impact damage is `base × (1 + actualDrop / 30)`. The default base is 22 authored units: 30 blocks = 44; 300 blocks = 242; 60,000 blocks = 44,022. Existing infected health-unit conversion applies to infected targets. Only numeric overflow saturates at a finite float; no gameplay height cap was added. Terrain work and visual budgets remain independent.
 
+For the configurable cross-mod incoming budget, outgoing multiplier and native true damage, see [CROSS_MOD_COMBAT.md](CROSS_MOD_COMBAT.md). The impact formula above is the base amount before the external-target multiplier.
+
 ## Installed-mod compatibility verified on 2026-10-18
 
 The opt-in `src/compatTest` GameTests load real third-party binaries. They invoke TaCZ's installed `createDamageSources` and `tacAttackEntity` routines, including its normal/AP split and invulnerability resets. This verifies the installed server hit pipeline, not physical projectile travel or a manually fired magazine.
 
 | Runtime | Exact external build | Verified outcome |
 | --- | --- | --- |
-| NeoForge 1.21.1 / 21.1.244 | [TaCZ unofficial 1.1.8-hotfix-r7](https://www.curseforge.com/minecraft/mc-mods/tacz-1-21-1/files/9027337) | 30 hits, rotating 0/50/100% AP, 100 damage per shot over 120 ticks: hive loses 100 of 800 HP; no knockdown. Prototype melee still deals full scaled damage. |
-| NeoForge 1.21.1 / 21.1.244 | [TheTitansNeo 1.0.8](https://www.curseforge.com/minecraft/mc-mods/thetitansneo/files/8210650) | Reproduced 1,000-damage cap; optional bridge permits the 44,022-point, 60,000-block dive to kill the vulnerable zombie titan through its own hurt/death pipeline. Ordinary attack cap and invulnerability are preserved. |
+| NeoForge 1.21.1 / 21.1.244 | [TaCZ unofficial 1.1.8-hotfix-r7](https://www.curseforge.com/minecraft/mc-mods/tacz-1-21-1/files/9027337) | 30 hits, rotating 0/50/100% AP, 100 damage per shot over 120 ticks: hive loses 25 of 800 HP with cross-mod defense enabled; no knockdown. Prototype melee still deals full scaled damage. |
+| NeoForge 1.21.1 / 21.1.244 | [TheTitansNeo 1.0.8](https://www.curseforge.com/minecraft/mc-mods/thetitansneo/files/8210650) | Reproduced 1,000-damage cap; optional bridge permits the 60,000-block dive (44,022 base impact before the external-target multiplier) to kill the vulnerable zombie titan through its own hurt/death pipeline. Ordinary external weapon cap and invulnerability are preserved; native Blacklight true attacks also bypass the cap. |
 | Forge 1.20.1 / 47.4.10 | [TaCZ 1.1.8-hotfix2](https://www.curseforge.com/minecraft/mc-mods/timeless-and-classics-zero/files/9037989) | Same installed 30-hit test passes. |
-| Forge 1.20.1 / 47.4.10 | [Potentia beta 0.12.2](https://www.curseforge.com/minecraft/mc-mods/potentia-titans-mod-returns/files/8810218) | Zombie titan (21,000 HP) dies from the 60,000-block dive. Spider titan's separate cap reproduced and bridged; a height-scaled hit exceeding its remaining HP kills it without skipping its native death path. Ordinary attacks remain capped and invulnerability remains effective. |
+| Forge 1.20.1 / 47.4.10 | [Potentia beta 0.12.2](https://www.curseforge.com/minecraft/mc-mods/potentia-titans-mod-returns/files/8810218) | Zombie titan (21,000 HP) dies from the 60,000-block dive. Spider titan's separate cap reproduced and bridged; a height-scaled hit exceeding its remaining HP kills it without skipping its native death path. Ordinary external weapons remain capped and invulnerability remains effective; native Blacklight true attacks also bypass the cap. |
 
 Potentia is a separate revival/reimagining, not the same implementation as TheTitansNeo. These results do not promise a kill against every titan, immune phase, or different release.
 

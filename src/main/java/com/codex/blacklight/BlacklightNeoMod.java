@@ -28,6 +28,7 @@ public final class BlacklightNeoMod {
     public BlacklightNeoMod(IEventBus modBus, ModContainer container) {
         container.registerConfig(net.neoforged.fml.config.ModConfig.Type.CLIENT, com.codex.blacklight.config.PassiveHudConfig.SPEC, "blacklight-client.toml");
         container.registerConfig(net.neoforged.fml.config.ModConfig.Type.SERVER, com.codex.blacklight.city.CityConfig.SPEC, "blacklight-city-server.toml");
+        container.registerConfig(net.neoforged.fml.config.ModConfig.Type.SERVER, com.codex.blacklight.config.CrossModCombatConfig.SPEC, "blacklight-combat-server.toml");
         com.codex.blacklight.city.CityBlocks.register(modBus);
         com.codex.blacklight.city.CityWorldgen.register(modBus);
         NeoForge.EVENT_BUS.register(com.codex.blacklight.city.CitySystem.class);
