@@ -63,7 +63,7 @@ public final class WeaponCombatSystem {
         if(queued!=null)beginInput(p,WeaponMove.choose(s.form,queued,true,false,false),queued,held);
     }
     private static boolean canRequest(ServerPlayer p){
-        if(com.codex.blacklight.power.BiomassSystem.active(p))return false;
+        if(com.codex.blacklight.power.BiomassSystem.active(p)||com.codex.blacklight.city.HydraTransport.active(p))return false;
         if(DevastatorSystem.busy(p))return false;
         var state=com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.PLAYER_STATE);var movement=com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.MOVEMENT_STATE);
         return p.isAlive()&&!p.isSpectator()&&!p.isPassenger()&&state.isInfected()&&state.isPrototypeMode()&&WeaponMove.controls(state.getActivePower(),p.getMainHandItem().isEmpty()&&p.getOffhandItem().isEmpty())&&!com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.CONSUMING)&&!movement.wallTraversal().attached()&&movement.chargeTicks()==0;
@@ -77,7 +77,7 @@ public final class WeaponCombatSystem {
         acceptInput(p,attack,special,false,false);
     }
     public static void acceptInput(ServerPlayer p,boolean attack,boolean special,boolean action,boolean jump){
-        if(com.codex.blacklight.power.BiomassSystem.active(p))return;
+        if(com.codex.blacklight.power.BiomassSystem.active(p)||com.codex.blacklight.city.HydraTransport.active(p))return;
         if(DevastatorSystem.acceptInput(p,attack,special,action,jump))return;
         var empty=new WeaponButtons(false,false,false,false);
         var old=BUTTONS.getOrDefault(p,new Buttons(empty,p.tickCount));
@@ -223,6 +223,7 @@ public final class WeaponCombatSystem {
         if (!com.codex.blacklight.registry.ModAttachments.available(event.player)) { if (event.player instanceof net.minecraft.server.level.ServerPlayer removed) { cancel(removed); BUTTONS.remove(removed); AIR_HITS.remove(removed); } return; }
         if(event.phase != net.minecraftforge.event.TickEvent.Phase.END)return;
         if(!(event.player instanceof ServerPlayer p))return;
+        if(com.codex.blacklight.city.HydraTransport.active(p)){cancel(p);cancelHeldInput(p);return;}
         if(p.onGround())AIR_HITS.remove(p);
         var s=ACTIVE.get(p);if(s==null)return;
         var state=com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.PLAYER_STATE);

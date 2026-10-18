@@ -46,7 +46,7 @@ public final class BiomassHusk extends PathfinderMob {
         entityData.set(DEBRIS,com.codex.blacklight.power.BiomassTerrain.erupt(p,this));
         setNoGravity(true);setDeltaMovement(net.minecraft.world.phys.Vec3.ZERO);
         level().playSound(null,blockPosition(),SoundEvents.GENERIC_EXPLODE,SoundSource.PLAYERS,1.2F,.7F);
-        for(var target:level().getEntitiesOfClass(net.minecraft.world.entity.LivingEntity.class,getBoundingBox().inflate(11,6,11),v->v!=this&&!(v instanceof BiomassHusk)&&CombatTargeting.damageable(p,v))) {
+        for(var target:level().getEntitiesOfClass(net.minecraft.world.entity.LivingEntity.class,getBoundingBox().inflate(11,6,11),v->v!=this&&!(v instanceof BiomassHusk)&&CombatTargeting.damageableFrom(p,v,this))) {
             if(target.distanceToSqr(this)>121||!hasLineOfSight(target))continue;
             if(target.hurt(damageSources().playerAttack(p),24)){
                 var direction=target.position().subtract(position()).normalize();target.push(direction.x*.7,.35,direction.z*.7);

@@ -42,7 +42,7 @@ public final class BiomassPlayerRendering {
             }
             for(int arm=0;arm<5;arm++){
                 double angle=arm*Math.PI*2/5;
-                int steps=Math.max(2,(int)Math.ceil(victim.getBbHeight()*front/.09));
+                int steps=Math.max(2,Math.min(64,(int)Math.ceil(victim.getBbHeight()*front/.09)));
                 for(int i=0;i<=steps;i++){
                     double y=victim.getBbHeight()*front*i/steps;
                     double curl=.025*Math.sin(time*.15-i*.6+arm),r=.065+(1-i/(double)steps)*.025;

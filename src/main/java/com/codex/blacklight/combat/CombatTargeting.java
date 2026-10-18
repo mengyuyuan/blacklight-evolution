@@ -52,7 +52,11 @@ public final class CombatTargeting {
         if(!player.isRemoved())com.codex.blacklight.registry.ModAttachments.syncData(player, ModAttachments.TARGET_LOCK_ID);
     }
     public static boolean damageable(Player player, LivingEntity target) {
-        return target!=null && target!=player && target.level()==player.level()
+        return damageableFrom(player,target,player);
+    }
+    /** Persistent owned attacks resolve in their origin's world even after the owner travels. */
+    public static boolean damageableFrom(Player player, LivingEntity target, Entity origin) {
+        return target!=null && target!=player && target.level()==origin.level()
                 && target.isAlive() && !target.isRemoved() && !target.isSpectator() && !target.isInvulnerable()
                 && !player.isAlliedTo(target) && !com.codex.blacklight.registry.ModAttachments.getData(target, ModAttachments.CONSUME_VISUAL).active()
                 && (!(target instanceof Player other) || !other.getAbilities().invulnerable && player.canHarmPlayer(other)

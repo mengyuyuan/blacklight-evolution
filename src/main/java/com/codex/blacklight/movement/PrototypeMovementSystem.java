@@ -72,6 +72,13 @@ public final class PrototypeMovementSystem {
         }
     }
 
+    /** Release traversal leases before another animation owns the actor's position. */
+    public static void suspendForTransport(ServerPlayer player){
+        var movement=ModAttachments.getData(player,ModAttachments.MOVEMENT_STATE);
+        movement.reset();unpauseServerAnimator(player);syncCharge(player,0);syncWallMotion(player,movement.wallTraversal());
+        clearGlideTrail(player);com.codex.blacklight.animation.NativePlayerActionBackend.clear(player);
+    }
+
     /** Handles edge-triggered inputs immediately instead of waiting for a later player tick. */
     public static void acceptInput(ServerPlayer player, boolean jumpHeld, boolean dashPressed,
                                    int forward, int sideways, boolean sprinting, boolean detach) {
@@ -141,7 +148,7 @@ public final class PrototypeMovementSystem {
         if (!com.codex.blacklight.registry.ModAttachments.available(event.player)) { return; }
         if(event.phase != net.minecraftforge.event.TickEvent.Phase.END)return;
         if (!(event.player instanceof ServerPlayer player)) return;
-        if(com.codex.blacklight.power.BiomassSystem.active(player)||WingFlightSystem.flying(player))return;
+        if(com.codex.blacklight.city.HydraTransport.active(player)||com.codex.blacklight.power.BiomassSystem.active(player)||WingFlightSystem.flying(player))return;
         if (com.codex.blacklight.registry.ModAttachments.getData(player, ModAttachments.CONSUMING)&&com.codex.blacklight.combat.ConsumeVisual.blocksInput(com.codex.blacklight.registry.ModAttachments.getData(player, ModAttachments.GRAB_STAGE))) return;
         MovementState movement = com.codex.blacklight.registry.ModAttachments.getData(player, ModAttachments.MOVEMENT_STATE);
         BlacklightState blacklight = com.codex.blacklight.registry.ModAttachments.getData(player, ModAttachments.PLAYER_STATE);

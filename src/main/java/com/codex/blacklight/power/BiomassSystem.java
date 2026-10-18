@@ -33,9 +33,10 @@ public final class BiomassSystem {
     public static boolean begin(ServerPlayer p,boolean fatal){
         var power=com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.PLAYER_STATE);
         if(active(p)||!power.isInfected()||!power.isPrototypeMode()||p.isSpectator()||p.isRemoved())return false;
-        if(!fatal&&(!p.isAlive()||p.isPassenger()||p.isSleeping()||p.isFallFlying()
+        if(!fatal&&(com.codex.blacklight.city.HydraTransport.active(p)||!p.isAlive()||p.isPassenger()||p.isSleeping()||p.isFallFlying()
                 ||com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.CONSUMING)||WeaponCombatSystem.busy(p)||DevastatorSystem.busy(p)))return false;
         if(fatal&&!power.spendBiomass(Math.max(0,Math.min(1000,p.level().getGameRules().getInt(BiomassRules.COST)))))return false;
+        if(fatal){var carrier=com.codex.blacklight.city.HydraTransport.carrier(p);if(carrier!=null)carrier.abortTransport(p);}
         String oldPower=power.getActivePower().id(),shell="";
         if(!fatal){
             var husk=new BiomassHusk(ModEntities.BIOMASS_HUSK.get(),p.level());

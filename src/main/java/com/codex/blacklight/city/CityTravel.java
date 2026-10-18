@@ -54,36 +54,67 @@ public final class CityTravel {
         event.getDispatcher().register(root);
     }
 
-    public static int travel(ServerPlayer player) {
-        if (HydraTransport.active(player)||player.isPassenger() || player.isSleeping() || !player.isAlive() || player.getCooldowns().isOnCooldown(CityBlocks.TRANSIT.get())) return 0;
-        var server = player.getServer();
-        if (server == null) return 0;
-        if (player.serverLevel().dimension().equals(CITY)) {
-            CompoundTag tag = player.getPersistentData().getCompound(RETURN);
-            ResourceLocation id = ResourceLocation.tryParse(tag.getString("dimension"));
-            ServerLevel target = id == null ? server.overworld() : server.getLevel(ResourceKey.create(Registries.DIMENSION, id));
-            if (target == null || target.dimension().equals(CITY)) target = server.overworld();
-            BlockPos origin = tag.contains("x") ? BlockPos.containing(tag.getDouble("x"), tag.getDouble("y"), tag.getDouble("z")) : target.getSharedSpawnPos();
-            BlockPos safe = safePosition(target, origin);
-            if (safe == null) { player.displayClientMessage(Component.translatable("city.blacklight.no_safe_exit"), false); return 0; }
-            player.teleportTo(target, safe.getX()+.5, safe.getY(), safe.getZ()+.5, tag.getFloat("yaw"), tag.getFloat("pitch"));
-            player.getPersistentData().remove(RETURN);
-        } else {
-            ServerLevel target = server.getLevel(CITY);
-            if (target == null) { player.displayClientMessage(Component.translatable("city.blacklight.unavailable"), false); return 0; }
-            BlockPos safe = safePosition(target, CitySystem.futian(target)?new BlockPos(670,64,820):new BlockPos(26,64,26));
-            if (safe == null) return 0;
-            CompoundTag tag = new CompoundTag();
-            tag.putString("dimension", player.level().dimension().location().toString());
-            tag.putDouble("x", player.getX()); tag.putDouble("y", player.getY()); tag.putDouble("z", player.getZ());
-            tag.putFloat("yaw",player.getYRot());tag.putFloat("pitch",player.getXRot());
-            player.getPersistentData().put(RETURN,tag);
-            player.teleportTo(target,safe.getX()+.5,safe.getY(),safe.getZ()+.5,CitySystem.futian(target)?180:0,0);
-            player.displayClientMessage(Component.translatable("city.blacklight.welcome"),false);
+    private static final java.util.Map<ServerPlayer,PendingTravel> PENDING=new java.util.HashMap<>();
+    private static final class PendingTravel {
+        final ServerLevel source,target;final BlockPos origin;final net.minecraft.world.phys.Vec3 start;
+        final float yaw,pitch;final boolean returning;final long deadline;
+        final HydraDestination ticket=new HydraDestination();
+        PendingTravel(ServerPlayer p,ServerLevel target,BlockPos origin,float yaw,float pitch,boolean returning){
+            source=p.serverLevel();this.target=target;this.origin=origin;this.yaw=yaw;this.pitch=pitch;this.returning=returning;
+            start=p.position();deadline=p.server.getTickCount()+600L;
         }
-        player.fallDistance=0; player.setDeltaMovement(0,0,0);
-        player.getCooldowns().addCooldown(CityBlocks.TRANSIT.get(),40);
-        return 1;
+    }
+    public static int travel(ServerPlayer player) {
+        if (HydraTransport.active(player)||player.isPassenger()||player.isSleeping()||!player.isAlive()
+                ||com.codex.blacklight.power.BiomassSystem.active(player)
+                ||player.getCooldowns().isOnCooldown(CityBlocks.TRANSIT.get())) return 0;
+        if(PENDING.containsKey(player))return 0;
+        var server=player.getServer();if(server==null)return 0;
+        boolean returning=player.level().dimension().equals(CITY);
+        ServerLevel target;BlockPos origin;float yaw,pitch;
+        if(returning){
+            var tag=player.getPersistentData().getCompound(RETURN);
+            var id=ResourceLocation.tryParse(tag.getString("dimension"));
+            target=id==null?server.overworld():server.getLevel(ResourceKey.create(Registries.DIMENSION,id));
+            if(target==null||target.dimension().equals(CITY))target=server.overworld();
+            origin=tag.contains("x")?BlockPos.containing(tag.getDouble("x"),tag.getDouble("y"),tag.getDouble("z")):target.getSharedSpawnPos();
+            yaw=tag.getFloat("yaw");pitch=tag.getFloat("pitch");
+        }else{
+            target=server.getLevel(CITY);
+            if(target==null){player.displayClientMessage(Component.translatable("city.blacklight.unavailable"),false);return 0;}
+            origin=arrivalOrigin(target);yaw=CitySystem.futian(target)?180:0;pitch=0;
+        }
+        // A bounded asynchronous ticket also supports returns to unloaded original worlds.
+        if(PENDING.size()>=16)return 0;
+        PENDING.put(player,new PendingTravel(player,target,origin,yaw,pitch,returning));
+        player.displayClientMessage(Component.translatable("hydra.blacklight.wait"),true);
+        tickTravel(player);return 1;
+    }
+    private static void cancelTravel(ServerPlayer p){var pending=PENDING.remove(p);if(pending!=null)pending.ticket.release();}
+    private static void tickTravel(ServerPlayer p){
+        var pending=PENDING.get(p);if(pending==null)return;
+        if(!p.isAlive()||p.isRemoved()||p.serverLevel()!=pending.source||p.position().distanceToSqr(pending.start)>64
+                ||p.isPassenger()||p.isSleeping()||HydraTransport.active(p)||com.codex.blacklight.power.BiomassSystem.active(p)){
+            cancelTravel(p);return;
+        }
+        if(p.server.getTickCount()>pending.deadline){cancelTravel(p);p.displayClientMessage(Component.translatable("city.blacklight.no_safe_exit"),false);return;}
+        if(!pending.ticket.prepare(pending.target,pending.origin))return;
+        var safe=safePosition(pending.target,pending.origin);
+        if(safe==null){cancelTravel(p);p.displayClientMessage(Component.translatable("city.blacklight.no_safe_exit"),false);return;}
+        var back=new CompoundTag();back.putString("dimension",p.level().dimension().location().toString());
+        back.putDouble("x",p.getX());back.putDouble("y",p.getY());back.putDouble("z",p.getZ());
+        back.putFloat("yaw",p.getYRot());back.putFloat("pitch",p.getXRot());
+        try{
+            p.teleportTo(pending.target,safe.getX()+.5,safe.getY(),safe.getZ()+.5,pending.yaw,pending.pitch);
+            if(p.serverLevel()!=pending.target)return; // Another mod may veto dimension travel.
+            if(pending.returning)p.getPersistentData().remove(RETURN);else p.getPersistentData().put(RETURN,back);
+            p.fallDistance=0;p.setDeltaMovement(0,0,0);p.getCooldowns().addCooldown(CityBlocks.TRANSIT.get(),40);
+            if(!pending.returning)p.displayClientMessage(Component.translatable("city.blacklight.welcome"),false);
+        }finally{cancelTravel(p);}
+    }
+    @SubscribeEvent public static void logout(PlayerEvent.PlayerLoggedOutEvent event){if(event.getEntity() instanceof ServerPlayer p)cancelTravel(p);}
+    @SubscribeEvent public static void stopping(net.minecraftforge.event.server.ServerStoppingEvent event){
+        for(var pending:PENDING.values())pending.ticket.release();PENDING.clear();
     }
 
     public static BlockPos arrivalOrigin(ServerLevel level) {
@@ -107,7 +138,7 @@ public final class CityTravel {
         var centre=new net.minecraft.world.level.ChunkPos(origin);
         for(int x=-1;x<=1;x++)for(int z=-1;z<=1;z++)
             if(target.getChunkSource().getChunkNow(centre.x+x,centre.z+z)==null)return false;
-        var safe=safePosition(target,origin);if(safe==null)return false;
+        var safe=link==null?arrivalPosition(target,origin,bodySize):safePosition(target,origin);if(safe==null)return false;
         com.codex.blacklight.entity.BlacklightHydra carrier=null;
         if(link!=null){
             var entity=target.getEntity(link.endpoint());
@@ -145,6 +176,27 @@ public final class CityTravel {
         return true;
     }
 
+    /** Keep new permanent gateways separate inside the already prepared 3x3 chunks. */
+    public static BlockPos arrivalPosition(ServerLevel level,BlockPos origin,float size){
+        double width=1.8*Math.max(1.6,Math.min(2.4,size));
+        for(int radius=0;radius<=20;radius+=4)for(int dx=-radius;dx<=radius;dx+=4)for(int dz=-radius;dz<=radius;dz+=4){
+            if(Math.max(Math.abs(dx),Math.abs(dz))!=radius)continue;
+            var at=origin.offset(dx,0,dz);
+            if(level.getChunkSource().getChunkNow(at.getX()>>4,at.getZ()>>4)==null)continue;
+            if(!safe(level,at))at=level.getHeightmapPos(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES,at);
+            if(!safe(level,at))continue;
+            var box=new net.minecraft.world.phys.AABB(at.getX()+.5-width/2,at.getY(),at.getZ()+.5-width/2,
+                    at.getX()+.5+width/2,at.getY()+2,at.getZ()+.5+width/2);
+            boolean loaded=true;
+            for(int x=net.minecraft.util.Mth.floor(box.minX)>>4;x<=net.minecraft.util.Mth.floor(box.maxX)>>4;x++)
+                for(int z=net.minecraft.util.Mth.floor(box.minZ)>>4;z<=net.minecraft.util.Mth.floor(box.maxZ)>>4;z++)
+                    if(level.getChunkSource().getChunkNow(x,z)==null)loaded=false;
+            if(!loaded||!level.noCollision(box))continue;
+            if(level.getEntitiesOfClass(com.codex.blacklight.entity.BlacklightHydra.class,box.inflate(3,16,3),h->h.isAlive()).isEmpty())return at;
+        }
+        return null;
+    }
+
     public static BlockPos safePosition(ServerLevel level,BlockPos origin) {
         // Check the saved floor first; if it changed, find nearby ground without destroying blocks.
         for(int radius=0;radius<=8;radius++) for(int dx=-radius;dx<=radius;dx++) for(int dz=-radius;dz<=radius;dz++) {
@@ -170,7 +222,7 @@ public final class CityTravel {
     public static void transitDamage(net.minecraftforge.event.entity.living.LivingAttackEvent event){
         if(!(event.getEntity() instanceof ServerPlayer p))return;
         // Ground transit must not trigger suffocation or manufacture adaptation stacks.
-        if(HydraTransport.active(p)
+        if((HydraTransport.active(p)||p.getPersistentData().contains("BlacklightHydraRescue"))
             &&(event.getSource().is(net.minecraft.world.damagesource.DamageTypes.IN_WALL)||event.getSource().is(net.minecraft.world.damagesource.DamageTypes.FALL)))event.setCanceled(true);
         else if(event.getSource().is(net.minecraft.world.damagesource.DamageTypes.FALL)
             &&p.getPersistentData().getLong("BlacklightHydraLanding")>p.level().getGameTime()){
@@ -181,6 +233,7 @@ public final class CityTravel {
         if(event.phase!=net.minecraftforge.event.TickEvent.Phase.END)return;
         var player=event.player;HydraTransport.place(player);
         if(!(player instanceof ServerPlayer p))return;
+        tickTravel(p);
         if(!HydraTransport.active(p)&&com.codex.blacklight.registry.ModAttachments.getData(p,com.codex.blacklight.registry.ModAttachments.HYDRA_CARRIER)>=0){
             com.codex.blacklight.registry.ModAttachments.setData(p,com.codex.blacklight.registry.ModAttachments.HYDRA_CARRIER,-1);com.codex.blacklight.registry.ModAttachments.syncData(p,com.codex.blacklight.registry.ModAttachments.HYDRA_CARRIER);
         }
