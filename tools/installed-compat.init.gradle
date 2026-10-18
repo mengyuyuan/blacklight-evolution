@@ -1,0 +1,13 @@
+// Opt-in only: stage downloaded, unmodified binaries with prepare-installed-compat.py.
+allprojects {
+    afterEvaluate { p ->
+        if (!p.hasProperty('compatLiveTest')) throw new GradleException('Requires -PcompatLiveTest')
+        if (!p.hasProperty('compatRepository')) throw new GradleException('Requires -PcompatRepository=<local Maven directory>')
+        p.repositories.maven {
+            url = p.uri(p.property('compatRepository'))
+            content { includeGroup('blacklight.qa') }
+        }
+        p.dependencies.add('localRuntime', p.fg.deobf('blacklight.qa:tacz:1'))
+        p.dependencies.add('localRuntime', p.fg.deobf('blacklight.qa:potentia:1'))
+    }
+}
