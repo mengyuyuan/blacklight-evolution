@@ -17,3 +17,12 @@ TaCZ implementation reference: https://github.com/MCModderAnchor/TACZ/blob/1.20.
 There are several Titan ports. The inspected `AquaThree/TheTitansNeo` base class explicitly caps non-Titan damage at 1,000 and checks whether players may hurt it. Generic true damage alone cannot promise an instant kill against that custom rule. No speculative reflection or health override was added without the user's actual runtime mod to test.
 
 Source: https://github.com/AquaThree/TheTitansNeo/blob/main/src/main/java/net/byAqua3/thetitansneo/entity/titan/EntityTitan.java
+
+## Available runtime candidates checked on 2026-10-18
+
+- NeoForge 1.21.1: TheTitansNeo 1.0.8, an unofficial remaster: https://www.curseforge.com/minecraft/mc-mods/thetitansneo/files/8210650
+- Forge 1.20.1: Potentia: Titans Mod Returns beta 0.12.2, a separate revival/reimagining, not the same implementation: https://www.curseforge.com/minecraft/mc-mods/potentia-titans-mod-returns/files/8810218
+- TaCZ Forge 1.20.1: https://www.curseforge.com/minecraft/mc-mods/timeless-and-classics-zero
+- TaCZ NeoForge 1.21.1 unofficial port: https://www.curseforge.com/minecraft/mc-mods/tacz-1-21-1
+
+These listings establish version availability only. They do not establish binary compatibility or constitute installed-mod testing. Titan-specific integration remains unimplemented; the generic damage and TaCZ-pattern tests above are the current tested scope.

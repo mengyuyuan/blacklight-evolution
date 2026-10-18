@@ -442,8 +442,9 @@ public final class PrototypeMovementSystem {
         movement.beginHop();movement.endDash();movement.wallTraversal().reset();unpauseServerAnimator(player);syncCharge(player,0);
         player.setYRot((float)Math.toDegrees(Math.atan2(-direction.x,direction.z)));
         player.yBodyRot=player.getYRot();
-        // Low forward dive: ~0.32 blocks of rise, not the vanilla 1.25-block jump.
-        player.setDeltaMovement(direction.scale(.62).add(0,.19,0));
+        // A stronger horizontal launch carries the roll beyond melee reach before
+        // ground friction brakes it. Keep the low arc and existing i-frame window.
+        player.setDeltaMovement(direction.scale(1.0).add(0,.19,0));
         player.setOnGround(false);player.hurtMarked=true;
         play(player,PlayerAction.TACTICAL_HOP);
         player.connection.send(new net.minecraft.network.protocol.game.ClientboundSetEntityMotionPacket(player));
