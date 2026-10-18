@@ -319,7 +319,8 @@ public final class BlacklightInfectedHost extends Monster {
         if(DevourerFeedingSystem.isDevourer(this)&&!giantBoss())return false;
         if(DevourerFeedingSystem.isDevourer(this)&&(!(target instanceof Player)
                 ||!DevourerFeedingSystem.withinTerritory(this,target)))return false;
-        if(target instanceof Player player)return !player.isCreative()&&!player.isSpectator()&&(encounterBoss()||!BlacklightInfectionSystem.isInfected(player));
+        // Player infection grants powers, not allegiance to hostile infected hosts.
+        if(target instanceof Player player)return !player.isCreative()&&!player.isSpectator();
         return !BlacklightInfectionSystem.isInfected(target);
     }
     @Override protected void registerGoals() {

@@ -588,5 +588,8 @@
   "hydra.blacklight.tooltip.3": "成熟后靠近前往黑光维度，对端九头蛇可以送你回来。",
   "advancement.blacklight.hydra_tissue": "活体通道的种子",
   "advancement.blacklight.hydra_tissue.desc": "种下蜂巢组织，喂养五只生物，培育通往黑光维度的双向九头蛇通道。",
-  "death.attack.blacklight.bulletdive": "%1$s 被 %2$s 的子弹俯冲击碎了"
+  "death.attack.blacklight.bulletdive": "%1$s 被 %2$s 的子弹俯冲击碎了",
+  "city.blacklight.hive_location": "蜂巢建筑：%s · 入口 [%s, %s, %s] · %s",
+  "city.blacklight.hive_inactive": "已摧毁",
+  "city.blacklight.hive_active": "存活（靠近后孵化猎手）"
 }

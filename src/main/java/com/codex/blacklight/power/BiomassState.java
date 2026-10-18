@@ -8,7 +8,7 @@ import com.codex.blacklight.forge.codec.StreamCodec;
 /** Persist the player's form; transient victim IDs are cleared on login/dimension changes. */
 public record BiomassState(int phase, long changedAt, boolean fatal, String shell, String previousPower, int victim, int age) {
     public static final int HUMAN=0, CRAWLING=1, ABSORBING=2, REFORMING=3, READY=4, SHATTERING=5;
-    public static final int ABSORB_TICKS=40, REFORM_TICKS=24, SHATTER_TICKS=28;
+    public static final int ABSORB_TICKS=60, REFORM_TICKS=40, SHATTER_TICKS=28;
     public static final BiomassState EMPTY=new BiomassState(HUMAN,0,false,"","none",-1);
     public BiomassState(int phase,long at,boolean fatal,String shell,String power,int victim){this(phase,at,fatal,shell,power,victim,0);}
     public BiomassState {

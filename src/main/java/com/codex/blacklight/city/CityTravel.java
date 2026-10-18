@@ -27,6 +27,19 @@ public final class CityTravel {
             .then(Commands.literal("credits").executes(c -> {
                 c.getSource().sendSuccess(()->Component.literal("深圳福田市民中心周边 · Map data © OpenStreetMap contributors (ODbL 1.0), generated with Arnis 3.3.0. https://www.openstreetmap.org/copyright"),false);return 1;
             }))
+            .then(Commands.literal("hives").executes(c -> {
+                var level=c.getSource().getServer().getLevel(CITY);
+                if(level==null)return 0;
+                var data=CityData.get(level);
+                for(int index=0;index<2;index++){
+                    var pos=CitySystem.port(level,index,0);
+                    String name=CitySystem.futian(level)?FutianLayout.hive(level.getSeed(),index).name():"Hive "+(index+1);
+                    var message=Component.translatable("city.blacklight.hive_location",name,pos.getX(),pos.getY(),pos.getZ(),
+                            Component.translatable(data.destroyed(index)?"city.blacklight.hive_inactive":"city.blacklight.hive_active"));
+                    c.getSource().sendSuccess(()->message,false);
+                }
+                return 2;
+            }))
             .then(Commands.literal("status").executes(c -> {
                 var level = c.getSource().getServer().getLevel(CITY);
                 if (level == null) return 0;
