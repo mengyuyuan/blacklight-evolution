@@ -85,6 +85,7 @@ public final class StandalonePlayerRendering {
         if(event.getRenderer() instanceof BlacklightPlayerRenderer)return;
         if(!(event.getEntity() instanceof AbstractClientPlayer player))return;
         float partial=event.getPartialTick();
+        boolean ysm=com.codex.blacklight.client.compat.YsmAppearanceBridge.prepare(player,partial);
         if(com.codex.blacklight.power.BiomassSystem.active(player)){
             event.setCanceled(true);
             if(player==net.minecraft.client.Minecraft.getInstance().player&&net.minecraft.client.Minecraft.getInstance().gameRenderer.getMainCamera().getPosition().distanceToSqr(player.getPosition(partial).add(0,.15,0))<.16)return;
@@ -109,6 +110,7 @@ public final class StandalonePlayerRendering {
                 ||player.getData(ModAttachments.CONSUME_VISUAL).active();
         if(!active)return;
         var renderer=RENDERERS.get(player.getSkin().model());if(renderer==null)return;
+        if(ysm){renderer.renderYsmAttachments(player,partial,event.getPoseStack(),event.getMultiBufferSource(),event.getPackedLight());return;}
         event.setCanceled(true);
         renderer.render(player,player.getYRot(),partial,event.getPoseStack(),event.getMultiBufferSource(),event.getPackedLight());
     }
@@ -119,6 +121,7 @@ public final class StandalonePlayerRendering {
             com.codex.blacklight.client.model.BlockArmorModel.invalidate();
             com.codex.blacklight.client.model.MercerPlayerMesh.invalidate();
             com.codex.blacklight.client.model.MercerArmorMesh.invalidate();
+            com.codex.blacklight.client.compat.YsmAppearanceBridge.invalidate();
             RENDERERS.clear();
             for(var skin:event.getSkins())RENDERERS.put(skin,new BlacklightPlayerRenderer(event.getContext(),skin==PlayerSkin.Model.SLIM));
         }
