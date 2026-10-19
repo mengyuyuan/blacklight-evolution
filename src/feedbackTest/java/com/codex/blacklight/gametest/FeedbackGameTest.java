@@ -95,4 +95,28 @@ public final class FeedbackGameTest {
         }
         h.succeed();
     }
+
+    @GameTest(template="wall_test",timeoutTicks=30)
+    public static void summonedDefaultHostUsesPotionPigMorphology(GameTestHelper h) {
+        var level=h.getLevel();
+        String marker="feedback-pig-"+UUID.randomUUID();
+        var position=h.absolutePos(new net.minecraft.core.BlockPos(1,2,1));
+        var source=level.getServer().createCommandSourceStack().withLevel(level)
+                .withPosition(net.minecraft.world.phys.Vec3.atCenterOf(position)).withSuppressedOutput();
+        level.getServer().getCommands().performPrefixedCommand(source,
+                "summon blacklight:infected_host ~ ~ ~ {NoAI:1b,Health:7f,Tags:[\""+marker+"\"]}");
+        var hosts=level.getEntitiesOfClass(com.codex.blacklight.entity.BlacklightInfectedHost.class,
+                new net.minecraft.world.phys.AABB(position).inflate(3),e->e.getTags().contains(marker));
+        h.assertTrue(hosts.size()==1,"real summon command creates exactly one host");
+        var summoned=hosts.get(0);
+        var converted=com.codex.blacklight.registry.ModEntities.INFECTED_HOST.get().create(level);
+        converted.inherit(net.minecraft.world.entity.EntityType.PIG.create(level));
+        h.assertTrue(summoned.speciesId().equals(converted.speciesId()),"summon must select the same pig geometry as potion conversion");
+        h.assertTrue(summoned.quadruped()==converted.quadruped()&&summoned.family().equals(converted.family()),"summon must carry pig anatomy and locomotion");
+        h.assertTrue(Math.abs(summoned.getHealth()-7*CombatScale.units(summoned))<.001F,"appearance normalization preserves explicit health through the existing unit conversion");
+        var saved=new net.minecraft.nbt.CompoundTag();summoned.saveWithoutId(saved);
+        var restored=com.codex.blacklight.registry.ModEntities.INFECTED_HOST.get().create(level);restored.load(saved);
+        h.assertTrue(restored.speciesId().equals("minecraft:pig")&&restored.quadruped(),"resolved appearance survives save/reload");
+        summoned.discard();h.succeed();
+    }
 }
