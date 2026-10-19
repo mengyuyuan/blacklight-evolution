@@ -534,6 +534,19 @@ public final class BlacklightInfectedHost extends Monster {
     }
     @Override public void readAdditionalSaveData(CompoundTag tag) {
         super.readAdditionalSaveData(tag);bossDefeated=tag.getBoolean("BlacklightBossDefeated");CompoundTag data=tag.getCompound("BlacklightHost").copy();
+        // /summon without host NBT historically displayed a pig proxy but passed
+        // an empty species ID to the new morphology selector. Persist the same
+        // species/anatomy metadata that potion conversion supplies, without
+        // replacing command-provided attributes, health or visual variants.
+        if(data.getString("Type").isBlank()) {
+            CompoundTag defaults=new CompoundTag();
+            defaults.putString("Family","ground");defaults.putBoolean("Quadruped",true);
+            defaults.putBoolean("Humanoid",false);defaults.putBoolean("Colossal",false);
+            defaults.putInt("FormVersion",2);
+            defaults.putFloat("Width",EntityType.PIG.getWidth()*1.12F);
+            defaults.putFloat("Height",EntityType.PIG.getHeight()*1.12F);
+            defaults.merge(data);defaults.putString("Type","minecraft:pig");data=defaults;
+        }
         InfectedBossProfile profile=InfectedBossProfile.forSpecies(data.getString("Type"));
         if(profile!=null) {
             // RC51 did not save how a giant was created. Preserve every already-saved
