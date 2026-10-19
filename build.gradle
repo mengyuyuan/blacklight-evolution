@@ -532,3 +532,20 @@ tasks.register('verifyBundledMotionResources') {
     }
 }
 tasks.named('assemble') { dependsOn tasks.named('verifyBundledMotionResources') }
+
+// Website-feedback regressions run only in disposable GameTest worlds.
+if (project.hasProperty('feedbackTest')) {
+    sourceSets.main.java.srcDir('src/feedbackTest/java')
+    sourceSets.main.resources.srcDir('src/traversalTest/resources')
+}
+
+if (project.hasProperty('feedbackVisual')) {
+    sourceSets.main.java.srcDir('src/feedbackVisualTest/java')
+    minecraft.runs.client {
+        property 'blacklight.feedbackVisual', 'true'
+        property 'blacklight.feedbackDirectory', file(project.property('clientRunDirectory')).absolutePath
+        args '--width', '960', '--height', '640'
+    }
+}
+
+tasks.withType(Jar).configureEach { exclude "com/codex/blacklight/client/FeedbackRenderSmoke*.class" }

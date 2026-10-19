@@ -18,6 +18,7 @@ public final class WingAnimationSnapshot {
     public static SovereignWingMotion.Pose sample(Player p,float partial) {
         var s=STATES.computeIfAbsent(p,k->new State());
         if(s.current==null||p.tickCount!=s.tick) {
+            if(s.current!=null&&p.tickCount<s.tick)s.changed+=p.tickCount-s.tick;
             var f=com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.WING_FLIGHT);
             float air=s.airFrom+((s.airborne?1:0)-s.airFrom)*SovereignFlightMotion.smooth((p.tickCount-s.changed)/24F);
             if(f.flying()!=s.airborne){s.airFrom=air;s.airborne=f.flying();s.changed=p.tickCount;}

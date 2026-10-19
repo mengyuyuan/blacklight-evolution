@@ -40,4 +40,17 @@ class WingFlightPresentationTest {
         assertEquals(neutral.get("Head").translation(),accelerating.get("Head").translation());
         for(String side:new String[]{"L","R"})assertEquals(neutral.get("Arm_"+side).translation(),accelerating.get("Arm_"+side).translation());
     }
+
+    @Test void rewoundClockResumesFlowWithoutInventingAnAccelerationImpulse() {
+        var c=new WingFlightPresentation.Controller();
+        c.update(120,1,true,false);
+        var previous=c.update(120.05,1,true,false);
+        c.update(0,2,true,false);
+        var resumed=c.update(.05,2,true,false);
+        assertTrue(resumed.flow()>0);
+        assertEquals(0,resumed.thrust(),.00001F);
+        assertEquals(0,resumed.brake(),.00001F);
+        assertTrue(resumed.speed()>previous.speed()+.1F);
+        assertEquals(resumed,c.update(.05,4,true,true));
+    }
 }
