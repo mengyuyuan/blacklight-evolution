@@ -15,7 +15,7 @@ import net.minecraftforge.common.util.FakePlayerFactory;
 import net.minecraftforge.gametest.GameTestHolder;
 import net.minecraftforge.gametest.PrefixGameTestTemplate;
 
-/** Website #9: exercise real Player.heal and the loader's registered heal event handlers. */
+/** Website #9/#12: real server-player healing, incoming damage and Devastator resource spending. */
 @GameTestHolder("blacklight") @PrefixGameTestTemplate(false)
 public final class FeedbackGameTest {
     private static ServerPlayer player(GameTestHelper h, GameType mode) {
@@ -60,5 +60,39 @@ public final class FeedbackGameTest {
         CriticalMassSystem.healFromConsume(p,maximum*.1F/CombatScale.units(p));
         h.assertTrue(Math.abs(ModAttachments.getData(p,ModAttachments.CRITICAL_MASS).reserve()-.11F)<.001F,
                 "the red-health portion must not also be counted as reserve");h.succeed();
+    }
+
+    @GameTest(template="wall_test",timeoutTicks=30)
+    public static void devastatorPaysOnlyMissingReserve(GameTestHelper h) {
+        var p=player(h,GameType.SURVIVAL);float maximum=p.getMaxHealth();
+        for(float reserve:new float[]{.001F,.25F,1F,1.25F}) {
+            p.setHealth(maximum);
+            ModAttachments.setData(p,ModAttachments.CRITICAL_MASS,new CriticalMassState(reserve,true));
+            h.assertTrue(CriticalMassSystem.spend(p),"positive reserve permits release");
+            float expected=maximum-Math.max(0,1-reserve)*maximum*.25F;
+            h.assertTrue(Math.abs(p.getHealth()-expected)<.001F,"red health pays only the reserve deficit: "+reserve);
+        }
+        ModAttachments.setData(p,ModAttachments.CRITICAL_MASS,CriticalMassState.EMPTY);
+        float before=p.getHealth();
+        h.assertTrue(!CriticalMassSystem.spend(p)&&p.getHealth()==before,"rejected release cannot charge red health");
+        h.succeed();
+    }
+
+    @GameTest(template="wall_test",timeoutTicks=30)
+    public static void incomingDamageOnlyChargesOverflow(GameTestHelper h) {
+        var p=player(h,GameType.SURVIVAL);
+        // Advance the real spawn protection instead of bypassing damage events.
+        for(int i=0;i<61;i++)p.tick();
+        float maximum=p.getMaxHealth();
+        for(float damageFraction:new float[]{.01F,.025F,.05F}) {
+            p.setHealth(maximum);p.invulnerableTime=0;p.setInvulnerable(false);
+            ModAttachments.setData(p,ModAttachments.CRITICAL_MASS,new CriticalMassState(.1F,true));
+            p.hurt(p.damageSources().generic(),maximum*damageFraction/CombatScale.units(p));
+            float expected=maximum-Math.max(0,damageFraction-.025F)*maximum;
+            h.assertTrue(Math.abs(p.getHealth()-expected)<.001F,"only overflow reaches red health: "+damageFraction+", actual="+p.getHealth()+", expected="+expected);
+            float reserve=Math.max(0,.1F-damageFraction/.25F);
+            h.assertTrue(Math.abs(ModAttachments.getData(p,ModAttachments.CRITICAL_MASS).reserve()-reserve)<.001F,"the real damage pipeline must consume reserve");
+        }
+        h.succeed();
     }
 }

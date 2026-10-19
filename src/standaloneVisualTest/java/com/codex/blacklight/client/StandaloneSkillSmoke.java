@@ -446,7 +446,7 @@ public final class StandaloneSkillSmoke {
             if(!probe.spent()){healthBeforeSpend=p.getHealth();maximumBeforeSpend=p.getMaxHealth();}
             else if(!spendHealthObserved){
                 healthAfterSpend=p.getHealth();
-                expectedSpendHealthLoss=(1-current().initialReserve()+CriticalMassState.EXIT_COST_CHARGES)
+                expectedSpendHealthLoss=Math.max(0,1-current().initialReserve())
                         *maximumBeforeSpend*CriticalMassState.CAPACITY_HEALTH_FRACTION;
                 spendHealthObserved=true;
                 require(Float.isFinite(healthBeforeSpend)&&Math.abs((healthBeforeSpend-healthAfterSpend)-expectedSpendHealthLoss)<.05F,
