@@ -7,14 +7,14 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 class CriticalMassStateTest {
-    @Test void reserveAbsorbsBeforeHealthAndExitLossAppliesOnDepletion() {
+    @Test void reserveAbsorbsBeforeHealthAndOnlyOverflowReachesHealth() {
         var state=new CriticalMassState(1,true,100);
         var small=state.absorb(10,100);
         assertEquals(0,small.remaining());assertEquals(10,small.absorbed());
         assertEquals(.6F,small.state().reserve(),.0001F);
         assertEquals(100,small.state().lastAdrenalineDevastatorAt());
         var overflow=state.absorb(40,100);
-        assertEquals(25,overflow.absorbed());assertEquals(27.5F,overflow.remaining());
+        assertEquals(25,overflow.absorbed());assertEquals(15F,overflow.remaining());
         assertEquals(0,overflow.state().reserve());
         assertEquals(40,overflow.state().absorb(40,100).remaining());
         var zero=state.absorb(0,100);
@@ -48,33 +48,33 @@ class CriticalMassStateTest {
         assertFalse(state.spend().spend().spend().spend().ready());
         assertEquals(2,CriticalMassState.EMPTY.addOverheal(1000,100,2).reserve());
     }
-    @Test void anyPositiveReserveReleasesButEntireCostAndExitLossStillApply() {
+    @Test void anyPositiveReserveReleasesAndOnlyShortfallCostsHealth() {
         var tiny=new CriticalMassState(.001F,false,500);
         assertTrue(tiny.ready());
         var spent=tiny.spend(100);
         assertEquals(0,spent.state().reserve());
-        assertEquals(37.475F,spent.healthLoss(),.0001F);
+        assertEquals(24.975F,spent.healthLoss(),.0001F);
         assertEquals(500,spent.state().lastAdrenalineDevastatorAt());
         assertFalse(spent.state().adrenalineArmed());
         var exact=new CriticalMassState(1,true).spend(100);
-        assertEquals(0,exact.state().reserve());assertEquals(12.5F,exact.healthLoss());
+        assertEquals(0,exact.state().reserve());assertEquals(0,exact.healthLoss());
         var excess=new CriticalMassState(1.001F,true).spend(100);
         assertEquals(.001F,excess.state().reserve(),.0001F);assertEquals(0,excess.healthLoss());
         var empty=CriticalMassState.EMPTY.spend(100);
         assertSame(CriticalMassState.EMPTY,empty.state());assertEquals(0,empty.healthLoss());
         assertFalse(empty.state().ready());
     }
-    @Test void damageCrossingCriticalMassAddsExitLossExactlyOnce() {
+    @Test void exactDamageDepletionDoesNotChargeRedHealth() {
         var state=new CriticalMassState(.1F,true,800);
         var exact=state.absorb(2.5F,100);
-        assertEquals(2.5F,exact.absorbed());assertEquals(12.5F,exact.remaining());
+        assertEquals(2.5F,exact.absorbed());assertEquals(0,exact.remaining());
         assertEquals(0,exact.state().reserve());
         assertEquals(1,exact.state().absorb(1,100).remaining());
         var partial=state.absorb(2.49F,100);
         assertTrue(partial.state().ready());assertEquals(0,partial.remaining());
         assertEquals(800,exact.state().lastAdrenalineDevastatorAt());
         var grown=new CriticalMassState(.1F,true).spend(200);
-        assertEquals(70,grown.healthLoss(),.0001F);
+        assertEquals(45,grown.healthLoss(),.0001F);
     }
     @Test void savedReserveDoesNotRearmAnAlreadySpentLastChance() {
         var state=new CriticalMassState(.7F,false,500);

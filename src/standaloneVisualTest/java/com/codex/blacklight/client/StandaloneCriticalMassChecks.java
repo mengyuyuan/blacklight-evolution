@@ -119,17 +119,17 @@ public final class StandaloneCriticalMassChecks {
             p.setData(ModAttachments.CRITICAL_MASS,new CriticalMassState(.001F,true));p.setHealth(maximum);
             require(CriticalMassSystem.ready(p)&&CriticalMassSystem.spend(p),"tiny positive reserve did not permit a formal release");
             near(mass().reserve(),0,"tiny release retained depleted reserve");
-            near(p.getHealth(),maximum-maximum*.25F*1.499F,"tiny release did not charge red health shortfall and source exit loss");
+            near(p.getHealth(),maximum-maximum*.25F*.999F,"tiny release did not charge only the red health shortfall");
             float afterSpend=p.getHealth();
             require(!CriticalMassSystem.spend(p),"zero reserve allowed another release");
             near(p.getHealth(),afterSpend,"rejected zero-reserve release charged health again");
-            record("positive_reserve_release_charges_shortfall_and_exit_once");
+            record("positive_reserve_release_charges_shortfall_once");
 
             p.setData(ModAttachments.CRITICAL_MASS,new CriticalMassState(1,true));p.setHealth(maximum);
             require(CriticalMassSystem.spend(p),"exact-cost release was rejected");
-            near(p.getHealth(),maximum*.875F,"exact-cost release omitted source exit loss");
+            near(p.getHealth(),maximum,"exact-cost release charged red health");
             require(mass().reserve()==0,"exact-cost release kept reserve");
-            record("exact_cost_release_charges_exit_loss");
+            record("exact_cost_release_preserves_red_health");
 
             p.setData(ModAttachments.CRITICAL_MASS,new CriticalMassState(1.25F,true));p.setHealth(maximum);
             require(CriticalMassSystem.spend(p),"greater-than-cost release was rejected");
@@ -147,8 +147,8 @@ public final class StandaloneCriticalMassChecks {
             p.setData(ModAttachments.CRITICAL_MASS,new CriticalMassState(.1F,true));p.setHealth(maximum*.75F);
             health=p.getHealth();hurt(maximum*.05F/units);
             require(mass().reserve()==0,"overflow damage retained depleted reserve");
-            near(p.getHealth(),health-maximum*.15F,"reserve overflow omitted health remainder or source exit loss");
-            record("damage_crossing_reserve_charges_remainder_and_exit_loss");
+            near(p.getHealth(),health-maximum*.025F,"reserve overflow must charge only remaining damage");
+            record("damage_crossing_reserve_charges_only_remainder");
 
             p.setData(ModAttachments.CRITICAL_MASS,new CriticalMassState(1,true));
             p.getAttribute(Attributes.MAX_ABSORPTION).setBaseValue(Math.max(originalAbsorptionBase,2/units));
