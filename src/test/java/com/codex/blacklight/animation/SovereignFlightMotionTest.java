@@ -88,4 +88,13 @@ class SovereignFlightMotionTest {
             }
         }
     }
+
+    @Test void clockRewindPreservesVisibleBlendAndThenCompletesIt() {
+        var t=new SovereignFlightMotion.Transition();var initial=new BlacklightPose();
+        var target=FlightAnimationClips.sample("boost",0);
+        t.apply("boost",120,1,target,initial);
+        var midway=t.apply("boost",120.25,1,target,initial);
+        same(midway,t.apply("boost",0,1,target,initial),1e-5F);
+        same(target,t.apply("boost",.75,1,target,initial),1e-5F);
+    }
 }

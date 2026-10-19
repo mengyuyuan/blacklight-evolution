@@ -10,8 +10,6 @@ public record CriticalMassState(float reserve, boolean adrenalineArmed, long las
     public static final float CAPACITY_HEALTH_FRACTION = .25F;
     /** PrototypeHealthBehaviour.criticalMassHealthGainFactor, verified locally. */
     public static final float CONSUME_GAIN_FACTOR = .55F;
-    /** Source exit loss 200 / Devastator cost 400; health-unit mapping remains a Minecraft adaptation. */
-    public static final float EXIT_COST_CHARGES = .5F;
     public static final int MAX_CAPACITY = 4;
     /** minTimeBetweenAdrenalineDevastators = 22.5 seconds; does not gate reserve releases. */
     public static final int ADRENALINE_RELEASE_INTERVAL_TICKS = 450;
@@ -57,14 +55,13 @@ public record CriticalMassState(float reserve, boolean adrenalineArmed, long las
         float storedHealth=reserve*healthPerCharge;
         float absorbed=Math.min(damage, storedHealth);
         var remainingState=damage>=storedHealth ? new CriticalMassState(0,adrenalineArmed,lastAdrenalineDevastatorAt) : damaged(absorbed, maximum);
-        float exitLoss=reserve>0 && remainingState.reserve()==0 ? healthPerCharge*EXIT_COST_CHARGES : 0;
-        return new DamageResult(remainingState, Math.max(0, damage-absorbed)+exitLoss, absorbed);
+        return new DamageResult(remainingState, Math.max(0, damage-absorbed), absorbed);
     }
     public record SpendResult(CriticalMassState state, float healthLoss) { }
-    /** Native spending subtracts the entire cost from combined health, then charges exit loss when crossing the maximum. */
+    /** Pay one complete release from reserve, using red health only for the missing portion. */
     public SpendResult spend(float maximum) {
         if (!ready() || !Float.isFinite(maximum) || maximum<=0) return new SpendResult(this,0);
-        float healthLoss=reserve<=1 ? (1-reserve+EXIT_COST_CHARGES)*maximum*CAPACITY_HEALTH_FRACTION : 0;
+        float healthLoss=Math.max(0,1-reserve)*maximum*CAPACITY_HEALTH_FRACTION;
         return new SpendResult(spend(),healthLoss);
     }
     /** Reserve-only projection; live releases must also apply spend(maximum).healthLoss(). */

@@ -60,6 +60,8 @@ public final class SovereignFlightMotion {
         private BlacklightPose from,last;private float duration;
         public BlacklightPose apply(String next,double time,float seconds,BlacklightPose target,BlacklightPose initial) {
             if(!Double.isFinite(time))throw new IllegalArgumentException("Non-finite transition time");
+            // Preserve blend progress across clock resets without advancing on duplicate passes.
+            if(time<lastTime-.5){changed+=time-lastTime;lastTime=time;}
             time=Math.max(time,lastTime);lastTime=time;
             if(!next.equals(key)) {from=last==null?initial.copy():last.copy();key=next;changed=time;duration=Math.max(.001F,seconds);}
             last=BlacklightPose.interpolatePose(from,target,smooth((float)(time-changed)/duration));return last.copy();
