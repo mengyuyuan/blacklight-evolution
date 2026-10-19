@@ -136,6 +136,8 @@ public final class SovereignWingMotion {
         public Pose update(double time,float deployment,float air,float targetSpeed,float targetForward,
                            float targetLateral,float targetVertical,float targetTurn,float targetBrake,float targetThrust) {
             if(!Double.isFinite(time))time=Double.isNaN(lastTime)?0:lastTime;
+            // Entity clocks can restart on a world change; keep the pose, rebase time.
+            if(time<lastTime-.5)lastTime=time;
             double dt=Double.isNaN(lastTime)?0:Math.clamp(time-lastTime,0,.1);
             if(Double.isNaN(lastTime)||time>lastTime)lastTime=time;
             float a=1-(float)Math.exp(-dt*5);
