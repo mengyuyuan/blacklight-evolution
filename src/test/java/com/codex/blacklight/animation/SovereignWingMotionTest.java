@@ -81,4 +81,14 @@ class SovereignWingMotionTest {
         for(double t=0;t<1;t+=1./120)
             close(SovereignWingMotion.sample(t,1,1,1,1,1,1,1,1,1),SovereignWingMotion.sample(t+1./120,1,1,1,1,1,1,1,1,1),6);
     }
+
+    @Test void rewoundEntityClockResumesWingbeatWithoutResettingPose() {
+        var c=new SovereignWingMotion.Controller();
+        c.update(120,1,1,0,0,0,0,0,0);
+        var before=c.update(120.05,1,1,0,0,0,0,0,0);
+        close(before,c.update(0,1,1,0,0,0,0,0,0),.0001F);
+        var resumed=c.update(.05,1,1,0,0,0,0,0,0);
+        assertNotEquals(before.left().strokeDegrees(),resumed.left().strokeDegrees(),.01F);
+        close(resumed,c.update(.05,1,1,0,0,0,0,0,0),0);
+    }
 }

@@ -124,6 +124,10 @@ public final class ClientSpeedPostEffect {
         if (minecraft.level == null || minecraft.player == null || minecraft.screen != null) return;
         float partial = event.getPartialTick().getGameTimeDeltaPartialTick(false);
         float renderedIntensity = Mth.lerp(partial, previousIntensity, intensity);
+        // Shader packs/portal renderers may own a different output here. Sampling the
+        // main texture and rebinding main would discard their view, even at intensity zero.
+        var main = minecraft.getMainRenderTarget();
+        if (GL11.glGetInteger(org.lwjgl.opengl.GL30.GL_DRAW_FRAMEBUFFER_BINDING) != main.frameBufferId) return;
         boolean copied=false;
         boolean wasBlend=GL11.glIsEnabled(GL11.GL_BLEND);
         boolean wasDepth=GL11.glIsEnabled(GL11.GL_DEPTH_TEST);
@@ -175,8 +179,8 @@ public final class ClientSpeedPostEffect {
             targetHeight = -1;
             BlacklightNeoMod.LOGGER.info("Loaded Prototype velocity-corrected speed shader");
         }
-        int width = minecraft.getWindow().getWidth();
-        int height = minecraft.getWindow().getHeight();
+        int width = minecraft.getMainRenderTarget().width;
+        int height = minecraft.getMainRenderTarget().height;
         if (width != targetWidth || height != targetHeight) {
             chain.resize(width, height);
             if(savedDepth!=null)savedDepth.destroyBuffers();

@@ -21,6 +21,8 @@ public final class WingFlightPresentation {
             if(!Double.isFinite(now))return frame;
             speed=Float.isFinite(speed)?Math.clamp(speed,0,24F):0;
             if(Double.isNaN(time)){time=now;velocity=speed;return frame;}
+            // A restarted entity clock must not freeze flow until the old age catches up.
+            if(now<time-.5){time=now;velocity=speed;return frame;}
             if(now<=time)return frame;
             double elapsed=now-time;time=now;
             // A teleport/reconnect is not an acceleration impulse.
