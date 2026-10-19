@@ -72,3 +72,16 @@ Map data © OpenStreetMap contributors (ODbL 1.0), generated with Arnis 3.3.0
 under ODbL 1.0. See `docs/FUTIAN_DATA_SOURCES.md` for attribution, source links,
 generation parameters and accuracy limits. In-game attribution is available
 through `/blacklightcity credits`.
+
+## Blacklight world atlas — Shenzhen
+
+The derived geographic database in `data/blacklight/worldmap/shenzhen/` is
+© OpenStreetMap contributors, ODbL 1.0, from Geofabrik's Guangdong extract
+dated 2026-10-14. The bundled JSON/GZIP files are the editable database form.
+Source, transformations and limitations: `docs/worldgen/SHENZHEN_SOURCES.md`.
+
+Elevation: Mapzen Terrain Tiles. Global SRTM and GMTED2010 terrain data
+courtesy of the U.S. Geological Survey; global ETOPO1 terrain data from the
+U.S. National Oceanic and Atmospheric Administration. Elevation was decoded,
+reprojected, sampled on a 32-metre grid and blended into the existing Futian
+core. These modifications are project-authored and not endorsed by providers.

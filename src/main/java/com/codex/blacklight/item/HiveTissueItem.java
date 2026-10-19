@@ -15,7 +15,7 @@ public final class HiveTissueItem extends Item {
     }
     @Override public InteractionResult useOn(UseOnContext c) {
         var level=c.getLevel();var player=c.getPlayer();
-        if(level.dimension().equals(com.codex.blacklight.city.CityTravel.CITY)){
+        if(com.codex.blacklight.city.CityTravel.isCity(level.dimension())){
             if(player!=null&&!level.isClientSide)player.displayClientMessage(net.minecraft.network.chat.Component.translatable("hydra.blacklight.outside"),true);
             return InteractionResult.FAIL;
         }

@@ -19,16 +19,23 @@ import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 public final class CityTravel {
     public static final ResourceKey<Level> CITY = ResourceKey.create(Registries.DIMENSION,
         ResourceLocation.fromNamespaceAndPath("blacklight", "city"));
+    public static final ResourceKey<Level> WORLD = ResourceKey.create(Registries.DIMENSION,
+        ResourceLocation.fromNamespaceAndPath("blacklight", "world"));
+    public static boolean isCity(ResourceKey<Level> key) { return key.equals(CITY)||key.equals(WORLD); }
+    static ServerLevel commandLevel(net.minecraft.commands.CommandSourceStack source) {
+        return isCity(source.getLevel().dimension())?source.getLevel():source.getServer().getLevel(WORLD);
+    }
     private static final String RETURN = "BlacklightCityReturn";
 
     @SubscribeEvent public static void commands(RegisterCommandsEvent event) {
         var root = Commands.literal("blacklightcity")
             .then(Commands.literal("travel").executes(c -> travel(c.getSource().getPlayerOrException())))
+            .then(Commands.literal("futian").executes(c -> travel(c.getSource().getPlayerOrException(),CITY)))
             .then(Commands.literal("credits").executes(c -> {
-                c.getSource().sendSuccess(()->Component.literal("深圳福田市民中心周边 · Map data © OpenStreetMap contributors (ODbL 1.0), generated with Arnis 3.3.0. https://www.openstreetmap.org/copyright"),false);return 1;
+                c.getSource().sendSuccess(()->Component.literal("黑光维度 · 深圳：Map data © OpenStreetMap contributors (ODbL 1.0), Geofabrik 2026-10-14; elevation Mapzen Terrain Tiles / USGS / NOAA; Futian core Arnis 3.3.0. https://www.openstreetmap.org/copyright"),false);return 1;
             }))
             .then(Commands.literal("hives").executes(c -> {
-                var level=c.getSource().getServer().getLevel(CITY);
+                var level=commandLevel(c.getSource());
                 if(level==null)return 0;
                 var data=CityData.get(level);
                 for(int index=0;index<2;index++){
@@ -41,7 +48,7 @@ public final class CityTravel {
                 return 2;
             }))
             .then(Commands.literal("status").executes(c -> {
-                var level = c.getSource().getServer().getLevel(CITY);
+                var level = commandLevel(c.getSource());
                 if (level == null) return 0;
                 var data = CityData.get(level);
                 c.getSource().sendSuccess(() -> Component.translatable("city.blacklight.status",
@@ -51,7 +58,7 @@ public final class CityTravel {
         for (String setting : new String[]{"population", "spread", "facade"}) {
             root.then(Commands.literal(setting).requires(s -> s.hasPermission(2))
                 .then(Commands.argument("enabled", com.mojang.brigadier.arguments.BoolArgumentType.bool()).executes(c -> {
-                    var level = c.getSource().getServer().getLevel(CITY);
+                    var level = commandLevel(c.getSource());
                     if (level == null) return 0;
                     var data = CityData.get(level);
                     boolean enabled = com.mojang.brigadier.arguments.BoolArgumentType.getBool(c, "enabled");
@@ -78,22 +85,25 @@ public final class CityTravel {
         }
     }
     public static int travel(ServerPlayer player) {
+        return travel(player,WORLD);
+    }
+    static int travel(ServerPlayer player,ResourceKey<Level> destination) {
         if (HydraTransport.active(player)||player.isPassenger()||player.isSleeping()||!player.isAlive()
                 ||com.codex.blacklight.power.BiomassSystem.active(player)
                 ||player.getCooldowns().isOnCooldown(CityBlocks.TRANSIT.get())) return 0;
         if(PENDING.containsKey(player))return 0;
         var server=player.getServer();if(server==null)return 0;
-        boolean returning=player.level().dimension().equals(CITY);
+        boolean returning=isCity(player.level().dimension());
         ServerLevel target;BlockPos origin;float yaw,pitch;
         if(returning){
             var tag=player.getPersistentData().getCompound(RETURN);
             var id=ResourceLocation.tryParse(tag.getString("dimension"));
             target=id==null?server.overworld():server.getLevel(ResourceKey.create(Registries.DIMENSION,id));
-            if(target==null||target.dimension().equals(CITY))target=server.overworld();
+            if(target==null||isCity(target.dimension()))target=server.overworld();
             origin=tag.contains("x")?BlockPos.containing(tag.getDouble("x"),tag.getDouble("y"),tag.getDouble("z")):target.getSharedSpawnPos();
             yaw=tag.getFloat("yaw");pitch=tag.getFloat("pitch");
         }else{
-            target=server.getLevel(CITY);
+            target=server.getLevel(destination);
             if(target==null){player.displayClientMessage(Component.translatable("city.blacklight.unavailable"),false);return 0;}
             origin=arrivalOrigin(target);yaw=CitySystem.futian(target)?180:0;pitch=0;
         }
@@ -122,7 +132,7 @@ public final class CityTravel {
             if(p.serverLevel()!=pending.target)return; // Another mod may veto dimension travel.
             if(pending.returning)p.getPersistentData().remove(RETURN);else p.getPersistentData().put(RETURN,back);
             p.fallDistance=0;p.setDeltaMovement(0,0,0);p.getCooldowns().addCooldown(CityBlocks.TRANSIT.get(),40);
-            if(!pending.returning)p.displayClientMessage(Component.translatable("city.blacklight.welcome"),false);
+            if(!pending.returning)p.displayClientMessage(Component.translatable(pending.target.dimension().equals(WORLD)?"city.blacklight.welcome":"city.blacklight.legacy_welcome"),false);
         }finally{cancelTravel(p);}
     }
     @SubscribeEvent public static void logout(PlayerEvent.PlayerLoggedOutEvent event){if(event.getEntity() instanceof ServerPlayer p)cancelTravel(p);}
@@ -145,8 +155,8 @@ public final class CityTravel {
     public static boolean transferFromHydra(ServerPlayer player,com.codex.blacklight.entity.BlacklightHydra sourceHydra,BlockPos returnPos,float bodySize) {
         if(!player.isAlive()||player.isPassenger()||HydraTransport.active(player))return false;
         var link=sourceHydra==null?null:sourceHydra.link();
-        if(link==null&&player.serverLevel().dimension().equals(CITY))return false;
-        var target=player.server.getLevel(link==null?CITY:link.dimension());if(target==null)return false;
+        if(link==null&&isCity(player.serverLevel().dimension()))return false;
+        var target=player.server.getLevel(link==null?WORLD:link.dimension());if(target==null)return false;
         var origin=link==null?arrivalOrigin(target):link.position();
         var centre=new net.minecraft.world.level.ChunkPos(origin);
         for(int x=-1;x<=1;x++)for(int z=-1;z<=1;z++)
@@ -171,7 +181,7 @@ public final class CityTravel {
         var source=player.serverLevel();var sourcePosition=player.position();float sourceYaw=player.getYRot(),sourcePitch=player.getXRot();
         var previousReturn=player.getPersistentData().getCompound(RETURN).copy();
         if(sourceHydra!=null&&created)carrier.connect(player.getUUID(),new HydraLink(source.dimension(),sourceHydra.blockPosition(),sourceHydra.getUUID()));
-        if(!source.dimension().equals(CITY)){
+        if(!isCity(source.dimension())){
             CompoundTag tag=new CompoundTag();tag.putString("dimension",source.dimension().location().toString());
             tag.putDouble("x",returnPos.getX()+.5);tag.putDouble("y",returnPos.getY());tag.putDouble("z",returnPos.getZ()+.5);
             tag.putFloat("yaw",sourceYaw);tag.putFloat("pitch",0);player.getPersistentData().put(RETURN,tag);
