@@ -123,6 +123,7 @@ if (project.hasProperty('hydraReleaseTest')) {
 }
 if (project.hasProperty('wingTest')) sourceSets.main.java.srcDir('src/wingTest/java')
 if (project.hasProperty('hydraVisualTest')) sourceSets.main.java.srcDir('src/hydraVisualTest/java')
+if (project.hasProperty('cityVisualTest')) sourceSets.main.java.srcDir('src/cityVisualTest/java')
 if (project.hasProperty('weaponModelPreview')) sourceSets.main.java.srcDir('src/weaponVisualTest/java')
 if (project.hasProperty('leanArmorPreview')) sourceSets.main.java.srcDir('src/armorVisualTest/java')
 if (project.hasProperty('hiveFeedingTest')) {
@@ -191,8 +192,13 @@ neoForge {
     runs {
         client {
             client()
+            if(project.hasProperty('cityVisualTest')) {
+                systemProperty 'blacklight.cityVisual', 'true'
+                programArguments.addAll '--width', '1280', '--height', '800'
+            }
             if(project.hasProperty('hydraVisualTest')) {
                 systemProperty 'blacklight.hydraVisual', 'true'
+                if(project.hasProperty('hydraVisualFast')) systemProperty 'blacklight.hydraVisualFast', 'true'
                 if(project.hasProperty('creatureCombatVisual')) systemProperty 'blacklight.creatureCombatVisual', 'true'
                 if(project.hasProperty('hunterRigOnly')) systemProperty 'blacklight.hunterRigOnly', 'true'
                 programArguments.addAll '--width', '1280', '--height', '800'

@@ -79,7 +79,7 @@ public final class HydraReleaseSmoke {
                 try{Files.writeString(OUT.resolve("server-telemetry.txt"),"tick="+tick+" dimension="+l.dimension().location()+" player="+p.position()+" hydra="+h.getId()+" uuid="+h.getUUID()+" held="+h.heldId()+" scene="+h.scenePlayerId()+" action="+h.action()+":"+h.actionTime()+"\n",StandardOpenOption.CREATE,StandardOpenOption.APPEND);}catch(Exception ex){throw new RuntimeException(ex);}
         });
         for(var entity:mc.level.entitiesForRendering())if(entity instanceof BlacklightHydra h&&h.scenePlayerId()==mc.player.getId()){
-            if(mc.level.dimension().equals(CityTravel.CITY)){cityEmerging|=h.action()==7;cityToss|=h.action()==8;}
+            if(mc.level.dimension().equals(CityTravel.WORLD)){cityEmerging|=h.action()==7;cityToss|=h.action()==8;}
             else if(entered){homeEmerging|=h.action()==7;homeToss|=h.action()==8;}
         }
         everRiding|=mc.player.isPassenger();dead|=!mc.player.isAlive();minHealth=Math.min(minHealth,mc.player.getHealth());
@@ -114,8 +114,8 @@ public final class HydraReleaseSmoke {
                 if(Boolean.getBoolean("blacklight.hydraVisualFast"))e.interact(p,net.minecraft.world.InteractionHand.MAIN_HAND);
             }
         });
-        if(mc.level.dimension().equals(CityTravel.CITY)){
-            if(!entered){entered=true;cityTick=tick;write("entered-city.txt","Actual client arrived in blacklight:city at tick "+tick);}
+        if(mc.level.dimension().equals(CityTravel.WORLD)){
+            if(!entered){entered=true;cityTick=tick;write("entered-city.txt","Actual client arrived in blacklight:world at tick "+tick);}
             if(cityEmerging&&cityToss&&!thrown&&tick>cityTick+100&&!HydraTransport.active(mc.player)){
                 thrown=true;write("thrown.txt","Released in city at tick "+tick+" velocity="+mc.player.getDeltaMovement());
             }

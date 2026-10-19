@@ -1,0 +1,21 @@
+{
+  "counts": {
+    "construction": 985,
+    "industrial": 2796,
+    "residential": 5231,
+    "brownfield": 107,
+    "commercial": 1315,
+    "railway": 65,
+    "retail": 199,
+    "education": 18,
+    "civic_admin": 1,
+    "garages": 3,
+    "institutional": 7,
+    "religious": 13
+  },
+  "invalid": {
+    "invalid_area": 3
+  },
+  "source": "guangdong-261014.osm.pbf",
+  "seconds": 62.23400000000038
+}

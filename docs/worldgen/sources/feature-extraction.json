@@ -1,0 +1,41 @@
+{
+  "counts": {
+    "water": 2223,
+    "rail": 1475,
+    "road": 101284,
+    "park": 3406,
+    "river": 2262,
+    "forest": 2002,
+    "building": 84363,
+    "paved": 1590
+  },
+  "invalid": {
+    "RuntimeError": 29
+  },
+  "boundary_bbox": [
+    113.6805151,
+    21.8213642,
+    115.3890648,
+    23.016534
+  ],
+  "projection": {
+    "originLon": 114.048,
+    "originLat": 22.552,
+    "metresPerLongitudeDegree": 102811.19191866614,
+    "metresPerLatitudeDegree": 111319.49079327358,
+    "wrapLongitude": true
+  },
+  "districts": [
+    "坪山区",
+    "罗湖区",
+    "光明区",
+    "龙岗区",
+    "深汕特别合作区",
+    "南山区",
+    "宝安区",
+    "龙华区",
+    "盐田区",
+    "福田区"
+  ],
+  "seconds": 283.8909999999996
+}
