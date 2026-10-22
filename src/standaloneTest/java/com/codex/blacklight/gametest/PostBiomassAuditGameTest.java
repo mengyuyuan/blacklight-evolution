@@ -22,6 +22,7 @@ public final class PostBiomassAuditGameTest {
   var position=p.position();level.removePlayerImmediately(p,Entity.RemovalReason.KILLED);p.invalidateCaps();
   h.assertTrue(!ModAttachments.available(p),"removed player has no live capability");
   h.assertTrue(!HydraTransport.active(p),"removed player is no longer a carrier participant");
+  h.assertTrue(!UtilityPowerSystem.active(p,PowerForm.ARMOR)&&!com.codex.blacklight.movement.WingFlightSystem.ownsTravel(p),"late movement packets see no active utility or flight state");
   HydraTransport.place(p);CityTravel.transitLanding(new net.minecraftforge.event.TickEvent.PlayerTickEvent(net.minecraftforge.event.TickEvent.Phase.END,p));
   h.assertTrue(p.position().equals(position)&&!ModAttachments.available(p),"post-death tick neither moves the corpse nor revives capability state");
   hydra.discard();h.succeed();
