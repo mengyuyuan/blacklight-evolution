@@ -107,10 +107,10 @@ public final class PostBiomassAuditGameTest {
  public static void consumedSlimeWaitsForStandingRoom(GameTestHelper h){
   var p=player(h,"SlimeRoom");long now=h.getLevel().getGameTime();var ceiling=p.blockPosition().above();
   h.getLevel().setBlock(ceiling,Blocks.STONE.defaultBlockState(),2);
-  ModAttachments.setData(p,ModAttachments.BIOMASS_FORM,new BiomassState(BiomassState.REFORMING,now-30,true,"","claws",-1,250));
+  ModAttachments.setData(p,ModAttachments.BIOMASS_FORM,new BiomassState(BiomassState.REFORMING,now-BiomassState.REFORM_TICKS,true,"","claws",-1,250));
   tickSlime(p);boolean waits=BiomassSystem.state(p).phase()==BiomassState.READY;
   h.getLevel().setBlock(ceiling,Blocks.AIR.defaultBlockState(),2);
-  ModAttachments.setData(p,ModAttachments.BIOMASS_FORM,BiomassSystem.state(p).ready(now-30));tickSlime(p);
+  ModAttachments.setData(p,ModAttachments.BIOMASS_FORM,BiomassSystem.state(p).ready(now-BiomassState.REFORM_TICKS));tickSlime(p);
   boolean restored=!BiomassSystem.active(p);
   h.getLevel().removePlayerImmediately(p,Entity.RemovalReason.DISCARDED);
   h.assertTrue(waits&&restored,"blocked reform waits, then restores at the same position without another prey");h.succeed();
