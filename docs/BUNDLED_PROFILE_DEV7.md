@@ -2,7 +2,7 @@
 
 本分支从上游 dev.7 接入同一套 224 个运行文件：213 个动作 JSON 和 11 个 JSON 格式 `.data`。默认输入 `art/motion-profile/`，输出到 JAR 内 `blacklight/bundled_motions/`。包含待机、走跑、跳跃、墙跑、武器变形、攻击、吸收、装甲、镜头及 HUD；源文件字节保持不变。
 
-`art/motion-profile-manifest.json` 记录字节数和 SHA-256。Forge 构建核验实际 Jar-in-Jar 重混淆成品的文件名集合、源字节、字节数和 SHA-256，`assemble` 依赖此检查。默认分类 bundled；显式 `-PbundleMotionDirectory` 完整替换并使用 external-profile。
+`art/motion-profile-manifest.json` 记录字节数。Forge 构建核验实际 Jar-in-Jar 重混淆成品的文件名集合、源字节及字节数；旧清单若提供 SHA-256 仍会验证。`assemble` 依赖此检查，发布收集器现场计算输入摘要并逐项比对 JAR 和源码快照。默认分类 bundled；显式 `-PbundleMotionDirectory` 完整替换并使用 external-profile，收集时需传入同一目录的 `--private-motion-directory`。
 
 ## 构建环境
 

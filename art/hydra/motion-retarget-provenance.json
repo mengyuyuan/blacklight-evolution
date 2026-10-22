@@ -3,7 +3,6 @@
     "species": "Hydra",
     "runtime": "idle",
     "source": "hyd_act_idle",
-    "sha256": "a0460d1a89a5fb476020d04a71737eb9df26eb93e2bf626971bf91938b17e4d3",
     "seconds": 6.0,
     "boneMap": {
       "neck_0": "full_rig_body1",
@@ -28,7 +27,6 @@
     "species": "Hydra",
     "runtime": "emerge",
     "source": "hyd_enter",
-    "sha256": "4d31d54db0c0f41cc4849ae9e70ea813c8866ce8cef95090d5d086f7e8dac5a4",
     "seconds": 4.0,
     "boneMap": {
       "neck_0": "full_rig_body1",
@@ -53,7 +51,6 @@
     "species": "Hydra",
     "runtime": "retract",
     "source": "hyd_exit",
-    "sha256": "ee4fa64ba52dce17a20119e9bd133d8e10562fa384581b6a8ef3de7a253e3929",
     "seconds": 1.8,
     "boneMap": {
       "neck_0": "full_rig_body1",
@@ -78,7 +75,6 @@
     "species": "Hydra",
     "runtime": "slam",
     "source": "hyd_slam",
-    "sha256": "a3fe808370cfc2f70bc6494c3480068d05216611834d335ca989fa506ac346d4",
     "seconds": 2.433333333333333,
     "boneMap": {
       "neck_0": "full_rig_body1",
@@ -103,7 +99,6 @@
     "species": "Hydra",
     "runtime": "sweep",
     "source": "hyd_sweep",
-    "sha256": "1fd75072bf9df93e27e9fb80a5b7bf50dcb6cbad8af324b285ba6eda9e8cb83b",
     "seconds": 2.3333333333333335,
     "boneMap": {
       "neck_0": "full_rig_body1",
@@ -128,7 +123,6 @@
     "species": "Hydra",
     "runtime": "sidesweep",
     "source": "hyd_sidesweep",
-    "sha256": "e02e34b579cf11db26314d5a96234eb70d0290f7486441ff0ddbf6f7e01b10f0",
     "seconds": 4.133333333333334,
     "boneMap": {
       "neck_0": "full_rig_body1",
@@ -153,7 +147,6 @@
     "species": "Hydra",
     "runtime": "capture",
     "source": "hyd_grab_concrete",
-    "sha256": "d00b23cdbee03a9652c09949c1283f0fe59287e3d438588e63a7009897389405",
     "seconds": 3.966666666666667,
     "boneMap": {
       "neck_0": "full_rig_body1",
@@ -173,15 +166,13 @@
     "reference": "hyd_act_idle",
     "rootMotion": "Removed horizontal locomotion; emerge/exit retain vertical Character_Root translation",
     "jawOverlay": {
-      "source": "hyd_act_partitioned_grab",
-      "sha256": "0941477eaeb7c8fb375e12e3a110a3d1970862d052ddf8049ca6489db34804a4"
+      "source": "hyd_act_partitioned_grab"
     }
   },
   {
     "species": "Hydra",
     "runtime": "dive",
     "source": "hyd_exit",
-    "sha256": "ee4fa64ba52dce17a20119e9bd133d8e10562fa384581b6a8ef3de7a253e3929",
     "seconds": 1.8,
     "boneMap": {
       "neck_0": "full_rig_body1",
@@ -201,15 +192,13 @@
     "reference": "hyd_act_idle",
     "rootMotion": "Removed horizontal locomotion; emerge/exit retain vertical Character_Root translation",
     "jawOverlay": {
-      "source": "hyd_act_partitioned_grab",
-      "sha256": "0941477eaeb7c8fb375e12e3a110a3d1970862d052ddf8049ca6489db34804a4"
+      "source": "hyd_act_partitioned_grab"
     }
   },
   {
     "species": "Hydra",
     "runtime": "arrival",
     "source": "hyd_enter",
-    "sha256": "4d31d54db0c0f41cc4849ae9e70ea813c8866ce8cef95090d5d086f7e8dac5a4",
     "seconds": 4.0,
     "boneMap": {
       "neck_0": "full_rig_body1",
@@ -229,15 +218,13 @@
     "reference": "hyd_act_idle",
     "rootMotion": "Removed horizontal locomotion; emerge/exit retain vertical Character_Root translation",
     "jawOverlay": {
-      "source": "hyd_act_partitioned_grab",
-      "sha256": "0941477eaeb7c8fb375e12e3a110a3d1970862d052ddf8049ca6489db34804a4"
+      "source": "hyd_act_partitioned_grab"
     }
   },
   {
     "species": "Hydra",
     "runtime": "toss",
     "source": "hyd_ped_toss",
-    "sha256": "9b731080ffc15f5b1076c60e84973cd3992b6d6bc4ba36d028c03c01c93dc41c",
     "seconds": 6.966666666666667,
     "boneMap": {
       "neck_0": "full_rig_body1",
@@ -257,15 +244,13 @@
     "reference": "hyd_act_idle",
     "rootMotion": "Removed horizontal locomotion; emerge/exit retain vertical Character_Root translation",
     "jawOverlay": {
-      "source": "hyd_act_partitioned_grab",
-      "sha256": "0941477eaeb7c8fb375e12e3a110a3d1970862d052ddf8049ca6489db34804a4"
+      "source": "hyd_act_partitioned_grab"
     }
   },
   {
     "species": "Brawler",
     "runtime": "idle",
     "source": "brawler_act_calm",
-    "sha256": "f522ea9f5f7d81d8f8b7ed7403172bef1c1df7e0bbb6dca28747caf830cb8fb5",
     "seconds": 1.7,
     "boneMap": {
       "hips": "Pelvis",
@@ -289,7 +274,6 @@
     "species": "Brawler",
     "runtime": "walk",
     "source": "brawler_loco_walk_n",
-    "sha256": "2dfccfafcc09139a419c16e6a614796a6d592a786000fc80f978399c41bfecd7",
     "seconds": 1.4666666666666666,
     "boneMap": {
       "hips": "Pelvis",
@@ -313,7 +297,6 @@
     "species": "Brawler",
     "runtime": "run",
     "source": "brawler_loco_run_n",
-    "sha256": "6ad61dc5d42dce84c16879629f96756303cd3d40d21e7af6a6744c6f686a3968",
     "seconds": 0.7666666666666667,
     "boneMap": {
       "hips": "Pelvis",
@@ -337,7 +320,6 @@
     "species": "Brawler",
     "runtime": "swipe",
     "source": "brawler_pnch_1",
-    "sha256": "e987c262dbdf1e39fc0d4c855980a3907d214979deccd161a90791f29112d5d9",
     "seconds": 1.6,
     "boneMap": {
       "hips": "Pelvis",
@@ -361,7 +343,6 @@
     "species": "Brawler",
     "runtime": "barrage",
     "source": "brawler_claw_barrage",
-    "sha256": "fab8baa7484a4a25b03569beeab19318b53c735449b039faae686c6e5e31e2dd",
     "seconds": 2.6,
     "boneMap": {
       "hips": "Pelvis",
@@ -385,7 +366,6 @@
     "species": "Brawler",
     "runtime": "barrage_end",
     "source": "brawler_claw_barrage_end",
-    "sha256": "77a48bcec4ea97880f6eed065c651c8e158169de96154cb35a0070471db89d59",
     "seconds": 2.066666666666667,
     "boneMap": {
       "hips": "Pelvis",
@@ -409,7 +389,6 @@
     "species": "Brawler",
     "runtime": "slam",
     "source": "brawler_pnch_fist_slam",
-    "sha256": "e7dc038d5b02326b9e03e81183e67b5eb433e31770a63975ecef6b15cba73403",
     "seconds": 2.4,
     "boneMap": {
       "hips": "Pelvis",
@@ -433,7 +412,6 @@
     "species": "Brawler",
     "runtime": "leap",
     "source": "brawler_loco_jump_medium",
-    "sha256": "d4e6946d9a3faac0ee511d4288c64f90a39386a343b1b2a23b7e7505cbb71a75",
     "seconds": 2.566666666666667,
     "boneMap": {
       "hips": "Pelvis",
@@ -457,7 +435,6 @@
     "species": "Brawler",
     "runtime": "air_slash",
     "source": "brawler_pnch_air_slash",
-    "sha256": "89440f23f50d8dfb4836131a09456f88b007fca81a831d450c0b3381d88eeaca",
     "seconds": 2.6,
     "boneMap": {
       "hips": "Pelvis",
@@ -481,7 +458,6 @@
     "species": "Brawler",
     "runtime": "dodge",
     "source": "brawler_loco_dodge_left",
-    "sha256": "d9e99edf7ffc83cef783936444c03fd1c95b27e155abdd1b9afe1ad8bf2f5a11",
     "seconds": 1.5666666666666667,
     "boneMap": {
       "hips": "Pelvis",

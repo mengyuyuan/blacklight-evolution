@@ -10,7 +10,7 @@ retain their source provenance. The 2026-10-13 addition contains 27 Devastator
 and Bulletdive release, charge, recovery, aiming and landing clips, copied
 byte-for-byte from the tested dev.9 skill profile. Existing branch-specific armor
 data is retained; reference FX textures and source shaders are not added.
-`art/motion-profile-manifest.json` records every current profile file hash and byte count.
+`art/motion-profile-manifest.json` records the current profile inventory and byte counts.
 
 The project uses Prototype as a design/animation reference. Existing source
 metadata and source-analysis documentation remain intact; adding a profile to
@@ -22,8 +22,10 @@ A normal clone and `assemble` now include all 251 files in
 `blacklight/bundled_motions/`. The `bundled` JAR/ZIP is the complete default build.
 An explicit `-PbundleMotionDirectory=<directory>` replaces the whole profile;
 that build uses the `external-profile` classifier. Build verification checks
-presence and byte equality; repository builds additionally check the manifest
-SHA-256 values. The former source-only/local-preview distinction is historical.
+presence, byte equality and manifest byte counts. Legacy manifests with SHA-256
+values retain their hash check; release collection computes current input hashes
+to compare the JAR and source snapshot without requiring stored hashes.
+The former source-only/local-preview distinction is historical.
 No original game archives, installers, dependency JARs or audio banks are included
 in this commit.
 
