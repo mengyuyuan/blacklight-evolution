@@ -1,7 +1,7 @@
 {
   "format": "ATTRIBUTES",
   "standaloneRetarget": {"author": "Blacklight project", "reason": "Original standalone shoulder constraint preserves at least 0.068 model units between the rendered sized blade and the native eight-pixel head. Only Arm_R rotations change; joints, lengths, target contact, and root motion are retained.", "basis": "Original Blacklight rounded humanoid bind and default BladeShape dimensions"},
-  "approvedBladeRetarget": {"version": 1, "joint": "Hand_R", "axis": "Z", "degrees": 150, "blendStart": 0, "blendEnd": 0.08, "fadeOut": false, "inputSha256": "19854b53f3509ab4b23f30d1c5fb5bb8ee8bec89f18748678359795e0105d649", "purpose": "Bank the approved blade mesh clear of the head; preserve mesh, root, contact and release times."},
+  "approvedBladeRetarget": {"version": 1, "joint": "Hand_R", "axis": "Z", "degrees": 150, "blendStart": 0, "blendEnd": 0.08, "fadeOut": false, "purpose": "Bank the approved blade mesh clear of the head; preserve mesh, root, contact and release times."},
   "animation": [
     {
       "name": "Root",

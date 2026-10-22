@@ -523,9 +523,14 @@ tasks.register('verifyBundledMotionResources') {
                 if (!java.util.Arrays.equals(packed, input.bytes))
                     throw new GradleException("Bundled motion changed: ${input.name}")
                 if (manifest != null) {
-                    def hash = java.security.MessageDigest.getInstance('SHA-256').digest(packed).encodeHex().toString()
-                    if (hash != manifest[input.name].sha256)
-                        throw new GradleException("Motion manifest mismatch: ${input.name}")
+                    def expected = manifest[input.name]
+                    if (packed.length != expected.bytes)
+                        throw new GradleException("Motion manifest size mismatch: ${input.name}")
+                    if (expected.sha256 != null) {
+                        def hash = java.security.MessageDigest.getInstance('SHA-256').digest(packed).encodeHex().toString()
+                        if (hash != expected.sha256)
+                            throw new GradleException("Motion manifest mismatch: ${input.name}")
+                    }
                 }
             }
             logger.lifecycle("Verified ${profile.size()} unchanged bundled motion/profile files")

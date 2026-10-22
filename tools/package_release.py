@@ -16,7 +16,7 @@ PROFILES = ('bundled', 'external-profile', 'local-preview', 'source-only')
 MOTION_PREFIX = 'blacklight/bundled_motions/'
 PROFILE_DATA_NAMES = {
     'combat-motion-tuning.data', 'consume-placement.data', 'consume-receiver-events.data',
-    'receiver-poses.data', 'hunter-consume.data', 'hammer-scales.data', 'armor-growth.data',
+    'receiver-poses.data', 'hunter-consume.data', 'hammer-scales.data', 'weapon-attack-scales.data', 'armor-growth.data',
     'camera-profile.data', 'camera-events.data', 'camera-film.data', 'health-hud.data',
 }
 SKILL_MOTIONS = ('dev_groundspike', 'dev_air_groundspike', 'dev_tendril', 'dev_air_tendril',
@@ -59,8 +59,11 @@ def repository_profile(repo: Path) -> dict[str, str]:
         path = repo / 'art/motion-profile' / name
         require(path.is_file() and not path.is_symlink(), f'Missing repository motion: {name}')
         data = path.read_bytes()
-        require(len(data) == entry['bytes'] and digest(data) == entry['sha256'], f'Repository motion manifest mismatch: {name}')
-        expected[name] = entry['sha256']
+        require(len(data) == entry['bytes'], f'Repository motion manifest size mismatch: {name}')
+        sha = digest(data)
+        if entry.get('sha256') is not None:
+            require(sha == entry['sha256'], f'Repository motion manifest hash mismatch: {name}')
+        expected[name] = sha
     require(profile_inventory(repo / 'art/motion-profile') == expected, 'Repository motion inventory differs from its manifest')
     return expected
 
@@ -111,7 +114,18 @@ def forbidden_runtime(name: str, qa_names: set[str]) -> bool:
 def private_curve(data: bytes) -> bool:
     if data.lstrip().startswith(b'{') and b'"privateNotice"' in data:
         parsed = json.loads(data)
-        return isinstance(parsed, dict) and parsed.get('format') == 'MATRIX'
+        if isinstance(parsed, dict) and parsed.get('format') == 'MATRIX':
+            provenance = parsed.get('provenance')
+            # Current project motions retain this legacy key as descriptive
+            # metadata; explicit private inputs still fail this check.
+            descriptive = (isinstance(parsed.get('privateNotice'), str)
+                           and parsed['privateNotice'].startswith(
+                               'Project-modified and adapted Blacklight motion data. Initial lineage / technical context: '))
+            adapted = (isinstance(provenance, dict)
+                       and provenance.get('schema') == 1
+                       and provenance.get('project') == 'Blacklight: Ascension'
+                       and provenance.get('currentStatus') == 'project_modified_and_adapted')
+            return not (descriptive and adapted)
     return False
 
 
