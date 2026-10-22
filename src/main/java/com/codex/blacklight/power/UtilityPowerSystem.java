@@ -18,6 +18,7 @@ public final class UtilityPowerSystem {
     public static final int DEFENSE = PowerForm.SHIELD.bit() | PowerForm.ARMOR.bit();
     public static boolean supported(PowerForm f) { return f == PowerForm.SOVEREIGN_WINGS || f == PowerForm.SHIELD || f == PowerForm.ARMOR || f == PowerForm.THERMAL_VISION || f == PowerForm.INFECTED_VISION; }
     public static boolean active(Player p, PowerForm form) {
+        if(!p.isAlive()||p.isRemoved())return false;
         var state = p.getData(ModAttachments.PLAYER_STATE);
         return p.isAlive() && state.isInfected() && state.isPrototypeMode() && (p.getData(ModAttachments.UTILITY_POWERS) & form.bit()) != 0;
     }
