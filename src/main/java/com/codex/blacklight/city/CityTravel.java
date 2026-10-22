@@ -245,7 +245,12 @@ public final class CityTravel {
     }
     @SubscribeEvent(priority=net.minecraftforge.eventbus.api.EventPriority.LOWEST) public static void transitLanding(net.minecraftforge.event.TickEvent.PlayerTickEvent event){
         if(event.phase!=net.minecraftforge.event.TickEvent.Phase.END)return;
-        var player=event.player;HydraTransport.place(player);
+        var player=event.player;
+        if(!player.isAlive()||!com.codex.blacklight.registry.ModAttachments.available(player)){
+            if(player instanceof ServerPlayer p)cancelTravel(p);
+            return;
+        }
+        HydraTransport.place(player);
         if(!(player instanceof ServerPlayer p))return;
         tickTravel(p);
         if(!HydraTransport.active(p)&&com.codex.blacklight.registry.ModAttachments.getData(p,com.codex.blacklight.registry.ModAttachments.HYDRA_CARRIER)>=0){
