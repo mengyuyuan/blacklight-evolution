@@ -24,7 +24,18 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
 
-      # Unit tests, collision tests, GameTests and in-game acceptance require
-      # an explicit user request; the default CI only compiles and packages.
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Check release collector regressions
+        run: python -m unittest discover -s tools/tests -p test_package_release.py
+
+      # Gameplay tests and in-game acceptance remain opt-in. These release
+      # checks only inspect inputs and assembled artifacts without launching Minecraft.
       - name: Assemble with Gradle
         run: bash ./gradlew assemble --no-daemon
+
+      - name: Verify release artifacts and source inputs
+        run: python tools/package_release.py --profile bundled --verify-only
