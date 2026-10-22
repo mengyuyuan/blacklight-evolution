@@ -63,6 +63,8 @@ public final class ConsumeSystem {
         com.codex.blacklight.registry.ModAttachments.setData(s.victim, ModAttachments.CONSUME_VISUAL,new ConsumeVisual(p.getId(),p.level().getGameTime()-offset,duration,s.animationForm().ordinal(),stage,s.facing,s.start));
         com.codex.blacklight.registry.ModAttachments.syncData(s.victim, ModAttachments.CONSUME_VISUAL);
         com.codex.blacklight.registry.ModAttachments.setData(p, ModAttachments.GRAB_STAGE,stage);com.codex.blacklight.registry.ModAttachments.syncData(p, ModAttachments.GRAB_STAGE);
+        ConsumeControl.releaseControls(p);ConsumeControl.releaseControls(s.victim);
+        if(s.committed())p.setDeltaMovement(Vec3.ZERO);
     }
     private static void play(ServerPlayer player, PlayerAction action) {
         PlayerActions.get().play(player, action, 0);
@@ -227,6 +229,10 @@ public final class ConsumeSystem {
         if (!com.codex.blacklight.registry.ModAttachments.available(event.player)) { if (event.player instanceof net.minecraft.server.level.ServerPlayer removed) cancel(removed); return; }
         if(event.phase != net.minecraftforge.event.TickEvent.Phase.END)return;
         if (!(event.player instanceof ServerPlayer player)) return;
+        Session claimed=ACTIVE.get(player);
+        try(var motion=ConsumeControl.motion(player,claimed==null?null:claimed.victim)) {tickPlayer(player);}
+    }
+    private static void tickPlayer(ServerPlayer player) {
         var recovery=com.codex.blacklight.registry.ModAttachments.getData(player, ModAttachments.CONSUME_RECOVERY);
         if(recovery.active() && (recovery.phaseProgress(player.level().getGameTime(),0)>=1
                 ||!player.isAlive()||!com.codex.blacklight.registry.ModAttachments.getData(player, ModAttachments.PLAYER_STATE).isPrototypeMode()
