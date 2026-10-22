@@ -50,7 +50,7 @@
       "bytes": 326837
     },
     "armor-growth.data": {
-      "bytes": 103216
+      "bytes": 103140
     },
     "basic_air_dash.json": {
       "bytes": 298243
@@ -62,7 +62,7 @@
       "bytes": 233311
     },
     "basic_dodge_roll.json": {
-      "bytes": 180173
+      "bytes": 180097
     },
     "basic_fall.json": {
       "bytes": 199315
@@ -92,7 +92,7 @@
       "bytes": 478461
     },
     "basic_idle_whip.json": {
-      "bytes": 456055
+      "bytes": 455889
     },
     "basic_jump_charge.json": {
       "bytes": 486448
@@ -101,7 +101,7 @@
       "bytes": 685272
     },
     "basic_jump_running.json": {
-      "bytes": 242876
+      "bytes": 242710
     },
     "basic_jump_tactical.json": {
       "bytes": 274364
@@ -119,13 +119,13 @@
       "bytes": 298571
     },
     "basic_parkour_small.json": {
-      "bytes": 277373
+      "bytes": 277297
     },
     "basic_run.json": {
       "bytes": 200043
     },
     "basic_sprint.json": {
-      "bytes": 178405
+      "bytes": 178239
     },
     "basic_sprint_brake.json": {
       "bytes": 277830
@@ -140,7 +140,7 @@
       "bytes": 125133
     },
     "basic_walk.json": {
-      "bytes": 395729
+      "bytes": 395563
     },
     "basic_wall_climb_down.json": {
       "bytes": 328015
@@ -179,7 +179,7 @@
       "bytes": 211670
     },
     "basic_wall_top.json": {
-      "bytes": 201585
+      "bytes": 201509
     },
     "basic_wall_vault.json": {
       "bytes": 136165
@@ -227,28 +227,28 @@
       "bytes": 244749
     },
     "bulletdive_drop.json": {
-      "bytes": 1086651
+      "bytes": 1086043
     },
     "bulletdive_drop_charge.json": {
-      "bytes": 239274
+      "bytes": 239046
     },
     "bulletdive_drop_flight.json": {
-      "bytes": 440289
+      "bytes": 440137
     },
     "bulletdive_drop_land.json": {
-      "bytes": 382887
+      "bytes": 382659
     },
     "bulletdive_drop_recovery.json": {
-      "bytes": 382887
+      "bytes": 382659
     },
     "camera-events.data": {
-      "bytes": 23087
+      "bytes": 23002
     },
     "camera-film.data": {
-      "bytes": 404364
+      "bytes": 403610
     },
     "camera-profile.data": {
-      "bytes": 10590
+      "bytes": 10503
     },
     "claw_auto1.json": {
       "bytes": 319247
@@ -458,76 +458,76 @@
       "bytes": 806812
     },
     "dev_air_critical_pain.json": {
-      "bytes": 2012682
+      "bytes": 2012226
     },
     "dev_air_critical_pain_aim_down.json": {
-      "bytes": 2000499
+      "bytes": 2000043
     },
     "dev_air_critical_pain_aim_up.json": {
-      "bytes": 2001482
+      "bytes": 2001026
     },
     "dev_air_critical_pain_charge.json": {
-      "bytes": 344277
+      "bytes": 344125
     },
     "dev_air_critical_pain_recovery.json": {
-      "bytes": 223021
+      "bytes": 222945
     },
     "dev_air_groundspike.json": {
-      "bytes": 2088703
+      "bytes": 2088247
     },
     "dev_air_groundspike_charge.json": {
-      "bytes": 327281
+      "bytes": 327129
     },
     "dev_air_groundspike_recovery.json": {
-      "bytes": 653517
+      "bytes": 653365
     },
     "dev_air_tendril.json": {
-      "bytes": 1812881
+      "bytes": 1812501
     },
     "dev_air_tendril_charge.json": {
-      "bytes": 346017
+      "bytes": 345865
     },
     "dev_air_tendril_recovery.json": {
-      "bytes": 199686
+      "bytes": 199610
     },
     "dev_critical_pain.json": {
-      "bytes": 2199762
+      "bytes": 2199306
     },
     "dev_critical_pain_aim_down.json": {
-      "bytes": 2204440
+      "bytes": 2203984
     },
     "dev_critical_pain_aim_up.json": {
-      "bytes": 2210840
+      "bytes": 2210384
     },
     "dev_critical_pain_charge.json": {
-      "bytes": 326985
+      "bytes": 326833
     },
     "dev_critical_pain_recovery.json": {
-      "bytes": 694927
+      "bytes": 694851
     },
     "dev_groundspike.json": {
-      "bytes": 2260206
+      "bytes": 2259750
     },
     "dev_groundspike_charge.json": {
-      "bytes": 350802
+      "bytes": 350650
     },
     "dev_groundspike_recovery.json": {
-      "bytes": 653517
+      "bytes": 653365
     },
     "dev_tendril.json": {
-      "bytes": 1799906
+      "bytes": 1799450
     },
     "dev_tendril_charge.json": {
-      "bytes": 340044
+      "bytes": 339892
     },
     "dev_tendril_recovery.json": {
-      "bytes": 273296
+      "bytes": 273144
     },
     "grab_whip_native.json": {
       "bytes": 579811
     },
     "hammer-scales.data": {
-      "bytes": 22036
+      "bytes": 21861
     },
     "hammer_combo_c.json": {
       "bytes": 523263
@@ -596,28 +596,28 @@
       "bytes": 414159
     },
     "health-hud.data": {
-      "bytes": 10564
+      "bytes": 10099
     },
     "hunter-consume.data": {
-      "bytes": 1760
+      "bytes": 1678
     },
     "morph_blade.json": {
-      "bytes": 1705022
+      "bytes": 1704870
     },
     "morph_claws.json": {
-      "bytes": 1487087
+      "bytes": 1486935
     },
     "morph_hammerfists.json": {
-      "bytes": 2190830
+      "bytes": 2190678
     },
     "morph_muscle_mass.json": {
-      "bytes": 1652780
+      "bytes": 1652628
     },
     "morph_thermal_vision.json": {
-      "bytes": 1865962
+      "bytes": 1865810
     },
     "morph_whipfist.json": {
-      "bytes": 1596637
+      "bytes": 1596485
     },
     "muscle_air.json": {
       "bytes": 384027
@@ -683,25 +683,25 @@
       "bytes": 634219
     },
     "utility_armor_idle.json": {
-      "bytes": 477533
+      "bytes": 477457
     },
     "utility_armor_transform.json": {
-      "bytes": 1298461
+      "bytes": 1298385
     },
     "utility_shield_deploy.json": {
-      "bytes": 970669
+      "bytes": 970593
     },
     "utility_shield_hit.json": {
-      "bytes": 130191
+      "bytes": 130115
     },
     "utility_shield_run.json": {
-      "bytes": 276095
+      "bytes": 276019
     },
     "utility_shield_sprint.json": {
-      "bytes": 207556
+      "bytes": 207480
     },
     "weapon-attack-scales.data": {
-      "bytes": 372367
+      "bytes": 370716
     },
     "whip_air.json": {
       "bytes": 383499
