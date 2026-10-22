@@ -63,6 +63,8 @@ public final class ConsumeSystem {
         s.victim.setData(ModAttachments.CONSUME_VISUAL,new ConsumeVisual(p.getId(),p.level().getGameTime()-offset,duration,s.animationForm().ordinal(),stage,s.facing,s.start));
         s.victim.syncData(ModAttachments.CONSUME_VISUAL);
         p.setData(ModAttachments.GRAB_STAGE,stage);p.syncData(ModAttachments.GRAB_STAGE);
+        ConsumeControl.releaseControls(p);ConsumeControl.releaseControls(s.victim);
+        if(s.committed())p.setDeltaMovement(Vec3.ZERO);
     }
     private static void play(ServerPlayer player, PlayerAction action) {
         PlayerActions.get().play(player, action, 0);
@@ -226,6 +228,12 @@ public final class ConsumeSystem {
 
     @SubscribeEvent public static void tick(PlayerTickEvent.Post event) {
         if (!(event.getEntity() instanceof ServerPlayer player)) return;
+        Session claimed=ACTIVE.get(player);
+        try(var motion=ConsumeControl.motion(player,claimed==null?null:claimed.victim)) {
+            tickPlayer(player);
+        }
+    }
+    private static void tickPlayer(ServerPlayer player) {
         var recovery=player.getData(ModAttachments.CONSUME_RECOVERY);
         if(recovery.active() && (recovery.phaseProgress(player.level().getGameTime(),0)>=1
                 ||!player.isAlive()||!player.getData(ModAttachments.PLAYER_STATE).isPrototypeMode()

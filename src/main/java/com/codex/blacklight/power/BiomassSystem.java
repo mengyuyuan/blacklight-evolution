@@ -28,6 +28,13 @@ public final class BiomassSystem {
         if(previous.victim()!=value.victim()&&p.level().getEntity(previous.victim()) instanceof Mob oldTarget)
             oldTarget.removeEffect(com.codex.blacklight.registry.ModEffects.BIOMASS_CONTACT);
         p.setData(ModAttachments.BIOMASS_FORM,value);
+        if(value.phase()==BiomassState.ABSORBING){
+            ConsumeControl.releaseControls(p);p.setDeltaMovement(Vec3.ZERO);
+            if(p.level().getEntity(value.victim()) instanceof Mob target){
+                ConsumeControl.releaseControls(target);target.setDeltaMovement(Vec3.ZERO);
+                target.addEffect(new net.minecraft.world.effect.MobEffectInstance(com.codex.blacklight.registry.ModEffects.BIOMASS_CONTACT,8,0,false,true,true));
+            }
+        }
         if(resize)p.refreshDimensions();
     }
     public static boolean begin(ServerPlayer p,boolean fatal){
@@ -93,6 +100,7 @@ public final class BiomassSystem {
     }
     /** A claim is transient and valid only while its live player is absorbing nearby. */
     public static Player claimant(Entity victim){
+        if(!(victim instanceof Mob))return null;
         for(var p:victim.level().players()){var s=state(p);
             if(p.isAlive()&&s.phase()==BiomassState.ABSORBING&&s.victim()==victim.getId()
                     &&p.getBoundingBox().inflate(1.15,.65,1.15).intersects(victim.getBoundingBox()))return p;
@@ -100,6 +108,11 @@ public final class BiomassSystem {
     }
     @SubscribeEvent public static void tick(PlayerTickEvent.Post e){
         if(!(e.getEntity() instanceof ServerPlayer p)||!active(p))return;
+        try(var motion=ConsumeControl.motion(p,p.level().getEntity(state(p).victim()))) {
+            tickPlayer(p);
+        }
+    }
+    private static void tickPlayer(ServerPlayer p){
         if(!p.isAlive())return;
         if(!p.getData(ModAttachments.PLAYER_STATE).isInfected()) {publish(p,BiomassState.EMPTY);return;}
         var s=state(p);long now=p.level().getGameTime();
