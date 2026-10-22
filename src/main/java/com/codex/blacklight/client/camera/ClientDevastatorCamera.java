@@ -27,7 +27,7 @@ public final class ClientDevastatorCamera {
         // GameRenderer requests false for native renderItemInHand's projection.
         // Flight optics affect the world only, leaving both hand anchors intact.
         if(!event.usedConfiguredFov()||event.getCamera()!=mc.gameRenderer.getMainCamera())return;
-        if(player==null||mc.level==null||!player.isAlive()){
+        if(CameraCompatibility.externalOwnsView()||player==null||mc.level==null||!player.isAlive()){
             gain=0;lastTime=-1;previousPlayer=previousLevel=null;
             statistics=new Statistics(0,0,0,0,0,0,false);return;
         }

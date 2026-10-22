@@ -26,6 +26,9 @@ public final class ClientBiomass {
             float size=active?com.codex.blacklight.power.BiomassEvolution.scale(p):0;
             if(SIZES.getOrDefault(p,0F)!=size){p.refreshDimensions();SIZES.put(p,size);}
         }
+        if(com.codex.blacklight.client.camera.CameraCompatibility.externalOwnsView()){
+            cameraOwner=null;previousCamera=null;cameraChangedByPlayer=false;return;
+        }
         if(mc.player!=null&&BiomassSystem.active(mc.player)){
             if(!mc.player.getUUID().equals(cameraOwner)){
                 restoreCamera(mc);
@@ -41,7 +44,7 @@ public final class ClientBiomass {
     }
     public static void camera(net.minecraft.client.Camera camera,float partial){
         var mc=Minecraft.getInstance();var p=mc.player;
-        if(p==null||!BiomassSystem.active(p)||camera.getEntity()!=p||mc.options.getCameraType().isFirstPerson())return;
+        if(com.codex.blacklight.client.camera.CameraCompatibility.externalOwnsView()||p==null||!BiomassSystem.active(p)||camera.getEntity()!=p||mc.options.getCameraType().isFirstPerson())return;
         var access=(com.codex.blacklight.mixin.client.PrototypeCameraAccess)camera;
         var eye=p.getEyePosition(partial);var raised=eye.add(0,.45,0);
         var hit=p.level().clip(new net.minecraft.world.level.ClipContext(eye,raised,net.minecraft.world.level.ClipContext.Block.VISUAL,net.minecraft.world.level.ClipContext.Fluid.NONE,p));
