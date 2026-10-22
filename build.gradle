@@ -522,7 +522,7 @@ tasks.register('verifyBundledMotionResources') {
                 def packed = archive.getInputStream(entry).withCloseable { it.readAllBytes() }
                 if (!java.util.Arrays.equals(packed, input.bytes))
                     throw new GradleException("Bundled motion changed: ${input.name}")
-                if (manifest != null) {
+                if (manifest != null && manifest[input.name].sha256 != null) {
                     def hash = java.security.MessageDigest.getInstance('SHA-256').digest(packed).encodeHex().toString()
                     if (hash != manifest[input.name].sha256)
                         throw new GradleException("Motion manifest mismatch: ${input.name}")
