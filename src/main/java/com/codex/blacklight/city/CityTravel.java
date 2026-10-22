@@ -254,7 +254,12 @@ public final class CityTravel {
         }
     }
     @SubscribeEvent(priority=net.neoforged.bus.api.EventPriority.LOWEST) public static void transitLanding(net.neoforged.neoforge.event.tick.PlayerTickEvent.Post event){
-        var player=event.getEntity();HydraTransport.place(player);
+        var player=event.getEntity();
+        if(!player.isAlive()||player.isRemoved()){
+            if(player instanceof ServerPlayer p)cancelTravel(p);
+            return;
+        }
+        HydraTransport.place(player);
         if(!(player instanceof ServerPlayer p))return;
         tickTravel(p);
         if(!HydraTransport.active(p)&&p.getData(com.codex.blacklight.registry.ModAttachments.HYDRA_CARRIER)>=0){

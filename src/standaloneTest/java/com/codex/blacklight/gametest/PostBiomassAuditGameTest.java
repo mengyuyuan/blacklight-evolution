@@ -14,6 +14,17 @@ import net.neoforged.neoforge.gametest.*;
 import java.util.UUID;
 @GameTestHolder("blacklight") @PrefixGameTestTemplate(false)
 public final class PostBiomassAuditGameTest {
+ @GameTest(template="wall_test",timeoutTicks=60,batch="audit_removed_transit")
+ public static void removedPlayerCannotRemainInHydraTransit(GameTestHelper h){
+  var p=player(h,"RemovedTransit");var level=h.getLevel();
+  var hydra=h.spawn(ModEntities.BLACKLIGHT_HYDRA.get(),4,22,4);
+  h.assertTrue(hydra.beginArrival(p)&&HydraTransport.carrier(p)==hydra,"live arrival owns the player");
+  var position=p.position();level.removePlayerImmediately(p,Entity.RemovalReason.KILLED);
+  h.assertTrue(!HydraTransport.active(p),"removed player is no longer a carrier participant");
+  HydraTransport.place(p);CityTravel.transitLanding(new net.neoforged.neoforge.event.tick.PlayerTickEvent.Post(p));
+  h.assertTrue(p.position().equals(position),"post-death tick never moves the corpse");
+  hydra.discard();h.succeed();
+ }
  @GameTest(template="wall_test",timeoutTicks=60,batch="audit_input")
  public static void hydraMustRejectWeaponInput(GameTestHelper h){
   var level=h.getLevel();var p=new FakePlayer(level,new GameProfile(UUID.randomUUID(),"AuditInput"));
