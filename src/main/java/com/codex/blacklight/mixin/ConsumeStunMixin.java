@@ -15,6 +15,7 @@ public abstract class ConsumeStunMixin {
     @Inject(method="knockback",at=@At("HEAD"),cancellable=true)
     private void blacklight$consumeStun(double strength,double x,double z,CallbackInfo ci) {
         var entity=(LivingEntity)(Object)this;
-        if(ConsumeSystem.grappleProtected(entity)||ModAttachments.peekData(entity, ModAttachments.CONSUME_VISUAL, ConsumeVisual.EMPTY).active())ci.cancel();
+        if(com.codex.blacklight.combat.ConsumeControl.protectedEntity(entity)
+                ||ModAttachments.peekData(entity, ModAttachments.CONSUME_VISUAL, ConsumeVisual.EMPTY).active())ci.cancel();
     }
 }

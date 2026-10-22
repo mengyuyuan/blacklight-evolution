@@ -21,6 +21,8 @@ public abstract class NativeRootMovementMixin {
         // Vanilla schedules this handler onto the server thread; never mutate entities on Netty.
         if (!player.server.isSameThread() || !(NativeRootMotion.controlsGroundRoot(player)
                 ||com.codex.blacklight.city.HydraTransport.active(player)
+                ||com.codex.blacklight.combat.ConsumeSystem.committed(player)
+                ||com.codex.blacklight.power.BiomassSystem.state(player).immobilized()
                 ||com.codex.blacklight.combat.DevastatorSystem.controlsLandingPosition(player))) return;
         float yaw = packet.getYRot(player.getYRot()), pitch = packet.getXRot(player.getXRot());
         // Preserve vanilla's malformed-packet disconnect path.
