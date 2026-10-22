@@ -85,10 +85,10 @@ public final class CrossModCombat {
     }
 
     /** Preserve the original damage ID, projectile/explosion tags, owner and death message. */
-    private static final class NativeAttackSource extends DamageSource {
+    public static class NativeAttackSource extends DamageSource {
         private final DamageSource original;
         private final boolean trueDamage;
-        NativeAttackSource(DamageSource original, boolean trueDamage) {
+        protected NativeAttackSource(DamageSource original, boolean trueDamage) {
             super(original.typeHolder(), original.getDirectEntity(), original.getEntity());
             this.original = original; this.trueDamage = trueDamage;
         }
