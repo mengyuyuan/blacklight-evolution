@@ -26,7 +26,8 @@ public final class SourceCameraViewport {
     public static void fov(ViewportEvent.ComputeFov event) {
         if(HydraCinematicCamera.active())return;
         var mc=Minecraft.getInstance();
-        if(event.getCamera()!=mc.gameRenderer.getMainCamera())return;
+        if(!event.usedConfiguredFov()||event.getCamera()!=mc.gameRenderer.getMainCamera())return;
+        if(CameraCompatibility.externalOwnsView()){reset();return;}
         var p=mc.player;
         if(p==null||mc.level==null){reset();return;}
         if(previousPlayer!=p||previousLevel!=mc.level){reset();previousPlayer=p;previousLevel=mc.level;vertical=event.getFOV();}

@@ -56,16 +56,17 @@ public final class PrototypeChaseCamera {
     public static float farPlane(float ordinary){var f=filmFrame();return f==null?ordinary:(float)Mth.lerp(f.weight(),ordinary,Mth.clamp(f.far(),16,ordinary));}
     public static float controlYaw() {
         var mc=Minecraft.getInstance();
-        if(previousPlayer!=mc.player||!(wasOwned||inputSeeded))return mc.gameRenderer.getMainCamera().getYRot();
+        if(CameraCompatibility.externalOwnsView()||previousPlayer!=mc.player||!(wasOwned||inputSeeded))return mc.gameRenderer.getMainCamera().getYRot();
         return !orbit.manual()&&lastOffset!=null&&filmFrame==null?lastYaw:orbit.controlYaw();
     }
     /** Flight uses the same unshaken orbit pitch as mouse aiming, even between mouse events. */
     public static float controlPitch() {
         var mc=Minecraft.getInstance();
-        if(previousPlayer!=mc.player||!(wasOwned||inputSeeded))return mc.gameRenderer.getMainCamera().getXRot();
+        if(CameraCompatibility.externalOwnsView()||previousPlayer!=mc.player||!(wasOwned||inputSeeded))return mc.gameRenderer.getMainCamera().getXRot();
         return !orbit.manual()&&lastOffset!=null&&filmFrame==null?lastPitch:orbit.controlPitch();
     }
     public static boolean mouse(double x,double y) {
+        if(CameraCompatibility.externalOwnsView()){reset();return false;}
         if(!ownsView()) {
             // Seed the external owner BEFORE its first mouse delta, not after it.
             var mc=Minecraft.getInstance();
@@ -105,7 +106,7 @@ public final class PrototypeChaseCamera {
     }
     public static boolean ownsView() {
         var mc=Minecraft.getInstance();var p=mc.player;
-        return !HydraCinematicCamera.active()&&p!=null&&!com.codex.blacklight.power.BiomassSystem.active(p)&&mc.level!=null&&mc.getCameraEntity()==p&&PrototypeModeSystem.isActive(p)
+        return !HydraCinematicCamera.active()&&!CameraCompatibility.externalOwnsView()&&p!=null&&!com.codex.blacklight.power.BiomassSystem.active(p)&&mc.level!=null&&mc.getCameraEntity()==p&&PrototypeModeSystem.isActive(p)
                 &&p.isAlive()&&!p.isSpectator()&&!p.isSleeping()&&!p.isUsingItem()
                 &&mc.options.getCameraType()==CameraType.THIRD_PERSON_BACK&&!mc.player.isScoping()
                 &&ChaseCameraProfile.get("Ground")!=null&&SourceCameraEvents.available();
@@ -173,6 +174,7 @@ public final class PrototypeChaseCamera {
 
     public static void apply(net.minecraft.client.Camera camera,float partial) {
         var mc=Minecraft.getInstance();var player=mc.player;
+        if(CameraCompatibility.externalOwnsView()){reset();return;}
         if(player==null||mc.level==null||camera!=mc.gameRenderer.getMainCamera()||camera.getEntity()!=player
                 ||!PrototypeModeSystem.isActive(player)||!player.isAlive()||player.isSpectator()||player.isSleeping()
                 ||mc.options.getCameraType()!=CameraType.THIRD_PERSON_BACK) {

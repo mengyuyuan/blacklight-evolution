@@ -14,6 +14,12 @@ import net.minecraft.client.renderer.entity.player.PlayerRenderer;
 
 /** Standalone player rendering retains vanilla equipment layers and uses Blacklight's own articulated skin. */
 public final class BlacklightPlayerRenderer extends PlayerRenderer {
+    @Override public void render(AbstractClientPlayer player,float yaw,float partial,PoseStack stack,
+                                 net.minecraft.client.renderer.MultiBufferSource buffers,int light) {
+        try(var scope=NativePlayerRenderScope.enter(player)) {
+            super.render(player,yaw,partial,stack,buffers,light);
+        }
+    }
     public record RenderedView(com.codex.blacklight.client.animation.FirstPersonPose.Result result,double gameTime,String route) {
         public RenderedView(com.codex.blacklight.client.animation.FirstPersonPose.Result result,double gameTime){this(result,gameTime,"native arm");}
     }

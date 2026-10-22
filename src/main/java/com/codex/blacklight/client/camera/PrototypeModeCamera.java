@@ -13,6 +13,9 @@ public final class PrototypeModeCamera {
     @SubscribeEvent public static void tick(ClientTickEvent event){if(event.phase!=net.minecraftforge.event.TickEvent.Phase.END)return;
         var mc=Minecraft.getInstance();var p=mc.player;
         if(HydraCinematicCamera.active())return;
+        if(CameraCompatibility.externalOwnsView()){
+            perspective.relinquish(p!=null&&PrototypeModeSystem.isActive(p));return;
+        }
         var before=mc.options.getCameraType();
         var after=perspective.update(before,p!=null&&PrototypeModeSystem.isActive(p),mc.options.keyTogglePerspective.isDown());
         if(after!=before)mc.options.setCameraType(after);

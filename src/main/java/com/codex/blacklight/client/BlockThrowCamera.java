@@ -12,7 +12,7 @@ public final class BlockThrowCamera {
  private static double offset,back;private static long last;private static Object owner;
  public static void apply(net.minecraft.client.Camera camera,float partial){
   var mc=Minecraft.getInstance();var p=mc.player;long now=System.nanoTime();
-  if(p==null||mc.options.getCameraType()!=CameraType.THIRD_PERSON_BACK){offset=back=0;last=now;owner=p;return;}
+  if(com.codex.blacklight.client.camera.CameraCompatibility.externalOwnsView()||p==null||mc.options.getCameraType()!=CameraType.THIRD_PERSON_BACK){offset=back=0;last=now;owner=p;return;}
   if(owner!=p){offset=back=0;owner=p;last=now;}
   double dt=last==0?0:Math.min(.1,(now-last)*1e-9);last=now;
   var cargo=com.codex.blacklight.combat.BlockThrowSystem.held(p);boolean held=cargo!=null;double distance=held?Math.max(1,cargo.cargo().half().x+.6):0;

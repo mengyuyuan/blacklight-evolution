@@ -35,6 +35,8 @@
   ],
   "client": [
     "client.PostChainAccess",
+    "client.OptionalEpicFightPlayerRenderMixin",
+    "client.OptionalPlayerAnimatorRenderMixin",
     "client.KeyboardInputMixin",
     "client.NativeHandRendererAccess",
     "client.LocalPlayerMixin",
