@@ -18,8 +18,9 @@ public final class UtilityPowerSystem {
     public static final int DEFENSE = PowerForm.SHIELD.bit() | PowerForm.ARMOR.bit();
     public static boolean supported(PowerForm f) { return f == PowerForm.SOVEREIGN_WINGS || f == PowerForm.SHIELD || f == PowerForm.ARMOR || f == PowerForm.THERMAL_VISION || f == PowerForm.INFECTED_VISION; }
     public static boolean active(Player p, PowerForm form) {
-        var state = com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.PLAYER_STATE);
-        return p.isAlive() && state.isInfected() && state.isPrototypeMode() && (com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.UTILITY_POWERS) & form.bit()) != 0;
+        if(!p.isAlive()||!ModAttachments.available(p))return false;
+        var state = ModAttachments.peekData(p, ModAttachments.PLAYER_STATE);
+        return state.isInfected() && state.isPrototypeMode() && (ModAttachments.peekData(p, ModAttachments.UTILITY_POWERS) & form.bit()) != 0;
     }
     public static boolean shieldReady(Player p) { return active(p, PowerForm.SHIELD) && !com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.UTILITY_STATE).broken(); }
     public static float visualWeight(Player p, PowerForm form, float partial) {

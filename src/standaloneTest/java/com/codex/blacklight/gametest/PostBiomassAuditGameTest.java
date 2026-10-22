@@ -14,6 +14,19 @@ import net.minecraftforge.gametest.*;
 import java.util.UUID;
 @GameTestHolder("blacklight") @PrefixGameTestTemplate(false)
 public final class PostBiomassAuditGameTest {
+ @GameTest(template="wall_test",timeoutTicks=60,batch="audit_removed_transit")
+ public static void removedPlayerCannotRemainInHydraTransit(GameTestHelper h){
+  var p=player(h,"RemovedTransit");var level=h.getLevel();
+  var hydra=h.spawn(ModEntities.BLACKLIGHT_HYDRA.get(),4,22,4);
+  h.assertTrue(hydra.beginArrival(p)&&HydraTransport.carrier(p)==hydra,"live arrival owns the player");
+  var position=p.position();level.removePlayerImmediately(p,Entity.RemovalReason.KILLED);p.invalidateCaps();
+  h.assertTrue(!ModAttachments.available(p),"removed player has no live capability");
+  h.assertTrue(!HydraTransport.active(p),"removed player is no longer a carrier participant");
+  h.assertTrue(!UtilityPowerSystem.active(p,PowerForm.ARMOR)&&!com.codex.blacklight.movement.WingFlightSystem.ownsTravel(p),"late movement packets see no active utility or flight state");
+  HydraTransport.place(p);CityTravel.transitLanding(new net.minecraftforge.event.TickEvent.PlayerTickEvent(net.minecraftforge.event.TickEvent.Phase.END,p));
+  h.assertTrue(p.position().equals(position)&&!ModAttachments.available(p),"post-death tick neither moves the corpse nor revives capability state");
+  hydra.discard();h.succeed();
+ }
  @GameTest(template="wall_test",timeoutTicks=60,batch="audit_input")
  public static void hydraMustRejectWeaponInput(GameTestHelper h){
   var level=h.getLevel();var p=new FakePlayer(level,new GameProfile(UUID.randomUUID(),"AuditInput"));
