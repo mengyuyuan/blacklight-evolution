@@ -74,11 +74,20 @@ public final class CombatTargeting {
         return entity instanceof LivingEntity living?living:null;
     }
     public static boolean multipart(LivingEntity target) {
-        return target instanceof BlacklightInfectedHost host&&host.hasMultipartBody();
+        return target instanceof BlacklightInfectedHost host&&host.hasMultipartBody()
+                || target.isMultipartEntity() && target.getParts()!=null && target.getParts().length>0;
     }
     public static List<AABB> hitboxes(LivingEntity target) {
-        return target instanceof BlacklightInfectedHost host&&host.hasMultipartBody()
-                ?host.combatHitboxes():List.of(target.getBoundingBox());
+        if(target instanceof BlacklightInfectedHost host&&host.hasMultipartBody())return host.combatHitboxes();
+        if(target.isMultipartEntity() && target.getParts()!=null) {
+            var boxes=new ArrayList<AABB>();
+            for(var part:target.getParts())if(part!=null&&!part.isRemoved()&&part.isPickable()) {
+                var box=part.getBoundingBox();
+                if(box.getXsize()>0&&box.getYsize()>0&&box.getZsize()>0)boxes.add(box);
+            }
+            if(!boxes.isEmpty())return boxes;
+        }
+        return List.of(target.getBoundingBox());
     }
     /** Broad phase finds loaded parent entities; the original query must still
      * intersect a real limb. The large search margin never becomes weapon reach. */
@@ -96,8 +105,8 @@ public final class CombatTargeting {
         }
         for(var target:player.level().getEntitiesOfClass(LivingEntity.class,query,predicate))
             if(!multipart(target)||hitboxes(target).stream().anyMatch(query::intersects))result.add(target);
-        for(var target:player.level().getEntitiesOfClass(BlacklightInfectedHost.class,query.inflate(80),
-                host->host.hasMultipartBody()&&predicate.test(host)))
+        for(var target:player.level().getEntitiesOfClass(LivingEntity.class,query.inflate(80),
+                host->multipart(host)&&predicate.test(host)))
             if(hitboxes(target).stream().anyMatch(query::intersects))result.add(target);
         return new ArrayList<>(result);
     }

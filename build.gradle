@@ -554,3 +554,11 @@ if (project.hasProperty('feedbackVisual')) {
     }
 }
 tasks.withType(Jar).configureEach { exclude "com/codex/blacklight/client/FeedbackRenderSmoke*.class" }
+
+// Optional real Twilight Forest integration tests; absent from normal builds and release jars.
+if (project.hasProperty('twilightTest')) {
+    sourceSets.main.java.srcDir('src/twilightTest/java')
+    sourceSets.main.resources.srcDir('src/traversalTest/resources')
+    repositories.maven { url = 'https://maven.tamaized.com/releases'; content { includeGroup 'team-twilight' } }
+    dependencies { localRuntime 'team-twilight:twilightforest:4.8.3345:universal' }
+}
