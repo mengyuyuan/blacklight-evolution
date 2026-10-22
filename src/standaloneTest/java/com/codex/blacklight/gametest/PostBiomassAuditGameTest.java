@@ -21,6 +21,7 @@ public final class PostBiomassAuditGameTest {
   h.assertTrue(hydra.beginArrival(p)&&HydraTransport.carrier(p)==hydra,"live arrival owns the player");
   var position=p.position();level.removePlayerImmediately(p,Entity.RemovalReason.KILLED);
   h.assertTrue(!HydraTransport.active(p),"removed player is no longer a carrier participant");
+  h.assertTrue(!UtilityPowerSystem.active(p,PowerForm.ARMOR)&&!com.codex.blacklight.movement.WingFlightSystem.ownsTravel(p),"late movement packets see no active utility or flight state");
   HydraTransport.place(p);CityTravel.transitLanding(new net.neoforged.neoforge.event.tick.PlayerTickEvent.Post(p));
   h.assertTrue(p.position().equals(position),"post-death tick never moves the corpse");
   hydra.discard();h.succeed();
