@@ -135,6 +135,7 @@ public final class ClientPhysicalFeedback {
 
     @SubscribeEvent
     public static void onCameraAngles(ViewportEvent.ComputeCameraAngles event) {
+        if(com.codex.blacklight.client.camera.CameraCompatibility.externalOwnsView())return;
         if(com.codex.blacklight.client.camera.HydraCinematicCamera.active())return;
         Minecraft minecraft = Minecraft.getInstance();
         if (minecraft.player == null || event.getCamera().getEntity() != minecraft.player) return;
@@ -162,6 +163,7 @@ public final class ClientPhysicalFeedback {
 
     @SubscribeEvent
     public static void onFov(ViewportEvent.ComputeFov event) {
+        if(!event.usedConfiguredFov()||com.codex.blacklight.client.camera.CameraCompatibility.externalOwnsView())return;
         if(com.codex.blacklight.client.camera.HydraCinematicCamera.active())return;
         Minecraft minecraft = Minecraft.getInstance();
         if (minecraft.player == null || event.getCamera().getEntity() != minecraft.player

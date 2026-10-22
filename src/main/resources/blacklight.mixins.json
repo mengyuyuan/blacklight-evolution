@@ -31,6 +31,8 @@
     "HydraServerMovementMixin"
   ],
   "client": [
+    "client.OptionalEpicFightPlayerRenderMixin",
+    "client.OptionalPlayerAnimatorRenderMixin",
     "client.KeyboardInputMixin",
     "client.BulletFlightCullingMixin",
     "client.NativeHandRendererAccess",

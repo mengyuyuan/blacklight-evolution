@@ -6,6 +6,8 @@ import net.minecraft.client.CameraType;
 public final class ModePerspective {
     private boolean active,owned;
     private CameraType previous;
+    /** Forget our restoration lease without changing another controller's perspective. */
+    public void relinquish(boolean mode){active=mode;owned=false;previous=null;}
     public CameraType update(CameraType current,boolean mode,boolean manual){
         if(mode&&!active){previous=current;owned=true;active=true;return CameraType.THIRD_PERSON_BACK;}
         if(owned&&(manual||current!=CameraType.THIRD_PERSON_BACK))owned=false;
