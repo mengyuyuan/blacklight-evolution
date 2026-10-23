@@ -60,9 +60,9 @@ public final class ClientMovementEvents {
     private ClientMovementEvents() { }
 
     @EventBusSubscriber(modid = BlacklightNeoMod.MOD_ID, value = Dist.CLIENT, bus = EventBusSubscriber.Bus.MOD)
-    public static final class Registration {
+    public static final class MovementKeyRegistration {
         @SubscribeEvent
-        public static void registerKeys(RegisterKeyMappingsEvent event) {
+        public static void registerMovementKeys(RegisterKeyMappingsEvent event) {
             event.register(DODGE);
             if (DeveloperTools.enabled()) event.register(ENGINE_TUNER);
         }

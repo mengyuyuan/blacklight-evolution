@@ -24,8 +24,8 @@ public final class UtilityPowerControls {
     private static int senseHeld;
     private static boolean senseConsumed;
     @EventBusSubscriber(modid="blacklight", value=Dist.CLIENT, bus=EventBusSubscriber.Bus.MOD)
-    public static final class Registration {
-        @SubscribeEvent public static void keys(RegisterKeyMappingsEvent e) { e.register(DEFENSE); e.register(SENSE); }
+    public static final class UtilityKeyRegistration {
+        @SubscribeEvent public static void registerUtilityKeys(RegisterKeyMappingsEvent e) { e.register(DEFENSE); e.register(SENSE); }
     }
     @SubscribeEvent public static void tick(ClientTickEvent e){if(e.phase!=net.minecraftforge.event.TickEvent.Phase.END)return;
         var mc = Minecraft.getInstance();
