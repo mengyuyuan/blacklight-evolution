@@ -11,6 +11,7 @@ public abstract class BiomassPreyMixin {
     @Inject(method="serverAiStep",at=@At("HEAD"),cancellable=true)
     private void blacklight$heldByBiomass(CallbackInfo ci){
         Mob mob=(Mob)(Object)this;
+        if(com.codex.blacklight.infection.TissueGrapples.owner(mob)!=null){mob.getNavigation().stop();mob.setXxa(0);mob.setZza(0);ci.cancel();return;}
         if(BiomassSystem.claimant(mob)!=null){mob.getNavigation().stop();mob.setDeltaMovement(0,mob.getDeltaMovement().y,0);ci.cancel();}
     }
 }

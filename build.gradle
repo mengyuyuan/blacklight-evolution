@@ -111,10 +111,13 @@ tasks.named('assemble') {
 // Mojang ships Java 21 to end users in 1.21.1, so mods should target Java 21.
 java.toolchain.languageVersion = JavaLanguageVersion.of(21)
 
+if (['compatLiveTest', 'hydraReleaseTest', 'hiveFeedingTest', 'wallTraversalTest', 'standaloneTest', 'cityTest', 'feedbackTest', 'releaseAuditTest', 'twilightTest', 'buildingBiomassTest'].any { project.hasProperty(it) }) {
+    sourceSets.main.resources.srcDir('src/traversalTest/resources')
+}
+
 // Real optional-mod integration tests, never bundled into release jars.
 if (project.hasProperty('compatLiveTest')) {
     sourceSets.main.java.srcDir('src/compatTest/java')
-    sourceSets.main.resources.srcDir('src/traversalTest/resources')
 }
 
 // Opt-in screenshot harness is excluded from normal builds and distributable JARs.
@@ -148,9 +151,6 @@ if (project.hasProperty('releaseAuditTest')) {
 if (project.hasProperty('cityTest')) {
     sourceSets.main.java.srcDir('src/cityTest/java')
     sourceSets.main.resources.srcDir('src/cityTest/resources')
-}
-if (['standaloneTest','wallTraversalTest','hiveFeedingTest','releaseAuditTest','cityTest','hydraReleaseTest'].any { project.hasProperty(it) }) {
-    sourceSets.main.resources.srcDir('src/traversalTest/resources')
 }
 tasks.named('jar', Jar).configure {
     archiveClassifier = releaseProfile
@@ -542,7 +542,6 @@ tasks.named('assemble') { dependsOn tasks.named('verifyBundledMotionResources') 
 // Website-feedback regressions run only in disposable GameTest worlds.
 if (project.hasProperty('feedbackTest')) {
     sourceSets.main.java.srcDir('src/feedbackTest/java')
-    sourceSets.main.resources.srcDir('src/traversalTest/resources')
 }
 
 if (project.hasProperty('feedbackVisual')) {
@@ -558,7 +557,62 @@ tasks.withType(Jar).configureEach { exclude "com/codex/blacklight/client/Feedbac
 // Optional real Twilight Forest integration tests; absent from normal builds and release jars.
 if (project.hasProperty('twilightTest')) {
     sourceSets.main.java.srcDir('src/twilightTest/java')
-    sourceSets.main.resources.srcDir('src/traversalTest/resources')
     repositories.maven { url = 'https://maven.tamaized.com/releases'; content { includeGroup 'team-twilight' } }
     dependencies { localRuntime 'team-twilight:twilightforest:4.8.3345:universal' }
+}
+
+tasks.withType(Jar).configureEach { exclude "com/codex/blacklight/client/GlideRenderSmoke*.class" }
+
+// Opt-in cancellation/exception renderer acceptance in an isolated native client.
+if (project.hasProperty('renderAudit')) {
+    sourceSets.main.java.srcDir('src/renderAuditTest/java')
+    neoForge.runs.client {
+        systemProperty 'blacklight.renderAudit', 'true'
+        programArguments.addAll '--width', '960', '--height', '640'
+    }
+}
+tasks.withType(Jar).configureEach { exclude "com/codex/blacklight/client/RenderScopeSmoke*.class" }
+
+// Loaded only for isolated tissue-growth visual acceptance.
+if (project.hasProperty('tissueVisual')) {
+    sourceSets.main.java.srcDir('src/tissueVisualTest/java')
+    neoForge.runs.client {
+        systemProperty 'blacklight.tissueVisual', 'true'
+        programArguments.addAll '--width', '1280', '--height', '800'
+    }
+}
+tasks.withType(Jar).configureEach { exclude "com/codex/blacklight/client/TissueVisualSmoke*.class" }
+
+if (project.hasProperty('proceduralTissueVisual')) {
+    sourceSets.main.java.srcDir('src/tissueVisualTest/java')
+    neoForge.runs.client {
+        systemProperty 'blacklight.proceduralVisual', 'true'
+        programArguments.addAll '--width', '1280', '--height', '800'
+    }
+}
+tasks.withType(Jar).configureEach { exclude "com/codex/blacklight/client/ProceduralTissueSmoke*.class" }
+tasks.withType(Jar).configureEach { exclude "com/codex/blacklight/client/AssimilationVisualSmoke*.class" }
+
+if (project.hasProperty('buildingVisual')) {
+    sourceSets.main.java.srcDir('src/buildingVisualTest/java')
+    neoForge.runs.client {
+        systemProperty 'blacklight.buildingVisual', 'true'
+        programArguments.addAll '--width', '1280', '--height', '800'
+    }
+}
+tasks.withType(Jar).configureEach { exclude "com/codex/blacklight/client/BuildingVisualSmoke*.class" }
+
+if (project.hasProperty('tissueEvolutionVisual')) {
+    sourceSets.main.java.srcDir('src/tissueVisualTest/java')
+    neoForge.runs.client {
+        systemProperty 'blacklight.tissueEvolutionVisual', 'true'
+        programArguments.addAll '--width', '1280', '--height', '800'
+    }
+}
+tasks.withType(Jar).configureEach { exclude 'com/codex/blacklight/client/TissueEvolutionSmoke*.class' }
+
+
+// Focused column integration tests. No private QA classes enter ordinary jars.
+if(project.hasProperty('buildingBiomassTest')) {
+    sourceSets.main.java.srcDir('src/buildingTest/java')
 }

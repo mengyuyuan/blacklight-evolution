@@ -111,6 +111,7 @@ public final class TwilightCompatibilityGameTest {
     @GameTest(template="wall_test",timeoutTicks=30)
     public static void biomassCanExecuteHydra(GameTestHelper h) {
         try(var f=fixture(h,"hydra")) {
+            f.boss.setHealth(1); // Current gameplay requires weakening before absorption.
             f.boss.setPos(f.player.position());f.boss.tick();
             f.player.setData(ModAttachments.BIOMASS_FORM,new com.codex.blacklight.power.BiomassState(
                     com.codex.blacklight.power.BiomassState.ABSORBING,h.getLevel().getGameTime()-60,true,"","claws",f.boss.getId(),10));
@@ -170,6 +171,7 @@ public final class TwilightCompatibilityGameTest {
     @GameTest(template="wall_test",timeoutTicks=30)
     public static void attachedSlimeFollowsMultipartSurfaceButCannotCrossWalls(GameTestHelper h) {
         try(var f=fixture(h,"hydra")) {
+            f.boss.setHealth(1);
             var part=f.boss.getParts()[0];var box=part.getBoundingBox();var at=box.getCenter();
             f.player.setPos(at.x,box.minY+.05,at.z);
             f.player.setData(ModAttachments.BIOMASS_FORM,new com.codex.blacklight.power.BiomassState(

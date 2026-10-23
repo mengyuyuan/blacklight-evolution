@@ -20,7 +20,7 @@ import java.util.List;
 public final class UpgradeScreen extends Screen {
     private static final int BG=0xFF101114, PANEL=0xFF1A1C20, RED=0xFFE94B42, TEXT=0xFFE9E5DF, DIM=0xFFABA9A7;
     private static final int TOP=48,ROW=31;
-    private enum Category { BASIC, MOVEMENT, CLAW, FORMS, COMBAT, UTILITY, BIOLOGY, ATTRIBUTES, SETTINGS;
+    private enum Category { BASIC, MOVEMENT, CLAW, FORMS, COMBAT, UTILITY, BIOLOGY, ORGANS, ATTRIBUTES, SETTINGS;
         Component label(){return Component.translatable("screen.blacklight.section."+name().toLowerCase(java.util.Locale.ROOT));}}
     private record Entry(String id,int cost,String required,boolean free) {}
     private Category category=Category.BASIC;
@@ -42,7 +42,7 @@ public final class UpgradeScreen extends Screen {
         addRenderableWidget(new TutorialButton(width-31,8,22,20,Component.literal("×"),b->onClose()));
         purchase=addRenderableWidget(new TutorialButton(detailX,height-25,Math.max(60,detailWidth),20,Component.empty(),b->activate()));
         rebuild();
-        if(!selected.isEmpty()&&category!=Category.SETTINGS&&category!=Category.ATTRIBUTES)gif.select(SkillTutorial.forSkill(selected).family());
+        if(!selected.isEmpty()&&category!=Category.SETTINGS&&category!=Category.ATTRIBUTES&&category!=Category.ORGANS)gif.select(SkillTutorial.forSkill(selected).family());
     }
     private void rebuild(){
         entries.clear();
@@ -54,6 +54,7 @@ public final class UpgradeScreen extends Screen {
             case COMBAT -> {for(var u:CombatSkill.values())if(!u.shieldBorer()&&!u.adaptivePassive())entries.add(new Entry(u.id(),u.epCost(),u.requires()!=null?u.requires().id():u.movementRequires()!=null?u.movementRequires().id():u.powerRequires()!=null?u.powerRequires().id():null,false));}
             case UTILITY -> {entries.add(new Entry(RicochetRules.ID,0,null,false));for(var u:List.of(PowerForm.SHIELD,PowerForm.ARMOR,PowerForm.THERMAL_VISION,PowerForm.INFECTED_VISION,PowerForm.BIOMASS,PowerForm.SOVEREIGN_WINGS))entries.add(new Entry(u.id(),u.epCost(),null,false));for(var u:CombatSkill.values())if(u.shieldBorer())entries.add(new Entry(u.id(),u.epCost(),u.requires()==null?PowerForm.SHIELD.id():u.requires().id(),false));}
             case BIOLOGY -> {for(var u:CombatSkill.values())if(u.adaptivePassive())entries.add(new Entry(u.id(),u.epCost(),u.requires()==null?null:u.requires().id(),false));for(var u:GrowthUpgrade.values())entries.add(new Entry(u.id,u.cost,u.requires()==null?null:u.requires().id,false));}
+            case ORGANS -> {for(var core:com.codex.blacklight.infection.TissueCore.values())entries.add(new Entry(core.id,0,null,false));}
             case SETTINGS -> {for(String id:List.of("bulletdive_blocks","shield_borer_blocks","prototype_item_pickup","passive_stacks"))entries.add(new Entry(id,0,null,true));}
             default -> {}
         }
@@ -62,14 +63,15 @@ public final class UpgradeScreen extends Screen {
     }
     private void select(String id){
         selected=id;detailScroll=0;selectedAt=System.nanoTime();paused=false;
-        if(!id.isEmpty()&&category!=Category.SETTINGS)gif.select(SkillTutorial.forSkill(id).family());else gif.close();
+        if(!id.isEmpty()&&category!=Category.SETTINGS&&category!=Category.ORGANS)gif.select(SkillTutorial.forSkill(id).family());else gif.close();
     }
     private Entry entry(){return entries.stream().filter(e->e.id.equals(selected)).findFirst().orElse(null);}
     private Component label(String id){return Component.translatable((category==Category.SETTINGS?"setting.blacklight.":"upgrade.blacklight.")+id);}
     private static BlacklightState state(){var p=Minecraft.getInstance().player;return p==null?null:p.getData(ModAttachments.PLAYER_STATE);}
-    private boolean owns(Entry e){return e.free||owned(state(),e.id);}
-    private boolean prerequisite(Entry e){return e.id.equals(RicochetRules.ID)?minecraft.player!=null&&ProjectileDefenseSystem.unlocked(minecraft.player):e.required==null||owned(state(),e.required);}
-    private int cost(Entry e){return e.id.equals(RicochetRules.ID)&&minecraft.player!=null?RicochetRules.cost(ProjectileDefenseSystem.level(minecraft.player)):e.cost;}
+    private com.codex.blacklight.state.OrganResearch research(){return minecraft.player==null?com.codex.blacklight.state.OrganResearch.EMPTY:minecraft.player.getData(ModAttachments.ORGAN_RESEARCH);}
+    private boolean owns(Entry e){var core=com.codex.blacklight.infection.TissueCore.byId(e.id);return core!=null?research().rank(core)>=3:e.free||owned(state(),e.id);}
+    private boolean prerequisite(Entry e){var core=com.codex.blacklight.infection.TissueCore.byId(e.id);if(core!=null)return research().canBuy(core);return e.id.equals(RicochetRules.ID)?minecraft.player!=null&&ProjectileDefenseSystem.unlocked(minecraft.player):e.required==null||owned(state(),e.required);}
+    private int cost(Entry e){var core=com.codex.blacklight.infection.TissueCore.byId(e.id);if(core!=null)return com.codex.blacklight.infection.TissueCore.cost(research().rank(core)+1);return e.id.equals(RicochetRules.ID)&&minecraft.player!=null?RicochetRules.cost(ProjectileDefenseSystem.level(minecraft.player)):e.cost;}
     private int balance(){var s=state();return s==null?0:s.getEvolutionPoints();}
     private void activate(){
         var e=entry();if(e==null||minecraft.player==null)return;
@@ -96,6 +98,11 @@ public final class UpgradeScreen extends Screen {
     }
     private void refreshButton(){
         var e=entry();if(e==null)return;
+        var core=com.codex.blacklight.infection.TissueCore.byId(e.id);
+        if(core!=null){
+            var progress=research();purchase.active=minecraft.player!=null&&progress.canBuy(core)&&balance()>=cost(e);
+            purchase.setMessage(Component.translatable(progress.rank(core)>=3?"screen.blacklight.organ_max":!progress.canBuy(core)?"screen.blacklight.organ_need_specimen":"screen.blacklight.state_cost",progress.canBuy(core)?cost(e):progress.rank(core)+1));return;
+        }
         if(category==Category.SETTINGS){
             boolean on=settingEnabled(e.id);
             purchase.setMessage(Component.translatable(on?"screen.blacklight.setting_on":"screen.blacklight.setting_off"));purchase.active=minecraft.player!=null;return;
@@ -122,7 +129,9 @@ public final class UpgradeScreen extends Screen {
                 g.fill(listX,y,listX+listWidth,y+ROW-3,chosen?0xFF682C29:hover?0xFF302627:PANEL);
                 if(chosen)g.fill(listX,y,listX+2,y+ROW-3,RED);
                 g.drawString(font,font.plainSubstrByWidth(label(e.id).getString(),listWidth-12),listX+7,y+5,TEXT,false);
-                var status=Component.translatable(category==Category.SETTINGS?(settingEnabled(e.id)?"screen.blacklight.setting_on":"screen.blacklight.setting_off"):owns(e)?"tutorial.blacklight.learned":prerequisite(e)?"tutorial.blacklight.available":"tutorial.blacklight.locked");
+                var organ=com.codex.blacklight.infection.TissueCore.byId(e.id);
+                var status=organ!=null?Component.translatable("screen.blacklight.organ_row",research().rank(organ),research().sample(organ)):
+                        Component.translatable(category==Category.SETTINGS?(settingEnabled(e.id)?"screen.blacklight.setting_on":"screen.blacklight.setting_off"):owns(e)?"tutorial.blacklight.learned":prerequisite(e)?"tutorial.blacklight.available":"tutorial.blacklight.locked");
                 g.drawString(font,status,listX+7,y+17,owns(e)?0xFFB1BEAE:0xFFD6A089,false);y+=ROW;
             }
             g.disableScissor();bar(g,listX+listWidth-2,TOP,bottom,listScroll,entries.size()*ROW);
@@ -135,7 +144,7 @@ public final class UpgradeScreen extends Screen {
         var e=entry();if(e==null)return;
         g.fill(detailX-3,TOP-4,width-8,bottom,0xFF16181B);g.enableScissor(detailX,TOP,width-10,bottom);
         int y=paragraph(g,label(e.id),TOP-detailScroll,TEXT)+6;
-        if(category!=Category.SETTINGS&&!e.id.equals(RicochetRules.ID)){
+        if(category!=Category.SETTINGS&&category!=Category.ORGANS&&!e.id.equals(RicochetRules.ID)){
             var tutorial=SkillTutorial.forSkill(e.id);int previewHeight=previewHeight();
             g.fill(detailX,y,detailX+detailWidth,y+previewHeight,0xFF22262B);
             long elapsed=((paused?pausedAt:System.nanoTime())-selectedAt)/1_000_000;
@@ -148,6 +157,11 @@ public final class UpgradeScreen extends Screen {
         }
         y=paragraph(g,Component.translatable("tutorial.blacklight.effect"),y,RED)+4;
         y=paragraph(g,Component.translatable((category==Category.SETTINGS?"setting.blacklight.":"upgrade.blacklight.")+e.id+".desc"),y,DIM)+8;
+        var core=com.codex.blacklight.infection.TissueCore.byId(e.id);
+        if(core!=null){
+            var progress=research();y=paragraph(g,Component.translatable("screen.blacklight.organ_progress",progress.sample(core),progress.rank(core),cost(e)),y,TEXT)+8;
+            y=paragraph(g,Component.translatable("screen.blacklight.organ_acquire"),y,DIM)+8;
+        }
         if(e.id.equals(RicochetRules.ID)&&minecraft.player!=null){
             long level=ProjectileDefenseSystem.level(minecraft.player);
             y=paragraph(g,Component.translatable("screen.blacklight.ricochet_stats",level,
@@ -183,7 +197,7 @@ public final class UpgradeScreen extends Screen {
             int step=Math.max(14,Math.min(27,(height-54)/Category.values().length));
             if(x>=4&&x<rail&&y>=TOP&&y<TOP+step*Category.values().length){category=Category.values()[(int)(y-TOP)/step];listScroll=detailScroll=0;rebuild();return true;}
             if(x>=listX&&x<listX+listWidth&&y>=TOP&&y<bottom){int index=((int)y-TOP+listScroll)/ROW;if(index<entries.size()){select(entries.get(index).id);return true;}}
-            if(category!=Category.ATTRIBUTES&&category!=Category.SETTINGS&&x>=detailX&&x<detailX+detailWidth&&y>=TOP&&y<bottom){
+            if(category!=Category.ATTRIBUTES&&category!=Category.SETTINGS&&category!=Category.ORGANS&&x>=detailX&&x<detailX+detailWidth&&y>=TOP&&y<bottom){
                 int start=TOP-detailScroll+font.split(label(selected),Math.max(50,detailWidth-6)).size()*11+6;
                 if(y>=start&&y<start+previewHeight()+15){if(paused){selectedAt+=System.nanoTime()-pausedAt;paused=false;}else{pausedAt=System.nanoTime();paused=true;}return true;}
             }

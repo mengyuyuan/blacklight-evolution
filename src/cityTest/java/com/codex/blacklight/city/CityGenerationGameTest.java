@@ -33,7 +33,7 @@ public class CityGenerationGameTest {
         }
         h.succeed();
     }
-    @GameTest(template="wall_test",timeoutTicks=1400)
+    @GameTest(template="wall_test",timeoutTicks=1400,batch="city_pregen_lifecycle")
     public static void pregenPausesResumesPreservesEditsAndReleasesTickets(GameTestHelper h){
         var level=city(h);CityPregenerator.start(level,1);var data=CityGenerationData.get(level);
         data.cursor=47;data.setDirty();
@@ -45,6 +45,10 @@ public class CityGenerationGameTest {
         CityPregenerator.tick(level);h.assertTrue(!CityPregenerator.hasTicket(level)&&data.cursor==47,"paused job advanced");
         CityPregenerator.resume(level);
         h.onEachTick(()->{
+            // GameTestServer.waitUntilNextTick runs without the normal 50 ms wait.
+            // Pace this isolated async-I/O test so 1200 production ticks still
+            // give chunk workers the real game's 60 seconds, not a few moments.
+            java.util.concurrent.locks.LockSupport.parkNanos(50_000_000L);
             CityPregenerator.tick(level);
             h.assertTrue(data.failure.isEmpty(),"pregen failed: "+data.failure);
             if(data.cursor==49&&!data.running){
