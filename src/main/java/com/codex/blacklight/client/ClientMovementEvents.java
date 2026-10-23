@@ -59,10 +59,13 @@ public final class ClientMovementEvents {
 
     private ClientMovementEvents() { }
 
-    @SubscribeEvent
-    public static void registerKeys(RegisterKeyMappingsEvent event) {
-        event.register(DODGE);
-        if (DeveloperTools.enabled()) event.register(ENGINE_TUNER);
+    @EventBusSubscriber(modid = BlacklightNeoMod.MOD_ID, value = Dist.CLIENT, bus = EventBusSubscriber.Bus.MOD)
+    public static final class MovementKeyRegistration {
+        @SubscribeEvent
+        public static void registerMovementKeys(RegisterKeyMappingsEvent event) {
+            event.register(DODGE);
+            if (DeveloperTools.enabled()) event.register(ENGINE_TUNER);
+        }
     }
 
     @SubscribeEvent(priority = net.minecraftforge.eventbus.api.EventPriority.LOWEST)

@@ -1,0 +1,9 @@
+// Use with the opt-in suite properties. Several suites append the same NBT root.
+// Only the shared test template may be duplicated; other resource conflicts still fail.
+allprojects { afterEvaluate {
+    tasks.named('processResources') {
+        filesMatching(['data/blacklight/structure/wall_test.nbt','data/blacklight/structures/wall_test.nbt']) {
+            duplicatesStrategy=DuplicatesStrategy.EXCLUDE
+        }
+    }
+} }
