@@ -52,7 +52,7 @@
 
 - Blockbench 源文件使用 `.bbmodel` 保存，但不得打入发布 JAR。
 - GeckoLib 模型导出到 `assets/blacklight/geo`，动画导出到 `assets/blacklight/animations`。
-- Epic Fight 动画放在 `assets/blacklight/animmodels/animations`，文件名与 Java 注册名必须完全一致。
+- Epic Fight 动画放在 `assets/blacklight/native_animations`，文件名与 Java 注册名必须完全一致。
 - 左右模型必须独立调参，不能用一个镜像参数代替另一侧。
 - 不分发《虐杀原形》原版模型、贴图、声音或其他受版权保护资产；所有资源必须自行制作或确认授权。
 

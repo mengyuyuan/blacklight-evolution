@@ -19,7 +19,7 @@ class WeaponContentTest {
                 assertEquals(21,definition.animation().getAsJsonArray("animation").size());
                 continue;
             }
-            var path=Path.of("src/main/resources/assets/blacklight/animmodels/animations/biped/combat/"+move.id+".json");
+            var path=Path.of("src/main/resources/assets/blacklight/native_animations/biped/combat/"+move.id+".json");
             var tracks=JsonParser.parseString(Files.readString(path)).getAsJsonObject().getAsJsonArray("animation");
             var joints=new java.util.HashSet<String>();
             for(var element:tracks){var track=element.getAsJsonObject();assertTrue(joints.add(track.get("name").getAsString()));var time=track.getAsJsonArray("time");var frames=track.getAsJsonArray("transform");assertEquals(time.size(),frames.size());

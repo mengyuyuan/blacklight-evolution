@@ -126,7 +126,7 @@ for name,(ticks,hit,load,strike) in moves.items():
       if track['name']=='Root':
        for time,frame in zip(track['time'],track['transform']):
         frame['rot']=list((Quaternion((0,1,0),math.radians(turn_at(turns[name],time)))@Quaternion(frame['rot'])).normalized())
-     (RES/'animmodels/animations/biped/combat'/f'{name}.json').write_text(clip_text(result),encoding='utf8')
+     (RES/'native_animations/biped/combat'/f'{name}.json').write_text(clip_text(result),encoding='utf8')
      (OUT/'exports'/f'{name}.json').write_text(clip_text(result),encoding='utf8')
 bpy.context.preferences.filepaths.save_version=0
 bpy.ops.wm.save_as_mainfile(filepath=str(OUT/'weapon-combat-r19.blend'))

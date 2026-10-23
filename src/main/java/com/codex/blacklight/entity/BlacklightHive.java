@@ -43,6 +43,7 @@ public final class BlacklightHive extends Monster implements GeoEntity {
     }
     @Override public void tick(){
         super.tick();if(level().isClientSide)return;
+        if(!isAlive()||isRemoved()){boss.removeAllPlayers();return;}
         boss.setProgress(getHealth()/getMaxHealth());
         if(tickCount%20==0){
             var nearby=((net.minecraft.server.level.ServerLevel)level()).getPlayers(p->p.isAlive()&&!p.isSpectator()&&p.distanceToSqr(this)<32*32);

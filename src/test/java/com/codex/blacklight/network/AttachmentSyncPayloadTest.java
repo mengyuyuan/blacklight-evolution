@@ -12,7 +12,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class AttachmentSyncPayloadTest {
     @Test void expandedLoginSnapshotRoundTripsWithoutDisconnect() {
         var fields=new LinkedHashMap<String,byte[]>();
-        for(int i=0;i<24;i++)fields.put("state_"+i,new byte[]{(byte)i});
+        for(int i=0;i<31;i++)fields.put("state_"+i,new byte[]{(byte)i});
         var packet=new AttachmentSyncPayload(7,UUID.randomUUID(),new ResourceLocation("minecraft","overworld"),fields);
         var buffer=new FriendlyByteBuf(Unpooled.buffer());
         try {

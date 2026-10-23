@@ -67,7 +67,7 @@ public final class PrototypeMovementSystem {
     public static void onLivingFall(LivingFallEvent event) {
         if (!(event.getEntity() instanceof ServerPlayer player)) return;
         BlacklightState blacklight = com.codex.blacklight.registry.ModAttachments.getData(player, ModAttachments.PLAYER_STATE);
-        if (blacklight.isInfected() && blacklight.isPrototypeMode()) {
+        if (blacklight.isInfected()) {
             event.setDamageMultiplier(0.0F);
         }
     }
@@ -82,7 +82,7 @@ public final class PrototypeMovementSystem {
     /** Handles edge-triggered inputs immediately instead of waiting for a later player tick. */
     public static void acceptInput(ServerPlayer player, boolean jumpHeld, boolean dashPressed,
                                    int forward, int sideways, boolean sprinting, boolean detach) {
-        if (com.codex.blacklight.city.HydraTransport.active(player)||com.codex.blacklight.power.BiomassSystem.active(player) || !PrototypeModeSystem.isActive(player) || !player.isAlive()
+        if (com.codex.blacklight.disguise.DisguiseSystem.active(player)||com.codex.blacklight.city.HydraTransport.active(player)||com.codex.blacklight.power.BiomassSystem.active(player) || !PrototypeModeSystem.isActive(player) || !player.isAlive()
                 || player.isSpectator() || player.isDeadOrDying()
                 || player.isPassenger() || player.isFallFlying() || player.getAbilities().flying
                 || player.isInLava()) {
@@ -148,7 +148,7 @@ public final class PrototypeMovementSystem {
         if (!com.codex.blacklight.registry.ModAttachments.available(event.player)) { return; }
         if(event.phase != net.minecraftforge.event.TickEvent.Phase.END)return;
         if (!(event.player instanceof ServerPlayer player)) return;
-        if(com.codex.blacklight.city.HydraTransport.active(player)||com.codex.blacklight.power.BiomassSystem.active(player)||WingFlightSystem.flying(player))return;
+        if(com.codex.blacklight.disguise.DisguiseSystem.active(player)||com.codex.blacklight.city.HydraTransport.active(player)||com.codex.blacklight.power.BiomassSystem.active(player)||WingFlightSystem.flying(player))return;
         if (com.codex.blacklight.registry.ModAttachments.getData(player, ModAttachments.CONSUMING)&&com.codex.blacklight.combat.ConsumeVisual.blocksInput(com.codex.blacklight.registry.ModAttachments.getData(player, ModAttachments.GRAB_STAGE))) return;
         MovementState movement = com.codex.blacklight.registry.ModAttachments.getData(player, ModAttachments.MOVEMENT_STATE);
         BlacklightState blacklight = com.codex.blacklight.registry.ModAttachments.getData(player, ModAttachments.PLAYER_STATE);

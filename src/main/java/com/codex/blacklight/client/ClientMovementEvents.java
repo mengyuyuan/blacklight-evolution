@@ -254,7 +254,7 @@ public final class ClientMovementEvents {
         // Consume queued clicks even in menus or another form; never dodge later from a stale press.
         boolean directDodge=false;
         while(DODGE.consumeClick()) directDodge=true;
-        if(minecraft.player!=null&&com.codex.blacklight.power.BiomassSystem.active(minecraft.player)){DODGE_TAP.reset();JUMP_INPUT.reset();lastJumpHeld=false;clientChargeTicks=0;resetClientWallRun();return;}
+        if(minecraft.player!=null&&(com.codex.blacklight.disguise.DisguiseSystem.active(minecraft.player)||com.codex.blacklight.power.BiomassSystem.active(minecraft.player))){DODGE_TAP.reset();JUMP_INPUT.reset();lastJumpHeld=false;clientChargeTicks=0;resetClientWallRun();return;}
         // Respawn can replace LocalPlayer without a tick in which player is null.
         // Charge/wall latches belong to the old entity, never the next life.
         if (inputOwner != minecraft.player || minecraft.player == null || minecraft.getConnection() == null) {

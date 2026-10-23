@@ -20,7 +20,7 @@ public final class BiomassPlayerRendering {
         flow.update(p.getPosition(partial),time,size);
         var victim=p.level().getEntity(state.victim());
         boolean absorbing=state.phase()==BiomassState.ABSORBING&&victim!=null;
-        double f=absorbing?state.progress(now,BiomassState.ABSORB_TICKS):0;
+        double f=absorbing?state.progress(now,com.codex.blacklight.power.ConsumeProgression.absorbTicks(p)):0;
         Vec3 delta=absorbing?victim.getPosition(partial).subtract(p.getPosition(partial)):Vec3.ZERO;
         double transfer=Math.min(1,f/.68),remaining=1-transfer;
         if(state.phase()==BiomassState.SHATTERING)remaining=Math.max(0,(state.progress(now,BiomassState.SHATTER_TICKS)-.55)/.45);

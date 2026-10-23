@@ -37,7 +37,7 @@ public final class WingFlightSystem {
         // Keep the feet planted while the capture coils, then release into flight.
         if(state.phase()==WingFlightState.TAKEOFF&&p.level().getGameTime()-state.started()<WingFlightState.WINDUP_TICKS&&p.onGround())return new Vec3(0,-.01,0);
         int tier=tier(p);
-        var next=WingFlightPhysics.step(v.x,v.y,v.z,keys.forward(),keys.sideways(),move.jumpHeld(),keys.detach(),keys.sprint(),move.cameraYaw(p.getYRot()),p.getXRot(),state.phase()==WingFlightState.TAKEOFF,tier);
+        var next=WingFlightPhysics.step(v.x,v.y,v.z,keys.forward(),keys.sideways(),move.jumpHeld(),keys.detach(),keys.sprint(),move.cameraYaw(p.getYRot()),p.getXRot(),state.phase()==WingFlightState.TAKEOFF,tier,ModAttachments.getData(p,ModAttachments.SKILL_SETTINGS).wingSpeedPercent()/100D);
         var result=new Vec3(next.x(),next.y(),next.z());double speed=result.length();
         if(speed<1e-6)return result;
         var direction=result.scale(1/speed);var box=p.getBoundingBox().inflate(.25);
