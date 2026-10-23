@@ -37,6 +37,9 @@ public final class DisguiseSystem {
     public static boolean morphing(Player p){return p.getData(ModAttachments.DISGUISE_MORPH).active(p.level().getGameTime());}
     public static void captured(ServerPlayer p,DisguiseIdentity identity){
         if(!identity.valid())return;
+        identity=identity.compact();
+        remember(p,identity);
+        DisguiseAwareness.rememberIdentity(p,p.getData(ModAttachments.DISGUISE_IDENTITY).type());
         boolean seen=active(p)&&!witnesses(p).isEmpty();
         p.setData(ModAttachments.DISGUISE_IDENTITY,identity);p.syncData(ModAttachments.DISGUISE_IDENTITY);
         DisguiseAwareness.newIdentity(p);
@@ -45,18 +48,41 @@ public final class DisguiseSystem {
         p.setData(ModAttachments.PLAYER_STATE,state);syncAlert(p);
         p.displayClientMessage(Component.translatable("message.blacklight.identity_captured",identity.entityType().getDescription()),true);
     }
+    private static void remember(ServerPlayer p,DisguiseIdentity identity) {
+        var old=p.getData(ModAttachments.DISGUISE_LIBRARY);var next=old.remember(identity);
+        if(next!=old){p.setData(ModAttachments.DISGUISE_LIBRARY,next);p.syncData(ModAttachments.DISGUISE_LIBRARY);}
+    }
+    /** Stale UI indices and arbitrary client-provided appearances cannot select a form. */
+    public static void select(ServerPlayer p,int revision,int index) {
+        if(!enabled(p)||p.isSpectator()||busy(p))return;
+        var identity=p.getData(ModAttachments.DISGUISE_LIBRARY).select(revision,index);
+        if(identity==null||!identity.valid()){message(p,"disguise_selection_stale");return;}
+        var old=p.getData(ModAttachments.DISGUISE_IDENTITY);
+        if(old.equals(identity)&&active(p))return;
+        DisguiseAwareness.rememberIdentity(p,old.type());
+        p.setData(ModAttachments.DISGUISE_IDENTITY,identity);p.syncData(ModAttachments.DISGUISE_IDENTITY);
+        DisguiseAwareness.restoreIdentity(p,identity.type());
+        var s=p.getData(ModAttachments.PLAYER_STATE);s.captureIdentity(identity.type());s.setDisguised(false);
+        p.setData(ModAttachments.PLAYER_STATE,s);p.syncData(ModAttachments.PLAYER_STATE);
+        request(p);
+    }
+    static boolean busy(ServerPlayer p) {
+        return morphing(p)||p.getData(ModAttachments.CONSUMING)||WeaponCombatSystem.busy(p)
+                ||p.getData(ModAttachments.CLAW_COMBAT).action()!=ClawCombatState.Action.IDLE
+                ||p.getData(ModAttachments.MOVEMENT_STATE).wallTraversal().attached()||p.isPassenger()
+                ||com.codex.blacklight.power.BiomassSystem.active(p)||com.codex.blacklight.city.HydraTransport.active(p);
+    }
     public static void request(ServerPlayer p){
         if(!enabled(p)||p.isSpectator())return;
         var s=p.getData(ModAttachments.PLAYER_STATE);var identity=p.getData(ModAttachments.DISGUISE_IDENTITY);
         if(!identity.valid()){message(p,"disguise_missing");return;}
-        if(morphing(p)||p.getData(ModAttachments.CONSUMING)||WeaponCombatSystem.busy(p)
-                ||p.getData(ModAttachments.CLAW_COMBAT).action()!=ClawCombatState.Action.IDLE
-                ||p.getData(ModAttachments.MOVEMENT_STATE).wallTraversal().attached()||p.isPassenger()){
+        if(busy(p)){
             message(p,"disguise_busy");return;
         }
         DisguiseAwareness.data(p);
         boolean entering=!s.isDisguised();
         if(entering){
+            com.codex.blacklight.movement.PrototypeMovementSystem.suspendForTransport(p);
             s.activate(PowerForm.NONE);
             com.codex.blacklight.movement.WingFlightSystem.transform(p,false);
             com.codex.blacklight.movement.WingFlightSystem.stop(p);
@@ -86,6 +112,9 @@ public final class DisguiseSystem {
     }
     /** Consumption completes without a damage event for ordinary receivers. */
     public static void consumed(ServerPlayer p,LivingEntity victim){hostileAct(p,victim,false);}
+    public static void speciesAttack(ServerPlayer p){
+        if(active(p)&&!witnesses(p).isEmpty()){DisguiseAwareness.expose(p,true);syncAlert(p);}
+    }
     private static void hostileAct(ServerPlayer p,LivingEntity victim){
         hostileAct(p,victim,true);
     }
@@ -207,6 +236,9 @@ public final class DisguiseSystem {
                 if(p.getData(ModAttachments.DISGUISE_IDENTITY).valid()){
                     p.setData(ModAttachments.DISGUISE_IDENTITY,DisguiseIdentity.EMPTY);p.syncData(ModAttachments.DISGUISE_IDENTITY);
                 }
+                if(!p.getData(ModAttachments.DISGUISE_LIBRARY).identities().isEmpty()){
+                    p.setData(ModAttachments.DISGUISE_LIBRARY,DisguiseLibrary.EMPTY);p.syncData(ModAttachments.DISGUISE_LIBRARY);
+                }
             }
             return;
         }
@@ -239,7 +271,7 @@ public final class DisguiseSystem {
         }
         if(p.tickCount%10!=0)return;
         if(p.getPersistentData().contains(DisguiseAwareness.KEY)
-                &&(DisguiseAwareness.exposure(p,false)>0||DisguiseAwareness.exposure(p,true)>0)&&!pursued(p)){
+                &&DisguiseAwareness.hasExposure(p)&&!pursued(p)){
             DisguiseAwareness.decay(p);
             if(s.getAlert()!=DisguiseAwareness.exposure(p,s.isDisguised()))syncAlert(p);
         }
@@ -251,7 +283,10 @@ public final class DisguiseSystem {
             e.getEntity().getPersistentData().put(DisguiseAwareness.KEY,e.getOriginal().getPersistentData().getCompound(DisguiseAwareness.KEY).copy());
     }
     @SubscribeEvent public static void login(PlayerEvent.PlayerLoggedInEvent e){
-        if(e.getEntity() instanceof ServerPlayer p){DisguiseAwareness.advanceEpoch(p);syncAlert(p);}
+        if(e.getEntity() instanceof ServerPlayer p){
+            var identity=p.getData(ModAttachments.DISGUISE_IDENTITY);if(identity.valid())remember(p,identity);
+            p.syncData(ModAttachments.DISGUISE_LIBRARY);DisguiseAwareness.advanceEpoch(p);syncAlert(p);
+        }
     }
     @SubscribeEvent public static void respawn(PlayerEvent.PlayerRespawnEvent e){
         if(e.getEntity() instanceof ServerPlayer p){
@@ -261,6 +296,7 @@ public final class DisguiseSystem {
             p.setData(ModAttachments.PLAYER_STATE,s);p.syncData(ModAttachments.PLAYER_STATE);
             p.setData(ModAttachments.DISGUISE_MORPH,DisguiseMorph.EMPTY);p.syncData(ModAttachments.DISGUISE_MORPH);
             p.syncData(ModAttachments.DISGUISE_IDENTITY);
+            p.syncData(ModAttachments.DISGUISE_LIBRARY);
         }
     }
     private static void message(ServerPlayer p,String key){p.displayClientMessage(Component.translatable("message.blacklight."+key),true);}

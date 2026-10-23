@@ -71,6 +71,7 @@ public final class BlacklightNeoMod {
         NeoForge.EVENT_BUS.register(com.codex.blacklight.power.BiomassSystem.class);
         NeoForge.EVENT_BUS.register(ModNetwork.class);
         NeoForge.EVENT_BUS.register(com.codex.blacklight.disguise.DisguiseSystem.class);
+        NeoForge.EVENT_BUS.register(com.codex.blacklight.disguise.SpeciesAbilities.class);
         if (net.neoforged.fml.ModList.get().isLoaded("parcool")) {
             NeoForge.EVENT_BUS.register(com.codex.blacklight.integration.parcool.ParCoolCompatibility.class);
         }

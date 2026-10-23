@@ -18,11 +18,12 @@ import org.lwjgl.glfw.GLFW;
 public final class DisguiseControls {
     // Tap to disguise; hold to choose a power. Uses the remapped binding everywhere.
     public static final KeyMapping SWITCH=new KeyMapping("key.blacklight.disguise",InputConstants.Type.KEYSYM,GLFW.GLFW_KEY_X,"key.categories.blacklight");
+    public static final KeyMapping ABILITY=new KeyMapping("key.blacklight.species_ability",InputConstants.Type.KEYSYM,GLFW.GLFW_KEY_Y,"key.categories.blacklight");
     private static net.minecraft.client.player.LocalPlayer owner;
     private static boolean down,pending;
     private static int heldTicks;
     private DisguiseControls(){}
-    @SubscribeEvent public static void keys(RegisterKeyMappingsEvent e){e.register(SWITCH);}
+    @SubscribeEvent public static void keys(RegisterKeyMappingsEvent e){e.register(SWITCH);e.register(ABILITY);}
     @SubscribeEvent public static void key(InputEvent.Key e){
         if(SWITCH.matches(e.getKey(),e.getScanCode())&&(e.getAction()==GLFW.GLFW_PRESS||e.getAction()==GLFW.GLFW_RELEASE))
             press(e.getAction()==GLFW.GLFW_PRESS);
@@ -36,6 +37,7 @@ public final class DisguiseControls {
             else if(down&&++heldTicks>=7){pending=false;mc.setScreen(new com.codex.blacklight.client.screen.MorphWheelScreen(SWITCH));}
         }
         while(SWITCH.consumeClick()){}
+        while(ABILITY.consumeClick())if(valid()&&DisguiseSystem.active(mc.player))PacketDistributor.sendToServer(new com.codex.blacklight.network.SpeciesAbilityPayload());
     }
     private static boolean physical(){return SkillBindings.down(SWITCH);}
     private static boolean valid(){
@@ -65,5 +67,13 @@ public final class DisguiseControls {
                 id.entityType().getDescription(),SWITCH.getTranslatedKeyMessage());
         int x=Math.max(10,e.getGuiGraphics().guiWidth()-mc.font.width(text)-10);
         e.getGuiGraphics().drawString(mc.font,text,x,12,DisguiseSystem.active(mc.player)?0xFFCBD9C0:0xFFDCC9C6,true);
+        if(DisguiseSystem.active(mc.player)){
+            var trait=com.codex.blacklight.disguise.SpeciesAbilities.trait(mc.player);
+            if(trait!=com.codex.blacklight.disguise.SpeciesTrait.NONE){
+                long left=Math.max(0,mc.player.getData(ModAttachments.SPECIES_READY_AT)-mc.level.getGameTime());
+                Component ability=Component.translatable("hud.blacklight.species",Component.translatable("species.blacklight."+trait.id()),ABILITY.getTranslatedKeyMessage(),(left+19)/20);
+                e.getGuiGraphics().drawString(mc.font,ability,Math.max(10,e.getGuiGraphics().guiWidth()-mc.font.width(ability)-10),25,0xFFCEB5BA,true);
+            }
+        }
     }
 }

@@ -128,6 +128,13 @@ public final class ModAttachments {
             "disguise_identity",()->AttachmentType.builder(()->com.codex.blacklight.disguise.DisguiseIdentity.EMPTY)
                     .serialize(com.codex.blacklight.disguise.DisguiseIdentity.CODEC).copyOnDeath()
                     .sync(com.codex.blacklight.disguise.DisguiseIdentity.STREAM_CODEC).build());
+    public static final Supplier<AttachmentType<com.codex.blacklight.disguise.DisguiseLibrary>> DISGUISE_LIBRARY=ATTACHMENTS.register(
+            "disguise_library",()->AttachmentType.builder(()->com.codex.blacklight.disguise.DisguiseLibrary.EMPTY)
+                    .serialize(com.codex.blacklight.disguise.DisguiseLibrary.CODEC).copyOnDeath()
+                    .sync((holder,to)->holder==to,com.codex.blacklight.disguise.DisguiseLibrary.STREAM_CODEC).build());
+    public static final Supplier<AttachmentType<Long>> SPECIES_READY_AT=ATTACHMENTS.register(
+            "species_ready_at",()->AttachmentType.builder(()->0L).serialize(com.mojang.serialization.Codec.LONG)
+                    .copyOnDeath().sync(net.minecraft.network.codec.ByteBufCodecs.VAR_LONG).build());
     public static final Supplier<AttachmentType<com.codex.blacklight.disguise.DisguiseMorph>> DISGUISE_MORPH=ATTACHMENTS.register(
             "disguise_morph",()->AttachmentType.builder(()->com.codex.blacklight.disguise.DisguiseMorph.EMPTY)
                     .sync(com.codex.blacklight.disguise.DisguiseMorph.CODEC).build());

@@ -21,7 +21,13 @@ public final class ModNetwork {
     public static void register(RegisterPayloadHandlersEvent event) {
         // Tissue anatomy adds synchronized entity metadata. Reject mixed old/new builds
         // during negotiation instead of decoding an unknown metadata index in-game.
-        event.registrar("standalone-22-feedback-settings")
+        event.registrar("standalone-23-identity-library")
+                .playToServer(DisguiseSelectPayload.TYPE,DisguiseSelectPayload.STREAM_CODEC,(payload,context)->context.enqueueWork(()->{
+                    if(context.player() instanceof ServerPlayer p&&canAct(p))com.codex.blacklight.disguise.DisguiseSystem.select(p,payload.revision(),payload.index());
+                }))
+                .playToServer(SpeciesAbilityPayload.TYPE,SpeciesAbilityPayload.STREAM_CODEC,(payload,context)->context.enqueueWork(()->{
+                    if(context.player() instanceof ServerPlayer p&&canAct(p))com.codex.blacklight.disguise.SpeciesAbilities.activate(p);
+                }))
                 .playToClient(TerrainGrabPreviewPayload.TYPE,TerrainGrabPreviewPayload.STREAM_CODEC,(payload,context)->context.enqueueWork(()->com.codex.blacklight.client.ClientTerrainGrab.accept(payload)))
                 .playToServer(BlockThrowAimPayload.TYPE,BlockThrowAimPayload.STREAM_CODEC,(payload,context)->context.enqueueWork(()->{
                     if(context.player() instanceof ServerPlayer p){var held=com.codex.blacklight.combat.BlockThrowSystem.held(p);if(held!=null)held.acceptAim(p,new net.minecraft.world.phys.Vec3(payload.x(),payload.y(),payload.z()),payload.assist());}
