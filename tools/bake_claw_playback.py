@@ -12,7 +12,7 @@ for pb in rig.pose.bones:
 for ob in list(bpy.data.objects):
     if ob.name.startswith('CTRL /'):bpy.data.objects.remove(ob,do_unlink=True)
 for action in list(bpy.data.actions):bpy.data.actions.remove(action)
-root=Path(__file__).resolve().parents[1]/'src/main/resources/assets/blacklight/animmodels/animations/biped'
+root=Path(__file__).resolve().parents[1]/'src/main/resources/assets/blacklight/native_animations/biped'
 for path in sorted(root.rglob('*.json')):
     data=json.loads(path.read_text())
     if 'animation' not in data:continue

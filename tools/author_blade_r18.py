@@ -54,7 +54,7 @@ for name,(duration,keys) in clips.items():
             for t,f in zip(tr['time'],tr['transform']):
                 w=max(0,min(1,t/.16,(.7-t)/.25));w=w*w*(3-2*w)
                 f['rot']=list((Quaternion(f['rot'])@Quaternion((0,1,0),-math.pi/2*w)).normalized())
-        (RES/'animmodels/animations/biped/action/grab_blade_throw.json').write_text(clip_text(result))
+        (RES/'native_animations/biped/action/grab_blade_throw.json').write_text(clip_text(result))
         (OUT/'exports/grab_blade_throw.json').write_text(clip_text(result))
 rig.animation_data.action=bpy.data.actions['action/grab_blade']
 for ob in controls.values():ob.animation_data.action=bpy.data.actions['action/grab_blade / '+ob.name]

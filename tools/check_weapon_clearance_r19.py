@@ -8,7 +8,7 @@ rig=json.loads(Path(sys.argv[sys.argv.index('--')+1]).read_text(encoding='utf8')
 tree=ast.parse((ROOT/'tools/clear_reverse_blade.py').read_text(encoding='utf8'))
 fn=next(n for n in tree.body if isinstance(n,ast.FunctionDef) and n.name=='pose')
 exec(compile(ast.Module(body=[fn],type_ignores=[]),'<pose>','exec'))
-folder=ROOT/'src/main/resources/assets/blacklight/animmodels/animations/biped/combat'
+folder=ROOT/'src/main/resources/assets/blacklight/native_animations/biped/combat'
 results=[]
 for path in sorted(folder.glob('*.json')):
  prefix=path.stem.split('_')[0]
