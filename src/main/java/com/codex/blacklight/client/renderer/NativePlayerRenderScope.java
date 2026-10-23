@@ -3,7 +3,7 @@ package com.codex.blacklight.client.renderer;
 import java.lang.reflect.Method;
 import java.util.Optional;
 
-/** Reentrant per-thread ownership, limited to the player currently drawn by Blacklight. */
+/** Reentrant ownership of the player or render-only disguise currently drawn by Blacklight. */
 public final class NativePlayerRenderScope implements AutoCloseable {
     private static final ThreadLocal<Object> CURRENT=new ThreadLocal<>();
     private static final ClassValue<Optional<Method>> ORIGINAL=new ClassValue<>() {

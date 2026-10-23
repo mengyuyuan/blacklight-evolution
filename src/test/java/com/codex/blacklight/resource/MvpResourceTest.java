@@ -195,9 +195,9 @@ class MvpResourceTest {
                 "wall_cling","wall_leap","wall_mantle","wall_vault","landing_light","landing_moving",
                 "landing_heavy","landing_devastating"})
             org.junit.jupiter.api.Assertions.assertNull(MvpResourceTest.class.getResource(
-                    "/assets/blacklight/animmodels/animations/biped/living/"+name+".json"),name);
+                    "/assets/blacklight/native_animations/biped/living/"+name+".json"),name);
         org.junit.jupiter.api.Assertions.assertNull(MvpResourceTest.class.getResource(
-                "/assets/blacklight/animmodels/animations/biped/action/air_dash.json"));
+                "/assets/blacklight/native_animations/biped/action/air_dash.json"));
     }
 
     private static void assertIdentity(JsonArray q) {
@@ -443,7 +443,7 @@ class MvpResourceTest {
     }
 
     private static JsonObject readAnimation(String path) throws IOException {
-        return readJson("/assets/blacklight/animmodels/animations/" + path);
+        return readJson("/assets/blacklight/native_animations/" + path);
     }
 
     private static JsonObject readJson(String path) throws IOException {
@@ -468,6 +468,6 @@ class MvpResourceTest {
 
     private static void assertResource(String path) {
         assertNotNull(MvpResourceTest.class.getResource(
-                "/assets/blacklight/animmodels/animations/" + path), path);
+                "/assets/blacklight/native_animations/" + path), path);
     }
 }

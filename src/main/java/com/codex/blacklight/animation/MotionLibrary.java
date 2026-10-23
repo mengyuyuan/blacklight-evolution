@@ -89,11 +89,11 @@ public final class MotionLibrary {
     private static Optional<Definition> definition(String id) { return CLIPS.computeIfAbsent(canonical(id), MotionLibrary::read); }
     private static Optional<Definition> read(String id) {
         Optional<JsonObject> data = id.startsWith("legacy_")
-                ?resource("/assets/blacklight/animmodels/animations/biped/combat/"+id.substring(7)+".json")
+                ?resource("/assets/blacklight/native_animations/biped/combat/"+id.substring(7)+".json")
                 :MotionResources.read(id+".json",8*1024*1024);
         if (data.isEmpty()&&!id.startsWith("legacy_")) data = resource("/assets/blacklight/authored_motions/" + id + ".json");
-        if (data.isEmpty()) data = resource("/assets/blacklight/animmodels/animations/biped/combat/" + id + ".json");
-        if (data.isEmpty()) data = resource("/assets/blacklight/animmodels/animations/biped/action/" + id + ".json");
+        if (data.isEmpty()) data = resource("/assets/blacklight/native_animations/biped/combat/" + id + ".json");
+        if (data.isEmpty()) data = resource("/assets/blacklight/native_animations/biped/action/" + id + ".json");
         return data.map(json -> {
             float transition = json.has("blacklight") ? json.getAsJsonObject("blacklight").get("transitionSeconds").getAsFloat() : .06F;
             var matrix = json.has("format") && "ATTRIBUTES".equalsIgnoreCase(json.get("format").getAsString()) ? attributes(json) : json;

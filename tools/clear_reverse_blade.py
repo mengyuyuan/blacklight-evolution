@@ -6,7 +6,7 @@ from pathlib import Path
 import numpy as np
 from mathutils import Matrix,Quaternion
 ROOT=Path(__file__).resolve().parents[1]
-path=ROOT/'src/main/resources/assets/blacklight/animmodels/animations/biped/action/consume_blade.json'
+path=ROOT/'src/main/resources/assets/blacklight/native_animations/biped/action/consume_blade.json'
 backup=ROOT/'tmp/weapons-r15-before/consume_blade.json'
 if not backup.exists():backup.write_bytes(path.read_bytes())
 original=json.loads(path.read_text())

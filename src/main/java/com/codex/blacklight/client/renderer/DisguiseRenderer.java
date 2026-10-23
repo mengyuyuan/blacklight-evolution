@@ -48,13 +48,20 @@ public final class DisguiseRenderer {
         mob.setPos(p.getX(),p.getY(),p.getZ());mob.xo=p.xo;mob.yo=p.yo;mob.zo=p.zo;
         mob.tickCount=p.tickCount;mob.setYRot(p.getYRot());mob.yRotO=p.yRotO;
         mob.setXRot(p.getXRot());mob.xRotO=p.xRotO;
-        Float facing=p instanceof net.minecraft.client.player.AbstractClientPlayer cp
+        Float previousFacing=p instanceof net.minecraft.client.player.AbstractClientPlayer cp
                 ?com.codex.blacklight.client.PrototypeAnimationController.movementFacing(cp,0):null;
-        mob.yBodyRot=facing==null?p.yBodyRot:facing;mob.yBodyRotO=facing==null?p.yBodyRotO:facing;
+        Float facing=p instanceof net.minecraft.client.player.AbstractClientPlayer cp
+                ?com.codex.blacklight.client.PrototypeAnimationController.movementFacing(cp,1):null;
+        mob.yBodyRot=facing==null?p.yBodyRot:facing;mob.yBodyRotO=previousFacing==null?p.yBodyRotO:previousFacing;
         mob.yHeadRot=p.yHeadRot;mob.yHeadRotO=p.yHeadRotO;
         mob.setOnGround(p.onGround());mob.setDeltaMovement(p.getDeltaMovement());
         mob.hurtTime=p.hurtTime;mob.hurtDuration=p.hurtDuration;mob.deathTime=0;
         mob.attackAnim=p.attackAnim;mob.oAttackAnim=p.oAttackAnim;mob.swinging=p.swinging;
+        // The surrogate never ticks AI. Copy presentation state explicitly so
+        // its species renderer can select crouch, swim and attack poses.
+        mob.setPose(p.getPose());mob.setShiftKeyDown(p.isShiftKeyDown());
+        mob.setSprinting(p.isSprinting());mob.setSwimming(p.isSwimming());
+        mob.setAggressive(p.swinging||p.attackAnim>0);
         return mob;
     }
     @SubscribeEvent(priority=EventPriority.HIGHEST)
@@ -78,7 +85,15 @@ public final class DisguiseRenderer {
     @SuppressWarnings({"rawtypes","unchecked"})
     private static void renderAvatar(Mob avatar,RenderPlayerEvent.Pre e){
         var renderer=(net.minecraft.client.renderer.entity.EntityRenderer)Minecraft.getInstance().getEntityRenderDispatcher().getRenderer(avatar);
-        renderer.render(avatar,avatar.getYRot(),e.getPartialTick(),e.getPoseStack(),e.getMultiBufferSource(),e.getPackedLight());
+        var humanoid=renderer instanceof net.minecraft.client.renderer.entity.LivingEntityRenderer living
+                &&living.getModel() instanceof net.minecraft.client.model.HumanoidModel model?model:null;
+        boolean crouching=humanoid!=null&&humanoid.crouching;
+        // Epic Fight's real-world animator does not tick this visual surrogate.
+        // Draw the animated species model once, without its frozen second rig.
+        try(var scope=NativePlayerRenderScope.enter(avatar)) {
+            if(humanoid!=null)humanoid.crouching=avatar.isCrouching();
+            renderer.render(avatar,avatar.getYRot(),e.getPartialTick(),e.getPoseStack(),e.getMultiBufferSource(),e.getPackedLight());
+        }finally{if(humanoid!=null)humanoid.crouching=crouching;}
     }
     /** Authored Minecraft adaptation: block tissue closes over both silhouettes before the swap. */
     private static void cover(Player p,Mob avatar,PoseStack stack,MultiBufferSource buffers,int light,float progress,float weight){
