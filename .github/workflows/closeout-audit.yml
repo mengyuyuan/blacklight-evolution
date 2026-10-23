@@ -42,6 +42,7 @@ jobs:
             -PcityTest -PfeedbackTest ${{ steps.platform.outputs.extra }} \
             -PgameTestMaxHeap=2G -PgameTestRunDirectory=build/closeout-gametest \
             runGameTestServer 2>&1 | tee closeout-server.log
+          grep -Eq 'All [1-9][0-9]* required tests passed' closeout-server.log
       - name: Preserve audit evidence
         if: always()
         uses: actions/upload-artifact@v4
