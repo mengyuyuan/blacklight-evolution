@@ -73,6 +73,18 @@ public final class MercerPlayerMesh {
         float armor=MercerArmorMesh.get()!=null?0F:com.codex.blacklight.power.UtilityPowerSystem.visualWeight(player,com.codex.blacklight.power.PowerForm.ARMOR,partial);
         return rig.sample(source,grip,armor,displayScale(player,partial));
     }
+    /** First-person sleeve in Minecraft's arm frame. HMI moves this frame and its
+     * item together; the YSM full-body arm rig must not apply another camera offset. */
+    public void renderHeldArm(PoseStack stack,VertexConsumer out,int light,int overlay,boolean left) {
+        int region=left?3:2;
+        float wrist=left?-.24375F:.24375F,anchor=left?.375F:-.375F;
+        var p=new Vector3f();var n=new Vector3f();
+        for(var part:parts)if(part.region==region)for(var v:part.vertices){
+            p.set(-(v.p.x-wrist)*1.4F+anchor,-(v.p.y-.928125F)+.625F,v.p.z*1.4F);
+            n.set(-v.n.x/1.4F,-v.n.y,v.n.z/1.4F).normalize();
+            out.addVertex(stack.last(),p.x,p.y,p.z).setColor(-1).setUv(v.u,v.v).setOverlay(overlay).setLight(light).setNormal(stack.last(),n.x,n.y,n.z);
+        }
+    }
     public void render(BlacklightPlayerModel model,AbstractClientPlayer player,float partial,PoseStack stack,VertexConsumer out,
                        int light,int overlay,int color,Matrix4f[] skin,Matrix3f[] normals,boolean rightBiological,boolean leftBiological) {
         // Tick time (including partial) keeps eyelids independent of frame rate, pause and death/rejoin caches.

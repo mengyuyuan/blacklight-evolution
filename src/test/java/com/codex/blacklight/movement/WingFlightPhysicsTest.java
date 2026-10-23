@@ -34,4 +34,15 @@ class WingFlightPhysicsTest {
             assertTrue(dot>1.15,"Held forward must follow a changed camera yaw: "+yaw);
         }
     }
+    @Test void personalSpeedCannotRaiseUnlockedLimitAndLoweringBrakesExistingMomentum(){
+        for(int tier=0;tier<=3;tier++)for(double scale:new double[]{.1,.25,.5,1,5,Double.NaN}){
+            var v=new WingFlightPhysics.Velocity(0,0,0);
+            for(int tick=0;tick<600;tick++)v=WingFlightPhysics.step(v.x(),v.y(),v.z(),1,0,false,false,true,0,0,false,tier,scale);
+            double expected=WingFlightTuning.tier(tier).boostSpeed()*(Double.isFinite(scale)?Math.max(.1,Math.min(1,scale)):1);
+            assertEquals(expected,v.z(),1e-6);
+        }
+        var v=new WingFlightPhysics.Velocity(0,0,22);
+        for(int tick=0;tick<60;tick++)v=WingFlightPhysics.step(v.x(),v.y(),v.z(),1,0,false,false,true,0,0,false,3,.1);
+        assertEquals(2.2,v.z(),1e-6);
+    }
 }

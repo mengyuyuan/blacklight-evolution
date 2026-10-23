@@ -7,6 +7,10 @@ public final class WingFlightPhysics {
         return step(x,y,z,forward,right,up,down,boost,yaw,pitch,takeoff,0);
     }
     public static Velocity step(double x,double y,double z,int forward,int right,boolean up,boolean down,boolean boost,float yaw,float pitch,boolean takeoff,int tier) {
+        return step(x,y,z,forward,right,up,down,boost,yaw,pitch,takeoff,tier,1);
+    }
+    public static Velocity step(double x,double y,double z,int forward,int right,boolean up,boolean down,boolean boost,float yaw,float pitch,boolean takeoff,int tier,double speedScale) {
+        speedScale=Double.isFinite(speedScale)?Math.max(.1,Math.min(1,speedScale)):1;
         var tuning=WingFlightTuning.tier(tier);
         if(!Double.isFinite(x)||!Double.isFinite(y)||!Double.isFinite(z)){x=y=z=0;}
         if(!Float.isFinite(yaw))yaw=0;if(!Float.isFinite(pitch))pitch=0;
@@ -16,7 +20,7 @@ public final class WingFlightPhysics {
         double dz=Math.cos(a)*Math.cos(p)*forward-Math.sin(a)*right;
         double dy=-Math.sin(p)*forward+(up?1:0)-(down?1:0);
         // Upgrades extend forward sprint only; sideways/backwards/vertical precision remains available.
-        double length=Math.sqrt(dx*dx+dy*dy+dz*dz),speed=boost?(forward>0&&!takeoff?tuning.boostSpeed():1.25):.52;
+        double length=Math.sqrt(dx*dx+dy*dy+dz*dz),speed=(boost?(forward>0&&!takeoff?tuning.boostSpeed():1.25):.52)*speedScale;
         if(length>0){dx=dx/Math.max(1,length)*speed;dy=dy/Math.max(1,length)*speed;dz=dz/Math.max(1,length)*speed;}
         if(takeoff)dy=Math.max(.3,dy);
         double accel=length==0?tuning.braking():boost?tuning.acceleration():.075;
@@ -32,7 +36,7 @@ public final class WingFlightPhysics {
         if(d>accel){ex*=accel/d;ey*=accel/d;ez*=accel/d;}
         x+=ex;y+=ey;z+=ez;
         double total=Math.sqrt(x*x+y*y+z*z);
-        double cap=Math.max(1.5,tuning.boostSpeed());
+        double cap=Math.max(1.5,tuning.boostSpeed()*speedScale);
         if(total>cap){x*=cap/total;y*=cap/total;z*=cap/total;}
         return new Velocity(x,y,z);
     }

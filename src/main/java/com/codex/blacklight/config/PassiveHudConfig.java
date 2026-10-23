@@ -4,9 +4,12 @@ import net.neoforged.neoforge.common.ModConfigSpec;
 public final class PassiveHudConfig {
     public static final ModConfigSpec SPEC;
     public static final ModConfigSpec.BooleanValue SHOW_STACKS;
+    public static final ModConfigSpec.DoubleValue HEALTH_X,HEALTH_Y;
     static {
         var b = new ModConfigSpec.Builder();
         SHOW_STACKS = b.comment("Show this mod's passive stack HUD. Does not change gameplay.").define("showPassiveStacks", true);
+        HEALTH_X = b.comment("Health HUD horizontal placement, 0 = left, 1 = right.").defineInRange("healthHudX",0D,0D,1D);
+        HEALTH_Y = b.comment("Health HUD vertical placement, 0 = top, 1 = bottom.").defineInRange("healthHudY",0D,0D,1D);
         SPEC = b.build();
     }
     private PassiveHudConfig() {}

@@ -117,6 +117,17 @@ public final class YsmAppearanceBridge {
             return true;
         } catch (ReflectiveOperationException | RuntimeException | LinkageError unavailable) { fail(); return false; }
     }
+    /** Identity check also works in ordinary mode, where no combat pose is published. */
+    public static boolean selected(AbstractClientPlayer player) {
+        initialize();
+        if(failed||stateLookup==null)return false;
+        try {
+            Object state=((Optional<?>)stateLookup.invoke(null,player)).orElse(null);
+            if(state==null||Boolean.TRUE.equals(disabled.invoke(state)))return false;
+            String id=(String)modelId.invoke(state);
+            return id!=null&&(id.equals(PACK)||id.endsWith("/"+PACK));
+        }catch(ReflectiveOperationException|RuntimeException|LinkageError unavailable){fail();return false;}
+    }
     public static MercerRig.Frame frame(AbstractClientPlayer player) { return FRAMES.get(player); }
     public static boolean active(AbstractClientPlayer player) { return FRAMES.containsKey(player); }
     public static void invalidate() { FRAMES.clear(); }

@@ -31,7 +31,7 @@ public final class AssimilationSystem {
         boolean hunter=target instanceof BlacklightHunter;
         float health=CombatScale.originalMaximum(target);if(!Float.isFinite(health)||health<0)health=0;
         float heal=hunter?8:Math.clamp(health*.2F,2,6);
-        if(p.getData(ModAttachments.GROWTH).owns(GrowthUpgrade.ASSIMILATION))heal*=1.35F;
+        heal*=ConsumeProgression.healingMultiplier(p.getData(ModAttachments.GROWTH));
         int biomass=hunter?120:(int)Math.clamp(health*2,10,60),ep=hunter?30:target.getType().is(com.codex.blacklight.combat.ConsumeSystem.PASSIVE)?2:10;
         TissueCore core=null;int quality=0;
         if(tissue(target)){

@@ -67,7 +67,7 @@ public final class PrototypeMovementSystem {
     public static void onLivingFall(LivingFallEvent event) {
         if (!(event.getEntity() instanceof ServerPlayer player)) return;
         BlacklightState blacklight = player.getData(ModAttachments.PLAYER_STATE);
-        if (blacklight.isInfected() && blacklight.isPrototypeMode()) {
+        if (blacklight.isInfected()) {
             event.setDamageMultiplier(0.0F);
         }
     }

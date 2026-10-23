@@ -37,6 +37,7 @@ public final class PrototypeHealthHud {
         }
     }
     private PrototypeHealthHud(){}
+    public static boolean preview(GuiGraphics graphics,int x,int y,int width){return NativeHealthHud.render(graphics,x,y,width,.75F,.85F,0);}
     public static boolean active(){
         var p=Minecraft.getInstance().player;
         return p!=null&&!p.isSpectator()&&p.getData(ModAttachments.PLAYER_STATE).isInfected();
@@ -44,6 +45,7 @@ public final class PrototypeHealthHud {
     public static int utilityTop(){
         var p=Minecraft.getInstance().player;
         if(!active())return 10;
+        if(com.codex.blacklight.config.PassiveHudConfig.HEALTH_X.get()>0||com.codex.blacklight.config.PassiveHudConfig.HEALTH_Y.get()>0)return 10;
         return Minecraft.getInstance().level!=null&&p.getData(ModAttachments.ADRENALINE).active(Minecraft.getInstance().level.getGameTime())?48:40;
     }
     @SubscribeEvent public static void hideHearts(RenderGuiLayerEvent.Pre event){
@@ -63,7 +65,11 @@ public final class PrototypeHealthHud {
         if(health>=trail)trail=health;
         else if(now>holdUntil)trail=Math.max(health,(float)(trail-maximum*dt*.65));
         lastHealth=health;lastMaximum=maximum;lastTime=now;
-        int x=10,y=10,w=Math.min(180,mc.getWindow().getGuiScaledWidth()-20);
+        int w=HealthHudLayout.meterWidth(mc.getWindow().getGuiScaledWidth());
+        var placement=HealthHudLayout.position(mc.getWindow().getGuiScaledWidth(),mc.getWindow().getGuiScaledHeight(),
+                Math.min(mc.getWindow().getGuiScaledWidth()-20,w*2),com.codex.blacklight.config.PassiveHudConfig.HEALTH_X.get(),
+                com.codex.blacklight.config.PassiveHudConfig.HEALTH_Y.get());
+        int x=placement.x(),y=placement.y();
         if(SourceBar.VALUE!=null)renderCriticalMassBacking(g,p,x,y,w,true);
         if(NativeHealthHud.render(g,x,y,w,health/maximum,trail/maximum,p.getAbsorptionAmount()/maximum)){
             renderAdrenalineStatus(g,p,x,y+24,w,mc.level.getGameTime());return;

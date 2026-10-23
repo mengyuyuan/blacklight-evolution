@@ -30,6 +30,7 @@ public final class WeaponCombatSystem {
     private static final class Session {
         final WeaponMove move;int started;final int created;float yaw,previousYaw;Vec3 direction;float clipOffset;double pursuitTravel;
         final com.codex.blacklight.power.PowerForm form;
+        final Map<UUID,Integer> closeSweepHits=new HashMap<>();
         final Set<UUID> hit=new HashSet<>();boolean effect,charging,released,queuedHeld,jumpQueued,tookOff,lifted,impactEffect,groundEffect,locked;
         WeaponMove.Input input,queued;int landed=-1,contact=-1,flight=-1,travelStarted,travelBudget,stuckTicks;boolean pounceCommitted,traveling;float chargePower;double travelSpeed;Vec3 lastTargetPosition;
         Vec3 previousFeet;LivingEntity target,queuedTarget;final Map<UUID,List<AABB>> previousTargets=new HashMap<>();
@@ -38,6 +39,10 @@ public final class WeaponCombatSystem {
         Session(ServerPlayer p,WeaponMove m,float offset,float heading){move=m;clipOffset=offset;started=p.tickCount-Math.round(offset*20);created=p.tickCount;form=p.getData(ModAttachments.PLAYER_STATE).getActivePower();yaw=heading;previousYaw=yaw;direction=Vec3.directionFromRotation(0,yaw);previousFeet=p.position();}
     }
     private WeaponCombatSystem(){}
+    public static boolean groundSpikeGrace(ServerPlayer p){
+        var s=ACTIVE.get(p);if(s==null||!s.move.groundSpike()||s.charging||s.traveling)return false;
+        int age=p.tickCount-s.started;return age>=0&&age<s.move.start&&p.tickCount-s.created<=s.move.start+2;
+    }
     public static boolean busy(ServerPlayer p){return ACTIVE.containsKey(p)||DevastatorSystem.busy(p);}
     /** A form swap cancels only a weapon-owned action, never a grab or devastator. */
     public static boolean canSwitchForm(ServerPlayer p){
@@ -501,18 +506,21 @@ public final class WeaponCombatSystem {
         var candidates=CombatTargeting.candidates(p,search,v->CombatTargeting.damageable(p,v));
         candidates.sort(Comparator.comparingInt((LivingEntity v)->v==s.target?0:1).thenComparingDouble(v->CombatTargeting.distanceSquared(p.getEyePosition(),v)));
         for(var v:candidates){
-            if(s.hit.size()>=(s.move.quake()?48:8))break;if(s.hit.contains(v.getUUID()))continue;
+            if(s.hit.size()>=(s.move.quake()?48:8)&&!s.hit.contains(v.getUUID()))continue;
+            int pulse=s.move.sweeperPulse(tick);
+            boolean close=pulse>=0&&CombatTargeting.inReach(p,v,1.8)&&CombatTargeting.visible(p,v);
+            if(close?s.closeSweepHits.getOrDefault(v.getUUID(),-1)==pulse:s.hit.contains(v.getUUID()))continue;
             // Previous-tick sweeps never authorize a hit after the actor has escaped
             // the victim's actual current reach (teleports, dash or stale movement).
             if(!CombatTargeting.inReach(p,v,whip==null?moveReach+1.0:30.0*AttackReach.scale(p)))continue;
-            if(!contact(p,s,v,bounds,whip,fromTime,toTime,bodyFlight,moveReach,direction,arc))continue;
+            if(!close&&!contact(p,s,v,bounds,whip,fromTime,toTime,bodyFlight,moveReach,direction,arc))continue;
             int resistance=v.invulnerableTime;
             var last=LAST_CONTACT.get(v);
             boolean ownPrevious=last!=null&&last.owner.equals(p.getUUID())&&p.level().getGameTime()-last.time<=10;
             if(ownPrevious)v.invulnerableTime=0;
             if(v.hurt(p.damageSources().playerAttack(p),s.move.damageFor(s.form)*(1+.5F*s.chargePower))){
                 LAST_CONTACT.put(v,new LastContact(p.getUUID(),p.level().getGameTime()));
-                s.hit.add(v.getUUID());
+                s.hit.add(v.getUUID());if(close)s.closeSweepHits.put(v.getUUID(),pulse);
                 if(!CombatTargeting.multipart(v)&&(s.move==WeaponMove.COMBO_FLOAT||s.move==WeaponMove.MUSCLE_UPPERCUT)){
                     v.setDeltaMovement(0,.8,0);v.hurtMarked=true;
                     if(!s.lifted){s.lifted=true;p.setOnGround(false);p.setDeltaMovement(s.direction.scale(.12).add(0,.72,0));p.hurtMarked=true;}

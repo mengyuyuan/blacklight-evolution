@@ -1,6 +1,6 @@
 # Optional YSM appearance bridge (preview)
 
-NeoForge 1.21.1 can display the dedicated `alex_mercer_blacklight_bridge` YSM model while Blacklight owns its combat pose. Other YSM models continue through the existing rendering path. The integration requires official YSM and YSM Mapping API; neither implementation names nor third-party model assets are embedded in this change.
+NeoForge 1.21.1 and Forge 1.20.1 support the dedicated `alex_mercer_blacklight_bridge` model while Blacklight supplies its combat pose. Install official YSM and YSM Mapping API separately. Other YSM model IDs retain their own rendering path.
 
 Build the opt-in model from our existing Alex Mercer YSM source:
 
@@ -8,15 +8,10 @@ Build the opt-in model from our existing Alex Mercer YSM source:
 python tools/build_ysm_bridge_model.py --help
 ```
 
-The converter preserves the body texture and geometry, adds pose/visibility channels, and writes into a separate destination. Select the resulting `alex_mercer_blacklight_bridge` pack in YSM. Armor remains Blacklight's original `armor_block.json` geometry; this is not a new YSM armor model.
+The converter preserves body geometry and texture, writes to a separate destination, and adds live pose and covered-skin channels. Select the resulting pack in YSM. Armor remains the original block armor. The bridge converts final articulated matrices to local Bedrock channels and matches YSM's reflected X basis for native attachments.
 
-The bridge converts articulated pose matrices into local Bedrock channels and matches the reflected X basis when drawing weapon/utility attachments. It suppresses covered skin regions for the native block armor.
+Forge locates the registered YSM capability through the type provided by Mapping API; NeoForge uses the published state accessor. No implementation names or third-party model assets are embedded in this integration.
 
-## Validation and remaining review
+With Hold My Items 2.1 and this dedicated model selected, ordinary first-person arms use the held-item arm frame instead of applying the independent YSM full-body camera offset. HMI continues to move the arm and item together; no user configuration is rewritten. This does not enable a new first-person combat mode.
 
-- All main Java sources compiled with Java 21 against the existing NeoForge classpath. This is not a successful Gradle build: Gradle is currently blocked by the local loopback/socket environment.
-- A deterministic 240-pose, 35-joint round-trip check covers both normal and grip matrices.
-- Official YSM 2.6.5 + Mapping API 0.1.8, Iris/Sodium and Complementary Reimagined were used for private gameplay recordings. Weapon poses, flight, native armor and slime reconstruction have visual samples.
-- Full multiplayer, resource-reload recovery, all combinations and complete continuous visual acceptance remain unverified. This PR stays a draft until those checks are completed.
-
-The disposable camera, recording controls, test-world setup and runtime implementation diagnostics are intentionally outside this repository and must not be packaged.
+See `verification/WEBSITE_FEEDBACK_20261023_ZH.md` for the current clean build, mathematical pose regression and real client checks. Cross-machine multiplayer, every HMI animation, all equipment combinations and arbitrary other YSM models have not been fully visually accepted. Private screenshot drivers remain outside the release sources.
