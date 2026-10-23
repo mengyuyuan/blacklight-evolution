@@ -1,0 +1,9 @@
+{
+  "loader": "blacklight:building_biomass",
+  "textures": {
+    "particle": "blacklight:block/hive_flesh",
+    "flesh": "blacklight:block/hive_flesh",
+    "skin": "blacklight:block/hive_carapace",
+    "fibre": "blacklight:block/tissue_fiber"
+  }
+}

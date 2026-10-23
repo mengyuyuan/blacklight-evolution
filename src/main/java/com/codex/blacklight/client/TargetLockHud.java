@@ -55,6 +55,17 @@ public final class TargetLockHud {
         String status=name+"  "+Math.round(Math.sqrt(com.codex.blacklight.combat.CombatTargeting.distanceSquared(mc.player.getEyePosition(),target)))+"m"
                 +(marker==null||!marker.onScreen()?" · 目标在视野外":"")+"  ["+key+" 取消]";
         panel(g,status,g.guiWidth()/2,g.guiHeight()-54,0xFFE8DDD6);
+        if(target instanceof com.codex.blacklight.entity.BlacklightInfectedHost host&&com.codex.blacklight.power.AssimilationSystem.tissue(host)){
+            var core=com.codex.blacklight.infection.TissueCore.forSeed(com.codex.blacklight.infection.TissueOrgans.seed(host.getUUID()));
+            int quality=com.codex.blacklight.infection.TissueCore.quality(host.tissueAge());
+            String condition=com.codex.blacklight.combat.ConsumeSystem.healthReady(host)?"ready":quality>=2&&host.tissueCoreFracture()<1?"armored":"weaken";
+            String info=net.minecraft.network.chat.Component.translatable("hud.blacklight.organ_target",net.minecraft.network.chat.Component.translatable("upgrade.blacklight."+core.id),quality,
+                    net.minecraft.network.chat.Component.translatable("hud.blacklight.organ_"+condition)).getString();
+            panel(g,info,g.guiWidth()/2,g.guiHeight()-68,0xFFDDA6A1);
+            long generation=Math.max(0,host.tissueAge()-com.codex.blacklight.infection.TissueGrowth.ANCIENT_TICKS)/com.codex.blacklight.infection.TissueEvolution.GENERATION_TICKS;
+            String evolution=net.minecraft.network.chat.Component.translatable("hud.blacklight.host_evolution",generation,host.tissueNutrition(),com.codex.blacklight.infection.TissueMetabolism.MAX_RESERVE).getString();
+            panel(g,evolution,g.guiWidth()/2,g.guiHeight()-82,0xFFB9B0A3);
+        }
     }
     private static void brackets(GuiGraphics g,int x,int y,int color) {
         int r=9,l=5;

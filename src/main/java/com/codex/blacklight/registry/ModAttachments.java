@@ -78,6 +78,8 @@ public final class ModAttachments {
 
     public static final Supplier<AttachmentType<com.codex.blacklight.state.GrowthProgress>> GROWTH=ATTACHMENTS.register(
             "growth",()->AttachmentType.builder(()->com.codex.blacklight.state.GrowthProgress.EMPTY).serialize(com.codex.blacklight.state.GrowthProgress.CODEC).copyOnDeath().sync(com.codex.blacklight.state.GrowthProgress.STREAM_CODEC).build());
+    public static final Supplier<AttachmentType<com.codex.blacklight.state.OrganResearch>> ORGAN_RESEARCH=ATTACHMENTS.register(
+            "organ_research",()->AttachmentType.builder(()->com.codex.blacklight.state.OrganResearch.EMPTY).serialize(com.codex.blacklight.state.OrganResearch.CODEC).copyOnDeath().sync(com.codex.blacklight.state.OrganResearch.STREAM_CODEC).build());
     public static final Supplier<AttachmentType<com.codex.blacklight.power.UtilityState>> UTILITY_STATE = ATTACHMENTS.register(
             "utility_state", () -> AttachmentType.builder(() -> com.codex.blacklight.power.UtilityState.EMPTY)
                     .serialize(com.codex.blacklight.power.UtilityState.CODEC)

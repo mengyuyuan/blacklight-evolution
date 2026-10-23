@@ -111,6 +111,7 @@ public final class TwilightCompatibilityGameTest {
     @GameTest(template="wall_test",timeoutTicks=30)
     public static void biomassCanExecuteHydra(GameTestHelper h) {
         try(var f=fixture(h,"hydra")) {
+            f.boss.setHealth(1); // Current gameplay requires weakening before absorption.
             f.boss.setPos(f.player.position());f.boss.tick();
             f.player.setData(ModAttachments.BIOMASS_FORM,new com.codex.blacklight.power.BiomassState(
                     com.codex.blacklight.power.BiomassState.ABSORBING,h.getLevel().getGameTime()-60,true,"","claws",f.boss.getId(),10));
@@ -170,6 +171,7 @@ public final class TwilightCompatibilityGameTest {
     @GameTest(template="wall_test",timeoutTicks=30)
     public static void attachedSlimeFollowsMultipartSurfaceButCannotCrossWalls(GameTestHelper h) {
         try(var f=fixture(h,"hydra")) {
+            f.boss.setHealth(1);
             var part=f.boss.getParts()[0];var box=part.getBoundingBox();var at=box.getCenter();
             f.player.setPos(at.x,box.minY+.05,at.z);
             f.player.setData(ModAttachments.BIOMASS_FORM,new com.codex.blacklight.power.BiomassState(
@@ -191,6 +193,21 @@ public final class TwilightCompatibilityGameTest {
             h.assertTrue(f.player.position().equals(before)
                     &&com.codex.blacklight.power.BiomassSystem.state(f.player).phase()==com.codex.blacklight.power.BiomassState.CRAWLING
                     &&com.codex.blacklight.power.BiomassSystem.claimant(f.boss)==null,"a blocked attachment releases without teleporting through terrain");
+        }h.succeed();
+    }
+
+    @GameTest(template="wall_test",timeoutTicks=30)
+    public static void ordinaryInfectedHostDoesNotRequireAMultipartAnchor(GameTestHelper h) {
+        try(var f=fixture(h,"hydra")) {
+            var host=com.codex.blacklight.registry.ModEntities.INFECTED_HOST.get().create(h.getLevel());
+            host.inherit(EntityType.COW.create(h.getLevel()));host.setPos(f.player.position());h.getLevel().addFreshEntity(host);
+            try {
+                h.assertTrue(host.isMultipartEntity()&&host.getParts().length==0,"ordinary species advertises multipart with no physical subparts");
+                var before=f.player.position();
+                h.assertTrue(com.codex.blacklight.power.BiomassAttachment.attach(f.player,host)
+                        &&com.codex.blacklight.power.BiomassAttachment.follow(f.player,host),"ordinary host remains absorbable without inventing a part anchor");
+                h.assertTrue(f.player.position().equals(before),"ordinary attachment cannot teleport the player");
+            }finally{host.discard();com.codex.blacklight.power.BiomassAttachment.clear(f.player);}
         }h.succeed();
     }
 }

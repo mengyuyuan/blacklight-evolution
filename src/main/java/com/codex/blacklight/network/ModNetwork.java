@@ -19,7 +19,9 @@ public final class ModNetwork {
     }
 
     public static void register(RegisterPayloadHandlersEvent event) {
-        event.registrar("standalone-20-hydra")
+        // Tissue anatomy adds synchronized entity metadata. Reject mixed old/new builds
+        // during negotiation instead of decoding an unknown metadata index in-game.
+        event.registrar("standalone-21-tissue-anatomy")
                 .playToClient(TerrainGrabPreviewPayload.TYPE,TerrainGrabPreviewPayload.STREAM_CODEC,(payload,context)->context.enqueueWork(()->com.codex.blacklight.client.ClientTerrainGrab.accept(payload)))
                 .playToServer(BlockThrowAimPayload.TYPE,BlockThrowAimPayload.STREAM_CODEC,(payload,context)->context.enqueueWork(()->{
                     if(context.player() instanceof ServerPlayer p){var held=com.codex.blacklight.combat.BlockThrowSystem.held(p);if(held!=null)held.acceptAim(p,new net.minecraft.world.phys.Vec3(payload.x(),payload.y(),payload.z()),payload.assist());}
@@ -163,6 +165,7 @@ public final class ModNetwork {
         player.syncData(com.codex.blacklight.registry.ModAttachments.PLAYER_STATE);
         player.syncData(com.codex.blacklight.registry.ModAttachments.SKILL_SETTINGS);
         player.syncData(com.codex.blacklight.registry.ModAttachments.GROWTH);
+        player.syncData(com.codex.blacklight.registry.ModAttachments.ORGAN_RESEARCH);
         player.syncData(com.codex.blacklight.registry.ModAttachments.UTILITY_STATE);
         player.syncData(com.codex.blacklight.registry.ModAttachments.DISGUISE_IDENTITY);
         player.syncData(com.codex.blacklight.registry.ModAttachments.DISGUISE_MORPH);

@@ -28,6 +28,8 @@ public final class ModItems {
 
     public static final DeferredItem<com.codex.blacklight.item.HiveTissueItem> LIVING_HIVE_TISSUE = ITEMS.registerItem("living_hive_tissue",com.codex.blacklight.item.HiveTissueItem::new,new Item.Properties().stacksTo(16).rarity(Rarity.RARE));
     public static final DeferredItem<net.neoforged.neoforge.common.DeferredSpawnEggItem> HYDRA_SPAWN_EGG = ITEMS.registerItem("blacklight_hydra_spawn_egg",p->new net.neoforged.neoforge.common.DeferredSpawnEggItem(ModEntities.BLACKLIGHT_HYDRA,0x361b22,0xcba886,p),new Item.Properties());
+    public static final DeferredItem<BlockItem> TISSUE_ATTACHMENT = ITEMS.registerSimpleBlockItem(ModBlocks.TISSUE_ATTACHMENT);
+    public static final DeferredItem<BlockItem> BUILDING_CORE = ITEMS.registerSimpleBlockItem(ModBlocks.BUILDING_CORE);
     public static final DeferredItem<BlockItem> HIVE_FLESH = ITEMS.registerSimpleBlockItem(ModBlocks.HIVE_FLESH);
     public static final DeferredItem<BlockItem> HIVE_CARAPACE = ITEMS.registerSimpleBlockItem(ModBlocks.HIVE_CARAPACE);
     public static final DeferredItem<BlockItem> HIVE_SAC = ITEMS.registerSimpleBlockItem(ModBlocks.HIVE_SAC);
@@ -57,7 +59,8 @@ public final class ModItems {
                         output.accept(BLACKLIGHT_SAMPLE.get()); output.accept(HUNTER_SPAWN_EGG.get());
                         output.accept(LIVING_HIVE_TISSUE.get());output.accept(HYDRA_SPAWN_EGG.get());
                         output.accept(INFECTED_SOIL.get()); output.accept(INFECTED_STONE.get());
-                        output.accept(TISSUE_FIBER.get()); output.accept(HIVE_FLESH.get());
+                        output.accept(TISSUE_ATTACHMENT.get()); output.accept(TISSUE_FIBER.get()); output.accept(HIVE_FLESH.get());
+                        output.accept(BUILDING_CORE.get());
                         output.accept(HIVE_CARAPACE.get()); output.accept(HIVE_VEIN.get());
                         output.accept(HIVE_MEMBRANE.get()); output.accept(HIVE_BONE.get());
                         output.accept(HIVE_SAC.get()); output.accept(NUTRIENT_NODE.get());

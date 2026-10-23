@@ -42,6 +42,7 @@ public final class GrowthSystem {
         if(advancement!=null)p.getAdvancements().award(advancement,"done");
     }
     public static void updateHealth(ServerPlayer p){
+        AssimilationSystem.updateCrest(p);
         var attribute=p.getAttribute(Attributes.MAX_HEALTH);if(attribute==null)return;
         float before=p.getMaxHealth(),health=p.getHealth();
         boolean infected=p.getData(ModAttachments.PLAYER_STATE).isInfected();

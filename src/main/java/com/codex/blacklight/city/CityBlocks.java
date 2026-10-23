@@ -13,7 +13,7 @@ public final class CityBlocks {
     private static final DeferredRegister.Items ITEMS=DeferredRegister.createItems("blacklight");
     private static final DeferredRegister<CreativeModeTab> TABS=DeferredRegister.create(Registries.CREATIVE_MODE_TAB,"blacklight");
     private static BlockBehaviour.Properties flesh(float strength){return BlockBehaviour.Properties.of().strength(strength,4).sound(SoundType.SLIME_BLOCK);}
-    public static final DeferredBlock<Block> FLESH=BLOCKS.registerSimpleBlock("city_flesh",flesh(2));
+    public static final DeferredBlock<Block> FLESH=BLOCKS.register("city_flesh",()->new com.codex.blacklight.world.TissueSourceBlock(flesh(2)));
     public static final DeferredBlock<RotatedPillarBlock> FIBER=BLOCKS.registerBlock("city_fiber",RotatedPillarBlock::new,flesh(2));
     public static final DeferredBlock<RotatedPillarBlock> VEIN=BLOCKS.registerBlock("city_vein",RotatedPillarBlock::new,flesh(2).lightLevel(s->1));
     public static final DeferredBlock<Block> SHELL=BLOCKS.registerSimpleBlock("city_shell",flesh(4));

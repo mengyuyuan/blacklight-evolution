@@ -33,15 +33,12 @@ public final class ConsumeSystem {
     private record Thrown(ServerPlayer owner, int remaining, Vec3 velocity,float damage) {}
     private static final class Session {
         final Mob victim; final PowerForm form; final float heal; final int biomass, ep; final boolean large; float facing;
+        final com.codex.blacklight.power.AssimilationSystem.Yield reward;
         Vec3 start,lastPosition,consumeTargetStart; int started, stage=ConsumeVisual.CAPTURE,stuckTicks;double pullSpeed;boolean releaseLogged,consumeQueued;
         Session(Mob v, ServerPlayer p, PowerForm f) {
             victim=v; form=f; start=p.position(); started=p.tickCount; large=ConsumeSequence.large(v); facing=p.getYRot();
-            boolean hunter=v instanceof BlacklightHunter;
-            float originalHealth=com.codex.blacklight.power.CombatScale.originalMaximum(v);
-            float baseHeal=hunter?8:Math.clamp(originalHealth*.2F,2,6);
-            heal=baseHeal*(p.getData(ModAttachments.GROWTH).owns(com.codex.blacklight.power.GrowthUpgrade.ASSIMILATION)?1.35F:1);
-            biomass=hunter?120:Math.clamp((int)originalHealth*2,10,60);
-            ep=hunter?30:v.getType().is(PASSIVE)?2:10;
+            reward=com.codex.blacklight.power.AssimilationSystem.quote(p,v);
+            heal=reward.healing();biomass=reward.biomass();ep=reward.ep();
         }
         Mob victim(){return victim;} PowerForm form(){return form;}
         Vec3 start(){return start;} int started(){return started;}
@@ -95,7 +92,7 @@ public final class ConsumeSystem {
                 &&state.getActivePower()==s.form&&v.isAlive()&&!v.isRemoved()&&v.level()==p.level()
                 &&!v.isInvulnerable()&&!v.isPassenger()&&!v.isVehicle()&&!v.isLeashed()
                 &&ModAttachments.peekData(v, ModAttachments.CONSUME_VISUAL, ConsumeVisual.EMPTY).consumerId()==p.getId()
-                &&(s.committed() || (s.large ? p.position().distanceToSqr(ConsumeSequence.mount(v))<=196 && hasGrabSight(p,v) : grabInReach(p,v,s.form==PowerForm.WHIPFIST && (s.stage==ConsumeVisual.CAPTURE||s.stage==ConsumeVisual.WHIP_PULL) ? WHIP_GRAB_RANGE+.5 : s.stage==ConsumeVisual.CONSUME&&ConsumeSequence.paired(s.form,false)?10:3.5)&&hasGrabSight(p,v)));
+                &&(s.committed() || (s.large ? p.position().distanceToSqr(ConsumeSequence.mount(v))<=196 && hasGrabSight(p,v) : grabInReach(p,v,s.form==PowerForm.WHIPFIST && (s.stage==ConsumeVisual.CAPTURE||s.stage==ConsumeVisual.WHIP_PULL) ? WHIP_GRAB_RANGE+.5+com.codex.blacklight.power.AssimilationSystem.grabBonus(p) : s.stage==ConsumeVisual.CONSUME&&ConsumeSequence.paired(s.form,false)?10:3.5+com.codex.blacklight.power.AssimilationSystem.grabBonus(p))&&hasGrabSight(p,v)));
     }
     private static boolean hasGrabSight(ServerPlayer player,Mob target) {
         // Use the ability's explicit range, followed by a real block ray trace.
@@ -151,7 +148,8 @@ public final class ConsumeSystem {
     public static boolean healthReady(LivingEntity target) {
         float maximum=target.getMaxHealth();
         return target.isAlive() && Float.isFinite(maximum) && maximum>0
-                && (com.codex.blacklight.power.CombatScale.originalMaximum(target)<DIRECT_GRAB_MAX_HEALTH || target.getHealth()<=maximum*HEALTH_LIMIT);
+                && (com.codex.blacklight.power.CombatScale.originalMaximum(target)<DIRECT_GRAB_MAX_HEALTH || target.getHealth()<=maximum*HEALTH_LIMIT)
+                && com.codex.blacklight.power.AssimilationSystem.ready(target);
     }
 
     public static boolean eligible(Mob mob) {
@@ -185,7 +183,7 @@ public final class ConsumeSystem {
             message(player,"grab_busy");return;
         }
         var form = state.getActivePower();
-        double range = form == PowerForm.WHIPFIST ? WHIP_GRAB_RANGE : 3;
+        double range = (form == PowerForm.WHIPFIST ? WHIP_GRAB_RANGE : 3)+com.codex.blacklight.power.AssimilationSystem.grabBonus(player);
         var locked=CombatTargeting.locked(player);
         Mob target;
         if(locked!=null) {
@@ -456,14 +454,9 @@ public final class ConsumeSystem {
         // Locomotion owns the base layer; the client samples the remaining source
         // pose independently, even after the receiver entity has disappeared.
         play(player,PlayerAction.CLAW_IDLE);
-        com.codex.blacklight.power.GrowthSystem.consumed(player,target);
-
-        var state = player.getData(ModAttachments.PLAYER_STATE);
-        state.addBiomass(session.biomass()); state.addEvolutionPoints(session.ep());
-        player.setData(ModAttachments.PLAYER_STATE, state); player.syncData(ModAttachments.PLAYER_STATE);
+        if(!com.codex.blacklight.power.AssimilationSystem.settle(player,target,session.reward,true))return;
         com.codex.blacklight.disguise.DisguiseSystem.consumed(player,target);
         com.codex.blacklight.disguise.DisguiseSystem.captured(player,identity);
-        com.codex.blacklight.power.CriticalMassSystem.healFromConsume(player, session.heal());
         player.level().playSound(null, player.blockPosition(), SoundEvents.GENERIC_EAT, SoundSource.PLAYERS, .8F, .55F);
         player.displayClientMessage(Component.translatable("message.blacklight.consume_complete", session.heal()*com.codex.blacklight.power.CombatScale.units(player), session.biomass(), session.ep()), true);
     }

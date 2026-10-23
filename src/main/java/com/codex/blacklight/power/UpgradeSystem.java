@@ -14,6 +14,8 @@ public final class UpgradeSystem {
     }
 
     public static void purchase(ServerPlayer player, String upgradeId) {
+        var organ=com.codex.blacklight.infection.TissueCore.byId(upgradeId);
+        if(organ!=null){AssimilationSystem.purchase(player,organ);return;}
         if(RicochetRules.ID.equals(upgradeId)){ProjectileDefenseSystem.purchase(player);return;}
         var growth=GrowthUpgrade.byId(upgradeId);
         if(growth!=null){GrowthSystem.purchase(player,growth);return;}

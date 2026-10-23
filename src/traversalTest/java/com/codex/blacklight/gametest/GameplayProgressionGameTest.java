@@ -46,7 +46,7 @@ public final class GameplayProgressionGameTest {
     }
     @GameTest(template="wall_test",timeoutTicks=40)
     public static void hiveRewardIsSingleAndWaveBudgetSurvivesReload(GameTestHelper h){
-        var p=FakePlayerFactory.get(h.getLevel(),new GameProfile(UUID.randomUUID(),"hive-qa"));var state=p.getData(ModAttachments.PLAYER_STATE);state.infect();
+        var p=FakePlayerFactory.get(h.getLevel(),new GameProfile(UUID.randomUUID(),"hive-qa"));var state=p.getData(ModAttachments.PLAYER_STATE);state.infect();state.setPrototypeMode(true);
         var hive=ModEntities.BLACKLIGHT_HIVE.get().create(h.getLevel());hive.setPos(h.absoluteVec(new Vec3(5,2,5)));h.getLevel().addFreshEntity(hive);
         var tag=new CompoundTag();hive.addAdditionalSaveData(tag);tag.putInt("BlacklightWaves",3);tag.putInt("BlacklightWaveCooldown",0);hive.readAdditionalSaveData(tag);
         var saved=new CompoundTag();hive.addAdditionalSaveData(saved);var restored=ModEntities.BLACKLIGHT_HIVE.get().create(h.getLevel());restored.readAdditionalSaveData(saved);

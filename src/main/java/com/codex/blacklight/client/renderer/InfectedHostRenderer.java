@@ -48,10 +48,12 @@ public final class InfectedHostRenderer extends EntityRenderer<BlacklightInfecte
         proxy.setCustomName(null);
         EntityRenderer renderer=Minecraft.getInstance().getEntityRenderDispatcher().getRenderer(proxy);
         var skin=new InfectedSkinBuffers(buffers);
-        stack.pushPose();DevourerFeedingFx.applyVictim(entity,partial,stack);stack.scale(1.12F,1.12F,1.12F);
+        stack.pushPose();DevourerFeedingFx.applyVictim(entity,partial,stack);
+        stack.translate(0,entity.tissueStanceOffset(),0);
+        float developedScale=1.12F*entity.tissueBodyScale();stack.scale(developedScale,developedScale,developedScale);
         try{
             if(renderer instanceof net.minecraft.client.renderer.entity.LivingEntityRenderer living){
-                try(var morphology=new InfectedMorphology(entity,proxy,living.getModel(),renderer.getTextureLocation(proxy))){
+                try(var morphology=new InfectedMorphology(entity,proxy,living.getModel(),renderer.getTextureLocation(proxy),stack.last(),partial)){
                     renderer.render(proxy,yaw,partial,stack,skin,light);
                 }
             }else renderer.render(proxy,yaw,partial,stack,skin,light);
@@ -66,7 +68,7 @@ public final class InfectedHostRenderer extends EntityRenderer<BlacklightInfecte
                 &&prey.isAlive()&&prey.distanceToSqr(entity)<=48*48
                 &&camera.isVisible(entity.getBoundingBox().minmax(prey.getBoundingBox()).inflate(3)))return true;
         var mesh=authoredMesh(entity);
-        if(mesh==null)return entity.shouldRender(x,y,z)&&(entity.noCulling||camera.isVisible(entity.getBoundingBox().inflate(.65)));
+        if(mesh==null)return entity.shouldRender(x,y,z)&&(entity.noCulling||camera.isVisible(entity.getBoundingBox().inflate(.65+entity.tissueOrganReach())));
         double scale=scale(entity,mesh);
         var bounds=mesh.bounds();
         double radius=Math.hypot(Math.max(Math.abs(bounds.minX),Math.abs(bounds.maxX)),
