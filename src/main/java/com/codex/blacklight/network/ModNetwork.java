@@ -19,7 +19,7 @@ import net.minecraftforge.network.NetworkRegistry;
 import net.minecraftforge.network.simple.SimpleChannel;
 
 public final class ModNetwork {
-    private static final String PROTOCOL = "forge-1.20.1-14-wings";
+    private static final String PROTOCOL = "forge-1.20.1-15-feedback-settings";
     private static final SimpleChannel CHANNEL = NetworkRegistry.newSimpleChannel(
             new ResourceLocation(BlacklightNeoMod.MOD_ID, "main"), () -> PROTOCOL, PROTOCOL::equals, PROTOCOL::equals);
     private static boolean registered;
@@ -35,6 +35,12 @@ public final class ModNetwork {
                 .playToClient(TerrainGrabPreviewPayload.class,TerrainGrabPreviewPayload.STREAM_CODEC,(payload,context)->context.enqueueWork(()->com.codex.blacklight.client.ClientTerrainGrab.accept(payload)))
                 .playToServer(BlockThrowAimPayload.class,BlockThrowAimPayload.STREAM_CODEC,(payload,context)->context.enqueueWork(()->{
                     if(context.player() instanceof ServerPlayer p){var held=com.codex.blacklight.combat.BlockThrowSystem.held(p);if(held!=null)held.acceptAim(p,new net.minecraft.world.phys.Vec3(payload.x(),payload.y(),payload.z()),payload.assist());}
+                }))
+                .playToServer(WingSpeedPayload.class,WingSpeedPayload.STREAM_CODEC,(payload,context)->context.enqueueWork(()->{
+                    if(context.player() instanceof ServerPlayer player&&WingSpeedPayload.valid(payload.percent())){
+                        com.codex.blacklight.registry.ModAttachments.setData(player,com.codex.blacklight.registry.ModAttachments.SKILL_SETTINGS,com.codex.blacklight.registry.ModAttachments.getData(player,com.codex.blacklight.registry.ModAttachments.SKILL_SETTINGS).withWingSpeed(payload.percent()));
+                        com.codex.blacklight.registry.ModAttachments.syncData(player,com.codex.blacklight.registry.ModAttachments.SKILL_SETTINGS);
+                    }
                 }))
                 .playToServer(SkillSettingsPayload.class,SkillSettingsPayload.STREAM_CODEC,(payload,context)->
                     context.enqueueWork(()->{

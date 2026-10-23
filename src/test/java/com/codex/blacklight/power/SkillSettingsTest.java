@@ -18,7 +18,7 @@ class SkillSettingsTest {
 
     @Test void disablingBlockBreakingSurvivesSaveAndNetworkRoundTrips() {
         for (boolean enabled : new boolean[]{false, true}) for(boolean borer:new boolean[]{false,true}) for(boolean pickup:new boolean[]{false,true}) {
-            var settings = new SkillSettings(enabled,borer,pickup);
+            var settings = new SkillSettings(enabled,borer,pickup,35);
             var saved = SkillSettings.CODEC.encodeStart(JsonOps.INSTANCE, settings).getOrThrow(false,message->{throw new IllegalStateException(message);});
             assertEquals(settings, SkillSettings.CODEC.parse(JsonOps.INSTANCE, saved).getOrThrow(false,message->{throw new IllegalStateException(message);}));
             var packet = new net.minecraft.network.FriendlyByteBuf(Unpooled.buffer());
@@ -67,5 +67,13 @@ class SkillSettingsTest {
     @Test void corruptPreferenceCannotSilentlyTurnOffDestruction() {
         assertTrue(SkillSettings.CODEC.parse(JsonOps.INSTANCE,
                 JsonParser.parseString("{\"bulletdive_block_breaking\":\"invalid\"}")).error().isPresent());
+    }
+    @Test void changingAnotherSettingPreservesPersonalWingSpeed(){
+        var slow=SkillSettings.DEFAULT.withWingSpeed(25);
+        assertEquals(25,slow.withBulletdive(false).withShieldBorer(true).withPrototypeItemPickup(false).wingSpeedPercent());
+        assertFalse(com.codex.blacklight.network.WingSpeedPayload.valid(Integer.MAX_VALUE));
+        assertFalse(com.codex.blacklight.network.WingSpeedPayload.valid(0));
+        assertTrue(com.codex.blacklight.network.WingSpeedPayload.valid(10));
+        assertTrue(com.codex.blacklight.network.WingSpeedPayload.valid(100));
     }
 }

@@ -33,13 +33,14 @@ public final class UtilityPowerLayer extends net.minecraft.client.renderer.entit
         var armor = BlockArmorModel.get();
         var form = com.codex.blacklight.registry.ModAttachments.getData(player, ModAttachments.PLAYER_STATE).getActivePower();
         boolean mercer=com.codex.blacklight.client.model.MercerArmorMesh.active(player);
-        if(mercer) {
+        boolean ysm=!firstPerson&&com.codex.blacklight.client.compat.YsmAppearanceBridge.active(player);
+        if(mercer&&!ysm) {
             var custom=com.codex.blacklight.client.model.MercerArmorMesh.get();
             if(firstPerson)custom.renderFirstPerson(player,stack,buffer,light,partial,poses,side);
             else if(getParentModel() instanceof com.codex.blacklight.client.model.BlacklightPlayerModel model&&model.mercerFrame()!=null)
                 custom.render(player,stack,buffer,light,partial,model.mercerFrame().skin(),-1);
         }
-        if (!mercer && armor.visible(player, partial)) for (String name : armor.joints()) {
+        if ((ysm || !mercer) && armor.visible(player, partial)) for (String name : armor.joints()) {
             var joint = com.codex.blacklight.animation.PlayerMotionController.skeleton().searchJointByName(name); if (joint == null) continue;
             boolean limb = name.startsWith("Arm_") || name.startsWith("Hand_");
             if(firstPerson&&(!limb||side>=0&&!name.endsWith(side==1?"_L":"_R")))continue;

@@ -27,6 +27,7 @@ public final class BlacklightPlayerRenderer extends PlayerRenderer {
     public static RenderedView renderedView(AbstractClientPlayer player){return VIEWS.get(player);}
     private final BlacklightClawLayer biological;
     private final UtilityPowerLayer utility;
+    private final com.codex.blacklight.client.renderer.layer.SovereignWingLayer wings;
     private final net.minecraft.client.model.PlayerModel<AbstractClientPlayer> handModel;
     private final boolean slimHands;
     private com.codex.blacklight.client.model.BlockShieldModel handShield;
@@ -35,7 +36,27 @@ public final class BlacklightPlayerRenderer extends PlayerRenderer {
         slimHands=slim;handModel=new net.minecraft.client.model.PlayerModel<>(context.bakeLayer(slim?ModelLayers.PLAYER_SLIM:ModelLayers.PLAYER),slim);
         this.model=new BlacklightPlayerModel(context.bakeLayer(slim?ModelLayers.PLAYER_SLIM:ModelLayers.PLAYER),slim);
         biological=new BlacklightClawLayer(this);utility=new UtilityPowerLayer(this);
-        addLayer(biological);addLayer(utility);addLayer(new com.codex.blacklight.client.renderer.layer.SovereignWingLayer(this));
+        wings=new com.codex.blacklight.client.renderer.layer.SovereignWingLayer(this);
+        addLayer(biological);addLayer(utility);addLayer(wings);
+    }
+    /** YSM owns the body pass; only Blacklight's weapon, shield and wing attachments are drawn here. */
+    public void renderYsmAttachments(AbstractClientPlayer player,float partial,PoseStack stack,
+            net.minecraft.client.renderer.MultiBufferSource buffers,int light) {
+        stack.pushPose();
+        try {
+            float facing=com.codex.blacklight.client.animation.BlacklightRenderPose.facing(player,partial);
+            stack.mulPose(com.mojang.math.Axis.YP.rotationDegrees(180-facing));
+            // YSM decodes Bedrock pivots with an X reflection. Match that basis
+            // for attachments as well as the live pose channels.
+            stack.scale(-1,1,1);
+            stack.scale(-1,-1,1); stack.scale(.9375F*1.5F,.9375F*1.5F,.9375F*1.5F);
+            stack.translate(0,-1.501F,0);
+            model.prepareMobModel(player,0,0,partial);
+            model.setupAnim(player,0,0,player.tickCount+partial,0,0);
+            biological.render(stack,buffers,light,player,0,0,partial,player.tickCount+partial,0,0);
+            utility.render(stack,buffers,light,player,0,0,partial,player.tickCount+partial,0,0);
+            wings.render(stack,buffers,light,player,0,0,partial,player.tickCount+partial,0,0);
+        } finally { stack.popPose(); }
     }
     public void renderPoweredArm(AbstractClientPlayer player,PoseStack stack,net.minecraft.client.renderer.MultiBufferSource buffers,int light,float partial,boolean left) {
         // A plain vanilla model is isolated from the third-person animated skin.

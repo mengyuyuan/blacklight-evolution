@@ -11,6 +11,7 @@ public record SkillTutorial(String family,String clip,PowerForm form,String inst
         if(id.startsWith("wing_speed_"))return of("sovereign_wings","basic_glide_forward",PowerForm.NONE,"key.blacklight.cycle_form","key.jump","key.sneak","key.sprint","key.forward");
         if(id.equals("adaptation")||id.equals("tissue_regeneration")||id.equals("adaptation_percent"))return new SkillTutorial("health","basic_idle",PowerForm.NONE,id);
         if(id.equals("kinetic_reflection"))return of("shield","basic_run",PowerForm.NONE,"key.blacklight.defense");
+        if(id.equals("assimilation_2")||id.equals("biomass_metabolism"))return new SkillTutorial("health","basic_idle",PowerForm.NONE,id);
         if(id.startsWith("slime_"))return new SkillTutorial("health","basic_idle",PowerForm.NONE,"slime");
         if(id.startsWith("block_throw_"))return of("block_throw","block_throw_two_release",PowerForm.MUSCLE_MASS,"key.blacklight.grab","key.attack","key.use","key.sneak");
         if(id.startsWith("jump_"))return of("jump","basic_jump_charge",PowerForm.NONE,"key.jump");

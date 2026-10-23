@@ -21,10 +21,14 @@ import net.minecraftforge.event.TickEvent.PlayerTickEvent;
 /** Same player and inventory throughout. Only the server may claim/kill a victim or restore a body. */
 public final class BiomassSystem {
     private BiomassSystem(){}
+    private record RejectedPrey(java.util.UUID target,long until){}
+    private static final java.util.Map<ServerPlayer,RejectedPrey> REJECTED=new java.util.WeakHashMap<>();
     public static BiomassState state(Entity p){return ModAttachments.peekData(p,ModAttachments.BIOMASS_FORM);}
     public static boolean active(Entity p){return state(p).active();}
     private static void publish(ServerPlayer p,BiomassState value){
         var previous=state(p);
+        if(!value.consumed())BiomassReformation.clear(p);
+        if(!value.active())REJECTED.remove(p);
         if(value.phase()!=BiomassState.ABSORBING||previous.victim()!=value.victim())BiomassAttachment.clear(p);
         boolean resize=previous.active()!=value.active();
         if(previous.victim()!=value.victim()&&p.level().getEntity(previous.victim()) instanceof Mob oldTarget)
@@ -97,11 +101,17 @@ public final class BiomassSystem {
         if(!e.getSource().is(DamageTypeTags.BYPASSES_INVULNERABILITY)&&begin(p,true))e.setCanceled(true);
     }
     public static boolean edible(ServerPlayer p,Mob victim){
+        var rejected=REJECTED.get(p);
+        if(rejected!=null){
+            if(p.level().getGameTime()>=rejected.until())REJECTED.remove(p);
+            else if(rejected.target().equals(victim.getUUID()))return false;
+        }
         return !(victim instanceof BiomassHusk)&&ConsumeSystem.eligibleBiomass(victim)
+                &&ConsumeSystem.healthReady(p,victim)
                 &&(claimant(victim)==null||claimant(victim)==p)&&CombatTargeting.damageable(p,victim)
                 &&inContact(p,victim)
                 &&(CombatTargeting.multipart(victim)?CombatTargeting.visibleContact(p,victim,p.getBoundingBox().inflate(1.15,.65,1.15))
-                    :p.hasLineOfSight(victim));
+                    :CombatTargeting.visible(p,p.getEyePosition(),victim.getBoundingBox()));
     }
     private static boolean inContact(Player player,LivingEntity victim){
         var contact=player.getBoundingBox().inflate(1.15,.65,1.15);
@@ -163,13 +173,16 @@ public final class BiomassSystem {
             if(!(entity instanceof Mob target)||!BiomassAttachment.follow(p,target)||!edible(p,target)){publish(p,s.crawl(now));return;}
             target.getNavigation().stop();target.setDeltaMovement(Vec3.ZERO);
             target.addEffect(new net.minecraft.world.effect.MobEffectInstance(com.codex.blacklight.registry.ModEffects.BIOMASS_CONTACT.get(),8,0,false,true,true));
-            if(now-s.changedAt()<BiomassState.ABSORB_TICKS)return;
+            if(now-s.changedAt()<ConsumeProgression.absorbTicks(p))return;
+            BiomassReformation.prepare(p);
             target.invulnerableTime=0;
-            boolean accepted=target.hurt(target.damageSources().playerAttack(p),Math.max(1000,target.getMaxHealth()*20));
+            float execution=(float)Math.min(Float.MAX_VALUE,Math.max(10000D,(double)target.getMaxHealth()*20));
+            boolean accepted=target.hurt(target.damageSources().playerAttack(p),execution);
             // Respect invulnerability, region protections, death vetoes and resurrection mods.
-            if(!accepted||!((com.codex.blacklight.mixin.LivingDeathAccess)target).blacklight$deathAccepted()){publish(p,s.crawl(now));return;}
+            if(!accepted||!((com.codex.blacklight.mixin.LivingDeathAccess)target).blacklight$deathAccepted()){REJECTED.put(p,new RejectedPrey(target.getUUID(),now+BiomassState.ABSORB_TICKS));publish(p,s.crawl(now));return;}
             target.setInvisible(true);
-            p.teleportTo(target.getX(),target.getY(),target.getZ());
+            Vec3 destination=BiomassReformation.completionPosition(p,target.position());
+            p.teleportTo(destination.x,destination.y,destination.z);
             p.setHealth(p.getMaxHealth());p.clearFire();p.invulnerableTime=40;
             var power=com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.PLAYER_STATE);power.addBiomass(40);com.codex.blacklight.registry.ModAttachments.syncData(p, ModAttachments.PLAYER_STATE);
             publish(p,s.reform(now));
@@ -184,9 +197,7 @@ public final class BiomassSystem {
         }
     }
     private static Vec3 standingRoom(ServerPlayer p){
-        Vec3 at=p.position();
-        // Stay in place; a low tunnel must not teleport the player through a wall.
-        return p.level().noCollision(p,new AABB(at.x-.3,at.y,at.z-.3,at.x+.3,at.y+1.8,at.z+.3))?at:null;
+        return BiomassReformation.standingRoom(p);
     }
 
     private static void burstLoadedHusk(ServerPlayer p,BiomassState s){

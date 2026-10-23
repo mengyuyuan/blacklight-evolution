@@ -39,7 +39,7 @@ public final class ConsumeSystem {
             boolean hunter=v instanceof BlacklightHunter;
             float originalHealth=com.codex.blacklight.power.CombatScale.originalMaximum(v);
             float baseHeal=hunter?8:com.codex.blacklight.util.MathCompat.clamp(originalHealth*.2F,2,6);
-            heal=baseHeal*(com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.GROWTH).owns(com.codex.blacklight.power.GrowthUpgrade.ASSIMILATION)?1.35F:1);
+            heal=baseHeal*com.codex.blacklight.power.ConsumeProgression.healingMultiplier(com.codex.blacklight.registry.ModAttachments.getData(p,ModAttachments.GROWTH));
             biomass=hunter?120:com.codex.blacklight.util.MathCompat.clamp((int)originalHealth*2,10,60);
             ep=hunter?30:v.getType().is(PASSIVE)?2:10;
         }
@@ -76,7 +76,7 @@ public final class ConsumeSystem {
         if(!ConsumeVisual.holding(s.stage))return;
         s.consumeQueued=false;
         // Recheck at confirmation: healing or changed attributes must not bypass the gate.
-        if (!healthReady(s.victim)) { message(player,"consume_weaken"); return; }
+        if (!healthReady(player,s.victim)) { message(player,"consume_weaken"); return; }
         s.facing=player.getYRot();
         s.consumeTargetStart=s.victim.position();
         phase(player,s,s.victim instanceof BlacklightHunter?ConsumeVisual.HUNTER_CONSUME:s.large?ConsumeVisual.MOUNT_CONSUME:ConsumeVisual.CONSUME);
@@ -149,10 +149,11 @@ public final class ConsumeSystem {
     }
 
     /** Use maximum health for the tier, current health only for the weakening threshold. */
-    public static boolean healthReady(LivingEntity target) {
+    public static boolean healthReady(LivingEntity target) { return healthReady(null,target); }
+    public static boolean healthReady(net.minecraft.world.entity.player.Player consumer,LivingEntity target) {
         float maximum=target.getMaxHealth();
         return target.isAlive() && Float.isFinite(maximum) && maximum>0
-                && (com.codex.blacklight.power.CombatScale.originalMaximum(target)<DIRECT_GRAB_MAX_HEALTH || target.getHealth()<=maximum*HEALTH_LIMIT);
+                && (com.codex.blacklight.power.CombatScale.originalMaximum(target)<DIRECT_GRAB_MAX_HEALTH || target.getHealth()<=maximum*(consumer==null?HEALTH_LIMIT:com.codex.blacklight.power.ConsumeProgression.healthLimit(com.codex.blacklight.power.ConsumeProgression.progress(consumer))));
     }
 
     public static boolean eligible(Mob mob) {return com.codex.blacklight.power.BiomassSystem.claimant(mob)==null&&eligibleBiomass(mob);}
@@ -205,7 +206,7 @@ public final class ConsumeSystem {
             }else message(player,"consume_no_target");
             return;
         }
-        if (!healthReady(target)) { message(player, "consume_weaken"); return; }
+        if (!healthReady(player,target)) { message(player, "consume_weaken"); return; }
         if(!canStartGroundGrab(player)&&!ConsumeSequence.large(target)) {
             message(player,"grab_ground");return;
         }
