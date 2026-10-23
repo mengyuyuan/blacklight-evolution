@@ -6,6 +6,7 @@ import com.codex.blacklight.registry.ModAttachments;
 import com.codex.blacklight.registry.ModEntities;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
@@ -24,6 +25,7 @@ public final class BiomassSystem {
     public static boolean active(Entity p){return state(p).active();}
     private static void publish(ServerPlayer p,BiomassState value){
         var previous=state(p);
+        if(value.phase()!=BiomassState.ABSORBING||previous.victim()!=value.victim())BiomassAttachment.clear(p);
         boolean resize=previous.active()!=value.active();
         if(previous.victim()!=value.victim()&&p.level().getEntity(previous.victim()) instanceof Mob oldTarget)
             oldTarget.removeEffect(com.codex.blacklight.registry.ModEffects.BIOMASS_CONTACT);
@@ -31,6 +33,7 @@ public final class BiomassSystem {
         if(value.phase()==BiomassState.ABSORBING){
             ConsumeControl.releaseControls(p);p.setDeltaMovement(Vec3.ZERO);
             if(p.level().getEntity(value.victim()) instanceof Mob target){
+                BiomassAttachment.attach(p,target);
                 ConsumeControl.releaseControls(target);target.setDeltaMovement(Vec3.ZERO);
                 target.addEffect(new net.minecraft.world.effect.MobEffectInstance(com.codex.blacklight.registry.ModEffects.BIOMASS_CONTACT,8,0,false,true,true));
             }
@@ -95,15 +98,21 @@ public final class BiomassSystem {
     }
     public static boolean edible(ServerPlayer p,Mob victim){
         return !(victim instanceof BiomassHusk)&&ConsumeSystem.eligibleBiomass(victim)
-                &&(claimant(victim)==null||claimant(victim)==p)&&CombatTargeting.damageable(p,victim)&&p.hasLineOfSight(victim)
-                &&p.getBoundingBox().inflate(1.15,.65,1.15).intersects(victim.getBoundingBox());
+                &&(claimant(victim)==null||claimant(victim)==p)&&CombatTargeting.damageable(p,victim)
+                &&inContact(p,victim)
+                &&(CombatTargeting.multipart(victim)?CombatTargeting.visibleContact(p,victim,p.getBoundingBox().inflate(1.15,.65,1.15))
+                    :p.hasLineOfSight(victim));
+    }
+    private static boolean inContact(Player player,LivingEntity victim){
+        var contact=player.getBoundingBox().inflate(1.15,.65,1.15);
+        return CombatTargeting.hitboxes(victim).stream().anyMatch(contact::intersects);
     }
     /** A claim is transient and valid only while its live player is absorbing nearby. */
     public static Player claimant(Entity victim){
         if(!(victim instanceof Mob))return null;
         for(var p:victim.level().players()){var s=state(p);
             if(p.isAlive()&&s.phase()==BiomassState.ABSORBING&&s.victim()==victim.getId()
-                    &&p.getBoundingBox().inflate(1.15,.65,1.15).intersects(victim.getBoundingBox()))return p;
+                    &&(inContact(p,(LivingEntity)victim)||p instanceof ServerPlayer server&&BiomassAttachment.attached(server,(Mob)victim)))return p;
         }return null;
     }
     @SubscribeEvent public static void tick(PlayerTickEvent.Post e){
@@ -139,7 +148,9 @@ public final class BiomassSystem {
         if(s.immobilized())p.setDeltaMovement(0,p.getDeltaMovement().y,0);
         if(s.phase()==BiomassState.CRAWLING){
             // Serial server ticks plus the claim below prevent two players consuming one mob.
-            var prey=p.level().getEntitiesOfClass(Mob.class,p.getBoundingBox().inflate(1.15,.65,1.15),v->edible(p,v));
+            var prey=new java.util.ArrayList<Mob>();
+            for(var candidate:CombatTargeting.candidates(p,p.getBoundingBox().inflate(1.15,.65,1.15),
+                    v->v instanceof Mob mob&&edible(p,mob)))prey.add((Mob)candidate);
             prey.sort(java.util.Comparator.comparingDouble(p::distanceToSqr));
             if(!prey.isEmpty()){
                 Mob target=prey.get(0);
@@ -150,7 +161,7 @@ public final class BiomassSystem {
             }
         }else if(s.phase()==BiomassState.ABSORBING){
             Entity entity=p.level().getEntity(s.victim());
-            if(!(entity instanceof Mob target)||!edible(p,target)){publish(p,s.crawl(now));return;}
+            if(!(entity instanceof Mob target)||!BiomassAttachment.follow(p,target)||!edible(p,target)){publish(p,s.crawl(now));return;}
             target.getNavigation().stop();target.setDeltaMovement(Vec3.ZERO);
             target.addEffect(new net.minecraft.world.effect.MobEffectInstance(com.codex.blacklight.registry.ModEffects.BIOMASS_CONTACT,8,0,false,true,true));
             if(now-s.changedAt()<BiomassState.ABSORB_TICKS)return;
