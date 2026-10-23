@@ -17,7 +17,7 @@ public final class BiomassAttachment {
     public static void clear(ServerPlayer player){ANCHORS.remove(player);}
 
     public static boolean attach(ServerPlayer player,Mob target){
-        if(!target.isMultipartEntity()||target.getParts()==null)return true;
+        if(!target.isMultipartEntity()||target.getParts()==null||target.getParts().length==0)return true;
         var contact=player.getBoundingBox().inflate(1.15,.65,1.15);
         Entity closest=null;double best=Double.POSITIVE_INFINITY;
         for(var part:target.getParts())if(part!=null&&!part.isRemoved()&&part.isPickable()
@@ -44,7 +44,7 @@ public final class BiomassAttachment {
 
     public static boolean follow(ServerPlayer player,Mob target){
         if(!target.isAlive()||target.isRemoved()||target.level()!=player.level())return false;
-        if(!target.isMultipartEntity()||target.getParts()==null)return true;
+        if(!target.isMultipartEntity()||target.getParts()==null||target.getParts().length==0)return true;
         if(!attached(player,target)&&!attach(player,target))return false;
         var anchor=ANCHORS.get(player);var box=anchor.part().getBoundingBox();var local=anchor.local();
         var at=new Vec3(box.minX+local.x*box.getXsize(),box.minY+local.y*box.getYsize(),box.minZ+local.z*box.getZsize());
