@@ -67,7 +67,7 @@ public final class PrototypeMovementSystem {
     public static void onLivingFall(LivingFallEvent event) {
         if (!(event.getEntity() instanceof ServerPlayer player)) return;
         BlacklightState blacklight = player.getData(ModAttachments.PLAYER_STATE);
-        if (blacklight.isInfected() && blacklight.isPrototypeMode()) {
+        if (blacklight.isInfected()) {
             event.setDamageMultiplier(0.0F);
         }
     }
@@ -82,7 +82,7 @@ public final class PrototypeMovementSystem {
     /** Handles edge-triggered inputs immediately instead of waiting for a later player tick. */
     public static void acceptInput(ServerPlayer player, boolean jumpHeld, boolean dashPressed,
                                    int forward, int sideways, boolean sprinting, boolean detach) {
-        if (com.codex.blacklight.city.HydraTransport.active(player)||com.codex.blacklight.power.BiomassSystem.active(player) || !PrototypeModeSystem.isActive(player) || !player.isAlive()
+        if (com.codex.blacklight.disguise.DisguiseSystem.active(player)||com.codex.blacklight.city.HydraTransport.active(player)||com.codex.blacklight.power.BiomassSystem.active(player) || !PrototypeModeSystem.isActive(player) || !player.isAlive()
                 || player.isSpectator() || player.isDeadOrDying()
                 || player.isPassenger() || player.isFallFlying() || player.getAbilities().flying
                 || player.isInLava()) {
@@ -146,7 +146,7 @@ public final class PrototypeMovementSystem {
     @SubscribeEvent
     public static void onPlayerTick(PlayerTickEvent.Post event) {
         if (!(event.getEntity() instanceof ServerPlayer player)) return;
-        if(com.codex.blacklight.city.HydraTransport.active(player)||com.codex.blacklight.power.BiomassSystem.active(player)||WingFlightSystem.flying(player))return;
+        if(com.codex.blacklight.disguise.DisguiseSystem.active(player)||com.codex.blacklight.city.HydraTransport.active(player)||com.codex.blacklight.power.BiomassSystem.active(player)||WingFlightSystem.flying(player))return;
         if (player.getData(ModAttachments.CONSUMING)&&com.codex.blacklight.combat.ConsumeVisual.blocksInput(player.getData(ModAttachments.GRAB_STAGE))) return;
         MovementState movement = player.getData(ModAttachments.MOVEMENT_STATE);
         BlacklightState blacklight = player.getData(ModAttachments.PLAYER_STATE);

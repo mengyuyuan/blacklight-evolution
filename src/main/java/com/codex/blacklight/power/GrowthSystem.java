@@ -37,6 +37,15 @@ public final class GrowthSystem {
             }
         }
     }
+    /** Spend biomass only when a real healing event restored red health; never creates critical reserve. */
+    public static void metabolize(ServerPlayer p){
+        var state=p.getData(ModAttachments.PLAYER_STATE);
+        if(!p.isAlive()||p.isSpectator()||BiomassSystem.active(p)||!state.isInfected()||!state.isPrototypeMode()
+                ||!p.getData(ModAttachments.GROWTH).owns(GrowthUpgrade.BIOMASS_METABOLISM)
+                ||state.getBiomass()<10||p.getHealth()>=p.getMaxHealth()-.001F)return;
+        float before=p.getHealth();p.heal(Math.max(1,CombatScale.originalMaximum(p)*.02F));
+        if(p.getHealth()>before){state.addBiomass(-10);p.syncData(ModAttachments.PLAYER_STATE);}
+    }
     public static void award(ServerPlayer p,String id){
         var advancement=p.server.getAdvancements().get(ResourceLocation.fromNamespaceAndPath("blacklight",id));
         if(advancement!=null)p.getAdvancements().award(advancement,"done");
@@ -58,6 +67,7 @@ public final class GrowthSystem {
         if(p.tickCount%20!=0)return;
         if(!p.getData(ModAttachments.PLAYER_STATE).isInfected())return;
         award(p,"awakening");
+        metabolize(p);
         if(!BiomassSystem.active(p)&&p.isAlive()&&p.tickCount%100==0&&p.tickCount-LAST_HURT.getOrDefault(p,p.tickCount-200)>=160&&p.getData(ModAttachments.GROWTH).owns(GrowthUpgrade.REGENERATION))p.heal(1);
     }
     @SubscribeEvent public static void hurt(LivingDamageEvent.Post e){if(e.getNewDamage()>0&&e.getEntity() instanceof ServerPlayer p)LAST_HURT.put(p,p.tickCount);}

@@ -5,7 +5,7 @@ Keep locomotion physics and combat's server timing separate from visual Root mot
 import json, math
 from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
-ASSETS = ROOT/'src/main/resources/assets/blacklight/animmodels/animations/biped'
+ASSETS = ROOT/'src/main/resources/assets/blacklight/native_animations/biped'
 JOINTS = ['Root','Torso','Chest','Head','Shoulder_R','Arm_R','Elbow_R','Hand_R','Tool_R',
           'Shoulder_L','Arm_L','Elbow_L','Hand_L','Tool_L','Thigh_R','Leg_R','Knee_R','Thigh_L','Leg_L','Knee_L']
 def quat(x=0,y=0,z=0):

@@ -1,0 +1,151 @@
+{
+  "version": "0.3.4-preview.20261023-feedback.2",
+  "scope": "Local integrated native clients; optional Epic Fight + BK modules installed; not a guarantee for arbitrary modpacks",
+  "platforms": {
+    "NeoForge 1.21.1": {
+      "junit": {
+        "full_existing_suite": 547,
+        "new_isolation_test": 1
+      },
+      "disguise_completed": true,
+      "leg_rotation_samples": [
+        {
+          "poseTick": 140,
+          "type": "zombie",
+          "legAngle": 0.00028182683,
+          "legRange": 2.6092224
+        },
+        {
+          "poseTick": 300,
+          "type": "villager",
+          "legAngle": 0.00012735167,
+          "legRange": 1.3043412
+        },
+        {
+          "poseTick": 460,
+          "type": "skeleton",
+          "legAngle": 0.00023990647,
+          "legRange": 2.6098328
+        }
+      ],
+      "disguise_canceled_renders": 0,
+      "armor_walk": {
+        "tick": 660,
+        "alive": true,
+        "height": -60.0,
+        "running": true,
+        "prototype": true,
+        "epicMode": false,
+        "externalCamera": false,
+        "nativeCamera": true,
+        "yaw": -90.0,
+        "body": 630.00006,
+        "head": -90.0,
+        "facing": -90.0,
+        "action": "",
+        "armor": true,
+        "rightThighRotation": "(-2.685E-2 -7.159E-3  2.478E-2  9.993E-1)",
+        "phase": "WALK",
+        "nativeRenders": 676,
+        "frames": 881,
+        "speed": 0.09546584153831064,
+        "externalOverridesNative": false
+      },
+      "mode_exit": {
+        "tick": 840,
+        "alive": true,
+        "height": -60.0,
+        "running": false,
+        "prototype": false,
+        "epicMode": false,
+        "externalCamera": false,
+        "nativeCamera": false,
+        "yaw": 180.0,
+        "body": 899.99994,
+        "head": 180.0,
+        "facing": 899.99994,
+        "action": "",
+        "armor": false,
+        "rightThighRotation": "( 1.872E-1  1.968E-2 -1.420E-1  9.718E-1)",
+        "phase": "IDLE",
+        "nativeRenders": 766,
+        "frames": 1148,
+        "speed": 0.0,
+        "externalOverridesNative": false
+      },
+      "blacklight_animation_discovery_errors": 0
+    },
+    "Forge 1.20.1": {
+      "junit": {
+        "full_suite": 478
+      },
+      "disguise_completed": true,
+      "leg_rotation_samples": [
+        {
+          "poseTick": 140,
+          "type": "zombie",
+          "legAngle": 0.00023990424,
+          "legRange": 2.6092224
+        },
+        {
+          "poseTick": 300,
+          "type": "villager",
+          "legAngle": 0.00013104982,
+          "legRange": 1.3016863
+        },
+        {
+          "poseTick": 460,
+          "type": "skeleton",
+          "legAngle": 0.00024237043,
+          "legRange": 2.6012776
+        }
+      ],
+      "disguise_canceled_renders": 0,
+      "armor_walk": {
+        "tick": 660,
+        "alive": true,
+        "height": 64.0,
+        "running": true,
+        "prototype": true,
+        "epicMode": false,
+        "externalCamera": false,
+        "nativeCamera": true,
+        "yaw": -90.0,
+        "body": 630.00006,
+        "head": -90.0,
+        "facing": 630.0,
+        "action": "",
+        "armor": true,
+        "rightThighRotation": "( 2.178E-1  1.209E-1 -3.093E-2  9.680E-1)",
+        "phase": "WALK",
+        "nativeRenders": 653,
+        "frames": 963,
+        "speed": 0.09546584153831064,
+        "externalOverridesNative": false
+      },
+      "mode_exit": {
+        "tick": 840,
+        "alive": true,
+        "height": 64.0,
+        "running": false,
+        "prototype": false,
+        "epicMode": false,
+        "externalCamera": false,
+        "nativeCamera": false,
+        "yaw": 180.0,
+        "body": 899.99994,
+        "head": 180.0,
+        "facing": 899.99994,
+        "action": "",
+        "armor": false,
+        "rightThighRotation": "( 1.872E-1  1.968E-2 -1.420E-1  9.718E-1)",
+        "phase": "IDLE",
+        "nativeRenders": 742,
+        "frames": 1229,
+        "speed": 0.0,
+        "externalOverridesNative": false
+      },
+      "blacklight_animation_discovery_errors": 0
+    }
+  }
+}

@@ -108,7 +108,7 @@ public final class BiomassSystem {
             else if(rejected.target().equals(victim.getUUID()))return false;
         }
         return !(victim instanceof BiomassHusk)&&ConsumeSystem.eligibleBiomass(victim)
-                &&ConsumeSystem.healthReady(victim)
+                &&ConsumeSystem.healthReady(p,victim)
                 &&(claimant(victim)==null||claimant(victim)==p)&&CombatTargeting.damageable(p,victim)
                 &&inContact(p,victim)
                 &&(CombatTargeting.multipart(victim)?CombatTargeting.visibleContact(p,victim,p.getBoundingBox().inflate(1.15,.65,1.15))
@@ -176,7 +176,7 @@ public final class BiomassSystem {
             if(!(entity instanceof Mob target)||!BiomassAttachment.follow(p,target)||!edible(p,target)){publish(p,s.crawl(now));return;}
             target.getNavigation().stop();target.setDeltaMovement(Vec3.ZERO);
             target.addEffect(new net.minecraft.world.effect.MobEffectInstance(com.codex.blacklight.registry.ModEffects.BIOMASS_CONTACT,8,0,false,true,true));
-            if(now-s.changedAt()<BiomassState.ABSORB_TICKS)return;
+            if(now-s.changedAt()<ConsumeProgression.absorbTicks(p))return;
             BiomassReformation.prepare(p);
             var consumeReward=AssimilationSystem.quote(p,target);
             target.invulnerableTime=0;

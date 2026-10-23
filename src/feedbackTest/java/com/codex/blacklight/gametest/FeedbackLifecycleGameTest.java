@@ -18,7 +18,7 @@ import net.neoforged.neoforge.gametest.*;
 /** Website #16/#17/#20. Actual server damage, death, attachment and reconstruction paths. */
 @GameTestHolder("blacklight") @PrefixGameTestTemplate(false)
 public final class FeedbackLifecycleGameTest {
-    private static ServerPlayer player(GameTestHelper h) {
+    static ServerPlayer player(GameTestHelper h) {
         var profile = new GameProfile(UUID.randomUUID(), "FeedbackLife");
         var p = new ServerPlayer(h.getLevel().getServer(),h.getLevel(),profile,ClientInformation.createDefault()) {
             @Override public void teleportTo(double x,double y,double z) { setPos(x,y,z); }
@@ -32,7 +32,7 @@ public final class FeedbackLifecycleGameTest {
         state.infect();state.setPrototypeMode(true);state.unlock(PowerForm.CLAWS);state.activate(PowerForm.CLAWS);
         return p;
     }
-    private static void cleanup(ServerPlayer p) { p.serverLevel().removePlayerImmediately(p,Entity.RemovalReason.DISCARDED); }
+    static void cleanup(ServerPlayer p) { p.serverLevel().removePlayerImmediately(p,Entity.RemovalReason.DISCARDED); }
     private static void tick(ServerPlayer p) { BiomassSystem.tick(new net.neoforged.neoforge.event.tick.PlayerTickEvent.Post(p)); }
     private static void finish(ServerPlayer p,Mob target) {
         target.setPos(p.position());target.setNoAi(true);p.serverLevel().addFreshEntity(target);
@@ -162,11 +162,22 @@ public final class FeedbackLifecycleGameTest {
         if(type.isEmpty()){h.succeed();return;}
         var p=player(h);var mob=(Mob)type.get().create(h.getLevel());
         mob.setPos(p.position());mob.setNoAi(true);h.getLevel().addFreshEntity(mob);
+        // The real boss positions its damageable parts during its first tick.
+        mob.tick();mob.setHealth(mob.getMaxHealth()*.14F);
+        // Multipart targets expose body parts above their root's feet. Contact a real
+        // part, rather than asserting that empty space under the boss is edible.
+        var part=com.codex.blacklight.combat.CombatTargeting.hitboxes(mob).get(0);
+        p.setPos((part.minX+part.maxX)/2,Math.floor(part.minY),part.minZ-.45);
+        for(int x=-7;x<=7;x++)for(int z=-7;z<=7;z++)
+            h.getLevel().setBlock(p.blockPosition().offset(x,-1,z),Blocks.STONE.defaultBlockState(),2);
         p.setData(ModAttachments.BIOMASS_FORM,new BiomassState(BiomassState.ABSORBING,h.getLevel().getGameTime()-60,true,"","claws",mob.getId(),10));
         p.refreshDimensions();
         String before=" eligible="+com.codex.blacklight.combat.ConsumeSystem.eligibleBiomass(mob)
                 +", edible="+BiomassSystem.edible(p,mob)+", damageable="+com.codex.blacklight.combat.CombatTargeting.damageable(p,mob)
-                +", sight="+p.hasLineOfSight(mob)+", max="+mob.getMaxHealth()+", beforeHP="+mob.getHealth();
+                +", sight="+p.hasLineOfSight(mob)+", max="+mob.getMaxHealth()+", beforeHP="+mob.getHealth()
+                +", ready="+com.codex.blacklight.combat.ConsumeSystem.healthReady(p,mob)
+                +", multipart="+com.codex.blacklight.combat.CombatTargeting.multipart(mob)
+                +", boxes="+com.codex.blacklight.combat.CombatTargeting.hitboxes(mob)+", playerBox="+p.getBoundingBox();
         tick(p);
         boolean committed=BiomassSystem.state(p).consumed()&&!mob.isAlive();
         String diagnostic=before+" phase="+BiomassSystem.state(p).phase()+", health="+mob.getHealth()+", removed="+mob.isRemoved()+", dead="+((com.codex.blacklight.mixin.LivingDeathAccess)mob).blacklight$deathAccepted()+", player="+p.position();

@@ -20,13 +20,17 @@ import net.minecraft.world.entity.npc.AbstractVillager;
 public record DisguiseIdentity(String type, String family, CompoundTag appearance) {
     public static final DisguiseIdentity EMPTY=new DisguiseIdentity("","",new CompoundTag());
     public static final Codec<DisguiseIdentity> CODEC=RecordCodecBuilder.create(i->i.group(
-            Codec.STRING.fieldOf("type").forGetter(DisguiseIdentity::type),
-            Codec.STRING.fieldOf("family").forGetter(DisguiseIdentity::family),
+            boundedString(128).fieldOf("type").forGetter(DisguiseIdentity::type),
+            boundedString(32).fieldOf("family").forGetter(DisguiseIdentity::family),
             CompoundTag.CODEC.fieldOf("appearance").forGetter(DisguiseIdentity::appearance)
     ).apply(i,DisguiseIdentity::new));
     public static final StreamCodec<RegistryFriendlyByteBuf,DisguiseIdentity> STREAM_CODEC=StreamCodec.composite(
             ByteBufCodecs.STRING_UTF8,DisguiseIdentity::type,ByteBufCodecs.STRING_UTF8,DisguiseIdentity::family,
             ByteBufCodecs.COMPOUND_TAG,DisguiseIdentity::appearance,DisguiseIdentity::new);
+    private static Codec<String> boundedString(int max) {
+        return Codec.STRING.flatXmap(s->s.length()<=max&&s.chars().allMatch(c->c<128)?com.mojang.serialization.DataResult.success(s):com.mojang.serialization.DataResult.error(()->"Identity string too long"),
+                s->s.length()<=max&&s.chars().allMatch(c->c<128)?com.mojang.serialization.DataResult.success(s):com.mojang.serialization.DataResult.error(()->"Identity string too long"));
+    }
     private static final String[] APPEARANCE_KEYS={"Age","IsBaby","Baby","Variant","variant","Color","Sheared",
             "CatType","CollarColor","Tame","RabbitType","Type","Size","VillagerData",
             "HandItems","ArmorItems","CustomName","CustomNameVisible","Profession",
@@ -37,6 +41,26 @@ public record DisguiseIdentity(String type, String family, CompoundTag appearanc
         return id==null?null:BuiltInRegistries.ENTITY_TYPE.getOptional(id).orElse(null);
     }
     public boolean valid(){return entityType()!=null&&!type.isBlank();}
+    /** Bound collection packets even for command-created mobs carrying huge cosmetic item NBT. */
+    public DisguiseIdentity compact() {
+        if(type.length()>128||family.length()>32||type.chars().anyMatch(c->c>=128)||family.chars().anyMatch(c->c>=128))return EMPTY;
+        var tag=appearance.copy();
+        if(!fits(tag)) {
+            for(String key:new String[]{"HandItems","ArmorItems","CustomName","CustomNameVisible","DecorItem","ArmorItem","BodyArmorItem"})tag.remove(key);
+            if(!fits(tag))tag=new CompoundTag();
+        }
+        return new DisguiseIdentity(type,family,tag);
+    }
+    private static boolean fits(CompoundTag tag) {
+        // NbtIo substitutes an empty value for overlong UTF strings. Reject them before
+        // measuring bytes, otherwise a huge in-memory cosmetic could appear to be tiny.
+        if(tag.sizeInBytes()>4096)return false;
+        try {
+            var bytes=new java.io.ByteArrayOutputStream();
+            net.minecraft.nbt.NbtIo.write(tag,new java.io.DataOutputStream(bytes));
+            return bytes.size()<=512;
+        }catch(java.io.IOException|RuntimeException error){return false;}
+    }
     public static DisguiseIdentity capture(Mob mob) {
         var id=BuiltInRegistries.ENTITY_TYPE.getKey(mob.getType());
         // Bosses, giants and custom infected bodies are not civilian identities.

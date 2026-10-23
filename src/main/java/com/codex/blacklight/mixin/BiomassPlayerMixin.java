@@ -20,6 +20,6 @@ public abstract class BiomassPlayerMixin {
     @Inject(method="getSpeed",at=@At("HEAD"),cancellable=true)
     private void blacklight$liquidSpeed(CallbackInfoReturnable<Float> ci){
         var state=BiomassSystem.state((Player)(Object)this);
-        if(state.active())ci.setReturnValue(state.immobilized()?0F:.085F);
+        if(state.active())ci.setReturnValue(state.immobilized()?0F:com.codex.blacklight.power.ConsumeProgression.crawlSpeed((Player)(Object)this));
     }
 }

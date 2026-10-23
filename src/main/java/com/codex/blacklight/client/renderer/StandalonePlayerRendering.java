@@ -71,6 +71,17 @@ public final class StandalonePlayerRendering {
             renderer.renderPoweredShield(mc.player,stack,event.getMultiBufferSource(),event.getPackedLight(),event.getPartialTick());
         }finally{stack.popPose();}
     }
+    @SubscribeEvent(priority=EventPriority.HIGHEST)
+    public static void compatibleHeldArm(RenderArmEvent event) {
+        if(hands!=null||event.getPlayer().getData(ModAttachments.PLAYER_STATE).isPrototypeMode()
+                ||!(net.neoforged.fml.ModList.get().isLoaded("holdmyitemsnf")||net.neoforged.fml.ModList.get().isLoaded("holdmyitems"))
+                ||!com.codex.blacklight.client.compat.YsmAppearanceBridge.selected(event.getPlayer()))return;
+        var mesh=com.codex.blacklight.client.model.MercerPlayerMesh.get();if(mesh==null)return;
+        event.setCanceled(true);
+        mesh.renderHeldArm(event.getPoseStack(),event.getMultiBufferSource().getBuffer(
+                net.minecraft.client.renderer.RenderType.entityCutoutNoCull(com.codex.blacklight.client.model.MercerPlayerMesh.TEXTURE)),
+                event.getPackedLight(),net.minecraft.client.renderer.texture.OverlayTexture.NO_OVERLAY,event.getArm()==HumanoidArm.LEFT);
+    }
     @SubscribeEvent public static void arm(RenderArmEvent event) {
         var current=hands;if(current==null||current.player()!=event.getPlayer())return;
         boolean left=event.getArm()==HumanoidArm.LEFT;

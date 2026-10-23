@@ -22,7 +22,7 @@ public abstract class BiomassEntityRenderMixin {
                                 PoseStack stack,MultiBufferSource buffers,int light,Operation<Void> original){
         var owner=entity instanceof LivingEntity?BiomassSystem.claimant(entity):null;
         if(owner==null){original.call(renderer,entity,yaw,partial,stack,buffers,light);return;}
-        float progress=BiomassSystem.state(owner).progress(entity.level().getGameTime()+partial,BiomassState.ABSORB_TICKS);
+        float progress=BiomassSystem.state(owner).progress(entity.level().getGameTime()+partial,com.codex.blacklight.power.ConsumeProgression.absorbTicks(owner));
         var coat=new BiomassCoatBuffers((LivingEntity)entity,stack,buffers,
                 Math.min(1,progress*1.45F),com.codex.blacklight.client.renderer.BiomassSurfaceBounds.ease((progress-.65F)/.35F),entity.tickCount+partial);
         original.call(renderer,entity,yaw,partial,stack,coat,light);

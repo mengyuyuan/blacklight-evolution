@@ -58,7 +58,7 @@ public final class TargetLockHud {
         if(target instanceof com.codex.blacklight.entity.BlacklightInfectedHost host&&com.codex.blacklight.power.AssimilationSystem.tissue(host)){
             var core=com.codex.blacklight.infection.TissueCore.forSeed(com.codex.blacklight.infection.TissueOrgans.seed(host.getUUID()));
             int quality=com.codex.blacklight.infection.TissueCore.quality(host.tissueAge());
-            String condition=com.codex.blacklight.combat.ConsumeSystem.healthReady(host)?"ready":quality>=2&&host.tissueCoreFracture()<1?"armored":"weaken";
+            String condition=com.codex.blacklight.combat.ConsumeSystem.healthReady(mc.player,host)?"ready":quality>=2&&host.tissueCoreFracture()<1?"armored":"weaken";
             String info=net.minecraft.network.chat.Component.translatable("hud.blacklight.organ_target",net.minecraft.network.chat.Component.translatable("upgrade.blacklight."+core.id),quality,
                     net.minecraft.network.chat.Component.translatable("hud.blacklight.organ_"+condition)).getString();
             panel(g,info,g.guiWidth()/2,g.guiHeight()-68,0xFFDDA6A1);

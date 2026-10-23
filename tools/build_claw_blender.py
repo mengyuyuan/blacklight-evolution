@@ -237,7 +237,7 @@ def stash_and_export(name,duration,keys):
             # Loader conjugation and OpenMatrix4f.fromQuaternion's transposed
             # convention cancel: retain Blender WXYZ without another conjugation.
             f['rot']=[v/norm for v in q]
-    dest=RES/'animmodels/animations/biped'/f'{name}.json';dest.parent.mkdir(parents=True,exist_ok=True)
+    dest=RES/'native_animations/biped'/f'{name}.json';dest.parent.mkdir(parents=True,exist_ok=True)
     dest.write_text(clip_text(result))
     (OUT/'exports').mkdir(exist_ok=True);(OUT/'exports'/f'{name.split("/")[-1]}.json').write_text(clip_text(result))
     return result
