@@ -143,6 +143,13 @@ public final class ModAttachments {
             "disguise_identity",()->AttachmentType.builder(()->com.codex.blacklight.disguise.DisguiseIdentity.EMPTY)
                     .serialize(com.codex.blacklight.disguise.DisguiseIdentity.CODEC).copyOnDeath()
                     .sync(com.codex.blacklight.disguise.DisguiseIdentity.STREAM_CODEC).build());
+    public static final Supplier<AttachmentType<com.codex.blacklight.disguise.DisguiseLibrary>> DISGUISE_LIBRARY=ATTACHMENTS.register(
+            "disguise_library",()->AttachmentType.builder(()->com.codex.blacklight.disguise.DisguiseLibrary.EMPTY)
+                    .serialize(com.codex.blacklight.disguise.DisguiseLibrary.CODEC).copyOnDeath()
+                    .syncOwner(com.codex.blacklight.disguise.DisguiseLibrary.STREAM_CODEC).build());
+    public static final Supplier<AttachmentType<Long>> SPECIES_READY_AT=ATTACHMENTS.register(
+            "species_ready_at",()->AttachmentType.builder(()->0L).serialize(com.mojang.serialization.Codec.LONG)
+                    .copyOnDeath().sync(com.codex.blacklight.forge.codec.ByteBufCodecs.VAR_LONG).build());
     public static final Supplier<AttachmentType<com.codex.blacklight.disguise.DisguiseMorph>> DISGUISE_MORPH=ATTACHMENTS.register(
             "disguise_morph",()->AttachmentType.builder(()->com.codex.blacklight.disguise.DisguiseMorph.EMPTY)
                     .sync(com.codex.blacklight.disguise.DisguiseMorph.CODEC).build());
@@ -217,8 +224,9 @@ public final class ModAttachments {
         if (type.syncCodec() == null) return;
         String name = ATTACHMENTS.types.entrySet().stream().filter(field -> field.getValue() == type)
                 .map(Map.Entry::getKey).findFirst().orElseThrow();
-        PacketDistributor.sendToPlayersTrackingEntityAndSelf(entity, packet(entity,
-                Map.of(name, encodeField(entity, type))));
+        var update=packet(entity,Map.of(name,encodeField(entity,type)));
+        if(type.ownerOnly()) { if(entity instanceof ServerPlayer owner)PacketDistributor.sendToPlayer(owner,update); }
+        else PacketDistributor.sendToPlayersTrackingEntityAndSelf(entity,update);
     }
 
     private static AttachmentSyncPayload packet(Entity entity, Map<String, byte[]> fields) {
@@ -229,7 +237,7 @@ public final class ModAttachments {
         if (!available(entity)) return;
         Map<String, byte[]> fields = new LinkedHashMap<>();
         ATTACHMENTS.types.forEach((name, type) -> {
-            if (type.syncCodec() != null && (entity instanceof Player || storage(entity).has(type)))
+            if (type.syncCodec() != null && (!type.ownerOnly() || entity==observer) && (entity instanceof Player || storage(entity).has(type)))
                 fields.put(name, encodeField(entity, type));
         });
         if (!fields.isEmpty()) PacketDistributor.sendToPlayer(observer, packet(entity, Map.copyOf(fields)));
