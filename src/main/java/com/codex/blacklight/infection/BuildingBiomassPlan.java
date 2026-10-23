@@ -145,6 +145,8 @@ public final class BuildingBiomassPlan {
             if(!Double.isFinite(radius+tip)||radius<=0||radius>4||tip<=0||tip>4||parent>=i||parent< -1||duration<1||duration>24000||delay<0||delay>24000)return null;
             stems.add(new Stem(points,radius,tip,delay,duration,parent));supports.add(BlockPos.of(n.getLong("support")));
         }
-        return new BuildingBiomassPlan(stems,supports);
+        var plan=new BuildingBiomassPlan(stems,supports);
+        try { plan.cells(); return plan; }
+        catch (IllegalArgumentException oversized) { return null; }
     }
 }

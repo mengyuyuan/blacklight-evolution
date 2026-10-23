@@ -37,7 +37,9 @@ public final class BuildingInfectionCoreBlock extends HorizontalDirectionalBlock
         return net.minecraft.world.InteractionResult.sidedSuccess(level.isClientSide);
     }
     @Override protected void onPlace(BlockState state, Level level, BlockPos pos, BlockState old, boolean moving) {
-        if (!old.is(this) && level instanceof ServerLevel server) BuildingInfectionSystem.register(server, pos);
+        if (!old.is(this) && level instanceof ServerLevel server
+                && !com.codex.blacklight.infection.NaturalInfectionPlacement.defersRegistration(server, pos))
+            BuildingInfectionSystem.register(server, pos);
     }
     @Override protected void onRemove(BlockState state, Level level, BlockPos pos, BlockState next, boolean moving) {
         if (!next.is(this) && level instanceof ServerLevel server) BuildingInfectionSystem.destroy(server, pos);

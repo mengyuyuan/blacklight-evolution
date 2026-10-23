@@ -1,0 +1,54 @@
+name: Closeout audit
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: closeout-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  server-audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - name: Select platform
+        id: platform
+        shell: bash
+        run: |
+          if grep -q '^minecraft_version=1.21.1' gradle.properties; then
+            echo 'java=21' >> "$GITHUB_OUTPUT"
+            echo 'extra=-PreleaseAuditTest -PbuildingBiomassTest' >> "$GITHUB_OUTPUT"
+          else
+            echo 'java=17' >> "$GITHUB_OUTPUT"
+            echo 'extra=-PentityLifecycleTest' >> "$GITHUB_OUTPUT"
+          fi
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: ${{ steps.platform.outputs.java }}
+      - uses: gradle/actions/setup-gradle@v4
+      - name: Run combined server regression suites
+        shell: bash
+        run: |
+          bash ./gradlew --no-daemon --max-workers=1 -Dorg.gradle.jvmargs=-Xmx1G \
+            -I tools/closeout_audit.init.gradle \
+            -PstandaloneTest -PwallTraversalTest -PhydraReleaseTest -PhiveFeedingTest \
+            -PcityTest -PfeedbackTest ${{ steps.platform.outputs.extra }} \
+            -PgameTestMaxHeap=2G -PgameTestRunDirectory=build/closeout-gametest \
+            runGameTestServer 2>&1 | tee closeout-server.log
+          grep -Eq 'All [1-9][0-9]* required tests passed' closeout-server.log
+      - name: Preserve audit evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: closeout-server-audit
+          path: |
+            closeout-server.log
+            build/closeout-gametest/logs/latest.log
+            build/test-results/**/*.xml

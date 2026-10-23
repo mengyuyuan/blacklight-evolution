@@ -47,7 +47,7 @@ public final class HiveFeedingGameTest {
         prey.getAttribute(Attributes.MOVEMENT_SPEED).setBaseValue(0);level.addFreshEntity(prey);
         return new Scene(host,core,prey,home);
     }
-    @GameTest(template="wall_test",timeoutTicks=600)
+    @GameTest(template="wall_test",timeoutTicks=600,batch="hive_feeding_footprint")
     public static void fixedHiveFeedsOnceWithoutMovingBoss(GameTestHelper h){
         var s=scene(h,0);Vec3 start=s.host.position();
         // Forced chunk/entity activation is asynchronous. Phase assertions use
@@ -62,12 +62,12 @@ public final class HiveFeedingGameTest {
         h.runAfterDelay(140,()->{
             h.assertTrue(!s.prey.isAlive(),"absorption must finish");
             h.assertTrue(DevourerFeedingSystem.meals(s.host)==1&&DevourerFeedingSystem.biomass(s.host)==2,"one cow credits exactly one meal and two biomass units");
-            h.assertTrue(s.host.position().distanceToSqr(start)<.01,"boss must not chase or lift prey");
+            h.assertTrue(s.host.position().distanceToSqr(start)<.01,"boss must not chase or lift prey: displacement="+s.host.position().subtract(start));
             h.assertTrue(!DevourerFeedingSystem.active(s.host),"session must be released after completion");s.cleanup();h.succeed();
         });
             });
     }
-    @GameTest(template="wall_test",timeoutTicks=160)
+    @GameTest(template="wall_test",timeoutTicks=160,batch="hive_feeding_footprint")
     public static void severedTendrilReleasesPreyWithoutReward(GameTestHelper h){
         var s=scene(h,1);
         // Forced chunks can activate after fixture creation. Cut during actual
@@ -82,7 +82,7 @@ public final class HiveFeedingGameTest {
             h.assertTrue(parts.stream().allMatch(HiveTendril::isRemoved),"all temporary hitboxes must be discarded");s.cleanup();h.succeed();
         }));
     }
-    @GameTest(template="wall_test",timeoutTicks=600)
+    @GameTest(template="wall_test",timeoutTicks=600,batch="hive_feeding_footprint")
     public static void brokenActivePortAbortsEvenWithOtherNodes(GameTestHelper h){
         var s=scene(h,2);
         h.runAfterDelay(45,()->h.getLevel().setBlock(HiveFeedingMotion.node(s.home,0),Blocks.AIR.defaultBlockState(),3));
@@ -92,7 +92,7 @@ public final class HiveFeedingGameTest {
             h.assertTrue(DevourerFeedingSystem.biomass(s.host)==0,"destroyed mouth grants no credit");s.cleanup();h.succeed();
         });
     }
-    @GameTest(template="wall_test",timeoutTicks=150)
+    @GameTest(template="wall_test",timeoutTicks=150,batch="hive_feeding_footprint")
     public static void solidWallPreventsAcquisition(GameTestHelper h){
         var s=scene(h,3);
         // Leave only western/eastern ports supplied; the eastern one is outside reach.
@@ -104,7 +104,7 @@ public final class HiveFeedingGameTest {
             h.assertTrue(!s.prey.isNoGravity()&&DevourerFeedingSystem.meals(s.host)==0,"occluded prey stays free");s.cleanup();h.succeed();
         });
     }
-    @GameTest(template="wall_test",timeoutTicks=150)
+    @GameTest(template="wall_test",timeoutTicks=150,batch="hive_feeding_footprint")
     public static void disappearingCoreRestoresExistingGravityFlag(GameTestHelper h){
         var s=scene(h,4);s.prey.setNoGravity(true);
         h.runAfterDelay(40,()->s.core.discard());

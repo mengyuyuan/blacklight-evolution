@@ -69,6 +69,7 @@ public final class CreatureCombatGameTest {
         var ordinary=damageEvent(p,source,14);
         h.assertTrue(Math.abs(ordinary.getAmount()-13.44F)<.001,"ordinary players get the reduced duel damage");
         p.getData(ModAttachments.PLAYER_STATE).infect();
+        p.getData(ModAttachments.PLAYER_STATE).setPrototypeMode(true);
         float difficulty=switch(p.level().getDifficulty()){case EASY->.75F;case HARD->1.5F;default->1;};
         float expected=com.codex.blacklight.combat.HunterBalance.infectedDamage(22.4F,CreatureAttack.SLAM,difficulty);
         h.assertTrue(Math.abs(damageEvent(p,source,14).getAmount()-expected)<.001,"registered handler applies hunter budget exactly once");

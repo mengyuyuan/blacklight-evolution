@@ -140,7 +140,7 @@ public final class WeaponCombatGameTest {
                 p.tickCount++;float last=target.getHealth();WeaponCombatSystem.tick(new PlayerTickEvent.Post(p));
                 if(target.getHealth()<last){hits++;h.assertTrue(move.contactIndex(t)>=0,"adapted contact is in server window: "+move);}
             }
-            h.assertTrue(hits==1&&Math.abs(before-target.getHealth()-move.damage)<.01,"one damage event for "+move+", got "+hits);
+            h.assertTrue(hits==1&&Math.abs(before-target.getHealth()-move.damageFor(referenced.form))<.01,"one damage event for "+move+", got "+hits);
             h.assertTrue(!WeaponCombatSystem.busy(p),"adapted recovery ends: "+move);
             target.discard();
         }
