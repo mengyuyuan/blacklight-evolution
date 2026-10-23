@@ -22,14 +22,18 @@ public final class BuildingBiomassGameTest {
         final ServerLevel level;final BuildingInfectionData data;final BlockPos origin;
         final List<BuildingInfectionData.Colony> previous;final BuildingInfectionData.Colony colony;
         final boolean grief,spawns;
+        final java.util.Map<BlockPos,net.minecraft.world.level.block.state.BlockState> terrain=new java.util.LinkedHashMap<>();
+        void block(BlockPos pos,net.minecraft.world.level.block.state.BlockState state) {
+            terrain.putIfAbsent(pos.immutable(),level.getBlockState(pos));level.setBlock(pos,state,2);
+        }
         Fixture(GameTestHelper h) {
             level=h.getLevel();data=BuildingInfectionData.get(level);previous=new ArrayList<>(data.colonies);data.colonies.clear();
             grief=level.getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING);spawns=level.getGameRules().getBoolean(GameRules.RULE_DOMOBSPAWNING);
             level.getGameRules().getRule(GameRules.RULE_MOBGRIEFING).set(true,level.getServer());
             level.getGameRules().getRule(GameRules.RULE_DOMOBSPAWNING).set(false,level.getServer());
             origin=h.absolutePos(new BlockPos(8,80,8));
-            for(int x=-12;x<=12;x++)for(int z=-12;z<=2;z++)level.setBlock(origin.offset(x,-1,z),Blocks.STONE.defaultBlockState(),2);
-            for(int x=-10;x<=10;x++)for(int y=0;y<=30;y++)level.setBlock(origin.offset(x,y,1),Blocks.STONE_BRICKS.defaultBlockState(),2);
+            for(int x=-12;x<=12;x++)for(int z=-12;z<=2;z++)block(origin.offset(x,-1,z),Blocks.STONE.defaultBlockState());
+            for(int x=-10;x<=10;x++)for(int y=0;y<=30;y++)block(origin.offset(x,y,1),Blocks.STONE_BRICKS.defaultBlockState());
             level.setBlock(origin,ModBlocks.BUILDING_CORE.get().defaultBlockState(),3);
             h.assertTrue(data.colonies.size()==1,"one real building core");colony=data.colonies.getFirst();
             colony.activeTicks=12000;colony.stage=3;
@@ -43,6 +47,7 @@ public final class BuildingBiomassGameTest {
             colony.dead=true;
             for(var c:colony.mass.cells()){var p=origin.offset(c.x(),c.y(),c.z());if(level.getBlockState(p).is(ModBlocks.BUILDING_BIOMASS.get()))level.removeBlock(p,false);}
             level.removeBlock(origin,false);data.colonies.clear();data.colonies.addAll(previous);data.setDirty();
+            terrain.forEach((pos,state)->level.setBlock(pos,state,2));
             level.getGameRules().getRule(GameRules.RULE_MOBGRIEFING).set(grief,level.getServer());
             level.getGameRules().getRule(GameRules.RULE_DOMOBSPAWNING).set(spawns,level.getServer());
         }
@@ -140,7 +145,7 @@ public final class BuildingBiomassGameTest {
     public static void streetCableRequiresAndTracksTheOtherBuilding(GameTestHelper h) {
         try(var f=new Fixture(h)) {
             h.assertTrue(f.colony.mass.supports.stream().noneMatch(p->p.getZ()<f.origin.getZ()-8),"no imaginary street anchor without a second building");
-            for(int x=-7;x<=7;x++)for(int y=0;y<=30;y++)f.level.setBlock(f.origin.offset(x,y,-22),Blocks.STONE_BRICKS.defaultBlockState(),2);
+            for(int x=-7;x<=7;x++)for(int y=0;y<=30;y++)f.block(f.origin.offset(x,y,-22),Blocks.STONE_BRICKS.defaultBlockState());
             f.colony.mass=null;f.colony.massAttempt=0;BuildingBiomassSystem.step(f.level,f.colony);
             int cable=-1;
             for(int i=0;i<f.colony.mass.supports.size();i++)if(f.colony.mass.supports.get(i).getZ()<f.origin.getZ()-8)cable=i;

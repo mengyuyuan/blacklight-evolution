@@ -21,9 +21,9 @@ public final class TissueSourceBlock extends Block {
         if (!level.hasChunkAt(target) || !level.getWorldBorder().isWithinBounds(target)
                 || level.isOutsideBuildHeight(target) || !level.isEmptyBlock(target)
                 || !state.isFaceSturdy(level, pos, outward)) return;
-        level.setBlock(target, ModBlocks.TISSUE_ATTACHMENT.get().defaultBlockState()
+        if (!com.codex.blacklight.infection.NaturalInfectionPlacement.place(level,target, ModBlocks.TISSUE_ATTACHMENT.get().defaultBlockState()
                 .setValue(TissueAttachmentBlock.FACING, outward.getOpposite())
-                .setValue(TissueAttachmentBlock.VARIANT, random.nextInt(3)), 3);
+                .setValue(TissueAttachmentBlock.VARIANT, random.nextInt(3)))) return;
         com.codex.blacklight.infection.BuildingInfectionSystem.considerNaturalCore(level,target,random);
     }
 }

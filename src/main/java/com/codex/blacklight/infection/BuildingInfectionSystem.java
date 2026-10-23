@@ -18,7 +18,7 @@ import net.neoforged.neoforge.event.tick.LevelTickEvent;
 public final class BuildingInfectionSystem {
     private BuildingInfectionSystem() {}
 
-    private static boolean allowedSite(ServerLevel level, BlockPos p) {
+    static boolean allowedSite(ServerLevel level, BlockPos p) {
         if (!CityTravel.isCity(level.dimension())) return true;
         if (!CityConfig.SPREAD.get() || !CityData.get(level).spread) return false;
         if (CitySystem.futian(level) && FutianLayout.sanctuary(p.getX(), p.getZ())) return false;
@@ -79,8 +79,8 @@ public final class BuildingInfectionSystem {
         for (var c : data.colonies)
             if (Math.abs(c.origin.getX()-tissue.getX()) <= BuildingInfectionConfig.RADIUS.get()*2
                     && Math.abs(c.origin.getZ()-tissue.getZ()) <= BuildingInfectionConfig.RADIUS.get()*2) return;
-        level.setBlock(tissue, ModBlocks.BUILDING_CORE.get().defaultBlockState()
-                .setValue(BuildingInfectionCoreBlock.FACING, support.getOpposite()), 3);
+        NaturalInfectionPlacement.place(level,tissue, ModBlocks.BUILDING_CORE.get().defaultBlockState()
+                .setValue(BuildingInfectionCoreBlock.FACING, support.getOpposite()));
     }
     @SubscribeEvent public static void tick(LevelTickEvent.Post event) {
         if (event.getLevel() instanceof ServerLevel level && level.getGameTime() % 5 == 0) advance(level);
@@ -162,7 +162,7 @@ public final class BuildingInfectionSystem {
                 .setValue(TissueAttachmentBlock.AGE,0)
                 .setValue(TissueAttachmentBlock.VARIANT,pattern.variant());
         // Do not erase an older patch when the frontier encounters it.
-        if(previous.isAir()) level.setBlock(pos,tissue,3);
+        if(previous.isAir() && !NaturalInfectionPlacement.place(level,pos,tissue)) return;
         c.surfaces.add(key);
     }
     private static void ageSurface(ServerLevel level, BuildingInfectionData.Colony c) {

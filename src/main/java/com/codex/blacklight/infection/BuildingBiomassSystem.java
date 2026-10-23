@@ -36,7 +36,8 @@ public final class BuildingBiomassSystem {
         var cell=cells.get(Math.floorMod(c.massCursor++,cells.size()));var pos=c.origin.offset(cell.x(),cell.y(),cell.z());
         if(c.severed.contains(pos.asLong())||level.isOutsideBuildHeight(pos)||!level.getWorldBorder().isWithinBounds(pos)
                 ||Math.abs(cell.x())>BuildingInfectionConfig.RADIUS.get()||Math.abs(cell.z())>BuildingInfectionConfig.RADIUS.get()
-                ||Math.abs(cell.y())>BuildingInfectionConfig.HEIGHT.get()||!level.hasChunkAt(pos)||!level.isPositionEntityTicking(pos))return;
+                ||Math.abs(cell.y())>BuildingInfectionConfig.HEIGHT.get()||!level.hasChunkAt(pos)||!level.isPositionEntityTicking(pos)
+                ||!BuildingInfectionSystem.allowedSite(level,pos))return;
         var before=level.getBlockState(pos);boolean own=before.is(ModBlocks.BUILDING_BIOMASS.get());
         if(!own&&!before.isAir()&&!before.is(ModBlocks.TISSUE_ATTACHMENT.get()))return;
         int age=(int)Math.min(24000,12000L*c.activeTicks/(BuildingInfectionConfig.MATURITY.get()*20L));

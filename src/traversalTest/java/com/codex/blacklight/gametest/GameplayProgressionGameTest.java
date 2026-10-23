@@ -51,6 +51,7 @@ public final class GameplayProgressionGameTest {
         var tag=new CompoundTag();hive.addAdditionalSaveData(tag);tag.putInt("BlacklightWaves",3);tag.putInt("BlacklightWaveCooldown",0);hive.readAdditionalSaveData(tag);
         var saved=new CompoundTag();hive.addAdditionalSaveData(saved);var restored=ModEntities.BLACKLIGHT_HIVE.get().create(h.getLevel());restored.readAdditionalSaveData(saved);
         h.assertTrue(restored.waves()==3,"saved exhausted hive cannot reset waves");
+        state.setPrototypeMode(true);
         hive.hurt(p.damageSources().playerAttack(p),1000);int ep=state.getEvolutionPoints(),bio=state.getBiomass();hive.die(p.damageSources().playerAttack(p));
         h.assertTrue(ep==180&&bio==500&&state.getEvolutionPoints()==ep&&state.getBiomass()==bio,"one clear produces exactly one reward");hive.discard();restored.discard();h.succeed();
     }
