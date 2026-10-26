@@ -20,7 +20,7 @@ public final class TissueGrapples {
     private TissueGrapples(){}
     public static boolean grab(BlacklightInfectedHost host,LivingEntity target,int duration) {
         if(host.level().isClientSide||host==target||!host.isAlive()||!target.isAlive()
-                ||Math.max(host.organPower(TissueCore.GRASP),Math.max(host.organPower(TissueCore.CHELA),host.organPower(TissueCore.HYDROSTAT)))<=0
+                ||Math.max(host.organPower(TissueCore.TONGUE),Math.max(host.organPower(TissueCore.GRASP),Math.max(host.organPower(TissueCore.CHELA),host.organPower(TissueCore.HYDROSTAT))))<=0
                 ||TissueCompetition.controls(target)||TissueCompetition.controls(host)||ConsumeSystem.grappleProtected(target)||target.isPassenger()||target.isVehicle()
                 ||target.getData(ModAttachments.CONSUME_VISUAL).active()
                 ||target instanceof Player p&&(p.isCreative()||p.isSpectator())
@@ -41,7 +41,7 @@ public final class TissueGrapples {
                 ||target.getData(ModAttachments.CONSUME_VISUAL).active()
                 ||target instanceof Player player&&(player.isCreative()||player.isSpectator())
                 ||target.isPassenger()||target.isVehicle()
-                ||target.distanceTo(host)>host.getBbWidth()+host.tissueOrganReach()+2||!host.hasLineOfSight(target)) {
+                ||target.distanceTo(host)>host.getBbWidth()+Math.max(host.tissueOrganReach(),host.organActionCore()==TissueCore.TONGUE?TissueOrganCycle.reach(TissueCore.TONGUE):0)+2||!host.hasLineOfSight(target)) {
             HOLDS.remove(target);return null;
         }
         return host;

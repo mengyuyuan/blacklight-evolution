@@ -28,7 +28,7 @@ class TissueFunctionalTest {
         var old=List.of(TissueCore.MUSCLE,TissueCore.CARAPACE,TissueCore.JAW,TissueCore.GRASP,TissueCore.CREST);
         for(long seed=-1000;seed<1000;seed++)assertEquals(old.get((int)(TissueGrowth.sample(TissueGrowth.mix(seed),846)*5)),TissueCore.forSeed(seed));
         assertEquals(72,TissueOrganCatalog.ALL.size());assertEquals(72,TissueOrganCatalog.ALL.stream().map(TissueOrganCatalog.Definition::id).distinct().count());
-        assertEquals(12,TissueOrganCatalog.ALL.stream().filter(TissueOrganCatalog.Definition::implemented).count());
+        assertEquals(16,TissueOrganCatalog.ALL.stream().filter(TissueOrganCatalog.Definition::implemented).count());
         assertNull(TissueOrganCatalog.get("venom_gland").runtime(),"a planned gland cannot pretend to have venom combat");
     }
     @Test void newNaturalDonorsAreReachableAndCompatibleWithoutSpeciesWhitelists(){
@@ -47,7 +47,7 @@ class TissueFunctionalTest {
     }
     @Test void eachFunctionalModuleHasAnActualBoundedConnectedStructureOnItsOwnSocket(){
         for(var core:TissueCore.values())if(!core.legacy()){
-            int role=switch(core){case HORN,PHARYNX->1;case TENDON->4;default->2;};var b=bone(role);
+            int role=switch(core){case HORN,PHARYNX,TONGUE->1;case TENDON->4;default->2;};var b=bone(role);
             var meshes=functional(core,b,0,42);assertFalse(meshes.isEmpty(),core.toString());
             assertTrue(meshes.stream().mapToInt(m->m.faces().length).sum()<200);
             for(var mesh:meshes){
@@ -59,8 +59,8 @@ class TissueFunctionalTest {
         }
     }
     @Test void locomotorAndWeaponMotionDoesNotDetachTheRootAndActuallyChangesTheDistalStructure(){
-        for(var core:List.of(TissueCore.TENDON,TissueCore.HYDRAULIC,TissueCore.HYDROSTAT,TissueCore.BLADE,TissueCore.CHELA,TissueCore.PHARYNX)){
-            var b=bone(core==TissueCore.TENDON?4:core==TissueCore.PHARYNX?1:2);var mesh=functional(core,b,0,42).getFirst();
+        for(var core:List.of(TissueCore.TENDON,TissueCore.HYDRAULIC,TissueCore.HYDROSTAT,TissueCore.BLADE,TissueCore.CHELA,TissueCore.PHARYNX,TissueCore.SADDLE,TissueCore.CLUB,TissueCore.TONGUE,TissueCore.CNIDOCYTE)){
+            var b=bone(core==TissueCore.TENDON?4:core==TissueCore.PHARYNX||core==TissueCore.TONGUE?1:2);var mesh=functional(core,b,0,42).getFirst();
             float[] rest=mesh.stages()[2].clone(),moving=rest.clone();
             TissueFunctionalMotion.apply(rest,b,mesh.name(),core,-1,0);
             TissueFunctionalMotion.apply(moving,b,mesh.name(),core,TissueOrganCycle.cycle(core).contact(),.5F);

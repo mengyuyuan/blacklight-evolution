@@ -16,6 +16,7 @@ import java.util.*;
 /** Complete donor body regions rooted in the receiver's animated native trunk. */
 final class ChimeraTissue {
     private static final ResourceLocation TEXTURE=ResourceLocation.fromNamespaceAndPath("blacklight","textures/entity/tissue_anatomy.png");
+    private static final List<TissueCore> UPPER_ORGANS=List.of(TissueCore.BLADE,TissueCore.CHELA,TissueCore.HYDROSTAT,TissueCore.HORN,TissueCore.PHARYNX,TissueCore.SADDLE,TissueCore.CLUB,TissueCore.TONGUE,TissueCore.CNIDOCYTE);
     private record DonorVisual(TissueChimera.Body body,List<RenderType> materials,ProceduralTissueBlueprint.Snapshot skeleton,Map<String,Matrix4f> bindPoses){}
     private record UpperModule(TissueCore core,String species,TissueMorphogenesis.Mesh mesh,TissueMorphogenesis.Bone frame,Matrix4f bonePose,TissueChimera.Piece rest,boolean support){}
     private record Remodel(TissueMorphogenesis.Bone frame,Matrix4f posed,Matrix4f inverse){}
@@ -45,7 +46,7 @@ final class ChimeraTissue {
         return inherited;
     }
     static boolean routed(BlacklightInfectedHost host,TissueCore core){
-        if(core!=TissueCore.BLADE&&core!=TissueCore.CHELA&&core!=TissueCore.HYDROSTAT&&core!=TissueCore.HORN&&core!=TissueCore.PHARYNX)return false;
+        if(!UPPER_ORGANS.contains(core))return false;
         var cached=CACHE.get(host.getUUID());if(cached==null||!cached.assembly.uprightUpper())return false;
         return cached.modules.stream().anyMatch(m->{var source=host.tissueInheritance().sources().get(m.species);return m.core==core&&source!=null&&TissueChimera.growth(source,0)>=.999F;});
     }
@@ -98,9 +99,9 @@ final class ChimeraTissue {
         if(assembly.upper()==null)return List.of();
         String species=assembly.pieces().stream().filter(p->p.name().equals("upper_body_fusion")).map(TissueChimera.Piece::species).findFirst().orElse("");
         var visual=visuals.get(species);if(visual==null)return List.of();var result=new ArrayList<UpperModule>();long seed=TissueOrgans.seed(host.getUUID());
-        for(var core:new TissueCore[]{TissueCore.BLADE,TissueCore.CHELA,TissueCore.HYDROSTAT,TissueCore.HORN,TissueCore.PHARYNX}){
-            boolean head=core==TissueCore.HORN||core==TissueCore.PHARYNX;
-            int side=(core==TissueCore.BLADE?1:-1)*TissueOrganLayout.bladeSide(seed);
+        for(var core:UPPER_ORGANS){
+            boolean head=core==TissueCore.HORN||core==TissueCore.PHARYNX||core==TissueCore.TONGUE;
+            int side=(core==TissueCore.BLADE||core==TissueCore.CLUB?1:-1)*TissueOrganLayout.bladeSide(seed);
             var arm=visual.skeleton.body().parts().stream().filter(p->head?p.role()==1:p.role()==2||p.role()==3).filter(p->head||side*TissueChimera.bounds(p.vertices()).centre().x()>0)
                     .max(Comparator.comparingDouble(p->{var b=TissueChimera.bounds(p.vertices());return b.span(0)*b.span(1)*b.span(2);})).orElse(null);
             if(arm==null)continue;var box=TissueChimera.bounds(arm.vertices());
@@ -163,6 +164,8 @@ final class ChimeraTissue {
         if(part!=nativeBody.anchor()||this.pose!=null)return;
         var copy=new PoseStack();copy.last().pose().set(pose.pose());copy.last().normal().set(pose.normal());this.pose=copy.last();this.light=light;this.overlay=overlay;
     }
+    private Matrix4f worldRelativePose;
+    void worldPose(Matrix4f pose){worldRelativePose=new Matrix4f(pose);}
     void flush(MultiBufferSource buffers){
         if(pose==null)return;var inverse=new Matrix4f(nativeBody.bind()).invert();
         float walk=host.walkAnimation.position(partial)*.6662F,speed=Math.clamp(host.walkAnimation.speed(partial)*2,0,1),attack=(float)Math.sin(Math.PI*host.getAttackAnim(partial));
@@ -188,7 +191,13 @@ final class ChimeraTissue {
             TissueFunctionalMotion.apply(vertices,module.frame,module.mesh.name(),module.core,time,0);TissueSkin.rootedScale(vertices,expression);
             var points=new ArrayList<TissueMorphogenesis.V>();for(int i=0;i<vertices.length;i+=3){var v=module.bonePose.transformPosition(new Vector3f(vertices[i],vertices[i+1],vertices[i+2]));points.add(assembly.upper().point(new TissueMorphogenesis.V(v.x,v.y,v.z)));}
             var p=module.rest;var moving=new TissueChimera.Piece(p.species(),p.name(),p.role(),p.pivot(),p.root(),points,p.faces(),p.uv(),p.colors(),p.material());
-            draw(moving,TissueChimera.pose(moving,growth,walk,speed,attack,host.tickCount+partial,yaw),buffers.getBuffer(RenderType.entityCutoutNoCull(TEXTURE)),inverse,-1);
+            var articulated=TissueChimera.pose(moving,growth,walk,speed,attack,host.tickCount+partial,yaw);
+            if(module.core==TissueCore.TONGUE){
+                float[] aligned=new float[articulated.size()*3];for(int i=0;i<articulated.size();i++){var v=articulated.get(i);aligned[i*3]=v.x();aligned[i*3+1]=v.y();aligned[i*3+2]=v.z();}
+                TissueTongueRender.aim(host,partial,aligned,new Matrix4f(pose.pose()).scale(1/16F).mul(inverse),worldRelativePose);
+                var fitted=new ArrayList<TissueMorphogenesis.V>();for(int i=0;i<aligned.length;i+=3)fitted.add(new TissueMorphogenesis.V(aligned[i],aligned[i+1],aligned[i+2]));articulated=fitted;
+            }
+            draw(moving,articulated,buffers.getBuffer(RenderType.entityCutoutNoCull(TEXTURE)),inverse,-1);
         }pose=null;
     }
     private void draw(TissueChimera.Piece piece,List<TissueMorphogenesis.V> vertices,VertexConsumer out,Matrix4f inverse,int override){

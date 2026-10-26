@@ -6,7 +6,7 @@ public final class TissueFunctionalMotion {
     private TissueFunctionalMotion(){}
     public static void apply(float[] vertices,Bone bone,String name,TissueCore core,float time,float feeding){
         if(vertices.length<48||bone==null)return;
-        if(core==TissueCore.HORN||time<0&&core!=TissueCore.PHARYNX)return;
+        if(core==TissueCore.HORN||time<0&&core!=TissueCore.PHARYNX&&core!=TissueCore.TONGUE)return;
         bone=TissueMorphogenesis.functionalFrame(bone);
         V root=new V(0,0,0);for(int i=0;i<24;i+=3)root=root.add(new V(vertices[i],vertices[i+1],vertices[i+2]));root=root.mul(.125F);
         var cycle=TissueOrganCycle.cycle(core);float effort=cycle.effort(time),strike=time<0?0:TissueOrganCycle.smooth((time-cycle.windup())/Math.max(1,cycle.contact()-cycle.windup()));
@@ -40,6 +40,14 @@ public final class TissueFunctionalMotion {
             if(core==TissueCore.PHARYNX){float extension=(float)Math.sin(Math.PI*Math.clamp(feeding,0,1));
                 // Completely folded into the mouth at rest. Extension and return share one curve.
                 p=root.add(d.mul(.12F+.88F*extension)).add(bone.forward().mul(2.4F*extension*flex));}
+            if(core==TissueCore.SADDLE)p=p.add(bone.up().mul(d.dot(bone.up())*-.20F*effort*flex)).add(bone.forward().mul(width*(strike*.85F-effort*.2F)*flex));
+            if(core==TissueCore.CLUB){
+                float angle=(-.45F*effort+1.05F*strike)*flex;
+                V rotated=d.mul((float)Math.cos(angle)).add(bone.right().cross(d).mul((float)Math.sin(angle)))
+                        .add(bone.right().mul(bone.right().dot(d)*(1-(float)Math.cos(angle))));p=root.add(rotated);
+            }
+            if(core==TissueCore.TONGUE)p=root.add(d.mul(.12F+.88F*strike));
+            if(core==TissueCore.CNIDOCYTE){V axis=bone.up().mul(d.dot(bone.up()));p=root.add(axis).add(d.sub(axis).mul(1+(.24F*effort-.15F*strike)*flex));}
             vertices[i]=p.x();vertices[i+1]=p.y();vertices[i+2]=p.z();
         }
     }

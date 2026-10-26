@@ -4,7 +4,8 @@ package com.codex.blacklight.infection;
 public enum TissueCore {
     MUSCLE("organ_muscle"), CARAPACE("organ_carapace"), JAW("organ_jaw"), GRASP("organ_grasp"), CREST("organ_crest"),
     TENDON("elastic_tendon"), HYDRAULIC("hydraulic_extensor"), HYDROSTAT("muscular_hydrostat"),
-    BLADE("cutting_blade"), CHELA("chela"), HORN("ramming_horn"), PHARYNX("pharyngeal_jaw");
+    BLADE("cutting_blade"), CHELA("chela"), HORN("ramming_horn"), PHARYNX("pharyngeal_jaw"),
+    SADDLE("saddle_spring"), CLUB("dactyl_club"), TONGUE("ballistic_tongue"), CNIDOCYTE("cnidocyte_battery");
     public final String id;
     TissueCore(String id){this.id=id;}
     /** Frozen aggregate.2 mapping. Never use the expanded enum length here. */
@@ -13,7 +14,7 @@ public enum TissueCore {
     public String key(){return "blacklight:"+id;}
     public TissueCore structuralBias(){return switch(this){
         case TENDON,HYDRAULIC->MUSCLE;case HYDROSTAT,CHELA,BLADE->GRASP;
-        case HORN->CARAPACE;case PHARYNX->JAW;default->this;
+        case HORN->CARAPACE;case PHARYNX,TONGUE->JAW;case SADDLE,CLUB->MUSCLE;case CNIDOCYTE->GRASP;default->this;
     };}
     private static final int[][] VISUAL_SEEDS=visualSeeds();
     /** Four shapes per primary organ: a finite cache that cannot silently
@@ -29,9 +30,9 @@ public enum TissueCore {
     }
     public static TissueCore byId(String id){for(var core:values())if(core.id.equals(id)||core.key().equals(id))return core;return null;}
     public static TissueCore forNewHost(long seed,int plan,boolean water){
-        TissueCore[] choices=water?new TissueCore[]{MUSCLE,CARAPACE,JAW,GRASP,CREST,HYDROSTAT,PHARYNX}
-                :plan==2?new TissueCore[]{MUSCLE,CARAPACE,JAW,GRASP,CREST,HYDRAULIC,CHELA,BLADE}
-                :new TissueCore[]{MUSCLE,CARAPACE,JAW,GRASP,CREST,TENDON,HYDROSTAT,BLADE,CHELA,HORN,PHARYNX};
+        TissueCore[] choices=water?new TissueCore[]{MUSCLE,CARAPACE,JAW,GRASP,CREST,HYDROSTAT,PHARYNX,TONGUE,CNIDOCYTE}
+                :plan==2?new TissueCore[]{MUSCLE,CARAPACE,JAW,GRASP,CREST,HYDRAULIC,CHELA,BLADE,SADDLE,CNIDOCYTE}
+                :new TissueCore[]{MUSCLE,CARAPACE,JAW,GRASP,CREST,TENDON,HYDROSTAT,BLADE,CHELA,HORN,PHARYNX,SADDLE,CLUB,TONGUE,CNIDOCYTE};
         return choices[(int)(TissueGrowth.sample(TissueGrowth.mix(seed),1846)*choices.length)];
     }
     public static int quality(long age){return age>=816000?3:age>=240000?2:age>=72000?1:0;}

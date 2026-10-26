@@ -52,6 +52,8 @@ final class AnatomicalTissue {
     private final boolean procedural,organsOnly;
     private final TissueEvolution.State evolution;
     private final TissueMotion.State[] motionStates=new TissueMotion.State[4];
+    private org.joml.Matrix4f worldRelativePose;
+    void worldPose(org.joml.Matrix4f pose){worldRelativePose=new org.joml.Matrix4f(pose);}
 
     private AnatomicalTissue(BlacklightInfectedHost host, List<Region> regions, ResourceLocation skin, float partial,boolean procedural,boolean organsOnly) {
         this.host = host; this.regions = regions; this.skin = skin; this.partial = partial;
@@ -148,10 +150,13 @@ final class AnatomicalTissue {
             regions=List.copyOf(resolved);
         }
         var layout=TissueOrganLayout.fit(regions.stream().map(Region::frame).filter(Objects::nonNull).toList(),seed);
+        var expressed=java.util.EnumSet.noneOf(TissueCore.class);
+        for(var core:genome.organs().keySet())if(!core.legacy())expressed.add(core);
+        if(host.knownNativeTissueCore()!=null&&!host.knownNativeTissueCore().legacy())expressed.add(host.knownNativeTissueCore());
         var functional=new ArrayList<Region>();int faceBudget=2400-regions.stream().flatMap(r->r.meshes.stream()).mapToInt(m->m.faces.length).sum();
         for(var r:regions){var meshes=new ArrayList<>(r.meshes);
             float replaced=0;
-            if(r.frame!=null)for(var weapon:new TissueCore[]{TissueCore.BLADE,TissueCore.CHELA,TissueCore.HYDROSTAT})
+            if(r.frame!=null)for(var weapon:new TissueCore[]{TissueCore.BLADE,TissueCore.CHELA,TissueCore.HYDROSTAT,TissueCore.CLUB})
                 if(!ChimeraTissue.routed(host,weapon)&&(layout.mounted(weapon,r.frame)||layout.fallback(weapon,r.frame)))replaced=Math.max(replaced,host.organExpression(weapon,partial));
             if(replaced>.0001F){
                 for(var iterator=meshes.iterator();iterator.hasNext();){var mesh=iterator.next();if(mesh.skin||!TissueOrganLayout.oldDistalKit(mesh.name))continue;
@@ -159,7 +164,7 @@ final class AnatomicalTissue {
                     else retiring.put(mesh,1-replaced);
                 }
             }
-            if(r.frame!=null)for(var core:TissueCore.values())if(!core.legacy()){
+            if(r.frame!=null)for(var core:expressed){
                 if(ChimeraTissue.routed(host,core))continue;
                 float expression=host.organExpression(core,partial);if(expression<=.0001F)continue;
                 boolean fallback=layout.fallback(core,r.frame);
@@ -324,6 +329,8 @@ final class AnatomicalTissue {
             posed.mulPose(Axis.XP.rotation(bend));
             posed.translate(-pivot.x / 16, -pivot.y / 16, -pivot.z / 16);
         }
+        if(graft!=null&&graft.core==TissueCore.TONGUE)
+            TissueTongueRender.aim(host,partial,vertices,new org.joml.Matrix4f(posed.last().pose()).scale(1/16F),worldRelativePose);
         for (int f = 0; f < mesh.faces.length; f++) {
             float[] face = mesh.faces[f]; int material = mandible?Math.max(1,(int)face[4]):(int)face[4];
             if (tissue && material == 0) continue;

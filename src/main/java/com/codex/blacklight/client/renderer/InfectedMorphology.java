@@ -52,7 +52,7 @@ public final class InfectedMorphology implements AutoCloseable {
             return JsonParser.parseReader(new InputStreamReader(stream,StandardCharsets.UTF_8)).getAsJsonObject();
         }catch(Exception e){throw new IllegalStateException("Cannot load infection morphology",e);}
     }
-    public InfectedMorphology(BlacklightInfectedHost host,LivingEntity proxy,EntityModel<?> model,ResourceLocation nativeTexture,PoseStack.Pose root,float partial){
+    public InfectedMorphology(BlacklightInfectedHost host,LivingEntity proxy,EntityModel<?> model,ResourceLocation nativeTexture,PoseStack.Pose root,float partial,org.joml.Matrix4f worldRelativePose){
         this.proxy=proxy;previous=ACTIVE.get();
         chimera=ChimeraTissue.bind(host,model,partial);
         String type=host.hostData().getString("Type");speciesId=type;
@@ -60,6 +60,9 @@ public final class InfectedMorphology implements AutoCloseable {
         anatomical=approved.available()?null:AnatomicalTissue.bind(host,model,nativeTexture,partial);
         authored=approved;
         lateOrgans=authored.available()?AnatomicalTissue.grafts(host,model,nativeTexture,partial):null;
+        if(anatomical!=null)anatomical.worldPose(worldRelativePose);
+        if(lateOrgans!=null)lateOrgans.worldPose(worldRelativePose);
+        if(chimera!=null)chimera.worldPose(worldRelativePose);
         tissueGrowth=.12F+.88F*com.codex.blacklight.infection.TissueGrowth.progress(host.tissueAge());
         tissueSeed=host.getUUID().getMostSignificantBits()^host.getUUID().getLeastSignificantBits();
         authored.growth(tissueGrowth,tissueSeed);

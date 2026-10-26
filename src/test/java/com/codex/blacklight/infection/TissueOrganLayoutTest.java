@@ -73,7 +73,7 @@ class TissueOrganLayoutTest {
             int count=0;for(var b:bones)if(layout.mounted(core,b))for(var mesh:functional(core,b,2,42)){count++;faces+=mesh.faces().length;}
             assertTrue(count>0,core.toString());pieces+=count;
         }
-        assertTrue(pieces<=20&&faces<700,"the skeleton gets a bounded integrated kit instead of a full kit on every front leg");
+        assertTrue(pieces<=24&&faces<700,"eleven functional categories share a bounded integrated kit rather than duplicating every weapon on each leg; pieces="+pieces+" faces="+faces);
     }
     @Test void retiringOldWeaponKitsIsContinuousAndDoesNotEraseSkinOrMouthParts(){
         assertTrue(TissueOrganLayout.oldDistalKit("claw_0"));assertTrue(TissueOrganLayout.oldDistalKit("blade_1"));assertTrue(TissueOrganLayout.oldDistalKit("ulnar_blade"));

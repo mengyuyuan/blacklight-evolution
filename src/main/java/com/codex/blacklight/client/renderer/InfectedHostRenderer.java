@@ -56,6 +56,7 @@ public final class InfectedHostRenderer extends EntityRenderer<BlacklightInfecte
         proxy.setCustomName(null);
         EntityRenderer renderer=Minecraft.getInstance().getEntityRenderDispatcher().getRenderer(proxy);
         var skin=new InfectedSkinBuffers(buffers);
+        var worldRelativePose=new org.joml.Matrix4f(stack.last().pose());
         stack.pushPose();DevourerFeedingFx.applyVictim(entity,partial,stack);
         TissueCompetitionFx.apply(entity,partial,stack);
         stack.translate(0,entity.tissueStanceOffset(),0);
@@ -63,7 +64,7 @@ public final class InfectedHostRenderer extends EntityRenderer<BlacklightInfecte
         if(entity.isMetamorphosing()){float reclaim=com.codex.blacklight.infection.EvolvedForm.oldBody(entity.evolvedProgress(partial));stack.scale(reclaim,reclaim,reclaim);}
         try{
             if(renderer instanceof net.minecraft.client.renderer.entity.LivingEntityRenderer living){
-                try(var morphology=new InfectedMorphology(entity,proxy,living.getModel(),renderer.getTextureLocation(proxy),stack.last(),partial)){
+                try(var morphology=new InfectedMorphology(entity,proxy,living.getModel(),renderer.getTextureLocation(proxy),stack.last(),partial,worldRelativePose)){
                     renderer.render(proxy,yaw,partial,stack,skin,light);
                 }
             }else renderer.render(proxy,yaw,partial,stack,skin,light);

@@ -183,6 +183,29 @@ public final class TissueMorphogenesis {
                         new Section(root.add(front.mul(d*.42F)),w*.22F,h*.09F),
                         new Section(root.add(front.mul(d*.62F)).sub(up.mul(jaw*h*.18F)),w*.08F,h*.06F)),right,up,b,seed);
             }
+        }else if(core==TissueCore.SADDLE&&fore){
+            V root=c.add(up.mul(h*.35F)).sub(front.mul(d*.25F));
+            organ(out,core.id+"_spring",2,"",right,null,List.of(new Section(root,w*.26F,d*.16F),
+                    new Section(c.add(up.mul(h*.10F)).sub(front.mul(d*.65F)),w*.48F,d*.22F),
+                    new Section(c.sub(up.mul(h*.24F)).sub(front.mul(d*.20F)),w*.28F,d*.18F)),right,front,b,seed);
+        }else if(core==TissueCore.CLUB&&fore){
+            V root=c.sub(up.mul(h*.12F));
+            organ(out,core.id+"_head",1,"",right,null,List.of(new Section(root,w*.27F,d*.26F),
+                    new Section(c.sub(up.mul(h*.34F)),w*.38F,d*.34F),
+                    new Section(c.sub(up.mul(h*.53F)).add(front.mul(d*.14F)),w*.70F,d*.56F),
+                    new Section(c.sub(up.mul(h*.70F)).add(front.mul(d*.12F)),w*.57F,d*.44F)),right,front,b,seed);
+        }else if(core==TissueCore.TONGUE&&b.role==1){
+            V root=c.add(front.mul(d*.30F)).sub(up.mul(h*.12F));
+            organ(out,core.id+"_tether",0,"",right,null,List.of(new Section(root,w*.14F,h*.08F),
+                    new Section(root.add(front.mul(d*.85F)),w*.12F,h*.07F),
+                    new Section(root.add(front.mul(d*1.65F)),w*.09F,h*.06F),
+                    new Section(root.add(front.mul(d*2.4F)),w*.19F,h*.10F)),right,up,b,seed);
+        }else if(core==TissueCore.CNIDOCYTE&&fore){
+            V root=c.add(up.mul(h*.24F)).add(outer.mul(w*.38F));
+            organ(out,core.id+"_battery",1,"",right,null,List.of(new Section(root,w*.20F,d*.21F),
+                    new Section(c.add(outer.mul(w*.52F)),w*.28F,d*.30F),
+                    new Section(c.sub(up.mul(h*.35F)).add(outer.mul(w*.42F)),w*.20F,d*.20F),
+                    new Section(c.sub(up.mul(h*.49F)).add(outer.mul(w*.45F)).add(front.mul(d*.24F)),w*.07F,d*.07F)),right,front,b,seed);
         }
         return out.stream().map(m->TissueSilhouette.fit(b,m)).toList();
     }
@@ -192,9 +215,9 @@ public final class TissueMorphogenesis {
         return functional(core,functionalMount(core,body,seed),plan,seed);
     }
     public static Bone functionalMount(TissueCore core,Bone body,long seed){
-        boolean sided=core==TissueCore.BLADE||core==TissueCore.CHELA||core==TissueCore.HYDROSTAT;
-        int role=switch(core){case HORN,PHARYNX->1;case TENDON,HYDRAULIC->4;default->2;};
-        int side=!sided?0:core==TissueCore.BLADE?TissueOrganLayout.bladeSide(seed):-TissueOrganLayout.bladeSide(seed);
+        boolean sided=core==TissueCore.BLADE||core==TissueCore.CHELA||core==TissueCore.HYDROSTAT||core==TissueCore.CLUB||core==TissueCore.SADDLE||core==TissueCore.CNIDOCYTE;
+        int role=switch(core){case HORN,PHARYNX,TONGUE->1;case TENDON,HYDRAULIC->4;default->2;};
+        int side=!sided?0:core==TissueCore.BLADE||core==TissueCore.CLUB?TissueOrganLayout.bladeSide(seed):-TissueOrganLayout.bladeSide(seed);
         V c=body.box.centre(),half=body.box.high.sub(body.box.low).mul(sided?.24F:.32F);
         V centre=c.add(body.right.mul(side*span(body.box,body.right)*.38F));
         return new Bone(body.path+"/grown_"+side,role,new Box(centre.sub(half),centre.add(half)),body.up,body.forward,body.right,

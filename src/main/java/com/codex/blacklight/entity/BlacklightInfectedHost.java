@@ -4,6 +4,7 @@ import com.codex.blacklight.combat.ConsumeSequence;
 import com.codex.blacklight.infection.BlacklightInfectionSystem;
 import com.codex.blacklight.infection.DevourerFeedingSystem;
 import com.codex.blacklight.infection.TissueOrgans;
+import com.codex.blacklight.infection.TissueGrowth;
 import com.codex.blacklight.infection.TissueEvolution;
 import com.codex.blacklight.infection.TissueCore;
 import com.codex.blacklight.infection.TissueMetabolism;
@@ -221,7 +222,7 @@ public final class BlacklightInfectedHost extends Monster {
     }
     public float organExpression(TissueCore core,float partial){
         var organ=tissueInheritance().organ(core);
-        float born=core==knownNativeTissueCore()?TissueEvolution.attachmentGrowth(tissueAge()):0;
+        float born=core==knownNativeTissueCore()?Math.max(core.legacy()?0:.35F*TissueGrowth.progress(tissueAge()),TissueEvolution.attachmentGrowth(tissueAge())):0;
         return Math.max(born,com.codex.blacklight.infection.TissueGraftLayout.growth(organ,tissueInheritanceVisualWork(partial)));
     }
     public int cannibalTargetId(){return entityData.get(CANNIBAL_TARGET);}
@@ -636,6 +637,7 @@ public final class BlacklightInfectedHost extends Monster {
             @Override protected void checkAndPerformAttack(LivingEntity target) {
                 if(organActionCore()!=null||TissueCompetition.controls(BlacklightInfectedHost.this))return;
                 if(target instanceof BlacklightInfectedHost prey&&TissueCompetition.tryStart(BlacklightInfectedHost.this,prey))return;
+                if(organAbilities.tryStart(target))return;
                 if(tissueStrikeElapsed(0)<0&&attackCooldown==0&&canPerformAttack(target)) {
                     resetAttackCooldown();swing(InteractionHand.MAIN_HAND);doHurtTarget(target);attackCooldown=giantBoss()?40:20;
                 }
