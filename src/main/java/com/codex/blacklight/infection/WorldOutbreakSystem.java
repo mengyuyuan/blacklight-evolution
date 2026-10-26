@@ -18,6 +18,15 @@ import net.neoforged.neoforge.event.tick.LevelTickEvent;
 
 @EventBusSubscriber(modid="blacklight")
 public final class WorldOutbreakSystem {
+    private static final java.util.Map<ServerLevel,BirthWindow> BIRTHS=new java.util.WeakHashMap<>();
+    private static final class BirthWindow { long window;int births;BirthWindow(long window){this.window=window;} }
+    private static BirthWindow births(ServerLevel level){
+        long window=Math.floorDiv(level.getGameTime(),OutbreakConfig.INTERVAL.get());
+        var value=BIRTHS.computeIfAbsent(level,l->new BirthWindow(window));
+        if(value.window!=window){value.window=window;value.births=0;}
+        return value;
+    }
+    public static void recordBirth(ServerLevel level){births(level).births++;}
     private WorldOutbreakSystem(){}
     public static boolean active(ServerLevel level){return OutbreakConfig.ENABLED.get()&&OutbreakData.get(level.getServer()).active();}
     public static int stage(ServerLevel level){return OutbreakRules.stage(OutbreakData.get(level.getServer()).elapsed(level.getServer().overworld().getGameTime()),OutbreakConfig.DAY_TICKS.get());}
@@ -33,6 +42,28 @@ public final class WorldOutbreakSystem {
                 CityLayout.inside(pos.getX(),pos.getZ())&&CityLayout.sanctuary(Math.floorDiv(pos.getX(),64),Math.floorDiv(pos.getZ(),64));
     }
     private static boolean nativeMob(Mob mob){return BlacklightInfectionSystem.isInfected(mob);}
+    /** All scheduled brood and ambient births share the actual loaded population. */
+    public static boolean populationRoom(ServerLevel level,BlockPos pos){
+        if(!active(level)||level.getDifficulty()==Difficulty.PEACEFUL||sanctuary(level,pos)
+                ||!level.getGameRules().getBoolean(GameRules.RULE_DOMOBSPAWNING)
+                ||births(level).births>=OutbreakConfig.BATCH.get())return false;
+        if(CityTravel.isCity(level.dimension())&&(!CityConfig.SPAWNS.get()||!CityData.get(level).population))return false;
+        int infected=0,mobs=0;
+        for(var entity:level.getAllEntities())if(entity instanceof Mob mob&&mob.isAlive()){
+            mobs++;if(nativeMob(mob))infected++;
+        }
+        if(infected>=OutbreakConfig.DIMENSION_CAP.get()
+                ||CityTravel.isCity(level.dimension())&&mobs>=CityConfig.MOB_LIMIT.get())return false;
+        return level.getEntitiesOfClass(Mob.class,new AABB(pos).inflate(96),m->m.isAlive()&&nativeMob(m)).size()<OutbreakConfig.LOCAL_CAP.get();
+    }
+    private static EntityType<? extends Mob> hostSpecies(int roll){
+        return switch(Math.floorMod(roll,10)){
+            case 0->EntityType.COW;case 1->EntityType.SHEEP;case 2->EntityType.SPIDER;
+            case 3->EntityType.PIG;case 4->EntityType.CHICKEN;case 5->EntityType.RABBIT;
+            case 6->EntityType.GOAT;case 7->EntityType.WOLF;case 8->EntityType.SKELETON;
+            default->EntityType.ZOMBIE;
+        };
+    }
     @SubscribeEvent(priority=net.neoforged.bus.api.EventPriority.HIGH)
     public static void naturalGuard(net.neoforged.neoforge.event.entity.EntityJoinLevelEvent event){
         if(!(event.getLevel() instanceof ServerLevel level)||event.loadedFromDisk()
@@ -56,8 +87,6 @@ public final class WorldOutbreakSystem {
             // A newly born host can occupy the seeding point. Growing a solid
             // root inside its feet would trap the creature immediately.
             if(!level.getEntitiesOfClass(LivingEntity.class,new AABB(p),LivingEntity::isAlive).isEmpty())continue;
-            if(CityEcology.stage(level,p)>=1&&BuildingInfectionConfig.NATURAL_SEEDS.get()&&BuildingInfectionSystem.canRegister(level,p)
-                    &&NaturalInfectionPlacement.place(level,p,ModBlocks.BUILDING_CORE.get().defaultBlockState()))return;
             if(NaturalInfectionPlacement.place(level,p,ModBlocks.TISSUE_ATTACHMENT.get().defaultBlockState().setValue(TissueAttachmentBlock.VARIANT,level.random.nextInt(3))))
                 BuildingInfectionSystem.considerNaturalCore(level,p,level.random);
             return;
@@ -66,7 +95,8 @@ public final class WorldOutbreakSystem {
     /** Bounded caller-selected spawn; still validates real support, fluid and whole-body collision. */
     public static Mob spawnAt(ServerLevel level,BlockPos pos,OutbreakRules.Tier tier){
         if(!active(level)||level.getDifficulty()==Difficulty.PEACEFUL||!level.getGameRules().getBoolean(GameRules.RULE_DOMOBSPAWNING)
-                ||sanctuary(level,pos)||!ready(level,pos)||!level.getBlockState(pos.below()).isFaceSturdy(level,pos.below(),Direction.UP))return null;
+                ||sanctuary(level,pos)||!ready(level,pos)||!populationRoom(level,pos)
+                ||!level.getBlockState(pos.below()).isFaceSturdy(level,pos.below(),Direction.UP))return null;
         Mob mob;
         if(tier==OutbreakRules.Tier.HUNTER)mob=ModEntities.BLACKLIGHT_HUNTER.get().create(level);
         else if(tier==OutbreakRules.Tier.FRESH)mob=ModEntities.COMMON_INFECTED.get().create(level);
@@ -75,7 +105,7 @@ public final class WorldOutbreakSystem {
             // Growth fits the body to its surroundings. Fit at the real birth
             // location, never the entity constructor's temporary world origin.
             host.setPos(pos.getX()+.5,pos.getY(),pos.getZ()+.5);
-            EntityType<? extends Mob> species=switch(level.random.nextInt(6)){case 0->EntityType.COW;case 1->EntityType.SHEEP;case 2->EntityType.SPIDER;case 3->EntityType.PIG;default->EntityType.ZOMBIE;};
+            EntityType<? extends Mob> species=hostSpecies(level.random.nextInt(10));
             Mob donor=species.create(level);if(donor==null)return null;host.inherit(donor);host.advanceTissue(OutbreakRules.tissueAge(tier));mob=host;
         }
         if(mob==null)return null;mob.moveTo(pos.getX()+.5,pos.getY(),pos.getZ()+.5,level.random.nextFloat()*360,0);
@@ -88,7 +118,8 @@ public final class WorldOutbreakSystem {
             return null;
         }
         mob.getPersistentData().putBoolean("blacklight:outbreak_spawn",true);
-        return level.addFreshEntity(mob)?mob:null;
+        if(!level.addFreshEntity(mob))return null;
+        recordBirth(level);return mob;
     }
     @SubscribeEvent public static void tick(LevelTickEvent.Post event){
         if(!(event.getLevel() instanceof ServerLevel level)||!active(level)||level.players().isEmpty()
@@ -108,6 +139,11 @@ public final class WorldOutbreakSystem {
             var local=level.getEntitiesOfClass(Mob.class,player.getBoundingBox().inflate(96),m->m.isAlive()&&nativeMob(m));
             if(local.size()>=OutbreakConfig.LOCAL_CAP.get())continue;
             long common=local.stream().filter(m->m instanceof com.codex.blacklight.entity.BlacklightCommonInfected).count();
+            int developed=0,mature=0,ancient=0;
+            for(var mob:local)if(mob instanceof BlacklightInfectedHost host&&!host.hasMultipartBody()){
+                developed++;if(host.tissueAge()>=TissueGrowth.MATURITY_TICKS)mature++;
+                if(host.tissueAge()>=TissueGrowth.ANCIENT_TICKS)ancient++;
+            }
             for(int attempt=0;attempt<6;attempt++){
             double angle=level.random.nextDouble()*Math.PI*2;int distance=28+level.random.nextInt(37);
             int x=player.getBlockX()+(int)Math.round(Math.cos(angle)*distance),z=player.getBlockZ()+(int)Math.round(Math.sin(angle)*distance);
@@ -117,8 +153,8 @@ public final class WorldOutbreakSystem {
                     ?near:new BlockPos(x,chunk.getHeight(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES,x&15,z&15)+1,z);
             if(!ready(level,pos)||!level.isPositionEntityTicking(pos)||Math.abs(pos.getY()-player.getY())>96
                     ||players.stream().anyMatch(p->p.distanceToSqr(pos.getCenter())<24*24))continue;
-            var tier=common<Math.min(OutbreakConfig.COMMON_RESERVE.get(),OutbreakConfig.LOCAL_CAP.get())
-                    ?OutbreakRules.Tier.FRESH:OutbreakRules.choose(CityEcology.stage(level,pos),level.random.nextInt(100));
+            var tier=OutbreakRules.populationTier(CityEcology.stage(level,pos),(int)common,developed,mature,ancient,
+                    OutbreakConfig.COMMON_RESERVE.get(),OutbreakConfig.LOCAL_CAP.get(),level.random.nextInt(100));
             if(spawnAt(level,pos,tier)!=null){births++;total++;allMobs++;if(level.random.nextInt(4)==0)seed(level,pos);break;}
             }
         }

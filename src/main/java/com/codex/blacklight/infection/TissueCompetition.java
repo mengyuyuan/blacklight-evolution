@@ -76,7 +76,10 @@ public final class TissueCompetition {
         if(host.getTarget() instanceof BlacklightInfectedHost prey&&contender(host,prey)){
             if(tryStart(host,prey))return true;
         }
-        if(host.getTarget()!=null||!free(host))return false;
+        var current=host.getTarget();
+        if(current instanceof BlacklightInfectedHost||!free(host)
+                ||current!=null&&(host.hurtTime>0||current instanceof net.minecraft.world.entity.player.Player
+                &&(host.isEvolved()||host.distanceToSqr(current)<24*24)))return false;
         var budget=BUDGETS.computeIfAbsent(host.level(),level->new Budget());long now=host.level().getGameTime();
         long due=SEARCH_AT.computeIfAbsent(host,h->now+Math.floorMod(h.getId(),30));if(now<due)return false;
         if(budget.tick!=now){budget.tick=now;budget.searches=0;}

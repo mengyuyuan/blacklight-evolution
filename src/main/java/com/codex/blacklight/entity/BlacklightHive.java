@@ -64,12 +64,14 @@ public final class BlacklightHive extends Monster implements GeoEntity {
         if(alive>=6){cooldown=80;return;}
         int spawned=0;
         for(int i=0;i<Math.min(waves>=3?1:2,6-alive);i++){
+            if(!com.codex.blacklight.infection.WorldOutbreakSystem.populationRoom((net.minecraft.server.level.ServerLevel)level(),blockPosition()))break;
             Mob mob=stage<2?ModEntities.COMMON_INFECTED.get().create(level()):i==0?ModEntities.BLACKLIGHT_HUNTER.get().create(level()):
                     (waves==2?ModEntities.BLACKLIGHT_BRUTE:ModEntities.BLACKLIGHT_SPITTER).get().create(level());
             if(mob==null||!placeGuard(mob))continue;
             mob.setPersistenceRequired();mob.restrictTo(blockPosition(),24);
             mob.getPersistentData().putUUID("BlacklightHiveGuard",getUUID());
             if(level().addFreshEntity(mob)){
+                com.codex.blacklight.infection.WorldOutbreakSystem.recordBirth((net.minecraft.server.level.ServerLevel)level());
                 spawned++;if(mob instanceof BlacklightHunter)hunterWaves++;
             }
         }

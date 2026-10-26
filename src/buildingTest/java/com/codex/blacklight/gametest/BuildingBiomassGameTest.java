@@ -22,12 +22,17 @@ public final class BuildingBiomassGameTest {
         final ServerLevel level;final BuildingInfectionData data;final BlockPos origin;
         final List<BuildingInfectionData.Colony> previous;final BuildingInfectionData.Colony colony;
         final boolean grief,spawns;
+        final OutbreakData outbreak;
+        final java.util.Set<Long> cleared;
         final java.util.Map<BlockPos,net.minecraft.world.level.block.state.BlockState> terrain=new java.util.LinkedHashMap<>();
         void block(BlockPos pos,net.minecraft.world.level.block.state.BlockState state) {
             terrain.putIfAbsent(pos.immutable(),level.getBlockState(pos));level.setBlock(pos,state,2);
         }
         Fixture(GameTestHelper h) {
             level=h.getLevel();data=BuildingInfectionData.get(level);previous=new ArrayList<>(data.colonies);data.colonies.clear();
+            cleared=new java.util.LinkedHashSet<>(data.clearedSites);data.clearedSites.clear();
+            outbreak=OutbreakData.get(level.getServer());var active=new OutbreakData();active.start(level.getServer().overworld().getGameTime()-7L*OutbreakConfig.DAY_TICKS.get());
+            level.getServer().overworld().getDataStorage().set("blacklight_outbreak",active);
             grief=level.getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING);spawns=level.getGameRules().getBoolean(GameRules.RULE_DOMOBSPAWNING);
             level.getGameRules().getRule(GameRules.RULE_MOBGRIEFING).set(true,level.getServer());
             level.getGameRules().getRule(GameRules.RULE_DOMOBSPAWNING).set(false,level.getServer());
@@ -47,6 +52,7 @@ public final class BuildingBiomassGameTest {
             colony.dead=true;
             for(var c:colony.mass.cells()){var p=origin.offset(c.x(),c.y(),c.z());if(level.getBlockState(p).is(ModBlocks.BUILDING_BIOMASS.get()))level.removeBlock(p,false);}
             level.removeBlock(origin,false);data.colonies.clear();data.colonies.addAll(previous);data.setDirty();
+            data.clearedSites.clear();data.clearedSites.addAll(cleared);level.getServer().overworld().getDataStorage().set("blacklight_outbreak",outbreak);
             terrain.forEach((pos,state)->level.setBlock(pos,state,2));
             level.getGameRules().getRule(GameRules.RULE_MOBGRIEFING).set(grief,level.getServer());
             level.getGameRules().getRule(GameRules.RULE_DOMOBSPAWNING).set(spawns,level.getServer());
@@ -135,8 +141,8 @@ public final class BuildingBiomassGameTest {
         try(var f=new Fixture(h)) {
             f.grow();f.level.getServer().setDifficulty(net.minecraft.world.Difficulty.NORMAL,true);
             f.level.getGameRules().getRule(GameRules.RULE_DOMOBSPAWNING).set(true,f.level.getServer());
-            h.assertTrue(BuildingInfectionSystem.hatch(f.level,f.colony),"living mature colony produces a hunter beside its thick roots");
-            var mobs=f.level.getEntitiesOfClass(com.codex.blacklight.entity.BlacklightHunter.class,new net.minecraft.world.phys.AABB(f.origin).inflate(16));
+            h.assertTrue(BuildingInfectionSystem.hatch(f.level,f.colony),"living mature colony produces stage-appropriate brood beside its thick roots");
+            var mobs=f.level.getEntitiesOfClass(net.minecraft.world.entity.Mob.class,new net.minecraft.world.phys.AABB(f.origin).inflate(16),BlacklightInfectionSystem::isInfected);
             h.assertTrue(!mobs.isEmpty()&&mobs.stream().allMatch(f.level::noCollision),"brood emerges without colliding with the column");
             mobs.forEach(net.minecraft.world.entity.Entity::discard);
         }finally{h.getLevel().getServer().setDifficulty(difficulty,true);}h.succeed();

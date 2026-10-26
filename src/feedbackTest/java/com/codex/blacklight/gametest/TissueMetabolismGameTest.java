@@ -68,16 +68,16 @@ public final class TissueMetabolismGameTest {
         }finally{host.discard();food.discard();}h.succeed();
     }
     @GameTest(template="wall_test",timeoutTicks=40,batch="tissue_metabolism")
-    public static void matureRestingBodiesKeepFoodAndFractionalCostsSurviveReload(GameTestHelper h){
+    public static void lateDevelopmentUsesFoodAndFractionalCostsSurviveReload(GameTestHelper h){
         var host=host(h,TissueCore.MUSCLE);
         try{
             host.advanceTissue(48000);var saved=new CompoundTag();host.saveWithoutId(saved);saved.putInt("BlacklightTissueNutrition",8);saved.putInt("BlacklightTissueNutritionDebt",65);host.load(saved);host.setHealth(host.getMaxHealth());
             long age=host.tissueAge();for(int i=0;i<200;i++)host.tick();
-            host.saveWithoutId(saved);h.assertTrue(host.tissueNutrition()==8&&saved.getInt("BlacklightTissueNutritionDebt")==65&&host.tissueAge()==age+200,"mature full-health resting bodies have no passive food decay, but natural age continues");
+            host.saveWithoutId(saved);h.assertTrue(host.tissueNutrition()==7&&saved.getInt("BlacklightTissueNutritionDebt")==65&&host.tissueAge()==age+200+10*TissueMetabolism.BONUS_TICKS,"later generations still pay fractional food for actual accelerated development");
             host.setHealth(host.getMaxHealth()*.5F);for(int i=0;i<40;i++)host.tick();host.saveWithoutId(saved);
-            h.assertTrue(host.tissueNutrition()==7&&saved.getInt("BlacklightTissueNutritionDebt")==5,"two actual repair seconds pay 40 hundredths, including the existing debt");
+            h.assertTrue(host.tissueNutrition()==6&&saved.getInt("BlacklightTissueNutritionDebt")==25,"two actual repair/development seconds pay 60 hundredths, including the existing debt");
             var restored=ModEntities.INFECTED_HOST.get().create(h.getLevel());restored.load(saved);var again=new CompoundTag();restored.saveWithoutId(again);
-            h.assertTrue(again.getInt("BlacklightTissueNutritionDebt")==5&&restored.tissueNutrition()==7,"reloading does not forgive repair/growth costs or refill food");restored.discard();
+            h.assertTrue(again.getInt("BlacklightTissueNutritionDebt")==25&&restored.tissueNutrition()==6,"reloading does not forgive repair/growth costs or refill food");restored.discard();
         }finally{host.discard();}h.succeed();
     }
     @GameTest(template="wall_test",timeoutTicks=40,batch="tissue_metabolism")

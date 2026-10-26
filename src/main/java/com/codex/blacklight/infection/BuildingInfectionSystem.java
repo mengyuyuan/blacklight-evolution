@@ -21,7 +21,7 @@ public final class BuildingInfectionSystem {
     static boolean allowedSite(ServerLevel level, BlockPos p) {
         if (!CityTravel.isCity(level.dimension())) return true;
         if (!CityConfig.SPREAD.get() || !CityData.get(level).spread) return false;
-        if (CitySystem.futian(level) && FutianLayout.sanctuary(p.getX(), p.getZ())) return false;
+        if (WorldOutbreakSystem.sanctuary(level,p)) return false;
         // The authored hives already have their own seven-port lifecycle. Never create a second
         // invisible producer on the same building, even after that original hive was destroyed.
         for (int hive = 0; hive < 2; hive++)
@@ -37,27 +37,36 @@ public final class BuildingInfectionSystem {
     }
     public static boolean canRegister(ServerLevel level, BlockPos pos) {
         var data = BuildingInfectionData.get(level);
-        if (data.colonies.size() >= BuildingInfectionConfig.COLONIES.get() || !allowedSite(level, pos)) return false;
+        if (data.activeColonies() >= BuildingInfectionConfig.COLONIES.get()
+                || data.clearedSites.size() >= BuildingInfectionData.MAX_CLEARED || !allowedSite(level, pos)) return false;
         for (var c : data.colonies)
             if (Math.abs(c.origin.getX() - pos.getX()) <= BuildingInfectionConfig.RADIUS.get() * 2
                     && Math.abs(c.origin.getZ() - pos.getZ()) <= BuildingInfectionConfig.RADIUS.get() * 2) return false;
+        for (long site : data.clearedSites) {
+            var cleared=BlockPos.of(site);
+            if (Math.abs(cleared.getX()-pos.getX()) <= BuildingInfectionConfig.RADIUS.get()*2
+                    && Math.abs(cleared.getZ()-pos.getZ()) <= BuildingInfectionConfig.RADIUS.get()*2) return false;
+        }
         return true;
     }
     public static boolean register(ServerLevel level, BlockPos pos) {
         if (!canRegister(level,pos)) return false;
         var data=BuildingInfectionData.get(level);
+        data.compactCleared();
         var colony = new BuildingInfectionData.Colony(pos);
         neighbours(colony, pos);
         data.colonies.add(colony); data.setDirty(); return true;
     }
     public static void destroy(ServerLevel level, BlockPos pos) {
         var data = BuildingInfectionData.get(level);
-        for (var c : data.colonies) if (c.origin.equals(pos)) {
-            c.dead = true; c.frontier.clear(); data.setDirty();
+        for (var c : data.colonies) if (c.origin.equals(pos) && !c.dead) {
+            c.dead = true; c.frontier.clear(); data.rememberCleared(c); data.setDirty();
+            CityEcology.cleared(level,pos);
         }
     }
     public static void considerNaturalCore(ServerLevel level, BlockPos tissue, RandomSource random) {
         if (!BuildingInfectionConfig.ENABLED.get() || !BuildingInfectionConfig.NATURAL_SEEDS.get()
+                || !WorldOutbreakSystem.active(level)
                 || !level.getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING)
                 || random.nextInt(16) != 0 || !ready(level, tissue) || !allowedSite(level, tissue)) return;
         var state = level.getBlockState(tissue);
@@ -74,11 +83,7 @@ public final class BuildingInfectionSystem {
             if(wallFound) { support=side;break; }
         }
         if(support==null) return;
-        var data = BuildingInfectionData.get(level);
-        if (data.colonies.size() >= BuildingInfectionConfig.COLONIES.get()) return;
-        for (var c : data.colonies)
-            if (Math.abs(c.origin.getX()-tissue.getX()) <= BuildingInfectionConfig.RADIUS.get()*2
-                    && Math.abs(c.origin.getZ()-tissue.getZ()) <= BuildingInfectionConfig.RADIUS.get()*2) return;
+        if (!canRegister(level,tissue)) return;
         NaturalInfectionPlacement.place(level,tissue, ModBlocks.BUILDING_CORE.get().defaultBlockState()
                 .setValue(BuildingInfectionCoreBlock.FACING, support.getOpposite()));
     }
@@ -87,13 +92,14 @@ public final class BuildingInfectionSystem {
     }
     /** One scheduled batch; public for dedicated-server acceptance without speeding up world time. */
     public static int advance(ServerLevel level) {
-        if (!BuildingInfectionConfig.ENABLED.get() || !level.getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING)) return 0;
+        if (!BuildingInfectionConfig.ENABLED.get() || !WorldOutbreakSystem.active(level)
+                || !level.getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING)) return 0;
         var data = BuildingInfectionData.get(level);
         if (data.colonies.isEmpty()) return 0;
         for (var c : data.colonies) {
             if (c.dead || !ready(level, c.origin) || !level.isPositionEntityTicking(c.origin) || !allowedSite(level, c.origin)) continue;
             var core = level.getBlockState(c.origin);
-            if (!core.is(ModBlocks.BUILDING_CORE.get())) { c.dead = true; c.frontier.clear(); data.setDirty(); continue; }
+            if (!core.is(ModBlocks.BUILDING_CORE.get())) { destroy(level,c.origin); continue; }
             c.activeTicks = (int)Math.min(Integer.MAX_VALUE, (long)c.activeTicks + 5);
             int maturity = BuildingInfectionConfig.MATURITY.get() * 20;
             int next = c.activeTicks >= maturity && c.surfaces.size() >= 256 ? 3
@@ -174,7 +180,8 @@ public final class BuildingInfectionSystem {
             level.setBlock(pos,state.setValue(TissueAttachmentBlock.AGE,c.stage),3);
     }
     public static boolean hatch(ServerLevel level, BuildingInfectionData.Colony c) {
-        if(c.dead || c.stage<3 || !BuildingInfectionConfig.ENABLED.get() || !BuildingInfectionConfig.SPAWNS.get()
+        if(c.dead || c.stage<3 || !WorldOutbreakSystem.active(level)
+                || !BuildingInfectionConfig.ENABLED.get() || !BuildingInfectionConfig.SPAWNS.get()
                 || !level.getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING)
                 || !level.getGameRules().getBoolean(GameRules.RULE_DOMOBSPAWNING)
                 || level.getDifficulty()==Difficulty.PEACEFUL || !ready(level,c.origin)
@@ -182,9 +189,7 @@ public final class BuildingInfectionSystem {
                 || !level.getBlockState(c.origin).is(ModBlocks.BUILDING_CORE.get())) return false;
         if(CityTravel.isCity(level.dimension())&&(!CityConfig.SPAWNS.get()||!CityData.get(level).population)) return false;
         if(level.getEntitiesOfClass(Mob.class,new AABB(c.origin).inflate(48),Entity::isAlive).size()>=BuildingInfectionConfig.MOB_LIMIT.get()) return false;
-        int total=0;
-        for(var e:level.getAllEntities()) if(e instanceof Mob && e.isAlive() && ++total>=CityConfig.MOB_LIMIT.get()) return false;
-        if(CityConfig.MOB_LIMIT.get()==0) return false;
+        if(!WorldOutbreakSystem.populationRoom(level,c.origin)) return false;
         var direction=level.getBlockState(c.origin).getValue(BuildingInfectionCoreBlock.FACING);
         // A mature root can occupy the old straight-ahead outlet. Search flanking
         // ground as well, so a successful volumetric colony cannot seal its own brood.
@@ -192,21 +197,10 @@ public final class BuildingInfectionSystem {
             var p=c.origin.relative(direction,distance).relative(direction.getClockWise(),lateral).below(down);
             if(!ready(level,p)||!level.isPositionEntityTicking(p)||!level.getBlockState(p.below()).isFaceSturdy(level,p.below(),Direction.UP)
                     || !level.getBlockState(p).getFluidState().isEmpty()) continue;
-            Mob mob;
-            if(c.births%4==0) mob=ModEntities.BLACKLIGHT_HUNTER.get().create(level);
-            else {
-                var host=ModEntities.INFECTED_HOST.get().create(level);
-                if(host==null) return false;
-                host.inherit(EntityType.ZOMBIE.create(level)); mob=host;
-            }
-            if(mob==null) return false;
-            mob.moveTo(p.getX()+.5,p.getY(),p.getZ()+.5,direction.toYRot(),0);
-            var bounds=mob.getBoundingBox().inflate(1);
-            if(!level.hasChunkAt(BlockPos.containing(bounds.minX,bounds.minY,bounds.minZ))
-                    || !level.hasChunkAt(BlockPos.containing(bounds.maxX,bounds.maxY,bounds.maxZ))
-                    || !level.noCollision(mob) || level.containsAnyLiquid(mob.getBoundingBox())) continue;
-            mob.finalizeSpawn(level,level.getCurrentDifficultyAt(p),MobSpawnType.EVENT,null);
-            if(level.addFreshEntity(mob)) {
+            int stage=CityEcology.stage(level,c.origin);
+            var tier=c.births%4==0&&stage>=2?OutbreakRules.Tier.HUNTER
+                    :OutbreakRules.choose(Math.max(1,stage),level.random.nextInt(100));
+            if(WorldOutbreakSystem.spawnAt(level,p,tier)!=null) {
                 c.births++; BuildingInfectionData.get(level).setDirty();
                 level.playSound(null,c.origin,net.minecraft.sounds.SoundEvents.SLIME_SQUISH,net.minecraft.sounds.SoundSource.HOSTILE,1,.6f);
                 return true;

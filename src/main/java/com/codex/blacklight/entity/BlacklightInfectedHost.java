@@ -72,6 +72,7 @@ public final class BlacklightInfectedHost extends Monster {
     private int tissueClock;
     private int tissueRecoveryTicks;
     private int tissueNutritionDebt;
+    private int tissueCultivationTicks;
     private int evolvedMorphTicks;
     private static final EntityDataAccessor<CompoundTag> EVOLVED_STATE=SynchedEntityData.defineId(BlacklightInfectedHost.class,EntityDataSerializers.COMPOUND_TAG);
     private static final EntityDataAccessor<CompoundTag> EVOLVED_ACTION=SynchedEntityData.defineId(BlacklightInfectedHost.class,EntityDataSerializers.COMPOUND_TAG);
@@ -286,7 +287,15 @@ public final class BlacklightInfectedHost extends Monster {
         int demand=tissueMetabolismActive()?TissueMetabolism.demand(tissueAge(),integrating,repairing,worldSpeed):0;
         var budget=TissueMetabolism.budget(tissueNutrition(),tissueNutritionDebt,demand);
         boolean supplied=budget.supplied();tissueNutritionDebt=budget.debt();entityData.set(TISSUE_NUTRITION,budget.reserve());
-        if(tissueMetabolismActive())publishInheritance(tissueInheritance().digest(TissueMetabolism.scaledTicks(elapsed,worldSpeed*(.2+.8*budget.fraction())),true,TissueOrgans.seed(getUUID()),tissueAge(),TissueCompetitionConfig.rules(),knownNativeTissueCore()));
+        if(tissueMetabolismActive()){
+            var developed=tissueInheritance().digest(TissueMetabolism.scaledTicks(elapsed,worldSpeed*(.2+.8*budget.fraction())),true,TissueOrgans.seed(getUUID()),tissueAge(),TissueCompetitionConfig.rules(),knownNativeTissueCore());
+            if(supplied&&developed.organs().values().stream().anyMatch(o->o.mature()&&o.pending()==0&&o.integrated()>0)){
+                var cultivation=TissueMetabolism.cultivation(tissueCultivationTicks,TissueMetabolism.scaledTicks(elapsed,worldSpeed*budget.fraction()));
+                tissueCultivationTicks=cultivation.remainder();
+                developed=developed.cultivate(cultivation.work(),knownNativeTissueCore(),tissueAge(),TissueCompetitionConfig.rules());
+            }
+            publishInheritance(developed);
+        }
         long natural=TissueMetabolism.scaledTicks(elapsed,worldSpeed),bonus=supplied&&TissueMetabolism.growing(tissueAge(),integrating)?TissueMetabolism.scaledTicks(TissueMetabolism.BONUS_TICKS,worldSpeed*budget.fraction()):0;
         advanceTissue(com.codex.blacklight.infection.TissueGrowth.advance(natural,bonus));
         if(supplied&&repairing)
@@ -899,6 +908,7 @@ public final class BlacklightInfectedHost extends Monster {
         var frame=tissueFrame();tag.putFloat("BlacklightTissueFrameX",frame.x);tag.putFloat("BlacklightTissueFrameY",frame.y);tag.putFloat("BlacklightTissueFrameZ",frame.z);
         tag.put("BlacklightTissueInheritance",TissueInheritanceCodec.write(tissueInheritance()));
         tag.putInt("BlacklightTissueNutrition",tissueNutrition());tag.putInt("BlacklightTissueNutritionDebt",tissueNutritionDebt);tag.putInt("BlacklightTissueRecovery",tissueRecoveryTicks);
+        tag.putInt("BlacklightTissueCultivation",tissueCultivationTicks);
         super.addAdditionalSaveData(tag);tag.putLong("BlacklightTissueAge",com.codex.blacklight.infection.TissueGrowth.advance(tissueAge(),tissueClock));tag.putFloat("BlacklightTissueScale",tissueBodyScale());tag.putFloat("BlacklightCoreFracture",tissueCoreFracture());tag.put("BlacklightHost",hostData().copy());tag.putBoolean("BlacklightBossDefeated",bossDefeated);
     }
     @Override public void readAdditionalSaveData(CompoundTag tag) {
@@ -914,6 +924,7 @@ public final class BlacklightInfectedHost extends Monster {
         setCannibalVisual(-1,-1,false);
         entityData.set(TISSUE_NUTRITION,TissueMetabolism.clamp(tag.getInt("BlacklightTissueNutrition")));
         tissueNutritionDebt=Math.clamp(tag.getInt("BlacklightTissueNutritionDebt"),0,TissueMetabolism.WORK_PER_UNIT-1);
+        tissueCultivationTicks=Math.clamp(tag.getInt("BlacklightTissueCultivation"),0,TissueMetabolism.CULTIVATION_BATCH-1);
         tissueRecoveryTicks=Math.clamp(tag.getInt("BlacklightTissueRecovery"),0,TissueMetabolism.RECOVERY_DELAY);
         float fracture=tag.getFloat("BlacklightCoreFracture");entityData.set(TISSUE_CORE_FRACTURE,Float.isFinite(fracture)?Math.clamp(fracture,0,1):0);
         super.readAdditionalSaveData(tag);entityData.set(TISSUE_AGE,com.codex.blacklight.infection.TissueGrowth.clamp(tag.getLong("BlacklightTissueAge")));tissueClock=0;bossDefeated=tag.getBoolean("BlacklightBossDefeated");CompoundTag data=tag.getCompound("BlacklightHost").copy();

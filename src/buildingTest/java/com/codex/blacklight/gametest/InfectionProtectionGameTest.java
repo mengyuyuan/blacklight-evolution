@@ -30,6 +30,9 @@ public final class InfectionProtectionGameTest {
     public static void rejectedNaturalCoreDoesNotPoisonColonyRegistry(GameTestHelper h) {
         var level=h.getLevel();var data=BuildingInfectionData.get(level);
         var old=new ArrayList<>(data.colonies);data.colonies.clear();
+        var oldCleared=new java.util.LinkedHashSet<>(data.clearedSites);data.clearedSites.clear();
+        var storage=level.getServer().overworld().getDataStorage();var outbreak=OutbreakData.get(level.getServer());
+        var active=new OutbreakData();active.start(level.getServer().overworld().getGameTime());storage.set("blacklight_outbreak",active);
         var pos=h.absolutePos(new BlockPos(5,120,5));
         for(int y=0;y<3;y++)level.setBlock(pos.offset(0,y,1),Blocks.STONE_BRICKS.defaultBlockState(),2);
         var tissue=ModBlocks.TISSUE_ATTACHMENT.get().defaultBlockState();level.setBlock(pos,tissue,3);
@@ -49,6 +52,7 @@ public final class InfectionProtectionGameTest {
                 "lifting protection permits the same site to seed exactly once");
         } finally {
             level.removeBlock(pos,false);data.colonies.clear();data.colonies.addAll(old);data.setDirty();
+            data.clearedSites.clear();data.clearedSites.addAll(oldCleared);storage.set("blacklight_outbreak",outbreak);
             level.getGameRules().getRule(GameRules.RULE_MOBGRIEFING).set(grief,level.getServer());
         }
         h.succeed();
@@ -58,6 +62,9 @@ public final class InfectionProtectionGameTest {
     public static void facadeSpreadCannotBypassPlacementVeto(GameTestHelper h) {
         var level=h.getLevel();var data=BuildingInfectionData.get(level);
         var old=new ArrayList<>(data.colonies);data.colonies.clear();
+        var oldCleared=new java.util.LinkedHashSet<>(data.clearedSites);data.clearedSites.clear();
+        var storage=level.getServer().overworld().getDataStorage();var outbreak=OutbreakData.get(level.getServer());
+        var active=new OutbreakData();active.start(level.getServer().overworld().getGameTime());storage.set("blacklight_outbreak",active);
         var origin=h.absolutePos(new BlockPos(5,120,5));
         for(int x=-5;x<=5;x++)for(int y=0;y<20;y++)level.setBlock(origin.offset(x,y,1),Blocks.STONE_BRICKS.defaultBlockState(),2);
         level.setBlock(origin,ModBlocks.BUILDING_CORE.get().defaultBlockState(),3);
@@ -73,6 +80,7 @@ public final class InfectionProtectionGameTest {
         } finally {
             NeoForge.EVENT_BUS.unregister(veto);level.removeBlock(origin,false);
             data.colonies.clear();data.colonies.addAll(old);data.setDirty();
+            data.clearedSites.clear();data.clearedSites.addAll(oldCleared);storage.set("blacklight_outbreak",outbreak);
             level.getGameRules().getRule(GameRules.RULE_MOBGRIEFING).set(grief,level.getServer());
         }
         h.succeed();

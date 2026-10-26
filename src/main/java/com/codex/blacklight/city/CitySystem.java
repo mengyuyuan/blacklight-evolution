@@ -105,6 +105,8 @@ public final class CitySystem {
     private static boolean spawn(ServerLevel level,EntityType<? extends Mob> type,BlockPos pos,boolean infected){
         if(!level.getGameRules().getBoolean(net.minecraft.world.level.GameRules.RULE_DOMOBSPAWNING))return false;
         if((infected||type==ModEntities.BLACKLIGHT_HUNTER.get()||type==ModEntities.BLACKLIGHT_HYDRA.get())&&!com.codex.blacklight.infection.WorldOutbreakSystem.active(level))return false;
+        if((infected||type==ModEntities.BLACKLIGHT_HUNTER.get()||type==ModEntities.BLACKLIGHT_HYDRA.get())
+                &&!com.codex.blacklight.infection.WorldOutbreakSystem.populationRoom(level,pos))return false;
         if(infected&&type==EntityType.ZOMBIE)type=ModEntities.COMMON_INFECTED.get();
         if(!loaded(level,pos)||!level.getBlockState(pos.below()).isSolid()||count(level)>=CityConfig.MOB_LIMIT.get())return false;
         Mob mob=type.create(level);if(mob==null)return false;
@@ -117,7 +119,10 @@ public final class CitySystem {
         if(type==EntityType.VILLAGER)mob.setPersistenceRequired();
         if(infected&&!BlacklightInfectionSystem.isInfected(mob))BlacklightInfectionSystem.infect(mob,null);
         if(mob instanceof Zombie zombie)zombie.setBaby(false);
-        return level.addFreshEntity(mob);
+        if(!level.addFreshEntity(mob))return false;
+        if(infected||type==ModEntities.BLACKLIGHT_HUNTER.get()||type==ModEntities.BLACKLIGHT_HYDRA.get())
+            com.codex.blacklight.infection.WorldOutbreakSystem.recordBirth(level);
+        return true;
     }
     private static void populateWorld(ServerLevel level){
         if(!CityConfig.SPAWNS.get()||!CityData.get(level).population||count(level)>=CityConfig.MOB_LIMIT.get())return;

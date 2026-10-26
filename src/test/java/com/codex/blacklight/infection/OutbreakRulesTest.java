@@ -4,6 +4,14 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 class OutbreakRulesTest {
+    @Test void PopulationFloorsKeepFoodAndMakeSpaceForActualEvolvingLineages(){
+        assertEquals(OutbreakRules.Tier.FRESH,OutbreakRules.populationTier(4,5,0,0,0,6,18,99));
+        assertEquals(OutbreakRules.Tier.GROWING,OutbreakRules.populationTier(1,6,0,0,0,6,18,0));
+        assertEquals(OutbreakRules.Tier.MATURE,OutbreakRules.populationTier(2,6,0,0,0,6,18,0));
+        assertEquals(OutbreakRules.Tier.ANCIENT,OutbreakRules.populationTier(3,6,2,2,0,6,18,0));
+        assertEquals(OutbreakRules.Tier.FRESH,OutbreakRules.populationTier(4,10,5,4,2,6,18,0));
+        assertEquals(OutbreakRules.Tier.FRESH,OutbreakRules.populationTier(4,1,0,0,0,6,1,0));
+    }
     @Test void StagesUseElapsedReleaseTimeAndExactDayBoundaries(){
         assertEquals(0,OutbreakRules.stage(23999,24000));assertEquals(1,OutbreakRules.stage(24000,24000));
         assertEquals(2,OutbreakRules.stage(3*24000,24000));assertEquals(3,OutbreakRules.stage(7*24000,24000));

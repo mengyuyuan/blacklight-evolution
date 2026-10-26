@@ -14,7 +14,7 @@ public final class BuildingInfectionConfig {
         NATURAL_SEEDS = b.comment("Existing infected tissue can establish a core beside a substantial wall.").define("naturalCores", true);
         SPAWNS = b.define("hatchInfected", true);
         WORK = b.comment("Shared frontier/aging operations per dimension every five ticks.").defineInRange("workBudget", 4, 1, 16);
-        COLONIES = b.comment("Includes destroyed cores, so cleared sites cannot endlessly reseed.").defineInRange("maxColonies", 16, 1, 64);
+        COLONIES = b.comment("Live colony limit; cleared sites retain separate compact reseeding protection.").defineInRange("maxColonies", 16, 1, 64);
         RADIUS = b.defineInRange("horizontalRadius", 48, 8, 96);
         HEIGHT = b.defineInRange("verticalReach", 96, 8, 192);
         SURFACES = b.defineInRange("surfacesPerColony", 8192, 64, 16384);
