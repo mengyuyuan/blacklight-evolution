@@ -13,6 +13,21 @@ import net.neoforged.neoforge.gametest.*;
 
 @GameTestHolder("blacklight") @PrefixGameTestTemplate(false)
 public final class EvolvedFormGameTest {
+    @GameTest(template="wall_test",timeoutTicks=500,batch="evolved_mapping_reload")
+    public static void StoredLineageSurvivesAnActualServerDatapackReload(GameTestHelper h){
+        var host=host(h);h.assertTrue(host.beginEvolvedMetamorphosis(),"registered lineage can enter its real metamorphosis");
+        for(int tick=0;tick<200;tick++)host.tick();
+        var choice=host.evolvedChoice().orElseThrow();var previous=com.codex.blacklight.infection.EvolvedMappingReload.current();
+        var server=h.getLevel().getServer();var reload=server.reloadResources(server.getPackRepository().getSelectedIds());
+        h.succeedWhen(()->{
+            h.assertTrue(reload.isDone(),"waiting for the actual asynchronous datapack reload");
+            try{
+                reload.join();
+                h.assertTrue(com.codex.blacklight.infection.EvolvedMappingReload.current()!=previous,"the real server reload applied a fresh mapping table");
+                h.assertTrue(host.isEvolved()&&host.evolvedChoice().orElseThrow().equals(choice),"a data reload cannot reroll the stored form, seed, bias or score snapshot");
+            }finally{host.discard();}
+        });
+    }
     @GameTest(template="wall_test",timeoutTicks=130,batch="evolved_chase_edge")
     public static void visiblePartialPathCannotWalkTheEvolvedOffAnUnsupportedEdge(GameTestHelper h){
         var host=host(h);h.assertTrue(host.beginEvolvedMetamorphosis(),"edge fixture qualifies for its human body");for(int i=0;i<200;i++)host.tick();

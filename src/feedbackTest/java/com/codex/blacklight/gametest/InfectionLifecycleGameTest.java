@@ -112,6 +112,13 @@ public final class InfectionLifecycleGameTest {
      * no qualified flag, meal count or inherited-organ inventory is prefilled. */
     @GameTest(template="wall_test",timeoutTicks=1600,batch="lifecycle_six_meals")
     public static void SixAcceptedCapturesIntegrateThenAutomaticallyBecomeAnEvolved(GameTestHelper h){
+        sixMeals(h,false);
+    }
+    @GameTest(template="wall_test",timeoutTicks=1600,batch="lifecycle_six_blade_bias")
+    public static void SixMatureBladeMealsUnlockTheDominantLineageWithoutLegacyBalanceOrExtraPoints(GameTestHelper h){
+        sixMeals(h,true);
+    }
+    private static void sixMeals(GameTestHelper h,boolean bladeBias){
         var level=h.getLevel();var origin=h.absolutePos(new BlockPos(5,100,5));
         for(int x=-14;x<=14;x++)for(int z=-14;z<=14;z++)level.setBlock(origin.offset(x,-1,z),Blocks.STONE.defaultBlockState(),2);
         var actors=new ArrayList<BlacklightInfectedHost>();
@@ -130,11 +137,14 @@ public final class InfectionLifecycleGameTest {
                         actor.setTarget(null);for(int t=0;t<240;t++)actor.tick();
                         h.assertTrue(actor.tissueInheritance().meals()==6&&actor.tissueInheritance().acquiredOrgans()==6,"six personally accepted captures preserve six actual donor organs");
                         h.assertTrue(actor.isEvolved()&&!actor.isMetamorphosing(),"integrated organs trigger and complete the actual automatic human metamorphosis");
+                        var choice=actor.evolvedChoice().orElseThrow();
+                        h.assertTrue(choice.form().equals(EvolvedMapping.DEFAULT_FORM)&&choice.table().equals(EvolvedMappingReload.current().fingerprint()),"real metamorphosis stores the registered form and mapping fingerprint");
+                        if(bladeBias)h.assertTrue(choice.bias().equals("blacklight:blade")&&!choice.fallback()&&actor.tissueInheritance().points()<1000,"six mature blade meals select the dominant blade pool without the removed four-role/1000-point gate");
                         var saved=new CompoundTag();actor.saveWithoutId(saved);var restored=ModEntities.INFECTED_HOST.get().create(level);restored.load(saved);
-                        h.assertTrue(restored.isEvolved()&&restored.tissueInheritance().meals()==6,"reload preserves the evolved body and actual consumption history");restored.discard();close();h.succeed();return;
+                        h.assertTrue(restored.isEvolved()&&restored.tissueInheritance().meals()==6&&restored.evolvedChoice().orElseThrow().equals(choice),"reload preserves the evolved body, actual consumption history and exact frozen random choice");restored.discard();close();h.succeed();return;
                     }
-                    var core=new TissueCore[]{TissueCore.CARAPACE,TissueCore.JAW,TissueCore.GRASP}[meals%3];
-                    var prey=body(meals%2==0?EntityType.PIG:EntityType.SPIDER,core,10_000_000);
+                    var core=bladeBias?TissueCore.BLADE:new TissueCore[]{TissueCore.CARAPACE,TissueCore.JAW,TissueCore.GRASP}[meals%3];
+                    var prey=body(meals%2==0?EntityType.PIG:EntityType.SPIDER,core,bladeBias?TissueGrowth.ANCIENT_TICKS:10_000_000);
                     prey.setPos(actor.position().add(0,0,(actor.getBbWidth()+prey.getBbWidth())*.5+.05));
                     prey.setHealth(prey.getMaxHealth()*.10F);actor.setNoAi(false);actor.setTarget(prey);
                     h.assertTrue(TissueCompetition.tryStart(actor,prey),"real weakened mature donor can be captured at meal "+meals);

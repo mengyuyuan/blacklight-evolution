@@ -96,6 +96,7 @@ public final class TissueInheritance {
     public long acquiredOrgans(){return acquiredOrgans;}
     public double points(){return points;}
     public boolean qualified(){return qualified;}
+    public boolean hasMatureInheritance(){return organs.values().stream().anyMatch(o->o.mature()&&o.pending()==0&&o.integrated()>0);}
     public UUID lastOperation(){return lastOperation;}
     public long revision(){return revision;}
     private long nextRevision(){return revision==Long.MAX_VALUE?revision:revision+1;}
@@ -188,16 +189,10 @@ public final class TissueInheritance {
         return (changed?new TissueInheritance(result,meals,points,qualified,lastOperation,nextRevision(),acquiredOrgans,dormant,bodies):this).latch(nativeCore,age,rules);
     }
     private TissueInheritance latch(TissueCore nativeCore,long age,Rules rules){
-        if(qualified||acquiredOrgans<MIN_ACQUIRED_ORGANS||meals<rules.meals()||points<rules.points())return this;
-        for(var core:new TissueCore[]{TissueCore.MUSCLE,TissueCore.CARAPACE,TissueCore.JAW,TissueCore.GRASP})
-            if(matureStructuralStrength(core,nativeCore,age)<rules.strong())return this;
+        // Six personally completed mature meals, then let the acquired bias
+        // choose the form. Do not require a balanced set of four legacy organs.
+        if(qualified||acquiredOrgans<MIN_ACQUIRED_ORGANS||meals<Math.max(MIN_ACQUIRED_ORGANS,rules.meals())||!hasMatureInheritance()||!readyToHunt(age))return this;
         return new TissueInheritance(organs,meals,points,true,lastOperation,nextRevision(),acquiredOrgans,dormant,sources);
-    }
-    private double matureStructuralStrength(TissueCore role,TissueCore nativeCore,long age){
-        double result=0;
-        for(var core:TissueCore.values())if(core.structuralBias()==role&&maturity(core,nativeCore,age)>=1)
-            result=add(result,strength(core,nativeCore,age));
-        return result;
     }
     /** Paid development of already integrated organs. Food never manufactures
      * donor identities, assimilation points or accepted consumption counts. */

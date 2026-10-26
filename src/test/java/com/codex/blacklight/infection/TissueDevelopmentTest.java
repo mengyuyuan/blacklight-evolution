@@ -15,7 +15,7 @@ class TissueDevelopmentTest {
         assertEquals(6,growing.meals());assertEquals(6,growing.acquiredOrgans());assertEquals(123,growing.points());
         assertEquals(42,growing.organ(TissueCore.BLADE).variant());
         assertEquals(TissueInheritance.BLADE,growing.organ(TissueCore.BLADE).weapons());
-        assertFalse(growing.qualified());assertSame(before,before.cultivate(0,TissueCore.MUSCLE,72000,TissueInheritance.Rules.DEFAULT));
+        assertTrue(growing.qualified());assertSame(before,before.cultivate(0,TissueCore.MUSCLE,72000,TissueInheritance.Rules.DEFAULT));
         var forming=new TissueInheritance(Map.of(TissueCore.BLADE,new TissueInheritance.Organ(100,20,10,10,1,42)),0,0,false,null,1);
         assertSame(forming,forming.cultivate(20,TissueCore.MUSCLE,72000,TissueInheritance.Rules.DEFAULT));
     }

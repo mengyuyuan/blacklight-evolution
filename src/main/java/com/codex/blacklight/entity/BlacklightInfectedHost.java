@@ -81,6 +81,7 @@ public final class BlacklightInfectedHost extends Monster {
     public boolean evolvedControlProtected(){return evolvedCombat.controlProtected();}
     public boolean isEvolved(){return hostData().getBoolean("Evolved")||entityData.get(EVOLVED_STATE).getInt("Stage")==2;}
     public boolean isMetamorphosing(){int stage=entityData.get(EVOLVED_STATE).getInt("Stage");return stage==1||stage==3;}
+    public java.util.Optional<com.codex.blacklight.infection.EvolvedMapping.Choice> evolvedChoice(){return com.codex.blacklight.infection.EvolvedChoiceCodec.read(hostData().getCompound("EvolvedChoice"));}
     public float evolvedProgress(float partial){
         var state=entityData.get(EVOLVED_STATE);int stage=state.getInt("Stage");if(stage==2)return com.codex.blacklight.infection.EvolvedForm.DURATION;
         float extra=Math.clamp(level().getGameTime()-state.getLong("SampledAt")+partial,0,10)*(stage==3?-2:1);
@@ -96,6 +97,9 @@ public final class BlacklightInfectedHost extends Monster {
     public boolean beginEvolvedMetamorphosis(){
         if(level().isClientSide||!isAlive()||isEvolved()||isMetamorphosing()||hasMultipartBody()||devourerIdentity()
                 ||!com.codex.blacklight.infection.EvolvedForm.eligible(tissueInheritance(),tissueAge())||!evolvedSpace())return false;
+        if(evolvedChoice().isEmpty()){
+            var data=hostData().copy();data.put("EvolvedChoice",com.codex.blacklight.infection.EvolvedChoiceCodec.write(com.codex.blacklight.infection.EvolvedMappingReload.choose(tissueInheritance(),getUUID())));entityData.set(HOST,data);
+        }
         evolvedMorphTicks=0;publishEvolvedState(1);clearTissueStrike();organAbilities.interrupt();getNavigation().stop();setTarget(null);return true;
     }
     private boolean evolvedSpace(){

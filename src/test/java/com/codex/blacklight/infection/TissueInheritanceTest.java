@@ -61,11 +61,11 @@ class TissueInheritanceTest {
             organs.put(core,new TissueInheritance.Organ(300,0,0,immature?1:0,0,core.ordinal()));
         return new TissueInheritance(organs,count,points,false,null,1,count).digest(0,true,MUSCLE,504000,TissueInheritance.Rules.DEFAULT);
     }
-    @Test void qualificationRequiresAllMatureOrgansPersonalMealsAndPointsTogether(){
+    @Test void qualificationRequiresSixMaturePersonalMealsWithoutForcingBalancedLegacyOrgans(){
         assertTrue(gate(6,1000,false,null).qualified());
-        assertFalse(gate(5,1000,false,null).qualified());assertFalse(gate(6,999,false,null).qualified());
+        assertFalse(gate(5,1000,false,null).qualified());assertTrue(gate(6,0,false,null).qualified());
         assertFalse(gate(6,1000,true,null).qualified());
-        for(var core:new TissueCore[]{TissueCore.CARAPACE,TissueCore.JAW,TissueCore.GRASP})assertFalse(gate(6,1000,false,core).qualified());
+        for(var core:new TissueCore[]{TissueCore.CARAPACE,TissueCore.JAW,TissueCore.GRASP})assertTrue(gate(6,1000,false,core).qualified());
         assertFalse(TissueInheritance.EMPTY.digest(3600,true,MUSCLE,Long.MAX_VALUE,TissueInheritance.Rules.DEFAULT).qualified());
     }
     @Test void milestoneLatchesAndContinuesAcquiringAfterQualification(){
@@ -121,7 +121,7 @@ class TissueInheritanceTest {
             value=value.digest(3600,true,MUSCLE,216000,TissueInheritance.Rules.DEFAULT);
         }
         assertEquals(5,value.organs().size());assertEquals(6,value.acquiredOrgans());
-        assertFalse(value.qualified(),"six organs do not bypass the original strength and points requirements");
+        assertTrue(value.qualified(),"six actually consumed, integrated mature sources unlock the bias-selected next form");
     }
     @Test void fiveAcquiredOrgansCannotAdvanceEvenWithHugeAncestryAndPerfectStats(){
         var ready=gate(6,1000,false,null);
