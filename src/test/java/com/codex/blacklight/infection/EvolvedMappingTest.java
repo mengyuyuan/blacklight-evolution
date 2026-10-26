@@ -58,7 +58,7 @@ class EvolvedMappingTest {
         try(var reader=Files.newBufferedReader(Path.of("src/main/resources/data/blacklight/blacklight/evolved_mapping/default.json"))){
             var table=EvolvedMapping.read(reader);assertEquals(72,table.organs().size());
             for(var design:TissueOrganCatalog.ALL)assertTrue(table.organs().containsKey(design.id()),design.id());
-            assertEquals(1,table.forms().size());assertEquals(24,TissueOrganCatalog.ALL.stream().filter(TissueOrganCatalog.Definition::implemented).count());
+            assertEquals(1,table.forms().size());assertEquals(32,TissueOrganCatalog.ALL.stream().filter(TissueOrganCatalog.Definition::implemented).count());
             assertEquals(8,table.biases().size());
         }
     }

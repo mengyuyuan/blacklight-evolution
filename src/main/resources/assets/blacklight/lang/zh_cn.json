@@ -745,5 +745,13 @@
   "upgrade.blacklight.fat_body": "脂肪体",
   "hud.blacklight.digestive_reserves": "待消化 %s 份 · 脂储 %s",
   "upgrade.blacklight.extraoral_gland": "体外消化腺",
-  "upgrade.blacklight.gill_raker": "滤食鳃耙"
+  "upgrade.blacklight.gill_raker": "滤食鳃耙",
+  "upgrade.blacklight.gill_lamella": "鳃叶换气器",
+  "upgrade.blacklight.bronchial_lung": "支气管肺",
+  "upgrade.blacklight.avian_airflow": "气囊肺复合器",
+  "upgrade.blacklight.book_lung": "书肺复合器",
+  "upgrade.blacklight.tracheal_network": "气管分支网",
+  "upgrade.blacklight.main_heart": "分区主心泵",
+  "upgrade.blacklight.branchial_heart": "辅助鳃心",
+  "upgrade.blacklight.splenic_reservoir": "脾脏储血器"
 }

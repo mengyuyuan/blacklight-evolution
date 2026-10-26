@@ -65,19 +65,27 @@ public final class AuthoredInfectionParts {
         private TissueDigestion.Profile digestiveProfile=new TissueDigestion.Profile(0,0,0,0,0,0);
         private net.minecraft.nbt.CompoundTag digestiveState=new net.minecraft.nbt.CompoundTag();
         private float digestiveTime;
+        private TissueVitals.Profile vitalProfile=TissueVitals.Profile.EMPTY;
+        private net.minecraft.nbt.CompoundTag vitalState=new net.minecraft.nbt.CompoundTag();
+        private float vitalTime;
+        private final Map<TissueMorphogenesis.Bone,TissueVitalMotion.Field> vitalFields=new IdentityHashMap<>();
         public void growth(float value,long seed){growth=Math.max(0,Math.min(1,value));growthSeed=seed;staged=true;}
         public void evolution(long age,float tentacles){this.age=age;this.tentacles=tentacles;evolution=TissueEvolution.authoredState(growthSeed,age);}
         public void evolution(long age,float tentacles,TissueEvolution.State inherited){this.age=age;this.tentacles=tentacles;evolution=inherited;}
         void digestion(TissueDigestion.Profile profile,net.minecraft.nbt.CompoundTag state,float time){digestiveProfile=profile;digestiveState=state;digestiveTime=time;}
         void digestion(Binding other){digestion(other.digestiveProfile,other.digestiveState,other.digestiveTime);}
+        void vitals(TissueVitals.Profile profile,net.minecraft.nbt.CompoundTag state,float time){vitalProfile=profile;vitalState=state;vitalTime=time;vitalFields.clear();}
+        void vitals(Binding other){vitals(other.vitalProfile,other.vitalState,other.vitalTime);}
+        private TissueVitalMotion.Field vitalField(TissueMorphogenesis.Bone frame){return vitalFields.computeIfAbsent(frame,f->TissueVitalMotion.field(f,vitalProfile,vitalState,vitalTime));}
         long age(){return age;}
         float tentacles(){return tentacles;}
         TissueEvolution.State development(){return evolution;}
-        Vector3f developRoot(ModelPart part,Vector3f point){var frame=frames.get(part);if(frame==null)return point;var p=develop(point,frame,evolution);float[] v={p.x,p.y,p.z};TissueDigestiveMotion.surface(v,frame,digestiveProfile,digestiveState,digestiveTime);return new Vector3f(v[0],v[1],v[2]);}
-        private Triangle digest(Triangle triangle,TissueMorphogenesis.Bone frame){
-            if(!digestiveProfile.digestive()||frame==null||frame.role()!=0&&frame.role()!=1)return triangle;
+        Vector3f developRoot(ModelPart part,Vector3f point){var frame=frames.get(part);if(frame==null)return point;var p=develop(point,frame,evolution);float[] v={p.x,p.y,p.z};TissueDigestiveMotion.surface(v,frame,digestiveProfile,digestiveState,digestiveTime);var field=vitalField(frame);if(field!=null)field.apply(v);return new Vector3f(v[0],v[1],v[2]);}
+        private Triangle remodel(Triangle triangle,TissueMorphogenesis.Bone frame){
+            if(!digestiveProfile.digestive()&&!vitalProfile.active()||frame==null||frame.role()!=0&&frame.role()!=1)return triangle;
             float[] v={triangle.a.x,triangle.a.y,triangle.a.z,triangle.b.x,triangle.b.y,triangle.b.z,triangle.c.x,triangle.c.y,triangle.c.z};
             TissueDigestiveMotion.surface(v,frame,digestiveProfile,digestiveState,digestiveTime);
+            var field=vitalField(frame);if(field!=null)field.apply(v);
             var a=new Vector3f(v[0],v[1],v[2]);var b=new Vector3f(v[3],v[4],v[5]);var c=new Vector3f(v[6],v[7],v[8]);
             var n=new Vector3f(b).sub(a).cross(new Vector3f(c).sub(a));if(n.lengthSquared()>1e-8F)n.normalize();else n.set(triangle.normal);
             return new Triangle(a,b,c,n,triangle.color,triangle.face,triangle.uvA,triangle.uvB,triangle.uvC);
@@ -93,7 +101,7 @@ public final class AuthoredInfectionParts {
             for(var p:matches)if(!p.skin.isEmpty()&&replaced.add(p.cube)) {
                 if(age<TissueGrowth.ANCIENT_TICKS) {
                     int tint=TissueSkin.tint(color,growthSeed,p.anatomy,TissueEvolution.attachmentGrowth(age));
-                    for(var triangle:p.skin)emit(digest(develop(triangle,frames.get(part),evolution),frames.get(part)),posed,out,light,overlay,tint,true);
+                    for(var triangle:p.skin)emit(remodel(develop(triangle,frames.get(part),evolution),frames.get(part)),posed,out,light,overlay,tint,true);
                 }
             }
             if(replaced.isEmpty())return false;
@@ -122,7 +130,7 @@ public final class AuthoredInfectionParts {
                     float delay=p.anatomy==ConsumeAnatomy.BODY?0:.08F+variation*.12F;
                     fraction=Math.max(.07F,Math.min(1,(growth-delay)/(1-delay)))*(.86F+.14F*variation);
                 }
-                for(var triangle:p.growth)emit(digest(develop(grow(triangle,p.cube,fraction),frames.get(e.getKey()),evolution),frames.get(e.getKey())),q.pose,out,q.light,q.overlay,q.color,false);
+                for(var triangle:p.growth)emit(remodel(develop(grow(triangle,p.cube,fraction),frames.get(e.getKey()),evolution),frames.get(e.getKey())),q.pose,out,q.light,q.overlay,q.color,false);
             }
             // Use the exact same developed vertices for the tissue cover. A
             // thin normal offset avoids z-fighting without adding body volume.
@@ -133,7 +141,7 @@ public final class AuthoredInfectionParts {
                 if(tissue instanceof ConsumeAnatomy.Consumer consumer)consumer.anatomy(entry.getKey());
                 EvolvedDonorCapture.mesh(entry.getKey(),"authored_skin");
                 for(var triangle:piece.skin) {
-                    if(TissueEvolution.attachmentGrowth(age)>0)emitTissue(triangle,digest(develop(triangle,frame,evolution),frame),frame,posed.pose,tissue,posed.light,posed.overlay,posed.color,growthSeed,age,piece.anatomy);
+                    if(TissueEvolution.attachmentGrowth(age)>0)emitTissue(triangle,remodel(develop(triangle,frame,evolution),frame),frame,posed.pose,tissue,posed.light,posed.overlay,posed.color,growthSeed,age,piece.anatomy);
                 }
             }
             pending.clear();

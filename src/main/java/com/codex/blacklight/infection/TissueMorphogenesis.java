@@ -141,7 +141,34 @@ public final class TissueMorphogenesis {
         float w=box.span(principal(right)),h=box.span(principal(up)),d=box.span(principal(front));
         boolean limb=b.role>=2&&b.role<=5,fore=b.role==2||b.role==3;
         float side=b.modelCentre.x<0?-1:1;V outer=right.mul(side);
-        if(core==TissueCore.GILL_RAKER&&b.role==1){
+        if(core==TissueCore.GILL_LAMELLA&&b.role==1){
+            for(int sign:new int[]{-1,1}){
+                V root=c.add(right.mul(sign*w*.30F)).sub(up.mul(h*.22F));
+                organ(out,core.id+"_operculum_"+sign,0,"",right,null,List.of(new Section(root,h*.15F,d*.14F),
+                        new Section(root.add(right.mul(sign*w*.17F)).sub(front.mul(d*.05F)),h*.19F,d*.18F),
+                        new Section(root.add(right.mul(sign*w*.13F)).sub(front.mul(d*.23F)),h*.12F,d*.07F)),up,front,b,seed);
+            }
+        }else if(core.vital()&&core!=TissueCore.GILL_LAMELLA&&b.role==0){
+            if(core==TissueCore.LUNG||core==TissueCore.AIRFLOW){
+                for(int sign:new int[]{-1,1}){V root=c.add(up.mul(h*.25F)).add(right.mul(sign*w*.16F));
+                    organ(out,core.id+"_lobe_"+sign,1,"",right,null,List.of(new Section(root,w*.10F,d*.13F),
+                            new Section(root.sub(up.mul(h*.18F)),w*.20F,d*.23F),new Section(root.sub(up.mul(h*(core==TissueCore.AIRFLOW?.48F:.35F))),w*.12F,d*.17F)),right,front,b,seed);
+                }
+            }else if(core==TissueCore.BOOK_LUNG||core==TissueCore.TRACHEA){
+                for(int sign:new int[]{-1,1}){V root=c.add(right.mul(sign*w*.34F)).sub(up.mul(h*.18F));
+                    organ(out,core.id+"_vent_"+sign,2,"",right,null,List.of(new Section(root,w*.05F,d*.12F),
+                            new Section(root.add(front.mul(d*.18F)).sub(up.mul(h*.08F)),w*.09F,d*.20F),
+                            new Section(root.sub(front.mul(d*.18F)).sub(up.mul(h*(core==TissueCore.TRACHEA?.32F:.16F))),w*.045F,d*.16F)),right,front,b,seed);
+                }
+            }else if(core==TissueCore.BRANCHIAL_HEART){
+                for(int sign:new int[]{-1,1}){V root=c.add(up.mul(h*.24F)).add(right.mul(sign*w*.22F));
+                    organ(out,core.id+"_pump_"+sign,0,"",right,null,List.of(new Section(root,w*.07F,d*.09F),new Section(root.sub(up.mul(h*.13F)),w*.12F,d*.15F),new Section(root.sub(up.mul(h*.21F)),w*.07F,d*.08F)),right,front,b,seed);
+                }
+            }else{
+                V root=c.add(up.mul(h*(core==TissueCore.HEART?.20F:-.08F))).add(right.mul(core==TissueCore.SPLEEN?-w*.24F:0)).add(front.mul(d*.12F));
+                organ(out,core.id+"_reservoir",1,"",right,null,List.of(new Section(root,w*.08F,d*.10F),new Section(root.sub(up.mul(h*.14F)),w*.17F,d*.18F),new Section(root.sub(up.mul(h*.25F)),w*.07F,d*.08F)),right,front,b,seed);
+            }
+        }else if(core==TissueCore.GILL_RAKER&&b.role==1){
             for(int sign:new int[]{-1,1})for(int fold=0;fold<2;fold++){
                 V root=c.add(right.mul(sign*w*.33F)).add(front.mul(d*(.05F+fold*.18F))).sub(up.mul(h*.22F));
                 organ(out,core.id+"_sieve_"+sign+"_"+fold,0,"",right,null,List.of(new Section(root,w*.08F,d*.09F),
@@ -263,7 +290,7 @@ public final class TissueMorphogenesis {
     }
     public static Bone functionalMount(TissueCore core,Bone body,long seed){
         boolean sided=core==TissueCore.BLADE||core==TissueCore.CHELA||core==TissueCore.HYDROSTAT||core==TissueCore.CLUB||core==TissueCore.SADDLE||core==TissueCore.CNIDOCYTE;
-        int role=core.digestive()&&core!=TissueCore.CROP&&core!=TissueCore.GILL_RAKER?0:switch(core){case HORN,PHARYNX,TONGUE,CROP,EXTRAORAL,GILL_RAKER->1;case TENDON,HYDRAULIC->4;default->2;};
+        int role=(core.digestive()&&core!=TissueCore.CROP&&core!=TissueCore.GILL_RAKER||core.vital()&&core!=TissueCore.GILL_LAMELLA)?0:switch(core){case HORN,PHARYNX,TONGUE,CROP,EXTRAORAL,GILL_RAKER,GILL_LAMELLA->1;case TENDON,HYDRAULIC->4;default->2;};
         int side=!sided?0:core==TissueCore.BLADE||core==TissueCore.CLUB?TissueOrganLayout.bladeSide(seed):-TissueOrganLayout.bladeSide(seed);
         V c=body.box.centre(),half=body.box.high.sub(body.box.low).mul(sided?.24F:.32F);
         V centre=c.add(body.right.mul(side*span(body.box,body.right)*.38F));

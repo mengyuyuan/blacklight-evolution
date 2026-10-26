@@ -745,5 +745,13 @@
   "upgrade.blacklight.fat_body": "Fat Body",
   "hud.blacklight.digestive_reserves": "Digesting %s · Lipid reserve %s",
   "upgrade.blacklight.extraoral_gland": "Extraoral Digestive Gland",
-  "upgrade.blacklight.gill_raker": "Gill Raker"
+  "upgrade.blacklight.gill_raker": "Gill Raker",
+  "upgrade.blacklight.gill_lamella": "Gill Lamellae",
+  "upgrade.blacklight.bronchial_lung": "Bronchial Lung",
+  "upgrade.blacklight.avian_airflow": "Air Sac Ventilation",
+  "upgrade.blacklight.book_lung": "Book Lung",
+  "upgrade.blacklight.tracheal_network": "Tracheal Network",
+  "upgrade.blacklight.main_heart": "Main Heart",
+  "upgrade.blacklight.branchial_heart": "Branchial Heart",
+  "upgrade.blacklight.splenic_reservoir": "Splenic Reservoir"
 }

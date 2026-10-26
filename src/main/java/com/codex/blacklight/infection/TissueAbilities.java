@@ -54,7 +54,7 @@ public final class TissueAbilities {
         }
         boolean closing=core==TissueCore.EXTRAORAL&&tick>=cycle.retract();
         if(tick<0||tick>=cycle.end()||!closing&&!valid(target)){
-            host.setOrganAction(null,-1,Vec3.ZERO);TissueGrapples.release(host);cooldown=cycle.cooldown();return false;
+            host.setOrganAction(null,-1,Vec3.ZERO);TissueGrapples.release(host);cooldown=host.recoverTissueAction(cycle.cooldown());return false;
         }
         host.getNavigation().stop();host.setXxa(0);host.setZza(0);
         // Water attacks brace against drift; a land mob's panic-float goal must not eject an aquatic grasper.

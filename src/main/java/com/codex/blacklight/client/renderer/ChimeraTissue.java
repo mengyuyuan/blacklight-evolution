@@ -16,7 +16,7 @@ import java.util.*;
 /** Complete donor body regions rooted in the receiver's animated native trunk. */
 final class ChimeraTissue {
     private static final ResourceLocation TEXTURE=ResourceLocation.fromNamespaceAndPath("blacklight","textures/entity/tissue_anatomy.png");
-    private static final List<TissueCore> UPPER_ORGANS=List.of(TissueCore.BLADE,TissueCore.CHELA,TissueCore.HYDROSTAT,TissueCore.HORN,TissueCore.PHARYNX,TissueCore.SADDLE,TissueCore.CLUB,TissueCore.TONGUE,TissueCore.CNIDOCYTE,TissueCore.CROP,TissueCore.EXTRAORAL,TissueCore.GILL_RAKER);
+    private static final List<TissueCore> UPPER_ORGANS=List.of(TissueCore.BLADE,TissueCore.CHELA,TissueCore.HYDROSTAT,TissueCore.HORN,TissueCore.PHARYNX,TissueCore.SADDLE,TissueCore.CLUB,TissueCore.TONGUE,TissueCore.CNIDOCYTE,TissueCore.CROP,TissueCore.EXTRAORAL,TissueCore.GILL_RAKER,TissueCore.GILL_LAMELLA,TissueCore.LUNG,TissueCore.AIRFLOW,TissueCore.BOOK_LUNG,TissueCore.TRACHEA,TissueCore.HEART,TissueCore.BRANCHIAL_HEART,TissueCore.SPLEEN);
     private record DonorVisual(TissueChimera.Body body,List<RenderType> materials,ProceduralTissueBlueprint.Snapshot skeleton,Map<String,Matrix4f> bindPoses){}
     private record UpperModule(TissueCore core,String species,TissueMorphogenesis.Mesh mesh,TissueMorphogenesis.Bone frame,Matrix4f bonePose,TissueChimera.Piece rest,boolean support){}
     private record Remodel(TissueMorphogenesis.Bone frame,Matrix4f posed,Matrix4f inverse){}
@@ -33,6 +33,7 @@ final class ChimeraTissue {
     private final List<UpperModule> modules;
     private final Set<net.minecraft.client.model.geom.ModelPart> heads;
     private final Map<String,Remodel> remodeling;
+    private final Map<TissueMorphogenesis.Bone,TissueVitalMotion.Field> vitalFields=new IdentityHashMap<>();
     private PoseStack.Pose pose;private int light,overlay;
     static void reload(){DONORS.clear();CACHE.clear();ProceduralTissueBlueprint.reloadNative();}
     static TissueEvolution.State receiverEvolution(BlacklightInfectedHost host,boolean authored,float partial){
@@ -100,9 +101,10 @@ final class ChimeraTissue {
         String species=assembly.pieces().stream().filter(p->p.name().equals("upper_body_fusion")).map(TissueChimera.Piece::species).findFirst().orElse("");
         var visual=visuals.get(species);if(visual==null)return List.of();var result=new ArrayList<UpperModule>();long seed=TissueOrgans.seed(host.getUUID());
         for(var core:UPPER_ORGANS){
-            boolean head=core==TissueCore.HORN||core==TissueCore.PHARYNX||core==TissueCore.TONGUE||core==TissueCore.CROP||core==TissueCore.EXTRAORAL||core==TissueCore.GILL_RAKER;
+            boolean head=core==TissueCore.HORN||core==TissueCore.PHARYNX||core==TissueCore.TONGUE||core==TissueCore.CROP||core==TissueCore.EXTRAORAL||core==TissueCore.GILL_RAKER||core==TissueCore.GILL_LAMELLA;
+            boolean trunk=core.vital()&&!head;
             int side=(core==TissueCore.BLADE||core==TissueCore.CLUB?1:-1)*TissueOrganLayout.bladeSide(seed);
-            var arm=visual.skeleton.body().parts().stream().filter(p->head?p.role()==1:p.role()==2||p.role()==3).filter(p->head||side*TissueChimera.bounds(p.vertices()).centre().x()>0)
+            var arm=visual.skeleton.body().parts().stream().filter(p->trunk?p.role()==0:head?p.role()==1:p.role()==2||p.role()==3).filter(p->head||trunk||side*TissueChimera.bounds(p.vertices()).centre().x()>0)
                     .max(Comparator.comparingDouble(p->{var b=TissueChimera.bounds(p.vertices());return b.span(0)*b.span(1)*b.span(2);})).orElse(null);
             if(arm==null)continue;var box=TissueChimera.bounds(arm.vertices());
             var frame=new TissueMorphogenesis.Bone(arm.name(),arm.role(),box,new TissueMorphogenesis.V(0,-1,0),new TissueMorphogenesis.V(0,0,-1),new TissueMorphogenesis.V(1,0,0),box.centre());
@@ -150,12 +152,15 @@ final class ChimeraTissue {
     }
     private TissueChimera.Piece remodel(TissueChimera.Piece piece,TissueInheritance.BodySource source){
         var region=remodeling.get(piece.name());if(region==null||!assembly.uprightUpper())return piece;
-        var delta=TissueEvolution.additionalDevelopment(source.authored(),host.tissueEvolution(true,partial));if(!delta.active())return piece;
+        var delta=TissueEvolution.additionalDevelopment(source.authored(),host.tissueEvolution(true,partial));
+        var field=vitalFields.computeIfAbsent(region.frame,b->TissueVitalMotion.field(b,host.vitalsProfile(),host.vitalsVisual(),TissueVitalMotion.clock(host.level().getGameTime(),partial)));
+        if(!delta.active()&&field==null)return piece;
         var mapping=assembly.upper();var points=new ArrayList<TissueMorphogenesis.V>(piece.vertices().size());
         for(var point:piece.vertices()){
             var p=point.sub(mapping.root()).mul(1/mapping.scale()).add(mapping.origin());
             var local=region.inverse.transformPosition(new Vector3f(p.x(),p.y(),p.z()));
             p=TissueEvolution.develop(region.frame,new TissueMorphogenesis.V(local.x,local.y,local.z),delta,false);
+            if(field!=null)p=field.point(p);
             var posed=region.posed.transformPosition(new Vector3f(p.x(),p.y(),p.z()));points.add(mapping.point(new TissueMorphogenesis.V(posed.x,posed.y,posed.z)));
         }
         return new TissueChimera.Piece(piece.species(),piece.name(),piece.role(),piece.pivot(),piece.root(),points,piece.faces(),piece.uv(),piece.colors(),piece.material());
@@ -186,6 +191,7 @@ final class ChimeraTissue {
             if(expression<=.001F||source==null)continue;float growth=TissueChimera.growth(source,host.tissueInheritanceVisualWork(partial));if(growth<=.001F)continue;
             float[] vertices=module.mesh.stages()[2].clone();
             TissueEvolution.organ(vertices,module.frame,module.mesh.name(),TissueEvolution.retainStronger(source.authored(),host.tissueEvolution(true,partial)),false);
+            var field=vitalFields.computeIfAbsent(module.frame,b->TissueVitalMotion.field(b,host.vitalsProfile(),host.vitalsVisual(),TissueVitalMotion.clock(host.level().getGameTime(),partial)));if(field!=null)field.apply(vertices);
             var acquired=host.tissueInheritance().organ(module.core);TissueSkin.focus(vertices,module.support?(float)(1+.2*Math.log1p(load)):acquired==null?1:TissueGraftLayout.gain(acquired));
             float time=host.organActionCore()==module.core?host.organActionElapsed(partial):-1;
             TissueFunctionalMotion.apply(vertices,module.frame,module.mesh.name(),module.core,time,0);TissueSkin.rootedScale(vertices,expression);
@@ -193,6 +199,7 @@ final class ChimeraTissue {
                 var digestion=host.digestiveVisual();TissueDigestiveMotion.apply(vertices,module.frame,module.core,host.level().getGameTime()+partial,
                         TissueDigestiveMotion.active(module.core,digestion),TissueDigestiveMotion.load(module.core,digestion));
             }
+            if(module.core.vital())TissueVitalMotion.module(vertices,module.frame,module.core,host.vitalsVisual(),TissueVitalMotion.clock(host.level().getGameTime(),partial));
             var points=new ArrayList<TissueMorphogenesis.V>();for(int i=0;i<vertices.length;i+=3){var v=module.bonePose.transformPosition(new Vector3f(vertices[i],vertices[i+1],vertices[i+2]));points.add(assembly.upper().point(new TissueMorphogenesis.V(v.x,v.y,v.z)));}
             var p=module.rest;var moving=new TissueChimera.Piece(p.species(),p.name(),p.role(),p.pivot(),p.root(),points,p.faces(),p.uv(),p.colors(),p.material());
             var articulated=TissueChimera.pose(moving,growth,walk,speed,attack,host.tickCount+partial,yaw);

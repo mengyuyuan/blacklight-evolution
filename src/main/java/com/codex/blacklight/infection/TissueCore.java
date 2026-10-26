@@ -7,17 +7,21 @@ public enum TissueCore {
     BLADE("cutting_blade"), CHELA("chela"), HORN("ramming_horn"), PHARYNX("pharyngeal_jaw"),
     SADDLE("saddle_spring"), CLUB("dactyl_club"), TONGUE("ballistic_tongue"), CNIDOCYTE("cnidocyte_battery"),
     GIZZARD("gizzard"), FERMENT("fermentation_chamber"), ABSORPTIVE("absorptive_gut"), PANCREAS("digestive_pancreas"), CROP("crop"), FAT("fat_body"),
-    EXTRAORAL("extraoral_gland"), GILL_RAKER("gill_raker");
+    EXTRAORAL("extraoral_gland"), GILL_RAKER("gill_raker"),
+    GILL_LAMELLA("gill_lamella"), LUNG("bronchial_lung"), AIRFLOW("avian_airflow"), BOOK_LUNG("book_lung"), TRACHEA("tracheal_network"),
+    HEART("main_heart"), BRANCHIAL_HEART("branchial_heart"), SPLEEN("splenic_reservoir");
     public final String id;
     TissueCore(String id){this.id=id;}
     /** Frozen aggregate.2 mapping. Never use the expanded enum length here. */
     public static TissueCore forSeed(long seed){return values()[(int)(TissueGrowth.sample(TissueGrowth.mix(seed),846)*5)];}
     public boolean legacy(){return ordinal()<5;}
     public boolean digestive(){return switch(this){case GIZZARD,FERMENT,ABSORPTIVE,PANCREAS,CROP,FAT,GILL_RAKER->true;default->false;};}
+    public boolean vital(){return switch(this){case GILL_LAMELLA,LUNG,AIRFLOW,BOOK_LUNG,TRACHEA,HEART,BRANCHIAL_HEART,SPLEEN->true;default->false;};}
     public String key(){return "blacklight:"+id;}
     public TissueCore structuralBias(){return switch(this){
         case TENDON,HYDRAULIC->MUSCLE;case HYDROSTAT,CHELA,BLADE->GRASP;
-        case HORN->CARAPACE;case PHARYNX,TONGUE,CROP,EXTRAORAL,GILL_RAKER->JAW;case SADDLE,CLUB,GIZZARD,FERMENT,ABSORPTIVE,PANCREAS,FAT->MUSCLE;case CNIDOCYTE->GRASP;default->this;
+        case HORN->CARAPACE;case PHARYNX,TONGUE,CROP,EXTRAORAL,GILL_RAKER,GILL_LAMELLA->JAW;
+        case SADDLE,CLUB,GIZZARD,FERMENT,ABSORPTIVE,PANCREAS,FAT,LUNG,AIRFLOW,BOOK_LUNG,TRACHEA,HEART,BRANCHIAL_HEART,SPLEEN->MUSCLE;case CNIDOCYTE->GRASP;default->this;
     };}
     private static final int[][] VISUAL_SEEDS=visualSeeds();
     /** Four shapes per primary organ: a finite cache that cannot silently
@@ -33,9 +37,9 @@ public enum TissueCore {
     }
     public static TissueCore byId(String id){for(var core:values())if(core.id.equals(id)||core.key().equals(id))return core;return null;}
     public static TissueCore forNewHost(long seed,int plan,boolean water){
-        TissueCore[] choices=water?new TissueCore[]{MUSCLE,CARAPACE,JAW,GRASP,CREST,HYDROSTAT,PHARYNX,TONGUE,CNIDOCYTE,GIZZARD,ABSORPTIVE,PANCREAS,CROP,FAT,EXTRAORAL,GILL_RAKER}
-                :plan==2?new TissueCore[]{MUSCLE,CARAPACE,JAW,GRASP,CREST,HYDRAULIC,CHELA,BLADE,SADDLE,CNIDOCYTE,GIZZARD,ABSORPTIVE,PANCREAS,CROP,FAT}
-                :new TissueCore[]{MUSCLE,CARAPACE,JAW,GRASP,CREST,TENDON,HYDROSTAT,BLADE,CHELA,HORN,PHARYNX,SADDLE,CLUB,TONGUE,CNIDOCYTE,GIZZARD,FERMENT,ABSORPTIVE,PANCREAS,CROP,FAT,EXTRAORAL};
+        TissueCore[] choices=water?new TissueCore[]{MUSCLE,CARAPACE,JAW,GRASP,CREST,HYDROSTAT,PHARYNX,TONGUE,CNIDOCYTE,GIZZARD,ABSORPTIVE,PANCREAS,CROP,FAT,EXTRAORAL,GILL_RAKER,GILL_LAMELLA,LUNG,HEART,BRANCHIAL_HEART,SPLEEN}
+                :plan==2?new TissueCore[]{MUSCLE,CARAPACE,JAW,GRASP,CREST,HYDRAULIC,CHELA,BLADE,SADDLE,CNIDOCYTE,GIZZARD,ABSORPTIVE,PANCREAS,CROP,FAT,EXTRAORAL,BOOK_LUNG,TRACHEA,HEART,SPLEEN}
+                :new TissueCore[]{MUSCLE,CARAPACE,JAW,GRASP,CREST,TENDON,HYDROSTAT,BLADE,CHELA,HORN,PHARYNX,SADDLE,CLUB,TONGUE,CNIDOCYTE,GIZZARD,FERMENT,ABSORPTIVE,PANCREAS,CROP,FAT,EXTRAORAL,GILL_LAMELLA,LUNG,AIRFLOW,BOOK_LUNG,TRACHEA,HEART,SPLEEN};
         return choices[(int)(TissueGrowth.sample(TissueGrowth.mix(seed),1846)*choices.length)];
     }
     public static int quality(long age){return age>=816000?3:age>=240000?2:age>=72000?1:0;}
