@@ -1,0 +1,326 @@
+{
+  "unavailableMembers": [],
+  "recoverableMembers": [
+    {
+      "relation": 6320763,
+      "way": 425404910,
+      "batches": [
+        [
+          -5,
+          0
+        ]
+      ],
+      "tags": {
+        "building": "apartments",
+        "ele": "115.9",
+        "height": "21.8",
+        "lacounty:ain": "4265004069",
+        "lacounty:bld_id": "421859841712",
+        "start_date": "1994",
+        "type": "multipolygon"
+      }
+    },
+    {
+      "relation": 6321359,
+      "way": 425432629,
+      "batches": [
+        [
+          -6,
+          0
+        ]
+      ],
+      "tags": {
+        "building": "apartments",
+        "building:units": "19",
+        "ele": "79.0",
+        "height": "7.5",
+        "lacounty:ain": "4267036036",
+        "lacounty:bld_id": "419654837632",
+        "start_date": "1972",
+        "type": "multipolygon"
+      }
+    },
+    {
+      "relation": 6336003,
+      "way": 426236608,
+      "batches": [
+        [
+          -2,
+          -1
+        ],
+        [
+          -1,
+          -1
+        ]
+      ],
+      "tags": {
+        "building": "apartments",
+        "building:units": "159",
+        "ele": "106.7",
+        "height": "11.7",
+        "lacounty:ain": "5501017044",
+        "lacounty:bld_id": "475120848617",
+        "start_date": "1971",
+        "type": "multipolygon"
+      }
+    },
+    {
+      "relation": 6406871,
+      "way": 430542302,
+      "batches": [
+        [
+          -7,
+          -6
+        ]
+      ],
+      "tags": {
+        "building": "house",
+        "building:units": "1",
+        "ele": "278.8",
+        "height": "4.9",
+        "lacounty:ain": "2763022001",
+        "lacounty:bld_id": "397342913733",
+        "start_date": "1960",
+        "type": "multipolygon"
+      }
+    },
+    {
+      "relation": 6406960,
+      "way": 430552671,
+      "batches": [
+        [
+          -5,
+          -4
+        ]
+      ],
+      "tags": {
+        "building": "apartments",
+        "building:units": "44",
+        "ele": "223.4",
+        "height": "6.4",
+        "lacounty:ain": "2240014026",
+        "lacounty:bld_id": "428073890506",
+        "start_date": "1971",
+        "type": "multipolygon"
+      }
+    },
+    {
+      "relation": 6411494,
+      "way": 430927536,
+      "batches": [
+        [
+          -5,
+          -7
+        ]
+      ],
+      "tags": {
+        "building": "apartments",
+        "building:units": "39",
+        "ele": "405.3",
+        "height": "9.9",
+        "lacounty:ain": "2504022013",
+        "lacounty:bld_id": "428768935857",
+        "start_date": "2007",
+        "type": "multipolygon"
+      }
+    },
+    {
+      "relation": 6424277,
+      "way": 431838635,
+      "batches": [
+        [
+          -10,
+          -5
+        ],
+        [
+          -9,
+          -5
+        ]
+      ],
+      "tags": {
+        "building": "house",
+        "building:units": "1",
+        "ele": "278.3",
+        "height": "6.7",
+        "lacounty:ain": "2020018062",
+        "lacounty:bld_id": "367667901701",
+        "start_date": "1982",
+        "type": "multipolygon"
+      }
+    },
+    {
+      "relation": 7395424,
+      "way": 1540963394,
+      "batches": [
+        [
+          -6,
+          -6
+        ],
+        [
+          -6,
+          -5
+        ],
+        [
+          -5,
+          -6
+        ],
+        [
+          -5,
+          -5
+        ]
+      ],
+      "tags": {
+        "landuse": "residential",
+        "type": "multipolygon"
+      }
+    },
+    {
+      "relation": 14412358,
+      "way": 1083082840,
+      "batches": [
+        [
+          -5,
+          2
+        ],
+        [
+          -5,
+          3
+        ]
+      ],
+      "tags": {
+        "name": "Dockweiler State Beach",
+        "natural": "beach",
+        "surface": "sand",
+        "type": "multipolygon"
+      }
+    },
+    {
+      "relation": 15083527,
+      "way": 1222660863,
+      "batches": [
+        [
+          -6,
+          -7
+        ],
+        [
+          -6,
+          -6
+        ],
+        [
+          -5,
+          -7
+        ]
+      ],
+      "tags": {
+        "amenity": "school",
+        "ele": "311",
+        "gnis:feature_id": "238499",
+        "name": "Bishop Alemany High School",
+        "type": "multipolygon"
+      }
+    },
+    {
+      "relation": 17245430,
+      "way": 1498143308,
+      "batches": [
+        [
+          -3,
+          -5
+        ],
+        [
+          -2,
+          -5
+        ],
+        [
+          -1,
+          -5
+        ]
+      ],
+      "tags": {
+        "dog": "leashed",
+        "name": "Verdugo Mountains",
+        "natural": "scrub",
+        "type": "multipolygon",
+        "wikidata": "Q7921151",
+        "wikipedia": "en:Verdugo Mountains"
+      }
+    },
+    {
+      "relation": 20252738,
+      "way": 1482118967,
+      "batches": [
+        [
+          -5,
+          -8
+        ],
+        [
+          -4,
+          -8
+        ]
+      ],
+      "tags": {
+        "natural": "scrub",
+        "type": "multipolygon"
+      }
+    },
+    {
+      "relation": 20452952,
+      "way": 1551254014,
+      "batches": [
+        [
+          -8,
+          -3
+        ],
+        [
+          -8,
+          -2
+        ],
+        [
+          -8,
+          -1
+        ],
+        [
+          -8,
+          0
+        ],
+        [
+          -7,
+          -3
+        ],
+        [
+          -7,
+          -2
+        ],
+        [
+          -7,
+          -1
+        ],
+        [
+          -7,
+          0
+        ],
+        [
+          -6,
+          -3
+        ],
+        [
+          -6,
+          -2
+        ],
+        [
+          -6,
+          -1
+        ],
+        [
+          -6,
+          0
+        ]
+      ],
+      "tags": {
+        "fixme": "Rough boundaries should be fixed to follow trails and roads",
+        "natural": "scrub",
+        "type": "multipolygon"
+      }
+    }
+  ]
+}

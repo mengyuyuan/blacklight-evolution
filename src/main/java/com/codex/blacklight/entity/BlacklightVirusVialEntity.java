@@ -60,6 +60,7 @@ public final class BlacklightVirusVialEntity extends ThrowableItemProjectile {
         if (result instanceof BlockHitResult block)
             burst = burst.add(Vec3.atLowerCornerOf(block.getDirection().getNormal()).scale(.02));
         setPos(burst);
+        com.codex.blacklight.infection.WorldOutbreakSystem.release(serverLevel,blockPosition());
         // Throwing at your feet is voluntary awakening; never infect bystanders in PvP.
         if (owner instanceof net.minecraft.world.entity.player.Player player
                 && player.distanceToSqr(burst) <= INFECTION_RADIUS * INFECTION_RADIUS

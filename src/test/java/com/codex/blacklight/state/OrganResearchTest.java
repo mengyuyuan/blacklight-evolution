@@ -5,6 +5,23 @@ import com.google.gson.JsonObject;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 class OrganResearchTest {
+    @Test void seventyTwoIdsAndUnknownFutureIdsNeverAliasOldBitPositions(){
+        var progress=OrganResearch.EMPTY;
+        for(var definition:com.codex.blacklight.infection.TissueOrganCatalog.ALL)progress=progress.discover(definition.id(),definition.number()%3+1);
+        progress=progress.discover("othermod:future_organ",3);
+        var decoded=OrganResearch.CODEC.parse(JsonOps.INSTANCE,OrganResearch.CODEC.encodeStart(JsonOps.INSTANCE,progress).getOrThrow()).getOrThrow();
+        assertEquals(progress,decoded);assertEquals(73,decoded.organs().size());
+        for(var d:com.codex.blacklight.infection.TissueOrganCatalog.ALL){assertEquals(d.number()%3+1,decoded.sample(d.id()));assertEquals(0,decoded.rank(d.id()));}
+        assertEquals(3,decoded.sample("othermod:future_organ"));
+    }
+    @Test void allOriginalBitPatternsMigrateWithoutBuyingOrLosingASample(){
+        for(int bits=0;bits<1024;bits++){
+            var json=new JsonObject();json.addProperty("samples",bits);json.addProperty("upgrades",1023);
+            var migrated=OrganResearch.CODEC.parse(JsonOps.INSTANCE,json).getOrThrow();
+            assertEquals(bits,migrated.samples());assertEquals(bits,migrated.upgrades());
+            assertEquals(0,migrated.sample(TissueCore.CHELA));
+        }
+    }
     @Test void oldDataLoadsEmptyAndDiscoveredProgressRoundTrips(){
         assertEquals(OrganResearch.EMPTY,OrganResearch.CODEC.parse(JsonOps.INSTANCE,new JsonObject()).getOrThrow());
         var progress=OrganResearch.EMPTY.discover(TissueCore.GRASP,3).buy(TissueCore.GRASP).discover(TissueCore.JAW,2);

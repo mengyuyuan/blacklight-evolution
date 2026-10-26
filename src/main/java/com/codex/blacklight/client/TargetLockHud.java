@@ -19,9 +19,13 @@ public final class TargetLockHud {
     private static long frame;
     private static WorldFrame world;
     private static Marker marker;
+    private static Object candidateLevel;
+    private static int candidateTick=-100,readyCount;
+    private static java.util.List<net.minecraft.world.entity.Mob> candidates=java.util.List.of();
     private TargetLockHud() { }
     public static Marker lastMarker(){return marker;}
-    @SubscribeEvent public static void begin(RenderFrameEvent.Pre event){frame++;marker=null;}
+    public static int readyMarkerCount(){return readyCount;}
+    @SubscribeEvent public static void begin(RenderFrameEvent.Pre event){frame++;marker=null;if(Minecraft.getInstance().level==null){world=null;candidateLevel=null;candidateTick=-100;candidates=java.util.List.of();}}
     @SubscribeEvent public static void captureWorld(RenderLevelStageEvent event) {
         if(event.getStage()!=RenderLevelStageEvent.Stage.AFTER_LEVEL)return;
         var mc=Minecraft.getInstance();
@@ -30,7 +34,17 @@ public final class TargetLockHud {
     }
     @SubscribeEvent public static void render(RenderGuiEvent.Post event) {
         var mc=Minecraft.getInstance();var g=event.getGuiGraphics();
-        if(mc.player==null||mc.level==null||mc.options.hideGui||!ClientTargetLock.active())return;
+        readyCount=0;
+        if(mc.player==null||mc.level==null||mc.options.hideGui)return;
+        consumeMarkers(g,mc);
+        var dive=mc.player.getData(com.codex.blacklight.registry.ModAttachments.DEVASTATOR_VISUAL);
+        if(dive.kind()==3&&dive.phase()==com.codex.blacklight.combat.DevastatorSystem.FLIGHT&&dive.diveAim()!=null){
+            Vec3 delta=dive.diveAim().subtract(mc.player.position());
+            String aim=net.minecraft.network.chat.Component.translatable("hud.blacklight.bulletdive_aim",
+                    String.format(java.util.Locale.ROOT,"%.1f",Math.hypot(delta.x,delta.z))).getString();
+            panel(g,aim,g.guiWidth()/2,g.guiHeight()-82,0xFFFFB297);
+        }
+        if(!ClientTargetLock.active())return;
         var target=ClientTargetLock.target();
         if(target==null){
             String notice=ClientTargetLock.notice();
@@ -48,23 +62,49 @@ public final class TargetLockHud {
             if(point.onScreen()) {
                 int x=Math.round(point.x()),y=Math.round(point.y()),color=ClientTargetLock.pending()?0xFFFFCA77:0xFFFF6B64;
                 brackets(g,x,y,color);
-                panel(g,name,x,Math.min(g.guiHeight()-36,y+17),color);
             }
         }
-        String key=com.codex.blacklight.client.ClientClawEvents.targetLockKey().getTranslatedKeyMessage().getString();
         String status=name+"  "+Math.round(Math.sqrt(com.codex.blacklight.combat.CombatTargeting.distanceSquared(mc.player.getEyePosition(),target)))+"m"
-                +(marker==null||!marker.onScreen()?" · 目标在视野外":"")+"  ["+key+" 取消]";
+                +(marker==null||!marker.onScreen()?" · 目标在视野外":"");
+        if(target instanceof net.minecraft.world.entity.Mob mob&&ready(mc,mob))status+=" · "+net.minecraft.network.chat.Component.translatable("hud.blacklight.consume_ready_short",SkillBindings.label("key.blacklight.grab")).getString();
         panel(g,status,g.guiWidth()/2,g.guiHeight()-54,0xFFE8DDD6);
-        if(target instanceof com.codex.blacklight.entity.BlacklightInfectedHost host&&com.codex.blacklight.power.AssimilationSystem.tissue(host)){
-            var core=com.codex.blacklight.infection.TissueCore.forSeed(com.codex.blacklight.infection.TissueOrgans.seed(host.getUUID()));
+        if(ClientClawEvents.targetInfoKey().isDown()&&mc.screen==null&&target instanceof com.codex.blacklight.entity.BlacklightInfectedHost host&&com.codex.blacklight.power.AssimilationSystem.tissue(host)){
+            var core=host.nativeTissueCore();
             int quality=com.codex.blacklight.infection.TissueCore.quality(host.tissueAge());
             String condition=com.codex.blacklight.combat.ConsumeSystem.healthReady(mc.player,host)?"ready":quality>=2&&host.tissueCoreFracture()<1?"armored":"weaken";
-            String info=net.minecraft.network.chat.Component.translatable("hud.blacklight.organ_target",net.minecraft.network.chat.Component.translatable("upgrade.blacklight."+core.id),quality,
+            var qualityLabel=net.minecraft.network.chat.Component.translatable(quality==0?"hud.blacklight.organ_developing":"hud.blacklight.organ_quality",quality);
+            String info=net.minecraft.network.chat.Component.translatable("hud.blacklight.organ_target",net.minecraft.network.chat.Component.translatable("upgrade.blacklight."+core.id),qualityLabel,
                     net.minecraft.network.chat.Component.translatable("hud.blacklight.organ_"+condition)).getString();
             panel(g,info,g.guiWidth()/2,g.guiHeight()-68,0xFFDDA6A1);
-            long generation=Math.max(0,host.tissueAge()-com.codex.blacklight.infection.TissueGrowth.ANCIENT_TICKS)/com.codex.blacklight.infection.TissueEvolution.GENERATION_TICKS;
+            long generation=com.codex.blacklight.infection.TissueGrowth.generation(host.tissueAge());
             String evolution=net.minecraft.network.chat.Component.translatable("hud.blacklight.host_evolution",generation,host.tissueNutrition(),com.codex.blacklight.infection.TissueMetabolism.MAX_RESERVE).getString();
             panel(g,evolution,g.guiWidth()/2,g.guiHeight()-82,0xFFB9B0A3);
+            String growthCost=net.minecraft.network.chat.Component.translatable("hud.blacklight.host_growth_cost",String.format(java.util.Locale.ROOT,"%.0f",com.codex.blacklight.infection.TissueMetabolism.phaseFood(host.tissueAge()))).getString();
+            panel(g,growthCost,g.guiWidth()/2,g.guiHeight()-96,0xFFB9B0A3);
+        }
+    }
+    private static boolean ready(Minecraft mc,net.minecraft.world.entity.Mob mob){return mob.isAlive()&&!mob.isRemoved()&&com.codex.blacklight.combat.ConsumeSystem.eligible(mob)&&com.codex.blacklight.combat.ConsumeSystem.healthReady(mc.player,mob);}
+    private static void consumeMarkers(GuiGraphics g,Minecraft mc){
+        var state=mc.player.getData(com.codex.blacklight.registry.ModAttachments.PLAYER_STATE);var captured=world;
+        if(!state.isInfected()||!state.isPrototypeMode()||captured==null||captured.level!=mc.level||captured.frame!=frame)return;
+        if(candidateLevel!=mc.level||mc.player.tickCount-candidateTick>=10||mc.player.tickCount<candidateTick){
+            candidateLevel=mc.level;candidateTick=mc.player.tickCount;
+            candidates=mc.level.getEntitiesOfClass(net.minecraft.world.entity.Mob.class,mc.player.getBoundingBox().inflate(16),mob->ready(mc,mob)&&mc.player.hasLineOfSight(mob)).stream()
+                    .sorted(java.util.Comparator.comparingDouble(mc.player::distanceToSqr)).limit(8).toList();
+        }
+        for(var mob:candidates){
+            if(!ready(mc,mob)||!mc.player.hasLineOfSight(mob)||mc.player.distanceToSqr(mob)>16*16)continue;
+            var p=mob.getPosition(captured.partial).add(0,mob.getBbHeight()+.35,0);var eye=captured.camera;
+            var screen=WorldHudProjection.project(captured.view,captured.projection,eye.x,eye.y,eye.z,p.x,p.y,p.z,g.guiWidth(),g.guiHeight());
+            if(!screen.onScreen())continue;readyCount++;int x=Math.round(screen.x()),y=Math.round(screen.y());
+            int pulse=205+(int)(35*Math.sin((mc.level.getGameTime()+captured.partial)*.16)),red=pulse<<24|0xFF5650;
+            int[] twist={-3,-4,-2,2,4,3};
+            for(int i=0;i<twist.length;i++){
+                int yy=y-6+i*2,dx=twist[i];
+                g.fill(x+dx-1,yy-1,x+dx+3,yy+3,0x99000000);g.fill(x-dx-1,yy-1,x-dx+3,yy+3,0x99000000);
+                g.fill(x+dx,yy,x+dx+2,yy+2,red);g.fill(x-dx,yy,x-dx+2,yy+2,red);
+                if(i%2==0)g.fill(x-Math.abs(dx)+1,yy+1,x+Math.abs(dx)+1,yy+2,0xCCFFB0A4);
+            }
         }
     }
     private static void brackets(GuiGraphics g,int x,int y,int color) {

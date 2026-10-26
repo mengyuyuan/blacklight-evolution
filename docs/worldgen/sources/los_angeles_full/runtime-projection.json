@@ -1,0 +1,28 @@
+{
+  "native": {
+    "kind": "web_mercator",
+    "originLat": 34.05575,
+    "originLon": -118.243,
+    "scale": 1,
+    "earthRadius": 6371000.0
+  },
+  "elevation": {
+    "min_height_m": 0,
+    "blocks_per_meter": 0.8,
+    "ground_level": 63
+  },
+  "worldBounds": [
+    13086201.266723191,
+    -1311934.2627629116,
+    13138931.225051224,
+    -1236485.8080854085
+  ],
+  "chunkEncoding": "LAC3",
+  "limitations": [
+    "Municipal Los Angeles relation 207359, not the county or metropolitan area.",
+    "Arnis-generated interiors and furnishings are procedural.",
+    "Terrain vertical scale is 0.8; building dimensions follow Arnis scale 1.0.",
+    "Below-dimension seabed is replaced by the dimension floor; entity and block-entity NBT is not imported.",
+    "Existing saved chunks are preserved."
+  ]
+}

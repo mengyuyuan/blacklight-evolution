@@ -6,6 +6,11 @@ public final class TissueGrowth {
     public static final int HYPERTROPHY_TICKS = 24000, ANCIENT_TICKS = 48000;
     private TissueGrowth() {}
     public static long clamp(long ticks) { return Math.max(0, ticks); }
+    /** Completed growth stages include the initial mature forms, before late genetic remodeling starts. */
+    public static long generation(long ticks) {
+        long age=clamp(ticks);
+        return age<MATURITY_TICKS?0:age<HYPERTROPHY_TICKS?1:age<ANCIENT_TICKS?2:3+(age-ANCIENT_TICKS)/TissueEvolution.GENERATION_TICKS;
+    }
     public static long advance(long ticks, long elapsed) {
         long age=clamp(ticks),delta=clamp(elapsed);
         return delta>Long.MAX_VALUE-age?Long.MAX_VALUE:age+delta;

@@ -7,6 +7,10 @@ import com.codex.blacklight.infection.TissueOrgans;
 import com.codex.blacklight.infection.TissueEvolution;
 import com.codex.blacklight.infection.TissueCore;
 import com.codex.blacklight.infection.TissueMetabolism;
+import com.codex.blacklight.infection.TissueInheritance;
+import com.codex.blacklight.infection.TissueInheritanceCodec;
+import com.codex.blacklight.infection.TissueCompetition;
+import com.codex.blacklight.infection.TissueCompetitionConfig;
 import com.codex.blacklight.power.CombatScale;
 import com.codex.blacklight.registry.ModAttachments;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -67,6 +71,62 @@ public final class BlacklightInfectedHost extends Monster {
     private int attackCooldown;
     private int tissueClock;
     private int tissueRecoveryTicks;
+    private int tissueNutritionDebt;
+    private int evolvedMorphTicks;
+    private static final EntityDataAccessor<CompoundTag> EVOLVED_STATE=SynchedEntityData.defineId(BlacklightInfectedHost.class,EntityDataSerializers.COMPOUND_TAG);
+    private static final EntityDataAccessor<CompoundTag> EVOLVED_ACTION=SynchedEntityData.defineId(BlacklightInfectedHost.class,EntityDataSerializers.COMPOUND_TAG);
+    private final com.codex.blacklight.infection.EvolvedCombat evolvedCombat=new com.codex.blacklight.infection.EvolvedCombat(this);
+    public boolean acceptEvolvedImpact(){return !isEvolved()||evolvedCombat.acceptImpact();}
+    public boolean evolvedControlProtected(){return evolvedCombat.controlProtected();}
+    public boolean isEvolved(){return hostData().getBoolean("Evolved")||entityData.get(EVOLVED_STATE).getInt("Stage")==2;}
+    public boolean isMetamorphosing(){int stage=entityData.get(EVOLVED_STATE).getInt("Stage");return stage==1||stage==3;}
+    public float evolvedProgress(float partial){
+        var state=entityData.get(EVOLVED_STATE);int stage=state.getInt("Stage");if(stage==2)return com.codex.blacklight.infection.EvolvedForm.DURATION;
+        float extra=Math.clamp(level().getGameTime()-state.getLong("SampledAt")+partial,0,10)*(stage==3?-2:1);
+        return Math.clamp(state.getInt("Elapsed")+(level().isClientSide?extra:0),0,com.codex.blacklight.infection.EvolvedForm.DURATION);
+    }
+    public String evolvedAction(){return entityData.get(EVOLVED_ACTION).getString("Move");}
+    public boolean evolvedEngaged(){return entityData.get(EVOLVED_STATE).getBoolean("Combat");}
+    public float evolvedDeployment(float partial){var state=entityData.get(EVOLVED_STATE);float t=(level().getGameTime()-state.getLong("CombatAt")+partial)/(evolvedEngaged()?6F:8F);return evolvedEngaged()?com.codex.blacklight.infection.EvolvedForm.smooth(t):1-com.codex.blacklight.infection.EvolvedForm.smooth(t);}
+    public void setEvolvedEngaged(boolean combat){if(level().isClientSide||evolvedEngaged()==combat)return;var tag=entityData.get(EVOLVED_STATE).copy();tag.putBoolean("Combat",combat);tag.putLong("CombatAt",level().getGameTime());entityData.set(EVOLVED_STATE,tag);}
+    public float evolvedActionElapsed(float partial){var action=entityData.get(EVOLVED_ACTION);return action.isEmpty()?-1:level().getGameTime()-action.getLong("Started")+partial;}
+    public void setEvolvedAction(String action){if(level().isClientSide)return;var tag=new CompoundTag();if(!action.isEmpty()){tag.putString("Move",action);tag.putLong("Started",level().getGameTime());}entityData.set(EVOLVED_ACTION,tag);}
+    private void publishEvolvedState(int stage){var tag=new CompoundTag();tag.putInt("Stage",stage);tag.putInt("Elapsed",evolvedMorphTicks);tag.putLong("SampledAt",level().getGameTime());entityData.set(EVOLVED_STATE,tag);}
+    public boolean beginEvolvedMetamorphosis(){
+        if(level().isClientSide||!isAlive()||isEvolved()||isMetamorphosing()||hasMultipartBody()||devourerIdentity()
+                ||!com.codex.blacklight.infection.EvolvedForm.eligible(tissueInheritance(),tissueAge())||!evolvedSpace())return false;
+        evolvedMorphTicks=0;publishEvolvedState(1);clearTissueStrike();organAbilities.interrupt();getNavigation().stop();setTarget(null);return true;
+    }
+    private boolean evolvedSpace(){
+        float scale=com.codex.blacklight.infection.EvolvedForm.scale(tissueInheritance());
+        var box=EntityDimensions.scalable(.95F*1.12F*scale,2.16F*1.12F*scale).makeBoundingBox(position());
+        return box.maxY<=level().getMaxBuildHeight()&&level().getWorldBorder().isWithinBounds(box)&&level().noCollision(this,box);
+    }
+    private boolean tickEvolvedMorph(){
+        if(isMetamorphosing()){
+            int stage=entityData.get(EVOLVED_STATE).getInt("Stage");getNavigation().stop();setTarget(null);setXxa(0);setZza(0);setDeltaMovement(getDeltaMovement().multiply(0,1,0));
+            if(stage==3){evolvedMorphTicks=Math.max(0,evolvedMorphTicks-2);if(evolvedMorphTicks==0)publishEvolvedState(0);else if(tickCount%5==0)publishEvolvedState(3);return true;}
+            evolvedMorphTicks++;
+            if(evolvedMorphTicks==com.codex.blacklight.infection.EvolvedForm.COMMIT){
+                if(!evolvedSpace()){publishEvolvedState(3);return true;}
+                commitEvolvedBody();
+            }
+            if(evolvedMorphTicks>=com.codex.blacklight.infection.EvolvedForm.DURATION){evolvedMorphTicks=com.codex.blacklight.infection.EvolvedForm.DURATION;publishEvolvedState(2);return true;}
+            if(tickCount%5==0||evolvedMorphTicks==com.codex.blacklight.infection.EvolvedForm.COMMIT)publishEvolvedState(1);return true;
+        }
+        if(!isEvolved()&&tissueRecoveryTicks==0&&tickCount%20==0&&(getTarget()==null||!getTarget().isAlive()||distanceToSqr(getTarget())>24*24)
+                &&getData(ModAttachments.CONSUME_VISUAL).active()==false&&!TissueCompetition.controls(this)&&organActionCore()==null)
+            return beginEvolvedMetamorphosis();
+        return false;
+    }
+    private void commitEvolvedBody(){
+        if(isEvolved())return;var data=hostData().copy();data.put("EvolvedOrigin",data.copy());data.putString("EvolvedOriginSpecies",speciesId());
+        data.putBoolean("Evolved",true);data.putString("Type","minecraft:zombie");data.putString("Family","ground");data.putBoolean("Humanoid",true);data.putBoolean("Quadruped",false);
+        data.putFloat("Width",.95F*1.12F);data.putFloat("Height",2.16F*1.12F);data.putFloat("ModelScale",1);data.put("Visual",new CompoundTag());
+        entityData.set(HOST,data);entityData.set(TISSUE_BODY_SCALE,com.codex.blacklight.infection.EvolvedForm.scale(tissueInheritance()));
+        if(!hasCustomName())setCustomName(Component.translatable("entity.blacklight.evolved"));
+        navigationReady=false;setupNavigation();getAttribute(Attributes.FOLLOW_RANGE).setBaseValue(Math.max(48,getAttributeValue(Attributes.FOLLOW_RANGE)));updateTissueCombat();refreshDimensions();
+    }
     private static final ResourceLocation TISSUE_HEALTH=ResourceLocation.fromNamespaceAndPath("blacklight","tissue_evolution_health");
     private static final ResourceLocation TISSUE_DAMAGE=ResourceLocation.fromNamespaceAndPath("blacklight","tissue_evolution_damage");
     private static final ResourceLocation TISSUE_ARMOR=ResourceLocation.fromNamespaceAndPath("blacklight","tissue_evolution_armor");
@@ -74,22 +134,115 @@ public final class BlacklightInfectedHost extends Monster {
     private static final String TISSUE_MEAL="BlacklightTissueMealSettled";
     private static final EntityDataAccessor<Long> TISSUE_AGE=SynchedEntityData.defineId(BlacklightInfectedHost.class,EntityDataSerializers.LONG);
     private static final EntityDataAccessor<Float> TISSUE_BODY_SCALE=SynchedEntityData.defineId(BlacklightInfectedHost.class,EntityDataSerializers.FLOAT);
+    private static final EntityDataAccessor<org.joml.Vector3f> TISSUE_FRAME=SynchedEntityData.defineId(BlacklightInfectedHost.class,EntityDataSerializers.VECTOR3);
+    public org.joml.Vector3f tissueFrame(){return new org.joml.Vector3f(entityData.get(TISSUE_FRAME));}
+    public com.codex.blacklight.infection.TissueBodyPlan.Frame tissueBodyPlan(){return com.codex.blacklight.infection.TissueBodyPlan.resolve(nativeTissuePlan(),nativeTissueCore(),TissueOrgans.seed(getUUID()),tissueAge(),tissueInheritance());}
     private static final EntityDataAccessor<Float> TISSUE_CORE_FRACTURE=SynchedEntityData.defineId(BlacklightInfectedHost.class,EntityDataSerializers.FLOAT);
     private static final EntityDataAccessor<Integer> TISSUE_STRIKE_TARGET=SynchedEntityData.defineId(BlacklightInfectedHost.class,EntityDataSerializers.INT);
     private static final EntityDataAccessor<Long> TISSUE_STRIKE_STARTED=SynchedEntityData.defineId(BlacklightInfectedHost.class,EntityDataSerializers.LONG);
     private static final EntityDataAccessor<Long> TISSUE_GRIP_RELEASE=SynchedEntityData.defineId(BlacklightInfectedHost.class,EntityDataSerializers.LONG);
     private static final EntityDataAccessor<org.joml.Vector3f> TISSUE_STRIKE_POINT=SynchedEntityData.defineId(BlacklightInfectedHost.class,EntityDataSerializers.VECTOR3);
     private static final EntityDataAccessor<Integer> TISSUE_NUTRITION=SynchedEntityData.defineId(BlacklightInfectedHost.class,EntityDataSerializers.INT);
+    private static final EntityDataAccessor<CompoundTag> TISSUE_INHERITANCE=SynchedEntityData.defineId(BlacklightInfectedHost.class,EntityDataSerializers.COMPOUND_TAG);
+    private static final EntityDataAccessor<Integer> CANNIBAL_TARGET=SynchedEntityData.defineId(BlacklightInfectedHost.class,EntityDataSerializers.INT);
+    private static final EntityDataAccessor<Long> CANNIBAL_STARTED=SynchedEntityData.defineId(BlacklightInfectedHost.class,EntityDataSerializers.LONG);
+    private static final EntityDataAccessor<Boolean> CANNIBAL_PREY=SynchedEntityData.defineId(BlacklightInfectedHost.class,EntityDataSerializers.BOOLEAN);
+    private static final EntityDataAccessor<Integer> CANNIBAL_DURATION=SynchedEntityData.defineId(BlacklightInfectedHost.class,EntityDataSerializers.INT);
+    private TissueInheritance inheritanceCache;
+    private static final EntityDataAccessor<CompoundTag> TISSUE_ACTION=SynchedEntityData.defineId(BlacklightInfectedHost.class,EntityDataSerializers.COMPOUND_TAG);
+    private final com.codex.blacklight.infection.TissueAbilities organAbilities=new com.codex.blacklight.infection.TissueAbilities(this);
+    public com.codex.blacklight.infection.TissueAbilities organAbilities(){return organAbilities;}
+    public TissueCore organActionCore(){return TissueCore.byId(entityData.get(TISSUE_ACTION).getString("Core"));}
+    public int organActionTarget(){return entityData.get(TISSUE_ACTION).getInt("Target");}
+    public Vec3 organActionDirection(){var tag=entityData.get(TISSUE_ACTION);return new Vec3(tag.getDouble("X"),0,tag.getDouble("Z"));}
+    public float organActionElapsed(float partial){return organActionCore()==null?-1:level().getGameTime()-entityData.get(TISSUE_ACTION).getLong("Started")+partial;}
+    public void setOrganAction(TissueCore core,int target,Vec3 direction){
+        if(level().isClientSide)return;var tag=new CompoundTag();
+        if(core!=null){clearTissueStrike();tag.putString("Core",core.key());tag.putInt("Target",target);tag.putLong("Started",level().getGameTime());tag.putDouble("X",direction.x);tag.putDouble("Z",direction.z);}
+        entityData.set(TISSUE_ACTION,tag);
+    }
+    public boolean spendTissueNutrition(int amount){if(level().isClientSide||amount<0||tissueNutrition()<amount)return false;entityData.set(TISSUE_NUTRITION,tissueNutrition()-amount);return true;}
+    public TissueInheritance tissueInheritance(){
+        if(inheritanceCache==null)inheritanceCache=TissueInheritanceCodec.read(entityData.get(TISSUE_INHERITANCE));
+        return inheritanceCache;
+    }
+    private void publishInheritance(TissueInheritance value){
+        if(value==tissueInheritance())return;
+        var tag=TissueInheritanceCodec.write(value);tag.putLong("SampledAt",level().getGameTime());
+        entityData.set(TISSUE_INHERITANCE,tag);inheritanceCache=value;
+    }
+    public double tissueInheritanceVisualWork(float partial){
+        if(!level().isClientSide)return 0;
+        return Math.clamp(level().getGameTime()+partial-entityData.get(TISSUE_INHERITANCE).getLong("SampledAt"),0,20)*(tissueNutrition()>0?1:.2);
+    }
+    public void inheritTissue(UUID operation,TissueInheritance donor,long seed,long age){
+        inheritTissue(operation,donor,seed,age,-1);
+    }
+    public void inheritTissue(UUID operation,TissueInheritance donor,long seed,long age,int donorPlan){
+        inheritTissue(operation,donor,seed,age,donorPlan,TissueCore.forSeed(seed));
+    }
+    public void inheritTissue(UUID operation,TissueInheritance donor,long seed,long age,int donorPlan,TissueCore donorCore){
+        inheritTissue(operation,donor,seed,age,donorPlan,donorCore,"");
+    }
+    public void inheritTissue(UUID operation,TissueInheritance donor,long seed,long age,int donorPlan,TissueCore donorCore,String donorSpecies){
+        inheritTissue(operation,donor,seed,age,donorPlan,donorCore,donorSpecies,"");
+    }
+    public void inheritTissue(UUID operation,TissueInheritance donor,long seed,long age,int donorPlan,TissueCore donorCore,String donorSpecies,String donorAppearance){
+        if(level().isClientSide||!isAlive())return;
+        var before=tissueInheritance();var after=before.inherit(operation,donor,TissueOrgans.seed(getUUID()),tissueAge(),seed,age,TissueCompetitionConfig.rules(),donorPlan,knownNativeTissueCore(),donorCore,donorSpecies,donorAppearance);
+        if(before==after)return;
+        publishInheritance(after);
+        entityData.set(TISSUE_NUTRITION,TissueMetabolism.add(tissueNutrition(),24));
+    }
+    /** Bounded source anatomy descriptor. Unknown species use structural proportions, not an ID whitelist. */
+    public int nativeTissuePlan(){
+        if(humanoid())return 0;if(quadruped()||!family().equals("ground"))return 1;
+        float width=hostData().getFloat("Width"),height=hostData().getFloat("Height");
+        return width>height*1.3F?2:height>width*1.8F?0:1;
+    }
+    public TissueEvolution.State tissueEvolution(boolean authored){
+        return tissueEvolution(authored,0);
+    }
+    public TissueEvolution.State tissueEvolution(boolean authored,float partial){
+        long seed=TissueOrgans.seed(getUUID());
+        return tissueInheritance().appearance(TissueEvolution.nativeState(nativeTissueCore(),seed,tissueAge(),authored),nativeTissueCore(),tissueInheritanceVisualWork(partial));
+    }
+    public TissueCore nativeTissueCore(){var core=TissueCore.byId(hostData().getString("NativeCore"));return core==null?TissueCore.forSeed(TissueOrgans.seed(getUUID())):core;}
+    /** Unknown future IDs keep their save identity but cannot mint a random functional organ. */
+    public TissueCore knownNativeTissueCore(){return hostData().getString("NativeCore").isBlank()?nativeTissueCore():TissueCore.byId(hostData().getString("NativeCore"));}
+    public double organPower(TissueCore core){
+        double strength=tissueInheritance().strength(core,knownNativeTissueCore(),tissueAge());
+        return tissueInheritance().maturity(core,knownNativeTissueCore(),tissueAge())<1?0:Math.log1p(strength/100)/Math.log(2);
+    }
+    public float organExpression(TissueCore core,float partial){
+        var organ=tissueInheritance().organ(core);
+        float born=core==knownNativeTissueCore()?TissueEvolution.attachmentGrowth(tissueAge()):0;
+        return Math.max(born,com.codex.blacklight.infection.TissueGraftLayout.growth(organ,tissueInheritanceVisualWork(partial)));
+    }
+    public int cannibalTargetId(){return entityData.get(CANNIBAL_TARGET);}
+    public long cannibalStarted(){return entityData.get(CANNIBAL_STARTED);}
+    public boolean cannibalPrey(){return entityData.get(CANNIBAL_PREY);}
+    public int cannibalDuration(){return entityData.get(CANNIBAL_DURATION);}
+    public void setCannibalVisual(int target,long started,boolean prey){
+        setCannibalVisual(target,started,prey,TissueCompetition.END_TICKS);
+    }
+    public void setCannibalVisual(int target,long started,boolean prey,int duration){
+        if(level().isClientSide)return;
+        if(target>=0)clearTissueStrike();
+        entityData.set(CANNIBAL_TARGET,target);entityData.set(CANNIBAL_STARTED,started);entityData.set(CANNIBAL_PREY,prey);
+        entityData.set(CANNIBAL_DURATION,Math.clamp(duration,40,200));
+    }
     public long tissueAge() { return entityData.get(TISSUE_AGE); }
     public int tissueNutrition() { return entityData.get(TISSUE_NUTRITION); }
     public float tissueCoreFracture() { return entityData.get(TISSUE_CORE_FRACTURE); }
     /** Accepted, space-checked development. Multipart encounters keep their separate evolution system. */
     public float tissueBodyScale() { return hasMultipartBody()?1:entityData.get(TISSUE_BODY_SCALE); }
     public float tissueTentacles() {
-        return hasMultipartBody()||!family().equals("ground")?0:TissueEvolution.tentacles(TissueEvolution.sample(TissueOrgans.seed(getUUID()),tissueAge()));
+        // Grip is a forelimb function. Native feet must not disappear when an unrelated donor has grasping wrists.
+        return 0;
     }
     /** Folded native feet stay inside the unchanged collider; new limbs support the lowered torso. */
-    public float tissueStanceOffset() { return -getBbHeight()*.10F*tissueTentacles(); }
+    public float tissueStanceOffset() { return isEvolved()?0:-getBbHeight()*.10F*tissueTentacles(); }
     public int tissueStrikeTargetId() { return entityData.get(TISSUE_STRIKE_TARGET); }
     public long tissueGripReleaseAt() { return entityData.get(TISSUE_GRIP_RELEASE); }
     public Vec3 tissueStrikePoint() { var p=entityData.get(TISSUE_STRIKE_POINT);return new Vec3(p.x,p.y,p.z); }
@@ -98,12 +251,13 @@ public final class BlacklightInfectedHost extends Monster {
         return start<0?-1:level().getGameTime()-start+partial;
     }
     public float tissueOrganReach() {
-        return TissueOrgans.reach(TissueOrgans.seed(getUUID()),tissueAge(),getBbWidth(),getBbHeight(),tissueBodyScale());
+        return TissueOrgans.reach(TissueOrgans.seed(getUUID()),tissueAge(),getBbWidth(),getBbHeight(),tissueBodyScale(),tissueEvolution(false));
     }
     public void advanceTissue(long ticks) {
         if (!level().isClientSide && isAlive()) {
             entityData.set(TISSUE_AGE,com.codex.blacklight.infection.TissueGrowth.advance(tissueAge(),ticks));
             growTissueBody();
+            fitTissueFrame();
             updateTissueCombat();
         }
     }
@@ -111,21 +265,32 @@ public final class BlacklightInfectedHost extends Monster {
         return !hasMultipartBody()&&!devourerIdentity()&&!DevourerFeedingSystem.isDevourer(this);
     }
     private void updateTissueCombat() {
-        var growth=tissueMetabolismActive()?TissueEvolution.combat(TissueOrgans.seed(getUUID()),tissueAge()):new TissueEvolution.Combat(0,0,0,0);
+        var growth=tissueMetabolismActive()?TissueEvolution.combat(TissueOrgans.seed(getUUID()),tissueAge(),nativeTissueCore()):new TissueEvolution.Combat(0,0,0,0);
+        var inherited=tissueMetabolismActive()?tissueInheritance().combat():new TissueEvolution.Combat(0,0,0,0);
+        var frame=tissueFrame();double vitality=tissueMetabolismActive()?tissueBodyPlan().vitality(frame.x,frame.y,frame.z):1;
+        growth=new TissueEvolution.Combat((1+growth.health()+inherited.health())*vitality-1,growth.damage()+inherited.damage(),growth.armor()+inherited.armor(),growth.knockback()+inherited.knockback());
         float maximum=getMaxHealth(),health=getHealth();
         CombatScale.modifier(getAttribute(Attributes.MAX_HEALTH),TISSUE_HEALTH,growth.health(),AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL);
         CombatScale.modifier(getAttribute(Attributes.ATTACK_DAMAGE),TISSUE_DAMAGE,growth.damage(),AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL);
         CombatScale.modifier(getAttribute(Attributes.ARMOR),TISSUE_ARMOR,growth.armor(),AttributeModifier.Operation.ADD_VALUE);
         CombatScale.modifier(getAttribute(Attributes.KNOCKBACK_RESISTANCE),TISSUE_KNOCKBACK,growth.knockback(),AttributeModifier.Operation.ADD_VALUE);
+        com.codex.blacklight.infection.EvolvedBalance.apply(this);
         CombatScale.preserveHealthFraction(this,maximum,health);
     }
     private void digestTissue() {
         int elapsed=tissueClock;tissueClock=0;
-        boolean supplied=tissueMetabolismActive()&&tissueNutrition()>0;
-        if(supplied)entityData.set(TISSUE_NUTRITION,tissueNutrition()-1);
-        advanceTissue(elapsed+(supplied?TissueMetabolism.BONUS_TICKS:0));
-        if(supplied&&tissueRecoveryTicks==0&&!getData(ModAttachments.CONSUME_VISUAL).active())
-            heal(getMaxHealth()*.005F/CombatScale.units(this));
+        var genes=tissueInheritance();
+        boolean integrating=genes.organs().values().stream().anyMatch(o->o.work()>0||!o.mature())||genes.sources().values().stream().anyMatch(s->s.work()>0);
+        boolean repairing=tissueRecoveryTicks==0&&getHealth()<getMaxHealth()-.01F&&!getData(ModAttachments.CONSUME_VISUAL).active();
+        double worldSpeed=level() instanceof ServerLevel server?TissueMetabolism.worldSpeed(server.getServer().overworld().getDayTime()):1;
+        int demand=tissueMetabolismActive()?TissueMetabolism.demand(tissueAge(),integrating,repairing,worldSpeed):0;
+        var budget=TissueMetabolism.budget(tissueNutrition(),tissueNutritionDebt,demand);
+        boolean supplied=budget.supplied();tissueNutritionDebt=budget.debt();entityData.set(TISSUE_NUTRITION,budget.reserve());
+        if(tissueMetabolismActive())publishInheritance(tissueInheritance().digest(TissueMetabolism.scaledTicks(elapsed,worldSpeed*(.2+.8*budget.fraction())),true,TissueOrgans.seed(getUUID()),tissueAge(),TissueCompetitionConfig.rules(),knownNativeTissueCore()));
+        long natural=TissueMetabolism.scaledTicks(elapsed,worldSpeed),bonus=supplied&&TissueMetabolism.growing(tissueAge(),integrating)?TissueMetabolism.scaledTicks(TissueMetabolism.BONUS_TICKS,worldSpeed*budget.fraction()):0;
+        advanceTissue(com.codex.blacklight.infection.TissueGrowth.advance(natural,bonus));
+        if(supplied&&repairing)
+            heal((float)(getMaxHealth()*.005F*budget.fraction()/CombatScale.units(this)));
     }
     /** Vanilla invokes this only after its death event accepts the kill. A
      * rejected death, infection conversion, or live victim cannot pay a meal. */
@@ -134,7 +299,7 @@ public final class BlacklightInfectedHost extends Monster {
         if(!accepted||!isAlive()||!tissueMetabolismActive()||!(victim instanceof Mob)||victim.isAlive()
                 ||victim.getKillCredit()!=this||BlacklightInfectionSystem.isInfected(victim)
                 ||victim.getPersistentData().getBoolean(TISSUE_MEAL))return accepted;
-        int meal=TissueMetabolism.meal(CombatScale.originalMaximum(victim),TissueCore.forSeed(TissueOrgans.seed(getUUID())));
+        int meal=TissueMetabolism.meal(CombatScale.originalMaximum(victim),nativeTissueCore());
         if(meal<=0)return accepted;
         victim.getPersistentData().putBoolean(TISSUE_MEAL,true);
         int previous=tissueNutrition();entityData.set(TISSUE_NUTRITION,TissueMetabolism.add(previous,meal));
@@ -144,7 +309,7 @@ public final class BlacklightInfectedHost extends Monster {
     }
     private void growTissueBody() {
         if(hasMultipartBody())return;
-        float current=tissueBodyScale(),desired=TissueEvolution.desiredScale(tissueAge());
+        float current=tissueBodyScale(),desired=desiredTissueScale();
         if(desired<=current+.0001F)return;
         var candidate=EntityDimensions.scalable(getBbWidth()*desired/current,getBbHeight()*desired/current).makeBoundingBox(position());
         // Evolution continues in confined spaces, but a bigger body waits until
@@ -152,6 +317,16 @@ public final class BlacklightInfectedHost extends Monster {
         if(isAddedToLevel()&&(!level().noCollision(this,candidate)||!level().getWorldBorder().isWithinBounds(candidate)
                 ||candidate.maxY>level().getMaxBuildHeight()))return;
         entityData.set(TISSUE_BODY_SCALE,desired);
+    }
+    private float desiredTissueScale(){return isEvolved()?com.codex.blacklight.infection.EvolvedForm.scale(tissueInheritance()):TissueEvolution.desiredScale(tissueAge())*tissueInheritance().scaleFactor();}
+    private void fitTissueFrame(){
+        if(!tissueMetabolismActive()||bossProfile()!=null)return;
+        var plan=tissueBodyPlan();var old=tissueFrame();var next=new org.joml.Vector3f(plan.width(),plan.height(),plan.depth());
+        if(old.distanceSquared(next)<.000001F)return;
+        float width=getBbWidth()*Math.max(next.x,next.z)/Math.max(old.x,old.z),height=getBbHeight()*next.y/old.y;
+        var box=EntityDimensions.scalable(width,height).makeBoundingBox(position());
+        if(isAddedToLevel()&&(!level().noCollision(this,box)||!level().getWorldBorder().isWithinBounds(box)||box.maxY>level().getMaxBuildHeight()))return;
+        entityData.set(TISSUE_FRAME,next);
     }
 
     public BlacklightInfectedHost(EntityType<? extends BlacklightInfectedHost> type,Level level) {
@@ -163,11 +338,13 @@ public final class BlacklightInfectedHost extends Monster {
     public static AttributeSupplier.Builder attributes() {
         return Monster.createMonsterAttributes().add(Attributes.MAX_HEALTH,30).add(Attributes.ATTACK_DAMAGE,5)
                 .add(Attributes.MOVEMENT_SPEED,.30).add(Attributes.FLYING_SPEED,.35).add(Attributes.FOLLOW_RANGE,24)
-                .add(Attributes.STEP_HEIGHT,1).add(Attributes.KNOCKBACK_RESISTANCE,0);
+                .add(Attributes.STEP_HEIGHT,1).add(Attributes.KNOCKBACK_RESISTANCE,0).add(Attributes.ARMOR_TOUGHNESS,0);
     }
     @Override protected void defineSynchedData(SynchedEntityData.Builder b) {
-        super.defineSynchedData(b);b.define(TISSUE_AGE,0L);b.define(TISSUE_BODY_SCALE,1F);b.define(TISSUE_CORE_FRACTURE,0F);b.define(TISSUE_STRIKE_TARGET,-1);b.define(TISSUE_STRIKE_STARTED,-1L);b.define(TISSUE_GRIP_RELEASE,-1L);b.define(TISSUE_STRIKE_POINT,new org.joml.Vector3f());b.define(HOST,new CompoundTag());b.define(FEED_TARGET,-1);b.define(FEED_STARTED,-1L);b.define(DEVOURER,false);b.define(NURSERY,new CompoundTag());b.define(FEED_NODE,-1);
+        super.defineSynchedData(b);b.define(TISSUE_FRAME,new org.joml.Vector3f(1));b.define(TISSUE_AGE,0L);b.define(TISSUE_BODY_SCALE,1F);b.define(TISSUE_CORE_FRACTURE,0F);b.define(TISSUE_STRIKE_TARGET,-1);b.define(TISSUE_STRIKE_STARTED,-1L);b.define(TISSUE_GRIP_RELEASE,-1L);b.define(TISSUE_STRIKE_POINT,new org.joml.Vector3f());b.define(HOST,new CompoundTag());b.define(FEED_TARGET,-1);b.define(FEED_STARTED,-1L);b.define(DEVOURER,false);b.define(NURSERY,new CompoundTag());b.define(FEED_NODE,-1);
         b.define(TISSUE_NUTRITION,0);
+        b.define(TISSUE_INHERITANCE,new CompoundTag());b.define(CANNIBAL_TARGET,-1);b.define(CANNIBAL_STARTED,-1L);b.define(CANNIBAL_PREY,false);b.define(CANNIBAL_DURATION,TissueCompetition.END_TICKS);b.define(TISSUE_ACTION,new CompoundTag());
+        b.define(EVOLVED_STATE,new CompoundTag());b.define(EVOLVED_ACTION,new CompoundTag());
     }
     public int feedingTargetId() { return entityData.get(FEED_TARGET); }
     public long feedingStarted() { return entityData.get(FEED_STARTED); }
@@ -336,8 +513,12 @@ public final class BlacklightInfectedHost extends Monster {
             data.putUUID("DragonFight",source.getUUID());
             data.putInt("DragonOriginX",dragon.getFightOrigin().getX());data.putInt("DragonOriginZ",dragon.getFightOrigin().getZ());
         }
+        entityData.set(HOST,data);
+        data=data.copy();data.putString("NativeCore",TissueCore.forNewHost(TissueOrgans.seed(getUUID()),nativeTissuePlan(),family.equals("water")).key());
         entityData.set(HOST,data);refreshDimensions();
         float originalHealth=CombatScale.originalMaximum(source);
+        if(!level().isClientSide&&!hasMultipartBody()&&tissueAge()==0&&tissueNutrition()==0)
+            entityData.set(TISSUE_NUTRITION,TissueMetabolism.initialReserve(originalHealth));
         getAttribute(Attributes.MAX_HEALTH).setBaseValue(colossal?profile.health():Math.max(18,originalHealth*1.4));
         getAttribute(Attributes.ATTACK_DAMAGE).setBaseValue(colossal?profile.damage():Math.clamp(originalHealth*.14,4,18));
         if(colossal)applyBossAttributes(profile);else if(encounterBoss())applyCompactEncounterAttributes(profile);
@@ -359,16 +540,23 @@ public final class BlacklightInfectedHost extends Monster {
         xpReward=profile==InfectedBossProfile.ENDER_DRAGON?500:50;
     }
     @Override public EntityDimensions getDefaultDimensions(Pose pose) {
+        if(isEvolved())return EntityDimensions.scalable(.95F*1.12F*tissueBodyScale(),2.16F*1.12F*tissueBodyScale()).withEyeHeight(1.95F*1.12F*tissueBodyScale());
         var data=hostData();InfectedBossProfile profile=bossProfile();
         if(profile!=null)return EntityDimensions.scalable(profile.width()*bodyScale(),profile.height()*bodyScale())
                 .withEyeHeight(profile.visualHeight()*bodyScale()*.77F);
         if(!data.contains("Width"))return super.getDefaultDimensions(pose);
         float width=Mth.clamp(data.getFloat("Width"),.2F,16),height=Mth.clamp(data.getFloat("Height"),.2F,16);
-        return EntityDimensions.scalable(width,height).scale(tissueBodyScale());
+        if(nativeTissuePlan()==2){
+            float upper=0;for(var entry:tissueInheritance().sources().entrySet())if(!entry.getKey().equals(speciesId())&&entry.getValue().plan()==0)
+                upper=Math.max(upper,com.codex.blacklight.infection.TissueChimera.growth(entry.getValue(),0));
+            height+=width*upper;
+        }
+        var frame=tissueFrame();return EntityDimensions.scalable(width*Math.max(frame.x,frame.z),height*frame.y).scale(tissueBodyScale());
     }
     @Override public void onSyncedDataUpdated(EntityDataAccessor<?> key) {
         super.onSyncedDataUpdated(key);
-        if(TISSUE_BODY_SCALE.equals(key))refreshDimensions();
+        if(TISSUE_INHERITANCE.equals(key)){inheritanceCache=null;refreshDimensions();}
+        if(TISSUE_BODY_SCALE.equals(key)||TISSUE_FRAME.equals(key))refreshDimensions();
         if(HOST.equals(key)) {
             appearance=null;appearanceAnimationTick=Integer.MIN_VALUE;
             refreshDimensions();configureParts();
@@ -413,19 +601,28 @@ public final class BlacklightInfectedHost extends Monster {
                 ||!DevourerFeedingSystem.withinTerritory(this,target)))return false;
         // Player infection grants powers, not allegiance to hostile infected hosts.
         if(target instanceof Player player)return !player.isCreative()&&!player.isSpectator();
-        return !BlacklightInfectionSystem.isInfected(target);
+        return TissueCompetition.contender(this,target)||!BlacklightInfectionSystem.isInfected(target);
     }
     @Override protected void registerGoals() {
-        goalSelector.addGoal(0,new FloatGoal(this));
+        targetSelector.addGoal(0,new NearestAttackableTargetGoal<>(this,Player.class,5,true,false,target->isEvolved()&&validTarget(target)){{setUnseenMemoryTicks(200);}});
+        targetSelector.addGoal(1,new net.minecraft.world.entity.ai.goal.target.HurtByTargetGoal(this){
+            @Override public boolean canUse(){return getLastHurtByMob()!=null&&validTarget(getLastHurtByMob())&&super.canUse();}
+            @Override public boolean canContinueToUse(){return getTarget()!=null&&validTarget(getTarget())&&super.canContinueToUse();}
+        });
+        goalSelector.addGoal(0,new FloatGoal(this){
+            @Override public boolean canUse(){return !family().equals("water")&&super.canUse();}
+        });
         goalSelector.addGoal(1,new Goal() {
             { setFlags(java.util.EnumSet.of(Goal.Flag.MOVE,Goal.Flag.LOOK)); }
-            @Override public boolean canUse() { return DevourerFeedingSystem.controls(BlacklightInfectedHost.this); }
+            @Override public boolean canUse() { return isMetamorphosing()||isEvolved()&&getTarget()!=null||organActionCore()!=null||DevourerFeedingSystem.controls(BlacklightInfectedHost.this)||TissueCompetition.controls(BlacklightInfectedHost.this); }
             @Override public boolean canContinueToUse() { return canUse(); }
         });
         goalSelector.addGoal(2,new MeleeAttackGoal(this,1.1,true) {
-            @Override public boolean canUse() { return !DevourerFeedingSystem.controls(BlacklightInfectedHost.this)&&family().equals("ground")&&super.canUse(); }
+            @Override public boolean canUse() { return !isEvolved()&&!isMetamorphosing()&&!DevourerFeedingSystem.controls(BlacklightInfectedHost.this)&&family().equals("ground")&&super.canUse(); }
             @Override public boolean canContinueToUse() { return !getData(ModAttachments.CONSUME_VISUAL).active()&&super.canContinueToUse(); }
             @Override protected void checkAndPerformAttack(LivingEntity target) {
+                if(organActionCore()!=null||TissueCompetition.controls(BlacklightInfectedHost.this))return;
+                if(target instanceof BlacklightInfectedHost prey&&TissueCompetition.tryStart(BlacklightInfectedHost.this,prey))return;
                 if(tissueStrikeElapsed(0)<0&&attackCooldown==0&&canPerformAttack(target)) {
                     resetAttackCooldown();swing(InteractionHand.MAIN_HAND);doHurtTarget(target);attackCooldown=giantBoss()?40:20;
                 }
@@ -434,7 +631,7 @@ public final class BlacklightInfectedHost extends Monster {
         goalSelector.addGoal(6,new WaterAvoidingRandomStrollGoal(this,.8) {
             @Override public boolean canUse() { return !DevourerFeedingSystem.isDevourer(BlacklightInfectedHost.this)&&family().equals("ground")&&super.canUse(); }
         });
-        targetSelector.addGoal(2,new NearestAttackableTargetGoal<>(this,LivingEntity.class,10,true,false,this::validTarget));
+        targetSelector.addGoal(2,new NearestAttackableTargetGoal<>(this,LivingEntity.class,10,true,false,target->validTarget(target)&&!(target instanceof BlacklightInfectedHost)));
     }
     @Override public boolean isWithinMeleeAttackRange(LivingEntity target) {
         if(!hasMultipartBody())return super.isWithinMeleeAttackRange(target);
@@ -459,8 +656,12 @@ public final class BlacklightInfectedHost extends Monster {
         entityData.set(DEVOURER,DevourerFeedingSystem.isDevourer(this));
         DevourerFeedingSystem.tick(this);
         tickBoss();
+        if(tickEvolvedMorph())return;
+        if(TissueCompetition.tick(this)){if(organActionCore()!=null)organAbilities.interrupt();return;}
         if(family().equals("water")||hasMultipartBody())setAirSupply(getMaxAirSupply());
-        if(getData(ModAttachments.CONSUME_VISUAL).active()||com.codex.blacklight.combat.ImpactControl.stunned(this)) { clearTissueStrike();getNavigation().stop();return; }
+        if(getData(ModAttachments.CONSUME_VISUAL).active()||com.codex.blacklight.combat.ImpactControl.stunned(this)) { organAbilities.interrupt();evolvedCombat.interruptForHit();clearTissueStrike();getNavigation().stop();return; }
+        if(isEvolved()&&evolvedCombat.tick())return;
+        if(organAbilities.tick())return;
         if(attackCooldown>0)attackCooldown--;
         if(tickTissueStrike())return;
         if(!isAlive()||isNoAi()||level().getDifficulty()==net.minecraft.world.Difficulty.PEACEFUL||family().equals("ground"))return;
@@ -523,10 +724,11 @@ public final class BlacklightInfectedHost extends Monster {
             if(entity instanceof LivingEntity target) {
                 getLookControl().setLookAt(target,30,30);
                 if(elapsed==TissueOrgans.HIT) {
+                    if(target instanceof BlacklightInfectedHost prey&&TissueCompetition.tryStart(this,prey))return true;
                     rememberTissueContact(target);
                     if(inTissueRange(target)&&hasLineOfSight(target)){
                         swing(InteractionHand.MAIN_HAND);
-                        if(doHurtTarget(target)&&tissueTentacles()>.6F&&com.codex.blacklight.infection.TissueGrapples.grab(this,target,TissueOrgans.GRAB_RELEASE-TissueOrgans.HIT))
+                        if(doHurtTarget(target)&&organPower(TissueCore.GRASP)>0&&com.codex.blacklight.infection.TissueGrapples.grab(this,target,TissueOrgans.GRAB_RELEASE-TissueOrgans.HIT))
                             entityData.set(TISSUE_GRIP_RELEASE,level().getGameTime()+TissueOrgans.GRAB_RELEASE-TissueOrgans.HIT);
                     }
                 }
@@ -622,13 +824,21 @@ public final class BlacklightInfectedHost extends Monster {
         // This hook already observes doMobLoot, drop capture, and LivingDrops cancellation.
         if(bossProfile()==InfectedBossProfile.WITHER)spawnAtLocation(net.minecraft.world.item.Items.NETHER_STAR);
     }
+    @Override public void knockback(double strength,double x,double z){
+        if(!evolvedControlProtected())super.knockback(strength,x,z);
+    }
     @Override public boolean hurt(DamageSource source,float amount) {
+        if(evolvedCombat.evading()&&!source.is(net.minecraft.tags.DamageTypeTags.BYPASSES_INVULNERABILITY))return false;
         if(encounterBoss()&&source.getEntity()==this)return false;
         float before=getHealth(),maximum=getMaxHealth();boolean accepted=super.hurt(source,amount);
-        if(accepted&&!level().isClientSide&&getHealth()<before)tissueRecoveryTicks=TissueMetabolism.RECOVERY_DELAY;
+        if(accepted&&!level().isClientSide&&getHealth()<before){
+            tissueRecoveryTicks=TissueMetabolism.RECOVERY_DELAY;TissueCompetition.damaged(this,before-getHealth());
+            if(before-getHealth()>=maximum*.1F)organAbilities.interrupt();
+            if(before-getHealth()>=maximum*.1F&&isMetamorphosing()&&!isEvolved())publishEvolvedState(3);
+        }
         if(accepted&&!level().isClientSide&&!hasMultipartBody()&&com.codex.blacklight.infection.TissueCore.quality(tissueAge())>=2&&maximum>0){
             float loss=Math.max(0,before-getHealth());
-            float durability=com.codex.blacklight.infection.TissueCore.forSeed(TissueOrgans.seed(getUUID()))==com.codex.blacklight.infection.TissueCore.CARAPACE?.5F:.3F;
+            float durability=nativeTissueCore()==TissueCore.CARAPACE?.5F:.3F;
             float old=tissueCoreFracture(),next=Math.clamp(old+loss/maximum/durability,0,1);
             entityData.set(TISSUE_CORE_FRACTURE,next);
             if(old<1&&next>=1&&level() instanceof ServerLevel server){
@@ -638,7 +848,7 @@ public final class BlacklightInfectedHost extends Monster {
         return accepted;
     }
     @Override public void remove(RemovalReason reason) {
-        if(!level().isClientSide)DevourerFeedingSystem.release(this);
+        if(!level().isClientSide){DevourerFeedingSystem.release(this);TissueCompetition.release(this);}
         if(bossBar!=null)bossBar.removeAllPlayers();if(trackingPlayers!=null)trackingPlayers.clear();super.remove(reason);
     }
     @Override protected boolean shouldDespawnInPeaceful() { return !encounterBoss(); }
@@ -685,11 +895,25 @@ public final class BlacklightInfectedHost extends Monster {
     }
     public AABB combatBounds() { AABB result=getBoundingBox();for(AABB box:combatHitboxes())result=result.minmax(box);return result; }
     @Override public void addAdditionalSaveData(CompoundTag tag) {
-        tag.putInt("BlacklightTissueNutrition",tissueNutrition());tag.putInt("BlacklightTissueRecovery",tissueRecoveryTicks);
+        var evolution=entityData.get(EVOLVED_STATE).copy();evolution.putInt("Elapsed",evolvedMorphTicks);evolution.remove("SampledAt");tag.put("BlacklightEvolvedState",evolution);
+        var frame=tissueFrame();tag.putFloat("BlacklightTissueFrameX",frame.x);tag.putFloat("BlacklightTissueFrameY",frame.y);tag.putFloat("BlacklightTissueFrameZ",frame.z);
+        tag.put("BlacklightTissueInheritance",TissueInheritanceCodec.write(tissueInheritance()));
+        tag.putInt("BlacklightTissueNutrition",tissueNutrition());tag.putInt("BlacklightTissueNutritionDebt",tissueNutritionDebt);tag.putInt("BlacklightTissueRecovery",tissueRecoveryTicks);
         super.addAdditionalSaveData(tag);tag.putLong("BlacklightTissueAge",com.codex.blacklight.infection.TissueGrowth.advance(tissueAge(),tissueClock));tag.putFloat("BlacklightTissueScale",tissueBodyScale());tag.putFloat("BlacklightCoreFracture",tissueCoreFracture());tag.put("BlacklightHost",hostData().copy());tag.putBoolean("BlacklightBossDefeated",bossDefeated);
     }
     @Override public void readAdditionalSaveData(CompoundTag tag) {
+        var evolution=tag.getCompound("BlacklightEvolvedState").copy();evolvedMorphTicks=Math.clamp(evolution.getInt("Elapsed"),0,com.codex.blacklight.infection.EvolvedForm.DURATION);evolution.putInt("Elapsed",evolvedMorphTicks);evolution.putLong("SampledAt",level().getGameTime());
+        if(evolution.getInt("Stage")<0||evolution.getInt("Stage")>3)evolution.putInt("Stage",0);
+        evolution.putBoolean("Combat",false);evolution.putLong("CombatAt",level().getGameTime()-20);entityData.set(EVOLVED_STATE,evolution);entityData.set(EVOLVED_ACTION,new CompoundTag());
+        float frameX=tag.contains("BlacklightTissueFrameX")?tag.getFloat("BlacklightTissueFrameX"):1,frameY=tag.contains("BlacklightTissueFrameY")?tag.getFloat("BlacklightTissueFrameY"):1,frameZ=tag.contains("BlacklightTissueFrameZ")?tag.getFloat("BlacklightTissueFrameZ"):1;
+        entityData.set(TISSUE_FRAME,new org.joml.Vector3f(Float.isFinite(frameX)?Math.clamp(frameX,.75F,2):1,Float.isFinite(frameY)?Math.clamp(frameY,.75F,2):1,Float.isFinite(frameZ)?Math.clamp(frameZ,.75F,2):1));
+        if(organActionCore()!=null)organAbilities.interrupt();
+        if(!level().isClientSide){com.codex.blacklight.infection.TissueGrapples.release(this);clearTissueStrike();}
+        if(!level().isClientSide)TissueCompetition.interrupt(this);
+        entityData.set(TISSUE_INHERITANCE,tag.getCompound("BlacklightTissueInheritance").copy());inheritanceCache=null;
+        setCannibalVisual(-1,-1,false);
         entityData.set(TISSUE_NUTRITION,TissueMetabolism.clamp(tag.getInt("BlacklightTissueNutrition")));
+        tissueNutritionDebt=Math.clamp(tag.getInt("BlacklightTissueNutritionDebt"),0,TissueMetabolism.WORK_PER_UNIT-1);
         tissueRecoveryTicks=Math.clamp(tag.getInt("BlacklightTissueRecovery"),0,TissueMetabolism.RECOVERY_DELAY);
         float fracture=tag.getFloat("BlacklightCoreFracture");entityData.set(TISSUE_CORE_FRACTURE,Float.isFinite(fracture)?Math.clamp(fracture,0,1):0);
         super.readAdditionalSaveData(tag);entityData.set(TISSUE_AGE,com.codex.blacklight.infection.TissueGrowth.clamp(tag.getLong("BlacklightTissueAge")));tissueClock=0;bossDefeated=tag.getBoolean("BlacklightBossDefeated");CompoundTag data=tag.getCompound("BlacklightHost").copy();
@@ -728,10 +952,12 @@ public final class BlacklightInfectedHost extends Monster {
             if(colossal)applyBossAttributes(profile);
             else if(profile==InfectedBossProfile.WITHER||profile==InfectedBossProfile.ENDER_DRAGON)applyCompactEncounterAttributes(profile);
         }
+        if(!data.contains("NativeCore"))data.putString("NativeCore",TissueCore.forSeed(TissueOrgans.seed(getUUID())).key());
         entityData.set(HOST,data);
         float savedScale=tag.getFloat("BlacklightTissueScale");
         entityData.set(TISSUE_BODY_SCALE,hasMultipartBody()||!Float.isFinite(savedScale)?1F
-                :Math.clamp(savedScale,1F,TissueEvolution.desiredScale(tissueAge())));
+                :Math.clamp(savedScale,1F,desiredTissueScale()));
+        if(isEvolved())getAttribute(Attributes.FOLLOW_RANGE).setBaseValue(Math.max(48,getAttributeValue(Attributes.FOLLOW_RANGE)));
         updateTissueCombat();refreshDimensions();setPersistenceRequired();
     }
 }

@@ -35,7 +35,7 @@ public final class ConsumeControl {
     public static boolean ownsMotion(Entity entity) {
         if (!(entity instanceof LivingEntity living) || !living.isAlive() || living.isRemoved()) return false;
         var visual = ModAttachments.peekData(entity, ModAttachments.CONSUME_VISUAL, ConsumeVisual.EMPTY);
-        return ConsumeSystem.committed(living) || visual.active() && visual.stage()!=ConsumeVisual.FLIGHT
+        return com.codex.blacklight.infection.TissueCompetition.controls(entity)||ConsumeSystem.committed(living) || visual.active() && visual.stage()!=ConsumeVisual.FLIGHT
                 || BiomassSystem.state(entity).immobilized() || biomassPrey(entity);
     }
 

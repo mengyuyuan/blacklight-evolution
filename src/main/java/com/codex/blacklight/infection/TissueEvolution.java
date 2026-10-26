@@ -7,26 +7,36 @@ import static com.codex.blacklight.infection.TissueMorphogenesis.*;
  * accumulate. Genotype and age are server data, never render-frame randomness. */
 public final class TissueEvolution {
     public static final long GENERATION_TICKS=24000;
-    public record State(long generation,float muscle,float carapace,float jaw,float grasp,float crest) {
-        public boolean active(){return muscle+carapace+jaw+grasp+crest>0;}
+    public record State(long generation,float muscle,float carapace,float jaw,float grasp,float crest,TissueAggregate.Form aggregate) {
+        public State(long generation,float muscle,float carapace,float jaw,float grasp,float crest){this(generation,muscle,carapace,jaw,grasp,crest,TissueAggregate.Form.NONE);}
+        public boolean active(){return muscle+carapace+jaw+grasp+crest>0||aggregate.active();}
     }
     private static final State BASE=new State(0,0,0,0,0,0);
+    private static final float[][] FUNCTIONAL_SUPPORT={
+            {.90F,.35F,.10F,.48F,.12F},{.72F,.78F,.08F,.70F,.18F},{.65F,.28F,.10F,1.05F,.12F},
+            {.75F,.68F,.12F,.90F,.42F},{.85F,.92F,.10F,.85F,.28F},{.90F,.95F,.30F,.15F,.90F},{.65F,.40F,1.10F,.20F,.20F}};
     public record Combat(double health,double damage,double armor,double knockback) { }
     private TissueEvolution() {}
 
     public static State sample(long seed,long age) {
+        return sample(seed,age,TissueCore.forSeed(seed));
+    }
+    private static State sample(long seed,long age,TissueCore primary) {
         long elapsed=Math.max(0,TissueGrowth.clamp(age)-TissueGrowth.ANCIENT_TICKS);
         if(elapsed==0)return BASE;
         long generation=elapsed/GENERATION_TICKS;
         float t=elapsed%GENERATION_TICKS/(float)GENERATION_TICKS;
         t=t*t*(3-2*t);
-        State a=generation==0?BASE:genotype(seed,generation),b=genotype(seed,generation+1);
+        State a=generation==0?BASE:genotype(seed,generation,primary),b=genotype(seed,generation+1,primary);
         return new State(generation,lerp(a.muscle,b.muscle,t),lerp(a.carapace,b.carapace,t),
                 lerp(a.jaw,b.jaw,t),lerp(a.grasp,b.grasp,t),lerp(a.crest,b.crest,t));
     }
     private static State genotype(long seed,long generation) {
+        return genotype(seed,generation,TissueCore.forSeed(seed));
+    }
+    private static State genotype(long seed,long generation,TissueCore primary) {
         long key=TissueGrowth.mix(seed^TissueGrowth.mix(generation));
-        int focus=TissueCore.forSeed(seed).ordinal();
+        int focus=primary.structuralBias().ordinal();
         float[] traits=new float[5];
         for(int i=0;i<traits.length;i++)traits[i]=i==focus?.8F+.2F*TissueGrowth.sample(key,810+i)
                 :.12F+.33F*TissueGrowth.sample(key,810+i);
@@ -35,11 +45,37 @@ public final class TissueEvolution {
         traits[1]=Math.max(traits[1],traits[4]*.5F);
         return new State(generation,traits[0],traits[1],traits[2],traits[3],traits[4]);
     }
+    /** Every functional organ develops its supporting body, not only its weapon.
+     * Profiles share the skin/socket deformation field without granting unrelated attacks. */
+    public static State nativeState(TissueCore core,long seed,long age,boolean authored){
+        if(core.legacy())return authored?authoredState(seed,age,core):sample(seed,age,core);
+        float[] profile=FUNCTIONAL_SUPPORT[core.ordinal()-5];
+        float g=attachmentGrowth(age)*(.9F+.2F*TissueGrowth.sample(seed,978+core.ordinal()));
+        return new State(Math.max(0,(age-TissueGrowth.ANCIENT_TICKS)/GENERATION_TICKS),g*profile[0],g*profile[1],g*profile[2],g*profile[3],g*profile[4]);
+    }
+    public static boolean supportingMesh(TissueCore core,String mesh){
+        if(mesh.startsWith("scapular_plate")||mesh.startsWith("costal_arch"))return core==TissueCore.HYDRAULIC||core==TissueCore.CHELA||core==TissueCore.BLADE||core==TissueCore.HORN;
+        if(mesh.startsWith("shoulder_crest"))return core==TissueCore.HORN||core==TissueCore.BLADE;
+        return core==TissueCore.PHARYNX&&TissueGraftLayout.owns(TissueCore.JAW,mesh);
+    }
+    /** Additional remodeling of an already developed donor. Never duplicate its
+     * captured initial bulk or shrink a stronger inherited phenotype. */
+    public static State additionalDevelopment(State captured,State current){
+        return new State(current.generation(),extra(captured.muscle,current.muscle,.38F),
+                extra(captured.carapace,current.carapace,.22F),extra(captured.jaw,current.jaw,.48F),
+                extra(captured.grasp,current.grasp,.22F),extra(captured.crest,current.crest,.10F));
+    }
+    private static float extra(float before,float after,float response){return Math.max(0,after-before)/(1+response*before);}
+    public static State retainStronger(State a,State b){return new State(Math.max(a.generation,b.generation),
+            Math.max(a.muscle,b.muscle),Math.max(a.carapace,b.carapace),Math.max(a.jaw,b.jaw),Math.max(a.grasp,b.grasp),Math.max(a.crest,b.crest));}
     /** Dedicated host anatomy persists; later organs bud on that same body. */
     public static float attachmentGrowth(long age){return TissueAnatomy.smooth((TissueGrowth.clamp(age)-12000)/36000F);}
     public static State authoredState(long seed,long age){
+        return authoredState(seed,age,TissueCore.forSeed(seed));
+    }
+    private static State authoredState(long seed,long age,TissueCore primary){
         float growth=attachmentGrowth(age);if(growth<=0)return BASE;
-        var first=genotype(seed,1);var current=sample(seed,age);
+        var first=genotype(seed,1,primary);var current=sample(seed,age,primary);
         return new State(current.generation,.65F*growth*first.muscle+.35F*current.muscle,
                 .65F*growth*first.carapace+.35F*current.carapace,.65F*growth*first.jaw+.35F*current.jaw,
                 .65F*growth*first.grasp+.35F*current.grasp,.65F*growth*first.crest+.35F*current.crest);
@@ -53,11 +89,14 @@ public final class TissueEvolution {
     /** Sublinear, age-derived combat growth. Stable IDs replace modifiers, so
      * neither saves nor repeated updates compound the previous generation. */
     public static Combat combat(long seed,long age) {
+        return combat(seed,age,TissueCore.forSeed(seed));
+    }
+    public static Combat combat(long seed,long age,TissueCore primary) {
         double elapsed=Math.max(0,TissueGrowth.clamp(age)-TissueGrowth.ANCIENT_TICKS);
         double growth=Math.log1p(elapsed/GENERATION_TICKS);
         // Inherited allocation is fixed. Remodeling noise must not make an
         // older generation weaker than yesterday's differently shaped organs.
-        State state=genotype(seed,1);
+        State state=genotype(seed,1,primary);
         double maturity=TissueGrowth.progress(age);
         return new Combat(1.8*maturity+.90*growth*(1+.35*state.muscle+.30*state.carapace),
                 .075*growth*(1+.8*state.muscle+.65*state.jaw),
@@ -75,6 +114,9 @@ public final class TissueEvolution {
         return develop(b,p,s,b.role()==4||b.role()==5||TissueMorphogenesis.legBone(b.path()));
     }
     public static V develop(Bone b,V p,State s,boolean groundSupport) {
+        return TissueAggregate.develop(b,developNative(b,p,s,groundSupport),s.aggregate,groundSupport);
+    }
+    private static V developNative(Bone b,V p,State s,boolean groundSupport) {
         if(!s.active())return p;
         Box box=b.box();V c=box.centre(),d=p.sub(c),right=b.right(),up=b.up(),forward=b.forward();
         if(b.role()==0) {

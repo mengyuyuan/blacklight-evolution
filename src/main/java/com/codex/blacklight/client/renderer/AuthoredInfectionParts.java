@@ -64,8 +64,10 @@ public final class AuthoredInfectionParts {
         private TissueEvolution.State evolution=TissueEvolution.sample(0,0);
         public void growth(float value,long seed){growth=Math.max(0,Math.min(1,value));growthSeed=seed;staged=true;}
         public void evolution(long age,float tentacles){this.age=age;this.tentacles=tentacles;evolution=TissueEvolution.authoredState(growthSeed,age);}
+        public void evolution(long age,float tentacles,TissueEvolution.State inherited){this.age=age;this.tentacles=tentacles;evolution=inherited;}
         long age(){return age;}
         float tentacles(){return tentacles;}
+        TissueEvolution.State development(){return evolution;}
         Vector3f developRoot(ModelPart part,Vector3f point){var frame=frames.get(part);return frame==null?point:develop(point,frame,evolution);}
         public List<Wound> wounds(){return List.copyOf(wounds);}
         private record Pending(PoseStack.Pose pose,int light,int overlay,int color) {}
@@ -98,7 +100,8 @@ public final class AuthoredInfectionParts {
             var out=buffers.getBuffer(RenderType.entityCutoutNoCull(ConsumedMobVisuals.WHITE));
             for(var e:pending.entrySet())for(var p:pieces.get(e.getKey())) {
                 if(omitBody&&p.anatomy==ConsumeAnatomy.BODY||onlyBody&&p.anatomy!=ConsumeAnatomy.BODY)continue;
-                if(out instanceof ConsumeAnatomy.Consumer consumer)consumer.anatomy(p.anatomy);
+                if(out instanceof ConsumeAnatomy.Consumer consumer)consumer.anatomy(e.getKey());
+                EvolvedDonorCapture.mesh(e.getKey(),"authored_growth");
                 var q=e.getValue();
                 float fraction=growth;
                 if(staged){
@@ -114,7 +117,8 @@ public final class AuthoredInfectionParts {
             for(var entry:pending.entrySet())for(var piece:pieces.get(entry.getKey())) {
                 if(omitBody&&piece.anatomy==ConsumeAnatomy.BODY||onlyBody&&piece.anatomy!=ConsumeAnatomy.BODY)continue;
                 var posed=entry.getValue();var frame=frames.get(entry.getKey());
-                if(tissue instanceof ConsumeAnatomy.Consumer consumer)consumer.anatomy(piece.anatomy);
+                if(tissue instanceof ConsumeAnatomy.Consumer consumer)consumer.anatomy(entry.getKey());
+                EvolvedDonorCapture.mesh(entry.getKey(),"authored_skin");
                 for(var triangle:piece.skin) {
                     if(TissueEvolution.attachmentGrowth(age)>0)emitTissue(triangle,develop(triangle,frame,evolution),frame,posed.pose,tissue,posed.light,posed.overlay,posed.color,growthSeed,age,piece.anatomy);
                 }
@@ -130,6 +134,30 @@ public final class AuthoredInfectionParts {
         }
     }
     private AuthoredInfectionParts(){}
+    /** Snapshot the already-remodelled donor body, using the same meshes and development field as its live renderer. */
+    static TissueChimera.Body donorBody(String species,EntityModel<?> model,TissueInheritance.BodySource source){
+        var binding=bind(species,model);var nativeBody=ProceduralTissueBlueprint.snapshot(model);
+        if(!binding.available()||nativeBody==null)return null;
+        var result=new ArrayList<TissueChimera.Part>();
+        for(var entry:binding.pieces.entrySet()){
+            var matrix=nativeBody.transforms().get(entry.getKey());if(matrix==null)continue;
+            for(var piece:entry.getValue()){
+                // Mature hosts use a reconstructed whole-body surface under their exposed organs.
+                // Export both layers: exporting growth alone loses chest/upper arms and shifts the waist.
+                var triangles=new ArrayList<Triangle>();triangles.addAll(piece.skin);triangles.addAll(piece.growth);
+                var points=new ArrayList<TissueMorphogenesis.V>();var faces=new ArrayList<int[]>();var colors=new ArrayList<Integer>();
+                for(var triangle:triangles){
+                    var evolved=develop(triangle,binding.frames.get(entry.getKey()),source.authored());
+                    int first=points.size();for(var v:List.of(evolved.a,evolved.b,evolved.c))points.add(value(matrix.transformPosition(new Vector3f(v))));
+                    faces.add(new int[]{first,first+1,first+2,first+2});colors.add(piece.skin.contains(triangle)?0xff4a2c31:0xff000000|evolved.color);
+                }
+                if(points.isEmpty())continue;
+                var pivot=value(matrix.transformPosition(new Vector3f()));
+                result.add(new TissueChimera.Part("evolved_"+piece.anatomy+"_"+result.size(),piece.anatomy,pivot,List.copyOf(points),List.copyOf(faces),Collections.nCopies(faces.size(),new float[]{0,0,1,0,1,1,0,1}),List.copyOf(colors)));
+            }
+        }
+        return result.isEmpty()?null:new TissueChimera.Body(List.copyOf(result),TissueChimera.bounds(result.stream().flatMap(p->p.vertices().stream()).toList()),nativeBody.anchorBox());
+    }
     public static void reload(){SOURCES.clear();BINDINGS.clear();FACES.clear();InfectedWoundTextures.reload();AnatomicalTissue.reload();}
     public static Binding bind(String species,EntityModel<?> model){return bind(species,model,false);}
     public static Binding bind(String species,EntityModel<?> model,boolean fur){

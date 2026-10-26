@@ -57,6 +57,10 @@ release/local-*/
 __pycache__/
 *.pyc
 
+# Optional offline whole-city voxel experiments. The default game uses the compact geographic atlas.
+/src/main/resources/data/blacklight/city/los_angeles_full/
+/src/main/resources/data/blacklight/city/los_angeles_compact/
+
 /run-standalone-gametest/
 /run-model-qa/
 /model-qa*/

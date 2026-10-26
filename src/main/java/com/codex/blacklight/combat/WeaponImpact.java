@@ -29,8 +29,7 @@ public final class WeaponImpact {
         // Hunter flinches are bounded by ImpactControl's cooldown. Blocking the
         // entire committed attack here bypassed both light flinches and heavy control.
         boolean protectedAttack=v instanceof com.codex.blacklight.entity.BlacklightHive||v.isAlive()&&v instanceof com.codex.blacklight.entity.BlacklightInfectedHost host&&host.giantBoss();
-        if(!protectedAttack){
-            ImpactControl.begin(v,profile,p.getYRot());
+        if(!protectedAttack&&ImpactControl.begin(v,profile,p.getYRot())){
             double force=profile.push()*mass*resistance;
             double vertical=profile.lift()==0?Math.max(0,Math.min(v.getDeltaMovement().y,.12)):profile.lift()*mass*resistance;
             v.setDeltaMovement(direction.x*force,vertical,direction.z*force);

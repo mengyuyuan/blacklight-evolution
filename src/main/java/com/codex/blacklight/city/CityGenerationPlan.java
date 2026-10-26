@@ -8,7 +8,7 @@ final class CityGenerationPlan {
     private static final List<Cell> FULL=build(false),ARRIVAL=build(true);
     static List<Cell> cells(int mode){return mode==3?WorldPlan.CELLS:mode==2?FULL:ARRIVAL;}
     private static final class WorldPlan {
-        // 6,200 geographic tiles cover ~25 million chunks. Keep only the tile index in memory.
+        // Keep only the global tile index in memory; expand each tile lazily into 4096 chunks.
         static final List<Cell> CELLS=new AbstractList<>(){
             @Override public int size(){return Math.multiplyExact(WorldAtlas.CELLS.size(),4096);}
             @Override public Cell get(int index){

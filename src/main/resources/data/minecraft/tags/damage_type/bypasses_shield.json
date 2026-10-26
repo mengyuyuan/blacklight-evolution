@@ -1,6 +1,7 @@
 {
   "replace": false,
   "values": [
-    "blacklight:bulletdive"
+    "blacklight:bulletdive",
+    "blacklight:devastator"
   ]
 }

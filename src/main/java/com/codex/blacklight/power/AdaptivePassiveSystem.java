@@ -19,11 +19,12 @@ public final class AdaptivePassiveSystem {
     public static boolean active(Player p, int flag) {
         if (IndependentPassives.owns(p, flag)) return false;
         var powers = p.getData(ModAttachments.PLAYER_STATE);
-        return powers.isInfected() && powers.isPrototypeMode() && powers.hasCombatSkill(
-                flag == AdaptivePassiveState.ADAPTATION ? CombatSkill.ADAPTATION : CombatSkill.TISSUE_REGENERATION);
+        var skill=flag==AdaptivePassiveState.ADAPTATION?CombatSkill.ADAPTATION:CombatSkill.TISSUE_REGENERATION;
+        return powers.isInfected()&&powers.isPrototypeMode()&&powers.hasCombatSkill(skill)&&EvolutionProgression.mayActivate(p,skill);
     }
     public static boolean percentBased(Player p) {
-        return active(p, AdaptivePassiveState.ADAPTATION) && p.getData(ModAttachments.PLAYER_STATE).hasCombatSkill(CombatSkill.ADAPTATION_PERCENT);
+        return active(p, AdaptivePassiveState.ADAPTATION) && p.getData(ModAttachments.PLAYER_STATE).hasCombatSkill(CombatSkill.ADAPTATION_PERCENT)
+                &&EvolutionProgression.mayActivate(p,CombatSkill.ADAPTATION_PERCENT);
     }
     private static void publish(ServerPlayer p, AdaptivePassiveState data) {
         if (data.equals(state(p))) return;
@@ -39,7 +40,7 @@ public final class AdaptivePassiveSystem {
         boolean adaptive = active(p, AdaptivePassiveState.ADAPTATION), regen = active(p, AdaptivePassiveState.REGENERATION);
         if (!adaptive && !regen) return IndependentPassives.damage(p, source, damage);
         var before = state(p);
-        float actual = adaptive ? (float)(damage * AdaptivePassiveRules.remainingFraction(before.adaptation(),
+        float actual = adaptive&&!com.codex.blacklight.combat.DevastatorDamage.isTrueDamage(source) ? (float)(damage * AdaptivePassiveRules.remainingFraction(before.adaptation(),
                 p.getHealth(), p.getMaxHealth(), percentBased(p))) : damage;
         int layers = adaptive ? AdaptivePassiveRules.adaptationAfterHit(before.adaptation(), actual, damage - (double)actual) : before.adaptation();
         int tissue = regen ? AdaptivePassiveRules.regenerationAfterHit(before.regeneration(), damage) : before.regeneration();

@@ -31,6 +31,7 @@ public final class InfectedMorphology implements AutoCloseable {
     private final SurfaceTissue surface;
     private final AnatomicalTissue anatomical;
     private final AnatomicalTissue lateOrgans;
+    private final ChimeraTissue chimera;
     private final List<AnatomicalTissue> anatomicalCoats=new ArrayList<>();
     private final float tissueGrowth;
     private final long tissueSeed;
@@ -43,6 +44,7 @@ public final class InfectedMorphology implements AutoCloseable {
     private final Map<ResourceLocation,ResourceLocation> skins=new HashMap<>();
     private final Map<ModelPart,Attachment> attachments;
     private final Map<ModelPart,Pending> pending = new IdentityHashMap<>();
+    private final Map<ModelPart,PoseStack.Pose> nativeChimeraPoses=new IdentityHashMap<>();
 
     private static JsonObject definitions(){
         try(var stream=InfectedMorphology.class.getResourceAsStream("/assets/blacklight/models/infected_morphology.json")){
@@ -52,6 +54,7 @@ public final class InfectedMorphology implements AutoCloseable {
     }
     public InfectedMorphology(BlacklightInfectedHost host,LivingEntity proxy,EntityModel<?> model,ResourceLocation nativeTexture,PoseStack.Pose root,float partial){
         this.proxy=proxy;previous=ACTIVE.get();
+        chimera=ChimeraTissue.bind(host,model,partial);
         String type=host.hostData().getString("Type");speciesId=type;
         var approved=Boolean.getBoolean("blacklight.proceduralTissueOnly")?new AuthoredInfectionParts.Binding():AuthoredInfectionParts.bind(type,model);
         anatomical=approved.available()?null:AnatomicalTissue.bind(host,model,nativeTexture,partial);
@@ -60,7 +63,7 @@ public final class InfectedMorphology implements AutoCloseable {
         tissueGrowth=.12F+.88F*com.codex.blacklight.infection.TissueGrowth.progress(host.tissueAge());
         tissueSeed=host.getUUID().getMostSignificantBits()^host.getUUID().getLeastSignificantBits();
         authored.growth(tissueGrowth,tissueSeed);
-        authored.evolution(host.tissueAge(),host.tissueTentacles());
+        authored.evolution(host.tissueAge(),host.tissueTentacles(),ChimeraTissue.receiverEvolution(host,true,partial));
         surface=new SurfaceTissue(host,model,root,partial,anatomical,authored);
         if(anatomical==null)skins.put(nativeTexture,InfectedWoundTextures.get(nativeTexture,type,authored.wounds()));
         var species=DEFINITIONS.getAsJsonObject("species");
@@ -90,7 +93,7 @@ public final class InfectedMorphology implements AutoCloseable {
             return;
         }
         if(context.authored.available()){
-            var coat=AuthoredInfectionParts.bind(context.speciesId,model,path.contains("sheep_fur"));coat.growth(context.tissueGrowth,context.tissueSeed);coat.evolution(context.authored.age(),context.authored.tentacles());context.coats.add(coat);
+            var coat=AuthoredInfectionParts.bind(context.speciesId,model,path.contains("sheep_fur"));coat.growth(context.tissueGrowth,context.tissueSeed);coat.evolution(context.authored.age(),context.authored.tentacles(),context.authored.development());context.coats.add(coat);
             if(path.contains("sheep_fur")||path.contains("slime"))context.coatGrowth.add(coat);
             context.skins.put(texture,InfectedWoundTextures.get(texture,context.speciesId,coat.wounds()));return;
         }
@@ -189,13 +192,18 @@ public final class InfectedMorphology implements AutoCloseable {
     /** Compile only selected native cubes through a local face cutter. No shared model mutation. */
     public static boolean renderWounded(ModelPart part,PoseStack.Pose pose,VertexConsumer out,int light,int overlay,int color){
         var context=ACTIVE.get();if(context==null)return false;
+        var originalPose=pose;
+        if(context.chimera!=null){if(context.chimera.nativeWeight(part)<=.0001F)return true;pose=context.chimera.nativePose(part,pose);context.nativeChimeraPoses.put(part,pose);}
+        EvolvedDonorCapture.joint(part,pose);
+        if(context.chimera!=null)context.chimera.capture(part,pose,light,overlay);
         if(context.anatomical!=null){
             boolean handled=context.anatomical.renderSkin(part,pose,out,light,overlay,color);
             if(handled)context.surface.capture(part,pose,light,overlay,color);
             if(!handled)for(var coat:context.anatomicalCoats)if(coat.renderSkin(part,pose,out,light,overlay,color))return true;
+            if(!handled&&pose!=originalPose){for(var cube:((ModelPartChildrenAccessor)(Object)part).blacklight$cubes())cube.compile(pose,out,light,overlay,color);capture(part,pose,light,overlay,color);return true;}
             return handled;
         }
-        var originalPose=pose;pose=context.surface.mutatedPose(part,pose);
+        pose=context.surface.mutatedPose(part,pose);
         if(context.surface.replacesBody(part)) {
             capture(part,pose,light,overlay,color);return true;
         }
@@ -232,10 +240,13 @@ public final class InfectedMorphology implements AutoCloseable {
     /** Called inside ModelPart.compile, after its complete animated transform. */
     public static void capture(ModelPart part,PoseStack.Pose pose,int light,int overlay,int color){
         var context=ACTIVE.get();if(context==null||context.pending.containsKey(part))return;
+        if(context.chimera!=null){if(context.chimera.nativeWeight(part)<=.0001F)return;var adjusted=context.nativeChimeraPoses.get(part);pose=adjusted==null?context.chimera.nativePose(part,pose):adjusted;}
+        EvolvedDonorCapture.joint(part,pose);
+        if(context.chimera!=null)context.chimera.capture(part,pose,light,overlay);
         if(context.anatomical!=null){
             context.anatomical.capture(part,pose,light,overlay,color);
             if(context.anatomical.owns(part))context.surface.capture(part,pose,light,overlay,color);
-            context.anatomicalCoats.forEach(coat->coat.capture(part,pose,light,overlay,color));return;
+            for(var coat:context.anatomicalCoats)coat.capture(part,pose,light,overlay,color);return;
         }
         if(context.surface!=null)context.surface.capture(part,pose,light,overlay,color);
         context.authored.capture(part,pose,light,overlay,color);
@@ -250,6 +261,7 @@ public final class InfectedMorphology implements AutoCloseable {
      * through its model; context never mutates the shared species skeleton. */
     public static void flush(LivingEntity entity,MultiBufferSource buffers){
         var context=ACTIVE.get();if(context==null||context.proxy!=entity)return;
+        if(context.chimera!=null)context.chimera.flush(buffers);
         if(context.anatomical!=null){context.anatomical.flush(buffers);context.anatomicalCoats.forEach(coat->coat.flush(buffers));context.surface.flush(buffers);return;}
         context.authored.flush(buffers,!context.coatGrowth.isEmpty(),false);
         context.coatGrowth.forEach(coat->coat.flush(buffers,false,true));

@@ -36,6 +36,7 @@ import org.lwjgl.glfw.GLFW;
 @EventBusSubscriber(modid = BlacklightNeoMod.MOD_ID, value = Dist.CLIENT)
 public final class ClientClawEvents {
     public static KeyMapping targetLockKey(){return TARGET_LOCK;}
+    public static KeyMapping targetInfoKey(){return TARGET_INFO;}
     private static final String CATEGORY = "key.categories.blacklight";
     private static final KeyMapping CYCLE_FORM = new KeyMapping("key.blacklight.cycle_form", InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_Z, CATEGORY);
     private static final KeyMapping GRAB = new KeyMapping(
@@ -50,6 +51,8 @@ public final class ClientClawEvents {
             "key.blacklight.animation_tuner", InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_J, CATEGORY);
     private static final KeyMapping TARGET_LOCK = new KeyMapping(
             "key.blacklight.target_lock", InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_TAB, CATEGORY);
+    private static final KeyMapping TARGET_INFO = new KeyMapping(
+            "key.blacklight.target_info", InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_RIGHT_ALT, CATEGORY);
     private static final KeyMapping UPGRADE_PANEL = new KeyMapping(
             "key.blacklight.upgrades", InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_U, CATEGORY);
     /** Grounded left-clicks held this long become a dashing slice instead of a combo hit. */
@@ -87,6 +90,7 @@ public final class ClientClawEvents {
         if (DeveloperTools.enabled()) event.register(CLAW_TUNER);
         if (DeveloperTools.enabled()) event.register(ANIMATION_TUNER);
         event.register(TARGET_LOCK);
+        event.register(TARGET_INFO);
         event.register(UPGRADE_PANEL);
     }
 
@@ -97,6 +101,7 @@ public final class ClientClawEvents {
         event.registerEntityRenderer(ModEntities.THROWN_BLOCK.get(),com.codex.blacklight.client.renderer.ThrownBlockRenderer::new);
         event.registerEntityRenderer(ModEntities.BIOMASS_HUSK.get(),com.codex.blacklight.client.renderer.BiomassHuskRenderer::new);
         event.registerEntityRenderer(ModEntities.INFECTED_HOST.get(), com.codex.blacklight.client.renderer.InfectedHostRenderer::new);
+        event.registerEntityRenderer(ModEntities.COMMON_INFECTED.get(), com.codex.blacklight.client.renderer.CommonInfectedRenderer::new);
         event.registerEntityRenderer(ModEntities.GROUND_SPIKE.get(), GroundSpikeRenderer::new);
         for(var type:java.util.List.of(ModEntities.BLACKLIGHT_STALKER,ModEntities.BLACKLIGHT_SPITTER,ModEntities.BLACKLIGHT_BRUTE))
             event.registerEntityRenderer(type.get(),context->new com.codex.blacklight.client.renderer.BlacklightCreatureRenderer<com.codex.blacklight.entity.BlacklightMutant>(context,com.codex.blacklight.entity.BlacklightMutant::asset));

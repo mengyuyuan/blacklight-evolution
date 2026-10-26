@@ -31,6 +31,19 @@ final class WorldTerrain {
         Column[] result=new Column[256];
         for(int z=0;z<16;z++)for(int x=0;x<16;x++){
             int wx=bx+x,wz=bz+z;var c=new Column(key.seed,wx,wz,tile.height(wx,wz));
+            var arnis=FullLosAngelesMap.column(wx,wz);
+            if(arnis!=null){
+                c.arnis=arnis;c.top=arnis.top();c.ground=Math.max(1,arnis.bottom());
+                c.water=arnis.state(c.top).is(Blocks.WATER)?c.top:0;
+                for(var f:features)if(f.kind==6&&f.layer==0&&f.intersects(wx,wz,1)&&f.lineDistance(wx+.5,wz+.5)<=f.width/2)c.road=6;
+                result[z*16+x]=c;continue;
+            }
+            if(LosAngelesMap.inside(wx,wz)){
+                c.scenery=true;c.ground=LosAngelesMap.GROUND;c.water=0;c.top=LosAngelesMap.top(wx,wz);
+                var surface=LosAngelesMap.state(wx,c.ground,wz);
+                if(surface.is(Blocks.BLACK_CONCRETE)||surface.is(Blocks.GRAY_CONCRETE)||surface.is(Blocks.GRAY_WOOL))c.road=6;
+                result[z*16+x]=c;continue;
+            }
             if(FutianMap.inside(wx,wz)){c.core=FutianLayout.column(key.seed,wx,wz);c.top=c.core.top;result[z*16+x]=c;continue;}
             // OSM land-use polygons often stop before the road reservation. Reclaim the
             // at-grade road verge before applying explicit water, not after it.
@@ -105,7 +118,7 @@ final class WorldTerrain {
     }
     static final class Column {
         final long seed;final int x,z;int ground,water,cover,road,bridge,top,treeBase,treeDistance,treeHeight;
-        boolean line,urban,sidewalk,lamp;FutianLayout.Column core;Part landmark;final List<Part> parts=new ArrayList<>();
+        boolean line,urban,sidewalk,lamp,scenery;FullLosAngelesMap.Column arnis;FutianLayout.Column core;Part landmark;final List<Part> parts=new ArrayList<>();
         Column(long seed,int x,int z,int ground){
             this.seed=seed;this.x=x;this.z=z;
             // The legacy core is at sea-level numerically, but its border is dry ground.
@@ -130,6 +143,8 @@ final class WorldTerrain {
         }
         BlockState state(int y){
             if(y<0||y>=HEIGHT)return b(Blocks.VOID_AIR);
+            if(arnis!=null)return arnis.state(y);
+            if(scenery)return LosAngelesMap.state(x,y,z);
             if(core!=null)return y>=FutianMap.HEIGHT?b(Blocks.AIR):core.state(y);
             if(y==0)return b(Blocks.BEDROCK);
             if(y<ground-3)return b(Blocks.STONE);

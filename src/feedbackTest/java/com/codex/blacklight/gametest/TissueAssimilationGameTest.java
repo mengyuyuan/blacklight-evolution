@@ -39,8 +39,29 @@ public final class TissueAssimilationGameTest {
     private static BlacklightInfectedHost host(ServerPlayer p,long age,TissueCore core){
         var host=ModEntities.INFECTED_HOST.get().create(p.serverLevel());host.inherit(EntityType.CHICKEN.create(p.serverLevel()));
         long seed=1;while(TissueCore.forSeed(seed)!=core)seed++;
-        host.setUUID(new UUID(0,seed));host.setNoAi(true);host.advanceTissue(age);
+        host.setUUID(new UUID(0,seed));var pinned=new net.minecraft.nbt.CompoundTag();host.saveWithoutId(pinned);pinned.getCompound("BlacklightHost").putString("NativeCore",core.key());host.readAdditionalSaveData(pinned);host.setNoAi(true);host.advanceTissue(age);
         host.setPos(p.position().add(0,0,1.2));p.serverLevel().addFreshEntity(host);return host;
+    }
+    @GameTest(template="wall_test",timeoutTicks=40,batch="tissue_assimilation")
+    public static void severalMatureOrgansGrantOneBaseRewardAndBoundedResearch(GameTestHelper h){
+        var p=player(h);var host=host(p,72000,TissueCore.MUSCLE);
+        try{
+            var genome=new TissueInheritance(java.util.Map.of(
+                    TissueCore.GRASP,new TissueInheritance.Organ(350,0,0,0,TissueInheritance.TENDRIL,5),
+                    TissueCore.JAW,new TissueInheritance.Organ(220,0,0,0,TissueInheritance.CLAWS,6),
+                    TissueCore.CREST,new TissueInheritance.Organ(500,30,100,300,0,7)),9,900,false,UUID.randomUUID(),8);
+            var saved=new CompoundTag();host.saveWithoutId(saved);saved.put("BlacklightTissueInheritance",TissueInheritanceCodec.write(genome));host.load(saved);
+            var quote=AssimilationSystem.quote(p,host);var state=p.getData(ModAttachments.PLAYER_STATE);
+            int ep=state.getEvolutionPoints(),biomass=state.getBiomass();
+            h.assertTrue(quote.samples().get(TissueCore.MUSCLE)==1&&quote.samples().get(TissueCore.GRASP)==3&&quote.samples().get(TissueCore.JAW)==2
+                    &&!quote.samples().containsKey(TissueCore.CREST),"native and fully integrated acquired samples coexist; immature crest is excluded");
+            host.discard();h.assertTrue(AssimilationSystem.settle(p,host,quote,false),"one completed victim settles");
+            int discoveries=40+(40+80+120)+(40+80);
+            h.assertTrue(state.getEvolutionPoints()==ep+quote.ep()+discoveries&&state.getBiomass()==Math.min(com.codex.blacklight.state.BlacklightState.MAX_BIOMASS,biomass+quote.biomass()),"several discoveries still grant base biomass and EP only once");
+            var research=p.getData(ModAttachments.ORGAN_RESEARCH);
+            h.assertTrue(research.sample(TissueCore.GRASP)==3&&research.sample(TissueCore.JAW)==2&&research.rank(TissueCore.GRASP)==0,"samples remain bounded and do not automatically purchase player ranks");
+            h.assertTrue(!AssimilationSystem.settle(p,host,quote,false),"a repeated callback cannot grant either samples or base rewards again");
+        }finally{host.discard();cleanup(p);}h.succeed();
     }
     @GameTest(template="wall_test",timeoutTicks=40,batch="tissue_assimilation")
     public static void matureTargetsHaveTheSameWeakeningGateForHumanAndSlime(GameTestHelper h){

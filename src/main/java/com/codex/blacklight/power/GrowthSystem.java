@@ -58,6 +58,7 @@ public final class GrowthSystem {
         var growth=p.getData(ModAttachments.GROWTH);
         double bonus=growth.owns(GrowthUpgrade.VITALITY_IV)?70:growth.owns(GrowthUpgrade.VITALITY_III)?45:
                 growth.owns(GrowthUpgrade.VITALITY_II)?25:growth.owns(GrowthUpgrade.VITALITY)?10:0;
+        bonus+=InfiniteEvolutionSystem.effectiveRank(p,EvolutionAttribute.VITALITY)*2D;
         CombatScale.modifier(attribute,HEALTH,infected?bonus:0,AttributeModifier.Operation.ADD_VALUE);
         CombatScale.attributes(p,infected);
         CombatScale.preserveHealthFraction(p,before,health);

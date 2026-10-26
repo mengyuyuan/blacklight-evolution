@@ -4,10 +4,12 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import os
 import re
 import shutil
 import subprocess
 import tomllib
+import tempfile
 from pathlib import Path
 from zipfile import ZIP_DEFLATED, ZipFile, ZipInfo
 
@@ -17,7 +19,7 @@ MOTION_PREFIX = 'blacklight/bundled_motions/'
 PROFILE_DATA_NAMES = {
     'combat-motion-tuning.data', 'consume-placement.data', 'consume-receiver-events.data',
     'receiver-poses.data', 'hunter-consume.data', 'hammer-scales.data', 'weapon-attack-scales.data', 'armor-growth.data',
-    'camera-profile.data', 'camera-events.data', 'camera-film.data', 'health-hud.data',
+    'camera-profile.data', 'camera-events.data', 'camera-film.data', 'health-hud.data', 'evolved-poses.data',
 }
 SKILL_MOTIONS = ('dev_groundspike', 'dev_air_groundspike', 'dev_tendril', 'dev_air_tendril',
                 'dev_critical_pain', 'dev_air_critical_pain', 'bulletdive_drop')
@@ -129,6 +131,21 @@ def private_curve(data: bytes) -> bool:
     return False
 
 
+def same_stream_content(left, right) -> bool:
+    """Compare large artifacts without retaining either whole payload."""
+    while True:
+        a, b = left.read(1024 * 1024), right.read(1024 * 1024)
+        if a != b:
+            return False
+        if not a:
+            return True
+
+
+def file_sha256(path: Path) -> str:
+    with path.open('rb') as stream:
+        return hashlib.file_digest(stream, 'sha256').hexdigest()
+
+
 def source_snapshot(repo: Path, output: Path | None, baseline: dict[str, str] | None = None,
                     private_hashes: set[str] | None = None) -> dict[str, str]:
     tracked = {p.decode('utf-8') for p in git(repo, 'ls-files', '-z').split(b'\0') if p}
@@ -138,50 +155,150 @@ def source_snapshot(repo: Path, output: Path | None, baseline: dict[str, str] | 
                   'gradle.properties', 'gradlew', 'gradlew.bat', '.gitignore'}
 
     def allowed(name: str) -> bool:
-        return name in root_files or name.startswith(('src/', 'gradle/', '.github/', 'docs/', 'tools/', 'art/'))
+        return name in root_files or name.startswith(('src/', 'gradle/', '.github/', 'docs/', 'tools/', 'art/', 'licenses/'))
 
     files = sorted(name for name in tracked | untracked if allowed(name) and (repo / name).is_file())
     baseline = repository_profile(repo) if baseline is None else baseline
     private_hashes = private_hashes or set()
     private_names = extension_motion_names()
-    payloads = {}
-    for name in files:
-        require('bundled_motions/' not in name, f'Generated/private runtime motion path found in source: {name}')
-        require(not forbidden_reference_asset(name), f'Private effect reference asset found in source: {name}')
-        path = repo / name
-        require(not path.is_symlink(), f'Source symlink needs explicit review: {name}')
-        require(path.resolve().is_relative_to(repo.resolve()), f'Source path escapes repository: {name}')
-        data = path.read_bytes()
-        sha = digest(data)
-        require(sha not in private_hashes, f'Private skill/recovery curve leaked into source: {name}')
-        if name.startswith('art/motion-profile/'):
-            motion_name = name[len('art/motion-profile/'):]
-            require(motion_name == 'README.md' or motion_name in baseline and sha == baseline[motion_name],
-                    f'Unexpected/changed baseline motion in source snapshot: {name}')
-            if motion_name == 'README.md':
-                require(not private_curve(data), f'Private MATRIX curve disguised as baseline documentation: {name}')
-        else:
-            require(path.name not in private_names, f'Private skill/recovery curve leaked into source: {name}')
-            require(not private_curve(data), f'Private MATRIX curve leaked into source: {name}')
-        payloads[name] = data
-    hashes = {name: digest(data) for name, data in payloads.items()}
+    hashes: dict[str, str] = {}
+    temporary = output.with_suffix(output.suffix + '.tmp') if output is not None else None
+    archive = ZipFile(temporary, 'w', compression=ZIP_DEFLATED, compresslevel=9) if temporary is not None else None
+    try:
+        for name in files:
+            require('bundled_motions/' not in name, f'Generated/private runtime motion path found in source: {name}')
+            require(not forbidden_reference_asset(name), f'Private effect reference asset found in source: {name}')
+            path = repo / name
+            require(not path.is_symlink(), f'Source symlink needs explicit review: {name}')
+            require(path.resolve().is_relative_to(repo.resolve()), f'Source path escapes repository: {name}')
+            data = path.read_bytes()
+            sha = digest(data)
+            require(sha not in private_hashes, f'Private skill/recovery curve leaked into source: {name}')
+            if name.startswith('art/motion-profile/'):
+                motion_name = name[len('art/motion-profile/'):]
+                require(motion_name == 'README.md' or motion_name in baseline and sha == baseline[motion_name],
+                        f'Unexpected/changed baseline motion in source snapshot: {name}')
+                if motion_name == 'README.md':
+                    require(not private_curve(data), f'Private MATRIX curve disguised as baseline documentation: {name}')
+            else:
+                require(path.name not in private_names, f'Private skill/recovery curve leaked into source: {name}')
+                require(not private_curve(data), f'Private MATRIX curve leaked into source: {name}')
+            hashes[name] = sha
+            if archive is not None:
+                info = ZipInfo(name, date_time=(2026, 1, 1, 0, 0, 0))
+                info.compress_type = ZIP_DEFLATED
+                info.external_attr = (0o100755 if name == 'gradlew' else 0o100644) << 16
+                archive.writestr(info, data)
+        if archive is not None:
+            info = ZipInfo('SOURCE_MANIFEST.json', date_time=(2026, 1, 1, 0, 0, 0))
+            info.compress_type = ZIP_DEFLATED
+            info.external_attr = 0o100644 << 16
+            archive.writestr(info, json.dumps(hashes, ensure_ascii=False, indent=2))
+    finally:
+        if archive is not None:
+            archive.close()
     if output is None:
         return hashes
-    with ZipFile(output, 'w', compression=ZIP_DEFLATED, compresslevel=9) as archive:
-        for name, data in payloads.items():
-            info = ZipInfo(name, date_time=(2026, 1, 1, 0, 0, 0))
-            info.compress_type = ZIP_DEFLATED
-            info.external_attr = (0o100755 if name == 'gradlew' else 0o100644) << 16
-            archive.writestr(info, data)
-        info = ZipInfo('SOURCE_MANIFEST.json', date_time=(2026, 1, 1, 0, 0, 0))
-        info.compress_type = ZIP_DEFLATED
-        info.external_attr = 0o100644 << 16
-        archive.writestr(info, json.dumps(hashes, ensure_ascii=False, indent=2))
-    with ZipFile(output) as archive:
+    with ZipFile(temporary) as archive:
         require(json.loads(archive.read('SOURCE_MANIFEST.json')) == hashes, 'Source manifest identity mismatch')
         for name, sha in hashes.items():
             require(digest(archive.read(name)) == sha, f'Source snapshot identity mismatch: {name}')
+    temporary.replace(output)
     return hashes
+
+
+def verify_compact_motions(repo: Path, build: Path, jar: Path, profile: Path) -> None:
+    """The same bounded Java decoder must restore every original input byte."""
+    classes = build / 'classes/java/resourceTools'
+    require((classes / 'CompactMotionPacker.class').is_file(), 'Compile resourceTools classes before checking compact motions')
+    java_home = os.environ.get('JAVA_HOME')
+    java = str(Path(java_home) / 'bin' / ('java.exe' if os.name == 'nt' else 'java')) if java_home else shutil.which('java')
+    require(bool(java), 'Java 21 is required to verify the exact compact motion originals')
+    temporary_root = build / 'tmp/compact-verification'
+    temporary_root.mkdir(parents=True, exist_ok=True)
+    with tempfile.TemporaryDirectory(prefix='decoder-', dir=temporary_root) as directory:
+        target = Path(directory).resolve()
+        require(target.is_relative_to(temporary_root.resolve()), 'Decoder temporary path escaped its build directory')
+        with ZipFile(jar) as archive:
+            metadata = json.loads(archive.read('META-INF/jarjar/metadata.json'))
+            libraries = [item for item in metadata['jars'] if item['identifier'] == {'group': 'org.tukaani', 'artifact': 'xz'}]
+            require(len(libraries) == 1 and libraries[0]['version']['artifactVersion'] == '1.10', 'Missing tested pure-Java XZ dependency')
+            name = libraries[0]['path']
+            require(name.startswith('META-INF/jarjar/') and '..' not in name.split('/'), 'Invalid embedded decoder path')
+            library = target / 'xz.jar'
+            library.write_bytes(archive.read(name))
+        command = [java, '-Xmx512m', '-XX:ActiveProcessorCount=2', '-cp', os.pathsep.join((str(classes), str(library))),
+                   'CompactMotionPacker', '--verify', str(jar), str(profile)]
+        result = subprocess.run(command, capture_output=True, text=True, encoding='utf-8', errors='replace', timeout=600)
+        require(result.returncode == 0, f'Exact compact motion restoration failed: {result.stdout}\n{result.stderr}')
+
+
+def geographic_city_selected(repo: Path, archive: ZipFile) -> bool:
+    name = 'data/blacklight/city/generation.json'
+    names = set(archive.namelist())
+    if name not in names:
+        return False
+    profile = json.loads(archive.read(name))
+    require(profile.get('schema') == 1 and profile.get('mode') in ('archive', 'geographic'), 'Invalid city generation profile')
+    if profile['mode'] != 'geographic':
+        return False
+    require(archive.read(name) == (repo / 'src/main/resources' / name).read_bytes(), 'Stale geographic generation profile')
+    require(not any(n.startswith(('data/blacklight/city/los_angeles_full/', 'data/blacklight/city/los_angeles_compact/'))
+                    for n in names), 'Baked municipal archives leaked into the geographic package')
+    for city in ('shenzhen', 'los_angeles'):
+        index_name = f'data/blacklight/worldmap/{city}/index.json'
+        index = json.loads(archive.read(index_name))
+        require(index.get('schema') == 1 and index.get('region') == city and index.get('tiles'), f'Missing geographic city: {city}')
+        for tile in index['tiles']:
+            tile_name = f"data/blacklight/worldmap/{city}/{tile['x']}_{tile['z']}.json.gz"
+            require(tile_name in names or tile_name[:-3]+'.xz' in names, f'Missing geographic tile: {tile_name}')
+    require('data/blacklight/city/futian/map.json' in names
+            and 'data/blacklight/city/los_angeles/map.json' in names, 'Authored city cores must be retained')
+    return True
+
+
+def verify_compact_maps(repo: Path, build: Path, jar: Path) -> None:
+    classes = build / 'classes/java/resourceTools'
+    require((classes / 'CompactMapPacker.class').is_file(), 'Compile resourceTools classes before checking compact maps')
+    java_home = os.environ.get('JAVA_HOME')
+    java = str(Path(java_home) / 'bin' / ('java.exe' if os.name == 'nt' else 'java')) if java_home else shutil.which('java')
+    require(bool(java), 'Java 21 is required to verify the compact maps')
+    temporary_root = build / 'tmp/compact-map-verification'
+    temporary_root.mkdir(parents=True, exist_ok=True)
+    with tempfile.TemporaryDirectory(prefix='decoder-', dir=temporary_root) as directory:
+        with ZipFile(jar) as archive:
+            metadata = json.loads(archive.read('META-INF/jarjar/metadata.json'))
+            libraries = [item for item in metadata['jars'] if item['identifier'] == {'group': 'org.tukaani', 'artifact': 'xz'}]
+            require(len(libraries) == 1 and libraries[0]['version']['artifactVersion'] == '1.10', 'Missing tested map decoder')
+            name = libraries[0]['path']
+            require(name.startswith('META-INF/jarjar/') and '..' not in name.split('/'), 'Invalid embedded map decoder path')
+            library = Path(directory) / 'xz.jar'
+            library.write_bytes(archive.read(name))
+        command = [java, '-Xmx384m', '-XX:ActiveProcessorCount=2', '-cp', os.pathsep.join((str(classes), str(library))),
+                   'CompactMapPacker', '--verify', str(jar), str(repo / 'src/main/resources')]
+        result = subprocess.run(command, capture_output=True, text=True, encoding='utf-8', errors='replace', timeout=600)
+        require(result.returncode == 0, f'Exact compact map restoration failed: {result.stdout}\n{result.stderr}')
+
+
+def compact_city_selected(repo: Path, archive: ZipFile) -> bool:
+    name = 'data/blacklight/city/los_angeles_compact/index.json'
+    if name not in archive.namelist():
+        return False
+    index = json.loads(archive.read(name))
+    legacy_path = repo / 'src/main/resources/data/blacklight/city/los_angeles_full/index.json'
+    legacy = json.loads(legacy_path.read_bytes())
+    require(index.get('complete') is True and index['schema'] == 3, 'Incomplete compact municipality')
+    require(index['sourceIndexSHA256'] == file_sha256(legacy_path), 'Compact map has a different baseline city')
+    for key in ('projection', 'worldBounds', 'nativeChunks', 'coverageSHA256'):
+        require(index[key] == legacy[key], f'Compact map changed its geographic reference: {key}')
+    source = {(r['x'], r['z']): r for r in legacy['regions']}
+    converted = {(r['x'], r['z']): r for r in index['regions']}
+    require(converted.keys() == source.keys(), 'Compact city lost or added geographic regions')
+    require(sum(row['chunks'] for row in converted.values()) == legacy['nativeChunks'], 'Compact city chunk coverage differs')
+    for key, row in converted.items():
+        require(row['sourceSha256'] == source[key]['sha256'] and row['verifiedCells'] > 0, f'Unverified compact region: {key}')
+    require(not any(n.startswith('data/blacklight/city/los_angeles_full/') for n in archive.namelist()), 'Redundant original municipal payload in compact build')
+    return True
 
 
 def main() -> None:
@@ -192,7 +309,10 @@ def main() -> None:
     parser.add_argument('--profile', choices=PROFILES, default='bundled')
     parser.add_argument('--private-motion-directory', type=Path, help='Exact external-profile/local-preview build input directory; every staged file SHA-256 is verified')
     parser.add_argument('--verify-only', action='store_true', help='Verify artifacts and source inputs without creating or changing a release directory')
+    parser.add_argument('--directory-only', action='store_true', help='Verify a prepared ordinary folder instead of a transport ZIP; requires --verify-only and --output')
     args = parser.parse_args()
+    if args.directory_only and (not args.verify_only or args.output is None):
+        parser.error('--directory-only requires --verify-only and --output')
     repo = args.repo.resolve()
     build = (args.build_dir or repo / 'build').resolve()
     props = dict(line.split('=', 1) for line in (repo / 'gradle.properties').read_text(encoding='utf-8').splitlines()
@@ -201,7 +321,7 @@ def main() -> None:
     stem = f"{props['mod_archive_name']}-MC{props['minecraft_version']}-NeoForge-{version}"
     jar = build / 'libs' / f'{stem}-{args.profile}.jar'
     dist = build / 'distributions' / f'{stem}-{args.profile}.zip'
-    require(jar.is_file() and dist.is_file(), f'Build the requested {args.profile} artifacts first')
+    require(jar.is_file() and (args.directory_only or dist.is_file()), f'Build the requested {args.profile} artifacts first')
     notices = ('LICENSE', 'THIRD_PARTY_ASSETS.md', 'THIRD_PARTY_NOTICES.md')
     baseline = repository_profile(repo)
     external = args.profile in ('external-profile', 'local-preview')
@@ -237,15 +357,32 @@ def main() -> None:
         require(manifest.get('Blacklight-Public-Release-Ready', 'false') == 'false', 'This collector cannot approve public releases')
         for name in notices:
             require(archive.read(name) == (repo / name).read_bytes(), f'Stale or missing notice: {name}')
-        motions = {name[len(MOTION_PREFIX):]: digest(archive.read(name)) for name in sorted(names)
-                   if name.startswith(MOTION_PREFIX) and not name.endswith('/')}
+        compact_motions = any(name.startswith(MOTION_PREFIX) and name.endswith('.jz') for name in names)
+        if compact_motions:
+            verify_compact_motions(repo, build, jar, profile if external else repo / 'art/motion-profile')
+            logical = [name[len(MOTION_PREFIX):-3] if name.endswith('.jz') else name[len(MOTION_PREFIX):]
+                       for name in names if name.startswith(MOTION_PREFIX) and not name.endswith('/') and name != MOTION_PREFIX + 'compact-index.json']
+            require(len(logical) == len(set(logical)) and set(logical) == set(expected), 'Compact logical motion inventory differs')
+            motions = dict(expected)  # Each actual decoded byte was compared by the Java verifier above.
+            require(archive.read('META-INF/licenses/XZ-JAVA-0BSD.txt') == (repo / 'licenses/XZ-JAVA-0BSD.txt').read_bytes(), 'Missing decoder license')
+        else:
+            motions = {name[len(MOTION_PREFIX):]: digest(archive.read(name)) for name in sorted(names)
+                       if name.startswith(MOTION_PREFIX) and not name.endswith('/')}
         require(motions == expected, 'Bundled resources differ from the exact selected input profile/manifest')
+        geographic_city = geographic_city_selected(repo, archive)
+        compact_city = compact_city_selected(repo, archive)
+        compact_maps = any(name.endswith('.xz') for name in names)
+        if compact_maps:
+            verify_compact_maps(repo, build, jar)
         forbidden = sorted(name for name in names if forbidden_runtime(name, qa_names))
         require(not forbidden, f'Reference FX, source Shader or opt-in QA content leaked into JAR: {forbidden}')
-        for name in names:
+        entry_hashes = {}
+        for name in sorted(names, key=lambda item: archive.getinfo(item).header_offset):
             if name.endswith('/') or name.startswith(MOTION_PREFIX):
                 continue
             data = archive.read(name)
+            entry_hashes[name] = digest(data)
+            require(not name.endswith('.jz'), f'Compact motion outside its verified profile: {name}')
             require(Path(name).name not in extension_motion_names() and digest(data) not in private_hashes,
                     f'External skill/recovery curve leaked outside the runtime motion directory: {name}')
             require(not private_curve(data), f'Private MATRIX curve leaked outside the runtime motion directory: {name}')
@@ -272,31 +409,58 @@ def main() -> None:
                 if not path.is_file() or path.suffix == '.bbmodel' or '.cache' in path.parts:
                     continue
                 name = path.relative_to(resource_root).as_posix()
+                if name.endswith(('.verified.json', '.tmp')) or compact_city and name.startswith('data/blacklight/city/los_angeles_full/'):
+                    continue
+                if geographic_city and name.startswith(('data/blacklight/city/los_angeles_full/', 'data/blacklight/city/los_angeles_compact/')):
+                    continue
                 if forbidden_runtime(name, qa_names):
                     continue
                 require(not path.is_symlink(), f'Production resource symlink needs explicit review: {name}')
                 data = path.read_bytes()
                 require(name not in resources or resources[name] == digest(data), f'Conflicting production resource roots: {name}')
                 resources[name] = digest(data)
-                require(archive.read(name) == data, f'Stale or missing production resource: {name}')
-    with ZipFile(dist) as archive:
-        require(len(set(archive.namelist())) == len(archive.namelist()), 'Duplicate distribution entries')
-        require([name for name in archive.namelist() if name.endswith('.jar')] == ['mods/' + jar.name],
-                'Distribution must contain exactly this build, without dependencies or old JARs')
-        require(archive.read('mods/' + jar.name) == jar.read_bytes(), 'Distribution JAR mismatch')
+                if compact_maps and name.endswith('.gz') and name[:-3]+'.xz' in names:
+                    # Every decoded byte and the complete logical inventory were checked above.
+                    require(name not in names, f'Both map encodings shipped: {name}')
+                    continue
+                actual = entry_hashes.get(name)
+                if actual is None and name in names:
+                    actual = digest(archive.read(name))
+                require(actual == digest(data), f'Stale or missing production resource: {name}')
+    if args.directory_only:
+        folder = args.output.resolve()
+        installed = folder / 'mods' / jar.name
+        dependency_name = f"geckolib-neoforge-{props['minecraft_version']}-{props['geckolib_version']}.jar"
+        require(installed.is_file(), 'Missing main mod in the ordinary folder')
+        require({path.name for path in (folder / 'mods').glob('*.jar')} == {jar.name, dependency_name}, 'Ordinary folder must contain exactly this mod and its GeckoLib dependency')
+        require({path.resolve() for path in folder.rglob('*.jar')} == {installed.resolve(), (folder / 'mods' / dependency_name).resolve()}, 'Unexpected loose dependency or old JAR outside mods/')
+        if not os.path.samefile(installed, jar):
+            with installed.open('rb') as packed, jar.open('rb') as built:
+                require(same_stream_content(packed, built), 'Ordinary-folder JAR differs from the verified build')
+        docs = sorted(path for path in (repo / 'docs').rglob('*') if path.is_file())
         for name in (*notices, 'README.md'):
-            require(archive.read(name) == (repo / name).read_bytes(), f'Distribution document mismatch: {name}')
-        docs = (sorted(path for path in (repo / 'docs').rglob('*') if path.is_file())
-                if args.profile in ('bundled', 'external-profile') else
-                [repo / 'docs' / name for name in ('INSTALL_ZH.md', 'ACCEPTANCE_0.2.0.md', 'RELEASE_PREPARATION_ZH.md', 'PLATFORM_PLAN_ZH.md')])
+            require((folder / name).read_bytes() == (repo / name).read_bytes(), f'Ordinary-folder document mismatch: {name}')
         for path in docs:
-            name = 'docs/' + path.relative_to(repo / 'docs').as_posix()
-            require(not path.is_symlink(), f'Distribution document symlink needs explicit review: {name}')
-            require(archive.read(name) == path.read_bytes(), f'Distribution document mismatch: {name}')
-        if args.profile in ('bundled', 'external-profile'):
-            require({name for name in archive.namelist() if name.startswith('docs/') and not name.endswith('/')}
-                    == {'docs/' + path.relative_to(repo / 'docs').as_posix() for path in docs}, 'Distribution docs inventory mismatch')
-
+            require((folder / path.relative_to(repo)).read_bytes() == path.read_bytes(), f'Ordinary-folder document mismatch: {path.name}')
+    else:
+        with ZipFile(dist) as archive:
+            require(len(set(archive.namelist())) == len(archive.namelist()), 'Duplicate distribution entries')
+            require([name for name in archive.namelist() if name.endswith('.jar')] == ['mods/' + jar.name],
+                    'Distribution must contain exactly this build, without dependencies or old JARs')
+            with archive.open('mods/' + jar.name) as packed, jar.open('rb') as built:
+                require(same_stream_content(packed, built), 'Distribution JAR mismatch')
+            for name in (*notices, 'README.md'):
+                require(archive.read(name) == (repo / name).read_bytes(), f'Distribution document mismatch: {name}')
+            docs = (sorted(path for path in (repo / 'docs').rglob('*') if path.is_file())
+                    if args.profile in ('bundled', 'external-profile') else
+                    [repo / 'docs' / name for name in ('INSTALL_ZH.md', 'ACCEPTANCE_0.2.0.md', 'RELEASE_PREPARATION_ZH.md', 'PLATFORM_PLAN_ZH.md')])
+            for path in docs:
+                name = 'docs/' + path.relative_to(repo / 'docs').as_posix()
+                require(not path.is_symlink(), f'Distribution document symlink needs explicit review: {name}')
+                require(archive.read(name) == path.read_bytes(), f'Distribution document mismatch: {name}')
+            if args.profile in ('bundled', 'external-profile'):
+                require({name for name in archive.namelist() if name.startswith('docs/') and not name.endswith('/')}
+                        == {'docs/' + path.relative_to(repo / 'docs').as_posix() for path in docs}, 'Distribution docs inventory mismatch')
     verified_sources = source_snapshot(repo, None, baseline, private_hashes)
     if args.verify_only:
         print(json.dumps({'profile': args.profile, 'version': version, 'motionFilesVerified': len(motions),
@@ -332,7 +496,7 @@ def main() -> None:
         'checks': ['production-class identity', 'metadata and author', 'license files', 'exact motion profile/manifest',
                    'private FX and QA exclusion', 'mixin classes', 'language JSON', 'distribution/document identity', 'source snapshot isolation'],
         'notPerformed': ['automated gameplay tests', 'dedicated-server or multiplayer acceptance', 'public upload'],
-        'files': {path.name: digest(path.read_bytes()) for path in (jar, dist, source)},
+        'files': {path.name: file_sha256(path) for path in (jar, dist, source)},
         'motionResourceHashes': motions,
         'privateResourceHashes': motions if external else {},
     }

@@ -1,0 +1,1205 @@
+{
+  "batchesCompared": 133,
+  "rawAnvilEqualsCompactPalettesAndBits": true,
+  "sourceVoxelStatesCompared": 1441792,
+  "samples": [
+    {
+      "batch": "0_0",
+      "nativeChunk": [
+        0,
+        16
+      ],
+      "sections": 5,
+      "voxelStates": 20480
+    },
+    {
+      "batch": "-1_-1",
+      "nativeChunk": [
+        -256,
+        -240
+      ],
+      "sections": 2,
+      "voxelStates": 8192
+    },
+    {
+      "batch": "0_-1",
+      "nativeChunk": [
+        0,
+        -240
+      ],
+      "sections": 3,
+      "voxelStates": 12288
+    },
+    {
+      "batch": "1_-1",
+      "nativeChunk": [
+        256,
+        -240
+      ],
+      "sections": 4,
+      "voxelStates": 16384
+    },
+    {
+      "batch": "-1_0",
+      "nativeChunk": [
+        -256,
+        16
+      ],
+      "sections": 3,
+      "voxelStates": 12288
+    },
+    {
+      "batch": "1_0",
+      "nativeChunk": [
+        256,
+        16
+      ],
+      "sections": 3,
+      "voxelStates": 12288
+    },
+    {
+      "batch": "-1_1",
+      "nativeChunk": [
+        -256,
+        272
+      ],
+      "sections": 4,
+      "voxelStates": 16384
+    },
+    {
+      "batch": "0_1",
+      "nativeChunk": [
+        224,
+        272
+      ],
+      "sections": 3,
+      "voxelStates": 12288
+    },
+    {
+      "batch": "1_1",
+      "nativeChunk": [
+        256,
+        272
+      ],
+      "sections": 3,
+      "voxelStates": 12288
+    },
+    {
+      "batch": "-2_-2",
+      "nativeChunk": [
+        -512,
+        -496
+      ],
+      "sections": 4,
+      "voxelStates": 16384
+    },
+    {
+      "batch": "-1_-2",
+      "nativeChunk": [
+        -256,
+        -496
+      ],
+      "sections": 3,
+      "voxelStates": 12288
+    },
+    {
+      "batch": "0_-2",
+      "nativeChunk": [
+        64,
+        -496
+      ],
+      "sections": 3,
+      "voxelStates": 12288
+    },
+    {
+      "batch": "1_-2",
+      "nativeChunk": [
+        256,
+        -496
+      ],
+      "sections": 2,
+      "voxelStates": 8192
+    },
+    {
+      "batch": "-2_-1",
+      "nativeChunk": [
+        -512,
+        -240
+      ],
+      "sections": 2,
+      "voxelStates": 8192
+    },
+    {
+      "batch": "-2_0",
+      "nativeChunk": [
+        -512,
+        16
+      ],
+      "sections": 2,
+      "voxelStates": 8192
+    },
+    {
+      "batch": "-2_1",
+      "nativeChunk": [
+        -512,
+        272
+      ],
+      "sections": 3,
+      "voxelStates": 12288
+    },
+    {
+      "batch": "-2_2",
+      "nativeChunk": [
+        -512,
+        528
+      ],
+      "sections": 3,
+      "voxelStates": 12288
+    },
+    {
+      "batch": "-1_2",
+      "nativeChunk": [
+        -256,
+        528
+      ],
+      "sections": 2,
+      "voxelStates": 8192
+    },
+    {
+      "batch": "0_2",
+      "nativeChunk": [
+        0,
+        752
+      ],
+      "sections": 3,
+      "voxelStates": 12288
+    },
+    {
+      "batch": "-3_-3",
+      "nativeChunk": [
+        -768,
+        -752
+      ],
+      "sections": 3,
+      "voxelStates": 12288
+    },
+    {
+      "batch": "-2_-3",
+      "nativeChunk": [
+        -384,
+        -688
+      ],
+      "sections": 2,
+      "voxelStates": 8192
+    },
+    {
+      "batch": "-1_-3",
+      "nativeChunk": [
+        -256,
+        -656
+      ],
+      "sections": 3,
+      "voxelStates": 12288
+    },
+    {
+      "batch": "0_-3",
+      "nativeChunk": [
+        96,
+        -624
+      ],
+      "sections": 2,
+      "voxelStates": 8192
+    },
+    {
+      "batch": "1_-3",
+      "nativeChunk": [
+        256,
+        -624
+      ],
+      "sections": 3,
+      "voxelStates": 12288
+    },
+    {
+      "batch": "-3_-2",
+      "nativeChunk": [
+        -768,
+        -496
+      ],
+      "sections": 3,
+      "voxelStates": 12288
+    },
+    {
+      "batch": "-3_-1",
+      "nativeChunk": [
+        -576,
+        -240
+      ],
+      "sections": 2,
+      "voxelStates": 8192
+    },
+    {
+      "batch": "-3_0",
+      "nativeChunk": [
+        -768,
+        16
+      ],
+      "sections": 2,
+      "voxelStates": 8192
+    },
+    {
+      "batch": "-3_1",
+      "nativeChunk": [
+        -704,
+        272
+      ],
+      "sections": 3,
+      "voxelStates": 12288
+    },
+    {
+      "batch": "-3_2",
+      "nativeChunk": [
+        -768,
+        592
+      ],
+      "sections": 3,
+      "voxelStates": 12288
+    },
+    {
+      "batch": "-3_3",
+      "nativeChunk": [
+        -768,
+        784
+      ],
+      "sections": 2,
+      "voxelStates": 8192
+    },
+    {
+      "batch": "-2_3",
+      "nativeChunk": [
+        -281,
+        784
+      ],
+      "sections": 2,
+      "voxelStates": 8192
+    },
+    {
+      "batch": "-1_3",
+      "nativeChunk": [
+        -256,
+        784
+      ],
+      "sections": 2,
+      "voxelStates": 8192
+    },
+    {
+      "batch": "0_3",
+      "nativeChunk": [
+        0,
+        784
+      ],
+      "sections": 3,
+      "voxelStates": 12288
+    },
+    {
+      "batch": "-4_-4",
+      "nativeChunk": [
+        -1024,
+        -1008
+      ],
+      "sections": 2,
+      "voxelStates": 8192
+    },
+    {
+      "batch": "-3_-4",
+      "nativeChunk": [
+        -768,
+        -1008
+      ],
+      "sections": 2,
+      "voxelStates": 8192
+    },
+    {
+      "batch": "-4_-3",
+      "nativeChunk": [
+        -1024,
+        -752
+      ],
+      "sections": 4,
+      "voxelStates": 16384
+    },
+    {
+      "batch": "-4_-2",
+      "nativeChunk": [
+        -1024,
+        -496
+      ],
+      "sections": 3,
+      "voxelStates": 12288
+    },
+    {
+      "batch": "-4_-1",
+      "nativeChunk": [
+        -1024,
+        -48
+      ],
+      "sections": 3,
+      "voxelStates": 12288
+    },
+    {
+      "batch": "-4_0",
+      "nativeChunk": [
+        -1024,
+        16
+      ],
+      "sections": 3,
+      "voxelStates": 12288
+    },
+    {
+      "batch": "-4_1",
+      "nativeChunk": [
+        -1024,
+        272
+      ],
+      "sections": 2,
+      "voxelStates": 8192
+    },
+    {
+      "batch": "-4_2",
+      "nativeChunk": [
+        -1024,
+        528
+      ],
+      "sections": 2,
+      "voxelStates": 8192
+    },
+    {
+      "batch": "-4_3",
+      "nativeChunk": [
+        -1024,
+        784
+      ],
+      "sections": 2,
+      "voxelStates": 8192
+    },
+    {
+      "batch": "-2_4",
+      "nativeChunk": [
+        -264,
+        1135
+      ],
+      "sections": 3,
+      "voxelStates": 12288
+    },
+    {
+      "batch": "-1_4",
+      "nativeChunk": [
+        -244,
+        1264
+      ],
+      "sections": 2,
+      "voxelStates": 8192
+    },
+    {
+      "batch": "-5_-5",
+      "nativeChunk": [
+        -1280,
+        -1264
+      ],
+      "sections": 3,
+      "voxelStates": 12288
+    },
+    {
+      "batch": "-4_-5",
+      "nativeChunk": [
+        -1024,
+        -1264
+      ],
+      "sections": 2,
+      "voxelStates": 8192
+    },
+    {
+      "batch": "-3_-5",
+      "nativeChunk": [
+        -768,
+        -1264
+      ],
+      "sections": 3,
+      "voxelStates": 12288
+    },
+    {
+      "batch": "-2_-5",
+      "nativeChunk": [
+        -512,
+        -1264
+      ],
+      "sections": 3,
+      "voxelStates": 12288
+    },
+    {
+      "batch": "-1_-5",
+      "nativeChunk": [
+        -256,
+        -1264
+      ],
+      "sections": 3,
+      "voxelStates": 12288
+    },
+    {
+      "batch": "-5_-4",
+      "nativeChunk": [
+        -1280,
+        -1008
+      ],
+      "sections": 3,
+      "voxelStates": 12288
+    },
+    {
+      "batch": "-5_-3",
+      "nativeChunk": [
+        -1280,
+        -752
+      ],
+      "sections": 3,
+      "voxelStates": 12288
+    },
+    {
+      "batch": "-5_-2",
+      "nativeChunk": [
+        -1280,
+        -496
+      ],
+      "sections": 3,
+      "voxelStates": 12288
+    },
+    {
+      "batch": "-5_-1",
+      "nativeChunk": [
+        -1280,
+        -240
+      ],
+      "sections": 3,
+      "voxelStates": 12288
+    },
+    {
+      "batch": "-5_0",
+      "nativeChunk": [
+        -1152,
+        16
+      ],
+      "sections": 3,
+      "voxelStates": 12288
+    },
+    {
+      "batch": "-5_1",
+      "nativeChunk": [
+        -1152,
+        272
+      ],
+      "sections": 2,
+      "voxelStates": 8192
+    },
+    {
+      "batch": "-5_2",
+      "nativeChunk": [
+        -1088,
+        528
+      ],
+      "sections": 1,
+      "voxelStates": 4096
+    },
+    {
+      "batch": "-5_3",
+      "nativeChunk": [
+        -1280,
+        784
+      ],
+      "sections": 2,
+      "voxelStates": 8192
+    },
+    {
+      "batch": "-2_5",
+      "nativeChunk": [
+        -288,
+        1424
+      ],
+      "sections": 1,
+      "voxelStates": 4096
+    },
+    {
+      "batch": "-1_5",
+      "nativeChunk": [
+        -256,
+        1296
+      ],
+      "sections": 1,
+      "voxelStates": 4096
+    },
+    {
+      "batch": "-6_-6",
+      "nativeChunk": [
+        -1536,
+        -1520
+      ],
+      "sections": 3,
+      "voxelStates": 12288
+    },
+    {
+      "batch": "-5_-6",
+      "nativeChunk": [
+        -1280,
+        -1520
+      ],
+      "sections": 3,
+      "voxelStates": 12288
+    },
+    {
+      "batch": "-4_-6",
+      "nativeChunk": [
+        -1024,
+        -1520
+      ],
+      "sections": 3,
+      "voxelStates": 12288
+    },
+    {
+      "batch": "-3_-6",
+      "nativeChunk": [
+        -768,
+        -1520
+      ],
+      "sections": 2,
+      "voxelStates": 8192
+    },
+    {
+      "batch": "-2_-6",
+      "nativeChunk": [
+        -512,
+        -1520
+      ],
+      "sections": 3,
+      "voxelStates": 12288
+    },
+    {
+      "batch": "-1_-6",
+      "nativeChunk": [
+        -256,
+        -1520
+      ],
+      "sections": 4,
+      "voxelStates": 16384
+    },
+    {
+      "batch": "0_-6",
+      "nativeChunk": [
+        0,
+        -1520
+      ],
+      "sections": 3,
+      "voxelStates": 12288
+    },
+    {
+      "batch": "-6_-5",
+      "nativeChunk": [
+        -1536,
+        -1264
+      ],
+      "sections": 3,
+      "voxelStates": 12288
+    },
+    {
+      "batch": "-6_-4",
+      "nativeChunk": [
+        -1536,
+        -1008
+      ],
+      "sections": 3,
+      "voxelStates": 12288
+    },
+    {
+      "batch": "-6_-3",
+      "nativeChunk": [
+        -1536,
+        -752
+      ],
+      "sections": 4,
+      "voxelStates": 16384
+    },
+    {
+      "batch": "-6_-2",
+      "nativeChunk": [
+        -1536,
+        -496
+      ],
+      "sections": 4,
+      "voxelStates": 16384
+    },
+    {
+      "batch": "-6_-1",
+      "nativeChunk": [
+        -1536,
+        -240
+      ],
+      "sections": 4,
+      "voxelStates": 16384
+    },
+    {
+      "batch": "-6_0",
+      "nativeChunk": [
+        -1536,
+        16
+      ],
+      "sections": 3,
+      "voxelStates": 12288
+    },
+    {
+      "batch": "-6_1",
+      "nativeChunk": [
+        -1312,
+        400
+      ],
+      "sections": 1,
+      "voxelStates": 4096
+    },
+    {
+      "batch": "-6_2",
+      "nativeChunk": [
+        -1504,
+        528
+      ],
+      "sections": 2,
+      "voxelStates": 8192
+    },
+    {
+      "batch": "-6_3",
+      "nativeChunk": [
+        -1536,
+        784
+      ],
+      "sections": 2,
+      "voxelStates": 8192
+    },
+    {
+      "batch": "-2_6",
+      "nativeChunk": [
+        -327,
+        1711
+      ],
+      "sections": 3,
+      "voxelStates": 12288
+    },
+    {
+      "batch": "-1_6",
+      "nativeChunk": [
+        -107,
+        1776
+      ],
+      "sections": 2,
+      "voxelStates": 8192
+    },
+    {
+      "batch": "0_6",
+      "nativeChunk": [
+        26,
+        1781
+      ],
+      "sections": 1,
+      "voxelStates": 4096
+    },
+    {
+      "batch": "-7_-7",
+      "nativeChunk": [
+        -1728,
+        -1776
+      ],
+      "sections": 2,
+      "voxelStates": 8192
+    },
+    {
+      "batch": "-6_-7",
+      "nativeChunk": [
+        -1536,
+        -1776
+      ],
+      "sections": 2,
+      "voxelStates": 8192
+    },
+    {
+      "batch": "-5_-7",
+      "nativeChunk": [
+        -1280,
+        -1776
+      ],
+      "sections": 2,
+      "voxelStates": 8192
+    },
+    {
+      "batch": "-4_-7",
+      "nativeChunk": [
+        -1024,
+        -1776
+      ],
+      "sections": 3,
+      "voxelStates": 12288
+    },
+    {
+      "batch": "-3_-7",
+      "nativeChunk": [
+        -768,
+        -1552
+      ],
+      "sections": 3,
+      "voxelStates": 12288
+    },
+    {
+      "batch": "-2_-7",
+      "nativeChunk": [
+        -320,
+        -1616
+      ],
+      "sections": 3,
+      "voxelStates": 12288
+    },
+    {
+      "batch": "-1_-7",
+      "nativeChunk": [
+        -160,
+        -1552
+      ],
+      "sections": 4,
+      "voxelStates": 16384
+    },
+    {
+      "batch": "0_-7",
+      "nativeChunk": [
+        0,
+        -1552
+      ],
+      "sections": 3,
+      "voxelStates": 12288
+    },
+    {
+      "batch": "-7_-6",
+      "nativeChunk": [
+        -1792,
+        -1520
+      ],
+      "sections": 4,
+      "voxelStates": 16384
+    },
+    {
+      "batch": "-7_-5",
+      "nativeChunk": [
+        -1792,
+        -1264
+      ],
+      "sections": 4,
+      "voxelStates": 16384
+    },
+    {
+      "batch": "-7_-4",
+      "nativeChunk": [
+        -1792,
+        -1008
+      ],
+      "sections": 2,
+      "voxelStates": 8192
+    },
+    {
+      "batch": "-7_-3",
+      "nativeChunk": [
+        -1792,
+        -752
+      ],
+      "sections": 3,
+      "voxelStates": 12288
+    },
+    {
+      "batch": "-7_-2",
+      "nativeChunk": [
+        -1792,
+        -496
+      ],
+      "sections": 3,
+      "voxelStates": 12288
+    },
+    {
+      "batch": "-7_-1",
+      "nativeChunk": [
+        -1792,
+        -240
+      ],
+      "sections": 4,
+      "voxelStates": 16384
+    },
+    {
+      "batch": "-7_0",
+      "nativeChunk": [
+        -1792,
+        16
+      ],
+      "sections": 2,
+      "voxelStates": 8192
+    },
+    {
+      "batch": "-7_1",
+      "nativeChunk": [
+        -1792,
+        272
+      ],
+      "sections": 2,
+      "voxelStates": 8192
+    },
+    {
+      "batch": "-7_2",
+      "nativeChunk": [
+        -1568,
+        560
+      ],
+      "sections": 2,
+      "voxelStates": 8192
+    },
+    {
+      "batch": "-7_3",
+      "nativeChunk": [
+        -1539,
+        783
+      ],
+      "sections": 2,
+      "voxelStates": 8192
+    },
+    {
+      "batch": "-2_7",
+      "nativeChunk": [
+        -352,
+        1808
+      ],
+      "sections": 2,
+      "voxelStates": 8192
+    },
+    {
+      "batch": "-1_7",
+      "nativeChunk": [
+        -256,
+        1808
+      ],
+      "sections": 1,
+      "voxelStates": 4096
+    },
+    {
+      "batch": "0_7",
+      "nativeChunk": [
+        0,
+        1808
+      ],
+      "sections": 1,
+      "voxelStates": 4096
+    },
+    {
+      "batch": "-7_-8",
+      "nativeChunk": [
+        -1568,
+        -1872
+      ],
+      "sections": 2,
+      "voxelStates": 8192
+    },
+    {
+      "batch": "-6_-8",
+      "nativeChunk": [
+        -1536,
+        -1904
+      ],
+      "sections": 3,
+      "voxelStates": 12288
+    },
+    {
+      "batch": "-5_-8",
+      "nativeChunk": [
+        -1280,
+        -1872
+      ],
+      "sections": 3,
+      "voxelStates": 12288
+    },
+    {
+      "batch": "-4_-8",
+      "nativeChunk": [
+        -1024,
+        -1840
+      ],
+      "sections": 2,
+      "voxelStates": 8192
+    },
+    {
+      "batch": "-8_-7",
+      "nativeChunk": [
+        -1984,
+        -1680
+      ],
+      "sections": 2,
+      "voxelStates": 8192
+    },
+    {
+      "batch": "-8_-6",
+      "nativeChunk": [
+        -2016,
+        -1520
+      ],
+      "sections": 4,
+      "voxelStates": 16384
+    },
+    {
+      "batch": "-8_-5",
+      "nativeChunk": [
+        -2048,
+        -1264
+      ],
+      "sections": 2,
+      "voxelStates": 8192
+    },
+    {
+      "batch": "-8_-4",
+      "nativeChunk": [
+        -2048,
+        -1008
+      ],
+      "sections": 3,
+      "voxelStates": 12288
+    },
+    {
+      "batch": "-8_-3",
+      "nativeChunk": [
+        -2048,
+        -752
+      ],
+      "sections": 3,
+      "voxelStates": 12288
+    },
+    {
+      "batch": "-8_-2",
+      "nativeChunk": [
+        -1856,
+        -496
+      ],
+      "sections": 3,
+      "voxelStates": 12288
+    },
+    {
+      "batch": "-8_-1",
+      "nativeChunk": [
+        -1984,
+        -240
+      ],
+      "sections": 4,
+      "voxelStates": 16384
+    },
+    {
+      "batch": "-8_0",
+      "nativeChunk": [
+        -1856,
+        16
+      ],
+      "sections": 2,
+      "voxelStates": 8192
+    },
+    {
+      "batch": "-8_1",
+      "nativeChunk": [
+        -1856,
+        272
+      ],
+      "sections": 2,
+      "voxelStates": 8192
+    },
+    {
+      "batch": "-3_8",
+      "nativeChunk": [
+        -513,
+        2303
+      ],
+      "sections": 1,
+      "voxelStates": 4096
+    },
+    {
+      "batch": "-2_8",
+      "nativeChunk": [
+        -320,
+        2064
+      ],
+      "sections": 3,
+      "voxelStates": 12288
+    },
+    {
+      "batch": "-1_8",
+      "nativeChunk": [
+        -256,
+        2064
+      ],
+      "sections": 1,
+      "voxelStates": 4096
+    },
+    {
+      "batch": "0_8",
+      "nativeChunk": [
+        0,
+        2288
+      ],
+      "sections": 1,
+      "voxelStates": 4096
+    },
+    {
+      "batch": "-9_-7",
+      "nativeChunk": [
+        -2108,
+        -1541
+      ],
+      "sections": 3,
+      "voxelStates": 12288
+    },
+    {
+      "batch": "-9_-6",
+      "nativeChunk": [
+        -2144,
+        -1520
+      ],
+      "sections": 3,
+      "voxelStates": 12288
+    },
+    {
+      "batch": "-9_-5",
+      "nativeChunk": [
+        -2208,
+        -1264
+      ],
+      "sections": 2,
+      "voxelStates": 8192
+    },
+    {
+      "batch": "-9_-4",
+      "nativeChunk": [
+        -2304,
+        -1008
+      ],
+      "sections": 4,
+      "voxelStates": 16384
+    },
+    {
+      "batch": "-9_-3",
+      "nativeChunk": [
+        -2272,
+        -752
+      ],
+      "sections": 4,
+      "voxelStates": 16384
+    },
+    {
+      "batch": "-9_-1",
+      "nativeChunk": [
+        -2051,
+        -131
+      ],
+      "sections": 5,
+      "voxelStates": 20480
+    },
+    {
+      "batch": "-3_9",
+      "nativeChunk": [
+        -544,
+        2384
+      ],
+      "sections": 2,
+      "voxelStates": 8192
+    },
+    {
+      "batch": "-2_9",
+      "nativeChunk": [
+        -512,
+        2320
+      ],
+      "sections": 3,
+      "voxelStates": 12288
+    },
+    {
+      "batch": "-1_9",
+      "nativeChunk": [
+        -256,
+        2320
+      ],
+      "sections": 2,
+      "voxelStates": 8192
+    },
+    {
+      "batch": "0_9",
+      "nativeChunk": [
+        0,
+        2320
+      ],
+      "sections": 2,
+      "voxelStates": 8192
+    },
+    {
+      "batch": "-10_-5",
+      "nativeChunk": [
+        -2336,
+        -1200
+      ],
+      "sections": 3,
+      "voxelStates": 12288
+    },
+    {
+      "batch": "-10_-4",
+      "nativeChunk": [
+        -2432,
+        -1008
+      ],
+      "sections": 4,
+      "voxelStates": 16384
+    },
+    {
+      "batch": "-10_-3",
+      "nativeChunk": [
+        -2312,
+        -756
+      ],
+      "sections": 3,
+      "voxelStates": 12288
+    },
+    {
+      "batch": "-3_10",
+      "nativeChunk": [
+        -640,
+        2576
+      ],
+      "sections": 2,
+      "voxelStates": 8192
+    },
+    {
+      "batch": "-2_10",
+      "nativeChunk": [
+        -512,
+        2576
+      ],
+      "sections": 2,
+      "voxelStates": 8192
+    },
+    {
+      "batch": "-1_10",
+      "nativeChunk": [
+        -256,
+        2576
+      ],
+      "sections": 2,
+      "voxelStates": 8192
+    },
+    {
+      "batch": "0_10",
+      "nativeChunk": [
+        6,
+        2562
+      ],
+      "sections": 2,
+      "voxelStates": 8192
+    }
+  ],
+  "gameplayTested": false
+}

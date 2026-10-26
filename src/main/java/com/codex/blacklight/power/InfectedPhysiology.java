@@ -17,7 +17,8 @@ public final class InfectedPhysiology {
     public static void incoming(LivingIncomingDamageEvent event){
         if(!(event.getEntity() instanceof Player p)||p.level().isClientSide||event.isCanceled()
                 ||event.getAmount()<=0||!p.getData(ModAttachments.PLAYER_STATE).isInfected()
-                ||event.getSource().is(DamageTypeTags.BYPASSES_INVULNERABILITY))return;
+                ||event.getSource().is(DamageTypeTags.BYPASSES_INVULNERABILITY)
+                ||com.codex.blacklight.combat.DevastatorDamage.isTrueDamage(event.getSource()))return;
         var source=event.getSource();
         if(source.is(DamageTypeTags.IS_FALL)){event.setCanceled(true);return;}
         float factor=source.is(DamageTypeTags.IS_FIRE)?.2F:

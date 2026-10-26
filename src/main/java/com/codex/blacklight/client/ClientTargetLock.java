@@ -87,7 +87,7 @@ public final class ClientTargetLock {
     }
     public static void toggle(){
         sync();
-        if(hasValidLock()){clear();return;}
+        if(REQUEST.desiredId()>=0){clear();return;}
         var mc=Minecraft.getInstance();var player=mc.player;
         if(player==null||mc.level==null||!active())return;
         // Exact limb hits retain their multipart parent. Otherwise choose the actor
@@ -123,7 +123,17 @@ public final class ClientTargetLock {
             // Respawn, reconnect and world handoff explicitly release any copied server attachment.
             request(-1);
         }
-        if(lockedTarget!=null&&(!active()||!visibleInRange(lockedTarget))){clear();return;}
+        // An observer can stop tracking a distant actor. Keep the explicit
+        // request across altitude changes, not a second automatically chosen target.
+        // The server still validates life, allies, dimension and loaded ownership.
+        if(lockedTarget!=null&&mc.level!=null){
+            var tracked=CombatTargeting.resolveTarget(mc.level.getEntity(lockedTarget.getId()));
+            if(tracked!=null)lockedTarget=tracked;
+        }
+        boolean altitude=lockedTarget!=null&&active()&&lockedTarget.level()==p.level()
+                &&lockedTarget.getHealth()>0&&com.codex.blacklight.combat.BulletdiveSteering.retainAltitudeLock(
+                        p.position(),p.onGround(),lockedTarget.position(),range());
+        if(lockedTarget!=null&&(!active()||!altitude&&!visibleInRange(lockedTarget))){clear();return;}
         if(REQUEST.observeAttachment(p.getData(ModAttachments.TARGET_LOCK_ID))){lockedTarget=null;cachedFocus=null;}
         if(REQUEST.desiredId()<0){lockedTarget=null;cachedFocus=null;}
     }

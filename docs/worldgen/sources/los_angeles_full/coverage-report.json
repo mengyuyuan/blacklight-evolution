@@ -1,0 +1,14 @@
+{
+  "schema": 1,
+  "regions": 5732,
+  "requiredNativeChunks": 5344322,
+  "bytes": 779564,
+  "sha256": "077c1f6d631b8b88b5b8cc19b46a6fc976bc9bd5bc4007d8f3c7ec2c077b515d",
+  "nativeBounds": [
+    -39169.36022284101,
+    -31359.835592752046,
+    8079.451280270907,
+    43954.13686867371
+  ],
+  "selection": "Every 16x16 native chunk intersecting municipal relation 207359, including boundary-touching chunks."
+}

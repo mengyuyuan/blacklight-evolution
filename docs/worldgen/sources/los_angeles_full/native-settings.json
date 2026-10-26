@@ -1,0 +1,28 @@
+{
+  "generator": "Arnis 3.3.0",
+  "arnisSHA256": "e4f6f8c9e07e7b8b99a7ec7f5e7c9f8790a79ff9edc2b3003b18e2dd37855a78",
+  "arguments": [
+    "--one-world",
+    "--mode",
+    "geo-terrain",
+    "--ground-level",
+    "63",
+    "--scale",
+    "1",
+    "--interior",
+    "--overture=false",
+    "--canopy-height=false",
+    "--no-3d",
+    "--signage",
+    "none",
+    "--map-item=false",
+    "--world-type",
+    "flat",
+    "--aws-only-elevation",
+    "--disable-height-limit"
+  ],
+  "coordinateFrame": "Shared native Mercator origin34.05575,-118.243; radius6371000; elevation min_height_m0, blocks_per_meter0.8, ground_level63",
+  "runtimeNetworkRequired": false,
+  "importsSourceEntityNBT": false,
+  "importsSourceBlockEntityNBT": false
+}

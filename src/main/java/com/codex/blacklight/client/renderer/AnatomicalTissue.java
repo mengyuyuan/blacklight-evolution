@@ -27,13 +27,24 @@ final class AnatomicalTissue {
     private static final ResourceLocation MATERIAL = ResourceLocation.fromNamespaceAndPath("blacklight", "textures/entity/tissue_anatomy.png");
     private static final Map<String, Optional<JsonObject>> SOURCES = new HashMap<>();
     private static final Map<EntityModel<?>, Map<String, List<Region>>> CACHE = new WeakHashMap<>();
+    private record ModuleKey(TissueCore core,int plan,boolean fallback,int side){}
+    private static final Map<TissueMorphogenesis.Bone,Map<ModuleKey,List<Mesh>>> MODULES=new WeakHashMap<>();
     private record Face(float[] position, float[] uv, Vector3f normal) {}
     private record Mesh(String name, boolean skin, int phase, float[][] pivots, float[][] parentPivots, String motion, Vector3f axis,
                         float[][] stages, float[][] faces, float[][] uv) {}
     private record Region(String name, ModelPart part, ModelPart.Cube cube, int anatomy, List<Mesh> meshes, float[][] outlet,TissueMorphogenesis.Bone frame,boolean groundSupport) {}
     private record Pending(Region region, PoseStack.Pose pose, int light, int overlay, int color) {}
     private final BlacklightInfectedHost host;
-    private final List<Region> regions;
+    private List<Region> regions;
+    private record Graft(Mesh previous,float progress,float gain,TissueCore core,TissueMorphogenesis.Bone motionFrame){
+        Graft(Mesh previous,float progress,float gain,TissueCore core){this(previous,progress,gain,core,null);}
+    }
+    private final Map<Mesh,Graft> grafts=new IdentityHashMap<>();
+    private final Map<Mesh,Float> retiring=new IdentityHashMap<>();
+    private record Resolved(List<Region> source,long revision,List<Region> regions,Map<Mesh,Graft> grafts){}
+    private static final Map<UUID,Resolved> MATURE_GRAFTS=new LinkedHashMap<>(32,.75F,true){
+        @Override protected boolean removeEldestEntry(Map.Entry<UUID,Resolved> entry){return size()>64;}
+    };
     private final Map<Region, Pending> pending = new IdentityHashMap<>();
     private final ResourceLocation skin;
     private final long seed;
@@ -46,14 +57,33 @@ final class AnatomicalTissue {
         this.host = host; this.regions = regions; this.skin = skin; this.partial = partial;
         seed = TissueOrgans.seed(host.getUUID()); growth = organsOnly?TissueEvolution.attachmentGrowth(host.tissueAge()):TissueGrowth.progress(host.tissueAge());
         this.procedural=procedural;this.organsOnly=organsOnly;
-        evolution=organsOnly?TissueEvolution.authoredState(seed,host.tissueAge()):TissueEvolution.sample(seed,procedural?host.tissueAge():0);
+        evolution=organsOnly?ChimeraTissue.receiverEvolution(host,true,partial):procedural?ChimeraTissue.receiverEvolution(host,false,partial):TissueEvolution.sample(seed,0);
         overgrowth=procedural&&!organsOnly?TissueGrowth.overgrowth(host.tissueAge()):0;
         float elapsed=host.tissueStrikeElapsed(partial);
         float melee=elapsed<0?(float)Math.sin(Math.PI*host.getAttackAnim(partial)):0;
         for(int phase=0;phase<motionStates.length;phase++)motionStates[phase]=TissueMotion.sample(seed,
                 host.level().getGameTime()+partial,TissueAnatomy.local(seed,growth,phase),melee,elapsed);
     }
-    static void reload() { SOURCES.clear(); CACHE.clear(); }
+    static void reload() { SOURCES.clear(); CACHE.clear(); MATURE_GRAFTS.clear(); MODULES.clear(); ChimeraTissue.reload(); EvolvedBodyRenderer.reload(); }
+    static TissueChimera.Body donorBody(EntityModel<?> model,TissueInheritance.BodySource source){
+        var nativeBody=ProceduralTissueBlueprint.snapshot(model);var core=TissueCore.byId(source.nativeCore());if(nativeBody==null||core==null)return null;
+        var regions=build("",model,false,true,TissueCore.visualSeed(core,source.variant()),false);var result=new ArrayList<TissueChimera.Part>();
+        for(var region:regions){var matrix=nativeBody.transforms().get(region.part);if(matrix==null||region.frame==null)continue;
+            var points=new ArrayList<TissueMorphogenesis.V>();var faces=new ArrayList<int[]>();var colors=new ArrayList<Integer>();
+            for(var mesh:region.meshes){
+                if(!core.legacy()&&!mesh.skin&&Arrays.stream(TissueCore.values()).filter(TissueCore::legacy).anyMatch(c->TissueGraftLayout.owns(c,mesh.name)))continue;
+                float g=TissueAnatomy.local(source.variant(),TissueGrowth.progress(source.age()),mesh.phase);float[] vertices=new float[mesh.stages[0].length];
+                for(int i=0;i<vertices.length;i++)vertices[i]=TissueAnatomy.coordinate(mesh.stages,i,g,TissueGrowth.overgrowth(source.age()));
+                TissueEvolution.organ(vertices,region.frame,mesh.name,source.procedural(),region.groundSupport);
+                for(var face:mesh.faces){int material=(int)face[4];
+                    int start=points.size();for(int j=0;j<4;j++){int i=(int)face[j]*3;var v=matrix.transformPosition(new Vector3f(vertices[i],vertices[i+1],vertices[i+2]));points.add(new TissueMorphogenesis.V(v.x,v.y,v.z));}
+                    faces.add(new int[]{start,start+1,start+2,start+3});colors.add(0xff000000|switch(material){case 2,5->0x73272d;case 3,6->0x251f22;default->0x443033;});
+                }
+            }
+            if(!points.isEmpty())result.add(new TissueChimera.Part("evolved_"+region.name,region.anatomy,new TissueMorphogenesis.V(matrix.m30(),matrix.m31(),matrix.m32()),List.copyOf(points),List.copyOf(faces),Collections.nCopies(faces.size(),new float[]{0,0,1,0,1,1,0,1}),List.copyOf(colors)));
+        }
+        return result.isEmpty()?null:new TissueChimera.Body(List.copyOf(result),TissueChimera.bounds(result.stream().flatMap(p->p.vertices().stream()).toList()),nativeBody.anchorBox());
+    }
     static AnatomicalTissue bind(BlacklightInfectedHost host, EntityModel<?> model, ResourceLocation skin, float partial) {
         return bind(host,model,skin,partial,false);
     }
@@ -66,11 +96,87 @@ final class AnatomicalTissue {
     private static AnatomicalTissue bind(BlacklightInfectedHost host,EntityModel<?> model,ResourceLocation skin,float partial,boolean coat,boolean organsOnly) {
         if(host.hasMultipartBody())return null;
         boolean authored=!organsOnly&&!coat&&Boolean.getBoolean("blacklight.authoredCowTissue")&&host.speciesId().equals("minecraft:cow")&&!host.isBaby();
-        int variant=TissueCore.visualSeed(TissueOrgans.seed(host.getUUID()));
+        int variant=TissueCore.visualSeed(host.nativeTissueCore(),TissueOrgans.seed(host.getUUID()));
         String key=authored?host.speciesId()+(TissueOrgans.dominantArm(TissueOrgans.seed(host.getUUID()))==ConsumeAnatomy.RIGHT_ARM?"#right":"#left")
                 :"procedural#"+variant+(coat?"#coat":"");
         var regions=CACHE.computeIfAbsent(model,k->new HashMap<>()).computeIfAbsent(key,k->build(host.speciesId(),model,authored&&k.endsWith("#right"),!authored,variant,coat));
-        return regions.isEmpty()?null:new AnatomicalTissue(host,regions,skin,partial,!authored,organsOnly);
+        if(regions.isEmpty())return null;
+        var result=new AnatomicalTissue(host,regions,skin,partial,!authored,organsOnly);
+        if(!coat)result.inherit(model);
+        return result;
+    }
+    /** Replace each named organ once, interpolating from its current surface to the donor's profile.
+     * Cached profiles are shared and immutable; this entity never edits a native model or another host. */
+    private void inherit(EntityModel<?> model){
+        var genome=host.tissueInheritance();TissueCore nativeCore=host.nativeTissueCore();
+        if(genome.organs().isEmpty()&&nativeCore.legacy())return;
+        boolean mature=(nativeCore.legacy()||TissueEvolution.attachmentGrowth(host.tissueAge())>=.999F)&&genome.organs().values().stream().allMatch(TissueInheritance.Organ::mature);
+        var original=regions;
+        var cached=mature?MATURE_GRAFTS.get(host.getUUID()):null;
+        if(cached!=null&&cached.source==original&&cached.revision==genome.revision()){
+            regions=cached.regions;grafts.putAll(cached.grafts);return;
+        }
+        if(!nativeCore.legacy()){
+            var stripped=new ArrayList<Region>();for(var r:regions){
+                var meshes=r.meshes.stream().filter(m->m.skin||TissueEvolution.supportingMesh(nativeCore,m.name)||java.util.Arrays.stream(TissueCore.values()).filter(TissueCore::legacy).noneMatch(c->TissueGraftLayout.owns(c,m.name))).toList();
+                stripped.add(new Region(r.name,r.part,r.cube,r.anatomy,meshes,r.outlet,r.frame,r.groundSupport));
+            }regions=List.copyOf(stripped);
+        }
+        for(var entry:genome.organs().entrySet()){
+            TissueCore core=entry.getKey();var organ=entry.getValue();
+            if(!core.legacy()||core==nativeCore||core==TissueCore.MUSCLE)continue;
+            float progress=TissueGraftLayout.growth(organ,host.tissueInheritanceVisualWork(partial));if(progress<=.0001F)continue;
+            int variant=TissueCore.visualSeed(core,organ.variant());String key="procedural#"+variant+"#donor"+organ.donorPlan();
+            var donors=CACHE.computeIfAbsent(model,k->new HashMap<>()).computeIfAbsent(key,k->build(host.speciesId(),model,false,true,variant,false,organ.donorPlan()));
+            var resolved=new ArrayList<Region>();
+            for(var region:regions){
+                var donor=donors.stream().filter(r->r.part==region.part&&r.cube==region.cube).findFirst().orElse(null);
+                if(donor==null){resolved.add(region);continue;}
+                var meshes=new LinkedHashMap<String,Mesh>();region.meshes.forEach(mesh->meshes.put(TissueGraftLayout.key(core,mesh.name),mesh));
+                var donorKeys=new HashSet<String>();
+                for(var mesh:donor.meshes)if(TissueGraftLayout.owns(core,mesh.name)){
+                    // A donor's digits replace the receiving digit set, even if one profile calls them blades.
+                    String meshKey=TissueGraftLayout.key(core,mesh.name);donorKeys.add(meshKey);Mesh previous=meshes.get(meshKey);
+                    meshes.put(meshKey,mesh);grafts.put(mesh,new Graft(previous,progress,TissueGraftLayout.gain(organ),core));
+                }
+                for(var mesh:region.meshes)if(TissueGraftLayout.owns(core,mesh.name)&&!donorKeys.contains(TissueGraftLayout.key(core,mesh.name))){
+                    if(progress>=.999F)meshes.remove(TissueGraftLayout.key(core,mesh.name));
+                    else grafts.put(mesh,new Graft(null,1-progress,1,nativeCore));
+                }
+                resolved.add(new Region(region.name,region.part,region.cube,region.anatomy,List.copyOf(meshes.values()),region.outlet,region.frame,region.groundSupport));
+            }
+            regions=List.copyOf(resolved);
+        }
+        var layout=TissueOrganLayout.fit(regions.stream().map(Region::frame).filter(Objects::nonNull).toList(),seed);
+        var functional=new ArrayList<Region>();int faceBudget=2400-regions.stream().flatMap(r->r.meshes.stream()).mapToInt(m->m.faces.length).sum();
+        for(var r:regions){var meshes=new ArrayList<>(r.meshes);
+            float replaced=0;
+            if(r.frame!=null)for(var weapon:new TissueCore[]{TissueCore.BLADE,TissueCore.CHELA,TissueCore.HYDROSTAT})
+                if(!ChimeraTissue.routed(host,weapon)&&(layout.mounted(weapon,r.frame)||layout.fallback(weapon,r.frame)))replaced=Math.max(replaced,host.organExpression(weapon,partial));
+            if(replaced>.0001F){
+                for(var iterator=meshes.iterator();iterator.hasNext();){var mesh=iterator.next();if(mesh.skin||!TissueOrganLayout.oldDistalKit(mesh.name))continue;
+                    if(replaced>=.999F){iterator.remove();grafts.remove(mesh);faceBudget+=mesh.faces.length;}
+                    else retiring.put(mesh,1-replaced);
+                }
+            }
+            if(r.frame!=null)for(var core:TissueCore.values())if(!core.legacy()){
+                if(ChimeraTissue.routed(host,core))continue;
+                float expression=host.organExpression(core,partial);if(expression<=.0001F)continue;
+                boolean fallback=layout.fallback(core,r.frame);
+                if(!fallback&&!layout.mounted(core,r.frame))continue;
+                var modules=MODULES.computeIfAbsent(r.frame,k->new HashMap<>()).computeIfAbsent(new ModuleKey(core,host.nativeTissuePlan(),fallback,fallback?TissueOrganLayout.bladeSide(seed):0),k->{
+                    var source=fallback?TissueMorphogenesis.functionalFallback(core,r.frame,host.nativeTissuePlan(),seed):TissueMorphogenesis.functional(core,r.frame,host.nativeTissuePlan(),seed);
+                    var result=new ArrayList<Mesh>();for(var m:source)
+                        result.add(new Mesh(m.name(),false,m.phase(),m.pivots(),null,m.motion(),new Vector3f(m.axis()),m.stages(),m.faces(),new float[m.faces().length][8]));
+                    return List.copyOf(result);
+                });
+                var acquired=genome.organ(core);float gain=acquired==null?1:TissueGraftLayout.gain(acquired);
+                var motionFrame=fallback?TissueMorphogenesis.functionalMount(core,r.frame,seed):r.frame;
+                for(var mesh:modules)if(faceBudget>=mesh.faces.length){faceBudget-=mesh.faces.length;meshes.add(mesh);grafts.put(mesh,new Graft(null,expression,gain,core,motionFrame));}
+            }
+            functional.add(new Region(r.name,r.part,r.cube,r.anatomy,List.copyOf(meshes),r.outlet,r.frame,r.groundSupport));
+        }regions=List.copyOf(functional);
+        if(mature)MATURE_GRAFTS.put(host.getUUID(),new Resolved(original,genome.revision(),regions,Map.copyOf(grafts)));
     }
     AnatomicalTissue coat(EntityModel<?> model,ResourceLocation texture){return bind(host,model,texture,partial,true);}
     boolean owns(ModelPart part){return regions.stream().anyMatch(r->r.part==part);}
@@ -138,15 +244,34 @@ final class AnatomicalTissue {
         pending.clear();
     }
     private void draw(Pending p, Mesh mesh, VertexConsumer out, boolean tissue) {
-        boolean mandible=organsOnly&&mesh.name.equals("mandible")&&TissueCore.forSeed(seed)==TissueCore.JAW;
+        var graft=grafts.get(mesh);
+        boolean mandible=organsOnly&&mesh.name.equals("mandible")&&(host.nativeTissueCore()==TissueCore.JAW||graft!=null&&graft.core==TissueCore.JAW);
         if(organsOnly&&((mesh.skin&&!mandible)||mesh.name.equals("tendril_gland")))return;
         if (out instanceof ConsumeAnatomy.Consumer c) c.anatomy(p.region.anatomy);
+        EvolvedDonorCapture.mesh(p.region.part,mesh.name);
         float g = TissueAnatomy.local(seed, growth, mesh.phase);
         if (tissue && g <= 0) return;
         int size = mesh.stages[0].length;
         float[] vertices = new float[size];
         for (int i = 0; i < size; i++) vertices[i] = TissueAnatomy.coordinate(mesh.stages,i,g,overgrowth);
-        if(organsOnly)TissueSkin.focus(vertices,1+(TissueSkin.organGain(TissueCore.forSeed(seed),mesh.name)-1)*g);
+        if(graft!=null){
+            // The mandible, palate and teeth share the head's deformation field.
+            // Scaling each around a separate root would detach teeth from the enlarged jaw.
+            float donorGain=graft.core==TissueCore.JAW?1:(1+(TissueSkin.organGain(graft.core,mesh.name)-1)*g)*graft.gain;
+            TissueSkin.focus(vertices,donorGain);
+            if(graft.previous!=null&&graft.previous.stages[0].length==size){
+                float[] previous=new float[size];
+                for(int i=0;i<size;i++)previous[i]=TissueAnatomy.coordinate(graft.previous.stages,i,g,overgrowth);
+                if(organsOnly)TissueSkin.focus(previous,1+(TissueSkin.organGain(host.nativeTissueCore(),graft.previous.name)-1)*g);
+                for(int i=0;i<size;i++){
+                    vertices[i]=previous[i]+(vertices[i]-previous[i])*graft.progress;
+                }
+            }else{
+                // New ribs/digits emerge from a buried root; no instant fully-sized attachment.
+                TissueSkin.rootedScale(vertices,graft.progress);
+            }
+        }else if(organsOnly)TissueSkin.focus(vertices,1+(TissueSkin.organGain(host.nativeTissueCore(),mesh.name)-1)*g);
+        if(retiring.containsKey(mesh))TissueSkin.rootedScale(vertices,retiring.get(mesh));
         var graftShift=new TissueMorphogenesis.V(0,0,0);
         if(organsOnly&&p.region.frame!=null){
             var root=new TissueMorphogenesis.V(0,0,0);for(int i=0;i<24;i+=3)root=root.add(new TissueMorphogenesis.V(vertices[i],vertices[i+1],vertices[i+2]));
@@ -154,6 +279,11 @@ final class AnatomicalTissue {
             TissueSilhouette.graft(vertices,graftShift);
         }
         if(procedural&&p.region.frame!=null)TissueEvolution.organ(vertices,p.region.frame,mesh.name,evolution,p.region.groundSupport);
+        if(graft!=null&&!graft.core.legacy()){
+            float time=host.organActionCore()==graft.core?host.organActionElapsed(partial):-1;
+            float feeding=host.cannibalStarted()<0?0:Math.clamp((host.level().getGameTime()-host.cannibalStarted()+partial-TissueCompetition.COVER_TICKS)/(host.cannibalDuration()-TissueCompetition.COVER_TICKS),0,1);
+            TissueFunctionalMotion.apply(vertices,graft.motionFrame==null?p.region.frame:graft.motionFrame,mesh.name,graft.core,time,feeding);
+        }
         float elapsed=host.tissueStrikeElapsed(partial);
         float melee=elapsed<0?(float)Math.sin(Math.PI*host.getAttackAnim(partial)):0;
         var motion=motionStates[mesh.phase>=0&&mesh.phase<4?mesh.phase:0];
@@ -232,10 +362,13 @@ final class AnatomicalTissue {
         }
     }
     private static List<Region> build(String species, EntityModel<?> model, boolean mirror,boolean procedural,int variant,boolean coat) {
+        return build(species,model,mirror,procedural,variant,coat,-1);
+    }
+    private static List<Region> build(String species,EntityModel<?> model,boolean mirror,boolean procedural,int variant,boolean coat,int donorPlan) {
         Optional<JsonObject> source;Map<String,ModelPart> parts=new HashMap<>();
         if(procedural){
             try {
-                var generated=ProceduralTissueBlueprint.generate(model,variant,coat);source=Optional.of(generated.source());parts.putAll(generated.parts());
+                var generated=ProceduralTissueBlueprint.generate(model,variant,coat,donorPlan);source=Optional.of(generated.source());parts.putAll(generated.parts());
             } catch(Exception ex){BlacklightNeoMod.LOGGER.error("Cannot generate tissue for model {}",model.getClass().getName(),ex);return List.of();}
         } else {
             source=SOURCES.computeIfAbsent(species,AnatomicalTissue::load);if(source.isEmpty())return List.of();

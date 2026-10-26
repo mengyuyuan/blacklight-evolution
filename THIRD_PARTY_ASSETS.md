@@ -18,7 +18,7 @@ Git does not change those provenance records. The GPL code license does not
 relicense separately owned dependency assets. This inventory describes the
 actual build contents rather than making a commercial release certification.
 
-A normal clone and `assemble` now include all 251 files in
+A normal clone and `assemble` now include all 254 files in
 `blacklight/bundled_motions/`. The `bundled` JAR/ZIP is the complete default build.
 An explicit `-PbundleMotionDirectory=<directory>` replaces the whole profile;
 that build uses the `external-profile` classifier. Build verification checks
@@ -46,6 +46,30 @@ The manifest contains current file hashes, which change when metadata changes;
 source hashes continue to identify the original inputs. License files are unchanged.
 
 ## Independent runtime and authored resources
+
+The 2026-10-25 Evolved sample uses standard Minecraft player cuboid dimensions,
+a project-authored 64x64 Runner1-inspired tactical skin. The adapted arm surfaces
+retain the locally decoded `evolved_1stRunner_Blades_geo_runner1_arm_bladeShape`
+geometry: its cutting profile, dorsal hooks and tendon openings are fitted to
+Minecraft shoulder/elbow proportions. Source hashes and the adaptation are
+recorded in `docs/design/evolved-complete-arms.json`. Source game torso/head
+meshes and game textures are not embedded. `evolved-poses.data` contains the complete
+67-joint Prototype 2 Evolved hierarchy and 27 locally decoded action/stance channels;
+the original clip names and input hashes are recorded in
+`docs/design/evolved-form-motion-sources.json`. The body retains
+Minecraft-sized rest proportions. The original parent hierarchy, elbow, knee,
+and action rotations drive the surface. Anatomical aim frames and bone lengths
+adapt those channels to the standard block body, retaining the source's -Z
+forward axis. `tools/fit_p2_evolved_arms.py` adapts the source arm geometry and
+authors new pixel materials; the player weapon mesh is not used for these arms.
+The reference channels retain their source lineage.
+
+The Evolved combat revision also samples original motion-root travel. Minecraft
+collision, navigation, contact windows and server damage are project code;
+they are not a port of the source game's fight bytecode. Blade trails and charge,
+impact and ground feedback use project-authored geometry and existing mod/vanilla
+particles and sounds, guided by local effect references. Source shader programs,
+particle textures and source audio are not embedded by this revision.
 
 The runtime does not depend on Epic Fight, Epic ParCool or Weapons of Miracles.
 The project-authored mathematical player bind hierarchy, continuous skin mesh,
@@ -144,3 +168,18 @@ independent player skeleton. `art/motion-profile/basic_dodge_roll.json` includes
 source hash and frame segments. The source's end frame 55 is clamped to the
 actual last frame 52. Six invulnerability ticks and MC displacement are gameplay
 adaptations, not verified original values.
+
+## Whole municipal Los Angeles Arnis scenery (2026-10-26)
+
+Map data © OpenStreetMap contributors, ODbL 1.0: https://www.openstreetmap.org/copyright .
+Geofabrik Southern California 2026-10-24; municipal relation 207359 frozen 2026-10-25.
+The derived geographic database and block templates retain ODbL 1.0.
+Arnis 3.3.0 (Apache-2.0) generated all municipal batches, including procedural interiors.
+Elevation: Mapzen Terrain Tiles, USGS SRTM/GMTED2010, NOAA ETOPO1.
+Land cover: ESA WorldCover 2021 v200, contains modified Copernicus Sentinel data (2021), CC BY 4.0.
+Climate: Beck et al. (2023) Köppen-Geiger, CC BY 4.0.
+Ecoregions: RESOLVE Ecoregions 2017 / Dinerstein et al., CC BY 4.0.
+Native schematic tree author: paleozoey, https://www.planetminecraft.com/member/paleozoey/ .
+Arnis assets/tree-packs/ATTRIBUTION.md credits the artist without stating a separate tree-art license;
+the generator's Apache license is not relabeled as the artist's independent license.
+Source links, modifications, hashes and reproduction: docs/worldgen/LOS_ANGELES_SOURCES.md.

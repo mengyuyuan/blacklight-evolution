@@ -3,6 +3,7 @@ package com.codex.blacklight.entity;
 import com.codex.blacklight.registry.*;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerBossEvent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.BossEvent;
@@ -46,6 +47,7 @@ public final class BlacklightHive extends Monster implements GeoEntity {
         // Death can occur immediately before the 20-tick audience refresh.
         // Never re-add viewers during the corpse's remaining removal ticks.
         if(!isAlive()||isRemoved()){boss.removeAllPlayers();return;}
+        if(!com.codex.blacklight.infection.WorldOutbreakSystem.active((net.minecraft.server.level.ServerLevel)level())){boss.removeAllPlayers();return;}
         boss.setProgress(getHealth()/getMaxHealth());
         if(tickCount%20==0){
             var nearby=((net.minecraft.server.level.ServerLevel)level()).getPlayers(p->p.isAlive()&&!p.isSpectator()&&p.distanceToSqr(this)<32*32);
@@ -56,17 +58,20 @@ public final class BlacklightHive extends Monster implements GeoEntity {
         if(cooldown>0){cooldown--;return;}
         // Old hives only spawned stalkers/spitters/brutes. Give such a saved hive one
         // finite hunter brood too, without resetting its already spent wave budget.
-        if(waves>=3&&hunterWaves>0)return;
+        int stage=com.codex.blacklight.city.CityEcology.stage((net.minecraft.server.level.ServerLevel)level(),blockPosition());
+        if(waves>=3&&(hunterWaves>0||stage<2))return;
         int alive=level().getEntitiesOfClass(Mob.class,getBoundingBox().inflate(24),e->e instanceof BlacklightMutant||e instanceof BlacklightHunter).size();
         if(alive>=6){cooldown=80;return;}
         int spawned=0;
         for(int i=0;i<Math.min(waves>=3?1:2,6-alive);i++){
-            Mob mob=i==0?ModEntities.BLACKLIGHT_HUNTER.get().create(level()):
+            Mob mob=stage<2?ModEntities.COMMON_INFECTED.get().create(level()):i==0?ModEntities.BLACKLIGHT_HUNTER.get().create(level()):
                     (waves==2?ModEntities.BLACKLIGHT_BRUTE:ModEntities.BLACKLIGHT_SPITTER).get().create(level());
             if(mob==null||!placeGuard(mob))continue;
             mob.setPersistenceRequired();mob.restrictTo(blockPosition(),24);
             mob.getPersistentData().putUUID("BlacklightHiveGuard",getUUID());
-            if(level().addFreshEntity(mob)){spawned++;if(i==0)hunterWaves++;}
+            if(level().addFreshEntity(mob)){
+                spawned++;if(mob instanceof BlacklightHunter)hunterWaves++;
+            }
         }
         if(spawned>0)waves=Math.min(3,waves+1);cooldown=spawned>0?240:80;
     }
@@ -103,6 +108,7 @@ public final class BlacklightHive extends Monster implements GeoEntity {
         // LivingDeath may be cancelled by another mod; only accepted deaths pay out.
         if(!level().isClientSide&&dead&&!rewarded){
             rewarded=true;
+            com.codex.blacklight.city.CityEcology.cleared((ServerLevel)level(),blockPosition());
             if(source.getEntity() instanceof ServerPlayer player){
                 var state=player.getData(ModAttachments.PLAYER_STATE);
                 if(state.isInfected()){state.addEvolutionPoints(180);state.addBiomass(250);player.setData(ModAttachments.PLAYER_STATE,state);player.syncData(ModAttachments.PLAYER_STATE);}

@@ -1,0 +1,23 @@
+{
+  "counts": {
+    "road": 264973,
+    "rail": 1782,
+    "park": 6771,
+    "paved": 7069,
+    "river": 2750,
+    "building": 1077919,
+    "water": 825,
+    "urban": 9736,
+    "forest": 1401
+  },
+  "invalid": {
+    "RuntimeError": 31
+  },
+  "boundary_bbox": [
+    -118.6681798,
+    33.659541,
+    -118.1552983,
+    34.337306
+  ],
+  "seconds": 1338.125
+}

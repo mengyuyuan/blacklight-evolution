@@ -87,6 +87,9 @@ public final class TissueMorphogenesis {
     }
 
     public static Plan generate(long seed,List<Bone> input,boolean organs) {
+        return generate(seed,input,organs,-1);
+    }
+    public static Plan generate(long seed,List<Bone> input,boolean organs,int donorPlan) {
         // Volume, semantic role and the full bone path make selection independent
         // of map iteration order. Tiny details/invalid planes never become trunks.
         var bones=TissueSilhouette.bind(inferRoles(input).stream().sorted(Comparator
@@ -102,11 +105,12 @@ public final class TissueMorphogenesis {
         for(var b:bones) {
             long key=TissueGrowth.mix(seed^b.path.hashCode());var meshes=new ArrayList<Mesh>();
             int phase=b.role==0||b.role==1?0:b.role==TissueOrgans.dominantArm(seed)?1:2;
-            if(b.role==1)head(meshes,b,key,organs,shape,core);else envelope(meshes,b,key,phase,upright);
+            BodyPlan organShape=donorPlan>=0&&donorPlan<BodyPlan.values().length?BodyPlan.values()[donorPlan]:shape;
+            if(b.role==1)head(meshes,b,key,organs,organShape,core);else envelope(meshes,b,key,phase,upright);
             float[][] outlet=null;
             if(organs&&b==trunk){outlet=gland(meshes,b,seed);carapace(meshes,b,key,upright,core);ribCage(meshes,b,key,upright,core);}
             if(organs&&b.role>=2&&b.role<=5&&(b.role==TissueOrgans.dominantArm(seed)||TissueGrowth.sample(key,3)>.3F)) {
-                extremity(meshes,b,key,phase,upright);
+                extremity(meshes,b,key,phase,upright,donorPlan);
             }
             for(int i=0;i<meshes.size();i++)meshes.set(i,TissueSilhouette.fit(b,TissueHypertrophy.extend(b,meshes.get(i),seed)));
             outlet=TissueHypertrophy.extendPoints(outlet,b,seed);
@@ -119,6 +123,84 @@ public final class TissueMorphogenesis {
         }
         return new Plan(List.copyOf(result),budget,organCount);
     }
+    /** First-batch functional structures, rooted to the actual native joint frame. */
+    public static boolean tailBone(String path){return semanticRole(path.substring(path.lastIndexOf('/')+1))==6;}
+    /** World-up is not a spider leg's length axis. Preserve the rod's true minor cross-section. */
+    public static Bone functionalFrame(Bone b){
+        if(b==null||b.role<2||b.role>5&&!(b.role==6&&tailBone(b.path)))return b;
+        int major=longest(b.box);V axis=axis(major);
+        float distal=Math.abs(b.box.low.get(major))>Math.abs(b.box.high.get(major))?-1:1;
+        V up=axis.mul(-distal),right=b.right.sub(axis.mul(b.right.dot(axis)));
+        if(right.length()<.01F)right=axis((major+1)%3);right=right.unit();
+        V forward=up.cross(right).unit();if(forward.dot(b.forward)<0)forward=forward.mul(-1);
+        return new Bone(b.path,b.role,b.box,up,forward,right,b.modelCentre,b.clearances);
+    }
+    public static List<Mesh> functional(TissueCore core,Bone b,int plan,long seed){
+        var out=new ArrayList<Mesh>();if(b==null||!b.box.usable()||core.legacy())return List.of();
+        var f=functionalFrame(b);var box=b.box;V c=box.centre(),up=f.up.unit(),front=f.forward.unit(),right=f.right.unit();
+        float w=box.span(principal(right)),h=box.span(principal(up)),d=box.span(principal(front));
+        boolean limb=b.role>=2&&b.role<=5,fore=b.role==2||b.role==3;
+        float side=b.modelCentre.x<0?-1:1;V outer=right.mul(side);
+        if(core==TissueCore.TENDON&&limb){
+            V root=c.add(up.mul(h*.32F)).sub(front.mul(d*.37F));
+            organ(out,core.id+"_cable",2,"",right,null,List.of(new Section(root,w*.22F,d*.11F),
+                    new Section(c.sub(front.mul(d*.48F)),w*.13F,d*.13F),
+                    new Section(c.sub(up.mul(h*.32F)).sub(front.mul(d*.35F)),w*.18F,d*.11F)),right,front,b,seed);
+        }else if(core==TissueCore.HYDRAULIC&&limb){
+            V root=c.add(up.mul(h*.22F));
+            organ(out,core.id+"_pressure",2,"",right,null,List.of(new Section(root,w*.44F,d*.44F),
+                    new Section(c.add(up.mul(h*.10F)),w*.55F,d*.54F),new Section(c.sub(up.mul(h*.07F)),w*.43F,d*.42F)),right,front,b,seed);
+        }else if(core==TissueCore.HYDROSTAT&&(fore||b.role==6&&tailBone(b.path))){
+            // A coiled muscular wrist belongs to the receiving limb. It uncoils during its own grab.
+            var sections=new ArrayList<Section>();for(int i=0;i<6;i++){
+                float t=i/5F,angle=-.35F+(float)Math.PI*1.35F*t,r=Math.min(w,d)*(.17F-.055F*t);
+                V point=c.sub(up.mul(h*(.03F+.31F*t))).add(outer.mul(w*.40F*(float)Math.cos(angle))).add(front.mul(d*.40F*(float)Math.sin(angle)));
+                sections.add(new Section(point,r,r));
+            }organ(out,core.id+"_arm",1,"",right,null,sections,outer,up,b,seed);
+        }else if(core==TissueCore.BLADE&&fore){
+            V root=c.add(outer.mul(w*.40F)).add(up.mul(h*.30F));
+            organ(out,core.id+"_edge",1,"",right,null,List.of(new Section(root,w*.24F,d*.17F),
+                    new Section(root.sub(up.mul(h*.34F)).add(outer.mul(w*.58F)),w*.43F,d*.10F),
+                    new Section(root.sub(up.mul(h*.72F)).add(outer.mul(w*.20F)).add(front.mul(d*.15F)),.025F,.035F)),outer,front,b,seed);
+        }else if(core==TissueCore.CHELA&&fore){
+            V root=c.add(outer.mul(w*.10F)).sub(up.mul(h*.28F));float length=Math.max(w*1.1F,Math.min(h*.30F,w*1.7F));
+            for(int jaw:new int[]{-1,1}){
+                V hinge=root.add(outer.mul(jaw*w*.28F));
+                organ(out,core.id+(jaw<0?"_inner":"_outer"),1,"",up,null,List.of(new Section(hinge,w*.24F,d*.25F),
+                        new Section(hinge.add(front.mul(length*.50F)).add(outer.mul(jaw*w*.30F)),w*.28F,d*.30F),
+                        new Section(hinge.add(front.mul(length*.85F)).add(outer.mul(jaw*w*.10F)),w*.16F,d*.22F),
+                        new Section(hinge.add(front.mul(length)).sub(outer.mul(jaw*w*.12F)),w*.10F,d*.13F)),outer,up,b,seed);
+            }
+        }else if(core==TissueCore.HORN&&b.role==1){
+            V root=c.add(front.mul(d*.20F)).add(up.mul(h*.15F));
+            organ(out,core.id+"_crown",0,"",right,null,List.of(new Section(root,w*.30F,h*.17F),
+                    new Section(root.add(front.mul(d*.32F)).add(up.mul(h*.10F)),w*.21F,h*.12F),
+                    new Section(root.add(front.mul(d*.66F)).add(up.mul(h*.20F)),.035F,.035F)),right,up,b,seed);
+        }else if(core==TissueCore.PHARYNX&&b.role==1){
+            for(int jaw:new int[]{-1,1}){
+                V root=c.add(front.mul(d*.24F)).add(up.mul(jaw*h*.12F));
+                organ(out,core.id+"_"+jaw,0,"",right,null,List.of(new Section(root,w*.27F,h*.1F),
+                        new Section(root.add(front.mul(d*.42F)),w*.22F,h*.09F),
+                        new Section(root.add(front.mul(d*.62F)).sub(up.mul(jaw*h*.18F)),w*.08F,h*.06F)),right,up,b,seed);
+            }
+        }
+        return out.stream().map(m->TissueSilhouette.fit(b,m)).toList();
+    }
+    /** Limbless/custom bodies grow a rooted functional socket instead of silently losing the organ. */
+    public static List<Mesh> functionalFallback(TissueCore core,Bone body,int plan,long seed){
+        if(core.legacy()||body==null||!body.box.usable())return List.of();
+        return functional(core,functionalMount(core,body,seed),plan,seed);
+    }
+    public static Bone functionalMount(TissueCore core,Bone body,long seed){
+        boolean sided=core==TissueCore.BLADE||core==TissueCore.CHELA||core==TissueCore.HYDROSTAT;
+        int role=switch(core){case HORN,PHARYNX->1;case TENDON,HYDRAULIC->4;default->2;};
+        int side=!sided?0:core==TissueCore.BLADE?TissueOrganLayout.bladeSide(seed):-TissueOrganLayout.bladeSide(seed);
+        V c=body.box.centre(),half=body.box.high.sub(body.box.low).mul(sided?.24F:.32F);
+        V centre=c.add(body.right.mul(side*span(body.box,body.right)*.38F));
+        return new Bone(body.path+"/grown_"+side,role,new Box(centre.sub(half),centre.add(half)),body.up,body.forward,body.right,
+                new V(side==0?body.modelCentre.x:side*8,body.modelCentre.y,body.modelCentre.z));
+    }
+    private static float span(Box box,V direction){return Math.abs(direction.x)*box.span(0)+Math.abs(direction.y)*box.span(1)+Math.abs(direction.z)*box.span(2);}
     private static int longest(Box b){return b.span(0)>b.span(1)&&b.span(0)>b.span(2)?0:b.span(1)>b.span(2)?1:2;}
     private static int principal(V v){return Math.abs(v.x)>Math.abs(v.y)&&Math.abs(v.x)>Math.abs(v.z)?0:Math.abs(v.y)>Math.abs(v.z)?1:2;}
     private static V axis(int a){return a==0?X:a==1?Y:Z;}
@@ -302,7 +384,7 @@ public final class TissueMorphogenesis {
                     new Section(c.add(right.mul(side*w*.95F)).sub(normal.mul(height*.60F)).add(along.mul(length*.09F)),thickness*.65F,height*.10F)),along,right,b,key);
         }
     }
-    private static void extremity(List<Mesh> out,Bone b,long key,int phase,boolean upright) {
+    private static void extremity(List<Mesh> out,Bone b,long key,int phase,boolean upright,int donorPlan) {
         Box box=b.box;int a=longest(box);V direction=axis(a),centre=box.centre();
         // Choose the end farthest from the real joint (local origin), including
         // horizontal spider legs and rotated limbs rather than assuming +Y.
@@ -310,7 +392,7 @@ public final class TissueMorphogenesis {
         direction=direction.mul(sign);int u=(a+1)%3,v=(a+2)%3;
         V across=axis(u),depth=axis(v);float width=box.span(u)*.5F,length=box.span(a);
         boolean dominant=phase==1;
-        boolean claw=dominant||TissueGrowth.sample(key,43)>.65F;int digits=claw?3:1;
+        boolean claw=donorPlan==2||dominant||TissueGrowth.sample(key,43)>.65F;int digits=donorPlan==2?2:claw?3:1;
         boolean planted=direction.dot(b.up)<-.65F&&(b.role>=4||!upright||legBone(b.path));
         if(planted){across=b.right.unit();depth=b.up.unit().mul(-1);}
         for(int digit=0;digit<digits;digit++) {

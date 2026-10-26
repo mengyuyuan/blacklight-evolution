@@ -1,0 +1,104 @@
+{
+  "downtown": {
+    "world": [
+      13129657,
+      -1280631
+    ],
+    "native": [
+      -231,
+      -39
+    ],
+    "batch": "-1_-1",
+    "top": 150,
+    "topBlock": [
+      "minecraft:cracked_stone_bricks",
+      {}
+    ],
+    "complete": true
+  },
+  "hollywood": {
+    "world": [
+      13121104,
+      -1285696
+    ],
+    "native": [
+      -7895,
+      -5100
+    ],
+    "batch": "-2_-2",
+    "top": 157,
+    "topBlock": [
+      "minecraft:cyan_terracotta",
+      {}
+    ],
+    "complete": true
+  },
+  "van_nuys": {
+    "world": [
+      13108766,
+      -1295169
+    ],
+    "native": [
+      -18950,
+      -14572
+    ],
+    "batch": "-5_-4",
+    "top": 237,
+    "topBlock": [
+      "minecraft:gray_concrete_powder",
+      {}
+    ],
+    "complete": true
+  },
+  "lax": {
+    "world": [
+      13112855,
+      -1267878
+    ],
+    "native": [
+      -15286,
+      12691
+    ],
+    "batch": "-4_3",
+    "top": 92,
+    "topBlock": [
+      "minecraft:gray_concrete",
+      {}
+    ],
+    "complete": true
+  },
+  "venice": {
+    "world": [
+      13106626,
+      -1272715
+    ],
+    "native": [
+      -20868,
+      7864
+    ],
+    "batch": "-6_1",
+    "top": 65,
+    "topBlock": [
+      "minecraft:gray_concrete_powder",
+      {}
+    ],
+    "complete": true
+  },
+  "san_pedro": {
+    "world": [
+      13124846,
+      -1245008
+    ],
+    "native": [
+      -4542,
+      35477
+    ],
+    "batch": "-2_8",
+    "top": 91,
+    "topBlock": [
+      "minecraft:gray_concrete_powder",
+      {}
+    ],
+    "complete": true
+  }
+}
