@@ -17,7 +17,7 @@
 配置：`data/blacklight/blacklight/evolved_mapping/default.json`，可由服务端数据包覆盖。
 
 1. **器官 ID → 偏向权重**：72 个设计 ID 已预留映射。仅实际实装、已继承、成熟且完成整合的器官参与计算。
-   这不意味着 72 种器官均已制作；当前运行器官仍为 12 种。
+   这不意味着 72 种器官均已制作；当前运行器官为 16 种，另 56 种仍是设计项。
 2. **偏向分数 → 最高偏向集合**：按已整合成熟器官强度乘表中权重求和。出生器官的年龄不能盖过实际吞噬偏向。
    分数先按最大器官强度统一归一化，保持相对比例并防止极端数值溢出。
 3. **最高偏向 → 进化者候选池**：只让匹配最高偏向、且运行实现已接入的候选参与权重随机。
@@ -56,4 +56,5 @@
 
 2026-10-27：697 项单元测试、5 项服务端测试通过。
 日志分别位于 `E:/Blacklight-Lifecycle-20261026/evolved-mapping-units-r1.log` 与
-`E:/Blacklight-Completion-20261027/mapping-server-r2.log`。当前尚未重新打包，前一份 lifecycle.1 安装包不含本项新映射。
+`E:/Blacklight-Completion-20261027/mapping-server-r2.log`。后续已纳入 `0.3.5-preview.20261027-organs.1` 阶段预览；
+前一份 lifecycle.1 安装包不含本项新映射。新增器官与药剂的验收见 `verification/ORGANS_AND_VIAL_20261027_ZH.md`。

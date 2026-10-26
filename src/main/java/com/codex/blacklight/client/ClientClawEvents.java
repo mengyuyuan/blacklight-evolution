@@ -110,7 +110,7 @@ public final class ClientClawEvents {
         event.registerEntityRenderer(ModEntities.BLACKLIGHT_SPIT.get(),ThrownItemRenderer::new);
         event.registerEntityRenderer(ModEntities.BLACKLIGHT_HUNTER.get(), com.codex.blacklight.client.renderer.BlacklightHunterRenderer::new);
         event.registerEntityRenderer(ModEntities.BLACKLIGHT_HYDRA.get(), com.codex.blacklight.client.renderer.BlacklightHydraRenderer::new);
-        event.registerEntityRenderer(ModEntities.BLACKLIGHT_VIRUS_VIAL.get(), ThrownItemRenderer::new);
+        event.registerEntityRenderer(ModEntities.BLACKLIGHT_VIRUS_VIAL.get(), com.codex.blacklight.client.renderer.VirusVialRenderer::new);
     }
 
     @SubscribeEvent

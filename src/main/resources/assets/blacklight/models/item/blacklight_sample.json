@@ -1,98 +1,1730 @@
 {
-  "credit": "Blacklight virus ampoule - Codex",
-  "ambientocclusion": false,
-  "gui_light": "front",
+  "credit": "Blacklight virus vial: original pixel geometry and atlas",
+  "ambientocclusion": true,
+  "gui_light": "side",
+  "render_type": "minecraft:cutout",
   "textures": {
-    "glass": "minecraft:block/glass",
-    "virus": "blacklight:item/biomass",
-    "metal": "minecraft:block/polished_blackstone",
-    "particle": "blacklight:item/biomass"
+    "vial": "blacklight:item/blacklight_vial",
+    "particle": "blacklight:item/blacklight_vial"
   },
   "elements": [
     {
-      "from": [5, 2, 5], "to": [11, 9, 11],
+      "name": "lower_metal_collar_north_0",
+      "from": [
+        7.047308806541881,
+        1,
+        5.7
+      ],
+      "to": [
+        8.952691193458119,
+        2.4,
+        5.94
+      ],
       "faces": {
-        "north": {"uv": [2, 2, 8, 9], "texture": "#virus"},
-        "east": {"uv": [2, 2, 8, 9], "texture": "#virus"},
-        "south": {"uv": [2, 2, 8, 9], "texture": "#virus"},
-        "west": {"uv": [2, 2, 8, 9], "texture": "#virus"},
-        "up": {"uv": [2, 2, 8, 8], "texture": "#virus"},
-        "down": {"uv": [2, 2, 8, 8], "texture": "#virus"}
+        "north": {
+          "uv": [
+            0.125,
+            0.125,
+            1.125,
+            0.875
+          ],
+          "texture": "#vial"
+        },
+        "south": {
+          "uv": [
+            0.125,
+            0.125,
+            1.125,
+            0.875
+          ],
+          "texture": "#vial"
+        }
       }
     },
     {
-      "from": [4.35, 1, 4.35], "to": [11.65, 2, 11.65],
+      "name": "lower_metal_collar_east_0",
+      "from": [
+        10.06,
+        1,
+        7.047308806541881
+      ],
+      "to": [
+        10.3,
+        2.4,
+        8.952691193458119
+      ],
       "faces": {
-        "north": {"texture": "#glass"}, "east": {"texture": "#glass"},
-        "south": {"texture": "#glass"}, "west": {"texture": "#glass"},
-        "up": {"texture": "#glass"}, "down": {"texture": "#glass"}
+        "east": {
+          "uv": [
+            0.125,
+            0.125,
+            1.125,
+            0.875
+          ],
+          "texture": "#vial"
+        },
+        "west": {
+          "uv": [
+            0.125,
+            0.125,
+            1.125,
+            0.875
+          ],
+          "texture": "#vial"
+        }
       }
     },
     {
-      "from": [4.35, 2, 4.35], "to": [5, 9.5, 5],
-      "faces": {"north":{"texture":"#glass"},"east":{"texture":"#glass"},"south":{"texture":"#glass"},"west":{"texture":"#glass"},"up":{"texture":"#glass"},"down":{"texture":"#glass"}}
-    },
-    {
-      "from": [11, 2, 4.35], "to": [11.65, 9.5, 5],
-      "faces": {"north":{"texture":"#glass"},"east":{"texture":"#glass"},"south":{"texture":"#glass"},"west":{"texture":"#glass"},"up":{"texture":"#glass"},"down":{"texture":"#glass"}}
-    },
-    {
-      "from": [4.35, 2, 11], "to": [5, 9.5, 11.65],
-      "faces": {"north":{"texture":"#glass"},"east":{"texture":"#glass"},"south":{"texture":"#glass"},"west":{"texture":"#glass"},"up":{"texture":"#glass"},"down":{"texture":"#glass"}}
-    },
-    {
-      "from": [11, 2, 11], "to": [11.65, 9.5, 11.65],
-      "faces": {"north":{"texture":"#glass"},"east":{"texture":"#glass"},"south":{"texture":"#glass"},"west":{"texture":"#glass"},"up":{"texture":"#glass"},"down":{"texture":"#glass"}}
-    },
-    {
-      "from": [4.35, 9, 4.35], "to": [11.65, 10, 11.65],
+      "name": "lower_metal_collar_south_0",
+      "from": [
+        7.047308806541881,
+        1,
+        10.06
+      ],
+      "to": [
+        8.952691193458119,
+        2.4,
+        10.3
+      ],
       "faces": {
-        "north": {"texture": "#glass"}, "east": {"texture": "#glass"},
-        "south": {"texture": "#glass"}, "west": {"texture": "#glass"},
-        "up": {"texture": "#glass"}, "down": {"texture": "#glass"}
+        "north": {
+          "uv": [
+            0.125,
+            0.125,
+            1.125,
+            0.875
+          ],
+          "texture": "#vial"
+        },
+        "south": {
+          "uv": [
+            0.125,
+            0.125,
+            1.125,
+            0.875
+          ],
+          "texture": "#vial"
+        }
       }
     },
     {
-      "from": [6.4, 9.5, 6.4], "to": [9.6, 13.25, 9.6],
+      "name": "lower_metal_collar_west_0",
+      "from": [
+        5.7,
+        1,
+        7.047308806541881
+      ],
+      "to": [
+        5.94,
+        2.4,
+        8.952691193458119
+      ],
       "faces": {
-        "north": {"texture": "#glass"}, "east": {"texture": "#glass"},
-        "south": {"texture": "#glass"}, "west": {"texture": "#glass"},
-        "up": {"texture": "#glass"}, "down": {"texture": "#glass"}
+        "east": {
+          "uv": [
+            0.125,
+            0.125,
+            1.125,
+            0.875
+          ],
+          "texture": "#vial"
+        },
+        "west": {
+          "uv": [
+            0.125,
+            0.125,
+            1.125,
+            0.875
+          ],
+          "texture": "#vial"
+        }
       }
     },
     {
-      "from": [5.65, 12.75, 5.65], "to": [10.35, 15, 10.35],
+      "name": "lower_metal_collar_north_45",
+      "from": [
+        7.047308806541881,
+        1,
+        5.7
+      ],
+      "to": [
+        8.952691193458119,
+        2.4,
+        5.94
+      ],
       "faces": {
-        "north": {"texture": "#metal"}, "east": {"texture": "#metal"},
-        "south": {"texture": "#metal"}, "west": {"texture": "#metal"},
-        "up": {"texture": "#metal"}, "down": {"texture": "#metal"}
+        "north": {
+          "uv": [
+            0.125,
+            0.125,
+            1.125,
+            0.875
+          ],
+          "texture": "#vial"
+        },
+        "south": {
+          "uv": [
+            0.125,
+            0.125,
+            1.125,
+            0.875
+          ],
+          "texture": "#vial"
+        }
+      },
+      "rotation": {
+        "origin": [
+          8,
+          8,
+          8
+        ],
+        "axis": "y",
+        "angle": 45
       }
     },
     {
-      "from": [5.25, 9.25, 4.15], "to": [10.75, 10.25, 11.85],
+      "name": "lower_metal_collar_east_45",
+      "from": [
+        10.06,
+        1,
+        7.047308806541881
+      ],
+      "to": [
+        10.3,
+        2.4,
+        8.952691193458119
+      ],
       "faces": {
-        "north": {"texture": "#virus"}, "east": {"texture": "#virus"},
-        "south": {"texture": "#virus"}, "west": {"texture": "#virus"},
-        "up": {"texture": "#virus"}, "down": {"texture": "#virus"}
+        "east": {
+          "uv": [
+            0.125,
+            0.125,
+            1.125,
+            0.875
+          ],
+          "texture": "#vial"
+        },
+        "west": {
+          "uv": [
+            0.125,
+            0.125,
+            1.125,
+            0.875
+          ],
+          "texture": "#vial"
+        }
+      },
+      "rotation": {
+        "origin": [
+          8,
+          8,
+          8
+        ],
+        "axis": "y",
+        "angle": 45
       }
     },
     {
-      "from": [7.45, 2.25, 4.6], "to": [8.55, 8.75, 11.4],
-      "rotation": {"origin": [8, 5.5, 8], "axis": "y", "angle": 45},
+      "name": "lower_metal_collar_south_45",
+      "from": [
+        7.047308806541881,
+        1,
+        10.06
+      ],
+      "to": [
+        8.952691193458119,
+        2.4,
+        10.3
+      ],
       "faces": {
-        "north": {"texture": "#virus"}, "east": {"texture": "#virus"},
-        "south": {"texture": "#virus"}, "west": {"texture": "#virus"},
-        "up": {"texture": "#virus"}, "down": {"texture": "#virus"}
+        "north": {
+          "uv": [
+            0.125,
+            0.125,
+            1.125,
+            0.875
+          ],
+          "texture": "#vial"
+        },
+        "south": {
+          "uv": [
+            0.125,
+            0.125,
+            1.125,
+            0.875
+          ],
+          "texture": "#vial"
+        }
+      },
+      "rotation": {
+        "origin": [
+          8,
+          8,
+          8
+        ],
+        "axis": "y",
+        "angle": 45
+      }
+    },
+    {
+      "name": "lower_metal_collar_west_45",
+      "from": [
+        5.7,
+        1,
+        7.047308806541881
+      ],
+      "to": [
+        5.94,
+        2.4,
+        8.952691193458119
+      ],
+      "faces": {
+        "east": {
+          "uv": [
+            0.125,
+            0.125,
+            1.125,
+            0.875
+          ],
+          "texture": "#vial"
+        },
+        "west": {
+          "uv": [
+            0.125,
+            0.125,
+            1.125,
+            0.875
+          ],
+          "texture": "#vial"
+        }
+      },
+      "rotation": {
+        "origin": [
+          8,
+          8,
+          8
+        ],
+        "axis": "y",
+        "angle": 45
+      }
+    },
+    {
+      "name": "lower_end_face",
+      "from": [
+        5.7,
+        1,
+        5.7
+      ],
+      "to": [
+        10.3,
+        1,
+        10.3
+      ],
+      "faces": {
+        "up": {
+          "uv": [
+            1.375,
+            0.125,
+            3.625,
+            2.375
+          ],
+          "texture": "#vial"
+        },
+        "down": {
+          "uv": [
+            1.375,
+            0.125,
+            3.625,
+            2.375
+          ],
+          "texture": "#vial"
+        }
+      }
+    },
+    {
+      "name": "lower_inside_face",
+      "from": [
+        5.7,
+        2.4,
+        5.7
+      ],
+      "to": [
+        10.3,
+        2.4,
+        10.3
+      ],
+      "faces": {
+        "up": {
+          "uv": [
+            1.375,
+            0.125,
+            3.625,
+            2.375
+          ],
+          "texture": "#vial"
+        },
+        "down": {
+          "uv": [
+            1.375,
+            0.125,
+            3.625,
+            2.375
+          ],
+          "texture": "#vial"
+        }
+      }
+    },
+    {
+      "name": "upper_metal_collar_north_0",
+      "from": [
+        7.047308806541881,
+        13.6,
+        5.7
+      ],
+      "to": [
+        8.952691193458119,
+        15,
+        5.94
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            0.125,
+            0.125,
+            1.125,
+            0.875
+          ],
+          "texture": "#vial"
+        },
+        "south": {
+          "uv": [
+            0.125,
+            0.125,
+            1.125,
+            0.875
+          ],
+          "texture": "#vial"
+        }
+      }
+    },
+    {
+      "name": "upper_metal_collar_east_0",
+      "from": [
+        10.06,
+        13.6,
+        7.047308806541881
+      ],
+      "to": [
+        10.3,
+        15,
+        8.952691193458119
+      ],
+      "faces": {
+        "east": {
+          "uv": [
+            0.125,
+            0.125,
+            1.125,
+            0.875
+          ],
+          "texture": "#vial"
+        },
+        "west": {
+          "uv": [
+            0.125,
+            0.125,
+            1.125,
+            0.875
+          ],
+          "texture": "#vial"
+        }
+      }
+    },
+    {
+      "name": "upper_metal_collar_south_0",
+      "from": [
+        7.047308806541881,
+        13.6,
+        10.06
+      ],
+      "to": [
+        8.952691193458119,
+        15,
+        10.3
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            0.125,
+            0.125,
+            1.125,
+            0.875
+          ],
+          "texture": "#vial"
+        },
+        "south": {
+          "uv": [
+            0.125,
+            0.125,
+            1.125,
+            0.875
+          ],
+          "texture": "#vial"
+        }
+      }
+    },
+    {
+      "name": "upper_metal_collar_west_0",
+      "from": [
+        5.7,
+        13.6,
+        7.047308806541881
+      ],
+      "to": [
+        5.94,
+        15,
+        8.952691193458119
+      ],
+      "faces": {
+        "east": {
+          "uv": [
+            0.125,
+            0.125,
+            1.125,
+            0.875
+          ],
+          "texture": "#vial"
+        },
+        "west": {
+          "uv": [
+            0.125,
+            0.125,
+            1.125,
+            0.875
+          ],
+          "texture": "#vial"
+        }
+      }
+    },
+    {
+      "name": "upper_metal_collar_north_45",
+      "from": [
+        7.047308806541881,
+        13.6,
+        5.7
+      ],
+      "to": [
+        8.952691193458119,
+        15,
+        5.94
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            0.125,
+            0.125,
+            1.125,
+            0.875
+          ],
+          "texture": "#vial"
+        },
+        "south": {
+          "uv": [
+            0.125,
+            0.125,
+            1.125,
+            0.875
+          ],
+          "texture": "#vial"
+        }
+      },
+      "rotation": {
+        "origin": [
+          8,
+          8,
+          8
+        ],
+        "axis": "y",
+        "angle": 45
+      }
+    },
+    {
+      "name": "upper_metal_collar_east_45",
+      "from": [
+        10.06,
+        13.6,
+        7.047308806541881
+      ],
+      "to": [
+        10.3,
+        15,
+        8.952691193458119
+      ],
+      "faces": {
+        "east": {
+          "uv": [
+            0.125,
+            0.125,
+            1.125,
+            0.875
+          ],
+          "texture": "#vial"
+        },
+        "west": {
+          "uv": [
+            0.125,
+            0.125,
+            1.125,
+            0.875
+          ],
+          "texture": "#vial"
+        }
+      },
+      "rotation": {
+        "origin": [
+          8,
+          8,
+          8
+        ],
+        "axis": "y",
+        "angle": 45
+      }
+    },
+    {
+      "name": "upper_metal_collar_south_45",
+      "from": [
+        7.047308806541881,
+        13.6,
+        10.06
+      ],
+      "to": [
+        8.952691193458119,
+        15,
+        10.3
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            0.125,
+            0.125,
+            1.125,
+            0.875
+          ],
+          "texture": "#vial"
+        },
+        "south": {
+          "uv": [
+            0.125,
+            0.125,
+            1.125,
+            0.875
+          ],
+          "texture": "#vial"
+        }
+      },
+      "rotation": {
+        "origin": [
+          8,
+          8,
+          8
+        ],
+        "axis": "y",
+        "angle": 45
+      }
+    },
+    {
+      "name": "upper_metal_collar_west_45",
+      "from": [
+        5.7,
+        13.6,
+        7.047308806541881
+      ],
+      "to": [
+        5.94,
+        15,
+        8.952691193458119
+      ],
+      "faces": {
+        "east": {
+          "uv": [
+            0.125,
+            0.125,
+            1.125,
+            0.875
+          ],
+          "texture": "#vial"
+        },
+        "west": {
+          "uv": [
+            0.125,
+            0.125,
+            1.125,
+            0.875
+          ],
+          "texture": "#vial"
+        }
+      },
+      "rotation": {
+        "origin": [
+          8,
+          8,
+          8
+        ],
+        "axis": "y",
+        "angle": 45
+      }
+    },
+    {
+      "name": "upper_inside_face",
+      "from": [
+        5.7,
+        13.6,
+        5.7
+      ],
+      "to": [
+        10.3,
+        13.6,
+        10.3
+      ],
+      "faces": {
+        "up": {
+          "uv": [
+            1.375,
+            0.125,
+            3.625,
+            2.375
+          ],
+          "texture": "#vial"
+        },
+        "down": {
+          "uv": [
+            1.375,
+            0.125,
+            3.625,
+            2.375
+          ],
+          "texture": "#vial"
+        }
+      }
+    },
+    {
+      "name": "upper_end_face",
+      "from": [
+        5.7,
+        15,
+        5.7
+      ],
+      "to": [
+        10.3,
+        15,
+        10.3
+      ],
+      "faces": {
+        "up": {
+          "uv": [
+            1.375,
+            0.125,
+            3.625,
+            2.375
+          ],
+          "texture": "#vial"
+        },
+        "down": {
+          "uv": [
+            1.375,
+            0.125,
+            3.625,
+            2.375
+          ],
+          "texture": "#vial"
+        }
+      }
+    },
+    {
+      "name": "protective_rail_-1_-1",
+      "from": [
+        6.34,
+        2.25,
+        6.34
+      ],
+      "to": [
+        6.74,
+        13.75,
+        6.74
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            3.875,
+            0.125,
+            4.125,
+            5.875
+          ],
+          "texture": "#vial"
+        },
+        "east": {
+          "uv": [
+            3.875,
+            0.125,
+            4.125,
+            5.875
+          ],
+          "texture": "#vial"
+        },
+        "south": {
+          "uv": [
+            3.875,
+            0.125,
+            4.125,
+            5.875
+          ],
+          "texture": "#vial"
+        },
+        "west": {
+          "uv": [
+            3.875,
+            0.125,
+            4.125,
+            5.875
+          ],
+          "texture": "#vial"
+        }
+      }
+    },
+    {
+      "name": "protective_rail_-1_1",
+      "from": [
+        6.34,
+        2.25,
+        9.260000000000002
+      ],
+      "to": [
+        6.74,
+        13.75,
+        9.66
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            3.875,
+            0.125,
+            4.125,
+            5.875
+          ],
+          "texture": "#vial"
+        },
+        "east": {
+          "uv": [
+            3.875,
+            0.125,
+            4.125,
+            5.875
+          ],
+          "texture": "#vial"
+        },
+        "south": {
+          "uv": [
+            3.875,
+            0.125,
+            4.125,
+            5.875
+          ],
+          "texture": "#vial"
+        },
+        "west": {
+          "uv": [
+            3.875,
+            0.125,
+            4.125,
+            5.875
+          ],
+          "texture": "#vial"
+        }
+      }
+    },
+    {
+      "name": "protective_rail_1_-1",
+      "from": [
+        9.260000000000002,
+        2.25,
+        6.34
+      ],
+      "to": [
+        9.66,
+        13.75,
+        6.74
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            3.875,
+            0.125,
+            4.125,
+            5.875
+          ],
+          "texture": "#vial"
+        },
+        "east": {
+          "uv": [
+            3.875,
+            0.125,
+            4.125,
+            5.875
+          ],
+          "texture": "#vial"
+        },
+        "south": {
+          "uv": [
+            3.875,
+            0.125,
+            4.125,
+            5.875
+          ],
+          "texture": "#vial"
+        },
+        "west": {
+          "uv": [
+            3.875,
+            0.125,
+            4.125,
+            5.875
+          ],
+          "texture": "#vial"
+        }
+      }
+    },
+    {
+      "name": "protective_rail_1_1",
+      "from": [
+        9.260000000000002,
+        2.25,
+        9.260000000000002
+      ],
+      "to": [
+        9.66,
+        13.75,
+        9.66
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            3.875,
+            0.125,
+            4.125,
+            5.875
+          ],
+          "texture": "#vial"
+        },
+        "east": {
+          "uv": [
+            3.875,
+            0.125,
+            4.125,
+            5.875
+          ],
+          "texture": "#vial"
+        },
+        "south": {
+          "uv": [
+            3.875,
+            0.125,
+            4.125,
+            5.875
+          ],
+          "texture": "#vial"
+        },
+        "west": {
+          "uv": [
+            3.875,
+            0.125,
+            4.125,
+            5.875
+          ],
+          "texture": "#vial"
+        }
+      }
+    },
+    {
+      "name": "glass_tube_north_0",
+      "from": [
+        7.295836943965739,
+        2.3,
+        6.3
+      ],
+      "to": [
+        8.704163056034261,
+        13.7,
+        6.3
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            4.375,
+            0.125,
+            5.125,
+            5.875
+          ],
+          "texture": "#vial"
+        },
+        "south": {
+          "uv": [
+            4.375,
+            0.125,
+            5.125,
+            5.875
+          ],
+          "texture": "#vial"
+        }
+      }
+    },
+    {
+      "name": "glass_tube_east_0",
+      "from": [
+        9.7,
+        2.3,
+        7.295836943965739
+      ],
+      "to": [
+        9.7,
+        13.7,
+        8.704163056034261
+      ],
+      "faces": {
+        "east": {
+          "uv": [
+            4.375,
+            0.125,
+            5.125,
+            5.875
+          ],
+          "texture": "#vial"
+        },
+        "west": {
+          "uv": [
+            4.375,
+            0.125,
+            5.125,
+            5.875
+          ],
+          "texture": "#vial"
+        }
+      }
+    },
+    {
+      "name": "glass_tube_south_0",
+      "from": [
+        7.295836943965739,
+        2.3,
+        9.7
+      ],
+      "to": [
+        8.704163056034261,
+        13.7,
+        9.7
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            4.375,
+            0.125,
+            5.125,
+            5.875
+          ],
+          "texture": "#vial"
+        },
+        "south": {
+          "uv": [
+            4.375,
+            0.125,
+            5.125,
+            5.875
+          ],
+          "texture": "#vial"
+        }
+      }
+    },
+    {
+      "name": "glass_tube_west_0",
+      "from": [
+        6.3,
+        2.3,
+        7.295836943965739
+      ],
+      "to": [
+        6.3,
+        13.7,
+        8.704163056034261
+      ],
+      "faces": {
+        "east": {
+          "uv": [
+            4.375,
+            0.125,
+            5.125,
+            5.875
+          ],
+          "texture": "#vial"
+        },
+        "west": {
+          "uv": [
+            4.375,
+            0.125,
+            5.125,
+            5.875
+          ],
+          "texture": "#vial"
+        }
+      }
+    },
+    {
+      "name": "glass_tube_north_45",
+      "from": [
+        7.295836943965739,
+        2.3,
+        6.3
+      ],
+      "to": [
+        8.704163056034261,
+        13.7,
+        6.3
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            4.375,
+            0.125,
+            5.125,
+            5.875
+          ],
+          "texture": "#vial"
+        },
+        "south": {
+          "uv": [
+            4.375,
+            0.125,
+            5.125,
+            5.875
+          ],
+          "texture": "#vial"
+        }
+      },
+      "rotation": {
+        "origin": [
+          8,
+          8,
+          8
+        ],
+        "axis": "y",
+        "angle": 45
+      }
+    },
+    {
+      "name": "glass_tube_east_45",
+      "from": [
+        9.7,
+        2.3,
+        7.295836943965739
+      ],
+      "to": [
+        9.7,
+        13.7,
+        8.704163056034261
+      ],
+      "faces": {
+        "east": {
+          "uv": [
+            4.375,
+            0.125,
+            5.125,
+            5.875
+          ],
+          "texture": "#vial"
+        },
+        "west": {
+          "uv": [
+            4.375,
+            0.125,
+            5.125,
+            5.875
+          ],
+          "texture": "#vial"
+        }
+      },
+      "rotation": {
+        "origin": [
+          8,
+          8,
+          8
+        ],
+        "axis": "y",
+        "angle": 45
+      }
+    },
+    {
+      "name": "glass_tube_south_45",
+      "from": [
+        7.295836943965739,
+        2.3,
+        9.7
+      ],
+      "to": [
+        8.704163056034261,
+        13.7,
+        9.7
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            4.375,
+            0.125,
+            5.125,
+            5.875
+          ],
+          "texture": "#vial"
+        },
+        "south": {
+          "uv": [
+            4.375,
+            0.125,
+            5.125,
+            5.875
+          ],
+          "texture": "#vial"
+        }
+      },
+      "rotation": {
+        "origin": [
+          8,
+          8,
+          8
+        ],
+        "axis": "y",
+        "angle": 45
+      }
+    },
+    {
+      "name": "glass_tube_west_45",
+      "from": [
+        6.3,
+        2.3,
+        7.295836943965739
+      ],
+      "to": [
+        6.3,
+        13.7,
+        8.704163056034261
+      ],
+      "faces": {
+        "east": {
+          "uv": [
+            4.375,
+            0.125,
+            5.125,
+            5.875
+          ],
+          "texture": "#vial"
+        },
+        "west": {
+          "uv": [
+            4.375,
+            0.125,
+            5.125,
+            5.875
+          ],
+          "texture": "#vial"
+        }
+      },
+      "rotation": {
+        "origin": [
+          8,
+          8,
+          8
+        ],
+        "axis": "y",
+        "angle": 45
+      }
+    },
+    {
+      "name": "virus_contents_north_0",
+      "from": [
+        7.399390334559012,
+        2.4,
+        6.55
+      ],
+      "to": [
+        8.600609665440988,
+        10.75,
+        6.55
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            5.375,
+            0.125,
+            6.0,
+            4.25
+          ],
+          "texture": "#vial"
+        },
+        "south": {
+          "uv": [
+            5.375,
+            0.125,
+            6.0,
+            4.25
+          ],
+          "texture": "#vial"
+        }
+      }
+    },
+    {
+      "name": "virus_contents_east_0",
+      "from": [
+        9.45,
+        2.4,
+        7.399390334559012
+      ],
+      "to": [
+        9.45,
+        10.75,
+        8.600609665440988
+      ],
+      "faces": {
+        "east": {
+          "uv": [
+            5.375,
+            0.125,
+            6.0,
+            4.25
+          ],
+          "texture": "#vial"
+        },
+        "west": {
+          "uv": [
+            5.375,
+            0.125,
+            6.0,
+            4.25
+          ],
+          "texture": "#vial"
+        }
+      }
+    },
+    {
+      "name": "virus_contents_south_0",
+      "from": [
+        7.399390334559012,
+        2.4,
+        9.45
+      ],
+      "to": [
+        8.600609665440988,
+        10.75,
+        9.45
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            5.375,
+            0.125,
+            6.0,
+            4.25
+          ],
+          "texture": "#vial"
+        },
+        "south": {
+          "uv": [
+            5.375,
+            0.125,
+            6.0,
+            4.25
+          ],
+          "texture": "#vial"
+        }
+      }
+    },
+    {
+      "name": "virus_contents_west_0",
+      "from": [
+        6.55,
+        2.4,
+        7.399390334559012
+      ],
+      "to": [
+        6.55,
+        10.75,
+        8.600609665440988
+      ],
+      "faces": {
+        "east": {
+          "uv": [
+            5.375,
+            0.125,
+            6.0,
+            4.25
+          ],
+          "texture": "#vial"
+        },
+        "west": {
+          "uv": [
+            5.375,
+            0.125,
+            6.0,
+            4.25
+          ],
+          "texture": "#vial"
+        }
+      }
+    },
+    {
+      "name": "virus_contents_north_45",
+      "from": [
+        7.399390334559012,
+        2.4,
+        6.55
+      ],
+      "to": [
+        8.600609665440988,
+        10.75,
+        6.55
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            5.375,
+            0.125,
+            6.0,
+            4.25
+          ],
+          "texture": "#vial"
+        },
+        "south": {
+          "uv": [
+            5.375,
+            0.125,
+            6.0,
+            4.25
+          ],
+          "texture": "#vial"
+        }
+      },
+      "rotation": {
+        "origin": [
+          8,
+          8,
+          8
+        ],
+        "axis": "y",
+        "angle": 45
+      }
+    },
+    {
+      "name": "virus_contents_east_45",
+      "from": [
+        9.45,
+        2.4,
+        7.399390334559012
+      ],
+      "to": [
+        9.45,
+        10.75,
+        8.600609665440988
+      ],
+      "faces": {
+        "east": {
+          "uv": [
+            5.375,
+            0.125,
+            6.0,
+            4.25
+          ],
+          "texture": "#vial"
+        },
+        "west": {
+          "uv": [
+            5.375,
+            0.125,
+            6.0,
+            4.25
+          ],
+          "texture": "#vial"
+        }
+      },
+      "rotation": {
+        "origin": [
+          8,
+          8,
+          8
+        ],
+        "axis": "y",
+        "angle": 45
+      }
+    },
+    {
+      "name": "virus_contents_south_45",
+      "from": [
+        7.399390334559012,
+        2.4,
+        9.45
+      ],
+      "to": [
+        8.600609665440988,
+        10.75,
+        9.45
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            5.375,
+            0.125,
+            6.0,
+            4.25
+          ],
+          "texture": "#vial"
+        },
+        "south": {
+          "uv": [
+            5.375,
+            0.125,
+            6.0,
+            4.25
+          ],
+          "texture": "#vial"
+        }
+      },
+      "rotation": {
+        "origin": [
+          8,
+          8,
+          8
+        ],
+        "axis": "y",
+        "angle": 45
+      }
+    },
+    {
+      "name": "virus_contents_west_45",
+      "from": [
+        6.55,
+        2.4,
+        7.399390334559012
+      ],
+      "to": [
+        6.55,
+        10.75,
+        8.600609665440988
+      ],
+      "faces": {
+        "east": {
+          "uv": [
+            5.375,
+            0.125,
+            6.0,
+            4.25
+          ],
+          "texture": "#vial"
+        },
+        "west": {
+          "uv": [
+            5.375,
+            0.125,
+            6.0,
+            4.25
+          ],
+          "texture": "#vial"
+        }
+      },
+      "rotation": {
+        "origin": [
+          8,
+          8,
+          8
+        ],
+        "axis": "y",
+        "angle": 45
+      }
+    },
+    {
+      "name": "contents_bottom",
+      "from": [
+        6.55,
+        2.4,
+        6.55
+      ],
+      "to": [
+        9.45,
+        2.4,
+        9.45
+      ],
+      "faces": {
+        "up": {
+          "uv": [
+            6.25,
+            0.125,
+            7.75,
+            1.625
+          ],
+          "texture": "#vial"
+        },
+        "down": {
+          "uv": [
+            6.25,
+            0.125,
+            7.75,
+            1.625
+          ],
+          "texture": "#vial"
+        }
+      }
+    },
+    {
+      "name": "contents_meniscus",
+      "from": [
+        6.55,
+        10.75,
+        6.55
+      ],
+      "to": [
+        9.45,
+        10.75,
+        9.45
+      ],
+      "faces": {
+        "up": {
+          "uv": [
+            6.25,
+            0.125,
+            7.75,
+            1.625
+          ],
+          "texture": "#vial"
+        },
+        "down": {
+          "uv": [
+            6.25,
+            0.125,
+            7.75,
+            1.625
+          ],
+          "texture": "#vial"
+        }
       }
     }
   ],
   "display": {
-    "thirdperson_righthand": {"rotation": [15, 0, 8], "translation": [0, 2.2, 0.5], "scale": [0.72, 0.72, 0.72]},
-    "thirdperson_lefthand": {"rotation": [15, 0, -8], "translation": [0, 2.2, 0.5], "scale": [0.72, 0.72, 0.72]},
-    "firstperson_righthand": {"rotation": [0, -18, 7], "translation": [1.2, 2.5, 0], "scale": [0.84, 0.84, 0.84]},
-    "firstperson_lefthand": {"rotation": [0, 18, -7], "translation": [1.2, 2.5, 0], "scale": [0.84, 0.84, 0.84]},
-    "gui": {"rotation": [25, 42, 0], "translation": [0, 0.5, 0], "scale": [0.9, 0.9, 0.9]},
-    "ground": {"translation": [0, 2.8, 0], "scale": [0.58, 0.58, 0.58]},
-    "fixed": {"rotation": [0, 180, 0], "scale": [0.85, 0.85, 0.85]}
+    "thirdperson_righthand": {
+      "rotation": [
+        80,
+        0,
+        5
+      ],
+      "translation": [
+        0,
+        1.3,
+        0.5
+      ],
+      "scale": [
+        0.55,
+        0.55,
+        0.55
+      ]
+    },
+    "thirdperson_lefthand": {
+      "rotation": [
+        80,
+        0,
+        -5
+      ],
+      "translation": [
+        0,
+        1.3,
+        0.5
+      ],
+      "scale": [
+        0.55,
+        0.55,
+        0.55
+      ]
+    },
+    "firstperson_righthand": {
+      "rotation": [
+        0,
+        -14,
+        8
+      ],
+      "translation": [
+        1,
+        1.2,
+        0
+      ],
+      "scale": [
+        0.65,
+        0.65,
+        0.65
+      ]
+    },
+    "firstperson_lefthand": {
+      "rotation": [
+        0,
+        14,
+        -8
+      ],
+      "translation": [
+        1,
+        1.2,
+        0
+      ],
+      "scale": [
+        0.65,
+        0.65,
+        0.65
+      ]
+    },
+    "gui": {
+      "rotation": [
+        18,
+        32,
+        -18
+      ],
+      "translation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ]
+    },
+    "ground": {
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "translation": [
+        0,
+        2,
+        0
+      ],
+      "scale": [
+        0.45,
+        0.45,
+        0.45
+      ]
+    },
+    "fixed": {
+      "rotation": [
+        0,
+        180,
+        0
+      ],
+      "scale": [
+        0.8,
+        0.8,
+        0.8
+      ]
+    }
   }
 }

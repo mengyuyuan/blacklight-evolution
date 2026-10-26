@@ -1,0 +1,1397 @@
+{
+  "elements": 42,
+  "quads": 92,
+  "triangles": 184,
+  "atlas": [
+    128,
+    128
+  ],
+  "png_bytes": 1525,
+  "effective_uv_density": [
+    {
+      "material": "metal",
+      "size_units": [
+        1.9053823869162372,
+        1.4
+      ],
+      "size_pixels": [
+        8,
+        6
+      ],
+      "density": [
+        4.1986,
+        4.2857
+      ]
+    },
+    {
+      "material": "metal",
+      "size_units": [
+        1.9053823869162372,
+        1.4
+      ],
+      "size_pixels": [
+        8,
+        6
+      ],
+      "density": [
+        4.1986,
+        4.2857
+      ]
+    },
+    {
+      "material": "metal",
+      "size_units": [
+        1.9053823869162372,
+        1.4
+      ],
+      "size_pixels": [
+        8,
+        6
+      ],
+      "density": [
+        4.1986,
+        4.2857
+      ]
+    },
+    {
+      "material": "metal",
+      "size_units": [
+        1.9053823869162372,
+        1.4
+      ],
+      "size_pixels": [
+        8,
+        6
+      ],
+      "density": [
+        4.1986,
+        4.2857
+      ]
+    },
+    {
+      "material": "metal",
+      "size_units": [
+        1.9053823869162372,
+        1.4
+      ],
+      "size_pixels": [
+        8,
+        6
+      ],
+      "density": [
+        4.1986,
+        4.2857
+      ]
+    },
+    {
+      "material": "metal",
+      "size_units": [
+        1.9053823869162372,
+        1.4
+      ],
+      "size_pixels": [
+        8,
+        6
+      ],
+      "density": [
+        4.1986,
+        4.2857
+      ]
+    },
+    {
+      "material": "metal",
+      "size_units": [
+        1.9053823869162372,
+        1.4
+      ],
+      "size_pixels": [
+        8,
+        6
+      ],
+      "density": [
+        4.1986,
+        4.2857
+      ]
+    },
+    {
+      "material": "metal",
+      "size_units": [
+        1.9053823869162372,
+        1.4
+      ],
+      "size_pixels": [
+        8,
+        6
+      ],
+      "density": [
+        4.1986,
+        4.2857
+      ]
+    },
+    {
+      "material": "metal",
+      "size_units": [
+        1.9053823869162372,
+        1.4
+      ],
+      "size_pixels": [
+        8,
+        6
+      ],
+      "density": [
+        4.1986,
+        4.2857
+      ]
+    },
+    {
+      "material": "metal",
+      "size_units": [
+        1.9053823869162372,
+        1.4
+      ],
+      "size_pixels": [
+        8,
+        6
+      ],
+      "density": [
+        4.1986,
+        4.2857
+      ]
+    },
+    {
+      "material": "metal",
+      "size_units": [
+        1.9053823869162372,
+        1.4
+      ],
+      "size_pixels": [
+        8,
+        6
+      ],
+      "density": [
+        4.1986,
+        4.2857
+      ]
+    },
+    {
+      "material": "metal",
+      "size_units": [
+        1.9053823869162372,
+        1.4
+      ],
+      "size_pixels": [
+        8,
+        6
+      ],
+      "density": [
+        4.1986,
+        4.2857
+      ]
+    },
+    {
+      "material": "metal",
+      "size_units": [
+        1.9053823869162372,
+        1.4
+      ],
+      "size_pixels": [
+        8,
+        6
+      ],
+      "density": [
+        4.1986,
+        4.2857
+      ]
+    },
+    {
+      "material": "metal",
+      "size_units": [
+        1.9053823869162372,
+        1.4
+      ],
+      "size_pixels": [
+        8,
+        6
+      ],
+      "density": [
+        4.1986,
+        4.2857
+      ]
+    },
+    {
+      "material": "metal",
+      "size_units": [
+        1.9053823869162372,
+        1.4
+      ],
+      "size_pixels": [
+        8,
+        6
+      ],
+      "density": [
+        4.1986,
+        4.2857
+      ]
+    },
+    {
+      "material": "metal",
+      "size_units": [
+        1.9053823869162372,
+        1.4
+      ],
+      "size_pixels": [
+        8,
+        6
+      ],
+      "density": [
+        4.1986,
+        4.2857
+      ]
+    },
+    {
+      "material": "cap_end",
+      "size_units": [
+        4.6000000000000005,
+        4.6000000000000005
+      ],
+      "size_pixels": [
+        18,
+        18
+      ],
+      "density": [
+        3.913,
+        3.913
+      ]
+    },
+    {
+      "material": "cap_end",
+      "size_units": [
+        4.6000000000000005,
+        4.6000000000000005
+      ],
+      "size_pixels": [
+        18,
+        18
+      ],
+      "density": [
+        3.913,
+        3.913
+      ]
+    },
+    {
+      "material": "cap_end",
+      "size_units": [
+        4.6000000000000005,
+        4.6000000000000005
+      ],
+      "size_pixels": [
+        18,
+        18
+      ],
+      "density": [
+        3.913,
+        3.913
+      ]
+    },
+    {
+      "material": "cap_end",
+      "size_units": [
+        4.6000000000000005,
+        4.6000000000000005
+      ],
+      "size_pixels": [
+        18,
+        18
+      ],
+      "density": [
+        3.913,
+        3.913
+      ]
+    },
+    {
+      "material": "metal",
+      "size_units": [
+        1.9053823869162372,
+        1.4000000000000004
+      ],
+      "size_pixels": [
+        8,
+        6
+      ],
+      "density": [
+        4.1986,
+        4.2857
+      ]
+    },
+    {
+      "material": "metal",
+      "size_units": [
+        1.9053823869162372,
+        1.4000000000000004
+      ],
+      "size_pixels": [
+        8,
+        6
+      ],
+      "density": [
+        4.1986,
+        4.2857
+      ]
+    },
+    {
+      "material": "metal",
+      "size_units": [
+        1.9053823869162372,
+        1.4000000000000004
+      ],
+      "size_pixels": [
+        8,
+        6
+      ],
+      "density": [
+        4.1986,
+        4.2857
+      ]
+    },
+    {
+      "material": "metal",
+      "size_units": [
+        1.9053823869162372,
+        1.4000000000000004
+      ],
+      "size_pixels": [
+        8,
+        6
+      ],
+      "density": [
+        4.1986,
+        4.2857
+      ]
+    },
+    {
+      "material": "metal",
+      "size_units": [
+        1.9053823869162372,
+        1.4000000000000004
+      ],
+      "size_pixels": [
+        8,
+        6
+      ],
+      "density": [
+        4.1986,
+        4.2857
+      ]
+    },
+    {
+      "material": "metal",
+      "size_units": [
+        1.9053823869162372,
+        1.4000000000000004
+      ],
+      "size_pixels": [
+        8,
+        6
+      ],
+      "density": [
+        4.1986,
+        4.2857
+      ]
+    },
+    {
+      "material": "metal",
+      "size_units": [
+        1.9053823869162372,
+        1.4000000000000004
+      ],
+      "size_pixels": [
+        8,
+        6
+      ],
+      "density": [
+        4.1986,
+        4.2857
+      ]
+    },
+    {
+      "material": "metal",
+      "size_units": [
+        1.9053823869162372,
+        1.4000000000000004
+      ],
+      "size_pixels": [
+        8,
+        6
+      ],
+      "density": [
+        4.1986,
+        4.2857
+      ]
+    },
+    {
+      "material": "metal",
+      "size_units": [
+        1.9053823869162372,
+        1.4000000000000004
+      ],
+      "size_pixels": [
+        8,
+        6
+      ],
+      "density": [
+        4.1986,
+        4.2857
+      ]
+    },
+    {
+      "material": "metal",
+      "size_units": [
+        1.9053823869162372,
+        1.4000000000000004
+      ],
+      "size_pixels": [
+        8,
+        6
+      ],
+      "density": [
+        4.1986,
+        4.2857
+      ]
+    },
+    {
+      "material": "metal",
+      "size_units": [
+        1.9053823869162372,
+        1.4000000000000004
+      ],
+      "size_pixels": [
+        8,
+        6
+      ],
+      "density": [
+        4.1986,
+        4.2857
+      ]
+    },
+    {
+      "material": "metal",
+      "size_units": [
+        1.9053823869162372,
+        1.4000000000000004
+      ],
+      "size_pixels": [
+        8,
+        6
+      ],
+      "density": [
+        4.1986,
+        4.2857
+      ]
+    },
+    {
+      "material": "metal",
+      "size_units": [
+        1.9053823869162372,
+        1.4000000000000004
+      ],
+      "size_pixels": [
+        8,
+        6
+      ],
+      "density": [
+        4.1986,
+        4.2857
+      ]
+    },
+    {
+      "material": "metal",
+      "size_units": [
+        1.9053823869162372,
+        1.4000000000000004
+      ],
+      "size_pixels": [
+        8,
+        6
+      ],
+      "density": [
+        4.1986,
+        4.2857
+      ]
+    },
+    {
+      "material": "metal",
+      "size_units": [
+        1.9053823869162372,
+        1.4000000000000004
+      ],
+      "size_pixels": [
+        8,
+        6
+      ],
+      "density": [
+        4.1986,
+        4.2857
+      ]
+    },
+    {
+      "material": "metal",
+      "size_units": [
+        1.9053823869162372,
+        1.4000000000000004
+      ],
+      "size_pixels": [
+        8,
+        6
+      ],
+      "density": [
+        4.1986,
+        4.2857
+      ]
+    },
+    {
+      "material": "cap_end",
+      "size_units": [
+        4.6000000000000005,
+        4.6000000000000005
+      ],
+      "size_pixels": [
+        18,
+        18
+      ],
+      "density": [
+        3.913,
+        3.913
+      ]
+    },
+    {
+      "material": "cap_end",
+      "size_units": [
+        4.6000000000000005,
+        4.6000000000000005
+      ],
+      "size_pixels": [
+        18,
+        18
+      ],
+      "density": [
+        3.913,
+        3.913
+      ]
+    },
+    {
+      "material": "cap_end",
+      "size_units": [
+        4.6000000000000005,
+        4.6000000000000005
+      ],
+      "size_pixels": [
+        18,
+        18
+      ],
+      "density": [
+        3.913,
+        3.913
+      ]
+    },
+    {
+      "material": "cap_end",
+      "size_units": [
+        4.6000000000000005,
+        4.6000000000000005
+      ],
+      "size_pixels": [
+        18,
+        18
+      ],
+      "density": [
+        3.913,
+        3.913
+      ]
+    },
+    {
+      "material": "rail",
+      "size_units": [
+        0.40000000000000036,
+        11.5
+      ],
+      "size_pixels": [
+        2,
+        46
+      ],
+      "density": [
+        5.0,
+        4.0
+      ]
+    },
+    {
+      "material": "rail",
+      "size_units": [
+        0.40000000000000036,
+        11.5
+      ],
+      "size_pixels": [
+        2,
+        46
+      ],
+      "density": [
+        5.0,
+        4.0
+      ]
+    },
+    {
+      "material": "rail",
+      "size_units": [
+        0.40000000000000036,
+        11.5
+      ],
+      "size_pixels": [
+        2,
+        46
+      ],
+      "density": [
+        5.0,
+        4.0
+      ]
+    },
+    {
+      "material": "rail",
+      "size_units": [
+        0.40000000000000036,
+        11.5
+      ],
+      "size_pixels": [
+        2,
+        46
+      ],
+      "density": [
+        5.0,
+        4.0
+      ]
+    },
+    {
+      "material": "rail",
+      "size_units": [
+        0.40000000000000036,
+        11.5
+      ],
+      "size_pixels": [
+        2,
+        46
+      ],
+      "density": [
+        5.0,
+        4.0
+      ]
+    },
+    {
+      "material": "rail",
+      "size_units": [
+        0.3999999999999986,
+        11.5
+      ],
+      "size_pixels": [
+        2,
+        46
+      ],
+      "density": [
+        5.0,
+        4.0
+      ]
+    },
+    {
+      "material": "rail",
+      "size_units": [
+        0.40000000000000036,
+        11.5
+      ],
+      "size_pixels": [
+        2,
+        46
+      ],
+      "density": [
+        5.0,
+        4.0
+      ]
+    },
+    {
+      "material": "rail",
+      "size_units": [
+        0.3999999999999986,
+        11.5
+      ],
+      "size_pixels": [
+        2,
+        46
+      ],
+      "density": [
+        5.0,
+        4.0
+      ]
+    },
+    {
+      "material": "rail",
+      "size_units": [
+        0.3999999999999986,
+        11.5
+      ],
+      "size_pixels": [
+        2,
+        46
+      ],
+      "density": [
+        5.0,
+        4.0
+      ]
+    },
+    {
+      "material": "rail",
+      "size_units": [
+        0.40000000000000036,
+        11.5
+      ],
+      "size_pixels": [
+        2,
+        46
+      ],
+      "density": [
+        5.0,
+        4.0
+      ]
+    },
+    {
+      "material": "rail",
+      "size_units": [
+        0.3999999999999986,
+        11.5
+      ],
+      "size_pixels": [
+        2,
+        46
+      ],
+      "density": [
+        5.0,
+        4.0
+      ]
+    },
+    {
+      "material": "rail",
+      "size_units": [
+        0.40000000000000036,
+        11.5
+      ],
+      "size_pixels": [
+        2,
+        46
+      ],
+      "density": [
+        5.0,
+        4.0
+      ]
+    },
+    {
+      "material": "rail",
+      "size_units": [
+        0.3999999999999986,
+        11.5
+      ],
+      "size_pixels": [
+        2,
+        46
+      ],
+      "density": [
+        5.0,
+        4.0
+      ]
+    },
+    {
+      "material": "rail",
+      "size_units": [
+        0.3999999999999986,
+        11.5
+      ],
+      "size_pixels": [
+        2,
+        46
+      ],
+      "density": [
+        5.0,
+        4.0
+      ]
+    },
+    {
+      "material": "rail",
+      "size_units": [
+        0.3999999999999986,
+        11.5
+      ],
+      "size_pixels": [
+        2,
+        46
+      ],
+      "density": [
+        5.0,
+        4.0
+      ]
+    },
+    {
+      "material": "rail",
+      "size_units": [
+        0.3999999999999986,
+        11.5
+      ],
+      "size_pixels": [
+        2,
+        46
+      ],
+      "density": [
+        5.0,
+        4.0
+      ]
+    },
+    {
+      "material": "glass",
+      "size_units": [
+        1.4083261120685222,
+        11.399999999999999
+      ],
+      "size_pixels": [
+        6,
+        46
+      ],
+      "density": [
+        4.2604,
+        4.0351
+      ]
+    },
+    {
+      "material": "glass",
+      "size_units": [
+        1.4083261120685222,
+        11.399999999999999
+      ],
+      "size_pixels": [
+        6,
+        46
+      ],
+      "density": [
+        4.2604,
+        4.0351
+      ]
+    },
+    {
+      "material": "glass",
+      "size_units": [
+        1.4083261120685222,
+        11.399999999999999
+      ],
+      "size_pixels": [
+        6,
+        46
+      ],
+      "density": [
+        4.2604,
+        4.0351
+      ]
+    },
+    {
+      "material": "glass",
+      "size_units": [
+        1.4083261120685222,
+        11.399999999999999
+      ],
+      "size_pixels": [
+        6,
+        46
+      ],
+      "density": [
+        4.2604,
+        4.0351
+      ]
+    },
+    {
+      "material": "glass",
+      "size_units": [
+        1.4083261120685222,
+        11.399999999999999
+      ],
+      "size_pixels": [
+        6,
+        46
+      ],
+      "density": [
+        4.2604,
+        4.0351
+      ]
+    },
+    {
+      "material": "glass",
+      "size_units": [
+        1.4083261120685222,
+        11.399999999999999
+      ],
+      "size_pixels": [
+        6,
+        46
+      ],
+      "density": [
+        4.2604,
+        4.0351
+      ]
+    },
+    {
+      "material": "glass",
+      "size_units": [
+        1.4083261120685222,
+        11.399999999999999
+      ],
+      "size_pixels": [
+        6,
+        46
+      ],
+      "density": [
+        4.2604,
+        4.0351
+      ]
+    },
+    {
+      "material": "glass",
+      "size_units": [
+        1.4083261120685222,
+        11.399999999999999
+      ],
+      "size_pixels": [
+        6,
+        46
+      ],
+      "density": [
+        4.2604,
+        4.0351
+      ]
+    },
+    {
+      "material": "glass",
+      "size_units": [
+        1.4083261120685222,
+        11.399999999999999
+      ],
+      "size_pixels": [
+        6,
+        46
+      ],
+      "density": [
+        4.2604,
+        4.0351
+      ]
+    },
+    {
+      "material": "glass",
+      "size_units": [
+        1.4083261120685222,
+        11.399999999999999
+      ],
+      "size_pixels": [
+        6,
+        46
+      ],
+      "density": [
+        4.2604,
+        4.0351
+      ]
+    },
+    {
+      "material": "glass",
+      "size_units": [
+        1.4083261120685222,
+        11.399999999999999
+      ],
+      "size_pixels": [
+        6,
+        46
+      ],
+      "density": [
+        4.2604,
+        4.0351
+      ]
+    },
+    {
+      "material": "glass",
+      "size_units": [
+        1.4083261120685222,
+        11.399999999999999
+      ],
+      "size_pixels": [
+        6,
+        46
+      ],
+      "density": [
+        4.2604,
+        4.0351
+      ]
+    },
+    {
+      "material": "glass",
+      "size_units": [
+        1.4083261120685222,
+        11.399999999999999
+      ],
+      "size_pixels": [
+        6,
+        46
+      ],
+      "density": [
+        4.2604,
+        4.0351
+      ]
+    },
+    {
+      "material": "glass",
+      "size_units": [
+        1.4083261120685222,
+        11.399999999999999
+      ],
+      "size_pixels": [
+        6,
+        46
+      ],
+      "density": [
+        4.2604,
+        4.0351
+      ]
+    },
+    {
+      "material": "glass",
+      "size_units": [
+        1.4083261120685222,
+        11.399999999999999
+      ],
+      "size_pixels": [
+        6,
+        46
+      ],
+      "density": [
+        4.2604,
+        4.0351
+      ]
+    },
+    {
+      "material": "glass",
+      "size_units": [
+        1.4083261120685222,
+        11.399999999999999
+      ],
+      "size_pixels": [
+        6,
+        46
+      ],
+      "density": [
+        4.2604,
+        4.0351
+      ]
+    },
+    {
+      "material": "fluid",
+      "size_units": [
+        1.201219330881976,
+        8.35
+      ],
+      "size_pixels": [
+        5,
+        33
+      ],
+      "density": [
+        4.1624,
+        3.9521
+      ]
+    },
+    {
+      "material": "fluid",
+      "size_units": [
+        1.201219330881976,
+        8.35
+      ],
+      "size_pixels": [
+        5,
+        33
+      ],
+      "density": [
+        4.1624,
+        3.9521
+      ]
+    },
+    {
+      "material": "fluid",
+      "size_units": [
+        1.201219330881976,
+        8.35
+      ],
+      "size_pixels": [
+        5,
+        33
+      ],
+      "density": [
+        4.1624,
+        3.9521
+      ]
+    },
+    {
+      "material": "fluid",
+      "size_units": [
+        1.201219330881976,
+        8.35
+      ],
+      "size_pixels": [
+        5,
+        33
+      ],
+      "density": [
+        4.1624,
+        3.9521
+      ]
+    },
+    {
+      "material": "fluid",
+      "size_units": [
+        1.201219330881976,
+        8.35
+      ],
+      "size_pixels": [
+        5,
+        33
+      ],
+      "density": [
+        4.1624,
+        3.9521
+      ]
+    },
+    {
+      "material": "fluid",
+      "size_units": [
+        1.201219330881976,
+        8.35
+      ],
+      "size_pixels": [
+        5,
+        33
+      ],
+      "density": [
+        4.1624,
+        3.9521
+      ]
+    },
+    {
+      "material": "fluid",
+      "size_units": [
+        1.201219330881976,
+        8.35
+      ],
+      "size_pixels": [
+        5,
+        33
+      ],
+      "density": [
+        4.1624,
+        3.9521
+      ]
+    },
+    {
+      "material": "fluid",
+      "size_units": [
+        1.201219330881976,
+        8.35
+      ],
+      "size_pixels": [
+        5,
+        33
+      ],
+      "density": [
+        4.1624,
+        3.9521
+      ]
+    },
+    {
+      "material": "fluid",
+      "size_units": [
+        1.201219330881976,
+        8.35
+      ],
+      "size_pixels": [
+        5,
+        33
+      ],
+      "density": [
+        4.1624,
+        3.9521
+      ]
+    },
+    {
+      "material": "fluid",
+      "size_units": [
+        1.201219330881976,
+        8.35
+      ],
+      "size_pixels": [
+        5,
+        33
+      ],
+      "density": [
+        4.1624,
+        3.9521
+      ]
+    },
+    {
+      "material": "fluid",
+      "size_units": [
+        1.201219330881976,
+        8.35
+      ],
+      "size_pixels": [
+        5,
+        33
+      ],
+      "density": [
+        4.1624,
+        3.9521
+      ]
+    },
+    {
+      "material": "fluid",
+      "size_units": [
+        1.201219330881976,
+        8.35
+      ],
+      "size_pixels": [
+        5,
+        33
+      ],
+      "density": [
+        4.1624,
+        3.9521
+      ]
+    },
+    {
+      "material": "fluid",
+      "size_units": [
+        1.201219330881976,
+        8.35
+      ],
+      "size_pixels": [
+        5,
+        33
+      ],
+      "density": [
+        4.1624,
+        3.9521
+      ]
+    },
+    {
+      "material": "fluid",
+      "size_units": [
+        1.201219330881976,
+        8.35
+      ],
+      "size_pixels": [
+        5,
+        33
+      ],
+      "density": [
+        4.1624,
+        3.9521
+      ]
+    },
+    {
+      "material": "fluid",
+      "size_units": [
+        1.201219330881976,
+        8.35
+      ],
+      "size_pixels": [
+        5,
+        33
+      ],
+      "density": [
+        4.1624,
+        3.9521
+      ]
+    },
+    {
+      "material": "fluid",
+      "size_units": [
+        1.201219330881976,
+        8.35
+      ],
+      "size_pixels": [
+        5,
+        33
+      ],
+      "density": [
+        4.1624,
+        3.9521
+      ]
+    },
+    {
+      "material": "fluid_end",
+      "size_units": [
+        2.8999999999999995,
+        2.8999999999999995
+      ],
+      "size_pixels": [
+        12,
+        12
+      ],
+      "density": [
+        4.1379,
+        4.1379
+      ]
+    },
+    {
+      "material": "fluid_end",
+      "size_units": [
+        2.8999999999999995,
+        2.8999999999999995
+      ],
+      "size_pixels": [
+        12,
+        12
+      ],
+      "density": [
+        4.1379,
+        4.1379
+      ]
+    },
+    {
+      "material": "fluid_end",
+      "size_units": [
+        2.8999999999999995,
+        2.8999999999999995
+      ],
+      "size_pixels": [
+        12,
+        12
+      ],
+      "density": [
+        4.1379,
+        4.1379
+      ]
+    },
+    {
+      "material": "fluid_end",
+      "size_units": [
+        2.8999999999999995,
+        2.8999999999999995
+      ],
+      "size_pixels": [
+        12,
+        12
+      ],
+      "density": [
+        4.1379,
+        4.1379
+      ]
+    }
+  ],
+  "source_movie_references": [
+    "NIS_4-5_Gentek4_48fr.bik at 0.7s",
+    "NIS_7_3_FMV.bik at 3.2s"
+  ],
+  "reference_limits": "Cinematic tube/cage silhouette verified; unreadable labels and exact fill level are not claimed to be original."
+}
