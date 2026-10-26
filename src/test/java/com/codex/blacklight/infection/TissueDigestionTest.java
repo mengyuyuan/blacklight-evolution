@@ -55,7 +55,7 @@ class TissueDigestionTest {
     }
     @Test void digestiveStructureRespondsToActualWorkAndStoredLoadWithoutMovingItsRoot(){
         for(var core:TissueCore.values())if(core.digestive()){
-            int role=core==TissueCore.CROP?1:0;var bone=new Bone("digestive_socket",role,new Box(new V(-4,-4,-3),new V(4,4,3)),new V(0,-1,0),new V(0,0,-1),new V(1,0,0),new V(0,0,0));
+            int role=core==TissueCore.CROP||core==TissueCore.GILL_RAKER?1:0;var bone=new Bone("digestive_socket",role,new Box(new V(-4,-4,-3),new V(4,4,3)),new V(0,-1,0),new V(0,0,-1),new V(1,0,0),new V(0,0,0));
             var source=TissueMorphogenesis.functional(core,bone,0,42).getFirst().stages()[2];float[] empty=source.clone(),full=source.clone();
             TissueDigestiveMotion.apply(empty,bone,core,20,false,0);TissueDigestiveMotion.apply(full,bone,core,30,true,1);
             assertFalse(java.util.Arrays.equals(empty,full));assertArrayEquals(java.util.Arrays.copyOf(source,24),java.util.Arrays.copyOf(full,24),0);
@@ -71,5 +71,17 @@ class TissueDigestionTest {
         assertEquals(-full[6],full[9],.00001);assertTrue(full[9]>skin[9]&&full[10]>skin[10],"storage widens and lowers the real belly surface");
         var leg=new Bone("leg",2,box,up,front,right,new V(0,0,0));var unchanged=skin.clone();TissueDigestiveMotion.surface(unchanged,leg,profile,state,30);assertArrayEquals(skin,unchanged);
         var empty=skin.clone();TissueDigestiveMotion.surface(empty,bone,BASE,state,0);assertArrayEquals(skin,empty,"an ordinary host gets no fake organ animation");
+    }
+    @Test void filterPortionsNeedARealRakerAndRetainTheirDistinctSmallValueAndProgress(){
+        var gut=new TissueDigestion();assertFalse(gut.offer(Kind.FILTER,2,BASE));
+        var raker=new Profile(0,0,0,0,0,0,2);assertTrue(gut.offer(Kind.FILTER,2,raker));
+        assertEquals(0,process(gut,raker,0,200));var restored=TissueDigestion.read(gut.write());
+        assertEquals(2,process(restored,raker,0,100));assertEquals(0,restored.queued());assertEquals(2,process(restored,raker,2,10000));
+    }
+    @Test void extraoralContactUsesItsOwnContinuousOpeningAndReturnClock(){
+        var c=TissueOrganCycle.cycle(TissueCore.EXTRAORAL);
+        assertEquals(0,TissueTongueShape.extension(TissueCore.EXTRAORAL,-1));assertEquals(0,TissueTongueShape.extension(TissueCore.EXTRAORAL,c.windup()));
+        assertEquals(1,TissueTongueShape.extension(TissueCore.EXTRAORAL,c.contact()));assertEquals(0,TissueTongueShape.extension(TissueCore.EXTRAORAL,c.end()));
+        float previous=0;for(float t=c.windup();t<c.end();t+=.1F){float v=TissueTongueShape.extension(TissueCore.EXTRAORAL,t);assertTrue(Math.abs(v-previous)<.04);previous=v;}
     }
 }

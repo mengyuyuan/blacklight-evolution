@@ -6,7 +6,10 @@ import static com.codex.blacklight.infection.TissueMorphogenesis.V;
 public final class TissueTongueShape {
     private TissueTongueShape(){}
     public static float extension(float tick){
-        var c=TissueOrganCycle.cycle(TissueCore.TONGUE);
+        return extension(TissueCore.TONGUE,tick);
+    }
+    public static float extension(TissueCore core,float tick){
+        var c=TissueOrganCycle.cycle(core);
         if(!Float.isFinite(tick)||tick<c.windup()||tick>=c.end())return 0;
         return TissueOrganCycle.smooth((tick-c.windup())/(c.contact()-c.windup()))
                 *(1-TissueOrganCycle.smooth((tick-c.retract())/(c.end()-c.retract())));

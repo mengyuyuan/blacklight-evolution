@@ -17,7 +17,8 @@ public final class TissueEvolution {
             {.75F,.68F,.12F,.90F,.42F},{.85F,.92F,.10F,.85F,.28F},{.90F,.95F,.30F,.15F,.90F},{.65F,.40F,1.10F,.20F,.20F},
             {1.15F,.50F,.10F,.45F,.20F},{1.20F,.65F,.10F,.55F,.18F},{.65F,.30F,.95F,.65F,.20F},{.65F,.45F,.20F,.85F,.35F},
             {.58F,.32F,.18F,.08F,.12F},{.62F,.28F,.18F,.08F,.12F},{.58F,.25F,.15F,.08F,.15F},
-            {.56F,.25F,.18F,.08F,.18F},{.56F,.28F,.42F,.08F,.12F},{.68F,.32F,.12F,.08F,.12F}};
+            {.56F,.25F,.18F,.08F,.18F},{.56F,.28F,.42F,.08F,.12F},{.68F,.32F,.12F,.08F,.12F},
+            {.65F,.32F,.65F,.15F,.20F},{.58F,.28F,.55F,.08F,.20F}};
     public record Combat(double health,double damage,double armor,double knockback) { }
     private TissueEvolution() {}
 

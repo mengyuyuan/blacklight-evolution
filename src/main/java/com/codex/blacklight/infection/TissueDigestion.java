@@ -7,18 +7,19 @@ import net.minecraft.nbt.*;
 public final class TissueDigestion {
     public static final int MAX_PORTIONS=12,MAX_FAT=600,MAX_ENZYMES=8;
     public enum Kind {
-        MEAT("meat",200),SOFT("soft",160),FIBRE("fibre",480),FERMENT("ferment",1600);
+        MEAT("meat",200),SOFT("soft",160),FIBRE("fibre",480),FERMENT("ferment",1600),FILTER("filter",320);
         public final String key;public final int work;
         Kind(String key,int work){this.key=key;this.work=work;}
         static Kind byKey(String key){for(var k:values())if(k.key.equals(key))return k;return null;}
     }
-    public record Profile(double gizzard,double ferment,double absorption,double pancreas,double crop,double fat){
-        public Profile{gizzard=p(gizzard);ferment=p(ferment);absorption=p(absorption);pancreas=p(pancreas);crop=p(crop);fat=p(fat);}
+    public record Profile(double gizzard,double ferment,double absorption,double pancreas,double crop,double fat,double filter){
+        public Profile(double gizzard,double ferment,double absorption,double pancreas,double crop,double fat){this(gizzard,ferment,absorption,pancreas,crop,fat,0);}
+        public Profile{gizzard=p(gizzard);ferment=p(ferment);absorption=p(absorption);pancreas=p(pancreas);crop=p(crop);fat=p(fat);filter=p(filter);}
         private static double p(double x){return Double.isFinite(x)?Math.clamp(x,0,8):0;}
         public int capacity(){return 2+(int)Math.min(10,Math.ceil(crop*1.25));}
         public int fatCapacity(){return fat>0?(int)Math.min(MAX_FAT,120+60*fat):0;}
-        public boolean digestive(){return gizzard+ferment+absorption+pancreas+crop+fat>0;}
-        public boolean accepts(Kind kind){return kind!=null&&switch(kind){case FIBRE->gizzard>0;case FERMENT->ferment>0;default->true;};}
+        public boolean digestive(){return gizzard+ferment+absorption+pancreas+crop+fat+filter>0;}
+        public boolean accepts(Kind kind){return kind!=null&&switch(kind){case FIBRE->gizzard>0;case FERMENT->ferment>0;case FILTER->filter>0;default->true;};}
     }
     private record Portion(String kind,int value,double work,boolean primed){
         Kind type(){return Kind.byKey(kind);}
@@ -45,6 +46,7 @@ public final class TissueDigestion {
         return switch(food.type()){
             case FIBRE->1+.15*p.gizzard;
             case FERMENT->.5+.15*p.ferment+.05*p.gizzard;
+            case FILTER->1+.1*p.filter;
             case MEAT->food.primed?1+.2*p.pancreas:1;
             case SOFT->food.primed?1+.08*p.pancreas:1;
         };

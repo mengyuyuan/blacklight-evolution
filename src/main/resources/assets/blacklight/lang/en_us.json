@@ -743,5 +743,7 @@
   "upgrade.blacklight.digestive_pancreas": "Digestive Pancreas",
   "upgrade.blacklight.crop": "Food Crop",
   "upgrade.blacklight.fat_body": "Fat Body",
-  "hud.blacklight.digestive_reserves": "Digesting %s · Lipid reserve %s"
+  "hud.blacklight.digestive_reserves": "Digesting %s · Lipid reserve %s",
+  "upgrade.blacklight.extraoral_gland": "Extraoral Digestive Gland",
+  "upgrade.blacklight.gill_raker": "Gill Raker"
 }

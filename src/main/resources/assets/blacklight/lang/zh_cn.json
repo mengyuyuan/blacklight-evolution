@@ -743,5 +743,7 @@
   "upgrade.blacklight.digestive_pancreas": "消化胰腺",
   "upgrade.blacklight.crop": "嗉囊储食器",
   "upgrade.blacklight.fat_body": "脂肪体",
-  "hud.blacklight.digestive_reserves": "待消化 %s 份 · 脂储 %s"
+  "hud.blacklight.digestive_reserves": "待消化 %s 份 · 脂储 %s",
+  "upgrade.blacklight.extraoral_gland": "体外消化腺",
+  "upgrade.blacklight.gill_raker": "滤食鳃耙"
 }

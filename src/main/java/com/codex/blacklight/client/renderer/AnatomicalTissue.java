@@ -336,7 +336,7 @@ final class AnatomicalTissue {
             posed.mulPose(Axis.XP.rotation(bend));
             posed.translate(-pivot.x / 16, -pivot.y / 16, -pivot.z / 16);
         }
-        if(graft!=null&&graft.core==TissueCore.TONGUE)
+        if(graft!=null&&(graft.core==TissueCore.TONGUE||graft.core==TissueCore.EXTRAORAL))
             TissueTongueRender.aim(host,partial,vertices,new org.joml.Matrix4f(posed.last().pose()).scale(1/16F),worldRelativePose);
         for (int f = 0; f < mesh.faces.length; f++) {
             float[] face = mesh.faces[f]; int material = mandible?Math.max(1,(int)face[4]):(int)face[4];

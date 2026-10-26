@@ -9,6 +9,7 @@ public final class TissueDigestiveMotion {
     public static boolean active(TissueCore core,CompoundTag state){return switch(core){
         case GIZZARD->state.getBoolean("Working")&&(state.getString("WorkingKind").equals("fibre")||state.getString("WorkingKind").equals("ferment"));
         case FERMENT->state.getBoolean("Working")&&state.getString("WorkingKind").equals("ferment");
+        case GILL_RAKER->state.getBoolean("Working")&&state.getString("WorkingKind").equals("filter");
         case PANCREAS->state.getBoolean("EnzymeWorking");case FAT->state.getBoolean("FatWorking");default->state.getBoolean("Working");
     };}
     public static float load(TissueCore core,CompoundTag state){

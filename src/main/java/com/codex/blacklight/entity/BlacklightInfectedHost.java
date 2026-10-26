@@ -156,7 +156,7 @@ public final class BlacklightInfectedHost extends Monster {
     private long nextTissueForage;
     public TissueDigestion digestion(){return digestion;}
     public CompoundTag digestiveVisual(){return entityData.get(TISSUE_DIGESTION).copy();}
-    public TissueDigestion.Profile digestiveProfile(){return new TissueDigestion.Profile(organPower(TissueCore.GIZZARD),organPower(TissueCore.FERMENT),organPower(TissueCore.ABSORPTIVE),organPower(TissueCore.PANCREAS),organPower(TissueCore.CROP),organPower(TissueCore.FAT));}
+    public TissueDigestion.Profile digestiveProfile(){return new TissueDigestion.Profile(organPower(TissueCore.GIZZARD),organPower(TissueCore.FERMENT),organPower(TissueCore.ABSORPTIVE),organPower(TissueCore.PANCREAS),organPower(TissueCore.CROP),organPower(TissueCore.FAT),organPower(TissueCore.GILL_RAKER));}
     private void publishDigestion(){if(!level().isClientSide){var visual=digestion.visual(digestiveProfile());if(!visual.equals(entityData.get(TISSUE_DIGESTION)))entityData.set(TISSUE_DIGESTION,visual);}}
     public boolean offerTissueFood(TissueDigestion.Kind kind,int nutrition){
         if(level().isClientSide||!isAlive()||hasMultipartBody()||devourerIdentity()||!digestion.offer(kind,nutrition,digestiveProfile()))return false;
@@ -186,6 +186,12 @@ public final class BlacklightInfectedHost extends Monster {
         if(level().isClientSide)return;var tag=new CompoundTag();
         if(core!=null){clearTissueStrike();tag.putString("Core",core.key());tag.putInt("Target",target);tag.putLong("Started",level().getGameTime());tag.putDouble("X",direction.x);tag.putDouble("Z",direction.z);}
         entityData.set(TISSUE_ACTION,tag);
+    }
+    /** Keep the same paid action and target, but begin its synchronized closing phase. */
+    public void retractOrganAction(){
+        var core=organActionCore();if(level().isClientSide||core==null)return;
+        int closing=com.codex.blacklight.infection.TissueOrganCycle.cycle(core).retract();if(organActionElapsed(0)>=closing)return;
+        var tag=entityData.get(TISSUE_ACTION).copy();tag.putLong("Started",level().getGameTime()-closing);entityData.set(TISSUE_ACTION,tag);
     }
     public boolean spendTissueNutrition(int amount){if(level().isClientSide||amount<0||tissueNutrition()<amount)return false;entityData.set(TISSUE_NUTRITION,tissueNutrition()-amount);return true;}
     public TissueInheritance tissueInheritance(){
@@ -340,7 +346,7 @@ public final class BlacklightInfectedHost extends Monster {
         if(meal<=0)return accepted;
         victim.getPersistentData().putBoolean(TISSUE_MEAL,true);
         int previous=tissueNutrition();
-        if(digestiveProfile().digestive())offerTissueFood(TissueDigestion.Kind.MEAT,meal);else depositTissueNutrition(meal);
+        if(digestiveProfile().digestive()||organPower(TissueCore.EXTRAORAL)>0)offerTissueFood(TissueDigestion.Kind.MEAT,meal);else depositTissueNutrition(meal);
         if(tissueNutrition()>previous)server.sendParticles(new net.minecraft.core.particles.DustParticleOptions(new org.joml.Vector3f(.38F,.025F,.035F),1.1F),
                 getX(),getY()+getBbHeight()*.55,getZ(),10,getBbWidth()*.2,getBbHeight()*.15,getBbWidth()*.2,.025);
         return accepted;

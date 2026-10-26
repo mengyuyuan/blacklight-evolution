@@ -19,6 +19,7 @@ import net.neoforged.fml.common.EventBusSubscriber;
 public final class TissueFeeding {
     private static final TagKey<net.minecraft.world.item.Item> GRIND=TagKey.create(Registries.ITEM,ResourceLocation.fromNamespaceAndPath("blacklight","tissue_grindable"));
     private static final TagKey<net.minecraft.world.item.Item> FERMENT=TagKey.create(Registries.ITEM,ResourceLocation.fromNamespaceAndPath("blacklight","tissue_fermentable"));
+    private static final TagKey<net.minecraft.world.item.Item> FILTER=TagKey.create(Registries.ITEM,ResourceLocation.fromNamespaceAndPath("blacklight","tissue_filterable"));
     private static final Map<Level,Budget> BUDGETS=new WeakHashMap<>();
     private static final class Budget {long tick=Long.MIN_VALUE;int queries;}
     public record Food(TissueDigestion.Kind kind,int value,ItemStack remainder){}
@@ -32,6 +33,7 @@ public final class TissueFeeding {
         }
         if(profile.gizzard()>0&&stack.is(GRIND))return new Food(TissueDigestion.Kind.FIBRE,6,ItemStack.EMPTY);
         if(profile.ferment()>0&&stack.is(FERMENT))return new Food(TissueDigestion.Kind.FERMENT,8,ItemStack.EMPTY);
+        if(profile.filter()>0&&host.isInWater()&&stack.is(FILTER))return new Food(TissueDigestion.Kind.FILTER,2,ItemStack.EMPTY);
         return null;
     }
     public static boolean free(BlacklightInfectedHost host){return !host.level().isClientSide&&host.isAlive()&&!host.isRemoved()&&!host.hasMultipartBody()&&!host.devourerIdentity()
@@ -55,9 +57,10 @@ public final class TissueFeeding {
                 ||host.getTarget()!=null&&host.getTarget().isAlive()&&host.distanceToSqr(host.getTarget())<16)return now+40;
         var budget=BUDGETS.computeIfAbsent(host.level(),k->new Budget());if(budget.tick!=now){budget.tick=now;budget.queries=0;}
         if(budget.queries>=8)return now+1+Math.floorMod(host.getId(),5);budget.queries++;
-        var nearby=host.level().getEntitiesOfClass(ItemEntity.class,host.getBoundingBox().inflate(1.25,.7,1.25),e->e.isAlive()&&!e.getItem().isEmpty());
+        double reach=host.isInWater()&&host.digestiveProfile().filter()>0?2:1.25;
+        var nearby=host.level().getEntitiesOfClass(ItemEntity.class,host.getBoundingBox().inflate(reach,.7,reach),e->e.isAlive()&&!e.getItem().isEmpty());
         for(var item:nearby.stream().sorted(Comparator.comparingDouble(host::distanceToSqr)).limit(16).toList()){
-            var stack=item.getItem();var food=food(host,stack);if(food==null||!visible(host,item)||!host.offerTissueFood(food.kind,food.value))continue;
+            var stack=item.getItem();var food=food(host,stack);if(food==null||food.kind==TissueDigestion.Kind.FILTER&&!item.isInWater()||!visible(host,item)||!host.offerTissueFood(food.kind,food.value))continue;
             stack.shrink(1);if(stack.isEmpty())item.discard();else item.setItem(stack.copy());
             if(!food.remainder.isEmpty())host.spawnAtLocation(food.remainder.copy());sound(host);break;
         }return now+40+Math.floorMod(host.getId(),13);

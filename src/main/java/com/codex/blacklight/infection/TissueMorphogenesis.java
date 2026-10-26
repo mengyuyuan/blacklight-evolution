@@ -141,7 +141,21 @@ public final class TissueMorphogenesis {
         float w=box.span(principal(right)),h=box.span(principal(up)),d=box.span(principal(front));
         boolean limb=b.role>=2&&b.role<=5,fore=b.role==2||b.role==3;
         float side=b.modelCentre.x<0?-1:1;V outer=right.mul(side);
-        if(core.digestive()&&b.role==(core==TissueCore.CROP?1:0)){
+        if(core==TissueCore.GILL_RAKER&&b.role==1){
+            for(int sign:new int[]{-1,1})for(int fold=0;fold<2;fold++){
+                V root=c.add(right.mul(sign*w*.33F)).add(front.mul(d*(.05F+fold*.18F))).sub(up.mul(h*.22F));
+                organ(out,core.id+"_sieve_"+sign+"_"+fold,0,"",right,null,List.of(new Section(root,w*.08F,d*.09F),
+                        new Section(root.add(right.mul(sign*w*.12F)).sub(up.mul(h*.10F)),w*.10F,d*.12F),
+                        new Section(root.add(front.mul(d*.12F)).sub(up.mul(h*.14F)),w*.035F,d*.05F)),right,front,b,seed);
+            }
+        }else if(core==TissueCore.EXTRAORAL&&b.role==1){
+            for(int sign:new int[]{-1,1}){
+                V root=c.add(front.mul(d*.32F)).add(up.mul(sign*h*.13F));
+                organ(out,core.id+"_contact_"+sign,0,"",right,null,List.of(new Section(root,w*.18F,h*.06F),
+                        new Section(root.add(front.mul(d*.25F)),w*.32F,h*.10F),
+                        new Section(root.add(front.mul(d*.48F)),w*.38F,h*.04F)),right,up,b,seed);
+            }
+        }else if(core.digestive()&&core!=TissueCore.GILL_RAKER&&b.role==(core==TissueCore.CROP?1:0)){
             if(core==TissueCore.CROP){
                 V root=c.sub(up.mul(h*.30F)).add(front.mul(d*.10F));
                 organ(out,core.id+"_pouch",0,"",right,null,List.of(new Section(root,w*.20F,d*.18F),
@@ -249,7 +263,7 @@ public final class TissueMorphogenesis {
     }
     public static Bone functionalMount(TissueCore core,Bone body,long seed){
         boolean sided=core==TissueCore.BLADE||core==TissueCore.CHELA||core==TissueCore.HYDROSTAT||core==TissueCore.CLUB||core==TissueCore.SADDLE||core==TissueCore.CNIDOCYTE;
-        int role=core.digestive()&&core!=TissueCore.CROP?0:switch(core){case HORN,PHARYNX,TONGUE,CROP->1;case TENDON,HYDRAULIC->4;default->2;};
+        int role=core.digestive()&&core!=TissueCore.CROP&&core!=TissueCore.GILL_RAKER?0:switch(core){case HORN,PHARYNX,TONGUE,CROP,EXTRAORAL,GILL_RAKER->1;case TENDON,HYDRAULIC->4;default->2;};
         int side=!sided?0:core==TissueCore.BLADE||core==TissueCore.CLUB?TissueOrganLayout.bladeSide(seed):-TissueOrganLayout.bladeSide(seed);
         V c=body.box.centre(),half=body.box.high.sub(body.box.low).mul(sided?.24F:.32F);
         V centre=c.add(body.right.mul(side*span(body.box,body.right)*.38F));

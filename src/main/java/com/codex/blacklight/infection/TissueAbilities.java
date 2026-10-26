@@ -10,13 +10,13 @@ import net.minecraft.world.phys.Vec3;
 
 /** Per-host bounded action controller. Real collision, one contact, finite recovery and nutrition costs. */
 public final class TissueAbilities {
-    private static final List<TissueCore> ACTIONS=List.of(TissueCore.TENDON,TissueCore.HYDRAULIC,TissueCore.HYDROSTAT,TissueCore.BLADE,TissueCore.CHELA,TissueCore.HORN,TissueCore.SADDLE,TissueCore.CLUB,TissueCore.TONGUE,TissueCore.CNIDOCYTE);
+    private static final List<TissueCore> ACTIONS=List.of(TissueCore.TENDON,TissueCore.HYDRAULIC,TissueCore.HYDROSTAT,TissueCore.BLADE,TissueCore.CHELA,TissueCore.HORN,TissueCore.SADDLE,TissueCore.CLUB,TissueCore.TONGUE,TissueCore.CNIDOCYTE,TissueCore.EXTRAORAL);
     private final BlacklightInfectedHost host;
     private int cursor,cooldown;
     private boolean contacted,launched;
     public TissueAbilities(BlacklightInfectedHost host){this.host=host;}
     public void interrupt(){if(!host.level().isClientSide){host.setOrganAction(null,-1,Vec3.ZERO);TissueGrapples.release(host);cooldown=Math.max(cooldown,20);}}
-    private static boolean gripping(TissueCore core){return core==TissueCore.CHELA||core==TissueCore.HYDROSTAT||core==TissueCore.TONGUE;}
+    private static boolean gripping(TissueCore core){return core==TissueCore.CHELA||core==TissueCore.HYDROSTAT||core==TissueCore.TONGUE||core==TissueCore.EXTRAORAL;}
     public boolean gripActive(){var core=host.organActionCore();return gripping(core)&&host.organActionElapsed(0)>=TissueOrganCycle.cycle(core).contact()&&host.organActionElapsed(0)<TissueOrganCycle.cycle(core).retract();}
     /** Called before ordinary melee starts, so close-range organs cannot be
      * starved forever by a fresh vanilla melee animation every recovery. */
@@ -49,13 +49,17 @@ public final class TissueAbilities {
         }
         var cycle=TissueOrganCycle.cycle(core);int tick=(int)host.organActionElapsed(0);
         var entity=host.level().getEntity(host.organActionTarget());var target=entity instanceof LivingEntity living?living:null;
-        if(tick<0||tick>=cycle.end()||!valid(target)){
+        if(core==TissueCore.EXTRAORAL&&contacted&&target!=null&&!target.isAlive()&&tick<cycle.retract()){
+            host.retractOrganAction();tick=cycle.retract();
+        }
+        boolean closing=core==TissueCore.EXTRAORAL&&tick>=cycle.retract();
+        if(tick<0||tick>=cycle.end()||!closing&&!valid(target)){
             host.setOrganAction(null,-1,Vec3.ZERO);TissueGrapples.release(host);cooldown=cycle.cooldown();return false;
         }
         host.getNavigation().stop();host.setXxa(0);host.setZza(0);
         // Water attacks brace against drift; a land mob's panic-float goal must not eject an aquatic grasper.
         if(host.isInWater())host.setDeltaMovement(host.getDeltaMovement().scale(.35));
-        if(core!=TissueCore.HORN||tick<cycle.windup())host.getLookControl().setLookAt(target,25,25);
+        if(target!=null&&(core!=TissueCore.HORN||tick<cycle.windup()))host.getLookControl().setLookAt(target,25,25);
         double power=host.organPower(core);Vec3 direction=host.organActionDirection();
         if(tick<cycle.windup())host.setDeltaMovement(new Vec3(0,host.getDeltaMovement().y,0));
         if(!launched&&tick>=cycle.windup()){
@@ -76,8 +80,15 @@ public final class TissueAbilities {
             else hit(target,core,power);
         }
         // Clamp first, then crush/release; grasp does not apply damage every render frame.
-        if(contacted&&gripping(core)&&tick==cycle.retract()-1){
+        if(contacted&&gripping(core)&&core!=TissueCore.EXTRAORAL&&tick==cycle.retract()-1){
             if(TissueGrapples.owner(target)==host)hit(target,core,power);
+        }
+        // A paid enzyme dose works only while the real prey remains held at the mouth.
+        if(core==TissueCore.EXTRAORAL&&contacted&&tick>=cycle.contact()&&tick<cycle.retract()
+                &&(tick-cycle.contact())%10==0&&TissueGrapples.owner(target)==host){
+            hit(target,core,power);
+            if(host.level() instanceof net.minecraft.server.level.ServerLevel server)server.sendParticles(new net.minecraft.core.particles.DustParticleOptions(new org.joml.Vector3f(.28F,.025F,.035F),.7F),
+                    target.getX(),target.getY()+target.getBbHeight()*.42,target.getZ(),5,target.getBbWidth()*.2,target.getBbHeight()*.1,target.getBbWidth()*.2,.01);
         }
         if(tick>=cycle.retract()){
             TissueGrapples.release(host);
@@ -87,13 +98,14 @@ public final class TissueAbilities {
     }
     private boolean valid(LivingEntity target){return target!=null&&target!=host&&target.isAlive()&&!target.isRemoved()&&target.level()==host.level()&&!host.isAlliedTo(target)
             &&!(target instanceof Player p&&(p.isCreative()||p.isSpectator()))&&!TissueCompetition.controls(target)
+            &&com.codex.blacklight.power.BiomassSystem.claimant(target)==null&&(TissueGrapples.owner(target)==null||TissueGrapples.owner(target)==host)
             &&!target.getData(ModAttachments.CONSUME_VISUAL).active();}
     private void hit(LivingEntity target,TissueCore core,double power){
-        float factor=switch(core){case CHELA->1.3F;case HORN->1.35F;case SADDLE->1.8F;case CLUB->2.1F;case TONGUE->.65F;case CNIDOCYTE->.35F;default->1;};
+        float factor=switch(core){case CHELA->1.3F;case HORN->1.35F;case SADDLE->1.8F;case CLUB->2.1F;case TONGUE->.65F;case CNIDOCYTE->.35F;case EXTRAORAL->.55F;default->1;};
         float amount=(float)(host.getAttributeValue(Attributes.ATTACK_DAMAGE)*factor*(1+.045*TissueOrganCycle.boundedPower(power)));
         if(target.hurt(host.damageSources().mobAttack(host),amount)){
             if(core==TissueCore.CNIDOCYTE)target.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.MOVEMENT_SLOWDOWN,40,1),host);
-            Vec3 d=target.position().subtract(host.position());target.knockback(TissueOrganCycle.knockback(core,power),-d.x,-d.z);
+            if(core!=TissueCore.EXTRAORAL){Vec3 d=target.position().subtract(host.position());target.knockback(TissueOrganCycle.knockback(core,power),-d.x,-d.z);}
         }
     }
     private void cleave(LivingEntity main,double power){

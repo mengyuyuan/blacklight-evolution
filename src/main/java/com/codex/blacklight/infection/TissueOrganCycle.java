@@ -23,6 +23,7 @@ public final class TissueOrganCycle {
         case CLUB->new Cycle(22,30,44,62,100,5);
         case TONGUE->new Cycle(12,20,38,50,85,4);
         case CNIDOCYTE->new Cycle(10,15,24,36,90,3);
+        case EXTRAORAL->new Cycle(16,20,38,54,110,4);
         default->new Cycle(8,12,20,28,46,1);
     };}
     public static float smooth(float t){t=Math.clamp(t,0,1);return t*t*(3-2*t);}
@@ -33,10 +34,10 @@ public final class TissueOrganCycle {
     public static float knockback(TissueCore core,double power){return (float)(switch(core){
         case HYDRAULIC->.45;case HORN,SADDLE->.8;case CLUB->1.1;default->.15;
     }+.06*boundedPower(power));}
-    public static float reach(TissueCore core){return switch(core){case HYDROSTAT->2.4F;case BLADE->1.4F;case CHELA->1.1F;case HYDRAULIC->1.2F;case TONGUE->6F;case SADDLE,CLUB,CNIDOCYTE->1.6F;default->.7F;};}
+    public static float reach(TissueCore core){return switch(core){case HYDROSTAT->2.4F;case BLADE->1.4F;case CHELA,EXTRAORAL->1.1F;case HYDRAULIC->1.2F;case TONGUE->6F;case SADDLE,CLUB,CNIDOCYTE->1.6F;default->.7F;};}
     public static boolean range(TissueCore core,double gap){return switch(core){
         case TENDON->gap>=1.2&&gap<=6;case HYDRAULIC->gap>=0&&gap<=2.8;
         case HORN->gap>=3&&gap<=12;case TONGUE->gap>=1.2&&gap<=reach(core);
-        case HYDROSTAT,BLADE,CHELA,SADDLE,CLUB,CNIDOCYTE->gap>=0&&gap<=reach(core);default->false;
+        case HYDROSTAT,BLADE,CHELA,SADDLE,CLUB,CNIDOCYTE,EXTRAORAL->gap>=0&&gap<=reach(core);default->false;
     };}
 }

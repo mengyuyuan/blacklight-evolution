@@ -74,7 +74,7 @@ public final class TissueDigestionGameTest {
     public static void absorptiveGutImprovesActualComponentFoodInsteadOfRequiringASpeciesOrItemWhitelist(GameTestHelper h){
         // The 10-block template owns its entity-ticking chunks. Keep both live subjects inside it.
         var plain=host(h,TissueCore.MUSCLE);var improved=host(h,TissueCore.ABSORPTIVE);improved.setPos(plain.position().add(3,0,0));
-        var p=player(h,plain);h.assertTrue(feed(plain,p,customFood(1,10)),"an unknown item's real FOOD component is recognized");p.setPos(improved.position().add(2,0,0));h.assertTrue(feed(improved,p,customFood(1,10)),"the same component reaches the enhanced gut");
+        var p=player(h,plain);h.assertTrue(feed(plain,p,customFood(1,10)),"an unknown item's real FOOD component is recognized");p.setPos(improved.position().add(-2,0,0));h.assertTrue(feed(improved,p,customFood(1,10)),"the same component reaches the enhanced gut inside the template; free="+TissueFeeding.free(improved)+" host="+improved.position()+" player="+p.position());
         h.succeedWhen(()->{
             h.assertTrue(plain.digestion().queued()==0&&improved.digestion().queued()==0,"both actual meals finish; plain="+plain.digestion().write()+" alive="+plain.isAlive()+" removed="+plain.isRemoved()+" improved="+improved.digestion().write()+" alive="+improved.isAlive()+" removed="+improved.isRemoved());
             h.assertTrue(improved.tissueNutrition()>plain.tissueNutrition(),"absorption pays extra only for a real processed portion; plain="+plain.tissueNutrition()+" improved="+improved.tissueNutrition());
