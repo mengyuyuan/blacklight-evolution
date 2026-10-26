@@ -1,0 +1,30 @@
+{
+  "source": {
+    "asset": "evolved_1stRunner_Blades_geo_runner1_arm_bladeShape000_skin",
+    "sourceFileSHA256": "292a0ff36415eaf3999ce3ae9e5228c6e35156f36788c85c6f119624e784def4",
+    "adaptation": "Original P2 Evolved Runner1 arm surfaces and cutting silhouette, fitted to Minecraft shoulder/elbow proportions; own pixel material. Wrist/blade influences follow the rigid forearm."
+  },
+  "sourceVertices": 1672,
+  "sourceTriangles": 1932,
+  "bodyQuads": 256,
+  "adaptedArmTriangles": 1932,
+  "glowTriangles": 275,
+  "adaptedBounds": [
+    [
+      -6.4375,
+      0.5,
+      -2.9375
+    ],
+    [
+      6.4375,
+      22.5625,
+      5.5625
+    ]
+  ],
+  "body": "unchanged standard Minecraft proportions",
+  "textureSize": [
+    256,
+    256
+  ],
+  "editable": "art/evolved-arm-adapter/evolved_arms.bbmodel"
+}

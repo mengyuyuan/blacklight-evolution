@@ -96,7 +96,7 @@ public final class HunterGameTest {
         hunter.setTarget(victim);h.assertTrue(hunter.beginAttack(com.codex.blacklight.combat.CreatureAttack.SWIPE,victim),"explicit swipe starts");
         h.runAfterDelay(30,()->{
             net.neoforged.neoforge.common.NeoForge.EVENT_BUS.unregister(listener);
-            h.assertTrue(hits.get()==1&&Math.abs(total.get()-14)<.001,"one declared 14-point swipe, independent of subsequent infection HP rescaling: hits="+hits+" damage="+total);
+            h.assertTrue(hits.get()==1&&Math.abs(total.get()-com.codex.blacklight.combat.HunterBalance.DAMAGE)<.001,"one current-tier swipe, independent of subsequent infection HP rescaling: hits="+hits+" damage="+total);
             hunter.discard();victim.discard();h.succeed();
         });
     }

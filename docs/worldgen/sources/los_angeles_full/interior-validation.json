@@ -1,0 +1,15 @@
+{
+  "sampleNativePosition": [
+    -2160,
+    170,
+    -2550
+  ],
+  "sourceChunksCompared": 9,
+  "sourceVoxelStatesCompared": 106496,
+  "rawAnvilEqualsCompactPalettesAndBits": true,
+  "visibleFurnishingBlocks": {
+    "minecraft:dark_oak_door": 12,
+    "minecraft:red_bed": 2
+  },
+  "gameplayTested": false
+}

@@ -1,0 +1,12 @@
+{
+  "url": "https://api.openstreetmap.org/api/0.6/map?bbox=-118.248,34.052,-118.238,34.0595",
+  "sha256": "c7586f8e5bba8ad1a1d8bbb5aa8b1531eaa7539a83bc82098d3c38b9b81e8af7",
+  "bytes": 6233737,
+  "retrieved": "2026-10-25",
+  "bbox": [
+    34.052,
+    -118.248,
+    34.0595,
+    -118.238
+  ]
+}

@@ -43,6 +43,7 @@ public final class BlacklightHunter extends Monster implements GeoEntity {
     public BlacklightHunter(EntityType<? extends BlacklightHunter> type, Level level) { super(type, level); xpReward = 12; }
     public static AttributeSupplier.Builder attributes() {
         return Monster.createMonsterAttributes().add(Attributes.MAX_HEALTH, HunterBalance.HEALTH).add(Attributes.MOVEMENT_SPEED, HunterBalance.SPEED)
+                .add(Attributes.ARMOR,HunterBalance.ARMOR).add(Attributes.ARMOR_TOUGHNESS,HunterBalance.TOUGHNESS)
                 .add(Attributes.ATTACK_DAMAGE, HunterBalance.DAMAGE).add(Attributes.FOLLOW_RANGE, 32)
                 .add(Attributes.KNOCKBACK_RESISTANCE, HunterBalance.KNOCKBACK_RESISTANCE).add(Attributes.STEP_HEIGHT, 1);
     }
@@ -150,7 +151,7 @@ public final class BlacklightHunter extends Monster implements GeoEntity {
     @Override public boolean isPickable() { return !isConsumeRemains()&&super.isPickable(); }
     @Override public void addAdditionalSaveData(CompoundTag tag) {
         super.addAdditionalSaveData(tag);
-        tag.putInt("BlacklightHunterBalanceVersion",1);
+        tag.putInt("BlacklightHunterBalanceVersion",HunterBalance.VERSION);
         // The transient grab must never persist as a permanently disabled AI after restart.
         if (isBeingConsumed()) tag.putBoolean("NoAI", previousNoAi);
         if (isConsumeRemains()) tag.putLong("BlacklightConsumeRemains",entityData.get(REMAINS_STARTED));
@@ -158,14 +159,16 @@ public final class BlacklightHunter extends Monster implements GeoEntity {
     @Override public void readAdditionalSaveData(CompoundTag tag) {
         super.readAdditionalSaveData(tag);
         // Upgrade only the old stock attributes. Preserve custom mobs and the current health fraction.
-        if(!tag.contains("BlacklightHunterBalanceVersion")
-                &&getAttribute(Attributes.MAX_HEALTH).getBaseValue()==48
-                &&getAttribute(Attributes.ATTACK_DAMAGE).getBaseValue()==7) {
+        double oldHealth=getAttribute(Attributes.MAX_HEALTH).getBaseValue(),oldDamage=getAttribute(Attributes.ATTACK_DAMAGE).getBaseValue();
+        boolean stock=oldHealth==48&&oldDamage==7||oldHealth==96&&oldDamage==14;
+        if(tag.getInt("BlacklightHunterBalanceVersion")<HunterBalance.VERSION&&stock) {
             float maximum=getMaxHealth(),health=getHealth();
             getAttribute(Attributes.MAX_HEALTH).setBaseValue(HunterBalance.HEALTH);
             getAttribute(Attributes.ATTACK_DAMAGE).setBaseValue(HunterBalance.DAMAGE);
             if(getAttribute(Attributes.MOVEMENT_SPEED).getBaseValue()==.29)getAttribute(Attributes.MOVEMENT_SPEED).setBaseValue(HunterBalance.SPEED);
-            if(getAttribute(Attributes.KNOCKBACK_RESISTANCE).getBaseValue()==.55)getAttribute(Attributes.KNOCKBACK_RESISTANCE).setBaseValue(HunterBalance.KNOCKBACK_RESISTANCE);
+            if(getAttribute(Attributes.ARMOR).getBaseValue()==0)getAttribute(Attributes.ARMOR).setBaseValue(HunterBalance.ARMOR);
+            if(getAttribute(Attributes.ARMOR_TOUGHNESS).getBaseValue()==0)getAttribute(Attributes.ARMOR_TOUGHNESS).setBaseValue(HunterBalance.TOUGHNESS);
+            if(getAttribute(Attributes.KNOCKBACK_RESISTANCE).getBaseValue()==.55||getAttribute(Attributes.KNOCKBACK_RESISTANCE).getBaseValue()==.65)getAttribute(Attributes.KNOCKBACK_RESISTANCE).setBaseValue(HunterBalance.KNOCKBACK_RESISTANCE);
             if(getAttribute(Attributes.FOLLOW_RANGE).getBaseValue()==24)getAttribute(Attributes.FOLLOW_RANGE).setBaseValue(32);
             com.codex.blacklight.power.CombatScale.preserveHealthFraction(this,maximum,health);
         }

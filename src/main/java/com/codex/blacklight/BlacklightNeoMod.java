@@ -29,7 +29,11 @@ public final class BlacklightNeoMod {
         container.registerConfig(net.neoforged.fml.config.ModConfig.Type.CLIENT, com.codex.blacklight.config.PassiveHudConfig.SPEC, "blacklight-client.toml");
         container.registerConfig(net.neoforged.fml.config.ModConfig.Type.SERVER, com.codex.blacklight.city.CityConfig.SPEC, "blacklight-city-server.toml");
         container.registerConfig(net.neoforged.fml.config.ModConfig.Type.SERVER, com.codex.blacklight.infection.BuildingInfectionConfig.SPEC, "blacklight-building-infection-server.toml");
+        container.registerConfig(net.neoforged.fml.config.ModConfig.Type.SERVER, com.codex.blacklight.infection.TissueCompetitionConfig.SPEC, "blacklight-evolution-server.toml");
+        container.registerConfig(net.neoforged.fml.config.ModConfig.Type.SERVER, com.codex.blacklight.infection.EvolvedBalance.SPEC, "blacklight-evolved-server.toml");
         container.registerConfig(net.neoforged.fml.config.ModConfig.Type.SERVER, com.codex.blacklight.config.CrossModCombatConfig.SPEC, "blacklight-combat-server.toml");
+        container.registerConfig(net.neoforged.fml.config.ModConfig.Type.SERVER, com.codex.blacklight.infection.OutbreakConfig.SPEC, "blacklight-outbreak-server.toml");
+        container.registerConfig(net.neoforged.fml.config.ModConfig.Type.SERVER, com.codex.blacklight.power.PlayerEvolutionConfig.SPEC, "blacklight-player-evolution-server.toml");
         com.codex.blacklight.city.CityBlocks.register(modBus);
         com.codex.blacklight.city.CityWorldgen.register(modBus);
         NeoForge.EVENT_BUS.register(com.codex.blacklight.city.CitySystem.class);
@@ -48,7 +52,7 @@ public final class BlacklightNeoMod {
             com.codex.blacklight.power.BiomassRules.initialize();
             com.codex.blacklight.animation.MotionLibrary.requireInstalled();
             var health=(net.minecraft.world.entity.ai.attributes.RangedAttribute)net.minecraft.world.entity.ai.attributes.Attributes.MAX_HEALTH.value();
-            ((com.codex.blacklight.mixin.HealthAttributeLimitAccessor)health).blacklight$setMaximum(Math.max(health.getMaxValue(),1000000));
+            ((com.codex.blacklight.mixin.HealthAttributeLimitAccessor)health).blacklight$setMaximum(Math.max(health.getMaxValue(),1e24));
         }));
         NeoForge.EVENT_BUS.register(BlacklightCommands.class);
         NeoForge.EVENT_BUS.register(ClawCombatSystem.class);

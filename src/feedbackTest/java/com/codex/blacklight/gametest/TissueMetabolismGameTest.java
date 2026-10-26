@@ -19,7 +19,7 @@ public final class TissueMetabolismGameTest {
     private static BlacklightInfectedHost host(GameTestHelper h,TissueCore core){
         var level=h.getLevel();var host=ModEntities.INFECTED_HOST.get().create(level);
         host.inherit(EntityType.COW.create(level));long seed=1;while(TissueCore.forSeed(seed)!=core)seed++;
-        long identity=UUID.randomUUID().getMostSignificantBits();host.setUUID(new UUID(identity,identity^seed));
+        long identity=UUID.randomUUID().getMostSignificantBits();host.setUUID(new UUID(identity,identity^seed));var pinned=new net.minecraft.nbt.CompoundTag();host.saveWithoutId(pinned);pinned.putInt("BlacklightTissueNutrition",0);pinned.getCompound("BlacklightHost").putString("NativeCore",core.key());host.readAdditionalSaveData(pinned);
         host.setNoAi(true);host.setPos(h.absolutePos(new BlockPos(5,30,5)).getCenter());
         level.addFreshEntity(host);return host;
     }
@@ -56,16 +56,38 @@ public final class TissueMetabolismGameTest {
             kill(host,food);h.assertTrue(host.tissueNutrition()==3,"a vanilla ten-health cow offers three reserve units; actual="+host.tissueNutrition());
             host.setHealth(host.getMaxHealth()*.5F);float injured=host.getHealth();long age=host.tissueAge();
             for(int i=0;i<20;i++)host.tick();
-            h.assertTrue(host.tissueAge()==age+20+TissueMetabolism.BONUS_TICKS&&host.tissueNutrition()==2,"one loaded second spends exactly one unit for accelerated evolution");
+            h.assertTrue(host.tissueAge()==age+20+TissueMetabolism.BONUS_TICKS&&host.tissueNutrition()==3,"one young growth/repair second spends only a fraction of a reserve unit");
             h.assertTrue(host.getHealth()>injured&&host.getHealth()<host.getMaxHealth()*.6F,"nutrition heals modestly, not to full health");
             host.invulnerableTime=0;host.hurt(host.damageSources().generic(),1);injured=host.getHealth()/host.getMaxHealth();
             for(int i=0;i<20;i++)host.tick();
-            h.assertTrue(Math.abs(host.getHealth()/host.getMaxHealth()-injured)<.00001&&host.tissueNutrition()==1,"recent damage suppresses meal regeneration while preserving the injury fraction during growth");
+            h.assertTrue(Math.abs(host.getHealth()/host.getMaxHealth()-injured)<.00001&&host.tissueNutrition()==3,"recent damage suppresses meal regeneration without charging its repair cost");
             var saved=new CompoundTag();host.saveWithoutId(saved);var restored=ModEntities.INFECTED_HOST.get().create(h.getLevel());restored.load(saved);
-            h.assertTrue(restored.tissueNutrition()==1&&restored.tissueAge()==host.tissueAge(),"age and unspent food survive save/load without offline growth");
+            h.assertTrue(restored.tissueNutrition()==3&&restored.tissueAge()==host.tissueAge(),"age and unspent food survive save/load without offline growth");
             float health=restored.getHealth()/restored.getMaxHealth();for(int i=0;i<20;i++)restored.tick();
             h.assertTrue(Math.abs(restored.getHealth()/restored.getMaxHealth()-health)<.00001,"combat recovery delay also survives save/load");restored.discard();
         }finally{host.discard();food.discard();}h.succeed();
+    }
+    @GameTest(template="wall_test",timeoutTicks=40,batch="tissue_metabolism")
+    public static void matureRestingBodiesKeepFoodAndFractionalCostsSurviveReload(GameTestHelper h){
+        var host=host(h,TissueCore.MUSCLE);
+        try{
+            host.advanceTissue(48000);var saved=new CompoundTag();host.saveWithoutId(saved);saved.putInt("BlacklightTissueNutrition",8);saved.putInt("BlacklightTissueNutritionDebt",65);host.load(saved);host.setHealth(host.getMaxHealth());
+            long age=host.tissueAge();for(int i=0;i<200;i++)host.tick();
+            host.saveWithoutId(saved);h.assertTrue(host.tissueNutrition()==8&&saved.getInt("BlacklightTissueNutritionDebt")==65&&host.tissueAge()==age+200,"mature full-health resting bodies have no passive food decay, but natural age continues");
+            host.setHealth(host.getMaxHealth()*.5F);for(int i=0;i<40;i++)host.tick();host.saveWithoutId(saved);
+            h.assertTrue(host.tissueNutrition()==7&&saved.getInt("BlacklightTissueNutritionDebt")==5,"two actual repair seconds pay 40 hundredths, including the existing debt");
+            var restored=ModEntities.INFECTED_HOST.get().create(h.getLevel());restored.load(saved);var again=new CompoundTag();restored.saveWithoutId(again);
+            h.assertTrue(again.getInt("BlacklightTissueNutritionDebt")==5&&restored.tissueNutrition()==7,"reloading does not forgive repair/growth costs or refill food");restored.discard();
+        }finally{host.discard();}h.succeed();
+    }
+    @GameTest(template="wall_test",timeoutTicks=40,batch="tissue_metabolism")
+    public static void freshInfectionGetsBodyReserveOnce(GameTestHelper h){
+        var mob=EntityType.COW.create(h.getLevel());var host=ModEntities.INFECTED_HOST.get().create(h.getLevel());host.inherit(mob);
+        try{
+            h.assertTrue(host.tissueNutrition()==8,"a newly infected cow carries a small body reserve");
+            var saved=new CompoundTag();host.saveWithoutId(saved);saved.putInt("BlacklightTissueNutrition",0);host.load(saved);host.load(saved);
+            h.assertTrue(host.tissueNutrition()==0,"an exhausted existing body cannot receive the initial reserve again by reloading");
+        }finally{host.discard();mob.discard();}h.succeed();
     }
     @GameTest(template="wall_test",timeoutTicks=40,batch="tissue_metabolism")
     public static void combatGrowthSurvivesRepeatedUpdatesAndSaveWithoutCompounding(GameTestHelper h){

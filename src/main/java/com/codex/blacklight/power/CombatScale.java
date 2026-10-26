@@ -72,7 +72,8 @@ public final class CombatScale {
     public static void damage(LivingDamageEvent.Pre event){
         if(!event.getEntity().level().isClientSide&&event.getNewDamage()>0)
             event.setNewDamage(com.codex.blacklight.combat.CrossModCombat.defend(event.getEntity(), event.getSource(),
-                    (float)Math.min(Float.MAX_VALUE,(double)event.getNewDamage()*units(event.getEntity()))));
+                    InfiniteEvolutionSystem.damage(event.getEntity(),event.getSource(),
+                            (float)Math.min(Float.MAX_VALUE,(double)event.getNewDamage()*units(event.getEntity())))));
     }
     @SubscribeEvent(priority=EventPriority.LOWEST)
     public static void heal(LivingHealEvent event){

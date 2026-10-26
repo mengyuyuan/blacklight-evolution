@@ -19,8 +19,9 @@ public final class TissueGrapples {
     private static final Map<LivingEntity,Hold> HOLDS=new WeakHashMap<>();
     private TissueGrapples(){}
     public static boolean grab(BlacklightInfectedHost host,LivingEntity target,int duration) {
-        if(host.level().isClientSide||host==target||!host.isAlive()||!target.isAlive()||host.tissueTentacles()<=.6F
-                ||ConsumeSystem.grappleProtected(target)||target.isPassenger()||target.isVehicle()
+        if(host.level().isClientSide||host==target||!host.isAlive()||!target.isAlive()
+                ||Math.max(host.organPower(TissueCore.GRASP),Math.max(host.organPower(TissueCore.CHELA),host.organPower(TissueCore.HYDROSTAT)))<=0
+                ||TissueCompetition.controls(target)||TissueCompetition.controls(host)||ConsumeSystem.grappleProtected(target)||target.isPassenger()||target.isVehicle()
                 ||target.getData(ModAttachments.CONSUME_VISUAL).active()
                 ||target instanceof Player p&&(p.isCreative()||p.isSpectator())
                 ||target.getBbWidth()>host.getBbWidth()*2||target.getBbHeight()>host.getBbHeight()*2
@@ -35,7 +36,7 @@ public final class TissueGrapples {
         var host=hold.owner.get();
         if(host==null||host.isRemoved()||!host.isAlive()||target.isRemoved()||!target.isAlive()
                 ||host.level()!=target.level()||host.level().getGameTime()>=hold.until
-                ||host.tissueStrikeElapsed(0)<TissueOrgans.HIT||host.tissueStrikeElapsed(0)>=TissueOrgans.DURATION
+                ||!host.organAbilities().gripActive()&&(host.tissueStrikeElapsed(0)<TissueOrgans.HIT||host.tissueStrikeElapsed(0)>=TissueOrgans.DURATION)
                 ||host.isNoAi()||host.getData(ModAttachments.CONSUME_VISUAL).active()
                 ||target.getData(ModAttachments.CONSUME_VISUAL).active()
                 ||target instanceof Player player&&(player.isCreative()||player.isSpectator())

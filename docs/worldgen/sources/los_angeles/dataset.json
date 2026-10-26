@@ -1,0 +1,18 @@
+{
+  "region": "los_angeles",
+  "counts": {
+    "road": 264973,
+    "rail": 1782,
+    "park": 6771,
+    "paved": 7069,
+    "river": 2750,
+    "building": 1077919,
+    "water": 825,
+    "urban": 9736,
+    "forest": 1401
+  },
+  "tiles": 1723,
+  "compressedBytes": 83815435,
+  "coreTemplates": 3074,
+  "coreGenerator": "Arnis 3.3.0"
+}

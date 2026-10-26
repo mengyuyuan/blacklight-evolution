@@ -30,7 +30,8 @@ public final class CombatTargeting {
     public static LivingEntity locked(ServerPlayer player) {
         var target=LOCKS.get(player);
         if (!com.codex.blacklight.power.PrototypeMetabolism.active(player)
-                || !selectable(player,target) || !inReach(player,target,viewRange(player))) {
+                || !selectable(player,target) || !(inReach(player,target,viewRange(player))
+                || BulletdiveSteering.retainAltitudeLock(player.position(),player.onGround(),target.position(),viewRange(player)))) {
             LOCKS.remove(player); syncLock(player, -1); return null;
         }
         return target;
@@ -185,6 +186,14 @@ public final class CombatTargeting {
         return false;
     }
     private static boolean clearRay(Player player,Vec3 from,Vec3 to) {
+        // Nothing can occupy block space above the dimension's build height.
+        // Clip that empty prefix before DDA; a retained high-altitude lock must
+        // not walk millions of air blocks on either logical side.
+        double ceiling=player.level().getMaxBuildHeight();
+        if(from.y>ceiling){
+            if(to.y>=ceiling)return true;
+            from=from.lerp(to,(from.y-ceiling)/(from.y-to.y));
+        }
         net.minecraft.world.level.BlockGetter blocks=player.level();
         if(player.level() instanceof net.minecraft.server.level.ServerLevel level) {
             // A visibility check must not synchronously generate chunks between

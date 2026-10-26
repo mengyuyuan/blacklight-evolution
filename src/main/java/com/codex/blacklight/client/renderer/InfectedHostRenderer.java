@@ -25,6 +25,10 @@ public final class InfectedHostRenderer extends EntityRenderer<BlacklightInfecte
     @Override @SuppressWarnings({"rawtypes","unchecked"})
     public void render(BlacklightInfectedHost entity,float yaw,float partial,PoseStack stack,MultiBufferSource buffers,int light){
         DevourerFeedingFx.render(entity,partial,stack,buffers,light);
+        TissueCompetitionFx.render(entity,partial,stack,buffers,light);
+        EvolvedBodyRenderer.cocoon(entity,partial,stack,buffers,light);
+        if(entity.cannibalPrey()&&TissueCompetitionFx.active(entity))buffers=new CannibalCoverBuffers(buffers,entity,stack,partial);
+        if(entity.isEvolved()){EvolvedBodyRenderer.render(entity,partial,stack,buffers,light);super.render(entity,yaw,partial,stack,buffers,light);return;}
         var mesh=authoredMesh(entity);
         if(mesh!=null){renderAuthored(entity,mesh,yaw,partial,stack,buffers,light);return;}
         var proxy=entity.appearance();if(proxy==null)return;
@@ -34,6 +38,10 @@ public final class InfectedHostRenderer extends EntityRenderer<BlacklightInfecte
         proxy.yBodyRot=entity.yBodyRot;proxy.yBodyRotO=entity.yBodyRotO;
         proxy.yHeadRot=entity.yHeadRot;proxy.yHeadRotO=entity.yHeadRotO;
         proxy.xRotO=entity.xRotO;proxy.yRotO=entity.yRotO;
+        if(entity.organActionCore()==com.codex.blacklight.infection.TissueCore.HORN){
+            float load=com.codex.blacklight.infection.TissueOrganCycle.cycle(entity.organActionCore()).effort(entity.organActionElapsed(partial));
+            proxy.setXRot(entity.getXRot()+32*load);proxy.xRotO=entity.xRotO+32*load;
+        }
         proxy.tickCount=entity.tickCount;proxy.hurtTime=entity.hurtTime;proxy.deathTime=entity.deathTime;
         proxy.setOnGround(entity.onGround());proxy.setDeltaMovement(entity.getDeltaMovement());
         proxy.attackAnim=entity.attackAnim;proxy.oAttackAnim=entity.oAttackAnim;
@@ -49,8 +57,10 @@ public final class InfectedHostRenderer extends EntityRenderer<BlacklightInfecte
         EntityRenderer renderer=Minecraft.getInstance().getEntityRenderDispatcher().getRenderer(proxy);
         var skin=new InfectedSkinBuffers(buffers);
         stack.pushPose();DevourerFeedingFx.applyVictim(entity,partial,stack);
+        TissueCompetitionFx.apply(entity,partial,stack);
         stack.translate(0,entity.tissueStanceOffset(),0);
-        float developedScale=1.12F*entity.tissueBodyScale();stack.scale(developedScale,developedScale,developedScale);
+        float developedScale=1.12F*entity.tissueBodyScale();var frame=entity.tissueFrame();stack.scale(developedScale*frame.x,developedScale*frame.y,developedScale*frame.z);
+        if(entity.isMetamorphosing()){float reclaim=com.codex.blacklight.infection.EvolvedForm.oldBody(entity.evolvedProgress(partial));stack.scale(reclaim,reclaim,reclaim);}
         try{
             if(renderer instanceof net.minecraft.client.renderer.entity.LivingEntityRenderer living){
                 try(var morphology=new InfectedMorphology(entity,proxy,living.getModel(),renderer.getTextureLocation(proxy),stack.last(),partial)){
@@ -68,7 +78,7 @@ public final class InfectedHostRenderer extends EntityRenderer<BlacklightInfecte
                 &&prey.isAlive()&&prey.distanceToSqr(entity)<=48*48
                 &&camera.isVisible(entity.getBoundingBox().minmax(prey.getBoundingBox()).inflate(3)))return true;
         var mesh=authoredMesh(entity);
-        if(mesh==null)return entity.shouldRender(x,y,z)&&(entity.noCulling||camera.isVisible(entity.getBoundingBox().inflate(.65+entity.tissueOrganReach())));
+        if(mesh==null)return entity.shouldRender(x,y,z)&&(entity.noCulling||camera.isVisible(entity.getBoundingBox().inflate((entity.tissueInheritance().sources().isEmpty()?.65:3)+entity.tissueOrganReach())));
         double scale=scale(entity,mesh);
         var bounds=mesh.bounds();
         double radius=Math.hypot(Math.max(Math.abs(bounds.minX),Math.abs(bounds.maxX)),

@@ -11,34 +11,47 @@ import java.util.*;
 /** Temporary control ends on recovery, capture, removal or server stop. Never changes NoAI. */
 @EventBusSubscriber(modid="blacklight")
 public final class ImpactControl {
-    private record Control(boolean knockdown,long flightStarted,boolean airborne){}
+    private record Control(boolean knockdown,long flightStarted,boolean airborne,boolean consume){}
     private static final Map<Mob,Control> ACTIVE=new IdentityHashMap<>();
     private ImpactControl(){}
-    public static void begin(LivingEntity entity,ImpactProfile profile,float yaw){
-        if(entity.isRemoved()){if(entity instanceof Mob mob)ACTIVE.remove(mob);return;}
-        if(entity instanceof com.codex.blacklight.entity.BlacklightHive){cancel(entity);return;}
-        if(ConsumeSystem.grappleProtected(entity)||ModAttachments.peekData(entity, ModAttachments.CONSUME_VISUAL, ConsumeVisual.EMPTY).active())return;
+    /** A confirmed low-health consume opening; uses the existing transient AI and hit-pose controller. */
+    public static boolean consumeOpening(Mob mob,float yaw){
+        if(mob.level().isClientSide||!mob.isAlive()||mob.isRemoved()||mob instanceof com.codex.blacklight.entity.BlacklightHive
+                ||ConsumeSystem.grappleProtected(mob)||ModAttachments.peekData(mob,ModAttachments.CONSUME_VISUAL,ConsumeVisual.EMPTY).active())return false;
+        long now=mob.level().getGameTime();ACTIVE.put(mob,new Control(false,now,!mob.onGround(),true));
+        mob.getNavigation().stop();mob.setXxa(0);mob.setZza(0);mob.setDeltaMovement(mob.getDeltaMovement().multiply(.15,1,.15));
+        publish(mob,new HitReaction(now,40,HitReaction.STAGGER,yaw,ImpactProfile.BODY));return true;
+    }
+    public static boolean begin(LivingEntity entity,ImpactProfile profile,float yaw){
+        if(entity.isRemoved()){if(entity instanceof Mob mob)ACTIVE.remove(mob);return false;}
+        if(entity instanceof com.codex.blacklight.entity.BlacklightHive){cancel(entity);return false;}
+        if(ConsumeSystem.grappleProtected(entity)||ModAttachments.peekData(entity, ModAttachments.CONSUME_VISUAL, ConsumeVisual.EMPTY).active())return false;
+        if(entity instanceof Mob mob){stunned(mob);var control=ACTIVE.get(mob);if(control!=null&&control.consume())return false;}
         boolean hunterLight=entity instanceof com.codex.blacklight.entity.BlacklightHunter
                 &&profile.kind()==HitReaction.STAGGER&&!profile.knockdown()&&entity.isAlive();
-        if(hunterLight&&!((com.codex.blacklight.entity.BlacklightHunter)entity).acceptLightStagger())return;
+        if(hunterLight&&!((com.codex.blacklight.entity.BlacklightHunter)entity).acceptLightStagger())return false;
+        boolean evolved=entity.isAlive()&&entity instanceof com.codex.blacklight.entity.BlacklightInfectedHost host&&host.isEvolved();
+        if(evolved&&!((com.codex.blacklight.entity.BlacklightInfectedHost)entity).acceptEvolvedImpact())return false;
         cancel(entity);
         if(!entity.isAlive()){
-            publish(entity,new HitReaction(entity.level().getGameTime(),20,HitReaction.DEATH,yaw,ImpactProfile.FALL));return;
+            publish(entity,new HitReaction(entity.level().getGameTime(),20,HitReaction.DEATH,yaw,ImpactProfile.FALL));return true;
         }
         // Colossal bodies retain basic AI and gravity under ordinary player hits.
         // Their authored stagger/knockdown windows belong to the later boss moveset.
-        if(entity instanceof com.codex.blacklight.entity.BlacklightInfectedHost host&&host.giantBoss())return;
+        if(entity instanceof com.codex.blacklight.entity.BlacklightInfectedHost host&&host.giantBoss())return false;
         if(entity instanceof Mob mob){
-            ACTIVE.put(mob,new Control(profile.knockdown(),entity.level().getGameTime(),!entity.onGround()));
+            ACTIVE.put(mob,new Control(profile.knockdown(),entity.level().getGameTime(),!entity.onGround(),false));
             mob.getNavigation().stop();mob.setXxa(0);mob.setZza(0);
         }
         int duration=profile.stun();
+        if(evolved)duration=profile.kind()==HitReaction.STAGGER?com.codex.blacklight.infection.EvolvedPoise.LIGHT_TICKS:com.codex.blacklight.infection.EvolvedPoise.HEAVY_TICKS;
         if(entity instanceof com.codex.blacklight.entity.BlacklightHunter){
             var source=ReceiverMotions.clip(ReceiverMotions.hitKey(entity,profile.kind(),profile.motion()));
             if(hunterLight)duration=HunterBalance.LIGHT_STAGGER_TICKS;
             else if(source!=null)duration=Math.max(duration,Math.clamp(Math.round(source.seconds()*20),10,70));
         }
         publish(entity,new HitReaction(entity.level().getGameTime(),duration,profile.kind(),yaw,profile.motion()));
+        return true;
     }
     private static void publish(LivingEntity entity,HitReaction state){entity.setData(ModAttachments.HIT_REACTION,state);entity.syncData(ModAttachments.HIT_REACTION);}
     public static void cancel(LivingEntity entity){
@@ -46,17 +59,29 @@ public final class ImpactControl {
         if(entity.isRemoved())return;
         if(ModAttachments.peekData(entity, ModAttachments.HIT_REACTION, HitReaction.EMPTY).duration()>0)publish(entity,HitReaction.EMPTY);
     }
-    public static boolean stunned(Mob mob){return !mob.level().isClientSide&&ACTIVE.containsKey(mob);}
+    public static boolean stunned(Mob mob){
+        if(mob.level().isClientSide)return false;var control=ACTIVE.get(mob);if(control==null)return false;
+        var hit=ModAttachments.peekData(mob,ModAttachments.HIT_REACTION,HitReaction.EMPTY);long now=mob.level().getGameTime();
+        boolean evolvedLimit=!control.consume()&&mob instanceof com.codex.blacklight.entity.BlacklightInfectedHost host&&host.isEvolved()
+                &&now-control.flightStarted()>=com.codex.blacklight.infection.EvolvedPoise.MAX_CONTROL_TICKS;
+        if(!mob.isAlive()||mob.isRemoved()||hit.duration()<=0||now-control.flightStarted()>80||evolvedLimit
+                ||!control.knockdown()&&now-hit.started()>=hit.duration()){
+            cancel(mob);return false;
+        }
+        return true;
+    }
     @SubscribeEvent public static void tick(EntityTickEvent.Post event){
         if(!(event.getEntity() instanceof Mob mob)||mob.level().isClientSide)return;
         if(mob.isRemoved()){ACTIVE.remove(mob);return;}
         var control=ACTIVE.get(mob);if(control==null)return;
-        if(!mob.onGround()&&!control.airborne()){control=new Control(control.knockdown(),control.flightStarted(),true);ACTIVE.put(mob,control);}
+        if(!mob.onGround()&&!control.airborne()){control=new Control(control.knockdown(),control.flightStarted(),true,control.consume());ACTIVE.put(mob,control);}
         var hit=ModAttachments.peekData(mob, ModAttachments.HIT_REACTION, HitReaction.EMPTY);long now=mob.level().getGameTime(),age=now-hit.started();
         if(ModAttachments.peekData(mob, ModAttachments.CONSUME_VISUAL, ConsumeVisual.EMPTY).active()){cancel(mob);return;}
         if(!mob.isAlive()){
             float yaw=hit.yaw();cancel(mob);publish(mob,new HitReaction(now,20,HitReaction.DEATH,yaw,ImpactProfile.FALL));return;
         }
+        if(!control.consume()&&mob instanceof com.codex.blacklight.entity.BlacklightInfectedHost host&&host.isEvolved()
+                &&now-control.flightStarted()>=com.codex.blacklight.infection.EvolvedPoise.MAX_CONTROL_TICKS){cancel(mob);return;}
         mob.getNavigation().stop();mob.setXxa(0);mob.setZza(0);
         if(hit.kind()==HitReaction.DOWN){
             var v=mob.getDeltaMovement();mob.setDeltaMovement(v.x*.45,v.y,v.z*.45);

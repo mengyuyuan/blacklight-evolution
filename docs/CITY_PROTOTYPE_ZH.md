@@ -1,5 +1,7 @@
 # 城市维度样板（NeoForge 1.21.1 / Forge 1.20.1）
 
+洛杉矶市全域已按 Arnis 建筑、楼层和程序化室内规格接入同一黑光维度，提供市政中心、好莱坞、山谷、机场、海滨和港区入口；范围和来源见 [洛杉矶说明](worldgen/LOS_ANGELES_SOURCES.md)。
+
 本文记录旧版 `blacklight:city` 福田样板。NeoForge 的默认入口已升级到
 `blacklight:world` 全市深圳地理地图，见 [全市地图说明](worldgen/SHENZHEN_SOURCES.md)
 和 [world.3 整合记录](worldgen/WORLD_3_INTEGRATION.md)。Forge 仍以其对应分支为准。

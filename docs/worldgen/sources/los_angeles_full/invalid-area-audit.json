@@ -1,0 +1,240 @@
+{
+  "failedAreas": [
+    {
+      "relation": 207884,
+      "error": "invalid area (area_id=415769)",
+      "tags": {
+        "attribution": "CASIL CSP_Opbdys072008",
+        "boundary": "protected_area",
+        "csp:globalid": "{5BC85163-741D-4F3A-96B0-B3D9B2E6FE3F}",
+        "csp:unitcode": "619",
+        "leisure": "nature_reserve",
+        "name": "Mount San Jacinto State Wilderness",
+        "ownership": "state",
+        "protected_area": "wilderness_preserve",
+        "type": "boundary"
+      },
+      "memberWays": 11,
+      "missingWays": [],
+      "memberBounds": [
+        -116.727955,
+        33.7584369,
+        -116.6154621,
+        33.8313516
+      ],
+      "intersectsCity": false
+    },
+    {
+      "relation": 11963646,
+      "error": "invalid area (area_id=23927293)",
+      "tags": {
+        "addr:county": "Kern",
+        "attribution": "Farmland Mapping and Monitoring Program",
+        "landuse": "farmland",
+        "source": "http://www.consrv.ca.gov/dlrp/fmmp/products/Pages/DownloadGISdata.aspx",
+        "type": "multipolygon"
+      },
+      "memberWays": 37,
+      "missingWays": [],
+      "memberBounds": [
+        -119.208654,
+        35.115329,
+        -118.9983634,
+        35.2671256
+      ],
+      "intersectsCity": false
+    },
+    {
+      "relation": 19292722,
+      "error": "invalid area (area_id=38585445)",
+      "tags": {
+        "natural": "scrub",
+        "note": "Split from previous larger Scrub area",
+        "type": "multipolygon"
+      },
+      "memberWays": 14,
+      "missingWays": [],
+      "memberBounds": [
+        -118.0107564,
+        34.1506426,
+        -117.8376308,
+        34.3284131
+      ],
+      "intersectsCity": false
+    },
+    {
+      "relation": 12418600,
+      "error": "invalid area (area_id=24837201)",
+      "tags": {
+        "boundary": "protected_area",
+        "leisure": "nature_reserve",
+        "name": "Mount Clef Ridge Open Space",
+        "operator": "Conejo Open Space Conservation Agency",
+        "operator:wikidata": "Q97575610",
+        "type": "boundary"
+      },
+      "memberWays": 19,
+      "missingWays": [],
+      "memberBounds": [
+        -118.885791,
+        34.2262381,
+        -118.8664536,
+        34.2396479
+      ],
+      "intersectsCity": false
+    },
+    {
+      "relation": 14277154,
+      "error": "invalid area (area_id=28554309)",
+      "tags": {
+        "natural": "scrub",
+        "type": "multipolygon"
+      },
+      "memberWays": 63,
+      "missingWays": [],
+      "memberBounds": [
+        -118.8409963,
+        34.1801418,
+        -118.6379264,
+        34.2633292
+      ],
+      "intersectsCity": true
+    },
+    {
+      "relation": 20018599,
+      "error": "invalid area (area_id=40037199)",
+      "tags": {
+        "addr:city": "San Diego",
+        "addr:housenumber": "1475",
+        "addr:postcode": "92101",
+        "addr:state": "CA",
+        "addr:street": "Island Avenue",
+        "building": "apartments",
+        "building:levels": "45",
+        "building:part": "apartments",
+        "height": "146",
+        "layer": "45",
+        "name": "Spire",
+        "tower": "yes",
+        "type": "multipolygon"
+      },
+      "memberWays": 2,
+      "missingWays": [],
+      "memberBounds": [
+        -117.1512519,
+        32.710078,
+        -117.1507356,
+        32.7103393
+      ],
+      "intersectsCity": false
+    },
+    {
+      "relation": 16741092,
+      "error": "invalid area (area_id=33482185)",
+      "tags": {
+        "admin_level": "10",
+        "boundary": "administrative",
+        "name": "West Hills Neighborhood Council District",
+        "place": "borough",
+        "source:url": "https://empowerla.org/city-map/",
+        "type": "boundary"
+      },
+      "memberWays": 16,
+      "missingWays": [],
+      "memberBounds": [
+        -118.6681798,
+        34.1837562,
+        -118.6027081,
+        34.2354634
+      ],
+      "intersectsCity": true
+    },
+    {
+      "relation": 17887583,
+      "error": "invalid area (area_id=35775167)",
+      "tags": {
+        "area": "yes",
+        "highway": "pedestrian",
+        "ref": "USH Enterance Plaza West",
+        "type": "multipolygon",
+        "wheelchair": "yes"
+      },
+      "memberWays": 4,
+      "missingWays": [],
+      "memberBounds": [
+        -118.3562512,
+        34.1366568,
+        -118.3555446,
+        34.1376376
+      ],
+      "intersectsCity": false
+    },
+    {
+      "relation": 13508653,
+      "error": "invalid area (area_id=27017307)",
+      "tags": {
+        "highway": "pedestrian",
+        "layer": "0",
+        "ref": "Citywalk Footway",
+        "type": "multipolygon"
+      },
+      "memberWays": 4,
+      "missingWays": [],
+      "memberBounds": [
+        -118.3561275,
+        34.1362857,
+        -118.3511513,
+        34.1367193
+      ],
+      "intersectsCity": false
+    },
+    {
+      "relation": 17463174,
+      "error": "invalid area (area_id=34926349)",
+      "tags": {
+        "boundary": "place",
+        "name": "Southern California",
+        "name:ja": "南カリフォルニア",
+        "place": "region",
+        "short_name": "SoCal",
+        "type": "boundary",
+        "wikidata": "Q844837",
+        "wikimedia_commons": "Category:Southern California",
+        "wikipedia": "en:Southern California"
+      },
+      "memberWays": 186,
+      "missingWays": [],
+      "memberBounds": [
+        -121.438176,
+        32.5295236,
+        -114.1307816,
+        35.8092129
+      ],
+      "intersectsCity": true
+    },
+    {
+      "relation": 21086424,
+      "error": "invalid area (area_id=42172849)",
+      "tags": {
+        "generator:method": "photovoltaic",
+        "generator:output:electricity": "yes",
+        "generator:source": "solar",
+        "generator:type": "solar_photovoltaic_panel",
+        "location": "roof",
+        "power": "generator",
+        "type": "multipolygon"
+      },
+      "memberWays": 2,
+      "missingWays": [],
+      "memberBounds": [
+        -117.8542655,
+        33.7385303,
+        -117.8540623,
+        33.7390329
+      ],
+      "intersectsCity": false
+    }
+  ],
+  "totalFailures": 11,
+  "withinCity": 3
+}

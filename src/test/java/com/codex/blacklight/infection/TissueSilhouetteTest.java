@@ -43,6 +43,7 @@ class TissueSilhouetteTest {
     @Test void secondaryArmourDoesNotFillEveryHostWithTheEntireOrganKit(){
         var torso=new Bone("body",0,new Box(new V(-4,0,-2),new V(4,12,2)),UP,FRONT,RIGHT,new V(0,6,0));
         for(var core:TissueCore.values()){
+            if(!core.legacy())continue;
             long seed=0;while(TissueCore.forSeed(seed)!=core)seed++;
             var plan=generate(seed,List.of(torso),true);
             long ribs=plan.regions().getFirst().meshes().stream().filter(m->m.name().startsWith("costal_arch")).count();

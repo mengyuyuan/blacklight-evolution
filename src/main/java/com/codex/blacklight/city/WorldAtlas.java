@@ -5,6 +5,7 @@ import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.zip.GZIPInputStream;
+import com.codex.blacklight.util.MapResources;
 
 /** Frozen geographic data, shared by all saves. No network, world access or mutable block data. */
 final class WorldAtlas {
@@ -24,15 +25,22 @@ final class WorldAtlas {
         return (int)Math.round(delta*LON_METRES);
     }
     static int worldZ(double latitude){return (int)Math.round((ORIGIN_LAT-latitude)*LAT_METRES);}
+    /** Identity uses the small atlas index; it never loads a terrain tile or chunk. */
+    static String regionId(int x,int z){
+        var cell=new Cell(Math.floorDiv(x,TILE),Math.floorDiv(z,TILE));
+        for(var region:REGIONS)if(region.cells.contains(cell))return region.id;
+        return "wilderness";
+    }
     static String fingerprint(){return digest(REGIONS.stream().map(r->r.id+":"+r.fingerprint).reduce("",(a,b)->a+"\n"+b));}
     private static String digest(String text){
         try{return HexFormat.of().formatHex(java.security.MessageDigest.getInstance("SHA-256").digest(text.getBytes(StandardCharsets.UTF_8)));}
         catch(java.security.NoSuchAlgorithmException e){throw new IllegalStateException(e);}
     }
     private static JsonObject json(String path,boolean gzip){
-        try(var raw=WorldAtlas.class.getResourceAsStream("/data/blacklight/worldmap/"+path)){
+        String name="/data/blacklight/worldmap/"+path;
+        try(var raw=gzip?MapResources.open(WorldAtlas.class,name):WorldAtlas.class.getResourceAsStream(name)){
             if(raw==null)throw new IOException("Missing bundled map: "+path);
-            try(var reader=new InputStreamReader(gzip?new GZIPInputStream(raw):raw,StandardCharsets.UTF_8)){
+            try(var reader=new InputStreamReader(raw,StandardCharsets.UTF_8)){
                 return JsonParser.parseReader(reader).getAsJsonObject();
             }
         }catch(IOException e){throw new IllegalStateException("Cannot read bundled world atlas",e);}

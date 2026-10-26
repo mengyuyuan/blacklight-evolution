@@ -1,0 +1,10 @@
+{
+  "coverageSHA256": "077c1f6d631b8b88b5b8cc19b46a6fc976bc9bd5bc4007d8f3c7ec2c077b515d",
+  "sourceRandomSamples": 1000000,
+  "municipalInteriorSamplesChecked": 382572,
+  "boundaryVerticesChecked": 3290,
+  "fixedWorldProjectionSamplesChecked": 382546,
+  "missingNativeChunks": 0,
+  "requiredNativeChunks": 5344322,
+  "regions": 5732
+}

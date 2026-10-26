@@ -5,6 +5,7 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import java.util.concurrent.CompletableFuture;
 import net.minecraft.core.*;
 import net.minecraft.world.level.*;
+import net.minecraft.world.level.block.EntityBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.*;
 import net.minecraft.world.level.levelgen.*;
@@ -37,6 +38,12 @@ public final class BlacklightWorldGenerator extends FlatLevelSource {
             for(int y=Math.max(0,chunk.getMinBuildHeight());y<=top;y++){
                 BlockState state=column.state(y);if(state.isAir())continue;
                 chunk.setBlockState(pos.set(bx+x,y,bz+z),state,false);
+                // ProtoChunk does not create these itself. Furniture needs an empty vanilla
+                // block entity; source-world entity NBT and inventories are never imported.
+                if(state.hasBlockEntity()&&state.getBlock() instanceof EntityBlock factory){
+                    var entity=factory.newBlockEntity(pos.immutable(),state);
+                    if(entity!=null)chunk.setBlockEntity(entity);
+                }
                 if(Heightmap.Types.WORLD_SURFACE_WG.isOpaque().test(state)){surfaceY=y;surfaceState=state;}
                 if(Heightmap.Types.OCEAN_FLOOR_WG.isOpaque().test(state)){floorY=y;floorState=state;}
             }

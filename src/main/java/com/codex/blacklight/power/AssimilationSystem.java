@@ -18,7 +18,10 @@ import net.neoforged.neoforge.event.entity.living.LivingDamageEvent;
 public final class AssimilationSystem {
     private static final String SETTLED="BlacklightAssimilationSettled";
     private static final ResourceLocation CREST=ResourceLocation.fromNamespaceAndPath("blacklight","organ_crest");
-    public record Yield(float healing,int biomass,int ep,TissueCore core,int quality) {}
+    public record Yield(float healing,int biomass,int ep,TissueCore core,int quality,java.util.Map<TissueCore,Integer> samples) {
+        public Yield { samples=java.util.Map.copyOf(samples); }
+        public Yield(float healing,int biomass,int ep,TissueCore core,int quality){this(healing,biomass,ep,core,quality,core==null?java.util.Map.of():java.util.Map.of(core,quality));}
+    }
     private AssimilationSystem(){}
     public static boolean tissue(Mob target){return target instanceof BlacklightInfectedHost h&&!h.hasMultipartBody()&&!h.devourerIdentity();}
     public static boolean ready(LivingEntity target){
@@ -31,16 +34,24 @@ public final class AssimilationSystem {
         boolean hunter=target instanceof BlacklightHunter;
         float health=CombatScale.originalMaximum(target);if(!Float.isFinite(health)||health<0)health=0;
         float heal=hunter?8:Math.clamp(health*.2F,2,6);
+        if(target instanceof BlacklightCommonInfected)
+            heal=Math.max(heal,(float)(p.getMaxHealth()/CombatScale.units(p)*OutbreakConfig.COMMON_HEAL.get()));
         heal*=ConsumeProgression.healingMultiplier(p.getData(ModAttachments.GROWTH));
         int biomass=hunter?120:(int)Math.clamp(health*2,10,60),ep=hunter?30:target.getType().is(com.codex.blacklight.combat.ConsumeSystem.PASSIVE)?2:10;
         TissueCore core=null;int quality=0;
         if(tissue(target)){
             var host=(BlacklightInfectedHost)target;float factor=TissueCore.yieldMultiplier(host.tissueAge());
             heal*=factor;biomass=Math.round(biomass*factor);ep=Math.round(ep*factor);
-            core=TissueCore.forSeed(TissueOrgans.seed(host.getUUID()));quality=TissueCore.quality(host.tissueAge());
+            core=host.knownNativeTissueCore();quality=core==null?0:TissueCore.quality(host.tissueAge());
         }
         int jaw=rank(p,TissueCore.JAW);heal*=1+.1F*jaw;biomass=Math.round(biomass*(1+.05F*jaw));
-        return new Yield(heal,biomass,ep,core,quality);
+        var samples=new java.util.EnumMap<TissueCore,Integer>(TissueCore.class);
+        if(core!=null&&quality>0)samples.put(core,quality);
+        if(tissue(target))for(var entry:((BlacklightInfectedHost)target).tissueInheritance().organs().entrySet()){
+            var organ=entry.getValue();
+            if(organ.mature()&&organ.integrated()>=100)samples.merge(entry.getKey(),(int)Math.min(3,Math.floor(organ.integrated()/100)),Math::max);
+        }
+        return new Yield(heal,biomass,ep,core,quality,samples);
     }
     /** Called only after successful execution/removal. A cancelled attempt pays nothing. */
     public static boolean settle(ServerPlayer p,Mob target,Yield reward,boolean heal){
@@ -48,13 +59,15 @@ public final class AssimilationSystem {
                 ||target.isAlive()&&!target.isRemoved()&&!(target instanceof BlacklightHunter hunter&&hunter.isBeingConsumed()))return false;
         target.getPersistentData().putBoolean(SETTLED,true);
         var research=p.getData(ModAttachments.ORGAN_RESEARCH);int bonus=0;
-        if(reward.core()!=null&&reward.quality()>research.sample(reward.core())){
-            int previous=research.sample(reward.core());
-            for(int rank=previous+1;rank<=reward.quality();rank++)bonus+=40*rank;
-            research=research.discover(reward.core(),reward.quality());
-            p.setData(ModAttachments.ORGAN_RESEARCH,research);p.syncData(ModAttachments.ORGAN_RESEARCH);
-            p.displayClientMessage(Component.translatable("message.blacklight.organ_discovered",Component.translatable("upgrade.blacklight."+reward.core().id),reward.quality(),bonus),false);
+        for(var entry:reward.samples().entrySet()){
+            var core=entry.getKey();int quality=Math.clamp(entry.getValue(),0,3);
+            if(quality<=research.sample(core))continue;
+            int previous=research.sample(core),sampleBonus=0;
+            for(int rank=previous+1;rank<=quality;rank++)sampleBonus+=40*rank;
+            bonus+=sampleBonus;research=research.discover(core,quality);
+            p.displayClientMessage(Component.translatable("message.blacklight.organ_discovered",Component.translatable("upgrade.blacklight."+core.id),quality,sampleBonus),false);
         }
+        if(research!=p.getData(ModAttachments.ORGAN_RESEARCH)){p.setData(ModAttachments.ORGAN_RESEARCH,research);p.syncData(ModAttachments.ORGAN_RESEARCH);}
         var state=p.getData(ModAttachments.PLAYER_STATE);state.addBiomass(reward.biomass());state.addEvolutionPoints(reward.ep()+bonus);
         p.syncData(ModAttachments.PLAYER_STATE);GrowthSystem.consumed(p,target);
         if(heal)CriticalMassSystem.healFromConsume(p,reward.healing());
@@ -63,6 +76,8 @@ public final class AssimilationSystem {
     public static int rank(Player player,TissueCore core){return ModAttachments.peekData(player,ModAttachments.ORGAN_RESEARCH,com.codex.blacklight.state.OrganResearch.EMPTY).rank(core);}
     public static double grabBonus(Player player){return .5*rank(player,TissueCore.GRASP);}
     public static void purchase(ServerPlayer p,TissueCore core){
+        // The seven new entries currently drive infected-host anatomy/AI. Do not sell an unimplemented player skill.
+        if(!core.legacy())return;
         var state=p.getData(ModAttachments.PLAYER_STATE);var progress=p.getData(ModAttachments.ORGAN_RESEARCH);
         int price=TissueCore.cost(progress.rank(core)+1);
         if(!p.isAlive()||p.isSpectator()||!state.isInfected()||!progress.canBuy(core)||state.getEvolutionPoints()<price)return;
@@ -74,11 +89,12 @@ public final class AssimilationSystem {
     @SubscribeEvent public static void damage(LivingDamageEvent.Pre event){
         if(event.getEntity().level().isClientSide||event.getNewDamage()<=0)return;
         float amount=event.getNewDamage();
+        boolean trueDamage=com.codex.blacklight.combat.DevastatorDamage.isTrueDamage(event.getSource());
         if(event.getEntity() instanceof BlacklightInfectedHost h&&tissue(h)&&TissueCore.quality(h.tissueAge())>=2&&h.tissueCoreFracture()<1
-                &&!event.getSource().is(net.minecraft.tags.DamageTypeTags.BYPASSES_INVULNERABILITY))
-            amount*=TissueCore.forSeed(TissueOrgans.seed(h.getUUID()))==TissueCore.CARAPACE?.65F:.85F;
+                &&!event.getSource().is(net.minecraft.tags.DamageTypeTags.BYPASSES_INVULNERABILITY)&&!trueDamage)
+            amount*=h.nativeTissueCore()==TissueCore.CARAPACE?.65F:.85F;
         if(event.getSource().getEntity() instanceof Player p&&event.getSource().getDirectEntity()==p&&active(p))amount*=1+.05F*rank(p,TissueCore.MUSCLE);
-        if(event.getEntity() instanceof Player p&&active(p)&&!event.getSource().is(net.minecraft.tags.DamageTypeTags.BYPASSES_INVULNERABILITY))amount*=1-.05F*rank(p,TissueCore.CARAPACE);
+        if(event.getEntity() instanceof Player p&&active(p)&&!event.getSource().is(net.minecraft.tags.DamageTypeTags.BYPASSES_INVULNERABILITY)&&!trueDamage)amount*=1-.05F*rank(p,TissueCore.CARAPACE);
         event.setNewDamage(amount);
     }
 }

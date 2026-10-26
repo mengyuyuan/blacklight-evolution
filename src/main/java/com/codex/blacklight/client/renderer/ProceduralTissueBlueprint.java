@@ -2,9 +2,12 @@ package com.codex.blacklight.client.renderer;
 
 import com.codex.blacklight.client.animation.ReceiverModelPose;
 import com.codex.blacklight.infection.TissueMorphogenesis;
+import com.codex.blacklight.infection.TissueChimera;
 import com.codex.blacklight.mixin.client.AgeableModelAccessor;
 import com.codex.blacklight.mixin.client.ModelPartChildrenAccessor;
 import com.google.gson.*;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.model.*;
 import net.minecraft.client.model.geom.ModelPart;
 import org.joml.*;
@@ -13,9 +16,61 @@ import java.util.*;
 /** Reads real bind geometry. Registry/species names never select organ geometry. */
 final class ProceduralTissueBlueprint {
     record Definition(JsonObject source,Map<String,ModelPart> parts) {}
+    record Snapshot(TissueChimera.Body body,ModelPart anchor,Matrix4f bind,TissueMorphogenesis.Box anchorBox,Map<ModelPart,Matrix4f> transforms,Map<String,ModelPart> paths) {}
+    private static final Map<EntityModel<?>,Snapshot> NATIVE=new WeakHashMap<>();
+    static void reloadNative(){NATIVE.clear();}
+    /** Read immutable native bind geometry, including muzzle, horns and limb proportions. */
+    static Snapshot snapshot(EntityModel<?> model){return NATIVE.computeIfAbsent(model,ProceduralTissueBlueprint::snapshotNative);}
+    private static Snapshot snapshotNative(EntityModel<?> model){
+        Map<String,ModelPart> parts=new TreeMap<>();Map<ModelPart,Matrix4f> bind=new IdentityHashMap<>();
+        var root=ReceiverModelPose.root(model);
+        if(root!=null)collect(root,"root",new Matrix4f(),parts,bind);
+        else if(model instanceof HumanoidModel<?> h){
+            collect(h.body,"body",new Matrix4f(),parts,bind);collect(h.head,"head",new Matrix4f(),parts,bind);
+            collect(h.rightArm,"right_arm",new Matrix4f(),parts,bind);collect(h.leftArm,"left_arm",new Matrix4f(),parts,bind);
+            collect(h.rightLeg,"right_leg",new Matrix4f(),parts,bind);collect(h.leftLeg,"left_leg",new Matrix4f(),parts,bind);
+        }else if(model instanceof AgeableModelAccessor a){int i=0;for(var p:a.blacklight$heads())collect(p,"head_"+i++,new Matrix4f(),parts,bind);i=0;for(var p:a.blacklight$body())collect(p,"body_"+i++,new Matrix4f(),parts,bind);}
+        var anatomy=ConsumeAnatomy.model(model);var result=new ArrayList<TissueChimera.Part>();ModelPart anchor=null;TissueMorphogenesis.Box anchorBox=null;float best=-1;
+        for(var entry:parts.entrySet()){
+            String path=entry.getKey();if(path.matches(".*(?:^|/)(?:hat|jacket|.*sleeve|.*pants|armor|armour|overlay)(?:/.*)?$"))continue;
+            ModelPart part=entry.getValue();Matrix4f matrix=bind.get(part);int role=TissueChimera.appendageRole(path,anatomy.getOrDefault(part,TissueMorphogenesis.semanticRole(path.substring(path.lastIndexOf('/')+1))));
+            int index=0;for(var cube:((ModelPartChildrenAccessor)(Object)part).blacklight$cubes()){
+                if(index>=24||result.size()>=192)break;
+                if(cube.maxX-cube.minX<.02F||cube.maxY-cube.minY<.02F||cube.maxZ-cube.minZ<.02F)continue;
+                var points=new ArrayList<TissueMorphogenesis.V>();var faces=new ArrayList<int[]>();var uv=new ArrayList<float[]>();
+                cube.compile(new PoseStack().last(),new VertexConsumer(){
+                    final float[] current=new float[8];int count;
+                    @Override public void addVertex(float x,float y,float z,int color,float u,float v,int overlay,int light,float nx,float ny,float nz){
+                        points.add(value(matrix.transformPosition(new Vector3f(x*16,y*16,z*16))));current[count*2]=u;current[count*2+1]=v;
+                        if(++count==4){int start=points.size()-4;faces.add(new int[]{start,start+1,start+2,start+3});uv.add(current.clone());count=0;}
+                    }
+                    @Override public VertexConsumer addVertex(float x,float y,float z){throw new UnsupportedOperationException("Native cube must supply full vertices");}
+                    @Override public VertexConsumer setColor(int a,int b,int c,int d){return this;}
+                    @Override public VertexConsumer setUv(float u,float v){return this;}
+                    @Override public VertexConsumer setUv1(int u,int v){return this;}
+                    @Override public VertexConsumer setUv2(int u,int v){return this;}
+                    @Override public VertexConsumer setNormal(float x,float y,float z){return this;}
+                },0,0,-1);
+                var box=TissueChimera.bounds(points);
+                // Muzzle, horns and child meshes rotate with their actual head/shoulder joint.
+                final int semantic=role;var joint=role>0&&role<=5?parts.entrySet().stream()
+                        .filter(e->(path.equals(e.getKey())||path.startsWith(e.getKey()+"/"))&&anatomy.getOrDefault(e.getValue(),-1)==semantic)
+                        .min(Comparator.comparingInt(e->e.getKey().length())).map(Map.Entry::getValue).orElse(part):part;
+                var pivot=value(bind.get(joint).transformPosition(new Vector3f()));
+                result.add(new TissueChimera.Part(path+"#"+index++,role,pivot,List.copyOf(points),List.copyOf(faces),List.copyOf(uv)));
+                float volume=(cube.maxX-cube.minX)*(cube.maxY-cube.minY)*(cube.maxZ-cube.minZ);
+                if(role==0&&volume>best){best=volume;anchor=part;anchorBox=box;}
+            }
+        }
+        if(result.isEmpty()||anchor==null)return null;
+        return new Snapshot(new TissueChimera.Body(List.copyOf(result),TissueChimera.bounds(result.stream().flatMap(p->p.vertices().stream()).toList()),anchorBox),anchor,new Matrix4f(bind.get(anchor)),anchorBox,Map.copyOf(bind),Map.copyOf(parts));
+    }
     private record Secondary(TissueMorphogenesis.Bone bone,ModelPart part,int cubeSlot) {}
     private ProceduralTissueBlueprint(){}
     static Definition generate(EntityModel<?> model,int variant,boolean coat) {
+        return generate(model,variant,coat,-1);
+    }
+    static Definition generate(EntityModel<?> model,int variant,boolean coat,int donorPlan) {
         Map<String,ModelPart> parts=new TreeMap<>();Map<ModelPart,Matrix4f> bind=new IdentityHashMap<>();
         var root=ReceiverModelPose.root(model);
         if(root!=null)collect(root,"root",new Matrix4f(),parts,bind);
@@ -38,7 +93,7 @@ final class ProceduralTissueBlueprint {
             if(cube==null)continue;
             var box=new TissueMorphogenesis.Box(new TissueMorphogenesis.V(cube.minX,cube.minY,cube.minZ),new TissueMorphogenesis.V(cube.maxX,cube.maxY,cube.maxZ));
             var inverse=new Matrix4f(bind.get(part)).invert();
-            int role=TissueMorphogenesis.semanticRole(name);
+            int role=TissueChimera.appendageRole(path,TissueMorphogenesis.semanticRole(name));
             if(root==null&&model instanceof AgeableModelAccessor&&!(model instanceof HumanoidModel<?>))role=anatomy.getOrDefault(part,role);
             // A neck and a muzzle follow the head, but are not additional heads.
             if(name.contains("neck")||name.equals("head_parts"))role=0;
@@ -61,7 +116,7 @@ final class ProceduralTissueBlueprint {
                 }
             }
         }
-        var plan=TissueMorphogenesis.generate(variant,bones,!coat);
+        var plan=TissueMorphogenesis.generate(variant,bones,!coat,donorPlan);
         var source=new JsonObject();source.addProperty("format",1);source.addProperty("procedural",true);
         source.addProperty("organCount",plan.organs());var regions=new Gson().toJsonTree(plan.regions()).getAsJsonArray();int faces=plan.faces();
         for(var extra:secondary) {

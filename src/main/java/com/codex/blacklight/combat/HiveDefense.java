@@ -16,7 +16,7 @@ public final class HiveDefense {
         // type tagged bypasses_armor/invulnerability must not become a hive killer.
         if (source.is(DamageTypes.GENERIC_KILL) || source.is(DamageTypes.FELL_OUT_OF_WORLD)) return true;
         if (!(source.getEntity() instanceof Player player) || !PrototypeMetabolism.active(player)) return false;
-        return source.is(BulletdiveDamage.TYPE) || source.is(DamageTypes.PLAYER_ATTACK)
+        return DevastatorDamage.isTrueDamage(source) || source.is(DamageTypes.PLAYER_ATTACK)
                 && source.getDirectEntity() == player && !source.is(DamageTypeTags.IS_PROJECTILE);
     }
     public static float chipDamage(float incoming) {

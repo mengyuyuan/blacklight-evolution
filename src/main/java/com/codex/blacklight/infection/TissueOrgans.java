@@ -13,6 +13,9 @@ public final class TissueOrgans {
     public static long seed(java.util.UUID id) { return id.getMostSignificantBits() ^ id.getLeastSignificantBits(); }
     public static int count(long seed) { return 4 + (TissueGrowth.sample(seed, 91) > .55F ? 1 : 0); }
     public static Organ organ(long seed, long age, int slot) {
+        return organ(seed,age,slot,TissueEvolution.sample(seed,age));
+    }
+    public static Organ organ(long seed,long age,int slot,TissueEvolution.State evolution) {
         Kind kind = switch(slot) { case 0 -> Kind.TENDRIL; case 1, 3 -> Kind.MUSCLE; case 4 -> Kind.BLADE; default -> Kind.CARAPACE; };
         float delay = .12F + slot * .075F + TissueGrowth.sample(seed, slot + 100) * .08F;
         float growth = smooth((TissueGrowth.progress(age) - delay) / (1 - delay));
@@ -20,7 +23,6 @@ public final class TissueOrgans {
         float radius = (float)Math.sqrt(growth) * (.16F + .13F * TissueGrowth.sample(seed, slot + 140));
         float excess=TissueGrowth.overgrowth(age);
         length*=1+.30F*excess;radius*=1+.25F*excess;
-        var evolution=TissueEvolution.sample(seed,age);
         length*=TissueEvolution.tendrilLength(evolution);radius*=TissueEvolution.tendrilGirth(evolution);
         if(kind == Kind.CARAPACE) { length *= .55F; radius *= 1.8F; }
         return new Organ(kind, growth, length, radius, TissueGrowth.sample(seed, slot + 160));
@@ -34,7 +36,10 @@ public final class TissueOrgans {
     }
     /** width/height are the actual grown collider; remove its scale before fitting the root. */
     public static float reach(long seed,long age,float width,float height,float bodyScale) {
-        var organ = organ(seed, age, 0);
+        return reach(seed,age,width,height,bodyScale,TissueEvolution.sample(seed,age));
+    }
+    public static float reach(long seed,long age,float width,float height,float bodyScale,TissueEvolution.State evolution) {
+        var organ = organ(seed, age, 0,evolution);
         return organ.growth < .25F ? 0 : organ.length * bodyFactor(width/bodyScale, height/bodyScale)*bodyScale;
     }
     public static int dominantArm(long seed) { return TissueGrowth.sample(seed, 181) < .5F ? 2 : 3; }

@@ -63,7 +63,8 @@ class TissueSkinTest {
     }
     @Test void primaryOrgansDevelopBeyondTheirBuriedSocketWithSupportingGirth() {
         for(var core:TissueCore.values()) {
-            String organ=switch(core){case MUSCLE,GRASP->"claw_0";case CARAPACE->"scapular_plate_1";case JAW->"mandible";case CREST->"shoulder_crest_1";};
+            if(!core.legacy())continue;
+            String organ=switch(core){case MUSCLE,GRASP->"claw_0";case CARAPACE->"scapular_plate_1";case JAW->"mandible";case CREST->"shoulder_crest_1";default->throw new AssertionError();};
             float gain=TissueSkin.organGain(core,organ);assertTrue(gain>1);
             assertEquals(1,TissueSkin.organGain(core,"tissue_body"));
             float[] points=new float[48];

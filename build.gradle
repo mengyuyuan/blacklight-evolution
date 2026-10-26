@@ -31,13 +31,65 @@ sourceSets.main.resources {
 // directory replaces it as one profile, preserving the runtime override contract.
 def bundledMotionDirectory = providers.gradleProperty('bundleMotionDirectory').orElse('art/motion-profile')
 def releaseProfile = providers.gradleProperty('bundleMotionDirectory').isPresent() ? 'external-profile' : 'bundled'
+def cityGenerationFile=file('src/main/resources/data/blacklight/city/generation.json')
+def geographicCityEnabled=cityGenerationFile.isFile() && new groovy.json.JsonSlurper().parse(cityGenerationFile).mode=='geographic'
+// Evaluate once, rather than reopening the descriptor for every resource entry.
+def geographicCity=providers.provider { geographicCityEnabled }
 def releaseNotices = ['LICENSE', 'THIRD_PARTY_ASSETS.md', 'THIRD_PARTY_NOTICES.md']
+sourceSets {
+    resourceTools {
+        java {
+            srcDirs = ['src/main/java', 'tools']
+            include 'com/codex/blacklight/util/CompactJson.java', 'com/codex/blacklight/util/CompactStreams.java', 'com/codex/blacklight/util/MapResources.java', 'CompactMotionPacker.java', 'CompactMapPacker.java'
+        }
+    }
+}
+def compactMotionOutput=layout.buildDirectory.dir('generated/compactMotionProfile')
+def compactMapOutput=layout.buildDirectory.dir('generated/compactMapResources')
+def compactMapManifest=layout.buildDirectory.file('generated/compactMapManifest.json')
+def compactMapState=[names:null]
+def compactMapNames={
+    if(compactMapState.names!=null)return compactMapState.names
+    def manifest=compactMapManifest.get().asFile
+    if(manifest.isFile()) {
+        compactMapState.names=new groovy.json.JsonSlurper().parse(manifest).converted.toSet()
+        return compactMapState.names
+    }
+    return [] as Set
+}
+
+def encodeCompactMaps=tasks.register('encodeCompactMaps',JavaExec) {
+    classpath=sourceSets.resourceTools.runtimeClasspath
+    mainClass='CompactMapPacker'
+    args file('src/main/resources').absolutePath,compactMapOutput.get().asFile.absolutePath
+    inputs.files(fileTree('src/main/resources') {
+        include 'data/blacklight/worldmap/**/*.gz','data/blacklight/city/futian/*.gz','data/blacklight/city/los_angeles/*.gz'
+    })
+    outputs.dir(compactMapOutput)
+    outputs.file(compactMapManifest)
+    maxHeapSize='384m'
+    jvmArgs '-XX:ActiveProcessorCount=2'
+    javaLauncher=javaToolchains.launcherFor {languageVersion=JavaLanguageVersion.of(21)}
+    doLast {compactMapState.names=null}
+}
+sourceSets.main.resources.srcDir(compactMapOutput)
+def encodeCompactMotions=tasks.register('encodeCompactMotions', JavaExec) {
+    classpath=sourceSets.resourceTools.runtimeClasspath
+    mainClass='CompactMotionPacker'
+    args file(bundledMotionDirectory.get()).absolutePath, compactMotionOutput.get().asFile.absolutePath
+    inputs.dir(bundledMotionDirectory)
+    outputs.dir(compactMotionOutput)
+    maxHeapSize='512m'
+    jvmArgs '-XX:ActiveProcessorCount=2'
+    javaLauncher=javaToolchains.launcherFor {languageVersion=JavaLanguageVersion.of(21)}
+}
 def stageBundledMotions = tasks.register('stageBundledMotions', Sync) {
+    dependsOn encodeCompactMotions
     into layout.buildDirectory.dir('generated/bundledMotionResources')
     if (bundledMotionDirectory.isPresent()) {
-        from(bundledMotionDirectory.get()) {
+        from(compactMotionOutput) {
             into 'blacklight/bundled_motions'
-            include '*.json', 'combat-motion-tuning.data', 'consume-placement.data', 'consume-receiver-events.data', 'receiver-poses.data', 'hunter-consume.data', 'hammer-scales.data', 'weapon-attack-scales.data', 'armor-growth.data', 'camera-profile.data', 'camera-events.data', 'camera-film.data', 'health-hud.data'
+            include '*.json', '*.data', '*.jz'
         }
         doFirst {
             def profile = file(bundledMotionDirectory.get())
@@ -61,7 +113,38 @@ def stageBundledMotions = tasks.register('stageBundledMotions', Sync) {
 }
 sourceSets.main.resources.srcDir(stageBundledMotions)
 tasks.named('processResources', ProcessResources).configure {
+    dependsOn encodeCompactMaps
     inputs.property('blacklightReleaseProfile', releaseProfile)
+    def compactIndex=file('src/main/resources/data/blacklight/city/los_angeles_compact/index.json')
+    inputs.property('compactCityReady',providers.provider {compactIndex.isFile()})
+    inputs.property('geographicCity',geographicCity)
+    exclude '**/*.verified.json', '**/*.tmp'
+    exclude { details -> compactMapNames().contains(details.path) }
+    exclude { details ->
+        geographicCity.get() && (details.path.startsWith('data/blacklight/city/los_angeles_full/') || details.path.startsWith('data/blacklight/city/los_angeles_compact/')) ||
+        details.path.startsWith('data/blacklight/city/los_angeles_full/') && compactIndex.isFile()
+    }
+    doFirst {
+        def outputRoot=destinationDir.toPath().toAbsolutePath().normalize()
+        def ownedRoot=layout.buildDirectory.get().asFile.toPath().toAbsolutePath().normalize()
+        if(!outputRoot.startsWith(ownedRoot))throw new GradleException('Compressed map staging escapes build directory')
+        compactMapNames().each { name -> java.nio.file.Files.deleteIfExists(outputRoot.resolve(name)) }
+        def compactDirectory=compactIndex.parentFile
+        if(geographicCity.get()) {
+            def buildRoot=layout.buildDirectory.get().asFile.toPath().toAbsolutePath().normalize()
+            ['los_angeles_full','los_angeles_compact'].each { name ->
+                def stale=destinationDir.toPath().resolve('data/blacklight/city/'+name).toAbsolutePath().normalize()
+                if(!stale.startsWith(buildRoot))throw new GradleException('City staging path escapes build directory')
+                if(java.nio.file.Files.exists(stale)) {
+                    def paths=java.nio.file.Files.walk(stale)
+                    try { paths.sorted(java.util.Comparator.reverseOrder()).forEach { java.nio.file.Files.delete(it) } }
+                    finally { paths.close() }
+                }
+            }
+        }
+        if(!geographicCity.get() && compactDirectory.isDirectory() && !compactIndex.isFile() && compactDirectory.listFiles().any{it.name.endsWith('.larc')})
+            throw new GradleException('Complete the lossless municipal conversion before packaging resources; original city sources are retained.')
+    }
 }
 
 repositories {
@@ -153,7 +236,14 @@ if (project.hasProperty('cityTest')) {
     sourceSets.main.resources.srcDir('src/cityTest/resources')
 }
 tasks.named('jar', Jar).configure {
+    includeEmptyDirs = false
+    from('licenses') { into 'META-INF/licenses' }
     archiveClassifier = releaseProfile
+    exclude { details -> compactMapNames().contains(details.path) }
+    // Legacy hand-staged build outputs can contain notices. Ship the explicit current sources once.
+    exclude { details -> releaseNotices.contains(details.path) && details.file.canonicalFile!=file(details.path).canonicalFile }
+    // Copy tasks may retain old outputs. Never ship a stale whole-city archive.
+    exclude { details -> geographicCity.get() && (details.path.startsWith('data/blacklight/city/los_angeles_full/') || details.path.startsWith('data/blacklight/city/los_angeles_compact/')) }
     from(releaseNotices)
     exclude 'blacklight/bundled_motions/devastator-fx.data', 'assets/blacklight/textures/private_devfx/**'
     exclude 'assets/blacklight/shaders/core/source_biomass.*', 'com/codex/blacklight/client/renderer/DevastatorSourceMesh*.class'
@@ -348,8 +438,18 @@ configurations {
     runtimeClasspath.extendsFrom localRuntime
 }
 
+// Development runs load loose classes rather than our jar-in-jar archive.
+neoForge.runs.configureEach {
+    additionalRuntimeClasspathConfiguration.dependencies.add(project.dependencies.create('org.tukaani:xz:1.10'))
+}
+
 dependencies {
     implementation "software.bernie.geckolib:geckolib-neoforge-${minecraft_version}:${geckolib_version}"
+    // Pure Java bounded XZ decoding for lossless city and motion resources.
+    jarJar(implementation('org.tukaani:xz')) {
+        version { strictly '[1.10,2.0)'; prefer '1.10' }
+    }
+    resourceToolsImplementation 'org.tukaani:xz:1.10'
 
     // Optional compatibility API only. The user installs the two mods independently.
     compileOnly "maven.modrinth:parcool:1.21.1-3.4.3.3"
@@ -499,10 +599,15 @@ tasks.register('verifyStandaloneBoundary') {
 tasks.named('jar') { dependsOn tasks.named('verifyStandaloneBoundary') }
 
 // CI and a fresh clone must never produce another motion-less installable JAR.
-tasks.register('verifyBundledMotionResources') {
+tasks.register('verifyBundledMotionResources',JavaExec) {
     group = 'verification'
     dependsOn tasks.named('jar')
-    doLast {
+    classpath=sourceSets.resourceTools.runtimeClasspath
+    mainClass='CompactMotionPacker'
+    maxHeapSize='512m'
+    jvmArgs '-XX:ActiveProcessorCount=2'
+    javaLauncher=javaToolchains.launcherFor {languageVersion=JavaLanguageVersion.of(21)}
+    doFirst {
         def source = file(bundledMotionDirectory.get())
         def profile = fileTree(source).matching {
             include '*.json', '*.data'
@@ -514,14 +619,8 @@ tasks.register('verifyBundledMotionResources') {
                 ? new groovy.json.JsonSlurper().parse(file('art/motion-profile-manifest.json')).files : null
         if (manifest != null && profile.collect { it.name }.toSet() != manifest.keySet())
             throw new GradleException('Repository motion inventory does not match its manifest')
-        def archive = new java.util.zip.ZipFile(tasks.named('jar', Jar).get().archiveFile.get().asFile)
-        try {
             profile.each { input ->
-                def entry = archive.getEntry("blacklight/bundled_motions/${input.name}")
-                if (entry == null) throw new GradleException("Missing bundled motion: ${input.name}")
-                def packed = archive.getInputStream(entry).withCloseable { it.readAllBytes() }
-                if (!java.util.Arrays.equals(packed, input.bytes))
-                    throw new GradleException("Bundled motion changed: ${input.name}")
+                def packed=input.bytes
                 if (manifest != null) {
                     def expected = manifest[input.name]
                     if (packed.length != expected.bytes)
@@ -533,15 +632,61 @@ tasks.register('verifyBundledMotionResources') {
                     }
                 }
             }
-            logger.lifecycle("Verified ${profile.size()} unchanged bundled motion/profile files")
-        } finally { archive.close() }
+        setArgs(['--verify',tasks.named('jar',Jar).get().archiveFile.get().asFile.absolutePath,source.absolutePath])
     }
 }
 tasks.named('assemble') { dependsOn tasks.named('verifyBundledMotionResources') }
 
+tasks.register('verifyCompactMapResources',JavaExec) {
+    group='verification'
+    dependsOn tasks.named('jar')
+    classpath=sourceSets.resourceTools.runtimeClasspath
+    mainClass='CompactMapPacker'
+    maxHeapSize='384m'
+    jvmArgs '-XX:ActiveProcessorCount=2'
+    javaLauncher=javaToolchains.launcherFor {languageVersion=JavaLanguageVersion.of(21)}
+    doFirst {setArgs(['--verify',tasks.named('jar',Jar).get().archiveFile.get().asFile.absolutePath,file('src/main/resources').absolutePath])}
+}
+tasks.named('assemble') {dependsOn tasks.named('verifyCompactMapResources')}
+
+tasks.register('verifyPackageSizeBudget') {
+    group='verification'
+    dependsOn tasks.named('jar')
+    def budget=providers.gradleProperty('packageSizeBudgetBytes').orElse('200000000')
+    inputs.property('packageSizeBudgetBytes',budget)
+    inputs.file(tasks.named('jar',Jar).flatMap {it.archiveFile})
+    outputs.file(layout.buildDirectory.file('reports/package-size.json'))
+    doLast {
+        long maximum=Long.parseLong(budget.get())
+        if(maximum<1)throw new GradleException('Package byte budget must be positive')
+        def artifact=tasks.named('jar',Jar).get().archiveFile.get().asFile
+        def categories=[:].withDefault {0L};def largest=[]
+        new java.util.zip.ZipFile(artifact).withCloseable { archive ->
+            archive.entries().each { entry ->
+                if(!entry.directory) {
+                    def category=entry.name.startsWith('data/blacklight/worldmap/')?'geography':
+                            entry.name.startsWith('data/blacklight/city/')?'city-scenes':
+                            entry.name.startsWith('blacklight/bundled_motions/')?'motions':'runtime'
+                    categories[category]+=entry.compressedSize
+                    largest.add([resource:entry.name,compressedBytes:entry.compressedSize])
+                }
+            }
+        }
+        def report=[version:project.version.toString(),jarBytes:artifact.length(),budgetBytes:maximum,
+                    withinBudget:artifact.length()<=maximum,categories:categories,
+                    largestResources:largest.sort {-it.compressedBytes}.take(20)]
+        def target=layout.buildDirectory.file('reports/package-size.json').get().asFile
+        target.parentFile.mkdirs();target.text=groovy.json.JsonOutput.prettyPrint(groovy.json.JsonOutput.toJson(report))
+        if(!report.withinBudget)throw new GradleException("Package exceeds its ${maximum}-byte budget: ${artifact.length()} bytes; inspect build/reports/package-size.json before publishing.")
+        logger.lifecycle("Package budget passed: ${artifact.length()} / ${maximum} bytes")
+    }
+}
+tasks.named('assemble') {dependsOn tasks.named('verifyPackageSizeBudget')}
+
 // Website-feedback regressions run only in disposable GameTest worlds.
 if (project.hasProperty('feedbackTest')) {
     sourceSets.main.java.srcDir('src/feedbackTest/java')
+    sourceSets.main.resources.srcDir('src/feedbackTest/resources')
 }
 
 if (project.hasProperty('feedbackVisual')) {
@@ -615,4 +760,64 @@ tasks.withType(Jar).configureEach { exclude 'com/codex/blacklight/client/TissueE
 // Focused column integration tests. No private QA classes enter ordinary jars.
 if(project.hasProperty('buildingBiomassTest')) {
     sourceSets.main.java.srcDir('src/buildingTest/java')
+}
+
+// Whole-city geographic archives may exceed the classic ZIP size limit.
+tasks.withType(Zip).configureEach { zip64 = true }
+
+// The install ZIP wraps an already compressed JAR; avoid a second multi-GB deflate pass.
+tasks.named('distributionZip', Zip).configure {
+    entryCompression = org.gradle.api.tasks.bundling.ZipEntryCompression.STORED
+}
+
+// Keep generated Arnis regions as immutable files in development and package them normally.
+// The archive packer regenerates by atomic replacement, so links never cause in-place writes.
+def losAngelesArnisRoot = file('src/main/resources/data/blacklight/city/los_angeles_full')
+def losAngelesArnisArchives = fileTree(losAngelesArnisRoot) { include '*.lar' }
+tasks.named('processResources', ProcessResources).configure {
+    exclude 'data/blacklight/city/los_angeles_full/*.lar'
+    def needsOriginalArchives=!geographicCity.get() && !file('src/main/resources/data/blacklight/city/los_angeles_compact/index.json').isFile()
+    if(needsOriginalArchives)inputs.files(losAngelesArnisArchives).withPropertyName('losAngelesArnisArchives')
+        .withPathSensitivity(org.gradle.api.tasks.PathSensitivity.RELATIVE)
+    doLast {
+        if(!needsOriginalArchives)return
+        def metadata = new groovy.json.JsonSlurper().parse(new File(losAngelesArnisRoot, 'index.json'))
+        if (metadata.schema != 2 || metadata.complete != true)
+            throw new GradleException('Complete Los Angeles Arnis resources are required')
+        def expected = metadata.regions.collect { "${it.x}_${it.z}.lar".toString() }.toSet()
+        def archives = losAngelesArnisArchives.files.sort { it.name }
+        if (archives.collect { it.name }.toSet() != expected)
+            throw new GradleException('Los Angeles Arnis region inventory differs from its index')
+        def outputRoot = destinationDir.toPath().resolve('data/blacklight/city/los_angeles_full').toAbsolutePath().normalize()
+        def buildRoot = layout.buildDirectory.get().asFile.toPath().toAbsolutePath().normalize()
+        if (!outputRoot.startsWith(buildRoot)) throw new GradleException('Arnis output escapes build directory')
+        java.nio.file.Files.createDirectories(outputRoot)
+        int linked = 0
+        archives.each { input ->
+            def target = outputRoot.resolve(input.name)
+            if (java.nio.file.Files.exists(target) && java.nio.file.Files.isSameFile(input.toPath(), target)) {
+                linked++
+            } else {
+                def staged = outputRoot.resolve(input.name + '.linking')
+                java.nio.file.Files.deleteIfExists(staged)
+                try {
+                    try {
+                        java.nio.file.Files.createLink(staged, input.toPath())
+                        linked++
+                    } catch (java.io.IOException | UnsupportedOperationException unavailable) {
+                        java.nio.file.Files.copy(input.toPath(), staged, java.nio.file.StandardCopyOption.REPLACE_EXISTING)
+                    }
+                    java.nio.file.Files.move(staged, target, java.nio.file.StandardCopyOption.REPLACE_EXISTING)
+                } finally {
+                    java.nio.file.Files.deleteIfExists(staged)
+                }
+            }
+        }
+        def oldFiles = java.nio.file.Files.list(outputRoot)
+        try {
+            oldFiles.filter { it.fileName.toString().endsWith('.lar') && !expected.contains(it.fileName.toString()) }
+                .forEach { java.nio.file.Files.delete(it) }
+        } finally { oldFiles.close() }
+        logger.lifecycle("Prepared ${archives.size()} complete Arnis regions (${linked} immutable links)")
+    }
 }

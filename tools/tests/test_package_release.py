@@ -3,6 +3,7 @@ import json
 import tempfile
 import unittest
 from pathlib import Path
+from zipfile import ZipFile
 
 
 SPEC = importlib.util.spec_from_file_location(
@@ -87,6 +88,53 @@ class PrivateCurveTest(unittest.TestCase):
         data = {'format': 'MATRIX', 'privateNotice': 'Private local use only.', 'provenance': {
             'schema': 1, 'project': 'Blacklight: Ascension', 'currentStatus': 'project_modified_and_adapted'}}
         self.assertTrue(release.private_curve(json.dumps(data).encode()))
+
+
+class GeographicPackageTest(unittest.TestCase):
+    def fixture(self, root, extra=None, missing_tile=False, compact=False):
+        repo = Path(root)
+        descriptor = b'{"schema":1,"mode":"geographic"}'
+        path = repo / 'src/main/resources/data/blacklight/city/generation.json'
+        path.parent.mkdir(parents=True)
+        path.write_bytes(descriptor)
+        jar = repo / 'candidate.jar'
+        with ZipFile(jar, 'w') as archive:
+            archive.writestr('data/blacklight/city/generation.json', descriptor)
+            for city in ('shenzhen', 'los_angeles'):
+                archive.writestr(f'data/blacklight/worldmap/{city}/index.json', json.dumps(
+                    {'schema': 1, 'region': city, 'tiles': [{'x': 0, 'z': 0}]}))
+                if not missing_tile:
+                    archive.writestr(f'data/blacklight/worldmap/{city}/0_0.json.'+('xz' if compact else 'gz'), b'fixture')
+            for city in ('futian', 'los_angeles'):
+                archive.writestr(f'data/blacklight/city/{city}/map.json', b'{}')
+            if extra:
+                archive.writestr(extra, b'old archive')
+        return repo, jar
+
+    def test_geographic_package_keeps_both_atlases_and_cores(self):
+        with tempfile.TemporaryDirectory() as root:
+            repo, jar = self.fixture(root)
+            with ZipFile(jar) as archive:
+                self.assertTrue(release.geographic_city_selected(repo, archive))
+
+    def test_stale_archive_cannot_silently_inflate_geographic_package(self):
+        for prefix in ('los_angeles_full', 'los_angeles_compact'):
+            with self.subTest(prefix=prefix), tempfile.TemporaryDirectory() as root:
+                repo, jar = self.fixture(root, f'data/blacklight/city/{prefix}/0_0.lar')
+                with ZipFile(jar) as archive, self.assertRaisesRegex(RuntimeError, 'Baked municipal archives leaked'):
+                    release.geographic_city_selected(repo, archive)
+
+    def test_missing_geographic_tile_is_rejected(self):
+        with tempfile.TemporaryDirectory() as root:
+            repo, jar = self.fixture(root, missing_tile=True)
+            with ZipFile(jar) as archive, self.assertRaisesRegex(RuntimeError, 'Missing geographic tile'):
+                release.geographic_city_selected(repo, archive)
+
+    def test_logical_tile_inventory_accepts_compact_encoding(self):
+        with tempfile.TemporaryDirectory() as root:
+            repo, jar = self.fixture(root, compact=True)
+            with ZipFile(jar) as archive:
+                self.assertTrue(release.geographic_city_selected(repo, archive))
 
 
 if __name__ == '__main__':

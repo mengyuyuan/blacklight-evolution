@@ -19,6 +19,11 @@ public final class ModEntities {
                     .<com.codex.blacklight.entity.BlacklightInfectedHost>of(com.codex.blacklight.entity.BlacklightInfectedHost::new, MobCategory.MONSTER)
                     .sized(.9F, 1.2F).clientTrackingRange(16).updateInterval(2).build("infected_host"));
 
+    public static final DeferredHolder<EntityType<?>, EntityType<com.codex.blacklight.entity.BlacklightCommonInfected>> COMMON_INFECTED =
+            ENTITIES.register("common_infected", () -> EntityType.Builder
+                    .<com.codex.blacklight.entity.BlacklightCommonInfected>of(com.codex.blacklight.entity.BlacklightCommonInfected::new,MobCategory.MONSTER)
+                    .sized(.6F,1.95F).clientTrackingRange(10).updateInterval(2).build("common_infected"));
+
     public static final DeferredHolder<EntityType<?>, EntityType<GroundSpikeEntity>> GROUND_SPIKE =
             ENTITIES.register("ground_spike", () -> EntityType.Builder
                     .<GroundSpikeEntity>of(GroundSpikeEntity::new, MobCategory.MISC)
@@ -69,6 +74,7 @@ public final class ModEntities {
             event.put(BLACKWATCH_HEAVY.get(),com.codex.blacklight.entity.BlackwatchSoldier.attributes(true).build());
             event.put(HIVE_TENDRIL.get(),com.codex.blacklight.entity.HiveTendril.attributes().build());
             event.put(INFECTED_HOST.get(),com.codex.blacklight.entity.BlacklightInfectedHost.attributes().build());
+            event.put(COMMON_INFECTED.get(),com.codex.blacklight.entity.BlacklightCommonInfected.attributes().build());
             event.put(BLACKLIGHT_STALKER.get(),com.codex.blacklight.entity.BlacklightMutant.attributes(com.codex.blacklight.entity.BlacklightMutant.Kind.STALKER).build());
             event.put(BLACKLIGHT_SPITTER.get(),com.codex.blacklight.entity.BlacklightMutant.attributes(com.codex.blacklight.entity.BlacklightMutant.Kind.SPITTER).build());
             event.put(BLACKLIGHT_BRUTE.get(),com.codex.blacklight.entity.BlacklightMutant.attributes(com.codex.blacklight.entity.BlacklightMutant.Kind.BRUTE).build());

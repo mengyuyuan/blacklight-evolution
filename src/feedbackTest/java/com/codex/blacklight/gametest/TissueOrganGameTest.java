@@ -2,6 +2,7 @@ package com.codex.blacklight.gametest;
 
 import com.codex.blacklight.entity.BlacklightInfectedHost;
 import com.codex.blacklight.infection.TissueOrgans;
+import com.codex.blacklight.infection.TissueCore;
 import com.codex.blacklight.registry.ModEntities;
 import net.minecraft.core.BlockPos;
 import net.minecraft.gametest.framework.*;
@@ -44,10 +45,13 @@ public final class TissueOrganGameTest {
     }
     private static Pair prepare(GameTestHelper h,boolean mature) {
         var level=h.getLevel();level.getServer().setDifficulty(Difficulty.NORMAL,true);
-        var pos=h.absolutePos(new BlockPos(5,30,5));
+        // Long ranged fixtures must not hit the next GameTest's escaping victim.
+        int height=30+24*Math.floorMod(h.absolutePos(BlockPos.ZERO).getX()/15,10);
+        var pos=h.absolutePos(new BlockPos(5,height,5));
         for(int x=-5;x<=6;x++)for(int z=-5;z<=5;z++)level.setBlock(pos.offset(x,-1,z),Blocks.STONE.defaultBlockState(),2);
         var host=ModEntities.INFECTED_HOST.get().create(level);host.inherit(EntityType.COW.create(level));
         long identity=pos.asLong();host.setUUID(new java.util.UUID(identity,identity^0x171));
+        var nativeTag=new net.minecraft.nbt.CompoundTag();host.saveWithoutId(nativeTag);nativeTag.getCompound("BlacklightHost").putString("NativeCore",TissueCore.forSeed(0x171).key());host.readAdditionalSaveData(nativeTag);
         if(mature)host.advanceTissue(12000);
         host.getAttribute(Attributes.MOVEMENT_SPEED).setBaseValue(0);
         host.setPos(pos.getCenter().add(0,-.5,0));level.addFreshEntity(host);
@@ -56,6 +60,7 @@ public final class TissueOrganGameTest {
         // prey and make a range/hold test depend on the random layout.
         host.removeAllGoals(goal->true);
         var prey=EntityType.COW.create(level);prey.setNoAi(true);prey.getAttribute(Attributes.MAX_HEALTH).setBaseValue(100);
+        prey.getPersistentData().putLong(com.codex.blacklight.infection.InfectionRules.NEXT_CONTACT_EXPOSURE,Long.MAX_VALUE);
         float reach=TissueOrgans.reach(TissueOrgans.seed(host.getUUID()),12000,host.getBbWidth(),host.getBbHeight());
         prey.setHealth(100);prey.setPos(host.position().add((host.getBbWidth()+prey.getBbWidth())*.5+reach*.85,0,0));level.addFreshEntity(prey);host.setTarget(prey);
         h.assertTrue(!host.isWithinMeleeAttackRange(prey),"fixture must be outside ordinary melee reach");
@@ -127,7 +132,9 @@ public final class TissueOrganGameTest {
     private static Pair tentacleHost(GameTestHelper h) {
         var pair=prepare(h,true);long seed=1;
         while(com.codex.blacklight.infection.TissueEvolution.tentacles(com.codex.blacklight.infection.TissueEvolution.sample(seed,120000))<.99F)seed++;
-        pair.host.setUUID(new java.util.UUID(0,seed));pair.host.advanceTissue(108000);
+        pair.host.setUUID(new java.util.UUID(0,seed));
+        var pinned=new net.minecraft.nbt.CompoundTag();pair.host.saveWithoutId(pinned);pinned.getCompound("BlacklightHost").putString("NativeCore",TissueCore.GRASP.key());pair.host.readAdditionalSaveData(pinned);
+        pair.host.advanceTissue(108000);
         pair.host.removeAllGoals(goal->true);pair.host.setNoAi(false);pair.prey.removeAllGoals(goal->true);pair.prey.setNoAi(false);
         pair.prey.setPos(pair.host.position().add((pair.host.getBbWidth()+pair.prey.getBbWidth())*.5+pair.host.tissueOrganReach()*.8,0,0));
         // This fixture verifies the tether lifecycle; contact infection has a

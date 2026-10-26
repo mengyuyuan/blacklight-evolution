@@ -4,6 +4,32 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 class TissueMetabolismTest {
+    @Test void reservePaysForActivityInsteadOfDecayingAtRest(){
+        var idle=TissueMetabolism.budget(15,35,TissueMetabolism.demand(48000,false,false));
+        assertEquals(new TissueMetabolism.Budget(15,35,false),idle);
+        var b=new TissueMetabolism.Budget(8,0,false);
+        for(int second=0;second<20;second++)b=TissueMetabolism.budget(b.reserve(),b.debt(),TissueMetabolism.demand(0,false,false));
+        assertEquals(7,b.reserve());assertEquals(20,b.debt());
+        assertEquals(10,TissueMetabolism.demand(48000,true,false));assertEquals(20,TissueMetabolism.demand(48000,false,true));
+        assertFalse(TissueMetabolism.budget(0,95,30).supplied());
+    }
+    @Test void newInfectionsHaveABoundedBodyReserveAndFractionalCostsCannotBeForgiven(){
+        assertEquals(8,TissueMetabolism.initialReserve(10));assertEquals(10,TissueMetabolism.initialReserve(20));
+        assertEquals(24,TissueMetabolism.initialReserve(Float.MAX_VALUE));
+        assertEquals(new TissueMetabolism.Budget(0,0,true,.5),TissueMetabolism.budget(1,95,10));
+        var b=TissueMetabolism.budget(5,95,10);assertEquals(4,b.reserve());assertEquals(5,b.debt());
+        assertTrue(TissueMetabolism.growing(48000,true));assertFalse(TissueMetabolism.growing(48000,false));
+    }
+    @Test void stageFoodIncreasesAndWorldDaysAccelerateBiologyWithoutMoreSimulationLoops(){
+        assertEquals(4,TissueMetabolism.phaseFood(0));assertEquals(7,TissueMetabolism.phaseFood(12000));
+        assertEquals(10,TissueMetabolism.phaseFood(24000));assertEquals(13,TissueMetabolism.phaseFood(48000));
+        assertEquals(16,TissueMetabolism.phaseFood(72000));
+        assertEquals(1,TissueMetabolism.worldSpeed(23999));assertEquals(2,TissueMetabolism.worldSpeed(7*24000));assertEquals(3,TissueMetabolism.worldSpeed(28*24000));
+        assertEquals(60,TissueMetabolism.scaledTicks(20,TissueMetabolism.worldSpeed(28*24000)));
+        assertTrue(TissueMetabolism.demand(72000,true,false,3)>TissueMetabolism.demand(48000,true,false,1));
+        assertTrue(Double.isFinite(TissueMetabolism.worldSpeed(Long.MAX_VALUE)));
+        assertEquals(0,TissueMetabolism.initialReserve(Float.NaN));
+    }
     @Test void foodStorageAndEditedPreyNeverOverflowOrProduceUnlimitedMeals(){
         assertEquals(5,TissueMetabolism.meal(20,TissueCore.MUSCLE));
         assertEquals(7,TissueMetabolism.meal(20,TissueCore.JAW));

@@ -1,0 +1,10 @@
+{
+  "url": "https://download.geofabrik.de/north-america/us/california/socal-261024.osm.pbf",
+  "file": "socal-261024.osm.pbf",
+  "bytes": 671991463,
+  "sha256": "93373c1762187568c6a6554308760d340c83347c5739131b60d6c7b8b7b65fa1",
+  "retrieved": "2026-10-25",
+  "license": "ODbL-1.0",
+  "attribution": "© OpenStreetMap contributors",
+  "boundaryRelation": 207359
+}

@@ -41,11 +41,10 @@ public final class TissueSkin {
     }
     /** Retain texture markings while developed tissue darkens from its own base. */
     public static int tint(int color,long seed,int role,float development) {
-        float amount=TissueAnatomy.smooth(development)*(.36F+.20F*TissueGrowth.sample(seed,920+role));
-        if(role==1)amount*=1.15F;
-        int red=Math.round((color>>>16&255)*(1-.64F*amount));
-        int green=Math.round((color>>>8&255)*(1-.84F*amount));
-        int blue=Math.round((color&255)*(1-.77F*amount));
+        float amount=TissueAnatomy.smooth(development)*(.94F+.06F*TissueGrowth.sample(seed,920+role));
+        int red=Math.round((color>>>16&255)*(1-.72F*amount));
+        int green=Math.round((color>>>8&255)*(1-.94F*amount));
+        int blue=Math.round((color&255)*(1-.91F*amount));
         return color&0xff000000|red<<16|green<<8|blue;
     }
     public record Vertex(V position,V rest) {}
@@ -81,12 +80,14 @@ public final class TissueSkin {
         return Math.clamp(edge,.05F,.95F);
     }
     public static float organGain(TissueCore core,String name) {
+        core=core.structuralBias();
         return switch(core) {
             case MUSCLE -> name.startsWith("claw_")||name.startsWith("blade_")||name.equals("ulnar_blade")?1.55F:1;
             case CARAPACE -> name.startsWith("scapular_plate")||name.startsWith("costal_arch")?1.55F:1;
             case JAW -> name.equals("mandible")||name.startsWith("cheek_blade")||name.startsWith("fang_")?1.40F:1;
             case GRASP -> name.startsWith("claw_")||name.startsWith("blade_")?1.35F:1;
             case CREST -> name.startsWith("shoulder_crest")?2.10F:1;
+            default -> 1;
         };
     }
     public static void focus(float[] vertices,float gain) {
@@ -101,5 +102,12 @@ public final class TissueSkin {
                 vertices[i]=point.x();vertices[i+1]=point.y();vertices[i+2]=point.z();
             }
         }
+    }
+    /** Retire an old appendage into its own buried root while its replacement forms. */
+    public static void rootedScale(float[] vertices,float amount){
+        if(vertices.length<24)return;
+        amount=Float.isFinite(amount)?Math.clamp(amount,0,1):1;if(amount==1)return;
+        V root=new V(0,0,0);for(int i=0;i<24;i+=3)root=root.add(new V(vertices[i],vertices[i+1],vertices[i+2]));root=root.mul(.125F);
+        for(int i=0;i<vertices.length;i+=3){vertices[i]=root.x()+(vertices[i]-root.x())*amount;vertices[i+1]=root.y()+(vertices[i+1]-root.y())*amount;vertices[i+2]=root.z()+(vertices[i+2]-root.z())*amount;}
     }
 }

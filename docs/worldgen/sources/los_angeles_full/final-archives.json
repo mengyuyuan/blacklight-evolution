@@ -1,0 +1,14 @@
+{
+  "complete": true,
+  "regions": 5732,
+  "nativeChunks": 5344322,
+  "bytes": 5288062694,
+  "indexSHA256": "f10db38c3516c9507bb91b6668b0f2ee05eecbe8a4fe0db268ef078f7a1b78f8",
+  "checks": [
+    "all region identities",
+    "exact municipal coverage",
+    "contiguous chunk payloads",
+    "GZIP framing"
+  ],
+  "gameplayTested": false
+}

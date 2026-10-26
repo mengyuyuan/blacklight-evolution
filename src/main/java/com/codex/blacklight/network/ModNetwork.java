@@ -21,7 +21,7 @@ public final class ModNetwork {
     public static void register(RegisterPayloadHandlersEvent event) {
         // Tissue anatomy adds synchronized entity metadata. Reject mixed old/new builds
         // during negotiation instead of decoding an unknown metadata index in-game.
-        event.registrar("standalone-23-identity-library")
+        event.registrar("standalone-35-evolution-qualifications")
                 .playToServer(DisguiseSelectPayload.TYPE,DisguiseSelectPayload.STREAM_CODEC,(payload,context)->context.enqueueWork(()->{
                     if(context.player() instanceof ServerPlayer p&&canAct(p))com.codex.blacklight.disguise.DisguiseSystem.select(p,payload.revision(),payload.index());
                 }))

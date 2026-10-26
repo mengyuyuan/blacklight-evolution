@@ -3,6 +3,13 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 class TissueGrowthTest {
+    @Test void visibleGenerationsIncludeInitialDevelopmentAndContinueWithoutResetting(){
+        assertEquals(0,TissueGrowth.generation(11999));assertEquals(1,TissueGrowth.generation(12000));
+        assertEquals(1,TissueGrowth.generation(23999));assertEquals(2,TissueGrowth.generation(24000));
+        assertEquals(2,TissueGrowth.generation(47999));assertEquals(3,TissueGrowth.generation(48000));
+        assertEquals(4,TissueGrowth.generation(72000));assertTrue(TissueGrowth.generation(Long.MAX_VALUE)>4);
+        assertEquals(7,TissueMetabolism.phaseFood(12000));assertEquals(10,TissueMetabolism.phaseFood(24000));
+    }
     @Test void loadedTimeContinuesPastTheOldFinalStageWithoutOverflow() {
         assertEquals(0,TissueGrowth.advance(-20,-1));
         assertEquals(100L+Integer.MAX_VALUE,TissueGrowth.advance(100,Integer.MAX_VALUE));

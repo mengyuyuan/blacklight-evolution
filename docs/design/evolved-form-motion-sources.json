@@ -1,0 +1,181 @@
+{
+  "sourceSkeleton": "evolved_runner1",
+  "sourceBones": 67,
+  "body": "standard Minecraft player cuboids",
+  "vertices": 2696,
+  "quads": 2463,
+  "motionBytes": 4896335,
+  "axes": {
+    "sourceForward": "-Z",
+    "minecraftForward": "-Z",
+    "conversion": [
+      1,
+      -1,
+      1
+    ]
+  },
+  "sources": [
+    {
+      "clip": "idle",
+      "source": "evolved_loco_idle_to_run",
+      "sha256": "cab1ef4a97b73d18d0c8ce5b5bec3db157a014d14d7fa1b294920b419192080d",
+      "matchedJoints": 34
+    },
+    {
+      "clip": "run",
+      "source": "evolved_loco_run",
+      "sha256": "30e3ae94408c2c91fd7bbbbc7956ff168df15cb68e89e3ab972f0605c30000ef",
+      "matchedJoints": 34
+    },
+    {
+      "clip": "sprint",
+      "source": "evolved_loco_sprint",
+      "sha256": "c65a300fc0215452dc0ca1bc1847cd5caf635a8568bff1275b6b315066ad5749",
+      "matchedJoints": 36
+    },
+    {
+      "clip": "left",
+      "source": "evolved_loco_strafe_run_left",
+      "sha256": "80534534339b1906361d0a19fc094a1a67c6a4fae2aebc7c8e056292d0e0984c",
+      "matchedJoints": 36
+    },
+    {
+      "clip": "right",
+      "source": "evolved_loco_strafe_run_right",
+      "sha256": "aeaeadff0725793fd13f87f73872dbacdd6493c98726a91bcc0c65a601321e95",
+      "matchedJoints": 35
+    },
+    {
+      "clip": "slash",
+      "source": "evolved_com_dash_back_double_slash",
+      "sha256": "eb2d0dca1ce9869480027cd88e77fc6e0b4469283343000ed0ff6f7c309e2ac7",
+      "matchedJoints": 37
+    },
+    {
+      "clip": "leap",
+      "source": "evolved_com_special_jumpslash",
+      "sha256": "c6e96398e74e43f97f077d8ac381d40aa503a06abbd6c7674db1aced3b226886",
+      "matchedJoints": 36
+    },
+    {
+      "clip": "dodge_left",
+      "source": "evolved_com_dodge_left",
+      "sha256": "501c9b22fa42b88eb28b85c1408499e724c3be8676182deac75fe6b46d93be40",
+      "matchedJoints": 34
+    },
+    {
+      "clip": "dodge_right",
+      "source": "evolved_com_dodge_right",
+      "sha256": "fac7f2bb8a311c622922631794966e69d509808aa2fac722bedf11c7fd176ac3",
+      "matchedJoints": 35
+    },
+    {
+      "clip": "transition",
+      "source": "evolved_transition_1",
+      "sha256": "2dc58154d189e09b3fddeb4ab85d2bbbb0de720163076258d05fa6e8ddeb54a3",
+      "matchedJoints": 32
+    },
+    {
+      "clip": "consume",
+      "source": "alex_hunt_consume_evolved_front_gv",
+      "sha256": "06037271c6171571de7af0482eb70cca5ff3e9efbdefabe6d1c63c1d3f0b788c",
+      "matchedJoints": 60
+    },
+    {
+      "clip": "victim",
+      "source": "alex_hunt_consume_evolved_front_rcv",
+      "sha256": "858653a2835be6f11eec4689f271eff938483289920a84054fcfe7b93dfc6415",
+      "matchedJoints": 60
+    },
+    {
+      "clip": "hit",
+      "source": "evolved_gethit_claw_pain_left",
+      "sha256": "b512e51dbd578a7ab5f86fb7949187749c922ef5c08bde334aea28e7fcdd2768",
+      "matchedJoints": 35
+    },
+    {
+      "clip": "heavy_hit",
+      "source": "evolved_gethit_claw_pain_right",
+      "sha256": "1f60d15f16833fcc464e71613a473ae9d92a8c99e3494392aa9257746867b54c",
+      "matchedJoints": 35
+    },
+    {
+      "clip": "back",
+      "source": "evolved_loco_strafe_run_back",
+      "sha256": "dad02b3ddb88575e36b917244229c7795db0478dd4912439d6d8de5c0168e5aa",
+      "matchedJoints": 35
+    },
+    {
+      "clip": "rush",
+      "source": "evolved_com_combo_4hit_from_run",
+      "sha256": "f489394a1877b7589cf4f93829a1f69e347b35fef121ef0c66ff5646daa934b8",
+      "matchedJoints": 36
+    },
+    {
+      "clip": "thrust_left",
+      "source": "evolved_com_special_impale_left",
+      "sha256": "be5d02571c3c8227c89732fce192efa99ebd496dba6ba28bb06100900cd3686a",
+      "matchedJoints": 34
+    },
+    {
+      "clip": "thrust_right",
+      "source": "evolved_com_special_impale_right",
+      "sha256": "7551c09204c69f0ca3a461b2f1028439cefd5668ff7bab5e9842b188928df22b",
+      "matchedJoints": 37
+    },
+    {
+      "clip": "guard",
+      "source": "evolved_taunt_change_side",
+      "sha256": "2e59fe5e6d32945f3a07ca48f2dc4ca48520691642a2fd8c35e92441f367c1b0",
+      "matchedJoints": 32
+    },
+    {
+      "clip": "taunt_sharpen",
+      "source": "evolved_taunt_stand_sharpen_blades",
+      "sha256": "6af7b4682efc44418ace1b5008c86cd81164ed88d1a25f763cac840f2ca910ed",
+      "matchedJoints": 34
+    },
+    {
+      "clip": "taunt_beckon",
+      "source": "evolved_taunt_come_here",
+      "sha256": "ffca810d0af175012f6d428e4a29f00cdb715bfbbeeb55c75c4c4176c729f108",
+      "matchedJoints": 34
+    },
+    {
+      "clip": "idle_shrug",
+      "source": "evolved_act_reaction_shrug",
+      "sha256": "bd1abbe65fd8d7dc088bb663f7d67645c9b9a8fef1046d40f2b7efe95bd88b51",
+      "matchedJoints": 33
+    },
+    {
+      "clip": "idle_neck",
+      "source": "evolved_act_reaction_crack_neck",
+      "sha256": "053244b8866c3e2208aec0412f29b413261cb75fcaf51ce23e1039ea36442aa0",
+      "matchedJoints": 34
+    },
+    {
+      "clip": "guard_forward",
+      "source": "evolved_taunt_walk_forward",
+      "sha256": "6f13f2ed75cd454c9af017b091b8c9b333a356d6dfc8dbbe8ffa940021963f4b",
+      "matchedJoints": 35
+    },
+    {
+      "clip": "guard_back",
+      "source": "evolved_taunt_walk_back",
+      "sha256": "91ffd6c4f8282d49cb1a594d73cc585d2e5555f3dac4edd6ec4a1b47944bfb4d",
+      "matchedJoints": 35
+    },
+    {
+      "clip": "guard_left",
+      "source": "evolved_taunt_walk_left",
+      "sha256": "db88958d3ecb7293333f2e0e9818253cb962add0903abfb15f94f3b54471f8c3",
+      "matchedJoints": 35
+    },
+    {
+      "clip": "guard_right",
+      "source": "evolved_taunt_walk_right",
+      "sha256": "bc06885b85191b3b81170e83aaa3a8d47d8cb1ba03f50f43b1c871b3a930d733",
+      "matchedJoints": 35
+    }
+  ]
+}

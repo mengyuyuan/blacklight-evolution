@@ -156,10 +156,12 @@ final class SurfaceTissue {
         float side=TissueOrgans.dominantArm(seed)==ConsumeAnatomy.LEFT_ARM?1:-1;
         float bodyScale=host.tissueBodyScale();
         float scale=TissueOrgans.bodyFactor(host.getBbWidth()/bodyScale,host.getBbHeight()/bodyScale)*16/1.12F;
+        renderAggregateMantle(out,body,f);
         if(anatomical&&(growthModel==null||growthModel.procedural()))renderSupportingTentacles(out,body,f,bodyScale);
+        // Acquired grasping wrists are rendered on the real forelimb joints by AnatomicalTissue.
         if(!anatomical)renderBodyEnvelope(out,body,f,side);
         for(int slot=0;slot<TissueOrgans.count(seed);slot++) {
-            var organ=TissueOrgans.organ(seed,host.tissueAge(),slot);float g=organ.growth();if(g<=.001F)continue;
+            var organ=TissueOrgans.organ(seed,host.tissueAge(),slot,ChimeraTissue.receiverEvolution(host,false,partial));float g=organ.growth();if(g<=.001F)continue;
             if(anatomical&&organ.kind()!=TissueOrgans.Kind.TENDRIL)continue;
             if(out instanceof ConsumeAnatomy.Consumer consumer)consumer.anatomy(body.part);
             switch(organ.kind()) {
@@ -236,6 +238,70 @@ final class SurfaceTissue {
                     }
                     tissueTube(out,limb,path,w,d,new Vector3f(1,0,0),TissueOrgans.Kind.BLADE);
                 }
+            }
+        }
+    }
+    /** One closed thoracic volume engulfs the old straight trunk. Coarse rings
+     * define a shoulder mass, narrowed waist and dorsal keel, never tiled cubes. */
+    private void renderAggregateMantle(VertexConsumer out,Part body,Frame f){
+        var form=ChimeraTissue.receiverEvolution(host,approved.available(),partial).aggregate();float a=form.amount();if(a<=.001F)return;
+        if(out instanceof ConsumeAnatomy.Consumer consumer)consumer.anatomy(body.part);
+        boolean upright=host.humanoid()||f.height>=f.length*.85F;
+        Vector3f along=upright?f.up:f.forward,dorsal=upright?new Vector3f(f.forward).negate():f.up;
+        float longSize=upright?f.height:f.length,cross=upright?f.length:f.height;
+        int rings=9;var path=new Vector3f[rings];var widths=new float[rings];var depths=new float[rings];
+        for(int i=0;i<rings;i++){
+            float t=i/(float)(rings-1),shoulder=(float)Math.exp(-Math.pow((t-.70F)/.32F,2));
+            float taper=i==0||i==rings-1?.72F:1;
+            path[i]=new Vector3f(f.center).fma(((t*2-1)*1.025F+a*.14F*form.quadruped()*shoulder)*longSize,along)
+                    .fma(cross*a*.42F*shoulder,dorsal).fma(f.width*a*.10F*form.handedness()*shoulder,f.right);
+            widths[i]=f.width*(.97F+a*(.45F+.72F*shoulder+.15F*form.radial()))*taper;
+            depths[i]=cross*(.97F+a*(.42F+.70F*shoulder))*taper;
+        }
+        tissueTube(out,body,path,widths,depths,f.right,TissueOrgans.Kind.MUSCLE);
+    }
+    /** Two independently articulated grasping organs, rooted in the posed body surface.
+     * The donor's paired hooks remain visible at rest and aim along the real server strike. */
+    private void renderInheritedGrasps(VertexConsumer out,Part body,Frame f,float bodyScale){
+        var organ=host.tissueInheritance().organ(com.codex.blacklight.infection.TissueCore.GRASP);
+        if(organ==null||com.codex.blacklight.infection.TissueCore.forSeed(seed)==com.codex.blacklight.infection.TissueCore.GRASP)return;
+        float growth=com.codex.blacklight.infection.TissueGraftLayout.growth(organ,host.tissueInheritanceVisualWork(partial));
+        if(growth<=.001F)return;
+        if(out instanceof ConsumeAnatomy.Consumer consumer)consumer.anatomy(body.part);
+        float span=2*Math.max(f.width,Math.max(f.height,f.length));
+        float length=Math.min(span*1.55F,host.tissueOrganReach()*16/(1.12F*bodyScale)*.9F)*growth;
+        float age=host.level().getGameTime()+partial;
+        float extension=TissueOrgans.extension(host.tissueStrikeElapsed(partial));
+        Vector3f endpoint=null;
+        if(extension>0&&Math.abs(body.pose.pose().determinant())>1e-8F){
+            var relative=host.tissueStrikePoint().subtract(0,host.tissueStanceOffset(),0).scale(1/(1.12*bodyScale));
+            if(relative.length()<host.getBbWidth()+host.tissueOrganReach()*2+2)
+                endpoint=new org.joml.Matrix4f(body.pose.pose()).invert().mul(rootPose).transformPosition(new Vector3f((float)relative.x,(float)relative.y,(float)relative.z)).mul(16);
+        }
+        for(int side:new int[]{-1,1}){
+            Vector3f root=f.point(side*.86F,.2F,.15F);
+            if(growthModel!=null){var fitted=growthModel.tentacleRoot(body.part,side,.15F);if(fitted!=null)root=fitted;}
+            else if(approved.available())root=approved.developRoot(body.part,root);
+            int count=13;var path=new Vector3f[count];var widths=new float[count];var depths=new float[count];
+            for(int i=0;i<count;i++){
+                float t=i/(float)(count-1),wave=(float)Math.sin(age*.075F+side*1.7F+t*4);
+                path[i]=new Vector3f(root).fma(side*length*(.80F*(float)Math.sin(t*Math.PI*.72F)+.035F*wave*t),f.right)
+                        .fma(length*(.27F*(float)Math.sin(Math.PI*t)-.04F*t+.035F*wave*t),f.up)
+                        .fma(length*(.32F*t+.08F*(float)Math.sin(t*Math.PI)),f.forward);
+                if(endpoint!=null){var attack=new Vector3f(root).lerp(endpoint,t).fma(side*length*.18F*(float)Math.sin(Math.PI*t),f.right).fma(length*.12F*(float)Math.sin(Math.PI*t),f.up);path[i].lerp(attack,extension);}
+                widths[i]=Math.max(.035F,span*.10F*growth*(1-.72F*t));depths[i]=widths[i]*.8F;
+            }
+            tissueTube(out,body,path,widths,depths,f.right,TissueOrgans.Kind.TENDRIL);
+            Vector3f tip=path[count-1];int fingers=organ.donorPlan()==2?2:3;
+            for(int digit=0;digit<fingers;digit++){
+                float spread=(digit-(fingers-1)*.5F)*length*.13F;
+                var hook=new Vector3f[4];var w=new float[4];var depth=new float[4];
+                for(int i=0;i<4;i++){
+                    float t=i/3F;hook[i]=new Vector3f(tip).fma(spread*t,f.right).fma(length*.19F*t,f.forward)
+                            .fma(length*(.06F*(float)Math.sin(t*Math.PI)-.10F*t*t),f.up);
+                    w[i]=Math.max(.025F,span*.055F*growth*(1-t*.95F));depth[i]=w[i]*.65F;
+                }
+                tissueTube(out,body,hook,w,depth,f.right,TissueOrgans.Kind.BLADE);
             }
         }
     }

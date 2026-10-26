@@ -157,6 +157,7 @@ public final class ConsumeSystem {
         return com.codex.blacklight.power.BiomassSystem.claimant(mob)==null&&eligibleBiomass(mob);
     }
     public static boolean eligibleBiomass(Mob mob) {
+        if(com.codex.blacklight.infection.TissueCompetition.controls(mob))return false;
         if(mob instanceof com.codex.blacklight.entity.BlacklightHydra hydra&&hydra.planted())return false;
         if(mob instanceof com.codex.blacklight.entity.HiveTendril)return false;
         return !THROWN.containsKey(mob) && mob.isAlive() && !mob.isRemoved() && !mob.isInvulnerable() && !mob.getType().is(UNCONSUMABLE)

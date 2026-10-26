@@ -85,3 +85,11 @@ courtesy of the U.S. Geological Survey; global ETOPO1 terrain data from the
 U.S. National Oceanic and Atmospheric Administration. Elevation was decoded,
 reprojected, sampled on a 32-metre grid and blended into the existing Futian
 core. These modifications are project-authored and not endorsed by providers.
+
+## XZ for Java 1.10
+
+Lossless city and motion resources use XZ for Java, embedded as a pure Java
+Jar-in-Jar dependency. Copyright (C) The XZ for Java authors and contributors.
+License: Zero-Clause BSD (0BSD). The complete notice is distributed at
+`META-INF/licenses/XZ-JAVA-0BSD.txt` and in the source `licenses/` directory.
+Source: https://github.com/tukaani-project/xz-java/tree/v1.10
