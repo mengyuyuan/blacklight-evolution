@@ -92,6 +92,9 @@ public final class BiomassSurface {
     public static float wave(float cycles) {
         if (!Float.isFinite(cycles)) return 0;
         float wrapped = cycles - (float)Math.floor(cycles);
+        // Tiny negative phases can round to exactly one after subtracting floor.
+        // Wrap that endpoint before interpolation so index + 1 stays in the table.
+        if (wrapped >= 1) return WAVE[0];
         float at = wrapped * WAVE_SIZE;
         int index = (int)at;
         return WAVE[index] + (WAVE[index + 1] - WAVE[index]) * (at - index);
