@@ -42,7 +42,11 @@ public final class FeedbackLifecycleGameTest {
     }
     @GameTest(template="wall_test",timeoutTicks=60,batch="feedback_hive_death")
     public static void hiveDeathCannotReAddBossBar(GameTestHelper h) throws Exception {
+        var storage=h.getLevel().getServer().overworld().getDataStorage();
+        var original=com.codex.blacklight.infection.OutbreakData.get(h.getLevel().getServer());
+        var outbreak=new com.codex.blacklight.infection.OutbreakData();outbreak.start(h.getLevel().getServer().overworld().getGameTime());storage.set("blacklight_outbreak",outbreak);
         var p=player(h);var hive=ModEntities.BLACKLIGHT_HIVE.get().create(h.getLevel());
+        try {
         hive.setPos(p.position().add(4,0,0));h.getLevel().addFreshEntity(hive);
         var field=BlacklightHive.class.getDeclaredField("boss");field.setAccessible(true);
         var boss=(ServerBossEvent)field.get(hive);
@@ -51,8 +55,8 @@ public final class FeedbackLifecycleGameTest {
         hive.hurt(hive.damageSources().genericKill(),Float.MAX_VALUE);
         hive.tickCount=20;hive.tick();
         boolean clean=boss.getPlayers().isEmpty();
-        hive.discard();cleanup(p);
         h.assertTrue(clean,"dead hive must not re-add its empty boss bar on audience refresh");h.succeed();
+        } finally {hive.discard();cleanup(p);storage.set("blacklight_outbreak",original);}
     }
     @GameTest(template="wall_test",timeoutTicks=60,batch="feedback_execution")
     public static void completedAbsorptionPassesExecutionThreshold(GameTestHelper h) {

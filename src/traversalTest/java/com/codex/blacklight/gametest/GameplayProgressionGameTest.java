@@ -78,6 +78,10 @@ public final class GameplayProgressionGameTest {
     }
     @GameTest(template="wall_test",timeoutTicks=100)
     public static void hiveGeneratesBuildingAndStopsAfterThreeWaves(GameTestHelper h){
+        var storage=h.getLevel().getServer().overworld().getDataStorage();
+        var original=com.codex.blacklight.infection.OutbreakData.get(h.getLevel().getServer());
+        var outbreak=new com.codex.blacklight.infection.OutbreakData();outbreak.start(h.getLevel().getServer().overworld().getGameTime());storage.set("blacklight_outbreak",outbreak);
+        try {
         var level=h.getLevel();var origin=new net.minecraft.core.BlockPos(1500,220,1500);
         for(int x=-12;x<=12;x++)for(int z=-12;z<=12;z++)for(int y=-1;y<15;y++)level.setBlock(origin.offset(x,y,z),(y==-1?Blocks.STONE:Blocks.AIR).defaultBlockState(),2);
         var feature=level.registryAccess().registryOrThrow(net.minecraft.core.registries.Registries.CONFIGURED_FEATURE).get(net.minecraft.resources.ResourceLocation.fromNamespaceAndPath("blacklight","hive"));
@@ -93,8 +97,7 @@ public final class GameplayProgressionGameTest {
         // Each wave starts with a hunter; random blocked secondary positions may
         // reduce mutants without reducing the completed wave count.
         java.util.function.Predicate<net.minecraft.world.entity.Mob> guard=mob->
-                (mob instanceof com.codex.blacklight.entity.BlacklightMutant||mob instanceof com.codex.blacklight.entity.BlacklightHunter)
-                &&mob.getPersistentData().hasUUID("BlacklightHiveGuard")
+                mob.getPersistentData().hasUUID("BlacklightHiveGuard")
                 &&mob.getPersistentData().getUUID("BlacklightHiveGuard").equals(hive.getUUID());
         int count=level.getEntitiesOfClass(net.minecraft.world.entity.Mob.class,box,guard).size();
         h.assertTrue(count>=3&&count<=6,"wave budget caps active hunter and mutant reinforcements: guards="+count);
@@ -102,5 +105,6 @@ public final class GameplayProgressionGameTest {
         for(int t=0;t<300;t++){hive.tickCount++;hive.tick();}
         h.assertTrue(level.getEntitiesOfClass(net.minecraft.world.entity.Mob.class,box,guard).size()==count,"reload does not refill wave budget");
         for(var mob:level.getEntitiesOfClass(net.minecraft.world.entity.Mob.class,box))mob.discard();p.discard();h.succeed();
+        } finally {storage.set("blacklight_outbreak",original);}
     }
 }

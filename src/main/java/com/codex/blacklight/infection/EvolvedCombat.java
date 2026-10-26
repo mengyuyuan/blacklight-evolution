@@ -17,7 +17,8 @@ public final class EvolvedCombat {
     private final Set<Integer> contacts=new HashSet<>();
     private final Set<Integer> cues=new HashSet<>();
     private final EvolvedPoise poise=new EvolvedPoise();
-    private Vec3 committedDirection=Vec3.ZERO,anchor;
+    private Vec3 committedDirection=Vec3.ZERO,anchor,lastChasePosition;
+    private int stalledChaseTicks;
     private float committedYaw,travelScale=1;
     private int cooldown=8,dodgeCooldown=40,graspCooldown=60,leapCooldown,pathCooldown,counterCooldown,tauntCooldown=180,sequence,wallTicks;
     public EvolvedCombat(BlacklightInfectedHost host){this.host=host;}
@@ -89,6 +90,36 @@ public final class EvolvedCombat {
     private void chase(LivingEntity target,double gap){
         host.setSprinting(gap>4);
         if(pathCooldown==0){host.getNavigation().moveTo(target,gap>4?1.4:1.05);pathCooldown=6;}
+        var path=host.getNavigation().getPath();
+        var next=path!=null&&!path.isDone()?path.getNextEntityPos(host).subtract(host.position()).multiply(1,0,1):toward(target);
+        var projected=next.lengthSqr()>.0001?next.normalize().scale(.4):Vec3.ZERO;
+        boolean stepDown=path!=null&&!path.isDone()&&path.getNextNode().y<host.getY()-.5&&path.getNextNode().y>=host.getY()-1.25;
+        if(host.onGround()&&projected.lengthSqr()>.0001&&!supported(projected,stepDown)){
+            host.getNavigation().stop();host.getMoveControl().setWantedPosition(host.getX(),host.getY(),host.getZ(),0);
+            host.setXxa(0);host.setZza(0);host.setDeltaMovement(0,host.getDeltaMovement().y,0);pathCooldown=0;return;
+        }
+        stalledChaseTicks=lastChasePosition!=null&&host.position().distanceToSqr(lastChasePosition)<.0004?stalledChaseTicks+1:0;
+        lastChasePosition=host.position();
+        // Ground navigation may return a partial path before actual attack reach.
+        // Close a visible, supported gap with ordinary collision movement; never teleport.
+        if(gap>1.7&&host.onGround()&&host.hasLineOfSight(target)&&(host.getNavigation().isDone()||stalledChaseTicks>=10)){
+            var step=toward(target).scale(.16);var box=host.getBoundingBox().move(step);
+            if(!supported(step)||!host.level().noCollision(host,box))return;
+            host.setDeltaMovement(step.x,host.getDeltaMovement().y,step.z);
+        }
+    }
+    private boolean supported(Vec3 step){
+        return supported(step,false);
+    }
+    private boolean supported(Vec3 step,boolean stepDown){
+        var box=host.getBoundingBox().move(step);
+        for(double x:new double[]{box.minX+.05,box.maxX-.05})for(double z:new double[]{box.minZ+.05,box.maxZ-.05}){
+            var floor=net.minecraft.core.BlockPos.containing(x,box.minY-.2,z);
+            if(!host.level().hasChunkAt(floor))return false;
+            if(host.level().getBlockState(floor).getCollisionShape(host.level(),floor).isEmpty()
+                    &&(!stepDown||host.level().getBlockState(floor.below()).getCollisionShape(host.level(),floor.below()).isEmpty()))return false;
+        }
+        return true;
     }
     private void circle(LivingEntity target,double gap){
         host.getNavigation().stop();host.setSprinting(false);

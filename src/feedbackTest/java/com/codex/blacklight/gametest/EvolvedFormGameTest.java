@@ -13,6 +13,20 @@ import net.neoforged.neoforge.gametest.*;
 
 @GameTestHolder("blacklight") @PrefixGameTestTemplate(false)
 public final class EvolvedFormGameTest {
+    @GameTest(template="wall_test",timeoutTicks=130,batch="evolved_chase_edge")
+    public static void visiblePartialPathCannotWalkTheEvolvedOffAnUnsupportedEdge(GameTestHelper h){
+        var host=host(h);h.assertTrue(host.beginEvolvedMetamorphosis(),"edge fixture qualifies for its human body");for(int i=0;i<200;i++)host.tick();
+        h.assertTrue(host.isEvolved(),"edge fixture completed metamorphosis");
+        for(int x=3;x<=7;x++)for(int z=3;z<=7;z++)h.getLevel().setBlock(h.absolutePos(new BlockPos(x,29,z)),Blocks.STONE.defaultBlockState(),2);
+        host.setPos(h.absolutePos(new BlockPos(5,30,5)).getBottomCenter());host.setDeltaMovement(net.minecraft.world.phys.Vec3.ZERO);host.setOnGround(true);
+        var target=EntityType.HUSK.create(h.getLevel());target.setNoAi(true);target.setNoGravity(true);
+        target.setPos(host.position().add(20,0,0));target.getPersistentData().putLong(InfectionRules.NEXT_CONTACT_EXPOSURE,Long.MAX_VALUE);
+        h.getLevel().addFreshEntity(target);host.setNoAi(false);host.setTarget(target);double floor=host.getY();
+        h.runAfterDelay(110,()->{try{
+            h.assertTrue(host.isAlive()&&host.getY()>=floor-.2,"direct visible-gap recovery retains support instead of falling off the small platform; y="+host.getY()+" floor="+floor+" action="+host.evolvedAction());
+            h.assertTrue(host.distanceTo(target)>3,"unsupported air cannot be crossed by collision recovery");
+        }finally{host.discard();target.discard();}h.succeed();});
+    }
     @GameTest(template="wall_test",timeoutTicks=140,batch="evolved_ledge")
     public static void pressuredGroundDodgeDoesNotCarryItOffALedge(GameTestHelper h){
         var host=host(h);host.beginEvolvedMetamorphosis();for(int i=0;i<200;i++)host.tick();
@@ -98,19 +112,21 @@ public final class EvolvedFormGameTest {
         target.getPersistentData().putLong(InfectionRules.NEXT_CONTACT_EXPOSURE,Long.MAX_VALUE);
         target.setPos(host.position().add(1.25,0,0));h.getLevel().addFreshEntity(target);
         host.getAttribute(net.minecraft.world.entity.ai.attributes.Attributes.MAX_HEALTH).setBaseValue(10000);host.setHealth(host.getMaxHealth());
-        float before=host.getHealth();host.setNoAi(false);host.setTarget(target);
+        var damagingHits=new java.util.concurrent.atomic.AtomicInteger();host.setNoAi(false);host.setTarget(target);
         var accepted=new java.util.concurrent.atomic.AtomicInteger();
         for(int tick=0;tick<=76;tick+=4){final boolean heavy=tick%12==0;
             h.runAfterDelay(tick,()->{
                 host.invulnerableTime=0;
+                float before=host.getHealth();
                 if(host.hurt(host.damageSources().generic(),2)){
+                    if(host.getHealth()<before)damagingHits.incrementAndGet();
                     var profile=new com.codex.blacklight.combat.ImpactProfile(heavy?com.codex.blacklight.combat.HitReaction.HEAVY:com.codex.blacklight.combat.HitReaction.STAGGER,0,55,.1,0,false);
                     if(com.codex.blacklight.combat.ImpactControl.begin(host,profile,0))accepted.incrementAndGet();
                 }
             });
         }
         h.runAfterDelay(105,()->{try{
-            h.assertTrue(host.getHealth()<before,"control resistance never prevents accepted damage");
+            h.assertTrue(damagingHits.get()>0,"control resistance never prevents accepted damage, measured at contact before later growth rescaling");
             h.assertTrue(accepted.get()<=2,"twenty consecutive hits cannot repeatedly restart flinch");
             h.assertTrue(target.getHealth()<10000,"an actual source-timed counterattack lands during sustained hits");
             h.assertTrue(!com.codex.blacklight.combat.ImpactControl.stunned(host)&&!host.isNoAi(),"finite recovery restores decisions without changing NoAI");

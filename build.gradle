@@ -686,6 +686,7 @@ tasks.named('assemble') {dependsOn tasks.named('verifyPackageSizeBudget')}
 // Website-feedback regressions run only in disposable GameTest worlds.
 if (project.hasProperty('feedbackTest')) {
     sourceSets.main.java.srcDir('src/feedbackTest/java')
+    sourceSets.main.resources.srcDir('src/feedbackTest/resources')
 }
 
 if (project.hasProperty('feedbackVisual')) {

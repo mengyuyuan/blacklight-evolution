@@ -47,13 +47,14 @@ public final class CreatureCombatGameTest {
         com.codex.blacklight.power.CombatScale.synchronizeMob(hunter);hunter.setHealth(hunter.getMaxHealth()*.25F);
         var tag=new net.minecraft.nbt.CompoundTag();hunter.addAdditionalSaveData(tag);tag.remove("BlacklightHunterBalanceVersion");
         var copy=ModEntities.BLACKLIGHT_HUNTER.get().create(h.getLevel());copy.readAdditionalSaveData(tag);
-        h.assertTrue(copy.getMaxHealth()==480&&copy.getHealth()==120,"old wounded hunter doubles max HP without healing its health fraction");
+        float maximum=(float)(com.codex.blacklight.combat.HunterBalance.HEALTH*5);
+        h.assertTrue(copy.getMaxHealth()==maximum&&copy.getHealth()==maximum*.25F,"stock migration preserves the wounded health fraction at the current encounter tier");
         h.assertTrue(!com.codex.blacklight.combat.ConsumeSystem.healthReady(copy),"elite cannot be swallowed above the weakening threshold");
-        copy.setHealth(72);
+        copy.setHealth(maximum*.15F);
         h.assertTrue(com.codex.blacklight.combat.ConsumeSystem.healthReady(copy),"15 percent health retains the consume reward window");
-        copy.setHealth(120);
+        copy.setHealth(maximum*.25F);
         var saved=new net.minecraft.nbt.CompoundTag();copy.addAdditionalSaveData(saved);copy.readAdditionalSaveData(saved);
-        h.assertTrue(copy.getMaxHealth()==480&&copy.getHealth()==120,"reload must not multiply stats again");
+        h.assertTrue(copy.getMaxHealth()==maximum&&copy.getHealth()==maximum*.25F,"reload must not multiply stats again");
         hunter.getAttribute(health).setBaseValue(160);hunter.getAttribute(damage).setBaseValue(20);
         hunter.addAdditionalSaveData(tag);tag.remove("BlacklightHunterBalanceVersion");copy.readAdditionalSaveData(tag);
         h.assertTrue(copy.getAttribute(health).getBaseValue()==160&&copy.getAttribute(damage).getBaseValue()==20,"custom attributes are preserved");
@@ -98,13 +99,15 @@ public final class CreatureCombatGameTest {
         h.assertTrue(damageEvent(hunter,hunter.damageSources().fellOutOfWorld(),1000).getAmount()==1000,"bypass damage remains intact");
         var arrow=EntityType.ARROW.create(h.getLevel());arrow.setOwner(p);
         h.assertTrue(damageEvent(hunter,p.damageSources().arrow(arrow,p),8).getAmount()==6,"player-owned projectiles use the same encounter rule");
-        h.assertTrue(hunter.getMaxHealth()==480,"hunter health stays fixed rather than following player upgrades");
+        h.assertTrue(hunter.getMaxHealth()==com.codex.blacklight.combat.HunterBalance.HEALTH*5,"hunter health stays fixed rather than following player upgrades");
         h.assertTrue(hunter.beginAttack(CreatureAttack.SLAM,cow),"hunter can target another mob");
         h.assertTrue(Math.abs(damageEvent(cow,cow.damageSources().mobAttack(hunter),14).getAmount()-22.4F)<.001,"hunter damage against other mobs is unchanged");
         hunter.setNoAi(true);
         float before=hunter.getHealth();
+        float expectedLoss=net.minecraft.world.damagesource.CombatRules.getDamageAfterAbsorb(hunter,6,playerAttack,hunter.getArmorValue(),
+                (float)hunter.getAttributeValue(net.minecraft.world.entity.ai.attributes.Attributes.ARMOR_TOUGHNESS))*5;
         hunter.hurt(playerAttack,8);
-        h.assertTrue(Math.abs(before-hunter.getHealth()-30)<.001,"real HP loss applies the duel modifier and infected units exactly once");
+        h.assertTrue(Math.abs(before-hunter.getHealth()-expectedLoss)<.001,"real HP loss applies the duel modifier, current armor and infected units exactly once");
         hunter.discard();h.succeed();
     }
     @GameTest(template="wall_test",timeoutTicks=100)
