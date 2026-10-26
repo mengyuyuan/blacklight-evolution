@@ -97,9 +97,13 @@ public final class BuildingInfectionSystem {
         var data = BuildingInfectionData.get(level);
         if (data.colonies.isEmpty()) return 0;
         for (var c : data.colonies) {
+            c.sustained=false;
             if (c.dead || !ready(level, c.origin) || !level.isPositionEntityTicking(c.origin) || !allowedSite(level, c.origin)) continue;
             var core = level.getBlockState(c.origin);
             if (!core.is(ModBlocks.BUILDING_CORE.get())) { destroy(level,c.origin); continue; }
+            ColonyFeeding.tick(level,c);
+            if(!c.supply.maintain(5,c.massBlocks)){data.setDirty();continue;}
+            c.sustained=true;
             c.activeTicks = (int)Math.min(Integer.MAX_VALUE, (long)c.activeTicks + 5);
             int maturity = BuildingInfectionConfig.MATURITY.get() * 20;
             int next = c.activeTicks >= maturity && c.surfaces.size() >= 256 ? 3
@@ -117,6 +121,9 @@ public final class BuildingInfectionSystem {
         while (used < budget && attempts++ < budget * data.colonies.size()) {
             var c = data.colonies.get(Math.floorMod(data.cursor++, data.colonies.size()));
             if (c.dead || !ready(level,c.origin) || !level.isPositionEntityTicking(c.origin) || !allowedSite(level,c.origin)) continue;
+            // Reopen one own obstructing cell per shared operation, including old starved cores.
+            if(BuildingBiomassSystem.openMouth(level,c)){used++;data.setDirty();continue;}
+            if(!c.sustained||c.supply.reserve()==0)continue;
             // Surface expansion, volume, surface aging, volume share this dimension's budget.
             if((c.workTurns&1)==1&&BuildingInfectionConfig.VOLUME.get())BuildingBiomassSystem.step(level,c);
             else if(c.workTurns==2||c.frontier.isEmpty()||c.surfaces.size()>=BuildingInfectionConfig.SURFACES.get())ageSurface(level,c);
@@ -168,7 +175,10 @@ public final class BuildingInfectionSystem {
                 .setValue(TissueAttachmentBlock.AGE,0)
                 .setValue(TissueAttachmentBlock.VARIANT,pattern.variant());
         // Do not erase an older patch when the frontier encounters it.
-        if(previous.isAir() && !NaturalInfectionPlacement.place(level,pos,tissue)) return;
+        if(previous.isAir()){
+            if(!c.supply.pay(1)){c.frontier.addFirst(key);return;}
+            if(!NaturalInfectionPlacement.place(level,pos,tissue)){c.supply.refund(1);return;}
+        }
         c.surfaces.add(key);
     }
     private static void ageSurface(ServerLevel level, BuildingInfectionData.Colony c) {
@@ -190,6 +200,10 @@ public final class BuildingInfectionSystem {
         if(CityTravel.isCity(level.dimension())&&(!CityConfig.SPAWNS.get()||!CityData.get(level).population)) return false;
         if(level.getEntitiesOfClass(Mob.class,new AABB(c.origin).inflate(48),Entity::isAlive).size()>=BuildingInfectionConfig.MOB_LIMIT.get()) return false;
         if(!WorldOutbreakSystem.populationRoom(level,c.origin)) return false;
+        int worldStage=CityEcology.stage(level,c.origin);
+        var tier=c.births%4==0&&worldStage>=2?OutbreakRules.Tier.HUNTER
+                :OutbreakRules.choose(worldStage,level.random.nextInt(100));
+        int cost=ColonySupply.broodCost(tier);if(c.supply.reserve()<cost)return false;
         var direction=level.getBlockState(c.origin).getValue(BuildingInfectionCoreBlock.FACING);
         // A mature root can occupy the old straight-ahead outlet. Search flanking
         // ground as well, so a successful volumetric colony cannot seal its own brood.
@@ -197,14 +211,13 @@ public final class BuildingInfectionSystem {
             var p=c.origin.relative(direction,distance).relative(direction.getClockWise(),lateral).below(down);
             if(!ready(level,p)||!level.isPositionEntityTicking(p)||!level.getBlockState(p.below()).isFaceSturdy(level,p.below(),Direction.UP)
                     || !level.getBlockState(p).getFluidState().isEmpty()) continue;
-            int stage=CityEcology.stage(level,c.origin);
-            var tier=c.births%4==0&&stage>=2?OutbreakRules.Tier.HUNTER
-                    :OutbreakRules.choose(Math.max(1,stage),level.random.nextInt(100));
+            if(!c.supply.pay(cost))return false;
             if(WorldOutbreakSystem.spawnAt(level,p,tier)!=null) {
                 c.births++; BuildingInfectionData.get(level).setDirty();
                 level.playSound(null,c.origin,net.minecraft.sounds.SoundEvents.SLIME_SQUISH,net.minecraft.sounds.SoundSource.HOSTILE,1,.6f);
                 return true;
             }
+            c.supply.refund(cost);
         }
         return false;
     }

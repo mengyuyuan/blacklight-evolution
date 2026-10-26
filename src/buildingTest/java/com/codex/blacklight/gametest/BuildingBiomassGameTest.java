@@ -41,10 +41,12 @@ public final class BuildingBiomassGameTest {
             for(int x=-10;x<=10;x++)for(int y=0;y<=30;y++)block(origin.offset(x,y,1),Blocks.STONE_BRICKS.defaultBlockState());
             level.setBlock(origin,ModBlocks.BUILDING_CORE.get().defaultBlockState(),3);
             h.assertTrue(data.colonies.size()==1,"one real building core");colony=data.colonies.getFirst();
+            fund(); // Geometry fixtures prepare finite digested meals; actual slot feeding is tested separately.
             colony.activeTicks=12000;colony.stage=3;
             BuildingBiomassSystem.step(level,colony);h.assertTrue(colony.mass!=null,"plan must anchor to real facade");
         }
-        void grow() { for(int i=0;i<colony.mass.cells().size()+1;i++)BuildingBiomassSystem.step(level,colony); }
+        void fund(){for(int i=0;i<36&&colony.supply.reserve()<2048;i++){colony.supply.offer(TissueDigestion.Kind.MEAT,64);colony.supply.digest(200);}}
+        void grow() { for(int i=0;i<colony.mass.cells().size()+1;i++){if(colony.supply.reserve()<256)fund();BuildingBiomassSystem.step(level,colony);} }
         BlockPos mass() {
             return colony.mass.cells().stream().map(c->origin.offset(c.x(),c.y(),c.z())).filter(p->level.getBlockState(p).is(ModBlocks.BUILDING_BIOMASS.get())).findFirst().orElseThrow();
         }
@@ -112,9 +114,10 @@ public final class BuildingBiomassGameTest {
     public static void protectedAirCanRejectColumnPlacement(GameTestHelper h) {
         try(var f=new Fixture(h)) {
             int initial=f.colony.massBlocks;
+            int before=f.colony.supply.reserve();
             Consumer<BlockEvent.EntityPlaceEvent> veto=e->{if(e.getPlacedBlock().is(ModBlocks.BUILDING_BIOMASS.get()))e.setCanceled(true);};
             NeoForge.EVENT_BUS.addListener(veto);
-            try{f.grow();h.assertTrue(f.colony.massBlocks==initial&&!f.colony.severed.isEmpty(),"cancelled placement is restored and not retried endlessly");}
+            try{f.grow();h.assertTrue(f.colony.massBlocks==initial&&!f.colony.severed.isEmpty(),"cancelled placement is restored and not retried endlessly");h.assertTrue(f.colony.supply.reserve()==before,"vetoed solid cells refund the reserved construction materials");}
             finally{NeoForge.EVENT_BUS.unregister(veto);}
         }h.succeed();
     }

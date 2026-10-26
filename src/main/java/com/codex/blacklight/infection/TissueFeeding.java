@@ -55,10 +55,9 @@ public final class TissueFeeding {
         long now=host.level().getGameTime();if(next>now)return next;
         if(!free(host)||host.isNoAi()||host.tissueNutrition()>=TissueMetabolism.MAX_RESERVE/4||host.digestion().queued()>=host.digestiveProfile().capacity()
                 ||host.getTarget()!=null&&host.getTarget().isAlive()&&host.distanceToSqr(host.getTarget())<16)return now+40;
-        var budget=BUDGETS.computeIfAbsent(host.level(),k->new Budget());if(budget.tick!=now){budget.tick=now;budget.queries=0;}
-        if(budget.queries>=8)return now+1+Math.floorMod(host.getId(),5);budget.queries++;
+        if(!takeQuery(host.level()))return now+1+Math.floorMod(host.getId(),5);
         double reach=host.isInWater()&&host.digestiveProfile().filter()>0?2:1.25;
-        var nearby=host.level().getEntitiesOfClass(ItemEntity.class,host.getBoundingBox().inflate(reach,.7,reach),e->e.isAlive()&&!e.getItem().isEmpty());
+        var nearby=new ArrayList<ItemEntity>();host.level().getEntities(net.minecraft.world.level.entity.EntityTypeTest.forClass(ItemEntity.class),host.getBoundingBox().inflate(reach,.7,reach),e->e.isAlive()&&!e.getItem().isEmpty(),nearby,32);
         for(var item:nearby.stream().sorted(Comparator.comparingDouble(host::distanceToSqr)).limit(16).toList()){
             var stack=item.getItem();var food=food(host,stack);if(food==null||food.kind==TissueDigestion.Kind.FILTER&&!item.isInWater()||!visible(host,item)||!host.offerTissueFood(food.kind,food.value))continue;
             stack.shrink(1);if(stack.isEmpty())item.discard();else item.setItem(stack.copy());
@@ -66,5 +65,7 @@ public final class TissueFeeding {
         }return now+40+Math.floorMod(host.getId(),13);
     }
     private static void sound(BlacklightInfectedHost host){host.playSound(net.minecraft.sounds.SoundEvents.GENERIC_EAT,.6F,.75F);}
+    /** Hosts and colony mouths share the same per-dimension item-query budget. */
+    public static boolean takeQuery(Level level){long now=level.getGameTime();var budget=BUDGETS.computeIfAbsent(level,k->new Budget());if(budget.tick!=now){budget.tick=now;budget.queries=0;}if(budget.queries>=8)return false;budget.queries++;return true;}
     @SubscribeEvent public static void stopped(net.neoforged.neoforge.event.server.ServerStoppedEvent event){BUDGETS.clear();}
 }

@@ -69,12 +69,15 @@ public final class InfectionProtectionGameTest {
         for(int x=-5;x<=5;x++)for(int y=0;y<20;y++)level.setBlock(origin.offset(x,y,1),Blocks.STONE_BRICKS.defaultBlockState(),2);
         level.setBlock(origin,ModBlocks.BUILDING_CORE.get().defaultBlockState(),3);
         var c=data.colonies.getFirst();
+        for(int i=0;i<8;i++){c.supply.offer(TissueDigestion.Kind.MEAT,64);c.supply.digest(200);}
         boolean grief=level.getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING);
         level.getGameRules().getRule(GameRules.RULE_MOBGRIEFING).set(true,level.getServer());
-        Consumer<BlockEvent.EntityPlaceEvent> veto=e->{if(e.getPlacedBlock().is(ModBlocks.TISSUE_ATTACHMENT.get()))e.setCanceled(true);};
+        var attempts=new java.util.concurrent.atomic.AtomicInteger();
+        Consumer<BlockEvent.EntityPlaceEvent> veto=e->{if(e.getPlacedBlock().is(ModBlocks.TISSUE_ATTACHMENT.get())){attempts.incrementAndGet();e.setCanceled(true);}};
         NeoForge.EVENT_BUS.addListener(veto);
         try {
             for(int i=0;i<300;i++)BuildingInfectionSystem.advance(level);
+            h.assertTrue(attempts.get()>0,"the fed fixture actually attempts protected construction");
             h.assertTrue(c.surfaces.isEmpty(),"cancelled patches never enter the saved surface list");
             for(int x=-5;x<=5;x++)for(int y=0;y<20;y++)h.assertTrue(!level.getBlockState(origin.offset(x,y,0)).is(ModBlocks.TISSUE_ATTACHMENT.get()),"protected facade remains free of patches");
         } finally {

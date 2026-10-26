@@ -47,6 +47,7 @@ public final class BuildingInfectionGameTest {
             h.assertTrue(data.colonies.size()==1&&level.getBlockState(origin).is(ModBlocks.BUILDING_CORE.get()),"floor tissue beside an ordinary wall establishes exactly one core");
             h.assertTrue(!BuildingInfectionSystem.register(level,origin.offset(5,0,0)),"nearby overlapping producer is rejected");
             var c=data.colonies.getFirst();
+            for(int i=0;i<32;i++){c.supply.offer(TissueDigestion.Kind.MEAT,64);c.supply.digest(200);}
             grief.set(false,level.getServer());
             int queued=c.frontier.size();
             h.assertTrue(BuildingInfectionSystem.advance(level)==0&&c.activeTicks==0&&c.frontier.size()==queued,"griefing off freezes both work and age");
@@ -56,6 +57,7 @@ public final class BuildingInfectionGameTest {
             BuildingInfectionSystem.advance(level);
             h.assertTrue(!level.hasChunkAt(far),"frontier cannot force-load remote chunks");c.frontier.remove(far.asLong());
             for(int i=0;i<1600;i++) {
+                if(c.supply.reserve()<128)for(int j=0;j<8;j++){c.supply.offer(TissueDigestion.Kind.MEAT,64);c.supply.digest(200);}
                 int operations=BuildingInfectionSystem.advance(level);
                 h.assertTrue(operations<=BuildingInfectionConfig.WORK.get(),"dimension work budget is shared and bounded");
             }

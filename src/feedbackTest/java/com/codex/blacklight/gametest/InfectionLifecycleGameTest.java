@@ -83,6 +83,7 @@ public final class InfectionLifecycleGameTest {
             level.setBlock(origin.below(),Blocks.STONE.defaultBlockState(),2);
             level.setBlock(origin,ModBlocks.BUILDING_CORE.get().defaultBlockState(),3);
             var colony=data.colonies.getFirst();colony.stage=3;
+            colony.supply.offer(TissueDigestion.Kind.MEAT,64);colony.supply.digest(200);
             h.assertTrue(BuildingInfectionSystem.advance(level)==0&&colony.activeTicks==0&&!BuildingInfectionSystem.hatch(level,colony),"dormant building neither advances nor hatches before the first vial");
             var active=new OutbreakData();active.start(level.getServer().overworld().getGameTime());storage.set("blacklight_outbreak",active);
             h.assertTrue(BuildingInfectionSystem.advance(level)>0&&colony.activeTicks==5,"release resumes actual loaded growth");

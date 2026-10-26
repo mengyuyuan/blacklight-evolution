@@ -28,10 +28,12 @@ public final class BuildingInfectionData extends SavedData {
         public final Set<Long> seen = new HashSet<>();
         public final List<Long> surfaces = new ArrayList<>();
         public int activeTicks, stage, ageCursor, broodTicks, births, workTurns;
+        public ColonySupply supply=new ColonySupply();
+        public long nextFoodTick,lastSupplyTick=Long.MIN_VALUE;
         public BuildingBiomassPlan mass;
         public int massCursor, massDisabled, massBlocks, massAttempt, massSupportCheck;
         public final Set<Long> severed=new HashSet<>();
-        public boolean dead;
+        public boolean dead,sustained;
         public Colony(BlockPos origin) { this.origin = origin.immutable(); }
         public void offer(BlockPos pos) {
             if (seen.size() < MAX_SEEN && seen.add(pos.asLong())) frontier.addLast(pos.asLong());
@@ -54,6 +56,7 @@ public final class BuildingInfectionData extends SavedData {
             c.dead = n.getBoolean("dead"); c.broodTicks = Math.clamp(n.getInt("brood"), 0, 600);
             if (c.dead) { data.rememberCleared(c); continue; }
             c.births = Math.max(0, n.getInt("births"));
+            c.supply=ColonySupply.read(n.getCompound("supply"));
             c.workTurns = Math.floorMod(n.getInt("workTurns"), 4);
             if(n.contains("mass"))c.mass=BuildingBiomassPlan.load(n.getCompound("mass"));
             c.massCursor=Math.max(0,n.getInt("massCursor"));c.massDisabled=n.getInt("massDisabled")&255;
@@ -83,6 +86,7 @@ public final class BuildingInfectionData extends SavedData {
             n.putLong("origin", c.origin.asLong()); n.putInt("ticks", c.activeTicks); n.putInt("stage", c.stage);
             n.putBoolean("dead", c.dead); n.putInt("brood", c.broodTicks); n.putInt("births", c.births); n.putInt("ageCursor", c.ageCursor);
             n.putInt("workTurns", c.workTurns);
+            n.put("supply",c.supply.write());
             if(c.mass!=null)n.put("mass",c.mass.save());
             n.putInt("massCursor",c.massCursor);n.putInt("massDisabled",c.massDisabled);n.putInt("massBlocks",c.massBlocks);
             n.putLongArray("severed",c.severed.stream().mapToLong(Long::longValue).toArray());
@@ -91,7 +95,7 @@ public final class BuildingInfectionData extends SavedData {
             n.putLongArray("surfaces", c.surfaces.stream().mapToLong(Long::longValue).toArray());
             entries.add(n);
         }
-        tag.putInt("schema", 2);
+        tag.putInt("schema", 3);
         tag.putLongArray("clearedSites", clearedSites.stream().mapToLong(Long::longValue).toArray());
         tag.put("colonies", entries); return tag;
     }

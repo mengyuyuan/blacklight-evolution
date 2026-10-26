@@ -753,5 +753,6 @@
   "upgrade.blacklight.tracheal_network": "Tracheal Network",
   "upgrade.blacklight.main_heart": "Main Heart",
   "upgrade.blacklight.branchial_heart": "Branchial Heart",
-  "upgrade.blacklight.splenic_reservoir": "Splenic Reservoir"
+  "upgrade.blacklight.splenic_reservoir": "Splenic Reservoir",
+  "building.blacklight.supply_status": "Stage %s/4 · Maturity %s%% · Tissue %s · Nutrients %s · Digesting %s portions"
 }
