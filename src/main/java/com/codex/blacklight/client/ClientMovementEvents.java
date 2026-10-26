@@ -435,7 +435,7 @@ public final class ClientMovementEvents {
         // Match the server acceleration locally.  Without this prediction the integrated
         // server repeatedly corrects the vanilla-speed client, which looks like a ghost
         // copy or stuttering trail behind the player.
-        if (!wallHandled && !isChargingJump() && (minecraft.player.onGround() || WaterRunning.onSurface(minecraft.player)) && forwardHeld && sprinting
+        if (!wallHandled && !isChargingJump() && com.codex.blacklight.movement.TerrainTraversal.sprintSupported(minecraft.player) && forwardHeld && sprinting
                 && !ClientClawEvents.isGroundSpikeActionActive()) {
             minecraft.player.setSprinting(true);
             var forward = com.codex.blacklight.movement.TraversalSteering.forward(minecraft.player);

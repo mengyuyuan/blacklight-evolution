@@ -128,7 +128,7 @@ public final class ConsumeSystem {
         var s=ACTIVE.get(p);
         var visual=ModAttachments.peekData(victim, ModAttachments.CONSUME_VISUAL, ConsumeVisual.EMPTY);
         if(GrappleMotion.active(visual)){
-            var nativeAnchor=ConsumePlacementTrack.carryAnchor(p.position(),p.getYRot(),victim,GrappleMotion.key(p,visual),GrappleMotion.progress(p,visual,0));
+            var nativeAnchor=GrappleMotion.carryAnchor(p,victim,visual,p.position(),p.getYRot(),0);
             if(nativeAnchor.isPresent())return nativeAnchor.get();
         }
         if(s!=null&&s.form==PowerForm.BLADE) {

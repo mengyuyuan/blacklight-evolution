@@ -58,6 +58,11 @@ public final class NativeConsumePose {
             return true;
         }
         BlacklightPose sample=sample(entity,visual,"actor",partial);if(sample==null)return false;
+        if(stage==ConsumeVisual.HOLD) {
+            var movement=entity.onGround()?com.codex.blacklight.animation.PlayerMotionController.locomotionPose(entity,partial):pose;
+            // The paired source carry clips grip with the right hand for every form.
+            sample=com.codex.blacklight.animation.CarryPoseLayer.holdCreature(sample,movement,!entity.onGround(),true);
+        }
         boolean hunter=victims.getFirst() instanceof com.codex.blacklight.entity.BlacklightHunter;
         if(ConsumeSequence.mountedStage(stage)&&hunter)sample.orElseEmpty("Root").translation().set(0,0,0);
         if(stage==ConsumeVisual.MOUNT_CONSUME&&!hunter) {

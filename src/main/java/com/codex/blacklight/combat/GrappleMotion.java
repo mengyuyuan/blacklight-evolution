@@ -31,6 +31,15 @@ public final class GrappleMotion {
     public static float sceneProgress(LivingEntity entity,ConsumeVisual visual,float partial){
         return active(visual)?progress(owner(entity,visual),visual,partial):visual.motionProgress(entity.level().getGameTime(),partial);
     }
+    /** The same body-relative grip is used by authority and receiver interpolation. */
+    public static java.util.Optional<net.minecraft.world.phys.Vec3> carryAnchor(LivingEntity owner,LivingEntity victim,
+            ConsumeVisual visual,net.minecraft.world.phys.Vec3 feet,float yaw,float partial) {
+        boolean gliding=visual.stage()==ConsumeVisual.HOLD&&!owner.onGround()
+                &&owner.getData(ModAttachments.GLIDE_UNTIL)>=owner.level().getGameTime();
+        float weight=owner.getData(ModAttachments.MOVEMENT_STATE).carryPosture().sample(owner.tickCount,gliding,partial);
+        var offset=net.minecraft.world.phys.Vec3.directionFromRotation(0,yaw).scale(.20*weight).add(0,-.25*weight,0);
+        return ConsumePlacementTrack.carryAnchor(feet,yaw,victim,key(owner,visual),progress(owner,visual,partial)).map(anchor->anchor.add(offset));
+    }
     public static float facing(LivingEntity entity,ConsumeVisual visual){return facing(entity,visual,1);}
     public static float facing(LivingEntity entity,ConsumeVisual visual,float partial){
         if(!active(visual))return visual.facing();

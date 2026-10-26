@@ -581,7 +581,7 @@ public final class PrototypeMovementSystem {
 
     private static void tickSprint(ServerPlayer player, MovementState movement,
                                    Vec3 forward, int upgradeMask) {
-        boolean shouldSprint = (player.onGround() || WaterRunning.onSurface(player))
+        boolean shouldSprint = TerrainTraversal.sprintSupported(player)
                 && movement.sprinting() && movement.forwardHeld();
         if (!shouldSprint) {
             movement.clearSprintDrive();

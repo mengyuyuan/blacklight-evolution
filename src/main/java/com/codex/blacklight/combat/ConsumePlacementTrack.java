@@ -130,17 +130,25 @@ public final class ConsumePlacementTrack {
         if(Math.abs(gap.y)<vertical+.4&&distance<minimum)goal=goal.add(direction.scale(minimum-distance));
         return goal;
     }
+    /** Receiver-space contact shared by placement and the actor's final grip fitting. */
+    public static Optional<Vec3> carryContact(LivingEntity victim,String key,float t) {
+        return contactFrame(key,t).map(p->carryContact(victim,key,t,p));
+    }
+    private static Vec3 carryContact(LivingEntity victim,String key,float t,double[] frame) {
+        double scale=ConsumeSequence.humanoid(victim)?(victim.isBaby()?.5:1):Math.clamp(victim.getBbHeight()/1.8,.3,1.5);
+        if(rigidReceiver(victim)) {
+            boolean quad=ConsumeSequence.quadruped(victim);
+            var point=rigidBody(victim,key,t).transformPosition(new org.joml.Vector3f(0,victim.getBbHeight()*(quad?.65F:.86F),quad?-victim.getBbWidth()*.45F:0));
+            return new Vec3(point.x,point.y,-point.z);
+        }
+        return new Vec3(frame[3],frame[4],frame[5]).scale(scale);
+    }
     /** Carrying keeps a neck contact while each participant plays its own full pose. */
     public static Optional<Vec3> carryAnchor(Vec3 origin,float yaw,LivingEntity victim,String key,float t){
         return contactFrame(key,t).map(p->{
             double scale=ConsumeSequence.humanoid(victim)?(victim.isBaby()?.5:1):Math.clamp(victim.getBbHeight()/1.8,.3,1.5);
             Vec3 actor=new Vec3(p[0],p[1],p[2]).scale(.9375);
-            Vec3 receiver=new Vec3(p[3],p[4],p[5]).scale(scale);
-            if(rigidReceiver(victim)){
-                boolean quad=ConsumeSequence.quadruped(victim);
-                var q=rigidBody(victim,key,t).transformPosition(new org.joml.Vector3f(0,victim.getBbHeight()*(quad?.65F:.86F),quad?-victim.getBbWidth()*.45F:0));
-                receiver=new Vec3(q.x,q.y,-q.z);
-            }
+            Vec3 receiver=carryContact(victim,key,t,p);
             Vec3 local=actor.subtract(receiver);
             Vec3 center=new Vec3(p[10],p[11],p[12]).scale(scale);
             if(rigidReceiver(victim)){
