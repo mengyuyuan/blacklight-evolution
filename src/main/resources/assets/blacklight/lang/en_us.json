@@ -736,5 +736,12 @@
   "screen.blacklight.passive_rank": "%s: %s / %s",
   "entity.blacklight.common_infected": "Common Infected",
   "city.blacklight.los_angeles_places": "Los Angeles districts: downtown, hollywood, van_nuys, lax, venice, san_pedro. Use /blacklightcity losangeles <district>.",
-  "city.blacklight.loading_timeout": "The destination is still loading. Travel cancelled; try again shortly."
+  "city.blacklight.loading_timeout": "The destination is still loading. Travel cancelled; try again shortly.",
+  "upgrade.blacklight.gizzard": "Gizzard",
+  "upgrade.blacklight.fermentation_chamber": "Fermentation Chamber",
+  "upgrade.blacklight.absorptive_gut": "Absorptive Gut",
+  "upgrade.blacklight.digestive_pancreas": "Digestive Pancreas",
+  "upgrade.blacklight.crop": "Food Crop",
+  "upgrade.blacklight.fat_body": "Fat Body",
+  "hud.blacklight.digestive_reserves": "Digesting %s · Lipid reserve %s"
 }

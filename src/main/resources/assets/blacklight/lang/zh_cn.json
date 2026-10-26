@@ -736,5 +736,12 @@
   "screen.blacklight.passive_rank": "%s：%s / %s",
   "entity.blacklight.common_infected": "普通感染者",
   "city.blacklight.los_angeles_places": "洛杉矶区域：downtown 市中心；hollywood 好莱坞；van_nuys 圣费尔南多谷；lax 洛杉矶国际机场；venice 威尼斯；san_pedro 圣佩德罗。用 /blacklightcity losangeles 区域名 前往。",
-  "city.blacklight.loading_timeout": "目标城市仍在加载，本次传送已取消，请稍后重试。"
+  "city.blacklight.loading_timeout": "目标城市仍在加载，本次传送已取消，请稍后重试。",
+  "upgrade.blacklight.gizzard": "研磨胃",
+  "upgrade.blacklight.fermentation_chamber": "发酵前胃",
+  "upgrade.blacklight.absorptive_gut": "吸收肠襞",
+  "upgrade.blacklight.digestive_pancreas": "消化胰腺",
+  "upgrade.blacklight.crop": "嗉囊储食器",
+  "upgrade.blacklight.fat_body": "脂肪体",
+  "hud.blacklight.digestive_reserves": "待消化 %s 份 · 脂储 %s"
 }

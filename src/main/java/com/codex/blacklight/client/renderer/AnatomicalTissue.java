@@ -53,10 +53,14 @@ final class AnatomicalTissue {
     private final TissueEvolution.State evolution;
     private final TissueMotion.State[] motionStates=new TissueMotion.State[4];
     private org.joml.Matrix4f worldRelativePose;
+    private final net.minecraft.nbt.CompoundTag digestiveState;
+    private final TissueDigestion.Profile digestiveProfile;
     void worldPose(org.joml.Matrix4f pose){worldRelativePose=new org.joml.Matrix4f(pose);}
 
     private AnatomicalTissue(BlacklightInfectedHost host, List<Region> regions, ResourceLocation skin, float partial,boolean procedural,boolean organsOnly) {
         this.host = host; this.regions = regions; this.skin = skin; this.partial = partial;
+        digestiveState=host.digestiveVisual();
+        digestiveProfile=host.digestiveProfile();
         seed = TissueOrgans.seed(host.getUUID()); growth = organsOnly?TissueEvolution.attachmentGrowth(host.tissueAge()):TissueGrowth.progress(host.tissueAge());
         this.procedural=procedural;this.organsOnly=organsOnly;
         evolution=organsOnly?ChimeraTissue.receiverEvolution(host,true,partial):procedural?ChimeraTissue.receiverEvolution(host,false,partial):TissueEvolution.sample(seed,0);
@@ -284,10 +288,13 @@ final class AnatomicalTissue {
             TissueSilhouette.graft(vertices,graftShift);
         }
         if(procedural&&p.region.frame!=null)TissueEvolution.organ(vertices,p.region.frame,mesh.name,evolution,p.region.groundSupport);
+        if(procedural)TissueDigestiveMotion.surface(vertices,p.region.frame,digestiveProfile,digestiveState,host.level().getGameTime()+partial);
         if(graft!=null&&!graft.core.legacy()){
             float time=host.organActionCore()==graft.core?host.organActionElapsed(partial):-1;
             float feeding=host.cannibalStarted()<0?0:Math.clamp((host.level().getGameTime()-host.cannibalStarted()+partial-TissueCompetition.COVER_TICKS)/(host.cannibalDuration()-TissueCompetition.COVER_TICKS),0,1);
             TissueFunctionalMotion.apply(vertices,graft.motionFrame==null?p.region.frame:graft.motionFrame,mesh.name,graft.core,time,feeding);
+            if(graft.core.digestive())TissueDigestiveMotion.apply(vertices,graft.motionFrame==null?p.region.frame:graft.motionFrame,graft.core,
+                    host.level().getGameTime()+partial,TissueDigestiveMotion.active(graft.core,digestiveState),TissueDigestiveMotion.load(graft.core,digestiveState));
         }
         float elapsed=host.tissueStrikeElapsed(partial);
         float melee=elapsed<0?(float)Math.sin(Math.PI*host.getAttackAnim(partial)):0;

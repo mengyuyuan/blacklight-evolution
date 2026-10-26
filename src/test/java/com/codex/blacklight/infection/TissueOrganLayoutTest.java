@@ -45,8 +45,10 @@ class TissueOrganLayoutTest {
         }
         var absent=TissueOrganLayout.fit(List.of(body),42);
         for(var core:TissueCore.values())if(!core.legacy()){
-            assertTrue(absent.fallback(core,body));assertFalse(functionalFallback(core,body,1,42).isEmpty());
+            if(core.digestive()&&core!=TissueCore.CROP){assertTrue(absent.mounted(core,body));assertFalse(functional(core,body,1,42).isEmpty());}
+            else {assertTrue(absent.fallback(core,body));assertFalse(functionalFallback(core,body,1,42).isEmpty());}
         }
+        var unclassified=TissueOrganLayout.fit(List.of(arm),42);assertTrue(unclassified.fallback(TissueCore.GIZZARD,arm));assertFalse(functionalFallback(TissueCore.GIZZARD,arm,1,42).isEmpty());
         assertNotEquals(Math.signum(functionalMount(TissueCore.BLADE,body,42).modelCentre().x()),Math.signum(functionalMount(TissueCore.CHELA,body,42).modelCentre().x()));
     }
     @Test void restingBladeRunsAlongTheForearmAndTheMuscularWristUncoilsOnlyForItsGrab(){
@@ -73,7 +75,7 @@ class TissueOrganLayoutTest {
             int count=0;for(var b:bones)if(layout.mounted(core,b))for(var mesh:functional(core,b,2,42)){count++;faces+=mesh.faces().length;}
             assertTrue(count>0,core.toString());pieces+=count;
         }
-        assertTrue(pieces<=24&&faces<700,"eleven functional categories share a bounded integrated kit rather than duplicating every weapon on each leg; pieces="+pieces+" faces="+faces);
+        assertTrue(pieces<=32&&faces<900,"seventeen functional categories share a bounded integrated kit rather than duplicating every weapon or stomach on each leg; pieces="+pieces+" faces="+faces);
     }
     @Test void retiringOldWeaponKitsIsContinuousAndDoesNotEraseSkinOrMouthParts(){
         assertTrue(TissueOrganLayout.oldDistalKit("claw_0"));assertTrue(TissueOrganLayout.oldDistalKit("blade_1"));assertTrue(TissueOrganLayout.oldDistalKit("ulnar_blade"));

@@ -141,7 +141,40 @@ public final class TissueMorphogenesis {
         float w=box.span(principal(right)),h=box.span(principal(up)),d=box.span(principal(front));
         boolean limb=b.role>=2&&b.role<=5,fore=b.role==2||b.role==3;
         float side=b.modelCentre.x<0?-1:1;V outer=right.mul(side);
-        if(core==TissueCore.TENDON&&limb){
+        if(core.digestive()&&b.role==(core==TissueCore.CROP?1:0)){
+            if(core==TissueCore.CROP){
+                V root=c.sub(up.mul(h*.30F)).add(front.mul(d*.10F));
+                organ(out,core.id+"_pouch",0,"",right,null,List.of(new Section(root,w*.20F,d*.18F),
+                        new Section(root.sub(up.mul(h*.16F)).add(front.mul(d*.14F)),w*.30F,d*.29F),
+                        new Section(root.sub(up.mul(h*.27F)),w*.19F,d*.18F)),right,front,b,seed);
+            }else if(core==TissueCore.GIZZARD){
+                V root=c.sub(up.mul(h*.22F)).add(front.mul(d*.14F));
+                organ(out,core.id+"_ventral",2,"",right,null,List.of(new Section(root,w*.23F,d*.19F),
+                        new Section(root.sub(up.mul(h*.22F)),w*.32F,d*.26F),
+                        new Section(root.sub(up.mul(h*.31F)),w*.21F,d*.17F)),right,front,b,seed);
+            }else if(core==TissueCore.FERMENT){
+                V root=c.sub(up.mul(h*.23F)).sub(front.mul(d*.16F));
+                organ(out,core.id+"_chamber",1,"",right,null,List.of(new Section(root,w*.24F,d*.17F),
+                        new Section(root.sub(up.mul(h*.18F)).sub(front.mul(d*.11F)),w*.36F,d*.26F),
+                        new Section(root.sub(up.mul(h*.25F)).add(front.mul(d*.13F)),w*.29F,d*.20F),
+                        new Section(root.sub(up.mul(h*.27F)).add(front.mul(d*.27F)),w*.18F,d*.12F)),right,front,b,seed);
+            }else if(core==TissueCore.ABSORPTIVE){
+                V root=c.sub(up.mul(h*.26F)).add(right.mul(w*.13F));
+                organ(out,core.id+"_fold",1,"",right,null,List.of(new Section(root,w*.14F,d*.14F),
+                        new Section(root.sub(up.mul(h*.15F)).add(front.mul(d*.16F)),w*.21F,d*.20F),
+                        new Section(root.sub(up.mul(h*.20F)).sub(front.mul(d*.17F)),w*.17F,d*.16F)),right,front,b,seed);
+            }else if(core==TissueCore.PANCREAS){
+                V root=c.sub(up.mul(h*.24F)).sub(right.mul(w*.16F));
+                organ(out,core.id+"_lobe",1,"",right,null,List.of(new Section(root,w*.15F,d*.14F),
+                        new Section(root.sub(up.mul(h*.13F)).add(front.mul(d*.15F)),w*.19F,d*.18F),
+                        new Section(root.sub(up.mul(h*.19F)).add(front.mul(d*.24F)),w*.10F,d*.10F)),right,front,b,seed);
+            }else{
+                V root=c.sub(up.mul(h*.23F));
+                organ(out,core.id+"_pad",2,"",right,null,List.of(new Section(root,w*.30F,d*.28F),
+                        new Section(root.sub(up.mul(h*.20F)),w*.44F,d*.41F),
+                        new Section(root.sub(up.mul(h*.28F)),w*.35F,d*.30F)),right,front,b,seed);
+            }
+        }else if(core==TissueCore.TENDON&&limb){
             V root=c.add(up.mul(h*.32F)).sub(front.mul(d*.37F));
             organ(out,core.id+"_cable",2,"",right,null,List.of(new Section(root,w*.22F,d*.11F),
                     new Section(c.sub(front.mul(d*.48F)),w*.13F,d*.13F),
@@ -216,7 +249,7 @@ public final class TissueMorphogenesis {
     }
     public static Bone functionalMount(TissueCore core,Bone body,long seed){
         boolean sided=core==TissueCore.BLADE||core==TissueCore.CHELA||core==TissueCore.HYDROSTAT||core==TissueCore.CLUB||core==TissueCore.SADDLE||core==TissueCore.CNIDOCYTE;
-        int role=switch(core){case HORN,PHARYNX,TONGUE->1;case TENDON,HYDRAULIC->4;default->2;};
+        int role=core.digestive()&&core!=TissueCore.CROP?0:switch(core){case HORN,PHARYNX,TONGUE,CROP->1;case TENDON,HYDRAULIC->4;default->2;};
         int side=!sided?0:core==TissueCore.BLADE||core==TissueCore.CLUB?TissueOrganLayout.bladeSide(seed):-TissueOrganLayout.bladeSide(seed);
         V c=body.box.centre(),half=body.box.high.sub(body.box.low).mul(sided?.24F:.32F);
         V centre=c.add(body.right.mul(side*span(body.box,body.right)*.38F));

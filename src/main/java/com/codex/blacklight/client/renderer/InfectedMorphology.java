@@ -67,6 +67,7 @@ public final class InfectedMorphology implements AutoCloseable {
         tissueSeed=host.getUUID().getMostSignificantBits()^host.getUUID().getLeastSignificantBits();
         authored.growth(tissueGrowth,tissueSeed);
         authored.evolution(host.tissueAge(),host.tissueTentacles(),ChimeraTissue.receiverEvolution(host,true,partial));
+        authored.digestion(host.digestiveProfile(),host.digestiveVisual(),host.level().getGameTime()+partial);
         surface=new SurfaceTissue(host,model,root,partial,anatomical,authored);
         if(anatomical==null)skins.put(nativeTexture,InfectedWoundTextures.get(nativeTexture,type,authored.wounds()));
         var species=DEFINITIONS.getAsJsonObject("species");
@@ -96,7 +97,7 @@ public final class InfectedMorphology implements AutoCloseable {
             return;
         }
         if(context.authored.available()){
-            var coat=AuthoredInfectionParts.bind(context.speciesId,model,path.contains("sheep_fur"));coat.growth(context.tissueGrowth,context.tissueSeed);coat.evolution(context.authored.age(),context.authored.tentacles(),context.authored.development());context.coats.add(coat);
+            var coat=AuthoredInfectionParts.bind(context.speciesId,model,path.contains("sheep_fur"));coat.growth(context.tissueGrowth,context.tissueSeed);coat.evolution(context.authored.age(),context.authored.tentacles(),context.authored.development());coat.digestion(context.authored);context.coats.add(coat);
             if(path.contains("sheep_fur")||path.contains("slime"))context.coatGrowth.add(coat);
             context.skins.put(texture,InfectedWoundTextures.get(texture,context.speciesId,coat.wounds()));return;
         }

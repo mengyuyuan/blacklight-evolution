@@ -36,6 +36,8 @@ public final class TissueOrganLayout {
         put(assignments,TissueCore.CLUB,pick(fore,side,centre,false));
         put(assignments,TissueCore.TONGUE,head);
         put(assignments,TissueCore.CNIDOCYTE,pick(fore,-side,centre,false));
+        for(var core:new TissueCore[]{TissueCore.GIZZARD,TissueCore.FERMENT,TissueCore.ABSORPTIVE,TissueCore.PANCREAS,TissueCore.FAT})put(assignments,core,trunk.role()==0?trunk:null);
+        put(assignments,TissueCore.CROP,head);
         return new TissueOrganLayout(assignments,trunk.path());
     }
     private static void put(Map<TissueCore,Set<String>> map,TissueCore core,Bone bone){map.put(core,bone==null?Set.of():Set.of(bone.path()));}

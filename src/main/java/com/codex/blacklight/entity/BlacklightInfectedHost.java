@@ -8,6 +8,8 @@ import com.codex.blacklight.infection.TissueGrowth;
 import com.codex.blacklight.infection.TissueEvolution;
 import com.codex.blacklight.infection.TissueCore;
 import com.codex.blacklight.infection.TissueMetabolism;
+import com.codex.blacklight.infection.TissueDigestion;
+import com.codex.blacklight.infection.TissueFeeding;
 import com.codex.blacklight.infection.TissueInheritance;
 import com.codex.blacklight.infection.TissueInheritanceCodec;
 import com.codex.blacklight.infection.TissueCompetition;
@@ -149,6 +151,24 @@ public final class BlacklightInfectedHost extends Monster {
     private static final EntityDataAccessor<Long> TISSUE_GRIP_RELEASE=SynchedEntityData.defineId(BlacklightInfectedHost.class,EntityDataSerializers.LONG);
     private static final EntityDataAccessor<org.joml.Vector3f> TISSUE_STRIKE_POINT=SynchedEntityData.defineId(BlacklightInfectedHost.class,EntityDataSerializers.VECTOR3);
     private static final EntityDataAccessor<Integer> TISSUE_NUTRITION=SynchedEntityData.defineId(BlacklightInfectedHost.class,EntityDataSerializers.INT);
+    private static final EntityDataAccessor<CompoundTag> TISSUE_DIGESTION=SynchedEntityData.defineId(BlacklightInfectedHost.class,EntityDataSerializers.COMPOUND_TAG);
+    private TissueDigestion digestion=new TissueDigestion();
+    private long nextTissueForage;
+    public TissueDigestion digestion(){return digestion;}
+    public CompoundTag digestiveVisual(){return entityData.get(TISSUE_DIGESTION).copy();}
+    public TissueDigestion.Profile digestiveProfile(){return new TissueDigestion.Profile(organPower(TissueCore.GIZZARD),organPower(TissueCore.FERMENT),organPower(TissueCore.ABSORPTIVE),organPower(TissueCore.PANCREAS),organPower(TissueCore.CROP),organPower(TissueCore.FAT));}
+    private void publishDigestion(){if(!level().isClientSide){var visual=digestion.visual(digestiveProfile());if(!visual.equals(entityData.get(TISSUE_DIGESTION)))entityData.set(TISSUE_DIGESTION,visual);}}
+    public boolean offerTissueFood(TissueDigestion.Kind kind,int nutrition){
+        if(level().isClientSide||!isAlive()||hasMultipartBody()||devourerIdentity()||!digestion.offer(kind,nutrition,digestiveProfile()))return false;
+        publishDigestion();return true;
+    }
+    private void depositTissueNutrition(int nutrition){entityData.set(TISSUE_NUTRITION,digestion.deposit(tissueNutrition(),nutrition,digestiveProfile()));publishDigestion();}
+    @Override protected net.minecraft.world.InteractionResult mobInteract(Player player,InteractionHand hand){
+        if(TissueFeeding.food(this,player.getItemInHand(hand))!=null){
+            if(level().isClientSide)return net.minecraft.world.InteractionResult.SUCCESS;
+            if(TissueFeeding.playerFeed(this,player,hand))return net.minecraft.world.InteractionResult.CONSUME;
+        }return super.mobInteract(player,hand);
+    }
     private static final EntityDataAccessor<CompoundTag> TISSUE_INHERITANCE=SynchedEntityData.defineId(BlacklightInfectedHost.class,EntityDataSerializers.COMPOUND_TAG);
     private static final EntityDataAccessor<Integer> CANNIBAL_TARGET=SynchedEntityData.defineId(BlacklightInfectedHost.class,EntityDataSerializers.INT);
     private static final EntityDataAccessor<Long> CANNIBAL_STARTED=SynchedEntityData.defineId(BlacklightInfectedHost.class,EntityDataSerializers.LONG);
@@ -198,7 +218,7 @@ public final class BlacklightInfectedHost extends Monster {
         var before=tissueInheritance();var after=before.inherit(operation,donor,TissueOrgans.seed(getUUID()),tissueAge(),seed,age,TissueCompetitionConfig.rules(),donorPlan,knownNativeTissueCore(),donorCore,donorSpecies,donorAppearance);
         if(before==after)return;
         publishInheritance(after);
-        entityData.set(TISSUE_NUTRITION,TissueMetabolism.add(tissueNutrition(),24));
+        depositTissueNutrition(24);
     }
     /** Bounded source anatomy descriptor. Unknown species use structural proportions, not an ID whitelist. */
     public int nativeTissuePlan(){
@@ -285,6 +305,9 @@ public final class BlacklightInfectedHost extends Monster {
     }
     private void digestTissue() {
         int elapsed=tissueClock;tissueClock=0;
+        if(tissueMetabolismActive()){
+            var processed=digestion.advance(elapsed,tissueNutrition(),digestiveProfile());entityData.set(TISSUE_NUTRITION,processed.reserve());publishDigestion();
+        }
         var genes=tissueInheritance();
         boolean integrating=genes.organs().values().stream().anyMatch(o->o.work()>0||!o.mature())||genes.sources().values().stream().anyMatch(s->s.work()>0);
         boolean repairing=tissueRecoveryTicks==0&&getHealth()<getMaxHealth()-.01F&&!getData(ModAttachments.CONSUME_VISUAL).active();
@@ -316,7 +339,8 @@ public final class BlacklightInfectedHost extends Monster {
         int meal=TissueMetabolism.meal(CombatScale.originalMaximum(victim),nativeTissueCore());
         if(meal<=0)return accepted;
         victim.getPersistentData().putBoolean(TISSUE_MEAL,true);
-        int previous=tissueNutrition();entityData.set(TISSUE_NUTRITION,TissueMetabolism.add(previous,meal));
+        int previous=tissueNutrition();
+        if(digestiveProfile().digestive())offerTissueFood(TissueDigestion.Kind.MEAT,meal);else depositTissueNutrition(meal);
         if(tissueNutrition()>previous)server.sendParticles(new net.minecraft.core.particles.DustParticleOptions(new org.joml.Vector3f(.38F,.025F,.035F),1.1F),
                 getX(),getY()+getBbHeight()*.55,getZ(),10,getBbWidth()*.2,getBbHeight()*.15,getBbWidth()*.2,.025);
         return accepted;
@@ -356,7 +380,7 @@ public final class BlacklightInfectedHost extends Monster {
     }
     @Override protected void defineSynchedData(SynchedEntityData.Builder b) {
         super.defineSynchedData(b);b.define(TISSUE_FRAME,new org.joml.Vector3f(1));b.define(TISSUE_AGE,0L);b.define(TISSUE_BODY_SCALE,1F);b.define(TISSUE_CORE_FRACTURE,0F);b.define(TISSUE_STRIKE_TARGET,-1);b.define(TISSUE_STRIKE_STARTED,-1L);b.define(TISSUE_GRIP_RELEASE,-1L);b.define(TISSUE_STRIKE_POINT,new org.joml.Vector3f());b.define(HOST,new CompoundTag());b.define(FEED_TARGET,-1);b.define(FEED_STARTED,-1L);b.define(DEVOURER,false);b.define(NURSERY,new CompoundTag());b.define(FEED_NODE,-1);
-        b.define(TISSUE_NUTRITION,0);
+        b.define(TISSUE_NUTRITION,0);b.define(TISSUE_DIGESTION,new CompoundTag());
         b.define(TISSUE_INHERITANCE,new CompoundTag());b.define(CANNIBAL_TARGET,-1);b.define(CANNIBAL_STARTED,-1L);b.define(CANNIBAL_PREY,false);b.define(CANNIBAL_DURATION,TissueCompetition.END_TICKS);b.define(TISSUE_ACTION,new CompoundTag());
         b.define(EVOLVED_STATE,new CompoundTag());b.define(EVOLVED_ACTION,new CompoundTag());
     }
@@ -668,6 +692,7 @@ public final class BlacklightInfectedHost extends Monster {
         super.tick();updateParts();if(level().isClientSide)return;setupNavigation();
         if(tissueRecoveryTicks>0)tissueRecoveryTicks--;
         if(isAlive() && ++tissueClock>=20)digestTissue();
+        if(isAlive()&&tissueMetabolismActive())nextTissueForage=TissueFeeding.scavenge(this,nextTissueForage);
         entityData.set(DEVOURER,DevourerFeedingSystem.isDevourer(this));
         DevourerFeedingSystem.tick(this);
         tickBoss();
@@ -915,6 +940,7 @@ public final class BlacklightInfectedHost extends Monster {
         tag.put("BlacklightTissueInheritance",TissueInheritanceCodec.write(tissueInheritance()));
         tag.putInt("BlacklightTissueNutrition",tissueNutrition());tag.putInt("BlacklightTissueNutritionDebt",tissueNutritionDebt);tag.putInt("BlacklightTissueRecovery",tissueRecoveryTicks);
         tag.putInt("BlacklightTissueCultivation",tissueCultivationTicks);
+        tag.put("BlacklightTissueDigestion",digestion.write());
         super.addAdditionalSaveData(tag);tag.putLong("BlacklightTissueAge",com.codex.blacklight.infection.TissueGrowth.advance(tissueAge(),tissueClock));tag.putFloat("BlacklightTissueScale",tissueBodyScale());tag.putFloat("BlacklightCoreFracture",tissueCoreFracture());tag.put("BlacklightHost",hostData().copy());tag.putBoolean("BlacklightBossDefeated",bossDefeated);
     }
     @Override public void readAdditionalSaveData(CompoundTag tag) {
@@ -975,6 +1001,7 @@ public final class BlacklightInfectedHost extends Monster {
         entityData.set(TISSUE_BODY_SCALE,hasMultipartBody()||!Float.isFinite(savedScale)?1F
                 :Math.clamp(savedScale,1F,desiredTissueScale()));
         if(isEvolved())getAttribute(Attributes.FOLLOW_RANGE).setBaseValue(Math.max(48,getAttributeValue(Attributes.FOLLOW_RANGE)));
+        digestion=TissueDigestion.read(tag.getCompound("BlacklightTissueDigestion"));publishDigestion();nextTissueForage=level().getGameTime()+Math.floorMod(getId(),40);
         updateTissueCombat();refreshDimensions();setPersistenceRequired();
     }
 }

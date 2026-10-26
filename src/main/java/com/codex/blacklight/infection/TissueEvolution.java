@@ -15,7 +15,9 @@ public final class TissueEvolution {
     private static final float[][] FUNCTIONAL_SUPPORT={
             {.90F,.35F,.10F,.48F,.12F},{.72F,.78F,.08F,.70F,.18F},{.65F,.28F,.10F,1.05F,.12F},
             {.75F,.68F,.12F,.90F,.42F},{.85F,.92F,.10F,.85F,.28F},{.90F,.95F,.30F,.15F,.90F},{.65F,.40F,1.10F,.20F,.20F},
-            {1.15F,.50F,.10F,.45F,.20F},{1.20F,.65F,.10F,.55F,.18F},{.65F,.30F,.95F,.65F,.20F},{.65F,.45F,.20F,.85F,.35F}};
+            {1.15F,.50F,.10F,.45F,.20F},{1.20F,.65F,.10F,.55F,.18F},{.65F,.30F,.95F,.65F,.20F},{.65F,.45F,.20F,.85F,.35F},
+            {.58F,.32F,.18F,.08F,.12F},{.62F,.28F,.18F,.08F,.12F},{.58F,.25F,.15F,.08F,.15F},
+            {.56F,.25F,.18F,.08F,.18F},{.56F,.28F,.42F,.08F,.12F},{.68F,.32F,.12F,.08F,.12F}};
     public record Combat(double health,double damage,double armor,double knockback) { }
     private TissueEvolution() {}
 
