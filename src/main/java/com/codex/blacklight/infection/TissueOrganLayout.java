@@ -41,6 +41,7 @@ public final class TissueOrganLayout {
         put(assignments,TissueCore.EXTRAORAL,head);put(assignments,TissueCore.GILL_RAKER,head);
         for(var core:TissueCore.values())if(core.vital())put(assignments,core,core==TissueCore.GILL_LAMELLA?head:trunk.role()==0?trunk:null);
         put(assignments,TissueCore.VASCULAR,trunk.role()==0?trunk:null);
+        for(var core:TissueCore.values())if(core.defensive())put(assignments,core,trunk.role()==0?trunk:null);
         return new TissueOrganLayout(assignments,trunk.path());
     }
     private static void put(Map<TissueCore,Set<String>> map,TissueCore core,Bone bone){map.put(core,bone==null?Set.of():Set.of(bone.path()));}

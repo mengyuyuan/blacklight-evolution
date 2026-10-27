@@ -755,5 +755,7 @@
   "upgrade.blacklight.branchial_heart": "辅助鳃心",
   "upgrade.blacklight.splenic_reservoir": "脾脏储血器",
   "building.blacklight.supply_status": "阶段 %s/4 · 成熟 %s%% · 组织 %s · 养分 %s · 待消化 %s份",
-  "upgrade.blacklight.vascular_stolon": "殖群贯通索"
+  "upgrade.blacklight.vascular_stolon": "殖群贯通索",
+  "upgrade.blacklight.osteoderm": "真皮骨板",
+  "upgrade.blacklight.nacre_shield": "层状复合盾"
 }

@@ -11,6 +11,8 @@ import com.codex.blacklight.infection.TissueMetabolism;
 import com.codex.blacklight.infection.TissueDigestion;
 import com.codex.blacklight.infection.TissueFeeding;
 import com.codex.blacklight.infection.TissueVitals;
+import com.codex.blacklight.infection.TissueDefense;
+import com.codex.blacklight.infection.TissueDefenseSystem;
 import com.codex.blacklight.infection.TissueVitalSystem;
 import com.codex.blacklight.infection.TissueInheritance;
 import com.codex.blacklight.infection.TissueInheritanceCodec;
@@ -162,6 +164,12 @@ public final class BlacklightInfectedHost extends Monster {
     public CompoundTag vascularVisual(){return entityData.get(TISSUE_VASCULAR).copy();}
     public void setVascularVisual(CompoundTag visual){if(!level().isClientSide)entityData.set(TISSUE_VASCULAR,visual);}
     private TissueVitals vitals=new TissueVitals();
+    private static final EntityDataAccessor<CompoundTag> TISSUE_DEFENSE=SynchedEntityData.defineId(BlacklightInfectedHost.class,EntityDataSerializers.COMPOUND_TAG);
+    private TissueDefense defense=new TissueDefense();
+    public TissueDefense defense(){return defense;}
+    public TissueDefense.Profile defenseProfile(){return tissueMetabolismActive()?new TissueDefense.Profile(organPower(TissueCore.OSTEODERM),organPower(TissueCore.NACRE)):new TissueDefense.Profile(0,0);}
+    public CompoundTag defenseVisual(){return entityData.get(TISSUE_DEFENSE).copy();}
+    public void publishDefense(){if(!level().isClientSide){var state=defense.visual(defenseProfile());if(!state.equals(entityData.get(TISSUE_DEFENSE)))entityData.set(TISSUE_DEFENSE,state);}}
     private TissueVitals.Profile vitalsProfile;
     private long vitalsAge=Long.MIN_VALUE,vitalsRevision=Long.MIN_VALUE;
     private String vitalsCore="";
@@ -417,7 +425,7 @@ public final class BlacklightInfectedHost extends Monster {
     }
     @Override protected void defineSynchedData(SynchedEntityData.Builder b) {
         super.defineSynchedData(b);b.define(TISSUE_FRAME,new org.joml.Vector3f(1));b.define(TISSUE_AGE,0L);b.define(TISSUE_BODY_SCALE,1F);b.define(TISSUE_CORE_FRACTURE,0F);b.define(TISSUE_STRIKE_TARGET,-1);b.define(TISSUE_STRIKE_STARTED,-1L);b.define(TISSUE_GRIP_RELEASE,-1L);b.define(TISSUE_STRIKE_POINT,new org.joml.Vector3f());b.define(HOST,new CompoundTag());b.define(FEED_TARGET,-1);b.define(FEED_STARTED,-1L);b.define(DEVOURER,false);b.define(NURSERY,new CompoundTag());b.define(FEED_NODE,-1);
-        b.define(TISSUE_NUTRITION,0);b.define(TISSUE_DIGESTION,new CompoundTag());b.define(TISSUE_VITALS,new CompoundTag());b.define(TISSUE_VASCULAR,new CompoundTag());
+        b.define(TISSUE_NUTRITION,0);b.define(TISSUE_DIGESTION,new CompoundTag());b.define(TISSUE_VITALS,new CompoundTag());b.define(TISSUE_VASCULAR,new CompoundTag());b.define(TISSUE_DEFENSE,new CompoundTag());
         b.define(TISSUE_INHERITANCE,new CompoundTag());b.define(CANNIBAL_TARGET,-1);b.define(CANNIBAL_STARTED,-1L);b.define(CANNIBAL_PREY,false);b.define(CANNIBAL_DURATION,TissueCompetition.END_TICKS);b.define(TISSUE_ACTION,new CompoundTag());
         b.define(EVOLVED_STATE,new CompoundTag());b.define(EVOLVED_ACTION,new CompoundTag());
     }
@@ -728,6 +736,7 @@ public final class BlacklightInfectedHost extends Monster {
     }
     @Override public void tick() {
         super.tick();updateParts();if(level().isClientSide)return;setupNavigation();
+        TissueDefenseSystem.tick(this);
         if(tissueRecoveryTicks>0)tissueRecoveryTicks--;
         if(isAlive() && ++tissueClock>=20)digestTissue();
         if(isAlive()&&tissueMetabolismActive())nextTissueForage=TissueFeeding.scavenge(this,nextTissueForage);
@@ -906,6 +915,15 @@ public final class BlacklightInfectedHost extends Monster {
     @Override public void knockback(double strength,double x,double z){
         if(!evolvedControlProtected())super.knockback(strength,x,z);
     }
+    /** Run after vanilla's same-hit cooldown comparison, on the accepted difference.
+     * NeoForge uses its container rather than the method argument as the damage source of truth. */
+    @Override protected void actuallyHurt(DamageSource source,float amount){
+        var protection=level().isClientSide?new TissueDefense.Decision(amount,0,0):TissueDefenseSystem.incoming(this,source,damageContainers.peek().getNewDamage());
+        if(!level().isClientSide)damageContainers.peek().setNewDamage(protection.damage());
+        float before=getHealth(),absorbed=getAbsorptionAmount(),maximum=getMaxHealth();
+        super.actuallyHurt(source,protection.damage());
+        if(!level().isClientSide&&(getHealth()<before||getAbsorptionAmount()<absorbed)){defense.accepted(protection,maximum,level().getGameTime());publishDefense();}
+    }
     @Override public boolean hurt(DamageSource source,float amount) {
         if(evolvedCombat.evading()&&!source.is(net.minecraft.tags.DamageTypeTags.BYPASSES_INVULNERABILITY))return false;
         if(encounterBoss()&&source.getEntity()==this)return false;
@@ -985,6 +1003,7 @@ public final class BlacklightInfectedHost extends Monster {
         tag.putInt("BlacklightTissueCultivation",tissueCultivationTicks);
         tag.put("BlacklightTissueDigestion",digestion.write());
         tag.put("BlacklightTissueVitals",vitals.write());
+        tag.put("BlacklightTissueDefense",defense.write());
         tag.put("BlacklightTissueVascular",vascular.write());
         super.addAdditionalSaveData(tag);tag.putLong("BlacklightTissueAge",com.codex.blacklight.infection.TissueGrowth.advance(tissueAge(),tissueClock));tag.putFloat("BlacklightTissueScale",tissueBodyScale());tag.putFloat("BlacklightCoreFracture",tissueCoreFracture());tag.put("BlacklightHost",hostData().copy());tag.putBoolean("BlacklightBossDefeated",bossDefeated);
     }
@@ -1049,6 +1068,7 @@ public final class BlacklightInfectedHost extends Monster {
         if(isEvolved())getAttribute(Attributes.FOLLOW_RANGE).setBaseValue(Math.max(48,getAttributeValue(Attributes.FOLLOW_RANGE)));
         digestion=TissueDigestion.read(tag.getCompound("BlacklightTissueDigestion"));publishDigestion();nextTissueForage=level().getGameTime()+Math.floorMod(getId(),40);
         vitals=TissueVitals.read(tag.getCompound("BlacklightTissueVitals"));vitalsProfile=null;publishVitals();
+        defense=TissueDefense.read(tag.getCompound("BlacklightTissueDefense"));publishDefense();
         vascular=com.codex.blacklight.infection.TissueVascular.read(tag.getCompound("BlacklightTissueVascular"));setVascularVisual(new CompoundTag());
         updateTissueCombat();refreshDimensions();setPersistenceRequired();
     }

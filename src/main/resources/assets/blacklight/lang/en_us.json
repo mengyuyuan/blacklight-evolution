@@ -755,5 +755,7 @@
   "upgrade.blacklight.branchial_heart": "Branchial Heart",
   "upgrade.blacklight.splenic_reservoir": "Splenic Reservoir",
   "building.blacklight.supply_status": "Stage %s/4 · Maturity %s%% · Tissue %s · Nutrients %s · Digesting %s portions",
-  "upgrade.blacklight.vascular_stolon": "Vascular Stolon"
+  "upgrade.blacklight.vascular_stolon": "Vascular Stolon",
+  "upgrade.blacklight.osteoderm": "Dermal osteoderms",
+  "upgrade.blacklight.nacre_shield": "Lamellar composite shield"
 }

@@ -141,7 +141,23 @@ public final class TissueMorphogenesis {
         float w=box.span(principal(right)),h=box.span(principal(up)),d=box.span(principal(front));
         boolean limb=b.role>=2&&b.role<=5,fore=b.role==2||b.role==3;
         float side=b.modelCentre.x<0?-1:1;V outer=right.mul(side);
-        if(core==TissueCore.VASCULAR&&b.role==0){
+        if(core==TissueCore.OSTEODERM&&b.role==0){
+            V normal=plan==0?front.mul(-1):up,along=plan==0?up:front;
+            float length=plan==0?h:d,thickness=plan==0?d:h;
+            for(int sign:new int[]{-1,1}){
+                V root=c.add(right.mul(sign*w*.20F)).add(along.mul(length*.30F)).add(normal.mul(thickness*.30F));
+                organ(out,core.id+"_dermal_plate_"+sign,1,"",right,null,List.of(new Section(root,w*.13F,thickness*.08F),
+                        new Section(root.sub(along.mul(length*.18F)).add(normal.mul(thickness*.18F)),w*.23F,thickness*.13F),
+                        new Section(root.sub(along.mul(length*.62F)).add(normal.mul(thickness*.13F)),w*.17F,thickness*.09F)),right,normal,b,seed);
+            }
+        }else if(core==TissueCore.NACRE&&b.role==0){
+            for(int layer=0;layer<3;layer++){
+                V root=c.add(up.mul(h*(.28F-layer*.17F))).add(front.mul(d*.42F));
+                organ(out,core.id+"_lamella_"+layer,2,"",right,null,List.of(new Section(root,w*.24F,d*.06F),
+                        new Section(root.sub(up.mul(h*.12F)).add(front.mul(d*.18F)),w*.45F,d*.10F),
+                        new Section(root.sub(up.mul(h*.23F)).add(front.mul(d*.10F)),w*.34F,d*.055F)),right,front,b,seed);
+            }
+        }else if(core==TissueCore.VASCULAR&&b.role==0){
             V root=c.sub(up.mul(h*.22F)).add(front.mul(d*.18F));
             organ(out,core.id+"_sinus",1,"",right,null,List.of(new Section(root,w*.18F,d*.12F),
                     new Section(root.sub(up.mul(h*.10F)).add(front.mul(d*.20F)),w*.23F,d*.17F),
@@ -295,7 +311,7 @@ public final class TissueMorphogenesis {
     }
     public static Bone functionalMount(TissueCore core,Bone body,long seed){
         boolean sided=core==TissueCore.BLADE||core==TissueCore.CHELA||core==TissueCore.HYDROSTAT||core==TissueCore.CLUB||core==TissueCore.SADDLE||core==TissueCore.CNIDOCYTE;
-        int role=(core.colonial()||core.digestive()&&core!=TissueCore.CROP&&core!=TissueCore.GILL_RAKER||core.vital()&&core!=TissueCore.GILL_LAMELLA)?0:switch(core){case HORN,PHARYNX,TONGUE,CROP,EXTRAORAL,GILL_RAKER,GILL_LAMELLA->1;case TENDON,HYDRAULIC->4;default->2;};
+        int role=(core.defensive()||core.colonial()||core.digestive()&&core!=TissueCore.CROP&&core!=TissueCore.GILL_RAKER||core.vital()&&core!=TissueCore.GILL_LAMELLA)?0:switch(core){case HORN,PHARYNX,TONGUE,CROP,EXTRAORAL,GILL_RAKER,GILL_LAMELLA->1;case TENDON,HYDRAULIC->4;default->2;};
         int side=!sided?0:core==TissueCore.BLADE||core==TissueCore.CLUB?TissueOrganLayout.bladeSide(seed):-TissueOrganLayout.bladeSide(seed);
         V c=body.box.centre(),half=body.box.high.sub(body.box.low).mul(sided?.24F:.32F);
         V centre=c.add(body.right.mul(side*span(body.box,body.right)*.38F));

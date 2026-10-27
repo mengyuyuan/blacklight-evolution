@@ -45,7 +45,7 @@ class TissueOrganLayoutTest {
         }
         var absent=TissueOrganLayout.fit(List.of(body),42);
         for(var core:TissueCore.values())if(!core.legacy()){
-            if(core.colonial()||core.digestive()&&core!=TissueCore.CROP&&core!=TissueCore.GILL_RAKER||core.vital()&&core!=TissueCore.GILL_LAMELLA){assertTrue(absent.mounted(core,body));assertFalse(functional(core,body,1,42).isEmpty());}
+            if(core.defensive()||core.colonial()||core.digestive()&&core!=TissueCore.CROP&&core!=TissueCore.GILL_RAKER||core.vital()&&core!=TissueCore.GILL_LAMELLA){assertTrue(absent.mounted(core,body));assertFalse(functional(core,body,1,42).isEmpty());}
             else {assertTrue(absent.fallback(core,body));assertFalse(functionalFallback(core,body,1,42).isEmpty());}
         }
         var unclassified=TissueOrganLayout.fit(List.of(arm),42);assertTrue(unclassified.fallback(TissueCore.GIZZARD,arm));assertFalse(functionalFallback(TissueCore.GIZZARD,arm,1,42).isEmpty());
