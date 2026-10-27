@@ -26,6 +26,7 @@ public final class InfectedHostRenderer extends EntityRenderer<BlacklightInfecte
     public void render(BlacklightInfectedHost entity,float yaw,float partial,PoseStack stack,MultiBufferSource buffers,int light){
         DevourerFeedingFx.render(entity,partial,stack,buffers,light);
         TissueCompetitionFx.render(entity,partial,stack,buffers,light);
+        TissueVascularFx.render(entity,partial,stack,buffers,light);
         EvolvedBodyRenderer.cocoon(entity,partial,stack,buffers,light);
         if(entity.cannibalPrey()&&TissueCompetitionFx.active(entity))buffers=new CannibalCoverBuffers(buffers,entity,stack,partial);
         if(entity.isEvolved()){EvolvedBodyRenderer.render(entity,partial,stack,buffers,light);super.render(entity,yaw,partial,stack,buffers,light);return;}
@@ -73,6 +74,7 @@ public final class InfectedHostRenderer extends EntityRenderer<BlacklightInfecte
     }
 
     @Override public boolean shouldRender(BlacklightInfectedHost entity,Frustum camera,double x,double y,double z){
+        if(entity.hasVascularVisual()){var vascular=entity.vascularVisual();if(entity.shouldRender(x,y,z)&&camera.isVisible(entity.getBoundingBox().minmax(new net.minecraft.world.phys.AABB(net.minecraft.core.BlockPos.of(vascular.getLong("Target")))).inflate(.3)))return true;}
         if(entity.devourerIdentity()&&!entity.giantBoss()&&entity.nurseryData().contains("Home")&&entity.shouldRender(x,y,z)
                 &&camera.isVisible(new net.minecraft.world.phys.AABB(entity.nurseryHome()).inflate(42)))return true;
         if(entity.feedingStarted()>=0&&entity.level().getEntity(entity.feedingTargetId()) instanceof net.minecraft.world.entity.LivingEntity prey

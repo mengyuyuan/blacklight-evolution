@@ -6,6 +6,8 @@ import static com.codex.blacklight.infection.TissueMorphogenesis.*;
 /** Internal organs contract around their buried attachment; full crop/lipid tissue has real volume. */
 public final class TissueDigestiveMotion {
     private TissueDigestiveMotion(){}
+    /** Reduce the common .17-radian cycle before converting to float, preserving sub-tick motion in old worlds. */
+    public static float clock(long tick,float partial){return (float)(Math.IEEEremainder(tick*.17,Math.PI*2)/.17+partial);}
     public static boolean active(TissueCore core,CompoundTag state){return switch(core){
         case GIZZARD->state.getBoolean("Working")&&(state.getString("WorkingKind").equals("fibre")||state.getString("WorkingKind").equals("ferment"));
         case FERMENT->state.getBoolean("Working")&&state.getString("WorkingKind").equals("ferment");

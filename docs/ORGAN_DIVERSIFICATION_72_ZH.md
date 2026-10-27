@@ -2,7 +2,7 @@
 
 日期：2026-10-24。范围：先为 NeoForge 1.21.1 设计，Forge 1.20.1 随后移植。
 
-**状态（2026-10-27）：72 项完整设计，实际接入 24 类，剩余 48 项正在分批实装。** 第一批 12 类之后，已增加四种战斗器官、六种消化储备器官，以及体外消化腺与滤食鳃耙；不能宣传成游戏已有 72 套模型或技能。当前验收以[补完台账](INFECTION_COMPLETION_WORKPLAN_ZH.md)为准；新增作用见[消化说明](TISSUE_DIGESTION_ZH.md)与[外消化、滤食说明](TISSUE_FEEDING_ORGANS_ZH.md)。
+**状态（2026-10-27）：72 项完整设计，实际接入 33 类，剩余 39 项正在分批实装。** 第一批 12 类之后，已增加四种战斗器官、八种消化/摄食器官、八种呼吸/循环器官，以及殖群贯通索；不能宣传成游戏已有 72 套模型或技能。当前验收以[补完台账](INFECTION_COMPLETION_WORKPLAN_ZH.md)为准；新增作用见[消化说明](TISSUE_DIGESTION_ZH.md)、[外消化、滤食说明](TISSUE_FEEDING_ORGANS_ZH.md)、[呼吸循环说明](TISSUE_VITAL_ORGANS_ZH.md)与[供养连接说明](TISSUE_VASCULAR_ZH.md)。
 
 完整条目见 [逐项目录](design/ORGAN_CATALOG_72.md)，机器可读版本为 [JSON 目录](design/ORGAN_CATALOG_72.json)。每条均记录生物学依据、独立作用、外形、所需支撑与使用代价；等级、颜色、左右副本、同类器官的重复来源不另算一个种类。
 

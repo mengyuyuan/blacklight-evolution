@@ -84,4 +84,9 @@ class TissueDigestionTest {
         assertEquals(1,TissueTongueShape.extension(TissueCore.EXTRAORAL,c.contact()));assertEquals(0,TissueTongueShape.extension(TissueCore.EXTRAORAL,c.end()));
         float previous=0;for(float t=c.windup();t<c.end();t+=.1F){float v=TissueTongueShape.extension(TissueCore.EXTRAORAL,t);assertTrue(Math.abs(v-previous)<.04);previous=v;}
     }
+    @Test void oldWorldDigestionPreservesSubTickMotionAndTheSameShortWorldCurve(){
+        var box=new Box(new V(-4,-4,-3),new V(4,4,3));var bone=new Bone("body",0,box,new V(0,-1,0),new V(0,0,-1),new V(1,0,0),new V(0,0,0));var state=new CompoundTag();state.putBoolean("Working",true);state.putInt("Queued",1);state.putInt("Capacity",2);var profile=new Profile(2,0,0,0,0,0);float[] original={4,4,0},same=original.clone();TissueDigestiveMotion.surface(original,bone,profile,state,24.4F);TissueDigestiveMotion.surface(same,bone,profile,state,TissueDigestiveMotion.clock(24,.4F));assertArrayEquals(original,same,.00001F);
+        float[] a={4,4,0},b=a.clone();TissueDigestiveMotion.surface(a,bone,profile,state,TissueDigestiveMotion.clock(40_000_000,.1F));TissueDigestiveMotion.surface(b,bone,profile,state,TissueDigestiveMotion.clock(40_000_000,.6F));assertFalse(java.util.Arrays.equals(a,b),"a long-running world still renders distinct intermediate frames");
+        var mesh=functional(TissueCore.GIZZARD,bone,0,42).getFirst();var first=mesh.stages()[2].clone();var later=first.clone();TissueDigestiveMotion.apply(first,bone,TissueCore.GIZZARD,TissueDigestiveMotion.clock(40_000_000,.1F),true,.5F);TissueDigestiveMotion.apply(later,bone,TissueCore.GIZZARD,TissueDigestiveMotion.clock(40_000_000,.6F),true,.5F);assertFalse(java.util.Arrays.equals(first,later));assertArrayEquals(java.util.Arrays.copyOf(first,24),java.util.Arrays.copyOf(later,24),0);
+    }
 }

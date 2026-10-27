@@ -141,7 +141,12 @@ public final class TissueMorphogenesis {
         float w=box.span(principal(right)),h=box.span(principal(up)),d=box.span(principal(front));
         boolean limb=b.role>=2&&b.role<=5,fore=b.role==2||b.role==3;
         float side=b.modelCentre.x<0?-1:1;V outer=right.mul(side);
-        if(core==TissueCore.GILL_LAMELLA&&b.role==1){
+        if(core==TissueCore.VASCULAR&&b.role==0){
+            V root=c.sub(up.mul(h*.22F)).add(front.mul(d*.18F));
+            organ(out,core.id+"_sinus",1,"",right,null,List.of(new Section(root,w*.18F,d*.12F),
+                    new Section(root.sub(up.mul(h*.10F)).add(front.mul(d*.20F)),w*.23F,d*.17F),
+                    new Section(root.sub(up.mul(h*.18F)).add(front.mul(d*.27F)),w*.12F,d*.09F)),right,front,b,seed);
+        }else if(core==TissueCore.GILL_LAMELLA&&b.role==1){
             for(int sign:new int[]{-1,1}){
                 V root=c.add(right.mul(sign*w*.30F)).sub(up.mul(h*.22F));
                 organ(out,core.id+"_operculum_"+sign,0,"",right,null,List.of(new Section(root,h*.15F,d*.14F),
@@ -290,7 +295,7 @@ public final class TissueMorphogenesis {
     }
     public static Bone functionalMount(TissueCore core,Bone body,long seed){
         boolean sided=core==TissueCore.BLADE||core==TissueCore.CHELA||core==TissueCore.HYDROSTAT||core==TissueCore.CLUB||core==TissueCore.SADDLE||core==TissueCore.CNIDOCYTE;
-        int role=(core.digestive()&&core!=TissueCore.CROP&&core!=TissueCore.GILL_RAKER||core.vital()&&core!=TissueCore.GILL_LAMELLA)?0:switch(core){case HORN,PHARYNX,TONGUE,CROP,EXTRAORAL,GILL_RAKER,GILL_LAMELLA->1;case TENDON,HYDRAULIC->4;default->2;};
+        int role=(core.colonial()||core.digestive()&&core!=TissueCore.CROP&&core!=TissueCore.GILL_RAKER||core.vital()&&core!=TissueCore.GILL_LAMELLA)?0:switch(core){case HORN,PHARYNX,TONGUE,CROP,EXTRAORAL,GILL_RAKER,GILL_LAMELLA->1;case TENDON,HYDRAULIC->4;default->2;};
         int side=!sided?0:core==TissueCore.BLADE||core==TissueCore.CLUB?TissueOrganLayout.bladeSide(seed):-TissueOrganLayout.bladeSide(seed);
         V c=body.box.centre(),half=body.box.high.sub(body.box.low).mul(sided?.24F:.32F);
         V centre=c.add(body.right.mul(side*span(body.box,body.right)*.38F));

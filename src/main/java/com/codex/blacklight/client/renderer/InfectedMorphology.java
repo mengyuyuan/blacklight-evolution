@@ -68,7 +68,7 @@ public final class InfectedMorphology implements AutoCloseable {
         tissueSeed=host.getUUID().getMostSignificantBits()^host.getUUID().getLeastSignificantBits();
         authored.growth(tissueGrowth,tissueSeed);
         authored.evolution(host.tissueAge(),host.tissueTentacles(),ChimeraTissue.receiverEvolution(host,true,partial));
-        authored.digestion(host.digestiveProfile(),host.digestiveVisual(),host.level().getGameTime()+partial);
+        authored.digestion(host.digestiveProfile(),host.digestiveVisual(),com.codex.blacklight.infection.TissueDigestiveMotion.clock(host.level().getGameTime(),partial));
         authored.vitals(host.vitalsProfile(),host.vitalsVisual(),TissueVitalMotion.clock(host.level().getGameTime(),partial));
         surface=new SurfaceTissue(host,model,root,partial,anatomical,authored);
         if(anatomical==null)skins.put(nativeTexture,InfectedWoundTextures.get(nativeTexture,type,authored.wounds()));

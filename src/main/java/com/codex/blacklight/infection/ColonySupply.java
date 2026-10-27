@@ -9,6 +9,8 @@ public final class ColonySupply {
     private TissueDigestion stomach=new TissueDigestion();
     private int reserve,upkeep;
     public int reserve(){return reserve;}public int queued(){return stomach.queued();}
+    public int room(){return TissueMetabolism.MAX_RESERVE-reserve;}
+    public int receive(int digested){int n=Math.min(room(),Math.max(0,digested));reserve+=n;return n;}
     public boolean offer(TissueDigestion.Kind kind,int value){return stomach.offer(kind,value,DIGESTION);}
     public void digest(int ticks){reserve=stomach.advance(ticks,reserve,DIGESTION).reserve();}
     public boolean pay(int cost){if(cost<=0||reserve<cost)return false;reserve-=cost;return true;}

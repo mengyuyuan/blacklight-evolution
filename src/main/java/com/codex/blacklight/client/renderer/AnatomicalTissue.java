@@ -293,7 +293,7 @@ final class AnatomicalTissue {
             TissueSilhouette.graft(vertices,graftShift);
         }
         if(procedural&&p.region.frame!=null)TissueEvolution.organ(vertices,p.region.frame,mesh.name,evolution,p.region.groundSupport);
-        if(procedural)TissueDigestiveMotion.surface(vertices,p.region.frame,digestiveProfile,digestiveState,host.level().getGameTime()+partial);
+        if(procedural)TissueDigestiveMotion.surface(vertices,p.region.frame,digestiveProfile,digestiveState,TissueDigestiveMotion.clock(host.level().getGameTime(),partial));
         if(procedural&&vitalProfile.active()){
             var field=vitalFields.computeIfAbsent(p.region.frame,b->TissueVitalMotion.field(b,vitalProfile,vitalState,vitalClock));if(field!=null)field.apply(vertices);
         }
@@ -302,8 +302,9 @@ final class AnatomicalTissue {
             float feeding=host.cannibalStarted()<0?0:Math.clamp((host.level().getGameTime()-host.cannibalStarted()+partial-TissueCompetition.COVER_TICKS)/(host.cannibalDuration()-TissueCompetition.COVER_TICKS),0,1);
             TissueFunctionalMotion.apply(vertices,graft.motionFrame==null?p.region.frame:graft.motionFrame,mesh.name,graft.core,time,feeding);
             if(graft.core.digestive())TissueDigestiveMotion.apply(vertices,graft.motionFrame==null?p.region.frame:graft.motionFrame,graft.core,
-                    host.level().getGameTime()+partial,TissueDigestiveMotion.active(graft.core,digestiveState),TissueDigestiveMotion.load(graft.core,digestiveState));
+                    TissueDigestiveMotion.clock(host.level().getGameTime(),partial),TissueDigestiveMotion.active(graft.core,digestiveState),TissueDigestiveMotion.load(graft.core,digestiveState));
             if(graft.core.vital())TissueVitalMotion.module(vertices,graft.motionFrame==null?p.region.frame:graft.motionFrame,graft.core,vitalState,vitalClock);
+            if(graft.core.colonial()){var link=host.vascularVisual();com.codex.blacklight.infection.TissueVascular.pulse(vertices,link,host.level().getGameTime()-link.getLong("Started")+partial);}
         }
         float elapsed=host.tissueStrikeElapsed(partial);
         float melee=elapsed<0?(float)Math.sin(Math.PI*host.getAttackAnim(partial)):0;

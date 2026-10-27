@@ -155,6 +155,12 @@ public final class BlacklightInfectedHost extends Monster {
     private static final EntityDataAccessor<Integer> TISSUE_NUTRITION=SynchedEntityData.defineId(BlacklightInfectedHost.class,EntityDataSerializers.INT);
     private static final EntityDataAccessor<CompoundTag> TISSUE_DIGESTION=SynchedEntityData.defineId(BlacklightInfectedHost.class,EntityDataSerializers.COMPOUND_TAG);
     private static final EntityDataAccessor<CompoundTag> TISSUE_VITALS=SynchedEntityData.defineId(BlacklightInfectedHost.class,EntityDataSerializers.COMPOUND_TAG);
+    private static final EntityDataAccessor<CompoundTag> TISSUE_VASCULAR=SynchedEntityData.defineId(BlacklightInfectedHost.class,EntityDataSerializers.COMPOUND_TAG);
+    private com.codex.blacklight.infection.TissueVascular vascular=new com.codex.blacklight.infection.TissueVascular();
+    public com.codex.blacklight.infection.TissueVascular vascular(){return vascular;}
+    public boolean hasVascularVisual(){return !entityData.get(TISSUE_VASCULAR).isEmpty();}
+    public CompoundTag vascularVisual(){return entityData.get(TISSUE_VASCULAR).copy();}
+    public void setVascularVisual(CompoundTag visual){if(!level().isClientSide)entityData.set(TISSUE_VASCULAR,visual);}
     private TissueVitals vitals=new TissueVitals();
     private TissueVitals.Profile vitalsProfile;
     private long vitalsAge=Long.MIN_VALUE,vitalsRevision=Long.MIN_VALUE;
@@ -411,7 +417,7 @@ public final class BlacklightInfectedHost extends Monster {
     }
     @Override protected void defineSynchedData(SynchedEntityData.Builder b) {
         super.defineSynchedData(b);b.define(TISSUE_FRAME,new org.joml.Vector3f(1));b.define(TISSUE_AGE,0L);b.define(TISSUE_BODY_SCALE,1F);b.define(TISSUE_CORE_FRACTURE,0F);b.define(TISSUE_STRIKE_TARGET,-1);b.define(TISSUE_STRIKE_STARTED,-1L);b.define(TISSUE_GRIP_RELEASE,-1L);b.define(TISSUE_STRIKE_POINT,new org.joml.Vector3f());b.define(HOST,new CompoundTag());b.define(FEED_TARGET,-1);b.define(FEED_STARTED,-1L);b.define(DEVOURER,false);b.define(NURSERY,new CompoundTag());b.define(FEED_NODE,-1);
-        b.define(TISSUE_NUTRITION,0);b.define(TISSUE_DIGESTION,new CompoundTag());b.define(TISSUE_VITALS,new CompoundTag());
+        b.define(TISSUE_NUTRITION,0);b.define(TISSUE_DIGESTION,new CompoundTag());b.define(TISSUE_VITALS,new CompoundTag());b.define(TISSUE_VASCULAR,new CompoundTag());
         b.define(TISSUE_INHERITANCE,new CompoundTag());b.define(CANNIBAL_TARGET,-1);b.define(CANNIBAL_STARTED,-1L);b.define(CANNIBAL_PREY,false);b.define(CANNIBAL_DURATION,TissueCompetition.END_TICKS);b.define(TISSUE_ACTION,new CompoundTag());
         b.define(EVOLVED_STATE,new CompoundTag());b.define(EVOLVED_ACTION,new CompoundTag());
     }
@@ -684,14 +690,14 @@ public final class BlacklightInfectedHost extends Monster {
         });
         goalSelector.addGoal(1,new Goal() {
             { setFlags(java.util.EnumSet.of(Goal.Flag.MOVE,Goal.Flag.LOOK)); }
-            @Override public boolean canUse() { return isMetamorphosing()||isEvolved()&&getTarget()!=null||organActionCore()!=null||DevourerFeedingSystem.controls(BlacklightInfectedHost.this)||TissueCompetition.controls(BlacklightInfectedHost.this); }
+            @Override public boolean canUse() { return isMetamorphosing()||isEvolved()&&getTarget()!=null||organActionCore()!=null||vascular.active()||vascular.seeking()||DevourerFeedingSystem.controls(BlacklightInfectedHost.this)||TissueCompetition.controls(BlacklightInfectedHost.this); }
             @Override public boolean canContinueToUse() { return canUse(); }
         });
         goalSelector.addGoal(2,new MeleeAttackGoal(this,1.1,true) {
             @Override public boolean canUse() { return !isEvolved()&&!isMetamorphosing()&&!DevourerFeedingSystem.controls(BlacklightInfectedHost.this)&&family().equals("ground")&&super.canUse(); }
             @Override public boolean canContinueToUse() { return !getData(ModAttachments.CONSUME_VISUAL).active()&&super.canContinueToUse(); }
             @Override protected void checkAndPerformAttack(LivingEntity target) {
-                if(organActionCore()!=null||TissueCompetition.controls(BlacklightInfectedHost.this))return;
+                if(organActionCore()!=null||vascular.active()||TissueCompetition.controls(BlacklightInfectedHost.this))return;
                 if(target instanceof BlacklightInfectedHost prey&&TissueCompetition.tryStart(BlacklightInfectedHost.this,prey))return;
                 if(organAbilities.tryStart(target))return;
                 if(tissueStrikeElapsed(0)<0&&attackCooldown==0&&isWithinMeleeAttackRange(target)&&getSensing().hasLineOfSight(target)) {
@@ -725,6 +731,7 @@ public final class BlacklightInfectedHost extends Monster {
         if(tissueRecoveryTicks>0)tissueRecoveryTicks--;
         if(isAlive() && ++tissueClock>=20)digestTissue();
         if(isAlive()&&tissueMetabolismActive())nextTissueForage=TissueFeeding.scavenge(this,nextTissueForage);
+        if(vascular.tick(this))return;
         entityData.set(DEVOURER,DevourerFeedingSystem.isDevourer(this));
         DevourerFeedingSystem.tick(this);
         tickBoss();
@@ -906,6 +913,7 @@ public final class BlacklightInfectedHost extends Monster {
         if(accepted&&!level().isClientSide&&getHealth()<before){
             tissueRecoveryTicks=TissueMetabolism.RECOVERY_DELAY;TissueCompetition.damaged(this,before-getHealth());
             vitals.damaged((before-getHealth())/Math.max(.001,maximum));
+            vascular.interrupt(this);
             if(before-getHealth()>=maximum*.025F)tissueRecoveryTicks=recoverTissueAction(tissueRecoveryTicks);
             publishVitals();
             if(before-getHealth()>=maximum*.1F)organAbilities.interrupt();
@@ -977,6 +985,7 @@ public final class BlacklightInfectedHost extends Monster {
         tag.putInt("BlacklightTissueCultivation",tissueCultivationTicks);
         tag.put("BlacklightTissueDigestion",digestion.write());
         tag.put("BlacklightTissueVitals",vitals.write());
+        tag.put("BlacklightTissueVascular",vascular.write());
         super.addAdditionalSaveData(tag);tag.putLong("BlacklightTissueAge",com.codex.blacklight.infection.TissueGrowth.advance(tissueAge(),tissueClock));tag.putFloat("BlacklightTissueScale",tissueBodyScale());tag.putFloat("BlacklightCoreFracture",tissueCoreFracture());tag.put("BlacklightHost",hostData().copy());tag.putBoolean("BlacklightBossDefeated",bossDefeated);
     }
     @Override public void readAdditionalSaveData(CompoundTag tag) {
@@ -1040,6 +1049,7 @@ public final class BlacklightInfectedHost extends Monster {
         if(isEvolved())getAttribute(Attributes.FOLLOW_RANGE).setBaseValue(Math.max(48,getAttributeValue(Attributes.FOLLOW_RANGE)));
         digestion=TissueDigestion.read(tag.getCompound("BlacklightTissueDigestion"));publishDigestion();nextTissueForage=level().getGameTime()+Math.floorMod(getId(),40);
         vitals=TissueVitals.read(tag.getCompound("BlacklightTissueVitals"));vitalsProfile=null;publishVitals();
+        vascular=com.codex.blacklight.infection.TissueVascular.read(tag.getCompound("BlacklightTissueVascular"));setVascularVisual(new CompoundTag());
         updateTissueCombat();refreshDimensions();setPersistenceRequired();
     }
 }
