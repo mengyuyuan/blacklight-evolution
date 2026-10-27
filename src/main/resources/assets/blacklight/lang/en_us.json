@@ -758,5 +758,10 @@
   "upgrade.blacklight.vascular_stolon": "Vascular Stolon",
   "upgrade.blacklight.osteoderm": "Dermal osteoderms",
   "upgrade.blacklight.nacre_shield": "Lamellar composite shield",
-  "city.blacklight.hive_supply_status": "Hive · live mouths %s/7 · nutrients %s · digesting %s · brood %s%%"
+  "city.blacklight.hive_supply_status": "Hive · live mouths %s/7 · nutrients %s · digesting %s · brood %s%%",
+  "zone.blacklight.green": "Green Zone",
+  "zone.blacklight.yellow": "Yellow Zone",
+  "zone.blacklight.red": "Red Zone",
+  "setting.blacklight.infection_zones": "Infection zone HUD",
+  "setting.blacklight.infection_zones.desc": "Show the server-owned Green, Yellow or Red zone label. Hiding it does not change infection or population."
 }

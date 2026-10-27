@@ -758,5 +758,10 @@
   "upgrade.blacklight.vascular_stolon": "殖群贯通索",
   "upgrade.blacklight.osteoderm": "真皮骨板",
   "upgrade.blacklight.nacre_shield": "层状复合盾",
-  "city.blacklight.hive_supply_status": "母巢 · 有效出口 %s/7 · 养分 %s · 待消化 %s份 · 育成 %s%%"
+  "city.blacklight.hive_supply_status": "母巢 · 有效出口 %s/7 · 养分 %s · 待消化 %s份 · 育成 %s%%",
+  "zone.blacklight.green": "绿区",
+  "zone.blacklight.yellow": "黄区",
+  "zone.blacklight.red": "红区",
+  "setting.blacklight.infection_zones": "感染区域显示",
+  "setting.blacklight.infection_zones.desc": "显示服务器判定的红区、黄区或绿区。关闭仅隐藏标识，不改变感染和生成。"
 }

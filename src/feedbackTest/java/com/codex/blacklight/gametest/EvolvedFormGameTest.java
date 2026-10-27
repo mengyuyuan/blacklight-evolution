@@ -185,7 +185,7 @@ public final class EvolvedFormGameTest {
             }catch(Throwable failure){net.neoforged.neoforge.common.NeoForge.EVENT_BUS.unregister(listener);host.discard();h.getLevel().removePlayerImmediately(player,net.minecraft.world.entity.Entity.RemovalReason.DISCARDED);throw failure;}
         });
     }
-    private static BlacklightInfectedHost host(GameTestHelper h){
+    static BlacklightInfectedHost host(GameTestHelper h){
         var host=ModEntities.INFECTED_HOST.get().create(h.getLevel());host.inherit(EntityType.ZOMBIE.create(h.getLevel()));
         var organs=new EnumMap<TissueCore,TissueInheritance.Organ>(TissueCore.class);
         for(var core:new TissueCore[]{TissueCore.MUSCLE,TissueCore.CARAPACE,TissueCore.JAW,TissueCore.GRASP,TissueCore.BLADE,TissueCore.HYDROSTAT})

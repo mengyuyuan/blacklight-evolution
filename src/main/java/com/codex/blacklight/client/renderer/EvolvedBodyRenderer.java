@@ -49,11 +49,10 @@ final class EvolvedBodyRenderer {
     static void render(BlacklightInfectedHost host,float partial,PoseStack stack,MultiBufferSource buffers,int light){if(instance==null)instance=new EvolvedBodyRenderer();instance.draw(host,partial,stack,buffers,light);}
     private static ModelPart part(HumanoidModel<?> m,int role){return switch(role){case 1->m.head;case 2->m.rightArm;case 3->m.leftArm;case 4->m.rightLeg;case 5->m.leftLeg;default->m.body;};}
     private void draw(BlacklightInfectedHost host,float partial,PoseStack stack,MultiBufferSource buffers,int light){
-        String clip=host.evolvedAction();float time=host.evolvedActionElapsed(partial),weight=1;boolean loop=false;
+        String clip=host.evolvedAction();float time=host.evolvedActionElapsed(partial);boolean loop=false;
         var visual=host.getData(com.codex.blacklight.registry.ModAttachments.CONSUME_VISUAL);
         var hit=host.getData(com.codex.blacklight.registry.ModAttachments.HIT_REACTION);
         if(visual.active()){clip="victim";time=visual.progress(host.level().getGameTime(),partial)*EvolvedMotions.clip(clip).seconds()*20;}
-        else if(hit.weight(host.level().getGameTime(),partial)>0){clip=hit.kind()==com.codex.blacklight.combat.HitReaction.STAGGER?"hit":"heavy_hit";time=hit.progress(host.level().getGameTime(),partial)*EvolvedMotions.clip(clip).seconds()*20;weight=hit.weight(host.level().getGameTime(),partial);}
         else if(host.cannibalTargetId()>=0){clip=host.cannibalPrey()?"victim":"consume";time=Math.clamp((host.level().getGameTime()+partial-host.cannibalStarted())/host.cannibalDuration(),0,1)*EvolvedMotions.clip(clip).seconds()*20;}
         else if(host.organActionCore()!=null){clip="consume";time=host.organActionElapsed(partial)/TissueOrganCycle.cycle(host.organActionCore()).end()*EvolvedMotions.clip(clip).seconds()*20;}
         else if(clip.isEmpty()){
@@ -64,7 +63,7 @@ final class EvolvedBodyRenderer {
                 clip=Math.abs(left)>Math.abs(forward)*1.2?(left>0?"left":"right"):forward<-.015?"back":host.isSprinting()?"sprint":"run";
                 if(host.evolvedEngaged()&&!host.isSprinting())clip=switch(clip){case "left"->"guard_left";case "right"->"guard_right";case "back"->"guard_back";default->"guard_forward";};
             }
-            time=host.walkAnimation.position(partial)*EvolvedMotions.clip(clip).seconds()*20/(clip.equals("sprint")?8.5F:6.2F);
+            time=speed>.025F?host.walkAnimation.position(partial)*EvolvedMotions.clip(clip).seconds()*20/(clip.equals("sprint")?8.5F:6.2F):host.tickCount+partial;
             if(speed<=.025F&&!host.evolvedEngaged()){
                 int phase=Math.floorMod(host.level().getGameTime()+host.getUUID().getLeastSignificantBits(),400);
                 String gesture=((host.getUUID().getMostSignificantBits()^host.level().getGameTime()/400)&1)==0?"idle_shrug":"idle_neck";
@@ -74,8 +73,15 @@ final class EvolvedBodyRenderer {
         float clock=host.tickCount+partial;var state=transitions.computeIfAbsent(host,k->new Transition());
         if(!clip.equals(state.clip)){state.clip=clip;state.from=state.last;state.time=clock;}
         var row=EvolvedMotions.sample(clip,time,loop);
+        row=com.codex.blacklight.combat.EvolvedRestPose.apply(row,clip,host.tickCount+partial,host.getUUID().getLeastSignificantBits());
+        float hitWeight=hit.weight(host.level().getGameTime(),partial);
+        if(hitWeight>0&&!visual.active()&&host.cannibalTargetId()<0){
+            String reaction=hit.kind()==com.codex.blacklight.combat.HitReaction.STAGGER?"hit":"heavy_hit";
+            float at=hit.progress(host.level().getGameTime(),partial)*EvolvedMotions.clip(reaction).seconds()*20;
+            row=EvolvedMotions.blend(row,EvolvedMotions.sample(reaction,at,false),hitWeight);
+        }
         row=EvolvedMotions.blend(state.from,row,EvolvedForm.smooth((clock-state.time)/4));state.last=row;
-        var matrices=EvolvedMotions.skin(row,weight);var joints=new RigidSkinning.Joint[matrices.length];for(int i=0;i<joints.length;i++)joints[i]=RigidSkinning.Joint.from(matrices[i]);
+        var matrices=EvolvedMotions.skin(row,1);var joints=new RigidSkinning.Joint[matrices.length];for(int i=0;i<joints.length;i++)joints[i]=RigidSkinning.Joint.from(matrices[i]);
         if(posed==null){posed=new Vector3f[vertices.length];for(int i=0;i<posed.length;i++)posed[i]=new Vector3f();}
         var points=posed;var real=new Quaternionf();var dual=new Quaternionf();float foot=Float.NEGATIVE_INFINITY;
         for(int i=0;i<vertices.length;i++){var v=vertices[i];RigidSkinning.transform(joints[v.a],joints[v.b],v.weight,v.point,points[i],real,dual);if(v.point.y==24&&v.point.x>=-3.91F&&v.point.x<=3.91F&&Math.abs(v.point.z)<=2)foot=Math.max(foot,points[i].y);}

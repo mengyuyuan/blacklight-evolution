@@ -56,7 +56,7 @@ public final class UpgradeScreen extends Screen {
             case BIOLOGY -> {for(var u:CombatSkill.values())if(u.adaptivePassive())entries.add(new Entry(u.id(),u.epCost(),u.requires()==null?null:u.requires().id(),false));for(var u:GrowthUpgrade.values())entries.add(new Entry(u.id,u.cost,u.requires()==null?null:u.requires().id,false));}
             case ORGANS -> {for(var core:com.codex.blacklight.infection.TissueCore.values())if(core.legacy())entries.add(new Entry(core.id,0,null,false));}
             case EVOLUTION -> {for(var a:EvolutionAttribute.values())entries.add(new Entry(a.id,0,null,false));}
-            case SETTINGS -> {for(String id:List.of("bulletdive_blocks","shield_borer_blocks","prototype_item_pickup","passive_stacks","health_hud","wing_speed"))entries.add(new Entry(id,0,null,true));}
+            case SETTINGS -> {for(String id:List.of("bulletdive_blocks","shield_borer_blocks","prototype_item_pickup","passive_stacks","infection_zones","health_hud","wing_speed"))entries.add(new Entry(id,0,null,true));}
             default -> {}
         }
         if(entries.stream().noneMatch(e->e.id.equals(selected)))select(entries.isEmpty()?"":entries.get(0).id);
@@ -85,6 +85,7 @@ public final class UpgradeScreen extends Screen {
         if(category==Category.SETTINGS){
             if(e.id.equals("health_hud")||e.id.equals("wing_speed")){minecraft.setScreen(new PresentationSettingsScreen(this,e.id.equals("health_hud")));return;}
             if (e.id.equals("passive_stacks")) { com.codex.blacklight.config.PassiveHudConfig.toggle(); refreshButton(); return; }
+            if(e.id.equals("infection_zones")){var option=com.codex.blacklight.config.PassiveHudConfig.SHOW_ZONE;option.set(!option.get());com.codex.blacklight.config.PassiveHudConfig.SPEC.save();refreshButton();return;}
             var setting=switch(e.id){
                 case "shield_borer_blocks" -> SkillSettingsPayload.Setting.SHIELD_BORER_BLOCKS;
                 case "prototype_item_pickup" -> SkillSettingsPayload.Setting.PROTOTYPE_ITEM_PICKUP;
@@ -97,6 +98,7 @@ public final class UpgradeScreen extends Screen {
     private boolean settingEnabled(String id){
         if(id.equals("health_hud")||id.equals("wing_speed"))return true;
         if (id.equals("passive_stacks")) return com.codex.blacklight.config.PassiveHudConfig.SHOW_STACKS.get();
+        if(id.equals("infection_zones"))return com.codex.blacklight.config.PassiveHudConfig.SHOW_ZONE.get();
         if(minecraft.player==null)return false;
         var settings=minecraft.player.getData(ModAttachments.SKILL_SETTINGS);
         return switch(id){

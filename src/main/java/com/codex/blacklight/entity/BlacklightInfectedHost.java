@@ -736,6 +736,7 @@ public final class BlacklightInfectedHost extends Monster {
         } else {
             moveControl=new net.minecraft.world.entity.ai.control.MoveControl(this);
             navigation=family().equals("water")?new WaterBoundPathNavigation(this,level()):new GroundPathNavigation(this,level());
+            if(isEvolved()&&navigation instanceof GroundPathNavigation ground)ground.setCanFloat(true);
         }
     }
     private Vec3 airDestination;
