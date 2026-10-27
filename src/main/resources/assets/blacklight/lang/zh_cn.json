@@ -757,5 +757,6 @@
   "building.blacklight.supply_status": "阶段 %s/4 · 成熟 %s%% · 组织 %s · 养分 %s · 待消化 %s份",
   "upgrade.blacklight.vascular_stolon": "殖群贯通索",
   "upgrade.blacklight.osteoderm": "真皮骨板",
-  "upgrade.blacklight.nacre_shield": "层状复合盾"
+  "upgrade.blacklight.nacre_shield": "层状复合盾",
+  "city.blacklight.hive_supply_status": "母巢 · 有效出口 %s/7 · 养分 %s · 待消化 %s份 · 育成 %s%%"
 }

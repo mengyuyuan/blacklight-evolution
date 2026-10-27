@@ -68,8 +68,9 @@ public final class CitySystem {
         CityData data=CityData.get(level);
         for(int hive=0;hive<2;hive++){
             inspectHive(level,data,hive);
+            CityHiveSupply.tick(level,data,hive);
             if(data.destroyed(hive)){if(data.facade&&CityConfig.DESTRUCTION.get())woundFacade(level,data,hive);}
-            else if(time%200==0&&data.population&&CityConfig.SPAWNS.get())spawnHive(level,data,hive);
+            else if(data.population&&CityConfig.SPAWNS.get()&&CityHiveSupply.ready(data,hive))spawnHive(level,data,hive);
         }
         if(time%100==0&&data.population&&CityConfig.SPAWNS.get())populate(level,data);
         if(data.spread&&CityConfig.SPREAD.get()&&com.codex.blacklight.infection.WorldOutbreakSystem.active(level)){
@@ -144,22 +145,26 @@ public final class CitySystem {
         spawn(level,type,p,type==EntityType.ZOMBIE);
     }
     private static void spawnHive(ServerLevel level,CityData data,int hive){
-        if(level.getDifficulty()==net.minecraft.world.Difficulty.PEACEFUL||!com.codex.blacklight.infection.WorldOutbreakSystem.active(level))return;
+        if(!CityHiveSupply.ready(data,hive)||level.getDifficulty()==net.minecraft.world.Difficulty.PEACEFUL||!com.codex.blacklight.infection.WorldOutbreakSystem.active(level))return;
         int start=level.random.nextInt(PORTS.length);
         for(int j=0;j<PORTS.length;j++){
             int i=(start+j)%PORTS.length;BlockPos port=port(level,hive,i);
-            if((data.brokenPorts[hive]&(1<<i))!=0||!loaded(level,port))continue;
+            if((data.brokenPorts[hive]&(1<<i))!=0||!loaded(level,port)||!level.getBlockState(port).is(CityBlocks.HATCH.get()))continue;
             if(level.players().stream().noneMatch(p->p.distanceToSqr(port.getX(),65,port.getZ())<96*96))continue;
             var facing=level.getBlockState(port).getValue(CityHatchBlock.FACING);
             BlockPos outside=port.relative(facing,3).below();
             var guards=level.getEntitiesOfClass(Mob.class,new AABB(port).inflate(48),Entity::isAlive);
             boolean hasHunter=guards.stream().anyMatch(e->e instanceof com.codex.blacklight.entity.BlacklightHunter);
-            // Reserve one brood slot for a hunter: surrounding infected must not fill every slot first.
-            if(guards.size()>=(hasHunter?12:13))return;
             int stage=CityEcology.stage(level,port);
-            boolean hunter=stage>=2&&(!hasHunter||level.random.nextInt(5)==0);
-            boolean hydra=stage>=3&&!hunter&&level.random.nextInt(12)==0&&level.getEntitiesOfClass(com.codex.blacklight.entity.BlacklightHydra.class,new AABB(port).inflate(64)).isEmpty();
-            if(spawn(level,hydra?ModEntities.BLACKLIGHT_HYDRA.get():hunter?ModEntities.BLACKLIGHT_HUNTER.get():EntityType.ZOMBIE,outside,!hunter&&!hydra)){
+            int common=0,developed=0,mature=0,ancient=0;
+            for(var mob:guards){if(mob instanceof com.codex.blacklight.entity.BlacklightCommonInfected)common++;
+                if(mob instanceof com.codex.blacklight.entity.BlacklightInfectedHost host&&!host.hasMultipartBody()){
+                    developed++;if(host.tissueAge()>=com.codex.blacklight.infection.TissueGrowth.MATURITY_TICKS)mature++;if(host.tissueAge()>=com.codex.blacklight.infection.TissueGrowth.ANCIENT_TICKS)ancient++;
+                }}
+            var tier=com.codex.blacklight.infection.OutbreakRules.populationTier(stage,common,developed,mature,ancient,com.codex.blacklight.infection.OutbreakConfig.COMMON_RESERVE.get(),com.codex.blacklight.infection.OutbreakConfig.LOCAL_CAP.get(),level.random.nextInt(100));
+            if(stage>=2&&!hasHunter&&common>=com.codex.blacklight.infection.OutbreakConfig.COMMON_RESERVE.get())tier=com.codex.blacklight.infection.OutbreakRules.Tier.HUNTER;
+            boolean hydra=stage>=3&&hasHunter&&tier==com.codex.blacklight.infection.OutbreakRules.Tier.ANCIENT&&level.random.nextInt(12)==0&&level.getEntitiesOfClass(com.codex.blacklight.entity.BlacklightHydra.class,new AABB(port).inflate(64)).isEmpty();
+            if((hydra?CityHiveSupply.hatchHydra(level,data,hive,port):CityHiveSupply.hatch(level,data,hive,port,tier))!=null){
                 level.setBlock(port,level.getBlockState(port).setValue(CityHatchBlock.OPEN,true),3);
                 level.sendParticles(ParticleTypes.CRIMSON_SPORE,outside.getX()+.5,65,outside.getZ()+.5,16,.7,.6,.7,.02);
                 level.playSound(null,port,SoundEvents.SLIME_SQUISH,SoundSource.HOSTILE,1,.6f);

@@ -757,5 +757,6 @@
   "building.blacklight.supply_status": "Stage %s/4 · Maturity %s%% · Tissue %s · Nutrients %s · Digesting %s portions",
   "upgrade.blacklight.vascular_stolon": "Vascular Stolon",
   "upgrade.blacklight.osteoderm": "Dermal osteoderms",
-  "upgrade.blacklight.nacre_shield": "Lamellar composite shield"
+  "upgrade.blacklight.nacre_shield": "Lamellar composite shield",
+  "city.blacklight.hive_supply_status": "Hive · live mouths %s/7 · nutrients %s · digesting %s · brood %s%%"
 }

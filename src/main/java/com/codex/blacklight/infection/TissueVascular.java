@@ -25,20 +25,22 @@ public final class TissueVascular {
     public static Vec3 root(BlacklightInfectedHost host,float partial){return host.getPosition(partial).add(0,host.getBbHeight()*.48+host.tissueStanceOffset(),0);}
     private static boolean free(BlacklightInfectedHost host){return TissueFeeding.free(host)&&!host.isNoAi()&&!host.isEvolved()&&host.getHealth()>=host.getMaxHealth()*.6F
             &&(host.getTarget()==null||!host.getTarget().isAlive()||host.distanceToSqr(host.getTarget())>16*16);}
-    private BuildingInfectionData.Colony colony(BlacklightInfectedHost host){if(!(host.level() instanceof ServerLevel level)||target==null)return null;return BuildingInfectionData.get(level).colonies.stream().filter(c->!c.dead&&c.origin.equals(target)).findFirst().orElse(null);}
+    private ColonyNutrients.Mouth colony(BlacklightInfectedHost host){return host.level() instanceof ServerLevel level&&target!=null?ColonyNutrients.resolve(level,target):null;}
     public static Vec3 mouth(ServerLevel level,BlockPos pos){var s=level.getBlockState(pos);return Vec3.atCenterOf(pos).relative(s.getValue(com.codex.blacklight.world.BuildingInfectionCoreBlock.FACING),.7);}
-    private static boolean valid(BlacklightInfectedHost host,BuildingInfectionData.Colony c,boolean contact){
-        if(!(host.level() instanceof ServerLevel level)||c==null||c.dead||!WorldOutbreakSystem.active(level)||!BuildingInfectionConfig.ENABLED.get()
-                ||!level.getGameRules().getBoolean(net.minecraft.world.level.GameRules.RULE_MOBGRIEFING)||!level.hasChunkAt(c.origin)||!level.isPositionEntityTicking(c.origin)
-                ||!level.getBlockState(c.origin).is(ModBlocks.BUILDING_CORE.get())||!BuildingInfectionSystem.allowedSite(level,c.origin))return false;
-        if(!contact)return host.distanceToSqr(Vec3.atCenterOf(c.origin))<=16*16;
-        var from=root(host,0);var to=mouth(level,c.origin);if(from.distanceToSqr(to)>25)return false;
-        for(int x:new int[]{(int)Math.floor(Math.min(from.x,to.x)),(int)Math.floor(Math.max(from.x,to.x))})for(int z:new int[]{(int)Math.floor(Math.min(from.z,to.z)),(int)Math.floor(Math.max(from.z,to.z))})if(!level.hasChunkAt(new BlockPos(x,c.origin.getY(),z)))return false;
+    private static boolean valid(BlacklightInfectedHost host,ColonyNutrients.Mouth c,boolean contact){
+        if(!(host.level() instanceof ServerLevel level)||c==null||!WorldOutbreakSystem.active(level)
+                ||!level.getGameRules().getBoolean(net.minecraft.world.level.GameRules.RULE_MOBGRIEFING)||!level.hasChunkAt(c.pos())||!level.isPositionEntityTicking(c.pos())
+                ||!ColonyNutrients.isPort(level.getBlockState(c.pos())))return false;
+        if(!contact)return host.distanceToSqr(Vec3.atCenterOf(c.pos()))<=16*16;
+        var from=root(host,0);var to=mouth(level,c.pos());if(from.distanceToSqr(to)>25)return false;
+        for(int x:new int[]{(int)Math.floor(Math.min(from.x,to.x)),(int)Math.floor(Math.max(from.x,to.x))})for(int z:new int[]{(int)Math.floor(Math.min(from.z,to.z)),(int)Math.floor(Math.max(from.z,to.z))})if(!level.hasChunkAt(new BlockPos(x,c.pos().getY(),z)))return false;
         return level.clip(new ClipContext(from,to,ClipContext.Block.COLLIDER,ClipContext.Fluid.NONE,host)).getType()==HitResult.Type.MISS;
     }
-    public boolean start(BlacklightInfectedHost host,BuildingInfectionData.Colony c){
-        double power=host.organPower(TissueCore.VASCULAR);if(active()||cooldown>0||!free(host)||!valid(host,c,true)||amount(power,host.tissueNutrition()-OPEN_COST,c.supply.room())==0||!host.spendTissueNutrition(OPEN_COST))return false;
-        target=c.origin;elapsed=0;started=host.level().getGameTime();committed=false;delivered=0;host.getNavigation().stop();publish(host);return true;
+    public boolean start(BlacklightInfectedHost host,BuildingInfectionData.Colony c){return host.level() instanceof ServerLevel level&&c!=null&&start(host,ColonyNutrients.resolve(level,c.origin));}
+    public boolean startAt(BlacklightInfectedHost host,BlockPos pos){return host.level() instanceof ServerLevel level&&start(host,ColonyNutrients.resolve(level,pos));}
+    private boolean start(BlacklightInfectedHost host,ColonyNutrients.Mouth c){
+        double power=host.organPower(TissueCore.VASCULAR);if(active()||cooldown>0||!free(host)||!valid(host,c,true)||amount(power,host.tissueNutrition()-OPEN_COST,c.stock().room())==0||!host.spendTissueNutrition(OPEN_COST))return false;
+        target=c.pos();elapsed=0;started=host.level().getGameTime();committed=false;delivered=0;host.getNavigation().stop();publish(host);return true;
     }
     public void interrupt(BlacklightInfectedHost host){
         if(!active()&&!seeking())return;boolean connected=active();var previous=host.vascularVisual();
@@ -54,24 +56,24 @@ public final class TissueVascular {
             host.getNavigation().stop();host.setXxa(0);host.setZza(0);host.setDeltaMovement(host.getDeltaMovement().multiply(.35,1,.35));
             elapsed++;
             if(elapsed==CONTACT&&!committed){
-                int n=amount(host.organPower(TissueCore.VASCULAR),host.tissueNutrition(),c.supply.room());
-                if(n>0&&host.spendTissueNutrition(n)){int accepted=c.supply.receive(n);if(accepted!=n)throw new IllegalStateException("Vascular destination changed during a server-owned transfer");delivered=n;BuildingInfectionData.get((ServerLevel)host.level()).setDirty();}
+                int n=amount(host.organPower(TissueCore.VASCULAR),host.tissueNutrition(),c.stock().room());
+                if(n>0&&host.spendTissueNutrition(n)){int accepted=c.stock().receive(n);if(accepted!=n)throw new IllegalStateException("Vascular destination changed during a server-owned transfer");delivered=n;c.changed().run();}
                 committed=true;publish(host);
             }
             if(elapsed>=END){elapsed=-1;target=null;cooldown=160;publish(host);return false;}return true;
         }
         if(cooldown>0||host.organPower(TissueCore.VASCULAR)<=0||host.tissueNutrition()<192||!free(host)||!(host.level() instanceof ServerLevel level)){if(seeking())interrupt(host);return false;}
         if(seeking()){
-            var c=colony(host);if(!valid(host,c,false)||c.supply.reserve()>=TissueMetabolism.MAX_RESERVE/2||++approach>160){interrupt(host);return false;}
+            var c=colony(host);if(!valid(host,c,false)||c.stock().reserve()>=TissueMetabolism.MAX_RESERVE/2||++approach>160){interrupt(host);return false;}
             if(start(host,c))return true;
-            if(approach%20==0&&work(level)){var entry=mouth(level,c.origin);host.getNavigation().moveTo(entry.x,c.origin.getY(),entry.z,.85);}return false;
+            if(approach%20==0&&work(level)){var entry=mouth(level,c.pos());host.getNavigation().moveTo(entry.x,c.pos().getY(),entry.z,.85);}return false;
         }
         long now=level.getGameTime();if(now<nextSearch)return false;nextSearch=now+40+Math.floorMod(host.getId(),17);
         if(!work(level)){nextSearch=now+1+Math.floorMod(host.getId(),5);return false;}
-        var choice=BuildingInfectionData.get(level).colonies.stream().filter(c->c.supply.reserve()<TissueMetabolism.MAX_RESERVE/2&&valid(host,c,false))
-                .min(Comparator.comparingDouble(c->host.distanceToSqr(Vec3.atCenterOf(c.origin)))).orElse(null);
-        if(choice==null)return false;if(start(host,choice))return true;target=choice.origin;approach=0;
-        var entry=mouth(level,choice.origin);host.getNavigation().moveTo(entry.x,choice.origin.getY(),entry.z,.85);return false;
+        var choice=ColonyNutrients.nearby(level,host.position(),16).stream().filter(c->c.stock().reserve()<TissueMetabolism.MAX_RESERVE/2&&valid(host,c,false))
+                .min(Comparator.comparingDouble(c->host.distanceToSqr(Vec3.atCenterOf(c.pos())))).orElse(null);
+        if(choice==null)return false;if(start(host,choice))return true;target=choice.pos();approach=0;
+        var entry=mouth(level,choice.pos());host.getNavigation().moveTo(entry.x,choice.pos().getY(),entry.z,.85);return false;
     }
     public CompoundTag write(){var t=new CompoundTag();t.putInt("Cooldown",Math.max(cooldown,active()?160:0));return t;}
     public static TissueVascular read(CompoundTag t){var v=new TissueVascular();v.cooldown=Math.clamp(t.getInt("Cooldown"),0,160);return v;}

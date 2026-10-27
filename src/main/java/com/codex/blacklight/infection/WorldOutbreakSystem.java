@@ -94,11 +94,16 @@ public final class WorldOutbreakSystem {
     }
     /** Bounded caller-selected spawn; still validates real support, fluid and whole-body collision. */
     public static Mob spawnAt(ServerLevel level,BlockPos pos,OutbreakRules.Tier tier){
+        return spawnAt(level,pos,tier,false);
+    }
+    public static Mob spawnHydraAt(ServerLevel level,BlockPos pos){return CityEcology.stage(level,pos)<3?null:spawnAt(level,pos,OutbreakRules.Tier.ANCIENT,true);}
+    private static Mob spawnAt(ServerLevel level,BlockPos pos,OutbreakRules.Tier tier,boolean hydra){
         if(!active(level)||level.getDifficulty()==Difficulty.PEACEFUL||!level.getGameRules().getBoolean(GameRules.RULE_DOMOBSPAWNING)
                 ||sanctuary(level,pos)||!ready(level,pos)||!populationRoom(level,pos)
                 ||!level.getBlockState(pos.below()).isFaceSturdy(level,pos.below(),Direction.UP))return null;
         Mob mob;
-        if(tier==OutbreakRules.Tier.HUNTER)mob=ModEntities.BLACKLIGHT_HUNTER.get().create(level);
+        if(hydra)mob=ModEntities.BLACKLIGHT_HYDRA.get().create(level);
+        else if(tier==OutbreakRules.Tier.HUNTER)mob=ModEntities.BLACKLIGHT_HUNTER.get().create(level);
         else if(tier==OutbreakRules.Tier.FRESH)mob=ModEntities.COMMON_INFECTED.get().create(level);
         else{
             var host=ModEntities.INFECTED_HOST.get().create(level);if(host==null)return null;
