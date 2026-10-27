@@ -154,7 +154,7 @@ public final class InfectedHostRenderer extends EntityRenderer<BlacklightInfecte
                         &&!InfectedModelPose.devourerFeeding(entity,bone.name,partial,posed))
                     InfectedModelPose.transform(mesh.species(),bone.name,age,walk,speed,attack,headYaw,headPitch,
                             entity.family().equals("air")&&!entity.onGround()||entity.isInWaterOrBubble(),posed);
-            });
+            },com.codex.blacklight.infection.TissueLateBody.progress(entity.tissueAge()));
             if(fracture!=null)fracture.finish();
         }finally{stack.popPose();}
         super.render(entity,yaw,partial,stack,buffers,light);

@@ -48,7 +48,7 @@ public final class AuthoredInfectionParts {
     private record Triangle(Vector3f a,Vector3f b,Vector3f c,Vector3f normal,int color,Face face,Vector3f uvA,Vector3f uvB,Vector3f uvC) {
         Triangle(Vector3f a,Vector3f b,Vector3f c,Vector3f normal,int color,Face face){this(a,b,c,normal,color,face,a,b,c);}
     }
-    private record Piece(ModelPart.Cube cube,List<Triangle> skin,List<Triangle> growth,int anatomy) {}
+    private record Piece(ModelPart.Cube cube,List<Triangle> skin,List<Triangle> growth,List<Triangle> late,int anatomy) {}
     public record Wound(float u,float v,float width,float height){}
     public static final class Binding {
         private final Map<ModelPart,List<Piece>> pieces=new IdentityHashMap<>();
@@ -131,6 +131,8 @@ public final class AuthoredInfectionParts {
                     fraction=Math.max(.07F,Math.min(1,(growth-delay)/(1-delay)))*(.86F+.14F*variation);
                 }
                 for(var triangle:p.growth)emit(remodel(develop(grow(triangle,p.cube,fraction),frames.get(e.getKey()),evolution),frames.get(e.getKey())),q.pose,out,q.light,q.overlay,q.color,false);
+                float late=TissueLateBody.progress(age);
+                if(late>0)for(var triangle:p.late)emit(remodel(develop(grow(triangle,p.cube,late),frames.get(e.getKey()),evolution),frames.get(e.getKey())),q.pose,out,q.light,q.overlay,q.color,false);
             }
             // Use the exact same developed vertices for the tissue cover. A
             // thin normal offset avoids z-fighting without adding body volume.
@@ -166,6 +168,8 @@ public final class AuthoredInfectionParts {
                 // Mature hosts use a reconstructed whole-body surface under their exposed organs.
                 // Export both layers: exporting growth alone loses chest/upper arms and shifts the waist.
                 var triangles=new ArrayList<Triangle>();triangles.addAll(piece.skin);triangles.addAll(piece.growth);
+                float late=TissueLateBody.progress(source.age());
+                if(late>0)for(var triangle:piece.late)triangles.add(grow(triangle,piece.cube,late));
                 var points=new ArrayList<TissueMorphogenesis.V>();var faces=new ArrayList<int[]>();var colors=new ArrayList<Integer>();
                 for(var triangle:triangles){
                     var evolved=develop(triangle,binding.frames.get(entry.getKey()),source.authored());
@@ -257,15 +261,26 @@ public final class AuthoredInfectionParts {
             Vector3f ratio=new Vector3f();
             for(int i=0;i<3;i++)ratio.setComponent(i,srcSpan.get(i)>.001F&&span.get(i)>.05F?span.get(i)/srcSpan.get(i):uniform);
             Vector3f centre=new Vector3f(nativeLow).add(nativeHigh).mul(.5F),srcCentre=new Vector3f(low).add(high).mul(.5F);
-            List<Triangle> skin=new ArrayList<>(),growth=new ArrayList<>();
+            List<Triangle> skin=new ArrayList<>(),growth=new ArrayList<>(),late=new ArrayList<>();
             if(bone==main)triangles(bone.getAsJsonObject("skin"),inverse,ratio,srcCentre,centre,cube,true,skin,growth);
             if(skin.isEmpty())growth.clear(); // No matching native surface: retain its original cube.
             triangles(bone.getAsJsonObject("growth"),inverse,ratio,srcCentre,centre,cube,false,skin,growth);
+            if(bone.has("lateGrowth"))triangles(bone.getAsJsonObject("lateGrowth"),inverse,ratio,srcCentre,centre,cube,false,skin,late);
             var frame=binding.frames.get(target.part);var sectioned=new ArrayList<Triangle>();
             for(var triangle:skin)for(var section:TissueSkin.sections(frame,value(triangle.a),value(triangle.b),value(triangle.c)))
                 sectioned.add(new Triangle(vector(section.a()),vector(section.b()),vector(section.c()),triangle.normal,triangle.color,triangle.face));
-            binding.pieces.computeIfAbsent(target.part,k->new ArrayList<>()).add(new Piece(cube,List.copyOf(sectioned),List.copyOf(growth),anatomy.getOrDefault(target.part,ConsumeAnatomy.BODY)));
+            binding.pieces.computeIfAbsent(target.part,k->new ArrayList<>()).add(new Piece(cube,List.copyOf(sectioned),List.copyOf(growth),List.copyOf(late),anatomy.getOrDefault(target.part,ConsumeAnatomy.BODY)));
             binding.assignments.add(name+" -> "+target.name+" ("+growth.size()+" growth triangles)");
+        }
+        // Segmented wings have independently animated tips. Fitting a whole
+        // wing to its narrow base hides most late membranes beside the chest.
+        if(source.get().has("nativeLateGrowth"))for(var entry:source.get().getAsJsonArray("nativeLateGrowth")){
+            var data=entry.getAsJsonObject();String name=data.get("name").getAsString();
+            var target=parts.stream().filter(p->p.name.equals(name)).findFirst().orElse(null);
+            if(target==null)continue;
+            var late=localTriangles(data);
+            binding.pieces.computeIfAbsent(target.part,k->new ArrayList<>()).add(new Piece(target.cube,List.of(),List.of(),late,anatomy.getOrDefault(target.part,ConsumeAnatomy.BODY)));
+            binding.assignments.add(name+" -> "+target.name+" ("+late.size()+" late local triangles)");
         }
         for(var list:binding.pieces.values())for(var piece:list)if(!piece.skin.isEmpty()){
             for(var face:faces(piece.cube)){
@@ -284,6 +299,17 @@ public final class AuthoredInfectionParts {
         }
         BlacklightNeoMod.LOGGER.info("Bound authored infection growth {}: {} native parts, {} source assignments, coat={}",species,binding.pieces.size(),binding.assignments.size(),fur);
         return binding;
+    }
+    private static List<Triangle> localTriangles(JsonObject data){
+        var points=new ArrayList<Vector3f>();var vs=data.getAsJsonArray("vertices");
+        for(int i=0;i<vs.size();i+=3)points.add(new Vector3f(vs.get(i).getAsFloat(),vs.get(i+1).getAsFloat(),vs.get(i+2).getAsFloat()));
+        var result=new ArrayList<Triangle>();var ts=data.getAsJsonArray("triangles");
+        for(int i=0;i<ts.size();i+=4){
+            var a=points.get(ts.get(i).getAsInt());var b=points.get(ts.get(i+1).getAsInt());var c=points.get(ts.get(i+2).getAsInt());
+            var normal=new Vector3f(b).sub(a).cross(new Vector3f(c).sub(a));if(normal.lengthSquared()<1e-10F)continue;normal.normalize();
+            result.add(new Triangle(a,b,c,normal,ts.get(i+3).getAsInt(),null));
+        }
+        return List.copyOf(result);
     }
     private static boolean inside(float x,float y,float[] a,float[] b,float[] c){
         float d=(b[1]-c[1])*(a[0]-c[0])+(c[0]-b[0])*(a[1]-c[1]);if(Math.abs(d)<1e-10)return false;
