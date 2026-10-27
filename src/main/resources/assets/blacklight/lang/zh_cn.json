@@ -763,5 +763,14 @@
   "zone.blacklight.yellow": "黄区",
   "zone.blacklight.red": "红区",
   "setting.blacklight.infection_zones": "感染区域显示",
-  "setting.blacklight.infection_zones.desc": "显示服务器判定的红区、黄区或绿区。关闭仅隐藏标识，不改变感染和生成。"
+  "setting.blacklight.infection_zones.desc": "显示服务器判定的红区、黄区或绿区。关闭仅隐藏标识，不改变感染和生成。",
+  "entity.blacklight.evolved_blade": "刃臂进化者",
+  "entity.blacklight.evolved_strength": "重锤进化者",
+  "entity.blacklight.evolved_armored": "盾甲进化者",
+  "entity.blacklight.evolved_predator": "猎食进化者",
+  "entity.blacklight.evolved_tendril": "触须进化者",
+  "entity.blacklight.evolved_skirmisher": "疾袭进化者",
+  "entity.blacklight.evolved_sensory": "骨刺进化者",
+  "entity.blacklight.evolved_regenerator": "供养进化者",
+  "entity.blacklight.evolved_quill": "进化者骨刺"
 }

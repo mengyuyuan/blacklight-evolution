@@ -30,4 +30,10 @@ final class EvolvedCombatEffects {
             level.playSound(null,ground,SoundEvents.GENERIC_BIG_FALL,SoundSource.HOSTILE,.8F,.65F);
         }
     }
+    static void feed(BlacklightInfectedHost host,LivingEntity target){
+        if(!(host.level() instanceof ServerLevel level))return;
+        var p=target.getBoundingBox().getCenter();
+        level.sendParticles(new DustParticleOptions(new Vector3f(.56F,.06F,.09F),.9F),p.x,p.y,p.z,10,.25,.25,.25,.02);
+        level.playSound(null,target.blockPosition(),SoundEvents.HONEY_BLOCK_SLIDE,SoundSource.HOSTILE,.5F,.6F);
+    }
 }

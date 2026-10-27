@@ -1,0 +1,167 @@
+[
+  {
+    "type": "blade",
+    "vertices": 4296,
+    "submittedQuads": 2863,
+    "weaponSurfaces": 1932,
+    "editableSurfaces": 2488,
+    "bytes": 414463,
+    "sourceSurfaces": [
+      {
+        "asset": "evolved_1stRunner_Blades_geo_runner1_arm_bladeShape000_skin",
+        "sourceFileSHA256": "292a0ff36415eaf3999ce3ae9e5228c6e35156f36788c85c6f119624e784def4",
+        "adaptation": "Original P2 Evolved Runner1 arm surfaces and cutting silhouette, fitted to Minecraft shoulder/elbow proportions; own pixel material. Wrist/blade influences follow the rigid forearm."
+      }
+    ]
+  },
+  {
+    "type": "strength",
+    "vertices": 4404,
+    "submittedQuads": 3174,
+    "weaponSurfaces": 2518,
+    "editableSurfaces": 3132,
+    "bytes": 502715,
+    "sourceSurfaces": [
+      {
+        "asset": "alex_hammerfist3",
+        "fileSHA256": "678d6836612529b5073578717787a21e57570fc0228f462811269a3690ede040",
+        "sourceTriangles": 2518,
+        "adaptedTriangles": 2518,
+        "sides": [
+          "R",
+          "L"
+        ],
+        "textures": "source colour regions remapped to own MC vertex palette; source texture files not shipped"
+      }
+    ]
+  },
+  {
+    "type": "armored",
+    "vertices": 5042,
+    "submittedQuads": 3911,
+    "weaponSurfaces": 3117,
+    "editableSurfaces": 3702,
+    "bytes": 587697,
+    "sourceSurfaces": [
+      {
+        "asset": "alex_tendril3",
+        "fileSHA256": "51eb79b30629a60fc19b54ecd7a553d2830d845b3db586672614be4e04dab15e",
+        "sourceTriangles": 2798,
+        "adaptedTriangles": 1409,
+        "sides": [
+          "L"
+        ],
+        "textures": "source colour regions remapped to own MC vertex palette; source texture files not shipped"
+      },
+      {
+        "asset": "heller_shield_3",
+        "fileSHA256": "b0e24945b1b0bff0d3dea3d5cc29d626ce75f1e7db3e7754647e08c8ee6a33b1",
+        "sourceTriangles": 742,
+        "adaptedTriangles": 742,
+        "sides": [
+          "L"
+        ],
+        "textures": "source colour regions remapped to own MC vertex palette; source texture files not shipped"
+      }
+    ]
+  },
+  {
+    "type": "predator",
+    "vertices": 5725,
+    "submittedQuads": 3956,
+    "weaponSurfaces": 3300,
+    "editableSurfaces": 3914,
+    "bytes": 650032,
+    "sourceSurfaces": [
+      {
+        "asset": "alex_claws3",
+        "fileSHA256": "7e145b36799ded064139fe4824dba5ae0ae725a55bc957c15489a7d7bd8897b4",
+        "sourceTriangles": 3300,
+        "adaptedTriangles": 3300,
+        "sides": [
+          "R",
+          "L"
+        ],
+        "textures": "source colour regions remapped to own MC vertex palette; source texture files not shipped"
+      }
+    ]
+  },
+  {
+    "type": "tendril",
+    "vertices": 4640,
+    "submittedQuads": 3454,
+    "weaponSurfaces": 2798,
+    "editableSurfaces": 3412,
+    "bytes": 545164,
+    "sourceSurfaces": [
+      {
+        "asset": "alex_tendril3",
+        "fileSHA256": "51eb79b30629a60fc19b54ecd7a553d2830d845b3db586672614be4e04dab15e",
+        "sourceTriangles": 2798,
+        "adaptedTriangles": 2798,
+        "sides": [
+          "R",
+          "L"
+        ],
+        "textures": "source colour regions remapped to own MC vertex palette; source texture files not shipped"
+      }
+    ]
+  },
+  {
+    "type": "skirmisher",
+    "vertices": 4296,
+    "submittedQuads": 2863,
+    "weaponSurfaces": 1932,
+    "editableSurfaces": 2488,
+    "bytes": 415880,
+    "sourceSurfaces": [
+      {
+        "asset": "evolved_1stRunner_Blades_geo_runner1_arm_bladeShape000_skin",
+        "sourceFileSHA256": "292a0ff36415eaf3999ce3ae9e5228c6e35156f36788c85c6f119624e784def4",
+        "adaptation": "Original P2 Evolved Runner1 arm surfaces and cutting silhouette, fitted to Minecraft shoulder/elbow proportions; own pixel material. Wrist/blade influences follow the rigid forearm."
+      }
+    ]
+  },
+  {
+    "type": "sensory",
+    "vertices": 5854,
+    "submittedQuads": 3207,
+    "weaponSurfaces": 2551,
+    "editableSurfaces": 3165,
+    "bytes": 566514,
+    "sourceSurfaces": [
+      {
+        "asset": "alex_claws2",
+        "fileSHA256": "616c153a83cda4190b68041f1119e621ddb72227cb6b00189fb142a7232878ec",
+        "sourceTriangles": 2551,
+        "adaptedTriangles": 2551,
+        "sides": [
+          "R",
+          "L"
+        ],
+        "textures": "source colour regions remapped to own MC vertex palette; source texture files not shipped"
+      }
+    ]
+  },
+  {
+    "type": "regenerator",
+    "vertices": 4006,
+    "submittedQuads": 2582,
+    "weaponSurfaces": 1926,
+    "editableSurfaces": 2540,
+    "bytes": 417459,
+    "sourceSurfaces": [
+      {
+        "asset": "alex_tendril2",
+        "fileSHA256": "40ed5967cbcdc16d849767d12b3c461a3824723e2d248f72bcaae267002bc585",
+        "sourceTriangles": 1926,
+        "adaptedTriangles": 1926,
+        "sides": [
+          "R",
+          "L"
+        ],
+        "textures": "source colour regions remapped to own MC vertex palette; source texture files not shipped"
+      }
+    ]
+  }
+]

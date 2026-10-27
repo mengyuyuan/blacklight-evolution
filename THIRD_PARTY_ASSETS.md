@@ -169,6 +169,19 @@ source hash and frame segments. The source's end frame 55 is clamped to the
 actual last frame 52. Six invulnerability ticks and MC displacement are gameplay
 adaptations, not verified original values.
 
+## Additional P2-derived Evolved weapon surfaces (2026-10-27)
+
+`models/evolved_variants/` adds fitted weapon geometry from locally extracted
+Prototype 2 `alex_hammerfist3`, `alex_claws3`, `alex_tendril3`, `heller_shield_3`,
+`alex_claws2`, and `alex_tendril2`, alongside the previously disclosed Runner1 blades.
+These surfaces remain source-game derivatives; they are not claimed as original
+weapon geometry. Original topology is fitted onto the existing 67-joint MC rig.
+Source colour regions are mapped to a small MC vertex palette; original game texture
+files are not shipped. The model JSON and `docs/design/evolved-variants-geometry.json`
+record source hashes and face counts. The new character clothing details and special
+combat behavior are mod adaptations, not claims that those named variants or
+mechanics exist unchanged in Prototype 2. Existing source-derived asset notices apply.
+
 ## Whole municipal Los Angeles Arnis scenery (2026-10-26)
 
 Map data © OpenStreetMap contributors, ODbL 1.0: https://www.openstreetmap.org/copyright .

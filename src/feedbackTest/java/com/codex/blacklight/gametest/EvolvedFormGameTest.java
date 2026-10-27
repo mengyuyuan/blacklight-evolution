@@ -189,7 +189,7 @@ public final class EvolvedFormGameTest {
         var host=ModEntities.INFECTED_HOST.get().create(h.getLevel());host.inherit(EntityType.ZOMBIE.create(h.getLevel()));
         var organs=new EnumMap<TissueCore,TissueInheritance.Organ>(TissueCore.class);
         for(var core:new TissueCore[]{TissueCore.MUSCLE,TissueCore.CARAPACE,TissueCore.JAW,TissueCore.GRASP,TissueCore.BLADE,TissueCore.HYDROSTAT})
-            organs.put(core,new TissueInheritance.Organ(350,0,0,0,core==TissueCore.BLADE?1:0,core.ordinal()+71));
+            organs.put(core,new TissueInheritance.Organ(core==TissueCore.BLADE?900:350,0,0,0,core==TissueCore.BLADE?1:0,core.ordinal()+71));
         long seed=TissueOrgans.seed(host.getUUID());var genes=new TissueInheritance(organs,6,2100,false,null,1,6).digest(1,true,seed,504000,TissueInheritance.Rules.DEFAULT,TissueCore.MUSCLE);
         var tag=new CompoundTag();host.saveWithoutId(tag);tag.getCompound("BlacklightHost").putString("NativeCore",TissueCore.MUSCLE.key());tag.putLong("BlacklightTissueAge",504000);tag.putInt("BlacklightTissueNutrition",0);tag.put("BlacklightTissueInheritance",TissueInheritanceCodec.write(genes));host.load(tag);
         for(int x=3;x<=7;x++)for(int z=3;z<=7;z++)h.getLevel().setBlock(h.absolutePos(new BlockPos(x,29,z)),Blocks.STONE.defaultBlockState(),2);

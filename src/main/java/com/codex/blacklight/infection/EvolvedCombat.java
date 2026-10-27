@@ -17,17 +17,22 @@ public final class EvolvedCombat {
     private final Set<Integer> contacts=new HashSet<>();
     private final Set<Integer> cues=new HashSet<>();
     private final EvolvedPoise poise=new EvolvedPoise();
+    private final EvolvedSpecials specials;
     private Vec3 committedDirection=Vec3.ZERO,anchor,lastChasePosition;
     private int stalledChaseTicks;
     private int comboLength;
     private boolean connected;
     private float committedYaw,travelScale=1;
     private int cooldown=8,dodgeCooldown=40,graspCooldown=60,leapCooldown,pathCooldown,counterCooldown,tauntCooldown=180,sequence,wallTicks;
-    public EvolvedCombat(BlacklightInfectedHost host){this.host=host;}
+    public EvolvedCombat(BlacklightInfectedHost host){this.host=host;specials=new EvolvedSpecials(host);}
+    public float protect(net.minecraft.world.damagesource.DamageSource source,float damage){return specials.protect(source,damage);}
+    public void acceptedShield(float reduction){specials.acceptedShield(reduction);}
+    public net.minecraft.nbt.CompoundTag saveSpecials(){return specials.save();}
+    public void loadSpecials(net.minecraft.nbt.CompoundTag tag){specials.load(tag);}
     public boolean acceptImpact(){return poise.accept(host.level().getGameTime());}
     public boolean controlProtected(){return host.isEvolved()&&poise.protectedAt(host.level().getGameTime());}
     public void interruptForHit(){interrupt();cooldown=4;}
-    public void interrupt(){host.setEvolvedAction("");host.setEvolvedEngaged(false);host.setSprinting(false);host.getNavigation().stop();host.setDeltaMovement(0,host.getDeltaMovement().y,0);contacts.clear();anchor=null;pathCooldown=0;comboLength=0;connected=false;cooldown=Math.max(cooldown,12);}
+    public void interrupt(){specials.interrupt();host.setEvolvedAction("");host.setEvolvedEngaged(false);host.setSprinting(false);host.getNavigation().stop();host.setDeltaMovement(0,host.getDeltaMovement().y,0);contacts.clear();anchor=null;pathCooldown=0;comboLength=0;connected=false;cooldown=Math.max(cooldown,12);}
     public boolean evading(){float t=host.evolvedActionElapsed(0);return host.isEvolved()&&host.evolvedAction().startsWith("dodge_")&&t>=3&&t<10;}
     private boolean valid(LivingEntity target){return target!=null&&target.isAlive()&&target!=host&&target.level()==host.level()&&!host.isAlliedTo(target)
             &&!(target instanceof Player p&&(p.isCreative()||p.isSpectator()));}
@@ -42,6 +47,7 @@ public final class EvolvedCombat {
         if(!valid(target)){if(!host.evolvedAction().isEmpty()||host.evolvedEngaged())interrupt();host.setTarget(null);return false;}
         host.setEvolvedEngaged(true);host.getLookControl().setLookAt(target,30,30);
         if(host.organActionCore()!=null)return host.organAbilities().tick();
+        if(specials.tick(target,host.evolvedAction().isEmpty()&&cooldown==0))return true;
         double gap=gap(target);
         if(host.evolvedAction().startsWith("taunt_")&&(gap<2.8||gap>8||threatening(target)||!host.hasLineOfSight(target))){
             host.setEvolvedAction("");anchor=null;cooldown=2;pathCooldown=0;
@@ -176,7 +182,7 @@ public final class EvolvedCombat {
         if(move.equals("rush")&&valid(target)&&host.hasLineOfSight(target)&&gap(target)<2)
             start((sequence++&1)==0?"thrust_left":"thrust_right",target);
     }
-    private double reach(){return EvolvedForm.blade(host.tissueInheritance(),host.nativeTissueCore(),TissueOrgans.seed(host.getUUID()),host.tissueAge())?2.0:1.1;}
+    private double reach(){return host.evolvedArchetype()!=EvolvedArchetype.BLADE?host.evolvedArchetype().reach:EvolvedForm.blade(host.tissueInheritance(),host.nativeTissueCore(),TissueOrgans.seed(host.getUUID()),host.tissueAge())?2.0:1.1;}
     private void contact(LivingEntity target,int key,float factor){
         if(contacts.contains(key)||!host.hasLineOfSight(target)
                 ||!host.getBoundingBox().inflate(reach(),.65,reach()).intersects(target.getBoundingBox()))return;

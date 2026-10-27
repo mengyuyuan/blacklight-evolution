@@ -89,6 +89,12 @@ public final class BlacklightInfectedHost extends Monster {
     public boolean isEvolved(){return hostData().getBoolean("Evolved")||entityData.get(EVOLVED_STATE).getInt("Stage")==2;}
     public boolean isMetamorphosing(){int stage=entityData.get(EVOLVED_STATE).getInt("Stage");return stage==1||stage==3;}
     public java.util.Optional<com.codex.blacklight.infection.EvolvedMapping.Choice> evolvedChoice(){return com.codex.blacklight.infection.EvolvedChoiceCodec.read(hostData().getCompound("EvolvedChoice"));}
+    public com.codex.blacklight.infection.EvolvedArchetype evolvedArchetype(){return com.codex.blacklight.infection.EvolvedArchetype.resolve(hostData().getCompound("EvolvedChoice").getString("Type"));}
+    public int evolvedSpecialTarget(){return entityData.get(EVOLVED_ACTION).getInt("Target");}
+    public int[] evolvedPatients(){return entityData.get(EVOLVED_ACTION).getIntArray("Patients");}
+    public int evolvedShield(){var state=entityData.get(EVOLVED_STATE);return state.contains("Shield")?state.getInt("Shield"):20;}
+    public void publishEvolvedShield(int shield){if(level().isClientSide)return;var state=entityData.get(EVOLVED_STATE).copy();state.putInt("Shield",Math.clamp(shield,0,20));entityData.set(EVOLVED_STATE,state);}
+    public void setEvolvedPatients(int[] ids){if(level().isClientSide)return;var tag=entityData.get(EVOLVED_ACTION).copy();tag.putIntArray("Patients",ids);entityData.set(EVOLVED_ACTION,tag);}
     public float evolvedProgress(float partial){
         var state=entityData.get(EVOLVED_STATE);int stage=state.getInt("Stage");if(stage==2)return com.codex.blacklight.infection.EvolvedForm.DURATION;
         float extra=Math.clamp(level().getGameTime()-state.getLong("SampledAt")+partial,0,10)*(stage==3?-2:1);
@@ -100,6 +106,7 @@ public final class BlacklightInfectedHost extends Monster {
     public void setEvolvedEngaged(boolean combat){if(level().isClientSide||evolvedEngaged()==combat)return;var tag=entityData.get(EVOLVED_STATE).copy();tag.putBoolean("Combat",combat);tag.putLong("CombatAt",level().getGameTime());entityData.set(EVOLVED_STATE,tag);}
     public float evolvedActionElapsed(float partial){var action=entityData.get(EVOLVED_ACTION);return action.isEmpty()?-1:level().getGameTime()-action.getLong("Started")+partial;}
     public void setEvolvedAction(String action){if(level().isClientSide)return;var tag=new CompoundTag();if(!action.isEmpty()){tag.putString("Move",action);tag.putLong("Started",level().getGameTime());}entityData.set(EVOLVED_ACTION,tag);}
+    public void setEvolvedAction(String action,LivingEntity target){setEvolvedAction(action);if(level().isClientSide||action.isEmpty())return;var tag=entityData.get(EVOLVED_ACTION).copy();tag.putInt("Target",target.getId());entityData.set(EVOLVED_ACTION,tag);}
     private void publishEvolvedState(int stage){var tag=new CompoundTag();tag.putInt("Stage",stage);tag.putInt("Elapsed",evolvedMorphTicks);tag.putLong("SampledAt",level().getGameTime());entityData.set(EVOLVED_STATE,tag);}
     public boolean beginEvolvedMetamorphosis(){
         if(level().isClientSide||!isAlive()||isEvolved()||isMetamorphosing()||hasMultipartBody()||devourerIdentity()
@@ -136,7 +143,7 @@ public final class BlacklightInfectedHost extends Monster {
         data.putBoolean("Evolved",true);data.putString("Type","minecraft:zombie");data.putString("Family","ground");data.putBoolean("Humanoid",true);data.putBoolean("Quadruped",false);
         data.putFloat("Width",.95F*1.12F);data.putFloat("Height",2.16F*1.12F);data.putFloat("ModelScale",1);data.put("Visual",new CompoundTag());
         entityData.set(HOST,data);entityData.set(TISSUE_BODY_SCALE,com.codex.blacklight.infection.EvolvedForm.scale(tissueInheritance()));
-        if(!hasCustomName())setCustomName(Component.translatable("entity.blacklight.evolved"));
+        if(!hasCustomName())setCustomName(Component.translatable(evolvedArchetype().translation()));
         navigationReady=false;setupNavigation();getAttribute(Attributes.FOLLOW_RANGE).setBaseValue(Math.max(48,getAttributeValue(Attributes.FOLLOW_RANGE)));updateTissueCombat();refreshDimensions();
     }
     private static final ResourceLocation TISSUE_HEALTH=ResourceLocation.fromNamespaceAndPath("blacklight","tissue_evolution_health");
@@ -961,11 +968,13 @@ public final class BlacklightInfectedHost extends Monster {
     /** Run after vanilla's same-hit cooldown comparison, on the accepted difference.
      * NeoForge uses its container rather than the method argument as the damage source of truth. */
     @Override protected void actuallyHurt(DamageSource source,float amount){
-        var protection=level().isClientSide?new TissueDefense.Decision(amount,0,0):TissueDefenseSystem.incoming(this,source,damageContainers.peek().getNewDamage());
+        float incoming=level().isClientSide?amount:damageContainers.peek().getNewDamage();
+        float shielded=level().isClientSide?incoming:evolvedCombat.protect(source,incoming),shieldReduction=Math.max(0,incoming-shielded);
+        var protection=level().isClientSide?new TissueDefense.Decision(amount,0,0):TissueDefenseSystem.incoming(this,source,shielded);
         if(!level().isClientSide)damageContainers.peek().setNewDamage(protection.damage());
         float before=getHealth(),absorbed=getAbsorptionAmount(),maximum=getMaxHealth();
         super.actuallyHurt(source,protection.damage());
-        if(!level().isClientSide&&(getHealth()<before||getAbsorptionAmount()<absorbed)){defense.accepted(protection,maximum,level().getGameTime());publishDefense();}
+        if(!level().isClientSide&&(getHealth()<before||getAbsorptionAmount()<absorbed)){defense.accepted(protection,maximum,level().getGameTime());evolvedCombat.acceptedShield(shieldReduction);publishDefense();}
     }
     @Override public boolean hurt(DamageSource source,float amount) {
         if(evolvedCombat.evading()&&!source.is(net.minecraft.tags.DamageTypeTags.BYPASSES_INVULNERABILITY))return false;
@@ -1040,6 +1049,7 @@ public final class BlacklightInfectedHost extends Monster {
     }
     public AABB combatBounds() { AABB result=getBoundingBox();for(AABB box:combatHitboxes())result=result.minmax(box);return result; }
     @Override public void addAdditionalSaveData(CompoundTag tag) {
+        tag.put("BlacklightEvolvedSpecials",evolvedCombat.saveSpecials());
         var evolution=entityData.get(EVOLVED_STATE).copy();evolution.putInt("Elapsed",evolvedMorphTicks);evolution.remove("SampledAt");tag.put("BlacklightEvolvedState",evolution);
         var frame=tissueFrame();tag.putFloat("BlacklightTissueFrameX",frame.x);tag.putFloat("BlacklightTissueFrameY",frame.y);tag.putFloat("BlacklightTissueFrameZ",frame.z);
         tag.put("BlacklightTissueInheritance",TissueInheritanceCodec.write(tissueInheritance()));
@@ -1052,6 +1062,7 @@ public final class BlacklightInfectedHost extends Monster {
         super.addAdditionalSaveData(tag);tag.putLong("BlacklightTissueAge",com.codex.blacklight.infection.TissueGrowth.advance(tissueAge(),tissueClock));tag.putFloat("BlacklightTissueScale",tissueBodyScale());tag.putFloat("BlacklightCoreFracture",tissueCoreFracture());tag.put("BlacklightHost",hostData().copy());tag.putBoolean("BlacklightBossDefeated",bossDefeated);
     }
     @Override public void readAdditionalSaveData(CompoundTag tag) {
+        evolvedCombat.loadSpecials(tag.getCompound("BlacklightEvolvedSpecials"));
         var evolution=tag.getCompound("BlacklightEvolvedState").copy();evolvedMorphTicks=Math.clamp(evolution.getInt("Elapsed"),0,com.codex.blacklight.infection.EvolvedForm.DURATION);evolution.putInt("Elapsed",evolvedMorphTicks);evolution.putLong("SampledAt",level().getGameTime());
         if(evolution.getInt("Stage")<0||evolution.getInt("Stage")>3)evolution.putInt("Stage",0);
         evolution.putBoolean("Combat",false);evolution.putLong("CombatAt",level().getGameTime()-20);entityData.set(EVOLVED_STATE,evolution);entityData.set(EVOLVED_ACTION,new CompoundTag());

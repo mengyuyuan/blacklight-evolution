@@ -12,84 +12,320 @@
     "blacklight:support": "供养再生"
   },
   "organs": {
-    "blacklight:organ_muscle": {"blacklight:strength": 1.0},
-    "blacklight:elastic_tendon": {"blacklight:mobility": 1.0, "blacklight:strength": 0.2},
-    "blacklight:saddle_spring": {"blacklight:strength": 1.0, "blacklight:mobility": 0.3},
-    "blacklight:hydraulic_extensor": {"blacklight:mobility": 0.8, "blacklight:strength": 0.4},
-    "blacklight:muscular_hydrostat": {"blacklight:tendril": 1.0},
-    "blacklight:patagial_wing": {"blacklight:mobility": 1.0},
-    "blacklight:caudal_propulsor": {"blacklight:mobility": 1.0},
-    "blacklight:setal_pad": {"blacklight:mobility": 0.8, "blacklight:tendril": 0.3},
-    "blacklight:cutting_blade": {"blacklight:blade": 1.0, "blacklight:strength": 0.2},
-    "blacklight:chela": {"blacklight:tendril": 0.7, "blacklight:strength": 0.6},
-    "blacklight:ramming_horn": {"blacklight:strength": 0.8, "blacklight:armor": 0.6},
-    "blacklight:dactyl_club": {"blacklight:strength": 1.0},
-    "blacklight:ballistic_tongue": {"blacklight:tendril": 0.7, "blacklight:predation": 0.6},
-    "blacklight:organ_grasp": {"blacklight:tendril": 1.0},
-    "blacklight:pharyngeal_jaw": {"blacklight:predation": 1.0},
-    "blacklight:cnidocyte_battery": {"blacklight:tendril": 0.6, "blacklight:predation": 0.7},
-    "blacklight:organ_jaw": {"blacklight:predation": 1.0},
-    "blacklight:gizzard": {"blacklight:predation": 0.6, "blacklight:support": 0.5},
-    "blacklight:fermentation_chamber": {"blacklight:support": 1.0},
-    "blacklight:extraoral_gland": {"blacklight:predation": 1.0},
-    "blacklight:gill_raker": {"blacklight:support": 0.8, "blacklight:predation": 0.3},
-    "blacklight:absorptive_gut": {"blacklight:support": 1.0},
-    "blacklight:digestive_pancreas": {"blacklight:support": 0.8, "blacklight:predation": 0.4},
-    "blacklight:crop": {"blacklight:support": 1.0},
-    "blacklight:organ_carapace": {"blacklight:armor": 1.0},
-    "blacklight:osteoderm": {"blacklight:armor": 1.0},
-    "blacklight:nacre_shield": {"blacklight:armor": 1.0},
-    "blacklight:mucus_sheath": {"blacklight:armor": 0.6, "blacklight:support": 0.5},
-    "blacklight:rolling_shield": {"blacklight:armor": 1.0},
-    "blacklight:autotomy_ring": {"blacklight:mobility": 0.7, "blacklight:support": 0.5},
-    "blacklight:chromatophore": {"blacklight:senses": 0.7, "blacklight:predation": 0.4},
-    "blacklight:quill_field": {"blacklight:armor": 0.8, "blacklight:blade": 0.4},
-    "blacklight:compound_eye": {"blacklight:senses": 1.0},
-    "blacklight:infrared_pit": {"blacklight:senses": 1.0},
-    "blacklight:echolocation": {"blacklight:senses": 1.0},
-    "blacklight:olfactory_turbinate": {"blacklight:senses": 0.8, "blacklight:predation": 0.3},
-    "blacklight:electroreceptor": {"blacklight:senses": 1.0},
-    "blacklight:lateral_line": {"blacklight:senses": 0.8, "blacklight:mobility": 0.3},
-    "blacklight:vestibular_organ": {"blacklight:mobility": 0.7, "blacklight:senses": 0.5},
-    "blacklight:organ_crest": {"blacklight:senses": 1.0},
-    "blacklight:gill_lamella": {"blacklight:support": 1.0},
-    "blacklight:bronchial_lung": {"blacklight:support": 0.8, "blacklight:strength": 0.3},
-    "blacklight:avian_airflow": {"blacklight:mobility": 0.6, "blacklight:support": 0.6},
-    "blacklight:book_lung": {"blacklight:support": 1.0},
-    "blacklight:tracheal_network": {"blacklight:support": 1.0},
-    "blacklight:main_heart": {"blacklight:support": 0.8, "blacklight:strength": 0.4},
-    "blacklight:branchial_heart": {"blacklight:support": 1.0},
-    "blacklight:splenic_reservoir": {"blacklight:support": 0.7, "blacklight:strength": 0.5},
-    "blacklight:hepatic_lobe": {"blacklight:support": 1.0},
-    "blacklight:nephric_filter": {"blacklight:support": 1.0},
-    "blacklight:salt_gland": {"blacklight:support": 1.0},
-    "blacklight:malpighian_tubule": {"blacklight:support": 1.0},
-    "blacklight:fat_body": {"blacklight:support": 0.8, "blacklight:armor": 0.3},
-    "blacklight:electric_organ": {"blacklight:predation": 0.8, "blacklight:senses": 0.4},
-    "blacklight:countercurrent_rete": {"blacklight:support": 1.0},
-    "blacklight:adrenal_complex": {"blacklight:strength": 0.7, "blacklight:mobility": 0.6},
-    "blacklight:venom_gland": {"blacklight:predation": 1.0},
-    "blacklight:corrosive_gland": {"blacklight:predation": 0.8, "blacklight:blade": 0.4},
-    "blacklight:bipartite_reactor": {"blacklight:predation": 0.8, "blacklight:strength": 0.4},
-    "blacklight:silk_gland": {"blacklight:tendril": 1.0},
-    "blacklight:spinneret": {"blacklight:tendril": 1.0},
-    "blacklight:adhesive_papilla": {"blacklight:tendril": 0.8, "blacklight:predation": 0.3},
-    "blacklight:alarm_gland": {"blacklight:senses": 0.7, "blacklight:support": 0.4},
-    "blacklight:ink_sac": {"blacklight:senses": 0.5, "blacklight:mobility": 0.5},
-    "blacklight:blastema_niche": {"blacklight:support": 1.0},
-    "blacklight:hematopoietic_marrow": {"blacklight:support": 1.0},
-    "blacklight:thymic_organ": {"blacklight:support": 0.8, "blacklight:armor": 0.3},
-    "blacklight:lymph_node_chain": {"blacklight:support": 1.0},
-    "blacklight:ecdysial_complex": {"blacklight:armor": 0.6, "blacklight:support": 0.6},
-    "blacklight:brood_pouch": {"blacklight:support": 1.0},
-    "blacklight:budding_disc": {"blacklight:support": 1.0},
-    "blacklight:vascular_stolon": {"blacklight:tendril": 0.6, "blacklight:support": 0.7}
+    "blacklight:organ_muscle": {
+      "blacklight:strength": 1.0
+    },
+    "blacklight:elastic_tendon": {
+      "blacklight:mobility": 1.0,
+      "blacklight:strength": 0.2
+    },
+    "blacklight:saddle_spring": {
+      "blacklight:strength": 1.0,
+      "blacklight:mobility": 0.3
+    },
+    "blacklight:hydraulic_extensor": {
+      "blacklight:mobility": 0.8,
+      "blacklight:strength": 0.4
+    },
+    "blacklight:muscular_hydrostat": {
+      "blacklight:tendril": 1.0
+    },
+    "blacklight:patagial_wing": {
+      "blacklight:mobility": 1.0
+    },
+    "blacklight:caudal_propulsor": {
+      "blacklight:mobility": 1.0
+    },
+    "blacklight:setal_pad": {
+      "blacklight:mobility": 0.8,
+      "blacklight:tendril": 0.3
+    },
+    "blacklight:cutting_blade": {
+      "blacklight:blade": 1.0,
+      "blacklight:strength": 0.2
+    },
+    "blacklight:chela": {
+      "blacklight:tendril": 0.7,
+      "blacklight:strength": 0.6
+    },
+    "blacklight:ramming_horn": {
+      "blacklight:strength": 0.8,
+      "blacklight:armor": 0.6
+    },
+    "blacklight:dactyl_club": {
+      "blacklight:strength": 1.0
+    },
+    "blacklight:ballistic_tongue": {
+      "blacklight:tendril": 0.7,
+      "blacklight:predation": 0.6
+    },
+    "blacklight:organ_grasp": {
+      "blacklight:tendril": 1.0
+    },
+    "blacklight:pharyngeal_jaw": {
+      "blacklight:predation": 1.0
+    },
+    "blacklight:cnidocyte_battery": {
+      "blacklight:tendril": 0.6,
+      "blacklight:predation": 0.7
+    },
+    "blacklight:organ_jaw": {
+      "blacklight:predation": 1.0
+    },
+    "blacklight:gizzard": {
+      "blacklight:predation": 0.6,
+      "blacklight:support": 0.5
+    },
+    "blacklight:fermentation_chamber": {
+      "blacklight:support": 1.0
+    },
+    "blacklight:extraoral_gland": {
+      "blacklight:predation": 1.0
+    },
+    "blacklight:gill_raker": {
+      "blacklight:support": 0.8,
+      "blacklight:predation": 0.3
+    },
+    "blacklight:absorptive_gut": {
+      "blacklight:support": 1.0
+    },
+    "blacklight:digestive_pancreas": {
+      "blacklight:support": 0.8,
+      "blacklight:predation": 0.4
+    },
+    "blacklight:crop": {
+      "blacklight:support": 1.0
+    },
+    "blacklight:organ_carapace": {
+      "blacklight:armor": 1.0
+    },
+    "blacklight:osteoderm": {
+      "blacklight:armor": 1.0
+    },
+    "blacklight:nacre_shield": {
+      "blacklight:armor": 1.0
+    },
+    "blacklight:mucus_sheath": {
+      "blacklight:armor": 0.6,
+      "blacklight:support": 0.5
+    },
+    "blacklight:rolling_shield": {
+      "blacklight:armor": 1.0
+    },
+    "blacklight:autotomy_ring": {
+      "blacklight:mobility": 0.7,
+      "blacklight:support": 0.5
+    },
+    "blacklight:chromatophore": {
+      "blacklight:senses": 0.7,
+      "blacklight:predation": 0.4
+    },
+    "blacklight:quill_field": {
+      "blacklight:armor": 0.8,
+      "blacklight:blade": 0.4
+    },
+    "blacklight:compound_eye": {
+      "blacklight:senses": 1.0
+    },
+    "blacklight:infrared_pit": {
+      "blacklight:senses": 1.0
+    },
+    "blacklight:echolocation": {
+      "blacklight:senses": 1.0
+    },
+    "blacklight:olfactory_turbinate": {
+      "blacklight:senses": 0.8,
+      "blacklight:predation": 0.3
+    },
+    "blacklight:electroreceptor": {
+      "blacklight:senses": 1.0
+    },
+    "blacklight:lateral_line": {
+      "blacklight:senses": 0.8,
+      "blacklight:mobility": 0.3
+    },
+    "blacklight:vestibular_organ": {
+      "blacklight:mobility": 0.7,
+      "blacklight:senses": 0.5
+    },
+    "blacklight:organ_crest": {
+      "blacklight:senses": 1.0
+    },
+    "blacklight:gill_lamella": {
+      "blacklight:support": 1.0
+    },
+    "blacklight:bronchial_lung": {
+      "blacklight:support": 0.8,
+      "blacklight:strength": 0.3
+    },
+    "blacklight:avian_airflow": {
+      "blacklight:mobility": 0.6,
+      "blacklight:support": 0.6
+    },
+    "blacklight:book_lung": {
+      "blacklight:support": 1.0
+    },
+    "blacklight:tracheal_network": {
+      "blacklight:support": 1.0
+    },
+    "blacklight:main_heart": {
+      "blacklight:support": 0.8,
+      "blacklight:strength": 0.4
+    },
+    "blacklight:branchial_heart": {
+      "blacklight:support": 1.0
+    },
+    "blacklight:splenic_reservoir": {
+      "blacklight:support": 0.7,
+      "blacklight:strength": 0.5
+    },
+    "blacklight:hepatic_lobe": {
+      "blacklight:support": 1.0
+    },
+    "blacklight:nephric_filter": {
+      "blacklight:support": 1.0
+    },
+    "blacklight:salt_gland": {
+      "blacklight:support": 1.0
+    },
+    "blacklight:malpighian_tubule": {
+      "blacklight:support": 1.0
+    },
+    "blacklight:fat_body": {
+      "blacklight:support": 0.8,
+      "blacklight:armor": 0.3
+    },
+    "blacklight:electric_organ": {
+      "blacklight:predation": 0.8,
+      "blacklight:senses": 0.4
+    },
+    "blacklight:countercurrent_rete": {
+      "blacklight:support": 1.0
+    },
+    "blacklight:adrenal_complex": {
+      "blacklight:strength": 0.7,
+      "blacklight:mobility": 0.6
+    },
+    "blacklight:venom_gland": {
+      "blacklight:predation": 1.0
+    },
+    "blacklight:corrosive_gland": {
+      "blacklight:predation": 0.8,
+      "blacklight:blade": 0.4
+    },
+    "blacklight:bipartite_reactor": {
+      "blacklight:predation": 0.8,
+      "blacklight:strength": 0.4
+    },
+    "blacklight:silk_gland": {
+      "blacklight:tendril": 1.0
+    },
+    "blacklight:spinneret": {
+      "blacklight:tendril": 1.0
+    },
+    "blacklight:adhesive_papilla": {
+      "blacklight:tendril": 0.8,
+      "blacklight:predation": 0.3
+    },
+    "blacklight:alarm_gland": {
+      "blacklight:senses": 0.7,
+      "blacklight:support": 0.4
+    },
+    "blacklight:ink_sac": {
+      "blacklight:senses": 0.5,
+      "blacklight:mobility": 0.5
+    },
+    "blacklight:blastema_niche": {
+      "blacklight:support": 1.0
+    },
+    "blacklight:hematopoietic_marrow": {
+      "blacklight:support": 1.0
+    },
+    "blacklight:thymic_organ": {
+      "blacklight:support": 0.8,
+      "blacklight:armor": 0.3
+    },
+    "blacklight:lymph_node_chain": {
+      "blacklight:support": 1.0
+    },
+    "blacklight:ecdysial_complex": {
+      "blacklight:armor": 0.6,
+      "blacklight:support": 0.6
+    },
+    "blacklight:brood_pouch": {
+      "blacklight:support": 1.0
+    },
+    "blacklight:budding_disc": {
+      "blacklight:support": 1.0
+    },
+    "blacklight:vascular_stolon": {
+      "blacklight:tendril": 0.6,
+      "blacklight:support": 0.7
+    }
   },
   "forms": [
     {
       "id": "blacklight:blade_evolved",
       "type": "blacklight:blade_evolved",
-      "biases": ["blacklight:blade"],
+      "biases": [
+        "blacklight:blade"
+      ],
+      "weight": 1.0
+    },
+    {
+      "id": "blacklight:strength_evolved",
+      "type": "blacklight:strength_evolved",
+      "biases": [
+        "blacklight:strength"
+      ],
+      "weight": 1.0
+    },
+    {
+      "id": "blacklight:armored_evolved",
+      "type": "blacklight:armored_evolved",
+      "biases": [
+        "blacklight:armor"
+      ],
+      "weight": 1.0
+    },
+    {
+      "id": "blacklight:predator_evolved",
+      "type": "blacklight:predator_evolved",
+      "biases": [
+        "blacklight:predation"
+      ],
+      "weight": 1.0
+    },
+    {
+      "id": "blacklight:tendril_evolved",
+      "type": "blacklight:tendril_evolved",
+      "biases": [
+        "blacklight:tendril"
+      ],
+      "weight": 1.0
+    },
+    {
+      "id": "blacklight:skirmisher_evolved",
+      "type": "blacklight:skirmisher_evolved",
+      "biases": [
+        "blacklight:mobility"
+      ],
+      "weight": 1.0
+    },
+    {
+      "id": "blacklight:sensory_evolved",
+      "type": "blacklight:sensory_evolved",
+      "biases": [
+        "blacklight:senses"
+      ],
+      "weight": 1.0
+    },
+    {
+      "id": "blacklight:regenerator_evolved",
+      "type": "blacklight:regenerator_evolved",
+      "biases": [
+        "blacklight:support"
+      ],
       "weight": 1.0
     }
   ]

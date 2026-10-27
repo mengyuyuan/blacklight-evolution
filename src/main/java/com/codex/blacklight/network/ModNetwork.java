@@ -21,7 +21,7 @@ public final class ModNetwork {
     public static void register(RegisterPayloadHandlersEvent event) {
         // Tissue anatomy adds synchronized entity metadata. Reject mixed old/new builds
         // during negotiation instead of decoding an unknown metadata index in-game.
-        event.registrar("standalone-36-district-zones")
+        event.registrar("standalone-37-evolved-archetypes")
                 .playToClient(DistrictZonePayload.TYPE,DistrictZonePayload.STREAM_CODEC,(payload,context)->context.enqueueWork(()->com.codex.blacklight.client.DistrictZoneHud.accept(payload)))
                 .playToServer(DisguiseSelectPayload.TYPE,DisguiseSelectPayload.STREAM_CODEC,(payload,context)->context.enqueueWork(()->{
                     if(context.player() instanceof ServerPlayer p&&canAct(p))com.codex.blacklight.disguise.DisguiseSystem.select(p,payload.revision(),payload.index());

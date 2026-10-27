@@ -14,7 +14,7 @@ import net.neoforged.neoforge.event.AddReloadListenerEvent;
 public final class EvolvedMappingReload {
     private static final String BUILTIN="/data/blacklight/blacklight/evolved_mapping/default.json";
     private static volatile EvolvedMapping.Table current;
-    private static final Set<String> TYPES=Set.of(EvolvedMapping.DEFAULT_FORM);
+    private static final Set<String> TYPES=EvolvedArchetype.types();
     private EvolvedMappingReload(){}
     public static EvolvedMapping.Table current(){
         var table=current;if(table!=null)return table;

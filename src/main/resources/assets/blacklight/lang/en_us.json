@@ -763,5 +763,14 @@
   "zone.blacklight.yellow": "Yellow Zone",
   "zone.blacklight.red": "Red Zone",
   "setting.blacklight.infection_zones": "Infection zone HUD",
-  "setting.blacklight.infection_zones.desc": "Show the server-owned Green, Yellow or Red zone label. Hiding it does not change infection or population."
+  "setting.blacklight.infection_zones.desc": "Show the server-owned Green, Yellow or Red zone label. Hiding it does not change infection or population.",
+  "entity.blacklight.evolved_blade": "Blade Evolved",
+  "entity.blacklight.evolved_strength": "Mauler Evolved",
+  "entity.blacklight.evolved_armored": "Bulwark Evolved",
+  "entity.blacklight.evolved_predator": "Predator Evolved",
+  "entity.blacklight.evolved_tendril": "Tendril Evolved",
+  "entity.blacklight.evolved_skirmisher": "Skirmisher Evolved",
+  "entity.blacklight.evolved_sensory": "Quill Evolved",
+  "entity.blacklight.evolved_regenerator": "Nurturer Evolved",
+  "entity.blacklight.evolved_quill": "Evolved Quill"
 }

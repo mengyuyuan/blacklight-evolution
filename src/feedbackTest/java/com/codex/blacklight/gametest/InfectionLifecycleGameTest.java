@@ -139,7 +139,9 @@ public final class InfectionLifecycleGameTest {
                         h.assertTrue(actor.tissueInheritance().meals()==6&&actor.tissueInheritance().acquiredOrgans()==6,"six personally accepted captures preserve six actual donor organs");
                         h.assertTrue(actor.isEvolved()&&!actor.isMetamorphosing(),"integrated organs trigger and complete the actual automatic human metamorphosis");
                         var choice=actor.evolvedChoice().orElseThrow();
-                        h.assertTrue(choice.form().equals(EvolvedMapping.DEFAULT_FORM)&&choice.table().equals(EvolvedMappingReload.current().fingerprint()),"real metamorphosis stores the registered form and mapping fingerprint");
+                        var mapping=EvolvedMappingReload.current();var selected=mapping.forms().get(choice.form());
+                        h.assertTrue(selected!=null&&selected.type().equals(choice.type())&&EvolvedArchetype.types().contains(choice.type())&&selected.biases().contains(choice.bias())&&!choice.fallback()&&choice.table().equals(mapping.fingerprint()),"real mixed meals select a registered matching body and store the mapping fingerprint, without silently falling back to the blade");
+                        if(bladeBias)h.assertTrue(choice.form().equals(EvolvedMapping.DEFAULT_FORM),"the dedicated six-blade donor case still selects the original blade body");
                         if(bladeBias)h.assertTrue(choice.bias().equals("blacklight:blade")&&!choice.fallback()&&actor.tissueInheritance().points()<1000,"six mature blade meals select the dominant blade pool without the removed four-role/1000-point gate");
                         var saved=new CompoundTag();actor.saveWithoutId(saved);var restored=ModEntities.INFECTED_HOST.get().create(level);restored.load(saved);
                         h.assertTrue(restored.isEvolved()&&restored.tissueInheritance().meals()==6&&restored.evolvedChoice().orElseThrow().equals(choice),"reload preserves the evolved body, actual consumption history and exact frozen random choice");restored.discard();close();h.succeed();return;
