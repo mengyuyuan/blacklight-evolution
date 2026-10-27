@@ -149,7 +149,9 @@ public final class ConsumeSystem {
     public static boolean healthReady(net.minecraft.world.entity.player.Player consumer,LivingEntity target) {
         float maximum=target.getMaxHealth();
         return target.isAlive() && Float.isFinite(maximum) && maximum>0
-                && (com.codex.blacklight.power.CombatScale.originalMaximum(target)<DIRECT_GRAB_MAX_HEALTH || target.getHealth()<=maximum*(consumer==null?HEALTH_LIMIT:com.codex.blacklight.power.ConsumeProgression.healthLimit(com.codex.blacklight.power.ConsumeProgression.progress(consumer))))
+                && (com.codex.blacklight.power.CombatScale.originalMaximum(target)<DIRECT_GRAB_MAX_HEALTH
+                    &&!(target instanceof com.codex.blacklight.entity.BlacklightInfectedHost host&&host.isEvolved())
+                    || target.getHealth()<=maximum*(consumer==null?HEALTH_LIMIT:com.codex.blacklight.power.ConsumeProgression.healthLimit(com.codex.blacklight.power.ConsumeProgression.progress(consumer))))
                 && com.codex.blacklight.power.AssimilationSystem.ready(target);
     }
 
@@ -173,6 +175,8 @@ public final class ConsumeSystem {
 
     public static void request(ServerPlayer player) {
         if(com.codex.blacklight.power.BiomassSystem.active(player))return;
+        var acquiring=ACTIVE.get(player);
+        if(acquiring!=null&&ConsumeVisual.acquiring(acquiring.stage)){cancel(player);return;}
         if (holding(player)) { throwTarget(player); return; }
         var state = player.getData(ModAttachments.PLAYER_STATE);
         if (!player.isAlive() || player.isSpectator() || !state.isInfected() || !state.isPrototypeMode()
@@ -186,6 +190,12 @@ public final class ConsumeSystem {
         }
         var form = state.getActivePower();
         double range = (form == PowerForm.WHIPFIST ? WHIP_GRAB_RANGE : 3)+com.codex.blacklight.power.AssimilationSystem.grabBonus(player);
+        // A lock supplies combat aim; it must not steal an explicit terrain grab.
+        // A real creature intersecting the view ray before that block keeps grab priority.
+        if(BlockThrowSystem.canUse(player)&&TerrainGrabSelection.targetsTerrain(player)){
+            if(!TerrainGrabSelection.start(player))message(player,TerrainGrabSelection.failureMessage(player));
+            return;
+        }
         var locked=CombatTargeting.locked(player);
         Mob target;
         if(locked!=null) {
@@ -200,7 +210,7 @@ public final class ConsumeSystem {
                             .thenComparingInt(Mob::getId)).orElse(null);
         }
         if (target == null) {
-            if(locked==null&&BlockThrowSystem.canUse(player)){
+            if(BlockThrowSystem.canUse(player)){
                 if(TerrainGrabSelection.start(player))return;
                 message(player,TerrainGrabSelection.failureMessage(player));
             }else message(player,"consume_no_target");
@@ -490,6 +500,12 @@ public final class ConsumeSystem {
         if (!player.isRemoved() && player.isAlive() && player.getData(ModAttachments.PLAYER_STATE).isPrototypeMode())
             play(player, PlayerAction.CLAW_IDLE);
         message(player, "consume_cancelled");
+    }
+    /** Escape a pending grapple without interrupting a committed consume scene. */
+    public static boolean releaseUncommitted(ServerPlayer player,boolean onlyMounted){
+        var session=ACTIVE.get(player);
+        if(session==null||session.committed()||onlyMounted&&!session.large)return false;
+        cancel(player);return true;
     }
     private static void release(Mob victim) {
         if (victim.isRemoved()) return;

@@ -82,6 +82,7 @@ public final class PrototypeMovementSystem {
     /** Handles edge-triggered inputs immediately instead of waiting for a later player tick. */
     public static void acceptInput(ServerPlayer player, boolean jumpHeld, boolean dashPressed,
                                    int forward, int sideways, boolean sprinting, boolean detach) {
+        if(detach&&com.codex.blacklight.combat.ConsumeSystem.releaseUncommitted(player,false))return;
         if (com.codex.blacklight.disguise.DisguiseSystem.active(player)||com.codex.blacklight.city.HydraTransport.active(player)||com.codex.blacklight.power.BiomassSystem.active(player) || !PrototypeModeSystem.isActive(player) || !player.isAlive()
                 || player.isSpectator() || player.isDeadOrDying()
                 || player.isPassenger() || player.isFallFlying() || player.getAbilities().flying

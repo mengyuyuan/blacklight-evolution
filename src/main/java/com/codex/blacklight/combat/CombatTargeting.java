@@ -38,7 +38,7 @@ public final class CombatTargeting {
     }
     /** Explicit camera lock only; ordinary crosshair focus is never authoritative. */
     public static void requestLock(ServerPlayer player, int entityId) {
-        if(entityId<0){LOCKS.remove(player);syncLock(player,-1);return;}
+        if(entityId<0){ConsumeSystem.releaseUncommitted(player,true);LOCKS.remove(player);syncLock(player,-1);return;}
         var entity=resolveTarget(player.serverLevel().getEntity(entityId));
         if(com.codex.blacklight.power.PrototypeMetabolism.active(player)
                 && entity != null && selectable(player,entity)

@@ -107,8 +107,10 @@ public final class OrdinaryConsumeGameTest {
         // the small test corridor; obstruction behaviour has its own test.
         for(int x=-1;x<=1;x++)for(int y=0;y<=3;y++)for(int z=-1;z<=14;z++)
             h.getLevel().setBlockAndUpdate(p.blockPosition().offset(x,y,z),net.minecraft.world.level.block.Blocks.AIR.defaultBlockState());
+        var lane=new net.minecraft.world.level.ChunkPos(net.minecraft.core.BlockPos.containing(p.position().add(0,0,12.6)));boolean forcedHere=!h.getLevel().getForcedChunks().contains(lane.toLong());if(forcedHere)h.getLevel().setChunkForced(lane.x,lane.z,true);h.getLevel().getChunk(lane.x,lane.z);
+        h.runAfterDelay(4,()->{
         var cow=EntityType.COW.create(h.getLevel());cow.setNoAi(true);
-        cow.setPos(p.position().add(0,0,12.6));h.getLevel().addFreshEntity(cow);
+        cow.setPos(p.position().add(0,0,12.6));var chunk=new net.minecraft.world.level.ChunkPos(cow.blockPosition());h.getLevel().setChunkForced(chunk.x,chunk.z,true);h.getLevel().getChunk(chunk.x,chunk.z);h.getLevel().addFreshEntity(cow);
         ConsumeSystem.request(p);
         h.assertTrue(!p.getData(ModAttachments.CONSUMING),"beyond twelve blocks must be rejected");
         cow.setPos(p.position().add(0,0,12));ConsumeSystem.request(p);
@@ -124,7 +126,8 @@ public final class OrdinaryConsumeGameTest {
         h.assertTrue(ConsumeSystem.holding(p)&&p.distanceToSqr(cow)<2,"reel-in must finish inside the capture animation");
         ConsumeSystem.consume(p);for(int i=0;i<ConsumeSequence.duration(PowerForm.WHIPFIST,false);i++)tick(p);
         h.assertTrue(cow.isRemoved()&&p.getHealth()>10,"long-range capture can then be consumed at hand");
-        h.succeed();
+        if(forcedHere)h.getLevel().setChunkForced(lane.x,lane.z,false);h.succeed();
+        });
     }
     @GameTest(template="wall_test", timeoutTicks=30)
     public static void petsAndMountedAnimalsAreProtectedWithoutSpeciesWhitelist(GameTestHelper h) {
