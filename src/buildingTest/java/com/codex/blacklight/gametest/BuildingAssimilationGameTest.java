@@ -44,6 +44,7 @@ public final class BuildingAssimilationGameTest {
         void block(BlockPos pos,BlockState state){terrain.putIfAbsent(pos.immutable(),level.getBlockState(pos));level.setBlock(pos,state,3);}
         BlockPos contact(int x,BlockState original){var pos=origin.offset(x,3,1);block(pos,original);var patch=pos.north();block(patch,ModBlocks.TISSUE_ATTACHMENT.get().defaultBlockState().setValue(TissueAttachmentBlock.FACING,Direction.SOUTH).setValue(TissueAttachmentBlock.AGE,1));colony.surfaces.add(patch.asLong());return pos;}
         void run(Runnable check){h.startSequence().thenWaitUntil(()->h.assertTrue(level.isPositionEntityTicking(origin)&&level.isPositionEntityTicking(origin.north(2)),"waiting for actual dimension/root/outlet activation; dimension="+level.dimension().location()+" root="+level.isPositionEntityTicking(origin)+" outlet="+level.isPositionEntityTicking(origin.north(2))+" forcedRoot="+level.getForcedChunks().contains(new ChunkPos(origin).toLong())+" forcedOutlet="+level.getForcedChunks().contains(new ChunkPos(origin.north(2)).toLong())+" loaded="+level.getChunkSource().getLoadedChunksCount())).thenExecute(()->{try{check.run();}finally{close();}h.succeed();});}
+        void after(int ticks,Runnable setup,Runnable check){h.startSequence().thenWaitUntil(()->h.assertTrue(level.isPositionEntityTicking(origin)&&level.isPositionEntityTicking(origin.north(2)),"waiting for occupied structure simulation")).thenExecute(setup).thenIdle(ticks).thenExecute(()->{try{check.run();}finally{close();}h.succeed();});}
         public void close(){if(closed)return;closed=true;if(observer!=null)level.removePlayerImmediately(observer,net.minecraft.world.entity.Entity.RemovalReason.DISCARDED);born.forEach(net.minecraft.world.entity.Entity::discard);colony.dead=true;for(var e:terrain.entrySet())level.setBlock(e.getKey(),e.getValue(),3);for(var cp:forced)level.setChunkForced(cp.x,cp.z,false);level.getDataStorage().set("blacklight_building_infection",old);if(city!=null)level.getDataStorage().set("blacklight_city",city);level.getDataStorage().set("blacklight_city_ecology",ecology);level.getServer().overworld().getDataStorage().set("blacklight_outbreak",outbreak);level.getGameRules().getRule(GameRules.RULE_MOBGRIEFING).set(grief,level.getServer());level.getGameRules().getRule(GameRules.RULE_DOMOBSPAWNING).set(spawns,level.getServer());BuildingInfectionConfig.ASSIMILATE.set(enabled);BuildingInfectionConfig.WORK.set(work);}
     }
     private static void dimension(GameTestHelper h,ServerLevel level){var f=new Fixture(h,level);var material=level.dimension().equals(Level.END)?Blocks.END_STONE.defaultBlockState():level.dimension().equals(Level.NETHER)?Blocks.NETHER_BRICKS.defaultBlockState():Blocks.QUARTZ_PILLAR.defaultBlockState().setValue(RotatedPillarBlock.AXIS,Direction.Axis.Z);var wall=f.contact(2,material);f.run(()->{
@@ -133,4 +134,67 @@ public final class BuildingAssimilationGameTest {
         brood(f);Consumer<net.neoforged.neoforge.event.entity.EntityJoinLevelEvent> cut=e->{if(e.getLevel()==f.level&&e.getEntity() instanceof com.codex.blacklight.entity.BlacklightCommonInfected){f.level.removeBlock(f.origin,false);f.data.save(new CompoundTag(),f.level.registryAccess());}};NeoForge.EVENT_BUS.addListener(cut);
         try{h.assertTrue(!hatch(f)&&f.born.isEmpty()&&f.colony.births==0&&f.colony.dead&&f.colony.supply.reserve()==96,"source removal during the actual publication event discards the provisional newborn, refunds its food and cannot count a ghost birth");}finally{NeoForge.EVENT_BUS.unregister(cut);}
     });}
+
+    @GameTest(template="wall_test",timeoutTicks=320,batch="occupation_bootstrap")
+    public static void actualNaturalInfectionRootsAndStartsGrowingWithoutAPlayerMeal(GameTestHelper h){var f=new Fixture(h,h.getLevel());var oldSeeds=BuildingInfectionConfig.NATURAL_SEEDS.get();BuildingInfectionData.Colony[] natural={null};f.after(200,()->{
+        f.level.removeBlock(f.origin,false);f.data.colonies.clear();f.data.clearedSites.clear();
+        f.block(f.origin,ModBlocks.TISSUE_ATTACHMENT.get().defaultBlockState().setValue(TissueAttachmentBlock.FACING,Direction.SOUTH));
+        BuildingInfectionConfig.NATURAL_SEEDS.set(true);var random=net.minecraft.util.RandomSource.create(1);
+        try{for(int i=0;i<128&&!f.level.getBlockState(f.origin).is(ModBlocks.BUILDING_CORE.get());i++)BuildingInfectionSystem.considerNaturalCore(f.level,f.origin,random);}finally{BuildingInfectionConfig.NATURAL_SEEDS.set(oldSeeds);}
+        h.assertTrue(f.data.colonies.size()==1&&f.data.colonies.getFirst().autonomous,"the genuine tissue-to-natural-core path enables occupation, without an inventory meal");natural[0]=f.data.colonies.getFirst();
+    },()->{
+        var c=natural[0];h.assertTrue(c.occupationProduced>0&&c.activeTicks>=150&&!c.surfaces.isEmpty()&&c.supply.queued()==0,"real scheduled loaded time bootstraps construction and maturation from an empty rooted building, without starving the active clock on every new patch; active="+c.activeTicks+" produced="+c.occupationProduced+" surfaces="+c.surfaces.size());
+        h.assertTrue(f.level.getBlockEntity(f.origin) instanceof com.codex.blacklight.world.BuildingHeartBlockEntity,"a real render anchor exists for client tracking, not per-tissue entities");
+    });}
+
+    @GameTest(template="wall_test",timeoutTicks=220,batch="occupation_clock")
+    public static void occupationCannotDuplicateIncomeInOneTickOrCatchUpUnloadedTime(GameTestHelper h){var f=new Fixture(h,h.getLevel());f.run(()->{
+        f.colony.stage=0;BuildingOccupation.establish(f.level,f.origin);long now=f.level.getGameTime();
+        try{
+            for(int i=0;i<8;i++){((net.minecraft.world.level.storage.ServerLevelData)f.level.getLevelData()).setGameTime(now+i*5);for(int nested=0;nested<20;nested++)BuildingOccupation.tick(f.level,f.colony);}
+            h.assertTrue(f.colony.supply.reserve()==2&&f.colony.occupationProduced==2,"eight distinct scheduled calls make one basal occupation dose; same-tick replay is free of income");
+            ((net.minecraft.world.level.storage.ServerLevelData)f.level.getLevelData()).setGameTime(now+40_000_000);BuildingOccupation.tick(f.level,f.colony);
+            h.assertTrue(f.colony.supply.reserve()==2&&f.colony.occupationTicks==5,"a huge elapsed world-clock gap adds only this scheduled work, not offline income");
+            var restored=BuildingInfectionData.load(f.data.save(new CompoundTag(),f.level.registryAccess()),f.level.registryAccess()).colonies.getFirst();
+            h.assertTrue(restored.autonomous&&restored.occupationProduced==2&&restored.occupationTicks==5,"occupation state and income audit survive real NBT without paying again");
+            var legacy=f.data.save(new CompoundTag(),f.level.registryAccess());legacy.putInt("schema",4);legacy.getList("colonies",10).getCompound(0).remove("autonomous");
+            var migrated=BuildingInfectionData.load(legacy,f.level.registryAccess()).colonies.getFirst();h.assertTrue(migrated.autonomous&&migrated.supply.reserve()==2&&migrated.occupationProduced==2,"an existing schema-four building adopts autonomous occupation without inventing a food refund or income payment on load");
+        }finally{((net.minecraft.world.level.storage.ServerLevelData)f.level.getLevelData()).setGameTime(now);}
+    });}
+
+    @GameTest(template="wall_test",timeoutTicks=220,batch="occupation_pause")
+    public static void severedRootsSettingsAndProtectedWorldsCannotProduceOccupationIncome(GameTestHelper h){var f=new Fixture(h,h.getLevel());f.run(()->{
+        BuildingOccupation.establish(f.level,f.origin);long now=f.level.getGameTime();boolean setting=BuildingInfectionConfig.AUTONOMOUS.get();var wall=f.origin.south();var before=f.level.getBlockState(wall);
+        try{
+            f.level.setBlock(wall,Blocks.AIR.defaultBlockState(),3);for(int i=0;i<10;i++){((net.minecraft.world.level.storage.ServerLevelData)f.level.getLevelData()).setGameTime(now+i*5);BuildingOccupation.tick(f.level,f.colony);}h.assertTrue(f.colony.occupationProduced==0,"a detached root does not synthesize resources");f.level.setBlock(wall,before,3);
+            BuildingInfectionConfig.AUTONOMOUS.set(false);for(int i=10;i<20;i++){((net.minecraft.world.level.storage.ServerLevelData)f.level.getLevelData()).setGameTime(now+i*5);BuildingOccupation.tick(f.level,f.colony);}h.assertTrue(f.colony.occupationProduced==0,"server opt-out pauses autonomous occupation");BuildingInfectionConfig.AUTONOMOUS.set(true);
+            f.level.getGameRules().getRule(GameRules.RULE_MOBGRIEFING).set(false,f.level.getServer());for(int i=20;i<30;i++){((net.minecraft.world.level.storage.ServerLevelData)f.level.getLevelData()).setGameTime(now+i*5);BuildingOccupation.tick(f.level,f.colony);}h.assertTrue(f.colony.occupationProduced==0,"disabled infection-world mutation cannot create occupation income");
+        }finally{BuildingInfectionConfig.AUTONOMOUS.set(setting);((net.minecraft.world.level.storage.ServerLevelData)f.level.getLevelData()).setGameTime(now);}
+    });}
+
+    @GameTest(template="wall_test",timeoutTicks=1500,batch="occupation_brood")
+    public static void aMatureOccupiedBuildingContinuouslyPaysForActualBroodWithoutFeeding(GameTestHelper h){var f=new Fixture(h,h.getLevel());Consumer<net.neoforged.neoforge.event.entity.EntityJoinLevelEvent> births=e->{if(e.getLevel()==f.level&&e.getEntity() instanceof com.codex.blacklight.entity.BlacklightCommonInfected&&e.getEntity().distanceToSqr(f.origin.getCenter())<4096)f.born.add(e.getEntity());};
+        f.after(1260,()->{f.colony.stage=3;f.colony.activeTicks=12000;BuildingOccupation.establish(f.level,f.origin);f.level.getGameRules().getRule(GameRules.RULE_DOMOBSPAWNING).set(true,f.level.getServer());NeoForge.EVENT_BUS.addListener(births);},()->{
+            try{h.assertTrue(f.colony.births>=2&&f.born.size()>=2&&f.colony.occupationProduced>24&&f.colony.supply.queued()==0,"a prepared mature building produces at least two genuine paid broods across real thirty-second cycles, without food injection; births="+f.colony.births+" entities="+f.born.size()+" produced="+f.colony.occupationProduced+" stock="+f.colony.supply.reserve()+" brood="+f.colony.broodTicks+" active="+f.colony.activeTicks+" stage="+f.colony.stage+" ticking="+f.level.isPositionEntityTicking(f.origin)+" grief="+f.level.getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING));}
+            finally{NeoForge.EVENT_BUS.unregister(births);}
+        });}
+
+    private static void diveAtHeart(GameTestHelper h,boolean veto,boolean enabled){var f=new Fixture(h,h.getLevel());var p=net.neoforged.neoforge.common.util.FakePlayerFactory.get(f.level,new com.mojang.authlib.GameProfile(UUID.randomUUID(),"heart-dive"));long session=UUID.randomUUID().getLeastSignificantBits();
+        Consumer<BlockEvent.BreakEvent> protection=e->{if(e.getPlayer()==p&&(!e.getPos().equals(f.origin)||veto))e.setCanceled(true);};
+        f.after(30,()->{
+            p.setGameMode(GameType.SURVIVAL);p.setPos(f.origin.north(2).getBottomCenter());var state=p.getData(com.codex.blacklight.registry.ModAttachments.PLAYER_STATE);state.infect();state.setPrototypeMode(true);state.addEvolutionPoints(10000);state.buyMovementUpgrade(com.codex.blacklight.power.MovementUpgrade.GLIDE_1);state.buyCombatSkill(com.codex.blacklight.power.CombatSkill.BULLETDIVE_DROP);
+            p.setData(com.codex.blacklight.registry.ModAttachments.SKILL_SETTINGS,new com.codex.blacklight.power.SkillSettings(enabled));NeoForge.EVENT_BUS.addListener(protection);
+            com.codex.blacklight.combat.BulletdiveTerrain.begin(p,session,p.position(),100);
+        },()->{
+            try{if(enabled&&!veto)h.assertTrue(f.colony.dead&&!f.level.getBlockState(f.origin).is(ModBlocks.BUILDING_CORE.get())&&!BuildingInfectionSystem.hatch(f.level,f.colony),"the real height-powered terrain pipeline breaks the above-ground heart and immediately stops its brood");
+                else h.assertTrue(!f.colony.dead&&f.level.getBlockState(f.origin).is(ModBlocks.BUILDING_CORE.get()),"player terrain preference and actual break protection veto also protect the organ");}
+            finally{com.codex.blacklight.combat.BulletdiveTerrain.cancel(p,session);NeoForge.EVENT_BUS.unregister(protection);}
+        });
+    }
+    @GameTest(template="wall_test",timeoutTicks=220,batch="occupation_dive")
+    public static void actualBulletdiveClearsAnExposedAboveGroundBuildingHeart(GameTestHelper h){diveAtHeart(h,false,true);}
+    @GameTest(template="wall_test",timeoutTicks=220,batch="occupation_dive_veto")
+    public static void actualBulletdiveCannotClearAProtectedBuildingHeart(GameTestHelper h){diveAtHeart(h,true,true);}
+    @GameTest(template="wall_test",timeoutTicks=220,batch="occupation_dive_off")
+    public static void disabledBulletdiveTerrainCannotSecretlyClearBuildingHearts(GameTestHelper h){diveAtHeart(h,false,false);}
 }

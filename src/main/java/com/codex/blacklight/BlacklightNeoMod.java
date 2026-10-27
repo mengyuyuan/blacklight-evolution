@@ -44,6 +44,7 @@ public final class BlacklightNeoMod {
         ModEffects.register(modBus);
         ModItems.register(modBus);
         com.codex.blacklight.registry.ModBlocks.register(modBus);
+        com.codex.blacklight.registry.ModBlockEntities.register(modBus);
         com.codex.blacklight.registry.ModWorldgen.register(modBus);
         ModParticles.register(modBus);
         com.codex.blacklight.registry.ModWeaponSounds.register(modBus);

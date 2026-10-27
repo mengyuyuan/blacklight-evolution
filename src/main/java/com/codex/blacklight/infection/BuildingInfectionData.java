@@ -29,6 +29,9 @@ public final class BuildingInfectionData extends SavedData {
         public final List<Long> surfaces = new ArrayList<>();
         public int activeTicks, stage, ageCursor, broodTicks, births, workTurns;
         public ColonySupply supply=new ColonySupply();
+        public boolean autonomous;
+        public int occupationTicks;
+        public long occupationProduced,lastOccupationTick=Long.MIN_VALUE;
         public long nextFoodTick,lastSupplyTick=Long.MIN_VALUE;
         public BuildingBiomassPlan mass;
         public int massCursor, massDisabled, massBlocks, massAttempt, massSupportCheck;
@@ -59,6 +62,9 @@ public final class BuildingInfectionData extends SavedData {
             var c = new Colony(BlockPos.of(n.getLong("origin")));
             c.activeTicks = Math.max(0, n.getInt("ticks")); c.stage = Math.clamp(n.getInt("stage"), 0, 3);
             c.dead = n.getBoolean("dead"); c.broodTicks = Math.clamp(n.getInt("brood"), 0, 600);
+            c.autonomous=n.contains("autonomous")?n.getBoolean("autonomous"):tag.getInt("schema")<5;
+            c.occupationTicks=Math.clamp(n.getInt("occupationTicks"),0,39);
+            c.occupationProduced=Math.max(0,n.getLong("occupationProduced"));
             c.assimilationCursor=Math.max(0,n.getInt("assimilationCursor"));c.assimilation=BuildingAssimilation.Ledger.read(n.getCompound("assimilation"),registry);
             c.assimilation.cells.keySet().removeIf(key->{var p=BlockPos.of(key);return Math.abs((long)p.getX()-c.origin.getX())>192||Math.abs((long)p.getZ()-c.origin.getZ())>192||Math.abs((long)p.getY()-c.origin.getY())>192;});
             c.recoveryCell=Math.max(0,n.getInt("recoveryCell"));c.recoveryPending=n.getBoolean("recoveryPending");
@@ -93,6 +99,7 @@ public final class BuildingInfectionData extends SavedData {
             var n = new CompoundTag();
             n.putLong("origin", c.origin.asLong()); n.putInt("ticks", c.activeTicks); n.putInt("stage", c.stage);
             n.putBoolean("dead", c.dead); n.putInt("brood", c.broodTicks); n.putInt("births", c.births); n.putInt("ageCursor", c.ageCursor);
+            n.putBoolean("autonomous",c.autonomous);n.putInt("occupationTicks",c.occupationTicks);n.putLong("occupationProduced",c.occupationProduced);
             n.putInt("workTurns", c.workTurns);
             n.putInt("assimilationCursor",c.assimilationCursor);n.put("assimilation",c.assimilation.write());
             n.putInt("recoveryCell",c.recoveryCell);n.putBoolean("recoveryPending",c.recoveryPending);
@@ -105,7 +112,7 @@ public final class BuildingInfectionData extends SavedData {
             n.putLongArray("surfaces", c.surfaces.stream().mapToLong(Long::longValue).toArray());
             entries.add(n);
         }
-        tag.putInt("schema", 4);
+        tag.putInt("schema", 5);
         tag.putLongArray("clearedSites", clearedSites.stream().mapToLong(Long::longValue).toArray());
         tag.put("colonies", entries); return tag;
     }

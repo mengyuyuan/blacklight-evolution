@@ -85,8 +85,8 @@ public final class BuildingInfectionSystem {
         }
         if(support==null) return;
         if (!canRegister(level,tissue)) return;
-        NaturalInfectionPlacement.place(level,tissue, ModBlocks.BUILDING_CORE.get().defaultBlockState()
-                .setValue(BuildingInfectionCoreBlock.FACING, support.getOpposite()));
+        if(NaturalInfectionPlacement.place(level,tissue, ModBlocks.BUILDING_CORE.get().defaultBlockState()
+                .setValue(BuildingInfectionCoreBlock.FACING, support.getOpposite()))) BuildingOccupation.establish(level,tissue);
     }
     @SubscribeEvent public static void tick(LevelTickEvent.Post event) {
         if (event.getLevel() instanceof ServerLevel level && level.getGameTime() % 5 == 0) advance(level);
@@ -108,6 +108,7 @@ public final class BuildingInfectionSystem {
             if (c.dead || c.assimilating || c.brooding || !ready(level, c.origin) || !level.isPositionEntityTicking(c.origin) || !allowedSite(level, c.origin)) continue;
             var core = level.getBlockState(c.origin);
             if (!core.is(ModBlocks.BUILDING_CORE.get())) { destroy(level,c.origin); continue; }
+            BuildingOccupation.tick(level,c);
             ColonyFeeding.tick(level,c);
             if(!c.supply.maintain(5,c.massBlocks)){data.setDirty();continue;}
             c.sustained=true;
@@ -129,6 +130,7 @@ public final class BuildingInfectionSystem {
             // Reopen one own obstructing cell per shared operation, including old starved cores.
             if(BuildingBiomassSystem.openMouth(level,c)){used++;data.setDirty();continue;}
             if(!c.sustained||c.supply.reserve()==0)continue;
+            if(c.autonomous&&c.supply.reserve()<BuildingOccupation.growthReserve(level,c)+3)continue;
             // Surface expansion, volume, surface aging, volume share this dimension's budget.
             if(c.workTurns==3&&BuildingInfectionConfig.ASSIMILATE.get())BuildingAssimilation.step(level,c);
             else if((c.workTurns&1)==1&&BuildingInfectionConfig.VOLUME.get())BuildingBiomassSystem.step(level,c);

@@ -10,12 +10,13 @@ import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.state.*;
 
 /** Fixed core, separate from the Hydra gateway and from authored city hive ports. */
-public final class BuildingInfectionCoreBlock extends HorizontalDirectionalBlock {
+public final class BuildingInfectionCoreBlock extends HorizontalDirectionalBlock implements EntityBlock {
     public static final MapCodec<BuildingInfectionCoreBlock> CODEC = simpleCodec(BuildingInfectionCoreBlock::new);
     public BuildingInfectionCoreBlock(Properties p) {
         super(p); registerDefaultState(stateDefinition.any().setValue(FACING, Direction.NORTH).setValue(TissueAttachmentBlock.AGE, 0));
     }
     @Override protected MapCodec<? extends HorizontalDirectionalBlock> codec() { return CODEC; }
+    @Override public net.minecraft.world.level.block.entity.BlockEntity newBlockEntity(BlockPos pos,BlockState state) { return new BuildingHeartBlockEntity(pos,state); }
     @Override protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> b) { b.add(FACING, TissueAttachmentBlock.AGE); }
     @Override public BlockState getStateForPlacement(BlockPlaceContext c) {
         if(c.getLevel() instanceof ServerLevel server && !BuildingInfectionSystem.canRegister(server,c.getClickedPos())) {
