@@ -15,4 +15,11 @@ public final class CommonInfectedRenderer extends HumanoidMobRenderer<Blacklight
     @Override public ResourceLocation getTextureLocation(BlacklightCommonInfected entity) {
         return TEXTURES[entity.appearance()];
     }
+    @Override public void render(BlacklightCommonInfected e,float yaw,float partial,com.mojang.blaze3d.vertex.PoseStack pose,net.minecraft.client.renderer.MultiBufferSource buffers,int light){
+        super.render(e,yaw,partial,pose,buffers,light);
+        if(e.attackStarted()<0)return;
+        pose.pushPose();pose.mulPose(com.mojang.math.Axis.YP.rotationDegrees(180-net.minecraft.util.Mth.rotLerp(partial,e.yBodyRotO,e.yBodyRot)));pose.scale(-1,-1,1);pose.translate(0,-1.501,0);
+        model.translateToHand(e.attackHand()==0?net.minecraft.world.entity.HumanoidArm.RIGHT:net.minecraft.world.entity.HumanoidArm.LEFT,pose);
+        InfectedLimbTrails.capture(e,e.attackHand(),pose.last(),new net.minecraft.world.phys.Vec3(0,.625,0));pose.popPose();
+    }
 }

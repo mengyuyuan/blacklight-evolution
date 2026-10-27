@@ -11,6 +11,11 @@ import org.joml.Vector3f;
 /** Bounded server broadcasts: impacts only occur after accepted damage. */
 final class EvolvedCombatEffects {
     private EvolvedCombatEffects(){}
+    static void prepare(BlacklightInfectedHost host,EvolvedSpecialMove move){
+        if(!(host.level() instanceof ServerLevel level))return;
+        level.playSound(null,host.blockPosition(),move==EvolvedSpecialMove.SLAM?SoundEvents.IRON_GOLEM_ATTACK:move==EvolvedSpecialMove.BASH?SoundEvents.SHIELD_BLOCK:move==EvolvedSpecialMove.MEND?SoundEvents.EVOKER_PREPARE_SUMMON:SoundEvents.PLAYER_ATTACK_SWEEP,SoundSource.HOSTILE,.75F,.6F);
+        level.sendParticles(new DustParticleOptions(new Vector3f(.4F,.035F,.07F),.85F),host.getX(),host.getY()+host.getBbHeight()*.6,host.getZ(),6,.25,.3,.25,.025);
+    }
     static void sweep(BlacklightInfectedHost host){
         host.level().playSound(null,host.blockPosition(),SoundEvents.PLAYER_ATTACK_SWEEP,SoundSource.HOSTILE,.75F,.65F);
     }

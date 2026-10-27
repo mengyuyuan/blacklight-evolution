@@ -77,6 +77,7 @@ public final class EvolvedSpecials {
             if(patients.isEmpty()||!host.spendTissueNutrition(6))return false;
         }
         emitted.clear();direction=toward(target);host.getNavigation().stop();host.setEvolvedAction(move.key,target);
+        EvolvedCombatEffects.prepare(host,move);
         host.setEvolvedPatients(patients.stream().mapToInt(Integer::intValue).toArray());
         return true;
     }

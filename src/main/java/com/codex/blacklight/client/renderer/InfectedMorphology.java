@@ -29,6 +29,8 @@ public final class InfectedMorphology implements AutoCloseable {
     private record Attachment(int anatomy,List<Box> boxes,InfectedBite wound) { }
     private record Pending(Attachment attachment,PoseStack.Pose pose,int light,int overlay,int color) { }
     private final LivingEntity proxy;
+    private final BlacklightInfectedHost trailHost;
+    private final Map<ModelPart,Integer> trailParts=new IdentityHashMap<>();
     private final SurfaceTissue surface;
     private final AnatomicalTissue anatomical;
     private final AnatomicalTissue lateOrgans;
@@ -54,7 +56,10 @@ public final class InfectedMorphology implements AutoCloseable {
         }catch(Exception e){throw new IllegalStateException("Cannot load infection morphology",e);}
     }
     public InfectedMorphology(BlacklightInfectedHost host,LivingEntity proxy,EntityModel<?> model,ResourceLocation nativeTexture,PoseStack.Pose root,float partial,org.joml.Matrix4f worldRelativePose){
-        this.proxy=proxy;previous=ACTIVE.get();
+        this.proxy=proxy;trailHost=host;previous=ACTIVE.get();
+        var anatomy=ConsumeAnatomy.model(model);var chosen=new HashMap<Integer,ModelPart>();
+        anatomy.forEach((part,role)->{if(role==ConsumeAnatomy.RIGHT_ARM||role==ConsumeAnatomy.LEFT_ARM||role==ConsumeAnatomy.HEAD){var b=bounds(part);var old=chosen.get(role);if(b!=null&&(old==null||b.volume()>bounds(old).volume()))chosen.put(role,part);}});
+        chosen.forEach((role,part)->trailParts.put(part,role));
         chimera=ChimeraTissue.bind(host,model,partial);
         String type=host.hostData().getString("Type");speciesId=type;
         var approved=Boolean.getBoolean("blacklight.proceduralTissueOnly")?new AuthoredInfectionParts.Binding():AuthoredInfectionParts.bind(type,model);
@@ -201,6 +206,7 @@ public final class InfectedMorphology implements AutoCloseable {
         var originalPose=pose;
         if(context.chimera!=null){if(context.chimera.nativeWeight(part)<=.0001F)return true;pose=context.chimera.nativePose(part,pose);context.nativeChimeraPoses.put(part,pose);}
         EvolvedDonorCapture.joint(part,pose);
+        context.trail(part,pose);
         if(context.chimera!=null)context.chimera.capture(part,pose,light,overlay);
         if(context.anatomical!=null){
             boolean handled=context.anatomical.renderSkin(part,pose,out,light,overlay,color);
@@ -248,6 +254,7 @@ public final class InfectedMorphology implements AutoCloseable {
         var context=ACTIVE.get();if(context==null||context.pending.containsKey(part))return;
         if(context.chimera!=null){if(context.chimera.nativeWeight(part)<=.0001F)return;var adjusted=context.nativeChimeraPoses.get(part);pose=adjusted==null?context.chimera.nativePose(part,pose):adjusted;}
         EvolvedDonorCapture.joint(part,pose);
+        context.trail(part,pose);
         if(context.chimera!=null)context.chimera.capture(part,pose,light,overlay);
         if(context.anatomical!=null){
             context.anatomical.capture(part,pose,light,overlay,color);
@@ -262,6 +269,7 @@ public final class InfectedMorphology implements AutoCloseable {
         PoseStack copy=new PoseStack();copy.last().pose().set(pose.pose());copy.last().normal().set(pose.normal());
         context.pending.put(part,new Pending(attachment,copy.last(),light,overlay,color));
     }
+    private void trail(ModelPart part,PoseStack.Pose pose){var slot=trailParts.get(part);if(slot==null)return;var b=bounds(part);if(b!=null)InfectedLimbTrails.capture(trailHost,slot,pose,new net.minecraft.world.phys.Vec3(b.x/16,(b.y+b.h*.45F)/16,b.z/16));}
     /** Flush before the current renderer's consume fracture wrapper finishes.
      * Deferred emission avoids switching a live vanilla BufferBuilder midway
      * through its model; context never mutates the shared species skeleton. */

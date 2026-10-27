@@ -10,6 +10,8 @@ public final class EvolvedAttack {
         return move.equals("leap")&&age>=16&&age<=29?0:-1;
     }
     public static boolean trail(String move,float age,int side){
+        var special=com.codex.blacklight.infection.EvolvedSpecialMove.resolve(move);
+        if(special!=null)return age>=special.contact-5&&age<=special.retract&&(special!=com.codex.blacklight.infection.EvolvedSpecialMove.MEND&&special!=com.codex.blacklight.infection.EvolvedSpecialMove.VOLLEY);
         if(move.equals("thrust_left")&&side!=1||move.equals("thrust_right")&&side!=0)return false;
         return contact(move,age+1)>=0||contact(move,age-1)>=0;
     }

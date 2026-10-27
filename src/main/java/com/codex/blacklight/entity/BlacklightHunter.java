@@ -115,8 +115,8 @@ public final class BlacklightHunter extends Monster implements GeoEntity {
                 ||!CreatureAttack.inArc(swipeTarget.getX()-getX(),swipeTarget.getZ()-getZ(),committedYaw,.15))return;
         // Honor vanilla immunity frames and other mods' damage cancellation; never reset victim immunity.
         if(doHurtTarget(swipeTarget)&&move==CreatureAttack.SLAM)swipeTarget.knockback(.7,getX()-swipeTarget.getX(),getZ()-swipeTarget.getZ());
-        if(level() instanceof net.minecraft.server.level.ServerLevel server)
-            server.sendParticles(net.minecraft.core.particles.ParticleTypes.SWEEP_ATTACK,swipeTarget.getX(),swipeTarget.getY()+.7,swipeTarget.getZ(),1,0,0,0,0);
+        // Accepted-hit tissue geometry is broadcast by InfectedAttackEffects;
+        // a missed/cancelled swipe must not draw a white successful-hit symbol.
     }
     public int consumerId() { return entityData.get(CONSUMER); }
     public int consumeTicks() { return entityData.get(CONSUME_TICKS); }

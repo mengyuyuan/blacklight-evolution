@@ -28,6 +28,7 @@ public final class InfectedHostRenderer extends EntityRenderer<BlacklightInfecte
         TissueCompetitionFx.render(entity,partial,stack,buffers,light);
         TissueVascularFx.render(entity,partial,stack,buffers,light);
         EvolvedBodyRenderer.cocoon(entity,partial,stack,buffers,light);
+        InfectionCombatVisuals.host(entity,partial,stack,buffers,light);
         if(entity.cannibalPrey()&&TissueCompetitionFx.active(entity))buffers=new CannibalCoverBuffers(buffers,entity,stack,partial);
         if(entity.isEvolved()){EvolvedBodyRenderer.render(entity,partial,stack,buffers,light);super.render(entity,yaw,partial,stack,buffers,light);return;}
         var mesh=authoredMesh(entity);
@@ -154,6 +155,7 @@ public final class InfectedHostRenderer extends EntityRenderer<BlacklightInfecte
                         &&!InfectedModelPose.devourerFeeding(entity,bone.name,partial,posed))
                     InfectedModelPose.transform(mesh.species(),bone.name,age,walk,speed,attack,headYaw,headPitch,
                             entity.family().equals("air")&&!entity.onGround()||entity.isInWaterOrBubble(),posed);
+                InfectedModelPose.nativeAction(entity.nativeAction(),bone.name,entity.nativeActionElapsed(partial),posed);
             },com.codex.blacklight.infection.TissueLateBody.progress(entity.tissueAge()));
             if(fracture!=null)fracture.finish();
         }finally{stack.popPose();}
