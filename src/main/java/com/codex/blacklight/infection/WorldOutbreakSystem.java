@@ -130,8 +130,12 @@ public final class WorldOutbreakSystem {
     public static Mob spawnAt(ServerLevel level,BlockPos pos,OutbreakRules.Tier tier){
         return spawnAt(level,pos,tier,false);
     }
+    public static Mob spawnFromBuilding(ServerLevel level,BlockPos pos,OutbreakRules.Tier tier){return spawnAt(level,pos,tier,false,true);}
     public static Mob spawnHydraAt(ServerLevel level,BlockPos pos){return CityEcology.stage(level,pos)<3?null:spawnAt(level,pos,OutbreakRules.Tier.ANCIENT,true);}
     private static Mob spawnAt(ServerLevel level,BlockPos pos,OutbreakRules.Tier tier,boolean hydra){
+        return spawnAt(level,pos,tier,hydra,false);
+    }
+    private static Mob spawnAt(ServerLevel level,BlockPos pos,OutbreakRules.Tier tier,boolean hydra,boolean requireExit){
         if(!active(level)||level.getDifficulty()==Difficulty.PEACEFUL||!level.getGameRules().getBoolean(GameRules.RULE_DOMOBSPAWNING)
                 ||sanctuary(level,pos)||!ready(level,pos)||!populationRoom(level,pos)
                 ||!level.getBlockState(pos.below()).isFaceSturdy(level,pos.below(),Direction.UP))return null;
@@ -156,8 +160,21 @@ public final class WorldOutbreakSystem {
             com.codex.blacklight.BlacklightNeoMod.LOGGER.debug("Outbreak spawn rejected tier={} pos={} body={} collision={} fluid={}",tier,pos,mob.getBoundingBox(),!level.noCollision(mob),level.containsAnyLiquid(mob.getBoundingBox()));
             return null;
         }
+        if(requireExit&&!hasWalkout(level,mob))return null;
         mob.getPersistentData().putBoolean("blacklight:outbreak_spawn",true);
         return addScheduled(level,mob)?mob:null;
+    }
+    /** A structural hatch cannot publish into a body-sized sealed pocket. No chunk requests. */
+    public static boolean hasWalkout(ServerLevel level,Mob mob){
+        double distance=Math.max(2,Math.min(4,mob.getBbWidth()+.5));
+        for(var direction:Direction.Plane.HORIZONTAL){
+            double dx=direction.getStepX()*distance,dz=direction.getStepZ()*distance;var swept=mob.getBoundingBox().expandTowards(dx,0,dz);
+            if(!level.getWorldBorder().isWithinBounds(swept))continue;
+            boolean loaded=true;for(int x=net.minecraft.util.Mth.floor(swept.minX)>>4;x<=net.minecraft.util.Mth.floor(swept.maxX)>>4;x++)for(int z=net.minecraft.util.Mth.floor(swept.minZ)>>4;z<=net.minecraft.util.Mth.floor(swept.maxZ)>>4;z++)if(level.getChunkSource().getChunkNow(x,z)==null)loaded=false;
+            if(!loaded||!level.noCollision(mob,swept)||level.containsAnyLiquid(swept))continue;
+            boolean supported=true;for(double step=.5;step<=distance;step+=.5){var floor=BlockPos.containing(mob.getX()+direction.getStepX()*step,mob.getY()-.05,mob.getZ()+direction.getStepZ()*step);if(!level.getBlockState(floor).isFaceSturdy(level,floor,Direction.UP)){supported=false;break;}}
+            if(supported)return true;
+        }return false;
     }
     @SubscribeEvent public static void tick(LevelTickEvent.Post event){
         if(!(event.getLevel() instanceof ServerLevel level)||!active(level)||level.players().isEmpty()

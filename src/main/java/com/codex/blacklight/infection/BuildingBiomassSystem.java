@@ -14,6 +14,12 @@ import net.neoforged.neoforge.event.level.BlockEvent;
 public final class BuildingBiomassSystem {
     private static final ThreadLocal<Boolean> UPDATING=ThreadLocal.withInitial(()->false);
     private BuildingBiomassSystem() {}
+    public static boolean clearAfterDeath(ServerLevel level,BuildingInfectionData.Colony c,BlockPos pos){
+        if(!c.dead)return false;var state=level.getBlockState(pos);if(!state.is(ModBlocks.BUILDING_BIOMASS.get())&&!state.is(ModBlocks.TISSUE_ATTACHMENT.get()))return false;
+        boolean updating=UPDATING.get();UPDATING.set(true);
+        try{boolean cleared=NaturalInfectionPlacement.place(level,pos,net.minecraft.world.level.block.Blocks.AIR.defaultBlockState());if(cleared&&state.is(ModBlocks.BUILDING_BIOMASS.get()))c.massBlocks=Math.max(0,c.massBlocks-1);return cleared;}
+        finally{if(updating)UPDATING.set(true);else UPDATING.remove();}
+    }
     private static boolean mouthCell(BlockPos origin,net.minecraft.core.Direction facing,BlockPos pos){
         int x=pos.getX()-origin.getX(),z=pos.getZ()-origin.getZ(),forward=x*facing.getStepX()+z*facing.getStepZ(),side=x*facing.getStepZ()-z*facing.getStepX(),y=pos.getY()-origin.getY();
         return forward>=1&&forward<=2&&side==0&&y>=0&&y<2;

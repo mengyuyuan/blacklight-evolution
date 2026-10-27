@@ -16,6 +16,7 @@ import net.neoforged.neoforge.event.tick.LevelTickEvent;
 
 /** Surface-connected building colonisation. Work, storage and brood all have independent bounds. */
 public final class BuildingInfectionSystem {
+    private static final ThreadLocal<java.util.Set<ServerLevel>> ADVANCING=ThreadLocal.withInitial(java.util.HashSet::new);
     private BuildingInfectionSystem() {}
 
     static boolean allowedSite(ServerLevel level, BlockPos p) {
@@ -37,7 +38,7 @@ public final class BuildingInfectionSystem {
     }
     public static boolean canRegister(ServerLevel level, BlockPos pos) {
         var data = BuildingInfectionData.get(level);
-        if (data.activeColonies() >= BuildingInfectionConfig.COLONIES.get()
+        if (data.colonies.size()>=64 || data.activeColonies() >= BuildingInfectionConfig.COLONIES.get()
                 || data.clearedSites.size() >= BuildingInfectionData.MAX_CLEARED || !allowedSite(level, pos)) return false;
         for (var c : data.colonies)
             if (Math.abs(c.origin.getX() - pos.getX()) <= BuildingInfectionConfig.RADIUS.get() * 2
@@ -92,13 +93,19 @@ public final class BuildingInfectionSystem {
     }
     /** One scheduled batch; public for dedicated-server acceptance without speeding up world time. */
     public static int advance(ServerLevel level) {
-        if (!BuildingInfectionConfig.ENABLED.get() || !WorldOutbreakSystem.active(level)
+        var active=ADVANCING.get();if(!active.add(level))return 0;
+        try{return advanceOnce(level);}finally{active.remove(level);if(active.isEmpty())ADVANCING.remove();}
+    }
+    private static int advanceOnce(ServerLevel level) {
+        if (!BuildingInfectionConfig.ENABLED.get()
                 || !level.getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING)) return 0;
         var data = BuildingInfectionData.get(level);
         if (data.colonies.isEmpty()) return 0;
+        int recovered=BuildingAssimilation.recover(level,data,BuildingInfectionConfig.WORK.get());
+        if(data.colonies.isEmpty()||!WorldOutbreakSystem.active(level))return recovered;
         for (var c : data.colonies) {
             c.sustained=false;
-            if (c.dead || !ready(level, c.origin) || !level.isPositionEntityTicking(c.origin) || !allowedSite(level, c.origin)) continue;
+            if (c.dead || c.assimilating || c.brooding || !ready(level, c.origin) || !level.isPositionEntityTicking(c.origin) || !allowedSite(level, c.origin)) continue;
             var core = level.getBlockState(c.origin);
             if (!core.is(ModBlocks.BUILDING_CORE.get())) { destroy(level,c.origin); continue; }
             ColonyFeeding.tick(level,c);
@@ -112,20 +119,19 @@ public final class BuildingInfectionSystem {
             c.stage = Math.max(c.stage, next);
             if (core.getValue(TissueAttachmentBlock.AGE) != c.stage)
                 level.setBlock(c.origin, core.setValue(TissueAttachmentBlock.AGE, c.stage), 3);
-            if (c.stage == 3 && (c.broodTicks += 5) >= 600) {
-                c.broodTicks = 0; hatch(level, c);
-            }
+            if (c.stage == 3 && (c.broodTicks=Math.min(600,c.broodTicks+5)) >= 600) hatch(level, c);
             data.setDirty();
         }
-        int used = 0, attempts = 0, budget = BuildingInfectionConfig.WORK.get();
+        int used = recovered, attempts = 0, budget = BuildingInfectionConfig.WORK.get();
         while (used < budget && attempts++ < budget * data.colonies.size()) {
             var c = data.colonies.get(Math.floorMod(data.cursor++, data.colonies.size()));
-            if (c.dead || !ready(level,c.origin) || !level.isPositionEntityTicking(c.origin) || !allowedSite(level,c.origin)) continue;
+            if (c.dead || c.assimilating || c.brooding || !ready(level,c.origin) || !level.isPositionEntityTicking(c.origin) || !allowedSite(level,c.origin)) continue;
             // Reopen one own obstructing cell per shared operation, including old starved cores.
             if(BuildingBiomassSystem.openMouth(level,c)){used++;data.setDirty();continue;}
             if(!c.sustained||c.supply.reserve()==0)continue;
             // Surface expansion, volume, surface aging, volume share this dimension's budget.
-            if((c.workTurns&1)==1&&BuildingInfectionConfig.VOLUME.get())BuildingBiomassSystem.step(level,c);
+            if(c.workTurns==3&&BuildingInfectionConfig.ASSIMILATE.get())BuildingAssimilation.step(level,c);
+            else if((c.workTurns&1)==1&&BuildingInfectionConfig.VOLUME.get())BuildingBiomassSystem.step(level,c);
             else if(c.workTurns==2||c.frontier.isEmpty()||c.surfaces.size()>=BuildingInfectionConfig.SURFACES.get())ageSurface(level,c);
             else growSurface(level,c);
             c.workTurns=(c.workTurns+1)%4;
@@ -190,6 +196,11 @@ public final class BuildingInfectionSystem {
             level.setBlock(pos,state.setValue(TissueAttachmentBlock.AGE,c.stage),3);
     }
     public static boolean hatch(ServerLevel level, BuildingInfectionData.Colony c) {
+        if(c.brooding||c.assimilating)return false;int before=c.broodTicks;c.brooding=true;c.broodTicks=0;boolean accepted=false;
+        try{accepted=hatchOnce(level,c);return accepted;}
+        finally{c.brooding=false;if(!accepted)c.broodTicks=before;}
+    }
+    private static boolean hatchOnce(ServerLevel level, BuildingInfectionData.Colony c) {
         if(c.dead || c.stage<3 || !WorldOutbreakSystem.active(level)
                 || !BuildingInfectionConfig.ENABLED.get() || !BuildingInfectionConfig.SPAWNS.get()
                 || !level.getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING)
@@ -212,12 +223,12 @@ public final class BuildingInfectionSystem {
             if(!ready(level,p)||!level.isPositionEntityTicking(p)||!level.getBlockState(p.below()).isFaceSturdy(level,p.below(),Direction.UP)
                     || !level.getBlockState(p).getFluidState().isEmpty()) continue;
             if(!c.supply.pay(cost))return false;
-            if(WorldOutbreakSystem.spawnAt(level,p,tier)!=null) {
+            boolean joined=false;
+            try{var child=WorldOutbreakSystem.spawnFromBuilding(level,p,tier);if(child!=null&&(c.dead||!level.getBlockState(c.origin).is(ModBlocks.BUILDING_CORE.get()))){child.discard();return false;}joined=child!=null;if(joined) {
                 c.births++; BuildingInfectionData.get(level).setDirty();
                 level.playSound(null,c.origin,net.minecraft.sounds.SoundEvents.SLIME_SQUISH,net.minecraft.sounds.SoundSource.HOSTILE,1,.6f);
                 return true;
-            }
-            c.supply.refund(cost);
+            }}finally{if(!joined)c.supply.refund(cost);}
         }
         return false;
     }
