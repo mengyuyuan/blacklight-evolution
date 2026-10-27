@@ -215,7 +215,7 @@ public final class BuildingInfectionSystem {
         if(!WorldOutbreakSystem.populationRoom(level,c.origin)) return false;
         int worldStage=CityEcology.stage(level,c.origin);
         var tier=c.births%4==0&&worldStage>=2?OutbreakRules.Tier.HUNTER
-                :OutbreakRules.choose(worldStage,level.random.nextInt(100));
+                :WorldOutbreakSystem.tierForPopulation(level,c.origin,level.random.nextInt(100));
         int cost=ColonySupply.broodCost(tier);if(c.supply.reserve()<cost)return false;
         var direction=level.getBlockState(c.origin).getValue(BuildingInfectionCoreBlock.FACING);
         // A mature root can occupy the old straight-ahead outlet. Search flanking

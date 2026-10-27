@@ -44,4 +44,22 @@ class OutbreakRulesTest {
         var copy=OutbreakData.load(data.save(new net.minecraft.nbt.CompoundTag(),null),null);
         assertTrue(copy.active());assertEquals(1900,copy.elapsed(2000));assertEquals(0,copy.elapsed(50));
     }
+    @Test void EarlyPopulationReservesFoodButAlsoStartsRealGrowingLineages(){
+        assertEquals(OutbreakRules.Tier.FRESH,OutbreakRules.populationTier(0,5,0,0,0,6,18,99));
+        assertEquals(OutbreakRules.Tier.GROWING,OutbreakRules.populationTier(0,6,0,0,0,6,18,0));
+        int ordinary=0,growing=0;
+        for(int roll=0;roll<100;roll++){
+            var tier=OutbreakRules.populationTier(0,10,3,0,0,6,18,roll);
+            if(tier==OutbreakRules.Tier.FRESH)ordinary++;
+            else if(tier==OutbreakRules.Tier.GROWING)growing++;
+            else fail("early ecology must not jump to mature hunters or ancient bodies");
+        }
+        assertEquals(75,ordinary);assertEquals(25,growing);
+        assertEquals(0,OutbreakRules.lineageFloor(4,6,6));
+        assertEquals(2,OutbreakRules.lineageFloor(0,6,18));
+        assertEquals(5,OutbreakRules.lineageFloor(4,6,18));
+        assertEquals(OutbreakRules.Tier.GROWING,OutbreakRules.ambientTier(0,0,0,0,0,6,18,99));
+        assertEquals(OutbreakRules.Tier.FRESH,OutbreakRules.ambientTier(0,0,0,0,0,6,18,0));
+        assertEquals(OutbreakRules.Tier.FRESH,OutbreakRules.ambientTier(0,0,0,0,0,6,6,99));
+    }
 }

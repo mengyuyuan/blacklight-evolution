@@ -11,8 +11,15 @@ public final class OutbreakRules {
         if(common<Math.min(Math.max(0,reserve),cap))return Tier.FRESH;
         if(stage>=3&&ancient<Math.min(2,available))return Tier.ANCIENT;
         if(stage>=2&&mature<Math.min(2,available))return Tier.MATURE;
-        if(stage>=1&&developed<Math.min(stage+1,available))return Tier.GROWING;
-        return choose(stage,roll);
+        if(developed<Math.min(Math.max(2,stage+1),available))return Tier.GROWING;
+        // The early pool also needs actual non-zombie lineages, without skipping to mature elites.
+        return stage<=0?Math.floorMod(roll,100)<75?Tier.FRESH:Tier.GROWING:choose(stage,roll);
+    }
+    public static int lineageFloor(int stage,int reserve,int cap){return Math.min(Math.max(0,cap-Math.min(Math.max(0,reserve),cap)),Math.max(2,Math.clamp(stage,0,4)+1));}
+    public static Tier ambientTier(int stage,int common,int developed,int mature,int ancient,int reserve,int cap,int roll){
+        // Continuous player clearing must not turn the early replenishment pool into 100% zombies.
+        if(stage<=0&&developed<lineageFloor(stage,reserve,cap)&&Math.floorMod(roll,100)>=90)return Tier.GROWING;
+        return populationTier(stage,common,developed,mature,ancient,reserve,cap,roll);
     }
     public static int stage(long elapsed,int dayTicks){
         long days=Math.max(0,elapsed)/Math.max(1,dayTicks);

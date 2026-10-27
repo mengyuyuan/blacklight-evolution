@@ -26,9 +26,10 @@ import net.neoforged.neoforge.gametest.*;
 @GameTestHolder("blacklight") @PrefixGameTestTemplate(false)
 public final class CityHiveSupplyGameTest {
     private static final class Fixture implements AutoCloseable {
-        final GameTestHelper h;final ServerLevel level;final CityData data,old;final OutbreakData outbreak;final FakePlayer player;
+        final GameTestHelper h;final ServerLevel level;final CityData data,old;final OutbreakData outbreak;final FakePlayer player,observer;
         final boolean spawning,grief,enabled,citySpawns;final net.minecraft.world.Difficulty difficulty;
         final Map<BlockPos,BlockState> changed=new LinkedHashMap<>();final Set<ChunkPos> forced=new LinkedHashSet<>();final Set<Integer> originalEntities=new HashSet<>();
+        boolean closed;
         Fixture(GameTestHelper helper){
             h=helper;level=h.getLevel().getServer().getLevel(CityTravel.WORLD);if(level==null)throw new AssertionError("the real blacklight world dimension is missing");
             for(var e:level.getAllEntities())originalEntities.add(e.getId());old=CityData.get(level);data=new CityData();data.population=true;data.populatedMask=-1;data.spread=false;data.facade=false;data.destroyedMask=2;level.getDataStorage().set("blacklight_city",data);
@@ -44,6 +45,10 @@ public final class CityHiveSupplyGameTest {
                 }
             }
             for(var cp:forced)level.setChunkForced(cp.x,cp.z,true);
+            // These component tests own their manual 20-tick clock. The observer supplies
+            // real chunk simulation, but must not also start a second production scheduler.
+            net.neoforged.neoforge.common.NeoForge.EVENT_BUS.unregister(CitySystem.class);
+            observer=FakePlayerFactory.get(level,new GameProfile(UUID.randomUUID(),"CitySupplyObserver"));observer.setGameMode(net.minecraft.world.level.GameType.SPECTATOR);observer.setPos(port(0).getCenter().add(0,8,0));level.addNewPlayer(observer);
             player=FakePlayerFactory.get(level,new GameProfile(UUID.fromString("22ad1749-c8c4-4b7c-a80e-3856e323acbe"),"CitySupplyQA"));player.getAbilities().instabuild=false;face(0);
         }
         BlockPos port(int i){return CitySystem.port(level,0,i);}
@@ -58,11 +63,14 @@ public final class CityHiveSupplyGameTest {
             var host=ModEntities.INFECTED_HOST.get().create(level);long id=host.getId();host.setUUID(new UUID(id,id^42));host.inherit(EntityType.COW.create(level));var tag=new CompoundTag();host.saveWithoutId(tag);tag.getCompound("BlacklightHost").putString("NativeCore",TissueCore.VASCULAR.key());tag.putInt("BlacklightTissueNutrition",400);host.readAdditionalSaveData(tag);host.advanceTissue(216000);host.setHealth(host.getMaxHealth());host.setNoAi(false);host.getAttribute(Attributes.MOVEMENT_SPEED).setBaseValue(0);host.moveTo(outside(0).getBottomCenter(),0,0);host.setOnGround(true);level.addFreshEntity(host);return host;
         }
         public void close(){
+            if(closed)return;closed=true;
+            level.removePlayerImmediately(observer,Entity.RemovalReason.DISCARDED);
             for(var e:level.getAllEntities())if((e instanceof Mob||e instanceof ItemEntity)&&!originalEntities.contains(e.getId()))e.discard();
             for(var entry:changed.entrySet())level.setBlock(entry.getKey(),entry.getValue(),3);
             for(var cp:forced)level.setChunkForced(cp.x,cp.z,false);
             level.getDataStorage().set("blacklight_city",old);level.getServer().overworld().getDataStorage().set("blacklight_outbreak",outbreak);
             level.getGameRules().getRule(GameRules.RULE_DOMOBSPAWNING).set(spawning,level.getServer());level.getGameRules().getRule(GameRules.RULE_MOBGRIEFING).set(grief,level.getServer());OutbreakConfig.ENABLED.set(enabled);CityConfig.SPAWNS.set(citySpawns);level.getServer().setDifficulty(difficulty,true);
+            net.neoforged.neoforge.common.NeoForge.EVENT_BUS.register(CitySystem.class);
         }
     }
     @GameTest(template="wall_test",timeoutTicks=420,batch="city_supply_empty")

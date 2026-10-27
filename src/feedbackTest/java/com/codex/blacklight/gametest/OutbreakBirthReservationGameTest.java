@@ -42,6 +42,7 @@ public final class OutbreakBirthReservationGameTest {
             }
             for(int x=-4;x<=8;x++)for(int z=-4;z<=4;z++){
                 var p=at.offset(x,-1,z);blocks.putIfAbsent(p,level.getBlockState(p));level.setBlock(p,Blocks.STONE.defaultBlockState(),2);
+                for(int y=0;y<3;y++){var air=at.offset(x,y,z);blocks.putIfAbsent(air,level.getBlockState(air));level.setBlock(air,Blocks.AIR.defaultBlockState(),2);}
             }
         }
         Mob spawn(BlockPos pos){var m=WorldOutbreakSystem.spawnAt(level,pos,OutbreakRules.Tier.FRESH);if(m!=null)m.setNoAi(true);return m;}
@@ -105,7 +106,8 @@ public final class OutbreakBirthReservationGameTest {
         Consumer<EntityJoinLevelEvent> callback=e->{if(e.getLevel()==f.level&&e.getEntity() instanceof com.codex.blacklight.entity.BlacklightCommonInfected)throw new IllegalStateException("expected isolated birth-reservation fixture exception");};
         NeoForge.EVENT_BUS.addListener(callback);boolean failed=false;
         try{f.spawn(f.origin);}catch(RuntimeException expected){failed=true;}finally{NeoForge.EVENT_BUS.unregister(callback);}
-        h.assertTrue(failed&&WorldOutbreakSystem.populationRoom(f.level,f.origin)&&f.spawn(f.origin)!=null,"the finally path returns the failed publication's quota and actual population slot even when a listener throws");
+        boolean room=WorldOutbreakSystem.populationRoom(f.level,f.origin);var accepted=f.spawn(f.origin);
+        h.assertTrue(failed&&room&&accepted!=null,"the finally path returns the failed publication's quota and actual population slot even when a listener throws; threw="+failed+" room="+room+" accepted="+accepted+" site="+f.level.getBlockState(f.origin));
     });}
     private static void encounter(GameTestHelper h,boolean hiveFirst){var f=new Fixture(h);OutbreakConfig.BATCH.set(1);f.run(()->{
         for(int x=-15;x<=15;x++)for(int z=-15;z<=15;z++){var p=f.origin.offset(x,-1,z);f.blocks.putIfAbsent(p,f.level.getBlockState(p));f.level.setBlock(p,Blocks.STONE.defaultBlockState(),2);}

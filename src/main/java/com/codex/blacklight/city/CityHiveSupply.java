@@ -43,7 +43,7 @@ public final class CityHiveSupply {
     public static Mob hatchHydra(ServerLevel level,CityData data,int hive,BlockPos pos){return hatch(level,data,hive,pos,OutbreakRules.Tier.ANCIENT,true);}
     private static Mob hatch(ServerLevel level,CityData data,int hive,BlockPos pos,OutbreakRules.Tier tier,boolean hydra){
         var p=port(level,pos);if(p==null||p.hive!=hive||!ready(data,hive)||!live(level,data,p)||!CityConfig.SPAWNS.get()||!data.population)return null;
-        int stage=CityEcology.stage(level,pos);if(tier==OutbreakRules.Tier.GROWING&&stage<1||(tier==OutbreakRules.Tier.MATURE||tier==OutbreakRules.Tier.HUNTER)&&stage<2||tier==OutbreakRules.Tier.ANCIENT&&stage<3)return null;
+        int stage=CityEcology.stage(level,pos);if((tier==OutbreakRules.Tier.MATURE||tier==OutbreakRules.Tier.HUNTER)&&stage<2||tier==OutbreakRules.Tier.ANCIENT&&stage<3)return null;
         var stock=data.hiveSupply[hive];int cost=ColonySupply.broodCost(tier);if(!stock.pay(cost))return null;
         var state=level.getBlockState(pos);var outside=pos.relative(state.getValue(CityHatchBlock.FACING),3).below();
         // Reserve the single organism's brood before external join callbacks can reenter another mouth.

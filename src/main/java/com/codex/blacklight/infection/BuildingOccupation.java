@@ -18,7 +18,7 @@ public final class BuildingOccupation {
         if (colony.stage < 3 || !BuildingInfectionConfig.SPAWNS.get()
                 || !level.getGameRules().getBoolean(GameRules.RULE_DOMOBSPAWNING)) return 5;
         return switch (com.codex.blacklight.city.CityEcology.stage(level,colony.origin)) {
-            case 0 -> 12;
+            case 0 -> 20;
             case 1 -> 20;
             case 2 -> 64;
             default -> 120;
