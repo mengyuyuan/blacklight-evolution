@@ -16,8 +16,14 @@ public final class ReceiverModelPose {
 
     public static ModelPart root(EntityModel<?> model) {
         if (model instanceof HierarchicalModel<?> hierarchy) return hierarchy.root();
-        return model instanceof VictimModelRoot receiver ? receiver.blacklight$victimRoot() : null;
+        if(model instanceof VictimModelRoot receiver)return receiver.blacklight$victimRoot();
+        // Preserve the established vanilla humanoid/ageable paths. Foreign
+        // EntityModels often retain only private root/limb fields.
+        if(model instanceof net.minecraft.client.model.HumanoidModel<?>
+                ||model instanceof com.codex.blacklight.mixin.client.AgeableModelAccessor)return null;
+        return NativeModelRoots.root(model);
     }
+    public static void reloadRoots(){NativeModelRoots.clear();}
 
     public static int apply(EntityModel<?> model, Map<ModelPart, PartPose> saved,
             double[] frame, boolean rigid, boolean mounted) {

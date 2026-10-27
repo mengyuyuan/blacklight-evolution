@@ -183,7 +183,7 @@ public final class AuthoredInfectionParts {
         }
         return result.isEmpty()?null:new TissueChimera.Body(List.copyOf(result),TissueChimera.bounds(result.stream().flatMap(p->p.vertices().stream()).toList()),nativeBody.anchorBox());
     }
-    public static void reload(){SOURCES.clear();BINDINGS.clear();FACES.clear();InfectedWoundTextures.reload();AnatomicalTissue.reload();}
+    public static void reload(){SOURCES.clear();BINDINGS.clear();FACES.clear();ReceiverModelPose.reloadRoots();InfectedWoundTextures.reload();AnatomicalTissue.reload();}
     public static Binding bind(String species,EntityModel<?> model){return bind(species,model,false);}
     public static Binding bind(String species,EntityModel<?> model,boolean fur){
         Binding cached=BINDINGS.computeIfAbsent(model,k->new HashMap<>()).computeIfAbsent(species+(fur?"#fur":""),k->build(species,model,fur));
