@@ -27,6 +27,7 @@ public final class TissueCompetition {
     private static final Map<Level,Budget> BUDGETS=new WeakHashMap<>();
     private static final Map<BlacklightInfectedHost,Long> RETRY=new WeakHashMap<>();
     private static final Map<BlacklightInfectedHost,Long> SEARCH_AT=new WeakHashMap<>();
+    private static final Map<BlacklightInfectedHost,Long> RECOVERED_UNTIL=new WeakHashMap<>();
     private static final class Budget { long tick=Long.MIN_VALUE;int searches; }
     private record Session(UUID operation,BlacklightInfectedHost actor,BlacklightInfectedHost prey,long start,int duration){}
     private TissueCompetition(){}
@@ -49,6 +50,28 @@ public final class TissueCompetition {
     }
     private static boolean contact(BlacklightInfectedHost actor,BlacklightInfectedHost prey){
         return actor.getBoundingBox().inflate(.75,.35,.75).intersects(prey.getBoundingBox())&&actor.hasLineOfSight(prey);
+    }
+    /** Only a ready, unclaimed predator in actual contact may preserve its own last bite. */
+    private static boolean canSecureMeal(BlacklightInfectedHost actor,BlacklightInfectedHost prey){
+        return contender(actor,prey)&&actor.tissueInheritance().readyToHunt(actor.tissueAge())&&free(actor)&&free(prey)
+                &&!controls(actor)&&!controls(prey)&&!prey.getPersistentData().getBoolean(SETTLED)
+                &&RETRY.getOrDefault(actor,0L)<=actor.level().getGameTime()&&contact(actor,prey);
+    }
+    public static float finalDamage(LivingEntity target,net.minecraft.world.damagesource.DamageSource source,float amount){
+        if(!(target instanceof BlacklightInfectedHost prey)||prey.level().isClientSide)return amount;
+        if(source.getEntity() instanceof BlacklightInfectedHost actor&&canSecureMeal(actor,prey)){
+            float floor=prey.getMaxHealth()*.12F;
+            amount=Math.min(amount,Math.max(0,prey.getHealth()-floor));
+        }
+        if(RECOVERED_UNTIL.getOrDefault(prey,0L)>prey.level().getGameTime()
+                &&source.getEntity() instanceof net.minecraft.world.entity.Mob
+                &&!source.is(net.minecraft.tags.DamageTypeTags.BYPASSES_INVULNERABILITY))amount*=.35F;
+        return amount;
+    }
+    /** Called after the original hit's stagger/cancel accounting, so that hit cannot cancel its own capture. */
+    public static void captureAfterContact(BlacklightInfectedHost prey,net.minecraft.world.damagesource.DamageSource source){
+        if(source.getEntity() instanceof BlacklightInfectedHost actor
+                &&canSecureMeal(actor,prey)&&TissueInheritance.weakened(prey.getHealth(),prey.getMaxHealth()))tryStart(actor,prey);
     }
     /** No teleporting, riding, saved NoAI, or bypass of a player's existing claim. */
     public static boolean tryStart(BlacklightInfectedHost actor,BlacklightInfectedHost prey){
@@ -78,8 +101,8 @@ public final class TissueCompetition {
         }
         var current=host.getTarget();
         if(current instanceof BlacklightInfectedHost||!free(host)
-                ||current!=null&&(host.hurtTime>0||current instanceof net.minecraft.world.entity.player.Player
-                &&(host.isEvolved()||host.distanceToSqr(current)<24*24)))return false;
+                ||current!=null&&(host.hurtTime>0||current instanceof net.minecraft.world.entity.player.Player&&host.isEvolved()))return false;
+        boolean pressured=current instanceof net.minecraft.world.entity.player.Player&&host.distanceToSqr(current)<24*24;
         var budget=BUDGETS.computeIfAbsent(host.level(),level->new Budget());long now=host.level().getGameTime();
         long due=SEARCH_AT.computeIfAbsent(host,h->now+Math.floorMod(h.getId(),30));if(now<due)return false;
         if(budget.tick!=now){budget.tick=now;budget.searches=0;}
@@ -94,7 +117,7 @@ public final class TissueCompetition {
                 prey->contender(host,prey)&&!controls(prey)&&free(prey)&&host.hasLineOfSight(prey)
                         &&TissueInheritance.sizeFits(host.getBbWidth(),host.getBbHeight(),prey.getBbWidth(),prey.getBbHeight())
                         &&!prey.getPersistentData().getBoolean(SETTLED)
-                        &&(TissueInheritance.weakened(prey.getHealth(),prey.getMaxHealth())||dominates(host,prey)))
+                        &&(TissueInheritance.weakened(prey.getHealth(),prey.getMaxHealth())||!pressured&&dominates(host,prey)))
                 .stream().min(Comparator.<BlacklightInfectedHost>comparingDouble(h->h.getHealth()/h.getMaxHealth())
                         .thenComparingDouble(host::distanceToSqr)).orElse(null);
         if(target!=null)host.setTarget(target);return false;
@@ -129,6 +152,8 @@ public final class TissueCompetition {
         boolean accepted=prey.hurt(prey.damageSources().mobAttack(actor),(float)Math.min(Float.MAX_VALUE,Math.max(10000D,prey.getMaxHealth()*20D)));
         if(accepted&&((LivingDeathAccess)(LivingEntity)prey).blacklight$deathAccepted()&&!prey.isAlive()&&prey.getKillCredit()==actor){
             if(TissueCompetitionConfig.INHERITANCE.get())actor.inheritTissue(session.operation(),donor,donorSeed,age,donorPlan,prey.knownNativeTissueCore(),prey.speciesId(),prey.hostData().toString());
+            actor.heal(actor.getMaxHealth()*.4F/com.codex.blacklight.power.CombatScale.units(actor));
+            RECOVERED_UNTIL.put(actor,now+40);
             prey.setInvisible(true);
         }else{
             prey.getPersistentData().remove(SETTLED);prey.getPersistentData().remove("BlacklightCannibalOperation");
@@ -152,5 +177,5 @@ public final class TissueCompetition {
         if(event.getLevel().isClientSide)return;
         interrupt(event.getEntity());
     }
-    @SubscribeEvent public static void stopped(ServerStoppedEvent event){ACTIVE.clear();CLAIMS.clear();BUDGETS.clear();RETRY.clear();SEARCH_AT.clear();}
+    @SubscribeEvent public static void stopped(ServerStoppedEvent event){ACTIVE.clear();CLAIMS.clear();BUDGETS.clear();RETRY.clear();SEARCH_AT.clear();RECOVERED_UNTIL.clear();}
 }

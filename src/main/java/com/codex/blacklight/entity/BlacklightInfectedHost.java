@@ -590,6 +590,7 @@ public final class BlacklightInfectedHost extends Monster {
         for(String key:new String[]{"Age","IsBaby","Variant","variant","Color","Sheared","CollarColor","CatType",
                 "RabbitType","Size","Type","Profession","VillagerData","PuffState","MooshroomType","MainGene","HiddenGene","Peek","AttachFace"})
             if(saved.contains(key))visual.put(key,saved.get(key).copy());
+        if(source instanceof BlacklightCommonInfected civilian)visual.putInt("BlacklightCivilianAppearance",civilian.appearance());
         data.put("Visual",visual);
         // Summoned draft dragons must never claim or finish the natural End encounter.
         if(source instanceof EnderDragon dragon&&level() instanceof ServerLevel server
@@ -671,6 +672,9 @@ public final class BlacklightInfectedHost extends Monster {
     public void advanceAppearanceAnimation() {
         if(appearance==null||appearanceAnimationTick==tickCount)return;
         appearanceAnimationTick=tickCount;
+        if(appearance instanceof net.minecraft.world.entity.ambient.Bat bat){
+            bat.setResting(false);bat.restAnimationState.stop();bat.flyAnimationState.startIfStopped(tickCount);
+        }
         if(level().isClientSide&&appearance instanceof net.minecraft.world.entity.monster.Shulker shulker)shulker.tick();
         appearance.walkAnimation.update(walkAnimation.speed()*(1-.95F*tissueTentacles()),.4F);
     }
@@ -734,6 +738,38 @@ public final class BlacklightInfectedHost extends Monster {
             navigation=family().equals("water")?new WaterBoundPathNavigation(this,level()):new GroundPathNavigation(this,level());
         }
     }
+    private Vec3 airDestination;
+    private int airRoamCooldown;
+    /** Idle fliers need actual flight steering; ground stroll goals never supply an air destination. */
+    private void roamInAir(){
+        if(!(level() instanceof ServerLevel server))return;
+        getNavigation().stop();
+        if(--airRoamCooldown<=0||airDestination==null||position().distanceToSqr(airDestination)<2||horizontalCollision){
+            airRoamCooldown=25+random.nextInt(25);airDestination=null;
+            for(int attempt=0;attempt<6;attempt++){
+                var goal=position().add(random.nextDouble()*12-6,onGround()?2+random.nextDouble()*2:random.nextDouble()*4-1,random.nextDouble()*12-6);
+                var box=getBoundingBox().move(goal.subtract(position()));
+                if(!server.hasChunksAt(net.minecraft.core.BlockPos.containing(box.minX,box.minY,box.minZ),net.minecraft.core.BlockPos.containing(box.maxX,box.maxY,box.maxZ))
+                        ||!server.noCollision(this,box)||server.containsAnyLiquid(box))continue;
+                if(server.clip(new net.minecraft.world.level.ClipContext(getBoundingBox().getCenter(),goal.add(0,getBbHeight()*.5,0),net.minecraft.world.level.ClipContext.Block.COLLIDER,net.minecraft.world.level.ClipContext.Fluid.NONE,this)).getType()!=net.minecraft.world.phys.HitResult.Type.MISS)continue;
+                airDestination=goal;break;
+            }
+        }
+        if(airDestination!=null){
+            var aim=airDestination.subtract(position());
+            setDeltaMovement(getDeltaMovement().scale(.85).add(aim.normalize().scale(.055)));
+            setYRot(Mth.rotLerp(.15F,getYRot(),(float)(Mth.atan2(-aim.x,aim.z)*Mth.RAD_TO_DEG)));yBodyRot=getYRot();
+        }
+    }
+    @Override public void travel(Vec3 input){
+        if(family().equals("air")&&!isInWater()&&!isInLava()){
+            if(isControlledByLocalInstance()){
+                moveRelative(.02F,input);move(net.minecraft.world.entity.MoverType.SELF,getDeltaMovement());
+                setDeltaMovement(getDeltaMovement().scale(.91));
+            }
+            calculateEntityAnimation(false);
+        }else super.travel(input);
+    }
     @Override public void tick() {
         super.tick();updateParts();if(level().isClientSide)return;setupNavigation();
         TissueDefenseSystem.tick(this);
@@ -753,7 +789,7 @@ public final class BlacklightInfectedHost extends Monster {
         if(attackCooldown>0)attackCooldown--;
         if(tickTissueStrike())return;
         if(!isAlive()||isNoAi()||level().getDifficulty()==net.minecraft.world.Difficulty.PEACEFUL||family().equals("ground"))return;
-        var target=getTarget();if(target==null||!validTarget(target))return;
+        var target=getTarget();if(target==null||!validTarget(target)){if(family().equals("air"))roamInAir();return;}
         if(family().equals("water")&&!isInWater())return;
         getLookControl().setLookAt(target,20,20);
         Vec3 direction=target.getBoundingBox().getCenter().subtract(getBoundingBox().getCenter());
@@ -776,7 +812,13 @@ public final class BlacklightInfectedHost extends Monster {
             setYRot(Mth.rotLerp(.09F,getYRot(),(float)(Mth.atan2(-direction.x,direction.z)*Mth.RAD_TO_DEG)));yBodyRot=getYRot();
             if(attackCooldown==0&&hasLineOfSight(target)&&direction.lengthSqr()<96*96)basicBossProjectile(target);
         } else {
-            if(hasLineOfSight(target))setDeltaMovement(getDeltaMovement().scale(.85).add(direction.normalize().scale(.045)));
+            Vec3 steering=direction;
+            if(family().equals("air")){
+                if(direction.horizontalDistanceSqr()>9)steering=steering.add(0,Math.max(1.5,getBbHeight()),0);
+                if(onGround())steering=steering.add(0,2,0);
+                setYRot(Mth.rotLerp(.15F,getYRot(),(float)(Mth.atan2(-direction.x,direction.z)*Mth.RAD_TO_DEG)));yBodyRot=getYRot();
+            }
+            if(hasLineOfSight(target))setDeltaMovement(getDeltaMovement().scale(.85).add(steering.normalize().scale(.055)));
             if(direction.lengthSqr()<Math.pow(getBbWidth()+target.getBbWidth()+.6,2)&&hasLineOfSight(target)&&attackCooldown==0) {
                 swing(InteractionHand.MAIN_HAND);doHurtTarget(target);attackCooldown=recoverTissueAction(24);
             }
@@ -913,7 +955,7 @@ public final class BlacklightInfectedHost extends Monster {
         if(bossProfile()==InfectedBossProfile.WITHER)spawnAtLocation(net.minecraft.world.item.Items.NETHER_STAR);
     }
     @Override public void knockback(double strength,double x,double z){
-        if(!evolvedControlProtected())super.knockback(strength,x,z);
+        if(!evolvedControlProtected()&&!TissueCompetition.controls(this))super.knockback(strength,x,z);
     }
     /** Run after vanilla's same-hit cooldown comparison, on the accepted difference.
      * NeoForge uses its container rather than the method argument as the damage source of truth. */
@@ -946,6 +988,7 @@ public final class BlacklightInfectedHost extends Monster {
                 server.sendParticles(new net.minecraft.core.particles.DustParticleOptions(new org.joml.Vector3f(.38F,.025F,.035F),1.4F),getX(),getY()+getBbHeight()*.6,getZ(),16,getBbWidth()*.3,getBbHeight()*.2,getBbWidth()*.3,.05);
             }
         }
+        if(accepted&&!level().isClientSide&&getHealth()<before)TissueCompetition.captureAfterContact(this,source);
         return accepted;
     }
     @Override public void remove(RemovalReason reason) {

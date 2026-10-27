@@ -212,6 +212,7 @@ public final class ConsumeSystem {
         }
         if (target instanceof BlacklightHunter hunter && !hunter.claim(player)) return;
         ImpactControl.cancel(target);
+        if(target instanceof com.codex.blacklight.entity.BlacklightCommonInfected civilian)civilian.cancelAttack();
         Session session=new Session(target,player,form);ACTIVE.put(player,session);
         target.getNavigation().stop();target.setTarget(null);
         boolean heavy=form==PowerForm.WHIPFIST&&(target instanceof BlacklightHunter||target.getBbWidth()*target.getBbWidth()*target.getBbHeight()>4)&&player.distanceTo(target)>2.5;

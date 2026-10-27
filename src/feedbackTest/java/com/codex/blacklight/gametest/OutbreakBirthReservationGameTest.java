@@ -62,7 +62,9 @@ public final class OutbreakBirthReservationGameTest {
         finally{NeoForge.EVENT_BUS.unregister(callback);}
     });}
     @GameTest(template="wall_test",timeoutTicks=240,batch="birth_pending_dimension")
-    public static void pendingActualChildrenAlreadyOccupyTheDimensionPopulationCap(GameTestHelper h){var f=new Fixture(h);OutbreakConfig.DIMENSION_CAP.set(1);f.run(()->{
+    public static void pendingActualChildrenAlreadyOccupyTheDimensionPopulationCap(GameTestHelper h){var f=new Fixture(h);f.run(()->{
+        int existing=0;for(var entity:f.level.getAllEntities())if(entity instanceof Mob mob&&mob.isAlive()&&BlacklightInfectionSystem.isInfected(mob))existing++;
+        OutbreakConfig.DIMENSION_CAP.set(existing+1);
         int[] calls={0};Mob[] nested={null};Consumer<EntityJoinLevelEvent> callback=e->{if(e.getLevel()==f.level&&e.getEntity() instanceof com.codex.blacklight.entity.BlacklightCommonInfected&&calls[0]++==0)nested[0]=f.spawn(f.origin.east(5));};
         NeoForge.EVENT_BUS.addListener(callback);
         try{h.assertTrue(f.spawn(f.origin)!=null&&nested[0]==null&&calls[0]==1,"a different producer sees the pending actual body even before it appears in getAllEntities");}
@@ -102,7 +104,9 @@ public final class OutbreakBirthReservationGameTest {
         h.assertTrue(!WorldOutbreakSystem.addScheduled(f.level,child)&&loaded==f.level.getChunkSource().getLoadedChunksCount()&&WorldOutbreakSystem.populationRoom(f.level,f.origin),"an arbitrary unloaded publication attempt neither generates chunks nor spends a ticket");child.discard();
     });}
     @GameTest(template="wall_test",timeoutTicks=240,batch="birth_pending_join_exception")
-    public static void aThrowingExternalJoinCallbackCannotLeaveAPermanentPendingSlot(GameTestHelper h){var f=new Fixture(h);OutbreakConfig.BATCH.set(1);OutbreakConfig.DIMENSION_CAP.set(1);f.run(()->{
+    public static void aThrowingExternalJoinCallbackCannotLeaveAPermanentPendingSlot(GameTestHelper h){var f=new Fixture(h);OutbreakConfig.BATCH.set(1);f.run(()->{
+        int existing=0;for(var entity:f.level.getAllEntities())if(entity instanceof Mob mob&&mob.isAlive()&&BlacklightInfectionSystem.isInfected(mob))existing++;
+        OutbreakConfig.DIMENSION_CAP.set(existing+1);
         Consumer<EntityJoinLevelEvent> callback=e->{if(e.getLevel()==f.level&&e.getEntity() instanceof com.codex.blacklight.entity.BlacklightCommonInfected)throw new IllegalStateException("expected isolated birth-reservation fixture exception");};
         NeoForge.EVENT_BUS.addListener(callback);boolean failed=false;
         try{f.spawn(f.origin);}catch(RuntimeException expected){failed=true;}finally{NeoForge.EVENT_BUS.unregister(callback);}

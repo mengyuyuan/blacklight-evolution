@@ -49,7 +49,6 @@ public final class InfectedHostRenderer extends EntityRenderer<BlacklightInfecte
         proxy.swinging=entity.swinging;proxy.setInvisible(entity.isInvisible());
         // Do not advance animation per render frame: interpolation is sampled from the host.
         entity.advanceAppearanceAnimation();
-        if(proxy instanceof net.minecraft.world.entity.ambient.Bat bat)bat.setResting(false);
         proxy.setHealth(Math.max(1,proxy.getMaxHealth()*entity.getHealth()/entity.getMaxHealth()));
         proxy.setData(ModAttachments.CONSUME_VISUAL,entity.getData(ModAttachments.CONSUME_VISUAL));
         proxy.setData(ModAttachments.HIT_REACTION,entity.getData(ModAttachments.HIT_REACTION));

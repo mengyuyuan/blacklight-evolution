@@ -1,17 +1,18 @@
 package com.codex.blacklight.client.renderer;
 
 import com.codex.blacklight.entity.BlacklightCommonInfected;
-import net.minecraft.client.model.ZombieModel;
-import net.minecraft.client.model.geom.ModelLayers;
+import com.codex.blacklight.client.model.CommonInfectedModel;
 import net.minecraft.client.renderer.entity.*;
 import net.minecraft.resources.ResourceLocation;
 
-/** Reuses the vanilla walking/attacking zombie rig, with no extra motion assets. */
-public final class CommonInfectedRenderer extends HumanoidMobRenderer<BlacklightCommonInfected,ZombieModel<BlacklightCommonInfected>> {
+/** Independent civilian appearance; old common_infected saves use it without replacing their entities. */
+public final class CommonInfectedRenderer extends HumanoidMobRenderer<BlacklightCommonInfected,CommonInfectedModel> {
+    private static final ResourceLocation[] TEXTURES=java.util.stream.IntStream.range(0,4)
+            .mapToObj(i->ResourceLocation.fromNamespaceAndPath("blacklight","textures/entity/infected_civilian_"+i+".png")).toArray(ResourceLocation[]::new);
     public CommonInfectedRenderer(EntityRendererProvider.Context context) {
-        super(context,new ZombieModel<>(context.bakeLayer(ModelLayers.ZOMBIE)),.5F);
+        super(context,new CommonInfectedModel(CommonInfectedModel.layer().bakeRoot()),.45F);
     }
     @Override public ResourceLocation getTextureLocation(BlacklightCommonInfected entity) {
-        return ResourceLocation.withDefaultNamespace("textures/entity/zombie/zombie.png");
+        return TEXTURES[entity.appearance()];
     }
 }
