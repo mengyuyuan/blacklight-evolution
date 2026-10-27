@@ -120,10 +120,7 @@ public final class CitySystem {
         if(type==EntityType.VILLAGER)mob.setPersistenceRequired();
         if(infected&&!BlacklightInfectionSystem.isInfected(mob))BlacklightInfectionSystem.infect(mob,null);
         if(mob instanceof Zombie zombie)zombie.setBaby(false);
-        if(!level.addFreshEntity(mob))return false;
-        if(infected||type==ModEntities.BLACKLIGHT_HUNTER.get()||type==ModEntities.BLACKLIGHT_HYDRA.get())
-            com.codex.blacklight.infection.WorldOutbreakSystem.recordBirth(level);
-        return true;
+        return com.codex.blacklight.infection.WorldOutbreakSystem.addScheduled(level,mob);
     }
     private static void populateWorld(ServerLevel level){
         if(!CityConfig.SPAWNS.get()||!CityData.get(level).population||count(level)>=CityConfig.MOB_LIMIT.get())return;

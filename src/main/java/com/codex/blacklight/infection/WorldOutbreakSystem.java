@@ -19,14 +19,19 @@ import net.neoforged.neoforge.event.tick.LevelTickEvent;
 @EventBusSubscriber(modid="blacklight")
 public final class WorldOutbreakSystem {
     private static final java.util.Map<ServerLevel,BirthWindow> BIRTHS=new java.util.WeakHashMap<>();
-    private static final class BirthWindow { long window;int births;BirthWindow(long window){this.window=window;} }
+    private static final class BirthWindow {
+        long window;int births;
+        // EntityJoinLevel fires before the new mob is visible in the level. Keep
+        // its slot reserved while other producers run inside that callback.
+        final java.util.Map<Mob,Boolean> pending=new java.util.IdentityHashMap<>();
+        BirthWindow(long window){this.window=window;}
+    }
     private static BirthWindow births(ServerLevel level){
         long window=Math.floorDiv(level.getGameTime(),OutbreakConfig.INTERVAL.get());
         var value=BIRTHS.computeIfAbsent(level,l->new BirthWindow(window));
         if(value.window!=window){value.window=window;value.births=0;}
         return value;
     }
-    public static void recordBirth(ServerLevel level){births(level).births++;}
     private WorldOutbreakSystem(){}
     public static boolean active(ServerLevel level){return OutbreakConfig.ENABLED.get()&&OutbreakData.get(level.getServer()).active();}
     public static int stage(ServerLevel level){return OutbreakRules.stage(OutbreakData.get(level.getServer()).elapsed(level.getServer().overworld().getGameTime()),OutbreakConfig.DAY_TICKS.get());}
@@ -46,15 +51,44 @@ public final class WorldOutbreakSystem {
     public static boolean populationRoom(ServerLevel level,BlockPos pos){
         if(!active(level)||level.getDifficulty()==Difficulty.PEACEFUL||sanctuary(level,pos)
                 ||!level.getGameRules().getBoolean(GameRules.RULE_DOMOBSPAWNING)
-                ||births(level).births>=OutbreakConfig.BATCH.get())return false;
+                ||births(level).births+pendingInfected(level)>=OutbreakConfig.BATCH.get())return false;
         if(CityTravel.isCity(level.dimension())&&(!CityConfig.SPAWNS.get()||!CityData.get(level).population))return false;
         int infected=0,mobs=0;
         for(var entity:level.getAllEntities())if(entity instanceof Mob mob&&mob.isAlive()){
             mobs++;if(nativeMob(mob))infected++;
         }
+        var area=new AABB(pos).inflate(96);int localPending=0;
+        for(var entry:births(level).pending.entrySet())if(unpublished(level,entry.getKey())){
+            mobs++;if(entry.getValue()){infected++;if(entry.getKey().getBoundingBox().intersects(area))localPending++;}
+        }
         if(infected>=OutbreakConfig.DIMENSION_CAP.get()
                 ||CityTravel.isCity(level.dimension())&&mobs>=CityConfig.MOB_LIMIT.get())return false;
-        return level.getEntitiesOfClass(Mob.class,new AABB(pos).inflate(96),m->m.isAlive()&&nativeMob(m)).size()<OutbreakConfig.LOCAL_CAP.get();
+        return localPending+level.getEntitiesOfClass(Mob.class,area,m->m.isAlive()&&nativeMob(m)).size()<OutbreakConfig.LOCAL_CAP.get();
+    }
+    private static boolean unpublished(ServerLevel level,Mob mob){return mob.isAlive()&&!mob.isRemoved()&&level.getEntity(mob.getUUID())!=mob;}
+    private static int pendingInfected(ServerLevel level){int count=0;for(boolean infected:births(level).pending.values())if(infected)count++;return count;}
+    /** All scheduled producers commit or release the same slot around the real join event. */
+    public static boolean addScheduled(ServerLevel level,Mob mob){
+        if(!level.getServer().isSameThread()||mob==null||mob.level()!=level||!mob.isAlive()||mob.isRemoved()
+                ||level.getEntity(mob.getUUID())!=null||!level.getGameRules().getBoolean(GameRules.RULE_DOMOBSPAWNING))return false;
+        var box=mob.getBoundingBox();
+        if(!level.isInWorldBounds(mob.blockPosition())||!level.getWorldBorder().isWithinBounds(box))return false;
+        int minX=net.minecraft.util.Mth.floor(box.minX)>>4,maxX=net.minecraft.util.Mth.floor(box.maxX)>>4;
+        int minZ=net.minecraft.util.Mth.floor(box.minZ)>>4,maxZ=net.minecraft.util.Mth.floor(box.maxZ)>>4;
+        if(maxX-minX>8||maxZ-minZ>8)return false;
+        for(int x=minX;x<=maxX;x++)for(int z=minZ;z<=maxZ;z++)if(level.getChunkSource().getChunkNow(x,z)==null)return false;
+        var window=births(level);if(window.pending.containsKey(mob))return false;
+        boolean infected=nativeMob(mob);
+        if(infected){if(!populationRoom(level,mob.blockPosition()))return false;}
+        else if(CityTravel.isCity(level.dimension())){
+            if(!CityConfig.SPAWNS.get()||!CityData.get(level).population)return false;
+            int mobs=0;for(var entity:level.getAllEntities())if(entity instanceof Mob m&&m.isAlive())mobs++;
+            for(var pending:window.pending.keySet())if(unpublished(level,pending))mobs++;
+            if(mobs>=CityConfig.MOB_LIMIT.get())return false;
+        }
+        window.pending.put(mob,infected);boolean accepted=false;
+        try{accepted=level.addFreshEntity(mob);return accepted;}
+        finally{window.pending.remove(mob);if(accepted&&infected)births(level).births++;}
     }
     private static EntityType<? extends Mob> hostSpecies(int roll){
         return switch(Math.floorMod(roll,10)){
@@ -123,8 +157,7 @@ public final class WorldOutbreakSystem {
             return null;
         }
         mob.getPersistentData().putBoolean("blacklight:outbreak_spawn",true);
-        if(!level.addFreshEntity(mob))return null;
-        recordBirth(level);return mob;
+        return addScheduled(level,mob)?mob:null;
     }
     @SubscribeEvent public static void tick(LevelTickEvent.Post event){
         if(!(event.getLevel() instanceof ServerLevel level)||!active(level)||level.players().isEmpty()

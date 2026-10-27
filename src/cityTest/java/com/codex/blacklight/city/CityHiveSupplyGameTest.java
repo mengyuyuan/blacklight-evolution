@@ -128,4 +128,21 @@ public final class CityHiveSupplyGameTest {
         try{h.assertTrue(CityHiveSupply.hatch(f.level,f.data,0,f.port(0),OutbreakRules.Tier.FRESH)==null&&f.stock().reserve()==before&&f.data.hiveBroodTicks[0]==200&&f.data.hiveBirths[0]==0,"a true join cancellation refunds both paid inputs and cannot count a nonexistent child");}
         finally{net.neoforged.neoforge.common.NeoForge.EVENT_BUS.unregister(veto);f.close();}h.succeed();
     });}
+    @GameTest(template="wall_test",timeoutTicks=240,batch="city_supply_global_ticket")
+    public static void anotherProducerCannotSpendTheLastBirthTicketInsideAnActualWorldSpawnCallback(GameTestHelper h){var f=new Fixture(h);int batch=OutbreakConfig.BATCH.get();OutbreakConfig.BATCH.set(1);h.runAfterDelay(100,()->{
+        f.stock().receive(40);f.tick();f.data.hiveBroodTicks[0]=200;int before=f.stock().reserve();Mob[] nested={null};int[] calls={0};
+        java.util.function.Consumer<net.neoforged.neoforge.event.entity.EntityJoinLevelEvent> callback=e->{if(e.getLevel()==f.level&&e.getEntity() instanceof com.codex.blacklight.entity.BlacklightCommonInfected&&calls[0]++==0)nested[0]=CityHiveSupply.hatch(f.level,f.data,0,f.port(1),OutbreakRules.Tier.FRESH);};
+        net.neoforged.neoforge.common.NeoForge.EVENT_BUS.addListener(callback);
+        try{var child=WorldOutbreakSystem.spawnAt(f.level,f.outside(0),OutbreakRules.Tier.FRESH);h.assertTrue(child!=null&&calls[0]==1&&nested[0]==null&&f.stock().reserve()==before&&f.data.hiveBroodTicks[0]==200&&f.data.hiveBirths[0]==0,"a real ambient entry reserves the shared ticket before another actual paid city producer can reenter; the rejected hive keeps its food and brood");}
+        finally{net.neoforged.neoforge.common.NeoForge.EVENT_BUS.unregister(callback);OutbreakConfig.BATCH.set(batch);f.close();}h.succeed();
+    });}
+    @GameTest(template="wall_test",timeoutTicks=240,batch="city_supply_resident_ticket")
+    public static void cityResidentsAlsoReserveTheSamePendingAllMobPopulationSlot(GameTestHelper h){var f=new Fixture(h);int limit=CityConfig.MOB_LIMIT.get();h.runAfterDelay(100,()->{
+        int count=0;for(var e:f.level.getAllEntities())if(e instanceof Mob m&&m.isAlive())count++;CityConfig.MOB_LIMIT.set(count+1);
+        var parent=EntityType.COW.create(f.level);parent.setNoAi(true);parent.setPos(f.outside(0).getBottomCenter());var child=EntityType.COW.create(f.level);child.setNoAi(true);child.setPos(f.outside(1).getBottomCenter());
+        int[] calls={0};boolean[] nested={true};java.util.function.Consumer<net.neoforged.neoforge.event.entity.EntityJoinLevelEvent> callback=e->{if(e.getLevel()==f.level&&e.getEntity()==parent){calls[0]++;nested[0]=WorldOutbreakSystem.addScheduled(f.level,child);}};
+        net.neoforged.neoforge.common.NeoForge.EVENT_BUS.addListener(callback);
+        try{h.assertTrue(WorldOutbreakSystem.addScheduled(f.level,parent)&&calls[0]==1&&!nested[0]&&!WorldOutbreakSystem.populationRoom(f.level,f.outside(1)),"an unpublished city resident already occupies the all-mob cap and a nested producer cannot publish over it");}
+        finally{net.neoforged.neoforge.common.NeoForge.EVENT_BUS.unregister(callback);if(!child.isRemoved())child.discard();CityConfig.MOB_LIMIT.set(limit);f.close();}h.succeed();
+    });}
 }
