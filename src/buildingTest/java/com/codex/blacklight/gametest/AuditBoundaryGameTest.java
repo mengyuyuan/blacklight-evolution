@@ -69,4 +69,26 @@ public final class AuditBoundaryGameTest {
     public static void entityPublicationCannotReenterTerrainExtraction(GameTestHelper h){pickup(h,false);}
     @GameTest(template="wall_test",timeoutTicks=30,batch="audit_pickup_interrupt")
     public static void entityPublicationCannotExtractAfterPowerWasRemoved(GameTestHelper h){pickup(h,true);}
+    @SuppressWarnings("unchecked")
+    @GameTest(template="wall_test",timeoutTicks=30,batch="audit_city_replaced_player")
+    public static void replacingAPlayerReleasesPendingCityArrivalAndItsTicket(GameTestHelper h)throws Exception{
+        var original=LockedGrabGameTest.player(h,PowerForm.MUSCLE_MASS);
+        var replacement=new net.neoforged.neoforge.common.util.FakePlayer(h.getLevel(),original.getGameProfile());
+        // Stage an asynchronous queue entry without relying on whether some other
+        // city fixture has already loaded the public debug destination.
+        var type=Class.forName("com.codex.blacklight.city.CityTravel$PendingTravel");
+        var constructor=type.getDeclaredConstructor(net.minecraft.server.level.ServerPlayer.class,net.minecraft.server.level.ServerLevel.class,net.minecraft.core.BlockPos.class,float.class,float.class,boolean.class,String.class);
+        constructor.setAccessible(true);var pending=constructor.newInstance(original,h.getLevel(),original.blockPosition(),0F,0F,false,"city.blacklight.welcome");
+        var field=CityTravel.class.getDeclaredField("PENDING");field.setAccessible(true);
+        var queue=(java.util.Map<net.minecraft.server.level.ServerPlayer,Object>)field.get(null);
+        var ticketField=type.getDeclaredField("ticket");ticketField.setAccessible(true);var ticket=(HydraDestination)ticketField.get(pending);
+        ticket.prepare(h.getLevel(),original.blockPosition());queue.put(original,pending);
+        try{
+            NeoForge.EVENT_BUS.post(new net.neoforged.neoforge.event.entity.player.PlayerEvent.Clone(replacement,original,true));
+            h.assertTrue(!queue.containsKey(original)&&ticket.diagnostics().equals("released"),"actual player replacement releases the old strong player reference, travel slot and arrival ticket");
+        }finally{
+            CityTravel.logout(new net.neoforged.neoforge.event.entity.player.PlayerEvent.PlayerLoggedOutEvent(original));ticket.release();replacement.discard();
+        }
+        h.succeed();
+    }
 }

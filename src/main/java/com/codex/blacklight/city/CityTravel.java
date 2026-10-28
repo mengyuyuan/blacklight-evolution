@@ -175,6 +175,7 @@ public final class CityTravel {
         }finally{cancelTravel(p);}
     }
     @SubscribeEvent public static void logout(PlayerEvent.PlayerLoggedOutEvent event){if(event.getEntity() instanceof ServerPlayer p)cancelTravel(p);}
+    @SubscribeEvent public static void cloned(PlayerEvent.Clone event){if(event.getOriginal() instanceof ServerPlayer p)cancelTravel(p);}
     @SubscribeEvent public static void stopping(net.neoforged.neoforge.event.server.ServerStoppingEvent event){
         for(var pending:PENDING.values())pending.ticket.release();PENDING.clear();
     }
