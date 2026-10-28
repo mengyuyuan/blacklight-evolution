@@ -12,6 +12,10 @@ public final class CityTransitItem extends Item {
             .withStyle(net.minecraft.ChatFormatting.GRAY));
     }
     @Override public InteractionResultHolder<ItemStack> use(Level l,Player p,InteractionHand hand){
+        if(!p.hasPermissions(2)){
+            if(!l.isClientSide)p.displayClientMessage(net.minecraft.network.chat.Component.translatable("city.blacklight.hydra_required"),true);
+            return InteractionResultHolder.fail(p.getItemInHand(hand));
+        }
         if(p instanceof ServerPlayer sp)CityTravel.travel(sp);
         return InteractionResultHolder.sidedSuccess(p.getItemInHand(hand),l.isClientSide);
     }

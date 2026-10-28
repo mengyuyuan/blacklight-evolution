@@ -1,4 +1,5 @@
 {
+  "city.blacklight.hydra_required": "Grow and feed living tissue to maturity; its hydra opens the route to the Blacklight dimension.",
   "screen.blacklight.section.organs": "Organ research",
   "screen.blacklight.organ_row": "Upgrade %s · Specimen %s",
   "screen.blacklight.organ_max": "Fully upgraded",
@@ -699,7 +700,7 @@
   "upgrade.blacklight.cnidocyte_battery": "Cnidocyte battery",
   "city.blacklight.los_angeles_welcome": "Blacklight Dimension · Los Angeles. /blacklightcity losangeles places lists district entrances. Use the transit beacon or /blacklightcity travel to return.",
   "city.blacklight.destinations": "Cities: Los Angeles /blacklightcity losangeles; Shenzhen /blacklightcity shenzhen. Return to your original world: /blacklightcity travel.",
-  "city.blacklight.destinations_hint": "City destinations: /blacklightcity cities",
+  "city.blacklight.destinations_hint": "Legacy operator debugging item. Survival travel uses a mature hydra.",
   "screen.blacklight.section.evolution": "Evolution",
   "screen.blacklight.infinite_rank": "Rank %s · Repeatable",
   "screen.blacklight.infinite_stats": "Rank %s → %s\nCost: %s EP",
