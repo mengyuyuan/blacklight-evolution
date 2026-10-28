@@ -16,7 +16,7 @@ public final class EvolvedDistrictGameTest {
         var host=EvolvedFormGameTest.host(h);h.assertTrue(host.beginEvolvedMetamorphosis(),"the real six-organ fixture qualifies");for(int i=0;i<200;i++)host.tick();
         for(int x=-10;x<=20;x++)for(int z=-10;z<=20;z++)h.getLevel().setBlock(h.absolutePos(new BlockPos(x,29,z)),Blocks.STONE.defaultBlockState(),2);
         host.setPos(h.absolutePos(new BlockPos(5,30,5)).getBottomCenter());host.setDeltaMovement(net.minecraft.world.phys.Vec3.ZERO);host.setOnGround(true);
-        var target=EntityType.HUSK.create(h.getLevel());target.setNoAi(true);target.setPos(host.position().add(2,0,0));
+        var target=EntityType.HUSK.create(h.getLevel());target.setPersistenceRequired();target.setNoAi(true);target.setPos(host.position().add(2,0,0));
         target.getAttribute(Attributes.MAX_HEALTH).setBaseValue(100000);target.setHealth(100000);target.getAttribute(Attributes.KNOCKBACK_RESISTANCE).setBaseValue(1);
         target.getPersistentData().putLong(InfectionRules.NEXT_CONTACT_EXPOSURE,Long.MAX_VALUE);h.getLevel().addFreshEntity(target);
         host.setNoAi(false);host.setTarget(target);

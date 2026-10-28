@@ -34,8 +34,9 @@ public final class NativeInfectedCombatGameTest {
         for(int x=-8;x<=13;x++)for(int z=-6;z<=19;z++)for(int y=0;y<=11;y++)fixture(h,at.offset(x,y-1,z),y==0?Blocks.STONE.defaultBlockState():Blocks.AIR.defaultBlockState());
         var host=ModEntities.INFECTED_HOST.get().create(h.getLevel());var original=source.create(h.getLevel());host.inherit(original);host.setPos(at.getBottomCenter());loaded(h,host.blockPosition());host.setPersistenceRequired();h.getLevel().addFreshEntity(host);cleanup.add(host);return host;
     }
+    // Deliberate combat dummies must survive distant test players and vanilla despawn checks.
     private static Mob enemy(GameTestHelper h,BlacklightInfectedHost body,Vec3 offset){
-        var target=EntityType.HUSK.create(h.getLevel());target.setNoAi(true);target.setPos(body.position().add(offset));loaded(h,target.blockPosition());target.getAttribute(Attributes.MAX_HEALTH).setBaseValue(100000);target.setHealth(100000);target.getAttribute(Attributes.KNOCKBACK_RESISTANCE).setBaseValue(1);target.getPersistentData().putLong(InfectionRules.NEXT_CONTACT_EXPOSURE,Long.MAX_VALUE);h.getLevel().addFreshEntity(target);cleanup.add(target);return target;
+        var target=EntityType.HUSK.create(h.getLevel());target.setPersistenceRequired();target.setNoAi(true);target.setPos(body.position().add(offset));loaded(h,target.blockPosition());target.getAttribute(Attributes.MAX_HEALTH).setBaseValue(100000);target.setHealth(100000);target.getAttribute(Attributes.KNOCKBACK_RESISTANCE).setBaseValue(1);target.getPersistentData().putLong(InfectionRules.NEXT_CONTACT_EXPOSURE,Long.MAX_VALUE);h.getLevel().addFreshEntity(target);cleanup.add(target);return target;
     }
     private static void end(){cleanup.forEach(Entity::discard);cleanup.clear();originalBlocks.forEach((p,s)->testLevel.setBlock(p,s,2));originalBlocks.clear();for(var p:tickets)testLevel.setChunkForced(p.x,p.z,false);tickets.clear();}
     private static void ranged(GameTestHelper h,EntityType<? extends Mob> source,Class<? extends Entity> projectile,boolean mustHit){

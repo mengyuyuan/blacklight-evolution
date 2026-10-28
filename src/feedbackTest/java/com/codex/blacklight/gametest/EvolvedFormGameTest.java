@@ -34,7 +34,7 @@ public final class EvolvedFormGameTest {
         h.assertTrue(host.isEvolved(),"edge fixture completed metamorphosis");
         for(int x=3;x<=7;x++)for(int z=3;z<=7;z++)h.getLevel().setBlock(h.absolutePos(new BlockPos(x,29,z)),Blocks.STONE.defaultBlockState(),2);
         host.setPos(h.absolutePos(new BlockPos(5,30,5)).getBottomCenter());host.setDeltaMovement(net.minecraft.world.phys.Vec3.ZERO);host.setOnGround(true);
-        var target=EntityType.HUSK.create(h.getLevel());target.setNoAi(true);target.setNoGravity(true);
+        var target=EntityType.HUSK.create(h.getLevel());target.setPersistenceRequired();target.setNoAi(true);target.setNoGravity(true);
         target.setPos(host.position().add(20,0,0));target.getPersistentData().putLong(InfectionRules.NEXT_CONTACT_EXPOSURE,Long.MAX_VALUE);
         h.getLevel().addFreshEntity(target);host.setNoAi(false);host.setTarget(target);double floor=host.getY();
         h.runAfterDelay(110,()->{try{
@@ -47,7 +47,7 @@ public final class EvolvedFormGameTest {
         var host=host(h);host.beginEvolvedMetamorphosis();for(int i=0;i<200;i++)host.tick();
         var data=new CompoundTag();host.saveWithoutId(data);data.putInt("BlacklightTissueNutrition",100);host.load(data);
         host.setPos(h.absolutePos(new BlockPos(5,30,5)).getBottomCenter());host.setOnGround(true);
-        var target=EntityType.HUSK.create(h.getLevel());target.setNoAi(true);target.setPos(host.position().add(1.2,0,0));
+        var target=EntityType.HUSK.create(h.getLevel());target.setPersistenceRequired();target.setNoAi(true);target.setPos(host.position().add(1.2,0,0));
         target.getAttribute(net.minecraft.world.entity.ai.attributes.Attributes.MAX_HEALTH).setBaseValue(100000);target.setHealth(100000);
         target.getAttribute(net.minecraft.world.entity.ai.attributes.Attributes.KNOCKBACK_RESISTANCE).setBaseValue(1);
         target.getPersistentData().putLong(InfectionRules.NEXT_CONTACT_EXPOSURE,Long.MAX_VALUE);h.getLevel().addFreshEntity(target);host.setNoAi(false);host.setTarget(target);
@@ -88,7 +88,7 @@ public final class EvolvedFormGameTest {
         var data=new CompoundTag();host.saveWithoutId(data);data.putInt("BlacklightTissueNutrition",100);host.load(data);
         for(int x=-15;x<=25;x++)for(int z=-15;z<=25;z++)h.getLevel().setBlock(h.absolutePos(new BlockPos(x,29,z)),Blocks.STONE.defaultBlockState(),2);
         host.setPos(h.absolutePos(new BlockPos(5,30,5)).getBottomCenter());host.setOnGround(true);
-        var target=EntityType.HUSK.create(h.getLevel());target.setNoAi(true);target.setPos(host.position().add(7,0,0));
+        var target=EntityType.HUSK.create(h.getLevel());target.setPersistenceRequired();target.setNoAi(true);target.setPos(host.position().add(7,0,0));
         target.getAttribute(net.minecraft.world.entity.ai.attributes.Attributes.MAX_HEALTH).setBaseValue(10000);target.setHealth(10000);
         target.getPersistentData().putLong(InfectionRules.NEXT_CONTACT_EXPOSURE,Long.MAX_VALUE);h.getLevel().addFreshEntity(target);host.setNoAi(false);host.setTarget(target);
         var previous=new net.minecraft.world.phys.Vec3[]{host.position()};var action=new String[]{""};double[] during={0},largest={0};
@@ -105,7 +105,7 @@ public final class EvolvedFormGameTest {
     }
     @GameTest(template="wall_test",timeoutTicks=40,batch="evolved_grasp")
     public static void doesNotStartAnInheritedGraspOutsideItsContactReach(GameTestHelper h){
-        var host=host(h);var target=EntityType.HUSK.create(h.getLevel());
+        var host=host(h);var target=EntityType.HUSK.create(h.getLevel());target.setPersistenceRequired();
         try{
             h.assertTrue(host.beginEvolvedMetamorphosis(),"sample has room to transform before testing grasp reach");for(int i=0;i<200;i++)host.tick();
             var data=new CompoundTag();host.saveWithoutId(data);data.putInt("BlacklightTissueNutrition",100);host.load(data);
@@ -122,7 +122,7 @@ public final class EvolvedFormGameTest {
     public static void sustainedLightAndHeavyHitsStillAllowARealCounterattack(GameTestHelper h){
         var host=host(h);host.beginEvolvedMetamorphosis();for(int i=0;i<200;i++)host.tick();
         for(int x=-2;x<=12;x++)for(int z=-2;z<=12;z++)h.getLevel().setBlock(h.absolutePos(new BlockPos(x,29,z)),Blocks.STONE.defaultBlockState(),2);
-        var target=EntityType.HUSK.create(h.getLevel());target.setNoAi(true);
+        var target=EntityType.HUSK.create(h.getLevel());target.setPersistenceRequired();target.setNoAi(true);
         target.getAttribute(net.minecraft.world.entity.ai.attributes.Attributes.MAX_HEALTH).setBaseValue(10000);target.setHealth(10000);
         target.getPersistentData().putLong(InfectionRules.NEXT_CONTACT_EXPOSURE,Long.MAX_VALUE);
         target.setPos(host.position().add(1.25,0,0));h.getLevel().addFreshEntity(target);

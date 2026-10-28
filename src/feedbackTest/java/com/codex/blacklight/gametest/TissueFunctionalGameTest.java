@@ -83,7 +83,7 @@ public final class TissueFunctionalGameTest {
         host.setOnGround(true);h.getLevel().addFreshEntity(host);return host;
     }
     private static Mob victim(GameTestHelper h,int x,int z){
-        var target=EntityType.HUSK.create(h.getLevel());target.setNoAi(true);
+        var target=EntityType.HUSK.create(h.getLevel());target.setPersistenceRequired();target.setNoAi(true);
         target.getAttribute(Attributes.MAX_HEALTH).setBaseValue(1000);target.setHealth(1000);
         target.getPersistentData().putLong(InfectionRules.NEXT_CONTACT_EXPOSURE,Long.MAX_VALUE);
         target.setPos(h.absolutePos(new BlockPos(x,2,z)).getBottomCenter());h.getLevel().addFreshEntity(target);return target;

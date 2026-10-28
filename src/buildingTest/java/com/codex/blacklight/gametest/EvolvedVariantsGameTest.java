@@ -27,7 +27,7 @@ public final class EvolvedVariantsGameTest {
         host.setOnGround(true);host.setHealth(host.getMaxHealth());return host;
     }
     static Mob enemy(GameTestHelper h,BlacklightInfectedHost host,double distance){
-        var e=EntityType.HUSK.create(h.getLevel());e.setNoAi(true);e.setPos(host.position().add(0,0,distance));e.getAttribute(Attributes.MAX_HEALTH).setBaseValue(100000);e.setHealth(100000);e.getAttribute(Attributes.KNOCKBACK_RESISTANCE).setBaseValue(1);e.getPersistentData().putLong(InfectionRules.NEXT_CONTACT_EXPOSURE,Long.MAX_VALUE);var chunk=new net.minecraft.world.level.ChunkPos(e.blockPosition());h.getLevel().setChunkForced(chunk.x,chunk.z,true);h.getLevel().getChunk(chunk.x,chunk.z);h.getLevel().addFreshEntity(e);return e;
+        var e=EntityType.HUSK.create(h.getLevel());e.setPersistenceRequired();e.setNoAi(true);e.setPos(host.position().add(0,0,distance));e.getAttribute(Attributes.MAX_HEALTH).setBaseValue(100000);e.setHealth(100000);e.getAttribute(Attributes.KNOCKBACK_RESISTANCE).setBaseValue(1);e.getPersistentData().putLong(InfectionRules.NEXT_CONTACT_EXPOSURE,Long.MAX_VALUE);var chunk=new net.minecraft.world.level.ChunkPos(e.blockPosition());h.getLevel().setChunkForced(chunk.x,chunk.z,true);h.getLevel().getChunk(chunk.x,chunk.z);h.getLevel().addFreshEntity(e);return e;
     }
     @GameTest(template="wall_test",timeoutTicks=80,batch="variants_lineage_save")
     public static void allEightActualSelectedBodiesTransformAndSurviveSavingWithoutReroll(GameTestHelper h){

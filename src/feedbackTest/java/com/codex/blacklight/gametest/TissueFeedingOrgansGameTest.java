@@ -28,7 +28,7 @@ public final class TissueFeedingOrgansGameTest {
         host.setNoAi(true);host.getAttribute(Attributes.MOVEMENT_SPEED).setBaseValue(0);host.moveTo(h.absolutePos(new BlockPos(4,water?3:2,5)).getBottomCenter(),-90,0);host.setOnGround(!water);h.getLevel().addFreshEntity(host);return host;
     }
     private static Mob prey(GameTestHelper h,BlacklightInfectedHost host){
-        var target=EntityType.HUSK.create(h.getLevel());target.getAttribute(Attributes.MAX_HEALTH).setBaseValue(1000);target.setHealth(1000);target.getAttribute(Attributes.MOVEMENT_SPEED).setBaseValue(0);
+        var target=EntityType.HUSK.create(h.getLevel());target.setPersistenceRequired();target.getAttribute(Attributes.MAX_HEALTH).setBaseValue(1000);target.setHealth(1000);target.getAttribute(Attributes.MOVEMENT_SPEED).setBaseValue(0);
         target.getPersistentData().putLong(InfectionRules.NEXT_CONTACT_EXPOSURE,Long.MAX_VALUE);target.moveTo(host.position().add(1.8,0,0));h.getLevel().addFreshEntity(target);return target;
     }
     private static void start(GameTestHelper h,BlacklightInfectedHost host,Mob target){
