@@ -28,7 +28,7 @@ public final class EcologyBehaviorGameTest{
     public static void civilianAiTelegraphsItsRealContactAndDoesNotHitOnEveryAnimationTick(GameTestHelper h){var f=fixture(h);BlacklightCommonInfected[] mob={null};LivingEntity[] target={null};int[] hits={0};long[] first={-1};
         f.after(30,()->{
             mob[0]=join(f,ModEntities.COMMON_INFECTED.get().create(f.level),-4,-2);
-            var cow=EntityType.COW.create(f.level);cow.setNoAi(true);cow.getAttribute(Attributes.MAX_HEALTH).setBaseValue(200);cow.setHealth(200);target[0]=join(f,cow,-2.7,-2);mob[0].setTarget(cow);
+            var cow=EntityType.COW.create(f.level);cow.setNoAi(true);cow.getPersistentData().putLong(InfectionRules.NEXT_CONTACT_EXPOSURE,Long.MAX_VALUE);cow.getAttribute(Attributes.MAX_HEALTH).setBaseValue(200);cow.setHealth(200);target[0]=join(f,cow,-2.7,-2);mob[0].setTarget(cow);
             float[] previous={cow.getHealth()};for(int t=1;t<=29;t++)h.runAfterDelay(t,()->{if(cow.getHealth()<previous[0]){hits[0]++;first[0]=mob[0].attackStarted()<0?-1:f.level.getGameTime()-mob[0].attackStarted();}previous[0]=cow.getHealth();});
         },()->{h.assertTrue(hits[0]==1&&first[0]>=CommonInfectedMotion.CONTACT_TICK&&first[0]<=CommonInfectedMotion.CONTACT_TICK+1,"one accepted contact after windup, not a repeated pose-driven hit; hits="+hits[0]+" contact="+first[0]+" action="+mob[0].attackStarted()+" tick="+f.level.getGameTime()+" target="+mob[0].getTarget()+" hp="+target[0].getHealth()+" ai="+mob[0].isNoAi()+" distance="+mob[0].distanceTo(target[0])+" hurt="+mob[0].hurtTime+" age="+mob[0].tickCount);});}
     @GameTest(template="wall_test",timeoutTicks=600,batch="civilian_capture_abort")
