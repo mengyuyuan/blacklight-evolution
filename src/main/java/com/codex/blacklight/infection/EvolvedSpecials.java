@@ -44,6 +44,7 @@ public final class EvolvedSpecials {
         var active=EvolvedSpecialMove.resolve(host.evolvedAction());
         if(active!=null){
             float t=host.evolvedActionElapsed(0);
+            if(t>=active.retract&&emitted.add(-1))com.codex.blacklight.registry.ModInfectedSounds.play(host,InfectedSoundCue.RETRACT);
             if(active.type!=host.evolvedArchetype()||!valid(target)||target.getId()!=host.evolvedSpecialTarget()||t>=active.duration){finish(active);return true;}
             if(active==EvolvedSpecialMove.LASH&&!host.hasLineOfSight(target)){finish(active);return true;}
             host.getNavigation().stop();host.setSprinting(false);host.setXxa(0);host.setZza(0);
@@ -62,7 +63,10 @@ public final class EvolvedSpecials {
             }
             if(active==EvolvedSpecialMove.VOLLEY){
                 for(int i=0;i<3;i++)if(t>=active.contact+i*6&&emitted.add(i))fire(target,i);
-            }else if(t>=active.contact&&emitted.add(0))impact(active,target);
+            }else if(t>=active.contact&&emitted.add(0)){
+                if(active!=EvolvedSpecialMove.MEND&&active!=EvolvedSpecialMove.SLAM)com.codex.blacklight.registry.ModInfectedSounds.play(host,active==EvolvedSpecialMove.LASH?InfectedSoundCue.LASH:InfectedSoundCue.SWING);
+                impact(active,target);
+            }
             return true;
         }
         var move=EvolvedSpecialMove.of(host.evolvedArchetype());

@@ -277,7 +277,7 @@ public final class InfectedModelPose {
         boolean active = visual.active();
         double[] projection = active && (visual.consuming() || GrappleMotion.active(visual))
                 ? ConsumePlacementTrack.projection(GrappleMotion.sceneKey(entity, visual),
-                        GrappleMotion.sceneProgress(entity, visual, partial)).orElse(null) : null;
+                        GrappleMotion.receiverProgress(entity, visual, partial)).orElse(null) : null;
         var hit = entity.getData(ModAttachments.HIT_REACTION);
         float weight = active ? 0 : hit.weight(entity.level().getGameTime(), partial);
         float bend = (hit.kind() == HitReaction.SLAM ? .45F : -.18F) * weight;

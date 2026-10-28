@@ -25,7 +25,7 @@ public final class OrdinaryConsumeGameTest {
 
     @GameTest(template="wall_test", timeoutTicks=30)
     public static void everyFormConsumesPassiveAndRewardsOnce(GameTestHelper h) {
-        for (var form : new PowerForm[]{PowerForm.NONE,PowerForm.CLAWS,PowerForm.HAMMERFISTS,PowerForm.BLADE,PowerForm.WHIPFIST}) {
+        for (var form : new PowerForm[]{PowerForm.NONE,PowerForm.CLAWS,PowerForm.HAMMERFISTS,PowerForm.BLADE,PowerForm.WHIPFIST,PowerForm.MUSCLE_MASS}) {
             var p=player(h,form);var cow=h.spawn(EntityType.COW,3,2,5);cow.setNoAi(true);
             ConsumeSystem.request(p);var visual=cow.getData(ModAttachments.CONSUME_VISUAL);
             h.assertTrue(visual.active() && visual.form()==form.ordinal(),"full-health cow accepted with form "+form);

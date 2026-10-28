@@ -206,6 +206,8 @@ public final class TissueEvolution {
         return sum.mul(.125F);
     }
     private static V axis(Box b){return b.span(0)>b.span(1)&&b.span(0)>b.span(2)?new V(1,0,0):b.span(1)>b.span(2)?new V(0,1,0):new V(0,0,1);}
-    private static float span(Box b,V direction){return Math.abs(direction.x())*b.span(0)+Math.abs(direction.y())*b.span(1)+Math.abs(direction.z())*b.span(2);}
+    // Native ears/fins may be planes. A zero-depth head frame must not turn
+    // 0/0 into NaN and discard its growing skin/organ geometry.
+    private static float span(Box b,V direction){return Math.max(.001F,Math.abs(direction.x())*b.span(0)+Math.abs(direction.y())*b.span(1)+Math.abs(direction.z())*b.span(2));}
     private static float lerp(float a,float b,float t){return a+(b-a)*t;}
 }

@@ -21,7 +21,7 @@ public final class NativeConsumePose {
         var clip=accessor;
         float time=visual.stage()==ConsumeVisual.HUNTER_CONSUME
                 ?Math.min(HunterConsume.seconds(visual,entity.level().getGameTime(),partial),Math.max(0,clip.duration()-.001F))
-                :GrappleMotion.sceneProgress(entity,visual,partial)*Math.max(0,clip.duration()-.001F);
+                :(role.equals("victim")?GrappleMotion.receiverProgress(entity,visual,partial):GrappleMotion.sceneProgress(entity,visual,partial))*Math.max(0,clip.duration()-.001F);
         BlacklightPose copy=new BlacklightPose();MotionLibrary.pose(key,time,false).getJointTransformData().forEach((name,transform)->copy.getJointTransformData().put(name,transform.copy()));
         if(mounted&&role.equals("victim")){
             // A giant reacts at the contact site; a small receiver's whole-body toss must not tow it.

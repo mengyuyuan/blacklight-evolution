@@ -39,7 +39,7 @@ public final class ConsumeSequence {
     }
     public static String clipKey(PowerForm form,boolean large) {
         if(!large)return key(form);
-        return switch(form){case HAMMERFISTS->"large_hammer";case MUSCLE_MASS->"large_muscle";case WHIPFIST->"large_whip";case CLAWS->"claws";case BLADE->"blade";default->"large";};
+        return switch(form){case HAMMERFISTS->"large_hammer";case MUSCLE_MASS->"large_muscle";case WHIPFIST->"large_whip";case CLAWS->"large_claws";case BLADE->"blade";default->"large";};
     }
     public static float contact(PowerForm form,boolean large){return large?switch(form){case HAMMERFISTS->.42F;case WHIPFIST->.36F;case NONE->.38F;default->strike(form);}:strike(form);}
     /** Receiver release markers are Minecraft adaptation cues, not recovered original event metadata. */
@@ -63,6 +63,11 @@ public final class ConsumeSequence {
                 ||target instanceof net.minecraft.world.entity.monster.AbstractIllager
                 ||target instanceof net.minecraft.world.entity.monster.piglin.AbstractPiglin
                 ||target instanceof net.minecraft.world.entity.npc.AbstractVillager;
+    }
+    public static float receiverScale(LivingEntity target){
+        if(target instanceof com.codex.blacklight.entity.BlacklightInfectedHost host&&host.isEvolved())
+            return 1.12F*host.tissueBodyScale();
+        return target.isBaby()?.5F:1F;
     }
     public static boolean quadruped(LivingEntity target){
         if(target instanceof com.codex.blacklight.entity.BlacklightInfectedHost host)return host.quadruped();
@@ -105,5 +110,16 @@ public final class ConsumeSequence {
             return Math.clamp(t*duration/(20*ConsumeReceiverScene.clipSeconds(form)),0,1);
         float strike=contact(form,large),half=1F/Math.max(20,duration),a=strike-half,b=strike+half;
         return t<a?t*strike/a:t<=b?strike:strike+(t-b)*(1-strike)/(1-b);
+    }
+    /** spawnGib inherits one posed body, rather than a live receiver skeleton. */
+    public static float splitSeconds(PowerForm form,boolean large){
+        if(large)return Float.NaN;
+        var scene=ConsumeReceiverScene.profile(form,false);
+        if(scene!=null&&(scene.style().equals("SEVER")||scene.style().equals("ARM_RIP")))return scene.deformSeconds();
+        return form==PowerForm.BLADE?.833333F:Float.NaN;
+    }
+    public static float receiverProgress(PowerForm form,float progress,boolean large){
+        float cut=splitSeconds(form,large);
+        return Float.isFinite(cut)?Math.min(progress,cut/ConsumeReceiverScene.clipSeconds(form)):progress;
     }
 }

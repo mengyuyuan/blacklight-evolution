@@ -40,16 +40,23 @@ public final class InfectedHostRenderer extends EntityRenderer<BlacklightInfecte
         proxy.yBodyRot=entity.yBodyRot;proxy.yBodyRotO=entity.yBodyRotO;
         proxy.yHeadRot=entity.yHeadRot;proxy.yHeadRotO=entity.yHeadRotO;
         proxy.xRotO=entity.xRotO;proxy.yRotO=entity.yRotO;
-        if(entity.organActionCore()==com.codex.blacklight.infection.TissueCore.HORN){
-            float load=com.codex.blacklight.infection.TissueOrganCycle.cycle(entity.organActionCore()).effort(entity.organActionElapsed(partial));
-            proxy.setXRot(entity.getXRot()+32*load);proxy.xRotO=entity.xRotO+32*load;
-        }
         proxy.tickCount=entity.tickCount;proxy.hurtTime=entity.hurtTime;proxy.deathTime=entity.deathTime;
         proxy.setOnGround(entity.onGround());proxy.setDeltaMovement(entity.getDeltaMovement());
         proxy.attackAnim=entity.attackAnim;proxy.oAttackAnim=entity.oAttackAnim;
         proxy.swinging=entity.swinging;proxy.setInvisible(entity.isInvisible());
         // Do not advance animation per render frame: interpolation is sampled from the host.
         entity.advanceAppearanceAnimation();
+        // Native tick advances old positions/rotations too. Restore the host interpolation
+        // after that tick so legs and wings cannot snap against a smoothly moving body.
+        proxy.xo=entity.xo;proxy.yo=entity.yo;proxy.zo=entity.zo;
+        proxy.xOld=entity.xOld;proxy.yOld=entity.yOld;proxy.zOld=entity.zOld;
+        proxy.yBodyRot=entity.yBodyRot;proxy.yBodyRotO=entity.yBodyRotO;
+        proxy.yHeadRot=entity.yHeadRot;proxy.yHeadRotO=entity.yHeadRotO;
+        proxy.xRotO=entity.xRotO;proxy.yRotO=entity.yRotO;
+        if(entity.organActionCore()==com.codex.blacklight.infection.TissueCore.HORN){
+            float load=com.codex.blacklight.infection.TissueOrganCycle.cycle(entity.organActionCore()).effort(entity.organActionElapsed(partial));
+            proxy.setXRot(entity.getXRot()+32*load);proxy.xRotO=entity.xRotO+32*load;
+        }
         proxy.setHealth(Math.max(1,proxy.getMaxHealth()*entity.getHealth()/entity.getMaxHealth()));
         proxy.setData(ModAttachments.CONSUME_VISUAL,entity.getData(ModAttachments.CONSUME_VISUAL));
         proxy.setData(ModAttachments.HIT_REACTION,entity.getData(ModAttachments.HIT_REACTION));

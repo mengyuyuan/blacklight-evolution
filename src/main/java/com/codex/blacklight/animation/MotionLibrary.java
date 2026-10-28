@@ -49,6 +49,7 @@ public final class MotionLibrary {
             case CONSUME_WHIP -> "consume_whip_actor";
             case CONSUME_MUSCLE -> "consume_muscle_actor";
             case CONSUME_LARGE -> "consume_large_actor";
+            case CONSUME_LARGE_CLAWS -> "consume_large_claws_actor";
             case CONSUME_LARGE_HAMMER -> "consume_large_hammer_actor";
             case CONSUME_LARGE_MUSCLE -> "consume_large_muscle_actor";
             case CONSUME_LARGE_WHIP -> "consume_large_whip_actor";

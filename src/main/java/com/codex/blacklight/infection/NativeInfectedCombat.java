@@ -25,7 +25,7 @@ import org.joml.Vector3f;
 public final class NativeInfectedCombat {
     private final BlacklightInfectedHost host;
     private int cooldown=12,movementCooldown,sequence;
-    private boolean contacted;
+    private boolean contacted,withdrawn;
     public NativeInfectedCombat(BlacklightInfectedHost host){this.host=host;}
     public NativeInfectedProfile profile(){return NativeInfectedProfile.saved(host.speciesId(),host.hostData().getString("NativeCapability"));}
     public CompoundTag save(){var tag=new CompoundTag();tag.putInt("Cooldown",Math.max(cooldown,host.nativeAction().isEmpty()?0:profile().cooldown));tag.putInt("Sequence",sequence);return tag;}
@@ -54,6 +54,7 @@ public final class NativeInfectedCombat {
             // Sonic waves intentionally travel through walls, like the native Warden.
             if(kind!=NativeInfectedProfile.SONIC&&!host.hasLineOfSight(target)){interrupt();return true;}
             if(age>=kind.contact&&!contacted){contacted=true;release(kind,target);}
+            if(contacted&&!withdrawn&&age>=kind.contact+5){withdrawn=true;com.codex.blacklight.registry.ModInfectedSounds.play(host,InfectedSoundCue.RETRACT);}
             return true;
         }
         movement(target);
@@ -65,8 +66,9 @@ public final class NativeInfectedCombat {
         double distance=host.distanceTo(target),minimum=kind==NativeInfectedProfile.SONIC?4:0;
         if(cooldown==0&&distance<=kind.range+Math.min(8,host.getBbWidth())&&distance>=minimum
                 &&(kind==NativeInfectedProfile.SONIC||host.hasLineOfSight(target))){
-            contacted=false;host.setNativeAction(kind.name(),target);host.getNavigation().stop();face(target);
-            sound(kind==NativeInfectedProfile.SONIC?SoundEvents.WARDEN_SONIC_CHARGE:kind==NativeInfectedProfile.WITHER?SoundEvents.WITHER_AMBIENT:SoundEvents.EVOKER_PREPARE_ATTACK,.75F,.7F);
+            contacted=false;withdrawn=false;host.setNativeAction(kind.name(),target);host.getNavigation().stop();face(target);
+            com.codex.blacklight.registry.ModInfectedSounds.play(host,kind==NativeInfectedProfile.SONIC||kind==NativeInfectedProfile.GUARDIAN?InfectedSoundCue.RESONANCE_CHARGE:InfectedSoundCue.TENSION);
+            if(kind==NativeInfectedProfile.SONIC)sound(SoundEvents.WARDEN_SONIC_CHARGE,.55F,.85F);
             return true;
         }
         if(kind.ranged()){
@@ -125,6 +127,7 @@ public final class NativeInfectedCombat {
     private float damage(float factor){return (float)Math.clamp(host.getAttributeValue(Attributes.ATTACK_DAMAGE)*factor,1,1000000);}
     private void release(NativeInfectedProfile kind,LivingEntity target){
         if(!(host.level() instanceof ServerLevel level))return;
+        com.codex.blacklight.registry.ModInfectedSounds.play(host,InfectedSoundCue.LAUNCH);
         var from=origin();var aim=target.getBoundingBox().getCenter().subtract(from);
         switch(kind){
             case BOW,CROSSBOW->{

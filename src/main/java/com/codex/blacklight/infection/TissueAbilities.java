@@ -13,7 +13,7 @@ public final class TissueAbilities {
     private static final List<TissueCore> ACTIONS=List.of(TissueCore.TENDON,TissueCore.HYDRAULIC,TissueCore.HYDROSTAT,TissueCore.BLADE,TissueCore.CHELA,TissueCore.HORN,TissueCore.SADDLE,TissueCore.CLUB,TissueCore.TONGUE,TissueCore.CNIDOCYTE,TissueCore.EXTRAORAL);
     private final BlacklightInfectedHost host;
     private int cursor,cooldown;
-    private boolean contacted,launched;
+    private boolean contacted,launched,withdrew;
     public TissueAbilities(BlacklightInfectedHost host){this.host=host;}
     public void interrupt(){if(!host.level().isClientSide){host.setOrganAction(null,-1,Vec3.ZERO);TissueGrapples.release(host);cooldown=Math.max(cooldown,20);}}
     private static boolean gripping(TissueCore core){return core==TissueCore.CHELA||core==TissueCore.HYDROSTAT||core==TissueCore.TONGUE||core==TissueCore.EXTRAORAL;}
@@ -32,9 +32,9 @@ public final class TissueAbilities {
             if(locomotor&&(!host.onGround()||!host.family().equals("ground")))continue;
             if(!locomotor&&host.family().equals("water")&&!host.isInWater())continue;
             if(host.organPower(candidate)<=0||!TissueOrganCycle.range(candidate,gap)||!host.spendTissueNutrition(TissueOrganCycle.cycle(candidate).cost()))continue;
-            cursor=(index+1)%ACTIONS.size();contacted=false;launched=false;
+            cursor=(index+1)%ACTIONS.size();contacted=false;launched=false;withdrew=false;
             Vec3 direction=target.position().subtract(host.position()).multiply(1,0,1).normalize();
-            host.setOrganAction(candidate,target.getId(),direction);host.getNavigation().stop();return true;
+            host.setOrganAction(candidate,target.getId(),direction);host.getNavigation().stop();com.codex.blacklight.registry.ModInfectedSounds.play(host,InfectedSoundCue.TENSION);return true;
         }return false;
     }
     public boolean tick(){
@@ -63,6 +63,7 @@ public final class TissueAbilities {
         double power=host.organPower(core);Vec3 direction=host.organActionDirection();
         if(tick<cycle.windup())host.setDeltaMovement(new Vec3(0,host.getDeltaMovement().y,0));
         if(!launched&&tick>=cycle.windup()){
+            com.codex.blacklight.registry.ModInfectedSounds.play(host,gripping(core)?InfectedSoundCue.LASH:InfectedSoundCue.SWING);
             launched=true;double speed=TissueOrganCycle.launchSpeed(core,power);
             if(speed>0){double rise=core==TissueCore.TENDON?.52:core==TissueCore.HYDRAULIC?.16:host.getDeltaMovement().y;
                 host.setDeltaMovement(direction.scale(speed).add(0,rise,0));host.hurtMarked=true;}
@@ -91,6 +92,7 @@ public final class TissueAbilities {
                     target.getX(),target.getY()+target.getBbHeight()*.42,target.getZ(),5,target.getBbWidth()*.2,target.getBbHeight()*.1,target.getBbWidth()*.2,.01);
         }
         if(tick>=cycle.retract()){
+            if(!withdrew){withdrew=true;com.codex.blacklight.registry.ModInfectedSounds.play(host,InfectedSoundCue.RETRACT);}
             TissueGrapples.release(host);
             if(core==TissueCore.HORN)host.setDeltaMovement(host.getDeltaMovement().multiply(.55,1,.55));
         }

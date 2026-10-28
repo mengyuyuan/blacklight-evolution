@@ -18,8 +18,8 @@ import org.joml.Vector3f;
 import java.util.*;
 import java.util.function.ToDoubleFunction;
 
-/** Anatomical separation of the posed mesh; source receiver animation continues underneath.
- * Timing markers are Minecraft choreography cues, not recovered original dismemberment events. */
+/** Anatomical separation of the inherited pose; cut pieces no longer animate as a live receiver.
+ * Source split markers and Minecraft fragment return timings have separate clocks. */
 public final class ConsumeFracture implements MultiBufferSource {
     public enum Style { HEAD_CRUSH, RIP, SEVER, CRUSH, COIL, HEAD_IMPACT, LASH, ARM_RIP, CHEST_ABSORB }
     public record Phase(PowerForm form,float progress,float opening,float returnFlow,float contact,Style style,boolean nativeEvents) {
@@ -39,8 +39,14 @@ public final class ConsumeFracture implements MultiBufferSource {
     private final boolean sourcedReceiver;
     private final Vector3f cutNormal;
     private final Vector3f cutCenter=new Vector3f();
+    private final Vector3f up,side,spinAxis,ground;
+    private final float fragmentAge;
+    private final Vector3f[] pieceCenter={new Vector3f(),new Vector3f()};
+    private final Vector3f[] pieceLow={new Vector3f(),new Vector3f()},pieceHigh={new Vector3f(),new Vector3f()};
+    private final float[] pieceFloor=new float[2];
+    private final org.joml.Quaternionf[] pieceSpin={new org.joml.Quaternionf(),new org.joml.Quaternionf()};
     private final Map<RenderType,Collector> streams=new LinkedHashMap<>();
-    private Map<ModelPart,Integer> modelParts=Map.of();
+    private final Map<ModelPart,Integer> modelParts=new IdentityHashMap<>();
     private final Vector3f[] centers=new Vector3f[ConsumeAnatomy.COUNT];
     private final float[] radii=new float[ConsumeAnatomy.COUNT];
     private final boolean[] present=new boolean[ConsumeAnatomy.COUNT];
@@ -62,11 +68,13 @@ public final class ConsumeFracture implements MultiBufferSource {
         var scene=com.codex.blacklight.combat.ConsumeReceiverScene.profile(form,large);
         if(scene!=null){
             float seconds=(mob.level().getGameTime()-v.started()+partial)/20F;
-            float flowStart=scene.effectSeconds()+scene.settleSeconds();
+            // Some source branches begin the consume shader before spawnGib.
+            // Never pull the complete body away before its actual separation.
+            float flowStart=Math.max(scene.effectSeconds(),scene.deformSeconds())+scene.settleSeconds();
             return new Phase(form,Math.clamp(seconds/scene.finishSeconds(),0,1),
                     smooth((seconds-scene.deformSeconds())/scene.settleSeconds()),
                     smooth((seconds-flowStart)/(scene.finishSeconds()-flowStart)),
-                    scene.effectSeconds()/scene.finishSeconds(),Style.valueOf(scene.style()),true);
+                    (scene.style().equals("SEVER")?scene.deformSeconds():scene.effectSeconds())/scene.finishSeconds(),Style.valueOf(scene.style()),true);
         }
         float t=v.motionProgress(mob.level().getGameTime(),partial),hit=ConsumeSequence.contact(form,large);
         // prototype_consume / blades / receiver: two spawnGib records and
@@ -82,7 +90,7 @@ public final class ConsumeFracture implements MultiBufferSource {
         var scene=com.codex.blacklight.combat.ConsumeReceiverScene.profile(p.form(),ConsumeSequence.mountedStage(v.stage()));
         return scene!=null?(mob.level().getGameTime()-v.started()+partial)/20F>=Math.min(scene.deformSeconds(),scene.effectSeconds()):p.progress()>=Math.max(0,p.contact()-.08F);
     }
-    public void bindModel(EntityModel<?> model){modelParts=ConsumeAnatomy.model(model);}
+    public void bindModel(EntityModel<?> model){modelParts.putAll(ConsumeAnatomy.model(model));}
     public ConsumeFracture(LivingEntity mob,float partial,PoseStack stack,MultiBufferSource target,Vec3 destination) {
         this.target=target;phase=phase(mob,partial);seed=mob.getId();
         headOnly=mob.getData(ModAttachments.CONSUME_VISUAL).stage()==ConsumeVisual.HUNTER_CONSUME;
@@ -92,6 +100,23 @@ public final class ConsumeFracture implements MultiBufferSource {
         light=net.minecraft.client.Minecraft.getInstance().getEntityRenderDispatcher().getPackedLightCoords(mob,partial);
         frame=new Matrix4f(stack.last().pose()).mul(ConsumeVictimPose.effectTransform(mob,partial));
         inverse=new Matrix4f(frame).invert();
+        var visual=mob.getData(ModAttachments.CONSUME_VISUAL);
+        if(bisect&&!ConsumeSequence.quadruped(mob)){
+            var projected=com.codex.blacklight.combat.ConsumePlacementTrack.projection(
+                    com.codex.blacklight.combat.GrappleMotion.sceneKey(mob,visual),
+                    com.codex.blacklight.combat.GrappleMotion.receiverProgress(mob,visual,partial)).orElse(null);
+            if(projected!=null){
+                var chest=com.codex.blacklight.combat.ConsumePlacementTrack.quaternion(projected,11);
+                cutNormal.set(com.codex.blacklight.combat.CorpseFragmentMotion.torsoNormal(chest));
+            }
+        }
+        float split=ConsumeSequence.splitSeconds(phase.form(),ConsumeSequence.mountedStage(visual.stage()));
+        fragmentAge=Float.isFinite(split)?Math.max(0,(mob.level().getGameTime()-visual.started()+partial)/20F-split):0;
+        up=inverse.transformDirection(stack.last().pose().transformDirection(new Vector3f(0,1,0))).normalize();
+        side=inverse.transformDirection(stack.last().pose().transformDirection(new Vector3f(1,0,0))).normalize();
+        spinAxis=inverse.transformDirection(stack.last().pose().transformDirection(new Vector3f(0,0,1))).normalize();
+        float floor=(float)(visual.origin().y-mob.getPosition(partial).y-com.codex.blacklight.client.ClientCarryPlacement.consumeOffset(mob,partial).y);
+        ground=inverse.transformPosition(stack.last().pose().transformPosition(new Vector3f(0,floor,0)));
         sink=inverse.transformPosition(stack.last().pose().transformPosition(new Vector3f((float)destination.x,(float)destination.y,(float)destination.z)));
         spread=Math.clamp(mob.getBbWidth()*.3F,.18F,.65F);
         divisions=bisect?2:phase.style()==Style.CRUSH?4:1;
@@ -111,6 +136,7 @@ public final class ConsumeFracture implements MultiBufferSource {
         }
         for(int a=0;a<centers.length;a++)if(present[a]){centers[a].set(lo[a]).add(hi[a]).mul(.5F);radii[a]=Math.clamp(lo[a].distance(hi[a])*.25F,.05F,.55F);}
         cutCenter.set(centers[ConsumeAnatomy.BODY]);
+        if(bisect)preparePieces();
         for(var entry:streams.entrySet()){
             Collector c=entry.getValue();VertexConsumer out=target.getBuffer(entry.getKey());int count=c.quads?4:3;
             List<List<Edge>> caps=new ArrayList<>();for(int i=0;i<centers.length*divisions;i++)caps.add(new ArrayList<>());
@@ -164,17 +190,35 @@ public final class ConsumeFracture implements MultiBufferSource {
         };
     }
     private float opening(int part){return smooth((phase.progress()-start(part))/.08F);}
+    private org.joml.Quaternionf pieceRotation(int piece){
+        return pieceSpin[piece];
+    }
+    private void preparePieces(){
+        for(int d=0;d<2;d++){pieceLow[d].set(cutCenter);pieceHigh[d].set(cutCenter);}
+        for(var stream:streams.values())for(var v:stream.vertices){int d=new Vector3f(v.p).sub(cutCenter).dot(cutNormal)<0?0:1;pieceLow[d].min(v.p);pieceHigh[d].max(v.p);}
+        for(int d=0;d<2;d++){
+            pieceSpin[d].rotationAxis((d==0?-1:1)*Math.min(.55F,fragmentAge)*.8F,spinAxis.x,spinAxis.y,spinAxis.z);
+            pieceCenter[d].set(pieceLow[d]).add(pieceHigh[d]).mul(.5F);var rotation=pieceRotation(d);float lowest=Float.POSITIVE_INFINITY;
+            for(int x=0;x<2;x++)for(int y=0;y<2;y++)for(int z=0;z<2;z++){
+                var p=new Vector3f(x==0?pieceLow[d].x:pieceHigh[d].x,y==0?pieceLow[d].y:pieceHigh[d].y,z==0?pieceLow[d].z:pieceHigh[d].z);
+                p.sub(pieceCenter[d]).rotate(rotation).add(pieceCenter[d]).sub(ground);lowest=Math.min(lowest,p.dot(up));
+            }
+            pieceFloor[d]=lowest;
+        }
+    }
     private Vector3f displaced(Vector3f p,int piece){
         int part=piece/divisions,d=piece%divisions;Vector3f pivot=centers[part];
         if(bisect){
             // Two coherent halves: attached head/limbs share their half's transform.
-            float side=d==0?-1:1,open=phase.opening(),flow=phase.returnFlow();
-            float shrink=smooth(flow/.6F),travel=smooth((flow-.4F)/.6F);
-            Vector3f offset=new Vector3f(cutNormal).mul(side*spread*1.5F*open);
-            offset.y-=spread*.6F*open*open;
-            Vector3f result=new Vector3f(p).sub(cutCenter).rotateZ(side*open*.35F)
-                    .mul(1-shrink*.997F).add(cutCenter).fma(1-travel,offset);
-            return frame.transformPosition(result.add(new Vector3f(sink).sub(cutCenter).mul(travel)));
+            float sign=d==0?-1:1,open=phase.opening(),flow=phase.returnFlow();
+            if(open<=0)return frame.transformPosition(new Vector3f(p));
+            float shrink=com.codex.blacklight.combat.CorpseFragmentMotion.shrink(flow),travel=smooth((flow-.30F)/.70F);
+            Vector3f pivotPiece=pieceCenter[d];
+            Vector3f offset=new Vector3f(side).mul(sign*(spread*.65F+Math.min(fragmentAge,.6F)*.12F)*open)
+                    .fma(com.codex.blacklight.combat.CorpseFragmentMotion.drop(fragmentAge,pieceFloor[d])*open,up);
+            Vector3f result=new Vector3f(p).sub(pivotPiece).rotate(pieceRotation(d))
+                    .mul(1-shrink*.997F).add(pivotPiece).fma(1-travel,offset);
+            return frame.transformPosition(result.add(new Vector3f(sink).sub(pivotPiece).mul(travel)));
         }
         if(headOnly) {
             if(part!=ConsumeAnatomy.HEAD)return frame.transformPosition(new Vector3f(p));

@@ -83,39 +83,48 @@ public final class ConsumePlacementTrack {
         // the receiver's root path to the actor and destroyed the paired choreography.
         // A compressed head stays in the animated palm until release. Baking its
         // first-frame offset and then only adding root travel loses that contact.
-        boolean headGrip=form==PowerForm.CLAWS&&ConsumeReceiverScene.profile(form,false)!=null;
+        boolean headGrip=headGrip(form);
         float contactTime=headGrip?Math.min(t,gripEnd(form)):0;
+        float receiverTime=ConsumeSequence.receiverProgress(form,t,false);
         Vec3 contactOrigin=headGrip?actorAnchor(origin,yaw,form,contactTime,false):origin;
         return heldAnchor(contactOrigin,yaw,victim,form,contactTime).map(base->{
             double[] from=sample(data().motion,form,contactTime,false).orElse(new double[3]);
-            double[] to=sample(data().motion,form,t,false).orElse(from);
-            double scale=ConsumeSequence.humanoid(victim)?(victim.isBaby()?.5:1):Math.clamp(victim.getBbHeight()/1.8,.3,1.5);
+            double[] to=sample(data().motion,form,receiverTime,false).orElse(from);
+            double scale=ConsumeSequence.humanoid(victim)?ConsumeSequence.receiverScale(victim):Math.clamp(victim.getBbHeight()/1.8,.3,1.5);
             Vec3 forward=Vec3.directionFromRotation(0,yaw),right=new Vec3(-forward.z,0,forward.x);
             // Scene travel is shared world distance, not the receiver's body scale.
             // Scaling a pig's path by its height made it land inside the actor.
             Vec3 goal=base.add(right.scale((to[0]-from[0])*.9375)).add(forward.scale((to[2]-from[2])*.9375)).add(0,(to[1]-from[1])*.9375,0);
-            double[] pose=contactFrame(form,t).orElse(null);
-            double floor=origin.y-(rigidReceiver(victim)?rigidFloor(victim,form,t):ConsumeSequence.humanoid(victim)&&pose!=null?pose[6]*scale:0);
+            double[] pose=contactFrame(form,receiverTime).orElse(null);
+            double floor=origin.y-(rigidReceiver(victim)?rigidFloor(victim,form,receiverTime):ConsumeSequence.humanoid(victim)&&pose!=null?pose[6]*scale:0);
             goal=new Vec3(goal.x,Math.max(floor,goal.y),goal.z);
             if(pose!=null){
-                goal=separateTorso(goal,origin,yaw,victim,form,t,pose,scale);
+                // Detached pieces retain the split frame's world anchor. The
+                // actor's recovery must not keep towing or pushing their root.
+                goal=separateTorso(goal,origin,yaw,victim,form,receiverTime,pose,scale);
             }
             return goal;
         });
     }
     public static float gripEnd(PowerForm form){return form==PowerForm.CLAWS?.72F:ConsumeSequence.release(form);}
+    public static boolean headGrip(PowerForm form){
+        var receiver=ConsumeReceiverScene.profile(form,false);
+        return form==PowerForm.CLAWS&&receiver!=null&&receiver.style().equals("HEAD_CRUSH");
+    }
     /** The posed torso has volume. A horizontal receiver cannot use standing width
      * and a fixed vertical threshold: its long axis then passes through the actor. */
     private static Vec3 separateTorso(Vec3 goal,Vec3 origin,float yaw,LivingEntity victim,PowerForm form,float t,double[] pose,double scale){
         Vec3 forward=Vec3.directionFromRotation(0,yaw),right=new Vec3(-forward.z,0,forward.x);
-        Vec3 actor=actorAnchor(origin,yaw,form,t,false).add(right.scale(pose[7]*.9375)).add(forward.scale(pose[9]*.9375)).add(0,pose[8]*.9375,0);
-        Vec3 center=rigidReceiver(victim)?rigidCenter(victim,form,t):new Vec3(pose[10]*scale,pose[11]*scale,pose[12]*scale);
+        var actorPose=contactFrame(form,t).orElse(pose);
+        Vec3 actor=actorAnchor(origin,yaw,form,t,false).add(right.scale(actorPose[7]*.9375)).add(forward.scale(actorPose[9]*.9375)).add(0,actorPose[8]*.9375,0);
+        float receiverTime=ConsumeSequence.receiverProgress(form,t,false);
+        Vec3 center=rigidReceiver(victim)?rigidCenter(victim,form,receiverTime):new Vec3(pose[10]*scale,pose[11]*scale,pose[12]*scale);
         Vec3 gap=goal.add(right.scale(center.x)).add(forward.scale(center.z)).add(0,center.y,0).subtract(actor);
         double distance=gap.horizontalDistance();Vec3 direction=distance>.08?gap.multiply(1,0,1).scale(1/distance):forward;
         org.joml.Matrix4f orientation;
-        if(rigidReceiver(victim))orientation=quadrupedBody(victim,form,t);
+        if(rigidReceiver(victim))orientation=quadrupedBody(victim,form,receiverTime);
         else {
-            var row=projection(form,t).orElse(null);orientation=new org.joml.Matrix4f();
+            var row=projection(form,receiverTime).orElse(null);orientation=new org.joml.Matrix4f();
             if(row!=null){var chest=quaternion(row,11);chest.set(-chest.x,-chest.y,chest.z,chest.w);orientation.rotate(quaternion(row,3)).rotate(chest);}
         }
         // Render Z is opposite the local forward convention used by placement data.
@@ -135,7 +144,7 @@ public final class ConsumePlacementTrack {
         return contactFrame(key,t).map(p->carryContact(victim,key,t,p));
     }
     private static Vec3 carryContact(LivingEntity victim,String key,float t,double[] frame) {
-        double scale=ConsumeSequence.humanoid(victim)?(victim.isBaby()?.5:1):Math.clamp(victim.getBbHeight()/1.8,.3,1.5);
+        double scale=ConsumeSequence.humanoid(victim)?ConsumeSequence.receiverScale(victim):Math.clamp(victim.getBbHeight()/1.8,.3,1.5);
         if(rigidReceiver(victim)) {
             boolean quad=ConsumeSequence.quadruped(victim);
             var point=rigidBody(victim,key,t).transformPosition(new org.joml.Vector3f(0,victim.getBbHeight()*(quad?.65F:.86F),quad?-victim.getBbWidth()*.45F:0));
@@ -146,7 +155,7 @@ public final class ConsumePlacementTrack {
     /** Carrying keeps a neck contact while each participant plays its own full pose. */
     public static Optional<Vec3> carryAnchor(Vec3 origin,float yaw,LivingEntity victim,String key,float t){
         return contactFrame(key,t).map(p->{
-            double scale=ConsumeSequence.humanoid(victim)?(victim.isBaby()?.5:1):Math.clamp(victim.getBbHeight()/1.8,.3,1.5);
+            double scale=ConsumeSequence.humanoid(victim)?ConsumeSequence.receiverScale(victim):Math.clamp(victim.getBbHeight()/1.8,.3,1.5);
             Vec3 actor=new Vec3(p[0],p[1],p[2]).scale(.9375);
             Vec3 receiver=carryContact(victim,key,t,p);
             Vec3 local=actor.subtract(receiver);
@@ -163,7 +172,7 @@ public final class ConsumePlacementTrack {
     }
     private static Optional<Vec3> heldAnchor(Vec3 origin,float yaw,LivingEntity victim,PowerForm form,float t) {
         return contactFrame(form,t).map(p->{
-            double scale=ConsumeSequence.humanoid(victim)?(victim.isBaby()?.5:1):Math.clamp(victim.getBbHeight()/1.8,.3,1.5);
+            double scale=ConsumeSequence.humanoid(victim)?ConsumeSequence.receiverScale(victim):Math.clamp(victim.getBbHeight()/1.8,.3,1.5);
             Vec3 actor=new Vec3(p[0],p[1],p[2]).scale(.9375);
             Vec3 receiver=ConsumeSequence.humanoid(victim)?new Vec3(p[3],p[4],p[5]).scale(scale)
                     :new Vec3(0,victim.getBbHeight()*(form==PowerForm.CLAWS||form==PowerForm.HAMMERFISTS?.82:.62),0);

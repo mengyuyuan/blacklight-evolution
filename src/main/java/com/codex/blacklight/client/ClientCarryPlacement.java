@@ -56,7 +56,7 @@ public final class ClientCarryPlacement {
                     net.minecraft.util.Mth.lerp(partial,owner.xRotO,owner.getXRot()),owner,victim,visual,partial)
                 :ConsumePlacementTrack.anchor(visual.origin(),visual.facing(),victim,form,visual.motionProgress(victim.level().getGameTime(),partial)).orElse(current);
         float motion=visual.motionProgress(victim.level().getGameTime(),partial);
-        if(visual.stage()==ConsumeVisual.CONSUME&&form==PowerForm.CLAWS&&motion<ConsumePlacementTrack.gripEnd(form))
+        if(visual.stage()==ConsumeVisual.CONSUME&&ConsumePlacementTrack.headGrip(form)&&motion<ConsumePlacementTrack.gripEnd(form))
             goal=goal.add(owner.getPosition(partial).subtract(ConsumePlacementTrack.actorAnchor(visual.origin(),visual.facing(),form,motion,false)));
         Vec3 delta=goal.subtract(current);double limit=correctionLimit(owner);
         if(limit<=0||delta.lengthSqr()>limit*limit)return Vec3.ZERO;

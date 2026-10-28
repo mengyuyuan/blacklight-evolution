@@ -51,12 +51,12 @@ public final class ConsumeVictimPose {
         if(nativePose!=null && com.codex.blacklight.combat.ConsumeSequence.nativeReceiver(entity)) {
             if(entity instanceof net.minecraft.client.player.AbstractClientPlayer) return matrix;
             var form=PowerForm.values()[Math.clamp(visual.form(),0,PowerForm.values().length-1)];
-            var projected=com.codex.blacklight.combat.ConsumePlacementTrack.projection(GrappleMotion.sceneKey(entity,visual),GrappleMotion.sceneProgress(entity,visual,partial));
+            var projected=com.codex.blacklight.combat.ConsumePlacementTrack.projection(GrappleMotion.sceneKey(entity,visual),GrappleMotion.receiverProgress(entity,visual,partial));
             if(projected.isPresent()){
-                double[] frame=projected.get();float scale=com.codex.blacklight.combat.ConsumeSequence.humanoid(entity)?(entity.isBaby()?.5F:1F):Math.clamp(h/1.8F,.3F,1.5F);
+                double[] frame=projected.get();float scale=com.codex.blacklight.combat.ConsumeSequence.humanoid(entity)?com.codex.blacklight.combat.ConsumeSequence.receiverScale(entity):Math.clamp(h/1.8F,.3F,1.5F);
                 float yaw=(float)Math.toRadians(180-GrappleMotion.facing(entity,visual,partial));
                 if(com.codex.blacklight.combat.ConsumePlacementTrack.rigidReceiver(entity))return matrix.rotateY(yaw)
-                        .mul(com.codex.blacklight.combat.ConsumePlacementTrack.rigidBody(entity,GrappleMotion.sceneKey(entity,visual),GrappleMotion.sceneProgress(entity,visual,partial))).rotateY(-yaw);
+                        .mul(com.codex.blacklight.combat.ConsumePlacementTrack.rigidBody(entity,GrappleMotion.sceneKey(entity,visual),GrappleMotion.receiverProgress(entity,visual,partial))).rotateY(-yaw);
                 return matrix.rotateY(yaw).translate((float)frame[0]*scale,(float)frame[1]*scale,(float)frame[2]*scale)
                         .translate(0,.9F*scale,0).rotate(com.codex.blacklight.combat.ConsumePlacementTrack.quaternion(frame,3)).translate(0,-.9F*scale,0).rotateY(-yaw);
             }
@@ -87,12 +87,12 @@ public final class ConsumeVictimPose {
         var visual=entity.getData(ModAttachments.CONSUME_VISUAL);
         if(!(entity instanceof net.minecraft.client.player.AbstractClientPlayer)||!com.codex.blacklight.combat.ConsumeSequence.humanoid(entity)||(!visual.consuming()&&!GrappleMotion.active(visual))||com.codex.blacklight.combat.ConsumeSequence.mountedStage(visual.stage()))return bodyTransform(entity,partial);
         var form=PowerForm.values()[Math.clamp(visual.form(),0,PowerForm.values().length-1)];
-        float t=GrappleMotion.sceneProgress(entity,visual,partial);
+        float t=GrappleMotion.receiverProgress(entity,visual,partial);
         String key=GrappleMotion.sceneKey(entity,visual);
         var frame=com.codex.blacklight.combat.ConsumePlacementTrack.projection(key,t).orElse(null);
         var contact=com.codex.blacklight.combat.ConsumePlacementTrack.contactFrame(key,t).orElse(null);
         if(frame==null||contact==null)return bodyTransform(entity,partial);
-        float scale=entity.isBaby()?.5F:1F,yaw=(float)Math.toRadians(180-GrappleMotion.facing(entity,visual,partial));
+        float scale=com.codex.blacklight.combat.ConsumeSequence.receiverScale(entity),yaw=(float)Math.toRadians(180-GrappleMotion.facing(entity,visual,partial));
         var forward=net.minecraft.world.phys.Vec3.directionFromRotation(0,GrappleMotion.facing(entity,visual,partial));
         var right=new net.minecraft.world.phys.Vec3(-forward.z,0,forward.x);
         var center=right.scale(contact[10]*scale).add(forward.scale(contact[12]*scale)).add(0,contact[11]*scale,0);
@@ -151,10 +151,10 @@ public final class ConsumeVictimPose {
         var visual=entity.getData(ModAttachments.CONSUME_VISUAL);
         if(!visual.consuming()&&!GrappleMotion.active(visual))return false;
         boolean large=com.codex.blacklight.combat.ConsumeSequence.mountedStage(visual.stage());
-        var projection=com.codex.blacklight.combat.ConsumePlacementTrack.projection(GrappleMotion.sceneKey(entity,visual),GrappleMotion.sceneProgress(entity,visual,partial));
+        var projection=com.codex.blacklight.combat.ConsumePlacementTrack.projection(GrappleMotion.sceneKey(entity,visual),GrappleMotion.receiverProgress(entity,visual,partial));
         if(projection.isEmpty())return false;
         var frame=projection.get();
-        var contact=large?null:com.codex.blacklight.combat.ConsumePlacementTrack.contactFrame(GrappleMotion.sceneKey(entity,visual),GrappleMotion.sceneProgress(entity,visual,partial)).orElse(null);
+        var contact=large?null:com.codex.blacklight.combat.ConsumePlacementTrack.contactFrame(GrappleMotion.sceneKey(entity,visual),GrappleMotion.receiverProgress(entity,visual,partial)).orElse(null);
         if(model instanceof HumanoidModel<?> h) {
             projectedPart(saved,h.head,frame,contact,0);projectedPart(saved,h.hat,frame,contact,0);
             projectedPart(saved,h.body,frame,contact,1);projectedPart(saved,h.rightArm,frame,contact,2);projectedPart(saved,h.leftArm,frame,contact,3);

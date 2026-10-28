@@ -401,7 +401,7 @@ public final class ConsumeSystem {
         player.fallDistance=0;player.setDeltaMovement(Vec3.ZERO);
         if(before.distanceToSqr(player.position())>.000001)player.connection.teleport(player.getX(),player.getY(),player.getZ(),session.facing,player.getXRot());
         Vec3 goal=ConsumePlacementTrack.anchor(session.start,session.facing,target,session.form,t).orElse(session.consumeTargetStart==null?target.position():session.consumeTargetStart);
-        if(session.form==PowerForm.CLAWS&&t<ConsumePlacementTrack.gripEnd(session.form))
+        if(ConsumePlacementTrack.headGrip(session.form)&&t<ConsumePlacementTrack.gripEnd(session.form))
             goal=goal.add(player.position().subtract(actorGoal));
         Vec3 delta=goal.subtract(target.position());
         target.move(MoverType.SELF,delta.length()>1.25?delta.normalize().scale(1.25):delta);
@@ -421,13 +421,12 @@ public final class ConsumeSystem {
         Vec3 point=ConsumeSequence.contact(session.victim);
         if(receiverScene!=null?receiverScene.impactAt(elapsed):elapsed==contact) {
             boolean hammer=animationForm==PowerForm.HAMMERFISTS;
-            player.level().playSound(null,session.victim.blockPosition(),hammer?SoundEvents.GENERIC_BIG_FALL:
-                    animationForm==PowerForm.BLADE||animationForm==PowerForm.CLAWS?SoundEvents.PLAYER_ATTACK_SWEEP:SoundEvents.PLAYER_ATTACK_STRONG,
-                    SoundSource.PLAYERS,1F,hammer?.6F:.8F);
-            player.serverLevel().sendParticles(net.minecraft.core.particles.ParticleTypes.CRIT,point.x,point.y,point.z,12,.2,.2,.2,.12);
+            com.codex.blacklight.registry.ModInfectedSounds.play(session.victim,hammer?
+                    com.codex.blacklight.infection.InfectedSoundCue.CRUSH:animationForm==PowerForm.NONE?
+                    com.codex.blacklight.infection.InfectedSoundCue.PIERCE:com.codex.blacklight.infection.InfectedSoundCue.TEAR,point);
+            player.serverLevel().sendParticles(new net.minecraft.core.particles.DustParticleOptions(new org.joml.Vector3f(.28F,.018F,.025F),.75F),point.x,point.y,point.z,9,.14,.12,.14,.08);
             session.victim.hurtTime=8;session.victim.hurtDuration=8;
             player.serverLevel().broadcastEntityEvent(session.victim,(byte)2);
-            player.level().playSound(null,session.victim.blockPosition(),SoundEvents.PLAYER_ATTACK_KNOCKBACK,SoundSource.PLAYERS,.85F,hammer?.55F:.72F);
             if(hammer){
                 var floor=session.victim.blockPosition().below();
                 player.serverLevel().sendParticles(new net.minecraft.core.particles.BlockParticleOption(net.minecraft.core.particles.ParticleTypes.BLOCK,player.level().getBlockState(floor)),

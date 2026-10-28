@@ -32,6 +32,21 @@ public final class LockedGrabGameTest {
   try{h.assertTrue(body.getBbHeight()>2.35&&!ConsumeSequence.large(body),"grown human retains its receiver skeleton instead of becoming a generic climbable monster");h.assertTrue(!ConsumeSystem.healthReady(p,body),"low original zombie health cannot bypass the super-elite weakening gate");var wounded=new net.minecraft.nbt.CompoundTag();body.saveWithoutId(wounded);wounded.putFloat("BlacklightCoreFracture",1);body.load(wounded);body.setHealth(body.getMaxHealth()*.08F);h.assertTrue(body.tissueCoreFracture()>=1&&ConsumeSystem.healthReady(p,body),"prepared broken-core low-health evolved remains absorbable");CombatTargeting.requestLock(p,body.getId());ClawCombatSystem.handle(p,Action.GRAB);h.assertTrue(p.getData(ModAttachments.GRAB_STAGE)==ConsumeVisual.CAPTURE,"real grab intent enters human capture, never mount");}
   finally{clean(p,body);}h.succeed();
  }
+ @GameTest(template="wall_test",timeoutTicks=80,batch="evolved_consume_all_forms")
+ public static void eachWeaponCompletesAnEvolvedHumanConsumeAndAwardsOnce(GameTestHelper h){
+  for(var form:new PowerForm[]{PowerForm.NONE,PowerForm.CLAWS,PowerForm.BLADE,PowerForm.HAMMERFISTS,PowerForm.WHIPFIST,PowerForm.MUSCLE_MASS}){
+   var body=EvolvedVariantsGameTest.host(h,EvolvedArchetype.STRENGTH);var p=player(h,form);body.setPos(p.position().add(0,0,2));
+   try{
+    var wounded=new net.minecraft.nbt.CompoundTag();body.saveWithoutId(wounded);wounded.putFloat("BlacklightCoreFracture",1);body.load(wounded);body.setHealth(body.getMaxHealth()*.08F);
+    CombatTargeting.requestLock(p,body.getId());ClawCombatSystem.handle(p,Action.GRAB);tick(p,ConsumeVisual.captureDuration(form));
+    h.assertTrue(ConsumeSystem.holding(p),form+" evolved reaches human hold");
+    ConsumeSystem.consume(p);int duration=ConsumeSequence.completionTick(form,false);tick(p,duration+2);
+    h.assertTrue(body.isRemoved()&&!p.getData(ModAttachments.CONSUMING),form+" evolved scene completes and releases both claims");
+    int awarded=p.getData(ModAttachments.PLAYER_STATE).getEvolutionPoints();tick(p,30);
+    h.assertTrue(p.getData(ModAttachments.PLAYER_STATE).getEvolutionPoints()==awarded,form+" corpse cannot award twice");
+   }finally{clean(p,body);}
+  }h.succeed();
+ }
  @GameTest(template="wall_test",timeoutTicks=80,batch="lock_grab_terrain")
  public static void aLockedNearbyWeakEvolvedCannotStealAnActualTerrainPickup(GameTestHelper h){
   var body=EvolvedVariantsGameTest.host(h,EvolvedArchetype.STRENGTH);var p=player(h,PowerForm.MUSCLE_MASS);body.setPos(p.position().add(2,0,1));body.setHealth(body.getMaxHealth()*.1F);p.setXRot(50);p.getData(ModAttachments.MOVEMENT_STATE).setCameraYaw(0);

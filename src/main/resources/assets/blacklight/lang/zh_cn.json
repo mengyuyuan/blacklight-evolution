@@ -772,5 +772,19 @@
   "entity.blacklight.evolved_skirmisher": "疾袭进化者",
   "entity.blacklight.evolved_sensory": "骨刺进化者",
   "entity.blacklight.evolved_regenerator": "供养进化者",
-  "entity.blacklight.evolved_quill": "进化者骨刺"
+  "entity.blacklight.evolved_quill": "进化者骨刺",
+  "subtitle.blacklight.infection.tension": "肌腱拉紧",
+  "subtitle.blacklight.infection.swing": "血肉挥动",
+  "subtitle.blacklight.infection.tear": "血肉撕裂",
+  "subtitle.blacklight.infection.pierce": "骨刺穿入",
+  "subtitle.blacklight.infection.crush": "重肢砸击",
+  "subtitle.blacklight.infection.lash": "触须甩动",
+  "subtitle.blacklight.infection.retract": "组织回抽",
+  "subtitle.blacklight.infection.launch": "肉瘤喷出",
+  "subtitle.blacklight.infection.burst": "肉瘤爆裂",
+  "subtitle.blacklight.infection.erupt": "触须破壳",
+  "subtitle.blacklight.infection.resonance_charge": "共振蓄势",
+  "subtitle.blacklight.infection.resonance": "血肉共振",
+  "subtitle.blacklight.infection.mend": "组织织合",
+  "subtitle.blacklight.infection.ground": "重击落地"
 }

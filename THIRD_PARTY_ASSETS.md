@@ -124,6 +124,11 @@ conversion steps and project edits are documented in
 
 Recorded source packs: StarNinjas sword sounds (CC0), artisticdude Swishes (CC0), and Philippe Groarke / Socapex combat sounds (CC BY-SA 3.0). Source URLs, archives and full upstream attribution are in `art/weapon-audio/`. Edited/mixed derivatives are distributed under CC BY-SA 3.0 separately from the code license. Packaged credits: `META-INF/licenses/blacklight-audio/`. See `docs/WEAPON_DEFENSE_AUDIO_ZH.md` for the 41 events / 123 variants and validation scope. No Prototype unpacked audio is added.
 
+The infection audio bank (2026-10-28) uses the same approved Swishes and Socapex
+recordings: 14 events, three variants each. These layered/filtered derivatives
+retain CC BY-SA 3.0 and the same packaged upstream credits. Reproduction:
+`tools/build_infected_audio.py`. No new proprietary game audio is bundled.
+
 
 ### Hydra and Hunter continuous skins and motion
 

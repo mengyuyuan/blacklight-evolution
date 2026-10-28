@@ -368,10 +368,12 @@
       "bytes": 168217
     },
     "consume-placement.data": {
-      "bytes": 1877907
+      "bytes": 2089939,
+      "sha256": "b737429ee8de4a20998f3cc2f073fc4a386b9542449f6dc185386d9faaf357b8"
     },
     "consume-receiver-events.data": {
-      "bytes": 1784
+      "bytes": 1848,
+      "sha256": "905204d8a08830673583258b1a1dc59ae2db62516c0d240ce0802c4edcd693f1"
     },
     "consume_blade_actor.json": {
       "bytes": 1129216
@@ -398,10 +400,12 @@
       "bytes": 356580
     },
     "consume_claws_actor.json": {
-      "bytes": 967833
+      "bytes": 790856,
+      "sha256": "b79b88ed94656f1226a60e90342f8b62a4ead58a8c78b9e78f618f98a83941b1"
     },
     "consume_claws_victim.json": {
-      "bytes": 967907
+      "bytes": 790704,
+      "sha256": "77c08cfe67e97e182ec8e8df2d6861938d594a347cef02079a457cd310df98f6"
     },
     "consume_hammer_actor.json": {
       "bytes": 812564
@@ -452,10 +456,12 @@
       "bytes": 1450302
     },
     "consume_whip_actor.json": {
-      "bytes": 812175
+      "bytes": 264827,
+      "sha256": "b80ff9db26883be156eb1b2789a671974152c08724974ea0f6a61d9a7df6818a"
     },
     "consume_whip_victim.json": {
-      "bytes": 806812
+      "bytes": 264607,
+      "sha256": "97dd52ed310b1f9b6f7587cca89c45f6c84b00c28de52fa68345728bdde67620"
     },
     "dev_air_critical_pain.json": {
       "bytes": 2012226
@@ -763,6 +769,14 @@
     "evolved-poses.data": {
       "bytes": 4896335,
       "sha256": "67b9315c7b999fab1bf2d9cf28894990998d133715cc66406c085a7b03626e7c"
+    },
+    "consume_large_claws_actor.json": {
+      "bytes": 967833,
+      "sha256": "4d393358cf11ccd6c83d215214322d2ff62f2dd9c04a51b9498fbc97a4d5e43a"
+    },
+    "consume_large_claws_victim.json": {
+      "bytes": 967907,
+      "sha256": "7852ece910babb36d96ec5cc95a792738e28cfcf5621f038661086ed2368d674"
     }
   }
 }

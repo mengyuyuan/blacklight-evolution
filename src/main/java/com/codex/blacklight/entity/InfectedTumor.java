@@ -23,7 +23,7 @@ import java.util.*;
 public final class InfectedTumor extends ThrowableItemProjectile {
     private static final EntityDataAccessor<CompoundTag> BURST=SynchedEntityData.defineId(InfectedTumor.class,EntityDataSerializers.COMPOUND_TAG);
     private float damage=12,radius=4;
-    private boolean pierced;
+    private boolean pierced,retractSound;
     public InfectedTumor(EntityType<? extends InfectedTumor> type,Level level){super(type,level);}
     public InfectedTumor(Level level,BlacklightInfectedHost owner){super(ModEntities.INFECTED_TUMOR.get(),owner,level);}
     @Override protected void defineSynchedData(SynchedEntityData.Builder builder){super.defineSynchedData(builder);builder.define(BURST,new CompoundTag());}
@@ -56,7 +56,7 @@ public final class InfectedTumor extends ThrowableItemProjectile {
         for(var target:targets)if(target.getBoundingBox().getCenter().distanceToSqr(position())<=2.3*2.3)hurt(target,damage*.35F);
         var server=(ServerLevel)level();server.sendParticles(ModParticles.IMPACT_SMOKE.get(),getX(),getY(),getZ(),10,.6,.45,.6,.04);
         server.sendParticles(new DustParticleOptions(new Vector3f(.45F,.018F,.035F),1.4F),getX(),getY(),getZ(),18,.5,.4,.5,.04);
-        level().playSound(null,blockPosition(),SoundEvents.GENERIC_EXPLODE.value(),SoundSource.HOSTILE,1.3F,.6F);
+        com.codex.blacklight.registry.ModInfectedSounds.play(this,com.codex.blacklight.infection.InfectedSoundCue.ERUPT);
     }
     private static void addArm(ListTag arms,Vec3 offset){var t=new CompoundTag();t.putDouble("X",offset.x);t.putDouble("Y",offset.y);t.putDouble("Z",offset.z);arms.add(t);}
     private boolean visible(Vec3 end){return level().clip(new ClipContext(position(),end,ClipContext.Block.COLLIDER,ClipContext.Fluid.NONE,this)).getType()==HitResult.Type.MISS;}
@@ -83,8 +83,9 @@ public final class InfectedTumor extends ThrowableItemProjectile {
                     var box=target.getBoundingBox().inflate(.32);
                     if(!contacts.contains(target.getId())&&(box.contains(position())||box.clip(position(),end).isPresent())&&visible(target.getBoundingBox().getCenter())){contacts.add(target.getId());hurt(target,damage*.85F);}
                 }
-            }level().playSound(null,blockPosition(),SoundEvents.PLAYER_ATTACK_STRONG,SoundSource.HOSTILE,1,.5F);
+            }
         }
+        if(age>=24&&!retractSound){retractSound=true;com.codex.blacklight.registry.ModInfectedSounds.play(this,com.codex.blacklight.infection.InfectedSoundCue.RETRACT);}
         if(age>=36)discard();
     }
     @Override public boolean isPickable(){return !erupted()&&!isRemoved();}

@@ -54,7 +54,19 @@ final class EvolvedBodyRenderer {
         }catch(Exception failure){throw new IllegalStateException("Cannot load P2 Evolved player binding",failure);}
     }
     static void reload(){instance=null;INSTANCES.clear();}
-    static void render(BlacklightInfectedHost host,float partial,PoseStack stack,MultiBufferSource buffers,int light){instance=INSTANCES.computeIfAbsent(host.evolvedArchetype(),EvolvedBodyRenderer::new);instance.draw(host,partial,stack,buffers,light);}
+    static void render(BlacklightInfectedHost host,float partial,PoseStack stack,MultiBufferSource buffers,int light){
+        instance=INSTANCES.computeIfAbsent(host.evolvedArchetype(),EvolvedBodyRenderer::new);
+        var visual=host.getData(com.codex.blacklight.registry.ModAttachments.CONSUME_VISUAL);
+        if(!visual.active()){instance.draw(host,partial,stack,buffers,light);return;}
+        if(visual.consuming()&&visual.progress(host.level().getGameTime(),partial)>=.995F)return;
+        var placement=com.codex.blacklight.client.ClientCarryPlacement.consumeOffset(host,partial);
+        stack.pushPose();stack.translate(placement.x,placement.y,placement.z);
+        try{
+            var fracture=ConsumeFracture.visible(host,partial)?new ConsumeFracture(host,partial,stack,buffers,ConsumeAbsorptionFx.destination(host,partial,placement)):null;
+            instance.draw(host,partial,stack,fracture==null?buffers:fracture,light);
+            if(fracture!=null)fracture.finish();
+        }finally{stack.popPose();}
+    }
     private static ModelPart part(HumanoidModel<?> m,int role){return switch(role){case 1->m.head;case 2->m.rightArm;case 3->m.leftArm;case 4->m.rightLeg;case 5->m.leftLeg;default->m.body;};}
     private void draw(BlacklightInfectedHost host,float partial,PoseStack stack,MultiBufferSource buffers,int light){
         String clip=host.evolvedAction();float time=host.evolvedActionElapsed(partial);boolean loop=false;
@@ -91,11 +103,12 @@ final class EvolvedBodyRenderer {
             row=EvolvedMotions.blend(row,EvolvedMotions.sample(reaction,at,false),hitWeight);
         }
         row=EvolvedMotions.blend(state.from,row,EvolvedForm.smooth((clock-state.time)/4));state.last=row;
-        var matrices=EvolvedMotions.skin(row,1);var joints=new RigidSkinning.Joint[matrices.length];for(int i=0;i<joints.length;i++)joints[i]=RigidSkinning.Joint.from(matrices[i]);
+        var receiver=visual.active()?com.codex.blacklight.client.animation.EvolvedConsumePose.skin(host,partial):null;
+        var matrices=receiver==null?EvolvedMotions.skin(row,1):receiver;var joints=new RigidSkinning.Joint[matrices.length];for(int i=0;i<joints.length;i++)joints[i]=RigidSkinning.Joint.from(matrices[i]);
         if(posed==null){posed=new Vector3f[vertices.length];for(int i=0;i<posed.length;i++)posed[i]=new Vector3f();}
         var points=posed;var real=new Quaternionf();var dual=new Quaternionf();float foot=Float.NEGATIVE_INFINITY;
         for(int i=0;i<vertices.length;i++){var v=vertices[i];RigidSkinning.transform(joints[v.a],joints[v.b],v.weight,v.point,points[i],real,dual);if(v.point.y==24&&v.point.x>=-3.91F&&v.point.x<=3.91F&&Math.abs(v.point.z)<=2)foot=Math.max(foot,points[i].y);}
-        float floor=host.onGround()&&Float.isFinite(foot)?24-foot:0,growth=host.isMetamorphosing()?EvolvedForm.humanBody(host.evolvedProgress(partial)):1,scale=1.12F*host.tissueBodyScale();
+        float floor=!visual.active()&&host.onGround()&&Float.isFinite(foot)?24-foot:0,growth=host.isMetamorphosing()?EvolvedForm.humanBody(host.evolvedProgress(partial)):1,scale=1.12F*host.tissueBodyScale();
         stack.pushPose();float yaw=net.minecraft.util.Mth.rotLerp(partial,host.yBodyRotO,host.yBodyRot);stack.mulPose(Axis.YP.rotationDegrees(180-yaw));stack.scale(growth,growth,growth);stack.translate(0,1.501F*scale,0);stack.scale(-scale,-scale,scale);stack.translate(0,floor/16,0);
         var proxy=host.appearance();HumanoidModel<?> nativeModel=anatomy;
         if(proxy!=null&&Minecraft.getInstance().getEntityRenderDispatcher().getRenderer(proxy) instanceof net.minecraft.client.renderer.entity.LivingEntityRenderer<?,?> renderer&&renderer.getModel() instanceof HumanoidModel<?> human)nativeModel=human;
@@ -112,7 +125,7 @@ final class EvolvedBodyRenderer {
             if(f.kind>=4&&!blade||f.kind==0&&blade&&(f.role==2||f.role==3)&&(type==EvolvedArchetype.BLADE||type==EvolvedArchetype.SKIRMISHER||type==EvolvedArchetype.ARMORED&&f.role==2||(vertices[f.ids[0]].point.y+vertices[f.ids[1]].point.y+vertices[f.ids[2]].point.y+vertices[f.ids[3]].point.y)*.25F>6.5F))continue;
             if(f.kind==1&&!blade||f.kind==2&&(blade||grasp)||f.kind==3&&!grasp)continue;float amount=f.kind==0||f.kind>=4?1:f.kind==3?graspDeploy:deploy;if(f.kind==1&&f.role==3)amount*=1-graspDeploy;if(amount<=.001F)continue;
             var q=quad;var anchor=f.role==2?rightAnchor:leftAnchor;for(int k=0;k<4;k++){q[k].set(points[f.ids[k]]);if(f.kind>0)q[k].lerp(anchor,1-amount);}
-            var n=normal.set(q[1]).sub(q[0]).cross(edge.set(q[2]).sub(q[0]));if(n.lengthSquared()<1e-10F)continue;n.normalize();int nextMaterial=f.kind==0?0:f.kind==5?2:f.kind==6?3:f.kind==7?4:f.kind==8?5:1;if(material!=nextMaterial){out=buffers.getBuffer(nextMaterial==2||nextMaterial==4?RenderType.entityTranslucentEmissive(nextMaterial==4?PLAYER_WEAPON_GLOW:runnerArms?WEAPON_GLOW:VARIANT_GLOW):RenderType.entityCutoutNoCull(nextMaterial==0?SKIN:nextMaterial==3?PLAYER_WEAPON:nextMaterial==5?ConsumedMobVisuals.WHITE:runnerArms?WEAPON:VARIANT_WEAPON));material=nextMaterial;}var identity=part(nativeModel,f.role);if(out instanceof ConsumeAnatomy.Consumer sink)sink.anatomy(identity);EvolvedDonorCapture.mesh(identity,f.kind==0?"evolved_player":"evolved_weapon");
+            var n=normal.set(q[1]).sub(q[0]).cross(edge.set(q[2]).sub(q[0]));if(n.lengthSquared()<1e-10F)continue;n.normalize();int nextMaterial=f.kind==0?0:f.kind==5?2:f.kind==6?3:f.kind==7?4:f.kind==8?5:1;if(material!=nextMaterial){out=buffers.getBuffer(nextMaterial==2||nextMaterial==4?RenderType.entityTranslucentEmissive(nextMaterial==4?PLAYER_WEAPON_GLOW:runnerArms?WEAPON_GLOW:VARIANT_GLOW):RenderType.entityCutoutNoCull(nextMaterial==0?SKIN:nextMaterial==3?PLAYER_WEAPON:nextMaterial==5?ConsumedMobVisuals.WHITE:runnerArms?WEAPON:VARIANT_WEAPON));material=nextMaterial;}var identity=part(nativeModel,f.role);if(out instanceof ConsumeAnatomy.Consumer sink)sink.anatomy(f.role);EvolvedDonorCapture.mesh(identity,f.kind==0?"evolved_player":"evolved_weapon");
             for(int k=0;k<4;k++)out.addVertex(stack.last(),q[k].x/16,q[k].y/16,q[k].z/16).setColor(f.color).setUv(f.uv[k*2],f.uv[k*2+1]).setOverlay(overlay).setLight(nextMaterial==2||nextMaterial==4?LightTexture.FULL_BRIGHT:light).setNormal(stack.last(),n.x,n.y,n.z);
         }
         if(blade)for(int side=0;side<2;side++)if(tips[side]>=0){

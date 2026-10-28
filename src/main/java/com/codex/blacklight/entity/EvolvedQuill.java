@@ -20,7 +20,7 @@ public final class EvolvedQuill extends ThrowableItemProjectile {
         super.onHitEntity(hit);if(level().isClientSide||hit.getEntity()==getOwner())return;
         if(hit.getEntity() instanceof LivingEntity target&&target.hurt(damageSources().thrown(this,getOwner()),damage)){
             var server=(net.minecraft.server.level.ServerLevel)level();server.sendParticles(com.codex.blacklight.registry.ModParticles.BIOMASS_SLASH.get(),target.getX(),target.getY()+target.getBbHeight()*.5,target.getZ(),5,.15,.2,.15,.03);
-            level().playSound(null,target.blockPosition(),net.minecraft.sounds.SoundEvents.TRIDENT_HIT,net.minecraft.sounds.SoundSource.HOSTILE,.8F,.7F);
+            // Accepted-hit observer provides the bone/flesh contact sound once.
         }
     }
     @Override protected void onHit(HitResult hit){super.onHit(hit);if(!level().isClientSide)discard();}

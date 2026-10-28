@@ -72,7 +72,7 @@ public final class BlacklightInfectedHost extends Monster {
     private Mob appearance;
     private EnderDragon dragonFightProxy;
     private int appearanceAnimationTick=Integer.MIN_VALUE;
-    private boolean appearanceSwing;
+    private boolean appearanceSwing,appearanceAirborne;
     private boolean navigationReady;
     private String navigationFamily="";
     private boolean bossDefeated;
@@ -667,7 +667,7 @@ public final class BlacklightInfectedHost extends Monster {
         if(TISSUE_INHERITANCE.equals(key)){inheritanceCache=null;refreshDimensions();}
         if(TISSUE_BODY_SCALE.equals(key)||TISSUE_FRAME.equals(key))refreshDimensions();
         if(HOST.equals(key)) {
-            appearance=null;appearanceAnimationTick=Integer.MIN_VALUE;
+            appearance=null;appearanceAnimationTick=Integer.MIN_VALUE;appearanceSwing=false;appearanceAirborne=false;
             refreshDimensions();configureParts();
             // The client initially registered reserved IDs before HOST was received.
             // Drop unused parts once species is known; ordinary hordes do not need 20
@@ -702,6 +702,18 @@ public final class BlacklightInfectedHost extends Monster {
         // Native client animation fields include squid tentacles, fish flops, allay wings,
         // golem attack clocks and modern AnimationStates. One client tick, never one per frame.
         if(level().isClientSide){
+            boolean airborne=!onGround()&&!isInWaterOrBubble();
+            if(appearance instanceof net.minecraft.world.entity.animal.Rabbit rabbit&&airborne&&!appearanceAirborne&&getDeltaMovement().y>.025)rabbit.handleEntityEvent((byte)1);
+            appearanceAirborne=airborne;
+            if(appearance instanceof net.minecraft.world.entity.animal.frog.Frog frog)
+                frog.setPose(airborne&&getDeltaMovement().lengthSqr()>.001?Pose.LONG_JUMPING:Pose.STANDING);
+            if(appearance instanceof net.minecraft.world.entity.monster.breeze.Breeze breeze){
+                breeze.setPose(nativeAction().equals("WIND")?(nativeActionElapsed(0)<nativeCombat.profile().contact?Pose.INHALING:Pose.SHOOTING)
+                        :airborne?Pose.LONG_JUMPING:getDeltaMovement().horizontalDistanceSqr()>.002?Pose.SLIDING:Pose.STANDING);
+                breeze.idle.startIfStopped(tickCount);
+            }
+            if(appearance instanceof net.minecraft.world.entity.monster.Shulker shulker)
+                ((com.codex.blacklight.mixin.ShulkerPeekAccess)shulker).blacklight$peek(nativeAction().equals("SHULKER")?100:Math.floorMod(tickCount+getId(),160)<35?30:0);
             if(swinging&&!appearanceSwing&&(appearance instanceof net.minecraft.world.entity.animal.IronGolem||appearance instanceof net.minecraft.world.entity.monster.Ravager))appearance.handleEntityEvent((byte)4);
             appearanceSwing=swinging;appearance.tick();appearance.copyPosition(this);appearance.setDeltaMovement(getDeltaMovement());
             if(appearance instanceof net.minecraft.world.entity.animal.Squid squid){
