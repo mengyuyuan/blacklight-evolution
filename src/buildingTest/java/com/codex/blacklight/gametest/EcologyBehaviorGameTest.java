@@ -44,12 +44,20 @@ public final class EcologyBehaviorGameTest{
             // FakePlayer.tick is a no-op; drive the real player-tick entry just as the existing consume fixtures do.
             for(int t=6;t<=23;t++)h.runAfterDelay(t,()->{f.observer.tickCount++;com.codex.blacklight.combat.ConsumeSystem.tick(new net.neoforged.neoforge.event.tick.PlayerTickEvent.Post(f.observer));});
         },()->{try{h.assertTrue(target[0].getHealth()==target[0].getMaxHealth()&&mob[0].attackStarted()<0,"capture owns the actor before its contact frame; health="+target[0].getHealth()+" action="+mob[0].attackStarted()+" visual="+mob[0].getData(ModAttachments.CONSUME_VISUAL));}finally{com.codex.blacklight.combat.ConsumeSystem.cancel(f.observer);}});}
+    private static void clearFlightArena(BuildingAssimilationGameTest.Fixture f){
+        // The architecture fixture only clears a narrow corridor. Idle flight
+        // samples randomized destinations outside it, into generated Nether rock.
+        // Test takeoff in loaded open air rather than a world-seed-dependent cave.
+        for(int x=-13;x<=13;x++)for(int z=-13;z<=13;z++)for(int y=-1;y<=8;y++)
+            f.block(f.origin.offset(x,y,z),y==-1?net.minecraft.world.level.block.Blocks.STONE.defaultBlockState():net.minecraft.world.level.block.Blocks.AIR.defaultBlockState());
+    }
     private static void flight(GameTestHelper h,EntityType<? extends net.minecraft.world.entity.Mob> type){var f=fixture(h);BlacklightInfectedHost[] actor={null};double[] raised={0};net.minecraft.world.phys.Vec3[] initial={null};
         f.after(100,()->{
+            clearFlightArena(f);
             actor[0]=ModEntities.INFECTED_HOST.get().create(f.level);actor[0].inherit(type.create(f.level));join(f,actor[0],-4,-2);initial[0]=actor[0].position();
             for(int t=1;t<=99;t++)h.runAfterDelay(t,()->raised[0]=Math.max(raised[0],actor[0].getY()-initial[0].y));
         },()->{
-            h.assertTrue(actor[0].isAlive()&&actor[0].isNoGravity()&&raised[0]>.6&&actor[0].position().distanceToSqr(initial[0])>.3,"idle infected "+type+" really leaves the floor and moves in loaded air; rise="+raised[0]);
+            h.assertTrue(actor[0].isAlive()&&actor[0].isNoGravity()&&raised[0]>.6&&actor[0].position().distanceToSqr(initial[0])>.3,"idle infected "+type+" really leaves the floor and moves in loaded air; rise="+raised[0]+" position="+actor[0].position()+" age="+actor[0].tickCount+" gravity="+actor[0].isNoGravity()+" alive="+actor[0].isAlive()+" ai="+actor[0].isNoAi()+" target="+actor[0].getTarget()+" action="+actor[0].nativeAction()+" velocity="+actor[0].getDeltaMovement());
             var proxy=actor[0].appearance();actor[0].advanceAppearanceAnimation();
             if(proxy instanceof net.minecraft.world.entity.ambient.Bat bat)h.assertTrue(!bat.isResting()&&bat.flyAnimationState.isStarted()&&!bat.restAnimationState.isStarted(),"unticked render proxy explicitly starts its flight animation, not its resting pose");
         });}
@@ -57,6 +65,18 @@ public final class EcologyBehaviorGameTest{
     public static void infectedBatActuallyTakesOffWithoutACombatTarget(GameTestHelper h){flight(h,EntityType.BAT);}
     @GameTest(template="wall_test",timeoutTicks=600,batch="infected_phantom_flight")
     public static void infectedPhantomActuallyTakesOffWithoutACombatTarget(GameTestHelper h){flight(h,EntityType.PHANTOM);}
+    @GameTest(template="wall_test",timeoutTicks=600,batch="infected_bat_flight_seeds")
+    public static void infectedBatsTakeOffAcrossIndependentRoamingSeeds(GameTestHelper h){
+        var f=fixture(h);var bats=new java.util.ArrayList<BlacklightInfectedHost>();double[] rise=new double[16];
+        f.after(100,()->{
+            clearFlightArena(f);
+            for(int i=0;i<16;i++){
+                var bat=ModEntities.INFECTED_HOST.get().create(f.level);bat.inherit(EntityType.BAT.create(f.level));bat.getRandom().setSeed(i);
+                join(f,bat,(i%4)*4-6,(i/4)*4-6);bats.add(bat);
+            }
+            for(int t=1;t<=99;t++)h.runAfterDelay(t,()->{for(int i=0;i<bats.size();i++)rise[i]=Math.max(rise[i],bats.get(i).getY()-f.origin.getY());});
+        },()->{for(int i=0;i<bats.size();i++)h.assertTrue(bats.get(i).isAlive()&&rise[i]>.6,"real no-target bat leaves a loaded open floor; seed="+i+" rise="+rise[i]+" age="+bats.get(i).tickCount+" position="+bats.get(i).position()+" target="+bats.get(i).getTarget());});
+    }
     @GameTest(template="wall_test",timeoutTicks=700,batch="automatic_contact_meal")
     public static void realAiFinishesAHighDamageDuelByConsumingAndRestoringItsWoundedBody(GameTestHelper h){var f=fixture(h);BlacklightInfectedHost[] pair=new BlacklightInfectedHost[2];
         f.after(180,()->{

@@ -1,5 +1,7 @@
 # 2026-10-28 全仓代码审计：NeoForge 1.21.1
 
+> 范围澄清：本报告的“全仓”指文件清点、扫描与关键路径复核，不表示每份文件都已逐份人工审完。后续人工审查按 `docs/audit/2026-10-28-file-review.json` 逐文件记录；其中 `pending` 仍是未审完，不能用本报告的测试数量代替。进展与新增修复见 `2026-10-28-file-by-file-audit.md`。
+
 ## 基线与方法
 
 - 原更新 PR #88 在 Build、Version policy 和 Closeout audit 全部通过后合并，主线基线为 `e168daa3e9748e6d989bc789e1147a47a1df5ed4`。

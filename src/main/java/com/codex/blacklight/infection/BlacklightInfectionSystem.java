@@ -20,6 +20,9 @@ import java.util.Comparator;
 
 public final class BlacklightInfectionSystem {
     private static final double HUNT_RADIUS = 14.0D;
+    // Entity publication and inventory drops invoke synchronous third-party
+    // callbacks. Reserve the source for the complete conversion transaction.
+    private static final java.util.Set<Mob> CONVERTING = java.util.Collections.newSetFromMap(new java.util.IdentityHashMap<>());
 
     private BlacklightInfectionSystem() {
     }
@@ -124,9 +127,29 @@ public final class BlacklightInfectionSystem {
     }
 
     private static void convertHost(Mob source, ServerLevel level) {
+        if (!level.getServer().isSameThread() || source.level() != level || !source.isAlive()
+                || source.isRemoved() || !CONVERTING.add(source)) return;
+        try {
+            publishReplacement(source, level);
+        } finally {
+            CONVERTING.remove(source);
+        }
+    }
+
+    private static boolean liveReplacement(Mob source, com.codex.blacklight.entity.BlacklightInfectedHost infected, ServerLevel level) {
+        return source.isAlive() && !source.isRemoved() && source.level() == level && isInfected(source)
+                && infected.isAlive() && !infected.isRemoved() && infected.level() == level;
+    }
+
+    private static void publishReplacement(Mob source, ServerLevel level) {
         var infected = com.codex.blacklight.registry.ModEntities.INFECTED_HOST.get().create(level);
         if (infected == null) return;
         infected.inherit(source);
+        // inherit() also prepares equipment for standalone authored fixtures.
+        // During a real replacement the source owns those stacks until commit;
+        // a join callback must never be able to take a second copy from the host.
+        for (var slot : net.minecraft.world.entity.EquipmentSlot.values())
+            infected.setItemSlot(slot, net.minecraft.world.item.ItemStack.EMPTY);
         infected.copyPosition(source);
         infected.yBodyRot=source.yBodyRot;infected.yHeadRot=source.yHeadRot;
         infected.setDeltaMovement(source.getDeltaMovement());
@@ -135,10 +158,14 @@ public final class BlacklightInfectionSystem {
         source.getTags().forEach(infected::addTag);
         // The source and its inventory survive if another mod vetoes replacement.
         if (!level.addFreshEntity(infected)) return;
+        if (!liveReplacement(source, infected, level)) {
+            infected.discard();
+            return;
+        }
         // Conversion is not a kill: return stored possessions even with doMobLoot=false.
         // Never clear them before the replacement joins, and retain the source if an
         // item-spawn veto prevents returning a slot. Earlier accepted drops stay dropped.
-        if (!releaseStoredItems(source, level)) {
+        if (!releaseStoredItems(source, level) || !liveReplacement(source, infected, level)) {
             infected.discard();
             source.getPersistentData().putLong("BlacklightConversionRetry", level.getGameTime() + 200);
             return;
