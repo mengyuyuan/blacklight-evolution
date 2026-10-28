@@ -16,6 +16,16 @@ import net.neoforged.neoforge.gametest.*;
 
 @GameTestHolder("blacklight") @PrefixGameTestTemplate(false)
 public final class TissueMetabolismGameTest {
+    private static long baselineDayTime;
+    // These exact-cost examples isolate the base coefficient. World-day scaling
+    // has separate rules tests and must not depend on the order of 400+ fixtures.
+    @BeforeBatch(batch="tissue_metabolism") public static void baselineClock(net.minecraft.server.level.ServerLevel level){
+        var overworld=level.getServer().overworld();baselineDayTime=overworld.getDayTime();overworld.setDayTime(0);
+    }
+    @AfterBatch(batch="tissue_metabolism") public static void restoreClock(net.minecraft.server.level.ServerLevel level){
+        level.getServer().overworld().setDayTime(baselineDayTime);
+    }
+
     private static BlacklightInfectedHost host(GameTestHelper h,TissueCore core){
         var level=h.getLevel();var host=ModEntities.INFECTED_HOST.get().create(level);
         host.inherit(EntityType.COW.create(level));long seed=1;while(TissueCore.forSeed(seed)!=core)seed++;

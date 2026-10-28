@@ -19,6 +19,7 @@ public final class BlockThrowSystem {
     public static final TagKey<Block> THROWABLE=TagKey.create(Registries.BLOCK,ResourceLocation.fromNamespaceAndPath("blacklight","throwable_blocks"));
     public static final TagKey<Block> UNGRABBABLE=TagKey.create(Registries.BLOCK,ResourceLocation.fromNamespaceAndPath("blacklight","ungrabbable_blocks"));
     private static final ThreadLocal<net.neoforged.neoforge.event.level.BlockEvent.BreakEvent> OWN_BREAK = new ThreadLocal<>();
+    private static final java.util.Set<ServerPlayer> PICKUPS=java.util.Collections.newSetFromMap(new java.util.IdentityHashMap<>());
     private BlockThrowSystem(){}
     /** Only our exact grab event bypasses the vanilla-interaction lock. Other protection listeners still run. */
     public static boolean ownsBreakEvent(net.neoforged.neoforge.event.level.BlockEvent.BreakEvent event){return OWN_BREAK.get()==event;}
@@ -49,6 +50,10 @@ public final class BlockThrowSystem {
     public static boolean request(ServerPlayer p){return request(p,false);}
     public static boolean request(ServerPlayer p,boolean large){return request(p,large?ThrowObjectSize.terrainLimit(level(p)):1,0,null);}
     public static boolean request(ServerPlayer p,int limit,long seed,BlockPos selected){
+        if(p==null||!p.getServer().isSameThread()||!PICKUPS.add(p))return false;
+        try{return extract(p,limit,seed,selected);}finally{PICKUPS.remove(p);}
+    }
+    private static boolean extract(ServerPlayer p,int limit,long seed,BlockPos selected){
         if(!p.mayBuild()||!p.isAlive()||p.isSpectator()||p.isPassenger()||p.getData(ModAttachments.CONSUMING))return false;
         var state=p.getData(ModAttachments.PLAYER_STATE);
         if(!canUse(p))return false;
@@ -73,6 +78,12 @@ public final class BlockThrowSystem {
         var origin=new BlockPos(minX,minY,minZ);var cells=new java.util.ArrayList<BlockThrowCargo.Cell>();for(var entry:selection.entrySet())cells.add(new BlockThrowCargo.Cell(entry.getKey().subtract(origin),entry.getValue()));
         var projectile=new ThrownBlock(level,p,block);projectile.setCargo(new BlockThrowCargo(cells));projectile.setPos(p.position());
         if(!level.addFreshEntity(projectile))return false;
+        // Join listeners may change the owner, mode, dimension or capture state.
+        // A successful add is not permission to remove terrain after that callback.
+        if(projectile.isRemoved()||projectile.level()!=level||projectile.getOwner()!=p||projectile.holderId()!=p.getId()
+                ||!canUse(p)||p.level()!=level||!p.mayBuild()||p.getData(ModAttachments.CONSUMING)){
+            projectile.discard();return false;
+        }
         var removed=new java.util.ArrayList<BlockPos>();
         for(var entry:selection.entrySet()){
             if(level.getBlockState(entry.getKey())!=entry.getValue()||!level.setBlock(entry.getKey(),net.minecraft.world.level.block.Blocks.AIR.defaultBlockState(),2)){

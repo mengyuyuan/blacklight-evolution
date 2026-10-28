@@ -15,6 +15,16 @@ import net.neoforged.neoforge.gametest.*;
 
 @GameTestHolder("blacklight") @PrefixGameTestTemplate(false)
 public final class InfectionLifecycleGameTest {
+    private static long baselineDayTime;
+    // These exact-cost examples isolate the base coefficient. World-day scaling
+    // has separate rules tests and must not depend on the order of 400+ fixtures.
+    @BeforeBatch(batch="lifecycle_sparse_growth") public static void baselineClock(net.minecraft.server.level.ServerLevel level){
+        var overworld=level.getServer().overworld();baselineDayTime=overworld.getDayTime();overworld.setDayTime(0);
+    }
+    @AfterBatch(batch="lifecycle_sparse_growth") public static void restoreClock(net.minecraft.server.level.ServerLevel level){
+        level.getServer().overworld().setDayTime(baselineDayTime);
+    }
+
     @GameTest(template="wall_test",timeoutTicks=60,batch="lifecycle_sparse_growth")
     public static void MatureOrganDevelopmentBatchesPayloadsAndKeepsPaidWorkOnReload(GameTestHelper h){
         var level=h.getLevel();var origin=h.absolutePos(new BlockPos(5,140,5));

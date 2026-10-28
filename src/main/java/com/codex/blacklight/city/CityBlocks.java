@@ -26,7 +26,7 @@ public final class CityBlocks {
         for(var block:java.util.List.of(FLESH,FIBER,VEIN,SHELL,WOUNDED,LAYER,HATCH,SAC))ITEMS.registerSimpleBlockItem(block);
         TABS.register("city",()->CreativeModeTab.builder().title(Component.translatable("city.blacklight.tab"))
             .icon(()->FLESH.get().asItem().getDefaultInstance()).displayItems((p,out)->{
-                out.accept(TRANSIT.get());for(var block:java.util.List.of(FLESH,FIBER,VEIN,SHELL,WOUNDED,LAYER,HATCH,SAC))out.accept(block.get());
+                for(var block:java.util.List.of(FLESH,FIBER,VEIN,SHELL,WOUNDED,LAYER,HATCH,SAC))out.accept(block.get());
             }).build());
     }
     public static void register(IEventBus bus){BLOCKS.register(bus);ITEMS.register(bus);TABS.register(bus);}

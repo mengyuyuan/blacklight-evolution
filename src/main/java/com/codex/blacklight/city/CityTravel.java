@@ -29,13 +29,13 @@ public final class CityTravel {
 
     @SubscribeEvent public static void commands(RegisterCommandsEvent event) {
         var root = Commands.literal("blacklightcity")
-            .then(Commands.literal("travel").executes(c -> travel(c.getSource().getPlayerOrException())))
+            .then(Commands.literal("travel").requires(s -> s.hasPermission(2)).executes(c -> travel(c.getSource().getPlayerOrException())))
             .then(losAngelesCommand())
-            .then(Commands.literal("shenzhen").executes(c -> travelToCity(c.getSource().getPlayerOrException(),false)))
+            .then(Commands.literal("shenzhen").requires(s -> s.hasPermission(2)).executes(c -> travelToCity(c.getSource().getPlayerOrException(),false)))
             .then(Commands.literal("cities").executes(c -> {
                 c.getSource().sendSuccess(()->Component.translatable("city.blacklight.destinations"),false);return 1;
             }))
-            .then(Commands.literal("futian").executes(c -> travel(c.getSource().getPlayerOrException(),CITY)))
+            .then(Commands.literal("futian").requires(s -> s.hasPermission(2)).executes(c -> travel(c.getSource().getPlayerOrException(),CITY)))
             .then(Commands.literal("credits").executes(c -> {
                 c.getSource().sendSuccess(()->Component.literal("黑光维度 · 深圳 / Los Angeles: Map data © OpenStreetMap contributors (ODbL 1.0), Geofabrik Guangdong 2026-10-14 / Southern California 2026-10-24; elevation Mapzen Terrain Tiles / USGS / NOAA; Futian core / entire municipal Los Angeles: Arnis 3.3.0; Los Angeles land cover ESA WorldCover. https://www.openstreetmap.org/copyright"),false);return 1;
             }))
@@ -104,7 +104,7 @@ public final class CityTravel {
         "venice",new double[]{-118.469517253,33.984993368},
         "san_pedro",new double[]{-118.2923,33.7361});
     private static com.mojang.brigadier.builder.LiteralArgumentBuilder<net.minecraft.commands.CommandSourceStack> losAngelesCommand(){
-        var root=Commands.literal("losangeles").executes(c->travelLosAngeles(c.getSource().getPlayerOrException(),"downtown"));
+        var root=Commands.literal("losangeles").requires(s -> s.hasPermission(2)).executes(c->travelLosAngeles(c.getSource().getPlayerOrException(),"downtown"));
         for(String place:LOS_ANGELES_PLACES.keySet())root.then(Commands.literal(place).executes(c->travelLosAngeles(c.getSource().getPlayerOrException(),place)));
         root.then(Commands.literal("places").executes(c->{c.getSource().sendSuccess(()->Component.translatable("city.blacklight.los_angeles_places"),false);return 1;}));
         return root;
@@ -175,6 +175,7 @@ public final class CityTravel {
         }finally{cancelTravel(p);}
     }
     @SubscribeEvent public static void logout(PlayerEvent.PlayerLoggedOutEvent event){if(event.getEntity() instanceof ServerPlayer p)cancelTravel(p);}
+    @SubscribeEvent public static void cloned(PlayerEvent.Clone event){if(event.getOriginal() instanceof ServerPlayer p)cancelTravel(p);}
     @SubscribeEvent public static void stopping(net.neoforged.neoforge.event.server.ServerStoppingEvent event){
         for(var pending:PENDING.values())pending.ticket.release();PENDING.clear();
     }

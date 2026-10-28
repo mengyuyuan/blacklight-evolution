@@ -1,4 +1,5 @@
 {
+  "city.blacklight.hydra_required": "培育并喂养活性组织，待其成熟后通过九头蛇进入黑光维度。",
   "screen.blacklight.section.organs": "器官研究",
   "screen.blacklight.organ_row": "强化 %s · 样本 %s",
   "screen.blacklight.organ_max": "强化已满阶",
@@ -699,7 +700,7 @@
   "upgrade.blacklight.cnidocyte_battery": "刺丝囊阵列",
   "city.blacklight.los_angeles_welcome": "已进入黑光维度 · 洛杉矶。/blacklightcity losangeles places 查看区域入口；通行信标或 /blacklightcity travel 返回原世界。",
   "city.blacklight.destinations": "黑光维度城市：洛杉矶 /blacklightcity losangeles；深圳 /blacklightcity shenzhen；返回原世界 /blacklightcity travel。",
-  "city.blacklight.destinations_hint": "城市列表：/blacklightcity cities",
+  "city.blacklight.destinations_hint": "旧版管理员调试物品；生存传送请培育成熟九头蛇。",
   "screen.blacklight.section.evolution": "无限进化",
   "screen.blacklight.infinite_rank": "等级 %s · 可持续强化",
   "screen.blacklight.infinite_stats": "当前 %s 级 → 下一阶 %s 级\n本次消耗：%s 进化点",

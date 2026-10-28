@@ -92,9 +92,11 @@ public final class NativeInfectedCombatGameTest {
     }
     @GameTest(template="wall_test",timeoutTicks=70,batch="native_movement")
     public static void infectedSlimeActuallyJumpsAndBatActuallyFlies(GameTestHelper h){
-        var slime=body(h,EntityType.SLIME);var target=enemy(h,slime,new Vec3(0,0,10));slime.setTarget(target);var bat=body(h,EntityType.BAT);bat.setPos(bat.position().add(4,0,0));var seenJump=new java.util.concurrent.atomic.AtomicBoolean();double initial=bat.getY();
-        for(int i=1;i<50;i++)h.runAfterDelay(i,()->{if(slime.getY()>target.getY()+.3)seenJump.set(true);});
-        h.runAfterDelay(55,()->{try{h.assertTrue(seenJump.get(),"slime uses real hopping locomotion instead of walking");h.assertTrue(bat.getY()>initial+.3,"bat lifts itself into actual free flight");}finally{end();}h.succeed();});
+        var slime=body(h,EntityType.SLIME);var target=enemy(h,slime,new Vec3(0,0,10));slime.setTarget(target);var bat=body(h,EntityType.BAT);bat.setPos(bat.position().add(4,0,0));var seenJump=new java.util.concurrent.atomic.AtomicBoolean();var seenFlight=new java.util.concurrent.atomic.AtomicBoolean();double initial=bat.getY();
+        for(int i=1;i<50;i++)h.runAfterDelay(i,()->{if(slime.getY()>target.getY()+.3)seenJump.set(true);if(bat.getY()>initial+.3&&bat.isNoGravity())seenFlight.set(true);});
+        // Roaming may descend again after taking off; test the actual flight path,
+        // rather than requiring a random bat to finish above its initial altitude.
+        h.runAfterDelay(55,()->{try{h.assertTrue(seenJump.get(),"slime uses real hopping locomotion instead of walking");h.assertTrue(seenFlight.get(),"bat lifts itself into actual free flight");}finally{end();}h.succeed();});
     }
     @GameTest(template="wall_test",timeoutTicks=110,batch="native_water")
     public static void infectedSquidSwimsInsteadOfSinkingLikeALandMob(GameTestHelper h){
