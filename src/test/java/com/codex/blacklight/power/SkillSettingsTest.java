@@ -17,8 +17,8 @@ class SkillSettingsTest {
     }
 
     @Test void disablingBlockBreakingSurvivesSaveAndNetworkRoundTrips() {
-        for (boolean enabled : new boolean[]{false, true}) for(boolean borer:new boolean[]{false,true}) for(boolean pickup:new boolean[]{false,true}) {
-            var settings = new SkillSettings(enabled,borer,pickup,35);
+        for (boolean enabled : new boolean[]{false, true}) for(boolean borer:new boolean[]{false,true}) for(boolean pickup:new boolean[]{false,true}) for(boolean precision:new boolean[]{false,true}) {
+            var settings = new SkillSettings(enabled,borer,pickup,35,precision);
             var saved = SkillSettings.CODEC.encodeStart(JsonOps.INSTANCE, settings).getOrThrow();
             assertEquals(settings, SkillSettings.CODEC.parse(JsonOps.INSTANCE, saved).getOrThrow());
             var packet = Unpooled.buffer();
@@ -75,5 +75,13 @@ class SkillSettingsTest {
         assertFalse(com.codex.blacklight.network.WingSpeedPayload.valid(0));
         assertTrue(com.codex.blacklight.network.WingSpeedPayload.valid(10));
         assertTrue(com.codex.blacklight.network.WingSpeedPayload.valid(100));
+    }
+    @Test void wingAppearanceChangesOnlyItsOwnSavedChoice(){
+        var old=SkillSettings.DEFAULT.withWingSpeed(45).withBulletdive(false).withShieldBorer(true).withPrototypeItemPickup(false);
+        var request=new com.codex.blacklight.network.SkillSettingsPayload(com.codex.blacklight.network.SkillSettingsPayload.Setting.PRECISION_WINGS,true);
+        var precision=request.apply(old);
+        assertTrue(precision.precisionWings());assertEquals(old,precision.withPrecisionWings(false));
+        assertTrue(precision.withWingSpeed(70).withBulletdive(true).withShieldBorer(false).withPrototypeItemPickup(true).precisionWings());
+        assertFalse(SkillSettings.CODEC.parse(JsonOps.INSTANCE,JsonParser.parseString("{\"wing_speed_percent\":45}")).getOrThrow().precisionWings(),"Existing saves keep classic wings");
     }
 }

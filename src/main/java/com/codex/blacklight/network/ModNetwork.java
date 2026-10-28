@@ -19,9 +19,9 @@ public final class ModNetwork {
     }
 
     public static void register(RegisterPayloadHandlersEvent event) {
-        // Tissue anatomy adds synchronized entity metadata. Reject mixed old/new builds
-        // during negotiation instead of decoding an unknown metadata index in-game.
-        event.registrar("standalone-38-infected-native-combat")
+        // Wing appearance extends the saved/synchronized settings tuple. Negotiate
+        // the layout before joining so older clients cannot misread its last field.
+        event.registrar("standalone-39-wing-appearance")
                 .playToClient(InfectedImpactPayload.TYPE,InfectedImpactPayload.STREAM_CODEC,(payload,context)->context.enqueueWork(()->com.codex.blacklight.client.renderer.InfectedImpactVisuals.accept(payload)))
                 .playToClient(DistrictZonePayload.TYPE,DistrictZonePayload.STREAM_CODEC,(payload,context)->context.enqueueWork(()->com.codex.blacklight.client.DistrictZoneHud.accept(payload)))
                 .playToServer(DisguiseSelectPayload.TYPE,DisguiseSelectPayload.STREAM_CODEC,(payload,context)->context.enqueueWork(()->{

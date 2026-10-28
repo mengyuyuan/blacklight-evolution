@@ -13,7 +13,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 /** Cached skinned surfaces; file IO and vertex construction never occur in the render loop. */
-public final class SovereignWingModel {
+public final class SovereignWingModel implements WingSurface {
     private record Vertex(float x,float y,float z,float u,float v,float nx,float ny,float nz,Bone a,Bone b,float blend){}
     private static final class Bone {
         final Quaternionf[] folded={new Quaternionf(),new Quaternionf()};
@@ -186,5 +186,11 @@ public final class SovereignWingModel {
             output.addVertex(viewPrepared[at],viewPrepared[at+1],viewPrepared[at+2],-1,v.u,v.v,
                     OverlayTexture.NO_OVERLAY,light,viewPrepared[at+3],viewPrepared[at+4],viewPrepared[at+5]);at+=6;
         }
+    }
+    @Override public void draw(PoseStack stack,net.minecraft.client.renderer.MultiBufferSource buffers,int light){
+        var color=net.minecraft.resources.ResourceLocation.fromNamespaceAndPath("blacklight","textures/sovereign_wings.png");
+        var glow=net.minecraft.resources.ResourceLocation.fromNamespaceAndPath("blacklight","textures/sovereign_wings_emissive.png");
+        render(stack,buffers.getBuffer(net.minecraft.client.renderer.RenderType.entityCutoutNoCull(color)),light);
+        render(stack,buffers.getBuffer(net.minecraft.client.renderer.RenderType.eyes(glow)),net.minecraft.client.renderer.LightTexture.FULL_BRIGHT);
     }
 }

@@ -787,5 +787,11 @@
   "subtitle.blacklight.infection.resonance_charge": "Blacklight resonance charge",
   "subtitle.blacklight.infection.resonance": "Blacklight resonance",
   "subtitle.blacklight.infection.mend": "Blacklight mend",
-  "subtitle.blacklight.infection.ground": "Blacklight ground"
+  "subtitle.blacklight.infection.ground": "Blacklight ground",
+  "setting.blacklight.wing_appearance": "Wing appearance",
+  "setting.blacklight.wing_appearance.desc": "Choose classic or precision wings. Your choice applies immediately, is saved, and is visible to other players. Both share flight abilities and upgrades.",
+  "setting.blacklight.wing_appearance.row_classic": "Current: Classic wings",
+  "setting.blacklight.wing_appearance.row_precision": "Current: Precision wings",
+  "setting.blacklight.wing_appearance.classic": "Current: Classic (click to switch)",
+  "setting.blacklight.wing_appearance.precision": "Current: Precision (click to switch)"
 }
