@@ -201,3 +201,24 @@ Native schematic tree author: paleozoey, https://www.planetminecraft.com/member/
 Arnis assets/tree-packs/ATTRIBUTION.md credits the artist without stating a separate tree-art license;
 the generator's Apache license is not relabeled as the artist's independent license.
 Source links, modifications, hashes and reproduction: docs/worldgen/LOS_ANGELES_SOURCES.md.
+
+## User-supplied precision Sovereign Wings appearance (2026-10-28)
+
+The optional precision appearance is derived from the user-provided
+`sovereign_wings_precision.glb`, original SHA-256
+`e5067dba2f4388d8f462ca64b9b6271b5d68a57b2433f2b4e131a8d902542738`.
+The user requested its integration and finer materials. This is not a claim that
+the supplied model or its emission artwork was authored from scratch in this PR.
+
+Front/back color refinement and a separate side-wall atlas were generated with
+the built-in image generator; prompts and integration notes are preserved in
+`art/sovereign-wings/PRECISION_TEXTURE_PROMPTS.md`. Original emission is retained.
+The editable accepted neutral GLB, its SHA, material UV derivation and lossless
+runtime packer are recorded in `art/sovereign-wings/PRECISION_APPEARANCE.md`.
+
+Only the 157,041-triangle accepted playback mesh and refined textures are loaded
+by the mod. The separate full-resolution original is not shipped as a runtime
+asset. Fixed chest binding, mirrored whole-wing rotations and uniform folding
+are project adaptations using the existing wing-motion controller. No new
+Prototype 2 flyer motion or sound files are included. The classic wing model,
+existing animation lineage and earlier attribution remain unchanged.

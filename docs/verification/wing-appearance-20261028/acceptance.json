@@ -1,0 +1,74 @@
+{
+  "artifact": "Blacklight-Ascension-MC1.21.1-NeoForge-0.3.5-preview.20261028-wing-switch.1-bundled.jar",
+  "sha256": "6198a368310d3da5c0a2c8779e24b50260a4b7ad0ae3f1401f3de9579466aef5",
+  "jar_bytes": 153361339,
+  "tests": {
+    "tests": 795,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "classic_resource_files_identical_to_HEAD": 26,
+  "new_resources_verified": 8,
+  "export_reproduced_byte_identically": true,
+  "private_QA_excluded": true,
+  "native_checks": {
+    "first": {
+      "completed": true,
+      "error": "",
+      "checks": [
+        "classic appearance remains default",
+        "wings equipped",
+        "client received server-owned precision choice",
+        "appearance keeps personal speed",
+        "new appearance uses real wing flight state",
+        "switch back to classic without a restart",
+        "server keeps precision choice for save",
+        "appearance did not unlock unrelated forms"
+      ],
+      "case": "first"
+    },
+    "reload": {
+      "completed": true,
+      "error": "",
+      "checks": [
+        "saved precision choice reloaded on actual client",
+        "saved choice reloaded on server"
+      ],
+      "case": "reload"
+    },
+    "performance": {
+      "precision": {
+        "frames": 269,
+        "median_render_ms": 5.7525,
+        "p95_render_ms": 10.8818
+      },
+      "classic": {
+        "frames": 268,
+        "median_render_ms": 4.9262,
+        "p95_render_ms": 17.4874
+      },
+      "completed": true,
+      "error": "",
+      "checks": [],
+      "case": "performance"
+    },
+    "ui": {
+      "completed": true,
+      "error": "",
+      "checks": [
+        "appearance button active",
+        "settings label follows saved precision choice",
+        "real settings button switched to classic",
+        "real settings button switched back to precision"
+      ],
+      "case": "ui",
+      "artifact_sha256": "6198a368310d3da5c0a2c8779e24b50260a4b7ad0ae3f1401f3de9579466aef5"
+    }
+  },
+  "limits": [
+    "Local isolated single-player client + integrated server, not a two-client dedicated-server soak test.",
+    "Rigid whole-wing binding, not a complete multi-joint Prototype 2 flyer retarget.",
+    "A separate full-code audit/server suite is not claimed complete by these checks."
+  ]
+}

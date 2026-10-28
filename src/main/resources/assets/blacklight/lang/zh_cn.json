@@ -787,5 +787,11 @@
   "subtitle.blacklight.infection.resonance_charge": "共振蓄势",
   "subtitle.blacklight.infection.resonance": "血肉共振",
   "subtitle.blacklight.infection.mend": "组织织合",
-  "subtitle.blacklight.infection.ground": "重击落地"
+  "subtitle.blacklight.infection.ground": "重击落地",
+  "setting.blacklight.wing_appearance": "翅膀外观",
+  "setting.blacklight.wing_appearance.desc": "选择原有翅膀或精细翅膀，即时生效并保存。其他玩家也能看到你选择的外观。两套共用飞行能力和升级。",
+  "setting.blacklight.wing_appearance.row_classic": "当前：原有翅膀",
+  "setting.blacklight.wing_appearance.row_precision": "当前：精细翅膀",
+  "setting.blacklight.wing_appearance.classic": "当前：原有翅膀（点击切换）",
+  "setting.blacklight.wing_appearance.precision": "当前：精细翅膀（点击切换）"
 }

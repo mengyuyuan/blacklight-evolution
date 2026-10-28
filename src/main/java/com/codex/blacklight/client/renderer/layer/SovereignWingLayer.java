@@ -17,8 +17,7 @@ import java.util.Map;
 import java.util.WeakHashMap;
 
 public final class SovereignWingLayer extends RenderLayer<AbstractClientPlayer,PlayerModel<AbstractClientPlayer>> {
-    private static final ResourceLocation COLOR=ResourceLocation.fromNamespaceAndPath("blacklight","textures/sovereign_wings.png"),GLOW=ResourceLocation.fromNamespaceAndPath("blacklight","textures/sovereign_wings_emissive.png");
-    private SovereignWingModel model;
+    private WingSurface classic,precision;
     private static final class Blend {
         boolean enabled,airborne;double changed,airChanged;float from,airFrom;
     }
@@ -40,7 +39,11 @@ public final class SovereignWingLayer extends RenderLayer<AbstractClientPlayer,P
             deployment=WingMorphTimeline.progress(enabled,elapsed);
             air=Math.max(air,WingMorphTimeline.unfurl(enabled,elapsed));
         }
-        if(deployment<.001)return;if(model==null)model=new SovereignWingModel();
+        if(deployment<.001)return;
+        WingSurface model;
+        if(p.getData(com.codex.blacklight.registry.ModAttachments.SKILL_SETTINGS).precisionWings()){
+            if(precision==null)precision=new PrecisionWingModel();model=precision;
+        }else{if(classic==null)classic=new SovereignWingModel();model=classic;}
         var flight=p.getData(com.codex.blacklight.registry.ModAttachments.WING_FLIGHT);
         var wingPose=com.codex.blacklight.client.animation.WingAnimationSnapshot.sample(p,partial);
         stack.pushPose();
@@ -53,8 +56,7 @@ public final class SovereignWingLayer extends RenderLayer<AbstractClientPlayer,P
         var strokeAxis=SovereignWingMotion.strokeAxis(chest.getUnnormalizedRotation(new Quaternionf()));
         model.prepare(wingPose,strokeAxis,deployment,air,flight.foldVariant());
         model.prepareRender(stack);
-        model.render(stack,buffer.getBuffer(RenderType.entityCutoutNoCull(COLOR)),light);
-        model.render(stack,buffer.getBuffer(RenderType.eyes(GLOW)),LightTexture.FULL_BRIGHT);
+        model.draw(stack,buffer,light);
         if(airborne&&deployment>.95F)com.codex.blacklight.client.renderer.WingFlightEffects.capture(p,stack,model,partial);
         stack.popPose();
     }
