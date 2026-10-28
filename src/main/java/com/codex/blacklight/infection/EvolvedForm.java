@@ -5,7 +5,7 @@ public final class EvolvedForm {
     public static final int DURATION=200,COMMIT=120;
     private EvolvedForm(){}
     public static boolean eligible(TissueInheritance genes,long age){
-        return genes.qualified()&&genes.acquiredOrgans()>=6&&genes.meals()>=6&&genes.readyToHunt(age);
+        return genes.qualified()&&genes.acquiredOrgans()>=6&&genes.meals()>=6&&genes.hasMatureInheritance()&&genes.readyToHunt(age);
     }
     public static float smooth(float x){x=Math.clamp(x,0,1);return x*x*(3-2*x);}
     public static float oldBody(float ticks){return 1-smooth((ticks-25)/80);}

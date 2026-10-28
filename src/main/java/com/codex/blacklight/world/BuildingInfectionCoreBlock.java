@@ -10,12 +10,13 @@ import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.state.*;
 
 /** Fixed core, separate from the Hydra gateway and from authored city hive ports. */
-public final class BuildingInfectionCoreBlock extends HorizontalDirectionalBlock {
+public final class BuildingInfectionCoreBlock extends HorizontalDirectionalBlock implements EntityBlock {
     public static final MapCodec<BuildingInfectionCoreBlock> CODEC = simpleCodec(BuildingInfectionCoreBlock::new);
     public BuildingInfectionCoreBlock(Properties p) {
         super(p); registerDefaultState(stateDefinition.any().setValue(FACING, Direction.NORTH).setValue(TissueAttachmentBlock.AGE, 0));
     }
     @Override protected MapCodec<? extends HorizontalDirectionalBlock> codec() { return CODEC; }
+    @Override public net.minecraft.world.level.block.entity.BlockEntity newBlockEntity(BlockPos pos,BlockState state) { return new BuildingHeartBlockEntity(pos,state); }
     @Override protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> b) { b.add(FACING, TissueAttachmentBlock.AGE); }
     @Override public BlockState getStateForPlacement(BlockPlaceContext c) {
         if(c.getLevel() instanceof ServerLevel server && !BuildingInfectionSystem.canRegister(server,c.getClickedPos())) {
@@ -24,6 +25,14 @@ public final class BuildingInfectionCoreBlock extends HorizontalDirectionalBlock
         }
         return defaultBlockState().setValue(FACING, c.getClickedFace().getAxis().isHorizontal() ? c.getClickedFace() : c.getHorizontalDirection().getOpposite());
     }
+    @Override protected net.minecraft.world.ItemInteractionResult useItemOn(net.minecraft.world.item.ItemStack stack,BlockState state,Level level,BlockPos pos,
+            net.minecraft.world.entity.player.Player player,net.minecraft.world.InteractionHand hand,net.minecraft.world.phys.BlockHitResult hit){
+        if(com.codex.blacklight.infection.ColonyFeeding.food(stack)!=null){
+            if(level.isClientSide)return net.minecraft.world.ItemInteractionResult.SUCCESS;
+            if(level instanceof ServerLevel server&&com.codex.blacklight.infection.ColonyFeeding.feed(server,pos,player,hand))return net.minecraft.world.ItemInteractionResult.CONSUME;
+        }
+        return net.minecraft.world.ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+    }
     @Override protected net.minecraft.world.InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos,
             net.minecraft.world.entity.player.Player player, net.minecraft.world.phys.BlockHitResult hit) {
         if(level instanceof ServerLevel server) {
@@ -31,7 +40,7 @@ public final class BuildingInfectionCoreBlock extends HorizontalDirectionalBlock
             if(colony.isPresent()) {
                 var c=colony.get();
                 int percent=(int)Math.min(100,100L*c.activeTicks/(com.codex.blacklight.infection.BuildingInfectionConfig.MATURITY.get()*20L));
-                player.displayClientMessage(net.minecraft.network.chat.Component.translatable("building.blacklight.status",c.stage+1,percent,c.surfaces.size()),true);
+                player.displayClientMessage(net.minecraft.network.chat.Component.translatable("building.blacklight.supply_status",c.stage+1,percent,c.surfaces.size(),c.supply.reserve(),c.supply.queued()),true);
             } else player.displayClientMessage(net.minecraft.network.chat.Component.translatable("building.blacklight.site_unavailable"),true);
         }
         return net.minecraft.world.InteractionResult.sidedSuccess(level.isClientSide);

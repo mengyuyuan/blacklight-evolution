@@ -14,6 +14,23 @@ import net.neoforged.neoforge.event.level.BlockEvent;
 public final class BuildingBiomassSystem {
     private static final ThreadLocal<Boolean> UPDATING=ThreadLocal.withInitial(()->false);
     private BuildingBiomassSystem() {}
+    public static boolean clearAfterDeath(ServerLevel level,BuildingInfectionData.Colony c,BlockPos pos){
+        if(!c.dead)return false;var state=level.getBlockState(pos);if(!state.is(ModBlocks.BUILDING_BIOMASS.get())&&!state.is(ModBlocks.TISSUE_ATTACHMENT.get()))return false;
+        boolean updating=UPDATING.get();UPDATING.set(true);
+        try{boolean cleared=NaturalInfectionPlacement.place(level,pos,net.minecraft.world.level.block.Blocks.AIR.defaultBlockState());if(cleared&&state.is(ModBlocks.BUILDING_BIOMASS.get()))c.massBlocks=Math.max(0,c.massBlocks-1);return cleared;}
+        finally{if(updating)UPDATING.set(true);else UPDATING.remove();}
+    }
+    private static boolean mouthCell(BlockPos origin,net.minecraft.core.Direction facing,BlockPos pos){
+        int x=pos.getX()-origin.getX(),z=pos.getZ()-origin.getZ(),forward=x*facing.getStepX()+z*facing.getStepZ(),side=x*facing.getStepZ()-z*facing.getStepX(),y=pos.getY()-origin.getY();
+        return forward>=1&&forward<=2&&side==0&&y>=0&&y<2;
+    }
+    public static boolean openMouth(ServerLevel level,BuildingInfectionData.Colony c){
+        var root=level.getBlockState(c.origin);if(!root.hasProperty(BuildingInfectionCoreBlock.FACING))return false;var facing=root.getValue(BuildingInfectionCoreBlock.FACING);
+        for(int distance=1;distance<=2;distance++)for(int y=0;y<2;y++){
+            var pos=c.origin.relative(facing,distance).above(y);if(!level.hasChunkAt(pos)||!BuildingInfectionSystem.allowedSite(level,pos))continue;
+            var state=level.getBlockState(pos);if(state.is(ModBlocks.BUILDING_BIOMASS.get())){change(level,c,pos,state,net.minecraft.world.level.block.Blocks.AIR.defaultBlockState(),false);return true;}
+        }return false;
+    }
     public static void removed(ServerLevel level,BlockPos pos) {
         if(UPDATING.get())return;
         var data=BuildingInfectionData.get(level);
@@ -39,6 +56,10 @@ public final class BuildingBiomassSystem {
                 ||Math.abs(cell.y())>BuildingInfectionConfig.HEIGHT.get()||!level.hasChunkAt(pos)||!level.isPositionEntityTicking(pos)
                 ||!BuildingInfectionSystem.allowedSite(level,pos))return;
         var before=level.getBlockState(pos);boolean own=before.is(ModBlocks.BUILDING_BIOMASS.get());
+        var root=level.getBlockState(c.origin);
+        if(root.hasProperty(BuildingInfectionCoreBlock.FACING)&&mouthCell(c.origin,root.getValue(BuildingInfectionCoreBlock.FACING),pos)){
+            if(own)change(level,c,pos,before,net.minecraft.world.level.block.Blocks.AIR.defaultBlockState(),false);return;
+        }
         if(!own&&!before.isAir()&&!before.is(ModBlocks.TISSUE_ATTACHMENT.get()))return;
         int age=(int)Math.min(24000,12000L*c.activeTicks/(BuildingInfectionConfig.MATURITY.get()*20L));
         int mask=BuildingBiomassField.mask(c.mass.stems,cell.x(),cell.y(),cell.z(),age,c.massDisabled);
@@ -50,6 +71,7 @@ public final class BuildingBiomassSystem {
         if(!before.equals(desired))change(level,c,pos,before,desired,!own);
     }
     private static void change(ServerLevel level,BuildingInfectionData.Colony c,BlockPos pos,BlockState before,BlockState next,boolean placed) {
+        if(placed&&!c.supply.pay(2))return;boolean committed=false;
         var snapshot=BlockSnapshot.create(level.dimension(),level,pos);boolean updating=UPDATING.get();UPDATING.set(true);
         try {
             if(!level.setBlock(pos,next,3))return;
@@ -70,6 +92,7 @@ public final class BuildingBiomassSystem {
             }
             if(!level.getBlockState(pos).equals(next))return;
             if(placed)c.massBlocks++;else if(next.isAir())c.massBlocks=Math.max(0,c.massBlocks-1);
-        }finally{if(updating)UPDATING.set(true);else UPDATING.remove();}
+            committed=true;BuildingInfectionData.get(level).setDirty();
+        }finally{if(placed&&!committed)c.supply.refund(2);if(updating)UPDATING.set(true);else UPDATING.remove();}
     }
 }

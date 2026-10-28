@@ -124,6 +124,11 @@ conversion steps and project edits are documented in
 
 Recorded source packs: StarNinjas sword sounds (CC0), artisticdude Swishes (CC0), and Philippe Groarke / Socapex combat sounds (CC BY-SA 3.0). Source URLs, archives and full upstream attribution are in `art/weapon-audio/`. Edited/mixed derivatives are distributed under CC BY-SA 3.0 separately from the code license. Packaged credits: `META-INF/licenses/blacklight-audio/`. See `docs/WEAPON_DEFENSE_AUDIO_ZH.md` for the 41 events / 123 variants and validation scope. No Prototype unpacked audio is added.
 
+The infection audio bank (2026-10-28) uses the same approved Swishes and Socapex
+recordings: 14 events, three variants each. These layered/filtered derivatives
+retain CC BY-SA 3.0 and the same packaged upstream credits. Reproduction:
+`tools/build_infected_audio.py`. No new proprietary game audio is bundled.
+
 
 ### Hydra and Hunter continuous skins and motion
 
@@ -168,6 +173,19 @@ independent player skeleton. `art/motion-profile/basic_dodge_roll.json` includes
 source hash and frame segments. The source's end frame 55 is clamped to the
 actual last frame 52. Six invulnerability ticks and MC displacement are gameplay
 adaptations, not verified original values.
+
+## Additional P2-derived Evolved weapon surfaces (2026-10-27)
+
+`models/evolved_variants/` adds fitted weapon geometry from locally extracted
+Prototype 2 `alex_hammerfist3`, `alex_claws3`, `alex_tendril3`, `heller_shield_3`,
+`alex_claws2`, and `alex_tendril2`, alongside the previously disclosed Runner1 blades.
+These surfaces remain source-game derivatives; they are not claimed as original
+weapon geometry. Original topology is fitted onto the existing 67-joint MC rig.
+Source colour regions are mapped to a small MC vertex palette; original game texture
+files are not shipped. The model JSON and `docs/design/evolved-variants-geometry.json`
+record source hashes and face counts. The new character clothing details and special
+combat behavior are mod adaptations, not claims that those named variants or
+mechanics exist unchanged in Prototype 2. Existing source-derived asset notices apply.
 
 ## Whole municipal Los Angeles Arnis scenery (2026-10-26)
 

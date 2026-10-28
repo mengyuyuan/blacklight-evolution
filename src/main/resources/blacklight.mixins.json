@@ -11,6 +11,7 @@
     "TheTitansNeoDiveMixin",
     "TheTitansNeoTagsMixin",
     "ShulkerReflectionAccess",
+    "ShulkerPeekAccess",
     "LivingDeathAccess",
     "BulletdiveBlockFeedbackMixin",
     "BulletdiveItemMergeAccess",

@@ -30,10 +30,10 @@ public final class ConsumeReceiverScene {
                         if(!Float.isFinite(time)||time<0||time>=finish)throw new IllegalArgumentException("Invalid receiver impact");
                         hits.add(time);
                     }
-                    if (!java.util.Set.of("HEAD_CRUSH","HEAD_IMPACT","LASH","ARM_RIP","CHEST_ABSORB").contains(style)
+                    if (!java.util.Set.of("SEVER","HEAD_CRUSH","HEAD_IMPACT","LASH","ARM_RIP","CHEST_ABSORB").contains(style)
                             || !Float.isFinite(effect)||!Float.isFinite(finish)||!Float.isFinite(settle)
                             || !Float.isFinite(deform)||deform<0||deform>=finish
-                            || effect<0||finish<=effect||finish>20||settle<=0||settle>=finish-effect)
+                            || effect<0||finish<=effect||finish>20||settle<=0||settle>=finish-Math.max(effect,deform))
                         throw new IllegalArgumentException("Invalid receiver events: "+entry.getKey());
                     loaded.put(entry.getKey(), new Profile(style,deform,java.util.List.copyOf(hits),effect,finish,settle));
                 }

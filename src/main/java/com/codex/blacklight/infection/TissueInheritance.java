@@ -96,6 +96,7 @@ public final class TissueInheritance {
     public long acquiredOrgans(){return acquiredOrgans;}
     public double points(){return points;}
     public boolean qualified(){return qualified;}
+    public boolean hasMatureInheritance(){return organs.values().stream().anyMatch(o->o.mature()&&o.pending()==0&&o.integrated()>0);}
     public UUID lastOperation(){return lastOperation;}
     public long revision(){return revision;}
     private long nextRevision(){return revision==Long.MAX_VALUE?revision:revision+1;}
@@ -188,10 +189,26 @@ public final class TissueInheritance {
         return (changed?new TissueInheritance(result,meals,points,qualified,lastOperation,nextRevision(),acquiredOrgans,dormant,bodies):this).latch(nativeCore,age,rules);
     }
     private TissueInheritance latch(TissueCore nativeCore,long age,Rules rules){
-        if(qualified||acquiredOrgans<MIN_ACQUIRED_ORGANS||meals<rules.meals()||points<rules.points())return this;
-        for(var core:new TissueCore[]{TissueCore.MUSCLE,TissueCore.CARAPACE,TissueCore.JAW,TissueCore.GRASP})
-            if(strength(core,nativeCore,age)<rules.strong()||maturity(core,nativeCore,age)<1)return this;
+        // Six personally completed mature meals, then let the acquired bias
+        // choose the form. Do not require a balanced set of four legacy organs.
+        if(qualified||acquiredOrgans<MIN_ACQUIRED_ORGANS||meals<Math.max(MIN_ACQUIRED_ORGANS,rules.meals())||!hasMatureInheritance()||!readyToHunt(age))return this;
         return new TissueInheritance(organs,meals,points,true,lastOperation,nextRevision(),acquiredOrgans,dormant,sources);
+    }
+    /** Paid development of already integrated organs. Food never manufactures
+     * donor identities, assimilation points or accepted consumption counts. */
+    public TissueInheritance cultivate(long paidTicks,TissueCore nativeCore,long age,Rules rules){
+        if(paidTicks<=0||organs.isEmpty())return this;
+        var result=new EnumMap<TissueCore,Organ>(TissueCore.class);boolean changed=false;
+        double work=Math.min(paidTicks,TissueMetabolism.CULTIVATION_BATCH)/24000D;
+        for(var entry:organs.entrySet()){
+            var organ=entry.getValue();
+            if(organ.mature()&&organ.pending()==0&&organ.integrated()>0){
+                double strength=add(organ.integrated(),20*work);
+                var grown=new Organ(strength,0,0,0,organ.weapons(),organ.variant(),organ.donorPlan());
+                result.put(entry.getKey(),grown);changed|=!grown.equals(organ);
+            }else result.put(entry.getKey(),organ);
+        }
+        return (changed?new TissueInheritance(result,meals,points,qualified,lastOperation,nextRevision(),acquiredOrgans,dormant,sources):this).latch(nativeCore,age,rules);
     }
     /** Added attributes use acquired strength only; native-age modifiers already exist. */
     public TissueEvolution.Combat combat(){

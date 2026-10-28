@@ -4,13 +4,21 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 class TissueMetabolismTest {
-    @Test void reservePaysForActivityInsteadOfDecayingAtRest(){
-        var idle=TissueMetabolism.budget(15,35,TissueMetabolism.demand(48000,false,false));
+    @Test void GeneticUpdatesAccumulatePaidWorkRatherThanSendingFullAncestryEverySecond(){
+        var batch=new TissueMetabolism.Cultivation(0,0);
+        for(int i=0;i<59;i++){batch=TissueMetabolism.cultivation(batch.remainder(),20);assertEquals(0,batch.work());}
+        assertEquals(1180,batch.remainder());assertEquals(new TissueMetabolism.Cultivation(0,1200),TissueMetabolism.cultivation(batch.remainder(),20));
+        assertEquals(new TissueMetabolism.Cultivation(19,1200),TissueMetabolism.cultivation(1199,20));
+        assertEquals(new TissueMetabolism.Cultivation(31,0),TissueMetabolism.cultivation(31,0));
+        assertEquals(new TissueMetabolism.Cultivation(1199,1200),TissueMetabolism.cultivation(Integer.MAX_VALUE,Long.MAX_VALUE));
+    }
+    @Test void reservePaysForDevelopmentInsteadOfDecayingAfterGrowthStops(){
+        var idle=TissueMetabolism.budget(15,35,TissueMetabolism.demand(Long.MAX_VALUE,false,false));
         assertEquals(new TissueMetabolism.Budget(15,35,false),idle);
         var b=new TissueMetabolism.Budget(8,0,false);
         for(int second=0;second<20;second++)b=TissueMetabolism.budget(b.reserve(),b.debt(),TissueMetabolism.demand(0,false,false));
         assertEquals(7,b.reserve());assertEquals(20,b.debt());
-        assertEquals(10,TissueMetabolism.demand(48000,true,false));assertEquals(20,TissueMetabolism.demand(48000,false,true));
+        assertEquals(10,TissueMetabolism.demand(48000,true,false));assertEquals(30,TissueMetabolism.demand(48000,false,true));
         assertFalse(TissueMetabolism.budget(0,95,30).supplied());
     }
     @Test void newInfectionsHaveABoundedBodyReserveAndFractionalCostsCannotBeForgiven(){
@@ -18,7 +26,15 @@ class TissueMetabolismTest {
         assertEquals(24,TissueMetabolism.initialReserve(Float.MAX_VALUE));
         assertEquals(new TissueMetabolism.Budget(0,0,true,.5),TissueMetabolism.budget(1,95,10));
         var b=TissueMetabolism.budget(5,95,10);assertEquals(4,b.reserve());assertEquals(5,b.debt());
-        assertTrue(TissueMetabolism.growing(48000,true));assertFalse(TissueMetabolism.growing(48000,false));
+        assertTrue(TissueMetabolism.growing(48000,true));assertTrue(TissueMetabolism.growing(48000,false));
+    }
+    @Test void FoodStillBuysRealDevelopmentAfterTheAncientBoundary(){
+        for(long age:new long[]{48000,72000,240000,816000}){
+            int demand=TissueMetabolism.demand(age,false,false);
+            var paid=TissueMetabolism.budget(10,0,demand);
+            assertTrue(demand>0&&paid.supplied()&&paid.fraction()>0);
+            assertTrue(TissueMetabolism.growing(age,false));
+        }
     }
     @Test void stageFoodIncreasesAndWorldDaysAccelerateBiologyWithoutMoreSimulationLoops(){
         assertEquals(4,TissueMetabolism.phaseFood(0));assertEquals(7,TissueMetabolism.phaseFood(12000));

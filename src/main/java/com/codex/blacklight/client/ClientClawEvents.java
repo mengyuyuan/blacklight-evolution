@@ -107,10 +107,12 @@ public final class ClientClawEvents {
             event.registerEntityRenderer(type.get(),context->new com.codex.blacklight.client.renderer.BlacklightCreatureRenderer<com.codex.blacklight.entity.BlacklightMutant>(context,com.codex.blacklight.entity.BlacklightMutant::asset));
         event.registerEntityRenderer(ModEntities.HIVE_TENDRIL.get(),com.codex.blacklight.client.renderer.HiveTendrilRenderer::new);
         event.registerEntityRenderer(ModEntities.BLACKLIGHT_HIVE.get(),context->new com.codex.blacklight.client.renderer.BlacklightCreatureRenderer<com.codex.blacklight.entity.BlacklightHive>(context,e->"blacklight_hive"));
-        event.registerEntityRenderer(ModEntities.BLACKLIGHT_SPIT.get(),ThrownItemRenderer::new);
+        event.registerEntityRenderer(ModEntities.BLACKLIGHT_SPIT.get(),com.codex.blacklight.client.renderer.BlacklightSpitRenderer::new);
+        event.registerEntityRenderer(ModEntities.EVOLVED_QUILL.get(),com.codex.blacklight.client.renderer.EvolvedQuillRenderer::new);
+        event.registerEntityRenderer(ModEntities.INFECTED_TUMOR.get(),com.codex.blacklight.client.renderer.InfectedTumorRenderer::new);
         event.registerEntityRenderer(ModEntities.BLACKLIGHT_HUNTER.get(), com.codex.blacklight.client.renderer.BlacklightHunterRenderer::new);
         event.registerEntityRenderer(ModEntities.BLACKLIGHT_HYDRA.get(), com.codex.blacklight.client.renderer.BlacklightHydraRenderer::new);
-        event.registerEntityRenderer(ModEntities.BLACKLIGHT_VIRUS_VIAL.get(), ThrownItemRenderer::new);
+        event.registerEntityRenderer(ModEntities.BLACKLIGHT_VIRUS_VIAL.get(), com.codex.blacklight.client.renderer.VirusVialRenderer::new);
     }
 
     @SubscribeEvent

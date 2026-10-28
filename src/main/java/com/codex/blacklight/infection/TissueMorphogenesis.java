@@ -141,7 +141,102 @@ public final class TissueMorphogenesis {
         float w=box.span(principal(right)),h=box.span(principal(up)),d=box.span(principal(front));
         boolean limb=b.role>=2&&b.role<=5,fore=b.role==2||b.role==3;
         float side=b.modelCentre.x<0?-1:1;V outer=right.mul(side);
-        if(core==TissueCore.TENDON&&limb){
+        if(core==TissueCore.OSTEODERM&&b.role==0){
+            V normal=plan==0?front.mul(-1):up,along=plan==0?up:front;
+            float length=plan==0?h:d,thickness=plan==0?d:h;
+            for(int sign:new int[]{-1,1}){
+                V root=c.add(right.mul(sign*w*.20F)).add(along.mul(length*.30F)).add(normal.mul(thickness*.30F));
+                organ(out,core.id+"_dermal_plate_"+sign,1,"",right,null,List.of(new Section(root,w*.13F,thickness*.08F),
+                        new Section(root.sub(along.mul(length*.18F)).add(normal.mul(thickness*.18F)),w*.23F,thickness*.13F),
+                        new Section(root.sub(along.mul(length*.62F)).add(normal.mul(thickness*.13F)),w*.17F,thickness*.09F)),right,normal,b,seed);
+            }
+        }else if(core==TissueCore.NACRE&&b.role==0){
+            for(int layer=0;layer<3;layer++){
+                V root=c.add(up.mul(h*(.28F-layer*.17F))).add(front.mul(d*.42F));
+                organ(out,core.id+"_lamella_"+layer,2,"",right,null,List.of(new Section(root,w*.24F,d*.06F),
+                        new Section(root.sub(up.mul(h*.12F)).add(front.mul(d*.18F)),w*.45F,d*.10F),
+                        new Section(root.sub(up.mul(h*.23F)).add(front.mul(d*.10F)),w*.34F,d*.055F)),right,front,b,seed);
+            }
+        }else if(core==TissueCore.VASCULAR&&b.role==0){
+            V root=c.sub(up.mul(h*.22F)).add(front.mul(d*.18F));
+            organ(out,core.id+"_sinus",1,"",right,null,List.of(new Section(root,w*.18F,d*.12F),
+                    new Section(root.sub(up.mul(h*.10F)).add(front.mul(d*.20F)),w*.23F,d*.17F),
+                    new Section(root.sub(up.mul(h*.18F)).add(front.mul(d*.27F)),w*.12F,d*.09F)),right,front,b,seed);
+        }else if(core==TissueCore.GILL_LAMELLA&&b.role==1){
+            for(int sign:new int[]{-1,1}){
+                V root=c.add(right.mul(sign*w*.30F)).sub(up.mul(h*.22F));
+                organ(out,core.id+"_operculum_"+sign,0,"",right,null,List.of(new Section(root,h*.15F,d*.14F),
+                        new Section(root.add(right.mul(sign*w*.17F)).sub(front.mul(d*.05F)),h*.19F,d*.18F),
+                        new Section(root.add(right.mul(sign*w*.13F)).sub(front.mul(d*.23F)),h*.12F,d*.07F)),up,front,b,seed);
+            }
+        }else if(core.vital()&&core!=TissueCore.GILL_LAMELLA&&b.role==0){
+            if(core==TissueCore.LUNG||core==TissueCore.AIRFLOW){
+                for(int sign:new int[]{-1,1}){V root=c.add(up.mul(h*.25F)).add(right.mul(sign*w*.16F));
+                    organ(out,core.id+"_lobe_"+sign,1,"",right,null,List.of(new Section(root,w*.10F,d*.13F),
+                            new Section(root.sub(up.mul(h*.18F)),w*.20F,d*.23F),new Section(root.sub(up.mul(h*(core==TissueCore.AIRFLOW?.48F:.35F))),w*.12F,d*.17F)),right,front,b,seed);
+                }
+            }else if(core==TissueCore.BOOK_LUNG||core==TissueCore.TRACHEA){
+                for(int sign:new int[]{-1,1}){V root=c.add(right.mul(sign*w*.34F)).sub(up.mul(h*.18F));
+                    organ(out,core.id+"_vent_"+sign,2,"",right,null,List.of(new Section(root,w*.05F,d*.12F),
+                            new Section(root.add(front.mul(d*.18F)).sub(up.mul(h*.08F)),w*.09F,d*.20F),
+                            new Section(root.sub(front.mul(d*.18F)).sub(up.mul(h*(core==TissueCore.TRACHEA?.32F:.16F))),w*.045F,d*.16F)),right,front,b,seed);
+                }
+            }else if(core==TissueCore.BRANCHIAL_HEART){
+                for(int sign:new int[]{-1,1}){V root=c.add(up.mul(h*.24F)).add(right.mul(sign*w*.22F));
+                    organ(out,core.id+"_pump_"+sign,0,"",right,null,List.of(new Section(root,w*.07F,d*.09F),new Section(root.sub(up.mul(h*.13F)),w*.12F,d*.15F),new Section(root.sub(up.mul(h*.21F)),w*.07F,d*.08F)),right,front,b,seed);
+                }
+            }else{
+                V root=c.add(up.mul(h*(core==TissueCore.HEART?.20F:-.08F))).add(right.mul(core==TissueCore.SPLEEN?-w*.24F:0)).add(front.mul(d*.12F));
+                organ(out,core.id+"_reservoir",1,"",right,null,List.of(new Section(root,w*.08F,d*.10F),new Section(root.sub(up.mul(h*.14F)),w*.17F,d*.18F),new Section(root.sub(up.mul(h*.25F)),w*.07F,d*.08F)),right,front,b,seed);
+            }
+        }else if(core==TissueCore.GILL_RAKER&&b.role==1){
+            for(int sign:new int[]{-1,1})for(int fold=0;fold<2;fold++){
+                V root=c.add(right.mul(sign*w*.33F)).add(front.mul(d*(.05F+fold*.18F))).sub(up.mul(h*.22F));
+                organ(out,core.id+"_sieve_"+sign+"_"+fold,0,"",right,null,List.of(new Section(root,w*.08F,d*.09F),
+                        new Section(root.add(right.mul(sign*w*.12F)).sub(up.mul(h*.10F)),w*.10F,d*.12F),
+                        new Section(root.add(front.mul(d*.12F)).sub(up.mul(h*.14F)),w*.035F,d*.05F)),right,front,b,seed);
+            }
+        }else if(core==TissueCore.EXTRAORAL&&b.role==1){
+            for(int sign:new int[]{-1,1}){
+                V root=c.add(front.mul(d*.32F)).add(up.mul(sign*h*.13F));
+                organ(out,core.id+"_contact_"+sign,0,"",right,null,List.of(new Section(root,w*.18F,h*.06F),
+                        new Section(root.add(front.mul(d*.25F)),w*.32F,h*.10F),
+                        new Section(root.add(front.mul(d*.48F)),w*.38F,h*.04F)),right,up,b,seed);
+            }
+        }else if(core.digestive()&&core!=TissueCore.GILL_RAKER&&b.role==(core==TissueCore.CROP?1:0)){
+            if(core==TissueCore.CROP){
+                V root=c.sub(up.mul(h*.30F)).add(front.mul(d*.10F));
+                organ(out,core.id+"_pouch",0,"",right,null,List.of(new Section(root,w*.20F,d*.18F),
+                        new Section(root.sub(up.mul(h*.16F)).add(front.mul(d*.14F)),w*.30F,d*.29F),
+                        new Section(root.sub(up.mul(h*.27F)),w*.19F,d*.18F)),right,front,b,seed);
+            }else if(core==TissueCore.GIZZARD){
+                V root=c.sub(up.mul(h*.22F)).add(front.mul(d*.14F));
+                organ(out,core.id+"_ventral",2,"",right,null,List.of(new Section(root,w*.23F,d*.19F),
+                        new Section(root.sub(up.mul(h*.22F)),w*.32F,d*.26F),
+                        new Section(root.sub(up.mul(h*.31F)),w*.21F,d*.17F)),right,front,b,seed);
+            }else if(core==TissueCore.FERMENT){
+                V root=c.sub(up.mul(h*.23F)).sub(front.mul(d*.16F));
+                organ(out,core.id+"_chamber",1,"",right,null,List.of(new Section(root,w*.24F,d*.17F),
+                        new Section(root.sub(up.mul(h*.18F)).sub(front.mul(d*.11F)),w*.36F,d*.26F),
+                        new Section(root.sub(up.mul(h*.25F)).add(front.mul(d*.13F)),w*.29F,d*.20F),
+                        new Section(root.sub(up.mul(h*.27F)).add(front.mul(d*.27F)),w*.18F,d*.12F)),right,front,b,seed);
+            }else if(core==TissueCore.ABSORPTIVE){
+                V root=c.sub(up.mul(h*.26F)).add(right.mul(w*.13F));
+                organ(out,core.id+"_fold",1,"",right,null,List.of(new Section(root,w*.14F,d*.14F),
+                        new Section(root.sub(up.mul(h*.15F)).add(front.mul(d*.16F)),w*.21F,d*.20F),
+                        new Section(root.sub(up.mul(h*.20F)).sub(front.mul(d*.17F)),w*.17F,d*.16F)),right,front,b,seed);
+            }else if(core==TissueCore.PANCREAS){
+                V root=c.sub(up.mul(h*.24F)).sub(right.mul(w*.16F));
+                organ(out,core.id+"_lobe",1,"",right,null,List.of(new Section(root,w*.15F,d*.14F),
+                        new Section(root.sub(up.mul(h*.13F)).add(front.mul(d*.15F)),w*.19F,d*.18F),
+                        new Section(root.sub(up.mul(h*.19F)).add(front.mul(d*.24F)),w*.10F,d*.10F)),right,front,b,seed);
+            }else{
+                V root=c.sub(up.mul(h*.23F));
+                organ(out,core.id+"_pad",2,"",right,null,List.of(new Section(root,w*.30F,d*.28F),
+                        new Section(root.sub(up.mul(h*.20F)),w*.44F,d*.41F),
+                        new Section(root.sub(up.mul(h*.28F)),w*.35F,d*.30F)),right,front,b,seed);
+            }
+        }else if(core==TissueCore.TENDON&&limb){
             V root=c.add(up.mul(h*.32F)).sub(front.mul(d*.37F));
             organ(out,core.id+"_cable",2,"",right,null,List.of(new Section(root,w*.22F,d*.11F),
                     new Section(c.sub(front.mul(d*.48F)),w*.13F,d*.13F),
@@ -183,6 +278,29 @@ public final class TissueMorphogenesis {
                         new Section(root.add(front.mul(d*.42F)),w*.22F,h*.09F),
                         new Section(root.add(front.mul(d*.62F)).sub(up.mul(jaw*h*.18F)),w*.08F,h*.06F)),right,up,b,seed);
             }
+        }else if(core==TissueCore.SADDLE&&fore){
+            V root=c.add(up.mul(h*.35F)).sub(front.mul(d*.25F));
+            organ(out,core.id+"_spring",2,"",right,null,List.of(new Section(root,w*.26F,d*.16F),
+                    new Section(c.add(up.mul(h*.10F)).sub(front.mul(d*.65F)),w*.48F,d*.22F),
+                    new Section(c.sub(up.mul(h*.24F)).sub(front.mul(d*.20F)),w*.28F,d*.18F)),right,front,b,seed);
+        }else if(core==TissueCore.CLUB&&fore){
+            V root=c.sub(up.mul(h*.12F));
+            organ(out,core.id+"_head",1,"",right,null,List.of(new Section(root,w*.27F,d*.26F),
+                    new Section(c.sub(up.mul(h*.34F)),w*.38F,d*.34F),
+                    new Section(c.sub(up.mul(h*.53F)).add(front.mul(d*.14F)),w*.70F,d*.56F),
+                    new Section(c.sub(up.mul(h*.70F)).add(front.mul(d*.12F)),w*.57F,d*.44F)),right,front,b,seed);
+        }else if(core==TissueCore.TONGUE&&b.role==1){
+            V root=c.add(front.mul(d*.30F)).sub(up.mul(h*.12F));
+            organ(out,core.id+"_tether",0,"",right,null,List.of(new Section(root,w*.14F,h*.08F),
+                    new Section(root.add(front.mul(d*.85F)),w*.12F,h*.07F),
+                    new Section(root.add(front.mul(d*1.65F)),w*.09F,h*.06F),
+                    new Section(root.add(front.mul(d*2.4F)),w*.19F,h*.10F)),right,up,b,seed);
+        }else if(core==TissueCore.CNIDOCYTE&&fore){
+            V root=c.add(up.mul(h*.24F)).add(outer.mul(w*.38F));
+            organ(out,core.id+"_battery",1,"",right,null,List.of(new Section(root,w*.20F,d*.21F),
+                    new Section(c.add(outer.mul(w*.52F)),w*.28F,d*.30F),
+                    new Section(c.sub(up.mul(h*.35F)).add(outer.mul(w*.42F)),w*.20F,d*.20F),
+                    new Section(c.sub(up.mul(h*.49F)).add(outer.mul(w*.45F)).add(front.mul(d*.24F)),w*.07F,d*.07F)),right,front,b,seed);
         }
         return out.stream().map(m->TissueSilhouette.fit(b,m)).toList();
     }
@@ -192,9 +310,9 @@ public final class TissueMorphogenesis {
         return functional(core,functionalMount(core,body,seed),plan,seed);
     }
     public static Bone functionalMount(TissueCore core,Bone body,long seed){
-        boolean sided=core==TissueCore.BLADE||core==TissueCore.CHELA||core==TissueCore.HYDROSTAT;
-        int role=switch(core){case HORN,PHARYNX->1;case TENDON,HYDRAULIC->4;default->2;};
-        int side=!sided?0:core==TissueCore.BLADE?TissueOrganLayout.bladeSide(seed):-TissueOrganLayout.bladeSide(seed);
+        boolean sided=core==TissueCore.BLADE||core==TissueCore.CHELA||core==TissueCore.HYDROSTAT||core==TissueCore.CLUB||core==TissueCore.SADDLE||core==TissueCore.CNIDOCYTE;
+        int role=(core.defensive()||core.colonial()||core.digestive()&&core!=TissueCore.CROP&&core!=TissueCore.GILL_RAKER||core.vital()&&core!=TissueCore.GILL_LAMELLA)?0:switch(core){case HORN,PHARYNX,TONGUE,CROP,EXTRAORAL,GILL_RAKER,GILL_LAMELLA->1;case TENDON,HYDRAULIC->4;default->2;};
+        int side=!sided?0:core==TissueCore.BLADE||core==TissueCore.CLUB?TissueOrganLayout.bladeSide(seed):-TissueOrganLayout.bladeSide(seed);
         V c=body.box.centre(),half=body.box.high.sub(body.box.low).mul(sided?.24F:.32F);
         V centre=c.add(body.right.mul(side*span(body.box,body.right)*.38F));
         return new Bone(body.path+"/grown_"+side,role,new Box(centre.sub(half),centre.add(half)),body.up,body.forward,body.right,

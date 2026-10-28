@@ -27,11 +27,12 @@ public final class EvolvedBalance {
     private static ResourceLocation id(String suffix){return ResourceLocation.fromNamespaceAndPath("blacklight","evolved_"+suffix);}
     public static void apply(BlacklightInfectedHost host){
         boolean active=host.isEvolved();var r=rules();
-        CombatScale.modifier(host.getAttribute(Attributes.MAX_HEALTH),id("health"),active?r.health-1:0,AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL);
-        CombatScale.modifier(host.getAttribute(Attributes.ATTACK_DAMAGE),id("attack"),active?r.attack-1:0,AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL);
-        CombatScale.modifier(host.getAttribute(Attributes.ARMOR),id("armor"),active?r.armor:0,AttributeModifier.Operation.ADD_VALUE);
+        var kind=host.evolvedArchetype();
+        CombatScale.modifier(host.getAttribute(Attributes.MAX_HEALTH),id("health"),active?r.health*kind.health-1:0,AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL);
+        CombatScale.modifier(host.getAttribute(Attributes.ATTACK_DAMAGE),id("attack"),active?r.attack*kind.attack-1:0,AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL);
+        CombatScale.modifier(host.getAttribute(Attributes.ARMOR),id("armor"),active?r.armor+kind.armor:0,AttributeModifier.Operation.ADD_VALUE);
         CombatScale.modifier(host.getAttribute(Attributes.ARMOR_TOUGHNESS),id("toughness"),active?r.toughness:0,AttributeModifier.Operation.ADD_VALUE);
-        CombatScale.modifier(host.getAttribute(Attributes.MOVEMENT_SPEED),id("speed"),active?r.speed-1:0,AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL);
+        CombatScale.modifier(host.getAttribute(Attributes.MOVEMENT_SPEED),id("speed"),active?r.speed*kind.speed-1:0,AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL);
         CombatScale.modifier(host.getAttribute(Attributes.KNOCKBACK_RESISTANCE),id("knockback"),active?r.knockback:0,AttributeModifier.Operation.ADD_VALUE);
         if(active)host.getAttribute(Attributes.FOLLOW_RANGE).setBaseValue(Math.max(64,host.getAttributeValue(Attributes.FOLLOW_RANGE)));
     }

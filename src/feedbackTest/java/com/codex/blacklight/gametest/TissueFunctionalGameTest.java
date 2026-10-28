@@ -17,6 +17,61 @@ import net.neoforged.neoforge.gametest.*;
 
 @GameTestHolder("blacklight") @PrefixGameTestTemplate(false)
 public final class TissueFunctionalGameTest {
+    @GameTest(template="wall_test",timeoutTicks=85,batch="organ_saddle_ai")
+    public static void saddleSpringActuallyPreemptsBasicMeleeAndReleasesOneChargedStrike(GameTestHelper h){
+        charged(h,TissueCore.SADDLE);
+    }
+    @GameTest(template="wall_test",timeoutTicks=90,batch="organ_club_ai")
+    public static void clubActuallyWindsUpHitsOnceAndRecovers(GameTestHelper h){charged(h,TissueCore.CLUB);}
+    private static void charged(GameTestHelper h,TissueCore core){
+        var host=actor(h,core);var target=victim(h,6,5);host.setTarget(target);
+        var hits=new java.util.concurrent.atomic.AtomicInteger();var started=new java.util.concurrent.atomic.AtomicBoolean();
+        java.util.function.Consumer<net.neoforged.neoforge.event.entity.living.LivingDamageEvent.Post> listener=e->{if(e.getEntity()==target&&e.getSource().getEntity()==host&&host.organActionCore()==core&&e.getNewDamage()>0)hits.incrementAndGet();};
+        net.neoforged.neoforge.common.NeoForge.EVENT_BUS.addListener(listener);
+        for(int tick=1;tick<=70;tick++)h.runAfterDelay(tick,()->{if(host.organActionCore()==core)started.set(true);});
+        h.runAfterDelay(72,()->{
+            try{h.assertTrue(started.get(),"actual AI, without manually starting a skill, selects its close-range "+core);
+                h.assertTrue(hits.get()==1&&target.getHealth()<1000,"charge releases exactly one accepted organ hit; hits="+hits.get());
+                h.assertTrue(host.organActionCore()==null,"organ releases control after its recovery");
+            }finally{net.neoforged.neoforge.common.NeoForge.EVENT_BUS.unregister(listener);host.discard();target.discard();}h.succeed();
+        });
+    }
+    @GameTest(template="wall_test",timeoutTicks=75,batch="organ_tongue")
+    public static void ballisticTongueReallyCapturesAtRangePullsAndReleases(GameTestHelper h){
+        var host=actor(h,TissueCore.TONGUE);var target=physicalVictim(h,9,5);double distance=host.distanceTo(target);start(h,host,target,TissueCore.TONGUE);
+        h.runAfterDelay(24,()->{
+            h.assertTrue(TissueGrapples.owner(target)==host,"extended tongue owns its actual distant target");
+            h.assertTrue(host.distanceTo(target)<distance-.25,"the tether actually pulls a physical victim, independent of delayed damage");
+        });
+        h.runAfterDelay(54,()->{
+            try{h.assertTrue(TissueGrapples.owner(target)==null&&host.organActionCore()==null,"tongue retracts without a permanent claim");
+                h.assertTrue(host.distanceTo(target)<distance-.25&&target.getHealth()<1000,"real physics pull and closure damage both occur without pulling inside the host's large body; before="+distance+" after="+host.distanceTo(target)+" hp="+target.getHealth());
+            }finally{host.discard();target.discard();}h.succeed();
+        });
+    }
+    @GameTest(template="wall_test",timeoutTicks=60,batch="organ_tongue_obstruction")
+    public static void tongueDropsItsClaimWhenThePathIsBlockedWithoutTeleportingTheVictim(GameTestHelper h){
+        var host=actor(h,TissueCore.TONGUE);var target=physicalVictim(h,9,5);start(h,host,target,TissueCore.TONGUE);
+        h.runAfterDelay(22,()->{
+            h.assertTrue(TissueGrapples.owner(target)==host,"the unobstructed cast first establishes a real tether");
+            for(int y=2;y<=6;y++)for(int z=3;z<=7;z++)h.setBlock(new BlockPos(7,y,z),Blocks.STONE);
+        });
+        h.runAfterDelay(42,()->{
+            try{h.assertTrue(TissueGrapples.owner(target)==null,"blocking the tether releases ownership");
+                h.assertTrue(target.getX()>=h.absolutePos(new BlockPos(8,2,5)).getX(),"the target stays on its own side of the solid wall");
+                h.assertTrue(target.getHealth()==1000,"a disconnected tongue cannot apply its delayed closure damage through the wall");
+            }finally{host.discard();target.discard();}h.succeed();
+        });
+    }
+    @GameTest(template="wall_test",timeoutTicks=65,batch="organ_cnidocyte")
+    public static void cnidocyteMakesActualContactDamageAndTemporarySlow(GameTestHelper h){
+        var host=actor(h,TissueCore.CNIDOCYTE);var target=victim(h,6,5);start(h,host,target,TissueCore.CNIDOCYTE);
+        h.runAfterDelay(18,()->h.assertTrue(target.getHealth()<1000&&target.hasEffect(net.minecraft.world.effect.MobEffects.MOVEMENT_SLOWDOWN),"real discharge damages and briefly slows the contacted target"));
+        h.runAfterDelay(60,()->{
+            try{h.assertTrue(!target.hasEffect(net.minecraft.world.effect.MobEffects.MOVEMENT_SLOWDOWN)&&host.organActionCore()==null,"slow expires before another organ charge can begin");}
+            finally{host.discard();target.discard();}h.succeed();
+        });
+    }
     private static BlacklightInfectedHost actor(GameTestHelper h,TissueCore core){
         for(int x=1;x<=13;x++)for(int z=1;z<12;z++){
             h.setBlock(new BlockPos(x,1,z),Blocks.STONE);for(int y=2;y<12;y++)h.setBlock(new BlockPos(x,y,z),Blocks.AIR);
@@ -28,10 +83,17 @@ public final class TissueFunctionalGameTest {
         host.setOnGround(true);h.getLevel().addFreshEntity(host);return host;
     }
     private static Mob victim(GameTestHelper h,int x,int z){
-        var target=EntityType.HUSK.create(h.getLevel());target.setNoAi(true);
+        var target=EntityType.HUSK.create(h.getLevel());target.setPersistenceRequired();target.setNoAi(true);
         target.getAttribute(Attributes.MAX_HEALTH).setBaseValue(1000);target.setHealth(1000);
         target.getPersistentData().putLong(InfectionRules.NEXT_CONTACT_EXPOSURE,Long.MAX_VALUE);
         target.setPos(h.absolutePos(new BlockPos(x,2,z)).getBottomCenter());h.getLevel().addFreshEntity(target);return target;
+    }
+    private static Mob physicalVictim(GameTestHelper h,int x,int z){
+        var target=victim(h,x,z);
+        // NoAI also disables vanilla's server-side travel. Preserve real travel and
+        // collision, while preventing navigation from moving the test subject.
+        target.setNoAi(false);target.getAttribute(Attributes.MOVEMENT_SPEED).setBaseValue(0);
+        return target;
     }
     private static void start(GameTestHelper h,BlacklightInfectedHost host,Mob target,TissueCore expected){
         host.setTarget(target);int food=host.tissueNutrition();

@@ -6,6 +6,16 @@ import static com.codex.blacklight.infection.TissueMorphogenesis.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 class TissueEvolutionTest {
+    @Test void planarNativeEarsRemainFiniteAfterMatureRemodeling(){
+        for(int axis=0;axis<3;axis++){
+            float[] high={3,5,2};high[axis]=0;
+            var b=new Bone("head/ear",1,new Box(new V(0,0,0),new V(high[0],high[1],high[2])),new V(0,-1,0),new V(0,0,-1),new V(1,0,0),new V(0,0,0));
+            for(long age:new long[]{48001,504000,10000000})for(var point:List.of(new V(0,0,0),new V(high[0],high[1],high[2]))){
+                var result=TissueEvolution.develop(b,point,TissueEvolution.authoredState(91,age),false);
+                assertTrue(Float.isFinite(result.x())&&Float.isFinite(result.y())&&Float.isFinite(result.z()));
+            }
+        }
+    }
     private static final V UP=new V(0,-1,0),FRONT=new V(0,0,-1),RIGHT=new V(1,0,0);
     private static Bone torso(){return new Bone("body",0,new Box(new V(-4,0,-2),new V(4,12,2)),UP,FRONT,RIGHT,new V(0,6,0));}
     @Test void approvedMatureAndAncientGeometryIncludingSpidersRemainsExact() {

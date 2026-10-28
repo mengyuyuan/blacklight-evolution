@@ -4,6 +4,13 @@ package com.codex.blacklight.infection;
 public final class TissueMetabolism {
     public static final int MAX_RESERVE=2400, BONUS_TICKS=180, RECOVERY_DELAY=100;
     public static final int WORK_PER_UNIT=100;
+    public static final int CULTIVATION_BATCH=1200;
+    public record Cultivation(int remainder,int work){}
+    /** Sparse genetic publications rather than a whole ancestry packet per second. */
+    public static Cultivation cultivation(int previous,long paidTicks){
+        int total=Math.clamp(previous,0,CULTIVATION_BATCH-1)+(int)Math.clamp(paidTicks,0,CULTIVATION_BATCH);
+        return total>=CULTIVATION_BATCH?new Cultivation(total-CULTIVATION_BATCH,CULTIVATION_BATCH):new Cultivation(total,0);
+    }
     public record Budget(int reserve,int debt,boolean supplied,double fraction) {
         public Budget(int reserve,int debt,boolean supplied){this(reserve,debt,supplied,supplied?1:0);}
     }
@@ -11,7 +18,7 @@ public final class TissueMetabolism {
     public static int clamp(int reserve){return Math.clamp(reserve,0,MAX_RESERVE);}
     public static int add(int reserve,int offered){return (int)Math.min(MAX_RESERVE,(long)clamp(reserve)+Math.max(0,offered));}
     public static int initialReserve(float originalHealth){return !Float.isFinite(originalHealth)||originalHealth<=0?0:Math.clamp(meal(originalHealth,TissueCore.MUSCLE)*2,8,24);}
-    public static boolean growing(long age,boolean integrating){return age<TissueGrowth.ANCIENT_TICKS||integrating;}
+    public static boolean growing(long age,boolean integrating){return age<Long.MAX_VALUE||integrating;}
     public static long growthPhase(long age){return TissueGrowth.generation(age);}
     public static double phaseFood(long age){return 4+3D*growthPhase(Math.max(0,age));}
     public static double worldSpeed(long overworldDayTime){return 1+Math.sqrt((Math.max(0,overworldDayTime)/24000L)/7D);}

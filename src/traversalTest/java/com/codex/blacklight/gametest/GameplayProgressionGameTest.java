@@ -76,35 +76,64 @@ public final class GameplayProgressionGameTest {
         h.assertTrue(!UtilityPowerSystem.active(p,PowerForm.ARMOR)&&UtilityPowerSystem.active(p,PowerForm.SHIELD)&&p.getArmorValue()==0,"shield replaces armour and removes its attributes");
         s.setPrototypeMode(false);p.tickCount=200;UtilityPowerSystem.tick(new PlayerTickEvent.Post(p));h.assertTrue(p.getData(ModAttachments.UTILITY_POWERS)==0,"normal mode clears utility powers");h.succeed();
     }
-    @GameTest(template="wall_test",timeoutTicks=100)
+    @GameTest(template="wall_test",timeoutTicks=4000,batch="hive_real_wave_lifecycle")
     public static void hiveGeneratesBuildingAndStopsAfterThreeWaves(GameTestHelper h){
-        var storage=h.getLevel().getServer().overworld().getDataStorage();
-        var original=com.codex.blacklight.infection.OutbreakData.get(h.getLevel().getServer());
-        var outbreak=new com.codex.blacklight.infection.OutbreakData();outbreak.start(h.getLevel().getServer().overworld().getGameTime());storage.set("blacklight_outbreak",outbreak);
+        var level=h.getLevel();var storage=level.getServer().overworld().getDataStorage();
+        var original=com.codex.blacklight.infection.OutbreakData.get(level.getServer());
+        var outbreak=new com.codex.blacklight.infection.OutbreakData();outbreak.start(level.getServer().overworld().getGameTime());storage.set("blacklight_outbreak",outbreak);
+        var spawnRule=level.getGameRules().getRule(net.minecraft.world.level.GameRules.RULE_DOMOBSPAWNING);
+        boolean oldSpawning=spawnRule.get();spawnRule.set(true,level.getServer());
+        var column=h.absolutePos(new net.minecraft.core.BlockPos(64,0,64));
+        var origin=new net.minecraft.core.BlockPos(column.getX(),220,column.getZ());
+        var box=new net.minecraft.world.phys.AABB(origin).inflate(24);
+        var forced=new java.util.HashSet<net.minecraft.world.level.ChunkPos>();
+        var viewer=new net.minecraft.server.level.ServerPlayer[1];
+        var core=new com.codex.blacklight.entity.BlacklightHive[1];
+        var births=new java.util.HashSet<UUID>();
+        java.util.function.Consumer<net.neoforged.neoforge.event.entity.EntityJoinLevelEvent> joined=e->{
+            if(e.getLevel()==level&&!e.loadedFromDisk()&&core[0]!=null&&e.getEntity().getPersistentData().hasUUID("BlacklightHiveGuard")&&e.getEntity().getPersistentData().getUUID("BlacklightHiveGuard").equals(core[0].getUUID()))births.add(e.getEntity().getUUID());
+        };
+        Runnable cleanup=()->{
+            net.neoforged.neoforge.common.NeoForge.EVENT_BUS.unregister(joined);
+            if(core[0]!=null){
+                for(var mob:level.getEntitiesOfClass(net.minecraft.world.entity.Mob.class,box,m->m.getPersistentData().hasUUID("BlacklightHiveGuard")&&m.getPersistentData().getUUID("BlacklightHiveGuard").equals(core[0].getUUID())))mob.discard();
+                core[0].discard();
+            }
+            if(viewer[0]!=null)level.removePlayerImmediately(viewer[0],net.minecraft.world.entity.Entity.RemovalReason.DISCARDED);
+            for(var cp:forced)level.setChunkForced(cp.x,cp.z,false);
+            spawnRule.set(oldSpawning,level.getServer());storage.set("blacklight_outbreak",original);
+        };
+        h.runAfterDelay(3900,cleanup);
         try {
-        var level=h.getLevel();var origin=new net.minecraft.core.BlockPos(1500,220,1500);
-        for(int x=-12;x<=12;x++)for(int z=-12;z<=12;z++)for(int y=-1;y<15;y++)level.setBlock(origin.offset(x,y,z),(y==-1?Blocks.STONE:Blocks.AIR).defaultBlockState(),2);
-        var feature=level.registryAccess().registryOrThrow(net.minecraft.core.registries.Registries.CONFIGURED_FEATURE).get(net.minecraft.resources.ResourceLocation.fromNamespaceAndPath("blacklight","hive"));
-        h.assertTrue(feature!=null&&feature.place(level,level.getChunkSource().getGenerator(),level.random,origin),"configured hive places a building");
-        h.assertTrue(level.getBlockState(origin.offset(5,5,5)).is(Blocks.SMOOTH_STONE)||level.getBlockState(origin.offset(5,5,5)).is(Blocks.CRACKED_STONE_BRICKS),"upper floor is real world geometry");
-        var box=new net.minecraft.world.phys.AABB(origin).inflate(20);var cores=level.getEntitiesOfClass(com.codex.blacklight.entity.BlacklightHive.class,box);h.assertTrue(cores.size()==1,"one core owns the encounter");
-        var p=FakePlayerFactory.get(level,new GameProfile(UUID.randomUUID(),"hive-waves"));p.moveTo(1500,220,1490,0,0);level.addNewPlayer(p);
-        var hive=cores.getFirst();
-        // A blocked random spawn point legitimately delays a wave by another cooldown.
-        // Allow those retries; the required wave count and reinforcement budget stay strict.
-        for(int t=0;t<2400&&hive.waves()<3;t++){hive.tickCount++;hive.tick();}
-        h.assertTrue(hive.waves()==3,"three reinforcement waves finish");
-        // Each wave starts with a hunter; random blocked secondary positions may
-        // reduce mutants without reducing the completed wave count.
-        java.util.function.Predicate<net.minecraft.world.entity.Mob> guard=mob->
-                mob.getPersistentData().hasUUID("BlacklightHiveGuard")
-                &&mob.getPersistentData().getUUID("BlacklightHiveGuard").equals(hive.getUUID());
-        int count=level.getEntitiesOfClass(net.minecraft.world.entity.Mob.class,box,guard).size();
-        h.assertTrue(count>=3&&count<=6,"wave budget caps active hunter and mutant reinforcements: guards="+count);
-        CompoundTag saved=new CompoundTag();hive.addAdditionalSaveData(saved);hive.readAdditionalSaveData(saved);
-        for(int t=0;t<300;t++){hive.tickCount++;hive.tick();}
-        h.assertTrue(level.getEntitiesOfClass(net.minecraft.world.entity.Mob.class,box,guard).size()==count,"reload does not refill wave budget");
-        for(var mob:level.getEntitiesOfClass(net.minecraft.world.entity.Mob.class,box))mob.discard();p.discard();h.succeed();
-        } finally {storage.set("blacklight_outbreak",original);}
+            for(int x=-1;x<=1;x++)for(int z=-1;z<=1;z++){
+                var cp=new net.minecraft.world.level.ChunkPos((origin.getX()>>4)+x,(origin.getZ()>>4)+z);
+                if(!level.getForcedChunks().contains(cp.toLong())){forced.add(cp);level.setChunkForced(cp.x,cp.z,true);}level.getChunk(cp.x,cp.z);
+            }
+            // Publication waits for genuine entity storage and ticking; no manual AI ticks.
+            h.startSequence().thenWaitUntil(()->h.assertTrue(level.isPositionEntityTicking(origin)&&level.areEntitiesLoaded(new net.minecraft.world.level.ChunkPos(origin).toLong()),"waiting for the real hive arena"))
+                .thenExecute(()->{
+                    try {
+                        for(int x=-12;x<=12;x++)for(int z=-12;z<=12;z++)for(int y=-1;y<15;y++)level.setBlock(origin.offset(x,y,z),(y==-1?Blocks.STONE:Blocks.AIR).defaultBlockState(),2);
+                        var feature=level.registryAccess().registryOrThrow(net.minecraft.core.registries.Registries.CONFIGURED_FEATURE).get(net.minecraft.resources.ResourceLocation.fromNamespaceAndPath("blacklight","hive"));
+                        h.assertTrue(feature!=null&&feature.place(level,level.getChunkSource().getGenerator(),level.random,origin),"configured hive places a building");
+                        h.assertTrue(level.getBlockState(origin.offset(5,5,5)).is(Blocks.SMOOTH_STONE)||level.getBlockState(origin.offset(5,5,5)).is(Blocks.CRACKED_STONE_BRICKS),"upper floor is real world geometry");
+                        com.codex.blacklight.BlacklightNeoMod.LOGGER.info("Prepared actual hive regression arena at {}",origin);
+                        var cores=level.getEntitiesOfClass(com.codex.blacklight.entity.BlacklightHive.class,box);h.assertTrue(cores.size()==1,"one core owns the encounter");core[0]=cores.getFirst();
+                        net.neoforged.neoforge.common.NeoForge.EVENT_BUS.addListener(joined);
+                        var p=FakePlayerFactory.get(level,new GameProfile(UUID.randomUUID(),"hive-waves"));viewer[0]=p;p.moveTo(origin.getX(),origin.getY(),origin.getZ()-10,0,0);level.addNewPlayer(p);
+                        // The shared outbreak quota uses world time. Separate genuine windows
+                        // must admit all three waves; ticking only one mob cannot reset it.
+                        h.runAfterDelay(850,()->{
+                            try {
+                                var hive=core[0];com.codex.blacklight.BlacklightNeoMod.LOGGER.info("Actual hive regression waves={}, published={}",hive.waves(),births.size());h.assertTrue(hive.waves()==3,"three reinforcement waves finish during real server ticks; waves="+hive.waves());
+                                int count=births.size();
+                                h.assertTrue(count>=3&&count<=6,"three finite waves retain their actual common/hunter/mutant guards: "+count);
+                                CompoundTag saved=new CompoundTag();hive.addAdditionalSaveData(saved);hive.readAdditionalSaveData(saved);
+                                h.runAfterDelay(260,()->{try{h.assertTrue(hive.waves()==3&&births.size()==count,"reload cannot publish fresh guards beyond the three-wave budget; before="+count+" after="+births.size());}finally{cleanup.run();}h.succeed();});
+                            }catch(Throwable failure){cleanup.run();throw failure;}
+                        });
+                    }catch(Throwable failure){cleanup.run();throw failure;}
+                });
+        }catch(Throwable failure){cleanup.run();throw failure;}
     }
 }

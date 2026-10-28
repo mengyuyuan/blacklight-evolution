@@ -2,6 +2,8 @@ package com.codex.blacklight.client.animation;
 
 import com.codex.blacklight.combat.GrabPlacement;
 import com.codex.blacklight.combat.ConsumeVisual;
+import com.codex.blacklight.combat.ConsumePlacementTrack;
+import com.codex.blacklight.combat.GrappleMotion;
 import com.codex.blacklight.power.PowerForm;
 import com.codex.blacklight.registry.ModAttachments;
 import net.minecraft.util.Mth;
@@ -30,22 +32,29 @@ public final class GrabHoldPose {
         float pitch=Mth.lerp(partial,player.xRotO,player.getXRot());
         var forward=Vec3.directionFromRotation(0,yaw);
         var left=new Vec3(forward.z,0,-forward.x);
-        var ownerPos=player.getPosition(partial);var mobPos=mob==null?ownerPos:mob.getPosition(partial);
+        var ownerPos=player.getPosition(partial);var mobPos=mob==null?ownerPos:mob.getPosition(partial)
+                .add(com.codex.blacklight.client.ClientCarryPlacement.consumeOffset(mob,partial));
         double gripHeight=Math.clamp(GrabPlacement.palm(ownerPos,yaw,pitch).y-mobPos.y,
                 mob==null?0:mob.getBbHeight()*.15,mob==null?2:mob.getBbHeight()*.85);
         var target=mobPos.add(0,gripHeight,0).subtract(forward.scale((mob==null?0:mob.getBbWidth()*.4))).subtract(ownerPos);
         if(carried!=null)target=GrabPlacement.palm(ownerPos,yaw,pitch).subtract(ownerPos);
-        if(blade) {
+        boolean paired=mob!=null&&GrappleMotion.active(mob.getData(ModAttachments.CONSUME_VISUAL));
+        if(paired) {
+            var visual=mob.getData(ModAttachments.CONSUME_VISUAL);
+            var point=ConsumePlacementTrack.carryContact(mob,GrappleMotion.key(player,visual),GrappleMotion.progress(player,visual,partial)).orElse(null);
+            if(point!=null)target=mobPos.add(left.scale(-point.x)).add(forward.scale(point.z)).add(0,point.y,0).subtract(ownerPos);
+        }
+        if(blade&&!paired) {
             var visual=mob.getData(ModAttachments.CONSUME_VISUAL);
             float progress=visual.consuming()?visual.progress(player.level().getGameTime(),partial):0;
             double height=Math.clamp(GrabPlacement.bladeContact(ownerPos,yaw,pitch,progress).y-mobPos.y,mob.getBbHeight()*.15,mob.getBbHeight()*.85);
             target=mobPos.add(ConsumeVictimPose.point(mob,new Vec3(0,height,0),partial)).subtract(ownerPos);
         }
         var desired=new org.joml.Vector3f((float)(-target.dot(left)/.9375),(float)(target.y/.9375),(float)(-target.dot(forward)/.9375));
-        String side=blade?"R":"L",tool="Tool_"+side;
+        String side=blade||paired?"R":"L",tool="Tool_"+side;
         boolean claws=player.getData(ModAttachments.PLAYER_STATE).getActivePower()==PowerForm.CLAWS;
-        var palmLocal=blade?new org.joml.Vector3f(-.0636396F,.68F,-.0636396F):claws?new org.joml.Vector3f(.00267F,.32362F,.07666F):new org.joml.Vector3f(0,.28F,0);
-        palmLocal=WeaponModelAnchors.get(player.getData(ModAttachments.PLAYER_STATE).getActivePower(),blade?"bladeGrip_R":"palm_L",palmLocal);
+        var palmLocal=blade?new org.joml.Vector3f(-.0636396F,.68F,-.0636396F):claws?new org.joml.Vector3f(side.equals("L")?.00267F:-.00267F,.32362F,.07666F):new org.joml.Vector3f(0,.28F,0);
+        palmLocal=WeaponModelAnchors.get(player.getData(ModAttachments.PLAYER_STATE).getActivePower(),blade?"bladeGrip_R":"palm_"+side,palmLocal);
         var wrist=armature.searchJointByName(tool);
         if(wrist==null)return;
         var endpoint=new org.joml.Matrix4f(wrist.getLocalTransform()).invert().transformPosition(palmLocal);

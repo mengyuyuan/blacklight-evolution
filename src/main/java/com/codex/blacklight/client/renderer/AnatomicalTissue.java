@@ -52,9 +52,20 @@ final class AnatomicalTissue {
     private final boolean procedural,organsOnly;
     private final TissueEvolution.State evolution;
     private final TissueMotion.State[] motionStates=new TissueMotion.State[4];
+    private org.joml.Matrix4f worldRelativePose;
+    private final net.minecraft.nbt.CompoundTag digestiveState;
+    private final TissueDigestion.Profile digestiveProfile;
+    private final TissueVitals.Profile vitalProfile;
+    private final net.minecraft.nbt.CompoundTag vitalState;
+    private final float vitalClock;
+    private final Map<TissueMorphogenesis.Bone,TissueVitalMotion.Field> vitalFields=new IdentityHashMap<>();
+    void worldPose(org.joml.Matrix4f pose){worldRelativePose=new org.joml.Matrix4f(pose);}
 
     private AnatomicalTissue(BlacklightInfectedHost host, List<Region> regions, ResourceLocation skin, float partial,boolean procedural,boolean organsOnly) {
         this.host = host; this.regions = regions; this.skin = skin; this.partial = partial;
+        digestiveState=host.digestiveVisual();
+        digestiveProfile=host.digestiveProfile();
+        vitalProfile=host.vitalsProfile();vitalState=host.vitalsVisual();vitalClock=TissueVitalMotion.clock(host.level().getGameTime(),partial);
         seed = TissueOrgans.seed(host.getUUID()); growth = organsOnly?TissueEvolution.attachmentGrowth(host.tissueAge()):TissueGrowth.progress(host.tissueAge());
         this.procedural=procedural;this.organsOnly=organsOnly;
         evolution=organsOnly?ChimeraTissue.receiverEvolution(host,true,partial):procedural?ChimeraTissue.receiverEvolution(host,false,partial):TissueEvolution.sample(seed,0);
@@ -148,10 +159,13 @@ final class AnatomicalTissue {
             regions=List.copyOf(resolved);
         }
         var layout=TissueOrganLayout.fit(regions.stream().map(Region::frame).filter(Objects::nonNull).toList(),seed);
+        var expressed=java.util.EnumSet.noneOf(TissueCore.class);
+        for(var core:genome.organs().keySet())if(!core.legacy())expressed.add(core);
+        if(host.knownNativeTissueCore()!=null&&!host.knownNativeTissueCore().legacy())expressed.add(host.knownNativeTissueCore());
         var functional=new ArrayList<Region>();int faceBudget=2400-regions.stream().flatMap(r->r.meshes.stream()).mapToInt(m->m.faces.length).sum();
         for(var r:regions){var meshes=new ArrayList<>(r.meshes);
             float replaced=0;
-            if(r.frame!=null)for(var weapon:new TissueCore[]{TissueCore.BLADE,TissueCore.CHELA,TissueCore.HYDROSTAT})
+            if(r.frame!=null)for(var weapon:new TissueCore[]{TissueCore.BLADE,TissueCore.CHELA,TissueCore.HYDROSTAT,TissueCore.CLUB})
                 if(!ChimeraTissue.routed(host,weapon)&&(layout.mounted(weapon,r.frame)||layout.fallback(weapon,r.frame)))replaced=Math.max(replaced,host.organExpression(weapon,partial));
             if(replaced>.0001F){
                 for(var iterator=meshes.iterator();iterator.hasNext();){var mesh=iterator.next();if(mesh.skin||!TissueOrganLayout.oldDistalKit(mesh.name))continue;
@@ -159,7 +173,7 @@ final class AnatomicalTissue {
                     else retiring.put(mesh,1-replaced);
                 }
             }
-            if(r.frame!=null)for(var core:TissueCore.values())if(!core.legacy()){
+            if(r.frame!=null)for(var core:expressed){
                 if(ChimeraTissue.routed(host,core))continue;
                 float expression=host.organExpression(core,partial);if(expression<=.0001F)continue;
                 boolean fallback=layout.fallback(core,r.frame);
@@ -279,10 +293,19 @@ final class AnatomicalTissue {
             TissueSilhouette.graft(vertices,graftShift);
         }
         if(procedural&&p.region.frame!=null)TissueEvolution.organ(vertices,p.region.frame,mesh.name,evolution,p.region.groundSupport);
+        if(procedural)TissueDigestiveMotion.surface(vertices,p.region.frame,digestiveProfile,digestiveState,TissueDigestiveMotion.clock(host.level().getGameTime(),partial));
+        if(procedural&&vitalProfile.active()){
+            var field=vitalFields.computeIfAbsent(p.region.frame,b->TissueVitalMotion.field(b,vitalProfile,vitalState,vitalClock));if(field!=null)field.apply(vertices);
+        }
         if(graft!=null&&!graft.core.legacy()){
             float time=host.organActionCore()==graft.core?host.organActionElapsed(partial):-1;
             float feeding=host.cannibalStarted()<0?0:Math.clamp((host.level().getGameTime()-host.cannibalStarted()+partial-TissueCompetition.COVER_TICKS)/(host.cannibalDuration()-TissueCompetition.COVER_TICKS),0,1);
             TissueFunctionalMotion.apply(vertices,graft.motionFrame==null?p.region.frame:graft.motionFrame,mesh.name,graft.core,time,feeding);
+            if(graft.core.digestive())TissueDigestiveMotion.apply(vertices,graft.motionFrame==null?p.region.frame:graft.motionFrame,graft.core,
+                    TissueDigestiveMotion.clock(host.level().getGameTime(),partial),TissueDigestiveMotion.active(graft.core,digestiveState),TissueDigestiveMotion.load(graft.core,digestiveState));
+            if(graft.core.vital())TissueVitalMotion.module(vertices,graft.motionFrame==null?p.region.frame:graft.motionFrame,graft.core,vitalState,vitalClock);
+            if(graft.core.defensive())TissueDefense.deform(vertices,graft.core,host.defenseVisual(),(double)host.level().getGameTime()+partial);
+            if(graft.core.colonial()){var link=host.vascularVisual();com.codex.blacklight.infection.TissueVascular.pulse(vertices,link,host.level().getGameTime()-link.getLong("Started")+partial);}
         }
         float elapsed=host.tissueStrikeElapsed(partial);
         float melee=elapsed<0?(float)Math.sin(Math.PI*host.getAttackAnim(partial)):0;
@@ -324,6 +347,8 @@ final class AnatomicalTissue {
             posed.mulPose(Axis.XP.rotation(bend));
             posed.translate(-pivot.x / 16, -pivot.y / 16, -pivot.z / 16);
         }
+        if(graft!=null&&(graft.core==TissueCore.TONGUE||graft.core==TissueCore.EXTRAORAL))
+            TissueTongueRender.aim(host,partial,vertices,new org.joml.Matrix4f(posed.last().pose()).scale(1/16F),worldRelativePose);
         for (int f = 0; f < mesh.faces.length; f++) {
             float[] face = mesh.faces[f]; int material = mandible?Math.max(1,(int)face[4]):(int)face[4];
             if (tissue && material == 0) continue;

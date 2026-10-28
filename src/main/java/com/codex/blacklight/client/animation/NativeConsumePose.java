@@ -21,7 +21,7 @@ public final class NativeConsumePose {
         var clip=accessor;
         float time=visual.stage()==ConsumeVisual.HUNTER_CONSUME
                 ?Math.min(HunterConsume.seconds(visual,entity.level().getGameTime(),partial),Math.max(0,clip.duration()-.001F))
-                :GrappleMotion.sceneProgress(entity,visual,partial)*Math.max(0,clip.duration()-.001F);
+                :(role.equals("victim")?GrappleMotion.receiverProgress(entity,visual,partial):GrappleMotion.sceneProgress(entity,visual,partial))*Math.max(0,clip.duration()-.001F);
         BlacklightPose copy=new BlacklightPose();MotionLibrary.pose(key,time,false).getJointTransformData().forEach((name,transform)->copy.getJointTransformData().put(name,transform.copy()));
         if(mounted&&role.equals("victim")){
             // A giant reacts at the contact site; a small receiver's whole-body toss must not tow it.
@@ -58,6 +58,11 @@ public final class NativeConsumePose {
             return true;
         }
         BlacklightPose sample=sample(entity,visual,"actor",partial);if(sample==null)return false;
+        if(stage==ConsumeVisual.HOLD) {
+            var movement=entity.onGround()?com.codex.blacklight.animation.PlayerMotionController.locomotionPose(entity,partial):pose;
+            // The paired source carry clips grip with the right hand for every form.
+            sample=com.codex.blacklight.animation.CarryPoseLayer.holdCreature(sample,movement,!entity.onGround(),true);
+        }
         boolean hunter=victims.getFirst() instanceof com.codex.blacklight.entity.BlacklightHunter;
         if(ConsumeSequence.mountedStage(stage)&&hunter)sample.orElseEmpty("Root").translation().set(0,0,0);
         if(stage==ConsumeVisual.MOUNT_CONSUME&&!hunter) {

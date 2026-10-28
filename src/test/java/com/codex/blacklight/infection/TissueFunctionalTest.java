@@ -28,7 +28,7 @@ class TissueFunctionalTest {
         var old=List.of(TissueCore.MUSCLE,TissueCore.CARAPACE,TissueCore.JAW,TissueCore.GRASP,TissueCore.CREST);
         for(long seed=-1000;seed<1000;seed++)assertEquals(old.get((int)(TissueGrowth.sample(TissueGrowth.mix(seed),846)*5)),TissueCore.forSeed(seed));
         assertEquals(72,TissueOrganCatalog.ALL.size());assertEquals(72,TissueOrganCatalog.ALL.stream().map(TissueOrganCatalog.Definition::id).distinct().count());
-        assertEquals(12,TissueOrganCatalog.ALL.stream().filter(TissueOrganCatalog.Definition::implemented).count());
+        assertEquals(35,TissueOrganCatalog.ALL.stream().filter(TissueOrganCatalog.Definition::implemented).count());
         assertNull(TissueOrganCatalog.get("venom_gland").runtime(),"a planned gland cannot pretend to have venom combat");
     }
     @Test void newNaturalDonorsAreReachableAndCompatibleWithoutSpeciesWhitelists(){
@@ -47,7 +47,7 @@ class TissueFunctionalTest {
     }
     @Test void eachFunctionalModuleHasAnActualBoundedConnectedStructureOnItsOwnSocket(){
         for(var core:TissueCore.values())if(!core.legacy()){
-            int role=switch(core){case HORN,PHARYNX->1;case TENDON->4;default->2;};var b=bone(role);
+            int role=(core.colonial()||core.defensive())?0:core.vital()?(core==TissueCore.GILL_LAMELLA?1:0):core.digestive()&&core!=TissueCore.CROP&&core!=TissueCore.GILL_RAKER?0:switch(core){case HORN,PHARYNX,TONGUE,CROP,EXTRAORAL,GILL_RAKER->1;case TENDON->4;default->2;};var b=bone(role);
             var meshes=functional(core,b,0,42);assertFalse(meshes.isEmpty(),core.toString());
             assertTrue(meshes.stream().mapToInt(m->m.faces().length).sum()<200);
             for(var mesh:meshes){
@@ -55,12 +55,12 @@ class TissueFunctionalTest {
                 assertEquals(3,mesh.stages().length);assertTrue(mesh.stages()[2].length>24);
                 for(var stage:mesh.stages())for(float v:stage)assertTrue(Float.isFinite(v)&&Math.abs(v)<64);
             }
-            assertTrue(functional(core,bone(0),0,42).isEmpty(),"no generic thorax lump substitutes for a real joint organ");
+            if((!core.digestive()&&!core.vital()&&!core.colonial()&&!core.defensive())||core==TissueCore.CROP||core==TissueCore.GILL_RAKER||core==TissueCore.GILL_LAMELLA)assertTrue(functional(core,bone(0),0,42).isEmpty(),"no generic thorax lump substitutes for a real joint organ");
         }
     }
     @Test void locomotorAndWeaponMotionDoesNotDetachTheRootAndActuallyChangesTheDistalStructure(){
-        for(var core:List.of(TissueCore.TENDON,TissueCore.HYDRAULIC,TissueCore.HYDROSTAT,TissueCore.BLADE,TissueCore.CHELA,TissueCore.PHARYNX)){
-            var b=bone(core==TissueCore.TENDON?4:core==TissueCore.PHARYNX?1:2);var mesh=functional(core,b,0,42).getFirst();
+        for(var core:List.of(TissueCore.TENDON,TissueCore.HYDRAULIC,TissueCore.HYDROSTAT,TissueCore.BLADE,TissueCore.CHELA,TissueCore.PHARYNX,TissueCore.SADDLE,TissueCore.CLUB,TissueCore.TONGUE,TissueCore.CNIDOCYTE,TissueCore.EXTRAORAL)){
+            var b=bone(core==TissueCore.TENDON?4:core==TissueCore.PHARYNX||core==TissueCore.TONGUE||core==TissueCore.EXTRAORAL?1:2);var mesh=functional(core,b,0,42).getFirst();
             float[] rest=mesh.stages()[2].clone(),moving=rest.clone();
             TissueFunctionalMotion.apply(rest,b,mesh.name(),core,-1,0);
             TissueFunctionalMotion.apply(moving,b,mesh.name(),core,TissueOrganCycle.cycle(core).contact(),.5F);
@@ -89,7 +89,7 @@ class TissueFunctionalTest {
         var tail=new Bone("root/tail",6,b.box(),b.up(),b.forward(),b.right(),b.modelCentre());assertEquals(0,functionalFrame(tail).right().x(),.00001);
     }
     @Test void phasesHaveRecoveryAndCannotTurnAFrameLoopIntoUnendingDamage(){
-        for(var core:TissueCore.values())if(!core.legacy()){
+        for(var core:TissueCore.values())if(!core.legacy()&&!core.digestive()&&!core.vital()&&!core.colonial()&&!core.defensive()){
             var c=TissueOrganCycle.cycle(core);assertTrue(c.windup()<c.contact()&&c.contact()<c.retract()&&c.retract()<c.end());
             assertTrue(c.cost()>0&&c.cooldown()>c.end());assertEquals(0,c.effort(-1));assertEquals(0,c.effort(c.end()));
             float previous=c.effort(0);for(float t=.1F;t<c.windup();t+=.1F){float value=c.effort(t);assertTrue(Math.abs(value-previous)<.08F);previous=value;}

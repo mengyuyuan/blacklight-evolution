@@ -32,6 +32,16 @@ public final class TissueOrganLayout {
         var hydraulic=new HashSet<String>();for(var bone:bones)if(bone.role()>=2&&bone.role()<=5)hydraulic.add(bone.path());
         assignments.put(TissueCore.HYDRAULIC,Set.copyOf(hydraulic));
         put(assignments,TissueCore.HORN,head);put(assignments,TissueCore.PHARYNX,head);
+        put(assignments,TissueCore.SADDLE,pick(fore,-side,centre,false));
+        put(assignments,TissueCore.CLUB,pick(fore,side,centre,false));
+        put(assignments,TissueCore.TONGUE,head);
+        put(assignments,TissueCore.CNIDOCYTE,pick(fore,-side,centre,false));
+        for(var core:new TissueCore[]{TissueCore.GIZZARD,TissueCore.FERMENT,TissueCore.ABSORPTIVE,TissueCore.PANCREAS,TissueCore.FAT})put(assignments,core,trunk.role()==0?trunk:null);
+        put(assignments,TissueCore.CROP,head);
+        put(assignments,TissueCore.EXTRAORAL,head);put(assignments,TissueCore.GILL_RAKER,head);
+        for(var core:TissueCore.values())if(core.vital())put(assignments,core,core==TissueCore.GILL_LAMELLA?head:trunk.role()==0?trunk:null);
+        put(assignments,TissueCore.VASCULAR,trunk.role()==0?trunk:null);
+        for(var core:TissueCore.values())if(core.defensive())put(assignments,core,trunk.role()==0?trunk:null);
         return new TissueOrganLayout(assignments,trunk.path());
     }
     private static void put(Map<TissueCore,Set<String>> map,TissueCore core,Bone bone){map.put(core,bone==null?Set.of():Set.of(bone.path()));}

@@ -30,6 +30,9 @@ public final class InfectionProtectionGameTest {
     public static void rejectedNaturalCoreDoesNotPoisonColonyRegistry(GameTestHelper h) {
         var level=h.getLevel();var data=BuildingInfectionData.get(level);
         var old=new ArrayList<>(data.colonies);data.colonies.clear();
+        var oldCleared=new java.util.LinkedHashSet<>(data.clearedSites);data.clearedSites.clear();
+        var storage=level.getServer().overworld().getDataStorage();var outbreak=OutbreakData.get(level.getServer());
+        var active=new OutbreakData();active.start(level.getServer().overworld().getGameTime());storage.set("blacklight_outbreak",active);
         var pos=h.absolutePos(new BlockPos(5,120,5));
         for(int y=0;y<3;y++)level.setBlock(pos.offset(0,y,1),Blocks.STONE_BRICKS.defaultBlockState(),2);
         var tissue=ModBlocks.TISSUE_ATTACHMENT.get().defaultBlockState();level.setBlock(pos,tissue,3);
@@ -49,6 +52,7 @@ public final class InfectionProtectionGameTest {
                 "lifting protection permits the same site to seed exactly once");
         } finally {
             level.removeBlock(pos,false);data.colonies.clear();data.colonies.addAll(old);data.setDirty();
+            data.clearedSites.clear();data.clearedSites.addAll(oldCleared);storage.set("blacklight_outbreak",outbreak);
             level.getGameRules().getRule(GameRules.RULE_MOBGRIEFING).set(grief,level.getServer());
         }
         h.succeed();
@@ -58,21 +62,28 @@ public final class InfectionProtectionGameTest {
     public static void facadeSpreadCannotBypassPlacementVeto(GameTestHelper h) {
         var level=h.getLevel();var data=BuildingInfectionData.get(level);
         var old=new ArrayList<>(data.colonies);data.colonies.clear();
+        var oldCleared=new java.util.LinkedHashSet<>(data.clearedSites);data.clearedSites.clear();
+        var storage=level.getServer().overworld().getDataStorage();var outbreak=OutbreakData.get(level.getServer());
+        var active=new OutbreakData();active.start(level.getServer().overworld().getGameTime());storage.set("blacklight_outbreak",active);
         var origin=h.absolutePos(new BlockPos(5,120,5));
         for(int x=-5;x<=5;x++)for(int y=0;y<20;y++)level.setBlock(origin.offset(x,y,1),Blocks.STONE_BRICKS.defaultBlockState(),2);
         level.setBlock(origin,ModBlocks.BUILDING_CORE.get().defaultBlockState(),3);
         var c=data.colonies.getFirst();
+        for(int i=0;i<8;i++){c.supply.offer(TissueDigestion.Kind.MEAT,64);c.supply.digest(200);}
         boolean grief=level.getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING);
         level.getGameRules().getRule(GameRules.RULE_MOBGRIEFING).set(true,level.getServer());
-        Consumer<BlockEvent.EntityPlaceEvent> veto=e->{if(e.getPlacedBlock().is(ModBlocks.TISSUE_ATTACHMENT.get()))e.setCanceled(true);};
+        var attempts=new java.util.concurrent.atomic.AtomicInteger();
+        Consumer<BlockEvent.EntityPlaceEvent> veto=e->{if(e.getPlacedBlock().is(ModBlocks.TISSUE_ATTACHMENT.get())){attempts.incrementAndGet();e.setCanceled(true);}};
         NeoForge.EVENT_BUS.addListener(veto);
         try {
             for(int i=0;i<300;i++)BuildingInfectionSystem.advance(level);
+            h.assertTrue(attempts.get()>0,"the fed fixture actually attempts protected construction");
             h.assertTrue(c.surfaces.isEmpty(),"cancelled patches never enter the saved surface list");
             for(int x=-5;x<=5;x++)for(int y=0;y<20;y++)h.assertTrue(!level.getBlockState(origin.offset(x,y,0)).is(ModBlocks.TISSUE_ATTACHMENT.get()),"protected facade remains free of patches");
         } finally {
             NeoForge.EVENT_BUS.unregister(veto);level.removeBlock(origin,false);
             data.colonies.clear();data.colonies.addAll(old);data.setDirty();
+            data.clearedSites.clear();data.clearedSites.addAll(oldCleared);storage.set("blacklight_outbreak",outbreak);
             level.getGameRules().getRule(GameRules.RULE_MOBGRIEFING).set(grief,level.getServer());
         }
         h.succeed();

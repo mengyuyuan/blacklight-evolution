@@ -16,13 +16,12 @@ public final class BlacklightRenderPose {
         if(entity instanceof net.minecraft.world.entity.player.Player p){var throwing=BlockThrowPose.sample(p,partial);if(throwing!=null)return throwing;}
         NativeHeadLook.apply(entity,pose,partial);
         if (!NativeHitPose.apply(entity, skeleton, pose, partial)) ConsumeVictimPose.epic(entity, pose, partial);
-        if (entity.getData(ModAttachments.GRAB_STAGE) == ConsumeVisual.HOLD) {
+        boolean actorOwns=NativeConsumePose.actor(entity, pose, partial);
+        if (!actorOwns && entity.getData(ModAttachments.GRAB_STAGE) == ConsumeVisual.HOLD) {
             String key = entity.getData(ModAttachments.PLAYER_STATE).getActivePower() == PowerForm.BLADE && (!(entity instanceof net.minecraft.world.entity.player.Player p)||com.codex.blacklight.combat.BlockThrowSystem.held(p)==null) ? "grab_blade_hold" : "grab_hold";
             var held = MotionLibrary.pose(key, (entity.tickCount + partial) / 20F, true);
-            for (String joint : new String[]{"Torso", "Chest", "Head", "Shoulder_R", "Arm_R", "Elbow_R", "Hand_R", "Tool_R", "Shoulder_L", "Arm_L", "Elbow_L", "Hand_L", "Tool_L"})
-                pose.getJointTransformData().put(joint, held.orElseEmpty(joint).copy());
+            pose=CarryPoseLayer.holdCreature(held,pose,!entity.onGround(),key.equals("grab_blade_hold"));
         }
-        if (!NativeConsumePose.actor(entity, pose, partial)) GrabHoldPose.apply(entity, skeleton, pose, partial);
         ConsumeGripPose.apply(entity, skeleton, pose, partial);
         var wall=com.codex.blacklight.movement.WallPoseState.get(entity);
         if(wall!=null) {
@@ -53,6 +52,11 @@ public final class BlacklightRenderPose {
         var weapon=entity.getData(ModAttachments.WEAPON_VISUAL);
         if(wall==null&&entity.onGround()&&weapon.spec()==com.codex.blacklight.combat.WeaponMove.HAMMER_RAM
                 &&!weapon.charging())HammerGroundContact.apply(pose);
+        // Fit after locomotion/wall constraints and to the receiver's rendered
+        // position. Holding no longer skips contact correction just because a
+        // paired actor clip was found.
+        if(!actorOwns||entity.getData(ModAttachments.GRAB_STAGE)==ConsumeVisual.HOLD)
+            GrabHoldPose.apply(entity,skeleton,pose,partial);
         return pose;
     }
     public static float facing(LivingEntity entity,float partial) {

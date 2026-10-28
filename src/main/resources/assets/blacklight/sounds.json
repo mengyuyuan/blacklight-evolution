@@ -941,5 +941,243 @@
         "attenuation_distance": 24
       }
     ]
+  },
+  "infection.tension": {
+    "subtitle": "subtitle.blacklight.infection.tension",
+    "sounds": [
+      {
+        "name": "blacklight:infection/tension_1",
+        "attenuation_distance": 24
+      },
+      {
+        "name": "blacklight:infection/tension_2",
+        "attenuation_distance": 24
+      },
+      {
+        "name": "blacklight:infection/tension_3",
+        "attenuation_distance": 24
+      }
+    ]
+  },
+  "infection.swing": {
+    "subtitle": "subtitle.blacklight.infection.swing",
+    "sounds": [
+      {
+        "name": "blacklight:infection/swing_1",
+        "attenuation_distance": 24
+      },
+      {
+        "name": "blacklight:infection/swing_2",
+        "attenuation_distance": 24
+      },
+      {
+        "name": "blacklight:infection/swing_3",
+        "attenuation_distance": 24
+      }
+    ]
+  },
+  "infection.tear": {
+    "subtitle": "subtitle.blacklight.infection.tear",
+    "sounds": [
+      {
+        "name": "blacklight:infection/tear_1",
+        "attenuation_distance": 24
+      },
+      {
+        "name": "blacklight:infection/tear_2",
+        "attenuation_distance": 24
+      },
+      {
+        "name": "blacklight:infection/tear_3",
+        "attenuation_distance": 24
+      }
+    ]
+  },
+  "infection.pierce": {
+    "subtitle": "subtitle.blacklight.infection.pierce",
+    "sounds": [
+      {
+        "name": "blacklight:infection/pierce_1",
+        "attenuation_distance": 24
+      },
+      {
+        "name": "blacklight:infection/pierce_2",
+        "attenuation_distance": 24
+      },
+      {
+        "name": "blacklight:infection/pierce_3",
+        "attenuation_distance": 24
+      }
+    ]
+  },
+  "infection.crush": {
+    "subtitle": "subtitle.blacklight.infection.crush",
+    "sounds": [
+      {
+        "name": "blacklight:infection/crush_1",
+        "attenuation_distance": 24
+      },
+      {
+        "name": "blacklight:infection/crush_2",
+        "attenuation_distance": 24
+      },
+      {
+        "name": "blacklight:infection/crush_3",
+        "attenuation_distance": 24
+      }
+    ]
+  },
+  "infection.lash": {
+    "subtitle": "subtitle.blacklight.infection.lash",
+    "sounds": [
+      {
+        "name": "blacklight:infection/lash_1",
+        "attenuation_distance": 24
+      },
+      {
+        "name": "blacklight:infection/lash_2",
+        "attenuation_distance": 24
+      },
+      {
+        "name": "blacklight:infection/lash_3",
+        "attenuation_distance": 24
+      }
+    ]
+  },
+  "infection.retract": {
+    "subtitle": "subtitle.blacklight.infection.retract",
+    "sounds": [
+      {
+        "name": "blacklight:infection/retract_1",
+        "attenuation_distance": 24
+      },
+      {
+        "name": "blacklight:infection/retract_2",
+        "attenuation_distance": 24
+      },
+      {
+        "name": "blacklight:infection/retract_3",
+        "attenuation_distance": 24
+      }
+    ]
+  },
+  "infection.launch": {
+    "subtitle": "subtitle.blacklight.infection.launch",
+    "sounds": [
+      {
+        "name": "blacklight:infection/launch_1",
+        "attenuation_distance": 24
+      },
+      {
+        "name": "blacklight:infection/launch_2",
+        "attenuation_distance": 24
+      },
+      {
+        "name": "blacklight:infection/launch_3",
+        "attenuation_distance": 24
+      }
+    ]
+  },
+  "infection.burst": {
+    "subtitle": "subtitle.blacklight.infection.burst",
+    "sounds": [
+      {
+        "name": "blacklight:infection/burst_1",
+        "attenuation_distance": 24
+      },
+      {
+        "name": "blacklight:infection/burst_2",
+        "attenuation_distance": 24
+      },
+      {
+        "name": "blacklight:infection/burst_3",
+        "attenuation_distance": 24
+      }
+    ]
+  },
+  "infection.erupt": {
+    "subtitle": "subtitle.blacklight.infection.erupt",
+    "sounds": [
+      {
+        "name": "blacklight:infection/erupt_1",
+        "attenuation_distance": 24
+      },
+      {
+        "name": "blacklight:infection/erupt_2",
+        "attenuation_distance": 24
+      },
+      {
+        "name": "blacklight:infection/erupt_3",
+        "attenuation_distance": 24
+      }
+    ]
+  },
+  "infection.resonance_charge": {
+    "subtitle": "subtitle.blacklight.infection.resonance_charge",
+    "sounds": [
+      {
+        "name": "blacklight:infection/resonance_charge_1",
+        "attenuation_distance": 24
+      },
+      {
+        "name": "blacklight:infection/resonance_charge_2",
+        "attenuation_distance": 24
+      },
+      {
+        "name": "blacklight:infection/resonance_charge_3",
+        "attenuation_distance": 24
+      }
+    ]
+  },
+  "infection.resonance": {
+    "subtitle": "subtitle.blacklight.infection.resonance",
+    "sounds": [
+      {
+        "name": "blacklight:infection/resonance_1",
+        "attenuation_distance": 24
+      },
+      {
+        "name": "blacklight:infection/resonance_2",
+        "attenuation_distance": 24
+      },
+      {
+        "name": "blacklight:infection/resonance_3",
+        "attenuation_distance": 24
+      }
+    ]
+  },
+  "infection.mend": {
+    "subtitle": "subtitle.blacklight.infection.mend",
+    "sounds": [
+      {
+        "name": "blacklight:infection/mend_1",
+        "attenuation_distance": 24
+      },
+      {
+        "name": "blacklight:infection/mend_2",
+        "attenuation_distance": 24
+      },
+      {
+        "name": "blacklight:infection/mend_3",
+        "attenuation_distance": 24
+      }
+    ]
+  },
+  "infection.ground": {
+    "subtitle": "subtitle.blacklight.infection.ground",
+    "sounds": [
+      {
+        "name": "blacklight:infection/ground_1",
+        "attenuation_distance": 24
+      },
+      {
+        "name": "blacklight:infection/ground_2",
+        "attenuation_distance": 24
+      },
+      {
+        "name": "blacklight:infection/ground_3",
+        "attenuation_distance": 24
+      }
+    ]
   }
 }

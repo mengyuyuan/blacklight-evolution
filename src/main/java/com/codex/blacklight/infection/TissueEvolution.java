@@ -14,7 +14,13 @@ public final class TissueEvolution {
     private static final State BASE=new State(0,0,0,0,0,0);
     private static final float[][] FUNCTIONAL_SUPPORT={
             {.90F,.35F,.10F,.48F,.12F},{.72F,.78F,.08F,.70F,.18F},{.65F,.28F,.10F,1.05F,.12F},
-            {.75F,.68F,.12F,.90F,.42F},{.85F,.92F,.10F,.85F,.28F},{.90F,.95F,.30F,.15F,.90F},{.65F,.40F,1.10F,.20F,.20F}};
+            {.75F,.68F,.12F,.90F,.42F},{.85F,.92F,.10F,.85F,.28F},{.90F,.95F,.30F,.15F,.90F},{.65F,.40F,1.10F,.20F,.20F},
+            {1.15F,.50F,.10F,.45F,.20F},{1.20F,.65F,.10F,.55F,.18F},{.65F,.30F,.95F,.65F,.20F},{.65F,.45F,.20F,.85F,.35F},
+            {.58F,.32F,.18F,.08F,.12F},{.62F,.28F,.18F,.08F,.12F},{.58F,.25F,.15F,.08F,.15F},
+            {.56F,.25F,.18F,.08F,.18F},{.56F,.28F,.42F,.08F,.12F},{.68F,.32F,.12F,.08F,.12F},
+            {.65F,.32F,.65F,.15F,.20F},{.58F,.28F,.55F,.08F,.20F},
+            {.58F,.22F,.38F,.08F,.20F},{.68F,.28F,.15F,.08F,.18F},{.66F,.20F,.12F,.12F,.22F},{.58F,.36F,.12F,.08F,.16F},
+            {.62F,.28F,.10F,.12F,.24F},{.74F,.34F,.12F,.10F,.20F},{.66F,.24F,.22F,.08F,.20F},{.64F,.30F,.14F,.08F,.18F},{.62F,.30F,.12F,.20F,.24F},{.62F,1.15F,.10F,.12F,.18F},{.62F,1.12F,.10F,.12F,.20F}};
     public record Combat(double health,double damage,double armor,double knockback) { }
     private TissueEvolution() {}
 
@@ -200,6 +206,8 @@ public final class TissueEvolution {
         return sum.mul(.125F);
     }
     private static V axis(Box b){return b.span(0)>b.span(1)&&b.span(0)>b.span(2)?new V(1,0,0):b.span(1)>b.span(2)?new V(0,1,0):new V(0,0,1);}
-    private static float span(Box b,V direction){return Math.abs(direction.x())*b.span(0)+Math.abs(direction.y())*b.span(1)+Math.abs(direction.z())*b.span(2);}
+    // Native ears/fins may be planes. A zero-depth head frame must not turn
+    // 0/0 into NaN and discard its growing skin/organ geometry.
+    private static float span(Box b,V direction){return Math.max(.001F,Math.abs(direction.x())*b.span(0)+Math.abs(direction.y())*b.span(1)+Math.abs(direction.z())*b.span(2));}
     private static float lerp(float a,float b,float t){return a+(b-a)*t;}
 }

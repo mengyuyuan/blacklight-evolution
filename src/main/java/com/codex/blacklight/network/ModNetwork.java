@@ -21,7 +21,9 @@ public final class ModNetwork {
     public static void register(RegisterPayloadHandlersEvent event) {
         // Tissue anatomy adds synchronized entity metadata. Reject mixed old/new builds
         // during negotiation instead of decoding an unknown metadata index in-game.
-        event.registrar("standalone-35-evolution-qualifications")
+        event.registrar("standalone-38-infected-native-combat")
+                .playToClient(InfectedImpactPayload.TYPE,InfectedImpactPayload.STREAM_CODEC,(payload,context)->context.enqueueWork(()->com.codex.blacklight.client.renderer.InfectedImpactVisuals.accept(payload)))
+                .playToClient(DistrictZonePayload.TYPE,DistrictZonePayload.STREAM_CODEC,(payload,context)->context.enqueueWork(()->com.codex.blacklight.client.DistrictZoneHud.accept(payload)))
                 .playToServer(DisguiseSelectPayload.TYPE,DisguiseSelectPayload.STREAM_CODEC,(payload,context)->context.enqueueWork(()->{
                     if(context.player() instanceof ServerPlayer p&&canAct(p))com.codex.blacklight.disguise.DisguiseSystem.select(p,payload.revision(),payload.index());
                 }))
@@ -170,6 +172,7 @@ public final class ModNetwork {
     }
 
     private static void synchronizePersistentState(ServerPlayer player) {
+        com.codex.blacklight.city.CityEcology.synchronize(player);
         com.codex.blacklight.animation.NativePlayerActionBackend.clear(player);
         com.codex.blacklight.power.GrowthSystem.updateHealth(player);
         // Copy-on-death restores server data; explicitly publish it for the new client

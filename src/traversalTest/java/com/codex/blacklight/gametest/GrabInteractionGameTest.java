@@ -168,4 +168,19 @@ public final class GrabInteractionGameTest {
         h.assertTrue(!p.getData(ModAttachments.CONSUMING)&&p.getData(ModAttachments.GRAB_STAGE)==0&&!cow.getData(ModAttachments.CONSUME_VISUAL).active()&&!cow.isNoAi(),"mode change frees target without persisting NoAI");
         h.assertTrue(p.getHealth()==10&&cow.isAlive(),"release is not consume");cow.discard();h.succeed();
     }
+    @GameTest(template="wall_test",timeoutTicks=30)
+    public static void heldBodyKeepsTheSharedGlideGripWithoutBreakingTheClaim(GameTestHelper h) {
+        var p=player(h);var cow=h.spawn(EntityType.COW,3,2,5);cow.setNoAi(true);
+        ConsumeSystem.request(p);tick(p,ConsumeVisual.captureDuration(PowerForm.CLAWS));
+        h.assertTrue(ConsumeSystem.holding(p),"fixture reaches a real held state");
+        p.setPos(p.position().add(0,3,0));cow.setPos(cow.position().add(0,3,0));p.setOnGround(false);
+        p.setData(ModAttachments.GLIDE_UNTIL,p.level().getGameTime()+100);
+        for(int step=0;step<8;step++) {
+            tick(p,1);var visual=cow.getData(ModAttachments.CONSUME_VISUAL);
+            var expected=GrappleMotion.carryAnchor(p,cow,visual,p.position(),p.getYRot(),0).orElseThrow();
+            h.assertTrue(ConsumeSystem.holding(p)&&cow.position().distanceTo(expected)<.03,"gliding keeps the server's collision-resolved body on the shared anchor");
+        }
+        h.assertTrue(p.getData(ModAttachments.MOVEMENT_STATE).carryPosture().sample(p.tickCount,true,1)==1,"glide grip transition completes");
+        ConsumeSystem.cancel(p);cow.discard();h.succeed();
+    }
 }

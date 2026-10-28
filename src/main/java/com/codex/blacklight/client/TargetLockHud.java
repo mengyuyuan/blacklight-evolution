@@ -78,6 +78,8 @@ public final class TargetLockHud {
             panel(g,info,g.guiWidth()/2,g.guiHeight()-68,0xFFDDA6A1);
             long generation=com.codex.blacklight.infection.TissueGrowth.generation(host.tissueAge());
             String evolution=net.minecraft.network.chat.Component.translatable("hud.blacklight.host_evolution",generation,host.tissueNutrition(),com.codex.blacklight.infection.TissueMetabolism.MAX_RESERVE).getString();
+            var digestion=host.digestiveVisual();
+            if(digestion.getInt("Queued")>0||digestion.getInt("Fat")>0)evolution+=" · "+net.minecraft.network.chat.Component.translatable("hud.blacklight.digestive_reserves",digestion.getInt("Queued"),digestion.getInt("Fat")).getString();
             panel(g,evolution,g.guiWidth()/2,g.guiHeight()-82,0xFFB9B0A3);
             String growthCost=net.minecraft.network.chat.Component.translatable("hud.blacklight.host_growth_cost",String.format(java.util.Locale.ROOT,"%.0f",com.codex.blacklight.infection.TissueMetabolism.phaseFood(host.tissueAge()))).getString();
             panel(g,growthCost,g.guiWidth()/2,g.guiHeight()-96,0xFFB9B0A3);

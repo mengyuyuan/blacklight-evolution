@@ -48,7 +48,7 @@ public final class AuthoredInfectionParts {
     private record Triangle(Vector3f a,Vector3f b,Vector3f c,Vector3f normal,int color,Face face,Vector3f uvA,Vector3f uvB,Vector3f uvC) {
         Triangle(Vector3f a,Vector3f b,Vector3f c,Vector3f normal,int color,Face face){this(a,b,c,normal,color,face,a,b,c);}
     }
-    private record Piece(ModelPart.Cube cube,List<Triangle> skin,List<Triangle> growth,int anatomy) {}
+    private record Piece(ModelPart.Cube cube,List<Triangle> skin,List<Triangle> growth,List<Triangle> late,int anatomy) {}
     public record Wound(float u,float v,float width,float height){}
     public static final class Binding {
         private final Map<ModelPart,List<Piece>> pieces=new IdentityHashMap<>();
@@ -62,13 +62,34 @@ public final class AuthoredInfectionParts {
         private long age;
         private float tentacles;
         private TissueEvolution.State evolution=TissueEvolution.sample(0,0);
+        private TissueDigestion.Profile digestiveProfile=new TissueDigestion.Profile(0,0,0,0,0,0);
+        private net.minecraft.nbt.CompoundTag digestiveState=new net.minecraft.nbt.CompoundTag();
+        private float digestiveTime;
+        private TissueVitals.Profile vitalProfile=TissueVitals.Profile.EMPTY;
+        private net.minecraft.nbt.CompoundTag vitalState=new net.minecraft.nbt.CompoundTag();
+        private float vitalTime;
+        private final Map<TissueMorphogenesis.Bone,TissueVitalMotion.Field> vitalFields=new IdentityHashMap<>();
         public void growth(float value,long seed){growth=Math.max(0,Math.min(1,value));growthSeed=seed;staged=true;}
         public void evolution(long age,float tentacles){this.age=age;this.tentacles=tentacles;evolution=TissueEvolution.authoredState(growthSeed,age);}
         public void evolution(long age,float tentacles,TissueEvolution.State inherited){this.age=age;this.tentacles=tentacles;evolution=inherited;}
+        void digestion(TissueDigestion.Profile profile,net.minecraft.nbt.CompoundTag state,float time){digestiveProfile=profile;digestiveState=state;digestiveTime=time;}
+        void digestion(Binding other){digestion(other.digestiveProfile,other.digestiveState,other.digestiveTime);}
+        void vitals(TissueVitals.Profile profile,net.minecraft.nbt.CompoundTag state,float time){vitalProfile=profile;vitalState=state;vitalTime=time;vitalFields.clear();}
+        void vitals(Binding other){vitals(other.vitalProfile,other.vitalState,other.vitalTime);}
+        private TissueVitalMotion.Field vitalField(TissueMorphogenesis.Bone frame){return vitalFields.computeIfAbsent(frame,f->TissueVitalMotion.field(f,vitalProfile,vitalState,vitalTime));}
         long age(){return age;}
         float tentacles(){return tentacles;}
         TissueEvolution.State development(){return evolution;}
-        Vector3f developRoot(ModelPart part,Vector3f point){var frame=frames.get(part);return frame==null?point:develop(point,frame,evolution);}
+        Vector3f developRoot(ModelPart part,Vector3f point){var frame=frames.get(part);if(frame==null)return point;var p=develop(point,frame,evolution);float[] v={p.x,p.y,p.z};TissueDigestiveMotion.surface(v,frame,digestiveProfile,digestiveState,digestiveTime);var field=vitalField(frame);if(field!=null)field.apply(v);return new Vector3f(v[0],v[1],v[2]);}
+        private Triangle remodel(Triangle triangle,TissueMorphogenesis.Bone frame){
+            if(!digestiveProfile.digestive()&&!vitalProfile.active()||frame==null||frame.role()!=0&&frame.role()!=1)return triangle;
+            float[] v={triangle.a.x,triangle.a.y,triangle.a.z,triangle.b.x,triangle.b.y,triangle.b.z,triangle.c.x,triangle.c.y,triangle.c.z};
+            TissueDigestiveMotion.surface(v,frame,digestiveProfile,digestiveState,digestiveTime);
+            var field=vitalField(frame);if(field!=null)field.apply(v);
+            var a=new Vector3f(v[0],v[1],v[2]);var b=new Vector3f(v[3],v[4],v[5]);var c=new Vector3f(v[6],v[7],v[8]);
+            var n=new Vector3f(b).sub(a).cross(new Vector3f(c).sub(a));if(n.lengthSquared()>1e-8F)n.normalize();else n.set(triangle.normal);
+            return new Triangle(a,b,c,n,triangle.color,triangle.face,triangle.uvA,triangle.uvB,triangle.uvC);
+        }
         public List<Wound> wounds(){return List.copyOf(wounds);}
         private record Pending(PoseStack.Pose pose,int light,int overlay,int color) {}
         public boolean available(){return !pieces.isEmpty();}
@@ -80,7 +101,7 @@ public final class AuthoredInfectionParts {
             for(var p:matches)if(!p.skin.isEmpty()&&replaced.add(p.cube)) {
                 if(age<TissueGrowth.ANCIENT_TICKS) {
                     int tint=TissueSkin.tint(color,growthSeed,p.anatomy,TissueEvolution.attachmentGrowth(age));
-                    for(var triangle:p.skin)emit(develop(triangle,frames.get(part),evolution),posed,out,light,overlay,tint,true);
+                    for(var triangle:p.skin)emit(remodel(develop(triangle,frames.get(part),evolution),frames.get(part)),posed,out,light,overlay,tint,true);
                 }
             }
             if(replaced.isEmpty())return false;
@@ -109,7 +130,9 @@ public final class AuthoredInfectionParts {
                     float delay=p.anatomy==ConsumeAnatomy.BODY?0:.08F+variation*.12F;
                     fraction=Math.max(.07F,Math.min(1,(growth-delay)/(1-delay)))*(.86F+.14F*variation);
                 }
-                for(var triangle:p.growth)emit(develop(grow(triangle,p.cube,fraction),frames.get(e.getKey()),evolution),q.pose,out,q.light,q.overlay,q.color,false);
+                for(var triangle:p.growth)emit(remodel(develop(grow(triangle,p.cube,fraction),frames.get(e.getKey()),evolution),frames.get(e.getKey())),q.pose,out,q.light,q.overlay,q.color,false);
+                float late=TissueLateBody.progress(age);
+                if(late>0)for(var triangle:p.late)emit(remodel(develop(grow(triangle,p.cube,late),frames.get(e.getKey()),evolution),frames.get(e.getKey())),q.pose,out,q.light,q.overlay,q.color,false);
             }
             // Use the exact same developed vertices for the tissue cover. A
             // thin normal offset avoids z-fighting without adding body volume.
@@ -120,7 +143,7 @@ public final class AuthoredInfectionParts {
                 if(tissue instanceof ConsumeAnatomy.Consumer consumer)consumer.anatomy(entry.getKey());
                 EvolvedDonorCapture.mesh(entry.getKey(),"authored_skin");
                 for(var triangle:piece.skin) {
-                    if(TissueEvolution.attachmentGrowth(age)>0)emitTissue(triangle,develop(triangle,frame,evolution),frame,posed.pose,tissue,posed.light,posed.overlay,posed.color,growthSeed,age,piece.anatomy);
+                    if(TissueEvolution.attachmentGrowth(age)>0)emitTissue(triangle,remodel(develop(triangle,frame,evolution),frame),frame,posed.pose,tissue,posed.light,posed.overlay,posed.color,growthSeed,age,piece.anatomy);
                 }
             }
             pending.clear();
@@ -145,6 +168,8 @@ public final class AuthoredInfectionParts {
                 // Mature hosts use a reconstructed whole-body surface under their exposed organs.
                 // Export both layers: exporting growth alone loses chest/upper arms and shifts the waist.
                 var triangles=new ArrayList<Triangle>();triangles.addAll(piece.skin);triangles.addAll(piece.growth);
+                float late=TissueLateBody.progress(source.age());
+                if(late>0)for(var triangle:piece.late)triangles.add(grow(triangle,piece.cube,late));
                 var points=new ArrayList<TissueMorphogenesis.V>();var faces=new ArrayList<int[]>();var colors=new ArrayList<Integer>();
                 for(var triangle:triangles){
                     var evolved=develop(triangle,binding.frames.get(entry.getKey()),source.authored());
@@ -158,7 +183,7 @@ public final class AuthoredInfectionParts {
         }
         return result.isEmpty()?null:new TissueChimera.Body(List.copyOf(result),TissueChimera.bounds(result.stream().flatMap(p->p.vertices().stream()).toList()),nativeBody.anchorBox());
     }
-    public static void reload(){SOURCES.clear();BINDINGS.clear();FACES.clear();InfectedWoundTextures.reload();AnatomicalTissue.reload();}
+    public static void reload(){SOURCES.clear();BINDINGS.clear();FACES.clear();ReceiverModelPose.reloadRoots();InfectedWoundTextures.reload();AnatomicalTissue.reload();}
     public static Binding bind(String species,EntityModel<?> model){return bind(species,model,false);}
     public static Binding bind(String species,EntityModel<?> model,boolean fur){
         Binding cached=BINDINGS.computeIfAbsent(model,k->new HashMap<>()).computeIfAbsent(species+(fur?"#fur":""),k->build(species,model,fur));
@@ -236,15 +261,26 @@ public final class AuthoredInfectionParts {
             Vector3f ratio=new Vector3f();
             for(int i=0;i<3;i++)ratio.setComponent(i,srcSpan.get(i)>.001F&&span.get(i)>.05F?span.get(i)/srcSpan.get(i):uniform);
             Vector3f centre=new Vector3f(nativeLow).add(nativeHigh).mul(.5F),srcCentre=new Vector3f(low).add(high).mul(.5F);
-            List<Triangle> skin=new ArrayList<>(),growth=new ArrayList<>();
+            List<Triangle> skin=new ArrayList<>(),growth=new ArrayList<>(),late=new ArrayList<>();
             if(bone==main)triangles(bone.getAsJsonObject("skin"),inverse,ratio,srcCentre,centre,cube,true,skin,growth);
             if(skin.isEmpty())growth.clear(); // No matching native surface: retain its original cube.
             triangles(bone.getAsJsonObject("growth"),inverse,ratio,srcCentre,centre,cube,false,skin,growth);
+            if(bone.has("lateGrowth"))triangles(bone.getAsJsonObject("lateGrowth"),inverse,ratio,srcCentre,centre,cube,false,skin,late);
             var frame=binding.frames.get(target.part);var sectioned=new ArrayList<Triangle>();
             for(var triangle:skin)for(var section:TissueSkin.sections(frame,value(triangle.a),value(triangle.b),value(triangle.c)))
                 sectioned.add(new Triangle(vector(section.a()),vector(section.b()),vector(section.c()),triangle.normal,triangle.color,triangle.face));
-            binding.pieces.computeIfAbsent(target.part,k->new ArrayList<>()).add(new Piece(cube,List.copyOf(sectioned),List.copyOf(growth),anatomy.getOrDefault(target.part,ConsumeAnatomy.BODY)));
+            binding.pieces.computeIfAbsent(target.part,k->new ArrayList<>()).add(new Piece(cube,List.copyOf(sectioned),List.copyOf(growth),List.copyOf(late),anatomy.getOrDefault(target.part,ConsumeAnatomy.BODY)));
             binding.assignments.add(name+" -> "+target.name+" ("+growth.size()+" growth triangles)");
+        }
+        // Segmented wings have independently animated tips. Fitting a whole
+        // wing to its narrow base hides most late membranes beside the chest.
+        if(source.get().has("nativeLateGrowth"))for(var entry:source.get().getAsJsonArray("nativeLateGrowth")){
+            var data=entry.getAsJsonObject();String name=data.get("name").getAsString();
+            var target=parts.stream().filter(p->p.name.equals(name)).findFirst().orElse(null);
+            if(target==null)continue;
+            var late=localTriangles(data);
+            binding.pieces.computeIfAbsent(target.part,k->new ArrayList<>()).add(new Piece(target.cube,List.of(),List.of(),late,anatomy.getOrDefault(target.part,ConsumeAnatomy.BODY)));
+            binding.assignments.add(name+" -> "+target.name+" ("+late.size()+" late local triangles)");
         }
         for(var list:binding.pieces.values())for(var piece:list)if(!piece.skin.isEmpty()){
             for(var face:faces(piece.cube)){
@@ -263,6 +299,17 @@ public final class AuthoredInfectionParts {
         }
         BlacklightNeoMod.LOGGER.info("Bound authored infection growth {}: {} native parts, {} source assignments, coat={}",species,binding.pieces.size(),binding.assignments.size(),fur);
         return binding;
+    }
+    private static List<Triangle> localTriangles(JsonObject data){
+        var points=new ArrayList<Vector3f>();var vs=data.getAsJsonArray("vertices");
+        for(int i=0;i<vs.size();i+=3)points.add(new Vector3f(vs.get(i).getAsFloat(),vs.get(i+1).getAsFloat(),vs.get(i+2).getAsFloat()));
+        var result=new ArrayList<Triangle>();var ts=data.getAsJsonArray("triangles");
+        for(int i=0;i<ts.size();i+=4){
+            var a=points.get(ts.get(i).getAsInt());var b=points.get(ts.get(i+1).getAsInt());var c=points.get(ts.get(i+2).getAsInt());
+            var normal=new Vector3f(b).sub(a).cross(new Vector3f(c).sub(a));if(normal.lengthSquared()<1e-10F)continue;normal.normalize();
+            result.add(new Triangle(a,b,c,normal,ts.get(i+3).getAsInt(),null));
+        }
+        return List.copyOf(result);
     }
     private static boolean inside(float x,float y,float[] a,float[] b,float[] c){
         float d=(b[1]-c[1])*(a[0]-c[0])+(c[0]-b[0])*(a[1]-c[1]);if(Math.abs(d)<1e-10)return false;

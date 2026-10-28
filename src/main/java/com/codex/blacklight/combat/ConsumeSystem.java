@@ -128,7 +128,7 @@ public final class ConsumeSystem {
         var s=ACTIVE.get(p);
         var visual=ModAttachments.peekData(victim, ModAttachments.CONSUME_VISUAL, ConsumeVisual.EMPTY);
         if(GrappleMotion.active(visual)){
-            var nativeAnchor=ConsumePlacementTrack.carryAnchor(p.position(),p.getYRot(),victim,GrappleMotion.key(p,visual),GrappleMotion.progress(p,visual,0));
+            var nativeAnchor=GrappleMotion.carryAnchor(p,victim,visual,p.position(),p.getYRot(),0);
             if(nativeAnchor.isPresent())return nativeAnchor.get();
         }
         if(s!=null&&s.form==PowerForm.BLADE) {
@@ -149,7 +149,9 @@ public final class ConsumeSystem {
     public static boolean healthReady(net.minecraft.world.entity.player.Player consumer,LivingEntity target) {
         float maximum=target.getMaxHealth();
         return target.isAlive() && Float.isFinite(maximum) && maximum>0
-                && (com.codex.blacklight.power.CombatScale.originalMaximum(target)<DIRECT_GRAB_MAX_HEALTH || target.getHealth()<=maximum*(consumer==null?HEALTH_LIMIT:com.codex.blacklight.power.ConsumeProgression.healthLimit(com.codex.blacklight.power.ConsumeProgression.progress(consumer))))
+                && (com.codex.blacklight.power.CombatScale.originalMaximum(target)<DIRECT_GRAB_MAX_HEALTH
+                    &&!(target instanceof com.codex.blacklight.entity.BlacklightInfectedHost host&&host.isEvolved())
+                    || target.getHealth()<=maximum*(consumer==null?HEALTH_LIMIT:com.codex.blacklight.power.ConsumeProgression.healthLimit(com.codex.blacklight.power.ConsumeProgression.progress(consumer))))
                 && com.codex.blacklight.power.AssimilationSystem.ready(target);
     }
 
@@ -173,6 +175,8 @@ public final class ConsumeSystem {
 
     public static void request(ServerPlayer player) {
         if(com.codex.blacklight.power.BiomassSystem.active(player))return;
+        var acquiring=ACTIVE.get(player);
+        if(acquiring!=null&&ConsumeVisual.acquiring(acquiring.stage)){cancel(player);return;}
         if (holding(player)) { throwTarget(player); return; }
         var state = player.getData(ModAttachments.PLAYER_STATE);
         if (!player.isAlive() || player.isSpectator() || !state.isInfected() || !state.isPrototypeMode()
@@ -186,6 +190,12 @@ public final class ConsumeSystem {
         }
         var form = state.getActivePower();
         double range = (form == PowerForm.WHIPFIST ? WHIP_GRAB_RANGE : 3)+com.codex.blacklight.power.AssimilationSystem.grabBonus(player);
+        // A lock supplies combat aim; it must not steal an explicit terrain grab.
+        // A real creature intersecting the view ray before that block keeps grab priority.
+        if(BlockThrowSystem.canUse(player)&&TerrainGrabSelection.targetsTerrain(player)){
+            if(!TerrainGrabSelection.start(player))message(player,TerrainGrabSelection.failureMessage(player));
+            return;
+        }
         var locked=CombatTargeting.locked(player);
         Mob target;
         if(locked!=null) {
@@ -200,7 +210,7 @@ public final class ConsumeSystem {
                             .thenComparingInt(Mob::getId)).orElse(null);
         }
         if (target == null) {
-            if(locked==null&&BlockThrowSystem.canUse(player)){
+            if(BlockThrowSystem.canUse(player)){
                 if(TerrainGrabSelection.start(player))return;
                 message(player,TerrainGrabSelection.failureMessage(player));
             }else message(player,"consume_no_target");
@@ -212,6 +222,7 @@ public final class ConsumeSystem {
         }
         if (target instanceof BlacklightHunter hunter && !hunter.claim(player)) return;
         ImpactControl.cancel(target);
+        if(target instanceof com.codex.blacklight.entity.BlacklightCommonInfected civilian)civilian.cancelAttack();
         Session session=new Session(target,player,form);ACTIVE.put(player,session);
         target.getNavigation().stop();target.setTarget(null);
         boolean heavy=form==PowerForm.WHIPFIST&&(target instanceof BlacklightHunter||target.getBbWidth()*target.getBbWidth()*target.getBbHeight()>4)&&player.distanceTo(target)>2.5;
@@ -390,7 +401,7 @@ public final class ConsumeSystem {
         player.fallDistance=0;player.setDeltaMovement(Vec3.ZERO);
         if(before.distanceToSqr(player.position())>.000001)player.connection.teleport(player.getX(),player.getY(),player.getZ(),session.facing,player.getXRot());
         Vec3 goal=ConsumePlacementTrack.anchor(session.start,session.facing,target,session.form,t).orElse(session.consumeTargetStart==null?target.position():session.consumeTargetStart);
-        if(session.form==PowerForm.CLAWS&&t<ConsumePlacementTrack.gripEnd(session.form))
+        if(ConsumePlacementTrack.headGrip(session.form)&&t<ConsumePlacementTrack.gripEnd(session.form))
             goal=goal.add(player.position().subtract(actorGoal));
         Vec3 delta=goal.subtract(target.position());
         target.move(MoverType.SELF,delta.length()>1.25?delta.normalize().scale(1.25):delta);
@@ -410,13 +421,12 @@ public final class ConsumeSystem {
         Vec3 point=ConsumeSequence.contact(session.victim);
         if(receiverScene!=null?receiverScene.impactAt(elapsed):elapsed==contact) {
             boolean hammer=animationForm==PowerForm.HAMMERFISTS;
-            player.level().playSound(null,session.victim.blockPosition(),hammer?SoundEvents.GENERIC_BIG_FALL:
-                    animationForm==PowerForm.BLADE||animationForm==PowerForm.CLAWS?SoundEvents.PLAYER_ATTACK_SWEEP:SoundEvents.PLAYER_ATTACK_STRONG,
-                    SoundSource.PLAYERS,1F,hammer?.6F:.8F);
-            player.serverLevel().sendParticles(net.minecraft.core.particles.ParticleTypes.CRIT,point.x,point.y,point.z,12,.2,.2,.2,.12);
+            com.codex.blacklight.registry.ModInfectedSounds.play(session.victim,hammer?
+                    com.codex.blacklight.infection.InfectedSoundCue.CRUSH:animationForm==PowerForm.NONE?
+                    com.codex.blacklight.infection.InfectedSoundCue.PIERCE:com.codex.blacklight.infection.InfectedSoundCue.TEAR,point);
+            player.serverLevel().sendParticles(new net.minecraft.core.particles.DustParticleOptions(new org.joml.Vector3f(.28F,.018F,.025F),.75F),point.x,point.y,point.z,9,.14,.12,.14,.08);
             session.victim.hurtTime=8;session.victim.hurtDuration=8;
             player.serverLevel().broadcastEntityEvent(session.victim,(byte)2);
-            player.level().playSound(null,session.victim.blockPosition(),SoundEvents.PLAYER_ATTACK_KNOCKBACK,SoundSource.PLAYERS,.85F,hammer?.55F:.72F);
             if(hammer){
                 var floor=session.victim.blockPosition().below();
                 player.serverLevel().sendParticles(new net.minecraft.core.particles.BlockParticleOption(net.minecraft.core.particles.ParticleTypes.BLOCK,player.level().getBlockState(floor)),
@@ -489,6 +499,12 @@ public final class ConsumeSystem {
         if (!player.isRemoved() && player.isAlive() && player.getData(ModAttachments.PLAYER_STATE).isPrototypeMode())
             play(player, PlayerAction.CLAW_IDLE);
         message(player, "consume_cancelled");
+    }
+    /** Escape a pending grapple without interrupting a committed consume scene. */
+    public static boolean releaseUncommitted(ServerPlayer player,boolean onlyMounted){
+        var session=ACTIVE.get(player);
+        if(session==null||session.committed()||onlyMounted&&!session.large)return false;
+        cancel(player);return true;
     }
     private static void release(Mob victim) {
         if (victim.isRemoved()) return;

@@ -191,11 +191,12 @@ public final class PrototypeAnimationController {
             boolean local=player==minecraft.player;
             var target=local?ClientTargetLock.target():player.level().getEntity(player.getData(ModAttachments.TARGET_LOCK_ID));
             boolean locked=target!=null&&target.isAlive()&&!target.isRemoved();
-            targetFacing=locked&&weapon.spec()==null&&!player.getData(ModAttachments.CONSUMING);
+            boolean runningFree=nowMoving&&(sprintIntent||player.isSprinting()||Math.sqrt(horizontalSqr)>=RUN_SPEED);
+            targetFacing=locked&&!runningFree&&weapon.spec()==null&&!player.getData(ModAttachments.CONSUMING);
             freeFacing=grounded&&!charging&&wallMode==WallTraversal.Mode.NONE
                     &&!player.isPassenger()&&!player.isSleeping()&&!player.isFallFlying()&&!player.getAbilities().flying
                     &&weapon.spec()==null&&!player.getData(ModAttachments.CONSUMING)
-                    &&!locked;
+                    &&(!locked||runningFree);
             if(!facingInitialized){facing=player.yBodyRot;facingInitialized=true;}
             previousFacing=facing;
             if(targetFacing){

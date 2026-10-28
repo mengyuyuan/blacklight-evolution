@@ -19,6 +19,9 @@ public final class BuildingInfectionGameTest {
     public static void connectedGrowthSaveBroodAndDestroyedCore(GameTestHelper h) {
         var level=h.getLevel();var data=BuildingInfectionData.get(level);
         var old=new java.util.ArrayList<>(data.colonies);data.colonies.clear();
+        var oldCleared=new java.util.LinkedHashSet<>(data.clearedSites);data.clearedSites.clear();
+        var storage=level.getServer().overworld().getDataStorage();var outbreak=OutbreakData.get(level.getServer());
+        var active=new OutbreakData();active.start(level.getServer().overworld().getGameTime()-7L*OutbreakConfig.DAY_TICKS.get());storage.set("blacklight_outbreak",active);
         var origin=h.absolutePos(new BlockPos(5,150,5));
         var grief=level.getGameRules().getRule(GameRules.RULE_MOBGRIEFING);
         var spawning=level.getGameRules().getRule(GameRules.RULE_DOMOBSPAWNING);
@@ -44,6 +47,7 @@ public final class BuildingInfectionGameTest {
             h.assertTrue(data.colonies.size()==1&&level.getBlockState(origin).is(ModBlocks.BUILDING_CORE.get()),"floor tissue beside an ordinary wall establishes exactly one core");
             h.assertTrue(!BuildingInfectionSystem.register(level,origin.offset(5,0,0)),"nearby overlapping producer is rejected");
             var c=data.colonies.getFirst();
+            for(int i=0;i<32;i++){c.supply.offer(TissueDigestion.Kind.MEAT,64);c.supply.digest(200);}
             grief.set(false,level.getServer());
             int queued=c.frontier.size();
             h.assertTrue(BuildingInfectionSystem.advance(level)==0&&c.activeTicks==0&&c.frontier.size()==queued,"griefing off freezes both work and age");
@@ -53,6 +57,7 @@ public final class BuildingInfectionGameTest {
             BuildingInfectionSystem.advance(level);
             h.assertTrue(!level.hasChunkAt(far),"frontier cannot force-load remote chunks");c.frontier.remove(far.asLong());
             for(int i=0;i<1600;i++) {
+                if(c.supply.reserve()<128)for(int j=0;j<8;j++){c.supply.offer(TissueDigestion.Kind.MEAT,64);c.supply.digest(200);}
                 int operations=BuildingInfectionSystem.advance(level);
                 h.assertTrue(operations<=BuildingInfectionConfig.WORK.get(),"dimension work budget is shared and bounded");
             }
@@ -72,19 +77,23 @@ public final class BuildingInfectionGameTest {
             spawning.set(true,level.getServer());
             boolean born=BuildingInfectionSystem.hatch(level,c);
             h.assertTrue(born,"mature core produces an actual living mob at a collision-free outlet");
-            h.assertTrue(!level.getEntitiesOfClass(com.codex.blacklight.entity.BlacklightHunter.class,new AABB(origin).inflate(12)).isEmpty(),"first brood reserves a hunter");
+            var children=level.getEntitiesOfClass(Mob.class,new AABB(origin).inflate(12),BlacklightInfectionSystem::isInfected);
+            h.assertTrue(!children.isEmpty()&&(com.codex.blacklight.city.CityEcology.stage(level,origin)>=2
+                    ?children.stream().anyMatch(m->m instanceof com.codex.blacklight.entity.BlacklightHunter)
+                    :children.stream().noneMatch(m->m instanceof com.codex.blacklight.entity.BlacklightHunter)),"brood matches the current shared world stage instead of spawning a premature hunter");
             level.removeBlock(origin,false);
             h.assertTrue(c.dead&&c.frontier.isEmpty(),"destroying the core immediately stops the queue");
             int surfaces=c.surfaces.size(),births=c.births;
             for(int i=0;i<20;i++)BuildingInfectionSystem.advance(level);
             h.assertTrue(c.surfaces.size()==surfaces&&c.births==births&&!BuildingInfectionSystem.hatch(level,c),"destroyed core neither grows nor spawns");
-            var dead=BuildingInfectionData.load(data.save(new CompoundTag(),level.registryAccess()),level.registryAccess()).colonies.getFirst();
-            h.assertTrue(dead.dead&&!BuildingInfectionSystem.register(level,origin),"cleared site remains cleared across save and reseeding");
+            var dead=BuildingInfectionData.load(data.save(new CompoundTag(),level.registryAccess()),level.registryAccess());
+            h.assertTrue(dead.clearedSites.contains(origin.asLong())&&dead.activeColonies()==0&&!BuildingInfectionSystem.register(level,origin),"compact history keeps the cleared site protected without spending a live colony slot");
             h.succeed();
         } finally {
             for(var mob:level.getEntitiesOfClass(Mob.class,new AABB(origin).inflate(48)))mob.discard();
             grief.set(oldGrief,level.getServer());spawning.set(oldSpawning,level.getServer());level.getServer().setDifficulty(difficulty,true);
             data.colonies.clear();data.colonies.addAll(old);data.setDirty();
+            data.clearedSites.clear();data.clearedSites.addAll(oldCleared);storage.set("blacklight_outbreak",outbreak);
         }
     }
 }

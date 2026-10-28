@@ -294,6 +294,12 @@ public final class ClientMovementEvents {
             lastChargingAnimation=false;clientChargeTicks=0;
             clientOffGroundTicks=0;JUMP_INPUT.reset();
             resetClientWallRun();
+            // Travel belongs to the grapple, but its escape edge must still
+            // reach the server before this input-ownership return.
+            boolean detachHeld=minecraft.screen==null&&mappingDown(minecraft,minecraft.options.keyShift);
+            if(detachHeld&&!lastDetach&&minecraft.getConnection()!=null)
+                PacketDistributor.sendToServer(new MovementInputPayload(false,false,0,0,false,true,cameraYaw(minecraft)));
+            lastDetach=detachHeld;
             if(com.codex.blacklight.combat.ConsumeVisual.blocksTravel(minecraft.player.getData(ModAttachments.GRAB_STAGE)))
                 minecraft.player.setDeltaMovement(0, minecraft.player.getDeltaMovement().y, 0);
             return;
@@ -435,7 +441,7 @@ public final class ClientMovementEvents {
         // Match the server acceleration locally.  Without this prediction the integrated
         // server repeatedly corrects the vanilla-speed client, which looks like a ghost
         // copy or stuttering trail behind the player.
-        if (!wallHandled && !isChargingJump() && (minecraft.player.onGround() || WaterRunning.onSurface(minecraft.player)) && forwardHeld && sprinting
+        if (!wallHandled && !isChargingJump() && com.codex.blacklight.movement.TerrainTraversal.sprintSupported(minecraft.player) && forwardHeld && sprinting
                 && !ClientClawEvents.isGroundSpikeActionActive()) {
             minecraft.player.setSprinting(true);
             var forward = com.codex.blacklight.movement.TraversalSteering.forward(minecraft.player);
