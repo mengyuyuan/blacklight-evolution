@@ -23,6 +23,7 @@ public final class BiomassSystem {
     private BiomassSystem(){}
     private record RejectedPrey(java.util.UUID target,long until){}
     private static final java.util.Map<ServerPlayer,RejectedPrey> REJECTED=new java.util.WeakHashMap<>();
+    private static final java.util.Set<ServerPlayer> STARTING=java.util.Collections.newSetFromMap(new java.util.IdentityHashMap<>());
     public static BiomassState state(Entity p){return ModAttachments.peekData(p,ModAttachments.BIOMASS_FORM,BiomassState.EMPTY);}
     public static boolean active(Entity p){return state(p).active();}
     private static void publish(ServerPlayer p,BiomassState value){
@@ -46,16 +47,31 @@ public final class BiomassSystem {
         if(resize)p.refreshDimensions();
     }
     public static boolean begin(ServerPlayer p,boolean fatal){
+        if(!p.server.isSameThread()||!STARTING.add(p))return false;
+        try{return beginReserved(p,fatal);}finally{STARTING.remove(p);}
+    }
+    private static boolean canBegin(ServerPlayer p,boolean fatal){
         var power=p.getData(ModAttachments.PLAYER_STATE);
         if(active(p)||!power.isInfected()||!power.isPrototypeMode()||p.isSpectator()||p.isRemoved())return false;
         if(!fatal&&(com.codex.blacklight.city.HydraTransport.active(p)||!p.isAlive()||p.isPassenger()||p.isSleeping()||p.isFallFlying()
                 ||p.getData(ModAttachments.CONSUMING)||WeaponCombatSystem.busy(p)||DevastatorSystem.busy(p)))return false;
+        return true;
+    }
+    private static boolean beginReserved(ServerPlayer p,boolean fatal){
+        if(!canBegin(p,fatal))return false;
+        var power=p.getData(ModAttachments.PLAYER_STATE);
         if(fatal&&!power.spendBiomass(Math.max(0,Math.min(1000,p.level().getGameRules().getInt(BiomassRules.COST)))))return false;
         if(fatal){var carrier=com.codex.blacklight.city.HydraTransport.carrier(p);if(carrier!=null)carrier.abortTransport(p);}
         String oldPower=power.getActivePower().id(),shell="";
         if(!fatal){
             var husk=new BiomassHusk(ModEntities.BIOMASS_HUSK.get(),p.level());
             husk.initialize(p);if(!p.serverLevel().addFreshEntity(husk))return false;
+            // Join listeners can remove the shell or change the owner's mode,
+            // level, life or action. Commit only to the still-valid separation.
+            if(!husk.isAlive()||husk.isRemoved()||husk.erupted()||husk.level()!=p.level()
+                    ||p.getData(ModAttachments.PLAYER_STATE)!=power||!canBegin(p,false)){
+                husk.discard();return false;
+            }
             shell=husk.getUUID().toString();
         }
         var heldBlock=BlockThrowSystem.held(p);if(heldBlock!=null)heldBlock.drop();
