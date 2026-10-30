@@ -20,7 +20,12 @@ public final class CityBlocks {
     public static final DeferredBlock<Block> WOUNDED=BLOCKS.registerSimpleBlock("city_wounded",flesh(1));
     public static final DeferredBlock<SlabBlock> LAYER=BLOCKS.registerBlock("city_tissue_layer",SlabBlock::new,flesh(1));
     public static final DeferredBlock<CityHatchBlock> HATCH=BLOCKS.registerBlock("city_hatch",CityHatchBlock::new,flesh(5));
-    public static final DeferredBlock<Block> SAC=BLOCKS.registerSimpleBlock("city_sac",flesh(2).lightLevel(s->2));
+    public static final DeferredBlock<Block> SAC=BLOCKS.register("city_sac",()->new Block(flesh(2).lightLevel(s->2)) {
+        @Override public void appendHoverText(ItemStack stack,Item.TooltipContext context,java.util.List<Component> tooltip,TooltipFlag flag) {
+            super.appendHoverText(stack,context,tooltip,flag);
+            tooltip.add(Component.translatable("city.blacklight.sac_hint").withStyle(net.minecraft.ChatFormatting.GRAY));
+        }
+    });
     public static final DeferredItem<CityTransitItem> TRANSIT=ITEMS.registerItem("city_transit",CityTransitItem::new,new Item.Properties().stacksTo(1));
     static {
         for(var block:java.util.List.of(FLESH,FIBER,VEIN,SHELL,WOUNDED,LAYER,HATCH,SAC))ITEMS.registerSimpleBlockItem(block);

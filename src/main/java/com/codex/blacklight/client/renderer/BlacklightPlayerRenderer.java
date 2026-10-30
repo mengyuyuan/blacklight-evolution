@@ -35,6 +35,12 @@ public final class BlacklightPlayerRenderer extends PlayerRenderer {
         super(context,slim);
         slimHands=slim;handModel=new net.minecraft.client.model.PlayerModel<>(context.bakeLayer(slim?ModelLayers.PLAYER_SLIM:ModelLayers.PLAYER),slim);
         this.model=new BlacklightPlayerModel(context.bakeLayer(slim?ModelLayers.PLAYER_SLIM:ModelLayers.PLAYER),slim);
+        // Keep vanilla equipment effects, but deform its cuboids with our body.
+        layers.removeIf(layer->layer instanceof net.minecraft.client.renderer.entity.layers.HumanoidArmorLayer<?,?,?>);
+        var body=(BlacklightPlayerModel)this.model;
+        addLayer(new net.minecraft.client.renderer.entity.layers.HumanoidArmorLayer<>(this,
+                new com.codex.blacklight.client.model.BlacklightArmorModel(context.bakeLayer(ModelLayers.PLAYER_INNER_ARMOR),body),
+                new com.codex.blacklight.client.model.BlacklightArmorModel(context.bakeLayer(ModelLayers.PLAYER_OUTER_ARMOR),body),context.getModelManager()));
         biological=new BlacklightClawLayer(this);utility=new UtilityPowerLayer(this);
         wings=new com.codex.blacklight.client.renderer.layer.SovereignWingLayer(this);
         addLayer(biological);addLayer(utility);addLayer(wings);

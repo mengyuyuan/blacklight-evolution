@@ -73,6 +73,13 @@ public final class WeaponCombatSystem {
         var state=p.getData(ModAttachments.PLAYER_STATE);var movement=p.getData(ModAttachments.MOVEMENT_STATE);
         return p.isAlive()&&!p.isSpectator()&&!p.isPassenger()&&state.isInfected()&&state.isPrototypeMode()&&WeaponMove.controls(state.getActivePower(),p.getMainHandItem().isEmpty()&&p.getOffhandItem().isEmpty())&&!p.getData(ModAttachments.CONSUMING)&&!movement.wallTraversal().attached()&&movement.chargeTicks()==0;
     }
+    /** A hit/terrain callback may kill, transform, travel or replace the actor's
+     * action synchronously. An old stack frame never owns the replacement. */
+    private static boolean currentSession(ServerPlayer p,Session s){
+        if(ACTIVE.get(p)!=s)return false;
+        if(canRequest(p)&&p.getData(ModAttachments.PLAYER_STATE).getActivePower()==s.form)return true;
+        cancel(p);return false;
+    }
     public static void request(ServerPlayer p,boolean special){
         request(p,special?WeaponMove.Input.SPECIAL:WeaponMove.Input.ATTACK);
     }
@@ -315,6 +322,7 @@ public final class WeaponCombatSystem {
                 }
                 if(freeToss&&!p.onGround()){
                     strike(p,s,s.move.start);
+                    if(!currentSession(p,s))return;
                     s.ballisticY-=CombatMotion.tossGravity();
                     if(p.horizontalCollision)s.travelSpeed=0;
                     p.setDeltaMovement(s.direction.scale(s.travelSpeed).add(0,s.ballisticY,0));p.hurtMarked=true;
@@ -370,6 +378,7 @@ public final class WeaponCombatSystem {
                 if(s.hit.isEmpty()){ClawCombatSystem.eruptGroundSpike(p);s.hit.add(p.getUUID());}
             }else strike(p,s,t);
         }else s.effect=false; // A later active interval can sound again without clearing the target ledger.
+        if(!currentSession(p,s))return;
         s.previousFeet=p.position();s.previousYaw=s.yaw;rememberTargets(p,s);
         if(s.jumpQueued&&p.onGround()&&t>=s.move.end&&!s.move.landingAttack()){
             jumpOut(p,s);
@@ -487,6 +496,7 @@ public final class WeaponCombatSystem {
     }
     private static void strike(ServerPlayer p,Session s,int tick){
         CombatEnvironmentEffects.contact(p,s.move,tick,s.yaw,s.clipOffset,s.terrainContacts);
+        if(!currentSession(p,s))return;
         boolean bodyFlight=s.mobilityStarted>=0&&!p.onGround()&&(CombatMotion.freeFlight(s.move)||s.move==WeaponMove.HAMMER_RAM);
         if(s.move.quake()&&!p.onGround()&&!bodyFlight)return;
         var direction=strikeDirection(s.move,s.yaw,tick);
@@ -506,6 +516,7 @@ public final class WeaponCombatSystem {
         var candidates=CombatTargeting.candidates(p,search,v->CombatTargeting.damageable(p,v));
         candidates.sort(Comparator.comparingInt((LivingEntity v)->v==s.target?0:1).thenComparingDouble(v->CombatTargeting.distanceSquared(p.getEyePosition(),v)));
         for(var v:candidates){
+            if(!currentSession(p,s))return;
             if(s.hit.size()>=(s.move.quake()?48:8)&&!s.hit.contains(v.getUUID()))continue;
             int pulse=s.move.sweeperPulse(tick);
             boolean close=pulse>=0&&CombatTargeting.inReach(p,v,1.8)&&CombatTargeting.visible(p,v);
@@ -518,7 +529,12 @@ public final class WeaponCombatSystem {
             var last=LAST_CONTACT.get(v);
             boolean ownPrevious=last!=null&&last.owner.equals(p.getUUID())&&p.level().getGameTime()-last.time<=10;
             if(ownPrevious)v.invulnerableTime=0;
-            if(v.hurt(p.damageSources().playerAttack(p),s.move.damageFor(s.form)*(1+.5F*s.chargePower))){
+            boolean accepted=v.hurt(p.damageSources().playerAttack(p),s.move.damageFor(s.form)*(1+.5F*s.chargePower));
+            // Restore only the timer we temporarily cleared, never overwrite a
+            // newer protection installed by another damage callback.
+            if(!accepted&&ownPrevious&&v.invulnerableTime==0)v.invulnerableTime=resistance;
+            if(!currentSession(p,s))return;
+            if(accepted){
                 LAST_CONTACT.put(v,new LastContact(p.getUUID(),p.level().getGameTime()));
                 s.hit.add(v.getUUID());if(close)s.closeSweepHits.put(v.getUUID(),pulse);
                 boolean resistsControl=v instanceof com.codex.blacklight.entity.BlacklightInfectedHost host&&host.evolvedControlProtected();
@@ -531,7 +547,7 @@ public final class WeaponCombatSystem {
                 if(s.move.form==com.codex.blacklight.power.PowerForm.HAMMERFISTS&&!s.move.quake()&&!s.impactEffect){
                     s.impactEffect=true;hammerSplash(p,s,v);
                 }
-            }else if(ownPrevious)v.invulnerableTime=resistance;
+            }
         }
     }
     private static boolean airTargetAvailable(ServerPlayer p,Session s){
@@ -550,6 +566,7 @@ public final class WeaponCombatSystem {
         }
         // Check the segment actually traversed, even on the final or wall tick.
         strike(p,s,s.move.start+Math.min(2,s.move.end-s.move.start-1));
+        if(!currentSession(p,s))return;
         boolean stop=p.tickCount-s.mobilityStarted>=CombatMotion.flightTicks(s.move,s.chargePower)
                 ||p.onGround()||p.horizontalCollision||p.verticalCollision||p.isInWater()||p.isInLava()||!s.hit.isEmpty();
         if(stop){
@@ -628,15 +645,19 @@ public final class WeaponCombatSystem {
     }
     /** Hammer contact disperses a nearby crowd; the main victim is never damaged twice. */
     private static void hammerSplash(ServerPlayer p,Session s,LivingEntity primary){
+        if(!currentSession(p,s))return;
         var center=CombatTargeting.positionNear(p.getEyePosition(),primary);double radius=(s.move==s.move.uncharged()?1.65:2.2)*AttackReach.scale(p);
         var search=CombatTargeting.multipart(primary)?new AABB(center,center).inflate(radius,1.5,radius):primary.getBoundingBox().inflate(radius,1,radius);
         var splashOrigin=CombatTargeting.multipart(primary)?center:primary.getBoundingBox().getCenter();
         for(var v:CombatTargeting.candidates(p,search,target->CombatTargeting.damageable(p,target))){
+            if(!currentSession(p,s))return;
             if(v==primary||!CombatTargeting.damageable(p,v)||s.hit.contains(v.getUUID()))continue;
             var delta=CombatTargeting.closestPoint(center,v).subtract(center);
             if(delta.horizontalDistance()>radius||Math.abs(delta.y)>1.5)continue;
             if(CombatTargeting.hitboxes(v).stream().noneMatch(box->box.intersects(search)&&CombatTargeting.visible(p,splashOrigin,box)))continue;
-            if(v.hurt(p.damageSources().playerAttack(p),s.move.damage*.65F)){
+            boolean accepted=v.hurt(p.damageSources().playerAttack(p),s.move.damage*.65F);
+            if(!currentSession(p,s))return;
+            if(accepted){
                 s.hit.add(v.getUUID());LAST_CONTACT.put(v,new LastContact(p.getUUID(),p.level().getGameTime()));
                 WeaponImpact.apply(p,v,s.move,delta.multiply(1,0,1).normalize(),false);
             }

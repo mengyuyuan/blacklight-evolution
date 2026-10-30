@@ -50,13 +50,19 @@ public final class BulletdiveAimGameTest {
     }
     @GameTest(template="wall_test",timeoutTicks=520,batch="dive_flight")
     public static void fullSixtyThousandBlockDiveGuidesToMovingTargetAndUsesRealCollision(GameTestHelper h){
-        var p=player(h);var ground=h.absolutePos(new BlockPos(4,30,4)).getBottomCenter();
-        for(int x=-4;x<=40;x++)for(int z=-4;z<=12;z++)h.getLevel().setBlock(BlockPos.containing(ground.add(x,-1,z)),Blocks.BEDROCK.defaultBlockState(),2);
+        var p=player(h);var ground=h.absolutePos(new BlockPos(4,120,4)).getBottomCenter();
+        // This long flight spans farther than the shared template. Previous
+        // batches may leave blocks outside its cleanup bounds; prepare an actual
+        // open impact volume instead of landing on another fixture's ceiling.
+        for(int x=-4;x<=40;x++)for(int z=-4;z<=12;z++){
+            h.getLevel().setBlock(BlockPos.containing(ground.add(x,-1,z)),Blocks.BEDROCK.defaultBlockState(),2);
+            for(int y=0;y<=32;y++)h.getLevel().setBlock(BlockPos.containing(ground.add(x,y,z)),Blocks.AIR.defaultBlockState(),2);
+        }
         p.moveTo(ground.x,ground.y,ground.z,-90,0);p.setOnGround(false);var target=victim(h,ground.add(20,0,0));
         var bystander=victim(h,ground.add(30,0,-3));
         CombatTargeting.requestLock(p,target.getId());p.setPos(ground.add(0,60000,0));p.setData(ModAttachments.GLIDE_UNTIL,h.getLevel().getGameTime()+40);
         h.getLevel().addNewPlayer(p);
-        boolean[] landed={false};double[] offset={Double.NaN},height={0},peak={0};
+        boolean[] landed={false};double[] offset={Double.NaN},height={0},peak={0};String[] landing={"not landed"};
         for(int t=2;t<470;t++){final int time=t;h.runAfterDelay(t,()->{
             if(landed[0]){p.tickCount++;DevastatorSystem.tick(new PlayerTickEvent.Post(p));return;}
             p.tickCount++;
@@ -72,6 +78,8 @@ public final class BulletdiveAimGameTest {
                 }
                 if(state.landed()){
                     landed[0]=true;offset[0]=Math.hypot(p.getX()-target.getX(),p.getZ()-target.getZ());
+                    landing[0]=state+" damageable="+CombatTargeting.damageable(p,target)+" visible="+CombatTargeting.visible(p,target)
+                            +" timing="+DevastatorTiming.of(WeaponMove.BULLETDIVE_DROP)+" actor="+p.position()+" target="+target.position();
                     h.assertTrue(p.onGround(),"real swept block collision, not an invented impact height");return;
                 }
             }
@@ -81,9 +89,10 @@ public final class BulletdiveAimGameTest {
         });}
         h.runAfterDelay(480,()->{try{
             h.assertTrue(landed[0]&&offset[0]<1,"guided moving-target landing is within one block, actual="+offset[0]);
-            h.assertTrue(height[0]>59900&&peak[0]>100,"uncapped vertical acceleration and actual fall height are retained");
+            h.assertTrue(height[0]>59999&&peak[0]>100,"uncapped vertical acceleration and the prepared impact floor are retained");
             h.assertTrue(target.getHealth()<target.getMaxHealth()&&bystander.getHealth()<bystander.getMaxHealth(),
-                    "guidance retains real area damage on both the locked victim and a nearby non-locked victim");
+                    "guidance retains real area damage on both the locked victim and a nearby non-locked victim: locked="
+                            +target.getHealth()+" bystander="+bystander.getHealth()+" state="+DevastatorSystem.snapshot(p)+" landing="+landing[0]);
             h.succeed();
         }finally{DevastatorSystem.cancel(p);CombatTargeting.requestLock(p,-1);target.discard();bystander.discard();h.getLevel().removePlayerImmediately(p,Entity.RemovalReason.DISCARDED);}});
     }

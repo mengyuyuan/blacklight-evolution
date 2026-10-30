@@ -200,14 +200,18 @@ public final class BiomassSystem {
             // Spore's calamities explicitly permit >= 10000 execution hits past their cap.
             float execution=(float)Math.min(Float.MAX_VALUE,Math.max(10000D,(double)target.getMaxHealth()*20));
             boolean accepted=target.hurt(target.damageSources().playerAttack(p),execution);
+            // hurt/die dispatch synchronous external callbacks. The player may
+            // die, travel, recall or leave this form while the prey is dying.
+            // Do not overwrite that newer state with the old scene's full heal.
+            if(!p.isAlive()||p.isRemoved()||p.isSpectator()||p.level()!=target.level()||!state(p).equals(s))return;
             // Respect invulnerability, region protections, death vetoes and resurrection mods.
-            if(!accepted||!((com.codex.blacklight.mixin.LivingDeathAccess)target).blacklight$deathAccepted()){
+            if(!accepted||target.isAlive()||!((com.codex.blacklight.mixin.LivingDeathAccess)target).blacklight$deathAccepted()){
                 // Do not immediately reclaim the same immune target and starve other nearby prey.
                 REJECTED.put(p,new RejectedPrey(target.getUUID(),now+BiomassState.ABSORB_TICKS));
                 publish(p,s.crawl(now));return;
             }
+            if(!AssimilationSystem.settle(p,target,consumeReward,false)){publish(p,s.crawl(now));return;}
             target.setInvisible(true);
-            AssimilationSystem.settle(p,target,consumeReward,false);
             Vec3 destination=BiomassReformation.completionPosition(p,target.position());
             p.teleportTo(destination.x,destination.y,destination.z);
             p.setHealth(p.getMaxHealth());p.clearFire();p.invulnerableTime=40;

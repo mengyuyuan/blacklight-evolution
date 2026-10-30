@@ -60,10 +60,23 @@ public final class DevastatorTrueDamageGameTest {
     public static void fullCriticalPainInputAnimationAndContactUseTrueDamage(GameTestHelper h){actualSkill(h,2);}
     private static void actualSkill(GameTestHelper h,int kind){
         var p=caster(h);
-        for(int x=0;x<40;x++)for(int z=0;z<8;z++)h.getLevel().setBlock(h.absolutePos(new BlockPos(x,29,z)),Blocks.STONE.defaultBlockState(),2);
-        var start=h.absolutePos(new BlockPos(4,30,4)).getBottomCenter();p.moveTo(start.x,start.y,start.z,-90,0);p.setOnGround(true);h.getLevel().addNewPlayer(p);
+        var tickets=new java.util.HashSet<ChunkPos>();
+        var min=h.absolutePos(new BlockPos(0,119,0));var max=h.absolutePos(new BlockPos(39,119,7));
+        for(int x=min.getX()>>4;x<=max.getX()>>4;x++)for(int z=min.getZ()>>4;z<=max.getZ()>>4;z++){
+            var chunk=new ChunkPos(x,z);
+            if(!h.getLevel().getForcedChunks().contains(chunk.toLong())){h.getLevel().setChunkForced(x,z,true);tickets.add(chunk);}
+            h.getLevel().getChunk(x,z);
+        }
+        // The 28-block contact lane extends beyond the shared template's clear box.
+        // Isolate it above other fixtures and remove old walls before casting.
+        for(int x=0;x<40;x++)for(int z=0;z<8;z++){
+            h.getLevel().setBlock(h.absolutePos(new BlockPos(x,119,z)),Blocks.STONE.defaultBlockState(),2);
+            for(int y=120;y<=132;y++)h.getLevel().setBlock(h.absolutePos(new BlockPos(x,y,z)),Blocks.AIR.defaultBlockState(),2);
+        }
+        var start=h.absolutePos(new BlockPos(4,120,4)).getBottomCenter();p.moveTo(start.x,start.y,start.z,-90,0);p.setOnGround(true);h.getLevel().addNewPlayer(p);
         var target=EntityType.COW.create(h.getLevel());target.setNoAi(true);target.getAttribute(Attributes.MAX_HEALTH).setBaseValue(10000);target.setHealth(10000);target.getPersistentData().putLong(com.codex.blacklight.infection.InfectionRules.NEXT_CONTACT_EXPOSURE,Long.MAX_VALUE);
         target.setPos(start.add(kind==0?28:22,0,0));h.getLevel().addFreshEntity(target);target.addEffect(new MobEffectInstance(MobEffects.DAMAGE_RESISTANCE,1000,4));
+        h.assertTrue(CombatTargeting.visible(p,target),"the real contact lane starts unobstructed");
         if(kind==2)CombatTargeting.requestLock(p,target.getId());
         // This server fixture has no real client packet listener calling doTick.
         // Advance its actor clock and dispatch the same formal skill tick against real world time and victims.
@@ -73,9 +86,12 @@ public final class DevastatorTrueDamageGameTest {
         });
         h.runAfterDelay(300,()->{try{
             float loss=10000-target.getHealth(),expected=DevastatorDamage.primary(kind);
-            h.assertTrue(loss>=expected-.1F&&loss<=expected+81,"full skill pipeline uses high true damage once, kind="+kind+" loss="+loss+" snapshot="+DevastatorSystem.snapshot(p));
+            h.assertTrue(loss>=expected-.1F&&loss<=expected+81,"full skill pipeline uses high true damage once, kind="+kind+" loss="+loss+" snapshot="+DevastatorSystem.snapshot(p)+" actor="+p.position()+" target="+target.position()+" sight="+CombatTargeting.visible(p,target));
             h.assertTrue(p.getData(ModAttachments.CRITICAL_MASS).reserve()==0,"actual release consumes its real critical reserve");
             h.succeed();
-        }finally{DevastatorSystem.cancel(p);CombatTargeting.requestLock(p,-1);target.discard();h.getLevel().removePlayerImmediately(p,Entity.RemovalReason.DISCARDED);}});
+        }finally{DevastatorSystem.cancel(p);CombatTargeting.requestLock(p,-1);target.discard();h.getLevel().removePlayerImmediately(p,Entity.RemovalReason.DISCARDED);
+            for(int x=0;x<40;x++)for(int z=0;z<8;z++)h.getLevel().setBlock(h.absolutePos(new BlockPos(x,119,z)),Blocks.AIR.defaultBlockState(),2);
+            for(var chunk:tickets)h.getLevel().setChunkForced(chunk.x,chunk.z,false);
+        }});
     }
 }

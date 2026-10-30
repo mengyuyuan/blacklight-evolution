@@ -281,7 +281,7 @@ public final class TissueInheritance {
         target=Math.max(base,target+.3*-Math.expm1(-.25*strength));
         return (float)Math.max(gradual,base+(target-base)*TissueGraftLayout.growth(organ,visualWork));
     }
-    public static boolean weakened(double health,double maximum){return Double.isFinite(health)&&Double.isFinite(maximum)&&maximum>0&&health>0&&health/maximum<.15;}
+    public static boolean weakened(double health,double maximum){return Double.isFinite(health)&&Double.isFinite(maximum)&&maximum>0&&health>0&&health/maximum<TissueCompetitionConfig.weakenedFraction();}
     public static boolean sizeFits(double width,double height,double preyWidth,double preyHeight){
         if(!Double.isFinite(width)||!Double.isFinite(height)||!Double.isFinite(preyWidth)||!Double.isFinite(preyHeight)
                 ||width<=0||height<=0||preyWidth<=0||preyHeight<=0)return false;

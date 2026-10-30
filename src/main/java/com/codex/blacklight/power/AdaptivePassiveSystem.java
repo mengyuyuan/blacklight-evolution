@@ -26,6 +26,11 @@ public final class AdaptivePassiveSystem {
         return active(p, AdaptivePassiveState.ADAPTATION) && p.getData(ModAttachments.PLAYER_STATE).hasCombatSkill(CombatSkill.ADAPTATION_PERCENT)
                 &&EvolutionProgression.mayActivate(p,CombatSkill.ADAPTATION_PERCENT);
     }
+    public static boolean percentRegeneration(Player p) {
+        return active(p,AdaptivePassiveState.REGENERATION)
+                &&p.getData(ModAttachments.PLAYER_STATE).hasCombatSkill(CombatSkill.TISSUE_REGENERATION_PERCENT)
+                &&EvolutionProgression.mayActivate(p,CombatSkill.TISSUE_REGENERATION_PERCENT);
+    }
     private static void publish(ServerPlayer p, AdaptivePassiveState data) {
         if (data.equals(state(p))) return;
         p.setData(ModAttachments.ADAPTIVE_PASSIVES, data);
@@ -40,21 +45,32 @@ public final class AdaptivePassiveSystem {
         boolean adaptive = active(p, AdaptivePassiveState.ADAPTATION), regen = active(p, AdaptivePassiveState.REGENERATION);
         if (!adaptive && !regen) return IndependentPassives.damage(p, source, damage);
         var before = state(p);
-        float actual = adaptive&&!com.codex.blacklight.combat.DevastatorDamage.isTrueDamage(source) ? (float)(damage * AdaptivePassiveRules.remainingFraction(before.adaptation(),
+        float reduced = adaptive&&!com.codex.blacklight.combat.DevastatorDamage.isTrueDamage(source) ? (float)(damage * AdaptivePassiveRules.remainingFraction(before.adaptation(),
                 p.getHealth(), p.getMaxHealth(), percentBased(p))) : damage;
+        // A potion may own Adaptation while the native skill owns regeneration.
+        // Both regeneration paths must use damage after the owning Adaptation pass.
+        float actual=IndependentPassives.damage(p,source,reduced);
         int layers = adaptive ? AdaptivePassiveRules.adaptationAfterHit(before.adaptation(), actual, damage - (double)actual) : before.adaptation();
-        int tissue = regen ? AdaptivePassiveRules.regenerationAfterHit(before.regeneration(), damage) : before.regeneration();
+        int tissue = regen ? AdaptivePassiveRules.regenerationAfterHit(before.regeneration(), actual) : before.regeneration();
         long next = before.nextHealAt();
         if (regen && tissue > 0 && (before.regeneration() == 0 || next == 0)) next = p.level().getGameTime() + 20;
         publish(p, new AdaptivePassiveState(before.permanentMask(), layers, tissue, next));
-        return IndependentPassives.damage(p, source, actual);
+        return actual;
     }
     private static void refreshEffects(ServerPlayer p) {
         if (active(p, AdaptivePassiveState.ADAPTATION)) {
-            if (!p.hasEffect(ModEffects.ADAPTATION)) p.addEffect(new MobEffectInstance(ModEffects.ADAPTATION, -1, 0, false, false, true));
+            int tier=percentBased(p)?1:0;var effect=p.getEffect(ModEffects.ADAPTATION);
+            if (effect==null||effect.getAmplifier()!=tier) {
+                p.removeEffect(ModEffects.ADAPTATION);
+                p.addEffect(new MobEffectInstance(ModEffects.ADAPTATION, -1, tier, false, false, true));
+            }
         } else p.removeEffect(ModEffects.ADAPTATION);
         if (active(p, AdaptivePassiveState.REGENERATION)) {
-            if (!p.hasEffect(ModEffects.TISSUE_REGENERATION)) p.addEffect(new MobEffectInstance(ModEffects.TISSUE_REGENERATION, -1, 0, false, false, true));
+            int tier=percentRegeneration(p)?1:0;var effect=p.getEffect(ModEffects.TISSUE_REGENERATION);
+            if (effect==null||effect.getAmplifier()!=tier) {
+                p.removeEffect(ModEffects.TISSUE_REGENERATION);
+                p.addEffect(new MobEffectInstance(ModEffects.TISSUE_REGENERATION, -1, tier, false, false, true));
+            }
         } else p.removeEffect(ModEffects.TISSUE_REGENERATION);
     }
     @SubscribeEvent public static void tick(PlayerTickEvent.Post event) {
@@ -72,8 +88,16 @@ public final class AdaptivePassiveSystem {
         }
         if (now < before.nextHealAt()) return;
         int count = before.regeneration();
-        publish(p, new AdaptivePassiveState(before.permanentMask(), before.adaptation(), AdaptivePassiveRules.regenerationAfterPulse(count), now + 20));
+        // Reserve this pulse before callbacks can reenter the tick/damage path.
+        publish(p, new AdaptivePassiveState(before.permanentMask(), before.adaptation(), count, now + 20));
+        float previousHealth=p.getHealth();
+        float amount=AdaptivePassiveRules.healing(count,previousHealth,p.getMaxHealth(),percentRegeneration(p));
         // CombatScale's heal listener converts units once. Do not turn 20 HP into 100 HP in Prototype mode.
-        p.heal(count / CombatScale.units(p));
+        if(amount>0)p.heal(amount / CombatScale.units(p));
+        var latest=state(p);
+        // Preserve layers/flags gained in a synchronous heal callback rather than
+        // overwriting the entire attachment with the pre-heal snapshot.
+        publish(p,new AdaptivePassiveState(latest.permanentMask(),latest.adaptation(),
+                AdaptivePassiveRules.regenerationAfterPulse(latest.regeneration(),Math.max(0,p.getHealth()-previousHealth)),latest.nextHealAt()));
     }
 }

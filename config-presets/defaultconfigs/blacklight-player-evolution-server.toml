@@ -1,0 +1,42 @@
+#Fixed EP cost for every repeatable attribute purchase, independent of rank.
+# Default: 200
+# Range: 1 ~ 1000000
+repeatableAttributeCost = 200
+#每级生命无限强化增加的实际HP。
+# Default: 10.0
+# Range: 0.0 ~ 1000000.0
+healthPerLevel = 10.0
+#Keep old learned passives active without new qualifications. False preserves learning/stacks but suspends effects until qualified.
+keepLegacyPassivesActive = false
+#无限恢复属性的脱战等待刻数；20刻约1秒。
+# Default: 80
+# Range: 0 ~ 240000
+recoveryDelayTicks = 80
+#移速倍率=1+本值×ln(1+等级)，不改变动作播放速度。
+# Default: 0.025
+# Range: 0.0 ~ 10.0
+mobilityLogCoefficient = 0.025
+#适应性II和组织再生II的逐项等级门槛；有效值不低于一级门槛，仍需购买对应一级技能。
+# Default: 150
+# Range: 1 ~ 1000000
+passiveTierTwoAttributeRank = 150
+#防御：受到伤害除以1+本值×等级；不影响虚空或管理击杀。
+# Default: 0.025
+# Range: 0.0 ~ 100.0
+defenseCoefficientPerLevel = 0.025
+#每级普通攻击增幅，0.02=2%。
+# Default: 0.02
+# Range: 0.0 ~ 100.0
+attackFractionPerLevel = 0.02
+#每级脱战后每秒恢复的实际HP；不是适应性或组织再生层数。
+# Default: 0.25
+# Range: 0.0 ~ 1000000.0
+recoveryHpPerLevel = 0.25
+#适应性I和组织再生I的门槛：六项无限进化属性分别达到此等级，非等级总和。旧20/50键不再使用，首次生成新键默认50/150。
+# Default: 50
+# Range: 1 ~ 1000000
+passiveTierOneAttributeRank = 50
+#每级黑光技能伤害增幅，0.04=4%。
+# Default: 0.04
+# Range: 0.0 ~ 100.0
+skillFractionPerLevel = 0.04

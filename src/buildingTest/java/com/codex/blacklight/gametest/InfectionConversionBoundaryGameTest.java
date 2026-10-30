@@ -18,6 +18,37 @@ import net.neoforged.neoforge.gametest.*;
 /** Real synchronous entity-join callbacks around the infection replacement transaction. */
 @GameTestHolder("blacklight") @PrefixGameTestTemplate(false)
 public final class InfectionConversionBoundaryGameTest {
+    @GameTest(template="wall_test",timeoutTicks=30,batch="audit_pig_saddle")
+    public static void aFailedPigConversionCannotReturnTheSameSaddleTwice(GameTestHelper h){saddle(h,false,false);}
+    @GameTest(template="wall_test",timeoutTicks=30,batch="audit_strider_saddle")
+    public static void aFailedStriderConversionCannotReturnTheSameSaddleTwice(GameTestHelper h){saddle(h,true,false);}
+    @GameTest(template="wall_test",timeoutTicks=30,batch="audit_saddle_veto")
+    public static void aRejectedSaddleDropPreservesTheSaddledSource(GameTestHelper h){saddle(h,false,true);}
+    private static void saddle(GameTestHelper h,boolean strider,boolean veto){
+        var level=h.getLevel();Mob source=strider?EntityType.STRIDER.create(level):EntityType.PIG.create(level);
+        source.setNoAi(true);source.setNoGravity(true);source.setPos(h.absolutePos(new BlockPos(3,140,3)).getBottomCenter());
+        ((Saddleable)source).equipSaddle(new ItemStack(Items.SADDLE),null);level.addFreshEntity(source);BlacklightInfectionSystem.infect(source,null);
+        String marker="audit-saddle-"+source.getUUID();source.addTag(marker);
+        var created=new ArrayList<BlacklightInfectedHost>();var drops=new ArrayList<net.minecraft.world.entity.item.ItemEntity>();
+        Consumer<EntityJoinLevelEvent> callback=e->{
+            if(e.getLevel()!=level)return;
+            if(e.getEntity() instanceof BlacklightInfectedHost host&&host.getTags().contains(marker))created.add(host);
+            if(e.getEntity() instanceof net.minecraft.world.entity.item.ItemEntity item&&item.getItem().is(Items.SADDLE)&&item.distanceToSqr(source)<4){
+                if(veto)e.setCanceled(true);else{drops.add(item);if(drops.size()==1)created.getLast().discard();}
+            }
+        };
+        NeoForge.EVENT_BUS.addListener(callback);
+        try{
+            convert(source,level);
+            if(veto)h.assertTrue(!source.isRemoved()&&((Saddleable)source).isSaddled()&&created.stream().allMatch(Entity::isRemoved),"a veto keeps the actual saddle flag and its original living owner");
+            else{
+                h.assertTrue(!source.isRemoved(),"the first callback really invalidates conversion after saddle publication");
+                convert(source,level);
+                h.assertTrue(drops.size()==1&&source.isRemoved(),"retry cannot duplicate a returned saddle; drops="+drops.size());
+            }
+            h.succeed();
+        }finally{NeoForge.EVENT_BUS.unregister(callback);created.forEach(Entity::discard);drops.forEach(Entity::discard);source.discard();}
+    }
     private static void convert(Mob source,ServerLevel level){
         try{
             var method=BlacklightInfectionSystem.class.getDeclaredMethod("convertHost",Mob.class,ServerLevel.class);

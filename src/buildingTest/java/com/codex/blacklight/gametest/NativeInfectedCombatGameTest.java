@@ -103,8 +103,16 @@ public final class NativeInfectedCombatGameTest {
         var squid=body(h,EntityType.SQUID);var base=squid.blockPosition();
         for(int x=-5;x<=5;x++)for(int z=-5;z<=6;z++)for(int y=0;y<6;y++)fixture(h,base.offset(x,y,z),Blocks.WATER.defaultBlockState());
         squid.setPos(squid.position().add(0,2,0));var start=squid.position();var moved=new java.util.concurrent.atomic.AtomicBoolean();
-        for(int i=5;i<85;i++)h.runAfterDelay(i,()->{if(squid.position().distanceToSqr(start)>.4)moved.set(true);});
-        h.runAfterDelay(90,()->{try{h.assertTrue(moved.get()&&squid.isInWater(),"actual aquatic roaming moves through water");h.assertTrue(squid.getY()>base.getY()+.4,"water locomotion does not apply land gravity to pin it to the bottom");}finally{end();}h.succeed();});
+        for(int i=5;i<45;i++)h.runAfterDelay(i,()->{if(squid.position().distanceToSqr(start)>.4)moved.set(true);});
+        // Random swimming may intentionally approach the bottom. Separate real
+        // roaming from a neutral-input gravity check instead of asserting the
+        // random final destination's height.
+        h.runAfterDelay(45,()->{squid.setNoAi(true);squid.getNavigation().stop();squid.setTarget(null);squid.setPos(start);squid.setDeltaMovement(Vec3.ZERO);});
+        var neutral=new java.util.concurrent.atomic.AtomicBoolean(true);
+        for(int i=48;i<75;i++)h.runAfterDelay(i,()->{
+            if(!squid.isInWater()||!squid.isNoGravity()||Math.abs(squid.getY()-start.y)>.03)neutral.set(false);
+        });
+        h.runAfterDelay(90,()->{try{h.assertTrue(moved.get(),"actual aquatic roaming moves through water");h.assertTrue(neutral.get(),"neutral underwater locomotion has no downward land acceleration");}finally{end();}h.succeed();});
     }
     @GameTest(template="wall_test",timeoutTicks=190,batch="native_organ_scheduler")
     public static void aRestoredRangedHostCanStillUseAnAcquiredCloseCombatOrgan(GameTestHelper h){

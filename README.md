@@ -47,6 +47,8 @@ Blacklight JAR 不内置前置 Mod。请使用上表的明确版本，不以“�
 
 退出游戏并备份存档、配置，把对应 NeoForge 版本的依赖与 Blacklight JAR 放入实例的 mods 目录，移除旧的 Blacklight JAR，只保留一份。正式版默认 `bundled` 包包含完整 251 文件资料。具体步骤见 [安装文档](docs/INSTALL_ZH.md)。
 
+刷怪、感染概率、成长速度、器官继承、城市与建筑繁殖和无限属性收益均有服务端配置；两种被动默认逐项50级解锁I、150级解锁II。完整文件分工、旧配置迁移和调整示例见 [服务端平衡配置](docs/SERVER_CONFIGURATION_ZH.md)，带注释模板位于 `config-presets/defaultconfigs/`。
+
 ## 生存开始
 
 1. 寻找雪地村庄的制图师，升至学徒，取得冰下研究站地图。已生成交易的旧村民不会自动换表；研究站只在符合条件的新区域生成。

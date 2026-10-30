@@ -4,6 +4,20 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 class TissueMetabolismTest {
+    @Test void slowMultipliersPreserveFractionalWorkWithoutAnArtificialMinimum(){
+        for(double speed:new double[]{.0001,.01,.075,.15,1,2.5}){
+            double remainder=0;long total=0;
+            for(int i=0;i<1000;i++){
+                var step=TissueMetabolism.timeStep(remainder,20,speed);total+=step.ticks();remainder=step.remainder();
+                assertTrue(remainder>=0&&remainder<1);
+            }
+            assertEquals(20000*speed,total+remainder,1e-8);
+        }
+        assertEquals(new TissueMetabolism.TimeStep(0,.7),TissueMetabolism.timeStep(.7,20,0));
+        assertEquals(new TissueMetabolism.TimeStep(Long.MAX_VALUE,0),TissueMetabolism.timeStep(.5,Long.MAX_VALUE,100));
+        for(double invalid:new double[]{Double.NaN,Double.POSITIVE_INFINITY,-1,1,100})assertEquals(0,TissueMetabolism.timeFraction(invalid));
+        assertEquals(new TissueMetabolism.TimeStep(20,.5),TissueMetabolism.timeStep(.5,20,Double.NaN));
+    }
     @Test void GeneticUpdatesAccumulatePaidWorkRatherThanSendingFullAncestryEverySecond(){
         var batch=new TissueMetabolism.Cultivation(0,0);
         for(int i=0;i<59;i++){batch=TissueMetabolism.cultivation(batch.remainder(),20);assertEquals(0,batch.work());}

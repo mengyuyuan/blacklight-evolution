@@ -35,6 +35,7 @@ public final class BlacklightMutant extends Monster implements GeoEntity {
     }
     @Override public void tick(){
         super.tick();if(level().isClientSide)return;
+        if(!isAlive()||isRemoved()||isNoAi()){entityData.set(ATTACK,0);return;}
         if(com.codex.blacklight.combat.ImpactControl.stunned(this)){entityData.set(ATTACK,0);return;}
         if(getData(com.codex.blacklight.registry.ModAttachments.CONSUME_VISUAL).active()){entityData.set(ATTACK,0);return;}
         if(cooldown>0)cooldown--;int t=entityData.get(ATTACK);if(t<=0)return;

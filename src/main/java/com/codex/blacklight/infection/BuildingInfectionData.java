@@ -61,9 +61,9 @@ public final class BuildingInfectionData extends SavedData {
             var n = entries.getCompound(i);
             var c = new Colony(BlockPos.of(n.getLong("origin")));
             c.activeTicks = Math.max(0, n.getInt("ticks")); c.stage = Math.clamp(n.getInt("stage"), 0, 3);
-            c.dead = n.getBoolean("dead"); c.broodTicks = Math.clamp(n.getInt("brood"), 0, 600);
+            c.dead = n.getBoolean("dead"); c.broodTicks = Math.clamp(n.getInt("brood"), 0, com.codex.blacklight.config.GameplayBalanceConfig.value(com.codex.blacklight.config.GameplayBalanceConfig.BROOD_TICKS));
             c.autonomous=n.contains("autonomous")?n.getBoolean("autonomous"):tag.getInt("schema")<5;
-            c.occupationTicks=Math.clamp(n.getInt("occupationTicks"),0,39);
+            c.occupationTicks=Math.clamp(n.getInt("occupationTicks"),0,com.codex.blacklight.config.GameplayBalanceConfig.value(com.codex.blacklight.config.GameplayBalanceConfig.OCCUPATION_TICKS)-1);
             c.occupationProduced=Math.max(0,n.getLong("occupationProduced"));
             c.assimilationCursor=Math.max(0,n.getInt("assimilationCursor"));c.assimilation=BuildingAssimilation.Ledger.read(n.getCompound("assimilation"),registry);
             c.assimilation.cells.keySet().removeIf(key->{var p=BlockPos.of(key);return Math.abs((long)p.getX()-c.origin.getX())>192||Math.abs((long)p.getZ()-c.origin.getZ())>192||Math.abs((long)p.getY()-c.origin.getY())>192;});

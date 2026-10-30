@@ -19,9 +19,8 @@ public final class ModNetwork {
     }
 
     public static void register(RegisterPayloadHandlersEvent event) {
-        // Wing appearance extends the saved/synchronized settings tuple. Negotiate
-        // the layout before joining so older clients cannot misread its last field.
-        event.registrar("standalone-39-wing-appearance")
+        // Passive formulas, HUD semantics and an appended skill bit must match on both sides.
+        event.registrar("standalone-41-configurable-ecology")
                 .playToClient(InfectedImpactPayload.TYPE,InfectedImpactPayload.STREAM_CODEC,(payload,context)->context.enqueueWork(()->com.codex.blacklight.client.renderer.InfectedImpactVisuals.accept(payload)))
                 .playToClient(DistrictZonePayload.TYPE,DistrictZonePayload.STREAM_CODEC,(payload,context)->context.enqueueWork(()->com.codex.blacklight.client.DistrictZoneHud.accept(payload)))
                 .playToServer(DisguiseSelectPayload.TYPE,DisguiseSelectPayload.STREAM_CODEC,(payload,context)->context.enqueueWork(()->{

@@ -36,13 +36,17 @@ public final class PassiveSystem {
             if (d.nextHeal == 0 || d.nextHeal > now + 20) { d.nextHeal = now + 20; d.save(p); }
             else if (now >= d.nextHeal) {
                 float before = p.getHealth(), amount = PassiveRules.healing(d.regeneration, before, p.getMaxHealth(), d.regenerationTier);
+                // LivingHealEvent can synchronously call this system again. Reserve
+                // the pulse before invoking it, then merge into the latest save.
+                d.nextHeal = now + 20; d.save(p);
                 // Tell compatible health-unit conversions that this amount is already measured in HP.
                 boolean previous = p.getPersistentData().getBoolean("adaptive_passives:healing");
                 p.getPersistentData().putBoolean("adaptive_passives:healing", true);
                 try { if (amount > 0) p.heal(amount); }
                 finally { p.getPersistentData().putBoolean("adaptive_passives:healing", previous); }
-                d.regeneration = PassiveRules.afterHeal(d.regeneration, Math.max(0, p.getHealth() - before));
-                d.nextHeal = now + 20; d.save(p);
+                var latest = PassiveData.read(p);
+                latest.regeneration = PassiveRules.afterHeal(latest.regeneration, Math.max(0, p.getHealth() - before));
+                latest.save(p);
             }
         }
         sync(p, false);

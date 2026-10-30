@@ -34,7 +34,7 @@ public final class CityData extends SavedData {
         for(int i=0;i<Math.min(2,supplies.size());i++){
             var n=supplies.getCompound(i);d.hiveSupply[i]=com.codex.blacklight.infection.ColonySupply.read(n.getCompound("supply"));
             d.hiveLoadedTicks[i]=Math.max(0,n.getInt("ticks"));d.hiveBirths[i]=Math.max(0,n.getInt("births"));d.hiveFeedCursor[i]=Math.floorMod(n.getInt("cursor"),7);
-            d.hiveBroodTicks[i]=Math.clamp(n.getInt("brood"),0,200);
+            d.hiveBroodTicks[i]=Math.clamp(n.getInt("brood"),0,CityConfig.SPEC.isLoaded()?CityConfig.HIVE_BROOD_INTERVAL.get():CityConfig.HIVE_BROOD_INTERVAL.getDefault());
         }
         for(long pos:tag.getLongArray("edited"))d.editedBlocks.add(pos);
         return d;

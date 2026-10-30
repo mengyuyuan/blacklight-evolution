@@ -1,0 +1,48 @@
+#吞噬完成后，对其他生物攻击的短暂保护时间。
+# Default: 40
+# Range: 0 ~ 24000
+postConsumeProtectionTicks = 40
+#成为进化者所需吞噬次数；至少6，且仍必须获得6个成熟器官。
+# Default: 6
+# Range: 6 ~ 1000000
+minimumMealsForEvolved = 6
+#继承器官强度的融合系数。
+# Default: 0.35
+# Range: 0.0 ~ 1.0
+fusionCoefficient = 0.35
+infectedCompetition = true
+# Default: 8
+# Range: 1 ~ 32
+simultaneousConsumptions = 8
+#同类血量低于该比例才允许吞噬；0.15=15%。
+# Default: 0.15
+# Range: 0.01 ~ 0.5
+preyWeakenedHealthFraction = 0.15
+#计作强大器官的整合强度门槛。
+# Default: 300.0
+# Range: 1.0 ~ 1.0E9
+strongOrganThreshold = 300.0
+#成功吞噬同类后恢复的最大生命比例。
+# Default: 0.4
+# Range: 0.0 ~ 1.0
+consumeHealFraction = 0.4
+#保护期间收到的生物伤害倍率，0完全减免，1不减伤。
+# Default: 0.35
+# Range: 0.0 ~ 1.0
+postConsumeIncomingMultiplier = 0.35
+#Maximum local prey searches per dimension each tick.
+# Default: 2
+# Range: 1 ~ 8
+searchesPerTick = 2
+# Default: 16
+# Range: 4 ~ 24
+searchRadius = 16
+inheritOrgans = true
+#成为进化者所需累计继承分数。
+# Default: 1000.0
+# Range: 1.0 ~ 1.0E12
+evolvedInheritancePoints = 1000.0
+#一次实际伤害达到最大生命该比例时中断同类吞噬。
+# Default: 0.1
+# Range: 0.01 ~ 1.0
+consumeInterruptHealthFraction = 0.1

@@ -12,9 +12,10 @@ import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.resources.ResourceLocation;
 import org.joml.Matrix3f;
 import org.joml.Matrix4f;
+import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
-/** Accepted neutral mesh, losslessly packed and moved as two undistorted wings.
+/** Accepted neutral mesh with rigid outer fans and a body-fixed soft collar.
  * IO is shared once; per-draw work never rebuilds geometry or allocates per vertex. */
 public final class PrecisionWingModel implements WingSurface {
     private record Mesh(int part,ResourceLocation color,ResourceLocation glow,float[] vertices,int[] indices,int[] emission){}
@@ -22,11 +23,18 @@ public final class PrecisionWingModel implements WingSurface {
     private final List<Mesh> meshes=Loaded.MESHES;
     private final Matrix4f[] parts={new Matrix4f(),new Matrix4f(),new Matrix4f()};
     private final List<float[]> prepared=new ArrayList<>();
+    private final List<float[]> flightWeights=new ArrayList<>();
+    private float collarPin;
     private final Vector3f[][] tips=new Vector3f[2][4];
     private final Vector3f[][] edge=new Vector3f[2][];
 
     public PrecisionWingModel(){
-        for(var mesh:meshes)prepared.add(new float[mesh.vertices.length/10*6]);
+        for(var mesh:meshes){
+            prepared.add(new float[mesh.vertices.length/10*6]);
+            var weights=new float[mesh.vertices.length/10];
+            for(int v=0;v<weights.length;v++)weights[v]=PrecisionWingPose.flightWeight(mesh.vertices[v*10],mesh.vertices[v*10+1],mesh.vertices[v*10+2]);
+            flightWeights.add(weights);
+        }
         for(int side=0;side<2;side++){
             float sign=side==0?1:-1;
             // Traced on the actual front reference, then converted to this model's
@@ -68,15 +76,28 @@ public final class PrecisionWingModel implements WingSurface {
         int[] data=new int[count];for(int i=0;i<count;i++){data[i]=in.readInt();if(data[i]<0||data[i]>=vertices)throw new IOException("Precision wing index outside vertices");}return data;
     }
     @Override public void prepare(SovereignWingMotion.Pose motion,Vector3f axis,float deployment,float air,int order){
+        float t=Float.isFinite(air)?Math.clamp(air,0,1):0;collarPin=t*t*(3-2*t);
         for(int i=0;i<parts.length;i++)parts[i].set(PrecisionWingPose.transform(i,motion,axis,deployment,air,order));
     }
     @Override public void prepareRender(PoseStack stack){
         var point=new Vector3f();var normal=new Vector3f();var matrix=new Matrix4f();var normals=new Matrix3f();
+        var rotation=new Quaternionf();var blend=new Quaternionf();var bodyNormals=new Matrix3f();stack.last().pose().normal(bodyNormals);
         for(int s=0;s<meshes.size();s++){
             var mesh=meshes.get(s);var result=prepared.get(s);matrix.set(stack.last().pose()).mul(parts[mesh.part]);matrix.normal(normals);
+            var pivot=PrecisionWingPose.pivot(mesh.part);float size=parts[mesh.part].m00()*parts[mesh.part].m00()+parts[mesh.part].m01()*parts[mesh.part].m01()+parts[mesh.part].m02()*parts[mesh.part].m02();size=(float)Math.sqrt(size);
+            if(size>1e-6F)parts[mesh.part].getUnnormalizedRotation(rotation).normalize();else rotation.identity();
             for(int v=0;v<mesh.vertices.length/10;v++){
-                int source=v*10,target=v*6;matrix.transformPosition(mesh.vertices[source],mesh.vertices[source+1],mesh.vertices[source+2],point);
-                normals.transform(mesh.vertices[source+3],mesh.vertices[source+4],mesh.vertices[source+5],normal).normalize();
+                int source=v*10,target=v*6;
+                float weight=1-collarPin*(1-flightWeights.get(s)[v]);
+                if(mesh.part!=0&&weight<1){
+                    blend.identity().nlerp(rotation,weight);
+                    point.set(mesh.vertices[source],mesh.vertices[source+1],mesh.vertices[source+2]).sub(pivot).mul(size).rotate(blend).add(pivot);
+                    stack.last().pose().transformPosition(point);
+                    normal.set(mesh.vertices[source+3],mesh.vertices[source+4],mesh.vertices[source+5]).rotate(blend);bodyNormals.transform(normal).normalize();
+                }else{
+                    matrix.transformPosition(mesh.vertices[source],mesh.vertices[source+1],mesh.vertices[source+2],point);
+                    normals.transform(mesh.vertices[source+3],mesh.vertices[source+4],mesh.vertices[source+5],normal).normalize();
+                }
                 result[target]=point.x;result[target+1]=point.y;result[target+2]=point.z;result[target+3]=normal.x;result[target+4]=normal.y;result[target+5]=normal.z;
             }
         }
@@ -95,11 +116,20 @@ public final class PrecisionWingModel implements WingSurface {
             output.addVertex(xyz[p],xyz[p+1],xyz[p+2],tint,mesh.vertices[u],mesh.vertices[u+1],OverlayTexture.NO_OVERLAY,light,xyz[p+3],xyz[p+4],xyz[p+5]);
         }
     }
-    @Override public Vector3f tip(String side,int number){int wing=side.equals("left")?0:1;return parts[wing+1].transformPosition(new Vector3f(tips[wing][number-1]));}
-    @Override public Vector3f[] leadingEdge(String side){int wing=side.equals("left")?0:1;return Arrays.stream(edge[wing]).map(p->parts[wing+1].transformPosition(new Vector3f(p))).toArray(Vector3f[]::new);}
+    private Vector3f surfacePoint(int part,Vector3f source){
+        var point=new Vector3f(source);float weight=1-collarPin*(1-PrecisionWingPose.flightWeight(source.x,source.y,source.z));
+        if(weight>=1)return parts[part].transformPosition(point);
+        float size=(float)Math.sqrt(parts[part].m00()*parts[part].m00()+parts[part].m01()*parts[part].m01()+parts[part].m02()*parts[part].m02());
+        var rotation=size>1e-6F?parts[part].getUnnormalizedRotation(new Quaternionf()).normalize():new Quaternionf();
+        var pivot=PrecisionWingPose.pivot(part);
+        return point.sub(pivot).mul(size).rotate(new Quaternionf().nlerp(rotation,weight)).add(pivot);
+    }
+    @Override public Vector3f tip(String side,int number){int wing=side.equals("left")?0:1;return surfacePoint(wing+1,tips[wing][number-1]);}
+    @Override public Vector3f[] leadingEdge(String side){int wing=side.equals("left")?0:1;return Arrays.stream(edge[wing]).map(p->surfacePoint(wing+1,p)).toArray(Vector3f[]::new);}
     int surfaceCount(){return meshes.size();}
     int triangles(){return meshes.stream().mapToInt(m->m.indices.length/3).sum();}
     int part(int surface){return meshes.get(surface).part;}
+    int[] faceIndices(int surface){return meshes.get(surface).indices;}
     float[] restVertices(int surface){return meshes.get(surface).vertices;}
     float[] drawnVertices(int surface){return prepared.get(surface);}
 }

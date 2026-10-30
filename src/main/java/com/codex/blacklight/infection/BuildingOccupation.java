@@ -17,12 +17,11 @@ public final class BuildingOccupation {
         // Otherwise each new patch empties the store and mature time advances only on income ticks.
         if (colony.stage < 3 || !BuildingInfectionConfig.SPAWNS.get()
                 || !level.getGameRules().getBoolean(GameRules.RULE_DOMOBSPAWNING)) return 5;
-        return switch (com.codex.blacklight.city.CityEcology.stage(level,colony.origin)) {
-            case 0 -> 20;
-            case 1 -> 20;
-            case 2 -> 64;
-            default -> 120;
-        };
+        return Math.max(5,ColonySupply.broodCost(switch (com.codex.blacklight.city.CityEcology.stage(level,colony.origin)) {
+            case 0,1 -> OutbreakRules.Tier.GROWING;
+            case 2 -> OutbreakRules.Tier.HUNTER;
+            default -> OutbreakRules.Tier.ANCIENT;
+        }));
     }
 
     public static void establish(ServerLevel level, BlockPos pos) {
@@ -58,10 +57,11 @@ public final class BuildingOccupation {
             if (state.hasBlockEntity() || !state.getFluidState().isEmpty() || state.getDestroySpeed(level, pos) < 0
                     || !state.isFaceSturdy(level, pos, root.getValue(BuildingInfectionCoreBlock.FACING))) return;
         }
-        colony.occupationTicks = Math.min(40, colony.occupationTicks + 5);
-        if (colony.occupationTicks >= 40) {
+        int interval=com.codex.blacklight.config.GameplayBalanceConfig.OCCUPATION_TICKS.get();
+        colony.occupationTicks = Math.min(interval, colony.occupationTicks + 5);
+        if (colony.occupationTicks >= interval) {
             colony.occupationTicks = 0;
-            int generated = colony.supply.receive(2 + Math.clamp(colony.stage, 0, 3) * 2);
+            int generated = colony.supply.receive(com.codex.blacklight.config.GameplayBalanceConfig.OCCUPATION_BASE.get() + Math.clamp(colony.stage, 0, 3) * com.codex.blacklight.config.GameplayBalanceConfig.OCCUPATION_PER_STAGE.get());
             colony.occupationProduced = Math.min(Long.MAX_VALUE - generated, colony.occupationProduced) + generated;
         }
         BuildingInfectionData.get(level).setDirty();

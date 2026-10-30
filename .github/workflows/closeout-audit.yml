@@ -43,6 +43,18 @@ jobs:
             -PgameTestMaxHeap=2G -PgameTestRunDirectory=build/closeout-gametest \
             runGameTestServer 2>&1 | tee closeout-server.log
           grep -Eq 'All [1-9][0-9]* required tests passed' closeout-server.log
+      - name: Test independent passives alone and with Blacklight
+        if: steps.platform.outputs.java == '21'
+        shell: bash
+        run: |
+          bash ./gradlew -p standalone-passives --no-daemon --max-workers=1 -Dorg.gradle.jvmargs=-Xmx1G \
+            -PpassiveGameTest -PgameTestRunDirectory=build/audit-alone \
+            test runGameTestServer 2>&1 | tee closeout-passives-alone.log
+          grep -Eq 'All [1-9][0-9]* required tests passed' closeout-passives-alone.log
+          bash ./gradlew -p standalone-passives --no-daemon --max-workers=1 -Dorg.gradle.jvmargs=-Xmx1G \
+            -PpassiveGameTest -PpassiveCompat -PgameTestRunDirectory=build/audit-compat \
+            test runGameTestServer 2>&1 | tee closeout-passives-compat.log
+          grep -Eq 'All [1-9][0-9]* required tests passed' closeout-passives-compat.log
       - name: Preserve audit evidence
         if: always()
         uses: actions/upload-artifact@v4
@@ -50,5 +62,8 @@ jobs:
           name: closeout-server-audit
           path: |
             closeout-server.log
+            closeout-passives-*.log
             build/closeout-gametest/logs/latest.log
             build/test-results/**/*.xml
+            standalone-passives/build/audit-*/logs/latest.log
+            standalone-passives/build/test-results/**/*.xml

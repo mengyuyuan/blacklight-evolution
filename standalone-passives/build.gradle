@@ -10,7 +10,11 @@ neoForge {
     runs {
         client { client(); if (project.hasProperty('clientRunDirectory')) gameDirectory = file(project.property('clientRunDirectory')); if (project.hasProperty('quickPlayWorld')) programArguments.addAll '--quickPlaySingleplayer', project.property('quickPlayWorld').toString() }
         server { server(); programArgument '--nogui'; if (project.hasProperty('serverRunDirectory')) gameDirectory = file(project.property('serverRunDirectory')) }
-        gameTestServer { jvmArgument '-Xmx1G'; type = 'gameTestServer'; systemProperty 'neoforge.enabledGameTestNamespaces', 'adaptive_passives' }
+        gameTestServer {
+            jvmArgument '-Xmx1G'; type = 'gameTestServer'
+            if (project.hasProperty('gameTestRunDirectory')) gameDirectory = file(project.property('gameTestRunDirectory'))
+            systemProperty 'neoforge.enabledGameTestNamespaces', 'adaptive_passives'
+        }
     }
     mods { adaptive_passives { sourceSet sourceSets.main } }
 }
@@ -33,7 +37,13 @@ if (project.hasProperty('passiveCompat')) {
     dependencies { runtimeOnly files(sourceSets.blacklightCompat.output) }
     repositories { maven { url = 'https://dl.cloudsmith.io/public/geckolib3/geckolib/maven/' } }
     neoForge.mods { blacklight { sourceSet sourceSets.blacklightCompat } }
-    dependencies { runtimeOnly 'software.bernie.geckolib:geckolib-neoforge-1.21.1:4.9.2' }
+    dependencies {
+        runtimeOnly 'software.bernie.geckolib:geckolib-neoforge-1.21.1:4.9.2'
+    }
+    // The parent's loose development classes need its bundled decoder on the game classpath.
+    neoForge.runs.configureEach {
+        additionalRuntimeClasspathConfiguration.dependencies.add(project.dependencies.create('org.tukaani:xz:1.10'))
+    }
 }
 tasks.named('jar') { exclude 'data/adaptive_passives/structure/empty.nbt', 'data/adaptive_passives/structures/empty.nbt' }
 

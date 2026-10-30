@@ -13,6 +13,7 @@
     "ShulkerReflectionAccess",
     "ShulkerPeekAccess",
     "LivingDeathAccess",
+    "SaddleSteeringAccess",
     "BulletdiveBlockFeedbackMixin",
     "BulletdiveItemMergeAccess",
     "HealthAttributeLimitAccessor",

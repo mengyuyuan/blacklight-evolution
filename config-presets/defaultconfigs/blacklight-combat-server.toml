@@ -1,0 +1,23 @@
+#Native attacks bypass armor, resistance, enchantments and shields on external mobs. Does not bypass administrative invulnerability or cancel death events.
+externalTrueDamage = true
+# Default: 0.25
+# Range: 0.0 ~ 1.0
+externalIncomingMultiplier = 0.25
+#Reduce external-mod attacks against Blacklight mobs, active Prototypes and dropped Blacklight items.
+externalDefense = true
+# Default: 10
+# Range: 1 ~ 200
+externalWindowTicks = 10
+#Enhance native Blacklight attacks against other mods' living entities, excluding players.
+externalOffense = true
+#Single external-mod hit limit for Blacklight creatures only. Does not cap native player skills.
+# Default: 0.06
+# Range: 0.001 ~ 1.0
+externalMobSingleHitHealthFraction = 0.06
+# Default: 2.0
+# Range: 1.0 ~ 100.0
+externalOutgoingMultiplier = 2.0
+#Maximum external damage per window, as a fraction of maximum health. Item entities accept at least one HP per window.
+# Default: 0.15
+# Range: 0.01 ~ 1.0
+externalWindowHealthFraction = 0.15

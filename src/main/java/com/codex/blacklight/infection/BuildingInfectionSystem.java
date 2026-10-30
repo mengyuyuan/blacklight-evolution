@@ -69,7 +69,7 @@ public final class BuildingInfectionSystem {
         if (!BuildingInfectionConfig.ENABLED.get() || !BuildingInfectionConfig.NATURAL_SEEDS.get()
                 || !WorldOutbreakSystem.active(level)
                 || !level.getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING)
-                || random.nextInt(16) != 0 || !ready(level, tissue) || !allowedSite(level, tissue)) return;
+                || random.nextDouble() >= com.codex.blacklight.config.GameplayBalanceConfig.CORE_CHANCE.get() || !ready(level, tissue) || !allowedSite(level, tissue)) return;
         var state = level.getBlockState(tissue);
         if (!state.is(ModBlocks.TISSUE_ATTACHMENT.get())) return;
         Direction support=null;
@@ -120,7 +120,12 @@ public final class BuildingInfectionSystem {
             c.stage = Math.max(c.stage, next);
             if (core.getValue(TissueAttachmentBlock.AGE) != c.stage)
                 level.setBlock(c.origin, core.setValue(TissueAttachmentBlock.AGE, c.stage), 3);
-            if (c.stage == 3 && (c.broodTicks=Math.min(600,c.broodTicks+5)) >= 600) hatch(level, c);
+            int broodInterval=com.codex.blacklight.config.GameplayBalanceConfig.BROOD_TICKS.get();
+            if (c.stage == 3 && (c.broodTicks=Math.min(broodInterval,c.broodTicks+5)) >= broodInterval) {
+                // Every roll consumes an interval; a failed roll cannot reroll each five ticks.
+                c.broodTicks=0;
+                if(level.random.nextDouble()<com.codex.blacklight.config.GameplayBalanceConfig.BROOD_CHANCE.get())hatch(level,c);
+            }
             data.setDirty();
         }
         int used = recovered, attempts = 0, budget = BuildingInfectionConfig.WORK.get();
@@ -214,8 +219,9 @@ public final class BuildingInfectionSystem {
         if(level.getEntitiesOfClass(Mob.class,new AABB(c.origin).inflate(48),Entity::isAlive).size()>=BuildingInfectionConfig.MOB_LIMIT.get()) return false;
         if(!WorldOutbreakSystem.populationRoom(level,c.origin)) return false;
         int worldStage=CityEcology.stage(level,c.origin);
-        var tier=c.births%4==0&&worldStage>=2?OutbreakRules.Tier.HUNTER
-                :WorldOutbreakSystem.tierForPopulation(level,c.origin,level.random.nextInt(100));
+        int hunterEvery=com.codex.blacklight.config.GameplayBalanceConfig.HUNTER_EVERY.get();
+        var tier=hunterEvery>0&&c.births%hunterEvery==0&&worldStage>=2?OutbreakRules.Tier.HUNTER
+                :WorldOutbreakSystem.tierForPopulation(level,c.origin,level.random.nextDouble());
         int cost=ColonySupply.broodCost(tier);if(c.supply.reserve()<cost)return false;
         var direction=level.getBlockState(c.origin).getValue(BuildingInfectionCoreBlock.FACING);
         // A mature root can occupy the old straight-ahead outlet. Search flanking

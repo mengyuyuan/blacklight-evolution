@@ -1,5 +1,8 @@
 package com.codex.blacklight.infection;
 
+import com.codex.blacklight.config.GameplayBalanceConfig;
+import static com.codex.blacklight.config.GameplayBalanceConfig.value;
+
 /** Exposure balance. Explicit infection commands and direct vial hits remain reliable. */
 public final class InfectionRules {
     public static final float CONTACT_CHANCE = 0.08F;
@@ -10,9 +13,11 @@ public final class InfectionRules {
     public static final float SPLASH_EDGE_CHANCE = 0.50F;
 
     private InfectionRules() {}
+    public static double radius(){return value(GameplayBalanceConfig.VIAL_RADIUS);}
 
     public static float splashChance(double distance) {
-        double fraction = Math.clamp(distance / VIAL_RADIUS, 0, 1);
-        return (float)(SPLASH_CENTER_CHANCE + (SPLASH_EDGE_CHANCE - SPLASH_CENTER_CHANCE) * fraction);
+        double fraction = Math.clamp(distance / radius(), 0, 1);
+        double center=value(GameplayBalanceConfig.VIAL_CENTER),edge=value(GameplayBalanceConfig.VIAL_EDGE);
+        return (float)(center+(edge-center)*fraction);
     }
 }

@@ -13,7 +13,6 @@ import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.neoforge.event.tick.ServerTickEvent;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -27,6 +26,9 @@ public final class LandingDebrisSystem {
     private static final int MAX_TRACKED = 64;
 
     private static final List<Entry> TRACKED = new ArrayList<>();
+    private static int publishing;
+    private static final java.util.Set<net.minecraft.server.MinecraftServer> STOPPING =
+            java.util.Collections.newSetFromMap(new java.util.IdentityHashMap<>());
 
     private LandingDebrisSystem() {
     }
@@ -44,7 +46,10 @@ public final class LandingDebrisSystem {
     }
 
     private static void spawn(ServerLevel level,double x,double y,double z,BlockState state,double vx,double vy,double vz,int lifetimeTicks,float size,boolean fragment){
-        if (TRACKED.size() >= MAX_TRACKED) return;
+        if (!level.getServer().isSameThread() || STOPPING.contains(level.getServer())
+                || TRACKED.size() + publishing >= MAX_TRACKED) return;
+        publishing++;
+        try {
         Display.BlockDisplay chunk = new Display.BlockDisplay(EntityType.BLOCK_DISPLAY, level){
             @Override public boolean shouldBeSaved(){return false;}
         };
@@ -62,8 +67,9 @@ public final class LandingDebrisSystem {
         }
         chunk.load(tag);
         chunk.moveTo(x, y, z, 0.0F, 0.0F);
-        if (!level.addFreshEntity(chunk)) return;
+        if (!level.addFreshEntity(chunk) || chunk.isRemoved()) return;
         TRACKED.add(new Entry(chunk, state, vx, vy, vz, lifetimeTicks,fragment));
+        } finally { publishing--; }
     }
 
     private static net.minecraft.nbt.ListTag floats(float... values){
@@ -73,17 +79,18 @@ public final class LandingDebrisSystem {
     @SubscribeEvent
     public static void onServerTick(ServerTickEvent.Post event) {
         if (TRACKED.isEmpty()) return;
-        Iterator<Entry> iterator = TRACKED.iterator();
-        while (iterator.hasNext()) {
-            Entry entry = iterator.next();
+        // Entity removal invokes other mods synchronously. New effects published
+        // by those callbacks belong to the next tick, never this active traversal.
+        for (Entry entry : List.copyOf(TRACKED)) {
+            if (!TRACKED.contains(entry)) continue;
             Display.BlockDisplay chunk = entry.chunk;
             if (!chunk.isAlive()) {
-                iterator.remove();
+                TRACKED.remove(entry);
                 continue;
             }
             entry.ticksLeft--;
             if (entry.ticksLeft <= 0) {
-                iterator.remove();
+                TRACKED.remove(entry);
                 shatter(chunk, entry.state);
                 continue;
             }
@@ -92,12 +99,25 @@ public final class LandingDebrisSystem {
             if(entry.fragment){
                 var next=position.add(entry.vx,entry.vy,entry.vz);
                 var hit=chunk.level().clip(new net.minecraft.world.level.ClipContext(position,next,net.minecraft.world.level.ClipContext.Block.COLLIDER,net.minecraft.world.level.ClipContext.Fluid.NONE,chunk));
-                if(hit.getType()!=net.minecraft.world.phys.HitResult.Type.MISS){iterator.remove();shatter(chunk,entry.state);continue;}
+                if(hit.getType()!=net.minecraft.world.phys.HitResult.Type.MISS){TRACKED.remove(entry);shatter(chunk,entry.state);continue;}
                 chunk.setYRot(chunk.getYRot()+19);chunk.setXRot(chunk.getXRot()+11);
             }
             chunk.setPos(position.x + entry.vx, position.y + entry.vy, position.z + entry.vz);
             chunk.hasImpulse = true;
         }
+    }
+
+    @SubscribeEvent
+    public static void stopping(net.neoforged.neoforge.event.server.ServerStoppingEvent event) {
+        var server = event.getServer();
+        if (!STOPPING.add(server)) return;
+        try {
+            for (Entry entry : List.copyOf(TRACKED)) {
+                if (entry.chunk.level().getServer() != server) continue;
+                TRACKED.remove(entry);
+                entry.chunk.discard();
+            }
+        } finally { STOPPING.remove(server); }
     }
 
     /** A small puff of the chunk's own material masks the mid-air despawn. */

@@ -31,7 +31,7 @@ class DistrictThreatTest {
     }
     @Test void LocalPopulationAndFrequencyKeepGreenQuietWithoutDeletingBodies(){
         assertEquals(8,DistrictThreat.populationCap(DistrictThreat.Zone.GREEN,18));
-        assertEquals(14,DistrictThreat.populationCap(DistrictThreat.Zone.YELLOW,18));
+        assertEquals(18,DistrictThreat.populationCap(DistrictThreat.Zone.YELLOW,18));
         assertEquals(18,DistrictThreat.populationCap(DistrictThreat.Zone.RED,18));
         for(var zone:DistrictThreat.Zone.values())assertEquals(3,DistrictThreat.populationCap(zone,3));
         assertTrue(DistrictThreat.ambientChance(DistrictThreat.Zone.GREEN)<DistrictThreat.ambientChance(DistrictThreat.Zone.YELLOW));

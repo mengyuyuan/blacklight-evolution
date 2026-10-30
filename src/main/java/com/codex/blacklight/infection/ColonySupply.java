@@ -22,7 +22,7 @@ public final class ColonySupply {
         if(upkeep>=200){if(!pay(1+Math.min(4,Math.max(0,solidCells)/512)))return false;upkeep-=200;}
         return true;
     }
-    public static int broodCost(OutbreakRules.Tier tier){return switch(tier){case FRESH->12;case GROWING->20;case MATURE->32;case HUNTER->64;case ANCIENT->120;};}
+    public static int broodCost(OutbreakRules.Tier tier){int base=switch(tier){case FRESH->12;case GROWING->20;case MATURE->32;case HUNTER->64;case ANCIENT->120;};return Math.max(1,(int)Math.ceil(base*com.codex.blacklight.config.GameplayBalanceConfig.value(com.codex.blacklight.config.GameplayBalanceConfig.BROOD_COST)));}
     public CompoundTag write(){var t=new CompoundTag();t.putInt("Schema",1);t.putInt("Reserve",reserve);t.putInt("Upkeep",upkeep);t.put("Meals",stomach.write());return t;}
     public static ColonySupply read(CompoundTag t){var s=new ColonySupply();s.reserve=TissueMetabolism.clamp(t.getInt("Reserve"));s.upkeep=Math.clamp(t.getInt("Upkeep"),0,200);s.stomach=TissueDigestion.read(t.getCompound("Meals"));return s;}
 }

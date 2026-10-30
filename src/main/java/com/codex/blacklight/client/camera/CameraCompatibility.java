@@ -11,6 +11,20 @@ public final class CameraCompatibility {
     private static OptionalShoulderCameraProbe shoulder;
     private CameraCompatibility() { }
 
+    static float externalYaw(float fallback) {return shoulderAngles().map(OptionalShoulderCameraProbe.Angles::yaw).orElse(fallback);}
+    static float externalPitch(float fallback) {return shoulderAngles().map(OptionalShoulderCameraProbe.Angles::pitch).orElse(fallback);}
+    private static java.util.Optional<OptionalShoulderCameraProbe.Angles> shoulderAngles() {
+        var player=Minecraft.getInstance().player;
+        if(player==null||!shoulderPresent)return java.util.Optional.empty();
+        try {
+            if(!shoulderOwnsView()||shoulder==null)return java.util.Optional.empty();
+            return shoulder.angles(player.getYRot(),player.getXRot());
+        }catch(ReflectiveOperationException|LinkageError|RuntimeException error) {
+            if(!warnedShoulder){warnedShoulder=true;BlacklightNeoMod.LOGGER.warn("Cannot read Shoulder Surfing view angles; using rendered camera",error);}
+            return java.util.Optional.empty();
+        }
+    }
+
     public static boolean externalOwnsView() {
         if(Minecraft.getInstance().player==null)return false;
         if(!initialized) {
