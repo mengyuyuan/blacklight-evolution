@@ -92,11 +92,14 @@ public final class BiomassSurface {
     public static float wave(float cycles) {
         if (!Float.isFinite(cycles)) return 0;
         float wrapped = cycles - (float)Math.floor(cycles);
+        // Tiny negative phases can round to exactly one after subtracting floor.
+        // Wrap that endpoint before interpolation so index + 1 stays in the table.
+        if (wrapped >= 1) return WAVE[0];
         float at = wrapped * WAVE_SIZE;
         int index = (int)at;
         return WAVE[index] + (WAVE[index + 1] - WAVE[index]) * (at - index);
     }
     public static float smooth(float value) { float t = unit(value); return t * t * (3 - 2 * t); }
-    private static float unit(float value) { return Float.isFinite(value) ? com.codex.blacklight.util.MathCompat.clamp(value, 0, 1) : 0; }
-    private static int channel(float value) { return com.codex.blacklight.util.MathCompat.clamp(Math.round(value), 0, 255); }
+    private static float unit(float value) { return Float.isFinite(value) ? com.codex.blacklight.forge.WingMath.clamp(value, 0, 1) : 0; }
+    private static int channel(float value) { return com.codex.blacklight.forge.WingMath.clamp(Math.round(value), 0, 255); }
 }

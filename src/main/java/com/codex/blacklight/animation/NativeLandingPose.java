@@ -10,7 +10,7 @@ public final class NativeLandingPose {
         if(root!=null){root.translation().x=0;root.translation().z=0;}
     }
     public static BlacklightPose blendUpper(BlacklightPose stride,BlacklightPose cushion,float weight) {
-        var result=stride.copy();weight=com.codex.blacklight.util.MathCompat.clamp(weight,0,1);
+        var result=stride.copy();weight=com.codex.blacklight.forge.WingMath.clamp(weight,0,1);
         if(weight==0)return result;
         for(String joint:UPPER) {
             var landing=cushion.get(joint);if(landing==null)continue;

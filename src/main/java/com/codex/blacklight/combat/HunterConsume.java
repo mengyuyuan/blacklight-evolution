@@ -38,13 +38,13 @@ public final class HunterConsume {
     public static float seconds(ConsumeVisual visual,long now,float partial) {
         return Math.max(0,(now-visual.started()+partial)/20F);
     }
-    public static float actorProgress(float seconds) { return com.codex.blacklight.util.MathCompat.clamp(seconds/profile().actorSeconds(),0,1); }
+    public static float actorProgress(float seconds) { return com.codex.blacklight.forge.WingMath.clamp(seconds/profile().actorSeconds(),0,1); }
     public static float[] jawScale(float seconds) {
         var keys=profile().scale();
         if(keys.length==0)return new float[]{1,1,1};
         int index=0;while(index+1<keys.length&&keys[index+1][0]<=seconds)index++;
         var a=keys[index];var b=keys[Math.min(index+1,keys.length-1)];
-        float t=b[0]>a[0]?com.codex.blacklight.util.MathCompat.clamp((seconds-a[0])/(b[0]-a[0]),0,1):0;
+        float t=b[0]>a[0]?com.codex.blacklight.forge.WingMath.clamp((seconds-a[0])/(b[0]-a[0]),0,1):0;
         return new float[]{a[1]+(b[1]-a[1])*t,a[2]+(b[2]-a[2])*t,a[3]+(b[3]-a[3])*t};
     }
 }

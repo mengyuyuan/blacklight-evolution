@@ -24,22 +24,9 @@ public record WeaponMotionProfile(String source, float contactIn, float contactO
     private static WeaponMotionProfile nativeMotion(WeaponMove move,float in,float out,float step,float elbow,float roll) {
         return new WeaponMotionProfile(move.id,in,out,step,elbow,roll);
     }
-    /** Account for the one-tick blend-in, then align source contact and recovery to server time. */
-    public static float sourceTime(WeaponMove move,float target,float sourceLength,float in,float out) {
-        return sourceTime(move.start,move.end,move.duration,target,sourceLength,in,out);
-    }
-    static float sourceTime(int start,int contactEnd,int duration,float target,float sourceLength,float in,float out) {
-        // Single-tick contacts need a full tick to map both contact endpoints.
-        // Longer windows keep their existing last-contact sampling time.
-        float begin=(start-1)/20F, end=Math.max(start,contactEnd-2)/20F, finish=(duration-1)/20F;
-        target=com.codex.blacklight.util.MathCompat.clamp(target,0,finish);
-        if(target<=begin)return begin>0?in*target/begin:in;
-        if(target<=end)return in+(out-in)*(target-begin)/(end-begin);
-        return out+(sourceLength-out)*(target-end)/(finish-end);
-    }
     public float distanceAt(WeaponMove move,float time) {
         float begin=Math.max(0,(move.start-4)/20F),end=(move.end-1)/20F;
-        float t=com.codex.blacklight.util.MathCompat.clamp((time-begin)/(end-begin),0,1);
+        float t=com.codex.blacklight.forge.WingMath.clamp((time-begin)/(end-begin),0,1);
         return step*t*t*(3-2*t);
     }
 }

@@ -5,8 +5,8 @@ public final class HydraGrowth {
     public static final int REQUIRED_FEEDS = 5;
     public static final int MATURE_TICKS = 2400;
     public static final int RADIUS = 6;
-    public static int feeds(int value) { return net.minecraft.util.Mth.clamp(value, 0, REQUIRED_FEEDS); }
-    public static int age(int value) { return net.minecraft.util.Mth.clamp(value, 0, MATURE_TICKS); }
+    public static int feeds(int value) { return com.codex.blacklight.forge.WingMath.clamp(value, 0, REQUIRED_FEEDS); }
+    public static int age(int value) { return com.codex.blacklight.forge.WingMath.clamp(value, 0, MATURE_TICKS); }
     public static float progress(int age, int feeds) {
         return Math.min(age(age)/(float)MATURE_TICKS, feeds(feeds)/(float)REQUIRED_FEEDS);
     }

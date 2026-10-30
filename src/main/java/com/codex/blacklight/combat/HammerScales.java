@@ -45,7 +45,7 @@ public final class HammerScales {
         var clip=data().get(key);if(clip==null||!Float.isFinite(time))return Shape.IDENTITY;
         int found=Arrays.binarySearch(clip.times,time);
         int a=found>=0?found:Math.max(0,-found-2),b=Math.min(a+1,clip.times.length-1);
-        float weight=a==b?0:com.codex.blacklight.util.MathCompat.clamp((time-clip.times[a])/(clip.times[b]-clip.times[a]),0,1);
+        float weight=a==b?0:com.codex.blacklight.forge.WingMath.clamp((time-clip.times[a])/(clip.times[b]-clip.times[a]),0,1);
         int offset=left?2:0;
         return new Shape(clip.frames[a][offset],clip.frames[a][offset+1])
                 .blend(new Shape(clip.frames[b][offset],clip.frames[b][offset+1]),weight);

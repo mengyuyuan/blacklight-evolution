@@ -16,6 +16,11 @@ public interface StreamCodec<B, T> {
         };
     }
 
+    /** Narrow the buffer input while preserving the same bounded encoder/decoder. */
+    default <C extends B> StreamCodec<C, T> cast() {
+        return StreamCodec.of(this::encode, this::decode);
+    }
+
     static <B, T> StreamCodec<B, T> unit(T value) {
         return of((buffer, ignored) -> {}, buffer -> value);
     }

@@ -1,0 +1,24 @@
+{
+  "variants": {
+    "facing=north": {
+      "model": "blacklight:block/sandbag_cover",
+      "y": 0,
+      "uvlock": true
+    },
+    "facing=east": {
+      "model": "blacklight:block/sandbag_cover",
+      "y": 90,
+      "uvlock": true
+    },
+    "facing=south": {
+      "model": "blacklight:block/sandbag_cover",
+      "y": 180,
+      "uvlock": true
+    },
+    "facing=west": {
+      "model": "blacklight:block/sandbag_cover",
+      "y": 270,
+      "uvlock": true
+    }
+  }
+}

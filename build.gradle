@@ -33,12 +33,60 @@ sourceSets.main.resources {
 def bundledMotionDirectory = providers.gradleProperty('bundleMotionDirectory').orElse('art/motion-profile')
 def releaseProfile = providers.gradleProperty('bundleMotionDirectory').isPresent() ? 'external-profile' : 'bundled'
 def releaseNotices = ['LICENSE', 'THIRD_PARTY_ASSETS.md', 'THIRD_PARTY_NOTICES.md']
+sourceSets {
+    resourceTools {
+        java {
+            srcDirs = ['src/main/java', 'tools']
+            include 'com/codex/blacklight/util/CompactJson.java', 'com/codex/blacklight/util/CompactStreams.java', 'com/codex/blacklight/util/MapResources.java', 'CompactMotionPacker.java', 'CompactMapPacker.java'
+        }
+    }
+}
+def compactMotionOutput=layout.buildDirectory.dir('generated/compactMotionProfile')
+def compactMapOutput=layout.buildDirectory.dir('generated/compactMapResources')
+def compactMapManifest=layout.buildDirectory.file('generated/compactMapManifest.json')
+def compactMapState=[names:null]
+def compactMapNames={
+    if(compactMapState.names!=null)return compactMapState.names
+    def manifest=compactMapManifest.get().asFile
+    if(manifest.isFile()) {
+        compactMapState.names=new groovy.json.JsonSlurper().parse(manifest).converted.toSet()
+        return compactMapState.names
+    }
+    return [] as Set
+}
+
+def encodeCompactMaps=tasks.register('encodeCompactMaps',JavaExec) {
+    classpath=sourceSets.resourceTools.runtimeClasspath
+    mainClass='CompactMapPacker'
+    args file('src/main/resources').absolutePath,compactMapOutput.get().asFile.absolutePath
+    inputs.files(fileTree('src/main/resources') {
+        include 'data/blacklight/worldmap/**/*.gz','data/blacklight/city/futian/*.gz','data/blacklight/city/los_angeles/*.gz'
+    })
+    outputs.dir(compactMapOutput)
+    outputs.file(compactMapManifest)
+    maxHeapSize='384m'
+    jvmArgs '-XX:ActiveProcessorCount=2'
+    javaLauncher=javaToolchains.launcherFor {languageVersion=JavaLanguageVersion.of(17)}
+    doLast {compactMapState.names=null}
+}
+sourceSets.main.resources.srcDir(compactMapOutput)
+def encodeCompactMotions=tasks.register('encodeCompactMotions', JavaExec) {
+    classpath=sourceSets.resourceTools.runtimeClasspath
+    mainClass='CompactMotionPacker'
+    args file(bundledMotionDirectory.get()).absolutePath, compactMotionOutput.get().asFile.absolutePath
+    inputs.dir(bundledMotionDirectory)
+    outputs.dir(compactMotionOutput)
+    maxHeapSize='512m'
+    jvmArgs '-XX:ActiveProcessorCount=2'
+    javaLauncher=javaToolchains.launcherFor {languageVersion=JavaLanguageVersion.of(17)}
+}
 def stageBundledMotions = tasks.register('stageBundledMotions', Sync) {
+    dependsOn encodeCompactMotions
     into layout.buildDirectory.dir('generated/bundledMotionResources')
     if (bundledMotionDirectory.isPresent()) {
-        from(bundledMotionDirectory.get()) {
+        from(compactMotionOutput) {
             into 'blacklight/bundled_motions'
-            include '*.json', 'combat-motion-tuning.data', 'consume-placement.data', 'consume-receiver-events.data', 'receiver-poses.data', 'hunter-consume.data', 'hammer-scales.data', 'weapon-attack-scales.data', 'armor-growth.data', 'camera-profile.data', 'camera-events.data', 'camera-film.data', 'health-hud.data'
+            include '*.json', '*.data', '*.jz'
         }
         doFirst {
             def profile = file(bundledMotionDirectory.get())
@@ -62,7 +110,22 @@ def stageBundledMotions = tasks.register('stageBundledMotions', Sync) {
 }
 sourceSets.main.resources.srcDir(stageBundledMotions)
 tasks.named('processResources', ProcessResources).configure {
+    dependsOn encodeCompactMaps
     inputs.property('blacklightReleaseProfile', releaseProfile)
+    exclude { details -> compactMapNames().contains(details.path) }
+    doFirst {
+        def outputRoot=destinationDir.toPath().toAbsolutePath().normalize()
+        def ownedRoot=layout.buildDirectory.get().asFile.toPath().toAbsolutePath().normalize()
+        if(!outputRoot.startsWith(ownedRoot))throw new GradleException('Compressed map staging escapes build directory')
+        compactMapNames().each { name -> java.nio.file.Files.deleteIfExists(outputRoot.resolve(name)) }
+        // Remove previous uncompressed profile entries only from our build output.
+        def motionRoot=outputRoot.resolve('blacklight/bundled_motions')
+        if(java.nio.file.Files.isDirectory(motionRoot)) {
+            def paths=java.nio.file.Files.list(motionRoot)
+            try {paths.filter { p -> p.fileName.toString().matches('[a-z0-9_-]+\\.(json|data)(\\.jz)?') }.forEach { java.nio.file.Files.delete(it) }}
+            finally {paths.close()}
+        }
+    }
 }
 
 repositories {
@@ -262,6 +325,11 @@ configurations {
 }
 
 dependencies {
+    resourceToolsImplementation 'org.tukaani:xz:1.10'
+    implementation(jarJar('org.tukaani:xz:1.10')) {
+        jarJar.ranged(it, '[1.10,1.11)')
+        jarJar.pin(it, '1.10')
+    }
     minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
     implementation fg.deobf("software.bernie.geckolib:geckolib-forge-${minecraft_version}:${geckolib_version}")
     annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'

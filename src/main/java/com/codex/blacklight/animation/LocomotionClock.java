@@ -43,7 +43,7 @@ public final class LocomotionClock {
         return changed;
     }
     public double seconds(float partial) {
-        double alpha=com.codex.blacklight.util.MathCompat.clamp(partial,0,1);
+        double alpha=com.codex.blacklight.forge.WingMath.clamp(partial,0,1);
         return previous+(current-previous)*alpha;
     }
     public float sampleTime(float partial) {

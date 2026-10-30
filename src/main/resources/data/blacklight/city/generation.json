@@ -1,0 +1,8 @@
+{
+  "schema": 1,
+  "mode": "geographic",
+  "geography": "Frozen OpenStreetMap building footprints, roads, land use and 32-metre elevation samples",
+  "detailCores": ["futian", "los_angeles"],
+  "ordinaryBuildings": "Deterministic facades and floor slabs generated inside mapped footprints",
+  "savedChunks": "Preserved; generation applies only to previously ungenerated chunks"
+}
