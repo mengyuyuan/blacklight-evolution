@@ -20,7 +20,12 @@ public final class CityBlocks {
     public static final RegistryObject<Block> WOUNDED=BLOCKS.register("city_wounded",()->new Block(flesh(1)));
     public static final RegistryObject<SlabBlock> LAYER=BLOCKS.register("city_tissue_layer",()->new SlabBlock(flesh(1)));
     public static final RegistryObject<CityHatchBlock> HATCH=BLOCKS.register("city_hatch",()->new CityHatchBlock(flesh(5)));
-    public static final RegistryObject<Block> SAC=BLOCKS.register("city_sac",()->new Block(flesh(2).lightLevel(s->2)));
+    public static final RegistryObject<Block> SAC=BLOCKS.register("city_sac",()->new Block(flesh(2).lightLevel(s->2)) {
+        @Override public void appendHoverText(ItemStack stack,net.minecraft.world.level.BlockGetter level,java.util.List<Component> tooltip,TooltipFlag flag) {
+            super.appendHoverText(stack,level,tooltip,flag);
+            tooltip.add(Component.translatable("city.blacklight.sac_hint").withStyle(net.minecraft.ChatFormatting.GRAY));
+        }
+    });
     public static final RegistryObject<CityTransitItem> TRANSIT=ITEMS.register("city_transit",()->new CityTransitItem(new Item.Properties().stacksTo(1)));
     static {
         for(var block:java.util.List.of(FLESH,FIBER,VEIN,SHELL,WOUNDED,LAYER,HATCH,SAC))ITEMS.register(block.getId().getPath(),()->new BlockItem(block.get(),new Item.Properties()));
