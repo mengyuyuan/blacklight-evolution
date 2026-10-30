@@ -648,5 +648,6 @@
   "species.blacklight.fireball.desc": "沿准星发射真正的小火球，归属玩家并遵守火焰与区域保护规则。",
   "species.blacklight.explode": "自爆冲击",
   "species.blacklight.explode.desc": "以自身为中心产生爆炸冲击。不会炸伤自身，也不会破坏地形；会暴露当前身份。",
-  "species.blacklight.fireproof": "此身份同时免疫火焰类伤害。"
+  "species.blacklight.fireproof": "此身份同时免疫火焰类伤害。",
+  "city.blacklight.sac_hint": "感染囊泡是组织装饰，不会自行孵化生物。"
 }

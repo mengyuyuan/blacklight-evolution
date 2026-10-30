@@ -51,6 +51,7 @@ public final class BlacklightHive extends Monster implements GeoEntity {
             for(var p:nearby)boss.addPlayer(p);
         }
         if(!isAlive()||boss.getPlayers().isEmpty()||level().getDifficulty()==net.minecraft.world.Difficulty.PEACEFUL)return;
+        if(!level().getGameRules().getBoolean(net.minecraft.world.level.GameRules.RULE_DOMOBSPAWNING))return;
         if(cooldown>0){cooldown--;return;}
         // Old hives only spawned stalkers/spitters/brutes. Give such a saved hive one
         // finite hunter brood too, without resetting its already spent wave budget.

@@ -56,13 +56,15 @@ public final class PrototypeChaseCamera {
     public static float farPlane(float ordinary){var f=filmFrame();return f==null?ordinary:(float)Mth.lerp(f.weight(),ordinary,Mth.clamp(f.far(),16,ordinary));}
     public static float controlYaw() {
         var mc=Minecraft.getInstance();
-        if(CameraCompatibility.externalOwnsView()||previousPlayer!=mc.player||!(wasOwned||inputSeeded))return mc.gameRenderer.getMainCamera().getYRot();
+        if(CameraCompatibility.externalOwnsView())return CameraCompatibility.externalYaw(mc.gameRenderer.getMainCamera().getYRot());
+        if(previousPlayer!=mc.player||!(wasOwned||inputSeeded))return mc.gameRenderer.getMainCamera().getYRot();
         return !orbit.manual()&&lastOffset!=null&&filmFrame==null?lastYaw:orbit.controlYaw();
     }
     /** Flight uses the same unshaken orbit pitch as mouse aiming, even between mouse events. */
     public static float controlPitch() {
         var mc=Minecraft.getInstance();
-        if(CameraCompatibility.externalOwnsView()||previousPlayer!=mc.player||!(wasOwned||inputSeeded))return mc.gameRenderer.getMainCamera().getXRot();
+        if(CameraCompatibility.externalOwnsView())return CameraCompatibility.externalPitch(mc.gameRenderer.getMainCamera().getXRot());
+        if(previousPlayer!=mc.player||!(wasOwned||inputSeeded))return mc.gameRenderer.getMainCamera().getXRot();
         return !orbit.manual()&&lastOffset!=null&&filmFrame==null?lastPitch:orbit.controlPitch();
     }
     public static boolean mouse(double x,double y) {

@@ -101,12 +101,15 @@ public final class CitySystem {
     private static int count(ServerLevel level){
         int n=0;for(Entity entity:level.getAllEntities())if(entity instanceof Mob && entity.isAlive())n++;return n;
     }
-    private static boolean spawn(ServerLevel level,EntityType<? extends Mob> type,BlockPos pos,boolean infected){
+    static boolean spawn(ServerLevel level,EntityType<? extends Mob> type,BlockPos pos,boolean infected){
+        if(!level.getGameRules().getBoolean(net.minecraft.world.level.GameRules.RULE_DOMOBSPAWNING))return false;
         if(!loaded(level,pos)||!level.getBlockState(pos.below()).isSolid()||count(level)>=CityConfig.MOB_LIMIT.get())return false;
         Mob mob=type.create(level);if(mob==null)return false;
         mob.moveTo(pos.getX()+.5,pos.getY(),pos.getZ()+.5,level.random.nextFloat()*360,0);
-        if(!level.noCollision(mob)||!level.getBlockState(pos).getFluidState().isEmpty())return false;
+        if(!level.noCollision(mob)||level.containsAnyLiquid(mob.getBoundingBox()))return false;
         mob.finalizeSpawn(level,level.getCurrentDifficultyAt(pos),MobSpawnType.EVENT,null,null);
+        // Finalization may change the body dimensions; validate the complete body again.
+        if(!level.noCollision(mob)||level.containsAnyLiquid(mob.getBoundingBox()))return false;
         mob.getPersistentData().putBoolean(POPULATION,true);
         mob.addTag(POPULATION); // Infection replacements preserve vanilla entity tags.
         // Residents persist in their district; hostile vanilla mobs may despawn normally.
@@ -144,18 +147,26 @@ public final class CitySystem {
             long bit=1L<<(x+z*8);if((data.populatedMask&bit)!=0)continue;
             BlockPos center=populationPoint(level,x,z);
             if(center==null||!loaded(level,center)||level.players().stream().noneMatch(p->p.distanceToSqr(center.getX(),center.getY(),center.getZ())<100*100))continue;
-            if(count(level)+4>CityConfig.MOB_LIMIT.get())return;
+            if(count(level)>=CityConfig.MOB_LIMIT.get())return;
             var zone=data.infected(x,z)&&!sanctuary(level,x,z)?CityLayout.Zone.INFECTED:zone(level,x,z);
             if(futian(level)&&FutianLayout.sanctuary(center.getX(),center.getZ()))zone=CityLayout.Zone.NORMAL;
             if(level.getDifficulty()==net.minecraft.world.Difficulty.PEACEFUL&&zone!=CityLayout.Zone.NORMAL)continue;
-            int spawned=0;
-            for(int i=0;i<4;i++){
-                EntityType<? extends Mob> type=zone==CityLayout.Zone.NORMAL?EntityType.VILLAGER:
-                    zone==CityLayout.Zone.CONFLICT&&i<2?ModEntities.BLACKWATCH_SOLDIER.get():EntityType.ZOMBIE;
-                if(spawn(level,type,center.offset(i*3-5,0,0),type==EntityType.ZOMBIE))spawned++;
-            }
+            int spawned=populateDistrict(level,center,zone);
             if(spawned>0){data.populatedMask|=bit;data.setDirty();}return;
         }
+    }
+    /** One bounded initial street cohort, sharing the ordinary publication and population guards. */
+    static int populateDistrict(ServerLevel level,BlockPos center,CityLayout.Zone zone){
+        if(!level.getGameRules().getBoolean(net.minecraft.world.level.GameRules.RULE_DOMOBSPAWNING))return 0;
+        if(level.getDifficulty()==net.minecraft.world.Difficulty.PEACEFUL&&zone!=CityLayout.Zone.NORMAL)return 0;
+        int attempts=Math.min(4,Math.max(0,CityConfig.MOB_LIMIT.get()-count(level))),spawned=0;
+        for(int i=0;i<attempts;i++){
+            var pos=center.offset(i*3-5,0,0);
+            EntityType<? extends Mob> type=zone==CityLayout.Zone.NORMAL?EntityType.VILLAGER:
+                    zone==CityLayout.Zone.CONFLICT&&i<2?ModEntities.BLACKWATCH_SOLDIER.get():EntityType.ZOMBIE;
+            if(spawn(level,type,pos,type==EntityType.ZOMBIE))spawned++;
+        }
+        return spawned;
     }
     private static void expand(ServerLevel level,CityData data){
         if(Long.bitCount(data.infectedMask)>=12)return;

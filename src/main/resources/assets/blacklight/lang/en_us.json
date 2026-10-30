@@ -648,5 +648,6 @@
   "species.blacklight.fireball.desc": "Fire an actual player-owned small fireball along your aim, respecting fire and area protection rules.",
   "species.blacklight.explode": "Explosion",
   "species.blacklight.explode.desc": "Explode around yourself. The blast spares its source and leaves terrain intact, but exposes your identity.",
-  "species.blacklight.fireproof": "This identity also resists fire damage."
+  "species.blacklight.fireproof": "This identity also resists fire damage.",
+  "city.blacklight.sac_hint": "Decorative infected tissue. Does not hatch creatures on its own."
 }

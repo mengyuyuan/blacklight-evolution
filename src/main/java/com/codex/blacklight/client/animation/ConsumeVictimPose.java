@@ -156,9 +156,7 @@ public final class ConsumeVictimPose {
         var frame=projection.get();
         var contact=large?null:com.codex.blacklight.combat.ConsumePlacementTrack.contactFrame(GrappleMotion.sceneKey(entity,visual),GrappleMotion.sceneProgress(entity,visual,partial)).orElse(null);
         if(model instanceof HumanoidModel<?> h) {
-            projectedPart(saved,h.head,frame,contact,0);projectedPart(saved,h.hat,frame,contact,0);
-            projectedPart(saved,h.body,frame,contact,1);projectedPart(saved,h.rightArm,frame,contact,2);projectedPart(saved,h.leftArm,frame,contact,3);
-            if(!large){projectedPart(saved,h.rightLeg,frame,contact,4);projectedPart(saved,h.leftLeg,frame,contact,5);}
+            projectHumanoid(h,saved,frame,contact,large);
             ReceiverPoseDiagnostics.record(entity,model,GrappleMotion.sceneKey(entity,visual),large?5:7);return true;
         }
         int bound=ReceiverModelPose.apply(model,saved,frame,
@@ -166,6 +164,41 @@ public final class ConsumeVictimPose {
         ReceiverPoseDiagnostics.record(entity, model, GrappleMotion.sceneKey(entity,visual), bound);
         return bound>0;
     }
+    static void projectHumanoid(HumanoidModel<?> h,Map<ModelPart,PartPose> saved,double[] frame,double[] contact,boolean large) {
+        var body=renderPosition(h.body,h.young,false);var head=renderPosition(h.head,h.young,true);
+        var hat=renderPosition(h.hat,h.young,false);var armR=renderPosition(h.rightArm,h.young,false);var armL=renderPosition(h.leftArm,h.young,false);
+        var legR=renderPosition(h.rightLeg,h.young,false);var legL=renderPosition(h.leftLeg,h.young,false);
+        var referenceRotation=rotation(h.body);
+        var bindBody=h.body.getInitialPose();var bindR=h.rightLeg.getInitialPose();var bindL=h.leftLeg.getInitialPose();
+        var waist=new org.joml.Vector3f((bindR.x+bindL.x)*.5F-bindBody.x,(bindR.y+bindL.y)*.5F-bindBody.y,(bindR.z+bindL.z)*.5F-bindBody.z)
+                .mul(h.body.xScale,h.body.yScale,h.body.zScale).mul(h.young?.5F:1);
+        projectedPart(saved,h.head,frame,null,0);projectedPart(saved,h.hat,frame,null,0);
+        projectedPart(saved,h.body,frame,null,1);projectedPart(saved,h.rightArm,frame,null,2);projectedPart(saved,h.leftArm,frame,null,3);
+        if(!large){projectedPart(saved,h.rightLeg,frame,null,4);projectedPart(saved,h.leftLeg,frame,null,5);}
+        // Source contacts describe a hierarchical, bent receiver. Vanilla's
+        // cuboid limbs are flat siblings with different neck/shoulder sockets.
+        // Retain the authored rotations and pelvis travel, then reconstruct
+        // positions from this model's actual sockets instead of moving each
+        // body part independently (which tears the neck and waist apart).
+        var hips=large?new org.joml.Quaternionf():com.codex.blacklight.combat.ConsumePlacementTrack.quaternion(frame,31);
+        var linked=NativeReceiverPose.linkHumanoid(body,referenceRotation,waist,rotation(h.body),hips,head,hat,armR,armL,legR,legL);
+        var shift=new org.joml.Vector3f();
+        if(contact!=null&&!large)shift.set((float)(contact[25]+contact[28]),(float)(contact[26]+contact[29]),(float)(contact[27]+contact[30])).mul(h.young?4:8);
+        position(saved,h.body,linked.body().add(shift),h.young,false);position(saved,h.head,linked.head().add(shift),h.young,true);
+        position(saved,h.hat,linked.hat().add(shift),h.young,false);position(saved,h.rightArm,linked.rightArm().add(shift),h.young,false);
+        position(saved,h.leftArm,linked.leftArm().add(shift),h.young,false);position(saved,h.rightLeg,linked.rightLeg().add(shift),h.young,false);
+        position(saved,h.leftLeg,linked.leftLeg().add(shift),h.young,false);
+        if(h instanceof PlayerModel<?> player) {
+            copyPart(saved,player.jacket,h.body);copyPart(saved,player.rightSleeve,h.rightArm);copyPart(saved,player.leftSleeve,h.leftArm);
+            copyPart(saved,player.rightPants,h.rightLeg);copyPart(saved,player.leftPants,h.leftLeg);
+        }
+    }
+    private static org.joml.Vector3f renderPosition(ModelPart part,boolean young,boolean head){return NativeReceiverPose.renderPosition(part.x,part.y,part.z,young,head);}
+    private static org.joml.Quaternionf rotation(ModelPart part){return new org.joml.Quaternionf().rotationZYX(part.zRot,part.yRot,part.xRot);}
+    private static void position(Map<ModelPart,PartPose> saved,ModelPart part,org.joml.Vector3f rendered,boolean young,boolean head){
+        saved.putIfAbsent(part,part.storePose());var local=NativeReceiverPose.modelPosition(rendered,young,head);part.setPos(local.x,local.y,local.z);
+    }
+    private static void copyPart(Map<ModelPart,PartPose> saved,ModelPart to,ModelPart from){saved.putIfAbsent(to,to.storePose());to.copyFrom(from);}
     private static void restrain(EntityModel<?> model,Map<ModelPart,PartPose> saved){
         var parts=new java.util.HashSet<ModelPart>();
         var root=ReceiverModelPose.root(model);
