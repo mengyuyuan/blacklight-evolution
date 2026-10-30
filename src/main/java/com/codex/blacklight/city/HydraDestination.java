@@ -13,7 +13,7 @@ public final class HydraDestination {
     private int height;
     private final UUID id=UUID.randomUUID();
     public boolean prepare(ServerLevel source) {
-        var next=source.getServer().getLevel(CityTravel.CITY);
+        var next=source.getServer().getLevel(CityTravel.WORLD);
         if(next==null)return false;
         return prepare(next,CityTravel.arrivalOrigin(next));
     }

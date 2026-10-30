@@ -63,7 +63,15 @@ public final class BulletdiveAimGameTest {
         h.getLevel().addNewPlayer(p);
         boolean[] landed={false};double[] offset={Double.NaN},height={0},peak={0};String[] landing={"not landed"};
         for(int t=2;t<470;t++){final int time=t;h.runAfterDelay(t,()->{
-            if(landed[0]){p.tickCount++;DevastatorSystem.tick(new net.minecraftforge.event.TickEvent.PlayerTickEvent(net.minecraftforge.event.TickEvent.Phase.END,p));return;}
+            if(landed[0]){
+                var previous=DevastatorSystem.snapshot(p);var visual=com.codex.blacklight.registry.ModAttachments.getData(p,ModAttachments.DEVASTATOR_VISUAL);
+                p.tickCount++;DevastatorSystem.tick(new net.minecraftforge.event.TickEvent.PlayerTickEvent(net.minecraftforge.event.TickEvent.Phase.END,p));
+                if(previous!=null&&DevastatorSystem.snapshot(p)==null)landing[0]+=" endedFrom="+previous+" hp="+p.getHealth()
+                        +" alive="+p.isAlive()+" mode="+com.codex.blacklight.registry.ModAttachments.getData(p,ModAttachments.PLAYER_STATE).isPrototypeMode()
+                        +" water="+p.isInWater()+" gliding="+p.isFallFlying()+" wall="+com.codex.blacklight.registry.ModAttachments.getData(p,ModAttachments.MOVEMENT_STATE).wallTraversal().attached()
+                        +" contacts="+visual.contacts()+" bystander="+bystander.getId()+" bystanderPos="+bystander.position();
+                return;
+            }
             p.tickCount++;
             if(time==120)target.setPos(ground.add(28,0,4));
             DevastatorSystem.acceptInput(p,false,time<85,false,false);
@@ -78,7 +86,9 @@ public final class BulletdiveAimGameTest {
                 if(state.landed()){
                     landed[0]=true;offset[0]=Math.hypot(p.getX()-target.getX(),p.getZ()-target.getZ());
                     landing[0]=state+" damageable="+CombatTargeting.damageable(p,target)+" visible="+CombatTargeting.visible(p,target)
-                            +" timing="+DevastatorTiming.of(WeaponMove.BULLETDIVE_DROP)+" actor="+p.position()+" target="+target.position();
+                            +" timing="+DevastatorTiming.of(WeaponMove.BULLETDIVE_DROP)+" actor="+p.position()+" target="+target.position()
+                            +" radius="+com.codex.blacklight.registry.ModAttachments.getData(p,ModAttachments.DEVASTATOR_VISUAL).radius()
+                            +" contacts="+com.codex.blacklight.registry.ModAttachments.getData(p,ModAttachments.DEVASTATOR_VISUAL).contacts();
                     h.assertTrue(p.onGround(),"real swept block collision, not an invented impact height");return;
                 }
             }

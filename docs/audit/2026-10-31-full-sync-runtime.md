@@ -46,3 +46,19 @@ The runtime failures exposed two further missed connections in the catch-up: `Bu
 The ecology frontier fixture now excludes its unrelated architectural core and restores its altered spawn interval on failure as well as success. Forge's different batch placement could put that core in the neighbour cell; its first assertion then left a 24,000-tick interval behind, contaminating later birth tests. The carrier fixture retains real AI navigation and allows its actual bounded search/approach/transfer phases to finish. No production readiness, nutrient, protection or population gate was bypassed. These changes require a new server run.
 
 The ordinary landing regression also exposed Forge 1.20 reporting a successful hurt call after a canceled LivingHurtEvent. Its physical impulse now requires real health or absorption loss; a veto restores the previous velocity. Fresh dedicated QA worlds use seed 0, matching reproducible geography assumptions instead of an arbitrary random seed. Full server and final artifact acceptance remain pending.
+
+### Continued parity review and actual server rounds 8–12
+
+The shared feature source is kept on the existing Forge adapter layer. Body comparisons are review candidates, not a proof of behavioral parity. Additional omitted calls were restored: destination-aware Blacklight World travel rather than the old hard-coded city, organ grab range, crest knockback attributes, tissue-grapple restraint, and the current combo transition window. The obsolete tutorial popup and developer-only mouse-key interception are removed from normal play.
+
+Client review also restored the scoped consume-render lifecycle, including cancelled or nested render calls; after-Post cleanup alone leaks a pushed pose when another renderer cancels the event. Infection rendering now publishes the existing late organ grafts, surface geometry, transformed native parts and copied anatomical coats. The obsolete generic box decoration is no longer combined with the newer anatomy renderer. These changes require actual client rendering checks; compilation and server passes cannot establish visual quality.
+
+Actual native results remain explicitly distinct:
+
+- r8: 526 completed, 5 required failures.
+- r9: 526 completed, 1 required failure (civilian slots fixture).
+- r10: 526 completed, 9 required failures, so the earlier near-pass is not accepted. The civilian fixture counted infected bodies against the wrong budget; it now establishes exactly two civilian slots and retains the exact two-birth assertion. Late disk-loaded bodies from preceding component batches are isolated only in the disposable GameTest server; new births still use production quotas, collision and join callbacks. The mature carrier keeps real navigation on a supported floor and restores fixture state after either outcome.
+- r11: incomplete, server crashed while a common infected executed capture checks after `super.tick()` removed its body on the final death tick. Forge correctly invalidated its capability. The body now returns immediately after removal, without reviving or inventing capability state. Two actual final-death cases cover common infected with and without AI.
+- r12: started with the full suites and the additional entity-lifecycle suite; not yet an accepted result at the time of this entry.
+
+The 1,119-test JVM pass predates these latest changes. Final JVM, server, client, coinstalled-mod, multiplayer and ordinary packaged-artifact checks remain required. No zero-bug or final-package claim is made.

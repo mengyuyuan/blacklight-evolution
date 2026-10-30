@@ -18,7 +18,7 @@ public final class CitySpawnAuditGameTest {
     private static final class Fixture implements AutoCloseable {
         final GameTestHelper h;final ServerLevel level;final BlockPos center;
         final boolean spawning;final int limit;final Map<BlockPos,BlockState> terrain=new LinkedHashMap<>();
-        final Set<ChunkPos> forced=new LinkedHashSet<>();final Set<Integer> original=new HashSet<>();
+        final Set<ChunkPos> forced=new LinkedHashSet<>();final Set<Integer> original=new HashSet<>();boolean closed;
         Fixture(GameTestHelper helper){
             h=helper;level=h.getLevel();center=h.absolutePos(new BlockPos(8,70,8));
             spawning=level.getGameRules().getBoolean(GameRules.RULE_DOMOBSPAWNING);limit=CityConfig.MOB_LIMIT.get();
@@ -31,11 +31,20 @@ public final class CitySpawnAuditGameTest {
             for(int x=-9;x<=9;x++)for(int z=-4;z<=4;z++)for(int y=-1;y<9;y++)
                 set(center.offset(x,y,z),y==-1?Blocks.STONE.defaultBlockState():Blocks.AIR.defaultBlockState());
             level.getGameRules().getRule(GameRules.RULE_DOMOBSPAWNING).set(true,level.getServer());CityConfig.MOB_LIMIT.set(200);
+            com.codex.blacklight.gametest.ForgeTestLifecycle.info(h).addListener(new GameTestListener(){
+                public void testStructureLoaded(GameTestInfo info){}
+                public void testPassed(GameTestInfo info){close();}
+                public void testFailed(GameTestInfo info){close();}
+                public void testAddedForRerun(GameTestInfo original,GameTestInfo retry){}
+            });
         }
         int count(){int n=0;for(var e:level.getAllEntities())if(e instanceof Mob&&e.isAlive())n++;return n;}
         void set(BlockPos p,BlockState state){terrain.putIfAbsent(p.immutable(),level.getBlockState(p));level.setBlock(p,state,3);}
-        void run(Runnable check){h.startSequence().thenWaitUntil(()->h.assertTrue(level.isPositionEntityTicking(center),"fixture chunks must really be entity ticking")).thenIdle(61).thenExecute(()->{try{check.run();}finally{close();}h.succeed();});}
+        void run(Runnable check){h.startSequence().thenWaitUntil(()->{
+            for(int i=0;i<4;i++)h.assertTrue(level.isPositionEntityTicking(center.offset(i*3-5,0,0)),"every actual cohort outlet must enter entity ticking");
+        }).thenIdle(61).thenExecute(()->{try{check.run();}finally{close();}h.succeed();});}
         public void close(){
+            if(closed)return;closed=true;
             var cleanup=new java.util.ArrayList<Entity>();level.getAllEntities().forEach(cleanup::add);for(var e:cleanup)if(e instanceof Mob&&!original.contains(e.getId()))e.discard();
             for(var e:terrain.entrySet())level.setBlock(e.getKey(),e.getValue(),3);
             for(var cp:forced)level.setChunkForced(cp.x,cp.z,false);
@@ -44,8 +53,15 @@ public final class CitySpawnAuditGameTest {
     }
     @GameTest(template="wall_test",timeoutTicks=400,batch="spawn_last_slots")
     public static void cityCohortUsesTheLastTwoRealPopulationSlots(GameTestHelper h){var f=new Fixture(h);f.run(()->{
-        int before=f.count();CityConfig.MOB_LIMIT.set(before+2);
-        h.assertTrue(CitySystem.populateDistrict(f.level,f.center,DistrictThreat.Zone.GREEN)==2&&f.count()==before+2,"two real remaining slots must fill without requiring a whole four-body wave");
+        int before=f.count(),residents=0;
+        // Infection has its own budget. Unrelated infected bodies from other
+        // suites must not accidentally give this civilian fixture extra slots.
+        for(var e:f.level.getAllEntities())if(e instanceof Mob mob&&mob.isAlive()
+                &&!com.codex.blacklight.infection.BlacklightInfectionSystem.isInfected(mob))residents++;
+        CityConfig.MOB_LIMIT.set(residents+2);
+        h.assertTrue(com.codex.blacklight.infection.WorldOutbreakSystem.cityPopulationSlots(f.level,false)==2,"fixture must leave exactly two real civilian slots");
+        int born=CitySystem.populateDistrict(f.level,f.center,DistrictThreat.Zone.GREEN);
+        h.assertTrue(born==2&&f.count()==before+2,"two real remaining slots must fill without requiring a whole four-body wave: before="+before+" born="+born+" after="+f.count()+" slots="+com.codex.blacklight.infection.WorldOutbreakSystem.cityPopulationSlots(f.level,false));
         h.assertTrue(CitySystem.populateDistrict(f.level,f.center,DistrictThreat.Zone.GREEN)==0,"a second call cannot exceed the actual city cap");
     });}
     @GameTest(template="wall_test",timeoutTicks=400,batch="spawn_head_water")

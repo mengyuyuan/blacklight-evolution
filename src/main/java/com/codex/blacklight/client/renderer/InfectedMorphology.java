@@ -87,7 +87,7 @@ public final class InfectedMorphology implements AutoCloseable {
             default->host.family().equals("air")?"winged":host.family().equals("water")?"aquatic":
                     host.humanoid()?"humanoid":host.quadruped()?"bovine":"generic";
         };
-        attachments=authored.available()?new IdentityHashMap<>():new IdentityHashMap<>(CACHE.computeIfAbsent(model,k->new HashMap<>()).computeIfAbsent(profile,k->bind(model,k)));
+        attachments=anatomical!=null||authored.available()?new IdentityHashMap<>():new IdentityHashMap<>(CACHE.computeIfAbsent(model,k->new HashMap<>()).computeIfAbsent(profile,k->bind(model,k)));
         ACTIVE.set(this);
     }
     @Override public void close(){pending.clear();authored.clear();coats.forEach(AuthoredInfectionParts.Binding::clear);if(previous==null)ACTIVE.remove();else ACTIVE.set(previous);}
@@ -99,6 +99,10 @@ public final class InfectedMorphology implements AutoCloseable {
         String path=texture.getPath();
         if(!path.contains("sheep_fur")&&!path.contains("slime")&&!path.contains("drowned_outer_layer")
                 &&!path.contains("stray_overlay")&&!path.contains("bogged_overlay"))return;
+        if(context.anatomical!=null){
+            var coat=context.anatomical.coat(model,texture);if(coat!=null)context.anatomicalCoats.add(coat);
+            return;
+        }
         if(context.authored.available()){
             var coat=AuthoredInfectionParts.bind(context.speciesId,model,path.contains("sheep_fur"));coat.growth(context.tissueGrowth,context.tissueSeed);coat.evolution(context.authored.age(),context.authored.tentacles(),context.authored.development());coat.digestion(context.authored);coat.vitals(context.authored);context.coats.add(coat);
             if(path.contains("sheep_fur")||path.contains("slime"))context.coatGrowth.add(coat);
@@ -172,21 +176,6 @@ public final class InfectedMorphology implements AutoCloseable {
     }
     private static Attachment attachment(ModelPart part,Bounds b,int anatomy,JsonArray source,boolean horizontalBody,String profile){
         List<Box> boxes=new ArrayList<>();
-        int index=0;
-        for(var value:source){
-            // Keep one loaded side instead of mirroring the same mutation on every limb.
-            if((anatomy==ConsumeAnatomy.LEFT_ARM||anatomy==ConsumeAnatomy.LEFT_LEG)&&index++%3!=0)continue;
-            var o=value.getAsJsonObject();var c=o.getAsJsonArray("center");var s=o.getAsJsonArray("size");
-            int material=DEFINITIONS.getAsJsonObject("materials").get(o.get("material").getAsString()).getAsInt();
-            // Keep small fish/wing details small, while preserving zero-thickness
-            // vanilla wing planes as visible but restrained block struts.
-            float cy=c.get(1).getAsFloat(),cz=c.get(2).getAsFloat(),sy=s.get(1).getAsFloat(),sz=s.get(2).getAsFloat();
-            // Cow/pig bodies bake a quarter turn; horse/hoglin bodies often
-            // model the long axis directly in Z. The ridge must stay dorsal.
-            if(horizontalBody){float old=cy;cy=1-cz;cz=old;old=sy;sy=sz;sz=old;}
-            boxes.add(new Box(b.x+c.get(0).getAsFloat()*b.w,b.y+cy*b.h,b.z+cz*b.d,
-                    Math.max(.18F,s.get(0).getAsFloat()*b.w),Math.max(.18F,sy*b.h),Math.max(.18F,sz*b.d),material));
-        }
         InfectedBite wound=InfectedBite.create(part,anatomy,profile);
         if(wound!=null)addWoundInterior(boxes,wound);
         return new Attachment(anatomy,List.copyOf(boxes),wound);
@@ -246,7 +235,11 @@ public final class InfectedMorphology implements AutoCloseable {
                 context.attachments.put(part,attachment);
             }
         }
-        if(attachment==null||attachment.wound==null)return false;
+        if(attachment==null||attachment.wound==null){
+            if(pose==originalPose)return false;
+            for(var cube:((ModelPartChildrenAccessor)(Object)part).blacklight$cubes())cube.compile(pose,out,light,overlay,((color>>>16)&255)/255F,((color>>>8)&255)/255F,(color&255)/255F,((color>>>24)&255)/255F);
+            capture(part,pose,light,overlay,color);return true;
+        }
         for(var cube:((ModelPartChildrenAccessor)(Object)part).blacklight$cubes()){
             if(cube==attachment.wound.cube)attachment.wound.compile(pose,out,light,overlay,color);
             else cube.compile(pose,out,light,overlay,((color>>16)&255)/255F,((color>>8)&255)/255F,(color&255)/255F,((color>>>24)&255)/255F);
@@ -270,6 +263,7 @@ public final class InfectedMorphology implements AutoCloseable {
         }
         if(context.surface!=null)context.surface.capture(part,pose,light,overlay,color);
         context.authored.capture(part,pose,light,overlay,color);
+        if(context.lateOrgans!=null)context.lateOrgans.capture(part,context.authored.pose(part,pose),light,overlay,color);
         for(var coat:context.coatGrowth)coat.capture(part,pose,light,overlay,color);
         Attachment attachment=context.attachments.get(part);if(attachment==null||attachment.boxes.isEmpty())return;
         PoseStack copy=new PoseStack();copy.last().pose().set(pose.pose());copy.last().normal().set(pose.normal());
@@ -285,6 +279,8 @@ public final class InfectedMorphology implements AutoCloseable {
         if(context.anatomical!=null){context.anatomical.flush(buffers);context.anatomicalCoats.forEach(coat->coat.flush(buffers));context.surface.flush(buffers);return;}
         context.authored.flush(buffers,!context.coatGrowth.isEmpty(),false);
         context.coatGrowth.forEach(coat->coat.flush(buffers,false,true));
+        if(context.lateOrgans!=null)context.lateOrgans.flush(buffers);
+        if(context.surface!=null)context.surface.flush(buffers);
         if(context.pending.isEmpty())return;
         var out=buffers.getBuffer(TYPE);
         for(var p:context.pending.values()){

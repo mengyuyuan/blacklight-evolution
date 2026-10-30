@@ -8,7 +8,7 @@ import net.minecraft.world.entity.player.Player;
 public final class HydraTransport {
     private HydraTransport(){}
     public static BlacklightHydra carrier(Player p){
-        if(!ModAttachments.available(p))return null;
+        if(p.isRemoved()||!ModAttachments.available(p))return null;
         int id=ModAttachments.peekData(p,ModAttachments.HYDRA_CARRIER);
         return id>=0&&p.level().getEntity(id) instanceof BlacklightHydra h&&h.isAlive()&&h.heldId()==p.getId()&&h.transporting()?h:null;
     }

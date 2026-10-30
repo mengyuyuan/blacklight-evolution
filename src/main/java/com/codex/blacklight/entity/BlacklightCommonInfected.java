@@ -91,6 +91,9 @@ public final class BlacklightCommonInfected extends Monster {
     }
     @Override public void tick() {
         super.tick();
+        // Vanilla's final death tick removes this body and invalidates Forge
+        // capabilities. Do not run capture/promotion logic on that stale body.
+        if(isRemoved())return;
         // Capture sets NoAI, so the stopped goal cannot clear its own pending pose until release.
         if(!level().isClientSide&&(isNoAi()||restrained()))cancelAttack();
         if(!(level() instanceof ServerLevel level)||!isAlive()||meals<3||tickCount%100!=0

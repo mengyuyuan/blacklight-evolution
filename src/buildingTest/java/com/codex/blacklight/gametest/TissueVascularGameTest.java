@@ -21,18 +21,32 @@ public final class TissueVascularGameTest {
     private static final class Fixture implements AutoCloseable {
         final GameTestHelper h;final ServerLevel level;final BuildingInfectionData data;final BlockPos origin;final BuildingInfectionData.Colony colony;
         final List<BuildingInfectionData.Colony> old;final Set<Long> cleared;final OutbreakData outbreak;final boolean grief,spawns,volume;final List<BlacklightInfectedHost> hosts=new ArrayList<>();
+        final Map<BlockPos,net.minecraft.world.level.block.state.BlockState> navigationFloor=new LinkedHashMap<>();boolean closed;
         Fixture(GameTestHelper h){
             this.h=h;level=h.getLevel();data=BuildingInfectionData.get(level);old=new ArrayList<>(data.colonies);cleared=new LinkedHashSet<>(data.clearedSites);data.colonies.clear();data.clearedSites.clear();outbreak=OutbreakData.get(level.getServer());var active=new OutbreakData();active.start(level.getServer().overworld().getGameTime());level.getServer().overworld().getDataStorage().set("blacklight_outbreak",active);
             grief=level.getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING);spawns=level.getGameRules().getBoolean(GameRules.RULE_DOMOBSPAWNING);volume=BuildingInfectionConfig.VOLUME.get();BuildingInfectionConfig.VOLUME.set(false);level.getGameRules().getRule(GameRules.RULE_MOBGRIEFING).set(true,level.getServer());level.getGameRules().getRule(GameRules.RULE_DOMOBSPAWNING).set(false,level.getServer());
             for(int x=1;x<=9;x++)for(int z=1;z<=9;z++){h.setBlock(new BlockPos(x,1,z),Blocks.STONE);for(int y=2;y<=8;y++)h.setBlock(new BlockPos(x,y,z),Blocks.AIR);}
             origin=h.absolutePos(new BlockPos(5,2,6));for(int x=1;x<=9;x++)for(int y=2;y<=7;y++)h.setBlock(new BlockPos(x,y,7),Blocks.STONE_BRICKS);
             level.setBlock(origin,ModBlocks.BUILDING_CORE.get().defaultBlockState().setValue(com.codex.blacklight.world.BuildingInfectionCoreBlock.FACING,Direction.NORTH),3);colony=data.colonies.get(0);colony.frontier.clear();
+            com.codex.blacklight.gametest.ForgeTestLifecycle.info(h).addListener(new GameTestListener(){
+                public void testStructureLoaded(GameTestInfo info){}
+                public void testPassed(GameTestInfo info){close();}
+                public void testFailed(GameTestInfo info){close();}
+                public void testAddedForRerun(GameTestInfo original,GameTestInfo retry){}
+            });
+        }
+        void supportNavigation(){
+            // Mature bodies have seed-dependent width. Their real navigation
+            // must not step off the nine-block template into the void.
+            for(int x=-4;x<=14;x++)for(int z=-4;z<=14;z++){
+                var pos=h.absolutePos(new BlockPos(x,1,z));navigationFloor.put(pos,level.getBlockState(pos));level.setBlock(pos,Blocks.STONE.defaultBlockState(),3);
+            }
         }
         BlacklightInfectedHost host(double x,double z,boolean moving){
             var host=ModEntities.INFECTED_HOST.get().create(level);long id=host.getId();host.setUUID(new UUID(id,id^42));host.inherit(EntityType.COW.create(level));var saved=new CompoundTag();host.saveWithoutId(saved);saved.getCompound("BlacklightHost").putString("NativeCore",TissueCore.VASCULAR.key());saved.putInt("BlacklightTissueNutrition",400);host.readAdditionalSaveData(saved);host.advanceTissue(216000);host.setHealth(host.getMaxHealth());host.setNoAi(false);if(!moving)host.getAttribute(Attributes.MOVEMENT_SPEED).setBaseValue(0);com.codex.blacklight.gametest.ForgeTestPositions.moveTo(host,net.minecraft.world.phys.Vec3.atBottomCenterOf(h.absolutePos(new BlockPos(0,2,0))).add(x,0,z),0,0);host.setOnGround(true);level.addFreshEntity(host);hosts.add(host);return host;
         }
         void start(BlacklightInfectedHost host){h.assertTrue(host.vascular().start(host,colony),"the mature real organ starts its own paid duct");h.assertTrue(host.tissueNutrition()==398,"opening the connection pays two existing nutrients");}
-        public void close(){for(var host:hosts)host.discard();colony.dead=true;level.removeBlock(origin,false);data.colonies.clear();data.colonies.addAll(old);data.clearedSites.clear();data.clearedSites.addAll(cleared);data.setDirty();level.getServer().overworld().getDataStorage().set("blacklight_outbreak",outbreak);level.getGameRules().getRule(GameRules.RULE_MOBGRIEFING).set(grief,level.getServer());level.getGameRules().getRule(GameRules.RULE_DOMOBSPAWNING).set(spawns,level.getServer());BuildingInfectionConfig.VOLUME.set(volume);}
+        public void close(){if(closed)return;closed=true;for(var host:hosts)host.discard();colony.dead=true;level.removeBlock(origin,false);navigationFloor.forEach((pos,state)->level.setBlock(pos,state,3));data.colonies.clear();data.colonies.addAll(old);data.clearedSites.clear();data.clearedSites.addAll(cleared);data.setDirty();level.getServer().overworld().getDataStorage().set("blacklight_outbreak",outbreak);level.getGameRules().getRule(GameRules.RULE_MOBGRIEFING).set(grief,level.getServer());level.getGameRules().getRule(GameRules.RULE_DOMOBSPAWNING).set(spawns,level.getServer());BuildingInfectionConfig.VOLUME.set(volume);}
     }
     @GameTest(template="wall_test",timeoutTicks=65,batch="vascular_actual_transfer")
     public static void oneRealConnectionTransfersExistingNutritionOnceAndFullyRetracts(GameTestHelper h){
@@ -45,7 +59,7 @@ public final class TissueVascularGameTest {
     public static void anIdleMatureCarrierActuallyNavigatesToTheCoreAndSelectsItsOwnConnection(GameTestHelper h){
         // Allow the real bounded search (56), approach (160) and connection
         // (40) phases; no forced teleport or direct start substitutes for AI.
-        var f=new Fixture(h);var host=f.host(1.5,1,true);var initial=host.position();var started=new boolean[1];for(int t=1;t<=255;t++)h.runAfterDelay(t,()->{if(host.vascular().active())started[0]=true;});
+        var f=new Fixture(h);f.supportNavigation();var host=f.host(1.5,1,true);var initial=host.position();var started=new boolean[1];for(int t=1;t<=255;t++)h.runAfterDelay(t,()->{if(host.vascular().active())started[0]=true;});
         h.runAfterDelay(260,()->{try{h.assertTrue(started[0]&&host.position().distanceToSqr(initial)>.04&&host.vascular().delivered()>0&&f.colony.supply.reserve()>0,"real unforced navigation and AI approach lead to an actual delivery: pos="+host.position()+" nutrition="+host.tissueNutrition()+" delivered="+host.vascular().delivered());}finally{f.close();}h.succeed();});
     }
     @GameTest(template="wall_test",timeoutTicks=45,batch="vascular_wall")

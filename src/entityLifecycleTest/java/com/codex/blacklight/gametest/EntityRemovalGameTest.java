@@ -12,8 +12,11 @@ import net.minecraftforge.gametest.*;
 @GameTestHolder("blacklight") @PrefixGameTestTemplate(false)
 public final class EntityRemovalGameTest {
     private static void finalDeathTick(GameTestHelper h, EntityType<? extends Mob> type) {
+        finalDeathTick(h,type,true);
+    }
+    private static void finalDeathTick(GameTestHelper h, EntityType<? extends Mob> type,boolean noAi) {
         var mob = h.spawn(type, 3, 2, 3);
-        mob.setNoAi(true);
+        mob.setNoAi(noAi);
         h.assertTrue(mob.getCapability(BlacklightAttachments.CAPABILITY).isPresent(), "live entity owns capability");
         ModAttachments.getData(mob, ModAttachments.CONSUME_VISUAL);
         mob.setHealth(0);
@@ -36,6 +39,10 @@ public final class EntityRemovalGameTest {
     public static void hostFinalDeathTick(GameTestHelper h) { finalDeathTick(h, ModEntities.INFECTED_HOST.get()); }
     @GameTest(template="wall_test", timeoutTicks=20)
     public static void hunterFinalDeathTick(GameTestHelper h) { finalDeathTick(h, ModEntities.BLACKLIGHT_HUNTER.get()); }
+    @GameTest(template="wall_test", timeoutTicks=20)
+    public static void commonInfectedFinalDeathTick(GameTestHelper h) { finalDeathTick(h, ModEntities.COMMON_INFECTED.get()); }
+    @GameTest(template="wall_test", timeoutTicks=20)
+    public static void commonInfectedWithAiFinalDeathTick(GameTestHelper h) { finalDeathTick(h, ModEntities.COMMON_INFECTED.get(),false); }
 
     @GameTest(template="wall_test", timeoutTicks=20)
     public static void cancelAfterRemovalKeepsCapabilityInvalid(GameTestHelper h) {

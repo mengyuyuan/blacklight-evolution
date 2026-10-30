@@ -39,7 +39,7 @@ public final class CityTravel {
                 c.getSource().sendSuccess(()->Component.literal("黑光维度 · 深圳 / Los Angeles: Map data © OpenStreetMap contributors (ODbL 1.0), Geofabrik Guangdong 2026-10-14 / Southern California 2026-10-24; elevation Mapzen Terrain Tiles / USGS / NOAA; Futian core / entire municipal Los Angeles: Arnis 3.3.0; Los Angeles land cover ESA WorldCover. https://www.openstreetmap.org/copyright"),false);return 1;
             }))
             .then(Commands.literal("hives").executes(c -> {
-                var level=c.getSource().getServer().getLevel(CITY);
+                var level=commandLevel(c.getSource());
                 if(level==null)return 0;
                 var data=CityData.get(level);
                 for(int index=0;index<2;index++){
@@ -52,7 +52,7 @@ public final class CityTravel {
                 return 2;
             }))
             .then(Commands.literal("status").executes(c -> {
-                var level = c.getSource().getServer().getLevel(CITY);
+                var level = commandLevel(c.getSource());
                 if (level == null) return 0;
                 var data = CityData.get(level);
                 c.getSource().sendSuccess(() -> Component.translatable("city.blacklight.status",
@@ -62,7 +62,7 @@ public final class CityTravel {
         for (String setting : new String[]{"population", "spread", "facade"}) {
             root.then(Commands.literal(setting).requires(s -> s.hasPermission(2))
                 .then(Commands.argument("enabled", com.mojang.brigadier.arguments.BoolArgumentType.bool()).executes(c -> {
-                    var level = c.getSource().getServer().getLevel(CITY);
+                    var level = commandLevel(c.getSource());
                     if (level == null) return 0;
                     var data = CityData.get(level);
                     boolean enabled = com.mojang.brigadier.arguments.BoolArgumentType.getBool(c, "enabled");
@@ -129,11 +129,11 @@ public final class CityTravel {
             var tag=player.getPersistentData().getCompound(RETURN);
             var id=ResourceLocation.tryParse(tag.getString("dimension"));
             target=id==null?server.overworld():server.getLevel(ResourceKey.create(Registries.DIMENSION,id));
-            if(target==null||target.dimension().equals(CITY))target=server.overworld();
+            if(target==null||isCity(target.dimension()))target=server.overworld();
             origin=tag.contains("x")?BlockPos.containing(tag.getDouble("x"),tag.getDouble("y"),tag.getDouble("z")):target.getSharedSpawnPos();
             yaw=tag.getFloat("yaw");pitch=tag.getFloat("pitch");
         }else{
-            target=server.getLevel(CITY);
+            target=server.getLevel(destination);
             if(target==null){player.displayClientMessage(Component.translatable("city.blacklight.unavailable"),false);return 0;}
             origin=requestedOrigin==null?arrivalOrigin(target):requestedOrigin;yaw=CitySystem.futian(target)?180:0;pitch=0;
         }
@@ -196,8 +196,8 @@ public final class CityTravel {
     public static boolean transferFromHydra(ServerPlayer player,com.codex.blacklight.entity.BlacklightHydra sourceHydra,BlockPos returnPos,float bodySize) {
         if(!player.isAlive()||player.isPassenger()||HydraTransport.active(player))return false;
         var link=sourceHydra==null?null:sourceHydra.link();
-        if(link==null&&player.serverLevel().dimension().equals(CITY))return false;
-        var target=player.server.getLevel(link==null?CITY:link.dimension());if(target==null)return false;
+        if(link==null&&isCity(player.serverLevel().dimension()))return false;
+        var target=player.server.getLevel(link==null?WORLD:link.dimension());if(target==null)return false;
         var origin=link==null?arrivalOrigin(target):link.position();
         var centre=new net.minecraft.world.level.ChunkPos(origin);
         for(int x=-1;x<=1;x++)for(int z=-1;z<=1;z++)
@@ -222,7 +222,7 @@ public final class CityTravel {
         var source=player.serverLevel();var sourcePosition=player.position();float sourceYaw=player.getYRot(),sourcePitch=player.getXRot();
         var previousReturn=player.getPersistentData().getCompound(RETURN).copy();
         if(sourceHydra!=null&&created)carrier.connect(player.getUUID(),new HydraLink(source.dimension(),sourceHydra.blockPosition(),sourceHydra.getUUID()));
-        if(!source.dimension().equals(CITY)){
+        if(!isCity(source.dimension())){
             CompoundTag tag=new CompoundTag();tag.putString("dimension",source.dimension().location().toString());
             tag.putDouble("x",returnPos.getX()+.5);tag.putDouble("y",returnPos.getY());tag.putDouble("z",returnPos.getZ()+.5);
             tag.putFloat("yaw",sourceYaw);tag.putFloat("pitch",0);player.getPersistentData().put(RETURN,tag);
@@ -297,7 +297,7 @@ public final class CityTravel {
     @SubscribeEvent(priority=net.minecraftforge.eventbus.api.EventPriority.LOWEST) public static void transitLanding(net.minecraftforge.event.TickEvent.PlayerTickEvent event){
         if(event.phase!=net.minecraftforge.event.TickEvent.Phase.END)return;
         var player=event.player;
-        if(!player.isAlive()||!com.codex.blacklight.registry.ModAttachments.available(player)){
+        if(!player.isAlive()||player.isRemoved()||!com.codex.blacklight.registry.ModAttachments.available(player)){
             if(player instanceof ServerPlayer p)cancelTravel(p);
             return;
         }

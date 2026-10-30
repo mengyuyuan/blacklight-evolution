@@ -44,11 +44,20 @@ public class CityGenerationGameTest {
         h.assertTrue(!saved.running&&saved.cursor==47&&saved.mode==1,"pause/progress did not persist");
         CityPregenerator.tick(level);h.assertTrue(!CityPregenerator.hasTicket(level)&&data.cursor==47,"paused job advanced");
         CityPregenerator.resume(level);
+        com.codex.blacklight.gametest.ForgeTestLifecycle.info(h).addListener(new GameTestListener(){
+            public void testStructureLoaded(GameTestInfo info){}
+            public void testPassed(GameTestInfo info){CityPregenerator.unload(level);}
+            public void testFailed(GameTestInfo info){
+                com.codex.blacklight.BlacklightNeoMod.LOGGER.warn("Pregen lifecycle fixture failed: {}",CityPregenerator.diagnostics(level));
+                CityPregenerator.pause(level);
+            }
+            public void testAddedForRerun(GameTestInfo original,GameTestInfo retry){}
+        });
         h.onEachTick(()->{
-            // GameTestServer.waitUntilNextTick runs without the normal 50 ms wait.
-            // Pace this isolated async-I/O test so 1200 production ticks still
-            // give chunk workers the real game's 60 seconds, not a few moments.
-            java.util.concurrent.locks.LockSupport.parkNanos(50_000_000L);
+            // Sleeping 50ms INSIDE the measured tick makes Forge's 35ms busy
+            // guard correctly pause forever. A small yield lets real chunk IO
+            // progress without manufacturing a permanently busy server.
+            java.util.concurrent.locks.LockSupport.parkNanos(10_000_000L);
             CityPregenerator.tick(level);
             h.assertTrue(data.failure.isEmpty(),"pregen failed: "+data.failure);
             if(data.cursor==49&&!data.running){

@@ -53,6 +53,11 @@ public final class CityPregenerator {
         d.failure="";d.setDirty();
     }
     static boolean hasTicket(ServerLevel level){var w=WORK.get(level);return w!=null&&w.pending!=null;}
+    static String diagnostics(ServerLevel level){
+        var data=CityGenerationData.get(level);var work=WORK.get(level);
+        return "cursor="+data.cursor+" running="+data.running+" averageTickMillis="+level.getServer().getAverageTickTime()
+                +" pending="+(work==null?null:work.pending)+" failure="+data.failure;
+    }
     public static String status(ServerLevel level){
         var d=CityGenerationData.get(level);int total=CityGenerationPlan.cells(d.mode).size();
         return "城市预生成："+(d.mode==3?"黑光维度已收录地图":d.mode==2?"完整福田":"出生点周边")+" "+d.cursor+"/"+total+"，"

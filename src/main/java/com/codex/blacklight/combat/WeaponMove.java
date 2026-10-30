@@ -253,7 +253,7 @@ public enum WeaponMove {
             }
             // A reviewed source hook can still precede Minecraft's hurt-resistance
             // boundary. Extend that hook without removing any source contact.
-            return Math.min(duration,Math.max(sourceTick,end-1+10-next.start));
+        return Math.min(duration,sourceTick);
         }
         // Until the source event sentinel is fully resolved, retain every active
         // contact and a short follow-through. Do not cancel into the next attack.

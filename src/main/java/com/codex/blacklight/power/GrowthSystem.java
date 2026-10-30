@@ -51,6 +51,7 @@ public static void metabolize(ServerPlayer p){
         if(advancement!=null)p.getAdvancements().award(advancement,"done");
     }
     public static void updateHealth(ServerPlayer p){
+        AssimilationSystem.updateCrest(p);
         var attribute=p.getAttribute(Attributes.MAX_HEALTH);if(attribute==null)return;
         float before=p.getMaxHealth(),health=p.getHealth();
         boolean infected=com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.PLAYER_STATE).isInfected();

@@ -235,6 +235,7 @@ public final class ClientClawEvents {
         if(VehicleControls.riding()||VehicleControls.interacting()&&SkillBindings.mouse(minecraft.options.keyUse,event.getButton()))return;
         if(event.getAction()==GLFW.GLFW_PRESS){
             boolean mapped=java.util.stream.Stream.of(PROTOTYPE_MODE,UPGRADE_PANEL,CYCLE_FORM,GRAB,TARGET_LOCK,TOGGLE_CLAWS,CLAW_TUNER,ANIMATION_TUNER)
+                    .filter(key->DeveloperTools.enabled()||key!=CLAW_TUNER&&key!=ANIMATION_TUNER)
                     .anyMatch(key->SkillBindings.mouse(key,event.getButton()));
             if(mapped){handleKeyPress(minecraft,key->SkillBindings.mouse(key,event.getButton()));event.setCanceled(true);return;}
         }

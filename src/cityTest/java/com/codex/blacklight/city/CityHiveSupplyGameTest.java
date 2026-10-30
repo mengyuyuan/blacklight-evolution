@@ -48,6 +48,7 @@ public final class CityHiveSupplyGameTest {
         final boolean spawning,grief,enabled,citySpawns;final net.minecraft.world.Difficulty difficulty;
         final Map<BlockPos,BlockState> changed=new LinkedHashMap<>();final Set<ChunkPos> forced=new LinkedHashSet<>();final Set<Integer> originalEntities=new HashSet<>();
         boolean closed;
+        final java.util.function.Consumer<net.minecraftforge.event.entity.EntityJoinLevelEvent> joinTrace;
         Fixture(GameTestHelper helper){
             h=helper;level=h.getLevel().getServer().getLevel(CityTravel.WORLD);if(level==null)throw new AssertionError("the real blacklight world dimension is missing");
             // This opt-in component fixture needs a known empty population scene.
@@ -59,6 +60,14 @@ public final class CityHiveSupplyGameTest {
                 previous.forEach(Mob::discard);
             }
             for(var e:level.getAllEntities())originalEntities.add(e.getId());old=CityData.get(level);data=new CityData();data.population=true;data.populatedMask=-1;data.spread=false;data.facade=false;data.destroyedMask=2;level.getDataStorage().set("blacklight_city",data);
+            // Forge restores entity sections asynchronously after chunks become
+            // available. Clearing only getAllEntities above misses old bodies
+            // still in that queue. Keep this component fixture empty of earlier
+            // batches, while every genuine new birth still uses the real caps
+            // and all external join callbacks.
+            joinTrace=e->{if(e.getLevel()==level&&e.getEntity() instanceof Mob&&e.loadedFromDisk()
+                    &&level.getServer() instanceof GameTestServer)e.setCanceled(true);};
+            net.minecraftforge.common.MinecraftForge.EVENT_BUS.addListener(joinTrace);
             outbreak=OutbreakData.get(level.getServer());var active=new OutbreakData();active.start(level.getServer().overworld().getGameTime());level.getServer().overworld().getDataStorage().set("blacklight_outbreak",active);
             spawning=level.getGameRules().getBoolean(GameRules.RULE_DOMOBSPAWNING);grief=level.getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING);enabled=OutbreakConfig.ENABLED.get();citySpawns=CityConfig.SPAWNS.get();difficulty=level.getDifficulty();
             OutbreakConfig.ENABLED.set(true);CityConfig.SPAWNS.set(true);level.getGameRules().getRule(GameRules.RULE_DOMOBSPAWNING).set(true,level.getServer());level.getServer().setDifficulty(net.minecraft.world.Difficulty.NORMAL,true);
@@ -106,6 +115,7 @@ public final class CityHiveSupplyGameTest {
         }
         public void close(){
             if(closed)return;closed=true;
+            net.minecraftforge.common.MinecraftForge.EVENT_BUS.unregister(joinTrace);
             level.removePlayerImmediately(observer,Entity.RemovalReason.DISCARDED);
             var cleanup=new java.util.ArrayList<Entity>();level.getAllEntities().forEach(cleanup::add);for(var e:cleanup)if((e instanceof Mob||e instanceof ItemEntity)&&!originalEntities.contains(e.getId()))e.discard();
             for(var entry:changed.entrySet())level.setBlock(entry.getKey(),entry.getValue(),3);
