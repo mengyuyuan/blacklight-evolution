@@ -1,0 +1,18 @@
+allprojects { afterEvaluate {
+    sourceSets.main.java.srcDir('src/blackwatchTest/java')
+    sourceSets.main.resources.srcDir('src/blackwatchTest/resources')
+    sourceSets.main.java.srcDir('src/cityMilitaryTest/java')
+    sourceSets.main.java.srcDir('src/officersTest/java')
+    sourceSets.main.resources.srcDir('src/cityMilitaryTest/resources')
+    def stageCityMilitaryRun = tasks.register('stageCityMilitaryRun', Sync) {
+        dependsOn tasks.named('classes')
+        from sourceSets.main.output
+        into layout.buildDirectory.dir('city-military-run-mod')
+    }
+    tasks.named('runGameTestServer').configure {
+        dependsOn stageCityMilitaryRun
+        doFirst { environment 'MOD_CLASSES', 'blacklight%%' + layout.buildDirectory.dir('city-military-run-mod').get().asFile.absolutePath }
+    }
+} }
+allprojects { tasks.withType(ProcessResources).configureEach { filteringCharset = 'UTF-8' }; tasks.matching { it.name == 'generateModMetadata' }.configureEach { outputs.upToDateWhen { false } } }
+

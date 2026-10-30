@@ -25,6 +25,12 @@ sourceSets.main.resources {
     exclude("**/*.bbmodel") // BlockBench project files
 
     exclude("src/generated/**/.cache") // datagen cache files
+    // Preserve dormant fuel resources on disk while disabling normal acquisition.
+    exclude('data/blacklight/recipe/military_fuel_can.json')
+    exclude { details ->
+        !details.isDirectory() && details.path.startsWith('data/blacklight/loot_table/') &&
+                details.name.endsWith('.json') && details.file.getText('UTF-8').contains('blacklight:military_fuel_can')
+    }
 }
 
 // A normal clone includes the complete runtime profile. An explicit developer
@@ -229,6 +235,11 @@ if (project.hasProperty('standaloneBulletExtreme') || project.hasProperty('stand
 if (project.hasProperty('standaloneTest')) {
     sourceSets.main.java.srcDir('src/standaloneTest/java')
 }
+if (project.hasProperty('blackwatchTest')) {
+    sourceSets.main.java.srcDir('src/blackwatchTest/java')
+    sourceSets.main.resources.srcDir('src/blackwatchTest/resources')
+    if (project.hasProperty('militaryStress')) sourceSets.main.java.srcDir('src/militaryStress/java')
+}
 if (project.hasProperty('releaseAuditTest')) {
     sourceSets.main.java.srcDir('src/releaseAuditTest/java')
 }
@@ -254,7 +265,10 @@ tasks.named('jar', Jar).configure {
             'Blacklight-Asset-Notice': 'THIRD_PARTY_ASSETS.md')
     exclude 'com/codex/blacklight/gametest/**'
     exclude 'data/blacklight/structure/wall_test.nbt', 'data/blacklight/structures/wall_test.nbt'
+    exclude 'com/codex/blacklight/client/vehicle/VehicleViewSmoke*.class', 'com/codex/blacklight/client/vehicle/VehicleViewBootstrap*.class'
     exclude 'com/codex/blacklight/city/*GameTest*.class'
+    exclude 'com/codex/blacklight/city/CityMilitaryServerAudit*.class'
+    exclude 'com/codex/blacklight/city/Military6LegacyAudit*.class'
     exclude 'data/minecraft/worldgen/world_preset/flat.json'
     exclude 'com/codex/blacklight/client/Standalone*Smoke*.class'
     exclude 'com/codex/blacklight/client/WingFlightSmoke*.class'
@@ -265,6 +279,11 @@ tasks.named('jar', Jar).configure {
     exclude 'com/codex/blacklight/client/InfectedCompositionSmoke*.class'
     exclude 'com/codex/blacklight/client/HydraReleaseSmoke*.class', 'com/codex/blacklight/client/CreatureCombatSmoke*.class'
     exclude 'data/blacklight/structure/wall_test.nbt'
+    exclude 'data/blacklight/structure/blackwatch_arena.nbt'
+    exclude 'data/blacklight/structure/military_march_arena.nbt'
+    exclude 'data/blacklight/structure/military_stress_arena.nbt'
+    exclude 'data/blacklight/structure/military_slope_arena.nbt'
+    exclude 'data/blacklight/structure/blackwatch_facility_arena.nbt'
 }
 
 neoForge {

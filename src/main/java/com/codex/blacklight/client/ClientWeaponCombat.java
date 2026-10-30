@@ -34,9 +34,10 @@ public final class ClientWeaponCombat {
     static void setFixtureOwnsInput(boolean owns){fixtureOwnsInput=owns;}
     private ClientWeaponCombat(){}
     public static boolean active(){
-        var mc=Minecraft.getInstance();if(mc.player==null||mc.screen!=null)return false;
+        var mc=Minecraft.getInstance();if(mc.player==null||mc.screen!=null||com.codex.blacklight.firearms.FirearmsCombat.holdingFirearm(mc.player))return false;
         var state=mc.player.getData(ModAttachments.PLAYER_STATE);
-        return !com.codex.blacklight.city.HydraTransport.active(mc.player)&&state.isPrototypeMode()&&state.isInfected()&&WeaponMove.controls(state.getActivePower(),mc.player.getMainHandItem().isEmpty()&&mc.player.getOffhandItem().isEmpty())&&!mc.player.getData(ModAttachments.CONSUMING);
+        return !com.codex.blacklight.city.HydraTransport.active(mc.player)&&new PersonalCombatInput(state.isInfected(),state.isPrototypeMode(),state.getActivePower(),
+                mc.player.getMainHandItem().isEmpty()&&mc.player.getOffhandItem().isEmpty(),mc.player.getData(ModAttachments.CONSUMING),VehicleControls.ownsInput()).active();
     }
     public static void poll(){
         if(fixtureOwnsInput)return;
@@ -101,4 +102,9 @@ public final class ClientWeaponCombat {
         if(payload.clipOffset()>0||!PlayerMotionController.isPlaying(mc.player,key))
             PlayerMotionController.request(mc.player,key,payload.clipOffset());
     }
+}
+
+record PersonalCombatInput(boolean infected,boolean prototype,com.codex.blacklight.power.PowerForm form,
+        boolean emptyHands,boolean consuming,boolean vehicleInput) {
+    boolean active(){return !vehicleInput&&infected&&prototype&&WeaponMove.controls(form,emptyHands)&&!consuming;}
 }

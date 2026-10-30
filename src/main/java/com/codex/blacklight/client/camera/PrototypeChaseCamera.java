@@ -45,6 +45,7 @@ public final class PrototypeChaseCamera {
     public static float farPlane(float ordinary){var f=filmFrame();return f==null?ordinary:(float)Mth.lerp(f.weight(),ordinary,Mth.clamp(f.far(),16,ordinary));}
     public static float controlYaw() {
         var mc=Minecraft.getInstance();
+        if(com.codex.blacklight.client.VehicleControls.riding())return mc.gameRenderer.getMainCamera().getYRot();
         if(CameraCompatibility.externalOwnsView())return CameraCompatibility.externalYaw(mc.gameRenderer.getMainCamera().getYRot());
         if(previousPlayer!=mc.player||!(wasOwned||inputSeeded))return mc.gameRenderer.getMainCamera().getYRot();
         return !orbit.manual()&&lastOffset!=null&&filmFrame==null?lastYaw:orbit.controlYaw();
@@ -52,11 +53,13 @@ public final class PrototypeChaseCamera {
     /** Flight uses the same unshaken orbit pitch as mouse aiming, even between mouse events. */
     public static float controlPitch() {
         var mc=Minecraft.getInstance();
+        if(com.codex.blacklight.client.VehicleControls.riding())return mc.gameRenderer.getMainCamera().getXRot();
         if(CameraCompatibility.externalOwnsView())return CameraCompatibility.externalPitch(mc.gameRenderer.getMainCamera().getXRot());
         if(previousPlayer!=mc.player||!(wasOwned||inputSeeded))return mc.gameRenderer.getMainCamera().getXRot();
         return !orbit.manual()&&lastOffset!=null&&filmFrame==null?lastPitch:orbit.controlPitch();
     }
     public static boolean mouse(double x,double y) {
+        if(com.codex.blacklight.client.VehicleControls.riding()){reset();return false;}
         if(CameraCompatibility.externalOwnsView()){reset();return false;}
         if(!ownsView()) {
             // Seed the external owner BEFORE its first mouse delta, not after it.
@@ -98,7 +101,7 @@ public final class PrototypeChaseCamera {
     public static boolean ownsView() {
         var mc=Minecraft.getInstance();var p=mc.player;
         return !HydraCinematicCamera.active()&&!CameraCompatibility.externalOwnsView()&&p!=null&&!com.codex.blacklight.power.BiomassSystem.active(p)&&mc.level!=null&&mc.getCameraEntity()==p&&PrototypeModeSystem.isActive(p)
-                &&p.isAlive()&&!p.isSpectator()&&!p.isSleeping()&&!p.isUsingItem()
+                &&p.isAlive()&&!p.isSpectator()&&!p.isSleeping()&&!p.isUsingItem()&&!com.codex.blacklight.client.VehicleControls.riding()
                 &&mc.options.getCameraType()==CameraType.THIRD_PERSON_BACK&&!mc.player.isScoping()
                 &&ChaseCameraProfile.get("Ground")!=null&&SourceCameraEvents.available();
     }
@@ -171,7 +174,7 @@ public final class PrototypeChaseCamera {
                 ||mc.options.getCameraType()!=CameraType.THIRD_PERSON_BACK) {
             reset();return;
         }
-        if(com.codex.blacklight.power.BiomassSystem.active(player)){reset();return;}
+        if(com.codex.blacklight.power.BiomassSystem.active(player)||com.codex.blacklight.client.VehicleControls.riding()){reset();return;}
         String state=select(player);var profile=ChaseCameraProfile.get(state);
         if(profile==null){reset();return;}
         Vec3 eye=player.getEyePosition(partial);

@@ -1,0 +1,19 @@
+{
+  "command": [
+    "F:\\MC\u5efa\u7b51\\.blackwatch-worktrees\\neoforge-military6\\gradlew.bat",
+    "--offline",
+    "--no-daemon",
+    "-Dorg.gradle.jvmargs=-Xmx3G -Dfile.encoding=GBK",
+    "-I",
+    "tools/military6-vehicle.init.gradle",
+    "-I",
+    ".superpowers/military6-summon-only.init.gradle",
+    "-PgameTestRunDirectory=.superpowers/m6-resume-neo-summon-green-20261027",
+    "runGameTestServer"
+  ],
+  "jdk": "21",
+  "pid": 83932,
+  "started": "2026-10-27T22:35:52.496580+08:00",
+  "finished": "2026-10-27T22:37:06.727595+08:00",
+  "exitCode": 0
+}

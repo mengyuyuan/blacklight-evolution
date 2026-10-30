@@ -1,0 +1,98 @@
+{
+  "neoforge": [
+    {
+      "name": "cityMobLimit",
+      "default": 80,
+      "minimum": 0,
+      "maximum": 200
+    },
+    {
+      "name": "militaryGarrisonLimit",
+      "default": 80,
+      "minimum": 0,
+      "maximum": 200
+    },
+    {
+      "name": "spreadIntervalSeconds",
+      "default": 180,
+      "minimum": 30,
+      "maximum": 3600
+    },
+    {
+      "name": "mapCacheTiles",
+      "default": 64,
+      "minimum": 8,
+      "maximum": 256
+    },
+    {
+      "name": "pregenIntervalTicks",
+      "default": 10,
+      "minimum": 1,
+      "maximum": 200
+    },
+    {
+      "name": "population",
+      "default": true
+    },
+    {
+      "name": "infectionSpread",
+      "default": true
+    },
+    {
+      "name": "hiveFacadeDamage",
+      "default": true
+    },
+    {
+      "name": "arrivalWarmup",
+      "default": true
+    }
+  ],
+  "forge": [
+    {
+      "name": "cityMobLimit",
+      "default": 80,
+      "minimum": 0,
+      "maximum": 200
+    },
+    {
+      "name": "militaryGarrisonLimit",
+      "default": 80,
+      "minimum": 0,
+      "maximum": 200
+    },
+    {
+      "name": "spreadIntervalSeconds",
+      "default": 180,
+      "minimum": 30,
+      "maximum": 3600
+    },
+    {
+      "name": "mapCacheTiles",
+      "default": 64,
+      "minimum": 8,
+      "maximum": 256
+    },
+    {
+      "name": "pregenIntervalTicks",
+      "default": 10,
+      "minimum": 1,
+      "maximum": 200
+    },
+    {
+      "name": "population",
+      "default": true
+    },
+    {
+      "name": "infectionSpread",
+      "default": true
+    },
+    {
+      "name": "hiveFacadeDamage",
+      "default": true
+    },
+    {
+      "name": "arrivalWarmup",
+      "default": true
+    }
+  ]
+}

@@ -1,0 +1,382 @@
+{
+  "id": "frozen_research_station",
+  "platform": "forge",
+  "size": [
+    23,
+    21,
+    23
+  ],
+  "data_version": 3465,
+  "serialized_blocks": 4363,
+  "non_air_blocks": 2821,
+  "palette_size": 19,
+  "embedded_entity_count": 2,
+  "embedded_entities": [
+    {
+      "pos": [
+        4.5,
+        1.0,
+        11.5
+      ],
+      "blockPos": [
+        4,
+        1,
+        11
+      ],
+      "id": "blacklight:infected_host",
+      "nbt": {
+        "id": "blacklight:infected_host",
+        "PersistenceRequired": 1,
+        "Health": 30.0,
+        "Rotation": [
+          0.0,
+          0.0
+        ],
+        "BlacklightHost": {
+          "Type": "minecraft:zombie",
+          "Family": "ground",
+          "Humanoid": 1,
+          "Quadruped": 0,
+          "Width": 0.671999990940094,
+          "Height": 2.184000015258789,
+          "Visual": {}
+        }
+      }
+    },
+    {
+      "pos": [
+        18.5,
+        1.0,
+        6.5
+      ],
+      "blockPos": [
+        18,
+        1,
+        6
+      ],
+      "id": "blacklight:infected_host",
+      "nbt": {
+        "id": "blacklight:infected_host",
+        "PersistenceRequired": 1,
+        "Health": 30.0,
+        "Rotation": [
+          0.0,
+          0.0
+        ],
+        "BlacklightHost": {
+          "Type": "minecraft:zombie",
+          "Family": "ground",
+          "Humanoid": 1,
+          "Quadruped": 0,
+          "Width": 0.671999990940094,
+          "Height": 2.184000015258789,
+          "Visual": {}
+        }
+      }
+    }
+  ],
+  "chests": [
+    {
+      "pos": [
+        3,
+        1,
+        14
+      ],
+      "block": {
+        "Name": "minecraft:chest",
+        "Properties": {
+          "facing": "north",
+          "type": "single",
+          "waterlogged": "false"
+        }
+      },
+      "nbt": {
+        "id": "minecraft:chest",
+        "LootTable": "blacklight:chests/research_supplies"
+      }
+    },
+    {
+      "pos": [
+        11,
+        1,
+        19
+      ],
+      "block": {
+        "Name": "minecraft:chest",
+        "Properties": {
+          "facing": "north",
+          "type": "single",
+          "waterlogged": "false"
+        }
+      },
+      "nbt": {
+        "id": "minecraft:chest",
+        "LootTable": "blacklight:chests/research_samples"
+      }
+    }
+  ],
+  "block_entities": [
+    {
+      "pos": [
+        3,
+        1,
+        14
+      ],
+      "block": {
+        "Name": "minecraft:chest",
+        "Properties": {
+          "facing": "north",
+          "type": "single",
+          "waterlogged": "false"
+        }
+      },
+      "nbt": {
+        "id": "minecraft:chest",
+        "LootTable": "blacklight:chests/research_supplies"
+      }
+    },
+    {
+      "pos": [
+        11,
+        1,
+        19
+      ],
+      "block": {
+        "Name": "minecraft:chest",
+        "Properties": {
+          "facing": "north",
+          "type": "single",
+          "waterlogged": "false"
+        }
+      },
+      "nbt": {
+        "id": "minecraft:chest",
+        "LootTable": "blacklight:chests/research_samples"
+      }
+    },
+    {
+      "pos": [
+        5,
+        2,
+        16
+      ],
+      "block": {
+        "Name": "minecraft:birch_wall_sign",
+        "Properties": {
+          "facing": "north",
+          "waterlogged": "false"
+        }
+      },
+      "nbt": {
+        "id": "minecraft:sign",
+        "is_waxed": 1,
+        "front_text": {
+          "messages": [
+            "{\"translate\":\"sign.blacklight.lab.1\"}",
+            "{\"translate\":\"sign.blacklight.lab.2\"}",
+            "{\"translate\":\"sign.blacklight.lab.3\"}",
+            "{\"translate\":\"sign.blacklight.lab.4\"}"
+          ],
+          "color": "black",
+          "has_glowing_text": 0
+        }
+      }
+    },
+    {
+      "pos": [
+        18,
+        2,
+        16
+      ],
+      "block": {
+        "Name": "minecraft:birch_wall_sign",
+        "Properties": {
+          "facing": "north",
+          "waterlogged": "false"
+        }
+      },
+      "nbt": {
+        "id": "minecraft:sign",
+        "is_waxed": 1,
+        "front_text": {
+          "messages": [
+            "{\"translate\":\"sign.blacklight.quarantine.1\"}",
+            "{\"translate\":\"sign.blacklight.quarantine.2\"}",
+            "{\"translate\":\"sign.blacklight.quarantine.3\"}",
+            "{\"translate\":\"sign.blacklight.quarantine.4\"}"
+          ],
+          "color": "black",
+          "has_glowing_text": 0
+        }
+      }
+    },
+    {
+      "pos": [
+        11,
+        3,
+        19
+      ],
+      "block": {
+        "Name": "minecraft:birch_wall_sign",
+        "Properties": {
+          "facing": "north",
+          "waterlogged": "false"
+        }
+      },
+      "nbt": {
+        "id": "minecraft:sign",
+        "is_waxed": 1,
+        "front_text": {
+          "messages": [
+            "{\"translate\":\"sign.blacklight.samples.1\"}",
+            "{\"translate\":\"sign.blacklight.samples.2\"}",
+            "{\"translate\":\"sign.blacklight.samples.3\"}",
+            "{\"translate\":\"sign.blacklight.samples.4\"}"
+          ],
+          "color": "black",
+          "has_glowing_text": 0
+        }
+      }
+    },
+    {
+      "pos": [
+        11,
+        14,
+        1
+      ],
+      "block": {
+        "Name": "minecraft:birch_wall_sign",
+        "Properties": {
+          "facing": "south",
+          "waterlogged": "false"
+        }
+      },
+      "nbt": {
+        "id": "minecraft:sign",
+        "is_waxed": 1,
+        "front_text": {
+          "messages": [
+            "{\"translate\":\"sign.blacklight.entrance.1\"}",
+            "{\"translate\":\"sign.blacklight.entrance.2\"}",
+            "{\"translate\":\"sign.blacklight.entrance.3\"}",
+            "{\"translate\":\"sign.blacklight.entrance.4\"}"
+          ],
+          "color": "black",
+          "has_glowing_text": 0
+        }
+      }
+    }
+  ],
+  "runtime_slots": 0,
+  "runtime_guards": [],
+  "large_base_metadata": null,
+  "source": "src/main/resources/data/blacklight/structures/frozen_research_station.nbt",
+  "sha256": "a6372878b35f88b835316a11fb6378ca5925efa9952a3b93ad2e0b7fe14329f3",
+  "preview": "assets/建筑/frozen_research_station.png",
+  "palette": [
+    {
+      "Name": "minecraft:stone_bricks"
+    },
+    {
+      "Name": "minecraft:smooth_stone"
+    },
+    {
+      "Name": "minecraft:stone_brick_stairs",
+      "Properties": {
+        "facing": "north",
+        "half": "bottom",
+        "shape": "straight",
+        "waterlogged": "false"
+      }
+    },
+    {
+      "Name": "minecraft:air"
+    },
+    {
+      "Name": "minecraft:white_concrete"
+    },
+    {
+      "Name": "minecraft:polished_andesite"
+    },
+    {
+      "Name": "minecraft:quartz_slab",
+      "Properties": {
+        "type": "bottom",
+        "waterlogged": "false"
+      }
+    },
+    {
+      "Name": "minecraft:packed_ice"
+    },
+    {
+      "Name": "minecraft:chest",
+      "Properties": {
+        "facing": "north",
+        "type": "single",
+        "waterlogged": "false"
+      }
+    },
+    {
+      "Name": "minecraft:light_blue_stained_glass"
+    },
+    {
+      "Name": "minecraft:iron_bars"
+    },
+    {
+      "Name": "minecraft:brewing_stand",
+      "Properties": {
+        "has_bottle_0": "false",
+        "has_bottle_1": "false",
+        "has_bottle_2": "false"
+      }
+    },
+    {
+      "Name": "minecraft:red_carpet"
+    },
+    {
+      "Name": "minecraft:birch_wall_sign",
+      "Properties": {
+        "facing": "north",
+        "waterlogged": "false"
+      }
+    },
+    {
+      "Name": "minecraft:cyan_concrete"
+    },
+    {
+      "Name": "minecraft:sea_lantern"
+    },
+    {
+      "Name": "minecraft:birch_wall_sign",
+      "Properties": {
+        "facing": "south",
+        "waterlogged": "false"
+      }
+    },
+    {
+      "Name": "minecraft:dark_prismarine"
+    },
+    {
+      "Name": "minecraft:redstone_block"
+    }
+  ],
+  "block_counts": {
+    "minecraft:stone_bricks": 1347,
+    "minecraft:smooth_stone": 438,
+    "minecraft:stone_brick_stairs": 33,
+    "minecraft:white_concrete": 283,
+    "minecraft:polished_andesite": 361,
+    "minecraft:quartz_slab": 8,
+    "minecraft:packed_ice": 149,
+    "minecraft:chest": 2,
+    "minecraft:light_blue_stained_glass": 39,
+    "minecraft:iron_bars": 24,
+    "minecraft:brewing_stand": 2,
+    "minecraft:red_carpet": 1,
+    "minecraft:birch_wall_sign": 4,
+    "minecraft:cyan_concrete": 65,
+    "minecraft:sea_lantern": 10,
+    "minecraft:dark_prismarine": 54,
+    "minecraft:redstone_block": 1
+  }
+}

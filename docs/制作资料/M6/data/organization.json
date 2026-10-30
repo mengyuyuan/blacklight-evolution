@@ -1,0 +1,119 @@
+{
+  "ranks": [
+    {
+      "id": "private",
+      "ordinal": 0,
+      "name": "列兵"
+    },
+    {
+      "id": "corporal",
+      "ordinal": 1,
+      "name": "下士"
+    },
+    {
+      "id": "sergeant",
+      "ordinal": 2,
+      "name": "中士"
+    },
+    {
+      "id": "lieutenant",
+      "ordinal": 3,
+      "name": "少尉"
+    },
+    {
+      "id": "captain",
+      "ordinal": 4,
+      "name": "上尉"
+    },
+    {
+      "id": "major",
+      "ordinal": 5,
+      "name": "少校"
+    },
+    {
+      "id": "colonel",
+      "ordinal": 6,
+      "name": "上校"
+    },
+    {
+      "id": "general",
+      "ordinal": 7,
+      "name": "将军"
+    }
+  ],
+  "unit_types": [
+    {
+      "id": "tactical_squad",
+      "level": 0,
+      "leaf": true,
+      "military_default_size": 8,
+      "blackwatch_default_size": 8,
+      "name": "战术小队"
+    },
+    {
+      "id": "section",
+      "level": 0,
+      "leaf": true,
+      "military_default_size": 8,
+      "blackwatch_default_size": 8,
+      "name": "班"
+    },
+    {
+      "id": "platoon",
+      "level": 1,
+      "leaf": false,
+      "military_default_size": 24,
+      "blackwatch_default_size": 24,
+      "name": "排"
+    },
+    {
+      "id": "company",
+      "level": 2,
+      "leaf": false,
+      "military_default_size": 72,
+      "blackwatch_default_size": 72,
+      "name": "连"
+    },
+    {
+      "id": "squadron",
+      "level": 1,
+      "leaf": false,
+      "military_default_size": 24,
+      "blackwatch_default_size": 24,
+      "name": "中队"
+    },
+    {
+      "id": "battalion",
+      "level": 3,
+      "leaf": false,
+      "military_default_size": 216,
+      "blackwatch_default_size": 72,
+      "name": "大队"
+    }
+  ],
+  "roles": [
+    {
+      "id": "trooper",
+      "default_rank": "private"
+    },
+    {
+      "id": "team_leader",
+      "default_rank": "sergeant"
+    },
+    {
+      "id": "officer",
+      "default_rank": "lieutenant"
+    },
+    {
+      "id": "commander",
+      "default_rank": "major"
+    }
+  ],
+  "hard_limits": {
+    "MAX_LEAF": 32,
+    "MAX_CHILDREN": 8,
+    "MAX_DEPTH": 4,
+    "MAX_TREE_MEMBERS": 256,
+    "MAX_UNITS": 2048
+  }
+}

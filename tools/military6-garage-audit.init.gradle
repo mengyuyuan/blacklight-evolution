@@ -1,0 +1,23 @@
+// Explicit disposable normal-server QA. Do not combine with older city audit init scripts.
+// Same -PserverRunDirectory for both invocations; phase must be prepare, then verify.
+allprojects { afterEvaluate {
+    def phase = project.findProperty('vehicleGarageAuditPhase')?.toString()
+    if (!(phase in ['prepare', 'verify'])) throw new GradleException('Set -PvehicleGarageAuditPhase=prepare or verify explicitly')
+    if (!project.hasProperty('serverRunDirectory')) throw new GradleException('Set an isolated -PserverRunDirectory and reuse it for verification')
+    sourceSets.main.java.srcDir('src/vehicleTest/java')
+    sourceSets.main.java.srcDir('src/vehicleServerTest/java')
+    sourceSets.main.resources.srcDir('src/blackwatchTest/resources')
+    neoForge.runs.server.systemProperty 'blacklight.vehicleGarageAudit', 'true'
+    neoForge.runs.server.systemProperty 'blacklight.vehicleGarageAudit.phase', phase
+    if (project.hasProperty('vehicleGarageAuditFile')) neoForge.runs.server.systemProperty 'blacklight.vehicleGarageAudit.file', file(project.property('vehicleGarageAuditFile')).absolutePath
+    def stageVehicleGarageAudit = tasks.register('stageVehicleGarageAudit', Sync) {
+        dependsOn tasks.named('classes')
+        from sourceSets.main.output
+        into layout.buildDirectory.dir('vehicle-garage-audit-mod')
+    }
+    tasks.named('runServer').configure {
+        dependsOn stageVehicleGarageAudit
+        doFirst { environment 'MOD_CLASSES', 'blacklight%%' + layout.buildDirectory.dir('vehicle-garage-audit-mod').get().asFile.absolutePath }
+    }
+} }
+allprojects { tasks.withType(ProcessResources).configureEach { filteringCharset = 'UTF-8' } }

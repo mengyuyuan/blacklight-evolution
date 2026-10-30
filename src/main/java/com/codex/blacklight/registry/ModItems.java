@@ -44,7 +44,16 @@ public final class ModItems {
     public static final DeferredItem<net.neoforged.neoforge.common.DeferredSpawnEggItem> BLACKWATCH_SOLDIER_SPAWN_EGG=ITEMS.registerItem("blackwatch_soldier_spawn_egg",p->new net.neoforged.neoforge.common.DeferredSpawnEggItem(ModEntities.BLACKWATCH_SOLDIER,0x20262a,0x8a2222,p),new Item.Properties());
     public static final DeferredItem<net.neoforged.neoforge.common.DeferredSpawnEggItem> BLACKWATCH_HEAVY_SPAWN_EGG=ITEMS.registerItem("blackwatch_heavy_spawn_egg",p->new net.neoforged.neoforge.common.DeferredSpawnEggItem(ModEntities.BLACKWATCH_HEAVY,0x20262a,0xb0a285,p),new Item.Properties());
     public static final DeferredItem<Item> MILITARY_CIRCUIT=ITEMS.registerItem("military_circuit",Item::new,new Item.Properties());
+    public static final DeferredItem<net.neoforged.neoforge.common.DeferredSpawnEggItem> MILITARY_SOLDIER_SPAWN_EGG=ITEMS.registerItem("military_soldier_spawn_egg",p->new net.neoforged.neoforge.common.DeferredSpawnEggItem(ModEntities.MILITARY_SOLDIER,0x4c5942,0x9a966c,p),new Item.Properties());
+    public static final DeferredItem<net.neoforged.neoforge.common.DeferredSpawnEggItem> MILITARY_HEAVY_SPAWN_EGG=ITEMS.registerItem("military_heavy_spawn_egg",p->new net.neoforged.neoforge.common.DeferredSpawnEggItem(ModEntities.MILITARY_HEAVY,0x4c5942,0x333f36,p),new Item.Properties());
     public static final DeferredItem<com.codex.blacklight.item.FieldScannerItem> FIELD_SCANNER=ITEMS.registerItem("field_scanner",com.codex.blacklight.item.FieldScannerItem::new,new Item.Properties().stacksTo(1));
+
+    public static final DeferredItem<net.neoforged.neoforge.common.DeferredSpawnEggItem> MILITARY_TEAM_LEADER_SPAWN_EGG=ITEMS.registerItem("military_team_leader_spawn_egg",p->new net.neoforged.neoforge.common.DeferredSpawnEggItem(ModEntities.MILITARY_TEAM_LEADER,0x4c5942,0xb59a5e,p),new Item.Properties());
+    public static final DeferredItem<net.neoforged.neoforge.common.DeferredSpawnEggItem> MILITARY_OFFICER_SPAWN_EGG=ITEMS.registerItem("military_officer_spawn_egg",p->new net.neoforged.neoforge.common.DeferredSpawnEggItem(ModEntities.MILITARY_OFFICER,0x4c5942,0xd3bd80,p),new Item.Properties());
+    public static final DeferredItem<net.neoforged.neoforge.common.DeferredSpawnEggItem> MILITARY_COMMANDER_SPAWN_EGG=ITEMS.registerItem("military_commander_spawn_egg",p->new net.neoforged.neoforge.common.DeferredSpawnEggItem(ModEntities.MILITARY_COMMANDER,0x4c5942,0xe7d6a0,p),new Item.Properties());
+    public static final DeferredItem<net.neoforged.neoforge.common.DeferredSpawnEggItem> BLACKWATCH_TEAM_LEADER_SPAWN_EGG=ITEMS.registerItem("blackwatch_team_leader_spawn_egg",p->new net.neoforged.neoforge.common.DeferredSpawnEggItem(ModEntities.BLACKWATCH_TEAM_LEADER,0x20262a,0xb59a5e,p),new Item.Properties());
+    public static final DeferredItem<net.neoforged.neoforge.common.DeferredSpawnEggItem> BLACKWATCH_OFFICER_SPAWN_EGG=ITEMS.registerItem("blackwatch_officer_spawn_egg",p->new net.neoforged.neoforge.common.DeferredSpawnEggItem(ModEntities.BLACKWATCH_OFFICER,0x20262a,0xd3bd80,p),new Item.Properties());
+    public static final DeferredItem<net.neoforged.neoforge.common.DeferredSpawnEggItem> BLACKWATCH_COMMANDER_SPAWN_EGG=ITEMS.registerItem("blackwatch_commander_spawn_egg",p->new net.neoforged.neoforge.common.DeferredSpawnEggItem(ModEntities.BLACKWATCH_COMMANDER,0x20262a,0xe7d6a0,p),new Item.Properties());
 
     // Legacy registry IDs remain loadable; new crafting and creative access live in the independent mod.
     public static final DeferredItem<com.codex.blacklight.item.PassiveSerumItem> ADAPTATION_SERUM = ITEMS.registerItem("adaptation_serum", props -> new com.codex.blacklight.item.PassiveSerumItem(props, 1), new Item.Properties().stacksTo(1).rarity(Rarity.RARE));
@@ -56,6 +65,13 @@ public final class ModItems {
                     .icon(() -> BLACKLIGHT_SAMPLE.get().getDefaultInstance())
                     .displayItems((parameters, output) -> {
                         output.accept(BLACKWATCH_SOLDIER_SPAWN_EGG.get()); output.accept(BLACKWATCH_HEAVY_SPAWN_EGG.get()); output.accept(MILITARY_CIRCUIT.get()); output.accept(FIELD_SCANNER.get());
+                        output.accept(MILITARY_SOLDIER_SPAWN_EGG.get());output.accept(MILITARY_HEAVY_SPAWN_EGG.get());
+                        output.accept(MILITARY_TEAM_LEADER_SPAWN_EGG.get());
+                        output.accept(MILITARY_OFFICER_SPAWN_EGG.get());
+                        output.accept(MILITARY_COMMANDER_SPAWN_EGG.get());
+                        output.accept(BLACKWATCH_TEAM_LEADER_SPAWN_EGG.get());
+                        output.accept(BLACKWATCH_OFFICER_SPAWN_EGG.get());
+                        output.accept(BLACKWATCH_COMMANDER_SPAWN_EGG.get());
                         output.accept(BLACKLIGHT_SAMPLE.get()); output.accept(HUNTER_SPAWN_EGG.get());
                         output.accept(LIVING_HIVE_TISSUE.get());output.accept(HYDRA_SPAWN_EGG.get());
                         output.accept(INFECTED_SOIL.get()); output.accept(INFECTED_STONE.get());
@@ -72,6 +88,7 @@ public final class ModItems {
     }
 
     public static void register(IEventBus bus) {
+        com.codex.blacklight.firearms.FirearmsRegistry.register(bus);
         ITEMS.register(bus);
         TABS.register(bus);
     }

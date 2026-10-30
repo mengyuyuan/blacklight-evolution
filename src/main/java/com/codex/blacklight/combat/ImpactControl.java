@@ -51,6 +51,8 @@ public final class ImpactControl {
             else if(source!=null)duration=Math.max(duration,Math.clamp(Math.round(source.seconds()*20),10,70));
         }
         publish(entity,new HitReaction(entity.level().getGameTime(),duration,profile.kind(),yaw,profile.motion()));
+        if(entity instanceof com.codex.blacklight.entity.MilitarySoldier soldier && stunned(soldier))
+            soldier.suspendTactics();
         return true;
     }
     private static void publish(LivingEntity entity,HitReaction state){entity.setData(ModAttachments.HIT_REACTION,state);entity.syncData(ModAttachments.HIT_REACTION);}

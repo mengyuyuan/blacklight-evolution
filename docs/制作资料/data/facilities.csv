@@ -1,0 +1,7 @@
+﻿id,name,light,north_collision_box,strength,explosion_resistance,functional,model,preview
+blacklight:field_barrier,军用混凝土路障,0,"[0.0, 0.0, 3.0, 16.0, 14.0, 13.0]",2.5,6.0,碰撞/掩体/装饰,src/main/resources/assets/blacklight/models/block/field_barrier.json,assets/场景块/field_barrier.png
+blacklight:sandbag_cover,沙袋掩体,0,"[0.0, 0.0, 3.0, 16.0, 9.0, 13.0]",2.5,6.0,碰撞/掩体/装饰,src/main/resources/assets/blacklight/models/block/sandbag_cover.json,assets/场景块/sandbag_cover.png
+blacklight:military_crate,军用装饰箱（无库存）,0,"[0.0, 0.0, 0.0, 16.0, 15.0, 16.0]",2.5,6.0,碰撞/掩体/装饰,src/main/resources/assets/blacklight/models/block/military_crate.json,assets/场景块/military_crate.png
+blacklight:command_terminal,装饰指挥终端,4,"[0.0, 0.0, 1.0, 16.0, 16.0, 15.0]",2.5,6.0,固定光照,src/main/resources/assets/blacklight/models/block/command_terminal.json,assets/场景块/command_terminal.png
+blacklight:communications_antenna,通信天线,0,"[6.0, 0.0, 6.0, 10.0, 16.0, 10.0]",2.5,6.0,碰撞/掩体/装饰,src/main/resources/assets/blacklight/models/block/communications_antenna.json,assets/场景块/communications_antenna.png
+blacklight:military_searchlight,军用探照灯,12,"[2.0, 0.0, 3.0, 14.0, 16.0, 13.0]",2.5,6.0,固定光照,src/main/resources/assets/blacklight/models/block/military_searchlight.json,assets/场景块/military_searchlight.png

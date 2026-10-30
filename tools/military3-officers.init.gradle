@@ -1,0 +1,15 @@
+allprojects { afterEvaluate {
+    sourceSets.main.java.srcDir('src/officersTest/java')
+    sourceSets.main.resources.srcDir('src/blackwatchTest/resources')
+    sourceSets.main.resources.srcDir('src/cityMilitaryTest/resources')
+    def stageOfficersRun = tasks.register('stageOfficersRun', Sync) {
+        dependsOn tasks.named('classes')
+        from sourceSets.main.output
+        into layout.buildDirectory.dir('officers-run-mod')
+    }
+    tasks.named('runGameTestServer').configure {
+        dependsOn stageOfficersRun
+        doFirst { environment 'MOD_CLASSES', 'blacklight%%' + layout.buildDirectory.dir('officers-run-mod').get().asFile.absolutePath }
+    }
+} }
+allprojects { tasks.withType(ProcessResources).configureEach { filteringCharset = 'UTF-8' }; tasks.matching { it.name == 'generateModMetadata' }.configureEach { outputs.upToDateWhen { false } } }

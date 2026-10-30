@@ -1,0 +1,7 @@
+{
+  "type":"blacklight:city_military",
+  "biomes":"blacklight:city",
+  "step":"surface_structures",
+  "spawn_overrides":{},
+  "terrain_adaptation":"none"
+}

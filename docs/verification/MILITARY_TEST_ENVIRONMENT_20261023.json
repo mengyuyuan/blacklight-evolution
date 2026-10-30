@@ -1,0 +1,29 @@
+{
+  "forgeFinalWorldGenerator": {
+    "settings": {
+      "features": 0,
+      "biome": "minecraft:plains",
+      "layers": [
+        {
+          "block": "minecraft:bedrock",
+          "height": 1
+        },
+        {
+          "block": "minecraft:stone",
+          "height": 2
+        },
+        {
+          "block": "minecraft:grass_block",
+          "height": 1
+        }
+      ],
+      "structure_overrides": [],
+      "lakes": 0
+    },
+    "type": "minecraft:flat"
+  },
+  "log": "military-final-forge-flat-green.log",
+  "actualTests": 70,
+  "completedAt": "2026-10-23 18:36:38 Asia/Shanghai",
+  "previousFailureCause": "Previous Forge test directory used minecraft:noise overworld. Saved region blocks contained gravel at726/-58/248 and138/-56/157 inside the authored arenas."
+}

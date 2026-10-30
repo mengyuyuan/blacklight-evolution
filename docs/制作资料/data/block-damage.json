@@ -1,0 +1,575 @@
+{
+  "status": "已提取四个策略/适配文件；运行通过状态仍由项目验证记录确认",
+  "platforms": {
+    "neoforge": {
+      "available_files": [
+        "BlockDamagePolicy.java",
+        "BlockDamageLedger.java",
+        "FirearmBlockDamage.java",
+        "FirearmsWorldConfig.java"
+      ],
+      "configuration": [
+        {
+          "name": "maxBlocksPerBlast",
+          "default": 48.0,
+          "minimum": 1.0,
+          "maximum": 128.0
+        },
+        {
+          "name": "bulletBlockDamage",
+          "default": true
+        },
+        {
+          "name": "explosiveBlockDamage",
+          "default": true
+        },
+        {
+          "name": "protectBlockEntities",
+          "default": true
+        }
+      ],
+      "protected_tags": [
+        {
+          "source": "src/main/resources/data/blacklight/tags/block/firearm_earth.json",
+          "raw": {
+            "replace": false,
+            "values": [
+              "#minecraft:dirt",
+              "#minecraft:sand",
+              "#minecraft:wool",
+              "minecraft:gravel",
+              "minecraft:clay",
+              "minecraft:snow_block",
+              "blacklight:sandbag_cover"
+            ]
+          }
+        },
+        {
+          "source": "src/main/resources/data/blacklight/tags/block/firearm_fragile.json",
+          "raw": {
+            "replace": false,
+            "values": [
+              "minecraft:glass",
+              "minecraft:glass_pane",
+              "minecraft:tinted_glass",
+              "minecraft:ice",
+              "#minecraft:leaves",
+              "minecraft:white_stained_glass",
+              "minecraft:white_stained_glass_pane",
+              "minecraft:orange_stained_glass",
+              "minecraft:orange_stained_glass_pane",
+              "minecraft:magenta_stained_glass",
+              "minecraft:magenta_stained_glass_pane",
+              "minecraft:light_blue_stained_glass",
+              "minecraft:light_blue_stained_glass_pane",
+              "minecraft:yellow_stained_glass",
+              "minecraft:yellow_stained_glass_pane",
+              "minecraft:lime_stained_glass",
+              "minecraft:lime_stained_glass_pane",
+              "minecraft:pink_stained_glass",
+              "minecraft:pink_stained_glass_pane",
+              "minecraft:gray_stained_glass",
+              "minecraft:gray_stained_glass_pane",
+              "minecraft:light_gray_stained_glass",
+              "minecraft:light_gray_stained_glass_pane",
+              "minecraft:cyan_stained_glass",
+              "minecraft:cyan_stained_glass_pane",
+              "minecraft:purple_stained_glass",
+              "minecraft:purple_stained_glass_pane",
+              "minecraft:blue_stained_glass",
+              "minecraft:blue_stained_glass_pane",
+              "minecraft:brown_stained_glass",
+              "minecraft:brown_stained_glass_pane",
+              "minecraft:green_stained_glass",
+              "minecraft:green_stained_glass_pane",
+              "minecraft:red_stained_glass",
+              "minecraft:red_stained_glass_pane",
+              "minecraft:black_stained_glass",
+              "minecraft:black_stained_glass_pane"
+            ]
+          }
+        },
+        {
+          "source": "src/main/resources/data/blacklight/tags/block/firearm_metal.json",
+          "raw": {
+            "replace": false,
+            "values": [
+              "minecraft:iron_block",
+              "minecraft:raw_iron_block",
+              "minecraft:iron_bars",
+              "minecraft:iron_door",
+              "minecraft:iron_trapdoor",
+              "minecraft:copper_block",
+              "minecraft:cut_copper",
+              "minecraft:exposed_copper",
+              "minecraft:weathered_copper",
+              "minecraft:oxidized_copper",
+              "minecraft:gold_block",
+              "minecraft:netherite_block",
+              "minecraft:anvil",
+              "minecraft:chipped_anvil",
+              "minecraft:damaged_anvil",
+              "blacklight:command_terminal",
+              "blacklight:communications_antenna",
+              "blacklight:military_searchlight"
+            ]
+          }
+        },
+        {
+          "source": "src/main/resources/data/blacklight/tags/block/firearm_protected.json",
+          "raw": {
+            "replace": false,
+            "values": [
+              "minecraft:bedrock",
+              "minecraft:barrier",
+              "minecraft:obsidian",
+              "minecraft:crying_obsidian",
+              "minecraft:reinforced_deepslate",
+              "minecraft:end_portal",
+              "minecraft:end_portal_frame",
+              "minecraft:end_gateway",
+              "minecraft:nether_portal",
+              "minecraft:command_block",
+              "minecraft:chain_command_block",
+              "minecraft:repeating_command_block",
+              "minecraft:structure_block",
+              "minecraft:structure_void",
+              "minecraft:jigsaw",
+              "minecraft:light",
+              "minecraft:bubble_column"
+            ]
+          }
+        },
+        {
+          "source": "src/main/resources/data/blacklight/tags/block/firearm_wood.json",
+          "raw": {
+            "replace": false,
+            "values": [
+              "#minecraft:logs",
+              "#minecraft:planks",
+              "#minecraft:wooden_doors",
+              "#minecraft:wooden_trapdoors",
+              "#minecraft:wooden_fences",
+              "#minecraft:fence_gates",
+              "blacklight:military_crate"
+            ]
+          }
+        },
+        {
+          "source": "src/main/resources/data/blacklight/tags/block/throwable_blocks.json",
+          "raw": {
+            "replace": false,
+            "values": [
+              "minecraft:dirt",
+              "minecraft:grass_block",
+              "minecraft:stone",
+              "minecraft:cobblestone",
+              "minecraft:deepslate",
+              "minecraft:cobbled_deepslate",
+              "minecraft:granite",
+              "minecraft:diorite",
+              "minecraft:andesite",
+              "minecraft:netherrack",
+              "minecraft:end_stone",
+              "#minecraft:logs",
+              "#minecraft:planks",
+              "#minecraft:mineable/pickaxe",
+              "#minecraft:mineable/shovel"
+            ]
+          }
+        },
+        {
+          "source": "src/main/resources/data/blacklight/tags/block/ungrabbable_blocks.json",
+          "raw": {
+            "replace": false,
+            "values": []
+          }
+        }
+      ],
+      "durability": {
+        "body": "if(material==null||material==Material.PROTECTED||!Float.isFinite(hardness)||hardness<0)return Float.POSITIVE_INFINITY;\n        return switch(material){\n            case FRAGILE -> 1;\n            case WOOD -> Math.max(8,hardness*8);\n            case EARTH -> Math.max(6,hardness*12);\n            case MASONRY -> Math.max(30,hardness*24);\n            case METAL -> Math.max(120,hardness*32);\n            default -> Float.POSITIVE_INFINITY;\n        };",
+        "switch_cases": {
+          "FRAGILE": "1",
+          "WOOD": "Math.max(8,hardness*8)",
+          "EARTH": "Math.max(6,hardness*12)",
+          "MASONRY": "Math.max(30,hardness*24)",
+          "METAL": "Math.max(120,hardness*32)",
+          "default": "Float.POSITIVE_INFINITY"
+        }
+      },
+      "bulletImpact": {
+        "body": "if(material==null||!Float.isFinite(weaponDamage)||weaponDamage<=0)return 0;\n        return switch(material){\n            case PROTECTED,METAL -> 0;\n            case MASONRY -> weaponDamage*(machineGun?.8F:.2F);\n            default -> weaponDamage;\n        };",
+        "switch_cases": {
+          "PROTECTED,METAL": "0",
+          "MASONRY": "weaponDamage*(machineGun?.8F:.2F)",
+          "default": "weaponDamage"
+        }
+      },
+      "blastRadius": {
+        "body": "if(kind==null)return 0;\n        return switch(kind){\n            case GRENADE -> 2.5F;\n            case ROCKET -> 3;\n            case MISSILE -> 3.5F;\n            case THERMOBARIC -> 4;\n            default -> 0;\n        };",
+        "switch_cases": {
+          "GRENADE": "2.5F",
+          "ROCKET": "3",
+          "MISSILE": "3.5F",
+          "THERMOBARIC": "4",
+          "default": "0"
+        }
+      },
+      "blastImpact": {
+        "body": "if(material==null||material==Material.PROTECTED||blastRadius(kind)==0||!Float.isFinite(weaponDamage)||weaponDamage<=0\n                ||!Double.isFinite(distance)||!Double.isFinite(radius)||distance<0||radius<=0||distance>=radius)return 0;\n        float type=kind==WeaponDefinition.Kind.GRENADE?.75F:kind==WeaponDefinition.Kind.THERMOBARIC?.65F:1;\n        return weaponDamage*2.5F*type*(float)(1-distance/radius)*(material==Material.METAL?.6F:1);",
+        "switch_cases": {}
+      },
+      "weapon_block_blast_radius": [
+        {
+          "id": "military_rifle",
+          "kind": "BULLET",
+          "entity_effect_radius": 0.0,
+          "policy_block_radius": 0.0,
+          "block_blast_radius": 0.0
+        },
+        {
+          "id": "military_carbine",
+          "kind": "BULLET",
+          "entity_effect_radius": 0.0,
+          "policy_block_radius": 0.0,
+          "block_blast_radius": 0.0
+        },
+        {
+          "id": "military_machine_gun",
+          "kind": "BULLET",
+          "entity_effect_radius": 0.0,
+          "policy_block_radius": 0.0,
+          "block_blast_radius": 0.0
+        },
+        {
+          "id": "grenade_launcher",
+          "kind": "GRENADE",
+          "entity_effect_radius": 3.0,
+          "policy_block_radius": 2.5,
+          "block_blast_radius": 2.5
+        },
+        {
+          "id": "rocket_launcher",
+          "kind": "ROCKET",
+          "entity_effect_radius": 4.0,
+          "policy_block_radius": 3.0,
+          "block_blast_radius": 3.0
+        },
+        {
+          "id": "missile_launcher",
+          "kind": "MISSILE",
+          "entity_effect_radius": 4.0,
+          "policy_block_radius": 3.5,
+          "block_blast_radius": 3.5
+        },
+        {
+          "id": "thermobaric_launcher",
+          "kind": "THERMOBARIC",
+          "entity_effect_radius": 5.0,
+          "policy_block_radius": 4.0,
+          "block_blast_radius": 4.0
+        },
+        {
+          "id": "infection_launcher",
+          "kind": "INFECTION",
+          "entity_effect_radius": 3.0,
+          "policy_block_radius": 0.0,
+          "block_blast_radius": 0.0
+        }
+      ],
+      "ledger_constructors": [
+        "512,200"
+      ],
+      "runtime_source": "src/main/java/com/codex/blacklight/firearms/FirearmBlockDamage.java",
+      "material_raw": "if(state.isAir()||state.getBlock() instanceof net.minecraft.world.level.block.LiquidBlock||state.is(PROTECTED)||state.getDestroySpeed(level,at)<0\n                ||FirearmsWorldConfig.PROTECT_BLOCK_ENTITIES.get()&&state.hasBlockEntity())return BlockDamagePolicy.Material.PROTECTED;\n        if(state.is(FRAGILE))return BlockDamagePolicy.Material.FRAGILE;\n        if(state.is(WOOD))return BlockDamagePolicy.Material.WOOD;\n        if(state.is(METAL))return BlockDamagePolicy.Material.METAL;\n        if(state.is(EARTH)||state.getDestroySpeed(level,at)<1)return BlockDamagePolicy.Material.EARTH;\n        return BlockDamagePolicy.Material.MASONRY;",
+      "allowed_raw": "if(owner instanceof ServerPlayer player){\n            if(player.isSpectator()||!player.mayBuild()||!level.mayInteract(player,at))return false;\n            return !NeoForge.EVENT_BUS.post(new BlockEvent.BreakEvent(level,at,state,player)).isCanceled();\n        }\n        return CommonHooks.canEntityDestroy(level,at,owner);",
+      "blast_raw": "if(!FirearmsWorldConfig.EXPLOSIVES.get()||!valid(owner)||owner.level()!=level||!Double.isFinite(center.lengthSqr()))return 0;\n        double radius=Math.min(definition.radius(),BlockDamagePolicy.blastRadius(definition.kind()));\n        if(radius<=0)return 0;\n        var candidates=new ArrayList<BlockPos>();var origin=BlockPos.containing(center);int extent=(int)Math.ceil(radius);\n        for(int x=-extent;x<=extent;x++)for(int y=-extent;y<=extent;y++)for(int z=-extent;z<=extent;z++){\n            var at=origin.offset(x,y,z);if(loaded(level,at)&&Vec3.atCenterOf(at).distanceToSqr(center)<radius*radius)candidates.add(at);\n        }\n        candidates.sort(Comparator.<BlockPos>comparingDouble(p->Vec3.atCenterOf(p).distanceToSqr(center)).thenComparingLong(BlockPos::asLong));\n        int processed=0,broken=0,limit=FirearmsWorldConfig.BLAST_BLOCK_LIMIT.get();\n        for(var at:candidates){\n            if(processed>=limit)break;\n            var state=level.getBlockState(at);var material=material(level,at,state);\n            if(state.isAir()||material==BlockDamagePolicy.Material.PROTECTED)continue;\n            var point=Vec3.atCenterOf(at);double distance=point.distanceTo(center);\n            if(distance>1.5){\n                var start=center.add(point.subtract(center).normalize().scale(.75));\n                var wall=level.clip(new ClipContext(start,point,ClipContext.Block.COLLIDER,ClipContext.Fluid.NONE,owner));\n                if(wall.getType()!=HitResult.Type.MISS&&!wall.getBlockPos().equals(at))continue;\n            }\n            float impact=BlockDamagePolicy.blastImpact(material,definition.kind(),definition.damage(),distance,radius);\n            if(impact<=0)continue;\n            processed++;if(apply(level,owner,at,impact))broken++;\n        }\n        return broken;",
+      "placed_raw": "if(event.isCanceled()||!(event.getLevel() instanceof ServerLevel level))return;\n        var ledger=LEDGERS.get(level);if(ledger==null)return;\n        if(event instanceof BlockEvent.EntityMultiPlaceEvent multi){\n            for(var snapshot:multi.getReplacedBlockSnapshots())ledger.forget(snapshot.getPos().asLong());\n        }else ledger.forget(event.getPos().asLong());\n        flush(level,ledger);"
+    },
+    "forge": {
+      "available_files": [
+        "BlockDamagePolicy.java",
+        "BlockDamageLedger.java",
+        "FirearmBlockDamage.java",
+        "FirearmsWorldConfig.java"
+      ],
+      "configuration": [
+        {
+          "name": "maxBlocksPerBlast",
+          "default": 48.0,
+          "minimum": 1.0,
+          "maximum": 128.0
+        },
+        {
+          "name": "bulletBlockDamage",
+          "default": true
+        },
+        {
+          "name": "explosiveBlockDamage",
+          "default": true
+        },
+        {
+          "name": "protectBlockEntities",
+          "default": true
+        }
+      ],
+      "protected_tags": [
+        {
+          "source": "src/main/resources/data/blacklight/tags/blocks/firearm_earth.json",
+          "raw": {
+            "replace": false,
+            "values": [
+              "#minecraft:dirt",
+              "#minecraft:sand",
+              "#minecraft:wool",
+              "minecraft:gravel",
+              "minecraft:clay",
+              "minecraft:snow_block",
+              "blacklight:sandbag_cover"
+            ]
+          }
+        },
+        {
+          "source": "src/main/resources/data/blacklight/tags/blocks/firearm_fragile.json",
+          "raw": {
+            "replace": false,
+            "values": [
+              "minecraft:glass",
+              "minecraft:glass_pane",
+              "minecraft:tinted_glass",
+              "minecraft:ice",
+              "#minecraft:leaves",
+              "minecraft:white_stained_glass",
+              "minecraft:white_stained_glass_pane",
+              "minecraft:orange_stained_glass",
+              "minecraft:orange_stained_glass_pane",
+              "minecraft:magenta_stained_glass",
+              "minecraft:magenta_stained_glass_pane",
+              "minecraft:light_blue_stained_glass",
+              "minecraft:light_blue_stained_glass_pane",
+              "minecraft:yellow_stained_glass",
+              "minecraft:yellow_stained_glass_pane",
+              "minecraft:lime_stained_glass",
+              "minecraft:lime_stained_glass_pane",
+              "minecraft:pink_stained_glass",
+              "minecraft:pink_stained_glass_pane",
+              "minecraft:gray_stained_glass",
+              "minecraft:gray_stained_glass_pane",
+              "minecraft:light_gray_stained_glass",
+              "minecraft:light_gray_stained_glass_pane",
+              "minecraft:cyan_stained_glass",
+              "minecraft:cyan_stained_glass_pane",
+              "minecraft:purple_stained_glass",
+              "minecraft:purple_stained_glass_pane",
+              "minecraft:blue_stained_glass",
+              "minecraft:blue_stained_glass_pane",
+              "minecraft:brown_stained_glass",
+              "minecraft:brown_stained_glass_pane",
+              "minecraft:green_stained_glass",
+              "minecraft:green_stained_glass_pane",
+              "minecraft:red_stained_glass",
+              "minecraft:red_stained_glass_pane",
+              "minecraft:black_stained_glass",
+              "minecraft:black_stained_glass_pane"
+            ]
+          }
+        },
+        {
+          "source": "src/main/resources/data/blacklight/tags/blocks/firearm_metal.json",
+          "raw": {
+            "replace": false,
+            "values": [
+              "minecraft:iron_block",
+              "minecraft:raw_iron_block",
+              "minecraft:iron_bars",
+              "minecraft:iron_door",
+              "minecraft:iron_trapdoor",
+              "minecraft:copper_block",
+              "minecraft:cut_copper",
+              "minecraft:exposed_copper",
+              "minecraft:weathered_copper",
+              "minecraft:oxidized_copper",
+              "minecraft:gold_block",
+              "minecraft:netherite_block",
+              "minecraft:anvil",
+              "minecraft:chipped_anvil",
+              "minecraft:damaged_anvil",
+              "blacklight:command_terminal",
+              "blacklight:communications_antenna",
+              "blacklight:military_searchlight"
+            ]
+          }
+        },
+        {
+          "source": "src/main/resources/data/blacklight/tags/blocks/firearm_protected.json",
+          "raw": {
+            "replace": false,
+            "values": [
+              "minecraft:bedrock",
+              "minecraft:barrier",
+              "minecraft:obsidian",
+              "minecraft:crying_obsidian",
+              "minecraft:reinforced_deepslate",
+              "minecraft:end_portal",
+              "minecraft:end_portal_frame",
+              "minecraft:end_gateway",
+              "minecraft:nether_portal",
+              "minecraft:command_block",
+              "minecraft:chain_command_block",
+              "minecraft:repeating_command_block",
+              "minecraft:structure_block",
+              "minecraft:structure_void",
+              "minecraft:jigsaw",
+              "minecraft:light",
+              "minecraft:bubble_column"
+            ]
+          }
+        },
+        {
+          "source": "src/main/resources/data/blacklight/tags/blocks/firearm_wood.json",
+          "raw": {
+            "replace": false,
+            "values": [
+              "#minecraft:logs",
+              "#minecraft:planks",
+              "#minecraft:wooden_doors",
+              "#minecraft:wooden_trapdoors",
+              "#minecraft:wooden_fences",
+              "#minecraft:fence_gates",
+              "blacklight:military_crate"
+            ]
+          }
+        },
+        {
+          "source": "src/main/resources/data/blacklight/tags/blocks/throwable_blocks.json",
+          "raw": {
+            "replace": false,
+            "values": [
+              "minecraft:dirt",
+              "minecraft:grass_block",
+              "minecraft:stone",
+              "minecraft:cobblestone",
+              "minecraft:deepslate",
+              "minecraft:cobbled_deepslate",
+              "minecraft:granite",
+              "minecraft:diorite",
+              "minecraft:andesite",
+              "minecraft:netherrack",
+              "minecraft:end_stone",
+              "#minecraft:logs",
+              "#minecraft:planks",
+              "#minecraft:mineable/pickaxe",
+              "#minecraft:mineable/shovel"
+            ]
+          }
+        },
+        {
+          "source": "src/main/resources/data/blacklight/tags/blocks/ungrabbable_blocks.json",
+          "raw": {
+            "replace": false,
+            "values": []
+          }
+        }
+      ],
+      "durability": {
+        "body": "if(material==null||material==Material.PROTECTED||!Float.isFinite(hardness)||hardness<0)return Float.POSITIVE_INFINITY;\n        return switch(material){\n            case FRAGILE -> 1;\n            case WOOD -> Math.max(8,hardness*8);\n            case EARTH -> Math.max(6,hardness*12);\n            case MASONRY -> Math.max(30,hardness*24);\n            case METAL -> Math.max(120,hardness*32);\n            default -> Float.POSITIVE_INFINITY;\n        };",
+        "switch_cases": {
+          "FRAGILE": "1",
+          "WOOD": "Math.max(8,hardness*8)",
+          "EARTH": "Math.max(6,hardness*12)",
+          "MASONRY": "Math.max(30,hardness*24)",
+          "METAL": "Math.max(120,hardness*32)",
+          "default": "Float.POSITIVE_INFINITY"
+        }
+      },
+      "bulletImpact": {
+        "body": "if(material==null||!Float.isFinite(weaponDamage)||weaponDamage<=0)return 0;\n        return switch(material){\n            case PROTECTED,METAL -> 0;\n            case MASONRY -> weaponDamage*(machineGun?.8F:.2F);\n            default -> weaponDamage;\n        };",
+        "switch_cases": {
+          "PROTECTED,METAL": "0",
+          "MASONRY": "weaponDamage*(machineGun?.8F:.2F)",
+          "default": "weaponDamage"
+        }
+      },
+      "blastRadius": {
+        "body": "if(kind==null)return 0;\n        return switch(kind){\n            case GRENADE -> 2.5F;\n            case ROCKET -> 3;\n            case MISSILE -> 3.5F;\n            case THERMOBARIC -> 4;\n            default -> 0;\n        };",
+        "switch_cases": {
+          "GRENADE": "2.5F",
+          "ROCKET": "3",
+          "MISSILE": "3.5F",
+          "THERMOBARIC": "4",
+          "default": "0"
+        }
+      },
+      "blastImpact": {
+        "body": "if(material==null||material==Material.PROTECTED||blastRadius(kind)==0||!Float.isFinite(weaponDamage)||weaponDamage<=0\n                ||!Double.isFinite(distance)||!Double.isFinite(radius)||distance<0||radius<=0||distance>=radius)return 0;\n        float type=kind==WeaponDefinition.Kind.GRENADE?.75F:kind==WeaponDefinition.Kind.THERMOBARIC?.65F:1;\n        return weaponDamage*2.5F*type*(float)(1-distance/radius)*(material==Material.METAL?.6F:1);",
+        "switch_cases": {}
+      },
+      "weapon_block_blast_radius": [
+        {
+          "id": "military_rifle",
+          "kind": "BULLET",
+          "entity_effect_radius": 0.0,
+          "policy_block_radius": 0.0,
+          "block_blast_radius": 0.0
+        },
+        {
+          "id": "military_carbine",
+          "kind": "BULLET",
+          "entity_effect_radius": 0.0,
+          "policy_block_radius": 0.0,
+          "block_blast_radius": 0.0
+        },
+        {
+          "id": "military_machine_gun",
+          "kind": "BULLET",
+          "entity_effect_radius": 0.0,
+          "policy_block_radius": 0.0,
+          "block_blast_radius": 0.0
+        },
+        {
+          "id": "grenade_launcher",
+          "kind": "GRENADE",
+          "entity_effect_radius": 3.0,
+          "policy_block_radius": 2.5,
+          "block_blast_radius": 2.5
+        },
+        {
+          "id": "rocket_launcher",
+          "kind": "ROCKET",
+          "entity_effect_radius": 4.0,
+          "policy_block_radius": 3.0,
+          "block_blast_radius": 3.0
+        },
+        {
+          "id": "missile_launcher",
+          "kind": "MISSILE",
+          "entity_effect_radius": 4.0,
+          "policy_block_radius": 3.5,
+          "block_blast_radius": 3.5
+        },
+        {
+          "id": "thermobaric_launcher",
+          "kind": "THERMOBARIC",
+          "entity_effect_radius": 5.0,
+          "policy_block_radius": 4.0,
+          "block_blast_radius": 4.0
+        },
+        {
+          "id": "infection_launcher",
+          "kind": "INFECTION",
+          "entity_effect_radius": 3.0,
+          "policy_block_radius": 0.0,
+          "block_blast_radius": 0.0
+        }
+      ],
+      "ledger_constructors": [
+        "512,200"
+      ],
+      "runtime_source": "src/main/java/com/codex/blacklight/firearms/FirearmBlockDamage.java",
+      "material_raw": "if(state.isAir()||state.getBlock() instanceof net.minecraft.world.level.block.LiquidBlock||state.is(PROTECTED)||state.getDestroySpeed(level,at)<0\n                ||FirearmsWorldConfig.PROTECT_BLOCK_ENTITIES.get()&&state.hasBlockEntity())return BlockDamagePolicy.Material.PROTECTED;\n        if(state.is(FRAGILE))return BlockDamagePolicy.Material.FRAGILE;\n        if(state.is(WOOD))return BlockDamagePolicy.Material.WOOD;\n        if(state.is(METAL))return BlockDamagePolicy.Material.METAL;\n        if(state.is(EARTH)||state.getDestroySpeed(level,at)<1)return BlockDamagePolicy.Material.EARTH;\n        return BlockDamagePolicy.Material.MASONRY;",
+      "allowed_raw": "if(owner instanceof ServerPlayer player){\n            if(player.isSpectator()||!player.mayBuild()||!level.mayInteract(player,at))return false;\n            return !MinecraftForge.EVENT_BUS.post(new BlockEvent.BreakEvent(level,at,state,player));\n        }\n        return ForgeHooks.canEntityDestroy(level,at,owner);",
+      "blast_raw": "if(!FirearmsWorldConfig.EXPLOSIVES.get()||!valid(owner)||owner.level()!=level||!Double.isFinite(center.lengthSqr()))return 0;\n        double radius=Math.min(definition.radius(),BlockDamagePolicy.blastRadius(definition.kind()));\n        if(radius<=0)return 0;\n        var candidates=new ArrayList<BlockPos>();var origin=BlockPos.containing(center);int extent=(int)Math.ceil(radius);\n        for(int x=-extent;x<=extent;x++)for(int y=-extent;y<=extent;y++)for(int z=-extent;z<=extent;z++){\n            var at=origin.offset(x,y,z);if(loaded(level,at)&&Vec3.atCenterOf(at).distanceToSqr(center)<radius*radius)candidates.add(at);\n        }\n        candidates.sort(Comparator.<BlockPos>comparingDouble(p->Vec3.atCenterOf(p).distanceToSqr(center)).thenComparingLong(BlockPos::asLong));\n        int processed=0,broken=0,limit=FirearmsWorldConfig.BLAST_BLOCK_LIMIT.get();\n        for(var at:candidates){\n            if(processed>=limit)break;\n            var state=level.getBlockState(at);var material=material(level,at,state);\n            if(state.isAir()||material==BlockDamagePolicy.Material.PROTECTED)continue;\n            var point=Vec3.atCenterOf(at);double distance=point.distanceTo(center);\n            if(distance>1.5){\n                var start=center.add(point.subtract(center).normalize().scale(.75));\n                var wall=level.clip(new ClipContext(start,point,ClipContext.Block.COLLIDER,ClipContext.Fluid.NONE,owner));\n                if(wall.getType()!=HitResult.Type.MISS&&!wall.getBlockPos().equals(at))continue;\n            }\n            float impact=BlockDamagePolicy.blastImpact(material,definition.kind(),definition.damage(),distance,radius);\n            if(impact<=0)continue;\n            processed++;if(apply(level,owner,at,impact))broken++;\n        }\n        return broken;",
+      "placed_raw": "if(event.isCanceled()||!(event.getLevel() instanceof ServerLevel level))return;\n        var ledger=LEDGERS.get(level);if(ledger==null)return;\n        if(event instanceof BlockEvent.EntityMultiPlaceEvent multi){\n            for(var snapshot:multi.getReplacedBlockSnapshots())ledger.forget(snapshot.getPos().asLong());\n        }else ledger.forget(event.getPos().asLong());\n        flush(level,ledger);"
+    }
+  }
+}

@@ -1,0 +1,1459 @@
+{
+  "id": "large_military_base",
+  "platform": "forge",
+  "size": [
+    65,
+    18,
+    65
+  ],
+  "data_version": 3465,
+  "serialized_blocks": 76050,
+  "non_air_blocks": 10163,
+  "palette_size": 48,
+  "embedded_entity_count": 0,
+  "embedded_entities": [],
+  "chests": [
+    {
+      "pos": [
+        10,
+        1,
+        19
+      ],
+      "block": {
+        "Name": "minecraft:chest",
+        "Properties": {
+          "facing": "south",
+          "type": "single",
+          "waterlogged": "false"
+        }
+      },
+      "nbt": {
+        "id": "minecraft:chest",
+        "LootTable": "blacklight:chests/base_supplies"
+      }
+    },
+    {
+      "pos": [
+        10,
+        1,
+        45
+      ],
+      "block": {
+        "Name": "minecraft:chest",
+        "Properties": {
+          "facing": "south",
+          "type": "single",
+          "waterlogged": "false"
+        }
+      },
+      "nbt": {
+        "id": "minecraft:chest",
+        "LootTable": "blacklight:chests/base_supplies"
+      }
+    },
+    {
+      "pos": [
+        10,
+        1,
+        57
+      ],
+      "block": {
+        "Name": "minecraft:chest",
+        "Properties": {
+          "facing": "south",
+          "type": "single",
+          "waterlogged": "false"
+        }
+      },
+      "nbt": {
+        "id": "minecraft:chest",
+        "LootTable": "blacklight:chests/base_medical"
+      }
+    },
+    {
+      "pos": [
+        10,
+        6,
+        19
+      ],
+      "block": {
+        "Name": "minecraft:chest",
+        "Properties": {
+          "facing": "south",
+          "type": "single",
+          "waterlogged": "false"
+        }
+      },
+      "nbt": {
+        "id": "minecraft:chest",
+        "LootTable": "blacklight:chests/base_supplies"
+      }
+    },
+    {
+      "pos": [
+        10,
+        6,
+        45
+      ],
+      "block": {
+        "Name": "minecraft:chest",
+        "Properties": {
+          "facing": "south",
+          "type": "single",
+          "waterlogged": "false"
+        }
+      },
+      "nbt": {
+        "id": "minecraft:chest",
+        "LootTable": "blacklight:chests/base_supplies"
+      }
+    },
+    {
+      "pos": [
+        13,
+        1,
+        45
+      ],
+      "block": {
+        "Name": "minecraft:chest",
+        "Properties": {
+          "facing": "south",
+          "type": "single",
+          "waterlogged": "false"
+        }
+      },
+      "nbt": {
+        "id": "minecraft:chest",
+        "LootTable": "blacklight:chests/base_supplies"
+      }
+    },
+    {
+      "pos": [
+        13,
+        6,
+        45
+      ],
+      "block": {
+        "Name": "minecraft:chest",
+        "Properties": {
+          "facing": "south",
+          "type": "single",
+          "waterlogged": "false"
+        }
+      },
+      "nbt": {
+        "id": "minecraft:chest",
+        "LootTable": "blacklight:chests/base_supplies"
+      }
+    },
+    {
+      "pos": [
+        45,
+        1,
+        52
+      ],
+      "block": {
+        "Name": "minecraft:chest",
+        "Properties": {
+          "facing": "south",
+          "type": "single",
+          "waterlogged": "false"
+        }
+      },
+      "nbt": {
+        "id": "minecraft:chest",
+        "LootTable": "blacklight:chests/base_supplies"
+      }
+    },
+    {
+      "pos": [
+        46,
+        1,
+        29
+      ],
+      "block": {
+        "Name": "minecraft:chest",
+        "Properties": {
+          "facing": "south",
+          "type": "single",
+          "waterlogged": "false"
+        }
+      },
+      "nbt": {
+        "id": "minecraft:chest",
+        "LootTable": "blacklight:chests/base_armory"
+      }
+    },
+    {
+      "pos": [
+        46,
+        1,
+        39
+      ],
+      "block": {
+        "Name": "minecraft:chest",
+        "Properties": {
+          "facing": "north",
+          "type": "single",
+          "waterlogged": "false"
+        }
+      },
+      "nbt": {
+        "id": "minecraft:chest",
+        "LootTable": "blacklight:chests/base_armory"
+      }
+    },
+    {
+      "pos": [
+        52,
+        1,
+        12
+      ],
+      "block": {
+        "Name": "minecraft:chest",
+        "Properties": {
+          "facing": "south",
+          "type": "single",
+          "waterlogged": "false"
+        }
+      },
+      "nbt": {
+        "id": "minecraft:chest",
+        "LootTable": "blacklight:chests/base_ammunition"
+      }
+    },
+    {
+      "pos": [
+        54,
+        1,
+        12
+      ],
+      "block": {
+        "Name": "minecraft:chest",
+        "Properties": {
+          "facing": "south",
+          "type": "single",
+          "waterlogged": "false"
+        }
+      },
+      "nbt": {
+        "id": "minecraft:chest",
+        "LootTable": "blacklight:chests/base_ammunition"
+      }
+    },
+    {
+      "pos": [
+        55,
+        1,
+        52
+      ],
+      "block": {
+        "Name": "minecraft:chest",
+        "Properties": {
+          "facing": "south",
+          "type": "single",
+          "waterlogged": "false"
+        }
+      },
+      "nbt": {
+        "id": "minecraft:chest",
+        "LootTable": "blacklight:chests/base_supplies"
+      }
+    }
+  ],
+  "block_entities": [
+    {
+      "pos": [
+        10,
+        1,
+        19
+      ],
+      "block": {
+        "Name": "minecraft:chest",
+        "Properties": {
+          "facing": "south",
+          "type": "single",
+          "waterlogged": "false"
+        }
+      },
+      "nbt": {
+        "id": "minecraft:chest",
+        "LootTable": "blacklight:chests/base_supplies"
+      }
+    },
+    {
+      "pos": [
+        10,
+        1,
+        45
+      ],
+      "block": {
+        "Name": "minecraft:chest",
+        "Properties": {
+          "facing": "south",
+          "type": "single",
+          "waterlogged": "false"
+        }
+      },
+      "nbt": {
+        "id": "minecraft:chest",
+        "LootTable": "blacklight:chests/base_supplies"
+      }
+    },
+    {
+      "pos": [
+        10,
+        1,
+        57
+      ],
+      "block": {
+        "Name": "minecraft:chest",
+        "Properties": {
+          "facing": "south",
+          "type": "single",
+          "waterlogged": "false"
+        }
+      },
+      "nbt": {
+        "id": "minecraft:chest",
+        "LootTable": "blacklight:chests/base_medical"
+      }
+    },
+    {
+      "pos": [
+        10,
+        6,
+        19
+      ],
+      "block": {
+        "Name": "minecraft:chest",
+        "Properties": {
+          "facing": "south",
+          "type": "single",
+          "waterlogged": "false"
+        }
+      },
+      "nbt": {
+        "id": "minecraft:chest",
+        "LootTable": "blacklight:chests/base_supplies"
+      }
+    },
+    {
+      "pos": [
+        10,
+        6,
+        45
+      ],
+      "block": {
+        "Name": "minecraft:chest",
+        "Properties": {
+          "facing": "south",
+          "type": "single",
+          "waterlogged": "false"
+        }
+      },
+      "nbt": {
+        "id": "minecraft:chest",
+        "LootTable": "blacklight:chests/base_supplies"
+      }
+    },
+    {
+      "pos": [
+        13,
+        1,
+        45
+      ],
+      "block": {
+        "Name": "minecraft:chest",
+        "Properties": {
+          "facing": "south",
+          "type": "single",
+          "waterlogged": "false"
+        }
+      },
+      "nbt": {
+        "id": "minecraft:chest",
+        "LootTable": "blacklight:chests/base_supplies"
+      }
+    },
+    {
+      "pos": [
+        13,
+        6,
+        45
+      ],
+      "block": {
+        "Name": "minecraft:chest",
+        "Properties": {
+          "facing": "south",
+          "type": "single",
+          "waterlogged": "false"
+        }
+      },
+      "nbt": {
+        "id": "minecraft:chest",
+        "LootTable": "blacklight:chests/base_supplies"
+      }
+    },
+    {
+      "pos": [
+        16,
+        4,
+        50
+      ],
+      "block": {
+        "Name": "minecraft:birch_wall_sign",
+        "Properties": {
+          "facing": "north",
+          "waterlogged": "false"
+        }
+      },
+      "nbt": {
+        "id": "minecraft:sign",
+        "is_waxed": 1,
+        "front_text": {
+          "messages": [
+            "{\"text\": \"05 / MEDICAL\"}",
+            "{\"text\": \"FIELD AID\"}",
+            "{\"text\": \"FINITE SUPPLY\"}",
+            "{\"text\": \"GARRISON 04\"}"
+          ],
+          "color": "black",
+          "has_glowing_text": 0
+        }
+      }
+    },
+    {
+      "pos": [
+        17,
+        4,
+        22
+      ],
+      "block": {
+        "Name": "minecraft:birch_wall_sign",
+        "Properties": {
+          "facing": "south",
+          "waterlogged": "false"
+        }
+      },
+      "nbt": {
+        "id": "minecraft:sign",
+        "is_waxed": 1,
+        "front_text": {
+          "messages": [
+            "{\"text\": \"01 / COMMAND\"}",
+            "{\"text\": \"OPERATIONS\"}",
+            "{\"text\": \"RADIO + BRIEF\"}",
+            "{\"text\": \"ROOF ACCESS\"}"
+          ],
+          "color": "black",
+          "has_glowing_text": 0
+        }
+      }
+    },
+    {
+      "pos": [
+        25,
+        4,
+        44
+      ],
+      "block": {
+        "Name": "minecraft:birch_wall_sign",
+        "Properties": {
+          "facing": "east",
+          "waterlogged": "false"
+        }
+      },
+      "nbt": {
+        "id": "minecraft:sign",
+        "is_waxed": 1,
+        "front_text": {
+          "messages": [
+            "{\"text\": \"03 / BARRACKS\"}",
+            "{\"text\": \"24 BEDS\"}",
+            "{\"text\": \"STAIRS EAST\"}",
+            "{\"text\": \"ROOF WATCH\"}"
+          ],
+          "color": "black",
+          "has_glowing_text": 0
+        }
+      }
+    },
+    {
+      "pos": [
+        32,
+        7,
+        63
+      ],
+      "block": {
+        "Name": "minecraft:birch_wall_sign",
+        "Properties": {
+          "facing": "north",
+          "waterlogged": "false"
+        }
+      },
+      "nbt": {
+        "id": "minecraft:sign",
+        "is_waxed": 1,
+        "front_text": {
+          "messages": [
+            "{\"text\": \"MILITARY\"}",
+            "{\"text\": \"GARRISON 04\"}",
+            "{\"text\": \"AUTHORIZED\"}",
+            "{\"text\": \"PERSONNEL\"}"
+          ],
+          "color": "black",
+          "has_glowing_text": 0
+        }
+      }
+    },
+    {
+      "pos": [
+        42,
+        4,
+        34
+      ],
+      "block": {
+        "Name": "minecraft:birch_wall_sign",
+        "Properties": {
+          "facing": "west",
+          "waterlogged": "false"
+        }
+      },
+      "nbt": {
+        "id": "minecraft:sign",
+        "is_waxed": 1,
+        "front_text": {
+          "messages": [
+            "{\"text\": \"04 / ARMORY\"}",
+            "{\"text\": \"ISSUE + REPAIR\"}",
+            "{\"text\": \"WEAPON STOCK\"}",
+            "{\"text\": \"CONTROLLED\"}"
+          ],
+          "color": "black",
+          "has_glowing_text": 0
+        }
+      }
+    },
+    {
+      "pos": [
+        45,
+        1,
+        52
+      ],
+      "block": {
+        "Name": "minecraft:chest",
+        "Properties": {
+          "facing": "south",
+          "type": "single",
+          "waterlogged": "false"
+        }
+      },
+      "nbt": {
+        "id": "minecraft:chest",
+        "LootTable": "blacklight:chests/base_supplies"
+      }
+    },
+    {
+      "pos": [
+        46,
+        1,
+        29
+      ],
+      "block": {
+        "Name": "minecraft:chest",
+        "Properties": {
+          "facing": "south",
+          "type": "single",
+          "waterlogged": "false"
+        }
+      },
+      "nbt": {
+        "id": "minecraft:chest",
+        "LootTable": "blacklight:chests/base_armory"
+      }
+    },
+    {
+      "pos": [
+        46,
+        1,
+        39
+      ],
+      "block": {
+        "Name": "minecraft:chest",
+        "Properties": {
+          "facing": "north",
+          "type": "single",
+          "waterlogged": "false"
+        }
+      },
+      "nbt": {
+        "id": "minecraft:chest",
+        "LootTable": "blacklight:chests/base_armory"
+      }
+    },
+    {
+      "pos": [
+        52,
+        1,
+        12
+      ],
+      "block": {
+        "Name": "minecraft:chest",
+        "Properties": {
+          "facing": "south",
+          "type": "single",
+          "waterlogged": "false"
+        }
+      },
+      "nbt": {
+        "id": "minecraft:chest",
+        "LootTable": "blacklight:chests/base_ammunition"
+      }
+    },
+    {
+      "pos": [
+        52,
+        4,
+        19
+      ],
+      "block": {
+        "Name": "minecraft:birch_wall_sign",
+        "Properties": {
+          "facing": "south",
+          "waterlogged": "false"
+        }
+      },
+      "nbt": {
+        "id": "minecraft:sign",
+        "is_waxed": 1,
+        "front_text": {
+          "messages": [
+            "{\"text\": \"02 / AMMO\"}",
+            "{\"text\": \"LIVE ORDNANCE\"}",
+            "{\"text\": \"FINITE STOCK\"}",
+            "{\"text\": \"NO OPEN FLAME\"}"
+          ],
+          "color": "black",
+          "has_glowing_text": 0
+        }
+      }
+    },
+    {
+      "pos": [
+        54,
+        1,
+        12
+      ],
+      "block": {
+        "Name": "minecraft:chest",
+        "Properties": {
+          "facing": "south",
+          "type": "single",
+          "waterlogged": "false"
+        }
+      },
+      "nbt": {
+        "id": "minecraft:chest",
+        "LootTable": "blacklight:chests/base_ammunition"
+      }
+    },
+    {
+      "pos": [
+        55,
+        1,
+        52
+      ],
+      "block": {
+        "Name": "minecraft:chest",
+        "Properties": {
+          "facing": "south",
+          "type": "single",
+          "waterlogged": "false"
+        }
+      },
+      "nbt": {
+        "id": "minecraft:chest",
+        "LootTable": "blacklight:chests/base_supplies"
+      }
+    }
+  ],
+  "runtime_slots": 16,
+  "runtime_guards": [
+    {
+      "x": 28,
+      "y": 1,
+      "z": 61,
+      "heavy": false,
+      "role": "entry",
+      "slot": 0,
+      "effective_role": "team_leader",
+      "effective_rank": "sergeant",
+      "registered_entity": "blacklight:military_team_leader",
+      "checkpoint_override": true,
+      "effective_weapon": "military_rifle"
+    },
+    {
+      "x": 36,
+      "y": 1,
+      "z": 61,
+      "heavy": true,
+      "role": "entry",
+      "slot": 1,
+      "effective_role": "trooper",
+      "effective_rank": "corporal",
+      "registered_entity": "blacklight:military_heavy",
+      "checkpoint_override": true,
+      "effective_weapon": "military_machine_gun"
+    },
+    {
+      "x": 32,
+      "y": 1,
+      "z": 53,
+      "heavy": false,
+      "role": "motor_yard",
+      "slot": 2,
+      "effective_role": "trooper",
+      "effective_rank": "private",
+      "registered_entity": "blacklight:military_soldier",
+      "checkpoint_override": false,
+      "effective_weapon": "military_rifle"
+    },
+    {
+      "x": 32,
+      "y": 1,
+      "z": 29,
+      "heavy": false,
+      "role": "central_lane",
+      "slot": 3,
+      "effective_role": "trooper",
+      "effective_rank": "private",
+      "registered_entity": "blacklight:military_soldier",
+      "checkpoint_override": false,
+      "effective_weapon": "military_rifle"
+    },
+    {
+      "x": 4,
+      "y": 8,
+      "z": 4,
+      "heavy": false,
+      "role": "tower_northwest",
+      "slot": 4,
+      "effective_role": "trooper",
+      "effective_rank": "private",
+      "registered_entity": "blacklight:military_soldier",
+      "checkpoint_override": false,
+      "effective_weapon": "military_rifle"
+    },
+    {
+      "x": 60,
+      "y": 8,
+      "z": 60,
+      "heavy": false,
+      "role": "tower_southeast",
+      "slot": 5,
+      "effective_role": "trooper",
+      "effective_rank": "private",
+      "registered_entity": "blacklight:military_soldier",
+      "checkpoint_override": false,
+      "effective_weapon": "military_rifle"
+    },
+    {
+      "x": 4,
+      "y": 8,
+      "z": 60,
+      "heavy": false,
+      "role": "tower_southwest",
+      "slot": 6,
+      "effective_role": "trooper",
+      "effective_rank": "private",
+      "registered_entity": "blacklight:military_soldier",
+      "checkpoint_override": false,
+      "effective_weapon": "military_rifle"
+    },
+    {
+      "x": 18,
+      "y": 1,
+      "z": 18,
+      "heavy": false,
+      "role": "command",
+      "slot": 7,
+      "effective_role": "officer",
+      "effective_rank": "lieutenant",
+      "registered_entity": "blacklight:military_officer",
+      "checkpoint_override": false,
+      "effective_weapon": "military_carbine"
+    },
+    {
+      "x": 18,
+      "y": 6,
+      "z": 18,
+      "heavy": false,
+      "role": "operations",
+      "slot": 8,
+      "effective_role": "commander",
+      "effective_rank": "major",
+      "registered_entity": "blacklight:military_commander",
+      "checkpoint_override": false,
+      "effective_weapon": "military_carbine"
+    },
+    {
+      "x": 18,
+      "y": 11,
+      "z": 12,
+      "heavy": false,
+      "role": "command_roof",
+      "slot": 9,
+      "effective_role": "trooper",
+      "effective_rank": "private",
+      "registered_entity": "blacklight:military_soldier",
+      "checkpoint_override": false,
+      "effective_weapon": "military_rifle"
+    },
+    {
+      "x": 50,
+      "y": 1,
+      "z": 15,
+      "heavy": true,
+      "role": "ammunition",
+      "slot": 10,
+      "effective_role": "trooper",
+      "effective_rank": "corporal",
+      "registered_entity": "blacklight:military_heavy",
+      "checkpoint_override": false,
+      "effective_weapon": "military_machine_gun"
+    },
+    {
+      "x": 16,
+      "y": 1,
+      "z": 41,
+      "heavy": false,
+      "role": "barracks",
+      "slot": 11,
+      "effective_role": "trooper",
+      "effective_rank": "private",
+      "registered_entity": "blacklight:military_soldier",
+      "checkpoint_override": false,
+      "effective_weapon": "military_rifle"
+    },
+    {
+      "x": 16,
+      "y": 6,
+      "z": 41,
+      "heavy": false,
+      "role": "barracks_upper",
+      "slot": 12,
+      "effective_role": "trooper",
+      "effective_rank": "private",
+      "registered_entity": "blacklight:military_soldier",
+      "checkpoint_override": false,
+      "effective_weapon": "military_rifle"
+    },
+    {
+      "x": 48,
+      "y": 1,
+      "z": 37,
+      "heavy": true,
+      "role": "armory",
+      "slot": 13,
+      "effective_role": "trooper",
+      "effective_rank": "corporal",
+      "registered_entity": "blacklight:military_heavy",
+      "checkpoint_override": false,
+      "effective_weapon": "military_machine_gun"
+    },
+    {
+      "x": 35,
+      "y": 1,
+      "z": 12,
+      "heavy": false,
+      "role": "landing_pad",
+      "slot": 14,
+      "effective_role": "trooper",
+      "effective_rank": "private",
+      "registered_entity": "blacklight:military_soldier",
+      "checkpoint_override": false,
+      "effective_weapon": "military_rifle"
+    },
+    {
+      "x": 40,
+      "y": 1,
+      "z": 53,
+      "heavy": false,
+      "role": "logistics",
+      "slot": 15,
+      "effective_role": "trooper",
+      "effective_rank": "private",
+      "registered_entity": "blacklight:military_soldier",
+      "checkpoint_override": false,
+      "effective_weapon": "military_rifle"
+    }
+  ],
+  "large_base_metadata": {
+    "name": "large_military_base",
+    "faction": "military",
+    "width": 65,
+    "height": 18,
+    "depth": 65,
+    "entrance": [
+      32,
+      1,
+      64
+    ],
+    "entrance_width": 7,
+    "ammo_chests": [
+      [
+        52,
+        1,
+        12
+      ],
+      [
+        54,
+        1,
+        12
+      ]
+    ],
+    "guards": [
+      {
+        "x": 28,
+        "y": 1,
+        "z": 61,
+        "heavy": false,
+        "role": "entry"
+      },
+      {
+        "x": 36,
+        "y": 1,
+        "z": 61,
+        "heavy": true,
+        "role": "entry"
+      },
+      {
+        "x": 32,
+        "y": 1,
+        "z": 53,
+        "heavy": false,
+        "role": "motor_yard"
+      },
+      {
+        "x": 32,
+        "y": 1,
+        "z": 29,
+        "heavy": false,
+        "role": "central_lane"
+      },
+      {
+        "x": 4,
+        "y": 8,
+        "z": 4,
+        "heavy": false,
+        "role": "tower_northwest"
+      },
+      {
+        "x": 60,
+        "y": 8,
+        "z": 60,
+        "heavy": false,
+        "role": "tower_southeast"
+      },
+      {
+        "x": 4,
+        "y": 8,
+        "z": 60,
+        "heavy": false,
+        "role": "tower_southwest"
+      },
+      {
+        "x": 18,
+        "y": 1,
+        "z": 18,
+        "heavy": false,
+        "role": "command"
+      },
+      {
+        "x": 18,
+        "y": 6,
+        "z": 18,
+        "heavy": false,
+        "role": "operations"
+      },
+      {
+        "x": 18,
+        "y": 11,
+        "z": 12,
+        "heavy": false,
+        "role": "command_roof"
+      },
+      {
+        "x": 50,
+        "y": 1,
+        "z": 15,
+        "heavy": true,
+        "role": "ammunition"
+      },
+      {
+        "x": 16,
+        "y": 1,
+        "z": 41,
+        "heavy": false,
+        "role": "barracks"
+      },
+      {
+        "x": 16,
+        "y": 6,
+        "z": 41,
+        "heavy": false,
+        "role": "barracks_upper"
+      },
+      {
+        "x": 48,
+        "y": 1,
+        "z": 37,
+        "heavy": true,
+        "role": "armory"
+      },
+      {
+        "x": 35,
+        "y": 1,
+        "z": 12,
+        "heavy": false,
+        "role": "landing_pad"
+      },
+      {
+        "x": 40,
+        "y": 1,
+        "z": 53,
+        "heavy": false,
+        "role": "logistics"
+      }
+    ],
+    "modules": [
+      {
+        "name": "command",
+        "bounds": [
+          8,
+          0,
+          6,
+          25,
+          10,
+          21
+        ],
+        "entry": [
+          17,
+          1,
+          19
+        ],
+        "floors": 2
+      },
+      {
+        "name": "ammunition",
+        "bounds": [
+          45,
+          0,
+          5,
+          60,
+          5,
+          18
+        ],
+        "entry": [
+          52,
+          1,
+          16
+        ],
+        "floors": 1
+      },
+      {
+        "name": "barracks",
+        "bounds": [
+          8,
+          0,
+          29,
+          24,
+          10,
+          47
+        ],
+        "entry": [
+          22,
+          1,
+          44
+        ],
+        "floors": 2
+      },
+      {
+        "name": "armory",
+        "bounds": [
+          43,
+          0,
+          27,
+          59,
+          5,
+          42
+        ],
+        "entry": [
+          45,
+          1,
+          34
+        ],
+        "floors": 1
+      },
+      {
+        "name": "medical",
+        "bounds": [
+          8,
+          0,
+          51,
+          23,
+          5,
+          59
+        ],
+        "entry": [
+          16,
+          1,
+          53
+        ],
+        "floors": 1
+      },
+      {
+        "name": "logistics_canopy",
+        "bounds": [
+          43,
+          0,
+          48,
+          58,
+          5,
+          59
+        ],
+        "entry": [
+          50,
+          1,
+          51
+        ],
+        "floors": 1
+      }
+    ],
+    "entities_embedded": false,
+    "loot_refresh": false
+  },
+  "source": "src/main/resources/data/blacklight/structures/large_military_base.nbt",
+  "sha256": "5c91bc9cd581eff2d83f8076538cab05b8d24a7c69d8a886dcfff496abe426ad",
+  "preview": "assets/建筑/large_military_base.png",
+  "palette": [
+    {
+      "Name": "minecraft:polished_andesite"
+    },
+    {
+      "Name": "minecraft:light_gray_concrete"
+    },
+    {
+      "Name": "minecraft:iron_bars",
+      "Properties": {
+        "east": "true",
+        "north": "false",
+        "south": "false",
+        "waterlogged": "false",
+        "west": "true"
+      }
+    },
+    {
+      "Name": "minecraft:iron_bars",
+      "Properties": {
+        "east": "false",
+        "north": "true",
+        "south": "true",
+        "waterlogged": "false",
+        "west": "false"
+      }
+    },
+    {
+      "Name": "minecraft:air"
+    },
+    {
+      "Name": "minecraft:gray_concrete"
+    },
+    {
+      "Name": "minecraft:green_terracotta"
+    },
+    {
+      "Name": "minecraft:ladder",
+      "Properties": {
+        "facing": "south",
+        "waterlogged": "false"
+      }
+    },
+    {
+      "Name": "blacklight:military_searchlight",
+      "Properties": {
+        "facing": "south"
+      }
+    },
+    {
+      "Name": "blacklight:field_barrier",
+      "Properties": {
+        "facing": "north"
+      }
+    },
+    {
+      "Name": "minecraft:black_stained_glass"
+    },
+    {
+      "Name": "blacklight:sandbag_cover",
+      "Properties": {
+        "facing": "north"
+      }
+    },
+    {
+      "Name": "minecraft:chest",
+      "Properties": {
+        "facing": "south",
+        "type": "single",
+        "waterlogged": "false"
+      }
+    },
+    {
+      "Name": "minecraft:green_bed",
+      "Properties": {
+        "facing": "north",
+        "occupied": "false",
+        "part": "head"
+      }
+    },
+    {
+      "Name": "minecraft:green_bed",
+      "Properties": {
+        "facing": "north",
+        "occupied": "false",
+        "part": "foot"
+      }
+    },
+    {
+      "Name": "minecraft:white_bed",
+      "Properties": {
+        "facing": "north",
+        "occupied": "false",
+        "part": "head"
+      }
+    },
+    {
+      "Name": "minecraft:white_bed",
+      "Properties": {
+        "facing": "north",
+        "occupied": "false",
+        "part": "foot"
+      }
+    },
+    {
+      "Name": "minecraft:iron_trapdoor",
+      "Properties": {
+        "facing": "east",
+        "half": "bottom",
+        "open": "false",
+        "powered": "false",
+        "waterlogged": "false"
+      }
+    },
+    {
+      "Name": "minecraft:smooth_stone"
+    },
+    {
+      "Name": "blacklight:command_terminal",
+      "Properties": {
+        "facing": "south"
+      }
+    },
+    {
+      "Name": "minecraft:sea_lantern"
+    },
+    {
+      "Name": "blacklight:communications_antenna",
+      "Properties": {
+        "facing": "north"
+      }
+    },
+    {
+      "Name": "minecraft:iron_bars",
+      "Properties": {
+        "east": "false",
+        "north": "false",
+        "south": "false",
+        "waterlogged": "false",
+        "west": "false"
+      }
+    },
+    {
+      "Name": "minecraft:redstone_lamp",
+      "Properties": {
+        "lit": "true"
+      }
+    },
+    {
+      "Name": "minecraft:white_concrete"
+    },
+    {
+      "Name": "minecraft:blue_carpet"
+    },
+    {
+      "Name": "minecraft:iron_trapdoor",
+      "Properties": {
+        "facing": "north",
+        "half": "bottom",
+        "open": "false",
+        "powered": "false",
+        "waterlogged": "false"
+      }
+    },
+    {
+      "Name": "minecraft:birch_wall_sign",
+      "Properties": {
+        "facing": "north",
+        "waterlogged": "false"
+      }
+    },
+    {
+      "Name": "minecraft:birch_wall_sign",
+      "Properties": {
+        "facing": "south",
+        "waterlogged": "false"
+      }
+    },
+    {
+      "Name": "minecraft:cauldron"
+    },
+    {
+      "Name": "blacklight:military_searchlight",
+      "Properties": {
+        "facing": "east"
+      }
+    },
+    {
+      "Name": "minecraft:crafting_table"
+    },
+    {
+      "Name": "minecraft:ladder",
+      "Properties": {
+        "facing": "west",
+        "waterlogged": "false"
+      }
+    },
+    {
+      "Name": "minecraft:stone_brick_stairs",
+      "Properties": {
+        "facing": "south",
+        "half": "bottom",
+        "shape": "straight",
+        "waterlogged": "false"
+      }
+    },
+    {
+      "Name": "minecraft:birch_wall_sign",
+      "Properties": {
+        "facing": "east",
+        "waterlogged": "false"
+      }
+    },
+    {
+      "Name": "blacklight:field_barrier",
+      "Properties": {
+        "facing": "east"
+      }
+    },
+    {
+      "Name": "minecraft:yellow_concrete"
+    },
+    {
+      "Name": "blacklight:field_barrier",
+      "Properties": {
+        "facing": "west"
+      }
+    },
+    {
+      "Name": "minecraft:birch_wall_sign",
+      "Properties": {
+        "facing": "west",
+        "waterlogged": "false"
+      }
+    },
+    {
+      "Name": "minecraft:green_concrete"
+    },
+    {
+      "Name": "minecraft:smooth_stone_slab",
+      "Properties": {
+        "type": "bottom",
+        "waterlogged": "false"
+      }
+    },
+    {
+      "Name": "minecraft:sandstone"
+    },
+    {
+      "Name": "minecraft:chest",
+      "Properties": {
+        "facing": "north",
+        "type": "single",
+        "waterlogged": "false"
+      }
+    },
+    {
+      "Name": "blacklight:military_crate",
+      "Properties": {
+        "facing": "north"
+      }
+    },
+    {
+      "Name": "minecraft:grindstone",
+      "Properties": {
+        "face": "floor",
+        "facing": "north"
+      }
+    },
+    {
+      "Name": "minecraft:smithing_table"
+    },
+    {
+      "Name": "blacklight:command_terminal",
+      "Properties": {
+        "facing": "west"
+      }
+    },
+    {
+      "Name": "blacklight:military_crate",
+      "Properties": {
+        "facing": "west"
+      }
+    }
+  ],
+  "block_counts": {
+    "minecraft:polished_andesite": 3237,
+    "minecraft:light_gray_concrete": 1730,
+    "minecraft:iron_bars": 682,
+    "minecraft:gray_concrete": 3067,
+    "minecraft:green_terracotta": 305,
+    "minecraft:ladder": 31,
+    "blacklight:military_searchlight": 9,
+    "blacklight:field_barrier": 6,
+    "minecraft:black_stained_glass": 192,
+    "blacklight:sandbag_cover": 8,
+    "minecraft:chest": 13,
+    "minecraft:green_bed": 48,
+    "minecraft:white_bed": 6,
+    "minecraft:iron_trapdoor": 30,
+    "minecraft:smooth_stone": 194,
+    "blacklight:command_terminal": 7,
+    "minecraft:sea_lantern": 17,
+    "blacklight:communications_antenna": 1,
+    "minecraft:redstone_lamp": 1,
+    "minecraft:white_concrete": 75,
+    "minecraft:blue_carpet": 6,
+    "minecraft:birch_wall_sign": 6,
+    "minecraft:cauldron": 1,
+    "minecraft:crafting_table": 2,
+    "minecraft:stone_brick_stairs": 33,
+    "minecraft:yellow_concrete": 59,
+    "minecraft:green_concrete": 192,
+    "minecraft:smooth_stone_slab": 176,
+    "minecraft:sandstone": 12,
+    "blacklight:military_crate": 15,
+    "minecraft:grindstone": 1,
+    "minecraft:smithing_table": 1
+  }
+}

@@ -1,0 +1,150 @@
+{
+  "format_version": "1.12.0",
+  "minecraft:geometry": [
+    {
+      "description": {
+        "identifier": "geometry.blacklight.hunter_authored",
+        "texture_width": 512,
+        "texture_height": 512,
+        "visible_bounds_width": 5,
+        "visible_bounds_height": 4,
+        "visible_bounds_offset": [
+          0,
+          1.25,
+          0
+        ]
+      },
+      "bones": [
+        {
+          "name": "root",
+          "pivot": [
+            0,
+            0,
+            0
+          ],
+          "cubes": []
+        },
+        {
+          "name": "hips",
+          "parent": "root",
+          "pivot": [
+            0,
+            18,
+            10
+          ],
+          "cubes": []
+        },
+        {
+          "name": "torso",
+          "parent": "hips",
+          "pivot": [
+            0,
+            21,
+            5
+          ],
+          "cubes": []
+        },
+        {
+          "name": "head",
+          "parent": "torso",
+          "pivot": [
+            0,
+            24,
+            -10
+          ],
+          "cubes": []
+        },
+        {
+          "name": "jaw",
+          "parent": "head",
+          "pivot": [
+            0,
+            21,
+            -12
+          ],
+          "cubes": []
+        },
+        {
+          "name": "right_arm",
+          "parent": "torso",
+          "pivot": [
+            -9,
+            25,
+            -4
+          ],
+          "cubes": []
+        },
+        {
+          "name": "right_forearm",
+          "parent": "right_arm",
+          "pivot": [
+            -12,
+            14,
+            -5
+          ],
+          "cubes": []
+        },
+        {
+          "name": "right_thigh",
+          "parent": "hips",
+          "pivot": [
+            -4,
+            18,
+            10
+          ],
+          "cubes": []
+        },
+        {
+          "name": "right_shin",
+          "parent": "right_thigh",
+          "pivot": [
+            -6,
+            8,
+            7
+          ],
+          "cubes": []
+        },
+        {
+          "name": "left_arm",
+          "parent": "torso",
+          "pivot": [
+            9,
+            25,
+            -4
+          ],
+          "cubes": []
+        },
+        {
+          "name": "left_forearm",
+          "parent": "left_arm",
+          "pivot": [
+            12,
+            14,
+            -5
+          ],
+          "cubes": []
+        },
+        {
+          "name": "left_thigh",
+          "parent": "hips",
+          "pivot": [
+            4,
+            18,
+            10
+          ],
+          "cubes": []
+        },
+        {
+          "name": "left_shin",
+          "parent": "left_thigh",
+          "pivot": [
+            6,
+            8,
+            7
+          ],
+          "cubes": []
+        }
+      ]
+    }
+  ]
+}

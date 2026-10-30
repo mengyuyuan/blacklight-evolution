@@ -1,0 +1,20 @@
+{
+  "replace": false,
+  "values": [
+    "minecraft:dirt",
+    "minecraft:grass_block",
+    "minecraft:stone",
+    "minecraft:cobblestone",
+    "minecraft:deepslate",
+    "minecraft:cobbled_deepslate",
+    "minecraft:granite",
+    "minecraft:diorite",
+    "minecraft:andesite",
+    "minecraft:netherrack",
+    "minecraft:end_stone",
+    "#minecraft:logs",
+    "#minecraft:planks",
+    "#minecraft:mineable/pickaxe",
+    "#minecraft:mineable/shovel"
+  ]
+}

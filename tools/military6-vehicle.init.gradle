@@ -1,0 +1,15 @@
+// Explicit opt-in only. Production build keeps gametest package excluded.
+allprojects { afterEvaluate {
+    sourceSets.main.java.srcDir('src/vehicleTest/java')
+    if (!sourceSets.main.resources.srcDirs.contains(file('src/blackwatchTest/resources'))) sourceSets.main.resources.srcDir('src/blackwatchTest/resources')
+    def stageVehicle6Run = tasks.register('stageVehicle6Run', Sync) {
+        dependsOn tasks.named('classes')
+        from sourceSets.main.output
+        into layout.buildDirectory.dir('vehicle6-run-mod')
+    }
+    tasks.named('runGameTestServer').configure {
+        dependsOn stageVehicle6Run
+        doFirst { environment 'MOD_CLASSES', 'blacklight%%' + layout.buildDirectory.dir('vehicle6-run-mod').get().asFile.absolutePath }
+    }
+} }
+allprojects { tasks.withType(ProcessResources).configureEach { filteringCharset = 'UTF-8' } }

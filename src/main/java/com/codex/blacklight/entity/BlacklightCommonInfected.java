@@ -37,10 +37,10 @@ public final class BlacklightCommonInfected extends Monster {
         goalSelector.addGoal(6,new WaterAvoidingRandomStrollGoal(this,.70));
         goalSelector.addGoal(7,new LookAtPlayerGoal(this,Player.class,8));goalSelector.addGoal(8,new RandomLookAroundGoal(this));
         targetSelector.addGoal(1,new HurtByTargetGoal(this));
-        targetSelector.addGoal(2,new NearestAttackableTargetGoal<>(this,LivingEntity.class,10,true,false,this::enemy));
+        targetSelector.addGoal(2,new NearestAttackableTargetGoal<>(this,LivingEntity.class,10,true,false,this::validTarget));
     }
-    private boolean enemy(LivingEntity target){
-        if(target==this||!target.isAlive()||isAlliedTo(target))return false;
+    public boolean validTarget(LivingEntity target){
+        if(target==null||target==this||!target.isAlive()||isAlliedTo(target))return false;
         if(target instanceof Player p)return !p.isCreative()&&!p.isSpectator()&&!com.codex.blacklight.disguise.DisguiseSystem.fooled(this,p);
         return target instanceof Mob&&!BlacklightInfectionSystem.isInfected(target);
     }
@@ -48,6 +48,8 @@ public final class BlacklightCommonInfected extends Monster {
     private boolean restrained(){return com.codex.blacklight.combat.ImpactControl.stunned(this)
             ||getData(com.codex.blacklight.registry.ModAttachments.CONSUME_VISUAL).active()
             ||com.codex.blacklight.power.BiomassSystem.claimant(this)!=null;}
+    /** Shared availability gate for the existing civilian attack and lawful mechanical pursuit. */
+    public boolean combatAvailable(){return !restrained();}
     @Override protected net.minecraft.sounds.SoundEvent getAmbientSound(){return null;}
     @Override protected net.minecraft.sounds.SoundEvent getHurtSound(net.minecraft.world.damagesource.DamageSource damage){return net.minecraft.sounds.SoundEvents.PLAYER_HURT;}
     @Override protected net.minecraft.sounds.SoundEvent getDeathSound(){return net.minecraft.sounds.SoundEvents.PLAYER_DEATH;}
@@ -55,7 +57,7 @@ public final class BlacklightCommonInfected extends Monster {
         private int cooldown;private LivingEntity committed;
         CivilianAttackGoal(){setFlags(java.util.EnumSet.of(Flag.MOVE,Flag.LOOK));}
         @Override public boolean requiresUpdateEveryTick(){return true;}
-        @Override public boolean canUse(){return getTarget()!=null&&enemy(getTarget())&&!restrained();}
+        @Override public boolean canUse(){return getTarget()!=null&&validTarget(getTarget())&&combatAvailable();}
         @Override public boolean canContinueToUse(){return canUse();}
         @Override public void stop(){entityData.set(ATTACK_STARTED,-1L);setAggressive(false);getNavigation().stop();committed=null;}
         @Override public void tick(){
@@ -70,7 +72,7 @@ public final class BlacklightCommonInfected extends Monster {
                     var toward=target.position().subtract(position()).multiply(1,0,1).normalize().scale(.18);
                     setDeltaMovement(toward.x,getDeltaMovement().y,toward.z);hurtMarked=true;
                 }
-                if(elapsed==CommonInfectedMotion.CONTACT_TICK&&enemy(target)&&getSensing().hasLineOfSight(target)
+                if(elapsed==CommonInfectedMotion.CONTACT_TICK&&validTarget(target)&&getSensing().hasLineOfSight(target)
                         &&getBoundingBox().inflate(.85,.25,.85).intersects(target.getBoundingBox())){
                     swing(entityData.get(ATTACK_HAND)==0?net.minecraft.world.InteractionHand.MAIN_HAND:net.minecraft.world.InteractionHand.OFF_HAND);
                     doHurtTarget(target);

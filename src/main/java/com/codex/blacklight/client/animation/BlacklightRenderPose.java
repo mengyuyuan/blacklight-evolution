@@ -10,6 +10,11 @@ import net.minecraft.world.entity.LivingEntity;
 public final class BlacklightRenderPose {
     private BlacklightRenderPose() { }
     public static BlacklightPose sample(LivingEntity entity, float partial) {
+        if(entity instanceof net.minecraft.world.entity.player.Player&&entity.getVehicle() instanceof com.codex.blacklight.entity.MilitaryVehicle vehicle){
+            String seat=vehicle.seatOf(entity.getUUID());
+            boolean driver=vehicle.definition().seats().stream().anyMatch(s->s.id().equals(seat)&&s.job()==com.codex.blacklight.military.vehicle.VehicleDefinition.Job.DRIVER);
+            return com.codex.blacklight.client.vehicle.VehicleSeatPose.skeleton(driver,net.minecraft.util.Mth.wrapDegrees(entity.getViewYRot(partial)+vehicle.getYRot()),entity.getViewXRot(partial),com.codex.blacklight.client.vehicle.VehicleSeatPose.drop(vehicle.definition()));
+        }
         if(entity instanceof net.minecraft.world.entity.player.Player p){var hydra=HydraPlayerPose.sample(p,partial);if(hydra!=null)return hydra;}
         var skeleton = PlayerMotionController.skeleton();
         var pose = PlayerMotionController.pose(entity, partial);
@@ -60,6 +65,7 @@ public final class BlacklightRenderPose {
         return pose;
     }
     public static float facing(LivingEntity entity,float partial) {
+        if(entity.getVehicle() instanceof com.codex.blacklight.entity.MilitaryVehicle vehicle)return -net.minecraft.util.Mth.rotLerp(partial,vehicle.yRotO,vehicle.getYRot());
         if(entity instanceof net.minecraft.world.entity.player.Player p){var h=com.codex.blacklight.city.HydraTransport.carrier(p);if(h!=null)return h.getYRot();}
         if(entity instanceof net.minecraft.world.entity.player.Player p&&com.codex.blacklight.combat.BlockThrowMotion.active(p))return com.codex.blacklight.combat.BlockThrowMotion.yaw(p,partial);
         return PlayerMotionController.facing(entity,partial);

@@ -1,0 +1,89 @@
+{
+  "profiles": [
+    {
+      "duty": "RIFLE",
+      "primary": {
+        "weapon": "military_rifle",
+        "magazine": 30,
+        "reserve": 90
+      },
+      "secondary": null
+    },
+    {
+      "duty": "CARBINE",
+      "primary": {
+        "weapon": "military_carbine",
+        "magazine": 24,
+        "reserve": 72
+      },
+      "secondary": null
+    },
+    {
+      "duty": "MACHINE_GUN",
+      "primary": {
+        "weapon": "military_machine_gun",
+        "magazine": 60,
+        "reserve": 180
+      },
+      "secondary": null
+    },
+    {
+      "duty": "GRENADIER",
+      "primary": {
+        "weapon": "grenade_launcher",
+        "magazine": 6,
+        "reserve": 12
+      },
+      "secondary": null
+    },
+    {
+      "duty": "ANTI_ARMOR",
+      "primary": {
+        "weapon": "military_carbine",
+        "magazine": 24,
+        "reserve": 48
+      },
+      "secondary": {
+        "weapon": "rocket_launcher",
+        "magazine": 1,
+        "reserve": 2
+      }
+    }
+  ],
+  "native_weights": {
+    "military": {
+      "RIFLE": 65,
+      "CARBINE": 15,
+      "MACHINE_GUN": 10,
+      "GRENADIER": 6,
+      "ANTI_ARMOR": 4
+    },
+    "blackwatch": {
+      "RIFLE": 60,
+      "CARBINE": 18,
+      "MACHINE_GUN": 12,
+      "GRENADIER": 6,
+      "ANTI_ARMOR": 4
+    }
+  },
+  "patrol8": {
+    "CARBINE": 1,
+    "RIFLE": 5,
+    "MACHINE_GUN": 1,
+    "GRENADIER": 1
+  },
+  "patrol8_mechanical": {
+    "CARBINE": 1,
+    "RIFLE": 5,
+    "MACHINE_GUN": 1,
+    "ANTI_ARMOR": 1
+  },
+  "patrol12": {
+    "CARBINE": 1,
+    "RIFLE": 8,
+    "MACHINE_GUN": 1,
+    "GRENADIER": 1,
+    "ANTI_ARMOR": 1
+  },
+  "patrol_status": "Policy factory, not a claim that production automatically spawns 8/12-person patrols"
+}

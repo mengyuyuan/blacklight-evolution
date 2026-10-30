@@ -1,0 +1,482 @@
+{
+  "military_rifle": {
+    "sha256": "1ac5a9988818d5a78ac3499ae91279906127a835d99504209c2c96362d97f80f",
+    "elements": 34,
+    "right_hand_view_z": [
+      -1.3113,
+      -0.4808
+    ],
+    "screen_bounds_960x540_fov70": [
+      579.3,
+      385.8,
+      808.8,
+      636.4
+    ],
+    "paired_models_byte_equal": true,
+    "json_geometry_texture_checks": "PASS",
+    "both_hands_peak_pose_checks": {
+      "right_rest": {
+        "view_z": [
+          -1.3113,
+          -0.4808
+        ],
+        "outside_camera_near_plane": true
+      },
+      "right_shot_peak": {
+        "view_z": [
+          -1.2397,
+          -0.4116
+        ],
+        "outside_camera_near_plane": true
+      },
+      "right_reload_peak": {
+        "view_z": [
+          -1.3011,
+          -0.4706
+        ],
+        "outside_camera_near_plane": true
+      },
+      "left_rest": {
+        "view_z": [
+          -1.3113,
+          -0.4808
+        ],
+        "outside_camera_near_plane": true
+      },
+      "left_shot_peak": {
+        "view_z": [
+          -1.2397,
+          -0.4116
+        ],
+        "outside_camera_near_plane": true
+      },
+      "left_reload_peak": {
+        "view_z": [
+          -1.3011,
+          -0.4706
+        ],
+        "outside_camera_near_plane": true
+      }
+    }
+  },
+  "military_carbine": {
+    "sha256": "189ed386f00cd5cacdf15a625dd14b5353ae841a17eed530b5b9ab8cb961056f",
+    "elements": 32,
+    "right_hand_view_z": [
+      -1.2264,
+      -0.4808
+    ],
+    "screen_bounds_960x540_fov70": [
+      586.2,
+      391.9,
+      808.8,
+      636.4
+    ],
+    "paired_models_byte_equal": true,
+    "json_geometry_texture_checks": "PASS",
+    "both_hands_peak_pose_checks": {
+      "right_rest": {
+        "view_z": [
+          -1.2264,
+          -0.4808
+        ],
+        "outside_camera_near_plane": true
+      },
+      "right_shot_peak": {
+        "view_z": [
+          -1.1548,
+          -0.4116
+        ],
+        "outside_camera_near_plane": true
+      },
+      "right_reload_peak": {
+        "view_z": [
+          -1.2165,
+          -0.4706
+        ],
+        "outside_camera_near_plane": true
+      },
+      "left_rest": {
+        "view_z": [
+          -1.2264,
+          -0.4808
+        ],
+        "outside_camera_near_plane": true
+      },
+      "left_shot_peak": {
+        "view_z": [
+          -1.1548,
+          -0.4116
+        ],
+        "outside_camera_near_plane": true
+      },
+      "left_reload_peak": {
+        "view_z": [
+          -1.2165,
+          -0.4706
+        ],
+        "outside_camera_near_plane": true
+      }
+    }
+  },
+  "military_machine_gun": {
+    "sha256": "600a120c5134c95c95d35e6487c22c6886fb8fb1b71ed7ebdd6f2fc9fc65a0d8",
+    "elements": 36,
+    "right_hand_view_z": [
+      -1.3962,
+      -0.4808
+    ],
+    "screen_bounds_960x540_fov70": [
+      573.3,
+      383.0,
+      808.8,
+      636.4
+    ],
+    "paired_models_byte_equal": true,
+    "json_geometry_texture_checks": "PASS",
+    "both_hands_peak_pose_checks": {
+      "right_rest": {
+        "view_z": [
+          -1.3962,
+          -0.4808
+        ],
+        "outside_camera_near_plane": true
+      },
+      "right_shot_peak": {
+        "view_z": [
+          -1.3247,
+          -0.4116
+        ],
+        "outside_camera_near_plane": true
+      },
+      "right_reload_peak": {
+        "view_z": [
+          -1.3858,
+          -0.4706
+        ],
+        "outside_camera_near_plane": true
+      },
+      "left_rest": {
+        "view_z": [
+          -1.3962,
+          -0.4808
+        ],
+        "outside_camera_near_plane": true
+      },
+      "left_shot_peak": {
+        "view_z": [
+          -1.3247,
+          -0.4116
+        ],
+        "outside_camera_near_plane": true
+      },
+      "left_reload_peak": {
+        "view_z": [
+          -1.3858,
+          -0.4706
+        ],
+        "outside_camera_near_plane": true
+      }
+    }
+  },
+  "grenade_launcher": {
+    "sha256": "b8ac8ae9fe91c1803710ca2bc196e27692f2917126add34e0ab9cfbc82d60ea2",
+    "elements": 25,
+    "right_hand_view_z": [
+      -1.231,
+      -0.5004
+    ],
+    "screen_bounds_960x540_fov70": [
+      577.0,
+      391.5,
+      794.0,
+      621.2
+    ],
+    "paired_models_byte_equal": true,
+    "json_geometry_texture_checks": "PASS",
+    "both_hands_peak_pose_checks": {
+      "right_rest": {
+        "view_z": [
+          -1.231,
+          -0.5004
+        ],
+        "outside_camera_near_plane": true
+      },
+      "right_shot_peak": {
+        "view_z": [
+          -1.1598,
+          -0.4312
+        ],
+        "outside_camera_near_plane": true
+      },
+      "right_reload_peak": {
+        "view_z": [
+          -1.2246,
+          -0.4904
+        ],
+        "outside_camera_near_plane": true
+      },
+      "left_rest": {
+        "view_z": [
+          -1.231,
+          -0.5004
+        ],
+        "outside_camera_near_plane": true
+      },
+      "left_shot_peak": {
+        "view_z": [
+          -1.1598,
+          -0.4312
+        ],
+        "outside_camera_near_plane": true
+      },
+      "left_reload_peak": {
+        "view_z": [
+          -1.2246,
+          -0.4904
+        ],
+        "outside_camera_near_plane": true
+      }
+    }
+  },
+  "rocket_launcher": {
+    "sha256": "64f1801677d62cf924d348a8b9662102f351aa1b698b10125570b6434e093d75",
+    "elements": 20,
+    "right_hand_view_z": [
+      -1.215,
+      -0.5318
+    ],
+    "screen_bounds_960x540_fov70": [
+      578.0,
+      386.4,
+      780.3,
+      595.2
+    ],
+    "paired_models_byte_equal": true,
+    "json_geometry_texture_checks": "PASS",
+    "both_hands_peak_pose_checks": {
+      "right_rest": {
+        "view_z": [
+          -1.215,
+          -0.5318
+        ],
+        "outside_camera_near_plane": true
+      },
+      "right_shot_peak": {
+        "view_z": [
+          -1.1427,
+          -0.4615
+        ],
+        "outside_camera_near_plane": true
+      },
+      "right_reload_peak": {
+        "view_z": [
+          -1.2067,
+          -0.52
+        ],
+        "outside_camera_near_plane": true
+      },
+      "left_rest": {
+        "view_z": [
+          -1.215,
+          -0.5318
+        ],
+        "outside_camera_near_plane": true
+      },
+      "left_shot_peak": {
+        "view_z": [
+          -1.1427,
+          -0.4615
+        ],
+        "outside_camera_near_plane": true
+      },
+      "left_reload_peak": {
+        "view_z": [
+          -1.2067,
+          -0.52
+        ],
+        "outside_camera_near_plane": true
+      }
+    }
+  },
+  "missile_launcher": {
+    "sha256": "b287226a9de7203ca4bcc08d1bc38fd3509842bcad158b97e950ea9ff4995279",
+    "elements": 22,
+    "right_hand_view_z": [
+      -1.2861,
+      -0.5318
+    ],
+    "screen_bounds_960x540_fov70": [
+      572.6,
+      380.9,
+      780.3,
+      595.2
+    ],
+    "paired_models_byte_equal": true,
+    "json_geometry_texture_checks": "PASS",
+    "both_hands_peak_pose_checks": {
+      "right_rest": {
+        "view_z": [
+          -1.2861,
+          -0.5318
+        ],
+        "outside_camera_near_plane": true
+      },
+      "right_shot_peak": {
+        "view_z": [
+          -1.2139,
+          -0.4615
+        ],
+        "outside_camera_near_plane": true
+      },
+      "right_reload_peak": {
+        "view_z": [
+          -1.2777,
+          -0.52
+        ],
+        "outside_camera_near_plane": true
+      },
+      "left_rest": {
+        "view_z": [
+          -1.2861,
+          -0.5318
+        ],
+        "outside_camera_near_plane": true
+      },
+      "left_shot_peak": {
+        "view_z": [
+          -1.2139,
+          -0.4615
+        ],
+        "outside_camera_near_plane": true
+      },
+      "left_reload_peak": {
+        "view_z": [
+          -1.2777,
+          -0.52
+        ],
+        "outside_camera_near_plane": true
+      }
+    }
+  },
+  "thermobaric_launcher": {
+    "sha256": "3166e0a436f5e49e1e407720a76c69eb8ea7b14c4575718b22ae6d75e25caaf6",
+    "elements": 22,
+    "right_hand_view_z": [
+      -1.1438,
+      -0.5318
+    ],
+    "screen_bounds_960x540_fov70": [
+      584.1,
+      392.5,
+      780.3,
+      595.2
+    ],
+    "paired_models_byte_equal": true,
+    "json_geometry_texture_checks": "PASS",
+    "both_hands_peak_pose_checks": {
+      "right_rest": {
+        "view_z": [
+          -1.1438,
+          -0.5318
+        ],
+        "outside_camera_near_plane": true
+      },
+      "right_shot_peak": {
+        "view_z": [
+          -1.0714,
+          -0.4615
+        ],
+        "outside_camera_near_plane": true
+      },
+      "right_reload_peak": {
+        "view_z": [
+          -1.1357,
+          -0.52
+        ],
+        "outside_camera_near_plane": true
+      },
+      "left_rest": {
+        "view_z": [
+          -1.1438,
+          -0.5318
+        ],
+        "outside_camera_near_plane": true
+      },
+      "left_shot_peak": {
+        "view_z": [
+          -1.0714,
+          -0.4615
+        ],
+        "outside_camera_near_plane": true
+      },
+      "left_reload_peak": {
+        "view_z": [
+          -1.1357,
+          -0.52
+        ],
+        "outside_camera_near_plane": true
+      }
+    }
+  },
+  "infection_launcher": {
+    "sha256": "ffa2c1b0aa4b248f541ab1621665ab4acea00ad22b8601e5adf77f58c09e8537",
+    "elements": 22,
+    "right_hand_view_z": [
+      -1.1438,
+      -0.5318
+    ],
+    "screen_bounds_960x540_fov70": [
+      584.1,
+      392.5,
+      780.3,
+      595.2
+    ],
+    "paired_models_byte_equal": true,
+    "json_geometry_texture_checks": "PASS",
+    "both_hands_peak_pose_checks": {
+      "right_rest": {
+        "view_z": [
+          -1.1438,
+          -0.5318
+        ],
+        "outside_camera_near_plane": true
+      },
+      "right_shot_peak": {
+        "view_z": [
+          -1.0714,
+          -0.4615
+        ],
+        "outside_camera_near_plane": true
+      },
+      "right_reload_peak": {
+        "view_z": [
+          -1.1357,
+          -0.52
+        ],
+        "outside_camera_near_plane": true
+      },
+      "left_rest": {
+        "view_z": [
+          -1.1438,
+          -0.5318
+        ],
+        "outside_camera_near_plane": true
+      },
+      "left_shot_peak": {
+        "view_z": [
+          -1.0714,
+          -0.4615
+        ],
+        "outside_camera_near_plane": true
+      },
+      "left_reload_peak": {
+        "view_z": [
+          -1.1357,
+          -0.52
+        ],
+        "outside_camera_near_plane": true
+      }
+    }
+  }
+}
