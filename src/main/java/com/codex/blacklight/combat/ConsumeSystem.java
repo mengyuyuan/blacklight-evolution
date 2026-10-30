@@ -34,7 +34,7 @@ public final class ConsumeSystem {
     private static final class Session {
         final Mob victim; final PowerForm form; final float heal; final int biomass, ep; final boolean large; float facing;
         final com.codex.blacklight.power.AssimilationSystem.Yield reward;
-        Vec3 start,lastPosition,consumeTargetStart; int started, stage=ConsumeVisual.CAPTURE,stuckTicks;double pullSpeed;boolean releaseLogged,consumeQueued;
+        Vec3 start,lastPosition,consumeTargetStart; int started, stage=ConsumeVisual.CAPTURE,stuckTicks,variant;double pullSpeed;boolean releaseLogged,consumeQueued;
         Session(Mob v, ServerPlayer p, PowerForm f) {
             victim=v; form=f; start=p.position(); started=p.tickCount; large=ConsumeSequence.large(v); facing=p.getYRot();
             reward=com.codex.blacklight.power.AssimilationSystem.quote(p,v);
@@ -43,8 +43,8 @@ public final class ConsumeSystem {
         Mob victim(){return victim;} PowerForm form(){return form;}
         Vec3 start(){return start;} int started(){return started;}
         PowerForm animationForm(){return stage==ConsumeVisual.HUNTER_CONSUME?PowerForm.NONE:form;}
-        int duration(){return stage==ConsumeVisual.HUNTER_CONSUME?HunterConsume.ACTOR_TICKS:ConsumeSequence.duration(animationForm(),large);}
-        int completionTick(){return stage==ConsumeVisual.HUNTER_CONSUME?HunterConsume.COMPLETE_TICKS:ConsumeSequence.completionTick(animationForm(),large);}
+        int duration(){return stage==ConsumeVisual.HUNTER_CONSUME?HunterConsume.ACTOR_TICKS:ConsumeSequence.duration(animationForm(),large,variant);}
+        int completionTick(){return stage==ConsumeVisual.HUNTER_CONSUME?HunterConsume.COMPLETE_TICKS:ConsumeSequence.completionTick(animationForm(),large,variant);}
         boolean committed(){return ConsumeVisual.consumeStage(stage);}
         float heal(){return heal;} int biomass(){return biomass;} int ep(){return ep;}
     }
@@ -57,7 +57,7 @@ public final class ConsumeSystem {
     private static void phase(ServerPlayer p,Session s,int stage,int offset) {
         s.stage=stage;s.started=p.tickCount-offset;s.start=p.position();
         int duration=stage==ConsumeVisual.MOUNT?40:stage==ConsumeVisual.WHIP_PULL?100:stage==ConsumeVisual.CAPTURE?ConsumeVisual.captureDuration(s.form):stage==ConsumeVisual.THROW?14:s.duration();
-        s.victim.setData(ModAttachments.CONSUME_VISUAL,new ConsumeVisual(p.getId(),p.level().getGameTime()-offset,duration,s.animationForm().ordinal(),stage,s.facing,s.start));
+        s.victim.setData(ModAttachments.CONSUME_VISUAL,new ConsumeVisual(p.getId(),p.level().getGameTime()-offset,duration,s.animationForm().ordinal(),stage,s.facing,s.start,s.variant));
         s.victim.syncData(ModAttachments.CONSUME_VISUAL);
         p.setData(ModAttachments.GRAB_STAGE,stage);p.syncData(ModAttachments.GRAB_STAGE);
         ConsumeControl.releaseControls(p);ConsumeControl.releaseControls(s.victim);
@@ -76,9 +76,12 @@ public final class ConsumeSystem {
         if (!healthReady(player,s.victim)) { message(player,"consume_weaken"); return; }
         s.facing=player.getYRot();
         s.consumeTargetStart=s.victim.position();
+        s.variant=ConsumeVariant.choose(s.form,s.large,player.getRandom());
         phase(player,s,s.victim instanceof BlacklightHunter?ConsumeVisual.HUNTER_CONSUME:s.large?ConsumeVisual.MOUNT_CONSUME:ConsumeVisual.CONSUME);
-        play(player,s.large?PlayerAction.consumeLarge(s.animationForm()):PlayerAction.consume(s.form));
-        com.codex.blacklight.BlacklightNeoMod.LOGGER.info("Consume scene started: form={} target={} large={} clip={} duration={} origin={}",s.form,s.victim.getType(),s.large,ConsumeSequence.clipKey(s.animationForm(),s.large),s.duration(),s.start);
+        if(!s.large&&ConsumeVariant.alternatives(s.form))
+            PlayerActions.get().playVisual(player,"consume_"+ConsumeSequence.clipKey(s.animationForm(),false,s.variant)+"_actor",0);
+        else play(player,s.large?PlayerAction.consumeLarge(s.animationForm()):PlayerAction.consume(s.form));
+        com.codex.blacklight.BlacklightNeoMod.LOGGER.info("Consume scene started: form={} target={} large={} clip={} duration={} origin={}",s.form,s.victim.getType(),s.large,ConsumeSequence.clipKey(s.animationForm(),s.large,s.variant),s.duration(),s.start);
     }
     /** E again or primary attack starts a throw; release is synchronized to the arm swing. */
     public static void throwTarget(ServerPlayer player) {
@@ -394,14 +397,14 @@ public final class ConsumeSystem {
     }
     private static void pairedPlacement(ServerPlayer player,Session session,int elapsed) {
         Mob target=session.victim;
-        float t=ConsumeSequence.motionProgress(session.form,elapsed/(float)session.duration(),session.duration(),false);
-        Vec3 actorGoal=ConsumePlacementTrack.actorAnchor(session.start,session.facing,session.form,t,false);
+        float t=ConsumeSequence.motionProgress(session.form,elapsed/(float)session.duration(),session.duration(),false,session.variant);
+        Vec3 actorGoal=ConsumePlacementTrack.actorAnchor(session.start,session.facing,session.form,t,false,session.variant);
         Vec3 before=player.position(),actorDelta=actorGoal.subtract(before);
         player.move(MoverType.SELF,actorDelta.length()>.8?actorDelta.normalize().scale(.8):actorDelta);
         player.fallDistance=0;player.setDeltaMovement(Vec3.ZERO);
         if(before.distanceToSqr(player.position())>.000001)player.connection.teleport(player.getX(),player.getY(),player.getZ(),session.facing,player.getXRot());
-        Vec3 goal=ConsumePlacementTrack.anchor(session.start,session.facing,target,session.form,t).orElse(session.consumeTargetStart==null?target.position():session.consumeTargetStart);
-        if(ConsumePlacementTrack.headGrip(session.form)&&t<ConsumePlacementTrack.gripEnd(session.form))
+        Vec3 goal=ConsumePlacementTrack.anchor(session.start,session.facing,target,session.form,t,session.variant).orElse(session.consumeTargetStart==null?target.position():session.consumeTargetStart);
+        if(ConsumePlacementTrack.headGrip(session.form,session.variant)&&t<ConsumePlacementTrack.gripEnd(session.form))
             goal=goal.add(player.position().subtract(actorGoal));
         Vec3 delta=goal.subtract(target.position());
         target.move(MoverType.SELF,delta.length()>1.25?delta.normalize().scale(1.25):delta);
@@ -417,7 +420,7 @@ public final class ConsumeSystem {
         PowerForm animationForm=session.animationForm();
         // Hunter camera-shake cue is at 1.2 s; sound/particles are Minecraft equivalents.
         int contact=session.stage==ConsumeVisual.HUNTER_CONSUME?24:Math.round(session.duration()*ConsumeSequence.contact(animationForm,session.large))-1;
-        var receiverScene=ConsumeReceiverScene.profile(animationForm,session.large);
+        var receiverScene=ConsumeReceiverScene.profile(animationForm,session.large,session.variant);
         Vec3 point=ConsumeSequence.contact(session.victim);
         if(receiverScene!=null?receiverScene.impactAt(elapsed):elapsed==contact) {
             boolean hammer=animationForm==PowerForm.HAMMERFISTS;

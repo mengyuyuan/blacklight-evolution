@@ -157,6 +157,14 @@ public final class ConsumeVictimPose {
         var contact=large?null:com.codex.blacklight.combat.ConsumePlacementTrack.contactFrame(GrappleMotion.sceneKey(entity,visual),GrappleMotion.receiverProgress(entity,visual,partial)).orElse(null);
         if(model instanceof HumanoidModel<?> h) {
             projectHumanoid(h,saved,frame,contact,large);
+            if(!large&&visual.form()==PowerForm.WHIPFIST.ordinal()
+                    &&visual.variant()==com.codex.blacklight.combat.ConsumeVariant.CLASSIC) {
+                var scene=com.codex.blacklight.combat.ConsumeReceiverScene.profile(PowerForm.WHIPFIST,false,visual.variant());
+                float seconds=(entity.level().getGameTime()-visual.started()+partial)/20F;
+                float hanging=Math.clamp((seconds-.08F)/.20F,0,1)
+                        *(1-Math.clamp((seconds-scene.effectSeconds())/.4F,0,1));
+                dangleHumanoid(h,saved,seconds,hanging);
+            }
             ReceiverPoseDiagnostics.record(entity,model,GrappleMotion.sceneKey(entity,visual),large?5:7);return true;
         }
         int bound=ReceiverModelPose.apply(model,saved,frame,
@@ -190,6 +198,38 @@ public final class ConsumeVictimPose {
         position(saved,h.leftLeg,linked.leftLeg().add(shift),h.young,false);
         if(h instanceof PlayerModel<?> player) {
             copyPart(saved,player.jacket,h.body);copyPart(saved,player.rightSleeve,h.rightArm);copyPart(saved,player.leftSleeve,h.leftArm);
+            copyPart(saved,player.rightPants,h.rightLeg);copyPart(saved,player.leftPants,h.leftLeg);
+        }
+        // Segmented receivers have actual elbow/knee children. Clearing their
+        // locomotion without applying these joints left the captured body rigid.
+        projectSegment(saved,h.rightArm,"forearm",frame,7);
+        projectSegment(saved,h.leftArm,"forearm",frame,8);
+        if(!large){projectSegment(saved,h.rightLeg,"shin",frame,9);projectSegment(saved,h.leftLeg,"shin",frame,10);}
+    }
+    private static void projectSegment(Map<ModelPart,PartPose> saved,ModelPart parent,String childName,double[] frame,int lower) {
+        if(!parent.hasChild(childName))return;
+        var child=parent.getChild(childName);saved.putIfAbsent(child,child.storePose());
+        var bind=child.getInitialPose();var parentBind=parent.getInitialPose();
+        var desired=com.codex.blacklight.combat.ConsumePlacementTrack.quaternion(frame,7+lower*4)
+                .mul(new org.joml.Quaternionf().rotationZYX(parentBind.zRot,parentBind.yRot,parentBind.xRot))
+                .mul(new org.joml.Quaternionf().rotationZYX(bind.zRot,bind.yRot,bind.xRot));
+        var angles=rotation(parent).invert().mul(desired).getEulerAnglesZYX(new org.joml.Vector3f());
+        child.xRot=angles.x;child.yRot=angles.y;child.zRot=angles.z;
+    }
+    /** Minecraft suspended-body follow-through for the old lash's near-straight
+     * receiver interval. Contact/root placement and the authored torso stay intact. */
+    static void dangleHumanoid(HumanoidModel<?> h,Map<ModelPart,PartPose> saved,float seconds,float weight) {
+        if(weight<=0)return;
+        float lag=(float)Math.sin(seconds*4.1F),other=(float)Math.sin(seconds*4.1F+1.8F);
+        rotate(saved,h.rightLeg,(-.55F+lag*.12F)*weight,-.05F*weight,.10F*weight);
+        rotate(saved,h.leftLeg,(-.22F+other*.13F)*weight,.05F*weight,-.10F*weight);
+        for(int i=0;i<2;i++) {
+            var leg=i==0?h.rightLeg:h.leftLeg;
+            if(leg.hasChild("shin"))rotate(saved,leg.getChild("shin"),((i==0?.95F:.72F)+(i==0?lag:other)*.18F)*weight,0,0);
+            var arm=i==0?h.rightArm:h.leftArm;
+            if(arm.hasChild("forearm"))rotate(saved,arm.getChild("forearm"),-(.25F+(i==0?other:lag)*.10F)*weight,0,0);
+        }
+        if(h instanceof PlayerModel<?> player) {
             copyPart(saved,player.rightPants,h.rightLeg);copyPart(saved,player.leftPants,h.leftLeg);
         }
     }

@@ -16,31 +16,49 @@ public final class ConsumeSequence {
         };
     }
     public static int duration(PowerForm form,boolean large) {
-        int animation=LocalVisualMotion.find("consume_"+clipKey(form,large)+"_actor")
+        return duration(form,large,ConsumeVariant.DEFAULT);
+    }
+    public static int duration(PowerForm form,boolean large,int variant) {
+        int animation=LocalVisualMotion.find("consume_"+clipKey(form,large,variant)+"_actor")
                 .map(LocalVisualMotion.Definition::durationTicks).orElse(large?100:ConsumeVisual.legacyDuration(form));
-        var scene=ConsumeReceiverScene.profile(form,large);
+        var scene=ConsumeReceiverScene.profile(form,large,variant);
         return scene==null?animation:Math.max(animation,(int)Math.ceil((scene.finishSeconds()+.10F)*20));
     }
     /** Minecraft choreography: finish the return flow before the actor's recovery tail.
      * This is not a recovered Prototype completion event. */
     public static float completion(PowerForm form,boolean large) {
-        var scene=ConsumeReceiverScene.profile(form,large);
-        if(scene!=null)return scene.finishSeconds()*20/duration(form,large);
+        return completion(form,large,ConsumeVariant.DEFAULT);
+    }
+    public static float completion(PowerForm form,boolean large,int variant) {
+        var scene=ConsumeReceiverScene.profile(form,large,variant);
+        if(scene!=null)return scene.finishSeconds()*20/duration(form,large,variant);
         return Math.max(.88F,contact(form,large)+.12F);
     }
     public static int completionTick(PowerForm form,boolean large) {
-        var scene=ConsumeReceiverScene.profile(form,large);
-        if(scene!=null)return Math.min(duration(form,large)-1,(int)Math.ceil(scene.finishSeconds()*20-.0001F));
-        return Math.min(duration(form,large)-1,(int)Math.ceil(duration(form,large)*completion(form,large)));
+        return completionTick(form,large,ConsumeVariant.DEFAULT);
+    }
+    public static int completionTick(PowerForm form,boolean large,int variant) {
+        var scene=ConsumeReceiverScene.profile(form,large,variant);
+        if(scene!=null)return Math.min(duration(form,large,variant)-1,(int)Math.ceil(scene.finishSeconds()*20-.0001F));
+        return Math.min(duration(form,large,variant)-1,(int)Math.ceil(duration(form,large,variant)*completion(form,large,variant)));
     }
     public static boolean paired(PowerForm form,boolean large) {
-        String prefix="consume_"+clipKey(form,large);
+        return paired(form,large,ConsumeVariant.DEFAULT);
+    }
+    public static boolean paired(PowerForm form,boolean large,int variant) {
+        String prefix="consume_"+clipKey(form,large,variant);
         return LocalVisualMotion.find(prefix+"_actor").isPresent()&&LocalVisualMotion.find(prefix+"_victim").isPresent();
     }
     public static String clipKey(PowerForm form,boolean large) {
         if(!large)return key(form);
         return switch(form){case HAMMERFISTS->"large_hammer";case MUSCLE_MASS->"large_muscle";case WHIPFIST->"large_whip";case CLAWS->"large_claws";case BLADE->"blade";default->"large";};
     }
+    public static String key(PowerForm form,int variant) {
+        if(ConsumeVariant.normalize(form,variant)==ConsumeVariant.CLASSIC)
+            return form==PowerForm.CLAWS?"claws_head":"whip_lash";
+        return key(form);
+    }
+    public static String clipKey(PowerForm form,boolean large,int variant){return large?clipKey(form,true):key(form,variant);}
     public static float contact(PowerForm form,boolean large){return large?switch(form){case HAMMERFISTS->.42F;case WHIPFIST->.36F;case NONE->.38F;default->strike(form);}:strike(form);}
     /** Receiver release markers are Minecraft adaptation cues, not recovered original event metadata. */
     public static float release(PowerForm form){return switch(form){case HAMMERFISTS->.32F;case WHIPFIST->.20F;case BLADE->.47F;case MUSCLE_MASS->.49F;case CLAWS->.48F;default->.43F;};}
@@ -104,22 +122,31 @@ public final class ConsumeSequence {
     }
     /** Both participants and the contact solver pause together for two ticks at impact. */
     public static float motionProgress(PowerForm form,float t,int duration,boolean large) {
+        return motionProgress(form,t,duration,large,ConsumeVariant.DEFAULT);
+    }
+    public static float motionProgress(PowerForm form,float t,int duration,boolean large,int variant) {
         // Source event profiles run in seconds. Extending an effect tail must not
         // stretch the paired skeleton clips or replay their final motion.
-        if(ConsumeReceiverScene.profile(form,large)!=null)
-            return Math.clamp(t*duration/(20*ConsumeReceiverScene.clipSeconds(form)),0,1);
+        if(ConsumeReceiverScene.profile(form,large,variant)!=null)
+            return Math.clamp(t*duration/(20*ConsumeReceiverScene.clipSeconds(form,variant)),0,1);
         float strike=contact(form,large),half=1F/Math.max(20,duration),a=strike-half,b=strike+half;
         return t<a?t*strike/a:t<=b?strike:strike+(t-b)*(1-strike)/(1-b);
     }
     /** spawnGib inherits one posed body, rather than a live receiver skeleton. */
     public static float splitSeconds(PowerForm form,boolean large){
+        return splitSeconds(form,large,ConsumeVariant.DEFAULT);
+    }
+    public static float splitSeconds(PowerForm form,boolean large,int variant){
         if(large)return Float.NaN;
-        var scene=ConsumeReceiverScene.profile(form,false);
+        var scene=ConsumeReceiverScene.profile(form,false,variant);
         if(scene!=null&&(scene.style().equals("SEVER")||scene.style().equals("ARM_RIP")))return scene.deformSeconds();
         return form==PowerForm.BLADE?.833333F:Float.NaN;
     }
     public static float receiverProgress(PowerForm form,float progress,boolean large){
-        float cut=splitSeconds(form,large);
-        return Float.isFinite(cut)?Math.min(progress,cut/ConsumeReceiverScene.clipSeconds(form)):progress;
+        return receiverProgress(form,progress,large,ConsumeVariant.DEFAULT);
+    }
+    public static float receiverProgress(PowerForm form,float progress,boolean large,int variant){
+        float cut=splitSeconds(form,large,variant);
+        return Float.isFinite(cut)?Math.min(progress,cut/ConsumeReceiverScene.clipSeconds(form,variant)):progress;
     }
 }

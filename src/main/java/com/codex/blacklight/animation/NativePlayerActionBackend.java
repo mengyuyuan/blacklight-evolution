@@ -11,6 +11,9 @@ import net.neoforged.neoforge.event.tick.PlayerTickEvent;
 
 /** Independent server animation authority. It never delegates movement or combat to another mod. */
 public final class NativePlayerActionBackend implements PlayerActionBackend {
+    @Override public void playVisual(ServerPlayer player,String clipId,float transitionSeconds) {
+        publish(player,MotionLibrary.canonical(clipId),Math.max(0,transitionSeconds),0,false);
+    }
     @Override public void play(ServerPlayer player, PlayerAction action, float transitionSeconds) {
         if (action == null) return;
         String id = MotionLibrary.resolve(action);
