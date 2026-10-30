@@ -25,3 +25,13 @@ The full NeoForge JVM suite completed with 1,104 tests, zero failures/errors/ski
 
 The hive reentry test now waits for actual entity ticking and a legal shared population slot while retaining all reentry, material and single-birth assertions. Its fixture restores state on GameTest pass/failure as well as explicit cleanup; diagnostic output records the exact active/difficulty/spawning/sanctuary/population budgets when birth is blocked. This is test isolation/diagnostic work, not a claimed production fix. The changed test compiles; repeated actual-server and CI verification remain pending.
 
+## 最新本机重复结果
+
+`neo-closeout-r9.log`：526 项实际服务端必测通过，BUILD SUCCESSFUL。测试使用另一份全新临时世界与 2 GB 游戏堆；仍保留此前失败记录，最终成品和兼容组合尚未验收。
+
+多次重复定位到测试环境的具体差异：GameTestServer 不执行正常 50 ms tick 等待，异步实体存储尚未读取时可能已耗尽 600 tick。往返测试现在独立分批，只在 sprinting GameTestServer 上给予正常 tick 的墙钟时间，保留实际区块／实体就绪、坐标、返回记录和九头蛇动画断言。建筑 fixture 等待实际实体更新时也给予同样的 I/O 时间，并在失败时释放状态与票据。生产传送不跳过实体存储检查；仅增加只读诊断。
+
+城市组件测试的旧场景可留下真实感染体并占满绿区名额。仅在一次性 GameTestServer 中重置组件测试的城市生物场景，密度回归仍自己加入真实居民／感染体检查双预算、拒绝和回调。普通独立或联机存档不会执行该清理。蝙蝠起飞测试改为给真实战斗 AI 一个可见、静止的空中目标，保留实际位移与无重力断言，避免把合法的随机水平／下降漫游误判为不会起飞。
+
+Forge 完整运行时 checkpoint `e818b46c` 的 1,118 项 JVM 测试通过；草稿 PR #97 仍等待实际 Minecraft 验收，不以单元测试代替可玩证明。
+

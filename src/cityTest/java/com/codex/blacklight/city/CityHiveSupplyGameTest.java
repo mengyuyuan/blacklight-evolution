@@ -51,6 +51,14 @@ public final class CityHiveSupplyGameTest {
         boolean closed;
         Fixture(GameTestHelper helper){
             h=helper;level=h.getLevel().getServer().getLevel(CityTravel.WORLD);if(level==null)throw new AssertionError("the real blacklight world dimension is missing");
+            // This opt-in component fixture needs a known empty population scene.
+            // Earlier whole-world tests may legitimately create city residents.
+            // Reset only the disposable sprinting GameTest server, never a live
+            // integrated/dedicated world. Density tests add their real actors below.
+            if(level.getServer() instanceof GameTestServer){
+                var previous=new java.util.ArrayList<Mob>();for(var entity:level.getAllEntities())if(entity instanceof Mob mob)previous.add(mob);
+                previous.forEach(Mob::discard);
+            }
             for(var e:level.getAllEntities())originalEntities.add(e.getId());old=CityData.get(level);data=new CityData();data.population=true;data.populatedMask=-1;data.spread=false;data.facade=false;data.destroyedMask=2;level.getDataStorage().set("blacklight_city",data);
             outbreak=OutbreakData.get(level.getServer());var active=new OutbreakData();active.start(level.getServer().overworld().getGameTime());level.getServer().overworld().getDataStorage().set("blacklight_outbreak",active);
             spawning=level.getGameRules().getBoolean(GameRules.RULE_DOMOBSPAWNING);grief=level.getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING);enabled=OutbreakConfig.ENABLED.get();citySpawns=CityConfig.SPAWNS.get();difficulty=level.getDifficulty();

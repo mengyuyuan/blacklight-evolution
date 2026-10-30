@@ -74,7 +74,7 @@ public final class DistrictZoneGameTest {
             var cp=new net.minecraft.world.level.ChunkPos((p.getX()>>4)+x,(p.getZ()>>4)+z);
             if(!f.level.getForcedChunks().contains(cp.toLong())){f.forced.add(cp);f.level.setChunkForced(cp.x,cp.z,true);}f.level.getChunk(cp.x,cp.z);
         }
-        h.startSequence().thenWaitUntil(()->h.assertTrue(f.level.isPositionEntityTicking(left)&&f.level.isPositionEntityTicking(right),"waiting for the two actual occupied frontier chunks"))
+        h.startSequence().thenWaitUntil(()->h.assertTrue(f.occupied(left,right),"waiting for the two actual occupied frontier chunks"))
           .thenExecute(()->{
             OutbreakConfig.INTERVAL.set(24000);
             for(int i=0;i<2;i++){var host=ModEntities.INFECTED_HOST.get().create(f.level);host.setPos(left.east(i*2).getBottomCenter());host.inherit(EntityType.PIG.create(f.level));host.advanceTissue(48000);host.setNoAi(true);host.setNoGravity(true);f.level.addFreshEntity(host);f.born.add(host);}
