@@ -69,6 +69,12 @@ public final class CityHiveSupplyGameTest {
             net.neoforged.neoforge.common.NeoForge.EVENT_BUS.unregister(CitySystem.class);
             observer=FakePlayerFactory.get(level,new GameProfile(UUID.randomUUID(),"CitySupplyObserver"));observer.setGameMode(net.minecraft.world.level.GameType.SPECTATOR);observer.setPos(port(0).getCenter().add(0,8,0));level.addNewPlayer(observer);
             player=FakePlayerFactory.get(level,new GameProfile(UUID.fromString("22ad1749-c8c4-4b7c-a80e-3856e323acbe"),"CitySupplyQA"));player.getAbilities().instabuild=false;face(0);
+            h.testInfo.addListener(new GameTestListener(){
+                public void testStructureLoaded(GameTestInfo info){}
+                public void testPassed(GameTestInfo info,GameTestRunner runner){close();}
+                public void testFailed(GameTestInfo info,GameTestRunner runner){close();}
+                public void testAddedForRerun(GameTestInfo original,GameTestInfo retry,GameTestRunner runner){}
+            });
         }
         BlockPos port(int i){return CitySystem.port(level,0,i);}
         BlockPos outside(int i){var p=port(i);return p.relative(level.getBlockState(p).getValue(CityHatchBlock.FACING),3).below();}
@@ -77,6 +83,16 @@ public final class CityHiveSupplyGameTest {
         ColonySupply stock(){return data.hiveSupply[0];}
         boolean feed(ItemStack stack){face(0);player.setItemInHand(InteractionHand.MAIN_HAND,stack);return CityHiveSupply.feed(level,port(0),player,InteractionHand.MAIN_HAND);}
         void tick(){CityHiveSupply.tick(level,data,0);}
+        String birthStatus(){
+            int total=0,infected=0,local=0;var area=new AABB(outside(0)).inflate(96);
+            for(var e:level.getAllEntities())if(e instanceof Mob mob&&mob.isAlive()){
+                total++;if(BlacklightInfectionSystem.isInfected(mob)){infected++;if(mob.getBoundingBox().intersects(area))local++;}
+            }
+            return "active="+WorldOutbreakSystem.active(level)+" difficulty="+level.getDifficulty()+" spawning="+level.getGameRules().getBoolean(GameRules.RULE_DOMOBSPAWNING)
+                    +" sanctuary="+WorldOutbreakSystem.sanctuary(level,outside(0))+" citySpawns="+CityConfig.SPAWNS.get()+" population="+CityData.get(level).population
+                    +" total="+total+" infected="+infected+" dimensionCap="+OutbreakConfig.DIMENSION_CAP.get()+" residentCap="+CityConfig.MOB_LIMIT.get()
+                    +" local="+local+" localCap="+CityEcology.populationCap(level,outside(0))+" batch="+OutbreakConfig.BATCH.get();
+        }
         void schedule(int from,int through){for(int t=from;t<=through;t+=20)h.runAfterDelay(t,this::tick);}
         BlacklightInfectedHost carrier(){
             var host=ModEntities.INFECTED_HOST.get().create(level);long id=host.getId();host.setUUID(new UUID(id,id^42));host.inherit(EntityType.COW.create(level));var tag=new CompoundTag();host.saveWithoutId(tag);tag.getCompound("BlacklightHost").putString("NativeCore",TissueCore.VASCULAR.key());tag.putInt("BlacklightTissueNutrition",400);host.readAdditionalSaveData(tag);host.advanceTissue(216000);host.setHealth(host.getMaxHealth());host.setNoAi(false);host.getAttribute(Attributes.MOVEMENT_SPEED).setBaseValue(0);host.moveTo(outside(0).getBottomCenter(),0,0);host.setOnGround(true);level.addFreshEntity(host);return host;
@@ -139,8 +155,15 @@ public final class CityHiveSupplyGameTest {
     public static void aRealMatureCarrierTransfersItsOwnExistingNutritionIntoTheAuthoredHive(GameTestHelper h){var f=new Fixture(h);var carrier=new BlacklightInfectedHost[1];h.runAfterDelay(100,()->{carrier[0]=f.carrier();h.assertTrue(carrier[0].vascular().startAt(carrier[0],f.port(0)),"the mature living organ connects to an actual authored mouth");});h.runAfterDelay(118,()->{var c=carrier[0];int income=c.vascular().delivered();h.assertTrue(income>0&&f.stock().reserve()==income&&c.tissueNutrition()+income==398&&f.stock().queued()==0,"the one conserved gift enters the hive store rather than inventing a food portion or a parallel core");});h.runAfterDelay(148,()->{try{h.assertTrue(!carrier[0].vascular().active()&&f.stock().reserve()==carrier[0].vascular().delivered(),"the living duct retracts without replaying its committed gift");}finally{f.close();}h.succeed();});}
     @GameTest(template="wall_test",timeoutTicks=170,batch="city_supply_carrier_cut")
     public static void removingTheAuthoredMouthCancelsAnExtendingCarrierBeforeItCanPayADeadStore(GameTestHelper h){var f=new Fixture(h);var carrier=new BlacklightInfectedHost[1];h.runAfterDelay(100,()->{carrier[0]=f.carrier();h.assertTrue(carrier[0].vascular().startAt(carrier[0],f.port(0)),"the actual connection begins before the cut");});h.runAfterDelay(106,()->f.set(f.port(0),Blocks.AIR.defaultBlockState()));h.runAfterDelay(124,()->{try{h.assertTrue(!carrier[0].vascular().active()&&carrier[0].vascularVisual().isEmpty()&&f.stock().reserve()==0&&carrier[0].tissueNutrition()<=398,"a removed real mouth immediately invalidates transport and retracts without crediting a stale hive");}finally{f.close();}h.succeed();});}
-    @GameTest(template="wall_test",timeoutTicks=170,batch="city_supply_join_reentrant")
-    public static void anActualJoinCallbackCannotClaimTheSameHiveBroodThroughAnotherMouth(GameTestHelper h){var f=new Fixture(h);h.runAfterDelay(100,()->{
+    @GameTest(template="wall_test",timeoutTicks=400,batch="city_supply_join_reentrant")
+    public static void anActualJoinCallbackCannotClaimTheSameHiveBroodThroughAnotherMouth(GameTestHelper h){var f=new Fixture(h);h.startSequence().thenIdle(100).thenWaitUntil(()->{
+        // The shared dimension can still have birth tickets spent by the preceding
+        // batch, and forced chunks enter entity ticking asynchronously. This test
+        // exercises join reentry, so wait for a legal first birth without bypassing
+        // either production guard or weakening the callback/material assertions.
+        h.assertTrue(CityHiveSupply.live(f.level,f.data,CityHiveSupply.port(f.level,f.port(0))),"waiting for the actual hive mouth to enter entity ticking");
+        h.assertTrue(WorldOutbreakSystem.populationRoom(f.level,f.outside(0)),"waiting for a real shared population/birth slot: "+f.birthStatus());
+    }).thenExecute(()->{
         f.stock().receive(40);f.tick();f.data.hiveBroodTicks[0]=200;int before=f.stock().reserve();var callbacks=new int[1];var replay=new Mob[1];
         java.util.function.Consumer<net.neoforged.neoforge.event.entity.EntityJoinLevelEvent> callback=e->{if(e.getLevel()==f.level&&e.getEntity() instanceof com.codex.blacklight.entity.BlacklightCommonInfected){callbacks[0]++;replay[0]=CityHiveSupply.hatch(f.level,f.data,0,f.port(1),OutbreakRules.Tier.FRESH);}};
         net.neoforged.neoforge.common.NeoForge.EVENT_BUS.addListener(callback);

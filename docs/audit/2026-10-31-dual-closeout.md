@@ -19,3 +19,9 @@
 ## 仍需完成
 
 完整 Forge 功能、状态、网络、注册、渲染、城市和生态适配；双版本全量 JVM 与客户端／多人实际检查；网站 #26 所述精确 Epic Fight/BK 组合及相关可选模组回归；最终安装产物、动作完整性和依赖核对。Android FCL 设备行为不能由桌面客户端验收替代。
+# Additional validation and fixture diagnostics
+
+The full NeoForge JVM suite completed with 1,104 tests, zero failures/errors/skips. A fourth local combined server run did not reproduce the earlier clean 526-test result: nine tests failed, mostly paid city-hive births plus chunk-activation and travel waits. CI on `06ea95b8` separately failed the reentrant hive birth before the entity-join callback was reached. These results supersede any implication that one local clean run proves the full audit stable.
+
+The hive reentry test now waits for actual entity ticking and a legal shared population slot while retaining all reentry, material and single-birth assertions. Its fixture restores state on GameTest pass/failure as well as explicit cleanup; diagnostic output records the exact active/difficulty/spawning/sanctuary/population budgets when birth is blocked. This is test isolation/diagnostic work, not a claimed production fix. The changed test compiles; repeated actual-server and CI verification remain pending.
+
