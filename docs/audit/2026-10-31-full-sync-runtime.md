@@ -20,3 +20,28 @@ Forge's old vertex, block-use, SavedData and item-NBT APIs replace the 1.21 APIs
 The final reobfuscated jar-in-jar build, complete actual server regression, private client validation, multiplayer/optional-mod combinations and final packaged-resource verification are still pending. In particular, the vehicle collision override, full entity tick/damage boundaries, native species movement, updated consumption and actual mechanical-target damage must pass in Minecraft. The opt-in QA port is being compiled separately; a JVM pass alone does not establish these results.
 
 No user save or installed playable instance was replaced. Delivery will use E: folders, not desktop ZIPs. Android/FCL device testing has not been performed.
+
+
+## Actual runtime follow-up, 2026-10-31
+
+The earlier 1,118 JVM checks passed before these native-runtime corrections. That result is not an acceptance claim for the final package.
+
+- Forge launch exposed an ordinary saddle access interface inside the reserved Mixin package. It now lives outside that package; pig and strider accessor mixins implement the same interface.
+- XZ is both embedded for distribution and declared as a Minecraft library for userdev launches. Compiling with an implementation dependency alone did not make it available to Forge's game classloader.
+- Both dimension types retain the 1.20 UniformInt `value` envelope. A regression parses both files through the actual 1.20 DimensionType codec. The sample advancement also uses 1.20 item-predicate arrays.
+- Native 1.20 bowl foods, suspicious stew and honey bottles predate consumable remainder components. Their containers now use a shared version adapter; custom crafting remainder hooks retain precedence.
+- LivingBreatheEvent in 1.20 has a separate canRefillAir gate. Acquired gills and exposed tracheal vents now enable that gate when their paid physiology supplies a refill.
+- Ordinary infected-host melee preserves the bounded 1.21 attack box rather than the older width-squared Mob fallback. The existing tissue-strike controller is connected to the host tick again; an omitted call left the full implementation idle. Existing real organ windup/contact/grab/retraction tests exercise this path.
+- The full opt-in runtime suites and their test-only food/lifecycle/position adapters are reproducible through repository build flags. Default builds do not compile QA roots.
+- Forge's GameTest entry initially generated a normal overworld. The incomplete r6 run was interrupted during sustained chunk generation; its 47 observed failures and thread dump are retained externally. Fresh GameTest runs now explicitly prepare a disposable flat directory and reject an existing incompatible configuration without modifying it.
+- r7 is still running; it already passes the original bowl/vent/clone-fixture checks but has further unresolved failures. Several changes above were made after its classes loaded. Neither this document nor a Gradle exit code alone establishes final server/client/compatibility acceptance.
+
+The obsolete city transit recipe has been removed from source. The next normal resource build and final archive check must verify that no stale recipe remains. The legacy registry item stays available for save compatibility.
+### Actual Forge server round 7 follow-up
+
+The fresh flat server completed all 526 cases with 44 required failures (`forge-server-r7.log`); it is not accepted. The previous 1,118-test JVM pass predates these runtime corrections.
+
+The runtime failures exposed two further missed connections in the catch-up: `BuildingInfectionSystem` had not been registered on the Forge bus, and the host's existing `tickTissueStrike` had no caller. Both connections are restored. The consumption settlement also still called the obsolete second heal after `AssimilationSystem.settle(..., true)`; the extra call is removed and the existing exact-once reward checks are retained.
+
+The ecology frontier fixture now excludes its unrelated architectural core and restores its altered spawn interval on failure as well as success. Forge's different batch placement could put that core in the neighbour cell; its first assertion then left a 24,000-tick interval behind, contaminating later birth tests. The carrier fixture retains real AI navigation and allows its actual bounded search/approach/transfer phases to finish. No production readiness, nutrient, protection or population gate was bypassed. These changes require a new server run.
+

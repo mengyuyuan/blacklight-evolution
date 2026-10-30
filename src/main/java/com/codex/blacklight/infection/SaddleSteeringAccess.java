@@ -1,4 +1,4 @@
-package com.codex.blacklight.mixin;
+package com.codex.blacklight.infection;
 
 import net.minecraft.world.entity.ItemBasedSteering;
 

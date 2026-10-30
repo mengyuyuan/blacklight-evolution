@@ -8,7 +8,6 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.gametest.*;
 
 @GameTestHolder("blacklight") @PrefixGameTestTemplate(false)
@@ -16,7 +15,7 @@ public final class AttackMobilityGameTest {
     private static ServerPlayer player(GameTestHelper h,PowerForm form,boolean ground){
         var p=MovingCombatGameTest.player(h,form);p.setPos(h.absoluteVec(new Vec3(3,260,3)));p.setOnGround(ground);p.setNoGravity(true);return p;
     }
-    private static void tick(ServerPlayer p){p.move(MoverType.SELF,p.getDeltaMovement());p.tickCount++;WeaponCombatSystem.tick(new TickEvent.PlayerTickEvent(TickEvent.Phase.END,p));}
+    private static void tick(ServerPlayer p){p.move(MoverType.SELF,p.getDeltaMovement());p.tickCount++;WeaponCombatSystem.tick(new net.minecraftforge.event.TickEvent.PlayerTickEvent(net.minecraftforge.event.TickEvent.Phase.END,p));}
     private static void input(ServerPlayer p,WeaponMove.Input input,boolean held){
         WeaponCombatSystem.acceptInput(p,held&&input==WeaponMove.Input.PAIN,held&&input==WeaponMove.Input.SPECIAL,held&&input==WeaponMove.Input.PAIN,false);
     }
@@ -66,7 +65,7 @@ public final class AttackMobilityGameTest {
             while(WeaponCombatSystem.busy(p)&&t++<190){
                 p.move(MoverType.SELF,p.getDeltaMovement());
                 if(t>3&&p.getY()<origin.y){p.setPos(p.getX(),origin.y,p.getZ());p.setOnGround(true);}
-                peak=Math.max(peak,p.getY()-origin.y);p.tickCount++;WeaponCombatSystem.tick(new TickEvent.PlayerTickEvent(TickEvent.Phase.END,p));
+                peak=Math.max(peak,p.getY()-origin.y);p.tickCount++;WeaponCombatSystem.tick(new net.minecraftforge.event.TickEvent.PlayerTickEvent(net.minecraftforge.event.TickEvent.Phase.END,p));
             }
             distances[charged]=p.position().subtract(origin).horizontalDistance();
             h.assertTrue(t<190&&peak>5&&distances[charged]>20,"toss arcs forward and lands, distance="+distances[charged]+" height="+peak);WeaponCombatSystem.cancel(p);
@@ -79,7 +78,7 @@ public final class AttackMobilityGameTest {
             for(int t=0;t<130&&WeaponCombatSystem.busy(p);t++){
                 p.move(MoverType.SELF,p.getDeltaMovement());
                 if(p.getY()<origin.y-12){p.setPos(p.getX(),origin.y-12,p.getZ());p.setOnGround(true);}
-                p.tickCount++;WeaponCombatSystem.tick(new TickEvent.PlayerTickEvent(TickEvent.Phase.END,p));
+                p.tickCount++;WeaponCombatSystem.tick(new net.minecraftforge.event.TickEvent.PlayerTickEvent(net.minecraftforge.event.TickEvent.Phase.END,p));
             }
             h.assertTrue(p.position().subtract(origin).horizontalDistance()>5&&!WeaponCombatSystem.busy(p),"directional descent travels before impact "+form);WeaponCombatSystem.cancel(p);
         }

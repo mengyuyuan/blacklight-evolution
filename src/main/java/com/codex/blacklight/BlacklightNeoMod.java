@@ -43,6 +43,7 @@ public final class BlacklightNeoMod {
         com.codex.blacklight.city.CityBlocks.register(modBus);
         com.codex.blacklight.city.CityWorldgen.register(modBus);
         MinecraftForge.EVENT_BUS.register(com.codex.blacklight.city.CitySystem.class);
+        MinecraftForge.EVENT_BUS.register(com.codex.blacklight.infection.BuildingInfectionSystem.class);
         MinecraftForge.EVENT_BUS.register(com.codex.blacklight.city.CityTravel.class);
         ModAttachments.register(modBus);
         ModEntities.register(modBus);

@@ -27,8 +27,6 @@ import net.minecraft.world.phys.*;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.eventbus.api.*;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
-import net.minecraftforge.event.TickEvent.ServerTickEvent;
-
 /** Dedicated-only, disposable-world observation of real production C2S handlers.
  * This class deliberately has no client classes, callbacks or client linkage. */
 @EventBusSubscriber(modid="blacklight",value=Dist.DEDICATED_SERVER)
@@ -56,13 +54,13 @@ public final class StandaloneSyncServerChecks {
     private StandaloneSyncServerChecks(){}
 
     @SubscribeEvent(priority=EventPriority.LOWEST)
-    public static void tick(ServerTickEvent event){if(event.phase!=net.minecraftforge.event.TickEvent.Phase.END)return;
+    public static void tick(net.minecraftforge.event.TickEvent.ServerTickEvent event){if(event.phase!=net.minecraftforge.event.TickEvent.Phase.END)return;
         if(System.getProperty(PROPERTY,"").isBlank())return;
         var server=event.getServer();
         try{
             if(!initialized){
                 if(!server.isDedicatedServer()||server.getPort()!=25568
-                        ||!server.getServerDirectory().toPath().toAbsolutePath().normalize().equals(SERVER)
+                        ||!server.getServerDirectory().toAbsolutePath().normalize().equals(SERVER)
                         ||!server.getWorldPath(LevelResource.ROOT).toAbsolutePath().normalize().equals(SERVER.resolve("QA-Sync-Dev10"))
                         ||!Path.of(System.getProperty(PROPERTY)).toAbsolutePath().normalize().equals(OUTPUT))
                     throw new IllegalStateException("Dedicated synchronization fixture refused directory/world/port/output");
@@ -150,10 +148,10 @@ public final class StandaloneSyncServerChecks {
     }
     private static void recordSetting(ServerPlayer p,boolean expected,String reason)throws Exception{
         var tag=p.saveWithoutId(new CompoundTag());var saved=findSettings(tag,0);
-        require(saved!=null&&SkillSettings.CODEC.parse(NbtOps.INSTANCE,saved).getOrThrow().bulletdiveBlockBreaking()==expected,"actual attachment serialization mismatch");
+        require(saved!=null&&SkillSettings.CODEC.parse(NbtOps.INSTANCE,saved).getOrThrow(false, message -> { throw new AssertionError(message); }).bulletdiveBlockBreaking()==expected,"actual attachment serialization mismatch");
         p.server.getPlayerList().saveAll();var path=p.server.getWorldPath(LevelResource.PLAYER_DATA_DIR).resolve(p.getUUID()+".dat");
         require(Files.exists(path),"settings were not written to a player file");var disk=findSettings(NbtIo.readCompressed(path,NbtAccounter.unlimitedHeap()),0);
-        require(disk!=null&&SkillSettings.CODEC.parse(NbtOps.INSTANCE,disk).getOrThrow().bulletdiveBlockBreaking()==expected,"disk player attachment mismatch");
+        require(disk!=null&&SkillSettings.CODEC.parse(NbtOps.INSTANCE,disk).getOrThrow(false, message -> { throw new AssertionError(message); }).bulletdiveBlockBreaking()==expected,"disk player attachment mismatch");
         var row=new JsonObject();row.addProperty("tick",p.level().getGameTime());row.addProperty("callerUuid",p.getUUID().toString());row.addProperty("reason",reason);row.addProperty("serverAttachment",expected);row.addProperty("serializedAttachment",saved.toString());row.addProperty("diskAttachment",disk.toString());row.addProperty("savedPlayerFile",path.toString());settings.add(row);
     }
     private static CompoundTag findSettings(CompoundTag tag,int depth){

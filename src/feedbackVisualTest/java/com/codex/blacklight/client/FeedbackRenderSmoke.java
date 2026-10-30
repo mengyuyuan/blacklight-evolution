@@ -6,7 +6,6 @@ import java.nio.file.*;
 import net.minecraft.client.*;
 import net.minecraft.world.level.GameType;
 import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.*;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 import net.minecraftforge.client.event.RenderLevelStageEvent;
@@ -20,8 +19,8 @@ public final class FeedbackRenderSmoke {
     private static boolean setup,done;private static int ticks;private static volatile boolean ready;
     private static String lastScreen;private static Path output;private static final JsonObject report=new JsonObject();
     private static boolean enabled(){return Boolean.getBoolean("blacklight.feedbackVisual");}
-    @SubscribeEvent public static void tick(TickEvent.ClientTickEvent e) {
-        if(!enabled()||done||e.phase!=TickEvent.Phase.END)return;
+    @SubscribeEvent public static void tick(net.minecraftforge.event.TickEvent.ClientTickEvent e){if(e.phase!=net.minecraftforge.event.TickEvent.Phase.END)return;
+        if(!enabled()||done)return;
         var mc=Minecraft.getInstance();
         GLFW.glfwHideWindow(mc.getWindow().getWindow());mc.mouseHandler.releaseMouse();
         mc.options.pauseOnLostFocus=false;

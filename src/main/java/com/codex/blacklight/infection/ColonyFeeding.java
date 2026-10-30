@@ -20,7 +20,7 @@ public final class ColonyFeeding {
     private ColonyFeeding(){}
     public static TissueFeeding.Food food(ItemStack stack){
         if(stack.isEmpty())return null;var properties=stack.getFoodProperties(null);
-        if(properties!=null&&properties.getNutrition()>0)return new TissueFeeding.Food(properties.isMeat()?TissueDigestion.Kind.MEAT:TissueDigestion.Kind.SOFT,(int)com.codex.blacklight.forge.WingMath.clamp((long)properties.getNutrition()*2,1,64),stack.getCraftingRemainingItem());
+        if(properties!=null&&properties.getNutrition()>0)return new TissueFeeding.Food(properties.isMeat()?TissueDigestion.Kind.MEAT:TissueDigestion.Kind.SOFT,(int)com.codex.blacklight.forge.WingMath.clamp((long)properties.getNutrition()*2,1,64),com.codex.blacklight.forge.ForgeFoodRemainder.of(stack));
         return stack.is(FIBRE)?new TissueFeeding.Food(TissueDigestion.Kind.FERMENT,8,ItemStack.EMPTY):null;
     }
     public static Vec3 mouth(ServerLevel level,BlockPos pos){var state=level.getBlockState(pos);return state.hasProperty(net.minecraft.world.level.block.HorizontalDirectionalBlock.FACING)?Vec3.atCenterOf(pos).relative(state.getValue(net.minecraft.world.level.block.HorizontalDirectionalBlock.FACING),.7):Vec3.atCenterOf(pos);}

@@ -215,6 +215,24 @@ if (project.hasProperty('cityTest')) {
     sourceSets.main.java.srcDir('src/cityTest/java')
     sourceSets.main.resources.srcDir('src/cityTest/resources')
 }
+// Current comprehensive suites remain opt-in and absent from normal artifacts.
+def closeoutSuites=[releaseAuditTest:'releaseAuditTest',buildingBiomassTest:'buildingTest',gunplayTest:'gunplayTest',
+                    blackwatchTest:'blackwatchTest',militaryCampaignTest:'campaignTest',cityMilitaryTest:'cityMilitaryTest',
+                    vehicleServerTest:'vehicleServerTest',vehicleTest:'vehicleTest',vehicleVisualTest:'vehicleVisualTest',
+                    weaponVisualTest:'weaponVisualTest',armorVisualTest:'armorVisualTest',buildingVisualTest:'buildingVisualTest']
+closeoutSuites.each { flag,folder -> if(project.hasProperty(flag))sourceSets.main.java.srcDir("src/${folder}/java") }
+if(closeoutSuites.keySet().any {project.hasProperty(it)} ||
+        ['standaloneTest','cityTest','wallTraversalTest','hydraReleaseTest','feedbackTest','hiveFeedingTest','compatLiveTest','twilightTest'].any {project.hasProperty(it)}) {
+    sourceSets.main.java.srcDir('src/qaSupport/java')
+    sourceSets.main.resources.srcDir('src/traversalTest/resources')
+}
+if(project.hasProperty('feedbackTest'))sourceSets.main.resources.srcDir('src/feedbackTest/resources')
+if(project.hasProperty('gunplayTest'))sourceSets.main.resources.srcDir('src/campaignTest/resources')
+tasks.named('processResources') {
+    filesMatching(['data/blacklight/structures/wall_test.nbt','data/minecraft/worldgen/world_preset/flat.json']) {
+        duplicatesStrategy=DuplicatesStrategy.EXCLUDE
+    }
+}
 tasks.withType(Jar).configureEach {
     archiveClassifier = releaseProfile
     from(releaseNotices)
@@ -303,6 +321,23 @@ mixin {
     config 'blacklight.mixins.json'
 }
 
+// Forge 1.20's GameTest entry uses DedicatedServerProperties before constructing
+// GameTestServer. Fresh component worlds must use the flat QA preset explicitly.
+tasks.matching { it.name == 'runGameTestServer' }.configureEach {
+    doFirst {
+        def directory=project.file(project.findProperty('gameTestRunDirectory') ?: 'run-standalone-gametest')
+        def settingsFile=new File(directory,'server.properties')
+        if(!settingsFile.exists()){
+            directory.mkdirs()
+            settingsFile.setText('level-type=minecraft:flat\nlevel-seed=0\ngenerate-structures=false\nonline-mode=false\nserver-ip=127.0.0.1\nspawn-protection=0\nmax-tick-time=-1\ndifficulty=normal\nlevel-name=world\n','UTF-8')
+        }
+        def settings=new java.util.Properties()
+        settingsFile.withInputStream {settings.load(it)}
+        if(settings.getProperty('level-type')!='minecraft:flat')
+            throw new GradleException('GameTest requires a fresh disposable flat directory; existing server.properties was left unchanged: '+directory)
+    }
+}
+
 // MixinGradle writes these outside JavaCompile's normal class output. Declare
 // both so clean builds restored from Gradle's cache retain runtime mappings.
 tasks.named('compileJava', JavaCompile) {
@@ -326,6 +361,9 @@ configurations {
 
 dependencies {
     resourceToolsImplementation 'org.tukaani:xz:1.10'
+    // Userdev launches need the ordinary library on Forge's game classpath;
+    // the installable artifact separately embeds it through Jar-in-Jar below.
+    minecraftLibrary 'org.tukaani:xz:1.10'
     implementation(jarJar('org.tukaani:xz:1.10')) {
         jarJar.ranged(it, '[1.10,1.11)')
         jarJar.pin(it, '1.10')

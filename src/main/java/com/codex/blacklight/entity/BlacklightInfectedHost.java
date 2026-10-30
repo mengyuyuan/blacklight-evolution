@@ -793,7 +793,16 @@ public final class BlacklightInfectedHost extends Monster {
         targetSelector.addGoal(2,new NearestAttackableTargetGoal<>(this,LivingEntity.class,10,true,false,target->validTarget(target)&&!(target instanceof BlacklightInfectedHost)));
     }
     @Override public boolean isWithinMeleeAttackRange(LivingEntity target) {
-        if(!hasMultipartBody())return super.isWithinMeleeAttackRange(target);
+        if(!hasMultipartBody()){
+            // Keep the 1.21 host's bounded physical reach. The older Mob fallback
+            // squares twice its width and otherwise swallows the organ's range.
+            var body=getBoundingBox();var vehicle=getVehicle();
+            if(vehicle!=null){var hull=vehicle.getBoundingBox();body=new AABB(
+                    Math.min(body.minX,hull.minX),body.minY,Math.min(body.minZ,hull.minZ),
+                    Math.max(body.maxX,hull.maxX),body.maxY,Math.max(body.maxZ,hull.maxZ));}
+            double reach=Math.sqrt(2.04F)-.6F;
+            return body.inflate(reach,0,reach).intersects(target.getBoundingBox());
+        }
         // Reach from nearby body/limbs, never from the full wingspan as one attack radius.
         for(AABB box:combatHitboxes())if(box.inflate(giantBoss()?1.25:.7).intersects(target.getBoundingBox()))return true;
         return false;
@@ -872,6 +881,7 @@ public final class BlacklightInfectedHost extends Monster {
         if(nativeCombat.tick())return;
         if(organAbilities.tick())return;
         if(attackCooldown>0)attackCooldown--;
+        if(tickTissueStrike())return;
         if(!isAlive()||isNoAi()||level().getDifficulty()==net.minecraft.world.Difficulty.PEACEFUL||family().equals("ground"))return;
         var target=getTarget();if(target==null||!validTarget(target)){if(family().equals("air"))roamInAir();else if(family().equals("water"))roamInWater();return;}
         if(family().equals("water")&&!isInWater())return;

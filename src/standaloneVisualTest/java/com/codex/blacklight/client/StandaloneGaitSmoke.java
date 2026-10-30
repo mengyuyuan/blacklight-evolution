@@ -27,7 +27,6 @@ import net.minecraftforge.eventbus.api.*;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 import net.minecraftforge.client.event.*;
-import net.minecraftforge.event.TickEvent;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 import org.lwjgl.stb.STBImageWrite;
@@ -80,8 +79,7 @@ public final class StandaloneGaitSmoke {
     private static boolean active(){return initialized&&!disabled&&!completed;}
     private static boolean sprinting(){return stage==Stage.SPRINT||stage==Stage.ARMOR_SPRINT||stage==Stage.JUMP_SPRINT;}
     @SubscribeEvent(priority=EventPriority.HIGHEST)
-    public static void input(TickEvent.ClientTickEvent event) {
-        if(event.phase!=TickEvent.Phase.START)return;
+    public static void input(net.minecraftforge.event.TickEvent.ClientTickEvent event){if(event.phase!=net.minecraftforge.event.TickEvent.Phase.START)return;
         if(!active())return;
         var mc=Minecraft.getInstance();
         // This fixture owns native W/sprint but must not consume the human's pointer.
@@ -107,7 +105,7 @@ public final class StandaloneGaitSmoke {
     }
     @SubscribeEvent(priority=EventPriority.LOWEST)
     public static void observePlantedServer(net.minecraftforge.event.TickEvent.PlayerTickEvent event){if(event.phase!=net.minecraftforge.event.TickEvent.Phase.END)return;
-        if(!active()||!serverReady||!standingCharge()||!(event.player instanceof ServerPlayer p))return;
+        if(!active()||!serverReady||!standingCharge()||!(event.getEntity() instanceof ServerPlayer p))return;
         var movement=com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.MOVEMENT_STATE);
         if(movement.chargeTicks()>3&&!movement.runningCharge()&&movement.jumpHeld()&&p.onGround()){
             if(plantedServer==null)plantedServer=p.position();
@@ -132,14 +130,13 @@ public final class StandaloneGaitSmoke {
         }
     }
     @SubscribeEvent(priority=EventPriority.LOWEST)
-    public static void tick(TickEvent.ClientTickEvent event) {
-        if(event.phase!=TickEvent.Phase.END)return;
+    public static void tick(net.minecraftforge.event.TickEvent.ClientTickEvent event){if(event.phase!=net.minecraftforge.event.TickEvent.Phase.END)return;
         if(disabled||completed||System.getProperty(PROPERTY,"").isBlank())return;
         var mc=Minecraft.getInstance();var server=mc.getSingleplayerServer();
         if(server==null||mc.player==null||mc.level==null)return;
         var save=server.getWorldPath(net.minecraft.world.level.storage.LevelResource.ROOT).toAbsolutePath().normalize();
         if(!save.getFileName().toString().equals("Blacklight Standalone QA v4")
-                ||!mc.gameDirectory.toPath().toAbsolutePath().normalize().equals(Path.of("D:/Blacklight-Standalone/run-forge-skills-qa"))) {
+                ||!mc.gameDirectory.toPath().toAbsolutePath().normalize().getFileName().toString().equals("run-native-qa")) {
             disabled=true;BlacklightNeoMod.LOGGER.error("Continuous gait QA refused non-QA save {}",save);return;
         }
         if(!initialized) {
@@ -188,7 +185,6 @@ public final class StandaloneGaitSmoke {
                         com.codex.blacklight.registry.ModAttachments.setData(p, ModAttachments.UTILITY_STATE,new UtilityState(UtilityState.SHIELD_CAPACITY,0,level.getGameTime()-200,0,-1000));com.codex.blacklight.registry.ModAttachments.syncData(p, ModAttachments.UTILITY_STATE);
                         com.codex.blacklight.registry.ModAttachments.setData(p, ModAttachments.POWER_MORPH,PowerMorph.NONE);com.codex.blacklight.registry.ModAttachments.syncData(p, ModAttachments.POWER_MORPH);
                         com.codex.blacklight.registry.ModAttachments.setData(p, ModAttachments.WEAPON_VISUAL,com.codex.blacklight.combat.WeaponVisual.EMPTY);com.codex.blacklight.registry.ModAttachments.syncData(p, ModAttachments.WEAPON_VISUAL);
-
                         NativePlayerActionBackend.clear(p);com.codex.blacklight.combat.CombatTargeting.requestLock(p,-1);
                         p.getInventory().clearContent();
                         p.setGameMode(GameType.CREATIVE);p.getAbilities().flying=false;p.onUpdateAbilities();
@@ -316,8 +312,7 @@ public final class StandaloneGaitSmoke {
         event.setYaw((float)Math.toDegrees(Math.atan2(-look.x,look.z)));
         event.setPitch((float)-Math.toDegrees(Math.atan2(look.y,look.horizontalDistance())));event.setRoll(0);
     }
-    @SubscribeEvent public static void beforeFrame(TickEvent.RenderTickEvent event) {
-        if(event.phase!=TickEvent.Phase.START)return;
+    @SubscribeEvent public static void beforeFrame(net.minecraftforge.event.TickEvent.RenderTickEvent event){if(event.phase!=net.minecraftforge.event.TickEvent.Phase.START)return;
         if(!active()||!serverReady)return;var mc=Minecraft.getInstance();if(mc.player==null||mc.level==null)return;
         mc.mouseHandler.releaseMouse();
         try {
@@ -327,7 +322,6 @@ public final class StandaloneGaitSmoke {
                 if(stageTicks<20+jumpHoldTicks)captureSequence="jump_charge";
                 else if(!mc.player.onGround())captureSequence="jump_flight";
                 else if(jumpContactTick>=0&&latestTick-jumpContactTick<=40)captureSequence="jump_landing";
-
             }
             int ordinal=captureSequence==null?16:sequenceFrames.getOrDefault(captureSequence,0);
             // Compare early frames with a later close view: armor must finish
@@ -346,7 +340,7 @@ public final class StandaloneGaitSmoke {
         if(!active()||!serverReady||event.getStage()!=RenderLevelStageEvent.Stage.AFTER_LEVEL)return;
         var mc=Minecraft.getInstance();if(mc.player==null||mc.level==null)return;
         try {
-            var renderer=((Map<?,?>)renderersField.get(null)).get(mc.player.getModelName());
+            var renderer=((Map<?,?>)renderersField.get(null)).get(mc.player.getSkin().model());
             // Current rendering uses the renderer directly. Permit a future wrapper
             // only by following its actual parent, never by creating a test model.
             if(!(renderer instanceof BlacklightPlayerRenderer)){
@@ -386,8 +380,7 @@ public final class StandaloneGaitSmoke {
             frames.add(row);
         }catch(Exception e){fail(e);}
     }
-    @SubscribeEvent public static void frame(TickEvent.RenderTickEvent event){if(event.phase!=net.minecraftforge.event.TickEvent.Phase.END)return;
-
+    @SubscribeEvent public static void frame(net.minecraftforge.event.TickEvent.RenderTickEvent event){if(event.phase!=net.minecraftforge.event.TickEvent.Phase.END)return;
         if(!active()||!capturePending)return;capturePending=false;var mc=Minecraft.getInstance();
         String name=(captureSequence==null?stage.name().toLowerCase(Locale.ROOT):captureSequence)+"_"+stageTicks+"_frame"+renderFrame+".png";
         try {

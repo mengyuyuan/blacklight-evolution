@@ -49,6 +49,8 @@ public final class TissueVitalSystem {
         if(decision.spent()>0&&!host.spendTissueNutrition(decision.spent()))throw new IllegalStateException("Physiology overspent server reserve");
         if(decision.airGrant()>0)host.setAirSupply(Math.min(host.getMaxAirSupply(),host.getAirSupply()+decision.airGrant()));
         event.setCanBreathe(decision.canBreathe());event.setRefillAirAmount(decision.refill());
+        // Forge 1.20.1 separately gates refilling while the head is submerged.
+        event.setCanRefillAir(decision.refill()>0);
         if(!decision.canBreathe())event.setConsumeAirAmount(Math.max(1,event.getConsumeAirAmount()));
         if(host.tickCount%10==0||decision.airGrant()>0)host.publishVitals();
     }

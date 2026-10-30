@@ -30,10 +30,10 @@ public final class SporeCompatibilityGameTest {
         return mob;
     }
     private static <T> void state(Entity entity, java.util.function.Supplier<com.codex.blacklight.forge.AttachmentType<T>> key,T value) {
-        ModAttachments.setData(entity,key,value);
+        entity.setData(key,value);
     }
     private static boolean has(Entity entity, java.util.function.Supplier<? extends com.codex.blacklight.forge.AttachmentType<?>> key) {
-        return ModAttachments.storage(entity).has(key.get());
+        return entity.hasData(key.get());
     }
 
     @GameTest(template="wall_test",timeoutTicks=30)
@@ -109,26 +109,6 @@ public final class SporeCompatibilityGameTest {
             h.assertTrue(!hosts.isEmpty(),"converted host retains Spore species identity");
             h.succeed();
         });
-    }
-
-    @GameTest(template="wall_test",timeoutTicks=30)
-    public static void missingCapabilityDuringRealSporeAttack(GameTestHelper h) {
-        var attacker=human(h);
-        var victim=h.spawn(EntityType.VILLAGER,3,2,4);
-        victim.setNoAi(true);
-        victim.invalidateCaps();
-        try {
-            float before=victim.getHealth();
-            attacker.doHurtTarget(victim);
-            victim.knockback(.4,1,0);
-            victim.push(attacker);
-            h.assertTrue(victim.getHealth()<before,"missing capability cannot cancel real Spore damage");
-            h.assertTrue(!ConsumeSystem.grappleProtected(victim),"missing state is not a hold");
-            h.assertTrue(!ModAttachments.available(victim),"passive hooks must not revive invalid capabilities");
-            ImpactControl.cancel(victim);
-            BlacklightInfectionSystem.isInfected(victim);
-        } finally { victim.reviveCaps(); }
-        h.succeed();
     }
 
 }

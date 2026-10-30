@@ -32,17 +32,15 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.level.BlockEvent;
-import net.minecraftforge.event.TickEvent.ServerTickEvent;
-
 /** Explicit disposable-world acceptance: actual queued begin() calls, block changes and cancellation. */
 @EventBusSubscriber(modid="blacklight",value=Dist.CLIENT)
 public final class StandaloneBulletTerrainChecks {
-    private static final Path QA=Path.of("D:/Blacklight-Standalone/run-forge-skills-qa").toAbsolutePath().normalize();
+    private static final Path QA=Path.of("D:/Blacklight-Standalone/run-native-qa").toAbsolutePath().normalize();
     private static Run active;
     private StandaloneBulletTerrainChecks() { }
     public static CompletableFuture<JsonObject> run(ServerPlayer p) {
         if(!p.server.isSameThread())throw new IllegalStateException("Terrain checks require server thread");
-        if(!p.server.getServerDirectory().toPath().toAbsolutePath().normalize().equals(QA)
+        if(!p.server.getServerDirectory().toAbsolutePath().normalize().equals(QA)
                 ||!p.server.getWorldPath(LevelResource.ROOT).toAbsolutePath().normalize()
                     .equals(QA.resolve("saves/Blacklight Standalone QA v4")))
             throw new IllegalStateException("Terrain checks refuse non-disposable directory/save");
@@ -51,7 +49,7 @@ public final class StandaloneBulletTerrainChecks {
         try { run.begin(); } catch(Throwable error) { run.finish(error); }
         return run.completion;
     }
-    @SubscribeEvent public static void tick(ServerTickEvent event){if(event.phase!=net.minecraftforge.event.TickEvent.Phase.END)return;
+    @SubscribeEvent public static void tick(net.minecraftforge.event.TickEvent.ServerTickEvent event){if(event.phase!=net.minecraftforge.event.TickEvent.Phase.END)return;
         var run=active;if(run==null)return;
         try { run.advance(); } catch(Throwable error) { run.finish(error); }
     }
@@ -79,7 +77,7 @@ public final class StandaloneBulletTerrainChecks {
             originalSettings=com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.SKILL_SETTINGS);
             originalDrops=p.level().getGameRules().getBoolean(GameRules.RULE_DOBLOCKDROPS);
             began=p.level().getGameTime();
-            int y=com.codex.blacklight.util.MathCompat.clamp(p.getBlockY()-1,p.level().getMinBuildHeight()+10,p.level().getMaxBuildHeight()-10);
+            int y=com.codex.blacklight.forge.WingMath.clamp(p.getBlockY()-1,p.level().getMinBuildHeight()+10,p.level().getMaxBuildHeight()-10);
             low=new BlockPos(p.getBlockX()-24,y,p.getBlockZ()+24);
             high=new BlockPos(p.getBlockX(),y,p.getBlockZ()+24);
             protectedLane=new BlockPos(p.getBlockX()+24,y,p.getBlockZ()+24);
@@ -176,9 +174,6 @@ public final class StandaloneBulletTerrainChecks {
                 BulletdiveTerrain.begin(p,canceledId,impact(canceledLane),80);stage=4;stageAt=now;
             }else if(stage==4){
                 var s=BulletdiveTerrain.snapshot(p,canceledId);if(s==null||s.destroyed()==0)return;
-                // A slow frame may exhaust the cooperative time budget before block 16.
-                // Wait for the injected toggle, while still failing a completed job that missed it.
-                if(!cancelTriggered&&!s.complete())return;
                 require(cancelTriggered&&s.complete()&&s.reason().equals("block_breaking_disabled"),"mid-burst preference change did not cancel pending terrain");
                 disabledAir=countAir(canceledLane);stage=5;stageAt=now;
             }else if(stage==5){

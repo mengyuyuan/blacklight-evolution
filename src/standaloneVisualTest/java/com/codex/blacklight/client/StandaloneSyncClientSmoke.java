@@ -42,7 +42,7 @@ public final class StandaloneSyncClientSmoke {
     private StandaloneSyncClientSmoke(){}
 
     @SubscribeEvent(priority=EventPriority.HIGHEST)
-    public static void input(ClientTickEvent event){if(event.phase!=net.minecraftforge.event.TickEvent.Phase.START)return;
+    public static void input(net.minecraftforge.event.TickEvent.ClientTickEvent event){if(event.phase!=net.minecraftforge.event.TickEvent.Phase.START)return;
         if(!initialized||completed||failed)return;var mc=Minecraft.getInstance();
         mc.mouseHandler.releaseMouse();mc.options.keyUp.setDown(false);mc.options.keyDown.setDown(false);mc.options.keyLeft.setDown(false);mc.options.keyRight.setDown(false);mc.options.keySprint.setDown(false);mc.options.keyShift.setDown(false);mc.options.keyAttack.setDown(false);mc.options.keyUse.setDown(false);
         boolean preparing=stage.equals("OFF_READY")||stage.equals("ON_READY");
@@ -50,7 +50,7 @@ public final class StandaloneSyncClientSmoke {
         mc.options.keyJump.setDown(preparing&&(visual==null||visual.kind()<0||visual.phase()==DevastatorSystem.CHARGE)&&!releaseSent);
     }
     @SubscribeEvent(priority=EventPriority.LOWEST)
-    public static void tick(ClientTickEvent event){if(event.phase!=net.minecraftforge.event.TickEvent.Phase.END)return;
+    public static void tick(net.minecraftforge.event.TickEvent.ClientTickEvent event){if(event.phase!=net.minecraftforge.event.TickEvent.Phase.END)return;
         if(completed||failed||System.getProperty(PROPERTY,"").isBlank())return;var mc=Minecraft.getInstance();
         if(mc.player==null||mc.level==null||mc.getConnection()==null)return;
         try{
@@ -111,7 +111,7 @@ public final class StandaloneSyncClientSmoke {
             if(ticks%5==0)write();
         }catch(Throwable problem){failed=true;error=problem.toString();BlacklightNeoMod.LOGGER.error("Dedicated client sync QA failed",problem);restore(mc);write();mc.stop();}
     }
-    @SubscribeEvent public static void frame(RenderTickEvent event){if(event.phase!=net.minecraftforge.event.TickEvent.Phase.END)return;
+    @SubscribeEvent public static void frame(net.minecraftforge.event.TickEvent.RenderTickEvent event){if(event.phase!=net.minecraftforge.event.TickEvent.Phase.END)return;
         if(!initialized||completed||failed)return;var mc=Minecraft.getInstance();if(mc.player==null||mc.level==null)return;
         try{
             var visual=com.codex.blacklight.registry.ModAttachments.getData(mc.player, ModAttachments.DEVASTATOR_VISUAL);if(visual.kind()!=3||caseIndex<0)return;

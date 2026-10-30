@@ -12,6 +12,16 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class ForgeNativeDataCompatibilityTest {
     @BeforeAll static void bootstrap(){net.minecraft.SharedConstants.tryDetectVersion();net.minecraft.server.Bootstrap.bootStrap();}
+    @Test void bothDimensionTypesDecodeWithTheActual1201Codec() throws Exception {
+        for(String name:List.of("city","world")){
+            var file=Path.of("src/main/resources/data/blacklight/dimension_type",name+".json");
+            try(var reader=Files.newBufferedReader(file)){
+                var decoded=net.minecraft.world.level.dimension.DimensionType.DIRECT_CODEC.parse(
+                        com.mojang.serialization.JsonOps.INSTANCE,JsonParser.parseReader(reader));
+                assertTrue(decoded.result().isPresent(),file+": "+decoded);
+            }
+        }
+    }
     @Test void bothCitiesUseReal1201BlocksAndLegalProperties() throws Exception {
         for(String city:List.of("futian","los_angeles")){
             var file=Path.of("src/main/resources/data/blacklight/city",city,"map.json");

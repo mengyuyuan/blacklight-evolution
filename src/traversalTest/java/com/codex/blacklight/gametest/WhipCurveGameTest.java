@@ -21,12 +21,10 @@ public final class WhipCurveGameTest {
     @GameTest(template = "wall_test", timeoutTicks = 20)
     public static void anatomicalRightAndForwardRotateTogether(GameTestHelper h) {
         var curve = new WhipCurve(.045, .4, List.of(sample(0, 2, 3), sample(1, 2, 3)));
-        var southPoints = WhipCurveContact.worldPoints(curve, 0, new Vec3(10, 20, 30), 0);
-        var south = southPoints.get(southPoints.size()-1);
+        var south = WhipCurveContact.worldPoints(curve, 0, new Vec3(10, 20, 30), 0).get(WhipCurveContact.worldPoints(curve, 0, new Vec3(10, 20, 30), 0).size()-1);
         h.assertTrue(south.distanceTo(new Vec3(8, 21, 33)) < .000001,
                 "actor right points west when facing south, with height unchanged");
-        var northPoints = WhipCurveContact.worldPoints(curve, 0, new Vec3(10, 20, 30), 180);
-        var north = northPoints.get(northPoints.size()-1);
+        var north = WhipCurveContact.worldPoints(curve, 0, new Vec3(10, 20, 30), 180).get(WhipCurveContact.worldPoints(curve, 0, new Vec3(10, 20, 30), 180).size()-1);
         h.assertTrue(north.distanceTo(new Vec3(12, 21, 27)) < .000001,
                 "a half turn rotates both anatomical right and forward exactly once");
         h.succeed();

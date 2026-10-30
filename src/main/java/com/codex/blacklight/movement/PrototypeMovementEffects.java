@@ -431,7 +431,15 @@ public final class PrototypeMovementEffects {
             if (distance > radius) continue;
             double falloff = 1.0D - distance / Math.max(0.01D, radius);
             float damage = (float)(impact.damage() * (0.38D + falloff * 0.62D));
+            float healthBefore=target.getHealth(),absorptionBefore=target.getAbsorptionAmount();
+            Vec3 velocityBefore=target.getDeltaMovement();boolean markedBefore=target.hurtMarked;
             if (!target.hurt(player.damageSources().playerAttack(player), damage)) continue;
+            // Forge 1.20 can report true even when LivingHurtEvent vetoes the
+            // actual health change. Do not turn that veto into a separate push.
+            if(target.isAlive()&&!target.isRemoved()&&target.level()==level
+                    &&target.getHealth()>=healthBefore&&target.getAbsorptionAmount()>=absorptionBefore){
+                target.setDeltaMovement(velocityBefore);target.hurtMarked=markedBefore;continue;
+            }
             // Damage callbacks may invalidate either actor; rejected hits cannot
             // bypass protection by applying their physical attack separately.
             if (!player.isAlive() || player.isRemoved() || player.level() != level) return;

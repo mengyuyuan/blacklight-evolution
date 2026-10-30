@@ -229,7 +229,7 @@ public final class BlacklightInfectionSystem {
             var drop = new net.minecraft.world.entity.item.ItemEntity(level, source.getX(), source.getY(), source.getZ(),
                     new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.SADDLE));
             drop.setDefaultPickUpDelay();
-            var steering=((com.codex.blacklight.mixin.SaddleSteeringAccess)source).blacklight$steering();
+            var steering=((SaddleSteeringAccess)source).blacklight$steering();
             steering.setSaddle(false);
             if (!level.addFreshEntity(drop)) {steering.setSaddle(true);return false;}
         }

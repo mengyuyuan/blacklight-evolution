@@ -145,6 +145,8 @@ public final class CityTravel {
         tickTravel(player);return 1;
     }
     private static void cancelTravel(ServerPlayer p){var pending=PENDING.remove(p);if(pending!=null)pending.ticket.release();}
+    static String loadingDiagnostics(ServerPlayer player){var pending=PENDING.get(player);return pending==null?"idle":pending.target.dimension().location()+" "+pending.origin+" "+pending.ticket.diagnostics();}
+
     private static void tickTravel(ServerPlayer p){
         var pending=PENDING.get(p);if(pending==null)return;
         if(!p.isAlive()||p.isRemoved()||p.serverLevel()!=pending.source||p.position().distanceToSqr(pending.start)>64

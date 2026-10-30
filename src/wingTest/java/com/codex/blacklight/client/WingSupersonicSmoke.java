@@ -29,8 +29,7 @@ public final class WingSupersonicSmoke {
     static volatile boolean prepared;
     static volatile int wall=Integer.MAX_VALUE;static volatile boolean collision,serverSonic;static int captured;
     static boolean guarded(Minecraft mc){return Boolean.getBoolean("blacklight.test.wingSonic")&&mc.gameDirectory.toPath().toAbsolutePath().normalize().equals(ROOT.resolve("client").toAbsolutePath().normalize());}
-    @SubscribeEvent(priority=EventPriority.LOWEST) public static void tick(net.minecraftforge.event.TickEvent.ClientTickEvent event){
-        if(event.phase!=net.minecraftforge.event.TickEvent.Phase.END)return;
+    @SubscribeEvent(priority=EventPriority.LOWEST) public static void tick(net.minecraftforge.event.TickEvent.ClientTickEvent event){if(event.phase!=net.minecraftforge.event.TickEvent.Phase.END)return;
         var mc=Minecraft.getInstance();if(!guarded(mc)||mc.player==null||mc.getSingleplayerServer()==null||finished)return;
         var uuid=mc.player.getUUID();var integrated=mc.getSingleplayerServer();
         if(!initialized){
@@ -103,8 +102,7 @@ public final class WingSupersonicSmoke {
         event.setPitch((float)-Math.toDegrees(Math.atan2(aim.y,aim.horizontalDistance())));event.setRoll(0);
     }
     @SubscribeEvent public static void rendered(RenderPlayerEvent.Pre e){if(e.getEntity()==Minecraft.getInstance().player)lastRendered=tick;}
-    @SubscribeEvent public static void frame(net.minecraftforge.event.TickEvent.RenderTickEvent e){
-        if(e.phase!=net.minecraftforge.event.TickEvent.Phase.END)return;
+    @SubscribeEvent public static void frame(net.minecraftforge.event.TickEvent.RenderTickEvent e){if(e.phase!=net.minecraftforge.event.TickEvent.Phase.END)return;
         var mc=Minecraft.getInstance();if(!guarded(mc)||mc.player==null||finished)return;
         int shot=CLIMB?(tick>=190&&tick<=225?tick-189:tick>=280?37:0):(tick>=370?8:tick>=330?7:tick>=280?6:tick>=230?5:tick>=220?4:tick>=210?3:tick>=200?2:tick>=190?1:0);
         if(shot<=captured)return;captured=shot;ROWS.add("frame,"+tick+",playerRendered="+(lastRendered==tick));
@@ -149,7 +147,7 @@ public final class WingSupersonicSmoke {
         var profile=new com.mojang.authlib.GameProfile(java.util.UUID.randomUUID(),"SonicPacketQA");
         var p=new net.minecraft.server.level.ServerPlayer(level.getServer(),level,profile);
         var sink=new net.minecraft.network.Connection(net.minecraft.network.protocol.PacketFlow.SERVERBOUND){
-            @Override public void send(net.minecraft.network.protocol.Packet<?> packet,net.minecraft.network.PacketSendListener callback){}
+            @Override public void send(net.minecraft.network.protocol.Packet<?> packet,net.minecraft.network.PacketSendListener callback,boolean flush){}
         };
         var listener=new net.minecraft.server.network.ServerGamePacketListenerImpl(level.getServer(),sink,p){
             @Override public void send(net.minecraft.network.protocol.Packet<?> packet,net.minecraft.network.PacketSendListener callback){}

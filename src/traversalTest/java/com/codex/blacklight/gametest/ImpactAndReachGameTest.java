@@ -11,7 +11,6 @@ import net.minecraft.world.entity.*;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.util.FakePlayerFactory;
-import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.gametest.*;
 import java.util.UUID;
 
@@ -20,7 +19,7 @@ public final class ImpactAndReachGameTest {
     private static ServerPlayer player(GameTestHelper h,PowerForm form){
         var p=FakePlayerFactory.get(h.getLevel(),new GameProfile(UUID.randomUUID(),"impact-range"));
         p.setPos(h.absoluteVec(new Vec3(3,2,1)));p.setYRot(0);p.setXRot(0);p.setOnGround(true);p.tickCount=100;
-        var s=com.codex.blacklight.registry.ModAttachments.getData(p,ModAttachments.PLAYER_STATE);s.infect();s.setPrototypeMode(true);s.unlock(form);s.activate(form);
+        var s=com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.PLAYER_STATE);s.infect();s.setPrototypeMode(true);s.unlock(form);s.activate(form);
         return p;
     }
     @GameTest(template="wall_test",timeoutTicks=40)
@@ -32,14 +31,14 @@ public final class ImpactAndReachGameTest {
                 h.getLevel().setBlockAndUpdate(p.blockPosition().offset(x,y,z),Blocks.AIR.defaultBlockState());
             var mob=(Mob)h.spawn(type,3,2,5);mob.setNoAi(true);mob.setPos(p.position().add(0,0,distance));
             var start=mob.position();ConsumeSystem.request(p);
-            h.assertTrue(com.codex.blacklight.registry.ModAttachments.getData(p,ModAttachments.GRAB_STAGE)==ConsumeVisual.CAPTURE,"acquire "+type+" at "+distance);
+            h.assertTrue(com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.GRAB_STAGE)==ConsumeVisual.CAPTURE,"acquire "+type+" at "+distance);
             for(int i=0;i<36;i++){
-                p.tickCount++;ConsumeSystem.tick(new TickEvent.PlayerTickEvent(TickEvent.Phase.END,p));
+                p.tickCount++;ConsumeSystem.tick(new net.minecraftforge.event.TickEvent.PlayerTickEvent(net.minecraftforge.event.TickEvent.Phase.END,p));
                 if(i<13)h.assertTrue(mob.position().distanceToSqr(start)<1e-8,"cannot pull before whip reaches target");
             }
             h.assertTrue(ConsumeSystem.holding(p),"complete 12-block reel, not merely select: "+type+" / "+distance);
             p.tickCount++;ConsumeSystem.tick(new net.minecraftforge.event.TickEvent.PlayerTickEvent(net.minecraftforge.event.TickEvent.Phase.END,p));
-            h.assertTrue(mob.position().distanceTo(ConsumePlacementTrack.carryAnchor(p.position(),p.getYRot(),mob,GrappleMotion.key(p,com.codex.blacklight.registry.ModAttachments.getData(mob,ModAttachments.CONSUME_VISUAL)),GrappleMotion.progress(p,com.codex.blacklight.registry.ModAttachments.getData(mob,ModAttachments.CONSUME_VISUAL),0)).orElseThrow())<.08,"arrive at animated hand");
+            h.assertTrue(mob.position().distanceTo(ConsumePlacementTrack.carryAnchor(p.position(),p.getYRot(),mob,GrappleMotion.key(p,com.codex.blacklight.registry.ModAttachments.getData(mob, ModAttachments.CONSUME_VISUAL)),GrappleMotion.progress(p,com.codex.blacklight.registry.ModAttachments.getData(mob, ModAttachments.CONSUME_VISUAL),0)).orElseThrow())<.08,"arrive at animated hand");
             ConsumeSystem.cancel(p);mob.discard();
         }
         h.succeed();
@@ -48,10 +47,10 @@ public final class ImpactAndReachGameTest {
     public static void whipRejectsBeyondRangeAndSolidWall(GameTestHelper h){
         var p=player(h,PowerForm.WHIPFIST);var pig=h.spawn(EntityType.PIG,3,2,5);pig.setNoAi(true);
         pig.setPos(p.position().add(0,0,13));ConsumeSystem.request(p);
-        h.assertTrue(!com.codex.blacklight.registry.ModAttachments.getData(p,ModAttachments.CONSUMING),"13 blocks is outside grab reach");
+        h.assertTrue(!com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.CONSUMING),"13 blocks is outside grab reach");
         pig.setPos(p.position().add(0,0,10));
         for(int x=1;x<6;x++)for(int y=1;y<6;y++)h.setBlock(x,y,6,Blocks.STONE);
-        ConsumeSystem.request(p);h.assertTrue(!com.codex.blacklight.registry.ModAttachments.getData(p,ModAttachments.CONSUMING),"cannot grab through solid wall");
+        ConsumeSystem.request(p);h.assertTrue(!com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.CONSUMING),"cannot grab through solid wall");
         pig.discard();h.succeed();
     }
     @GameTest(template="wall_test",timeoutTicks=40)
@@ -59,27 +58,27 @@ public final class ImpactAndReachGameTest {
         for(int x=0;x<8;x++)for(int z=0;z<8;z++)h.setBlock(x,1,z,Blocks.STONE);
         var p=player(h,PowerForm.CLAWS);p.setDeltaMovement(0,0,.55);
         PrototypeMovementSystem.acceptInput(p,true,false,1,0,true,false);
-        for(int i=0;i<12;i++){p.tickCount++;p.setOnGround(true);PrototypeMovementSystem.onPlayerTick(new TickEvent.PlayerTickEvent(TickEvent.Phase.END,p));}
-        h.assertTrue(com.codex.blacklight.registry.ModAttachments.getData(p,ModAttachments.MOVEMENT_STATE).runningCharge(),"charge retains running mode");
+        for(int i=0;i<12;i++){p.tickCount++;p.setOnGround(true);PrototypeMovementSystem.onPlayerTick(new net.minecraftforge.event.TickEvent.PlayerTickEvent(net.minecraftforge.event.TickEvent.Phase.END,p));}
+        h.assertTrue(com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.MOVEMENT_STATE).runningCharge(),"charge retains running mode");
         h.assertTrue(p.getDeltaMovement().horizontalDistance()>=.55,"running charge must not brake to a crouch");
-        h.assertTrue(com.codex.blacklight.registry.ModAttachments.getData(p,ModAttachments.JUMP_CHARGE)>0,"leg charge visual is synchronized");
+        h.assertTrue(com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.JUMP_CHARGE)>0,"leg charge visual is synchronized");
         PrototypeMovementSystem.acceptInput(p,false,false,1,0,true,false);var launch=p.getDeltaMovement();
         h.assertTrue(!p.onGround()&&launch.y>.6&&launch.z>.55,"release launches up and retains running momentum");
         PrototypeMovementSystem.acceptInput(p,false,false,1,0,true,false);
-        h.assertTrue(p.getDeltaMovement().equals(launch)&&com.codex.blacklight.registry.ModAttachments.getData(p,ModAttachments.JUMP_CHARGE)==0,"release is consumed once and clears coil");
-        com.codex.blacklight.registry.ModAttachments.getData(p,ModAttachments.MOVEMENT_STATE).reset();h.succeed();
+        h.assertTrue(p.getDeltaMovement().equals(launch)&&com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.JUMP_CHARGE)==0,"release is consumed once and clears coil");
+        com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.MOVEMENT_STATE).reset();h.succeed();
     }
     @GameTest(template="wall_test",timeoutTicks=40)
     public static void confirmedMeleeHitsStaggerAndOpenersKeepTargetClose(GameTestHelper h){
         for(var form:new PowerForm[]{PowerForm.CLAWS,PowerForm.BLADE,PowerForm.HAMMERFISTS,PowerForm.MUSCLE_MASS}){
             var p=player(h,form);var mob=h.spawn(EntityType.IRON_GOLEM,3,2,3);mob.setNoAi(true);mob.setPos(p.position().add(0,0,1.8));
-            float before=mob.getHealth();WeaponCombatSystem.request(p,false);var move=com.codex.blacklight.registry.ModAttachments.getData(p,ModAttachments.WEAPON_VISUAL).spec();
+            float before=mob.getHealth();WeaponCombatSystem.request(p,false);var move=com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.WEAPON_VISUAL).spec();
             int hits=0;for(int t=1;t<=move.duration;t++){
-                p.tickCount++;float old=mob.getHealth();WeaponCombatSystem.tick(new TickEvent.PlayerTickEvent(TickEvent.Phase.END,p));
+                p.tickCount++;float old=mob.getHealth();WeaponCombatSystem.tick(new net.minecraftforge.event.TickEvent.PlayerTickEvent(net.minecraftforge.event.TickEvent.Phase.END,p));
                 if(mob.getHealth()<old){hits++;h.assertTrue(move.contactIndex(t)>=0,"damage only in contact window");}
             }
             h.assertTrue(hits==1&&mob.getHealth()<before,"one confirmed hit for "+form);
-            h.assertTrue(com.codex.blacklight.registry.ModAttachments.getData(mob,ModAttachments.HIT_REACTION).duration()>0,"hit drives victim response: "+form);
+            h.assertTrue(com.codex.blacklight.registry.ModAttachments.getData(mob, ModAttachments.HIT_REACTION).duration()>0,"hit drives victim response: "+form);
             h.assertTrue(mob.getDeltaMovement().horizontalDistance()<=.23,"opener must not launch victim out of next attack");
             WeaponCombatSystem.cancel(p);mob.discard();
         }

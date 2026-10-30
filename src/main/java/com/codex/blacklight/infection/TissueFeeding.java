@@ -29,7 +29,7 @@ public final class TissueFeeding {
         var properties=stack.getFoodProperties(host);
         if(properties!=null&&properties.getNutrition()>0){
             int value=(int)com.codex.blacklight.forge.WingMath.clamp((long)properties.getNutrition()*2,1,64);
-            return new Food(properties.isMeat()?TissueDigestion.Kind.MEAT:TissueDigestion.Kind.SOFT,value,stack.getCraftingRemainingItem());
+            return new Food(properties.isMeat()?TissueDigestion.Kind.MEAT:TissueDigestion.Kind.SOFT,value,com.codex.blacklight.forge.ForgeFoodRemainder.of(stack));
         }
         if(profile.gizzard()>0&&stack.is(GRIND))return new Food(TissueDigestion.Kind.FIBRE,6,ItemStack.EMPTY);
         if(profile.ferment()>0&&stack.is(FERMENT))return new Food(TissueDigestion.Kind.FERMENT,8,ItemStack.EMPTY);
