@@ -14,12 +14,20 @@ public final class UpgradeSystem {
     }
 
     public static void purchase(ServerPlayer player, String upgradeId) {
+        var attribute=EvolutionAttribute.byId(upgradeId);
+        if(attribute!=null){InfiniteEvolutionSystem.purchase(player,attribute);return;}
+        var organ=com.codex.blacklight.infection.TissueCore.byId(upgradeId);
+        if(organ!=null){AssimilationSystem.purchase(player,organ);return;}
         if(RicochetRules.ID.equals(upgradeId)){ProjectileDefenseSystem.purchase(player);return;}
         var growth=GrowthUpgrade.byId(upgradeId);
         if(growth!=null){GrowthSystem.purchase(player,growth);return;}
         BlacklightState state = com.codex.blacklight.registry.ModAttachments.getData(player, ModAttachments.PLAYER_STATE);
         var combat = CombatSkill.byId(upgradeId);
         if (combat != null) {
+            EvolutionProgression.refresh(player);
+            if(combat.adaptivePassive()&&!EvolutionProgression.canLearn(player,combat)){
+                player.displayClientMessage(Component.translatable("message.blacklight.passive_qualification",EvolutionProgression.required(combat)),true);return;
+            }
             if (!state.buyCombatSkill(combat)) { deny(player, upgradeId, combat.epCost()); return; }
             confirm(player, state, upgradeId); return;
         }

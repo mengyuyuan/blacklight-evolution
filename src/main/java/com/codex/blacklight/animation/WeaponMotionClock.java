@@ -35,7 +35,7 @@ public final class WeaponMotionClock {
             var landing=definition.get().landing().get();
             if(visual.clipOffset()<landing.impactTime()-.001F)time=Math.min(time,landing.holdTime());
         }
-        float blend=com.codex.blacklight.forge.WingMath.clamp((float)(age/Math.max(.001F,transition)),0,1);
-        return new Sample(key,com.codex.blacklight.forge.WingMath.clamp(time,0,MotionLibrary.duration(key)),false,blend);
+        float blend=com.codex.blacklight.util.MathCompat.clamp((float)(age/Math.max(.001F,transition)),0,1);
+        return new Sample(key,com.codex.blacklight.util.MathCompat.clamp(time,0,MotionLibrary.duration(key)),false,blend);
     }
 }

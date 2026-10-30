@@ -9,6 +9,8 @@ import static org.junit.jupiter.api.Assertions.*;
 
 /** Actual bundled source segments, not mocked timing numbers. */
 class DevastatorSourceTest {
+    @org.junit.jupiter.api.BeforeAll static void bootstrapMinecraft(){net.minecraft.SharedConstants.tryDetectVersion();net.minecraft.server.Bootstrap.bootStrap();}
+
     @BeforeEach void requirePrivateProfile() {org.junit.jupiter.api.Assumptions.assumeTrue(LocalWeaponMotion.find("dev_groundspike").isPresent(),"Requires the private dev7 source motion profile");}
     @Test void formalSkillsHaveSeparateSourceChargeAndValidEffects() {
         for(var move:List.of(WeaponMove.DEV_GROUNDSPIKE,WeaponMove.DEV_AIR_GROUNDSPIKE,
@@ -45,6 +47,13 @@ class DevastatorSourceTest {
         assertEquals(32.70493,DevastatorTiming.of(WeaponMove.DEV_GROUNDSPIKE).radius(),.0001);
         assertEquals(24.52870,DevastatorTiming.of(WeaponMove.DEV_TENDRIL).radius(),.0001);
         assertEquals(163.52465,DevastatorTiming.of(WeaponMove.DEV_CRITICAL_PAIN).radius(),.0001);
+    }
+    @Test void groundAndAirVariantsUseHighActualHealthBudgets(){
+        for(var move:List.of(WeaponMove.DEV_GROUNDSPIKE,WeaponMove.DEV_AIR_GROUNDSPIKE))assertEquals(2000,DevastatorTiming.of(move).damage());
+        for(var move:List.of(WeaponMove.DEV_TENDRIL,WeaponMove.DEV_AIR_TENDRIL))assertEquals(1600,DevastatorTiming.of(move).damage());
+        for(var move:List.of(WeaponMove.DEV_CRITICAL_PAIN,WeaponMove.DEV_AIR_CRITICAL_PAIN))assertEquals(4000,DevastatorTiming.of(move).damage());
+        assertEquals(50,DevastatorDamage.secondary(250));
+        assertEquals(22,DevastatorTiming.of(WeaponMove.BULLETDIVE_DROP).damage(),.0001);
     }
     @Test void painSourceProvidesRealVerticalAimVariants() {
         for(String key:List.of("dev_critical_pain","dev_air_critical_pain")){

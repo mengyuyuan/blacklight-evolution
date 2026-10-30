@@ -19,7 +19,7 @@ import net.minecraftforge.network.NetworkRegistry;
 import net.minecraftforge.network.simple.SimpleChannel;
 
 public final class ModNetwork {
-    private static final String PROTOCOL = "forge-1.20.1-16-identity-library";
+    private static final String PROTOCOL = "forge-1.20.1-17-full-sync";
     private static final SimpleChannel CHANNEL = NetworkRegistry.newSimpleChannel(
             new ResourceLocation(BlacklightNeoMod.MOD_ID, "main"), () -> PROTOCOL, PROTOCOL::equals, PROTOCOL::equals);
     private static boolean registered;
@@ -29,9 +29,16 @@ public final class ModNetwork {
     }
 
     public static void register() {
-        if (registered) throw new IllegalStateException("Blacklight network registered twice");
-        registered = true;
+        if(registered)throw new IllegalStateException("Blacklight network registered twice");
+        registered=true;
+        // Configurable ecology, consume variants and military payloads share one negotiated layout.
         new ForgePayloadRegistrar(CHANNEL)
+                .playToServer(FirearmReloadPayload.class,FirearmReloadPayload.STREAM_CODEC,(payload,context)->context.enqueueWork(()->{if(context.player() instanceof ServerPlayer player)payload.handle(player);}))
+                .playToClient(GunplayFeedbackPayload.class,GunplayFeedbackPayload.STREAM_CODEC,(payload,context)->context.enqueueWork(()->com.codex.blacklight.client.renderer.GunplayVisuals.accept(payload)))
+                .playToClient(InfectedImpactPayload.class,InfectedImpactPayload.STREAM_CODEC,(payload,context)->context.enqueueWork(()->com.codex.blacklight.client.renderer.InfectedImpactVisuals.accept(payload)))
+                .playToClient(DistrictZonePayload.class,DistrictZonePayload.STREAM_CODEC,(payload,context)->context.enqueueWork(()->com.codex.blacklight.client.DistrictZoneHud.accept(payload)))
+                .playToServer(VehicleControlPayload.class,VehicleControlPayload.STREAM_CODEC,(payload,context)->context.enqueueWork(()->{if(context.player() instanceof ServerPlayer p)payload.handle(p);}))
+                .playToServer(VehicleSeatPayload.class,VehicleSeatPayload.STREAM_CODEC,(payload,context)->context.enqueueWork(()->{if(context.player() instanceof ServerPlayer p)payload.handle(p);}))
                 .playToServer(DisguiseSelectPayload.class,DisguiseSelectPayload.STREAM_CODEC,(payload,context)->context.enqueueWork(()->{
                     if(context.player() instanceof ServerPlayer p&&canAct(p))com.codex.blacklight.disguise.DisguiseSystem.select(p,payload.revision(),payload.index());
                 }))
@@ -186,6 +193,7 @@ public final class ModNetwork {
     }
 
     private static void synchronizePersistentState(ServerPlayer player) {
+        com.codex.blacklight.city.CityEcology.synchronize(player);
         com.codex.blacklight.animation.NativePlayerActionBackend.clear(player);
         com.codex.blacklight.power.GrowthSystem.updateHealth(player);
         // Copy-on-death restores server data; explicitly publish it for the new client

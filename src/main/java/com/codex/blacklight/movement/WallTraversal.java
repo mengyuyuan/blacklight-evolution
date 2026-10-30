@@ -70,17 +70,17 @@ public final class WallTraversal {
             mode = lowObstacle ? Mode.PARKOUR : input.sprint() ? Mode.TOP : Mode.MANTLE;
             arcTicks = leapTicks = stallTicks = chargeTicks = 0;
             mantleTop = surface.ledgeY();
-            carrySpeed = input.sprint() ? com.codex.blacklight.forge.WingMath.clamp(Math.max(incomingSpeed, runSpeed * .75), .40, .90) : .24;
+            carrySpeed = input.sprint() ? com.codex.blacklight.util.MathCompat.clamp(Math.max(incomingSpeed, runSpeed * .75), .40, .90) : .24;
             return finishMantle(input, surface, y);
         }
         if (!surface.torso() && !surface.lower()) {
             if (mode == Mode.LEAP && leapTicks > 0) return leap();
             clearSurface(); return idle();
         }
-        double multiplier = Double.isFinite(upgrade) ? com.codex.blacklight.forge.WingMath.clamp(upgrade, .25, 3) : 1;
+        double multiplier = Double.isFinite(upgrade) ? com.codex.blacklight.util.MathCompat.clamp(upgrade, .25, 3) : 1;
         double target = Math.min(1.4, WallRunPhysics.climbVelocity(configuredRun,
                 Math.max(incomingSpeed, runSpeed)) * 1.2 * multiplier);
-        runSpeed = wasAttached ? runSpeed + com.codex.blacklight.forge.WingMath.clamp(target-runSpeed, -.10, .10) : target;
+        runSpeed = wasAttached ? runSpeed + com.codex.blacklight.util.MathCompat.clamp(target-runSpeed, -.10, .10) : target;
         if (jumpPressed || !wasAttached&&input.jump()) chargeTicks=1;
         else if(input.jump()&&chargeTicks>0)chargeTicks=Math.min(20,chargeTicks+1);
         if (jumpReleased && chargeTicks>0) {
@@ -99,7 +99,7 @@ public final class WallTraversal {
         if (stallTicks >= 3) {
             mode = Mode.VAULT; arcTicks = 0; stallTicks = 0;
             mantleTop = Double.NaN;
-            carrySpeed = input.sprint() ? com.codex.blacklight.forge.WingMath.clamp(runSpeed * .75, .40, .90) : .24;
+            carrySpeed = input.sprint() ? com.codex.blacklight.util.MathCompat.clamp(runSpeed * .75, .40, .90) : .24;
             return finishMantle(input, surface, y);
         }
         return frame(.055, vertical, lateral);
@@ -126,7 +126,7 @@ public final class WallTraversal {
             clearSurface(); detachTicks = 4;
             return idle();
         }
-        double vertical = feetBelowLip ? com.codex.blacklight.forge.WingMath.clamp(rise * .7, .08, .55) : -.10;
+        double vertical = feetBelowLip ? com.codex.blacklight.util.MathCompat.clamp(rise * .7, .08, .55) : -.10;
         double inward = input.forward() > 0 ? carrySpeed : 0;
         // Normal movement collision clips inward travel until the feet clear the lip.
         return frame(inward, vertical, 0);

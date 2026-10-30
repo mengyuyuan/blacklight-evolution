@@ -19,13 +19,24 @@ import net.minecraftforge.event.entity.player.PlayerEvent;
 public final class CityTravel {
     public static final ResourceKey<Level> CITY = ResourceKey.create(Registries.DIMENSION,
         new ResourceLocation("blacklight", "city"));
+    public static final ResourceKey<Level> WORLD=ResourceKey.create(Registries.DIMENSION,new ResourceLocation("blacklight","world"));
+    public static boolean isCity(ResourceKey<Level> key){return key.equals(CITY)||key.equals(WORLD);}
+    static ServerLevel commandLevel(net.minecraft.commands.CommandSourceStack source){
+        return isCity(source.getLevel().dimension())?source.getLevel():source.getServer().getLevel(WORLD);
+    }
     private static final String RETURN = "BlacklightCityReturn";
 
     @SubscribeEvent public static void commands(RegisterCommandsEvent event) {
         var root = Commands.literal("blacklightcity")
-            .then(Commands.literal("travel").executes(c -> travel(c.getSource().getPlayerOrException())))
+            .then(Commands.literal("travel").requires(s -> s.hasPermission(2)).executes(c -> travel(c.getSource().getPlayerOrException())))
+            .then(losAngelesCommand())
+            .then(Commands.literal("shenzhen").requires(s -> s.hasPermission(2)).executes(c -> travelToCity(c.getSource().getPlayerOrException(),false)))
+            .then(Commands.literal("cities").executes(c -> {
+                c.getSource().sendSuccess(()->Component.translatable("city.blacklight.destinations"),false);return 1;
+            }))
+            .then(Commands.literal("futian").requires(s -> s.hasPermission(2)).executes(c -> travel(c.getSource().getPlayerOrException(),CITY)))
             .then(Commands.literal("credits").executes(c -> {
-                c.getSource().sendSuccess(()->Component.literal("深圳福田市民中心周边 · Map data © OpenStreetMap contributors (ODbL 1.0), generated with Arnis 3.3.0. https://www.openstreetmap.org/copyright"),false);return 1;
+                c.getSource().sendSuccess(()->Component.literal("黑光维度 · 深圳 / Los Angeles: Map data © OpenStreetMap contributors (ODbL 1.0), Geofabrik Guangdong 2026-10-14 / Southern California 2026-10-24; elevation Mapzen Terrain Tiles / USGS / NOAA; Futian core / entire municipal Los Angeles: Arnis 3.3.0; Los Angeles land cover ESA WorldCover. https://www.openstreetmap.org/copyright"),false);return 1;
             }))
             .then(Commands.literal("hives").executes(c -> {
                 var level=c.getSource().getServer().getLevel(CITY);
@@ -70,20 +81,49 @@ public final class CityTravel {
     private static final java.util.Map<ServerPlayer,PendingTravel> PENDING=new java.util.HashMap<>();
     private static final class PendingTravel {
         final ServerLevel source,target;final BlockPos origin;final net.minecraft.world.phys.Vec3 start;
-        final float yaw,pitch;final boolean returning;final long deadline;
+        final float yaw,pitch;final boolean returning;final long deadline;final String welcome;
         final HydraDestination ticket=new HydraDestination();
-        PendingTravel(ServerPlayer p,ServerLevel target,BlockPos origin,float yaw,float pitch,boolean returning){
+        PendingTravel(ServerPlayer p,ServerLevel target,BlockPos origin,float yaw,float pitch,boolean returning,String welcome){
             source=p.serverLevel();this.target=target;this.origin=origin;this.yaw=yaw;this.pitch=pitch;this.returning=returning;
-            start=p.position();deadline=p.server.getTickCount()+600L;
+            this.welcome=welcome;
+            start=p.position();deadline=p.server.getTickCount()+CityConfig.TRAVEL_TIMEOUT.get()*20L;
         }
     }
     public static int travel(ServerPlayer player) {
+        return travel(player,WORLD);
+    }
+    static int travel(ServerPlayer player,ResourceKey<Level> destination) {
+        return travel(player,destination,null,null);
+    }
+    private static final java.util.Map<String,double[]> LOS_ANGELES_PLACES=java.util.Map.of(
+        "downtown",new double[]{-118.2455,34.0561},
+        "hollywood",new double[]{-118.3287,34.1016},
+        "van_nuys",new double[]{-118.4487,34.1867},
+        "lax",new double[]{-118.408930464,33.941541858},
+        "venice",new double[]{-118.469517253,33.984993368},
+        "san_pedro",new double[]{-118.2923,33.7361});
+    private static com.mojang.brigadier.builder.LiteralArgumentBuilder<net.minecraft.commands.CommandSourceStack> losAngelesCommand(){
+        var root=Commands.literal("losangeles").requires(s -> s.hasPermission(2)).executes(c->travelLosAngeles(c.getSource().getPlayerOrException(),"downtown"));
+        for(String place:LOS_ANGELES_PLACES.keySet())root.then(Commands.literal(place).executes(c->travelLosAngeles(c.getSource().getPlayerOrException(),place)));
+        root.then(Commands.literal("places").executes(c->{c.getSource().sendSuccess(()->Component.translatable("city.blacklight.los_angeles_places"),false);return 1;}));
+        return root;
+    }
+    /** Explicit city selection also works within the atlas and preserves the original-world return. */
+    public static int travelToCity(ServerPlayer player,boolean losAngeles) {
+        return losAngeles?travelLosAngeles(player,"downtown"):travel(player,WORLD,new BlockPos(670,64,820),"city.blacklight.welcome");
+    }
+    public static int travelLosAngeles(ServerPlayer player,String place){
+        var location=LOS_ANGELES_PLACES.get(place);if(location==null)return 0;
+        int x=WorldAtlas.worldX(location[0]),z=WorldAtlas.worldZ(location[1]);
+        return travel(player,WORLD,new BlockPos(x,WorldAtlas.ground(x,z)+1,z),"city.blacklight.los_angeles_welcome");
+    }
+    private static int travel(ServerPlayer player,ResourceKey<Level> destination,BlockPos requestedOrigin,String welcome) {
         if (HydraTransport.active(player)||player.isPassenger()||player.isSleeping()||!player.isAlive()
                 ||com.codex.blacklight.power.BiomassSystem.active(player)
                 ||player.getCooldowns().isOnCooldown(CityBlocks.TRANSIT.get())) return 0;
         if(PENDING.containsKey(player))return 0;
         var server=player.getServer();if(server==null)return 0;
-        boolean returning=player.level().dimension().equals(CITY);
+        boolean returning=requestedOrigin==null&&isCity(player.level().dimension());
         ServerLevel target;BlockPos origin;float yaw,pitch;
         if(returning){
             var tag=player.getPersistentData().getCompound(RETURN);
@@ -95,11 +135,12 @@ public final class CityTravel {
         }else{
             target=server.getLevel(CITY);
             if(target==null){player.displayClientMessage(Component.translatable("city.blacklight.unavailable"),false);return 0;}
-            origin=arrivalOrigin(target);yaw=CitySystem.futian(target)?180:0;pitch=0;
+            origin=requestedOrigin==null?arrivalOrigin(target):requestedOrigin;yaw=CitySystem.futian(target)?180:0;pitch=0;
         }
         // A bounded asynchronous ticket also supports returns to unloaded original worlds.
         if(PENDING.size()>=16)return 0;
-        PENDING.put(player,new PendingTravel(player,target,origin,yaw,pitch,returning));
+        String arrivalMessage=welcome!=null?welcome:destination.equals(WORLD)?"city.blacklight.welcome":"city.blacklight.legacy_welcome";
+        PENDING.put(player,new PendingTravel(player,target,origin,yaw,pitch,returning,arrivalMessage));
         player.displayClientMessage(Component.translatable("hydra.blacklight.wait"),true);
         tickTravel(player);return 1;
     }
@@ -110,22 +151,30 @@ public final class CityTravel {
                 ||p.isPassenger()||p.isSleeping()||HydraTransport.active(p)||com.codex.blacklight.power.BiomassSystem.active(p)){
             cancelTravel(p);return;
         }
-        if(p.server.getTickCount()>pending.deadline){cancelTravel(p);p.displayClientMessage(Component.translatable("city.blacklight.no_safe_exit"),false);return;}
+        if(p.server.getTickCount()>pending.deadline){
+            com.codex.blacklight.BlacklightNeoMod.LOGGER.warn("City arrival timed out: dimension={} origin={} readiness={}",pending.target.dimension().location(),pending.origin,pending.ticket.diagnostics());
+            cancelTravel(p);p.displayClientMessage(Component.translatable("city.blacklight.loading_timeout"),false);return;
+        }
         if(!pending.ticket.prepare(pending.target,pending.origin))return;
         var safe=safePosition(pending.target,pending.origin);
-        if(safe==null){cancelTravel(p);p.displayClientMessage(Component.translatable("city.blacklight.no_safe_exit"),false);return;}
+        if(safe==null){
+            com.codex.blacklight.BlacklightNeoMod.LOGGER.warn("City arrival has no safe floor: dimension={} origin={} readiness={}",pending.target.dimension().location(),pending.origin,pending.ticket.diagnostics());
+            cancelTravel(p);p.displayClientMessage(Component.translatable("city.blacklight.no_safe_exit"),false);return;
+        }
         var back=new CompoundTag();back.putString("dimension",p.level().dimension().location().toString());
         back.putDouble("x",p.getX());back.putDouble("y",p.getY());back.putDouble("z",p.getZ());
         back.putFloat("yaw",p.getYRot());back.putFloat("pitch",p.getXRot());
         try{
             p.teleportTo(pending.target,safe.getX()+.5,safe.getY(),safe.getZ()+.5,pending.yaw,pending.pitch);
             if(p.serverLevel()!=pending.target)return; // Another mod may veto dimension travel.
-            if(pending.returning)p.getPersistentData().remove(RETURN);else p.getPersistentData().put(RETURN,back);
+            if(pending.returning)p.getPersistentData().remove(RETURN);
+            else if(!isCity(pending.source.dimension()))p.getPersistentData().put(RETURN,back);
             p.fallDistance=0;p.setDeltaMovement(0,0,0);p.getCooldowns().addCooldown(CityBlocks.TRANSIT.get(),40);
-            if(!pending.returning)p.displayClientMessage(Component.translatable("city.blacklight.welcome"),false);
+            if(!pending.returning)p.displayClientMessage(Component.translatable(pending.welcome),false);
         }finally{cancelTravel(p);}
     }
     @SubscribeEvent public static void logout(PlayerEvent.PlayerLoggedOutEvent event){if(event.getEntity() instanceof ServerPlayer p)cancelTravel(p);}
+    @SubscribeEvent public static void cloned(PlayerEvent.Clone event){if(event.getOriginal() instanceof ServerPlayer p)cancelTravel(p);}
     @SubscribeEvent public static void stopping(net.minecraftforge.event.server.ServerStoppingEvent event){
         for(var pending:PENDING.values())pending.ticket.release();PENDING.clear();
     }

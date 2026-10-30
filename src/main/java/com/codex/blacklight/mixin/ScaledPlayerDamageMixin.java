@@ -17,7 +17,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public abstract class ScaledPlayerDamageMixin {
     @ModifyVariable(method="actuallyHurt",at=@At(value="STORE",ordinal=2),argsOnly=true,ordinal=0)
     private float blacklight$convertBeforeAbsorption(float damage, @Local(argsOnly=true) DamageSource source){
-        return com.codex.blacklight.combat.CrossModCombat.defend((Player)(Object)this, source, CombatScale.damageUnits((Player)(Object)this,damage));
+        return CombatScale.finalDamage((Player)(Object)this,source,damage);
     }
     @Inject(method="actuallyHurt",at=@At(value="INVOKE",target="Lnet/minecraft/world/entity/player/Player;setHealth(F)V",shift=At.Shift.AFTER))
     private void blacklight$afterHealthLoss(DamageSource source,float damage,CallbackInfo callback,@Local(index=3) float healthDamage){

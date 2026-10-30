@@ -58,7 +58,7 @@ public final class WingFlightEffects {
         var current=Minecraft.getInstance().level;
         if(level!=current){TRACKS.clear();PULSES.clear();level=current;}
     }
-    public static void capture(Player player,PoseStack stack,SovereignWingModel model,float partial){
+    public static void capture(Player player,PoseStack stack,com.codex.blacklight.client.model.WingSurface model,float partial){
         world();var mc=Minecraft.getInstance();
         if(mc.level==null||player.isInvisible()||VisionPowerRenderer.drawingSilhouettes()
                 ||player.distanceToSqr(mc.gameRenderer.getMainCamera().getPosition())>64*64)return;

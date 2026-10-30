@@ -7,7 +7,7 @@ public final class BlacklightSkinWeights {
     public record Blend(String first,String second,float secondWeight) { }
     private BlacklightSkinWeights() { }
     private static float ramp(float x,float low,float high) {
-        float t=com.codex.blacklight.forge.WingMath.clamp((x-low)/(high-low),0,1);return t*t*(3-2*t);
+        float t=net.minecraft.util.Mth.clamp((x-low)/(high-low),0,1);return t*t*(3-2*t);
     }
     public static Blend sample(int region,float modelY,boolean neck) {
         if(neck)return new Blend("Head","Chest",ramp(modelY,-.5F,1.5F));

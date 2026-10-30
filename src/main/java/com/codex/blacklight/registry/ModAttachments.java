@@ -183,6 +183,13 @@ public final class ModAttachments {
                 .orElseGet(type::createDefault);
     }
 
+    public static <T> T peekData(Entity entity,Supplier<AttachmentType<T>> key,T fallback){
+        if(entity==null||entity.isRemoved())return fallback;
+        AttachmentType<T> type=key.get();
+        return entity.getCapability(BlacklightAttachments.CAPABILITY).resolve()
+                .filter(storage->storage.has(type)).map(storage->storage.get(type)).orElse(fallback);
+    }
+
     public static boolean available(Entity entity) {
         return !entity.isRemoved() && entity.getCapability(BlacklightAttachments.CAPABILITY).isPresent();
     }

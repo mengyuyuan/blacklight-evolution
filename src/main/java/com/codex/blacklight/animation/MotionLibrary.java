@@ -49,6 +49,7 @@ public final class MotionLibrary {
             case CONSUME_WHIP -> "consume_whip_actor";
             case CONSUME_MUSCLE -> "consume_muscle_actor";
             case CONSUME_LARGE -> "consume_large_actor";
+            case CONSUME_LARGE_CLAWS -> "consume_large_claws_actor";
             case CONSUME_LARGE_HAMMER -> "consume_large_hammer_actor";
             case CONSUME_LARGE_MUSCLE -> "consume_large_muscle_actor";
             case CONSUME_LARGE_WHIP -> "consume_large_whip_actor";
@@ -142,6 +143,13 @@ public final class MotionLibrary {
         for(String hand:new String[]{"one","two"})for(String phase:new String[]{"pickup","hold","charge","release"})clip("block_throw_"+hand+"_"+phase);
         boolean extension = skillExtensionInstalled();
         for (var action : PlayerAction.values()) clip(resolve(action));
+        for(var form:new com.codex.blacklight.power.PowerForm[]{com.codex.blacklight.power.PowerForm.CLAWS,com.codex.blacklight.power.PowerForm.WHIPFIST})
+            for(int variant:new int[]{com.codex.blacklight.combat.ConsumeVariant.DEFAULT,com.codex.blacklight.combat.ConsumeVariant.CLASSIC}) {
+                String key=com.codex.blacklight.combat.ConsumeSequence.key(form,variant);
+                clip("consume_"+key+"_actor");clip("consume_"+key+"_victim");
+                if(com.codex.blacklight.combat.ConsumeReceiverScene.profile(form,false,variant)==null)
+                    throw new IllegalStateException("Missing consume scene events: "+key);
+            }
         for (var move : com.codex.blacklight.combat.WeaponMove.values()) {
             if (!extension && skillMotion(move.id)) continue;
             clip(move.id);

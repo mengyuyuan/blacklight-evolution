@@ -51,7 +51,7 @@ public final class CrossModCombat {
                 && CrossModDamageRules.externalNamespace(namespace(victim));
     }
     public static boolean bypassTitanLimit(DamageSource source) {
-        return source.is(BulletdiveDamage.TYPE) && source.getEntity() instanceof Player p && PrototypeMetabolism.active(p)
+        return DevastatorDamage.isTrueDamage(source) && source.getEntity() instanceof Player p && PrototypeMetabolism.active(p)
                 || CrossModCombatConfig.OFFENSE.get() && CrossModCombatConfig.TRUE_DAMAGE.get() && nativeAttack(source);
     }
     public static DamageSource offensiveSource(DamageSource source) {
@@ -78,6 +78,7 @@ public final class CrossModCombat {
         var old = new CrossModDamageRules.Budget(data.contains(START) ? data.getLong(START) : now, data.getFloat(SPENT));
         float limit = (float)(maximum * CrossModCombatConfig.WINDOW_FRACTION.get());
         float reduced = CrossModDamageRules.multiply(damage, CrossModCombatConfig.INCOMING.get());
+        if(target instanceof net.minecraft.world.entity.Mob)reduced=Math.min(reduced,(float)(maximum*CrossModCombatConfig.MOB_HIT_FRACTION.get()));
         if (item && reduced > 0) { limit = Math.max(1, (float)Math.floor(limit)); reduced = Math.max(1, (float)Math.ceil(reduced)); }
         var result = old.accept(now, CrossModCombatConfig.WINDOW_TICKS.get(), reduced, limit);
         data.putLong(START, result.budget().start()); data.putFloat(SPENT, result.budget().spent());

@@ -10,7 +10,7 @@ public final class CarrySteering {
     public static Step steer(float cameraYaw, float actorYaw, float forward, float left) {
         if (Math.abs(forward) + Math.abs(left) < 1E-5F) return new Step(actorYaw, forward, left);
         float desired = cameraYaw + (float)Math.toDegrees(Math.atan2(-left, forward));
-        float yaw = actorYaw + com.codex.blacklight.forge.WingMath.clamp(wrap(desired - actorYaw), -45F, 45F);
+        float yaw = actorYaw + com.codex.blacklight.util.MathCompat.clamp(wrap(desired - actorYaw), -45F, 45F);
         double delta = Math.toRadians(cameraYaw - yaw);
         float cosine = (float)Math.cos(delta), sine = (float)Math.sin(delta);
         return new Step(wrap(yaw), forward * cosine + left * sine,

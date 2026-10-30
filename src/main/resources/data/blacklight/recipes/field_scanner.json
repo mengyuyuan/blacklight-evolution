@@ -21,7 +21,7 @@
     }
   },
   "result": {
-    "item": "blacklight:field_scanner",
-    "count": 1
+    "count": 1,
+    "item": "blacklight:field_scanner"
   }
 }

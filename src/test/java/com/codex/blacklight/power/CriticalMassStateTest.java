@@ -78,13 +78,13 @@ class CriticalMassStateTest {
     }
     @Test void savedReserveDoesNotRearmAnAlreadySpentLastChance() {
         var state=new CriticalMassState(.7F,false,500);
-        var encoded=CriticalMassState.CODEC.encodeStart(JsonOps.INSTANCE,state).getOrThrow(false,message->{throw new IllegalStateException(message);});
-        var decoded=CriticalMassState.CODEC.parse(JsonOps.INSTANCE,encoded).getOrThrow(false,message->{throw new IllegalStateException(message);});
+        var encoded=CriticalMassState.CODEC.encodeStart(JsonOps.INSTANCE,state).getOrThrow(false, message -> { throw new AssertionError(message); });
+        var decoded=CriticalMassState.CODEC.parse(JsonOps.INSTANCE,encoded).getOrThrow(false, message -> { throw new AssertionError(message); });
         assertEquals(state,decoded);
         assertFalse(decoded.spend().adrenalineArmed());
         assertTrue(decoded.armed(true).adrenalineArmed());
         assertEquals(CriticalMassState.EMPTY,CriticalMassState.CODEC.parse(JsonOps.INSTANCE,
-                JsonParser.parseString("{}")).getOrThrow(false,message->{throw new IllegalStateException(message);}));
+                JsonParser.parseString("{}")).getOrThrow(false, message -> { throw new AssertionError(message); }));
     }
     @Test void adrenalineIntervalPersistsAndDoesNotRestrictOrdinaryReserve() {
         var state=new CriticalMassState(2,false).adrenalineSpent(1000);

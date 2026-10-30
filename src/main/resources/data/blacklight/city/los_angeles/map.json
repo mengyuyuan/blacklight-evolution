@@ -231,7 +231,7 @@
       "Name": "minecraft:yellow_concrete"
     },
     {
-      "Name": "minecraft:short_grass"
+      "Name": "minecraft:grass"
     },
     {
       "Name": "minecraft:mud_bricks"
@@ -3015,7 +3015,7 @@
       "Name": "minecraft:waxed_exposed_cut_copper"
     },
     {
-      "Name": "minecraft:waxed_exposed_chiseled_copper"
+      "Name": "minecraft:waxed_exposed_cut_copper"
     },
     {
       "Name": "minecraft:waxed_exposed_copper"

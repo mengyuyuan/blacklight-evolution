@@ -371,7 +371,7 @@ class MvpResourceTest {
             var track=item.getAsJsonObject();var times=track.getAsJsonArray("time");var frames=track.getAsJsonArray("transform");
             int upper=0;while(upper<times.size()-1&&times.get(upper).getAsDouble()<time)upper++;
             int lower=Math.max(0,upper-1);double start=times.get(lower).getAsDouble(),end=times.get(upper).getAsDouble();
-            double t=end==start?0:com.codex.blacklight.util.MathCompat.clamp((time-start)/(end-start),0,1);
+            double t=end==start?0:com.codex.blacklight.forge.WingMath.clamp((time-start)/(end-start),0,1);
             var a=frames.get(lower).getAsJsonObject();var b=frames.get(upper).getAsJsonObject();var frame=new JsonObject();
             for(String channel:new String[]{"loc","sca"}) {
                 var values=new com.google.gson.JsonArray();
@@ -383,7 +383,7 @@ class MvpResourceTest {
             double dot=0;for(int axis=0;axis<4;axis++){qa[axis]/=Math.sqrt(la);qb[axis]/=Math.sqrt(lb);dot+=qa[axis]*qb[axis];}
             if(dot<0){dot=-dot;for(int axis=0;axis<4;axis++)qb[axis]=-qb[axis];}
             double wa=1-t,wb=t;
-            if(dot<.9995){double angle=Math.acos(com.codex.blacklight.util.MathCompat.clamp(dot,-1,1));wa=Math.sin((1-t)*angle)/Math.sin(angle);wb=Math.sin(t*angle)/Math.sin(angle);}
+            if(dot<.9995){double angle=Math.acos(com.codex.blacklight.forge.WingMath.clamp(dot,-1,1));wa=Math.sin((1-t)*angle)/Math.sin(angle);wb=Math.sin(t*angle)/Math.sin(angle);}
             double length=0;double[] q=new double[4];for(int axis=0;axis<4;axis++){q[axis]=qa[axis]*wa+qb[axis]*wb;length+=q[axis]*q[axis];}
             var rotation=new com.google.gson.JsonArray();for(double value:q)rotation.add(value/Math.sqrt(length));frame.add("rot",rotation);
             var sampledTimes=new com.google.gson.JsonArray();sampledTimes.add(time);var sampledFrames=new com.google.gson.JsonArray();sampledFrames.add(frame);

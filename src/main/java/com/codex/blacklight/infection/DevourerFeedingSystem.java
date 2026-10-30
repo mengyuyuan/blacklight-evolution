@@ -268,7 +268,7 @@ public final class DevourerFeedingSystem {
         if(claim.getBoolean("HadGravityFlag"))mob.setNoGravity(claim.getBoolean("NoGravity"));
         mob.getPersistentData().remove(CLAIM);mob.setDeltaMovement(Vec3.ZERO);mob.hurtMarked=true;
     }
-    @SubscribeEvent public static void freeze(ForgeEntityTickEvent.Pre event) {
+    @SubscribeEvent public static void freeze(com.codex.blacklight.combat.ForgeEntityTickEvent.Pre event) {
         if(!(event.getEntity() instanceof Mob prey)||prey.level().isClientSide)return;
         Session session=CAPTURED.get(prey);if(session==null)return;
         if(!DevourerHabitat.canFeed(session.host)||(DevourerHabitat.nodeMask(session.host)&(1<<session.node))==0) {abort(session,"供养中断，已释放猎物");return;}

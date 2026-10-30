@@ -35,11 +35,13 @@ public final class BlacklightMutant extends Monster implements GeoEntity {
     }
     @Override public void tick(){
         super.tick();
-        // The final vanilla death tick removes this entity and invalidates Forge capabilities.
-        if(isRemoved()||level().isClientSide)return;
+        if(isRemoved()||level().isClientSide||!com.codex.blacklight.registry.ModAttachments.available(this))return;
+        if(!isAlive()||isNoAi()){entityData.set(ATTACK,0);return;}
         if(com.codex.blacklight.combat.ImpactControl.stunned(this)){entityData.set(ATTACK,0);return;}
-        if(com.codex.blacklight.registry.ModAttachments.getData(this, com.codex.blacklight.registry.ModAttachments.CONSUME_VISUAL).active()){entityData.set(ATTACK,0);return;}
-        if(cooldown>0)cooldown--;int t=entityData.get(ATTACK);if(t<=0)return;
+        if(com.codex.blacklight.registry.ModAttachments.getData(this,com.codex.blacklight.registry.ModAttachments.CONSUME_VISUAL).active()){entityData.set(ATTACK,0);return;}
+        if(cooldown>0)cooldown--;
+        if(com.codex.blacklight.military.vehicle.VehicleHullAttackGoal.handles(this)){entityData.set(ATTACK,0);return;}
+        int t=entityData.get(ATTACK);if(t<=0)return;
         getNavigation().stop();
         if(kind==Kind.STALKER&&t<=12&&t>=8)move(MoverType.SELF,aim.subtract(position()).multiply(1,0,1).normalize().scale(.34));
         if(t==10){

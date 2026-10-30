@@ -11,7 +11,7 @@ public final class LandingMotionPolicy {
     }
 
     public static float movingCushionWeight(float seconds) {
-        return 1-com.codex.blacklight.forge.WingMath.clamp(seconds/MOVING_CUSHION_SECONDS,0,1);
+        return 1-com.codex.blacklight.util.MathCompat.clamp(seconds/MOVING_CUSHION_SECONDS,0,1);
     }
 
     public static boolean permitsStride(String clip,float seconds) {

@@ -26,13 +26,20 @@ public final class BlacklightNeoMod {
     public static final Logger LOGGER = LogUtils.getLogger();
 
     public BlacklightNeoMod() {
-        IEventBus modBus = FMLJavaModLoadingContext.get().getModEventBus();
-        net.minecraftforge.fml.ModLoadingContext.get().registerConfig(net.minecraftforge.fml.config.ModConfig.Type.CLIENT,com.codex.blacklight.config.PassiveHudConfig.SPEC,"blacklight-client.toml");
-        net.minecraftforge.fml.ModLoadingContext.get().registerConfig(net.minecraftforge.fml.config.ModConfig.Type.SERVER,com.codex.blacklight.config.GameplayBalanceConfig.SPEC,"blacklight-gameplay-server.toml");
-        net.minecraftforge.fml.ModLoadingContext.get().registerConfig(net.minecraftforge.fml.config.ModConfig.Type.SERVER,com.codex.blacklight.power.PlayerEvolutionConfig.SPEC,"blacklight-player-evolution-server.toml");
-        net.minecraftforge.fml.ModLoadingContext.get().registerConfig(net.minecraftforge.fml.config.ModConfig.Type.SERVER,com.codex.blacklight.infection.TissueCompetitionConfig.SPEC,"blacklight-tissue-competition-server.toml");
-        net.minecraftforge.fml.ModLoadingContext.get().registerConfig(net.minecraftforge.fml.config.ModConfig.Type.SERVER,com.codex.blacklight.city.CityConfig.SPEC,"blacklight-city-server.toml");
-        net.minecraftforge.fml.ModLoadingContext.get().registerConfig(net.minecraftforge.fml.config.ModConfig.Type.SERVER,com.codex.blacklight.config.CrossModCombatConfig.SPEC,"blacklight-combat-server.toml");
+        IEventBus modBus=FMLJavaModLoadingContext.get().getModEventBus();
+        net.minecraftforge.fml.ModLoadingContext.get().registerConfig(net.minecraftforge.fml.config.ModConfig.Type.CLIENT, com.codex.blacklight.config.PassiveHudConfig.SPEC, "blacklight-client.toml");
+        net.minecraftforge.fml.ModLoadingContext.get().registerConfig(net.minecraftforge.fml.config.ModConfig.Type.CLIENT,com.codex.blacklight.config.GunplayClientConfig.SPEC,"blacklight-gunplay-client.toml");
+        net.minecraftforge.fml.ModLoadingContext.get().registerConfig(net.minecraftforge.fml.config.ModConfig.Type.SERVER, com.codex.blacklight.city.CityConfig.SPEC, "blacklight-city-server.toml");
+        net.minecraftforge.fml.ModLoadingContext.get().registerConfig(net.minecraftforge.fml.config.ModConfig.Type.SERVER, com.codex.blacklight.city.MilitaryCampaignConfig.SPEC, "blacklight-military-campaign-server.toml");
+        net.minecraftforge.fml.ModLoadingContext.get().registerConfig(net.minecraftforge.fml.config.ModConfig.Type.SERVER, com.codex.blacklight.infection.BuildingInfectionConfig.SPEC, "blacklight-building-infection-server.toml");
+        net.minecraftforge.fml.ModLoadingContext.get().registerConfig(net.minecraftforge.fml.config.ModConfig.Type.SERVER, com.codex.blacklight.infection.TissueCompetitionConfig.SPEC, "blacklight-evolution-server.toml");
+        net.minecraftforge.fml.ModLoadingContext.get().registerConfig(net.minecraftforge.fml.config.ModConfig.Type.SERVER, com.codex.blacklight.infection.EvolvedBalance.SPEC, "blacklight-evolved-server.toml");
+        net.minecraftforge.fml.ModLoadingContext.get().registerConfig(net.minecraftforge.fml.config.ModConfig.Type.SERVER, com.codex.blacklight.firearms.FirearmsWorldConfig.SPEC, "blacklight-firearms-server.toml");
+
+        net.minecraftforge.fml.ModLoadingContext.get().registerConfig(net.minecraftforge.fml.config.ModConfig.Type.SERVER, com.codex.blacklight.config.CrossModCombatConfig.SPEC, "blacklight-combat-server.toml");
+        net.minecraftforge.fml.ModLoadingContext.get().registerConfig(net.minecraftforge.fml.config.ModConfig.Type.SERVER, com.codex.blacklight.infection.OutbreakConfig.SPEC, "blacklight-outbreak-server.toml");
+        net.minecraftforge.fml.ModLoadingContext.get().registerConfig(net.minecraftforge.fml.config.ModConfig.Type.SERVER, com.codex.blacklight.power.PlayerEvolutionConfig.SPEC, "blacklight-player-evolution-server.toml");
+        net.minecraftforge.fml.ModLoadingContext.get().registerConfig(net.minecraftforge.fml.config.ModConfig.Type.SERVER, com.codex.blacklight.config.GameplayBalanceConfig.SPEC, "blacklight-gameplay-server.toml");
         com.codex.blacklight.city.CityBlocks.register(modBus);
         com.codex.blacklight.city.CityWorldgen.register(modBus);
         MinecraftForge.EVENT_BUS.register(com.codex.blacklight.city.CitySystem.class);
@@ -41,16 +48,21 @@ public final class BlacklightNeoMod {
         ModEntities.register(modBus);
         ModEffects.register(modBus);
         ModItems.register(modBus);
+        com.codex.blacklight.military.vehicle.VehicleRegistry.register(modBus);
+        com.codex.blacklight.registry.MilitaryFacilityBlocks.register(modBus);
         com.codex.blacklight.registry.ModBlocks.register(modBus);
+        com.codex.blacklight.registry.ModBlockEntities.register(modBus);
         com.codex.blacklight.registry.ModWorldgen.register(modBus);
         ModParticles.register(modBus);
         com.codex.blacklight.registry.ModWeaponSounds.register(modBus);
+        com.codex.blacklight.firearms.GunplaySounds.register(modBus);
+        com.codex.blacklight.registry.ModInfectedSounds.register(modBus);
         ModNetwork.register();
         modBus.addListener((net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent event)->event.enqueueWork(()->{
             com.codex.blacklight.power.BiomassRules.initialize();
             com.codex.blacklight.animation.MotionLibrary.requireInstalled();
             var health=(net.minecraft.world.entity.ai.attributes.RangedAttribute)net.minecraft.world.entity.ai.attributes.Attributes.MAX_HEALTH;
-            ((com.codex.blacklight.mixin.HealthAttributeLimitAccessor)health).blacklight$setMaximum(Math.max(health.getMaxValue(),1000000));
+            ((com.codex.blacklight.mixin.HealthAttributeLimitAccessor)health).blacklight$setMaximum(Math.max(health.getMaxValue(),1e24));
         }));
         MinecraftForge.EVENT_BUS.register(BlacklightCommands.class);
         MinecraftForge.EVENT_BUS.register(ClawCombatSystem.class);
@@ -66,6 +78,11 @@ public final class BlacklightNeoMod {
         com.codex.blacklight.animation.PlayerActions.install(new com.codex.blacklight.animation.NativePlayerActionBackend());
         MinecraftForge.EVENT_BUS.register(com.codex.blacklight.animation.NativePlayerActionBackend.class);
         MinecraftForge.EVENT_BUS.register(BlacklightInfectionSystem.class);
+        MinecraftForge.EVENT_BUS.register(com.codex.blacklight.entity.BlackwatchSquadSystem.class);
+        MinecraftForge.EVENT_BUS.register(com.codex.blacklight.military.MilitaryOrganizationSystem.class);
+        MinecraftForge.EVENT_BUS.register(com.codex.blacklight.military.MilitaryFormationSystem.class);
+        MinecraftForge.EVENT_BUS.register(com.codex.blacklight.city.CityMilitaryService.class);
+        MinecraftForge.EVENT_BUS.register(com.codex.blacklight.firearms.FirearmBlockDamage.class);
         MinecraftForge.EVENT_BUS.register(com.codex.blacklight.world.ResearchStationTrades.class);
         MinecraftForge.EVENT_BUS.register(com.codex.blacklight.world.SurvivalGuide.class);
         MinecraftForge.EVENT_BUS.register(com.codex.blacklight.combat.ConsumeSystem.class);

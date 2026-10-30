@@ -21,7 +21,7 @@ public final class CitySystem {
     private static final int[][] PORTS=CityLayout.HATCHES;
     private CitySystem(){}
     @SubscribeEvent public static void placed(net.minecraftforge.event.level.BlockEvent.EntityPlaceEvent event){
-        if(!(event.getLevel() instanceof ServerLevel level)||!level.dimension().equals(CityTravel.CITY))return;
+        if(!(event.getLevel() instanceof ServerLevel level)||!CityTravel.isCity(level.dimension()))return;
         if(event instanceof net.minecraftforge.event.level.BlockEvent.EntityMultiPlaceEvent multi){
             for(var snapshot:multi.getReplacedBlockSnapshots())protect(level,snapshot.getPos());
         }else protect(level,event.getPos());
@@ -30,7 +30,7 @@ public final class CitySystem {
         if(inside(level,p.getX(),p.getZ())&&p.getY()>=63&&p.getY()<=72){var data=CityData.get(level);if(data.editedBlocks.add(p.asLong()))data.setDirty();}
     }
     public static BlockPos port(long seed,int hive,int index){return new BlockPos(CityLayout.hiveX(seed,hive)*64+PORTS[index][0],65,CityLayout.hiveZ(seed,hive)*64+PORTS[index][1]);}
-    public static boolean futian(ServerLevel level){return level.getChunkSource().getGenerator() instanceof CityChunkGenerator g&&g.futian();}
+    public static boolean futian(ServerLevel level){return level.getChunkSource().getGenerator() instanceof BlacklightWorldGenerator||level.getChunkSource().getGenerator() instanceof CityChunkGenerator g&&g.futian();}
     public static BlockPos port(ServerLevel level,int hive,int index){return futian(level)?FutianLayout.hive(level.getSeed(),hive).ports().get(index).pos():port(level.getSeed(),hive,index);}
     private static int cell(ServerLevel level){return futian(level)?FutianMap.CELL:64;}
     private static boolean inside(ServerLevel level,int x,int z){return futian(level)?FutianMap.inside(x,z):CityLayout.inside(x,z);}
@@ -55,11 +55,12 @@ public final class CitySystem {
     private static boolean loaded(ServerLevel level,BlockPos pos){return level.hasChunkAt(pos)&&level.isPositionEntityTicking(pos);}
     @SubscribeEvent public static void tick(TickEvent.LevelTickEvent event){
         if(event.phase!=TickEvent.Phase.END)return;
-        if(!(event.level instanceof ServerLevel level)||!level.dimension().equals(CityTravel.CITY))return;
+        if(!(event.level instanceof ServerLevel level)||!CityTravel.isCity(level.dimension()))return;
         CityPregenerator.tick(level);
         if(level.players().isEmpty())return;
         long time=level.getGameTime();if(time%20!=0)return;
         updateLoadedCity(level,time);
+        if(level.dimension().equals(CityTravel.WORLD)&&time%CityConfig.populationIntervalTicks()==0)populateWorld(level);
     }
     @SubscribeEvent public static void unloaded(net.minecraftforge.event.level.LevelEvent.Unload event){
         if(event.getLevel() instanceof ServerLevel level)CityPregenerator.unload(level);
@@ -68,11 +69,12 @@ public final class CitySystem {
         CityData data=CityData.get(level);
         for(int hive=0;hive<2;hive++){
             inspectHive(level,data,hive);
+            CityHiveSupply.tick(level,data,hive);
             if(data.destroyed(hive)){if(data.facade&&CityConfig.DESTRUCTION.get())woundFacade(level,data,hive);}
-            else if(time%200==0&&data.population&&CityConfig.SPAWNS.get())spawnHive(level,data,hive);
+            else if(data.population&&CityConfig.SPAWNS.get()&&CityHiveSupply.ready(data,hive))spawnHive(level,data,hive);
         }
-        if(time%100==0&&data.population&&CityConfig.SPAWNS.get())populate(level,data);
-        if(data.spread&&CityConfig.SPREAD.get()){
+        if(time%CityConfig.populationIntervalTicks()==0&&data.population&&CityConfig.SPAWNS.get())populate(level,data);
+        if(data.spread&&CityConfig.SPREAD.get()&&level.getGameRules().getBoolean(net.minecraft.world.level.GameRules.RULE_MOBGRIEFING)&&com.codex.blacklight.infection.WorldOutbreakSystem.active(level)){
             if(time>=data.nextSpread){expand(level,data);data.nextSpread=time+CityConfig.SPREAD_SECONDS.get()*20L;data.setDirty();}
             paintSpread(level,data);
         }
@@ -93,17 +95,19 @@ public final class CitySystem {
         if(Integer.bitCount(data.brokenPorts[hive])==PORTS.length){
             data.destroyedMask|=1<<hive;data.setDirty();
             BlockPos center=port(level,hive,0);
+            CityEcology.cleared(level,center);
             level.playSound(null,center,SoundEvents.GENERIC_EXPLODE,SoundSource.HOSTILE,3,.65f);
             for(var player:level.players())if(player.distanceToSqr(center.getX(),65,center.getZ())<160*160)
                 player.displayClientMessage(net.minecraft.network.chat.Component.translatable("city.blacklight.hive_destroyed"),false);
         }
     }
-    private static int count(ServerLevel level){
-        int n=0;for(Entity entity:level.getAllEntities())if(entity instanceof Mob && entity.isAlive())n++;return n;
-    }
     static boolean spawn(ServerLevel level,EntityType<? extends Mob> type,BlockPos pos,boolean infected){
         if(!level.getGameRules().getBoolean(net.minecraft.world.level.GameRules.RULE_DOMOBSPAWNING))return false;
-        if(!loaded(level,pos)||!level.getBlockState(pos.below()).isSolid()||count(level)>=CityConfig.MOB_LIMIT.get())return false;
+        if((infected||type==ModEntities.BLACKLIGHT_HUNTER.get()||type==ModEntities.BLACKLIGHT_HYDRA.get())&&!com.codex.blacklight.infection.WorldOutbreakSystem.active(level))return false;
+        if((infected||type==ModEntities.BLACKLIGHT_HUNTER.get()||type==ModEntities.BLACKLIGHT_HYDRA.get())
+                &&!com.codex.blacklight.infection.WorldOutbreakSystem.populationRoom(level,pos))return false;
+        if(infected&&type==EntityType.ZOMBIE)type=ModEntities.COMMON_INFECTED.get();
+        if(!loaded(level,pos)||!level.getBlockState(pos.below()).isSolid()||com.codex.blacklight.infection.WorldOutbreakSystem.cityPopulationSlots(level,infected||type==ModEntities.BLACKLIGHT_HUNTER.get()||type==ModEntities.BLACKLIGHT_HYDRA.get())==0)return false;
         Mob mob=type.create(level);if(mob==null)return false;
         mob.moveTo(pos.getX()+.5,pos.getY(),pos.getZ()+.5,level.random.nextFloat()*360,0);
         if(!level.noCollision(mob)||level.containsAnyLiquid(mob.getBoundingBox()))return false;
@@ -114,26 +118,52 @@ public final class CitySystem {
         mob.addTag(POPULATION); // Infection replacements preserve vanilla entity tags.
         // Residents persist in their district; hostile vanilla mobs may despawn normally.
         if(type==EntityType.VILLAGER)mob.setPersistenceRequired();
-        if(infected)BlacklightInfectionSystem.infect(mob,null);
+        if(infected){if(!CityEcology.ambientAllowed(level,pos,level.random.nextInt(100)))return false;if(!BlacklightInfectionSystem.isInfected(mob))BlacklightInfectionSystem.infect(mob,null);}
         if(mob instanceof Zombie zombie)zombie.setBaby(false);
-        return level.addFreshEntity(mob);
+        return com.codex.blacklight.infection.WorldOutbreakSystem.addScheduled(level,mob);
+    }
+    private static void populateWorld(ServerLevel level){
+        if(!CityConfig.SPAWNS.get()||!CityData.get(level).population)return;
+        // One spawn attempt per five seconds for the entire dimension, only in ticking chunks.
+        var player=level.players().get(level.random.nextInt(level.players().size()));
+        int x=player.getBlockX()+level.random.nextInt(129)-64,z=player.getBlockZ()+level.random.nextInt(129)-64;
+        if(FutianMap.inside(x,z)||!level.isPositionEntityTicking(new BlockPos(x,64,z)))return;
+        var column=WorldTerrain.column(level.getSeed(),x,z);
+        if(column.road==0||column.water>0||!column.parts.isEmpty())return;
+        var chunk=level.getChunkSource().getChunkNow(Math.floorDiv(x,16),Math.floorDiv(z,16));if(chunk==null)return;
+        int y=chunk.getHeight(net.minecraft.world.level.levelgen.Heightmap.Types.MOTION_BLOCKING_NO_LEAVES,x&15,z&15)+1;
+        var p=new BlockPos(x,y,z);
+        var zone=CityEcology.zone(level,p);
+        if(zone!=DistrictThreat.Zone.RED&&level.getEntitiesOfClass(Mob.class,new AABB(p).inflate(48),m->m.isAlive()&&!BlacklightInfectionSystem.isInfected(m)).size()>=8)return;
+        if(zone!=DistrictThreat.Zone.GREEN&&level.getDifficulty()==net.minecraft.world.Difficulty.PEACEFUL)return;
+        if(zone==DistrictThreat.Zone.RED){if(!CityEcology.ambientAllowed(level,p,level.random.nextInt(100)))return;com.codex.blacklight.infection.WorldOutbreakSystem.spawnAt(level,p,
+                com.codex.blacklight.infection.WorldOutbreakSystem.tierForPopulation(level,p,level.random.nextDouble()));return;}
+        EntityType<? extends Mob> type=zone==DistrictThreat.Zone.GREEN?EntityType.VILLAGER:
+            level.random.nextBoolean()?ModEntities.BLACKWATCH_SOLDIER.get():EntityType.ZOMBIE;
+        spawn(level,type,p,type==EntityType.ZOMBIE);
     }
     private static void spawnHive(ServerLevel level,CityData data,int hive){
-        if(level.getDifficulty()==net.minecraft.world.Difficulty.PEACEFUL)return;
+        if(!CityHiveSupply.ready(data,hive)||level.getDifficulty()==net.minecraft.world.Difficulty.PEACEFUL||!com.codex.blacklight.infection.WorldOutbreakSystem.active(level))return;
+        if(level.random.nextDouble()>=com.codex.blacklight.config.GameplayBalanceConfig.BROOD_CHANCE.get()){data.hiveBroodTicks[hive]=0;data.setDirty();return;}
         int start=level.random.nextInt(PORTS.length);
         for(int j=0;j<PORTS.length;j++){
             int i=(start+j)%PORTS.length;BlockPos port=port(level,hive,i);
-            if((data.brokenPorts[hive]&(1<<i))!=0||!loaded(level,port))continue;
+            if((data.brokenPorts[hive]&(1<<i))!=0||!loaded(level,port)||!level.getBlockState(port).is(CityBlocks.HATCH.get()))continue;
             if(level.players().stream().noneMatch(p->p.distanceToSqr(port.getX(),65,port.getZ())<96*96))continue;
             var facing=level.getBlockState(port).getValue(CityHatchBlock.FACING);
             BlockPos outside=port.relative(facing,3).below();
             var guards=level.getEntitiesOfClass(Mob.class,new AABB(port).inflate(48),Entity::isAlive);
             boolean hasHunter=guards.stream().anyMatch(e->e instanceof com.codex.blacklight.entity.BlacklightHunter);
-            // Reserve one brood slot for a hunter: surrounding infected must not fill every slot first.
-            if(guards.size()>=(hasHunter?12:13))return;
-            boolean hunter=!hasHunter||level.random.nextInt(5)==0;
-            boolean hydra=!hunter&&level.random.nextInt(12)==0&&level.getEntitiesOfClass(com.codex.blacklight.entity.BlacklightHydra.class,new AABB(port).inflate(64)).isEmpty();
-            if(spawn(level,hydra?ModEntities.BLACKLIGHT_HYDRA.get():hunter?ModEntities.BLACKLIGHT_HUNTER.get():EntityType.ZOMBIE,outside,!hunter&&!hydra)){
+            int stage=CityEcology.stage(level,port);
+            int common=0,developed=0,mature=0,ancient=0;
+            for(var mob:guards){if(mob instanceof com.codex.blacklight.entity.BlacklightCommonInfected)common++;
+                if(mob instanceof com.codex.blacklight.entity.BlacklightInfectedHost host&&!host.hasMultipartBody()){
+                    developed++;if(host.tissueAge()>=com.codex.blacklight.infection.TissueGrowth.MATURITY_TICKS)mature++;if(host.tissueAge()>=com.codex.blacklight.infection.TissueGrowth.ANCIENT_TICKS)ancient++;
+                }}
+            var tier=com.codex.blacklight.infection.OutbreakRules.populationTier(stage,common,developed,mature,ancient,com.codex.blacklight.infection.OutbreakConfig.COMMON_RESERVE.get(),com.codex.blacklight.infection.OutbreakConfig.LOCAL_CAP.get(),level.random.nextDouble());
+            if(com.codex.blacklight.config.GameplayBalanceConfig.LINEAGE_GUARANTEES.get()&&stage>=2&&!hasHunter&&common>=com.codex.blacklight.infection.OutbreakConfig.COMMON_RESERVE.get())tier=com.codex.blacklight.infection.OutbreakRules.Tier.HUNTER;
+            boolean hydra=stage>=3&&hasHunter&&tier==com.codex.blacklight.infection.OutbreakRules.Tier.ANCIENT&&level.random.nextDouble()<CityConfig.HYDRA_CHANCE.get()&&level.getEntitiesOfClass(com.codex.blacklight.entity.BlacklightHydra.class,new AABB(port).inflate(64)).isEmpty();
+            if((hydra?CityHiveSupply.hatchHydra(level,data,hive,port):CityHiveSupply.hatch(level,data,hive,port,tier))!=null){
                 level.setBlock(port,level.getBlockState(port).setValue(CityHatchBlock.OPEN,true),3);
                 level.sendParticles(ParticleTypes.CRIMSON_SPORE,outside.getX()+.5,65,outside.getZ()+.5,16,.7,.6,.7,.02);
                 level.playSound(null,port,SoundEvents.SLIME_SQUISH,SoundSource.HOSTILE,1,.6f);
@@ -147,23 +177,34 @@ public final class CitySystem {
             long bit=1L<<(x+z*8);if((data.populatedMask&bit)!=0)continue;
             BlockPos center=populationPoint(level,x,z);
             if(center==null||!loaded(level,center)||level.players().stream().noneMatch(p->p.distanceToSqr(center.getX(),center.getY(),center.getZ())<100*100))continue;
-            if(count(level)>=CityConfig.MOB_LIMIT.get())return;
-            var zone=data.infected(x,z)&&!sanctuary(level,x,z)?CityLayout.Zone.INFECTED:zone(level,x,z);
-            if(futian(level)&&FutianLayout.sanctuary(center.getX(),center.getZ()))zone=CityLayout.Zone.NORMAL;
-            if(level.getDifficulty()==net.minecraft.world.Difficulty.PEACEFUL&&zone!=CityLayout.Zone.NORMAL)continue;
+            var zone=CityEcology.zone(level,center);
+            if(!hasPopulationRoom(level,zone))continue;
+            if(level.getDifficulty()==net.minecraft.world.Difficulty.PEACEFUL&&zone!=DistrictThreat.Zone.GREEN)continue;
             int spawned=populateDistrict(level,center,zone);
             if(spawned>0){data.populatedMask|=bit;data.setDirty();}return;
         }
     }
+    static boolean hasPopulationRoom(ServerLevel level,DistrictThreat.Zone zone){
+        int residents=com.codex.blacklight.infection.WorldOutbreakSystem.cityPopulationSlots(level,false);
+        int infected=com.codex.blacklight.infection.WorldOutbreakSystem.cityPopulationSlots(level,true);
+        return switch(zone){case GREEN->residents>0;case RED->infected>0;case YELLOW->residents>0||infected>0;};
+    }
     /** One bounded initial street cohort, sharing the ordinary publication and population guards. */
-    static int populateDistrict(ServerLevel level,BlockPos center,CityLayout.Zone zone){
+    static int populateDistrict(ServerLevel level,BlockPos center,DistrictThreat.Zone zone){
         if(!level.getGameRules().getBoolean(net.minecraft.world.level.GameRules.RULE_DOMOBSPAWNING))return 0;
-        if(level.getDifficulty()==net.minecraft.world.Difficulty.PEACEFUL&&zone!=CityLayout.Zone.NORMAL)return 0;
-        int attempts=Math.min(4,Math.max(0,CityConfig.MOB_LIMIT.get()-count(level))),spawned=0;
+        if(level.getDifficulty()==net.minecraft.world.Difficulty.PEACEFUL&&zone!=DistrictThreat.Zone.GREEN)return 0;
+        if(!hasPopulationRoom(level,zone))return 0;
+        int attempts=4,spawned=0;
         for(int i=0;i<attempts;i++){
             var pos=center.offset(i*3-5,0,0);
-            EntityType<? extends Mob> type=zone==CityLayout.Zone.NORMAL?EntityType.VILLAGER:
-                    zone==CityLayout.Zone.CONFLICT&&i<2?ModEntities.BLACKWATCH_SOLDIER.get():EntityType.ZOMBIE;
+            if(zone==DistrictThreat.Zone.RED){
+                if(CityEcology.ambientAllowed(level,pos,level.random.nextInt(100))
+                        &&com.codex.blacklight.infection.WorldOutbreakSystem.spawnAt(level,pos,
+                        com.codex.blacklight.infection.WorldOutbreakSystem.tierForPopulation(level,pos,level.random.nextDouble()))!=null)spawned++;
+                continue;
+            }
+            EntityType<? extends Mob> type=zone==DistrictThreat.Zone.GREEN?EntityType.VILLAGER:
+                    zone==DistrictThreat.Zone.YELLOW&&i<2?ModEntities.BLACKWATCH_SOLDIER.get():EntityType.ZOMBIE;
             if(spawn(level,type,pos,type==EntityType.ZOMBIE))spawned++;
         }
         return spawned;
@@ -176,7 +217,7 @@ public final class CitySystem {
             int hx=hiveX(level,hive),hz=hiveZ(level,hive);
             for(int distance=2;distance<=3;distance++)for(int z=0;z<8;z++)for(int x=0;x<8;x++){
                 if(sanctuary(level,x,z)||data.infected(x,z)||zone(level,x,z)==CityLayout.Zone.INFECTED||Math.abs(x-hx)+Math.abs(z-hz)!=distance)continue;
-                BlockPos p=populationPoint(level,x,z);if(p==null||!loaded(level,p))continue;
+                BlockPos p=populationPoint(level,x,z);if(p==null||!loaded(level,p)||CityEcology.zone(level,p)!=DistrictThreat.Zone.RED)continue;
                 boolean adjacent=false;for(int[] d:new int[][]{{-1,0},{1,0},{0,-1},{0,1}}){int nx=x+d[0],nz=z+d[1];if(nx>=0&&nx<8&&nz>=0&&nz<8&&(zone(level,nx,nz)==CityLayout.Zone.INFECTED||data.infected(nx,nz)))adjacent=true;}
                 if(!adjacent)continue;
                 data.infectedMask|=1L<<(x+z*8);data.setDirty();
@@ -191,7 +232,8 @@ public final class CitySystem {
         int budget=32;
         int size=cell(level),total=size*size;
         for(int cell=0;cell<64&&budget>0;cell++){
-            int cx=cell%8,cz=cell/8;if(!data.infected(cx,cz)||data.spreadProgress[cell]>=total)continue;
+            int cx=cell%8,cz=cell/8;if(!data.infected(cx,cz)||data.spreadProgress[cell]>=total
+                    ||CityEcology.zone(level,new BlockPos(cx*size+size/2,64,cz*size+size/2))!=DistrictThreat.Zone.RED)continue;
             while(data.spreadProgress[cell]<total&&budget>0){
                 int i=data.spreadProgress[cell];int x=cx*size+i%size,z=cz*size+i/size;
                 BlockPos p=new BlockPos(x,63,z);if(!loaded(level,p))break;

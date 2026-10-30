@@ -5,10 +5,10 @@ public final class InfectionTimeline {
     public static final float DURATION = 48;
     private InfectionTimeline() {}
     public static float progress(long start, long now, float partial) {
-        return start < 0 ? 1 : com.codex.blacklight.forge.WingMath.clamp((now-start+partial)/DURATION,0,1);
+        return start < 0 ? 1 : com.codex.blacklight.util.MathCompat.clamp((now-start+partial)/DURATION,0,1);
     }
     public static float stage(float t,float start,float end) {
-        float u=com.codex.blacklight.forge.WingMath.clamp((t-start)/(end-start),0,1);return u*u*(3-2*u);
+        float u=com.codex.blacklight.util.MathCompat.clamp((t-start)/(end-start),0,1);return u*u*(3-2*u);
     }
     public static float growth(String joint,float t) {
         return switch(joint) {

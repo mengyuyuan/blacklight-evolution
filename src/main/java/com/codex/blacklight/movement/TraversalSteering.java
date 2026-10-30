@@ -10,6 +10,7 @@ public final class TraversalSteering {
     public static float cameraYaw(Player player){return com.codex.blacklight.registry.ModAttachments.getData(player, ModAttachments.MOVEMENT_STATE).cameraYaw(player.getYRot());}
     public static Vec3 forward(Player player){return Vec3.directionFromRotation(0,cameraYaw(player));}
     public static Vec3 sprint(Player player,Vec3 velocity,double maximum,double acceleration,int forward,int right) {
+        double evolved=com.codex.blacklight.power.InfiniteEvolutionSystem.mobility(player);maximum*=evolved;acceleration*=evolved;
         float yaw=cameraYaw(player)+(float)Math.toDegrees(Math.atan2(right,forward));
         Vec3 direction=Vec3.directionFromRotation(0,yaw);
         Vec3 horizontal=velocity.multiply(1,0,1);

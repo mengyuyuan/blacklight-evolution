@@ -9,13 +9,13 @@ public final class DevastatorEffectTimeline {
     public static final double GRAVEYARD_DESCEND=.2;
     public static final double PAIN_CONTACT_DWELL=.20;
     private DevastatorEffectTimeline() { }
-    public static double smooth(double value) {double t=com.codex.blacklight.forge.WingMath.clamp(value,0,1);return t*t*(3-2*t);}
+    public static double smooth(double value) {double t=com.codex.blacklight.util.MathCompat.clamp(value,0,1);return t*t*(3-2*t);}
     public static double strand(double age,double launch,double reverseAt,double distance,double forward,double reverse) {
         if(!Double.isFinite(age+launch+reverseAt+distance+forward+reverse)||distance<=0||forward<=0||reverse<=0)return 0;
         if(age<=launch)return 0;
-        if(age<reverseAt)return com.codex.blacklight.forge.WingMath.clamp((age-launch)*forward/distance,0,1);
-        double formed=com.codex.blacklight.forge.WingMath.clamp((reverseAt-launch)*forward/distance,0,1);
-        return com.codex.blacklight.forge.WingMath.clamp(formed-(age-reverseAt)*reverse/distance,0,1);
+        if(age<reverseAt)return com.codex.blacklight.util.MathCompat.clamp((age-launch)*forward/distance,0,1);
+        double formed=com.codex.blacklight.util.MathCompat.clamp((reverseAt-launch)*forward/distance,0,1);
+        return com.codex.blacklight.util.MathCompat.clamp(formed-(age-reverseAt)*reverse/distance,0,1);
     }
     /** Positive occupancy drives translation into the soil, never height scaling. */
     public static double spike(double age,double launch,double rise,double reverseAt) {
@@ -81,7 +81,7 @@ public final class DevastatorEffectTimeline {
         // speed is Minecraft blocks/tick. The previous /12 response barely
         // moved at a normal 1-3 blocks/tick dive. Optics may saturate; physics
         // and terrain energy continue to use the full actual values.
-        return com.codex.blacklight.forge.WingMath.clamp((1-Math.exp(-Math.max(0,height)/20))*.35
+        return com.codex.blacklight.util.MathCompat.clamp((1-Math.exp(-Math.max(0,height)/20))*.35
                 +(1-Math.exp(-Math.max(0,speed)/2.4))*.65,0,1);
     }
     public record Flight(double strength,double tangentGain,double streakLength,double airAlpha,double shock) {
@@ -111,8 +111,8 @@ public final class DevastatorEffectTimeline {
     /** The hand projection uses a different event and never calls this mapping. */
     public static double flightFov(double original,double tangentGain,double userEffectScale) {
         if(!Double.isFinite(original+tangentGain+userEffectScale)||tangentGain<=0||userEffectScale<=0)return original;
-        double safe=com.codex.blacklight.forge.WingMath.clamp(original,1,175);
-        double tangent=Math.tan(Math.toRadians(safe)*.5)*(1+com.codex.blacklight.forge.WingMath.clamp(tangentGain,0,1)*com.codex.blacklight.forge.WingMath.clamp(userEffectScale,0,1));
+        double safe=com.codex.blacklight.util.MathCompat.clamp(original,1,175);
+        double tangent=Math.tan(Math.toRadians(safe)*.5)*(1+com.codex.blacklight.util.MathCompat.clamp(tangentGain,0,1)*com.codex.blacklight.util.MathCompat.clamp(userEffectScale,0,1));
         return Math.max(original,Math.min(175,Math.toDegrees(2*Math.atan(tangent))));
     }
     private static double pulse(double age,double duration) {

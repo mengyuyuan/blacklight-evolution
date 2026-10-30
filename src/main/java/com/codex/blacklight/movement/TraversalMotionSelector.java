@@ -43,6 +43,6 @@ public final class TraversalMotionSelector {
     }
     public static float cadence(double speed,double nominal){
         if(!Double.isFinite(speed)||!Double.isFinite(nominal)||nominal<=0)return 1;
-        return (float)com.codex.blacklight.forge.WingMath.clamp(speed/nominal,.55,8.0);
+        return (float)com.codex.blacklight.util.MathCompat.clamp(speed/nominal,.55,8.0);
     }
 }

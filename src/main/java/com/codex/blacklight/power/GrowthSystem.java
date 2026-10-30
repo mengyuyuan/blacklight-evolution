@@ -57,6 +57,7 @@ public static void metabolize(ServerPlayer p){
         var growth=com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.GROWTH);
         double bonus=growth.owns(GrowthUpgrade.VITALITY_IV)?70:growth.owns(GrowthUpgrade.VITALITY_III)?45:
                 growth.owns(GrowthUpgrade.VITALITY_II)?25:growth.owns(GrowthUpgrade.VITALITY)?10:0;
+        bonus+=InfiniteEvolutionSystem.effectiveRank(p,EvolutionAttribute.VITALITY)*PlayerEvolutionConfig.HEALTH_PER_LEVEL.get()/CombatScale.UNITS;
         CombatScale.modifier(attribute,HEALTH,infected?bonus:0,AttributeModifier.Operation.ADDITION);
         CombatScale.attributes(p,infected);
         CombatScale.preserveHealthFraction(p,before,health);

@@ -12,17 +12,14 @@ import java.util.ArrayList;
 import static org.junit.jupiter.api.Assertions.*;
 
 class SovereignWingShoulderTest {
-    private static final class Vertices implements VertexConsumer {
-        public void endVertex(){}
-        public void defaultColor(int r,int g,int b,int a){}
-        public void unsetDefaultColor(){}
+    private static final class Vertices extends com.codex.blacklight.forge.ForgeVertexConsumer {
         final ArrayList<Vector3f> points=new ArrayList<>();
-        public VertexConsumer vertex(double x,double y,double z){points.add(new Vector3f((float)x,(float)y,(float)z));return this;}
-        public VertexConsumer color(int r,int g,int b,int a){return this;}
-        public VertexConsumer uv(float u,float v){return this;}
-        public VertexConsumer overlayCoords(int u,int v){return this;}
-        public VertexConsumer uv2(int u,int v){return this;}
-        public VertexConsumer normal(float x,float y,float z){return this;}
+        public VertexConsumer addVertex(float x,float y,float z){points.add(new Vector3f(x,y,z));return this;}
+        public VertexConsumer setColor(int r,int g,int b,int a){return this;}
+        public VertexConsumer setUv(float u,float v){return this;}
+        public VertexConsumer setUv1(int u,int v){return this;}
+        public VertexConsumer setUv2(int u,int v){return this;}
+        public VertexConsumer setNormal(float x,float y,float z){return this;}
     }
     @Test void actualRenderedAttachmentStaysOnChestThroughFoldingAndFlapping() throws Exception {
         var caps=new ArrayList<Integer>();

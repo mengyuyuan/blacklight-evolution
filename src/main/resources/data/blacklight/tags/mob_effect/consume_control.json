@@ -3,6 +3,9 @@
   "values": [
     "minecraft:slowness",
     "minecraft:levitation",
-    { "id": "spore:stunt", "required": false }
+    {
+      "id": "spore:stunt",
+      "required": false
+    }
   ]
 }

@@ -12,9 +12,9 @@ public final class ClientTargetOutline {
     public static boolean matches(Entity entity) {
         var mc=Minecraft.getInstance();
         if(entity==null||mc.level==null||mc.player==null||entity.level()!=mc.level)return false;
-        var target=ClientTargetLock.target();
+        var target=ClientTargetLock.entityTarget();
         // Parent identity also covers multipart renderers, and cannot match an old
         // world's entity merely because its numeric ID has been reused.
-        return target!=null&&target.level()==mc.level&&CombatTargeting.resolveTarget(entity)==target;
+        return target!=null&&target.level()==mc.level&&com.codex.blacklight.combat.ExplicitTarget.resolve(entity)==target;
     }
 }

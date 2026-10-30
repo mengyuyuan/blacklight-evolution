@@ -13,7 +13,7 @@ public final class LocalWeaponMotion {
 
     public record ContactWindow(int startTick, int endTick) {
         public boolean contains(double tick) { return tick >= startTick && tick < endTick; }
-        public double progress(double tick) { return com.codex.blacklight.forge.WingMath.clamp((tick-startTick)/Math.max(1,endTick-startTick-1),0,1); }
+        public double progress(double tick) { return com.codex.blacklight.util.MathCompat.clamp((tick-startTick)/Math.max(1,endTick-startTick-1),0,1); }
     }
     /** Swept blade bounds in actor-local right/up/forward axes, relative to the current feet. */
     public record ContactBounds(double minRight, double minUp, double minForward,

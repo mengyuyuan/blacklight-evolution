@@ -319,6 +319,7 @@ public final class BulletdiveTerrain {
         final BulletdiveBreakEffects effects=new BulletdiveBreakEffects();
         final ServerPlayer owner;final Key key;final ServerLevel level;final Plan plan;final BlockPos center;
         final WaveCursor wave;final int startedTick;
+        final ArrayDeque<BlockPos> buildingHearts=new ArrayDeque<>();
         int endedTick,firstBreakTick=-1,lastBreakTick=-1,breaksThisTick,peakBreaksPerTick;
         long firstTickDestroyed;double peakSliceMillis;
         boolean complete;String reason="running";long visited,destroyed,protectedBlocks,skipped;int maxDepth;double energy,maxRadius;
@@ -328,22 +329,41 @@ public final class BulletdiveTerrain {
             wave=new WaveCursor(plan,center.getX(),center.getZ(),
                     (int)Math.min(Integer.MAX_VALUE,Math.max(0,(long)center.getY()-level.getMinBuildHeight()+1)),
                     (x,z)->level.getChunkSource().getChunkNow(x,z)!=null);
+            // The normal crater front travels downward. Exposed building hearts just above
+            // the landing surface must also meet that same protected, paid break pipeline.
+            if(plan.radius>0)com.codex.blacklight.infection.BuildingInfectionData.get(level).colonies.stream()
+                    .filter(c->!c.dead&&Math.abs((long)c.origin.getY()-center.getY())<=Math.min(12,Math.max(3,plan.depth)))
+                    .map(c->c.origin).filter(pos->{double dx=pos.getX()-(double)center.getX(),dz=pos.getZ()-(double)center.getZ(),reach=Math.min(64,plan.radius);return dx*dx+dz*dz<reach*reach;})
+                    .sorted(Comparator.comparingDouble(pos->pos.distSqr(center))).limit(64).forEach(buildingHearts::add);
         }
         boolean loaded(BlockPos pos){return level.getChunkSource().getChunkNow(pos.getX()>>4,pos.getZ()>>4)!=null;}
         boolean next() {
             if(!blockBreakingEnabled(owner)){finish("block_breaking_disabled");return false;}
             if(energy<1){finish("energy_exhausted");return false;}
-            var cell=wave.step();
+            boolean heart=!buildingHearts.isEmpty();
+            BlockPos heartPos=heart?buildingHearts.removeFirst():null;
+            long heartX=heart?(long)heartPos.getX()-center.getX():0,heartZ=heart?(long)heartPos.getZ()-center.getZ():0;
+            var cell=heart?new WaveCell(new Column((int)heartX,(int)heartZ,heartX*heartX+heartZ*heartZ),0):wave.step();
             if(cell==null){if(wave.exhausted())finish("complete");return false;}
             var current=cell.column;int currentLayer=cell.layer;
             visited++;
             long x=(long)center.getX()+current.x,y=(long)center.getY()-currentLayer,z=(long)center.getZ()+current.z;
             if(x<Integer.MIN_VALUE||x>Integer.MAX_VALUE||y<Integer.MIN_VALUE||y>Integer.MAX_VALUE||z<Integer.MIN_VALUE||z>Integer.MAX_VALUE){skipped++;return false;}
-            var pos=new BlockPos((int)x,(int)y,(int)z);
+            var pos=heart?heartPos:new BlockPos((int)x,(int)y,(int)z);
             if(!level.isInWorldBounds(pos)||!loaded(pos)){skipped++;return false;}
             if(!level.mayInteract(owner,pos)||!owner.mayBuild()){protectedBlocks++;return false;}
             var state=level.getBlockState(pos);
-            if(state.isAir()||state.getBlock() instanceof LiquidBlock){skipped++;wave.advance(cell);return false;}
+            if(heart){
+                if(!state.is(com.codex.blacklight.registry.ModBlocks.BUILDING_CORE.get())){skipped++;return false;}
+                // Guard the whole short pressure ray before vanilla clipping queries blocks.
+                // Remote loaded islands must never pull the unloaded street between them into memory.
+                for(int cx=(Math.min(center.getX(),pos.getX())-1)>>4;cx<=((Math.max(center.getX(),pos.getX())+1)>>4);cx++)
+                    for(int cz=(Math.min(center.getZ(),pos.getZ())-1)>>4;cz<=((Math.max(center.getZ(),pos.getZ())+1)>>4);cz++)
+                        if(level.getChunkSource().getChunkNow(cx,cz)==null){skipped++;return false;}
+                var sight=level.clip(new net.minecraft.world.level.ClipContext(center.getCenter().add(0,1,0),pos.getCenter(),net.minecraft.world.level.ClipContext.Block.COLLIDER,net.minecraft.world.level.ClipContext.Fluid.NONE,owner));
+                if(sight.getType()!=net.minecraft.world.phys.HitResult.Type.MISS&&!sight.getBlockPos().equals(pos)){skipped++;return false;}
+            }
+            if(state.isAir()||state.getBlock() instanceof LiquidBlock){skipped++;if(!heart)wave.advance(cell);return false;}
             float hardness=state.getDestroySpeed(level,pos),resistance=state.getBlock().getExplosionResistance();
             if(hardness<0){protectedBlocks++;return false;}
             double cost=hardnessCost(hardness);
@@ -357,18 +377,18 @@ public final class BulletdiveTerrain {
             if(!level.getBlockState(pos).equals(state)){skipped++;return false;}
             boolean broken=effects.destroy(level,pos,owner);
             if(!broken){skipped++;return false;}
-            energy=Math.max(0,energy-cost);destroyed++;wave.advance(cell);
+            energy=Math.max(0,energy-cost);destroyed++;if(!heart)wave.advance(cell);
             int tick=owner.server.getTickCount();
             if(firstBreakTick<0)firstBreakTick=tick;
             if(tick==firstBreakTick)firstTickDestroyed++;
             if(tick!=lastBreakTick){lastBreakTick=tick;breaksThisTick=0;}
             peakBreaksPerTick=Math.max(peakBreaksPerTick,++breaksThisTick);
-            maxRadius=Math.max(maxRadius,Math.sqrt(current.distanceSquared));maxDepth=Math.max(maxDepth,currentLayer+1);
+            maxRadius=Math.max(maxRadius,Math.sqrt(current.distanceSquared));if(!heart)maxDepth=Math.max(maxDepth,currentLayer+1);
             return true;
         }
         void finish(String reason){
             if(complete)return;
-            complete=true;endedTick=owner.server.getTickCount();this.reason=reason;wave.clear();effects.clear();ACTIVE_OWNERS.complete(key.owner,this);
+            complete=true;endedTick=owner.server.getTickCount();this.reason=reason;wave.clear();buildingHearts.clear();effects.clear();ACTIVE_OWNERS.complete(key.owner,this);
         }
         Snapshot snapshot(){return new Snapshot(plan,complete,visited,destroyed,protectedBlocks,skipped,energy,maxRadius,maxDepth,reason,
                 (complete?endedTick:owner.server.getTickCount())-(long)startedTick,firstTickDestroyed,peakBreaksPerTick,peakSliceMillis);}

@@ -1,6 +1,7 @@
 package com.codex.blacklight.client.renderer;
 
 import com.codex.blacklight.entity.BlacklightInfectedHost;
+import com.codex.blacklight.infection.TissueVitalMotion;
 import com.codex.blacklight.mixin.client.ModelPartChildrenAccessor;
 import com.google.gson.*;
 import com.mojang.blaze3d.vertex.*;
@@ -28,6 +29,15 @@ public final class InfectedMorphology implements AutoCloseable {
     private record Attachment(int anatomy,List<Box> boxes,InfectedBite wound) { }
     private record Pending(Attachment attachment,PoseStack.Pose pose,int light,int overlay,int color) { }
     private final LivingEntity proxy;
+    private final BlacklightInfectedHost trailHost;
+    private final Map<ModelPart,Integer> trailParts=new IdentityHashMap<>();
+    private final SurfaceTissue surface;
+    private final AnatomicalTissue anatomical;
+    private final AnatomicalTissue lateOrgans;
+    private final ChimeraTissue chimera;
+    private final List<AnatomicalTissue> anatomicalCoats=new ArrayList<>();
+    private final float tissueGrowth;
+    private final long tissueSeed;
     private final String speciesId;
     private final AuthoredInfectionParts.Binding authored;
     private final java.util.Set<AuthoredInfectionParts.Binding> coats=java.util.Collections.newSetFromMap(new java.util.IdentityHashMap<>());
@@ -37,6 +47,7 @@ public final class InfectedMorphology implements AutoCloseable {
     private final Map<ResourceLocation,ResourceLocation> skins=new HashMap<>();
     private final Map<ModelPart,Attachment> attachments;
     private final Map<ModelPart,Pending> pending = new IdentityHashMap<>();
+    private final Map<ModelPart,PoseStack.Pose> nativeChimeraPoses=new IdentityHashMap<>();
 
     private static JsonObject definitions(){
         try(var stream=InfectedMorphology.class.getResourceAsStream("/assets/blacklight/models/infected_morphology.json")){
@@ -44,11 +55,28 @@ public final class InfectedMorphology implements AutoCloseable {
             return JsonParser.parseReader(new InputStreamReader(stream,StandardCharsets.UTF_8)).getAsJsonObject();
         }catch(Exception e){throw new IllegalStateException("Cannot load infection morphology",e);}
     }
-    public InfectedMorphology(BlacklightInfectedHost host,LivingEntity proxy,EntityModel<?> model,ResourceLocation nativeTexture){
-        this.proxy=proxy;previous=ACTIVE.get();
+    public InfectedMorphology(BlacklightInfectedHost host,LivingEntity proxy,EntityModel<?> model,ResourceLocation nativeTexture,PoseStack.Pose root,float partial,org.joml.Matrix4f worldRelativePose){
+        this.proxy=proxy;trailHost=host;previous=ACTIVE.get();
+        var anatomy=ConsumeAnatomy.model(model);var chosen=new HashMap<Integer,ModelPart>();
+        anatomy.forEach((part,role)->{if(role==ConsumeAnatomy.RIGHT_ARM||role==ConsumeAnatomy.LEFT_ARM||role==ConsumeAnatomy.HEAD){var b=bounds(part);var old=chosen.get(role);if(b!=null&&(old==null||b.volume()>bounds(old).volume()))chosen.put(role,part);}});
+        chosen.forEach((role,part)->trailParts.put(part,role));
+        chimera=ChimeraTissue.bind(host,model,partial);
         String type=host.hostData().getString("Type");speciesId=type;
-        authored=AuthoredInfectionParts.bind(type,model);
-        skins.put(nativeTexture,InfectedWoundTextures.get(nativeTexture,type,authored.wounds()));
+        var approved=Boolean.getBoolean("blacklight.proceduralTissueOnly")?new AuthoredInfectionParts.Binding():AuthoredInfectionParts.bind(type,model);
+        anatomical=approved.available()?null:AnatomicalTissue.bind(host,model,nativeTexture,partial);
+        authored=approved;
+        lateOrgans=authored.available()?AnatomicalTissue.grafts(host,model,nativeTexture,partial):null;
+        if(anatomical!=null)anatomical.worldPose(worldRelativePose);
+        if(lateOrgans!=null)lateOrgans.worldPose(worldRelativePose);
+        if(chimera!=null)chimera.worldPose(worldRelativePose);
+        tissueGrowth=.12F+.88F*com.codex.blacklight.infection.TissueGrowth.progress(host.tissueAge());
+        tissueSeed=host.getUUID().getMostSignificantBits()^host.getUUID().getLeastSignificantBits();
+        authored.growth(tissueGrowth,tissueSeed);
+        authored.evolution(host.tissueAge(),host.tissueTentacles(),ChimeraTissue.receiverEvolution(host,true,partial));
+        authored.digestion(host.digestiveProfile(),host.digestiveVisual(),com.codex.blacklight.infection.TissueDigestiveMotion.clock(host.level().getGameTime(),partial));
+        authored.vitals(host.vitalsProfile(),host.vitalsVisual(),TissueVitalMotion.clock(host.level().getGameTime(),partial));
+        surface=new SurfaceTissue(host,model,root,partial,anatomical,authored);
+        if(anatomical==null)skins.put(nativeTexture,InfectedWoundTextures.get(nativeTexture,type,authored.wounds()));
         var species=DEFINITIONS.getAsJsonObject("species");
         profile=species.has(type)?species.get(type).getAsString():switch(type){
             case "minecraft:skeleton_horse","minecraft:zombie_horse"->"equine";
@@ -72,7 +100,7 @@ public final class InfectedMorphology implements AutoCloseable {
         if(!path.contains("sheep_fur")&&!path.contains("slime")&&!path.contains("drowned_outer_layer")
                 &&!path.contains("stray_overlay")&&!path.contains("bogged_overlay"))return;
         if(context.authored.available()){
-            var coat=AuthoredInfectionParts.bind(context.speciesId,model,path.contains("sheep_fur"));context.coats.add(coat);
+            var coat=AuthoredInfectionParts.bind(context.speciesId,model,path.contains("sheep_fur"));coat.growth(context.tissueGrowth,context.tissueSeed);coat.evolution(context.authored.age(),context.authored.tentacles(),context.authored.development());coat.digestion(context.authored);coat.vitals(context.authored);context.coats.add(coat);
             if(path.contains("sheep_fur")||path.contains("slime"))context.coatGrowth.add(coat);
             context.skins.put(texture,InfectedWoundTextures.get(texture,context.speciesId,coat.wounds()));return;
         }
@@ -186,7 +214,26 @@ public final class InfectedMorphology implements AutoCloseable {
     /** Compile only selected native cubes through a local face cutter. No shared model mutation. */
     public static boolean renderWounded(ModelPart part,PoseStack.Pose pose,VertexConsumer out,int light,int overlay,int color){
         var context=ACTIVE.get();if(context==null)return false;
-        if(context.authored.renderSkin(part,pose,out,light,overlay,color))return true;
+        var originalPose=pose;
+        if(context.chimera!=null){if(context.chimera.nativeWeight(part)<=.0001F)return true;pose=context.chimera.nativePose(part,pose);context.nativeChimeraPoses.put(part,pose);}
+        EvolvedDonorCapture.joint(part,pose);
+        context.trail(part,pose);
+        if(context.chimera!=null)context.chimera.capture(part,pose,light,overlay);
+        if(context.anatomical!=null){
+            boolean handled=context.anatomical.renderSkin(part,pose,out,light,overlay,color);
+            if(handled)context.surface.capture(part,pose,light,overlay,color);
+            if(!handled)for(var coat:context.anatomicalCoats)if(coat.renderSkin(part,pose,out,light,overlay,color))return true;
+            if(!handled&&pose!=originalPose){for(var cube:((ModelPartChildrenAccessor)(Object)part).blacklight$cubes())cube.compile(pose,out,light,overlay,((color>>>16)&255)/255F,((color>>>8)&255)/255F,(color&255)/255F,((color>>>24)&255)/255F);capture(part,pose,light,overlay,color);return true;}
+            return handled;
+        }
+        pose=context.surface.mutatedPose(part,pose);
+        if(context.surface.replacesBody(part)) {
+            capture(part,pose,light,overlay,color);return true;
+        }
+        if(context.authored.renderSkin(part,pose,out,light,overlay,color)){
+            if(context.lateOrgans!=null)context.lateOrgans.capture(part,context.authored.pose(part,pose),light,overlay,color);
+            context.surface.capture(part,pose,light,overlay,color);return true;
+        }
         for(var coat:context.coats)if(coat.renderSkin(part,pose,out,light,overlay,color)){if(!context.coatGrowth.contains(coat))coat.clear();return true;}
         Attachment attachment=context.attachments.get(part);
         // Slime's translucent shell bypasses RenderLayer's copied-cutout helper.
@@ -212,17 +259,30 @@ public final class InfectedMorphology implements AutoCloseable {
     /** Called inside ModelPart.compile, after its complete animated transform. */
     public static void capture(ModelPart part,PoseStack.Pose pose,int light,int overlay,int color){
         var context=ACTIVE.get();if(context==null||context.pending.containsKey(part))return;
+        if(context.chimera!=null){if(context.chimera.nativeWeight(part)<=.0001F)return;var adjusted=context.nativeChimeraPoses.get(part);pose=adjusted==null?context.chimera.nativePose(part,pose):adjusted;}
+        EvolvedDonorCapture.joint(part,pose);
+        context.trail(part,pose);
+        if(context.chimera!=null)context.chimera.capture(part,pose,light,overlay);
+        if(context.anatomical!=null){
+            context.anatomical.capture(part,pose,light,overlay,color);
+            if(context.anatomical.owns(part))context.surface.capture(part,pose,light,overlay,color);
+            for(var coat:context.anatomicalCoats)coat.capture(part,pose,light,overlay,color);return;
+        }
+        if(context.surface!=null)context.surface.capture(part,pose,light,overlay,color);
         context.authored.capture(part,pose,light,overlay,color);
         for(var coat:context.coatGrowth)coat.capture(part,pose,light,overlay,color);
         Attachment attachment=context.attachments.get(part);if(attachment==null||attachment.boxes.isEmpty())return;
         PoseStack copy=new PoseStack();copy.last().pose().set(pose.pose());copy.last().normal().set(pose.normal());
         context.pending.put(part,new Pending(attachment,copy.last(),light,overlay,color));
     }
+    private void trail(ModelPart part,PoseStack.Pose pose){var slot=trailParts.get(part);if(slot==null)return;var b=bounds(part);if(b!=null)InfectedLimbTrails.capture(trailHost,slot,pose,new net.minecraft.world.phys.Vec3(b.x/16,(b.y+b.h*.45F)/16,b.z/16));}
     /** Flush before the current renderer's consume fracture wrapper finishes.
      * Deferred emission avoids switching a live vanilla BufferBuilder midway
      * through its model; context never mutates the shared species skeleton. */
     public static void flush(LivingEntity entity,MultiBufferSource buffers){
         var context=ACTIVE.get();if(context==null||context.proxy!=entity)return;
+        if(context.chimera!=null)context.chimera.flush(buffers);
+        if(context.anatomical!=null){context.anatomical.flush(buffers);context.anatomicalCoats.forEach(coat->coat.flush(buffers));context.surface.flush(buffers);return;}
         context.authored.flush(buffers,!context.coatGrowth.isEmpty(),false);
         context.coatGrowth.forEach(coat->coat.flush(buffers,false,true));
         if(context.pending.isEmpty())return;

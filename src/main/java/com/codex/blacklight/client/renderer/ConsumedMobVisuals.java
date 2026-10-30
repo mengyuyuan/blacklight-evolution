@@ -86,16 +86,20 @@ public final class ConsumedMobVisuals {
     }
     /** A thick, continuous cable and tightening coil distinguish whip capture from generic tendrils. */
     public static void whip(LivingEntity mob, PoseStack stack, VertexConsumer out, int light, Vec3 delta, float t) {
-        if (com.codex.blacklight.registry.ModAttachments.getData(mob, ModAttachments.CONSUME_VISUAL).form() != PowerForm.WHIPFIST.ordinal() || t > .9F) return;
+        var visual=com.codex.blacklight.registry.ModAttachments.getData(mob, ModAttachments.CONSUME_VISUAL);
+        if (visual.form() != PowerForm.WHIPFIST.ordinal() || t > .9F) return;
         if (t < .185F) return;
+        float contraction=visual.consuming()?WhipConsumeRetraction.coil(ConsumeFracture.phase(mob,
+                net.minecraft.client.Minecraft.getInstance().getFrameTime()).opening()):1;
+        if(contraction<=.001F)return;
         stack.pushPose();
         com.codex.blacklight.client.ClientPoseMatrices.multiply(stack,com.codex.blacklight.client.animation.ConsumeVictimPose.effectTransform(mob,net.minecraft.client.Minecraft.getInstance().getFrameTime()));
-        double radius = mob.getBbWidth() * .58 * (1-net.minecraft.util.Mth.clamp((t-.85)/.05, 0, 1));
+        double radius = mob.getBbWidth() * .58 * (1-net.minecraft.util.Mth.clamp((t-.85)/.05, 0, 1))*contraction;
         for (int i = 0; i < 48; i++) {
             double a = i / 48.0, b = (i+1) / 48.0;
             Vec3 p = new Vec3(Math.cos(a*Math.PI*5)*radius, mob.getBbHeight()*(.22+.6*a), Math.sin(a*Math.PI*5)*radius);
             Vec3 q = new Vec3(Math.cos(b*Math.PI*5)*radius, mob.getBbHeight()*(.22+.6*b), Math.sin(b*Math.PI*5)*radius);
-            tube(stack, out, light, p, q, .045, i%4==0 ? 0xff833b32 : 0xff35292a);
+            tube(stack, out, light, p, q, .045*contraction, i%4==0 ? 0xff833b32 : 0xff35292a);
         }
         stack.popPose();
     }

@@ -15,16 +15,16 @@ public final class ConsumeReaction {
     private ConsumeReaction() {}
     public static Pose sample(PowerForm form, float t) {
         var keys=switch(form){case HAMMERFISTS->HAMMER;case BLADE->BLADE;case WHIPFIST->WHIP;default->NORMAL;};
-        t=com.codex.blacklight.forge.WingMath.clamp(t,0,1);
+        t=com.codex.blacklight.util.MathCompat.clamp(t,0,1);
         float contact=(t*ConsumeVisual.duration(form)-ConsumeVisual.impactTick(form))/20F;
         int i=0;while(i<keys.length-2 && contact>keys[i+1][0])i++;
         float segmentStart=i==0?-ConsumeVisual.impactTick(form)/20F:keys[i][0];
-        float a=com.codex.blacklight.forge.WingMath.clamp((contact-segmentStart)/(keys[i+1][0]-segmentStart),0,1);a=a*a*(3-2*a);
+        float a=com.codex.blacklight.util.MathCompat.clamp((contact-segmentStart)/(keys[i+1][0]-segmentStart),0,1);a=a*a*(3-2*a);
         float[] v=new float[6];for(int k=0;k<6;k++)v[k]=keys[i][k+1]+(keys[i+1][k+1]-keys[i][k+1])*a;
         // The brief contact hold must stay readable; struggle resumes only as recoil.
         float struggle=contact<0?(float)Math.sin(t*61)*.35F:contact<.10F?0:
                 (float)Math.sin((contact-.1F)*28)*Math.max(0,1-(contact-.1F)/.5F)*.3F;
-        float grounded=form==PowerForm.HAMMERFISTS ? com.codex.blacklight.forge.WingMath.clamp((contact+.12F)/.12F,0,1) : 0;
+        float grounded=form==PowerForm.HAMMERFISTS ? com.codex.blacklight.util.MathCompat.clamp((contact+.12F)/.12F,0,1) : 0;
         grounded=grounded*grounded*(3-2*grounded);
         return new Pose((float)Math.toRadians(v[0])*(1-grounded*.8F),(float)Math.toRadians(v[1]+struggle*7),v[2]*(1-grounded),v[3],v[4]*(1-grounded*.65F),(float)Math.toRadians(v[5]+struggle*5)*(1-grounded*.8F),grounded);
     }

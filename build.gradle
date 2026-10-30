@@ -406,6 +406,33 @@ def prepareForgeCapabilityTests = tasks.register('prepareForgeCapabilityTests') 
                 target.parentFile.mkdirs()
                 target.bytes = writer.toByteArray()
             }
+            // Bootstrap invokes Forge's real network event bus. In a normal
+            // launch ModLauncher supplies these event constructors/listeners;
+            // the plain JVM harness must run that same event transformer too.
+            def eventTransformer=loader.loadClass('net.minecraftforge.eventbus.EventSubclassTransformer').getConstructor().newInstance()
+            def eventLoader=eventTransformer.class.getDeclaredField('gameClassLoader')
+            eventLoader.setAccessible(true)
+            eventLoader.set(eventTransformer,java.util.Optional.of(loader))
+            def eventTransform=eventTransformer.class.getMethod('transform',nodeClass,typeClass)
+            def contextThread=Thread.currentThread()
+            def previousContextLoader=contextThread.contextClassLoader
+            contextThread.contextClassLoader=loader
+            try {
+            ['', '$ChannelRegistrationChangeEvent', '$ClientCustomPayloadEvent', '$ClientCustomPayloadLoginEvent',
+             '$GatherLoginPayloadsEvent', '$LoginPayloadEvent', '$ServerCustomPayloadEvent', '$ServerCustomPayloadLoginEvent'].each { suffix ->
+                String name='net/minecraftforge/network/NetworkEvent'+suffix
+                byte[] original=loader.getResourceAsStream("${name}.class").withCloseable {it.readAllBytes()}
+                def node=nodeClass.getConstructor().newInstance()
+                readerClass.getConstructor(byte[].class).newInstance([original] as Object[]).accept(node,0)
+                def transformed=eventTransform.invoke(eventTransformer,node,typeClass.getMethod('getObjectType',String.class).invoke(null,name))
+                if(transformed.isPresent()) {
+                    def writer=writerClass.getConstructor(int.class).newInstance(1)
+                    nodeClass.getMethod('accept',visitorClass).invoke(transformed.get(),writer)
+                    def target=new File(forgeTestClasses.get().asFile,"${name}.class")
+                    target.parentFile.mkdirs();target.bytes=writer.toByteArray()
+                }
+            }
+            } finally {contextThread.contextClassLoader=previousContextLoader}
         } finally {
             loader.close()
         }
