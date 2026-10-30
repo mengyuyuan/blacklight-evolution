@@ -144,7 +144,7 @@ public final class CityHiveSupplyGameTest {
         f.stock().receive(40);f.tick();f.data.hiveBroodTicks[0]=200;int before=f.stock().reserve();var callbacks=new int[1];var replay=new Mob[1];
         java.util.function.Consumer<net.neoforged.neoforge.event.entity.EntityJoinLevelEvent> callback=e->{if(e.getLevel()==f.level&&e.getEntity() instanceof com.codex.blacklight.entity.BlacklightCommonInfected){callbacks[0]++;replay[0]=CityHiveSupply.hatch(f.level,f.data,0,f.port(1),OutbreakRules.Tier.FRESH);}};
         net.neoforged.neoforge.common.NeoForge.EVENT_BUS.addListener(callback);
-        try{var child=CityHiveSupply.hatch(f.level,f.data,0,f.port(0),OutbreakRules.Tier.FRESH);h.assertTrue(child!=null&&callbacks[0]==1&&replay[0]==null&&f.data.hiveBirths[0]==1&&f.stock().reserve()==before-12,"a real external join listener cannot replay reserved work or duplicate its material commit");}
+        try{var child=CityHiveSupply.hatch(f.level,f.data,0,f.port(0),OutbreakRules.Tier.FRESH);h.assertTrue(child!=null&&callbacks[0]==1&&replay[0]==null&&f.data.hiveBirths[0]==1&&f.stock().reserve()==before-12,"a real external join listener cannot replay reserved work or duplicate its material commit: child="+child+" callbacks="+callbacks[0]+" replay="+replay[0]+" births="+f.data.hiveBirths[0]+" reserve="+f.stock().reserve()+" before="+before+" brood="+f.data.hiveBroodTicks[0]);}
         finally{net.neoforged.neoforge.common.NeoForge.EVENT_BUS.unregister(callback);f.close();}h.succeed();
     });}
     @GameTest(template="wall_test",timeoutTicks=170,batch="city_supply_join_veto")
