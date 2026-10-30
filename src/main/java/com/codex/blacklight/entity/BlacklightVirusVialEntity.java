@@ -53,7 +53,8 @@ public final class BlacklightVirusVialEntity extends ThrowableItemProjectile {
         Entity hitEntity = result instanceof EntityHitResult hit ? hit.getEntity() : null;
         if (hitEntity instanceof net.neoforged.neoforge.entity.PartEntity<?> part) hitEntity = part.getParent();
         LivingEntity directTarget = hitEntity instanceof LivingEntity living ? living : null;
-        if (directTarget != null && BlacklightInfectionSystem.infect(directTarget, this)) infected++;
+        double radius=InfectionRules.radius();
+        if (directTarget != null && random.nextFloat()<com.codex.blacklight.config.GameplayBalanceConfig.VIAL_DIRECT.get() && BlacklightInfectionSystem.infect(directTarget, this)) infected++;
         // A direct creature hit is intentional and guaranteed when eligible.
         // A deliberately shattered vial seeds a wide outbreak, respecting solid walls.
         Vec3 burst = result.getLocation();
@@ -63,19 +64,19 @@ public final class BlacklightVirusVialEntity extends ThrowableItemProjectile {
         com.codex.blacklight.infection.WorldOutbreakSystem.release(serverLevel,blockPosition());
         // Throwing at your feet is voluntary awakening; never infect bystanders in PvP.
         if (owner instanceof net.minecraft.world.entity.player.Player player
-                && player.distanceToSqr(burst) <= INFECTION_RADIUS * INFECTION_RADIUS
+                && player.distanceToSqr(burst) <= radius * radius
                 && serverLevel.clip(new ClipContext(burst, player.getEyePosition(), ClipContext.Block.COLLIDER,
                     ClipContext.Fluid.NONE, this)).getType() == HitResult.Type.MISS)
             BlacklightInfectionSystem.awaken(player);
         for (LivingEntity target : serverLevel.getEntitiesOfClass(
-                LivingEntity.class, new AABB(burst, burst).inflate(INFECTION_RADIUS),
+                LivingEntity.class, new AABB(burst, burst).inflate(radius),
                 BlacklightInfectionSystem::canInfect)) {
             if (target == directTarget) continue;
             AABB box = target.getBoundingBox();
             Vec3 point = new Vec3(Math.clamp(burst.x, box.minX, box.maxX),
                     Math.clamp(burst.y, box.minY, box.maxY), Math.clamp(burst.z, box.minZ, box.maxZ));
             double distance = burst.distanceTo(point);
-            if (distance > INFECTION_RADIUS) continue;
+            if (distance > radius) continue;
             if (serverLevel.clip(new ClipContext(burst, point, ClipContext.Block.COLLIDER,
                     ClipContext.Fluid.NONE, this)).getType() != HitResult.Type.MISS) continue;
             if (random.nextFloat() < InfectionRules.splashChance(distance)
@@ -85,7 +86,7 @@ public final class BlacklightVirusVialEntity extends ThrowableItemProjectile {
         serverLevel.sendParticles(ParticleTypes.LARGE_SMOKE,
                 getX(), getY() + 0.15D, getZ(), 30, 1.0D, 0.65D, 1.0D, 0.025D);
         serverLevel.sendParticles(ParticleTypes.CRIMSON_SPORE,
-                getX(), getY() + 0.3D, getZ(), 120, INFECTION_RADIUS * .45D, 1.5D, INFECTION_RADIUS * .45D, 0.025D);
+                getX(), getY() + 0.3D, getZ(), 120, radius * .45D, 1.5D, radius * .45D, 0.025D);
         serverLevel.playSound(null, blockPosition(), SoundEvents.GLASS_BREAK,
                 SoundSource.PLAYERS, 1.35F, 0.72F);
         serverLevel.playSound(null, blockPosition(), SoundEvents.SCULK_CATALYST_BLOOM,

@@ -165,8 +165,20 @@ public final class EvolvedFormGameTest {
     @GameTest(template="wall_test",timeoutTicks=280,batch="evolved_pursuit")
     public static void findsPursuesAndActuallyHitsAPlayerThenReleasesCreativeTargets(GameTestHelper h){
         var host=host(h);h.assertTrue(host.beginEvolvedMetamorphosis(),"qualified sample begins");for(int i=0;i<200;i++)host.tick();
-        for(int x=-2;x<=22;x++)for(int z=-2;z<=12;z++)h.getLevel().setBlock(h.absolutePos(new BlockPos(x,29,z)),Blocks.STONE.defaultBlockState(),2);
-        host.setPos(h.absolutePos(new BlockPos(5,30,5)).getBottomCenter());host.setOnGround(true);
+        // The chase leaves the tiny template footprint. Keep its whole real arena
+        // ticking; a fake connection does not acknowledge client chunk simulation.
+        var tickets=new java.util.HashSet<net.minecraft.world.level.ChunkPos>();
+        var min=h.absolutePos(new BlockPos(-2,119,-2));var max=h.absolutePos(new BlockPos(22,119,12));
+        for(int x=min.getX()>>4;x<=max.getX()>>4;x++)for(int z=min.getZ()>>4;z<=max.getZ()>>4;z++){
+            var chunk=new net.minecraft.world.level.ChunkPos(x,z);
+            if(!h.getLevel().getForcedChunks().contains(chunk.toLong())){h.getLevel().setChunkForced(x,z,true);tickets.add(chunk);}
+            h.getLevel().getChunk(x,z);
+        }
+        for(int x=-2;x<=22;x++)for(int z=-2;z<=12;z++){
+            h.getLevel().setBlock(h.absolutePos(new BlockPos(x,119,z)),Blocks.STONE.defaultBlockState(),2);
+            for(int y=120;y<=132;y++)h.getLevel().setBlock(h.absolutePos(new BlockPos(x,y,z)),Blocks.AIR.defaultBlockState(),2);
+        }
+        host.setPos(h.absolutePos(new BlockPos(5,120,5)).getBottomCenter());host.setOnGround(true);
         var profile=new com.mojang.authlib.GameProfile(java.util.UUID.randomUUID(),"EvolvedPursuit");
         var player=new net.minecraft.server.level.ServerPlayer(h.getLevel().getServer(),h.getLevel(),profile,net.minecraft.server.level.ClientInformation.createDefault());
         player.connection=net.neoforged.neoforge.common.util.FakePlayerFactory.get(h.getLevel(),profile).connection;
@@ -174,6 +186,11 @@ public final class EvolvedFormGameTest {
         player.getAttribute(net.minecraft.world.entity.ai.attributes.Attributes.MAX_HEALTH).setBaseValue(1000);player.setHealth(1000);h.getLevel().addNewPlayer(player);
         var hits=new java.util.concurrent.atomic.AtomicInteger();
         java.util.function.Consumer<net.neoforged.neoforge.event.entity.living.LivingDamageEvent.Post> listener=event->{if(event.getEntity()==player&&event.getSource().getEntity()==host&&event.getNewDamage()>0)hits.incrementAndGet();};
+        Runnable clean=()->{
+            net.neoforged.neoforge.common.NeoForge.EVENT_BUS.unregister(listener);host.discard();h.getLevel().removePlayerImmediately(player,net.minecraft.world.entity.Entity.RemovalReason.DISCARDED);
+            for(int x=-2;x<=22;x++)for(int z=-2;z<=12;z++)h.getLevel().setBlock(h.absolutePos(new BlockPos(x,119,z)),Blocks.AIR.defaultBlockState(),2);
+            for(var chunk:tickets)h.getLevel().setChunkForced(chunk.x,chunk.z,false);
+        };
         net.neoforged.neoforge.common.NeoForge.EVENT_BUS.addListener(listener);host.setNoAi(false);
         h.runAfterDelay(180,()->{
             try{
@@ -181,8 +198,8 @@ public final class EvolvedFormGameTest {
                 h.assertTrue(hits.get()>0,"real AI contact causes accepted player damage, not only a playing animation; distance="+host.distanceTo(player)+" action="+host.evolvedAction()+" elapsed="+host.evolvedActionElapsed(0)+" target="+host.getTarget()+" sight="+host.hasLineOfSight(player)+" health="+player.getHealth());
                 player.setGameMode(net.minecraft.world.level.GameType.CREATIVE);
                 h.runAfterDelay(25,()->{try{h.assertTrue(host.getTarget()!=player&&host.evolvedAction().isEmpty(),"creative player stops being a combat target and no attack stays latched");h.succeed();}
-                    finally{net.neoforged.neoforge.common.NeoForge.EVENT_BUS.unregister(listener);host.discard();h.getLevel().removePlayerImmediately(player,net.minecraft.world.entity.Entity.RemovalReason.DISCARDED);}});
-            }catch(Throwable failure){net.neoforged.neoforge.common.NeoForge.EVENT_BUS.unregister(listener);host.discard();h.getLevel().removePlayerImmediately(player,net.minecraft.world.entity.Entity.RemovalReason.DISCARDED);throw failure;}
+                    finally{clean.run();}});
+            }catch(Throwable failure){clean.run();throw failure;}
         });
     }
     static BlacklightInfectedHost host(GameTestHelper h){

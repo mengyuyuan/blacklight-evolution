@@ -25,6 +25,25 @@ import net.neoforged.neoforge.gametest.*;
 
 @GameTestHolder("blacklight") @PrefixGameTestTemplate(false)
 public final class CityHiveSupplyGameTest {
+    @GameTest(template="wall_test",timeoutTicks=170,batch="audit_city_brood_removed")
+    public static void aPortDestroyedDuringBirthCannotCommitOrCrashItsProducer(GameTestHelper h){
+        var f=new Fixture(h);h.runAfterDelay(100,()->{
+            f.stock().receive(40);f.tick();f.data.hiveBroodTicks[0]=200;int before=f.stock().reserve();Mob[] published={null};
+            java.util.function.Consumer<net.neoforged.neoforge.event.entity.EntityJoinLevelEvent> callback=e->{
+                if(e.getLevel()==f.level&&e.getEntity() instanceof com.codex.blacklight.entity.BlacklightCommonInfected mob){
+                    published[0]=mob;f.set(f.port(0),Blocks.AIR.defaultBlockState());f.data.destroyedMask|=1;
+                }
+            };
+            net.neoforged.neoforge.common.NeoForge.EVENT_BUS.addListener(callback);
+            try{
+                var child=CityHiveSupply.hatch(f.level,f.data,0,f.port(0),OutbreakRules.Tier.FRESH);
+                h.assertTrue(published[0]!=null,"a real birth reaches the external join listener");
+                h.assertTrue(child==null&&published[0].isRemoved()&&f.data.hiveBirths[0]==0&&f.stock().reserve()==before,
+                        "destroyed producer rolls back its newborn and material before reopening a nonexistent hatch");
+            }finally{net.neoforged.neoforge.common.NeoForge.EVENT_BUS.unregister(callback);f.close();}
+            h.succeed();
+        });
+    }
     private static final class Fixture implements AutoCloseable {
         final GameTestHelper h;final ServerLevel level;final CityData data,old;final OutbreakData outbreak;final FakePlayer player,observer;
         final boolean spawning,grief,enabled,citySpawns;final net.minecraft.world.Difficulty difficulty;
@@ -65,7 +84,7 @@ public final class CityHiveSupplyGameTest {
         public void close(){
             if(closed)return;closed=true;
             level.removePlayerImmediately(observer,Entity.RemovalReason.DISCARDED);
-            for(var e:level.getAllEntities())if((e instanceof Mob||e instanceof ItemEntity)&&!originalEntities.contains(e.getId()))e.discard();
+            var cleanup=new java.util.ArrayList<Entity>();level.getAllEntities().forEach(cleanup::add);for(var e:cleanup)if((e instanceof Mob||e instanceof ItemEntity)&&!originalEntities.contains(e.getId()))e.discard();
             for(var entry:changed.entrySet())level.setBlock(entry.getKey(),entry.getValue(),3);
             for(var cp:forced)level.setChunkForced(cp.x,cp.z,false);
             level.getDataStorage().set("blacklight_city",old);level.getServer().overworld().getDataStorage().set("blacklight_outbreak",outbreak);
@@ -150,7 +169,21 @@ public final class CityHiveSupplyGameTest {
         var parent=EntityType.COW.create(f.level);parent.setNoAi(true);parent.setPos(f.outside(0).getBottomCenter());var child=EntityType.COW.create(f.level);child.setNoAi(true);child.setPos(f.outside(1).getBottomCenter());
         int[] calls={0};boolean[] nested={true};java.util.function.Consumer<net.neoforged.neoforge.event.entity.EntityJoinLevelEvent> callback=e->{if(e.getLevel()==f.level&&e.getEntity()==parent){calls[0]++;nested[0]=WorldOutbreakSystem.addScheduled(f.level,child);}};
         net.neoforged.neoforge.common.NeoForge.EVENT_BUS.addListener(callback);
-        try{h.assertTrue(WorldOutbreakSystem.addScheduled(f.level,parent)&&calls[0]==1&&!nested[0]&&!WorldOutbreakSystem.populationRoom(f.level,f.outside(1)),"an unpublished city resident already occupies the all-mob cap and a nested producer cannot publish over it");}
+        try{h.assertTrue(WorldOutbreakSystem.addScheduled(f.level,parent)&&calls[0]==1&&!nested[0]&&WorldOutbreakSystem.populationRoom(f.level,f.outside(1)),"an unpublished resident reserves its own pool without stealing the independent infected pool");}
         finally{net.neoforged.neoforge.common.NeoForge.EVENT_BUS.unregister(callback);if(!child.isRemoved())child.discard();CityConfig.MOB_LIMIT.set(limit);f.close();}h.succeed();
+    });}
+    @GameTest(template="wall_test",timeoutTicks=240,batch="density_independent_pools")
+    public static void aFullResidentPoolAllowsRealInfectedBirthsAndReservesBothPoolsDuringJoins(GameTestHelper h){var f=new Fixture(h);int limit=CityConfig.MOB_LIMIT.get(),cap=OutbreakConfig.DIMENSION_CAP.get();h.runAfterDelay(100,()->{
+        CityConfig.MOB_LIMIT.set(1);OutbreakConfig.DIMENSION_CAP.set(2);
+        var resident=EntityType.COW.create(f.level);resident.setNoAi(true);resident.setPos(f.outside(0).getBottomCenter());Mob[] nested={null};
+        java.util.function.Consumer<net.neoforged.neoforge.event.entity.EntityJoinLevelEvent> callback=e->{if(e.getLevel()==f.level&&e.getEntity()==resident)nested[0]=WorldOutbreakSystem.spawnAt(f.level,f.outside(1),OutbreakRules.Tier.FRESH);};
+        net.neoforged.neoforge.common.NeoForge.EVENT_BUS.addListener(callback);
+        try{
+            h.assertTrue(WorldOutbreakSystem.addScheduled(f.level,resident)&&nested[0]!=null,"a real infected producer can use its own slot inside the final resident join callback");
+            h.assertTrue(!CitySystem.hasPopulationRoom(f.level,DistrictThreat.Zone.GREEN)&&CitySystem.hasPopulationRoom(f.level,DistrictThreat.Zone.RED),"full green resident districts are skipped while red districts retain their own infection slot");
+            var extraResident=EntityType.COW.create(f.level);extraResident.setPos(f.outside(2).getBottomCenter());h.assertTrue(!WorldOutbreakSystem.addScheduled(f.level,extraResident),"a full resident pool cannot borrow infection slots");
+            h.assertTrue(WorldOutbreakSystem.spawnAt(f.level,f.outside(2),OutbreakRules.Tier.FRESH)!=null,"the second real infection slot is independent of the full resident pool");
+            h.assertTrue(WorldOutbreakSystem.spawnAt(f.level,f.outside(3),OutbreakRules.Tier.FRESH)==null,"the independent infection cap is still enforced");
+        }finally{net.neoforged.neoforge.common.NeoForge.EVENT_BUS.unregister(callback);CityConfig.MOB_LIMIT.set(limit);OutbreakConfig.DIMENSION_CAP.set(cap);f.close();}h.succeed();
     });}
 }

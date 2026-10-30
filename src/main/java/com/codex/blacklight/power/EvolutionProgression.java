@@ -17,10 +17,10 @@ public final class EvolutionProgression {
                 ||BaseEvolutionCatalog.complete(p.getData(ModAttachments.PLAYER_STATE),p.getData(ModAttachments.GROWTH)));
     }
     public static boolean everyAttribute(InfiniteProgress progress,int required){return CORE_ATTRIBUTES.stream().allMatch(a->progress.rank(a)>=required);}
-    public static int required(CombatSkill skill){return skill==CombatSkill.ADAPTATION_PERCENT?Math.max(PlayerEvolutionConfig.PASSIVE_LEVEL.get(),PlayerEvolutionConfig.PERCENT_LEVEL.get()):PlayerEvolutionConfig.PASSIVE_LEVEL.get();}
+    public static int required(CombatSkill skill){return skill.advancedPassive()?Math.max(PlayerEvolutionConfig.PASSIVE_LEVEL.get(),PlayerEvolutionConfig.PERCENT_LEVEL.get()):PlayerEvolutionConfig.PASSIVE_LEVEL.get();}
     public static boolean canLearn(Player p,CombatSkill skill){
         if(!skill.adaptivePassive())return true;
-        int milestone=skill==CombatSkill.ADAPTATION_PERCENT?EvolutionMilestones.PERCENT:EvolutionMilestones.PASSIVES;
+        int milestone=skill.advancedPassive()?EvolutionMilestones.PERCENT:EvolutionMilestones.PASSIVES;
         return p.getData(ModAttachments.PLAYER_STATE).isInfected()&&(p.getData(ModAttachments.EVOLUTION_MILESTONES).has(milestone)
                 ||infiniteUnlocked(p)&&everyAttribute(p.getData(ModAttachments.INFINITE_EVOLUTION),required(skill)));
     }

@@ -59,7 +59,7 @@ public final class CitySystem {
         if(level.players().isEmpty())return;
         long time=level.getGameTime();if(time%20!=0)return;
         updateLoadedCity(level,time);
-        if(level.dimension().equals(CityTravel.WORLD)&&time%100==0)populateWorld(level);
+        if(level.dimension().equals(CityTravel.WORLD)&&time%CityConfig.populationIntervalTicks()==0)populateWorld(level);
     }
     @SubscribeEvent public static void unloaded(net.neoforged.neoforge.event.level.LevelEvent.Unload event){
         if(event.getLevel() instanceof ServerLevel level)CityPregenerator.unload(level);
@@ -72,7 +72,7 @@ public final class CitySystem {
             if(data.destroyed(hive)){if(data.facade&&CityConfig.DESTRUCTION.get())woundFacade(level,data,hive);}
             else if(data.population&&CityConfig.SPAWNS.get()&&CityHiveSupply.ready(data,hive))spawnHive(level,data,hive);
         }
-        if(time%100==0&&data.population&&CityConfig.SPAWNS.get())populate(level,data);
+        if(time%CityConfig.populationIntervalTicks()==0&&data.population&&CityConfig.SPAWNS.get())populate(level,data);
         if(data.spread&&CityConfig.SPREAD.get()&&level.getGameRules().getBoolean(net.minecraft.world.level.GameRules.RULE_MOBGRIEFING)&&com.codex.blacklight.infection.WorldOutbreakSystem.active(level)){
             if(time>=data.nextSpread){expand(level,data);data.nextSpread=time+CityConfig.SPREAD_SECONDS.get()*20L;data.setDirty();}
             paintSpread(level,data);
@@ -100,30 +100,29 @@ public final class CitySystem {
                 player.displayClientMessage(net.minecraft.network.chat.Component.translatable("city.blacklight.hive_destroyed"),false);
         }
     }
-    private static int count(ServerLevel level){
-        int n=0;for(Entity entity:level.getAllEntities())if(entity instanceof Mob && entity.isAlive())n++;return n;
-    }
-    private static boolean spawn(ServerLevel level,EntityType<? extends Mob> type,BlockPos pos,boolean infected){
+    static boolean spawn(ServerLevel level,EntityType<? extends Mob> type,BlockPos pos,boolean infected){
         if(!level.getGameRules().getBoolean(net.minecraft.world.level.GameRules.RULE_DOMOBSPAWNING))return false;
         if((infected||type==ModEntities.BLACKLIGHT_HUNTER.get()||type==ModEntities.BLACKLIGHT_HYDRA.get())&&!com.codex.blacklight.infection.WorldOutbreakSystem.active(level))return false;
         if((infected||type==ModEntities.BLACKLIGHT_HUNTER.get()||type==ModEntities.BLACKLIGHT_HYDRA.get())
                 &&!com.codex.blacklight.infection.WorldOutbreakSystem.populationRoom(level,pos))return false;
         if(infected&&type==EntityType.ZOMBIE)type=ModEntities.COMMON_INFECTED.get();
-        if(!loaded(level,pos)||!level.getBlockState(pos.below()).isSolid()||count(level)>=CityConfig.MOB_LIMIT.get())return false;
+        if(!loaded(level,pos)||!level.getBlockState(pos.below()).isSolid()||com.codex.blacklight.infection.WorldOutbreakSystem.cityPopulationSlots(level,infected||type==ModEntities.BLACKLIGHT_HUNTER.get()||type==ModEntities.BLACKLIGHT_HYDRA.get())==0)return false;
         Mob mob=type.create(level);if(mob==null)return false;
         mob.moveTo(pos.getX()+.5,pos.getY(),pos.getZ()+.5,level.random.nextFloat()*360,0);
-        if(!level.noCollision(mob)||!level.getBlockState(pos).getFluidState().isEmpty())return false;
+        if(!level.noCollision(mob)||level.containsAnyLiquid(mob.getBoundingBox()))return false;
         mob.finalizeSpawn(level,level.getCurrentDifficultyAt(pos),MobSpawnType.EVENT,null);
+        // Finalization may change the body dimensions; validate the complete body again.
+        if(!level.noCollision(mob)||level.containsAnyLiquid(mob.getBoundingBox()))return false;
         mob.getPersistentData().putBoolean(POPULATION,true);
         mob.addTag(POPULATION); // Infection replacements preserve vanilla entity tags.
         // Residents persist in their district; hostile vanilla mobs may despawn normally.
         if(type==EntityType.VILLAGER)mob.setPersistenceRequired();
-        if(infected&&!BlacklightInfectionSystem.isInfected(mob))BlacklightInfectionSystem.infect(mob,null);
+        if(infected){if(!CityEcology.ambientAllowed(level,pos,level.random.nextInt(100)))return false;if(!BlacklightInfectionSystem.isInfected(mob))BlacklightInfectionSystem.infect(mob,null);}
         if(mob instanceof Zombie zombie)zombie.setBaby(false);
         return com.codex.blacklight.infection.WorldOutbreakSystem.addScheduled(level,mob);
     }
     private static void populateWorld(ServerLevel level){
-        if(!CityConfig.SPAWNS.get()||!CityData.get(level).population||count(level)>=CityConfig.MOB_LIMIT.get())return;
+        if(!CityConfig.SPAWNS.get()||!CityData.get(level).population)return;
         // One spawn attempt per five seconds for the entire dimension, only in ticking chunks.
         var player=level.players().get(level.random.nextInt(level.players().size()));
         int x=player.getBlockX()+level.random.nextInt(129)-64,z=player.getBlockZ()+level.random.nextInt(129)-64;
@@ -133,17 +132,18 @@ public final class CitySystem {
         var chunk=level.getChunkSource().getChunkNow(Math.floorDiv(x,16),Math.floorDiv(z,16));if(chunk==null)return;
         int y=chunk.getHeight(net.minecraft.world.level.levelgen.Heightmap.Types.MOTION_BLOCKING_NO_LEAVES,x&15,z&15)+1;
         var p=new BlockPos(x,y,z);
-        if(level.getEntitiesOfClass(Mob.class,new AABB(p).inflate(48)).size()>=8)return;
         var zone=CityEcology.zone(level,p);
+        if(zone!=DistrictThreat.Zone.RED&&level.getEntitiesOfClass(Mob.class,new AABB(p).inflate(48),m->m.isAlive()&&!BlacklightInfectionSystem.isInfected(m)).size()>=8)return;
         if(zone!=DistrictThreat.Zone.GREEN&&level.getDifficulty()==net.minecraft.world.Difficulty.PEACEFUL)return;
-        if(zone==DistrictThreat.Zone.RED){com.codex.blacklight.infection.WorldOutbreakSystem.spawnAt(level,p,
-                com.codex.blacklight.infection.WorldOutbreakSystem.tierForPopulation(level,p,level.random.nextInt(100)));return;}
+        if(zone==DistrictThreat.Zone.RED){if(!CityEcology.ambientAllowed(level,p,level.random.nextInt(100)))return;com.codex.blacklight.infection.WorldOutbreakSystem.spawnAt(level,p,
+                com.codex.blacklight.infection.WorldOutbreakSystem.tierForPopulation(level,p,level.random.nextDouble()));return;}
         EntityType<? extends Mob> type=zone==DistrictThreat.Zone.GREEN?EntityType.VILLAGER:
             level.random.nextBoolean()?ModEntities.BLACKWATCH_SOLDIER.get():EntityType.ZOMBIE;
         spawn(level,type,p,type==EntityType.ZOMBIE);
     }
     private static void spawnHive(ServerLevel level,CityData data,int hive){
         if(!CityHiveSupply.ready(data,hive)||level.getDifficulty()==net.minecraft.world.Difficulty.PEACEFUL||!com.codex.blacklight.infection.WorldOutbreakSystem.active(level))return;
+        if(level.random.nextDouble()>=com.codex.blacklight.config.GameplayBalanceConfig.BROOD_CHANCE.get()){data.hiveBroodTicks[hive]=0;data.setDirty();return;}
         int start=level.random.nextInt(PORTS.length);
         for(int j=0;j<PORTS.length;j++){
             int i=(start+j)%PORTS.length;BlockPos port=port(level,hive,i);
@@ -159,9 +159,9 @@ public final class CitySystem {
                 if(mob instanceof com.codex.blacklight.entity.BlacklightInfectedHost host&&!host.hasMultipartBody()){
                     developed++;if(host.tissueAge()>=com.codex.blacklight.infection.TissueGrowth.MATURITY_TICKS)mature++;if(host.tissueAge()>=com.codex.blacklight.infection.TissueGrowth.ANCIENT_TICKS)ancient++;
                 }}
-            var tier=com.codex.blacklight.infection.OutbreakRules.populationTier(stage,common,developed,mature,ancient,com.codex.blacklight.infection.OutbreakConfig.COMMON_RESERVE.get(),com.codex.blacklight.infection.OutbreakConfig.LOCAL_CAP.get(),level.random.nextInt(100));
-            if(stage>=2&&!hasHunter&&common>=com.codex.blacklight.infection.OutbreakConfig.COMMON_RESERVE.get())tier=com.codex.blacklight.infection.OutbreakRules.Tier.HUNTER;
-            boolean hydra=stage>=3&&hasHunter&&tier==com.codex.blacklight.infection.OutbreakRules.Tier.ANCIENT&&level.random.nextInt(12)==0&&level.getEntitiesOfClass(com.codex.blacklight.entity.BlacklightHydra.class,new AABB(port).inflate(64)).isEmpty();
+            var tier=com.codex.blacklight.infection.OutbreakRules.populationTier(stage,common,developed,mature,ancient,com.codex.blacklight.infection.OutbreakConfig.COMMON_RESERVE.get(),com.codex.blacklight.infection.OutbreakConfig.LOCAL_CAP.get(),level.random.nextDouble());
+            if(com.codex.blacklight.config.GameplayBalanceConfig.LINEAGE_GUARANTEES.get()&&stage>=2&&!hasHunter&&common>=com.codex.blacklight.infection.OutbreakConfig.COMMON_RESERVE.get())tier=com.codex.blacklight.infection.OutbreakRules.Tier.HUNTER;
+            boolean hydra=stage>=3&&hasHunter&&tier==com.codex.blacklight.infection.OutbreakRules.Tier.ANCIENT&&level.random.nextDouble()<CityConfig.HYDRA_CHANCE.get()&&level.getEntitiesOfClass(com.codex.blacklight.entity.BlacklightHydra.class,new AABB(port).inflate(64)).isEmpty();
             if((hydra?CityHiveSupply.hatchHydra(level,data,hive,port):CityHiveSupply.hatch(level,data,hive,port,tier))!=null){
                 level.setBlock(port,level.getBlockState(port).setValue(CityHatchBlock.OPEN,true),3);
                 level.sendParticles(ParticleTypes.CRIMSON_SPORE,outside.getX()+.5,65,outside.getZ()+.5,16,.7,.6,.7,.02);
@@ -176,17 +176,37 @@ public final class CitySystem {
             long bit=1L<<(x+z*8);if((data.populatedMask&bit)!=0)continue;
             BlockPos center=populationPoint(level,x,z);
             if(center==null||!loaded(level,center)||level.players().stream().noneMatch(p->p.distanceToSqr(center.getX(),center.getY(),center.getZ())<100*100))continue;
-            if(count(level)+4>CityConfig.MOB_LIMIT.get())return;
             var zone=CityEcology.zone(level,center);
+            if(!hasPopulationRoom(level,zone))continue;
             if(level.getDifficulty()==net.minecraft.world.Difficulty.PEACEFUL&&zone!=DistrictThreat.Zone.GREEN)continue;
-            int spawned=0;
-            for(int i=0;i<4;i++){
-                EntityType<? extends Mob> type=zone==DistrictThreat.Zone.GREEN?EntityType.VILLAGER:
-                    zone==DistrictThreat.Zone.YELLOW&&i<2?ModEntities.BLACKWATCH_SOLDIER.get():EntityType.ZOMBIE;
-                if(spawn(level,type,center.offset(i*3-5,0,0),type==EntityType.ZOMBIE))spawned++;
-            }
+            int spawned=populateDistrict(level,center,zone);
             if(spawned>0){data.populatedMask|=bit;data.setDirty();}return;
         }
+    }
+    static boolean hasPopulationRoom(ServerLevel level,DistrictThreat.Zone zone){
+        int residents=com.codex.blacklight.infection.WorldOutbreakSystem.cityPopulationSlots(level,false);
+        int infected=com.codex.blacklight.infection.WorldOutbreakSystem.cityPopulationSlots(level,true);
+        return switch(zone){case GREEN->residents>0;case RED->infected>0;case YELLOW->residents>0||infected>0;};
+    }
+    /** One bounded initial street cohort, sharing the ordinary publication and population guards. */
+    static int populateDistrict(ServerLevel level,BlockPos center,DistrictThreat.Zone zone){
+        if(!level.getGameRules().getBoolean(net.minecraft.world.level.GameRules.RULE_DOMOBSPAWNING))return 0;
+        if(level.getDifficulty()==net.minecraft.world.Difficulty.PEACEFUL&&zone!=DistrictThreat.Zone.GREEN)return 0;
+        if(!hasPopulationRoom(level,zone))return 0;
+        int attempts=4,spawned=0;
+        for(int i=0;i<attempts;i++){
+            var pos=center.offset(i*3-5,0,0);
+            if(zone==DistrictThreat.Zone.RED){
+                if(CityEcology.ambientAllowed(level,pos,level.random.nextInt(100))
+                        &&com.codex.blacklight.infection.WorldOutbreakSystem.spawnAt(level,pos,
+                        com.codex.blacklight.infection.WorldOutbreakSystem.tierForPopulation(level,pos,level.random.nextDouble()))!=null)spawned++;
+                continue;
+            }
+            EntityType<? extends Mob> type=zone==DistrictThreat.Zone.GREEN?EntityType.VILLAGER:
+                    zone==DistrictThreat.Zone.YELLOW&&i<2?ModEntities.BLACKWATCH_SOLDIER.get():EntityType.ZOMBIE;
+            if(spawn(level,type,pos,type==EntityType.ZOMBIE))spawned++;
+        }
+        return spawned;
     }
     private static void expand(ServerLevel level,CityData data){
         if(Long.bitCount(data.infectedMask)>=12)return;

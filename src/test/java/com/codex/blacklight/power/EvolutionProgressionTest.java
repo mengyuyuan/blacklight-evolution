@@ -19,6 +19,10 @@ class EvolutionProgressionTest {
     @Test void FiniteCurriculumExcludesCircularAndUnboundedRequirements(){
         var state=full();assertTrue(BaseEvolutionCatalog.complete(state,growth()));
         assertFalse(state.hasCombatSkill(CombatSkill.ADAPTATION));
+        assertFalse(state.hasCombatSkill(CombatSkill.TISSUE_REGENERATION_PERCENT));
+        assertTrue(CombatSkill.TISSUE_REGENERATION_PERCENT.advancedPassive());
+        assertTrue(CombatSkill.TISSUE_REGENERATION_PERCENT.adaptivePassive());
+        assertEquals(CombatSkill.TISSUE_REGENERATION,CombatSkill.TISSUE_REGENERATION_PERCENT.requires());
         assertEquals(63,BaseEvolutionCatalog.REQUIREMENTS.size());
         assertTrue(BaseEvolutionCatalog.REQUIREMENTS.stream().noneMatch(r->r.id().startsWith("infinite_")||r.id().equals("adaptation")||r.id().equals(RicochetRules.ID)));
         assertFalse(BaseEvolutionCatalog.complete(state,GrowthProgress.EMPTY));

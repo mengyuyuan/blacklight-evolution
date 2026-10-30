@@ -1,0 +1,39 @@
+#Prepare 7x7 arrival chunks in the background once per Futian world. Can be paused with /blacklightcity pregen pause.
+arrivalWarmup = true
+#Allow hive wounds to affect its generated facade. Does not replace player blocks.
+hiveFacadeDamage = true
+# Default: 180
+# Range: 30 ~ 3600
+spreadIntervalSeconds = 180
+#Slow spread across generated city blocks only; sanctuary remains intact.
+infectionSpread = true
+#Minimum ticks between background chunk requests. Only one request is active; busy servers defer new work.
+# Default: 10
+# Range: 1 ~ 200
+pregenIntervalTicks = 10
+#Decoded map tile cache. About 129 KiB per tile; transient worldgen buffers are additional.
+# Default: 64
+# Range: 8 ~ 256
+mapCacheTiles = 64
+#Maximum active waiting time for asynchronous city arrival, in seconds. Large cold municipal scenes need more than 30 seconds on slower storage. Movement or logout still cancels travel.
+# Default: 120
+# Range: 30 ~ 600
+travelTimeoutSeconds = 120
+#城市居民和环境人口尝试间隔；按20刻向上取整，以匹配人口更新节拍。
+# Default: 100
+# Range: 20 ~ 240000
+populationIntervalTicks = 100
+#已有城市母巢的繁殖等待刻数；需实际供能、区域阶段和人口预算。普通建筑菌落使用gameplay配置中的broodIntervalTicks。
+# Default: 200
+# Range: 20 ~ 240000
+hiveBroodIntervalTicks = 200
+#城市母巢抽到古老谱系、已有猎手且阶段允许时，改生九头蛇的概率。
+# Default: 0.08333333333333333
+# Range: 0.0 ~ 1.0
+hiveHydraChance = 0.08333333333333333
+#City residents, infected and military population. Server authoritative.
+population = true
+#城市非感染体（居民、军方及其他生物）的独立名额；感染体使用outbreak配置的infectedPerDimension，合计为城市调度硬上限。0仍关闭城市全部人口生成，不删除已有生物。
+# Default: 48
+# Range: 0 ~ 200
+cityMobLimit = 48

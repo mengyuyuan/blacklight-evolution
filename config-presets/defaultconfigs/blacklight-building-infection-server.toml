@@ -1,0 +1,34 @@
+#Shared frontier/aging operations per dimension every five ticks.
+# Default: 4
+# Range: 1 ~ 16
+workBudget = 4
+# Default: 48
+# Range: 8 ~ 96
+horizontalRadius = 48
+# Default: 96
+# Range: 8 ~ 192
+verticalReach = 96
+#Grow solid, connected biomass columns using the shared work budget.
+buildingBiomass = true
+# Default: 8192
+# Range: 64 ~ 16384
+surfacesPerColony = 8192
+#Existing infected tissue can establish a core beside a substantial wall.
+naturalCores = true
+#Live colony limit; cleared sites retain separate compact reseeding protection.
+# Default: 16
+# Range: 1 ~ 64
+maxColonies = 16
+hatchInfected = true
+#Mature attached tissue can pay to assimilate contacted building blocks; clearing gradually restores unchanged recorded material.
+assimilateBuildings = true
+#Naturally infected, anchored buildings mature and sustain brood over loaded time; feeding remains an optional boost.
+autonomousBuildings = true
+#Loaded, active seconds; sufficient actual surface growth is also required.
+# Default: 600
+# Range: 60 ~ 7200
+maturitySeconds = 600
+buildingInfection = true
+# Default: 12
+# Range: 0 ~ 32
+nearbyMobLimit = 12

@@ -19,10 +19,11 @@ public final class AdaptivePassiveHud {
         var state = AdaptivePassiveSystem.state(p);
         var g = event.getGuiGraphics(); int y = mc.getWindow().getGuiScaledHeight() - 65;
         if (AdaptivePassiveSystem.active(p, AdaptivePassiveState.ADAPTATION)) {
-            long percent = Math.round(100 * (1 - AdaptivePassiveRules.remainingFraction(state.adaptation(), p.getHealth(), p.getMaxHealth(), AdaptivePassiveSystem.percentBased(p))));
-            g.drawString(mc.font, Component.translatable("hud.blacklight.adaptation", state.adaptation(), percent), 8, y, 0xFF9AD9EC, true); y -= 12;
+            boolean advanced=AdaptivePassiveSystem.percentBased(p);
+            int percent = AdaptivePassiveRules.mitigation(state.adaptation(), p.getHealth(), p.getMaxHealth(), advanced);
+            g.drawString(mc.font, Component.translatable(advanced?"hud.blacklight.adaptation_ii":"hud.blacklight.adaptation", state.adaptation(), percent), 8, y, 0xFF9AD9EC, true); y -= 12;
         }
         if (AdaptivePassiveSystem.active(p, AdaptivePassiveState.REGENERATION))
-            g.drawString(mc.font, Component.translatable("hud.blacklight.tissue_regeneration", state.regeneration()), 8, y, 0xFFEB9C9D, true);
+            g.drawString(mc.font, Component.translatable(AdaptivePassiveSystem.percentRegeneration(p)?"hud.blacklight.tissue_regeneration_ii":"hud.blacklight.tissue_regeneration", state.regeneration()), 8, y, 0xFFEB9C9D, true);
     }
 }

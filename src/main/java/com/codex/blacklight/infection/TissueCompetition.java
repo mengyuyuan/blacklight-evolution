@@ -60,12 +60,12 @@ public final class TissueCompetition {
     public static float finalDamage(LivingEntity target,net.minecraft.world.damagesource.DamageSource source,float amount){
         if(!(target instanceof BlacklightInfectedHost prey)||prey.level().isClientSide)return amount;
         if(source.getEntity() instanceof BlacklightInfectedHost actor&&canSecureMeal(actor,prey)){
-            float floor=prey.getMaxHealth()*.12F;
+            float floor=(float)(prey.getMaxHealth()*TissueCompetitionConfig.weakenedFraction()*.8);
             amount=Math.min(amount,Math.max(0,prey.getHealth()-floor));
         }
         if(RECOVERED_UNTIL.getOrDefault(prey,0L)>prey.level().getGameTime()
                 &&source.getEntity() instanceof net.minecraft.world.entity.Mob
-                &&!source.is(net.minecraft.tags.DamageTypeTags.BYPASSES_INVULNERABILITY))amount*=.35F;
+                &&!source.is(net.minecraft.tags.DamageTypeTags.BYPASSES_INVULNERABILITY))amount*=TissueCompetitionConfig.RECOVERY_DAMAGE.get();
         return amount;
     }
     /** Called after the original hit's stagger/cancel accounting, so that hit cannot cancel its own capture. */
@@ -152,8 +152,8 @@ public final class TissueCompetition {
         boolean accepted=prey.hurt(prey.damageSources().mobAttack(actor),(float)Math.min(Float.MAX_VALUE,Math.max(10000D,prey.getMaxHealth()*20D)));
         if(accepted&&((LivingDeathAccess)(LivingEntity)prey).blacklight$deathAccepted()&&!prey.isAlive()&&prey.getKillCredit()==actor){
             if(TissueCompetitionConfig.INHERITANCE.get())actor.inheritTissue(session.operation(),donor,donorSeed,age,donorPlan,prey.knownNativeTissueCore(),prey.speciesId(),prey.hostData().toString());
-            actor.heal(actor.getMaxHealth()*.4F/com.codex.blacklight.power.CombatScale.units(actor));
-            RECOVERED_UNTIL.put(actor,now+40);
+            actor.heal((float)(actor.getMaxHealth()*TissueCompetitionConfig.HEAL.get()/com.codex.blacklight.power.CombatScale.units(actor)));
+            RECOVERED_UNTIL.put(actor,now+TissueCompetitionConfig.RECOVERY_TICKS.get());
             prey.setInvisible(true);
         }else{
             prey.getPersistentData().remove(SETTLED);prey.getPersistentData().remove("BlacklightCannibalOperation");
@@ -161,7 +161,7 @@ public final class TissueCompetition {
         release(actor);
     }
     public static void damaged(BlacklightInfectedHost host,float actual){
-        if(actual>=host.getMaxHealth()*.10F){var session=ACTIVE.get(host);if(session==null)session=CLAIMS.get(host);if(session!=null)release(session.actor());}
+        if(actual>=host.getMaxHealth()*TissueCompetitionConfig.INTERRUPT.get()){var session=ACTIVE.get(host);if(session==null)session=CLAIMS.get(host);if(session!=null)release(session.actor());}
     }
     public static void release(BlacklightInfectedHost actor){
         var session=ACTIVE.remove(actor);if(session==null)return;CLAIMS.remove(session.prey());

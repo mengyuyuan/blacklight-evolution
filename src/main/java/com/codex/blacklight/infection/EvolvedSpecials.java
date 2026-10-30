@@ -116,7 +116,13 @@ public final class EvolvedSpecials {
     private void impact(EvolvedSpecialMove move,LivingEntity target){
         if(move==EvolvedSpecialMove.MEND){
             float budget=120;
-            for(int id:patients)if(host.level().getEntity(id) instanceof Mob ally&&ally.isAlive()&&host.distanceToSqr(ally)<=100&&host.hasLineOfSight(ally)&&BlacklightInfectionSystem.isInfected(ally)){
+            // Heal listeners can interrupt this action and clear its patient list.
+            // Keep iteration stable, then revalidate the live caster before each pulse.
+            for(int id:List.copyOf(patients)){
+                if(!host.isAlive()||host.isRemoved()||!host.evolvedAction().equals(move.key)
+                        ||host.evolvedSpecialTarget()!=target.getId()||host.level()!=target.level())break;
+                if(!(host.level().getEntity(id) instanceof Mob ally)||!ally.isAlive()||host.distanceToSqr(ally)>100
+                        ||!host.hasLineOfSight(ally)||!BlacklightInfectionSystem.isInfected(ally))continue;
                 float heal=Math.min(budget,Math.min(60,ally.getMaxHealth()*.05F));float before=ally.getHealth();ally.heal(heal);float actual=Math.max(0,ally.getHealth()-before);budget-=actual;
                 if(actual>0)EvolvedCombatEffects.feed(host,ally);if(budget<=0)break;
             }return;

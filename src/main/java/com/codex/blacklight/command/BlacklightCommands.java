@@ -54,7 +54,8 @@ public final class BlacklightCommands {
                     tag.putLong("BlacklightTissueAge",504000);tag.put("BlacklightTissueInheritance",com.codex.blacklight.infection.TissueInheritanceCodec.write(inventory));tag.putInt("BlacklightTissueNutrition",100);host.load(tag);host.advanceTissue(0);
                     var pos=player.position().add(player.getLookAngle().multiply(1,0,1).normalize().scale(8));host.moveTo(pos.x,pos.y,pos.z,player.getYRot()+180,0);
                     if(!level.noCollision(host,host.getBoundingBox())||!level.addFreshEntity(host)){context.getSource().sendFailure(Component.literal("这里空间不足，进化者样本未生成。"));return 0;}
-                    host.setCustomName(Component.literal("刀臂进化者 · 试玩样本"));host.setPersistenceRequired();
+                    // Metamorphosis assigns the selected archetype's real name.
+                    host.setPersistenceRequired();
                     if(!host.beginEvolvedMetamorphosis()){host.discard();context.getSource().sendFailure(Component.literal("这里没有完整蜕变所需空间。"));return 0;}
                     context.getSource().sendSuccess(()->Component.literal("已生成预置成熟器官的试玩样本，开始十秒蜕变。自然进化仍需满足真实吞噬门槛。"),false);return 1;
                 }))

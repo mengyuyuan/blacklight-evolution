@@ -4,6 +4,33 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 class OptionalShoulderCameraProbeTest {
+    public interface ViewApi {
+        ViewState STATE=new ViewState();
+        static ViewApi getInstance(){return STATE.instance;}
+        boolean isShoulderSurfing();
+        boolean isFreeLooking();
+        CameraApi getCamera();
+    }
+    public interface CameraApi { float getYRot();float getXRot(); }
+    public static class ViewState { ViewApi instance; }
+    private static class ViewProvider implements ViewApi,CameraApi {
+        float yaw,pitch;boolean free,active=true;
+        public boolean isShoulderSurfing(){return active;}
+        public boolean isFreeLooking(){return free;}
+        public CameraApi getCamera(){return this;}
+        public float getYRot(){return yaw;}public float getXRot(){return pitch;}
+    }
+    @Test void decoupledAndAbsoluteTouchCameraReadLogicalAnglesInsteadOfFrozenEntityYaw() throws Exception {
+        var p=new ViewProvider();ViewApi.STATE.instance=p;var probe=new OptionalShoulderCameraProbe(ViewApi.class);
+        for(float yaw:new float[]{0,90,-160,179,-179}) {
+            p.yaw=yaw;p.pitch=-32;
+            var angles=probe.angles(12,7).orElseThrow();assertEquals(yaw,angles.yaw());assertEquals(-32,angles.pitch());
+        }
+        p.free=true;var free=probe.angles(12,7).orElseThrow();assertEquals(12,free.yaw());assertEquals(7,free.pitch());
+        p.free=false;p.yaw=Float.NaN;assertTrue(probe.angles(12,7).isEmpty());
+        p.yaw=90;p.active=false;assertTrue(probe.angles(12,7).isEmpty());
+        ViewApi.STATE.instance=null;assertTrue(probe.angles(12,7).isEmpty());
+    }
     public interface Api {
         State STATE=new State();
         static Api getInstance(){return STATE.instance;}

@@ -89,7 +89,7 @@ public final class BlacklightInfectionSystem {
     @SubscribeEvent
     public static void onContactDamage(LivingDamageEvent.Post event) {
         LivingEntity victim = event.getEntity();
-        if (event.getNewDamage() <= 0.0F || !canInfect(victim)) return;
+        if (event.getNewDamage() <= 0.0F || !com.codex.blacklight.config.GameplayBalanceConfig.CONTACT_ENABLED.get() || !canInfect(victim)) return;
         var damage = event.getSource();
         // Only physical bites/claws by infected creatures can spread infection.
         // Causing-entity alone also matches arrows, explosions and thorns, and
@@ -102,8 +102,8 @@ public final class BlacklightInfectionSystem {
         if (data.getLong(InfectionRules.NEXT_CONTACT_EXPOSURE) > now) return;
         // Failed rolls also consume this victim's exposure window. Multiple
         // attackers and save/reload cannot reroll every damage event.
-        data.putLong(InfectionRules.NEXT_CONTACT_EXPOSURE, now + InfectionRules.CONTACT_COOLDOWN_TICKS);
-        if (attacker.getRandom().nextFloat() < InfectionRules.CONTACT_CHANCE) infect(victim, attacker);
+        data.putLong(InfectionRules.NEXT_CONTACT_EXPOSURE, now + com.codex.blacklight.config.GameplayBalanceConfig.CONTACT_COOLDOWN.get());
+        if (attacker.getRandom().nextFloat() < com.codex.blacklight.config.GameplayBalanceConfig.CONTACT_CHANCE.get()) infect(victim, attacker);
     }
 
     @SubscribeEvent
@@ -204,14 +204,17 @@ public final class BlacklightInfectionSystem {
             }
         }
         // These two vanilla species store only a saddle flag, not an inventory stack.
-        // Keep this last, so accepted insertion is followed immediately by conversion.
+        // Transfer the flag before item publication, just like a real inventory slot.
+        // A join listener may invalidate conversion after accepting the returned item.
         if ((source instanceof net.minecraft.world.entity.animal.Pig
                 || source instanceof net.minecraft.world.entity.monster.Strider)
                 && source instanceof net.minecraft.world.entity.Saddleable saddled && saddled.isSaddled()) {
             var drop = new net.minecraft.world.entity.item.ItemEntity(level, source.getX(), source.getY(), source.getZ(),
                     new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.SADDLE));
             drop.setDefaultPickUpDelay();
-            if (!level.addFreshEntity(drop)) return false;
+            var steering=((com.codex.blacklight.mixin.SaddleSteeringAccess)source).blacklight$steering();
+            steering.setSaddle(false);
+            if (!level.addFreshEntity(drop)) {steering.setSaddle(true);return false;}
         }
         return true;
     }

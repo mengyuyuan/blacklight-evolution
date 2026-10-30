@@ -1,5 +1,8 @@
 package com.codex.blacklight.city;
 
+import com.codex.blacklight.config.GameplayBalanceConfig;
+import static com.codex.blacklight.config.GameplayBalanceConfig.value;
+
 /** Local infection pressure, separate from global eligibility and daylight time. */
 public final class DistrictThreat {
     public static final int MAXIMUM=10000, YELLOW=2000, RED=6000;
@@ -27,7 +30,7 @@ public final class DistrictThreat {
         if(previous!=Zone.GREEN&&pressure>=YELLOW-400)return Zone.YELLOW;
         return pressure>=YELLOW?Zone.YELLOW:Zone.GREEN;
     }
-    public static int populationCap(Zone zone,int configured){return Math.min(Math.max(0,configured),zone==Zone.GREEN?8:zone==Zone.YELLOW?14:Math.max(0,configured));}
-    public static int ambientChance(Zone zone){return zone==Zone.GREEN?12:zone==Zone.YELLOW?55:100;}
+    public static int populationCap(Zone zone,int configured){return Math.min(Math.max(0,configured),zone==Zone.GREEN?value(GameplayBalanceConfig.GREEN_CAP):zone==Zone.YELLOW?value(GameplayBalanceConfig.YELLOW_CAP):Math.max(0,configured));}
+    public static int ambientChance(Zone zone){return value(zone==Zone.GREEN?GameplayBalanceConfig.GREEN_CHANCE:zone==Zone.YELLOW?GameplayBalanceConfig.YELLOW_CHANCE:GameplayBalanceConfig.RED_CHANCE);}
     public static int stage(Zone zone,int global,int local){return Math.min(Math.clamp(global,0,4),zone==Zone.GREEN?0:zone==Zone.YELLOW?1:Math.max(2,Math.clamp(local,0,4)));}
 }

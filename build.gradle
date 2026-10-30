@@ -183,6 +183,7 @@ def distributionZip = tasks.register('distributionZip', Zip) {
     exclude 'blacklight/bundled_motions/devastator-fx.data', 'assets/blacklight/textures/private_devfx/**'
     exclude 'assets/blacklight/shaders/core/source_biomass.*', 'com/codex/blacklight/client/renderer/DevastatorSourceMesh*.class'
     from('docs') { into 'docs' }
+    from('config-presets/defaultconfigs') { into 'defaultconfigs' }
     preserveFileTimestamps = false
     reproducibleFileOrder = true
 }

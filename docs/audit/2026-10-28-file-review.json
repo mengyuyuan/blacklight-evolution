@@ -5007,104 +5007,104 @@
       "module": "main/movement",
       "lines": 12,
       "sha256": "647996a3f7602341b4985dd66370d297adaa06f0ceee4baab600f592c2d1c6d6",
-      "status": "pending",
-      "notes": ""
+      "status": "reviewed",
+      "notes": "完整读取随身实体延迟纠偏上限；非有限、负距离及超过四格传送不预测，普通携带移动允许有限追赶，不按实体 ID 推算。"
     },
     {
       "path": "src/main/java/com/codex/blacklight/movement/CarryPostureClock.java",
       "module": "main/movement",
       "lines": 18,
       "sha256": "e618368b5b1a45aaacfdf01e1c4a2e22b984c752f2fe76a558f76337f786c17e",
-      "status": "pending",
-      "notes": ""
+      "status": "reviewed",
+      "notes": "完整读取持物姿态 tick 提交与 partial 采样；同 tick 不重复推进，跨 tick 有限追赶，reset 清零。时钟重基准由持有该状态的实体生命周期负责。"
     },
     {
       "path": "src/main/java/com/codex/blacklight/movement/CarrySteering.java",
       "module": "main/movement",
       "lines": 24,
       "sha256": "e6bc27ec5ea099a5b3c9fc78bec53aba9e16501326000e4929b30ffff12036d0",
-      "status": "pending",
-      "notes": ""
+      "status": "reviewed",
+      "notes": "完整读取镜头坐标到搬运角色输入坐标转换；限制单 tick 转身，重投影 forward/left，避免转身后二次旋转世界移动方向。"
     },
     {
       "path": "src/main/java/com/codex/blacklight/movement/JumpInputState.java",
       "module": "main/movement",
       "lines": 63,
       "sha256": "ae18230f57df7f34944433b8abc72d5f96de780d10d5b54acf203079872fe231",
-      "status": "pending",
-      "notes": ""
+      "status": "reviewed",
+      "notes": "完整读取空格边沿、近地缓冲、落地观察与滑翔门槛；同次按住蓄力不能在掉下台阶后变滑翔，松开清缓冲，不伪造接地状态。"
     },
     {
       "path": "src/main/java/com/codex/blacklight/movement/LandingDebrisSystem.java",
       "module": "main/movement",
-      "lines": 135,
-      "sha256": "da1c4916b327aae1fab7d3fda03d3da79ed338c6a2a856507243f61d7ef0f3da",
-      "status": "pending",
-      "notes": ""
+      "lines": 155,
+      "sha256": "25927199c6a87888a4386e24cbf626446360566b97c93983a453a8a2487b055a",
+      "status": "reviewed",
+      "notes": "完整读取显示碎块发布、弹道/碰撞、共享预算、销毁和生命周期；真实回调复现三处缺陷：移除回调再次发布导致遍历 CME、同步递归发布突破 64 预算至 81、服务器停止时未释放残片。改快照遍历、发布中预算预约 finally 释放、停止事件清理并阻止清理中重发。三项真实服务端回归修复前失败，修复后通过，未改变真实方块/掉落/伤害。"
     },
     {
       "path": "src/main/java/com/codex/blacklight/movement/LandingImpact.java",
       "module": "main/movement",
       "lines": 90,
       "sha256": "9c320b60c6979101eb6046a82a9e83cf81f688265a4594f5c4e20d2aa8b4fdff",
-      "status": "pending",
-      "notes": ""
+      "status": "reviewed",
+      "notes": "完整读取落地高度/速度双门槛、较弱分类、半径/伤害/击退上限和恢复 tick；长距离受控滑翔不会凭高度触发重落地。非有限输入不形成伤害。"
     },
     {
       "path": "src/main/java/com/codex/blacklight/movement/LocomotionDirection.java",
       "module": "main/movement",
       "lines": 99,
       "sha256": "46b24bee6d35613283a8a583be4b066a7f1cfe2c214ee641d150e779ff678ce5",
-      "status": "pending",
-      "notes": ""
+      "status": "reviewed",
+      "notes": "完整读取八向分类、有限输入、角度绕回与双 tick 滞回；零向量保持原方向，边界小波动不反复切换。"
     },
     {
       "path": "src/main/java/com/codex/blacklight/movement/LocomotionPhase.java",
       "module": "main/movement",
       "lines": 51,
       "sha256": "194c39cde50e684d2fe7c125788ed9b3133fd1eb448b6977b378b399604e3221",
-      "status": "pending",
-      "notes": ""
+      "status": "reviewed",
+      "notes": "完整读取蓄力/落地/腾空/转身/起步与制动优先顺序；仅视觉分类，不直接产生物理位移或伤害。"
     },
     {
       "path": "src/main/java/com/codex/blacklight/movement/LocomotionVisualState.java",
       "module": "main/movement",
       "lines": 42,
       "sha256": "1bb711ea15b677cc5a64943ad6d8c5f9c83632a926ee5a35b2bf9926c8e50515",
-      "status": "pending",
-      "notes": ""
+      "status": "reviewed",
+      "notes": "完整读取客户端实体 ID 快照与默认值缓存；提供 remove/clear 接口。世界更换与实体离开调用方仍待客户端整模块复核，不能仅凭容器接口声称无残留。"
     },
     {
       "path": "src/main/java/com/codex/blacklight/movement/MovementState.java",
       "module": "main/movement",
       "lines": 258,
       "sha256": "e27072011b153264d1e43ec77eb175b217d7ebf85b6f431391878ab118fa386f",
-      "status": "pending",
-      "notes": ""
+      "status": "reviewed",
+      "notes": "完整读取 258 行临时状态、输入边沿、冲刺马达、跳跃/滑翔/翻滚/墙面及落地能量；驱动力只跨相邻 tick，落地观察只结算一次，reset 清除运动与输入租期。未把内部 setter 当网络可信入口。"
     },
     {
       "path": "src/main/java/com/codex/blacklight/movement/MovementTuningSettings.java",
       "module": "main/movement",
       "lines": 184,
       "sha256": "7cd6ea6ba1f537be0c9e8084a36b54e4a83f6304a5fa727ded94540d49f5ff6d",
-      "status": "pending",
-      "notes": ""
+      "status": "reviewed",
+      "notes": "完整读取运行参数文件、旧调试速度迁移、服务端快照、有限夹取和原子保存；只迁移精确旧默认对，保留自定义参数。客户端快照还原调用已找到 ClientMovementTuning，待客户端整文件复核。"
     },
     {
       "path": "src/main/java/com/codex/blacklight/movement/MovementTuningSnapshot.java",
       "module": "main/movement",
       "lines": 18,
       "sha256": "2e40e74a1e76270dfc7a2a44e765fde082e9b4c862221bc2c695dd9e1fb711d9",
-      "status": "pending",
-      "notes": ""
+      "status": "reviewed",
+      "notes": "完整读取不可变传输数据；实际应用统一经 MovementTuningSettings 有限夹取，不直接用未验证 double 设置角色速度。"
     },
     {
       "path": "src/main/java/com/codex/blacklight/movement/PrototypeLocomotion.java",
       "module": "main/movement",
       "lines": 84,
       "sha256": "f0157d2565942214198c99211e34d0e7b55e752d84ed5b5bf6cbda0fad3f23d4",
-      "status": "pending",
-      "notes": ""
+      "status": "reviewed",
+      "notes": "完整读取步态确认窗口、有限播放倍率及视觉强度；蓄力与初次移动立即响应，普通状态变化三 tick 确认。视觉速度没有改变角色数值。"
     },
     {
       "path": "src/main/java/com/codex/blacklight/movement/PrototypeMovementEffects.java",
@@ -5127,112 +5127,112 @@
       "module": "main/movement",
       "lines": 13,
       "sha256": "38e76559f55f932f913742c82063cc7ba473caa841ebcd312e78df84ac7dc548",
-      "status": "pending",
-      "notes": ""
+      "status": "reviewed",
+      "notes": "完整读取短按疾跑识别；超过十 tick 的长按不会松键后触发翻滚，失去资格时清除暂存手势。"
     },
     {
       "path": "src/main/java/com/codex/blacklight/movement/TerrainTraversal.java",
       "module": "main/movement",
       "lines": 60,
       "sha256": "2287cac28ed7a1dcacbb4fa9b87b921773febc5ba74d53c88e7c6e86c8b0dfdc",
-      "status": "pending",
-      "notes": ""
+      "status": "reviewed",
+      "notes": "完整读取接地/台阶/翻越碰撞探针；所有探测走 Entity.collideBoundingBox，不传送角色。冲刺跨短下台阶需已有驱动力，腾空主动跳跃不借台阶接地。"
     },
     {
       "path": "src/main/java/com/codex/blacklight/movement/TraversalMotionSelector.java",
       "module": "main/movement",
       "lines": 48,
       "sha256": "12b963ccd4b44d214239ee9788dda715dae3abb1e1e058d71e2d06e551b83bc4",
-      "status": "pending",
-      "notes": ""
+      "status": "reviewed",
+      "notes": "完整读取地面、墙面、滑翔片段与速度滞回；原生右向基与 MC yaw 一致，壁跑/攀爬分流只选择表现，不更改碰撞。"
     },
     {
       "path": "src/main/java/com/codex/blacklight/movement/TraversalSteering.java",
       "module": "main/movement",
       "lines": 39,
       "sha256": "7ab55010cf99932efba5a2773a028f0a1139ef10c09cf254d57f7c1c2b43830a",
-      "status": "pending",
-      "notes": ""
+      "status": "reviewed",
+      "notes": "完整读取镜头基准、连续冲刺驱动力及斜向惯性削减；仅连续相邻 tick 继承驱动，碰撞/零加速度清空，进化倍率取服务端权威状态。"
     },
     {
       "path": "src/main/java/com/codex/blacklight/movement/WallContacts.java",
       "module": "main/movement",
       "lines": 55,
       "sha256": "f1b95a215ef2d83d69a75d50bea6284e9b5d758ead9d1fcd578616653a080430",
-      "status": "pending",
-      "notes": ""
+      "status": "reviewed",
+      "notes": "完整读取躯干/脚部/上升扫描与近距离附墙门槛；原版可跨台阶先行，墙顶扫描有有限步数，不以远距离射线直接吸到墙面。"
     },
     {
       "path": "src/main/java/com/codex/blacklight/movement/WallPoseState.java",
       "module": "main/movement",
       "lines": 27,
       "sha256": "a896a02614a38eee669fdc6f9c2a151bbd6f471a840160686fecc0e75d14e7c4",
-      "status": "pending",
-      "notes": ""
+      "status": "reviewed",
+      "notes": "完整读取弱身份键及法线归一化；避免单人双逻辑侧同 ID 冲突，退场参考系有限保留四 tick，非有限法线不存入。"
     },
     {
       "path": "src/main/java/com/codex/blacklight/movement/WallRunPhysics.java",
       "module": "main/movement",
       "lines": 22,
       "sha256": "5a2db71440d2367991f87f00d10038e42f5650675a9d4e8009204a7e77372555",
-      "status": "pending",
-      "notes": ""
+      "status": "reviewed",
+      "notes": "完整读取奔跑动量转换与翻顶判定；输入速度有限化，垂直速度有界，不改玩家碰撞坐标。"
     },
     {
       "path": "src/main/java/com/codex/blacklight/movement/WallTraversal.java",
       "module": "main/movement",
       "lines": 152,
       "sha256": "2c199ce9759bd5bad71ff5ed9e0cad82c306bc6cf01162f737f2cb899087c5b7",
-      "status": "pending",
-      "notes": ""
+      "status": "reviewed",
+      "notes": "完整读取 152 行墙面输入/模式/蓄力/跃起/翻顶流程；输入取符号、法线有限化、脱离冷却、顶面真实接地确认与有限失败超时，超时不伪造成功落地。"
     },
     {
       "path": "src/main/java/com/codex/blacklight/movement/WaterRunning.java",
       "module": "main/movement",
       "lines": 80,
       "sha256": "c03db6768a813240de665da53f69acbce0d17228365312e4bef2f94d21c1e836",
-      "status": "pending",
-      "notes": ""
+      "status": "reviewed",
+      "notes": "完整读取水面资格、水下上浮及水表面检测；蹲下/飞行/载具/武器和吸收状态不抢水跑，真实流体高度及顶棚碰撞决定上浮，不制造接地。"
     },
     {
       "path": "src/main/java/com/codex/blacklight/movement/WingFlightCorridor.java",
       "module": "main/movement",
       "lines": 59,
       "sha256": "df4a7718e90ecfa94864f819e0e5b9befbddefb934bdacd279d9ddba1fa04bdb",
-      "status": "pending",
-      "notes": ""
+      "status": "reviewed",
+      "notes": "完整读取已加载前方走廊、刹车距离和八 tick 加载储备；负载预算缓升速、突发卸载保留硬停距，未在探针内加载区块。"
     },
     {
       "path": "src/main/java/com/codex/blacklight/movement/WingFlightPhysics.java",
       "module": "main/movement",
       "lines": 44,
       "sha256": "53c4f5f665f79360c6671ae319ad01624dee1ad4a906814dd2a396d301be7286",
-      "status": "pending",
-      "notes": ""
+      "status": "reviewed",
+      "notes": "完整读取有限速度/朝向、等级推进、反向制动和速度尺度；非有限速度回零，斜向指令归一，转身额外加速度不绕过总速度帽。"
     },
     {
       "path": "src/main/java/com/codex/blacklight/movement/WingFlightState.java",
       "module": "main/movement",
       "lines": 19,
       "sha256": "892f7055b6467f08c0cabdb5f42557e5ea2a121712c85fe668b35f80de63905a",
-      "status": "pending",
-      "notes": ""
+      "status": "reviewed",
+      "notes": "完整读取有限阶段常量、同步编解码和折叠变体；S2C 临时状态不写入长期存档，foldVariant 限到 0/1。"
     },
     {
       "path": "src/main/java/com/codex/blacklight/movement/WingFlightSystem.java",
       "module": "main/movement",
       "lines": 114,
       "sha256": "2b47d7eb3e9ce437ab30f0cde5c1f0c335bb860c9c93c98ae4f49e57b10cd09d",
-      "status": "pending",
-      "notes": ""
+      "status": "reviewed",
+      "notes": "完整读取服务端资格、动作互斥、输入超时、真实位移音障、前方已就绪区块探针和阶段同步；getChunkNow 不等待生成，普通碰撞与网络速度校验保留，弱键控制不持有玩家强引用。"
     },
     {
       "path": "src/main/java/com/codex/blacklight/movement/WingFlightTuning.java",
       "module": "main/movement",
       "lines": 40,
       "sha256": "1d46ee6242e9f669b56dccb49257181a71873b08a000aa34d3d13bdd1a772e32",
-      "status": "pending",
-      "notes": ""
+      "status": "reviewed",
+      "notes": "完整读取四档推进/刹车、音速参考、网络合包容差和音障滞回；最多五包有限位移包络，实际位移过音速且冷却足够才播放共享音效。"
     },
     {
       "path": "src/main/java/com/codex/blacklight/network/BlockThrowAimPayload.java",
@@ -9267,6 +9267,15 @@
       "sha256": "776eb87a7282532af92b7054d34cdec8e903d77e98267737f5e3406e51ea7738",
       "status": "reviewed",
       "notes": "Authored and fully reviewed: actual canceled death leaving zero HP fails before fix, passes after; matching owned accepted-death positive control passes. Reflection only prepares private action, real hurt/event chain runs.",
+      "introduced_in_this_pass": true
+    },
+    {
+      "path": "src/buildingTest/java/com/codex/blacklight/gametest/LandingDebrisBoundaryGameTest.java",
+      "module": "buildingTest",
+      "lines": 55,
+      "sha256": "76b4fed7c0776d81558bea48ec1965ce3f33e34537dbe304fbb561f960011592",
+      "status": "reviewed",
+      "notes": "完整读取并运行三项真实实体回调/停止事件回归；修复前分别复现 CME、81 个发布超预算及退出残片不清理，修复后三项通过。finally 注销监听器并移除本测试创建的实体，未静默重试。",
       "introduced_in_this_pass": true
     }
   ],

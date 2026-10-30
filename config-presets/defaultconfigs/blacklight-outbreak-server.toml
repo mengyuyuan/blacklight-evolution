@@ -1,0 +1,26 @@
+#Maximum successful births per dimension per interval, regardless of city count.
+# Default: 8
+# Range: 1 ~ 16
+birthsPerBatch = 8
+#Reserve these local population slots for ordinary consumable infected.
+# Default: 6
+# Range: 0 ~ 64
+commonReserve = 6
+# Default: 128
+# Range: 0 ~ 1024
+infectedPerDimension = 128
+# Default: 32
+# Range: 0 ~ 128
+infectedWithin96Blocks = 32
+# Default: 40
+# Range: 20 ~ 24000
+spawnIntervalTicks = 40
+# Default: 24000
+# Range: 200 ~ 24000000
+progressionDayTicks = 24000
+#Minimum fraction of current maximum health restored by consuming a common infected, before assimilation upgrades.
+# Default: 0.1
+# Range: 0.0 ~ 0.5
+commonConsumeHealFraction = 0.1
+#World infection starts when a player releases a virus vial. Saved world clock; loaded chunks only.
+enabled = true

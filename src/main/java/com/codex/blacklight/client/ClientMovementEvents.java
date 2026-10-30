@@ -134,7 +134,11 @@ public final class ClientMovementEvents {
     }
 
     private static float cameraYaw(Minecraft mc) {
-        if(com.codex.blacklight.client.camera.PrototypeChaseCamera.ownsView())
+        // External cameras can decouple view yaw from entity yaw. Traversal
+        // consumes physical keys, so it must use the external view heading;
+        // vanilla/Shoulder Surfing keep ownership of their rebased walk input.
+        if(com.codex.blacklight.client.camera.PrototypeChaseCamera.ownsView()
+                ||com.codex.blacklight.client.camera.CameraCompatibility.externalOwnsView())
             return com.codex.blacklight.client.camera.PrototypeChaseCamera.controlYaw();
         return mc.player.getYRot();
     }

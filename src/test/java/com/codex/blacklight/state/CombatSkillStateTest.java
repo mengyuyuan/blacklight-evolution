@@ -9,6 +9,18 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 class CombatSkillStateTest {
+    @Test void secondRegenerationTierAppendsABitAndPreservesLegacyLearning() {
+        assertEquals(1<<18,CombatSkill.TISSUE_REGENERATION_PERCENT.bit());
+        var state=new BlacklightState();state.infect();state.addEvolutionPoints(2000);
+        assertFalse(state.buyCombatSkill(CombatSkill.TISSUE_REGENERATION_PERCENT));
+        assertTrue(state.buyCombatSkill(CombatSkill.TISSUE_REGENERATION));
+        assertTrue(state.buyCombatSkill(CombatSkill.TISSUE_REGENERATION_PERCENT));
+        var encoded=BlacklightState.CODEC.encodeStart(JsonOps.INSTANCE,state).getOrThrow();
+        var copy=BlacklightState.CODEC.parse(JsonOps.INSTANCE,encoded).getOrThrow();
+        assertTrue(copy.hasCombatSkill(CombatSkill.TISSUE_REGENERATION));
+        assertTrue(copy.hasCombatSkill(CombatSkill.TISSUE_REGENERATION_PERCENT));
+        assertEquals(1150,copy.getEvolutionPoints());
+    }
     @Test void criticalMassBoostsRequireEachPriorTierAndAddStorage() {
         var state=new BlacklightState();state.infect();state.addEvolutionPoints(3000);
         assertFalse(state.buyCombatSkill(CombatSkill.CRITICAL_MASS_BOOST_2));

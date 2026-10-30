@@ -78,6 +78,8 @@ public final class BlacklightInfectedHost extends Monster {
     private boolean bossDefeated;
     private int attackCooldown;
     private int tissueClock;
+    private static final String[] TISSUE_TIME_KEYS={"Natural","Fed","Integration","Cultivation"};
+    private final double[] tissueTimeFractions=new double[TISSUE_TIME_KEYS.length];
     private int tissueRecoveryTicks;
     private int tissueNutritionDebt;
     private int tissueCultivationTicks;
@@ -258,7 +260,9 @@ public final class BlacklightInfectedHost extends Monster {
     }
     public double tissueInheritanceVisualWork(float partial){
         if(!level().isClientSide)return 0;
-        return Math.clamp(level().getGameTime()+partial-entityData.get(TISSUE_INHERITANCE).getLong("SampledAt"),0,20)*(tissueNutrition()>0?1:.2);
+        return Math.clamp(level().getGameTime()+partial-entityData.get(TISSUE_INHERITANCE).getLong("SampledAt"),0,20)
+                *TissueMetabolism.worldSpeed(level().getDayTime())*com.codex.blacklight.config.GameplayBalanceConfig.value(com.codex.blacklight.config.GameplayBalanceConfig.INTEGRATION_SPEED)
+                *(tissueNutrition()>0?1:com.codex.blacklight.config.GameplayBalanceConfig.value(com.codex.blacklight.config.GameplayBalanceConfig.UNFED_INTEGRATION));
     }
     public void inheritTissue(UUID operation,TissueInheritance donor,long seed,long age){
         inheritTissue(operation,donor,seed,age,-1);
@@ -353,7 +357,9 @@ public final class BlacklightInfectedHost extends Monster {
         var growth=tissueMetabolismActive()?TissueEvolution.combat(TissueOrgans.seed(getUUID()),tissueAge(),nativeTissueCore()):new TissueEvolution.Combat(0,0,0,0);
         var inherited=tissueMetabolismActive()?tissueInheritance().combat():new TissueEvolution.Combat(0,0,0,0);
         var frame=tissueFrame();double vitality=tissueMetabolismActive()?tissueBodyPlan().vitality(frame.x,frame.y,frame.z):1;
-        growth=new TissueEvolution.Combat((1+growth.health()+inherited.health())*vitality-1,growth.damage()+inherited.damage(),growth.armor()+inherited.armor(),growth.knockback()+inherited.knockback());
+        growth=new TissueEvolution.Combat(((1+growth.health()+inherited.health())*vitality-1)*com.codex.blacklight.config.GameplayBalanceConfig.HOST_HEALTH_GROWTH.get(),
+                (growth.damage()+inherited.damage())*com.codex.blacklight.config.GameplayBalanceConfig.HOST_ATTACK_GROWTH.get(),
+                (growth.armor()+inherited.armor())*com.codex.blacklight.config.GameplayBalanceConfig.HOST_ARMOR_GROWTH.get(),growth.knockback()+inherited.knockback());
         float maximum=getMaxHealth(),health=getHealth();
         CombatScale.modifier(getAttribute(Attributes.MAX_HEALTH),TISSUE_HEALTH,growth.health(),AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL);
         CombatScale.modifier(getAttribute(Attributes.ATTACK_DAMAGE),TISSUE_DAMAGE,growth.damage(),AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL);
@@ -361,6 +367,10 @@ public final class BlacklightInfectedHost extends Monster {
         CombatScale.modifier(getAttribute(Attributes.KNOCKBACK_RESISTANCE),TISSUE_KNOCKBACK,growth.knockback(),AttributeModifier.Operation.ADD_VALUE);
         com.codex.blacklight.infection.EvolvedBalance.apply(this);
         CombatScale.preserveHealthFraction(this,maximum,health);
+    }
+    private long scaledTissueTime(int lane,long ticks,double speed){
+        var step=TissueMetabolism.timeStep(tissueTimeFractions[lane],ticks,speed);
+        tissueTimeFractions[lane]=step.remainder();return step.ticks();
     }
     private void digestTissue() {
         int elapsed=tissueClock;tissueClock=0;
@@ -375,18 +385,19 @@ public final class BlacklightInfectedHost extends Monster {
         var budget=TissueMetabolism.budget(tissueNutrition(),tissueNutritionDebt,demand);
         boolean supplied=budget.supplied();tissueNutritionDebt=budget.debt();entityData.set(TISSUE_NUTRITION,budget.reserve());
         if(tissueMetabolismActive()){
-            var developed=tissueInheritance().digest(TissueMetabolism.scaledTicks(elapsed,worldSpeed*(.2+.8*budget.fraction())),true,TissueOrgans.seed(getUUID()),tissueAge(),TissueCompetitionConfig.rules(),knownNativeTissueCore());
+            double unfed=com.codex.blacklight.config.GameplayBalanceConfig.UNFED_INTEGRATION.get();
+            var developed=tissueInheritance().digest(scaledTissueTime(2,elapsed,worldSpeed*(unfed+(1-unfed)*budget.fraction())*com.codex.blacklight.config.GameplayBalanceConfig.INTEGRATION_SPEED.get()),true,TissueOrgans.seed(getUUID()),tissueAge(),TissueCompetitionConfig.rules(),knownNativeTissueCore());
             if(supplied&&developed.organs().values().stream().anyMatch(o->o.mature()&&o.pending()==0&&o.integrated()>0)){
-                var cultivation=TissueMetabolism.cultivation(tissueCultivationTicks,TissueMetabolism.scaledTicks(elapsed,worldSpeed*budget.fraction()));
+                var cultivation=TissueMetabolism.cultivation(tissueCultivationTicks,scaledTissueTime(3,elapsed,worldSpeed*budget.fraction()));
                 tissueCultivationTicks=cultivation.remainder();
                 developed=developed.cultivate(cultivation.work(),knownNativeTissueCore(),tissueAge(),TissueCompetitionConfig.rules());
             }
             publishInheritance(developed);
         }
-        long natural=TissueMetabolism.scaledTicks(elapsed,worldSpeed),bonus=supplied&&TissueMetabolism.growing(tissueAge(),integrating)?TissueMetabolism.scaledTicks(TissueMetabolism.BONUS_TICKS,worldSpeed*budget.fraction()):0;
+        long natural=scaledTissueTime(0,elapsed,worldSpeed),bonus=supplied&&TissueMetabolism.growing(tissueAge(),integrating)?scaledTissueTime(1,TissueMetabolism.fedBonusTicks(),worldSpeed*budget.fraction()):0;
         advanceTissue(com.codex.blacklight.infection.TissueGrowth.advance(natural,bonus));
         if(supplied&&repairing){
-            heal((float)(getMaxHealth()*.005F*budget.fraction()/CombatScale.units(this)));vitals.repaired(budget.fraction());
+            heal((float)(getMaxHealth()*com.codex.blacklight.config.GameplayBalanceConfig.REPAIR_FRACTION.get()*budget.fraction()/CombatScale.units(this)));vitals.repaired(budget.fraction());
         }
     }
     /** Vanilla invokes this only after its death event accepts the kill. A
@@ -1044,7 +1055,7 @@ public final class BlacklightInfectedHost extends Monster {
         if(encounterBoss()&&source.getEntity()==this)return false;
         float before=getHealth(),maximum=getMaxHealth();boolean accepted=super.hurt(source,amount);
         if(accepted&&!level().isClientSide&&getHealth()<before){
-            tissueRecoveryTicks=TissueMetabolism.RECOVERY_DELAY;TissueCompetition.damaged(this,before-getHealth());
+            tissueRecoveryTicks=TissueMetabolism.repairDelay();TissueCompetition.damaged(this,before-getHealth());
             vitals.damaged((before-getHealth())/Math.max(.001,maximum));
             vascular.interrupt(this);
             if(before-getHealth()>=maximum*.025F)tissueRecoveryTicks=recoverTissueAction(tissueRecoveryTicks);
@@ -1123,7 +1134,14 @@ public final class BlacklightInfectedHost extends Monster {
         tag.put("BlacklightTissueVitals",vitals.write());
         tag.put("BlacklightTissueDefense",defense.write());
         tag.put("BlacklightTissueVascular",vascular.write());
-        super.addAdditionalSaveData(tag);tag.putLong("BlacklightTissueAge",com.codex.blacklight.infection.TissueGrowth.advance(tissueAge(),tissueClock));tag.putFloat("BlacklightTissueScale",tissueBodyScale());tag.putFloat("BlacklightCoreFracture",tissueCoreFracture());tag.put("BlacklightHost",hostData().copy());tag.putBoolean("BlacklightBossDefeated",bossDefeated);
+        double speed=level() instanceof ServerLevel server?TissueMetabolism.worldSpeed(server.getServer().overworld().getDayTime()):1;
+        super.addAdditionalSaveData(tag);
+        // Snapshot pending natural time without consuming it in the live actor.
+        // Repeated saves cannot mint work; unloading also preserves its fraction.
+        var pending=TissueMetabolism.timeStep(tissueTimeFractions[0],tissueClock,speed);
+        var fractions=new CompoundTag();for(int i=0;i<TISSUE_TIME_KEYS.length;i++)fractions.putDouble(TISSUE_TIME_KEYS[i],i==0?pending.remainder():tissueTimeFractions[i]);
+        tag.put("BlacklightTissueTimeFractions",fractions);
+        tag.putLong("BlacklightTissueAge",com.codex.blacklight.infection.TissueGrowth.advance(tissueAge(),pending.ticks()));tag.putFloat("BlacklightTissueScale",tissueBodyScale());tag.putFloat("BlacklightCoreFracture",tissueCoreFracture());tag.put("BlacklightHost",hostData().copy());tag.putBoolean("BlacklightBossDefeated",bossDefeated);
     }
     @Override public void readAdditionalSaveData(CompoundTag tag) {
         nativeCombat.load(tag.getCompound("BlacklightNativeCombat"));
@@ -1141,7 +1159,8 @@ public final class BlacklightInfectedHost extends Monster {
         entityData.set(TISSUE_NUTRITION,TissueMetabolism.clamp(tag.getInt("BlacklightTissueNutrition")));
         tissueNutritionDebt=Math.clamp(tag.getInt("BlacklightTissueNutritionDebt"),0,TissueMetabolism.WORK_PER_UNIT-1);
         tissueCultivationTicks=Math.clamp(tag.getInt("BlacklightTissueCultivation"),0,TissueMetabolism.CULTIVATION_BATCH-1);
-        tissueRecoveryTicks=Math.clamp(tag.getInt("BlacklightTissueRecovery"),0,TissueMetabolism.RECOVERY_DELAY);
+        var fractions=tag.getCompound("BlacklightTissueTimeFractions");for(int i=0;i<TISSUE_TIME_KEYS.length;i++)tissueTimeFractions[i]=TissueMetabolism.timeFraction(fractions.getDouble(TISSUE_TIME_KEYS[i]));
+        tissueRecoveryTicks=Math.clamp(tag.getInt("BlacklightTissueRecovery"),0,TissueMetabolism.repairDelay());
         float fracture=tag.getFloat("BlacklightCoreFracture");entityData.set(TISSUE_CORE_FRACTURE,Float.isFinite(fracture)?Math.clamp(fracture,0,1):0);
         super.readAdditionalSaveData(tag);entityData.set(TISSUE_AGE,com.codex.blacklight.infection.TissueGrowth.clamp(tag.getLong("BlacklightTissueAge")));tissueClock=0;bossDefeated=tag.getBoolean("BlacklightBossDefeated");CompoundTag data=tag.getCompound("BlacklightHost").copy();
         // /summon without host NBT historically displayed a pig proxy but passed
@@ -1156,6 +1175,15 @@ public final class BlacklightInfectedHost extends Monster {
             defaults.putFloat("Width",EntityType.PIG.getWidth()*1.12F);
             defaults.putFloat("Height",EntityType.PIG.getHeight()*1.12F);
             defaults.merge(data);defaults.putString("Type","minecraft:pig");data=defaults;
+        }
+        // Clamping does not sanitize NaN. Reject non-finite saved geometry
+        // before HOST publication can refresh collision boxes or multipart IDs.
+        var sourceType=EntityType.byString(data.getString("Type")).orElse(EntityType.PIG);
+        for(String key:new String[]{"Width","Height","BodyScale","BaseBodyScale","ModelScale"}){
+            if(!data.contains(key)||Float.isFinite(data.getFloat(key)))continue;
+            if(key.equals("Width"))data.putFloat(key,sourceType.getWidth()*1.12F);
+            else if(key.equals("Height"))data.putFloat(key,sourceType.getHeight()*1.12F);
+            else data.remove(key);
         }
         InfectedBossProfile profile=InfectedBossProfile.forSpecies(data.getString("Type"));
         if(profile!=null) {

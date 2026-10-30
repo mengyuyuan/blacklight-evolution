@@ -33,10 +33,10 @@ public final class CityHiveSupply {
         if(mouth==null)return;data.hiveFeedCursor[hive]=(mouth.index+1)%7;
         var stock=data.hiveSupply[hive];stock.digest(20);data.nextHiveFoodTick[hive]=ColonyFeeding.scavenge(level,mouth.pos,stock,data.nextHiveFoodTick[hive]);
         if(stock.maintain(20,0)){
-            data.hiveSustained[hive]=true;data.hiveLoadedTicks[hive]=(int)Math.min(Integer.MAX_VALUE,(long)data.hiveLoadedTicks[hive]+20);data.hiveBroodTicks[hive]=Math.min(200,data.hiveBroodTicks[hive]+20);
+            data.hiveSustained[hive]=true;data.hiveLoadedTicks[hive]=(int)Math.min(Integer.MAX_VALUE,(long)data.hiveLoadedTicks[hive]+20);data.hiveBroodTicks[hive]=Math.min(CityConfig.HIVE_BROOD_INTERVAL.get(),data.hiveBroodTicks[hive]+20);
         }data.setDirty();
     }
-    public static boolean ready(CityData data,int hive){return !data.destroyed(hive)&&data.hiveSustained[hive]&&data.hiveBroodTicks[hive]>=200&&data.hiveSupply[hive].reserve()>=ColonySupply.broodCost(OutbreakRules.Tier.FRESH);}
+    public static boolean ready(CityData data,int hive){return !data.destroyed(hive)&&data.hiveSustained[hive]&&data.hiveBroodTicks[hive]>=CityConfig.HIVE_BROOD_INTERVAL.get()&&data.hiveSupply[hive].reserve()>=ColonySupply.broodCost(OutbreakRules.Tier.FRESH);}
     public static Mob hatch(ServerLevel level,CityData data,int hive,BlockPos pos,OutbreakRules.Tier tier){
         return hatch(level,data,hive,pos,tier,false);
     }
@@ -50,9 +50,13 @@ public final class CityHiveSupply {
         data.hiveBroodTicks[hive]=0;boolean committed=false;
         try{
             Mob child=hydra?WorldOutbreakSystem.spawnHydraAt(level,outside):WorldOutbreakSystem.spawnAt(level,outside,tier);
-            if(child==null)return null;committed=true;
+            if(child==null)return null;
+            // Entity-join callbacks may destroy the organism or its emitting port.
+            // Do not publish success to a caller that would reopen the missing hatch.
+            if(!live(level,data,p)||!child.isAlive()||child.isRemoved()||child.level()!=level){child.discard();return null;}
+            committed=true;
             child.getPersistentData().putBoolean("BlacklightCityPopulation",true);child.addTag("BlacklightCityPopulation");
             data.hiveBirths[hive]=(int)Math.min(Integer.MAX_VALUE,(long)data.hiveBirths[hive]+1);data.setDirty();return child;
-        }finally{if(!committed){stock.refund(cost);data.hiveBroodTicks[hive]=200;}}
+        }finally{if(!committed){stock.refund(cost);data.hiveBroodTicks[hive]=CityConfig.HIVE_BROOD_INTERVAL.get();}}
     }
 }

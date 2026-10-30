@@ -1,0 +1,24 @@
+#Multiplier on the evolved's attack attribute, before player armor and blood units.
+# Default: 5.0
+# Range: 1.0 ~ 100.0
+attackMultiplier = 5.0
+# Default: 1.25
+# Range: 0.5 ~ 3.0
+movementMultiplier = 1.25
+# Default: 6.0
+# Range: 0.0 ~ 30.0
+additionalArmor = 6.0
+#Multiplier on the fully grown/inherited host maximum health.
+# Default: 6.0
+# Range: 1.0 ~ 100.0
+healthMultiplier = 6.0
+#Per-contact damage ceiling as a fraction of an infected player's maximum health, before defenses. Does not force damage upward.
+# Default: 0.3
+# Range: 0.05 ~ 1.0
+maximumPlayerHealthFractionPerHit = 0.3
+# Default: 4.0
+# Range: 0.0 ~ 30.0
+additionalArmorToughness = 4.0
+# Default: 0.4
+# Range: 0.0 ~ 1.0
+additionalKnockbackResistance = 0.4

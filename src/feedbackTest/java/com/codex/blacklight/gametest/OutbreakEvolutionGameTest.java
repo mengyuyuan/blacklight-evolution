@@ -27,6 +27,8 @@ public final class OutbreakEvolutionGameTest {
     @GameTest(template="wall_test",timeoutTicks=40,batch="outbreak_natural_guards")
     public static void NewNaturalHiveGuardsWaitForReleaseAndOldSavedGuardsArePreserved(GameTestHelper h){
         var level=h.getLevel();var storage=level.getServer().overworld().getDataStorage();var original=OutbreakData.get(level.getServer());storage.set("blacklight_outbreak",new OutbreakData());
+        boolean spawning=level.getGameRules().getBoolean(GameRules.RULE_DOMOBSPAWNING);var difficulty=level.getDifficulty();
+        level.getGameRules().getRule(GameRules.RULE_DOMOBSPAWNING).set(true,level.getServer());level.getServer().setDifficulty(net.minecraft.world.Difficulty.NORMAL,true);
         var host=ModEntities.INFECTED_HOST.get().create(level);host.inherit(EntityType.ZOMBIE.create(level));host.getPersistentData().putBoolean("BlacklightColossalHive",true);host.setPos(h.absolutePos(new BlockPos(4,30,4)).getBottomCenter());
         try{
             var fresh=new net.neoforged.neoforge.event.entity.EntityJoinLevelEvent(host,level,false);WorldOutbreakSystem.naturalGuard(fresh);h.assertTrue(fresh.isCanceled(),"new roaming guards do not appear before the first vial");
@@ -34,7 +36,7 @@ public final class OutbreakEvolutionGameTest {
             OutbreakData.get(level.getServer()).start(level.getServer().overworld().getGameTime());
             var active=new net.neoforged.neoforge.event.entity.EntityJoinLevelEvent(host,level,false);WorldOutbreakSystem.naturalGuard(active);h.assertTrue(!active.isCanceled(),"ordinary natural guards are accepted after release");
             host.getPersistentData().putBoolean("BlacklightDevourer",true);var elite=new net.neoforged.neoforge.event.entity.EntityJoinLevelEvent(host,level,false);WorldOutbreakSystem.naturalGuard(elite);h.assertTrue(elite.isCanceled(),"late hive devourers do not bypass the time gate");
-        }finally{host.discard();storage.set("blacklight_outbreak",original);}h.succeed();
+        }finally{host.discard();storage.set("blacklight_outbreak",original);level.getGameRules().getRule(GameRules.RULE_DOMOBSPAWNING).set(spawning,level.getServer());level.getServer().setDifficulty(difficulty,true);}h.succeed();
     }
     private static ServerPlayer player(GameTestHelper h){
         var profile=new GameProfile(java.util.UUID.randomUUID(),"EvolutionQA");var p=new ServerPlayer(h.getLevel().getServer(),h.getLevel(),profile,ClientInformation.createDefault());
