@@ -69,6 +69,7 @@ public final class BulletdiveAimGameTest {
             public void testStructureLoaded(GameTestInfo info){}
             public void testPassed(GameTestInfo info,GameTestRunner runner){cleanup.run();}
             public void testFailed(GameTestInfo info,GameTestRunner runner){cleanup.run();}
+            public void testAddedForRerun(GameTestInfo original,GameTestInfo retry,GameTestRunner runner){}
         });
         CombatTargeting.requestLock(p,target.getId());
         h.assertTrue(CombatTargeting.locked(p)==target,"initial visible dive target is acquired: actor="+p.position()+" target="+target.position()
