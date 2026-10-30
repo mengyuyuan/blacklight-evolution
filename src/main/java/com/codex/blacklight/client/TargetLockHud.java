@@ -45,7 +45,7 @@ public final class TargetLockHud {
             panel(g,aim,g.guiWidth()/2,g.guiHeight()-82,0xFFFFB297);
         }
         if(!ClientTargetLock.active())return;
-        var target=ClientTargetLock.target();
+        var target=ClientTargetLock.entityTarget();
         if(target==null){
             String notice=ClientTargetLock.notice();
             if(!notice.isBlank())panel(g,notice,g.guiWidth()/2,g.guiHeight()-54,0xFFFFCA77);
@@ -64,10 +64,17 @@ public final class TargetLockHud {
                 brackets(g,x,y,color);
             }
         }
-        String status=name+"  "+Math.round(Math.sqrt(com.codex.blacklight.combat.CombatTargeting.distanceSquared(mc.player.getEyePosition(),target)))+"m"
+        String status=name+"  "+Math.round(Math.sqrt(com.codex.blacklight.combat.ExplicitTarget.distanceSquared(mc.player,target)))+"m"
                 +(marker==null||!marker.onScreen()?" · 目标在视野外":"");
         if(target instanceof net.minecraft.world.entity.Mob mob&&ready(mc,mob))status+=" · "+net.minecraft.network.chat.Component.translatable("hud.blacklight.consume_ready_short",SkillBindings.label("key.blacklight.grab")).getString();
-        panel(g,status,g.guiWidth()/2,g.guiHeight()-54,0xFFE8DDD6);
+        var shown=mc.font.plainSubstrByWidth(status,182);int statusY=g.guiHeight()-108;
+        g.fill(4,statusY-4,12+Math.min(182,mc.font.width(shown)),statusY+12,0xA6090B10);
+        g.drawString(mc.font,shown,8,statusY,0xFFE8DDD6,false);
+        if(target instanceof com.codex.blacklight.entity.MilitaryVehicle vehicle){
+            int w=72,x=8,y=statusY+13;
+            g.fill(x,y,x+w,y+3,0xB0202020);g.fill(x,y,x+(int)(w*Math.clamp(vehicle.health()/vehicle.maxHealth(),0,1)),y+3,0xFFFF6B64);
+            g.drawString(mc.font,String.format(java.util.Locale.ROOT,"%.1f / %.0f",vehicle.health(),vehicle.maxHealth()),x+w+5,y-3,0xFFBFAEA8,false);
+        }
         if(ClientClawEvents.targetInfoKey().isDown()&&mc.screen==null&&target instanceof com.codex.blacklight.entity.BlacklightInfectedHost host&&com.codex.blacklight.power.AssimilationSystem.tissue(host)){
             var core=host.nativeTissueCore();
             int quality=com.codex.blacklight.infection.TissueCore.quality(host.tissueAge());

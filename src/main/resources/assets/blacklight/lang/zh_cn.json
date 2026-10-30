@@ -966,5 +966,9 @@
   "subtitles.blacklight.firearm.impact": "炮弹爆炸",
   "subtitles.blacklight.firearm.reload_out": "取出弹匣",
   "subtitles.blacklight.firearm.reload_insert": "插入弹匣",
-  "subtitles.blacklight.firearm.reload_bolt": "枪栓归位"
+  "subtitles.blacklight.firearm.reload_bolt": "枪栓归位",
+  "hud.blacklight.firearm_reloading": "装填中",
+  "hud.blacklight.firearm_reload_key": "%s 换弹 · %s 锁定",
+  "hud.blacklight.firearm_need_ammo": "需要：%s",
+  "hud.blacklight.vehicle_details": "%s 详情"
 }

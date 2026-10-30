@@ -966,5 +966,9 @@
   "subtitles.blacklight.firearm.impact": "Ordnance detonates",
   "subtitles.blacklight.firearm.reload_out": "Magazine removed",
   "subtitles.blacklight.firearm.reload_insert": "Magazine inserted",
-  "subtitles.blacklight.firearm.reload_bolt": "Bolt cycles"
+  "subtitles.blacklight.firearm.reload_bolt": "Bolt cycles",
+  "hud.blacklight.firearm_reloading": "Reloading",
+  "hud.blacklight.firearm_reload_key": "%s Reload · %s Lock",
+  "hud.blacklight.firearm_need_ammo": "Need: %s",
+  "hud.blacklight.vehicle_details": "%s Details"
 }

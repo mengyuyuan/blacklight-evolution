@@ -66,6 +66,10 @@ public final class VehicleDamageBridge {
                 :actor instanceof Player player?actor.damageSources().playerAttack(player):actor.damageSources().mobAttack(actor);
         return target.hurt(source,damage*coefficient);
     }
+    /** Devastators use their already-resolved true damage, with identical protection checks. */
+    public static boolean hurtSpecial(ServerPlayer actor,MilitaryVehicle target,float damage){
+        return permitted(actor,target,damage)&&target.hurt(actor.damageSources().playerAttack(actor),damage);
+    }
     public static boolean hurt(LivingEntity actor,MilitaryVehicle target,WeaponDefinition definition,float damage,Entity projectile){
         if(!permitted(actor,target,damage))return false;
         VehicleWeaponDefinition specific=VehicleWeaponDefinition.ALL.stream().filter(value->value.weapon().id().equals(definition.id())).findFirst().orElse(null);

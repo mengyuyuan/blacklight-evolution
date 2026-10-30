@@ -417,7 +417,7 @@ public final class ClawCombatSystem {
                         action == ClawCombatState.Action.AUTO_3);
             }
         }
-        if(action==ClawCombatState.Action.AUTO_3){
+        {
             var mechanical=com.codex.blacklight.military.vehicle.VehiclePhysicalDamageBridge.clawContacts(player,sweep,attackOrigin,forward);
             for(var contact:mechanical.stream().limit(Math.max(0,maxTargets-targets.size())).toList())
                 if(com.codex.blacklight.military.vehicle.VehicleDamageBridge.hurtPhysical(player,contact.vehicle(),damage,null))hitCount++;

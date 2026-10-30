@@ -29,6 +29,9 @@ public final class FirearmsCombat {
                 end=hit.getLocation();
                 if(hit.getEntity() instanceof LivingEntity target&&!protectedTarget(owner,target)){
                     float damage=definition.damage()*scale;
+                    if(owner instanceof com.codex.blacklight.entity.MilitarySoldier soldier
+                            &&soldier.faction()==com.codex.blacklight.military.MilitaryFaction.BLACKWATCH
+                            &&target instanceof com.codex.blacklight.entity.BlacklightCommonInfected)damage*=4;
                     if(!(target instanceof net.minecraft.server.level.ServerPlayer defender)||!com.codex.blacklight.power.ProjectileDefenseSystem.hitscan(defender,start,end,damage,4))
                         target.hurt(owner.damageSources().mobProjectile(owner,owner),damage);
                 }

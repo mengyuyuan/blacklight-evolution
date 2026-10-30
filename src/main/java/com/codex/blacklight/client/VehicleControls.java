@@ -64,8 +64,13 @@ public final class VehicleControls {
         int actions=seat.fireActions(mc.options.keyAttack.isDown(),mc.options.keyUse.isDown())
                 |(driver&&mc.options.keyJump.isDown()?VehicleControlAuthority.BRAKE:0)
                 |(nextAmmo&&seat.weaponOperator()?VehicleControlAuthority.NEXT_AMMUNITION:0);
+        float aimYaw=mc.player.getYRot(),aimPitch=mc.player.getXRot();var target=ClientTargetLock.entityTarget();
+        if(target!=null&&ClientTargetLock.visibleInRange(target)){
+            var delta=com.codex.blacklight.combat.ExplicitTarget.point(mc.player,target).subtract(mc.player.getEyePosition());
+            aimYaw=(float)Math.toDegrees(Math.atan2(-delta.x,delta.z));aimPitch=(float)-Math.toDegrees(Math.atan2(delta.y,delta.horizontalDistance()));
+        }
         PacketDistributor.sendToServer(new VehicleControlPayload(vehicleId,lease,sequence++,forward,steering,
-                Mth.wrapDegrees(mc.player.getYRot()),Mth.clamp(mc.player.getXRot(),-90,90),actions));
+                Mth.wrapDegrees(aimYaw),Mth.clamp(aimPitch,-90,90),actions));
         nextAmmo=false;
     }
     record SeatInput(VehicleDefinition definition,String id,java.util.Set<String> occupied){

@@ -147,7 +147,7 @@ public final class ClientClawEvents {
     @SubscribeEvent
     public static void onKey(InputEvent.Key event) {
         Minecraft minecraft = Minecraft.getInstance();
-        if(VehicleControls.riding()||VehicleControls.interacting()&&minecraft.options.keyUse.matches(event.getKey(),event.getScanCode()))return;
+        if(VehicleControls.riding()&&!TARGET_LOCK.matches(event.getKey(),event.getScanCode())||VehicleControls.interacting()&&minecraft.options.keyUse.matches(event.getKey(),event.getScanCode()))return;
         if(minecraft.screen==null && (minecraft.options.keyAttack.matches(event.getKey(),event.getScanCode()) || minecraft.options.keyUse.matches(event.getKey(),event.getScanCode()))){
             ClientWeaponCombat.poll();tickGrabButtons();
         }
@@ -159,6 +159,7 @@ public final class ClientClawEvents {
     }
 
     private static void handleKeyPress(Minecraft minecraft,java.util.function.Predicate<KeyMapping> matches){
+        if(minecraft.screen==null&&ClientTargetLock.active()&&matches.test(TARGET_LOCK)){toggleTargetLock(minecraft);return;}
         if(VehicleControls.riding())return;
         var state = minecraft.player.getData(ModAttachments.PLAYER_STATE);
         if (minecraft.screen == null && matches.test(PROTOTYPE_MODE)) {
@@ -203,13 +204,13 @@ public final class ClientClawEvents {
     @SubscribeEvent
     public static void onClientTick(ClientTickEvent.Post event) {
         resetInputOwner();
+        suppressPrototypePlayerList();
         if(VehicleControls.riding()){
             clearLeftAttackHold();deferredGrabTick=-1;lastGrabDown=physicalGrabDown();
             ClientWeaponCombat.poll();return;
         }
         pollGrabPress(physicalGrabDown());
         ClientTerrainGrab.tick();
-        suppressPrototypePlayerList();
         tickGrabButtons();
         ClientWeaponCombat.poll();
         tickDeferredGrab();
@@ -367,7 +368,7 @@ public final class ClientClawEvents {
         Minecraft minecraft = Minecraft.getInstance();
         if (minecraft.player == null || minecraft.screen != null) return;
         var state = minecraft.player.getData(ModAttachments.PLAYER_STATE);
-        if (state.isPrototypeMode() && TARGET_LOCK.isDown()) {
+        if (ClientTargetLock.active() && TARGET_LOCK.isDown()) {
             minecraft.options.keyPlayerList.setDown(false);
         }
     }

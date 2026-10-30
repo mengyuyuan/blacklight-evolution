@@ -16,6 +16,12 @@ public final class GunplayEffects {
         for(int i=0;i<VehicleWeaponDefinition.ALL.size();i++)if(VehicleWeaponDefinition.ALL.get(i).weapon().equals(d))return 8+i;return 0;}
     public static boolean bullet(int id){return id>=0&&id<3||id==12;}
     public static boolean cannon(int id){return id==8||id==10||id==11;}
+    public static void metalContact(LivingEntity actor,Vec3 at,Vec3 normal){
+        if(!(actor.level() instanceof ServerLevel level))return;
+        var packet=new GunplayFeedbackPayload(actor.getId(),0,2,3,at.x,at.y,at.z,at.x,at.y,at.z,(float)normal.x,(float)normal.y,(float)normal.z,1,level.random.nextLong());
+        PacketDistributor.sendToPlayersNear(level,null,at.x,at.y,at.z,64,packet);
+        level.playSound(null,at.x,at.y,at.z,net.minecraft.sounds.SoundEvents.CHAIN_HIT,net.minecraft.sounds.SoundSource.PLAYERS,.7F,.9F);
+    }
     public static Vec3 muzzle(LivingEntity actor,Vec3 direction){
         var eye=actor.getEyePosition().add(0,-.18,0);var d=direction.normalize();var right=d.cross(new Vec3(0,1,0)).normalize();
         var at=eye.add(d.scale(.8)).add(right.scale(actor.getMainArm()==net.minecraft.world.entity.HumanoidArm.RIGHT?.15:-.15));

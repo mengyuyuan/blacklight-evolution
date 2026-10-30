@@ -336,6 +336,9 @@ public final class MilitaryVehicle extends Entity {
     private void destroyOnce() {
         if (destroyed) return;
         destroyed = true; mechanicalHealth = 0;
+        if(level() instanceof net.minecraft.server.level.ServerLevel effectLevel)
+            com.codex.blacklight.firearms.GunplayEffects.explosion(effectLevel,null,
+                    com.codex.blacklight.firearms.WeaponCatalog.GRENADE,getBoundingBox().getCenter(),new Vec3(0,1,0));
         if(level() instanceof net.minecraft.server.level.ServerLevel server)VehicleGarageService.onDestroyed(server,this);
         if (authority != null) authority.revokeAll(); leases.clear(); previousActions.clear();
         ejectPassengers(); syncVehicleState(); discard();

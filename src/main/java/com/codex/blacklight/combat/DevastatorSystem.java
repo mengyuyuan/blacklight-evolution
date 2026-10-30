@@ -257,6 +257,26 @@ public final class DevastatorSystem {
     }
     private static void strike(ServerPlayer p,Session s,double age){
         int kind=kind(s.move);double radius=s.timing.radius();
+        // Mechanical hulls participate in the same finite damage window, never
+        // in living launch/grab reactions. Iterate loaded entities for very high dives.
+        var mechanicalTargets=new java.util.ArrayList<com.codex.blacklight.entity.MilitaryVehicle>();
+        for(var entity:p.serverLevel().getAllEntities())if(entity instanceof com.codex.blacklight.entity.MilitaryVehicle vehicle)mechanicalTargets.add(vehicle);
+        for(var vehicle:mechanicalTargets){
+            if(ACTIVE.get(p)!=s)return;
+            if(s.struck.contains(vehicle.getUUID())
+                    ||s.struck.size()>=s.timing.targets()||!ExplicitTarget.selectable(p,vehicle))continue;
+            var point=ExplicitTarget.closestPoint(kind==2?p.getEyePosition():s.origin,vehicle);
+            double distance=point.distanceTo(kind==2?p.getEyePosition():s.origin);if(distance>radius)continue;
+            if(!CombatTargeting.clearRay(p,p.getEyePosition(),point))continue;
+            if(kind==2){var delta=point.subtract(p.getEyePosition());double along=delta.dot(s.direction);
+                if(along<0||delta.subtract(s.direction.scale(along)).length()>1.25)continue;}
+            double contact=kind==2?s.timing.targetStart():s.timing.contactAt(distance);
+            if(age<contact||age>Math.min(s.timing.damageEnd(),contact+DevastatorCollision.targetDuration(s.move)))continue;
+            float damage=s.timing.damage();if(kind==3)damage=BulletdivePhysics.impactDamage(damage,s.highest-s.origin.y);
+            if(com.codex.blacklight.military.vehicle.VehicleDamageBridge.hurtSpecial(p,vehicle,damage)){
+                s.struck.add(vehicle.getUUID());s.hits++;com.codex.blacklight.firearms.GunplayEffects.metalContact(p,point,s.direction.scale(-1));
+            }
+        }
         for(var plan:s.targets){
             var target=plan.target();
             if(s.struck.size()>=s.timing.targets())break;

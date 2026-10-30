@@ -27,6 +27,6 @@ public final class ClientClawMotionEvents {
         });
         if(mc.level==null){ClientTargetLock.clear();return;}
         for(var player:mc.level.players())if(PrototypeModeSystem.isActive(player))OWNED.add(player);
-        if(mc.player!=null&&!PrototypeModeSystem.isActive(mc.player))ClientTargetLock.clear();
+        if(mc.player!=null&&!ClientTargetLock.active())ClientTargetLock.clear();
     }
 }

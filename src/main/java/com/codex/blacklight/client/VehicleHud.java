@@ -53,6 +53,15 @@ public final class VehicleHud {
         if(mc.player==null||!(mc.player.getVehicle() instanceof MilitaryVehicle vehicle))return;
         var g=event.getGuiGraphics();
         if(mc.options.hideGui)return;
+        if(com.codex.blacklight.config.GunplayClientConfig.COMPACT_VEHICLE_HUD.get()&&!ClientClawEvents.targetInfoKey().isDown()){
+            int w=146,x=g.guiWidth()-w-8,y=g.guiHeight()-88;
+            g.fill(x-4,y-4,x+w+4,y+42,0xB00C1116);
+            g.drawString(mc.font,Component.literal(Math.round(vehicle.health())+" / "+Math.round(vehicle.maxHealth())+" HP"),x,y,0xFFE8EDD9,false);
+            g.fill(x,y+12,x+w,y+15,0xFF333A42);g.fill(x,y+12,x+(int)(w*Math.clamp(vehicle.health()/vehicle.maxHealth(),0,1)),y+15,0xFFCA7B65);
+            String selected=vehicle.selectedPrimaryWeapon();var def=vehicle.definition().weapons().get(selected);
+            if(def!=null){var text=Component.translatable("weapon.blacklight."+selected).getString()+"  "+vehicle.inventory().ammunition(def.ammunitionId());g.drawString(mc.font,mc.font.plainSubstrByWidth(text,w),x,y+20,0xFFF7D699,false);}
+            g.drawString(mc.font,Component.translatable("hud.blacklight.vehicle_details",ClientClawEvents.targetInfoKey().getTranslatedKeyMessage()),x,y+31,0xFF9FAFB9,false);return;
+        }
         int width=layout(g.guiWidth(),g.guiHeight(),0).width();var rows=new ArrayList<Row>();
         String seat=vehicle.seatOf(mc.player.getUUID());
         var status=Component.translatableWithFallback("hud.blacklight.vehicle_status","HP %s/%s | %s",Math.round(vehicle.health()),Math.round(vehicle.maxHealth()),

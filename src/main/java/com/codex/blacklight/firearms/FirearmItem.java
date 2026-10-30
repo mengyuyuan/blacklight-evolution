@@ -32,13 +32,11 @@ public final class FirearmItem extends Item {
         if(player.getCooldowns().isOnCooldown(this))return InteractionResultHolder.fail(stack);
         long now=level.getGameTime();
         AmmoState before=state(stack,0);
-        if(before.magazine()==0){emptyHint(player);return InteractionResultHolder.fail(stack);}
-        if(!before.canFire(now)){player.displayClientMessage(Component.translatable("message.blacklight.firearm_loading",new ItemStack(FirearmsRegistry.ammo(definition.ammoId())).getHoverName()),true);return InteractionResultHolder.fail(stack);}
+        if(before.magazine()==0)return InteractionResultHolder.fail(stack);
+        if(!before.canFire(now))return InteractionResultHolder.fail(stack);
         store(stack,before.fire(definition,now));
-        FirearmsCombat.fire(player,definition,player.getLookAngle(),1);
+        FirearmsCombat.fire(player,definition,player instanceof net.minecraft.server.level.ServerPlayer server?FirearmAim.direction(server,definition):player.getLookAngle(),1);
         player.getCooldowns().addCooldown(this,definition.cooldownTicks());
-        AmmoState current=state(stack,0);
-        player.displayClientMessage(Component.translatable("message.blacklight.firearm_ammo",current.magazine(),definition.capacity()),true);
         return InteractionResultHolder.success(stack);
     }
     public int reserveAmmo(Player player){
@@ -46,8 +44,6 @@ public final class FirearmItem extends Item {
         for(int i=0;i<player.getInventory().getContainerSize();i++){var item=player.getInventory().getItem(i);if(item.is(ammo))count+=item.getCount();}
         return (int)Math.min(Integer.MAX_VALUE,count);
     }
-    private void emptyHint(Player player){player.displayClientMessage(Component.translatable("message.blacklight.firearm_empty",
-            new ItemStack(FirearmsRegistry.ammo(definition.ammoId())).getHoverName(),reserveAmmo(player),Component.keybind("key.blacklight.firearm_reload")),true);}
     /** Validated held-item operation. A reload request never supplies ammunition counts or deadlines. */
     public boolean reload(Player player,InteractionHand hand){
         if(player==null||player.level().isClientSide||!player.isAlive()||player.isRemoved()||player.isSpectator()
@@ -55,13 +51,13 @@ public final class FirearmItem extends Item {
         var stack=player.getItemInHand(hand);long now=player.level().getGameTime();
         var before=state(stack,reserveAmmo(player));
         if(player.getCooldowns().isOnCooldown(this)||now<before.readyAt())return false;
-        if(before.magazine()>=definition.capacity()){player.displayClientMessage(Component.translatable("message.blacklight.firearm_full"),true);return false;}
-        if(before.reserve()==0){emptyHint(player);return false;}
+        if(before.magazine()>=definition.capacity())return false;
+        if(before.reserve()==0)return false;
         var after=before.reload(definition,now);int consumed=before.reserve()-after.reserve();if(consumed<=0)return false;
         Item ammo=FirearmsRegistry.ammo(definition.ammoId());int remaining=consumed;
         for(int i=0;i<player.getInventory().getContainerSize()&&remaining>0;i++){var entry=player.getInventory().getItem(i);if(entry.is(ammo)){int take=Math.min(remaining,entry.getCount());entry.shrink(take);remaining-=take;}}
         FirearmReloadSystem.begin(stack,after,now);player.getCooldowns().addCooldown(this,definition.reloadTicks());
-        player.displayClientMessage(Component.translatable("message.blacklight.firearm_loading",new ItemStack(ammo).getHoverName()),true);return true;
+        return true;
     }
     @Override public void appendHoverText(ItemStack stack,TooltipContext context,java.util.List<Component> tooltip,TooltipFlag flag){
         super.appendHoverText(stack,context,tooltip,flag);

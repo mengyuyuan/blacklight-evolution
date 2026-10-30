@@ -241,7 +241,7 @@ public final class PrototypeChaseCamera {
         distance=SourceCameraMath.approach(distance,profile.distance(),profile.distanceRate(),dt,profile.slowingDistance());
         elevation=SourceCameraMath.approach(elevation,profile.elevation(),profile.elevationRate(),dt,profile.elevationSlow());
         boolean targeting=com.codex.blacklight.client.ClientTargetLock.hasValidLock();
-        var target=targeting?ClientTargetLock.target():null;
+        net.minecraft.world.entity.Entity target=targeting?ClientTargetLock.entityTarget():null;
         if(!targeting&&action.hint("AutoTarget")) {
             var accepted=player.level().getEntity(player.getData(ModAttachments.WEAPON_VISUAL).targetId());
             if(accepted instanceof net.minecraft.world.entity.LivingEntity living&&living.distanceToSqr(player)<4096

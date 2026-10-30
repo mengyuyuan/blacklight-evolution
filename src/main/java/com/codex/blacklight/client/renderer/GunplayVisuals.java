@@ -50,6 +50,7 @@ public final class GunplayVisuals {
         for(var fx:ACTIVE){var p=fx.data;double age=now-fx.at;Vec3 start=new Vec3(p.x(),p.y(),p.z()),end=new Vec3(p.endX(),p.endY(),p.endZ());
             if(start.distanceToSqr(camera)>96*96)continue;
             if(p.event()==1){explosion(pose,out,end,p,age);continue;}
+            if(p.event()==2){if(age<10)impact(pose,out,end,p,age);continue;}
             var axis=end.subtract(start).normalize();if(axis.lengthSqr()<.01)axis=new Vec3(0,0,1);
             boolean local=mc.player!=null&&p.actor()==mc.player.getId()&&mc.options.getCameraType().isFirstPerson();
             if(age<1.8&&!local){double size=(GunplayEffects.cannon(p.weapon())?.85:GunplayEffects.bullet(p.weapon())?.23:.4)*(1-age/1.8);

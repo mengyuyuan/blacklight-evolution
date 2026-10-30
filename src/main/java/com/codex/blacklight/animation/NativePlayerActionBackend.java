@@ -62,7 +62,7 @@ public final class NativePlayerActionBackend implements PlayerActionBackend {
     @Override public void synchronizeMode(ServerPlayer player, boolean enabled) {
         if (!enabled) {
             clear(player);
-            com.codex.blacklight.combat.CombatTargeting.requestLock(player, -1);
+            if(!com.codex.blacklight.combat.ExplicitTarget.enabled(player))com.codex.blacklight.combat.CombatTargeting.requestLock(player, -1);
         }
     }
 

@@ -315,6 +315,7 @@ neoForge {
         client {
             if (project.hasProperty('gunplayTest')) {
                 systemProperty 'blacklight.test.gunplay', 'true'
+                if (project.hasProperty('mechanicalVisual')) systemProperty 'blacklight.test.mechanical', 'true'
                 if (project.hasProperty('gunplayRunDirectory')) gameDirectory = file(project.property('gunplayRunDirectory'))
                 jvmArgument '-Xmx2304m'
                 programArguments.addAll '--width', '1280', '--height', '800'

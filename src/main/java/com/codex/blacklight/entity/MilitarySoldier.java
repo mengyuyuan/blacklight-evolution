@@ -218,6 +218,10 @@ public abstract class MilitarySoldier extends Monster {
                 && target.level() == level() && !isAlliedTo(target)
                 && (!(target instanceof Player p) || !p.isCreative() && !p.isSpectator() && !DisguiseSystem.fooled(this, p));
     }
+    @Override public boolean canBeAffected(net.minecraft.world.effect.MobEffectInstance effect){
+        return !(BlacklightInfectionSystem.infectionImmune(this)&&effect.getEffect().value()==com.codex.blacklight.registry.ModEffects.BLACKLIGHT_INFECTION.value())
+                &&super.canBeAffected(effect);
+    }
     public boolean tacticsAvailable() {
         return isAlive() && !isRemoved() && !isNoAi() && !isPassenger()
                 && !com.codex.blacklight.combat.ImpactControl.stunned(this)
@@ -295,6 +299,7 @@ public abstract class MilitarySoldier extends Monster {
     }
     @Override public void tick() {
         if (!level().isClientSide) {
+            BlacklightInfectionSystem.preserveBlackwatch(this);
             initializeWeapon();
             home();
             com.codex.blacklight.military.MilitaryOrganizationSystem.ensureMember(this);
