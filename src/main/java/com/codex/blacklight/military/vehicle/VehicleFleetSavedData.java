@@ -32,6 +32,7 @@ public final class VehicleFleetSavedData extends SavedData {
             entry.put("Vehicles",ids(fleet.vehicles()));entry.put("Units",ids(fleet.units()));entry.put("Return",point(fleet.returnPoint()));entry.put("Target",point(fleet.target()));
             entry.putString("Mission",fleet.mission().name());entry.putString("Status",fleet.status().name());entry.putString("PersonnelOrder",fleet.personnelOrder());
             if(fleet.supplyReturn())entry.putBoolean("SupplyReturn",true);
+            if(fleet.automaticPatrol())entry.putBoolean("AutomaticPatrol",true);
             entry.putInt("Contacts",fleet.contacts());entry.putInt("Resolved",fleet.resolved());list.add(entry);
         }
         tag.put("Fleets",list);return tag;
@@ -55,6 +56,7 @@ public final class VehicleFleetSavedData extends SavedData {
             var fleet=new VehicleFleet(entry.getUUID("Id"),faction,readIds(entry.getList("Vehicles",10),4),readIds(entry.getList("Units",10),64),entry.getUUID("Commander"),readPoint(entry.getCompound("Return")));
             if(!fleet.order(VehicleFleet.Mission.valueOf(entry.getString("Mission")),readPoint(entry.getCompound("Target"))))continue;
             fleet.supplyReturn(entry.getBoolean("SupplyReturn"));
+            fleet.automaticPatrol(entry.getBoolean("AutomaticPatrol"));
             fleet.status(VehicleFleet.Status.valueOf(entry.getString("Status")));fleet.personnelOrder(entry.getString("PersonnelOrder"));fleet.restoreResults(entry.getInt("Contacts"),entry.getInt("Resolved"));data.add(fleet);
         }catch(IllegalArgumentException|NoSuchElementException invalid){data.setDirty();}
         return data;

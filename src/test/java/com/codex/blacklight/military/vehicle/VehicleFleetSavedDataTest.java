@@ -8,6 +8,15 @@ import net.minecraft.nbt.CompoundTag;
 import org.junit.jupiter.api.Test;
 
 class VehicleFleetSavedDataTest {
+    @Test void automaticPatrolOwnershipPersistsButExistingManualFleetsRemainManual(){
+        var data=new VehicleFleetSavedData();var id=UUID.randomUUID();
+        var fleet=new VehicleFleet(id,MilitaryFaction.BLACKWATCH,List.of(UUID.randomUUID()),List.of(),UUID.randomUUID(),new MilitaryOrder.Point(1,81,2));
+        fleet.automaticPatrol(true);assertTrue(data.add(fleet));
+        var tag=data.save(new CompoundTag(),null);
+        assertTrue(VehicleFleetSavedData.load(tag,null).fleet(id).orElseThrow().automaticPatrol());
+        tag.getList("Fleets",10).getCompound(0).remove("AutomaticPatrol");
+        assertFalse(VehicleFleetSavedData.load(tag,null).fleet(id).orElseThrow().automaticPatrol(),"old manual fleets must never be commandeered on migration");
+    }
     @Test void optionalSupplyReturnSurvivesRealNbtRoundTripAndOldSavesRemainUnlatched(){
         var data=new VehicleFleetSavedData();var id=UUID.randomUUID();
         var fleet=new VehicleFleet(id,MilitaryFaction.MILITARY,List.of(UUID.randomUUID()),List.of(),UUID.randomUUID(),new MilitaryOrder.Point(1,81,2));

@@ -7,5 +7,5 @@ import net.neoforged.neoforge.event.tick.LevelTickEvent;
 @EventBusSubscriber(modid="blacklight")
 public final class VehicleWorldEvents {
  private VehicleWorldEvents(){}
- @SubscribeEvent public static void tick(LevelTickEvent.Post event){if(event.getLevel() instanceof ServerLevel level){VehicleGarageService.tick(level);VehicleFleetSystem.tick(level);}}
+ @SubscribeEvent public static void tick(LevelTickEvent.Post event){if(event.getLevel() instanceof ServerLevel level){VehicleGarageService.tick(level);VehiclePatrolSystem.tick(level);VehicleFleetSystem.tick(level);}}
 }

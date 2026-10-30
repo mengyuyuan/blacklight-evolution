@@ -287,6 +287,16 @@ public final class VehicleGarageService {
         return lane(level,vehicle,vehicle.position(),apron) && lane(level,vehicle,apron,bay);
     }
     /** Conservative loaded flat-road certification; blocked or unknown routes are rejected. */
+    static Optional<BlockPos> patrolDestination(ServerLevel level,MilitaryVehicle vehicle,VehicleGarageData.Garage garage){
+        if(garage==null||!automatic(vehicle))return Optional.empty();
+        // Start with the actual doorway lane. Reject buildings, water and unknown
+        // chunks using the same full-hull sweeps as the garage return path.
+        for(double distance:new double[]{72.5,56.5,40.5,32.5}){
+            var goal=world(garage.site(),bayX(vehicle.chassisId()),1,distance);
+            if(lane(level,vehicle,vehicle.position(),goal))return Optional.of(BlockPos.containing(goal));
+        }
+        return Optional.empty();
+    }
     private static boolean lane(ServerLevel level,MilitaryVehicle vehicle,Vec3 from,Vec3 to) {
         var delta=to.subtract(from);int steps=Math.max(1,(int)Math.ceil(delta.horizontalDistance()/2));
         float yaw=(float)Math.toDegrees(Math.atan2(delta.x,delta.z));var shape=VehicleHullShape.from(vehicle.definition(),vehicle.turretYaw(),vehicle.gunPitch());

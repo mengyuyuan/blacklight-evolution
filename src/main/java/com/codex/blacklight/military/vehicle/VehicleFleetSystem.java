@@ -79,24 +79,42 @@ public final class VehicleFleetSystem {
                 +" logistics="+state.supplyReports.get(fleetId)+" home="+state.homes.get(vehicleId)+" driving="+(drive==null?"NONE":"destination="+drive.destination+", size="+drive.route.size()+", next="+drive.route.peekFirst()+", last="+drive.route.peekLast()+", failures="+drive.failures+", lastProgress="+drive.lastProgress);
     }
     public static Optional<UUID> create(ServerLevel level,List<MilitaryVehicle> selected,UUID formalCommander){
+        return create(level,selected,formalCommander,false);
+    }
+    /** Only an issued, crewed native garage chassis may start an automatic one-vehicle patrol. */
+    static Optional<UUID> createAutomaticPatrol(ServerLevel level,MilitaryVehicle vehicle){
+        if(!VehiclePatrolSystem.eligible(level,vehicle))return Optional.empty();
+        var driver=(MilitarySoldier)vehicle.occupant(VehicleDefinition.Job.DRIVER);
+        return create(level,List.of(vehicle),driver.getUUID(),true);
+    }
+    private static Optional<UUID> create(ServerLevel level,List<MilitaryVehicle> selected,UUID formalCommander,boolean automatic){
         if(level==null||selected==null||selected.isEmpty()||selected.size()>4||formalCommander==null)return Optional.empty();
         var vehicles=new ArrayList<>(selected);if(new HashSet<>(vehicles).size()!=vehicles.size()||vehicles.stream().anyMatch(Objects::isNull))return Optional.empty();
         var faction=vehicles.get(0).faction();var data=runtime(level).data;
         for(var vehicle:vehicles)if(vehicle.level()!=level||level.getEntity(vehicle.getUUID())!=vehicle||vehicle.isRemoved()||vehicle.health()<=0||vehicle.faction()!=faction||data.vehicleFleet(vehicle.getUUID()).isPresent())return Optional.empty();
         var crew=crew(vehicles,faction);var officer=crew.get(formalCommander);
-        if(officer==null||officer.rank().ordinal()<MilitaryRank.LIEUTENANT.ordinal()||officer.commandRole()!=MilitaryRole.OFFICER&&officer.commandRole()!=MilitaryRole.COMMANDER)return Optional.empty();
+        if(officer==null||!automatic&&(officer.rank().ordinal()<MilitaryRank.LIEUTENANT.ordinal()||officer.commandRole()!=MilitaryRole.OFFICER&&officer.commandRole()!=MilitaryRole.COMMANDER))return Optional.empty();
         vehicles.sort(Comparator.comparingInt((MilitaryVehicle v)->v.chassisId().equals("apc")?0:v.chassisId().equals("truck")?1:2).thenComparing(MilitaryVehicle::getUUID));
         var units=crew.values().stream().map(MilitarySoldier::unitId).filter(Objects::nonNull).distinct().sorted().toList();
         var leader=vehicles.get(0);var id=UUID.randomUUID();
         var fleet=new VehicleFleet(id,faction,vehicles.stream().map(Entity::getUUID).toList(),units,formalCommander,point(leader.position()));
+        fleet.automaticPatrol(automatic);
         fleet.personnelOrder(unitOrder(level,fleet,officer).map(Object::toString).orElse(""));
         return data.add(fleet)?Optional.of(id):Optional.empty();
     }
     public static boolean setMission(ServerLevel level,UUID id,String mode,BlockPos target){
+        return order(level,id,mode,target,false);
+    }
+    static boolean automaticMission(ServerLevel level,UUID id,String mode,BlockPos target){
+        if(!runtime(level).data.fleet(id).map(VehicleFleet::automaticPatrol).orElse(false))return false;
+        return order(level,id,mode,target,true);
+    }
+    private static boolean order(ServerLevel level,UUID id,String mode,BlockPos target,boolean automatic){
         var state=runtime(level);var fleet=state.data.fleet(id).orElse(null);if(fleet==null||mode==null)return false;
         VehicleFleet.Mission mission;
         try{mission=VehicleFleet.Mission.valueOf(mode.toUpperCase(Locale.ROOT));}catch(IllegalArgumentException invalid){return false;}
         if(!fleet.order(mission,target==null?null:new MilitaryOrder.Point(target.getX()+.5,target.getY(),target.getZ()+.5)))return false;
+        if(!automatic)fleet.automaticPatrol(false); // Any explicit order permanently takes ownership from the scheduler.
         if(state.deployed.values().stream().anyMatch(d->d.fleet.equals(id)))state.recalling.add(id);
         state.resupplying.remove(id);state.supplyReports.remove(id);clearRoutes(state,fleet);state.patrolBack.remove(id);state.data.setDirty();return true;
     }
@@ -134,6 +152,7 @@ public final class VehicleFleetSystem {
         var order=unitOrder(level,fleet,commander);String signature=order.map(Object::toString).orElse("");
         if(signature.equals(fleet.personnelOrder()))return;
         fleet.personnelOrder(signature);state.data.setDirty();if(order.isEmpty())return;
+        fleet.automaticPatrol(false);
         var intent=order.get();var mode=switch(intent.mode()){case PATROL->VehicleFleet.Mission.PATROL;case MOVE,REGROUP->VehicleFleet.Mission.MOVE;case RETURN->VehicleFleet.Mission.RETURN;case GUARD->VehicleFleet.Mission.GUARD;};
         if(fleet.order(mode,intent.mode()==MilitaryOrder.Mode.REGROUP&&intent.target()==null?fleet.returnPoint():intent.target())){if(state.deployed.values().stream().anyMatch(d->d.fleet.equals(fleet.id())))state.recalling.add(fleet.id());state.resupplying.remove(fleet.id());state.supplyReports.remove(fleet.id());clearRoutes(state,fleet);state.patrolBack.remove(fleet.id());}
     }

@@ -5,14 +5,16 @@ import net.neoforged.neoforge.common.ModConfigSpec;
 /** Shared rules, independently stored operations in each actual dimension. */
 public final class MilitaryCampaignConfig {
     public static final ModConfigSpec SPEC;
-    public static final ModConfigSpec.BooleanValue ENABLED, NATURAL_BASES, REINFORCEMENTS;
+    public static final ModConfigSpec.BooleanValue ENABLED, NATURAL_BASES, REINFORCEMENTS, VEHICLE_PATROLS;
     public static final ModConfigSpec.IntValue INTERVAL, RANGE, SQUAD, ACTIVE, TIMEOUT, COOLDOWN,
             SABOTAGE, RECOVERY, REDUCTION, SECURED_PRESSURE, SURVIVORS, DESTROY_REWARD, INFILTRATE_REWARD,
-            REINFORCEMENT_INTERVAL, FIELD_LIMIT, FIELD_LIFETIME;
+            REINFORCEMENT_INTERVAL, FIELD_LIMIT, FIELD_LIFETIME, VEHICLE_PATROL_LIMIT;
     static {
         var b=new ModConfigSpec.Builder();
         ENABLED=b.comment("启用主世界和黑光维度的军事清剿与基地争夺。关闭不删除已有实体或据点。").define("enabled",true);
         NATURAL_BASES=b.comment("在新的主世界与黑光城市区块选择不同阵营的天然军事基地；不覆盖已探索区块。").define("naturalBases",true);
+        VEHICLE_PATROLS=b.comment("疫情开始后，实际基地车库已发放且乘员齐备的车辆沿已加载通路自动巡逻、交战和返库补给。不会凭空生成车辆或接管玩家命令。").define("vehiclePatrols",true);
+        VEHICLE_PATROL_LIMIT=b.comment("每维度同时加载并出勤的自动巡逻车辆上限。").defineInRange("vehiclePatrolLimit",2,0,8);
         REINFORCEMENTS=b.comment("红区持续派入地面增援，使用新编队和有限弹药，不重置原驻军。遵守刷怪规则和人数预算。").define("redZoneReinforcements",true);
         REINFORCEMENT_INTERVAL=b.comment("红区尝试补充一队增援的间隔；一秒20刻。无有效加载地面时等待。").defineInRange("reinforcementIntervalTicks",400,100,240000);
         FIELD_LIMIT=b.comment("每维度同时加载的增援人数上限，且受总驻军上限约束，不随玩家数倍增。").defineInRange("fieldPersonnelLimit",24,0,64);

@@ -163,4 +163,53 @@ public final class MilitaryCampaignGameTest {
             System.out.println("CAMPAIGN_ASSERTIONS "+f.passed.size());f.close();h.succeed();
         });
     }
+    @GameTest(template="blackwatch_arena",timeoutTicks=650,batch="campaign_npc_patrol")
+    public static void opposingInfectedAndRealGaragePatrol(GameTestHelper h){
+        var f=new Fixture(h);var l=f.level;
+        f.set(com.codex.blacklight.config.GameplayBalanceConfig.CONTACT_CHANCE,0D);
+        f.set(MilitaryCampaignConfig.VEHICLE_PATROLS,true);f.set(MilitaryCampaignConfig.VEHICLE_PATROL_LIMIT,1);
+        f.soldier=f.soldier(f.at.west(30));
+        f.soldier.getAttribute(net.minecraft.world.entity.ai.attributes.Attributes.MAX_HEALTH).setBaseValue(1000);f.soldier.setHealth(1000);
+        var infected=ModEntities.COMMON_INFECTED.get().create(l);infected.moveTo(Vec3.atBottomCenterOf(f.at.west(22)));
+        infected.getAttribute(net.minecraft.world.entity.ai.attributes.Attributes.MAX_HEALTH).setBaseValue(1000);infected.setHealth(1000);l.addFreshEntity(infected);f.born.add(infected);
+        h.startSequence().thenWaitUntil(()->h.assertTrue(MilitaryCampaignSystem.loaded(l,f.at),"waiting for NPC arena"))
+        .thenIdle(100).thenExecute(()->{
+            System.out.println("NPC_WAR_DIAGNOSTIC soldier="+f.soldier.getTarget()+" infected="+infected.getTarget()+" soldierHP="+f.soldier.getHealth()+" infectedHP="+infected.getHealth());
+            f.check(f.soldier.getTarget()==infected&&infected.getTarget()==f.soldier&&infected.getHealth()<infected.getMaxHealth(),"opposing NPC target AI acquires both ways and actual Blackwatch rifle damages infected");
+            f.check(!BlacklightInfectionSystem.isInfected(f.soldier),"combat test keeps Blackwatch in military faction");
+            // Riflemen lawfully backpedal faster than this slow food-tier infected.
+            // A stationary real defender isolates the infected's melee contact path.
+            f.soldier.setNoAi(true);infected.moveTo(f.soldier.position().add(0,0,1.3));
+        }).thenIdle(80).thenExecute(()->{
+            f.check(f.soldier.getHealth()<1000,"common infected closes and inflicts actual melee damage on uninfected Blackwatch");
+            f.check(BlacklightInfectionSystem.infect(f.soldier,null)&&infected.isAlliedTo(f.soldier),"infected Blackwatch is correctly allied to common infected");
+            f.soldier.discard();infected.discard();
+            var site=new CityMilitaryPlan.Site(f.at.getX()-65,f.at.getZ()-65,99,0,true);f.baseId=CityMilitaryService.register(l,site);
+            for(var core:LargeBaseBlueprint.get(true).commandCores()){var p=site.world(core[0],core[2]);l.setBlock(new BlockPos(p[0],site.floor()+core[1],p[1]),MilitaryFacilityBlocks.COMMAND_TERMINAL.get().defaultBlockState(),3);}
+            var garage=new com.codex.blacklight.military.vehicle.VehicleGarageData.Site(f.at.getX(),99,f.at.getZ()-24,0);
+            var ledger=com.codex.blacklight.military.vehicle.VehicleGarageService.data(l);
+            f.check(ledger.register("campaign-patrol-qa",f.baseId,l.dimension().location().toString(),com.codex.blacklight.military.MilitaryFaction.BLACKWATCH,garage),"actual native garage ledger registers fixture");
+            var vehicle=ModEntities.BLACKWATCH_TRUCK.get().create(l);vehicle.moveTo(f.at.getX()+5.5,100,f.at.getZ()-14.5,0,0);
+            vehicle.initializeNativeOrigin(f.baseId,l.dimension().location().toString());vehicle.setCurrentHome("campaign-patrol-qa");vehicle.inventory().issueInitialLoadout();l.addFreshEntity(vehicle);f.born.add(vehicle);
+            ledger.reserve("campaign-patrol-qa","truck",vehicle.getUUID());ledger.issued("campaign-patrol-qa","truck",vehicle.getUUID());
+            var driver=f.soldier(f.at);f.check(driver.startRiding(vehicle),"real existing trooper boards actual issued truck");
+            f.player=f.player(f.at.east(30));f.player.setGameMode(GameType.CREATIVE);
+            f.first=Set.of(vehicle.getUUID());
+        }).thenIdle(145).thenExecute(()->{
+            var vehicle=(MilitaryVehicle)l.getEntity(f.first.iterator().next());
+            var fleets=com.codex.blacklight.military.vehicle.VehicleFleetSavedData.get(l);
+            var fleet=fleets.vehicleFleet(vehicle.getUUID()).orElseThrow();
+            System.out.println("NATIVE_PATROL_DIAGNOSTIC "+com.codex.blacklight.military.vehicle.VehicleFleetSystem.diagnostic(l,fleet.id(),vehicle.getUUID()));
+            f.check(fleet.automaticPatrol()&&fleet.mission()==com.codex.blacklight.military.vehicle.VehicleFleet.Mission.PATROL,"real production tick starts native garage patrol without manual commands");
+            f.check(vehicle.getZ()>f.at.getZ()-10,"real native truck physically leaves its original bay with existing driver");
+            var round=com.codex.blacklight.military.vehicle.VehicleFleetSavedData.load(fleets.save(new CompoundTag(),l.registryAccess()),l.registryAccess());
+            f.check(round.fleet(fleet.id()).orElseThrow().automaticPatrol(),"automatic fleet authority survives save/reload");
+            f.check(com.codex.blacklight.military.vehicle.VehicleFleetSystem.setMission(l,fleet.id(),"GUARD",vehicle.blockPosition())&&!fleet.automaticPatrol(),"explicit fleet command immediately relinquishes automatic authority");
+        }).thenIdle(105).thenExecute(()->{
+            var vehicle=(MilitaryVehicle)l.getEntity(f.first.iterator().next());
+            var fleet=com.codex.blacklight.military.vehicle.VehicleFleetSavedData.get(l).vehicleFleet(vehicle.getUUID()).orElseThrow();
+            f.check(!fleet.automaticPatrol()&&fleet.mission()==com.codex.blacklight.military.vehicle.VehicleFleet.Mission.GUARD,"later scheduler tick never overwrites explicit guard command");
+            com.codex.blacklight.military.vehicle.VehicleFleetSystem.remove(l,fleet.id());f.close();h.succeed();
+        });
+    }
 }
