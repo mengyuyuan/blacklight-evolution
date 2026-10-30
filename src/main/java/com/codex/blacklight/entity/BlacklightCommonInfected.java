@@ -91,6 +91,8 @@ public final class BlacklightCommonInfected extends Monster {
     }
     @Override public void tick() {
         super.tick();
+        // The final vanilla death tick can remove this body during super.tick().
+        if(isRemoved())return;
         // Capture sets NoAI, so the stopped goal cannot clear its own pending pose until release.
         if(!level().isClientSide&&(isNoAi()||restrained()))cancelAttack();
         if(!(level() instanceof ServerLevel level)||!isAlive()||meals<3||tickCount%100!=0

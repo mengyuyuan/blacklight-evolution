@@ -44,7 +44,13 @@ public final class CitySpawnAuditGameTest {
     }
     @GameTest(template="wall_test",timeoutTicks=400,batch="spawn_last_slots")
     public static void cityCohortUsesTheLastTwoRealPopulationSlots(GameTestHelper h){var f=new Fixture(h);f.run(()->{
-        int before=f.count();CityConfig.MOB_LIMIT.set(before+2);
+        int before=f.count(),residents=0;
+        // Infection has its own budget. Unrelated infected bodies from other
+        // suites must not accidentally give this civilian fixture extra slots.
+        for(var e:f.level.getAllEntities())if(e instanceof Mob mob&&mob.isAlive()
+                &&!com.codex.blacklight.infection.BlacklightInfectionSystem.isInfected(mob))residents++;
+        CityConfig.MOB_LIMIT.set(residents+2);
+        h.assertTrue(com.codex.blacklight.infection.WorldOutbreakSystem.cityPopulationSlots(f.level,false)==2,"fixture must leave exactly two real civilian slots");
         h.assertTrue(CitySystem.populateDistrict(f.level,f.center,DistrictThreat.Zone.GREEN)==2&&f.count()==before+2,"two real remaining slots must fill without requiring a whole four-body wave");
         h.assertTrue(CitySystem.populateDistrict(f.level,f.center,DistrictThreat.Zone.GREEN)==0,"a second call cannot exceed the actual city cap");
     });}
