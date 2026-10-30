@@ -174,6 +174,7 @@ public final class BlackwatchSquadSystem {
     }
 
     public static boolean withinTerritory(MilitarySoldier soldier, Vec3 position) {
+        if(com.codex.blacklight.city.MilitaryCampaignSystem.deploymentAllows(soldier,position))return true;
         if(com.codex.blacklight.military.vehicle.VehicleFleetSystem.deploymentAllows(soldier,position))return true;
         return position.distanceToSqr(com.codex.blacklight.city.MilitaryHomeSystem.territory(soldier,()->com.codex.blacklight.city.CityMilitaryService.post(soldier).orElseGet(()->MilitaryFormationSystem.territory(soldier)))) <= 48 * 48;
     }

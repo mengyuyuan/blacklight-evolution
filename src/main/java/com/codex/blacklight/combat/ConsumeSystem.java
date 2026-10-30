@@ -470,6 +470,7 @@ public final class ConsumeSystem {
         // pose independently, even after the receiver entity has disappeared.
         play(player,PlayerAction.CLAW_IDLE);
         if(!com.codex.blacklight.power.AssimilationSystem.settle(player,target,session.reward,true))return;
+        com.codex.blacklight.city.MilitaryCampaignSystem.consumed(player,target);
         com.codex.blacklight.disguise.DisguiseSystem.consumed(player,target);
         com.codex.blacklight.disguise.DisguiseSystem.captured(player,identity);
         player.level().playSound(null, player.blockPosition(), SoundEvents.GENERIC_EAT, SoundSource.PLAYERS, .8F, .55F);

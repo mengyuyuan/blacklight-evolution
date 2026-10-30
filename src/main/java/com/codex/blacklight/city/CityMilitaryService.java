@@ -64,7 +64,7 @@ public final class CityMilitaryService {
         for(var base:data.bases.values()){
             if(budget<=0||count>=limit)break;
             if(observers.stream().noneMatch(p->p.distanceToSqr(base.site.x()+base.site.width()/2.,base.site.floor()+1,base.site.z()+base.site.depth()/2.)<128*128))continue;
-            observeCore(level,base);if(!base.health.operational())continue;
+            observeCore(level,base);if(!base.health.operational()||MilitaryCampaignSystem.disabled(level,base.id))continue;
             var definition=LargeBaseBlueprint.get(base.site.blackwatch());
             for(int slot=0;slot<base.slots.length&&budget>0&&count<limit;slot++){
                 if(base.slots[slot]!=null)continue;
@@ -109,6 +109,7 @@ public final class CityMilitaryService {
         var loaded=new HashSet<UUID>();
         for(var base:data.bases.values())for(var id:base.slots)
             if(id!=null&&level.getEntity(id) instanceof MilitarySoldier soldier&&soldier.isAlive())loaded.add(id);
+        for(var entity:level.getAllEntities())if(entity instanceof MilitarySoldier soldier&&soldier.isAlive()&&MilitaryCampaignSystem.ambient(soldier))loaded.add(soldier.getUUID());
         return loaded.size();
     }
     private static BlockPos postPosition(CityMilitaryData.Base base,int slot){
@@ -172,6 +173,7 @@ public final class CityMilitaryService {
         }).toList();
     }
     public static Optional<Vec3> post(MilitarySoldier soldier){
+        if(MilitaryCampaignSystem.active(soldier))return Optional.empty();
         if(!(soldier.level() instanceof ServerLevel level)||!soldier.getPersistentData().contains(POST_TAG))return Optional.empty();
         var base=CityMilitaryData.get(level).bases.get(soldier.getPersistentData().getString(BASE_TAG));if(base==null||!MilitaryHomeSystem.originalPostApplies(soldier,base))return Optional.empty();
         if(soldier.unitId()!=null&&MilitaryOrganizationSystem.organization(level).effectiveOrder(soldier.unitId()).isPresent())return Optional.empty();
@@ -238,7 +240,7 @@ public final class CityMilitaryService {
         private final MilitarySoldier soldier;private BlockPos target;private Vec3 approach;private long retryAt;private int ticks;private Deque<Vec3> waypoints=new ArrayDeque<>();
         SupplyGoal(MilitarySoldier soldier){this.soldier=soldier;setFlags(EnumSet.of(Flag.MOVE,Flag.LOOK));}
         @Override public boolean canUse(){
-            if(!(soldier.level() instanceof ServerLevel level)||!soldier.equipped()||!soldier.tacticsAvailable()||MilitaryHomeSystem.ordered(soldier)||level.getGameTime()<retryAt)return false;
+            if(!(soldier.level() instanceof ServerLevel level)||!soldier.equipped()||!soldier.tacticsAvailable()||MilitaryHomeSystem.ordered(soldier)||MilitaryCampaignSystem.active(soldier)||level.getGameTime()<retryAt)return false;
             if(soldier.reserveAmmo()>0&&(soldier.getTarget()!=null||soldier.ammoDeficit()==0))return false;
             var base=MilitaryHomeSystem.currentBase(soldier).orElse(null);if(base==null||!base.health.operational())return false;
             target=null;approach=null;double nearest=128*128;
@@ -293,7 +295,10 @@ public final class CityMilitaryService {
             if(!level.hasChunkAt(at)){loaded=false;continue;}
             if(level.getBlockState(at).is(com.codex.blacklight.registry.MilitaryFacilityBlocks.COMMAND_TERMINAL.get()))present=true;
         }
+        boolean inactive=base.health.inactive();
         if(base.health.observe(level.getGameTime(),loaded,present))CityMilitaryData.get(level).setDirty();
+        if(inactive!=base.health.inactive()||base.health.inactive()&&!MilitaryCampaignData.get(level).bases.containsKey(base.id))
+            MilitaryCampaignSystem.baseCoreStateChanged(level,base.id,base.health.inactive());
     }
     @SubscribeEvent public static void homeCommands(net.neoforged.neoforge.event.RegisterCommandsEvent event){MilitaryHomeSystem.commands(event.getDispatcher());}
     @SubscribeEvent public static void homeUnload(net.neoforged.neoforge.event.level.LevelEvent.Unload event){if(event.getLevel() instanceof ServerLevel level)MilitaryHomeSystem.unload(level);}

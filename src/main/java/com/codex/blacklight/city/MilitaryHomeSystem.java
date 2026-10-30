@@ -35,7 +35,7 @@ public final class MilitaryHomeSystem {
     private MilitaryHomeSystem(){}
     static void joined(MilitarySoldier soldier){
         if(!(soldier.level() instanceof ServerLevel level))return;
-        soldier.setPersistenceRequired(); // Despawn protection cannot wait for the delayed ownership initialization.
+        if(!MilitaryCampaignSystem.ambient(soldier))soldier.setPersistenceRequired(); // Existing garrisons retain their persistent identity.
         state(level).entries.putIfAbsent(soldier.getUUID(),new Entry(level.getGameTime(),soldier.blockPosition()));
         if(GOALS.put(soldier,Boolean.TRUE)==null)soldier.goalSelector.addGoal(5,new HomePatrolGoal(soldier));
     }
@@ -54,7 +54,7 @@ public final class MilitaryHomeSystem {
         for(var soldier:soldiers){
             var entry=state.entries.get(soldier.getUUID());
             if(now-entry.joined<20||BlacklightInfectionSystem.isInfected(soldier))continue;
-            if(!entry.ready){entry.ready=true;soldier.setPersistenceRequired();migrateOrigin(level,soldier);}
+            if(!entry.ready){entry.ready=true;if(!MilitaryCampaignSystem.ambient(soldier))soldier.setPersistenceRequired();migrateOrigin(level,soldier);}
             update(level,soldier,entry,state,now);
         }
     }
@@ -181,7 +181,7 @@ public final class MilitaryHomeSystem {
     private static final class HomePatrolGoal extends Goal {
         private final MilitarySoldier soldier;private Vec3 destination;private long nextPatrol;private int ticks;private Deque<Vec3> route=new ArrayDeque<>();
         HomePatrolGoal(MilitarySoldier soldier){this.soldier=soldier;setFlags(EnumSet.of(Flag.MOVE));}
-        @Override public boolean canUse(){return soldier.tacticsAvailable()&&soldier.getTarget()==null&&!ordered(soldier)&&patrolAnchor(soldier).isPresent();}
+        @Override public boolean canUse(){return soldier.tacticsAvailable()&&soldier.getTarget()==null&&!ordered(soldier)&&!MilitaryCampaignSystem.active(soldier)&&patrolAnchor(soldier).isPresent();}
         @Override public boolean canContinueToUse(){return canUse();}
         @Override public boolean requiresUpdateEveryTick(){return true;}
         @Override public void start(){destination=null;route.clear();ticks=0;}

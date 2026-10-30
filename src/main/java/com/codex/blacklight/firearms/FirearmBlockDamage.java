@@ -93,7 +93,12 @@ public final class FirearmBlockDamage {
         if(level.getBlockState(at)!=state)return false;
         var ledger=ledger(level);var result=ledger.hit(at.asLong(),Block.getId(state),impact,capacity,level.getGameTime());
         flush(level,ledger);
-        if(result.broken())return level.destroyBlock(at,!(owner instanceof ServerPlayer player&&player.isCreative()),owner);
+        if(result.broken()){
+            boolean broken=level.destroyBlock(at,!(owner instanceof ServerPlayer player&&player.isCreative()),owner);
+            if(broken&&state.is(com.codex.blacklight.registry.MilitaryFacilityBlocks.COMMAND_TERMINAL.get())&&owner instanceof ServerPlayer player)
+                com.codex.blacklight.city.MilitaryCampaignSystem.actualPlayerBreak(player,at);
+            return broken;
+        }
         level.destroyBlockProgress(crackId(at),at,result.stage());
         level.sendParticles(new BlockParticleOption(ParticleTypes.BLOCK,state),at.getX()+.5,at.getY()+.5,at.getZ()+.5,2,.15,.15,.15,.015);
         return false;

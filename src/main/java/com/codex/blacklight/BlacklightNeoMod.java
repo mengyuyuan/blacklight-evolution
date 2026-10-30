@@ -28,6 +28,7 @@ public final class BlacklightNeoMod {
     public BlacklightNeoMod(IEventBus modBus, ModContainer container) {
         container.registerConfig(net.neoforged.fml.config.ModConfig.Type.CLIENT, com.codex.blacklight.config.PassiveHudConfig.SPEC, "blacklight-client.toml");
         container.registerConfig(net.neoforged.fml.config.ModConfig.Type.SERVER, com.codex.blacklight.city.CityConfig.SPEC, "blacklight-city-server.toml");
+        container.registerConfig(net.neoforged.fml.config.ModConfig.Type.SERVER, com.codex.blacklight.city.MilitaryCampaignConfig.SPEC, "blacklight-military-campaign-server.toml");
         container.registerConfig(net.neoforged.fml.config.ModConfig.Type.SERVER, com.codex.blacklight.infection.BuildingInfectionConfig.SPEC, "blacklight-building-infection-server.toml");
         container.registerConfig(net.neoforged.fml.config.ModConfig.Type.SERVER, com.codex.blacklight.infection.TissueCompetitionConfig.SPEC, "blacklight-evolution-server.toml");
         container.registerConfig(net.neoforged.fml.config.ModConfig.Type.SERVER, com.codex.blacklight.infection.EvolvedBalance.SPEC, "blacklight-evolved-server.toml");

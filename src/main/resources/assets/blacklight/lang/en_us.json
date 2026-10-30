@@ -949,5 +949,11 @@
   "sign.blacklight.military_technology.4": "DETECT INFECTION",
   "entity.blacklight.military_heavy": "Military Heavy",
   "sign.blacklight.military_supplies.2": "FOOD AND LIGHT",
-  "entity.blacklight.military_truck": "Military Transport Truck"
+  "entity.blacklight.military_truck": "Military Transport Truck",
+  "campaign.blacklight.blackwatch": "Blackwatch",
+  "campaign.blacklight.military": "Military",
+  "campaign.blacklight.base_destroyed": "%s command facilities destroyed: local reinforcements and base production stopped.",
+  "campaign.blacklight.identity_required": "Infiltration requires an unexposed %s identity.",
+  "campaign.blacklight.infiltration_started": "%s infiltration assigned: consume an officer of this base to disrupt support.",
+  "campaign.blacklight.infiltration_complete": "%s infiltration complete: command and reinforcements temporarily disabled."
 }

@@ -949,5 +949,11 @@
   "sign.blacklight.military_technology.4": "用于搜索感染者",
   "entity.blacklight.military_heavy": "军方重装兵",
   "sign.blacklight.military_supplies.2": "食物与照明",
-  "entity.blacklight.military_truck": "军方运输卡车"
+  "entity.blacklight.military_truck": "军方运输卡车",
+  "campaign.blacklight.blackwatch": "黑色守望",
+  "campaign.blacklight.military": "军方",
+  "campaign.blacklight.base_destroyed": "%s 指挥设施已摧毁：附近增援与基地生产停止。",
+  "campaign.blacklight.identity_required": "潜入需要未暴露的 %s 身份。",
+  "campaign.blacklight.infiltration_started": "%s 潜入目标已获取：吞噬本基地军官，瘫痪其支援。",
+  "campaign.blacklight.infiltration_complete": "%s 潜入成功：指挥与增援暂时瘫痪。"
 }

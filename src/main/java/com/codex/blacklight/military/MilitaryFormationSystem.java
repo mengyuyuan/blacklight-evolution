@@ -106,6 +106,7 @@ public final class MilitaryFormationSystem {
         return r.center.add(offset(level,scope,soldier.unitId(),captain==null?null:captain.getUUID(),r.heading));
     }
     public static boolean patrol(MilitarySoldier soldier){
+        if(com.codex.blacklight.city.MilitaryCampaignSystem.active(soldier))return true;
         UUID scope=scope(soldier);if(scope==null)return false;
         var level=(ServerLevel)soldier.level();var r=route(soldier,scope);var captain=movingCommander(level,scope,scope);var leafCaptain=movingCommander(level,soldier.unitId(),scope);
         if(captain==null||leafCaptain==null){soldier.getNavigation().stop();return true;}

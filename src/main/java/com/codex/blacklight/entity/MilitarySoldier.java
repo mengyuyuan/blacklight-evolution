@@ -120,6 +120,35 @@ public abstract class MilitarySoldier extends Monster {
         }return state.canFire(now);
     }
     private boolean hasAmmunition(ItemStack stack){var d=definition(stack);return d!=null&&(FirearmItem.state(stack,0).magazine()>0||reserveAmmo(d.ammoId())>0);}
+    public boolean hasBattleAmmunition(){return equipped()&&(hasAmmunition(getMainHandItem())||hasAmmunition(getOffhandItem()));}
+
+    /** A campaign core is a real block hit with a real carried rifle, never a timed objective deletion. */
+    public boolean fireAtCampaignCore(BlockPos at){
+        if(!(level() instanceof ServerLevel server)||!tacticsAvailable()
+                ||!com.codex.blacklight.city.MilitaryCampaignSystem.authorizedCore(this,at))return false;
+        ItemStack main=getMainHandItem(),other=getOffhandItem();
+        var d=definition(main);
+        if(d==null||d.kind()!=WeaponDefinition.Kind.BULLET||!hasAmmunition(main)){
+            var second=definition(other);
+            if(second==null||second.kind()!=WeaponDefinition.Kind.BULLET||!hasAmmunition(other))return false;
+            setItemSlot(EquipmentSlot.MAINHAND,other);setItemSlot(EquipmentSlot.OFFHAND,main);d=second;
+        }
+        Vec3 start=getEyePosition().add(0,-.18,0),end=Vec3.atCenterOf(at);
+        if(start.distanceToSqr(end)>28*28||!com.codex.blacklight.military.vehicle.VehicleDamageBridge.loaded(server,start,end))return false;
+        var wall=server.clip(new ClipContext(start,end,ClipContext.Block.COLLIDER,ClipContext.Fluid.NONE,this));
+        if(wall.getType()!=HitResult.Type.BLOCK||!wall.getBlockPos().equals(at))return false;
+        var hit=ProjectileUtil.getEntityHitResult(server,this,start,wall.getLocation(),new AABB(start,end).inflate(.3),
+                entity->entity!=this&&entity instanceof LivingEntity&&entity.isAlive()&&entity.isPickable());
+        if(hit!=null)return false;
+        if(com.codex.blacklight.military.vehicle.VehicleDamageBridge.nearest(server,this,null,start,wall.getLocation())!=null)return false;
+        long now=server.getGameTime();int age=(int)Math.floorMod(now,profile().cycleTicks());
+        if(age<profile().aimTicks()||age>=profile().burstTicks()){entityData.set(PHASE,age<profile().aimTicks()?1:3);return true;}
+        entityData.set(PHASE,2);
+        if((age-profile().aimTicks())%8!=0||!readyWeapon())return true;
+        var state=FirearmItem.state(getMainHandItem(),reserveAmmo(d.ammoId()));
+        FirearmItem.store(getMainHandItem(),state.fire(d,now));
+        FirearmsCombat.fire(this,d,end.subtract(start).normalize(),profile().damage()/d.damage());return true;
+    }
     private void selectWeapon(LivingEntity target){
         if(!equipped())return;
         var main=getMainHandItem();var other=getOffhandItem();var a=definition(main);var b=definition(other);ItemStack selected=main;

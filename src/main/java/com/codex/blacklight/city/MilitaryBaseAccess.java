@@ -62,7 +62,7 @@ public final class MilitaryBaseAccess {
         // city's delayed core observation or guessing from an unloaded chunk.
         return Optional.of(new BaseView(base.id,
                 base.site.blackwatch() ? MilitaryFaction.BLACKWATCH : MilitaryFaction.MILITARY,
-                center, CityMilitaryPiece.bounds(base.site), loaded, loaded && terminalPresent,
+                center, CityMilitaryPiece.bounds(base.site), loaded, loaded && terminalPresent && !MilitaryCampaignSystem.disabled(level,base.id),
                 issued, base.slots.length));
     }
 
@@ -95,7 +95,7 @@ public final class MilitaryBaseAccess {
             if (soldier.level() != level || soldier.faction() != view.faction()
                     || !level.isPositionEntityTicking(soldier.blockPosition())
                     || soldier.commandRole() != MilitaryRole.TROOPER
-                    || soldier.getTarget() != null || soldier.isPassenger() || soldier.isVehicle()
+                    || soldier.getTarget() != null || soldier.isPassenger() || soldier.isVehicle() || MilitaryCampaignSystem.active(soldier)
                     || !MilitaryVehicle.crewOperational(soldier)
                     || MilitaryHomeSystem.currentBase(soldier).orElse(null) != base
                     || "field".equals(tag.getString(MilitaryHomeSystem.MODE_TAG))
