@@ -1,0 +1,780 @@
+[
+  {
+    "platform": "neoforge",
+    "id": "military_truck_chassis",
+    "ingredients": {
+      "minecraft:iron_block": 6,
+      "minecraft:copper_block": 2,
+      "minecraft:furnace": 1
+    },
+    "result": "blacklight:military_truck_chassis",
+    "count": 1,
+    "source": "src/main/resources/data/blacklight/recipe/military_truck_chassis.json",
+    "raw": {
+      "type": "minecraft:crafting_shaped",
+      "pattern": [
+        "ICI",
+        "IFI",
+        "ICI"
+      ],
+      "key": {
+        "I": {
+          "item": "minecraft:iron_block"
+        },
+        "C": {
+          "item": "minecraft:copper_block"
+        },
+        "F": {
+          "item": "minecraft:furnace"
+        }
+      },
+      "result": {
+        "id": "blacklight:military_truck_chassis",
+        "count": 1
+      }
+    },
+    "active": true,
+    "policy": "active"
+  },
+  {
+    "platform": "neoforge",
+    "id": "military_apc_chassis",
+    "ingredients": {
+      "minecraft:iron_block": 6,
+      "minecraft:redstone_block": 1,
+      "blacklight:military_truck_chassis": 1,
+      "minecraft:observer": 1
+    },
+    "result": "blacklight:military_apc_chassis",
+    "count": 1,
+    "source": "src/main/resources/data/blacklight/recipe/military_apc_chassis.json",
+    "raw": {
+      "type": "minecraft:crafting_shaped",
+      "pattern": [
+        "IRI",
+        "ITI",
+        "IOI"
+      ],
+      "key": {
+        "I": {
+          "item": "minecraft:iron_block"
+        },
+        "R": {
+          "item": "minecraft:redstone_block"
+        },
+        "T": {
+          "item": "blacklight:military_truck_chassis"
+        },
+        "O": {
+          "item": "minecraft:observer"
+        }
+      },
+      "result": {
+        "id": "blacklight:military_apc_chassis",
+        "count": 1
+      }
+    },
+    "active": true,
+    "policy": "active"
+  },
+  {
+    "platform": "neoforge",
+    "id": "military_tank_chassis",
+    "ingredients": {
+      "minecraft:iron_block": 6,
+      "minecraft:redstone_block": 1,
+      "blacklight:military_apc_chassis": 1,
+      "minecraft:dispenser": 1
+    },
+    "result": "blacklight:military_tank_chassis",
+    "count": 1,
+    "source": "src/main/resources/data/blacklight/recipe/military_tank_chassis.json",
+    "raw": {
+      "type": "minecraft:crafting_shaped",
+      "pattern": [
+        "IRI",
+        "IAI",
+        "IDI"
+      ],
+      "key": {
+        "I": {
+          "item": "minecraft:iron_block"
+        },
+        "R": {
+          "item": "minecraft:redstone_block"
+        },
+        "A": {
+          "item": "blacklight:military_apc_chassis"
+        },
+        "D": {
+          "item": "minecraft:dispenser"
+        }
+      },
+      "result": {
+        "id": "blacklight:military_tank_chassis",
+        "count": 1
+      }
+    },
+    "active": true,
+    "policy": "active"
+  },
+  {
+    "platform": "neoforge",
+    "id": "blackwatch_truck_chassis",
+    "ingredients": {
+      "blacklight:military_truck_chassis": 1,
+      "minecraft:black_dye": 1
+    },
+    "result": "blacklight:blackwatch_truck_chassis",
+    "count": 1,
+    "source": "src/main/resources/data/blacklight/recipe/blackwatch_truck_chassis.json",
+    "raw": {
+      "type": "minecraft:crafting_shapeless",
+      "ingredients": [
+        {
+          "item": "blacklight:military_truck_chassis"
+        },
+        {
+          "item": "minecraft:black_dye"
+        }
+      ],
+      "result": {
+        "id": "blacklight:blackwatch_truck_chassis",
+        "count": 1
+      }
+    },
+    "active": true,
+    "policy": "active"
+  },
+  {
+    "platform": "neoforge",
+    "id": "blackwatch_apc_chassis",
+    "ingredients": {
+      "blacklight:military_apc_chassis": 1,
+      "minecraft:black_dye": 1
+    },
+    "result": "blacklight:blackwatch_apc_chassis",
+    "count": 1,
+    "source": "src/main/resources/data/blacklight/recipe/blackwatch_apc_chassis.json",
+    "raw": {
+      "type": "minecraft:crafting_shapeless",
+      "ingredients": [
+        {
+          "item": "blacklight:military_apc_chassis"
+        },
+        {
+          "item": "minecraft:black_dye"
+        }
+      ],
+      "result": {
+        "id": "blacklight:blackwatch_apc_chassis",
+        "count": 1
+      }
+    },
+    "active": true,
+    "policy": "active"
+  },
+  {
+    "platform": "neoforge",
+    "id": "blackwatch_tank_chassis",
+    "ingredients": {
+      "blacklight:military_tank_chassis": 1,
+      "minecraft:black_dye": 1
+    },
+    "result": "blacklight:blackwatch_tank_chassis",
+    "count": 1,
+    "source": "src/main/resources/data/blacklight/recipe/blackwatch_tank_chassis.json",
+    "raw": {
+      "type": "minecraft:crafting_shapeless",
+      "ingredients": [
+        {
+          "item": "blacklight:military_tank_chassis"
+        },
+        {
+          "item": "minecraft:black_dye"
+        }
+      ],
+      "result": {
+        "id": "blacklight:blackwatch_tank_chassis",
+        "count": 1
+      }
+    },
+    "active": true,
+    "policy": "active"
+  },
+  {
+    "platform": "neoforge",
+    "id": "autocannon_round",
+    "ingredients": {
+      "minecraft:iron_ingot": 2,
+      "minecraft:copper_ingot": 1,
+      "minecraft:gunpowder": 1
+    },
+    "result": "blacklight:autocannon_round",
+    "count": 8,
+    "source": "src/main/resources/data/blacklight/recipe/autocannon_round.json",
+    "raw": {
+      "type": "minecraft:crafting_shapeless",
+      "ingredients": [
+        {
+          "item": "minecraft:iron_ingot"
+        },
+        {
+          "item": "minecraft:iron_ingot"
+        },
+        {
+          "item": "minecraft:copper_ingot"
+        },
+        {
+          "item": "minecraft:gunpowder"
+        }
+      ],
+      "result": {
+        "id": "blacklight:autocannon_round",
+        "count": 8
+      }
+    },
+    "active": true,
+    "policy": "active"
+  },
+  {
+    "platform": "neoforge",
+    "id": "tank_he_shell",
+    "ingredients": {
+      "minecraft:iron_ingot": 2,
+      "minecraft:gunpowder": 2,
+      "minecraft:copper_ingot": 1
+    },
+    "result": "blacklight:tank_he_shell",
+    "count": 1,
+    "source": "src/main/resources/data/blacklight/recipe/tank_he_shell.json",
+    "raw": {
+      "type": "minecraft:crafting_shapeless",
+      "ingredients": [
+        {
+          "item": "minecraft:iron_ingot"
+        },
+        {
+          "item": "minecraft:iron_ingot"
+        },
+        {
+          "item": "minecraft:gunpowder"
+        },
+        {
+          "item": "minecraft:gunpowder"
+        },
+        {
+          "item": "minecraft:copper_ingot"
+        }
+      ],
+      "result": {
+        "id": "blacklight:tank_he_shell",
+        "count": 1
+      }
+    },
+    "active": true,
+    "policy": "active"
+  },
+  {
+    "platform": "neoforge",
+    "id": "tank_ap_shell",
+    "ingredients": {
+      "minecraft:iron_ingot": 3,
+      "minecraft:gunpowder": 1,
+      "minecraft:copper_ingot": 1
+    },
+    "result": "blacklight:tank_ap_shell",
+    "count": 1,
+    "source": "src/main/resources/data/blacklight/recipe/tank_ap_shell.json",
+    "raw": {
+      "type": "minecraft:crafting_shapeless",
+      "ingredients": [
+        {
+          "item": "minecraft:iron_ingot"
+        },
+        {
+          "item": "minecraft:iron_ingot"
+        },
+        {
+          "item": "minecraft:iron_ingot"
+        },
+        {
+          "item": "minecraft:gunpowder"
+        },
+        {
+          "item": "minecraft:copper_ingot"
+        }
+      ],
+      "result": {
+        "id": "blacklight:tank_ap_shell",
+        "count": 1
+      }
+    },
+    "active": true,
+    "policy": "active"
+  },
+  {
+    "platform": "neoforge",
+    "id": "military_fuel_can",
+    "ingredients": {
+      "minecraft:coal": 4,
+      "minecraft:iron_ingot": 2,
+      "minecraft:glass_bottle": 1
+    },
+    "result": "blacklight:military_fuel_can",
+    "count": 1,
+    "source": "src/main/resources/data/blacklight/recipe/military_fuel_can.json",
+    "raw": {
+      "type": "minecraft:crafting_shapeless",
+      "ingredients": [
+        {
+          "item": "minecraft:coal"
+        },
+        {
+          "item": "minecraft:coal"
+        },
+        {
+          "item": "minecraft:coal"
+        },
+        {
+          "item": "minecraft:coal"
+        },
+        {
+          "item": "minecraft:iron_ingot"
+        },
+        {
+          "item": "minecraft:iron_ingot"
+        },
+        {
+          "item": "minecraft:glass_bottle"
+        }
+      ],
+      "result": {
+        "id": "blacklight:military_fuel_can",
+        "count": 1
+      }
+    },
+    "active": false,
+    "policy": "preserved_on_disk_excluded_from_game_build"
+  },
+  {
+    "platform": "neoforge",
+    "id": "vehicle_repair_parts",
+    "ingredients": {
+      "minecraft:iron_ingot": 2,
+      "minecraft:redstone": 1
+    },
+    "result": "blacklight:vehicle_repair_parts",
+    "count": 1,
+    "source": "src/main/resources/data/blacklight/recipe/vehicle_repair_parts.json",
+    "raw": {
+      "type": "minecraft:crafting_shapeless",
+      "ingredients": [
+        {
+          "item": "minecraft:iron_ingot"
+        },
+        {
+          "item": "minecraft:iron_ingot"
+        },
+        {
+          "item": "minecraft:redstone"
+        }
+      ],
+      "result": {
+        "id": "blacklight:vehicle_repair_parts",
+        "count": 1
+      }
+    },
+    "active": true,
+    "policy": "active"
+  },
+  {
+    "platform": "forge",
+    "id": "military_truck_chassis",
+    "ingredients": {
+      "minecraft:iron_block": 6,
+      "minecraft:copper_block": 2,
+      "minecraft:furnace": 1
+    },
+    "result": "blacklight:military_truck_chassis",
+    "count": 1,
+    "source": "src/main/resources/data/blacklight/recipes/military_truck_chassis.json",
+    "raw": {
+      "type": "minecraft:crafting_shaped",
+      "pattern": [
+        "ICI",
+        "IFI",
+        "ICI"
+      ],
+      "key": {
+        "I": {
+          "item": "minecraft:iron_block"
+        },
+        "C": {
+          "item": "minecraft:copper_block"
+        },
+        "F": {
+          "item": "minecraft:furnace"
+        }
+      },
+      "result": {
+        "item": "blacklight:military_truck_chassis",
+        "count": 1
+      }
+    },
+    "active": true,
+    "policy": "active"
+  },
+  {
+    "platform": "forge",
+    "id": "military_apc_chassis",
+    "ingredients": {
+      "minecraft:iron_block": 6,
+      "minecraft:redstone_block": 1,
+      "blacklight:military_truck_chassis": 1,
+      "minecraft:observer": 1
+    },
+    "result": "blacklight:military_apc_chassis",
+    "count": 1,
+    "source": "src/main/resources/data/blacklight/recipes/military_apc_chassis.json",
+    "raw": {
+      "type": "minecraft:crafting_shaped",
+      "pattern": [
+        "IRI",
+        "ITI",
+        "IOI"
+      ],
+      "key": {
+        "I": {
+          "item": "minecraft:iron_block"
+        },
+        "R": {
+          "item": "minecraft:redstone_block"
+        },
+        "T": {
+          "item": "blacklight:military_truck_chassis"
+        },
+        "O": {
+          "item": "minecraft:observer"
+        }
+      },
+      "result": {
+        "item": "blacklight:military_apc_chassis",
+        "count": 1
+      }
+    },
+    "active": true,
+    "policy": "active"
+  },
+  {
+    "platform": "forge",
+    "id": "military_tank_chassis",
+    "ingredients": {
+      "minecraft:iron_block": 6,
+      "minecraft:redstone_block": 1,
+      "blacklight:military_apc_chassis": 1,
+      "minecraft:dispenser": 1
+    },
+    "result": "blacklight:military_tank_chassis",
+    "count": 1,
+    "source": "src/main/resources/data/blacklight/recipes/military_tank_chassis.json",
+    "raw": {
+      "type": "minecraft:crafting_shaped",
+      "pattern": [
+        "IRI",
+        "IAI",
+        "IDI"
+      ],
+      "key": {
+        "I": {
+          "item": "minecraft:iron_block"
+        },
+        "R": {
+          "item": "minecraft:redstone_block"
+        },
+        "A": {
+          "item": "blacklight:military_apc_chassis"
+        },
+        "D": {
+          "item": "minecraft:dispenser"
+        }
+      },
+      "result": {
+        "item": "blacklight:military_tank_chassis",
+        "count": 1
+      }
+    },
+    "active": true,
+    "policy": "active"
+  },
+  {
+    "platform": "forge",
+    "id": "blackwatch_truck_chassis",
+    "ingredients": {
+      "blacklight:military_truck_chassis": 1,
+      "minecraft:black_dye": 1
+    },
+    "result": "blacklight:blackwatch_truck_chassis",
+    "count": 1,
+    "source": "src/main/resources/data/blacklight/recipes/blackwatch_truck_chassis.json",
+    "raw": {
+      "type": "minecraft:crafting_shapeless",
+      "ingredients": [
+        {
+          "item": "blacklight:military_truck_chassis"
+        },
+        {
+          "item": "minecraft:black_dye"
+        }
+      ],
+      "result": {
+        "item": "blacklight:blackwatch_truck_chassis",
+        "count": 1
+      }
+    },
+    "active": true,
+    "policy": "active"
+  },
+  {
+    "platform": "forge",
+    "id": "blackwatch_apc_chassis",
+    "ingredients": {
+      "blacklight:military_apc_chassis": 1,
+      "minecraft:black_dye": 1
+    },
+    "result": "blacklight:blackwatch_apc_chassis",
+    "count": 1,
+    "source": "src/main/resources/data/blacklight/recipes/blackwatch_apc_chassis.json",
+    "raw": {
+      "type": "minecraft:crafting_shapeless",
+      "ingredients": [
+        {
+          "item": "blacklight:military_apc_chassis"
+        },
+        {
+          "item": "minecraft:black_dye"
+        }
+      ],
+      "result": {
+        "item": "blacklight:blackwatch_apc_chassis",
+        "count": 1
+      }
+    },
+    "active": true,
+    "policy": "active"
+  },
+  {
+    "platform": "forge",
+    "id": "blackwatch_tank_chassis",
+    "ingredients": {
+      "blacklight:military_tank_chassis": 1,
+      "minecraft:black_dye": 1
+    },
+    "result": "blacklight:blackwatch_tank_chassis",
+    "count": 1,
+    "source": "src/main/resources/data/blacklight/recipes/blackwatch_tank_chassis.json",
+    "raw": {
+      "type": "minecraft:crafting_shapeless",
+      "ingredients": [
+        {
+          "item": "blacklight:military_tank_chassis"
+        },
+        {
+          "item": "minecraft:black_dye"
+        }
+      ],
+      "result": {
+        "item": "blacklight:blackwatch_tank_chassis",
+        "count": 1
+      }
+    },
+    "active": true,
+    "policy": "active"
+  },
+  {
+    "platform": "forge",
+    "id": "autocannon_round",
+    "ingredients": {
+      "minecraft:iron_ingot": 2,
+      "minecraft:copper_ingot": 1,
+      "minecraft:gunpowder": 1
+    },
+    "result": "blacklight:autocannon_round",
+    "count": 8,
+    "source": "src/main/resources/data/blacklight/recipes/autocannon_round.json",
+    "raw": {
+      "type": "minecraft:crafting_shapeless",
+      "ingredients": [
+        {
+          "item": "minecraft:iron_ingot"
+        },
+        {
+          "item": "minecraft:iron_ingot"
+        },
+        {
+          "item": "minecraft:copper_ingot"
+        },
+        {
+          "item": "minecraft:gunpowder"
+        }
+      ],
+      "result": {
+        "item": "blacklight:autocannon_round",
+        "count": 8
+      }
+    },
+    "active": true,
+    "policy": "active"
+  },
+  {
+    "platform": "forge",
+    "id": "tank_he_shell",
+    "ingredients": {
+      "minecraft:iron_ingot": 2,
+      "minecraft:gunpowder": 2,
+      "minecraft:copper_ingot": 1
+    },
+    "result": "blacklight:tank_he_shell",
+    "count": 1,
+    "source": "src/main/resources/data/blacklight/recipes/tank_he_shell.json",
+    "raw": {
+      "type": "minecraft:crafting_shapeless",
+      "ingredients": [
+        {
+          "item": "minecraft:iron_ingot"
+        },
+        {
+          "item": "minecraft:iron_ingot"
+        },
+        {
+          "item": "minecraft:gunpowder"
+        },
+        {
+          "item": "minecraft:gunpowder"
+        },
+        {
+          "item": "minecraft:copper_ingot"
+        }
+      ],
+      "result": {
+        "item": "blacklight:tank_he_shell",
+        "count": 1
+      }
+    },
+    "active": true,
+    "policy": "active"
+  },
+  {
+    "platform": "forge",
+    "id": "tank_ap_shell",
+    "ingredients": {
+      "minecraft:iron_ingot": 3,
+      "minecraft:gunpowder": 1,
+      "minecraft:copper_ingot": 1
+    },
+    "result": "blacklight:tank_ap_shell",
+    "count": 1,
+    "source": "src/main/resources/data/blacklight/recipes/tank_ap_shell.json",
+    "raw": {
+      "type": "minecraft:crafting_shapeless",
+      "ingredients": [
+        {
+          "item": "minecraft:iron_ingot"
+        },
+        {
+          "item": "minecraft:iron_ingot"
+        },
+        {
+          "item": "minecraft:iron_ingot"
+        },
+        {
+          "item": "minecraft:gunpowder"
+        },
+        {
+          "item": "minecraft:copper_ingot"
+        }
+      ],
+      "result": {
+        "item": "blacklight:tank_ap_shell",
+        "count": 1
+      }
+    },
+    "active": true,
+    "policy": "active"
+  },
+  {
+    "platform": "forge",
+    "id": "military_fuel_can",
+    "ingredients": {
+      "minecraft:coal": 4,
+      "minecraft:iron_ingot": 2,
+      "minecraft:glass_bottle": 1
+    },
+    "result": "blacklight:military_fuel_can",
+    "count": 1,
+    "source": "src/main/resources/data/blacklight/recipes/military_fuel_can.json",
+    "raw": {
+      "type": "minecraft:crafting_shapeless",
+      "ingredients": [
+        {
+          "item": "minecraft:coal"
+        },
+        {
+          "item": "minecraft:coal"
+        },
+        {
+          "item": "minecraft:coal"
+        },
+        {
+          "item": "minecraft:coal"
+        },
+        {
+          "item": "minecraft:iron_ingot"
+        },
+        {
+          "item": "minecraft:iron_ingot"
+        },
+        {
+          "item": "minecraft:glass_bottle"
+        }
+      ],
+      "result": {
+        "item": "blacklight:military_fuel_can",
+        "count": 1
+      }
+    },
+    "active": false,
+    "policy": "preserved_on_disk_excluded_from_game_build"
+  },
+  {
+    "platform": "forge",
+    "id": "vehicle_repair_parts",
+    "ingredients": {
+      "minecraft:iron_ingot": 2,
+      "minecraft:redstone": 1
+    },
+    "result": "blacklight:vehicle_repair_parts",
+    "count": 1,
+    "source": "src/main/resources/data/blacklight/recipes/vehicle_repair_parts.json",
+    "raw": {
+      "type": "minecraft:crafting_shapeless",
+      "ingredients": [
+        {
+          "item": "minecraft:iron_ingot"
+        },
+        {
+          "item": "minecraft:iron_ingot"
+        },
+        {
+          "item": "minecraft:redstone"
+        }
+      ],
+      "result": {
+        "item": "blacklight:vehicle_repair_parts",
+        "count": 1
+      }
+    },
+    "active": true,
+    "policy": "active"
+  }
+]

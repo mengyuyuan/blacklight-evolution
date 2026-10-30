@@ -1,0 +1,944 @@
+{
+  "weapon_models": [
+    {
+      "id": "military_rifle",
+      "elements": 34,
+      "display": {
+        "thirdperson_righthand": {
+          "rotation": [
+            -75,
+            0,
+            0
+          ],
+          "translation": [
+            0,
+            2,
+            1
+          ],
+          "scale": [
+            0.7,
+            0.7,
+            0.7
+          ]
+        },
+        "thirdperson_lefthand": {
+          "rotation": [
+            -75,
+            0,
+            0
+          ],
+          "translation": [
+            0,
+            2,
+            1
+          ],
+          "scale": [
+            0.7,
+            0.7,
+            0.7
+          ]
+        },
+        "firstperson_righthand": {
+          "rotation": [
+            0,
+            90,
+            -3
+          ],
+          "translation": [
+            -1,
+            0.75,
+            -1.5
+          ],
+          "scale": [
+            0.68,
+            0.68,
+            0.68
+          ]
+        },
+        "firstperson_lefthand": {
+          "rotation": [
+            0,
+            -90,
+            3
+          ],
+          "translation": [
+            -1,
+            0.75,
+            -1.5
+          ],
+          "scale": [
+            0.68,
+            0.68,
+            0.68
+          ]
+        },
+        "gui": {
+          "rotation": [
+            20,
+            -35,
+            -15
+          ],
+          "translation": [
+            -1,
+            0,
+            0
+          ],
+          "scale": [
+            0.7,
+            0.7,
+            0.7
+          ]
+        },
+        "ground": {
+          "translation": [
+            0,
+            3,
+            0
+          ],
+          "scale": [
+            0.5,
+            0.5,
+            0.5
+          ]
+        },
+        "fixed": {
+          "rotation": [
+            0,
+            0,
+            0
+          ],
+          "scale": [
+            0.7,
+            0.7,
+            0.7
+          ]
+        }
+      }
+    },
+    {
+      "id": "military_carbine",
+      "elements": 32,
+      "display": {
+        "thirdperson_righthand": {
+          "rotation": [
+            -75,
+            0,
+            0
+          ],
+          "translation": [
+            0,
+            2,
+            1
+          ],
+          "scale": [
+            0.7,
+            0.7,
+            0.7
+          ]
+        },
+        "thirdperson_lefthand": {
+          "rotation": [
+            -75,
+            0,
+            0
+          ],
+          "translation": [
+            0,
+            2,
+            1
+          ],
+          "scale": [
+            0.7,
+            0.7,
+            0.7
+          ]
+        },
+        "firstperson_righthand": {
+          "rotation": [
+            0,
+            90,
+            -3
+          ],
+          "translation": [
+            -1,
+            0.75,
+            -1.5
+          ],
+          "scale": [
+            0.68,
+            0.68,
+            0.68
+          ]
+        },
+        "firstperson_lefthand": {
+          "rotation": [
+            0,
+            -90,
+            3
+          ],
+          "translation": [
+            -1,
+            0.75,
+            -1.5
+          ],
+          "scale": [
+            0.68,
+            0.68,
+            0.68
+          ]
+        },
+        "gui": {
+          "rotation": [
+            20,
+            -35,
+            -15
+          ],
+          "translation": [
+            -1,
+            0,
+            0
+          ],
+          "scale": [
+            0.7,
+            0.7,
+            0.7
+          ]
+        },
+        "ground": {
+          "translation": [
+            0,
+            3,
+            0
+          ],
+          "scale": [
+            0.5,
+            0.5,
+            0.5
+          ]
+        },
+        "fixed": {
+          "rotation": [
+            0,
+            0,
+            0
+          ],
+          "scale": [
+            0.7,
+            0.7,
+            0.7
+          ]
+        }
+      }
+    },
+    {
+      "id": "military_machine_gun",
+      "elements": 36,
+      "display": {
+        "thirdperson_righthand": {
+          "rotation": [
+            -75,
+            0,
+            0
+          ],
+          "translation": [
+            0,
+            2,
+            1
+          ],
+          "scale": [
+            0.7,
+            0.7,
+            0.7
+          ]
+        },
+        "thirdperson_lefthand": {
+          "rotation": [
+            -75,
+            0,
+            0
+          ],
+          "translation": [
+            0,
+            2,
+            1
+          ],
+          "scale": [
+            0.7,
+            0.7,
+            0.7
+          ]
+        },
+        "firstperson_righthand": {
+          "rotation": [
+            0,
+            90,
+            -3
+          ],
+          "translation": [
+            -1,
+            0.75,
+            -1.5
+          ],
+          "scale": [
+            0.68,
+            0.68,
+            0.68
+          ]
+        },
+        "firstperson_lefthand": {
+          "rotation": [
+            0,
+            -90,
+            3
+          ],
+          "translation": [
+            -1,
+            0.75,
+            -1.5
+          ],
+          "scale": [
+            0.68,
+            0.68,
+            0.68
+          ]
+        },
+        "gui": {
+          "rotation": [
+            20,
+            -35,
+            -15
+          ],
+          "translation": [
+            -1,
+            0,
+            0
+          ],
+          "scale": [
+            0.7,
+            0.7,
+            0.7
+          ]
+        },
+        "ground": {
+          "translation": [
+            0,
+            3,
+            0
+          ],
+          "scale": [
+            0.5,
+            0.5,
+            0.5
+          ]
+        },
+        "fixed": {
+          "rotation": [
+            0,
+            0,
+            0
+          ],
+          "scale": [
+            0.7,
+            0.7,
+            0.7
+          ]
+        }
+      }
+    },
+    {
+      "id": "grenade_launcher",
+      "elements": 25,
+      "display": {
+        "thirdperson_righthand": {
+          "rotation": [
+            -75,
+            0,
+            0
+          ],
+          "translation": [
+            0,
+            2,
+            1
+          ],
+          "scale": [
+            0.7,
+            0.7,
+            0.7
+          ]
+        },
+        "thirdperson_lefthand": {
+          "rotation": [
+            -75,
+            0,
+            0
+          ],
+          "translation": [
+            0,
+            2,
+            1
+          ],
+          "scale": [
+            0.7,
+            0.7,
+            0.7
+          ]
+        },
+        "firstperson_righthand": {
+          "rotation": [
+            0,
+            90,
+            -3
+          ],
+          "translation": [
+            -1,
+            0.75,
+            -1.5
+          ],
+          "scale": [
+            0.64,
+            0.64,
+            0.64
+          ]
+        },
+        "firstperson_lefthand": {
+          "rotation": [
+            0,
+            -90,
+            3
+          ],
+          "translation": [
+            -1,
+            0.75,
+            -1.5
+          ],
+          "scale": [
+            0.64,
+            0.64,
+            0.64
+          ]
+        },
+        "gui": {
+          "rotation": [
+            20,
+            -35,
+            -15
+          ],
+          "translation": [
+            -1,
+            0,
+            0
+          ],
+          "scale": [
+            0.7,
+            0.7,
+            0.7
+          ]
+        },
+        "ground": {
+          "translation": [
+            0,
+            3,
+            0
+          ],
+          "scale": [
+            0.5,
+            0.5,
+            0.5
+          ]
+        },
+        "fixed": {
+          "rotation": [
+            0,
+            0,
+            0
+          ],
+          "scale": [
+            0.7,
+            0.7,
+            0.7
+          ]
+        }
+      }
+    },
+    {
+      "id": "rocket_launcher",
+      "elements": 20,
+      "display": {
+        "thirdperson_righthand": {
+          "rotation": [
+            -75,
+            0,
+            0
+          ],
+          "translation": [
+            0,
+            2,
+            1
+          ],
+          "scale": [
+            0.7,
+            0.7,
+            0.7
+          ]
+        },
+        "thirdperson_lefthand": {
+          "rotation": [
+            -75,
+            0,
+            0
+          ],
+          "translation": [
+            0,
+            2,
+            1
+          ],
+          "scale": [
+            0.7,
+            0.7,
+            0.7
+          ]
+        },
+        "firstperson_righthand": {
+          "rotation": [
+            0,
+            90,
+            -3
+          ],
+          "translation": [
+            -1,
+            0.75,
+            -1.5
+          ],
+          "scale": [
+            0.57,
+            0.57,
+            0.57
+          ]
+        },
+        "firstperson_lefthand": {
+          "rotation": [
+            0,
+            -90,
+            3
+          ],
+          "translation": [
+            -1,
+            0.75,
+            -1.5
+          ],
+          "scale": [
+            0.57,
+            0.57,
+            0.57
+          ]
+        },
+        "gui": {
+          "rotation": [
+            20,
+            -35,
+            -15
+          ],
+          "translation": [
+            -1,
+            0,
+            0
+          ],
+          "scale": [
+            0.7,
+            0.7,
+            0.7
+          ]
+        },
+        "ground": {
+          "translation": [
+            0,
+            3,
+            0
+          ],
+          "scale": [
+            0.5,
+            0.5,
+            0.5
+          ]
+        },
+        "fixed": {
+          "rotation": [
+            0,
+            0,
+            0
+          ],
+          "scale": [
+            0.7,
+            0.7,
+            0.7
+          ]
+        }
+      }
+    },
+    {
+      "id": "missile_launcher",
+      "elements": 22,
+      "display": {
+        "thirdperson_righthand": {
+          "rotation": [
+            -75,
+            0,
+            0
+          ],
+          "translation": [
+            0,
+            2,
+            1
+          ],
+          "scale": [
+            0.7,
+            0.7,
+            0.7
+          ]
+        },
+        "thirdperson_lefthand": {
+          "rotation": [
+            -75,
+            0,
+            0
+          ],
+          "translation": [
+            0,
+            2,
+            1
+          ],
+          "scale": [
+            0.7,
+            0.7,
+            0.7
+          ]
+        },
+        "firstperson_righthand": {
+          "rotation": [
+            0,
+            90,
+            -3
+          ],
+          "translation": [
+            -1,
+            0.75,
+            -1.5
+          ],
+          "scale": [
+            0.57,
+            0.57,
+            0.57
+          ]
+        },
+        "firstperson_lefthand": {
+          "rotation": [
+            0,
+            -90,
+            3
+          ],
+          "translation": [
+            -1,
+            0.75,
+            -1.5
+          ],
+          "scale": [
+            0.57,
+            0.57,
+            0.57
+          ]
+        },
+        "gui": {
+          "rotation": [
+            20,
+            -35,
+            -15
+          ],
+          "translation": [
+            -1,
+            0,
+            0
+          ],
+          "scale": [
+            0.7,
+            0.7,
+            0.7
+          ]
+        },
+        "ground": {
+          "translation": [
+            0,
+            3,
+            0
+          ],
+          "scale": [
+            0.5,
+            0.5,
+            0.5
+          ]
+        },
+        "fixed": {
+          "rotation": [
+            0,
+            0,
+            0
+          ],
+          "scale": [
+            0.7,
+            0.7,
+            0.7
+          ]
+        }
+      }
+    },
+    {
+      "id": "thermobaric_launcher",
+      "elements": 22,
+      "display": {
+        "thirdperson_righthand": {
+          "rotation": [
+            -75,
+            0,
+            0
+          ],
+          "translation": [
+            0,
+            2,
+            1
+          ],
+          "scale": [
+            0.7,
+            0.7,
+            0.7
+          ]
+        },
+        "thirdperson_lefthand": {
+          "rotation": [
+            -75,
+            0,
+            0
+          ],
+          "translation": [
+            0,
+            2,
+            1
+          ],
+          "scale": [
+            0.7,
+            0.7,
+            0.7
+          ]
+        },
+        "firstperson_righthand": {
+          "rotation": [
+            0,
+            90,
+            -3
+          ],
+          "translation": [
+            -1,
+            0.75,
+            -1.5
+          ],
+          "scale": [
+            0.57,
+            0.57,
+            0.57
+          ]
+        },
+        "firstperson_lefthand": {
+          "rotation": [
+            0,
+            -90,
+            3
+          ],
+          "translation": [
+            -1,
+            0.75,
+            -1.5
+          ],
+          "scale": [
+            0.57,
+            0.57,
+            0.57
+          ]
+        },
+        "gui": {
+          "rotation": [
+            20,
+            -35,
+            -15
+          ],
+          "translation": [
+            -1,
+            0,
+            0
+          ],
+          "scale": [
+            0.7,
+            0.7,
+            0.7
+          ]
+        },
+        "ground": {
+          "translation": [
+            0,
+            3,
+            0
+          ],
+          "scale": [
+            0.5,
+            0.5,
+            0.5
+          ]
+        },
+        "fixed": {
+          "rotation": [
+            0,
+            0,
+            0
+          ],
+          "scale": [
+            0.7,
+            0.7,
+            0.7
+          ]
+        }
+      }
+    },
+    {
+      "id": "infection_launcher",
+      "elements": 22,
+      "display": {
+        "thirdperson_righthand": {
+          "rotation": [
+            -75,
+            0,
+            0
+          ],
+          "translation": [
+            0,
+            2,
+            1
+          ],
+          "scale": [
+            0.7,
+            0.7,
+            0.7
+          ]
+        },
+        "thirdperson_lefthand": {
+          "rotation": [
+            -75,
+            0,
+            0
+          ],
+          "translation": [
+            0,
+            2,
+            1
+          ],
+          "scale": [
+            0.7,
+            0.7,
+            0.7
+          ]
+        },
+        "firstperson_righthand": {
+          "rotation": [
+            0,
+            90,
+            -3
+          ],
+          "translation": [
+            -1,
+            0.75,
+            -1.5
+          ],
+          "scale": [
+            0.57,
+            0.57,
+            0.57
+          ]
+        },
+        "firstperson_lefthand": {
+          "rotation": [
+            0,
+            -90,
+            3
+          ],
+          "translation": [
+            -1,
+            0.75,
+            -1.5
+          ],
+          "scale": [
+            0.57,
+            0.57,
+            0.57
+          ]
+        },
+        "gui": {
+          "rotation": [
+            20,
+            -35,
+            -15
+          ],
+          "translation": [
+            -1,
+            0,
+            0
+          ],
+          "scale": [
+            0.7,
+            0.7,
+            0.7
+          ]
+        },
+        "ground": {
+          "translation": [
+            0,
+            3,
+            0
+          ],
+          "scale": [
+            0.5,
+            0.5,
+            0.5
+          ]
+        },
+        "fixed": {
+          "rotation": [
+            0,
+            0,
+            0
+          ],
+          "scale": [
+            0.7,
+            0.7,
+            0.7
+          ]
+        }
+      }
+    }
+  ],
+  "FirearmViewEvents.java": {
+    "source": "src/main/java/com/codex/blacklight/firearms/FirearmViewEvents.java",
+    "sha256": "1b6e40c4bd3ad861c759d627919252b8c31f56355c60572fa0889b2a4144f035"
+  },
+  "first_person_transforms_raw": [
+    "pose.translate(-sign * .13, .035 - frame.reload() * .11, frame.recoil() * .065);",
+    "pose.mulPose(Axis.XP.rotationDegrees(frame.recoil() * 4.5F + frame.reload() * 8));",
+    "pose.mulPose(Axis.ZP.rotationDegrees(sign * frame.reload() * 7));"
+  ],
+  "FirearmViewState.java": {
+    "source": "src/main/java/com/codex/blacklight/firearms/FirearmViewState.java",
+    "sha256": "73af3181f3d55439c9c3d55981c1a8ca5bd044ef5040974df22a269526cf6e82"
+  },
+  "frame_formula_raw": "double age = now - shotAt;\n        float recoil = age >= 0 && age < 8 ? (float) Math.pow(1 - age / 8, 2) : 0;\n        double remaining = reloadEnd - now;\n        float reload = reloadDuration > 0 && remaining > 0 && remaining <= reloadDuration\n                ? (float) Math.sin(Math.PI * remaining / reloadDuration) : 0;\n        return new Frame(recoil, reload);",
+  "muzzle_distance": [
+    ".95"
+  ],
+  "tracer_loop_raw": [
+    "for(double t=2.5;t<start.distanceTo(end);t+=2.5)"
+  ]
+}

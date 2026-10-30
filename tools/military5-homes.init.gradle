@@ -1,0 +1,15 @@
+allprojects { afterEvaluate {
+    sourceSets.main.java.srcDir('src/homeTest/java')
+    sourceSets.main.resources.srcDir('src/blackwatchTest/resources')
+    sourceSets.main.resources.srcDir('src/cityMilitaryTest/resources')
+    def stageHome5Run = tasks.register('stageHome5Run', Sync) {
+        dependsOn tasks.named('classes')
+        from sourceSets.main.output
+        into layout.buildDirectory.dir('home5-run-mod')
+    }
+    tasks.named('runGameTestServer').configure {
+        dependsOn stageHome5Run
+        doFirst { environment 'MOD_CLASSES', 'blacklight%%' + layout.buildDirectory.dir('home5-run-mod').get().asFile.absolutePath }
+    }
+} }
+allprojects { tasks.withType(ProcessResources).configureEach { filteringCharset = 'UTF-8' } }

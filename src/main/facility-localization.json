@@ -1,0 +1,20 @@
+{
+  "zh_cn": {
+    "block.blacklight.field_barrier": "军用混凝土路障",
+    "block.blacklight.sandbag_cover": "沙袋掩体",
+    "block.blacklight.military_crate": "军用装饰箱（无库存）",
+    "block.blacklight.command_terminal": "装饰指挥终端",
+    "block.blacklight.communications_antenna": "通信天线",
+    "block.blacklight.military_searchlight": "军用探照灯",
+    "itemGroup.blacklight.military_facilities": "黑光：军事设施"
+  },
+  "en_us": {
+    "block.blacklight.field_barrier": "Military Concrete Barrier",
+    "block.blacklight.sandbag_cover": "Sandbag Cover",
+    "block.blacklight.military_crate": "Military Prop Crate (No Storage)",
+    "block.blacklight.command_terminal": "Decorative Command Terminal",
+    "block.blacklight.communications_antenna": "Communications Antenna",
+    "block.blacklight.military_searchlight": "Military Searchlight",
+    "itemGroup.blacklight.military_facilities": "Blacklight: Military Facilities"
+  }
+}

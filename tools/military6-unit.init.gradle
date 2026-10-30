@@ -1,0 +1,18 @@
+// Explicit QA only. Invalid vanilla UUID arguments initialize Language; use the
+// real version-matched Minecraft asset JAR rather than a fabricated translation.
+allprojects { afterEvaluate {
+    def nativeAssets = project.fileTree(project.layout.buildDirectory.dir('moddev/artifacts')).matching {
+        include '*-client-extra-aka-minecraft-resources.jar'
+    }.files.toList()
+    if (nativeAssets.isEmpty()) {
+        def classpathFile = new File(project.projectDir, 'build/classpath/runGameTestServer_minecraftClasspath.txt')
+        if (classpathFile.isFile()) nativeAssets = classpathFile.readLines('UTF-8')
+                .findAll { it.endsWith('client-extra.jar') }.collect { new File(it) }.findAll { it.isFile() }.unique()
+    }
+    if (nativeAssets.size() != 1) throw new GradleException('Build the matching native game artifacts before military6 unit QA')
+    tasks.withType(Test).configureEach { classpath += files(nativeAssets) }
+} }
+allprojects {
+    tasks.withType(ProcessResources).configureEach { filteringCharset = 'UTF-8' }
+    tasks.matching { it.name == 'generateModMetadata' }.configureEach { outputs.upToDateWhen { false } }
+}

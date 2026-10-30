@@ -1,0 +1,15 @@
+{
+  "military2_geometry_and_uv_preserved": true,
+  "original_piece_count": 110,
+  "baseline_source_sha256": "aff76ad77296d660ec87b0df3abe0826601353056779930e46f6d152160bae83",
+  "candidate_source_sha256": "d5e2fe99f0a428c3531b5839ce0a0e36b450917956949f785e97019959470d28",
+  "trooper_renders": {
+    "uniform-military": "385fd6eef11f78b48a771edacee720ceb166d2da52da065af81d8ff7587310d3",
+    "uniform-blackwatch": "ed7bde9664b6b935eb07703534da2acf1690528bf454ad65bc1acd1d90fbba3e",
+    "military-regular": "f59794eb45dc374edfb55f520cb248fe9eb416f4a1de6589b2cf18cf35f4ebb5",
+    "military-heavy": "424cd8577787e30fdca2714597d81fc80bdc12565380da05d4d056548e1ced6b",
+    "blackwatch-regular": "efd89d6476a7de11c818906ca9c7a10a7b44d174096d6d9071c1402ba901161a",
+    "blackwatch-heavy": "641d539b33dfd8be87fe70e0f819fc2c55427ba748bbc0d649abbd5fc0f984e7"
+  },
+  "military2_existing_uv_pixel_regions_preserved": true
+}

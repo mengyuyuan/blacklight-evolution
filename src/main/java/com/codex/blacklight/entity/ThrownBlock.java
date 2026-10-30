@@ -155,12 +155,19 @@ public final class ThrownBlock extends Projectile {
         if(level().isClientSide){setPos(position().add(getDeltaMovement()));setDeltaMovement(BlockThrowBallistics.nextVelocity(getDeltaMovement(),isInWater()));return;}
         if(!armed){discard();return;}
         var start=position();var velocity=getDeltaMovement();var end=start.add(velocity);
-        if(!level().hasChunkAt(net.minecraft.core.BlockPos.containing(end))||age>BlockThrowBallistics.LIFE||getY()<level().getMinBuildHeight()){drop();return;}
+        if(!Double.isFinite(velocity.lengthSqr())||velocity.lengthSqr()>64*64||!BlockThrowCollision.loaded(level(),start,end,cargo().half())||age>BlockThrowBallistics.LIFE||getY()<level().getMinBuildHeight()){drop();return;}
         var wall=BlockThrowCollision.block(level(),this,start,end,cargo().half());if(wall!=null)end=wall;
         var victim=BlockThrowCollision.entity(level(),this,start,end,cargo().half(),this::canHitEntity);
-        if(victim!=null||wall!=null){
-            Vec3 impact=victim!=null?victim.getLocation():wall;
+        var mechanical=com.codex.blacklight.military.vehicle.VehiclePhysicalDamageBridge.nearest((net.minecraft.server.level.ServerLevel)level(),this,start,end,cargo().half());
+        double wallDistance=wall==null?Double.POSITIVE_INFINITY:start.distanceTo(wall);
+        if(victim!=null&&start.distanceTo(victim.getLocation())>=wallDistance-1e-5)victim=null;
+        if(mechanical!=null&&mechanical.distance()>=wallDistance-1e-5)mechanical=null;
+        if(mechanical!=null&&victim!=null){if(mechanical.distance()<=start.distanceTo(victim.getLocation())+1e-5)victim=null;else mechanical=null;}
+        if(victim!=null||mechanical!=null||wall!=null){
+            Vec3 impact=mechanical!=null?mechanical.point():victim!=null?victim.getLocation():wall;
             setPos(impact);
+            if(mechanical!=null&&getOwner() instanceof LivingEntity actor)
+                com.codex.blacklight.military.vehicle.VehicleDamageBridge.hurtPhysical(actor,mechanical.vehicle(),impactDamage,this);
             if(victim!=null&&victim.getEntity() instanceof LivingEntity target&&allowed(target)){
                 if(target.hurt(damageSources().thrown(this,getOwner()),impactDamage)){
                     var push=velocity.normalize().scale(impactKnockback);

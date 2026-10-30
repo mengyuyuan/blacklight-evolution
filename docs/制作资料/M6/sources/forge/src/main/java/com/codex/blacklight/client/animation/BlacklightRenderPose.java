@@ -1,0 +1,84 @@
+package com.codex.blacklight.client.animation;
+
+import com.codex.blacklight.animation.*;
+import com.codex.blacklight.combat.ConsumeVisual;
+import com.codex.blacklight.power.PowerForm;
+import com.codex.blacklight.registry.ModAttachments;
+import net.minecraft.world.entity.LivingEntity;
+
+/** Applies gameplay-driven pose constraints once, before any skin, armour or limb layer samples it. */
+public final class BlacklightRenderPose {
+    private BlacklightRenderPose() { }
+    public static BlacklightPose sample(LivingEntity entity, float partial) {
+        if(entity instanceof net.minecraft.world.entity.player.Player&&entity.getVehicle() instanceof com.codex.blacklight.entity.MilitaryVehicle vehicle){
+            String seat=vehicle.seatOf(entity.getUUID());
+            boolean driver=vehicle.definition().seats().stream().anyMatch(s->s.id().equals(seat)&&s.job()==com.codex.blacklight.military.vehicle.VehicleDefinition.Job.DRIVER);
+            return com.codex.blacklight.client.vehicle.VehicleSeatPose.skeleton(driver,net.minecraft.util.Mth.wrapDegrees(entity.getViewYRot(partial)+vehicle.getYRot()),entity.getViewXRot(partial),com.codex.blacklight.client.vehicle.VehicleSeatPose.drop(vehicle.definition()));
+        }
+        if(entity instanceof net.minecraft.world.entity.player.Player p){var hydra=HydraPlayerPose.sample(p,partial);if(hydra!=null)return hydra;}
+        var skeleton = PlayerMotionController.skeleton();
+        var pose = PlayerMotionController.pose(entity, partial);
+        if(entity instanceof net.minecraft.world.entity.player.Player p){var throwing=BlockThrowPose.sample(p,partial);if(throwing!=null)return throwing;}
+        NativeHeadLook.apply(entity,pose,partial);
+        if (!NativeHitPose.apply(entity, skeleton, pose, partial)) ConsumeVictimPose.epic(entity, pose, partial);
+        if (com.codex.blacklight.registry.ModAttachments.getData(entity, ModAttachments.GRAB_STAGE) == ConsumeVisual.HOLD) {
+            String key = com.codex.blacklight.registry.ModAttachments.getData(entity, ModAttachments.PLAYER_STATE).getActivePower() == PowerForm.BLADE && (!(entity instanceof net.minecraft.world.entity.player.Player p)||com.codex.blacklight.combat.BlockThrowSystem.held(p)==null) ? "grab_blade_hold" : "grab_hold";
+            var held = MotionLibrary.pose(key, (entity.tickCount + partial) / 20F, true);
+            for (String joint : new String[]{"Torso", "Chest", "Head", "Shoulder_R", "Arm_R", "Elbow_R", "Hand_R", "Tool_R", "Shoulder_L", "Arm_L", "Elbow_L", "Hand_L", "Tool_L"})
+                pose.getJointTransformData().put(joint, held.orElseEmpty(joint).copy());
+        }
+        if (!NativeConsumePose.actor(entity, pose, partial)) GrabHoldPose.apply(entity, skeleton, pose, partial);
+        ConsumeGripPose.apply(entity, skeleton, pose, partial);
+        var wall=com.codex.blacklight.movement.WallPoseState.get(entity);
+        if(wall!=null) {
+            var velocity=entity.getDeltaMovement();
+            if(wall.mode()==com.codex.blacklight.movement.WallTraversal.Mode.RUN) {
+                double right=velocity.x*wall.normalZ()-velocity.z*wall.normalX();
+                double up=WallSurfacePose.normalizeRunVertical(right,velocity.y,entity.onGround(),wall.retiring());
+                // A paused editor frame has an authored direction, rather than the
+                // player's residual gravity. Live wall travel still uses authority velocity.
+                String preview=PlayerMotionController.previewKey(entity);
+                if(preview!=null)switch(preview) {
+                    case "basic_wall_run_up" -> {right=0;up=1;}
+                    case "basic_wall_run_right" -> {right=1;up=0;}
+                    case "basic_wall_run_left" -> {right=-1;up=0;}
+                    case "basic_wall_run_diag_right" -> {right=1;up=1;}
+                    case "basic_wall_run_diag_left" -> {right=-1;up=1;}
+                    default -> { }
+                }
+                WallSurfacePose.orientRun(pose,skeleton,right,up,entity.getBbWidth()*.5F);
+            }
+            if(wall.mode()!=com.codex.blacklight.movement.WallTraversal.Mode.TOP
+                    &&wall.mode()!=com.codex.blacklight.movement.WallTraversal.Mode.PARKOUR)
+                WallSurfacePose.clearSkin(pose,skeleton,entity.getBbWidth()*.5F);
+            WallSurfacePose.faceWall(pose,skeleton,new org.joml.Matrix4f()
+                    .rotationY((float)Math.toRadians(180-facing(entity,partial))).scale(.9375F),wall.normalX(),wall.normalZ());
+        }
+        WallContactPose.apply(entity, skeleton, pose, partial);
+        var weapon=ModAttachments.getData(entity,ModAttachments.WEAPON_VISUAL);
+        if(wall==null&&entity.onGround()&&weapon.spec()==com.codex.blacklight.combat.WeaponMove.HAMMER_RAM
+                &&!weapon.charging())HammerGroundContact.apply(pose);
+        return pose;
+    }
+    public static float facing(LivingEntity entity,float partial) {
+        if(entity.getVehicle() instanceof com.codex.blacklight.entity.MilitaryVehicle vehicle)return -net.minecraft.util.Mth.rotLerp(partial,vehicle.yRotO,vehicle.getYRot());
+        if(entity instanceof net.minecraft.world.entity.player.Player p){var h=com.codex.blacklight.city.HydraTransport.carrier(p);if(h!=null)return h.getYRot();}
+        if(entity instanceof net.minecraft.world.entity.player.Player p&&com.codex.blacklight.combat.BlockThrowMotion.active(p))return com.codex.blacklight.combat.BlockThrowMotion.yaw(p,partial);
+        return PlayerMotionController.facing(entity,partial);
+    }
+    public static float rawFacing(LivingEntity entity,float partial) {
+        var dodge=com.codex.blacklight.registry.ModAttachments.getData(entity,ModAttachments.PLAYER_ACTION);
+        if(dodge.clipId().equals("basic_dodge_roll")&&dodge.active(entity.level().getGameTime()+partial))return dodge.yaw();
+        float body=net.minecraft.util.Mth.rotLerp(partial,entity.yBodyRotO,entity.yBodyRot);
+        var weapon=com.codex.blacklight.registry.ModAttachments.getData(entity, ModAttachments.WEAPON_VISUAL);
+        float facing=NativeConsumePose.facing(entity,weapon.spec()==null?entity.getYRot():weapon.yaw(),partial);
+        if(entity instanceof net.minecraft.client.player.AbstractClientPlayer player) {
+            Float movement=com.codex.blacklight.client.PrototypeAnimationController.movementFacing(player,partial);
+            var morph=com.codex.blacklight.registry.ModAttachments.getData(player, ModAttachments.POWER_MORPH);
+            if(morph.visible(player,partial))movement=morph.facing();
+            if(com.codex.blacklight.registry.ModAttachments.getData(player, ModAttachments.GRAB_STAGE)==0&&weapon.spec()==null&&movement!=null)return movement;
+            if(com.codex.blacklight.registry.ModAttachments.getData(player, ModAttachments.GRAB_STAGE)==0&&weapon.spec()==null&&!morph.visible(player,partial))return body;
+        }
+        return facing;
+    }
+}

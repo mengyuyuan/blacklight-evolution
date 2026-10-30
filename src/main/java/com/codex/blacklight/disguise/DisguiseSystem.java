@@ -112,6 +112,8 @@ public final class DisguiseSystem {
     }
     /** Consumption completes without a damage event for ordinary receivers. */
     public static void consumed(ServerPlayer p,LivingEntity victim){hostileAct(p,victim,false);}
+    /** Actual crew extraction uses the same victim/witness recognition as a hostile contact. */
+    public static void vehicleHostileAct(ServerPlayer p,LivingEntity victim){hostileAct(p,victim);}
     public static void speciesAttack(ServerPlayer p){
         if(active(p)&&!witnesses(p).isEmpty()){DisguiseAwareness.expose(p,true);syncAlert(p);}
     }
@@ -143,7 +145,7 @@ public final class DisguiseSystem {
         if(newlyExposed&&disguised)message(p,"disguise_exposed");
     }
     private static boolean recognizer(Mob mob){
-        return mob instanceof com.codex.blacklight.entity.BlackwatchSoldier || mob instanceof Monster&&BuiltInRegistries.ENTITY_TYPE.getKey(mob.getType()).getNamespace().equals("minecraft");
+        return mob instanceof com.codex.blacklight.entity.MilitarySoldier || mob instanceof Monster&&BuiltInRegistries.ENTITY_TYPE.getKey(mob.getType()).getNamespace().equals("minecraft");
     }
     private static boolean sees(Mob mob,ServerPlayer p){
         if(!mob.isAlive()||mob.isNoAi()||!recognizer(mob)||!mob.hasLineOfSight(p))return false;
@@ -165,9 +167,9 @@ public final class DisguiseSystem {
                 ?mob.getBrain().getMemory(type):java.util.Optional.empty();
     }
     private static boolean factionMatches(Mob mob,Player p){
-        if(mob instanceof com.codex.blacklight.entity.BlackwatchSoldier){
+        if(mob instanceof com.codex.blacklight.entity.MilitarySoldier){
             var identity=p.getData(ModAttachments.DISGUISE_IDENTITY);
-            return identity.family().equals("blackwatch")||identity.family().equals("civilian")||identity.family().equals("animal");
+            return identity.family().equals("blackwatch")||identity.family().equals("military")||identity.family().equals("civilian")||identity.family().equals("animal");
         }
         if(!BuiltInRegistries.ENTITY_TYPE.getKey(mob.getType()).getNamespace().equals("minecraft"))return false;
         var id=p.getData(ModAttachments.DISGUISE_IDENTITY);

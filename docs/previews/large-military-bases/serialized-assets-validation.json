@@ -1,0 +1,40 @@
+[
+  {
+    "name": "large_military_base",
+    "size": [
+      65,
+      18,
+      65
+    ],
+    "entities": 0,
+    "chests": 13,
+    "custom_scene_ids": [
+      "command_terminal",
+      "communications_antenna",
+      "field_barrier",
+      "military_crate",
+      "military_searchlight",
+      "sandbag_cover"
+    ],
+    "status": "PASS"
+  },
+  {
+    "name": "large_blackwatch_base",
+    "size": [
+      65,
+      18,
+      81
+    ],
+    "entities": 0,
+    "chests": 14,
+    "custom_scene_ids": [
+      "command_terminal",
+      "communications_antenna",
+      "field_barrier",
+      "military_crate",
+      "military_searchlight",
+      "sandbag_cover"
+    ],
+    "status": "PASS"
+  }
+]

@@ -1,0 +1,94 @@
+[
+  {
+    "profile": "WARDEN",
+    "source_species": "minecraft:warden",
+    "family": "ground",
+    "locomotion_width": 6.0,
+    "locomotion_height": 30.0,
+    "visual_width": 34.5,
+    "visual_depth": 19.08,
+    "visual_height": 36.0,
+    "base_health": 700.0,
+    "attack_attribute": 10.0,
+    "movement_speed": 0.27,
+    "local_visual_bounds": [
+      -17.61,
+      0.0,
+      -9.55,
+      16.92,
+      36.01,
+      9.56
+    ],
+    "note": "infected_host 的资料档，不是单独注册ID；巨型时bodyScale=1，紧凑型依宿主/成长缩放",
+    "resource_path": "src/main/resources/assets/blacklight/infected_models/warden.json"
+  },
+  {
+    "profile": "IRON_GOLEM",
+    "source_species": "minecraft:iron_golem",
+    "family": "ground",
+    "locomotion_width": 6.0,
+    "locomotion_height": 26.0,
+    "visual_width": 32.18,
+    "visual_depth": 19.23,
+    "visual_height": 30.0,
+    "base_health": 500.0,
+    "attack_attribute": 9.0,
+    "movement_speed": 0.25,
+    "local_visual_bounds": [
+      -17.1,
+      0.0,
+      -10.07,
+      15.11,
+      30.01,
+      9.19
+    ],
+    "note": "infected_host 的资料档，不是单独注册ID；巨型时bodyScale=1，紧凑型依宿主/成长缩放",
+    "resource_path": "src/main/resources/assets/blacklight/infected_models/iron_golem.json"
+  },
+  {
+    "profile": "WITHER",
+    "source_species": "minecraft:wither",
+    "family": "air",
+    "locomotion_width": 6.0,
+    "locomotion_height": 32.0,
+    "visual_width": 30.38,
+    "visual_depth": 13.4,
+    "visual_height": 40.0,
+    "base_health": 800.0,
+    "attack_attribute": 8.0,
+    "movement_speed": 0.3,
+    "local_visual_bounds": [
+      -15.22,
+      0.0,
+      -5.38,
+      15.2,
+      40.01,
+      8.05
+    ],
+    "note": "infected_host 的资料档，不是单独注册ID；巨型时bodyScale=1，紧凑型依宿主/成长缩放",
+    "resource_path": "src/main/resources/assets/blacklight/infected_models/wither.json"
+  },
+  {
+    "profile": "ENDER_DRAGON",
+    "source_species": "minecraft:ender_dragon",
+    "family": "air",
+    "locomotion_width": 12.0,
+    "locomotion_height": 22.0,
+    "visual_width": 112.0,
+    "visual_depth": 104.68,
+    "visual_height": 37.75,
+    "base_health": 1000.0,
+    "attack_attribute": 10.0,
+    "movement_speed": 0.32,
+    "local_visual_bounds": [
+      -56.02,
+      0.0,
+      -42.84,
+      56.02,
+      37.77,
+      61.88
+    ],
+    "note": "infected_host 的资料档，不是单独注册ID；巨型时bodyScale=1，紧凑型依宿主/成长缩放",
+    "resource_path": "src/main/resources/assets/blacklight/infected_models/ender_dragon.json"
+  }
+]

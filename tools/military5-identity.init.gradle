@@ -1,0 +1,15 @@
+// Opt-in actual capture/library/selection integration. No production source or build changes.
+allprojects { afterEvaluate {
+    sourceSets.main.java.srcDir('src/identityMilitaryTest/java')
+    sourceSets.main.resources.srcDir('src/blackwatchTest/resources')
+    def stageMilitaryIdentity5Run = tasks.register('stageMilitaryIdentity5Run', Sync) {
+        dependsOn tasks.named('classes')
+        from sourceSets.main.output
+        into layout.buildDirectory.dir('military-identity5-run-mod')
+    }
+    tasks.named('runGameTestServer').configure {
+        dependsOn stageMilitaryIdentity5Run
+        doFirst { environment 'MOD_CLASSES', 'blacklight%%' + layout.buildDirectory.dir('military-identity5-run-mod').get().asFile.absolutePath }
+    }
+} }
+allprojects { tasks.withType(ProcessResources).configureEach { filteringCharset = 'UTF-8' }; tasks.matching { it.name == 'generateModMetadata' }.configureEach { outputs.upToDateWhen { false } } }

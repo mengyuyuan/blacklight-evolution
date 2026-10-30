@@ -4,6 +4,11 @@
   "package": "com.codex.blacklight.mixin",
   "compatibilityLevel": "JAVA_21",
   "mixins": [
+    "VehicleEntityCollisionMixin",
+    "OptionalLithiumVehicleCollisionMixin",
+    "OptionalLithiumCollisionContextMixin",
+    "OptionalLithiumCollisionIteratorMixin",
+    "VehicleProjectileCollisionMixin",
     "OptionalTwilightHydraMixin",
     "OptionalTwilightLichMixin",
     "CrossModLivingDamageMixin",
@@ -37,6 +42,7 @@
     "HydraServerMovementMixin"
   ],
   "client": [
+    "client.VehiclePlayerPoseMixin",
     "client.OptionalEpicFightPlayerRenderMixin",
     "client.OptionalPlayerAnimatorRenderMixin",
     "client.KeyboardInputMixin",
@@ -44,6 +50,7 @@
     "client.NativeHandRendererAccess",
     "client.LocalPlayerMixin",
     "client.PrototypeTargetLockMixin",
+    "client.PrototypeVehiclePickMixin",
     "client.TargetLockGlowMixin",
     "client.TargetLockOutlineColorMixin",
     "client.PrototypeCameraAccess",

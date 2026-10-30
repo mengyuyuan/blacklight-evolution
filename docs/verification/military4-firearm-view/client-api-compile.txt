@@ -1,0 +1,4 @@
+Final independent javac API check: exit 0
+Includes FirearmViewEvents, FirearmViewState, FirearmsCombat against endpoint Minecraft/Forge cached classpath and current main classes.
+Not a full Gradle build, GL render test, or runtime GameTest.
+Current snapshot precedes pending block-damage hook.

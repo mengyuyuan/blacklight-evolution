@@ -1,0 +1,12 @@
+{
+  "original_filename": "codex-clipboard-14169190-9043-468d-86e1-053ed32e6d44.png",
+  "original_sha256": "9e2b467bf5341e4e9d2db5fb7f9462d19fb0bc9004e9fcafc8e94e1dc1c83608",
+  "crop_box": [
+    0,
+    342,
+    700,
+    656
+  ],
+  "derived_sha256": "671944c94b4e545bcff216942b490c1a3c23ffdcc58d5cd96162ed448a8a75e3",
+  "purpose": "只保留模型提供/许可相关区域"
+}

@@ -1,0 +1,176 @@
+{
+  "neoforge/CityMilitaryCommands.java": {
+    "literals": [
+      "base",
+      "status",
+      "place",
+      "outfit"
+    ],
+    "arguments": [
+      "pos",
+      "turn",
+      "entities",
+      "outfit"
+    ]
+  },
+  "neoforge/MilitaryCommands.java": {
+    "literals": [
+      "military",
+      "unit",
+      "create",
+      "assign",
+      "unassign",
+      "resize",
+      "attach",
+      "detach",
+      "remove",
+      "commander",
+      "rank",
+      "role",
+      "order",
+      "organize",
+      "inspect"
+    ],
+    "arguments": [
+      "faction",
+      "preset",
+      "name",
+      "capacity",
+      "entities",
+      "entities",
+      "capacity",
+      "entity",
+      "entities",
+      "rank",
+      "entities",
+      "role",
+      "mode",
+      "pos",
+      "entities"
+    ]
+  },
+  "neoforge/VehicleFleetCommands.java": {
+    "literals": [
+      "fleet",
+      "crew",
+      "create",
+      "list",
+      "inspect",
+      "order",
+      "remove"
+    ],
+    "arguments": [
+      "vehicle",
+      "soldiers",
+      "vehicles",
+      "officer",
+      "fleet",
+      "fleet",
+      "mission",
+      "position",
+      "fleet"
+    ]
+  },
+  "neoforge/VehicleGarageCommands.java": {
+    "literals": [
+      "garage",
+      "preview",
+      "attach",
+      "status",
+      "bases"
+    ],
+    "arguments": [
+      "base",
+      "position",
+      "turn",
+      "token"
+    ]
+  },
+  "forge/CityMilitaryCommands.java": {
+    "literals": [
+      "base",
+      "status",
+      "place",
+      "outfit"
+    ],
+    "arguments": [
+      "pos",
+      "turn",
+      "entities",
+      "outfit"
+    ]
+  },
+  "forge/MilitaryCommands.java": {
+    "literals": [
+      "military",
+      "unit",
+      "create",
+      "assign",
+      "unassign",
+      "resize",
+      "attach",
+      "detach",
+      "remove",
+      "commander",
+      "rank",
+      "role",
+      "order",
+      "organize",
+      "inspect"
+    ],
+    "arguments": [
+      "faction",
+      "preset",
+      "name",
+      "capacity",
+      "entities",
+      "entities",
+      "capacity",
+      "entity",
+      "entities",
+      "rank",
+      "entities",
+      "role",
+      "mode",
+      "pos",
+      "entities"
+    ]
+  },
+  "forge/VehicleFleetCommands.java": {
+    "literals": [
+      "fleet",
+      "crew",
+      "create",
+      "list",
+      "inspect",
+      "order",
+      "remove"
+    ],
+    "arguments": [
+      "vehicle",
+      "soldiers",
+      "vehicles",
+      "officer",
+      "fleet",
+      "fleet",
+      "mission",
+      "position",
+      "fleet"
+    ]
+  },
+  "forge/VehicleGarageCommands.java": {
+    "literals": [
+      "garage",
+      "preview",
+      "attach",
+      "status",
+      "bases"
+    ],
+    "arguments": [
+      "base",
+      "position",
+      "turn",
+      "token"
+    ]
+  }
+}

@@ -1,0 +1,62 @@
+[
+  {
+    "id": "autocannon",
+    "ammo": "autocannon_round",
+    "cooldown_ticks": 6,
+    "damage": 8.0,
+    "range": 96.0,
+    "kind": "GRENADE",
+    "radius": 1.2,
+    "damage_class": "AUTOCANNON",
+    "speed": 3.0,
+    "secondary": false
+  },
+  {
+    "id": "vehicle_rocket",
+    "ammo": "rocket_round",
+    "cooldown_ticks": 30,
+    "damage": 20.0,
+    "range": 96.0,
+    "kind": "ROCKET",
+    "radius": 4.0,
+    "damage_class": "EXPLOSIVE",
+    "speed": 2.2,
+    "secondary": true
+  },
+  {
+    "id": "tank_he",
+    "ammo": "tank_he_shell",
+    "cooldown_ticks": 80,
+    "damage": 24.0,
+    "range": 96.0,
+    "kind": "ROCKET",
+    "radius": 4.0,
+    "damage_class": "EXPLOSIVE",
+    "speed": 2.8,
+    "secondary": false
+  },
+  {
+    "id": "tank_ap",
+    "ammo": "tank_ap_shell",
+    "cooldown_ticks": 80,
+    "damage": 36.0,
+    "range": 96.0,
+    "kind": "ROCKET",
+    "radius": 1.0,
+    "damage_class": "AP",
+    "speed": 3.2,
+    "secondary": false
+  },
+  {
+    "id": "coaxial_machine_gun",
+    "ammo": "machine_gun_round",
+    "cooldown_ticks": 4,
+    "damage": 4.0,
+    "range": 80.0,
+    "kind": "BULLET",
+    "radius": 0.0,
+    "damage_class": "BULLET",
+    "speed": 0.0,
+    "secondary": true
+  }
+]

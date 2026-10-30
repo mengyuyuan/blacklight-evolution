@@ -10,7 +10,7 @@
           "block": "minecraft:bedrock"
         }
       ],
-      "structure_overrides": [],
+      "structure_overrides": ["blacklight:city_military_bases"],
       "lakes": false,
       "features": false
     },

@@ -1,0 +1,45 @@
+{
+  "texture_sizes": {
+    "military": [
+      512,
+      512
+    ],
+    "blackwatch": [
+      512,
+      512
+    ]
+  },
+  "independent_faction_pngs": true,
+  "disjoint_uv_islands": 110,
+  "all_cube_face_samples_opaque": true,
+  "variants": {
+    "uniform-military": {
+      "pieces": 10,
+      "equipped": false
+    },
+    "uniform-blackwatch": {
+      "pieces": 10,
+      "equipped": false
+    },
+    "military-regular": {
+      "pieces": 46,
+      "equipped": true
+    },
+    "military-heavy": {
+      "pieces": 55,
+      "equipped": true
+    },
+    "blackwatch-regular": {
+      "pieces": 48,
+      "equipped": true
+    },
+    "blackwatch-heavy": {
+      "pieces": 60,
+      "equipped": true
+    }
+  },
+  "empty_hand_hides_every_weapon_family": true,
+  "production_java_sha256": "aff76ad77296d660ec87b0df3abe0826601353056779930e46f6d152160bae83",
+  "inspected_at": "2026-10-24T05:28:39.828360+08:00",
+  "scope": "Static geometry / UV / PNG inspection only, not a game-client render or Gradle build."
+}

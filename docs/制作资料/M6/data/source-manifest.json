@@ -1,0 +1,2732 @@
+[
+  {
+    "platform": "forge",
+    "path": ".superpowers/military6-qa/visual-seat-sync-final-receipt.json",
+    "snapshot": "sources/forge/.superpowers/military6-qa/visual-seat-sync-final-receipt.json",
+    "sha256": "f7bf92c917f0a8837b1cb6f5618723bb64b7dda7dbc8d645f8a9133adcb5c72e",
+    "bytes": 13493
+  },
+  {
+    "platform": "forge",
+    "path": ".superpowers/military6-qa/visual-seating-final-receipt.json",
+    "snapshot": "sources/forge/.superpowers/military6-qa/visual-seating-final-receipt.json",
+    "sha256": "956093751ae1779f46e6f0cd72d98f86f4aec49a57738ad9b7e1ffdf86b67253",
+    "bytes": 8463
+  },
+  {
+    "platform": "forge",
+    "path": "THIRD_PARTY_ASSETS.md",
+    "snapshot": "sources/forge/THIRD_PARTY_ASSETS.md",
+    "sha256": "617e11558f7fa9988e656dd8babfa69bbd86eadc8cd2a1f9c55a3cdc4fbb7fdb",
+    "bytes": 12562
+  },
+  {
+    "platform": "forge",
+    "path": "art/military-vehicles/apc.bbmodel",
+    "snapshot": "sources/forge/art/military-vehicles/apc.bbmodel",
+    "sha256": "3149c6e7b9bdf8c18e000343573a1f315fc077c16f367e2f84dbe150f823ab49",
+    "bytes": 557073
+  },
+  {
+    "platform": "forge",
+    "path": "art/military-vehicles/previews/production/manifest.json",
+    "snapshot": "sources/forge/art/military-vehicles/previews/production/manifest.json",
+    "sha256": "fef8a2222cdd432fd05b3f518106c6014559bb3b4c6a67e7c9d6035f125a5ae6",
+    "bytes": 1467
+  },
+  {
+    "platform": "forge",
+    "path": "art/military-vehicles/reference-observations.json",
+    "snapshot": "sources/forge/art/military-vehicles/reference-observations.json",
+    "sha256": "f56bd8e02e9863c44d70b8a01aa902f4d4a35a70a1beb09abf9b2720ecb26fc7",
+    "bytes": 16239
+  },
+  {
+    "platform": "forge",
+    "path": "art/military-vehicles/tank.bbmodel",
+    "snapshot": "sources/forge/art/military-vehicles/tank.bbmodel",
+    "sha256": "32c0520794fbbfcb11e3daefee79caf10e12f2e055e53ed3a3446b070b0eace2",
+    "bytes": 589675
+  },
+  {
+    "platform": "forge",
+    "path": "art/military-vehicles/textures/blackwatch.png",
+    "snapshot": "sources/forge/art/military-vehicles/textures/blackwatch.png",
+    "sha256": "5f878d6f5cf0bfb333b6959422a2c71466674e4d4960723d12c06ceeead0283b",
+    "bytes": 106376
+  },
+  {
+    "platform": "forge",
+    "path": "art/military-vehicles/textures/military.png",
+    "snapshot": "sources/forge/art/military-vehicles/textures/military.png",
+    "sha256": "a05858c5609c5eced700a12393bf25955cd563b31591dad974f6d2ce6b6d6445",
+    "bytes": 124466
+  },
+  {
+    "platform": "forge",
+    "path": "art/military-vehicles/truck.bbmodel",
+    "snapshot": "sources/forge/art/military-vehicles/truck.bbmodel",
+    "sha256": "112195dde7fe189074ff123b0dc7b237b993718a8f0fd355ba64c54f5117f9a6",
+    "bytes": 447663
+  },
+  {
+    "platform": "forge",
+    "path": "art/military-vehicles/validation-receipt.json",
+    "snapshot": "sources/forge/art/military-vehicles/validation-receipt.json",
+    "sha256": "f0d302d902ca0eacd44bad39b70b7c6b96adad3de144ad779af8a723b6640fc7",
+    "bytes": 10958
+  },
+  {
+    "platform": "forge",
+    "path": "art/military-vehicles/vehicle-authoring.json",
+    "snapshot": "sources/forge/art/military-vehicles/vehicle-authoring.json",
+    "sha256": "4ccafec7230accdac6d2d84c7ffbd043f2ece8d2b2848e9fe9eb98aa13523a21",
+    "bytes": 135054
+  },
+  {
+    "platform": "forge",
+    "path": "src/main/java/com/codex/blacklight/city/CityMilitaryService.java",
+    "snapshot": "sources/forge/src/main/java/com/codex/blacklight/city/CityMilitaryService.java",
+    "sha256": "5f41e7998c5f05f2827d56ca0655df36f022aaeb9a45398c60138c9c9d0cd8af",
+    "bytes": 26645
+  },
+  {
+    "platform": "forge",
+    "path": "src/main/java/com/codex/blacklight/city/MilitaryBaseAccess.java",
+    "snapshot": "sources/forge/src/main/java/com/codex/blacklight/city/MilitaryBaseAccess.java",
+    "sha256": "81273811b790922664831f6147960afca35a4ac8e487eea462bba28b6bd67d09",
+    "bytes": 6301
+  },
+  {
+    "platform": "forge",
+    "path": "src/main/java/com/codex/blacklight/city/VehicleGaragePiece.java",
+    "snapshot": "sources/forge/src/main/java/com/codex/blacklight/city/VehicleGaragePiece.java",
+    "sha256": "dc94c1c9881c4c903b31f5a2bc41e6530b87327fa61b8ced2d559324e81e68dd",
+    "bytes": 8576
+  },
+  {
+    "platform": "forge",
+    "path": "src/main/java/com/codex/blacklight/client/ClientClawEvents.java",
+    "snapshot": "sources/forge/src/main/java/com/codex/blacklight/client/ClientClawEvents.java",
+    "sha256": "4732cb3fd99dadc58f2c21cc8d466e05428fbfabe239cfe2d0e99e243fbf59fc",
+    "bytes": 32921
+  },
+  {
+    "platform": "forge",
+    "path": "src/main/java/com/codex/blacklight/client/ClientWeaponCombat.java",
+    "snapshot": "sources/forge/src/main/java/com/codex/blacklight/client/ClientWeaponCombat.java",
+    "sha256": "bf66d967082e10de3644ae150a9784e4ae388e17a0c54434dce0b1d615d28a00",
+    "bytes": 7571
+  },
+  {
+    "platform": "forge",
+    "path": "src/main/java/com/codex/blacklight/client/SkillBindings.java",
+    "snapshot": "sources/forge/src/main/java/com/codex/blacklight/client/SkillBindings.java",
+    "sha256": "eaedf0d572dbb76243a266c12aefbaf13af69bee83a9de27660f3e16410246ca",
+    "bytes": 2445
+  },
+  {
+    "platform": "forge",
+    "path": "src/main/java/com/codex/blacklight/client/VehicleControls.java",
+    "snapshot": "sources/forge/src/main/java/com/codex/blacklight/client/VehicleControls.java",
+    "sha256": "a6c09b8ff5f26003214e800c0b3e0614479095f38392669de648c164bbda77ea",
+    "bytes": 6254
+  },
+  {
+    "platform": "forge",
+    "path": "src/main/java/com/codex/blacklight/client/VehicleHud.java",
+    "snapshot": "sources/forge/src/main/java/com/codex/blacklight/client/VehicleHud.java",
+    "sha256": "9b2ebfa5c9de7ada7ab94ac1b7a16644e315f8e15d20662fa94817b6c594f737",
+    "bytes": 4892
+  },
+  {
+    "platform": "forge",
+    "path": "src/main/java/com/codex/blacklight/client/animation/BlacklightRenderPose.java",
+    "snapshot": "sources/forge/src/main/java/com/codex/blacklight/client/animation/BlacklightRenderPose.java",
+    "sha256": "a6e062f73f1c60fe886c7cb947fcf73969c0b0410d6d9409b59a5b653bd7f82c",
+    "bytes": 6984
+  },
+  {
+    "platform": "forge",
+    "path": "src/main/java/com/codex/blacklight/client/camera/PrototypeChaseCamera.java",
+    "snapshot": "sources/forge/src/main/java/com/codex/blacklight/client/camera/PrototypeChaseCamera.java",
+    "sha256": "ebd60a5121a2e95fc495b5079f8a383df0026e50fb7d0fddefaba48468b31324",
+    "bytes": 22016
+  },
+  {
+    "platform": "forge",
+    "path": "src/main/java/com/codex/blacklight/client/model/BlacklightPlayerModel.java",
+    "snapshot": "sources/forge/src/main/java/com/codex/blacklight/client/model/BlacklightPlayerModel.java",
+    "sha256": "67fb73a19af55909f95c551be152d0842daf6fc196dfdff9a10c3ba77b94a250",
+    "bytes": 15118
+  },
+  {
+    "platform": "forge",
+    "path": "src/main/java/com/codex/blacklight/client/model/BlackwatchModel.java",
+    "snapshot": "sources/forge/src/main/java/com/codex/blacklight/client/model/BlackwatchModel.java",
+    "sha256": "220260ec3df9b3e61a066d33336fe6e324bef1a394620fd2a19c45e2c45ff477",
+    "bytes": 44183
+  },
+  {
+    "platform": "forge",
+    "path": "src/main/java/com/codex/blacklight/client/model/MercerPlayerMesh.java",
+    "snapshot": "sources/forge/src/main/java/com/codex/blacklight/client/model/MercerPlayerMesh.java",
+    "sha256": "8b512a0c95bac569a48121fefa3d4f8aafee01fbfe2ca8326f6f7aa756895c2f",
+    "bytes": 7632
+  },
+  {
+    "platform": "forge",
+    "path": "src/main/java/com/codex/blacklight/client/model/MilitaryVehicleModel.java",
+    "snapshot": "sources/forge/src/main/java/com/codex/blacklight/client/model/MilitaryVehicleModel.java",
+    "sha256": "da35d77f42ac82c1b5d594e876943042b2dc0de9b59377eef572f76cbb4d491b",
+    "bytes": 5443
+  },
+  {
+    "platform": "forge",
+    "path": "src/main/java/com/codex/blacklight/client/vehicle/VehicleCamera.java",
+    "snapshot": "sources/forge/src/main/java/com/codex/blacklight/client/vehicle/VehicleCamera.java",
+    "sha256": "96dc125dd0226b9c44c6bf7ea05c636a6864e55d63f362ab9e54c3346b4322f0",
+    "bytes": 5232
+  },
+  {
+    "platform": "forge",
+    "path": "src/main/java/com/codex/blacklight/client/vehicle/VehicleOpticClipper.java",
+    "snapshot": "sources/forge/src/main/java/com/codex/blacklight/client/vehicle/VehicleOpticClipper.java",
+    "sha256": "a682fb0f322040b6d185475099e57ffa00bef183d1b53b85b17ab9f965fdc663",
+    "bytes": 4725
+  },
+  {
+    "platform": "forge",
+    "path": "src/main/java/com/codex/blacklight/client/vehicle/VehicleSeatPose.java",
+    "snapshot": "sources/forge/src/main/java/com/codex/blacklight/client/vehicle/VehicleSeatPose.java",
+    "sha256": "f28efbe70fa44e99045064b42addccc1ca86afd96d26323dc91823d53b8aa85e",
+    "bytes": 6225
+  },
+  {
+    "platform": "forge",
+    "path": "src/main/java/com/codex/blacklight/client/vehicle/VehicleViewRendering.java",
+    "snapshot": "sources/forge/src/main/java/com/codex/blacklight/client/vehicle/VehicleViewRendering.java",
+    "sha256": "d50e2fa9ba8ef2d1fe0502d81535756e45fc15b5a2874ff43d1bcf00c6cd6cde",
+    "bytes": 5288
+  },
+  {
+    "platform": "forge",
+    "path": "src/main/java/com/codex/blacklight/command/BlacklightCommands.java",
+    "snapshot": "sources/forge/src/main/java/com/codex/blacklight/command/BlacklightCommands.java",
+    "sha256": "0fc0e44b3cdf8e0ddb6bb21a47f8ae7db2db2e74d53adf350b17bc4517904343",
+    "bytes": 14081
+  },
+  {
+    "platform": "forge",
+    "path": "src/main/java/com/codex/blacklight/command/CityMilitaryCommands.java",
+    "snapshot": "sources/forge/src/main/java/com/codex/blacklight/command/CityMilitaryCommands.java",
+    "sha256": "6c8cef26ca142012168525f226816a6a0397ae3fe2323b63dc03e2903b861801",
+    "bytes": 3437
+  },
+  {
+    "platform": "forge",
+    "path": "src/main/java/com/codex/blacklight/command/MilitaryCommands.java",
+    "snapshot": "sources/forge/src/main/java/com/codex/blacklight/command/MilitaryCommands.java",
+    "sha256": "9159eb6ab9ae478284f4ddfb89bddc161fb93f4edf363d9006727edf5bbdf787",
+    "bytes": 17725
+  },
+  {
+    "platform": "forge",
+    "path": "src/main/java/com/codex/blacklight/command/VehicleFleetCommands.java",
+    "snapshot": "sources/forge/src/main/java/com/codex/blacklight/command/VehicleFleetCommands.java",
+    "sha256": "105dad2a3064ca25acf92b21424f12bc2e0bffdf0d44e835655d7950c92aa24d",
+    "bytes": 6924
+  },
+  {
+    "platform": "forge",
+    "path": "src/main/java/com/codex/blacklight/command/VehicleGarageCommands.java",
+    "snapshot": "sources/forge/src/main/java/com/codex/blacklight/command/VehicleGarageCommands.java",
+    "sha256": "060c51d4236c1c3793d1cd86ff20cae1e7e9fb688ef96880d1b2fe7a32c898fb",
+    "bytes": 4403
+  },
+  {
+    "platform": "forge",
+    "path": "src/main/java/com/codex/blacklight/entity/BlackwatchSoldier.java",
+    "snapshot": "sources/forge/src/main/java/com/codex/blacklight/entity/BlackwatchSoldier.java",
+    "sha256": "e7ccffbf3b8f9fd6448257b8a6e75d6c645b390458f4cce5df8fff21feeed968",
+    "bytes": 704
+  },
+  {
+    "platform": "forge",
+    "path": "src/main/java/com/codex/blacklight/entity/MilitarySoldier.java",
+    "snapshot": "sources/forge/src/main/java/com/codex/blacklight/entity/MilitarySoldier.java",
+    "sha256": "04cca22824817d7da59c90d152620a83db40e41b2a99b572a4aa956324840cd8",
+    "bytes": 32327
+  },
+  {
+    "platform": "forge",
+    "path": "src/main/java/com/codex/blacklight/entity/MilitaryVehicle.java",
+    "snapshot": "sources/forge/src/main/java/com/codex/blacklight/entity/MilitaryVehicle.java",
+    "sha256": "45573a188849d9042c16121a1010c272839a7877a53f84d8498ad15c8321c1cc",
+    "bytes": 31543
+  },
+  {
+    "platform": "forge",
+    "path": "src/main/java/com/codex/blacklight/entity/RegularSoldier.java",
+    "snapshot": "sources/forge/src/main/java/com/codex/blacklight/entity/RegularSoldier.java",
+    "sha256": "2cfb468381049a31a78155c7a9c2c6682b00c2ef71d93a5bb7e4c62cae944198",
+    "bytes": 697
+  },
+  {
+    "platform": "forge",
+    "path": "src/main/java/com/codex/blacklight/entity/VehicleHullPart.java",
+    "snapshot": "sources/forge/src/main/java/com/codex/blacklight/entity/VehicleHullPart.java",
+    "sha256": "d3044865dda33439d3f0ccea18494a1aafa34349276d185f6d617cf944479acb",
+    "bytes": 1881
+  },
+  {
+    "platform": "forge",
+    "path": "src/main/java/com/codex/blacklight/firearms/FirearmsCombat.java",
+    "snapshot": "sources/forge/src/main/java/com/codex/blacklight/firearms/FirearmsCombat.java",
+    "sha256": "4eeb4869850b64cb27d423f420fffec20b416aea8d2a3d356f1c0366b36df994",
+    "bytes": 4069
+  },
+  {
+    "platform": "forge",
+    "path": "src/main/java/com/codex/blacklight/firearms/VehicleOrdnanceProjectile.java",
+    "snapshot": "sources/forge/src/main/java/com/codex/blacklight/firearms/VehicleOrdnanceProjectile.java",
+    "sha256": "f17a44fbb4e138319cd4aee5f181b430a465f011b3088bad5fa5bdfc39be9859",
+    "bytes": 10021
+  },
+  {
+    "platform": "forge",
+    "path": "src/main/java/com/codex/blacklight/firearms/WeaponCatalog.java",
+    "snapshot": "sources/forge/src/main/java/com/codex/blacklight/firearms/WeaponCatalog.java",
+    "sha256": "54d0e1d1afee93cda5624705f40cf78b44ff467fd77a4ec0d5369023c77d311e",
+    "bytes": 1757
+  },
+  {
+    "platform": "forge",
+    "path": "src/main/java/com/codex/blacklight/military/MilitaryCombatProfile.java",
+    "snapshot": "sources/forge/src/main/java/com/codex/blacklight/military/MilitaryCombatProfile.java",
+    "sha256": "10529332de849b18a3fbae41fda199d86ae1aee5b0d260aaea47ecca2ff19272",
+    "bytes": 875
+  },
+  {
+    "platform": "forge",
+    "path": "src/main/java/com/codex/blacklight/military/MilitaryFaction.java",
+    "snapshot": "sources/forge/src/main/java/com/codex/blacklight/military/MilitaryFaction.java",
+    "sha256": "206143d47924f5c17842ff474e68df9a3564e235eb15d2369e9741087d81cb9c",
+    "bytes": 577
+  },
+  {
+    "platform": "forge",
+    "path": "src/main/java/com/codex/blacklight/military/MilitaryFormationSystem.java",
+    "snapshot": "sources/forge/src/main/java/com/codex/blacklight/military/MilitaryFormationSystem.java",
+    "sha256": "fd765ea6503e2aa8eab10e55fd7157e7f18ba83e59ce36d0bf20e3885ec65bb0",
+    "bytes": 16669
+  },
+  {
+    "platform": "forge",
+    "path": "src/main/java/com/codex/blacklight/military/MilitaryGroundNavigation.java",
+    "snapshot": "sources/forge/src/main/java/com/codex/blacklight/military/MilitaryGroundNavigation.java",
+    "sha256": "1f922851e0352bbadc191a76dda4b9fe28d2892e176b445f158e360d58a7cee0",
+    "bytes": 1782
+  },
+  {
+    "platform": "forge",
+    "path": "src/main/java/com/codex/blacklight/military/MilitaryLoadoutInventory.java",
+    "snapshot": "sources/forge/src/main/java/com/codex/blacklight/military/MilitaryLoadoutInventory.java",
+    "sha256": "b40288060dc514551904a5f4b3b437584d48414c880b668d2bb4d1aeac17cc10",
+    "bytes": 5327
+  },
+  {
+    "platform": "forge",
+    "path": "src/main/java/com/codex/blacklight/military/MilitaryLoadoutProfile.java",
+    "snapshot": "sources/forge/src/main/java/com/codex/blacklight/military/MilitaryLoadoutProfile.java",
+    "sha256": "242c9f6c2397f8ae3cfbfa9809e962ef78ededd507ac3f3d3e9bdf5ab094d72b",
+    "bytes": 4032
+  },
+  {
+    "platform": "forge",
+    "path": "src/main/java/com/codex/blacklight/military/MilitaryOrder.java",
+    "snapshot": "sources/forge/src/main/java/com/codex/blacklight/military/MilitaryOrder.java",
+    "sha256": "50d287e5138b2b4e99f53547c496b278afa859b867ac6d148c13f489e85bfd09",
+    "bytes": 554
+  },
+  {
+    "platform": "forge",
+    "path": "src/main/java/com/codex/blacklight/military/MilitaryOrganization.java",
+    "snapshot": "sources/forge/src/main/java/com/codex/blacklight/military/MilitaryOrganization.java",
+    "sha256": "d3e997424505a42080337c7c3c2e6a1300f5d5ae6665fc0e1b61d7ba43f7a54a",
+    "bytes": 9612
+  },
+  {
+    "platform": "forge",
+    "path": "src/main/java/com/codex/blacklight/military/MilitaryOrganizationSystem.java",
+    "snapshot": "sources/forge/src/main/java/com/codex/blacklight/military/MilitaryOrganizationSystem.java",
+    "sha256": "888e167a00089d50a8b779aad5a1ca0a7de75d84416c359e37210c0717d791a7",
+    "bytes": 12588
+  },
+  {
+    "platform": "forge",
+    "path": "src/main/java/com/codex/blacklight/military/MilitaryRank.java",
+    "snapshot": "sources/forge/src/main/java/com/codex/blacklight/military/MilitaryRank.java",
+    "sha256": "7cbcc0a47c06697b2083a86053354754524fe442f82ea656f10084aa3b1a5337",
+    "bytes": 709
+  },
+  {
+    "platform": "forge",
+    "path": "src/main/java/com/codex/blacklight/military/MilitaryRole.java",
+    "snapshot": "sources/forge/src/main/java/com/codex/blacklight/military/MilitaryRole.java",
+    "sha256": "1c01d0c9dc68d7ac166680b5529096fdebd7bea7a13ebef34d142da89b659b94",
+    "bytes": 1285
+  },
+  {
+    "platform": "forge",
+    "path": "src/main/java/com/codex/blacklight/military/MilitarySavedData.java",
+    "snapshot": "sources/forge/src/main/java/com/codex/blacklight/military/MilitarySavedData.java",
+    "sha256": "1247bc8bf7914ba9a5c268581a04673de393d888325c47e385f935d6366b108f",
+    "bytes": 6970
+  },
+  {
+    "platform": "forge",
+    "path": "src/main/java/com/codex/blacklight/military/MilitaryUnitType.java",
+    "snapshot": "sources/forge/src/main/java/com/codex/blacklight/military/MilitaryUnitType.java",
+    "sha256": "8dfe2eff79e5648f96c001582d923db2bc64075042f9ed3119651ea101ca3b9c",
+    "bytes": 1005
+  },
+  {
+    "platform": "forge",
+    "path": "src/main/java/com/codex/blacklight/military/MilitaryWorkBudget.java",
+    "snapshot": "sources/forge/src/main/java/com/codex/blacklight/military/MilitaryWorkBudget.java",
+    "sha256": "c3ad760265e5a46a14039d3e5f039c7e4172803d97a4497f06ad606103bf6728",
+    "bytes": 2406
+  },
+  {
+    "platform": "forge",
+    "path": "src/main/java/com/codex/blacklight/military/vehicle/VehicleAttackService.java",
+    "snapshot": "sources/forge/src/main/java/com/codex/blacklight/military/vehicle/VehicleAttackService.java",
+    "sha256": "01df22bbe9ae24c2ae80ee41902c149f24b6400df42cbc9e63160ade6c0ced10",
+    "bytes": 5687
+  },
+  {
+    "platform": "forge",
+    "path": "src/main/java/com/codex/blacklight/military/vehicle/VehicleCatalog.java",
+    "snapshot": "sources/forge/src/main/java/com/codex/blacklight/military/vehicle/VehicleCatalog.java",
+    "sha256": "7345beb463ada2db74df1df4a4692ceecdf05fad3bc4cff823e9fc3e3b4a1d2f",
+    "bytes": 11680
+  },
+  {
+    "platform": "forge",
+    "path": "src/main/java/com/codex/blacklight/military/vehicle/VehicleCollisionGeometry.java",
+    "snapshot": "sources/forge/src/main/java/com/codex/blacklight/military/vehicle/VehicleCollisionGeometry.java",
+    "sha256": "fbeb5b3bf226c1f8222c44b58ac167b9ce62944f21413b02a3141f5591486bf1",
+    "bytes": 7629
+  },
+  {
+    "platform": "forge",
+    "path": "src/main/java/com/codex/blacklight/military/vehicle/VehicleCollisionShapes.java",
+    "snapshot": "sources/forge/src/main/java/com/codex/blacklight/military/vehicle/VehicleCollisionShapes.java",
+    "sha256": "7a3e6a1b558a2be7e269199b25f42301db79a58f789f44be37c044c4d2987d0f",
+    "bytes": 2144
+  },
+  {
+    "platform": "forge",
+    "path": "src/main/java/com/codex/blacklight/military/vehicle/VehicleControlAuthority.java",
+    "snapshot": "sources/forge/src/main/java/com/codex/blacklight/military/vehicle/VehicleControlAuthority.java",
+    "sha256": "43905494faf34f92ed4ca23892454e04d955fb11e542d563222e4aa26796870b",
+    "bytes": 4977
+  },
+  {
+    "platform": "forge",
+    "path": "src/main/java/com/codex/blacklight/military/vehicle/VehicleDamageBridge.java",
+    "snapshot": "sources/forge/src/main/java/com/codex/blacklight/military/vehicle/VehicleDamageBridge.java",
+    "sha256": "923636a08858d672dc45a68e64668875c323767d05380eb5206dd0380ea6f536",
+    "bytes": 9123
+  },
+  {
+    "platform": "forge",
+    "path": "src/main/java/com/codex/blacklight/military/vehicle/VehicleDefinition.java",
+    "snapshot": "sources/forge/src/main/java/com/codex/blacklight/military/vehicle/VehicleDefinition.java",
+    "sha256": "c55ee0e70631e674eb8bbce17be04547c2dc1c8d02a3be4dcc79ed577562ef23",
+    "bytes": 6716
+  },
+  {
+    "platform": "forge",
+    "path": "src/main/java/com/codex/blacklight/military/vehicle/VehicleFleet.java",
+    "snapshot": "sources/forge/src/main/java/com/codex/blacklight/military/vehicle/VehicleFleet.java",
+    "sha256": "42a0ffb5182beba8ecaaee6367696ae89b141718f80ebc34b7724fca74b130e8",
+    "bytes": 3790
+  },
+  {
+    "platform": "forge",
+    "path": "src/main/java/com/codex/blacklight/military/vehicle/VehicleFleetSavedData.java",
+    "snapshot": "sources/forge/src/main/java/com/codex/blacklight/military/vehicle/VehicleFleetSavedData.java",
+    "sha256": "18bc5432bd3b826871f1c29f0b28ef1ebeb517e242c1953f59df5445311edaf7",
+    "bytes": 4944
+  },
+  {
+    "platform": "forge",
+    "path": "src/main/java/com/codex/blacklight/military/vehicle/VehicleFleetSystem.java",
+    "snapshot": "sources/forge/src/main/java/com/codex/blacklight/military/vehicle/VehicleFleetSystem.java",
+    "sha256": "c200b009ca7a1ad8d7a95056e186c5d95c5e2b95427d5e08821048a0134872f8",
+    "bytes": 43687
+  },
+  {
+    "platform": "forge",
+    "path": "src/main/java/com/codex/blacklight/military/vehicle/VehicleGarageData.java",
+    "snapshot": "sources/forge/src/main/java/com/codex/blacklight/military/vehicle/VehicleGarageData.java",
+    "sha256": "976a688b202a8e2d193b7e4644719a01914f1e171d66dfc7bc0d890dc09e1264",
+    "bytes": 5819
+  },
+  {
+    "platform": "forge",
+    "path": "src/main/java/com/codex/blacklight/military/vehicle/VehicleGarageService.java",
+    "snapshot": "sources/forge/src/main/java/com/codex/blacklight/military/vehicle/VehicleGarageService.java",
+    "sha256": "859071955ac11decfb347e8952040fd55180559309efb0cbbea7cc6f48d2bbab",
+    "bytes": 39522
+  },
+  {
+    "platform": "forge",
+    "path": "src/main/java/com/codex/blacklight/military/vehicle/VehicleHijackSystem.java",
+    "snapshot": "sources/forge/src/main/java/com/codex/blacklight/military/vehicle/VehicleHijackSystem.java",
+    "sha256": "604bdcf2603a9c1044064d5aad6ed4b6b3ddcb06ce8a493ecd53f19cca126211",
+    "bytes": 8044
+  },
+  {
+    "platform": "forge",
+    "path": "src/main/java/com/codex/blacklight/military/vehicle/VehicleHullAttackEvents.java",
+    "snapshot": "sources/forge/src/main/java/com/codex/blacklight/military/vehicle/VehicleHullAttackEvents.java",
+    "sha256": "a310fed5923143bb343f1a7eea3d1bcae71beb13df1cabf12eaffe18b2e21fff",
+    "bytes": 936
+  },
+  {
+    "platform": "forge",
+    "path": "src/main/java/com/codex/blacklight/military/vehicle/VehicleHullAttackGoal.java",
+    "snapshot": "sources/forge/src/main/java/com/codex/blacklight/military/vehicle/VehicleHullAttackGoal.java",
+    "sha256": "b368f1d7b0af30fd9259dafa75b061852867c77fda4d2f05b47bf0bb1dcdb1f4",
+    "bytes": 7855
+  },
+  {
+    "platform": "forge",
+    "path": "src/main/java/com/codex/blacklight/military/vehicle/VehicleHullShape.java",
+    "snapshot": "sources/forge/src/main/java/com/codex/blacklight/military/vehicle/VehicleHullShape.java",
+    "sha256": "af1582996b28d5ee3df3d058d99947e35a95e3d96859acc47b902292f9aaf980",
+    "bytes": 17455
+  },
+  {
+    "platform": "forge",
+    "path": "src/main/java/com/codex/blacklight/military/vehicle/VehicleInventory.java",
+    "snapshot": "sources/forge/src/main/java/com/codex/blacklight/military/vehicle/VehicleInventory.java",
+    "sha256": "88edd40a861b5ecf5baa710f6d4af6f758baefbd693b7be835e70bfee52927bd",
+    "bytes": 5360
+  },
+  {
+    "platform": "forge",
+    "path": "src/main/java/com/codex/blacklight/military/vehicle/VehicleKinematics.java",
+    "snapshot": "sources/forge/src/main/java/com/codex/blacklight/military/vehicle/VehicleKinematics.java",
+    "sha256": "aaeab095d7fdf8a11af2ce02718316a58f8a826075a7ff8d61ee78b8f3610225",
+    "bytes": 12366
+  },
+  {
+    "platform": "forge",
+    "path": "src/main/java/com/codex/blacklight/military/vehicle/VehicleLogisticsService.java",
+    "snapshot": "sources/forge/src/main/java/com/codex/blacklight/military/vehicle/VehicleLogisticsService.java",
+    "sha256": "fb16ac09b4c4da3f72f614afc8eb5e784c7e03e2b9fcb9a6b11926bf6998da6c",
+    "bytes": 19099
+  },
+  {
+    "platform": "forge",
+    "path": "src/main/java/com/codex/blacklight/military/vehicle/VehiclePhysicalDamageBridge.java",
+    "snapshot": "sources/forge/src/main/java/com/codex/blacklight/military/vehicle/VehiclePhysicalDamageBridge.java",
+    "sha256": "281c63e80a6ea79694161df8fa377b87992f3867bdfc27ce9fca04901eadac0e",
+    "bytes": 4658
+  },
+  {
+    "platform": "forge",
+    "path": "src/main/java/com/codex/blacklight/military/vehicle/VehicleRegistry.java",
+    "snapshot": "sources/forge/src/main/java/com/codex/blacklight/military/vehicle/VehicleRegistry.java",
+    "sha256": "229e077a6962f9fc83fdcd083a9009bf464a678a09a0d72d37ace0188d836114",
+    "bytes": 6937
+  },
+  {
+    "platform": "forge",
+    "path": "src/main/java/com/codex/blacklight/military/vehicle/VehicleSeats.java",
+    "snapshot": "sources/forge/src/main/java/com/codex/blacklight/military/vehicle/VehicleSeats.java",
+    "sha256": "2871a7848aa7c01cbdaa5261a09b25bbea459e7c7ae4100d7fbb331435f8427d",
+    "bytes": 2348
+  },
+  {
+    "platform": "forge",
+    "path": "src/main/java/com/codex/blacklight/military/vehicle/VehicleSupplyRules.java",
+    "snapshot": "sources/forge/src/main/java/com/codex/blacklight/military/vehicle/VehicleSupplyRules.java",
+    "sha256": "b62a5d7b3eae05df1c1a2c78f0eb4f69362b6f1be4a565fa29ccb111bf537e67",
+    "bytes": 2935
+  },
+  {
+    "platform": "forge",
+    "path": "src/main/java/com/codex/blacklight/military/vehicle/VehicleThreatBridge.java",
+    "snapshot": "sources/forge/src/main/java/com/codex/blacklight/military/vehicle/VehicleThreatBridge.java",
+    "sha256": "a736ccf9f34e7ffdcdc589e5558297a685ed3167a01ea97d834cd9ce090ddfc7",
+    "bytes": 4290
+  },
+  {
+    "platform": "forge",
+    "path": "src/main/java/com/codex/blacklight/military/vehicle/VehicleThreatGoal.java",
+    "snapshot": "sources/forge/src/main/java/com/codex/blacklight/military/vehicle/VehicleThreatGoal.java",
+    "sha256": "848db41d095c3bd7cd2b7085d8caba844f5feae9095a2dd5be008247dc8662ac",
+    "bytes": 3084
+  },
+  {
+    "platform": "forge",
+    "path": "src/main/java/com/codex/blacklight/military/vehicle/VehicleWeaponDefinition.java",
+    "snapshot": "sources/forge/src/main/java/com/codex/blacklight/military/vehicle/VehicleWeaponDefinition.java",
+    "sha256": "7536b553d7d4bb5b2bca17d9518f91d75ff70a062f768a3b540b91e5d7e49855",
+    "bytes": 2938
+  },
+  {
+    "platform": "forge",
+    "path": "src/main/java/com/codex/blacklight/military/vehicle/VehicleWorkBudget.java",
+    "snapshot": "sources/forge/src/main/java/com/codex/blacklight/military/vehicle/VehicleWorkBudget.java",
+    "sha256": "9f6e0556e85086f4bf8ba2d2c9ea4de7f215e436e4f8bc2916854a48ebd0f5ce",
+    "bytes": 2294
+  },
+  {
+    "platform": "forge",
+    "path": "src/main/java/com/codex/blacklight/military/vehicle/VehicleWorldEvents.java",
+    "snapshot": "sources/forge/src/main/java/com/codex/blacklight/military/vehicle/VehicleWorldEvents.java",
+    "sha256": "3762c953c6eff8e4b1e5e789d2788a148d79f8e52ea5774a46d89b9e93eee7f0",
+    "bytes": 696
+  },
+  {
+    "platform": "forge",
+    "path": "src/main/java/com/codex/blacklight/mixin/VehicleEntityCollisionMixin.java",
+    "snapshot": "sources/forge/src/main/java/com/codex/blacklight/mixin/VehicleEntityCollisionMixin.java",
+    "sha256": "5fdf8847b6aae3663e3fabad959ad6ceb3adaf9be6e8f5054d81055284eab754",
+    "bytes": 2021
+  },
+  {
+    "platform": "forge",
+    "path": "src/main/java/com/codex/blacklight/mixin/VehicleProjectileCollisionMixin.java",
+    "snapshot": "sources/forge/src/main/java/com/codex/blacklight/mixin/VehicleProjectileCollisionMixin.java",
+    "sha256": "05708ab871c01c7cc0695e51e6b87b26aef3ef0ac4da20035da54b165e9768de",
+    "bytes": 1307
+  },
+  {
+    "platform": "forge",
+    "path": "src/main/java/com/codex/blacklight/mixin/client/PrototypeChaseCameraMixin.java",
+    "snapshot": "sources/forge/src/main/java/com/codex/blacklight/mixin/client/PrototypeChaseCameraMixin.java",
+    "sha256": "a3ca18cabcab20943d8d459b1f34a0c72742a2108c3d7b7d8b21e692e6bb695c",
+    "bytes": 1430
+  },
+  {
+    "platform": "forge",
+    "path": "src/main/java/com/codex/blacklight/mixin/client/VehiclePlayerPoseMixin.java",
+    "snapshot": "sources/forge/src/main/java/com/codex/blacklight/mixin/client/VehiclePlayerPoseMixin.java",
+    "sha256": "344fbd1042bae0e3b9f75ad1aa4654baa4c2dfa059f491aeffd40c4ff266e83f",
+    "bytes": 2912
+  },
+  {
+    "platform": "forge",
+    "path": "src/main/java/com/codex/blacklight/network/VehicleControlPayload.java",
+    "snapshot": "sources/forge/src/main/java/com/codex/blacklight/network/VehicleControlPayload.java",
+    "sha256": "846582fb095e94c07e0ca70259a12257e3fc69b2d2d12c8f5575ad0b9babae67",
+    "bytes": 2564
+  },
+  {
+    "platform": "forge",
+    "path": "src/main/java/com/codex/blacklight/network/VehicleSeatPayload.java",
+    "snapshot": "sources/forge/src/main/java/com/codex/blacklight/network/VehicleSeatPayload.java",
+    "sha256": "9396240a19ba0a144db9970242988bd7a1f2c4dc7c17e12f0fb6a356ee5d0c31",
+    "bytes": 1766
+  },
+  {
+    "platform": "forge",
+    "path": "src/main/java/com/codex/blacklight/registry/ModEntities.java",
+    "snapshot": "sources/forge/src/main/java/com/codex/blacklight/registry/ModEntities.java",
+    "sha256": "c77524ce98f53e320d9526e4d5ac6cb3b144ca9218e40749d49513b7023da7cf",
+    "bytes": 16156
+  },
+  {
+    "platform": "forge",
+    "path": "src/main/java/com/codex/blacklight/registry/ModItems.java",
+    "snapshot": "sources/forge/src/main/java/com/codex/blacklight/registry/ModItems.java",
+    "sha256": "23cf7ed92dde9f3465b2fb85ee90c5ee77fd650cf4e0c29ffe58b208fad1a6f1",
+    "bytes": 10513
+  },
+  {
+    "platform": "forge",
+    "path": "src/main/resources/assets/blacklight/military/vehicle-models.json",
+    "snapshot": "sources/forge/src/main/resources/assets/blacklight/military/vehicle-models.json",
+    "sha256": "70e8e155646d0214b4f9c7933298c1e68378180f93a0e03bbe07bb01c9fbbb94",
+    "bytes": 174951
+  },
+  {
+    "platform": "forge",
+    "path": "src/main/resources/assets/blacklight/models/item/autocannon_round.json",
+    "snapshot": "sources/forge/src/main/resources/assets/blacklight/models/item/autocannon_round.json",
+    "sha256": "6f141a0a7a8c35fde70bdc01820108df775c001bd1b1b308654f8cafedcf7460",
+    "bytes": 113
+  },
+  {
+    "platform": "forge",
+    "path": "src/main/resources/assets/blacklight/models/item/blackwatch_apc_chassis.json",
+    "snapshot": "sources/forge/src/main/resources/assets/blacklight/models/item/blackwatch_apc_chassis.json",
+    "sha256": "84889d5aa8008d484b709e80857e15e49e588698694a58721de4d509256a64dc",
+    "bytes": 119
+  },
+  {
+    "platform": "forge",
+    "path": "src/main/resources/assets/blacklight/models/item/blackwatch_tank_chassis.json",
+    "snapshot": "sources/forge/src/main/resources/assets/blacklight/models/item/blackwatch_tank_chassis.json",
+    "sha256": "2eaa7290611b2d8d96c533c239145aafd4c95d8680511deff0186f7cc3eb7350",
+    "bytes": 120
+  },
+  {
+    "platform": "forge",
+    "path": "src/main/resources/assets/blacklight/models/item/blackwatch_truck_chassis.json",
+    "snapshot": "sources/forge/src/main/resources/assets/blacklight/models/item/blackwatch_truck_chassis.json",
+    "sha256": "2fae9ee7d751563a3fe63b57d18132020b05cc42aa4ab4859ab0b34bcc45b531",
+    "bytes": 121
+  },
+  {
+    "platform": "forge",
+    "path": "src/main/resources/assets/blacklight/models/item/machine_gun_round.json",
+    "snapshot": "sources/forge/src/main/resources/assets/blacklight/models/item/machine_gun_round.json",
+    "sha256": "2669bb27da23bb62a354cf8ab581ec6eac8c513e5d984f5a0a2726acc639fe95",
+    "bytes": 99
+  },
+  {
+    "platform": "forge",
+    "path": "src/main/resources/assets/blacklight/models/item/military_apc_chassis.json",
+    "snapshot": "sources/forge/src/main/resources/assets/blacklight/models/item/military_apc_chassis.json",
+    "sha256": "f0f69996f92d86662648f1cb776d86b9ae64989dc200b8224108dd81d9aa7b81",
+    "bytes": 117
+  },
+  {
+    "platform": "forge",
+    "path": "src/main/resources/assets/blacklight/models/item/military_fuel_can.json",
+    "snapshot": "sources/forge/src/main/resources/assets/blacklight/models/item/military_fuel_can.json",
+    "sha256": "e1390990871aa6699aba8e859b3a98b110859bff22758219d2e28826827bd47c",
+    "bytes": 114
+  },
+  {
+    "platform": "forge",
+    "path": "src/main/resources/assets/blacklight/models/item/military_tank_chassis.json",
+    "snapshot": "sources/forge/src/main/resources/assets/blacklight/models/item/military_tank_chassis.json",
+    "sha256": "52a702e753e058678b89073347744bca96875e742725f895868e4c126f185aeb",
+    "bytes": 118
+  },
+  {
+    "platform": "forge",
+    "path": "src/main/resources/assets/blacklight/models/item/military_truck_chassis.json",
+    "snapshot": "sources/forge/src/main/resources/assets/blacklight/models/item/military_truck_chassis.json",
+    "sha256": "011473e5f323d8a963c6f12f0004c00d061ba2723e16cd287112dca43bb6417f",
+    "bytes": 119
+  },
+  {
+    "platform": "forge",
+    "path": "src/main/resources/assets/blacklight/models/item/rocket_round.json",
+    "snapshot": "sources/forge/src/main/resources/assets/blacklight/models/item/rocket_round.json",
+    "sha256": "365382ff4f2c64c377e508ccd622e3bed09e112d878407b334451f602689e5a5",
+    "bytes": 94
+  },
+  {
+    "platform": "forge",
+    "path": "src/main/resources/assets/blacklight/models/item/tank_ap_shell.json",
+    "snapshot": "sources/forge/src/main/resources/assets/blacklight/models/item/tank_ap_shell.json",
+    "sha256": "51849a974556cfc426719971d15c1d05a0a3fb187240fb904aa4dae49ad61914",
+    "bytes": 110
+  },
+  {
+    "platform": "forge",
+    "path": "src/main/resources/assets/blacklight/models/item/tank_he_shell.json",
+    "snapshot": "sources/forge/src/main/resources/assets/blacklight/models/item/tank_he_shell.json",
+    "sha256": "fe8aabf13963b9ed99070b29f74e13809519e66e34972dd708e1a5fc69a46a5b",
+    "bytes": 110
+  },
+  {
+    "platform": "forge",
+    "path": "src/main/resources/assets/blacklight/models/item/vehicle_repair_parts.json",
+    "snapshot": "sources/forge/src/main/resources/assets/blacklight/models/item/vehicle_repair_parts.json",
+    "sha256": "2e4fbc84a7d86afd1378ea183f85ad27bed45ece9aae9a0f9b27130a6d703aac",
+    "bytes": 117
+  },
+  {
+    "platform": "forge",
+    "path": "src/main/resources/assets/blacklight/textures/entity/military_vehicles_blackwatch.png",
+    "snapshot": "sources/forge/src/main/resources/assets/blacklight/textures/entity/military_vehicles_blackwatch.png",
+    "sha256": "5f878d6f5cf0bfb333b6959422a2c71466674e4d4960723d12c06ceeead0283b",
+    "bytes": 106376
+  },
+  {
+    "platform": "forge",
+    "path": "src/main/resources/assets/blacklight/textures/entity/military_vehicles_military.png",
+    "snapshot": "sources/forge/src/main/resources/assets/blacklight/textures/entity/military_vehicles_military.png",
+    "sha256": "a05858c5609c5eced700a12393bf25955cd563b31591dad974f6d2ce6b6d6445",
+    "bytes": 124466
+  },
+  {
+    "platform": "forge",
+    "path": "src/main/resources/assets/blacklight/textures/item/autocannon_round.png",
+    "snapshot": "sources/forge/src/main/resources/assets/blacklight/textures/item/autocannon_round.png",
+    "sha256": "a721a411b187c087863ac4fe33138176a61c0ca3849bcfce1cd4f827a5ef092a",
+    "bytes": 312
+  },
+  {
+    "platform": "forge",
+    "path": "src/main/resources/assets/blacklight/textures/item/blackwatch_apc_chassis.png",
+    "snapshot": "sources/forge/src/main/resources/assets/blacklight/textures/item/blackwatch_apc_chassis.png",
+    "sha256": "0316fe708b91a744bb8e10c681a19067e7796e947f7bb97b5975f497ee4fa13d",
+    "bytes": 466
+  },
+  {
+    "platform": "forge",
+    "path": "src/main/resources/assets/blacklight/textures/item/blackwatch_tank_chassis.png",
+    "snapshot": "sources/forge/src/main/resources/assets/blacklight/textures/item/blackwatch_tank_chassis.png",
+    "sha256": "4f1a49772926b1edb92a492abb7997ccf4567d19f78278963160a9084a862613",
+    "bytes": 463
+  },
+  {
+    "platform": "forge",
+    "path": "src/main/resources/assets/blacklight/textures/item/blackwatch_truck_chassis.png",
+    "snapshot": "sources/forge/src/main/resources/assets/blacklight/textures/item/blackwatch_truck_chassis.png",
+    "sha256": "cca44f405c35d4748e9ccb44ead1625f974b506411c470961bb636295c6c6d10",
+    "bytes": 590
+  },
+  {
+    "platform": "forge",
+    "path": "src/main/resources/assets/blacklight/textures/item/machine_gun_round.png",
+    "snapshot": "sources/forge/src/main/resources/assets/blacklight/textures/item/machine_gun_round.png",
+    "sha256": "9a3c19043de5f1a906dd28724e53cb3e64f7a765f1a83636c3792bf70d92b950",
+    "bytes": 108
+  },
+  {
+    "platform": "forge",
+    "path": "src/main/resources/assets/blacklight/textures/item/military_apc_chassis.png",
+    "snapshot": "sources/forge/src/main/resources/assets/blacklight/textures/item/military_apc_chassis.png",
+    "sha256": "32b0a4b2aa118e78900e065fb1e7e32dd14897f45cffefee62ade198a2f82e85",
+    "bytes": 453
+  },
+  {
+    "platform": "forge",
+    "path": "src/main/resources/assets/blacklight/textures/item/military_fuel_can.png",
+    "snapshot": "sources/forge/src/main/resources/assets/blacklight/textures/item/military_fuel_can.png",
+    "sha256": "13eadfa29908440794f2771bd1fd358b8211ba9a7474a24eede33b68d1ca2b82",
+    "bytes": 422
+  },
+  {
+    "platform": "forge",
+    "path": "src/main/resources/assets/blacklight/textures/item/military_tank_chassis.png",
+    "snapshot": "sources/forge/src/main/resources/assets/blacklight/textures/item/military_tank_chassis.png",
+    "sha256": "99bfd40c42d3a9f235d54686402c023c0be5b6871d0ee2aeef818c95673e24dd",
+    "bytes": 447
+  },
+  {
+    "platform": "forge",
+    "path": "src/main/resources/assets/blacklight/textures/item/military_truck_chassis.png",
+    "snapshot": "sources/forge/src/main/resources/assets/blacklight/textures/item/military_truck_chassis.png",
+    "sha256": "3690b5760b639230d86309655b79575498468db24b861e72954c2c480e925710",
+    "bytes": 528
+  },
+  {
+    "platform": "forge",
+    "path": "src/main/resources/assets/blacklight/textures/item/rocket_round.png",
+    "snapshot": "sources/forge/src/main/resources/assets/blacklight/textures/item/rocket_round.png",
+    "sha256": "f0da949f8a069668cd0526402af0b14a357c10c97c744c059758ecfe0ffcd102",
+    "bytes": 108
+  },
+  {
+    "platform": "forge",
+    "path": "src/main/resources/assets/blacklight/textures/item/tank_ap_shell.png",
+    "snapshot": "sources/forge/src/main/resources/assets/blacklight/textures/item/tank_ap_shell.png",
+    "sha256": "176490bee9167244d746c417b31f1a35eb5ce5bfbbc333d474100b155785eabb",
+    "bytes": 417
+  },
+  {
+    "platform": "forge",
+    "path": "src/main/resources/assets/blacklight/textures/item/tank_he_shell.png",
+    "snapshot": "sources/forge/src/main/resources/assets/blacklight/textures/item/tank_he_shell.png",
+    "sha256": "52ad5e6f0f67fd40784e3b13a4081db8de6c63c98296e3f595c94877a09ade91",
+    "bytes": 318
+  },
+  {
+    "platform": "forge",
+    "path": "src/main/resources/assets/blacklight/textures/item/vehicle_repair_parts.png",
+    "snapshot": "sources/forge/src/main/resources/assets/blacklight/textures/item/vehicle_repair_parts.png",
+    "sha256": "035dcfd51c2ba826ba2029000d9488711c1a6a6b67fdde10be9fb1a834c931f9",
+    "bytes": 407
+  },
+  {
+    "platform": "forge",
+    "path": "src/main/resources/blacklight.mixins.json",
+    "snapshot": "sources/forge/src/main/resources/blacklight.mixins.json",
+    "sha256": "b1e7a193600e67352717900b892d7906d189e7a1ae105e6c17eb91e72868b453",
+    "bytes": 2314
+  },
+  {
+    "platform": "forge",
+    "path": "src/main/resources/data/blacklight/military/large_bases.json",
+    "snapshot": "sources/forge/src/main/resources/data/blacklight/military/large_bases.json",
+    "sha256": "28415b70a14589794e259251812be2916b0a5e031a1b8d3ff902f7cb86c9fdbd",
+    "bytes": 10670
+  },
+  {
+    "platform": "forge",
+    "path": "src/main/resources/data/blacklight/military/vehicle-mounts.json",
+    "snapshot": "sources/forge/src/main/resources/data/blacklight/military/vehicle-mounts.json",
+    "sha256": "9f938d16aa68bbe5bf8b492042f1bb59409aed3850f3dc8630a4cda626cfc51a",
+    "bytes": 10630
+  },
+  {
+    "platform": "forge",
+    "path": "src/main/resources/data/blacklight/military/vehicle_garages.json",
+    "snapshot": "sources/forge/src/main/resources/data/blacklight/military/vehicle_garages.json",
+    "sha256": "58203b07f01d5020f5c0d7eab294e183ebdf07a0645866377b333f814befdc61",
+    "bytes": 9418
+  },
+  {
+    "platform": "forge",
+    "path": "src/main/resources/data/blacklight/military/vehicles.json",
+    "snapshot": "sources/forge/src/main/resources/data/blacklight/military/vehicles.json",
+    "sha256": "044ed2d729b1ee1fc06207492fa5b1e8f35335f8536fb51ed80d83706dde9cd2",
+    "bytes": 4721
+  },
+  {
+    "platform": "forge",
+    "path": "src/main/resources/data/blacklight/recipes/autocannon_round.json",
+    "snapshot": "sources/forge/src/main/resources/data/blacklight/recipes/autocannon_round.json",
+    "sha256": "90798bc4e282f7219df7982bdb4baabd29d6a8bb8118c99aa30399ca4dd5a149",
+    "bytes": 346
+  },
+  {
+    "platform": "forge",
+    "path": "src/main/resources/data/blacklight/recipes/blackwatch_apc_chassis.json",
+    "snapshot": "sources/forge/src/main/resources/data/blacklight/recipes/blackwatch_apc_chassis.json",
+    "sha256": "f06dfe6d99472c3282b98b7d1815e7bd2ca43fe1348e94cf487c2f386a6c98ae",
+    "bytes": 261
+  },
+  {
+    "platform": "forge",
+    "path": "src/main/resources/data/blacklight/recipes/blackwatch_tank_chassis.json",
+    "snapshot": "sources/forge/src/main/resources/data/blacklight/recipes/blackwatch_tank_chassis.json",
+    "sha256": "f4f063a3e737934da8e8b4b9e1663ee1b5c13205daf06e74d7a2afb658145284",
+    "bytes": 263
+  },
+  {
+    "platform": "forge",
+    "path": "src/main/resources/data/blacklight/recipes/blackwatch_truck_chassis.json",
+    "snapshot": "sources/forge/src/main/resources/data/blacklight/recipes/blackwatch_truck_chassis.json",
+    "sha256": "d43c4277a60931bb86f31228bfe56815eaa5d4449554b357a114d00b76bc5ba4",
+    "bytes": 265
+  },
+  {
+    "platform": "forge",
+    "path": "src/main/resources/data/blacklight/recipes/military_apc_chassis.json",
+    "snapshot": "sources/forge/src/main/resources/data/blacklight/recipes/military_apc_chassis.json",
+    "sha256": "c8ffc1e04fbd3cd8ffef7fbedd8b7741a398c70773573fbdabe0ac27d1598d2e",
+    "bytes": 425
+  },
+  {
+    "platform": "forge",
+    "path": "src/main/resources/data/blacklight/recipes/military_fuel_can.json",
+    "snapshot": "sources/forge/src/main/resources/data/blacklight/recipes/military_fuel_can.json",
+    "sha256": "e7a7334e7c1ab7c3f9fac28f467d686bdb537755b3af4ea4adc728da4a581ef0",
+    "bytes": 474
+  },
+  {
+    "platform": "forge",
+    "path": "src/main/resources/data/blacklight/recipes/military_tank_chassis.json",
+    "snapshot": "sources/forge/src/main/resources/data/blacklight/recipes/military_tank_chassis.json",
+    "sha256": "5641648b33cd387f55a99ac1fe53b9f004bb5abfff60980ffae58b4001aa607f",
+    "bytes": 425
+  },
+  {
+    "platform": "forge",
+    "path": "src/main/resources/data/blacklight/recipes/military_truck_chassis.json",
+    "snapshot": "sources/forge/src/main/resources/data/blacklight/recipes/military_truck_chassis.json",
+    "sha256": "be34a80f440e15ca5ecc2f7fddb8bc341d284406a4bfdb03b6a959c442752590",
+    "bytes": 356
+  },
+  {
+    "platform": "forge",
+    "path": "src/main/resources/data/blacklight/recipes/tank_ap_shell.json",
+    "snapshot": "sources/forge/src/main/resources/data/blacklight/recipes/tank_ap_shell.json",
+    "sha256": "6ed1e8dc1c7bfc1c1f707baf27ba01bcbcb2e199fc4c2ced8654ae70052f3844",
+    "bytes": 393
+  },
+  {
+    "platform": "forge",
+    "path": "src/main/resources/data/blacklight/recipes/tank_he_shell.json",
+    "snapshot": "sources/forge/src/main/resources/data/blacklight/recipes/tank_he_shell.json",
+    "sha256": "b92c47eb6f65a94049928497c4b9bfc47968833bc828835290eb5301ebc02a9b",
+    "bytes": 392
+  },
+  {
+    "platform": "forge",
+    "path": "src/main/resources/data/blacklight/recipes/vehicle_repair_parts.json",
+    "snapshot": "sources/forge/src/main/resources/data/blacklight/recipes/vehicle_repair_parts.json",
+    "sha256": "f32b0d7aa9b44ba20db9e3e8da759cc3dcfa07178df33d9a6a21bf286eac5faf",
+    "bytes": 297
+  },
+  {
+    "platform": "forge",
+    "path": "src/main/resources/data/blacklight/structures/blackwatch_checkpoint.nbt",
+    "snapshot": "sources/forge/src/main/resources/data/blacklight/structures/blackwatch_checkpoint.nbt",
+    "sha256": "220e9c68c06ef38e26cea56c862c8133f6fbce66ca11a48e74ba6806d5437854",
+    "bytes": 7957
+  },
+  {
+    "platform": "forge",
+    "path": "src/main/resources/data/blacklight/structures/blackwatch_outpost.nbt",
+    "snapshot": "sources/forge/src/main/resources/data/blacklight/structures/blackwatch_outpost.nbt",
+    "sha256": "801d6088e76a5566efbb03d874721e7a65013eaa290c68b6b8d9838588827743",
+    "bytes": 16864
+  },
+  {
+    "platform": "forge",
+    "path": "src/main/resources/data/blacklight/structures/frozen_research_station.nbt",
+    "snapshot": "sources/forge/src/main/resources/data/blacklight/structures/frozen_research_station.nbt",
+    "sha256": "a6372878b35f88b835316a11fb6378ca5925efa9952a3b93ad2e0b7fe14329f3",
+    "bytes": 12459
+  },
+  {
+    "platform": "forge",
+    "path": "src/main/resources/data/blacklight/structures/large_blackwatch_base.nbt",
+    "snapshot": "sources/forge/src/main/resources/data/blacklight/structures/large_blackwatch_base.nbt",
+    "sha256": "a3615c1dc9416e8da49741a4bd0fac02a826f93845d73ecb48943828cb92ac67",
+    "bytes": 245693
+  },
+  {
+    "platform": "forge",
+    "path": "src/main/resources/data/blacklight/structures/large_military_base.nbt",
+    "snapshot": "sources/forge/src/main/resources/data/blacklight/structures/large_military_base.nbt",
+    "sha256": "5c91bc9cd581eff2d83f8076538cab05b8d24a7c69d8a886dcfff496abe426ad",
+    "bytes": 196581
+  },
+  {
+    "platform": "forge",
+    "path": "src/main/resources/data/blacklight/structures/military_camp.nbt",
+    "snapshot": "sources/forge/src/main/resources/data/blacklight/structures/military_camp.nbt",
+    "sha256": "25f480997fa2921f8a2feb849e4a33dd328e522d89998f4bbfd5cb4a714f21f0",
+    "bytes": 12010
+  },
+  {
+    "platform": "forge",
+    "path": "src/main/resources/data/blacklight/structures/military_checkpoint.nbt",
+    "snapshot": "sources/forge/src/main/resources/data/blacklight/structures/military_checkpoint.nbt",
+    "sha256": "d7798ca6efb4788811b0758faab6f65f7a82f1cb204a36a9d1f0597a526705b8",
+    "bytes": 8031
+  },
+  {
+    "platform": "forge",
+    "path": "src/main/resources/data/blacklight/structures/vehicle_garage_blackwatch.nbt",
+    "snapshot": "sources/forge/src/main/resources/data/blacklight/structures/vehicle_garage_blackwatch.nbt",
+    "sha256": "fb505927279a4b4c5b77276a7fd827ce418d66cd4bc4ac47902335a943027112",
+    "bytes": 23965
+  },
+  {
+    "platform": "forge",
+    "path": "src/main/resources/data/blacklight/structures/vehicle_garage_military.nbt",
+    "snapshot": "sources/forge/src/main/resources/data/blacklight/structures/vehicle_garage_military.nbt",
+    "sha256": "3b2b294e1a64066901075e6cbe63e258800fc1b40041d260ba532f4adb1ce357",
+    "bytes": 23988
+  },
+  {
+    "platform": "forge",
+    "path": "src/test/java/com/codex/blacklight/client/model/VehicleRiderPoseTest.java",
+    "snapshot": "sources/forge/src/test/java/com/codex/blacklight/client/model/VehicleRiderPoseTest.java",
+    "sha256": "4519075d3c47bea3b0bf5a461497fdd55175d124b4af519533c2bd3f0cf01153",
+    "bytes": 11413
+  },
+  {
+    "platform": "forge",
+    "path": "src/test/java/com/codex/blacklight/client/vehicle/VehicleHudLayoutTest.java",
+    "snapshot": "sources/forge/src/test/java/com/codex/blacklight/client/vehicle/VehicleHudLayoutTest.java",
+    "sha256": "ba2ed287d3e50bb48d59df9d3b0c92ad8aff2abf10ce63b81e3f9afacbf3b830",
+    "bytes": 4080
+  },
+  {
+    "platform": "forge",
+    "path": "src/test/java/com/codex/blacklight/client/vehicle/VehiclePresentationTest.java",
+    "snapshot": "sources/forge/src/test/java/com/codex/blacklight/client/vehicle/VehiclePresentationTest.java",
+    "sha256": "1aaa64a575fda0ba9d434e81276590f60eedc185e6f99c8bd58e282f64742771",
+    "bytes": 23744
+  },
+  {
+    "platform": "forge",
+    "path": "src/test/java/com/codex/blacklight/military/vehicle/MilitaryLoadoutTest.java",
+    "snapshot": "sources/forge/src/test/java/com/codex/blacklight/military/vehicle/MilitaryLoadoutTest.java",
+    "sha256": "bdac48e50f2510f631bc4ae496c61304c6b517c883934cc3ec88af21c30cfba1",
+    "bytes": 7623
+  },
+  {
+    "platform": "forge",
+    "path": "src/test/java/com/codex/blacklight/military/vehicle/VehicleCatalogTest.java",
+    "snapshot": "sources/forge/src/test/java/com/codex/blacklight/military/vehicle/VehicleCatalogTest.java",
+    "sha256": "b0dc957788ab74d61736268d24ef2560be19297cc98d7dad1c15848ea25ee2a7",
+    "bytes": 10299
+  },
+  {
+    "platform": "forge",
+    "path": "src/test/java/com/codex/blacklight/military/vehicle/VehicleCollisionGeometryTest.java",
+    "snapshot": "sources/forge/src/test/java/com/codex/blacklight/military/vehicle/VehicleCollisionGeometryTest.java",
+    "sha256": "4d7f3b1c98d5e85754d6fe36a1e431b5b41d5ac48097c50bcc14fea0949ec268",
+    "bytes": 6060
+  },
+  {
+    "platform": "forge",
+    "path": "src/test/java/com/codex/blacklight/military/vehicle/VehicleControlAuthorityTest.java",
+    "snapshot": "sources/forge/src/test/java/com/codex/blacklight/military/vehicle/VehicleControlAuthorityTest.java",
+    "sha256": "951dc49aaadd77d5dd4d24e82544aa5c4643ce4efd00eaf86c865393945d6812",
+    "bytes": 8217
+  },
+  {
+    "platform": "forge",
+    "path": "src/test/java/com/codex/blacklight/military/vehicle/VehicleFleetSavedDataTest.java",
+    "snapshot": "sources/forge/src/test/java/com/codex/blacklight/military/vehicle/VehicleFleetSavedDataTest.java",
+    "sha256": "3ad5815ec4b8ec5365633e94bb573eedb196ac5a5ec1a49f84577d77d54c7f95",
+    "bytes": 4118
+  },
+  {
+    "platform": "forge",
+    "path": "src/test/java/com/codex/blacklight/military/vehicle/VehicleFleetTest.java",
+    "snapshot": "sources/forge/src/test/java/com/codex/blacklight/military/vehicle/VehicleFleetTest.java",
+    "sha256": "2ef154404849c638816aa7218f6cf9132e4bced5901d5a1b36d3a531455a568e",
+    "bytes": 1561
+  },
+  {
+    "platform": "forge",
+    "path": "src/test/java/com/codex/blacklight/military/vehicle/VehicleFuelDeactivationTest.java",
+    "snapshot": "sources/forge/src/test/java/com/codex/blacklight/military/vehicle/VehicleFuelDeactivationTest.java",
+    "sha256": "4e07aa1064632d59dbd5e25269b46baecb850d9735ba870a68d72a5f748eb8f3",
+    "bytes": 1608
+  },
+  {
+    "platform": "forge",
+    "path": "src/test/java/com/codex/blacklight/military/vehicle/VehicleGarageBoardingTest.java",
+    "snapshot": "sources/forge/src/test/java/com/codex/blacklight/military/vehicle/VehicleGarageBoardingTest.java",
+    "sha256": "204e3602b3510947c563fa400bf9f26196eeb96e2d1922dd249241d49bf752a0",
+    "bytes": 1801
+  },
+  {
+    "platform": "forge",
+    "path": "src/test/java/com/codex/blacklight/military/vehicle/VehicleGarageDataTest.java",
+    "snapshot": "sources/forge/src/test/java/com/codex/blacklight/military/vehicle/VehicleGarageDataTest.java",
+    "sha256": "2a18e097be456d998eeed2ff7ec8f5ee5eb89af88a881857ffb4de5b5218e0ad",
+    "bytes": 3742
+  },
+  {
+    "platform": "forge",
+    "path": "src/test/java/com/codex/blacklight/military/vehicle/VehicleHullAttackGoalTest.java",
+    "snapshot": "sources/forge/src/test/java/com/codex/blacklight/military/vehicle/VehicleHullAttackGoalTest.java",
+    "sha256": "6b01fb5e1d48b4b4ceb656ecfc1d09cce99646d7534a1d302e6bf17388358339",
+    "bytes": 2312
+  },
+  {
+    "platform": "forge",
+    "path": "src/test/java/com/codex/blacklight/military/vehicle/VehicleHullShapeTest.java",
+    "snapshot": "sources/forge/src/test/java/com/codex/blacklight/military/vehicle/VehicleHullShapeTest.java",
+    "sha256": "10d2b41e14e40e134c5b6324bbed209cf175f5a19e06782942591972a63e0f3c",
+    "bytes": 5996
+  },
+  {
+    "platform": "forge",
+    "path": "src/test/java/com/codex/blacklight/military/vehicle/VehicleInventoryTest.java",
+    "snapshot": "sources/forge/src/test/java/com/codex/blacklight/military/vehicle/VehicleInventoryTest.java",
+    "sha256": "21f25a80075c5e3517aea52b5d4db7a158c7dae2ea17d2a84158fc51741f7793",
+    "bytes": 6735
+  },
+  {
+    "platform": "forge",
+    "path": "src/test/java/com/codex/blacklight/military/vehicle/VehiclePhysicalContactTest.java",
+    "snapshot": "sources/forge/src/test/java/com/codex/blacklight/military/vehicle/VehiclePhysicalContactTest.java",
+    "sha256": "42258f1494a8c929ba7d633cfaeb18433a35cdda5951499582ab584faffac4c1",
+    "bytes": 2690
+  },
+  {
+    "platform": "forge",
+    "path": "src/test/java/com/codex/blacklight/military/vehicle/VehicleSupplyRulesTest.java",
+    "snapshot": "sources/forge/src/test/java/com/codex/blacklight/military/vehicle/VehicleSupplyRulesTest.java",
+    "sha256": "50f22f514777a68879d5c0d34b322f4cc22d73b1d09dfb7542d067daaa8594aa",
+    "bytes": 5649
+  },
+  {
+    "platform": "forge",
+    "path": "src/test/java/com/codex/blacklight/military/vehicle/VehicleWeaponDefinitionTest.java",
+    "snapshot": "sources/forge/src/test/java/com/codex/blacklight/military/vehicle/VehicleWeaponDefinitionTest.java",
+    "sha256": "80c798cf2ffbbb1b1d71573f3f0216963b56d96627cd6754352cdb1b1178a3c0",
+    "bytes": 2596
+  },
+  {
+    "platform": "forge",
+    "path": "src/test/java/com/codex/blacklight/military/vehicle/VehicleWorkBudgetTest.java",
+    "snapshot": "sources/forge/src/test/java/com/codex/blacklight/military/vehicle/VehicleWorkBudgetTest.java",
+    "sha256": "d1903c821eab6927ee864fa228327672d7cc7572c9e6adfa55fc8e886489323e",
+    "bytes": 3215
+  },
+  {
+    "platform": "forge",
+    "path": "src/vehicleTest/java/com/codex/blacklight/gametest/vehicle/MilitaryLauncherGameTest.java",
+    "snapshot": "sources/forge/src/vehicleTest/java/com/codex/blacklight/gametest/vehicle/MilitaryLauncherGameTest.java",
+    "sha256": "cc6b77a702534cd1ccc7e859002eab60500f68aaf7095e2fc8fc4bac952c52c4",
+    "bytes": 16185
+  },
+  {
+    "platform": "forge",
+    "path": "src/vehicleTest/java/com/codex/blacklight/gametest/vehicle/MilitaryLauncherSafetyGameTest.java",
+    "snapshot": "sources/forge/src/vehicleTest/java/com/codex/blacklight/gametest/vehicle/MilitaryLauncherSafetyGameTest.java",
+    "sha256": "d38f797dbe20c1305da39156c9fd92aa66620b1cf0216f6c60a374b0005514c7",
+    "bytes": 10806
+  },
+  {
+    "platform": "forge",
+    "path": "src/vehicleTest/java/com/codex/blacklight/gametest/vehicle/MilitarySummonLoadoutGameTest.java",
+    "snapshot": "sources/forge/src/vehicleTest/java/com/codex/blacklight/gametest/vehicle/MilitarySummonLoadoutGameTest.java",
+    "sha256": "3b8645c512d24b93e81aa5829dfc3feada0c3e573b461e8c22224572db388cf2",
+    "bytes": 6859
+  },
+  {
+    "platform": "forge",
+    "path": "src/vehicleTest/java/com/codex/blacklight/gametest/vehicle/MilitaryVehicleGameTest.java",
+    "snapshot": "sources/forge/src/vehicleTest/java/com/codex/blacklight/gametest/vehicle/MilitaryVehicleGameTest.java",
+    "sha256": "b839ec8fad2ed8a789e50c537a860d711426be618a747819231f16912c80d9c4",
+    "bytes": 23216
+  },
+  {
+    "platform": "forge",
+    "path": "src/vehicleTest/java/com/codex/blacklight/gametest/vehicle/VehicleAmmunitionRecipeGameTest.java",
+    "snapshot": "sources/forge/src/vehicleTest/java/com/codex/blacklight/gametest/vehicle/VehicleAmmunitionRecipeGameTest.java",
+    "sha256": "688043200f1acb5aed3cc08e77c1f3eb0f9a5c32f844c45f6deb49ea9f00b45f",
+    "bytes": 5279
+  },
+  {
+    "platform": "forge",
+    "path": "src/vehicleTest/java/com/codex/blacklight/gametest/vehicle/VehicleContactGameTest.java",
+    "snapshot": "sources/forge/src/vehicleTest/java/com/codex/blacklight/gametest/vehicle/VehicleContactGameTest.java",
+    "sha256": "ab9c9f5b096f2518b1d0a0ccddd7b3a47a08200cf0441cfd3dbed185498c544e",
+    "bytes": 11077
+  },
+  {
+    "platform": "forge",
+    "path": "src/vehicleTest/java/com/codex/blacklight/gametest/vehicle/VehicleFireGameTest.java",
+    "snapshot": "sources/forge/src/vehicleTest/java/com/codex/blacklight/gametest/vehicle/VehicleFireGameTest.java",
+    "sha256": "381cdd60667b8a2b109e5d77e930612db4e46b76b7b63b5d78ba5ff411312e07",
+    "bytes": 9746
+  },
+  {
+    "platform": "forge",
+    "path": "src/vehicleTest/java/com/codex/blacklight/gametest/vehicle/VehicleFleetGameTest.java",
+    "snapshot": "sources/forge/src/vehicleTest/java/com/codex/blacklight/gametest/vehicle/VehicleFleetGameTest.java",
+    "sha256": "e655faa5b5bea87f3cc774d06ee775d1f1fbff90cb8dcffeb730eea2a550b099",
+    "bytes": 36815
+  },
+  {
+    "platform": "forge",
+    "path": "src/vehicleTest/java/com/codex/blacklight/gametest/vehicle/VehicleFuelDeactivationGameTest.java",
+    "snapshot": "sources/forge/src/vehicleTest/java/com/codex/blacklight/gametest/vehicle/VehicleFuelDeactivationGameTest.java",
+    "sha256": "b7c3a4d99b6eee3d4913496193acf64196044241ce01a27fb7167752b98240d4",
+    "bytes": 8785
+  },
+  {
+    "platform": "forge",
+    "path": "src/vehicleTest/java/com/codex/blacklight/gametest/vehicle/VehicleGarageDispatchGameTest.java",
+    "snapshot": "sources/forge/src/vehicleTest/java/com/codex/blacklight/gametest/vehicle/VehicleGarageDispatchGameTest.java",
+    "sha256": "8d89f46a38fe8664da3ee6d06d6ebb735e35b6ecff710e22df0aec33c1f80dd1",
+    "bytes": 23110
+  },
+  {
+    "platform": "forge",
+    "path": "src/vehicleTest/java/com/codex/blacklight/gametest/vehicle/VehicleGarageGameTest.java",
+    "snapshot": "sources/forge/src/vehicleTest/java/com/codex/blacklight/gametest/vehicle/VehicleGarageGameTest.java",
+    "sha256": "b5da905f77abfe9c9bbb0ec9e2b854f82e10ecd0cb63b7664db032a96cc417f1",
+    "bytes": 12411
+  },
+  {
+    "platform": "forge",
+    "path": "src/vehicleTest/java/com/codex/blacklight/gametest/vehicle/VehicleHijackGameTest.java",
+    "snapshot": "sources/forge/src/vehicleTest/java/com/codex/blacklight/gametest/vehicle/VehicleHijackGameTest.java",
+    "sha256": "5289652a6b26888b5dff4b311c79cfd419c4612ea00c0ff3ebe62ef8276e9849",
+    "bytes": 8168
+  },
+  {
+    "platform": "forge",
+    "path": "src/vehicleTest/java/com/codex/blacklight/gametest/vehicle/VehicleHullAttackGameTest.java",
+    "snapshot": "sources/forge/src/vehicleTest/java/com/codex/blacklight/gametest/vehicle/VehicleHullAttackGameTest.java",
+    "sha256": "7079b816b3f26d4f91f272342520ce1497e062718f3eaa244153867f1e4a6b50",
+    "bytes": 13686
+  },
+  {
+    "platform": "forge",
+    "path": "src/vehicleTest/java/com/codex/blacklight/gametest/vehicle/VehicleHullBoardingGameTest.java",
+    "snapshot": "sources/forge/src/vehicleTest/java/com/codex/blacklight/gametest/vehicle/VehicleHullBoardingGameTest.java",
+    "sha256": "c3c4a5adb7753c9e7954b7a7c29018954ecc23cc16d74b636655d63e372984a0",
+    "bytes": 6032
+  },
+  {
+    "platform": "forge",
+    "path": "src/vehicleTest/java/com/codex/blacklight/gametest/vehicle/VehicleLogisticsGameTest.java",
+    "snapshot": "sources/forge/src/vehicleTest/java/com/codex/blacklight/gametest/vehicle/VehicleLogisticsGameTest.java",
+    "sha256": "a498a0859f6ceb2bb1de4a1e72746139aa02061d24dd02c09dfa55a2ad45e7ea",
+    "bytes": 24095
+  },
+  {
+    "platform": "forge",
+    "path": "src/vehicleTest/java/com/codex/blacklight/gametest/vehicle/VehiclePermissionGameTest.java",
+    "snapshot": "sources/forge/src/vehicleTest/java/com/codex/blacklight/gametest/vehicle/VehiclePermissionGameTest.java",
+    "sha256": "aab15953e42483b583421785856248c71347c7c7bd504245a32899a768521196",
+    "bytes": 4575
+  },
+  {
+    "platform": "forge",
+    "path": "src/vehicleTest/java/com/codex/blacklight/gametest/vehicle/VehiclePhysicalDamageGameTest.java",
+    "snapshot": "sources/forge/src/vehicleTest/java/com/codex/blacklight/gametest/vehicle/VehiclePhysicalDamageGameTest.java",
+    "sha256": "c87e02634d16886bdcf68d20d5b4d25d2d67470631f635d972335ae2dde9eae5",
+    "bytes": 13209
+  },
+  {
+    "platform": "forge",
+    "path": "src/vehicleTest/java/com/codex/blacklight/gametest/vehicle/VehicleProjectileHullGameTest.java",
+    "snapshot": "sources/forge/src/vehicleTest/java/com/codex/blacklight/gametest/vehicle/VehicleProjectileHullGameTest.java",
+    "sha256": "94fa8ae88724da22db9c357db9b7bbceb59ce7d76a9b65b908c0ee9ce1eec2dd",
+    "bytes": 9680
+  },
+  {
+    "platform": "forge",
+    "path": "src/vehicleTest/java/com/codex/blacklight/gametest/vehicle/VehicleSupplyGameTest.java",
+    "snapshot": "sources/forge/src/vehicleTest/java/com/codex/blacklight/gametest/vehicle/VehicleSupplyGameTest.java",
+    "sha256": "4622e8e12260ac85d63f9f3eef3b0b92cf3924d2e6df22ef167bc28ea3ac3c0a",
+    "bytes": 6045
+  },
+  {
+    "platform": "forge",
+    "path": "src/vehicleTest/java/com/codex/blacklight/gametest/vehicle/VehicleTestReadiness.java",
+    "snapshot": "sources/forge/src/vehicleTest/java/com/codex/blacklight/gametest/vehicle/VehicleTestReadiness.java",
+    "sha256": "d0061af1d2bc0865f343410f198e7ac2d079f687871ca8d7b69e7147ba0acb47",
+    "bytes": 2037
+  },
+  {
+    "platform": "forge",
+    "path": "src/vehicleTest/java/com/codex/blacklight/gametest/vehicle/VehicleUsabilityGameTest.java",
+    "snapshot": "sources/forge/src/vehicleTest/java/com/codex/blacklight/gametest/vehicle/VehicleUsabilityGameTest.java",
+    "sha256": "1cd39b552a5aea321335dded23530902876434d09af643a6de98f1361c0a0c2f",
+    "bytes": 4316
+  },
+  {
+    "platform": "forge",
+    "path": "tools/VehicleMeshCapture.java",
+    "snapshot": "sources/forge/tools/VehicleMeshCapture.java",
+    "sha256": "5bddf928eab952a4782b45e5262e7dc3931224b4d84963fb850d0efcc784faf2",
+    "bytes": 4818
+  },
+  {
+    "platform": "forge",
+    "path": "tools/archive_military6_catalog.py",
+    "snapshot": "sources/forge/tools/archive_military6_catalog.py",
+    "sha256": "1d8635804f6d29991b03758156c9fba170a46fc4fc1b1c2f44bb4ed77000fa52",
+    "bytes": 50066
+  },
+  {
+    "platform": "forge",
+    "path": "tools/build_military_vehicles.py",
+    "snapshot": "sources/forge/tools/build_military_vehicles.py",
+    "sha256": "d4000f9a90c480da10fc792c71d8dd94690c9db979a1f578d9207aa6bd66b5e9",
+    "bytes": 19126
+  },
+  {
+    "platform": "forge",
+    "path": "tools/build_vehicle_garages.py",
+    "snapshot": "sources/forge/tools/build_vehicle_garages.py",
+    "sha256": "865e8d907b7beafc811d04ce081b21eaa394785fe8a56bee8c1e77c6d92fff6c",
+    "bytes": 8874
+  },
+  {
+    "platform": "forge",
+    "path": "tools/preview_large_military_bases.py",
+    "snapshot": "sources/forge/tools/preview_large_military_bases.py",
+    "sha256": "98551552649a97d8ab9ec9a13dfa251c9831c051256d53c9053c5009a84a9d7c",
+    "bytes": 24078
+  },
+  {
+    "platform": "forge",
+    "path": "tools/preview_military_vehicles.py",
+    "snapshot": "sources/forge/tools/preview_military_vehicles.py",
+    "sha256": "2ab27a11bb35d4275ca4206daf146fd9d90b254969c4a2aba6411e9bbd467bae",
+    "bytes": 4844
+  },
+  {
+    "platform": "neoforge",
+    "path": ".superpowers/military6-qa/neo-resume-summon-green.log",
+    "snapshot": "sources/neoforge/.superpowers/military6-qa/neo-resume-summon-green.log",
+    "sha256": "1af6fc460bb3e8955fafe461e9400675ce34b6440371fc34714051401339cb16",
+    "bytes": 106037
+  },
+  {
+    "platform": "neoforge",
+    "path": ".superpowers/military6-qa/neo-resume-summon-green.result.json",
+    "snapshot": "sources/neoforge/.superpowers/military6-qa/neo-resume-summon-green.result.json",
+    "sha256": "6e853297365ff3893b3cf7922aaa5b75c245acf1c78259b2b500348420c1a714",
+    "bytes": 582
+  },
+  {
+    "platform": "neoforge",
+    "path": ".superpowers/military6-qa/visual-seat-sync-final-receipt.json",
+    "snapshot": "sources/neoforge/.superpowers/military6-qa/visual-seat-sync-final-receipt.json",
+    "sha256": "24c66fe921f3e4e7bbc09429a6d4abc312657d2997f045ccd47e3b990abb90e3",
+    "bytes": 13499
+  },
+  {
+    "platform": "neoforge",
+    "path": ".superpowers/military6-qa/visual-seating-final-receipt.json",
+    "snapshot": "sources/neoforge/.superpowers/military6-qa/visual-seating-final-receipt.json",
+    "sha256": "44215010be13031f65a8a5eff6c5b0c5aff7c1d7da8ba65db7b9429c71ab9ec7",
+    "bytes": 8469
+  },
+  {
+    "platform": "neoforge",
+    "path": "THIRD_PARTY_ASSETS.md",
+    "snapshot": "sources/neoforge/THIRD_PARTY_ASSETS.md",
+    "sha256": "617e11558f7fa9988e656dd8babfa69bbd86eadc8cd2a1f9c55a3cdc4fbb7fdb",
+    "bytes": 12562
+  },
+  {
+    "platform": "neoforge",
+    "path": "art/military-vehicles/apc.bbmodel",
+    "snapshot": "sources/neoforge/art/military-vehicles/apc.bbmodel",
+    "sha256": "3149c6e7b9bdf8c18e000343573a1f315fc077c16f367e2f84dbe150f823ab49",
+    "bytes": 557073
+  },
+  {
+    "platform": "neoforge",
+    "path": "art/military-vehicles/previews/production/manifest.json",
+    "snapshot": "sources/neoforge/art/military-vehicles/previews/production/manifest.json",
+    "sha256": "481362516ca2a36422c9951c8582cd9bf7d0fce78e6120e463f693e2ee1c75c1",
+    "bytes": 1467
+  },
+  {
+    "platform": "neoforge",
+    "path": "art/military-vehicles/reference-observations.json",
+    "snapshot": "sources/neoforge/art/military-vehicles/reference-observations.json",
+    "sha256": "f56bd8e02e9863c44d70b8a01aa902f4d4a35a70a1beb09abf9b2720ecb26fc7",
+    "bytes": 16239
+  },
+  {
+    "platform": "neoforge",
+    "path": "art/military-vehicles/tank.bbmodel",
+    "snapshot": "sources/neoforge/art/military-vehicles/tank.bbmodel",
+    "sha256": "32c0520794fbbfcb11e3daefee79caf10e12f2e055e53ed3a3446b070b0eace2",
+    "bytes": 589675
+  },
+  {
+    "platform": "neoforge",
+    "path": "art/military-vehicles/textures/blackwatch.png",
+    "snapshot": "sources/neoforge/art/military-vehicles/textures/blackwatch.png",
+    "sha256": "5f878d6f5cf0bfb333b6959422a2c71466674e4d4960723d12c06ceeead0283b",
+    "bytes": 106376
+  },
+  {
+    "platform": "neoforge",
+    "path": "art/military-vehicles/textures/military.png",
+    "snapshot": "sources/neoforge/art/military-vehicles/textures/military.png",
+    "sha256": "a05858c5609c5eced700a12393bf25955cd563b31591dad974f6d2ce6b6d6445",
+    "bytes": 124466
+  },
+  {
+    "platform": "neoforge",
+    "path": "art/military-vehicles/truck.bbmodel",
+    "snapshot": "sources/neoforge/art/military-vehicles/truck.bbmodel",
+    "sha256": "112195dde7fe189074ff123b0dc7b237b993718a8f0fd355ba64c54f5117f9a6",
+    "bytes": 447663
+  },
+  {
+    "platform": "neoforge",
+    "path": "art/military-vehicles/validation-receipt.json",
+    "snapshot": "sources/neoforge/art/military-vehicles/validation-receipt.json",
+    "sha256": "f0d302d902ca0eacd44bad39b70b7c6b96adad3de144ad779af8a723b6640fc7",
+    "bytes": 10958
+  },
+  {
+    "platform": "neoforge",
+    "path": "art/military-vehicles/vehicle-authoring.json",
+    "snapshot": "sources/neoforge/art/military-vehicles/vehicle-authoring.json",
+    "sha256": "4ccafec7230accdac6d2d84c7ffbd043f2ece8d2b2848e9fe9eb98aa13523a21",
+    "bytes": 135054
+  },
+  {
+    "platform": "neoforge",
+    "path": "src/main/java/com/codex/blacklight/city/CityMilitaryService.java",
+    "snapshot": "sources/neoforge/src/main/java/com/codex/blacklight/city/CityMilitaryService.java",
+    "sha256": "2e3170deb0e7314bfb4f9ae937952b40fe48bb6653feb82eb5dd6a2cfe0fd683",
+    "bytes": 26697
+  },
+  {
+    "platform": "neoforge",
+    "path": "src/main/java/com/codex/blacklight/city/MilitaryBaseAccess.java",
+    "snapshot": "sources/neoforge/src/main/java/com/codex/blacklight/city/MilitaryBaseAccess.java",
+    "sha256": "81273811b790922664831f6147960afca35a4ac8e487eea462bba28b6bd67d09",
+    "bytes": 6301
+  },
+  {
+    "platform": "neoforge",
+    "path": "src/main/java/com/codex/blacklight/city/VehicleGaragePiece.java",
+    "snapshot": "sources/neoforge/src/main/java/com/codex/blacklight/city/VehicleGaragePiece.java",
+    "sha256": "cdc29440b759ca298628b01ffdbddda1e8052598a909653f292f23a90e2062a0",
+    "bytes": 8593
+  },
+  {
+    "platform": "neoforge",
+    "path": "src/main/java/com/codex/blacklight/client/ClientClawEvents.java",
+    "snapshot": "sources/neoforge/src/main/java/com/codex/blacklight/client/ClientClawEvents.java",
+    "sha256": "09b58b2c78d48f517fd79163d6f0da55af9e5577118c622638bf77cec79dae52",
+    "bytes": 32149
+  },
+  {
+    "platform": "neoforge",
+    "path": "src/main/java/com/codex/blacklight/client/ClientWeaponCombat.java",
+    "snapshot": "sources/neoforge/src/main/java/com/codex/blacklight/client/ClientWeaponCombat.java",
+    "sha256": "f775689afb2072c5033a3088a39674b0e652a672903b6459ad7d08323e154883",
+    "bytes": 7253
+  },
+  {
+    "platform": "neoforge",
+    "path": "src/main/java/com/codex/blacklight/client/SkillBindings.java",
+    "snapshot": "sources/neoforge/src/main/java/com/codex/blacklight/client/SkillBindings.java",
+    "sha256": "eaedf0d572dbb76243a266c12aefbaf13af69bee83a9de27660f3e16410246ca",
+    "bytes": 2445
+  },
+  {
+    "platform": "neoforge",
+    "path": "src/main/java/com/codex/blacklight/client/VehicleControls.java",
+    "snapshot": "sources/neoforge/src/main/java/com/codex/blacklight/client/VehicleControls.java",
+    "sha256": "ea74ae2476a334286f3643276010998834fcbe3bd2c41fcf1aa050fbb1986b73",
+    "bytes": 6009
+  },
+  {
+    "platform": "neoforge",
+    "path": "src/main/java/com/codex/blacklight/client/VehicleHud.java",
+    "snapshot": "sources/neoforge/src/main/java/com/codex/blacklight/client/VehicleHud.java",
+    "sha256": "8a4a967b646276012e40fde921df2b5b57331bf1894738c228f4c77552c796a0",
+    "bytes": 4872
+  },
+  {
+    "platform": "neoforge",
+    "path": "src/main/java/com/codex/blacklight/client/animation/BlacklightRenderPose.java",
+    "snapshot": "sources/neoforge/src/main/java/com/codex/blacklight/client/animation/BlacklightRenderPose.java",
+    "sha256": "c7108e59dc790631f774e9e03cd6c2eb5fffd31cbcc14ea84c01e71cf8e65827",
+    "bytes": 6648
+  },
+  {
+    "platform": "neoforge",
+    "path": "src/main/java/com/codex/blacklight/client/camera/PrototypeChaseCamera.java",
+    "snapshot": "sources/neoforge/src/main/java/com/codex/blacklight/client/camera/PrototypeChaseCamera.java",
+    "sha256": "30ed1958e3fc9ad9b0b6eb090682496ec2837be6ff3955f87632e4b907af257a",
+    "bytes": 21337
+  },
+  {
+    "platform": "neoforge",
+    "path": "src/main/java/com/codex/blacklight/client/model/BlacklightPlayerModel.java",
+    "snapshot": "sources/neoforge/src/main/java/com/codex/blacklight/client/model/BlacklightPlayerModel.java",
+    "sha256": "ab329c81211e13b0173b99b3e4f6fb1fce5dc63936ba96d52743dc1f7d4ee63f",
+    "bytes": 14788
+  },
+  {
+    "platform": "neoforge",
+    "path": "src/main/java/com/codex/blacklight/client/model/BlackwatchModel.java",
+    "snapshot": "sources/neoforge/src/main/java/com/codex/blacklight/client/model/BlackwatchModel.java",
+    "sha256": "220260ec3df9b3e61a066d33336fe6e324bef1a394620fd2a19c45e2c45ff477",
+    "bytes": 44183
+  },
+  {
+    "platform": "neoforge",
+    "path": "src/main/java/com/codex/blacklight/client/model/MercerPlayerMesh.java",
+    "snapshot": "sources/neoforge/src/main/java/com/codex/blacklight/client/model/MercerPlayerMesh.java",
+    "sha256": "55867a3b999d25e7d835be49f6ad46028c288dfd217ceaa3097626b8fdb59440",
+    "bytes": 7576
+  },
+  {
+    "platform": "neoforge",
+    "path": "src/main/java/com/codex/blacklight/client/model/MilitaryVehicleModel.java",
+    "snapshot": "sources/neoforge/src/main/java/com/codex/blacklight/client/model/MilitaryVehicleModel.java",
+    "sha256": "da35d77f42ac82c1b5d594e876943042b2dc0de9b59377eef572f76cbb4d491b",
+    "bytes": 5443
+  },
+  {
+    "platform": "neoforge",
+    "path": "src/main/java/com/codex/blacklight/client/vehicle/VehicleCamera.java",
+    "snapshot": "sources/neoforge/src/main/java/com/codex/blacklight/client/vehicle/VehicleCamera.java",
+    "sha256": "d7d9422fab6b0956ebaa362122a20bd5d433ed0990bd5230db0b741bd563d4f9",
+    "bytes": 5234
+  },
+  {
+    "platform": "neoforge",
+    "path": "src/main/java/com/codex/blacklight/client/vehicle/VehicleOpticClipper.java",
+    "snapshot": "sources/neoforge/src/main/java/com/codex/blacklight/client/vehicle/VehicleOpticClipper.java",
+    "sha256": "e6bf38d919961ad10a6876809827c6c48b9fc0314873513284c47aab5d0cf563",
+    "bytes": 4308
+  },
+  {
+    "platform": "neoforge",
+    "path": "src/main/java/com/codex/blacklight/client/vehicle/VehicleSeatPose.java",
+    "snapshot": "sources/neoforge/src/main/java/com/codex/blacklight/client/vehicle/VehicleSeatPose.java",
+    "sha256": "f28efbe70fa44e99045064b42addccc1ca86afd96d26323dc91823d53b8aa85e",
+    "bytes": 6225
+  },
+  {
+    "platform": "neoforge",
+    "path": "src/main/java/com/codex/blacklight/client/vehicle/VehicleViewRendering.java",
+    "snapshot": "sources/neoforge/src/main/java/com/codex/blacklight/client/vehicle/VehicleViewRendering.java",
+    "sha256": "d50e2fa9ba8ef2d1fe0502d81535756e45fc15b5a2874ff43d1bcf00c6cd6cde",
+    "bytes": 5288
+  },
+  {
+    "platform": "neoforge",
+    "path": "src/main/java/com/codex/blacklight/command/BlacklightCommands.java",
+    "snapshot": "sources/neoforge/src/main/java/com/codex/blacklight/command/BlacklightCommands.java",
+    "sha256": "5d475001bb1a6c93a8f67a38309418ce0694d54cb3696d123ee2b3f5980c2d3f",
+    "bytes": 13707
+  },
+  {
+    "platform": "neoforge",
+    "path": "src/main/java/com/codex/blacklight/command/CityMilitaryCommands.java",
+    "snapshot": "sources/neoforge/src/main/java/com/codex/blacklight/command/CityMilitaryCommands.java",
+    "sha256": "4910525ab8006e01b54cb0bb8ea0f8f2630596641903958ecca38a526d857b44",
+    "bytes": 3389
+  },
+  {
+    "platform": "neoforge",
+    "path": "src/main/java/com/codex/blacklight/command/MilitaryCommands.java",
+    "snapshot": "sources/neoforge/src/main/java/com/codex/blacklight/command/MilitaryCommands.java",
+    "sha256": "9159eb6ab9ae478284f4ddfb89bddc161fb93f4edf363d9006727edf5bbdf787",
+    "bytes": 17725
+  },
+  {
+    "platform": "neoforge",
+    "path": "src/main/java/com/codex/blacklight/command/VehicleFleetCommands.java",
+    "snapshot": "sources/neoforge/src/main/java/com/codex/blacklight/command/VehicleFleetCommands.java",
+    "sha256": "105dad2a3064ca25acf92b21424f12bc2e0bffdf0d44e835655d7950c92aa24d",
+    "bytes": 6924
+  },
+  {
+    "platform": "neoforge",
+    "path": "src/main/java/com/codex/blacklight/command/VehicleGarageCommands.java",
+    "snapshot": "sources/neoforge/src/main/java/com/codex/blacklight/command/VehicleGarageCommands.java",
+    "sha256": "060c51d4236c1c3793d1cd86ff20cae1e7e9fb688ef96880d1b2fe7a32c898fb",
+    "bytes": 4403
+  },
+  {
+    "platform": "neoforge",
+    "path": "src/main/java/com/codex/blacklight/entity/BlackwatchSoldier.java",
+    "snapshot": "sources/neoforge/src/main/java/com/codex/blacklight/entity/BlackwatchSoldier.java",
+    "sha256": "e7ccffbf3b8f9fd6448257b8a6e75d6c645b390458f4cce5df8fff21feeed968",
+    "bytes": 704
+  },
+  {
+    "platform": "neoforge",
+    "path": "src/main/java/com/codex/blacklight/entity/MilitarySoldier.java",
+    "snapshot": "sources/neoforge/src/main/java/com/codex/blacklight/entity/MilitarySoldier.java",
+    "sha256": "ab805e1723ed1ac181c9e318043d5440ad38ba9a79fa6a0fd9fd3a9ba12ce7d4",
+    "bytes": 32430
+  },
+  {
+    "platform": "neoforge",
+    "path": "src/main/java/com/codex/blacklight/entity/MilitaryVehicle.java",
+    "snapshot": "sources/neoforge/src/main/java/com/codex/blacklight/entity/MilitaryVehicle.java",
+    "sha256": "2bc854480349e248c1ef4a992bafc6e31c46f22ebdd9dea242d85416ca940ccb",
+    "bytes": 31594
+  },
+  {
+    "platform": "neoforge",
+    "path": "src/main/java/com/codex/blacklight/entity/RegularSoldier.java",
+    "snapshot": "sources/neoforge/src/main/java/com/codex/blacklight/entity/RegularSoldier.java",
+    "sha256": "2cfb468381049a31a78155c7a9c2c6682b00c2ef71d93a5bb7e4c62cae944198",
+    "bytes": 697
+  },
+  {
+    "platform": "neoforge",
+    "path": "src/main/java/com/codex/blacklight/entity/VehicleHullPart.java",
+    "snapshot": "sources/neoforge/src/main/java/com/codex/blacklight/entity/VehicleHullPart.java",
+    "sha256": "d80ebe4ca087bfc78f2e567d429d9b122d5cdc9740889a055bed10d253578b24",
+    "bytes": 1918
+  },
+  {
+    "platform": "neoforge",
+    "path": "src/main/java/com/codex/blacklight/firearms/FirearmsCombat.java",
+    "snapshot": "sources/neoforge/src/main/java/com/codex/blacklight/firearms/FirearmsCombat.java",
+    "sha256": "4eeb4869850b64cb27d423f420fffec20b416aea8d2a3d356f1c0366b36df994",
+    "bytes": 4069
+  },
+  {
+    "platform": "neoforge",
+    "path": "src/main/java/com/codex/blacklight/firearms/VehicleOrdnanceProjectile.java",
+    "snapshot": "sources/neoforge/src/main/java/com/codex/blacklight/firearms/VehicleOrdnanceProjectile.java",
+    "sha256": "c9cdcb984bc61db2db5e31e5d05b9df2cdc36768948d86577c3a6ac5cd323be4",
+    "bytes": 10066
+  },
+  {
+    "platform": "neoforge",
+    "path": "src/main/java/com/codex/blacklight/firearms/WeaponCatalog.java",
+    "snapshot": "sources/neoforge/src/main/java/com/codex/blacklight/firearms/WeaponCatalog.java",
+    "sha256": "54d0e1d1afee93cda5624705f40cf78b44ff467fd77a4ec0d5369023c77d311e",
+    "bytes": 1757
+  },
+  {
+    "platform": "neoforge",
+    "path": "src/main/java/com/codex/blacklight/military/MilitaryCombatProfile.java",
+    "snapshot": "sources/neoforge/src/main/java/com/codex/blacklight/military/MilitaryCombatProfile.java",
+    "sha256": "224be2268db526b3dde1feaa3333b2272cd52f22460e10895c46119414ffb1d1",
+    "bytes": 861
+  },
+  {
+    "platform": "neoforge",
+    "path": "src/main/java/com/codex/blacklight/military/MilitaryFaction.java",
+    "snapshot": "sources/neoforge/src/main/java/com/codex/blacklight/military/MilitaryFaction.java",
+    "sha256": "5b3e70b3d3e24a8c8c586dd9a0dfdf58ccb5ca8865aff16b1d3ffb6e6a77b974",
+    "bytes": 562
+  },
+  {
+    "platform": "neoforge",
+    "path": "src/main/java/com/codex/blacklight/military/MilitaryFormationSystem.java",
+    "snapshot": "sources/neoforge/src/main/java/com/codex/blacklight/military/MilitaryFormationSystem.java",
+    "sha256": "9c796103ca73c6f2e8b7e420240492ef78e925b558ecf55596bfa9fcf8f57187",
+    "bytes": 16466
+  },
+  {
+    "platform": "neoforge",
+    "path": "src/main/java/com/codex/blacklight/military/MilitaryGroundNavigation.java",
+    "snapshot": "sources/neoforge/src/main/java/com/codex/blacklight/military/MilitaryGroundNavigation.java",
+    "sha256": "277ad24b96f2fa551f67bf8fdda0d05eafdc114e7e4b0703b50e888e4a38e9c4",
+    "bytes": 1749
+  },
+  {
+    "platform": "neoforge",
+    "path": "src/main/java/com/codex/blacklight/military/MilitaryLoadoutInventory.java",
+    "snapshot": "sources/neoforge/src/main/java/com/codex/blacklight/military/MilitaryLoadoutInventory.java",
+    "sha256": "b40288060dc514551904a5f4b3b437584d48414c880b668d2bb4d1aeac17cc10",
+    "bytes": 5327
+  },
+  {
+    "platform": "neoforge",
+    "path": "src/main/java/com/codex/blacklight/military/MilitaryLoadoutProfile.java",
+    "snapshot": "sources/neoforge/src/main/java/com/codex/blacklight/military/MilitaryLoadoutProfile.java",
+    "sha256": "242c9f6c2397f8ae3cfbfa9809e962ef78ededd507ac3f3d3e9bdf5ab094d72b",
+    "bytes": 4032
+  },
+  {
+    "platform": "neoforge",
+    "path": "src/main/java/com/codex/blacklight/military/MilitaryOrder.java",
+    "snapshot": "sources/neoforge/src/main/java/com/codex/blacklight/military/MilitaryOrder.java",
+    "sha256": "a050ed6158b359aa5a8553566572eba6a2b18aac2fb916494cc1c53a53c48b5e",
+    "bytes": 544
+  },
+  {
+    "platform": "neoforge",
+    "path": "src/main/java/com/codex/blacklight/military/MilitaryOrganization.java",
+    "snapshot": "sources/neoforge/src/main/java/com/codex/blacklight/military/MilitaryOrganization.java",
+    "sha256": "648f5dfcfef46ac8a16e39240bf2ecce6f941d70b5c02821ccdc3358bf4e6717",
+    "bytes": 9441
+  },
+  {
+    "platform": "neoforge",
+    "path": "src/main/java/com/codex/blacklight/military/MilitaryOrganizationSystem.java",
+    "snapshot": "sources/neoforge/src/main/java/com/codex/blacklight/military/MilitaryOrganizationSystem.java",
+    "sha256": "e34628a04ff403829f29a97c6a9ba0569dcda8777ee3f909407b5fab0119ad46",
+    "bytes": 12598
+  },
+  {
+    "platform": "neoforge",
+    "path": "src/main/java/com/codex/blacklight/military/MilitaryRank.java",
+    "snapshot": "sources/neoforge/src/main/java/com/codex/blacklight/military/MilitaryRank.java",
+    "sha256": "5f7c94da6a902a0acb2d703f94b9466617567a3bdad4eba66b22a6e933bc00f1",
+    "bytes": 693
+  },
+  {
+    "platform": "neoforge",
+    "path": "src/main/java/com/codex/blacklight/military/MilitaryRole.java",
+    "snapshot": "sources/neoforge/src/main/java/com/codex/blacklight/military/MilitaryRole.java",
+    "sha256": "1c01d0c9dc68d7ac166680b5529096fdebd7bea7a13ebef34d142da89b659b94",
+    "bytes": 1285
+  },
+  {
+    "platform": "neoforge",
+    "path": "src/main/java/com/codex/blacklight/military/MilitarySavedData.java",
+    "snapshot": "sources/neoforge/src/main/java/com/codex/blacklight/military/MilitarySavedData.java",
+    "sha256": "34e8686e494bb28e603219bb93521ce80dda4a9f4e36f95c7c94b572f24d0d67",
+    "bytes": 7102
+  },
+  {
+    "platform": "neoforge",
+    "path": "src/main/java/com/codex/blacklight/military/MilitaryUnitType.java",
+    "snapshot": "sources/neoforge/src/main/java/com/codex/blacklight/military/MilitaryUnitType.java",
+    "sha256": "c3f9c256b76d49f79b97165ee42a92175f1df37486c2b1b93bd5fec8f23ac926",
+    "bytes": 985
+  },
+  {
+    "platform": "neoforge",
+    "path": "src/main/java/com/codex/blacklight/military/MilitaryWorkBudget.java",
+    "snapshot": "sources/neoforge/src/main/java/com/codex/blacklight/military/MilitaryWorkBudget.java",
+    "sha256": "29601e0e5fd0b3420148379101816cd1f09f543e14f94e7e6db1ae5a1f4c18a4",
+    "bytes": 2352
+  },
+  {
+    "platform": "neoforge",
+    "path": "src/main/java/com/codex/blacklight/military/vehicle/VehicleAttackService.java",
+    "snapshot": "sources/neoforge/src/main/java/com/codex/blacklight/military/vehicle/VehicleAttackService.java",
+    "sha256": "01df22bbe9ae24c2ae80ee41902c149f24b6400df42cbc9e63160ade6c0ced10",
+    "bytes": 5687
+  },
+  {
+    "platform": "neoforge",
+    "path": "src/main/java/com/codex/blacklight/military/vehicle/VehicleCatalog.java",
+    "snapshot": "sources/neoforge/src/main/java/com/codex/blacklight/military/vehicle/VehicleCatalog.java",
+    "sha256": "7345beb463ada2db74df1df4a4692ceecdf05fad3bc4cff823e9fc3e3b4a1d2f",
+    "bytes": 11680
+  },
+  {
+    "platform": "neoforge",
+    "path": "src/main/java/com/codex/blacklight/military/vehicle/VehicleCollisionGeometry.java",
+    "snapshot": "sources/neoforge/src/main/java/com/codex/blacklight/military/vehicle/VehicleCollisionGeometry.java",
+    "sha256": "fbeb5b3bf226c1f8222c44b58ac167b9ce62944f21413b02a3141f5591486bf1",
+    "bytes": 7629
+  },
+  {
+    "platform": "neoforge",
+    "path": "src/main/java/com/codex/blacklight/military/vehicle/VehicleCollisionShapes.java",
+    "snapshot": "sources/neoforge/src/main/java/com/codex/blacklight/military/vehicle/VehicleCollisionShapes.java",
+    "sha256": "7a3e6a1b558a2be7e269199b25f42301db79a58f789f44be37c044c4d2987d0f",
+    "bytes": 2144
+  },
+  {
+    "platform": "neoforge",
+    "path": "src/main/java/com/codex/blacklight/military/vehicle/VehicleControlAuthority.java",
+    "snapshot": "sources/neoforge/src/main/java/com/codex/blacklight/military/vehicle/VehicleControlAuthority.java",
+    "sha256": "43905494faf34f92ed4ca23892454e04d955fb11e542d563222e4aa26796870b",
+    "bytes": 4977
+  },
+  {
+    "platform": "neoforge",
+    "path": "src/main/java/com/codex/blacklight/military/vehicle/VehicleDamageBridge.java",
+    "snapshot": "sources/neoforge/src/main/java/com/codex/blacklight/military/vehicle/VehicleDamageBridge.java",
+    "sha256": "167b0a96e7b0460736be61ce763ff7a06e394c1e72b83c9a4ce519d06d12f239",
+    "bytes": 9119
+  },
+  {
+    "platform": "neoforge",
+    "path": "src/main/java/com/codex/blacklight/military/vehicle/VehicleDefinition.java",
+    "snapshot": "sources/neoforge/src/main/java/com/codex/blacklight/military/vehicle/VehicleDefinition.java",
+    "sha256": "c55ee0e70631e674eb8bbce17be04547c2dc1c8d02a3be4dcc79ed577562ef23",
+    "bytes": 6716
+  },
+  {
+    "platform": "neoforge",
+    "path": "src/main/java/com/codex/blacklight/military/vehicle/VehicleFleet.java",
+    "snapshot": "sources/neoforge/src/main/java/com/codex/blacklight/military/vehicle/VehicleFleet.java",
+    "sha256": "42a0ffb5182beba8ecaaee6367696ae89b141718f80ebc34b7724fca74b130e8",
+    "bytes": 3790
+  },
+  {
+    "platform": "neoforge",
+    "path": "src/main/java/com/codex/blacklight/military/vehicle/VehicleFleetSavedData.java",
+    "snapshot": "sources/neoforge/src/main/java/com/codex/blacklight/military/vehicle/VehicleFleetSavedData.java",
+    "sha256": "d3bdfef51e2f60b0e012e61d94f90c27dcd473e0b724e0619b2c9a102eef06f4",
+    "bytes": 5074
+  },
+  {
+    "platform": "neoforge",
+    "path": "src/main/java/com/codex/blacklight/military/vehicle/VehicleFleetSystem.java",
+    "snapshot": "sources/neoforge/src/main/java/com/codex/blacklight/military/vehicle/VehicleFleetSystem.java",
+    "sha256": "c200b009ca7a1ad8d7a95056e186c5d95c5e2b95427d5e08821048a0134872f8",
+    "bytes": 43687
+  },
+  {
+    "platform": "neoforge",
+    "path": "src/main/java/com/codex/blacklight/military/vehicle/VehicleGarageData.java",
+    "snapshot": "sources/neoforge/src/main/java/com/codex/blacklight/military/vehicle/VehicleGarageData.java",
+    "sha256": "976a688b202a8e2d193b7e4644719a01914f1e171d66dfc7bc0d890dc09e1264",
+    "bytes": 5819
+  },
+  {
+    "platform": "neoforge",
+    "path": "src/main/java/com/codex/blacklight/military/vehicle/VehicleGarageService.java",
+    "snapshot": "sources/neoforge/src/main/java/com/codex/blacklight/military/vehicle/VehicleGarageService.java",
+    "sha256": "3d9763525949851a47cf5bc35b689a0273b94607ca98ba37bd81b9115c5f1584",
+    "bytes": 39671
+  },
+  {
+    "platform": "neoforge",
+    "path": "src/main/java/com/codex/blacklight/military/vehicle/VehicleHijackSystem.java",
+    "snapshot": "sources/neoforge/src/main/java/com/codex/blacklight/military/vehicle/VehicleHijackSystem.java",
+    "sha256": "7e4a4bf9fcac900d9aee7cfc98a618fec7d7097ea6b0c6dcda184ff1caabf396",
+    "bytes": 7958
+  },
+  {
+    "platform": "neoforge",
+    "path": "src/main/java/com/codex/blacklight/military/vehicle/VehicleHullAttackEvents.java",
+    "snapshot": "sources/neoforge/src/main/java/com/codex/blacklight/military/vehicle/VehicleHullAttackEvents.java",
+    "sha256": "cf5da0da110dd46b780a575947fce882a0771b24c9f5e672364cc21bb029fd0f",
+    "bytes": 904
+  },
+  {
+    "platform": "neoforge",
+    "path": "src/main/java/com/codex/blacklight/military/vehicle/VehicleHullAttackGoal.java",
+    "snapshot": "sources/neoforge/src/main/java/com/codex/blacklight/military/vehicle/VehicleHullAttackGoal.java",
+    "sha256": "b368f1d7b0af30fd9259dafa75b061852867c77fda4d2f05b47bf0bb1dcdb1f4",
+    "bytes": 7855
+  },
+  {
+    "platform": "neoforge",
+    "path": "src/main/java/com/codex/blacklight/military/vehicle/VehicleHullShape.java",
+    "snapshot": "sources/neoforge/src/main/java/com/codex/blacklight/military/vehicle/VehicleHullShape.java",
+    "sha256": "af1582996b28d5ee3df3d058d99947e35a95e3d96859acc47b902292f9aaf980",
+    "bytes": 17455
+  },
+  {
+    "platform": "neoforge",
+    "path": "src/main/java/com/codex/blacklight/military/vehicle/VehicleInventory.java",
+    "snapshot": "sources/neoforge/src/main/java/com/codex/blacklight/military/vehicle/VehicleInventory.java",
+    "sha256": "88edd40a861b5ecf5baa710f6d4af6f758baefbd693b7be835e70bfee52927bd",
+    "bytes": 5360
+  },
+  {
+    "platform": "neoforge",
+    "path": "src/main/java/com/codex/blacklight/military/vehicle/VehicleKinematics.java",
+    "snapshot": "sources/neoforge/src/main/java/com/codex/blacklight/military/vehicle/VehicleKinematics.java",
+    "sha256": "aaeab095d7fdf8a11af2ce02718316a58f8a826075a7ff8d61ee78b8f3610225",
+    "bytes": 12366
+  },
+  {
+    "platform": "neoforge",
+    "path": "src/main/java/com/codex/blacklight/military/vehicle/VehicleLogisticsService.java",
+    "snapshot": "sources/neoforge/src/main/java/com/codex/blacklight/military/vehicle/VehicleLogisticsService.java",
+    "sha256": "3925bb05527fd64431d90dbe2549b63592adf4411c07963234d9c32f83f408ef",
+    "bytes": 19111
+  },
+  {
+    "platform": "neoforge",
+    "path": "src/main/java/com/codex/blacklight/military/vehicle/VehiclePhysicalDamageBridge.java",
+    "snapshot": "sources/neoforge/src/main/java/com/codex/blacklight/military/vehicle/VehiclePhysicalDamageBridge.java",
+    "sha256": "281c63e80a6ea79694161df8fa377b87992f3867bdfc27ce9fca04901eadac0e",
+    "bytes": 4658
+  },
+  {
+    "platform": "neoforge",
+    "path": "src/main/java/com/codex/blacklight/military/vehicle/VehicleRegistry.java",
+    "snapshot": "sources/neoforge/src/main/java/com/codex/blacklight/military/vehicle/VehicleRegistry.java",
+    "sha256": "fcdcc6e6247c414e4070745ed4492c1b1c6fb9013d3558acbb75f90901a67973",
+    "bytes": 6894
+  },
+  {
+    "platform": "neoforge",
+    "path": "src/main/java/com/codex/blacklight/military/vehicle/VehicleSeats.java",
+    "snapshot": "sources/neoforge/src/main/java/com/codex/blacklight/military/vehicle/VehicleSeats.java",
+    "sha256": "2871a7848aa7c01cbdaa5261a09b25bbea459e7c7ae4100d7fbb331435f8427d",
+    "bytes": 2348
+  },
+  {
+    "platform": "neoforge",
+    "path": "src/main/java/com/codex/blacklight/military/vehicle/VehicleSupplyRules.java",
+    "snapshot": "sources/neoforge/src/main/java/com/codex/blacklight/military/vehicle/VehicleSupplyRules.java",
+    "sha256": "b62a5d7b3eae05df1c1a2c78f0eb4f69362b6f1be4a565fa29ccb111bf537e67",
+    "bytes": 2935
+  },
+  {
+    "platform": "neoforge",
+    "path": "src/main/java/com/codex/blacklight/military/vehicle/VehicleThreatBridge.java",
+    "snapshot": "sources/neoforge/src/main/java/com/codex/blacklight/military/vehicle/VehicleThreatBridge.java",
+    "sha256": "a736ccf9f34e7ffdcdc589e5558297a685ed3167a01ea97d834cd9ce090ddfc7",
+    "bytes": 4290
+  },
+  {
+    "platform": "neoforge",
+    "path": "src/main/java/com/codex/blacklight/military/vehicle/VehicleThreatGoal.java",
+    "snapshot": "sources/neoforge/src/main/java/com/codex/blacklight/military/vehicle/VehicleThreatGoal.java",
+    "sha256": "848db41d095c3bd7cd2b7085d8caba844f5feae9095a2dd5be008247dc8662ac",
+    "bytes": 3084
+  },
+  {
+    "platform": "neoforge",
+    "path": "src/main/java/com/codex/blacklight/military/vehicle/VehicleWeaponDefinition.java",
+    "snapshot": "sources/neoforge/src/main/java/com/codex/blacklight/military/vehicle/VehicleWeaponDefinition.java",
+    "sha256": "7536b553d7d4bb5b2bca17d9518f91d75ff70a062f768a3b540b91e5d7e49855",
+    "bytes": 2938
+  },
+  {
+    "platform": "neoforge",
+    "path": "src/main/java/com/codex/blacklight/military/vehicle/VehicleWorkBudget.java",
+    "snapshot": "sources/neoforge/src/main/java/com/codex/blacklight/military/vehicle/VehicleWorkBudget.java",
+    "sha256": "9f6e0556e85086f4bf8ba2d2c9ea4de7f215e436e4f8bc2916854a48ebd0f5ce",
+    "bytes": 2294
+  },
+  {
+    "platform": "neoforge",
+    "path": "src/main/java/com/codex/blacklight/military/vehicle/VehicleWorldEvents.java",
+    "snapshot": "sources/neoforge/src/main/java/com/codex/blacklight/military/vehicle/VehicleWorldEvents.java",
+    "sha256": "e068212f650c2c8cdc9123e34b5d6acd48190e91d06cdf3fccce8553b404787a",
+    "bytes": 657
+  },
+  {
+    "platform": "neoforge",
+    "path": "src/main/java/com/codex/blacklight/mixin/VehicleEntityCollisionMixin.java",
+    "snapshot": "sources/neoforge/src/main/java/com/codex/blacklight/mixin/VehicleEntityCollisionMixin.java",
+    "sha256": "2d8a42b65a716f80f9360118e4018682392950225d2c147ad175cb5a633b4591",
+    "bytes": 1663
+  },
+  {
+    "platform": "neoforge",
+    "path": "src/main/java/com/codex/blacklight/mixin/VehicleProjectileCollisionMixin.java",
+    "snapshot": "sources/neoforge/src/main/java/com/codex/blacklight/mixin/VehicleProjectileCollisionMixin.java",
+    "sha256": "15d495d2d76867ecdf7e6156da1d55d46d34992ae2bf3ec259f81107ec64462c",
+    "bytes": 1286
+  },
+  {
+    "platform": "neoforge",
+    "path": "src/main/java/com/codex/blacklight/mixin/client/PrototypeChaseCameraMixin.java",
+    "snapshot": "sources/neoforge/src/main/java/com/codex/blacklight/mixin/client/PrototypeChaseCameraMixin.java",
+    "sha256": "a3ca18cabcab20943d8d459b1f34a0c72742a2108c3d7b7d8b21e692e6bb695c",
+    "bytes": 1430
+  },
+  {
+    "platform": "neoforge",
+    "path": "src/main/java/com/codex/blacklight/mixin/client/VehiclePlayerPoseMixin.java",
+    "snapshot": "sources/neoforge/src/main/java/com/codex/blacklight/mixin/client/VehiclePlayerPoseMixin.java",
+    "sha256": "344fbd1042bae0e3b9f75ad1aa4654baa4c2dfa059f491aeffd40c4ff266e83f",
+    "bytes": 2912
+  },
+  {
+    "platform": "neoforge",
+    "path": "src/main/java/com/codex/blacklight/network/VehicleControlPayload.java",
+    "snapshot": "sources/neoforge/src/main/java/com/codex/blacklight/network/VehicleControlPayload.java",
+    "sha256": "77b30229213e19ad560d0e15bf1aa9741b6e03f0b3eaa1d5a2337af1a194adaf",
+    "bytes": 2557
+  },
+  {
+    "platform": "neoforge",
+    "path": "src/main/java/com/codex/blacklight/network/VehicleSeatPayload.java",
+    "snapshot": "sources/neoforge/src/main/java/com/codex/blacklight/network/VehicleSeatPayload.java",
+    "sha256": "bf1814464f53220225f16954d6efbeeeecccafef23c7368648f27aa40dbbdfc1",
+    "bytes": 1767
+  },
+  {
+    "platform": "neoforge",
+    "path": "src/main/java/com/codex/blacklight/registry/ModEntities.java",
+    "snapshot": "sources/neoforge/src/main/java/com/codex/blacklight/registry/ModEntities.java",
+    "sha256": "c500050d56a17734bde17a838314847145027405e8c1b8dcd4799207e8cebb23",
+    "bytes": 16643
+  },
+  {
+    "platform": "neoforge",
+    "path": "src/main/java/com/codex/blacklight/registry/ModItems.java",
+    "snapshot": "sources/neoforge/src/main/java/com/codex/blacklight/registry/ModItems.java",
+    "sha256": "91d3416db8ebd805af4fce9fc38aeb48daa751e8eb7028b0f37fd64301df459f",
+    "bytes": 9734
+  },
+  {
+    "platform": "neoforge",
+    "path": "src/main/resources/assets/blacklight/lang/zh_cn.json",
+    "snapshot": "sources/neoforge/src/main/resources/assets/blacklight/lang/zh_cn.json",
+    "sha256": "1498826f51e3a497e2a5cf7da928f80d2c375f31233d8568e15dfb909128c962",
+    "bytes": 71243
+  },
+  {
+    "platform": "neoforge",
+    "path": "src/main/resources/assets/blacklight/military/vehicle-models.json",
+    "snapshot": "sources/neoforge/src/main/resources/assets/blacklight/military/vehicle-models.json",
+    "sha256": "70e8e155646d0214b4f9c7933298c1e68378180f93a0e03bbe07bb01c9fbbb94",
+    "bytes": 174951
+  },
+  {
+    "platform": "neoforge",
+    "path": "src/main/resources/assets/blacklight/models/item/autocannon_round.json",
+    "snapshot": "sources/neoforge/src/main/resources/assets/blacklight/models/item/autocannon_round.json",
+    "sha256": "6f141a0a7a8c35fde70bdc01820108df775c001bd1b1b308654f8cafedcf7460",
+    "bytes": 113
+  },
+  {
+    "platform": "neoforge",
+    "path": "src/main/resources/assets/blacklight/models/item/blackwatch_apc_chassis.json",
+    "snapshot": "sources/neoforge/src/main/resources/assets/blacklight/models/item/blackwatch_apc_chassis.json",
+    "sha256": "84889d5aa8008d484b709e80857e15e49e588698694a58721de4d509256a64dc",
+    "bytes": 119
+  },
+  {
+    "platform": "neoforge",
+    "path": "src/main/resources/assets/blacklight/models/item/blackwatch_tank_chassis.json",
+    "snapshot": "sources/neoforge/src/main/resources/assets/blacklight/models/item/blackwatch_tank_chassis.json",
+    "sha256": "2eaa7290611b2d8d96c533c239145aafd4c95d8680511deff0186f7cc3eb7350",
+    "bytes": 120
+  },
+  {
+    "platform": "neoforge",
+    "path": "src/main/resources/assets/blacklight/models/item/blackwatch_truck_chassis.json",
+    "snapshot": "sources/neoforge/src/main/resources/assets/blacklight/models/item/blackwatch_truck_chassis.json",
+    "sha256": "2fae9ee7d751563a3fe63b57d18132020b05cc42aa4ab4859ab0b34bcc45b531",
+    "bytes": 121
+  },
+  {
+    "platform": "neoforge",
+    "path": "src/main/resources/assets/blacklight/models/item/machine_gun_round.json",
+    "snapshot": "sources/neoforge/src/main/resources/assets/blacklight/models/item/machine_gun_round.json",
+    "sha256": "2669bb27da23bb62a354cf8ab581ec6eac8c513e5d984f5a0a2726acc639fe95",
+    "bytes": 99
+  },
+  {
+    "platform": "neoforge",
+    "path": "src/main/resources/assets/blacklight/models/item/military_apc_chassis.json",
+    "snapshot": "sources/neoforge/src/main/resources/assets/blacklight/models/item/military_apc_chassis.json",
+    "sha256": "f0f69996f92d86662648f1cb776d86b9ae64989dc200b8224108dd81d9aa7b81",
+    "bytes": 117
+  },
+  {
+    "platform": "neoforge",
+    "path": "src/main/resources/assets/blacklight/models/item/military_fuel_can.json",
+    "snapshot": "sources/neoforge/src/main/resources/assets/blacklight/models/item/military_fuel_can.json",
+    "sha256": "e1390990871aa6699aba8e859b3a98b110859bff22758219d2e28826827bd47c",
+    "bytes": 114
+  },
+  {
+    "platform": "neoforge",
+    "path": "src/main/resources/assets/blacklight/models/item/military_tank_chassis.json",
+    "snapshot": "sources/neoforge/src/main/resources/assets/blacklight/models/item/military_tank_chassis.json",
+    "sha256": "52a702e753e058678b89073347744bca96875e742725f895868e4c126f185aeb",
+    "bytes": 118
+  },
+  {
+    "platform": "neoforge",
+    "path": "src/main/resources/assets/blacklight/models/item/military_truck_chassis.json",
+    "snapshot": "sources/neoforge/src/main/resources/assets/blacklight/models/item/military_truck_chassis.json",
+    "sha256": "011473e5f323d8a963c6f12f0004c00d061ba2723e16cd287112dca43bb6417f",
+    "bytes": 119
+  },
+  {
+    "platform": "neoforge",
+    "path": "src/main/resources/assets/blacklight/models/item/rocket_round.json",
+    "snapshot": "sources/neoforge/src/main/resources/assets/blacklight/models/item/rocket_round.json",
+    "sha256": "365382ff4f2c64c377e508ccd622e3bed09e112d878407b334451f602689e5a5",
+    "bytes": 94
+  },
+  {
+    "platform": "neoforge",
+    "path": "src/main/resources/assets/blacklight/models/item/tank_ap_shell.json",
+    "snapshot": "sources/neoforge/src/main/resources/assets/blacklight/models/item/tank_ap_shell.json",
+    "sha256": "51849a974556cfc426719971d15c1d05a0a3fb187240fb904aa4dae49ad61914",
+    "bytes": 110
+  },
+  {
+    "platform": "neoforge",
+    "path": "src/main/resources/assets/blacklight/models/item/tank_he_shell.json",
+    "snapshot": "sources/neoforge/src/main/resources/assets/blacklight/models/item/tank_he_shell.json",
+    "sha256": "fe8aabf13963b9ed99070b29f74e13809519e66e34972dd708e1a5fc69a46a5b",
+    "bytes": 110
+  },
+  {
+    "platform": "neoforge",
+    "path": "src/main/resources/assets/blacklight/models/item/vehicle_repair_parts.json",
+    "snapshot": "sources/neoforge/src/main/resources/assets/blacklight/models/item/vehicle_repair_parts.json",
+    "sha256": "2e4fbc84a7d86afd1378ea183f85ad27bed45ece9aae9a0f9b27130a6d703aac",
+    "bytes": 117
+  },
+  {
+    "platform": "neoforge",
+    "path": "src/main/resources/assets/blacklight/textures/entity/military_vehicles_blackwatch.png",
+    "snapshot": "sources/neoforge/src/main/resources/assets/blacklight/textures/entity/military_vehicles_blackwatch.png",
+    "sha256": "5f878d6f5cf0bfb333b6959422a2c71466674e4d4960723d12c06ceeead0283b",
+    "bytes": 106376
+  },
+  {
+    "platform": "neoforge",
+    "path": "src/main/resources/assets/blacklight/textures/entity/military_vehicles_military.png",
+    "snapshot": "sources/neoforge/src/main/resources/assets/blacklight/textures/entity/military_vehicles_military.png",
+    "sha256": "a05858c5609c5eced700a12393bf25955cd563b31591dad974f6d2ce6b6d6445",
+    "bytes": 124466
+  },
+  {
+    "platform": "neoforge",
+    "path": "src/main/resources/assets/blacklight/textures/item/autocannon_round.png",
+    "snapshot": "sources/neoforge/src/main/resources/assets/blacklight/textures/item/autocannon_round.png",
+    "sha256": "a721a411b187c087863ac4fe33138176a61c0ca3849bcfce1cd4f827a5ef092a",
+    "bytes": 312
+  },
+  {
+    "platform": "neoforge",
+    "path": "src/main/resources/assets/blacklight/textures/item/blackwatch_apc_chassis.png",
+    "snapshot": "sources/neoforge/src/main/resources/assets/blacklight/textures/item/blackwatch_apc_chassis.png",
+    "sha256": "0316fe708b91a744bb8e10c681a19067e7796e947f7bb97b5975f497ee4fa13d",
+    "bytes": 466
+  },
+  {
+    "platform": "neoforge",
+    "path": "src/main/resources/assets/blacklight/textures/item/blackwatch_tank_chassis.png",
+    "snapshot": "sources/neoforge/src/main/resources/assets/blacklight/textures/item/blackwatch_tank_chassis.png",
+    "sha256": "4f1a49772926b1edb92a492abb7997ccf4567d19f78278963160a9084a862613",
+    "bytes": 463
+  },
+  {
+    "platform": "neoforge",
+    "path": "src/main/resources/assets/blacklight/textures/item/blackwatch_truck_chassis.png",
+    "snapshot": "sources/neoforge/src/main/resources/assets/blacklight/textures/item/blackwatch_truck_chassis.png",
+    "sha256": "cca44f405c35d4748e9ccb44ead1625f974b506411c470961bb636295c6c6d10",
+    "bytes": 590
+  },
+  {
+    "platform": "neoforge",
+    "path": "src/main/resources/assets/blacklight/textures/item/machine_gun_round.png",
+    "snapshot": "sources/neoforge/src/main/resources/assets/blacklight/textures/item/machine_gun_round.png",
+    "sha256": "9a3c19043de5f1a906dd28724e53cb3e64f7a765f1a83636c3792bf70d92b950",
+    "bytes": 108
+  },
+  {
+    "platform": "neoforge",
+    "path": "src/main/resources/assets/blacklight/textures/item/military_apc_chassis.png",
+    "snapshot": "sources/neoforge/src/main/resources/assets/blacklight/textures/item/military_apc_chassis.png",
+    "sha256": "32b0a4b2aa118e78900e065fb1e7e32dd14897f45cffefee62ade198a2f82e85",
+    "bytes": 453
+  },
+  {
+    "platform": "neoforge",
+    "path": "src/main/resources/assets/blacklight/textures/item/military_fuel_can.png",
+    "snapshot": "sources/neoforge/src/main/resources/assets/blacklight/textures/item/military_fuel_can.png",
+    "sha256": "13eadfa29908440794f2771bd1fd358b8211ba9a7474a24eede33b68d1ca2b82",
+    "bytes": 422
+  },
+  {
+    "platform": "neoforge",
+    "path": "src/main/resources/assets/blacklight/textures/item/military_tank_chassis.png",
+    "snapshot": "sources/neoforge/src/main/resources/assets/blacklight/textures/item/military_tank_chassis.png",
+    "sha256": "99bfd40c42d3a9f235d54686402c023c0be5b6871d0ee2aeef818c95673e24dd",
+    "bytes": 447
+  },
+  {
+    "platform": "neoforge",
+    "path": "src/main/resources/assets/blacklight/textures/item/military_truck_chassis.png",
+    "snapshot": "sources/neoforge/src/main/resources/assets/blacklight/textures/item/military_truck_chassis.png",
+    "sha256": "3690b5760b639230d86309655b79575498468db24b861e72954c2c480e925710",
+    "bytes": 528
+  },
+  {
+    "platform": "neoforge",
+    "path": "src/main/resources/assets/blacklight/textures/item/rocket_round.png",
+    "snapshot": "sources/neoforge/src/main/resources/assets/blacklight/textures/item/rocket_round.png",
+    "sha256": "f0da949f8a069668cd0526402af0b14a357c10c97c744c059758ecfe0ffcd102",
+    "bytes": 108
+  },
+  {
+    "platform": "neoforge",
+    "path": "src/main/resources/assets/blacklight/textures/item/tank_ap_shell.png",
+    "snapshot": "sources/neoforge/src/main/resources/assets/blacklight/textures/item/tank_ap_shell.png",
+    "sha256": "176490bee9167244d746c417b31f1a35eb5ce5bfbbc333d474100b155785eabb",
+    "bytes": 417
+  },
+  {
+    "platform": "neoforge",
+    "path": "src/main/resources/assets/blacklight/textures/item/tank_he_shell.png",
+    "snapshot": "sources/neoforge/src/main/resources/assets/blacklight/textures/item/tank_he_shell.png",
+    "sha256": "52ad5e6f0f67fd40784e3b13a4081db8de6c63c98296e3f595c94877a09ade91",
+    "bytes": 318
+  },
+  {
+    "platform": "neoforge",
+    "path": "src/main/resources/assets/blacklight/textures/item/vehicle_repair_parts.png",
+    "snapshot": "sources/neoforge/src/main/resources/assets/blacklight/textures/item/vehicle_repair_parts.png",
+    "sha256": "035dcfd51c2ba826ba2029000d9488711c1a6a6b67fdde10be9fb1a834c931f9",
+    "bytes": 407
+  },
+  {
+    "platform": "neoforge",
+    "path": "src/main/resources/blacklight.mixins.json",
+    "snapshot": "sources/neoforge/src/main/resources/blacklight.mixins.json",
+    "sha256": "54b96191b70ccd0da68dec66ff91004846125a9ff7fdb85fda4cae7f1e34b307",
+    "bytes": 2149
+  },
+  {
+    "platform": "neoforge",
+    "path": "src/main/resources/data/blacklight/military/large_bases.json",
+    "snapshot": "sources/neoforge/src/main/resources/data/blacklight/military/large_bases.json",
+    "sha256": "28415b70a14589794e259251812be2916b0a5e031a1b8d3ff902f7cb86c9fdbd",
+    "bytes": 10670
+  },
+  {
+    "platform": "neoforge",
+    "path": "src/main/resources/data/blacklight/military/vehicle-mounts.json",
+    "snapshot": "sources/neoforge/src/main/resources/data/blacklight/military/vehicle-mounts.json",
+    "sha256": "9f938d16aa68bbe5bf8b492042f1bb59409aed3850f3dc8630a4cda626cfc51a",
+    "bytes": 10630
+  },
+  {
+    "platform": "neoforge",
+    "path": "src/main/resources/data/blacklight/military/vehicle_garages.json",
+    "snapshot": "sources/neoforge/src/main/resources/data/blacklight/military/vehicle_garages.json",
+    "sha256": "58203b07f01d5020f5c0d7eab294e183ebdf07a0645866377b333f814befdc61",
+    "bytes": 9418
+  },
+  {
+    "platform": "neoforge",
+    "path": "src/main/resources/data/blacklight/military/vehicles.json",
+    "snapshot": "sources/neoforge/src/main/resources/data/blacklight/military/vehicles.json",
+    "sha256": "044ed2d729b1ee1fc06207492fa5b1e8f35335f8536fb51ed80d83706dde9cd2",
+    "bytes": 4721
+  },
+  {
+    "platform": "neoforge",
+    "path": "src/main/resources/data/blacklight/recipe/autocannon_round.json",
+    "snapshot": "sources/neoforge/src/main/resources/data/blacklight/recipe/autocannon_round.json",
+    "sha256": "d34bb6bc1e6d50032abbc1ff74fd691a5d57543314730747ea67d4c8fbb88caa",
+    "bytes": 344
+  },
+  {
+    "platform": "neoforge",
+    "path": "src/main/resources/data/blacklight/recipe/blackwatch_apc_chassis.json",
+    "snapshot": "sources/neoforge/src/main/resources/data/blacklight/recipe/blackwatch_apc_chassis.json",
+    "sha256": "8229c51e75d0e7830929a78d37b21bfe7fd5bd797dbdefa33ca0a7fdc6adc229",
+    "bytes": 259
+  },
+  {
+    "platform": "neoforge",
+    "path": "src/main/resources/data/blacklight/recipe/blackwatch_tank_chassis.json",
+    "snapshot": "sources/neoforge/src/main/resources/data/blacklight/recipe/blackwatch_tank_chassis.json",
+    "sha256": "36e625ea40d36aa43f92b87ebc9e661fd14bf6e6a9a01093feda6b7768cd0cfe",
+    "bytes": 261
+  },
+  {
+    "platform": "neoforge",
+    "path": "src/main/resources/data/blacklight/recipe/blackwatch_truck_chassis.json",
+    "snapshot": "sources/neoforge/src/main/resources/data/blacklight/recipe/blackwatch_truck_chassis.json",
+    "sha256": "69de0cad972489c1a868f805215357253aa40a73989913370171e9b62b9c5ad7",
+    "bytes": 263
+  },
+  {
+    "platform": "neoforge",
+    "path": "src/main/resources/data/blacklight/recipe/military_apc_chassis.json",
+    "snapshot": "sources/neoforge/src/main/resources/data/blacklight/recipe/military_apc_chassis.json",
+    "sha256": "f0e08d97a4471157c2daf74bae6be58cfbf5a8c9d815dff1ff4df9c12c9ca0f6",
+    "bytes": 423
+  },
+  {
+    "platform": "neoforge",
+    "path": "src/main/resources/data/blacklight/recipe/military_fuel_can.json",
+    "snapshot": "sources/neoforge/src/main/resources/data/blacklight/recipe/military_fuel_can.json",
+    "sha256": "4877f0746c41c599d9c9a35a1dc98b8a531e304199a878de56087276036f50f4",
+    "bytes": 472
+  },
+  {
+    "platform": "neoforge",
+    "path": "src/main/resources/data/blacklight/recipe/military_tank_chassis.json",
+    "snapshot": "sources/neoforge/src/main/resources/data/blacklight/recipe/military_tank_chassis.json",
+    "sha256": "185afb0450eb7d20e5757c5de6dadc819dba4d3a9ae0923769cd63fedfe3c016",
+    "bytes": 423
+  },
+  {
+    "platform": "neoforge",
+    "path": "src/main/resources/data/blacklight/recipe/military_truck_chassis.json",
+    "snapshot": "sources/neoforge/src/main/resources/data/blacklight/recipe/military_truck_chassis.json",
+    "sha256": "8114035d893e343105f433cde6bcfb100dcd64d44a963b87a59b5e7da4dff32c",
+    "bytes": 354
+  },
+  {
+    "platform": "neoforge",
+    "path": "src/main/resources/data/blacklight/recipe/tank_ap_shell.json",
+    "snapshot": "sources/neoforge/src/main/resources/data/blacklight/recipe/tank_ap_shell.json",
+    "sha256": "1d65ddacde56c168567b7db7361398dff3629cea223456253fc416584398d1e0",
+    "bytes": 391
+  },
+  {
+    "platform": "neoforge",
+    "path": "src/main/resources/data/blacklight/recipe/tank_he_shell.json",
+    "snapshot": "sources/neoforge/src/main/resources/data/blacklight/recipe/tank_he_shell.json",
+    "sha256": "7a70729096081a994def7ae52d82faacb2cb128635e22423310b577d1e362730",
+    "bytes": 390
+  },
+  {
+    "platform": "neoforge",
+    "path": "src/main/resources/data/blacklight/recipe/vehicle_repair_parts.json",
+    "snapshot": "sources/neoforge/src/main/resources/data/blacklight/recipe/vehicle_repair_parts.json",
+    "sha256": "6a65740ce386c81be5458b8c9db7b4b82d1628754a80f74ed9cf5d10dd9d853a",
+    "bytes": 295
+  },
+  {
+    "platform": "neoforge",
+    "path": "src/main/resources/data/blacklight/structure/blackwatch_checkpoint.nbt",
+    "snapshot": "sources/neoforge/src/main/resources/data/blacklight/structure/blackwatch_checkpoint.nbt",
+    "sha256": "9de7f3c962ef2aaf25592e00c5f6552a111f327b8fdb646973b8026cb71f611d",
+    "bytes": 7954
+  },
+  {
+    "platform": "neoforge",
+    "path": "src/main/resources/data/blacklight/structure/blackwatch_outpost.nbt",
+    "snapshot": "sources/neoforge/src/main/resources/data/blacklight/structure/blackwatch_outpost.nbt",
+    "sha256": "fc6b2eb87373e4e09edbb27d2a15fcabdef45c510cdb5d2bd5ca8c96bd980742",
+    "bytes": 16862
+  },
+  {
+    "platform": "neoforge",
+    "path": "src/main/resources/data/blacklight/structure/frozen_research_station.nbt",
+    "snapshot": "sources/neoforge/src/main/resources/data/blacklight/structure/frozen_research_station.nbt",
+    "sha256": "0dc5f32b6582f66384870df8c90de2f41d334de0486482d01a69fa95db7b795a",
+    "bytes": 12761
+  },
+  {
+    "platform": "neoforge",
+    "path": "src/main/resources/data/blacklight/structure/large_blackwatch_base.nbt",
+    "snapshot": "sources/neoforge/src/main/resources/data/blacklight/structure/large_blackwatch_base.nbt",
+    "sha256": "06b613cf9fc372c034750bc694989c095d9dabecbc599395182a33fa476ded60",
+    "bytes": 245691
+  },
+  {
+    "platform": "neoforge",
+    "path": "src/main/resources/data/blacklight/structure/large_military_base.nbt",
+    "snapshot": "sources/neoforge/src/main/resources/data/blacklight/structure/large_military_base.nbt",
+    "sha256": "90c1715fa57bd839bdfbcde72341d5c9ac1d95b74084b398ea4d628a43c38943",
+    "bytes": 196578
+  },
+  {
+    "platform": "neoforge",
+    "path": "src/main/resources/data/blacklight/structure/military_camp.nbt",
+    "snapshot": "sources/neoforge/src/main/resources/data/blacklight/structure/military_camp.nbt",
+    "sha256": "c8b4cef8815da20fc91511a12951f60125943006140adbbdf7a635a2ef430ad9",
+    "bytes": 12009
+  },
+  {
+    "platform": "neoforge",
+    "path": "src/main/resources/data/blacklight/structure/military_checkpoint.nbt",
+    "snapshot": "sources/neoforge/src/main/resources/data/blacklight/structure/military_checkpoint.nbt",
+    "sha256": "b828b4ee23a20e17913421ed62c98c954ce8460529bd8c4a4825a8c8a3237ae1",
+    "bytes": 8029
+  },
+  {
+    "platform": "neoforge",
+    "path": "src/main/resources/data/blacklight/structure/vehicle_garage_blackwatch.nbt",
+    "snapshot": "sources/neoforge/src/main/resources/data/blacklight/structure/vehicle_garage_blackwatch.nbt",
+    "sha256": "f5db5afc1c70a5ecae9c0f60c12c352405940af20a369b91945b3d07f169103e",
+    "bytes": 23967
+  },
+  {
+    "platform": "neoforge",
+    "path": "src/main/resources/data/blacklight/structure/vehicle_garage_military.nbt",
+    "snapshot": "sources/neoforge/src/main/resources/data/blacklight/structure/vehicle_garage_military.nbt",
+    "sha256": "0be44405ffe952fa6a619a8747c7b65345596adeace6ee86de86aff0e430487e",
+    "bytes": 23988
+  },
+  {
+    "platform": "neoforge",
+    "path": "src/test/java/com/codex/blacklight/client/model/VehicleRiderPoseTest.java",
+    "snapshot": "sources/neoforge/src/test/java/com/codex/blacklight/client/model/VehicleRiderPoseTest.java",
+    "sha256": "4519075d3c47bea3b0bf5a461497fdd55175d124b4af519533c2bd3f0cf01153",
+    "bytes": 11413
+  },
+  {
+    "platform": "neoforge",
+    "path": "src/test/java/com/codex/blacklight/client/vehicle/VehicleHudLayoutTest.java",
+    "snapshot": "sources/neoforge/src/test/java/com/codex/blacklight/client/vehicle/VehicleHudLayoutTest.java",
+    "sha256": "24fab5ae5d9b97b5286f59b73ef47a119d87b9b571ab02e4e04af3c2464b08ec",
+    "bytes": 4064
+  },
+  {
+    "platform": "neoforge",
+    "path": "src/test/java/com/codex/blacklight/client/vehicle/VehiclePresentationTest.java",
+    "snapshot": "sources/neoforge/src/test/java/com/codex/blacklight/client/vehicle/VehiclePresentationTest.java",
+    "sha256": "1aaa64a575fda0ba9d434e81276590f60eedc185e6f99c8bd58e282f64742771",
+    "bytes": 23744
+  },
+  {
+    "platform": "neoforge",
+    "path": "src/test/java/com/codex/blacklight/military/vehicle/MilitaryLoadoutTest.java",
+    "snapshot": "sources/neoforge/src/test/java/com/codex/blacklight/military/vehicle/MilitaryLoadoutTest.java",
+    "sha256": "bdac48e50f2510f631bc4ae496c61304c6b517c883934cc3ec88af21c30cfba1",
+    "bytes": 7623
+  },
+  {
+    "platform": "neoforge",
+    "path": "src/test/java/com/codex/blacklight/military/vehicle/VehicleCatalogTest.java",
+    "snapshot": "sources/neoforge/src/test/java/com/codex/blacklight/military/vehicle/VehicleCatalogTest.java",
+    "sha256": "b0dc957788ab74d61736268d24ef2560be19297cc98d7dad1c15848ea25ee2a7",
+    "bytes": 10299
+  },
+  {
+    "platform": "neoforge",
+    "path": "src/test/java/com/codex/blacklight/military/vehicle/VehicleCollisionGeometryTest.java",
+    "snapshot": "sources/neoforge/src/test/java/com/codex/blacklight/military/vehicle/VehicleCollisionGeometryTest.java",
+    "sha256": "4d7f3b1c98d5e85754d6fe36a1e431b5b41d5ac48097c50bcc14fea0949ec268",
+    "bytes": 6060
+  },
+  {
+    "platform": "neoforge",
+    "path": "src/test/java/com/codex/blacklight/military/vehicle/VehicleControlAuthorityTest.java",
+    "snapshot": "sources/neoforge/src/test/java/com/codex/blacklight/military/vehicle/VehicleControlAuthorityTest.java",
+    "sha256": "951dc49aaadd77d5dd4d24e82544aa5c4643ce4efd00eaf86c865393945d6812",
+    "bytes": 8217
+  },
+  {
+    "platform": "neoforge",
+    "path": "src/test/java/com/codex/blacklight/military/vehicle/VehicleFleetSavedDataTest.java",
+    "snapshot": "sources/neoforge/src/test/java/com/codex/blacklight/military/vehicle/VehicleFleetSavedDataTest.java",
+    "sha256": "e1bc966eef5498ba931a96929a9dd5812da345cbc336729516c2e98881ee44d4",
+    "bytes": 4271
+  },
+  {
+    "platform": "neoforge",
+    "path": "src/test/java/com/codex/blacklight/military/vehicle/VehicleFleetTest.java",
+    "snapshot": "sources/neoforge/src/test/java/com/codex/blacklight/military/vehicle/VehicleFleetTest.java",
+    "sha256": "2ef154404849c638816aa7218f6cf9132e4bced5901d5a1b36d3a531455a568e",
+    "bytes": 1561
+  },
+  {
+    "platform": "neoforge",
+    "path": "src/test/java/com/codex/blacklight/military/vehicle/VehicleFuelDeactivationTest.java",
+    "snapshot": "sources/neoforge/src/test/java/com/codex/blacklight/military/vehicle/VehicleFuelDeactivationTest.java",
+    "sha256": "4e07aa1064632d59dbd5e25269b46baecb850d9735ba870a68d72a5f748eb8f3",
+    "bytes": 1608
+  },
+  {
+    "platform": "neoforge",
+    "path": "src/test/java/com/codex/blacklight/military/vehicle/VehicleGarageBoardingTest.java",
+    "snapshot": "sources/neoforge/src/test/java/com/codex/blacklight/military/vehicle/VehicleGarageBoardingTest.java",
+    "sha256": "204e3602b3510947c563fa400bf9f26196eeb96e2d1922dd249241d49bf752a0",
+    "bytes": 1801
+  },
+  {
+    "platform": "neoforge",
+    "path": "src/test/java/com/codex/blacklight/military/vehicle/VehicleGarageDataTest.java",
+    "snapshot": "sources/neoforge/src/test/java/com/codex/blacklight/military/vehicle/VehicleGarageDataTest.java",
+    "sha256": "2a18e097be456d998eeed2ff7ec8f5ee5eb89af88a881857ffb4de5b5218e0ad",
+    "bytes": 3742
+  },
+  {
+    "platform": "neoforge",
+    "path": "src/test/java/com/codex/blacklight/military/vehicle/VehicleHullAttackGoalTest.java",
+    "snapshot": "sources/neoforge/src/test/java/com/codex/blacklight/military/vehicle/VehicleHullAttackGoalTest.java",
+    "sha256": "6b01fb5e1d48b4b4ceb656ecfc1d09cce99646d7534a1d302e6bf17388358339",
+    "bytes": 2312
+  },
+  {
+    "platform": "neoforge",
+    "path": "src/test/java/com/codex/blacklight/military/vehicle/VehicleHullShapeTest.java",
+    "snapshot": "sources/neoforge/src/test/java/com/codex/blacklight/military/vehicle/VehicleHullShapeTest.java",
+    "sha256": "10d2b41e14e40e134c5b6324bbed209cf175f5a19e06782942591972a63e0f3c",
+    "bytes": 5996
+  },
+  {
+    "platform": "neoforge",
+    "path": "src/test/java/com/codex/blacklight/military/vehicle/VehicleInventoryTest.java",
+    "snapshot": "sources/neoforge/src/test/java/com/codex/blacklight/military/vehicle/VehicleInventoryTest.java",
+    "sha256": "21f25a80075c5e3517aea52b5d4db7a158c7dae2ea17d2a84158fc51741f7793",
+    "bytes": 6735
+  },
+  {
+    "platform": "neoforge",
+    "path": "src/test/java/com/codex/blacklight/military/vehicle/VehiclePhysicalContactTest.java",
+    "snapshot": "sources/neoforge/src/test/java/com/codex/blacklight/military/vehicle/VehiclePhysicalContactTest.java",
+    "sha256": "42258f1494a8c929ba7d633cfaeb18433a35cdda5951499582ab584faffac4c1",
+    "bytes": 2690
+  },
+  {
+    "platform": "neoforge",
+    "path": "src/test/java/com/codex/blacklight/military/vehicle/VehicleSupplyRulesTest.java",
+    "snapshot": "sources/neoforge/src/test/java/com/codex/blacklight/military/vehicle/VehicleSupplyRulesTest.java",
+    "sha256": "50f22f514777a68879d5c0d34b322f4cc22d73b1d09dfb7542d067daaa8594aa",
+    "bytes": 5649
+  },
+  {
+    "platform": "neoforge",
+    "path": "src/test/java/com/codex/blacklight/military/vehicle/VehicleWeaponDefinitionTest.java",
+    "snapshot": "sources/neoforge/src/test/java/com/codex/blacklight/military/vehicle/VehicleWeaponDefinitionTest.java",
+    "sha256": "80c798cf2ffbbb1b1d71573f3f0216963b56d96627cd6754352cdb1b1178a3c0",
+    "bytes": 2596
+  },
+  {
+    "platform": "neoforge",
+    "path": "src/test/java/com/codex/blacklight/military/vehicle/VehicleWorkBudgetTest.java",
+    "snapshot": "sources/neoforge/src/test/java/com/codex/blacklight/military/vehicle/VehicleWorkBudgetTest.java",
+    "sha256": "d1903c821eab6927ee864fa228327672d7cc7572c9e6adfa55fc8e886489323e",
+    "bytes": 3215
+  },
+  {
+    "platform": "neoforge",
+    "path": "src/vehicleTest/java/com/codex/blacklight/gametest/vehicle/MilitaryLauncherGameTest.java",
+    "snapshot": "sources/neoforge/src/vehicleTest/java/com/codex/blacklight/gametest/vehicle/MilitaryLauncherGameTest.java",
+    "sha256": "c094b0c39a6c921620c7593f556a142aec4967f7a767c1ac2fb5e2afa5e7c21c",
+    "bytes": 16189
+  },
+  {
+    "platform": "neoforge",
+    "path": "src/vehicleTest/java/com/codex/blacklight/gametest/vehicle/MilitaryLauncherSafetyGameTest.java",
+    "snapshot": "sources/neoforge/src/vehicleTest/java/com/codex/blacklight/gametest/vehicle/MilitaryLauncherSafetyGameTest.java",
+    "sha256": "37a3aa9eb625a76da058273c80b47d960c55852a157f4ad445f8f4efb1b33f51",
+    "bytes": 10750
+  },
+  {
+    "platform": "neoforge",
+    "path": "src/vehicleTest/java/com/codex/blacklight/gametest/vehicle/MilitarySummonLoadoutGameTest.java",
+    "snapshot": "sources/neoforge/src/vehicleTest/java/com/codex/blacklight/gametest/vehicle/MilitarySummonLoadoutGameTest.java",
+    "sha256": "58c6cebab8cf807ca7803b1b8f562b547ab0d9a29feed07f3d2bc0cbc1b493b7",
+    "bytes": 6870
+  },
+  {
+    "platform": "neoforge",
+    "path": "src/vehicleTest/java/com/codex/blacklight/gametest/vehicle/MilitaryVehicleGameTest.java",
+    "snapshot": "sources/neoforge/src/vehicleTest/java/com/codex/blacklight/gametest/vehicle/MilitaryVehicleGameTest.java",
+    "sha256": "07088dec40cbee50e8574231fae1100f685b5ec24454d3847f5ef283581afade",
+    "bytes": 23061
+  },
+  {
+    "platform": "neoforge",
+    "path": "src/vehicleTest/java/com/codex/blacklight/gametest/vehicle/VehicleAmmunitionRecipeGameTest.java",
+    "snapshot": "sources/neoforge/src/vehicleTest/java/com/codex/blacklight/gametest/vehicle/VehicleAmmunitionRecipeGameTest.java",
+    "sha256": "42022e6a2db08e92ec4a417d92f76e1d4508fde0680c1e87c60f32283667f596",
+    "bytes": 5095
+  },
+  {
+    "platform": "neoforge",
+    "path": "src/vehicleTest/java/com/codex/blacklight/gametest/vehicle/VehicleContactGameTest.java",
+    "snapshot": "sources/neoforge/src/vehicleTest/java/com/codex/blacklight/gametest/vehicle/VehicleContactGameTest.java",
+    "sha256": "73476c452b0f9e637bbad9c260a0ff9b71398b0759b0e276734e7dfb6d537fe4",
+    "bytes": 11085
+  },
+  {
+    "platform": "neoforge",
+    "path": "src/vehicleTest/java/com/codex/blacklight/gametest/vehicle/VehicleFireGameTest.java",
+    "snapshot": "sources/neoforge/src/vehicleTest/java/com/codex/blacklight/gametest/vehicle/VehicleFireGameTest.java",
+    "sha256": "6e4f1bbeda840afb66f94dc730f9d575f0246add6e40cdd883eff4914f63ed88",
+    "bytes": 9739
+  },
+  {
+    "platform": "neoforge",
+    "path": "src/vehicleTest/java/com/codex/blacklight/gametest/vehicle/VehicleFleetGameTest.java",
+    "snapshot": "sources/neoforge/src/vehicleTest/java/com/codex/blacklight/gametest/vehicle/VehicleFleetGameTest.java",
+    "sha256": "93edb58e8cc4ac80b8ca9074f18e6bb248c7e49816df7d7460627a084295720f",
+    "bytes": 36819
+  },
+  {
+    "platform": "neoforge",
+    "path": "src/vehicleTest/java/com/codex/blacklight/gametest/vehicle/VehicleFuelDeactivationGameTest.java",
+    "snapshot": "sources/neoforge/src/vehicleTest/java/com/codex/blacklight/gametest/vehicle/VehicleFuelDeactivationGameTest.java",
+    "sha256": "4daefe35946583b7b9dd37994646fb16e69796ec5985edcc1b0db43b18944ed5",
+    "bytes": 8888
+  },
+  {
+    "platform": "neoforge",
+    "path": "src/vehicleTest/java/com/codex/blacklight/gametest/vehicle/VehicleGarageDispatchGameTest.java",
+    "snapshot": "sources/neoforge/src/vehicleTest/java/com/codex/blacklight/gametest/vehicle/VehicleGarageDispatchGameTest.java",
+    "sha256": "494649c4316fe9ab0729d99d37f93d7545456a9fe8430e4da20efb9549496a97",
+    "bytes": 23112
+  },
+  {
+    "platform": "neoforge",
+    "path": "src/vehicleTest/java/com/codex/blacklight/gametest/vehicle/VehicleGarageGameTest.java",
+    "snapshot": "sources/neoforge/src/vehicleTest/java/com/codex/blacklight/gametest/vehicle/VehicleGarageGameTest.java",
+    "sha256": "94a9104fc8c173280a1e82ad0a2425b1c435cc15beda7e610396d61542905c96",
+    "bytes": 12413
+  },
+  {
+    "platform": "neoforge",
+    "path": "src/vehicleTest/java/com/codex/blacklight/gametest/vehicle/VehicleHijackGameTest.java",
+    "snapshot": "sources/neoforge/src/vehicleTest/java/com/codex/blacklight/gametest/vehicle/VehicleHijackGameTest.java",
+    "sha256": "89d534ff8afe1e100ebd4e48df758790bb7c55695064562dd5291a6faa83f9e6",
+    "bytes": 8150
+  },
+  {
+    "platform": "neoforge",
+    "path": "src/vehicleTest/java/com/codex/blacklight/gametest/vehicle/VehicleHullAttackGameTest.java",
+    "snapshot": "sources/neoforge/src/vehicleTest/java/com/codex/blacklight/gametest/vehicle/VehicleHullAttackGameTest.java",
+    "sha256": "b24cf5e856ea4f2d68bde16792cd2dd0bdea96ab4a230d387b874c5699899432",
+    "bytes": 13563
+  },
+  {
+    "platform": "neoforge",
+    "path": "src/vehicleTest/java/com/codex/blacklight/gametest/vehicle/VehicleHullBoardingGameTest.java",
+    "snapshot": "sources/neoforge/src/vehicleTest/java/com/codex/blacklight/gametest/vehicle/VehicleHullBoardingGameTest.java",
+    "sha256": "68ba4d5ca46cf33990aeda81a1b934631ce4d29b53c2b080c2b598b2ba12729f",
+    "bytes": 6289
+  },
+  {
+    "platform": "neoforge",
+    "path": "src/vehicleTest/java/com/codex/blacklight/gametest/vehicle/VehicleLogisticsGameTest.java",
+    "snapshot": "sources/neoforge/src/vehicleTest/java/com/codex/blacklight/gametest/vehicle/VehicleLogisticsGameTest.java",
+    "sha256": "c95b1ae5efa5a787d9e6babe32592af1ebbbc26f3ccc2b358b0957e4618c1c36",
+    "bytes": 24099
+  },
+  {
+    "platform": "neoforge",
+    "path": "src/vehicleTest/java/com/codex/blacklight/gametest/vehicle/VehiclePermissionGameTest.java",
+    "snapshot": "sources/neoforge/src/vehicleTest/java/com/codex/blacklight/gametest/vehicle/VehiclePermissionGameTest.java",
+    "sha256": "2f266899481f5f46c99fd25c11cc9aaeb1aa368d2e59c0793e4a0224d58433b8",
+    "bytes": 4557
+  },
+  {
+    "platform": "neoforge",
+    "path": "src/vehicleTest/java/com/codex/blacklight/gametest/vehicle/VehiclePhysicalDamageGameTest.java",
+    "snapshot": "sources/neoforge/src/vehicleTest/java/com/codex/blacklight/gametest/vehicle/VehiclePhysicalDamageGameTest.java",
+    "sha256": "0788a6e70d32f3e0a233b0baa9cd29c073f697bf2455de63dd1bbd0eed046329",
+    "bytes": 13154
+  },
+  {
+    "platform": "neoforge",
+    "path": "src/vehicleTest/java/com/codex/blacklight/gametest/vehicle/VehicleProjectileHullGameTest.java",
+    "snapshot": "sources/neoforge/src/vehicleTest/java/com/codex/blacklight/gametest/vehicle/VehicleProjectileHullGameTest.java",
+    "sha256": "d8c4c37a1dd814479b623f836dadfff6bff62ceb5cb1b0e9eefe4735b041f4e8",
+    "bytes": 9669
+  },
+  {
+    "platform": "neoforge",
+    "path": "src/vehicleTest/java/com/codex/blacklight/gametest/vehicle/VehicleSupplyGameTest.java",
+    "snapshot": "sources/neoforge/src/vehicleTest/java/com/codex/blacklight/gametest/vehicle/VehicleSupplyGameTest.java",
+    "sha256": "58b93f1588bbd32aa223ae7fc1ccdba234ea7689c8b1aeb1de6bc262abdbbe3b",
+    "bytes": 6078
+  },
+  {
+    "platform": "neoforge",
+    "path": "src/vehicleTest/java/com/codex/blacklight/gametest/vehicle/VehicleTestReadiness.java",
+    "snapshot": "sources/neoforge/src/vehicleTest/java/com/codex/blacklight/gametest/vehicle/VehicleTestReadiness.java",
+    "sha256": "1ed097ed94e28280fdc4158e0bf06be792479b0936de247272b674b498926790",
+    "bytes": 2020
+  },
+  {
+    "platform": "neoforge",
+    "path": "src/vehicleTest/java/com/codex/blacklight/gametest/vehicle/VehicleUsabilityGameTest.java",
+    "snapshot": "sources/neoforge/src/vehicleTest/java/com/codex/blacklight/gametest/vehicle/VehicleUsabilityGameTest.java",
+    "sha256": "bd7479ac5942e90b98ebdf682ab5d2aa7416c0c63275385e50e544e7390c4776",
+    "bytes": 4274
+  },
+  {
+    "platform": "neoforge",
+    "path": "tools/VehicleMeshCapture.java",
+    "snapshot": "sources/neoforge/tools/VehicleMeshCapture.java",
+    "sha256": "5bddf928eab952a4782b45e5262e7dc3931224b4d84963fb850d0efcc784faf2",
+    "bytes": 4818
+  },
+  {
+    "platform": "neoforge",
+    "path": "tools/archive_military6_catalog.py",
+    "snapshot": "sources/neoforge/tools/archive_military6_catalog.py",
+    "sha256": "1d8635804f6d29991b03758156c9fba170a46fc4fc1b1c2f44bb4ed77000fa52",
+    "bytes": 50066
+  },
+  {
+    "platform": "neoforge",
+    "path": "tools/archive_military_catalog.py",
+    "snapshot": "sources/neoforge/tools/archive_military_catalog.py",
+    "sha256": "14400a5ca01565c6535e859ceee17825b5696d3be3193d33c987b131dd32e48e",
+    "bytes": 125818
+  },
+  {
+    "platform": "neoforge",
+    "path": "tools/build_military_vehicles.py",
+    "snapshot": "sources/neoforge/tools/build_military_vehicles.py",
+    "sha256": "d4000f9a90c480da10fc792c71d8dd94690c9db979a1f578d9207aa6bd66b5e9",
+    "bytes": 19126
+  },
+  {
+    "platform": "neoforge",
+    "path": "tools/build_vehicle_garages.py",
+    "snapshot": "sources/neoforge/tools/build_vehicle_garages.py",
+    "sha256": "865e8d907b7beafc811d04ce081b21eaa394785fe8a56bee8c1e77c6d92fff6c",
+    "bytes": 8874
+  },
+  {
+    "platform": "neoforge",
+    "path": "tools/preview_large_military_bases.py",
+    "snapshot": "sources/neoforge/tools/preview_large_military_bases.py",
+    "sha256": "98551552649a97d8ab9ec9a13dfa251c9831c051256d53c9053c5009a84a9d7c",
+    "bytes": 24078
+  },
+  {
+    "platform": "neoforge",
+    "path": "tools/preview_military_vehicles.py",
+    "snapshot": "sources/neoforge/tools/preview_military_vehicles.py",
+    "sha256": "2ab27a11bb35d4275ca4206daf146fd9d90b254969c4a2aba6411e9bbd467bae",
+    "bytes": 4844
+  }
+]

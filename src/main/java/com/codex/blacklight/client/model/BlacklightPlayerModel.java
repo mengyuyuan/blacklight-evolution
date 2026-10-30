@@ -67,7 +67,7 @@ public final class BlacklightPlayerModel extends PlayerModel<AbstractClientPlaye
         renderedPlayer=player;
         super.setupAnim(player,swing,amount,age,yaw,pitch);
         float partial=renderPartial;
-        matrices=PlayerMotionController.skeleton().getPoseMatrices(BlacklightRenderPose.sample(player,partial));
+        pose(BlacklightRenderPose.sample(player,partial));
         mercerFrame=MercerPlayerMesh.active(player)?MercerPlayerMesh.get().sample(player,partial,matrices):null;
         var ysmFrame=com.codex.blacklight.client.compat.YsmAppearanceBridge.frame(player);
         if(ysmFrame!=null)mercerFrame=ysmFrame;
@@ -110,6 +110,8 @@ public final class BlacklightPlayerModel extends PlayerModel<AbstractClientPlaye
         part.xRot=rotation.x;part.yRot=rotation.y;part.zRot=rotation.z;
         var scale=matrix.getScale(new Vector3f());part.xScale=scale.x;part.yScale=scale.y;part.zScale=scale.z;
     }
+    /** Shared final pose input for the native skin and its equipment projection. */
+    public void pose(BlacklightPose pose) { matrices=PlayerMotionController.skeleton().getPoseMatrices(pose); }
     public MercerRig.Frame mercerFrame() { return mercerFrame; }
     public Matrix4f[] matrices() { return mercerFrame==null?matrices:mercerFrame.attachments(); }
     @Override public void renderToBuffer(PoseStack stack,VertexConsumer out,int light,int overlay,int color) {

@@ -66,6 +66,8 @@ __pycache__/
 /model-qa*/
 # Native game and unit-test logging is local runtime output.
 /logs/
+# Disposable setup left beside an init script is not project source.
+/tools/.superpowers/
 
 # Local wing iterations and generated previews; current authoring sources are explicit.
 /art/sovereign-wings/model-*/

@@ -22,6 +22,7 @@ public final class BlacklightCommands {
         CommandDispatcher<CommandSourceStack> dispatcher = event.getDispatcher();
         dispatcher.register(Commands.literal("blacklight")
                 .then(HiveCommands.commands())
+                .then(MilitaryCommands.commands())
                 .then(Commands.literal("infect").requires(source -> source.hasPermission(2)).executes(context -> {
                     ServerPlayer player = context.getSource().getPlayerOrException();
                     BlacklightState state = player.getData(ModAttachments.PLAYER_STATE);

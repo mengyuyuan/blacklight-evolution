@@ -1,0 +1,170 @@
+{
+  "format_version": "1.12.0",
+  "minecraft:geometry": [
+    {
+      "description": {
+        "identifier": "geometry.blacklight.hydra",
+        "texture_width": 1024,
+        "texture_height": 1024,
+        "visible_bounds_width": 8,
+        "visible_bounds_height": 9,
+        "visible_bounds_offset": [
+          0,
+          3.4,
+          0
+        ]
+      },
+      "bones": [
+        {
+          "name": "root",
+          "pivot": [
+            -0.0,
+            0.0,
+            0
+          ],
+          "cubes": []
+        },
+        {
+          "name": "base",
+          "parent": "root",
+          "pivot": [
+            -0.0,
+            0.0,
+            0
+          ],
+          "cubes": []
+        },
+        {
+          "name": "neck_0",
+          "parent": "base",
+          "pivot": [
+            -0.0,
+            13.5,
+            5.0
+          ],
+          "cubes": []
+        },
+        {
+          "name": "neck_1",
+          "parent": "neck_0",
+          "pivot": [
+            -0.0,
+            25.245,
+            4.45
+          ],
+          "cubes": []
+        },
+        {
+          "name": "neck_2",
+          "parent": "neck_1",
+          "pivot": [
+            -0.0,
+            36.99,
+            2.8
+          ],
+          "cubes": []
+        },
+        {
+          "name": "neck_3",
+          "parent": "neck_2",
+          "pivot": [
+            -0.0,
+            48.73499999999999,
+            0.04999999999999982
+          ],
+          "cubes": []
+        },
+        {
+          "name": "neck_4",
+          "parent": "neck_3",
+          "pivot": [
+            -0.0,
+            60.48,
+            -3.8000000000000007
+          ],
+          "cubes": []
+        },
+        {
+          "name": "neck_5",
+          "parent": "neck_4",
+          "pivot": [
+            -0.0,
+            72.22500000000001,
+            -8.75
+          ],
+          "cubes": []
+        },
+        {
+          "name": "neck_6",
+          "parent": "neck_5",
+          "pivot": [
+            0,
+            83.55,
+            -14.8
+          ],
+          "cubes": []
+        },
+        {
+          "name": "head",
+          "parent": "neck_6",
+          "pivot": [
+            0,
+            91.35,
+            -18
+          ],
+          "cubes": []
+        },
+        {
+          "name": "jaw",
+          "parent": "head",
+          "pivot": [
+            0,
+            87.35,
+            -24
+          ],
+          "cubes": []
+        },
+        {
+          "name": "pincer_left",
+          "parent": "head",
+          "pivot": [
+            7,
+            94.35,
+            -27
+          ],
+          "cubes": []
+        },
+        {
+          "name": "pincer_right",
+          "parent": "head",
+          "pivot": [
+            -7,
+            94.35,
+            -27
+          ],
+          "cubes": []
+        },
+        {
+          "name": "claw_left",
+          "parent": "pincer_left",
+          "pivot": [
+            26,
+            103,
+            -37.5
+          ],
+          "cubes": []
+        },
+        {
+          "name": "claw_right",
+          "parent": "pincer_right",
+          "pivot": [
+            -26,
+            103,
+            -37.5
+          ],
+          "cubes": []
+        }
+      ]
+    }
+  ]
+}

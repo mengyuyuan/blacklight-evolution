@@ -521,22 +521,34 @@ public final class ConsumeSystem {
     @SubscribeEvent public static void thrown(net.neoforged.neoforge.event.tick.EntityTickEvent.Pre event) {
         if(!(event.getEntity() instanceof Mob mob)||mob.level().isClientSide)return;
         var shot=THROWN.get(mob);if(shot==null)return;
-        if(mob.isRemoved()||!mob.isAlive()||shot.remaining()<=0||shot.owner().level()!=mob.level()) {
+        if(mob.isRemoved()||!mob.isAlive()||shot.remaining()<=0||!shot.owner().isAlive()||shot.owner().isRemoved()||shot.owner().isSpectator()||shot.owner().level()!=mob.level()) {
             THROWN.remove(mob);release(mob);return;
         }
         event.setCanceled(true);
         Vec3 before=mob.position();
-        mob.move(MoverType.SELF,shot.velocity());mob.setDeltaMovement(shot.velocity());mob.hurtMarked=true;mob.fallDistance=0;
-        Vec3 step=mob.position().subtract(before);
-        Vec3 from=before.add(0,mob.getBbHeight()*.5,0),to=mob.position().add(0,mob.getBbHeight()*.5,0);
-        var hits=mob.level().getEntitiesOfClass(LivingEntity.class,mob.getBoundingBox().expandTowards(step.scale(-1)).inflate(.1),
-                e->e!=shot.owner()&&e!=mob&&e.isAlive()&&!e.isSpectator()&&mob.hasLineOfSight(e)
-                &&(!(e instanceof net.minecraft.world.entity.player.Player other)||shot.owner().canHarmPlayer(other)));
-        var hit=hits.stream().filter(e->e.getBoundingBox().inflate(mob.getBbWidth()*.5).contains(from)
-                ||e.getBoundingBox().inflate(mob.getBbWidth()*.5).clip(from,to).isPresent()).findFirst();
-        if(hit.isPresent()||mob.horizontalCollision||mob.verticalCollision) {
+        Vec3 from=before.add(0,mob.getBbHeight()*.5,0),requested=from.add(shot.velocity());
+        Vec3 half=new Vec3(mob.getBbWidth()*.5,mob.getBbHeight()*.5,mob.getBbWidth()*.5);
+        if(!Double.isFinite(shot.velocity().lengthSqr())||shot.velocity().lengthSqr()>64*64||!BlockThrowCollision.loaded(mob.level(),from,requested,half)){
+            THROWN.remove(mob);release(mob);mob.setDeltaMovement(Vec3.ZERO);return;
+        }
+        Vec3 wall=BlockThrowCollision.block(mob.level(),mob,from,requested,half),to=wall==null?requested:wall;
+        var hit=BlockThrowCollision.entity(mob.level(),mob,from,to,half,
+                entity->entity instanceof LivingEntity living&&entity!=mob&&CombatTargeting.damageable(shot.owner(),living));
+        var mechanical=com.codex.blacklight.military.vehicle.VehiclePhysicalDamageBridge.nearest((net.minecraft.server.level.ServerLevel)mob.level(),mob,from,to,half);
+        double wallDistance=wall==null?Double.POSITIVE_INFINITY:from.distanceTo(wall);
+        if(hit!=null&&from.distanceTo(hit.getLocation())>=wallDistance-1e-5)hit=null;
+        if(mechanical!=null&&mechanical.distance()>=wallDistance-1e-5)mechanical=null;
+        if(mechanical!=null&&hit!=null){if(mechanical.distance()<=from.distanceTo(hit.getLocation())+1e-5)hit=null;else mechanical=null;}
+        Vec3 contact=mechanical!=null?mechanical.point():hit!=null?hit.getLocation():to;
+        mob.move(MoverType.SELF,contact.subtract(from));mob.setDeltaMovement(shot.velocity());mob.hurtMarked=true;mob.fallDistance=0;
+        // Native movement may stop first at an entity or a conservative rotated hull envelope.
+        // A later exact geometric contact must not deal remote damage past that real stop.
+        boolean stoppedBeforeContact=mob.position().add(0,mob.getBbHeight()*.5,0).distanceToSqr(contact)>.03*.03;
+        if(stoppedBeforeContact){hit=null;mechanical=null;}
+        if(stoppedBeforeContact||hit!=null||mechanical!=null||wall!=null||mob.horizontalCollision||mob.verticalCollision) {
             THROWN.remove(mob);release(mob);mob.setDeltaMovement(Vec3.ZERO);
-            hit.ifPresent(e->e.hurt(mob.damageSources().thrown(mob,shot.owner()),shot.damage()));
+            if(hit!=null)hit.getEntity().hurt(mob.damageSources().thrown(mob,shot.owner()),shot.damage());
+            if(mechanical!=null)com.codex.blacklight.military.vehicle.VehicleDamageBridge.hurtPhysical(shot.owner(),mechanical.vehicle(),shot.damage(),mob);
             mob.hurt(mob.damageSources().thrown(mob,shot.owner()),shot.damage());
             mob.level().playSound(null,mob.blockPosition(),SoundEvents.GENERIC_BIG_FALL,SoundSource.PLAYERS,.8F,.8F);
         } else THROWN.put(mob,new Thrown(shot.owner(),shot.remaining()-1,shot.velocity().add(0,-.08,0).scale(.98),shot.damage()));

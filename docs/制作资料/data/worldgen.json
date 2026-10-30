@@ -1,0 +1,671 @@
+[
+  {
+    "platform": "neoforge",
+    "id": "biome/city",
+    "source": "src/main/resources/data/blacklight/worldgen/biome/city.json",
+    "sha256": "a401039f5ba46da56c7c964d256d9635fd0ffef0e9c8aa63a11ff61cc94bbbf1",
+    "raw": {
+      "has_precipitation": true,
+      "temperature": 0.8,
+      "downfall": 0.4,
+      "effects": {
+        "fog_color": 12638463,
+        "water_color": 4159204,
+        "water_fog_color": 329011,
+        "sky_color": 7907327
+      },
+      "spawners": {},
+      "spawn_costs": {},
+      "carvers": {},
+      "features": []
+    }
+  },
+  {
+    "platform": "neoforge",
+    "id": "configured_feature/hive",
+    "source": "src/main/resources/data/blacklight/worldgen/configured_feature/hive.json",
+    "sha256": "4996941e876d6480294142bf3b75c3016b409d57515f9fb427cd8cb5e9409c59",
+    "raw": {
+      "type": "blacklight:hive",
+      "config": {}
+    }
+  },
+  {
+    "platform": "neoforge",
+    "id": "placed_feature/hive",
+    "source": "src/main/resources/data/blacklight/worldgen/placed_feature/hive.json",
+    "sha256": "477a1de9b58ee0aa9281ad4f1c67ec47cbdc6bd84ab76ace1b56c7d508e73d9b",
+    "raw": {
+      "feature": "blacklight:hive",
+      "placement": [
+        {
+          "type": "minecraft:rarity_filter",
+          "chance": 64
+        },
+        {
+          "type": "minecraft:in_square"
+        },
+        {
+          "type": "minecraft:heightmap",
+          "heightmap": "WORLD_SURFACE_WG"
+        },
+        {
+          "type": "minecraft:biome"
+        }
+      ]
+    }
+  },
+  {
+    "platform": "neoforge",
+    "id": "structure/blackwatch_outpost",
+    "source": "src/main/resources/data/blacklight/worldgen/structure/blackwatch_outpost.json",
+    "sha256": "9a33c0ac8a54fcb803acc57a26d187b0d72fcde79d5c314486c2a7f72fc2b9f3",
+    "raw": {
+      "type": "minecraft:jigsaw",
+      "biomes": "#blacklight:has_structure/blackwatch_outpost",
+      "step": "surface_structures",
+      "spawn_overrides": {},
+      "terrain_adaptation": "beard_thin",
+      "start_pool": "blacklight:blackwatch_outpost",
+      "size": 1,
+      "start_height": {
+        "absolute": 0
+      },
+      "project_start_to_heightmap": "WORLD_SURFACE_WG",
+      "max_distance_from_center": 40,
+      "use_expansion_hack": false
+    }
+  },
+  {
+    "platform": "neoforge",
+    "id": "structure/city_military_base",
+    "source": "src/main/resources/data/blacklight/worldgen/structure/city_military_base.json",
+    "sha256": "2ac8471ee74c1bffddd97020b23e2fdb1e378f5c961446cd4db6680d47baf0cc",
+    "raw": {
+      "type": "blacklight:city_military",
+      "biomes": "blacklight:city",
+      "step": "surface_structures",
+      "spawn_overrides": {},
+      "terrain_adaptation": "none"
+    }
+  },
+  {
+    "platform": "neoforge",
+    "id": "structure/colossal_hive",
+    "source": "src/main/resources/data/blacklight/worldgen/structure/colossal_hive.json",
+    "sha256": "ece9da661906e47f45a0eb184ef2e12c2ec72db1ff44ad091a9316f770774669",
+    "raw": {
+      "type": "blacklight:colossal_hive",
+      "biomes": "#blacklight:has_structure/colossal_hive",
+      "step": "surface_structures",
+      "spawn_overrides": {},
+      "terrain_adaptation": "none"
+    }
+  },
+  {
+    "platform": "neoforge",
+    "id": "structure/frozen_research_station",
+    "source": "src/main/resources/data/blacklight/worldgen/structure/frozen_research_station.json",
+    "sha256": "af421eede063c814c498e28780ee9c7137fedf6ff3e4f63f1aefe43aa14a39a1",
+    "raw": {
+      "type": "minecraft:jigsaw",
+      "biomes": "#blacklight:has_structure/frozen_research_station",
+      "step": "surface_structures",
+      "spawn_overrides": {},
+      "terrain_adaptation": "none",
+      "start_pool": "blacklight:frozen_research_station",
+      "size": 1,
+      "start_height": {
+        "absolute": -11
+      },
+      "project_start_to_heightmap": "WORLD_SURFACE_WG",
+      "max_distance_from_center": 32,
+      "use_expansion_hack": false,
+      "liquid_settings": "ignore_waterlogging"
+    }
+  },
+  {
+    "platform": "neoforge",
+    "id": "structure/military_outpost",
+    "source": "src/main/resources/data/blacklight/worldgen/structure/military_outpost.json",
+    "sha256": "5dbc42e355b04bded4008bc5b811c0790b09f4a046e236266c2d5c84ecfb8e02",
+    "raw": {
+      "type": "minecraft:jigsaw",
+      "biomes": "#blacklight:has_structure/military_outpost",
+      "step": "surface_structures",
+      "spawn_overrides": {},
+      "terrain_adaptation": "beard_thin",
+      "start_pool": "blacklight:military_outpost",
+      "size": 1,
+      "start_height": {
+        "absolute": 0
+      },
+      "project_start_to_heightmap": "WORLD_SURFACE_WG",
+      "max_distance_from_center": 40,
+      "use_expansion_hack": false
+    }
+  },
+  {
+    "platform": "neoforge",
+    "id": "structure_set/blackwatch_outposts",
+    "source": "src/main/resources/data/blacklight/worldgen/structure_set/blackwatch_outposts.json",
+    "sha256": "221680fa7be1a1e158b26f6219765727484e6d657b6cb123e002b0e9636ad615",
+    "raw": {
+      "structures": [
+        {
+          "structure": "blacklight:blackwatch_outpost",
+          "weight": 1
+        }
+      ],
+      "placement": {
+        "type": "minecraft:random_spread",
+        "spacing": 32,
+        "separation": 12,
+        "salt": 26101431
+      }
+    }
+  },
+  {
+    "platform": "neoforge",
+    "id": "structure_set/city_military_bases",
+    "source": "src/main/resources/data/blacklight/worldgen/structure_set/city_military_bases.json",
+    "sha256": "8c73d119c38a71f875b6ab449e5e906331ee74954952cdd235da01c505df1e49",
+    "raw": {
+      "structures": [
+        {
+          "structure": "blacklight:city_military_base",
+          "weight": 1
+        }
+      ],
+      "placement": {
+        "type": "minecraft:random_spread",
+        "spacing": 24,
+        "separation": 12,
+        "salt": 26102471
+      }
+    }
+  },
+  {
+    "platform": "neoforge",
+    "id": "structure_set/colossal_hives",
+    "source": "src/main/resources/data/blacklight/worldgen/structure_set/colossal_hives.json",
+    "sha256": "66f8d0a0f69da9c10b84a7b518b790e81b33c804a8db7066f1c3659b421f56f0",
+    "raw": {
+      "structures": [
+        {
+          "structure": "blacklight:colossal_hive",
+          "weight": 1
+        }
+      ],
+      "placement": {
+        "type": "minecraft:random_spread",
+        "spacing": 80,
+        "separation": 32,
+        "salt": 26100153,
+        "exclusion_zone": {
+          "other_set": "minecraft:villages",
+          "chunk_count": 8
+        }
+      }
+    }
+  },
+  {
+    "platform": "neoforge",
+    "id": "structure_set/frozen_research_stations",
+    "source": "src/main/resources/data/blacklight/worldgen/structure_set/frozen_research_stations.json",
+    "sha256": "ca6e208daade305e3e699ea0932209e947839d59f03bce26f7ffe44a02f9b503",
+    "raw": {
+      "structures": [
+        {
+          "structure": "blacklight:frozen_research_station",
+          "weight": 1
+        }
+      ],
+      "placement": {
+        "type": "minecraft:random_spread",
+        "spacing": 24,
+        "separation": 8,
+        "salt": 26092617
+      }
+    }
+  },
+  {
+    "platform": "neoforge",
+    "id": "structure_set/military_outposts",
+    "source": "src/main/resources/data/blacklight/worldgen/structure_set/military_outposts.json",
+    "sha256": "13271f0dc7b8a45e2e196067caf35ac9067216451d1c8426e0db28fea1c7b9a6",
+    "raw": {
+      "structures": [
+        {
+          "structure": "blacklight:military_outpost",
+          "weight": 1
+        }
+      ],
+      "placement": {
+        "type": "minecraft:random_spread",
+        "spacing": 40,
+        "separation": 16,
+        "salt": 26102371,
+        "exclusion_zone": {
+          "other_set": "blacklight:blackwatch_outposts",
+          "chunk_count": 8
+        }
+      }
+    }
+  },
+  {
+    "platform": "neoforge",
+    "id": "template_pool/blackwatch_outpost",
+    "source": "src/main/resources/data/blacklight/worldgen/template_pool/blackwatch_outpost.json",
+    "sha256": "af0519d76c693e84053e36afed6ec35e01192b081209c441d3cccf740103d674",
+    "raw": {
+      "name": "blacklight:blackwatch_outpost",
+      "fallback": "minecraft:empty",
+      "elements": [
+        {
+          "weight": 2,
+          "element": {
+            "element_type": "minecraft:single_pool_element",
+            "location": "blacklight:blackwatch_outpost",
+            "processors": "minecraft:empty",
+            "projection": "rigid"
+          }
+        },
+        {
+          "weight": 1,
+          "element": {
+            "element_type": "minecraft:single_pool_element",
+            "location": "blacklight:blackwatch_checkpoint",
+            "processors": "minecraft:empty",
+            "projection": "rigid"
+          }
+        }
+      ]
+    }
+  },
+  {
+    "platform": "neoforge",
+    "id": "template_pool/frozen_research_station",
+    "source": "src/main/resources/data/blacklight/worldgen/template_pool/frozen_research_station.json",
+    "sha256": "702203e7f60d0338ae509da186d8df754f1e104e45369685511cf4fa6ff03bf6",
+    "raw": {
+      "name": "blacklight:frozen_research_station",
+      "fallback": "minecraft:empty",
+      "elements": [
+        {
+          "weight": 1,
+          "element": {
+            "element_type": "minecraft:single_pool_element",
+            "location": "blacklight:frozen_research_station",
+            "processors": "minecraft:empty",
+            "projection": "rigid"
+          }
+        }
+      ]
+    }
+  },
+  {
+    "platform": "neoforge",
+    "id": "template_pool/military_outpost",
+    "source": "src/main/resources/data/blacklight/worldgen/template_pool/military_outpost.json",
+    "sha256": "01fc66326d8c4750c52214399f9d5978e4a3d1445d226276e2ecc96f92dee98a",
+    "raw": {
+      "name": "blacklight:military_outpost",
+      "fallback": "minecraft:empty",
+      "elements": [
+        {
+          "weight": 2,
+          "element": {
+            "element_type": "minecraft:single_pool_element",
+            "location": "blacklight:military_camp",
+            "processors": "minecraft:empty",
+            "projection": "rigid"
+          }
+        },
+        {
+          "weight": 1,
+          "element": {
+            "element_type": "minecraft:single_pool_element",
+            "location": "blacklight:military_checkpoint",
+            "processors": "minecraft:empty",
+            "projection": "rigid"
+          }
+        }
+      ]
+    }
+  },
+  {
+    "platform": "forge",
+    "id": "biome/city",
+    "source": "src/main/resources/data/blacklight/worldgen/biome/city.json",
+    "sha256": "a401039f5ba46da56c7c964d256d9635fd0ffef0e9c8aa63a11ff61cc94bbbf1",
+    "raw": {
+      "has_precipitation": true,
+      "temperature": 0.8,
+      "downfall": 0.4,
+      "effects": {
+        "fog_color": 12638463,
+        "water_color": 4159204,
+        "water_fog_color": 329011,
+        "sky_color": 7907327
+      },
+      "spawners": {},
+      "spawn_costs": {},
+      "carvers": {},
+      "features": []
+    }
+  },
+  {
+    "platform": "forge",
+    "id": "configured_feature/hive",
+    "source": "src/main/resources/data/blacklight/worldgen/configured_feature/hive.json",
+    "sha256": "4996941e876d6480294142bf3b75c3016b409d57515f9fb427cd8cb5e9409c59",
+    "raw": {
+      "type": "blacklight:hive",
+      "config": {}
+    }
+  },
+  {
+    "platform": "forge",
+    "id": "placed_feature/hive",
+    "source": "src/main/resources/data/blacklight/worldgen/placed_feature/hive.json",
+    "sha256": "477a1de9b58ee0aa9281ad4f1c67ec47cbdc6bd84ab76ace1b56c7d508e73d9b",
+    "raw": {
+      "feature": "blacklight:hive",
+      "placement": [
+        {
+          "type": "minecraft:rarity_filter",
+          "chance": 64
+        },
+        {
+          "type": "minecraft:in_square"
+        },
+        {
+          "type": "minecraft:heightmap",
+          "heightmap": "WORLD_SURFACE_WG"
+        },
+        {
+          "type": "minecraft:biome"
+        }
+      ]
+    }
+  },
+  {
+    "platform": "forge",
+    "id": "structure/blackwatch_outpost",
+    "source": "src/main/resources/data/blacklight/worldgen/structure/blackwatch_outpost.json",
+    "sha256": "9a33c0ac8a54fcb803acc57a26d187b0d72fcde79d5c314486c2a7f72fc2b9f3",
+    "raw": {
+      "type": "minecraft:jigsaw",
+      "biomes": "#blacklight:has_structure/blackwatch_outpost",
+      "step": "surface_structures",
+      "spawn_overrides": {},
+      "terrain_adaptation": "beard_thin",
+      "start_pool": "blacklight:blackwatch_outpost",
+      "size": 1,
+      "start_height": {
+        "absolute": 0
+      },
+      "project_start_to_heightmap": "WORLD_SURFACE_WG",
+      "max_distance_from_center": 40,
+      "use_expansion_hack": false
+    }
+  },
+  {
+    "platform": "forge",
+    "id": "structure/city_military_base",
+    "source": "src/main/resources/data/blacklight/worldgen/structure/city_military_base.json",
+    "sha256": "57e0a9991bd17e8fcc964f1b2d6905bb8f54374d2f07f08555d10305b4dfd32c",
+    "raw": {
+      "type": "blacklight:city_military",
+      "biomes": "blacklight:city",
+      "step": "surface_structures",
+      "spawn_overrides": {},
+      "terrain_adaptation": "none"
+    }
+  },
+  {
+    "platform": "forge",
+    "id": "structure/colossal_hive",
+    "source": "src/main/resources/data/blacklight/worldgen/structure/colossal_hive.json",
+    "sha256": "ece9da661906e47f45a0eb184ef2e12c2ec72db1ff44ad091a9316f770774669",
+    "raw": {
+      "type": "blacklight:colossal_hive",
+      "biomes": "#blacklight:has_structure/colossal_hive",
+      "step": "surface_structures",
+      "spawn_overrides": {},
+      "terrain_adaptation": "none"
+    }
+  },
+  {
+    "platform": "forge",
+    "id": "structure/frozen_research_station",
+    "source": "src/main/resources/data/blacklight/worldgen/structure/frozen_research_station.json",
+    "sha256": "11a9a0d682f17e7b0da07be0584a44b75b00b0da71d0776979af2b33aa6929d8",
+    "raw": {
+      "type": "minecraft:jigsaw",
+      "biomes": "#blacklight:has_structure/frozen_research_station",
+      "step": "surface_structures",
+      "spawn_overrides": {},
+      "terrain_adaptation": "none",
+      "start_pool": "blacklight:frozen_research_station",
+      "size": 1,
+      "start_height": {
+        "absolute": -11
+      },
+      "project_start_to_heightmap": "WORLD_SURFACE_WG",
+      "max_distance_from_center": 32,
+      "use_expansion_hack": false
+    }
+  },
+  {
+    "platform": "forge",
+    "id": "structure/military_outpost",
+    "source": "src/main/resources/data/blacklight/worldgen/structure/military_outpost.json",
+    "sha256": "8342fc436a32147b932cf071eb9e32d9b8d6234f7973c38b32a9ef3f5ade190a",
+    "raw": {
+      "type": "minecraft:jigsaw",
+      "biomes": "#blacklight:has_structure/military_outpost",
+      "step": "surface_structures",
+      "spawn_overrides": {},
+      "terrain_adaptation": "beard_thin",
+      "start_pool": "blacklight:military_outpost",
+      "size": 1,
+      "start_height": {
+        "absolute": 0
+      },
+      "project_start_to_heightmap": "WORLD_SURFACE_WG",
+      "max_distance_from_center": 40,
+      "use_expansion_hack": false
+    }
+  },
+  {
+    "platform": "forge",
+    "id": "structure_set/blackwatch_outposts",
+    "source": "src/main/resources/data/blacklight/worldgen/structure_set/blackwatch_outposts.json",
+    "sha256": "221680fa7be1a1e158b26f6219765727484e6d657b6cb123e002b0e9636ad615",
+    "raw": {
+      "structures": [
+        {
+          "structure": "blacklight:blackwatch_outpost",
+          "weight": 1
+        }
+      ],
+      "placement": {
+        "type": "minecraft:random_spread",
+        "spacing": 32,
+        "separation": 12,
+        "salt": 26101431
+      }
+    }
+  },
+  {
+    "platform": "forge",
+    "id": "structure_set/city_military_bases",
+    "source": "src/main/resources/data/blacklight/worldgen/structure_set/city_military_bases.json",
+    "sha256": "b3cef60efe1e51576b1b54ed936c26d793e8dd72bf91413ff8a0fbf761d9e0e2",
+    "raw": {
+      "structures": [
+        {
+          "structure": "blacklight:city_military_base",
+          "weight": 1
+        }
+      ],
+      "placement": {
+        "type": "minecraft:random_spread",
+        "spacing": 24,
+        "separation": 12,
+        "salt": 26102471
+      }
+    }
+  },
+  {
+    "platform": "forge",
+    "id": "structure_set/colossal_hives",
+    "source": "src/main/resources/data/blacklight/worldgen/structure_set/colossal_hives.json",
+    "sha256": "0d0cd6d91473fe3255ea6c2b16aa1bdcf3588ea700c182463bea628070a9cec8",
+    "raw": {
+      "structures": [
+        {
+          "structure": "blacklight:colossal_hive",
+          "weight": 1
+        }
+      ],
+      "placement": {
+        "type": "minecraft:random_spread",
+        "spacing": 80,
+        "separation": 32,
+        "salt": 26100153,
+        "exclusion_zone": {
+          "other_set": "minecraft:villages",
+          "chunk_count": 8
+        }
+      }
+    }
+  },
+  {
+    "platform": "forge",
+    "id": "structure_set/frozen_research_stations",
+    "source": "src/main/resources/data/blacklight/worldgen/structure_set/frozen_research_stations.json",
+    "sha256": "a7e9c748f8db4ec2cfd022a6299b31f5697bc94364299269656505c30a22df9d",
+    "raw": {
+      "structures": [
+        {
+          "structure": "blacklight:frozen_research_station",
+          "weight": 1
+        }
+      ],
+      "placement": {
+        "type": "minecraft:random_spread",
+        "spacing": 24,
+        "separation": 8,
+        "salt": 26092617
+      }
+    }
+  },
+  {
+    "platform": "forge",
+    "id": "structure_set/military_outposts",
+    "source": "src/main/resources/data/blacklight/worldgen/structure_set/military_outposts.json",
+    "sha256": "a12c3656dfd319c480541a1470bb4adff8dbe71ace52ba07c1b49d5e6aa6be04",
+    "raw": {
+      "structures": [
+        {
+          "structure": "blacklight:military_outpost",
+          "weight": 1
+        }
+      ],
+      "placement": {
+        "type": "minecraft:random_spread",
+        "spacing": 40,
+        "separation": 16,
+        "salt": 26102371,
+        "exclusion_zone": {
+          "other_set": "blacklight:blackwatch_outposts",
+          "chunk_count": 8
+        }
+      }
+    }
+  },
+  {
+    "platform": "forge",
+    "id": "template_pool/blackwatch_outpost",
+    "source": "src/main/resources/data/blacklight/worldgen/template_pool/blackwatch_outpost.json",
+    "sha256": "af0519d76c693e84053e36afed6ec35e01192b081209c441d3cccf740103d674",
+    "raw": {
+      "name": "blacklight:blackwatch_outpost",
+      "fallback": "minecraft:empty",
+      "elements": [
+        {
+          "weight": 2,
+          "element": {
+            "element_type": "minecraft:single_pool_element",
+            "location": "blacklight:blackwatch_outpost",
+            "processors": "minecraft:empty",
+            "projection": "rigid"
+          }
+        },
+        {
+          "weight": 1,
+          "element": {
+            "element_type": "minecraft:single_pool_element",
+            "location": "blacklight:blackwatch_checkpoint",
+            "processors": "minecraft:empty",
+            "projection": "rigid"
+          }
+        }
+      ]
+    }
+  },
+  {
+    "platform": "forge",
+    "id": "template_pool/frozen_research_station",
+    "source": "src/main/resources/data/blacklight/worldgen/template_pool/frozen_research_station.json",
+    "sha256": "b17b2a3918185dc8008b0a5b21b043afce709d3c3da972f966bd8705c5d90cb8",
+    "raw": {
+      "name": "blacklight:frozen_research_station",
+      "fallback": "minecraft:empty",
+      "elements": [
+        {
+          "weight": 1,
+          "element": {
+            "element_type": "minecraft:single_pool_element",
+            "location": "blacklight:frozen_research_station",
+            "processors": "minecraft:empty",
+            "projection": "rigid"
+          }
+        }
+      ]
+    }
+  },
+  {
+    "platform": "forge",
+    "id": "template_pool/military_outpost",
+    "source": "src/main/resources/data/blacklight/worldgen/template_pool/military_outpost.json",
+    "sha256": "14f85409584812f6060125ce7e651d0f10df42b8352c2cb74360203a36fbcb05",
+    "raw": {
+      "name": "blacklight:military_outpost",
+      "fallback": "minecraft:empty",
+      "elements": [
+        {
+          "weight": 2,
+          "element": {
+            "element_type": "minecraft:single_pool_element",
+            "location": "blacklight:military_camp",
+            "processors": "minecraft:empty",
+            "projection": "rigid"
+          }
+        },
+        {
+          "weight": 1,
+          "element": {
+            "element_type": "minecraft:single_pool_element",
+            "location": "blacklight:military_checkpoint",
+            "processors": "minecraft:empty",
+            "projection": "rigid"
+          }
+        }
+      ]
+    }
+  }
+]

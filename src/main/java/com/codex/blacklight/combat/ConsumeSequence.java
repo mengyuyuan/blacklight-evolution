@@ -56,7 +56,7 @@ public final class ConsumeSequence {
                 ||target instanceof com.codex.blacklight.entity.BlacklightInfectedHost host&&(host.giantBoss()||host.encounterBoss());
     }
     public static boolean humanoid(LivingEntity target) {
-        if(target instanceof com.codex.blacklight.entity.BlackwatchSoldier||target instanceof com.codex.blacklight.entity.BlacklightCommonInfected)return true;
+        if(target instanceof com.codex.blacklight.entity.MilitarySoldier||target instanceof com.codex.blacklight.entity.BlacklightCommonInfected)return true;
         if(target instanceof com.codex.blacklight.entity.BlacklightInfectedHost host)return host.humanoid();
         return target instanceof net.minecraft.world.entity.monster.Zombie
                 ||target instanceof net.minecraft.world.entity.monster.AbstractSkeleton

@@ -1,0 +1,22 @@
+{
+  "kind": "actual-production-ModelPart-CPU-preview",
+  "not_game_screenshot": true,
+  "scenes": 8,
+  "capture_sha256": "b340e3b3e33b2b5d73e974562497bcd9e66ea445ac47e450f4a05e97ff2d7c1b",
+  "files": {
+    "apc-blackwatch.png": "dabca06f986d10806813dc100b4298599b042964c3bae5a2fe7dcce59f7b933b",
+    "apc-military.png": "6fcd9a9eba4eba6afafdccab22ee6df59f9cea3741282d456671154d91a48a73",
+    "tank-blackwatch.png": "4765580dc21487a4544238ce10ab108d2acba01f31b4f82887ee3ed1f4efe833",
+    "tank-military.png": "fa96192d0812a20cd27cd0937ed225c672817bdc956f35189b4a0065730eca6c",
+    "truck-blackwatch.png": "a617bd44f547a0509ca64384a9a5d47ebbfb7f2c7a41617f5192e79c3640134c",
+    "truck-crew-blackwatch.png": "6bbd2358195b3185d0aadeb053ab503b4eb87887d1113e5f13953ee9d7a94349",
+    "truck-crew-military.png": "76016ec7e6e59a937840f70d7582e193bdaf85e9f942202ee615b7767257a74d",
+    "truck-military.png": "18d82579f5be5d165bc4b33aeea2af121aca5cda20f39e738ca57a81128405ef",
+    "vehicles-production-board.png": "219d6648850eba910065277f9639cbd65d74cb9a8ea4c8ca43758d24f8e1254e"
+  },
+  "diagnostic_capture_sha256": "63532c80f86651aeee19d00b39d15b2239ee8d87b2d3d789ae05600785c12a8c",
+  "diagnostic_files": {
+    "diagnostics/truck-crew-interior-blackwatch.png": "929890f19f297de0ba989e8ecf3c54c155281ab914520ed23ef5bd9f6164c0c9",
+    "diagnostics/truck-crew-interior-military.png": "844b49fbb7d3ad8849d2769853c5f956cc9678964cc7e3554108ea919f6f67ae"
+  }
+}

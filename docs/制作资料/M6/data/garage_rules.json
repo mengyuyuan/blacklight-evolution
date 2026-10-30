@@ -1,0 +1,15 @@
+{
+  "fuel_gameplay": "disabled",
+  "dormant_fuel": {
+    "snapshot_and_finite_api_retained": true,
+    "capacity_field": "maxFuelTicks",
+    "usage": "inactive configuration and saved FuelTicks retained; no gameplay consumption"
+  },
+  "health_per_repair_part": 20,
+  "loaded_native_dispatch_cap": 12,
+  "low_primary_ammunition_ratio": 0.2,
+  "low_health_ratio": 0.35,
+  "resume_primary_ammunition_ratio": 0.5,
+  "resume_health_ratio": 0.6,
+  "automatic_supply": "actual ItemEntity ammunition/repair cargo; runtime acceptance belongs to root"
+}

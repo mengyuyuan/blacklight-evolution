@@ -1,0 +1,1080 @@
+[
+  {
+    "platform": "neoforge",
+    "id": "city_transit",
+    "source": "src/main/resources/data/blacklight/recipe/city_transit.json",
+    "sha256": "2f2e3fb4e6a175828fa4c38bf0d8526356d6b0baf2c4c489e15bdaa6e382de49",
+    "raw": {
+      "type": "minecraft:crafting_shaped",
+      "pattern": [
+        " I ",
+        "ICI",
+        " R "
+      ],
+      "key": {
+        "I": {
+          "item": "minecraft:iron_ingot"
+        },
+        "C": {
+          "item": "minecraft:compass"
+        },
+        "R": {
+          "item": "minecraft:redstone"
+        }
+      },
+      "result": {
+        "id": "blacklight:city_transit",
+        "count": 1
+      }
+    },
+    "result": {
+      "id": "blacklight:city_transit",
+      "count": 1
+    }
+  },
+  {
+    "platform": "neoforge",
+    "id": "field_scanner",
+    "source": "src/main/resources/data/blacklight/recipe/field_scanner.json",
+    "sha256": "cf167ea254eb3608537834a4ed5733f156704780faca3797c87a337636df3546",
+    "raw": {
+      "type": "minecraft:crafting_shaped",
+      "category": "equipment",
+      "pattern": [
+        " I ",
+        "CGC",
+        " R "
+      ],
+      "key": {
+        "I": {
+          "item": "minecraft:iron_ingot"
+        },
+        "C": {
+          "item": "blacklight:military_circuit"
+        },
+        "G": {
+          "item": "minecraft:glass"
+        },
+        "R": {
+          "item": "minecraft:redstone"
+        }
+      },
+      "result": {
+        "id": "blacklight:field_scanner",
+        "count": 1
+      }
+    },
+    "result": {
+      "id": "blacklight:field_scanner",
+      "count": 1
+    }
+  },
+  {
+    "platform": "neoforge",
+    "id": "grenade_launcher",
+    "source": "src/main/resources/data/blacklight/recipe/grenade_launcher.json",
+    "sha256": "a403bf2a685a0c65ba6cf05edacc8dd11b8c527f3367194f3ced2eed702e126c",
+    "raw": {
+      "type": "minecraft:crafting_shaped",
+      "pattern": [
+        "III",
+        " CR",
+        " SI"
+      ],
+      "key": {
+        "I": {
+          "item": "minecraft:iron_ingot"
+        },
+        "C": {
+          "item": "blacklight:military_circuit"
+        },
+        "R": {
+          "item": "blacklight:grenade_round"
+        },
+        "S": {
+          "item": "minecraft:stick"
+        }
+      },
+      "result": {
+        "id": "blacklight:grenade_launcher",
+        "count": 1
+      }
+    },
+    "result": {
+      "id": "blacklight:grenade_launcher",
+      "count": 1
+    }
+  },
+  {
+    "platform": "neoforge",
+    "id": "grenade_round",
+    "source": "src/main/resources/data/blacklight/recipe/grenade_round.json",
+    "sha256": "7b227b2224e36c6df62b17819e35a2180d7f3cdc1837c475a37666ea450a4eba",
+    "raw": {
+      "type": "minecraft:crafting_shapeless",
+      "ingredients": [
+        {
+          "item": "minecraft:iron_ingot"
+        },
+        {
+          "item": "minecraft:gunpowder"
+        }
+      ],
+      "result": {
+        "id": "blacklight:grenade_round",
+        "count": 2
+      }
+    },
+    "result": {
+      "id": "blacklight:grenade_round",
+      "count": 2
+    }
+  },
+  {
+    "platform": "neoforge",
+    "id": "infection_launcher",
+    "source": "src/main/resources/data/blacklight/recipe/infection_launcher.json",
+    "sha256": "75f9385995b07bb31cd166a40fd8f6b1eff0d2997a42222126da1e5882ed01cc",
+    "raw": {
+      "type": "minecraft:crafting_shaped",
+      "pattern": [
+        "III",
+        " CR",
+        " SI"
+      ],
+      "key": {
+        "I": {
+          "item": "minecraft:iron_ingot"
+        },
+        "C": {
+          "item": "blacklight:military_circuit"
+        },
+        "R": {
+          "item": "blacklight:infection_round"
+        },
+        "S": {
+          "item": "minecraft:stick"
+        }
+      },
+      "result": {
+        "id": "blacklight:infection_launcher",
+        "count": 1
+      }
+    },
+    "result": {
+      "id": "blacklight:infection_launcher",
+      "count": 1
+    }
+  },
+  {
+    "platform": "neoforge",
+    "id": "infection_round",
+    "source": "src/main/resources/data/blacklight/recipe/infection_round.json",
+    "sha256": "334701a6fc85c7a12d447b439c6d555f9f5c78b8816480d7bd5c09f09b6d8fc1",
+    "raw": {
+      "type": "minecraft:crafting_shapeless",
+      "ingredients": [
+        {
+          "item": "minecraft:iron_ingot"
+        },
+        {
+          "item": "minecraft:gunpowder"
+        },
+        {
+          "item": "blacklight:blacklight_sample"
+        }
+      ],
+      "result": {
+        "id": "blacklight:infection_round",
+        "count": 2
+      }
+    },
+    "result": {
+      "id": "blacklight:infection_round",
+      "count": 2
+    }
+  },
+  {
+    "platform": "neoforge",
+    "id": "machine_gun_round",
+    "source": "src/main/resources/data/blacklight/recipe/machine_gun_round.json",
+    "sha256": "d0dbd1676fb2cde3483d64ac67242c6c3cf55d2ff88e57698b2ed396cdd9176c",
+    "raw": {
+      "type": "minecraft:crafting_shapeless",
+      "ingredients": [
+        {
+          "item": "minecraft:iron_ingot"
+        },
+        {
+          "item": "minecraft:gunpowder"
+        }
+      ],
+      "result": {
+        "id": "blacklight:machine_gun_round",
+        "count": 16
+      }
+    },
+    "result": {
+      "id": "blacklight:machine_gun_round",
+      "count": 16
+    }
+  },
+  {
+    "platform": "neoforge",
+    "id": "military_carbine",
+    "source": "src/main/resources/data/blacklight/recipe/military_carbine.json",
+    "sha256": "37ea501a12cd798d4222f666a38a04178927cd0b7e6310ef5ad1bdbc26a54473",
+    "raw": {
+      "type": "minecraft:crafting_shaped",
+      "pattern": [
+        " II",
+        " CR",
+        " SI"
+      ],
+      "key": {
+        "I": {
+          "item": "minecraft:iron_ingot"
+        },
+        "C": {
+          "item": "blacklight:military_circuit"
+        },
+        "R": {
+          "item": "blacklight:rifle_round"
+        },
+        "S": {
+          "item": "minecraft:stick"
+        }
+      },
+      "result": {
+        "id": "blacklight:military_carbine",
+        "count": 1
+      }
+    },
+    "result": {
+      "id": "blacklight:military_carbine",
+      "count": 1
+    }
+  },
+  {
+    "platform": "neoforge",
+    "id": "military_machine_gun",
+    "source": "src/main/resources/data/blacklight/recipe/military_machine_gun.json",
+    "sha256": "c64325aef5c066ad33c38e85a4bbe845468ffba09f8b7812d05d9f5f9231c96d",
+    "raw": {
+      "type": "minecraft:crafting_shaped",
+      "pattern": [
+        "III",
+        " CR",
+        " SI"
+      ],
+      "key": {
+        "I": {
+          "item": "minecraft:iron_ingot"
+        },
+        "C": {
+          "item": "blacklight:military_circuit"
+        },
+        "R": {
+          "item": "blacklight:machine_gun_round"
+        },
+        "S": {
+          "item": "minecraft:stick"
+        }
+      },
+      "result": {
+        "id": "blacklight:military_machine_gun",
+        "count": 1
+      }
+    },
+    "result": {
+      "id": "blacklight:military_machine_gun",
+      "count": 1
+    }
+  },
+  {
+    "platform": "neoforge",
+    "id": "military_rifle",
+    "source": "src/main/resources/data/blacklight/recipe/military_rifle.json",
+    "sha256": "b804427e7a9d457b18ac8afdffad8140fbb54ee78d36207e5e5e33604191d983",
+    "raw": {
+      "type": "minecraft:crafting_shaped",
+      "pattern": [
+        "III",
+        " CR",
+        " SI"
+      ],
+      "key": {
+        "I": {
+          "item": "minecraft:iron_ingot"
+        },
+        "C": {
+          "item": "blacklight:military_circuit"
+        },
+        "R": {
+          "item": "blacklight:rifle_round"
+        },
+        "S": {
+          "item": "minecraft:stick"
+        }
+      },
+      "result": {
+        "id": "blacklight:military_rifle",
+        "count": 1
+      }
+    },
+    "result": {
+      "id": "blacklight:military_rifle",
+      "count": 1
+    }
+  },
+  {
+    "platform": "neoforge",
+    "id": "missile_launcher",
+    "source": "src/main/resources/data/blacklight/recipe/missile_launcher.json",
+    "sha256": "df23448187321c684ee96bcad9c63458e922fd694a7aac93f7f68f92906a0a85",
+    "raw": {
+      "type": "minecraft:crafting_shaped",
+      "pattern": [
+        "III",
+        " CR",
+        " SI"
+      ],
+      "key": {
+        "I": {
+          "item": "minecraft:iron_ingot"
+        },
+        "C": {
+          "item": "blacklight:military_circuit"
+        },
+        "R": {
+          "item": "blacklight:missile_round"
+        },
+        "S": {
+          "item": "minecraft:stick"
+        }
+      },
+      "result": {
+        "id": "blacklight:missile_launcher",
+        "count": 1
+      }
+    },
+    "result": {
+      "id": "blacklight:missile_launcher",
+      "count": 1
+    }
+  },
+  {
+    "platform": "neoforge",
+    "id": "missile_round",
+    "source": "src/main/resources/data/blacklight/recipe/missile_round.json",
+    "sha256": "16741d1833f2a8874ded02db83724b1a9dc86d9117b5e283c580e9579ff9ac20",
+    "raw": {
+      "type": "minecraft:crafting_shapeless",
+      "ingredients": [
+        {
+          "item": "minecraft:iron_ingot"
+        },
+        {
+          "item": "minecraft:gunpowder"
+        }
+      ],
+      "result": {
+        "id": "blacklight:missile_round",
+        "count": 2
+      }
+    },
+    "result": {
+      "id": "blacklight:missile_round",
+      "count": 2
+    }
+  },
+  {
+    "platform": "neoforge",
+    "id": "rifle_round",
+    "source": "src/main/resources/data/blacklight/recipe/rifle_round.json",
+    "sha256": "95c64f0ac63c510b41775bf127ba9e34afaca4e26ec0762e46fe9a415947bc78",
+    "raw": {
+      "type": "minecraft:crafting_shapeless",
+      "ingredients": [
+        {
+          "item": "minecraft:iron_ingot"
+        },
+        {
+          "item": "minecraft:gunpowder"
+        }
+      ],
+      "result": {
+        "id": "blacklight:rifle_round",
+        "count": 16
+      }
+    },
+    "result": {
+      "id": "blacklight:rifle_round",
+      "count": 16
+    }
+  },
+  {
+    "platform": "neoforge",
+    "id": "rocket_launcher",
+    "source": "src/main/resources/data/blacklight/recipe/rocket_launcher.json",
+    "sha256": "152c626c4bac850717cc74a0e75be9b7f55ff8b4d9a6e611c5f38b1ece6906a2",
+    "raw": {
+      "type": "minecraft:crafting_shaped",
+      "pattern": [
+        "III",
+        " CR",
+        " SI"
+      ],
+      "key": {
+        "I": {
+          "item": "minecraft:iron_ingot"
+        },
+        "C": {
+          "item": "blacklight:military_circuit"
+        },
+        "R": {
+          "item": "blacklight:rocket_round"
+        },
+        "S": {
+          "item": "minecraft:stick"
+        }
+      },
+      "result": {
+        "id": "blacklight:rocket_launcher",
+        "count": 1
+      }
+    },
+    "result": {
+      "id": "blacklight:rocket_launcher",
+      "count": 1
+    }
+  },
+  {
+    "platform": "neoforge",
+    "id": "rocket_round",
+    "source": "src/main/resources/data/blacklight/recipe/rocket_round.json",
+    "sha256": "1b17e681bd1b228968990a3b5dee684376d4d2e2f467a1fd8fd098ca608b1ca1",
+    "raw": {
+      "type": "minecraft:crafting_shapeless",
+      "ingredients": [
+        {
+          "item": "minecraft:iron_ingot"
+        },
+        {
+          "item": "minecraft:gunpowder"
+        }
+      ],
+      "result": {
+        "id": "blacklight:rocket_round",
+        "count": 2
+      }
+    },
+    "result": {
+      "id": "blacklight:rocket_round",
+      "count": 2
+    }
+  },
+  {
+    "platform": "neoforge",
+    "id": "thermobaric_launcher",
+    "source": "src/main/resources/data/blacklight/recipe/thermobaric_launcher.json",
+    "sha256": "bc24146081be3103ed04341572f14d9894ff49081583ae93eae301c2b3976903",
+    "raw": {
+      "type": "minecraft:crafting_shaped",
+      "pattern": [
+        "III",
+        " CR",
+        " SI"
+      ],
+      "key": {
+        "I": {
+          "item": "minecraft:iron_ingot"
+        },
+        "C": {
+          "item": "blacklight:military_circuit"
+        },
+        "R": {
+          "item": "blacklight:thermobaric_round"
+        },
+        "S": {
+          "item": "minecraft:stick"
+        }
+      },
+      "result": {
+        "id": "blacklight:thermobaric_launcher",
+        "count": 1
+      }
+    },
+    "result": {
+      "id": "blacklight:thermobaric_launcher",
+      "count": 1
+    }
+  },
+  {
+    "platform": "neoforge",
+    "id": "thermobaric_round",
+    "source": "src/main/resources/data/blacklight/recipe/thermobaric_round.json",
+    "sha256": "b14b4ccf82e1147c013069751fe99a97ad562272c73921060ceffca0722d8f25",
+    "raw": {
+      "type": "minecraft:crafting_shapeless",
+      "ingredients": [
+        {
+          "item": "minecraft:iron_ingot"
+        },
+        {
+          "item": "minecraft:gunpowder"
+        },
+        {
+          "item": "minecraft:blaze_powder"
+        }
+      ],
+      "result": {
+        "id": "blacklight:thermobaric_round",
+        "count": 2
+      }
+    },
+    "result": {
+      "id": "blacklight:thermobaric_round",
+      "count": 2
+    }
+  },
+  {
+    "platform": "forge",
+    "id": "city_transit",
+    "source": "src/main/resources/data/blacklight/recipes/city_transit.json",
+    "sha256": "fbee48dc420fb5af29a15ecad18a5b399bfc90a5d7718dc0b72513d1dd7c4e00",
+    "raw": {
+      "type": "minecraft:crafting_shaped",
+      "pattern": [
+        " I ",
+        "ICI",
+        " R "
+      ],
+      "key": {
+        "I": {
+          "item": "minecraft:iron_ingot"
+        },
+        "C": {
+          "item": "minecraft:compass"
+        },
+        "R": {
+          "item": "minecraft:redstone"
+        }
+      },
+      "result": {
+        "count": 1,
+        "item": "blacklight:city_transit"
+      }
+    },
+    "result": {
+      "count": 1,
+      "item": "blacklight:city_transit"
+    }
+  },
+  {
+    "platform": "forge",
+    "id": "field_scanner",
+    "source": "src/main/resources/data/blacklight/recipes/field_scanner.json",
+    "sha256": "6238a02dd8bc66df4e39a17a83d28a8f574fae1bbafdee681640a6ebde5b9aa7",
+    "raw": {
+      "type": "minecraft:crafting_shaped",
+      "category": "equipment",
+      "pattern": [
+        " I ",
+        "CGC",
+        " R "
+      ],
+      "key": {
+        "I": {
+          "item": "minecraft:iron_ingot"
+        },
+        "C": {
+          "item": "blacklight:military_circuit"
+        },
+        "G": {
+          "item": "minecraft:glass"
+        },
+        "R": {
+          "item": "minecraft:redstone"
+        }
+      },
+      "result": {
+        "item": "blacklight:field_scanner",
+        "count": 1
+      }
+    },
+    "result": {
+      "item": "blacklight:field_scanner",
+      "count": 1
+    }
+  },
+  {
+    "platform": "forge",
+    "id": "grenade_launcher",
+    "source": "src/main/resources/data/blacklight/recipes/grenade_launcher.json",
+    "sha256": "8476638966d97663e1cfbdaf2ba6a3bbdb04913251119beebd2ed1372d2b29cb",
+    "raw": {
+      "type": "minecraft:crafting_shaped",
+      "pattern": [
+        "III",
+        " CR",
+        " SI"
+      ],
+      "key": {
+        "I": {
+          "item": "minecraft:iron_ingot"
+        },
+        "C": {
+          "item": "blacklight:military_circuit"
+        },
+        "R": {
+          "item": "blacklight:grenade_round"
+        },
+        "S": {
+          "item": "minecraft:stick"
+        }
+      },
+      "result": {
+        "item": "blacklight:grenade_launcher",
+        "count": 1
+      }
+    },
+    "result": {
+      "item": "blacklight:grenade_launcher",
+      "count": 1
+    }
+  },
+  {
+    "platform": "forge",
+    "id": "grenade_round",
+    "source": "src/main/resources/data/blacklight/recipes/grenade_round.json",
+    "sha256": "ade4315ab5ec3ae382e2490575a62bf06a52d977030b66c8e2b43de98f0c0797",
+    "raw": {
+      "type": "minecraft:crafting_shapeless",
+      "ingredients": [
+        {
+          "item": "minecraft:iron_ingot"
+        },
+        {
+          "item": "minecraft:gunpowder"
+        }
+      ],
+      "result": {
+        "item": "blacklight:grenade_round",
+        "count": 2
+      }
+    },
+    "result": {
+      "item": "blacklight:grenade_round",
+      "count": 2
+    }
+  },
+  {
+    "platform": "forge",
+    "id": "infection_launcher",
+    "source": "src/main/resources/data/blacklight/recipes/infection_launcher.json",
+    "sha256": "5895618510611f885820a08dcafa48eb292d4c5680f68f30b273ddc28ce64f39",
+    "raw": {
+      "type": "minecraft:crafting_shaped",
+      "pattern": [
+        "III",
+        " CR",
+        " SI"
+      ],
+      "key": {
+        "I": {
+          "item": "minecraft:iron_ingot"
+        },
+        "C": {
+          "item": "blacklight:military_circuit"
+        },
+        "R": {
+          "item": "blacklight:infection_round"
+        },
+        "S": {
+          "item": "minecraft:stick"
+        }
+      },
+      "result": {
+        "item": "blacklight:infection_launcher",
+        "count": 1
+      }
+    },
+    "result": {
+      "item": "blacklight:infection_launcher",
+      "count": 1
+    }
+  },
+  {
+    "platform": "forge",
+    "id": "infection_round",
+    "source": "src/main/resources/data/blacklight/recipes/infection_round.json",
+    "sha256": "3cfd3b944ade13bf3a09de40f24937d5f435d2327c867e1273d196d98c18a0c3",
+    "raw": {
+      "type": "minecraft:crafting_shapeless",
+      "ingredients": [
+        {
+          "item": "minecraft:iron_ingot"
+        },
+        {
+          "item": "minecraft:gunpowder"
+        },
+        {
+          "item": "blacklight:blacklight_sample"
+        }
+      ],
+      "result": {
+        "item": "blacklight:infection_round",
+        "count": 2
+      }
+    },
+    "result": {
+      "item": "blacklight:infection_round",
+      "count": 2
+    }
+  },
+  {
+    "platform": "forge",
+    "id": "machine_gun_round",
+    "source": "src/main/resources/data/blacklight/recipes/machine_gun_round.json",
+    "sha256": "f4e6ec7244d7bf3609c61e35aab2b067ddb8fa5c0c248dbe33216386210e5f17",
+    "raw": {
+      "type": "minecraft:crafting_shapeless",
+      "ingredients": [
+        {
+          "item": "minecraft:iron_ingot"
+        },
+        {
+          "item": "minecraft:gunpowder"
+        }
+      ],
+      "result": {
+        "item": "blacklight:machine_gun_round",
+        "count": 16
+      }
+    },
+    "result": {
+      "item": "blacklight:machine_gun_round",
+      "count": 16
+    }
+  },
+  {
+    "platform": "forge",
+    "id": "military_carbine",
+    "source": "src/main/resources/data/blacklight/recipes/military_carbine.json",
+    "sha256": "01a66303c18665f899aa5091165ce01de19532b33e6fd35be059babfdeafd157",
+    "raw": {
+      "type": "minecraft:crafting_shaped",
+      "pattern": [
+        " II",
+        " CR",
+        " SI"
+      ],
+      "key": {
+        "I": {
+          "item": "minecraft:iron_ingot"
+        },
+        "C": {
+          "item": "blacklight:military_circuit"
+        },
+        "R": {
+          "item": "blacklight:rifle_round"
+        },
+        "S": {
+          "item": "minecraft:stick"
+        }
+      },
+      "result": {
+        "item": "blacklight:military_carbine",
+        "count": 1
+      }
+    },
+    "result": {
+      "item": "blacklight:military_carbine",
+      "count": 1
+    }
+  },
+  {
+    "platform": "forge",
+    "id": "military_machine_gun",
+    "source": "src/main/resources/data/blacklight/recipes/military_machine_gun.json",
+    "sha256": "7bf1ed646d0677a7dfd3348074dda734e37975254266220259db1d5eba54737f",
+    "raw": {
+      "type": "minecraft:crafting_shaped",
+      "pattern": [
+        "III",
+        " CR",
+        " SI"
+      ],
+      "key": {
+        "I": {
+          "item": "minecraft:iron_ingot"
+        },
+        "C": {
+          "item": "blacklight:military_circuit"
+        },
+        "R": {
+          "item": "blacklight:machine_gun_round"
+        },
+        "S": {
+          "item": "minecraft:stick"
+        }
+      },
+      "result": {
+        "item": "blacklight:military_machine_gun",
+        "count": 1
+      }
+    },
+    "result": {
+      "item": "blacklight:military_machine_gun",
+      "count": 1
+    }
+  },
+  {
+    "platform": "forge",
+    "id": "military_rifle",
+    "source": "src/main/resources/data/blacklight/recipes/military_rifle.json",
+    "sha256": "30f7b400b54d231827433970cfc7b04d202803452064682539eeeccadf31c1a6",
+    "raw": {
+      "type": "minecraft:crafting_shaped",
+      "pattern": [
+        "III",
+        " CR",
+        " SI"
+      ],
+      "key": {
+        "I": {
+          "item": "minecraft:iron_ingot"
+        },
+        "C": {
+          "item": "blacklight:military_circuit"
+        },
+        "R": {
+          "item": "blacklight:rifle_round"
+        },
+        "S": {
+          "item": "minecraft:stick"
+        }
+      },
+      "result": {
+        "item": "blacklight:military_rifle",
+        "count": 1
+      }
+    },
+    "result": {
+      "item": "blacklight:military_rifle",
+      "count": 1
+    }
+  },
+  {
+    "platform": "forge",
+    "id": "missile_launcher",
+    "source": "src/main/resources/data/blacklight/recipes/missile_launcher.json",
+    "sha256": "26f5312054578c48c43c5d5718cf7b8b25e02ca229f84f68c54a985abfe0abe0",
+    "raw": {
+      "type": "minecraft:crafting_shaped",
+      "pattern": [
+        "III",
+        " CR",
+        " SI"
+      ],
+      "key": {
+        "I": {
+          "item": "minecraft:iron_ingot"
+        },
+        "C": {
+          "item": "blacklight:military_circuit"
+        },
+        "R": {
+          "item": "blacklight:missile_round"
+        },
+        "S": {
+          "item": "minecraft:stick"
+        }
+      },
+      "result": {
+        "item": "blacklight:missile_launcher",
+        "count": 1
+      }
+    },
+    "result": {
+      "item": "blacklight:missile_launcher",
+      "count": 1
+    }
+  },
+  {
+    "platform": "forge",
+    "id": "missile_round",
+    "source": "src/main/resources/data/blacklight/recipes/missile_round.json",
+    "sha256": "83ac25f33f617169c1df4a35a40fc1da92d5f6ae977963e373b8753aeb704b27",
+    "raw": {
+      "type": "minecraft:crafting_shapeless",
+      "ingredients": [
+        {
+          "item": "minecraft:iron_ingot"
+        },
+        {
+          "item": "minecraft:gunpowder"
+        }
+      ],
+      "result": {
+        "item": "blacklight:missile_round",
+        "count": 2
+      }
+    },
+    "result": {
+      "item": "blacklight:missile_round",
+      "count": 2
+    }
+  },
+  {
+    "platform": "forge",
+    "id": "rifle_round",
+    "source": "src/main/resources/data/blacklight/recipes/rifle_round.json",
+    "sha256": "83168104b36663ab38c6c8821fb75caad00d939e9bb822cd63e02b3d3075cd6b",
+    "raw": {
+      "type": "minecraft:crafting_shapeless",
+      "ingredients": [
+        {
+          "item": "minecraft:iron_ingot"
+        },
+        {
+          "item": "minecraft:gunpowder"
+        }
+      ],
+      "result": {
+        "item": "blacklight:rifle_round",
+        "count": 16
+      }
+    },
+    "result": {
+      "item": "blacklight:rifle_round",
+      "count": 16
+    }
+  },
+  {
+    "platform": "forge",
+    "id": "rocket_launcher",
+    "source": "src/main/resources/data/blacklight/recipes/rocket_launcher.json",
+    "sha256": "04152623a6546937860cd2c9a22a848edf3c4fbd3e24c71790e707764ce044ce",
+    "raw": {
+      "type": "minecraft:crafting_shaped",
+      "pattern": [
+        "III",
+        " CR",
+        " SI"
+      ],
+      "key": {
+        "I": {
+          "item": "minecraft:iron_ingot"
+        },
+        "C": {
+          "item": "blacklight:military_circuit"
+        },
+        "R": {
+          "item": "blacklight:rocket_round"
+        },
+        "S": {
+          "item": "minecraft:stick"
+        }
+      },
+      "result": {
+        "item": "blacklight:rocket_launcher",
+        "count": 1
+      }
+    },
+    "result": {
+      "item": "blacklight:rocket_launcher",
+      "count": 1
+    }
+  },
+  {
+    "platform": "forge",
+    "id": "rocket_round",
+    "source": "src/main/resources/data/blacklight/recipes/rocket_round.json",
+    "sha256": "6649f89ddb899802b0f96e7c53e78d7d2975df7f241a784511bb0cdb440f7b7a",
+    "raw": {
+      "type": "minecraft:crafting_shapeless",
+      "ingredients": [
+        {
+          "item": "minecraft:iron_ingot"
+        },
+        {
+          "item": "minecraft:gunpowder"
+        }
+      ],
+      "result": {
+        "item": "blacklight:rocket_round",
+        "count": 2
+      }
+    },
+    "result": {
+      "item": "blacklight:rocket_round",
+      "count": 2
+    }
+  },
+  {
+    "platform": "forge",
+    "id": "thermobaric_launcher",
+    "source": "src/main/resources/data/blacklight/recipes/thermobaric_launcher.json",
+    "sha256": "c5c5ab5863cf86d65e947e8f4190fe6525a1c8bdbbd7c03dbca70595c794599a",
+    "raw": {
+      "type": "minecraft:crafting_shaped",
+      "pattern": [
+        "III",
+        " CR",
+        " SI"
+      ],
+      "key": {
+        "I": {
+          "item": "minecraft:iron_ingot"
+        },
+        "C": {
+          "item": "blacklight:military_circuit"
+        },
+        "R": {
+          "item": "blacklight:thermobaric_round"
+        },
+        "S": {
+          "item": "minecraft:stick"
+        }
+      },
+      "result": {
+        "item": "blacklight:thermobaric_launcher",
+        "count": 1
+      }
+    },
+    "result": {
+      "item": "blacklight:thermobaric_launcher",
+      "count": 1
+    }
+  },
+  {
+    "platform": "forge",
+    "id": "thermobaric_round",
+    "source": "src/main/resources/data/blacklight/recipes/thermobaric_round.json",
+    "sha256": "e60bfa7094783a8fae938b4618e9637812f283821e02cbb3d0da761fe1ce4d52",
+    "raw": {
+      "type": "minecraft:crafting_shapeless",
+      "ingredients": [
+        {
+          "item": "minecraft:iron_ingot"
+        },
+        {
+          "item": "minecraft:gunpowder"
+        },
+        {
+          "item": "minecraft:blaze_powder"
+        }
+      ],
+      "result": {
+        "item": "blacklight:thermobaric_round",
+        "count": 2
+      }
+    },
+    "result": {
+      "item": "blacklight:thermobaric_round",
+      "count": 2
+    }
+  }
+]

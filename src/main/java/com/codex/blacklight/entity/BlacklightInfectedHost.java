@@ -757,7 +757,11 @@ public final class BlacklightInfectedHost extends Monster {
         });
         goalSelector.addGoal(1,new Goal() {
             { setFlags(java.util.EnumSet.of(Goal.Flag.MOVE,Goal.Flag.LOOK)); }
-            @Override public boolean canUse() { return isMetamorphosing()||!nativeAction().isEmpty()||isEvolved()&&getTarget()!=null||organActionCore()!=null||vascular.active()||vascular.seeking()||DevourerFeedingSystem.controls(BlacklightInfectedHost.this)||TissueCompetition.controls(BlacklightInfectedHost.this); }
+            @Override public boolean canUse() {
+                boolean hull=com.codex.blacklight.military.vehicle.VehicleHullAttackGoal.handles(BlacklightInfectedHost.this);
+                return isMetamorphosing()||!hull&&(!nativeAction().isEmpty()||isEvolved()&&getTarget()!=null||organActionCore()!=null)
+                        ||vascular.active()||vascular.seeking()||DevourerFeedingSystem.controls(BlacklightInfectedHost.this)||TissueCompetition.controls(BlacklightInfectedHost.this);
+            }
             @Override public boolean canContinueToUse() { return canUse(); }
         });
         goalSelector.addGoal(2,new MeleeAttackGoal(this,1.1,true) {
@@ -844,6 +848,15 @@ public final class BlacklightInfectedHost extends Monster {
         if(TissueCompetition.tick(this)){nativeCombat.interrupt();if(organActionCore()!=null)organAbilities.interrupt();return;}
         if(hasMultipartBody())setAirSupply(getMaxAirSupply());
         if(getData(ModAttachments.CONSUME_VISUAL).active()||com.codex.blacklight.combat.ImpactControl.stunned(this)) { nativeCombat.interrupt();organAbilities.interrupt();evolvedCombat.interruptForHit();clearTissueStrike();getNavigation().stop();return; }
+        // The same lawful living target now occupies a real mechanical hull. Release old
+        // living-only actions before their contact callbacks, without stopping hull approach every tick.
+        if(com.codex.blacklight.military.vehicle.VehicleHullAttackGoal.handles(this)){
+            if(!nativeAction().isEmpty())nativeCombat.interrupt();
+            if(organActionCore()!=null)organAbilities.interrupt();
+            if(!evolvedAction().isEmpty()||evolvedEngaged())evolvedCombat.interrupt();
+            if(attackCooldown>0)attackCooldown--;
+            clearTissueStrike();return;
+        }
         if(isEvolved()&&evolvedCombat.tick())return;
         if(nativeCombat.tick())return;
         if(organAbilities.tick())return;
