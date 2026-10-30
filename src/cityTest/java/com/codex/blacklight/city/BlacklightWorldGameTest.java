@@ -61,7 +61,7 @@ public class BlacklightWorldGameTest {
         h.assertTrue(!data.running&&!CityPregenerator.hasTicket(world)&&data.cursor==12345&&!data.failure.isEmpty(),"atlas update reused old cursor or ticket");
         CityPregenerator.start(world,1);CityPregenerator.pause(world);h.succeed();
     }
-    @GameTest(template="wall_test",timeoutTicks=600,batch="city_world_roundtrip")
+    @GameTest(template="wall_test",timeoutTicks=5600,batch="city_world_roundtrip")
     public static void beaconTravelsToWorldAndReturnsToSavedDimension(GameTestHelper h){
         var origin=h.getLevel();
         var profile=new com.mojang.authlib.GameProfile(java.util.UUID.randomUUID(),"world-travel-qa");
@@ -101,13 +101,17 @@ public class BlacklightWorldGameTest {
             if(closed[0])return;
             // GameTestServer drains ticks without the normal 50ms wait. This
             // fixture crosses real asynchronous entity storage, so give its
-            // existing 600-tick budget the same wall time as a real server.
+            // budget the same wall time as a real server. Both actual travel
+            // requests retain the configured 120-second cold-arrival deadline.
             // A dedicated/integrated server already supplies that clock.
             if(origin.getServer() instanceof net.minecraft.gametest.framework.GameTestServer)
                 java.util.concurrent.locks.LockSupport.parkNanos(50_000_000L);
             // Exercise the production tick handler; travel is asynchronous since the
             // hydra audit, and must wait for both terrain and entity storage.
             CityTravel.transitLanding(new net.neoforged.neoforge.event.tick.PlayerTickEvent.Post(player));
+            if(stage[0]<2&&CityTravel.loadingDiagnostics(player).equals("idle")
+                    &&(stage[0]==0?!player.serverLevel().dimension().equals(CityTravel.WORLD):player.serverLevel()!=origin))
+                h.fail("the real travel request ended without its expected handoff, stage="+stage[0]+" dimension="+player.level().dimension().location());
             if(stage[0]==0&&player.serverLevel().dimension().equals(CityTravel.WORLD)){
                 h.assertTrue(player.getPersistentData().getCompound("BlacklightCityReturn").getString("dimension").equals(origin.dimension().location().toString()),"return dimension not saved");
                 player.getCooldowns().removeCooldown(CityBlocks.TRANSIT.get());
