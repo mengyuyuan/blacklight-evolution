@@ -60,7 +60,20 @@ public final class BulletdiveAimGameTest {
         }
         p.moveTo(ground.x,ground.y,ground.z,-90,0);p.setOnGround(false);var target=victim(h,ground.add(20,0,0));
         var bystander=victim(h,ground.add(30,0,-3));
-        CombatTargeting.requestLock(p,target.getId());p.setPos(ground.add(0,60000,0));p.setData(ModAttachments.GLIDE_UNTIL,h.getLevel().getGameTime()+40);
+        var closed=new java.util.concurrent.atomic.AtomicBoolean();
+        Runnable cleanup=()->{if(closed.compareAndSet(false,true)){
+            DevastatorSystem.cancel(p);CombatTargeting.requestLock(p,-1);target.discard();bystander.discard();
+            h.getLevel().removePlayerImmediately(p,Entity.RemovalReason.DISCARDED);
+        }};
+        h.testInfo.addListener(new GameTestListener(){
+            public void testStructureLoaded(GameTestInfo info){}
+            public void testPassed(GameTestInfo info,GameTestRunner runner){cleanup.run();}
+            public void testFailed(GameTestInfo info,GameTestRunner runner){cleanup.run();}
+        });
+        CombatTargeting.requestLock(p,target.getId());
+        h.assertTrue(CombatTargeting.locked(p)==target,"initial visible dive target is acquired: actor="+p.position()+" target="+target.position()
+                +" selectable="+CombatTargeting.selectable(p,target)+" visible="+CombatTargeting.visible(p,target));
+        p.setPos(ground.add(0,60000,0));p.setData(ModAttachments.GLIDE_UNTIL,h.getLevel().getGameTime()+40);
         h.getLevel().addNewPlayer(p);
         boolean[] landed={false};double[] offset={Double.NaN},height={0},peak={0};String[] landing={"not landed"};
         for(int t=2;t<470;t++){final int time=t;h.runAfterDelay(t,()->{
@@ -74,7 +87,11 @@ public final class BulletdiveAimGameTest {
                 peak[0]=Math.max(peak[0],state.peakDown());height[0]=Math.max(height[0],state.fallHeight());
                 if(state.phase()==DevastatorSystem.FLIGHT){
                     var visual=p.getData(ModAttachments.DEVASTATOR_VISUAL);
-                    h.assertTrue(visual.targetId()==target.getId()&&visual.diveAim()!=null,"real observer snapshot contains the selected server target and aim coordinate");
+                    h.assertTrue(visual.targetId()==target.getId()&&visual.diveAim()!=null,
+                            "real observer snapshot contains the selected server target and aim coordinate: visual="+visual
+                            +" state="+state+" selected="+p.getData(ModAttachments.TARGET_LOCK_ID)+" expected="+target.getId()
+                            +" locked="+CombatTargeting.locked(p)+" actor="+p.position()+" target="+target.position()
+                            +" alive="+target.isAlive()+" removed="+target.isRemoved()+" tick="+time);
                 }
                 if(state.landed()){
                     landed[0]=true;offset[0]=Math.hypot(p.getX()-target.getX(),p.getZ()-target.getZ());
@@ -94,6 +111,6 @@ public final class BulletdiveAimGameTest {
                     "guidance retains real area damage on both the locked victim and a nearby non-locked victim: locked="
                             +target.getHealth()+" bystander="+bystander.getHealth()+" state="+DevastatorSystem.snapshot(p)+" landing="+landing[0]);
             h.succeed();
-        }finally{DevastatorSystem.cancel(p);CombatTargeting.requestLock(p,-1);target.discard();bystander.discard();h.getLevel().removePlayerImmediately(p,Entity.RemovalReason.DISCARDED);}});
+        }finally{cleanup.run();}});
     }
 }
