@@ -14,7 +14,7 @@ public final class FirearmsCombat {
     public static void fire(LivingEntity owner,WeaponDefinition definition,Vec3 direction,float scale){
         if(!(owner.level() instanceof ServerLevel level))return;
         if(com.codex.blacklight.military.vehicle.VehicleDamageBridge.interceptOrdinaryBullet(owner,definition,direction,scale))return;
-        Vec3 start=owner.getEyePosition().add(0,-.18,0);
+        Vec3 start=owner.getEyePosition().add(0,-.18,0),visualEnd=start.add(direction.normalize().scale(12)),normal=direction.normalize().scale(-1);int impact=0;
         if(definition.kind()!=WeaponDefinition.Kind.BULLET){
             var projectile=new OrdnanceProjectile(level,owner,definition.kind());
             projectile.setPos(start);projectile.shoot(direction.x,direction.y,direction.z,
@@ -34,18 +34,10 @@ public final class FirearmsCombat {
                 }
             }
             if(hit==null&&wall.getType()==HitResult.Type.BLOCK)FirearmBlockDamage.bullet(owner,definition,wall);
-            Vec3 delta=end.subtract(start).normalize();
-            // Presentation starts beyond the local camera; the hitscan above keeps its original origin.
-            for(double t=2.5;t<start.distanceTo(end);t+=2.5){var point=start.add(delta.scale(t));level.sendParticles(net.minecraft.core.particles.ParticleTypes.CRIT,point.x,point.y,point.z,1,0,0,0,0);}
+            visualEnd=end;impact=hit!=null?2:wall.getType()==HitResult.Type.BLOCK?1:0;
+            if(impact==1)normal=Vec3.atLowerCornerOf(wall.getDirection().getNormal());
         }
-        Vec3 muzzle=start.add(direction.normalize().scale(.95));
-        var muzzleWall=level.clip(new ClipContext(start,muzzle,ClipContext.Block.COLLIDER,ClipContext.Fluid.NONE,owner));
-        if(muzzleWall.getType()==HitResult.Type.MISS)
-            level.sendParticles(net.minecraft.core.particles.ParticleTypes.SMALL_FLAME,muzzle.x,muzzle.y,muzzle.z,1,.012,.012,.012,0);
-        var soundSource=owner instanceof Player?net.minecraft.sounds.SoundSource.PLAYERS:net.minecraft.sounds.SoundSource.HOSTILE;
-        boolean bullet=definition.kind()==WeaponDefinition.Kind.BULLET;
-        level.playSound(null,owner.blockPosition(),bullet?net.minecraft.sounds.SoundEvents.CROSSBOW_SHOOT:net.minecraft.sounds.SoundEvents.FIREWORK_ROCKET_LAUNCH,soundSource,.65F,definition.capacity()>30?.7F:.95F);
-        if(bullet)level.playSound(null,owner.blockPosition(),net.minecraft.sounds.SoundEvents.FIREWORK_ROCKET_BLAST,soundSource,.22F,1.5F);
+        GunplayEffects.shot(owner,definition,GunplayEffects.muzzle(owner,direction),visualEnd,impact,normal);
     }
     private FirearmsCombat(){}
 }

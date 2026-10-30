@@ -57,7 +57,7 @@ public final class FirearmViewEvents {
         var definition = gun.definition();
         int slot = hand == InteractionHand.MAIN_HAND ? mc.player.getInventory().selected : -1;
         return new FirearmViewState.HeldSnapshot(definition.id(), slot, ammo.magazine(), ammo.readyAt(),
-                definition.cooldownTicks(), definition.reloadTicks());
+                definition.cooldownTicks(), definition.reloadTicks(),FirearmReloadSystem.started(mc.player.getItemInHand(hand)));
     }
 
     /** Draw the real player skin arm with its wrist placed at the item grip. */
@@ -101,15 +101,16 @@ public final class FirearmViewEvents {
             // One common camera basis keeps the two real hands and the item in phase.
             FirearmHandTransforms.feedback(pose,frame,side==HumanoidArm.LEFT);
             String weapon=((FirearmItem)event.getItemStack().getItem()).definition().id();boolean leftMain=side==HumanoidArm.LEFT;
+            var access=(com.codex.blacklight.mixin.client.NativeHandRendererAccess)mc.gameRenderer.itemInHandRenderer;
+            var weaponBasis=new com.mojang.blaze3d.vertex.PoseStack();access.blacklight$applyItemArmTransform(weaponBasis,side,0);weaponBasis.translate(-sign*.13,.035,0);
+            var context=leftMain?ItemDisplayContext.FIRST_PERSON_LEFT_HAND:ItemDisplayContext.FIRST_PERSON_RIGHT_HAND;
             arm(mc,event,FirearmHandPose.primary(weapon,leftMain,reload));
             var support=FirearmSupportPose.evaluate(main,true,mc.player.getOffhandItem().isEmpty(),leftMain,reload,weapon);
-            if(support.visible())arm(mc,event,FirearmHandPose.support(weapon,leftMain,reload));
-            var access=(com.codex.blacklight.mixin.client.NativeHandRendererAccess)mc.gameRenderer.itemInHandRenderer;
-            access.blacklight$applyItemArmTransform(pose,side,0);
-            pose.translate(-sign*.13,.035,0);
-            mc.gameRenderer.itemInHandRenderer.renderItem(mc.player, event.getItemStack(),
+            if(support.visible())arm(mc,event,FirearmItemRendering.reloadHand(mc,event.getItemStack(),weaponBasis,context,leftMain,reload));
+            pose.mulPose(weaponBasis.last().pose());
+            FirearmItemRendering.render(mc,pose,event.getMultiBufferSource(),event.getItemStack(),
                     side == HumanoidArm.RIGHT ? ItemDisplayContext.FIRST_PERSON_RIGHT_HAND : ItemDisplayContext.FIRST_PERSON_LEFT_HAND,
-                    side == HumanoidArm.LEFT, pose, event.getMultiBufferSource(), event.getPackedLight());
+                    side == HumanoidArm.LEFT,event.getPackedLight(),reload,state.shotAgeSeconds(now));
         } finally {
             pose.popPose();
         }

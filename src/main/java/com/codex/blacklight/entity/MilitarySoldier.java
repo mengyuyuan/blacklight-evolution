@@ -115,7 +115,7 @@ public abstract class MilitarySoldier extends Monster {
         var d=weaponDefinition();long now=level().getGameTime();var state=FirearmItem.state(getMainHandItem(),reserveAmmo(d.ammoId()));
         if(state.magazine()==0){
             var reloaded=state.reload(d,now);int debit=state.reserve()-reloaded.reserve();
-            if(debit>0&&loadoutInventory.consume(d.ammoId(),debit))FirearmItem.store(getMainHandItem(),reloaded);
+            if(debit>0&&loadoutInventory.consume(d.ammoId(),debit))com.codex.blacklight.firearms.FirearmReloadSystem.begin(getMainHandItem(),reloaded,now);
             return false;
         }return state.canFire(now);
     }

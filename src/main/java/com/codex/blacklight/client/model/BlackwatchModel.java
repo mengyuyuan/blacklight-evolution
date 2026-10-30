@@ -20,6 +20,7 @@ public final class BlackwatchModel extends HumanoidModel<MilitarySoldier> {
     private final ModelPart[] forearmEquipment = new ModelPart[2];
     private final ModelPart[][] forearmCommands = new ModelPart[3][2];
     private static final BlackwatchReferenceProfile REFERENCE=BlackwatchReferenceProfile.load();
+    private static final Map<String,java.util.List<BlackwatchReferenceProfile.WeaponPart>> WEAPON_PARTS=REFERENCE.weapons();
     private static final class ActorState {
         final FirearmViewState view=new FirearmViewState();
         double at=Double.NaN,movement,crouch,aimYaw,aimPitch;
@@ -41,7 +42,7 @@ public final class BlackwatchModel extends HumanoidModel<MilitarySoldier> {
             rightArm.getChild("equipment"), leftArm.getChild("equipment"),
             rightLeg.getChild("equipment"), leftLeg.getChild("equipment")};
         for (int i=0; i<8; i++) ranks[i] = body.getChild("rank_"+i);
-        for(String kind:REFERENCE.weapons().keySet())weapons.put(kind,carry.getChild("weapon_mount").getChild(kind));
+        for(String kind:WEAPON_PARTS.keySet())weapons.put(kind,carry.getChild("weapon_mount").getChild(kind));
         String[] parents={"head","body","right_arm","left_arm","right_leg","left_leg"};
         String[] roles={"team_leader","officer","commander"};
         for(int i=0;i<roles.length;i++) for(int j=0;j<parents.length;j++)
@@ -85,7 +86,7 @@ public final class BlackwatchModel extends HumanoidModel<MilitarySoldier> {
         }
         var mount=REFERENCE.vector("weapon_mount_position");var rotation=REFERENCE.vector("weapon_mount_rotation");
         var weaponMount=carry.addOrReplaceChild("weapon_mount",CubeListBuilder.create(),PartPose.offsetAndRotation((float)mount[0],(float)mount[1],(float)mount[2],(float)rotation[0],(float)rotation[1],(float)rotation[2]));
-        for(var entry:REFERENCE.weapons().entrySet()){
+        for(var entry:WEAPON_PARTS.entrySet()){
             var group=weaponMount.addOrReplaceChild(entry.getKey(),CubeListBuilder.create(),PartPose.ZERO);
             for(var p:entry.getValue()){
                 var b=p.box();group.addOrReplaceChild(p.name(),CubeListBuilder.create().texOffs(p.u(),p.v()).addBox(b[0],b[1],b[2],b[3],b[4],b[5]),PartPose.ZERO);
@@ -415,12 +416,18 @@ public final class BlackwatchModel extends HumanoidModel<MilitarySoldier> {
             state.view.reset();state.at=Double.NaN;return;
         }
         var ammo=FirearmItem.state(stack,0);var definition=gun.definition();long tick=entity.level().getGameTime();
-        state.view.observe(definition.id(),0,ammo.magazine(),ammo.readyAt(),definition.cooldownTicks(),definition.reloadTicks(),tick,true);
+        state.view.observe(definition.id(),0,ammo.magazine(),ammo.readyAt(),definition.cooldownTicks(),definition.reloadTicks(),tick,true,com.codex.blacklight.firearms.FirearmReloadSystem.started(stack));
         double clock=tick+(age-Math.floor(age)),delta=Double.isFinite(state.at)?Math.min(3,Math.max(0,clock-state.at)):1;
         state.at=clock;state.movement=blend(state.movement,amount,delta);state.crouch=blend(state.crouch,entity.isCrouching()?1:0,delta);
         state.aimYaw=blend(state.aimYaw,Math.toRadians(yaw)*.65,delta);state.aimPitch=blend(state.aimPitch,Math.toRadians(pitch)*.75,delta);
         applyReferencePose(BlackwatchRigPose.animated(state.aimYaw,state.aimPitch,entity.getMainArm()==net.minecraft.world.entity.HumanoidArm.LEFT,
                 state.view.reloadProgress(clock),1,age/20d,state.movement,state.crouch,state.view.shotAgeSeconds(clock)));
-        for(var entry:weapons.entrySet())entry.getValue().visible=entry.getKey().equals(definition.id());
+        var reload=com.codex.blacklight.firearms.FirearmReloadMotion.sample(state.view.reloadProgress(clock));
+        for(var entry:weapons.entrySet()){
+            entry.getValue().visible=entry.getKey().equals(definition.id());
+            for(var p:WEAPON_PARTS.get(entry.getKey()))if(com.codex.blacklight.firearms.FirearmReloadMotion.magazinePart(p.name())){
+                var part=entry.getValue().getChild(p.name());part.y=(float)(reload.magazineDrop()*16);part.visible=reload.magazineVisible();
+            }
+        }
     }
 }

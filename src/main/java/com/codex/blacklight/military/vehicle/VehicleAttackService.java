@@ -33,15 +33,13 @@ public final class VehicleAttackService {
             var projectile=new VehicleOrdnanceProjectile(level,actor,vehicle,weapon);
             projectile.setPos(muzzle);projectile.shoot(direction.x,direction.y,direction.z,(float)specification.speed(),0);
             if(!level.addFreshEntity(projectile)){vehicle.restoreResourcesIfUnchanged(before,debited);return false;}
+            GunplayEffects.shot(actor,vehicle,definition,muzzle,muzzle.add(direction.scale(12)),0,direction.scale(-1));
         }
         vehicle.recordShot(weapon);
-        level.sendParticles(net.minecraft.core.particles.ParticleTypes.SMALL_FLAME,muzzle.x,muzzle.y,muzzle.z,2,.025,.025,.025,.005);
-        level.playSound(null,net.minecraft.core.BlockPos.containing(muzzle),definition.kind()==WeaponDefinition.Kind.BULLET?net.minecraft.sounds.SoundEvents.CROSSBOW_SHOOT:net.minecraft.sounds.SoundEvents.FIREWORK_ROCKET_LAUNCH,
-                actor instanceof Player?net.minecraft.sounds.SoundSource.PLAYERS:net.minecraft.sounds.SoundSource.HOSTILE,1F,definition.kind()==WeaponDefinition.Kind.BULLET?.8F:.6F);
         return true;
     }
     private static void hitscan(MilitaryVehicle origin,LivingEntity actor,WeaponDefinition definition,Vec3 start,Vec3 direction){
-        var level=(ServerLevel)actor.level();Vec3 end=start;
+        var level=(ServerLevel)actor.level();Vec3 end=start;int impact=0;Vec3 normal=direction.scale(-1);
         // The visual ray stops before a missing chunk instead of asking it to generate.
         for(double t=.5;t<=definition.range();t+=.5){var next=start.add(direction.scale(t));if(!VehicleKinematics.loaded(level,new AABB(start,next).inflate(1)))break;end=next;}
         var wall=level.clip(new ClipContext(start,end,ClipContext.Block.COLLIDER,ClipContext.Fluid.NONE,actor));
@@ -50,13 +48,13 @@ public final class VehicleAttackService {
         var living=net.minecraft.world.entity.projectile.ProjectileUtil.getEntityHitResult(level,actor,start,end,new AABB(start,end).inflate(.3),entity->entity!=actor
                 &&entity instanceof LivingEntity target&&target.isAlive()&&!(entity.getVehicle() instanceof MilitaryVehicle)&&entity.isPickable());
         if(mechanical!=null&&(living==null||mechanical.distance()<=start.distanceTo(living.getLocation()))){
-            end=mechanical.point();VehicleDamageBridge.hurt(actor,mechanical.vehicle(),definition,definition.damage(),null);
+            end=mechanical.point();impact=3;VehicleDamageBridge.hurt(actor,mechanical.vehicle(),definition,definition.damage(),null);
         }else if(living!=null){
-            end=living.getLocation();var target=(LivingEntity)living.getEntity();
+            end=living.getLocation();impact=2;var target=(LivingEntity)living.getEntity();
             if(!FirearmsCombat.protectedTarget(actor,target)&&(!(actor instanceof Player p)||!(target instanceof Player q)||p.canHarmPlayer(q)&&level.getServer().isPvpAllowed()))
                 if(!(target instanceof ServerPlayer defender)||!com.codex.blacklight.power.ProjectileDefenseSystem.hitscan(defender,start,end,definition.damage(),4))
                     target.hurt(actor.damageSources().mobProjectile(actor,actor),definition.damage());
-        }else if(wall.getType()==HitResult.Type.BLOCK)FirearmBlockDamage.bullet(actor,definition,wall);
-        for(double t=1;t<start.distanceTo(end);t+=2){var at=start.add(end.subtract(start).normalize().scale(t));level.sendParticles(net.minecraft.core.particles.ParticleTypes.CRIT,at.x,at.y,at.z,1,0,0,0,0);}
+        }else if(wall.getType()==HitResult.Type.BLOCK){impact=1;normal=Vec3.atLowerCornerOf(wall.getDirection().getNormal());FirearmBlockDamage.bullet(actor,definition,wall);}
+        GunplayEffects.shot(actor,origin,definition,start,end,impact,normal);
     }
 }

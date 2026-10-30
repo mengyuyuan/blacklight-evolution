@@ -33,6 +33,7 @@ public final class MilitaryVehicleRenderer extends EntityRenderer<MilitaryVehicl
         }
         distance%=Math.PI*100;movement.put(entity,new Travel(at,distance));
         model.pose(entity.turretYaw(),entity.gunPitch(),distance);
+        model.recoil(entity.level().getGameTime()+partial-entity.primaryShot(),entity.chassisId().equals("tank"));
         stack.pushPose();
         try {
             stack.mulPose(Axis.YP.rotationDegrees(yaw));

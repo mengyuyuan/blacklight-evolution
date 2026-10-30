@@ -96,7 +96,7 @@ public final class ClientClawEvents {
 
     @SubscribeEvent
     public static void registerRenderers(EntityRenderersEvent.RegisterRenderers event) {
-        event.registerEntityRenderer(ModEntities.VEHICLE_ORDNANCE.get(),net.minecraft.client.renderer.entity.ThrownItemRenderer::new);
+        event.registerEntityRenderer(ModEntities.VEHICLE_ORDNANCE.get(),com.codex.blacklight.client.renderer.OrdnanceRenderer::new);
         event.registerEntityRenderer(ModEntities.MILITARY_TRUCK.get(),context->new com.codex.blacklight.client.renderer.MilitaryVehicleRenderer(context,"truck"));
         event.registerEntityRenderer(ModEntities.MILITARY_APC.get(),context->new com.codex.blacklight.client.renderer.MilitaryVehicleRenderer(context,"apc"));
         event.registerEntityRenderer(ModEntities.MILITARY_TANK.get(),context->new com.codex.blacklight.client.renderer.MilitaryVehicleRenderer(context,"tank"));

@@ -5,7 +5,9 @@ public final class FirearmViewState {
     public enum Action { NONE, SHOT, RELOAD }
     public record Frame(float recoil, float reload) { }
     public record HeldSnapshot(String weapon, int slot, int magazine, long readyAt,
-                               int cooldownTicks, int reloadTicks) { }
+                               int cooldownTicks, int reloadTicks,long reloadStarted) {
+        public HeldSnapshot(String weapon,int slot,int magazine,long readyAt,int cooldownTicks,int reloadTicks){this(weapon,slot,magazine,readyAt,cooldownTicks,reloadTicks,-1);}
+    }
     public record HandActions(Action main, Action off) { }
     private String weapon;
     private int slot;
@@ -15,6 +17,7 @@ public final class FirearmViewState {
     private double shotAt = Double.NEGATIVE_INFINITY;
     private long reloadEnd;
     private int reloadDuration;
+    private float retainedRecoil;
 
     public static HandActions observeHands(FirearmViewState main, HeldSnapshot mainSnapshot,
                                           FirearmViewState off, HeldSnapshot offSnapshot,
@@ -41,12 +44,15 @@ public final class FirearmViewState {
             return Action.NONE;
         }
         return observe(snapshot.weapon(), snapshot.slot(), snapshot.magazine(), snapshot.readyAt(),
-                snapshot.cooldownTicks(), snapshot.reloadTicks(), now, true);
+                snapshot.cooldownTicks(), snapshot.reloadTicks(), now, true,snapshot.reloadStarted());
     }
 
     /** Observes server-synchronised item data, never raw use/attack input. */
     public Action observe(String weapon, int slot, int magazine, long readyAt,
                           int cooldownTicks, int reloadTicks, long now, boolean enabled) {
+        return observe(weapon,slot,magazine,readyAt,cooldownTicks,reloadTicks,now,enabled,-1);
+    }
+    public Action observe(String weapon,int slot,int magazine,long readyAt,int cooldownTicks,int reloadTicks,long now,boolean enabled,long reloadStarted){
         if (!enabled || weapon == null || magazine < 0 || cooldownTicks < 1 || reloadTicks < 1) {
             reset();
             return Action.NONE;
@@ -58,7 +64,8 @@ public final class FirearmViewState {
         } else if (readyAt > this.readyAt) {
             long remaining = readyAt - now;
             // A short packet delay must not erase feedback for low-cooldown weapons.
-            if (this.magazine - magazine == 1 && remaining >= -4 && remaining <= cooldownTicks + 2L) {
+            if (this.magazine - magazine >= 1 && this.magazine-magazine<=8 && remaining >= -4 && remaining <= cooldownTicks + 2L) {
+                retainedRecoil=frame(now).recoil();
                 shotAt = now;
                 reloadDuration = 0;
                 action = Action.SHOT;
@@ -69,6 +76,9 @@ public final class FirearmViewState {
                 action = Action.RELOAD;
             }
         }
+        // Explicit persisted metadata resumes an in-progress reload after a held
+        // item/observer swap, without replaying a shot or restarting the server clock.
+        if(reloadStarted>=0&&now>=reloadStarted&&now<readyAt&&readyAt-reloadStarted==reloadTicks){reloadEnd=readyAt;reloadDuration=reloadTicks;}
         this.weapon = weapon;
         this.slot = slot;
         this.magazine = magazine;
@@ -81,12 +91,12 @@ public final class FirearmViewState {
         double age = now - shotAt;
         // The source has a short rise, one peak and a recovery over 0.5 seconds.
         // Sampling it at a shot's own clock prevents global-time oscillation or repeated shots.
-        float recoil = age >= 0 && age <= 10 ? (float)(com.codex.blacklight.client.model.BlackwatchReferenceProfile.load()
-                .sample("shoot_standing","Two Hand Carry","rotation",age/20)[0]/1.103638) : 0;
+        float recoil=(float)FirearmReloadMotion.recoil(age);
+        if(age>=0&&age<.7)recoil=retainedRecoil+(1-retainedRecoil)*recoil;
         recoil=Math.max(0,Math.min(1,recoil));
         double remaining = reloadEnd - now;
         float reload = reloadDuration > 0 && remaining > 0 && remaining <= reloadDuration
-                ? (float) Math.sin(Math.PI * remaining / reloadDuration) : 0;
+                ? (float)FirearmReloadMotion.sample(1-remaining/reloadDuration).lower() : 0;
         return new Frame(recoil, reload);
     }
 
@@ -103,5 +113,6 @@ public final class FirearmViewState {
         weapon = null;
         shotAt = Double.NEGATIVE_INFINITY;
         reloadDuration = 0;
+        retainedRecoil=0;
     }
 }

@@ -80,6 +80,7 @@ public final class VehicleOrdnanceProjectile extends ThrowableItemProjectile {
                     ||!VehicleKinematics.loaded(level,new AABB(position(),position().add(getDeltaMovement())).inflate(1))){discard();return;}
         }
         super.tick();
+        if(level().isClientSide)OrdnanceTrail.tick(this,weaponId().equals("vehicle_rocket")?WeaponDefinition.Kind.ROCKET:WeaponDefinition.Kind.GRENADE);
     }
     @Override protected void onHit(HitResult result){
         super.onHit(result);
@@ -101,8 +102,7 @@ public final class VehicleOrdnanceProjectile extends ThrowableItemProjectile {
         }
         VehicleDamageBridge.blast(level,actor,definition,center,this,direct);
         if(VehicleKinematics.loaded(level,new AABB(center,center).inflate(radius+1)))FirearmBlockDamage.blast(level,actor,definition,center);
-        level.sendParticles(net.minecraft.core.particles.ParticleTypes.EXPLOSION,center.x,center.y,center.z,2,.2,.2,.2,0);
-        level.playSound(null,net.minecraft.core.BlockPos.containing(center),net.minecraft.sounds.SoundEvents.GENERIC_EXPLODE.value(),net.minecraft.sounds.SoundSource.HOSTILE,1,.8F);
+        GunplayEffects.explosion(level,actor,definition,center,result instanceof BlockHitResult block?Vec3.atLowerCornerOf(block.getDirection().getNormal()):new Vec3(0,1,0));
         discard();
     }
     private static boolean allowedLiving(ServerLevel level,LivingEntity actor,LivingEntity target){

@@ -11,9 +11,9 @@ public final class FirearmHandPose {
         return new Hand(leftMain,sign*grip[0],grip[1],grip[2],-.90,sign*.40,sign*.35);
     }
     public static Hand support(String weapon,boolean leftMain,double progress){
-        double p=Double.isFinite(progress)?Math.max(0,Math.min(1,progress)):0,release=Math.pow(Math.sin(Math.PI*p),2),sign=leftMain?-1:1;
+        var f=FirearmReloadMotion.sample(progress);double release=f.release(),sign=leftMain?-1:1;
         var grip=BlackwatchReferenceProfile.load().firstPersonGrip(weapon,true);
-        return new Hand(!leftMain,sign*(grip[0]+.10*release),grip[1]-.18*release,grip[2]+.30*release,
-                -.87+release*.20,-sign*.60,-sign*(.60+release*.15));
+        return new Hand(!leftMain,sign*(grip[0]+.09*release),grip[1]-f.handDown(),grip[2]+f.handBack(),
+                -.87+release*.30,-sign*(.60+f.bolt()*.24),-sign*(.60+release*.22));
     }
 }

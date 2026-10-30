@@ -244,6 +244,10 @@ if (project.hasProperty('campaignTest')) {
     sourceSets.main.java.srcDir('src/campaignTest/java')
     sourceSets.main.resources.srcDir('src/campaignTest/resources')
 }
+if (project.hasProperty('gunplayTest')) {
+    sourceSets.main.java.srcDir('src/gunplayTest/java')
+    sourceSets.main.resources.srcDir('src/campaignTest/resources')
+}
 if (project.hasProperty('releaseAuditTest')) {
     sourceSets.main.java.srcDir('src/releaseAuditTest/java')
 }
@@ -252,6 +256,7 @@ if (project.hasProperty('cityTest')) {
     sourceSets.main.resources.srcDir('src/cityTest/resources')
 }
 tasks.named('jar', Jar).configure {
+    exclude 'com/codex/blacklight/client/GunplaySmoke*.class'
     includeEmptyDirs = false
     from('licenses') { into 'META-INF/licenses' }
     archiveClassifier = releaseProfile
@@ -308,6 +313,12 @@ neoForge {
     // These can be tweaked, removed, or duplicated as needed.
     runs {
         client {
+            if (project.hasProperty('gunplayTest')) {
+                systemProperty 'blacklight.test.gunplay', 'true'
+                if (project.hasProperty('gunplayRunDirectory')) gameDirectory = file(project.property('gunplayRunDirectory'))
+                jvmArgument '-Xmx2304m'
+                programArguments.addAll '--width', '1280', '--height', '800'
+            }
             client()
             if(project.hasProperty('cityVisualTest')) {
                 systemProperty 'blacklight.cityVisual', 'true'

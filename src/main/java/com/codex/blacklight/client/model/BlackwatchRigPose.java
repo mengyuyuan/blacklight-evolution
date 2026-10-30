@@ -78,7 +78,7 @@ public final class BlackwatchRigPose {
             carryAuth=carryAuth.add(vec(PROFILE.sample(shot,"Two Hand Carry","rotation",shotAge)).sub(vec(PROFILE.sample(shot,"Two Hand Carry","rotation",0))));
             carryPos=carryPos.add(vec(PROFILE.sample(shot,"Two Hand Carry","position",shotAge)).sub(vec(PROFILE.sample(shot,"Two Hand Carry","position",0))));
         }
-        double progress=clamp(reloadProgress),release=Math.pow(Math.sin(Math.PI*progress),2);
+        double progress=clamp(reloadProgress);var reload=com.codex.blacklight.firearms.FirearmReloadMotion.sample(progress);double release=reload.release();
         double lookYaw=Double.isFinite(yaw)?yaw:0,lookPitch=Double.isFinite(pitch)?pitch:0;
         double limit=PROFILE.number("relative_aim_limit_radians");
         double relativeYaw=Math.max(-limit,Math.min(limit,lookYaw)),relativePitch=Math.max(-limit,Math.min(limit,lookPitch));
@@ -86,13 +86,13 @@ public final class BlackwatchRigPose {
                 .add(new Vec(lookPitch-relativePitch,lookYaw-relativeYaw,0)).mul(weight);Matrix torso=rotation(torsoRotation);
         Vec bob=new Vec(rootAuth.x,-rootAuth.y,rootAuth.z).mul(weight),torsoPosition=bob.add(WAIST).sub(torso.point(WAIST));
         Vec carryRotation=nativeDegrees(new double[]{carryAuth.x,carryAuth.y,carryAuth.z});
-        carryRotation=carryRotation.add(new Vec(relativePitch,relativeYaw,0)).add(new Vec(release*.12,0,(leftHanded?-1:1)*release*.08));
+        carryRotation=carryRotation.add(new Vec(relativePitch,relativeYaw,0)).add(new Vec(reload.lower()*.16,0,(leftHanded?-1:1)*reload.lower()*-.16));
         Matrix carry=rotation(carryRotation);Vec carryPosition=CARRY.add(new Vec(carryPos.x,-carryPos.y,carryPos.z).mul(weight));
         Reference mainReference=leftHanded?mirror(MAIN):MAIN,supportReference=leftHanded?mirror(SUPPORT):SUPPORT;
         carryPosition=fitCarry(carryPosition,carry,mainReference,supportReference);
         Vec mainTarget=carryPosition.add(carry.point(mainReference.wrist.sub(CARRY)));
         Vec supportTarget=carryPosition.add(carry.point(supportReference.wrist.sub(CARRY)));
-        Vec magazine=vec(PROFILE.vector("magazine_grip")).add(new Vec(0,Math.sin(progress*Math.PI*6)*release*.2,0));
+        Vec magazine=vec(PROFILE.vector("magazine_grip")).add(new Vec(reload.bolt()*1.6,reload.handDown()*12,-reload.handBack()*4));
         if(leftHanded)magazine=magazine.mirror();
         supportTarget=mix(supportTarget,carryPosition.add(carry.point(magazine.sub(CARRY))),release);
         Reference posedMain=reach(mainReference,mainTarget),posedSupport=reach(supportReference,supportTarget);

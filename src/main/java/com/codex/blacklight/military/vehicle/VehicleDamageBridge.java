@@ -102,8 +102,7 @@ public final class VehicleDamageBridge {
         if(living!=null&&living.getLocation().distanceTo(from)<hit.distance-.001)return false;
         if(level.clip(new ClipContext(from,hit.point,ClipContext.Block.COLLIDER,ClipContext.Fluid.NONE,actor)).getType()!=HitResult.Type.MISS)return false;
         hurt(actor,hit.vehicle,definition,definition.damage()*scale,null);
-        level.sendParticles(net.minecraft.core.particles.ParticleTypes.CRIT,hit.point.x,hit.point.y,hit.point.z,3,.05,.05,.05,.01);
-        level.playSound(null,actor.blockPosition(),net.minecraft.sounds.SoundEvents.CROSSBOW_SHOOT,net.minecraft.sounds.SoundSource.PLAYERS,.65F,.9F);
+          com.codex.blacklight.firearms.GunplayEffects.shot(actor,definition,com.codex.blacklight.firearms.GunplayEffects.muzzle(actor,direction),hit.point,3,direction.normalize().scale(-1));
         return true;
     }
 }

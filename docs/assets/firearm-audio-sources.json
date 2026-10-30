@@ -1,0 +1,90 @@
+{
+  "license": "CC0-1.0",
+  "authors": {
+    "25-cc0-bang-firework-sfx": "rubberduck",
+    "gun-reload-sound-effects": "Brian MacIntosh (BMacZero)",
+    "cannon-fire": "Thimras"
+  },
+  "assets": [
+    {
+      "file": "assets/blacklight/sounds/firearms/rifle_1.ogg",
+      "page": "https://opengameart.org/content/25-cc0-bang-firework-sfx",
+      "original": "shot_01.ogg",
+      "conversion": "Game format conform only: mono OGG Vorbis; no synthesis or artistic effects",
+      "sha256": "59df976468a1f94a00e1c45d5fd03448884f73911ae1bd9f3e99c217b6e783d4",
+      "duration": 0.458594
+    },
+    {
+      "file": "assets/blacklight/sounds/firearms/rifle_2.ogg",
+      "page": "https://opengameart.org/content/25-cc0-bang-firework-sfx",
+      "original": "shot_02.ogg",
+      "conversion": "Game format conform only: mono OGG Vorbis; no synthesis or artistic effects",
+      "sha256": "fa598af005a137b7ce510393e7db128adc0a67029e7282cdc53a80e3e63703fa",
+      "duration": 0.374376
+    },
+    {
+      "file": "assets/blacklight/sounds/firearms/rifle_3.ogg",
+      "page": "https://opengameart.org/content/25-cc0-bang-firework-sfx",
+      "original": "shot_03.ogg",
+      "conversion": "Game format conform only: mono OGG Vorbis; no synthesis or artistic effects",
+      "sha256": "ce8a2dd1a34f5048dd29aff4f8623d3681a8dfbcd73ef601831053e6ac757fb8",
+      "duration": 0.264263
+    },
+    {
+      "file": "assets/blacklight/sounds/firearms/impact_1.ogg",
+      "page": "https://opengameart.org/content/25-cc0-bang-firework-sfx",
+      "original": "cannon_01.ogg",
+      "conversion": "Game format conform only: mono OGG Vorbis; no synthesis or artistic effects",
+      "sha256": "7a6ec01478ec4afed41319b057b4ea98944873042b08cd96b87e0fa502e06040",
+      "duration": 1.238277
+    },
+    {
+      "file": "assets/blacklight/sounds/firearms/impact_2.ogg",
+      "page": "https://opengameart.org/content/25-cc0-bang-firework-sfx",
+      "original": "cannon_02.ogg",
+      "conversion": "Game format conform only: mono OGG Vorbis; no synthesis or artistic effects",
+      "sha256": "b7c21303c0463c8e6f82c9e2f4e61fca51285722784744e878ae47d8ad9757ff",
+      "duration": 1.795102
+    },
+    {
+      "file": "assets/blacklight/sounds/firearms/reload_out.ogg",
+      "page": "https://opengameart.org/content/gun-reload-sound-effects",
+      "original": "clipload2.wav",
+      "conversion": "Game format conform only: mono OGG Vorbis; no synthesis or artistic effects",
+      "sha256": "e765fb1ee85e42702e5f9326a151a311c397117c929d08f39353ac421427a39f",
+      "duration": 0.20898
+    },
+    {
+      "file": "assets/blacklight/sounds/firearms/reload_insert.ogg",
+      "page": "https://opengameart.org/content/gun-reload-sound-effects",
+      "original": "clipload1.wav",
+      "conversion": "Game format conform only: mono OGG Vorbis; no synthesis or artistic effects",
+      "sha256": "f9f4ba41b541eef90b529b0258ee4d6c50c0a080e1859a31d3574c3760920b09",
+      "duration": 0.25542
+    },
+    {
+      "file": "assets/blacklight/sounds/firearms/reload_bolt.ogg",
+      "page": "https://opengameart.org/content/gun-reload-sound-effects",
+      "original": "singlebullet1.wav",
+      "conversion": "Game format conform only: mono OGG Vorbis; no synthesis or artistic effects",
+      "sha256": "0f74e6bb1c182ea416e2ec7d67c9b495aa72d457fb0c69f0f22550d0c47998b3",
+      "duration": 0.301859
+    },
+    {
+      "file": "assets/blacklight/sounds/firearms/cannon_1.ogg",
+      "page": "https://opengameart.org/content/cannon-fire",
+      "original": "cannon_fire.ogg",
+      "conversion": "Game format conform only: mono OGG Vorbis; no synthesis or artistic effects",
+      "sha256": "2a0086f4ebbe1bd5d6f8dfe44a11418647662be2dfdfe8d9c053b08aacd3f27d",
+      "duration": 3.575896
+    },
+    {
+      "file": "assets/blacklight/sounds/firearms/cannon_2.ogg",
+      "page": "https://opengameart.org/content/cannon-fire",
+      "original": "cannon_fire_0.ogg",
+      "conversion": "Game format conform only: mono OGG Vorbis; no synthesis or artistic effects",
+      "sha256": "2bbaf5020830c1ee0c88ef9fe2f0200a0764625ac44e018f4fa0a4640d75e0cf",
+      "duration": 3.575896
+    }
+  ]
+}

@@ -37,11 +37,10 @@ public final class OrdnanceProjectile extends ThrowableItemProjectile {
         }
         if(owner!=null)com.codex.blacklight.military.vehicle.VehicleDamageBridge.blast(level,owner,d,center,this,null);
         if(owner!=null)FirearmBlockDamage.blast(level,owner,d,center);
-        level.sendParticles(d.kind()==WeaponDefinition.Kind.INFECTION?net.minecraft.core.particles.ParticleTypes.SNEEZE:net.minecraft.core.particles.ParticleTypes.EXPLOSION,center.x,center.y,center.z,12,d.radius()*.3,.5,d.radius()*.3,.03);
-        level.playSound(null,blockPosition(),net.minecraft.sounds.SoundEvents.GENERIC_EXPLODE.value(),net.minecraft.sounds.SoundSource.HOSTILE,1,1);
+        GunplayEffects.explosion(level,owner,d,center,result instanceof BlockHitResult block?Vec3.atLowerCornerOf(block.getDirection().getNormal()):new Vec3(0,1,0));
         discard();
     }
-    @Override public void tick(){super.tick();if(!level().isClientSide&&tickCount>100)discard();}
+    @Override public void tick(){super.tick();if(level().isClientSide)com.codex.blacklight.firearms.OrdnanceTrail.tick(this,definition().kind());else if(tickCount>100)discard();}
     @Override public void addAdditionalSaveData(CompoundTag tag){super.addAdditionalSaveData(tag);tag.putInt("OrdnanceKind",entityData.get(KIND));tag.putInt("OrdnanceAge",tickCount);}
     @Override public void readAdditionalSaveData(CompoundTag tag){super.readAdditionalSaveData(tag);entityData.set(KIND,tag.getInt("OrdnanceKind"));tickCount=Math.max(0,tag.getInt("OrdnanceAge"));}
 }

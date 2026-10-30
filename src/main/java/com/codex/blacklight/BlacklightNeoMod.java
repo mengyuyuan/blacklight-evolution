@@ -27,6 +27,7 @@ public final class BlacklightNeoMod {
 
     public BlacklightNeoMod(IEventBus modBus, ModContainer container) {
         container.registerConfig(net.neoforged.fml.config.ModConfig.Type.CLIENT, com.codex.blacklight.config.PassiveHudConfig.SPEC, "blacklight-client.toml");
+        container.registerConfig(net.neoforged.fml.config.ModConfig.Type.CLIENT,com.codex.blacklight.config.GunplayClientConfig.SPEC,"blacklight-gunplay-client.toml");
         container.registerConfig(net.neoforged.fml.config.ModConfig.Type.SERVER, com.codex.blacklight.city.CityConfig.SPEC, "blacklight-city-server.toml");
         container.registerConfig(net.neoforged.fml.config.ModConfig.Type.SERVER, com.codex.blacklight.city.MilitaryCampaignConfig.SPEC, "blacklight-military-campaign-server.toml");
         container.registerConfig(net.neoforged.fml.config.ModConfig.Type.SERVER, com.codex.blacklight.infection.BuildingInfectionConfig.SPEC, "blacklight-building-infection-server.toml");
@@ -54,6 +55,7 @@ public final class BlacklightNeoMod {
         com.codex.blacklight.registry.ModWorldgen.register(modBus);
         ModParticles.register(modBus);
         com.codex.blacklight.registry.ModWeaponSounds.register(modBus);
+        com.codex.blacklight.firearms.GunplaySounds.register(modBus);
         com.codex.blacklight.registry.ModInfectedSounds.register(modBus);
         modBus.addListener(ModNetwork::register);
         modBus.addListener((net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent event)->event.enqueueWork(()->{

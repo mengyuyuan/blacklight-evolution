@@ -10,9 +10,9 @@ public final class FirearmHandTransforms {
     private FirearmHandTransforms(){}
     public static void feedback(PoseStack pose,FirearmViewState.Frame frame,boolean left){
         int sign=left?-1:1;
-        pose.translate(0,-frame.reload()*.11,frame.recoil()*.065);
-        pose.mulPose(Axis.XP.rotationDegrees(frame.recoil()*1.103638F+frame.reload()*8));
-        pose.mulPose(Axis.ZP.rotationDegrees(sign*frame.reload()*7));
+        pose.translate(0,-frame.reload()*.085,frame.recoil()*.095);
+        pose.mulPose(Axis.XP.rotationDegrees(frame.recoil()*3.4F+frame.reload()*10));
+        pose.mulPose(Axis.ZP.rotationDegrees(sign*(frame.reload()*-13+frame.recoil()*.45F)));
     }
     public static Vector3f wrist(ModelPart arm,boolean left,boolean slim){
         var bind=new PoseStack();arm.translateAndRotate(bind);

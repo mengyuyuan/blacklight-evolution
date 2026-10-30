@@ -180,11 +180,11 @@ class FirearmViewStateTest {
         assertEquals(0, view.frame(102).recoil());
     }
 
-    @Test void sourceShotStartsAtRestThenRisesAndRecoversOnce() {
+    @Test void shotStartsAtRestThenKicksAndRecoversOnce() {
         observe(30,0,99);observe(29,104,100);
         assertEquals(0,view.frame(100).recoil());
         assertTrue(view.frame(100.5).recoil()>0);
-        assertEquals(1,view.frame(100+20/12d).recoil(),.0001);
+        assertEquals(1,view.frame(100.7).recoil(),.0001);
         assertEquals(0,view.frame(110).recoil(),.0001);
         assertEquals(0,view.frame(120).recoil());
         assertEquals(.05,view.shotAgeSeconds(101),.00001);

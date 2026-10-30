@@ -1,0 +1,21 @@
+Firearm sound assets - CC0 1.0 Universal
+
+The following sound recordings were published under CC0 on OpenGameArt:
+
+rubberduck - 25 CC0 bang/firework SFX
+https://opengameart.org/content/25-cc0-bang-firework-sfx
+Selected originals: shot_01.ogg, shot_02.ogg, shot_03.ogg,
+cannon_01.ogg, cannon_02.ogg.
+
+Brian MacIntosh (BMacZero) - Gun Reload Sound Effects
+https://opengameart.org/content/gun-reload-sound-effects
+Selected originals: clipload2.wav, clipload1.wav, singlebullet1.wav.
+
+Thimras - Cannon Fire
+https://opengameart.org/content/cannon-fire
+Selected originals: cannon_fire.ogg, cannon_fire_0.ogg.
+
+License: https://creativecommons.org/publicdomain/zero/1.0/
+Original mono OGG files are retained. WAV recordings were converted only to
+mono OGG Vorbis for Minecraft playback. Asset hashes, lengths and the mapping
+to repository files are recorded in docs/assets/firearm-audio-sources.json.

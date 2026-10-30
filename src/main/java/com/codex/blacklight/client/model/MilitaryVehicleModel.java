@@ -61,6 +61,10 @@ public final class MilitaryVehicleModel {
         if(bones.containsKey("gun_pitch"))bones.get("gun_pitch").xRot=(float)Math.toRadians(pitch);
         for(var entry:bones.entrySet())if(entry.getKey().contains("wheel"))entry.getValue().xRot=(float)(wheelTravel/.5);
     }
+    public void recoil(double ageTicks,boolean heavy){
+        double kick=com.codex.blacklight.firearms.FirearmReloadMotion.recoil(ageTicks);
+        if(bones.containsKey("gun_pitch"))bones.get("gun_pitch").z-=(float)(kick*(heavy?3.6:1.2));
+    }
     public Vec3 anchorWorld(String name,Vec3 origin,double bodyYaw) {
         finite(bodyYaw);
         if(origin==null || !Double.isFinite(origin.x) || !Double.isFinite(origin.y) || !Double.isFinite(origin.z) || !anchors.has(name))throw new IllegalArgumentException("Invalid vehicle model mount: "+name);
