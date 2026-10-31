@@ -64,12 +64,15 @@ public final class TissueVascularGameTest {
     public static void anIdleMatureCarrierActuallyNavigatesToTheCoreAndSelectsItsOwnConnection(GameTestHelper h){
         // Allow the real bounded search (56), approach (160) and connection
         // (40) phases; no forced teleport or direct start substitutes for AI.
-        var f=new Fixture(h);f.supportNavigation();var host=f.host(1.5,1,true);var initial=host.position();var started=new boolean[1];var trace=new StringBuilder(" origin="+f.origin+" size="+host.getBbWidth()+"x"+host.getBbHeight());
+        var f=new Fixture(h);f.supportNavigation();var host=f.host(1.5,1,true);var initial=host.position();var started=new boolean[1];var observedDelivery=new int[1];var trace=new StringBuilder(" origin="+f.origin+" size="+host.getBbWidth()+"x"+host.getBbHeight());
         for(int t=1;t<=255;t++){final int step=t;h.runAfterDelay(t,()->{
             if(host.vascular().active())started[0]=true;
+            // Delivered is per connection and resets when a later connection starts.
+            // Preserve the first actual transfer instead of requiring a particular random AI phase at tick 260.
+            observedDelivery[0]=Math.max(observedDelivery[0],host.vascular().delivered());
             if(step==1||step%80==0)trace.append(" [").append(step).append(" pos=").append(host.position()).append(" root=").append(TissueVascular.root(host,0)).append(" seek=").append(host.vascular().seeking()).append(" active=").append(host.vascular().active()).append(" cooldown=").append(host.vascular().cooldown()).append(" target=").append(host.getTarget()).append(" navDone=").append(host.getNavigation().isDone()).append(']');
         });}
-        h.runAfterDelay(260,()->{try{h.assertTrue(started[0]&&host.position().distanceToSqr(initial)>.04&&host.vascular().delivered()>0&&f.colony.supply.reserve()>0,"real unforced navigation and AI approach lead to an actual delivery: pos="+host.position()+" nutrition="+host.tissueNutrition()+" delivered="+host.vascular().delivered()+trace);}finally{f.close();}h.succeed();});
+        h.runAfterDelay(260,()->{try{h.assertTrue(started[0]&&host.position().distanceToSqr(initial)>.04&&observedDelivery[0]>0&&f.colony.supply.reserve()>0,"real unforced navigation and AI approach lead to an actual delivery: pos="+host.position()+" nutrition="+host.tissueNutrition()+" delivered="+host.vascular().delivered()+trace);}finally{f.close();}h.succeed();});
     }
     @GameTest(template="wall_test",timeoutTicks=45,batch="vascular_wall")
     public static void aNewSolidWallCancelsTheConnectionBeforeAnyMaterialCrossesIt(GameTestHelper h){
