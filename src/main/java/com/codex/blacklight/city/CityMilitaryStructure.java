@@ -17,10 +17,10 @@ public final class CityMilitaryStructure extends Structure {
         if(!city&&!(context.chunkGenerator() instanceof net.minecraft.world.level.levelgen.NoiseBasedChunkGenerator))return Optional.empty();
         long seed=context.seed();boolean blackwatch=((seed^context.chunkPos().toLong())&1)!=0;
         var survey=city?CityMilitaryTerrain.survey(context.chunkGenerator(),seed):CityMilitaryTerrain.field(context);
-        var site=CityMilitaryPlan.find(seed,context.chunkPos().x,context.chunkPos().z,blackwatch,city,survey);
+        var site=CityMilitaryPlan.find(seed,context.chunkPos().x,context.chunkPos().z,blackwatch,city,survey,city?3:CityMilitaryPlan.FIELD_FOUNDATION_DEPTH);
         return site.map(s->new GenerationStub(new BlockPos(s.x(),s.floor(),s.z()),pieces->{
             var checkpoint=CityMilitaryPlan.checkpoint(s,context.chunkPos().x,context.chunkPos().z,survey).orElse(null);
-            pieces.addPiece(new CityMilitaryPiece(s,checkpoint));
+            pieces.addPiece(new CityMilitaryPiece(s,checkpoint,city?3:CityMilitaryPlan.FIELD_FOUNDATION_DEPTH));
             // This callback only selects NEW starts. Saved old piece lists are
             // loaded as recorded and are never passed through this planner.
             // Base/checkpoint candidate scans can spend the complete field sample cache.

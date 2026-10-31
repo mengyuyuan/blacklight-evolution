@@ -51,6 +51,12 @@ class CityMilitaryPlanTest {
         assertTrue(CityMilitaryPlan.checkpoint(base,0,0,(x,z)->new CityMilitaryPlan.Surface(64,false,z>32,z>=46&&z<=50)).isEmpty());
         assertTrue(CityMilitaryPlan.checkpoint(base,0,0,(x,z)->new CityMilitaryPlan.Surface(64,true,false,true)).isEmpty());
     }
+    @Test void newFieldFoundationSupportsSixBlockReliefWhileCityKeepsThree(){
+        CityMilitaryPlan.Survey slope=(x,z)->new CityMilitaryPlan.Surface(64+Math.floorMod(x,7),false,false,false);
+        assertTrue(CityMilitaryPlan.find(42,0,0,false,false,slope).isEmpty());
+        assertEquals(70,CityMilitaryPlan.find(42,0,0,false,false,slope,CityMilitaryPlan.FIELD_FOUNDATION_DEPTH).orElseThrow().floor());
+        assertTrue(CityMilitaryPlan.find(42,0,0,false,false,(x,z)->new CityMilitaryPlan.Surface(64+Math.floorMod(x,8),false,false,false),6).isEmpty());
+    }
     public static void main(String[] args){
         var t=new CityMilitaryPlanTest();t.deterministicForSameSeedAndChunk();t.footprintIncludesTheLargerBlackwatchCompound();
         t.waterIsNeverReclaimedForABase();t.existingBuildingsAreNeverCleared();t.steepTerrainIsRejected();
