@@ -58,7 +58,7 @@ public final class MilitarySummonLoadoutGameTest {
             // A fresh vanilla HandItems payload owns exactly that gun; it is not permission to clone or refill it.
             var vanilla=new CompoundTag();var gun=new net.minecraft.world.item.ItemStack(FirearmsRegistry.weapon("military_carbine"));
             com.codex.blacklight.firearms.FirearmItem.store(gun,new com.codex.blacklight.firearms.AmmoState(7,0,12345));
-            var hands=new net.minecraft.nbt.ListTag();hands.add(gun.save(f.level.registryAccess()));hands.add(new CompoundTag());vanilla.put("HandItems",hands);
+            var hands=new net.minecraft.nbt.ListTag();hands.add(gun.save(new CompoundTag()));hands.add(new CompoundTag());vanilla.put("HandItems",hands);
             var carried=ModEntities.MILITARY_SOLDIER.get().create(f.level);carried.load(vanilla);carried.setNoAi(true);f.entities.add(carried);carried.tick();
             var actual=carried.getMainHandItem();var actualState=com.codex.blacklight.firearms.FirearmItem.state(actual,0);
             h.assertTrue(actual.getItem()==FirearmsRegistry.weapon("military_carbine")&&actual.getCount()==1&&actualState.magazine()==7&&actualState.readyAt()==12345&&carried.getOffhandItem().isEmpty()

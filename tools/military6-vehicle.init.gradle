@@ -1,0 +1,10 @@
+// Explicit opt-in only. Production build keeps gametest package excluded.
+allprojects { afterEvaluate {
+    sourceSets.main.java.srcDir('src/vehicleTest/java')
+    if (!sourceSets.main.resources.srcDirs.contains(file('src/blackwatchTest/resources'))) sourceSets.main.resources.srcDir('src/blackwatchTest/resources')
+    tasks.matching { it.name == 'runGameTestServer' }.configureEach {
+        dependsOn tasks.named('classes')
+        doFirst { environment 'MOD_CLASSES', sourceSets.main.output.files.collect { 'blacklight%%'+it.absolutePath }.join(File.pathSeparator) }
+    }
+} }
+allprojects { tasks.withType(ProcessResources).configureEach { filteringCharset = 'UTF-8' } }

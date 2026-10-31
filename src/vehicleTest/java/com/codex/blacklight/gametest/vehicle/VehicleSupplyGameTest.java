@@ -61,7 +61,7 @@ public final class VehicleSupplyGameTest {
         for(String id:new String[]{"military_truck_chassis","military_apc_chassis","military_tank_chassis","blackwatch_truck_chassis","blackwatch_apc_chassis","blackwatch_tank_chassis","autocannon_round","tank_he_shell","tank_ap_shell","vehicle_repair_parts"}){
             var recipe=h.getLevel().getRecipeManager().byKey(new net.minecraft.resources.ResourceLocation("blacklight",id));
             h.assertTrue(recipe.isPresent(),"actual recipe manager loaded "+id);
-            var result=recipe.orElseThrow().value().getResultItem(h.getLevel().registryAccess());
+            var result=recipe.orElseThrow().getResultItem(h.getLevel().registryAccess());
             h.assertTrue(result.getItem()==VehicleRegistry.item(id)&&result.getCount()==(id.equals("autocannon_round")?8:1),"actual registered result and finite yield match "+id);
         }h.succeed();
     }

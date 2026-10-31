@@ -18,6 +18,7 @@ public final class VehicleFleet {
     private String personnelOrder="";
     private boolean supplyReturn;
     private boolean automaticPatrol;
+    private boolean ambientPatrol;
     private int contacts,resolved;
     public VehicleFleet(UUID id,MilitaryFaction faction,List<UUID> vehicles,List<UUID> units,UUID formalCommander,MilitaryOrder.Point returnPoint){
         this.id=Objects.requireNonNull(id);this.faction=Objects.requireNonNull(faction);
@@ -41,6 +42,8 @@ public final class VehicleFleet {
     public boolean supplyReturn(){return supplyReturn;}
     public boolean automaticPatrol(){return automaticPatrol;}
     public void automaticPatrol(boolean value){automaticPatrol=value;}
+    public boolean ambientPatrol(){return ambientPatrol;}
+    public void ambientPatrol(boolean value){ambientPatrol=value;}
     public void supplyReturn(boolean value){supplyReturn=value;}
     public boolean order(Mission mission,MilitaryOrder.Point target){
         if(mission==null||target!=null&&!target.finite()||mission==Mission.MOVE&&target==null)return false;

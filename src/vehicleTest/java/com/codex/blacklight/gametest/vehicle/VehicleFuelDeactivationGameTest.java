@@ -51,7 +51,7 @@ public final class VehicleFuelDeactivationGameTest {
         h.succeed();
     }
     private static void assertTooltip(GameTestHelper h,String id,String... keys){
-        var stack=new ItemStack(VehicleRegistry.item(id));var tooltip=stack.getTooltipLines(net.minecraft.world.item.Item.TooltipContext.of(h.getLevel()),null,net.minecraft.world.item.TooltipFlag.NORMAL);
+        var stack=new ItemStack(VehicleRegistry.item(id));var tooltip=stack.getTooltipLines(null,net.minecraft.world.item.TooltipFlag.NORMAL);
         for(String key:keys)h.assertTrue(tooltip.stream().anyMatch(line->line.getContents() instanceof net.minecraft.network.chat.contents.TranslatableContents text&&text.getKey().equals(key)),"actual item tooltip must expose its translated help: "+id+" / "+key);
     }
     @GameTest(template="blackwatch_arena",batch="vehicle6fueldeactivation",timeoutTicks=100)

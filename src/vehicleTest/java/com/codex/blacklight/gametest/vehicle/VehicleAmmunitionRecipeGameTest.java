@@ -8,7 +8,8 @@ import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.item.crafting.CraftingInput;
+import net.minecraft.world.inventory.TransientCraftingContainer;
+import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraftforge.gametest.GameTestHolder;
 import net.minecraftforge.gametest.PrefixGameTestTemplate;
@@ -48,12 +49,16 @@ public final class VehicleAmmunitionRecipeGameTest {
                 h.assertTrue(item!=Items.AIR,"fixture ingredient must be registered: "+ingredientId);
                 stacks.set(scattered?8-i*2:i,new ItemStack(item));
             }
-            var input=CraftingInput.of(3,3,List.copyOf(stacks));
+            var input=new TransientCraftingContainer(new AbstractContainerMenu(null,-1){
+                public ItemStack quickMoveStack(net.minecraft.world.entity.player.Player player,int slot){return ItemStack.EMPTY;}
+                public boolean stillValid(net.minecraft.world.entity.player.Player player){return true;}
+            },3,3);
+            for(int slot=0;slot<9;slot++)input.setItem(slot,stacks.get(slot));
             var matches=manager.getRecipesFor(RecipeType.CRAFTING,input,level);
-            h.assertTrue(matches.size()==1,"one actual crafting match for "+ammunition+", got "+matches.stream().map(recipe->recipe.id().toString()).toList());
+            h.assertTrue(matches.size()==1,"one actual crafting match for "+ammunition+", got "+matches.stream().map(recipe->recipe.getId().toString()).toList());
             var selected=manager.getRecipeFor(RecipeType.CRAFTING,input,level).orElseThrow();
-            h.assertTrue(selected.id().equals(expected),"actual recipe manager must select "+expected+", got "+selected.id());
-            var result=selected.value().assemble(input,level.registryAccess());
+            h.assertTrue(selected.getId().equals(expected),"actual recipe manager must select "+expected+", got "+selected.getId());
+            var result=selected.assemble(input,level.registryAccess());
             h.assertTrue(BuiltInRegistries.ITEM.getKey(result.getItem()).equals(expected)&&result.getCount()==count,
                     "actual assembled result must be "+count+" "+expected+", got "+result);
         }

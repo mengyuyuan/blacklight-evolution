@@ -36,6 +36,20 @@ public final class MilitaryCampaignSystem {
     private MilitaryCampaignSystem() {}
     public static boolean supported(ServerLevel level){return level.dimension().equals(Level.OVERWORLD)||CityTravel.isCity(level.dimension());}
     public static boolean enabled(ServerLevel level){return supported(level)&&MilitaryCampaignConfig.ENABLED.get();}
+    /** Reject rooftops/water without loading a candidate or its neighbours. */
+    public static boolean streetSurface(ServerLevel level,int x,int y,int z){
+        if(level.getChunkSource().getChunkNow(x>>4,z>>4)==null)return false;
+        var generator=level.getChunkSource().getGenerator();
+        if(CityMilitaryTerrain.supported(generator)){
+            var ground=CityMilitaryTerrain.survey(generator,level.getSeed()).at(x,z);
+            return !ground.water()&&!ground.blocked()&&Math.abs(y-ground.ground()-1)<=3;
+        }
+        if(generator instanceof net.minecraft.world.level.levelgen.NoiseBasedChunkGenerator){
+            int ground=generator.getFirstOccupiedHeight(x,z,net.minecraft.world.level.levelgen.Heightmap.Types.OCEAN_FLOOR_WG,level,level.getChunkSource().randomState());
+            return Math.abs(y-ground-1)<=4;
+        }
+        return true;
+    }
     public static boolean disabled(ServerLevel level,String id){
         if(!enabled(level))return false;var state=get(level).bases.get(id);return state!=null&&state.sabotage>0;
     }

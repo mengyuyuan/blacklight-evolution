@@ -210,12 +210,10 @@ public final class MilitaryVehicleGameTest {
     }
     static net.minecraft.server.level.ServerPlayer mockPlayer(GameTestHelper h){
         var profile=new com.mojang.authlib.GameProfile(UUID.randomUUID(),"vehicle-qa");
-        var cookie=net.minecraft.server.network.CommonListenerCookie.createInitial(profile,false);
-        var player=new net.minecraft.server.level.ServerPlayer(h.getLevel().getServer(),h.getLevel(),profile,cookie.clientInformation());
+        var player=new net.minecraft.server.level.ServerPlayer(h.getLevel().getServer(),h.getLevel(),profile);
         var connection=new net.minecraft.network.Connection(net.minecraft.network.protocol.PacketFlow.SERVERBOUND);
         new io.netty.channel.embedded.EmbeddedChannel(connection);
-        net.minecraftforge.network.registration.NetworkRegistry.configureMockConnection(connection);
-        h.getLevel().getServer().getPlayerList().placeNewPlayer(connection,player,cookie);
+        h.getLevel().getServer().getPlayerList().placeNewPlayer(connection,player);
         return player;
     }
     static final class Fixture implements AutoCloseable {

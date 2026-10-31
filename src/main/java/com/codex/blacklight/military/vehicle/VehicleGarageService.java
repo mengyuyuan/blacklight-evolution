@@ -297,7 +297,7 @@ public final class VehicleGarageService {
         }
         return Optional.empty();
     }
-    private static boolean lane(ServerLevel level,MilitaryVehicle vehicle,Vec3 from,Vec3 to) {
+    static boolean lane(ServerLevel level,MilitaryVehicle vehicle,Vec3 from,Vec3 to) {
         var delta=to.subtract(from);int steps=Math.max(1,(int)Math.ceil(delta.horizontalDistance()/2));
         float yaw=(float)Math.toDegrees(Math.atan2(delta.x,delta.z));var shape=VehicleHullShape.from(vehicle.definition(),vehicle.turretYaw(),vehicle.gunPitch());
         for(int step=0;step<=steps;step++) {
