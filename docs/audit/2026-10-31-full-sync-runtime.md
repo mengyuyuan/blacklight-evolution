@@ -106,3 +106,10 @@ The old Gradle and Python artifact checks still expected uncompressed motion/map
 - The 1.20 Forge AFTER_LEVEL event receives GameRenderer's projection PoseStack, not LevelRenderer's camera view stack. The thermal renderer now captures the actual view/normal matrices at AFTER_ENTITIES and applies them exactly once to model vertices after post-processing. Thermal body-height tint is measured back in camera-relative world coordinates. Native r7 captured the same baseline/thermal pair; manual comparison confirms the heat silhouette covers the real posed sheep and the displaced orange geometry is gone. This last change still requires commit/final build.
 
 Actual dedicated-server synchronization and client compatibility combinations remain pending. Desktop results do not establish Android/FCL behavior. No final release folder has yet been accepted.
+
+
+### Separate dedicated-server synchronization — round 2
+
+The actual Forge dedicated server and actual remote client both passed and exited normally. The client sent production settings/button payloads only, wrote no local attachments, and observed matching charge/flight/landing sessions. The server executed both impacts exactly once: block breaking OFF destroyed zero blocks and produced zero terrain loot; ON destroyed 225 substrate blocks and produced live dirt loot. OFF, ON and final OFF settings each round-tripped through the actual Forge capability NBT and on-disk player file. Evidence: `forge-sync-evidence-r2/sync-client-report.json` and `sync-server-report.json` in the task directory. Only one real client was connected; another player's runtime isolation assertion was not exercised.
+
+The first round timed out before login and is retained. The fixture's old Neo attachment-NBT lookup was replaced with the exact ForgeCaps / blacklight:entity_state / skill_settings path. Its pre-connection screen diagnostics and deadlines are opt-in and directory guarded; normal clients never execute them. No personal save was used.

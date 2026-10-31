@@ -39,6 +39,8 @@ public final class StandaloneSyncClientSmoke {
     private static String stage="CONNECTING",error;
     private static JsonObject serverReport;
     private static boolean specialSent,releaseSent;
+    private static final long connectionBegan=System.nanoTime();
+    private static String lastScreen="";
     private StandaloneSyncClientSmoke(){}
 
     @SubscribeEvent(priority=EventPriority.HIGHEST)
@@ -55,6 +57,23 @@ public final class StandaloneSyncClientSmoke {
         if(mc.gameDirectory.toPath().toAbsolutePath().normalize().equals(CLIENT)) {
             org.lwjgl.glfw.GLFW.glfwHideWindow(mc.getWindow().getWindow());
             mc.mouseHandler.releaseMouse();
+            if(!initialized&&mc.player==null) {
+                String screen=mc.screen==null?"none":mc.screen.getClass().getName()+": "+mc.screen.getTitle().getString();
+                if(!screen.equals(lastScreen)){lastScreen=screen;BlacklightNeoMod.LOGGER.info("Dedicated sync prejoin screen: {}",screen);}
+                if(mc.screen instanceof net.minecraft.client.gui.screens.DisconnectedScreen||(System.nanoTime()-connectionBegan)/1e9>240) {
+                    failed=true;error="Client did not join the task-owned loopback server: "+screen;
+                    try {
+                        if(mc.screen!=null)for(var field:mc.screen.getClass().getDeclaredFields())
+                            if(net.minecraft.network.chat.Component.class.isAssignableFrom(field.getType())&&field.trySetAccessible()) {
+                                var value=(net.minecraft.network.chat.Component)field.get(mc.screen);if(value!=null)error+="; "+value.getString();
+                            }
+                        Files.createDirectories(OUTPUT);var report=new JsonObject();report.addProperty("passed",false);report.addProperty("error",error);
+                        Files.writeString(OUTPUT.resolve("sync-client-connect-failure.json"),new GsonBuilder().setPrettyPrinting().create().toJson(report));
+                        try(var picture=Screenshot.takeScreenshot(mc.getMainRenderTarget())){picture.writeToFile(OUTPUT.resolve("connection-failure.png"));}
+                    }catch(Exception failure){BlacklightNeoMod.LOGGER.error("Cannot record sync connection failure",failure);}
+                    BlacklightNeoMod.LOGGER.error(error);mc.stop();return;
+                }
+            }
         }
         if(mc.player==null||mc.level==null||mc.getConnection()==null)return;
         try{

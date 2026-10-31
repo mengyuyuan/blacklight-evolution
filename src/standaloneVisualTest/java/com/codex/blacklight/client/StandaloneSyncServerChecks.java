@@ -71,10 +71,11 @@ public final class StandaloneSyncServerChecks {
                 if(server.overworld().getGameTime()-finishedAt>=100)server.halt(false);
                 return;
             }
-            require(server.overworld().getGameTime()-began<6000,"dedicated synchronization fixture exceeded five minutes");
+            require(server.overworld().getGameTime()-began<(owner==null?12000:6000),"dedicated synchronization fixture exceeded its connection/action deadline");
             var p=owner==null?server.getPlayerList().getPlayers().stream().filter(x->x.getGameProfile().getName().equals("Dev")).findFirst().orElse(null):server.getPlayerList().getPlayer(owner);
             if(p==null){if(owner!=null)throw new IllegalStateException("QA owner disconnected before completion");if(server.overworld().getGameTime()%20==0)write(server,null);return;}
             if(owner==null){
+                began=server.overworld().getGameTime();
                 owner=p.getUUID();oldState=com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.PLAYER_STATE);oldSettings=com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.SKILL_SETTINGS);oldMode=p.gameMode.getGameModeForPlayer();oldPosition=p.position();
                 defaultOn=oldSettings.bulletdiveBlockBreaking();require(defaultOn,"fresh dedicated player did not default block breaking ON");
                 for(var other:server.getPlayerList().getPlayers())if(other!=p)otherPreferences.put(other.getUUID(),com.codex.blacklight.registry.ModAttachments.getData(other, ModAttachments.SKILL_SETTINGS).bulletdiveBlockBreaking());
@@ -156,8 +157,8 @@ public final class StandaloneSyncServerChecks {
         var row=new JsonObject();row.addProperty("tick",p.level().getGameTime());row.addProperty("callerUuid",p.getUUID().toString());row.addProperty("reason",reason);row.addProperty("serverAttachment",expected);row.addProperty("serializedAttachment",saved.toString());row.addProperty("diskAttachment",disk.toString());row.addProperty("savedPlayerFile",path.toString());settings.add(row);
     }
     private static CompoundTag findSettings(CompoundTag tag,int depth){
-        if(depth>8)return null;if(tag.contains("blacklight:skill_settings",Tag.TAG_COMPOUND))return tag.getCompound("blacklight:skill_settings");
-        for(String key:tag.getAllKeys())if(tag.contains(key,Tag.TAG_COMPOUND)){var found=findSettings(tag.getCompound(key),depth+1);if(found!=null)return found;}return null;
+        var fields=tag.getCompound("ForgeCaps").getCompound("blacklight:entity_state");
+        return fields.contains("skill_settings",Tag.TAG_COMPOUND)?fields.getCompound("skill_settings"):null;
     }
     private static void cleanup(ServerPlayer p){
         DevastatorSystem.cancel(p);WeaponCombatSystem.cancel(p);NativePlayerActionBackend.clear(p);
