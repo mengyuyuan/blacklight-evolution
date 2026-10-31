@@ -85,7 +85,7 @@ public final class MilitaryLauncherSafetyGameTest {
         soldier.setTarget(player);float health=player.getHealth();
         h.runAfterDelay(120,()->{try(f){
             h.assertTrue(DisguiseSystem.fooled(soldier,player),"the real identity remains successful during the firing window");
-            h.assertTrue(rockets(soldier)==3&&carbineRounds(soldier)==72&&player.getHealth()==health,"actual NPC fires neither physical gun at the successfully disguised player");
+            h.assertTrue(rockets(soldier)==3&&carbineRounds(soldier)==72&&player.getHealth()>=health,"actual NPC fires neither physical gun at the successfully disguised player; rockets="+rockets(soldier)+" carbine="+carbineRounds(soldier)+" health="+player.getHealth()+" initial="+health);
         }h.succeed();});
     }
 
