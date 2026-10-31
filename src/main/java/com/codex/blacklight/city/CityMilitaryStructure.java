@@ -23,7 +23,10 @@ public final class CityMilitaryStructure extends Structure {
             pieces.addPiece(new CityMilitaryPiece(s,checkpoint));
             // This callback only selects NEW starts. Saved old piece lists are
             // loaded as recorded and are never passed through this planner.
-            VehicleGaragePiece.Planner.find(s,checkpoint,context.chunkPos().x,context.chunkPos().z,true,city,survey)
+            // Base/checkpoint candidate scans can spend the complete field sample cache.
+            // Give the independent garage its own equally bounded survey.
+            var garageSurvey=city?survey:CityMilitaryTerrain.field(context);
+            VehicleGaragePiece.Planner.find(s,checkpoint,context.chunkPos().x,context.chunkPos().z,true,city,garageSurvey)
                     .ifPresent(garage->pieces.addPiece(new VehicleGaragePiece(VehicleGaragePiece.Planner.baseId(s),
                             s.blackwatch()?com.codex.blacklight.military.MilitaryFaction.BLACKWATCH:com.codex.blacklight.military.MilitaryFaction.MILITARY,garage,!city)));
         }));
