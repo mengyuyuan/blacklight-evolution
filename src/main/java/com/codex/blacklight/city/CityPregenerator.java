@@ -12,6 +12,7 @@ public final class CityPregenerator {
     private static final Map<ServerLevel,Work> WORK=new WeakHashMap<>();
     private static final class Work {ChunkPos pending;int requested,next;}
     static void tick(ServerLevel level){
+        if(!level.getServer().isRunning())return;
         if(!CitySystem.futian(level))return;
         var data=CityGenerationData.get(level);
         if(!data.initialized){data.initialized=true;data.running=CityConfig.WARMUP.get();data.setDirty();}
@@ -41,6 +42,16 @@ public final class CityPregenerator {
         if(work.pending!=null){level.getChunkSource().removeRegionTicket(TICKET,work.pending,0,work.pending);work.pending=null;}
     }
     static void unload(ServerLevel level){var work=WORK.remove(level);if(work!=null)release(level,work);}
+    /** LevelEvent.Unload is too late: Minecraft drains generation before posting it. */
+    static void stopping(net.minecraft.server.MinecraftServer server){
+        var iterator=WORK.entrySet().iterator();
+        while(iterator.hasNext()){
+            var entry=iterator.next();
+            if(entry.getKey().getServer()!=server)continue;
+            release(entry.getKey(),entry.getValue());iterator.remove();
+        }
+        // Keep the saved running/cursor state so a future server can resume it.
+    }
     static void start(ServerLevel level,int mode){
         unload(level);var d=CityGenerationData.get(level);d.initialized=true;d.mode=mode;d.cursor=0;
         d.running=true;d.failure="";d.atlasFingerprint=mode==3?WorldAtlas.fingerprint():"";d.setDirty();
