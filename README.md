@@ -1,5 +1,7 @@
 # Blacklight: Ascension
 
+原作者：**末者**；军事与黑色守望系统贡献：**WWYFC（@yfcyy889-ops）**；Forge 原始移植：**雨夜（@lingweiliang2510579032）**。详细分工与来源见 [贡献者记录](docs/CONTRIBUTORS_ZH.md)。
+
 本分支新增军方与黑色守望的编制、军衔、士兵装备、枪械弹药、军事基地、车辆与车库后勤，包含 M6.1 的完整车辆放置、无需燃油驾驶、玩家武器操作、原型体抢夺及实物补给机制。当前目标平台为 **Minecraft 1.21.1 / NeoForge 21.1.244 / Java 21**，开发预览版本为 `0.3.5-preview.20261030-military.6.1-latest.4`。见 [M6.1 安装与玩法](docs/MILITARY6_PLAYER_TEST_ZH.md)、[制作资料](docs/制作资料/README.md)及[原有功能](docs/MILITARY2_PLAYER_TEST_ZH.md)。较早的 military.2–6 文档保留各阶段历史验证；不将它们当作当前版本的新验收，也不声明最新 Forge 适配或多人已通过。
 
 > **正式版 `0.3.0` · NeoForge 1.21.1。** 整合最新感染生物模型、持有生物转向、临界质量、正式毁灭技和子弹俯冲。核心、动作、模型、输入、镜头与服务端同步由黑光自身驱动，运行不再要求 Epic Fight、Epic ParCool 或 Weapons of Miracles。当前验证范围见 [独立化记录](docs/STANDALONE_MIGRATION.md)。

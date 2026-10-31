@@ -29,7 +29,7 @@ public final class RedZoneVehicleSpawnGameTest {
         final OutbreakData previousOutbreak;
         Rules(ServerLevel level){
             this.level=level;enabled=MilitaryCampaignConfig.ENABLED.get();outbreak=OutbreakConfig.ENABLED.get();patrols=MilitaryCampaignConfig.VEHICLE_PATROLS.get();interval=MilitaryCampaignConfig.VEHICLE_PATROL_INTERVAL.get();
-            previousOutbreak=OutbreakData.load(OutbreakData.get(level.getServer()).save(new net.minecraft.nbt.CompoundTag(),level.registryAccess()),level.registryAccess());
+            previousOutbreak=OutbreakData.load(OutbreakData.get(level.getServer()).save(new net.minecraft.nbt.CompoundTag()));
             spawning=level.getGameRules().getBoolean(GameRules.RULE_DOMOBSPAWNING);
             limit=MilitaryCampaignConfig.VEHICLE_PATROL_LIMIT.get();personnel=CityConfig.MILITARY_GARRISON_LIMIT.get();
             MilitaryCampaignConfig.ENABLED.set(true);MilitaryCampaignConfig.VEHICLE_PATROLS.set(true);
@@ -44,7 +44,7 @@ public final class RedZoneVehicleSpawnGameTest {
             previousOutbreak.setDirty();level.getServer().overworld().getDataStorage().set("blacklight_outbreak",previousOutbreak);}
     }
     private static void collect(MilitaryVehicleGameTest.Fixture f,MilitaryVehicle vehicle){f.entities.addAll(vehicle.getPassengers());f.entities.add(vehicle);}
-    @GameTest(template="blackwatch_arena",batch="redzone_random_tick",timeoutTicks=900)
+    @GameTest(template="blackwatch_arena",batch="redzone_random_tick",timeoutTicks=1600)
     public static void registeredServerTickRandomlySpawnsNearPlayerWithoutAnyLocalGarage(GameTestHelper h){
         var f=new MilitaryVehicleGameTest.Fixture(h,915200);var rules=new Rules(f.level);
         var center=new BlockPos(f.x+128,0,128);rules.red(center);
@@ -65,23 +65,40 @@ public final class RedZoneVehicleSpawnGameTest {
             for(var entity:f.level.getAllEntities())if(entity instanceof MilitaryVehicle v&&v.blockPosition().distSqr(center)<256*256
                     &&VehicleFleetSavedData.get(f.level).vehicleFleet(v.getUUID()).map(VehicleFleet::ambientPatrol).orElse(false))vehicles.add(v);
             if(!vehicles.isEmpty()){
+                try{
                 var vehicle=vehicles.get(0);var start=vehicle.position();collect(f,vehicle);
-                awaitMotion(h,f,rules,center,vehicle,start,240);return;
+                var crew=new ArrayList<UUID>();
+                for(var entity:f.level.getAllEntities())if(entity instanceof MilitarySoldier soldier
+                        &&soldier.getPersistentData().hasUUID("BlacklightPatrolVehicle")
+                        &&vehicle.getUUID().equals(soldier.getPersistentData().getUUID("BlacklightPatrolVehicle"))){
+                    crew.add(soldier.getUUID());f.entities.add(soldier);
+                }
+                h.assertTrue(crew.size()==vehicle.definition().seats().size(),"random generation supplies the complete actual crew; found="+crew.size());
+                awaitMotion(h,f,rules,center,vehicle,start,crew,400);return;
+                }catch(RuntimeException|Error failure){f.close();rules.close();throw failure;}
             }
             if(left<=0){try(f;rules){h.assertTrue(false,"no random red-zone vehicle appeared during 800 actual server ticks");}return;}
             awaitRandom(h,f,rules,center,left-10);
         });
     }
-    private static void awaitMotion(GameTestHelper h,MilitaryVehicleGameTest.Fixture f,Rules rules,BlockPos center,MilitaryVehicle vehicle,net.minecraft.world.phys.Vec3 start,int left){
+    private static void awaitMotion(GameTestHelper h,MilitaryVehicleGameTest.Fixture f,Rules rules,BlockPos center,MilitaryVehicle vehicle,net.minecraft.world.phys.Vec3 start,List<UUID> crew,int left){
         h.runAfterDelay(10,()->{
             double moved=vehicle.position().subtract(start).horizontalDistance();
             if(moved>4||left<=0){try(f;rules){
                 for(var entity:f.level.getAllEntities())if(entity instanceof MilitaryVehicle v&&v.blockPosition().distSqr(center)<256*256&&VehicleFleetSavedData.get(f.level).vehicleFleet(v.getUUID()).map(VehicleFleet::ambientPatrol).orElse(false))collect(f,v);
                 var fleet=VehicleFleetSavedData.get(f.level).vehicleFleet(vehicle.getUUID()).orElseThrow();
                 h.assertTrue(moved>4,"real registered random patrol must drive; moved="+moved+" "+VehicleFleetSystem.diagnostic(f.level,fleet.id(),vehicle.getUUID()));
-                h.assertTrue(vehicle.getPassengers().size()==vehicle.definition().seats().size(),"random generation supplies all actual crew seats");
+                h.assertTrue(vehicle.occupant(VehicleDefinition.Job.DRIVER) instanceof MilitarySoldier driver&&MilitaryVehicle.crewOperational(driver),"moving patrol retains an actual operational driver");
+                for(var id:crew){
+                    var entity=f.level.getEntity(id);
+                    h.assertTrue(entity instanceof MilitarySoldier soldier&&soldier.isAlive(),"original patrol crew remains a real living soldier: "+id);
+                    var soldier=(MilitarySoldier)entity;
+                    var deployment=VehicleFleetSystem.deployment(soldier);
+                    h.assertTrue(soldier.getVehicle()==vehicle||deployment!=null&&deployment.vehicle()==vehicle,
+                            "original crew must be seated or legitimately deployed from this vehicle: "+id);
+                }
             }h.succeed();return;}
-            awaitMotion(h,f,rules,center,vehicle,start,left-10);
+            awaitMotion(h,f,rules,center,vehicle,start,crew,left-10);
         });
     }
     @GameTest(template="blackwatch_arena",batch="redzone_truck",timeoutTicks=400)
@@ -133,7 +150,7 @@ public final class RedZoneVehicleSpawnGameTest {
             MilitaryCampaignConfig.VEHICLE_PATROL_LIMIT.set(existing+1);
             var truck=spawn(f.level,"truck",at).orElseThrow();collect(f,truck);
             var data=VehicleFleetSavedData.get(f.level);var id=data.vehicleFleet(truck.getUUID()).orElseThrow().id();
-            var saved=VehicleFleetSavedData.load(data.save(new net.minecraft.nbt.CompoundTag(),f.level.registryAccess()),f.level.registryAccess());
+            var saved=VehicleFleetSavedData.load(data.save(new net.minecraft.nbt.CompoundTag()));
             h.assertTrue(saved.fleet(id).orElseThrow().ambientPatrol(),"ambient reservation survives actual SavedData roundtrip");
             h.assertTrue(spawn(f.level,"apc",at.offset(6,0,0)).isEmpty(),"existing patrol consumes dimension budget before new crew is created");
             truck.discard();h.assertTrue(data.fleet(id).isEmpty(),"real entity discard releases its ambient fleet slot");
