@@ -50,7 +50,14 @@ class VehicleGarageNaturalPlanTest {
             }
         }
         assertTrue(VehicleGaragePiece.Planner.find(base(0),null,2,2,true,false,(x,z)->new CityMilitaryPlan.Surface(63,true,false,false)).isEmpty());
-        assertTrue(VehicleGaragePiece.Planner.find(base(0),null,2,2,true,false,(x,z)->new CityMilitaryPlan.Surface(59,false,false,false)).isEmpty());
+        assertTrue(VehicleGaragePiece.Planner.find(base(0),null,2,2,true,false,(x,z)->new CityMilitaryPlan.Surface(56,false,false,false)).isEmpty());
+    }
+    @Test void fieldGarageUsesItsOwnNearbyDatumAndSupportedFoundation(){
+        var garage=VehicleGaragePiece.Planner.find(base(0),null,2,2,true,false,(x,z)->new CityMilitaryPlan.Surface(67,false,false,false)).orElseThrow();
+        assertEquals(67,garage.floor());
+        assertEquals(61,VehicleGaragePiece.Planner.bounds(garage,true).minY());
+        assertEquals(64,VehicleGaragePiece.Planner.bounds(garage,true,3).minY());
+        assertTrue(VehicleGaragePiece.Planner.find(base(0),null,2,2,true,false,(x,z)->new CityMilitaryPlan.Surface(70,false,false,false)).isEmpty());
     }
 
 }

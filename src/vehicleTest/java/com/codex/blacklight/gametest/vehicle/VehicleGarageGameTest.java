@@ -18,6 +18,24 @@ import net.neoforged.neoforge.gametest.*;
 
 @GameTestHolder("blacklight") @PrefixGameTestTemplate(false)
 public final class VehicleGarageGameTest {
+    @GameTest(template="blackwatch_arena", batch="vehicle6garage", timeoutTicks=40)
+    public static void fieldFoundationDepthSurvivesSaveWhileLegacyPiecesKeepOriginalBounds(GameTestHelper h) {
+        var context=net.minecraft.world.level.levelgen.structure.pieces.StructurePieceSerializationContext.fromLevel(h.getLevel());
+        for(int turn=0;turn<4;turn++) {
+            var base=new CityMilitaryPlan.Site(0,0,80,turn,false);
+            var oldBase=new CityMilitaryPiece(base);var oldBaseTag=oldBase.createTag(context);
+            var fieldBase=new CityMilitaryPiece(base,null,CityMilitaryPlan.FIELD_FOUNDATION_DEPTH);
+            h.assertTrue(!oldBaseTag.contains("FoundationDepth") && new CityMilitaryPiece(oldBaseTag).getBoundingBox().minY()==77,"legacy base bounds remain at three blocks");
+            h.assertTrue(new CityMilitaryPiece(fieldBase.createTag(context)).getBoundingBox().minY()==74,"field base persisted support extends through six blocks");
+            var site=new VehicleGarageData.Site(100,80,100,turn);
+            var legacy=new VehicleGaragePiece("legacy",com.codex.blacklight.military.MilitaryFaction.MILITARY,site);
+            var field=new VehicleGaragePiece("field",com.codex.blacklight.military.MilitaryFaction.MILITARY,site,true);
+            h.assertTrue(new VehicleGaragePiece(legacy.createTag(context)).getBoundingBox().minY()==77,"legacy garage does not gain a new foundation on load");
+            h.assertTrue(new VehicleGaragePiece(field.createTag(context)).getBoundingBox().minY()==74,"field garage retains its supported depth after reload");
+        }
+        h.succeed();
+    }
+
     @GameTest(template="blackwatch_arena", batch="vehicle6garage", timeoutTicks=160)
     public static void oldSavedBasePieceRegistersWithoutPlanningOrPlacingAnyNewGarage(GameTestHelper h) {
         try(var f=new Fixture(h,235000)) {

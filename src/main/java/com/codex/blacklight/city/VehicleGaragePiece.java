@@ -45,7 +45,8 @@ public final class VehicleGaragePiece extends StructurePiece {
                 if(minX<(long)chunkX*16-96 || minZ<(long)chunkZ*16-96 || maxX>(long)chunkX*16+111 || maxZ>(long)chunkZ*16+111)continue;
                 if(overlap(minX,minZ,maxX,maxZ,base.x(),base.z(),base.x()+base.width()-1,base.z()+base.depth()-1))continue;
                 if(checkpoint!=null&&overlap(minX,minZ,maxX,maxZ,checkpoint.x(),checkpoint.z(),checkpoint.x()+16,checkpoint.z()+16))continue;
-                if(urban?terrain(site,survey)&&roads(site,survey):fieldTerrain(site,survey))return Optional.of(site);
+                if(urban){if(terrain(site,survey)&&roads(site,survey))return Optional.of(site);}
+                else {var adapted=fieldSite(site,survey);if(adapted.isPresent())return adapted;}
             }
             return Optional.empty();
         }
@@ -63,16 +64,20 @@ public final class VehicleGaragePiece extends StructurePiece {
             }
             return true;
         }
-        private static boolean fieldTerrain(VehicleGarageData.Site site,CityMilitaryPlan.Survey survey) {
+        private static Optional<VehicleGarageData.Site> fieldSite(VehicleGarageData.Site site,CityMilitaryPlan.Survey survey) {
+            int low=Integer.MAX_VALUE,high=Integer.MIN_VALUE;
             // A new field base has no pre-existing city road. Survey its own bounded
             // motor-pool apron; never retrofit old starts, build over water or demand
             // a perfectly flat 31-by-43 naturally generated patch.
             for(int x=0;x<31;x++)for(int z=0;z<43;z++) {
                 int[] p=site.world(x,z);var surface=survey.at(p[0],p[1]);
                 if(surface.water()||surface.blocked()||surface.road()
-                        ||surface.ground()>site.floor()||site.floor()-surface.ground()>3)return false;
+                        )return Optional.empty();
+                low=Math.min(low,surface.ground());high=Math.max(high,surface.ground());
+                if(high-low>CityMilitaryPlan.FIELD_FOUNDATION_DEPTH)return Optional.empty();
             }
-            return true;
+            if(Math.abs(high-site.floor())>CityMilitaryPlan.FIELD_FOUNDATION_DEPTH)return Optional.empty();
+            return Optional.of(new VehicleGarageData.Site(site.x(),high,site.z(),site.rotation()));
         }
         private static boolean roads(VehicleGarageData.Site site,CityMilitaryPlan.Survey survey) {
             // Each seven-wide doorway must reach an existing road within 16
@@ -88,11 +93,13 @@ public final class VehicleGaragePiece extends StructurePiece {
             return true;
         }
         /** Pure geometry, independent of StructurePiece/native block registry initialization. */
-        public static BoundingBox bounds(VehicleGarageData.Site site,boolean fieldApron) {
+        public static BoundingBox bounds(VehicleGarageData.Site site,boolean fieldApron) {return bounds(site,fieldApron,fieldApron?CityMilitaryPlan.FIELD_FOUNDATION_DEPTH:3);}
+        public static BoundingBox bounds(VehicleGarageData.Site site,boolean fieldApron,int depth) {
+            if(depth<3||depth>CityMilitaryPlan.FIELD_FOUNDATION_DEPTH)throw new IllegalArgumentException("Invalid foundation depth");
             Objects.requireNonNull(site);
             int[] a=fieldApron?site.world(0,0):new int[]{site.x(),site.z()};
             int[] b=fieldApron?site.world(30,42):new int[]{site.x()+site.width()-1,site.z()+site.depth()-1};
-            return new BoundingBox(Math.min(a[0],b[0]),site.floor()-3,Math.min(a[1],b[1]),
+            return new BoundingBox(Math.min(a[0],b[0]),site.floor()-depth,Math.min(a[1],b[1]),
                     Math.max(a[0],b[0]),site.floor()+9,Math.max(a[1],b[1]));
         }
         private Planner() { }
@@ -101,13 +108,14 @@ public final class VehicleGaragePiece extends StructurePiece {
     private final MilitaryFaction faction;
     private final VehicleGarageData.Site site;
     private final boolean fieldApron;
+    private final int foundationDepth;
 
     public VehicleGaragePiece(String baseId, MilitaryFaction faction, VehicleGarageData.Site site) {
         this(baseId,faction,site,false);
     }
     public VehicleGaragePiece(String baseId, MilitaryFaction faction, VehicleGarageData.Site site,boolean fieldApron) {
         super(ModWorldgen.VEHICLE_GARAGE_PIECE.get(), 0, bounds(site,fieldApron));
-        this.fieldApron=fieldApron;
+        this.fieldApron=fieldApron;this.foundationDepth=fieldApron?CityMilitaryPlan.FIELD_FOUNDATION_DEPTH:3;
         if (baseId == null || baseId.isBlank() || baseId.length() > 256)
             throw new IllegalArgumentException("Invalid garage base reference");
         this.baseId = baseId;
@@ -127,8 +135,8 @@ public final class VehicleGaragePiece extends StructurePiece {
                 .orElseThrow(() -> new IllegalArgumentException("Invalid garage faction"));
         site = new VehicleGarageData.Site(tag.getInt("SiteX"), tag.getInt("Floor"),
                 tag.getInt("SiteZ"), tag.getInt("Turn"));
-        fieldApron=tag.getBoolean("FieldApron");
-        boundingBox = bounds(site,fieldApron);
+        fieldApron=tag.getBoolean("FieldApron");foundationDepth=tag.contains("FoundationDepth")?tag.getInt("FoundationDepth"):3;
+        boundingBox = Planner.bounds(site,fieldApron,foundationDepth);
         setOrientation(null);
     }
 
@@ -162,6 +170,7 @@ public final class VehicleGaragePiece extends StructurePiece {
         tag.putInt("SiteZ", site.z());
         tag.putInt("Turn", site.rotation());
         if(fieldApron)tag.putBoolean("FieldApron",true);
+        if(foundationDepth!=3)tag.putInt("FoundationDepth",foundationDepth);
     }
 
     @Override public void postProcess(WorldGenLevel level, StructureManager manager,
@@ -176,7 +185,7 @@ public final class VehicleGaragePiece extends StructurePiece {
         template.placeInWorld(level, at, at, settings, random, 2);
         if(fieldApron)for(int localX=0;localX<31;localX++)for(int localZ=27;localZ<43;localZ++){
             int[] point=site.world(localX,localZ);
-            for(int y=site.floor()-3;y<=site.floor()+7;y++){
+            for(int y=site.floor()-foundationDepth;y<=site.floor()+7;y++){
                 var pos=new BlockPos(point[0],y,point[1]);if(!clip.isInside(pos))continue;
                 // Every part is clipped into this NEW structure's saved bounds.
                 // Fill surveyed shallow gaps, preserve deeper terrain, leave a
@@ -190,7 +199,7 @@ public final class VehicleGaragePiece extends StructurePiece {
                 x <= Math.min(site.x() + site.width() - 1, clip.maxX()); x++) {
             for (int z = Math.max(site.z(), clip.minZ());
                     z <= Math.min(site.z() + site.depth() - 1, clip.maxZ()); z++) {
-                for (int y = site.floor() - 1; y >= site.floor() - 3; y--) {
+                for (int y = site.floor() - 1; y >= site.floor() - foundationDepth; y--) {
                     var foundation = new BlockPos(x, y, z);
                     if (clip.isInside(foundation) && level.getBlockState(foundation).isAir())
                         level.setBlock(foundation, Blocks.STONE_BRICKS.defaultBlockState(), 2);

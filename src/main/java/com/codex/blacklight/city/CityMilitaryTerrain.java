@@ -24,7 +24,7 @@ final class CityMilitaryTerrain {
         return (x,z)->{
             int sx=Math.floorDiv(x,8)*8,sz=Math.floorDiv(z,8)*8;long key=net.minecraft.world.level.ChunkPos.asLong(sx,sz);
             var saved=cache.get(key);if(saved!=null)return saved;
-            if(cache.size()>=256)return new CityMilitaryPlan.Surface(0,false,true,false);
+            if(cache.size()>=1024)return new CityMilitaryPlan.Surface(0,false,true,false);
             int ground=context.chunkGenerator().getFirstOccupiedHeight(sx,sz,net.minecraft.world.level.levelgen.Heightmap.Types.OCEAN_FLOOR_WG,context.heightAccessor(),context.randomState());
             int surface=context.chunkGenerator().getFirstOccupiedHeight(sx,sz,net.minecraft.world.level.levelgen.Heightmap.Types.WORLD_SURFACE_WG,context.heightAccessor(),context.randomState());
             var result=new CityMilitaryPlan.Surface(ground,surface>ground,false,false);cache.put(key,result);return result;

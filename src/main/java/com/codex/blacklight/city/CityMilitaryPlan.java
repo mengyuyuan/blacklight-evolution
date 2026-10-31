@@ -4,6 +4,7 @@ import java.util.Optional;
 
 /** Bounded, deterministic selection; never reads or changes a Minecraft world. */
 public final class CityMilitaryPlan {
+    public static final int FIELD_FOUNDATION_DEPTH=6;
     public record Surface(int ground,boolean water,boolean blocked,boolean road){}
     public record Checkpoint(int x,int z,int floor,int rotation){
         public int[] world(int localX,int localZ){return switch(rotation&3){case 1->new int[]{x+16-localZ,z+localX};case 2->new int[]{x+16-localX,z+16-localZ};case 3->new int[]{x+localZ,z+16-localX};default->new int[]{x+localX,z+localZ};};}
@@ -24,6 +25,10 @@ public final class CityMilitaryPlan {
         }
     }
     public static Optional<Site> find(long seed,int chunkX,int chunkZ,boolean blackwatch,boolean roadRequired,Survey survey){
+        return find(seed,chunkX,chunkZ,blackwatch,roadRequired,survey,3);
+    }
+    public static Optional<Site> find(long seed,int chunkX,int chunkZ,boolean blackwatch,boolean roadRequired,Survey survey,int relief){
+        if(relief<3||relief>FIELD_FOUNDATION_DEPTH)throw new IllegalArgumentException("Invalid foundation relief");
         int first=(int)(mix(seed^((long)chunkX<<32)^chunkZ)&3);
         for(int ring=0;ring<=4;ring++)for(int dx=-ring;dx<=ring;dx++)for(int dz=-ring;dz<=ring;dz++){
             if(Math.max(Math.abs(dx),Math.abs(dz))!=ring)continue;
@@ -33,29 +38,30 @@ public final class CityMilitaryPlan {
                 // Native starts are at least 13 chunks apart. Keep disjoint 208-block
                 // windows, also inside vanilla's eight-chunk structure reference range.
                 if(x<chunkX*16-96||z<chunkZ*16-96||x+sample.width()-1>chunkX*16+111||z+sample.depth()-1>chunkZ*16+111)continue;
-                int floor=coarseFloor(sample,survey);if(floor==Integer.MIN_VALUE)continue;
+                int floor=coarseFloor(sample,survey,relief);if(floor==Integer.MIN_VALUE)continue;
                 var site=new Site(x,z,floor,rotation,blackwatch);
                 if(roadRequired&&!adjacentRoad(site,survey))continue;
-                if(validFootprint(site,survey))return Optional.of(site);
+                if(validFootprint(site,survey,relief))return Optional.of(site);
             }
         }
         return Optional.empty();
     }
-    private static int coarseFloor(Site site,Survey survey){
+    private static int coarseFloor(Site site,Survey survey,int relief){
         int low=Integer.MAX_VALUE,high=Integer.MIN_VALUE;
         for(int x=0;x<=site.width();x+=8)for(int z=0;z<=site.depth();z+=8){
             var s=survey.at(site.x()+Math.min(x,site.width()-1),site.z()+Math.min(z,site.depth()-1));
             if(s.water()||s.blocked()||s.road())return Integer.MIN_VALUE;
             low=Math.min(low,s.ground());high=Math.max(high,s.ground());
-            if(high-low>3)return Integer.MIN_VALUE;
+            if(high-low>relief)return Integer.MIN_VALUE;
         }
         return high;
     }
-    public static boolean validFootprint(Site site,Survey survey){
+    public static boolean validFootprint(Site site,Survey survey){return validFootprint(site,survey,3);}
+    private static boolean validFootprint(Site site,Survey survey,int relief){
         // A narrow building between the fast probes must still remain untouched.
         for(int x=0;x<site.width();x++)for(int z=0;z<site.depth();z++){
             var s=survey.at(site.x()+x,site.z()+z);
-            if(s.water()||s.blocked()||s.road()||s.ground()>site.floor()||site.floor()-s.ground()>3)return false;
+            if(s.water()||s.blocked()||s.road()||s.ground()>site.floor()||site.floor()-s.ground()>relief)return false;
         }
         return true;
     }
