@@ -65,23 +65,40 @@ public final class RedZoneVehicleSpawnGameTest {
             for(var entity:f.level.getAllEntities())if(entity instanceof MilitaryVehicle v&&v.blockPosition().distSqr(center)<256*256
                     &&VehicleFleetSavedData.get(f.level).vehicleFleet(v.getUUID()).map(VehicleFleet::ambientPatrol).orElse(false))vehicles.add(v);
             if(!vehicles.isEmpty()){
+                try{
                 var vehicle=vehicles.get(0);var start=vehicle.position();collect(f,vehicle);
-                awaitMotion(h,f,rules,center,vehicle,start,400);return;
+                var crew=new ArrayList<UUID>();
+                for(var entity:f.level.getAllEntities())if(entity instanceof MilitarySoldier soldier
+                        &&soldier.getPersistentData().hasUUID("BlacklightPatrolVehicle")
+                        &&vehicle.getUUID().equals(soldier.getPersistentData().getUUID("BlacklightPatrolVehicle"))){
+                    crew.add(soldier.getUUID());f.entities.add(soldier);
+                }
+                h.assertTrue(crew.size()==vehicle.definition().seats().size(),"random generation supplies the complete actual crew; found="+crew.size());
+                awaitMotion(h,f,rules,center,vehicle,start,crew,400);return;
+                }catch(RuntimeException|Error failure){f.close();rules.close();throw failure;}
             }
             if(left<=0){try(f;rules){h.assertTrue(false,"no random red-zone vehicle appeared during 800 actual server ticks");}return;}
             awaitRandom(h,f,rules,center,left-10);
         });
     }
-    private static void awaitMotion(GameTestHelper h,MilitaryVehicleGameTest.Fixture f,Rules rules,BlockPos center,MilitaryVehicle vehicle,net.minecraft.world.phys.Vec3 start,int left){
+    private static void awaitMotion(GameTestHelper h,MilitaryVehicleGameTest.Fixture f,Rules rules,BlockPos center,MilitaryVehicle vehicle,net.minecraft.world.phys.Vec3 start,List<UUID> crew,int left){
         h.runAfterDelay(10,()->{
             double moved=vehicle.position().subtract(start).horizontalDistance();
             if(moved>4||left<=0){try(f;rules){
                 for(var entity:f.level.getAllEntities())if(entity instanceof MilitaryVehicle v&&v.blockPosition().distSqr(center)<256*256&&VehicleFleetSavedData.get(f.level).vehicleFleet(v.getUUID()).map(VehicleFleet::ambientPatrol).orElse(false))collect(f,v);
                 var fleet=VehicleFleetSavedData.get(f.level).vehicleFleet(vehicle.getUUID()).orElseThrow();
                 h.assertTrue(moved>4,"real registered random patrol must drive; moved="+moved+" "+VehicleFleetSystem.diagnostic(f.level,fleet.id(),vehicle.getUUID()));
-                h.assertTrue(vehicle.getPassengers().size()==vehicle.definition().seats().size(),"random generation supplies all actual crew seats");
+                h.assertTrue(vehicle.occupant(VehicleDefinition.Job.DRIVER) instanceof MilitarySoldier driver&&MilitaryVehicle.crewOperational(driver),"moving patrol retains an actual operational driver");
+                for(var id:crew){
+                    var entity=f.level.getEntity(id);
+                    h.assertTrue(entity instanceof MilitarySoldier soldier&&soldier.isAlive(),"original patrol crew remains a real living soldier: "+id);
+                    var soldier=(MilitarySoldier)entity;
+                    var deployment=VehicleFleetSystem.deployment(soldier);
+                    h.assertTrue(soldier.getVehicle()==vehicle||deployment!=null&&deployment.vehicle()==vehicle,
+                            "original crew must be seated or legitimately deployed from this vehicle: "+id);
+                }
             }h.succeed();return;}
-            awaitMotion(h,f,rules,center,vehicle,start,left-10);
+            awaitMotion(h,f,rules,center,vehicle,start,crew,left-10);
         });
     }
     @GameTest(template="blackwatch_arena",batch="redzone_truck",timeoutTicks=400)
