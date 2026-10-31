@@ -1,4 +1,5 @@
 import importlib.util
+import io
 import json
 import subprocess
 import tempfile
@@ -88,6 +89,37 @@ class RepositoryProfileTest(unittest.TestCase):
         (self.profile / 'basic_idle.json').write_bytes(self.data.replace(b'0,1', b'1,0'))
         with self.assertRaisesRegex(RuntimeError, 'changed baseline motion in source snapshot'):
             release.source_snapshot(self.repo, None, baseline)
+
+
+class ProductionClassBoundaryTest(unittest.TestCase):
+    def setUp(self):
+        self.temp = tempfile.TemporaryDirectory()
+        self.addCleanup(self.temp.cleanup)
+        self.repo = Path(self.temp.name)
+        self.root = self.repo / 'build/classes/java/main'
+        self.source = self.repo / 'src/main/java/Live.java'
+        self.source.parent.mkdir(parents=True)
+        self.source.write_text('package com.codex.blacklight;\npublic class Live {}', encoding='utf-8')
+        self.classes = self.root / 'com/codex/blacklight'
+        self.classes.mkdir(parents=True)
+
+    def test_private_fixture_is_not_required_in_production_archive(self):
+        for name in ('Live', 'Live$Nested', 'PrivateQaFixture'):
+            (self.classes / (name + '.class')).write_bytes(b'fixture')
+        selected = release.production_classes(self.repo, self.root)
+        self.assertEqual({'Live.class', 'Live$Nested.class'}, {p.name for p in selected})
+
+    def test_missing_production_source_cannot_be_hidden_by_other_class_files(self):
+        (self.classes / 'Live.class').write_bytes(b'fixture')
+        (self.source.parent / 'NewFeature.java').write_text('package com.codex.blacklight;\npublic class NewFeature {}', encoding='utf-8')
+        with self.assertRaisesRegex(RuntimeError, 'Production sources were not compiled'):
+            release.production_classes(self.repo, self.root)
+
+    def test_stream_comparison_checks_tail_content_and_length(self):
+        prefix = b'x' * (1024 * 1024)
+        self.assertTrue(release.same_stream_content(io.BytesIO(prefix + b'a'), io.BytesIO(prefix + b'a')))
+        self.assertFalse(release.same_stream_content(io.BytesIO(prefix + b'a'), io.BytesIO(prefix + b'b')))
+        self.assertFalse(release.same_stream_content(io.BytesIO(prefix), io.BytesIO(prefix + b'a')))
 
 
 if __name__ == '__main__':

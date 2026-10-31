@@ -5,6 +5,7 @@ import argparse
 import hashlib
 import json
 import os
+import re
 import tempfile
 import shutil
 import subprocess
@@ -27,6 +28,35 @@ def digest(data: bytes) -> str:
 def require(condition: bool, message: str) -> None:
     if not condition:
         raise RuntimeError(message)
+
+
+def java_class_names(root: Path) -> set[str]:
+    names = set()
+    for path in root.rglob('*.java'):
+        match = re.search(r'^\s*package\s+([\w.]+)\s*;', path.read_text(encoding='utf-8'), re.MULTILINE)
+        prefix = match.group(1).replace('.', '/') + '/' if match else ''
+        names.add(prefix + path.stem)
+    return names
+
+
+def production_classes(repo: Path, class_root: Path) -> list[Path]:
+    production = {name for name in java_class_names(repo / 'src/main/java')
+                  if name.rsplit('/', 1)[-1] not in ('package-info', 'module-info')}
+    classes = [path for path in class_root.rglob('*.class')
+               if path.relative_to(class_root).as_posix()[:-6].split('$', 1)[0] in production]
+    require(bool(classes), 'No compiled production classes to verify')
+    compiled = {path.relative_to(class_root).as_posix()[:-6].split('$', 1)[0] for path in classes}
+    require(production <= compiled, f'Production sources were not compiled: {sorted(production - compiled)}')
+    return classes
+
+
+def same_stream_content(left, right) -> bool:
+    while True:
+        a, b = left.read(1024 * 1024), right.read(1024 * 1024)
+        if a != b:
+            return False
+        if not a:
+            return True
 
 
 def manifest_values(data: bytes) -> dict[str, str]:
@@ -193,7 +223,10 @@ def main() -> None:
     parser.add_argument('--profile', choices=('bundled', 'external-profile'), default='bundled')
     parser.add_argument('--private-motion-directory', type=Path, help='Exact external-profile build input directory')
     parser.add_argument('--verify-only', action='store_true', help='Verify inputs and artifacts without writing a release directory')
+    parser.add_argument('--directory-only', action='store_true', help='Verify a prepared ordinary folder instead of a transport ZIP; requires --verify-only and --output')
     args = parser.parse_args()
+    if args.directory_only and (not args.verify_only or args.output is None):
+        parser.error('--directory-only requires --verify-only and --output')
     repo = args.repo.resolve()
     build = (args.build_dir or repo / 'build').resolve()
     props = dict(line.split('=', 1) for line in (repo / 'gradle.properties').read_text(encoding='utf-8').splitlines()
@@ -202,7 +235,7 @@ def main() -> None:
     stem = f"{props['mod_archive_name']}-MC{props['minecraft_version']}-Forge-{version}"
     jar = build / 'libs' / f'{stem}-{args.profile}.jar'
     dist = build / 'distributions' / f'{stem}-{args.profile}.zip'
-    require(jar.is_file() and dist.is_file(), f'Build the requested {args.profile} artifacts first')
+    require(jar.is_file() and (args.directory_only or dist.is_file()), f'Build the requested {args.profile} artifacts first')
     notices = ('LICENSE', 'THIRD_PARTY_ASSETS.md', 'THIRD_PARTY_NOTICES.md')
     external = args.profile == 'external-profile'
     baseline = repository_profile(repo)
@@ -245,8 +278,7 @@ def main() -> None:
             verify_compact_maps(repo, build, jar)
 
         require(motions == expected, 'Bundled resources differ from the exact selected input profile/manifest')
-        classes = list((build / 'classes/java/main').rglob('*.class'))
-        require(bool(classes), 'No compiled classes to verify')
+        classes = production_classes(repo, build / 'classes/java/main')
         for path in classes:
             name = path.relative_to(build / 'classes/java/main').as_posix()
             require(name in names, f'Missing class: {name}')
@@ -259,6 +291,10 @@ def main() -> None:
         require('blacklight.refmap.json' in names, 'Missing Forge Mixin refmap')
         require(not any('/preview/' in name or '/gametest/' in name or name.startswith('blacklight/test/')
                         for name in names), 'Development harness leaked into JAR')
+        shipped = {name[:-6].split('$', 1)[0] for name in names
+                   if name.startswith('com/codex/blacklight/') and name.endswith('.class')}
+        require(shipped <= java_class_names(repo / 'src/main/java'),
+                f'Unrecognized runtime classes or QA harness leaked into JAR: {sorted(shipped - java_class_names(repo / "src/main/java"))}')
         mixins = json.loads(archive.read('blacklight.mixins.json'))
         for name in mixins['mixins'] + mixins['client']:
             require((mixins['package'] + '.' + name).replace('.', '/') + '.class' in names, f'Missing mixin: {name}')
@@ -283,20 +319,39 @@ def main() -> None:
                     require(name not in names, f'Both map encodings shipped: {name}')
                     continue  # Exact complete logical map bytes were verified above.
                 require(archive.read(name) == data, f'Stale or missing production resource: {name}')
-    with ZipFile(dist) as archive:
-        require(len(set(archive.namelist())) == len(archive.namelist()), 'Duplicate distribution entries')
-        require([name for name in archive.namelist() if name.endswith('.jar')] == ['mods/' + jar.name],
-                'Distribution must contain exactly this build, without dependencies or old JARs')
-        require(archive.read('mods/' + jar.name) == jar.read_bytes(), 'Distribution JAR mismatch')
+    docs = sorted(path for path in (repo / 'docs').rglob('*') if path.is_file())
+    if args.directory_only:
+        folder = args.output.resolve()
+        installed = folder / 'mods' / jar.name
+        dependency_name = f"geckolib-forge-{props['minecraft_version']}-{props['geckolib_version']}.jar"
+        require(installed.is_file(), 'Missing main mod in the ordinary folder')
+        require({path.name for path in (folder / 'mods').glob('*.jar')} == {jar.name, dependency_name},
+                'Ordinary folder must contain exactly this mod and its GeckoLib dependency')
+        require({path.resolve() for path in folder.rglob('*.jar')} == {installed.resolve(), (folder / 'mods' / dependency_name).resolve()},
+                'Unexpected loose dependency or old JAR outside mods/')
+        if not os.path.samefile(installed, jar):
+            with installed.open('rb') as packed, jar.open('rb') as built:
+                require(same_stream_content(packed, built), 'Ordinary-folder JAR differs from the verified build')
         for name in (*notices, 'README.md'):
-            require(archive.read(name) == (repo / name).read_bytes(), f'Distribution document mismatch: {name}')
-        docs = sorted(path for path in (repo / 'docs').rglob('*') if path.is_file())
+            require((folder / name).read_bytes() == (repo / name).read_bytes(), f'Ordinary-folder document mismatch: {name}')
         for path in docs:
-            name = 'docs/' + path.relative_to(repo / 'docs').as_posix()
-            require(not path.is_symlink(), f'Distribution document symlink needs explicit review: {name}')
-            require(archive.read(name) == path.read_bytes(), f'Distribution document mismatch: {name}')
-        require({name for name in archive.namelist() if name.startswith('docs/') and not name.endswith('/')}
-                == {'docs/' + path.relative_to(repo / 'docs').as_posix() for path in docs}, 'Distribution docs inventory mismatch')
+            require(not path.is_symlink(), f'Document symlink needs explicit review: {path}')
+            require((folder / path.relative_to(repo)).read_bytes() == path.read_bytes(), f'Ordinary-folder document mismatch: {path.name}')
+    else:
+        with ZipFile(dist) as archive:
+            require(len(set(archive.namelist())) == len(archive.namelist()), 'Duplicate distribution entries')
+            require([name for name in archive.namelist() if name.endswith('.jar')] == ['mods/' + jar.name],
+                    'Distribution must contain exactly this build, without dependencies or old JARs')
+            with archive.open('mods/' + jar.name) as packed, jar.open('rb') as built:
+                require(same_stream_content(packed, built), 'Distribution JAR mismatch')
+            for name in (*notices, 'README.md'):
+                require(archive.read(name) == (repo / name).read_bytes(), f'Distribution document mismatch: {name}')
+            for path in docs:
+                name = 'docs/' + path.relative_to(repo / 'docs').as_posix()
+                require(not path.is_symlink(), f'Distribution document symlink needs explicit review: {name}')
+                require(archive.read(name) == path.read_bytes(), f'Distribution document mismatch: {name}')
+            require({name for name in archive.namelist() if name.startswith('docs/') and not name.endswith('/')}
+                    == {'docs/' + path.relative_to(repo / 'docs').as_posix() for path in docs}, 'Distribution docs inventory mismatch')
 
     verified_sources = source_snapshot(repo, None, baseline)
     if args.verify_only:
