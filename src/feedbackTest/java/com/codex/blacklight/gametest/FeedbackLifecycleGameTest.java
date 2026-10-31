@@ -143,7 +143,7 @@ public final class FeedbackLifecycleGameTest {
     }
     @GameTest(template="wall_test",timeoutTicks=120,batch="feedback_slime_recovery")
     public static void deathSlimeSurvivesCombatAndAutomaticallyConsumesHealthyPrey(GameTestHelper h){
-        var p=player(h);p.setGameMode(net.minecraft.world.level.GameType.SURVIVAL);var prey=EntityType.ZOMBIE.create(h.getLevel());
+        var p=player(h);p.setGameMode(net.minecraft.world.level.GameType.SURVIVAL);for(int i=0;i<65;i++)p.tick();var prey=EntityType.ZOMBIE.create(h.getLevel());
         h.runAfterDelay(70,()->{try{
             prey.setNoAi(true);prey.setPos(p.position());prey.getAttribute(net.minecraft.world.entity.ai.attributes.Attributes.MAX_HEALTH).setBaseValue(200);
             h.getLevel().addFreshEntity(prey);prey.setHealth(prey.getMaxHealth());
@@ -167,7 +167,7 @@ public final class FeedbackLifecycleGameTest {
     }
     @GameTest(template="wall_test",timeoutTicks=120,batch="feedback_slime_recovery")
     public static void voluntarySlimeAndAdministrativeDeathRemainDamageable(GameTestHelper h){
-        var p=player(h);p.setGameMode(net.minecraft.world.level.GameType.SURVIVAL);
+        var p=player(h);p.setGameMode(net.minecraft.world.level.GameType.SURVIVAL);for(int i=0;i<65;i++)p.tick();
         h.runAfterDelay(70,()->{try{
             h.assertTrue(BiomassSystem.begin(p,false),"voluntary split starts");
             p.invulnerableTime=0;float health=p.getHealth();p.hurt(p.damageSources().generic(),1);
