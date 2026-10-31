@@ -104,7 +104,3 @@ public final class ClientWeaponCombat {
     }
 }
 
-record PersonalCombatInput(boolean infected,boolean prototype,com.codex.blacklight.power.PowerForm form,
-        boolean emptyHands,boolean consuming,boolean vehicleInput) {
-    boolean active(){return !vehicleInput&&infected&&prototype&&WeaponMove.controls(form,emptyHands)&&!consuming;}
-}
