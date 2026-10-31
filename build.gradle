@@ -231,6 +231,12 @@ if (project.hasProperty('standaloneInfected')) {
 if (project.hasProperty('standaloneBulletExtreme') || project.hasProperty('standaloneTutorialInspect') || project.hasProperty('standaloneTutorial') || project.hasProperty('standaloneVisual') || project.hasProperty('standaloneGait') || project.hasProperty('standaloneLock') || project.hasProperty('standaloneMorph') || project.hasProperty('standaloneSkill') || project.hasProperty('standaloneSync')) {
     sourceSets.main.java.srcDir('src/standaloneVisualTest/java')
     if (!project.hasProperty('standaloneSync')) sourceSets.main.java.exclude '**/StandaloneSyncClientSmoke.java', '**/StandaloneSyncServerChecks.java'
+    else {
+        fileTree('src/standaloneVisualTest/java').matching { include '**/*.java' }.each { source ->
+            if(!(source.name in ['StandaloneSyncClientSmoke.java','StandaloneSyncServerChecks.java']))
+                sourceSets.main.java.exclude '**/'+source.name
+        }
+    }
 }
 if (project.hasProperty('standaloneTest')) {
     sourceSets.main.java.srcDir('src/standaloneTest/java')
@@ -385,8 +391,10 @@ neoForge {
                 programArguments.addAll '--width', '1280', '--height', '900'
             }
             if (project.hasProperty('standaloneSync')) {
+                if (!project.hasProperty('clientRunDirectory')) throw new GradleException('Synchronization QA requires a disposable clientRunDirectory')
+                systemProperty 'blacklight.test.qaDirectory', file(project.property('clientRunDirectory')).absolutePath
                 systemProperty 'blacklight.test.standaloneSync', file(project.property('standaloneSync')).absolutePath
-                programArguments.addAll '--width', '1280', '--height', '900'
+                programArguments.addAll '--quickPlayMultiplayer', '127.0.0.1:25568', '--username', 'Dev', '--width', '960', '--height', '640'
             }
             if (project.hasProperty('localWeaponMotions')) {
                 systemProperty 'blacklight.localWeaponMotions', file(project.property('localWeaponMotions')).absolutePath
@@ -415,7 +423,11 @@ neoForge {
         server {
             server()
             if (project.hasProperty('serverRunDirectory')) gameDirectory = file(project.property('serverRunDirectory'))
-            if (project.hasProperty('standaloneSync')) systemProperty 'blacklight.test.standaloneSync', file(project.property('standaloneSync')).absolutePath
+            if (project.hasProperty('standaloneSync')) {
+                if (!project.hasProperty('serverRunDirectory')) throw new GradleException('Synchronization QA requires a disposable serverRunDirectory')
+                systemProperty 'blacklight.test.qaDirectory', file(project.property('serverRunDirectory')).absolutePath
+                systemProperty 'blacklight.test.standaloneSync', file(project.property('standaloneSync')).absolutePath
+            }
             jvmArgument(project.hasProperty('serverMaxHeap') ? '-Xmx'+project.property('serverMaxHeap') : project.hasProperty('hydraReleaseTest') ? '-Xmx1G' : '-Xmx2G')
             if (project.hasProperty('campaignWorldgenAudit')) systemProperty 'blacklight.campaignWorldgenAudit', 'true'
             programArgument '--nogui'
