@@ -94,3 +94,15 @@ The first actual TaCZ 1.1.8 / Potentia / Spore 2.2.0j / Twilight 4.3.2508 server
 Forge 1.20 can return true after LivingHurtEvent cancels damage. The optional Twilight bridges now require real health/absorption loss before accepting the mechanism hit or removing a shield. The budget-refresh fixture now observes the configured single-hit cap (6% by default), separately from the multi-hit window cap (15%). A fresh combination run is pending.
 
 The old Gradle and Python artifact checks still expected uncompressed motion/map ZIP entries. Both now invoke the actual bounded Java decoders to compare complete logical inventories and restored bytes. Source-manifest, Forge refmap, Java 17 class and reobfuscated-jar identity checks remain. The Linux server workflow now includes the same release/building/gunplay suites as the local 535-case round. These corrected gates need a fresh cloud run.
+
+
+### Completed gates at revision 2335da45 and thermal correction
+
+- Cloud ordinary assemble and Python artifact verification passed at `2335da45`; compressed inputs and reobfuscated output were verified rather than accepted by filename alone.
+- Cloud combined actual server: **535 required cases passed**, normal exit, including the previously failing human assimilation fixture. No duplicate-TOML or double-watch-unload exception was reported.
+- Local real optional-mod combination r8: **32 required cases passed**, normal exit.
+- Full JVM r9: **1,119 tests / 251 classes, zero failures/errors/skips**. The opt-in dedicated sync harness also compiled. This run precedes the following rendering-only correction.
+- Native ground-stage visual r6 completed seven captures with skylight 15 and packed light 15728640. Manual inspection found thermal silhouettes still displaced from the sheep, despite successful capture and valid lighting. This was not accepted.
+- The 1.20 Forge AFTER_LEVEL event receives GameRenderer's projection PoseStack, not LevelRenderer's camera view stack. The thermal renderer now captures the actual view/normal matrices at AFTER_ENTITIES and applies them exactly once to model vertices after post-processing. Thermal body-height tint is measured back in camera-relative world coordinates. Native r7 captured the same baseline/thermal pair; manual comparison confirms the heat silhouette covers the real posed sheep and the displaced orange geometry is gone. This last change still requires commit/final build.
+
+Actual dedicated-server synchronization and client compatibility combinations remain pending. Desktop results do not establish Android/FCL behavior. No final release folder has yet been accepted.
