@@ -1,0 +1,21 @@
+// Full military.5 integration checks; QA classes/resources never enter a normal release build.
+allprojects { afterEvaluate {
+    ['blackwatchTest', 'cityMilitaryTest', 'officersTest', 'garrisonTest', 'terrainTest', 'homeTest', 'identityMilitaryTest'].each {
+        sourceSets.main.java.srcDir('src/' + it + '/java')
+    }
+    sourceSets.main.resources.srcDir('src/blackwatchTest/resources')
+    sourceSets.main.resources.srcDir('src/cityMilitaryTest/resources')
+    def stageMilitary5Run = tasks.register('stageMilitary5Run', Sync) {
+        dependsOn tasks.named('classes')
+        from sourceSets.main.output
+        into layout.buildDirectory.dir('military5-run-mod')
+    }
+    tasks.named('runGameTestServer').configure {
+        dependsOn stageMilitary5Run
+        doFirst { environment 'MOD_CLASSES', 'blacklight%%' + layout.buildDirectory.dir('military5-run-mod').get().asFile.absolutePath }
+    }
+} }
+allprojects {
+    tasks.withType(ProcessResources).configureEach { filteringCharset = 'UTF-8' }
+    tasks.matching { it.name == 'generateModMetadata' }.configureEach { outputs.upToDateWhen { false } }
+}

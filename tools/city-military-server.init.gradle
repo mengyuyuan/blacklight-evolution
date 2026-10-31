@@ -1,0 +1,17 @@
+allprojects { afterEvaluate {
+    sourceSets.main.java.srcDir('src/cityMilitaryTest/java')
+    sourceSets.main.java.exclude '**/CityMilitaryGameTest.java'
+    sourceSets.main.resources.srcDir('src/cityMilitaryTest/resources')
+    neoForge.runs.server.systemProperty 'blacklight.cityMilitaryAudit', 'true'
+    if(project.hasProperty('cityMilitaryAuditDimension')) neoForge.runs.server.systemProperty 'blacklight.cityMilitaryAudit.dimension', project.property('cityMilitaryAuditDimension').toString()
+    def stageCityMilitaryServer = tasks.register('stageCityMilitaryServer', Sync) {
+        dependsOn tasks.named('classes')
+        from sourceSets.main.output
+        into layout.buildDirectory.dir('city-military-server-mod')
+    }
+    tasks.named('runServer').configure {
+        dependsOn stageCityMilitaryServer
+        doFirst { environment 'MOD_CLASSES', 'blacklight%%' + layout.buildDirectory.dir('city-military-server-mod').get().asFile.absolutePath }
+    }
+} }
+allprojects { tasks.withType(ProcessResources).configureEach { filteringCharset = 'UTF-8' }; tasks.matching { it.name == 'generateModMetadata' }.configureEach { outputs.upToDateWhen { false } } }

@@ -51,7 +51,20 @@ public final class BlacklightInfectionSystem {
     /** Eligibility is checked before random exposure/cooldown; players awaken voluntarily. */
     public static boolean canInfect(LivingEntity target) {
         return target != null && !target.isRemoved() && !target.level().isClientSide && target.isAlive()
-                && target instanceof Mob && !(target instanceof com.codex.blacklight.entity.HiveTendril) && !isInfected(target);
+                && target instanceof Mob && !infectionImmune(target) && !(target instanceof com.codex.blacklight.entity.HiveTendril) && !isInfected(target);
+    }
+
+    public static boolean infectionImmune(LivingEntity target){
+        return target instanceof com.codex.blacklight.entity.MilitarySoldier soldier
+                &&soldier.faction()==com.codex.blacklight.military.MilitaryFaction.BLACKWATCH;
+    }
+    /** Migrate still-native saved soldiers before any infection conversion/AI tick. */
+    public static void preserveBlackwatch(LivingEntity target){
+        if(target.level().isClientSide||!infectionImmune(target))return;
+        if(target.hasEffect(ModEffects.BLACKLIGHT_INFECTION))target.removeEffect(ModEffects.BLACKLIGHT_INFECTION);
+        if(ModAttachments.peekData(target,ModAttachments.INFECTION_START,-1L)>=0){
+            target.setData(ModAttachments.INFECTION_START,-1L);target.syncData(ModAttachments.INFECTION_START);
+        }
     }
 
     public static boolean awaken(Player player) {
@@ -70,6 +83,7 @@ public final class BlacklightInfectionSystem {
     }
 
     public static boolean isInfected(LivingEntity entity) {
+        if(infectionImmune(entity))return false;
         if (entity instanceof Player player) {
             return !player.isRemoved() && player.hasData(ModAttachments.PLAYER_STATE)
                     && player.getData(ModAttachments.PLAYER_STATE).isInfected();
@@ -108,6 +122,7 @@ public final class BlacklightInfectionSystem {
 
     @SubscribeEvent
     public static void onInfectedMobTick(EntityTickEvent.Post event) {
+        if(event.getEntity() instanceof LivingEntity immune&&infectionImmune(immune)){preserveBlackwatch(immune);return;}
         if (!(event.getEntity() instanceof Mob mob)
                 || !(mob.level() instanceof ServerLevel serverLevel)
                 || mob.isRemoved() || !mob.isAlive() || mob instanceof com.codex.blacklight.entity.BlacklightCommonInfected || mob instanceof com.codex.blacklight.entity.BlacklightHydra || mob instanceof com.codex.blacklight.entity.HiveTendril || mob instanceof com.codex.blacklight.entity.BlacklightInfectedHost || mob instanceof com.codex.blacklight.entity.BlacklightHunter || mob instanceof com.codex.blacklight.entity.BlacklightMutant || mob instanceof com.codex.blacklight.entity.BlacklightHive || !isInfected(mob)) return;

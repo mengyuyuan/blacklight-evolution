@@ -61,7 +61,7 @@ public class BlacklightWorldGameTest {
         h.assertTrue(!data.running&&!CityPregenerator.hasTicket(world)&&data.cursor==12345&&!data.failure.isEmpty(),"atlas update reused old cursor or ticket");
         CityPregenerator.start(world,1);CityPregenerator.pause(world);h.succeed();
     }
-    @GameTest(template="wall_test",timeoutTicks=600)
+    @GameTest(template="wall_test",timeoutTicks=5600,batch="city_world_roundtrip")
     public static void beaconTravelsToWorldAndReturnsToSavedDimension(GameTestHelper h){
         var origin=h.getLevel();
         var profile=new com.mojang.authlib.GameProfile(java.util.UUID.randomUUID(),"world-travel-qa");
@@ -80,11 +80,38 @@ public class BlacklightWorldGameTest {
         h.assertTrue(CityTravel.travel(player)==1,"beacon request rejected");
         int[] stage={0};boolean[] closed={false};
         var destination=new HydraDestination();
+        var carriers=new java.util.ArrayList<com.codex.blacklight.entity.BlacklightHydra>();
+        Runnable cleanup=()->{
+            if(closed[0])return;closed[0]=true;
+            CityTravel.logout(new net.neoforged.neoforge.event.entity.player.PlayerEvent.PlayerLoggedOutEvent(player));
+            destination.release();for(var hydra:carriers)if(hydra!=null&&!hydra.isRemoved())hydra.discard();
+            if(!player.isRemoved())player.discard();channel.finishAndReleaseAll();
+        };
+        h.testInfo.addListener(new net.minecraft.gametest.framework.GameTestListener(){
+            public void testStructureLoaded(net.minecraft.gametest.framework.GameTestInfo info){}
+            public void testPassed(net.minecraft.gametest.framework.GameTestInfo info,net.minecraft.gametest.framework.GameTestRunner runner){cleanup.run();}
+            public void testFailed(net.minecraft.gametest.framework.GameTestInfo info,net.minecraft.gametest.framework.GameTestRunner runner){
+                com.codex.blacklight.BlacklightNeoMod.LOGGER.warn("World roundtrip fixture failed: stage={} dimension={} position={} removed={} request={} destination={}",
+                    stage[0],player.level().dimension().location(),player.position(),player.isRemoved(),CityTravel.loadingDiagnostics(player),destination.diagnostics());
+                cleanup.run();
+            }
+            public void testAddedForRerun(net.minecraft.gametest.framework.GameTestInfo original,net.minecraft.gametest.framework.GameTestInfo retry,net.minecraft.gametest.framework.GameTestRunner runner){}
+        });
         h.onEachTick(()->{
             if(closed[0])return;
+            // GameTestServer drains ticks without the normal 50ms wait. This
+            // fixture crosses real asynchronous entity storage, so give its
+            // budget the same wall time as a real server. Both actual travel
+            // requests retain the configured 120-second cold-arrival deadline.
+            // A dedicated/integrated server already supplies that clock.
+            if(origin.getServer() instanceof net.minecraft.gametest.framework.GameTestServer)
+                java.util.concurrent.locks.LockSupport.parkNanos(50_000_000L);
             // Exercise the production tick handler; travel is asynchronous since the
             // hydra audit, and must wait for both terrain and entity storage.
             CityTravel.transitLanding(new net.neoforged.neoforge.event.tick.PlayerTickEvent.Post(player));
+            if(stage[0]<2&&CityTravel.loadingDiagnostics(player).equals("idle")
+                    &&(stage[0]==0?!player.serverLevel().dimension().equals(CityTravel.WORLD):player.serverLevel()!=origin))
+                h.fail("the real travel request ended without its expected handoff, stage="+stage[0]+" dimension="+player.level().dimension().location());
             if(stage[0]==0&&player.serverLevel().dimension().equals(CityTravel.WORLD)){
                 h.assertTrue(player.getPersistentData().getCompound("BlacklightCityReturn").getString("dimension").equals(origin.dimension().location().toString()),"return dimension not saved");
                 player.getCooldowns().removeCooldown(CityBlocks.TRANSIT.get());
@@ -95,17 +122,18 @@ public class BlacklightWorldGameTest {
                 stage[0]=2;
             }else if(stage[0]==2&&destination.prepare(origin)){
                 var entrance=com.codex.blacklight.registry.ModEntities.BLACKLIGHT_HYDRA.get().create(origin);
+                carriers.add(entrance);
                 entrance.setBodySize(1.6F);entrance.plant(player.getUUID());entrance.moveTo(player.position());
                 origin.addFreshEntity(entrance);
                 h.assertTrue(CityTravel.transferFromHydra(player,entrance,ground.above(),1.6F),"hydra transfer rejected prepared destination");
                 h.assertTrue(player.serverLevel().dimension().equals(CityTravel.WORLD),"new hydra still routed to legacy Futian");
                 var carrier=HydraTransport.carrier(player);
+                if(carrier!=null)carriers.add(carrier);
                 h.assertTrue(carrier!=null&&carrier.action()==7&&!player.isPassenger(),"arrival animation missing or replaced by riding");
                 h.assertTrue(entrance.link().dimension().equals(CityTravel.WORLD)&&entrance.link().endpoint().equals(carrier.getUUID()),"outbound link not attached to world endpoint");
                 var restored=HydraLink.load(carrier.link().save());
                 h.assertTrue(restored.dimension().equals(origin.dimension())&&restored.endpoint().equals(entrance.getUUID()),"return endpoint lost original identity");
-                carrier.discard();entrance.discard();destination.release();
-                closed[0]=true;player.discard();channel.finishAndReleaseAll();h.succeed();
+                cleanup.run();h.succeed();
             }
         });
     }

@@ -1,0 +1,59 @@
+[
+  {
+    "id": "rifle_round",
+    "name": "步枪弹",
+    "weapons": [
+      "military_rifle",
+      "military_carbine"
+    ],
+    "recipe": "rifle_round"
+  },
+  {
+    "id": "machine_gun_round",
+    "name": "机枪弹",
+    "weapons": [
+      "military_machine_gun"
+    ],
+    "recipe": "machine_gun_round"
+  },
+  {
+    "id": "grenade_round",
+    "name": "破片榴弹",
+    "weapons": [
+      "grenade_launcher"
+    ],
+    "recipe": "grenade_round"
+  },
+  {
+    "id": "rocket_round",
+    "name": "火箭弹",
+    "weapons": [
+      "rocket_launcher"
+    ],
+    "recipe": "rocket_round"
+  },
+  {
+    "id": "missile_round",
+    "name": "导弹",
+    "weapons": [
+      "missile_launcher"
+    ],
+    "recipe": "missile_round"
+  },
+  {
+    "id": "thermobaric_round",
+    "name": "温压榴弹",
+    "weapons": [
+      "thermobaric_launcher"
+    ],
+    "recipe": "thermobaric_round"
+  },
+  {
+    "id": "infection_round",
+    "name": "感染榴弹",
+    "weapons": [
+      "infection_launcher"
+    ],
+    "recipe": "infection_round"
+  }
+]

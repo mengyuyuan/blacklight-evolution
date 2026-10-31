@@ -5,7 +5,7 @@
     "settings": {
       "biome": "blacklight:city",
       "layers": [{"height": 1, "block": "minecraft:bedrock"}],
-      "structure_overrides": [], "lakes": false, "features": false
+      "structure_overrides": ["blacklight:city_military_bases"], "lakes": false, "features": false
     }
   }
 }

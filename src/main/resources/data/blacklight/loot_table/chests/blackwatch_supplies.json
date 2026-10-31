@@ -1,0 +1,27 @@
+{
+  "type": "minecraft:chest",
+  "pools": [
+    {
+      "rolls": 2,
+      "entries": [
+        {"type": "minecraft:item", "name": "minecraft:bread", "weight": 3},
+        {"type": "minecraft:item", "name": "minecraft:cooked_beef", "weight": 2},
+        {"type": "minecraft:item", "name": "minecraft:baked_potato", "weight": 3}
+      ],
+      "functions": [{"function": "minecraft:set_count", "count": {"type": "minecraft:uniform", "min": 2, "max": 4}}]
+    },
+    {
+      "rolls": 1,
+      "entries": [{"type": "minecraft:item", "name": "minecraft:torch"}],
+      "functions": [{"function": "minecraft:set_count", "count": {"type": "minecraft:uniform", "min": 4, "max": 8}}]
+    },
+    {
+      "rolls": 1,
+      "entries": [
+        {"type": "minecraft:item", "name": "minecraft:iron_ingot", "weight": 3},
+        {"type": "minecraft:item", "name": "minecraft:leather", "weight": 2}
+      ],
+      "functions": [{"function": "minecraft:set_count", "count": {"type": "minecraft:uniform", "min": 1, "max": 2}}]
+    }
+  ]
+}

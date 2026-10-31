@@ -67,3 +67,39 @@ jobs:
             build/test-results/**/*.xml
             standalone-passives/build/audit-*/logs/latest.log
             standalone-passives/build/test-results/**/*.xml
+
+  vehicle-audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - name: Select vehicle test Java
+        id: platform
+        shell: bash
+        run: |
+          if grep -q '^minecraft_version=1.21.1' gradle.properties; then
+            echo 'java=21' >> "$GITHUB_OUTPUT"
+          else
+            echo 'java=17' >> "$GITHUB_OUTPUT"
+          fi
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: ${{ steps.platform.outputs.java }}
+      - uses: gradle/actions/setup-gradle@v4
+      - name: Run complete opt-in vehicle regressions
+        shell: bash
+        run: |
+          bash ./gradlew --no-daemon --max-workers=1 -Dorg.gradle.jvmargs=-Xmx1G \
+            -I tools/military6-vehicle.init.gradle -PgameTestMaxHeap=2G \
+            -PgameTestRunDirectory=build/vehicle-closeout-gametest \
+            runGameTestServer 2>&1 | tee vehicle-closeout-server.log
+          grep -Eq 'All [1-9][0-9]* required tests passed' vehicle-closeout-server.log
+      - name: Preserve vehicle evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: closeout-vehicle-server-audit
+          path: |
+            vehicle-closeout-server.log
+            build/vehicle-closeout-gametest/logs/latest.log

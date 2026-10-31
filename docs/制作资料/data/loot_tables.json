@@ -1,0 +1,3432 @@
+[
+  {
+    "platform": "neoforge",
+    "id": "blocks/city_fiber",
+    "source": "src/main/resources/data/blacklight/loot_table/blocks/city_fiber.json",
+    "sha256": "21a507e29c0b6c44bef25970e04d9fab861924a5d502648016dc90481429ea70",
+    "raw": {
+      "type": "minecraft:block",
+      "pools": [
+        {
+          "rolls": 1,
+          "entries": [
+            {
+              "type": "minecraft:item",
+              "name": "blacklight:city_fiber",
+              "functions": []
+            }
+          ],
+          "conditions": [
+            {
+              "condition": "minecraft:survives_explosion"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "platform": "neoforge",
+    "id": "blocks/city_flesh",
+    "source": "src/main/resources/data/blacklight/loot_table/blocks/city_flesh.json",
+    "sha256": "2d55962370b5cd3ffff4e28c09029f1fbbb2a0001b4c453fa70d4f26fc962a0b",
+    "raw": {
+      "type": "minecraft:block",
+      "pools": [
+        {
+          "rolls": 1,
+          "entries": [
+            {
+              "type": "minecraft:item",
+              "name": "blacklight:city_flesh",
+              "functions": []
+            }
+          ],
+          "conditions": [
+            {
+              "condition": "minecraft:survives_explosion"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "platform": "neoforge",
+    "id": "blocks/city_hatch",
+    "source": "src/main/resources/data/blacklight/loot_table/blocks/city_hatch.json",
+    "sha256": "8e357207d8778cfa1073c96bb3a5f637cf990984eb370a22fc4d85f217ba4225",
+    "raw": {
+      "type": "minecraft:block",
+      "pools": [
+        {
+          "rolls": 1,
+          "entries": [
+            {
+              "type": "minecraft:item",
+              "name": "blacklight:city_hatch",
+              "functions": []
+            }
+          ],
+          "conditions": [
+            {
+              "condition": "minecraft:survives_explosion"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "platform": "neoforge",
+    "id": "blocks/city_sac",
+    "source": "src/main/resources/data/blacklight/loot_table/blocks/city_sac.json",
+    "sha256": "efdb97d8393b837e1e57676bb37d1e52849a9dce34df96308dfb3c0bed4c992b",
+    "raw": {
+      "type": "minecraft:block",
+      "pools": [
+        {
+          "rolls": 1,
+          "entries": [
+            {
+              "type": "minecraft:item",
+              "name": "blacklight:city_sac",
+              "functions": []
+            }
+          ],
+          "conditions": [
+            {
+              "condition": "minecraft:survives_explosion"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "platform": "neoforge",
+    "id": "blocks/city_shell",
+    "source": "src/main/resources/data/blacklight/loot_table/blocks/city_shell.json",
+    "sha256": "6720f8b08ce58f81c3ec4da4c754166200406836c1b70f67bac13a990624c121",
+    "raw": {
+      "type": "minecraft:block",
+      "pools": [
+        {
+          "rolls": 1,
+          "entries": [
+            {
+              "type": "minecraft:item",
+              "name": "blacklight:city_shell",
+              "functions": []
+            }
+          ],
+          "conditions": [
+            {
+              "condition": "minecraft:survives_explosion"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "platform": "neoforge",
+    "id": "blocks/city_tissue_layer",
+    "source": "src/main/resources/data/blacklight/loot_table/blocks/city_tissue_layer.json",
+    "sha256": "d3a6a19aba149585e30ef00a98bb56a87bfc71cc2c651a60c1a2d90e2413c16a",
+    "raw": {
+      "type": "minecraft:block",
+      "pools": [
+        {
+          "rolls": 1,
+          "entries": [
+            {
+              "type": "minecraft:item",
+              "name": "blacklight:city_tissue_layer",
+              "functions": [
+                {
+                  "function": "minecraft:set_count",
+                  "count": 2,
+                  "conditions": [
+                    {
+                      "condition": "minecraft:block_state_property",
+                      "block": "blacklight:city_tissue_layer",
+                      "properties": {
+                        "type": "double"
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "conditions": [
+            {
+              "condition": "minecraft:survives_explosion"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "platform": "neoforge",
+    "id": "blocks/city_vein",
+    "source": "src/main/resources/data/blacklight/loot_table/blocks/city_vein.json",
+    "sha256": "ccb9059a365cf3f143f249edf363a22499d54d0bad3f3eb273b2f437a1b90834",
+    "raw": {
+      "type": "minecraft:block",
+      "pools": [
+        {
+          "rolls": 1,
+          "entries": [
+            {
+              "type": "minecraft:item",
+              "name": "blacklight:city_vein",
+              "functions": []
+            }
+          ],
+          "conditions": [
+            {
+              "condition": "minecraft:survives_explosion"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "platform": "neoforge",
+    "id": "blocks/city_wounded",
+    "source": "src/main/resources/data/blacklight/loot_table/blocks/city_wounded.json",
+    "sha256": "25c3ebfd2c413c52c4929072774e282b9b06857d9501b995d6198bd661c56c51",
+    "raw": {
+      "type": "minecraft:block",
+      "pools": [
+        {
+          "rolls": 1,
+          "entries": [
+            {
+              "type": "minecraft:item",
+              "name": "blacklight:city_wounded",
+              "functions": []
+            }
+          ],
+          "conditions": [
+            {
+              "condition": "minecraft:survives_explosion"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "platform": "neoforge",
+    "id": "blocks/command_terminal",
+    "source": "src/main/resources/data/blacklight/loot_table/blocks/command_terminal.json",
+    "sha256": "b68660125e94a26f879ea4735adcb341eacc37bedaaa2af331c1a55290c235cf",
+    "raw": {
+      "type": "minecraft:block",
+      "pools": [
+        {
+          "rolls": 1,
+          "entries": [
+            {
+              "type": "minecraft:item",
+              "name": "blacklight:command_terminal"
+            }
+          ],
+          "conditions": [
+            {
+              "condition": "minecraft:survives_explosion"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "platform": "neoforge",
+    "id": "blocks/communications_antenna",
+    "source": "src/main/resources/data/blacklight/loot_table/blocks/communications_antenna.json",
+    "sha256": "e1f80b1a0b867f2597c190e06710de78a0f3265b6334ba0a71b2f022595c0f8a",
+    "raw": {
+      "type": "minecraft:block",
+      "pools": [
+        {
+          "rolls": 1,
+          "entries": [
+            {
+              "type": "minecraft:item",
+              "name": "blacklight:communications_antenna"
+            }
+          ],
+          "conditions": [
+            {
+              "condition": "minecraft:survives_explosion"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "platform": "neoforge",
+    "id": "blocks/field_barrier",
+    "source": "src/main/resources/data/blacklight/loot_table/blocks/field_barrier.json",
+    "sha256": "6e3cdd545b94b46b037e53a9e154b0e7b1781b1905a0f054bc237f77dd80c2a4",
+    "raw": {
+      "type": "minecraft:block",
+      "pools": [
+        {
+          "rolls": 1,
+          "entries": [
+            {
+              "type": "minecraft:item",
+              "name": "blacklight:field_barrier"
+            }
+          ],
+          "conditions": [
+            {
+              "condition": "minecraft:survives_explosion"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "platform": "neoforge",
+    "id": "blocks/hive_bone",
+    "source": "src/main/resources/data/blacklight/loot_table/blocks/hive_bone.json",
+    "sha256": "8255e490d5163bb50162c5db5d8c8f07153933cdb9e4876ee0e9b6a7a06ef721",
+    "raw": {
+      "type": "minecraft:block",
+      "pools": [
+        {
+          "rolls": 1,
+          "bonus_rolls": 0,
+          "conditions": [
+            {
+              "condition": "minecraft:survives_explosion"
+            }
+          ],
+          "entries": [
+            {
+              "type": "minecraft:item",
+              "name": "blacklight:hive_bone"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "platform": "neoforge",
+    "id": "blocks/hive_carapace",
+    "source": "src/main/resources/data/blacklight/loot_table/blocks/hive_carapace.json",
+    "sha256": "f93537b8844117993782311ba779007168151b8bd7530fa2069a6c974f47b950",
+    "raw": {
+      "type": "minecraft:block",
+      "pools": [
+        {
+          "rolls": 1,
+          "bonus_rolls": 0,
+          "conditions": [
+            {
+              "condition": "minecraft:survives_explosion"
+            }
+          ],
+          "entries": [
+            {
+              "type": "minecraft:item",
+              "name": "blacklight:hive_carapace"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "platform": "neoforge",
+    "id": "blocks/hive_flesh",
+    "source": "src/main/resources/data/blacklight/loot_table/blocks/hive_flesh.json",
+    "sha256": "b454444fbe6e28bedb591816c38685b9982289c202443e2f0a36440a16383227",
+    "raw": {
+      "type": "minecraft:block",
+      "pools": [
+        {
+          "rolls": 1,
+          "bonus_rolls": 0,
+          "conditions": [
+            {
+              "condition": "minecraft:survives_explosion"
+            }
+          ],
+          "entries": [
+            {
+              "type": "minecraft:item",
+              "name": "blacklight:hive_flesh"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "platform": "neoforge",
+    "id": "blocks/hive_membrane",
+    "source": "src/main/resources/data/blacklight/loot_table/blocks/hive_membrane.json",
+    "sha256": "b2517433e98a73c309dba153228fbcf9f025b72a793cdfc46b6c2779f1acba8f",
+    "raw": {
+      "type": "minecraft:block",
+      "pools": [
+        {
+          "rolls": 1,
+          "bonus_rolls": 0,
+          "conditions": [
+            {
+              "condition": "minecraft:survives_explosion"
+            }
+          ],
+          "entries": [
+            {
+              "type": "minecraft:item",
+              "name": "blacklight:hive_membrane"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "platform": "neoforge",
+    "id": "blocks/hive_sac",
+    "source": "src/main/resources/data/blacklight/loot_table/blocks/hive_sac.json",
+    "sha256": "b2f227b981eb4b0977c11d15e6b454846513895c3a7e0732461ef456166a96c9",
+    "raw": {
+      "type": "minecraft:block",
+      "pools": [
+        {
+          "rolls": 1,
+          "bonus_rolls": 0,
+          "conditions": [
+            {
+              "condition": "minecraft:survives_explosion"
+            }
+          ],
+          "entries": [
+            {
+              "type": "minecraft:item",
+              "name": "blacklight:hive_sac"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "platform": "neoforge",
+    "id": "blocks/hive_vein",
+    "source": "src/main/resources/data/blacklight/loot_table/blocks/hive_vein.json",
+    "sha256": "a9f2d6fe3b40c96810da08b71259c5e663fb71056546f279d8706acd707211c6",
+    "raw": {
+      "type": "minecraft:block",
+      "pools": [
+        {
+          "rolls": 1,
+          "bonus_rolls": 0,
+          "conditions": [
+            {
+              "condition": "minecraft:survives_explosion"
+            }
+          ],
+          "entries": [
+            {
+              "type": "minecraft:item",
+              "name": "blacklight:hive_vein"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "platform": "neoforge",
+    "id": "blocks/infected_soil",
+    "source": "src/main/resources/data/blacklight/loot_table/blocks/infected_soil.json",
+    "sha256": "2d63935af3432ef6c74ecd209a1f8080f746f0b358d77351c105e92d6e6ff00d",
+    "raw": {
+      "type": "minecraft:block",
+      "pools": [
+        {
+          "rolls": 1,
+          "bonus_rolls": 0,
+          "conditions": [
+            {
+              "condition": "minecraft:survives_explosion"
+            }
+          ],
+          "entries": [
+            {
+              "type": "minecraft:item",
+              "name": "blacklight:infected_soil"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "platform": "neoforge",
+    "id": "blocks/infected_stone",
+    "source": "src/main/resources/data/blacklight/loot_table/blocks/infected_stone.json",
+    "sha256": "3437994f73cff558f500cc9434aa3deee6cec934a371b83c06f10a9f506b1287",
+    "raw": {
+      "type": "minecraft:block",
+      "pools": [
+        {
+          "rolls": 1,
+          "bonus_rolls": 0,
+          "conditions": [
+            {
+              "condition": "minecraft:survives_explosion"
+            }
+          ],
+          "entries": [
+            {
+              "type": "minecraft:item",
+              "name": "blacklight:infected_stone"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "platform": "neoforge",
+    "id": "blocks/military_crate",
+    "source": "src/main/resources/data/blacklight/loot_table/blocks/military_crate.json",
+    "sha256": "5b8a42fa6b607a3f48e3280155bdf0a109c809362523eba90c10c7175b48d7cf",
+    "raw": {
+      "type": "minecraft:block",
+      "pools": [
+        {
+          "rolls": 1,
+          "entries": [
+            {
+              "type": "minecraft:item",
+              "name": "blacklight:military_crate"
+            }
+          ],
+          "conditions": [
+            {
+              "condition": "minecraft:survives_explosion"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "platform": "neoforge",
+    "id": "blocks/military_searchlight",
+    "source": "src/main/resources/data/blacklight/loot_table/blocks/military_searchlight.json",
+    "sha256": "06fc30323f27f9b298f34360485aad2711e765f244e666b09653bc4aaf71699b",
+    "raw": {
+      "type": "minecraft:block",
+      "pools": [
+        {
+          "rolls": 1,
+          "entries": [
+            {
+              "type": "minecraft:item",
+              "name": "blacklight:military_searchlight"
+            }
+          ],
+          "conditions": [
+            {
+              "condition": "minecraft:survives_explosion"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "platform": "neoforge",
+    "id": "blocks/nutrient_node",
+    "source": "src/main/resources/data/blacklight/loot_table/blocks/nutrient_node.json",
+    "sha256": "6860caad235e4d19f2b9c84dd88c2d05c702402dcd04cc2a91bf820588337fbe",
+    "raw": {
+      "type": "minecraft:block",
+      "pools": [
+        {
+          "rolls": 1,
+          "bonus_rolls": 0,
+          "conditions": [
+            {
+              "condition": "minecraft:survives_explosion"
+            }
+          ],
+          "entries": [
+            {
+              "type": "minecraft:item",
+              "name": "blacklight:nutrient_node"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "platform": "neoforge",
+    "id": "blocks/sandbag_cover",
+    "source": "src/main/resources/data/blacklight/loot_table/blocks/sandbag_cover.json",
+    "sha256": "4af6e113be7a1d7d2087b33352320ae9d3a188c64903ad4eff948662aca61ac1",
+    "raw": {
+      "type": "minecraft:block",
+      "pools": [
+        {
+          "rolls": 1,
+          "entries": [
+            {
+              "type": "minecraft:item",
+              "name": "blacklight:sandbag_cover"
+            }
+          ],
+          "conditions": [
+            {
+              "condition": "minecraft:survives_explosion"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "platform": "neoforge",
+    "id": "blocks/tissue_fiber",
+    "source": "src/main/resources/data/blacklight/loot_table/blocks/tissue_fiber.json",
+    "sha256": "92ea0e643ecd59cb5b336070f8d909297dc8d2b5f9a125bcd6ce2ce7a48f9b4e",
+    "raw": {
+      "type": "minecraft:block",
+      "pools": [
+        {
+          "rolls": 1,
+          "bonus_rolls": 0,
+          "conditions": [
+            {
+              "condition": "minecraft:survives_explosion"
+            }
+          ],
+          "entries": [
+            {
+              "type": "minecraft:item",
+              "name": "blacklight:tissue_fiber"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "platform": "neoforge",
+    "id": "chests/base_ammunition",
+    "source": "src/main/resources/data/blacklight/loot_table/chests/base_ammunition.json",
+    "sha256": "4139a089af8abb89d24141f39207336b58dd24a86c853ed1d963b3c86d691e82",
+    "raw": {
+      "type": "minecraft:chest",
+      "pools": [
+        {
+          "rolls": 1,
+          "entries": [
+            {
+              "type": "minecraft:item",
+              "name": "blacklight:rifle_round",
+              "functions": [
+                {
+                  "function": "minecraft:set_count",
+                  "count": {
+                    "min": 24,
+                    "max": 48
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "rolls": 1,
+          "entries": [
+            {
+              "type": "minecraft:item",
+              "name": "blacklight:machine_gun_round",
+              "functions": [
+                {
+                  "function": "minecraft:set_count",
+                  "count": {
+                    "min": 24,
+                    "max": 48
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "rolls": 1,
+          "entries": [
+            {
+              "type": "minecraft:item",
+              "name": "blacklight:grenade_round",
+              "functions": [
+                {
+                  "function": "minecraft:set_count",
+                  "count": {
+                    "min": 4,
+                    "max": 8
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "rolls": 1,
+          "entries": [
+            {
+              "type": "minecraft:item",
+              "name": "blacklight:rocket_round",
+              "functions": [
+                {
+                  "function": "minecraft:set_count",
+                  "count": {
+                    "min": 1,
+                    "max": 3
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "rolls": 1,
+          "entries": [
+            {
+              "type": "minecraft:item",
+              "name": "blacklight:missile_round",
+              "functions": [
+                {
+                  "function": "minecraft:set_count",
+                  "count": {
+                    "min": 1,
+                    "max": 2
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "rolls": 1,
+          "entries": [
+            {
+              "type": "minecraft:item",
+              "name": "blacklight:thermobaric_round",
+              "functions": [
+                {
+                  "function": "minecraft:set_count",
+                  "count": {
+                    "min": 1,
+                    "max": 2
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "rolls": 1,
+          "entries": [
+            {
+              "type": "minecraft:item",
+              "name": "blacklight:infection_round",
+              "functions": [
+                {
+                  "function": "minecraft:set_count",
+                  "count": {
+                    "min": 1,
+                    "max": 2
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "platform": "neoforge",
+    "id": "chests/base_armory",
+    "source": "src/main/resources/data/blacklight/loot_table/chests/base_armory.json",
+    "sha256": "b479e1fd477da297d3bda526066adba11091ee415987d2d557424bb30c1e9583",
+    "raw": {
+      "type": "minecraft:chest",
+      "pools": [
+        {
+          "rolls": 2,
+          "entries": [
+            {
+              "type": "minecraft:item",
+              "name": "blacklight:military_rifle",
+              "functions": [
+                {
+                  "function": "minecraft:set_count",
+                  "count": 1
+                }
+              ]
+            },
+            {
+              "type": "minecraft:item",
+              "name": "blacklight:military_carbine",
+              "functions": [
+                {
+                  "function": "minecraft:set_count",
+                  "count": 1
+                }
+              ]
+            },
+            {
+              "type": "minecraft:item",
+              "name": "blacklight:military_machine_gun",
+              "functions": [
+                {
+                  "function": "minecraft:set_count",
+                  "count": 1
+                }
+              ]
+            },
+            {
+              "type": "minecraft:item",
+              "name": "blacklight:grenade_launcher",
+              "functions": [
+                {
+                  "function": "minecraft:set_count",
+                  "count": 1
+                }
+              ]
+            },
+            {
+              "type": "minecraft:item",
+              "name": "blacklight:rocket_launcher",
+              "functions": [
+                {
+                  "function": "minecraft:set_count",
+                  "count": 1
+                }
+              ]
+            },
+            {
+              "type": "minecraft:item",
+              "name": "blacklight:missile_launcher",
+              "functions": [
+                {
+                  "function": "minecraft:set_count",
+                  "count": 1
+                }
+              ]
+            },
+            {
+              "type": "minecraft:item",
+              "name": "blacklight:thermobaric_launcher",
+              "functions": [
+                {
+                  "function": "minecraft:set_count",
+                  "count": 1
+                }
+              ]
+            },
+            {
+              "type": "minecraft:item",
+              "name": "blacklight:infection_launcher",
+              "functions": [
+                {
+                  "function": "minecraft:set_count",
+                  "count": 1
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "platform": "neoforge",
+    "id": "chests/base_medical",
+    "source": "src/main/resources/data/blacklight/loot_table/chests/base_medical.json",
+    "sha256": "86b8bbcda9f0985fee7c1ed287fe1f1b80428ebd105b18138f144be1ab0e43e5",
+    "raw": {
+      "type": "minecraft:chest",
+      "pools": [
+        {
+          "rolls": 1,
+          "entries": [
+            {
+              "type": "minecraft:item",
+              "name": "minecraft:golden_apple",
+              "functions": [
+                {
+                  "function": "minecraft:set_count",
+                  "count": {
+                    "min": 1,
+                    "max": 2
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "rolls": 1,
+          "entries": [
+            {
+              "type": "minecraft:item",
+              "name": "minecraft:cooked_beef",
+              "functions": [
+                {
+                  "function": "minecraft:set_count",
+                  "count": {
+                    "min": 4,
+                    "max": 8
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "platform": "neoforge",
+    "id": "chests/base_supplies",
+    "source": "src/main/resources/data/blacklight/loot_table/chests/base_supplies.json",
+    "sha256": "81b0b31d01d8f63b0528a4821ec52413fb789668733fbb95657cebc61224150b",
+    "raw": {
+      "type": "minecraft:chest",
+      "pools": [
+        {
+          "rolls": 1,
+          "entries": [
+            {
+              "type": "minecraft:item",
+              "name": "minecraft:bread",
+              "functions": [
+                {
+                  "function": "minecraft:set_count",
+                  "count": {
+                    "min": 6,
+                    "max": 12
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "rolls": 1,
+          "entries": [
+            {
+              "type": "minecraft:item",
+              "name": "minecraft:iron_ingot",
+              "functions": [
+                {
+                  "function": "minecraft:set_count",
+                  "count": {
+                    "min": 3,
+                    "max": 6
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "rolls": 1,
+          "entries": [
+            {
+              "type": "minecraft:item",
+              "name": "minecraft:torch",
+              "functions": [
+                {
+                  "function": "minecraft:set_count",
+                  "count": {
+                    "min": 8,
+                    "max": 16
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "platform": "neoforge",
+    "id": "chests/blackwatch_supplies",
+    "source": "src/main/resources/data/blacklight/loot_table/chests/blackwatch_supplies.json",
+    "sha256": "8ac66029855b4a48762240e2a0257840b95e4ea4a6383676f2eb723b5a1a23aa",
+    "raw": {
+      "type": "minecraft:chest",
+      "pools": [
+        {
+          "rolls": 2,
+          "entries": [
+            {
+              "type": "minecraft:item",
+              "name": "minecraft:bread",
+              "weight": 3
+            },
+            {
+              "type": "minecraft:item",
+              "name": "minecraft:cooked_beef",
+              "weight": 2
+            },
+            {
+              "type": "minecraft:item",
+              "name": "minecraft:baked_potato",
+              "weight": 3
+            }
+          ],
+          "functions": [
+            {
+              "function": "minecraft:set_count",
+              "count": {
+                "type": "minecraft:uniform",
+                "min": 2,
+                "max": 4
+              }
+            }
+          ]
+        },
+        {
+          "rolls": 1,
+          "entries": [
+            {
+              "type": "minecraft:item",
+              "name": "minecraft:torch"
+            }
+          ],
+          "functions": [
+            {
+              "function": "minecraft:set_count",
+              "count": {
+                "type": "minecraft:uniform",
+                "min": 4,
+                "max": 8
+              }
+            }
+          ]
+        },
+        {
+          "rolls": 1,
+          "entries": [
+            {
+              "type": "minecraft:item",
+              "name": "minecraft:iron_ingot",
+              "weight": 3
+            },
+            {
+              "type": "minecraft:item",
+              "name": "minecraft:leather",
+              "weight": 2
+            }
+          ],
+          "functions": [
+            {
+              "function": "minecraft:set_count",
+              "count": {
+                "type": "minecraft:uniform",
+                "min": 1,
+                "max": 2
+              }
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "platform": "neoforge",
+    "id": "chests/blackwatch_technology",
+    "source": "src/main/resources/data/blacklight/loot_table/chests/blackwatch_technology.json",
+    "sha256": "bdd50a52ae8f0e3b42f42f753b7b5ed0e0689608a8af49a4a2416571d0b47cff",
+    "raw": {
+      "type": "minecraft:chest",
+      "pools": [
+        {
+          "rolls": 1,
+          "entries": [
+            {
+              "type": "minecraft:item",
+              "name": "blacklight:military_circuit",
+              "functions": [
+                {
+                  "function": "minecraft:set_count",
+                  "count": {
+                    "type": "minecraft:uniform",
+                    "min": 3,
+                    "max": 6
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "rolls": 2,
+          "entries": [
+            {
+              "type": "minecraft:item",
+              "name": "minecraft:iron_ingot",
+              "weight": 3
+            },
+            {
+              "type": "minecraft:item",
+              "name": "minecraft:redstone",
+              "weight": 3
+            },
+            {
+              "type": "minecraft:item",
+              "name": "minecraft:gold_ingot",
+              "weight": 1
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "platform": "neoforge",
+    "id": "chests/military_ammunition",
+    "source": "src/main/resources/data/blacklight/loot_table/chests/military_ammunition.json",
+    "sha256": "de5e6bd4a8dde2cfbe1ca14f3222507778ac7211ff76dc0d9482ecf7f383e56c",
+    "raw": {
+      "type": "minecraft:chest",
+      "pools": [
+        {
+          "rolls": 3,
+          "entries": [
+            {
+              "type": "minecraft:item",
+              "name": "blacklight:rifle_round",
+              "functions": [
+                {
+                  "function": "minecraft:set_count",
+                  "count": {
+                    "min": 4,
+                    "max": 12
+                  }
+                }
+              ]
+            },
+            {
+              "type": "minecraft:item",
+              "name": "blacklight:machine_gun_round",
+              "functions": [
+                {
+                  "function": "minecraft:set_count",
+                  "count": {
+                    "min": 4,
+                    "max": 12
+                  }
+                }
+              ]
+            },
+            {
+              "type": "minecraft:item",
+              "name": "blacklight:grenade_round",
+              "functions": [
+                {
+                  "function": "minecraft:set_count",
+                  "count": {
+                    "min": 1,
+                    "max": 2
+                  }
+                }
+              ]
+            },
+            {
+              "type": "minecraft:item",
+              "name": "blacklight:rocket_round",
+              "functions": [
+                {
+                  "function": "minecraft:set_count",
+                  "count": {
+                    "min": 1,
+                    "max": 2
+                  }
+                }
+              ]
+            },
+            {
+              "type": "minecraft:item",
+              "name": "blacklight:missile_round",
+              "functions": [
+                {
+                  "function": "minecraft:set_count",
+                  "count": {
+                    "min": 1,
+                    "max": 2
+                  }
+                }
+              ]
+            },
+            {
+              "type": "minecraft:item",
+              "name": "blacklight:thermobaric_round",
+              "functions": [
+                {
+                  "function": "minecraft:set_count",
+                  "count": {
+                    "min": 1,
+                    "max": 2
+                  }
+                }
+              ]
+            },
+            {
+              "type": "minecraft:item",
+              "name": "blacklight:infection_round",
+              "functions": [
+                {
+                  "function": "minecraft:set_count",
+                  "count": {
+                    "min": 1,
+                    "max": 2
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "platform": "neoforge",
+    "id": "chests/research_samples",
+    "source": "src/main/resources/data/blacklight/loot_table/chests/research_samples.json",
+    "sha256": "46eb43630ade686702aab1ea2044601c5f6e1d4a0ab929bbd07cbb70cf3dd9ce",
+    "raw": {
+      "type": "minecraft:chest",
+      "pools": [
+        {
+          "rolls": 1,
+          "entries": [
+            {
+              "type": "minecraft:item",
+              "name": "blacklight:blacklight_sample",
+              "functions": [
+                {
+                  "function": "minecraft:set_count",
+                  "count": 3
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "platform": "neoforge",
+    "id": "chests/research_supplies",
+    "source": "src/main/resources/data/blacklight/loot_table/chests/research_supplies.json",
+    "sha256": "a45e7ff118fc6b1ca82dbbd98d11e8723814ab5513caf07de012804b89a1db66",
+    "raw": {
+      "type": "minecraft:chest",
+      "pools": [
+        {
+          "rolls": 1,
+          "entries": [
+            {
+              "type": "minecraft:item",
+              "name": "minecraft:iron_sword"
+            }
+          ]
+        },
+        {
+          "rolls": 1,
+          "entries": [
+            {
+              "type": "minecraft:item",
+              "name": "minecraft:bread",
+              "functions": [
+                {
+                  "function": "minecraft:set_count",
+                  "count": 6
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "rolls": 1,
+          "entries": [
+            {
+              "type": "minecraft:item",
+              "name": "minecraft:torch",
+              "functions": [
+                {
+                  "function": "minecraft:set_count",
+                  "count": 12
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "platform": "neoforge",
+    "id": "entities/blacklight_brute",
+    "source": "src/main/resources/data/blacklight/loot_table/entities/blacklight_brute.json",
+    "sha256": "e08386d61c1c4e6492b320451d2feb06457041146ba69d6310d0082d3066fefc",
+    "raw": {
+      "type": "minecraft:entity",
+      "pools": [
+        {
+          "rolls": 1,
+          "entries": [
+            {
+              "type": "minecraft:item",
+              "name": "minecraft:rotten_flesh",
+              "functions": [
+                {
+                  "function": "minecraft:set_count",
+                  "count": {
+                    "type": "minecraft:uniform",
+                    "min": 1,
+                    "max": 3
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "platform": "neoforge",
+    "id": "entities/blacklight_hive",
+    "source": "src/main/resources/data/blacklight/loot_table/entities/blacklight_hive.json",
+    "sha256": "1d069904c7e397aaec0e42ffccdacc8bd0694200dfab2fecf84adf09c514cc9d",
+    "raw": {
+      "type": "minecraft:entity",
+      "pools": []
+    }
+  },
+  {
+    "platform": "neoforge",
+    "id": "entities/blacklight_hunter",
+    "source": "src/main/resources/data/blacklight/loot_table/entities/blacklight_hunter.json",
+    "sha256": "b53dbc374579664e54b85367dbf73ce0c5afdb00252295c6b198af97b3bdf4b5",
+    "raw": {
+      "type": "minecraft:entity",
+      "pools": []
+    }
+  },
+  {
+    "platform": "neoforge",
+    "id": "entities/blacklight_spitter",
+    "source": "src/main/resources/data/blacklight/loot_table/entities/blacklight_spitter.json",
+    "sha256": "e08386d61c1c4e6492b320451d2feb06457041146ba69d6310d0082d3066fefc",
+    "raw": {
+      "type": "minecraft:entity",
+      "pools": [
+        {
+          "rolls": 1,
+          "entries": [
+            {
+              "type": "minecraft:item",
+              "name": "minecraft:rotten_flesh",
+              "functions": [
+                {
+                  "function": "minecraft:set_count",
+                  "count": {
+                    "type": "minecraft:uniform",
+                    "min": 1,
+                    "max": 3
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "platform": "neoforge",
+    "id": "entities/blacklight_stalker",
+    "source": "src/main/resources/data/blacklight/loot_table/entities/blacklight_stalker.json",
+    "sha256": "e08386d61c1c4e6492b320451d2feb06457041146ba69d6310d0082d3066fefc",
+    "raw": {
+      "type": "minecraft:entity",
+      "pools": [
+        {
+          "rolls": 1,
+          "entries": [
+            {
+              "type": "minecraft:item",
+              "name": "minecraft:rotten_flesh",
+              "functions": [
+                {
+                  "function": "minecraft:set_count",
+                  "count": {
+                    "type": "minecraft:uniform",
+                    "min": 1,
+                    "max": 3
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "platform": "neoforge",
+    "id": "entities/blackwatch_commander",
+    "source": "src/main/resources/data/blacklight/loot_table/entities/blackwatch_commander.json",
+    "sha256": "26aa2da3930bcfb27ff08540d77c01607d28ddcef06be4813bfc676569d56a4b",
+    "raw": {
+      "type": "minecraft:entity",
+      "pools": [
+        {
+          "rolls": 1,
+          "conditions": [
+            {
+              "condition": "minecraft:killed_by_player"
+            }
+          ],
+          "entries": [
+            {
+              "type": "minecraft:item",
+              "name": "blacklight:military_circuit",
+              "functions": [
+                {
+                  "function": "minecraft:set_count",
+                  "count": 1
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "platform": "neoforge",
+    "id": "entities/blackwatch_heavy",
+    "source": "src/main/resources/data/blacklight/loot_table/entities/blackwatch_heavy.json",
+    "sha256": "66327f35a32e2d731dd4601eef1debc14df4173ecd5fc6ee380f144ca04b9d38",
+    "raw": {
+      "type": "minecraft:entity",
+      "pools": [
+        {
+          "rolls": 1,
+          "conditions": [
+            {
+              "condition": "minecraft:killed_by_player"
+            }
+          ],
+          "entries": [
+            {
+              "type": "minecraft:item",
+              "name": "blacklight:military_circuit",
+              "functions": [
+                {
+                  "function": "minecraft:set_count",
+                  "count": 2
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "platform": "neoforge",
+    "id": "entities/blackwatch_officer",
+    "source": "src/main/resources/data/blacklight/loot_table/entities/blackwatch_officer.json",
+    "sha256": "26aa2da3930bcfb27ff08540d77c01607d28ddcef06be4813bfc676569d56a4b",
+    "raw": {
+      "type": "minecraft:entity",
+      "pools": [
+        {
+          "rolls": 1,
+          "conditions": [
+            {
+              "condition": "minecraft:killed_by_player"
+            }
+          ],
+          "entries": [
+            {
+              "type": "minecraft:item",
+              "name": "blacklight:military_circuit",
+              "functions": [
+                {
+                  "function": "minecraft:set_count",
+                  "count": 1
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "platform": "neoforge",
+    "id": "entities/blackwatch_soldier",
+    "source": "src/main/resources/data/blacklight/loot_table/entities/blackwatch_soldier.json",
+    "sha256": "26aa2da3930bcfb27ff08540d77c01607d28ddcef06be4813bfc676569d56a4b",
+    "raw": {
+      "type": "minecraft:entity",
+      "pools": [
+        {
+          "rolls": 1,
+          "conditions": [
+            {
+              "condition": "minecraft:killed_by_player"
+            }
+          ],
+          "entries": [
+            {
+              "type": "minecraft:item",
+              "name": "blacklight:military_circuit",
+              "functions": [
+                {
+                  "function": "minecraft:set_count",
+                  "count": 1
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "platform": "neoforge",
+    "id": "entities/blackwatch_team_leader",
+    "source": "src/main/resources/data/blacklight/loot_table/entities/blackwatch_team_leader.json",
+    "sha256": "26aa2da3930bcfb27ff08540d77c01607d28ddcef06be4813bfc676569d56a4b",
+    "raw": {
+      "type": "minecraft:entity",
+      "pools": [
+        {
+          "rolls": 1,
+          "conditions": [
+            {
+              "condition": "minecraft:killed_by_player"
+            }
+          ],
+          "entries": [
+            {
+              "type": "minecraft:item",
+              "name": "blacklight:military_circuit",
+              "functions": [
+                {
+                  "function": "minecraft:set_count",
+                  "count": 1
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "platform": "neoforge",
+    "id": "entities/military_commander",
+    "source": "src/main/resources/data/blacklight/loot_table/entities/military_commander.json",
+    "sha256": "26aa2da3930bcfb27ff08540d77c01607d28ddcef06be4813bfc676569d56a4b",
+    "raw": {
+      "type": "minecraft:entity",
+      "pools": [
+        {
+          "rolls": 1,
+          "conditions": [
+            {
+              "condition": "minecraft:killed_by_player"
+            }
+          ],
+          "entries": [
+            {
+              "type": "minecraft:item",
+              "name": "blacklight:military_circuit",
+              "functions": [
+                {
+                  "function": "minecraft:set_count",
+                  "count": 1
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "platform": "neoforge",
+    "id": "entities/military_heavy",
+    "source": "src/main/resources/data/blacklight/loot_table/entities/military_heavy.json",
+    "sha256": "66327f35a32e2d731dd4601eef1debc14df4173ecd5fc6ee380f144ca04b9d38",
+    "raw": {
+      "type": "minecraft:entity",
+      "pools": [
+        {
+          "rolls": 1,
+          "conditions": [
+            {
+              "condition": "minecraft:killed_by_player"
+            }
+          ],
+          "entries": [
+            {
+              "type": "minecraft:item",
+              "name": "blacklight:military_circuit",
+              "functions": [
+                {
+                  "function": "minecraft:set_count",
+                  "count": 2
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "platform": "neoforge",
+    "id": "entities/military_officer",
+    "source": "src/main/resources/data/blacklight/loot_table/entities/military_officer.json",
+    "sha256": "26aa2da3930bcfb27ff08540d77c01607d28ddcef06be4813bfc676569d56a4b",
+    "raw": {
+      "type": "minecraft:entity",
+      "pools": [
+        {
+          "rolls": 1,
+          "conditions": [
+            {
+              "condition": "minecraft:killed_by_player"
+            }
+          ],
+          "entries": [
+            {
+              "type": "minecraft:item",
+              "name": "blacklight:military_circuit",
+              "functions": [
+                {
+                  "function": "minecraft:set_count",
+                  "count": 1
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "platform": "neoforge",
+    "id": "entities/military_soldier",
+    "source": "src/main/resources/data/blacklight/loot_table/entities/military_soldier.json",
+    "sha256": "26aa2da3930bcfb27ff08540d77c01607d28ddcef06be4813bfc676569d56a4b",
+    "raw": {
+      "type": "minecraft:entity",
+      "pools": [
+        {
+          "rolls": 1,
+          "conditions": [
+            {
+              "condition": "minecraft:killed_by_player"
+            }
+          ],
+          "entries": [
+            {
+              "type": "minecraft:item",
+              "name": "blacklight:military_circuit",
+              "functions": [
+                {
+                  "function": "minecraft:set_count",
+                  "count": 1
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "platform": "neoforge",
+    "id": "entities/military_team_leader",
+    "source": "src/main/resources/data/blacklight/loot_table/entities/military_team_leader.json",
+    "sha256": "26aa2da3930bcfb27ff08540d77c01607d28ddcef06be4813bfc676569d56a4b",
+    "raw": {
+      "type": "minecraft:entity",
+      "pools": [
+        {
+          "rolls": 1,
+          "conditions": [
+            {
+              "condition": "minecraft:killed_by_player"
+            }
+          ],
+          "entries": [
+            {
+              "type": "minecraft:item",
+              "name": "blacklight:military_circuit",
+              "functions": [
+                {
+                  "function": "minecraft:set_count",
+                  "count": 1
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "platform": "forge",
+    "id": "blocks/city_fiber",
+    "source": "src/main/resources/data/blacklight/loot_tables/blocks/city_fiber.json",
+    "sha256": "21a507e29c0b6c44bef25970e04d9fab861924a5d502648016dc90481429ea70",
+    "raw": {
+      "type": "minecraft:block",
+      "pools": [
+        {
+          "rolls": 1,
+          "entries": [
+            {
+              "type": "minecraft:item",
+              "name": "blacklight:city_fiber",
+              "functions": []
+            }
+          ],
+          "conditions": [
+            {
+              "condition": "minecraft:survives_explosion"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "platform": "forge",
+    "id": "blocks/city_flesh",
+    "source": "src/main/resources/data/blacklight/loot_tables/blocks/city_flesh.json",
+    "sha256": "2d55962370b5cd3ffff4e28c09029f1fbbb2a0001b4c453fa70d4f26fc962a0b",
+    "raw": {
+      "type": "minecraft:block",
+      "pools": [
+        {
+          "rolls": 1,
+          "entries": [
+            {
+              "type": "minecraft:item",
+              "name": "blacklight:city_flesh",
+              "functions": []
+            }
+          ],
+          "conditions": [
+            {
+              "condition": "minecraft:survives_explosion"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "platform": "forge",
+    "id": "blocks/city_hatch",
+    "source": "src/main/resources/data/blacklight/loot_tables/blocks/city_hatch.json",
+    "sha256": "8e357207d8778cfa1073c96bb3a5f637cf990984eb370a22fc4d85f217ba4225",
+    "raw": {
+      "type": "minecraft:block",
+      "pools": [
+        {
+          "rolls": 1,
+          "entries": [
+            {
+              "type": "minecraft:item",
+              "name": "blacklight:city_hatch",
+              "functions": []
+            }
+          ],
+          "conditions": [
+            {
+              "condition": "minecraft:survives_explosion"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "platform": "forge",
+    "id": "blocks/city_sac",
+    "source": "src/main/resources/data/blacklight/loot_tables/blocks/city_sac.json",
+    "sha256": "efdb97d8393b837e1e57676bb37d1e52849a9dce34df96308dfb3c0bed4c992b",
+    "raw": {
+      "type": "minecraft:block",
+      "pools": [
+        {
+          "rolls": 1,
+          "entries": [
+            {
+              "type": "minecraft:item",
+              "name": "blacklight:city_sac",
+              "functions": []
+            }
+          ],
+          "conditions": [
+            {
+              "condition": "minecraft:survives_explosion"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "platform": "forge",
+    "id": "blocks/city_shell",
+    "source": "src/main/resources/data/blacklight/loot_tables/blocks/city_shell.json",
+    "sha256": "6720f8b08ce58f81c3ec4da4c754166200406836c1b70f67bac13a990624c121",
+    "raw": {
+      "type": "minecraft:block",
+      "pools": [
+        {
+          "rolls": 1,
+          "entries": [
+            {
+              "type": "minecraft:item",
+              "name": "blacklight:city_shell",
+              "functions": []
+            }
+          ],
+          "conditions": [
+            {
+              "condition": "minecraft:survives_explosion"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "platform": "forge",
+    "id": "blocks/city_tissue_layer",
+    "source": "src/main/resources/data/blacklight/loot_tables/blocks/city_tissue_layer.json",
+    "sha256": "d3a6a19aba149585e30ef00a98bb56a87bfc71cc2c651a60c1a2d90e2413c16a",
+    "raw": {
+      "type": "minecraft:block",
+      "pools": [
+        {
+          "rolls": 1,
+          "entries": [
+            {
+              "type": "minecraft:item",
+              "name": "blacklight:city_tissue_layer",
+              "functions": [
+                {
+                  "function": "minecraft:set_count",
+                  "count": 2,
+                  "conditions": [
+                    {
+                      "condition": "minecraft:block_state_property",
+                      "block": "blacklight:city_tissue_layer",
+                      "properties": {
+                        "type": "double"
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "conditions": [
+            {
+              "condition": "minecraft:survives_explosion"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "platform": "forge",
+    "id": "blocks/city_vein",
+    "source": "src/main/resources/data/blacklight/loot_tables/blocks/city_vein.json",
+    "sha256": "ccb9059a365cf3f143f249edf363a22499d54d0bad3f3eb273b2f437a1b90834",
+    "raw": {
+      "type": "minecraft:block",
+      "pools": [
+        {
+          "rolls": 1,
+          "entries": [
+            {
+              "type": "minecraft:item",
+              "name": "blacklight:city_vein",
+              "functions": []
+            }
+          ],
+          "conditions": [
+            {
+              "condition": "minecraft:survives_explosion"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "platform": "forge",
+    "id": "blocks/city_wounded",
+    "source": "src/main/resources/data/blacklight/loot_tables/blocks/city_wounded.json",
+    "sha256": "25c3ebfd2c413c52c4929072774e282b9b06857d9501b995d6198bd661c56c51",
+    "raw": {
+      "type": "minecraft:block",
+      "pools": [
+        {
+          "rolls": 1,
+          "entries": [
+            {
+              "type": "minecraft:item",
+              "name": "blacklight:city_wounded",
+              "functions": []
+            }
+          ],
+          "conditions": [
+            {
+              "condition": "minecraft:survives_explosion"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "platform": "forge",
+    "id": "blocks/command_terminal",
+    "source": "src/main/resources/data/blacklight/loot_tables/blocks/command_terminal.json",
+    "sha256": "b68660125e94a26f879ea4735adcb341eacc37bedaaa2af331c1a55290c235cf",
+    "raw": {
+      "type": "minecraft:block",
+      "pools": [
+        {
+          "rolls": 1,
+          "entries": [
+            {
+              "type": "minecraft:item",
+              "name": "blacklight:command_terminal"
+            }
+          ],
+          "conditions": [
+            {
+              "condition": "minecraft:survives_explosion"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "platform": "forge",
+    "id": "blocks/communications_antenna",
+    "source": "src/main/resources/data/blacklight/loot_tables/blocks/communications_antenna.json",
+    "sha256": "e1f80b1a0b867f2597c190e06710de78a0f3265b6334ba0a71b2f022595c0f8a",
+    "raw": {
+      "type": "minecraft:block",
+      "pools": [
+        {
+          "rolls": 1,
+          "entries": [
+            {
+              "type": "minecraft:item",
+              "name": "blacklight:communications_antenna"
+            }
+          ],
+          "conditions": [
+            {
+              "condition": "minecraft:survives_explosion"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "platform": "forge",
+    "id": "blocks/field_barrier",
+    "source": "src/main/resources/data/blacklight/loot_tables/blocks/field_barrier.json",
+    "sha256": "6e3cdd545b94b46b037e53a9e154b0e7b1781b1905a0f054bc237f77dd80c2a4",
+    "raw": {
+      "type": "minecraft:block",
+      "pools": [
+        {
+          "rolls": 1,
+          "entries": [
+            {
+              "type": "minecraft:item",
+              "name": "blacklight:field_barrier"
+            }
+          ],
+          "conditions": [
+            {
+              "condition": "minecraft:survives_explosion"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "platform": "forge",
+    "id": "blocks/hive_bone",
+    "source": "src/main/resources/data/blacklight/loot_tables/blocks/hive_bone.json",
+    "sha256": "8255e490d5163bb50162c5db5d8c8f07153933cdb9e4876ee0e9b6a7a06ef721",
+    "raw": {
+      "type": "minecraft:block",
+      "pools": [
+        {
+          "rolls": 1,
+          "bonus_rolls": 0,
+          "conditions": [
+            {
+              "condition": "minecraft:survives_explosion"
+            }
+          ],
+          "entries": [
+            {
+              "type": "minecraft:item",
+              "name": "blacklight:hive_bone"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "platform": "forge",
+    "id": "blocks/hive_carapace",
+    "source": "src/main/resources/data/blacklight/loot_tables/blocks/hive_carapace.json",
+    "sha256": "f93537b8844117993782311ba779007168151b8bd7530fa2069a6c974f47b950",
+    "raw": {
+      "type": "minecraft:block",
+      "pools": [
+        {
+          "rolls": 1,
+          "bonus_rolls": 0,
+          "conditions": [
+            {
+              "condition": "minecraft:survives_explosion"
+            }
+          ],
+          "entries": [
+            {
+              "type": "minecraft:item",
+              "name": "blacklight:hive_carapace"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "platform": "forge",
+    "id": "blocks/hive_flesh",
+    "source": "src/main/resources/data/blacklight/loot_tables/blocks/hive_flesh.json",
+    "sha256": "b454444fbe6e28bedb591816c38685b9982289c202443e2f0a36440a16383227",
+    "raw": {
+      "type": "minecraft:block",
+      "pools": [
+        {
+          "rolls": 1,
+          "bonus_rolls": 0,
+          "conditions": [
+            {
+              "condition": "minecraft:survives_explosion"
+            }
+          ],
+          "entries": [
+            {
+              "type": "minecraft:item",
+              "name": "blacklight:hive_flesh"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "platform": "forge",
+    "id": "blocks/hive_membrane",
+    "source": "src/main/resources/data/blacklight/loot_tables/blocks/hive_membrane.json",
+    "sha256": "b2517433e98a73c309dba153228fbcf9f025b72a793cdfc46b6c2779f1acba8f",
+    "raw": {
+      "type": "minecraft:block",
+      "pools": [
+        {
+          "rolls": 1,
+          "bonus_rolls": 0,
+          "conditions": [
+            {
+              "condition": "minecraft:survives_explosion"
+            }
+          ],
+          "entries": [
+            {
+              "type": "minecraft:item",
+              "name": "blacklight:hive_membrane"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "platform": "forge",
+    "id": "blocks/hive_sac",
+    "source": "src/main/resources/data/blacklight/loot_tables/blocks/hive_sac.json",
+    "sha256": "b2f227b981eb4b0977c11d15e6b454846513895c3a7e0732461ef456166a96c9",
+    "raw": {
+      "type": "minecraft:block",
+      "pools": [
+        {
+          "rolls": 1,
+          "bonus_rolls": 0,
+          "conditions": [
+            {
+              "condition": "minecraft:survives_explosion"
+            }
+          ],
+          "entries": [
+            {
+              "type": "minecraft:item",
+              "name": "blacklight:hive_sac"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "platform": "forge",
+    "id": "blocks/hive_vein",
+    "source": "src/main/resources/data/blacklight/loot_tables/blocks/hive_vein.json",
+    "sha256": "a9f2d6fe3b40c96810da08b71259c5e663fb71056546f279d8706acd707211c6",
+    "raw": {
+      "type": "minecraft:block",
+      "pools": [
+        {
+          "rolls": 1,
+          "bonus_rolls": 0,
+          "conditions": [
+            {
+              "condition": "minecraft:survives_explosion"
+            }
+          ],
+          "entries": [
+            {
+              "type": "minecraft:item",
+              "name": "blacklight:hive_vein"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "platform": "forge",
+    "id": "blocks/infected_soil",
+    "source": "src/main/resources/data/blacklight/loot_tables/blocks/infected_soil.json",
+    "sha256": "2d63935af3432ef6c74ecd209a1f8080f746f0b358d77351c105e92d6e6ff00d",
+    "raw": {
+      "type": "minecraft:block",
+      "pools": [
+        {
+          "rolls": 1,
+          "bonus_rolls": 0,
+          "conditions": [
+            {
+              "condition": "minecraft:survives_explosion"
+            }
+          ],
+          "entries": [
+            {
+              "type": "minecraft:item",
+              "name": "blacklight:infected_soil"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "platform": "forge",
+    "id": "blocks/infected_stone",
+    "source": "src/main/resources/data/blacklight/loot_tables/blocks/infected_stone.json",
+    "sha256": "3437994f73cff558f500cc9434aa3deee6cec934a371b83c06f10a9f506b1287",
+    "raw": {
+      "type": "minecraft:block",
+      "pools": [
+        {
+          "rolls": 1,
+          "bonus_rolls": 0,
+          "conditions": [
+            {
+              "condition": "minecraft:survives_explosion"
+            }
+          ],
+          "entries": [
+            {
+              "type": "minecraft:item",
+              "name": "blacklight:infected_stone"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "platform": "forge",
+    "id": "blocks/military_crate",
+    "source": "src/main/resources/data/blacklight/loot_tables/blocks/military_crate.json",
+    "sha256": "5b8a42fa6b607a3f48e3280155bdf0a109c809362523eba90c10c7175b48d7cf",
+    "raw": {
+      "type": "minecraft:block",
+      "pools": [
+        {
+          "rolls": 1,
+          "entries": [
+            {
+              "type": "minecraft:item",
+              "name": "blacklight:military_crate"
+            }
+          ],
+          "conditions": [
+            {
+              "condition": "minecraft:survives_explosion"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "platform": "forge",
+    "id": "blocks/military_searchlight",
+    "source": "src/main/resources/data/blacklight/loot_tables/blocks/military_searchlight.json",
+    "sha256": "06fc30323f27f9b298f34360485aad2711e765f244e666b09653bc4aaf71699b",
+    "raw": {
+      "type": "minecraft:block",
+      "pools": [
+        {
+          "rolls": 1,
+          "entries": [
+            {
+              "type": "minecraft:item",
+              "name": "blacklight:military_searchlight"
+            }
+          ],
+          "conditions": [
+            {
+              "condition": "minecraft:survives_explosion"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "platform": "forge",
+    "id": "blocks/nutrient_node",
+    "source": "src/main/resources/data/blacklight/loot_tables/blocks/nutrient_node.json",
+    "sha256": "6860caad235e4d19f2b9c84dd88c2d05c702402dcd04cc2a91bf820588337fbe",
+    "raw": {
+      "type": "minecraft:block",
+      "pools": [
+        {
+          "rolls": 1,
+          "bonus_rolls": 0,
+          "conditions": [
+            {
+              "condition": "minecraft:survives_explosion"
+            }
+          ],
+          "entries": [
+            {
+              "type": "minecraft:item",
+              "name": "blacklight:nutrient_node"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "platform": "forge",
+    "id": "blocks/sandbag_cover",
+    "source": "src/main/resources/data/blacklight/loot_tables/blocks/sandbag_cover.json",
+    "sha256": "4af6e113be7a1d7d2087b33352320ae9d3a188c64903ad4eff948662aca61ac1",
+    "raw": {
+      "type": "minecraft:block",
+      "pools": [
+        {
+          "rolls": 1,
+          "entries": [
+            {
+              "type": "minecraft:item",
+              "name": "blacklight:sandbag_cover"
+            }
+          ],
+          "conditions": [
+            {
+              "condition": "minecraft:survives_explosion"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "platform": "forge",
+    "id": "blocks/tissue_fiber",
+    "source": "src/main/resources/data/blacklight/loot_tables/blocks/tissue_fiber.json",
+    "sha256": "92ea0e643ecd59cb5b336070f8d909297dc8d2b5f9a125bcd6ce2ce7a48f9b4e",
+    "raw": {
+      "type": "minecraft:block",
+      "pools": [
+        {
+          "rolls": 1,
+          "bonus_rolls": 0,
+          "conditions": [
+            {
+              "condition": "minecraft:survives_explosion"
+            }
+          ],
+          "entries": [
+            {
+              "type": "minecraft:item",
+              "name": "blacklight:tissue_fiber"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "platform": "forge",
+    "id": "chests/base_ammunition",
+    "source": "src/main/resources/data/blacklight/loot_tables/chests/base_ammunition.json",
+    "sha256": "4139a089af8abb89d24141f39207336b58dd24a86c853ed1d963b3c86d691e82",
+    "raw": {
+      "type": "minecraft:chest",
+      "pools": [
+        {
+          "rolls": 1,
+          "entries": [
+            {
+              "type": "minecraft:item",
+              "name": "blacklight:rifle_round",
+              "functions": [
+                {
+                  "function": "minecraft:set_count",
+                  "count": {
+                    "min": 24,
+                    "max": 48
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "rolls": 1,
+          "entries": [
+            {
+              "type": "minecraft:item",
+              "name": "blacklight:machine_gun_round",
+              "functions": [
+                {
+                  "function": "minecraft:set_count",
+                  "count": {
+                    "min": 24,
+                    "max": 48
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "rolls": 1,
+          "entries": [
+            {
+              "type": "minecraft:item",
+              "name": "blacklight:grenade_round",
+              "functions": [
+                {
+                  "function": "minecraft:set_count",
+                  "count": {
+                    "min": 4,
+                    "max": 8
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "rolls": 1,
+          "entries": [
+            {
+              "type": "minecraft:item",
+              "name": "blacklight:rocket_round",
+              "functions": [
+                {
+                  "function": "minecraft:set_count",
+                  "count": {
+                    "min": 1,
+                    "max": 3
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "rolls": 1,
+          "entries": [
+            {
+              "type": "minecraft:item",
+              "name": "blacklight:missile_round",
+              "functions": [
+                {
+                  "function": "minecraft:set_count",
+                  "count": {
+                    "min": 1,
+                    "max": 2
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "rolls": 1,
+          "entries": [
+            {
+              "type": "minecraft:item",
+              "name": "blacklight:thermobaric_round",
+              "functions": [
+                {
+                  "function": "minecraft:set_count",
+                  "count": {
+                    "min": 1,
+                    "max": 2
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "rolls": 1,
+          "entries": [
+            {
+              "type": "minecraft:item",
+              "name": "blacklight:infection_round",
+              "functions": [
+                {
+                  "function": "minecraft:set_count",
+                  "count": {
+                    "min": 1,
+                    "max": 2
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "platform": "forge",
+    "id": "chests/base_armory",
+    "source": "src/main/resources/data/blacklight/loot_tables/chests/base_armory.json",
+    "sha256": "b479e1fd477da297d3bda526066adba11091ee415987d2d557424bb30c1e9583",
+    "raw": {
+      "type": "minecraft:chest",
+      "pools": [
+        {
+          "rolls": 2,
+          "entries": [
+            {
+              "type": "minecraft:item",
+              "name": "blacklight:military_rifle",
+              "functions": [
+                {
+                  "function": "minecraft:set_count",
+                  "count": 1
+                }
+              ]
+            },
+            {
+              "type": "minecraft:item",
+              "name": "blacklight:military_carbine",
+              "functions": [
+                {
+                  "function": "minecraft:set_count",
+                  "count": 1
+                }
+              ]
+            },
+            {
+              "type": "minecraft:item",
+              "name": "blacklight:military_machine_gun",
+              "functions": [
+                {
+                  "function": "minecraft:set_count",
+                  "count": 1
+                }
+              ]
+            },
+            {
+              "type": "minecraft:item",
+              "name": "blacklight:grenade_launcher",
+              "functions": [
+                {
+                  "function": "minecraft:set_count",
+                  "count": 1
+                }
+              ]
+            },
+            {
+              "type": "minecraft:item",
+              "name": "blacklight:rocket_launcher",
+              "functions": [
+                {
+                  "function": "minecraft:set_count",
+                  "count": 1
+                }
+              ]
+            },
+            {
+              "type": "minecraft:item",
+              "name": "blacklight:missile_launcher",
+              "functions": [
+                {
+                  "function": "minecraft:set_count",
+                  "count": 1
+                }
+              ]
+            },
+            {
+              "type": "minecraft:item",
+              "name": "blacklight:thermobaric_launcher",
+              "functions": [
+                {
+                  "function": "minecraft:set_count",
+                  "count": 1
+                }
+              ]
+            },
+            {
+              "type": "minecraft:item",
+              "name": "blacklight:infection_launcher",
+              "functions": [
+                {
+                  "function": "minecraft:set_count",
+                  "count": 1
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "platform": "forge",
+    "id": "chests/base_medical",
+    "source": "src/main/resources/data/blacklight/loot_tables/chests/base_medical.json",
+    "sha256": "86b8bbcda9f0985fee7c1ed287fe1f1b80428ebd105b18138f144be1ab0e43e5",
+    "raw": {
+      "type": "minecraft:chest",
+      "pools": [
+        {
+          "rolls": 1,
+          "entries": [
+            {
+              "type": "minecraft:item",
+              "name": "minecraft:golden_apple",
+              "functions": [
+                {
+                  "function": "minecraft:set_count",
+                  "count": {
+                    "min": 1,
+                    "max": 2
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "rolls": 1,
+          "entries": [
+            {
+              "type": "minecraft:item",
+              "name": "minecraft:cooked_beef",
+              "functions": [
+                {
+                  "function": "minecraft:set_count",
+                  "count": {
+                    "min": 4,
+                    "max": 8
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "platform": "forge",
+    "id": "chests/base_supplies",
+    "source": "src/main/resources/data/blacklight/loot_tables/chests/base_supplies.json",
+    "sha256": "81b0b31d01d8f63b0528a4821ec52413fb789668733fbb95657cebc61224150b",
+    "raw": {
+      "type": "minecraft:chest",
+      "pools": [
+        {
+          "rolls": 1,
+          "entries": [
+            {
+              "type": "minecraft:item",
+              "name": "minecraft:bread",
+              "functions": [
+                {
+                  "function": "minecraft:set_count",
+                  "count": {
+                    "min": 6,
+                    "max": 12
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "rolls": 1,
+          "entries": [
+            {
+              "type": "minecraft:item",
+              "name": "minecraft:iron_ingot",
+              "functions": [
+                {
+                  "function": "minecraft:set_count",
+                  "count": {
+                    "min": 3,
+                    "max": 6
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "rolls": 1,
+          "entries": [
+            {
+              "type": "minecraft:item",
+              "name": "minecraft:torch",
+              "functions": [
+                {
+                  "function": "minecraft:set_count",
+                  "count": {
+                    "min": 8,
+                    "max": 16
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "platform": "forge",
+    "id": "chests/blackwatch_supplies",
+    "source": "src/main/resources/data/blacklight/loot_tables/chests/blackwatch_supplies.json",
+    "sha256": "8ac66029855b4a48762240e2a0257840b95e4ea4a6383676f2eb723b5a1a23aa",
+    "raw": {
+      "type": "minecraft:chest",
+      "pools": [
+        {
+          "rolls": 2,
+          "entries": [
+            {
+              "type": "minecraft:item",
+              "name": "minecraft:bread",
+              "weight": 3
+            },
+            {
+              "type": "minecraft:item",
+              "name": "minecraft:cooked_beef",
+              "weight": 2
+            },
+            {
+              "type": "minecraft:item",
+              "name": "minecraft:baked_potato",
+              "weight": 3
+            }
+          ],
+          "functions": [
+            {
+              "function": "minecraft:set_count",
+              "count": {
+                "type": "minecraft:uniform",
+                "min": 2,
+                "max": 4
+              }
+            }
+          ]
+        },
+        {
+          "rolls": 1,
+          "entries": [
+            {
+              "type": "minecraft:item",
+              "name": "minecraft:torch"
+            }
+          ],
+          "functions": [
+            {
+              "function": "minecraft:set_count",
+              "count": {
+                "type": "minecraft:uniform",
+                "min": 4,
+                "max": 8
+              }
+            }
+          ]
+        },
+        {
+          "rolls": 1,
+          "entries": [
+            {
+              "type": "minecraft:item",
+              "name": "minecraft:iron_ingot",
+              "weight": 3
+            },
+            {
+              "type": "minecraft:item",
+              "name": "minecraft:leather",
+              "weight": 2
+            }
+          ],
+          "functions": [
+            {
+              "function": "minecraft:set_count",
+              "count": {
+                "type": "minecraft:uniform",
+                "min": 1,
+                "max": 2
+              }
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "platform": "forge",
+    "id": "chests/blackwatch_technology",
+    "source": "src/main/resources/data/blacklight/loot_tables/chests/blackwatch_technology.json",
+    "sha256": "bdd50a52ae8f0e3b42f42f753b7b5ed0e0689608a8af49a4a2416571d0b47cff",
+    "raw": {
+      "type": "minecraft:chest",
+      "pools": [
+        {
+          "rolls": 1,
+          "entries": [
+            {
+              "type": "minecraft:item",
+              "name": "blacklight:military_circuit",
+              "functions": [
+                {
+                  "function": "minecraft:set_count",
+                  "count": {
+                    "type": "minecraft:uniform",
+                    "min": 3,
+                    "max": 6
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "rolls": 2,
+          "entries": [
+            {
+              "type": "minecraft:item",
+              "name": "minecraft:iron_ingot",
+              "weight": 3
+            },
+            {
+              "type": "minecraft:item",
+              "name": "minecraft:redstone",
+              "weight": 3
+            },
+            {
+              "type": "minecraft:item",
+              "name": "minecraft:gold_ingot",
+              "weight": 1
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "platform": "forge",
+    "id": "chests/military_ammunition",
+    "source": "src/main/resources/data/blacklight/loot_tables/chests/military_ammunition.json",
+    "sha256": "de5e6bd4a8dde2cfbe1ca14f3222507778ac7211ff76dc0d9482ecf7f383e56c",
+    "raw": {
+      "type": "minecraft:chest",
+      "pools": [
+        {
+          "rolls": 3,
+          "entries": [
+            {
+              "type": "minecraft:item",
+              "name": "blacklight:rifle_round",
+              "functions": [
+                {
+                  "function": "minecraft:set_count",
+                  "count": {
+                    "min": 4,
+                    "max": 12
+                  }
+                }
+              ]
+            },
+            {
+              "type": "minecraft:item",
+              "name": "blacklight:machine_gun_round",
+              "functions": [
+                {
+                  "function": "minecraft:set_count",
+                  "count": {
+                    "min": 4,
+                    "max": 12
+                  }
+                }
+              ]
+            },
+            {
+              "type": "minecraft:item",
+              "name": "blacklight:grenade_round",
+              "functions": [
+                {
+                  "function": "minecraft:set_count",
+                  "count": {
+                    "min": 1,
+                    "max": 2
+                  }
+                }
+              ]
+            },
+            {
+              "type": "minecraft:item",
+              "name": "blacklight:rocket_round",
+              "functions": [
+                {
+                  "function": "minecraft:set_count",
+                  "count": {
+                    "min": 1,
+                    "max": 2
+                  }
+                }
+              ]
+            },
+            {
+              "type": "minecraft:item",
+              "name": "blacklight:missile_round",
+              "functions": [
+                {
+                  "function": "minecraft:set_count",
+                  "count": {
+                    "min": 1,
+                    "max": 2
+                  }
+                }
+              ]
+            },
+            {
+              "type": "minecraft:item",
+              "name": "blacklight:thermobaric_round",
+              "functions": [
+                {
+                  "function": "minecraft:set_count",
+                  "count": {
+                    "min": 1,
+                    "max": 2
+                  }
+                }
+              ]
+            },
+            {
+              "type": "minecraft:item",
+              "name": "blacklight:infection_round",
+              "functions": [
+                {
+                  "function": "minecraft:set_count",
+                  "count": {
+                    "min": 1,
+                    "max": 2
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "platform": "forge",
+    "id": "chests/research_samples",
+    "source": "src/main/resources/data/blacklight/loot_tables/chests/research_samples.json",
+    "sha256": "92b602be6493285901c811711dfb84884ef83462e532ceca24336ede73f12398",
+    "raw": {
+      "type": "minecraft:chest",
+      "pools": [
+        {
+          "rolls": 1,
+          "entries": [
+            {
+              "type": "minecraft:item",
+              "name": "blacklight:blacklight_sample",
+              "functions": [
+                {
+                  "function": "minecraft:set_count",
+                  "count": 3
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "platform": "forge",
+    "id": "chests/research_supplies",
+    "source": "src/main/resources/data/blacklight/loot_tables/chests/research_supplies.json",
+    "sha256": "51eabdad30a74e2dca493fd0620f305a8cefa57f523b37ed778fdb5f2ece0251",
+    "raw": {
+      "type": "minecraft:chest",
+      "pools": [
+        {
+          "rolls": 1,
+          "entries": [
+            {
+              "type": "minecraft:item",
+              "name": "minecraft:iron_sword"
+            }
+          ]
+        },
+        {
+          "rolls": 1,
+          "entries": [
+            {
+              "type": "minecraft:item",
+              "name": "minecraft:bread",
+              "functions": [
+                {
+                  "function": "minecraft:set_count",
+                  "count": 6
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "rolls": 1,
+          "entries": [
+            {
+              "type": "minecraft:item",
+              "name": "minecraft:torch",
+              "functions": [
+                {
+                  "function": "minecraft:set_count",
+                  "count": 12
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "platform": "forge",
+    "id": "entities/blacklight_brute",
+    "source": "src/main/resources/data/blacklight/loot_tables/entities/blacklight_brute.json",
+    "sha256": "e08386d61c1c4e6492b320451d2feb06457041146ba69d6310d0082d3066fefc",
+    "raw": {
+      "type": "minecraft:entity",
+      "pools": [
+        {
+          "rolls": 1,
+          "entries": [
+            {
+              "type": "minecraft:item",
+              "name": "minecraft:rotten_flesh",
+              "functions": [
+                {
+                  "function": "minecraft:set_count",
+                  "count": {
+                    "type": "minecraft:uniform",
+                    "min": 1,
+                    "max": 3
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "platform": "forge",
+    "id": "entities/blacklight_hive",
+    "source": "src/main/resources/data/blacklight/loot_tables/entities/blacklight_hive.json",
+    "sha256": "1d069904c7e397aaec0e42ffccdacc8bd0694200dfab2fecf84adf09c514cc9d",
+    "raw": {
+      "type": "minecraft:entity",
+      "pools": []
+    }
+  },
+  {
+    "platform": "forge",
+    "id": "entities/blacklight_hunter",
+    "source": "src/main/resources/data/blacklight/loot_tables/entities/blacklight_hunter.json",
+    "sha256": "1d069904c7e397aaec0e42ffccdacc8bd0694200dfab2fecf84adf09c514cc9d",
+    "raw": {
+      "type": "minecraft:entity",
+      "pools": []
+    }
+  },
+  {
+    "platform": "forge",
+    "id": "entities/blacklight_spitter",
+    "source": "src/main/resources/data/blacklight/loot_tables/entities/blacklight_spitter.json",
+    "sha256": "e08386d61c1c4e6492b320451d2feb06457041146ba69d6310d0082d3066fefc",
+    "raw": {
+      "type": "minecraft:entity",
+      "pools": [
+        {
+          "rolls": 1,
+          "entries": [
+            {
+              "type": "minecraft:item",
+              "name": "minecraft:rotten_flesh",
+              "functions": [
+                {
+                  "function": "minecraft:set_count",
+                  "count": {
+                    "type": "minecraft:uniform",
+                    "min": 1,
+                    "max": 3
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "platform": "forge",
+    "id": "entities/blacklight_stalker",
+    "source": "src/main/resources/data/blacklight/loot_tables/entities/blacklight_stalker.json",
+    "sha256": "e08386d61c1c4e6492b320451d2feb06457041146ba69d6310d0082d3066fefc",
+    "raw": {
+      "type": "minecraft:entity",
+      "pools": [
+        {
+          "rolls": 1,
+          "entries": [
+            {
+              "type": "minecraft:item",
+              "name": "minecraft:rotten_flesh",
+              "functions": [
+                {
+                  "function": "minecraft:set_count",
+                  "count": {
+                    "type": "minecraft:uniform",
+                    "min": 1,
+                    "max": 3
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "platform": "forge",
+    "id": "entities/blackwatch_commander",
+    "source": "src/main/resources/data/blacklight/loot_tables/entities/blackwatch_commander.json",
+    "sha256": "26aa2da3930bcfb27ff08540d77c01607d28ddcef06be4813bfc676569d56a4b",
+    "raw": {
+      "type": "minecraft:entity",
+      "pools": [
+        {
+          "rolls": 1,
+          "conditions": [
+            {
+              "condition": "minecraft:killed_by_player"
+            }
+          ],
+          "entries": [
+            {
+              "type": "minecraft:item",
+              "name": "blacklight:military_circuit",
+              "functions": [
+                {
+                  "function": "minecraft:set_count",
+                  "count": 1
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "platform": "forge",
+    "id": "entities/blackwatch_heavy",
+    "source": "src/main/resources/data/blacklight/loot_tables/entities/blackwatch_heavy.json",
+    "sha256": "66327f35a32e2d731dd4601eef1debc14df4173ecd5fc6ee380f144ca04b9d38",
+    "raw": {
+      "type": "minecraft:entity",
+      "pools": [
+        {
+          "rolls": 1,
+          "conditions": [
+            {
+              "condition": "minecraft:killed_by_player"
+            }
+          ],
+          "entries": [
+            {
+              "type": "minecraft:item",
+              "name": "blacklight:military_circuit",
+              "functions": [
+                {
+                  "function": "minecraft:set_count",
+                  "count": 2
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "platform": "forge",
+    "id": "entities/blackwatch_officer",
+    "source": "src/main/resources/data/blacklight/loot_tables/entities/blackwatch_officer.json",
+    "sha256": "26aa2da3930bcfb27ff08540d77c01607d28ddcef06be4813bfc676569d56a4b",
+    "raw": {
+      "type": "minecraft:entity",
+      "pools": [
+        {
+          "rolls": 1,
+          "conditions": [
+            {
+              "condition": "minecraft:killed_by_player"
+            }
+          ],
+          "entries": [
+            {
+              "type": "minecraft:item",
+              "name": "blacklight:military_circuit",
+              "functions": [
+                {
+                  "function": "minecraft:set_count",
+                  "count": 1
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "platform": "forge",
+    "id": "entities/blackwatch_soldier",
+    "source": "src/main/resources/data/blacklight/loot_tables/entities/blackwatch_soldier.json",
+    "sha256": "26aa2da3930bcfb27ff08540d77c01607d28ddcef06be4813bfc676569d56a4b",
+    "raw": {
+      "type": "minecraft:entity",
+      "pools": [
+        {
+          "rolls": 1,
+          "conditions": [
+            {
+              "condition": "minecraft:killed_by_player"
+            }
+          ],
+          "entries": [
+            {
+              "type": "minecraft:item",
+              "name": "blacklight:military_circuit",
+              "functions": [
+                {
+                  "function": "minecraft:set_count",
+                  "count": 1
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "platform": "forge",
+    "id": "entities/blackwatch_team_leader",
+    "source": "src/main/resources/data/blacklight/loot_tables/entities/blackwatch_team_leader.json",
+    "sha256": "26aa2da3930bcfb27ff08540d77c01607d28ddcef06be4813bfc676569d56a4b",
+    "raw": {
+      "type": "minecraft:entity",
+      "pools": [
+        {
+          "rolls": 1,
+          "conditions": [
+            {
+              "condition": "minecraft:killed_by_player"
+            }
+          ],
+          "entries": [
+            {
+              "type": "minecraft:item",
+              "name": "blacklight:military_circuit",
+              "functions": [
+                {
+                  "function": "minecraft:set_count",
+                  "count": 1
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "platform": "forge",
+    "id": "entities/military_commander",
+    "source": "src/main/resources/data/blacklight/loot_tables/entities/military_commander.json",
+    "sha256": "26aa2da3930bcfb27ff08540d77c01607d28ddcef06be4813bfc676569d56a4b",
+    "raw": {
+      "type": "minecraft:entity",
+      "pools": [
+        {
+          "rolls": 1,
+          "conditions": [
+            {
+              "condition": "minecraft:killed_by_player"
+            }
+          ],
+          "entries": [
+            {
+              "type": "minecraft:item",
+              "name": "blacklight:military_circuit",
+              "functions": [
+                {
+                  "function": "minecraft:set_count",
+                  "count": 1
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "platform": "forge",
+    "id": "entities/military_heavy",
+    "source": "src/main/resources/data/blacklight/loot_tables/entities/military_heavy.json",
+    "sha256": "66327f35a32e2d731dd4601eef1debc14df4173ecd5fc6ee380f144ca04b9d38",
+    "raw": {
+      "type": "minecraft:entity",
+      "pools": [
+        {
+          "rolls": 1,
+          "conditions": [
+            {
+              "condition": "minecraft:killed_by_player"
+            }
+          ],
+          "entries": [
+            {
+              "type": "minecraft:item",
+              "name": "blacklight:military_circuit",
+              "functions": [
+                {
+                  "function": "minecraft:set_count",
+                  "count": 2
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "platform": "forge",
+    "id": "entities/military_officer",
+    "source": "src/main/resources/data/blacklight/loot_tables/entities/military_officer.json",
+    "sha256": "26aa2da3930bcfb27ff08540d77c01607d28ddcef06be4813bfc676569d56a4b",
+    "raw": {
+      "type": "minecraft:entity",
+      "pools": [
+        {
+          "rolls": 1,
+          "conditions": [
+            {
+              "condition": "minecraft:killed_by_player"
+            }
+          ],
+          "entries": [
+            {
+              "type": "minecraft:item",
+              "name": "blacklight:military_circuit",
+              "functions": [
+                {
+                  "function": "minecraft:set_count",
+                  "count": 1
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "platform": "forge",
+    "id": "entities/military_soldier",
+    "source": "src/main/resources/data/blacklight/loot_tables/entities/military_soldier.json",
+    "sha256": "26aa2da3930bcfb27ff08540d77c01607d28ddcef06be4813bfc676569d56a4b",
+    "raw": {
+      "type": "minecraft:entity",
+      "pools": [
+        {
+          "rolls": 1,
+          "conditions": [
+            {
+              "condition": "minecraft:killed_by_player"
+            }
+          ],
+          "entries": [
+            {
+              "type": "minecraft:item",
+              "name": "blacklight:military_circuit",
+              "functions": [
+                {
+                  "function": "minecraft:set_count",
+                  "count": 1
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "platform": "forge",
+    "id": "entities/military_team_leader",
+    "source": "src/main/resources/data/blacklight/loot_tables/entities/military_team_leader.json",
+    "sha256": "26aa2da3930bcfb27ff08540d77c01607d28ddcef06be4813bfc676569d56a4b",
+    "raw": {
+      "type": "minecraft:entity",
+      "pools": [
+        {
+          "rolls": 1,
+          "conditions": [
+            {
+              "condition": "minecraft:killed_by_player"
+            }
+          ],
+          "entries": [
+            {
+              "type": "minecraft:item",
+              "name": "blacklight:military_circuit",
+              "functions": [
+                {
+                  "function": "minecraft:set_count",
+                  "count": 1
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  }
+]

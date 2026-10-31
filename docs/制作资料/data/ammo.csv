@@ -1,0 +1,8 @@
+﻿id,name,weapons,recipe
+rifle_round,步枪弹,"[""military_rifle"", ""military_carbine""]",rifle_round
+machine_gun_round,机枪弹,"[""military_machine_gun""]",machine_gun_round
+grenade_round,破片榴弹,"[""grenade_launcher""]",grenade_round
+rocket_round,火箭弹,"[""rocket_launcher""]",rocket_round
+missile_round,导弹,"[""missile_launcher""]",missile_round
+thermobaric_round,温压榴弹,"[""thermobaric_launcher""]",thermobaric_round
+infection_round,感染榴弹,"[""infection_launcher""]",infection_round

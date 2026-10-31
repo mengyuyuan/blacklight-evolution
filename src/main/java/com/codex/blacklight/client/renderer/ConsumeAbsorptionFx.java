@@ -26,7 +26,7 @@ public final class ConsumeAbsorptionFx {
         Vec3 chest=new Vec3(0,owner.getBbHeight()*.63,0);
         if(owner instanceof LivingEntity&&!ConsumeSequence.mountedStage(data.stage())){
             var form=PowerForm.values()[Math.clamp(data.form(),0,PowerForm.values().length-1)];
-            var row=ConsumePlacementTrack.contactFrame(form,data.motionProgress(victim.level().getGameTime(),partial)).orElse(null);
+            var row=ConsumePlacementTrack.contactFrame(ConsumeSequence.key(form,data.variant()),data.motionProgress(victim.level().getGameTime(),partial)).orElse(null);
             if(row!=null){Vec3 f=Vec3.directionFromRotation(0,data.facing()),r=new Vec3(-f.z,0,f.x);chest=r.scale(row[7]*.9375).add(f.scale(row[9]*.9375)).add(0,row[8]*.9375,0);}
         }
         return owner.getPosition(partial).add(chest).subtract(victim.getPosition(partial).add(placement));

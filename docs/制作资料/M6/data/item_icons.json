@@ -1,0 +1,145 @@
+[
+  {
+    "id": "autocannon_round",
+    "active": true,
+    "source": "src/main/resources/assets/blacklight/textures/item/autocannon_round.png",
+    "path": "assets/items/autocannon_round.png",
+    "sha256": "a721a411b187c087863ac4fe33138176a61c0ca3849bcfce1cd4f827a5ef092a",
+    "size": [
+      32,
+      32
+    ]
+  },
+  {
+    "id": "blackwatch_apc_chassis",
+    "active": true,
+    "source": "src/main/resources/assets/blacklight/textures/item/blackwatch_apc_chassis.png",
+    "path": "assets/items/blackwatch_apc_chassis.png",
+    "sha256": "0316fe708b91a744bb8e10c681a19067e7796e947f7bb97b5975f497ee4fa13d",
+    "size": [
+      32,
+      32
+    ]
+  },
+  {
+    "id": "blackwatch_tank_chassis",
+    "active": true,
+    "source": "src/main/resources/assets/blacklight/textures/item/blackwatch_tank_chassis.png",
+    "path": "assets/items/blackwatch_tank_chassis.png",
+    "sha256": "4f1a49772926b1edb92a492abb7997ccf4567d19f78278963160a9084a862613",
+    "size": [
+      32,
+      32
+    ]
+  },
+  {
+    "id": "blackwatch_truck_chassis",
+    "active": true,
+    "source": "src/main/resources/assets/blacklight/textures/item/blackwatch_truck_chassis.png",
+    "path": "assets/items/blackwatch_truck_chassis.png",
+    "sha256": "cca44f405c35d4748e9ccb44ead1625f974b506411c470961bb636295c6c6d10",
+    "size": [
+      32,
+      32
+    ]
+  },
+  {
+    "id": "machine_gun_round",
+    "active": true,
+    "source": "src/main/resources/assets/blacklight/textures/item/machine_gun_round.png",
+    "path": "assets/items/machine_gun_round.png",
+    "sha256": "9a3c19043de5f1a906dd28724e53cb3e64f7a765f1a83636c3792bf70d92b950",
+    "size": [
+      16,
+      16
+    ]
+  },
+  {
+    "id": "military_apc_chassis",
+    "active": true,
+    "source": "src/main/resources/assets/blacklight/textures/item/military_apc_chassis.png",
+    "path": "assets/items/military_apc_chassis.png",
+    "sha256": "32b0a4b2aa118e78900e065fb1e7e32dd14897f45cffefee62ade198a2f82e85",
+    "size": [
+      32,
+      32
+    ]
+  },
+  {
+    "id": "military_fuel_can",
+    "active": false,
+    "source": "src/main/resources/assets/blacklight/textures/item/military_fuel_can.png",
+    "path": "assets/items/military_fuel_can.png",
+    "sha256": "13eadfa29908440794f2771bd1fd358b8211ba9a7474a24eede33b68d1ca2b82",
+    "size": [
+      32,
+      32
+    ]
+  },
+  {
+    "id": "military_tank_chassis",
+    "active": true,
+    "source": "src/main/resources/assets/blacklight/textures/item/military_tank_chassis.png",
+    "path": "assets/items/military_tank_chassis.png",
+    "sha256": "99bfd40c42d3a9f235d54686402c023c0be5b6871d0ee2aeef818c95673e24dd",
+    "size": [
+      32,
+      32
+    ]
+  },
+  {
+    "id": "military_truck_chassis",
+    "active": true,
+    "source": "src/main/resources/assets/blacklight/textures/item/military_truck_chassis.png",
+    "path": "assets/items/military_truck_chassis.png",
+    "sha256": "3690b5760b639230d86309655b79575498468db24b861e72954c2c480e925710",
+    "size": [
+      32,
+      32
+    ]
+  },
+  {
+    "id": "rocket_round",
+    "active": true,
+    "source": "src/main/resources/assets/blacklight/textures/item/rocket_round.png",
+    "path": "assets/items/rocket_round.png",
+    "sha256": "f0da949f8a069668cd0526402af0b14a357c10c97c744c059758ecfe0ffcd102",
+    "size": [
+      16,
+      16
+    ]
+  },
+  {
+    "id": "tank_ap_shell",
+    "active": true,
+    "source": "src/main/resources/assets/blacklight/textures/item/tank_ap_shell.png",
+    "path": "assets/items/tank_ap_shell.png",
+    "sha256": "176490bee9167244d746c417b31f1a35eb5ce5bfbbc333d474100b155785eabb",
+    "size": [
+      32,
+      32
+    ]
+  },
+  {
+    "id": "tank_he_shell",
+    "active": true,
+    "source": "src/main/resources/assets/blacklight/textures/item/tank_he_shell.png",
+    "path": "assets/items/tank_he_shell.png",
+    "sha256": "52ad5e6f0f67fd40784e3b13a4081db8de6c63c98296e3f595c94877a09ade91",
+    "size": [
+      32,
+      32
+    ]
+  },
+  {
+    "id": "vehicle_repair_parts",
+    "active": true,
+    "source": "src/main/resources/assets/blacklight/textures/item/vehicle_repair_parts.png",
+    "path": "assets/items/vehicle_repair_parts.png",
+    "sha256": "035dcfd51c2ba826ba2029000d9488711c1a6a6b67fdde10be9fb1a834c931f9",
+    "size": [
+      32,
+      32
+    ]
+  }
+]

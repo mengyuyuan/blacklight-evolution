@@ -1,0 +1,12 @@
+{
+  "replace": false,
+  "values": [
+    "#minecraft:dirt",
+    "#minecraft:sand",
+    "#minecraft:wool",
+    "minecraft:gravel",
+    "minecraft:clay",
+    "minecraft:snow_block",
+    "blacklight:sandbag_cover"
+  ]
+}

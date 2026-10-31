@@ -65,7 +65,7 @@ public final class ConsumeFracture implements MultiBufferSource {
             return new Phase(form,seconds/end,smooth((seconds-begin)/(reverse-begin)),
                     smooth((seconds-reverse)/(end-reverse)),begin/end,Style.HEAD_CRUSH);
         }
-        var scene=com.codex.blacklight.combat.ConsumeReceiverScene.profile(form,large);
+        var scene=com.codex.blacklight.combat.ConsumeReceiverScene.profile(form,large,v.variant());
         if(scene!=null){
             float seconds=(mob.level().getGameTime()-v.started()+partial)/20F;
             // Some source branches begin the consume shader before spawnGib.
@@ -87,7 +87,7 @@ public final class ConsumeFracture implements MultiBufferSource {
     public static boolean visible(LivingEntity mob,float partial){
         var v=mob.getData(ModAttachments.CONSUME_VISUAL);if(!v.consuming())return false;
         var p=phase(mob,partial);
-        var scene=com.codex.blacklight.combat.ConsumeReceiverScene.profile(p.form(),ConsumeSequence.mountedStage(v.stage()));
+        var scene=com.codex.blacklight.combat.ConsumeReceiverScene.profile(p.form(),ConsumeSequence.mountedStage(v.stage()),v.variant());
         return scene!=null?(mob.level().getGameTime()-v.started()+partial)/20F>=Math.min(scene.deformSeconds(),scene.effectSeconds()):p.progress()>=Math.max(0,p.contact()-.08F);
     }
     public void bindModel(EntityModel<?> model){modelParts.putAll(ConsumeAnatomy.model(model));}
@@ -110,7 +110,7 @@ public final class ConsumeFracture implements MultiBufferSource {
                 cutNormal.set(com.codex.blacklight.combat.CorpseFragmentMotion.torsoNormal(chest));
             }
         }
-        float split=ConsumeSequence.splitSeconds(phase.form(),ConsumeSequence.mountedStage(visual.stage()));
+        float split=ConsumeSequence.splitSeconds(phase.form(),ConsumeSequence.mountedStage(visual.stage()),visual.variant());
         fragmentAge=Float.isFinite(split)?Math.max(0,(mob.level().getGameTime()-visual.started()+partial)/20F-split):0;
         up=inverse.transformDirection(stack.last().pose().transformDirection(new Vector3f(0,1,0))).normalize();
         side=inverse.transformDirection(stack.last().pose().transformDirection(new Vector3f(1,0,0))).normalize();

@@ -1,0 +1,594 @@
+{
+  "file": "参考模型/blackwatch_two_hand_sneak.bbmodel",
+  "sha256": "4d1b2213f160aa7a5ece31131c77102d654474277b46a6f93c8624cba71b4696",
+  "bytes": 4780792,
+  "meta": {
+    "format_version": "4.10",
+    "model_format": "free",
+    "box_uv": false
+  },
+  "elements": 5365,
+  "element_types": {
+    "cube": 5365
+  },
+  "textures": [
+    {
+      "name": "blackwatch_soldier_texture.png",
+      "id": "0",
+      "width": null,
+      "height": null,
+      "uv_width": null,
+      "uv_height": null,
+      "size": [
+        64,
+        64
+      ],
+      "file": "参考模型/内嵌贴图/00.png",
+      "sha256": "a007416a9d070d09f52a861afc092835dbf10da6bcdc465b4c1d6084525eb307"
+    },
+    {
+      "name": "brass.png",
+      "id": "1",
+      "width": 16,
+      "height": 16,
+      "uv_width": 64,
+      "uv_height": 64,
+      "size": [
+        16,
+        16
+      ],
+      "file": "参考模型/内嵌贴图/01.png",
+      "sha256": "d71f98cc769d77820c14c744ffb5c47e437d4ea55d330bddf1fef241982f0121"
+    },
+    {
+      "name": "copper.png",
+      "id": "2",
+      "width": 16,
+      "height": 16,
+      "uv_width": 64,
+      "uv_height": 64,
+      "size": [
+        16,
+        16
+      ],
+      "file": "参考模型/内嵌贴图/02.png",
+      "sha256": "98e35d2e10d46e57908a822d2a5a200c8de591ad6090a80fcaa56e52da57c6c9"
+    },
+    {
+      "name": "goldy pol.png",
+      "id": "3",
+      "width": 16,
+      "height": 16,
+      "uv_width": 64,
+      "uv_height": 64,
+      "size": [
+        16,
+        16
+      ],
+      "file": "参考模型/内嵌贴图/03.png",
+      "sha256": "4ae94dd557e02faffe16a77fe75a7cdc4aaccbad94e9abf64ee0c7768afd9cc4"
+    },
+    {
+      "name": "h-190.png",
+      "id": "4",
+      "width": 16,
+      "height": 16,
+      "uv_width": 64,
+      "uv_height": 64,
+      "size": [
+        16,
+        16
+      ],
+      "file": "参考模型/内嵌贴图/04.png",
+      "sha256": "946046b87eb551fe43fa1a435fef13c40607237145a6ccb1dc66d87e3d31f54c"
+    },
+    {
+      "name": "polycarbonate.png",
+      "id": "5",
+      "width": 16,
+      "height": 16,
+      "uv_width": 64,
+      "uv_height": 64,
+      "size": [
+        16,
+        16
+      ],
+      "file": "参考模型/内嵌贴图/05.png",
+      "sha256": "22a9731fdc8da6368a138309070e7514a4bd3327520b32b878858f43ee8b0ec7"
+    },
+    {
+      "name": "polymer.png",
+      "id": "6",
+      "width": 16,
+      "height": 16,
+      "uv_width": 64,
+      "uv_height": 64,
+      "size": [
+        16,
+        16
+      ],
+      "file": "参考模型/内嵌贴图/06.png",
+      "sha256": "fb856fcfbca25062d931aa38521da8294de89ce6c09bd3ff37a06c824c0cd4ee"
+    },
+    {
+      "name": "ral8k.png",
+      "id": "7",
+      "width": 16,
+      "height": 16,
+      "uv_width": 64,
+      "uv_height": 64,
+      "size": [
+        16,
+        16
+      ],
+      "file": "参考模型/内嵌贴图/07.png",
+      "sha256": "2339e0c4f737f1a170050c8c40211c1f19e2b7971518aca911400a868cc8d31c"
+    },
+    {
+      "name": "stell.png",
+      "id": "8",
+      "width": 16,
+      "height": 16,
+      "uv_width": 64,
+      "uv_height": 64,
+      "size": [
+        16,
+        16
+      ],
+      "file": "参考模型/内嵌贴图/08.png",
+      "sha256": "f8a3ac085831f2e95de4d4fc4f48d5306c61ade2edd00570a1810491ff66e130"
+    },
+    {
+      "name": "fallback.png",
+      "id": "9",
+      "width": 16,
+      "height": 16,
+      "uv_width": 64,
+      "uv_height": 64,
+      "size": [
+        16,
+        16
+      ],
+      "file": "参考模型/内嵌贴图/09.png",
+      "sha256": "206b73119f0bdddec8731731e006db82ba0db7c295f190dcd8284b73b98d33ac"
+    }
+  ],
+  "animations": [
+    {
+      "name": "idle",
+      "length_seconds": 2,
+      "loop": "loop",
+      "animators": 2,
+      "keyframes": 363,
+      "targets": [
+        {
+          "uuid": "1663e1f2-0af2-fe52-3605-6648b394566e",
+          "group": "Two Hand Carry",
+          "type": "bone",
+          "name": "Two Hand Carry"
+        },
+        {
+          "uuid": "04fc5fb1-5730-ef8c-333f-f5a23eb73252",
+          "group": "Head",
+          "type": "bone",
+          "name": "Head"
+        }
+      ]
+    },
+    {
+      "name": "walk",
+      "length_seconds": 1,
+      "loop": "loop",
+      "animators": 5,
+      "keyframes": 305,
+      "targets": [
+        {
+          "uuid": "1995f6df-6bf1-67d7-95e1-474372cf958d",
+          "group": "Blackwatch Rig",
+          "type": "bone",
+          "name": "Blackwatch Rig"
+        },
+        {
+          "uuid": "efa28ff0-b188-8ab7-0001-7c402f93423b",
+          "group": "Upper Body",
+          "type": "bone",
+          "name": "Upper Body"
+        },
+        {
+          "uuid": "1663e1f2-0af2-fe52-3605-6648b394566e",
+          "group": "Two Hand Carry",
+          "type": "bone",
+          "name": "Two Hand Carry"
+        },
+        {
+          "uuid": "bd6d5f66-d24b-e55e-4993-307382e82bcf",
+          "group": "Right Leg",
+          "type": "bone",
+          "name": "Right Leg"
+        },
+        {
+          "uuid": "e65a8e13-14ef-6c06-dcbb-20ec1f3f90d5",
+          "group": "Left Leg",
+          "type": "bone",
+          "name": "Left Leg"
+        }
+      ]
+    },
+    {
+      "name": "run",
+      "length_seconds": 0.65,
+      "loop": "loop",
+      "animators": 6,
+      "keyframes": 240,
+      "targets": [
+        {
+          "uuid": "1995f6df-6bf1-67d7-95e1-474372cf958d",
+          "group": "Blackwatch Rig",
+          "type": "bone",
+          "name": "Blackwatch Rig"
+        },
+        {
+          "uuid": "efa28ff0-b188-8ab7-0001-7c402f93423b",
+          "group": "Upper Body",
+          "type": "bone",
+          "name": "Upper Body"
+        },
+        {
+          "uuid": "1663e1f2-0af2-fe52-3605-6648b394566e",
+          "group": "Two Hand Carry",
+          "type": "bone",
+          "name": "Two Hand Carry"
+        },
+        {
+          "uuid": "04fc5fb1-5730-ef8c-333f-f5a23eb73252",
+          "group": "Head",
+          "type": "bone",
+          "name": "Head"
+        },
+        {
+          "uuid": "bd6d5f66-d24b-e55e-4993-307382e82bcf",
+          "group": "Right Leg",
+          "type": "bone",
+          "name": "Right Leg"
+        },
+        {
+          "uuid": "e65a8e13-14ef-6c06-dcbb-20ec1f3f90d5",
+          "group": "Left Leg",
+          "type": "bone",
+          "name": "Left Leg"
+        }
+      ]
+    },
+    {
+      "name": "shoot_standing",
+      "length_seconds": 0.5,
+      "loop": "loop",
+      "animators": 1,
+      "keyframes": 62,
+      "targets": [
+        {
+          "uuid": "1663e1f2-0af2-fe52-3605-6648b394566e",
+          "group": "Two Hand Carry",
+          "type": "bone",
+          "name": "Two Hand Carry"
+        }
+      ]
+    },
+    {
+      "name": "crouch",
+      "length_seconds": 1.4,
+      "loop": "loop",
+      "animators": 6,
+      "keyframes": 680,
+      "targets": [
+        {
+          "uuid": "1995f6df-6bf1-67d7-95e1-474372cf958d",
+          "group": "Blackwatch Rig",
+          "type": "bone",
+          "name": "Blackwatch Rig"
+        },
+        {
+          "uuid": "efa28ff0-b188-8ab7-0001-7c402f93423b",
+          "group": "Upper Body",
+          "type": "bone",
+          "name": "Upper Body"
+        },
+        {
+          "uuid": "04fc5fb1-5730-ef8c-333f-f5a23eb73252",
+          "group": "Head",
+          "type": "bone",
+          "name": "Head"
+        },
+        {
+          "uuid": "1663e1f2-0af2-fe52-3605-6648b394566e",
+          "group": "Two Hand Carry",
+          "type": "bone",
+          "name": "Two Hand Carry"
+        },
+        {
+          "uuid": "bd6d5f66-d24b-e55e-4993-307382e82bcf",
+          "group": "Right Leg",
+          "type": "bone",
+          "name": "Right Leg"
+        },
+        {
+          "uuid": "e65a8e13-14ef-6c06-dcbb-20ec1f3f90d5",
+          "group": "Left Leg",
+          "type": "bone",
+          "name": "Left Leg"
+        }
+      ]
+    },
+    {
+      "name": "shoot_crouching",
+      "length_seconds": 0.5,
+      "loop": "loop",
+      "animators": 6,
+      "keyframes": 279,
+      "targets": [
+        {
+          "uuid": "1995f6df-6bf1-67d7-95e1-474372cf958d",
+          "group": "Blackwatch Rig",
+          "type": "bone",
+          "name": "Blackwatch Rig"
+        },
+        {
+          "uuid": "efa28ff0-b188-8ab7-0001-7c402f93423b",
+          "group": "Upper Body",
+          "type": "bone",
+          "name": "Upper Body"
+        },
+        {
+          "uuid": "04fc5fb1-5730-ef8c-333f-f5a23eb73252",
+          "group": "Head",
+          "type": "bone",
+          "name": "Head"
+        },
+        {
+          "uuid": "1663e1f2-0af2-fe52-3605-6648b394566e",
+          "group": "Two Hand Carry",
+          "type": "bone",
+          "name": "Two Hand Carry"
+        },
+        {
+          "uuid": "bd6d5f66-d24b-e55e-4993-307382e82bcf",
+          "group": "Right Leg",
+          "type": "bone",
+          "name": "Right Leg"
+        },
+        {
+          "uuid": "e65a8e13-14ef-6c06-dcbb-20ec1f3f90d5",
+          "group": "Left Leg",
+          "type": "bone",
+          "name": "Left Leg"
+        }
+      ]
+    },
+    {
+      "name": "dodge",
+      "length_seconds": 0.8,
+      "loop": "once",
+      "animators": 4,
+      "keyframes": 245,
+      "targets": [
+        {
+          "uuid": "1995f6df-6bf1-67d7-95e1-474372cf958d",
+          "group": "Blackwatch Rig",
+          "type": "bone",
+          "name": "Blackwatch Rig"
+        },
+        {
+          "uuid": "1663e1f2-0af2-fe52-3605-6648b394566e",
+          "group": "Two Hand Carry",
+          "type": "bone",
+          "name": "Two Hand Carry"
+        },
+        {
+          "uuid": "bd6d5f66-d24b-e55e-4993-307382e82bcf",
+          "group": "Right Leg",
+          "type": "bone",
+          "name": "Right Leg"
+        },
+        {
+          "uuid": "e65a8e13-14ef-6c06-dcbb-20ec1f3f90d5",
+          "group": "Left Leg",
+          "type": "bone",
+          "name": "Left Leg"
+        }
+      ]
+    }
+  ],
+  "outliner_groups": [
+    {
+      "name": "Blackwatch Rig",
+      "uuid": "1995f6df-6bf1-67d7-95e1-474372cf958d",
+      "parent": null,
+      "origin": [
+        0,
+        12,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "children": 3,
+      "element_references_below": 5365
+    },
+    {
+      "name": "Upper Body",
+      "uuid": "efa28ff0-b188-8ab7-0001-7c402f93423b",
+      "parent": "1995f6df-6bf1-67d7-95e1-474372cf958d",
+      "origin": [
+        0,
+        12,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "children": 3,
+      "element_references_below": 5361
+    },
+    {
+      "name": "Body",
+      "uuid": "a8a9423b-be7e-d184-28d2-413632433f35",
+      "parent": "efa28ff0-b188-8ab7-0001-7c402f93423b",
+      "origin": [
+        0,
+        24,
+        0
+      ],
+      "rotation": null,
+      "children": 2,
+      "element_references_below": 2
+    },
+    {
+      "name": "Head",
+      "uuid": "04fc5fb1-5730-ef8c-333f-f5a23eb73252",
+      "parent": "efa28ff0-b188-8ab7-0001-7c402f93423b",
+      "origin": [
+        0,
+        24,
+        0
+      ],
+      "rotation": null,
+      "children": 2,
+      "element_references_below": 2
+    },
+    {
+      "name": "Two Hand Carry",
+      "uuid": "1663e1f2-0af2-fe52-3605-6648b394566e",
+      "parent": "efa28ff0-b188-8ab7-0001-7c402f93423b",
+      "origin": [
+        0,
+        20,
+        -5
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "children": 3,
+      "element_references_below": 5357
+    },
+    {
+      "name": "Left Arm",
+      "uuid": "97a3891e-4592-fdd6-cc63-2b536971007c",
+      "parent": "1663e1f2-0af2-fe52-3605-6648b394566e",
+      "origin": [
+        -6,
+        24,
+        0
+      ],
+      "rotation": [
+        23.094412,
+        -2.715963,
+        -13.236614
+      ],
+      "children": 3,
+      "element_references_below": 4
+    },
+    {
+      "name": "Left Arm Forearm",
+      "uuid": "9f7fcc06-b3ef-8156-dca8-623b0a8af192",
+      "parent": "97a3891e-4592-fdd6-cc63-2b536971007c",
+      "origin": [
+        -6,
+        18,
+        0
+      ],
+      "rotation": [
+        -0.859774,
+        28.125151,
+        95.185932
+      ],
+      "children": 2,
+      "element_references_below": 2
+    },
+    {
+      "name": "Right Arm",
+      "uuid": "830b2dcd-baae-d344-1d78-03d8d6511c62",
+      "parent": "1663e1f2-0af2-fe52-3605-6648b394566e",
+      "origin": [
+        6,
+        24,
+        0
+      ],
+      "rotation": [
+        56.101509,
+        -7.146476,
+        -13.368329
+      ],
+      "children": 3,
+      "element_references_below": 4
+    },
+    {
+      "name": "Right Arm Forearm",
+      "uuid": "b3becfab-9e58-209d-7ef7-fc6b87349a80",
+      "parent": "830b2dcd-baae-d344-1d78-03d8d6511c62",
+      "origin": [
+        6,
+        18,
+        0
+      ],
+      "rotation": [
+        2.822417,
+        -14.834521,
+        -27.154952
+      ],
+      "children": 2,
+      "element_references_below": 2
+    },
+    {
+      "name": "Weapon - Left Grip",
+      "uuid": "67648350-7288-ca18-85cf-b8cf0485d5c8",
+      "parent": "1663e1f2-0af2-fe52-3605-6648b394566e",
+      "origin": [
+        -2,
+        19,
+        -5
+      ],
+      "rotation": [
+        0,
+        -33.4,
+        0
+      ],
+      "children": 5349,
+      "element_references_below": 5349
+    },
+    {
+      "name": "Right Leg",
+      "uuid": "bd6d5f66-d24b-e55e-4993-307382e82bcf",
+      "parent": "1995f6df-6bf1-67d7-95e1-474372cf958d",
+      "origin": [
+        2,
+        12,
+        0
+      ],
+      "rotation": null,
+      "children": 2,
+      "element_references_below": 2
+    },
+    {
+      "name": "Left Leg",
+      "uuid": "e65a8e13-14ef-6c06-dcbb-20ec1f3f90d5",
+      "parent": "1995f6df-6bf1-67d7-95e1-474372cf958d",
+      "origin": [
+        -2,
+        12,
+        0
+      ],
+      "rotation": null,
+      "children": 2,
+      "element_references_below": 2
+    }
+  ],
+  "use_status": "仅参考；未直接整体导入运行资源或JAR",
+  "author": "1145homo（用户提供截图署名）",
+  "permission_evidence": "截图中作者回复“可以直接用”；仅记录本次提供的许可事实，不扩展为独立许可证"
+}

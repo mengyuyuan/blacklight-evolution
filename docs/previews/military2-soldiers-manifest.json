@@ -1,0 +1,24 @@
+{
+  "source": "F:\\MC建筑\\blacklight-evolution\\src\\main\\java\\com\\codex\\blacklight\\client\\model\\BlackwatchModel.java",
+  "source_sha256": "aff76ad77296d660ec87b0df3abe0826601353056779930e46f6d152160bae83",
+  "pieces": 110,
+  "staged": false,
+  "textures": {
+    "military": {
+      "path": "F:\\MC建筑\\blacklight-evolution\\src\\main\\resources\\assets\\blacklight\\textures\\entity\\military_soldier_layered.png",
+      "sha256": "303fd14aa647d14b4f2c48c93c934bb6a8243b2a30e68d904c082ab3b2d0e747",
+      "size": [
+        512,
+        512
+      ]
+    },
+    "blackwatch": {
+      "path": "F:\\MC建筑\\blacklight-evolution\\src\\main\\resources\\assets\\blacklight\\textures\\entity\\blackwatch_soldier_layered.png",
+      "sha256": "6f91565e5569a9a96e3f9d550d13b8e648908b7f712d6fa034a326f0b8659e4a",
+      "size": [
+        512,
+        512
+      ]
+    }
+  }
+}

@@ -1,0 +1,7 @@
+{
+  "type": "blacklight:colossal_hive",
+  "biomes": "#blacklight:has_structure/colossal_hive",
+  "step": "surface_structures",
+  "spawn_overrides": {},
+  "terrain_adaptation": "none"
+}

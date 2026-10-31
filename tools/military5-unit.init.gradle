@@ -1,0 +1,5 @@
+// Test the actual production source set. GameTest fixtures are compiled/run by military5-regression separately.
+allprojects {
+    tasks.withType(ProcessResources).configureEach { filteringCharset = 'UTF-8' }
+    tasks.matching { it.name == 'generateModMetadata' }.configureEach { outputs.upToDateWhen { false } }
+}

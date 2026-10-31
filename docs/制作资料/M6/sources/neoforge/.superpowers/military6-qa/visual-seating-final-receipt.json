@@ -1,0 +1,129 @@
+{
+  "schema_version": 1,
+  "run_id": "visual-seating-final-20261027",
+  "repository": "F:/MC建筑/.blackwatch-worktrees/neoforge-military6",
+  "loader": "neoforge",
+  "result": "FOCUSED_GEOMETRY_AND_ASSET_CHECKS_PASS",
+  "recorded_at": "2026-10-27T23:43:33+08:00",
+  "log": ".superpowers/military6-qa/visual-seating-final-receipt.log",
+  "evidence_root": "build/military6-visual-capture/seating-qa",
+  "machine_asset_receipt": "build/military6-visual-capture/seating-qa/final-assets-green2/receipt.json",
+  "machine_asset_receipt_sha256": "c351138bc88b0647d8442e64d25f797ab05683904a461cc13245efdd390ffbaa",
+  "red_evidence": [
+    {"directory": "body-walls-red1", "compile_exit_code": 0, "junit_exit_code": 1, "tests": 8, "passed": 7, "failed": 1},
+    {"directory": "body-volume-red2", "compile_exit_code": 0, "junit_exit_code": 1, "tests": 8, "passed": 7, "failed": 1},
+    {"directory": "role-clearance-red3", "compile_exit_code": 0, "junit_exit_code": 1, "tests": 8, "passed": 7, "failed": 1}
+  ],
+  "geometry_findings": {
+    "render_basis": "The real LivingEntity model basis (180-degree Y rotation, scale -1/-1/+1, translation y=-1.501) was correct. Entity feet/base and preview use the same generated anchors.",
+    "original_driver_right_arm_min_x": -1.182165,
+    "cab_inner_left_x": -1.01,
+    "original_officer_left_arm_max_x": 1.213054,
+    "cab_inner_right_x": 1.01,
+    "original_cargo_outer_arm_abs_x": 1.263054,
+    "original_cargo_outer_leg_abs_x": 1.185619,
+    "cargo_inner_abs_x": 1.07,
+    "original_driver_arm_max_z": 2.772373,
+    "original_driver_leg_max_z": 2.821716,
+    "original_driver_leg_min_y": 1.05588,
+    "cab_floor_top_y": 1.2,
+    "role_red_cargo_military_officer_head_max_y": 2.98225,
+    "cargo_roof_bottom_y": 2.95,
+    "role_red_cab_commander_coat_min_y": 1.179125,
+    "cause": "Truck seat centers were too far outward, cab seats were too far forward, and the rigid seated limb pose used arm roll plus leg yaw/roll and a low hip position. Role hats and coat hems also required seated clearance. These are actual vertex bounds, not an image-only inference."
+  },
+  "production_change": {
+    "cab_seats": {"x": [-0.48, 0.48], "y": 0.55, "z": 1.7},
+    "cargo_seats": {"x": [-0.5, 0.5], "y": 0.85, "z": [-0.6, -1.4, -2.2]},
+    "pose": "Remove seated arm roll; make both rigid legs level and parallel; raise seated leg roots from 12 to 11 model pixels; tuck commander coat hems upward by 0.5 model pixels only in the seated adapter.",
+    "generated_assets": [
+      "art/military-vehicles/truck.bbmodel",
+      "src/main/resources/assets/blacklight/military/vehicle-models.json",
+      "src/main/resources/data/blacklight/military/vehicle-mounts.json"
+    ],
+    "same_entity_and_visual_anchors": true,
+    "model_scale_changed": false,
+    "tank_or_apc_geometry_changed": false,
+    "tank_followup": "No speculative barrel change. Existing actual ModelPart mount/aim tests passed, including server/client mount agreement across body/turret/pitch and depression direction; single-view full gameplay barrel clearance is not claimed."
+  },
+  "green_evidence": {
+    "directory": "body-volume-green2",
+    "receipt": "build/military6-visual-capture/seating-qa/body-volume-green2/receipt.json",
+    "compile_started_at": "2026-10-27T23:41:53.106761+08:00",
+    "compile_ended_at": "2026-10-27T23:41:55.250335+08:00",
+    "compile_exit_code": 0,
+    "junit_started_at": "2026-10-27T23:41:55.251990+08:00",
+    "junit_ended_at": "2026-10-27T23:41:56.690621+08:00",
+    "junit_exit_code": 0,
+    "tests": 8,
+    "passed": 8,
+    "failed": 0,
+    "skipped": 0,
+    "body_clearance_combinations": 128,
+    "body_parts_per_combination": 6,
+    "coverage": "All eight truck seats, both factions, regular/heavy bodies, none/team_leader/officer/commander appearance. Actual head/body/arms/legs render vertices are checked against actual cab doors, stepped front, rear wall, floor and roof, and cargo sides, ends, floor and roof. All model-part scales must remain 1.",
+    "final_standard_capture_min_lateral_clearance_blocks": 0.02624995470046998
+  },
+  "asset_checks": {
+    "vehicles_check_exit_code": 0,
+    "vehicles_files": 9,
+    "items_check_exit_code": 0,
+    "items_files": 22,
+    "garage_generator_check_option_added": false,
+    "garage_tests_exit_code": 0,
+    "garage_tests_passed": 4,
+    "garage_install_used": false,
+    "garage_generated_directory": "build/military6-visual-capture/seating-qa/final-assets-green2/garage-generated",
+    "production_garage_comparison": "Both actual production NBT files and metadata equal isolated generated files byte for byte; decompressed NBT equality was also verified. Full production/generated/decompressed SHA256 values are in machine_asset_receipt."
+  },
+  "canonical_capture": {
+    "command_line": "python -B -X utf8 tools/preview_military_vehicles.py",
+    "started_at": "2026-10-27T23:41:59.484013+08:00",
+    "ended_at": "2026-10-27T23:42:06.039633+08:00",
+    "exit_code": 0,
+    "output": "art/military-vehicles/previews/production",
+    "scenes": 8,
+    "main_pngs": 9,
+    "additional_diagnostic_pngs": 2,
+    "manifest_sha256": "91469a743f5a741f4fe19e714b05fb65aeb6ff0b87baf0336149ba05ce13f0e2",
+    "capture_sha256": "31f57e8e37e3210ba668c938eb1e765ea6a6a2a8cb3fe1b2fcc93b94661e38a0",
+    "diagnostic_capture_sha256": "8c113c70119ea032ec6c7093c56254049d5a28bb039cac3edf6958002d39e56a",
+    "all_manifest_image_hashes_verified": true,
+    "all_eleven_png_hashes_match_other_loader": true,
+    "tank_and_apc_png_hashes_unchanged_from_initial_receipt": true,
+    "diagnostic_method": "The same production rider vertices are reused in an offline-only vehicle cutaway. No rider geometry or model size is removed. Diagnostic images live in a subdirectory, preserving the existing eight-scene/nine-PNG canonical manifest contract."
+  },
+  "final_source_sha256": {
+    "src/main/java/com/codex/blacklight/client/model/BlackwatchModel.java": "5e0e28407560a5a839851a0ecaa9dca5e899f544416cea06e8f5e242934218f6",
+    "art/military-vehicles/vehicle-authoring.json": "df546a58efaddcdba90f717587876602c68e42af2bcc68a70d7a60fbec4542da",
+    "art/military-vehicles/truck.bbmodel": "dca01e311e5ca004627cf2b2077e104cad59f6bfe11ff1022b82ea14d7a9f10c",
+    "src/main/resources/assets/blacklight/military/vehicle-models.json": "5f6b0f90c785c5bc7fac80b29e31bd91d28a1f8dababddb2a8723b24f7937c0e",
+    "src/main/resources/data/blacklight/military/vehicle-mounts.json": "9d155af583aad174ff6eab5ddd8fa3b5f51df484e19b32928323d8742c36abd6",
+    "tools/VehicleMeshCapture.java": "5bddf928eab952a4782b45e5262e7dc3931224b4d84963fb850d0efcc784faf2",
+    "tools/preview_military_vehicles.py": "2ab27a11bb35d4275ca4206daf146fd9d90b254969c4a2aba6411e9bbd467bae",
+    "src/test/java/com/codex/blacklight/client/model/VehicleRiderPoseTest.java": "4519075d3c47bea3b0bf5a461497fdd55175d124b4af519533c2bd3f0cf01153"
+  },
+  "visual_review": {
+    "reviewer": "AI agent viewing actual final local image attachments; not a human playtest",
+    "opened_after_final_capture": [
+      "art/military-vehicles/previews/production/truck-crew-military.png",
+      "art/military-vehicles/previews/production/truck-crew-blackwatch.png",
+      "art/military-vehicles/previews/production/diagnostics/truck-crew-interior-military.png",
+      "art/military-vehicles/previews/production/diagnostics/truck-crew-interior-blackwatch.png"
+    ],
+    "observation": "The previous dark limb strips at the cab door and three cargo side positions are gone. Cutaways show the full riders inside the body footprint. Faces remain visible through the real open canvas front above the cab; opaque normal views do not expose all interior details.",
+    "limits": "Static CPU pose and wall clearance only. No GL/game/human playtest; no claim of testing all animated head angles, rider-to-rider collision or every barrel sweep."
+  },
+  "scope": {
+    "gradle_or_server_run": false,
+    "vehicle_fleet_system_modified": false,
+    "military_soldier_modified": false,
+    "client_input_modified": false,
+    "main_record_or_snapshots_modified": false,
+    "user_worlds_pcl_or_old_deliveries_modified": false,
+    "git_commit_push_fetch_pull_reset_clean_used": false,
+    "old_files_deleted": false,
+    "old_receipts_and_preview_subdirectories_preserved": true
+  },
+  "next_step": "Production edits are finished. Root should freeze the listed hashes and run the full integration/release tests; refresh any delivery source snapshots separately."
+}

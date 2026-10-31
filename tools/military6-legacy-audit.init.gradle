@@ -1,0 +1,22 @@
+// Combine with -I tools/military5-homes-server.init.gradle, using a prepared M5 copy.
+allprojects {
+    tasks.withType(Jar).configureEach { exclude 'com/codex/blacklight/city/Military6LegacyAudit*.class' }
+    afterEvaluate {
+        def phase = project.findProperty('military6LegacyPhase')?.toString()
+        if (!(phase in ['first', 'second'])) throw new GradleException('Set -Pmilitary6LegacyPhase=first or second')
+        if (!project.hasProperty('serverRunDirectory')) throw new GradleException('Set the prepared -PserverRunDirectory')
+        def directory = project.file(project.property('serverRunDirectory')).canonicalFile
+        if (directory.parentFile != project.file('.superpowers').canonicalFile || !directory.name.startsWith('military6-legacy-'))
+            throw new GradleException('Use a new .superpowers/military6-legacy-* M5 copy')
+        def manifestFile = new File(directory, 'military6-legacy-copy.json')
+        if (!manifestFile.isFile()) throw new GradleException('Run tools/prepare_military6_upgrade.py first')
+        def manifest = new groovy.json.JsonSlurper().parse(manifestFile, 'UTF-8')
+        if (manifest.schema != 1 || manifest.status != 'COPY_VERIFIED' || new File(manifest.destination).canonicalFile != directory)
+            throw new GradleException('Copy manifest does not match the requested run directory')
+        def dimension = project.findProperty('cityMilitaryAuditDimension')?.toString() ?: 'city'
+        if (manifest.dimension != 'blacklight:' + dimension || !(manifest.case in ['neo-city', 'neo-world']))
+            throw new GradleException('Select the copied city/world with -PcityMilitaryAuditDimension=city or world')
+        neoForge.runs.server.systemProperty 'blacklight.military6LegacyAudit', 'true'
+        neoForge.runs.server.systemProperty 'blacklight.military6LegacyAudit.phase', phase
+    }
+}

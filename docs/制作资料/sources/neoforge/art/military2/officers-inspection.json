@@ -1,0 +1,86 @@
+{
+  "texture_sizes": {
+    "military": [
+      512,
+      512
+    ],
+    "blackwatch": [
+      512,
+      512
+    ]
+  },
+  "independent_faction_pngs": true,
+  "disjoint_uv_islands": 242,
+  "all_cube_face_samples_opaque": true,
+  "variants": {
+    "uniform-military": {
+      "pieces": 10,
+      "equipped": false
+    },
+    "uniform-blackwatch": {
+      "pieces": 10,
+      "equipped": false
+    },
+    "military-regular": {
+      "pieces": 46,
+      "equipped": true
+    },
+    "military-heavy": {
+      "pieces": 55,
+      "equipped": true
+    },
+    "blackwatch-regular": {
+      "pieces": 48,
+      "equipped": true
+    },
+    "blackwatch-heavy": {
+      "pieces": 60,
+      "equipped": true
+    }
+  },
+  "empty_hand_hides_every_weapon_family": true,
+  "production_java_sha256": "d5e2fe99f0a428c3531b5839ce0a0e36b450917956949f785e97019959470d28",
+  "inspected_at": "2026-10-24T07:36:44.381357+08:00",
+  "scope": "Static geometry / UV / PNG inspection only, not a game-client render or Gradle build.",
+  "roles": {
+    "military-team_leader": {
+      "role": "team_leader",
+      "default_rank_ordinal": 2,
+      "visible_pieces": 59,
+      "role_pieces": 11
+    },
+    "military-officer": {
+      "role": "officer",
+      "default_rank_ordinal": 3,
+      "visible_pieces": 54,
+      "role_pieces": 20
+    },
+    "military-commander": {
+      "role": "commander",
+      "default_rank_ordinal": 5,
+      "visible_pieces": 67,
+      "role_pieces": 33
+    },
+    "blackwatch-team_leader": {
+      "role": "team_leader",
+      "default_rank_ordinal": 2,
+      "visible_pieces": 61,
+      "role_pieces": 11
+    },
+    "blackwatch-officer": {
+      "role": "officer",
+      "default_rank_ordinal": 3,
+      "visible_pieces": 61,
+      "role_pieces": 21
+    },
+    "blackwatch-commander": {
+      "role": "commander",
+      "default_rank_ordinal": 5,
+      "visible_pieces": 76,
+      "role_pieces": 36
+    }
+  },
+  "role_rank_combinations_checked": 48,
+  "uniforms_complete_empty_hands_hide_guns_bw_respirators_retained": true,
+  "military2_geometry_uv_existing_pixels_and_six_renders_preserved": true
+}

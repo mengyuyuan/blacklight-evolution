@@ -1,0 +1,6 @@
+2026-10-24 02:13 UTC: independent javac API check exit 0.
+Sources: FirearmViewEvents.java and FirearmViewState.java only.
+Neo endpoint uses Java 21 --release 21; Forge endpoint Java 17 --release 17.
+Uses endpoint cached Minecraft/Forge classpath and existing main classes.
+FirearmsCombat.java was read only for the SHA manifest; not modified or recompiled in this pass.
+No Gradle, runtime GameTest, GL render test, or user game was run by this subtask.

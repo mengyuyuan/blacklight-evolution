@@ -7,13 +7,14 @@ import static com.codex.blacklight.config.GameplayBalanceConfig.value;
 public final class DistrictThreat {
     public static final int MAXIMUM=10000, YELLOW=2000, RED=6000;
     public enum Zone { GREEN, YELLOW, RED }
-    public record Signal(int infected,int mature,int evolved,int colonies,int redNeighbours,int yellowNeighbours) {
+    public record Signal(int infected,int mature,int evolved,int colonies,int redNeighbours,int yellowNeighbours,int military) {
+        public Signal(int infected,int mature,int evolved,int colonies,int redNeighbours,int yellowNeighbours){this(infected,mature,evolved,colonies,redNeighbours,yellowNeighbours,0);}
         public static final Signal EMPTY=new Signal(0,0,0,0,0,0);
         public int rate(){
             int local=infected>0?Math.min(12,2+Math.max(0,infected)/2):0;
             local+=Math.min(3,Math.max(0,mature))*2+Math.min(2,Math.max(0,evolved))*5+Math.min(20,Math.min(4,Math.max(0,colonies))*6);
             int incoming=Math.min(10,Math.min(4,Math.max(0,redNeighbours))*3+Math.min(4,Math.max(0,yellowNeighbours)));
-            return local+incoming-(local==0?(incoming>0?1:6):0);
+            return local+incoming-(local==0?(incoming>0?1:6):0)-Math.min(8,Math.max(0,military)*2);
         }
     }
     private DistrictThreat(){}

@@ -1,0 +1,4600 @@
+[
+  {
+    "group": "all",
+    "parent": "head",
+    "name": "uniform_head",
+    "uv": [
+      2,
+      2
+    ],
+    "box": [
+      -4,
+      -8,
+      -4,
+      8,
+      8,
+      8
+    ],
+    "material": "skin",
+    "detail": "face"
+  },
+  {
+    "group": "all",
+    "parent": "body",
+    "name": "uniform_torso",
+    "uv": [
+      36,
+      2
+    ],
+    "box": [
+      -4,
+      0,
+      -2,
+      8,
+      12,
+      4
+    ],
+    "material": "cloth",
+    "detail": "jacket"
+  },
+  {
+    "group": "all",
+    "parent": "right_arm",
+    "name": "uniform_sleeve",
+    "uv": [
+      62,
+      2
+    ],
+    "box": [
+      -3,
+      -2,
+      -2,
+      4,
+      12,
+      4
+    ],
+    "material": "cloth",
+    "detail": "sleeve"
+  },
+  {
+    "group": "all",
+    "parent": "right_leg",
+    "name": "uniform_trouser",
+    "uv": [
+      80,
+      2
+    ],
+    "box": [
+      -2,
+      0,
+      -2,
+      4,
+      12,
+      4
+    ],
+    "material": "cloth",
+    "detail": "trouser"
+  },
+  {
+    "group": "all",
+    "parent": "right_leg",
+    "name": "uniform_boot",
+    "uv": [
+      98,
+      2
+    ],
+    "box": [
+      -2.06,
+      8.2,
+      -2.4,
+      4.12,
+      3.8,
+      4.55
+    ],
+    "material": "boot",
+    "detail": "laces"
+  },
+  {
+    "group": "all",
+    "parent": "right_leg",
+    "name": "uniform_sole",
+    "uv": [
+      118,
+      2
+    ],
+    "box": [
+      -2.1,
+      11.45,
+      -2.55,
+      4.2,
+      0.6,
+      4.75
+    ],
+    "material": "rubber",
+    "detail": ""
+  },
+  {
+    "group": "all",
+    "parent": "left_arm",
+    "name": "uniform_sleeve",
+    "uv": [
+      138,
+      2
+    ],
+    "box": [
+      -1,
+      -2,
+      -2,
+      4,
+      12,
+      4
+    ],
+    "material": "cloth",
+    "detail": "sleeve"
+  },
+  {
+    "group": "all",
+    "parent": "left_leg",
+    "name": "uniform_trouser",
+    "uv": [
+      156,
+      2
+    ],
+    "box": [
+      -2,
+      0,
+      -2,
+      4,
+      12,
+      4
+    ],
+    "material": "cloth",
+    "detail": "trouser"
+  },
+  {
+    "group": "all",
+    "parent": "left_leg",
+    "name": "uniform_boot",
+    "uv": [
+      174,
+      2
+    ],
+    "box": [
+      -2.06,
+      8.2,
+      -2.4,
+      4.12,
+      3.8,
+      4.55
+    ],
+    "material": "boot",
+    "detail": "laces"
+  },
+  {
+    "group": "all",
+    "parent": "left_leg",
+    "name": "uniform_sole",
+    "uv": [
+      194,
+      2
+    ],
+    "box": [
+      -2.1,
+      11.45,
+      -2.55,
+      4.2,
+      0.6,
+      4.75
+    ],
+    "material": "rubber",
+    "detail": ""
+  },
+  {
+    "group": "military",
+    "parent": "head",
+    "name": "gear_helmet_crown",
+    "uv": [
+      214,
+      2
+    ],
+    "box": [
+      -4.075,
+      -8.65,
+      -4.075,
+      8.15,
+      1.55,
+      8.15
+    ],
+    "material": "helmet",
+    "detail": "helmet"
+  },
+  {
+    "group": "military",
+    "parent": "head",
+    "name": "gear_helmet_rim",
+    "uv": [
+      2,
+      20
+    ],
+    "box": [
+      -4.25,
+      -7.1,
+      -4.2,
+      8.5,
+      1.4,
+      8.4
+    ],
+    "material": "helmet",
+    "detail": "helmet"
+  },
+  {
+    "group": "military",
+    "parent": "head",
+    "name": "gear_helmet_rear",
+    "uv": [
+      38,
+      20
+    ],
+    "box": [
+      -4.2,
+      -5.7,
+      3.7,
+      8.4,
+      2.4,
+      0.65
+    ],
+    "material": "helmet",
+    "detail": ""
+  },
+  {
+    "group": "military",
+    "parent": "head",
+    "name": "gear_helmet_right",
+    "uv": [
+      59,
+      20
+    ],
+    "box": [
+      -4.3,
+      -5.7,
+      -3,
+      0.6,
+      1.9,
+      6.7
+    ],
+    "material": "helmet",
+    "detail": ""
+  },
+  {
+    "group": "military",
+    "parent": "head",
+    "name": "gear_helmet_left",
+    "uv": [
+      76,
+      20
+    ],
+    "box": [
+      3.7,
+      -5.7,
+      -3,
+      0.6,
+      1.9,
+      6.7
+    ],
+    "material": "helmet",
+    "detail": ""
+  },
+  {
+    "group": "military",
+    "parent": "head",
+    "name": "gear_helmet_brim",
+    "uv": [
+      93,
+      20
+    ],
+    "box": [
+      -4.3,
+      -5.95,
+      -4.65,
+      8.6,
+      0.45,
+      1.2
+    ],
+    "material": "helmet",
+    "detail": ""
+  },
+  {
+    "group": "military",
+    "parent": "head",
+    "name": "gear_headset",
+    "uv": [
+      115,
+      20
+    ],
+    "box": [
+      -4.65,
+      -4.8,
+      -0.9,
+      0.7,
+      2.25,
+      2.1
+    ],
+    "material": "rubber",
+    "detail": "headset"
+  },
+  {
+    "group": "military",
+    "parent": "head",
+    "name": "gear_microphone",
+    "uv": [
+      123,
+      20
+    ],
+    "box": [
+      -4.45,
+      -2.8,
+      -3.6,
+      0.35,
+      0.4,
+      3.5
+    ],
+    "material": "metal",
+    "detail": ""
+  },
+  {
+    "group": "military",
+    "parent": "head",
+    "name": "gear_stowed_goggles",
+    "uv": [
+      133,
+      20
+    ],
+    "box": [
+      -2.9,
+      -7.35,
+      -4.52,
+      5.8,
+      1.3,
+      0.55
+    ],
+    "material": "lens",
+    "detail": "goggles"
+  },
+  {
+    "group": "bw",
+    "parent": "head",
+    "name": "gear_hood_crown",
+    "uv": [
+      148,
+      20
+    ],
+    "box": [
+      -4.075,
+      -8.6,
+      -4.075,
+      8.15,
+      1.55,
+      8.15
+    ],
+    "material": "hood",
+    "detail": ""
+  },
+  {
+    "group": "bw",
+    "parent": "head",
+    "name": "gear_hood_rim",
+    "uv": [
+      183,
+      20
+    ],
+    "box": [
+      -4.3,
+      -7.05,
+      -4.25,
+      8.6,
+      1.25,
+      8.6
+    ],
+    "material": "hood",
+    "detail": ""
+  },
+  {
+    "group": "bw",
+    "parent": "head",
+    "name": "gear_hood_rear",
+    "uv": [
+      220,
+      20
+    ],
+    "box": [
+      -4.25,
+      -5.8,
+      3.8,
+      8.5,
+      5.9,
+      0.65
+    ],
+    "material": "hood",
+    "detail": "hood"
+  },
+  {
+    "group": "bw",
+    "parent": "head",
+    "name": "gear_hood_right",
+    "uv": [
+      2,
+      32
+    ],
+    "box": [
+      -4.35,
+      -5.8,
+      -4.2,
+      0.65,
+      5.7,
+      8.6
+    ],
+    "material": "hood",
+    "detail": ""
+  },
+  {
+    "group": "bw",
+    "parent": "head",
+    "name": "gear_hood_left",
+    "uv": [
+      23,
+      32
+    ],
+    "box": [
+      3.7,
+      -5.8,
+      -4.2,
+      0.65,
+      5.7,
+      8.6
+    ],
+    "material": "hood",
+    "detail": ""
+  },
+  {
+    "group": "bw",
+    "parent": "head",
+    "name": "gear_mask_seal",
+    "uv": [
+      44,
+      32
+    ],
+    "box": [
+      -3.75,
+      -5.9,
+      -4.48,
+      7.5,
+      6.1,
+      0.65
+    ],
+    "material": "rubber",
+    "detail": "seal"
+  },
+  {
+    "group": "bw",
+    "parent": "head",
+    "name": "gear_lens_right",
+    "uv": [
+      63,
+      32
+    ],
+    "box": [
+      -3.3,
+      -5.25,
+      -4.88,
+      2.95,
+      1.45,
+      0.5
+    ],
+    "material": "lens",
+    "detail": "lens"
+  },
+  {
+    "group": "bw",
+    "parent": "head",
+    "name": "gear_lens_left",
+    "uv": [
+      72,
+      32
+    ],
+    "box": [
+      0.35,
+      -5.25,
+      -4.88,
+      2.95,
+      1.45,
+      0.5
+    ],
+    "material": "lens",
+    "detail": "lens"
+  },
+  {
+    "group": "bw",
+    "parent": "head",
+    "name": "gear_respirator",
+    "uv": [
+      81,
+      32
+    ],
+    "box": [
+      -2.6,
+      -3.35,
+      -5.2,
+      5.2,
+      2.85,
+      1.15
+    ],
+    "material": "mask",
+    "detail": "vents"
+  },
+  {
+    "group": "bw",
+    "parent": "head",
+    "name": "gear_filter_right",
+    "uv": [
+      96,
+      32
+    ],
+    "box": [
+      -4.05,
+      -2.85,
+      -5.4,
+      1.7,
+      2.1,
+      1.65
+    ],
+    "material": "filter",
+    "detail": "filter"
+  },
+  {
+    "group": "bw",
+    "parent": "head",
+    "name": "gear_filter_left",
+    "uv": [
+      105,
+      32
+    ],
+    "box": [
+      2.35,
+      -2.85,
+      -5.4,
+      1.7,
+      2.1,
+      1.65
+    ],
+    "material": "filter",
+    "detail": "filter"
+  },
+  {
+    "group": "all",
+    "parent": "body",
+    "name": "gear_front_carrier",
+    "uv": [
+      114,
+      32
+    ],
+    "box": [
+      -3.8,
+      0.8,
+      -2.7,
+      7.6,
+      7.55,
+      0.8
+    ],
+    "material": "carrier",
+    "detail": "molle"
+  },
+  {
+    "group": "all",
+    "parent": "body",
+    "name": "gear_rear_carrier",
+    "uv": [
+      133,
+      32
+    ],
+    "box": [
+      -3.8,
+      0.8,
+      1.95,
+      7.6,
+      7.55,
+      0.8
+    ],
+    "material": "carrier",
+    "detail": "molle"
+  },
+  {
+    "group": "all",
+    "parent": "body",
+    "name": "gear_strap_right",
+    "uv": [
+      152,
+      32
+    ],
+    "box": [
+      -3.65,
+      -0.15,
+      -2.65,
+      1.45,
+      2,
+      5.3
+    ],
+    "material": "webbing",
+    "detail": "strap"
+  },
+  {
+    "group": "all",
+    "parent": "body",
+    "name": "gear_strap_left",
+    "uv": [
+      168,
+      32
+    ],
+    "box": [
+      2.2,
+      -0.15,
+      -2.65,
+      1.45,
+      2,
+      5.3
+    ],
+    "material": "webbing",
+    "detail": "strap"
+  },
+  {
+    "group": "all",
+    "parent": "body",
+    "name": "gear_magpouch_0",
+    "uv": [
+      184,
+      32
+    ],
+    "box": [
+      -3.15,
+      4.65,
+      -4.05,
+      1.8,
+      3.2,
+      1.45
+    ],
+    "material": "pouch",
+    "detail": "pouch"
+  },
+  {
+    "group": "all",
+    "parent": "body",
+    "name": "gear_magpouch_1",
+    "uv": [
+      193,
+      32
+    ],
+    "box": [
+      -0.9,
+      4.65,
+      -4.05,
+      1.8,
+      3.2,
+      1.45
+    ],
+    "material": "pouch",
+    "detail": "pouch"
+  },
+  {
+    "group": "all",
+    "parent": "body",
+    "name": "gear_magpouch_2",
+    "uv": [
+      202,
+      32
+    ],
+    "box": [
+      1.35,
+      4.65,
+      -4.05,
+      1.8,
+      3.2,
+      1.45
+    ],
+    "material": "pouch",
+    "detail": "pouch"
+  },
+  {
+    "group": "all",
+    "parent": "body",
+    "name": "gear_belt",
+    "uv": [
+      211,
+      32
+    ],
+    "box": [
+      -4.12,
+      9.25,
+      -2.2,
+      8.24,
+      1.1,
+      4.4
+    ],
+    "material": "webbing",
+    "detail": "belt"
+  },
+  {
+    "group": "all",
+    "parent": "body",
+    "name": "gear_utility_pouch",
+    "uv": [
+      239,
+      32
+    ],
+    "box": [
+      3.6,
+      8.7,
+      -0.1,
+      1.45,
+      2.8,
+      2.1
+    ],
+    "material": "pouch",
+    "detail": "pouch"
+  },
+  {
+    "group": "all",
+    "parent": "body",
+    "name": "gear_rank_patch",
+    "uv": [
+      249,
+      32
+    ],
+    "box": [
+      -3.25,
+      1.8,
+      -3.62,
+      2.15,
+      2.1,
+      0.3
+    ],
+    "material": "patch",
+    "detail": ""
+  },
+  {
+    "group": "all",
+    "parent": "body",
+    "name": "gear_faction_tab",
+    "uv": [
+      2,
+      49
+    ],
+    "box": [
+      0.8,
+      1.85,
+      -3.62,
+      2.35,
+      1,
+      0.3
+    ],
+    "material": "identity",
+    "detail": "identity"
+  },
+  {
+    "group": "regular",
+    "parent": "body",
+    "name": "gear_patrol_pack",
+    "uv": [
+      10,
+      49
+    ],
+    "box": [
+      -2.7,
+      2,
+      2.75,
+      5.4,
+      6.1,
+      2.3
+    ],
+    "material": "pack",
+    "detail": "pack"
+  },
+  {
+    "group": "regular",
+    "parent": "body",
+    "name": "gear_radio",
+    "uv": [
+      28,
+      49
+    ],
+    "box": [
+      -4.15,
+      1.15,
+      2.75,
+      1.65,
+      3.75,
+      1.7
+    ],
+    "material": "radio",
+    "detail": "radio"
+  },
+  {
+    "group": "heavy",
+    "parent": "body",
+    "name": "gear_supply_pack",
+    "uv": [
+      37,
+      49
+    ],
+    "box": [
+      -3.25,
+      1,
+      2.75,
+      6.5,
+      8.6,
+      3.5
+    ],
+    "material": "pack",
+    "detail": "pack"
+  },
+  {
+    "group": "heavy",
+    "parent": "body",
+    "name": "gear_supply_lid",
+    "uv": [
+      59,
+      49
+    ],
+    "box": [
+      -3.4,
+      0.65,
+      2.65,
+      6.8,
+      1.65,
+      3.7
+    ],
+    "material": "webbing",
+    "detail": "strap"
+  },
+  {
+    "group": "all",
+    "parent": "body",
+    "name": "gear_aerial",
+    "uv": [
+      82,
+      49
+    ],
+    "box": [
+      -3.5,
+      -2.3,
+      3.75,
+      0.3,
+      4,
+      0.3
+    ],
+    "material": "metal",
+    "detail": ""
+  },
+  {
+    "group": "heavy",
+    "parent": "body",
+    "name": "gear_sternum_plate",
+    "uv": [
+      86,
+      49
+    ],
+    "box": [
+      -3.55,
+      0.7,
+      -3.25,
+      7.1,
+      3.5,
+      0.65
+    ],
+    "material": "plate",
+    "detail": "plate"
+  },
+  {
+    "group": "heavy",
+    "parent": "body",
+    "name": "gear_abdomen_plate",
+    "uv": [
+      104,
+      49
+    ],
+    "box": [
+      -2.7,
+      8,
+      -2.75,
+      5.4,
+      2.25,
+      0.65
+    ],
+    "material": "plate",
+    "detail": "plate"
+  },
+  {
+    "group": "bwHeavy",
+    "parent": "body",
+    "name": "gear_neck_guard",
+    "uv": [
+      119,
+      49
+    ],
+    "box": [
+      -3.5,
+      -0.65,
+      -2.45,
+      7,
+      1.45,
+      4.9
+    ],
+    "material": "plate",
+    "detail": "plate"
+  },
+  {
+    "group": "all",
+    "parent": "right_arm",
+    "name": "gear_glove",
+    "uv": [
+      145,
+      49
+    ],
+    "box": [
+      -3.06,
+      6.85,
+      -2.06,
+      4.12,
+      3.3,
+      4.12
+    ],
+    "material": "glove",
+    "detail": "glove"
+  },
+  {
+    "group": "heavy",
+    "parent": "right_arm",
+    "name": "gear_shoulder",
+    "uv": [
+      164,
+      49
+    ],
+    "box": [
+      -3.15,
+      -2.25,
+      -2.35,
+      4.3,
+      2.9,
+      4.7
+    ],
+    "material": "plate",
+    "detail": "plate"
+  },
+  {
+    "group": "heavy",
+    "parent": "right_arm",
+    "name": "gear_forearm",
+    "uv": [
+      184,
+      49
+    ],
+    "box": [
+      -3.08,
+      4.4,
+      -2.35,
+      4.16,
+      2.45,
+      0.55
+    ],
+    "material": "plate",
+    "detail": "plate"
+  },
+  {
+    "group": "all",
+    "parent": "right_leg",
+    "name": "gear_kneepad",
+    "uv": [
+      196,
+      49
+    ],
+    "box": [
+      -1.55,
+      4.75,
+      -2.5,
+      3.1,
+      2.65,
+      0.7
+    ],
+    "material": "knee",
+    "detail": "knee"
+  },
+  {
+    "group": "heavy",
+    "parent": "right_leg",
+    "name": "gear_shin",
+    "uv": [
+      206,
+      49
+    ],
+    "box": [
+      -1.55,
+      7.45,
+      -2.55,
+      3.1,
+      1.8,
+      0.65
+    ],
+    "material": "plate",
+    "detail": "plate"
+  },
+  {
+    "group": "bwHeavy",
+    "parent": "right_leg",
+    "name": "gear_thigh",
+    "uv": [
+      216,
+      49
+    ],
+    "box": [
+      -1.6,
+      1.1,
+      -2.35,
+      3.2,
+      2.8,
+      0.55
+    ],
+    "material": "plate",
+    "detail": "plate"
+  },
+  {
+    "group": "all",
+    "parent": "left_arm",
+    "name": "gear_glove",
+    "uv": [
+      226,
+      49
+    ],
+    "box": [
+      -1.06,
+      6.85,
+      -2.06,
+      4.12,
+      3.3,
+      4.12
+    ],
+    "material": "glove",
+    "detail": "glove"
+  },
+  {
+    "group": "heavy",
+    "parent": "left_arm",
+    "name": "gear_shoulder",
+    "uv": [
+      2,
+      64
+    ],
+    "box": [
+      -1.15,
+      -2.25,
+      -2.35,
+      4.3,
+      2.9,
+      4.7
+    ],
+    "material": "plate",
+    "detail": "plate"
+  },
+  {
+    "group": "heavy",
+    "parent": "left_arm",
+    "name": "gear_forearm",
+    "uv": [
+      22,
+      64
+    ],
+    "box": [
+      -1.08,
+      4.4,
+      -2.35,
+      4.16,
+      2.45,
+      0.55
+    ],
+    "material": "plate",
+    "detail": "plate"
+  },
+  {
+    "group": "all",
+    "parent": "left_leg",
+    "name": "gear_kneepad",
+    "uv": [
+      34,
+      64
+    ],
+    "box": [
+      -1.55,
+      4.75,
+      -2.5,
+      3.1,
+      2.65,
+      0.7
+    ],
+    "material": "knee",
+    "detail": "knee"
+  },
+  {
+    "group": "heavy",
+    "parent": "left_leg",
+    "name": "gear_shin",
+    "uv": [
+      44,
+      64
+    ],
+    "box": [
+      -1.55,
+      7.45,
+      -2.55,
+      3.1,
+      1.8,
+      0.65
+    ],
+    "material": "plate",
+    "detail": "plate"
+  },
+  {
+    "group": "bwHeavy",
+    "parent": "left_leg",
+    "name": "gear_thigh",
+    "uv": [
+      54,
+      64
+    ],
+    "box": [
+      -1.6,
+      1.1,
+      -2.35,
+      3.2,
+      2.8,
+      0.55
+    ],
+    "material": "plate",
+    "detail": "plate"
+  },
+  {
+    "group": "weapon_rifle",
+    "parent": "right_arm",
+    "name": "stock",
+    "uv": [
+      64,
+      64
+    ],
+    "box": [
+      -1.8,
+      3.2,
+      -1.8,
+      1.6,
+      5,
+      2.45
+    ],
+    "material": "gunstock",
+    "detail": "stock"
+  },
+  {
+    "group": "weapon_rifle",
+    "parent": "right_arm",
+    "name": "receiver",
+    "uv": [
+      75,
+      64
+    ],
+    "box": [
+      -1.95,
+      8,
+      -2.25,
+      1.9,
+      5.4,
+      2.45
+    ],
+    "material": "gunmetal",
+    "detail": "receiver"
+  },
+  {
+    "group": "weapon_rifle",
+    "parent": "right_arm",
+    "name": "grip",
+    "uv": [
+      86,
+      64
+    ],
+    "box": [
+      -1.65,
+      9.1,
+      0.15,
+      1.3,
+      1.4,
+      2.6
+    ],
+    "material": "rubber",
+    "detail": ""
+  },
+  {
+    "group": "weapon_rifle",
+    "parent": "right_arm",
+    "name": "handguard",
+    "uv": [
+      96,
+      64
+    ],
+    "box": [
+      -1.8,
+      13.4,
+      -2.05,
+      1.6,
+      4.6,
+      1.95
+    ],
+    "material": "gunstock",
+    "detail": "rail"
+  },
+  {
+    "group": "weapon_rifle",
+    "parent": "right_arm",
+    "name": "barrel",
+    "uv": [
+      106,
+      64
+    ],
+    "box": [
+      -1.43,
+      18,
+      -1.45,
+      0.85,
+      3.8,
+      0.85
+    ],
+    "material": "metal",
+    "detail": ""
+  },
+  {
+    "group": "weapon_rifle",
+    "parent": "right_arm",
+    "name": "muzzle",
+    "uv": [
+      112,
+      64
+    ],
+    "box": [
+      -1.57,
+      21.5,
+      -1.59,
+      1.14,
+      1.15,
+      1.14
+    ],
+    "material": "rubber",
+    "detail": "muzzle"
+  },
+  {
+    "group": "weapon_rifle",
+    "parent": "right_arm",
+    "name": "sight",
+    "uv": [
+      119,
+      64
+    ],
+    "box": [
+      -1.4,
+      10,
+      -3.15,
+      0.8,
+      2.4,
+      0.9
+    ],
+    "material": "metal",
+    "detail": "sight"
+  },
+  {
+    "group": "weapon_rifle",
+    "parent": "right_arm",
+    "name": "magazine",
+    "uv": [
+      125,
+      64
+    ],
+    "box": [
+      -1.65,
+      11.7,
+      0.1,
+      1.3,
+      2.5,
+      3.25
+    ],
+    "material": "gunmetal",
+    "detail": "magazine"
+  },
+  {
+    "group": "weapon_machine",
+    "parent": "right_arm",
+    "name": "stock",
+    "uv": [
+      137,
+      64
+    ],
+    "box": [
+      -1.8,
+      3.2,
+      -1.8,
+      1.6,
+      5,
+      2.45
+    ],
+    "material": "gunstock",
+    "detail": "stock"
+  },
+  {
+    "group": "weapon_machine",
+    "parent": "right_arm",
+    "name": "receiver",
+    "uv": [
+      148,
+      64
+    ],
+    "box": [
+      -1.95,
+      8,
+      -2.25,
+      1.9,
+      5.4,
+      2.45
+    ],
+    "material": "gunmetal",
+    "detail": "receiver"
+  },
+  {
+    "group": "weapon_machine",
+    "parent": "right_arm",
+    "name": "grip",
+    "uv": [
+      159,
+      64
+    ],
+    "box": [
+      -1.65,
+      9.1,
+      0.15,
+      1.3,
+      1.4,
+      2.6
+    ],
+    "material": "rubber",
+    "detail": ""
+  },
+  {
+    "group": "weapon_machine",
+    "parent": "right_arm",
+    "name": "handguard",
+    "uv": [
+      169,
+      64
+    ],
+    "box": [
+      -1.8,
+      13.4,
+      -2.05,
+      1.6,
+      5.7,
+      1.95
+    ],
+    "material": "gunstock",
+    "detail": "rail"
+  },
+  {
+    "group": "weapon_machine",
+    "parent": "right_arm",
+    "name": "barrel",
+    "uv": [
+      179,
+      64
+    ],
+    "box": [
+      -1.43,
+      19.1,
+      -1.45,
+      0.85,
+      6,
+      0.85
+    ],
+    "material": "metal",
+    "detail": ""
+  },
+  {
+    "group": "weapon_machine",
+    "parent": "right_arm",
+    "name": "muzzle",
+    "uv": [
+      185,
+      64
+    ],
+    "box": [
+      -1.57,
+      24.7,
+      -1.59,
+      1.14,
+      1.15,
+      1.14
+    ],
+    "material": "rubber",
+    "detail": "muzzle"
+  },
+  {
+    "group": "weapon_machine",
+    "parent": "right_arm",
+    "name": "sight",
+    "uv": [
+      192,
+      64
+    ],
+    "box": [
+      -1.4,
+      10,
+      -3.15,
+      0.8,
+      2.4,
+      0.9
+    ],
+    "material": "metal",
+    "detail": "sight"
+  },
+  {
+    "group": "weapon_machine",
+    "parent": "right_arm",
+    "name": "ammo_box",
+    "uv": [
+      198,
+      64
+    ],
+    "box": [
+      -2.7,
+      11,
+      0.1,
+      3.4,
+      3.6,
+      3.1
+    ],
+    "material": "pack",
+    "detail": "ammobox"
+  },
+  {
+    "group": "weapon_machine",
+    "parent": "right_arm",
+    "name": "bipod",
+    "uv": [
+      213,
+      64
+    ],
+    "box": [
+      -1.65,
+      19.5,
+      -0.5,
+      1.3,
+      4.3,
+      0.5
+    ],
+    "material": "metal",
+    "detail": ""
+  },
+  {
+    "group": "weapon_grenade",
+    "parent": "right_arm",
+    "name": "stock",
+    "uv": [
+      219,
+      64
+    ],
+    "box": [
+      -1.8,
+      3.2,
+      -1.8,
+      1.6,
+      5,
+      2.45
+    ],
+    "material": "gunstock",
+    "detail": "stock"
+  },
+  {
+    "group": "weapon_grenade",
+    "parent": "right_arm",
+    "name": "receiver",
+    "uv": [
+      230,
+      64
+    ],
+    "box": [
+      -1.95,
+      8,
+      -2.25,
+      1.9,
+      5.4,
+      2.45
+    ],
+    "material": "gunmetal",
+    "detail": "receiver"
+  },
+  {
+    "group": "weapon_grenade",
+    "parent": "right_arm",
+    "name": "grip",
+    "uv": [
+      241,
+      64
+    ],
+    "box": [
+      -1.65,
+      9.1,
+      0.15,
+      1.3,
+      1.4,
+      2.6
+    ],
+    "material": "rubber",
+    "detail": ""
+  },
+  {
+    "group": "weapon_grenade",
+    "parent": "right_arm",
+    "name": "handguard",
+    "uv": [
+      2,
+      74
+    ],
+    "box": [
+      -1.8,
+      13.4,
+      -2.05,
+      1.6,
+      4.6,
+      1.95
+    ],
+    "material": "gunstock",
+    "detail": "rail"
+  },
+  {
+    "group": "weapon_grenade",
+    "parent": "right_arm",
+    "name": "barrel",
+    "uv": [
+      12,
+      74
+    ],
+    "box": [
+      -1.43,
+      18,
+      -1.45,
+      0.85,
+      3.8,
+      0.85
+    ],
+    "material": "metal",
+    "detail": ""
+  },
+  {
+    "group": "weapon_grenade",
+    "parent": "right_arm",
+    "name": "muzzle",
+    "uv": [
+      18,
+      74
+    ],
+    "box": [
+      -1.57,
+      21.5,
+      -1.59,
+      1.14,
+      1.15,
+      1.14
+    ],
+    "material": "rubber",
+    "detail": "muzzle"
+  },
+  {
+    "group": "weapon_grenade",
+    "parent": "right_arm",
+    "name": "sight",
+    "uv": [
+      25,
+      74
+    ],
+    "box": [
+      -1.4,
+      10,
+      -3.15,
+      0.8,
+      2.4,
+      0.9
+    ],
+    "material": "metal",
+    "detail": "sight"
+  },
+  {
+    "group": "weapon_grenade",
+    "parent": "right_arm",
+    "name": "drum",
+    "uv": [
+      31,
+      74
+    ],
+    "box": [
+      -2.65,
+      10.65,
+      0.1,
+      3.3,
+      3.2,
+      3.1
+    ],
+    "material": "gunmetal",
+    "detail": "drum"
+  },
+  {
+    "group": "weapon_grenade",
+    "parent": "right_arm",
+    "name": "wide_bore",
+    "uv": [
+      46,
+      74
+    ],
+    "box": [
+      -2,
+      16.1,
+      -2.25,
+      2,
+      4.3,
+      2.2
+    ],
+    "material": "metal",
+    "detail": "muzzle"
+  },
+  {
+    "group": "weapon_launcher",
+    "parent": "right_arm",
+    "name": "tube",
+    "uv": [
+      57,
+      74
+    ],
+    "box": [
+      -3.25,
+      -0.6,
+      -4,
+      3.5,
+      19.8,
+      3.5
+    ],
+    "material": "launcher",
+    "detail": "launcher"
+  },
+  {
+    "group": "weapon_launcher",
+    "parent": "right_arm",
+    "name": "rear_ring",
+    "uv": [
+      73,
+      74
+    ],
+    "box": [
+      -3.5,
+      -0.7,
+      -4.25,
+      4,
+      1.15,
+      4
+    ],
+    "material": "rubber",
+    "detail": "muzzle"
+  },
+  {
+    "group": "weapon_launcher",
+    "parent": "right_arm",
+    "name": "front_ring",
+    "uv": [
+      91,
+      74
+    ],
+    "box": [
+      -3.5,
+      18.2,
+      -4.25,
+      4,
+      1.2,
+      4
+    ],
+    "material": "rubber",
+    "detail": "muzzle"
+  },
+  {
+    "group": "weapon_launcher",
+    "parent": "right_arm",
+    "name": "grip",
+    "uv": [
+      109,
+      74
+    ],
+    "box": [
+      -2,
+      8.1,
+      -0.5,
+      1.4,
+      1.6,
+      3.3
+    ],
+    "material": "rubber",
+    "detail": ""
+  },
+  {
+    "group": "weapon_launcher",
+    "parent": "right_arm",
+    "name": "trigger_mount",
+    "uv": [
+      121,
+      74
+    ],
+    "box": [
+      -2.25,
+      6.8,
+      -1,
+      1.9,
+      4,
+      0.8
+    ],
+    "material": "gunmetal",
+    "detail": ""
+  },
+  {
+    "group": "weapon_launcher",
+    "parent": "right_arm",
+    "name": "optic",
+    "uv": [
+      129,
+      74
+    ],
+    "box": [
+      0.25,
+      9.7,
+      -3.7,
+      1.2,
+      3.7,
+      1.35
+    ],
+    "material": "lens",
+    "detail": "sight"
+  },
+  {
+    "group": "rank_0",
+    "parent": "body",
+    "name": "mark_0",
+    "uv": [
+      137,
+      74
+    ],
+    "box": [
+      -3.02,
+      2.15,
+      -3.82,
+      1.65,
+      0.22,
+      0.14
+    ],
+    "material": "rank",
+    "detail": ""
+  },
+  {
+    "group": "rank_1",
+    "parent": "body",
+    "name": "mark_0",
+    "uv": [
+      143,
+      74
+    ],
+    "box": [
+      -3.02,
+      2.15,
+      -3.82,
+      1.65,
+      0.22,
+      0.14
+    ],
+    "material": "rank",
+    "detail": ""
+  },
+  {
+    "group": "rank_1",
+    "parent": "body",
+    "name": "mark_1",
+    "uv": [
+      149,
+      74
+    ],
+    "box": [
+      -3.02,
+      2.62,
+      -3.82,
+      1.65,
+      0.22,
+      0.14
+    ],
+    "material": "rank",
+    "detail": ""
+  },
+  {
+    "group": "rank_2",
+    "parent": "body",
+    "name": "mark_0",
+    "uv": [
+      155,
+      74
+    ],
+    "box": [
+      -3.02,
+      2.15,
+      -3.82,
+      1.65,
+      0.22,
+      0.14
+    ],
+    "material": "rank",
+    "detail": ""
+  },
+  {
+    "group": "rank_2",
+    "parent": "body",
+    "name": "mark_1",
+    "uv": [
+      161,
+      74
+    ],
+    "box": [
+      -3.02,
+      2.62,
+      -3.82,
+      1.65,
+      0.22,
+      0.14
+    ],
+    "material": "rank",
+    "detail": ""
+  },
+  {
+    "group": "rank_2",
+    "parent": "body",
+    "name": "mark_2",
+    "uv": [
+      167,
+      74
+    ],
+    "box": [
+      -3.02,
+      3.09,
+      -3.82,
+      1.65,
+      0.22,
+      0.14
+    ],
+    "material": "rank",
+    "detail": ""
+  },
+  {
+    "group": "rank_3",
+    "parent": "body",
+    "name": "mark_0",
+    "uv": [
+      173,
+      74
+    ],
+    "box": [
+      -3.02,
+      2.15,
+      -3.82,
+      1.65,
+      0.22,
+      0.14
+    ],
+    "material": "rank",
+    "detail": ""
+  },
+  {
+    "group": "rank_4",
+    "parent": "body",
+    "name": "mark_0",
+    "uv": [
+      179,
+      74
+    ],
+    "box": [
+      -3.02,
+      2.15,
+      -3.82,
+      1.65,
+      0.22,
+      0.14
+    ],
+    "material": "rank",
+    "detail": ""
+  },
+  {
+    "group": "rank_4",
+    "parent": "body",
+    "name": "mark_1",
+    "uv": [
+      185,
+      74
+    ],
+    "box": [
+      -3.02,
+      2.62,
+      -3.82,
+      1.65,
+      0.22,
+      0.14
+    ],
+    "material": "rank",
+    "detail": ""
+  },
+  {
+    "group": "rank_5",
+    "parent": "body",
+    "name": "mark_0",
+    "uv": [
+      191,
+      74
+    ],
+    "box": [
+      -2.95,
+      2.25,
+      -3.82,
+      0.52,
+      0.52,
+      0.14
+    ],
+    "material": "rank",
+    "detail": ""
+  },
+  {
+    "group": "rank_6",
+    "parent": "body",
+    "name": "mark_0",
+    "uv": [
+      195,
+      74
+    ],
+    "box": [
+      -2.95,
+      2.25,
+      -3.82,
+      0.52,
+      0.52,
+      0.14
+    ],
+    "material": "rank",
+    "detail": ""
+  },
+  {
+    "group": "rank_6",
+    "parent": "body",
+    "name": "mark_1",
+    "uv": [
+      199,
+      74
+    ],
+    "box": [
+      -2.1500000000000004,
+      2.25,
+      -3.82,
+      0.52,
+      0.52,
+      0.14
+    ],
+    "material": "rank",
+    "detail": ""
+  },
+  {
+    "group": "rank_6",
+    "parent": "body",
+    "name": "mark_2",
+    "uv": [
+      203,
+      74
+    ],
+    "box": [
+      -2.95,
+      3.0,
+      -3.82,
+      0.52,
+      0.52,
+      0.14
+    ],
+    "material": "rank",
+    "detail": ""
+  },
+  {
+    "group": "rank_7",
+    "parent": "body",
+    "name": "mark_0",
+    "uv": [
+      207,
+      74
+    ],
+    "box": [
+      -2.95,
+      2.25,
+      -3.82,
+      0.52,
+      0.52,
+      0.14
+    ],
+    "material": "rank",
+    "detail": ""
+  },
+  {
+    "group": "rank_7",
+    "parent": "body",
+    "name": "mark_1",
+    "uv": [
+      211,
+      74
+    ],
+    "box": [
+      -2.1500000000000004,
+      2.25,
+      -3.82,
+      0.52,
+      0.52,
+      0.14
+    ],
+    "material": "rank",
+    "detail": ""
+  },
+  {
+    "group": "rank_7",
+    "parent": "body",
+    "name": "mark_2",
+    "uv": [
+      215,
+      74
+    ],
+    "box": [
+      -2.95,
+      3.0,
+      -3.82,
+      0.52,
+      0.52,
+      0.14
+    ],
+    "material": "rank",
+    "detail": ""
+  },
+  {
+    "group": "rank_7",
+    "parent": "body",
+    "name": "mark_3",
+    "uv": [
+      219,
+      74
+    ],
+    "box": [
+      -2.1500000000000004,
+      3.0,
+      -3.82,
+      0.52,
+      0.52,
+      0.14
+    ],
+    "material": "rank",
+    "detail": ""
+  },
+  {
+    "group": "militaryRole_team_leader",
+    "parent": "head",
+    "name": "role_leader_crown_stripe",
+    "uv": [
+      223,
+      74
+    ],
+    "box": [
+      -0.7,
+      -8.77,
+      -4.12,
+      1.4,
+      0.18,
+      8.24
+    ],
+    "material": "recognition",
+    "detail": ""
+  },
+  {
+    "group": "militaryRole_team_leader",
+    "parent": "head",
+    "name": "role_leader_front_stripe",
+    "uv": [
+      2,
+      100
+    ],
+    "box": [
+      -3.9,
+      -6.55,
+      -4.8,
+      7.8,
+      0.45,
+      0.2
+    ],
+    "material": "recognition",
+    "detail": ""
+  },
+  {
+    "group": "militaryRole_team_leader",
+    "parent": "head",
+    "name": "role_leader_rear_stripe",
+    "uv": [
+      20,
+      100
+    ],
+    "box": [
+      -0.7,
+      -7.05,
+      4.4,
+      1.4,
+      2.3,
+      0.18
+    ],
+    "material": "recognition",
+    "detail": ""
+  },
+  {
+    "group": "militaryRole_team_leader",
+    "parent": "right_arm",
+    "name": "role_leader_arm_bar_0",
+    "uv": [
+      26,
+      100
+    ],
+    "box": [
+      -3.12,
+      1.1,
+      -2.15,
+      4.24,
+      0.42,
+      0.26
+    ],
+    "material": "recognition",
+    "detail": ""
+  },
+  {
+    "group": "militaryRole_team_leader",
+    "parent": "right_arm",
+    "name": "role_leader_arm_bar_1",
+    "uv": [
+      37,
+      100
+    ],
+    "box": [
+      -3.12,
+      1.85,
+      -2.15,
+      4.24,
+      0.42,
+      0.26
+    ],
+    "material": "recognition",
+    "detail": ""
+  },
+  {
+    "group": "militaryRole_team_leader",
+    "parent": "left_arm",
+    "name": "role_leader_arm_bar_0",
+    "uv": [
+      48,
+      100
+    ],
+    "box": [
+      -1.12,
+      1.1,
+      -2.15,
+      4.24,
+      0.42,
+      0.26
+    ],
+    "material": "recognition",
+    "detail": ""
+  },
+  {
+    "group": "militaryRole_team_leader",
+    "parent": "left_arm",
+    "name": "role_leader_arm_bar_1",
+    "uv": [
+      59,
+      100
+    ],
+    "box": [
+      -1.12,
+      1.85,
+      -2.15,
+      4.24,
+      0.42,
+      0.26
+    ],
+    "material": "recognition",
+    "detail": ""
+  },
+  {
+    "group": "militaryRole_team_leader",
+    "parent": "body",
+    "name": "role_leader_radio_panel",
+    "uv": [
+      70,
+      100
+    ],
+    "box": [
+      2.45,
+      2.7,
+      -3.6,
+      1.6,
+      1.5,
+      0.75
+    ],
+    "material": "radio",
+    "detail": "radio"
+  },
+  {
+    "group": "militaryRole_team_leader",
+    "parent": "body",
+    "name": "role_leader_radio_battery",
+    "uv": [
+      77,
+      100
+    ],
+    "box": [
+      -2.4,
+      1.2,
+      5.1,
+      4.8,
+      3.6,
+      1.1
+    ],
+    "material": "radio",
+    "detail": "radio"
+  },
+  {
+    "group": "militaryRole_team_leader",
+    "parent": "body",
+    "name": "role_leader_long_aerial",
+    "uv": [
+      91,
+      100
+    ],
+    "box": [
+      1.6,
+      -4.1,
+      5.5,
+      0.28,
+      5.6,
+      0.28
+    ],
+    "material": "metal",
+    "detail": ""
+  },
+  {
+    "group": "militaryRole_team_leader",
+    "parent": "head",
+    "name": "role_leader_comms",
+    "uv": [
+      95,
+      100
+    ],
+    "box": [
+      4.32,
+      -4.9,
+      -0.75,
+      0.75,
+      2.4,
+      2
+    ],
+    "material": "radio",
+    "detail": "radio"
+  },
+  {
+    "group": "militaryRole_officer",
+    "parent": "body",
+    "name": "role_command_pack",
+    "uv": [
+      103,
+      100
+    ],
+    "box": [
+      -2.8,
+      1.6,
+      2.8,
+      5.6,
+      5.5,
+      1.8
+    ],
+    "material": "command_fabric",
+    "detail": "pack"
+  },
+  {
+    "group": "militaryRole_officer",
+    "parent": "body",
+    "name": "role_command_pack_frame",
+    "uv": [
+      120,
+      100
+    ],
+    "box": [
+      -3,
+      1.35,
+      2.7,
+      6,
+      0.65,
+      2
+    ],
+    "material": "webbing",
+    "detail": "strap"
+  },
+  {
+    "group": "militaryRole_officer",
+    "parent": "body",
+    "name": "role_command_aerial",
+    "uv": [
+      138,
+      100
+    ],
+    "box": [
+      -2.6,
+      -2.8,
+      3.5,
+      0.28,
+      4.3,
+      0.28
+    ],
+    "material": "metal",
+    "detail": ""
+  },
+  {
+    "group": "militaryRole_officer",
+    "parent": "body",
+    "name": "role_map_case",
+    "uv": [
+      142,
+      100
+    ],
+    "box": [
+      3.7,
+      6.25,
+      -0.8,
+      1.3,
+      5.1,
+      3.7
+    ],
+    "material": "command_leather",
+    "detail": "mapcase"
+  },
+  {
+    "group": "militaryRole_officer",
+    "parent": "left_arm",
+    "name": "role_field_terminal",
+    "uv": [
+      154,
+      100
+    ],
+    "box": [
+      -0.25,
+      3.8,
+      -2.65,
+      2.5,
+      2,
+      0.65
+    ],
+    "material": "radio",
+    "detail": "terminal"
+  },
+  {
+    "group": "militaryRole_officer",
+    "parent": "right_arm",
+    "name": "role_shoulder_board",
+    "uv": [
+      163,
+      100
+    ],
+    "box": [
+      -3.15,
+      -2.65,
+      -1.75,
+      4.3,
+      0.65,
+      3.5
+    ],
+    "material": "command_trim",
+    "detail": "epaulette"
+  },
+  {
+    "group": "militaryRole_officer",
+    "parent": "right_arm",
+    "name": "role_shoulder_core",
+    "uv": [
+      181,
+      100
+    ],
+    "box": [
+      -2.75,
+      -2.81,
+      -1.25,
+      3.5,
+      0.2,
+      2.5
+    ],
+    "material": "command_fabric",
+    "detail": "epaulette"
+  },
+  {
+    "group": "militaryRole_officer",
+    "parent": "left_arm",
+    "name": "role_shoulder_board",
+    "uv": [
+      195,
+      100
+    ],
+    "box": [
+      -1.15,
+      -2.65,
+      -1.75,
+      4.3,
+      0.65,
+      3.5
+    ],
+    "material": "command_trim",
+    "detail": "epaulette"
+  },
+  {
+    "group": "militaryRole_officer",
+    "parent": "left_arm",
+    "name": "role_shoulder_core",
+    "uv": [
+      213,
+      100
+    ],
+    "box": [
+      -0.7499999999999999,
+      -2.81,
+      -1.25,
+      3.5,
+      0.2,
+      2.5
+    ],
+    "material": "command_fabric",
+    "detail": "epaulette"
+  },
+  {
+    "group": "militaryRole_officer",
+    "parent": "body",
+    "name": "role_cross_strap_0",
+    "uv": [
+      227,
+      100
+    ],
+    "box": [
+      2.2,
+      3.9,
+      -4.3,
+      0.85,
+      0.78,
+      0.35
+    ],
+    "material": "command_leather",
+    "detail": "strap"
+  },
+  {
+    "group": "militaryRole_officer",
+    "parent": "body",
+    "name": "role_cross_strap_1",
+    "uv": [
+      232,
+      100
+    ],
+    "box": [
+      1.0000000000000002,
+      4.6,
+      -4.3,
+      0.85,
+      0.78,
+      0.35
+    ],
+    "material": "command_leather",
+    "detail": "strap"
+  },
+  {
+    "group": "militaryRole_officer",
+    "parent": "body",
+    "name": "role_cross_strap_2",
+    "uv": [
+      237,
+      100
+    ],
+    "box": [
+      -0.19999999999999973,
+      5.3,
+      -4.3,
+      0.85,
+      0.78,
+      0.35
+    ],
+    "material": "command_leather",
+    "detail": "strap"
+  },
+  {
+    "group": "militaryRole_officer",
+    "parent": "body",
+    "name": "role_cross_strap_3",
+    "uv": [
+      242,
+      100
+    ],
+    "box": [
+      -1.3999999999999995,
+      6.0,
+      -4.3,
+      0.85,
+      0.78,
+      0.35
+    ],
+    "material": "command_leather",
+    "detail": "strap"
+  },
+  {
+    "group": "militaryRole_officer",
+    "parent": "head",
+    "name": "role_cap_crown",
+    "uv": [
+      2,
+      111
+    ],
+    "box": [
+      -4.22,
+      -8.8,
+      -4.15,
+      8.44,
+      2.5,
+      8.3
+    ],
+    "material": "command_fabric",
+    "detail": "cap"
+  },
+  {
+    "group": "militaryRole_officer",
+    "parent": "head",
+    "name": "role_cap_top",
+    "uv": [
+      38,
+      111
+    ],
+    "box": [
+      -4.08,
+      -9.3,
+      -4.02,
+      8.16,
+      0.5,
+      8.04
+    ],
+    "material": "command_fabric",
+    "detail": ""
+  },
+  {
+    "group": "militaryRole_officer",
+    "parent": "head",
+    "name": "role_cap_band",
+    "uv": [
+      73,
+      111
+    ],
+    "box": [
+      -4.3,
+      -6.3,
+      -4.25,
+      8.6,
+      0.75,
+      8.5
+    ],
+    "material": "command_leather",
+    "detail": "capband"
+  },
+  {
+    "group": "militaryRole_officer",
+    "parent": "head",
+    "name": "role_cap_visor",
+    "uv": [
+      110,
+      111
+    ],
+    "box": [
+      -4.35,
+      -5.75,
+      -6.05,
+      8.7,
+      0.42,
+      3.35
+    ],
+    "material": "command_leather",
+    "detail": "visor"
+  },
+  {
+    "group": "militaryRole_officer",
+    "parent": "head",
+    "name": "role_cap_badge",
+    "uv": [
+      137,
+      111
+    ],
+    "box": [
+      -0.7,
+      -8,
+      -4.4,
+      1.4,
+      1.35,
+      0.3
+    ],
+    "material": "command_trim",
+    "detail": "badge"
+  },
+  {
+    "group": "militaryRole_officer",
+    "parent": "head",
+    "name": "role_officer_headset",
+    "uv": [
+      143,
+      111
+    ],
+    "box": [
+      -4.7,
+      -4.8,
+      -0.9,
+      0.7,
+      2.2,
+      2
+    ],
+    "material": "rubber",
+    "detail": "headset"
+  },
+  {
+    "group": "militaryRole_officer",
+    "parent": "head",
+    "name": "role_officer_boom",
+    "uv": [
+      151,
+      111
+    ],
+    "box": [
+      -4.5,
+      -2.8,
+      -3.5,
+      0.35,
+      0.35,
+      3.2
+    ],
+    "material": "metal",
+    "detail": ""
+  },
+  {
+    "group": "militaryRole_commander",
+    "parent": "body",
+    "name": "role_command_pack",
+    "uv": [
+      161,
+      111
+    ],
+    "box": [
+      -2.8,
+      1.6,
+      2.8,
+      5.6,
+      5.5,
+      1.8
+    ],
+    "material": "command_fabric",
+    "detail": "pack"
+  },
+  {
+    "group": "militaryRole_commander",
+    "parent": "body",
+    "name": "role_command_pack_frame",
+    "uv": [
+      178,
+      111
+    ],
+    "box": [
+      -3,
+      1.35,
+      2.7,
+      6,
+      0.65,
+      2
+    ],
+    "material": "webbing",
+    "detail": "strap"
+  },
+  {
+    "group": "militaryRole_commander",
+    "parent": "body",
+    "name": "role_command_aerial",
+    "uv": [
+      196,
+      111
+    ],
+    "box": [
+      -2.6,
+      -2.8,
+      3.5,
+      0.28,
+      4.3,
+      0.28
+    ],
+    "material": "metal",
+    "detail": ""
+  },
+  {
+    "group": "militaryRole_commander",
+    "parent": "body",
+    "name": "role_map_case",
+    "uv": [
+      200,
+      111
+    ],
+    "box": [
+      3.7,
+      6.25,
+      -0.8,
+      1.3,
+      5.1,
+      3.7
+    ],
+    "material": "command_leather",
+    "detail": "mapcase"
+  },
+  {
+    "group": "militaryRole_commander",
+    "parent": "left_arm",
+    "name": "role_field_terminal",
+    "uv": [
+      212,
+      111
+    ],
+    "box": [
+      -0.25,
+      3.8,
+      -2.65,
+      2.5,
+      2,
+      0.65
+    ],
+    "material": "radio",
+    "detail": "terminal"
+  },
+  {
+    "group": "militaryRole_commander",
+    "parent": "right_arm",
+    "name": "role_shoulder_board",
+    "uv": [
+      221,
+      111
+    ],
+    "box": [
+      -3.15,
+      -2.65,
+      -1.75,
+      4.3,
+      0.65,
+      3.5
+    ],
+    "material": "command_trim",
+    "detail": "epaulette"
+  },
+  {
+    "group": "militaryRole_commander",
+    "parent": "right_arm",
+    "name": "role_shoulder_core",
+    "uv": [
+      239,
+      111
+    ],
+    "box": [
+      -2.75,
+      -2.81,
+      -1.25,
+      3.5,
+      0.2,
+      2.5
+    ],
+    "material": "command_fabric",
+    "detail": "epaulette"
+  },
+  {
+    "group": "militaryRole_commander",
+    "parent": "left_arm",
+    "name": "role_shoulder_board",
+    "uv": [
+      2,
+      124
+    ],
+    "box": [
+      -1.15,
+      -2.65,
+      -1.75,
+      4.3,
+      0.65,
+      3.5
+    ],
+    "material": "command_trim",
+    "detail": "epaulette"
+  },
+  {
+    "group": "militaryRole_commander",
+    "parent": "left_arm",
+    "name": "role_shoulder_core",
+    "uv": [
+      20,
+      124
+    ],
+    "box": [
+      -0.7499999999999999,
+      -2.81,
+      -1.25,
+      3.5,
+      0.2,
+      2.5
+    ],
+    "material": "command_fabric",
+    "detail": "epaulette"
+  },
+  {
+    "group": "militaryRole_commander",
+    "parent": "body",
+    "name": "role_cross_strap_0",
+    "uv": [
+      34,
+      124
+    ],
+    "box": [
+      2.2,
+      3.9,
+      -4.3,
+      0.85,
+      0.78,
+      0.35
+    ],
+    "material": "command_leather",
+    "detail": "strap"
+  },
+  {
+    "group": "militaryRole_commander",
+    "parent": "body",
+    "name": "role_cross_strap_1",
+    "uv": [
+      39,
+      124
+    ],
+    "box": [
+      1.0000000000000002,
+      4.6,
+      -4.3,
+      0.85,
+      0.78,
+      0.35
+    ],
+    "material": "command_leather",
+    "detail": "strap"
+  },
+  {
+    "group": "militaryRole_commander",
+    "parent": "body",
+    "name": "role_cross_strap_2",
+    "uv": [
+      44,
+      124
+    ],
+    "box": [
+      -0.19999999999999973,
+      5.3,
+      -4.3,
+      0.85,
+      0.78,
+      0.35
+    ],
+    "material": "command_leather",
+    "detail": "strap"
+  },
+  {
+    "group": "militaryRole_commander",
+    "parent": "body",
+    "name": "role_cross_strap_3",
+    "uv": [
+      49,
+      124
+    ],
+    "box": [
+      -1.3999999999999995,
+      6.0,
+      -4.3,
+      0.85,
+      0.78,
+      0.35
+    ],
+    "material": "command_leather",
+    "detail": "strap"
+  },
+  {
+    "group": "militaryRole_commander",
+    "parent": "head",
+    "name": "role_cap_crown",
+    "uv": [
+      54,
+      124
+    ],
+    "box": [
+      -4.22,
+      -8.8,
+      -4.15,
+      8.44,
+      2.5,
+      8.3
+    ],
+    "material": "command_fabric",
+    "detail": "cap"
+  },
+  {
+    "group": "militaryRole_commander",
+    "parent": "head",
+    "name": "role_cap_top",
+    "uv": [
+      90,
+      124
+    ],
+    "box": [
+      -4.08,
+      -9.3,
+      -4.02,
+      8.16,
+      0.5,
+      8.04
+    ],
+    "material": "command_fabric",
+    "detail": ""
+  },
+  {
+    "group": "militaryRole_commander",
+    "parent": "head",
+    "name": "role_cap_band",
+    "uv": [
+      125,
+      124
+    ],
+    "box": [
+      -4.3,
+      -6.3,
+      -4.25,
+      8.6,
+      0.75,
+      8.5
+    ],
+    "material": "command_trim",
+    "detail": "capband"
+  },
+  {
+    "group": "militaryRole_commander",
+    "parent": "head",
+    "name": "role_cap_visor",
+    "uv": [
+      162,
+      124
+    ],
+    "box": [
+      -4.35,
+      -5.75,
+      -6.05,
+      8.7,
+      0.42,
+      3.35
+    ],
+    "material": "command_leather",
+    "detail": "visor"
+  },
+  {
+    "group": "militaryRole_commander",
+    "parent": "head",
+    "name": "role_cap_badge",
+    "uv": [
+      189,
+      124
+    ],
+    "box": [
+      -0.7,
+      -8,
+      -4.4,
+      1.4,
+      1.35,
+      0.3
+    ],
+    "material": "command_trim",
+    "detail": "badge"
+  },
+  {
+    "group": "militaryRole_commander",
+    "parent": "head",
+    "name": "role_officer_headset",
+    "uv": [
+      195,
+      124
+    ],
+    "box": [
+      -4.7,
+      -4.8,
+      -0.9,
+      0.7,
+      2.2,
+      2
+    ],
+    "material": "rubber",
+    "detail": "headset"
+  },
+  {
+    "group": "militaryRole_commander",
+    "parent": "head",
+    "name": "role_officer_boom",
+    "uv": [
+      203,
+      124
+    ],
+    "box": [
+      -4.5,
+      -2.8,
+      -3.5,
+      0.35,
+      0.35,
+      3.2
+    ],
+    "material": "metal",
+    "detail": ""
+  },
+  {
+    "group": "militaryRole_commander",
+    "parent": "body",
+    "name": "role_command_collar_right",
+    "uv": [
+      213,
+      124
+    ],
+    "box": [
+      -4.45,
+      -0.8,
+      -2.6,
+      0.85,
+      2.65,
+      5.15
+    ],
+    "material": "command_fabric",
+    "detail": ""
+  },
+  {
+    "group": "militaryRole_commander",
+    "parent": "body",
+    "name": "role_command_collar_left",
+    "uv": [
+      227,
+      124
+    ],
+    "box": [
+      3.6,
+      -0.8,
+      -2.6,
+      0.85,
+      2.65,
+      5.15
+    ],
+    "material": "command_fabric",
+    "detail": ""
+  },
+  {
+    "group": "militaryRole_commander",
+    "parent": "body",
+    "name": "role_collar_lapel_right",
+    "uv": [
+      241,
+      124
+    ],
+    "box": [
+      -4.6,
+      -0.3,
+      -3.15,
+      2.1,
+      2.15,
+      0.65
+    ],
+    "material": "command_trim",
+    "detail": ""
+  },
+  {
+    "group": "militaryRole_commander",
+    "parent": "body",
+    "name": "role_collar_lapel_left",
+    "uv": [
+      2,
+      137
+    ],
+    "box": [
+      2.5,
+      -0.3,
+      -3.15,
+      2.1,
+      2.15,
+      0.65
+    ],
+    "material": "command_trim",
+    "detail": ""
+  },
+  {
+    "group": "militaryRole_commander",
+    "parent": "body",
+    "name": "role_collar_rear",
+    "uv": [
+      10,
+      137
+    ],
+    "box": [
+      -4.45,
+      -0.8,
+      2.05,
+      8.9,
+      1.6,
+      0.6
+    ],
+    "material": "command_trim",
+    "detail": ""
+  },
+  {
+    "group": "militaryRole_commander",
+    "parent": "body",
+    "name": "role_command_mantle",
+    "uv": [
+      31,
+      137
+    ],
+    "box": [
+      -4.8,
+      0.05,
+      2.25,
+      9.6,
+      0.75,
+      1.05
+    ],
+    "material": "command_trim",
+    "detail": ""
+  },
+  {
+    "group": "militaryRole_commander",
+    "parent": "right_arm",
+    "name": "role_command_board_edge",
+    "uv": [
+      55,
+      137
+    ],
+    "box": [
+      -3.25,
+      -2.45,
+      -2.15,
+      4.5,
+      0.9,
+      0.35
+    ],
+    "material": "recognition",
+    "detail": ""
+  },
+  {
+    "group": "militaryRole_commander",
+    "parent": "left_arm",
+    "name": "role_command_board_edge",
+    "uv": [
+      67,
+      137
+    ],
+    "box": [
+      -1.25,
+      -2.45,
+      -2.15,
+      4.5,
+      0.9,
+      0.35
+    ],
+    "material": "recognition",
+    "detail": ""
+  },
+  {
+    "group": "militaryRole_commander",
+    "parent": "body",
+    "name": "role_coat_front_right",
+    "uv": [
+      79,
+      137
+    ],
+    "box": [
+      -4.1,
+      10.25,
+      -2.65,
+      3.65,
+      3.7,
+      0.6
+    ],
+    "material": "command_fabric",
+    "detail": "coat"
+  },
+  {
+    "group": "militaryRole_commander",
+    "parent": "body",
+    "name": "role_coat_front_left",
+    "uv": [
+      90,
+      137
+    ],
+    "box": [
+      0.45,
+      10.25,
+      -2.65,
+      3.65,
+      3.7,
+      0.6
+    ],
+    "material": "command_fabric",
+    "detail": "coat"
+  },
+  {
+    "group": "militaryRole_commander",
+    "parent": "body",
+    "name": "role_coat_rear",
+    "uv": [
+      101,
+      137
+    ],
+    "box": [
+      -4.1,
+      9.8,
+      2.25,
+      8.2,
+      4.15,
+      0.65
+    ],
+    "material": "command_fabric",
+    "detail": "coat"
+  },
+  {
+    "group": "militaryRole_commander",
+    "parent": "body",
+    "name": "role_belt_buckle",
+    "uv": [
+      121,
+      137
+    ],
+    "box": [
+      -1,
+      9.25,
+      -2.75,
+      2,
+      1.05,
+      0.65
+    ],
+    "material": "command_trim",
+    "detail": "badge"
+  },
+  {
+    "group": "militaryRole_commander",
+    "parent": "body",
+    "name": "role_command_back_tab",
+    "uv": [
+      129,
+      137
+    ],
+    "box": [
+      -1.65,
+      3.25,
+      4.62,
+      3.3,
+      2,
+      0.25
+    ],
+    "material": "recognition",
+    "detail": "badge"
+  },
+  {
+    "group": "bwRole_team_leader",
+    "parent": "head",
+    "name": "role_leader_crown_stripe",
+    "uv": [
+      139,
+      137
+    ],
+    "box": [
+      -0.7,
+      -8.77,
+      -4.12,
+      1.4,
+      0.18,
+      8.24
+    ],
+    "material": "recognition",
+    "detail": ""
+  },
+  {
+    "group": "bwRole_team_leader",
+    "parent": "head",
+    "name": "role_leader_front_stripe",
+    "uv": [
+      161,
+      137
+    ],
+    "box": [
+      -3.9,
+      -6.55,
+      -4.8,
+      7.8,
+      0.45,
+      0.2
+    ],
+    "material": "recognition",
+    "detail": ""
+  },
+  {
+    "group": "bwRole_team_leader",
+    "parent": "head",
+    "name": "role_leader_rear_stripe",
+    "uv": [
+      179,
+      137
+    ],
+    "box": [
+      -0.7,
+      -7.05,
+      4.4,
+      1.4,
+      2.3,
+      0.18
+    ],
+    "material": "recognition",
+    "detail": ""
+  },
+  {
+    "group": "bwRole_team_leader",
+    "parent": "right_arm",
+    "name": "role_leader_arm_bar_0",
+    "uv": [
+      185,
+      137
+    ],
+    "box": [
+      -3.12,
+      1.1,
+      -2.15,
+      4.24,
+      0.42,
+      0.26
+    ],
+    "material": "recognition",
+    "detail": ""
+  },
+  {
+    "group": "bwRole_team_leader",
+    "parent": "right_arm",
+    "name": "role_leader_arm_bar_1",
+    "uv": [
+      196,
+      137
+    ],
+    "box": [
+      -3.12,
+      1.85,
+      -2.15,
+      4.24,
+      0.42,
+      0.26
+    ],
+    "material": "recognition",
+    "detail": ""
+  },
+  {
+    "group": "bwRole_team_leader",
+    "parent": "left_arm",
+    "name": "role_leader_arm_bar_0",
+    "uv": [
+      207,
+      137
+    ],
+    "box": [
+      -1.12,
+      1.1,
+      -2.15,
+      4.24,
+      0.42,
+      0.26
+    ],
+    "material": "recognition",
+    "detail": ""
+  },
+  {
+    "group": "bwRole_team_leader",
+    "parent": "left_arm",
+    "name": "role_leader_arm_bar_1",
+    "uv": [
+      218,
+      137
+    ],
+    "box": [
+      -1.12,
+      1.85,
+      -2.15,
+      4.24,
+      0.42,
+      0.26
+    ],
+    "material": "recognition",
+    "detail": ""
+  },
+  {
+    "group": "bwRole_team_leader",
+    "parent": "body",
+    "name": "role_leader_radio_panel",
+    "uv": [
+      229,
+      137
+    ],
+    "box": [
+      2.45,
+      2.7,
+      -3.6,
+      1.6,
+      1.5,
+      0.75
+    ],
+    "material": "radio",
+    "detail": "radio"
+  },
+  {
+    "group": "bwRole_team_leader",
+    "parent": "body",
+    "name": "role_leader_radio_battery",
+    "uv": [
+      236,
+      137
+    ],
+    "box": [
+      -2.4,
+      1.2,
+      5.1,
+      4.8,
+      3.6,
+      1.1
+    ],
+    "material": "radio",
+    "detail": "radio"
+  },
+  {
+    "group": "bwRole_team_leader",
+    "parent": "body",
+    "name": "role_leader_long_aerial",
+    "uv": [
+      250,
+      137
+    ],
+    "box": [
+      1.6,
+      -4.1,
+      5.5,
+      0.28,
+      5.6,
+      0.28
+    ],
+    "material": "metal",
+    "detail": ""
+  },
+  {
+    "group": "bwRole_team_leader",
+    "parent": "head",
+    "name": "role_leader_comms",
+    "uv": [
+      2,
+      148
+    ],
+    "box": [
+      4.32,
+      -4.9,
+      -0.75,
+      0.75,
+      2.4,
+      2
+    ],
+    "material": "radio",
+    "detail": "radio"
+  },
+  {
+    "group": "bwRole_officer",
+    "parent": "body",
+    "name": "role_command_pack",
+    "uv": [
+      10,
+      148
+    ],
+    "box": [
+      -2.8,
+      1.6,
+      2.8,
+      5.6,
+      5.5,
+      1.8
+    ],
+    "material": "command_fabric",
+    "detail": "pack"
+  },
+  {
+    "group": "bwRole_officer",
+    "parent": "body",
+    "name": "role_command_pack_frame",
+    "uv": [
+      27,
+      148
+    ],
+    "box": [
+      -3,
+      1.35,
+      2.7,
+      6,
+      0.65,
+      2
+    ],
+    "material": "webbing",
+    "detail": "strap"
+  },
+  {
+    "group": "bwRole_officer",
+    "parent": "body",
+    "name": "role_command_aerial",
+    "uv": [
+      45,
+      148
+    ],
+    "box": [
+      -2.6,
+      -2.8,
+      3.5,
+      0.28,
+      4.3,
+      0.28
+    ],
+    "material": "metal",
+    "detail": ""
+  },
+  {
+    "group": "bwRole_officer",
+    "parent": "body",
+    "name": "role_map_case",
+    "uv": [
+      49,
+      148
+    ],
+    "box": [
+      3.7,
+      6.25,
+      -0.8,
+      1.3,
+      5.1,
+      3.7
+    ],
+    "material": "command_leather",
+    "detail": "mapcase"
+  },
+  {
+    "group": "bwRole_officer",
+    "parent": "left_arm",
+    "name": "role_field_terminal",
+    "uv": [
+      61,
+      148
+    ],
+    "box": [
+      -0.25,
+      3.8,
+      -2.65,
+      2.5,
+      2,
+      0.65
+    ],
+    "material": "radio",
+    "detail": "terminal"
+  },
+  {
+    "group": "bwRole_officer",
+    "parent": "right_arm",
+    "name": "role_shoulder_board",
+    "uv": [
+      70,
+      148
+    ],
+    "box": [
+      -3.15,
+      -2.65,
+      -1.75,
+      4.3,
+      0.65,
+      3.5
+    ],
+    "material": "command_trim",
+    "detail": "epaulette"
+  },
+  {
+    "group": "bwRole_officer",
+    "parent": "right_arm",
+    "name": "role_shoulder_core",
+    "uv": [
+      88,
+      148
+    ],
+    "box": [
+      -2.75,
+      -2.81,
+      -1.25,
+      3.5,
+      0.2,
+      2.5
+    ],
+    "material": "command_fabric",
+    "detail": "epaulette"
+  },
+  {
+    "group": "bwRole_officer",
+    "parent": "left_arm",
+    "name": "role_shoulder_board",
+    "uv": [
+      102,
+      148
+    ],
+    "box": [
+      -1.15,
+      -2.65,
+      -1.75,
+      4.3,
+      0.65,
+      3.5
+    ],
+    "material": "command_trim",
+    "detail": "epaulette"
+  },
+  {
+    "group": "bwRole_officer",
+    "parent": "left_arm",
+    "name": "role_shoulder_core",
+    "uv": [
+      120,
+      148
+    ],
+    "box": [
+      -0.7499999999999999,
+      -2.81,
+      -1.25,
+      3.5,
+      0.2,
+      2.5
+    ],
+    "material": "command_fabric",
+    "detail": "epaulette"
+  },
+  {
+    "group": "bwRole_officer",
+    "parent": "body",
+    "name": "role_cross_strap_0",
+    "uv": [
+      134,
+      148
+    ],
+    "box": [
+      2.2,
+      3.9,
+      -4.3,
+      0.85,
+      0.78,
+      0.35
+    ],
+    "material": "command_leather",
+    "detail": "strap"
+  },
+  {
+    "group": "bwRole_officer",
+    "parent": "body",
+    "name": "role_cross_strap_1",
+    "uv": [
+      139,
+      148
+    ],
+    "box": [
+      1.0000000000000002,
+      4.6,
+      -4.3,
+      0.85,
+      0.78,
+      0.35
+    ],
+    "material": "command_leather",
+    "detail": "strap"
+  },
+  {
+    "group": "bwRole_officer",
+    "parent": "body",
+    "name": "role_cross_strap_2",
+    "uv": [
+      144,
+      148
+    ],
+    "box": [
+      -0.19999999999999973,
+      5.3,
+      -4.3,
+      0.85,
+      0.78,
+      0.35
+    ],
+    "material": "command_leather",
+    "detail": "strap"
+  },
+  {
+    "group": "bwRole_officer",
+    "parent": "body",
+    "name": "role_cross_strap_3",
+    "uv": [
+      149,
+      148
+    ],
+    "box": [
+      -1.3999999999999995,
+      6.0,
+      -4.3,
+      0.85,
+      0.78,
+      0.35
+    ],
+    "material": "command_leather",
+    "detail": "strap"
+  },
+  {
+    "group": "bwRole_officer",
+    "parent": "head",
+    "name": "role_hood_crown",
+    "uv": [
+      154,
+      148
+    ],
+    "box": [
+      -4.12,
+      -9.05,
+      -4.12,
+      8.24,
+      1.8,
+      8.24
+    ],
+    "material": "command_fabric",
+    "detail": ""
+  },
+  {
+    "group": "bwRole_officer",
+    "parent": "head",
+    "name": "role_hood_band",
+    "uv": [
+      189,
+      148
+    ],
+    "box": [
+      -4.45,
+      -7.25,
+      -4.4,
+      8.9,
+      1.5,
+      8.8
+    ],
+    "material": "command_fabric",
+    "detail": ""
+  },
+  {
+    "group": "bwRole_officer",
+    "parent": "head",
+    "name": "role_hood_rear",
+    "uv": [
+      227,
+      148
+    ],
+    "box": [
+      -4.4,
+      -5.75,
+      3.85,
+      8.8,
+      5.9,
+      0.65
+    ],
+    "material": "command_fabric",
+    "detail": "hood"
+  },
+  {
+    "group": "bwRole_officer",
+    "parent": "head",
+    "name": "role_hood_right",
+    "uv": [
+      2,
+      161
+    ],
+    "box": [
+      -4.5,
+      -5.75,
+      -4.3,
+      0.75,
+      5.9,
+      8.7
+    ],
+    "material": "command_fabric",
+    "detail": ""
+  },
+  {
+    "group": "bwRole_officer",
+    "parent": "head",
+    "name": "role_hood_left",
+    "uv": [
+      23,
+      161
+    ],
+    "box": [
+      3.75,
+      -5.75,
+      -4.3,
+      0.75,
+      5.9,
+      8.7
+    ],
+    "material": "command_fabric",
+    "detail": ""
+  },
+  {
+    "group": "bwRole_officer",
+    "parent": "head",
+    "name": "role_visor_bridge",
+    "uv": [
+      44,
+      161
+    ],
+    "box": [
+      -3.7,
+      -5.85,
+      -4.9,
+      7.4,
+      0.42,
+      0.55
+    ],
+    "material": "command_trim",
+    "detail": ""
+  },
+  {
+    "group": "bwRole_officer",
+    "parent": "head",
+    "name": "role_hood_badge",
+    "uv": [
+      62,
+      161
+    ],
+    "box": [
+      -1,
+      -7.1,
+      -4.66,
+      2,
+      0.9,
+      0.28
+    ],
+    "material": "recognition",
+    "detail": "badge"
+  },
+  {
+    "group": "bwRole_officer",
+    "parent": "head",
+    "name": "role_hood_rear_band",
+    "uv": [
+      69,
+      161
+    ],
+    "box": [
+      -4.5,
+      -6.9,
+      4.42,
+      9,
+      0.55,
+      0.2
+    ],
+    "material": "recognition",
+    "detail": ""
+  },
+  {
+    "group": "bwRole_commander",
+    "parent": "body",
+    "name": "role_command_pack",
+    "uv": [
+      90,
+      161
+    ],
+    "box": [
+      -2.8,
+      1.6,
+      2.8,
+      5.6,
+      5.5,
+      1.8
+    ],
+    "material": "command_fabric",
+    "detail": "pack"
+  },
+  {
+    "group": "bwRole_commander",
+    "parent": "body",
+    "name": "role_command_pack_frame",
+    "uv": [
+      107,
+      161
+    ],
+    "box": [
+      -3,
+      1.35,
+      2.7,
+      6,
+      0.65,
+      2
+    ],
+    "material": "webbing",
+    "detail": "strap"
+  },
+  {
+    "group": "bwRole_commander",
+    "parent": "body",
+    "name": "role_command_aerial",
+    "uv": [
+      125,
+      161
+    ],
+    "box": [
+      -2.6,
+      -2.8,
+      3.5,
+      0.28,
+      4.3,
+      0.28
+    ],
+    "material": "metal",
+    "detail": ""
+  },
+  {
+    "group": "bwRole_commander",
+    "parent": "body",
+    "name": "role_map_case",
+    "uv": [
+      129,
+      161
+    ],
+    "box": [
+      3.7,
+      6.25,
+      -0.8,
+      1.3,
+      5.1,
+      3.7
+    ],
+    "material": "command_leather",
+    "detail": "mapcase"
+  },
+  {
+    "group": "bwRole_commander",
+    "parent": "left_arm",
+    "name": "role_field_terminal",
+    "uv": [
+      141,
+      161
+    ],
+    "box": [
+      -0.25,
+      3.8,
+      -2.65,
+      2.5,
+      2,
+      0.65
+    ],
+    "material": "radio",
+    "detail": "terminal"
+  },
+  {
+    "group": "bwRole_commander",
+    "parent": "right_arm",
+    "name": "role_shoulder_board",
+    "uv": [
+      150,
+      161
+    ],
+    "box": [
+      -3.15,
+      -2.65,
+      -1.75,
+      4.3,
+      0.65,
+      3.5
+    ],
+    "material": "command_trim",
+    "detail": "epaulette"
+  },
+  {
+    "group": "bwRole_commander",
+    "parent": "right_arm",
+    "name": "role_shoulder_core",
+    "uv": [
+      168,
+      161
+    ],
+    "box": [
+      -2.75,
+      -2.81,
+      -1.25,
+      3.5,
+      0.2,
+      2.5
+    ],
+    "material": "command_fabric",
+    "detail": "epaulette"
+  },
+  {
+    "group": "bwRole_commander",
+    "parent": "left_arm",
+    "name": "role_shoulder_board",
+    "uv": [
+      182,
+      161
+    ],
+    "box": [
+      -1.15,
+      -2.65,
+      -1.75,
+      4.3,
+      0.65,
+      3.5
+    ],
+    "material": "command_trim",
+    "detail": "epaulette"
+  },
+  {
+    "group": "bwRole_commander",
+    "parent": "left_arm",
+    "name": "role_shoulder_core",
+    "uv": [
+      200,
+      161
+    ],
+    "box": [
+      -0.7499999999999999,
+      -2.81,
+      -1.25,
+      3.5,
+      0.2,
+      2.5
+    ],
+    "material": "command_fabric",
+    "detail": "epaulette"
+  },
+  {
+    "group": "bwRole_commander",
+    "parent": "body",
+    "name": "role_cross_strap_0",
+    "uv": [
+      214,
+      161
+    ],
+    "box": [
+      2.2,
+      3.9,
+      -4.3,
+      0.85,
+      0.78,
+      0.35
+    ],
+    "material": "command_leather",
+    "detail": "strap"
+  },
+  {
+    "group": "bwRole_commander",
+    "parent": "body",
+    "name": "role_cross_strap_1",
+    "uv": [
+      219,
+      161
+    ],
+    "box": [
+      1.0000000000000002,
+      4.6,
+      -4.3,
+      0.85,
+      0.78,
+      0.35
+    ],
+    "material": "command_leather",
+    "detail": "strap"
+  },
+  {
+    "group": "bwRole_commander",
+    "parent": "body",
+    "name": "role_cross_strap_2",
+    "uv": [
+      224,
+      161
+    ],
+    "box": [
+      -0.19999999999999973,
+      5.3,
+      -4.3,
+      0.85,
+      0.78,
+      0.35
+    ],
+    "material": "command_leather",
+    "detail": "strap"
+  },
+  {
+    "group": "bwRole_commander",
+    "parent": "body",
+    "name": "role_cross_strap_3",
+    "uv": [
+      229,
+      161
+    ],
+    "box": [
+      -1.3999999999999995,
+      6.0,
+      -4.3,
+      0.85,
+      0.78,
+      0.35
+    ],
+    "material": "command_leather",
+    "detail": "strap"
+  },
+  {
+    "group": "bwRole_commander",
+    "parent": "head",
+    "name": "role_hood_crown",
+    "uv": [
+      2,
+      178
+    ],
+    "box": [
+      -4.12,
+      -9.05,
+      -4.12,
+      8.24,
+      1.8,
+      8.24
+    ],
+    "material": "command_fabric",
+    "detail": ""
+  },
+  {
+    "group": "bwRole_commander",
+    "parent": "head",
+    "name": "role_hood_band",
+    "uv": [
+      37,
+      178
+    ],
+    "box": [
+      -4.45,
+      -7.25,
+      -4.4,
+      8.9,
+      1.5,
+      8.8
+    ],
+    "material": "command_fabric",
+    "detail": ""
+  },
+  {
+    "group": "bwRole_commander",
+    "parent": "head",
+    "name": "role_hood_rear",
+    "uv": [
+      75,
+      178
+    ],
+    "box": [
+      -4.4,
+      -5.75,
+      3.85,
+      8.8,
+      5.9,
+      0.65
+    ],
+    "material": "command_fabric",
+    "detail": "hood"
+  },
+  {
+    "group": "bwRole_commander",
+    "parent": "head",
+    "name": "role_hood_right",
+    "uv": [
+      96,
+      178
+    ],
+    "box": [
+      -4.5,
+      -5.75,
+      -4.3,
+      0.75,
+      5.9,
+      8.7
+    ],
+    "material": "command_fabric",
+    "detail": ""
+  },
+  {
+    "group": "bwRole_commander",
+    "parent": "head",
+    "name": "role_hood_left",
+    "uv": [
+      117,
+      178
+    ],
+    "box": [
+      3.75,
+      -5.75,
+      -4.3,
+      0.75,
+      5.9,
+      8.7
+    ],
+    "material": "command_fabric",
+    "detail": ""
+  },
+  {
+    "group": "bwRole_commander",
+    "parent": "head",
+    "name": "role_visor_bridge",
+    "uv": [
+      138,
+      178
+    ],
+    "box": [
+      -3.7,
+      -5.85,
+      -4.9,
+      7.4,
+      0.42,
+      0.55
+    ],
+    "material": "command_trim",
+    "detail": ""
+  },
+  {
+    "group": "bwRole_commander",
+    "parent": "head",
+    "name": "role_hood_badge",
+    "uv": [
+      156,
+      178
+    ],
+    "box": [
+      -1,
+      -7.1,
+      -4.66,
+      2,
+      0.9,
+      0.28
+    ],
+    "material": "recognition",
+    "detail": "badge"
+  },
+  {
+    "group": "bwRole_commander",
+    "parent": "head",
+    "name": "role_hood_rear_band",
+    "uv": [
+      163,
+      178
+    ],
+    "box": [
+      -4.5,
+      -6.9,
+      4.42,
+      9,
+      0.55,
+      0.2
+    ],
+    "material": "recognition",
+    "detail": ""
+  },
+  {
+    "group": "bwRole_commander",
+    "parent": "body",
+    "name": "role_command_collar_right",
+    "uv": [
+      184,
+      178
+    ],
+    "box": [
+      -4.45,
+      -0.8,
+      -2.6,
+      0.85,
+      2.65,
+      5.15
+    ],
+    "material": "command_fabric",
+    "detail": ""
+  },
+  {
+    "group": "bwRole_commander",
+    "parent": "body",
+    "name": "role_command_collar_left",
+    "uv": [
+      198,
+      178
+    ],
+    "box": [
+      3.6,
+      -0.8,
+      -2.6,
+      0.85,
+      2.65,
+      5.15
+    ],
+    "material": "command_fabric",
+    "detail": ""
+  },
+  {
+    "group": "bwRole_commander",
+    "parent": "body",
+    "name": "role_collar_lapel_right",
+    "uv": [
+      212,
+      178
+    ],
+    "box": [
+      -4.6,
+      -0.3,
+      -3.15,
+      2.1,
+      2.15,
+      0.65
+    ],
+    "material": "command_trim",
+    "detail": ""
+  },
+  {
+    "group": "bwRole_commander",
+    "parent": "body",
+    "name": "role_collar_lapel_left",
+    "uv": [
+      220,
+      178
+    ],
+    "box": [
+      2.5,
+      -0.3,
+      -3.15,
+      2.1,
+      2.15,
+      0.65
+    ],
+    "material": "command_trim",
+    "detail": ""
+  },
+  {
+    "group": "bwRole_commander",
+    "parent": "body",
+    "name": "role_collar_rear",
+    "uv": [
+      228,
+      178
+    ],
+    "box": [
+      -4.45,
+      -0.8,
+      2.05,
+      8.9,
+      1.6,
+      0.6
+    ],
+    "material": "command_trim",
+    "detail": ""
+  },
+  {
+    "group": "bwRole_commander",
+    "parent": "body",
+    "name": "role_command_mantle",
+    "uv": [
+      2,
+      195
+    ],
+    "box": [
+      -4.8,
+      0.05,
+      2.25,
+      9.6,
+      0.75,
+      1.05
+    ],
+    "material": "command_trim",
+    "detail": ""
+  },
+  {
+    "group": "bwRole_commander",
+    "parent": "right_arm",
+    "name": "role_command_board_edge",
+    "uv": [
+      26,
+      195
+    ],
+    "box": [
+      -3.25,
+      -2.45,
+      -2.15,
+      4.5,
+      0.9,
+      0.35
+    ],
+    "material": "recognition",
+    "detail": ""
+  },
+  {
+    "group": "bwRole_commander",
+    "parent": "left_arm",
+    "name": "role_command_board_edge",
+    "uv": [
+      38,
+      195
+    ],
+    "box": [
+      -1.25,
+      -2.45,
+      -2.15,
+      4.5,
+      0.9,
+      0.35
+    ],
+    "material": "recognition",
+    "detail": ""
+  },
+  {
+    "group": "bwRole_commander",
+    "parent": "head",
+    "name": "role_commander_visor_flash_right",
+    "uv": [
+      50,
+      195
+    ],
+    "box": [
+      -4.15,
+      -6.85,
+      -4.82,
+      2.6,
+      0.48,
+      0.2
+    ],
+    "material": "recognition",
+    "detail": ""
+  },
+  {
+    "group": "bwRole_commander",
+    "parent": "head",
+    "name": "role_commander_visor_flash_left",
+    "uv": [
+      58,
+      195
+    ],
+    "box": [
+      1.55,
+      -6.85,
+      -4.82,
+      2.6,
+      0.48,
+      0.2
+    ],
+    "material": "recognition",
+    "detail": ""
+  },
+  {
+    "group": "bwRole_commander",
+    "parent": "body",
+    "name": "role_coat_front_right",
+    "uv": [
+      66,
+      195
+    ],
+    "box": [
+      -4.1,
+      10.25,
+      -2.65,
+      3.65,
+      3.7,
+      0.6
+    ],
+    "material": "command_fabric",
+    "detail": "coat"
+  },
+  {
+    "group": "bwRole_commander",
+    "parent": "body",
+    "name": "role_coat_front_left",
+    "uv": [
+      77,
+      195
+    ],
+    "box": [
+      0.45,
+      10.25,
+      -2.65,
+      3.65,
+      3.7,
+      0.6
+    ],
+    "material": "command_fabric",
+    "detail": "coat"
+  },
+  {
+    "group": "bwRole_commander",
+    "parent": "body",
+    "name": "role_coat_rear",
+    "uv": [
+      88,
+      195
+    ],
+    "box": [
+      -4.1,
+      9.8,
+      2.25,
+      8.2,
+      4.15,
+      0.65
+    ],
+    "material": "command_fabric",
+    "detail": "coat"
+  },
+  {
+    "group": "bwRole_commander",
+    "parent": "body",
+    "name": "role_belt_buckle",
+    "uv": [
+      108,
+      195
+    ],
+    "box": [
+      -1,
+      9.25,
+      -2.75,
+      2,
+      1.05,
+      0.65
+    ],
+    "material": "command_trim",
+    "detail": "badge"
+  },
+  {
+    "group": "bwRole_commander",
+    "parent": "body",
+    "name": "role_command_back_tab",
+    "uv": [
+      116,
+      195
+    ],
+    "box": [
+      -1.65,
+      3.25,
+      4.62,
+      3.3,
+      2,
+      0.25
+    ],
+    "material": "recognition",
+    "detail": "badge"
+  }
+]

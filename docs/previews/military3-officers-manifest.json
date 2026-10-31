@@ -1,0 +1,62 @@
+{
+  "source": "F:\\MC建筑\\blacklight-evolution\\src\\main\\java\\com\\codex\\blacklight\\client\\model\\BlackwatchModel.java",
+  "source_sha256": "d5e2fe99f0a428c3531b5839ce0a0e36b450917956949f785e97019959470d28",
+  "pieces": 242,
+  "staged": false,
+  "variants": [
+    {
+      "id": "military-team_leader",
+      "faction": "military",
+      "role": "team_leader",
+      "rank_ordinal": 2
+    },
+    {
+      "id": "military-officer",
+      "faction": "military",
+      "role": "officer",
+      "rank_ordinal": 3
+    },
+    {
+      "id": "military-commander",
+      "faction": "military",
+      "role": "commander",
+      "rank_ordinal": 5
+    },
+    {
+      "id": "blackwatch-team_leader",
+      "faction": "blackwatch",
+      "role": "team_leader",
+      "rank_ordinal": 2
+    },
+    {
+      "id": "blackwatch-officer",
+      "faction": "blackwatch",
+      "role": "officer",
+      "rank_ordinal": 3
+    },
+    {
+      "id": "blackwatch-commander",
+      "faction": "blackwatch",
+      "role": "commander",
+      "rank_ordinal": 5
+    }
+  ],
+  "textures": {
+    "military": {
+      "path": "F:\\MC建筑\\blacklight-evolution\\src\\main\\resources\\assets\\blacklight\\textures\\entity\\military_soldier_layered.png",
+      "sha256": "88c9fed042c81c90f4b9ba822c4d837823d1b08cb3ba24109a48d20d9197f9b8",
+      "size": [
+        512,
+        512
+      ]
+    },
+    "blackwatch": {
+      "path": "F:\\MC建筑\\blacklight-evolution\\src\\main\\resources\\assets\\blacklight\\textures\\entity\\blackwatch_soldier_layered.png",
+      "sha256": "4ac0ea80f013c388443dec0d62a10d4adbd18c5571f5c5610ef9df90ca742e13",
+      "size": [
+        512,
+        512
+      ]
+    }
+  }
+}

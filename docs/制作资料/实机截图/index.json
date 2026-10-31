@@ -1,0 +1,23 @@
+[
+  {
+    "source_name": "codex-clipboard-6fd37604-bea0-4be4-ae2f-86741e8c69df.png",
+    "file": "实机截图/01-持枪比例反馈.png",
+    "present": true,
+    "sha256": "6bda514b0ec394ab02fd640d07e91108bd16b3a05c3ed914120225a5b231e6b9",
+    "status": "用户失败反馈，不能视作修复通过"
+  },
+  {
+    "source_name": "codex-clipboard-ad8cbc00-8ce9-4eab-853b-f54584395d95.png",
+    "file": "实机截图/02-开火遮挡反馈.png",
+    "present": true,
+    "sha256": "08043722d54c36c0a2889e0a1ce83759f25a0933c6e644e013e9ff15a67510a4",
+    "status": "用户失败反馈，不能视作修复通过"
+  },
+  {
+    "source_name": "codex-clipboard-0264f90d-2067-46d4-8665-97edd5eef48e.png",
+    "file": "实机截图/03-基地零驻军反馈.png",
+    "present": true,
+    "sha256": "5e1c3780762f9249cd3dc62b0d80911b56aac6dc0facf7c3c3450233a9f7a0be",
+    "status": "用户失败反馈，不能视作修复通过"
+  }
+]

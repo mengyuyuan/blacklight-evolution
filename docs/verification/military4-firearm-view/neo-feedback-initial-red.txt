@@ -1,0 +1,69 @@
+
+Test run finished after 84 ms
+[         2 containers found      ]
+[         0 containers skipped    ]
+[         2 containers started    ]
+[         0 containers aborted    ]
+[         2 containers successful ]
+[         0 containers failed     ]
+[        14 tests found           ]
+[         0 tests skipped         ]
+[        14 tests started         ]
+[         0 tests aborted         ]
+[        10 tests successful      ]
+[         4 tests failed          ]
+
+
+Failures (4):
+  JUnit Jupiter:FirearmViewStateTest:successfulReloadDipsGunUntilServerDeadline()
+    MethodSource [className = 'com.codex.blacklight.firearms.FirearmViewStateTest', methodName = 'successfulReloadDipsGunUntilServerDeadline', methodParameterTypes = '']
+    => org.opentest4j.AssertionFailedError: expected: <RELOAD> but was: <NONE>
+       org.junit.jupiter.api.AssertionFailureBuilder.build(AssertionFailureBuilder.java:151)
+       org.junit.jupiter.api.AssertionFailureBuilder.buildAndThrow(AssertionFailureBuilder.java:132)
+       org.junit.jupiter.api.AssertEquals.failNotEqual(AssertEquals.java:197)
+       org.junit.jupiter.api.AssertEquals.assertEquals(AssertEquals.java:182)
+       org.junit.jupiter.api.AssertEquals.assertEquals(AssertEquals.java:177)
+       org.junit.jupiter.api.Assertions.assertEquals(Assertions.java:1145)
+       com.codex.blacklight.firearms.FirearmViewStateTest.successfulReloadDipsGunUntilServerDeadline(FirearmViewStateTest.java:43)
+       java.base/java.lang.reflect.Method.invoke(Method.java:580)
+       java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+       java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+  JUnit Jupiter:FirearmViewStateTest:twoHandsTrackIndependently()
+    MethodSource [className = 'com.codex.blacklight.firearms.FirearmViewStateTest', methodName = 'twoHandsTrackIndependently', methodParameterTypes = '']
+    => org.opentest4j.AssertionFailedError: expected: <true> but was: <false>
+       org.junit.jupiter.api.AssertionFailureBuilder.build(AssertionFailureBuilder.java:151)
+       org.junit.jupiter.api.AssertionFailureBuilder.buildAndThrow(AssertionFailureBuilder.java:132)
+       org.junit.jupiter.api.AssertTrue.failNotTrue(AssertTrue.java:63)
+       org.junit.jupiter.api.AssertTrue.assertTrue(AssertTrue.java:36)
+       org.junit.jupiter.api.AssertTrue.assertTrue(AssertTrue.java:31)
+       org.junit.jupiter.api.Assertions.assertTrue(Assertions.java:183)
+       com.codex.blacklight.firearms.FirearmViewStateTest.twoHandsTrackIndependently(FirearmViewStateTest.java:112)
+       java.base/java.lang.reflect.Method.invoke(Method.java:580)
+       java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+       java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+  JUnit Jupiter:FirearmViewStateTest:repeatedShotsStayBoundedAndReturnToRest()
+    MethodSource [className = 'com.codex.blacklight.firearms.FirearmViewStateTest', methodName = 'repeatedShotsStayBoundedAndReturnToRest', methodParameterTypes = '']
+    => org.opentest4j.AssertionFailedError: expected: <SHOT> but was: <NONE>
+       org.junit.jupiter.api.AssertionFailureBuilder.build(AssertionFailureBuilder.java:151)
+       org.junit.jupiter.api.AssertionFailureBuilder.buildAndThrow(AssertionFailureBuilder.java:132)
+       org.junit.jupiter.api.AssertEquals.failNotEqual(AssertEquals.java:197)
+       org.junit.jupiter.api.AssertEquals.assertEquals(AssertEquals.java:182)
+       org.junit.jupiter.api.AssertEquals.assertEquals(AssertEquals.java:177)
+       org.junit.jupiter.api.Assertions.assertEquals(Assertions.java:1145)
+       com.codex.blacklight.firearms.FirearmViewStateTest.repeatedShotsStayBoundedAndReturnToRest(FirearmViewStateTest.java:87)
+       java.base/java.lang.reflect.Method.invoke(Method.java:580)
+       java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+       java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+  JUnit Jupiter:FirearmViewStateTest:authoritativeMagazineDecreaseStartsOneRecoil()
+    MethodSource [className = 'com.codex.blacklight.firearms.FirearmViewStateTest', methodName = 'authoritativeMagazineDecreaseStartsOneRecoil', methodParameterTypes = '']
+    => org.opentest4j.AssertionFailedError: expected: <SHOT> but was: <NONE>
+       org.junit.jupiter.api.AssertionFailureBuilder.build(AssertionFailureBuilder.java:151)
+       org.junit.jupiter.api.AssertionFailureBuilder.buildAndThrow(AssertionFailureBuilder.java:132)
+       org.junit.jupiter.api.AssertEquals.failNotEqual(AssertEquals.java:197)
+       org.junit.jupiter.api.AssertEquals.assertEquals(AssertEquals.java:182)
+       org.junit.jupiter.api.AssertEquals.assertEquals(AssertEquals.java:177)
+       org.junit.jupiter.api.Assertions.assertEquals(Assertions.java:1145)
+       com.codex.blacklight.firearms.FirearmViewStateTest.authoritativeMagazineDecreaseStartsOneRecoil(FirearmViewStateTest.java:19)
+       java.base/java.lang.reflect.Method.invoke(Method.java:580)
+       java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+       java.base/java.util.ArrayList.forEach(ArrayList.java:1596)

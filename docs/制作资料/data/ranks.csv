@@ -1,0 +1,9 @@
+﻿id,ordinal,name
+private,0,列兵
+corporal,1,下士
+sergeant,2,中士
+lieutenant,3,少尉
+captain,4,上尉
+major,5,少校
+colonel,6,上校
+general,7,将军

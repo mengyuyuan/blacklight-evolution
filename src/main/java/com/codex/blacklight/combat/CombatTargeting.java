@@ -18,7 +18,7 @@ import net.neoforged.neoforge.entity.PartEntity;
 
 /** Selection is independent of camera pitch when the player explicitly locks a target. */
 public final class CombatTargeting {
-    private static final Map<ServerPlayer, LivingEntity> LOCKS = new WeakHashMap<>();
+    private static final Map<ServerPlayer, Entity> LOCKS = new WeakHashMap<>();
     private CombatTargeting() {}
     /** Search loaded, visible actors. This does not enlarge a weapon's contact volume. */
     public static double viewRange(ServerPlayer player) {
@@ -28,10 +28,13 @@ public final class CombatTargeting {
         return !target.isInvisibleTo(player)&&aimScore(player,target)>.5;
     }
     public static LivingEntity locked(ServerPlayer player) {
+        return lockedEntity(player) instanceof LivingEntity living?living:null;
+    }
+    public static Entity lockedEntity(ServerPlayer player) {
         var target=LOCKS.get(player);
-        if (!com.codex.blacklight.power.PrototypeMetabolism.active(player)
-                || !selectable(player,target) || !(inReach(player,target,viewRange(player))
-                || BulletdiveSteering.retainAltitudeLock(player.position(),player.onGround(),target.position(),viewRange(player)))) {
+        if (!ExplicitTarget.enabled(player)
+                || !ExplicitTarget.selectable(player,target) || !(ExplicitTarget.distanceSquared(player,target)<=viewRange(player)*viewRange(player)
+                || target instanceof LivingEntity&&BulletdiveSteering.retainAltitudeLock(player.position(),player.onGround(),target.position(),viewRange(player)))) {
             LOCKS.remove(player); syncLock(player, -1); return null;
         }
         return target;
@@ -39,10 +42,10 @@ public final class CombatTargeting {
     /** Explicit camera lock only; ordinary crosshair focus is never authoritative. */
     public static void requestLock(ServerPlayer player, int entityId) {
         if(entityId<0){ConsumeSystem.releaseUncommitted(player,true);LOCKS.remove(player);syncLock(player,-1);return;}
-        var entity=resolveTarget(player.serverLevel().getEntity(entityId));
-        if(com.codex.blacklight.power.PrototypeMetabolism.active(player)
-                && entity != null && selectable(player,entity)
-                && visibleWithinRange(player,entity,viewRange(player))) {
+        var entity=ExplicitTarget.resolve(player.serverLevel().getEntity(entityId));
+        if(ExplicitTarget.enabled(player)
+                && entity != null && ExplicitTarget.selectable(player,entity)
+                && ExplicitTarget.visibleWithinRange(player,entity,viewRange(player))) {
             LOCKS.put(player,entity);syncLock(player,entity.getId());
         } else {LOCKS.remove(player);syncLock(player,-1);}
     }
@@ -185,7 +188,7 @@ public final class CombatTargeting {
         for(var box:hitboxes(target))if(box.intersects(contact)&&visible(player,player.getEyePosition(),box))return true;
         return false;
     }
-    private static boolean clearRay(Player player,Vec3 from,Vec3 to) {
+    public static boolean clearRay(Player player,Vec3 from,Vec3 to) {
         // Nothing can occupy block space above the dimension's build height.
         // Clip that empty prefix before DDA; a retained high-altitude lock must
         // not walk millions of air blocks on either logical side.

@@ -1,0 +1,9 @@
+﻿symbol,id,ammo_id,capacity,cooldown_ticks,reload_ticks,player_base_damage,range_blocks,kind,radius_blocks,preview
+RIFLE,military_rifle,rifle_round,30,4,40,4.0,64.0,BULLET,0.0,assets/枪械/military_rifle.png
+CARBINE,military_carbine,rifle_round,24,3,32,3.5,48.0,BULLET,0.0,assets/枪械/military_carbine.png
+MACHINE_GUN,military_machine_gun,machine_gun_round,60,3,65,5.0,72.0,BULLET,0.0,assets/枪械/military_machine_gun.png
+GRENADE,grenade_launcher,grenade_round,6,14,55,12.0,40.0,GRENADE,3.0,assets/枪械/grenade_launcher.png
+ROCKET,rocket_launcher,rocket_round,1,22,65,20.0,80.0,ROCKET,4.0,assets/枪械/rocket_launcher.png
+MISSILE,missile_launcher,missile_round,1,28,75,22.0,96.0,MISSILE,4.0,assets/枪械/missile_launcher.png
+THERMOBARIC,thermobaric_launcher,thermobaric_round,1,25,70,24.0,48.0,THERMOBARIC,5.0,assets/枪械/thermobaric_launcher.png
+INFECTION,infection_launcher,infection_round,1,25,60,0.0,40.0,INFECTION,3.0,assets/枪械/infection_launcher.png

@@ -75,6 +75,14 @@ public final class CityEcologyData extends SavedData {
         }
         setDirty();
     }
+    /** A confirmed physical source removal, not a timer or nearby kill counter. */
+    public void purge(Key center,long duration,int reduction,boolean secured,int securedPressure){
+        clear(center,duration);
+        var district=districts.get(center);if(district==null)return;
+        district.threatWork=Math.max(0,Math.max(0,district.threatWork)-Math.clamp(reduction,0,DistrictThreat.MAXIMUM)*20L);
+        if(secured)district.threatWork=Math.min(district.threatWork,Math.clamp(securedPressure,0,DistrictThreat.YELLOW-401)*20L);
+        district.zone=DistrictThreat.zone(district.zone,district.pressure());setDirty();
+    }
     public static CityEcologyData load(CompoundTag tag,HolderLookup.Provider lookup){
         var data=new CityEcologyData();
         for(var value:tag.getList("districts",Tag.TAG_COMPOUND)){

@@ -1,0 +1,12 @@
+package com.codex.blacklight.military.vehicle;
+import net.minecraft.server.level.ServerLevel;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.event.tick.LevelTickEvent;
+/** One production coordinator after actual entities tick. No player-client movement ownership. */
+@EventBusSubscriber(modid="blacklight")
+public final class VehicleWorldEvents {
+ private VehicleWorldEvents(){}
+ @SubscribeEvent public static void leave(net.neoforged.neoforge.event.entity.EntityLeaveLevelEvent event){if(event.getEntity() instanceof com.codex.blacklight.entity.MilitaryVehicle vehicle&&event.getLevel() instanceof ServerLevel level&&vehicle.getRemovalReason()!=null)RedZoneVehicleSpawns.removed(level,vehicle,vehicle.getRemovalReason());}
+ @SubscribeEvent public static void tick(LevelTickEvent.Post event){if(event.getLevel() instanceof ServerLevel level){VehicleGarageService.tick(level);VehiclePatrolSystem.tick(level);VehicleFleetSystem.tick(level);}}
+}

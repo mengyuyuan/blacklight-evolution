@@ -39,10 +39,10 @@ displayURL="https://github.com/mengyuyuan/blacklight-evolution"
 #logoFile="examplemod.png" #optional
 
 # A text field displayed in the mod UI
-#credits="" #optional
+credits="Military / Blackwatch systems: WWYFC (@yfcyy889-ops, PR #95). See repository docs/CONTRIBUTORS_ZH.md."
 
 # The authors of the mod, displayed in the mod UI (optional)
-authors="末者"
+authors="末者; WWYFC (military / Blackwatch systems)"
 
 # The description text for the mod (multi line!) (#mandatory)
 description='''

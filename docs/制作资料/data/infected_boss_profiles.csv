@@ -1,0 +1,5 @@
+﻿profile,source_species,family,locomotion_width,locomotion_height,visual_width,visual_depth,visual_height,base_health,attack_attribute,movement_speed,local_visual_bounds,note,resource_path
+WARDEN,minecraft:warden,ground,6.0,30.0,34.5,19.08,36.0,700.0,10.0,0.27,"[-17.61, 0.0, -9.55, 16.92, 36.01, 9.56]",infected_host 的资料档，不是单独注册ID；巨型时bodyScale=1，紧凑型依宿主/成长缩放,src/main/resources/assets/blacklight/infected_models/warden.json
+IRON_GOLEM,minecraft:iron_golem,ground,6.0,26.0,32.18,19.23,30.0,500.0,9.0,0.25,"[-17.1, 0.0, -10.07, 15.11, 30.01, 9.19]",infected_host 的资料档，不是单独注册ID；巨型时bodyScale=1，紧凑型依宿主/成长缩放,src/main/resources/assets/blacklight/infected_models/iron_golem.json
+WITHER,minecraft:wither,air,6.0,32.0,30.38,13.4,40.0,800.0,8.0,0.3,"[-15.22, 0.0, -5.38, 15.2, 40.01, 8.05]",infected_host 的资料档，不是单独注册ID；巨型时bodyScale=1，紧凑型依宿主/成长缩放,src/main/resources/assets/blacklight/infected_models/wither.json
+ENDER_DRAGON,minecraft:ender_dragon,air,12.0,22.0,112.0,104.68,37.75,1000.0,10.0,0.32,"[-56.02, 0.0, -42.84, 56.02, 37.77, 61.88]",infected_host 的资料档，不是单独注册ID；巨型时bodyScale=1，紧凑型依宿主/成长缩放,src/main/resources/assets/blacklight/infected_models/ender_dragon.json

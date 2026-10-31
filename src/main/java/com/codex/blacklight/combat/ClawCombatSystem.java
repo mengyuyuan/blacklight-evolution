@@ -393,6 +393,8 @@ public final class ClawCombatSystem {
         var targets = CombatTargeting.candidates(player, sweep,
                         target -> CombatTargeting.damageable(player,target) && CombatTargeting.visibleContact(player,target,sweep))
                 .stream()
+                .filter(target -> action != ClawCombatState.Action.AUTO_3
+                        || !com.codex.blacklight.military.vehicle.VehiclePhysicalDamageBridge.shielded(player,target,attackOrigin))
                 .filter(target -> {
                     Vec3 direction = CombatTargeting.closestPoint(attackOrigin,target).subtract(attackOrigin)
                             .multiply(1.0D, 0.0D, 1.0D);
@@ -414,6 +416,11 @@ public final class ClawCombatSystem {
                 ClawPhysicalEffects.onComboTargetHit(player, target,
                         action == ClawCombatState.Action.AUTO_3);
             }
+        }
+        {
+            var mechanical=com.codex.blacklight.military.vehicle.VehiclePhysicalDamageBridge.clawContacts(player,sweep,attackOrigin,forward);
+            for(var contact:mechanical.stream().limit(Math.max(0,maxTargets-targets.size())).toList())
+                if(com.codex.blacklight.military.vehicle.VehicleDamageBridge.hurtPhysical(player,contact.vehicle(),damage,null))hitCount++;
         }
         ClawPhysicalEffects.onComboImpact(player, action, forward, hitCount);
     }

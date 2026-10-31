@@ -137,5 +137,32 @@ class GeographicPackageTest(unittest.TestCase):
                 self.assertTrue(release.geographic_city_selected(repo, archive))
 
 
+class ContributorAttributionTest(unittest.TestCase):
+    repo = Path(__file__).resolve().parents[2]
+
+    def test_real_gradle_template_with_dependency_placeholders_can_be_read(self):
+        declared = release.declared_mod_attribution(self.repo, 'blacklight')
+        self.assertIn('末者', declared['authors'])
+        self.assertIn('WWYFC', declared['authors'])
+        self.assertIn('@yfcyy889-ops', declared['credits'])
+        release.verify_mod_attribution(self.repo, declared, 'blacklight')
+
+    def test_old_single_author_metadata_cannot_drop_a_new_contributor(self):
+        mod = dict(release.declared_mod_attribution(self.repo, 'blacklight'), authors='末者')
+        with self.assertRaisesRegex(RuntimeError, 'Author attribution'):
+            release.verify_mod_attribution(self.repo, mod, 'blacklight')
+
+    def test_original_author_cannot_be_removed(self):
+        mod = dict(release.declared_mod_attribution(self.repo, 'blacklight'), authors='WWYFC')
+        with self.assertRaisesRegex(RuntimeError, 'Author attribution'):
+            release.verify_mod_attribution(self.repo, mod, 'blacklight')
+
+    def test_missing_contributor_credits_are_rejected(self):
+        mod = dict(release.declared_mod_attribution(self.repo, 'blacklight'))
+        mod.pop('credits')
+        with self.assertRaisesRegex(RuntimeError, 'Contributor credits'):
+            release.verify_mod_attribution(self.repo, mod, 'blacklight')
+
+
 if __name__ == '__main__':
     unittest.main()

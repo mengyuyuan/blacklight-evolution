@@ -1,0 +1,12 @@
+// Explicit isolated Player/GL verification; never install into a user instance.
+allprojects { afterEvaluate {
+    if (!project.hasProperty('clientRunDirectory')) throw new GradleException('Set a new isolated clientRunDirectory')
+    def run = project.file(project.property('clientRunDirectory')).canonicalFile
+    if (run.parentFile != project.file('.superpowers').canonicalFile || !run.name.startsWith('run-military6-client-')) throw new GradleException('Use a fresh .superpowers/run-military6-client-* directory')
+    if (new File(run, 'saves/Military6 Vehicle View QA').exists()) throw new GradleException('Keep old visual evidence; choose a new client directory')
+    sourceSets.main.java.srcDir('src/vehicleVisualTest/java')
+    neoForge.runs.client.systemProperty 'blacklight.test.vehicleView', 'true'
+    neoForge.runs.client.programArguments.addAll '--width', '1280', '--height', '800'
+    tasks.withType(Jar).configureEach { exclude 'com/codex/blacklight/client/vehicle/VehicleViewSmoke*.class', 'com/codex/blacklight/client/vehicle/VehicleViewBootstrap*.class' }
+} }
+allprojects { tasks.withType(ProcessResources).configureEach { filteringCharset = 'UTF-8' } }

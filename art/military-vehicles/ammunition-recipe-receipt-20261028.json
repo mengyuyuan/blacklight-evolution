@@ -1,0 +1,111 @@
+{
+  "scope": "ammunition crafting collision repair only; no production Java, physical authoring, camera, language or HUD revision",
+  "verifiedAt": "2026-10-28T06:39:09.851006+00:00",
+  "physicalSourceSha256": "4ccafec7230accdac6d2d84c7ffbd043f2ece8d2b2848e9fe9eb98aa13523a21",
+  "priorReceipt": {
+    "path": "art/military-vehicles/validation-receipt.json",
+    "sha256": "f0d302d902ca0eacd44bad39b70b7c6b96adad3de144ad779af8a723b6640fc7",
+    "preservedUnchangedInBothTrees": true,
+    "historicalAsset38BundleSha256": "5aef790d9147dd5a47b3caecfdfbb3570fb2d99b588afd5d599f304b14e9d2d7"
+  },
+  "currentAsset38BundleSha256": "ec409706dae345b5c24f31ae5a6ca25575bb9df6ca14532709d76616b9edb51e",
+  "priorManifestEntriesStillMatching": 37,
+  "changedPriorManifestEntry": {
+    "path": "tools/build_vehicle_items.py",
+    "oldSha256": "25f53273c82dba9538b6064333eb7dc3b78155afe87a58a78424252b5bf2240a",
+    "newSha256": "42eb55c9732185a6c460a4354c5004bee4294c1367f1a182fd2efddad3bc666c"
+  },
+  "publicFixture": {
+    "path": "neoforge-military6/tools/test_build_vehicle_items.py",
+    "sha256": "d95eee5b12abbc8dd8368bbc96f5fb10764ca0fc294971a3bac6eddcb2527248",
+    "usedAgainstEachLoadersOwnBuilder": true,
+    "redBeforeProductionRecipeChanges": {
+      "testMethod": "test_public_generator_gives_each_of_ten_ammunition_inputs_one_expected_result",
+      "testsPerLoader": 1,
+      "assertionFailuresPerLoader": 6,
+      "errorsPerLoader": 0,
+      "observed": "rifle input matched five legacy ammunition IDs, four differentiated inputs had no match, ten kinds had only six unique multisets"
+    },
+    "greenPerLoader": {"tests": 7, "failures": 0, "errors": 0, "skipped": 0}
+  },
+  "generation": {
+    "productionWriteMode": "--recipes-only",
+    "fullCheckPassedOnBothLoaders": true,
+    "recipeOnlyCheckPassedOnBothLoaders": true,
+    "fullOutputCounts": {"models": 11, "textures": 11, "recipes": 16, "outputFiles": 38},
+    "activeOutputCounts": {"models": 10, "textures": 10, "recipes": 15},
+    "preservedFuelOutputCounts": {"models": 1, "textures": 1, "recipes": 1},
+    "recipeOnlyOutputCounts": {"models": 0, "textures": 0, "recipes": 16, "outputFiles": 16},
+    "sameByteOutputsAreNotRewritten": true,
+    "recipeResultKeys": {"neo": "id", "forge": "item"},
+    "idsAndResultCountsRetained": true
+  },
+  "semanticRecipeChanges": ["machine_gun_round", "grenade_round", "rocket_round", "missile_round"],
+  "formatOnlyRecipeChanges": {
+    "rifle_round": "ingredients and output remain iron_ingot + gunpowder -> 16 rifle_round; old CRLF without final newline becomes generator LF with final newline"
+  },
+  "unchangedExistingAmmunitionRecipeBytes": ["thermobaric_round", "infection_round", "autocannon_round", "tank_he_shell", "tank_ap_shell"],
+  "productionStaticChecks": {
+    "ammunitionKinds": 10,
+    "uniqueIngredientMultisets": 10,
+    "crossLoaderRecipeSemanticsMatch": true,
+    "expectedIdsCountsAndStandardJsonResultKeysVerified": true
+  },
+  "frozenLanguageSha256": {
+    "neo": {"zh_cn": "1498826f51e3a497e2a5cf7da928f80d2c375f31233d8568e15dfb909128c962", "en_us": "7b0993c94b9eef58bfa9c9a83f1d1d54671f2014e49e5aa4ee0dc95d5b6cbbee"},
+    "forge": {"zh_cn": "e56963861165618405ebc8093094c6dff63830534390901aa4291d1665e1947d", "en_us": "5d9d3536c3ef25c41d0b1960f35e4b0eaf74751b778d1fbddef1499c91cea75f"}
+  },
+  "gameTest": {
+    "class": "com.codex.blacklight.gametest.vehicle.VehicleAmmunitionRecipeGameTest",
+    "batch": "vehicle6ammunitionrecipes",
+    "existingTemplate": "blackwatch_arena",
+    "testMethods": 10,
+    "craftingGridsCheckedWhenRun": 20,
+    "calls": ["actual RecipeManager.getRecipesFor", "actual RecipeManager.getRecipeFor", "selected production recipe assemble"],
+    "checks": ["exactly one loaded crafting match", "expected recipe ID", "assembled item registry ID", "exact output count"],
+    "fixtureRecipeResourcesAdded": false,
+    "compileExit": {"neoJava21": 0, "forgeJava17": 0},
+    "compilerOutputs": {
+      "neo": "C:/Users/CFYHS/AppData/Local/Temp/opencode/m6-ammunition-recipes-neo-20261028",
+      "forge": "C:/Users/CFYHS/AppData/Local/Temp/opencode/m6-ammunition-recipes-forge-20261028"
+    },
+    "runtimeState": "pending root-owned serial RecipeManager GameTest run; independent compile is not runtime GREEN"
+  },
+  "bundleDigestFormat": "SHA256 of UTF-8 relativePath=sha256 lines in ordinal path order, LF after every line including last; each loader owns the 12 paths listed below",
+  "loaders": {
+    "neo": {
+      "artifactBundleSha256": "69352b32ec141e80650babcb43f6d383199fc324552acd1a307efbf31c759312",
+      "ownedFiles": {
+        "tools/build_vehicle_items.py": "42eb55c9732185a6c460a4354c5004bee4294c1367f1a182fd2efddad3bc666c",
+        "src/vehicleTest/java/com/codex/blacklight/gametest/vehicle/VehicleAmmunitionRecipeGameTest.java": "42022e6a2db08e92ec4a417d92f76e1d4508fde0680c1e87c60f32283667f596",
+        "src/main/resources/data/blacklight/recipe/rifle_round.json": "c32d7e8fd752d078ed3a24951db2452fa073f6372a99db59d953c42b28657bcf",
+        "src/main/resources/data/blacklight/recipe/machine_gun_round.json": "cfa017a79f7f52bb0f6e8c3aadd70eb360714199cdb94fe16676353ba6f3a3fd",
+        "src/main/resources/data/blacklight/recipe/grenade_round.json": "a1214e7c14bbc70bfb650ce5c67c5978c9643bea82731c6b2ebd80aa310a5db3",
+        "src/main/resources/data/blacklight/recipe/rocket_round.json": "0874859934d7e25c70c13f4282e13c6211253f41db3a68f0d8da3395c3f8ed45",
+        "src/main/resources/data/blacklight/recipe/missile_round.json": "ff7f63df67bf3b6c401c998aae69d756a6146db6abec3caee8e6c9b2fb97f996",
+        "src/main/resources/data/blacklight/recipe/thermobaric_round.json": "b14b4ccf82e1147c013069751fe99a97ad562272c73921060ceffca0722d8f25",
+        "src/main/resources/data/blacklight/recipe/infection_round.json": "334701a6fc85c7a12d447b439c6d555f9f5c78b8816480d7bd5c09f09b6d8fc1",
+        "src/main/resources/data/blacklight/recipe/autocannon_round.json": "d34bb6bc1e6d50032abbc1ff74fd691a5d57543314730747ea67d4c8fbb88caa",
+        "src/main/resources/data/blacklight/recipe/tank_he_shell.json": "7a70729096081a994def7ae52d82faacb2cb128635e22423310b577d1e362730",
+        "src/main/resources/data/blacklight/recipe/tank_ap_shell.json": "1d65ddacde56c168567b7db7361398dff3629cea223456253fc416584398d1e0"
+      }
+    },
+    "forge": {
+      "artifactBundleSha256": "e2e0a385b4ba79536020781229ceeda0c2d96a68124866af02efbfab8637ea9b",
+      "ownedFiles": {
+        "tools/build_vehicle_items.py": "42eb55c9732185a6c460a4354c5004bee4294c1367f1a182fd2efddad3bc666c",
+        "src/vehicleTest/java/com/codex/blacklight/gametest/vehicle/VehicleAmmunitionRecipeGameTest.java": "688043200f1acb5aed3cc08e77c1f3eb0f9a5c32f844c45f6deb49ea9f00b45f",
+        "src/main/resources/data/blacklight/recipes/rifle_round.json": "4c5559b8d6a2fa130f93910f7ba6096bba3ede8d69890546af01d51e4f41dd07",
+        "src/main/resources/data/blacklight/recipes/machine_gun_round.json": "05272f0fe16b145dd6be88bfafb6f6226a457abeca7092493b261aeea9eaed4f",
+        "src/main/resources/data/blacklight/recipes/grenade_round.json": "98d465b29a1ff74f2f0f6a69242c6dc0c7fc2e09cd4b91c87b65cadb585ee4a4",
+        "src/main/resources/data/blacklight/recipes/rocket_round.json": "fb8d3b0893784584876b6b36a36f76526f34825f2dc53296784987c544d333d8",
+        "src/main/resources/data/blacklight/recipes/missile_round.json": "3a07408c9c453412db0a0752b3f26c8cb883c7dc49a551445ce167fb9c766131",
+        "src/main/resources/data/blacklight/recipes/thermobaric_round.json": "e60bfa7094783a8fae938b4618e9637812f283821e02cbb3d0da761fe1ce4d52",
+        "src/main/resources/data/blacklight/recipes/infection_round.json": "3cfd3b944ade13bf3a09de40f24937d5f435d2327c867e1273d196d98c18a0c3",
+        "src/main/resources/data/blacklight/recipes/autocannon_round.json": "90798bc4e282f7219df7982bdb4baabd29d6a8bb8118c99aa30399ca4dd5a149",
+        "src/main/resources/data/blacklight/recipes/tank_he_shell.json": "b92c47eb6f65a94049928497c4b9bfc47968833bc828835290eb5301ebc02a9b",
+        "src/main/resources/data/blacklight/recipes/tank_ap_shell.json": "6ed1e8dc1c7bfc1c1f707baf27ba01bcbcb2e199fc4c2ced8654ae70052f3844"
+      }
+    }
+  }
+}

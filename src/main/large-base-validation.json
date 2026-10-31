@@ -1,0 +1,57 @@
+{
+  "loader": "neoforge-1.21.1",
+  "checks": [
+    {
+      "name": "large_military_base",
+      "dimensions": [
+        65,
+        18,
+        65
+      ],
+      "blocks_including_air": 76050,
+      "reachable_foot_positions": 4801,
+      "module_access": [
+        "command",
+        "ammunition",
+        "barracks",
+        "armory",
+        "medical",
+        "logistics_canopy"
+      ],
+      "guard_positions_reachable": 16,
+      "ammo_chests_openable_and_reachable": true,
+      "entities": 0,
+      "status": "PASS",
+      "path": "F:\\MC建筑\\blacklight-evolution\\src\\main\\resources\\data\\blacklight\\structure\\large_military_base.nbt",
+      "sha256": "90c1715fa57bd839bdfbcde72341d5c9ac1d95b74084b398ea4d628a43c38943",
+      "compressed_bytes": 196578,
+      "palette_states": 48
+    },
+    {
+      "name": "large_blackwatch_base",
+      "dimensions": [
+        65,
+        18,
+        81
+      ],
+      "blocks_including_air": 94770,
+      "reachable_foot_positions": 6789,
+      "module_access": [
+        "command",
+        "ammunition",
+        "barracks",
+        "armory",
+        "medical_isolation",
+        "containment_research"
+      ],
+      "guard_positions_reachable": 20,
+      "ammo_chests_openable_and_reachable": true,
+      "entities": 0,
+      "status": "PASS",
+      "path": "F:\\MC建筑\\blacklight-evolution\\src\\main\\resources\\data\\blacklight\\structure\\large_blackwatch_base.nbt",
+      "sha256": "06b613cf9fc372c034750bc694989c095d9dabecbc599395182a33fa476ded60",
+      "compressed_bytes": 245691,
+      "palette_states": 50
+    }
+  ]
+}

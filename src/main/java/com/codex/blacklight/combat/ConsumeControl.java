@@ -61,6 +61,8 @@ public final class ConsumeControl {
     public static void releaseControls(LivingEntity entity) {
         for(var effect:java.util.List.copyOf(entity.getActiveEffects()))
             if(controlEffect(effect))entity.removeEffect(effect.getEffect());
+        if (entity instanceof com.codex.blacklight.entity.MilitarySoldier soldier && !soldier.tacticsAvailable())
+            soldier.suspendTactics();
     }
     private ConsumeControl(){}
 }

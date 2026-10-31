@@ -1,0 +1,6 @@
+{
+  "src/main/java/com/codex/blacklight/firearms/FirearmViewState.java": "73af3181f3d55439c9c3d55981c1a8ca5bd044ef5040974df22a269526cf6e82",
+  "src/main/java/com/codex/blacklight/firearms/FirearmViewEvents.java": "1b6e40c4bd3ad861c759d627919252b8c31f56355c60572fa0889b2a4144f035",
+  "src/main/java/com/codex/blacklight/firearms/FirearmsCombat.java": "8641f4b9a4e03327fe60c3ec90da7da5b6df990777a3a10c37da10e35d639668",
+  "src/test/java/com/codex/blacklight/firearms/FirearmViewStateTest.java": "56316f0dd95eccf866ec431a544b277c1c57ad2dfe1292a57d32350650bab869"
+}

@@ -1,0 +1,5829 @@
+{
+  "schemaVersion": 1,
+  "authorship": "Original Blacklight cuboid geometry and pixel palettes; no extracted game models or image pixels.",
+  "proportionRevision": {
+    "date": "2026-10-28",
+    "method": "Physical geometry baked per axis, circular wheel profiles retained; real passengers stay scale 1. Official vehicles establish size references only, not replica identity.",
+    "sources": [
+      {"vehicle": "tank", "publisher": "KNDS", "reference": "Leopard 2 A8", "bodyLengthWidthHeightMetres": [8.05, 3.8, 3.13], "heightDatum": "PERI; turret roof 2.72 m; gun-forward overall length 11.17 m", "url": "https://knds.com/media/KNDS_25_068_Datasheet_LEOPARD_2_A8_2_S_EN_03_2fd7d256d4.pdf"},
+      {"vehicle": "apc", "publisher": "Rheinmetall", "reference": "Lynx KF41", "lengthWidthHeightMetres": [7.845, 3.78, 3.3], "url": "https://www.rheinmetall.com/Rheinmetall%20Group/brochure-download/Vehicle-Systems/D1150e0624-Lynx-IFV.pdf"},
+      {"vehicle": "truck", "publisher": "Oshkosh Defense", "reference": "MTVR MK23/MK25 Standard Cargo", "lengthWidthHeightMetres": [8.023, 2.489, 3.556], "url": "https://oshkoshdefense.com/wp-content/uploads/2018/12/MTVR_StndCargo_SS_6-13-11.pdf"}
+    ],
+    "acquisition": "Installed agent-reach Exa web_search_exa returned official datasheet dimensions. Jina Reader connection failed. No fetched source code or imported pixels."
+  },
+  "coordinateSystem": {
+    "units": "blocks",
+    "x": "vehicle right",
+    "y": "up",
+    "z": "vehicle front",
+    "origin": "body horizontal center at ground level",
+    "anchorPositions": "absolute vehicle-local rest pose; apply frame pivot before rotations",
+    "seatAnchorMeaning": "Actual passenger Entity feet/base origin while riding; not cushion or pelvis. No additional rider offset.",
+    "yawConvention": "Server mountWorld is authoritative: yaw 0 faces +Z; positive 90 degrees faces +X."
+  },
+  "palettes": {
+    "military": {
+      "armor": "#70785A",
+      "armor_light": "#8A9070",
+      "armor_dark": "#4C5944",
+      "metal": "#414947",
+      "rubber": "#242B2A",
+      "hub": "#535F50",
+      "glass": "#29444A",
+      "canvas": "#626F4D",
+      "lamp": "#E8E4BF",
+      "tail_lamp": "#BA4232",
+      "marker": "#D3CDB0",
+      "hazard": "#BCA556"
+    },
+    "blackwatch": {
+      "armor": "#303C3E",
+      "armor_light": "#4A5554",
+      "armor_dark": "#222D30",
+      "metal": "#394445",
+      "rubber": "#1D2526",
+      "hub": "#4A5552",
+      "glass": "#213F46",
+      "canvas": "#394743",
+      "lamp": "#C7E0DA",
+      "tail_lamp": "#BC4436",
+      "marker": "#BFC5BA",
+      "hazard": "#C4A253"
+    }
+  },
+  "chassis": {
+    "truck": {
+      "dimensions": [
+        2.9,
+        7.5,
+        3.7
+      ],
+      "referenceStatus": {
+        "status": "Original adapted model after actual Prototype 2 gameplay views",
+        "viewed": [
+          "https://www.igcd.net/vehicle.php?id=50329"
+        ],
+        "confirmed": "Six wheels, high angular cab, split sloping windscreen, low forward nose, open drop-side troop cargo bed.",
+        "adapted": "Canvas enclosure and two faction palettes are mod choices; exact real vehicle identity is not asserted."
+      },
+      "barrelRadius": 0.0,
+      "bones": [
+        {
+          "name": "root",
+          "parent": null,
+          "pivot": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "name": "body",
+          "parent": "root",
+          "pivot": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "name": "left_wheel_1",
+          "parent": "body",
+          "pivot": [
+            -1.20296296,
+            0.6475,
+            2.47983871
+          ]
+        },
+        {
+          "name": "left_wheel_2",
+          "parent": "body",
+          "pivot": [
+            -1.20296296,
+            0.6475,
+            -1.4516129
+          ]
+        },
+        {
+          "name": "left_wheel_3",
+          "parent": "body",
+          "pivot": [
+            -1.20296296,
+            0.6475,
+            -2.70967742
+          ]
+        },
+        {
+          "name": "right_wheel_1",
+          "parent": "body",
+          "pivot": [
+            1.20296296,
+            0.6475,
+            2.47983871
+          ]
+        },
+        {
+          "name": "right_wheel_2",
+          "parent": "body",
+          "pivot": [
+            1.20296296,
+            0.6475,
+            -1.4516129
+          ]
+        },
+        {
+          "name": "right_wheel_3",
+          "parent": "body",
+          "pivot": [
+            1.20296296,
+            0.6475,
+            -2.70967742
+          ]
+        },
+        {
+          "name": "door_left",
+          "parent": "body",
+          "pivot": [
+            -1.2137037,
+            1.4453125,
+            2.74596774
+          ]
+        },
+        {
+          "name": "door_right",
+          "parent": "body",
+          "pivot": [
+            1.2137037,
+            1.4453125,
+            2.74596774
+          ]
+        },
+        {
+          "name": "door_rear",
+          "parent": "body",
+          "pivot": [
+            0.0,
+            1.4915625,
+            -3.66532258
+          ]
+        }
+      ],
+      "anchors": {
+        "seat_driver": {
+          "frame": "body",
+          "position": [
+            -0.51555556,
+            0.89,
+            2.05645161
+          ]
+        },
+        "seat_officer": {
+          "frame": "body",
+          "position": [
+            0.51555556,
+            0.89,
+            2.05645161
+          ]
+        },
+        "seat_passenger_1": {
+          "frame": "body",
+          "position": [
+            -0.53703704,
+            1.053125,
+            -0.72580645
+          ]
+        },
+        "seat_passenger_2": {
+          "frame": "body",
+          "position": [
+            0.53703704,
+            1.053125,
+            -0.72580645
+          ]
+        },
+        "seat_passenger_3": {
+          "frame": "body",
+          "position": [
+            -0.53703704,
+            1.053125,
+            -1.69354839
+          ]
+        },
+        "seat_passenger_4": {
+          "frame": "body",
+          "position": [
+            0.53703704,
+            1.053125,
+            -1.69354839
+          ]
+        },
+        "seat_passenger_5": {
+          "frame": "body",
+          "position": [
+            -0.53703704,
+            1.053125,
+            -2.66129032
+          ]
+        },
+        "seat_passenger_6": {
+          "frame": "body",
+          "position": [
+            0.53703704,
+            1.053125,
+            -2.66129032
+          ]
+        },
+        "camera_driver": {"frame": "body", "position": [-0.51555556, 2.51, 2.05645161]},
+        "camera_officer": {"frame": "body", "position": [0.51555556, 2.51, 2.05645161]},
+        "camera_passenger_1": {"frame": "body", "position": [-0.53703704, 2.673125, -0.72580645]},
+        "camera_passenger_2": {"frame": "body", "position": [0.53703704, 2.673125, -0.72580645]},
+        "camera_passenger_3": {"frame": "body", "position": [-0.53703704, 2.673125, -1.69354839]},
+        "camera_passenger_4": {"frame": "body", "position": [0.53703704, 2.673125, -1.69354839]},
+        "camera_passenger_5": {"frame": "body", "position": [-0.53703704, 2.673125, -2.66129032]},
+        "camera_passenger_6": {"frame": "body", "position": [0.53703704, 2.673125, -2.66129032]},
+        "exit_driver": {
+          "frame": "body",
+          "position": [
+            -2.09444444,
+            0.1,
+            2.47983871
+          ]
+        },
+        "exit_officer": {
+          "frame": "body",
+          "position": [
+            2.09444444,
+            0.1,
+            2.47983871
+          ]
+        },
+        "exit_rear": {
+          "frame": "body",
+          "position": [
+            0.0,
+            0.1,
+            -4.47580645
+          ]
+        }
+      },
+      "weapons": [],
+      "parts": [
+        {
+          "name": "ladder_frame",
+          "bone": "body",
+          "box": [
+            -0.91296296,
+            0.670625,
+            -3.55645161,
+            1.82592593,
+            0.4046875,
+            7.13709677
+          ],
+          "material": "metal"
+        },
+        {
+          "name": "cargo_floor",
+          "bone": "body",
+          "box": [
+            -1.26740741,
+            1.24875,
+            -3.53225806,
+            2.53481481,
+            0.254375,
+            4.57258065
+          ],
+          "material": "armor_dark"
+        },
+        {
+          "name": "cab_floor",
+          "bone": "body",
+          "box": [
+            -1.18148148,
+            1.0984375,
+            1.24596774,
+            2.36296296,
+            0.2890625,
+            2.33467742
+          ],
+          "material": "armor"
+        },
+        {
+          "name": "front_bumper",
+          "bone": "body",
+          "box": [
+            -1.45,
+            0.8325,
+            3.43548387,
+            2.9,
+            0.3121875,
+            0.31451613
+          ],
+          "material": "metal"
+        },
+        {
+          "name": "cab_lower_nose",
+          "bone": "body",
+          "box": [
+            -1.20296296,
+            1.364375,
+            3.19354839,
+            2.40592593,
+            0.5203125,
+            0.4233871
+          ],
+          "material": "armor"
+        },
+        {
+          "name": "cab_front_step_1",
+          "bone": "body",
+          "box": [
+            -1.18148148,
+            1.873125,
+            3.10887097,
+            2.36296296,
+            0.2890625,
+            0.4233871
+          ],
+          "material": "armor"
+        },
+        {
+          "name": "cab_front_step_2",
+          "bone": "body",
+          "box": [
+            -1.16,
+            2.1621875,
+            2.98790323,
+            2.32,
+            0.254375,
+            0.39919355
+          ],
+          "material": "armor"
+        },
+        {
+          "name": "cab_windscreen_frame",
+          "bone": "body",
+          "box": [
+            -1.16,
+            2.4165625,
+            2.70967742,
+            2.32,
+            0.6128125,
+            0.39919355
+          ],
+          "material": "armor_light"
+        },
+        {
+          "name": "windscreen_0",
+          "bone": "body",
+          "box": [
+            -1.05259259,
+            2.5090625,
+            3.10282258,
+            0.95592593,
+            0.4278125,
+            0.04233871
+          ],
+          "material": "glass"
+        },
+        {
+          "name": "windscreen_1",
+          "bone": "body",
+          "box": [
+            0.09666667,
+            2.5090625,
+            3.10282258,
+            0.95592593,
+            0.4278125,
+            0.04233871
+          ],
+          "material": "glass"
+        },
+        {
+          "name": "cab_roof",
+          "bone": "body",
+          "box": [
+            -1.20296296,
+            3.0525,
+            1.28225806,
+            2.40592593,
+            0.254375,
+            1.77822581
+          ],
+          "material": "armor_light"
+        },
+        {
+          "name": "cab_rear_wall",
+          "bone": "body",
+          "box": [
+            -1.16,
+            1.43375,
+            1.25806452,
+            2.32,
+            1.641875,
+            0.21774194
+          ],
+          "material": "armor"
+        },
+        {
+          "name": "left_cab_door",
+          "bone": "door_left",
+          "box": [
+            -1.2137037,
+            1.4453125,
+            1.4516129,
+            0.12888889,
+            1.0059375,
+            1.35483871
+          ],
+          "material": "armor"
+        },
+        {
+          "name": "left_side_window",
+          "bone": "door_left",
+          "box": [
+            -1.2137037,
+            2.4975,
+            1.57258065,
+            0.12888889,
+            0.4971875,
+            0.99193548
+          ],
+          "material": "glass"
+        },
+        {
+          "name": "left_door_front_pillar",
+          "bone": "door_left",
+          "box": [
+            -1.2137037,
+            2.4628125,
+            2.6733871,
+            0.12888889,
+            0.5896875,
+            0.19354839
+          ],
+          "material": "armor"
+        },
+        {
+          "name": "left_door_handle",
+          "bone": "door_left",
+          "box": [
+            -1.23518519,
+            2.243125,
+            1.8266129,
+            0.17185185,
+            0.0809375,
+            0.27822581
+          ],
+          "material": "metal"
+        },
+        {
+          "name": "left_fuel_tank",
+          "bone": "body",
+          "box": [
+            -1.25666667,
+            0.7284375,
+            -0.27822581,
+            0.37592593,
+            0.485625,
+            1.14919355
+          ],
+          "material": "armor_light"
+        },
+        {
+          "name": "left_step",
+          "bone": "body",
+          "box": [
+            -1.29962963,
+            0.7284375,
+            1.46370968,
+            0.32222222,
+            0.1271875,
+            0.84677419
+          ],
+          "material": "metal"
+        },
+        {
+          "name": "left_canvas_side",
+          "bone": "body",
+          "box": [
+            -1.28888889,
+            2.1390625,
+            -3.47177419,
+            0.13962963,
+            1.133125,
+            4.41532258
+          ],
+          "material": "canvas"
+        },
+        {
+          "name": "left_cargo_board",
+          "bone": "body",
+          "box": [
+            -1.32111111,
+            1.503125,
+            -3.53225806,
+            0.13962963,
+            0.6475,
+            4.56048387
+          ],
+          "material": "armor"
+        },
+        {
+          "name": "left_cargo_upright_0",
+          "bone": "body",
+          "box": [
+            -1.34259259,
+            1.503125,
+            -3.26612903,
+            0.10740741,
+            0.7284375,
+            0.12096774
+          ],
+          "material": "armor_light"
+        },
+        {
+          "name": "left_cargo_upright_1",
+          "bone": "body",
+          "box": [
+            -1.34259259,
+            1.503125,
+            -1.75403226,
+            0.10740741,
+            0.7284375,
+            0.12096774
+          ],
+          "material": "armor_light"
+        },
+        {
+          "name": "left_cargo_upright_2",
+          "bone": "body",
+          "box": [
+            -1.34259259,
+            1.503125,
+            -0.24193548,
+            0.10740741,
+            0.7284375,
+            0.12096774
+          ],
+          "material": "armor_light"
+        },
+        {
+          "name": "left_cargo_upright_3",
+          "bone": "body",
+          "box": [
+            -1.34259259,
+            1.503125,
+            0.78629032,
+            0.10740741,
+            0.7284375,
+            0.12096774
+          ],
+          "material": "armor_light"
+        },
+        {
+          "name": "left_bench_0",
+          "bone": "body",
+          "box": [
+            -1.05259259,
+            1.4915625,
+            -1.02822581,
+            0.56925926,
+            0.13875,
+            0.60483871
+          ],
+          "material": "canvas"
+        },
+        {
+          "name": "left_bench_1",
+          "bone": "body",
+          "box": [
+            -1.05259259,
+            1.4915625,
+            -1.99596774,
+            0.56925926,
+            0.13875,
+            0.60483871
+          ],
+          "material": "canvas"
+        },
+        {
+          "name": "left_bench_2",
+          "bone": "body",
+          "box": [
+            -1.05259259,
+            1.4915625,
+            -2.96370968,
+            0.56925926,
+            0.13875,
+            0.60483871
+          ],
+          "material": "canvas"
+        },
+        {
+          "name": "right_cab_door",
+          "bone": "door_right",
+          "box": [
+            1.08481481,
+            1.4453125,
+            1.4516129,
+            0.12888889,
+            1.0059375,
+            1.35483871
+          ],
+          "material": "armor"
+        },
+        {
+          "name": "right_side_window",
+          "bone": "door_right",
+          "box": [
+            1.08481481,
+            2.4975,
+            1.57258065,
+            0.12888889,
+            0.4971875,
+            0.99193548
+          ],
+          "material": "glass"
+        },
+        {
+          "name": "right_door_front_pillar",
+          "bone": "door_right",
+          "box": [
+            1.08481481,
+            2.4628125,
+            2.6733871,
+            0.12888889,
+            0.5896875,
+            0.19354839
+          ],
+          "material": "armor"
+        },
+        {
+          "name": "right_door_handle",
+          "bone": "door_right",
+          "box": [
+            1.06333333,
+            2.243125,
+            1.8266129,
+            0.17185185,
+            0.0809375,
+            0.27822581
+          ],
+          "material": "metal"
+        },
+        {
+          "name": "right_fuel_tank",
+          "bone": "body",
+          "box": [
+            1.04185185,
+            0.7284375,
+            -0.27822581,
+            0.37592593,
+            0.485625,
+            1.14919355
+          ],
+          "material": "armor_light"
+        },
+        {
+          "name": "right_step",
+          "bone": "body",
+          "box": [
+            0.99888889,
+            0.7284375,
+            1.46370968,
+            0.32222222,
+            0.1271875,
+            0.84677419
+          ],
+          "material": "metal"
+        },
+        {
+          "name": "right_canvas_side",
+          "bone": "body",
+          "box": [
+            1.14925926,
+            2.1390625,
+            -3.47177419,
+            0.13962963,
+            1.133125,
+            4.41532258
+          ],
+          "material": "canvas"
+        },
+        {
+          "name": "right_cargo_board",
+          "bone": "body",
+          "box": [
+            1.18148148,
+            1.503125,
+            -3.53225806,
+            0.13962963,
+            0.6475,
+            4.56048387
+          ],
+          "material": "armor"
+        },
+        {
+          "name": "right_cargo_upright_0",
+          "bone": "body",
+          "box": [
+            1.23518519,
+            1.503125,
+            -3.26612903,
+            0.10740741,
+            0.7284375,
+            0.12096774
+          ],
+          "material": "armor_light"
+        },
+        {
+          "name": "right_cargo_upright_1",
+          "bone": "body",
+          "box": [
+            1.23518519,
+            1.503125,
+            -1.75403226,
+            0.10740741,
+            0.7284375,
+            0.12096774
+          ],
+          "material": "armor_light"
+        },
+        {
+          "name": "right_cargo_upright_2",
+          "bone": "body",
+          "box": [
+            1.23518519,
+            1.503125,
+            -0.24193548,
+            0.10740741,
+            0.7284375,
+            0.12096774
+          ],
+          "material": "armor_light"
+        },
+        {
+          "name": "right_cargo_upright_3",
+          "bone": "body",
+          "box": [
+            1.23518519,
+            1.503125,
+            0.78629032,
+            0.10740741,
+            0.7284375,
+            0.12096774
+          ],
+          "material": "armor_light"
+        },
+        {
+          "name": "right_bench_0",
+          "bone": "body",
+          "box": [
+            0.48333333,
+            1.4915625,
+            -1.02822581,
+            0.56925926,
+            0.13875,
+            0.60483871
+          ],
+          "material": "canvas"
+        },
+        {
+          "name": "right_bench_1",
+          "bone": "body",
+          "box": [
+            0.48333333,
+            1.4915625,
+            -1.99596774,
+            0.56925926,
+            0.13875,
+            0.60483871
+          ],
+          "material": "canvas"
+        },
+        {
+          "name": "right_bench_2",
+          "bone": "body",
+          "box": [
+            0.48333333,
+            1.4915625,
+            -2.96370968,
+            0.56925926,
+            0.13875,
+            0.60483871
+          ],
+          "material": "canvas"
+        },
+        {
+          "name": "canopy_top",
+          "bone": "body",
+          "box": [
+            -1.12777778,
+            3.4109375,
+            -3.48387097,
+            2.25555556,
+            0.2890625,
+            4.43951613
+          ],
+          "material": "canvas"
+        },
+        {
+          "name": "canopy_left_shoulder",
+          "bone": "body",
+          "box": [
+            -1.26740741,
+            3.260625,
+            -3.48387097,
+            0.26851852,
+            0.23125,
+            4.43951613
+          ],
+          "material": "canvas"
+        },
+        {
+          "name": "canopy_right_shoulder",
+          "bone": "body",
+          "box": [
+            0.99888889,
+            3.260625,
+            -3.48387097,
+            0.26851852,
+            0.23125,
+            4.43951613
+          ],
+          "material": "canvas"
+        },
+        {
+          "name": "rear_tailgate",
+          "bone": "door_rear",
+          "box": [
+            -1.26740741,
+            1.4915625,
+            -3.66532258,
+            2.53481481,
+            0.5203125,
+            0.16935484
+          ],
+          "material": "armor"
+        },
+        {
+          "name": "front_lamp_0",
+          "bone": "body",
+          "box": [
+            -0.97740741,
+            1.5609375,
+            3.62903226,
+            0.29,
+            0.185,
+            0.05443548
+          ],
+          "material": "lamp"
+        },
+        {
+          "name": "rear_lamp_0",
+          "bone": "body",
+          "box": [
+            -0.97740741,
+            1.0059375,
+            -3.75,
+            0.29,
+            0.13875,
+            0.06048387
+          ],
+          "material": "tail_lamp"
+        },
+        {
+          "name": "front_lamp_1",
+          "bone": "body",
+          "box": [
+            0.68740741,
+            1.5609375,
+            3.62903226,
+            0.29,
+            0.185,
+            0.05443548
+          ],
+          "material": "lamp"
+        },
+        {
+          "name": "rear_lamp_1",
+          "bone": "body",
+          "box": [
+            0.68740741,
+            1.0059375,
+            -3.75,
+            0.29,
+            0.13875,
+            0.06048387
+          ],
+          "material": "tail_lamp"
+        },
+        {
+          "name": "grille",
+          "bone": "body",
+          "box": [
+            -0.64444444,
+            1.364375,
+            3.62903226,
+            1.28888889,
+            0.3121875,
+            0.05443548
+          ],
+          "material": "armor_dark"
+        },
+        {
+          "name": "left_wheel_1_tire_vertical",
+          "bone": "left_wheel_1",
+          "box": [
+            -1.3962963,
+            0.0,
+            2.05896371,
+            0.38666667,
+            1.295,
+            0.84175
+          ],
+          "material": "rubber"
+        },
+        {
+          "name": "left_wheel_1_tire_horizontal",
+          "bone": "left_wheel_1",
+          "box": [
+            -1.3962963,
+            0.226625,
+            1.83233871,
+            0.38666667,
+            0.84175,
+            1.295
+          ],
+          "material": "rubber"
+        },
+        {
+          "name": "left_wheel_1_hub",
+          "bone": "left_wheel_1",
+          "box": [
+            -1.42722963,
+            0.37555,
+            2.20788871,
+            0.44853333,
+            0.5439,
+            0.5439
+          ],
+          "material": "hub"
+        },
+        {
+          "name": "left_wheel_2_tire_vertical",
+          "bone": "left_wheel_2",
+          "box": [
+            -1.3962963,
+            0.0,
+            -1.8724879,
+            0.38666667,
+            1.295,
+            0.84175
+          ],
+          "material": "rubber"
+        },
+        {
+          "name": "left_wheel_2_tire_horizontal",
+          "bone": "left_wheel_2",
+          "box": [
+            -1.3962963,
+            0.226625,
+            -2.0991129,
+            0.38666667,
+            0.84175,
+            1.295
+          ],
+          "material": "rubber"
+        },
+        {
+          "name": "left_wheel_2_hub",
+          "bone": "left_wheel_2",
+          "box": [
+            -1.42722963,
+            0.37555,
+            -1.7235629,
+            0.44853333,
+            0.5439,
+            0.5439
+          ],
+          "material": "hub"
+        },
+        {
+          "name": "left_wheel_3_tire_vertical",
+          "bone": "left_wheel_3",
+          "box": [
+            -1.3962963,
+            0.0,
+            -3.13055242,
+            0.38666667,
+            1.295,
+            0.84175
+          ],
+          "material": "rubber"
+        },
+        {
+          "name": "left_wheel_3_tire_horizontal",
+          "bone": "left_wheel_3",
+          "box": [
+            -1.3962963,
+            0.226625,
+            -3.35717742,
+            0.38666667,
+            0.84175,
+            1.295
+          ],
+          "material": "rubber"
+        },
+        {
+          "name": "left_wheel_3_hub",
+          "bone": "left_wheel_3",
+          "box": [
+            -1.42722963,
+            0.37555,
+            -2.98162742,
+            0.44853333,
+            0.5439,
+            0.5439
+          ],
+          "material": "hub"
+        },
+        {
+          "name": "right_wheel_1_tire_vertical",
+          "bone": "right_wheel_1",
+          "box": [
+            1.00962963,
+            0.0,
+            2.05896371,
+            0.38666667,
+            1.295,
+            0.84175
+          ],
+          "material": "rubber"
+        },
+        {
+          "name": "right_wheel_1_tire_horizontal",
+          "bone": "right_wheel_1",
+          "box": [
+            1.00962963,
+            0.226625,
+            1.83233871,
+            0.38666667,
+            0.84175,
+            1.295
+          ],
+          "material": "rubber"
+        },
+        {
+          "name": "right_wheel_1_hub",
+          "bone": "right_wheel_1",
+          "box": [
+            0.9786963,
+            0.37555,
+            2.20788871,
+            0.44853333,
+            0.5439,
+            0.5439
+          ],
+          "material": "hub"
+        },
+        {
+          "name": "right_wheel_2_tire_vertical",
+          "bone": "right_wheel_2",
+          "box": [
+            1.00962963,
+            0.0,
+            -1.8724879,
+            0.38666667,
+            1.295,
+            0.84175
+          ],
+          "material": "rubber"
+        },
+        {
+          "name": "right_wheel_2_tire_horizontal",
+          "bone": "right_wheel_2",
+          "box": [
+            1.00962963,
+            0.226625,
+            -2.0991129,
+            0.38666667,
+            0.84175,
+            1.295
+          ],
+          "material": "rubber"
+        },
+        {
+          "name": "right_wheel_2_hub",
+          "bone": "right_wheel_2",
+          "box": [
+            0.9786963,
+            0.37555,
+            -1.7235629,
+            0.44853333,
+            0.5439,
+            0.5439
+          ],
+          "material": "hub"
+        },
+        {
+          "name": "right_wheel_3_tire_vertical",
+          "bone": "right_wheel_3",
+          "box": [
+            1.00962963,
+            0.0,
+            -3.13055242,
+            0.38666667,
+            1.295,
+            0.84175
+          ],
+          "material": "rubber"
+        },
+        {
+          "name": "right_wheel_3_tire_horizontal",
+          "bone": "right_wheel_3",
+          "box": [
+            1.00962963,
+            0.226625,
+            -3.35717742,
+            0.38666667,
+            0.84175,
+            1.295
+          ],
+          "material": "rubber"
+        },
+        {
+          "name": "right_wheel_3_hub",
+          "bone": "right_wheel_3",
+          "box": [
+            0.9786963,
+            0.37555,
+            -2.98162742,
+            0.44853333,
+            0.5439,
+            0.5439
+          ],
+          "material": "hub"
+        },
+        {
+          "name": "recognition_bar_0",
+          "bone": "body",
+          "box": [
+            -0.42962963,
+            1.6996875,
+            3.67741935,
+            0.18259259,
+            0.0925,
+            0.07258065
+          ],
+          "material": "marker"
+        },
+        {
+          "name": "recognition_bar_1",
+          "bone": "body",
+          "box": [
+            -0.11814815,
+            1.6996875,
+            3.67741935,
+            0.18259259,
+            0.0925,
+            0.07258065
+          ],
+          "material": "marker"
+        },
+        {
+          "name": "recognition_bar_2",
+          "bone": "body",
+          "box": [
+            0.19333333,
+            1.6996875,
+            3.67741935,
+            0.18259259,
+            0.0925,
+            0.07258065
+          ],
+          "material": "marker"
+        },
+        {
+          "name": "left_hazard_bar_0",
+          "bone": "body",
+          "box": [
+            -1.45,
+            1.641875,
+            -0.54435484,
+            0.03759259,
+            0.300625,
+            0.15725806
+          ],
+          "material": "hazard"
+        },
+        {
+          "name": "left_hazard_bar_1",
+          "bone": "body",
+          "box": [
+            -1.45,
+            1.641875,
+            -0.18145161,
+            0.03759259,
+            0.300625,
+            0.15725806
+          ],
+          "material": "hazard"
+        },
+        {
+          "name": "left_hazard_bar_2",
+          "bone": "body",
+          "box": [
+            -1.45,
+            1.641875,
+            0.18145161,
+            0.03759259,
+            0.300625,
+            0.15725806
+          ],
+          "material": "hazard"
+        },
+        {
+          "name": "right_hazard_bar_0",
+          "bone": "body",
+          "box": [
+            1.41240741,
+            1.641875,
+            -0.54435484,
+            0.03759259,
+            0.300625,
+            0.15725806
+          ],
+          "material": "hazard"
+        },
+        {
+          "name": "right_hazard_bar_1",
+          "bone": "body",
+          "box": [
+            1.41240741,
+            1.641875,
+            -0.18145161,
+            0.03759259,
+            0.300625,
+            0.15725806
+          ],
+          "material": "hazard"
+        },
+        {
+          "name": "right_hazard_bar_2",
+          "bone": "body",
+          "box": [
+            1.41240741,
+            1.641875,
+            0.18145161,
+            0.03759259,
+            0.300625,
+            0.15725806
+          ],
+          "material": "hazard"
+        }
+      ]
+    },
+    "apc": {
+      "dimensions": [
+        3.3,
+        7.0,
+        3.3
+      ],
+      "referenceStatus": {
+        "status": "Original adapted model after actual Prototype 1 and 2 gameplay views",
+        "viewed": [
+          "https://www.igcd.net/vehicle.php?id=50318",
+          "https://www.gamepressure.com/prototype2/main-mission-14-enemies-and-allies/z93aa4",
+          "https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/10150/0000008860.1920x1080.jpg?t=1655760765"
+        ],
+        "confirmed": "Tracked hull, six visible road wheels, steep stepped glacis, small turret, slim cannon, one side twin launcher, rear door.",
+        "adapted": "Dimensions, interior seats, ammunition counts and faction palettes are mod values."
+      },
+      "barrelRadius": 0.12964286,
+      "bones": [
+        {
+          "name": "root",
+          "parent": null,
+          "pivot": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "name": "body",
+          "parent": "root",
+          "pivot": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "name": "turret_yaw",
+          "parent": "body",
+          "pivot": [
+            0.0,
+            1.94464286,
+            0.12068966
+          ]
+        },
+        {
+          "name": "gun_pitch",
+          "parent": "turret_yaw",
+          "pivot": [
+            0.0,
+            2.475,
+            0.54310345
+          ]
+        },
+        {
+          "name": "track_left",
+          "parent": "body",
+          "pivot": [
+            -1.33064516,
+            0.64821429,
+            0.0
+          ]
+        },
+        {
+          "name": "track_left_wheel_1",
+          "parent": "track_left",
+          "pivot": [
+            -1.33064516,
+            0.66,
+            -2.70948276
+          ]
+        },
+        {
+          "name": "track_left_wheel_2",
+          "parent": "track_left",
+          "pivot": [
+            -1.33064516,
+            0.66,
+            -1.62568966
+          ]
+        },
+        {
+          "name": "track_left_wheel_3",
+          "parent": "track_left",
+          "pivot": [
+            -1.33064516,
+            0.66,
+            -0.54189655
+          ]
+        },
+        {
+          "name": "track_left_wheel_4",
+          "parent": "track_left",
+          "pivot": [
+            -1.33064516,
+            0.66,
+            0.54189655
+          ]
+        },
+        {
+          "name": "track_left_wheel_5",
+          "parent": "track_left",
+          "pivot": [
+            -1.33064516,
+            0.66,
+            1.62568966
+          ]
+        },
+        {
+          "name": "track_left_wheel_6",
+          "parent": "track_left",
+          "pivot": [
+            -1.33064516,
+            0.66,
+            2.70948276
+          ]
+        },
+        {
+          "name": "track_right",
+          "parent": "body",
+          "pivot": [
+            1.33064516,
+            0.64821429,
+            0.0
+          ]
+        },
+        {
+          "name": "track_right_wheel_1",
+          "parent": "track_right",
+          "pivot": [
+            1.33064516,
+            0.66,
+            -2.70948276
+          ]
+        },
+        {
+          "name": "track_right_wheel_2",
+          "parent": "track_right",
+          "pivot": [
+            1.33064516,
+            0.66,
+            -1.62568966
+          ]
+        },
+        {
+          "name": "track_right_wheel_3",
+          "parent": "track_right",
+          "pivot": [
+            1.33064516,
+            0.66,
+            -0.54189655
+          ]
+        },
+        {
+          "name": "track_right_wheel_4",
+          "parent": "track_right",
+          "pivot": [
+            1.33064516,
+            0.66,
+            0.54189655
+          ]
+        },
+        {
+          "name": "track_right_wheel_5",
+          "parent": "track_right",
+          "pivot": [
+            1.33064516,
+            0.66,
+            1.62568966
+          ]
+        },
+        {
+          "name": "track_right_wheel_6",
+          "parent": "track_right",
+          "pivot": [
+            1.33064516,
+            0.66,
+            2.70948276
+          ]
+        },
+        {
+          "name": "door_rear",
+          "parent": "body",
+          "pivot": [
+            0.68129032,
+            1.03714286,
+            -3.48793103
+          ]
+        },
+        {
+          "name": "hatch_gunner",
+          "parent": "turret_yaw",
+          "pivot": [
+            -0.51096774,
+            2.81678571,
+            -0.55517241
+          ]
+        }
+      ],
+      "anchors": {
+        "seat_driver": {
+          "frame": "body",
+          "position": [
+            -0.69193548,
+            0.23571429,
+            2.11206897
+          ]
+        },
+        "seat_gunner": {
+          "frame": "body",
+          "position": [
+            0.26612903,
+            0.53035714,
+            0.18103448
+          ]
+        },
+        "seat_passenger_1": {
+          "frame": "body",
+          "position": [
+            -0.74516129,
+            0.23571429,
+            -0.84482759
+          ]
+        },
+        "seat_passenger_2": {
+          "frame": "body",
+          "position": [
+            0.74516129,
+            0.23571429,
+            -0.84482759
+          ]
+        },
+        "seat_passenger_3": {
+          "frame": "body",
+          "position": [
+            -0.74516129,
+            0.23571429,
+            -1.75
+          ]
+        },
+        "seat_passenger_4": {
+          "frame": "body",
+          "position": [
+            0.74516129,
+            0.23571429,
+            -1.75
+          ]
+        },
+        "seat_passenger_5": {
+          "frame": "body",
+          "position": [
+            -0.74516129,
+            0.23571429,
+             -2.65517241
+          ]
+        },
+        "camera_driver": {"frame": "body", "position": [-0.69193548, 2.15, 1.91]},
+        "camera_gunner": {"frame": "turret_yaw", "position": [0.0, 2.88, 0.17]},
+        "camera_passenger_1": {"frame": "body", "position": [-1.45, 1.85571429, -0.84482759]},
+        "camera_passenger_2": {"frame": "body", "position": [1.45, 1.85571429, -0.84482759]},
+        "camera_passenger_3": {"frame": "body", "position": [-1.45, 1.85571429, -1.75]},
+        "camera_passenger_4": {"frame": "body", "position": [1.45, 1.85571429, -1.75]},
+        "camera_passenger_5": {"frame": "body", "position": [-1.45, 1.85571429, -2.65517241]},
+        "camera_passenger_6": {"frame": "body", "position": [1.45, 1.85571429, -2.65517241]},
+        "seat_passenger_6": {
+          "frame": "body",
+          "position": [
+            0.74516129,
+            0.23571429,
+            -2.65517241
+          ]
+        },
+        "exit_driver": {
+          "frame": "body",
+          "position": [
+            -2.23548387,
+            0.1,
+            1.81034483
+          ]
+        },
+        "exit_gunner": {
+          "frame": "body",
+          "position": [
+            2.23548387,
+            0.1,
+            1.81034483
+          ]
+        },
+        "exit_rear": {
+          "frame": "body",
+          "position": [
+            0.0,
+            0.1,
+            -4.22413793
+          ]
+        },
+        "breech_primary": {
+          "frame": "gun_pitch",
+          "position": [
+            0.0,
+            2.475,
+            0.54310345
+          ]
+        },
+        "muzzle_primary": {
+          "frame": "gun_pitch",
+          "position": [
+            0.0,
+            2.475,
+            4.22413793
+          ]
+        },
+        "breech_secondary": {
+          "frame": "gun_pitch",
+          "position": [
+            1.01129032,
+            2.82857143,
+            0.06034483
+          ]
+        },
+        "muzzle_secondary": {
+          "frame": "gun_pitch",
+          "position": [
+            1.01129032,
+            2.82857143,
+            1.62931034
+          ]
+        }
+      },
+      "weapons": [
+        {
+          "id": "primary",
+          "muzzlePart": "main_muzzle"
+        },
+        {
+          "id": "secondary",
+          "muzzlePart": "launcher_muzzle_marker"
+        }
+      ],
+      "parts": [
+        {
+          "name": "track_left_upper",
+          "bone": "track_left",
+          "box": [
+            -1.61806452,
+            1.10785714,
+            -3.34913793,
+            0.57483871,
+            0.21214286,
+            6.69827586
+          ],
+          "material": "rubber"
+        },
+        {
+          "name": "track_left_lower",
+          "bone": "track_left",
+          "box": [
+            -1.61806452,
+            0.05892857,
+            -3.13189655,
+            0.57483871,
+            0.18857143,
+            6.2637931
+          ],
+          "material": "rubber"
+        },
+        {
+          "name": "track_left_tread_0",
+          "bone": "track_left",
+          "box": [
+            -1.63403226,
+            0.02946429,
+            -3.16810345,
+            0.60677419,
+            0.07660714,
+            0.12068966
+          ],
+          "material": "metal"
+        },
+        {
+          "name": "track_left_tread_1",
+          "bone": "track_left",
+          "box": [
+            -1.63403226,
+            0.02946429,
+            -2.81810345,
+            0.60677419,
+            0.07660714,
+            0.12068966
+          ],
+          "material": "metal"
+        },
+        {
+          "name": "track_left_tread_2",
+          "bone": "track_left",
+          "box": [
+            -1.63403226,
+            0.02946429,
+            -2.46810345,
+            0.60677419,
+            0.07660714,
+            0.12068966
+          ],
+          "material": "metal"
+        },
+        {
+          "name": "track_left_tread_3",
+          "bone": "track_left",
+          "box": [
+            -1.63403226,
+            0.02946429,
+            -2.11810345,
+            0.60677419,
+            0.07660714,
+            0.12068966
+          ],
+          "material": "metal"
+        },
+        {
+          "name": "track_left_tread_4",
+          "bone": "track_left",
+          "box": [
+            -1.63403226,
+            0.02946429,
+            -1.76810345,
+            0.60677419,
+            0.07660714,
+            0.12068966
+          ],
+          "material": "metal"
+        },
+        {
+          "name": "track_left_tread_5",
+          "bone": "track_left",
+          "box": [
+            -1.63403226,
+            0.02946429,
+            -1.41810345,
+            0.60677419,
+            0.07660714,
+            0.12068966
+          ],
+          "material": "metal"
+        },
+        {
+          "name": "track_left_tread_6",
+          "bone": "track_left",
+          "box": [
+            -1.63403226,
+            0.02946429,
+            -1.06810345,
+            0.60677419,
+            0.07660714,
+            0.12068966
+          ],
+          "material": "metal"
+        },
+        {
+          "name": "track_left_tread_7",
+          "bone": "track_left",
+          "box": [
+            -1.63403226,
+            0.02946429,
+            -0.71810345,
+            0.60677419,
+            0.07660714,
+            0.12068966
+          ],
+          "material": "metal"
+        },
+        {
+          "name": "track_left_tread_8",
+          "bone": "track_left",
+          "box": [
+            -1.63403226,
+            0.02946429,
+            -0.36810345,
+            0.60677419,
+            0.07660714,
+            0.12068966
+          ],
+          "material": "metal"
+        },
+        {
+          "name": "track_left_tread_9",
+          "bone": "track_left",
+          "box": [
+            -1.63403226,
+            0.02946429,
+            -0.01810345,
+            0.60677419,
+            0.07660714,
+            0.12068966
+          ],
+          "material": "metal"
+        },
+        {
+          "name": "track_left_tread_10",
+          "bone": "track_left",
+          "box": [
+            -1.63403226,
+            0.02946429,
+            0.33189655,
+            0.60677419,
+            0.07660714,
+            0.12068966
+          ],
+          "material": "metal"
+        },
+        {
+          "name": "track_left_tread_11",
+          "bone": "track_left",
+          "box": [
+            -1.63403226,
+            0.02946429,
+            0.68189655,
+            0.60677419,
+            0.07660714,
+            0.12068966
+          ],
+          "material": "metal"
+        },
+        {
+          "name": "track_left_tread_12",
+          "bone": "track_left",
+          "box": [
+            -1.63403226,
+            0.02946429,
+            1.03189655,
+            0.60677419,
+            0.07660714,
+            0.12068966
+          ],
+          "material": "metal"
+        },
+        {
+          "name": "track_left_tread_13",
+          "bone": "track_left",
+          "box": [
+            -1.63403226,
+            0.02946429,
+            1.38189655,
+            0.60677419,
+            0.07660714,
+            0.12068966
+          ],
+          "material": "metal"
+        },
+        {
+          "name": "track_left_tread_14",
+          "bone": "track_left",
+          "box": [
+            -1.63403226,
+            0.02946429,
+            1.73189655,
+            0.60677419,
+            0.07660714,
+            0.12068966
+          ],
+          "material": "metal"
+        },
+        {
+          "name": "track_left_tread_15",
+          "bone": "track_left",
+          "box": [
+            -1.63403226,
+            0.02946429,
+            2.08189655,
+            0.60677419,
+            0.07660714,
+            0.12068966
+          ],
+          "material": "metal"
+        },
+        {
+          "name": "track_left_tread_16",
+          "bone": "track_left",
+          "box": [
+            -1.63403226,
+            0.02946429,
+            2.43189655,
+            0.60677419,
+            0.07660714,
+            0.12068966
+          ],
+          "material": "metal"
+        },
+        {
+          "name": "track_left_tread_17",
+          "bone": "track_left",
+          "box": [
+            -1.63403226,
+            0.02946429,
+            2.78189655,
+            0.60677419,
+            0.07660714,
+            0.12068966
+          ],
+          "material": "metal"
+        },
+        {
+          "name": "track_left_tread_18",
+          "bone": "track_left",
+          "box": [
+            -1.63403226,
+            0.02946429,
+            3.13189655,
+            0.60677419,
+            0.07660714,
+            0.12068966
+          ],
+          "material": "metal"
+        },
+        {
+          "name": "track_left_wheel_1_tire_vertical",
+          "bone": "track_left_wheel_1",
+          "box": [
+            -1.59794516,
+            0.12964286,
+            -3.0542149,
+            0.5346,
+            1.06071429,
+            0.68946429
+          ],
+          "material": "rubber"
+        },
+        {
+          "name": "track_left_wheel_1_tire_horizontal",
+          "bone": "track_left_wheel_1",
+          "box": [
+            -1.59794516,
+            0.31526786,
+            -3.2398399,
+            0.5346,
+            0.68946429,
+            1.06071429
+          ],
+          "material": "rubber"
+        },
+        {
+          "name": "track_left_wheel_1_hub",
+          "bone": "track_left_wheel_1",
+          "box": [
+            -1.64071742,
+            0.43725,
+            -2.93223276,
+            0.62013387,
+            0.4455,
+            0.4455
+          ],
+          "material": "hub"
+        },
+        {
+          "name": "track_left_wheel_2_tire_vertical",
+          "bone": "track_left_wheel_2",
+          "box": [
+            -1.59794516,
+            0.12964286,
+            -1.9704218,
+            0.5346,
+            1.06071429,
+            0.68946429
+          ],
+          "material": "rubber"
+        },
+        {
+          "name": "track_left_wheel_2_tire_horizontal",
+          "bone": "track_left_wheel_2",
+          "box": [
+            -1.59794516,
+            0.31526786,
+            -2.1560468,
+            0.5346,
+            0.68946429,
+            1.06071429
+          ],
+          "material": "rubber"
+        },
+        {
+          "name": "track_left_wheel_2_hub",
+          "bone": "track_left_wheel_2",
+          "box": [
+            -1.64071742,
+            0.43725,
+            -1.84843966,
+            0.62013387,
+            0.4455,
+            0.4455
+          ],
+          "material": "hub"
+        },
+        {
+          "name": "track_left_wheel_3_tire_vertical",
+          "bone": "track_left_wheel_3",
+          "box": [
+            -1.59794516,
+            0.12964286,
+            -0.88662869,
+            0.5346,
+            1.06071429,
+            0.68946429
+          ],
+          "material": "rubber"
+        },
+        {
+          "name": "track_left_wheel_3_tire_horizontal",
+          "bone": "track_left_wheel_3",
+          "box": [
+            -1.59794516,
+            0.31526786,
+            -1.07225369,
+            0.5346,
+            0.68946429,
+            1.06071429
+          ],
+          "material": "rubber"
+        },
+        {
+          "name": "track_left_wheel_3_hub",
+          "bone": "track_left_wheel_3",
+          "box": [
+            -1.64071742,
+            0.43725,
+            -0.76464655,
+            0.62013387,
+            0.4455,
+            0.4455
+          ],
+          "material": "hub"
+        },
+        {
+          "name": "track_left_wheel_4_tire_vertical",
+          "bone": "track_left_wheel_4",
+          "box": [
+            -1.59794516,
+            0.12964286,
+            0.19716441,
+            0.5346,
+            1.06071429,
+            0.68946429
+          ],
+          "material": "rubber"
+        },
+        {
+          "name": "track_left_wheel_4_tire_horizontal",
+          "bone": "track_left_wheel_4",
+          "box": [
+            -1.59794516,
+            0.31526786,
+            0.01153941,
+            0.5346,
+            0.68946429,
+            1.06071429
+          ],
+          "material": "rubber"
+        },
+        {
+          "name": "track_left_wheel_4_hub",
+          "bone": "track_left_wheel_4",
+          "box": [
+            -1.64071742,
+            0.43725,
+            0.31914655,
+            0.62013387,
+            0.4455,
+            0.4455
+          ],
+          "material": "hub"
+        },
+        {
+          "name": "track_left_wheel_5_tire_vertical",
+          "bone": "track_left_wheel_5",
+          "box": [
+            -1.59794516,
+            0.12964286,
+            1.28095751,
+            0.5346,
+            1.06071429,
+            0.68946429
+          ],
+          "material": "rubber"
+        },
+        {
+          "name": "track_left_wheel_5_tire_horizontal",
+          "bone": "track_left_wheel_5",
+          "box": [
+            -1.59794516,
+            0.31526786,
+            1.09533251,
+            0.5346,
+            0.68946429,
+            1.06071429
+          ],
+          "material": "rubber"
+        },
+        {
+          "name": "track_left_wheel_5_hub",
+          "bone": "track_left_wheel_5",
+          "box": [
+            -1.64071742,
+            0.43725,
+            1.40293966,
+            0.62013387,
+            0.4455,
+            0.4455
+          ],
+          "material": "hub"
+        },
+        {
+          "name": "track_left_wheel_6_tire_vertical",
+          "bone": "track_left_wheel_6",
+          "box": [
+            -1.59794516,
+            0.12964286,
+            2.36475062,
+            0.5346,
+            1.06071429,
+            0.68946429
+          ],
+          "material": "rubber"
+        },
+        {
+          "name": "track_left_wheel_6_tire_horizontal",
+          "bone": "track_left_wheel_6",
+          "box": [
+            -1.59794516,
+            0.31526786,
+            2.17912562,
+            0.5346,
+            0.68946429,
+            1.06071429
+          ],
+          "material": "rubber"
+        },
+        {
+          "name": "track_left_wheel_6_hub",
+          "bone": "track_left_wheel_6",
+          "box": [
+            -1.64071742,
+            0.43725,
+            2.48673276,
+            0.62013387,
+            0.4455,
+            0.4455
+          ],
+          "material": "hub"
+        },
+        {
+          "name": "track_left_front",
+          "bone": "track_left",
+          "box": [
+            -1.61806452,
+            0.22392857,
+            3.16810345,
+            0.57483871,
+            0.84857143,
+            0.18103448
+          ],
+          "material": "rubber"
+        },
+        {
+          "name": "track_left_rear",
+          "bone": "track_left",
+          "box": [
+            -1.61806452,
+            0.22392857,
+            -3.34913793,
+            0.57483871,
+            0.84857143,
+            0.18103448
+          ],
+          "material": "rubber"
+        },
+        {
+          "name": "track_right_upper",
+          "bone": "track_right",
+          "box": [
+            1.04322581,
+            1.10785714,
+            -3.34913793,
+            0.57483871,
+            0.21214286,
+            6.69827586
+          ],
+          "material": "rubber"
+        },
+        {
+          "name": "track_right_lower",
+          "bone": "track_right",
+          "box": [
+            1.04322581,
+            0.05892857,
+            -3.13189655,
+            0.57483871,
+            0.18857143,
+            6.2637931
+          ],
+          "material": "rubber"
+        },
+        {
+          "name": "track_right_tread_0",
+          "bone": "track_right",
+          "box": [
+            1.02725806,
+            0.02946429,
+            -3.16810345,
+            0.60677419,
+            0.07660714,
+            0.12068966
+          ],
+          "material": "metal"
+        },
+        {
+          "name": "track_right_tread_1",
+          "bone": "track_right",
+          "box": [
+            1.02725806,
+            0.02946429,
+            -2.81810345,
+            0.60677419,
+            0.07660714,
+            0.12068966
+          ],
+          "material": "metal"
+        },
+        {
+          "name": "track_right_tread_2",
+          "bone": "track_right",
+          "box": [
+            1.02725806,
+            0.02946429,
+            -2.46810345,
+            0.60677419,
+            0.07660714,
+            0.12068966
+          ],
+          "material": "metal"
+        },
+        {
+          "name": "track_right_tread_3",
+          "bone": "track_right",
+          "box": [
+            1.02725806,
+            0.02946429,
+            -2.11810345,
+            0.60677419,
+            0.07660714,
+            0.12068966
+          ],
+          "material": "metal"
+        },
+        {
+          "name": "track_right_tread_4",
+          "bone": "track_right",
+          "box": [
+            1.02725806,
+            0.02946429,
+            -1.76810345,
+            0.60677419,
+            0.07660714,
+            0.12068966
+          ],
+          "material": "metal"
+        },
+        {
+          "name": "track_right_tread_5",
+          "bone": "track_right",
+          "box": [
+            1.02725806,
+            0.02946429,
+            -1.41810345,
+            0.60677419,
+            0.07660714,
+            0.12068966
+          ],
+          "material": "metal"
+        },
+        {
+          "name": "track_right_tread_6",
+          "bone": "track_right",
+          "box": [
+            1.02725806,
+            0.02946429,
+            -1.06810345,
+            0.60677419,
+            0.07660714,
+            0.12068966
+          ],
+          "material": "metal"
+        },
+        {
+          "name": "track_right_tread_7",
+          "bone": "track_right",
+          "box": [
+            1.02725806,
+            0.02946429,
+            -0.71810345,
+            0.60677419,
+            0.07660714,
+            0.12068966
+          ],
+          "material": "metal"
+        },
+        {
+          "name": "track_right_tread_8",
+          "bone": "track_right",
+          "box": [
+            1.02725806,
+            0.02946429,
+            -0.36810345,
+            0.60677419,
+            0.07660714,
+            0.12068966
+          ],
+          "material": "metal"
+        },
+        {
+          "name": "track_right_tread_9",
+          "bone": "track_right",
+          "box": [
+            1.02725806,
+            0.02946429,
+            -0.01810345,
+            0.60677419,
+            0.07660714,
+            0.12068966
+          ],
+          "material": "metal"
+        },
+        {
+          "name": "track_right_tread_10",
+          "bone": "track_right",
+          "box": [
+            1.02725806,
+            0.02946429,
+            0.33189655,
+            0.60677419,
+            0.07660714,
+            0.12068966
+          ],
+          "material": "metal"
+        },
+        {
+          "name": "track_right_tread_11",
+          "bone": "track_right",
+          "box": [
+            1.02725806,
+            0.02946429,
+            0.68189655,
+            0.60677419,
+            0.07660714,
+            0.12068966
+          ],
+          "material": "metal"
+        },
+        {
+          "name": "track_right_tread_12",
+          "bone": "track_right",
+          "box": [
+            1.02725806,
+            0.02946429,
+            1.03189655,
+            0.60677419,
+            0.07660714,
+            0.12068966
+          ],
+          "material": "metal"
+        },
+        {
+          "name": "track_right_tread_13",
+          "bone": "track_right",
+          "box": [
+            1.02725806,
+            0.02946429,
+            1.38189655,
+            0.60677419,
+            0.07660714,
+            0.12068966
+          ],
+          "material": "metal"
+        },
+        {
+          "name": "track_right_tread_14",
+          "bone": "track_right",
+          "box": [
+            1.02725806,
+            0.02946429,
+            1.73189655,
+            0.60677419,
+            0.07660714,
+            0.12068966
+          ],
+          "material": "metal"
+        },
+        {
+          "name": "track_right_tread_15",
+          "bone": "track_right",
+          "box": [
+            1.02725806,
+            0.02946429,
+            2.08189655,
+            0.60677419,
+            0.07660714,
+            0.12068966
+          ],
+          "material": "metal"
+        },
+        {
+          "name": "track_right_tread_16",
+          "bone": "track_right",
+          "box": [
+            1.02725806,
+            0.02946429,
+            2.43189655,
+            0.60677419,
+            0.07660714,
+            0.12068966
+          ],
+          "material": "metal"
+        },
+        {
+          "name": "track_right_tread_17",
+          "bone": "track_right",
+          "box": [
+            1.02725806,
+            0.02946429,
+            2.78189655,
+            0.60677419,
+            0.07660714,
+            0.12068966
+          ],
+          "material": "metal"
+        },
+        {
+          "name": "track_right_tread_18",
+          "bone": "track_right",
+          "box": [
+            1.02725806,
+            0.02946429,
+            3.13189655,
+            0.60677419,
+            0.07660714,
+            0.12068966
+          ],
+          "material": "metal"
+        },
+        {
+          "name": "track_right_wheel_1_tire_vertical",
+          "bone": "track_right_wheel_1",
+          "box": [
+            1.06334516,
+            0.12964286,
+            -3.0542149,
+            0.5346,
+            1.06071429,
+            0.68946429
+          ],
+          "material": "rubber"
+        },
+        {
+          "name": "track_right_wheel_1_tire_horizontal",
+          "bone": "track_right_wheel_1",
+          "box": [
+            1.06334516,
+            0.31526786,
+            -3.2398399,
+            0.5346,
+            0.68946429,
+            1.06071429
+          ],
+          "material": "rubber"
+        },
+        {
+          "name": "track_right_wheel_1_hub",
+          "bone": "track_right_wheel_1",
+          "box": [
+            1.0205729,
+            0.43725,
+            -2.93223276,
+            0.62013387,
+            0.4455,
+            0.4455
+          ],
+          "material": "hub"
+        },
+        {
+          "name": "track_right_wheel_2_tire_vertical",
+          "bone": "track_right_wheel_2",
+          "box": [
+            1.06334516,
+            0.12964286,
+            -1.9704218,
+            0.5346,
+            1.06071429,
+            0.68946429
+          ],
+          "material": "rubber"
+        },
+        {
+          "name": "track_right_wheel_2_tire_horizontal",
+          "bone": "track_right_wheel_2",
+          "box": [
+            1.06334516,
+            0.31526786,
+            -2.1560468,
+            0.5346,
+            0.68946429,
+            1.06071429
+          ],
+          "material": "rubber"
+        },
+        {
+          "name": "track_right_wheel_2_hub",
+          "bone": "track_right_wheel_2",
+          "box": [
+            1.0205729,
+            0.43725,
+            -1.84843966,
+            0.62013387,
+            0.4455,
+            0.4455
+          ],
+          "material": "hub"
+        },
+        {
+          "name": "track_right_wheel_3_tire_vertical",
+          "bone": "track_right_wheel_3",
+          "box": [
+            1.06334516,
+            0.12964286,
+            -0.88662869,
+            0.5346,
+            1.06071429,
+            0.68946429
+          ],
+          "material": "rubber"
+        },
+        {
+          "name": "track_right_wheel_3_tire_horizontal",
+          "bone": "track_right_wheel_3",
+          "box": [
+            1.06334516,
+            0.31526786,
+            -1.07225369,
+            0.5346,
+            0.68946429,
+            1.06071429
+          ],
+          "material": "rubber"
+        },
+        {
+          "name": "track_right_wheel_3_hub",
+          "bone": "track_right_wheel_3",
+          "box": [
+            1.0205729,
+            0.43725,
+            -0.76464655,
+            0.62013387,
+            0.4455,
+            0.4455
+          ],
+          "material": "hub"
+        },
+        {
+          "name": "track_right_wheel_4_tire_vertical",
+          "bone": "track_right_wheel_4",
+          "box": [
+            1.06334516,
+            0.12964286,
+            0.19716441,
+            0.5346,
+            1.06071429,
+            0.68946429
+          ],
+          "material": "rubber"
+        },
+        {
+          "name": "track_right_wheel_4_tire_horizontal",
+          "bone": "track_right_wheel_4",
+          "box": [
+            1.06334516,
+            0.31526786,
+            0.01153941,
+            0.5346,
+            0.68946429,
+            1.06071429
+          ],
+          "material": "rubber"
+        },
+        {
+          "name": "track_right_wheel_4_hub",
+          "bone": "track_right_wheel_4",
+          "box": [
+            1.0205729,
+            0.43725,
+            0.31914655,
+            0.62013387,
+            0.4455,
+            0.4455
+          ],
+          "material": "hub"
+        },
+        {
+          "name": "track_right_wheel_5_tire_vertical",
+          "bone": "track_right_wheel_5",
+          "box": [
+            1.06334516,
+            0.12964286,
+            1.28095751,
+            0.5346,
+            1.06071429,
+            0.68946429
+          ],
+          "material": "rubber"
+        },
+        {
+          "name": "track_right_wheel_5_tire_horizontal",
+          "bone": "track_right_wheel_5",
+          "box": [
+            1.06334516,
+            0.31526786,
+            1.09533251,
+            0.5346,
+            0.68946429,
+            1.06071429
+          ],
+          "material": "rubber"
+        },
+        {
+          "name": "track_right_wheel_5_hub",
+          "bone": "track_right_wheel_5",
+          "box": [
+            1.0205729,
+            0.43725,
+            1.40293966,
+            0.62013387,
+            0.4455,
+            0.4455
+          ],
+          "material": "hub"
+        },
+        {
+          "name": "track_right_wheel_6_tire_vertical",
+          "bone": "track_right_wheel_6",
+          "box": [
+            1.06334516,
+            0.12964286,
+            2.36475062,
+            0.5346,
+            1.06071429,
+            0.68946429
+          ],
+          "material": "rubber"
+        },
+        {
+          "name": "track_right_wheel_6_tire_horizontal",
+          "bone": "track_right_wheel_6",
+          "box": [
+            1.06334516,
+            0.31526786,
+            2.17912562,
+            0.5346,
+            0.68946429,
+            1.06071429
+          ],
+          "material": "rubber"
+        },
+        {
+          "name": "track_right_wheel_6_hub",
+          "bone": "track_right_wheel_6",
+          "box": [
+            1.0205729,
+            0.43725,
+            2.48673276,
+            0.62013387,
+            0.4455,
+            0.4455
+          ],
+          "material": "hub"
+        },
+        {
+          "name": "track_right_front",
+          "bone": "track_right",
+          "box": [
+            1.04322581,
+            0.22392857,
+            3.16810345,
+            0.57483871,
+            0.84857143,
+            0.18103448
+          ],
+          "material": "rubber"
+        },
+        {
+          "name": "track_right_rear",
+          "bone": "track_right",
+          "box": [
+            1.04322581,
+            0.22392857,
+            -3.34913793,
+            0.57483871,
+            0.84857143,
+            0.18103448
+          ],
+          "material": "rubber"
+        },
+        {
+          "name": "lower_hull",
+          "bone": "body",
+          "box": [
+            -1.08580645,
+            0.66,
+            -3.1862069,
+            2.1716129,
+            0.75428571,
+            6.25172414
+          ],
+          "material": "armor_dark"
+        },
+        {
+          "name": "upper_hull",
+          "bone": "body",
+          "viewports": ["camera_passenger_1", "camera_passenger_2", "camera_passenger_3", "camera_passenger_4", "camera_passenger_5", "camera_passenger_6"],
+          "box": [
+            -1.4583871,
+            1.34357143,
+            -3.33103448,
+            2.91677419,
+            0.64821429,
+            5.99827586
+          ],
+          "material": "armor"
+        },
+        {
+          "name": "glacis_step_0",
+          "bone": "body",
+          "box": [
+            -1.44774194,
+            1.17857143,
+            2.63103448,
+            2.89548387,
+            0.21214286,
+            0.84482759
+          ],
+          "material": "armor_light"
+        },
+        {
+          "name": "glacis_step_1",
+          "bone": "body",
+          "box": [
+            -1.44774194,
+            1.41428571,
+            2.53448276,
+            2.89548387,
+            0.21214286,
+            0.78448276
+          ],
+          "material": "armor_light"
+        },
+        {
+          "name": "glacis_step_2",
+          "bone": "body",
+          "box": [
+            -1.44774194,
+            1.65,
+            2.34137931,
+            2.89548387,
+            0.21214286,
+            0.72413793
+          ],
+          "material": "armor_light"
+        },
+        {
+          "name": "glacis_step_3",
+          "bone": "body",
+          "box": [
+            -1.44774194,
+            1.88571429,
+            2.12413793,
+            2.89548387,
+            0.21214286,
+            0.56724138
+          ],
+          "material": "armor_light"
+        },
+        {
+          "name": "rear_door",
+          "bone": "door_rear",
+          "box": [
+            -0.68129032,
+            1.03714286,
+            -3.48793103,
+            1.36258065,
+            0.87214286,
+            0.15689655
+          ],
+          "material": "armor_dark"
+        },
+        {
+          "name": "rear_door_inner",
+          "bone": "door_rear",
+          "box": [
+            -0.54290323,
+            1.16678571,
+            -3.5,
+            1.08580645,
+            0.60107143,
+            0.07241379
+          ],
+          "material": "armor"
+        },
+        {
+          "name": "rear_step",
+          "bone": "body",
+          "box": [
+            -0.80903226,
+            0.50678571,
+            -3.48793103,
+            1.61806452,
+            0.14142857,
+            0.25344828
+          ],
+          "material": "metal"
+        },
+        {
+          "name": "left_skirt_0",
+          "bone": "body",
+          "box": [
+            -1.65,
+            0.86035714,
+            -2.82413793,
+            0.14903226,
+            1.00178571,
+            1.13448276
+          ],
+          "material": "armor"
+        },
+        {
+          "name": "left_skirt_latch_0",
+          "bone": "body",
+          "box": [
+            -1.65,
+            1.09607143,
+            -2.43793103,
+            0.17032258,
+            0.07071429,
+            0.37413793
+          ],
+          "material": "metal"
+        },
+        {
+          "name": "left_skirt_1",
+          "bone": "body",
+          "box": [
+            -1.65,
+            0.86035714,
+            -1.62931034,
+            0.14903226,
+            1.00178571,
+            1.13448276
+          ],
+          "material": "armor"
+        },
+        {
+          "name": "left_skirt_latch_1",
+          "bone": "body",
+          "box": [
+            -1.65,
+            1.09607143,
+            -1.24310345,
+            0.17032258,
+            0.07071429,
+            0.37413793
+          ],
+          "material": "metal"
+        },
+        {
+          "name": "left_skirt_2",
+          "bone": "body",
+          "box": [
+            -1.65,
+            0.86035714,
+            -0.43448276,
+            0.14903226,
+            1.00178571,
+            1.13448276
+          ],
+          "material": "armor"
+        },
+        {
+          "name": "left_skirt_latch_2",
+          "bone": "body",
+          "box": [
+            -1.65,
+            1.09607143,
+            -0.04827586,
+            0.17032258,
+            0.07071429,
+            0.37413793
+          ],
+          "material": "metal"
+        },
+        {
+          "name": "left_skirt_3",
+          "bone": "body",
+          "box": [
+            -1.65,
+            0.86035714,
+            0.76034483,
+            0.14903226,
+            1.00178571,
+            1.13448276
+          ],
+          "material": "armor"
+        },
+        {
+          "name": "left_skirt_latch_3",
+          "bone": "body",
+          "box": [
+            -1.65,
+            1.09607143,
+            1.14655172,
+            0.17032258,
+            0.07071429,
+            0.37413793
+          ],
+          "material": "metal"
+        },
+        {
+          "name": "left_rail",
+          "bone": "body",
+          "box": [
+            -1.65,
+            1.86214286,
+            -3.05344828,
+            0.17032258,
+            0.09428571,
+            5.61206897
+          ],
+          "material": "armor_light"
+        },
+        {
+          "name": "right_skirt_0",
+          "bone": "body",
+          "box": [
+            1.50096774,
+            0.86035714,
+            -2.82413793,
+            0.14903226,
+            1.00178571,
+            1.13448276
+          ],
+          "material": "armor"
+        },
+        {
+          "name": "right_skirt_latch_0",
+          "bone": "body",
+          "box": [
+            1.47967742,
+            1.09607143,
+            -2.43793103,
+            0.17032258,
+            0.07071429,
+            0.37413793
+          ],
+          "material": "metal"
+        },
+        {
+          "name": "right_skirt_1",
+          "bone": "body",
+          "box": [
+            1.50096774,
+            0.86035714,
+            -1.62931034,
+            0.14903226,
+            1.00178571,
+            1.13448276
+          ],
+          "material": "armor"
+        },
+        {
+          "name": "right_skirt_latch_1",
+          "bone": "body",
+          "box": [
+            1.47967742,
+            1.09607143,
+            -1.24310345,
+            0.17032258,
+            0.07071429,
+            0.37413793
+          ],
+          "material": "metal"
+        },
+        {
+          "name": "right_skirt_2",
+          "bone": "body",
+          "box": [
+            1.50096774,
+            0.86035714,
+            -0.43448276,
+            0.14903226,
+            1.00178571,
+            1.13448276
+          ],
+          "material": "armor"
+        },
+        {
+          "name": "right_skirt_latch_2",
+          "bone": "body",
+          "box": [
+            1.47967742,
+            1.09607143,
+            -0.04827586,
+            0.17032258,
+            0.07071429,
+            0.37413793
+          ],
+          "material": "metal"
+        },
+        {
+          "name": "right_skirt_3",
+          "bone": "body",
+          "box": [
+            1.50096774,
+            0.86035714,
+            0.76034483,
+            0.14903226,
+            1.00178571,
+            1.13448276
+          ],
+          "material": "armor"
+        },
+        {
+          "name": "right_skirt_latch_3",
+          "bone": "body",
+          "box": [
+            1.47967742,
+            1.09607143,
+            1.14655172,
+            0.17032258,
+            0.07071429,
+            0.37413793
+          ],
+          "material": "metal"
+        },
+        {
+          "name": "right_rail",
+          "bone": "body",
+          "box": [
+            1.47967742,
+            1.86214286,
+            -3.05344828,
+            0.17032258,
+            0.09428571,
+            5.61206897
+          ],
+          "material": "armor_light"
+        },
+        {
+          "name": "turret_ring",
+          "bone": "turret_yaw",
+          "box": [
+            -0.80903226,
+            1.95642857,
+            -0.79655172,
+            1.61806452,
+            0.20035714,
+            1.7862069
+          ],
+          "material": "metal"
+        },
+        {
+          "name": "turret_lower",
+          "bone": "turret_yaw",
+          "box": [
+            -0.94741935,
+            2.15678571,
+            -0.94137931,
+            1.89483871,
+            0.42428571,
+            2.02758621
+          ],
+          "material": "armor"
+        },
+        {
+          "name": "turret_top",
+          "bone": "turret_yaw",
+          "box": [
+            -0.78774194,
+            2.58107143,
+            -0.79655172,
+            1.57548387,
+            0.22392857,
+            1.73793103
+          ],
+          "material": "armor_light"
+        },
+        {
+          "name": "gun_mantlet",
+          "bone": "gun_pitch",
+          "box": [
+            -0.29806452,
+            2.21571429,
+            0.54310345,
+            0.59612903,
+            0.51857143,
+            0.56724138
+          ],
+          "material": "armor_dark"
+        },
+        {
+          "name": "main_barrel",
+          "bone": "gun_pitch",
+          "box": [
+            -0.07983871,
+            2.38660714,
+            1.0137931,
+            0.15967742,
+            0.17678571,
+            3.00517241
+          ],
+          "material": "metal",
+          "weaponOverhang": true
+        },
+        {
+          "name": "main_muzzle",
+          "bone": "gun_pitch",
+          "box": [
+            -0.11709677,
+            2.34535714,
+            3.99482759,
+            0.23419355,
+            0.25928571,
+            0.22931034
+          ],
+          "material": "metal",
+          "weaponOverhang": true
+        },
+        {
+          "name": "launcher_box",
+          "bone": "gun_pitch",
+          "box": [
+            0.66,
+            2.5575,
+            -0.06034483,
+            0.70258065,
+            0.70714286,
+            1.62931034
+          ],
+          "material": "armor_light"
+        },
+        {
+          "name": "launcher_upper_port",
+          "bone": "gun_pitch",
+          "box": [
+            0.80903226,
+            2.92285714,
+            1.56896552,
+            0.40451613,
+            0.17678571,
+            0.06034483
+          ],
+          "material": "armor_dark"
+        },
+        {
+          "name": "launcher_lower_port",
+          "bone": "gun_pitch",
+          "box": [
+            0.80903226,
+            2.62821429,
+            1.56896552,
+            0.40451613,
+            0.17678571,
+            0.06034483
+          ],
+          "material": "armor_dark"
+        },
+        {
+          "name": "launcher_muzzle_marker",
+          "bone": "gun_pitch",
+          "box": [
+            0.89419355,
+            2.69892857,
+            1.56896552,
+            0.23419355,
+            0.25928571,
+            0.06034483
+          ],
+          "material": "armor_dark"
+        },
+        {
+          "name": "hatch",
+          "bone": "hatch_gunner",
+          "viewports": ["camera_gunner"],
+          "box": [
+            -0.51096774,
+            2.81678571,
+            -0.55517241,
+            0.70258065,
+            0.11785714,
+            0.7362069
+          ],
+          "material": "metal"
+        },
+        {
+          "name": "antenna",
+          "bone": "turret_yaw",
+          "box": [
+            -0.73451613,
+            2.805,
+            -0.7362069,
+            0.05854839,
+            0.495,
+            0.06637931
+          ],
+          "material": "metal"
+        },
+        {
+          "name": "headlamp_0",
+          "bone": "body",
+          "box": [
+            -1.21354839,
+            1.32,
+            3.42758621,
+            0.21290323,
+            0.18857143,
+            0.07241379
+          ],
+          "material": "lamp"
+        },
+        {
+          "name": "headlamp_1",
+          "bone": "body",
+          "box": [
+            1.00064516,
+            1.32,
+            3.42758621,
+            0.21290323,
+            0.18857143,
+            0.07241379
+          ],
+          "material": "lamp"
+        },
+        {
+          "name": "rear_lamp_0",
+          "bone": "body",
+          "box": [
+            -1.00064516,
+            1.52035714,
+            -3.48793103,
+            0.21290323,
+            0.14142857,
+            0.06034483
+          ],
+          "material": "tail_lamp"
+        },
+        {
+          "name": "rear_lamp_1",
+          "bone": "body",
+          "box": [
+            0.78774194,
+            1.52035714,
+            -3.48793103,
+            0.21290323,
+            0.14142857,
+            0.06034483
+          ],
+          "material": "tail_lamp"
+        },
+        {
+          "name": "glacis_vent_0",
+          "bone": "body",
+          "viewports": ["camera_driver"],
+          "box": [
+            -0.76645161,
+            2.12214286,
+            1.83448276,
+            1.53290323,
+            0.05303571,
+            0.08448276
+          ],
+          "material": "armor_dark"
+        },
+        {
+          "name": "glacis_vent_1",
+          "bone": "body",
+          "box": [
+            -0.76645161,
+            2.02714286,
+            1.47241379,
+            1.53290323,
+            0.05303571,
+            0.08448276
+          ],
+          "material": "armor_dark"
+        },
+        {
+          "name": "glacis_vent_2",
+          "bone": "body",
+          "box": [
+            -0.76645161,
+            2.02714286,
+            1.11034483,
+            1.53290323,
+            0.05303571,
+            0.08448276
+          ],
+          "material": "armor_dark"
+        },
+        {
+          "name": "glacis_vent_3",
+          "bone": "body",
+          "box": [
+            -0.76645161,
+            2.02714286,
+            0.74827586,
+            1.53290323,
+            0.05303571,
+            0.08448276
+          ],
+          "material": "armor_dark"
+        },
+        {
+          "name": "recognition_bar_0",
+          "bone": "body",
+          "box": [
+            -0.42580645,
+            1.7325,
+            3.42758621,
+            0.18096774,
+            0.09428571,
+            0.07241379
+          ],
+          "material": "marker"
+        },
+        {
+          "name": "recognition_bar_1",
+          "bone": "body",
+          "box": [
+            -0.11709677,
+            1.7325,
+            3.42758621,
+            0.18096774,
+            0.09428571,
+            0.07241379
+          ],
+          "material": "marker"
+        },
+        {
+          "name": "recognition_bar_2",
+          "bone": "body",
+          "box": [
+            0.1916129,
+            1.7325,
+            3.42758621,
+            0.18096774,
+            0.09428571,
+            0.07241379
+          ],
+          "material": "marker"
+        },
+        {
+          "name": "left_hazard_bar_0",
+          "bone": "body",
+          "box": [
+            -1.65,
+            1.67357143,
+            -0.54310345,
+            0.03725806,
+            0.30642857,
+            0.15689655
+          ],
+          "material": "hazard"
+        },
+        {
+          "name": "left_hazard_bar_1",
+          "bone": "body",
+          "box": [
+            -1.65,
+            1.67357143,
+            -0.18103448,
+            0.03725806,
+            0.30642857,
+            0.15689655
+          ],
+          "material": "hazard"
+        },
+        {
+          "name": "left_hazard_bar_2",
+          "bone": "body",
+          "box": [
+            -1.65,
+            1.67357143,
+            0.18103448,
+            0.03725806,
+            0.30642857,
+            0.15689655
+          ],
+          "material": "hazard"
+        },
+        {
+          "name": "right_hazard_bar_0",
+          "bone": "body",
+          "box": [
+            1.61274194,
+            1.67357143,
+            -0.54310345,
+            0.03725806,
+            0.30642857,
+            0.15689655
+          ],
+          "material": "hazard"
+        },
+        {
+          "name": "right_hazard_bar_1",
+          "bone": "body",
+          "box": [
+            1.61274194,
+            1.67357143,
+            -0.18103448,
+            0.03725806,
+            0.30642857,
+            0.15689655
+          ],
+          "material": "hazard"
+        },
+        {
+          "name": "right_hazard_bar_2",
+          "bone": "body",
+          "box": [
+            1.61274194,
+            1.67357143,
+            0.18103448,
+            0.03725806,
+            0.30642857,
+            0.15689655
+          ],
+          "material": "hazard"
+        }
+      ]
+    },
+    "tank": {
+      "dimensions": [
+        4.0,
+        8.0,
+        3.4
+      ],
+      "referenceStatus": {
+        "status": "Original adapted model after actual Prototype 2 gameplay views",
+        "viewed": [
+          "https://www.igcd.net/vehicle.php?id=50317"
+        ],
+        "confirmed": "Wide low tracked hull with seven visible road wheels, side skirts, separate broad turret, long cannon, roof-mounted multiple-barrel gun, front plough teeth, rear stowage.",
+        "adapted": "Exact scale, mounts, seats, simplified plough and two palettes are mod choices; no real model or caliber assertion."
+      },
+      "barrelRadius": 0.15785714,
+      "bones": [
+        {
+          "name": "root",
+          "parent": null,
+          "pivot": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "name": "body",
+          "parent": "root",
+          "pivot": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "name": "turret_yaw",
+          "parent": "body",
+          "pivot": [
+            0.0,
+            1.88214286,
+            0.0
+          ]
+        },
+        {
+          "name": "gun_pitch",
+          "parent": "turret_yaw",
+          "pivot": [
+            0.0,
+            2.55,
+            1.16923077
+          ]
+        },
+        {
+          "name": "track_left",
+          "parent": "body",
+          "pivot": [
+            -1.6,
+            0.66785714,
+            0.0
+          ]
+        },
+        {
+          "name": "track_left_wheel_1",
+          "parent": "track_left",
+          "pivot": [
+            -1.6,
+            0.68,
+            -3.19384615
+          ]
+        },
+        {
+          "name": "track_left_wheel_2",
+          "parent": "track_left",
+          "pivot": [
+            -1.6,
+            0.68,
+            -2.12923077
+          ]
+        },
+        {
+          "name": "track_left_wheel_3",
+          "parent": "track_left",
+          "pivot": [
+            -1.6,
+            0.68,
+            -1.06461538
+          ]
+        },
+        {
+          "name": "track_left_wheel_4",
+          "parent": "track_left",
+          "pivot": [
+            -1.6,
+            0.68,
+            0.0
+          ]
+        },
+        {
+          "name": "track_left_wheel_5",
+          "parent": "track_left",
+          "pivot": [
+            -1.6,
+            0.68,
+            1.06461538
+          ]
+        },
+        {
+          "name": "track_left_wheel_6",
+          "parent": "track_left",
+          "pivot": [
+            -1.6,
+            0.68,
+            2.12923077
+          ]
+        },
+        {
+          "name": "track_left_wheel_7",
+          "parent": "track_left",
+          "pivot": [
+            -1.6,
+            0.68,
+            3.19384615
+          ]
+        },
+        {
+          "name": "track_right",
+          "parent": "body",
+          "pivot": [
+            1.6,
+            0.66785714,
+            0.0
+          ]
+        },
+        {
+          "name": "track_right_wheel_1",
+          "parent": "track_right",
+          "pivot": [
+            1.6,
+            0.68,
+            -3.19384615
+          ]
+        },
+        {
+          "name": "track_right_wheel_2",
+          "parent": "track_right",
+          "pivot": [
+            1.6,
+            0.68,
+            -2.12923077
+          ]
+        },
+        {
+          "name": "track_right_wheel_3",
+          "parent": "track_right",
+          "pivot": [
+            1.6,
+            0.68,
+            -1.06461538
+          ]
+        },
+        {
+          "name": "track_right_wheel_4",
+          "parent": "track_right",
+          "pivot": [
+            1.6,
+            0.68,
+            0.0
+          ]
+        },
+        {
+          "name": "track_right_wheel_5",
+          "parent": "track_right",
+          "pivot": [
+            1.6,
+            0.68,
+            1.06461538
+          ]
+        },
+        {
+          "name": "track_right_wheel_6",
+          "parent": "track_right",
+          "pivot": [
+            1.6,
+            0.68,
+            2.12923077
+          ]
+        },
+        {
+          "name": "track_right_wheel_7",
+          "parent": "track_right",
+          "pivot": [
+            1.6,
+            0.68,
+            3.19384615
+          ]
+        },
+        {
+          "name": "hatch_commander",
+          "parent": "turret_yaw",
+          "pivot": [
+            0.23529412,
+            3.10857143,
+            -0.84923077
+          ]
+        }
+      ],
+      "anchors": {
+        "seat_driver": {
+          "frame": "body",
+          "position": [
+            0.0,
+            0.06071429,
+            2.03076923
+          ]
+        },
+        "seat_gunner": {
+          "frame": "body",
+          "position": [
+            -0.52941176,
+            0.54642857,
+            0.12307692
+          ]
+        },
+        "seat_commander": {
+          "frame": "body",
+          "position": [
+            0.58823529,
+            0.72857143,
+             -0.55384615
+          ]
+        },
+        "camera_driver": {"frame": "body", "position": [0.0, 1.98, 3.29]},
+        "camera_gunner": {"frame": "turret_yaw", "position": [0.55294118, 3.35142857, -0.22]},
+        "camera_commander": {"frame": "turret_yaw", "position": [0.55294118, 3.35142857, -0.22]},
+        "exit_left": {
+          "frame": "body",
+          "position": [
+            -2.70588235,
+            0.1,
+            0.0
+          ]
+        },
+        "exit_right": {
+          "frame": "body",
+          "position": [
+            2.70588235,
+            0.1,
+            0.0
+          ]
+        },
+        "exit_rear": {
+          "frame": "body",
+          "position": [
+            0.0,
+            0.1,
+            -4.8
+          ]
+        },
+        "breech_primary": {
+          "frame": "gun_pitch",
+          "position": [
+            0.0,
+            2.55,
+            1.16923077
+          ]
+        },
+        "muzzle_primary": {
+          "frame": "gun_pitch",
+          "position": [
+            0.0,
+            2.55,
+            6.03076923
+          ]
+        },
+        "breech_secondary": {
+          "frame": "gun_pitch",
+          "position": [
+            -0.70588235,
+            3.09642857,
+            0.73846154
+          ]
+        },
+        "muzzle_secondary": {
+          "frame": "gun_pitch",
+          "position": [
+            -0.70588235,
+            3.09642857,
+            3.01538462
+          ]
+        }
+      },
+      "weapons": [
+        {
+          "id": "primary",
+          "muzzlePart": "main_muzzle"
+        },
+        {
+          "id": "secondary",
+          "muzzlePart": "roof_gun_muzzle"
+        }
+      ],
+      "parts": [
+        {
+          "name": "track_left_upper",
+          "bone": "track_left",
+          "box": [
+            -1.96470588,
+            1.14142857,
+            -3.84615385,
+            0.72941176,
+            0.21857143,
+            7.69230769
+          ],
+          "material": "rubber"
+        },
+        {
+          "name": "track_left_lower",
+          "bone": "track_left",
+          "box": [
+            -1.96470588,
+            0.06071429,
+            -3.62461538,
+            0.72941176,
+            0.19428571,
+            7.24923077
+          ],
+          "material": "rubber"
+        },
+        {
+          "name": "track_left_tread_0",
+          "bone": "track_left",
+          "box": [
+            -1.98235294,
+            0.03035714,
+            -3.66153846,
+            0.76470588,
+            0.07892857,
+            0.12307692
+          ],
+          "material": "metal"
+        },
+        {
+          "name": "track_left_tread_1",
+          "bone": "track_left",
+          "box": [
+            -1.98235294,
+            0.03035714,
+            -3.30461538,
+            0.76470588,
+            0.07892857,
+            0.12307692
+          ],
+          "material": "metal"
+        },
+        {
+          "name": "track_left_tread_2",
+          "bone": "track_left",
+          "box": [
+            -1.98235294,
+            0.03035714,
+            -2.94769231,
+            0.76470588,
+            0.07892857,
+            0.12307692
+          ],
+          "material": "metal"
+        },
+        {
+          "name": "track_left_tread_3",
+          "bone": "track_left",
+          "box": [
+            -1.98235294,
+            0.03035714,
+            -2.59076923,
+            0.76470588,
+            0.07892857,
+            0.12307692
+          ],
+          "material": "metal"
+        },
+        {
+          "name": "track_left_tread_4",
+          "bone": "track_left",
+          "box": [
+            -1.98235294,
+            0.03035714,
+            -2.23384615,
+            0.76470588,
+            0.07892857,
+            0.12307692
+          ],
+          "material": "metal"
+        },
+        {
+          "name": "track_left_tread_5",
+          "bone": "track_left",
+          "box": [
+            -1.98235294,
+            0.03035714,
+            -1.87692308,
+            0.76470588,
+            0.07892857,
+            0.12307692
+          ],
+          "material": "metal"
+        },
+        {
+          "name": "track_left_tread_6",
+          "bone": "track_left",
+          "box": [
+            -1.98235294,
+            0.03035714,
+            -1.52,
+            0.76470588,
+            0.07892857,
+            0.12307692
+          ],
+          "material": "metal"
+        },
+        {
+          "name": "track_left_tread_7",
+          "bone": "track_left",
+          "box": [
+            -1.98235294,
+            0.03035714,
+            -1.16307692,
+            0.76470588,
+            0.07892857,
+            0.12307692
+          ],
+          "material": "metal"
+        },
+        {
+          "name": "track_left_tread_8",
+          "bone": "track_left",
+          "box": [
+            -1.98235294,
+            0.03035714,
+            -0.80615385,
+            0.76470588,
+            0.07892857,
+            0.12307692
+          ],
+          "material": "metal"
+        },
+        {
+          "name": "track_left_tread_9",
+          "bone": "track_left",
+          "box": [
+            -1.98235294,
+            0.03035714,
+            -0.44923077,
+            0.76470588,
+            0.07892857,
+            0.12307692
+          ],
+          "material": "metal"
+        },
+        {
+          "name": "track_left_tread_10",
+          "bone": "track_left",
+          "box": [
+            -1.98235294,
+            0.03035714,
+            -0.09230769,
+            0.76470588,
+            0.07892857,
+            0.12307692
+          ],
+          "material": "metal"
+        },
+        {
+          "name": "track_left_tread_11",
+          "bone": "track_left",
+          "box": [
+            -1.98235294,
+            0.03035714,
+            0.26461538,
+            0.76470588,
+            0.07892857,
+            0.12307692
+          ],
+          "material": "metal"
+        },
+        {
+          "name": "track_left_tread_12",
+          "bone": "track_left",
+          "box": [
+            -1.98235294,
+            0.03035714,
+            0.62153846,
+            0.76470588,
+            0.07892857,
+            0.12307692
+          ],
+          "material": "metal"
+        },
+        {
+          "name": "track_left_tread_13",
+          "bone": "track_left",
+          "box": [
+            -1.98235294,
+            0.03035714,
+            0.97846154,
+            0.76470588,
+            0.07892857,
+            0.12307692
+          ],
+          "material": "metal"
+        },
+        {
+          "name": "track_left_tread_14",
+          "bone": "track_left",
+          "box": [
+            -1.98235294,
+            0.03035714,
+            1.33538462,
+            0.76470588,
+            0.07892857,
+            0.12307692
+          ],
+          "material": "metal"
+        },
+        {
+          "name": "track_left_tread_15",
+          "bone": "track_left",
+          "box": [
+            -1.98235294,
+            0.03035714,
+            1.69230769,
+            0.76470588,
+            0.07892857,
+            0.12307692
+          ],
+          "material": "metal"
+        },
+        {
+          "name": "track_left_tread_16",
+          "bone": "track_left",
+          "box": [
+            -1.98235294,
+            0.03035714,
+            2.04923077,
+            0.76470588,
+            0.07892857,
+            0.12307692
+          ],
+          "material": "metal"
+        },
+        {
+          "name": "track_left_tread_17",
+          "bone": "track_left",
+          "box": [
+            -1.98235294,
+            0.03035714,
+            2.40615385,
+            0.76470588,
+            0.07892857,
+            0.12307692
+          ],
+          "material": "metal"
+        },
+        {
+          "name": "track_left_tread_18",
+          "bone": "track_left",
+          "box": [
+            -1.98235294,
+            0.03035714,
+            2.76307692,
+            0.76470588,
+            0.07892857,
+            0.12307692
+          ],
+          "material": "metal"
+        },
+        {
+          "name": "track_left_tread_19",
+          "bone": "track_left",
+          "box": [
+            -1.98235294,
+            0.03035714,
+            3.12,
+            0.76470588,
+            0.07892857,
+            0.12307692
+          ],
+          "material": "metal"
+        },
+        {
+          "name": "track_left_tread_20",
+          "bone": "track_left",
+          "box": [
+            -1.98235294,
+            0.03035714,
+            3.47692308,
+            0.76470588,
+            0.07892857,
+            0.12307692
+          ],
+          "material": "metal"
+        },
+        {
+          "name": "track_left_wheel_1_tire_vertical",
+          "bone": "track_left_wheel_1",
+          "box": [
+            -1.93917647,
+            0.13357143,
+            -3.54902473,
+            0.67835294,
+            1.09285714,
+            0.71035714
+          ],
+          "material": "rubber"
+        },
+        {
+          "name": "track_left_wheel_1_tire_horizontal",
+          "bone": "track_left_wheel_1",
+          "box": [
+            -1.93917647,
+            0.32482143,
+            -3.74027473,
+            0.67835294,
+            0.71035714,
+            1.09285714
+          ],
+          "material": "rubber"
+        },
+        {
+          "name": "track_left_wheel_1_hub",
+          "bone": "track_left_wheel_1",
+          "box": [
+            -1.99344706,
+            0.4505,
+            -3.42334615,
+            0.78689412,
+            0.459,
+            0.459
+          ],
+          "material": "hub"
+        },
+        {
+          "name": "track_left_wheel_2_tire_vertical",
+          "bone": "track_left_wheel_2",
+          "box": [
+            -1.93917647,
+            0.13357143,
+            -2.48440934,
+            0.67835294,
+            1.09285714,
+            0.71035714
+          ],
+          "material": "rubber"
+        },
+        {
+          "name": "track_left_wheel_2_tire_horizontal",
+          "bone": "track_left_wheel_2",
+          "box": [
+            -1.93917647,
+            0.32482143,
+            -2.67565934,
+            0.67835294,
+            0.71035714,
+            1.09285714
+          ],
+          "material": "rubber"
+        },
+        {
+          "name": "track_left_wheel_2_hub",
+          "bone": "track_left_wheel_2",
+          "box": [
+            -1.99344706,
+            0.4505,
+            -2.35873077,
+            0.78689412,
+            0.459,
+            0.459
+          ],
+          "material": "hub"
+        },
+        {
+          "name": "track_left_wheel_3_tire_vertical",
+          "bone": "track_left_wheel_3",
+          "box": [
+            -1.93917647,
+            0.13357143,
+            -1.41979396,
+            0.67835294,
+            1.09285714,
+            0.71035714
+          ],
+          "material": "rubber"
+        },
+        {
+          "name": "track_left_wheel_3_tire_horizontal",
+          "bone": "track_left_wheel_3",
+          "box": [
+            -1.93917647,
+            0.32482143,
+            -1.61104396,
+            0.67835294,
+            0.71035714,
+            1.09285714
+          ],
+          "material": "rubber"
+        },
+        {
+          "name": "track_left_wheel_3_hub",
+          "bone": "track_left_wheel_3",
+          "box": [
+            -1.99344706,
+            0.4505,
+            -1.29411538,
+            0.78689412,
+            0.459,
+            0.459
+          ],
+          "material": "hub"
+        },
+        {
+          "name": "track_left_wheel_4_tire_vertical",
+          "bone": "track_left_wheel_4",
+          "box": [
+            -1.93917647,
+            0.13357143,
+            -0.35517857,
+            0.67835294,
+            1.09285714,
+            0.71035714
+          ],
+          "material": "rubber"
+        },
+        {
+          "name": "track_left_wheel_4_tire_horizontal",
+          "bone": "track_left_wheel_4",
+          "box": [
+            -1.93917647,
+            0.32482143,
+            -0.54642857,
+            0.67835294,
+            0.71035714,
+            1.09285714
+          ],
+          "material": "rubber"
+        },
+        {
+          "name": "track_left_wheel_4_hub",
+          "bone": "track_left_wheel_4",
+          "box": [
+            -1.99344706,
+            0.4505,
+            -0.2295,
+            0.78689412,
+            0.459,
+            0.459
+          ],
+          "material": "hub"
+        },
+        {
+          "name": "track_left_wheel_5_tire_vertical",
+          "bone": "track_left_wheel_5",
+          "box": [
+            -1.93917647,
+            0.13357143,
+            0.70943681,
+            0.67835294,
+            1.09285714,
+            0.71035714
+          ],
+          "material": "rubber"
+        },
+        {
+          "name": "track_left_wheel_5_tire_horizontal",
+          "bone": "track_left_wheel_5",
+          "box": [
+            -1.93917647,
+            0.32482143,
+            0.51818681,
+            0.67835294,
+            0.71035714,
+            1.09285714
+          ],
+          "material": "rubber"
+        },
+        {
+          "name": "track_left_wheel_5_hub",
+          "bone": "track_left_wheel_5",
+          "box": [
+            -1.99344706,
+            0.4505,
+            0.83511538,
+            0.78689412,
+            0.459,
+            0.459
+          ],
+          "material": "hub"
+        },
+        {
+          "name": "track_left_wheel_6_tire_vertical",
+          "bone": "track_left_wheel_6",
+          "box": [
+            -1.93917647,
+            0.13357143,
+            1.7740522,
+            0.67835294,
+            1.09285714,
+            0.71035714
+          ],
+          "material": "rubber"
+        },
+        {
+          "name": "track_left_wheel_6_tire_horizontal",
+          "bone": "track_left_wheel_6",
+          "box": [
+            -1.93917647,
+            0.32482143,
+            1.5828022,
+            0.67835294,
+            0.71035714,
+            1.09285714
+          ],
+          "material": "rubber"
+        },
+        {
+          "name": "track_left_wheel_6_hub",
+          "bone": "track_left_wheel_6",
+          "box": [
+            -1.99344706,
+            0.4505,
+            1.89973077,
+            0.78689412,
+            0.459,
+            0.459
+          ],
+          "material": "hub"
+        },
+        {
+          "name": "track_left_wheel_7_tire_vertical",
+          "bone": "track_left_wheel_7",
+          "box": [
+            -1.93917647,
+            0.13357143,
+            2.83866758,
+            0.67835294,
+            1.09285714,
+            0.71035714
+          ],
+          "material": "rubber"
+        },
+        {
+          "name": "track_left_wheel_7_tire_horizontal",
+          "bone": "track_left_wheel_7",
+          "box": [
+            -1.93917647,
+            0.32482143,
+            2.64741758,
+            0.67835294,
+            0.71035714,
+            1.09285714
+          ],
+          "material": "rubber"
+        },
+        {
+          "name": "track_left_wheel_7_hub",
+          "bone": "track_left_wheel_7",
+          "box": [
+            -1.99344706,
+            0.4505,
+            2.96434615,
+            0.78689412,
+            0.459,
+            0.459
+          ],
+          "material": "hub"
+        },
+        {
+          "name": "track_left_front",
+          "bone": "track_left",
+          "box": [
+            -1.96470588,
+            0.23071429,
+            3.66153846,
+            0.72941176,
+            0.87428571,
+            0.18461538
+          ],
+          "material": "rubber"
+        },
+        {
+          "name": "track_left_rear",
+          "bone": "track_left",
+          "box": [
+            -1.96470588,
+            0.23071429,
+            -3.84615385,
+            0.72941176,
+            0.87428571,
+            0.18461538
+          ],
+          "material": "rubber"
+        },
+        {
+          "name": "track_right_upper",
+          "bone": "track_right",
+          "box": [
+            1.23529412,
+            1.14142857,
+            -3.84615385,
+            0.72941176,
+            0.21857143,
+            7.69230769
+          ],
+          "material": "rubber"
+        },
+        {
+          "name": "track_right_lower",
+          "bone": "track_right",
+          "box": [
+            1.23529412,
+            0.06071429,
+            -3.62461538,
+            0.72941176,
+            0.19428571,
+            7.24923077
+          ],
+          "material": "rubber"
+        },
+        {
+          "name": "track_right_tread_0",
+          "bone": "track_right",
+          "box": [
+            1.21764706,
+            0.03035714,
+            -3.66153846,
+            0.76470588,
+            0.07892857,
+            0.12307692
+          ],
+          "material": "metal"
+        },
+        {
+          "name": "track_right_tread_1",
+          "bone": "track_right",
+          "box": [
+            1.21764706,
+            0.03035714,
+            -3.30461538,
+            0.76470588,
+            0.07892857,
+            0.12307692
+          ],
+          "material": "metal"
+        },
+        {
+          "name": "track_right_tread_2",
+          "bone": "track_right",
+          "box": [
+            1.21764706,
+            0.03035714,
+            -2.94769231,
+            0.76470588,
+            0.07892857,
+            0.12307692
+          ],
+          "material": "metal"
+        },
+        {
+          "name": "track_right_tread_3",
+          "bone": "track_right",
+          "box": [
+            1.21764706,
+            0.03035714,
+            -2.59076923,
+            0.76470588,
+            0.07892857,
+            0.12307692
+          ],
+          "material": "metal"
+        },
+        {
+          "name": "track_right_tread_4",
+          "bone": "track_right",
+          "box": [
+            1.21764706,
+            0.03035714,
+            -2.23384615,
+            0.76470588,
+            0.07892857,
+            0.12307692
+          ],
+          "material": "metal"
+        },
+        {
+          "name": "track_right_tread_5",
+          "bone": "track_right",
+          "box": [
+            1.21764706,
+            0.03035714,
+            -1.87692308,
+            0.76470588,
+            0.07892857,
+            0.12307692
+          ],
+          "material": "metal"
+        },
+        {
+          "name": "track_right_tread_6",
+          "bone": "track_right",
+          "box": [
+            1.21764706,
+            0.03035714,
+            -1.52,
+            0.76470588,
+            0.07892857,
+            0.12307692
+          ],
+          "material": "metal"
+        },
+        {
+          "name": "track_right_tread_7",
+          "bone": "track_right",
+          "box": [
+            1.21764706,
+            0.03035714,
+            -1.16307692,
+            0.76470588,
+            0.07892857,
+            0.12307692
+          ],
+          "material": "metal"
+        },
+        {
+          "name": "track_right_tread_8",
+          "bone": "track_right",
+          "box": [
+            1.21764706,
+            0.03035714,
+            -0.80615385,
+            0.76470588,
+            0.07892857,
+            0.12307692
+          ],
+          "material": "metal"
+        },
+        {
+          "name": "track_right_tread_9",
+          "bone": "track_right",
+          "box": [
+            1.21764706,
+            0.03035714,
+            -0.44923077,
+            0.76470588,
+            0.07892857,
+            0.12307692
+          ],
+          "material": "metal"
+        },
+        {
+          "name": "track_right_tread_10",
+          "bone": "track_right",
+          "box": [
+            1.21764706,
+            0.03035714,
+            -0.09230769,
+            0.76470588,
+            0.07892857,
+            0.12307692
+          ],
+          "material": "metal"
+        },
+        {
+          "name": "track_right_tread_11",
+          "bone": "track_right",
+          "box": [
+            1.21764706,
+            0.03035714,
+            0.26461538,
+            0.76470588,
+            0.07892857,
+            0.12307692
+          ],
+          "material": "metal"
+        },
+        {
+          "name": "track_right_tread_12",
+          "bone": "track_right",
+          "box": [
+            1.21764706,
+            0.03035714,
+            0.62153846,
+            0.76470588,
+            0.07892857,
+            0.12307692
+          ],
+          "material": "metal"
+        },
+        {
+          "name": "track_right_tread_13",
+          "bone": "track_right",
+          "box": [
+            1.21764706,
+            0.03035714,
+            0.97846154,
+            0.76470588,
+            0.07892857,
+            0.12307692
+          ],
+          "material": "metal"
+        },
+        {
+          "name": "track_right_tread_14",
+          "bone": "track_right",
+          "box": [
+            1.21764706,
+            0.03035714,
+            1.33538462,
+            0.76470588,
+            0.07892857,
+            0.12307692
+          ],
+          "material": "metal"
+        },
+        {
+          "name": "track_right_tread_15",
+          "bone": "track_right",
+          "box": [
+            1.21764706,
+            0.03035714,
+            1.69230769,
+            0.76470588,
+            0.07892857,
+            0.12307692
+          ],
+          "material": "metal"
+        },
+        {
+          "name": "track_right_tread_16",
+          "bone": "track_right",
+          "box": [
+            1.21764706,
+            0.03035714,
+            2.04923077,
+            0.76470588,
+            0.07892857,
+            0.12307692
+          ],
+          "material": "metal"
+        },
+        {
+          "name": "track_right_tread_17",
+          "bone": "track_right",
+          "box": [
+            1.21764706,
+            0.03035714,
+            2.40615385,
+            0.76470588,
+            0.07892857,
+            0.12307692
+          ],
+          "material": "metal"
+        },
+        {
+          "name": "track_right_tread_18",
+          "bone": "track_right",
+          "box": [
+            1.21764706,
+            0.03035714,
+            2.76307692,
+            0.76470588,
+            0.07892857,
+            0.12307692
+          ],
+          "material": "metal"
+        },
+        {
+          "name": "track_right_tread_19",
+          "bone": "track_right",
+          "box": [
+            1.21764706,
+            0.03035714,
+            3.12,
+            0.76470588,
+            0.07892857,
+            0.12307692
+          ],
+          "material": "metal"
+        },
+        {
+          "name": "track_right_tread_20",
+          "bone": "track_right",
+          "box": [
+            1.21764706,
+            0.03035714,
+            3.47692308,
+            0.76470588,
+            0.07892857,
+            0.12307692
+          ],
+          "material": "metal"
+        },
+        {
+          "name": "track_right_wheel_1_tire_vertical",
+          "bone": "track_right_wheel_1",
+          "box": [
+            1.26082353,
+            0.13357143,
+            -3.54902473,
+            0.67835294,
+            1.09285714,
+            0.71035714
+          ],
+          "material": "rubber"
+        },
+        {
+          "name": "track_right_wheel_1_tire_horizontal",
+          "bone": "track_right_wheel_1",
+          "box": [
+            1.26082353,
+            0.32482143,
+            -3.74027473,
+            0.67835294,
+            0.71035714,
+            1.09285714
+          ],
+          "material": "rubber"
+        },
+        {
+          "name": "track_right_wheel_1_hub",
+          "bone": "track_right_wheel_1",
+          "box": [
+            1.20655294,
+            0.4505,
+            -3.42334615,
+            0.78689412,
+            0.459,
+            0.459
+          ],
+          "material": "hub"
+        },
+        {
+          "name": "track_right_wheel_2_tire_vertical",
+          "bone": "track_right_wheel_2",
+          "box": [
+            1.26082353,
+            0.13357143,
+            -2.48440934,
+            0.67835294,
+            1.09285714,
+            0.71035714
+          ],
+          "material": "rubber"
+        },
+        {
+          "name": "track_right_wheel_2_tire_horizontal",
+          "bone": "track_right_wheel_2",
+          "box": [
+            1.26082353,
+            0.32482143,
+            -2.67565934,
+            0.67835294,
+            0.71035714,
+            1.09285714
+          ],
+          "material": "rubber"
+        },
+        {
+          "name": "track_right_wheel_2_hub",
+          "bone": "track_right_wheel_2",
+          "box": [
+            1.20655294,
+            0.4505,
+            -2.35873077,
+            0.78689412,
+            0.459,
+            0.459
+          ],
+          "material": "hub"
+        },
+        {
+          "name": "track_right_wheel_3_tire_vertical",
+          "bone": "track_right_wheel_3",
+          "box": [
+            1.26082353,
+            0.13357143,
+            -1.41979396,
+            0.67835294,
+            1.09285714,
+            0.71035714
+          ],
+          "material": "rubber"
+        },
+        {
+          "name": "track_right_wheel_3_tire_horizontal",
+          "bone": "track_right_wheel_3",
+          "box": [
+            1.26082353,
+            0.32482143,
+            -1.61104396,
+            0.67835294,
+            0.71035714,
+            1.09285714
+          ],
+          "material": "rubber"
+        },
+        {
+          "name": "track_right_wheel_3_hub",
+          "bone": "track_right_wheel_3",
+          "box": [
+            1.20655294,
+            0.4505,
+            -1.29411538,
+            0.78689412,
+            0.459,
+            0.459
+          ],
+          "material": "hub"
+        },
+        {
+          "name": "track_right_wheel_4_tire_vertical",
+          "bone": "track_right_wheel_4",
+          "box": [
+            1.26082353,
+            0.13357143,
+            -0.35517857,
+            0.67835294,
+            1.09285714,
+            0.71035714
+          ],
+          "material": "rubber"
+        },
+        {
+          "name": "track_right_wheel_4_tire_horizontal",
+          "bone": "track_right_wheel_4",
+          "box": [
+            1.26082353,
+            0.32482143,
+            -0.54642857,
+            0.67835294,
+            0.71035714,
+            1.09285714
+          ],
+          "material": "rubber"
+        },
+        {
+          "name": "track_right_wheel_4_hub",
+          "bone": "track_right_wheel_4",
+          "box": [
+            1.20655294,
+            0.4505,
+            -0.2295,
+            0.78689412,
+            0.459,
+            0.459
+          ],
+          "material": "hub"
+        },
+        {
+          "name": "track_right_wheel_5_tire_vertical",
+          "bone": "track_right_wheel_5",
+          "box": [
+            1.26082353,
+            0.13357143,
+            0.70943681,
+            0.67835294,
+            1.09285714,
+            0.71035714
+          ],
+          "material": "rubber"
+        },
+        {
+          "name": "track_right_wheel_5_tire_horizontal",
+          "bone": "track_right_wheel_5",
+          "box": [
+            1.26082353,
+            0.32482143,
+            0.51818681,
+            0.67835294,
+            0.71035714,
+            1.09285714
+          ],
+          "material": "rubber"
+        },
+        {
+          "name": "track_right_wheel_5_hub",
+          "bone": "track_right_wheel_5",
+          "box": [
+            1.20655294,
+            0.4505,
+            0.83511538,
+            0.78689412,
+            0.459,
+            0.459
+          ],
+          "material": "hub"
+        },
+        {
+          "name": "track_right_wheel_6_tire_vertical",
+          "bone": "track_right_wheel_6",
+          "box": [
+            1.26082353,
+            0.13357143,
+            1.7740522,
+            0.67835294,
+            1.09285714,
+            0.71035714
+          ],
+          "material": "rubber"
+        },
+        {
+          "name": "track_right_wheel_6_tire_horizontal",
+          "bone": "track_right_wheel_6",
+          "box": [
+            1.26082353,
+            0.32482143,
+            1.5828022,
+            0.67835294,
+            0.71035714,
+            1.09285714
+          ],
+          "material": "rubber"
+        },
+        {
+          "name": "track_right_wheel_6_hub",
+          "bone": "track_right_wheel_6",
+          "box": [
+            1.20655294,
+            0.4505,
+            1.89973077,
+            0.78689412,
+            0.459,
+            0.459
+          ],
+          "material": "hub"
+        },
+        {
+          "name": "track_right_wheel_7_tire_vertical",
+          "bone": "track_right_wheel_7",
+          "box": [
+            1.26082353,
+            0.13357143,
+            2.83866758,
+            0.67835294,
+            1.09285714,
+            0.71035714
+          ],
+          "material": "rubber"
+        },
+        {
+          "name": "track_right_wheel_7_tire_horizontal",
+          "bone": "track_right_wheel_7",
+          "box": [
+            1.26082353,
+            0.32482143,
+            2.64741758,
+            0.67835294,
+            0.71035714,
+            1.09285714
+          ],
+          "material": "rubber"
+        },
+        {
+          "name": "track_right_wheel_7_hub",
+          "bone": "track_right_wheel_7",
+          "box": [
+            1.20655294,
+            0.4505,
+            2.96434615,
+            0.78689412,
+            0.459,
+            0.459
+          ],
+          "material": "hub"
+        },
+        {
+          "name": "track_right_front",
+          "bone": "track_right",
+          "box": [
+            1.23529412,
+            0.23071429,
+            3.66153846,
+            0.72941176,
+            0.87428571,
+            0.18461538
+          ],
+          "material": "rubber"
+        },
+        {
+          "name": "track_right_rear",
+          "bone": "track_right",
+          "box": [
+            1.23529412,
+            0.23071429,
+            -3.84615385,
+            0.72941176,
+            0.87428571,
+            0.18461538
+          ],
+          "material": "rubber"
+        },
+        {
+          "name": "lower_hull",
+          "bone": "body",
+          "box": [
+            -1.27058824,
+            0.58285714,
+            -3.71692308,
+            2.54117647,
+            0.82571429,
+            7.27384615
+          ],
+          "material": "armor_dark"
+        },
+        {
+          "name": "upper_deck",
+          "bone": "body",
+          "box": [
+            -1.72941176,
+            1.32357143,
+            -3.77846154,
+            3.45882353,
+            0.53428571,
+            7.32307692
+          ],
+          "material": "armor"
+        },
+        {
+          "name": "front_armor_step_0",
+          "bone": "body",
+          "box": [
+            -1.68235294,
+            1.37214286,
+            3.26153846,
+            3.36470588,
+            0.20642857,
+            0.52923077
+          ],
+          "material": "armor_light"
+        },
+        {
+          "name": "front_armor_step_1",
+          "bone": "body",
+          "box": [
+            -1.68235294,
+            1.57857143,
+            3.01538462,
+            3.36470588,
+            0.20642857,
+            0.60307692
+          ],
+          "material": "armor_light"
+        },
+        {
+          "name": "front_armor_step_2",
+          "bone": "body",
+          "viewports": ["camera_driver"],
+          "box": [
+            -1.68235294,
+            1.785,
+            2.73230769,
+            3.36470588,
+            0.20642857,
+            0.56615385
+          ],
+          "material": "armor_light"
+        },
+        {
+          "name": "left_skirt_0",
+          "bone": "body",
+          "box": [
+            -2.0,
+            1.05642857,
+            -3.61846154,
+            0.18823529,
+            0.72857143,
+            1.10769231
+          ],
+          "material": "armor"
+        },
+        {
+          "name": "left_skirt_1",
+          "bone": "body",
+          "box": [
+            -2.0,
+            1.05642857,
+            -2.43692308,
+            0.18823529,
+            0.72857143,
+            1.10769231
+          ],
+          "material": "armor"
+        },
+        {
+          "name": "left_skirt_2",
+          "bone": "body",
+          "box": [
+            -2.0,
+            1.05642857,
+            -1.25538462,
+            0.18823529,
+            0.72857143,
+            1.10769231
+          ],
+          "material": "armor"
+        },
+        {
+          "name": "left_skirt_3",
+          "bone": "body",
+          "box": [
+            -2.0,
+            1.05642857,
+            -0.07384615,
+            0.18823529,
+            0.72857143,
+            1.10769231
+          ],
+          "material": "armor"
+        },
+        {
+          "name": "left_skirt_4",
+          "bone": "body",
+          "box": [
+            -2.0,
+            1.05642857,
+            1.10769231,
+            0.18823529,
+            0.72857143,
+            1.10769231
+          ],
+          "material": "armor"
+        },
+        {
+          "name": "left_skirt_5",
+          "bone": "body",
+          "box": [
+            -2.0,
+            1.05642857,
+            2.28923077,
+            0.18823529,
+            0.72857143,
+            1.10769231
+          ],
+          "material": "armor"
+        },
+        {
+          "name": "left_fender",
+          "bone": "body",
+          "box": [
+            -2.0,
+            1.73642857,
+            -3.79076923,
+            0.18823529,
+            0.17,
+            7.37230769
+          ],
+          "material": "armor_light"
+        },
+        {
+          "name": "left_stowage_0",
+          "bone": "body",
+          "box": [
+            -2.0,
+            1.90642857,
+            -2.95384615,
+            0.2,
+            0.30357143,
+            0.8
+          ],
+          "material": "metal"
+        },
+        {
+          "name": "left_stowage_1",
+          "bone": "body",
+          "box": [
+            -2.0,
+            1.90642857,
+            -1.90769231,
+            0.2,
+            0.30357143,
+            0.8
+          ],
+          "material": "metal"
+        },
+        {
+          "name": "right_skirt_0",
+          "bone": "body",
+          "box": [
+            1.81176471,
+            1.05642857,
+            -3.61846154,
+            0.18823529,
+            0.72857143,
+            1.10769231
+          ],
+          "material": "armor"
+        },
+        {
+          "name": "right_skirt_1",
+          "bone": "body",
+          "box": [
+            1.81176471,
+            1.05642857,
+            -2.43692308,
+            0.18823529,
+            0.72857143,
+            1.10769231
+          ],
+          "material": "armor"
+        },
+        {
+          "name": "right_skirt_2",
+          "bone": "body",
+          "box": [
+            1.81176471,
+            1.05642857,
+            -1.25538462,
+            0.18823529,
+            0.72857143,
+            1.10769231
+          ],
+          "material": "armor"
+        },
+        {
+          "name": "right_skirt_3",
+          "bone": "body",
+          "box": [
+            1.81176471,
+            1.05642857,
+            -0.07384615,
+            0.18823529,
+            0.72857143,
+            1.10769231
+          ],
+          "material": "armor"
+        },
+        {
+          "name": "right_skirt_4",
+          "bone": "body",
+          "box": [
+            1.81176471,
+            1.05642857,
+            1.10769231,
+            0.18823529,
+            0.72857143,
+            1.10769231
+          ],
+          "material": "armor"
+        },
+        {
+          "name": "right_skirt_5",
+          "bone": "body",
+          "box": [
+            1.81176471,
+            1.05642857,
+            2.28923077,
+            0.18823529,
+            0.72857143,
+            1.10769231
+          ],
+          "material": "armor"
+        },
+        {
+          "name": "right_fender",
+          "bone": "body",
+          "box": [
+            1.81176471,
+            1.73642857,
+            -3.79076923,
+            0.18823529,
+            0.17,
+            7.37230769
+          ],
+          "material": "armor_light"
+        },
+        {
+          "name": "right_stowage_0",
+          "bone": "body",
+          "box": [
+            1.8,
+            1.90642857,
+            -2.95384615,
+            0.2,
+            0.30357143,
+            0.8
+          ],
+          "material": "metal"
+        },
+        {
+          "name": "right_stowage_1",
+          "bone": "body",
+          "box": [
+            1.8,
+            1.90642857,
+            -1.90769231,
+            0.2,
+            0.30357143,
+            0.8
+          ],
+          "material": "metal"
+        },
+        {
+          "name": "turret_ring",
+          "bone": "turret_yaw",
+          "box": [
+            -1.21176471,
+            1.87,
+            -1.50153846,
+            2.42352941,
+            0.21857143,
+            3.08923077
+          ],
+          "material": "metal"
+        },
+        {
+          "name": "turret_base",
+          "bone": "turret_yaw",
+          "box": [
+            -1.36470588,
+            2.08857143,
+            -1.79692308,
+            2.72941176,
+            0.47357143,
+            3.32307692
+          ],
+          "material": "armor"
+        },
+        {
+          "name": "turret_middle",
+          "bone": "turret_yaw",
+          "box": [
+            -1.27058824,
+            2.56214286,
+            -1.66153846,
+            2.54117647,
+            0.37642857,
+            2.99076923
+          ],
+          "material": "armor_light"
+        },
+        {
+          "name": "turret_top",
+          "bone": "turret_yaw",
+          "box": [
+            -1.08235294,
+            2.93857143,
+            -1.50153846,
+            2.16470588,
+            0.17,
+            2.60923077
+          ],
+          "material": "armor"
+        },
+        {
+          "name": "main_mantlet",
+          "bone": "gun_pitch",
+          "box": [
+            -0.47058824,
+            2.22214286,
+            1.08307692,
+            0.94117647,
+            0.64357143,
+            0.77538462
+          ],
+          "material": "armor_dark"
+        },
+        {
+          "name": "main_barrel_sleeve",
+          "bone": "gun_pitch",
+          "box": [
+            -0.21176471,
+            2.33142857,
+            1.82153846,
+            0.42352941,
+            0.43714286,
+            0.88615385
+          ],
+          "material": "armor_dark"
+        },
+        {
+          "name": "main_barrel",
+          "bone": "gun_pitch",
+          "box": [
+            -0.11764706,
+            2.42857143,
+            2.63384615,
+            0.23529412,
+            0.24285714,
+            3.04
+          ],
+          "material": "metal",
+          "weaponOverhang": true
+        },
+        {
+          "name": "main_muzzle",
+          "bone": "gun_pitch",
+          "box": [
+            -0.15294118,
+            2.39214286,
+            5.63692308,
+            0.30588235,
+            0.31571429,
+            0.39384615
+          ],
+          "material": "metal",
+          "weaponOverhang": true
+        },
+        {
+          "name": "roof_gun_cradle",
+          "bone": "gun_pitch",
+          "box": [
+            -1.01176471,
+            2.975,
+            0.50461538,
+            0.61176471,
+            0.36428571,
+            0.60307692
+          ],
+          "material": "armor_dark"
+        },
+        {
+          "name": "roof_gun_body",
+          "bone": "gun_pitch",
+          "box": [
+            -0.96470588,
+            2.84142857,
+            0.78769231,
+            0.51764706,
+            0.51,
+            0.70153846
+          ],
+          "material": "metal"
+        },
+        {
+          "name": "roof_gun_barrels",
+          "bone": "gun_pitch",
+          "box": [
+            -0.82352941,
+            2.975,
+            1.45230769,
+            0.23529412,
+            0.24285714,
+            1.35384615
+          ],
+          "material": "metal"
+        },
+        {
+          "name": "roof_gun_muzzle",
+          "bone": "gun_pitch",
+          "box": [
+            -0.89411765,
+            2.90214286,
+            2.79384615,
+            0.37647059,
+            0.38857143,
+            0.22153846
+          ],
+          "material": "metal"
+        },
+        {
+          "name": "commander_hatch",
+          "bone": "hatch_commander",
+          "box": [
+            0.23529412,
+            3.10857143,
+            -0.84923077,
+            0.71764706,
+            0.19428571,
+            0.82461538
+          ],
+          "material": "metal"
+        },
+        {
+          "name": "commander_scope",
+          "bone": "hatch_commander",
+          "box": [
+            0.37647059,
+            3.30285714,
+            -0.50461538,
+            0.35294118,
+            0.09714286,
+            0.29538462
+          ],
+          "material": "glass"
+        },
+        {
+          "name": "rear_turret_basket",
+          "bone": "turret_yaw",
+          "box": [
+            -1.31764706,
+            2.33142857,
+            -2.19076923,
+            2.63529412,
+            0.47357143,
+            0.44307692
+          ],
+          "material": "metal"
+        },
+        {
+          "name": "rear_turret_pack_0",
+          "bone": "turret_yaw",
+          "box": [
+            -1.05882353,
+            2.50142857,
+            -2.25230769,
+            0.49411765,
+            0.52214286,
+            0.52923077
+          ],
+          "material": "canvas"
+        },
+        {
+          "name": "rear_turret_pack_1",
+          "bone": "turret_yaw",
+          "box": [
+            -0.43529412,
+            2.50142857,
+            -2.25230769,
+            0.49411765,
+            0.52214286,
+            0.52923077
+          ],
+          "material": "canvas"
+        },
+        {
+          "name": "rear_turret_pack_2",
+          "bone": "turret_yaw",
+          "box": [
+            0.18823529,
+            2.50142857,
+            -2.25230769,
+            0.49411765,
+            0.52214286,
+            0.52923077
+          ],
+          "material": "canvas"
+        },
+        {
+          "name": "rear_turret_pack_3",
+          "bone": "turret_yaw",
+          "box": [
+            0.81176471,
+            2.50142857,
+            -2.25230769,
+            0.49411765,
+            0.52214286,
+            0.52923077
+          ],
+          "material": "canvas"
+        },
+        {
+          "name": "plough_crossbeam",
+          "bone": "body",
+          "box": [
+            -1.76470588,
+            0.63142857,
+            3.50769231,
+            3.52941176,
+            0.255,
+            0.29538462
+          ],
+          "material": "metal"
+        },
+        {
+          "name": "plough_tooth_0",
+          "bone": "body",
+          "box": [
+            -1.68235294,
+            0.255,
+            3.69230769,
+            0.35294118,
+            0.26714286,
+            0.30769231
+          ],
+          "material": "metal"
+        },
+        {
+          "name": "plough_tooth_riser_0",
+          "bone": "body",
+          "box": [
+            -1.68235294,
+            0.52214286,
+            3.56923077,
+            0.35294118,
+            0.27928571,
+            0.24615385
+          ],
+          "material": "metal"
+        },
+        {
+          "name": "plough_tooth_1",
+          "bone": "body",
+          "box": [
+            -1.11764706,
+            0.255,
+            3.69230769,
+            0.35294118,
+            0.26714286,
+            0.30769231
+          ],
+          "material": "metal"
+        },
+        {
+          "name": "plough_tooth_riser_1",
+          "bone": "body",
+          "box": [
+            -1.11764706,
+            0.52214286,
+            3.56923077,
+            0.35294118,
+            0.27928571,
+            0.24615385
+          ],
+          "material": "metal"
+        },
+        {
+          "name": "plough_tooth_2",
+          "bone": "body",
+          "box": [
+            -0.55294118,
+            0.255,
+            3.69230769,
+            0.35294118,
+            0.26714286,
+            0.30769231
+          ],
+          "material": "metal"
+        },
+        {
+          "name": "plough_tooth_riser_2",
+          "bone": "body",
+          "box": [
+            -0.55294118,
+            0.52214286,
+            3.56923077,
+            0.35294118,
+            0.27928571,
+            0.24615385
+          ],
+          "material": "metal"
+        },
+        {
+          "name": "plough_tooth_3",
+          "bone": "body",
+          "box": [
+            0.01176471,
+            0.255,
+            3.69230769,
+            0.35294118,
+            0.26714286,
+            0.30769231
+          ],
+          "material": "metal"
+        },
+        {
+          "name": "plough_tooth_riser_3",
+          "bone": "body",
+          "box": [
+            0.01176471,
+            0.52214286,
+            3.56923077,
+            0.35294118,
+            0.27928571,
+            0.24615385
+          ],
+          "material": "metal"
+        },
+        {
+          "name": "plough_tooth_4",
+          "bone": "body",
+          "box": [
+            0.57647059,
+            0.255,
+            3.69230769,
+            0.35294118,
+            0.26714286,
+            0.30769231
+          ],
+          "material": "metal"
+        },
+        {
+          "name": "plough_tooth_riser_4",
+          "bone": "body",
+          "box": [
+            0.57647059,
+            0.52214286,
+            3.56923077,
+            0.35294118,
+            0.27928571,
+            0.24615385
+          ],
+          "material": "metal"
+        },
+        {
+          "name": "plough_tooth_5",
+          "bone": "body",
+          "box": [
+            1.14117647,
+            0.255,
+            3.69230769,
+            0.35294118,
+            0.26714286,
+            0.30769231
+          ],
+          "material": "metal"
+        },
+        {
+          "name": "plough_tooth_riser_5",
+          "bone": "body",
+          "box": [
+            1.14117647,
+            0.52214286,
+            3.56923077,
+            0.35294118,
+            0.27928571,
+            0.24615385
+          ],
+          "material": "metal"
+        },
+        {
+          "name": "front_lamp_0",
+          "bone": "body",
+          "box": [
+            -1.41176471,
+            1.63928571,
+            3.60615385,
+            0.23529412,
+            0.14571429,
+            0.08615385
+          ],
+          "material": "lamp"
+        },
+        {
+          "name": "front_lamp_1",
+          "bone": "body",
+          "box": [
+            1.17647059,
+            1.63928571,
+            3.60615385,
+            0.23529412,
+            0.14571429,
+            0.08615385
+          ],
+          "material": "lamp"
+        },
+        {
+          "name": "engine_grille_0",
+          "bone": "body",
+          "box": [
+            -1.03529412,
+            1.87,
+            -3.50769231,
+            2.07058824,
+            0.04857143,
+            0.19692308
+          ],
+          "material": "armor_dark"
+        },
+        {
+          "name": "engine_grille_1",
+          "bone": "body",
+          "box": [
+            -1.03529412,
+            1.87,
+            -3.12615385,
+            2.07058824,
+            0.04857143,
+            0.19692308
+          ],
+          "material": "armor_dark"
+        },
+        {
+          "name": "engine_grille_2",
+          "bone": "body",
+          "box": [
+            -1.03529412,
+            1.87,
+            -2.74461538,
+            2.07058824,
+            0.04857143,
+            0.19692308
+          ],
+          "material": "armor_dark"
+        },
+        {
+          "name": "recognition_bar_0",
+          "bone": "body",
+          "box": [
+            -0.47058824,
+            1.785,
+            3.92615385,
+            0.2,
+            0.09714286,
+            0.07384615
+          ],
+          "material": "marker"
+        },
+        {
+          "name": "recognition_bar_1",
+          "bone": "body",
+          "box": [
+            -0.12941176,
+            1.785,
+            3.92615385,
+            0.2,
+            0.09714286,
+            0.07384615
+          ],
+          "material": "marker"
+        },
+        {
+          "name": "recognition_bar_2",
+          "bone": "body",
+          "box": [
+            0.21176471,
+            1.785,
+            3.92615385,
+            0.2,
+            0.09714286,
+            0.07384615
+          ],
+          "material": "marker"
+        },
+        {
+          "name": "left_hazard_bar_0",
+          "bone": "body",
+          "box": [
+            -2.0,
+            1.72428571,
+            -0.55384615,
+            0.04117647,
+            0.31571429,
+            0.16
+          ],
+          "material": "hazard"
+        },
+        {
+          "name": "left_hazard_bar_1",
+          "bone": "body",
+          "box": [
+            -2.0,
+            1.72428571,
+            -0.18461538,
+            0.04117647,
+            0.31571429,
+            0.16
+          ],
+          "material": "hazard"
+        },
+        {
+          "name": "left_hazard_bar_2",
+          "bone": "body",
+          "box": [
+            -2.0,
+            1.72428571,
+            0.18461538,
+            0.04117647,
+            0.31571429,
+            0.16
+          ],
+          "material": "hazard"
+        },
+        {
+          "name": "right_hazard_bar_0",
+          "bone": "body",
+          "box": [
+            1.95882353,
+            1.72428571,
+            -0.55384615,
+            0.04117647,
+            0.31571429,
+            0.16
+          ],
+          "material": "hazard"
+        },
+        {
+          "name": "right_hazard_bar_1",
+          "bone": "body",
+          "box": [
+            1.95882353,
+            1.72428571,
+            -0.18461538,
+            0.04117647,
+            0.31571429,
+            0.16
+          ],
+          "material": "hazard"
+        },
+        {
+          "name": "right_hazard_bar_2",
+          "bone": "body",
+          "box": [
+            1.95882353,
+            1.72428571,
+            0.18461538,
+            0.04117647,
+            0.31571429,
+            0.16
+          ],
+          "material": "hazard"
+        }
+      ]
+    }
+  }
+}

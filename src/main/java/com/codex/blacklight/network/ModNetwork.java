@@ -19,10 +19,14 @@ public final class ModNetwork {
     }
 
     public static void register(RegisterPayloadHandlersEvent event) {
-        // Passive formulas, HUD semantics and an appended skill bit must match on both sides.
-        event.registrar("standalone-41-configurable-ecology")
+        // Configurable ecology, consume variants and military payloads share one negotiated layout.
+        event.registrar("standalone-45-mechanical-lock")
+                .playToServer(FirearmReloadPayload.TYPE,FirearmReloadPayload.STREAM_CODEC,(payload,context)->context.enqueueWork(()->{if(context.player() instanceof ServerPlayer player)payload.handle(player);}))
+                .playToClient(GunplayFeedbackPayload.TYPE,GunplayFeedbackPayload.STREAM_CODEC,(payload,context)->context.enqueueWork(()->com.codex.blacklight.client.renderer.GunplayVisuals.accept(payload)))
                 .playToClient(InfectedImpactPayload.TYPE,InfectedImpactPayload.STREAM_CODEC,(payload,context)->context.enqueueWork(()->com.codex.blacklight.client.renderer.InfectedImpactVisuals.accept(payload)))
                 .playToClient(DistrictZonePayload.TYPE,DistrictZonePayload.STREAM_CODEC,(payload,context)->context.enqueueWork(()->com.codex.blacklight.client.DistrictZoneHud.accept(payload)))
+                .playToServer(VehicleControlPayload.TYPE,VehicleControlPayload.STREAM_CODEC,(payload,context)->context.enqueueWork(()->{if(context.player() instanceof ServerPlayer p)payload.handle(p);}))
+                .playToServer(VehicleSeatPayload.TYPE,VehicleSeatPayload.STREAM_CODEC,(payload,context)->context.enqueueWork(()->{if(context.player() instanceof ServerPlayer p)payload.handle(p);}))
                 .playToServer(DisguiseSelectPayload.TYPE,DisguiseSelectPayload.STREAM_CODEC,(payload,context)->context.enqueueWork(()->{
                     if(context.player() instanceof ServerPlayer p&&canAct(p))com.codex.blacklight.disguise.DisguiseSystem.select(p,payload.revision(),payload.index());
                 }))
