@@ -5,7 +5,6 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 class VehicleGarageNaturalPlanTest {
-    @org.junit.jupiter.api.BeforeAll static void bootstrap(){net.minecraft.SharedConstants.tryDetectVersion();net.minecraft.server.Bootstrap.bootStrap();}
     private CityMilitaryPlan.Site base(int rotation) { return new CityMilitaryPlan.Site(0,0,63,rotation,false); }
     private CityMilitaryPlan.Survey road(int rotation) {
         return (x,z)->new CityMilitaryPlan.Surface(63,false,false,switch(rotation){case 1->x>=-9&&x<=-1;case 2->z>=-9&&z<=-1;case 3->x>=65&&x<=73;default->z>=65&&z<=73;});
@@ -45,7 +44,7 @@ class VehicleGarageNaturalPlanTest {
         for(int turn=0;turn<4;turn++){
             CityMilitaryPlan.Survey flat=(x,z)->new CityMilitaryPlan.Surface(63,false,false,false);
             var site=VehicleGaragePiece.Planner.find(base(turn),null,2,2,true,false,flat).orElseThrow();
-            var bounds=VehicleGaragePiece.bounds(site,true);
+            var bounds=VehicleGaragePiece.Planner.bounds(site,true);
             for(int x:new int[]{0,30})for(int z:new int[]{0,42}){
                 var point=site.world(x,z);assertTrue(bounds.isInside(new net.minecraft.core.BlockPos(point[0],63,point[1])));
             }

@@ -87,6 +87,14 @@ public final class VehicleGaragePiece extends StructurePiece {
             }
             return true;
         }
+        /** Pure geometry, independent of StructurePiece/native block registry initialization. */
+        public static BoundingBox bounds(VehicleGarageData.Site site,boolean fieldApron) {
+            Objects.requireNonNull(site);
+            int[] a=fieldApron?site.world(0,0):new int[]{site.x(),site.z()};
+            int[] b=fieldApron?site.world(30,42):new int[]{site.x()+site.width()-1,site.z()+site.depth()-1};
+            return new BoundingBox(Math.min(a[0],b[0]),site.floor()-3,Math.min(a[1],b[1]),
+                    Math.max(a[0],b[0]),site.floor()+9,Math.max(a[1],b[1]));
+        }
         private Planner() { }
     }
     private final String baseId;
@@ -129,16 +137,11 @@ public final class VehicleGaragePiece extends StructurePiece {
     public VehicleGarageData.Site site() { return site; }
 
     public static BoundingBox bounds(VehicleGarageData.Site site) {
-        Objects.requireNonNull(site);
-        return new BoundingBox(site.x(), site.floor() - 3, site.z(),
-                site.x() + site.width() - 1, site.floor() + 9, site.z() + site.depth() - 1);
+        return Planner.bounds(site,false);
     }
 
     public static BoundingBox bounds(VehicleGarageData.Site site,boolean fieldApron) {
-        if(!fieldApron)return bounds(site);
-        int[] a=site.world(0,0),b=site.world(30,42);
-        return new BoundingBox(Math.min(a[0],b[0]),site.floor()-3,Math.min(a[1],b[1]),
-                Math.max(a[0],b[0]),site.floor()+9,Math.max(a[1],b[1]));
+        return Planner.bounds(site,fieldApron);
     }
     public static BlockPos origin(VehicleGarageData.Site site) {
         int[] point = site.world(0, 0);
