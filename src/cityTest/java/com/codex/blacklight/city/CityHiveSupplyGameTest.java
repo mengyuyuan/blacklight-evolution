@@ -164,7 +164,14 @@ public final class CityHiveSupplyGameTest {
     @GameTest(template="wall_test",timeoutTicks=170,batch="city_supply_carrier_cut")
     public static void removingTheAuthoredMouthCancelsAnExtendingCarrierBeforeItCanPayADeadStore(GameTestHelper h){var f=new Fixture(h);var carrier=new BlacklightInfectedHost[1];h.runAfterDelay(100,()->{carrier[0]=f.carrier();h.assertTrue(carrier[0].vascular().startAt(carrier[0],f.port(0)),"the actual connection begins before the cut");});h.runAfterDelay(106,()->f.set(f.port(0),Blocks.AIR.defaultBlockState()));h.runAfterDelay(124,()->{try{h.assertTrue(!carrier[0].vascular().active()&&carrier[0].vascularVisual().isEmpty()&&f.stock().reserve()==0&&carrier[0].tissueNutrition()<=398,"a removed real mouth immediately invalidates transport and retracts without crediting a stale hive");}finally{f.close();}h.succeed();});}
     @GameTest(template="wall_test",timeoutTicks=400,batch="city_supply_join_reentrant")
-    public static void anActualJoinCallbackCannotClaimTheSameHiveBroodThroughAnotherMouth(GameTestHelper h){var f=new Fixture(h);h.startSequence().thenIdle(100).thenWaitUntil(()->{
+    public static void anActualJoinCallbackCannotClaimTheSameHiveBroodThroughAnotherMouth(GameTestHelper h){var f=new Fixture(h);h.startSequence().thenIdle(100).thenExecute(()->{
+        // Forced chunks publish saved residents asynchronously after the fixture's
+        // constructor cleanup. Establish the intended empty component scene only
+        // after those chunks tick; the real cap/ticket checks below remain active.
+        if(!(f.level.getServer() instanceof GameTestServer))throw new AssertionError("disposable GameTest server required");
+        var lateResidents=new java.util.ArrayList<Mob>();for(var entity:f.level.getAllEntities())if(entity instanceof Mob mob)lateResidents.add(mob);
+        lateResidents.forEach(Mob::discard);
+    }).thenWaitUntil(()->{
         // The shared dimension can still have birth tickets spent by the preceding
         // batch, and forced chunks enter entity ticking asynchronously. This test
         // exercises join reentry, so wait for a legal first birth without bypassing
