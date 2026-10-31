@@ -30,10 +30,10 @@ public final class SporeCompatibilityGameTest {
         return mob;
     }
     private static <T> void state(Entity entity, java.util.function.Supplier<com.codex.blacklight.forge.AttachmentType<T>> key,T value) {
-        entity.setData(key,value);
+        ModAttachments.setData(entity,key,value);
     }
     private static boolean has(Entity entity, java.util.function.Supplier<? extends com.codex.blacklight.forge.AttachmentType<?>> key) {
-        return entity.hasData(key.get());
+        return ModAttachments.hasData(entity,key);
     }
 
     @GameTest(template="wall_test",timeoutTicks=30)

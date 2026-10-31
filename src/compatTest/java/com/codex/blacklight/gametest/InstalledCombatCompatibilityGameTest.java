@@ -94,10 +94,13 @@ public final class InstalledCombatCompatibilityGameTest {
         titan.discard();h.succeed();
     }
     @GameTest(template="wall_test",timeoutTicks=80,batch="compat_tags")
-    public static void installedTitanPreservesUndeadTags(GameTestHelper h) {
-        h.assertTrue(EntityType.ZOMBIE.is(net.minecraft.tags.EntityTypeTags.UNDEAD),"installed Titan invalidated vanilla undead tag");
-        h.assertTrue(EntityType.ZOMBIE.is(net.minecraft.tags.EntityTypeTags.SENSITIVE_TO_SMITE),"installed Titan invalidated smite tag");
-        h.assertTrue(EntityType.ZOMBIE.is(net.minecraft.tags.EntityTypeTags.INVERTED_HEALING_AND_HARM),"installed Titan invalidated healing inversion tag");
+    public static void installedTitanPreservesNativeUndeadTraits(GameTestHelper h) {
+        // 1.20 uses MobType and native methods, before these became 1.21 tags.
+        var zombie=EntityType.ZOMBIE.create(h.getLevel());
+        h.assertTrue(zombie!=null&&zombie.getMobType()==MobType.UNDEAD,"installed Titan invalidated vanilla undead classification");
+        h.assertTrue(net.minecraft.world.item.enchantment.Enchantments.SMITE.getDamageBonus(1,zombie.getMobType())>0,"installed Titan invalidated smite sensitivity");
+        h.assertTrue(zombie.isInvertedHealAndHarm(),"installed Titan invalidated healing inversion");
+        zombie.discard();
         h.succeed();
     }
 

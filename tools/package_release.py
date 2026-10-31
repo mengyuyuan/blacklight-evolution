@@ -14,7 +14,7 @@ from zipfile import ZIP_DEFLATED, ZipFile, ZipInfo
 PROFILE_DATA_NAMES = {
     'combat-motion-tuning.data', 'consume-placement.data', 'consume-receiver-events.data',
     'receiver-poses.data', 'hunter-consume.data', 'hammer-scales.data', 'weapon-attack-scales.data', 'armor-growth.data',
-    'camera-profile.data', 'camera-events.data', 'camera-film.data', 'health-hud.data',
+    'camera-profile.data', 'camera-events.data', 'camera-film.data', 'health-hud.data', 'evolved-poses.data',
 }
 
 

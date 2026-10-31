@@ -74,3 +74,14 @@ The native visual fixture completed 66 captures, but this is not a visual accept
 An independent fresh-world native framebuffer check passed with actual skylight 15, baseline luminance 0.8303, sprint luminance 0.8112, a preserved foreign framebuffer binding and OpenGL error 0. The earlier attempted fixture copied GameTest metadata containing test-only registry IDs and stopped at a missing-mapping confirmation; it was retained as evidence and replaced by a new native fresh-world bootstrap. Such GameTest worlds are not playable release saves.
 
 Updated full JVM, combined full server, remaining mod combinations, actual multiplayer, all final visuals and ordinary reobfuscated artifacts remain pending. QA observer sources and config are opt-in and must be absent from distributable jars.
+
+
+### Server completion and release-input audit
+
+The native Forge r13 run completed all **535 required checks successfully** and exited normally after chunk storage finished flushing. The shutdown thread dump showed region-file writes, not a deadlock. This result predates the following QA-only changes and does not replace remaining compatibility, multiplayer or packaged-artifact checks.
+
+Linux CI exposed an outdated release-input manifest: six existing motion entries had stale sizes and seven newly synchronized files were absent. All 260 Forge input files were compared byte for byte against the current NeoForge profile before copying its manifest. The collector now includes `evolved-poses.data`, matching the runtime packer. All ten release-collector tests pass. No motion bytes or checks were removed.
+
+The Forge bulk GameTest suite also exposed NightConfig autosave/file-watcher interference: hundreds of transient `ConfigValue.set` calls caused concurrent disk reload/correction, duplicated TOML tables and reset scenario values. A QA-only GameTest-server bootstrap now requires actual framework-loaded config files to parse and validate from disk, removes their test-process watchers, and binds independent parsed in-memory configurations for scenario overrides. Normal servers, integrated play and client settings keep the normal Forge config behavior; the helper is excluded from release jars. A fresh combined CI run remains required.
+
+The current NeoForge revision `069f1b5d` passed cloud build, version policy and its actual 524-case server suite, plus 13 independent-passive and 17 coinstalled-passive checks. Forge's real TaCZ/Potentia/Spore/Twilight combination is being run separately; these results do not yet establish that combination.

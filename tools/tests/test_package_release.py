@@ -57,10 +57,12 @@ class RepositoryProfileTest(unittest.TestCase):
             self.load()
 
     def test_weapon_attack_configuration_is_part_of_profile_inventory(self):
-        name = 'weapon-attack-scales.data'
-        (self.profile / name).write_bytes(self.data)
-        self.files[name] = {'bytes': len(self.data)}
-        self.assertEqual({'basic_idle.json': release.digest(self.data), name: release.digest(self.data)}, self.load())
+        names = ['weapon-attack-scales.data', 'evolved-poses.data']
+        for name in names:
+            (self.profile / name).write_bytes(self.data)
+            self.files[name] = {'bytes': len(self.data)}
+        expected = {name: release.digest(self.data) for name in ['basic_idle.json', *names]}
+        self.assertEqual(expected, self.load())
 
     def test_repository_manifest_matches_all_current_runtime_inputs(self):
         repo = Path(__file__).resolve().parents[2]

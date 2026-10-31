@@ -142,10 +142,18 @@ public final class CitySpawnAuditGameTest {
         }
         for(int x=-16;x<=16;x++)for(int z=-16;z<=16;z++)for(int y=-1;y<5;y++)f.set(f.center.offset(x,y,z),y==-1?Blocks.STONE.defaultBlockState():Blocks.AIR.defaultBlockState());
         level.getGameRules().getRule(GameRules.RULE_DOMOBSPAWNING).set(false,server);
-        var bornWindows=new java.util.HashMap<Long,Integer>();java.util.function.Consumer<EntityJoinLevelEvent> countBirths=e->{if(e.getLevel()==level&&e.getEntity() instanceof com.codex.blacklight.entity.BlacklightCommonInfected)bornWindows.merge(Math.floorDiv(level.getGameTime(),20),1,Integer::sum);};MinecraftForge.EVENT_BUS.addListener(countBirths);
+        // Loading an old resident from an entity section is not a scheduled birth.
+        // Observe genuine new actors, then verify that they were really published.
+        var bornWindows=new java.util.HashMap<Long,Integer>();var born=new java.util.HashSet<UUID>();
+        java.util.function.Consumer<EntityJoinLevelEvent> countBirths=e->{
+            if(e.getLevel()==level&&!e.loadedFromDisk()&&e.getEntity() instanceof com.codex.blacklight.entity.BlacklightCommonInfected mob
+                    &&mob.getBoundingBox().intersects(new net.minecraft.world.phys.AABB(f.center).inflate(64))){
+                born.add(mob.getUUID());bornWindows.merge(Math.floorDiv(level.getGameTime(),20),1,Integer::sum);
+            }
+        };MinecraftForge.EVENT_BUS.addListener(countBirths);
         var player=net.minecraftforge.common.util.FakePlayerFactory.get(level,new com.mojang.authlib.GameProfile(UUID.randomUUID(),"AmbientSpawnQA"));player.setGameMode(GameType.SURVIVAL);player.setPos(net.minecraft.world.phys.Vec3.atBottomCenterOf(f.center));player.setNoGravity(true);level.addNewPlayer(player);
         Runnable close=()->{MinecraftForge.EVENT_BUS.unregister(countBirths);level.removePlayerImmediately(player,Entity.RemovalReason.DISCARDED);f.close();for(var e:values.entrySet())((net.minecraftforge.common.ForgeConfigSpec.ConfigValue)e.getKey()).set(e.getValue());server.setDifficulty(difficulty,true);server.overworld().getDataStorage().set("blacklight_outbreak",old);level.getDataStorage().set("blacklight_city_ecology",ecology);};
-        java.util.function.LongSupplier infected=()->level.getEntitiesOfClass(Mob.class,new net.minecraft.world.phys.AABB(f.center).inflate(64),m->m.isAlive()&&!f.original.contains(m.getId())&&com.codex.blacklight.infection.BlacklightInfectionSystem.isInfected(m)).size();
+        java.util.function.LongSupplier infected=()->level.getEntitiesOfClass(Mob.class,new net.minecraft.world.phys.AABB(f.center).inflate(64),m->m.isAlive()&&born.contains(m.getUUID())&&com.codex.blacklight.infection.BlacklightInfectionSystem.isInfected(m)).size();
         h.startSequence().thenWaitUntil(()->h.assertTrue(level.isPositionEntityTicking(f.center),"actual player neighborhood must simulate"))
             .thenIdle(61).thenExecute(()->{try{h.assertTrue(infected.getAsLong()==0,"real scheduled ticks respect the disabled spawning rule");level.getGameRules().getRule(GameRules.RULE_DOMOBSPAWNING).set(true,server);}catch(Throwable t){close.run();throw t;}})
             .thenIdle(61).thenExecute(()->{try{h.assertTrue(bornWindows.values().stream().allMatch(n->n<=Math.min(perPlayer,batch))&&bornWindows.values().stream().anyMatch(n->n==Math.min(perPlayer,batch)),"real event windows enforce per-player and shared budgets: "+bornWindows);h.assertTrue(infected.getAsLong()>0,"the real server event loop must publish infected near a living survival player without calling the spawn helper; actual="+infected.getAsLong());}finally{close.run();}h.succeed();});
