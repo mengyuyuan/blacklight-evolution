@@ -46,7 +46,7 @@ public final class VehicleFuelDeactivationGameTest {
             else assertTooltip(h,active,"tooltip.blacklight."+active);
         }
         assertTooltip(h,"military_fuel_can","tooltip.blacklight.military_fuel_can");
-        for(var entry:h.getLevel().getServer().getResourceManager().listResources("loot_table",location->location.getNamespace().equals("blacklight")&&location.getPath().endsWith(".json")).entrySet())
+        for(var entry:h.getLevel().getServer().getResourceManager().listResources("loot_tables",location->location.getNamespace().equals("blacklight")&&location.getPath().endsWith(".json")).entrySet())
             try(var reader=entry.getValue().openAsReader()){h.assertTrue(reader.lines().noneMatch(line->line.contains("blacklight:military_fuel_can")),"active loot resource cannot issue preserved fuel: "+entry.getKey());}
         h.succeed();
     }

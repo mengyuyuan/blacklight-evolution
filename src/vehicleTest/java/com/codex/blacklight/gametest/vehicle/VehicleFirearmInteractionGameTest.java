@@ -26,8 +26,8 @@ public final class VehicleFirearmInteractionGameTest {
             player.setItemInHand(InteractionHand.MAIN_HAND,gun);player.setShiftKeyDown(true);
             h.assertTrue(player.interactOn(target,InteractionHand.MAIN_HAND)==InteractionResult.PASS&&!player.isPassenger(),"real Player.interactOn must let an empty held firearm reload instead of boarding its parent or native hull proxy");
             player.getInventory().setItem(10,new ItemStack(FirearmsRegistry.ammo("rifle_round"),32));
-            var reload=gun.getItem().use(f.level,player,InteractionHand.MAIN_HAND);
-            h.assertTrue(reload.getResult().consumesAction()&&FirearmItem.state(gun,0).magazine()==30&&player.getInventory().getItem(10).getCount()==2,"after entity PASS normal firearm use loads thirty actual rounds and spends the real reserve");
+            boolean reload=rifle.reload(player,InteractionHand.MAIN_HAND);
+            h.assertTrue(reload&&FirearmItem.state(player.getMainHandItem(),0).magazine()==30&&player.getInventory().getItem(10).getCount()==2,"after entity PASS the validated R-key reload operation loads thirty actual rounds and spends the real reserve");
             player.setShiftKeyDown(false);
             h.assertTrue(player.interactOn(target,InteractionHand.MAIN_HAND)==InteractionResult.PASS&&!player.isPassenger()&&FirearmItem.state(player.getMainHandItem(),0).magazine()==30,"a genuinely loaded held firearm also remains on foot and passes entity interaction");
             long readyAt=FirearmItem.state(player.getMainHandItem(),0).readyAt();float afterReloadHull=vehicle.health();

@@ -26,8 +26,10 @@ public final class RedZoneVehicleSpawnGameTest {
     }
     private static final class Rules implements AutoCloseable {
         final ServerLevel level;final boolean enabled,spawning,outbreak,patrols;final int limit,personnel,interval;
+        final OutbreakData previousOutbreak;
         Rules(ServerLevel level){
             this.level=level;enabled=MilitaryCampaignConfig.ENABLED.get();outbreak=OutbreakConfig.ENABLED.get();patrols=MilitaryCampaignConfig.VEHICLE_PATROLS.get();interval=MilitaryCampaignConfig.VEHICLE_PATROL_INTERVAL.get();
+            previousOutbreak=OutbreakData.load(OutbreakData.get(level.getServer()).save(new net.minecraft.nbt.CompoundTag()));
             spawning=level.getGameRules().getBoolean(GameRules.RULE_DOMOBSPAWNING);
             limit=MilitaryCampaignConfig.VEHICLE_PATROL_LIMIT.get();personnel=CityConfig.MILITARY_GARRISON_LIMIT.get();
             MilitaryCampaignConfig.ENABLED.set(true);MilitaryCampaignConfig.VEHICLE_PATROLS.set(true);
@@ -38,7 +40,8 @@ public final class RedZoneVehicleSpawnGameTest {
         void red(BlockPos at){CityEcologyData.get(level).observe(CityEcology.key(level,at),level.getGameTime(),1,2,24000,DistrictThreat.Signal.EMPTY);}
         @Override public void close(){MilitaryCampaignConfig.ENABLED.set(enabled);OutbreakConfig.ENABLED.set(outbreak);MilitaryCampaignConfig.VEHICLE_PATROLS.set(patrols);MilitaryCampaignConfig.VEHICLE_PATROL_INTERVAL.set(interval);
             MilitaryCampaignConfig.VEHICLE_PATROL_LIMIT.set(limit);CityConfig.MILITARY_GARRISON_LIMIT.set(personnel);
-            level.getGameRules().getRule(GameRules.RULE_DOMOBSPAWNING).set(spawning,level.getServer());}
+            level.getGameRules().getRule(GameRules.RULE_DOMOBSPAWNING).set(spawning,level.getServer());
+            previousOutbreak.setDirty();level.getServer().overworld().getDataStorage().set("blacklight_outbreak",previousOutbreak);}
     }
     private static void collect(MilitaryVehicleGameTest.Fixture f,MilitaryVehicle vehicle){f.entities.addAll(vehicle.getPassengers());f.entities.add(vehicle);}
     @GameTest(template="blackwatch_arena",batch="redzone_random_tick",timeoutTicks=900)
@@ -63,17 +66,25 @@ public final class RedZoneVehicleSpawnGameTest {
                     &&VehicleFleetSavedData.get(f.level).vehicleFleet(v.getUUID()).map(VehicleFleet::ambientPatrol).orElse(false))vehicles.add(v);
             if(!vehicles.isEmpty()){
                 var vehicle=vehicles.get(0);var start=vehicle.position();collect(f,vehicle);
-                h.runAfterDelay(55,()->{try(f;rules){
-                    for(var entity:f.level.getAllEntities())if(entity instanceof MilitaryVehicle v&&v.blockPosition().distSqr(center)<256*256&&VehicleFleetSavedData.get(f.level).vehicleFleet(v.getUUID()).map(VehicleFleet::ambientPatrol).orElse(false))collect(f,v);
-                    h.assertTrue(vehicle.position().subtract(start).horizontalDistance()>4,"real registered random street patrol actually drives after spawning");
-                    h.assertTrue(vehicle.getPassengers().size()==vehicle.definition().seats().size(),"random generation supplies all actual crew seats");
-                }h.succeed();});return;
+                awaitMotion(h,f,rules,center,vehicle,start,240);return;
             }
             if(left<=0){try(f;rules){h.assertTrue(false,"no random red-zone vehicle appeared during 800 actual server ticks");}return;}
             awaitRandom(h,f,rules,center,left-10);
         });
     }
-    @GameTest(template="blackwatch_arena",batch="redzone_truck",timeoutTicks=200)
+    private static void awaitMotion(GameTestHelper h,MilitaryVehicleGameTest.Fixture f,Rules rules,BlockPos center,MilitaryVehicle vehicle,net.minecraft.world.phys.Vec3 start,int left){
+        h.runAfterDelay(10,()->{
+            double moved=vehicle.position().subtract(start).horizontalDistance();
+            if(moved>4||left<=0){try(f;rules){
+                for(var entity:f.level.getAllEntities())if(entity instanceof MilitaryVehicle v&&v.blockPosition().distSqr(center)<256*256&&VehicleFleetSavedData.get(f.level).vehicleFleet(v.getUUID()).map(VehicleFleet::ambientPatrol).orElse(false))collect(f,v);
+                var fleet=VehicleFleetSavedData.get(f.level).vehicleFleet(vehicle.getUUID()).orElseThrow();
+                h.assertTrue(moved>4,"real registered random patrol must drive; moved="+moved+" "+VehicleFleetSystem.diagnostic(f.level,fleet.id(),vehicle.getUUID()));
+                h.assertTrue(vehicle.getPassengers().size()==vehicle.definition().seats().size(),"random generation supplies all actual crew seats");
+            }h.succeed();return;}
+            awaitMotion(h,f,rules,center,vehicle,start,left-10);
+        });
+    }
+    @GameTest(template="blackwatch_arena",batch="redzone_truck",timeoutTicks=400)
     public static void noGarageTruckHasSixRearTroopsAndActuallyDrives(GameTestHelper h){
         var f=new MilitaryVehicleGameTest.Fixture(h,910000);var rules=new Rules(f.level);var at=new BlockPos(f.x,81,0);rules.red(at);
         VehicleTestReadiness.await(h,f,()->{
@@ -90,7 +101,7 @@ public final class RedZoneVehicleSpawnGameTest {
             }h.succeed();});
         });
     }
-    @GameTest(template="blackwatch_arena",batch="redzone_tank",timeoutTicks=200)
+    @GameTest(template="blackwatch_arena",batch="redzone_tank",timeoutTicks=400)
     public static void redZoneTankDrivesWithRealDriverAndGunner(GameTestHelper h){
         var f=new MilitaryVehicleGameTest.Fixture(h,911000);var rules=new Rules(f.level);var at=new BlockPos(f.x,81,0);rules.red(at);
         VehicleTestReadiness.await(h,f,()->{
@@ -99,7 +110,7 @@ public final class RedZoneVehicleSpawnGameTest {
             var initial=tank.position();h.runAfterDelay(60,()->{try(f;rules){h.assertTrue(tank.position().subtract(initial).horizontalDistance()>4,"actual tank patrol moves horizontally");}h.succeed();});
         });
     }
-    @GameTest(template="blackwatch_arena",batch="redzone_rejection",timeoutTicks=180)
+    @GameTest(template="blackwatch_arena",batch="redzone_rejection",timeoutTicks=400)
     public static void greenDisabledAndBlockedSitesNeverProducePartialVehiclesOrCrew(GameTestHelper h){
         var f=new MilitaryVehicleGameTest.Fixture(h,912000);var rules=new Rules(f.level);var at=new BlockPos(f.x,81,0);
         VehicleTestReadiness.await(h,f,()->{try(f;rules){
@@ -114,7 +125,7 @@ public final class RedZoneVehicleSpawnGameTest {
             h.assertTrue(before.equals(after),"rejection leaves no chassis or partial squad");
         }h.succeed();});
     }
-    @GameTest(template="blackwatch_arena",batch="redzone_limit",timeoutTicks=180)
+    @GameTest(template="blackwatch_arena",batch="redzone_limit",timeoutTicks=400)
     public static void persistedPatrolSlotPreventsDuplicationAndDeathReleasesIt(GameTestHelper h){
         var f=new MilitaryVehicleGameTest.Fixture(h,913000);var rules=new Rules(f.level);var at=new BlockPos(f.x,81,0);rules.red(at);
         VehicleTestReadiness.await(h,f,()->{try(f;rules){

@@ -2,9 +2,16 @@
 allprojects { afterEvaluate {
     sourceSets.main.java.srcDir('src/vehicleTest/java')
     if (!sourceSets.main.resources.srcDirs.contains(file('src/blackwatchTest/resources'))) sourceSets.main.resources.srcDir('src/blackwatchTest/resources')
-    tasks.matching { it.name == 'runGameTestServer' }.configureEach {
+    def stageVehicle6Classes=tasks.register('stageVehicle6Classes',Sync){
         dependsOn tasks.named('classes')
-        doFirst { environment 'MOD_CLASSES', sourceSets.main.output.files.collect { 'blacklight%%'+it.absolutePath }.join(File.pathSeparator) }
+        from sourceSets.main.output.classesDirs
+        into layout.buildDirectory.dir('vehicle6-run-classes')
+    }
+    tasks.matching { it.name == 'runGameTestServer' }.configureEach {
+        dependsOn stageVehicle6Classes
+        // Snapshot classes so a later normal build cannot remove opt-in tests
+        // from a running JVM. Reuse immutable resources without recopying all assets.
+        doFirst { environment 'MOD_CLASSES', [layout.buildDirectory.dir('vehicle6-run-classes').get().asFile,sourceSets.main.output.resourcesDir].collect { 'blacklight%%'+it.absolutePath }.join(File.pathSeparator) }
     }
 } }
 allprojects { tasks.withType(ProcessResources).configureEach { filteringCharset = 'UTF-8' } }

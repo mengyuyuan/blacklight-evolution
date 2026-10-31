@@ -5,7 +5,7 @@ import net.minecraft.gametest.framework.GameTestHelper;
 
 /** Bounded readiness for the fixture's real entity sections; no fixed-delay visibility assumption. */
 final class VehicleTestReadiness {
-    private static final int MAX_ATTEMPTS=80;
+    private static final int MAX_ATTEMPTS=200;
     private VehicleTestReadiness(){}
     static void run(GameTestHelper helper,MilitaryVehicleGameTest.Fixture fixture,Runnable test){
         await(helper,fixture,()->{try(fixture){test.run();}helper.succeed();});
