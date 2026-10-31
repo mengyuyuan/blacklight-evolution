@@ -29,7 +29,7 @@ public final class RedZoneVehicleSpawnGameTest {
         final OutbreakData previousOutbreak;
         Rules(ServerLevel level){
             this.level=level;enabled=MilitaryCampaignConfig.ENABLED.get();outbreak=OutbreakConfig.ENABLED.get();patrols=MilitaryCampaignConfig.VEHICLE_PATROLS.get();interval=MilitaryCampaignConfig.VEHICLE_PATROL_INTERVAL.get();
-            previousOutbreak=OutbreakData.load(OutbreakData.get(level.getServer()).save(new net.minecraft.nbt.CompoundTag()));
+            previousOutbreak=OutbreakData.load(OutbreakData.get(level.getServer()).save(new net.minecraft.nbt.CompoundTag(),level.registryAccess()),level.registryAccess());
             spawning=level.getGameRules().getBoolean(GameRules.RULE_DOMOBSPAWNING);
             limit=MilitaryCampaignConfig.VEHICLE_PATROL_LIMIT.get();personnel=CityConfig.MILITARY_GARRISON_LIMIT.get();
             MilitaryCampaignConfig.ENABLED.set(true);MilitaryCampaignConfig.VEHICLE_PATROLS.set(true);
@@ -150,7 +150,7 @@ public final class RedZoneVehicleSpawnGameTest {
             MilitaryCampaignConfig.VEHICLE_PATROL_LIMIT.set(existing+1);
             var truck=spawn(f.level,"truck",at).orElseThrow();collect(f,truck);
             var data=VehicleFleetSavedData.get(f.level);var id=data.vehicleFleet(truck.getUUID()).orElseThrow().id();
-            var saved=VehicleFleetSavedData.load(data.save(new net.minecraft.nbt.CompoundTag()));
+            var saved=VehicleFleetSavedData.load(data.save(new net.minecraft.nbt.CompoundTag(),f.level.registryAccess()),f.level.registryAccess());
             h.assertTrue(saved.fleet(id).orElseThrow().ambientPatrol(),"ambient reservation survives actual SavedData roundtrip");
             h.assertTrue(spawn(f.level,"apc",at.offset(6,0,0)).isEmpty(),"existing patrol consumes dimension budget before new crew is created");
             truck.discard();h.assertTrue(data.fleet(id).isEmpty(),"real entity discard releases its ambient fleet slot");
