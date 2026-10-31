@@ -37,6 +37,20 @@ def require(condition: bool, message: str) -> None:
         raise RuntimeError(message)
 
 
+def declared_mod_attribution(repo: Path, mod_id: str) -> dict:
+    template = (repo / 'src/main/templates/META-INF/neoforge.mods.toml').read_text(encoding='utf-8')
+    # Gradle also expands this placeholder in table keys; the raw template is not TOML.
+    declared_meta = tomllib.loads(template.replace('${mod_id}', mod_id))
+    return next(m for m in declared_meta['mods'] if m['modId'] == mod_id)
+
+
+def verify_mod_attribution(repo: Path, mod: dict, mod_id: str) -> None:
+    declared = declared_mod_attribution(repo, mod_id)
+    require(mod.get('authors') == declared.get('authors') and '末者' in mod.get('authors', ''),
+            'Author attribution differs from the source declaration or omits the original author')
+    require(mod.get('credits') == declared.get('credits'), 'Contributor credits differ from the source declaration')
+
+
 def manifest_values(data: bytes) -> dict[str, str]:
     text = data.decode('utf-8').replace('\r\n', '\n').replace('\n ', '')
     return dict(line.split(': ', 1) for line in text.splitlines() if ': ' in line)
@@ -381,12 +395,8 @@ def main() -> None:
             inactive[name] = digest(path.read_bytes())
         meta = tomllib.loads(archive.read('META-INF/neoforge.mods.toml').decode('utf-8'))
         mod = next(m for m in meta['mods'] if m['modId'] == props['mod_id'])
-        declared_meta = tomllib.loads((repo / 'src/main/templates/META-INF/neoforge.mods.toml').read_text(encoding='utf-8'))
-        declared_mod = next(m for m in declared_meta['mods'] if m['modId'] == '${mod_id}')
         require(mod['version'] == version, 'Version mismatch')
-        require(mod.get('authors') == declared_mod.get('authors') and '末者' in mod.get('authors', ''),
-                'Author attribution differs from the source declaration or omits the original author')
-        require(mod.get('credits') == declared_mod.get('credits'), 'Contributor credits differ from the source declaration')
+        verify_mod_attribution(repo, mod, props['mod_id'])
         manifest = manifest_values(archive.read('META-INF/MANIFEST.MF'))
         require(manifest.get('Blacklight-Build-Profile') == args.profile, 'Build profile mismatch')
         if args.profile in ('bundled', 'external-profile'):
