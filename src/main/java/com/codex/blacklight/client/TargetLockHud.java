@@ -27,7 +27,9 @@ public final class TargetLockHud {
     public static int readyMarkerCount(){return readyCount;}
     @SubscribeEvent public static void begin(net.minecraftforge.event.TickEvent.RenderTickEvent event){if(event.phase!=net.minecraftforge.event.TickEvent.Phase.START)return;frame++;marker=null;if(Minecraft.getInstance().level==null){world=null;candidateLevel=null;candidateTick=-100;candidates=java.util.List.of();}}
     @SubscribeEvent public static void captureWorld(RenderLevelStageEvent event) {
-        if(event.getStage()!=RenderLevelStageEvent.Stage.AFTER_LEVEL)return;
+        // Forge 1.20 supplies GameRenderer's projection stack at AFTER_LEVEL.
+        // Entity-stage PoseStack is the real view transform used for world points.
+        if(event.getStage()!=RenderLevelStageEvent.Stage.AFTER_ENTITIES)return;
         var mc=Minecraft.getInstance();
         world=new WorldFrame(mc.level,frame,new Matrix4f(event.getPoseStack().last().pose()),new Matrix4f(event.getProjectionMatrix()),
                 event.getCamera().getPosition(),event.getPartialTick());

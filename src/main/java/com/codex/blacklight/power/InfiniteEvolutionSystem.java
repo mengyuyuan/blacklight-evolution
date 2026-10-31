@@ -43,7 +43,8 @@ public final class InfiniteEvolutionSystem {
     }
     @SubscribeEvent public static void hurt(com.codex.blacklight.combat.ForgeDamageEvent.Post event){if(event.getNewDamage()>0&&event.getEntity() instanceof ServerPlayer p)LAST_HURT.put(p,p.tickCount);}
     @SubscribeEvent public static void tick(net.minecraftforge.event.TickEvent.PlayerTickEvent event){if(event.phase!=net.minecraftforge.event.TickEvent.Phase.END)return;
-        if(!(event.player instanceof ServerPlayer p))return;EvolutionProgression.refresh(p);updateMobility(p);
+        if(!(event.player instanceof ServerPlayer p)||!p.isAlive()||p.isRemoved()||!ModAttachments.available(p))return;
+        EvolutionProgression.refresh(p);updateMobility(p);
         if(p.tickCount%20==0&&PrototypeMetabolism.active(p)&&!BiomassSystem.active(p)&&p.isAlive()
                 &&p.tickCount-(long)LAST_HURT.getOrDefault(p,p.tickCount-240000)>=PlayerEvolutionConfig.RECOVERY_DELAY.get()&&p.getHealth()<p.getMaxHealth())
             p.heal((float)Math.min(Float.MAX_VALUE,effectiveRank(p,EvolutionAttribute.RECOVERY)*PlayerEvolutionConfig.RECOVERY_PER_LEVEL.get()/CombatScale.units(p)));

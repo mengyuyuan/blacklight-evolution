@@ -11,6 +11,24 @@ import net.minecraftforge.gametest.*;
 /** Real Forge entity/capability lifecycle; never shipped in the mod JAR. */
 @GameTestHolder("blacklight") @PrefixGameTestTemplate(false)
 public final class EntityRemovalGameTest {
+    @GameTest(template="wall_test",timeoutTicks=30)
+    public static void stalePlayerEvolutionTickKeepsCapsInvalid(GameTestHelper h) {
+        var p=new net.minecraftforge.common.util.FakePlayer(h.getLevel(),
+                new com.mojang.authlib.GameProfile(java.util.UUID.randomUUID(),"StaleEvolution"));
+        var state=ModAttachments.getData(p,ModAttachments.PLAYER_STATE);state.infect();
+        for(var form:com.codex.blacklight.power.PowerForm.values())state.unlock(form);
+        state.addEvolutionPoints(999999);
+        for(var upgrade:com.codex.blacklight.power.ClawUpgrade.values())state.buyClawUpgrade(upgrade);
+        for(var upgrade:com.codex.blacklight.power.MovementUpgrade.values())state.buyMovementUpgrade(upgrade);
+        for(var skill:com.codex.blacklight.power.CombatSkill.values())state.buyCombatSkill(skill);
+        p.invalidateCaps();
+        h.assertTrue(!ModAttachments.available(p),"fixture capability really invalidated");
+        com.codex.blacklight.power.EvolutionProgression.refresh(p);
+        com.codex.blacklight.power.InfiniteEvolutionSystem.tick(new net.minecraftforge.event.TickEvent.PlayerTickEvent(
+                net.minecraftforge.event.TickEvent.Phase.END,p));
+        h.assertTrue(!p.getCapability(BlacklightAttachments.CAPABILITY).isPresent(),"evolution must not revive stale capability");
+        h.succeed();
+    }
     private static void finalDeathTick(GameTestHelper h, EntityType<? extends Mob> type) {
         finalDeathTick(h,type,true);
     }
