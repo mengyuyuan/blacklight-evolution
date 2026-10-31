@@ -67,7 +67,7 @@ public final class TissueAssimilationGameTest {
     public static void matureTargetsHaveTheSameWeakeningGateForHumanAndSlime(GameTestHelper h){
         var p=player(h);var host=host(p,72000,TissueCore.GRASP);
         try{
-            host.setPos(p.position());p.setData(ModAttachments.BIOMASS_FORM,new BiomassState(BiomassState.CRAWLING,h.getLevel().getGameTime(),true,"","claws",-1,0));p.refreshDimensions();
+            host.setPos(p.position());p.setData(ModAttachments.BIOMASS_FORM,new BiomassState(BiomassState.CRAWLING,h.getLevel().getGameTime(),false,"","claws",-1,0));p.refreshDimensions();
             h.assertTrue(!ConsumeSystem.healthReady(host)&&!BiomassSystem.edible(p,host),"full-health matured tissue cannot be bypassed in slime form");
             host.setHealth(host.getMaxHealth()*.14F);
             h.assertTrue(ConsumeSystem.healthReady(host)&&BiomassSystem.edible(p,host),"both paths accept the same weakened host");

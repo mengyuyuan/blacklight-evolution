@@ -124,7 +124,9 @@ public final class BiomassSystem {
             else if(rejected.target().equals(victim.getUUID()))return false;
         }
         return !(victim instanceof BiomassHusk)&&ConsumeSystem.eligibleBiomass(victim)
-                &&ConsumeSystem.healthReady(p,victim)
+                // Death recovery must be possible without first fighting in a helpless form.
+                // Mature organs and protected bosses still retain their physical assimilation gate.
+                &&(state(p).active()&&state(p).fatal()?AssimilationSystem.ready(victim):ConsumeSystem.healthReady(p,victim))
                 &&(claimant(victim)==null||claimant(victim)==p)&&CombatTargeting.damageable(p,victim)
                 &&inContact(p,victim)
                 &&(CombatTargeting.multipart(victim)?CombatTargeting.visibleContact(p,victim,p.getBoundingBox().inflate(1.15,.65,1.15))
