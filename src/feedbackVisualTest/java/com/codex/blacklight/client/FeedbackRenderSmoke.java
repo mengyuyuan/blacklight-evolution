@@ -16,7 +16,7 @@ import org.lwjgl.opengl.GL30;
 /** Opt-in native framebuffer regression, isolated from personal saves and human input. */
 @EventBusSubscriber(modid="blacklight",value=Dist.CLIENT)
 public final class FeedbackRenderSmoke {
-    private static boolean setup,done;private static int ticks;private static volatile boolean ready;
+    private static boolean setup,done,creating;private static int ticks;private static volatile boolean ready;
     private static String lastScreen;private static Path output;private static final JsonObject report=new JsonObject();
     private static boolean enabled(){return Boolean.getBoolean("blacklight.feedbackVisual");}
     @SubscribeEvent public static void tick(net.minecraftforge.event.TickEvent.ClientTickEvent e){if(e.phase!=net.minecraftforge.event.TickEvent.Phase.END)return;
@@ -26,7 +26,21 @@ public final class FeedbackRenderSmoke {
         mc.options.pauseOnLostFocus=false;
         String screen=mc.screen==null?"none":mc.screen.getClass().getName();
         if(!screen.equals(lastScreen)){com.codex.blacklight.BlacklightNeoMod.LOGGER.info("Feedback QA screen: {}",screen);lastScreen=screen;}
-        if(mc.player==null||mc.getSingleplayerServer()==null)return;
+        if(mc.player==null||mc.getSingleplayerServer()==null){
+            if(Boolean.getBoolean("blacklight.feedbackFreshWorld")&&!creating&&mc.screen instanceof net.minecraft.client.gui.screens.TitleScreen){
+                try{
+                    Path expected=Path.of(System.getProperty("blacklight.feedbackDirectory")).toAbsolutePath().normalize();
+                    if(!mc.gameDirectory.toPath().toAbsolutePath().normalize().equals(expected))throw new IllegalStateException("Not the disposable feedback directory");
+                    creating=true;String name="Blacklight Feedback QA "+System.currentTimeMillis();
+                    mc.createWorldOpenFlows().createFreshLevel(name,new net.minecraft.world.level.LevelSettings(name,GameType.CREATIVE,false,
+                            net.minecraft.world.Difficulty.PEACEFUL,true,new net.minecraft.world.level.GameRules(),net.minecraft.world.level.WorldDataConfiguration.DEFAULT),
+                            new net.minecraft.world.level.levelgen.WorldOptions(7712L,false,false),
+                            registries->registries.registryOrThrow(net.minecraft.core.registries.Registries.WORLD_PRESET)
+                                    .getHolderOrThrow(net.minecraft.world.level.levelgen.presets.WorldPresets.FLAT).value().createWorldDimensions());
+                }catch(Throwable t){finish(t);}
+            }
+            return;
+        }
         try {
             Path expected=Path.of(System.getProperty("blacklight.feedbackDirectory")).toAbsolutePath().normalize();
             if(!mc.gameDirectory.toPath().toAbsolutePath().normalize().equals(expected))throw new IllegalStateException("Not the disposable feedback directory");
@@ -52,6 +66,9 @@ public final class FeedbackRenderSmoke {
         try {
             var main=mc.getMainRenderTarget();
             if(!report.has("baseline")){
+                int sky=mc.level.getBrightness(net.minecraft.world.level.LightLayer.SKY,mc.player.blockPosition().above(3));
+                report.addProperty("nativeSkyLight",sky);
+                if(sky<1)throw new IllegalStateException("Native daylight scene has not acquired real skylight");
                 report.addProperty("baseline",capture("baseline"));
                 intensity(.8F);ClientSpeedPostEffect.onRenderLevel(e);
                 report.addProperty("sprint",capture("sprint"));

@@ -19,7 +19,7 @@ import net.minecraftforge.network.NetworkRegistry;
 import net.minecraftforge.network.simple.SimpleChannel;
 
 public final class ModNetwork {
-    private static final String PROTOCOL = "forge-1.20.1-17-full-sync";
+    private static final String PROTOCOL = "forge-1.20.1-18-full-sync";
     private static final SimpleChannel CHANNEL = NetworkRegistry.newSimpleChannel(
             new ResourceLocation(BlacklightNeoMod.MOD_ID, "main"), () -> PROTOCOL, PROTOCOL::equals, PROTOCOL::equals);
     private static boolean registered;

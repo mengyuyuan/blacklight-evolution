@@ -32,6 +32,9 @@ import net.minecraftforge.eventbus.api.EventPriority;
 /** Opt-in real-frame QA. Only a disposable copied world with the explicit QA prefix may be mutated. */
 @EventBusSubscriber(modid=BlacklightNeoMod.MOD_ID,value=Dist.CLIENT)
 public final class StandaloneVisualSmoke {
+    // Reuse the naturally lit flat-world surface. An artificial platform in an
+    // initially empty high section can precede Forge's first skylight upload.
+    private static final int STAGE_Y=-60;
     private record Shot(String name,PowerForm form,PowerForm utility,WeaponMove move,float seconds,boolean charge,boolean firstPerson,boolean editor,float pitch,CameraType camera,boolean nativeCamera) {
         Shot(String name,PowerForm form,PowerForm utility,WeaponMove move,float seconds,boolean charge,boolean firstPerson,boolean editor){this(name,form,utility,move,seconds,charge,firstPerson,editor,0,null,false);}
     }
@@ -182,12 +185,12 @@ public final class StandaloneVisualSmoke {
                 try {
                     var level=server.overworld();level.setDayTime(6000);level.setWeatherParameters(6000,0,false,false);
                     for(int x=-9;x<=9;x++)for(int z=-9;z<=9;z++) {
-                        level.setBlockAndUpdate(new BlockPos(x,250,z),((x+z)&1)==0?Blocks.SMOOTH_STONE.defaultBlockState():Blocks.POLISHED_ANDESITE.defaultBlockState());
-                        for(int y=251;y<258;y++)level.setBlockAndUpdate(new BlockPos(x,y,z),Blocks.AIR.defaultBlockState());
+                        level.setBlockAndUpdate(new BlockPos(x,STAGE_Y-1,z),((x+z)&1)==0?Blocks.SMOOTH_STONE.defaultBlockState():Blocks.POLISHED_ANDESITE.defaultBlockState());
+                        for(int y=STAGE_Y;y<STAGE_Y+7;y++)level.setBlockAndUpdate(new BlockPos(x,y,z),Blocks.AIR.defaultBlockState());
                     }
                     var p=server.getPlayerList().getPlayer(uuid);if(p==null)throw new IllegalStateException("QA player missing");
                     p.setGameMode(GameType.CREATIVE);p.getAbilities().flying=false;p.onUpdateAbilities();
-                    p.connection.teleport(.5,251,.5,180,0);p.setDeltaMovement(0,0,0);p.yBodyRot=p.yBodyRotO=180;p.yHeadRot=p.yHeadRotO=180;
+                    p.connection.teleport(.5,STAGE_Y,.5,180,0);p.setDeltaMovement(0,0,0);p.yBodyRot=p.yBodyRotO=180;p.yHeadRot=p.yHeadRotO=180;
                     serverReady=true;
                 }catch(Exception e){fail(e);}
             });
@@ -250,7 +253,7 @@ public final class StandaloneVisualSmoke {
         if(shot.name().equals("56_vision_baseline")){
             for(double x:new double[]{-1.2,1.8}){
                 var sheep=net.minecraft.world.entity.EntityType.SHEEP.create(p.serverLevel());
-                sheep.setPos(x,251,2.5);sheep.setNoAi(true);sheep.setPersistenceRequired();p.serverLevel().addFreshEntity(sheep);
+                sheep.setPos(x,STAGE_Y,2.5);sheep.setNoAi(true);sheep.setPersistenceRequired();p.serverLevel().addFreshEntity(sheep);
             }
         }
         var state=com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.PLAYER_STATE);if(!state.isInfected())state.infect();
@@ -262,10 +265,10 @@ public final class StandaloneVisualSmoke {
         com.codex.blacklight.registry.ModAttachments.setData(p, ModAttachments.UTILITY_STATE,new UtilityState(UtilityState.SHIELD_CAPACITY,0,p.level().getGameTime()-200,0,-1000));com.codex.blacklight.registry.ModAttachments.syncData(p, ModAttachments.UTILITY_STATE);
         com.codex.blacklight.registry.ModAttachments.setData(p, ModAttachments.POWER_MORPH,PowerMorph.NONE);com.codex.blacklight.registry.ModAttachments.syncData(p, ModAttachments.POWER_MORPH);
         com.codex.blacklight.registry.ModAttachments.setData(p, ModAttachments.WEAPON_VISUAL,WeaponVisual.EMPTY);com.codex.blacklight.registry.ModAttachments.syncData(p, ModAttachments.WEAPON_VISUAL);
-        p.setDeltaMovement(0,0,0);p.connection.teleport(.5,251,.5,180,shot.pitch());p.yBodyRot=p.yBodyRotO=180;p.yHeadRot=p.yHeadRotO=180;
+        p.setDeltaMovement(0,0,0);p.connection.teleport(.5,STAGE_Y,.5,180,shot.pitch());p.yBodyRot=p.yBodyRotO=180;p.yHeadRot=p.yHeadRotO=180;
         if(wall(shot)!=com.codex.blacklight.movement.WallTraversal.Mode.NONE) {
-            p.connection.teleport(.5,251,.31,180,shot.pitch());
-            for(int x=-5;x<=5;x++)for(int y=251;y<=(liveWall(shot)?310:257);y++)p.level().setBlockAndUpdate(new BlockPos(x,y,-1),Blocks.SMOOTH_STONE.defaultBlockState());
+            p.connection.teleport(.5,STAGE_Y,.31,180,shot.pitch());
+            for(int x=-5;x<=5;x++)for(int y=STAGE_Y;y<=STAGE_Y+(liveWall(shot)?59:6);y++)p.level().setBlockAndUpdate(new BlockPos(x,y,-1),Blocks.SMOOTH_STONE.defaultBlockState());
         }
     }
     private static com.codex.blacklight.movement.WallTraversal.Mode wall(Shot shot) {
@@ -279,15 +282,9 @@ public final class StandaloneVisualSmoke {
         // normal client movement prediction. Physical wall movement is tested separately.
         com.codex.blacklight.movement.WallPoseState.set(player,wall(SHOTS.get(index)),0,1);
     }
-    @SubscribeEvent(priority=EventPriority.LOWEST) public static void camera(ViewportEvent.ComputeCameraAngles event) {
-        observerCamera(event.getCamera(),(float)event.getPartialTick());
-    }
-    @SubscribeEvent(priority=EventPriority.LOWEST) public static void observerAfterCameraSetup(ViewportEvent.ComputeFov event) {
-        // The gameplay follow camera wraps Camera.setup, after ComputeCameraAngles.
-        // Reapply the QA observer after setup so screenshots really use the side view.
-        observerCamera(event.getCamera(),(float)event.getPartialTick());
-    }
-    private static void observerCamera(net.minecraft.client.Camera view,float partial) {
+    // Called by the opt-in observer mixin immediately after the actual Camera.setup
+    // invocation. Forge 1.20's FOV event is too late to establish the view matrix.
+    public static void observerCamera(net.minecraft.client.Camera view,float partial) {
         if(!initialized||disabled||completed||!preview||index>=SHOTS.size())return;
         var shot=SHOTS.get(index);if(shot.firstPerson()||shot.editor()||shot.nativeCamera())return;
         var player=Minecraft.getInstance().player;if(player==null)return;
@@ -312,7 +309,7 @@ public final class StandaloneVisualSmoke {
         float yaw=(float)Math.toDegrees(Math.atan2(-look.x,look.z));
         float pitch=(float)-Math.toDegrees(Math.atan2(look.y,look.horizontalDistance()));
         var access=(com.codex.blacklight.mixin.client.PrototypeCameraAccess)view;
-        access.blacklight$setPosition(camera);access.blacklight$setRotation(yaw,pitch,0);
+        access.blacklight$setPosition(camera);access.blacklight$setRotation(yaw,pitch);
     }
     @SubscribeEvent public static void frame(net.minecraftforge.event.TickEvent.RenderTickEvent event){if(event.phase!=net.minecraftforge.event.TickEvent.Phase.END)return;
         if(!capture||disabled||completed)return;
@@ -330,7 +327,7 @@ public final class StandaloneVisualSmoke {
                 record.addProperty("liveSurfaceWallMode",actualSurface==null?"NONE":actualSurface.mode().name());
                 record.addProperty("liveActorY",client.player.getY());
                 if(PlayerMotionController.previewKey(client.player)!=null||actualWall!=wall(shot)
-                        ||actualSurface==null||actualSurface.mode()!=actualWall||client.player.getY()<251.5)
+                        ||actualSurface==null||actualSurface.mode()!=actualWall||client.player.getY()<STAGE_Y+.5)
                     throw new IllegalStateException("Live input, wall mode and actual upward travel did not agree");
                 var states=PlayerMotionController.class.getDeclaredField("STATES");states.setAccessible(true);
                 var runtime=((java.util.Map<?,?>)states.get(null)).get(client.player);
@@ -342,12 +339,15 @@ public final class StandaloneVisualSmoke {
             record.addProperty("cameraTypeMatches",camera(shot)==client.options.getCameraType());record.addProperty("requestedPitch",shot.pitch());record.addProperty("actualPlayerPitch",client.player.getXRot());
             if(camera(shot)!=client.options.getCameraType())throw new IllegalStateException("Native camera perspective changed during "+shot.name());
             if(!shot.name().equals("49_native_back_orbit_180")&&Math.abs(client.player.getXRot()-shot.pitch())>.1F)throw new IllegalStateException("Requested view pitch not exercised");
-            record.addProperty("nativeCamera",shot.nativeCamera());record.addProperty("skinTexture",client.player.getSkin().texture().toString());
+            record.addProperty("nativeCamera",shot.nativeCamera());record.addProperty("skinTexture",client.player.getSkinTextureLocation().toString());
+            record.addProperty("dayTime",client.level.getDayTime());
+            record.addProperty("skyLight",client.level.getBrightness(net.minecraft.world.level.LightLayer.SKY,client.player.blockPosition().above(2)));
+            record.addProperty("packedLight",client.getEntityRenderDispatcher().getPackedLightCoords(client.player,event.renderTickTime));
             record.addProperty("actualPlayerYaw",client.player.getYRot());record.addProperty("actualBodyYaw",client.player.yBodyRot);
             record.addProperty("renderFacing",com.codex.blacklight.client.animation.BlacklightRenderPose.facing(client.player,0));
             record.addProperty("cameraControlYaw",com.codex.blacklight.client.camera.PrototypeChaseCamera.controlYaw());
             if(shot.name().equals("49_native_back_orbit_180")){record.addProperty("nativeOrbitRawMouseX",1200);record.addProperty("nativeOrbitRawMouseY",orbitMouseY);record.addProperty("orbitBeforePlayerYaw",orbitBeforeYaw);record.addProperty("orbitBeforeRenderFacing",orbitBeforeFacing);record.addProperty("orbitBeforeControlYaw",orbitBeforeControl);}
-            var pose=com.codex.blacklight.client.animation.BlacklightRenderPose.sample(client.player,(float)event.getPartialTick().getGameTimeDeltaPartialTick(false));
+            var pose=com.codex.blacklight.client.animation.BlacklightRenderPose.sample(client.player,event.renderTickTime);
             var rig=PlayerMotionController.skeleton();
             var hip=rig.getBoundTransformFor(pose,rig.rootJoint).getTranslation(new org.joml.Vector3f());
             var head=rig.getBoundTransformFor(pose,rig.head).getTranslation(new org.joml.Vector3f());
@@ -373,7 +373,7 @@ public final class StandaloneVisualSmoke {
             if(shot.name().equals("49_native_back_orbit_180")&&facingCamera<=.2)throw new IllegalStateException("Native BACK orbit cannot show the face: "+facingCamera);
             if(shot.firstPerson()) {
                 var view=com.codex.blacklight.client.renderer.BlacklightPlayerRenderer.renderedView(client.player);
-                if(view==null||Math.abs(view.gameTime()-(client.level.getGameTime()+event.getPartialTick().getGameTimeDeltaPartialTick(false)))>1)throw new IllegalStateException("Native first-person renderer did not execute this frame");
+                if(view==null||Math.abs(view.gameTime()-(client.level.getGameTime()+event.renderTickTime))>1)throw new IllegalStateException("Native first-person renderer did not execute this frame");
                 if(view.result().nearestDepth()<.1499F)throw new IllegalStateException("Actual first-person mesh crosses near plane");
                 record.addProperty("handRenderingPath",view.route());
                 record.addProperty("handRendererGameTime",view.gameTime());record.addProperty("nearestViewmodelDepth",view.result().nearestDepth());

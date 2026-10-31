@@ -62,3 +62,15 @@ Actual native results remain explicitly distinct:
 - r12: started with the full suites and the additional entity-lifecycle suite; not yet an accepted result at the time of this entry.
 
 The 1,119-test JVM pass predates these latest changes. Final JVM, server, client, coinstalled-mod, multiplayer and ordinary packaged-artifact checks remain required. No zero-bug or final-package claim is made.
+
+### Actual client login and render acceptance in progress
+
+r12 completed all 535 required server checks: 534 passed; the idle carrier scenario alone failed. Its isolated eight-case actual-server subset passed. The full fixture now establishes an idle subject without stale nearby combat actors from earlier disposable batches; it still exercises real navigation and resource transfer. Another full run is required.
+
+The first actual client exposed a separate login regression: the registry now has 34 synchronized attachment fields, but the old envelope decoder allowed only 32. The bounded envelope now accepts at most 64 fields, validates its outgoing count too, and negotiates protocol `forge-1.20.1-18-full-sync`. The login-envelope test builds its table from the actual registered synchronized fields, rather than a hand-written 31-field sample. Seven packet-codec checks passed with no failures, errors or skips. The next actual client successfully joined and consumed the expanded snapshot.
+
+The native visual fixture completed 66 captures, but this is not a visual acceptance claim. Inspection exposed an out-of-frame photographer and an unlit artificial high platform. A QA-only camera wrapper now applies the observer immediately after the actual camera setup, before the view matrix. That corrected wall framing. Lighting diagnostics distinguish real native light values from rendering failures; the photographic stage now uses the naturally lit flat-world ground. These fixture changes do not alter production camera or lighting rules.
+
+An independent fresh-world native framebuffer check passed with actual skylight 15, baseline luminance 0.8303, sprint luminance 0.8112, a preserved foreign framebuffer binding and OpenGL error 0. The earlier attempted fixture copied GameTest metadata containing test-only registry IDs and stopped at a missing-mapping confirmation; it was retained as evidence and replaced by a new native fresh-world bootstrap. Such GameTest worlds are not playable release saves.
+
+Updated full JVM, combined full server, remaining mod combinations, actual multiplayer, all final visuals and ordinary reobfuscated artifacts remain pending. QA observer sources and config are opt-in and must be absent from distributable jars.
