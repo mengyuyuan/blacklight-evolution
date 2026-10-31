@@ -34,7 +34,8 @@ public final class ForgeTestConfigIsolation {
                     || !(config.getConfigData() instanceof CommentedFileConfig file)) {
                 throw new IllegalStateException("Expected a real loaded server config: " + config.getFileName());
             }
-            FileWatcher.defaultInstance().removeWatch(file.getNioPath());
+            // Keep a watch entry for Forge's normal unload path to remove once.
+            FileWatcher.defaultInstance().setWatch(file.getNioPath(), () -> {});
             var disk = new TomlParser().parse(Files.readString(file.getNioPath()));
             if (!spec.isCorrect(disk)) {
                 throw new IllegalStateException("Loaded config fails disk round-trip: " + config.getFileName());

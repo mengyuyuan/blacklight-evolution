@@ -127,7 +127,12 @@ public final class TissueAssimilationGameTest {
         try{
             host.setHealth(host.getMaxHealth()*.1F);var quoted=AssimilationSystem.quote(p,host);int before=com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.PLAYER_STATE).getEvolutionPoints();
             ConsumeSystem.request(p);
-            h.assertTrue(com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.CONSUMING),"actual human capture starts on the weakened evolved receiver");
+            h.assertTrue(com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.CONSUMING),
+                    "actual human capture starts on the weakened evolved receiver; eligible="+ConsumeSystem.eligible(host)
+                    +", ready="+ConsumeSystem.healthReady(p,host)+", terrain="+TerrainGrabSelection.targetsTerrain(p)
+                    +", sight="+p.hasLineOfSight(host)+", distance="+p.distanceTo(host)+", bounds="+host.getBoundingBox()
+                    +", onGround="+p.onGround()+", yaw="+com.codex.blacklight.movement.TraversalSteering.cameraYaw(p)
+                    +", locked="+CombatTargeting.locked(p)+", busy="+WeaponCombatSystem.busy(p));
             for(int i=0;i<80;i++){p.tickCount++;ConsumeSystem.tick(new net.minecraftforge.event.TickEvent.PlayerTickEvent(net.minecraftforge.event.TickEvent.Phase.END,p));}
             ConsumeSystem.consume(p);
             for(int i=0;i<220;i++){p.tickCount++;ConsumeSystem.tick(new net.minecraftforge.event.TickEvent.PlayerTickEvent(net.minecraftforge.event.TickEvent.Phase.END,p));}

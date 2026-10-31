@@ -23,7 +23,9 @@ public abstract class OptionalTwilightHydraMixin {
         var self = (LivingEntity)(Object)this;
         if (!TwilightCombat.applies(self, source, amount)) return original.call(source, amount);
         var hit = TwilightCombat.prepare(self, source, amount);
+        float vitality = self.getHealth() + self.getAbsorptionAmount();
         boolean accepted = original.call(hit.source(), hit.amount());
+        accepted &= self.getHealth() + self.getAbsorptionAmount() < vitality;
         if (accepted) ticksSinceDamaged = 0;
         return accepted;
     }

@@ -23,8 +23,8 @@ import com.codex.blacklight.forge.PacketDistributor;
 @EventBusSubscriber(modid="blacklight",value=Dist.CLIENT)
 public final class StandaloneSyncClientSmoke {
     private static final String PROPERTY="blacklight.test.standaloneSync";
-    private static final Path CLIENT=Path.of("D:/Blacklight-Standalone/run-sync-client-qa").toAbsolutePath().normalize();
-    private static final Path OUTPUT=Path.of("D:/Blacklight-Standalone/sync-dev10-native").toAbsolutePath().normalize();
+    private static final Path CLIENT=Path.of(System.getProperty("blacklight.test.qaDirectory","D:/Blacklight-Standalone/run-sync-client-qa")).toAbsolutePath().normalize();
+    private static final Path OUTPUT=Path.of(System.getProperty(PROPERTY,"D:/Blacklight-Standalone/sync-dev10-native")).toAbsolutePath().normalize();
     private static final JsonArray requests=new JsonArray(),samples=new JsonArray(),settingsAcks=new JsonArray();
     private static final Map<Integer,Set<Integer>> phases=new HashMap<>();
     private static final Map<Integer,Long> sessions=new HashMap<>();
@@ -52,6 +52,10 @@ public final class StandaloneSyncClientSmoke {
     @SubscribeEvent(priority=EventPriority.LOWEST)
     public static void tick(net.minecraftforge.event.TickEvent.ClientTickEvent event){if(event.phase!=net.minecraftforge.event.TickEvent.Phase.END)return;
         if(completed||failed||System.getProperty(PROPERTY,"").isBlank())return;var mc=Minecraft.getInstance();
+        if(mc.gameDirectory.toPath().toAbsolutePath().normalize().equals(CLIENT)) {
+            org.lwjgl.glfw.GLFW.glfwHideWindow(mc.getWindow().getWindow());
+            mc.mouseHandler.releaseMouse();
+        }
         if(mc.player==null||mc.level==null||mc.getConnection()==null)return;
         try{
             if(!initialized){

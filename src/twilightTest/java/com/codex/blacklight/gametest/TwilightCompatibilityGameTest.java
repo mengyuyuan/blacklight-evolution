@@ -169,6 +169,21 @@ public final class TwilightCompatibilityGameTest {
     }
 
     @GameTest(template="wall_test",timeoutTicks=30)
+    public static void cancelledNativeHydraDamageRemainsRejected(GameTestHelper h) {
+        try(var f=fixture(h,"hydra")) {
+            float before=f.boss.getHealth();
+            java.util.function.Consumer<net.minecraftforge.event.entity.living.LivingHurtEvent> cancel=e->{
+                if(e.getEntity()==f.boss)e.setCanceled(true);
+            };
+            net.minecraftforge.common.MinecraftForge.EVENT_BUS.addListener(cancel);
+            try {
+                h.assertTrue(!f.boss.hurt(nativeHit(f),10)&&f.boss.getHealth()==before,
+                        "native mechanism bridge must preserve a real Forge damage cancellation");
+            } finally {net.minecraftforge.common.MinecraftForge.EVENT_BUS.unregister(cancel);}
+        }h.succeed();
+    }
+
+    @GameTest(template="wall_test",timeoutTicks=30)
     public static void attachedSlimeFollowsMultipartSurfaceButCannotCrossWalls(GameTestHelper h) {
         try(var f=fixture(h,"hydra")) {
             f.boss.setHealth(1);

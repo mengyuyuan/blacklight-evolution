@@ -301,6 +301,11 @@ minecraft {
                 args '--width', '960', '--height', '640'
             }
             if (project.hasProperty('openAnimationTuner')) property 'blacklight.test.openAnimationTuner', 'true'
+            if (project.hasProperty('standaloneSync')) {
+                if (!project.hasProperty('clientRunDirectory')) throw new GradleException('Synchronization QA requires a disposable clientRunDirectory')
+                property 'blacklight.test.qaDirectory', file(project.property('clientRunDirectory')).absolutePath
+                args '--quickPlayMultiplayer', '127.0.0.1:25568', '--width', '960', '--height', '640'
+            }
             ['standaloneVisual', 'standaloneGait', 'standaloneLock', 'standaloneSkill', 'standaloneSync'].each { hook ->
                 if (project.hasProperty(hook)) property "blacklight.test.${hook}", file(project.property(hook)).absolutePath
             }
@@ -312,6 +317,11 @@ minecraft {
         }
         server {
             if (project.hasProperty('serverRunDirectory')) workingDirectory file(project.property('serverRunDirectory'))
+            if (project.hasProperty('standaloneSync')) {
+                if (!project.hasProperty('serverRunDirectory')) throw new GradleException('Synchronization QA requires a disposable serverRunDirectory')
+                property 'blacklight.test.qaDirectory', file(project.property('serverRunDirectory')).absolutePath
+                property 'blacklight.test.standaloneSync', file(project.property('standaloneSync')).absolutePath
+            }
             args '--nogui'
             jvmArgs '-Xmx'+(project.findProperty('gameTestMaxHeap') ?: '2G')
         }
@@ -641,10 +651,15 @@ tasks.named('jarJar') { finalizedBy 'reobfJarJar' }
 tasks.named('distributionZip') { dependsOn 'reobfJarJar' }
 
 // CI and a fresh clone must never produce another motion-less installable JAR.
-tasks.register('verifyBundledMotionResources') {
+tasks.register('verifyBundledMotionResources',JavaExec) {
     group = 'verification'
     dependsOn tasks.named('reobfJarJar')
-    doLast {
+    classpath=sourceSets.resourceTools.runtimeClasspath
+    mainClass='CompactMotionPacker'
+    maxHeapSize='512m'
+    jvmArgs '-XX:ActiveProcessorCount=2'
+    javaLauncher=javaToolchains.launcherFor {languageVersion=JavaLanguageVersion.of(17)}
+    doFirst {
         def source = file(bundledMotionDirectory.get())
         def profile = fileTree(source).matching { include '*.json', '*.data'; exclude 'devastator-fx.data' }.files
         if (profile.empty || !new File(source, 'basic_idle.json').isFile())
@@ -663,11 +678,7 @@ tasks.register('verifyBundledMotionResources') {
             if (!refmap.mappings || !refmap.data?.searge)
                 throw new GradleException('Empty Forge Mixin runtime mappings')
             profile.each { input ->
-                def entry = archive.getEntry("blacklight/bundled_motions/${input.name}")
-                if (entry == null) throw new GradleException("Missing bundled motion: ${input.name}")
-                def packed = archive.getInputStream(entry).withCloseable { it.readAllBytes() }
-                if (!java.util.Arrays.equals(packed, input.bytes))
-                    throw new GradleException("Bundled motion changed: ${input.name}")
+                def packed = input.bytes
                 if (manifest != null) {
                     def expected = manifest[input.name]
                     if (packed.length != expected.bytes)
@@ -679,8 +690,9 @@ tasks.register('verifyBundledMotionResources') {
                     }
                 }
             }
-            logger.lifecycle("Verified ${profile.size()} unchanged bundled motion/profile files")
+            logger.lifecycle("Verified ${profile.size()} source motion/profile entries and Forge runtime refmap")
         } finally { archive.close() }
+        setArgs(['--verify',tasks.named('jarJar',Jar).get().archiveFile.get().asFile.absolutePath,source.absolutePath])
     }
 }
 tasks.named('assemble') { dependsOn tasks.named('verifyBundledMotionResources') }

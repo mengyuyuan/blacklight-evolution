@@ -4,6 +4,8 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import os
+import tempfile
 import shutil
 import subprocess
 import tomllib
@@ -109,6 +111,80 @@ def source_snapshot(repo: Path, output: Path | None, baseline: dict[str, str] | 
     return hashes
 
 
+
+def verify_compact_motions(repo: Path, build: Path, jar: Path, profile: Path) -> None:
+    """The same bounded Java decoder must restore every original input byte."""
+    classes = build / 'classes/java/resourceTools'
+    require((classes / 'CompactMotionPacker.class').is_file(), 'Compile resourceTools classes before checking compact motions')
+    java_home = os.environ.get('JAVA_HOME')
+    java = str(Path(java_home) / 'bin' / ('java.exe' if os.name == 'nt' else 'java')) if java_home else shutil.which('java')
+    require(bool(java), 'Java 17 is required to verify the exact compact motion originals')
+    temporary_root = build / 'tmp/compact-verification'
+    temporary_root.mkdir(parents=True, exist_ok=True)
+    with tempfile.TemporaryDirectory(prefix='decoder-', dir=temporary_root) as directory:
+        target = Path(directory).resolve()
+        require(target.is_relative_to(temporary_root.resolve()), 'Decoder temporary path escaped its build directory')
+        with ZipFile(jar) as archive:
+            metadata = json.loads(archive.read('META-INF/jarjar/metadata.json'))
+            libraries = [item for item in metadata['jars'] if item['identifier'] == {'group': 'org.tukaani', 'artifact': 'xz'}]
+            require(len(libraries) == 1 and libraries[0]['version']['artifactVersion'] == '1.10', 'Missing tested pure-Java XZ dependency')
+            name = libraries[0]['path']
+            require(name.startswith('META-INF/jarjar/') and '..' not in name.split('/'), 'Invalid embedded decoder path')
+            library = target / 'xz.jar'
+            library.write_bytes(archive.read(name))
+        command = [java, '-Xmx512m', '-XX:ActiveProcessorCount=2', '-cp', os.pathsep.join((str(classes), str(library))),
+                   'CompactMotionPacker', '--verify', str(jar), str(profile)]
+        result = subprocess.run(command, capture_output=True, text=True, encoding='utf-8', errors='replace', timeout=600)
+        require(result.returncode == 0, f'Exact compact motion restoration failed: {result.stdout}\n{result.stderr}')
+
+
+def geographic_city_selected(repo: Path, archive: ZipFile) -> bool:
+    name = 'data/blacklight/city/generation.json'
+    names = set(archive.namelist())
+    if name not in names:
+        return False
+    profile = json.loads(archive.read(name))
+    require(profile.get('schema') == 1 and profile.get('mode') in ('archive', 'geographic'), 'Invalid city generation profile')
+    if profile['mode'] != 'geographic':
+        return False
+    require(archive.read(name) == (repo / 'src/main/resources' / name).read_bytes(), 'Stale geographic generation profile')
+    require(not any(n.startswith(('data/blacklight/city/los_angeles_full/', 'data/blacklight/city/los_angeles_compact/'))
+                    for n in names), 'Baked municipal archives leaked into the geographic package')
+    for city in ('shenzhen', 'los_angeles'):
+        index_name = f'data/blacklight/worldmap/{city}/index.json'
+        index = json.loads(archive.read(index_name))
+        require(index.get('schema') == 1 and index.get('region') == city and index.get('tiles'), f'Missing geographic city: {city}')
+        for tile in index['tiles']:
+            tile_name = f"data/blacklight/worldmap/{city}/{tile['x']}_{tile['z']}.json.gz"
+            require(tile_name in names or tile_name[:-3]+'.xz' in names, f'Missing geographic tile: {tile_name}')
+    require('data/blacklight/city/futian/map.json' in names
+            and 'data/blacklight/city/los_angeles/map.json' in names, 'Authored city cores must be retained')
+    return True
+
+
+def verify_compact_maps(repo: Path, build: Path, jar: Path) -> None:
+    classes = build / 'classes/java/resourceTools'
+    require((classes / 'CompactMapPacker.class').is_file(), 'Compile resourceTools classes before checking compact maps')
+    java_home = os.environ.get('JAVA_HOME')
+    java = str(Path(java_home) / 'bin' / ('java.exe' if os.name == 'nt' else 'java')) if java_home else shutil.which('java')
+    require(bool(java), 'Java 17 is required to verify the compact maps')
+    temporary_root = build / 'tmp/compact-map-verification'
+    temporary_root.mkdir(parents=True, exist_ok=True)
+    with tempfile.TemporaryDirectory(prefix='decoder-', dir=temporary_root) as directory:
+        with ZipFile(jar) as archive:
+            metadata = json.loads(archive.read('META-INF/jarjar/metadata.json'))
+            libraries = [item for item in metadata['jars'] if item['identifier'] == {'group': 'org.tukaani', 'artifact': 'xz'}]
+            require(len(libraries) == 1 and libraries[0]['version']['artifactVersion'] == '1.10', 'Missing tested map decoder')
+            name = libraries[0]['path']
+            require(name.startswith('META-INF/jarjar/') and '..' not in name.split('/'), 'Invalid embedded map decoder path')
+            library = Path(directory) / 'xz.jar'
+            library.write_bytes(archive.read(name))
+        command = [java, '-Xmx384m', '-XX:ActiveProcessorCount=2', '-cp', os.pathsep.join((str(classes), str(library))),
+                   'CompactMapPacker', '--verify', str(jar), str(repo / 'src/main/resources')]
+        result = subprocess.run(command, capture_output=True, text=True, encoding='utf-8', errors='replace', timeout=600)
+        require(result.returncode == 0, f'Exact compact map restoration failed: {result.stdout}\n{result.stderr}')
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--repo', type=Path, default=Path(__file__).resolve().parents[1])
@@ -152,8 +228,22 @@ def main() -> None:
         for name in notices:
             require(archive.read(name) == (repo / name).read_bytes(), f'Stale or missing notice: {name}')
         motion_prefix = 'blacklight/bundled_motions/'
-        motions = {name[len(motion_prefix):]: digest(archive.read(name)) for name in sorted(names)
-                   if name.startswith(motion_prefix) and not name.endswith('/')}
+        compact_motions = any(name.startswith(motion_prefix) and name.endswith('.jz') for name in names)
+        if compact_motions:
+            verify_compact_motions(repo, build, jar, args.private_motion_directory.resolve() if external else repo / 'art/motion-profile')
+            logical = [name[len(motion_prefix):-3] if name.endswith('.jz') else name[len(motion_prefix):]
+                       for name in names if name.startswith(motion_prefix) and not name.endswith('/')
+                       and name != motion_prefix + 'compact-index.json']
+            require(len(logical) == len(set(logical)) and set(logical) == set(expected), 'Compact logical motion inventory differs')
+            motions = dict(expected)  # Every archived decoded byte was compared above.
+        else:
+            motions = {name[len(motion_prefix):]: digest(archive.read(name)) for name in sorted(names)
+                       if name.startswith(motion_prefix) and not name.endswith('/')}
+        geographic_city = geographic_city_selected(repo, archive)
+        compact_maps = any(name.endswith('.xz') for name in names)
+        if compact_maps:
+            verify_compact_maps(repo, build, jar)
+
         require(motions == expected, 'Bundled resources differ from the exact selected input profile/manifest')
         classes = list((build / 'classes/java/main').rglob('*.class'))
         require(bool(classes), 'No compiled classes to verify')
@@ -180,10 +270,18 @@ def main() -> None:
                 if not path.is_file() or path.suffix == '.bbmodel' or '.cache' in path.parts:
                     continue
                 name = path.relative_to(resource_root).as_posix()
+                if geographic_city and name.startswith(('data/blacklight/city/los_angeles_full/', 'data/blacklight/city/los_angeles_compact/')):
+                    continue
+                if name in {'data/blacklight/dimension/city_futian.json', 'data/blacklight/dimension/city_legacy.json'}:
+                    require(name not in names, f'Legacy dimension unexpectedly shipped: {name}')
+                    continue
                 require(not path.is_symlink(), f'Production resource symlink needs explicit review: {name}')
                 data = path.read_bytes()
                 require(name not in resources or resources[name] == digest(data), f'Conflicting production resource roots: {name}')
                 resources[name] = digest(data)
+                if compact_maps and name.endswith('.gz') and name[:-3]+'.xz' in names:
+                    require(name not in names, f'Both map encodings shipped: {name}')
+                    continue  # Exact complete logical map bytes were verified above.
                 require(archive.read(name) == data, f'Stale or missing production resource: {name}')
     with ZipFile(dist) as archive:
         require(len(set(archive.namelist())) == len(archive.namelist()), 'Duplicate distribution entries')

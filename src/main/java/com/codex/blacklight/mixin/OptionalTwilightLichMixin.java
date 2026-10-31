@@ -21,7 +21,10 @@ public abstract class OptionalTwilightLichMixin {
         var self = (LivingEntity)(Object)this;
         if (!TwilightCombat.applies(self, source, amount)) return original.call(source, amount);
         var hit = TwilightCombat.prepare(self, source, amount);
+        float vitality = self.getHealth() + self.getAbsorptionAmount();
         boolean accepted = original.call(hit.source(), hit.amount());
+        // Forge 1.20 may return true even when LivingHurtEvent vetoed the hit.
+        accepted &= self.getHealth() + self.getAbsorptionAmount() < vitality;
         // Damage rejected by an event must not grant a successful shield break.
         if (accepted && getShieldStrength() > 0) {
             setShieldStrength(0);
