@@ -27,6 +27,7 @@ public final class EvolutionProgression {
     public static boolean mayActivate(Player p,CombatSkill skill){return canLearn(p,skill)
             ||PlayerEvolutionConfig.KEEP_LEGACY_PASSIVES.get()&&p.getData(ModAttachments.PLAYER_STATE).hasCombatSkill(skill);}
     public static void refresh(ServerPlayer p){
+        if(!p.isAlive()||p.isRemoved())return;
         if(!p.getData(ModAttachments.PLAYER_STATE).isInfected())return;
         var before=p.getData(ModAttachments.EVOLUTION_MILESTONES);var after=before;
         if(infiniteUnlocked(p)){
