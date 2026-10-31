@@ -103,4 +103,3 @@ public final class ClientWeaponCombat {
             PlayerMotionController.request(mc.player,key,payload.clipOffset());
     }
 }
-

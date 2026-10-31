@@ -505,6 +505,10 @@ tasks.named('test', Test).configure {
     dependsOn prepareForgeCapabilityTests
     classpath = forgeTestRuntime
     useJUnitPlatform()
+    // These tests bootstrap the real Minecraft registries and Forge capabilities.
+    // Gradle's default 512 MiB worker exhausts its heap during block-state setup.
+    maxHeapSize = '1536m'
+    maxParallelForks = 1
     // Native pose tests use the project-authored mathematical bind hierarchy.
 }
 
