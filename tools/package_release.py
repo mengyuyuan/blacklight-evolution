@@ -381,7 +381,12 @@ def main() -> None:
             inactive[name] = digest(path.read_bytes())
         meta = tomllib.loads(archive.read('META-INF/neoforge.mods.toml').decode('utf-8'))
         mod = next(m for m in meta['mods'] if m['modId'] == props['mod_id'])
-        require(mod['version'] == version and mod['authors'] == '末者', 'Version or author mismatch')
+        declared_meta = tomllib.loads((repo / 'src/main/templates/META-INF/neoforge.mods.toml').read_text(encoding='utf-8'))
+        declared_mod = next(m for m in declared_meta['mods'] if m['modId'] == '${mod_id}')
+        require(mod['version'] == version, 'Version mismatch')
+        require(mod.get('authors') == declared_mod.get('authors') and '末者' in mod.get('authors', ''),
+                'Author attribution differs from the source declaration or omits the original author')
+        require(mod.get('credits') == declared_mod.get('credits'), 'Contributor credits differ from the source declaration')
         manifest = manifest_values(archive.read('META-INF/MANIFEST.MF'))
         require(manifest.get('Blacklight-Build-Profile') == args.profile, 'Build profile mismatch')
         if args.profile in ('bundled', 'external-profile'):
