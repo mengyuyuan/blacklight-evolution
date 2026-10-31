@@ -12,7 +12,10 @@ import static org.junit.jupiter.api.Assertions.*;
 class AttachmentSyncPayloadTest {
     @Test void expandedLoginSnapshotRoundTripsWithoutDisconnect() {
         var fields=new LinkedHashMap<String,byte[]>();
-        for(int i=0;i<31;i++)fields.put("state_"+i,new byte[]{(byte)i});
+        com.codex.blacklight.registry.ModAttachments.types().forEach((name,type)->{
+            if(type.syncCodec()!=null)fields.put(name,new byte[]{(byte)fields.size()});
+        });
+        assertTrue(fields.size()>32,"the real current login schema must exercise the old 32-field disconnect");
         var packet=new AttachmentSyncPayload(7,UUID.randomUUID(),new ResourceLocation("minecraft","overworld"),fields);
         var buffer=new FriendlyByteBuf(Unpooled.buffer());
         try {
@@ -28,7 +31,7 @@ class AttachmentSyncPayloadTest {
         var buffer=new FriendlyByteBuf(Unpooled.buffer());
         try {
             buffer.writeVarInt(7);buffer.writeUUID(UUID.randomUUID());
-            buffer.writeResourceLocation(new ResourceLocation("minecraft","overworld"));buffer.writeVarInt(33);
+            buffer.writeResourceLocation(new ResourceLocation("minecraft","overworld"));buffer.writeVarInt(AttachmentSyncPayload.MAX_FIELDS+1);
             assertThrows(DecoderException.class,()->AttachmentSyncPayload.STREAM_CODEC.decode(buffer));
         } finally { buffer.release(); }
     }

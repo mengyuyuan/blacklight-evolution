@@ -16,7 +16,7 @@ class WingRenderFrameTest {
    assertEquals(local.length,view.length);assertArrayEquals(local,(float[])sourceField.get(model));
    for(int i=0;i<local.length;i+=6){
     var expected=stack.last().pose().transformPosition(new Vector3f(local[i],local[i+1],local[i+2]));
-    var expectedNormal=new Vector3f(local[i+3],local[i+4],local[i+5]);stack.last().normal().transform(expectedNormal);
+    var expectedNormal=new Vector3f(local[i+3],local[i+4],local[i+5]);expectedNormal.mul(stack.last().normal());
     assertEquals(expected.x,view[i],.00001F);assertEquals(expected.y,view[i+1],.00001F);assertEquals(expected.z,view[i+2],.00001F);
     assertEquals(expectedNormal.x,view[i+3],.00001F);assertEquals(expectedNormal.y,view[i+4],.00001F);assertEquals(expectedNormal.z,view[i+5],.00001F);
    }

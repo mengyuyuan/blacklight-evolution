@@ -7,7 +7,8 @@ modId="${mod_id}"
 version="${mod_version}"
 displayName="${mod_name}"
 displayURL="https://github.com/lingweiliang2510579032/blacklight-evolution/tree/forge-1.20.1"
-authors="末者 (original author); 雨夜 (Forge 1.20.1 maintenance)"
+authors="末者 (original author); 雨夜 (initial Forge 1.20.1 port); WWYFC (upstream military / Blackwatch systems)"
+credits="WWYFC (@yfcyy889-ops, military PR #95); 雨夜 (@lingweiliang2510579032, original Forge port PR #6). See repository docs/CONTRIBUTORS_ZH.md."
 description='''
 Blacklight: Ascension — independent Forge 1.20.1 port.
 Biological shapeshifting, consumption, disguise, movement and infected hive encounters.

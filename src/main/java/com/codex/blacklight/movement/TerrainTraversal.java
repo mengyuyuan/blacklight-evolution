@@ -9,6 +9,17 @@ import net.minecraft.world.phys.Vec3;
 public final class TerrainTraversal {
     private TerrainTraversal() { }
 
+    /** Continue an existing sprint motor over a short downward terrain step. */
+    public static boolean sprintSupported(Player player) {
+        if (player.onGround() || WaterRunning.onSurface(player)) return true;
+        if (player.isFallFlying() || player.getAbilities().flying || player.isNoGravity()
+                || player.isInWater() || player.isInLava()) return false;
+        var state = com.codex.blacklight.registry.ModAttachments.getData(player, com.codex.blacklight.registry.ModAttachments.MOVEMENT_STATE);
+        if (state.jumpHeld() || state.sprintDrive(player.tickCount).horizontalDistanceSqr() <= 1.0e-8) return false;
+        double downward = player.getDeltaMovement().y;
+        return downward <= .035 && downward >= -.5 && supportBelow(player, 1.05);
+    }
+
     public static boolean supportBelow(Player player, double distance) {
         Vec3 resolved = Entity.collideBoundingBox(player, new Vec3(0, -distance, 0),
                 player.getBoundingBox(), player.level(), List.of());

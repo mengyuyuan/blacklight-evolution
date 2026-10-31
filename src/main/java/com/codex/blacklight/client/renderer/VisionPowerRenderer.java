@@ -26,6 +26,9 @@ public final class VisionPowerRenderer {
     private static float strength;
     private static double lastFrame = -1;
     private static net.minecraft.client.multiplayer.ClientLevel previousLevel;
+    private static final org.joml.Matrix4f worldView = new org.joml.Matrix4f();
+    private static final org.joml.Matrix3f worldNormal = new org.joml.Matrix3f();
+    private static boolean worldViewReady;
     public static boolean effectFailed() { return failed; }
     public static boolean drawingSilhouettes() { return drawing; }
     private static int mode() {
@@ -48,7 +51,7 @@ public final class VisionPowerRenderer {
     @SubscribeEvent public static void tick(ClientTickEvent e){if(e.phase!=net.minecraftforge.event.TickEvent.Phase.END)return;
         var current = Minecraft.getInstance().level;
         if (current != previousLevel) {
-            closeEffect(); previousLevel = current; displayedMode = 0; strength = 0; lastFrame = -1; failed = false;
+            closeEffect(); previousLevel = current; displayedMode = 0; strength = 0; lastFrame = -1; failed = false; worldViewReady = false;
         }
     }
     private static int transition(Minecraft mc, float partial) {
@@ -90,9 +93,19 @@ public final class VisionPowerRenderer {
         } finally { mc.getMainRenderTarget().bindWrite(false); }
     }
     @SubscribeEvent public static void render(RenderLevelStageEvent e) {
+        // Forge 1.20 passes GameRenderer's projection PoseStack to AFTER_LEVEL.
+        // Capture the actual camera view while LevelRenderer still supplies it.
+        if (e.getStage() == RenderLevelStageEvent.Stage.AFTER_ENTITIES) {
+            worldView.set(e.getPoseStack().last().pose());
+            worldNormal.set(e.getPoseStack().last().normal());
+            worldViewReady = true;
+            return;
+        }
         if (e.getStage() != RenderLevelStageEvent.Stage.AFTER_LEVEL || drawing) return;
+        boolean capturedView = worldViewReady;
+        worldViewReady = false;
         var mc = Minecraft.getInstance();
-        if (mc.level == null || mc.player == null) return;
+        if (mc.level == null || mc.player == null || !capturedView) return;
         float partial = e.getPartialTick();
         int mode = transition(mc, partial);
         if (mode == 0 || strength <= 0) return;
@@ -107,9 +120,12 @@ public final class VisionPowerRenderer {
         targets.sort(java.util.Comparator.comparingDouble(mc.player::distanceToSqr));
         var buffer = mc.renderBuffers().bufferSource();
         var camera = e.getCamera().getPosition();
-        // Forge supplies view rotation in the event PoseStack. Use an identity
-        // shader model-view to avoid applying it twice after PostChain; restore
-        // both global matrices when the silhouette pass ends.
+        // Transform model vertices by the captured world view exactly once.
+        // PostChain replaces global matrices; restore both after the pass.
+        var stack = new PoseStack();
+        stack.last().pose().set(worldView);
+        stack.last().normal().set(worldNormal);
+        var viewToWorld = new org.joml.Matrix4f(worldView).invert();
         var view = com.mojang.blaze3d.systems.RenderSystem.getModelViewStack();
         view.pushPose();
         view.setIdentity();
@@ -124,15 +140,15 @@ public final class VisionPowerRenderer {
                 var out = buffer.getBuffer(RenderType.entityTranslucentEmissive(ConsumedMobVisuals.WHITE));
                 var pos = target.getPosition(partial).subtract(camera);
                 boolean hot = mode == 1 && !(target instanceof net.minecraft.world.entity.animal.AbstractGolem);
-                var tint = new Tint(out, color, strength, hot, (float)pos.y, target.getBbHeight(), target.isOnFire());
+                var tint = new Tint(out, color, strength, hot, (float)pos.y, target.getBbHeight(), target.isOnFire(), viewToWorld);
                 // Non-entity buffers include labels, fire and debug effects; omit them from this pass.
-                var discard = new Tint(null, 0, 0, false, 0, 1, false);
+                var discard = new Tint(null, 0, 0, false, 0, 1, false, null);
                 MultiBufferSource colored = type -> type.format() == DefaultVertexFormat.NEW_ENTITY && type.mode() == VertexFormat.Mode.QUADS ? tint : discard;
                 // Render only the model. Dispatcher.render also submits its
                 // shadow as NEW_ENTITY quads, which turned the floor orange.
                 var renderer=mc.getEntityRenderDispatcher().getRenderer(target);
                 var offset=renderer.getRenderOffset(target,partial);
-                var stack=e.getPoseStack();stack.pushPose();
+                stack.pushPose();
                 try{
                     stack.translate(pos.x+offset.x,pos.y+offset.y,pos.z+offset.z);
                     renderer.render(target,target.getYRot(),partial,stack,colored,LightTexture.FULL_BRIGHT);
@@ -150,14 +166,19 @@ public final class VisionPowerRenderer {
     private static final class Tint implements VertexConsumer {
         private final VertexConsumer out; private final int color;
         private final float opacity, baseY, height; private final boolean thermal, burning;
+        private final org.joml.Matrix4f viewToWorld;
         private float vertexY;
-        Tint(VertexConsumer out, int color, float opacity, boolean thermal, float baseY, float height, boolean burning) {
+        Tint(VertexConsumer out, int color, float opacity, boolean thermal, float baseY, float height, boolean burning, org.joml.Matrix4f viewToWorld) {
             this.out=out;this.color=color;this.opacity=opacity;this.thermal=thermal;this.baseY=baseY;this.height=Math.max(.1F,height);this.burning=burning;
+            this.viewToWorld=viewToWorld;
         }
         public void endVertex(){if(out!=null)out.endVertex();}
         public void defaultColor(int r,int g,int b,int a){if(out!=null)out.defaultColor(r,g,b,a);}
         public void unsetDefaultColor(){if(out!=null)out.unsetDefaultColor();}
-        public VertexConsumer vertex(double x, double y, double z) { vertexY=(float)y;if (out != null) out.vertex(x,y,z); return this; }
+        public VertexConsumer vertex(double x, double y, double z) {
+            vertexY=thermal&&viewToWorld!=null?(float)(viewToWorld.m01()*x+viewToWorld.m11()*y+viewToWorld.m21()*z+viewToWorld.m31()):(float)y;
+            if (out != null) out.vertex(x,y,z); return this;
+        }
         public VertexConsumer color(int r, int g, int b, int a) {
             if (out != null) {
                 int alpha=(int)((color>>>24)*opacity);

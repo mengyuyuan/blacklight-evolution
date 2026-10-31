@@ -8,8 +8,8 @@ class BiomassStateTest {
  @Test void saveKeepsCommittedConsumptionButNotWorldLocalVictimIds(){
    var start=new BiomassState(BiomassState.CRAWLING,10,true,"550e8400-e29b-41d4-a716-446655440000","claws",-1);
    for(var s:java.util.List.of(start.absorb(42,20),start.reform(30),start.ready(50))){
-     var json=BiomassState.CODEC.encodeStart(JsonOps.INSTANCE,s).getOrThrow(false,error->{throw new AssertionError(error);});
-     var saved=BiomassState.CODEC.parse(JsonOps.INSTANCE,json).getOrThrow(false,error->{throw new AssertionError(error);});
+     var json=BiomassState.CODEC.encodeStart(JsonOps.INSTANCE,s).getOrThrow(false, message -> { throw new AssertionError(message); });
+     var saved=BiomassState.CODEC.parse(JsonOps.INSTANCE,json).getOrThrow(false, message -> { throw new AssertionError(message); });
      assertEquals(-1,saved.victim());assertEquals(s.phase(),saved.phase());assertEquals(s.shell(),saved.shell());assertEquals(s.consumed(),saved.consumed());
    }
  }

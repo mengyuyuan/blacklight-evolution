@@ -31,8 +31,8 @@ class SupersonicFlightTest {
             assertTrue(s.buyMovementUpgrade(u));assertFalse(s.buyMovementUpgrade(u));
         }
         assertEquals(5800,s.getEvolutionPoints());
-        var json=BlacklightState.CODEC.encodeStart(JsonOps.INSTANCE,s).getOrThrow(false, error->{throw new AssertionError(error);});
-        var restored=BlacklightState.CODEC.parse(JsonOps.INSTANCE,json).getOrThrow(false, error->{throw new AssertionError(error);});
+        var json=BlacklightState.CODEC.encodeStart(JsonOps.INSTANCE,s).getOrThrow(false, message -> { throw new AssertionError(message); });
+        var restored=BlacklightState.CODEC.parse(JsonOps.INSTANCE,json).getOrThrow(false, message -> { throw new AssertionError(message); });
         assertEquals(3,MovementUpgrade.wingTier(restored.getMovementUpgradeMask()));
         assertEquals(0,MovementUpgrade.wingTier(MovementUpgrade.WING_SPEED_3.bit()));
     }

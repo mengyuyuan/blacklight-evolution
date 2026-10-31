@@ -20,7 +20,7 @@ import java.util.List;
 public final class UpgradeScreen extends Screen {
     private static final int BG=0xFF101114, PANEL=0xFF1A1C20, RED=0xFFE94B42, TEXT=0xFFE9E5DF, DIM=0xFFABA9A7;
     private static final int TOP=48,ROW=31;
-    private enum Category { BASIC, MOVEMENT, CLAW, FORMS, COMBAT, UTILITY, BIOLOGY, ATTRIBUTES, SETTINGS;
+    private enum Category { BASIC, MOVEMENT, CLAW, FORMS, COMBAT, UTILITY, BIOLOGY, ORGANS, EVOLUTION, ATTRIBUTES, SETTINGS;
         Component label(){return Component.translatable("screen.blacklight.section."+name().toLowerCase(java.util.Locale.ROOT));}}
     private record Entry(String id,int cost,String required,boolean free) {}
     private Category category=Category.BASIC;
@@ -42,7 +42,7 @@ public final class UpgradeScreen extends Screen {
         addRenderableWidget(new TutorialButton(width-31,8,22,20,Component.literal("×"),b->onClose()));
         purchase=addRenderableWidget(new TutorialButton(detailX,height-25,Math.max(60,detailWidth),20,Component.empty(),b->activate()));
         rebuild();
-        if(!selected.isEmpty()&&category!=Category.SETTINGS&&category!=Category.ATTRIBUTES)gif.select(SkillTutorial.forSkill(selected).family());
+        if(!selected.isEmpty()&&category!=Category.SETTINGS&&category!=Category.ATTRIBUTES&&category!=Category.ORGANS&&category!=Category.EVOLUTION)gif.select(SkillTutorial.forSkill(selected).family());
     }
     private void rebuild(){
         entries.clear();
@@ -54,7 +54,9 @@ public final class UpgradeScreen extends Screen {
             case COMBAT -> {for(var u:CombatSkill.values())if(!u.shieldBorer()&&!u.adaptivePassive())entries.add(new Entry(u.id(),u.epCost(),u.requires()!=null?u.requires().id():u.movementRequires()!=null?u.movementRequires().id():u.powerRequires()!=null?u.powerRequires().id():null,false));}
             case UTILITY -> {entries.add(new Entry(RicochetRules.ID,0,null,false));for(var u:List.of(PowerForm.SHIELD,PowerForm.ARMOR,PowerForm.THERMAL_VISION,PowerForm.INFECTED_VISION,PowerForm.BIOMASS,PowerForm.SOVEREIGN_WINGS))entries.add(new Entry(u.id(),u.epCost(),null,false));for(var u:CombatSkill.values())if(u.shieldBorer())entries.add(new Entry(u.id(),u.epCost(),u.requires()==null?PowerForm.SHIELD.id():u.requires().id(),false));}
             case BIOLOGY -> {for(var u:CombatSkill.values())if(u.adaptivePassive())entries.add(new Entry(u.id(),u.epCost(),u.requires()==null?null:u.requires().id(),false));for(var u:GrowthUpgrade.values())entries.add(new Entry(u.id,u.cost,u.requires()==null?null:u.requires().id,false));}
-            case SETTINGS -> {for(String id:List.of("bulletdive_blocks","shield_borer_blocks","prototype_item_pickup","passive_stacks","health_hud","wing_speed"))entries.add(new Entry(id,0,null,true));}
+            case ORGANS -> {for(var core:com.codex.blacklight.infection.TissueCore.values())if(core.legacy())entries.add(new Entry(core.id,0,null,false));}
+            case EVOLUTION -> {for(var a:EvolutionAttribute.values())entries.add(new Entry(a.id,0,null,false));}
+            case SETTINGS -> {for(String id:List.of("bulletdive_blocks","shield_borer_blocks","prototype_item_pickup","passive_stacks","infection_zones","health_hud","wing_speed","wing_appearance"))entries.add(new Entry(id,0,null,true));}
             default -> {}
         }
         if(entries.stream().noneMatch(e->e.id.equals(selected)))select(entries.isEmpty()?"":entries.get(0).id);
@@ -62,20 +64,31 @@ public final class UpgradeScreen extends Screen {
     }
     private void select(String id){
         selected=id;detailScroll=0;selectedAt=System.nanoTime();paused=false;
-        if(!id.isEmpty()&&category!=Category.SETTINGS)gif.select(SkillTutorial.forSkill(id).family());else gif.close();
+        if(!id.isEmpty()&&category!=Category.SETTINGS&&category!=Category.ORGANS&&category!=Category.EVOLUTION)gif.select(SkillTutorial.forSkill(id).family());else gif.close();
     }
     private Entry entry(){return entries.stream().filter(e->e.id.equals(selected)).findFirst().orElse(null);}
     private Component label(String id){return Component.translatable((category==Category.SETTINGS?"setting.blacklight.":"upgrade.blacklight.")+id);}
     private static BlacklightState state(){var p=Minecraft.getInstance().player;return p==null?null:com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.PLAYER_STATE);}
-    private boolean owns(Entry e){return e.free||owned(state(),e.id);}
-    private boolean prerequisite(Entry e){return e.id.equals(RicochetRules.ID)?minecraft.player!=null&&ProjectileDefenseSystem.unlocked(minecraft.player):e.required==null||owned(state(),e.required);}
-    private int cost(Entry e){return e.id.equals(RicochetRules.ID)&&minecraft.player!=null?RicochetRules.cost(ProjectileDefenseSystem.level(minecraft.player)):e.cost;}
+    private com.codex.blacklight.state.OrganResearch research(){return minecraft.player==null?com.codex.blacklight.state.OrganResearch.EMPTY:com.codex.blacklight.registry.ModAttachments.getData(minecraft.player, ModAttachments.ORGAN_RESEARCH);}
+    private boolean owns(Entry e){if(EvolutionAttribute.byId(e.id)!=null)return false;var core=com.codex.blacklight.infection.TissueCore.byId(e.id);return core!=null?research().rank(core)>=3:e.free||owned(state(),e.id);}
+    private boolean prerequisite(Entry e){
+        if(EvolutionAttribute.byId(e.id)!=null)return minecraft.player!=null&&EvolutionProgression.infiniteUnlocked(minecraft.player);
+        var skill=CombatSkill.byId(e.id);if(skill!=null&&skill.adaptivePassive()&&(minecraft.player==null||!EvolutionProgression.canLearn(minecraft.player,skill)))return false;
+        var core=com.codex.blacklight.infection.TissueCore.byId(e.id);if(core!=null)return research().canBuy(core);
+        return e.id.equals(RicochetRules.ID)?minecraft.player!=null&&ProjectileDefenseSystem.unlocked(minecraft.player):e.required==null||owned(state(),e.required);
+    }
+    private int cost(Entry e){var a=EvolutionAttribute.byId(e.id);if(a!=null)return PlayerEvolutionConfig.COST.get();var core=com.codex.blacklight.infection.TissueCore.byId(e.id);if(core!=null)return com.codex.blacklight.infection.TissueCore.cost(research().rank(core)+1);return e.id.equals(RicochetRules.ID)&&minecraft.player!=null?RicochetRules.cost(ProjectileDefenseSystem.level(minecraft.player)):e.cost;}
+    private long evolutionRank(EvolutionAttribute a){return minecraft.player==null?0:InfiniteEvolutionSystem.rank(minecraft.player,a);}
     private int balance(){var s=state();return s==null?0:s.getEvolutionPoints();}
     private void activate(){
         var e=entry();if(e==null||minecraft.player==null)return;
         if(category==Category.SETTINGS){
+            if(e.id.equals("wing_appearance")){
+                PacketDistributor.sendToServer(new SkillSettingsPayload(SkillSettingsPayload.Setting.PRECISION_WINGS,!settingEnabled(e.id)));return;
+            }
             if(e.id.equals("health_hud")||e.id.equals("wing_speed")){minecraft.setScreen(new PresentationSettingsScreen(this,e.id.equals("health_hud")));return;}
             if (e.id.equals("passive_stacks")) { com.codex.blacklight.config.PassiveHudConfig.toggle(); refreshButton(); return; }
+            if(e.id.equals("infection_zones")){var option=com.codex.blacklight.config.PassiveHudConfig.SHOW_ZONE;option.set(!option.get());com.codex.blacklight.config.PassiveHudConfig.SPEC.save();refreshButton();return;}
             var setting=switch(e.id){
                 case "shield_borer_blocks" -> SkillSettingsPayload.Setting.SHIELD_BORER_BLOCKS;
                 case "prototype_item_pickup" -> SkillSettingsPayload.Setting.PROTOTYPE_ITEM_PICKUP;
@@ -86,8 +99,10 @@ public final class UpgradeScreen extends Screen {
         if(!owns(e)&&prerequisite(e)&&balance()>=cost(e))PacketDistributor.sendToServer(new UpgradePurchasePayload(e.id));
     }
     private boolean settingEnabled(String id){
+        if(id.equals("wing_appearance"))return minecraft.player!=null&&com.codex.blacklight.registry.ModAttachments.getData(minecraft.player, ModAttachments.SKILL_SETTINGS).precisionWings();
         if(id.equals("health_hud")||id.equals("wing_speed"))return true;
         if (id.equals("passive_stacks")) return com.codex.blacklight.config.PassiveHudConfig.SHOW_STACKS.get();
+        if(id.equals("infection_zones"))return com.codex.blacklight.config.PassiveHudConfig.SHOW_ZONE.get();
         if(minecraft.player==null)return false;
         var settings=com.codex.blacklight.registry.ModAttachments.getData(minecraft.player,ModAttachments.SKILL_SETTINGS);
         return switch(id){
@@ -98,8 +113,23 @@ public final class UpgradeScreen extends Screen {
     }
     private void refreshButton(){
         var e=entry();if(e==null)return;
+        if(EvolutionAttribute.byId(e.id)!=null&&!prerequisite(e)){
+            purchase.active=false;purchase.setMessage(Component.translatable("screen.blacklight.evolution_locked"));return;
+        }
+        var skill=CombatSkill.byId(e.id);
+        if(skill!=null&&skill.adaptivePassive()&&owns(e)&&minecraft.player!=null&&!EvolutionProgression.mayActivate(minecraft.player,skill)){
+            purchase.active=false;purchase.setMessage(Component.translatable("screen.blacklight.passive_suspended"));return;
+        }
+        var core=com.codex.blacklight.infection.TissueCore.byId(e.id);
+        if(core!=null){
+            var progress=research();purchase.active=minecraft.player!=null&&progress.canBuy(core)&&balance()>=cost(e);
+            purchase.setMessage(Component.translatable(progress.rank(core)>=3?"screen.blacklight.organ_max":!progress.canBuy(core)?"screen.blacklight.organ_need_specimen":"screen.blacklight.state_cost",progress.canBuy(core)?cost(e):progress.rank(core)+1));return;
+        }
         if(category==Category.SETTINGS){
             boolean on=settingEnabled(e.id);
+            if(e.id.equals("wing_appearance")){
+                purchase.setMessage(Component.translatable(on?"setting.blacklight.wing_appearance.precision":"setting.blacklight.wing_appearance.classic"));purchase.active=minecraft.player!=null;return;
+            }
             purchase.setMessage(Component.translatable(e.id.equals("health_hud")||e.id.equals("wing_speed")?"screen.blacklight.configure_setting":on?"screen.blacklight.setting_on":"screen.blacklight.setting_off"));purchase.active=minecraft.player!=null;return;
         }
         purchase.active=minecraft.player!=null&&!owns(e)&&prerequisite(e)&&balance()>=cost(e);
@@ -124,7 +154,11 @@ public final class UpgradeScreen extends Screen {
                 g.fill(listX,y,listX+listWidth,y+ROW-3,chosen?0xFF682C29:hover?0xFF302627:PANEL);
                 if(chosen)g.fill(listX,y,listX+2,y+ROW-3,RED);
                 g.drawString(font,font.plainSubstrByWidth(label(e.id).getString(),listWidth-12),listX+7,y+5,TEXT,false);
-                var status=Component.translatable(category==Category.SETTINGS?(settingEnabled(e.id)?"screen.blacklight.setting_on":"screen.blacklight.setting_off"):owns(e)?"tutorial.blacklight.learned":prerequisite(e)?"tutorial.blacklight.available":"tutorial.blacklight.locked");
+                var organ=com.codex.blacklight.infection.TissueCore.byId(e.id);
+                var evolution=EvolutionAttribute.byId(e.id);
+                var status=category==Category.SETTINGS&&e.id.equals("wing_appearance")?Component.translatable(settingEnabled(e.id)?"setting.blacklight.wing_appearance.row_precision":"setting.blacklight.wing_appearance.row_classic"):
+                        evolution!=null?Component.translatable("screen.blacklight.infinite_rank",evolutionRank(evolution)):organ!=null?Component.translatable("screen.blacklight.organ_row",research().rank(organ),research().sample(organ)):
+                        Component.translatable(category==Category.SETTINGS?(settingEnabled(e.id)?"screen.blacklight.setting_on":"screen.blacklight.setting_off"):owns(e)?"tutorial.blacklight.learned":prerequisite(e)?"tutorial.blacklight.available":"tutorial.blacklight.locked");
                 g.drawString(font,status,listX+7,y+17,owns(e)?0xFFB1BEAE:0xFFD6A089,false);y+=ROW;
             }
             g.disableScissor();bar(g,listX+listWidth-2,TOP,bottom,listScroll,entries.size()*ROW);
@@ -137,7 +171,28 @@ public final class UpgradeScreen extends Screen {
         var e=entry();if(e==null)return;
         g.fill(detailX-3,TOP-4,width-8,bottom,0xFF16181B);g.enableScissor(detailX,TOP,width-10,bottom);
         int y=paragraph(g,label(e.id),TOP-detailScroll,TEXT)+6;
-        if(category!=Category.SETTINGS&&!e.id.equals(RicochetRules.ID)){
+        if(category==Category.EVOLUTION&&minecraft.player!=null){
+            if(EvolutionProgression.infiniteUnlocked(minecraft.player))y=paragraph(g,Component.translatable("screen.blacklight.evolution_unlocked"),y,0xFFB1BEAE)+8;
+            else{
+                var missing=EvolutionProgression.missing(minecraft.player);int total=BaseEvolutionCatalog.REQUIREMENTS.size();
+                y=paragraph(g,Component.translatable("screen.blacklight.evolution_curriculum",total-missing.size(),total),y,RED)+5;
+                y=paragraph(g,Component.translatable("screen.blacklight.evolution_curriculum_desc"),y,DIM)+6;
+                for(var requirement:missing.stream().limit(10).toList())y=paragraph(g,Component.translatable("screen.blacklight.evolution_missing",Component.translatable("upgrade.blacklight."+requirement.id())),y,TEXT)+2;
+                if(missing.size()>10)y=paragraph(g,Component.translatable("screen.blacklight.evolution_more",missing.size()-10),y,DIM)+4;
+                y+=8;
+            }
+        }
+        var passive=CombatSkill.byId(e.id);
+        if(passive!=null&&passive.adaptivePassive()&&minecraft.player!=null){
+            if(EvolutionProgression.canLearn(minecraft.player,passive))y=paragraph(g,Component.translatable("screen.blacklight.passive_qualified"),y,0xFFB1BEAE)+8;
+            else{
+                int required=EvolutionProgression.required(passive);
+                y=paragraph(g,Component.translatable("screen.blacklight.passive_requirement",required),y,RED)+5;
+                for(var a:EvolutionProgression.CORE_ATTRIBUTES)y=paragraph(g,Component.translatable("screen.blacklight.passive_rank",Component.translatable("upgrade.blacklight."+a.id),InfiniteEvolutionSystem.rank(minecraft.player,a),required),y,DIM)+2;
+                y+=8;
+            }
+        }
+        if(category!=Category.SETTINGS&&category!=Category.ORGANS&&category!=Category.EVOLUTION&&!e.id.equals(RicochetRules.ID)){
             var tutorial=SkillTutorial.forSkill(e.id);int previewHeight=previewHeight();
             g.fill(detailX,y,detailX+detailWidth,y+previewHeight,0xFF22262B);
             long elapsed=((paused?pausedAt:System.nanoTime())-selectedAt)/1_000_000;
@@ -150,6 +205,19 @@ public final class UpgradeScreen extends Screen {
         }
         y=paragraph(g,Component.translatable("tutorial.blacklight.effect"),y,RED)+4;
         y=paragraph(g,Component.translatable((category==Category.SETTINGS?"setting.blacklight.":"upgrade.blacklight.")+e.id+".desc"),y,DIM)+8;
+        var evolution=EvolutionAttribute.byId(e.id);
+        if(evolution!=null){
+            long rank=evolutionRank(evolution);
+            y=paragraph(g,Component.translatable("screen.blacklight.infinite_stats",rank,rank==Long.MAX_VALUE?rank:rank+1,cost(e)),y,TEXT)+8;
+            y=paragraph(g,Component.translatable("screen.blacklight.infinite_effect",
+                    Component.translatable("upgrade.blacklight."+e.id+".value",String.format(java.util.Locale.ROOT,"%.2f",evolution.effect(rank))),
+                    Component.translatable("upgrade.blacklight."+e.id+".value",String.format(java.util.Locale.ROOT,"%.2f",evolution.effect(rank==Long.MAX_VALUE?rank:rank+1)))),y,TEXT)+8;
+        }
+        var core=com.codex.blacklight.infection.TissueCore.byId(e.id);
+        if(core!=null){
+            var progress=research();y=paragraph(g,Component.translatable("screen.blacklight.organ_progress",progress.sample(core),progress.rank(core),cost(e)),y,TEXT)+8;
+            y=paragraph(g,Component.translatable("screen.blacklight.organ_acquire"),y,DIM)+8;
+        }
         if(e.id.equals(RicochetRules.ID)&&minecraft.player!=null){
             long level=ProjectileDefenseSystem.level(minecraft.player);
             y=paragraph(g,Component.translatable("screen.blacklight.ricochet_stats",level,
@@ -185,7 +253,7 @@ public final class UpgradeScreen extends Screen {
             int step=Math.max(14,Math.min(27,(height-54)/Category.values().length));
             if(x>=4&&x<rail&&y>=TOP&&y<TOP+step*Category.values().length){category=Category.values()[(int)(y-TOP)/step];listScroll=detailScroll=0;rebuild();return true;}
             if(x>=listX&&x<listX+listWidth&&y>=TOP&&y<bottom){int index=((int)y-TOP+listScroll)/ROW;if(index<entries.size()){select(entries.get(index).id);return true;}}
-            if(category!=Category.ATTRIBUTES&&category!=Category.SETTINGS&&x>=detailX&&x<detailX+detailWidth&&y>=TOP&&y<bottom){
+            if(category!=Category.ATTRIBUTES&&category!=Category.SETTINGS&&category!=Category.ORGANS&&category!=Category.EVOLUTION&&x>=detailX&&x<detailX+detailWidth&&y>=TOP&&y<bottom){
                 int start=TOP-detailScroll+font.split(label(selected),Math.max(50,detailWidth-6)).size()*11+6;
                 if(y>=start&&y<start+previewHeight()+15){if(paused){selectedAt+=System.nanoTime()-pausedAt;paused=false;}else{pausedAt=System.nanoTime();paused=true;}return true;}
             }

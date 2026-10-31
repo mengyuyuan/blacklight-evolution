@@ -34,6 +34,10 @@
     "minecraft:axolotl",
     "minecraft:ocelot",
     "minecraft:camel",
-    "minecraft:sniffer"
+    "minecraft:sniffer",
+    {
+      "id": "minecraft:armadillo",
+      "required": false
+    }
   ]
 }

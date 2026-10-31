@@ -42,7 +42,7 @@ public final class ColossusEvolutionSystem {
     private ColossusEvolutionSystem() {}
 
     @SubscribeEvent
-    public static void onTick(ForgeEntityTickEvent.Post event) {
+    public static void onTick(com.codex.blacklight.combat.ForgeEntityTickEvent.Post event) {
         Entity entity = event.getEntity();
         if (!(entity.level() instanceof ServerLevel level)) return;
         if (entity instanceof BlacklightHive hive) {

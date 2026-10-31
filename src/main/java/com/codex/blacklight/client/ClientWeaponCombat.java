@@ -34,9 +34,10 @@ public final class ClientWeaponCombat {
     static void setFixtureOwnsInput(boolean owns){fixtureOwnsInput=owns;}
     private ClientWeaponCombat(){}
     public static boolean active(){
-        var mc=Minecraft.getInstance();if(mc.player==null||mc.screen!=null)return false;
+        var mc=Minecraft.getInstance();if(mc.player==null||mc.screen!=null||com.codex.blacklight.firearms.FirearmsCombat.holdingFirearm(mc.player))return false;
         var state=com.codex.blacklight.registry.ModAttachments.getData(mc.player, ModAttachments.PLAYER_STATE);
-        return !com.codex.blacklight.city.HydraTransport.active(mc.player)&&state.isPrototypeMode()&&state.isInfected()&&WeaponMove.controls(state.getActivePower(),mc.player.getMainHandItem().isEmpty()&&mc.player.getOffhandItem().isEmpty())&&!com.codex.blacklight.registry.ModAttachments.getData(mc.player, ModAttachments.CONSUMING);
+        return !com.codex.blacklight.city.HydraTransport.active(mc.player)&&new PersonalCombatInput(state.isInfected(),state.isPrototypeMode(),state.getActivePower(),
+                mc.player.getMainHandItem().isEmpty()&&mc.player.getOffhandItem().isEmpty(),com.codex.blacklight.registry.ModAttachments.getData(mc.player, ModAttachments.CONSUMING),VehicleControls.ownsInput()).active();
     }
     public static void poll(){
         if(fixtureOwnsInput)return;

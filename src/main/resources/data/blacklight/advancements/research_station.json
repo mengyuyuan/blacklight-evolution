@@ -23,7 +23,7 @@
           {
             "condition": "minecraft:location_check",
             "predicate": {
-              "structure": "blacklight:frozen_research_station"
+              "structures": "blacklight:frozen_research_station"
             }
           }
         ]

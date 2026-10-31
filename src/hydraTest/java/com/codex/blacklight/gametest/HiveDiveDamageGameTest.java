@@ -23,7 +23,7 @@ public final class HiveDiveDamageGameTest {
     public static void rapidArmorPiercingHitsCannotDeleteHiveOrStaggerIt(GameTestHelper h){
         var p=FakePlayerFactory.get(h.getLevel(),new GameProfile(UUID.randomUUID(),"HiveGunQA"));
         p.moveTo(h.absolutePos(new BlockPos(4,3,4)).getCenter());
-        var state=ModAttachments.getData(p,ModAttachments.PLAYER_STATE);state.infect();state.setPrototypeMode(true);
+        var state=com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.PLAYER_STATE);state.infect();state.setPrototypeMode(true);
         var hive=h.spawn(ModEntities.BLACKLIGHT_HIVE.get(),5,2,5);hive.setNoAi(true);
         var arrow=EntityType.ARROW.create(h.getLevel());arrow.setOwner(p);
         // Reproduce two TaCZ damage parts and its invulnerableTime resets.
@@ -42,7 +42,7 @@ public final class HiveDiveDamageGameTest {
         }
         h.assertTrue(hive.isAlive()&&before-hive.getHealth()<=HiveDefense.MAX_CHIP*units+.001,"magazine/AP parts bypassed structural interval");
         ImpactControl.begin(hive,new ImpactProfile(HitReaction.LAUNCH,ImpactProfile.UP,40,1,1,true),0);
-        h.assertTrue(!ImpactControl.stunned(hive)&&ModAttachments.getData(hive,ModAttachments.HIT_REACTION).duration()==0,"building acquired a knockdown pose");
+        h.assertTrue(!ImpactControl.stunned(hive)&&com.codex.blacklight.registry.ModAttachments.getData(hive, ModAttachments.HIT_REACTION).duration()==0,"building acquired a knockdown pose");
         hive.setDeltaMovement(Vec3.ZERO);hive.push(3,2,1);hive.knockback(3,1,0);
         h.assertTrue(hive.getDeltaMovement().equals(Vec3.ZERO),"building was pushed");
         hive.invulnerableTime=0;float afterBullets=hive.getHealth();

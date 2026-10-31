@@ -19,7 +19,8 @@ public enum CombatSkill {
     BLOCK_THROW_3("block_throw_3", 1 << 14, 450, BLOCK_THROW_2),
     ADAPTATION("adaptation", 1 << 15, 350, null),
     TISSUE_REGENERATION("tissue_regeneration", 1 << 16, 350, null),
-    ADAPTATION_PERCENT("adaptation_percent", 1 << 17, 500, ADAPTATION);
+    ADAPTATION_PERCENT("adaptation_percent", 1 << 17, 500, ADAPTATION),
+    TISSUE_REGENERATION_PERCENT("tissue_regeneration_percent", 1 << 18, 500, TISSUE_REGENERATION);
 
     private final String id;
     private final int bit, epCost;
@@ -32,7 +33,8 @@ public enum CombatSkill {
     public int bit() { return bit; }
     public int epCost() { return epCost; }
     public CombatSkill requires() { return requires; }
-    public boolean adaptivePassive() { return this == ADAPTATION || this == TISSUE_REGENERATION || this == ADAPTATION_PERCENT; }
+    public boolean adaptivePassive() { return this == ADAPTATION || this == TISSUE_REGENERATION || advancedPassive(); }
+    public boolean advancedPassive() { return this==ADAPTATION_PERCENT||this==TISSUE_REGENERATION_PERCENT; }
     public boolean shieldBorer() { return this==SHIELD_BORER||this==SHIELD_BORER_BOOST_1||this==SHIELD_BORER_BOOST_2; }
     public boolean blockThrow() { return this==BLOCK_THROW_1||this==BLOCK_THROW_2||this==BLOCK_THROW_3; }
     public PowerForm powerRequires() { return shieldBorer() ? PowerForm.SHIELD : blockThrow() ? PowerForm.MUSCLE_MASS : null; }

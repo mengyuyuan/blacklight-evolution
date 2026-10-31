@@ -13,7 +13,6 @@ import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.util.FakePlayerFactory;
-import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.gametest.*;
 import java.util.UUID;
 
@@ -46,7 +45,7 @@ public final class HunterGameTest {
     private static ServerPlayer player(GameTestHelper h) {
         var p=FakePlayerFactory.get(h.getLevel(),new GameProfile(UUID.randomUUID(),"consume-test"));
         p.setPos(h.absoluteVec(new Vec3(3,2,3)));p.setYRot(0);p.setXRot(0);p.setOnGround(true);p.tickCount=100;
-        var state=com.codex.blacklight.registry.ModAttachments.getData(p,ModAttachments.PLAYER_STATE);state.infect();state.setPrototypeMode(true);com.codex.blacklight.registry.ModAttachments.setData(p,ModAttachments.PLAYER_STATE,state);p.setHealth(10);
+        var state=com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.PLAYER_STATE);state.infect();state.setPrototypeMode(true);com.codex.blacklight.registry.ModAttachments.setData(p, ModAttachments.PLAYER_STATE,state);p.setHealth(10);
         return p;
     }
     private static BlacklightHunter victim(GameTestHelper h) {
@@ -54,18 +53,18 @@ public final class HunterGameTest {
     }
     @GameTest(template="wall_test", timeoutTicks=30)
     public static void consumptionClaimsAndPaysOnlyOnce(GameTestHelper h) {
-        var p=player(h);var target=victim(h);int biomass=com.codex.blacklight.registry.ModAttachments.getData(p,ModAttachments.PLAYER_STATE).getBiomass();
+        var p=player(h);var target=victim(h);int biomass=com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.PLAYER_STATE).getBiomass();
         ConsumeSystem.request(p);h.assertTrue(target.isBeingConsumed(),"weakened nearby target must be grabbed");
         var other=player(h);ConsumeSystem.request(other);
-        h.assertTrue(!com.codex.blacklight.registry.ModAttachments.getData(other,ModAttachments.CONSUMING),"second player cannot steal claim");
-        for(int i=0;i<com.codex.blacklight.combat.ConsumeVisual.captureDuration(com.codex.blacklight.registry.ModAttachments.getData(p,ModAttachments.PLAYER_STATE).getActivePower());i++){p.tickCount++;ConsumeSystem.tick(new TickEvent.PlayerTickEvent(TickEvent.Phase.END,p));}
+        h.assertTrue(!com.codex.blacklight.registry.ModAttachments.getData(other, ModAttachments.CONSUMING),"second player cannot steal claim");
+        for(int i=0;i<com.codex.blacklight.combat.ConsumeVisual.captureDuration(com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.PLAYER_STATE).getActivePower());i++){p.tickCount++;ConsumeSystem.tick(new net.minecraftforge.event.TickEvent.PlayerTickEvent(net.minecraftforge.event.TickEvent.Phase.END,p));}
         ConsumeSystem.consume(p);ConsumeSystem.consume(p);
-        for(int i=0;i<com.codex.blacklight.combat.HunterConsume.COMPLETE_TICKS-1;i++){p.tickCount++;ConsumeSystem.tick(new TickEvent.PlayerTickEvent(TickEvent.Phase.END,p));}
+        for(int i=0;i<com.codex.blacklight.combat.HunterConsume.COMPLETE_TICKS-1;i++){p.tickCount++;ConsumeSystem.tick(new net.minecraftforge.event.TickEvent.PlayerTickEvent(net.minecraftforge.event.TickEvent.Phase.END,p));}
         h.assertTrue(!target.isRemoved()&&p.getHealth()==10,"no early removal or reward");
-        p.tickCount++;ConsumeSystem.tick(new TickEvent.PlayerTickEvent(TickEvent.Phase.END,p));ConsumeSystem.tick(new TickEvent.PlayerTickEvent(TickEvent.Phase.END,p));
+        p.tickCount++;ConsumeSystem.tick(new net.minecraftforge.event.TickEvent.PlayerTickEvent(net.minecraftforge.event.TickEvent.Phase.END,p));ConsumeSystem.tick(new net.minecraftforge.event.TickEvent.PlayerTickEvent(net.minecraftforge.event.TickEvent.Phase.END,p));
         h.assertTrue(target.isConsumeRemains()&&p.getHealth()==18,"completed consumption removes victim and heals");
-        h.assertTrue(com.codex.blacklight.registry.ModAttachments.getData(p,ModAttachments.PLAYER_STATE).getBiomass()==biomass+120 && com.codex.blacklight.registry.ModAttachments.getData(p,ModAttachments.PLAYER_STATE).getEvolutionPoints()==30,"reward exactly once");
-        h.assertTrue(!com.codex.blacklight.registry.ModAttachments.getData(p,ModAttachments.CONSUMING),"action lock must clear");h.succeed();
+        h.assertTrue(com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.PLAYER_STATE).getBiomass()==biomass+120 && com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.PLAYER_STATE).getEvolutionPoints()==30,"reward exactly once");
+        h.assertTrue(!com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.CONSUMING),"action lock must clear");h.succeed();
     }
     @GameTest(template="wall_test", timeoutTicks=30)
     public static void healthyFarAndInterruptedTargetsGiveNoReward(GameTestHelper h) {
@@ -76,10 +75,10 @@ public final class HunterGameTest {
         var saved=new net.minecraft.nbt.CompoundTag();target.addAdditionalSaveData(saved);
         h.assertTrue(!saved.getBoolean("NoAI"),"transient grab must not persist disabled AI");
         // Large-target mounting tolerates 14 blocks; interrupt outside that actual bound.
-        p.setPos(p.position().add(20,0,0));ConsumeSystem.tick(new TickEvent.PlayerTickEvent(TickEvent.Phase.END,p));
+        p.setPos(p.position().add(20,0,0));ConsumeSystem.tick(new net.minecraftforge.event.TickEvent.PlayerTickEvent(net.minecraftforge.event.TickEvent.Phase.END,p));
         h.assertTrue(target.isAlive()&&!target.isBeingConsumed()&&!target.isNoAi(),"interruption must release AI");
         ConsumeSystem.request(p);h.assertTrue(!target.isBeingConsumed(),"cannot consume across distance");
-        h.assertTrue(p.getHealth()==10&&com.codex.blacklight.registry.ModAttachments.getData(p,ModAttachments.PLAYER_STATE).getEvolutionPoints()==0,"interruption gives no reward");h.succeed();
+        h.assertTrue(p.getHealth()==10&&com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.PLAYER_STATE).getEvolutionPoints()==0,"interruption gives no reward");h.succeed();
     }
 
     @GameTest(template="wall_test", timeoutTicks=60)
@@ -89,14 +88,14 @@ public final class HunterGameTest {
         var victim=h.spawn(EntityType.VILLAGER,3,2,4);victim.setNoAi(true);
         hunter.getAttribute(net.minecraft.world.entity.ai.attributes.Attributes.FOLLOW_RANGE).setBaseValue(3);
         var hits=new java.util.concurrent.atomic.AtomicInteger();var total=new java.util.concurrent.atomic.AtomicReference<Float>(0F);
-        java.util.function.Consumer<net.minecraftforge.event.entity.living.LivingDamageEvent> listener=e->{
-            if(e.getEntity()==victim&&e.getSource().getEntity()==hunter&&e.getAmount()>0){hits.incrementAndGet();total.set(total.get()+e.getAmount());}
+        java.util.function.Consumer<com.codex.blacklight.combat.ForgeDamageEvent.Post> listener=e->{
+            if(e.getEntity()==victim&&e.getSource().getEntity()==hunter&&e.getNewDamage()>0){hits.incrementAndGet();total.set(total.get()+e.getNewDamage());}
         };
         net.minecraftforge.common.MinecraftForge.EVENT_BUS.addListener(listener);
         hunter.setTarget(victim);h.assertTrue(hunter.beginAttack(com.codex.blacklight.combat.CreatureAttack.SWIPE,victim),"explicit swipe starts");
         h.runAfterDelay(30,()->{
             net.minecraftforge.common.MinecraftForge.EVENT_BUS.unregister(listener);
-            h.assertTrue(hits.get()==1&&Math.abs(total.get()-14)<.001,"one declared 14-point swipe, independent of subsequent infection HP rescaling: hits="+hits+" damage="+total);
+            h.assertTrue(hits.get()==1&&Math.abs(total.get()-com.codex.blacklight.combat.HunterBalance.DAMAGE)<.001,"one current-tier swipe, independent of subsequent infection HP rescaling: hits="+hits+" damage="+total);
             hunter.discard();victim.discard();h.succeed();
         });
     }
@@ -129,9 +128,9 @@ public final class HunterGameTest {
         var restored=ModEntities.BLACKLIGHT_HUNTER.get().create(h.getLevel());restored.load(tag);
         h.assertTrue(!restored.isBeingConsumed()&&!restored.isNoAi(),"reload clears transient capture and restores original AI");
         h.assertTrue(target.hurt(target.damageSources().generic(),1),"real damage must reach the victim");
-        h.assertTrue(target.isBeingConsumed()&&com.codex.blacklight.registry.ModAttachments.getData(p,ModAttachments.CONSUMING),"RC49 nonlethal damage keeps the claim");
-        target.kill();p.tickCount++;ConsumeSystem.tick(new TickEvent.PlayerTickEvent(TickEvent.Phase.END,p));
-        h.assertTrue(!com.codex.blacklight.registry.ModAttachments.getData(p,ModAttachments.CONSUMING),"death releases capture without rewards");
-        h.assertTrue(com.codex.blacklight.registry.ModAttachments.getData(p,ModAttachments.PLAYER_STATE).getEvolutionPoints()==0,"interrupted consumption must not pay");h.succeed();
+        h.assertTrue(target.isBeingConsumed()&&com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.CONSUMING),"RC49 nonlethal damage keeps the claim");
+        target.kill();p.tickCount++;ConsumeSystem.tick(new net.minecraftforge.event.TickEvent.PlayerTickEvent(net.minecraftforge.event.TickEvent.Phase.END,p));
+        h.assertTrue(!com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.CONSUMING),"death releases capture without rewards");
+        h.assertTrue(com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.PLAYER_STATE).getEvolutionPoints()==0,"interrupted consumption must not pay");h.succeed();
     }
 }

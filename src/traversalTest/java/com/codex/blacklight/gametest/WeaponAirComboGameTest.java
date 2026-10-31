@@ -9,7 +9,6 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.util.FakePlayerFactory;
-import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.gametest.*;
 import java.util.UUID;
 
@@ -21,7 +20,7 @@ public final class WeaponAirComboGameTest {
         var state=com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.PLAYER_STATE);state.infect();state.setPrototypeMode(true);state.unlock(form);state.activate(form);
         com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.MOVEMENT_STATE).reset();return p;
     }
-    private static void tick(ServerPlayer p,int count){for(int i=0;i<count;i++){p.tickCount++;WeaponCombatSystem.tick(new TickEvent.PlayerTickEvent(TickEvent.Phase.END,p));}}
+    private static void tick(ServerPlayer p,int count){for(int i=0;i<count;i++){p.tickCount++;WeaponCombatSystem.tick(new net.minecraftforge.event.TickEvent.PlayerTickEvent(net.minecraftforge.event.TickEvent.Phase.END,p));}}
     private static WeaponMove move(ServerPlayer p){return com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.WEAPON_VISUAL).spec();}
     private static void close(ServerPlayer p){WeaponCombatSystem.cancelHeldInput(p);WeaponCombatSystem.cancel(p);}
 

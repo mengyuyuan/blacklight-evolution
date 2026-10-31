@@ -368,10 +368,12 @@
       "bytes": 168217
     },
     "consume-placement.data": {
-      "bytes": 1877907
+      "bytes": 2389563,
+      "sha256": "50dafe7992d30f572a81f749a17680499920b96c7e3fdf74cdcb36ceebd74da0"
     },
     "consume-receiver-events.data": {
-      "bytes": 1784
+      "bytes": 2269,
+      "sha256": "74b90864f7ac5ee2cc373e32b9be84b3a7bf052831c4ca6388a0494d3a305903"
     },
     "consume_blade_actor.json": {
       "bytes": 1129216
@@ -398,10 +400,12 @@
       "bytes": 356580
     },
     "consume_claws_actor.json": {
-      "bytes": 967833
+      "bytes": 790158,
+      "sha256": "ce662792c3af2583ea12cb2b148d54fbff55288c67791c3d9ac30c55f9ed6b1b"
     },
     "consume_claws_victim.json": {
-      "bytes": 967907
+      "bytes": 790704,
+      "sha256": "77c08cfe67e97e182ec8e8df2d6861938d594a347cef02079a457cd310df98f6"
     },
     "consume_hammer_actor.json": {
       "bytes": 812564
@@ -452,10 +456,12 @@
       "bytes": 1450302
     },
     "consume_whip_actor.json": {
-      "bytes": 812175
+      "bytes": 264827,
+      "sha256": "b80ff9db26883be156eb1b2789a671974152c08724974ea0f6a61d9a7df6818a"
     },
     "consume_whip_victim.json": {
-      "bytes": 806812
+      "bytes": 264607,
+      "sha256": "97dd52ed310b1f9b6f7587cca89c45f6c84b00c28de52fa68345728bdde67620"
     },
     "dev_air_critical_pain.json": {
       "bytes": 2012226
@@ -759,6 +765,34 @@
     },
     "whip_sweep_charged.json": {
       "bytes": 414068
+    },
+    "evolved-poses.data": {
+      "bytes": 4896335,
+      "sha256": "67b9315c7b999fab1bf2d9cf28894990998d133715cc66406c085a7b03626e7c"
+    },
+    "consume_large_claws_actor.json": {
+      "bytes": 967833,
+      "sha256": "4d393358cf11ccd6c83d215214322d2ff62f2dd9c04a51b9498fbc97a4d5e43a"
+    },
+    "consume_large_claws_victim.json": {
+      "bytes": 967907,
+      "sha256": "7852ece910babb36d96ec5cc95a792738e28cfcf5621f038661086ed2368d674"
+    },
+    "consume_claws_head_actor.json": {
+      "bytes": 967833,
+      "sha256": "4d393358cf11ccd6c83d215214322d2ff62f2dd9c04a51b9498fbc97a4d5e43a"
+    },
+    "consume_claws_head_victim.json": {
+      "bytes": 967907,
+      "sha256": "7852ece910babb36d96ec5cc95a792738e28cfcf5621f038661086ed2368d674"
+    },
+    "consume_whip_lash_actor.json": {
+      "bytes": 812175,
+      "sha256": "8f55b7cb27d11d76443185aad97fc30b218783d53df56fdcbffff1615e4ae7c2"
+    },
+    "consume_whip_lash_victim.json": {
+      "bytes": 806812,
+      "sha256": "96c3b58b1ee5bfe12ae772cc6674d58e60ff8035c88fd51b70d7fa142092af15"
     }
   }
 }

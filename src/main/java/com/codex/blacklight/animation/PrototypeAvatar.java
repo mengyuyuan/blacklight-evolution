@@ -8,8 +8,9 @@ import software.bernie.geckolib.core.animation.RawAnimation;
 import software.bernie.geckolib.util.GeckoLibUtil;
 
 /**
- * GeckoLib animation carrier for the biological overlay. Epic Fight owns the
- * player armature; this object owns morph bones, tentacles and keyed effects.
+ * GeckoLib animation carrier for the biological overlay. The independent
+ * player pose engine owns the armature; this object owns morph bones,
+ * tentacles and keyed effects.
  */
 public final class PrototypeAvatar implements GeoAnimatable {
     public static final RawAnimation IDLE = RawAnimation.begin().thenLoop("animation.blacklight.idle");

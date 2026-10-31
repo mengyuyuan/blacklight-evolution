@@ -1,0 +1,28 @@
+package com.codex.blacklight.infection;
+
+import net.minecraftforge.common.ForgeConfigSpec;
+
+/** Dimension-wide budgets, never multiplied by the number of surface blocks. */
+public final class BuildingInfectionConfig {
+    public static final ForgeConfigSpec SPEC;
+    public static final ForgeConfigSpec.BooleanValue ENABLED, NATURAL_SEEDS, SPAWNS, VOLUME,ASSIMILATE,AUTONOMOUS;
+    public static final ForgeConfigSpec.IntValue WORK, COLONIES, RADIUS, HEIGHT, SURFACES, MATURITY, MOB_LIMIT;
+    static {
+        var b = new ForgeConfigSpec.Builder();
+        ENABLED = b.define("buildingInfection", true);
+        VOLUME=b.comment("Grow solid, connected biomass columns using the shared work budget.").define("buildingBiomass",true);
+        ASSIMILATE=b.comment("Mature attached tissue can pay to assimilate contacted building blocks; clearing gradually restores unchanged recorded material.").define("assimilateBuildings",true);
+        NATURAL_SEEDS = b.comment("Existing infected tissue can establish a core beside a substantial wall.").define("naturalCores", true);
+        SPAWNS = b.define("hatchInfected", true);
+        AUTONOMOUS=b.comment("Naturally infected, anchored buildings mature and sustain brood over loaded time; feeding remains an optional boost.").define("autonomousBuildings",true);
+        WORK = b.comment("Shared frontier/aging operations per dimension every five ticks.").defineInRange("workBudget", 4, 1, 16);
+        COLONIES = b.comment("Live colony limit; cleared sites retain separate compact reseeding protection.").defineInRange("maxColonies", 16, 1, 64);
+        RADIUS = b.defineInRange("horizontalRadius", 48, 8, 96);
+        HEIGHT = b.defineInRange("verticalReach", 96, 8, 192);
+        SURFACES = b.defineInRange("surfacesPerColony", 8192, 64, 16384);
+        MATURITY = b.comment("Loaded, active seconds; sufficient actual surface growth is also required.").defineInRange("maturitySeconds", 600, 60, 7200);
+        MOB_LIMIT = b.defineInRange("nearbyMobLimit", 12, 0, 32);
+        SPEC = b.build();
+    }
+    private BuildingInfectionConfig() {}
+}

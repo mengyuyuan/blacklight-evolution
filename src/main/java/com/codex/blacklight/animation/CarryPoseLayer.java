@@ -7,6 +7,23 @@ import org.joml.Vector3f;
 public final class CarryPoseLayer {
     private CarryPoseLayer() {}
 
+    /** Held creatures must not replace the movement clock or a flight posture. */
+    public static BlacklightPose holdCreature(BlacklightPose hold, BlacklightPose movement,
+                                             boolean airborne, boolean rightHanded) {
+        if (!airborne) return apply(hold, movement, 1);
+        var result = movement.copy();
+        String side = rightHanded ? "R" : "L";
+        // In the air only the gripping arm yields. The torso, legs and free arm
+        // retain the current jump, glide or wing-flight pose; contact IK follows.
+        for (String prefix : new String[]{"Shoulder_", "Arm_", "Elbow_", "Hand_", "Tool_"}) {
+            String name = prefix + side;
+            var transform = hold.get(name);
+            if (transform == null) result.getJointTransformData().remove(name);
+            else result.getJointTransformData().put(name, transform.copy());
+        }
+        return result;
+    }
+
     public static BlacklightPose apply(BlacklightPose action, BlacklightPose stride, float weight) {
         if (weight <= 0) return action.copy();
         var skeleton = BlacklightSkeleton.get();

@@ -11,7 +11,8 @@ public enum PlayerAction {
     GRAB_BLADE, GRAB_BLADE_THROW, GRAB_HOLD, GRAB_BLADE_HOLD,
     CONSUME, CONSUME_NORMAL, CONSUME_HAMMER, CONSUME_BLADE, CONSUME_WHIP, CONSUME_MUSCLE,
     CONSUME_LARGE, CONSUME_LARGE_HAMMER, CONSUME_LARGE_MUSCLE, CONSUME_LARGE_WHIP,
-    AIR_DASH, AIR_DASH_BRAKE, LAND_MOVING, LAND_LIGHT, LAND_HEAVY, LAND_DEVASTATING, TACTICAL_HOP;
+    AIR_DASH, AIR_DASH_BRAKE, LAND_MOVING, LAND_LIGHT, LAND_HEAVY, LAND_DEVASTATING, TACTICAL_HOP,
+    CONSUME_LARGE_CLAWS;
 
     public static PlayerAction consume(PowerForm form) {
         return switch (form) {
@@ -26,7 +27,7 @@ public enum PlayerAction {
 
     public static PlayerAction consumeLarge(PowerForm form) {
         return switch (form) {
-            case CLAWS -> CONSUME;
+            case CLAWS -> CONSUME_LARGE_CLAWS;
             case BLADE -> CONSUME_BLADE;
             case HAMMERFISTS -> CONSUME_LARGE_HAMMER;
             case MUSCLE_MASS -> CONSUME_LARGE_MUSCLE;

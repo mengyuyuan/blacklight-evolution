@@ -1,0 +1,112 @@
+{
+  "parent": "minecraft:block/block",
+  "ambientocclusion": true,
+  "textures": {
+    "concrete": "blacklight:block/facility_concrete",
+    "hazard": "blacklight:block/facility_hazard",
+    "sandbag": "blacklight:block/facility_sandbag",
+    "crate": "blacklight:block/facility_crate",
+    "metal": "blacklight:block/facility_metal",
+    "screen": "blacklight:block/facility_screen",
+    "lamp": "blacklight:block/facility_lamp",
+    "particle": "blacklight:block/facility_metal"
+  },
+  "elements": [
+    {
+      "from": [
+        0,
+        0,
+        3
+      ],
+      "to": [
+        16,
+        3,
+        13
+      ],
+      "faces": {
+        "up": {
+          "texture": "#concrete"
+        },
+        "down": {
+          "texture": "#concrete"
+        },
+        "north": {
+          "texture": "#concrete"
+        },
+        "south": {
+          "texture": "#concrete"
+        },
+        "east": {
+          "texture": "#concrete"
+        },
+        "west": {
+          "texture": "#concrete"
+        }
+      }
+    },
+    {
+      "from": [
+        1,
+        3,
+        4
+      ],
+      "to": [
+        15,
+        7,
+        12
+      ],
+      "faces": {
+        "up": {
+          "texture": "#concrete"
+        },
+        "down": {
+          "texture": "#concrete"
+        },
+        "north": {
+          "texture": "#concrete"
+        },
+        "south": {
+          "texture": "#concrete"
+        },
+        "east": {
+          "texture": "#concrete"
+        },
+        "west": {
+          "texture": "#concrete"
+        }
+      }
+    },
+    {
+      "from": [
+        3,
+        7,
+        6
+      ],
+      "to": [
+        13,
+        14,
+        10
+      ],
+      "faces": {
+        "up": {
+          "texture": "#hazard"
+        },
+        "down": {
+          "texture": "#hazard"
+        },
+        "north": {
+          "texture": "#hazard"
+        },
+        "south": {
+          "texture": "#hazard"
+        },
+        "east": {
+          "texture": "#hazard"
+        },
+        "west": {
+          "texture": "#hazard"
+        }
+      }
+    }
+  ]
+}

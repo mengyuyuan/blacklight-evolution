@@ -3,7 +3,7 @@ package com.codex.blacklight.combat;
 import com.google.gson.JsonObject;
 
 /** FIG target/effect times are relative to entering the formal release/antic.
- * World distances and damage use explicit Minecraft unit conversions. */
+ * Formal damage is an actual-HP budget; Bulletdive retains its existing pre-scale energy units. */
 public record DevastatorTiming(float effectStart,float effectEnd,float damageStart,float damageEnd,
                                 float targetStart,float targetStop,float radius,float damage,int targets) {
     /** Measured Alex retarget scale .8721314614 times native player .9375. */
@@ -33,8 +33,8 @@ public record DevastatorTiming(float effectStart,float effectEnd,float damageSta
         float sourceRadius=value(f,"radiusSource",radiusSource), sourceDamage=value(f,"damageSource",damageSource);
         float sourceTargets=value(f,"targetCountSource",kind==2?1:kind==0?40:50);
         if(kind==3){if(sourceRadius<=0)sourceRadius=24;if(sourceDamage<=0)sourceDamage=550;if(sourceTargets<=0)sourceTargets=16;}
-        float radius=kind==3?6:sourceRadius*SOURCE_WORLD_SCALE, damage=sourceDamage*.04F;
-        int targets=com.codex.blacklight.util.MathCompat.clamp(Math.round(sourceTargets),1,kind==2?1:64);
+        float radius=kind==3?6:sourceRadius*SOURCE_WORLD_SCALE, damage=kind==3?sourceDamage*.04F:DevastatorDamage.primary(kind);
+        int targets=com.codex.blacklight.forge.WingMath.clamp(Math.round(sourceTargets),1,kind==2?1:64);
         if(end<=begin||damageEnd<damageStart||radius<=0||damage<=0)throw new IllegalStateException("Invalid source skill effect window "+move.id);
         return new DevastatorTiming(begin,end,damageStart,damageEnd,targetStart,targetStop,radius,damage,targets);
     }

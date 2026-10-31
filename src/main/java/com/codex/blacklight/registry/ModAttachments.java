@@ -95,6 +95,12 @@ public final class ModAttachments {
 
     public static final Supplier<AttachmentType<com.codex.blacklight.state.GrowthProgress>> GROWTH=ATTACHMENTS.register(
             "growth",()->AttachmentType.builder(()->com.codex.blacklight.state.GrowthProgress.EMPTY).serialize(com.codex.blacklight.state.GrowthProgress.CODEC).copyOnDeath().sync(com.codex.blacklight.state.GrowthProgress.STREAM_CODEC).build());
+    public static final Supplier<AttachmentType<com.codex.blacklight.state.InfiniteProgress>> INFINITE_EVOLUTION=ATTACHMENTS.register(
+            "infinite_evolution",()->AttachmentType.builder(()->com.codex.blacklight.state.InfiniteProgress.EMPTY).serialize(com.codex.blacklight.state.InfiniteProgress.CODEC).copyOnDeath().sync(com.codex.blacklight.state.InfiniteProgress.STREAM_CODEC).build());
+    public static final Supplier<AttachmentType<com.codex.blacklight.state.EvolutionMilestones>> EVOLUTION_MILESTONES=ATTACHMENTS.register(
+            "evolution_milestones",()->AttachmentType.builder(()->com.codex.blacklight.state.EvolutionMilestones.EMPTY).serialize(com.codex.blacklight.state.EvolutionMilestones.CODEC).copyOnDeath().sync(com.codex.blacklight.state.EvolutionMilestones.STREAM_CODEC).build());
+    public static final Supplier<AttachmentType<com.codex.blacklight.state.OrganResearch>> ORGAN_RESEARCH=ATTACHMENTS.register(
+            "organ_research",()->AttachmentType.builder(()->com.codex.blacklight.state.OrganResearch.EMPTY).serialize(com.codex.blacklight.state.OrganResearch.CODEC).copyOnDeath().sync(com.codex.blacklight.state.OrganResearch.STREAM_CODEC).build());
     public static final Supplier<AttachmentType<com.codex.blacklight.power.UtilityState>> UTILITY_STATE = ATTACHMENTS.register(
             "utility_state", () -> AttachmentType.builder(() -> com.codex.blacklight.power.UtilityState.EMPTY)
                     .serialize(com.codex.blacklight.power.UtilityState.CODEC)
@@ -175,6 +181,13 @@ public final class ModAttachments {
         return entity.getCapability(BlacklightAttachments.CAPABILITY).resolve()
                 .filter(storage -> storage.has(type)).map(storage -> storage.get(type))
                 .orElseGet(type::createDefault);
+    }
+
+    public static <T> T peekData(Entity entity,Supplier<AttachmentType<T>> key,T fallback){
+        if(entity==null||entity.isRemoved())return fallback;
+        AttachmentType<T> type=key.get();
+        return entity.getCapability(BlacklightAttachments.CAPABILITY).resolve()
+                .filter(storage->storage.has(type)).map(storage->storage.get(type)).orElse(fallback);
     }
 
     public static boolean available(Entity entity) {

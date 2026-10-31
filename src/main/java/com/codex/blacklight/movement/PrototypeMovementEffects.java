@@ -423,15 +423,30 @@ public final class PrototypeMovementEffects {
         AABB hitBox = new AABB(centerX - radius, player.getY() - 1.25D, centerZ - radius,
                 centerX + radius, player.getY() + 3.5D, centerZ + radius);
         for (LivingEntity target : level.getEntitiesOfClass(LivingEntity.class, hitBox,
-                target -> target != player && target.isAlive() && !player.isAlliedTo(target))) {
+                target -> com.codex.blacklight.combat.CombatTargeting.damageable(player,target)
+                        && com.codex.blacklight.combat.CombatTargeting.visible(player,target))) {
+            if (!player.isAlive() || player.isRemoved() || player.level() != level) return;
             Vec3 away = radialDirection(player, target, centerX, centerZ);
             double distance = Math.sqrt(target.distanceToSqr(centerX, target.getY(), centerZ));
             if (distance > radius) continue;
             double falloff = 1.0D - distance / Math.max(0.01D, radius);
             float damage = (float)(impact.damage() * (0.38D + falloff * 0.62D));
-            target.hurt(player.damageSources().playerAttack(player), damage);
+            float healthBefore=target.getHealth(),absorptionBefore=target.getAbsorptionAmount();
+            Vec3 velocityBefore=target.getDeltaMovement();boolean markedBefore=target.hurtMarked;
+            if (!target.hurt(player.damageSources().playerAttack(player), damage)) continue;
+            // Forge 1.20 can report true even when LivingHurtEvent vetoes the
+            // actual health change. Do not turn that veto into a separate push.
+            if(target.isAlive()&&!target.isRemoved()&&target.level()==level
+                    &&target.getHealth()>=healthBefore&&target.getAbsorptionAmount()>=absorptionBefore){
+                target.setDeltaMovement(velocityBefore);target.hurtMarked=markedBefore;continue;
+            }
+            // Damage callbacks may invalidate either actor; rejected hits cannot
+            // bypass protection by applying their physical attack separately.
+            if (!player.isAlive() || player.isRemoved() || player.level() != level) return;
+            if (target.isRemoved() || target.level() != level) continue;
             double impulse = impact.knockback() * (0.52D + falloff * 0.48D);
             target.push(away.x * impulse, 0.18D + impulse * 0.48D, away.z * impulse);
+            target.hurtMarked = true;
         }
 
         for (Entity loose : level.getEntities(player, hitBox,

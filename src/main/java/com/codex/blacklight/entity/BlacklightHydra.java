@@ -177,8 +177,12 @@ public final class BlacklightHydra extends Monster implements GeoEntity {
                 if(t%5==0)level.sendParticles(ParticleTypes.CRIMSON_SPORE,food.getX(),food.getY()+.5,food.getZ(),8,.3,.4,.3,.02);
             }
             if(t==30){
-                food.hurt(damageSources().mobAttack(this),Math.max(20,food.getMaxHealth()*4));
-                if(!food.isAlive()){feeds=HydraGrowth.feeds(feeds+1);playSound(SoundEvents.GENERIC_EAT,1,.6F);}
+                var prey=food;
+                boolean accepted=prey.hurt(damageSources().mobAttack(this),Math.max(20,prey.getMaxHealth()*4));
+                // A canceled LivingDeath can leave zero HP without accepting the
+                // kill. Match other feeding systems: that cannot pay growth.
+                if(accepted&&isAlive()&&!prey.isAlive()&&((com.codex.blacklight.mixin.LivingDeathAccess)prey).blacklight$deathAccepted()
+                        &&prey.getKillCredit()==this){feeds=HydraGrowth.feeds(feeds+1);playSound(SoundEvents.GENERIC_EAT,1,.6F);}
                 food=null;entityData.set(FEED_TARGET,-1);
             }
             if(t>=30)finishAction();

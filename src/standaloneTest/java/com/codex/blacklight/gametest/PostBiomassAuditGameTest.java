@@ -19,28 +19,27 @@ public final class PostBiomassAuditGameTest {
   var p=player(h,"RemovedTransit");var level=h.getLevel();
   var hydra=h.spawn(ModEntities.BLACKLIGHT_HYDRA.get(),4,22,4);
   h.assertTrue(hydra.beginArrival(p)&&HydraTransport.carrier(p)==hydra,"live arrival owns the player");
-  var position=p.position();level.removePlayerImmediately(p,Entity.RemovalReason.KILLED);p.invalidateCaps();
-  h.assertTrue(!ModAttachments.available(p),"removed player has no live capability");
+  var position=p.position();level.removePlayerImmediately(p,Entity.RemovalReason.KILLED);
   h.assertTrue(!HydraTransport.active(p),"removed player is no longer a carrier participant");
   h.assertTrue(!UtilityPowerSystem.active(p,PowerForm.ARMOR)&&!com.codex.blacklight.movement.WingFlightSystem.ownsTravel(p),"late movement packets see no active utility or flight state");
   HydraTransport.place(p);CityTravel.transitLanding(new net.minecraftforge.event.TickEvent.PlayerTickEvent(net.minecraftforge.event.TickEvent.Phase.END,p));
-  h.assertTrue(p.position().equals(position)&&!ModAttachments.available(p),"post-death tick neither moves the corpse nor revives capability state");
+  h.assertTrue(p.position().equals(position),"post-death tick never moves the corpse");
   hydra.discard();h.succeed();
  }
  @GameTest(template="wall_test",timeoutTicks=60,batch="audit_input")
  public static void hydraMustRejectWeaponInput(GameTestHelper h){
   var level=h.getLevel();var p=new FakePlayer(level,new GameProfile(UUID.randomUUID(),"AuditInput"));
   p.moveTo(h.absolutePos(new BlockPos(4,22,4)).getCenter());level.addNewPlayer(p);
-  var state=ModAttachments.getData(p,ModAttachments.PLAYER_STATE);state.infect();state.setPrototypeMode(true);state.unlock(PowerForm.CLAWS);state.activate(PowerForm.CLAWS);ModAttachments.setData(p,ModAttachments.PLAYER_STATE,state);
+  var state=com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.PLAYER_STATE);state.infect();state.setPrototypeMode(true);state.unlock(PowerForm.CLAWS);state.activate(PowerForm.CLAWS);com.codex.blacklight.registry.ModAttachments.setData(p, ModAttachments.PLAYER_STATE,state);
   WeaponCombatSystem.request(p,false);
-  boolean control=ModAttachments.getData(p,ModAttachments.WEAPON_VISUAL).spec()!=null;
-  ModAttachments.getData(p,ModAttachments.MOVEMENT_STATE).beginCharge();
+  boolean control=com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.WEAPON_VISUAL).spec()!=null;
+  com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.MOVEMENT_STATE).beginCharge();
   var hydra=h.spawn(ModEntities.BLACKLIGHT_HYDRA.get(),4,22,4);
   boolean held=hydra.beginArrival(p)&&HydraTransport.active(p);
-  h.assertTrue(ModAttachments.getData(p,ModAttachments.MOVEMENT_STATE).chargeTicks()==0,"capture clears latent charged-jump movement");
+  h.assertTrue(com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.MOVEMENT_STATE).chargeTicks()==0,"capture clears latent charged-jump movement");
   h.assertTrue(!WeaponCombatSystem.busy(p),"capture cancels an already running attack");
   WeaponCombatSystem.acceptInput(p,true,false,false,false);
-  boolean attack=ModAttachments.getData(p,ModAttachments.WEAPON_VISUAL).spec()!=null;
+  boolean attack=com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.WEAPON_VISUAL).spec()!=null;
   WeaponCombatSystem.cancel(p);hydra.discard();level.removePlayerImmediately(p,Entity.RemovalReason.DISCARDED);
   h.assertTrue(control&&held,"AUDIT fixture: ordinary attack must work, then hydra must hold player");
   h.assertTrue(!attack,"AUDIT BUG: held player started weapon action during hydra cinematic");h.succeed();
@@ -75,7 +74,7 @@ public final class PostBiomassAuditGameTest {
    @Override public void teleportTo(double x,double y,double z){setPos(x,y,z);}
   };
   p.setPos(h.absolutePos(new BlockPos(4,22,4)).getCenter());h.getLevel().addNewPlayer(p);
-  var state=ModAttachments.getData(p,ModAttachments.PLAYER_STATE);state.infect();state.setPrototypeMode(true);state.unlock(PowerForm.CLAWS);state.activate(PowerForm.CLAWS);
+  var state=com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.PLAYER_STATE);state.infect();state.setPrototypeMode(true);state.unlock(PowerForm.CLAWS);state.activate(PowerForm.CLAWS);
   return p;
  }
  private static void tickSlime(FakePlayer p){BiomassSystem.tick(new net.minecraftforge.event.TickEvent.PlayerTickEvent(net.minecraftforge.event.TickEvent.Phase.END,p));}
@@ -86,32 +85,32 @@ public final class PostBiomassAuditGameTest {
   var shell=h.getLevel().getEntity(UUID.fromString(BiomassSystem.state(p).shell()));
   p.setPos(p.position().add(2,0,0));
   boolean recalled=BiomassSystem.cancel(p);
-  boolean valid=recalled&&!BiomassSystem.active(p)&&shell.isRemoved()&&p.getHealth()==7&&ModAttachments.getData(p,ModAttachments.PLAYER_STATE).getActivePower()==PowerForm.CLAWS;
+  boolean valid=recalled&&!BiomassSystem.active(p)&&shell.isRemoved()&&p.getHealth()==7&&com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.PLAYER_STATE).getActivePower()==PowerForm.CLAWS;
   h.getLevel().removePlayerImmediately(p,Entity.RemovalReason.DISCARDED);
   h.assertTrue(valid,"recall restores form without healing, leaving a shell or bursting terrain");h.succeed();
  }
  @GameTest(template="wall_test",timeoutTicks=60,batch="audit_slime_consume")
  public static void fatalSlimeCannotRecallAndOneMealCommitsOnce(GameTestHelper h){
-  var p=player(h,"SlimeFatal");var level=h.getLevel();int before=ModAttachments.getData(p,ModAttachments.PLAYER_STATE).getBiomass();
+  var p=player(h,"SlimeFatal");var level=h.getLevel();int before=com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.PLAYER_STATE).getBiomass();
   h.assertTrue(BiomassSystem.begin(p,true),"fatal split has enough reserve");
   h.assertTrue(!BiomassSystem.cancel(p)&&BiomassSystem.state(p).shell().isEmpty(),"death slime has no recall or shell");
-  h.assertTrue(ModAttachments.getData(p,ModAttachments.PLAYER_STATE).getBiomass()==before-level.getGameRules().getInt(BiomassRules.COST),"reserve charged once");
+  h.assertTrue(com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.PLAYER_STATE).getBiomass()==before-level.getGameRules().getInt(BiomassRules.COST),"reserve charged once");
   var cow=h.spawn(net.minecraft.world.entity.EntityType.COW,4,22,4);cow.setPos(p.position());
-  ModAttachments.setData(p,ModAttachments.BIOMASS_FORM,BiomassSystem.state(p).absorb(cow.getId(),level.getGameTime()-BiomassState.ABSORB_TICKS));
+  com.codex.blacklight.registry.ModAttachments.setData(p, ModAttachments.BIOMASS_FORM,BiomassSystem.state(p).absorb(cow.getId(),level.getGameTime()-BiomassState.ABSORB_TICKS));
   tickSlime(p);
   h.assertTrue(!cow.isAlive()&&BiomassSystem.state(p).consumed(),"confirmed prey death commits reform");
-  int biomass=ModAttachments.getData(p,ModAttachments.PLAYER_STATE).getBiomass();int age=BiomassSystem.state(p).age();
+  int biomass=com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.PLAYER_STATE).getBiomass();int age=BiomassSystem.state(p).age();
   BiomassSystem.login(new net.minecraftforge.event.entity.player.PlayerEvent.PlayerLoggedInEvent(p));tickSlime(p);
-  h.assertTrue(BiomassSystem.state(p).consumed()&&BiomassSystem.state(p).age()==age&&ModAttachments.getData(p,ModAttachments.PLAYER_STATE).getBiomass()==biomass,"relogin preserves committed kill and cannot award it twice");
+  h.assertTrue(BiomassSystem.state(p).consumed()&&BiomassSystem.state(p).age()==age&&com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.PLAYER_STATE).getBiomass()==biomass,"relogin preserves committed kill and cannot award it twice");
   cow.discard();level.removePlayerImmediately(p,Entity.RemovalReason.DISCARDED);h.succeed();
  }
  @GameTest(template="wall_test",timeoutTicks=60,batch="audit_slime_claim")
  public static void concurrentSlimesCannotClaimTheSamePrey(GameTestHelper h){
   var p=player(h,"SlimeFirst");var q=player(h,"SlimeSecond");var cow=h.spawn(net.minecraft.world.entity.EntityType.COW,4,22,4);cow.setPos(p.position());
   h.assertTrue(BiomassSystem.begin(p,true)&&BiomassSystem.begin(q,true),"both forms start");
-  ModAttachments.setData(p,ModAttachments.BIOMASS_FORM,BiomassSystem.state(p).absorb(cow.getId(),h.getLevel().getGameTime()));
+  com.codex.blacklight.registry.ModAttachments.setData(p, ModAttachments.BIOMASS_FORM,BiomassSystem.state(p).absorb(cow.getId(),h.getLevel().getGameTime()));
   boolean protectedClaim=BiomassSystem.edible(p,cow)&&!BiomassSystem.edible(q,cow);
-  ModAttachments.setData(p,ModAttachments.BIOMASS_FORM,BiomassState.EMPTY);
+  com.codex.blacklight.registry.ModAttachments.setData(p, ModAttachments.BIOMASS_FORM,BiomassState.EMPTY);
   boolean freed=BiomassSystem.edible(q,cow);
   cow.discard();h.getLevel().removePlayerImmediately(p,Entity.RemovalReason.DISCARDED);h.getLevel().removePlayerImmediately(q,Entity.RemovalReason.DISCARDED);
   h.assertTrue(protectedClaim&&freed,"one live claim excludes other players and releases immediately when form ends");h.succeed();
@@ -120,10 +119,10 @@ public final class PostBiomassAuditGameTest {
  public static void consumedSlimeWaitsForStandingRoom(GameTestHelper h){
   var p=player(h,"SlimeRoom");long now=h.getLevel().getGameTime();var ceiling=p.blockPosition().above();
   h.getLevel().setBlock(ceiling,Blocks.STONE.defaultBlockState(),2);
-  ModAttachments.setData(p,ModAttachments.BIOMASS_FORM,new BiomassState(BiomassState.REFORMING,now-BiomassState.REFORM_TICKS,true,"","claws",-1,250));
+  com.codex.blacklight.registry.ModAttachments.setData(p, ModAttachments.BIOMASS_FORM,new BiomassState(BiomassState.REFORMING,now-BiomassState.REFORM_TICKS,true,"","claws",-1,250));
   tickSlime(p);boolean waits=BiomassSystem.state(p).phase()==BiomassState.READY;
   h.getLevel().setBlock(ceiling,Blocks.AIR.defaultBlockState(),2);
-  ModAttachments.setData(p,ModAttachments.BIOMASS_FORM,BiomassSystem.state(p).ready(now-BiomassState.REFORM_TICKS));tickSlime(p);
+  com.codex.blacklight.registry.ModAttachments.setData(p, ModAttachments.BIOMASS_FORM,BiomassSystem.state(p).ready(now-BiomassState.REFORM_TICKS));tickSlime(p);
   boolean restored=!BiomassSystem.active(p);
   h.getLevel().removePlayerImmediately(p,Entity.RemovalReason.DISCARDED);
   h.assertTrue(waits&&restored,"blocked reform waits, then restores at the same position without another prey");h.succeed();

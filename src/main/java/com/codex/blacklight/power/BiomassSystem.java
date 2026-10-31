@@ -23,7 +23,8 @@ public final class BiomassSystem {
     private BiomassSystem(){}
     private record RejectedPrey(java.util.UUID target,long until){}
     private static final java.util.Map<ServerPlayer,RejectedPrey> REJECTED=new java.util.WeakHashMap<>();
-    public static BiomassState state(Entity p){return ModAttachments.peekData(p,ModAttachments.BIOMASS_FORM);}
+    private static final java.util.Set<ServerPlayer> STARTING=java.util.Collections.newSetFromMap(new java.util.IdentityHashMap<>());
+    public static BiomassState state(Entity p){return ModAttachments.peekData(p,ModAttachments.BIOMASS_FORM,BiomassState.EMPTY);}
     public static boolean active(Entity p){return state(p).active();}
     private static void publish(ServerPlayer p,BiomassState value){
         var previous=state(p);
@@ -45,16 +46,31 @@ public final class BiomassSystem {
         if(resize)p.refreshDimensions();
     }
     public static boolean begin(ServerPlayer p,boolean fatal){
+        if(!p.server.isSameThread()||!STARTING.add(p))return false;
+        try{return beginReserved(p,fatal);}finally{STARTING.remove(p);}
+    }
+    private static boolean canBegin(ServerPlayer p,boolean fatal){
         var power=com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.PLAYER_STATE);
         if(active(p)||!power.isInfected()||!power.isPrototypeMode()||p.isSpectator()||p.isRemoved())return false;
         if(!fatal&&(com.codex.blacklight.city.HydraTransport.active(p)||!p.isAlive()||p.isPassenger()||p.isSleeping()||p.isFallFlying()
                 ||com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.CONSUMING)||WeaponCombatSystem.busy(p)||DevastatorSystem.busy(p)))return false;
+        return true;
+    }
+    private static boolean beginReserved(ServerPlayer p,boolean fatal){
+        if(!canBegin(p,fatal))return false;
+        var power=com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.PLAYER_STATE);
         if(fatal&&!power.spendBiomass(Math.max(0,Math.min(1000,p.level().getGameRules().getInt(BiomassRules.COST)))))return false;
         if(fatal){var carrier=com.codex.blacklight.city.HydraTransport.carrier(p);if(carrier!=null)carrier.abortTransport(p);}
         String oldPower=power.getActivePower().id(),shell="";
         if(!fatal){
             var husk=new BiomassHusk(ModEntities.BIOMASS_HUSK.get(),p.level());
             husk.initialize(p);if(!p.serverLevel().addFreshEntity(husk))return false;
+            // Join listeners can remove the shell or change the owner's mode,
+            // level, life or action. Commit only to the still-valid separation.
+            if(!husk.isAlive()||husk.isRemoved()||husk.erupted()||husk.level()!=p.level()
+                    ||com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.PLAYER_STATE)!=power||!canBegin(p,false)){
+                husk.discard();return false;
+            }
             shell=husk.getUUID().toString();
         }
         var heldBlock=BlockThrowSystem.held(p);if(heldBlock!=null)heldBlock.drop();
@@ -107,7 +123,9 @@ public final class BiomassSystem {
             else if(rejected.target().equals(victim.getUUID()))return false;
         }
         return !(victim instanceof BiomassHusk)&&ConsumeSystem.eligibleBiomass(victim)
-                &&ConsumeSystem.healthReady(p,victim)
+                // Death recovery must be possible without first fighting in a helpless form.
+                // Mature organs and protected bosses still retain their physical assimilation gate.
+                &&(state(p).active()&&state(p).fatal()?AssimilationSystem.ready(victim):ConsumeSystem.healthReady(p,victim))
                 &&(claimant(victim)==null||claimant(victim)==p)&&CombatTargeting.damageable(p,victim)
                 &&inContact(p,victim)
                 &&(CombatTargeting.multipart(victim)?CombatTargeting.visibleContact(p,victim,p.getBoundingBox().inflate(1.15,.65,1.15))
@@ -175,16 +193,25 @@ public final class BiomassSystem {
             target.addEffect(new net.minecraft.world.effect.MobEffectInstance(com.codex.blacklight.registry.ModEffects.BIOMASS_CONTACT.get(),8,0,false,true,true));
             if(now-s.changedAt()<ConsumeProgression.absorbTicks(p))return;
             BiomassReformation.prepare(p);
+            var consumeReward=AssimilationSystem.quote(p,target);
             target.invulnerableTime=0;
             float execution=(float)Math.min(Float.MAX_VALUE,Math.max(10000D,(double)target.getMaxHealth()*20));
             boolean accepted=target.hurt(target.damageSources().playerAttack(p),execution);
+            // hurt/die dispatch synchronous external callbacks. The player may
+            // die, travel, recall or leave this form while the prey is dying.
+            // Do not overwrite that newer state with the old scene's full heal.
+            if(!p.isAlive()||p.isRemoved()||p.isSpectator()||p.level()!=target.level()||!state(p).equals(s))return;
             // Respect invulnerability, region protections, death vetoes and resurrection mods.
-            if(!accepted||!((com.codex.blacklight.mixin.LivingDeathAccess)target).blacklight$deathAccepted()){REJECTED.put(p,new RejectedPrey(target.getUUID(),now+BiomassState.ABSORB_TICKS));publish(p,s.crawl(now));return;}
+            if(!accepted||target.isAlive()||!((com.codex.blacklight.mixin.LivingDeathAccess)target).blacklight$deathAccepted()){
+                // Do not immediately reclaim the same immune target and starve other nearby prey.
+                REJECTED.put(p,new RejectedPrey(target.getUUID(),now+BiomassState.ABSORB_TICKS));
+                publish(p,s.crawl(now));return;
+            }
+            if(!AssimilationSystem.settle(p,target,consumeReward,false)){publish(p,s.crawl(now));return;}
             target.setInvisible(true);
             Vec3 destination=BiomassReformation.completionPosition(p,target.position());
             p.teleportTo(destination.x,destination.y,destination.z);
             p.setHealth(p.getMaxHealth());p.clearFire();p.invulnerableTime=40;
-            var power=com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.PLAYER_STATE);power.addBiomass(40);com.codex.blacklight.registry.ModAttachments.syncData(p, ModAttachments.PLAYER_STATE);
             publish(p,s.reform(now));
             burstLoadedHusk(p,s);
         }else if(now-s.changedAt()>=BiomassState.REFORM_TICKS){

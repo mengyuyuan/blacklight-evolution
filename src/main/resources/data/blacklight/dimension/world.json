@@ -1,0 +1,20 @@
+{
+  "type": "blacklight:world",
+  "generator": {
+    "type": "blacklight:world",
+    "settings": {
+      "biome": "blacklight:city",
+      "layers": [
+        {
+          "height": 1,
+          "block": "minecraft:bedrock"
+        }
+      ],
+      "structure_overrides": [
+        "blacklight:city_military_bases"
+      ],
+      "lakes": false,
+      "features": false
+    }
+  }
+}

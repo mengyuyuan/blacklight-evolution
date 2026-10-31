@@ -32,8 +32,7 @@ public final class WingFlightSmoke {
     private static int qaForward,qaSide;private static boolean qaUp,qaDown,qaBoost;
     private static long lastCapture;private static int captured,dropped;
     private static boolean guarded(Minecraft mc){return !Boolean.getBoolean("blacklight.test.wingSonic")&&Boolean.getBoolean("blacklight.test.wings")&&mc.gameDirectory.toPath().toAbsolutePath().normalize().equals(ROOT.resolve("client").toAbsolutePath().normalize());}
-    @SubscribeEvent(priority=EventPriority.LOWEST) public static void tick(net.minecraftforge.event.TickEvent.ClientTickEvent event){
-        if(event.phase!=net.minecraftforge.event.TickEvent.Phase.END)return;
+    @SubscribeEvent(priority=EventPriority.LOWEST) public static void tick(net.minecraftforge.event.TickEvent.ClientTickEvent event){if(event.phase!=net.minecraftforge.event.TickEvent.Phase.END)return;
         var mc=Minecraft.getInstance();if(!guarded(mc)||mc.player==null||mc.getSingleplayerServer()==null||finished)return;
         if(!initialized){
             initialized=true;mc.options.pauseOnLostFocus=false;mc.options.setCameraType(CameraType.THIRD_PERSON_BACK);mc.options.hideGui=true;
@@ -82,7 +81,7 @@ public final class WingFlightSmoke {
             mc.options.hideGui=false;
             var wheel=new com.codex.blacklight.client.screen.PowerWheelScreen(SkillBindings.find("key.blacklight.cycle_form"));
             mc.setScreen(wheel);wheel.keyPressed(org.lwjgl.glfw.GLFW.GLFW_KEY_TAB,0,0);
-            for(int i=0;i<5;i++)wheel.mouseScrolled(0,0,-1);
+            for(int i=0;i<5;i++)wheel.mouseScrolled(0,0,0,-1);
         }
         if(tick==810){
             WRITER.shutdown();try{WRITER.awaitTermination(5,java.util.concurrent.TimeUnit.SECONDS);}catch(InterruptedException ex){Thread.currentThread().interrupt();}
@@ -96,8 +95,7 @@ public final class WingFlightSmoke {
         var input=e.getInput();input.forwardImpulse=qaForward;input.leftImpulse=-qaSide;input.jumping=false;input.shiftKeyDown=false;
         input.up=qaForward>0;input.down=qaForward<0;input.left=qaSide<0;input.right=qaSide>0;
     }
-    @SubscribeEvent public static void frame(net.minecraftforge.event.TickEvent.RenderTickEvent event){
-        if(event.phase!=net.minecraftforge.event.TickEvent.Phase.END)return;
+    @SubscribeEvent public static void frame(net.minecraftforge.event.TickEvent.RenderTickEvent event){if(event.phase!=net.minecraftforge.event.TickEvent.Phase.END)return;
         var mc=Minecraft.getInstance();if(!guarded(mc)||mc.player==null||tick<80||tick>800)return;
         long now=System.nanoTime();if(now-lastCapture<66_666_666L)return;lastCapture=now;
         if(pending.get()>=6){dropped++;return;}

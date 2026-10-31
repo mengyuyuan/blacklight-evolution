@@ -14,6 +14,18 @@ public final class TerrainGrabSelection {
  private static BlockHitResult pick(ServerPlayer p){
   var a=p.getEyePosition();return p.level().clip(new ClipContext(a,a.add(Vec3.directionFromRotation(p.getXRot(),com.codex.blacklight.movement.TraversalSteering.cameraYaw(p)).scale(3.5)),ClipContext.Block.OUTLINE,ClipContext.Fluid.NONE,p));
  }
+ /** Resolve the physical view ray independently from an unrelated locked actor. */
+ public static boolean targetsTerrain(ServerPlayer p){
+  var hit=pick(p);if(hit.getType()!=HitResult.Type.BLOCK)return false;
+  var eye=p.getEyePosition();var end=hit.getLocation();double distance=eye.distanceToSqr(end);
+  var query=new net.minecraft.world.phys.AABB(eye,end).inflate(.15);
+  for(var target:CombatTargeting.candidates(p,query,e->e instanceof net.minecraft.world.entity.Mob&&CombatTargeting.selectable(p,e)))
+   for(var box:CombatTargeting.hitboxes(target)){
+    var touch=box.inflate(.08).clip(eye,end);
+    if(box.contains(eye)||touch.isPresent()&&eye.distanceToSqr(touch.get())<distance)return false;
+   }
+  return true;
+ }
  /** Report the terrain rejection instead of claiming there was no creature target. */
  public static String failureMessage(ServerPlayer p){
   return pick(p).getType()==HitResult.Type.BLOCK?"terrain_grab_unavailable":"terrain_grab_out_of_reach";

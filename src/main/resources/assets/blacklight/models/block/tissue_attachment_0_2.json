@@ -1,0 +1,97 @@
+{
+  "textures": {
+    "flesh": "blacklight:block/hive_flesh",
+    "shell": "blacklight:block/hive_carapace",
+    "vein": "blacklight:block/hive_vein",
+    "particle": "blacklight:block/hive_flesh"
+  },
+  "elements": [
+    {
+      "from": [
+        4,
+        0,
+        4
+      ],
+      "to": [
+        12,
+        0.84,
+        12
+      ],
+      "faces": {
+        "up": {
+          "texture": "#flesh"
+        },
+        "north": {
+          "texture": "#flesh"
+        },
+        "south": {
+          "texture": "#flesh"
+        },
+        "east": {
+          "texture": "#flesh"
+        },
+        "west": {
+          "texture": "#flesh"
+        }
+      }
+    },
+    {
+      "from": [
+        4,
+        0.7999999999999999,
+        4
+      ],
+      "to": [
+        6,
+        0.9359999999999999,
+        12
+      ],
+      "faces": {
+        "up": {
+          "texture": "#shell"
+        },
+        "north": {
+          "texture": "#shell"
+        },
+        "south": {
+          "texture": "#shell"
+        },
+        "east": {
+          "texture": "#shell"
+        },
+        "west": {
+          "texture": "#shell"
+        }
+      }
+    },
+    {
+      "from": [
+        10,
+        0.7999999999999999,
+        4
+      ],
+      "to": [
+        12,
+        0.8959999999999999,
+        12
+      ],
+      "faces": {
+        "up": {
+          "texture": "#vein"
+        },
+        "north": {
+          "texture": "#vein"
+        },
+        "south": {
+          "texture": "#vein"
+        },
+        "east": {
+          "texture": "#vein"
+        },
+        "west": {
+          "texture": "#vein"
+        }
+      }
+    }
+  ]
+}

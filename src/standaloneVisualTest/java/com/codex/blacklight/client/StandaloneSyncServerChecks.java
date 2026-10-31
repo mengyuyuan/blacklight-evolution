@@ -27,15 +27,13 @@ import net.minecraft.world.phys.*;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.eventbus.api.*;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
-import net.minecraftforge.event.TickEvent.ServerTickEvent;
-
 /** Dedicated-only, disposable-world observation of real production C2S handlers.
  * This class deliberately has no client classes, callbacks or client linkage. */
 @EventBusSubscriber(modid="blacklight",value=Dist.DEDICATED_SERVER)
 public final class StandaloneSyncServerChecks {
     private static final String PROPERTY="blacklight.test.standaloneSync";
-    private static final Path SERVER=Path.of("D:/Blacklight-Standalone/run-dev10-dedicated").toAbsolutePath().normalize();
-    private static final Path OUTPUT=Path.of("D:/Blacklight-Standalone/sync-dev10-native").toAbsolutePath().normalize();
+    private static final Path SERVER=Path.of(System.getProperty("blacklight.test.qaDirectory","D:/Blacklight-Standalone/run-dev10-dedicated")).toAbsolutePath().normalize();
+    private static final Path OUTPUT=Path.of(System.getProperty(PROPERTY,"D:/Blacklight-Standalone/sync-dev10-native")).toAbsolutePath().normalize();
     private static final Map<BlockPos,BlockState> blocks=new LinkedHashMap<>();
     private static final Set<UUID> createdEntities=new HashSet<>();
     private static final Map<UUID,Boolean> otherPreferences=new HashMap<>();
@@ -47,8 +45,10 @@ public final class StandaloneSyncServerChecks {
     private static int caseIndex,highestHits;
     private static boolean seenCharge,seenFlight,seenLand;
     private static Cow victim;
+    private static final List<Cow> victims=new ArrayList<>();
     private static BlockPos center;
     private static float initialHealth;
+    private static double landingY;
     private static BlacklightState oldState;
     private static SkillSettings oldSettings;
     private static GameType oldMode;
@@ -56,9 +56,10 @@ public final class StandaloneSyncServerChecks {
     private StandaloneSyncServerChecks(){}
 
     @SubscribeEvent(priority=EventPriority.LOWEST)
-    public static void tick(ServerTickEvent event){if(event.phase!=net.minecraftforge.event.TickEvent.Phase.END)return;
+    public static void tick(net.minecraftforge.event.TickEvent.ServerTickEvent event){if(event.phase!=net.minecraftforge.event.TickEvent.Phase.END)return;
         if(System.getProperty(PROPERTY,"").isBlank())return;
-        var server=event.getServer();
+        var server=net.minecraftforge.server.ServerLifecycleHooks.getCurrentServer();
+        if(server==null)return;
         try{
             if(!initialized){
                 if(!server.isDedicatedServer()||server.getPort()!=25568
@@ -72,10 +73,11 @@ public final class StandaloneSyncServerChecks {
                 if(server.overworld().getGameTime()-finishedAt>=100)server.halt(false);
                 return;
             }
-            require(server.overworld().getGameTime()-began<6000,"dedicated synchronization fixture exceeded five minutes");
+            require(server.overworld().getGameTime()-began<(owner==null?12000:6000),"dedicated synchronization fixture exceeded its connection/action deadline");
             var p=owner==null?server.getPlayerList().getPlayers().stream().filter(x->x.getGameProfile().getName().equals("Dev")).findFirst().orElse(null):server.getPlayerList().getPlayer(owner);
             if(p==null){if(owner!=null)throw new IllegalStateException("QA owner disconnected before completion");if(server.overworld().getGameTime()%20==0)write(server,null);return;}
             if(owner==null){
+                began=server.overworld().getGameTime();
                 owner=p.getUUID();oldState=com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.PLAYER_STATE);oldSettings=com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.SKILL_SETTINGS);oldMode=p.gameMode.getGameModeForPlayer();oldPosition=p.position();
                 defaultOn=oldSettings.bulletdiveBlockBreaking();require(defaultOn,"fresh dedicated player did not default block breaking ON");
                 for(var other:server.getPlayerList().getPlayers())if(other!=p)otherPreferences.put(other.getUUID(),com.codex.blacklight.registry.ModAttachments.getData(other, ModAttachments.SKILL_SETTINGS).bulletdiveBlockBreaking());
@@ -95,10 +97,18 @@ public final class StandaloneSyncServerChecks {
             boolean enabled=com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.SKILL_SETTINGS).bulletdiveBlockBreaking();
             if(stage.equals("WAIT_OFF")&&!enabled){recordSetting(p,false,"off_received");prepare(p,0);setStage(server,"OFF_READY");}
             else if(stage.equals("WAIT_ON")&&enabled){recordSetting(p,true,"on_received");prepare(p,1);setStage(server,"ON_READY");}
-            else if(stage.equals("WAIT_FINAL_OFF")&&!enabled){recordSetting(p,false,"final_off_saved");cleanup(p);completed=true;finishedAt=server.overworld().getGameTime();stage="COMPLETE";write(server,p);return;}
+            else if(stage.equals("WAIT_FINAL_OFF")&&!enabled){recordSetting(p,false,"final_off_saved");cleanup(p);setStage(server,"WAIT_RETURN_ACK");write(server,p);return;}
+            if(stage.equals("WAIT_RETURN_ACK")){
+                require(p.level().getGameTime()-stageAt<200,"ordinary return teleport was not acknowledged");
+                if(pendingCorrection(p).equals("null")&&p.position().distanceToSqr(oldPosition)<1){
+                    completed=true;finishedAt=server.overworld().getGameTime();stage="COMPLETE";write(server,p);return;
+                }
+            }
             if(stage.equals("OFF_READY")||stage.equals("ON_READY")){
                 var visual=com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.DEVASTATOR_VISUAL);var probe=DevastatorSystem.snapshot(p);
-                if(visual.kind()==3){session=visual.session();seenCharge|=visual.phase()==DevastatorSystem.CHARGE;seenFlight|=visual.phase()==DevastatorSystem.FLIGHT;seenLand|=visual.phase()==DevastatorSystem.LAND;
+                if(visual.kind()==3){
+                    if(visual.phase()==DevastatorSystem.LAND&&!seenLand)landingY=p.getY();
+                    session=visual.session();seenCharge|=visual.phase()==DevastatorSystem.CHARGE;seenFlight|=visual.phase()==DevastatorSystem.FLIGHT;seenLand|=visual.phase()==DevastatorSystem.LAND;
                     if(probe!=null)highestHits=Math.max(highestHits,probe.hits());
                     if(visual.phase()==DevastatorSystem.FLIGHT&&p.getY()>251){
                         // A real immutable support follows glide drift before collision;
@@ -107,11 +117,20 @@ public final class StandaloneSyncServerChecks {
                     }
                 }
                 var row=new JsonObject();row.addProperty("tick",p.level().getGameTime());row.addProperty("case",caseIndex);row.addProperty("kind",visual.kind());row.addProperty("phase",visual.phase());row.addProperty("session",visual.session());row.addProperty("released",visual.released());row.addProperty("y",p.getY());row.addProperty("onGround",p.onGround());row.addProperty("fallHeight",visual.fallHeight());row.addProperty("downSpeed",visual.downSpeed());row.addProperty("serverHits",probe==null?highestHits:probe.hits());
+                if(seenLand&&probe!=null&&probe.age()<=.3){
+                    row.addProperty("age",probe.age());row.addProperty("pendingCorrection",pendingCorrection(p));
+                    row.addProperty("damagedTargets",victims.stream().filter(v->v.getHealth()<initialHealth).count());
+                }
                 if(samples.size()<4000)samples.add(row);
+                require(!seenLand||visual.kind()!=3||visual.phase()!=DevastatorSystem.LAND||p.getY()<=landingY+.5,
+                        "server-owned landing moved upward: landedY="+landingY+" actual="+p.position()+" pending="+pendingCorrection(p));
                 var job=session<0?null:BulletdiveTerrain.snapshot(p,session);
                 if(seenLand&&visual.kind()<0&&(caseIndex==0||job!=null&&job.complete())){
-                    require(seenCharge&&seenFlight,"real server action missed charge or flight");require(victim!=null&&victim.getHealth()<initialHealth&&highestHits>0,"settings toggle disabled actual impact damage");
+                    // Static targets cover real glide drift; no target/actor is
+                    // moved into a successful collision after takeoff.
+                    victim=victims.stream().filter(v->v.getHealth()<initialHealth).findFirst().orElse(victim);
                     int changed=changed(p),loot=loot(p);var impact=new JsonObject();impact.addProperty("case",caseIndex);impact.addProperty("breakingEnabled",caseIndex==1);impact.addProperty("session",session);impact.addProperty("initialTargetHealth",initialHealth);impact.addProperty("finalTargetHealth",victim.getHealth());impact.addProperty("serverHits",highestHits);impact.addProperty("airBlocksInSubstrate",changed);impact.addProperty("liveItemEntities",loot);impact.addProperty("terrainComplete",job!=null&&job.complete());
+                    require(seenCharge&&seenFlight,"real server action missed charge or flight");require(victim!=null&&victim.getHealth()<initialHealth&&highestHits>0,"actual impact missed all stationary targets");
                     if(caseIndex==0){require(job==null&&changed==0&&loot==0,"OFF impact broke blocks or spawned terrain loot");}
                     else{require(job!=null&&job.complete()&&job.destroyed()>0&&changed>0&&loot>0,"ON impact lacked actual blocks and live drops");impact.addProperty("destroyed",job.destroyed());impact.addProperty("terrainReason",job.reason());}
                     impacts.add(impact);setStage(server,caseIndex==0?"WAIT_ON":"WAIT_FINAL_OFF");
@@ -136,7 +155,11 @@ public final class StandaloneSyncServerChecks {
             level.setBlockAndUpdate(pos,(y<=250?Blocks.DIRT:Blocks.AIR).defaultBlockState());
         }
         level.setBlockAndUpdate(center,Blocks.BEDROCK.defaultBlockState());
-        victim=new Cow(EntityType.COW,level);victim.setNoAi(true);victim.setNoGravity(true);victim.setPersistenceRequired();victim.getAttribute(Attributes.MAX_HEALTH).setBaseValue(20_000);victim.setHealth(20_000);victim.moveTo(.5,251,center.getZ()+3.5,180,0);level.addFreshEntity(victim);createdEntities.add(victim.getUUID());initialHealth=victim.getHealth();
+        victims.clear();
+        for(int x=-12;x<=12;x+=6)for(int z=-12;z<=12;z+=6){
+            var target=new Cow(EntityType.COW,level);target.setNoAi(true);target.setNoGravity(true);target.setPersistenceRequired();target.getAttribute(Attributes.MAX_HEALTH).setBaseValue(20_000);target.setHealth(20_000);target.moveTo(x+.5,251,center.getZ()+z+.5,180,0);level.addFreshEntity(target);createdEntities.add(target.getUUID());victims.add(target);
+        }
+        victim=victims.get(12);initialHealth=victim.getHealth();
         p.setHealth(p.getMaxHealth());p.connection.teleport(.5,331,center.getZ()+.5,0,0);p.setDeltaMovement(Vec3.ZERO);p.setOnGround(false);p.fallDistance=0;
     }
     private static void remember(ServerPlayer p,BlockPos pos){
@@ -144,21 +167,25 @@ public final class StandaloneSyncServerChecks {
     }
     private static int changed(ServerPlayer p){int count=0;for(int x=-14;x<=14;x++)for(int z=-14;z<=14;z++)for(int y=247;y<=250;y++)if(p.level().getBlockState(new BlockPos(x,y,center.getZ()+z)).isAir())count++;return count;}
     private static int loot(ServerPlayer p){
-        var items=p.serverLevel().getEntitiesOfClass(ItemEntity.class,new AABB(center).inflate(22,8,22));int count=0;
+        // The elevated test pad opens into air; drops can leave an eight-block
+        // vertical observation box before the landing recovery finishes.
+        var area=new AABB(center.getX()-22D,p.level().getMinBuildHeight(),center.getZ()-22D,
+                center.getX()+23D,center.getY()+9D,center.getZ()+23D);
+        var items=p.serverLevel().getEntitiesOfClass(ItemEntity.class,area);int count=0;
         for(var item:items){if(item.getItem().is(net.minecraft.world.item.Items.DIRT)){count++;createdEntities.add(item.getUUID());}}
         return count;
     }
     private static void recordSetting(ServerPlayer p,boolean expected,String reason)throws Exception{
         var tag=p.saveWithoutId(new CompoundTag());var saved=findSettings(tag,0);
-        require(saved!=null&&SkillSettings.CODEC.parse(NbtOps.INSTANCE,saved).getOrThrow().bulletdiveBlockBreaking()==expected,"actual attachment serialization mismatch");
+        require(saved!=null&&SkillSettings.CODEC.parse(NbtOps.INSTANCE,saved).getOrThrow(false, message -> { throw new AssertionError(message); }).bulletdiveBlockBreaking()==expected,"actual attachment serialization mismatch");
         p.server.getPlayerList().saveAll();var path=p.server.getWorldPath(LevelResource.PLAYER_DATA_DIR).resolve(p.getUUID()+".dat");
-        require(Files.exists(path),"settings were not written to a player file");var disk=findSettings(NbtIo.readCompressed(path,NbtAccounter.unlimitedHeap()),0);
-        require(disk!=null&&SkillSettings.CODEC.parse(NbtOps.INSTANCE,disk).getOrThrow().bulletdiveBlockBreaking()==expected,"disk player attachment mismatch");
+        require(Files.exists(path),"settings were not written to a player file");var disk=findSettings(NbtIo.readCompressed(path.toFile()),0);
+        require(disk!=null&&SkillSettings.CODEC.parse(NbtOps.INSTANCE,disk).getOrThrow(false, message -> { throw new AssertionError(message); }).bulletdiveBlockBreaking()==expected,"disk player attachment mismatch");
         var row=new JsonObject();row.addProperty("tick",p.level().getGameTime());row.addProperty("callerUuid",p.getUUID().toString());row.addProperty("reason",reason);row.addProperty("serverAttachment",expected);row.addProperty("serializedAttachment",saved.toString());row.addProperty("diskAttachment",disk.toString());row.addProperty("savedPlayerFile",path.toString());settings.add(row);
     }
     private static CompoundTag findSettings(CompoundTag tag,int depth){
-        if(depth>8)return null;if(tag.contains("blacklight:skill_settings",Tag.TAG_COMPOUND))return tag.getCompound("blacklight:skill_settings");
-        for(String key:tag.getAllKeys())if(tag.contains(key,Tag.TAG_COMPOUND)){var found=findSettings(tag.getCompound(key),depth+1);if(found!=null)return found;}return null;
+        var fields=tag.getCompound("ForgeCaps").getCompound("blacklight:entity_state");
+        return fields.contains("skill_settings",Tag.TAG_COMPOUND)?fields.getCompound("skill_settings"):null;
     }
     private static void cleanup(ServerPlayer p){
         DevastatorSystem.cancel(p);WeaponCombatSystem.cancel(p);NativePlayerActionBackend.clear(p);
@@ -174,6 +201,13 @@ public final class StandaloneSyncServerChecks {
             report.add("settings",settings);report.add("serverSamples",samples);report.add("impacts",impacts);if(error!=null)report.addProperty("error",error);
             var tmp=OUTPUT.resolve("sync-server.pending.json");Files.writeString(tmp,new GsonBuilder().setPrettyPrinting().create().toJson(report));Files.move(tmp,OUTPUT.resolve("sync-server-report.json"),StandardCopyOption.REPLACE_EXISTING);
         }catch(Exception problem){BlacklightNeoMod.LOGGER.error("Cannot write dedicated sync report",problem);}
+    }
+    private static String pendingCorrection(ServerPlayer p){
+        for(String name:new String[]{"awaitingPositionFromClient","f_9766_"}){
+            try{var field=net.minecraft.server.network.ServerGamePacketListenerImpl.class.getDeclaredField(name);field.setAccessible(true);return String.valueOf(field.get(p.connection));}
+            catch(NoSuchFieldException ignored){}catch(IllegalAccessException failure){throw new IllegalStateException(failure);}
+        }
+        throw new IllegalStateException("No mapped pending teleport field for QA observation");
     }
     private static void require(boolean ok,String message){if(!ok)throw new IllegalStateException(message);}
 }

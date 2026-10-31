@@ -20,6 +20,9 @@ import java.util.Comparator;
 
 public final class BlacklightInfectionSystem {
     private static final double HUNT_RADIUS = 14.0D;
+    // Entity publication and inventory drops invoke synchronous third-party
+    // callbacks. Reserve the source for the complete conversion transaction.
+    private static final java.util.Set<Mob> CONVERTING = java.util.Collections.newSetFromMap(new java.util.IdentityHashMap<>());
 
     private BlacklightInfectionSystem() {
     }
@@ -48,7 +51,20 @@ public final class BlacklightInfectionSystem {
     /** Eligibility is checked before random exposure/cooldown; players awaken voluntarily. */
     public static boolean canInfect(LivingEntity target) {
         return target != null && ModAttachments.available(target) && !target.level().isClientSide && target.isAlive()
-                && target instanceof Mob && !(target instanceof com.codex.blacklight.entity.HiveTendril) && !isInfected(target);
+                && target instanceof Mob && !infectionImmune(target) && !(target instanceof com.codex.blacklight.entity.HiveTendril) && !isInfected(target);
+    }
+
+    public static boolean infectionImmune(LivingEntity target){
+        return target instanceof com.codex.blacklight.entity.MilitarySoldier soldier
+                &&soldier.faction()==com.codex.blacklight.military.MilitaryFaction.BLACKWATCH;
+    }
+    /** Migrate still-native saved soldiers before any infection conversion/AI tick. */
+    public static void preserveBlackwatch(LivingEntity target){
+        if(target.level().isClientSide||!ModAttachments.available(target)||!infectionImmune(target))return;
+        if(target.hasEffect(ModEffects.BLACKLIGHT_INFECTION.get()))target.removeEffect(ModEffects.BLACKLIGHT_INFECTION.get());
+        if(ModAttachments.peekData(target,ModAttachments.INFECTION_START,-1L)>=0){
+            com.codex.blacklight.registry.ModAttachments.setData(target, ModAttachments.INFECTION_START,-1L);com.codex.blacklight.registry.ModAttachments.syncData(target, ModAttachments.INFECTION_START);
+        }
     }
 
     public static boolean awaken(Player player) {
@@ -67,11 +83,12 @@ public final class BlacklightInfectionSystem {
     }
 
     public static boolean isInfected(LivingEntity entity) {
+        if(infectionImmune(entity))return false;
         if (entity instanceof Player player) {
             return ModAttachments.peekData(player, ModAttachments.PLAYER_STATE).isInfected();
         }
-        return entity instanceof com.codex.blacklight.entity.BlacklightHydra || entity instanceof com.codex.blacklight.entity.HiveTendril || entity instanceof com.codex.blacklight.entity.BlacklightInfectedHost || entity instanceof com.codex.blacklight.entity.BlacklightHunter || entity instanceof com.codex.blacklight.entity.BlacklightMutant || entity instanceof com.codex.blacklight.entity.BlacklightHive || entity.hasEffect(ModEffects.BLACKLIGHT_INFECTION.get())
-                || (ModAttachments.peekData(entity, ModAttachments.INFECTION_START)>=0
+        return entity instanceof com.codex.blacklight.entity.BlacklightCommonInfected || entity instanceof com.codex.blacklight.entity.BlacklightHydra || entity instanceof com.codex.blacklight.entity.HiveTendril || entity instanceof com.codex.blacklight.entity.BlacklightInfectedHost || entity instanceof com.codex.blacklight.entity.BlacklightHunter || entity instanceof com.codex.blacklight.entity.BlacklightMutant || entity instanceof com.codex.blacklight.entity.BlacklightHive || entity.hasEffect(ModEffects.BLACKLIGHT_INFECTION.get())
+                || (ModAttachments.peekData(entity, ModAttachments.INFECTION_START, -1L)>=0
                     && com.codex.blacklight.entity.InfectedBossProfile.forSpecies(net.minecraft.core.registries.BuiltInRegistries.ENTITY_TYPE.getKey(entity.getType()).toString())!=null);
     }
 
@@ -85,7 +102,7 @@ public final class BlacklightInfectionSystem {
     @SubscribeEvent
     public static void onContactDamage(ForgeDamageEvent.Post event) {
         LivingEntity victim = event.getEntity();
-        if (event.getNewDamage() <= 0.0F || !canInfect(victim)) return;
+        if (event.getNewDamage() <= 0.0F || !com.codex.blacklight.config.GameplayBalanceConfig.CONTACT_ENABLED.get() || !canInfect(victim)) return;
         var damage = event.getSource();
         // Only physical bites/claws by infected creatures can spread infection.
         // Causing-entity alone also matches arrows, explosions and thorns, and
@@ -98,16 +115,17 @@ public final class BlacklightInfectionSystem {
         if (data.getLong(InfectionRules.NEXT_CONTACT_EXPOSURE) > now) return;
         // Failed rolls also consume this victim's exposure window. Multiple
         // attackers and save/reload cannot reroll every damage event.
-        data.putLong(InfectionRules.NEXT_CONTACT_EXPOSURE, now + InfectionRules.CONTACT_COOLDOWN_TICKS);
-        if (attacker.getRandom().nextFloat() < InfectionRules.CONTACT_CHANCE) infect(victim, attacker);
+        data.putLong(InfectionRules.NEXT_CONTACT_EXPOSURE, now + com.codex.blacklight.config.GameplayBalanceConfig.CONTACT_COOLDOWN.get());
+        if (attacker.getRandom().nextFloat() < com.codex.blacklight.config.GameplayBalanceConfig.CONTACT_CHANCE.get()) infect(victim, attacker);
     }
 
     @SubscribeEvent
-    public static void onInfectedMobTick(ForgeEntityTickEvent.Post event) {
+    public static void onInfectedMobTick(com.codex.blacklight.combat.ForgeEntityTickEvent.Post event) {
+        if(event.getEntity() instanceof LivingEntity immune&&infectionImmune(immune)){preserveBlackwatch(immune);return;}
         if (!(event.getEntity() instanceof Mob mob)
                 || !(mob.level() instanceof ServerLevel serverLevel)
-                || !ModAttachments.available(mob) || !mob.isAlive() || mob instanceof com.codex.blacklight.entity.BlacklightHydra || mob instanceof com.codex.blacklight.entity.HiveTendril || mob instanceof com.codex.blacklight.entity.BlacklightInfectedHost || mob instanceof com.codex.blacklight.entity.BlacklightHunter || mob instanceof com.codex.blacklight.entity.BlacklightMutant || mob instanceof com.codex.blacklight.entity.BlacklightHive || !isInfected(mob)) return;
-        long onset=ModAttachments.peekData(mob, ModAttachments.INFECTION_START);
+                || !ModAttachments.available(mob) || !mob.isAlive() || mob instanceof com.codex.blacklight.entity.BlacklightCommonInfected || mob instanceof com.codex.blacklight.entity.BlacklightHydra || mob instanceof com.codex.blacklight.entity.HiveTendril || mob instanceof com.codex.blacklight.entity.BlacklightInfectedHost || mob instanceof com.codex.blacklight.entity.BlacklightHunter || mob instanceof com.codex.blacklight.entity.BlacklightMutant || mob instanceof com.codex.blacklight.entity.BlacklightHive || !isInfected(mob)) return;
+        long onset=ModAttachments.peekData(mob, ModAttachments.INFECTION_START, -1L);
         // Migrate existing saved infections too, without removing infection or other effects.
         var infection=mob.getEffect(ModEffects.BLACKLIGHT_INFECTION.get());
         if(infection!=null&&infection.isVisible())mob.addEffect(new MobEffectInstance(
@@ -123,9 +141,29 @@ public final class BlacklightInfectionSystem {
     }
 
     private static void convertHost(Mob source, ServerLevel level) {
+        if (!level.getServer().isSameThread() || source.level() != level || !source.isAlive()
+                || source.isRemoved() || !CONVERTING.add(source)) return;
+        try {
+            publishReplacement(source, level);
+        } finally {
+            CONVERTING.remove(source);
+        }
+    }
+
+    private static boolean liveReplacement(Mob source, com.codex.blacklight.entity.BlacklightInfectedHost infected, ServerLevel level) {
+        return source.isAlive() && !source.isRemoved() && source.level() == level && isInfected(source)
+                && infected.isAlive() && !infected.isRemoved() && infected.level() == level;
+    }
+
+    private static void publishReplacement(Mob source, ServerLevel level) {
         var infected = com.codex.blacklight.registry.ModEntities.INFECTED_HOST.get().create(level);
         if (infected == null) return;
         infected.inherit(source);
+        // inherit() also prepares equipment for standalone authored fixtures.
+        // During a real replacement the source owns those stacks until commit;
+        // a join callback must never be able to take a second copy from the host.
+        for (var slot : net.minecraft.world.entity.EquipmentSlot.values())
+            infected.setItemSlot(slot, net.minecraft.world.item.ItemStack.EMPTY);
         infected.copyPosition(source);
         infected.yBodyRot=source.yBodyRot;infected.yHeadRot=source.yHeadRot;
         infected.setDeltaMovement(source.getDeltaMovement());
@@ -134,10 +172,14 @@ public final class BlacklightInfectionSystem {
         source.getTags().forEach(infected::addTag);
         // The source and its inventory survive if another mod vetoes replacement.
         if (!level.addFreshEntity(infected)) return;
+        if (!liveReplacement(source, infected, level)) {
+            infected.discard();
+            return;
+        }
         // Conversion is not a kill: return stored possessions even with doMobLoot=false.
         // Never clear them before the replacement joins, and retain the source if an
         // item-spawn veto prevents returning a slot. Earlier accepted drops stay dropped.
-        if (!releaseStoredItems(source, level)) {
+        if (!releaseStoredItems(source, level) || !liveReplacement(source, infected, level)) {
             infected.discard();
             source.getPersistentData().putLong("BlacklightConversionRetry", level.getGameTime() + 200);
             return;
@@ -179,14 +221,17 @@ public final class BlacklightInfectionSystem {
             }
         }
         // These two vanilla species store only a saddle flag, not an inventory stack.
-        // Keep this last, so accepted insertion is followed immediately by conversion.
+        // Transfer the flag before item publication, just like a real inventory slot.
+        // A join listener may invalidate conversion after accepting the returned item.
         if ((source instanceof net.minecraft.world.entity.animal.Pig
                 || source instanceof net.minecraft.world.entity.monster.Strider)
                 && source instanceof net.minecraft.world.entity.Saddleable saddled && saddled.isSaddled()) {
             var drop = new net.minecraft.world.entity.item.ItemEntity(level, source.getX(), source.getY(), source.getZ(),
                     new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.SADDLE));
             drop.setDefaultPickUpDelay();
-            if (!level.addFreshEntity(drop)) return false;
+            var steering=((SaddleSteeringAccess)source).blacklight$steering();
+            steering.setSaddle(false);
+            if (!level.addFreshEntity(drop)) {steering.setSaddle(true);return false;}
         }
         return true;
     }

@@ -1,0 +1,23 @@
+{
+  "replace": false,
+  "values": [
+    "minecraft:iron_block",
+    "minecraft:raw_iron_block",
+    "minecraft:iron_bars",
+    "minecraft:iron_door",
+    "minecraft:iron_trapdoor",
+    "minecraft:copper_block",
+    "minecraft:cut_copper",
+    "minecraft:exposed_copper",
+    "minecraft:weathered_copper",
+    "minecraft:oxidized_copper",
+    "minecraft:gold_block",
+    "minecraft:netherite_block",
+    "minecraft:anvil",
+    "minecraft:chipped_anvil",
+    "minecraft:damaged_anvil",
+    "blacklight:command_terminal",
+    "blacklight:communications_antenna",
+    "blacklight:military_searchlight"
+  ]
+}

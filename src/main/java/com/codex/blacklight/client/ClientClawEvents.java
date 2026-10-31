@@ -36,6 +36,7 @@ import org.lwjgl.glfw.GLFW;
 @EventBusSubscriber(modid = BlacklightNeoMod.MOD_ID, value = Dist.CLIENT)
 public final class ClientClawEvents {
     public static KeyMapping targetLockKey(){return TARGET_LOCK;}
+    public static KeyMapping targetInfoKey(){return TARGET_INFO;}
     private static final String CATEGORY = "key.categories.blacklight";
     private static final KeyMapping CYCLE_FORM = new KeyMapping("key.blacklight.cycle_form", InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_Z, CATEGORY);
     private static final KeyMapping GRAB = new KeyMapping(
@@ -50,6 +51,8 @@ public final class ClientClawEvents {
             "key.blacklight.animation_tuner", InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_J, CATEGORY);
     private static final KeyMapping TARGET_LOCK = new KeyMapping(
             "key.blacklight.target_lock", InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_TAB, CATEGORY);
+    private static final KeyMapping TARGET_INFO = new KeyMapping(
+            "key.blacklight.target_info", InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_RIGHT_ALT, CATEGORY);
     private static final KeyMapping UPGRADE_PANEL = new KeyMapping(
             "key.blacklight.upgrades", InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_U, CATEGORY);
     /** Grounded left-clicks held this long become a dashing slice instead of a combo hit. */
@@ -89,25 +92,44 @@ public final class ClientClawEvents {
         if (DeveloperTools.enabled()) event.register(CLAW_TUNER);
         if (DeveloperTools.enabled()) event.register(ANIMATION_TUNER);
         event.register(TARGET_LOCK);
+        event.register(TARGET_INFO);
         event.register(UPGRADE_PANEL);
     }
 
     @SubscribeEvent
     public static void registerRenderers(EntityRenderersEvent.RegisterRenderers event) {
+        event.registerEntityRenderer(ModEntities.VEHICLE_ORDNANCE.get(),com.codex.blacklight.client.renderer.OrdnanceRenderer::new);
+        event.registerEntityRenderer(ModEntities.MILITARY_TRUCK.get(),context->new com.codex.blacklight.client.renderer.MilitaryVehicleRenderer(context,"truck"));
+        event.registerEntityRenderer(ModEntities.MILITARY_APC.get(),context->new com.codex.blacklight.client.renderer.MilitaryVehicleRenderer(context,"apc"));
+        event.registerEntityRenderer(ModEntities.MILITARY_TANK.get(),context->new com.codex.blacklight.client.renderer.MilitaryVehicleRenderer(context,"tank"));
+        event.registerEntityRenderer(ModEntities.BLACKWATCH_TRUCK.get(),context->new com.codex.blacklight.client.renderer.MilitaryVehicleRenderer(context,"truck"));
+        event.registerEntityRenderer(ModEntities.BLACKWATCH_APC.get(),context->new com.codex.blacklight.client.renderer.MilitaryVehicleRenderer(context,"apc"));
+        event.registerEntityRenderer(ModEntities.BLACKWATCH_TANK.get(),context->new com.codex.blacklight.client.renderer.MilitaryVehicleRenderer(context,"tank"));
         event.registerEntityRenderer(ModEntities.BLACKWATCH_SOLDIER.get(),context->new com.codex.blacklight.client.renderer.BlackwatchRenderer(context,false));
         event.registerEntityRenderer(ModEntities.BLACKWATCH_HEAVY.get(),context->new com.codex.blacklight.client.renderer.BlackwatchRenderer(context,true));
+        event.registerEntityRenderer(ModEntities.MILITARY_SOLDIER.get(),context->new com.codex.blacklight.client.renderer.BlackwatchRenderer(context,false,true));
+        event.registerEntityRenderer(ModEntities.MILITARY_HEAVY.get(),context->new com.codex.blacklight.client.renderer.BlackwatchRenderer(context,true,true));
+        event.registerEntityRenderer(ModEntities.MILITARY_TEAM_LEADER.get(),context->new com.codex.blacklight.client.renderer.BlackwatchRenderer(context,false,true));
+        event.registerEntityRenderer(ModEntities.MILITARY_OFFICER.get(),context->new com.codex.blacklight.client.renderer.BlackwatchRenderer(context,false,true));
+        event.registerEntityRenderer(ModEntities.MILITARY_COMMANDER.get(),context->new com.codex.blacklight.client.renderer.BlackwatchRenderer(context,false,true));
+        event.registerEntityRenderer(ModEntities.BLACKWATCH_TEAM_LEADER.get(),context->new com.codex.blacklight.client.renderer.BlackwatchRenderer(context,false));
+        event.registerEntityRenderer(ModEntities.BLACKWATCH_OFFICER.get(),context->new com.codex.blacklight.client.renderer.BlackwatchRenderer(context,false));
+        event.registerEntityRenderer(ModEntities.BLACKWATCH_COMMANDER.get(),context->new com.codex.blacklight.client.renderer.BlackwatchRenderer(context,false));
         event.registerEntityRenderer(ModEntities.THROWN_BLOCK.get(),com.codex.blacklight.client.renderer.ThrownBlockRenderer::new);
         event.registerEntityRenderer(ModEntities.BIOMASS_HUSK.get(),com.codex.blacklight.client.renderer.BiomassHuskRenderer::new);
         event.registerEntityRenderer(ModEntities.INFECTED_HOST.get(), com.codex.blacklight.client.renderer.InfectedHostRenderer::new);
+        event.registerEntityRenderer(ModEntities.COMMON_INFECTED.get(), com.codex.blacklight.client.renderer.CommonInfectedRenderer::new);
         event.registerEntityRenderer(ModEntities.GROUND_SPIKE.get(), GroundSpikeRenderer::new);
         for(var type:java.util.List.of(ModEntities.BLACKLIGHT_STALKER,ModEntities.BLACKLIGHT_SPITTER,ModEntities.BLACKLIGHT_BRUTE))
             event.registerEntityRenderer(type.get(),context->new com.codex.blacklight.client.renderer.BlacklightCreatureRenderer<com.codex.blacklight.entity.BlacklightMutant>(context,com.codex.blacklight.entity.BlacklightMutant::asset));
         event.registerEntityRenderer(ModEntities.HIVE_TENDRIL.get(),com.codex.blacklight.client.renderer.HiveTendrilRenderer::new);
         event.registerEntityRenderer(ModEntities.BLACKLIGHT_HIVE.get(),context->new com.codex.blacklight.client.renderer.BlacklightCreatureRenderer<com.codex.blacklight.entity.BlacklightHive>(context,e->"blacklight_hive"));
-        event.registerEntityRenderer(ModEntities.BLACKLIGHT_SPIT.get(),ThrownItemRenderer::new);
+        event.registerEntityRenderer(ModEntities.BLACKLIGHT_SPIT.get(),com.codex.blacklight.client.renderer.BlacklightSpitRenderer::new);
+        event.registerEntityRenderer(ModEntities.EVOLVED_QUILL.get(),com.codex.blacklight.client.renderer.EvolvedQuillRenderer::new);
+        event.registerEntityRenderer(ModEntities.INFECTED_TUMOR.get(),com.codex.blacklight.client.renderer.InfectedTumorRenderer::new);
         event.registerEntityRenderer(ModEntities.BLACKLIGHT_HUNTER.get(), com.codex.blacklight.client.renderer.BlacklightHunterRenderer::new);
         event.registerEntityRenderer(ModEntities.BLACKLIGHT_HYDRA.get(), com.codex.blacklight.client.renderer.BlacklightHydraRenderer::new);
-        event.registerEntityRenderer(ModEntities.BLACKLIGHT_VIRUS_VIAL.get(), ThrownItemRenderer::new);
+        event.registerEntityRenderer(ModEntities.BLACKLIGHT_VIRUS_VIAL.get(), com.codex.blacklight.client.renderer.VirusVialRenderer::new);
     }
 
     @SubscribeEvent
@@ -129,6 +151,7 @@ public final class ClientClawEvents {
     @SubscribeEvent
     public static void onKey(InputEvent.Key event) {
         Minecraft minecraft = Minecraft.getInstance();
+        if(VehicleControls.riding()&&!TARGET_LOCK.matches(event.getKey(),event.getScanCode())||VehicleControls.interacting()&&minecraft.options.keyUse.matches(event.getKey(),event.getScanCode()))return;
         if(minecraft.screen==null && (minecraft.options.keyAttack.matches(event.getKey(),event.getScanCode()) || minecraft.options.keyUse.matches(event.getKey(),event.getScanCode()))){
             ClientWeaponCombat.poll();tickGrabButtons();
         }
@@ -140,6 +163,8 @@ public final class ClientClawEvents {
     }
 
     private static void handleKeyPress(Minecraft minecraft,java.util.function.Predicate<KeyMapping> matches){
+        if(minecraft.screen==null&&ClientTargetLock.active()&&matches.test(TARGET_LOCK)){toggleTargetLock(minecraft);return;}
+        if(VehicleControls.riding())return;
         var state = com.codex.blacklight.registry.ModAttachments.getData(minecraft.player, ModAttachments.PLAYER_STATE);
         if (minecraft.screen == null && matches.test(PROTOTYPE_MODE)) {
             PacketDistributor.sendToServer(new PrototypeModePayload(!state.isPrototypeMode()));
@@ -183,9 +208,13 @@ public final class ClientClawEvents {
     @SubscribeEvent
     public static void onClientTick(ClientTickEvent event){if(event.phase!=net.minecraftforge.event.TickEvent.Phase.END)return;
         resetInputOwner();
+        suppressPrototypePlayerList();
+        if(VehicleControls.riding()){
+            clearLeftAttackHold();deferredGrabTick=-1;lastGrabDown=physicalGrabDown();
+            ClientWeaponCombat.poll();return;
+        }
         pollGrabPress(physicalGrabDown());
         ClientTerrainGrab.tick();
-        suppressPrototypePlayerList();
         tickGrabButtons();
         ClientWeaponCombat.poll();
         tickDeferredGrab();
@@ -203,8 +232,10 @@ public final class ClientClawEvents {
     public static void onRawMouseButton(InputEvent.MouseButton.Pre event) {
         Minecraft minecraft = Minecraft.getInstance();
         if (minecraft.player == null || minecraft.screen != null) return;
+        if(VehicleControls.riding()||VehicleControls.interacting()&&SkillBindings.mouse(minecraft.options.keyUse,event.getButton()))return;
         if(event.getAction()==GLFW.GLFW_PRESS){
             boolean mapped=java.util.stream.Stream.of(PROTOTYPE_MODE,UPGRADE_PANEL,CYCLE_FORM,GRAB,TARGET_LOCK,TOGGLE_CLAWS,CLAW_TUNER,ANIMATION_TUNER)
+                    .filter(key->DeveloperTools.enabled()||key!=CLAW_TUNER&&key!=ANIMATION_TUNER)
                     .anyMatch(key->SkillBindings.mouse(key,event.getButton()));
             if(mapped){handleKeyPress(minecraft,key->SkillBindings.mouse(key,event.getButton()));event.setCanceled(true);return;}
         }
@@ -226,6 +257,7 @@ public final class ClientClawEvents {
                 && (SkillBindings.mouse(minecraft.options.keyAttack,event.getButton())||SkillBindings.mouse(minecraft.options.keyUse,event.getButton()))) {
             event.setCanceled(true);tickGrabButtons();return;
         }
+        if(com.codex.blacklight.firearms.FirearmsCombat.holdingFirearm(minecraft.player))return;
         if (!state.isInfected() || !state.isPrototypeMode()
                 || state.getActivePower() != PowerForm.CLAWS) return;
 
@@ -340,7 +372,7 @@ public final class ClientClawEvents {
         Minecraft minecraft = Minecraft.getInstance();
         if (minecraft.player == null || minecraft.screen != null) return;
         var state = com.codex.blacklight.registry.ModAttachments.getData(minecraft.player, ModAttachments.PLAYER_STATE);
-        if (state.isPrototypeMode() && TARGET_LOCK.isDown()) {
+        if (ClientTargetLock.active() && TARGET_LOCK.isDown()) {
             minecraft.options.keyPlayerList.setDown(false);
         }
     }
@@ -358,7 +390,7 @@ public final class ClientClawEvents {
         Minecraft minecraft = Minecraft.getInstance();
         boolean physicallyDown = minecraft.getWindow() != null
                 && SkillBindings.down(minecraft.options.keyAttack);
-        if (minecraft.player == null || minecraft.level == null || minecraft.screen != null) {
+        if (minecraft.player == null || minecraft.level == null || minecraft.screen != null || VehicleControls.ownsInput()) {
             clearLeftAttackHold();
             lastPhysicalLeftDown = physicallyDown;
             return;
@@ -497,11 +529,13 @@ public final class ClientClawEvents {
     public static void onAttack(InputEvent.InteractionKeyMappingTriggered event) {
         Minecraft minecraft = Minecraft.getInstance();
         if (minecraft.player == null || minecraft.screen != null) return;
+        if(VehicleControls.riding()||VehicleControls.interacting()&&event.isUseItem())return;
         var state = com.codex.blacklight.registry.ModAttachments.getData(minecraft.player, ModAttachments.PLAYER_STATE);
         if(ClientWeaponCombat.active()) {event.setSwingHand(false);event.setCanceled(true);ClientWeaponCombat.poll();return;}
         if(state.isPrototypeMode()&&com.codex.blacklight.registry.ModAttachments.getData(minecraft.player, ModAttachments.CONSUMING)) {
             event.setSwingHand(false);event.setCanceled(true);tickGrabButtons();return;
         }
+        if(com.codex.blacklight.firearms.FirearmsCombat.holdingFirearm(minecraft.player))return;
         if (!state.isInfected() || !state.isPrototypeMode()
                 || state.getActivePower() != PowerForm.CLAWS) return;
 

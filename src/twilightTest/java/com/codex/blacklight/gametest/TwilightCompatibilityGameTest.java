@@ -28,7 +28,7 @@ public final class TwilightCompatibilityGameTest {
         }
     }
     private static Fixture fixture(GameTestHelper h, String id) {
-        var key=ResourceLocation.fromNamespaceAndPath("twilightforest",id);
+        var key=new ResourceLocation("twilightforest",id);
         h.assertTrue(BuiltInRegistries.ENTITY_TYPE.containsKey(key),"real Twilight Forest must be installed: "+id);
         var boss=(Mob)BuiltInRegistries.ENTITY_TYPE.get(key).create(h.getLevel());
         h.assertTrue(boss.getClass().getName().startsWith("twilightforest."),"use the actual Twilight boss implementation");
@@ -40,7 +40,7 @@ public final class TwilightCompatibilityGameTest {
         };
         p.connection=FakePlayerFactory.get(h.getLevel(),profile).connection;
         p.setPos(boss.position().add(0,0,3));h.getLevel().addNewPlayer(p);
-        var state=ModAttachments.getData(p,ModAttachments.PLAYER_STATE);
+        var state=com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.PLAYER_STATE);
         state.infect();state.setPrototypeMode(true);state.unlock(PowerForm.CLAWS);state.activate(PowerForm.CLAWS);
         if(id.equals("hydra"))boss.tick();
         boss.invulnerableTime=0;
@@ -75,7 +75,7 @@ public final class TwilightCompatibilityGameTest {
     @GameTest(template="wall_test",timeoutTicks=30)
     public static void ordinaryHydraDamageKeepsOriginalRules(GameTestHelper h) {
         try(var f=fixture(h,"hydra")) {
-            ModAttachments.getData(f.player,ModAttachments.PLAYER_STATE).setPrototypeMode(false);
+            com.codex.blacklight.registry.ModAttachments.getData(f.player, ModAttachments.PLAYER_STATE).setPrototypeMode(false);
             float before=f.boss.getHealth();
             h.assertTrue(!f.boss.hurt(nativeHit(f),10)&&f.boss.getHealth()==before,"ordinary parent hits remain rejected");
             h.assertTrue(f.boss.getParts()[0].hurt(nativeHit(f),16),"ordinary physical part hits still work");
@@ -94,7 +94,7 @@ public final class TwilightCompatibilityGameTest {
     @GameTest(template="wall_test",timeoutTicks=30)
     public static void ordinaryLichDamageKeepsShield(GameTestHelper h) {
         try(var f=fixture(h,"lich")) {
-            shield(f.boss,5);ModAttachments.getData(f.player,ModAttachments.PLAYER_STATE).setPrototypeMode(false);
+            shield(f.boss,5);com.codex.blacklight.registry.ModAttachments.getData(f.player, ModAttachments.PLAYER_STATE).setPrototypeMode(false);
             float before=f.boss.getHealth();
             h.assertTrue(!f.boss.hurt(nativeHit(f),10),"ordinary attack remains blocked");
             h.assertTrue(f.boss.getHealth()==before&&shield(f.boss)==5,"ordinary combat and shield puzzle are unchanged");
@@ -111,8 +111,9 @@ public final class TwilightCompatibilityGameTest {
     @GameTest(template="wall_test",timeoutTicks=30)
     public static void biomassCanExecuteHydra(GameTestHelper h) {
         try(var f=fixture(h,"hydra")) {
+            f.boss.setHealth(1); // Current gameplay requires weakening before absorption.
             f.boss.setPos(f.player.position());f.boss.tick();
-            ModAttachments.setData(f.player,ModAttachments.BIOMASS_FORM,new com.codex.blacklight.power.BiomassState(
+            com.codex.blacklight.registry.ModAttachments.setData(f.player, ModAttachments.BIOMASS_FORM,new com.codex.blacklight.power.BiomassState(
                     com.codex.blacklight.power.BiomassState.ABSORBING,h.getLevel().getGameTime()-60,true,"","claws",f.boss.getId(),10));
             f.player.refreshDimensions();
             String diagnostic=" eligible="+ConsumeSystem.eligibleBiomass(f.boss)
@@ -156,10 +157,10 @@ public final class TwilightCompatibilityGameTest {
     public static void cancelledDamageDoesNotBreakLichShield(GameTestHelper h) {
         try(var f=fixture(h,"lich")) {
             shield(f.boss,5);float before=f.boss.getHealth();
-            java.util.function.Consumer<net.minecraftforge.event.entity.living.LivingAttackEvent> cancel=e->{
+            java.util.function.Consumer<net.minecraftforge.event.entity.living.LivingHurtEvent> cancel=e->{
                 if(e.getEntity()==f.boss)e.setCanceled(true);
             };
-            net.minecraftforge.common.MinecraftForge.EVENT_BUS.addListener(net.minecraftforge.eventbus.api.EventPriority.HIGHEST,false,net.minecraftforge.event.entity.living.LivingAttackEvent.class,cancel);
+            net.minecraftforge.common.MinecraftForge.EVENT_BUS.addListener(cancel);
             try {
                 h.assertTrue(!f.boss.hurt(nativeHit(f),10),"normal damage-event cancellation must still work");
                 h.assertTrue(f.boss.getHealth()==before&&shield(f.boss)==5,"rejected damage cannot remove shield");
@@ -168,11 +169,27 @@ public final class TwilightCompatibilityGameTest {
     }
 
     @GameTest(template="wall_test",timeoutTicks=30)
+    public static void cancelledNativeHydraDamageRemainsRejected(GameTestHelper h) {
+        try(var f=fixture(h,"hydra")) {
+            float before=f.boss.getHealth();
+            java.util.function.Consumer<net.minecraftforge.event.entity.living.LivingHurtEvent> cancel=e->{
+                if(e.getEntity()==f.boss)e.setCanceled(true);
+            };
+            net.minecraftforge.common.MinecraftForge.EVENT_BUS.addListener(cancel);
+            try {
+                h.assertTrue(!f.boss.hurt(nativeHit(f),10)&&f.boss.getHealth()==before,
+                        "native mechanism bridge must preserve a real Forge damage cancellation");
+            } finally {net.minecraftforge.common.MinecraftForge.EVENT_BUS.unregister(cancel);}
+        }h.succeed();
+    }
+
+    @GameTest(template="wall_test",timeoutTicks=30)
     public static void attachedSlimeFollowsMultipartSurfaceButCannotCrossWalls(GameTestHelper h) {
         try(var f=fixture(h,"hydra")) {
+            f.boss.setHealth(1);
             var part=f.boss.getParts()[0];var box=part.getBoundingBox();var at=box.getCenter();
             f.player.setPos(at.x,box.minY+.05,at.z);
-            ModAttachments.setData(f.player,ModAttachments.BIOMASS_FORM,new com.codex.blacklight.power.BiomassState(
+            com.codex.blacklight.registry.ModAttachments.setData(f.player, ModAttachments.BIOMASS_FORM,new com.codex.blacklight.power.BiomassState(
                     com.codex.blacklight.power.BiomassState.ABSORBING,h.getLevel().getGameTime(),true,"","claws",f.boss.getId(),10));
             f.player.refreshDimensions();
             var start=f.player.blockPosition();

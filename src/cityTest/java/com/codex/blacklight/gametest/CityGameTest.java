@@ -9,6 +9,12 @@ import net.minecraftforge.gametest.*;
 
 @GameTestHolder("blacklight") @PrefixGameTestTemplate(false)
 public class CityGameTest {
+    private static net.minecraft.server.level.ServerLevel legacy(GameTestHelper h){
+        // Forge 1.20 loads dimension JSONs directly for GameTest worlds instead
+        // of replacing them from our 1.21-style flat world preset.
+        return h.getLevel().getServer().getLevel(net.minecraft.resources.ResourceKey.create(
+                net.minecraft.core.registries.Registries.DIMENSION,new net.minecraft.resources.ResourceLocation("blacklight","city_legacy")));
+    }
     @GameTest(template="wall_test") public static void publicAxisRemainsWalkable(GameTestHelper h){
         h.assertTrue(FutianLayout.state(42,668,63,820).is(Blocks.SMOOTH_QUARTZ),"central pedestrian paving missing");
         for(int x=658;x<=678;x++)for(int z=725;z<=945;z++)for(int y=64;y<=67;y++)
@@ -57,7 +63,7 @@ public class CityGameTest {
         h.assertTrue(choices.size()>=8,"infection layout not varying");h.succeed();
     }
     @GameTest(template="wall_test",timeoutTicks=400) public static void dimensionAndChunkSeams(GameTestHelper h){
-        var city=h.getLevel().getServer().getLevel(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.DIMENSION,new net.minecraft.resources.ResourceLocation("blacklight","city_legacy")));
+        var city=legacy(h);
         h.assertTrue(city!=null,"city dimension missing");
         h.assertTrue(city.getChunkSource().getGenerator() instanceof CityChunkGenerator,"wrong generator");
         long seed=city.getSeed();
@@ -71,7 +77,7 @@ public class CityGameTest {
         h.succeed();
     }
     @GameTest(template="wall_test",timeoutTicks=400) public static void hivePortsAndAccess(GameTestHelper h){
-        var city=h.getLevel().getServer().getLevel(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.DIMENSION,new net.minecraft.resources.ResourceLocation("blacklight","city_legacy")));long seed=city.getSeed();
+        var city=legacy(h);long seed=city.getSeed();
         for(int hive=0;hive<2;hive++){
             for(int i=0;i<7;i++){
                 BlockPos p=CitySystem.port(seed,hive,i);city.getChunkAt(p);

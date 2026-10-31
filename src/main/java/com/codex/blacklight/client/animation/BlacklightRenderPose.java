@@ -10,19 +10,23 @@ import net.minecraft.world.entity.LivingEntity;
 public final class BlacklightRenderPose {
     private BlacklightRenderPose() { }
     public static BlacklightPose sample(LivingEntity entity, float partial) {
+        if(entity instanceof net.minecraft.world.entity.player.Player&&entity.getVehicle() instanceof com.codex.blacklight.entity.MilitaryVehicle vehicle){
+            String seat=vehicle.seatOf(entity.getUUID());
+            boolean driver=vehicle.definition().seats().stream().anyMatch(s->s.id().equals(seat)&&s.job()==com.codex.blacklight.military.vehicle.VehicleDefinition.Job.DRIVER);
+            return com.codex.blacklight.client.vehicle.VehicleSeatPose.skeleton(driver,net.minecraft.util.Mth.wrapDegrees(entity.getViewYRot(partial)+vehicle.getYRot()),entity.getViewXRot(partial),com.codex.blacklight.client.vehicle.VehicleSeatPose.drop(vehicle.definition()));
+        }
         if(entity instanceof net.minecraft.world.entity.player.Player p){var hydra=HydraPlayerPose.sample(p,partial);if(hydra!=null)return hydra;}
         var skeleton = PlayerMotionController.skeleton();
         var pose = PlayerMotionController.pose(entity, partial);
         if(entity instanceof net.minecraft.world.entity.player.Player p){var throwing=BlockThrowPose.sample(p,partial);if(throwing!=null)return throwing;}
         NativeHeadLook.apply(entity,pose,partial);
         if (!NativeHitPose.apply(entity, skeleton, pose, partial)) ConsumeVictimPose.epic(entity, pose, partial);
-        if (com.codex.blacklight.registry.ModAttachments.getData(entity, ModAttachments.GRAB_STAGE) == ConsumeVisual.HOLD) {
+        boolean actorOwns=NativeConsumePose.actor(entity, pose, partial);
+        if (!actorOwns && com.codex.blacklight.registry.ModAttachments.getData(entity, ModAttachments.GRAB_STAGE) == ConsumeVisual.HOLD) {
             String key = com.codex.blacklight.registry.ModAttachments.getData(entity, ModAttachments.PLAYER_STATE).getActivePower() == PowerForm.BLADE && (!(entity instanceof net.minecraft.world.entity.player.Player p)||com.codex.blacklight.combat.BlockThrowSystem.held(p)==null) ? "grab_blade_hold" : "grab_hold";
             var held = MotionLibrary.pose(key, (entity.tickCount + partial) / 20F, true);
-            for (String joint : new String[]{"Torso", "Chest", "Head", "Shoulder_R", "Arm_R", "Elbow_R", "Hand_R", "Tool_R", "Shoulder_L", "Arm_L", "Elbow_L", "Hand_L", "Tool_L"})
-                pose.getJointTransformData().put(joint, held.orElseEmpty(joint).copy());
+            pose=CarryPoseLayer.holdCreature(held,pose,!entity.onGround(),key.equals("grab_blade_hold"));
         }
-        if (!NativeConsumePose.actor(entity, pose, partial)) GrabHoldPose.apply(entity, skeleton, pose, partial);
         ConsumeGripPose.apply(entity, skeleton, pose, partial);
         var wall=com.codex.blacklight.movement.WallPoseState.get(entity);
         if(wall!=null) {
@@ -53,9 +57,15 @@ public final class BlacklightRenderPose {
         var weapon=ModAttachments.getData(entity,ModAttachments.WEAPON_VISUAL);
         if(wall==null&&entity.onGround()&&weapon.spec()==com.codex.blacklight.combat.WeaponMove.HAMMER_RAM
                 &&!weapon.charging())HammerGroundContact.apply(pose);
+        // Fit after locomotion/wall constraints and to the receiver's rendered
+        // position. Holding no longer skips contact correction just because a
+        // paired actor clip was found.
+        if(!actorOwns||com.codex.blacklight.registry.ModAttachments.getData(entity, ModAttachments.GRAB_STAGE)==ConsumeVisual.HOLD)
+            GrabHoldPose.apply(entity,skeleton,pose,partial);
         return pose;
     }
     public static float facing(LivingEntity entity,float partial) {
+        if(entity.getVehicle() instanceof com.codex.blacklight.entity.MilitaryVehicle vehicle)return -net.minecraft.util.Mth.rotLerp(partial,vehicle.yRotO,vehicle.getYRot());
         if(entity instanceof net.minecraft.world.entity.player.Player p){var h=com.codex.blacklight.city.HydraTransport.carrier(p);if(h!=null)return h.getYRot();}
         if(entity instanceof net.minecraft.world.entity.player.Player p&&com.codex.blacklight.combat.BlockThrowMotion.active(p))return com.codex.blacklight.combat.BlockThrowMotion.yaw(p,partial);
         return PlayerMotionController.facing(entity,partial);

@@ -11,6 +11,9 @@ import net.minecraftforge.event.TickEvent.PlayerTickEvent;
 
 /** Independent server animation authority. It never delegates movement or combat to another mod. */
 public final class NativePlayerActionBackend implements PlayerActionBackend {
+    @Override public void playVisual(ServerPlayer player,String clipId,float transitionSeconds) {
+        publish(player,MotionLibrary.canonical(clipId),Math.max(0,transitionSeconds),0,false);
+    }
     @Override public void play(ServerPlayer player, PlayerAction action, float transitionSeconds) {
         if (action == null) return;
         String id = MotionLibrary.resolve(action);
@@ -59,7 +62,9 @@ public final class NativePlayerActionBackend implements PlayerActionBackend {
     @Override public void synchronizeMode(ServerPlayer player, boolean enabled) {
         if (!enabled) {
             clear(player);
-            com.codex.blacklight.combat.CombatTargeting.requestLock(player, -1);
+            boolean ordinaryLock=com.codex.blacklight.firearms.FirearmsCombat.holdingFirearm(player)
+                    ||player.getVehicle() instanceof com.codex.blacklight.entity.MilitaryVehicle;
+            if(!ordinaryLock)com.codex.blacklight.combat.CombatTargeting.requestLock(player, -1);
         }
     }
 

@@ -27,6 +27,8 @@ public final class MovementState {
     private boolean sprinting;
     private net.minecraft.world.phys.Vec3 sprintDrive = net.minecraft.world.phys.Vec3.ZERO;
     private int sprintDriveTick = Integer.MIN_VALUE;
+    private final CarryPostureClock carryPosture=new CarryPostureClock();
+    public CarryPostureClock carryPosture(){return carryPosture;}
     public net.minecraft.world.phys.Vec3 sprintDrive(int tick) {
         return tick > sprintDriveTick && tick - (long)sprintDriveTick == 1 ? sprintDrive : net.minecraft.world.phys.Vec3.ZERO;
     }

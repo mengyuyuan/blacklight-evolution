@@ -50,6 +50,20 @@ public final class InfectedModelPose {
         return true;
     }
     private static float ease(float value){float t=unit(value);return t*t*(3-2*t);}
+    /** Authored giant bodies use the same network action clock as their native proxies. */
+    public static void nativeAction(String action,String bone,float age,PoseStack stack){
+        if(age<0||action.isEmpty())return;
+        float load=action.equals("SONIC")?ease(age/25)*(1-ease((age-32)/18)):ease(age/16)*(1-ease((age-20)/15));
+        if(action.equals("SONIC")){
+            if(bone.equals("chest"))rotate(stack,-.25F*load,0,0);
+            else if(bone.startsWith("upper_arm_"))rotate(stack,-.4F*load,0,side(bone)*.28F*load);
+            else if(bone.equals("head"))rotate(stack,-.12F*load,0,0);
+        }else if(action.equals("WITHER")||action.equals("DRAGON")){
+            if(bone.equals("chest"))rotate(stack,.10F*load,0,0);
+            else if(bone.startsWith("jaw"))rotate(stack,-.5F*load,0,0);
+            else if(bone.startsWith("head")||bone.startsWith("neck"))rotate(stack,-.08F*load,0,0);
+        }
+    }
 
     /** Called between translate(pivot) and translate(-pivot). Front is -Z; Y is up.
      * age is ticks, phase is radians, speed/attack are 0..1, look angles are degrees.
@@ -263,7 +277,7 @@ public final class InfectedModelPose {
         boolean active = visual.active();
         double[] projection = active && (visual.consuming() || GrappleMotion.active(visual))
                 ? ConsumePlacementTrack.projection(GrappleMotion.sceneKey(entity, visual),
-                        GrappleMotion.sceneProgress(entity, visual, partial)).orElse(null) : null;
+                        GrappleMotion.receiverProgress(entity, visual, partial)).orElse(null) : null;
         var hit = com.codex.blacklight.registry.ModAttachments.getData(entity, ModAttachments.HIT_REACTION);
         float weight = active ? 0 : hit.weight(entity.level().getGameTime(), partial);
         float bend = (hit.kind() == HitReaction.SLAM ? .45F : -.18F) * weight;

@@ -119,8 +119,8 @@ public final class HydraReleaseGameTest {
         // Infection legitimately raises max health after a successful bite.
         // Check accepted damage rather than comparing against pre-infection HP.
         var damaged=new java.util.concurrent.atomic.AtomicBoolean();
-        java.util.function.Consumer<net.minecraftforge.event.entity.living.LivingDamageEvent> damageListener=event->{
-            if(event.getEntity()==cow&&event.getSource().getEntity()==hunter&&event.getAmount()>0)damaged.set(true);
+        java.util.function.Consumer<com.codex.blacklight.combat.ForgeDamageEvent.Post> damageListener=event->{
+            if(event.getEntity()==cow&&event.getSource().getEntity()==hunter&&event.getNewDamage()>0)damaged.set(true);
         };
         net.minecraftforge.common.MinecraftForge.EVENT_BUS.addListener(damageListener);
         hunter.setTarget(cow);

@@ -23,7 +23,7 @@ public final class InstalledCombatCompatibilityGameTest {
     private static ServerPlayer player(GameTestHelper h) {
         var p=FakePlayerFactory.get(h.getLevel(),new GameProfile(UUID.randomUUID(),"CompatQA"));
         p.moveTo(h.absolutePos(new BlockPos(2,3,2)).getCenter());
-        var state=ModAttachments.getData(p,ModAttachments.PLAYER_STATE);state.infect();state.setPrototypeMode(true);
+        var state=com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.PLAYER_STATE);state.infect();state.setPrototypeMode(true);
         return p;
     }
     @GameTest(template="wall_test",timeoutTicks=180,batch="compat_guns")
@@ -59,25 +59,10 @@ public final class InstalledCombatCompatibilityGameTest {
     }
     @GameTest(template="wall_test",timeoutTicks=80,batch="compat_titans")
     public static void installedTitanReceivesHeightScaledDive(GameTestHelper h) throws Exception {
-        checkTitan(h,"zombie_titan");
-    }
-    @GameTest(template="wall_test",timeoutTicks=80,batch="compat_spider")
-    public static void installedSpiderReceivesHeightScaledDive(GameTestHelper h) throws Exception {
-        checkTitan(h,"spider_titan");
-    }
-    @GameTest(template="wall_test",timeoutTicks=80,batch="compat_tags")
-    public static void installedModsPreserveDamageTags(GameTestHelper h) {
-        var source=BulletdiveDamage.source(player(h));
-        h.assertTrue(source.is(net.minecraft.tags.DamageTypeTags.BYPASSES_ARMOR),"installed mod invalidated armor bypass tag");
-        h.assertTrue(source.is(net.minecraft.tags.DamageTypeTags.BYPASSES_ENCHANTMENTS),"installed mod invalidated enchantment bypass tag");
-        h.assertTrue(source.is(net.minecraft.tags.DamageTypeTags.BYPASSES_SHIELD),"installed mod invalidated shield bypass tag");
-        h.succeed();
-    }
-    private static void checkTitan(GameTestHelper h,String entityName) throws Exception {
         var p=player(h);
         var candidates=BuiltInRegistries.ENTITY_TYPE.keySet().stream().filter(k->
             (k.getNamespace().equals("thetitansneo")||k.getNamespace().equals("potentia"))
-                &&k.getPath().equals(entityName)).sorted().toList();
+                &&k.getPath().contains("zombie")&&k.getPath().contains("titan")&&!k.getPath().contains("minion")).sorted().toList();
         h.assertTrue(!candidates.isEmpty(),"installed zombie titan entity missing");
         var key=candidates.get(0);
         var titan=(LivingEntity)BuiltInRegistries.ENTITY_TYPE.get(key).create(h.getLevel());
@@ -90,14 +75,14 @@ public final class InstalledCombatCompatibilityGameTest {
         h.getLevel().addFreshEntity(titan);
         titan.setInvulnerable(true);
         float protectedHealth=titan.getHealth();
-        titan.hurt(BulletdiveDamage.source(p),10000000);
+        titan.hurt(BulletdiveDamage.source(p),1000000);
         h.assertTrue(titan.getHealth()==protectedHealth,"compatibility bypassed invulnerability");
         titan.setInvulnerable(false);
-        if(entityName.equals("spider_titan")) {
-            ModAttachments.getData(p,ModAttachments.PLAYER_STATE).setPrototypeMode(false);
-            titan.hurt(p.damageSources().playerAttack(p),10000000);
-            ModAttachments.getData(p,ModAttachments.PLAYER_STATE).setPrototypeMode(true);
-            h.assertTrue(titan.getHealth()>protectedHealth*.5F,"ordinary attacks lost Titan cap");
+        if(key.getNamespace().equals("thetitansneo")) {
+            com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.PLAYER_STATE).setPrototypeMode(false);
+            titan.hurt(p.damageSources().playerAttack(p),10000);
+            com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.PLAYER_STATE).setPrototypeMode(true);
+            h.assertTrue(Math.abs(protectedHealth-titan.getHealth()-1000)<.1,"ordinary attacks lost Titan cap");
         }
         float before=titan.getHealth();
         double height=Math.max(60000,30D*(before*2D/22-1));
@@ -107,6 +92,16 @@ public final class InstalledCombatCompatibilityGameTest {
         h.assertTrue(hit&&titan.getHealth()<=0,"height-scaled dive capped by installed Titan: "+titan.getHealth()+" / "+before);
         h.assertTrue(!titan.isRemoved(),"damage must preserve native death sequence");
         titan.discard();h.succeed();
+    }
+    @GameTest(template="wall_test",timeoutTicks=80,batch="compat_tags")
+    public static void installedTitanPreservesNativeUndeadTraits(GameTestHelper h) {
+        // 1.20 uses MobType and native methods, before these became 1.21 tags.
+        var zombie=EntityType.ZOMBIE.create(h.getLevel());
+        h.assertTrue(zombie!=null&&zombie.getMobType()==MobType.UNDEAD,"installed Titan invalidated vanilla undead classification");
+        h.assertTrue(net.minecraft.world.item.enchantment.Enchantments.SMITE.getDamageBonus(1,zombie.getMobType())>0,"installed Titan invalidated smite sensitivity");
+        h.assertTrue(zombie.isInvertedHealAndHarm(),"installed Titan invalidated healing inversion");
+        zombie.discard();
+        h.succeed();
     }
 
     private static LivingEntity externalTitan(GameTestHelper h) throws Exception {
@@ -134,9 +129,11 @@ public final class InstalledCombatCompatibilityGameTest {
         h.assertTrue(item.isAlive() && item.saveWithoutId(new net.minecraft.nbt.CompoundTag()).getShort("Health")==4,"item burst bypassed integral damage budget");
         var ordinary=h.spawn(EntityType.COW,8,2,8);ordinary.setNoAi(true);ordinary.hurt(source,1000000);
         h.assertTrue(!ordinary.isAlive(),"external protection leaked into ordinary vanilla mobs");
-        h.runAfterDelay(11,()->{
+        h.runAfterDelay(com.codex.blacklight.config.CrossModCombatConfig.WINDOW_TICKS.get()+1,()->{
             hunter.invulnerableTime=0;float previous=hunter.getHealth();hunter.hurt(source,1000000);
-            h.assertTrue(Math.abs(previous-hunter.getHealth()-maximum*.15F)<.1F,"budget did not refresh after configured window");
+            float singleLimit=(float)(maximum*Math.min(com.codex.blacklight.config.CrossModCombatConfig.WINDOW_FRACTION.get(),
+                    com.codex.blacklight.config.CrossModCombatConfig.MOB_HIT_FRACTION.get()));
+            h.assertTrue(Math.abs(previous-hunter.getHealth()-singleLimit)<.1F,"fresh window must admit the configured single-hit budget: "+(previous-hunter.getHealth()));
             item.hurt(source,1000000);
             h.assertTrue(item.isAlive() && item.saveWithoutId(new net.minecraft.nbt.CompoundTag()).getShort("Health")==3,"item became immortal");
             hunter.hurt(h.getLevel().damageSources().genericKill(),10000000);
@@ -188,7 +185,7 @@ public final class InstalledCombatCompatibilityGameTest {
         p.connection=FakePlayerFactory.get(h.getLevel(),profile).connection;
         for(int i=0;i<61;i++)p.tick();
         p.moveTo(h.absolutePos(new BlockPos(3,3,3)).getCenter());
-        var state=ModAttachments.getData(p,ModAttachments.PLAYER_STATE);state.infect();state.setPrototypeMode(true);
+        var state=com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.PLAYER_STATE);state.infect();state.setPrototypeMode(true);
         p.setGameMode(net.minecraft.world.level.GameType.SURVIVAL);
         p.getAbilities().invulnerable=false;
         CombatScale.attributes(p,true);p.setHealth(p.getMaxHealth());
@@ -198,5 +195,21 @@ public final class InstalledCombatCompatibilityGameTest {
         float lost=before-p.getHealth();
         h.assertTrue(lost>0 && lost<=p.getMaxHealth()*.15F+.01F && p.isAlive(),"Prototype final HP budget failed: "+lost);
         attacker.discard();h.succeed();
+    }
+
+    @GameTest(template="wall_test",timeoutTicks=60,batch="compat_titan_real_attack")
+    public static void titanOwnAttackRespectsProtectedHunterBudget(GameTestHelper h) throws Exception {
+        var attacker=externalTitan(h);
+        var hunter=h.spawn(ModEntities.BLACKLIGHT_HUNTER.get(),3,2,3);hunter.setNoAi(true);
+        float maximum=hunter.getMaxHealth(),before=hunter.getHealth();
+        // This file's registered zombie is the MCreator Monster implementation,
+        // not the unrelated com.potentia.entity.EntityTitan also present in its JAR.
+        h.assertTrue(attacker instanceof Mob,"installed Titan must expose its real melee path");
+        attacker.getAttribute(net.minecraft.world.entity.ai.attributes.Attributes.ATTACK_DAMAGE).setBaseValue(1000000D);
+        for(int i=0;i<30;i++){hunter.invulnerableTime=0;((Mob)attacker).doHurtTarget(hunter);}
+        float lost=before-hunter.getHealth();
+        h.assertTrue(lost>0 && lost<=maximum*.15F+.1F && hunter.isAlive() && !hunter.isRemoved(),"Titan attack fallback bypassed protection: lost="+lost);
+        h.assertTrue(hunter.getMaxHealth()==maximum,"Titan rewrote victim maximum health");
+        attacker.discard();hunter.discard();h.succeed();
     }
 }

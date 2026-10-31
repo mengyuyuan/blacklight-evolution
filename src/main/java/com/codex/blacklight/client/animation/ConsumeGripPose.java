@@ -15,10 +15,18 @@ public final class ConsumeGripPose {
         if(com.codex.blacklight.registry.ModAttachments.getData(actor, ModAttachments.GRAB_STAGE)!=ConsumeVisual.CONSUME)return;
         var victims=actor.level().getEntitiesOfClass(LivingEntity.class,actor.getBoundingBox().inflate(5),v->{
             var scene=com.codex.blacklight.registry.ModAttachments.getData(v, ModAttachments.CONSUME_VISUAL);
-            return scene.consumerId()==actor.getId()&&scene.stage()==ConsumeVisual.CONSUME&&scene.form()==PowerForm.CLAWS.ordinal();
+            return scene.consumerId()==actor.getId()&&scene.stage()==ConsumeVisual.CONSUME&&scene.form()==PowerForm.CLAWS.ordinal()
+                    &&ConsumePlacementTrack.headGrip(PowerForm.CLAWS,scene.variant());
         });
         if(victims.isEmpty())return;
         var victim=victims.get(0);var visual=com.codex.blacklight.registry.ModAttachments.getData(victim, ModAttachments.CONSUME_VISUAL);
+        applyForScene(actor,victim,armature,pose,visual,partial);
+    }
+    static void applyForScene(LivingEntity actor,LivingEntity victim,com.codex.blacklight.animation.BlacklightSkeleton armature,
+                              BlacklightPose pose,ConsumeVisual visual,float partial) {
+        // Only a head-crush scene may fit palms to the target head. A sweep must
+        // retain its authored pose, even though both scenes use the same weapon.
+        if(!ConsumePlacementTrack.headGrip(PowerForm.CLAWS,visual.variant()))return;
         float time=visual.motionProgress(actor.level().getGameTime(),partial),end=ConsumePlacementTrack.gripEnd(PowerForm.CLAWS);
         float weight=net.minecraft.util.Mth.clamp((actor.level().getGameTime()-visual.started()+partial)/4F,0,1)*net.minecraft.util.Mth.clamp((end-time)/.06F,0,1);
         if(weight<=0)return;
