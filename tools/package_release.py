@@ -301,6 +301,7 @@ def main() -> None:
         for language in ('en_us', 'zh_cn'):
             json.loads(archive.read(f'assets/blacklight/lang/{language}.json'))
         resources = {}
+        inactive = {}
         for resource_root in (repo / 'src/main/resources', repo / 'src/generated/resources'):
             for path in resource_root.rglob('*'):
                 if not path.is_file() or path.suffix == '.bbmodel' or '.cache' in path.parts:
@@ -313,6 +314,13 @@ def main() -> None:
                     continue
                 require(not path.is_symlink(), f'Production resource symlink needs explicit review: {name}')
                 data = path.read_bytes()
+                if name == 'data/blacklight/recipes/military_fuel_can.json' or (
+                        name.startswith('data/blacklight/loot_tables/') and name.endswith('.json')
+                        and b'blacklight:military_fuel_can' in data):
+                    require(name not in names, f'Disabled fuel acquisition leaked into runtime: {name}')
+                    require(name not in inactive or inactive[name] == digest(data), f'Conflicting inactive resource: {name}')
+                    inactive[name] = digest(data)
+                    continue
                 require(name not in resources or resources[name] == digest(data), f'Conflicting production resource roots: {name}')
                 resources[name] = digest(data)
                 if compact_maps and name.endswith('.gz') and name[:-3]+'.xz' in names:
@@ -357,7 +365,7 @@ def main() -> None:
     if args.verify_only:
         print(json.dumps({'profile': args.profile, 'version': version, 'motionFilesVerified': len(motions),
                           'repositoryMotionFilesVerified': len(baseline), 'productionClassesVerified': len(classes),
-                          'productionResourcesVerified': len(resources), 'sourceFilesVerified': len(verified_sources),
+                          'productionResourcesVerified': len(resources), 'inactiveResourcesVerified': inactive, 'sourceFilesVerified': len(verified_sources),
                           'distributionDocumentsVerified': len(docs) + len(notices) + 1,
                           'outputWritten': False}, ensure_ascii=False, indent=2))
         return
@@ -380,7 +388,7 @@ def main() -> None:
         'name': props['mod_name'], 'author': mod['authors'], 'minecraft': props['minecraft_version'],
         'version': version, 'profile': args.profile, 'publicReleaseReady': False,
         'compiledClassesVerified': len(classes), 'bundledMotionFiles': len(motions), 'externalProfile': external,
-        'productionResourcesVerified': len(resources), 'repositoryMotionFiles': len(baseline),
+        'productionResourcesVerified': len(resources), 'inactiveResourcesVerified': inactive, 'repositoryMotionFiles': len(baseline),
         'baseCommit': git(repo, 'rev-parse', 'HEAD').decode().strip(),
         'workingTreeChanged': bool(git(repo, 'status', '--porcelain', '--untracked-files=no').strip()),
         'sourceFiles': len(sources),

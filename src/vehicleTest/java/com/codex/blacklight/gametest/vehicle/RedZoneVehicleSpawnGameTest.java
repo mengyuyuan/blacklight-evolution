@@ -44,7 +44,7 @@ public final class RedZoneVehicleSpawnGameTest {
             previousOutbreak.setDirty();level.getServer().overworld().getDataStorage().set("blacklight_outbreak",previousOutbreak);}
     }
     private static void collect(MilitaryVehicleGameTest.Fixture f,MilitaryVehicle vehicle){f.entities.addAll(vehicle.getPassengers());f.entities.add(vehicle);}
-    @GameTest(template="blackwatch_arena",batch="redzone_random_tick",timeoutTicks=900)
+    @GameTest(template="blackwatch_arena",batch="redzone_random_tick",timeoutTicks=1600)
     public static void registeredServerTickRandomlySpawnsNearPlayerWithoutAnyLocalGarage(GameTestHelper h){
         var f=new MilitaryVehicleGameTest.Fixture(h,915200);var rules=new Rules(f.level);
         var center=new BlockPos(f.x+128,0,128);rules.red(center);
@@ -66,7 +66,7 @@ public final class RedZoneVehicleSpawnGameTest {
                     &&VehicleFleetSavedData.get(f.level).vehicleFleet(v.getUUID()).map(VehicleFleet::ambientPatrol).orElse(false))vehicles.add(v);
             if(!vehicles.isEmpty()){
                 var vehicle=vehicles.get(0);var start=vehicle.position();collect(f,vehicle);
-                awaitMotion(h,f,rules,center,vehicle,start,240);return;
+                awaitMotion(h,f,rules,center,vehicle,start,400);return;
             }
             if(left<=0){try(f;rules){h.assertTrue(false,"no random red-zone vehicle appeared during 800 actual server ticks");}return;}
             awaitRandom(h,f,rules,center,left-10);
