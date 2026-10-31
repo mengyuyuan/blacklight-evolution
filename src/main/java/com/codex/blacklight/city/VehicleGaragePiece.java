@@ -26,6 +26,10 @@ public final class VehicleGaragePiece extends StructurePiece {
     public static final class Planner {
         public static Optional<VehicleGarageData.Site> find(CityMilitaryPlan.Site base,CityMilitaryPlan.Checkpoint checkpoint,
                 int chunkX,int chunkZ,boolean newStart,CityMilitaryPlan.Survey survey) {
+            return find(base,checkpoint,chunkX,chunkZ,newStart,true,survey);
+        }
+        public static Optional<VehicleGarageData.Site> find(CityMilitaryPlan.Site base,CityMilitaryPlan.Checkpoint checkpoint,
+                int chunkX,int chunkZ,boolean newStart,boolean urban,CityMilitaryPlan.Survey survey) {
             if(!newStart || base==null || survey==null)return Optional.empty();
             // Two independent side plots. The original base bounds and personnel
             // footprint stay unchanged, including when both attachments are refused.
@@ -41,7 +45,7 @@ public final class VehicleGaragePiece extends StructurePiece {
                 if(minX<(long)chunkX*16-96 || minZ<(long)chunkZ*16-96 || maxX>(long)chunkX*16+111 || maxZ>(long)chunkZ*16+111)continue;
                 if(overlap(minX,minZ,maxX,maxZ,base.x(),base.z(),base.x()+base.width()-1,base.z()+base.depth()-1))continue;
                 if(checkpoint!=null&&overlap(minX,minZ,maxX,maxZ,checkpoint.x(),checkpoint.z(),checkpoint.x()+16,checkpoint.z()+16))continue;
-                if(terrain(site,survey)&&roads(site,survey))return Optional.of(site);
+                if(urban?terrain(site,survey)&&roads(site,survey):fieldTerrain(site,survey))return Optional.of(site);
             }
             return Optional.empty();
         }
@@ -56,6 +60,17 @@ public final class VehicleGaragePiece extends StructurePiece {
                 if(z<27) {
                     if(surface.road()||surface.ground()>site.floor()||site.floor()-surface.ground()>3)return false;
                 } else if(surface.ground()!=site.floor())return false;
+            }
+            return true;
+        }
+        private static boolean fieldTerrain(VehicleGarageData.Site site,CityMilitaryPlan.Survey survey) {
+            // A new field base has no pre-existing city road. Survey its own bounded
+            // motor-pool apron; never retrofit old starts, build over water or demand
+            // a perfectly flat 31-by-43 naturally generated patch.
+            for(int x=0;x<31;x++)for(int z=0;z<43;z++) {
+                int[] p=site.world(x,z);var surface=survey.at(p[0],p[1]);
+                if(surface.water()||surface.blocked()||surface.road()
+                        ||surface.ground()>site.floor()||site.floor()-surface.ground()>3)return false;
             }
             return true;
         }
@@ -77,9 +92,14 @@ public final class VehicleGaragePiece extends StructurePiece {
     private final String baseId;
     private final MilitaryFaction faction;
     private final VehicleGarageData.Site site;
+    private final boolean fieldApron;
 
     public VehicleGaragePiece(String baseId, MilitaryFaction faction, VehicleGarageData.Site site) {
-        super(ModWorldgen.VEHICLE_GARAGE_PIECE.get(), 0, bounds(site));
+        this(baseId,faction,site,false);
+    }
+    public VehicleGaragePiece(String baseId, MilitaryFaction faction, VehicleGarageData.Site site,boolean fieldApron) {
+        super(ModWorldgen.VEHICLE_GARAGE_PIECE.get(), 0, bounds(site,fieldApron));
+        this.fieldApron=fieldApron;
         if (baseId == null || baseId.isBlank() || baseId.length() > 256)
             throw new IllegalArgumentException("Invalid garage base reference");
         this.baseId = baseId;
@@ -99,7 +119,8 @@ public final class VehicleGaragePiece extends StructurePiece {
                 .orElseThrow(() -> new IllegalArgumentException("Invalid garage faction"));
         site = new VehicleGarageData.Site(tag.getInt("SiteX"), tag.getInt("Floor"),
                 tag.getInt("SiteZ"), tag.getInt("Turn"));
-        boundingBox = bounds(site);
+        fieldApron=tag.getBoolean("FieldApron");
+        boundingBox = bounds(site,fieldApron);
         setOrientation(null);
     }
 
@@ -113,6 +134,12 @@ public final class VehicleGaragePiece extends StructurePiece {
                 site.x() + site.width() - 1, site.floor() + 9, site.z() + site.depth() - 1);
     }
 
+    public static BoundingBox bounds(VehicleGarageData.Site site,boolean fieldApron) {
+        if(!fieldApron)return bounds(site);
+        int[] a=site.world(0,0),b=site.world(30,42);
+        return new BoundingBox(Math.min(a[0],b[0]),site.floor()-3,Math.min(a[1],b[1]),
+                Math.max(a[0],b[0]),site.floor()+9,Math.max(a[1],b[1]));
+    }
     public static BlockPos origin(VehicleGarageData.Site site) {
         int[] point = site.world(0, 0);
         return new BlockPos(point[0], site.floor(), point[1]);
@@ -131,6 +158,7 @@ public final class VehicleGaragePiece extends StructurePiece {
         tag.putInt("Floor", site.floor());
         tag.putInt("SiteZ", site.z());
         tag.putInt("Turn", site.rotation());
+        if(fieldApron)tag.putBoolean("FieldApron",true);
     }
 
     @Override public void postProcess(WorldGenLevel level, StructureManager manager,
@@ -143,6 +171,18 @@ public final class VehicleGaragePiece extends StructurePiece {
                 .setRotation(Rotation.values()[site.rotation()])
                 .setBoundingBox(clip).setIgnoreEntities(true);
         template.placeInWorld(level, at, at, settings, random, 2);
+        if(fieldApron)for(int localX=0;localX<31;localX++)for(int localZ=27;localZ<43;localZ++){
+            int[] point=site.world(localX,localZ);
+            for(int y=site.floor()-3;y<=site.floor()+7;y++){
+                var pos=new BlockPos(point[0],y,point[1]);if(!clip.isInside(pos))continue;
+                // Every part is clipped into this NEW structure's saved bounds.
+                // Fill surveyed shallow gaps, preserve deeper terrain, leave a
+                // seven-block-clear exit for the complete tank hull.
+                if(y==site.floor())level.setBlock(pos,Blocks.GRAY_CONCRETE.defaultBlockState(),2);
+                else if(y>site.floor())level.setBlock(pos,Blocks.AIR.defaultBlockState(),2);
+                else if(level.getBlockState(pos).isAir())level.setBlock(pos,Blocks.STONE_BRICKS.defaultBlockState(),2);
+            }
+        }
         for (int x = Math.max(site.x(), clip.minX());
                 x <= Math.min(site.x() + site.width() - 1, clip.maxX()); x++) {
             for (int z = Math.max(site.z(), clip.minZ());
