@@ -109,6 +109,7 @@ public final class BlacklightHive extends Monster implements GeoEntity {
         // LivingDeath may be cancelled by another mod; only accepted deaths pay out.
         if(!level().isClientSide&&dead&&!rewarded){
             rewarded=true;
+            com.codex.blacklight.city.MilitaryCampaignSystem.hiveDefeated(this);
             com.codex.blacklight.city.CityEcology.cleared((ServerLevel)level(),blockPosition());
             if(source.getEntity() instanceof ServerPlayer player){
                 var state=player.getData(ModAttachments.PLAYER_STATE);

@@ -21,7 +21,7 @@ public final class BlacklightWorldGenerator extends FlatLevelSource {
     public BlacklightWorldGenerator(FlatLevelGeneratorSettings settings){super(settings);}
     @Override protected MapCodec<? extends ChunkGenerator> codec(){return CODEC;}
     @Override public ChunkGeneratorStructureState createState(HolderLookup<StructureSet> lookup,RandomState random,long seed){this.seed=seed;return super.createState(lookup,random,seed);}
-    @Override public void applyBiomeDecoration(WorldGenLevel level,ChunkAccess chunk,StructureManager structures){}
+    @Override public void applyBiomeDecoration(WorldGenLevel level,ChunkAccess chunk,StructureManager structures){super.applyBiomeDecoration(level,chunk,structures);}
     @Override public int getMinY(){return 0;}
     @Override public int getGenDepth(){return WorldTerrain.HEIGHT;}
     @Override public int getSeaLevel(){return WorldTerrain.SEA;}

@@ -1,0 +1,854 @@
+[
+  {
+    "path": "assets/兵种/military_soldier.png",
+    "sha256": "6591c509b4572bdc5569e85934125b524c640f6f67382b4f56b59c693ee9d1c6",
+    "kind": "生产分层几何+原生纹理离线预览，非GL/非实机",
+    "sources": [
+      {
+        "path": "src/main/java/com/codex/blacklight/client/model/BlackwatchModel.java",
+        "sha256": "d5e2fe99f0a428c3531b5839ce0a0e36b450917956949f785e97019959470d28"
+      },
+      {
+        "path": "src/main/resources/assets/blacklight/textures/entity/military_soldier_layered.png",
+        "sha256": "88c9fed042c81c90f4b9ba822c4d837823d1b08cb3ba24109a48d20d9197f9b8"
+      }
+    ]
+  },
+  {
+    "path": "assets/兵种/military_heavy.png",
+    "sha256": "d496b53396528c1e790905c99c71bcd3843061082aae70b3b62254de1e87eb98",
+    "kind": "生产分层几何+原生纹理离线预览，非GL/非实机",
+    "sources": [
+      {
+        "path": "src/main/java/com/codex/blacklight/client/model/BlackwatchModel.java",
+        "sha256": "d5e2fe99f0a428c3531b5839ce0a0e36b450917956949f785e97019959470d28"
+      },
+      {
+        "path": "src/main/resources/assets/blacklight/textures/entity/military_soldier_layered.png",
+        "sha256": "88c9fed042c81c90f4b9ba822c4d837823d1b08cb3ba24109a48d20d9197f9b8"
+      }
+    ]
+  },
+  {
+    "path": "assets/兵种/military_team_leader.png",
+    "sha256": "7ad4ba729d08450f5641b697177094d47d30c9976b8451ff437f0998f68cb9e7",
+    "kind": "生产分层几何+原生纹理离线预览，非GL/非实机",
+    "sources": [
+      {
+        "path": "src/main/java/com/codex/blacklight/client/model/BlackwatchModel.java",
+        "sha256": "d5e2fe99f0a428c3531b5839ce0a0e36b450917956949f785e97019959470d28"
+      },
+      {
+        "path": "src/main/resources/assets/blacklight/textures/entity/military_soldier_layered.png",
+        "sha256": "88c9fed042c81c90f4b9ba822c4d837823d1b08cb3ba24109a48d20d9197f9b8"
+      }
+    ]
+  },
+  {
+    "path": "assets/兵种/military_officer.png",
+    "sha256": "e685662afa597ab0ad6d0a38916667e81f7585a62a9978ae3056c17db13be321",
+    "kind": "生产分层几何+原生纹理离线预览，非GL/非实机",
+    "sources": [
+      {
+        "path": "src/main/java/com/codex/blacklight/client/model/BlackwatchModel.java",
+        "sha256": "d5e2fe99f0a428c3531b5839ce0a0e36b450917956949f785e97019959470d28"
+      },
+      {
+        "path": "src/main/resources/assets/blacklight/textures/entity/military_soldier_layered.png",
+        "sha256": "88c9fed042c81c90f4b9ba822c4d837823d1b08cb3ba24109a48d20d9197f9b8"
+      }
+    ]
+  },
+  {
+    "path": "assets/兵种/military_commander.png",
+    "sha256": "71cc167e63032f224bf94ce94d5826c55ec2adbb5351ad26faa204a604b65b85",
+    "kind": "生产分层几何+原生纹理离线预览，非GL/非实机",
+    "sources": [
+      {
+        "path": "src/main/java/com/codex/blacklight/client/model/BlackwatchModel.java",
+        "sha256": "d5e2fe99f0a428c3531b5839ce0a0e36b450917956949f785e97019959470d28"
+      },
+      {
+        "path": "src/main/resources/assets/blacklight/textures/entity/military_soldier_layered.png",
+        "sha256": "88c9fed042c81c90f4b9ba822c4d837823d1b08cb3ba24109a48d20d9197f9b8"
+      }
+    ]
+  },
+  {
+    "path": "assets/兵种/blackwatch_soldier.png",
+    "sha256": "2a8affe5bb58c25fcfa195ee76009bf6582dc3dc362bd14b7e7bdf0cad832921",
+    "kind": "生产分层几何+原生纹理离线预览，非GL/非实机",
+    "sources": [
+      {
+        "path": "src/main/java/com/codex/blacklight/client/model/BlackwatchModel.java",
+        "sha256": "d5e2fe99f0a428c3531b5839ce0a0e36b450917956949f785e97019959470d28"
+      },
+      {
+        "path": "src/main/resources/assets/blacklight/textures/entity/blackwatch_soldier_layered.png",
+        "sha256": "4ac0ea80f013c388443dec0d62a10d4adbd18c5571f5c5610ef9df90ca742e13"
+      }
+    ]
+  },
+  {
+    "path": "assets/兵种/blackwatch_heavy.png",
+    "sha256": "058c93d1498cd29f0d080ede2675ec122ca27f836030380e596dd7ca856d3b3e",
+    "kind": "生产分层几何+原生纹理离线预览，非GL/非实机",
+    "sources": [
+      {
+        "path": "src/main/java/com/codex/blacklight/client/model/BlackwatchModel.java",
+        "sha256": "d5e2fe99f0a428c3531b5839ce0a0e36b450917956949f785e97019959470d28"
+      },
+      {
+        "path": "src/main/resources/assets/blacklight/textures/entity/blackwatch_soldier_layered.png",
+        "sha256": "4ac0ea80f013c388443dec0d62a10d4adbd18c5571f5c5610ef9df90ca742e13"
+      }
+    ]
+  },
+  {
+    "path": "assets/兵种/blackwatch_team_leader.png",
+    "sha256": "8e10845101debfd09a35c1c8ca8a0cc2596a70d2386530004a7b3046a02353e6",
+    "kind": "生产分层几何+原生纹理离线预览，非GL/非实机",
+    "sources": [
+      {
+        "path": "src/main/java/com/codex/blacklight/client/model/BlackwatchModel.java",
+        "sha256": "d5e2fe99f0a428c3531b5839ce0a0e36b450917956949f785e97019959470d28"
+      },
+      {
+        "path": "src/main/resources/assets/blacklight/textures/entity/blackwatch_soldier_layered.png",
+        "sha256": "4ac0ea80f013c388443dec0d62a10d4adbd18c5571f5c5610ef9df90ca742e13"
+      }
+    ]
+  },
+  {
+    "path": "assets/兵种/blackwatch_officer.png",
+    "sha256": "187efb15d1cd52272ad65e6700c7ecfd456d5392aa0b024710fb8ada1452f7ff",
+    "kind": "生产分层几何+原生纹理离线预览，非GL/非实机",
+    "sources": [
+      {
+        "path": "src/main/java/com/codex/blacklight/client/model/BlackwatchModel.java",
+        "sha256": "d5e2fe99f0a428c3531b5839ce0a0e36b450917956949f785e97019959470d28"
+      },
+      {
+        "path": "src/main/resources/assets/blacklight/textures/entity/blackwatch_soldier_layered.png",
+        "sha256": "4ac0ea80f013c388443dec0d62a10d4adbd18c5571f5c5610ef9df90ca742e13"
+      }
+    ]
+  },
+  {
+    "path": "assets/兵种/blackwatch_commander.png",
+    "sha256": "5994b6d88a1c69196fc5b241062de185e39a94dc9fd2dea4f433ee03610b78bd",
+    "kind": "生产分层几何+原生纹理离线预览，非GL/非实机",
+    "sources": [
+      {
+        "path": "src/main/java/com/codex/blacklight/client/model/BlackwatchModel.java",
+        "sha256": "d5e2fe99f0a428c3531b5839ce0a0e36b450917956949f785e97019959470d28"
+      },
+      {
+        "path": "src/main/resources/assets/blacklight/textures/entity/blackwatch_soldier_layered.png",
+        "sha256": "4ac0ea80f013c388443dec0d62a10d4adbd18c5571f5c5610ef9df90ca742e13"
+      }
+    ]
+  },
+  {
+    "path": "assets/建筑/blackwatch_checkpoint.png",
+    "sha256": "3b8b8a7f005b35cf17ce1f59acf82a611cfc63ad88cec656be77274a656f1079",
+    "kind": "实际NBT几何，原版材质近似；不渲染嵌入人员/箱内物品，非实机",
+    "sources": [
+      {
+        "path": "src/main/resources/data/blacklight/structure/blackwatch_checkpoint.nbt",
+        "sha256": "9de7f3c962ef2aaf25592e00c5f6552a111f327b8fdb646973b8026cb71f611d"
+      },
+      {
+        "path": "tools/preview_large_military_bases.py",
+        "sha256": "98551552649a97d8ab9ec9a13dfa251c9831c051256d53c9053c5009a84a9d7c"
+      }
+    ]
+  },
+  {
+    "path": "assets/建筑/blackwatch_outpost.png",
+    "sha256": "667e2951267d07dea3cb8307eb19822156fc8ee4bdbb47e19e0c973e3c2820ca",
+    "kind": "实际NBT几何，原版材质近似；不渲染嵌入人员/箱内物品，非实机",
+    "sources": [
+      {
+        "path": "src/main/resources/data/blacklight/structure/blackwatch_outpost.nbt",
+        "sha256": "fc6b2eb87373e4e09edbb27d2a15fcabdef45c510cdb5d2bd5ca8c96bd980742"
+      },
+      {
+        "path": "tools/preview_large_military_bases.py",
+        "sha256": "98551552649a97d8ab9ec9a13dfa251c9831c051256d53c9053c5009a84a9d7c"
+      }
+    ]
+  },
+  {
+    "path": "assets/建筑/frozen_research_station.png",
+    "sha256": "e09b0f7fb99f284d8b96c443c868add3153f7777ee318831cf7861061c36e3c3",
+    "kind": "实际NBT几何，原版材质近似；不渲染嵌入人员/箱内物品，非实机",
+    "sources": [
+      {
+        "path": "src/main/resources/data/blacklight/structure/frozen_research_station.nbt",
+        "sha256": "0dc5f32b6582f66384870df8c90de2f41d334de0486482d01a69fa95db7b795a"
+      },
+      {
+        "path": "tools/preview_large_military_bases.py",
+        "sha256": "98551552649a97d8ab9ec9a13dfa251c9831c051256d53c9053c5009a84a9d7c"
+      }
+    ]
+  },
+  {
+    "path": "assets/建筑/large_blackwatch_base.png",
+    "sha256": "75e5897fed89ada67ec1b654979f42c96e96962e1e63782f02a9f64d0cfae319",
+    "kind": "实际NBT几何，原版材质近似；不渲染嵌入人员/箱内物品，非实机",
+    "sources": [
+      {
+        "path": "src/main/resources/data/blacklight/structure/large_blackwatch_base.nbt",
+        "sha256": "06b613cf9fc372c034750bc694989c095d9dabecbc599395182a33fa476ded60"
+      },
+      {
+        "path": "tools/preview_large_military_bases.py",
+        "sha256": "98551552649a97d8ab9ec9a13dfa251c9831c051256d53c9053c5009a84a9d7c"
+      }
+    ]
+  },
+  {
+    "path": "assets/建筑/large_blackwatch_base-floorplan.png",
+    "sha256": "ad21be73955ff2aa10d12c0dd29ba51786cfea5243ff74a3ae05de2743ab4a91",
+    "kind": "已有离线制作图，历史来源以原目录manifest为准",
+    "sources": [
+      {
+        "path": "docs/previews/large-military-bases/large_blackwatch_base-floorplan.png",
+        "sha256": "ad21be73955ff2aa10d12c0dd29ba51786cfea5243ff74a3ae05de2743ab4a91"
+      }
+    ]
+  },
+  {
+    "path": "assets/建筑/large_blackwatch_base-cutaway.png",
+    "sha256": "d1a71b56f1fcbb2b0f95f6cabfdf87b8af9b5067eecdc96294517fe2616d421f",
+    "kind": "已有离线制作图，历史来源以原目录manifest为准",
+    "sources": [
+      {
+        "path": "docs/previews/large-military-bases/large_blackwatch_base-cutaway.png",
+        "sha256": "d1a71b56f1fcbb2b0f95f6cabfdf87b8af9b5067eecdc96294517fe2616d421f"
+      }
+    ]
+  },
+  {
+    "path": "assets/建筑/large_blackwatch_base-fourviews.png",
+    "sha256": "4ba0e262a680ec78eca71372628783fbf8a153c6c1d28c6c7852397e03607b8e",
+    "kind": "已有离线制作图，历史来源以原目录manifest为准",
+    "sources": [
+      {
+        "path": "docs/previews/large-military-bases/large_blackwatch_base-fourviews.png",
+        "sha256": "4ba0e262a680ec78eca71372628783fbf8a153c6c1d28c6c7852397e03607b8e"
+      }
+    ]
+  },
+  {
+    "path": "assets/建筑/large_military_base.png",
+    "sha256": "d9029eb34fa2dd2f8ae19347df70aa701541a1a903acc9421c1ae3bc45c8cfa0",
+    "kind": "实际NBT几何，原版材质近似；不渲染嵌入人员/箱内物品，非实机",
+    "sources": [
+      {
+        "path": "src/main/resources/data/blacklight/structure/large_military_base.nbt",
+        "sha256": "90c1715fa57bd839bdfbcde72341d5c9ac1d95b74084b398ea4d628a43c38943"
+      },
+      {
+        "path": "tools/preview_large_military_bases.py",
+        "sha256": "98551552649a97d8ab9ec9a13dfa251c9831c051256d53c9053c5009a84a9d7c"
+      }
+    ]
+  },
+  {
+    "path": "assets/建筑/large_military_base-floorplan.png",
+    "sha256": "3858768e34313cb7f50368b016133504d764b4cd2cc74a1d85e9f606c7b67f32",
+    "kind": "已有离线制作图，历史来源以原目录manifest为准",
+    "sources": [
+      {
+        "path": "docs/previews/large-military-bases/large_military_base-floorplan.png",
+        "sha256": "3858768e34313cb7f50368b016133504d764b4cd2cc74a1d85e9f606c7b67f32"
+      }
+    ]
+  },
+  {
+    "path": "assets/建筑/large_military_base-cutaway.png",
+    "sha256": "f6aba62e1ce0a5db4e938127c932372674fbfcad0cd7de6e1bef9d6dfdc6b403",
+    "kind": "已有离线制作图，历史来源以原目录manifest为准",
+    "sources": [
+      {
+        "path": "docs/previews/large-military-bases/large_military_base-cutaway.png",
+        "sha256": "f6aba62e1ce0a5db4e938127c932372674fbfcad0cd7de6e1bef9d6dfdc6b403"
+      }
+    ]
+  },
+  {
+    "path": "assets/建筑/large_military_base-fourviews.png",
+    "sha256": "ac326aca09d54a04daeb351d0ab4fb3354240f92c677aebda6daa762a0529370",
+    "kind": "已有离线制作图，历史来源以原目录manifest为准",
+    "sources": [
+      {
+        "path": "docs/previews/large-military-bases/large_military_base-fourviews.png",
+        "sha256": "ac326aca09d54a04daeb351d0ab4fb3354240f92c677aebda6daa762a0529370"
+      }
+    ]
+  },
+  {
+    "path": "assets/建筑/military_camp.png",
+    "sha256": "22bd1361975fe839c5b69c7fe36fe93862624041ff69a82570de186366dbea92",
+    "kind": "实际NBT几何，原版材质近似；不渲染嵌入人员/箱内物品，非实机",
+    "sources": [
+      {
+        "path": "src/main/resources/data/blacklight/structure/military_camp.nbt",
+        "sha256": "c8b4cef8815da20fc91511a12951f60125943006140adbbdf7a635a2ef430ad9"
+      },
+      {
+        "path": "tools/preview_large_military_bases.py",
+        "sha256": "98551552649a97d8ab9ec9a13dfa251c9831c051256d53c9053c5009a84a9d7c"
+      }
+    ]
+  },
+  {
+    "path": "assets/建筑/military_checkpoint.png",
+    "sha256": "46cd9f9df49f1d6842a2d7562838d674118870359f5fe9d9cf34e9d21ab59082",
+    "kind": "实际NBT几何，原版材质近似；不渲染嵌入人员/箱内物品，非实机",
+    "sources": [
+      {
+        "path": "src/main/resources/data/blacklight/structure/military_checkpoint.nbt",
+        "sha256": "b828b4ee23a20e17913421ed62c98c954ce8460529bd8c4a4825a8c8a3237ae1"
+      },
+      {
+        "path": "tools/preview_large_military_bases.py",
+        "sha256": "98551552649a97d8ab9ec9a13dfa251c9831c051256d53c9053c5009a84a9d7c"
+      }
+    ]
+  },
+  {
+    "path": "assets/枪械/military_rifle.png",
+    "sha256": "0af492ac60123e3c019ed15ef3c1286bb04aa006580fc5b496b876df6161b014",
+    "kind": "实际JSON立方体/逐面UV纹理采样；不含display/透视/GL光影与运行时反馈，非GL",
+    "sources": [
+      {
+        "path": "src/main/resources/assets/blacklight/models/item/military_rifle.json",
+        "sha256": "1ac5a9988818d5a78ac3499ae91279906127a835d99504209c2c96362d97f80f"
+      },
+      {
+        "path": "tools/archive_military_catalog.py",
+        "sha256": "62764abba992ddd3a4ceed41bddde2959acf4f9cc5884e4289c53ad9a7fa0e68"
+      },
+      {
+        "path": "src/main/resources/assets/blacklight/textures/item/firearms_palette.png",
+        "sha256": "110956a1470344b94fb48de038f2a11b13e2433f2dae2173635607006169598a"
+      }
+    ]
+  },
+  {
+    "path": "assets/枪械/military_carbine.png",
+    "sha256": "12967c1c42c31db6c8de83d6f8c7164e531a2673ce6acbf208a1c0614c327218",
+    "kind": "实际JSON立方体/逐面UV纹理采样；不含display/透视/GL光影与运行时反馈，非GL",
+    "sources": [
+      {
+        "path": "src/main/resources/assets/blacklight/models/item/military_carbine.json",
+        "sha256": "189ed386f00cd5cacdf15a625dd14b5353ae841a17eed530b5b9ab8cb961056f"
+      },
+      {
+        "path": "tools/archive_military_catalog.py",
+        "sha256": "62764abba992ddd3a4ceed41bddde2959acf4f9cc5884e4289c53ad9a7fa0e68"
+      },
+      {
+        "path": "src/main/resources/assets/blacklight/textures/item/firearms_palette.png",
+        "sha256": "110956a1470344b94fb48de038f2a11b13e2433f2dae2173635607006169598a"
+      }
+    ]
+  },
+  {
+    "path": "assets/枪械/military_machine_gun.png",
+    "sha256": "1d0a0d0ae9a4ded1d87a8c42a6b86d06bc76b7efeaa9fa916dc8bc95857e3f54",
+    "kind": "实际JSON立方体/逐面UV纹理采样；不含display/透视/GL光影与运行时反馈，非GL",
+    "sources": [
+      {
+        "path": "src/main/resources/assets/blacklight/models/item/military_machine_gun.json",
+        "sha256": "600a120c5134c95c95d35e6487c22c6886fb8fb1b71ed7ebdd6f2fc9fc65a0d8"
+      },
+      {
+        "path": "tools/archive_military_catalog.py",
+        "sha256": "62764abba992ddd3a4ceed41bddde2959acf4f9cc5884e4289c53ad9a7fa0e68"
+      },
+      {
+        "path": "src/main/resources/assets/blacklight/textures/item/firearms_palette.png",
+        "sha256": "110956a1470344b94fb48de038f2a11b13e2433f2dae2173635607006169598a"
+      }
+    ]
+  },
+  {
+    "path": "assets/枪械/grenade_launcher.png",
+    "sha256": "562ed6b82abad0e35eaf695bd14830d8dc8ee396a56805e324dc16ed99e1328e",
+    "kind": "实际JSON立方体/逐面UV纹理采样；不含display/透视/GL光影与运行时反馈，非GL",
+    "sources": [
+      {
+        "path": "src/main/resources/assets/blacklight/models/item/grenade_launcher.json",
+        "sha256": "b8ac8ae9fe91c1803710ca2bc196e27692f2917126add34e0ab9cfbc82d60ea2"
+      },
+      {
+        "path": "tools/archive_military_catalog.py",
+        "sha256": "62764abba992ddd3a4ceed41bddde2959acf4f9cc5884e4289c53ad9a7fa0e68"
+      },
+      {
+        "path": "src/main/resources/assets/blacklight/textures/item/firearms_palette.png",
+        "sha256": "110956a1470344b94fb48de038f2a11b13e2433f2dae2173635607006169598a"
+      }
+    ]
+  },
+  {
+    "path": "assets/枪械/rocket_launcher.png",
+    "sha256": "525f0918027281ab4a07cde38efaba06668521ae8430602c86723dc745c08d18",
+    "kind": "实际JSON立方体/逐面UV纹理采样；不含display/透视/GL光影与运行时反馈，非GL",
+    "sources": [
+      {
+        "path": "src/main/resources/assets/blacklight/models/item/rocket_launcher.json",
+        "sha256": "64f1801677d62cf924d348a8b9662102f351aa1b698b10125570b6434e093d75"
+      },
+      {
+        "path": "tools/archive_military_catalog.py",
+        "sha256": "62764abba992ddd3a4ceed41bddde2959acf4f9cc5884e4289c53ad9a7fa0e68"
+      },
+      {
+        "path": "src/main/resources/assets/blacklight/textures/item/firearms_palette.png",
+        "sha256": "110956a1470344b94fb48de038f2a11b13e2433f2dae2173635607006169598a"
+      }
+    ]
+  },
+  {
+    "path": "assets/枪械/missile_launcher.png",
+    "sha256": "46c12f28274c57be94acf48cebf3d4b689e4936489675832f9f82a4001131d27",
+    "kind": "实际JSON立方体/逐面UV纹理采样；不含display/透视/GL光影与运行时反馈，非GL",
+    "sources": [
+      {
+        "path": "src/main/resources/assets/blacklight/models/item/missile_launcher.json",
+        "sha256": "b287226a9de7203ca4bcc08d1bc38fd3509842bcad158b97e950ea9ff4995279"
+      },
+      {
+        "path": "tools/archive_military_catalog.py",
+        "sha256": "62764abba992ddd3a4ceed41bddde2959acf4f9cc5884e4289c53ad9a7fa0e68"
+      },
+      {
+        "path": "src/main/resources/assets/blacklight/textures/item/firearms_palette.png",
+        "sha256": "110956a1470344b94fb48de038f2a11b13e2433f2dae2173635607006169598a"
+      }
+    ]
+  },
+  {
+    "path": "assets/枪械/thermobaric_launcher.png",
+    "sha256": "aa83ed51ab30148c99896964db7b23520d734a5ad2a61723661168f4dfa4eb60",
+    "kind": "实际JSON立方体/逐面UV纹理采样；不含display/透视/GL光影与运行时反馈，非GL",
+    "sources": [
+      {
+        "path": "src/main/resources/assets/blacklight/models/item/thermobaric_launcher.json",
+        "sha256": "3166e0a436f5e49e1e407720a76c69eb8ea7b14c4575718b22ae6d75e25caaf6"
+      },
+      {
+        "path": "tools/archive_military_catalog.py",
+        "sha256": "62764abba992ddd3a4ceed41bddde2959acf4f9cc5884e4289c53ad9a7fa0e68"
+      },
+      {
+        "path": "src/main/resources/assets/blacklight/textures/item/firearms_palette.png",
+        "sha256": "110956a1470344b94fb48de038f2a11b13e2433f2dae2173635607006169598a"
+      }
+    ]
+  },
+  {
+    "path": "assets/枪械/infection_launcher.png",
+    "sha256": "a5a6cf209e095fffa5961526b3c79f61625921a70d6a8adadcc49fbbb7eb3169",
+    "kind": "实际JSON立方体/逐面UV纹理采样；不含display/透视/GL光影与运行时反馈，非GL",
+    "sources": [
+      {
+        "path": "src/main/resources/assets/blacklight/models/item/infection_launcher.json",
+        "sha256": "ffa2c1b0aa4b248f541ab1621665ab4acea00ad22b8601e5adf77f58c09e8537"
+      },
+      {
+        "path": "tools/archive_military_catalog.py",
+        "sha256": "62764abba992ddd3a4ceed41bddde2959acf4f9cc5884e4289c53ad9a7fa0e68"
+      },
+      {
+        "path": "src/main/resources/assets/blacklight/textures/item/firearms_palette.png",
+        "sha256": "110956a1470344b94fb48de038f2a11b13e2433f2dae2173635607006169598a"
+      }
+    ]
+  },
+  {
+    "path": "assets/场景块/field_barrier.png",
+    "sha256": "4b2c8b326231b43dac28b10aa7531e7c10f84997587e14df393a7d7596df8fda",
+    "kind": "实际JSON立方体/逐面UV纹理采样；不含display/透视/GL光影与运行时反馈，非GL",
+    "sources": [
+      {
+        "path": "src/main/resources/assets/blacklight/models/block/field_barrier.json",
+        "sha256": "9332ab2bcacda2eb756919415e6c59838dd6ea367fb9a7c73cfb19e03ae37302"
+      },
+      {
+        "path": "tools/archive_military_catalog.py",
+        "sha256": "62764abba992ddd3a4ceed41bddde2959acf4f9cc5884e4289c53ad9a7fa0e68"
+      },
+      {
+        "path": "src/main/resources/assets/blacklight/textures/block/facility_concrete.png",
+        "sha256": "c09eef6e42d31bdfb574d0bc56ed823369629d3a62771c56df01d21a04c68c7d"
+      },
+      {
+        "path": "src/main/resources/assets/blacklight/textures/block/facility_hazard.png",
+        "sha256": "0e9fd9e8c8e5d53176e976607af9b6c252f2fd46c4ae86b01bfff8d43f669cb6"
+      },
+      {
+        "path": "src/main/resources/assets/blacklight/textures/block/facility_sandbag.png",
+        "sha256": "3048c328938773c20049565a4987f2e0a4efe188e30a063462413c7524a4d684"
+      },
+      {
+        "path": "src/main/resources/assets/blacklight/textures/block/facility_crate.png",
+        "sha256": "76bb6ead057f2fec1e458c6b8cee94115238877d5054484791e8f1a37f2cb040"
+      },
+      {
+        "path": "src/main/resources/assets/blacklight/textures/block/facility_metal.png",
+        "sha256": "8824db17c7c31b7a1dd0a1244406160720d350e0ac71b9e74aa64146f850c30b"
+      },
+      {
+        "path": "src/main/resources/assets/blacklight/textures/block/facility_screen.png",
+        "sha256": "a4ff7ebf4aeb9dd5efe26b2b697b1b826e22f814738c4f9675944307cd93d5ed"
+      },
+      {
+        "path": "src/main/resources/assets/blacklight/textures/block/facility_lamp.png",
+        "sha256": "87ee424d3c7b6b4e8248e05f41ebd43f6f7dbfe98d365b4a3c17261009b41b62"
+      }
+    ]
+  },
+  {
+    "path": "assets/场景块/sandbag_cover.png",
+    "sha256": "f37287672a64a068495c1827dcce1783460de6cfc3bd48a64099416057feafd3",
+    "kind": "实际JSON立方体/逐面UV纹理采样；不含display/透视/GL光影与运行时反馈，非GL",
+    "sources": [
+      {
+        "path": "src/main/resources/assets/blacklight/models/block/sandbag_cover.json",
+        "sha256": "67664c86f4ed335589213b50167083596cdddb9e3d1abcf4e3556eb35c5133fd"
+      },
+      {
+        "path": "tools/archive_military_catalog.py",
+        "sha256": "62764abba992ddd3a4ceed41bddde2959acf4f9cc5884e4289c53ad9a7fa0e68"
+      },
+      {
+        "path": "src/main/resources/assets/blacklight/textures/block/facility_concrete.png",
+        "sha256": "c09eef6e42d31bdfb574d0bc56ed823369629d3a62771c56df01d21a04c68c7d"
+      },
+      {
+        "path": "src/main/resources/assets/blacklight/textures/block/facility_hazard.png",
+        "sha256": "0e9fd9e8c8e5d53176e976607af9b6c252f2fd46c4ae86b01bfff8d43f669cb6"
+      },
+      {
+        "path": "src/main/resources/assets/blacklight/textures/block/facility_sandbag.png",
+        "sha256": "3048c328938773c20049565a4987f2e0a4efe188e30a063462413c7524a4d684"
+      },
+      {
+        "path": "src/main/resources/assets/blacklight/textures/block/facility_crate.png",
+        "sha256": "76bb6ead057f2fec1e458c6b8cee94115238877d5054484791e8f1a37f2cb040"
+      },
+      {
+        "path": "src/main/resources/assets/blacklight/textures/block/facility_metal.png",
+        "sha256": "8824db17c7c31b7a1dd0a1244406160720d350e0ac71b9e74aa64146f850c30b"
+      },
+      {
+        "path": "src/main/resources/assets/blacklight/textures/block/facility_screen.png",
+        "sha256": "a4ff7ebf4aeb9dd5efe26b2b697b1b826e22f814738c4f9675944307cd93d5ed"
+      },
+      {
+        "path": "src/main/resources/assets/blacklight/textures/block/facility_lamp.png",
+        "sha256": "87ee424d3c7b6b4e8248e05f41ebd43f6f7dbfe98d365b4a3c17261009b41b62"
+      }
+    ]
+  },
+  {
+    "path": "assets/场景块/military_crate.png",
+    "sha256": "9f0b85850a67e06126a09d76e9a50d78bb7d98b2e7009a30d6dcd0b19a36727d",
+    "kind": "实际JSON立方体/逐面UV纹理采样；不含display/透视/GL光影与运行时反馈，非GL",
+    "sources": [
+      {
+        "path": "src/main/resources/assets/blacklight/models/block/military_crate.json",
+        "sha256": "91d879a2d0bfec3046abe00964602f3989e43c365e33e605430156b52ed2ee8e"
+      },
+      {
+        "path": "tools/archive_military_catalog.py",
+        "sha256": "62764abba992ddd3a4ceed41bddde2959acf4f9cc5884e4289c53ad9a7fa0e68"
+      },
+      {
+        "path": "src/main/resources/assets/blacklight/textures/block/facility_concrete.png",
+        "sha256": "c09eef6e42d31bdfb574d0bc56ed823369629d3a62771c56df01d21a04c68c7d"
+      },
+      {
+        "path": "src/main/resources/assets/blacklight/textures/block/facility_hazard.png",
+        "sha256": "0e9fd9e8c8e5d53176e976607af9b6c252f2fd46c4ae86b01bfff8d43f669cb6"
+      },
+      {
+        "path": "src/main/resources/assets/blacklight/textures/block/facility_sandbag.png",
+        "sha256": "3048c328938773c20049565a4987f2e0a4efe188e30a063462413c7524a4d684"
+      },
+      {
+        "path": "src/main/resources/assets/blacklight/textures/block/facility_crate.png",
+        "sha256": "76bb6ead057f2fec1e458c6b8cee94115238877d5054484791e8f1a37f2cb040"
+      },
+      {
+        "path": "src/main/resources/assets/blacklight/textures/block/facility_metal.png",
+        "sha256": "8824db17c7c31b7a1dd0a1244406160720d350e0ac71b9e74aa64146f850c30b"
+      },
+      {
+        "path": "src/main/resources/assets/blacklight/textures/block/facility_screen.png",
+        "sha256": "a4ff7ebf4aeb9dd5efe26b2b697b1b826e22f814738c4f9675944307cd93d5ed"
+      },
+      {
+        "path": "src/main/resources/assets/blacklight/textures/block/facility_lamp.png",
+        "sha256": "87ee424d3c7b6b4e8248e05f41ebd43f6f7dbfe98d365b4a3c17261009b41b62"
+      }
+    ]
+  },
+  {
+    "path": "assets/场景块/command_terminal.png",
+    "sha256": "9adb751c6bb51b28e41fb7438b99b355a8809c10f2e7d8fb23164fd95547c5b6",
+    "kind": "实际JSON立方体/逐面UV纹理采样；不含display/透视/GL光影与运行时反馈，非GL",
+    "sources": [
+      {
+        "path": "src/main/resources/assets/blacklight/models/block/command_terminal.json",
+        "sha256": "fa993cde57be62d2a56d29f4db9147bb27918867aea1a18e06e23a07996a88f4"
+      },
+      {
+        "path": "tools/archive_military_catalog.py",
+        "sha256": "62764abba992ddd3a4ceed41bddde2959acf4f9cc5884e4289c53ad9a7fa0e68"
+      },
+      {
+        "path": "src/main/resources/assets/blacklight/textures/block/facility_concrete.png",
+        "sha256": "c09eef6e42d31bdfb574d0bc56ed823369629d3a62771c56df01d21a04c68c7d"
+      },
+      {
+        "path": "src/main/resources/assets/blacklight/textures/block/facility_hazard.png",
+        "sha256": "0e9fd9e8c8e5d53176e976607af9b6c252f2fd46c4ae86b01bfff8d43f669cb6"
+      },
+      {
+        "path": "src/main/resources/assets/blacklight/textures/block/facility_sandbag.png",
+        "sha256": "3048c328938773c20049565a4987f2e0a4efe188e30a063462413c7524a4d684"
+      },
+      {
+        "path": "src/main/resources/assets/blacklight/textures/block/facility_crate.png",
+        "sha256": "76bb6ead057f2fec1e458c6b8cee94115238877d5054484791e8f1a37f2cb040"
+      },
+      {
+        "path": "src/main/resources/assets/blacklight/textures/block/facility_metal.png",
+        "sha256": "8824db17c7c31b7a1dd0a1244406160720d350e0ac71b9e74aa64146f850c30b"
+      },
+      {
+        "path": "src/main/resources/assets/blacklight/textures/block/facility_screen.png",
+        "sha256": "a4ff7ebf4aeb9dd5efe26b2b697b1b826e22f814738c4f9675944307cd93d5ed"
+      },
+      {
+        "path": "src/main/resources/assets/blacklight/textures/block/facility_lamp.png",
+        "sha256": "87ee424d3c7b6b4e8248e05f41ebd43f6f7dbfe98d365b4a3c17261009b41b62"
+      }
+    ]
+  },
+  {
+    "path": "assets/场景块/communications_antenna.png",
+    "sha256": "7640cf28adde807865e6e519ae79c5417f2274696de0bdd48cb3a70bfe3ee72c",
+    "kind": "实际JSON立方体/逐面UV纹理采样；不含display/透视/GL光影与运行时反馈，非GL",
+    "sources": [
+      {
+        "path": "src/main/resources/assets/blacklight/models/block/communications_antenna.json",
+        "sha256": "71bcf127c5e5c018dc8fc3e3450082d1986be3d8d12f388accc5041ac2e3cf8d"
+      },
+      {
+        "path": "tools/archive_military_catalog.py",
+        "sha256": "62764abba992ddd3a4ceed41bddde2959acf4f9cc5884e4289c53ad9a7fa0e68"
+      },
+      {
+        "path": "src/main/resources/assets/blacklight/textures/block/facility_concrete.png",
+        "sha256": "c09eef6e42d31bdfb574d0bc56ed823369629d3a62771c56df01d21a04c68c7d"
+      },
+      {
+        "path": "src/main/resources/assets/blacklight/textures/block/facility_hazard.png",
+        "sha256": "0e9fd9e8c8e5d53176e976607af9b6c252f2fd46c4ae86b01bfff8d43f669cb6"
+      },
+      {
+        "path": "src/main/resources/assets/blacklight/textures/block/facility_sandbag.png",
+        "sha256": "3048c328938773c20049565a4987f2e0a4efe188e30a063462413c7524a4d684"
+      },
+      {
+        "path": "src/main/resources/assets/blacklight/textures/block/facility_crate.png",
+        "sha256": "76bb6ead057f2fec1e458c6b8cee94115238877d5054484791e8f1a37f2cb040"
+      },
+      {
+        "path": "src/main/resources/assets/blacklight/textures/block/facility_metal.png",
+        "sha256": "8824db17c7c31b7a1dd0a1244406160720d350e0ac71b9e74aa64146f850c30b"
+      },
+      {
+        "path": "src/main/resources/assets/blacklight/textures/block/facility_screen.png",
+        "sha256": "a4ff7ebf4aeb9dd5efe26b2b697b1b826e22f814738c4f9675944307cd93d5ed"
+      },
+      {
+        "path": "src/main/resources/assets/blacklight/textures/block/facility_lamp.png",
+        "sha256": "87ee424d3c7b6b4e8248e05f41ebd43f6f7dbfe98d365b4a3c17261009b41b62"
+      }
+    ]
+  },
+  {
+    "path": "assets/场景块/military_searchlight.png",
+    "sha256": "84da9b9346bb332f5457d0a6a8f42377d15e91b803e92273fbf8346b8bc92766",
+    "kind": "实际JSON立方体/逐面UV纹理采样；不含display/透视/GL光影与运行时反馈，非GL",
+    "sources": [
+      {
+        "path": "src/main/resources/assets/blacklight/models/block/military_searchlight.json",
+        "sha256": "d5513b19c0d1f267245c67d25f805c837148beb5a0db726458dca0beb00be1cf"
+      },
+      {
+        "path": "tools/archive_military_catalog.py",
+        "sha256": "62764abba992ddd3a4ceed41bddde2959acf4f9cc5884e4289c53ad9a7fa0e68"
+      },
+      {
+        "path": "src/main/resources/assets/blacklight/textures/block/facility_concrete.png",
+        "sha256": "c09eef6e42d31bdfb574d0bc56ed823369629d3a62771c56df01d21a04c68c7d"
+      },
+      {
+        "path": "src/main/resources/assets/blacklight/textures/block/facility_hazard.png",
+        "sha256": "0e9fd9e8c8e5d53176e976607af9b6c252f2fd46c4ae86b01bfff8d43f669cb6"
+      },
+      {
+        "path": "src/main/resources/assets/blacklight/textures/block/facility_sandbag.png",
+        "sha256": "3048c328938773c20049565a4987f2e0a4efe188e30a063462413c7524a4d684"
+      },
+      {
+        "path": "src/main/resources/assets/blacklight/textures/block/facility_crate.png",
+        "sha256": "76bb6ead057f2fec1e458c6b8cee94115238877d5054484791e8f1a37f2cb040"
+      },
+      {
+        "path": "src/main/resources/assets/blacklight/textures/block/facility_metal.png",
+        "sha256": "8824db17c7c31b7a1dd0a1244406160720d350e0ac71b9e74aa64146f850c30b"
+      },
+      {
+        "path": "src/main/resources/assets/blacklight/textures/block/facility_screen.png",
+        "sha256": "a4ff7ebf4aeb9dd5efe26b2b697b1b826e22f814738c4f9675944307cd93d5ed"
+      },
+      {
+        "path": "src/main/resources/assets/blacklight/textures/block/facility_lamp.png",
+        "sha256": "87ee424d3c7b6b4e8248e05f41ebd43f6f7dbfe98d365b4a3c17261009b41b62"
+      }
+    ]
+  },
+  {
+    "path": "assets/弹药/rifle_round.png",
+    "sha256": "5998b48aa9a17047c3826ca808780c84773393348edd3695e94b3e2395d97659",
+    "kind": "实际弹药物品纹理像素放大，非实机",
+    "sources": [
+      {
+        "path": "src/main/resources/assets/blacklight/textures/item/rifle_round.png",
+        "sha256": "e70d4c28c7f9e9623185bc67bcbcb8c86fae9f0ce90fce2fa766adb83fe315bf"
+      }
+    ]
+  },
+  {
+    "path": "assets/弹药/machine_gun_round.png",
+    "sha256": "fed3ea52c9c75c179ee38725b565a39ea2f3df13643ffee66355bc67857e8824",
+    "kind": "实际弹药物品纹理像素放大，非实机",
+    "sources": [
+      {
+        "path": "src/main/resources/assets/blacklight/textures/item/machine_gun_round.png",
+        "sha256": "9a3c19043de5f1a906dd28724e53cb3e64f7a765f1a83636c3792bf70d92b950"
+      }
+    ]
+  },
+  {
+    "path": "assets/弹药/grenade_round.png",
+    "sha256": "df730224f150cf4325cb0f3aee0bfb4c8f2310f7497e40f22569ec76b8e20a12",
+    "kind": "实际弹药物品纹理像素放大，非实机",
+    "sources": [
+      {
+        "path": "src/main/resources/assets/blacklight/textures/item/grenade_round.png",
+        "sha256": "68db0e327c26c5f30d381565c47f7ecfdc57e4ca9336347c14edcfb450fbd3c6"
+      }
+    ]
+  },
+  {
+    "path": "assets/弹药/rocket_round.png",
+    "sha256": "e2f713a820510acd073cc9c7b75c2744935e697fcaf058074e274a1aa9b229f9",
+    "kind": "实际弹药物品纹理像素放大，非实机",
+    "sources": [
+      {
+        "path": "src/main/resources/assets/blacklight/textures/item/rocket_round.png",
+        "sha256": "f0da949f8a069668cd0526402af0b14a357c10c97c744c059758ecfe0ffcd102"
+      }
+    ]
+  },
+  {
+    "path": "assets/弹药/missile_round.png",
+    "sha256": "abc71702bdf8f71b5097f6d00d8a227d1257443a60d6d0053113a0780ad293aa",
+    "kind": "实际弹药物品纹理像素放大，非实机",
+    "sources": [
+      {
+        "path": "src/main/resources/assets/blacklight/textures/item/missile_round.png",
+        "sha256": "49c5f105eb2f198a9809d9e6784bb6c7afac8e25e09f400b8d33fe0f53cc5b6a"
+      }
+    ]
+  },
+  {
+    "path": "assets/弹药/thermobaric_round.png",
+    "sha256": "c5be13f933445a3b79cbaf153f8b2f0825cfb3d3b8d12db91682726bdb8fe661",
+    "kind": "实际弹药物品纹理像素放大，非实机",
+    "sources": [
+      {
+        "path": "src/main/resources/assets/blacklight/textures/item/thermobaric_round.png",
+        "sha256": "e4cd7904a84bdd16db90587a9c20aa4889e0f65ca6768faec011b51ae4133f58"
+      }
+    ]
+  },
+  {
+    "path": "assets/弹药/infection_round.png",
+    "sha256": "1b66f969aa524c639e4496b3aadb782ed3dd88dfae5418e6a5276e384409af82",
+    "kind": "实际弹药物品纹理像素放大，非实机",
+    "sources": [
+      {
+        "path": "src/main/resources/assets/blacklight/textures/item/infection_round.png",
+        "sha256": "44a8c476594ddb8b3f5564aa2f0557ddf045bf794171f75fc09b7bad56c36903"
+      }
+    ]
+  },
+  {
+    "path": "assets/感染生物/hunter-front.png",
+    "sha256": "c4bbbb42a319a51fe9791dd611fea0cd9ea739438c1ae310144fbdba4125432c",
+    "kind": "既有作者制作预览；非实机，未在此刷新几何",
+    "sources": [
+      {
+        "path": "art/creature-connected/hunter-front.png",
+        "sha256": "c4bbbb42a319a51fe9791dd611fea0cd9ea739438c1ae310144fbdba4125432c"
+      }
+    ]
+  },
+  {
+    "path": "assets/感染生物/hunter-three-quarter.png",
+    "sha256": "851c03066212ab3ba1697b2c7a1fceb52b62803bf991abc1f0d82bde3836426d",
+    "kind": "既有作者制作预览；非实机，未在此刷新几何",
+    "sources": [
+      {
+        "path": "art/creature-connected/hunter-three-quarter.png",
+        "sha256": "851c03066212ab3ba1697b2c7a1fceb52b62803bf991abc1f0d82bde3836426d"
+      }
+    ]
+  },
+  {
+    "path": "assets/感染生物/hydra-front.png",
+    "sha256": "c0b0529f88a1d242bde87976af07c293ab387cb4112ba780a8f6de98128ab263",
+    "kind": "既有作者制作预览；非实机，未在此刷新几何",
+    "sources": [
+      {
+        "path": "art/creature-connected/hydra-front.png",
+        "sha256": "c0b0529f88a1d242bde87976af07c293ab387cb4112ba780a8f6de98128ab263"
+      }
+    ]
+  },
+  {
+    "path": "assets/感染生物/hydra-three-quarter.png",
+    "sha256": "ad8d85979c24e9c1631f0a1d223f5daa12858b56309d8170e339925a8ded8ef1",
+    "kind": "既有作者制作预览；非实机，未在此刷新几何",
+    "sources": [
+      {
+        "path": "art/creature-connected/hydra-three-quarter.png",
+        "sha256": "ad8d85979c24e9c1631f0a1d223f5daa12858b56309d8170e339925a8ded8ef1"
+      }
+    ]
+  }
+]

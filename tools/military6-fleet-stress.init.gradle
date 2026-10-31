@@ -1,0 +1,60 @@
+// Disposable normal-server QA only. One fresh .superpowers directory per tier; never reuse a saved world.
+allprojects { afterEvaluate {
+    def tier = project.findProperty('vehicleFleetStressVehicles')?.toString()
+    if (!(tier in ['3','12','24'])) throw new GradleException('Choose -PvehicleFleetStressVehicles=3, 12 or 24')
+    if (!project.hasProperty('serverRunDirectory')) throw new GradleException('Set a fresh isolated -PserverRunDirectory under .superpowers')
+    def run = project.file(project.property('serverRunDirectory')).canonicalFile
+    def qa = project.file('.superpowers').canonicalFile
+    if (!run.path.startsWith(qa.path + File.separator)) throw new GradleException('Stress server directory must be inside this worktree .superpowers')
+    def measurement = new File(run, 'vehicle-fleet-stress-' + tier + '.json')
+    def scene = new File(run, 'vehicle-fleet-scene-' + tier + '.json')
+    if (new File(run, 'world/level.dat').exists() || measurement.exists() || scene.exists()) throw new GradleException('Preserve existing evidence and choose a NEW run directory for this tier')
+    def sample = (project.findProperty('vehicleFleetStressTicks') ?: '600').toString().toInteger()
+    if (sample < 200 || sample > 1200) throw new GradleException('Sample must be 200..1200 real normal-server ticks')
+    run.mkdirs()
+    new File(run, 'eula.txt').setText('eula=true\n', 'UTF-8')
+    new File(run, 'server.properties').setText('''level-name=world
+level-seed=61027
+level-type=minecraft:flat
+generator-settings={"biome":"minecraft:plains","layers":[{"block":"minecraft:bedrock","height":1},{"block":"minecraft:dirt","height":2},{"block":"minecraft:grass_block","height":1}],"structure_overrides":[]}
+generate-structures=false
+online-mode=false
+spawn-protection=0
+spawn-monsters=false
+spawn-animals=false
+spawn-npcs=false
+allow-nether=false
+view-distance=5
+simulation-distance=4
+server-port=0
+enable-query=false
+enable-rcon=false
+enable-status=false
+max-tick-time=-1
+sync-chunk-writes=true
+''', 'UTF-8')
+    sourceSets.main.java.srcDir('src/vehicleTest/java')
+    sourceSets.main.java.srcDir('src/vehicleServerTest/java')
+    sourceSets.main.resources.srcDir('src/blackwatchTest/resources')
+    def values = [
+        'blacklight.vehicleFleetStressScene':'true', 'blacklight.vehicleFleetStress':'true',
+        'blacklight.vehicleFleetStress.vehicles':tier, 'blacklight.vehicleFleetStress.ticks':sample.toString(),
+        'blacklight.vehicleFleetStress.x':'320000', 'blacklight.vehicleFleetStress.y':'80',
+        'blacklight.vehicleFleetStress.z':'0', 'blacklight.vehicleFleetStress.radius':'256',
+        'blacklight.vehicleFleetStress.infantry':'12',
+        'blacklight.vehicleFleetStress.file':measurement.absolutePath,
+        'blacklight.vehicleFleetStress.sceneFile':scene.absolutePath
+    ]
+    values.each { name, value -> neoForge.runs.server.systemProperty name, value }
+    neoForge.runs.server.jvmArgument '-Xmx4G'
+    def stageFleetStress = tasks.register('stageFleetStress', Sync) {
+        dependsOn tasks.named('classes')
+        from sourceSets.main.output
+        into layout.buildDirectory.dir('vehicle-fleet-stress-mod')
+    }
+    tasks.named('runServer').configure {
+        dependsOn stageFleetStress
+        doFirst { environment 'MOD_CLASSES', 'blacklight%%' + layout.buildDirectory.dir('vehicle-fleet-stress-mod').get().asFile.absolutePath }
+    }
+} }
+allprojects { tasks.withType(ProcessResources).configureEach { filteringCharset = 'UTF-8' } }

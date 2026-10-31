@@ -69,6 +69,10 @@ public final class BlacklightHunter extends Monster implements GeoEntity {
         if(com.codex.blacklight.combat.ImpactControl.stunned(this)||isNoAi()){cancelAttack();return;}
         if (attackCooldown > 0) attackCooldown--;
         if(evadeCooldown>0)evadeCooldown--;
+        if(com.codex.blacklight.military.vehicle.VehicleHullAttackGoal.handles(this)){
+            if(committedAttack())cancelAttack();
+            return;
+        }
         int attack = entityData.get(ATTACK);
         if (attack > 0) {
             getNavigation().stop();

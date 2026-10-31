@@ -126,9 +126,11 @@ public final class InstalledCombatCompatibilityGameTest {
         h.assertTrue(item.isAlive() && item.saveWithoutId(new net.minecraft.nbt.CompoundTag()).getShort("Health")==4,"item burst bypassed integral damage budget");
         var ordinary=h.spawn(EntityType.COW,8,2,8);ordinary.setNoAi(true);ordinary.hurt(source,1000000);
         h.assertTrue(!ordinary.isAlive(),"external protection leaked into ordinary vanilla mobs");
-        h.runAfterDelay(11,()->{
+        h.runAfterDelay(com.codex.blacklight.config.CrossModCombatConfig.WINDOW_TICKS.get()+1,()->{
             hunter.invulnerableTime=0;float previous=hunter.getHealth();hunter.hurt(source,1000000);
-            h.assertTrue(Math.abs(previous-hunter.getHealth()-maximum*.15F)<.1F,"budget did not refresh after configured window");
+            float singleLimit=(float)(maximum*Math.min(com.codex.blacklight.config.CrossModCombatConfig.WINDOW_FRACTION.get(),
+                    com.codex.blacklight.config.CrossModCombatConfig.MOB_HIT_FRACTION.get()));
+            h.assertTrue(Math.abs(previous-hunter.getHealth()-singleLimit)<.1F,"fresh window must admit the configured single-hit budget: "+(previous-hunter.getHealth()));
             item.hurt(source,1000000);
             h.assertTrue(item.isAlive() && item.saveWithoutId(new net.minecraft.nbt.CompoundTag()).getShort("Health")==3,"item became immortal");
             hunter.hurt(h.getLevel().damageSources().genericKill(),10000000);

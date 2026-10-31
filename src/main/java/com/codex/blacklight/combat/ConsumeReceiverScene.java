@@ -13,7 +13,8 @@ public final class ConsumeReceiverScene {
     private static Map<String, Profile> profiles;
     private ConsumeReceiverScene() {}
 
-    public static synchronized Profile profile(PowerForm form, boolean large) {
+    public static Profile profile(PowerForm form,boolean large){return profile(form,large,ConsumeVariant.DEFAULT);}
+    public static synchronized Profile profile(PowerForm form, boolean large,int variant) {
         if (large) return null;
         if (profiles == null) {
             var loaded = new HashMap<String, Profile>();
@@ -40,11 +41,12 @@ public final class ConsumeReceiverScene {
             });
             profiles=Map.copyOf(loaded);
         }
-        return profiles.get(ConsumeSequence.key(form));
+        return profiles.get(ConsumeSequence.key(form,variant));
     }
 
-    public static float clipSeconds(PowerForm form) {
-        return LocalVisualMotion.find("consume_"+ConsumeSequence.key(form)+"_actor")
+    public static float clipSeconds(PowerForm form){return clipSeconds(form,ConsumeVariant.DEFAULT);}
+    public static float clipSeconds(PowerForm form,int variant) {
+        return LocalVisualMotion.find("consume_"+ConsumeSequence.key(form,variant)+"_actor")
                 .map(clip -> {
                     var times=clip.animation().getAsJsonArray("animation").get(0).getAsJsonObject().getAsJsonArray("time");
                     return Math.max(.05F,times.get(times.size()-1).getAsFloat());

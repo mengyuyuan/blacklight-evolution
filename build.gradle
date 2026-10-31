@@ -25,6 +25,12 @@ sourceSets.main.resources {
     exclude("**/*.bbmodel") // BlockBench project files
 
     exclude("src/generated/**/.cache") // datagen cache files
+    // Preserve dormant fuel resources on disk while disabling normal acquisition.
+    exclude('data/blacklight/recipe/military_fuel_can.json')
+    exclude { details ->
+        !details.isDirectory() && details.path.startsWith('data/blacklight/loot_table/') &&
+                details.name.endsWith('.json') && details.file.getText('UTF-8').contains('blacklight:military_fuel_can')
+    }
 }
 
 // A normal clone includes the complete runtime profile. An explicit developer
@@ -225,9 +231,28 @@ if (project.hasProperty('standaloneInfected')) {
 if (project.hasProperty('standaloneBulletExtreme') || project.hasProperty('standaloneTutorialInspect') || project.hasProperty('standaloneTutorial') || project.hasProperty('standaloneVisual') || project.hasProperty('standaloneGait') || project.hasProperty('standaloneLock') || project.hasProperty('standaloneMorph') || project.hasProperty('standaloneSkill') || project.hasProperty('standaloneSync')) {
     sourceSets.main.java.srcDir('src/standaloneVisualTest/java')
     if (!project.hasProperty('standaloneSync')) sourceSets.main.java.exclude '**/StandaloneSyncClientSmoke.java', '**/StandaloneSyncServerChecks.java'
+    else {
+        fileTree('src/standaloneVisualTest/java').matching { include '**/*.java' }.each { source ->
+            if(!(source.name in ['StandaloneSyncClientSmoke.java','StandaloneSyncServerChecks.java']))
+                sourceSets.main.java.exclude '**/'+source.name
+        }
+    }
 }
 if (project.hasProperty('standaloneTest')) {
     sourceSets.main.java.srcDir('src/standaloneTest/java')
+}
+if (project.hasProperty('blackwatchTest')) {
+    sourceSets.main.java.srcDir('src/blackwatchTest/java')
+    sourceSets.main.resources.srcDir('src/blackwatchTest/resources')
+    if (project.hasProperty('militaryStress')) sourceSets.main.java.srcDir('src/militaryStress/java')
+}
+if (project.hasProperty('campaignTest')) {
+    sourceSets.main.java.srcDir('src/campaignTest/java')
+    sourceSets.main.resources.srcDir('src/campaignTest/resources')
+}
+if (project.hasProperty('gunplayTest')) {
+    sourceSets.main.java.srcDir('src/gunplayTest/java')
+    sourceSets.main.resources.srcDir('src/campaignTest/resources')
 }
 if (project.hasProperty('releaseAuditTest')) {
     sourceSets.main.java.srcDir('src/releaseAuditTest/java')
@@ -237,6 +262,7 @@ if (project.hasProperty('cityTest')) {
     sourceSets.main.resources.srcDir('src/cityTest/resources')
 }
 tasks.named('jar', Jar).configure {
+    exclude 'com/codex/blacklight/client/GunplaySmoke*.class'
     includeEmptyDirs = false
     from('licenses') { into 'META-INF/licenses' }
     archiveClassifier = releaseProfile
@@ -254,8 +280,13 @@ tasks.named('jar', Jar).configure {
             'Blacklight-Asset-Notice': 'THIRD_PARTY_ASSETS.md')
     exclude 'com/codex/blacklight/gametest/**'
     exclude 'data/blacklight/structure/wall_test.nbt', 'data/blacklight/structures/wall_test.nbt'
+    exclude 'com/codex/blacklight/client/vehicle/VehicleViewSmoke*.class', 'com/codex/blacklight/client/vehicle/VehicleViewBootstrap*.class'
     exclude 'com/codex/blacklight/city/*GameTest*.class'
+    exclude 'com/codex/blacklight/city/CityMilitaryServerAudit*.class'
+    exclude 'com/codex/blacklight/city/Military6LegacyAudit*.class'
+    exclude 'com/codex/blacklight/city/MilitaryCampaignWorldgenAudit*.class'
     exclude 'data/minecraft/worldgen/world_preset/flat.json'
+    exclude 'data/blacklight_qa/**', 'data/blacklight/structure/blackwatch_arena.nbt'
     exclude 'com/codex/blacklight/client/Standalone*Smoke*.class'
     exclude 'com/codex/blacklight/client/WingFlightSmoke*.class'
     exclude 'com/codex/blacklight/client/WingSupersonicSmoke*.class'
@@ -265,6 +296,11 @@ tasks.named('jar', Jar).configure {
     exclude 'com/codex/blacklight/client/InfectedCompositionSmoke*.class'
     exclude 'com/codex/blacklight/client/HydraReleaseSmoke*.class', 'com/codex/blacklight/client/CreatureCombatSmoke*.class'
     exclude 'data/blacklight/structure/wall_test.nbt'
+    exclude 'data/blacklight/structure/blackwatch_arena.nbt'
+    exclude 'data/blacklight/structure/military_march_arena.nbt'
+    exclude 'data/blacklight/structure/military_stress_arena.nbt'
+    exclude 'data/blacklight/structure/military_slope_arena.nbt'
+    exclude 'data/blacklight/structure/blackwatch_facility_arena.nbt'
 }
 
 neoForge {
@@ -283,6 +319,13 @@ neoForge {
     // These can be tweaked, removed, or duplicated as needed.
     runs {
         client {
+            if (project.hasProperty('gunplayTest')) {
+                systemProperty 'blacklight.test.gunplay', 'true'
+                if (project.hasProperty('mechanicalVisual')) systemProperty 'blacklight.test.mechanical', 'true'
+                if (project.hasProperty('gunplayRunDirectory')) gameDirectory = file(project.property('gunplayRunDirectory'))
+                jvmArgument '-Xmx2304m'
+                programArguments.addAll '--width', '1280', '--height', '800'
+            }
             client()
             if(project.hasProperty('cityVisualTest')) {
                 systemProperty 'blacklight.cityVisual', 'true'
@@ -348,8 +391,10 @@ neoForge {
                 programArguments.addAll '--width', '1280', '--height', '900'
             }
             if (project.hasProperty('standaloneSync')) {
+                if (!project.hasProperty('clientRunDirectory')) throw new GradleException('Synchronization QA requires a disposable clientRunDirectory')
+                systemProperty 'blacklight.test.qaDirectory', file(project.property('clientRunDirectory')).absolutePath
                 systemProperty 'blacklight.test.standaloneSync', file(project.property('standaloneSync')).absolutePath
-                programArguments.addAll '--width', '1280', '--height', '900'
+                programArguments.addAll '--quickPlayMultiplayer', '127.0.0.1:25568', '--username', 'Dev', '--width', '960', '--height', '640'
             }
             if (project.hasProperty('localWeaponMotions')) {
                 systemProperty 'blacklight.localWeaponMotions', file(project.property('localWeaponMotions')).absolutePath
@@ -378,8 +423,13 @@ neoForge {
         server {
             server()
             if (project.hasProperty('serverRunDirectory')) gameDirectory = file(project.property('serverRunDirectory'))
-            if (project.hasProperty('standaloneSync')) systemProperty 'blacklight.test.standaloneSync', file(project.property('standaloneSync')).absolutePath
-            jvmArgument(project.hasProperty('hydraReleaseTest') ? '-Xmx1G' : '-Xmx2G')
+            if (project.hasProperty('standaloneSync')) {
+                if (!project.hasProperty('serverRunDirectory')) throw new GradleException('Synchronization QA requires a disposable serverRunDirectory')
+                systemProperty 'blacklight.test.qaDirectory', file(project.property('serverRunDirectory')).absolutePath
+                systemProperty 'blacklight.test.standaloneSync', file(project.property('standaloneSync')).absolutePath
+            }
+            jvmArgument(project.hasProperty('serverMaxHeap') ? '-Xmx'+project.property('serverMaxHeap') : project.hasProperty('hydraReleaseTest') ? '-Xmx1G' : '-Xmx2G')
+            if (project.hasProperty('campaignWorldgenAudit')) systemProperty 'blacklight.campaignWorldgenAudit', 'true'
             programArgument '--nogui'
             systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
         }
@@ -458,6 +508,12 @@ dependencies {
 
     testImplementation 'org.junit.jupiter:junit-jupiter:5.11.4'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    // KeyMapping labels touch GLFW even though these tests create no window.
+    def testOs = System.getProperty('os.name').toLowerCase()
+    def testNative = testOs.contains('win') ? 'natives-windows' : testOs.contains('mac') ? 'natives-macos' : 'natives-linux'
+    if (System.getProperty('os.arch').toLowerCase().contains('aarch64')) testNative += '-arm64'
+    testRuntimeOnly "org.lwjgl:lwjgl:3.3.3:${testNative}"
+    testRuntimeOnly "org.lwjgl:lwjgl-glfw:3.3.3:${testNative}"
     // BlacklightState exposes a Minecraft Codec; plain JVM tests therefore need DFU too.
     testImplementation 'com.mojang:datafixerupper:8.0.16'
     testImplementation 'com.google.code.gson:gson:2.10.1'
@@ -488,8 +544,24 @@ dependencies {
 
 tasks.named('test', Test).configure {
     useJUnitPlatform()
+    maxHeapSize = providers.gradleProperty('testHeap').orElse('1536m').get()
+    forkEvery = 1 // Motion profiles and Minecraft static bootstraps must not accumulate between classes.
+    // Windows installers sometimes quote an entire PATH entry. LWJGL treats that quote as an illegal filename.
+    environment 'PATH', (System.getenv('PATH') ?: '').split(java.util.regex.Pattern.quote(File.pathSeparator))
+            .collect { it.trim().replaceAll('^"|"$', '') }.join(File.pathSeparator)
     // Native pose tests use the project-authored mathematical bind hierarchy.
 }
+
+// NeoForm's compiled Minecraft artifact does not contain the vanilla language assets.
+// Use the real, already downloaded client resource in JVM tests, without shipping it in the mod.
+def vanillaTestClient = providers.gradleProperty('testVanillaClient').map { file(it) }.orElse(
+        providers.provider { new File(gradle.gradleUserHomeDir, "caches/neoformruntime/artifacts/minecraft_${minecraft_version}_client.jar") })
+def extractVanillaTestLanguage = tasks.register('extractVanillaTestLanguage', Copy) {
+    dependsOn tasks.named('createMinecraftArtifacts')
+    from({ zipTree(vanillaTestClient.get()) }) { include 'assets/minecraft/lang/en_us.json' }
+    into layout.buildDirectory.dir('generated/testVanillaLanguage')
+}
+sourceSets.test.resources.srcDir(extractVanillaTestLanguage)
 
 // This block of code expands all declared replace properties in the specified resource targets.
 // A missing property will result in an error. Properties are expanded using ${} Groovy notation.

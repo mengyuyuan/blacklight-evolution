@@ -1,0 +1,162 @@
+[
+  {
+    "path": "assets/vehicles/apc-blackwatch.png",
+    "sha256": "dabca06f986d10806813dc100b4298599b042964c3bae5a2fe7dcce59f7b933b",
+    "kind": "actual_ModelPart_CPU_not_game_screenshot"
+  },
+  {
+    "path": "assets/vehicles/apc-military.png",
+    "sha256": "6fcd9a9eba4eba6afafdccab22ee6df59f9cea3741282d456671154d91a48a73",
+    "kind": "actual_ModelPart_CPU_not_game_screenshot"
+  },
+  {
+    "path": "assets/vehicles/tank-blackwatch.png",
+    "sha256": "4765580dc21487a4544238ce10ab108d2acba01f31b4f82887ee3ed1f4efe833",
+    "kind": "actual_ModelPart_CPU_not_game_screenshot"
+  },
+  {
+    "path": "assets/vehicles/tank-military.png",
+    "sha256": "fa96192d0812a20cd27cd0937ed225c672817bdc956f35189b4a0065730eca6c",
+    "kind": "actual_ModelPart_CPU_not_game_screenshot"
+  },
+  {
+    "path": "assets/vehicles/truck-blackwatch.png",
+    "sha256": "a617bd44f547a0509ca64384a9a5d47ebbfb7f2c7a41617f5192e79c3640134c",
+    "kind": "actual_ModelPart_CPU_not_game_screenshot"
+  },
+  {
+    "path": "assets/vehicles/truck-crew-blackwatch.png",
+    "sha256": "6bbd2358195b3185d0aadeb053ab503b4eb87887d1113e5f13953ee9d7a94349",
+    "kind": "actual_ModelPart_CPU_not_game_screenshot"
+  },
+  {
+    "path": "assets/vehicles/truck-crew-military.png",
+    "sha256": "76016ec7e6e59a937840f70d7582e193bdaf85e9f942202ee615b7767257a74d",
+    "kind": "actual_ModelPart_CPU_not_game_screenshot"
+  },
+  {
+    "path": "assets/vehicles/truck-military.png",
+    "sha256": "18d82579f5be5d165bc4b33aeea2af121aca5cda20f39e738ca57a81128405ef",
+    "kind": "actual_ModelPart_CPU_not_game_screenshot"
+  },
+  {
+    "path": "assets/vehicles/vehicles-production-board.png",
+    "sha256": "219d6648850eba910065277f9639cbd65d74cb9a8ea4c8ca43758d24f8e1254e",
+    "kind": "actual_ModelPart_CPU_not_game_screenshot"
+  },
+  {
+    "path": "assets/soldiers/catalog-military_soldier-card.png",
+    "sha256": "093eea273755a535d54523d2199c1f0b06bb845ff2b3807cb55db289f0a91ccb",
+    "kind": "historical_M5_actual_ModelPart_CPU_not_refreshed_for_M6",
+    "original_manifest_sha256": "0fea897997e8e31a7c52c1619aedf28ecb389d8012090a5b60caf8b530c71bf8"
+  },
+  {
+    "path": "assets/soldiers/catalog-military_heavy-card.png",
+    "sha256": "a873cb67c502895e039043224b2225636c3354e361ad54651de0fe4d8bb755c9",
+    "kind": "historical_M5_actual_ModelPart_CPU_not_refreshed_for_M6",
+    "original_manifest_sha256": "0fea897997e8e31a7c52c1619aedf28ecb389d8012090a5b60caf8b530c71bf8"
+  },
+  {
+    "path": "assets/soldiers/catalog-military_team_leader-card.png",
+    "sha256": "e7808ef15f7486ec5b0bfcf5e72216d1ddaed8b1dbfe24f65f8ed441ab188807",
+    "kind": "historical_M5_actual_ModelPart_CPU_not_refreshed_for_M6",
+    "original_manifest_sha256": "0fea897997e8e31a7c52c1619aedf28ecb389d8012090a5b60caf8b530c71bf8"
+  },
+  {
+    "path": "assets/soldiers/catalog-military_officer-card.png",
+    "sha256": "256cbeba3c35ba6ad17f2be7f28cac3f42c61d38cfc22e1c6f570bf7284c7c1c",
+    "kind": "historical_M5_actual_ModelPart_CPU_not_refreshed_for_M6",
+    "original_manifest_sha256": "0fea897997e8e31a7c52c1619aedf28ecb389d8012090a5b60caf8b530c71bf8"
+  },
+  {
+    "path": "assets/soldiers/catalog-military_commander-card.png",
+    "sha256": "d1e1026a9cda098f509cc5ba917932bd282e6803b74c0fce056bbea1073d3771",
+    "kind": "historical_M5_actual_ModelPart_CPU_not_refreshed_for_M6",
+    "original_manifest_sha256": "0fea897997e8e31a7c52c1619aedf28ecb389d8012090a5b60caf8b530c71bf8"
+  },
+  {
+    "path": "assets/soldiers/catalog-blackwatch_soldier-card.png",
+    "sha256": "58af1c3724237b25bbe76176011f90485a3b8c2beb921945566e3230283bcd4c",
+    "kind": "historical_M5_actual_ModelPart_CPU_not_refreshed_for_M6",
+    "original_manifest_sha256": "0fea897997e8e31a7c52c1619aedf28ecb389d8012090a5b60caf8b530c71bf8"
+  },
+  {
+    "path": "assets/soldiers/catalog-blackwatch_heavy-card.png",
+    "sha256": "397dbd1a6aaa13db38375b0e4a720fecaab6113110e967251ef327e28a3d7987",
+    "kind": "historical_M5_actual_ModelPart_CPU_not_refreshed_for_M6",
+    "original_manifest_sha256": "0fea897997e8e31a7c52c1619aedf28ecb389d8012090a5b60caf8b530c71bf8"
+  },
+  {
+    "path": "assets/soldiers/catalog-blackwatch_team_leader-card.png",
+    "sha256": "a15800a6b24cda81f6528909f92dd624373f99b50827af03be29101038a389da",
+    "kind": "historical_M5_actual_ModelPart_CPU_not_refreshed_for_M6",
+    "original_manifest_sha256": "0fea897997e8e31a7c52c1619aedf28ecb389d8012090a5b60caf8b530c71bf8"
+  },
+  {
+    "path": "assets/soldiers/catalog-blackwatch_officer-card.png",
+    "sha256": "286204c2df8e8b2fcec87f9943844372f3f8ac403a9ef10fa80aca391b5856fd",
+    "kind": "historical_M5_actual_ModelPart_CPU_not_refreshed_for_M6",
+    "original_manifest_sha256": "0fea897997e8e31a7c52c1619aedf28ecb389d8012090a5b60caf8b530c71bf8"
+  },
+  {
+    "path": "assets/soldiers/catalog-blackwatch_commander-card.png",
+    "sha256": "a9381e95c3f97443862e36bd39dcd6eaeb19885943e815ee3b4508332a58e48e",
+    "kind": "historical_M5_actual_ModelPart_CPU_not_refreshed_for_M6",
+    "original_manifest_sha256": "0fea897997e8e31a7c52c1619aedf28ecb389d8012090a5b60caf8b530c71bf8"
+  },
+  {
+    "path": "assets/buildings/blackwatch_checkpoint.png",
+    "sha256": "3b8b8a7f005b35cf17ce1f59acf82a611cfc63ad88cec656be77274a656f1079",
+    "kind": "historical_M5_NBT_preview_not_refreshed_for_M6"
+  },
+  {
+    "path": "assets/buildings/blackwatch_outpost.png",
+    "sha256": "667e2951267d07dea3cb8307eb19822156fc8ee4bdbb47e19e0c973e3c2820ca",
+    "kind": "historical_M5_NBT_preview_not_refreshed_for_M6"
+  },
+  {
+    "path": "assets/buildings/frozen_research_station.png",
+    "sha256": "e09b0f7fb99f284d8b96c443c868add3153f7777ee318831cf7861061c36e3c3",
+    "kind": "historical_M5_NBT_preview_not_refreshed_for_M6"
+  },
+  {
+    "path": "assets/buildings/large_blackwatch_base.png",
+    "sha256": "75e5897fed89ada67ec1b654979f42c96e96962e1e63782f02a9f64d0cfae319",
+    "kind": "historical_M5_NBT_preview_not_refreshed_for_M6"
+  },
+  {
+    "path": "assets/buildings/large_military_base.png",
+    "sha256": "d9029eb34fa2dd2f8ae19347df70aa701541a1a903acc9421c1ae3bc45c8cfa0",
+    "kind": "historical_M5_NBT_preview_not_refreshed_for_M6"
+  },
+  {
+    "path": "assets/buildings/military_camp.png",
+    "sha256": "22bd1361975fe839c5b69c7fe36fe93862624041ff69a82570de186366dbea92",
+    "kind": "historical_M5_NBT_preview_not_refreshed_for_M6"
+  },
+  {
+    "path": "assets/buildings/military_checkpoint.png",
+    "sha256": "46cd9f9df49f1d6842a2d7562838d674118870359f5fe9d9cf34e9d21ab59082",
+    "kind": "historical_M5_NBT_preview_not_refreshed_for_M6"
+  },
+  {
+    "path": "assets/garages/vehicle_garage_military-exterior.png",
+    "sha256": "518dce730f1d007eb68756282bb44e81dd4c72848fcd1808b7a6e0b0311be845",
+    "kind": "actual_NBT_geometry_approximate_vanilla_materials_not_game_screenshot"
+  },
+  {
+    "path": "assets/garages/vehicle_garage_military-cutaway.png",
+    "sha256": "bebbee236300d301cfdb90dc917d84fe7ae2a4339e075b69eb7a10b8b58b13c3",
+    "kind": "actual_NBT_geometry_approximate_vanilla_materials_not_game_screenshot"
+  },
+  {
+    "path": "assets/garages/vehicle_garage_blackwatch-exterior.png",
+    "sha256": "34dc51ed2fb352f10110f0b88bd52cdcf445ce510b407c7a9d04c71d340b0ca1",
+    "kind": "actual_NBT_geometry_approximate_vanilla_materials_not_game_screenshot"
+  },
+  {
+    "path": "assets/garages/vehicle_garage_blackwatch-cutaway.png",
+    "sha256": "ea8f69a392be31580836d428e76b6b13d355ff23589efa78e12761f7711b1f76",
+    "kind": "actual_NBT_geometry_approximate_vanilla_materials_not_game_screenshot"
+  }
+]

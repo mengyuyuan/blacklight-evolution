@@ -1,0 +1,6855 @@
+{
+  "schema": 1,
+  "generated_at": "2026-10-28T20:47:05+08:00",
+  "gameplay_validation": "Not asserted by catalogue generation",
+  "authoring_sha256": "4ccafec7230accdac6d2d84c7ffbd043f2ece8d2b2848e9fe9eb98aa13523a21",
+  "soldiers": [
+    {
+      "id": "blacklight:military_soldier",
+      "name": "军方步兵",
+      "faction": "military",
+      "role": "trooper",
+      "spawn_default_rank": "private",
+      "heavy": false,
+      "health": 20.0,
+      "armor": 2.0,
+      "npc_effective_bullet_damage": 1.4,
+      "movement_speed": 0.29,
+      "knockback_resistance": 0.1,
+      "aim_ticks": 16,
+      "cycle_ticks": 72,
+      "burst_shot_ages": [
+        16,
+        24,
+        32
+      ],
+      "burst_end_ticks": 33,
+      "attack_attribute": 2,
+      "follow_range": 28,
+      "registered_width": 0.6,
+      "registered_height": 1.95,
+      "initial_weapon": "military_rifle",
+      "initial_magazine": 30,
+      "initial_reserve": 90,
+      "npc_scale": 0.35,
+      "texture": "src/main/resources/assets/blacklight/textures/entity/military_soldier_layered.png",
+      "model": "src/main/java/com/codex/blacklight/client/model/BlackwatchModel.java",
+      "initial_weapon_scope": "initializeWeapon direct/new entity default; native assignments use M6 typed profile",
+      "historical_m5_visual_card": "assets/soldiers/catalog-military_soldier-card.png"
+    },
+    {
+      "id": "blacklight:military_heavy",
+      "name": "军方重装兵",
+      "faction": "military",
+      "role": "trooper",
+      "spawn_default_rank": "private",
+      "heavy": true,
+      "health": 48.0,
+      "armor": 6.0,
+      "npc_effective_bullet_damage": 2.0,
+      "movement_speed": 0.24,
+      "knockback_resistance": 0.4,
+      "aim_ticks": 16,
+      "cycle_ticks": 84,
+      "burst_shot_ages": [
+        16,
+        24,
+        32
+      ],
+      "burst_end_ticks": 33,
+      "attack_attribute": 4,
+      "follow_range": 28,
+      "registered_width": 0.6,
+      "registered_height": 1.95,
+      "initial_weapon": "military_machine_gun",
+      "initial_magazine": 60,
+      "initial_reserve": 180,
+      "npc_scale": 0.4,
+      "texture": "src/main/resources/assets/blacklight/textures/entity/military_soldier_layered.png",
+      "model": "src/main/java/com/codex/blacklight/client/model/BlackwatchModel.java",
+      "initial_weapon_scope": "initializeWeapon direct/new entity default; native assignments use M6 typed profile",
+      "historical_m5_visual_card": "assets/soldiers/catalog-military_heavy-card.png"
+    },
+    {
+      "id": "blacklight:military_team_leader",
+      "name": "军方队长",
+      "faction": "military",
+      "role": "team_leader",
+      "spawn_default_rank": "sergeant",
+      "heavy": false,
+      "health": 20.0,
+      "armor": 2.0,
+      "npc_effective_bullet_damage": 1.4,
+      "movement_speed": 0.29,
+      "knockback_resistance": 0.1,
+      "aim_ticks": 16,
+      "cycle_ticks": 72,
+      "burst_shot_ages": [
+        16,
+        24,
+        32
+      ],
+      "burst_end_ticks": 33,
+      "attack_attribute": 2,
+      "follow_range": 28,
+      "registered_width": 0.6,
+      "registered_height": 1.95,
+      "initial_weapon": "military_rifle",
+      "initial_magazine": 30,
+      "initial_reserve": 90,
+      "npc_scale": 0.35,
+      "texture": "src/main/resources/assets/blacklight/textures/entity/military_soldier_layered.png",
+      "model": "src/main/java/com/codex/blacklight/client/model/BlackwatchModel.java",
+      "initial_weapon_scope": "initializeWeapon direct/new entity default; native assignments use M6 typed profile",
+      "historical_m5_visual_card": "assets/soldiers/catalog-military_team_leader-card.png"
+    },
+    {
+      "id": "blacklight:military_officer",
+      "name": "军方野战军官",
+      "faction": "military",
+      "role": "officer",
+      "spawn_default_rank": "lieutenant",
+      "heavy": false,
+      "health": 20.0,
+      "armor": 2.0,
+      "npc_effective_bullet_damage": 1.4,
+      "movement_speed": 0.29,
+      "knockback_resistance": 0.1,
+      "aim_ticks": 16,
+      "cycle_ticks": 72,
+      "burst_shot_ages": [
+        16,
+        24,
+        32
+      ],
+      "burst_end_ticks": 33,
+      "attack_attribute": 2,
+      "follow_range": 28,
+      "registered_width": 0.6,
+      "registered_height": 1.95,
+      "initial_weapon": "military_carbine",
+      "initial_magazine": 24,
+      "initial_reserve": 72,
+      "npc_scale": 0.39999999999999997,
+      "texture": "src/main/resources/assets/blacklight/textures/entity/military_soldier_layered.png",
+      "model": "src/main/java/com/codex/blacklight/client/model/BlackwatchModel.java",
+      "initial_weapon_scope": "initializeWeapon direct/new entity default; native assignments use M6 typed profile",
+      "historical_m5_visual_card": "assets/soldiers/catalog-military_officer-card.png"
+    },
+    {
+      "id": "blacklight:military_commander",
+      "name": "军方基地指挥官",
+      "faction": "military",
+      "role": "commander",
+      "spawn_default_rank": "major",
+      "heavy": false,
+      "health": 20.0,
+      "armor": 2.0,
+      "npc_effective_bullet_damage": 1.4,
+      "movement_speed": 0.29,
+      "knockback_resistance": 0.1,
+      "aim_ticks": 16,
+      "cycle_ticks": 72,
+      "burst_shot_ages": [
+        16,
+        24,
+        32
+      ],
+      "burst_end_ticks": 33,
+      "attack_attribute": 2,
+      "follow_range": 28,
+      "registered_width": 0.6,
+      "registered_height": 1.95,
+      "initial_weapon": "military_carbine",
+      "initial_magazine": 24,
+      "initial_reserve": 72,
+      "npc_scale": 0.39999999999999997,
+      "texture": "src/main/resources/assets/blacklight/textures/entity/military_soldier_layered.png",
+      "model": "src/main/java/com/codex/blacklight/client/model/BlackwatchModel.java",
+      "initial_weapon_scope": "initializeWeapon direct/new entity default; native assignments use M6 typed profile",
+      "historical_m5_visual_card": "assets/soldiers/catalog-military_commander-card.png"
+    },
+    {
+      "id": "blacklight:blackwatch_soldier",
+      "name": "黑色守望步兵",
+      "faction": "blackwatch",
+      "role": "trooper",
+      "spawn_default_rank": "private",
+      "heavy": false,
+      "health": 24.0,
+      "armor": 4.0,
+      "npc_effective_bullet_damage": 1.6,
+      "movement_speed": 0.29,
+      "knockback_resistance": 0.1,
+      "aim_ticks": 12,
+      "cycle_ticks": 64,
+      "burst_shot_ages": [
+        12,
+        20,
+        28
+      ],
+      "burst_end_ticks": 29,
+      "attack_attribute": 2,
+      "follow_range": 28,
+      "registered_width": 0.6,
+      "registered_height": 1.95,
+      "initial_weapon": "military_rifle",
+      "initial_magazine": 30,
+      "initial_reserve": 90,
+      "npc_scale": 0.4,
+      "texture": "src/main/resources/assets/blacklight/textures/entity/blackwatch_soldier_layered.png",
+      "model": "src/main/java/com/codex/blacklight/client/model/BlackwatchModel.java",
+      "initial_weapon_scope": "initializeWeapon direct/new entity default; native assignments use M6 typed profile",
+      "historical_m5_visual_card": "assets/soldiers/catalog-blackwatch_soldier-card.png"
+    },
+    {
+      "id": "blacklight:blackwatch_heavy",
+      "name": "黑色守望重装兵",
+      "faction": "blackwatch",
+      "role": "trooper",
+      "spawn_default_rank": "private",
+      "heavy": true,
+      "health": 60.0,
+      "armor": 10.0,
+      "npc_effective_bullet_damage": 2.2,
+      "movement_speed": 0.24,
+      "knockback_resistance": 0.4,
+      "aim_ticks": 12,
+      "cycle_ticks": 76,
+      "burst_shot_ages": [
+        12,
+        20,
+        28
+      ],
+      "burst_end_ticks": 29,
+      "attack_attribute": 4,
+      "follow_range": 28,
+      "registered_width": 0.6,
+      "registered_height": 1.95,
+      "initial_weapon": "military_machine_gun",
+      "initial_magazine": 60,
+      "initial_reserve": 180,
+      "npc_scale": 0.44000000000000006,
+      "texture": "src/main/resources/assets/blacklight/textures/entity/blackwatch_soldier_layered.png",
+      "model": "src/main/java/com/codex/blacklight/client/model/BlackwatchModel.java",
+      "initial_weapon_scope": "initializeWeapon direct/new entity default; native assignments use M6 typed profile",
+      "historical_m5_visual_card": "assets/soldiers/catalog-blackwatch_heavy-card.png"
+    },
+    {
+      "id": "blacklight:blackwatch_team_leader",
+      "name": "黑色守望队长",
+      "faction": "blackwatch",
+      "role": "team_leader",
+      "spawn_default_rank": "sergeant",
+      "heavy": false,
+      "health": 24.0,
+      "armor": 4.0,
+      "npc_effective_bullet_damage": 1.6,
+      "movement_speed": 0.29,
+      "knockback_resistance": 0.1,
+      "aim_ticks": 12,
+      "cycle_ticks": 64,
+      "burst_shot_ages": [
+        12,
+        20,
+        28
+      ],
+      "burst_end_ticks": 29,
+      "attack_attribute": 2,
+      "follow_range": 28,
+      "registered_width": 0.6,
+      "registered_height": 1.95,
+      "initial_weapon": "military_rifle",
+      "initial_magazine": 30,
+      "initial_reserve": 90,
+      "npc_scale": 0.4,
+      "texture": "src/main/resources/assets/blacklight/textures/entity/blackwatch_soldier_layered.png",
+      "model": "src/main/java/com/codex/blacklight/client/model/BlackwatchModel.java",
+      "initial_weapon_scope": "initializeWeapon direct/new entity default; native assignments use M6 typed profile",
+      "historical_m5_visual_card": "assets/soldiers/catalog-blackwatch_team_leader-card.png"
+    },
+    {
+      "id": "blacklight:blackwatch_officer",
+      "name": "黑色守望野战军官",
+      "faction": "blackwatch",
+      "role": "officer",
+      "spawn_default_rank": "lieutenant",
+      "heavy": false,
+      "health": 24.0,
+      "armor": 4.0,
+      "npc_effective_bullet_damage": 1.6,
+      "movement_speed": 0.29,
+      "knockback_resistance": 0.1,
+      "aim_ticks": 12,
+      "cycle_ticks": 64,
+      "burst_shot_ages": [
+        12,
+        20,
+        28
+      ],
+      "burst_end_ticks": 29,
+      "attack_attribute": 2,
+      "follow_range": 28,
+      "registered_width": 0.6,
+      "registered_height": 1.95,
+      "initial_weapon": "military_carbine",
+      "initial_magazine": 24,
+      "initial_reserve": 72,
+      "npc_scale": 0.4571428571428572,
+      "texture": "src/main/resources/assets/blacklight/textures/entity/blackwatch_soldier_layered.png",
+      "model": "src/main/java/com/codex/blacklight/client/model/BlackwatchModel.java",
+      "initial_weapon_scope": "initializeWeapon direct/new entity default; native assignments use M6 typed profile",
+      "historical_m5_visual_card": "assets/soldiers/catalog-blackwatch_officer-card.png"
+    },
+    {
+      "id": "blacklight:blackwatch_commander",
+      "name": "黑色守望基地指挥官",
+      "faction": "blackwatch",
+      "role": "commander",
+      "spawn_default_rank": "major",
+      "heavy": false,
+      "health": 24.0,
+      "armor": 4.0,
+      "npc_effective_bullet_damage": 1.6,
+      "movement_speed": 0.29,
+      "knockback_resistance": 0.1,
+      "aim_ticks": 12,
+      "cycle_ticks": 64,
+      "burst_shot_ages": [
+        12,
+        20,
+        28
+      ],
+      "burst_end_ticks": 29,
+      "attack_attribute": 2,
+      "follow_range": 28,
+      "registered_width": 0.6,
+      "registered_height": 1.95,
+      "initial_weapon": "military_carbine",
+      "initial_magazine": 24,
+      "initial_reserve": 72,
+      "npc_scale": 0.4571428571428572,
+      "texture": "src/main/resources/assets/blacklight/textures/entity/blackwatch_soldier_layered.png",
+      "model": "src/main/java/com/codex/blacklight/client/model/BlackwatchModel.java",
+      "initial_weapon_scope": "initializeWeapon direct/new entity default; native assignments use M6 typed profile",
+      "historical_m5_visual_card": "assets/soldiers/catalog-blackwatch_commander-card.png"
+    }
+  ],
+  "infantry_weapons": [
+    {
+      "symbol": "RIFLE",
+      "id": "military_rifle",
+      "ammo_id": "rifle_round",
+      "capacity": 30,
+      "cooldown_ticks": 4,
+      "reload_ticks": 40,
+      "player_base_damage": 4.0,
+      "range_blocks": 64.0,
+      "kind": "BULLET",
+      "radius_blocks": 0.0
+    },
+    {
+      "symbol": "CARBINE",
+      "id": "military_carbine",
+      "ammo_id": "rifle_round",
+      "capacity": 24,
+      "cooldown_ticks": 3,
+      "reload_ticks": 32,
+      "player_base_damage": 3.5,
+      "range_blocks": 48.0,
+      "kind": "BULLET",
+      "radius_blocks": 0.0
+    },
+    {
+      "symbol": "MACHINE_GUN",
+      "id": "military_machine_gun",
+      "ammo_id": "machine_gun_round",
+      "capacity": 60,
+      "cooldown_ticks": 3,
+      "reload_ticks": 65,
+      "player_base_damage": 5.0,
+      "range_blocks": 72.0,
+      "kind": "BULLET",
+      "radius_blocks": 0.0
+    },
+    {
+      "symbol": "GRENADE",
+      "id": "grenade_launcher",
+      "ammo_id": "grenade_round",
+      "capacity": 6,
+      "cooldown_ticks": 14,
+      "reload_ticks": 55,
+      "player_base_damage": 12.0,
+      "range_blocks": 40.0,
+      "kind": "GRENADE",
+      "radius_blocks": 3.0
+    },
+    {
+      "symbol": "ROCKET",
+      "id": "rocket_launcher",
+      "ammo_id": "rocket_round",
+      "capacity": 1,
+      "cooldown_ticks": 22,
+      "reload_ticks": 65,
+      "player_base_damage": 20.0,
+      "range_blocks": 80.0,
+      "kind": "ROCKET",
+      "radius_blocks": 4.0
+    },
+    {
+      "symbol": "MISSILE",
+      "id": "missile_launcher",
+      "ammo_id": "missile_round",
+      "capacity": 1,
+      "cooldown_ticks": 28,
+      "reload_ticks": 75,
+      "player_base_damage": 22.0,
+      "range_blocks": 96.0,
+      "kind": "MISSILE",
+      "radius_blocks": 4.0
+    },
+    {
+      "symbol": "THERMOBARIC",
+      "id": "thermobaric_launcher",
+      "ammo_id": "thermobaric_round",
+      "capacity": 1,
+      "cooldown_ticks": 25,
+      "reload_ticks": 70,
+      "player_base_damage": 24.0,
+      "range_blocks": 48.0,
+      "kind": "THERMOBARIC",
+      "radius_blocks": 5.0
+    },
+    {
+      "symbol": "INFECTION",
+      "id": "infection_launcher",
+      "ammo_id": "infection_round",
+      "capacity": 1,
+      "cooldown_ticks": 25,
+      "reload_ticks": 60,
+      "player_base_damage": 0.0,
+      "range_blocks": 40.0,
+      "kind": "INFECTION",
+      "radius_blocks": 3.0
+    }
+  ],
+  "organization": {
+    "ranks": [
+      {
+        "id": "private",
+        "ordinal": 0,
+        "name": "列兵"
+      },
+      {
+        "id": "corporal",
+        "ordinal": 1,
+        "name": "下士"
+      },
+      {
+        "id": "sergeant",
+        "ordinal": 2,
+        "name": "中士"
+      },
+      {
+        "id": "lieutenant",
+        "ordinal": 3,
+        "name": "少尉"
+      },
+      {
+        "id": "captain",
+        "ordinal": 4,
+        "name": "上尉"
+      },
+      {
+        "id": "major",
+        "ordinal": 5,
+        "name": "少校"
+      },
+      {
+        "id": "colonel",
+        "ordinal": 6,
+        "name": "上校"
+      },
+      {
+        "id": "general",
+        "ordinal": 7,
+        "name": "将军"
+      }
+    ],
+    "unit_types": [
+      {
+        "id": "tactical_squad",
+        "level": 0,
+        "leaf": true,
+        "military_default_size": 8,
+        "blackwatch_default_size": 8,
+        "name": "战术小队"
+      },
+      {
+        "id": "section",
+        "level": 0,
+        "leaf": true,
+        "military_default_size": 8,
+        "blackwatch_default_size": 8,
+        "name": "班"
+      },
+      {
+        "id": "platoon",
+        "level": 1,
+        "leaf": false,
+        "military_default_size": 24,
+        "blackwatch_default_size": 24,
+        "name": "排"
+      },
+      {
+        "id": "company",
+        "level": 2,
+        "leaf": false,
+        "military_default_size": 72,
+        "blackwatch_default_size": 72,
+        "name": "连"
+      },
+      {
+        "id": "squadron",
+        "level": 1,
+        "leaf": false,
+        "military_default_size": 24,
+        "blackwatch_default_size": 24,
+        "name": "中队"
+      },
+      {
+        "id": "battalion",
+        "level": 3,
+        "leaf": false,
+        "military_default_size": 216,
+        "blackwatch_default_size": 72,
+        "name": "大队"
+      }
+    ],
+    "roles": [
+      {
+        "id": "trooper",
+        "default_rank": "private"
+      },
+      {
+        "id": "team_leader",
+        "default_rank": "sergeant"
+      },
+      {
+        "id": "officer",
+        "default_rank": "lieutenant"
+      },
+      {
+        "id": "commander",
+        "default_rank": "major"
+      }
+    ],
+    "hard_limits": {
+      "MAX_LEAF": 32,
+      "MAX_CHILDREN": 8,
+      "MAX_DEPTH": 4,
+      "MAX_TREE_MEMBERS": 256,
+      "MAX_UNITS": 2048
+    }
+  },
+  "vehicles": {
+    "schemaVersion": 1,
+    "balanceOrigin": "mod_proposed_values_not_original_game_statistics",
+    "vehicles": [
+      {
+        "id": "truck",
+        "width": 2.9,
+        "length": 7.5,
+        "height": 3.7,
+        "maxHealth": 100,
+        "maxSpeed": 0.28,
+        "maxFuelTicks": 12000,
+        "armor": "light",
+        "liveries": [
+          "military",
+          "blackwatch"
+        ],
+        "mountsResource": "data/blacklight/military/vehicle-mounts.json",
+        "chassis": "truck",
+        "seats": [
+          {
+            "id": "driver",
+            "job": "driver",
+            "anchorId": "seat_driver"
+          },
+          {
+            "id": "officer",
+            "job": "officer",
+            "anchorId": "seat_officer"
+          },
+          {
+            "id": "passenger_1",
+            "job": "passenger",
+            "anchorId": "seat_passenger_1"
+          },
+          {
+            "id": "passenger_2",
+            "job": "passenger",
+            "anchorId": "seat_passenger_2"
+          },
+          {
+            "id": "passenger_3",
+            "job": "passenger",
+            "anchorId": "seat_passenger_3"
+          },
+          {
+            "id": "passenger_4",
+            "job": "passenger",
+            "anchorId": "seat_passenger_4"
+          },
+          {
+            "id": "passenger_5",
+            "job": "passenger",
+            "anchorId": "seat_passenger_5"
+          },
+          {
+            "id": "passenger_6",
+            "job": "passenger",
+            "anchorId": "seat_passenger_6"
+          }
+        ],
+        "ammunitionCapacities": {},
+        "weapons": []
+      },
+      {
+        "id": "apc",
+        "width": 3.3,
+        "length": 7.0,
+        "height": 3.3,
+        "maxHealth": 240,
+        "maxSpeed": 0.2,
+        "maxFuelTicks": 9000,
+        "armor": "armored",
+        "liveries": [
+          "military",
+          "blackwatch"
+        ],
+        "mountsResource": "data/blacklight/military/vehicle-mounts.json",
+        "chassis": "apc",
+        "seats": [
+          {
+            "id": "driver",
+            "job": "driver",
+            "anchorId": "seat_driver"
+          },
+          {
+            "id": "gunner",
+            "job": "gunner",
+            "anchorId": "seat_gunner"
+          },
+          {
+            "id": "passenger_1",
+            "job": "passenger",
+            "anchorId": "seat_passenger_1"
+          },
+          {
+            "id": "passenger_2",
+            "job": "passenger",
+            "anchorId": "seat_passenger_2"
+          },
+          {
+            "id": "passenger_3",
+            "job": "passenger",
+            "anchorId": "seat_passenger_3"
+          },
+          {
+            "id": "passenger_4",
+            "job": "passenger",
+            "anchorId": "seat_passenger_4"
+          },
+          {
+            "id": "passenger_5",
+            "job": "passenger",
+            "anchorId": "seat_passenger_5"
+          },
+          {
+            "id": "passenger_6",
+            "job": "passenger",
+            "anchorId": "seat_passenger_6"
+          }
+        ],
+        "ammunitionCapacities": {
+          "autocannon_round": 120,
+          "rocket_round": 4
+        },
+        "weapons": [
+          {
+            "id": "autocannon",
+            "ammunitionId": "autocannon_round",
+            "cooldownTicks": 6,
+            "cooldownGroup": "autocannon"
+          },
+          {
+            "id": "vehicle_rocket",
+            "ammunitionId": "rocket_round",
+            "cooldownTicks": 30,
+            "cooldownGroup": "vehicle_rocket"
+          }
+        ]
+      },
+      {
+        "id": "tank",
+        "width": 4.0,
+        "length": 8.0,
+        "height": 3.4,
+        "maxHealth": 420,
+        "maxSpeed": 0.16,
+        "maxFuelTicks": 7200,
+        "armor": "heavy",
+        "liveries": [
+          "military",
+          "blackwatch"
+        ],
+        "mountsResource": "data/blacklight/military/vehicle-mounts.json",
+        "chassis": "tank",
+        "seats": [
+          {
+            "id": "driver",
+            "job": "driver",
+            "anchorId": "seat_driver"
+          },
+          {
+            "id": "gunner",
+            "job": "gunner",
+            "anchorId": "seat_gunner"
+          },
+          {
+            "id": "commander",
+            "job": "commander",
+            "anchorId": "seat_commander"
+          }
+        ],
+        "ammunitionCapacities": {
+          "tank_he_shell": 12,
+          "tank_ap_shell": 8,
+          "machine_gun_round": 240
+        },
+        "weapons": [
+          {
+            "id": "tank_he",
+            "ammunitionId": "tank_he_shell",
+            "cooldownTicks": 80,
+            "cooldownGroup": "tank_main"
+          },
+          {
+            "id": "tank_ap",
+            "ammunitionId": "tank_ap_shell",
+            "cooldownTicks": 80,
+            "cooldownGroup": "tank_main"
+          },
+          {
+            "id": "coaxial_machine_gun",
+            "ammunitionId": "machine_gun_round",
+            "cooldownTicks": 4,
+            "cooldownGroup": "coaxial_machine_gun"
+          }
+        ]
+      }
+    ]
+  },
+  "mounts": {
+    "schemaVersion": 1,
+    "sourceSha256": "4ccafec7230accdac6d2d84c7ffbd043f2ece8d2b2848e9fe9eb98aa13523a21",
+    "coordinateSystem": {
+      "units": "blocks",
+      "x": "vehicle right",
+      "y": "up",
+      "z": "vehicle front",
+      "origin": "body horizontal center at ground level",
+      "anchorPositions": "absolute vehicle-local rest pose; apply frame pivot before rotations",
+      "seatAnchorMeaning": "Actual passenger Entity feet/base origin while riding; not cushion or pelvis. No additional rider offset.",
+      "yawConvention": "Server mountWorld is authoritative: yaw 0 faces +Z; positive 90 degrees faces +X."
+    },
+    "chassis": {
+      "truck": {
+        "turretPivot": [
+          0,
+          0,
+          0
+        ],
+        "gunPivot": [
+          0,
+          0,
+          0
+        ],
+        "barrelRadius": 0.0,
+        "anchors": {
+          "seat_driver": {
+            "frame": "body",
+            "position": [
+              -0.51555556,
+              0.89,
+              2.05645161
+            ]
+          },
+          "seat_officer": {
+            "frame": "body",
+            "position": [
+              0.51555556,
+              0.89,
+              2.05645161
+            ]
+          },
+          "seat_passenger_1": {
+            "frame": "body",
+            "position": [
+              -0.53703704,
+              1.053125,
+              -0.72580645
+            ]
+          },
+          "seat_passenger_2": {
+            "frame": "body",
+            "position": [
+              0.53703704,
+              1.053125,
+              -0.72580645
+            ]
+          },
+          "seat_passenger_3": {
+            "frame": "body",
+            "position": [
+              -0.53703704,
+              1.053125,
+              -1.69354839
+            ]
+          },
+          "seat_passenger_4": {
+            "frame": "body",
+            "position": [
+              0.53703704,
+              1.053125,
+              -1.69354839
+            ]
+          },
+          "seat_passenger_5": {
+            "frame": "body",
+            "position": [
+              -0.53703704,
+              1.053125,
+              -2.66129032
+            ]
+          },
+          "seat_passenger_6": {
+            "frame": "body",
+            "position": [
+              0.53703704,
+              1.053125,
+              -2.66129032
+            ]
+          },
+          "camera_driver": {
+            "frame": "body",
+            "position": [
+              -0.51555556,
+              2.51,
+              2.05645161
+            ]
+          },
+          "camera_officer": {
+            "frame": "body",
+            "position": [
+              0.51555556,
+              2.51,
+              2.05645161
+            ]
+          },
+          "camera_passenger_1": {
+            "frame": "body",
+            "position": [
+              -0.53703704,
+              2.673125,
+              -0.72580645
+            ]
+          },
+          "camera_passenger_2": {
+            "frame": "body",
+            "position": [
+              0.53703704,
+              2.673125,
+              -0.72580645
+            ]
+          },
+          "camera_passenger_3": {
+            "frame": "body",
+            "position": [
+              -0.53703704,
+              2.673125,
+              -1.69354839
+            ]
+          },
+          "camera_passenger_4": {
+            "frame": "body",
+            "position": [
+              0.53703704,
+              2.673125,
+              -1.69354839
+            ]
+          },
+          "camera_passenger_5": {
+            "frame": "body",
+            "position": [
+              -0.53703704,
+              2.673125,
+              -2.66129032
+            ]
+          },
+          "camera_passenger_6": {
+            "frame": "body",
+            "position": [
+              0.53703704,
+              2.673125,
+              -2.66129032
+            ]
+          },
+          "exit_driver": {
+            "frame": "body",
+            "position": [
+              -2.09444444,
+              0.1,
+              2.47983871
+            ]
+          },
+          "exit_officer": {
+            "frame": "body",
+            "position": [
+              2.09444444,
+              0.1,
+              2.47983871
+            ]
+          },
+          "exit_rear": {
+            "frame": "body",
+            "position": [
+              0.0,
+              0.1,
+              -4.47580645
+            ]
+          }
+        }
+      },
+      "apc": {
+        "turretPivot": [
+          0.0,
+          1.94464286,
+          0.12068966
+        ],
+        "gunPivot": [
+          0.0,
+          2.475,
+          0.54310345
+        ],
+        "barrelRadius": 0.12964286,
+        "anchors": {
+          "seat_driver": {
+            "frame": "body",
+            "position": [
+              -0.69193548,
+              0.23571429,
+              2.11206897
+            ]
+          },
+          "seat_gunner": {
+            "frame": "body",
+            "position": [
+              0.26612903,
+              0.53035714,
+              0.18103448
+            ]
+          },
+          "seat_passenger_1": {
+            "frame": "body",
+            "position": [
+              -0.74516129,
+              0.23571429,
+              -0.84482759
+            ]
+          },
+          "seat_passenger_2": {
+            "frame": "body",
+            "position": [
+              0.74516129,
+              0.23571429,
+              -0.84482759
+            ]
+          },
+          "seat_passenger_3": {
+            "frame": "body",
+            "position": [
+              -0.74516129,
+              0.23571429,
+              -1.75
+            ]
+          },
+          "seat_passenger_4": {
+            "frame": "body",
+            "position": [
+              0.74516129,
+              0.23571429,
+              -1.75
+            ]
+          },
+          "seat_passenger_5": {
+            "frame": "body",
+            "position": [
+              -0.74516129,
+              0.23571429,
+              -2.65517241
+            ]
+          },
+          "camera_driver": {
+            "frame": "body",
+            "position": [
+              -0.69193548,
+              2.15,
+              1.91
+            ]
+          },
+          "camera_gunner": {
+            "frame": "turret_yaw",
+            "position": [
+              0.0,
+              2.88,
+              0.17
+            ]
+          },
+          "camera_passenger_1": {
+            "frame": "body",
+            "position": [
+              -1.45,
+              1.85571429,
+              -0.84482759
+            ]
+          },
+          "camera_passenger_2": {
+            "frame": "body",
+            "position": [
+              1.45,
+              1.85571429,
+              -0.84482759
+            ]
+          },
+          "camera_passenger_3": {
+            "frame": "body",
+            "position": [
+              -1.45,
+              1.85571429,
+              -1.75
+            ]
+          },
+          "camera_passenger_4": {
+            "frame": "body",
+            "position": [
+              1.45,
+              1.85571429,
+              -1.75
+            ]
+          },
+          "camera_passenger_5": {
+            "frame": "body",
+            "position": [
+              -1.45,
+              1.85571429,
+              -2.65517241
+            ]
+          },
+          "camera_passenger_6": {
+            "frame": "body",
+            "position": [
+              1.45,
+              1.85571429,
+              -2.65517241
+            ]
+          },
+          "seat_passenger_6": {
+            "frame": "body",
+            "position": [
+              0.74516129,
+              0.23571429,
+              -2.65517241
+            ]
+          },
+          "exit_driver": {
+            "frame": "body",
+            "position": [
+              -2.23548387,
+              0.1,
+              1.81034483
+            ]
+          },
+          "exit_gunner": {
+            "frame": "body",
+            "position": [
+              2.23548387,
+              0.1,
+              1.81034483
+            ]
+          },
+          "exit_rear": {
+            "frame": "body",
+            "position": [
+              0.0,
+              0.1,
+              -4.22413793
+            ]
+          },
+          "breech_primary": {
+            "frame": "gun_pitch",
+            "position": [
+              0.0,
+              2.475,
+              0.54310345
+            ]
+          },
+          "muzzle_primary": {
+            "frame": "gun_pitch",
+            "position": [
+              0.0,
+              2.475,
+              4.22413793
+            ]
+          },
+          "breech_secondary": {
+            "frame": "gun_pitch",
+            "position": [
+              1.01129032,
+              2.82857143,
+              0.06034483
+            ]
+          },
+          "muzzle_secondary": {
+            "frame": "gun_pitch",
+            "position": [
+              1.01129032,
+              2.82857143,
+              1.62931034
+            ]
+          }
+        }
+      },
+      "tank": {
+        "turretPivot": [
+          0.0,
+          1.88214286,
+          0.0
+        ],
+        "gunPivot": [
+          0.0,
+          2.55,
+          1.16923077
+        ],
+        "barrelRadius": 0.15785714,
+        "anchors": {
+          "seat_driver": {
+            "frame": "body",
+            "position": [
+              0.0,
+              0.06071429,
+              2.03076923
+            ]
+          },
+          "seat_gunner": {
+            "frame": "body",
+            "position": [
+              -0.52941176,
+              0.54642857,
+              0.12307692
+            ]
+          },
+          "seat_commander": {
+            "frame": "body",
+            "position": [
+              0.58823529,
+              0.72857143,
+              -0.55384615
+            ]
+          },
+          "camera_driver": {
+            "frame": "body",
+            "position": [
+              0.0,
+              1.98,
+              3.29
+            ]
+          },
+          "camera_gunner": {
+            "frame": "turret_yaw",
+            "position": [
+              0.55294118,
+              3.35142857,
+              -0.22
+            ]
+          },
+          "camera_commander": {
+            "frame": "turret_yaw",
+            "position": [
+              0.55294118,
+              3.35142857,
+              -0.22
+            ]
+          },
+          "exit_left": {
+            "frame": "body",
+            "position": [
+              -2.70588235,
+              0.1,
+              0.0
+            ]
+          },
+          "exit_right": {
+            "frame": "body",
+            "position": [
+              2.70588235,
+              0.1,
+              0.0
+            ]
+          },
+          "exit_rear": {
+            "frame": "body",
+            "position": [
+              0.0,
+              0.1,
+              -4.8
+            ]
+          },
+          "breech_primary": {
+            "frame": "gun_pitch",
+            "position": [
+              0.0,
+              2.55,
+              1.16923077
+            ]
+          },
+          "muzzle_primary": {
+            "frame": "gun_pitch",
+            "position": [
+              0.0,
+              2.55,
+              6.03076923
+            ]
+          },
+          "breech_secondary": {
+            "frame": "gun_pitch",
+            "position": [
+              -0.70588235,
+              3.09642857,
+              0.73846154
+            ]
+          },
+          "muzzle_secondary": {
+            "frame": "gun_pitch",
+            "position": [
+              -0.70588235,
+              3.09642857,
+              3.01538462
+            ]
+          }
+        }
+      }
+    }
+  },
+  "vehicle_weapons": [
+    {
+      "id": "autocannon",
+      "ammo": "autocannon_round",
+      "cooldown_ticks": 6,
+      "damage": 8.0,
+      "range": 96.0,
+      "kind": "GRENADE",
+      "radius": 1.2,
+      "damage_class": "AUTOCANNON",
+      "speed": 3.0,
+      "secondary": false
+    },
+    {
+      "id": "vehicle_rocket",
+      "ammo": "rocket_round",
+      "cooldown_ticks": 30,
+      "damage": 20.0,
+      "range": 96.0,
+      "kind": "ROCKET",
+      "radius": 4.0,
+      "damage_class": "EXPLOSIVE",
+      "speed": 2.2,
+      "secondary": true
+    },
+    {
+      "id": "tank_he",
+      "ammo": "tank_he_shell",
+      "cooldown_ticks": 80,
+      "damage": 24.0,
+      "range": 96.0,
+      "kind": "ROCKET",
+      "radius": 4.0,
+      "damage_class": "EXPLOSIVE",
+      "speed": 2.8,
+      "secondary": false
+    },
+    {
+      "id": "tank_ap",
+      "ammo": "tank_ap_shell",
+      "cooldown_ticks": 80,
+      "damage": 36.0,
+      "range": 96.0,
+      "kind": "ROCKET",
+      "radius": 1.0,
+      "damage_class": "AP",
+      "speed": 3.2,
+      "secondary": false
+    },
+    {
+      "id": "coaxial_machine_gun",
+      "ammo": "machine_gun_round",
+      "cooldown_ticks": 4,
+      "damage": 4.0,
+      "range": 80.0,
+      "kind": "BULLET",
+      "radius": 0.0,
+      "damage_class": "BULLET",
+      "speed": 0.0,
+      "secondary": true
+    }
+  ],
+  "infantry_loadouts": {
+    "profiles": [
+      {
+        "duty": "RIFLE",
+        "primary": {
+          "weapon": "military_rifle",
+          "magazine": 30,
+          "reserve": 90
+        },
+        "secondary": null
+      },
+      {
+        "duty": "CARBINE",
+        "primary": {
+          "weapon": "military_carbine",
+          "magazine": 24,
+          "reserve": 72
+        },
+        "secondary": null
+      },
+      {
+        "duty": "MACHINE_GUN",
+        "primary": {
+          "weapon": "military_machine_gun",
+          "magazine": 60,
+          "reserve": 180
+        },
+        "secondary": null
+      },
+      {
+        "duty": "GRENADIER",
+        "primary": {
+          "weapon": "grenade_launcher",
+          "magazine": 6,
+          "reserve": 12
+        },
+        "secondary": null
+      },
+      {
+        "duty": "ANTI_ARMOR",
+        "primary": {
+          "weapon": "military_carbine",
+          "magazine": 24,
+          "reserve": 48
+        },
+        "secondary": {
+          "weapon": "rocket_launcher",
+          "magazine": 1,
+          "reserve": 2
+        }
+      }
+    ],
+    "native_weights": {
+      "military": {
+        "RIFLE": 65,
+        "CARBINE": 15,
+        "MACHINE_GUN": 10,
+        "GRENADIER": 6,
+        "ANTI_ARMOR": 4
+      },
+      "blackwatch": {
+        "RIFLE": 60,
+        "CARBINE": 18,
+        "MACHINE_GUN": 12,
+        "GRENADIER": 6,
+        "ANTI_ARMOR": 4
+      }
+    },
+    "patrol8": {
+      "CARBINE": 1,
+      "RIFLE": 5,
+      "MACHINE_GUN": 1,
+      "GRENADIER": 1
+    },
+    "patrol8_mechanical": {
+      "CARBINE": 1,
+      "RIFLE": 5,
+      "MACHINE_GUN": 1,
+      "ANTI_ARMOR": 1
+    },
+    "patrol12": {
+      "CARBINE": 1,
+      "RIFLE": 8,
+      "MACHINE_GUN": 1,
+      "GRENADIER": 1,
+      "ANTI_ARMOR": 1
+    },
+    "patrol_status": "Policy factory, not a claim that production automatically spawns 8/12-person patrols"
+  },
+  "garages": {
+    "schemaVersion": 1,
+    "coordinateSystem": "template-local block boundaries; feet at y=1",
+    "garages": [
+      {
+        "id": "vehicle_garage_military",
+        "template": "blacklight:vehicle_garage_military",
+        "faction": "military",
+        "size": [
+          31,
+          10,
+          27
+        ],
+        "terrainBounds": [
+          0,
+          0,
+          0,
+          30,
+          9,
+          26
+        ],
+        "foundationDepth": 3,
+        "boundsConvention": "repairBounds and gateBounds are min-inclusive max-exclusive block boundaries",
+        "bayFacingYaw": 0,
+        "bayFacing": "south +Z",
+        "longitudinalLaneWidth": 9,
+        "gateWidth": 7,
+        "gateClearanceHeight": 7,
+        "roadConnections": [
+          [
+            5.5,
+            1,
+            26.5
+          ],
+          [
+            15.5,
+            1,
+            26.5
+          ],
+          [
+            25.5,
+            1,
+            26.5
+          ]
+        ],
+        "bays": [
+          {
+            "id": "truck",
+            "chassis": "truck",
+            "center": [
+              5.5,
+              1,
+              12.5
+            ],
+            "repairBounds": [
+              1,
+              1,
+              6,
+              10,
+              8,
+              20
+            ],
+            "container": [
+              5,
+              1,
+              2
+            ],
+            "gateBounds": [
+              2,
+              1,
+              26,
+              9,
+              8,
+              27
+            ]
+          },
+          {
+            "id": "tank",
+            "chassis": "tank",
+            "center": [
+              15.5,
+              1,
+              12.5
+            ],
+            "repairBounds": [
+              10,
+              1,
+              6,
+              21,
+              8,
+              20
+            ],
+            "container": [
+              15,
+              1,
+              2
+            ],
+            "gateBounds": [
+              12,
+              1,
+              26,
+              19,
+              8,
+              27
+            ]
+          },
+          {
+            "id": "apc",
+            "chassis": "apc",
+            "center": [
+              25.5,
+              1,
+              12.5
+            ],
+            "repairBounds": [
+              21,
+              1,
+              6,
+              30,
+              8,
+              20
+            ],
+            "container": [
+              25,
+              1,
+              2
+            ],
+            "gateBounds": [
+              22,
+              1,
+              26,
+              29,
+              8,
+              27
+            ]
+          }
+        ],
+        "supplyContainers": [
+          {
+            "bayId": "truck",
+            "position": [
+              5,
+              1,
+              2
+            ],
+            "items": [
+              {
+                "id": "blacklight:vehicle_repair_parts",
+                "count": 4
+              }
+            ]
+          },
+          {
+            "bayId": "tank",
+            "position": [
+              15,
+              1,
+              2
+            ],
+            "items": [
+              {
+                "id": "blacklight:vehicle_repair_parts",
+                "count": 4
+              },
+              {
+                "id": "blacklight:tank_he_shell",
+                "count": 12
+              },
+              {
+                "id": "blacklight:tank_ap_shell",
+                "count": 8
+              },
+              {
+                "id": "blacklight:machine_gun_round",
+                "count": 64
+              },
+              {
+                "id": "blacklight:machine_gun_round",
+                "count": 64
+              },
+              {
+                "id": "blacklight:machine_gun_round",
+                "count": 64
+              },
+              {
+                "id": "blacklight:machine_gun_round",
+                "count": 48
+              }
+            ]
+          },
+          {
+            "bayId": "apc",
+            "position": [
+              25,
+              1,
+              2
+            ],
+            "items": [
+              {
+                "id": "blacklight:vehicle_repair_parts",
+                "count": 4
+              },
+              {
+                "id": "blacklight:autocannon_round",
+                "count": 64
+              },
+              {
+                "id": "blacklight:autocannon_round",
+                "count": 56
+              },
+              {
+                "id": "blacklight:rocket_round",
+                "count": 4
+              }
+            ]
+          }
+        ],
+        "entitiesEmbedded": false,
+        "lootRefresh": false,
+        "automaticOldWorldAttachment": false,
+        "initialDispatchChassis": [
+          "truck",
+          "apc",
+          "tank"
+        ],
+        "authorship": "Original Blacklight block layout; no imported commercial game assets."
+      },
+      {
+        "id": "vehicle_garage_blackwatch",
+        "template": "blacklight:vehicle_garage_blackwatch",
+        "faction": "blackwatch",
+        "size": [
+          31,
+          10,
+          27
+        ],
+        "terrainBounds": [
+          0,
+          0,
+          0,
+          30,
+          9,
+          26
+        ],
+        "foundationDepth": 3,
+        "boundsConvention": "repairBounds and gateBounds are min-inclusive max-exclusive block boundaries",
+        "bayFacingYaw": 0,
+        "bayFacing": "south +Z",
+        "longitudinalLaneWidth": 9,
+        "gateWidth": 7,
+        "gateClearanceHeight": 7,
+        "roadConnections": [
+          [
+            5.5,
+            1,
+            26.5
+          ],
+          [
+            15.5,
+            1,
+            26.5
+          ],
+          [
+            25.5,
+            1,
+            26.5
+          ]
+        ],
+        "bays": [
+          {
+            "id": "truck",
+            "chassis": "truck",
+            "center": [
+              5.5,
+              1,
+              12.5
+            ],
+            "repairBounds": [
+              1,
+              1,
+              6,
+              10,
+              8,
+              20
+            ],
+            "container": [
+              5,
+              1,
+              2
+            ],
+            "gateBounds": [
+              2,
+              1,
+              26,
+              9,
+              8,
+              27
+            ]
+          },
+          {
+            "id": "tank",
+            "chassis": "tank",
+            "center": [
+              15.5,
+              1,
+              12.5
+            ],
+            "repairBounds": [
+              10,
+              1,
+              6,
+              21,
+              8,
+              20
+            ],
+            "container": [
+              15,
+              1,
+              2
+            ],
+            "gateBounds": [
+              12,
+              1,
+              26,
+              19,
+              8,
+              27
+            ]
+          },
+          {
+            "id": "apc",
+            "chassis": "apc",
+            "center": [
+              25.5,
+              1,
+              12.5
+            ],
+            "repairBounds": [
+              21,
+              1,
+              6,
+              30,
+              8,
+              20
+            ],
+            "container": [
+              25,
+              1,
+              2
+            ],
+            "gateBounds": [
+              22,
+              1,
+              26,
+              29,
+              8,
+              27
+            ]
+          }
+        ],
+        "supplyContainers": [
+          {
+            "bayId": "truck",
+            "position": [
+              5,
+              1,
+              2
+            ],
+            "items": [
+              {
+                "id": "blacklight:vehicle_repair_parts",
+                "count": 4
+              }
+            ]
+          },
+          {
+            "bayId": "tank",
+            "position": [
+              15,
+              1,
+              2
+            ],
+            "items": [
+              {
+                "id": "blacklight:vehicle_repair_parts",
+                "count": 4
+              },
+              {
+                "id": "blacklight:tank_he_shell",
+                "count": 12
+              },
+              {
+                "id": "blacklight:tank_ap_shell",
+                "count": 8
+              },
+              {
+                "id": "blacklight:machine_gun_round",
+                "count": 64
+              },
+              {
+                "id": "blacklight:machine_gun_round",
+                "count": 64
+              },
+              {
+                "id": "blacklight:machine_gun_round",
+                "count": 64
+              },
+              {
+                "id": "blacklight:machine_gun_round",
+                "count": 48
+              }
+            ]
+          },
+          {
+            "bayId": "apc",
+            "position": [
+              25,
+              1,
+              2
+            ],
+            "items": [
+              {
+                "id": "blacklight:vehicle_repair_parts",
+                "count": 4
+              },
+              {
+                "id": "blacklight:autocannon_round",
+                "count": 64
+              },
+              {
+                "id": "blacklight:autocannon_round",
+                "count": 56
+              },
+              {
+                "id": "blacklight:rocket_round",
+                "count": 4
+              }
+            ]
+          }
+        ],
+        "entitiesEmbedded": false,
+        "lootRefresh": false,
+        "automaticOldWorldAttachment": false,
+        "initialDispatchChassis": [
+          "truck",
+          "apc",
+          "tank"
+        ],
+        "authorship": "Original Blacklight block layout; no imported commercial game assets."
+      }
+    ]
+  },
+  "garage_rules": {
+    "fuel_gameplay": "disabled",
+    "dormant_fuel": {
+      "snapshot_and_finite_api_retained": true,
+      "capacity_field": "maxFuelTicks",
+      "usage": "inactive configuration and saved FuelTicks retained; no gameplay consumption"
+    },
+    "health_per_repair_part": 20,
+    "loaded_native_dispatch_cap": 12,
+    "low_primary_ammunition_ratio": 0.2,
+    "low_health_ratio": 0.35,
+    "resume_primary_ammunition_ratio": 0.5,
+    "resume_health_ratio": 0.6,
+    "automatic_supply": "actual ItemEntity ammunition/repair cargo; runtime acceptance belongs to root"
+  },
+  "structures": [
+    {
+      "id": "blackwatch_checkpoint",
+      "platform": "neoforge",
+      "size": [
+        17,
+        9,
+        17
+      ],
+      "serialized_blocks": 2601,
+      "non_air_blocks": 572,
+      "palette_size": 13,
+      "embedded_entities": [
+        {
+          "pos": [
+            3.5,
+            1.0,
+            6.5
+          ],
+          "blockPos": [
+            3,
+            1,
+            6
+          ],
+          "nbt": {
+            "id": "blacklight:blackwatch_soldier",
+            "PersistenceRequired": 1,
+            "Rotation": [
+              180.0,
+              0.0
+            ],
+            "MilitaryRank": "sergeant",
+            "MilitaryDeployment": "blackwatch_checkpoint",
+            "MilitaryDeploymentCapacity": 8,
+            "MilitaryDeploymentX": 5.0,
+            "MilitaryDeploymentY": 0.0,
+            "MilitaryDeploymentZ": 2.0
+          }
+        },
+        {
+          "pos": [
+            13.5,
+            1.0,
+            6.5
+          ],
+          "blockPos": [
+            13,
+            1,
+            6
+          ],
+          "nbt": {
+            "id": "blacklight:blackwatch_soldier",
+            "PersistenceRequired": 1,
+            "Rotation": [
+              180.0,
+              0.0
+            ],
+            "MilitaryRank": "private",
+            "MilitaryDeployment": "blackwatch_checkpoint",
+            "MilitaryDeploymentCapacity": 8,
+            "MilitaryDeploymentX": -5.0,
+            "MilitaryDeploymentY": 0.0,
+            "MilitaryDeploymentZ": 2.0
+          }
+        },
+        {
+          "pos": [
+            8.5,
+            1.0,
+            12.5
+          ],
+          "blockPos": [
+            8,
+            1,
+            12
+          ],
+          "nbt": {
+            "id": "blacklight:blackwatch_heavy",
+            "PersistenceRequired": 1,
+            "Rotation": [
+              180.0,
+              0.0
+            ],
+            "MilitaryRank": "corporal",
+            "MilitaryDeployment": "blackwatch_checkpoint",
+            "MilitaryDeploymentCapacity": 8,
+            "MilitaryDeploymentX": 0.0,
+            "MilitaryDeploymentY": 0.0,
+            "MilitaryDeploymentZ": -4.0
+          }
+        }
+      ],
+      "chests": [
+        {
+          "position": [
+            2,
+            1,
+            13
+          ],
+          "nbt": {
+            "id": "minecraft:chest",
+            "LootTable": "blacklight:chests/blackwatch_supplies"
+          }
+        },
+        {
+          "position": [
+            4,
+            1,
+            13
+          ],
+          "nbt": {
+            "id": "minecraft:chest",
+            "LootTable": "blacklight:chests/blackwatch_technology"
+          }
+        }
+      ],
+      "runtime_metadata": null,
+      "source": "src/main/resources/data/blacklight/structure/blackwatch_checkpoint.nbt",
+      "sha256": "9de7f3c962ef2aaf25592e00c5f6552a111f327b8fdb646973b8026cb71f611d"
+    },
+    {
+      "id": "blackwatch_outpost",
+      "platform": "neoforge",
+      "size": [
+        25,
+        9,
+        25
+      ],
+      "serialized_blocks": 5625,
+      "non_air_blocks": 1375,
+      "palette_size": 21,
+      "embedded_entities": [
+        {
+          "pos": [
+            7.5,
+            1.0,
+            7.5
+          ],
+          "blockPos": [
+            7,
+            1,
+            7
+          ],
+          "nbt": {
+            "id": "blacklight:blackwatch_soldier",
+            "PersistenceRequired": 1,
+            "Rotation": [
+              180.0,
+              0.0
+            ],
+            "MilitaryRank": "sergeant",
+            "MilitaryDeployment": "blackwatch_outpost",
+            "MilitaryDeploymentCapacity": 8,
+            "MilitaryDeploymentX": 5.0,
+            "MilitaryDeploymentY": 0.0,
+            "MilitaryDeploymentZ": 5.0
+          }
+        },
+        {
+          "pos": [
+            17.5,
+            1.0,
+            7.5
+          ],
+          "blockPos": [
+            17,
+            1,
+            7
+          ],
+          "nbt": {
+            "id": "blacklight:blackwatch_soldier",
+            "PersistenceRequired": 1,
+            "Rotation": [
+              180.0,
+              0.0
+            ],
+            "MilitaryRank": "private",
+            "MilitaryDeployment": "blackwatch_outpost",
+            "MilitaryDeploymentCapacity": 8,
+            "MilitaryDeploymentX": -5.0,
+            "MilitaryDeploymentY": 0.0,
+            "MilitaryDeploymentZ": 5.0
+          }
+        },
+        {
+          "pos": [
+            9.5,
+            1.0,
+            17.5
+          ],
+          "blockPos": [
+            9,
+            1,
+            17
+          ],
+          "nbt": {
+            "id": "blacklight:blackwatch_soldier",
+            "PersistenceRequired": 1,
+            "Rotation": [
+              180.0,
+              0.0
+            ],
+            "MilitaryRank": "private",
+            "MilitaryDeployment": "blackwatch_outpost",
+            "MilitaryDeploymentCapacity": 8,
+            "MilitaryDeploymentX": 3.0,
+            "MilitaryDeploymentY": 0.0,
+            "MilitaryDeploymentZ": -5.0
+          }
+        },
+        {
+          "pos": [
+            12.5,
+            1.0,
+            19.5
+          ],
+          "blockPos": [
+            12,
+            1,
+            19
+          ],
+          "nbt": {
+            "id": "blacklight:blackwatch_heavy",
+            "PersistenceRequired": 1,
+            "Rotation": [
+              180.0,
+              0.0
+            ],
+            "MilitaryRank": "corporal",
+            "MilitaryDeployment": "blackwatch_outpost",
+            "MilitaryDeploymentCapacity": 8,
+            "MilitaryDeploymentX": 0.0,
+            "MilitaryDeploymentY": 0.0,
+            "MilitaryDeploymentZ": -7.0
+          }
+        },
+        {
+          "pos": [
+            2.5,
+            7.0,
+            19.5
+          ],
+          "blockPos": [
+            2,
+            7,
+            19
+          ],
+          "nbt": {
+            "id": "blacklight:blackwatch_soldier",
+            "PersistenceRequired": 1,
+            "Rotation": [
+              180.0,
+              0.0
+            ],
+            "MilitaryRank": "private",
+            "MilitaryDeployment": "blackwatch_outpost",
+            "MilitaryDeploymentCapacity": 8,
+            "MilitaryDeploymentX": 10.0,
+            "MilitaryDeploymentY": -6.0,
+            "MilitaryDeploymentZ": -7.0
+          }
+        }
+      ],
+      "chests": [
+        {
+          "position": [
+            6,
+            2,
+            20
+          ],
+          "nbt": {
+            "id": "minecraft:chest",
+            "LootTable": "blacklight:chests/blackwatch_technology"
+          }
+        },
+        {
+          "position": [
+            13,
+            1,
+            21
+          ],
+          "nbt": {
+            "id": "minecraft:chest",
+            "LootTable": "blacklight:chests/blackwatch_supplies"
+          }
+        },
+        {
+          "position": [
+            18,
+            1,
+            20
+          ],
+          "nbt": {
+            "id": "minecraft:chest",
+            "LootTable": "blacklight:chests/blackwatch_technology"
+          }
+        }
+      ],
+      "runtime_metadata": null,
+      "source": "src/main/resources/data/blacklight/structure/blackwatch_outpost.nbt",
+      "sha256": "fc6b2eb87373e4e09edbb27d2a15fcabdef45c510cdb5d2bd5ca8c96bd980742"
+    },
+    {
+      "id": "frozen_research_station",
+      "platform": "neoforge",
+      "size": [
+        23,
+        21,
+        23
+      ],
+      "serialized_blocks": 4363,
+      "non_air_blocks": 2821,
+      "palette_size": 19,
+      "embedded_entities": [
+        {
+          "pos": [
+            4.5,
+            1.0,
+            11.5
+          ],
+          "blockPos": [
+            4,
+            1,
+            11
+          ],
+          "nbt": {
+            "id": "blacklight:infected_host",
+            "PersistenceRequired": 1,
+            "Health": 30.0,
+            "Rotation": [
+              0.0,
+              0.0
+            ],
+            "BlacklightHost": {
+              "Type": "minecraft:zombie",
+              "Family": "ground",
+              "Humanoid": 1,
+              "Quadruped": 0,
+              "Width": 0.671999990940094,
+              "Height": 2.184000015258789,
+              "Visual": {}
+            }
+          }
+        },
+        {
+          "pos": [
+            18.5,
+            1.0,
+            6.5
+          ],
+          "blockPos": [
+            18,
+            1,
+            6
+          ],
+          "nbt": {
+            "id": "blacklight:infected_host",
+            "PersistenceRequired": 1,
+            "Health": 30.0,
+            "Rotation": [
+              0.0,
+              0.0
+            ],
+            "BlacklightHost": {
+              "Type": "minecraft:zombie",
+              "Family": "ground",
+              "Humanoid": 1,
+              "Quadruped": 0,
+              "Width": 0.671999990940094,
+              "Height": 2.184000015258789,
+              "Visual": {}
+            }
+          }
+        }
+      ],
+      "chests": [
+        {
+          "position": [
+            3,
+            1,
+            14
+          ],
+          "nbt": {
+            "id": "minecraft:chest",
+            "LootTable": "blacklight:chests/research_supplies"
+          }
+        },
+        {
+          "position": [
+            11,
+            1,
+            19
+          ],
+          "nbt": {
+            "id": "minecraft:chest",
+            "LootTable": "blacklight:chests/research_samples"
+          }
+        }
+      ],
+      "runtime_metadata": null,
+      "source": "src/main/resources/data/blacklight/structure/frozen_research_station.nbt",
+      "sha256": "0dc5f32b6582f66384870df8c90de2f41d334de0486482d01a69fa95db7b795a"
+    },
+    {
+      "id": "large_blackwatch_base",
+      "platform": "neoforge",
+      "size": [
+        65,
+        18,
+        81
+      ],
+      "serialized_blocks": 94770,
+      "non_air_blocks": 13667,
+      "palette_size": 50,
+      "embedded_entities": [],
+      "chests": [
+        {
+          "position": [
+            10,
+            1,
+            19
+          ],
+          "nbt": {
+            "id": "minecraft:chest",
+            "LootTable": "blacklight:chests/base_supplies"
+          }
+        },
+        {
+          "position": [
+            10,
+            1,
+            45
+          ],
+          "nbt": {
+            "id": "minecraft:chest",
+            "LootTable": "blacklight:chests/base_supplies"
+          }
+        },
+        {
+          "position": [
+            10,
+            1,
+            64
+          ],
+          "nbt": {
+            "id": "minecraft:chest",
+            "LootTable": "blacklight:chests/base_medical"
+          }
+        },
+        {
+          "position": [
+            10,
+            6,
+            19
+          ],
+          "nbt": {
+            "id": "minecraft:chest",
+            "LootTable": "blacklight:chests/base_supplies"
+          }
+        },
+        {
+          "position": [
+            10,
+            6,
+            45
+          ],
+          "nbt": {
+            "id": "minecraft:chest",
+            "LootTable": "blacklight:chests/base_supplies"
+          }
+        },
+        {
+          "position": [
+            10,
+            6,
+            64
+          ],
+          "nbt": {
+            "id": "minecraft:chest",
+            "LootTable": "blacklight:chests/base_medical"
+          }
+        },
+        {
+          "position": [
+            13,
+            1,
+            45
+          ],
+          "nbt": {
+            "id": "minecraft:chest",
+            "LootTable": "blacklight:chests/base_supplies"
+          }
+        },
+        {
+          "position": [
+            13,
+            6,
+            45
+          ],
+          "nbt": {
+            "id": "minecraft:chest",
+            "LootTable": "blacklight:chests/base_supplies"
+          }
+        },
+        {
+          "position": [
+            46,
+            1,
+            29
+          ],
+          "nbt": {
+            "id": "minecraft:chest",
+            "LootTable": "blacklight:chests/base_armory"
+          }
+        },
+        {
+          "position": [
+            46,
+            1,
+            39
+          ],
+          "nbt": {
+            "id": "minecraft:chest",
+            "LootTable": "blacklight:chests/base_armory"
+          }
+        },
+        {
+          "position": [
+            49,
+            1,
+            65
+          ],
+          "nbt": {
+            "id": "minecraft:chest",
+            "LootTable": "blacklight:chests/base_supplies"
+          }
+        },
+        {
+          "position": [
+            49,
+            6,
+            65
+          ],
+          "nbt": {
+            "id": "minecraft:chest",
+            "LootTable": "blacklight:chests/base_supplies"
+          }
+        },
+        {
+          "position": [
+            52,
+            1,
+            12
+          ],
+          "nbt": {
+            "id": "minecraft:chest",
+            "LootTable": "blacklight:chests/base_ammunition"
+          }
+        },
+        {
+          "position": [
+            54,
+            1,
+            12
+          ],
+          "nbt": {
+            "id": "minecraft:chest",
+            "LootTable": "blacklight:chests/base_ammunition"
+          }
+        }
+      ],
+      "runtime_metadata": {
+        "name": "large_blackwatch_base",
+        "faction": "blackwatch",
+        "width": 65,
+        "height": 18,
+        "depth": 81,
+        "entrance": [
+          32,
+          1,
+          80
+        ],
+        "entrance_width": 7,
+        "ammo_chests": [
+          [
+            52,
+            1,
+            12
+          ],
+          [
+            54,
+            1,
+            12
+          ]
+        ],
+        "guards": [
+          {
+            "x": 28,
+            "y": 1,
+            "z": 77,
+            "heavy": false,
+            "role": "entry"
+          },
+          {
+            "x": 36,
+            "y": 1,
+            "z": 77,
+            "heavy": true,
+            "role": "entry"
+          },
+          {
+            "x": 32,
+            "y": 1,
+            "z": 69,
+            "heavy": false,
+            "role": "motor_yard"
+          },
+          {
+            "x": 32,
+            "y": 1,
+            "z": 29,
+            "heavy": false,
+            "role": "central_lane"
+          },
+          {
+            "x": 4,
+            "y": 8,
+            "z": 4,
+            "heavy": false,
+            "role": "tower_northwest"
+          },
+          {
+            "x": 60,
+            "y": 8,
+            "z": 76,
+            "heavy": false,
+            "role": "tower_southeast"
+          },
+          {
+            "x": 4,
+            "y": 8,
+            "z": 76,
+            "heavy": false,
+            "role": "tower_southwest"
+          },
+          {
+            "x": 18,
+            "y": 1,
+            "z": 18,
+            "heavy": false,
+            "role": "command"
+          },
+          {
+            "x": 18,
+            "y": 6,
+            "z": 18,
+            "heavy": false,
+            "role": "operations"
+          },
+          {
+            "x": 18,
+            "y": 11,
+            "z": 12,
+            "heavy": false,
+            "role": "command_roof"
+          },
+          {
+            "x": 50,
+            "y": 1,
+            "z": 15,
+            "heavy": true,
+            "role": "ammunition"
+          },
+          {
+            "x": 16,
+            "y": 1,
+            "z": 41,
+            "heavy": false,
+            "role": "barracks"
+          },
+          {
+            "x": 16,
+            "y": 6,
+            "z": 41,
+            "heavy": false,
+            "role": "barracks_upper"
+          },
+          {
+            "x": 48,
+            "y": 1,
+            "z": 37,
+            "heavy": true,
+            "role": "armory"
+          },
+          {
+            "x": 35,
+            "y": 1,
+            "z": 12,
+            "heavy": false,
+            "role": "landing_pad"
+          },
+          {
+            "x": 40,
+            "y": 1,
+            "z": 51,
+            "heavy": false,
+            "role": "logistics"
+          },
+          {
+            "x": 47,
+            "y": 1,
+            "z": 55,
+            "heavy": true,
+            "role": "research"
+          },
+          {
+            "x": 48,
+            "y": 6,
+            "z": 60,
+            "heavy": false,
+            "role": "research_upper"
+          },
+          {
+            "x": 20,
+            "y": 1,
+            "z": 59,
+            "heavy": false,
+            "role": "isolation"
+          },
+          {
+            "x": 20,
+            "y": 6,
+            "z": 59,
+            "heavy": false,
+            "role": "isolation_upper"
+          }
+        ],
+        "modules": [
+          {
+            "name": "command",
+            "bounds": [
+              8,
+              0,
+              6,
+              25,
+              10,
+              21
+            ],
+            "entry": [
+              17,
+              1,
+              19
+            ],
+            "floors": 2
+          },
+          {
+            "name": "ammunition",
+            "bounds": [
+              45,
+              0,
+              5,
+              60,
+              5,
+              18
+            ],
+            "entry": [
+              52,
+              1,
+              16
+            ],
+            "floors": 1
+          },
+          {
+            "name": "barracks",
+            "bounds": [
+              8,
+              0,
+              29,
+              24,
+              10,
+              47
+            ],
+            "entry": [
+              22,
+              1,
+              44
+            ],
+            "floors": 2
+          },
+          {
+            "name": "armory",
+            "bounds": [
+              43,
+              0,
+              27,
+              59,
+              5,
+              42
+            ],
+            "entry": [
+              45,
+              1,
+              34
+            ],
+            "floors": 1
+          },
+          {
+            "name": "medical_isolation",
+            "bounds": [
+              8,
+              0,
+              52,
+              25,
+              10,
+              67
+            ],
+            "entry": [
+              23,
+              1,
+              61
+            ],
+            "floors": 2
+          },
+          {
+            "name": "containment_research",
+            "bounds": [
+              43,
+              0,
+              48,
+              59,
+              10,
+              67
+            ],
+            "entry": [
+              45,
+              1,
+              58
+            ],
+            "floors": 2
+          }
+        ],
+        "entities_embedded": false,
+        "loot_refresh": false,
+        "command_cores": [
+          [
+            11,
+            2,
+            9
+          ],
+          [
+            13,
+            2,
+            9
+          ],
+          [
+            15,
+            2,
+            9
+          ],
+          [
+            11,
+            7,
+            9
+          ],
+          [
+            13,
+            7,
+            9
+          ],
+          [
+            15,
+            7,
+            9
+          ]
+        ]
+      },
+      "source": "src/main/resources/data/blacklight/structure/large_blackwatch_base.nbt",
+      "sha256": "06b613cf9fc372c034750bc694989c095d9dabecbc599395182a33fa476ded60",
+      "native_personnel_slots": 20
+    },
+    {
+      "id": "large_military_base",
+      "platform": "neoforge",
+      "size": [
+        65,
+        18,
+        65
+      ],
+      "serialized_blocks": 76050,
+      "non_air_blocks": 10163,
+      "palette_size": 48,
+      "embedded_entities": [],
+      "chests": [
+        {
+          "position": [
+            10,
+            1,
+            19
+          ],
+          "nbt": {
+            "id": "minecraft:chest",
+            "LootTable": "blacklight:chests/base_supplies"
+          }
+        },
+        {
+          "position": [
+            10,
+            1,
+            45
+          ],
+          "nbt": {
+            "id": "minecraft:chest",
+            "LootTable": "blacklight:chests/base_supplies"
+          }
+        },
+        {
+          "position": [
+            10,
+            1,
+            57
+          ],
+          "nbt": {
+            "id": "minecraft:chest",
+            "LootTable": "blacklight:chests/base_medical"
+          }
+        },
+        {
+          "position": [
+            10,
+            6,
+            19
+          ],
+          "nbt": {
+            "id": "minecraft:chest",
+            "LootTable": "blacklight:chests/base_supplies"
+          }
+        },
+        {
+          "position": [
+            10,
+            6,
+            45
+          ],
+          "nbt": {
+            "id": "minecraft:chest",
+            "LootTable": "blacklight:chests/base_supplies"
+          }
+        },
+        {
+          "position": [
+            13,
+            1,
+            45
+          ],
+          "nbt": {
+            "id": "minecraft:chest",
+            "LootTable": "blacklight:chests/base_supplies"
+          }
+        },
+        {
+          "position": [
+            13,
+            6,
+            45
+          ],
+          "nbt": {
+            "id": "minecraft:chest",
+            "LootTable": "blacklight:chests/base_supplies"
+          }
+        },
+        {
+          "position": [
+            45,
+            1,
+            52
+          ],
+          "nbt": {
+            "id": "minecraft:chest",
+            "LootTable": "blacklight:chests/base_supplies"
+          }
+        },
+        {
+          "position": [
+            46,
+            1,
+            29
+          ],
+          "nbt": {
+            "id": "minecraft:chest",
+            "LootTable": "blacklight:chests/base_armory"
+          }
+        },
+        {
+          "position": [
+            46,
+            1,
+            39
+          ],
+          "nbt": {
+            "id": "minecraft:chest",
+            "LootTable": "blacklight:chests/base_armory"
+          }
+        },
+        {
+          "position": [
+            52,
+            1,
+            12
+          ],
+          "nbt": {
+            "id": "minecraft:chest",
+            "LootTable": "blacklight:chests/base_ammunition"
+          }
+        },
+        {
+          "position": [
+            54,
+            1,
+            12
+          ],
+          "nbt": {
+            "id": "minecraft:chest",
+            "LootTable": "blacklight:chests/base_ammunition"
+          }
+        },
+        {
+          "position": [
+            55,
+            1,
+            52
+          ],
+          "nbt": {
+            "id": "minecraft:chest",
+            "LootTable": "blacklight:chests/base_supplies"
+          }
+        }
+      ],
+      "runtime_metadata": {
+        "name": "large_military_base",
+        "faction": "military",
+        "width": 65,
+        "height": 18,
+        "depth": 65,
+        "entrance": [
+          32,
+          1,
+          64
+        ],
+        "entrance_width": 7,
+        "ammo_chests": [
+          [
+            52,
+            1,
+            12
+          ],
+          [
+            54,
+            1,
+            12
+          ]
+        ],
+        "guards": [
+          {
+            "x": 28,
+            "y": 1,
+            "z": 61,
+            "heavy": false,
+            "role": "entry"
+          },
+          {
+            "x": 36,
+            "y": 1,
+            "z": 61,
+            "heavy": true,
+            "role": "entry"
+          },
+          {
+            "x": 32,
+            "y": 1,
+            "z": 53,
+            "heavy": false,
+            "role": "motor_yard"
+          },
+          {
+            "x": 32,
+            "y": 1,
+            "z": 29,
+            "heavy": false,
+            "role": "central_lane"
+          },
+          {
+            "x": 4,
+            "y": 8,
+            "z": 4,
+            "heavy": false,
+            "role": "tower_northwest"
+          },
+          {
+            "x": 60,
+            "y": 8,
+            "z": 60,
+            "heavy": false,
+            "role": "tower_southeast"
+          },
+          {
+            "x": 4,
+            "y": 8,
+            "z": 60,
+            "heavy": false,
+            "role": "tower_southwest"
+          },
+          {
+            "x": 18,
+            "y": 1,
+            "z": 18,
+            "heavy": false,
+            "role": "command"
+          },
+          {
+            "x": 18,
+            "y": 6,
+            "z": 18,
+            "heavy": false,
+            "role": "operations"
+          },
+          {
+            "x": 18,
+            "y": 11,
+            "z": 12,
+            "heavy": false,
+            "role": "command_roof"
+          },
+          {
+            "x": 50,
+            "y": 1,
+            "z": 15,
+            "heavy": true,
+            "role": "ammunition"
+          },
+          {
+            "x": 16,
+            "y": 1,
+            "z": 41,
+            "heavy": false,
+            "role": "barracks"
+          },
+          {
+            "x": 16,
+            "y": 6,
+            "z": 41,
+            "heavy": false,
+            "role": "barracks_upper"
+          },
+          {
+            "x": 48,
+            "y": 1,
+            "z": 37,
+            "heavy": true,
+            "role": "armory"
+          },
+          {
+            "x": 35,
+            "y": 1,
+            "z": 12,
+            "heavy": false,
+            "role": "landing_pad"
+          },
+          {
+            "x": 40,
+            "y": 1,
+            "z": 53,
+            "heavy": false,
+            "role": "logistics"
+          }
+        ],
+        "modules": [
+          {
+            "name": "command",
+            "bounds": [
+              8,
+              0,
+              6,
+              25,
+              10,
+              21
+            ],
+            "entry": [
+              17,
+              1,
+              19
+            ],
+            "floors": 2
+          },
+          {
+            "name": "ammunition",
+            "bounds": [
+              45,
+              0,
+              5,
+              60,
+              5,
+              18
+            ],
+            "entry": [
+              52,
+              1,
+              16
+            ],
+            "floors": 1
+          },
+          {
+            "name": "barracks",
+            "bounds": [
+              8,
+              0,
+              29,
+              24,
+              10,
+              47
+            ],
+            "entry": [
+              22,
+              1,
+              44
+            ],
+            "floors": 2
+          },
+          {
+            "name": "armory",
+            "bounds": [
+              43,
+              0,
+              27,
+              59,
+              5,
+              42
+            ],
+            "entry": [
+              45,
+              1,
+              34
+            ],
+            "floors": 1
+          },
+          {
+            "name": "medical",
+            "bounds": [
+              8,
+              0,
+              51,
+              23,
+              5,
+              59
+            ],
+            "entry": [
+              16,
+              1,
+              53
+            ],
+            "floors": 1
+          },
+          {
+            "name": "logistics_canopy",
+            "bounds": [
+              43,
+              0,
+              48,
+              58,
+              5,
+              59
+            ],
+            "entry": [
+              50,
+              1,
+              51
+            ],
+            "floors": 1
+          }
+        ],
+        "entities_embedded": false,
+        "loot_refresh": false,
+        "command_cores": [
+          [
+            11,
+            2,
+            9
+          ],
+          [
+            13,
+            2,
+            9
+          ],
+          [
+            15,
+            2,
+            9
+          ],
+          [
+            11,
+            7,
+            9
+          ],
+          [
+            13,
+            7,
+            9
+          ],
+          [
+            15,
+            7,
+            9
+          ]
+        ]
+      },
+      "source": "src/main/resources/data/blacklight/structure/large_military_base.nbt",
+      "sha256": "90c1715fa57bd839bdfbcde72341d5c9ac1d95b74084b398ea4d628a43c38943",
+      "native_personnel_slots": 16
+    },
+    {
+      "id": "military_camp",
+      "platform": "neoforge",
+      "size": [
+        21,
+        9,
+        21
+      ],
+      "serialized_blocks": 3969,
+      "non_air_blocks": 976,
+      "palette_size": 16,
+      "embedded_entities": [
+        {
+          "pos": [
+            6.5,
+            1.0,
+            5.5
+          ],
+          "blockPos": [
+            6,
+            1,
+            5
+          ],
+          "nbt": {
+            "id": "blacklight:military_soldier",
+            "PersistenceRequired": 1,
+            "Rotation": [
+              180.0,
+              0.0
+            ],
+            "MilitaryRank": "sergeant",
+            "MilitaryDeployment": "military_camp",
+            "MilitaryDeploymentCapacity": 8,
+            "MilitaryDeploymentX": 4.0,
+            "MilitaryDeploymentY": 0.0,
+            "MilitaryDeploymentZ": 5.0
+          }
+        },
+        {
+          "pos": [
+            14.5,
+            1.0,
+            5.5
+          ],
+          "blockPos": [
+            14,
+            1,
+            5
+          ],
+          "nbt": {
+            "id": "blacklight:military_soldier",
+            "PersistenceRequired": 1,
+            "Rotation": [
+              180.0,
+              0.0
+            ],
+            "MilitaryRank": "private",
+            "MilitaryDeployment": "military_camp",
+            "MilitaryDeploymentCapacity": 8,
+            "MilitaryDeploymentX": -4.0,
+            "MilitaryDeploymentY": 0.0,
+            "MilitaryDeploymentZ": 5.0
+          }
+        },
+        {
+          "pos": [
+            10.5,
+            1.0,
+            10.5
+          ],
+          "blockPos": [
+            10,
+            1,
+            10
+          ],
+          "nbt": {
+            "id": "blacklight:military_soldier",
+            "PersistenceRequired": 1,
+            "Rotation": [
+              180.0,
+              0.0
+            ],
+            "MilitaryRank": "private",
+            "MilitaryDeployment": "military_camp",
+            "MilitaryDeploymentCapacity": 8,
+            "MilitaryDeploymentX": 0.0,
+            "MilitaryDeploymentY": 0.0,
+            "MilitaryDeploymentZ": 0.0
+          }
+        },
+        {
+          "pos": [
+            6.5,
+            1.0,
+            16.5
+          ],
+          "blockPos": [
+            6,
+            1,
+            16
+          ],
+          "nbt": {
+            "id": "blacklight:military_soldier",
+            "PersistenceRequired": 1,
+            "Rotation": [
+              180.0,
+              0.0
+            ],
+            "MilitaryRank": "private",
+            "MilitaryDeployment": "military_camp",
+            "MilitaryDeploymentCapacity": 8,
+            "MilitaryDeploymentX": 4.0,
+            "MilitaryDeploymentY": 0.0,
+            "MilitaryDeploymentZ": -6.0
+          }
+        },
+        {
+          "pos": [
+            14.5,
+            1.0,
+            16.5
+          ],
+          "blockPos": [
+            14,
+            1,
+            16
+          ],
+          "nbt": {
+            "id": "blacklight:military_heavy",
+            "PersistenceRequired": 1,
+            "Rotation": [
+              180.0,
+              0.0
+            ],
+            "MilitaryRank": "corporal",
+            "MilitaryDeployment": "military_camp",
+            "MilitaryDeploymentCapacity": 8,
+            "MilitaryDeploymentX": -4.0,
+            "MilitaryDeploymentY": 0.0,
+            "MilitaryDeploymentZ": -6.0
+          }
+        },
+        {
+          "pos": [
+            17.5,
+            1.0,
+            8.5
+          ],
+          "blockPos": [
+            17,
+            1,
+            8
+          ],
+          "nbt": {
+            "id": "blacklight:military_soldier",
+            "PersistenceRequired": 1,
+            "Rotation": [
+              180.0,
+              0.0
+            ],
+            "MilitaryRank": "private",
+            "MilitaryDeployment": "military_camp",
+            "MilitaryDeploymentCapacity": 8,
+            "MilitaryDeploymentX": -7.0,
+            "MilitaryDeploymentY": 0.0,
+            "MilitaryDeploymentZ": 2.0
+          }
+        },
+        {
+          "pos": [
+            3.5,
+            7.0,
+            4.5
+          ],
+          "blockPos": [
+            3,
+            7,
+            4
+          ],
+          "nbt": {
+            "id": "blacklight:military_soldier",
+            "PersistenceRequired": 1,
+            "Rotation": [
+              180.0,
+              0.0
+            ],
+            "MilitaryRank": "private",
+            "MilitaryDeployment": "military_camp",
+            "MilitaryDeploymentCapacity": 8,
+            "MilitaryDeploymentX": 7.0,
+            "MilitaryDeploymentY": -6.0,
+            "MilitaryDeploymentZ": 6.0
+          }
+        },
+        {
+          "pos": [
+            10.5,
+            1.0,
+            17.5
+          ],
+          "blockPos": [
+            10,
+            1,
+            17
+          ],
+          "nbt": {
+            "id": "blacklight:military_soldier",
+            "PersistenceRequired": 1,
+            "Rotation": [
+              180.0,
+              0.0
+            ],
+            "MilitaryRank": "private",
+            "MilitaryDeployment": "military_camp",
+            "MilitaryDeploymentCapacity": 8,
+            "MilitaryDeploymentX": 0.0,
+            "MilitaryDeploymentY": 0.0,
+            "MilitaryDeploymentZ": -7.0
+          }
+        }
+      ],
+      "chests": [
+        {
+          "position": [
+            6,
+            1,
+            17
+          ],
+          "nbt": {
+            "id": "minecraft:chest",
+            "LootTable": "blacklight:chests/blackwatch_technology"
+          }
+        },
+        {
+          "position": [
+            16,
+            1,
+            17
+          ],
+          "nbt": {
+            "id": "minecraft:chest",
+            "LootTable": "blacklight:chests/blackwatch_supplies"
+          }
+        }
+      ],
+      "runtime_metadata": null,
+      "source": "src/main/resources/data/blacklight/structure/military_camp.nbt",
+      "sha256": "c8b4cef8815da20fc91511a12951f60125943006140adbbdf7a635a2ef430ad9"
+    },
+    {
+      "id": "military_checkpoint",
+      "platform": "neoforge",
+      "size": [
+        17,
+        9,
+        17
+      ],
+      "serialized_blocks": 2601,
+      "non_air_blocks": 583,
+      "palette_size": 10,
+      "embedded_entities": [
+        {
+          "pos": [
+            3.5,
+            1.0,
+            6.5
+          ],
+          "blockPos": [
+            3,
+            1,
+            6
+          ],
+          "nbt": {
+            "id": "blacklight:military_soldier",
+            "PersistenceRequired": 1,
+            "Rotation": [
+              180.0,
+              0.0
+            ],
+            "MilitaryRank": "sergeant",
+            "MilitaryDeployment": "military_checkpoint",
+            "MilitaryDeploymentCapacity": 8,
+            "MilitaryDeploymentX": 5.0,
+            "MilitaryDeploymentY": 0.0,
+            "MilitaryDeploymentZ": 2.0
+          }
+        },
+        {
+          "pos": [
+            13.5,
+            1.0,
+            6.5
+          ],
+          "blockPos": [
+            13,
+            1,
+            6
+          ],
+          "nbt": {
+            "id": "blacklight:military_soldier",
+            "PersistenceRequired": 1,
+            "Rotation": [
+              180.0,
+              0.0
+            ],
+            "MilitaryRank": "private",
+            "MilitaryDeployment": "military_checkpoint",
+            "MilitaryDeploymentCapacity": 8,
+            "MilitaryDeploymentX": -5.0,
+            "MilitaryDeploymentY": 0.0,
+            "MilitaryDeploymentZ": 2.0
+          }
+        },
+        {
+          "pos": [
+            8.5,
+            1.0,
+            12.5
+          ],
+          "blockPos": [
+            8,
+            1,
+            12
+          ],
+          "nbt": {
+            "id": "blacklight:military_heavy",
+            "PersistenceRequired": 1,
+            "Rotation": [
+              180.0,
+              0.0
+            ],
+            "MilitaryRank": "corporal",
+            "MilitaryDeployment": "military_checkpoint",
+            "MilitaryDeploymentCapacity": 8,
+            "MilitaryDeploymentX": 0.0,
+            "MilitaryDeploymentY": 0.0,
+            "MilitaryDeploymentZ": -4.0
+          }
+        },
+        {
+          "pos": [
+            8.5,
+            1.0,
+            5.5
+          ],
+          "blockPos": [
+            8,
+            1,
+            5
+          ],
+          "nbt": {
+            "id": "blacklight:military_soldier",
+            "PersistenceRequired": 1,
+            "Rotation": [
+              180.0,
+              0.0
+            ],
+            "MilitaryRank": "private",
+            "MilitaryDeployment": "military_checkpoint",
+            "MilitaryDeploymentCapacity": 8,
+            "MilitaryDeploymentX": 0.0,
+            "MilitaryDeploymentY": 0.0,
+            "MilitaryDeploymentZ": 3.0
+          }
+        }
+      ],
+      "chests": [
+        {
+          "position": [
+            2,
+            1,
+            13
+          ],
+          "nbt": {
+            "id": "minecraft:chest",
+            "LootTable": "blacklight:chests/blackwatch_technology"
+          }
+        },
+        {
+          "position": [
+            12,
+            1,
+            13
+          ],
+          "nbt": {
+            "id": "minecraft:chest",
+            "LootTable": "blacklight:chests/blackwatch_supplies"
+          }
+        }
+      ],
+      "runtime_metadata": null,
+      "source": "src/main/resources/data/blacklight/structure/military_checkpoint.nbt",
+      "sha256": "b828b4ee23a20e17913421ed62c98c954ce8460529bd8c4a4825a8c8a3237ae1"
+    },
+    {
+      "id": "vehicle_garage_blackwatch",
+      "platform": "neoforge",
+      "size": [
+        31,
+        10,
+        27
+      ],
+      "serialized_blocks": 8370,
+      "non_air_blocks": 2438,
+      "palette_size": 12,
+      "embedded_entities": [],
+      "chests": [
+        {
+          "position": [
+            5,
+            1,
+            2
+          ],
+          "nbt": {
+            "id": "minecraft:chest",
+            "Items": [
+              {
+                "Slot": 0,
+                "id": "blacklight:vehicle_repair_parts",
+                "count": 4
+              }
+            ]
+          }
+        },
+        {
+          "position": [
+            15,
+            1,
+            2
+          ],
+          "nbt": {
+            "id": "minecraft:chest",
+            "Items": [
+              {
+                "Slot": 0,
+                "id": "blacklight:vehicle_repair_parts",
+                "count": 4
+              },
+              {
+                "Slot": 1,
+                "id": "blacklight:tank_he_shell",
+                "count": 12
+              },
+              {
+                "Slot": 2,
+                "id": "blacklight:tank_ap_shell",
+                "count": 8
+              },
+              {
+                "Slot": 3,
+                "id": "blacklight:machine_gun_round",
+                "count": 64
+              },
+              {
+                "Slot": 4,
+                "id": "blacklight:machine_gun_round",
+                "count": 64
+              },
+              {
+                "Slot": 5,
+                "id": "blacklight:machine_gun_round",
+                "count": 64
+              },
+              {
+                "Slot": 6,
+                "id": "blacklight:machine_gun_round",
+                "count": 48
+              }
+            ]
+          }
+        },
+        {
+          "position": [
+            25,
+            1,
+            2
+          ],
+          "nbt": {
+            "id": "minecraft:chest",
+            "Items": [
+              {
+                "Slot": 0,
+                "id": "blacklight:vehicle_repair_parts",
+                "count": 4
+              },
+              {
+                "Slot": 1,
+                "id": "blacklight:autocannon_round",
+                "count": 64
+              },
+              {
+                "Slot": 2,
+                "id": "blacklight:autocannon_round",
+                "count": 56
+              },
+              {
+                "Slot": 3,
+                "id": "blacklight:rocket_round",
+                "count": 4
+              }
+            ]
+          }
+        }
+      ],
+      "runtime_metadata": null,
+      "source": "src/main/resources/data/blacklight/structure/vehicle_garage_blackwatch.nbt",
+      "sha256": "f5db5afc1c70a5ecae9c0f60c12c352405940af20a369b91945b3d07f169103e"
+    },
+    {
+      "id": "vehicle_garage_military",
+      "platform": "neoforge",
+      "size": [
+        31,
+        10,
+        27
+      ],
+      "serialized_blocks": 8370,
+      "non_air_blocks": 2438,
+      "palette_size": 12,
+      "embedded_entities": [],
+      "chests": [
+        {
+          "position": [
+            5,
+            1,
+            2
+          ],
+          "nbt": {
+            "id": "minecraft:chest",
+            "Items": [
+              {
+                "Slot": 0,
+                "id": "blacklight:vehicle_repair_parts",
+                "count": 4
+              }
+            ]
+          }
+        },
+        {
+          "position": [
+            15,
+            1,
+            2
+          ],
+          "nbt": {
+            "id": "minecraft:chest",
+            "Items": [
+              {
+                "Slot": 0,
+                "id": "blacklight:vehicle_repair_parts",
+                "count": 4
+              },
+              {
+                "Slot": 1,
+                "id": "blacklight:tank_he_shell",
+                "count": 12
+              },
+              {
+                "Slot": 2,
+                "id": "blacklight:tank_ap_shell",
+                "count": 8
+              },
+              {
+                "Slot": 3,
+                "id": "blacklight:machine_gun_round",
+                "count": 64
+              },
+              {
+                "Slot": 4,
+                "id": "blacklight:machine_gun_round",
+                "count": 64
+              },
+              {
+                "Slot": 5,
+                "id": "blacklight:machine_gun_round",
+                "count": 64
+              },
+              {
+                "Slot": 6,
+                "id": "blacklight:machine_gun_round",
+                "count": 48
+              }
+            ]
+          }
+        },
+        {
+          "position": [
+            25,
+            1,
+            2
+          ],
+          "nbt": {
+            "id": "minecraft:chest",
+            "Items": [
+              {
+                "Slot": 0,
+                "id": "blacklight:vehicle_repair_parts",
+                "count": 4
+              },
+              {
+                "Slot": 1,
+                "id": "blacklight:autocannon_round",
+                "count": 64
+              },
+              {
+                "Slot": 2,
+                "id": "blacklight:autocannon_round",
+                "count": 56
+              },
+              {
+                "Slot": 3,
+                "id": "blacklight:rocket_round",
+                "count": 4
+              }
+            ]
+          }
+        }
+      ],
+      "runtime_metadata": null,
+      "source": "src/main/resources/data/blacklight/structure/vehicle_garage_military.nbt",
+      "sha256": "0be44405ffe952fa6a619a8747c7b65345596adeace6ee86de86aff0e430487e"
+    },
+    {
+      "id": "blackwatch_checkpoint",
+      "platform": "forge",
+      "size": [
+        17,
+        9,
+        17
+      ],
+      "serialized_blocks": 2601,
+      "non_air_blocks": 572,
+      "palette_size": 13,
+      "embedded_entities": [
+        {
+          "pos": [
+            3.5,
+            1.0,
+            6.5
+          ],
+          "blockPos": [
+            3,
+            1,
+            6
+          ],
+          "nbt": {
+            "id": "blacklight:blackwatch_soldier",
+            "PersistenceRequired": 1,
+            "Rotation": [
+              180.0,
+              0.0
+            ],
+            "MilitaryRank": "sergeant",
+            "MilitaryDeployment": "blackwatch_checkpoint",
+            "MilitaryDeploymentCapacity": 8,
+            "MilitaryDeploymentX": 5.0,
+            "MilitaryDeploymentY": 0.0,
+            "MilitaryDeploymentZ": 2.0
+          }
+        },
+        {
+          "pos": [
+            13.5,
+            1.0,
+            6.5
+          ],
+          "blockPos": [
+            13,
+            1,
+            6
+          ],
+          "nbt": {
+            "id": "blacklight:blackwatch_soldier",
+            "PersistenceRequired": 1,
+            "Rotation": [
+              180.0,
+              0.0
+            ],
+            "MilitaryRank": "private",
+            "MilitaryDeployment": "blackwatch_checkpoint",
+            "MilitaryDeploymentCapacity": 8,
+            "MilitaryDeploymentX": -5.0,
+            "MilitaryDeploymentY": 0.0,
+            "MilitaryDeploymentZ": 2.0
+          }
+        },
+        {
+          "pos": [
+            8.5,
+            1.0,
+            12.5
+          ],
+          "blockPos": [
+            8,
+            1,
+            12
+          ],
+          "nbt": {
+            "id": "blacklight:blackwatch_heavy",
+            "PersistenceRequired": 1,
+            "Rotation": [
+              180.0,
+              0.0
+            ],
+            "MilitaryRank": "corporal",
+            "MilitaryDeployment": "blackwatch_checkpoint",
+            "MilitaryDeploymentCapacity": 8,
+            "MilitaryDeploymentX": 0.0,
+            "MilitaryDeploymentY": 0.0,
+            "MilitaryDeploymentZ": -4.0
+          }
+        }
+      ],
+      "chests": [
+        {
+          "position": [
+            2,
+            1,
+            13
+          ],
+          "nbt": {
+            "id": "minecraft:chest",
+            "LootTable": "blacklight:chests/blackwatch_supplies"
+          }
+        },
+        {
+          "position": [
+            4,
+            1,
+            13
+          ],
+          "nbt": {
+            "id": "minecraft:chest",
+            "LootTable": "blacklight:chests/blackwatch_technology"
+          }
+        }
+      ],
+      "runtime_metadata": null,
+      "source": "src/main/resources/data/blacklight/structures/blackwatch_checkpoint.nbt",
+      "sha256": "220e9c68c06ef38e26cea56c862c8133f6fbce66ca11a48e74ba6806d5437854"
+    },
+    {
+      "id": "blackwatch_outpost",
+      "platform": "forge",
+      "size": [
+        25,
+        9,
+        25
+      ],
+      "serialized_blocks": 5625,
+      "non_air_blocks": 1375,
+      "palette_size": 21,
+      "embedded_entities": [
+        {
+          "pos": [
+            7.5,
+            1.0,
+            7.5
+          ],
+          "blockPos": [
+            7,
+            1,
+            7
+          ],
+          "nbt": {
+            "id": "blacklight:blackwatch_soldier",
+            "PersistenceRequired": 1,
+            "Rotation": [
+              180.0,
+              0.0
+            ],
+            "MilitaryRank": "sergeant",
+            "MilitaryDeployment": "blackwatch_outpost",
+            "MilitaryDeploymentCapacity": 8,
+            "MilitaryDeploymentX": 5.0,
+            "MilitaryDeploymentY": 0.0,
+            "MilitaryDeploymentZ": 5.0
+          }
+        },
+        {
+          "pos": [
+            17.5,
+            1.0,
+            7.5
+          ],
+          "blockPos": [
+            17,
+            1,
+            7
+          ],
+          "nbt": {
+            "id": "blacklight:blackwatch_soldier",
+            "PersistenceRequired": 1,
+            "Rotation": [
+              180.0,
+              0.0
+            ],
+            "MilitaryRank": "private",
+            "MilitaryDeployment": "blackwatch_outpost",
+            "MilitaryDeploymentCapacity": 8,
+            "MilitaryDeploymentX": -5.0,
+            "MilitaryDeploymentY": 0.0,
+            "MilitaryDeploymentZ": 5.0
+          }
+        },
+        {
+          "pos": [
+            9.5,
+            1.0,
+            17.5
+          ],
+          "blockPos": [
+            9,
+            1,
+            17
+          ],
+          "nbt": {
+            "id": "blacklight:blackwatch_soldier",
+            "PersistenceRequired": 1,
+            "Rotation": [
+              180.0,
+              0.0
+            ],
+            "MilitaryRank": "private",
+            "MilitaryDeployment": "blackwatch_outpost",
+            "MilitaryDeploymentCapacity": 8,
+            "MilitaryDeploymentX": 3.0,
+            "MilitaryDeploymentY": 0.0,
+            "MilitaryDeploymentZ": -5.0
+          }
+        },
+        {
+          "pos": [
+            12.5,
+            1.0,
+            19.5
+          ],
+          "blockPos": [
+            12,
+            1,
+            19
+          ],
+          "nbt": {
+            "id": "blacklight:blackwatch_heavy",
+            "PersistenceRequired": 1,
+            "Rotation": [
+              180.0,
+              0.0
+            ],
+            "MilitaryRank": "corporal",
+            "MilitaryDeployment": "blackwatch_outpost",
+            "MilitaryDeploymentCapacity": 8,
+            "MilitaryDeploymentX": 0.0,
+            "MilitaryDeploymentY": 0.0,
+            "MilitaryDeploymentZ": -7.0
+          }
+        },
+        {
+          "pos": [
+            2.5,
+            7.0,
+            19.5
+          ],
+          "blockPos": [
+            2,
+            7,
+            19
+          ],
+          "nbt": {
+            "id": "blacklight:blackwatch_soldier",
+            "PersistenceRequired": 1,
+            "Rotation": [
+              180.0,
+              0.0
+            ],
+            "MilitaryRank": "private",
+            "MilitaryDeployment": "blackwatch_outpost",
+            "MilitaryDeploymentCapacity": 8,
+            "MilitaryDeploymentX": 10.0,
+            "MilitaryDeploymentY": -6.0,
+            "MilitaryDeploymentZ": -7.0
+          }
+        }
+      ],
+      "chests": [
+        {
+          "position": [
+            6,
+            2,
+            20
+          ],
+          "nbt": {
+            "id": "minecraft:chest",
+            "LootTable": "blacklight:chests/blackwatch_technology"
+          }
+        },
+        {
+          "position": [
+            13,
+            1,
+            21
+          ],
+          "nbt": {
+            "id": "minecraft:chest",
+            "LootTable": "blacklight:chests/blackwatch_supplies"
+          }
+        },
+        {
+          "position": [
+            18,
+            1,
+            20
+          ],
+          "nbt": {
+            "id": "minecraft:chest",
+            "LootTable": "blacklight:chests/blackwatch_technology"
+          }
+        }
+      ],
+      "runtime_metadata": null,
+      "source": "src/main/resources/data/blacklight/structures/blackwatch_outpost.nbt",
+      "sha256": "801d6088e76a5566efbb03d874721e7a65013eaa290c68b6b8d9838588827743"
+    },
+    {
+      "id": "frozen_research_station",
+      "platform": "forge",
+      "size": [
+        23,
+        21,
+        23
+      ],
+      "serialized_blocks": 4363,
+      "non_air_blocks": 2821,
+      "palette_size": 19,
+      "embedded_entities": [
+        {
+          "pos": [
+            4.5,
+            1.0,
+            11.5
+          ],
+          "blockPos": [
+            4,
+            1,
+            11
+          ],
+          "nbt": {
+            "id": "blacklight:infected_host",
+            "PersistenceRequired": 1,
+            "Health": 30.0,
+            "Rotation": [
+              0.0,
+              0.0
+            ],
+            "BlacklightHost": {
+              "Type": "minecraft:zombie",
+              "Family": "ground",
+              "Humanoid": 1,
+              "Quadruped": 0,
+              "Width": 0.671999990940094,
+              "Height": 2.184000015258789,
+              "Visual": {}
+            }
+          }
+        },
+        {
+          "pos": [
+            18.5,
+            1.0,
+            6.5
+          ],
+          "blockPos": [
+            18,
+            1,
+            6
+          ],
+          "nbt": {
+            "id": "blacklight:infected_host",
+            "PersistenceRequired": 1,
+            "Health": 30.0,
+            "Rotation": [
+              0.0,
+              0.0
+            ],
+            "BlacklightHost": {
+              "Type": "minecraft:zombie",
+              "Family": "ground",
+              "Humanoid": 1,
+              "Quadruped": 0,
+              "Width": 0.671999990940094,
+              "Height": 2.184000015258789,
+              "Visual": {}
+            }
+          }
+        }
+      ],
+      "chests": [
+        {
+          "position": [
+            3,
+            1,
+            14
+          ],
+          "nbt": {
+            "id": "minecraft:chest",
+            "LootTable": "blacklight:chests/research_supplies"
+          }
+        },
+        {
+          "position": [
+            11,
+            1,
+            19
+          ],
+          "nbt": {
+            "id": "minecraft:chest",
+            "LootTable": "blacklight:chests/research_samples"
+          }
+        }
+      ],
+      "runtime_metadata": null,
+      "source": "src/main/resources/data/blacklight/structures/frozen_research_station.nbt",
+      "sha256": "a6372878b35f88b835316a11fb6378ca5925efa9952a3b93ad2e0b7fe14329f3"
+    },
+    {
+      "id": "large_blackwatch_base",
+      "platform": "forge",
+      "size": [
+        65,
+        18,
+        81
+      ],
+      "serialized_blocks": 94770,
+      "non_air_blocks": 13667,
+      "palette_size": 50,
+      "embedded_entities": [],
+      "chests": [
+        {
+          "position": [
+            10,
+            1,
+            19
+          ],
+          "nbt": {
+            "id": "minecraft:chest",
+            "LootTable": "blacklight:chests/base_supplies"
+          }
+        },
+        {
+          "position": [
+            10,
+            1,
+            45
+          ],
+          "nbt": {
+            "id": "minecraft:chest",
+            "LootTable": "blacklight:chests/base_supplies"
+          }
+        },
+        {
+          "position": [
+            10,
+            1,
+            64
+          ],
+          "nbt": {
+            "id": "minecraft:chest",
+            "LootTable": "blacklight:chests/base_medical"
+          }
+        },
+        {
+          "position": [
+            10,
+            6,
+            19
+          ],
+          "nbt": {
+            "id": "minecraft:chest",
+            "LootTable": "blacklight:chests/base_supplies"
+          }
+        },
+        {
+          "position": [
+            10,
+            6,
+            45
+          ],
+          "nbt": {
+            "id": "minecraft:chest",
+            "LootTable": "blacklight:chests/base_supplies"
+          }
+        },
+        {
+          "position": [
+            10,
+            6,
+            64
+          ],
+          "nbt": {
+            "id": "minecraft:chest",
+            "LootTable": "blacklight:chests/base_medical"
+          }
+        },
+        {
+          "position": [
+            13,
+            1,
+            45
+          ],
+          "nbt": {
+            "id": "minecraft:chest",
+            "LootTable": "blacklight:chests/base_supplies"
+          }
+        },
+        {
+          "position": [
+            13,
+            6,
+            45
+          ],
+          "nbt": {
+            "id": "minecraft:chest",
+            "LootTable": "blacklight:chests/base_supplies"
+          }
+        },
+        {
+          "position": [
+            46,
+            1,
+            29
+          ],
+          "nbt": {
+            "id": "minecraft:chest",
+            "LootTable": "blacklight:chests/base_armory"
+          }
+        },
+        {
+          "position": [
+            46,
+            1,
+            39
+          ],
+          "nbt": {
+            "id": "minecraft:chest",
+            "LootTable": "blacklight:chests/base_armory"
+          }
+        },
+        {
+          "position": [
+            49,
+            1,
+            65
+          ],
+          "nbt": {
+            "id": "minecraft:chest",
+            "LootTable": "blacklight:chests/base_supplies"
+          }
+        },
+        {
+          "position": [
+            49,
+            6,
+            65
+          ],
+          "nbt": {
+            "id": "minecraft:chest",
+            "LootTable": "blacklight:chests/base_supplies"
+          }
+        },
+        {
+          "position": [
+            52,
+            1,
+            12
+          ],
+          "nbt": {
+            "id": "minecraft:chest",
+            "LootTable": "blacklight:chests/base_ammunition"
+          }
+        },
+        {
+          "position": [
+            54,
+            1,
+            12
+          ],
+          "nbt": {
+            "id": "minecraft:chest",
+            "LootTable": "blacklight:chests/base_ammunition"
+          }
+        }
+      ],
+      "runtime_metadata": {
+        "name": "large_blackwatch_base",
+        "faction": "blackwatch",
+        "width": 65,
+        "height": 18,
+        "depth": 81,
+        "entrance": [
+          32,
+          1,
+          80
+        ],
+        "entrance_width": 7,
+        "ammo_chests": [
+          [
+            52,
+            1,
+            12
+          ],
+          [
+            54,
+            1,
+            12
+          ]
+        ],
+        "guards": [
+          {
+            "x": 28,
+            "y": 1,
+            "z": 77,
+            "heavy": false,
+            "role": "entry"
+          },
+          {
+            "x": 36,
+            "y": 1,
+            "z": 77,
+            "heavy": true,
+            "role": "entry"
+          },
+          {
+            "x": 32,
+            "y": 1,
+            "z": 69,
+            "heavy": false,
+            "role": "motor_yard"
+          },
+          {
+            "x": 32,
+            "y": 1,
+            "z": 29,
+            "heavy": false,
+            "role": "central_lane"
+          },
+          {
+            "x": 4,
+            "y": 8,
+            "z": 4,
+            "heavy": false,
+            "role": "tower_northwest"
+          },
+          {
+            "x": 60,
+            "y": 8,
+            "z": 76,
+            "heavy": false,
+            "role": "tower_southeast"
+          },
+          {
+            "x": 4,
+            "y": 8,
+            "z": 76,
+            "heavy": false,
+            "role": "tower_southwest"
+          },
+          {
+            "x": 18,
+            "y": 1,
+            "z": 18,
+            "heavy": false,
+            "role": "command"
+          },
+          {
+            "x": 18,
+            "y": 6,
+            "z": 18,
+            "heavy": false,
+            "role": "operations"
+          },
+          {
+            "x": 18,
+            "y": 11,
+            "z": 12,
+            "heavy": false,
+            "role": "command_roof"
+          },
+          {
+            "x": 50,
+            "y": 1,
+            "z": 15,
+            "heavy": true,
+            "role": "ammunition"
+          },
+          {
+            "x": 16,
+            "y": 1,
+            "z": 41,
+            "heavy": false,
+            "role": "barracks"
+          },
+          {
+            "x": 16,
+            "y": 6,
+            "z": 41,
+            "heavy": false,
+            "role": "barracks_upper"
+          },
+          {
+            "x": 48,
+            "y": 1,
+            "z": 37,
+            "heavy": true,
+            "role": "armory"
+          },
+          {
+            "x": 35,
+            "y": 1,
+            "z": 12,
+            "heavy": false,
+            "role": "landing_pad"
+          },
+          {
+            "x": 40,
+            "y": 1,
+            "z": 51,
+            "heavy": false,
+            "role": "logistics"
+          },
+          {
+            "x": 47,
+            "y": 1,
+            "z": 55,
+            "heavy": true,
+            "role": "research"
+          },
+          {
+            "x": 48,
+            "y": 6,
+            "z": 60,
+            "heavy": false,
+            "role": "research_upper"
+          },
+          {
+            "x": 20,
+            "y": 1,
+            "z": 59,
+            "heavy": false,
+            "role": "isolation"
+          },
+          {
+            "x": 20,
+            "y": 6,
+            "z": 59,
+            "heavy": false,
+            "role": "isolation_upper"
+          }
+        ],
+        "modules": [
+          {
+            "name": "command",
+            "bounds": [
+              8,
+              0,
+              6,
+              25,
+              10,
+              21
+            ],
+            "entry": [
+              17,
+              1,
+              19
+            ],
+            "floors": 2
+          },
+          {
+            "name": "ammunition",
+            "bounds": [
+              45,
+              0,
+              5,
+              60,
+              5,
+              18
+            ],
+            "entry": [
+              52,
+              1,
+              16
+            ],
+            "floors": 1
+          },
+          {
+            "name": "barracks",
+            "bounds": [
+              8,
+              0,
+              29,
+              24,
+              10,
+              47
+            ],
+            "entry": [
+              22,
+              1,
+              44
+            ],
+            "floors": 2
+          },
+          {
+            "name": "armory",
+            "bounds": [
+              43,
+              0,
+              27,
+              59,
+              5,
+              42
+            ],
+            "entry": [
+              45,
+              1,
+              34
+            ],
+            "floors": 1
+          },
+          {
+            "name": "medical_isolation",
+            "bounds": [
+              8,
+              0,
+              52,
+              25,
+              10,
+              67
+            ],
+            "entry": [
+              23,
+              1,
+              61
+            ],
+            "floors": 2
+          },
+          {
+            "name": "containment_research",
+            "bounds": [
+              43,
+              0,
+              48,
+              59,
+              10,
+              67
+            ],
+            "entry": [
+              45,
+              1,
+              58
+            ],
+            "floors": 2
+          }
+        ],
+        "entities_embedded": false,
+        "loot_refresh": false,
+        "command_cores": [
+          [
+            11,
+            2,
+            9
+          ],
+          [
+            13,
+            2,
+            9
+          ],
+          [
+            15,
+            2,
+            9
+          ],
+          [
+            11,
+            7,
+            9
+          ],
+          [
+            13,
+            7,
+            9
+          ],
+          [
+            15,
+            7,
+            9
+          ]
+        ]
+      },
+      "source": "src/main/resources/data/blacklight/structures/large_blackwatch_base.nbt",
+      "sha256": "a3615c1dc9416e8da49741a4bd0fac02a826f93845d73ecb48943828cb92ac67",
+      "native_personnel_slots": 20
+    },
+    {
+      "id": "large_military_base",
+      "platform": "forge",
+      "size": [
+        65,
+        18,
+        65
+      ],
+      "serialized_blocks": 76050,
+      "non_air_blocks": 10163,
+      "palette_size": 48,
+      "embedded_entities": [],
+      "chests": [
+        {
+          "position": [
+            10,
+            1,
+            19
+          ],
+          "nbt": {
+            "id": "minecraft:chest",
+            "LootTable": "blacklight:chests/base_supplies"
+          }
+        },
+        {
+          "position": [
+            10,
+            1,
+            45
+          ],
+          "nbt": {
+            "id": "minecraft:chest",
+            "LootTable": "blacklight:chests/base_supplies"
+          }
+        },
+        {
+          "position": [
+            10,
+            1,
+            57
+          ],
+          "nbt": {
+            "id": "minecraft:chest",
+            "LootTable": "blacklight:chests/base_medical"
+          }
+        },
+        {
+          "position": [
+            10,
+            6,
+            19
+          ],
+          "nbt": {
+            "id": "minecraft:chest",
+            "LootTable": "blacklight:chests/base_supplies"
+          }
+        },
+        {
+          "position": [
+            10,
+            6,
+            45
+          ],
+          "nbt": {
+            "id": "minecraft:chest",
+            "LootTable": "blacklight:chests/base_supplies"
+          }
+        },
+        {
+          "position": [
+            13,
+            1,
+            45
+          ],
+          "nbt": {
+            "id": "minecraft:chest",
+            "LootTable": "blacklight:chests/base_supplies"
+          }
+        },
+        {
+          "position": [
+            13,
+            6,
+            45
+          ],
+          "nbt": {
+            "id": "minecraft:chest",
+            "LootTable": "blacklight:chests/base_supplies"
+          }
+        },
+        {
+          "position": [
+            45,
+            1,
+            52
+          ],
+          "nbt": {
+            "id": "minecraft:chest",
+            "LootTable": "blacklight:chests/base_supplies"
+          }
+        },
+        {
+          "position": [
+            46,
+            1,
+            29
+          ],
+          "nbt": {
+            "id": "minecraft:chest",
+            "LootTable": "blacklight:chests/base_armory"
+          }
+        },
+        {
+          "position": [
+            46,
+            1,
+            39
+          ],
+          "nbt": {
+            "id": "minecraft:chest",
+            "LootTable": "blacklight:chests/base_armory"
+          }
+        },
+        {
+          "position": [
+            52,
+            1,
+            12
+          ],
+          "nbt": {
+            "id": "minecraft:chest",
+            "LootTable": "blacklight:chests/base_ammunition"
+          }
+        },
+        {
+          "position": [
+            54,
+            1,
+            12
+          ],
+          "nbt": {
+            "id": "minecraft:chest",
+            "LootTable": "blacklight:chests/base_ammunition"
+          }
+        },
+        {
+          "position": [
+            55,
+            1,
+            52
+          ],
+          "nbt": {
+            "id": "minecraft:chest",
+            "LootTable": "blacklight:chests/base_supplies"
+          }
+        }
+      ],
+      "runtime_metadata": {
+        "name": "large_military_base",
+        "faction": "military",
+        "width": 65,
+        "height": 18,
+        "depth": 65,
+        "entrance": [
+          32,
+          1,
+          64
+        ],
+        "entrance_width": 7,
+        "ammo_chests": [
+          [
+            52,
+            1,
+            12
+          ],
+          [
+            54,
+            1,
+            12
+          ]
+        ],
+        "guards": [
+          {
+            "x": 28,
+            "y": 1,
+            "z": 61,
+            "heavy": false,
+            "role": "entry"
+          },
+          {
+            "x": 36,
+            "y": 1,
+            "z": 61,
+            "heavy": true,
+            "role": "entry"
+          },
+          {
+            "x": 32,
+            "y": 1,
+            "z": 53,
+            "heavy": false,
+            "role": "motor_yard"
+          },
+          {
+            "x": 32,
+            "y": 1,
+            "z": 29,
+            "heavy": false,
+            "role": "central_lane"
+          },
+          {
+            "x": 4,
+            "y": 8,
+            "z": 4,
+            "heavy": false,
+            "role": "tower_northwest"
+          },
+          {
+            "x": 60,
+            "y": 8,
+            "z": 60,
+            "heavy": false,
+            "role": "tower_southeast"
+          },
+          {
+            "x": 4,
+            "y": 8,
+            "z": 60,
+            "heavy": false,
+            "role": "tower_southwest"
+          },
+          {
+            "x": 18,
+            "y": 1,
+            "z": 18,
+            "heavy": false,
+            "role": "command"
+          },
+          {
+            "x": 18,
+            "y": 6,
+            "z": 18,
+            "heavy": false,
+            "role": "operations"
+          },
+          {
+            "x": 18,
+            "y": 11,
+            "z": 12,
+            "heavy": false,
+            "role": "command_roof"
+          },
+          {
+            "x": 50,
+            "y": 1,
+            "z": 15,
+            "heavy": true,
+            "role": "ammunition"
+          },
+          {
+            "x": 16,
+            "y": 1,
+            "z": 41,
+            "heavy": false,
+            "role": "barracks"
+          },
+          {
+            "x": 16,
+            "y": 6,
+            "z": 41,
+            "heavy": false,
+            "role": "barracks_upper"
+          },
+          {
+            "x": 48,
+            "y": 1,
+            "z": 37,
+            "heavy": true,
+            "role": "armory"
+          },
+          {
+            "x": 35,
+            "y": 1,
+            "z": 12,
+            "heavy": false,
+            "role": "landing_pad"
+          },
+          {
+            "x": 40,
+            "y": 1,
+            "z": 53,
+            "heavy": false,
+            "role": "logistics"
+          }
+        ],
+        "modules": [
+          {
+            "name": "command",
+            "bounds": [
+              8,
+              0,
+              6,
+              25,
+              10,
+              21
+            ],
+            "entry": [
+              17,
+              1,
+              19
+            ],
+            "floors": 2
+          },
+          {
+            "name": "ammunition",
+            "bounds": [
+              45,
+              0,
+              5,
+              60,
+              5,
+              18
+            ],
+            "entry": [
+              52,
+              1,
+              16
+            ],
+            "floors": 1
+          },
+          {
+            "name": "barracks",
+            "bounds": [
+              8,
+              0,
+              29,
+              24,
+              10,
+              47
+            ],
+            "entry": [
+              22,
+              1,
+              44
+            ],
+            "floors": 2
+          },
+          {
+            "name": "armory",
+            "bounds": [
+              43,
+              0,
+              27,
+              59,
+              5,
+              42
+            ],
+            "entry": [
+              45,
+              1,
+              34
+            ],
+            "floors": 1
+          },
+          {
+            "name": "medical",
+            "bounds": [
+              8,
+              0,
+              51,
+              23,
+              5,
+              59
+            ],
+            "entry": [
+              16,
+              1,
+              53
+            ],
+            "floors": 1
+          },
+          {
+            "name": "logistics_canopy",
+            "bounds": [
+              43,
+              0,
+              48,
+              58,
+              5,
+              59
+            ],
+            "entry": [
+              50,
+              1,
+              51
+            ],
+            "floors": 1
+          }
+        ],
+        "entities_embedded": false,
+        "loot_refresh": false,
+        "command_cores": [
+          [
+            11,
+            2,
+            9
+          ],
+          [
+            13,
+            2,
+            9
+          ],
+          [
+            15,
+            2,
+            9
+          ],
+          [
+            11,
+            7,
+            9
+          ],
+          [
+            13,
+            7,
+            9
+          ],
+          [
+            15,
+            7,
+            9
+          ]
+        ]
+      },
+      "source": "src/main/resources/data/blacklight/structures/large_military_base.nbt",
+      "sha256": "5c91bc9cd581eff2d83f8076538cab05b8d24a7c69d8a886dcfff496abe426ad",
+      "native_personnel_slots": 16
+    },
+    {
+      "id": "military_camp",
+      "platform": "forge",
+      "size": [
+        21,
+        9,
+        21
+      ],
+      "serialized_blocks": 3969,
+      "non_air_blocks": 976,
+      "palette_size": 16,
+      "embedded_entities": [
+        {
+          "pos": [
+            6.5,
+            1.0,
+            5.5
+          ],
+          "blockPos": [
+            6,
+            1,
+            5
+          ],
+          "nbt": {
+            "id": "blacklight:military_soldier",
+            "PersistenceRequired": 1,
+            "Rotation": [
+              180.0,
+              0.0
+            ],
+            "MilitaryRank": "sergeant",
+            "MilitaryDeployment": "military_camp",
+            "MilitaryDeploymentCapacity": 8,
+            "MilitaryDeploymentX": 4.0,
+            "MilitaryDeploymentY": 0.0,
+            "MilitaryDeploymentZ": 5.0
+          }
+        },
+        {
+          "pos": [
+            14.5,
+            1.0,
+            5.5
+          ],
+          "blockPos": [
+            14,
+            1,
+            5
+          ],
+          "nbt": {
+            "id": "blacklight:military_soldier",
+            "PersistenceRequired": 1,
+            "Rotation": [
+              180.0,
+              0.0
+            ],
+            "MilitaryRank": "private",
+            "MilitaryDeployment": "military_camp",
+            "MilitaryDeploymentCapacity": 8,
+            "MilitaryDeploymentX": -4.0,
+            "MilitaryDeploymentY": 0.0,
+            "MilitaryDeploymentZ": 5.0
+          }
+        },
+        {
+          "pos": [
+            10.5,
+            1.0,
+            10.5
+          ],
+          "blockPos": [
+            10,
+            1,
+            10
+          ],
+          "nbt": {
+            "id": "blacklight:military_soldier",
+            "PersistenceRequired": 1,
+            "Rotation": [
+              180.0,
+              0.0
+            ],
+            "MilitaryRank": "private",
+            "MilitaryDeployment": "military_camp",
+            "MilitaryDeploymentCapacity": 8,
+            "MilitaryDeploymentX": 0.0,
+            "MilitaryDeploymentY": 0.0,
+            "MilitaryDeploymentZ": 0.0
+          }
+        },
+        {
+          "pos": [
+            6.5,
+            1.0,
+            16.5
+          ],
+          "blockPos": [
+            6,
+            1,
+            16
+          ],
+          "nbt": {
+            "id": "blacklight:military_soldier",
+            "PersistenceRequired": 1,
+            "Rotation": [
+              180.0,
+              0.0
+            ],
+            "MilitaryRank": "private",
+            "MilitaryDeployment": "military_camp",
+            "MilitaryDeploymentCapacity": 8,
+            "MilitaryDeploymentX": 4.0,
+            "MilitaryDeploymentY": 0.0,
+            "MilitaryDeploymentZ": -6.0
+          }
+        },
+        {
+          "pos": [
+            14.5,
+            1.0,
+            16.5
+          ],
+          "blockPos": [
+            14,
+            1,
+            16
+          ],
+          "nbt": {
+            "id": "blacklight:military_heavy",
+            "PersistenceRequired": 1,
+            "Rotation": [
+              180.0,
+              0.0
+            ],
+            "MilitaryRank": "corporal",
+            "MilitaryDeployment": "military_camp",
+            "MilitaryDeploymentCapacity": 8,
+            "MilitaryDeploymentX": -4.0,
+            "MilitaryDeploymentY": 0.0,
+            "MilitaryDeploymentZ": -6.0
+          }
+        },
+        {
+          "pos": [
+            17.5,
+            1.0,
+            8.5
+          ],
+          "blockPos": [
+            17,
+            1,
+            8
+          ],
+          "nbt": {
+            "id": "blacklight:military_soldier",
+            "PersistenceRequired": 1,
+            "Rotation": [
+              180.0,
+              0.0
+            ],
+            "MilitaryRank": "private",
+            "MilitaryDeployment": "military_camp",
+            "MilitaryDeploymentCapacity": 8,
+            "MilitaryDeploymentX": -7.0,
+            "MilitaryDeploymentY": 0.0,
+            "MilitaryDeploymentZ": 2.0
+          }
+        },
+        {
+          "pos": [
+            3.5,
+            7.0,
+            4.5
+          ],
+          "blockPos": [
+            3,
+            7,
+            4
+          ],
+          "nbt": {
+            "id": "blacklight:military_soldier",
+            "PersistenceRequired": 1,
+            "Rotation": [
+              180.0,
+              0.0
+            ],
+            "MilitaryRank": "private",
+            "MilitaryDeployment": "military_camp",
+            "MilitaryDeploymentCapacity": 8,
+            "MilitaryDeploymentX": 7.0,
+            "MilitaryDeploymentY": -6.0,
+            "MilitaryDeploymentZ": 6.0
+          }
+        },
+        {
+          "pos": [
+            10.5,
+            1.0,
+            17.5
+          ],
+          "blockPos": [
+            10,
+            1,
+            17
+          ],
+          "nbt": {
+            "id": "blacklight:military_soldier",
+            "PersistenceRequired": 1,
+            "Rotation": [
+              180.0,
+              0.0
+            ],
+            "MilitaryRank": "private",
+            "MilitaryDeployment": "military_camp",
+            "MilitaryDeploymentCapacity": 8,
+            "MilitaryDeploymentX": 0.0,
+            "MilitaryDeploymentY": 0.0,
+            "MilitaryDeploymentZ": -7.0
+          }
+        }
+      ],
+      "chests": [
+        {
+          "position": [
+            6,
+            1,
+            17
+          ],
+          "nbt": {
+            "id": "minecraft:chest",
+            "LootTable": "blacklight:chests/blackwatch_technology"
+          }
+        },
+        {
+          "position": [
+            16,
+            1,
+            17
+          ],
+          "nbt": {
+            "id": "minecraft:chest",
+            "LootTable": "blacklight:chests/blackwatch_supplies"
+          }
+        }
+      ],
+      "runtime_metadata": null,
+      "source": "src/main/resources/data/blacklight/structures/military_camp.nbt",
+      "sha256": "25f480997fa2921f8a2feb849e4a33dd328e522d89998f4bbfd5cb4a714f21f0"
+    },
+    {
+      "id": "military_checkpoint",
+      "platform": "forge",
+      "size": [
+        17,
+        9,
+        17
+      ],
+      "serialized_blocks": 2601,
+      "non_air_blocks": 583,
+      "palette_size": 10,
+      "embedded_entities": [
+        {
+          "pos": [
+            3.5,
+            1.0,
+            6.5
+          ],
+          "blockPos": [
+            3,
+            1,
+            6
+          ],
+          "nbt": {
+            "id": "blacklight:military_soldier",
+            "PersistenceRequired": 1,
+            "Rotation": [
+              180.0,
+              0.0
+            ],
+            "MilitaryRank": "sergeant",
+            "MilitaryDeployment": "military_checkpoint",
+            "MilitaryDeploymentCapacity": 8,
+            "MilitaryDeploymentX": 5.0,
+            "MilitaryDeploymentY": 0.0,
+            "MilitaryDeploymentZ": 2.0
+          }
+        },
+        {
+          "pos": [
+            13.5,
+            1.0,
+            6.5
+          ],
+          "blockPos": [
+            13,
+            1,
+            6
+          ],
+          "nbt": {
+            "id": "blacklight:military_soldier",
+            "PersistenceRequired": 1,
+            "Rotation": [
+              180.0,
+              0.0
+            ],
+            "MilitaryRank": "private",
+            "MilitaryDeployment": "military_checkpoint",
+            "MilitaryDeploymentCapacity": 8,
+            "MilitaryDeploymentX": -5.0,
+            "MilitaryDeploymentY": 0.0,
+            "MilitaryDeploymentZ": 2.0
+          }
+        },
+        {
+          "pos": [
+            8.5,
+            1.0,
+            12.5
+          ],
+          "blockPos": [
+            8,
+            1,
+            12
+          ],
+          "nbt": {
+            "id": "blacklight:military_heavy",
+            "PersistenceRequired": 1,
+            "Rotation": [
+              180.0,
+              0.0
+            ],
+            "MilitaryRank": "corporal",
+            "MilitaryDeployment": "military_checkpoint",
+            "MilitaryDeploymentCapacity": 8,
+            "MilitaryDeploymentX": 0.0,
+            "MilitaryDeploymentY": 0.0,
+            "MilitaryDeploymentZ": -4.0
+          }
+        },
+        {
+          "pos": [
+            8.5,
+            1.0,
+            5.5
+          ],
+          "blockPos": [
+            8,
+            1,
+            5
+          ],
+          "nbt": {
+            "id": "blacklight:military_soldier",
+            "PersistenceRequired": 1,
+            "Rotation": [
+              180.0,
+              0.0
+            ],
+            "MilitaryRank": "private",
+            "MilitaryDeployment": "military_checkpoint",
+            "MilitaryDeploymentCapacity": 8,
+            "MilitaryDeploymentX": 0.0,
+            "MilitaryDeploymentY": 0.0,
+            "MilitaryDeploymentZ": 3.0
+          }
+        }
+      ],
+      "chests": [
+        {
+          "position": [
+            2,
+            1,
+            13
+          ],
+          "nbt": {
+            "id": "minecraft:chest",
+            "LootTable": "blacklight:chests/blackwatch_technology"
+          }
+        },
+        {
+          "position": [
+            12,
+            1,
+            13
+          ],
+          "nbt": {
+            "id": "minecraft:chest",
+            "LootTable": "blacklight:chests/blackwatch_supplies"
+          }
+        }
+      ],
+      "runtime_metadata": null,
+      "source": "src/main/resources/data/blacklight/structures/military_checkpoint.nbt",
+      "sha256": "d7798ca6efb4788811b0758faab6f65f7a82f1cb204a36a9d1f0597a526705b8"
+    },
+    {
+      "id": "vehicle_garage_blackwatch",
+      "platform": "forge",
+      "size": [
+        31,
+        10,
+        27
+      ],
+      "serialized_blocks": 8370,
+      "non_air_blocks": 2438,
+      "palette_size": 12,
+      "embedded_entities": [],
+      "chests": [
+        {
+          "position": [
+            5,
+            1,
+            2
+          ],
+          "nbt": {
+            "id": "minecraft:chest",
+            "Items": [
+              {
+                "Slot": 0,
+                "id": "blacklight:vehicle_repair_parts",
+                "Count": 4
+              }
+            ]
+          }
+        },
+        {
+          "position": [
+            15,
+            1,
+            2
+          ],
+          "nbt": {
+            "id": "minecraft:chest",
+            "Items": [
+              {
+                "Slot": 0,
+                "id": "blacklight:vehicle_repair_parts",
+                "Count": 4
+              },
+              {
+                "Slot": 1,
+                "id": "blacklight:tank_he_shell",
+                "Count": 12
+              },
+              {
+                "Slot": 2,
+                "id": "blacklight:tank_ap_shell",
+                "Count": 8
+              },
+              {
+                "Slot": 3,
+                "id": "blacklight:machine_gun_round",
+                "Count": 64
+              },
+              {
+                "Slot": 4,
+                "id": "blacklight:machine_gun_round",
+                "Count": 64
+              },
+              {
+                "Slot": 5,
+                "id": "blacklight:machine_gun_round",
+                "Count": 64
+              },
+              {
+                "Slot": 6,
+                "id": "blacklight:machine_gun_round",
+                "Count": 48
+              }
+            ]
+          }
+        },
+        {
+          "position": [
+            25,
+            1,
+            2
+          ],
+          "nbt": {
+            "id": "minecraft:chest",
+            "Items": [
+              {
+                "Slot": 0,
+                "id": "blacklight:vehicle_repair_parts",
+                "Count": 4
+              },
+              {
+                "Slot": 1,
+                "id": "blacklight:autocannon_round",
+                "Count": 64
+              },
+              {
+                "Slot": 2,
+                "id": "blacklight:autocannon_round",
+                "Count": 56
+              },
+              {
+                "Slot": 3,
+                "id": "blacklight:rocket_round",
+                "Count": 4
+              }
+            ]
+          }
+        }
+      ],
+      "runtime_metadata": null,
+      "source": "src/main/resources/data/blacklight/structures/vehicle_garage_blackwatch.nbt",
+      "sha256": "fb505927279a4b4c5b77276a7fd827ce418d66cd4bc4ac47902335a943027112"
+    },
+    {
+      "id": "vehicle_garage_military",
+      "platform": "forge",
+      "size": [
+        31,
+        10,
+        27
+      ],
+      "serialized_blocks": 8370,
+      "non_air_blocks": 2438,
+      "palette_size": 12,
+      "embedded_entities": [],
+      "chests": [
+        {
+          "position": [
+            5,
+            1,
+            2
+          ],
+          "nbt": {
+            "id": "minecraft:chest",
+            "Items": [
+              {
+                "Slot": 0,
+                "id": "blacklight:vehicle_repair_parts",
+                "Count": 4
+              }
+            ]
+          }
+        },
+        {
+          "position": [
+            15,
+            1,
+            2
+          ],
+          "nbt": {
+            "id": "minecraft:chest",
+            "Items": [
+              {
+                "Slot": 0,
+                "id": "blacklight:vehicle_repair_parts",
+                "Count": 4
+              },
+              {
+                "Slot": 1,
+                "id": "blacklight:tank_he_shell",
+                "Count": 12
+              },
+              {
+                "Slot": 2,
+                "id": "blacklight:tank_ap_shell",
+                "Count": 8
+              },
+              {
+                "Slot": 3,
+                "id": "blacklight:machine_gun_round",
+                "Count": 64
+              },
+              {
+                "Slot": 4,
+                "id": "blacklight:machine_gun_round",
+                "Count": 64
+              },
+              {
+                "Slot": 5,
+                "id": "blacklight:machine_gun_round",
+                "Count": 64
+              },
+              {
+                "Slot": 6,
+                "id": "blacklight:machine_gun_round",
+                "Count": 48
+              }
+            ]
+          }
+        },
+        {
+          "position": [
+            25,
+            1,
+            2
+          ],
+          "nbt": {
+            "id": "minecraft:chest",
+            "Items": [
+              {
+                "Slot": 0,
+                "id": "blacklight:vehicle_repair_parts",
+                "Count": 4
+              },
+              {
+                "Slot": 1,
+                "id": "blacklight:autocannon_round",
+                "Count": 64
+              },
+              {
+                "Slot": 2,
+                "id": "blacklight:autocannon_round",
+                "Count": 56
+              },
+              {
+                "Slot": 3,
+                "id": "blacklight:rocket_round",
+                "Count": 4
+              }
+            ]
+          }
+        }
+      ],
+      "runtime_metadata": null,
+      "source": "src/main/resources/data/blacklight/structures/vehicle_garage_military.nbt",
+      "sha256": "3b2b294e1a64066901075e6cbe63e258800fc1b40041d260ba532f4adb1ce357"
+    }
+  ],
+  "recipes": [
+    {
+      "platform": "neoforge",
+      "id": "military_truck_chassis",
+      "ingredients": {
+        "minecraft:iron_block": 6,
+        "minecraft:copper_block": 2,
+        "minecraft:furnace": 1
+      },
+      "result": "blacklight:military_truck_chassis",
+      "count": 1,
+      "source": "src/main/resources/data/blacklight/recipe/military_truck_chassis.json",
+      "raw": {
+        "type": "minecraft:crafting_shaped",
+        "pattern": [
+          "ICI",
+          "IFI",
+          "ICI"
+        ],
+        "key": {
+          "I": {
+            "item": "minecraft:iron_block"
+          },
+          "C": {
+            "item": "minecraft:copper_block"
+          },
+          "F": {
+            "item": "minecraft:furnace"
+          }
+        },
+        "result": {
+          "id": "blacklight:military_truck_chassis",
+          "count": 1
+        }
+      },
+      "active": true,
+      "policy": "active"
+    },
+    {
+      "platform": "neoforge",
+      "id": "military_apc_chassis",
+      "ingredients": {
+        "minecraft:iron_block": 6,
+        "minecraft:redstone_block": 1,
+        "blacklight:military_truck_chassis": 1,
+        "minecraft:observer": 1
+      },
+      "result": "blacklight:military_apc_chassis",
+      "count": 1,
+      "source": "src/main/resources/data/blacklight/recipe/military_apc_chassis.json",
+      "raw": {
+        "type": "minecraft:crafting_shaped",
+        "pattern": [
+          "IRI",
+          "ITI",
+          "IOI"
+        ],
+        "key": {
+          "I": {
+            "item": "minecraft:iron_block"
+          },
+          "R": {
+            "item": "minecraft:redstone_block"
+          },
+          "T": {
+            "item": "blacklight:military_truck_chassis"
+          },
+          "O": {
+            "item": "minecraft:observer"
+          }
+        },
+        "result": {
+          "id": "blacklight:military_apc_chassis",
+          "count": 1
+        }
+      },
+      "active": true,
+      "policy": "active"
+    },
+    {
+      "platform": "neoforge",
+      "id": "military_tank_chassis",
+      "ingredients": {
+        "minecraft:iron_block": 6,
+        "minecraft:redstone_block": 1,
+        "blacklight:military_apc_chassis": 1,
+        "minecraft:dispenser": 1
+      },
+      "result": "blacklight:military_tank_chassis",
+      "count": 1,
+      "source": "src/main/resources/data/blacklight/recipe/military_tank_chassis.json",
+      "raw": {
+        "type": "minecraft:crafting_shaped",
+        "pattern": [
+          "IRI",
+          "IAI",
+          "IDI"
+        ],
+        "key": {
+          "I": {
+            "item": "minecraft:iron_block"
+          },
+          "R": {
+            "item": "minecraft:redstone_block"
+          },
+          "A": {
+            "item": "blacklight:military_apc_chassis"
+          },
+          "D": {
+            "item": "minecraft:dispenser"
+          }
+        },
+        "result": {
+          "id": "blacklight:military_tank_chassis",
+          "count": 1
+        }
+      },
+      "active": true,
+      "policy": "active"
+    },
+    {
+      "platform": "neoforge",
+      "id": "blackwatch_truck_chassis",
+      "ingredients": {
+        "blacklight:military_truck_chassis": 1,
+        "minecraft:black_dye": 1
+      },
+      "result": "blacklight:blackwatch_truck_chassis",
+      "count": 1,
+      "source": "src/main/resources/data/blacklight/recipe/blackwatch_truck_chassis.json",
+      "raw": {
+        "type": "minecraft:crafting_shapeless",
+        "ingredients": [
+          {
+            "item": "blacklight:military_truck_chassis"
+          },
+          {
+            "item": "minecraft:black_dye"
+          }
+        ],
+        "result": {
+          "id": "blacklight:blackwatch_truck_chassis",
+          "count": 1
+        }
+      },
+      "active": true,
+      "policy": "active"
+    },
+    {
+      "platform": "neoforge",
+      "id": "blackwatch_apc_chassis",
+      "ingredients": {
+        "blacklight:military_apc_chassis": 1,
+        "minecraft:black_dye": 1
+      },
+      "result": "blacklight:blackwatch_apc_chassis",
+      "count": 1,
+      "source": "src/main/resources/data/blacklight/recipe/blackwatch_apc_chassis.json",
+      "raw": {
+        "type": "minecraft:crafting_shapeless",
+        "ingredients": [
+          {
+            "item": "blacklight:military_apc_chassis"
+          },
+          {
+            "item": "minecraft:black_dye"
+          }
+        ],
+        "result": {
+          "id": "blacklight:blackwatch_apc_chassis",
+          "count": 1
+        }
+      },
+      "active": true,
+      "policy": "active"
+    },
+    {
+      "platform": "neoforge",
+      "id": "blackwatch_tank_chassis",
+      "ingredients": {
+        "blacklight:military_tank_chassis": 1,
+        "minecraft:black_dye": 1
+      },
+      "result": "blacklight:blackwatch_tank_chassis",
+      "count": 1,
+      "source": "src/main/resources/data/blacklight/recipe/blackwatch_tank_chassis.json",
+      "raw": {
+        "type": "minecraft:crafting_shapeless",
+        "ingredients": [
+          {
+            "item": "blacklight:military_tank_chassis"
+          },
+          {
+            "item": "minecraft:black_dye"
+          }
+        ],
+        "result": {
+          "id": "blacklight:blackwatch_tank_chassis",
+          "count": 1
+        }
+      },
+      "active": true,
+      "policy": "active"
+    },
+    {
+      "platform": "neoforge",
+      "id": "autocannon_round",
+      "ingredients": {
+        "minecraft:iron_ingot": 2,
+        "minecraft:copper_ingot": 1,
+        "minecraft:gunpowder": 1
+      },
+      "result": "blacklight:autocannon_round",
+      "count": 8,
+      "source": "src/main/resources/data/blacklight/recipe/autocannon_round.json",
+      "raw": {
+        "type": "minecraft:crafting_shapeless",
+        "ingredients": [
+          {
+            "item": "minecraft:iron_ingot"
+          },
+          {
+            "item": "minecraft:iron_ingot"
+          },
+          {
+            "item": "minecraft:copper_ingot"
+          },
+          {
+            "item": "minecraft:gunpowder"
+          }
+        ],
+        "result": {
+          "id": "blacklight:autocannon_round",
+          "count": 8
+        }
+      },
+      "active": true,
+      "policy": "active"
+    },
+    {
+      "platform": "neoforge",
+      "id": "tank_he_shell",
+      "ingredients": {
+        "minecraft:iron_ingot": 2,
+        "minecraft:gunpowder": 2,
+        "minecraft:copper_ingot": 1
+      },
+      "result": "blacklight:tank_he_shell",
+      "count": 1,
+      "source": "src/main/resources/data/blacklight/recipe/tank_he_shell.json",
+      "raw": {
+        "type": "minecraft:crafting_shapeless",
+        "ingredients": [
+          {
+            "item": "minecraft:iron_ingot"
+          },
+          {
+            "item": "minecraft:iron_ingot"
+          },
+          {
+            "item": "minecraft:gunpowder"
+          },
+          {
+            "item": "minecraft:gunpowder"
+          },
+          {
+            "item": "minecraft:copper_ingot"
+          }
+        ],
+        "result": {
+          "id": "blacklight:tank_he_shell",
+          "count": 1
+        }
+      },
+      "active": true,
+      "policy": "active"
+    },
+    {
+      "platform": "neoforge",
+      "id": "tank_ap_shell",
+      "ingredients": {
+        "minecraft:iron_ingot": 3,
+        "minecraft:gunpowder": 1,
+        "minecraft:copper_ingot": 1
+      },
+      "result": "blacklight:tank_ap_shell",
+      "count": 1,
+      "source": "src/main/resources/data/blacklight/recipe/tank_ap_shell.json",
+      "raw": {
+        "type": "minecraft:crafting_shapeless",
+        "ingredients": [
+          {
+            "item": "minecraft:iron_ingot"
+          },
+          {
+            "item": "minecraft:iron_ingot"
+          },
+          {
+            "item": "minecraft:iron_ingot"
+          },
+          {
+            "item": "minecraft:gunpowder"
+          },
+          {
+            "item": "minecraft:copper_ingot"
+          }
+        ],
+        "result": {
+          "id": "blacklight:tank_ap_shell",
+          "count": 1
+        }
+      },
+      "active": true,
+      "policy": "active"
+    },
+    {
+      "platform": "neoforge",
+      "id": "military_fuel_can",
+      "ingredients": {
+        "minecraft:coal": 4,
+        "minecraft:iron_ingot": 2,
+        "minecraft:glass_bottle": 1
+      },
+      "result": "blacklight:military_fuel_can",
+      "count": 1,
+      "source": "src/main/resources/data/blacklight/recipe/military_fuel_can.json",
+      "raw": {
+        "type": "minecraft:crafting_shapeless",
+        "ingredients": [
+          {
+            "item": "minecraft:coal"
+          },
+          {
+            "item": "minecraft:coal"
+          },
+          {
+            "item": "minecraft:coal"
+          },
+          {
+            "item": "minecraft:coal"
+          },
+          {
+            "item": "minecraft:iron_ingot"
+          },
+          {
+            "item": "minecraft:iron_ingot"
+          },
+          {
+            "item": "minecraft:glass_bottle"
+          }
+        ],
+        "result": {
+          "id": "blacklight:military_fuel_can",
+          "count": 1
+        }
+      },
+      "active": false,
+      "policy": "preserved_on_disk_excluded_from_game_build"
+    },
+    {
+      "platform": "neoforge",
+      "id": "vehicle_repair_parts",
+      "ingredients": {
+        "minecraft:iron_ingot": 2,
+        "minecraft:redstone": 1
+      },
+      "result": "blacklight:vehicle_repair_parts",
+      "count": 1,
+      "source": "src/main/resources/data/blacklight/recipe/vehicle_repair_parts.json",
+      "raw": {
+        "type": "minecraft:crafting_shapeless",
+        "ingredients": [
+          {
+            "item": "minecraft:iron_ingot"
+          },
+          {
+            "item": "minecraft:iron_ingot"
+          },
+          {
+            "item": "minecraft:redstone"
+          }
+        ],
+        "result": {
+          "id": "blacklight:vehicle_repair_parts",
+          "count": 1
+        }
+      },
+      "active": true,
+      "policy": "active"
+    },
+    {
+      "platform": "forge",
+      "id": "military_truck_chassis",
+      "ingredients": {
+        "minecraft:iron_block": 6,
+        "minecraft:copper_block": 2,
+        "minecraft:furnace": 1
+      },
+      "result": "blacklight:military_truck_chassis",
+      "count": 1,
+      "source": "src/main/resources/data/blacklight/recipes/military_truck_chassis.json",
+      "raw": {
+        "type": "minecraft:crafting_shaped",
+        "pattern": [
+          "ICI",
+          "IFI",
+          "ICI"
+        ],
+        "key": {
+          "I": {
+            "item": "minecraft:iron_block"
+          },
+          "C": {
+            "item": "minecraft:copper_block"
+          },
+          "F": {
+            "item": "minecraft:furnace"
+          }
+        },
+        "result": {
+          "item": "blacklight:military_truck_chassis",
+          "count": 1
+        }
+      },
+      "active": true,
+      "policy": "active"
+    },
+    {
+      "platform": "forge",
+      "id": "military_apc_chassis",
+      "ingredients": {
+        "minecraft:iron_block": 6,
+        "minecraft:redstone_block": 1,
+        "blacklight:military_truck_chassis": 1,
+        "minecraft:observer": 1
+      },
+      "result": "blacklight:military_apc_chassis",
+      "count": 1,
+      "source": "src/main/resources/data/blacklight/recipes/military_apc_chassis.json",
+      "raw": {
+        "type": "minecraft:crafting_shaped",
+        "pattern": [
+          "IRI",
+          "ITI",
+          "IOI"
+        ],
+        "key": {
+          "I": {
+            "item": "minecraft:iron_block"
+          },
+          "R": {
+            "item": "minecraft:redstone_block"
+          },
+          "T": {
+            "item": "blacklight:military_truck_chassis"
+          },
+          "O": {
+            "item": "minecraft:observer"
+          }
+        },
+        "result": {
+          "item": "blacklight:military_apc_chassis",
+          "count": 1
+        }
+      },
+      "active": true,
+      "policy": "active"
+    },
+    {
+      "platform": "forge",
+      "id": "military_tank_chassis",
+      "ingredients": {
+        "minecraft:iron_block": 6,
+        "minecraft:redstone_block": 1,
+        "blacklight:military_apc_chassis": 1,
+        "minecraft:dispenser": 1
+      },
+      "result": "blacklight:military_tank_chassis",
+      "count": 1,
+      "source": "src/main/resources/data/blacklight/recipes/military_tank_chassis.json",
+      "raw": {
+        "type": "minecraft:crafting_shaped",
+        "pattern": [
+          "IRI",
+          "IAI",
+          "IDI"
+        ],
+        "key": {
+          "I": {
+            "item": "minecraft:iron_block"
+          },
+          "R": {
+            "item": "minecraft:redstone_block"
+          },
+          "A": {
+            "item": "blacklight:military_apc_chassis"
+          },
+          "D": {
+            "item": "minecraft:dispenser"
+          }
+        },
+        "result": {
+          "item": "blacklight:military_tank_chassis",
+          "count": 1
+        }
+      },
+      "active": true,
+      "policy": "active"
+    },
+    {
+      "platform": "forge",
+      "id": "blackwatch_truck_chassis",
+      "ingredients": {
+        "blacklight:military_truck_chassis": 1,
+        "minecraft:black_dye": 1
+      },
+      "result": "blacklight:blackwatch_truck_chassis",
+      "count": 1,
+      "source": "src/main/resources/data/blacklight/recipes/blackwatch_truck_chassis.json",
+      "raw": {
+        "type": "minecraft:crafting_shapeless",
+        "ingredients": [
+          {
+            "item": "blacklight:military_truck_chassis"
+          },
+          {
+            "item": "minecraft:black_dye"
+          }
+        ],
+        "result": {
+          "item": "blacklight:blackwatch_truck_chassis",
+          "count": 1
+        }
+      },
+      "active": true,
+      "policy": "active"
+    },
+    {
+      "platform": "forge",
+      "id": "blackwatch_apc_chassis",
+      "ingredients": {
+        "blacklight:military_apc_chassis": 1,
+        "minecraft:black_dye": 1
+      },
+      "result": "blacklight:blackwatch_apc_chassis",
+      "count": 1,
+      "source": "src/main/resources/data/blacklight/recipes/blackwatch_apc_chassis.json",
+      "raw": {
+        "type": "minecraft:crafting_shapeless",
+        "ingredients": [
+          {
+            "item": "blacklight:military_apc_chassis"
+          },
+          {
+            "item": "minecraft:black_dye"
+          }
+        ],
+        "result": {
+          "item": "blacklight:blackwatch_apc_chassis",
+          "count": 1
+        }
+      },
+      "active": true,
+      "policy": "active"
+    },
+    {
+      "platform": "forge",
+      "id": "blackwatch_tank_chassis",
+      "ingredients": {
+        "blacklight:military_tank_chassis": 1,
+        "minecraft:black_dye": 1
+      },
+      "result": "blacklight:blackwatch_tank_chassis",
+      "count": 1,
+      "source": "src/main/resources/data/blacklight/recipes/blackwatch_tank_chassis.json",
+      "raw": {
+        "type": "minecraft:crafting_shapeless",
+        "ingredients": [
+          {
+            "item": "blacklight:military_tank_chassis"
+          },
+          {
+            "item": "minecraft:black_dye"
+          }
+        ],
+        "result": {
+          "item": "blacklight:blackwatch_tank_chassis",
+          "count": 1
+        }
+      },
+      "active": true,
+      "policy": "active"
+    },
+    {
+      "platform": "forge",
+      "id": "autocannon_round",
+      "ingredients": {
+        "minecraft:iron_ingot": 2,
+        "minecraft:copper_ingot": 1,
+        "minecraft:gunpowder": 1
+      },
+      "result": "blacklight:autocannon_round",
+      "count": 8,
+      "source": "src/main/resources/data/blacklight/recipes/autocannon_round.json",
+      "raw": {
+        "type": "minecraft:crafting_shapeless",
+        "ingredients": [
+          {
+            "item": "minecraft:iron_ingot"
+          },
+          {
+            "item": "minecraft:iron_ingot"
+          },
+          {
+            "item": "minecraft:copper_ingot"
+          },
+          {
+            "item": "minecraft:gunpowder"
+          }
+        ],
+        "result": {
+          "item": "blacklight:autocannon_round",
+          "count": 8
+        }
+      },
+      "active": true,
+      "policy": "active"
+    },
+    {
+      "platform": "forge",
+      "id": "tank_he_shell",
+      "ingredients": {
+        "minecraft:iron_ingot": 2,
+        "minecraft:gunpowder": 2,
+        "minecraft:copper_ingot": 1
+      },
+      "result": "blacklight:tank_he_shell",
+      "count": 1,
+      "source": "src/main/resources/data/blacklight/recipes/tank_he_shell.json",
+      "raw": {
+        "type": "minecraft:crafting_shapeless",
+        "ingredients": [
+          {
+            "item": "minecraft:iron_ingot"
+          },
+          {
+            "item": "minecraft:iron_ingot"
+          },
+          {
+            "item": "minecraft:gunpowder"
+          },
+          {
+            "item": "minecraft:gunpowder"
+          },
+          {
+            "item": "minecraft:copper_ingot"
+          }
+        ],
+        "result": {
+          "item": "blacklight:tank_he_shell",
+          "count": 1
+        }
+      },
+      "active": true,
+      "policy": "active"
+    },
+    {
+      "platform": "forge",
+      "id": "tank_ap_shell",
+      "ingredients": {
+        "minecraft:iron_ingot": 3,
+        "minecraft:gunpowder": 1,
+        "minecraft:copper_ingot": 1
+      },
+      "result": "blacklight:tank_ap_shell",
+      "count": 1,
+      "source": "src/main/resources/data/blacklight/recipes/tank_ap_shell.json",
+      "raw": {
+        "type": "minecraft:crafting_shapeless",
+        "ingredients": [
+          {
+            "item": "minecraft:iron_ingot"
+          },
+          {
+            "item": "minecraft:iron_ingot"
+          },
+          {
+            "item": "minecraft:iron_ingot"
+          },
+          {
+            "item": "minecraft:gunpowder"
+          },
+          {
+            "item": "minecraft:copper_ingot"
+          }
+        ],
+        "result": {
+          "item": "blacklight:tank_ap_shell",
+          "count": 1
+        }
+      },
+      "active": true,
+      "policy": "active"
+    },
+    {
+      "platform": "forge",
+      "id": "military_fuel_can",
+      "ingredients": {
+        "minecraft:coal": 4,
+        "minecraft:iron_ingot": 2,
+        "minecraft:glass_bottle": 1
+      },
+      "result": "blacklight:military_fuel_can",
+      "count": 1,
+      "source": "src/main/resources/data/blacklight/recipes/military_fuel_can.json",
+      "raw": {
+        "type": "minecraft:crafting_shapeless",
+        "ingredients": [
+          {
+            "item": "minecraft:coal"
+          },
+          {
+            "item": "minecraft:coal"
+          },
+          {
+            "item": "minecraft:coal"
+          },
+          {
+            "item": "minecraft:coal"
+          },
+          {
+            "item": "minecraft:iron_ingot"
+          },
+          {
+            "item": "minecraft:iron_ingot"
+          },
+          {
+            "item": "minecraft:glass_bottle"
+          }
+        ],
+        "result": {
+          "item": "blacklight:military_fuel_can",
+          "count": 1
+        }
+      },
+      "active": false,
+      "policy": "preserved_on_disk_excluded_from_game_build"
+    },
+    {
+      "platform": "forge",
+      "id": "vehicle_repair_parts",
+      "ingredients": {
+        "minecraft:iron_ingot": 2,
+        "minecraft:redstone": 1
+      },
+      "result": "blacklight:vehicle_repair_parts",
+      "count": 1,
+      "source": "src/main/resources/data/blacklight/recipes/vehicle_repair_parts.json",
+      "raw": {
+        "type": "minecraft:crafting_shapeless",
+        "ingredients": [
+          {
+            "item": "minecraft:iron_ingot"
+          },
+          {
+            "item": "minecraft:iron_ingot"
+          },
+          {
+            "item": "minecraft:redstone"
+          }
+        ],
+        "result": {
+          "item": "blacklight:vehicle_repair_parts",
+          "count": 1
+        }
+      },
+      "active": true,
+      "policy": "active"
+    }
+  ],
+  "item_icons": [
+    {
+      "id": "autocannon_round",
+      "active": true,
+      "source": "src/main/resources/assets/blacklight/textures/item/autocannon_round.png",
+      "path": "assets/items/autocannon_round.png",
+      "sha256": "a721a411b187c087863ac4fe33138176a61c0ca3849bcfce1cd4f827a5ef092a",
+      "size": [
+        32,
+        32
+      ]
+    },
+    {
+      "id": "blackwatch_apc_chassis",
+      "active": true,
+      "source": "src/main/resources/assets/blacklight/textures/item/blackwatch_apc_chassis.png",
+      "path": "assets/items/blackwatch_apc_chassis.png",
+      "sha256": "0316fe708b91a744bb8e10c681a19067e7796e947f7bb97b5975f497ee4fa13d",
+      "size": [
+        32,
+        32
+      ]
+    },
+    {
+      "id": "blackwatch_tank_chassis",
+      "active": true,
+      "source": "src/main/resources/assets/blacklight/textures/item/blackwatch_tank_chassis.png",
+      "path": "assets/items/blackwatch_tank_chassis.png",
+      "sha256": "4f1a49772926b1edb92a492abb7997ccf4567d19f78278963160a9084a862613",
+      "size": [
+        32,
+        32
+      ]
+    },
+    {
+      "id": "blackwatch_truck_chassis",
+      "active": true,
+      "source": "src/main/resources/assets/blacklight/textures/item/blackwatch_truck_chassis.png",
+      "path": "assets/items/blackwatch_truck_chassis.png",
+      "sha256": "cca44f405c35d4748e9ccb44ead1625f974b506411c470961bb636295c6c6d10",
+      "size": [
+        32,
+        32
+      ]
+    },
+    {
+      "id": "machine_gun_round",
+      "active": true,
+      "source": "src/main/resources/assets/blacklight/textures/item/machine_gun_round.png",
+      "path": "assets/items/machine_gun_round.png",
+      "sha256": "9a3c19043de5f1a906dd28724e53cb3e64f7a765f1a83636c3792bf70d92b950",
+      "size": [
+        16,
+        16
+      ]
+    },
+    {
+      "id": "military_apc_chassis",
+      "active": true,
+      "source": "src/main/resources/assets/blacklight/textures/item/military_apc_chassis.png",
+      "path": "assets/items/military_apc_chassis.png",
+      "sha256": "32b0a4b2aa118e78900e065fb1e7e32dd14897f45cffefee62ade198a2f82e85",
+      "size": [
+        32,
+        32
+      ]
+    },
+    {
+      "id": "military_fuel_can",
+      "active": false,
+      "source": "src/main/resources/assets/blacklight/textures/item/military_fuel_can.png",
+      "path": "assets/items/military_fuel_can.png",
+      "sha256": "13eadfa29908440794f2771bd1fd358b8211ba9a7474a24eede33b68d1ca2b82",
+      "size": [
+        32,
+        32
+      ]
+    },
+    {
+      "id": "military_tank_chassis",
+      "active": true,
+      "source": "src/main/resources/assets/blacklight/textures/item/military_tank_chassis.png",
+      "path": "assets/items/military_tank_chassis.png",
+      "sha256": "99bfd40c42d3a9f235d54686402c023c0be5b6871d0ee2aeef818c95673e24dd",
+      "size": [
+        32,
+        32
+      ]
+    },
+    {
+      "id": "military_truck_chassis",
+      "active": true,
+      "source": "src/main/resources/assets/blacklight/textures/item/military_truck_chassis.png",
+      "path": "assets/items/military_truck_chassis.png",
+      "sha256": "3690b5760b639230d86309655b79575498468db24b861e72954c2c480e925710",
+      "size": [
+        32,
+        32
+      ]
+    },
+    {
+      "id": "rocket_round",
+      "active": true,
+      "source": "src/main/resources/assets/blacklight/textures/item/rocket_round.png",
+      "path": "assets/items/rocket_round.png",
+      "sha256": "f0da949f8a069668cd0526402af0b14a357c10c97c744c059758ecfe0ffcd102",
+      "size": [
+        16,
+        16
+      ]
+    },
+    {
+      "id": "tank_ap_shell",
+      "active": true,
+      "source": "src/main/resources/assets/blacklight/textures/item/tank_ap_shell.png",
+      "path": "assets/items/tank_ap_shell.png",
+      "sha256": "176490bee9167244d746c417b31f1a35eb5ce5bfbbc333d474100b155785eabb",
+      "size": [
+        32,
+        32
+      ]
+    },
+    {
+      "id": "tank_he_shell",
+      "active": true,
+      "source": "src/main/resources/assets/blacklight/textures/item/tank_he_shell.png",
+      "path": "assets/items/tank_he_shell.png",
+      "sha256": "52ad5e6f0f67fd40784e3b13a4081db8de6c63c98296e3f595c94877a09ade91",
+      "size": [
+        32,
+        32
+      ]
+    },
+    {
+      "id": "vehicle_repair_parts",
+      "active": true,
+      "source": "src/main/resources/assets/blacklight/textures/item/vehicle_repair_parts.png",
+      "path": "assets/items/vehicle_repair_parts.png",
+      "sha256": "035dcfd51c2ba826ba2029000d9488711c1a6a6b67fdde10be9fb1a834c931f9",
+      "size": [
+        32,
+        32
+      ]
+    }
+  ],
+  "command_registration": {
+    "neoforge/CityMilitaryCommands.java": {
+      "literals": [
+        "base",
+        "status",
+        "place",
+        "outfit"
+      ],
+      "arguments": [
+        "pos",
+        "turn",
+        "entities",
+        "outfit"
+      ]
+    },
+    "neoforge/MilitaryCommands.java": {
+      "literals": [
+        "military",
+        "unit",
+        "create",
+        "assign",
+        "unassign",
+        "resize",
+        "attach",
+        "detach",
+        "remove",
+        "commander",
+        "rank",
+        "role",
+        "order",
+        "organize",
+        "inspect"
+      ],
+      "arguments": [
+        "faction",
+        "preset",
+        "name",
+        "capacity",
+        "entities",
+        "entities",
+        "capacity",
+        "entity",
+        "entities",
+        "rank",
+        "entities",
+        "role",
+        "mode",
+        "pos",
+        "entities"
+      ]
+    },
+    "neoforge/VehicleFleetCommands.java": {
+      "literals": [
+        "fleet",
+        "crew",
+        "create",
+        "list",
+        "inspect",
+        "order",
+        "remove"
+      ],
+      "arguments": [
+        "vehicle",
+        "soldiers",
+        "vehicles",
+        "officer",
+        "fleet",
+        "fleet",
+        "mission",
+        "position",
+        "fleet"
+      ]
+    },
+    "neoforge/VehicleGarageCommands.java": {
+      "literals": [
+        "garage",
+        "preview",
+        "attach",
+        "status",
+        "bases"
+      ],
+      "arguments": [
+        "base",
+        "position",
+        "turn",
+        "token"
+      ]
+    },
+    "forge/CityMilitaryCommands.java": {
+      "literals": [
+        "base",
+        "status",
+        "place",
+        "outfit"
+      ],
+      "arguments": [
+        "pos",
+        "turn",
+        "entities",
+        "outfit"
+      ]
+    },
+    "forge/MilitaryCommands.java": {
+      "literals": [
+        "military",
+        "unit",
+        "create",
+        "assign",
+        "unassign",
+        "resize",
+        "attach",
+        "detach",
+        "remove",
+        "commander",
+        "rank",
+        "role",
+        "order",
+        "organize",
+        "inspect"
+      ],
+      "arguments": [
+        "faction",
+        "preset",
+        "name",
+        "capacity",
+        "entities",
+        "entities",
+        "capacity",
+        "entity",
+        "entities",
+        "rank",
+        "entities",
+        "role",
+        "mode",
+        "pos",
+        "entities"
+      ]
+    },
+    "forge/VehicleFleetCommands.java": {
+      "literals": [
+        "fleet",
+        "crew",
+        "create",
+        "list",
+        "inspect",
+        "order",
+        "remove"
+      ],
+      "arguments": [
+        "vehicle",
+        "soldiers",
+        "vehicles",
+        "officer",
+        "fleet",
+        "fleet",
+        "mission",
+        "position",
+        "fleet"
+      ]
+    },
+    "forge/VehicleGarageCommands.java": {
+      "literals": [
+        "garage",
+        "preview",
+        "attach",
+        "status",
+        "bases"
+      ],
+      "arguments": [
+        "base",
+        "position",
+        "turn",
+        "token"
+      ]
+    }
+  }
+}

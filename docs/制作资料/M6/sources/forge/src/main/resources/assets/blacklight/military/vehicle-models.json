@@ -1,0 +1,8089 @@
+{
+  "schemaVersion": 1,
+  "source": "art/military-vehicles/vehicle-authoring.json",
+  "sourceSha256": "4ccafec7230accdac6d2d84c7ffbd043f2ece8d2b2848e9fe9eb98aa13523a21",
+  "coordinateSystem": {
+    "units": "blocks",
+    "x": "vehicle right",
+    "y": "up",
+    "z": "vehicle front",
+    "origin": "body horizontal center at ground level",
+    "anchorPositions": "absolute vehicle-local rest pose; apply frame pivot before rotations",
+    "seatAnchorMeaning": "Actual passenger Entity feet/base origin while riding; not cushion or pelvis. No additional rider offset.",
+    "yawConvention": "Server mountWorld is authoritative: yaw 0 faces +Z; positive 90 degrees faces +X."
+  },
+  "modelPartContract": {
+    "unitsPerBlock": 16,
+    "axisScale": [
+      16,
+      16,
+      16
+    ],
+    "rootOrigin": [
+      0,
+      0,
+      0
+    ],
+    "pivot": "parent-relative model units",
+    "box": "bone-relative [x,y,z,w,h,d] model units",
+    "render": "ModelPart.render emits 1/16 units. Custom renderer must not apply Humanoid's negative Y/Z scale or +24 model offset.",
+    "rotation": "bone rest positions are absolute author blocks; runtime bone pivots below are relative to parent. Apply yaw to turret_yaw and pitch to gun_pitch."
+  },
+  "textureWidth": 2048,
+  "textureHeight": 2048,
+  "textures": {
+    "military": "blacklight:textures/entity/military_vehicles_military.png",
+    "blackwatch": "blacklight:textures/entity/military_vehicles_blackwatch.png"
+  },
+  "palettes": {
+    "military": {
+      "armor": "#70785A",
+      "armor_light": "#8A9070",
+      "armor_dark": "#4C5944",
+      "metal": "#414947",
+      "rubber": "#242B2A",
+      "hub": "#535F50",
+      "glass": "#29444A",
+      "canvas": "#626F4D",
+      "lamp": "#E8E4BF",
+      "tail_lamp": "#BA4232",
+      "marker": "#D3CDB0",
+      "hazard": "#BCA556"
+    },
+    "blackwatch": {
+      "armor": "#303C3E",
+      "armor_light": "#4A5554",
+      "armor_dark": "#222D30",
+      "metal": "#394445",
+      "rubber": "#1D2526",
+      "hub": "#4A5552",
+      "glass": "#213F46",
+      "canvas": "#394743",
+      "lamp": "#C7E0DA",
+      "tail_lamp": "#BC4436",
+      "marker": "#BFC5BA",
+      "hazard": "#C4A253"
+    }
+  },
+  "chassis": {
+    "truck": {
+      "dimensions": [
+        2.9,
+        7.5,
+        3.7
+      ],
+      "referenceStatus": {
+        "status": "Original adapted model after actual Prototype 2 gameplay views",
+        "viewed": [
+          "https://www.igcd.net/vehicle.php?id=50329"
+        ],
+        "confirmed": "Six wheels, high angular cab, split sloping windscreen, low forward nose, open drop-side troop cargo bed.",
+        "adapted": "Canvas enclosure and two faction palettes are mod choices; exact real vehicle identity is not asserted."
+      },
+      "bones": [
+        {
+          "name": "root",
+          "parent": null,
+          "pivot": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "pivotBlocks": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "name": "body",
+          "parent": "root",
+          "pivot": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "pivotBlocks": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "name": "left_wheel_1",
+          "parent": "body",
+          "pivot": [
+            -19.247407,
+            10.36,
+            39.677419
+          ],
+          "pivotBlocks": [
+            -1.20296296,
+            0.6475,
+            2.47983871
+          ]
+        },
+        {
+          "name": "left_wheel_2",
+          "parent": "body",
+          "pivot": [
+            -19.247407,
+            10.36,
+            -23.225806
+          ],
+          "pivotBlocks": [
+            -1.20296296,
+            0.6475,
+            -1.4516129
+          ]
+        },
+        {
+          "name": "left_wheel_3",
+          "parent": "body",
+          "pivot": [
+            -19.247407,
+            10.36,
+            -43.354839
+          ],
+          "pivotBlocks": [
+            -1.20296296,
+            0.6475,
+            -2.70967742
+          ]
+        },
+        {
+          "name": "right_wheel_1",
+          "parent": "body",
+          "pivot": [
+            19.247407,
+            10.36,
+            39.677419
+          ],
+          "pivotBlocks": [
+            1.20296296,
+            0.6475,
+            2.47983871
+          ]
+        },
+        {
+          "name": "right_wheel_2",
+          "parent": "body",
+          "pivot": [
+            19.247407,
+            10.36,
+            -23.225806
+          ],
+          "pivotBlocks": [
+            1.20296296,
+            0.6475,
+            -1.4516129
+          ]
+        },
+        {
+          "name": "right_wheel_3",
+          "parent": "body",
+          "pivot": [
+            19.247407,
+            10.36,
+            -43.354839
+          ],
+          "pivotBlocks": [
+            1.20296296,
+            0.6475,
+            -2.70967742
+          ]
+        },
+        {
+          "name": "door_left",
+          "parent": "body",
+          "pivot": [
+            -19.419259,
+            23.125,
+            43.935484
+          ],
+          "pivotBlocks": [
+            -1.2137037,
+            1.4453125,
+            2.74596774
+          ]
+        },
+        {
+          "name": "door_right",
+          "parent": "body",
+          "pivot": [
+            19.419259,
+            23.125,
+            43.935484
+          ],
+          "pivotBlocks": [
+            1.2137037,
+            1.4453125,
+            2.74596774
+          ]
+        },
+        {
+          "name": "door_rear",
+          "parent": "body",
+          "pivot": [
+            0.0,
+            23.865,
+            -58.645161
+          ],
+          "pivotBlocks": [
+            0.0,
+            1.4915625,
+            -3.66532258
+          ]
+        }
+      ],
+      "parts": [
+        {
+          "name": "ladder_frame",
+          "parent": "body",
+          "box": [
+            -14.607407,
+            10.73,
+            -56.903226,
+            29.214815,
+            6.475,
+            114.193548
+          ],
+          "uv": [
+            2,
+            2
+          ],
+          "material": "metal",
+          "weaponOverhang": false
+        },
+        {
+          "name": "cargo_floor",
+          "parent": "body",
+          "box": [
+            -20.278519,
+            19.98,
+            -56.516129,
+            40.557037,
+            4.07,
+            73.16129
+          ],
+          "uv": [
+            293,
+            2
+          ],
+          "material": "armor_dark",
+          "weaponOverhang": false
+        },
+        {
+          "name": "cab_floor",
+          "parent": "body",
+          "box": [
+            -18.903704,
+            17.575,
+            19.935484,
+            37.807407,
+            4.625,
+            37.354839
+          ],
+          "uv": [
+            525,
+            2
+          ],
+          "material": "armor",
+          "weaponOverhang": false
+        },
+        {
+          "name": "front_bumper",
+          "parent": "body",
+          "box": [
+            -23.2,
+            13.32,
+            54.967742,
+            46.4,
+            4.995,
+            5.032258
+          ],
+          "uv": [
+            680,
+            2
+          ],
+          "material": "metal",
+          "weaponOverhang": false
+        },
+        {
+          "name": "cab_lower_nose",
+          "parent": "body",
+          "box": [
+            -19.247407,
+            21.83,
+            51.096774,
+            38.494815,
+            8.325,
+            6.774194
+          ],
+          "uv": [
+            787,
+            2
+          ],
+          "material": "armor",
+          "weaponOverhang": false
+        },
+        {
+          "name": "cab_front_step_1",
+          "parent": "body",
+          "box": [
+            -18.903704,
+            29.97,
+            49.741936,
+            37.807407,
+            4.625,
+            6.774194
+          ],
+          "uv": [
+            882,
+            2
+          ],
+          "material": "armor",
+          "weaponOverhang": false
+        },
+        {
+          "name": "cab_front_step_2",
+          "parent": "body",
+          "box": [
+            -18.56,
+            34.595,
+            47.806452,
+            37.12,
+            4.07,
+            6.387097
+          ],
+          "uv": [
+            976,
+            2
+          ],
+          "material": "armor",
+          "weaponOverhang": false
+        },
+        {
+          "name": "cab_windscreen_frame",
+          "parent": "body",
+          "box": [
+            -18.56,
+            38.665,
+            43.354839,
+            37.12,
+            9.805,
+            6.387097
+          ],
+          "uv": [
+            1068,
+            2
+          ],
+          "material": "armor_light",
+          "weaponOverhang": false
+        },
+        {
+          "name": "windscreen_0",
+          "parent": "body",
+          "box": [
+            -16.841481,
+            40.145,
+            49.645161,
+            15.294815,
+            6.845,
+            0.677419
+          ],
+          "uv": [
+            1160,
+            2
+          ],
+          "material": "glass",
+          "weaponOverhang": false
+        },
+        {
+          "name": "windscreen_1",
+          "parent": "body",
+          "box": [
+            1.546667,
+            40.145,
+            49.645161,
+            15.294815,
+            6.845,
+            0.677419
+          ],
+          "uv": [
+            1196,
+            2
+          ],
+          "material": "glass",
+          "weaponOverhang": false
+        },
+        {
+          "name": "cab_roof",
+          "parent": "body",
+          "box": [
+            -19.247407,
+            48.84,
+            20.516129,
+            38.494815,
+            4.07,
+            28.451613
+          ],
+          "uv": [
+            1232,
+            2
+          ],
+          "material": "armor_light",
+          "weaponOverhang": false
+        },
+        {
+          "name": "cab_rear_wall",
+          "parent": "body",
+          "box": [
+            -18.56,
+            22.94,
+            20.129032,
+            37.12,
+            26.27,
+            3.483871
+          ],
+          "uv": [
+            1370,
+            2
+          ],
+          "material": "armor",
+          "weaponOverhang": false
+        },
+        {
+          "name": "left_cab_door",
+          "parent": "door_left",
+          "box": [
+            0.0,
+            0.0,
+            -20.709677,
+            2.062222,
+            16.095,
+            21.677419
+          ],
+          "uv": [
+            1456,
+            2
+          ],
+          "material": "armor",
+          "weaponOverhang": false
+        },
+        {
+          "name": "left_side_window",
+          "parent": "door_left",
+          "box": [
+            0.0,
+            16.835,
+            -18.774193,
+            2.062222,
+            7.955,
+            15.870968
+          ],
+          "uv": [
+            1508,
+            2
+          ],
+          "material": "glass",
+          "weaponOverhang": false
+        },
+        {
+          "name": "left_door_front_pillar",
+          "parent": "door_left",
+          "box": [
+            0.0,
+            16.28,
+            -1.16129,
+            2.062222,
+            9.435,
+            3.096774
+          ],
+          "uv": [
+            1548,
+            2
+          ],
+          "material": "armor",
+          "weaponOverhang": false
+        },
+        {
+          "name": "left_door_handle",
+          "parent": "door_left",
+          "box": [
+            -0.343704,
+            12.765,
+            -14.709677,
+            2.74963,
+            1.295,
+            4.451613
+          ],
+          "uv": [
+            1563,
+            2
+          ],
+          "material": "metal",
+          "weaponOverhang": false
+        },
+        {
+          "name": "left_fuel_tank",
+          "parent": "body",
+          "box": [
+            -20.106667,
+            11.655,
+            -4.451613,
+            6.014815,
+            7.77,
+            18.387097
+          ],
+          "uv": [
+            1582,
+            2
+          ],
+          "material": "armor_light",
+          "weaponOverhang": false
+        },
+        {
+          "name": "left_step",
+          "parent": "body",
+          "box": [
+            -20.794074,
+            11.655,
+            23.419355,
+            5.155556,
+            2.035,
+            13.548387
+          ],
+          "uv": [
+            1635,
+            2
+          ],
+          "material": "metal",
+          "weaponOverhang": false
+        },
+        {
+          "name": "left_canvas_side",
+          "parent": "body",
+          "box": [
+            -20.622222,
+            34.225,
+            -55.548387,
+            2.234074,
+            18.13,
+            70.645161
+          ],
+          "uv": [
+            1677,
+            2
+          ],
+          "material": "canvas",
+          "weaponOverhang": false
+        },
+        {
+          "name": "left_cargo_board",
+          "parent": "body",
+          "box": [
+            -21.137778,
+            24.05,
+            -56.516129,
+            2.234074,
+            10.36,
+            72.967742
+          ],
+          "uv": [
+            1827,
+            2
+          ],
+          "material": "armor",
+          "weaponOverhang": false
+        },
+        {
+          "name": "left_cargo_upright_0",
+          "parent": "body",
+          "box": [
+            -21.481481,
+            24.05,
+            -52.258064,
+            1.718519,
+            11.655,
+            1.935484
+          ],
+          "uv": [
+            1982,
+            2
+          ],
+          "material": "armor_light",
+          "weaponOverhang": false
+        },
+        {
+          "name": "left_cargo_upright_1",
+          "parent": "body",
+          "box": [
+            -21.481481,
+            24.05,
+            -28.064516,
+            1.718519,
+            11.655,
+            1.935484
+          ],
+          "uv": [
+            1994,
+            2
+          ],
+          "material": "armor_light",
+          "weaponOverhang": false
+        },
+        {
+          "name": "left_cargo_upright_2",
+          "parent": "body",
+          "box": [
+            -21.481481,
+            24.05,
+            -3.870968,
+            1.718519,
+            11.655,
+            1.935484
+          ],
+          "uv": [
+            2006,
+            2
+          ],
+          "material": "armor_light",
+          "weaponOverhang": false
+        },
+        {
+          "name": "left_cargo_upright_3",
+          "parent": "body",
+          "box": [
+            -21.481481,
+            24.05,
+            12.580645,
+            1.718519,
+            11.655,
+            1.935484
+          ],
+          "uv": [
+            2018,
+            2
+          ],
+          "material": "armor_light",
+          "weaponOverhang": false
+        },
+        {
+          "name": "left_bench_0",
+          "parent": "body",
+          "box": [
+            -16.841481,
+            23.865,
+            -16.451613,
+            9.108148,
+            2.22,
+            9.677419
+          ],
+          "uv": [
+            2,
+            127
+          ],
+          "material": "canvas",
+          "weaponOverhang": false
+        },
+        {
+          "name": "left_bench_1",
+          "parent": "body",
+          "box": [
+            -16.841481,
+            23.865,
+            -31.935484,
+            9.108148,
+            2.22,
+            9.677419
+          ],
+          "uv": [
+            44,
+            127
+          ],
+          "material": "canvas",
+          "weaponOverhang": false
+        },
+        {
+          "name": "left_bench_2",
+          "parent": "body",
+          "box": [
+            -16.841481,
+            23.865,
+            -47.419355,
+            9.108148,
+            2.22,
+            9.677419
+          ],
+          "uv": [
+            86,
+            127
+          ],
+          "material": "canvas",
+          "weaponOverhang": false
+        },
+        {
+          "name": "right_cab_door",
+          "parent": "door_right",
+          "box": [
+            -2.062222,
+            0.0,
+            -20.709677,
+            2.062222,
+            16.095,
+            21.677419
+          ],
+          "uv": [
+            128,
+            127
+          ],
+          "material": "armor",
+          "weaponOverhang": false
+        },
+        {
+          "name": "right_side_window",
+          "parent": "door_right",
+          "box": [
+            -2.062222,
+            16.835,
+            -18.774193,
+            2.062222,
+            7.955,
+            15.870968
+          ],
+          "uv": [
+            180,
+            127
+          ],
+          "material": "glass",
+          "weaponOverhang": false
+        },
+        {
+          "name": "right_door_front_pillar",
+          "parent": "door_right",
+          "box": [
+            -2.062222,
+            16.28,
+            -1.16129,
+            2.062222,
+            9.435,
+            3.096774
+          ],
+          "uv": [
+            220,
+            127
+          ],
+          "material": "armor",
+          "weaponOverhang": false
+        },
+        {
+          "name": "right_door_handle",
+          "parent": "door_right",
+          "box": [
+            -2.405926,
+            12.765,
+            -14.709677,
+            2.74963,
+            1.295,
+            4.451613
+          ],
+          "uv": [
+            235,
+            127
+          ],
+          "material": "metal",
+          "weaponOverhang": false
+        },
+        {
+          "name": "right_fuel_tank",
+          "parent": "body",
+          "box": [
+            16.66963,
+            11.655,
+            -4.451613,
+            6.014815,
+            7.77,
+            18.387097
+          ],
+          "uv": [
+            254,
+            127
+          ],
+          "material": "armor_light",
+          "weaponOverhang": false
+        },
+        {
+          "name": "right_step",
+          "parent": "body",
+          "box": [
+            15.982222,
+            11.655,
+            23.419355,
+            5.155556,
+            2.035,
+            13.548387
+          ],
+          "uv": [
+            307,
+            127
+          ],
+          "material": "metal",
+          "weaponOverhang": false
+        },
+        {
+          "name": "right_canvas_side",
+          "parent": "body",
+          "box": [
+            18.388148,
+            34.225,
+            -55.548387,
+            2.234074,
+            18.13,
+            70.645161
+          ],
+          "uv": [
+            349,
+            127
+          ],
+          "material": "canvas",
+          "weaponOverhang": false
+        },
+        {
+          "name": "right_cargo_board",
+          "parent": "body",
+          "box": [
+            18.903704,
+            24.05,
+            -56.516129,
+            2.234074,
+            10.36,
+            72.967742
+          ],
+          "uv": [
+            499,
+            127
+          ],
+          "material": "armor",
+          "weaponOverhang": false
+        },
+        {
+          "name": "right_cargo_upright_0",
+          "parent": "body",
+          "box": [
+            19.762963,
+            24.05,
+            -52.258064,
+            1.718519,
+            11.655,
+            1.935484
+          ],
+          "uv": [
+            654,
+            127
+          ],
+          "material": "armor_light",
+          "weaponOverhang": false
+        },
+        {
+          "name": "right_cargo_upright_1",
+          "parent": "body",
+          "box": [
+            19.762963,
+            24.05,
+            -28.064516,
+            1.718519,
+            11.655,
+            1.935484
+          ],
+          "uv": [
+            666,
+            127
+          ],
+          "material": "armor_light",
+          "weaponOverhang": false
+        },
+        {
+          "name": "right_cargo_upright_2",
+          "parent": "body",
+          "box": [
+            19.762963,
+            24.05,
+            -3.870968,
+            1.718519,
+            11.655,
+            1.935484
+          ],
+          "uv": [
+            678,
+            127
+          ],
+          "material": "armor_light",
+          "weaponOverhang": false
+        },
+        {
+          "name": "right_cargo_upright_3",
+          "parent": "body",
+          "box": [
+            19.762963,
+            24.05,
+            12.580645,
+            1.718519,
+            11.655,
+            1.935484
+          ],
+          "uv": [
+            690,
+            127
+          ],
+          "material": "armor_light",
+          "weaponOverhang": false
+        },
+        {
+          "name": "right_bench_0",
+          "parent": "body",
+          "box": [
+            7.733333,
+            23.865,
+            -16.451613,
+            9.108148,
+            2.22,
+            9.677419
+          ],
+          "uv": [
+            702,
+            127
+          ],
+          "material": "canvas",
+          "weaponOverhang": false
+        },
+        {
+          "name": "right_bench_1",
+          "parent": "body",
+          "box": [
+            7.733333,
+            23.865,
+            -31.935484,
+            9.108148,
+            2.22,
+            9.677419
+          ],
+          "uv": [
+            744,
+            127
+          ],
+          "material": "canvas",
+          "weaponOverhang": false
+        },
+        {
+          "name": "right_bench_2",
+          "parent": "body",
+          "box": [
+            7.733333,
+            23.865,
+            -47.419355,
+            9.108148,
+            2.22,
+            9.677419
+          ],
+          "uv": [
+            786,
+            127
+          ],
+          "material": "canvas",
+          "weaponOverhang": false
+        },
+        {
+          "name": "canopy_top",
+          "parent": "body",
+          "box": [
+            -18.044444,
+            54.575,
+            -55.741936,
+            36.088889,
+            4.625,
+            71.032258
+          ],
+          "uv": [
+            828,
+            127
+          ],
+          "material": "canvas",
+          "weaponOverhang": false
+        },
+        {
+          "name": "canopy_left_shoulder",
+          "parent": "body",
+          "box": [
+            -20.278519,
+            52.17,
+            -55.741936,
+            4.296296,
+            3.7,
+            71.032258
+          ],
+          "uv": [
+            1047,
+            127
+          ],
+          "material": "canvas",
+          "weaponOverhang": false
+        },
+        {
+          "name": "canopy_right_shoulder",
+          "parent": "body",
+          "box": [
+            15.982222,
+            52.17,
+            -55.741936,
+            4.296296,
+            3.7,
+            71.032258
+          ],
+          "uv": [
+            1202,
+            127
+          ],
+          "material": "canvas",
+          "weaponOverhang": false
+        },
+        {
+          "name": "rear_tailgate",
+          "parent": "door_rear",
+          "box": [
+            -20.278519,
+            0.0,
+            0.0,
+            40.557037,
+            8.325,
+            2.709677
+          ],
+          "uv": [
+            1357,
+            127
+          ],
+          "material": "armor",
+          "weaponOverhang": false
+        },
+        {
+          "name": "front_lamp_0",
+          "parent": "body",
+          "box": [
+            -15.638519,
+            24.975,
+            58.064516,
+            4.64,
+            2.96,
+            0.870968
+          ],
+          "uv": [
+            1448,
+            127
+          ],
+          "material": "lamp",
+          "weaponOverhang": false
+        },
+        {
+          "name": "rear_lamp_0",
+          "parent": "body",
+          "box": [
+            -15.638519,
+            16.095,
+            -60.0,
+            4.64,
+            2.22,
+            0.967742
+          ],
+          "uv": [
+            1464,
+            127
+          ],
+          "material": "tail_lamp",
+          "weaponOverhang": false
+        },
+        {
+          "name": "front_lamp_1",
+          "parent": "body",
+          "box": [
+            10.998519,
+            24.975,
+            58.064516,
+            4.64,
+            2.96,
+            0.870968
+          ],
+          "uv": [
+            1480,
+            127
+          ],
+          "material": "lamp",
+          "weaponOverhang": false
+        },
+        {
+          "name": "rear_lamp_1",
+          "parent": "body",
+          "box": [
+            10.998519,
+            16.095,
+            -60.0,
+            4.64,
+            2.22,
+            0.967742
+          ],
+          "uv": [
+            1496,
+            127
+          ],
+          "material": "tail_lamp",
+          "weaponOverhang": false
+        },
+        {
+          "name": "grille",
+          "parent": "body",
+          "box": [
+            -10.311111,
+            21.83,
+            58.064516,
+            20.622222,
+            4.995,
+            0.870968
+          ],
+          "uv": [
+            1512,
+            127
+          ],
+          "material": "armor_dark",
+          "weaponOverhang": false
+        },
+        {
+          "name": "left_wheel_1_tire_vertical",
+          "parent": "left_wheel_1",
+          "box": [
+            -3.093333,
+            -10.36,
+            -6.734,
+            6.186667,
+            20.72,
+            13.468
+          ],
+          "uv": [
+            1559,
+            127
+          ],
+          "material": "rubber",
+          "weaponOverhang": false
+        },
+        {
+          "name": "left_wheel_1_tire_horizontal",
+          "parent": "left_wheel_1",
+          "box": [
+            -3.093333,
+            -6.734,
+            -10.36,
+            6.186667,
+            13.468,
+            20.72
+          ],
+          "uv": [
+            1603,
+            127
+          ],
+          "material": "rubber",
+          "weaponOverhang": false
+        },
+        {
+          "name": "left_wheel_1_hub",
+          "parent": "left_wheel_1",
+          "box": [
+            -3.588267,
+            -4.3512,
+            -4.3512,
+            7.176533,
+            8.7024,
+            8.7024
+          ],
+          "uv": [
+            1661,
+            127
+          ],
+          "material": "hub",
+          "weaponOverhang": false
+        },
+        {
+          "name": "left_wheel_2_tire_vertical",
+          "parent": "left_wheel_2",
+          "box": [
+            -3.093333,
+            -10.36,
+            -6.734,
+            6.186667,
+            20.72,
+            13.468
+          ],
+          "uv": [
+            1697,
+            127
+          ],
+          "material": "rubber",
+          "weaponOverhang": false
+        },
+        {
+          "name": "left_wheel_2_tire_horizontal",
+          "parent": "left_wheel_2",
+          "box": [
+            -3.093333,
+            -6.734,
+            -10.36,
+            6.186667,
+            13.468,
+            20.72
+          ],
+          "uv": [
+            1741,
+            127
+          ],
+          "material": "rubber",
+          "weaponOverhang": false
+        },
+        {
+          "name": "left_wheel_2_hub",
+          "parent": "left_wheel_2",
+          "box": [
+            -3.588267,
+            -4.3512,
+            -4.3512,
+            7.176533,
+            8.7024,
+            8.7024
+          ],
+          "uv": [
+            1799,
+            127
+          ],
+          "material": "hub",
+          "weaponOverhang": false
+        },
+        {
+          "name": "left_wheel_3_tire_vertical",
+          "parent": "left_wheel_3",
+          "box": [
+            -3.093333,
+            -10.36,
+            -6.734,
+            6.186667,
+            20.72,
+            13.468
+          ],
+          "uv": [
+            1835,
+            127
+          ],
+          "material": "rubber",
+          "weaponOverhang": false
+        },
+        {
+          "name": "left_wheel_3_tire_horizontal",
+          "parent": "left_wheel_3",
+          "box": [
+            -3.093333,
+            -6.734,
+            -10.36,
+            6.186667,
+            13.468,
+            20.72
+          ],
+          "uv": [
+            1879,
+            127
+          ],
+          "material": "rubber",
+          "weaponOverhang": false
+        },
+        {
+          "name": "left_wheel_3_hub",
+          "parent": "left_wheel_3",
+          "box": [
+            -3.588267,
+            -4.3512,
+            -4.3512,
+            7.176533,
+            8.7024,
+            8.7024
+          ],
+          "uv": [
+            1937,
+            127
+          ],
+          "material": "hub",
+          "weaponOverhang": false
+        },
+        {
+          "name": "right_wheel_1_tire_vertical",
+          "parent": "right_wheel_1",
+          "box": [
+            -3.093333,
+            -10.36,
+            -6.734,
+            6.186667,
+            20.72,
+            13.468
+          ],
+          "uv": [
+            1973,
+            127
+          ],
+          "material": "rubber",
+          "weaponOverhang": false
+        },
+        {
+          "name": "right_wheel_1_tire_horizontal",
+          "parent": "right_wheel_1",
+          "box": [
+            -3.093333,
+            -6.734,
+            -10.36,
+            6.186667,
+            13.468,
+            20.72
+          ],
+          "uv": [
+            2,
+            220
+          ],
+          "material": "rubber",
+          "weaponOverhang": false
+        },
+        {
+          "name": "right_wheel_1_hub",
+          "parent": "right_wheel_1",
+          "box": [
+            -3.588267,
+            -4.3512,
+            -4.3512,
+            7.176533,
+            8.7024,
+            8.7024
+          ],
+          "uv": [
+            60,
+            220
+          ],
+          "material": "hub",
+          "weaponOverhang": false
+        },
+        {
+          "name": "right_wheel_2_tire_vertical",
+          "parent": "right_wheel_2",
+          "box": [
+            -3.093333,
+            -10.36,
+            -6.734,
+            6.186667,
+            20.72,
+            13.468
+          ],
+          "uv": [
+            96,
+            220
+          ],
+          "material": "rubber",
+          "weaponOverhang": false
+        },
+        {
+          "name": "right_wheel_2_tire_horizontal",
+          "parent": "right_wheel_2",
+          "box": [
+            -3.093333,
+            -6.734,
+            -10.36,
+            6.186667,
+            13.468,
+            20.72
+          ],
+          "uv": [
+            140,
+            220
+          ],
+          "material": "rubber",
+          "weaponOverhang": false
+        },
+        {
+          "name": "right_wheel_2_hub",
+          "parent": "right_wheel_2",
+          "box": [
+            -3.588267,
+            -4.3512,
+            -4.3512,
+            7.176533,
+            8.7024,
+            8.7024
+          ],
+          "uv": [
+            198,
+            220
+          ],
+          "material": "hub",
+          "weaponOverhang": false
+        },
+        {
+          "name": "right_wheel_3_tire_vertical",
+          "parent": "right_wheel_3",
+          "box": [
+            -3.093333,
+            -10.36,
+            -6.734,
+            6.186667,
+            20.72,
+            13.468
+          ],
+          "uv": [
+            234,
+            220
+          ],
+          "material": "rubber",
+          "weaponOverhang": false
+        },
+        {
+          "name": "right_wheel_3_tire_horizontal",
+          "parent": "right_wheel_3",
+          "box": [
+            -3.093333,
+            -6.734,
+            -10.36,
+            6.186667,
+            13.468,
+            20.72
+          ],
+          "uv": [
+            278,
+            220
+          ],
+          "material": "rubber",
+          "weaponOverhang": false
+        },
+        {
+          "name": "right_wheel_3_hub",
+          "parent": "right_wheel_3",
+          "box": [
+            -3.588267,
+            -4.3512,
+            -4.3512,
+            7.176533,
+            8.7024,
+            8.7024
+          ],
+          "uv": [
+            336,
+            220
+          ],
+          "material": "hub",
+          "weaponOverhang": false
+        },
+        {
+          "name": "recognition_bar_0",
+          "parent": "body",
+          "box": [
+            -6.874074,
+            27.195,
+            58.83871,
+            2.921481,
+            1.48,
+            1.16129
+          ],
+          "uv": [
+            372,
+            220
+          ],
+          "material": "marker",
+          "weaponOverhang": false
+        },
+        {
+          "name": "recognition_bar_1",
+          "parent": "body",
+          "box": [
+            -1.89037,
+            27.195,
+            58.83871,
+            2.921481,
+            1.48,
+            1.16129
+          ],
+          "uv": [
+            385,
+            220
+          ],
+          "material": "marker",
+          "weaponOverhang": false
+        },
+        {
+          "name": "recognition_bar_2",
+          "parent": "body",
+          "box": [
+            3.093333,
+            27.195,
+            58.83871,
+            2.921481,
+            1.48,
+            1.16129
+          ],
+          "uv": [
+            398,
+            220
+          ],
+          "material": "marker",
+          "weaponOverhang": false
+        },
+        {
+          "name": "left_hazard_bar_0",
+          "parent": "body",
+          "box": [
+            -23.2,
+            26.27,
+            -8.709677,
+            0.601481,
+            4.81,
+            2.516129
+          ],
+          "uv": [
+            411,
+            220
+          ],
+          "material": "hazard",
+          "weaponOverhang": false
+        },
+        {
+          "name": "left_hazard_bar_1",
+          "parent": "body",
+          "box": [
+            -23.2,
+            26.27,
+            -2.903226,
+            0.601481,
+            4.81,
+            2.516129
+          ],
+          "uv": [
+            422,
+            220
+          ],
+          "material": "hazard",
+          "weaponOverhang": false
+        },
+        {
+          "name": "left_hazard_bar_2",
+          "parent": "body",
+          "box": [
+            -23.2,
+            26.27,
+            2.903226,
+            0.601481,
+            4.81,
+            2.516129
+          ],
+          "uv": [
+            433,
+            220
+          ],
+          "material": "hazard",
+          "weaponOverhang": false
+        },
+        {
+          "name": "right_hazard_bar_0",
+          "parent": "body",
+          "box": [
+            22.598519,
+            26.27,
+            -8.709677,
+            0.601481,
+            4.81,
+            2.516129
+          ],
+          "uv": [
+            444,
+            220
+          ],
+          "material": "hazard",
+          "weaponOverhang": false
+        },
+        {
+          "name": "right_hazard_bar_1",
+          "parent": "body",
+          "box": [
+            22.598519,
+            26.27,
+            -2.903226,
+            0.601481,
+            4.81,
+            2.516129
+          ],
+          "uv": [
+            455,
+            220
+          ],
+          "material": "hazard",
+          "weaponOverhang": false
+        },
+        {
+          "name": "right_hazard_bar_2",
+          "parent": "body",
+          "box": [
+            22.598519,
+            26.27,
+            2.903226,
+            0.601481,
+            4.81,
+            2.516129
+          ],
+          "uv": [
+            466,
+            220
+          ],
+          "material": "hazard",
+          "weaponOverhang": false
+        }
+      ],
+      "anchors": {
+        "seat_driver": {
+          "frame": "body",
+          "position": [
+            -0.51555556,
+            0.89,
+            2.05645161
+          ]
+        },
+        "seat_officer": {
+          "frame": "body",
+          "position": [
+            0.51555556,
+            0.89,
+            2.05645161
+          ]
+        },
+        "seat_passenger_1": {
+          "frame": "body",
+          "position": [
+            -0.53703704,
+            1.053125,
+            -0.72580645
+          ]
+        },
+        "seat_passenger_2": {
+          "frame": "body",
+          "position": [
+            0.53703704,
+            1.053125,
+            -0.72580645
+          ]
+        },
+        "seat_passenger_3": {
+          "frame": "body",
+          "position": [
+            -0.53703704,
+            1.053125,
+            -1.69354839
+          ]
+        },
+        "seat_passenger_4": {
+          "frame": "body",
+          "position": [
+            0.53703704,
+            1.053125,
+            -1.69354839
+          ]
+        },
+        "seat_passenger_5": {
+          "frame": "body",
+          "position": [
+            -0.53703704,
+            1.053125,
+            -2.66129032
+          ]
+        },
+        "seat_passenger_6": {
+          "frame": "body",
+          "position": [
+            0.53703704,
+            1.053125,
+            -2.66129032
+          ]
+        },
+        "camera_driver": {
+          "frame": "body",
+          "position": [
+            -0.51555556,
+            2.51,
+            2.05645161
+          ]
+        },
+        "camera_officer": {
+          "frame": "body",
+          "position": [
+            0.51555556,
+            2.51,
+            2.05645161
+          ]
+        },
+        "camera_passenger_1": {
+          "frame": "body",
+          "position": [
+            -0.53703704,
+            2.673125,
+            -0.72580645
+          ]
+        },
+        "camera_passenger_2": {
+          "frame": "body",
+          "position": [
+            0.53703704,
+            2.673125,
+            -0.72580645
+          ]
+        },
+        "camera_passenger_3": {
+          "frame": "body",
+          "position": [
+            -0.53703704,
+            2.673125,
+            -1.69354839
+          ]
+        },
+        "camera_passenger_4": {
+          "frame": "body",
+          "position": [
+            0.53703704,
+            2.673125,
+            -1.69354839
+          ]
+        },
+        "camera_passenger_5": {
+          "frame": "body",
+          "position": [
+            -0.53703704,
+            2.673125,
+            -2.66129032
+          ]
+        },
+        "camera_passenger_6": {
+          "frame": "body",
+          "position": [
+            0.53703704,
+            2.673125,
+            -2.66129032
+          ]
+        },
+        "exit_driver": {
+          "frame": "body",
+          "position": [
+            -2.09444444,
+            0.1,
+            2.47983871
+          ]
+        },
+        "exit_officer": {
+          "frame": "body",
+          "position": [
+            2.09444444,
+            0.1,
+            2.47983871
+          ]
+        },
+        "exit_rear": {
+          "frame": "body",
+          "position": [
+            0.0,
+            0.1,
+            -4.47580645
+          ]
+        }
+      }
+    },
+    "apc": {
+      "dimensions": [
+        3.3,
+        7.0,
+        3.3
+      ],
+      "referenceStatus": {
+        "status": "Original adapted model after actual Prototype 1 and 2 gameplay views",
+        "viewed": [
+          "https://www.igcd.net/vehicle.php?id=50318",
+          "https://www.gamepressure.com/prototype2/main-mission-14-enemies-and-allies/z93aa4",
+          "https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/10150/0000008860.1920x1080.jpg?t=1655760765"
+        ],
+        "confirmed": "Tracked hull, six visible road wheels, steep stepped glacis, small turret, slim cannon, one side twin launcher, rear door.",
+        "adapted": "Dimensions, interior seats, ammunition counts and faction palettes are mod values."
+      },
+      "bones": [
+        {
+          "name": "root",
+          "parent": null,
+          "pivot": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "pivotBlocks": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "name": "body",
+          "parent": "root",
+          "pivot": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "pivotBlocks": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "name": "turret_yaw",
+          "parent": "body",
+          "pivot": [
+            0.0,
+            31.114286,
+            1.931035
+          ],
+          "pivotBlocks": [
+            0.0,
+            1.94464286,
+            0.12068966
+          ]
+        },
+        {
+          "name": "gun_pitch",
+          "parent": "turret_yaw",
+          "pivot": [
+            0.0,
+            8.485714,
+            6.758621
+          ],
+          "pivotBlocks": [
+            0.0,
+            2.475,
+            0.54310345
+          ]
+        },
+        {
+          "name": "track_left",
+          "parent": "body",
+          "pivot": [
+            -21.290323,
+            10.371429,
+            0.0
+          ],
+          "pivotBlocks": [
+            -1.33064516,
+            0.64821429,
+            0.0
+          ]
+        },
+        {
+          "name": "track_left_wheel_1",
+          "parent": "track_left",
+          "pivot": [
+            0.0,
+            0.188571,
+            -43.351724
+          ],
+          "pivotBlocks": [
+            -1.33064516,
+            0.66,
+            -2.70948276
+          ]
+        },
+        {
+          "name": "track_left_wheel_2",
+          "parent": "track_left",
+          "pivot": [
+            0.0,
+            0.188571,
+            -26.011035
+          ],
+          "pivotBlocks": [
+            -1.33064516,
+            0.66,
+            -1.62568966
+          ]
+        },
+        {
+          "name": "track_left_wheel_3",
+          "parent": "track_left",
+          "pivot": [
+            0.0,
+            0.188571,
+            -8.670345
+          ],
+          "pivotBlocks": [
+            -1.33064516,
+            0.66,
+            -0.54189655
+          ]
+        },
+        {
+          "name": "track_left_wheel_4",
+          "parent": "track_left",
+          "pivot": [
+            0.0,
+            0.188571,
+            8.670345
+          ],
+          "pivotBlocks": [
+            -1.33064516,
+            0.66,
+            0.54189655
+          ]
+        },
+        {
+          "name": "track_left_wheel_5",
+          "parent": "track_left",
+          "pivot": [
+            0.0,
+            0.188571,
+            26.011035
+          ],
+          "pivotBlocks": [
+            -1.33064516,
+            0.66,
+            1.62568966
+          ]
+        },
+        {
+          "name": "track_left_wheel_6",
+          "parent": "track_left",
+          "pivot": [
+            0.0,
+            0.188571,
+            43.351724
+          ],
+          "pivotBlocks": [
+            -1.33064516,
+            0.66,
+            2.70948276
+          ]
+        },
+        {
+          "name": "track_right",
+          "parent": "body",
+          "pivot": [
+            21.290323,
+            10.371429,
+            0.0
+          ],
+          "pivotBlocks": [
+            1.33064516,
+            0.64821429,
+            0.0
+          ]
+        },
+        {
+          "name": "track_right_wheel_1",
+          "parent": "track_right",
+          "pivot": [
+            0.0,
+            0.188571,
+            -43.351724
+          ],
+          "pivotBlocks": [
+            1.33064516,
+            0.66,
+            -2.70948276
+          ]
+        },
+        {
+          "name": "track_right_wheel_2",
+          "parent": "track_right",
+          "pivot": [
+            0.0,
+            0.188571,
+            -26.011035
+          ],
+          "pivotBlocks": [
+            1.33064516,
+            0.66,
+            -1.62568966
+          ]
+        },
+        {
+          "name": "track_right_wheel_3",
+          "parent": "track_right",
+          "pivot": [
+            0.0,
+            0.188571,
+            -8.670345
+          ],
+          "pivotBlocks": [
+            1.33064516,
+            0.66,
+            -0.54189655
+          ]
+        },
+        {
+          "name": "track_right_wheel_4",
+          "parent": "track_right",
+          "pivot": [
+            0.0,
+            0.188571,
+            8.670345
+          ],
+          "pivotBlocks": [
+            1.33064516,
+            0.66,
+            0.54189655
+          ]
+        },
+        {
+          "name": "track_right_wheel_5",
+          "parent": "track_right",
+          "pivot": [
+            0.0,
+            0.188571,
+            26.011035
+          ],
+          "pivotBlocks": [
+            1.33064516,
+            0.66,
+            1.62568966
+          ]
+        },
+        {
+          "name": "track_right_wheel_6",
+          "parent": "track_right",
+          "pivot": [
+            0.0,
+            0.188571,
+            43.351724
+          ],
+          "pivotBlocks": [
+            1.33064516,
+            0.66,
+            2.70948276
+          ]
+        },
+        {
+          "name": "door_rear",
+          "parent": "body",
+          "pivot": [
+            10.900645,
+            16.594286,
+            -55.806896
+          ],
+          "pivotBlocks": [
+            0.68129032,
+            1.03714286,
+            -3.48793103
+          ]
+        },
+        {
+          "name": "hatch_gunner",
+          "parent": "turret_yaw",
+          "pivot": [
+            -8.175484,
+            13.954286,
+            -10.813793
+          ],
+          "pivotBlocks": [
+            -0.51096774,
+            2.81678571,
+            -0.55517241
+          ]
+        }
+      ],
+      "parts": [
+        {
+          "name": "track_left_upper",
+          "parent": "track_left",
+          "box": [
+            -4.59871,
+            7.354286,
+            -53.586207,
+            9.197419,
+            3.394286,
+            107.172414
+          ],
+          "uv": [
+            477,
+            220
+          ],
+          "material": "rubber",
+          "weaponOverhang": false
+        },
+        {
+          "name": "track_left_lower",
+          "parent": "track_left",
+          "box": [
+            -4.59871,
+            -9.428572,
+            -50.110345,
+            9.197419,
+            3.017143,
+            100.22069
+          ],
+          "uv": [
+            714,
+            220
+          ],
+          "material": "rubber",
+          "weaponOverhang": false
+        },
+        {
+          "name": "track_left_tread_0",
+          "parent": "track_left",
+          "box": [
+            -4.854194,
+            -9.9,
+            -50.689655,
+            9.708387,
+            1.225714,
+            1.931035
+          ],
+          "uv": [
+            937,
+            220
+          ],
+          "material": "metal",
+          "weaponOverhang": false
+        },
+        {
+          "name": "track_left_tread_1",
+          "parent": "track_left",
+          "box": [
+            -4.854194,
+            -9.9,
+            -45.089655,
+            9.708387,
+            1.225714,
+            1.931035
+          ],
+          "uv": [
+            965,
+            220
+          ],
+          "material": "metal",
+          "weaponOverhang": false
+        },
+        {
+          "name": "track_left_tread_2",
+          "parent": "track_left",
+          "box": [
+            -4.854194,
+            -9.9,
+            -39.489655,
+            9.708387,
+            1.225714,
+            1.931035
+          ],
+          "uv": [
+            993,
+            220
+          ],
+          "material": "metal",
+          "weaponOverhang": false
+        },
+        {
+          "name": "track_left_tread_3",
+          "parent": "track_left",
+          "box": [
+            -4.854194,
+            -9.9,
+            -33.889655,
+            9.708387,
+            1.225714,
+            1.931035
+          ],
+          "uv": [
+            1021,
+            220
+          ],
+          "material": "metal",
+          "weaponOverhang": false
+        },
+        {
+          "name": "track_left_tread_4",
+          "parent": "track_left",
+          "box": [
+            -4.854194,
+            -9.9,
+            -28.289655,
+            9.708387,
+            1.225714,
+            1.931035
+          ],
+          "uv": [
+            1049,
+            220
+          ],
+          "material": "metal",
+          "weaponOverhang": false
+        },
+        {
+          "name": "track_left_tread_5",
+          "parent": "track_left",
+          "box": [
+            -4.854194,
+            -9.9,
+            -22.689655,
+            9.708387,
+            1.225714,
+            1.931035
+          ],
+          "uv": [
+            1077,
+            220
+          ],
+          "material": "metal",
+          "weaponOverhang": false
+        },
+        {
+          "name": "track_left_tread_6",
+          "parent": "track_left",
+          "box": [
+            -4.854194,
+            -9.9,
+            -17.089655,
+            9.708387,
+            1.225714,
+            1.931035
+          ],
+          "uv": [
+            1105,
+            220
+          ],
+          "material": "metal",
+          "weaponOverhang": false
+        },
+        {
+          "name": "track_left_tread_7",
+          "parent": "track_left",
+          "box": [
+            -4.854194,
+            -9.9,
+            -11.489655,
+            9.708387,
+            1.225714,
+            1.931035
+          ],
+          "uv": [
+            1133,
+            220
+          ],
+          "material": "metal",
+          "weaponOverhang": false
+        },
+        {
+          "name": "track_left_tread_8",
+          "parent": "track_left",
+          "box": [
+            -4.854194,
+            -9.9,
+            -5.889655,
+            9.708387,
+            1.225714,
+            1.931035
+          ],
+          "uv": [
+            1161,
+            220
+          ],
+          "material": "metal",
+          "weaponOverhang": false
+        },
+        {
+          "name": "track_left_tread_9",
+          "parent": "track_left",
+          "box": [
+            -4.854194,
+            -9.9,
+            -0.289655,
+            9.708387,
+            1.225714,
+            1.931035
+          ],
+          "uv": [
+            1189,
+            220
+          ],
+          "material": "metal",
+          "weaponOverhang": false
+        },
+        {
+          "name": "track_left_tread_10",
+          "parent": "track_left",
+          "box": [
+            -4.854194,
+            -9.9,
+            5.310345,
+            9.708387,
+            1.225714,
+            1.931035
+          ],
+          "uv": [
+            1217,
+            220
+          ],
+          "material": "metal",
+          "weaponOverhang": false
+        },
+        {
+          "name": "track_left_tread_11",
+          "parent": "track_left",
+          "box": [
+            -4.854194,
+            -9.9,
+            10.910345,
+            9.708387,
+            1.225714,
+            1.931035
+          ],
+          "uv": [
+            1245,
+            220
+          ],
+          "material": "metal",
+          "weaponOverhang": false
+        },
+        {
+          "name": "track_left_tread_12",
+          "parent": "track_left",
+          "box": [
+            -4.854194,
+            -9.9,
+            16.510345,
+            9.708387,
+            1.225714,
+            1.931035
+          ],
+          "uv": [
+            1273,
+            220
+          ],
+          "material": "metal",
+          "weaponOverhang": false
+        },
+        {
+          "name": "track_left_tread_13",
+          "parent": "track_left",
+          "box": [
+            -4.854194,
+            -9.9,
+            22.110345,
+            9.708387,
+            1.225714,
+            1.931035
+          ],
+          "uv": [
+            1301,
+            220
+          ],
+          "material": "metal",
+          "weaponOverhang": false
+        },
+        {
+          "name": "track_left_tread_14",
+          "parent": "track_left",
+          "box": [
+            -4.854194,
+            -9.9,
+            27.710345,
+            9.708387,
+            1.225714,
+            1.931035
+          ],
+          "uv": [
+            1329,
+            220
+          ],
+          "material": "metal",
+          "weaponOverhang": false
+        },
+        {
+          "name": "track_left_tread_15",
+          "parent": "track_left",
+          "box": [
+            -4.854194,
+            -9.9,
+            33.310345,
+            9.708387,
+            1.225714,
+            1.931035
+          ],
+          "uv": [
+            1357,
+            220
+          ],
+          "material": "metal",
+          "weaponOverhang": false
+        },
+        {
+          "name": "track_left_tread_16",
+          "parent": "track_left",
+          "box": [
+            -4.854194,
+            -9.9,
+            38.910345,
+            9.708387,
+            1.225714,
+            1.931035
+          ],
+          "uv": [
+            1385,
+            220
+          ],
+          "material": "metal",
+          "weaponOverhang": false
+        },
+        {
+          "name": "track_left_tread_17",
+          "parent": "track_left",
+          "box": [
+            -4.854194,
+            -9.9,
+            44.510345,
+            9.708387,
+            1.225714,
+            1.931035
+          ],
+          "uv": [
+            1413,
+            220
+          ],
+          "material": "metal",
+          "weaponOverhang": false
+        },
+        {
+          "name": "track_left_tread_18",
+          "parent": "track_left",
+          "box": [
+            -4.854194,
+            -9.9,
+            50.110345,
+            9.708387,
+            1.225714,
+            1.931035
+          ],
+          "uv": [
+            1441,
+            220
+          ],
+          "material": "metal",
+          "weaponOverhang": false
+        },
+        {
+          "name": "track_left_wheel_1_tire_vertical",
+          "parent": "track_left_wheel_1",
+          "box": [
+            -4.2768,
+            -8.485714,
+            -5.515714,
+            8.5536,
+            16.971429,
+            11.031429
+          ],
+          "uv": [
+            1469,
+            220
+          ],
+          "material": "rubber",
+          "weaponOverhang": false
+        },
+        {
+          "name": "track_left_wheel_1_tire_horizontal",
+          "parent": "track_left_wheel_1",
+          "box": [
+            -4.2768,
+            -5.515714,
+            -8.485714,
+            8.5536,
+            11.031429,
+            16.971429
+          ],
+          "uv": [
+            1513,
+            220
+          ],
+          "material": "rubber",
+          "weaponOverhang": false
+        },
+        {
+          "name": "track_left_wheel_1_hub",
+          "parent": "track_left_wheel_1",
+          "box": [
+            -4.961156,
+            -3.564,
+            -3.564,
+            9.922142,
+            7.128,
+            7.128
+          ],
+          "uv": [
+            1569,
+            220
+          ],
+          "material": "hub",
+          "weaponOverhang": false
+        },
+        {
+          "name": "track_left_wheel_2_tire_vertical",
+          "parent": "track_left_wheel_2",
+          "box": [
+            -4.2768,
+            -8.485714,
+            -5.515714,
+            8.5536,
+            16.971429,
+            11.031429
+          ],
+          "uv": [
+            1608,
+            220
+          ],
+          "material": "rubber",
+          "weaponOverhang": false
+        },
+        {
+          "name": "track_left_wheel_2_tire_horizontal",
+          "parent": "track_left_wheel_2",
+          "box": [
+            -4.2768,
+            -5.515714,
+            -8.485714,
+            8.5536,
+            11.031429,
+            16.971429
+          ],
+          "uv": [
+            1652,
+            220
+          ],
+          "material": "rubber",
+          "weaponOverhang": false
+        },
+        {
+          "name": "track_left_wheel_2_hub",
+          "parent": "track_left_wheel_2",
+          "box": [
+            -4.961156,
+            -3.564,
+            -3.564,
+            9.922142,
+            7.128,
+            7.128
+          ],
+          "uv": [
+            1708,
+            220
+          ],
+          "material": "hub",
+          "weaponOverhang": false
+        },
+        {
+          "name": "track_left_wheel_3_tire_vertical",
+          "parent": "track_left_wheel_3",
+          "box": [
+            -4.2768,
+            -8.485714,
+            -5.515714,
+            8.5536,
+            16.971429,
+            11.031429
+          ],
+          "uv": [
+            1747,
+            220
+          ],
+          "material": "rubber",
+          "weaponOverhang": false
+        },
+        {
+          "name": "track_left_wheel_3_tire_horizontal",
+          "parent": "track_left_wheel_3",
+          "box": [
+            -4.2768,
+            -5.515714,
+            -8.485714,
+            8.5536,
+            11.031429,
+            16.971429
+          ],
+          "uv": [
+            1791,
+            220
+          ],
+          "material": "rubber",
+          "weaponOverhang": false
+        },
+        {
+          "name": "track_left_wheel_3_hub",
+          "parent": "track_left_wheel_3",
+          "box": [
+            -4.961156,
+            -3.564,
+            -3.564,
+            9.922142,
+            7.128,
+            7.128
+          ],
+          "uv": [
+            1847,
+            220
+          ],
+          "material": "hub",
+          "weaponOverhang": false
+        },
+        {
+          "name": "track_left_wheel_4_tire_vertical",
+          "parent": "track_left_wheel_4",
+          "box": [
+            -4.2768,
+            -8.485714,
+            -5.515714,
+            8.5536,
+            16.971429,
+            11.031429
+          ],
+          "uv": [
+            1886,
+            220
+          ],
+          "material": "rubber",
+          "weaponOverhang": false
+        },
+        {
+          "name": "track_left_wheel_4_tire_horizontal",
+          "parent": "track_left_wheel_4",
+          "box": [
+            -4.2768,
+            -5.515714,
+            -8.485714,
+            8.5536,
+            11.031429,
+            16.971429
+          ],
+          "uv": [
+            1930,
+            220
+          ],
+          "material": "rubber",
+          "weaponOverhang": false
+        },
+        {
+          "name": "track_left_wheel_4_hub",
+          "parent": "track_left_wheel_4",
+          "box": [
+            -4.961156,
+            -3.564,
+            -3.564,
+            9.922142,
+            7.128,
+            7.128
+          ],
+          "uv": [
+            1986,
+            220
+          ],
+          "material": "hub",
+          "weaponOverhang": false
+        },
+        {
+          "name": "track_left_wheel_5_tire_vertical",
+          "parent": "track_left_wheel_5",
+          "box": [
+            -4.2768,
+            -8.485714,
+            -5.515714,
+            8.5536,
+            16.971429,
+            11.031429
+          ],
+          "uv": [
+            2,
+            335
+          ],
+          "material": "rubber",
+          "weaponOverhang": false
+        },
+        {
+          "name": "track_left_wheel_5_tire_horizontal",
+          "parent": "track_left_wheel_5",
+          "box": [
+            -4.2768,
+            -5.515714,
+            -8.485714,
+            8.5536,
+            11.031429,
+            16.971429
+          ],
+          "uv": [
+            46,
+            335
+          ],
+          "material": "rubber",
+          "weaponOverhang": false
+        },
+        {
+          "name": "track_left_wheel_5_hub",
+          "parent": "track_left_wheel_5",
+          "box": [
+            -4.961156,
+            -3.564,
+            -3.564,
+            9.922142,
+            7.128,
+            7.128
+          ],
+          "uv": [
+            102,
+            335
+          ],
+          "material": "hub",
+          "weaponOverhang": false
+        },
+        {
+          "name": "track_left_wheel_6_tire_vertical",
+          "parent": "track_left_wheel_6",
+          "box": [
+            -4.2768,
+            -8.485714,
+            -5.515714,
+            8.5536,
+            16.971429,
+            11.031429
+          ],
+          "uv": [
+            141,
+            335
+          ],
+          "material": "rubber",
+          "weaponOverhang": false
+        },
+        {
+          "name": "track_left_wheel_6_tire_horizontal",
+          "parent": "track_left_wheel_6",
+          "box": [
+            -4.2768,
+            -5.515714,
+            -8.485714,
+            8.5536,
+            11.031429,
+            16.971429
+          ],
+          "uv": [
+            185,
+            335
+          ],
+          "material": "rubber",
+          "weaponOverhang": false
+        },
+        {
+          "name": "track_left_wheel_6_hub",
+          "parent": "track_left_wheel_6",
+          "box": [
+            -4.961156,
+            -3.564,
+            -3.564,
+            9.922142,
+            7.128,
+            7.128
+          ],
+          "uv": [
+            241,
+            335
+          ],
+          "material": "hub",
+          "weaponOverhang": false
+        },
+        {
+          "name": "track_left_front",
+          "parent": "track_left",
+          "box": [
+            -4.59871,
+            -6.788572,
+            50.689655,
+            9.197419,
+            13.577143,
+            2.896552
+          ],
+          "uv": [
+            280,
+            335
+          ],
+          "material": "rubber",
+          "weaponOverhang": false
+        },
+        {
+          "name": "track_left_rear",
+          "parent": "track_left",
+          "box": [
+            -4.59871,
+            -6.788572,
+            -53.586207,
+            9.197419,
+            13.577143,
+            2.896552
+          ],
+          "uv": [
+            309,
+            335
+          ],
+          "material": "rubber",
+          "weaponOverhang": false
+        },
+        {
+          "name": "track_right_upper",
+          "parent": "track_right",
+          "box": [
+            -4.59871,
+            7.354286,
+            -53.586207,
+            9.197419,
+            3.394286,
+            107.172414
+          ],
+          "uv": [
+            338,
+            335
+          ],
+          "material": "rubber",
+          "weaponOverhang": false
+        },
+        {
+          "name": "track_right_lower",
+          "parent": "track_right",
+          "box": [
+            -4.59871,
+            -9.428572,
+            -50.110345,
+            9.197419,
+            3.017143,
+            100.22069
+          ],
+          "uv": [
+            575,
+            335
+          ],
+          "material": "rubber",
+          "weaponOverhang": false
+        },
+        {
+          "name": "track_right_tread_0",
+          "parent": "track_right",
+          "box": [
+            -4.854194,
+            -9.9,
+            -50.689655,
+            9.708387,
+            1.225714,
+            1.931035
+          ],
+          "uv": [
+            798,
+            335
+          ],
+          "material": "metal",
+          "weaponOverhang": false
+        },
+        {
+          "name": "track_right_tread_1",
+          "parent": "track_right",
+          "box": [
+            -4.854194,
+            -9.9,
+            -45.089655,
+            9.708387,
+            1.225714,
+            1.931035
+          ],
+          "uv": [
+            826,
+            335
+          ],
+          "material": "metal",
+          "weaponOverhang": false
+        },
+        {
+          "name": "track_right_tread_2",
+          "parent": "track_right",
+          "box": [
+            -4.854194,
+            -9.9,
+            -39.489655,
+            9.708387,
+            1.225714,
+            1.931035
+          ],
+          "uv": [
+            854,
+            335
+          ],
+          "material": "metal",
+          "weaponOverhang": false
+        },
+        {
+          "name": "track_right_tread_3",
+          "parent": "track_right",
+          "box": [
+            -4.854194,
+            -9.9,
+            -33.889655,
+            9.708387,
+            1.225714,
+            1.931035
+          ],
+          "uv": [
+            882,
+            335
+          ],
+          "material": "metal",
+          "weaponOverhang": false
+        },
+        {
+          "name": "track_right_tread_4",
+          "parent": "track_right",
+          "box": [
+            -4.854194,
+            -9.9,
+            -28.289655,
+            9.708387,
+            1.225714,
+            1.931035
+          ],
+          "uv": [
+            910,
+            335
+          ],
+          "material": "metal",
+          "weaponOverhang": false
+        },
+        {
+          "name": "track_right_tread_5",
+          "parent": "track_right",
+          "box": [
+            -4.854194,
+            -9.9,
+            -22.689655,
+            9.708387,
+            1.225714,
+            1.931035
+          ],
+          "uv": [
+            938,
+            335
+          ],
+          "material": "metal",
+          "weaponOverhang": false
+        },
+        {
+          "name": "track_right_tread_6",
+          "parent": "track_right",
+          "box": [
+            -4.854194,
+            -9.9,
+            -17.089655,
+            9.708387,
+            1.225714,
+            1.931035
+          ],
+          "uv": [
+            966,
+            335
+          ],
+          "material": "metal",
+          "weaponOverhang": false
+        },
+        {
+          "name": "track_right_tread_7",
+          "parent": "track_right",
+          "box": [
+            -4.854194,
+            -9.9,
+            -11.489655,
+            9.708387,
+            1.225714,
+            1.931035
+          ],
+          "uv": [
+            994,
+            335
+          ],
+          "material": "metal",
+          "weaponOverhang": false
+        },
+        {
+          "name": "track_right_tread_8",
+          "parent": "track_right",
+          "box": [
+            -4.854194,
+            -9.9,
+            -5.889655,
+            9.708387,
+            1.225714,
+            1.931035
+          ],
+          "uv": [
+            1022,
+            335
+          ],
+          "material": "metal",
+          "weaponOverhang": false
+        },
+        {
+          "name": "track_right_tread_9",
+          "parent": "track_right",
+          "box": [
+            -4.854194,
+            -9.9,
+            -0.289655,
+            9.708387,
+            1.225714,
+            1.931035
+          ],
+          "uv": [
+            1050,
+            335
+          ],
+          "material": "metal",
+          "weaponOverhang": false
+        },
+        {
+          "name": "track_right_tread_10",
+          "parent": "track_right",
+          "box": [
+            -4.854194,
+            -9.9,
+            5.310345,
+            9.708387,
+            1.225714,
+            1.931035
+          ],
+          "uv": [
+            1078,
+            335
+          ],
+          "material": "metal",
+          "weaponOverhang": false
+        },
+        {
+          "name": "track_right_tread_11",
+          "parent": "track_right",
+          "box": [
+            -4.854194,
+            -9.9,
+            10.910345,
+            9.708387,
+            1.225714,
+            1.931035
+          ],
+          "uv": [
+            1106,
+            335
+          ],
+          "material": "metal",
+          "weaponOverhang": false
+        },
+        {
+          "name": "track_right_tread_12",
+          "parent": "track_right",
+          "box": [
+            -4.854194,
+            -9.9,
+            16.510345,
+            9.708387,
+            1.225714,
+            1.931035
+          ],
+          "uv": [
+            1134,
+            335
+          ],
+          "material": "metal",
+          "weaponOverhang": false
+        },
+        {
+          "name": "track_right_tread_13",
+          "parent": "track_right",
+          "box": [
+            -4.854194,
+            -9.9,
+            22.110345,
+            9.708387,
+            1.225714,
+            1.931035
+          ],
+          "uv": [
+            1162,
+            335
+          ],
+          "material": "metal",
+          "weaponOverhang": false
+        },
+        {
+          "name": "track_right_tread_14",
+          "parent": "track_right",
+          "box": [
+            -4.854194,
+            -9.9,
+            27.710345,
+            9.708387,
+            1.225714,
+            1.931035
+          ],
+          "uv": [
+            1190,
+            335
+          ],
+          "material": "metal",
+          "weaponOverhang": false
+        },
+        {
+          "name": "track_right_tread_15",
+          "parent": "track_right",
+          "box": [
+            -4.854194,
+            -9.9,
+            33.310345,
+            9.708387,
+            1.225714,
+            1.931035
+          ],
+          "uv": [
+            1218,
+            335
+          ],
+          "material": "metal",
+          "weaponOverhang": false
+        },
+        {
+          "name": "track_right_tread_16",
+          "parent": "track_right",
+          "box": [
+            -4.854194,
+            -9.9,
+            38.910345,
+            9.708387,
+            1.225714,
+            1.931035
+          ],
+          "uv": [
+            1246,
+            335
+          ],
+          "material": "metal",
+          "weaponOverhang": false
+        },
+        {
+          "name": "track_right_tread_17",
+          "parent": "track_right",
+          "box": [
+            -4.854194,
+            -9.9,
+            44.510345,
+            9.708387,
+            1.225714,
+            1.931035
+          ],
+          "uv": [
+            1274,
+            335
+          ],
+          "material": "metal",
+          "weaponOverhang": false
+        },
+        {
+          "name": "track_right_tread_18",
+          "parent": "track_right",
+          "box": [
+            -4.854194,
+            -9.9,
+            50.110345,
+            9.708387,
+            1.225714,
+            1.931035
+          ],
+          "uv": [
+            1302,
+            335
+          ],
+          "material": "metal",
+          "weaponOverhang": false
+        },
+        {
+          "name": "track_right_wheel_1_tire_vertical",
+          "parent": "track_right_wheel_1",
+          "box": [
+            -4.2768,
+            -8.485714,
+            -5.515714,
+            8.5536,
+            16.971429,
+            11.031429
+          ],
+          "uv": [
+            1330,
+            335
+          ],
+          "material": "rubber",
+          "weaponOverhang": false
+        },
+        {
+          "name": "track_right_wheel_1_tire_horizontal",
+          "parent": "track_right_wheel_1",
+          "box": [
+            -4.2768,
+            -5.515714,
+            -8.485714,
+            8.5536,
+            11.031429,
+            16.971429
+          ],
+          "uv": [
+            1374,
+            335
+          ],
+          "material": "rubber",
+          "weaponOverhang": false
+        },
+        {
+          "name": "track_right_wheel_1_hub",
+          "parent": "track_right_wheel_1",
+          "box": [
+            -4.961156,
+            -3.564,
+            -3.564,
+            9.922142,
+            7.128,
+            7.128
+          ],
+          "uv": [
+            1430,
+            335
+          ],
+          "material": "hub",
+          "weaponOverhang": false
+        },
+        {
+          "name": "track_right_wheel_2_tire_vertical",
+          "parent": "track_right_wheel_2",
+          "box": [
+            -4.2768,
+            -8.485714,
+            -5.515714,
+            8.5536,
+            16.971429,
+            11.031429
+          ],
+          "uv": [
+            1469,
+            335
+          ],
+          "material": "rubber",
+          "weaponOverhang": false
+        },
+        {
+          "name": "track_right_wheel_2_tire_horizontal",
+          "parent": "track_right_wheel_2",
+          "box": [
+            -4.2768,
+            -5.515714,
+            -8.485714,
+            8.5536,
+            11.031429,
+            16.971429
+          ],
+          "uv": [
+            1513,
+            335
+          ],
+          "material": "rubber",
+          "weaponOverhang": false
+        },
+        {
+          "name": "track_right_wheel_2_hub",
+          "parent": "track_right_wheel_2",
+          "box": [
+            -4.961156,
+            -3.564,
+            -3.564,
+            9.922142,
+            7.128,
+            7.128
+          ],
+          "uv": [
+            1569,
+            335
+          ],
+          "material": "hub",
+          "weaponOverhang": false
+        },
+        {
+          "name": "track_right_wheel_3_tire_vertical",
+          "parent": "track_right_wheel_3",
+          "box": [
+            -4.2768,
+            -8.485714,
+            -5.515714,
+            8.5536,
+            16.971429,
+            11.031429
+          ],
+          "uv": [
+            1608,
+            335
+          ],
+          "material": "rubber",
+          "weaponOverhang": false
+        },
+        {
+          "name": "track_right_wheel_3_tire_horizontal",
+          "parent": "track_right_wheel_3",
+          "box": [
+            -4.2768,
+            -5.515714,
+            -8.485714,
+            8.5536,
+            11.031429,
+            16.971429
+          ],
+          "uv": [
+            1652,
+            335
+          ],
+          "material": "rubber",
+          "weaponOverhang": false
+        },
+        {
+          "name": "track_right_wheel_3_hub",
+          "parent": "track_right_wheel_3",
+          "box": [
+            -4.961156,
+            -3.564,
+            -3.564,
+            9.922142,
+            7.128,
+            7.128
+          ],
+          "uv": [
+            1708,
+            335
+          ],
+          "material": "hub",
+          "weaponOverhang": false
+        },
+        {
+          "name": "track_right_wheel_4_tire_vertical",
+          "parent": "track_right_wheel_4",
+          "box": [
+            -4.2768,
+            -8.485714,
+            -5.515714,
+            8.5536,
+            16.971429,
+            11.031429
+          ],
+          "uv": [
+            1747,
+            335
+          ],
+          "material": "rubber",
+          "weaponOverhang": false
+        },
+        {
+          "name": "track_right_wheel_4_tire_horizontal",
+          "parent": "track_right_wheel_4",
+          "box": [
+            -4.2768,
+            -5.515714,
+            -8.485714,
+            8.5536,
+            11.031429,
+            16.971429
+          ],
+          "uv": [
+            1791,
+            335
+          ],
+          "material": "rubber",
+          "weaponOverhang": false
+        },
+        {
+          "name": "track_right_wheel_4_hub",
+          "parent": "track_right_wheel_4",
+          "box": [
+            -4.961156,
+            -3.564,
+            -3.564,
+            9.922142,
+            7.128,
+            7.128
+          ],
+          "uv": [
+            1847,
+            335
+          ],
+          "material": "hub",
+          "weaponOverhang": false
+        },
+        {
+          "name": "track_right_wheel_5_tire_vertical",
+          "parent": "track_right_wheel_5",
+          "box": [
+            -4.2768,
+            -8.485714,
+            -5.515714,
+            8.5536,
+            16.971429,
+            11.031429
+          ],
+          "uv": [
+            1886,
+            335
+          ],
+          "material": "rubber",
+          "weaponOverhang": false
+        },
+        {
+          "name": "track_right_wheel_5_tire_horizontal",
+          "parent": "track_right_wheel_5",
+          "box": [
+            -4.2768,
+            -5.515714,
+            -8.485714,
+            8.5536,
+            11.031429,
+            16.971429
+          ],
+          "uv": [
+            1930,
+            335
+          ],
+          "material": "rubber",
+          "weaponOverhang": false
+        },
+        {
+          "name": "track_right_wheel_5_hub",
+          "parent": "track_right_wheel_5",
+          "box": [
+            -4.961156,
+            -3.564,
+            -3.564,
+            9.922142,
+            7.128,
+            7.128
+          ],
+          "uv": [
+            1986,
+            335
+          ],
+          "material": "hub",
+          "weaponOverhang": false
+        },
+        {
+          "name": "track_right_wheel_6_tire_vertical",
+          "parent": "track_right_wheel_6",
+          "box": [
+            -4.2768,
+            -8.485714,
+            -5.515714,
+            8.5536,
+            16.971429,
+            11.031429
+          ],
+          "uv": [
+            2,
+            450
+          ],
+          "material": "rubber",
+          "weaponOverhang": false
+        },
+        {
+          "name": "track_right_wheel_6_tire_horizontal",
+          "parent": "track_right_wheel_6",
+          "box": [
+            -4.2768,
+            -5.515714,
+            -8.485714,
+            8.5536,
+            11.031429,
+            16.971429
+          ],
+          "uv": [
+            46,
+            450
+          ],
+          "material": "rubber",
+          "weaponOverhang": false
+        },
+        {
+          "name": "track_right_wheel_6_hub",
+          "parent": "track_right_wheel_6",
+          "box": [
+            -4.961156,
+            -3.564,
+            -3.564,
+            9.922142,
+            7.128,
+            7.128
+          ],
+          "uv": [
+            102,
+            450
+          ],
+          "material": "hub",
+          "weaponOverhang": false
+        },
+        {
+          "name": "track_right_front",
+          "parent": "track_right",
+          "box": [
+            -4.59871,
+            -6.788572,
+            50.689655,
+            9.197419,
+            13.577143,
+            2.896552
+          ],
+          "uv": [
+            141,
+            450
+          ],
+          "material": "rubber",
+          "weaponOverhang": false
+        },
+        {
+          "name": "track_right_rear",
+          "parent": "track_right",
+          "box": [
+            -4.59871,
+            -6.788572,
+            -53.586207,
+            9.197419,
+            13.577143,
+            2.896552
+          ],
+          "uv": [
+            170,
+            450
+          ],
+          "material": "rubber",
+          "weaponOverhang": false
+        },
+        {
+          "name": "lower_hull",
+          "parent": "body",
+          "box": [
+            -17.372903,
+            10.56,
+            -50.97931,
+            34.745806,
+            12.068571,
+            100.027586
+          ],
+          "uv": [
+            199,
+            450
+          ],
+          "material": "armor_dark",
+          "weaponOverhang": false
+        },
+        {
+          "name": "upper_hull",
+          "parent": "body",
+          "box": [
+            -23.334194,
+            21.497143,
+            -53.296552,
+            46.668387,
+            10.371429,
+            95.972414
+          ],
+          "uv": [
+            473,
+            450
+          ],
+          "material": "armor",
+          "weaponOverhang": false
+        },
+        {
+          "name": "glacis_step_0",
+          "parent": "body",
+          "box": [
+            -23.163871,
+            18.857143,
+            42.096552,
+            46.327742,
+            3.394286,
+            13.517241
+          ],
+          "uv": [
+            763,
+            450
+          ],
+          "material": "armor_light",
+          "weaponOverhang": false
+        },
+        {
+          "name": "glacis_step_1",
+          "parent": "body",
+          "box": [
+            -23.163871,
+            22.628571,
+            40.551724,
+            46.327742,
+            3.394286,
+            12.551724
+          ],
+          "uv": [
+            887,
+            450
+          ],
+          "material": "armor_light",
+          "weaponOverhang": false
+        },
+        {
+          "name": "glacis_step_2",
+          "parent": "body",
+          "box": [
+            -23.163871,
+            26.4,
+            37.462069,
+            46.327742,
+            3.394286,
+            11.586207
+          ],
+          "uv": [
+            1009,
+            450
+          ],
+          "material": "armor_light",
+          "weaponOverhang": false
+        },
+        {
+          "name": "glacis_step_3",
+          "parent": "body",
+          "box": [
+            -23.163871,
+            30.171429,
+            33.986207,
+            46.327742,
+            3.394286,
+            9.075862
+          ],
+          "uv": [
+            1129,
+            450
+          ],
+          "material": "armor_light",
+          "weaponOverhang": false
+        },
+        {
+          "name": "rear_door",
+          "parent": "door_rear",
+          "box": [
+            -21.80129,
+            0.0,
+            0.0,
+            21.80129,
+            13.954286,
+            2.510345
+          ],
+          "uv": [
+            1244,
+            450
+          ],
+          "material": "armor_dark",
+          "weaponOverhang": false
+        },
+        {
+          "name": "rear_door_inner",
+          "parent": "door_rear",
+          "box": [
+            -19.587097,
+            2.074286,
+            -0.193104,
+            17.372903,
+            9.617143,
+            1.158621
+          ],
+          "uv": [
+            1297,
+            450
+          ],
+          "material": "armor",
+          "weaponOverhang": false
+        },
+        {
+          "name": "rear_step",
+          "parent": "body",
+          "box": [
+            -12.944516,
+            8.108571,
+            -55.806896,
+            25.889032,
+            2.262857,
+            4.055172
+          ],
+          "uv": [
+            1339,
+            450
+          ],
+          "material": "metal",
+          "weaponOverhang": false
+        },
+        {
+          "name": "left_skirt_0",
+          "parent": "body",
+          "box": [
+            -26.4,
+            13.765714,
+            -45.186207,
+            2.384516,
+            16.028571,
+            18.151724
+          ],
+          "uv": [
+            1403,
+            450
+          ],
+          "material": "armor",
+          "weaponOverhang": false
+        },
+        {
+          "name": "left_skirt_latch_0",
+          "parent": "body",
+          "box": [
+            -26.4,
+            17.537143,
+            -39.006896,
+            2.725161,
+            1.131429,
+            5.986207
+          ],
+          "uv": [
+            1449,
+            450
+          ],
+          "material": "metal",
+          "weaponOverhang": false
+        },
+        {
+          "name": "left_skirt_1",
+          "parent": "body",
+          "box": [
+            -26.4,
+            13.765714,
+            -26.068965,
+            2.384516,
+            16.028571,
+            18.151724
+          ],
+          "uv": [
+            1471,
+            450
+          ],
+          "material": "armor",
+          "weaponOverhang": false
+        },
+        {
+          "name": "left_skirt_latch_1",
+          "parent": "body",
+          "box": [
+            -26.4,
+            17.537143,
+            -19.889655,
+            2.725161,
+            1.131429,
+            5.986207
+          ],
+          "uv": [
+            1517,
+            450
+          ],
+          "material": "metal",
+          "weaponOverhang": false
+        },
+        {
+          "name": "left_skirt_2",
+          "parent": "body",
+          "box": [
+            -26.4,
+            13.765714,
+            -6.951724,
+            2.384516,
+            16.028571,
+            18.151724
+          ],
+          "uv": [
+            1539,
+            450
+          ],
+          "material": "armor",
+          "weaponOverhang": false
+        },
+        {
+          "name": "left_skirt_latch_2",
+          "parent": "body",
+          "box": [
+            -26.4,
+            17.537143,
+            -0.772414,
+            2.725161,
+            1.131429,
+            5.986207
+          ],
+          "uv": [
+            1585,
+            450
+          ],
+          "material": "metal",
+          "weaponOverhang": false
+        },
+        {
+          "name": "left_skirt_3",
+          "parent": "body",
+          "box": [
+            -26.4,
+            13.765714,
+            12.165517,
+            2.384516,
+            16.028571,
+            18.151724
+          ],
+          "uv": [
+            1607,
+            450
+          ],
+          "material": "armor",
+          "weaponOverhang": false
+        },
+        {
+          "name": "left_skirt_latch_3",
+          "parent": "body",
+          "box": [
+            -26.4,
+            17.537143,
+            18.344828,
+            2.725161,
+            1.131429,
+            5.986207
+          ],
+          "uv": [
+            1653,
+            450
+          ],
+          "material": "metal",
+          "weaponOverhang": false
+        },
+        {
+          "name": "left_rail",
+          "parent": "body",
+          "box": [
+            -26.4,
+            29.794286,
+            -48.855172,
+            2.725161,
+            1.508571,
+            89.793104
+          ],
+          "uv": [
+            1675,
+            450
+          ],
+          "material": "armor_light",
+          "weaponOverhang": false
+        },
+        {
+          "name": "right_skirt_0",
+          "parent": "body",
+          "box": [
+            24.015484,
+            13.765714,
+            -45.186207,
+            2.384516,
+            16.028571,
+            18.151724
+          ],
+          "uv": [
+            1865,
+            450
+          ],
+          "material": "armor",
+          "weaponOverhang": false
+        },
+        {
+          "name": "right_skirt_latch_0",
+          "parent": "body",
+          "box": [
+            23.674839,
+            17.537143,
+            -39.006896,
+            2.725161,
+            1.131429,
+            5.986207
+          ],
+          "uv": [
+            1911,
+            450
+          ],
+          "material": "metal",
+          "weaponOverhang": false
+        },
+        {
+          "name": "right_skirt_1",
+          "parent": "body",
+          "box": [
+            24.015484,
+            13.765714,
+            -26.068965,
+            2.384516,
+            16.028571,
+            18.151724
+          ],
+          "uv": [
+            1933,
+            450
+          ],
+          "material": "armor",
+          "weaponOverhang": false
+        },
+        {
+          "name": "right_skirt_latch_1",
+          "parent": "body",
+          "box": [
+            23.674839,
+            17.537143,
+            -19.889655,
+            2.725161,
+            1.131429,
+            5.986207
+          ],
+          "uv": [
+            1979,
+            450
+          ],
+          "material": "metal",
+          "weaponOverhang": false
+        },
+        {
+          "name": "right_skirt_2",
+          "parent": "body",
+          "box": [
+            24.015484,
+            13.765714,
+            -6.951724,
+            2.384516,
+            16.028571,
+            18.151724
+          ],
+          "uv": [
+            2001,
+            450
+          ],
+          "material": "armor",
+          "weaponOverhang": false
+        },
+        {
+          "name": "right_skirt_latch_2",
+          "parent": "body",
+          "box": [
+            23.674839,
+            17.537143,
+            -0.772414,
+            2.725161,
+            1.131429,
+            5.986207
+          ],
+          "uv": [
+            2,
+            567
+          ],
+          "material": "metal",
+          "weaponOverhang": false
+        },
+        {
+          "name": "right_skirt_3",
+          "parent": "body",
+          "box": [
+            24.015484,
+            13.765714,
+            12.165517,
+            2.384516,
+            16.028571,
+            18.151724
+          ],
+          "uv": [
+            24,
+            567
+          ],
+          "material": "armor",
+          "weaponOverhang": false
+        },
+        {
+          "name": "right_skirt_latch_3",
+          "parent": "body",
+          "box": [
+            23.674839,
+            17.537143,
+            18.344828,
+            2.725161,
+            1.131429,
+            5.986207
+          ],
+          "uv": [
+            70,
+            567
+          ],
+          "material": "metal",
+          "weaponOverhang": false
+        },
+        {
+          "name": "right_rail",
+          "parent": "body",
+          "box": [
+            23.674839,
+            29.794286,
+            -48.855172,
+            2.725161,
+            1.508571,
+            89.793104
+          ],
+          "uv": [
+            92,
+            567
+          ],
+          "material": "armor_light",
+          "weaponOverhang": false
+        },
+        {
+          "name": "turret_ring",
+          "parent": "turret_yaw",
+          "box": [
+            -12.944516,
+            0.188571,
+            -14.675862,
+            25.889032,
+            3.205714,
+            28.57931
+          ],
+          "uv": [
+            282,
+            567
+          ],
+          "material": "metal",
+          "weaponOverhang": false
+        },
+        {
+          "name": "turret_lower",
+          "parent": "turret_yaw",
+          "box": [
+            -15.15871,
+            3.394286,
+            -16.993104,
+            30.317419,
+            6.788571,
+            32.441379
+          ],
+          "uv": [
+            395,
+            567
+          ],
+          "material": "armor",
+          "weaponOverhang": false
+        },
+        {
+          "name": "turret_top",
+          "parent": "turret_yaw",
+          "box": [
+            -12.603871,
+            10.182857,
+            -14.675862,
+            25.207742,
+            3.582857,
+            27.806896
+          ],
+          "uv": [
+            525,
+            567
+          ],
+          "material": "armor_light",
+          "weaponOverhang": false
+        },
+        {
+          "name": "gun_mantlet",
+          "parent": "gun_pitch",
+          "box": [
+            -4.769032,
+            -4.148571,
+            0.0,
+            9.538064,
+            8.297143,
+            9.075862
+          ],
+          "uv": [
+            636,
+            567
+          ],
+          "material": "armor_dark",
+          "weaponOverhang": false
+        },
+        {
+          "name": "main_barrel",
+          "parent": "gun_pitch",
+          "box": [
+            -1.277419,
+            -1.414286,
+            7.531034,
+            2.554839,
+            2.828571,
+            48.082759
+          ],
+          "uv": [
+            678,
+            567
+          ],
+          "material": "metal",
+          "weaponOverhang": true
+        },
+        {
+          "name": "main_muzzle",
+          "parent": "gun_pitch",
+          "box": [
+            -1.873548,
+            -2.074286,
+            55.227586,
+            3.747097,
+            4.148571,
+            3.668965
+          ],
+          "uv": [
+            784,
+            567
+          ],
+          "material": "metal",
+          "weaponOverhang": true
+        },
+        {
+          "name": "launcher_box",
+          "parent": "gun_pitch",
+          "box": [
+            10.56,
+            1.32,
+            -9.655172,
+            11.24129,
+            11.314286,
+            26.068965
+          ],
+          "uv": [
+            803,
+            567
+          ],
+          "material": "armor_light",
+          "weaponOverhang": false
+        },
+        {
+          "name": "launcher_upper_port",
+          "parent": "gun_pitch",
+          "box": [
+            12.944516,
+            7.165714,
+            16.413793,
+            6.472258,
+            2.828571,
+            0.965517
+          ],
+          "uv": [
+            882,
+            567
+          ],
+          "material": "armor_dark",
+          "weaponOverhang": false
+        },
+        {
+          "name": "launcher_lower_port",
+          "parent": "gun_pitch",
+          "box": [
+            12.944516,
+            2.451429,
+            16.413793,
+            6.472258,
+            2.828571,
+            0.965517
+          ],
+          "uv": [
+            901,
+            567
+          ],
+          "material": "armor_dark",
+          "weaponOverhang": false
+        },
+        {
+          "name": "launcher_muzzle_marker",
+          "parent": "gun_pitch",
+          "box": [
+            14.307097,
+            3.582857,
+            16.413793,
+            3.747097,
+            4.148571,
+            0.965517
+          ],
+          "uv": [
+            920,
+            567
+          ],
+          "material": "armor_dark",
+          "weaponOverhang": false
+        },
+        {
+          "name": "hatch",
+          "parent": "hatch_gunner",
+          "box": [
+            0.0,
+            0.0,
+            0.0,
+            11.24129,
+            1.885714,
+            11.77931
+          ],
+          "uv": [
+            934,
+            567
+          ],
+          "material": "metal",
+          "weaponOverhang": false
+        },
+        {
+          "name": "antenna",
+          "parent": "turret_yaw",
+          "box": [
+            -11.752258,
+            13.765714,
+            -13.710345,
+            0.936774,
+            7.92,
+            1.062069
+          ],
+          "uv": [
+            985,
+            567
+          ],
+          "material": "metal",
+          "weaponOverhang": false
+        },
+        {
+          "name": "headlamp_0",
+          "parent": "body",
+          "box": [
+            -19.416774,
+            21.12,
+            54.841379,
+            3.406452,
+            3.017143,
+            1.158621
+          ],
+          "uv": [
+            993,
+            567
+          ],
+          "material": "lamp",
+          "weaponOverhang": false
+        },
+        {
+          "name": "headlamp_1",
+          "parent": "body",
+          "box": [
+            16.010323,
+            21.12,
+            54.841379,
+            3.406452,
+            3.017143,
+            1.158621
+          ],
+          "uv": [
+            1007,
+            567
+          ],
+          "material": "lamp",
+          "weaponOverhang": false
+        },
+        {
+          "name": "rear_lamp_0",
+          "parent": "body",
+          "box": [
+            -16.010323,
+            24.325714,
+            -55.806896,
+            3.406452,
+            2.262857,
+            0.965517
+          ],
+          "uv": [
+            1021,
+            567
+          ],
+          "material": "tail_lamp",
+          "weaponOverhang": false
+        },
+        {
+          "name": "rear_lamp_1",
+          "parent": "body",
+          "box": [
+            12.603871,
+            24.325714,
+            -55.806896,
+            3.406452,
+            2.262857,
+            0.965517
+          ],
+          "uv": [
+            1034,
+            567
+          ],
+          "material": "tail_lamp",
+          "weaponOverhang": false
+        },
+        {
+          "name": "glacis_vent_0",
+          "parent": "body",
+          "box": [
+            -12.263226,
+            33.954286,
+            29.351724,
+            24.526452,
+            0.848571,
+            1.351724
+          ],
+          "uv": [
+            1047,
+            567
+          ],
+          "material": "armor_dark",
+          "weaponOverhang": false
+        },
+        {
+          "name": "glacis_vent_1",
+          "parent": "body",
+          "box": [
+            -12.263226,
+            32.434286,
+            23.558621,
+            24.526452,
+            0.848571,
+            1.351724
+          ],
+          "uv": [
+            1103,
+            567
+          ],
+          "material": "armor_dark",
+          "weaponOverhang": false
+        },
+        {
+          "name": "glacis_vent_2",
+          "parent": "body",
+          "box": [
+            -12.263226,
+            32.434286,
+            17.765517,
+            24.526452,
+            0.848571,
+            1.351724
+          ],
+          "uv": [
+            1159,
+            567
+          ],
+          "material": "armor_dark",
+          "weaponOverhang": false
+        },
+        {
+          "name": "glacis_vent_3",
+          "parent": "body",
+          "box": [
+            -12.263226,
+            32.434286,
+            11.972414,
+            24.526452,
+            0.848571,
+            1.351724
+          ],
+          "uv": [
+            1215,
+            567
+          ],
+          "material": "armor_dark",
+          "weaponOverhang": false
+        },
+        {
+          "name": "recognition_bar_0",
+          "parent": "body",
+          "box": [
+            -6.812903,
+            27.72,
+            54.841379,
+            2.895484,
+            1.508571,
+            1.158621
+          ],
+          "uv": [
+            1271,
+            567
+          ],
+          "material": "marker",
+          "weaponOverhang": false
+        },
+        {
+          "name": "recognition_bar_1",
+          "parent": "body",
+          "box": [
+            -1.873548,
+            27.72,
+            54.841379,
+            2.895484,
+            1.508571,
+            1.158621
+          ],
+          "uv": [
+            1284,
+            567
+          ],
+          "material": "marker",
+          "weaponOverhang": false
+        },
+        {
+          "name": "recognition_bar_2",
+          "parent": "body",
+          "box": [
+            3.065806,
+            27.72,
+            54.841379,
+            2.895484,
+            1.508571,
+            1.158621
+          ],
+          "uv": [
+            1297,
+            567
+          ],
+          "material": "marker",
+          "weaponOverhang": false
+        },
+        {
+          "name": "left_hazard_bar_0",
+          "parent": "body",
+          "box": [
+            -26.4,
+            26.777143,
+            -8.689655,
+            0.596129,
+            4.902857,
+            2.510345
+          ],
+          "uv": [
+            1310,
+            567
+          ],
+          "material": "hazard",
+          "weaponOverhang": false
+        },
+        {
+          "name": "left_hazard_bar_1",
+          "parent": "body",
+          "box": [
+            -26.4,
+            26.777143,
+            -2.896552,
+            0.596129,
+            4.902857,
+            2.510345
+          ],
+          "uv": [
+            1321,
+            567
+          ],
+          "material": "hazard",
+          "weaponOverhang": false
+        },
+        {
+          "name": "left_hazard_bar_2",
+          "parent": "body",
+          "box": [
+            -26.4,
+            26.777143,
+            2.896552,
+            0.596129,
+            4.902857,
+            2.510345
+          ],
+          "uv": [
+            1332,
+            567
+          ],
+          "material": "hazard",
+          "weaponOverhang": false
+        },
+        {
+          "name": "right_hazard_bar_0",
+          "parent": "body",
+          "box": [
+            25.803871,
+            26.777143,
+            -8.689655,
+            0.596129,
+            4.902857,
+            2.510345
+          ],
+          "uv": [
+            1343,
+            567
+          ],
+          "material": "hazard",
+          "weaponOverhang": false
+        },
+        {
+          "name": "right_hazard_bar_1",
+          "parent": "body",
+          "box": [
+            25.803871,
+            26.777143,
+            -2.896552,
+            0.596129,
+            4.902857,
+            2.510345
+          ],
+          "uv": [
+            1354,
+            567
+          ],
+          "material": "hazard",
+          "weaponOverhang": false
+        },
+        {
+          "name": "right_hazard_bar_2",
+          "parent": "body",
+          "box": [
+            25.803871,
+            26.777143,
+            2.896552,
+            0.596129,
+            4.902857,
+            2.510345
+          ],
+          "uv": [
+            1365,
+            567
+          ],
+          "material": "hazard",
+          "weaponOverhang": false
+        }
+      ],
+      "anchors": {
+        "seat_driver": {
+          "frame": "body",
+          "position": [
+            -0.69193548,
+            0.23571429,
+            2.11206897
+          ]
+        },
+        "seat_gunner": {
+          "frame": "body",
+          "position": [
+            0.26612903,
+            0.53035714,
+            0.18103448
+          ]
+        },
+        "seat_passenger_1": {
+          "frame": "body",
+          "position": [
+            -0.74516129,
+            0.23571429,
+            -0.84482759
+          ]
+        },
+        "seat_passenger_2": {
+          "frame": "body",
+          "position": [
+            0.74516129,
+            0.23571429,
+            -0.84482759
+          ]
+        },
+        "seat_passenger_3": {
+          "frame": "body",
+          "position": [
+            -0.74516129,
+            0.23571429,
+            -1.75
+          ]
+        },
+        "seat_passenger_4": {
+          "frame": "body",
+          "position": [
+            0.74516129,
+            0.23571429,
+            -1.75
+          ]
+        },
+        "seat_passenger_5": {
+          "frame": "body",
+          "position": [
+            -0.74516129,
+            0.23571429,
+            -2.65517241
+          ]
+        },
+        "camera_driver": {
+          "frame": "body",
+          "position": [
+            -0.69193548,
+            2.15,
+            1.91
+          ]
+        },
+        "camera_gunner": {
+          "frame": "turret_yaw",
+          "position": [
+            0.0,
+            2.88,
+            0.17
+          ]
+        },
+        "camera_passenger_1": {
+          "frame": "body",
+          "position": [
+            -1.45,
+            1.85571429,
+            -0.84482759
+          ]
+        },
+        "camera_passenger_2": {
+          "frame": "body",
+          "position": [
+            1.45,
+            1.85571429,
+            -0.84482759
+          ]
+        },
+        "camera_passenger_3": {
+          "frame": "body",
+          "position": [
+            -1.45,
+            1.85571429,
+            -1.75
+          ]
+        },
+        "camera_passenger_4": {
+          "frame": "body",
+          "position": [
+            1.45,
+            1.85571429,
+            -1.75
+          ]
+        },
+        "camera_passenger_5": {
+          "frame": "body",
+          "position": [
+            -1.45,
+            1.85571429,
+            -2.65517241
+          ]
+        },
+        "camera_passenger_6": {
+          "frame": "body",
+          "position": [
+            1.45,
+            1.85571429,
+            -2.65517241
+          ]
+        },
+        "seat_passenger_6": {
+          "frame": "body",
+          "position": [
+            0.74516129,
+            0.23571429,
+            -2.65517241
+          ]
+        },
+        "exit_driver": {
+          "frame": "body",
+          "position": [
+            -2.23548387,
+            0.1,
+            1.81034483
+          ]
+        },
+        "exit_gunner": {
+          "frame": "body",
+          "position": [
+            2.23548387,
+            0.1,
+            1.81034483
+          ]
+        },
+        "exit_rear": {
+          "frame": "body",
+          "position": [
+            0.0,
+            0.1,
+            -4.22413793
+          ]
+        },
+        "breech_primary": {
+          "frame": "gun_pitch",
+          "position": [
+            0.0,
+            2.475,
+            0.54310345
+          ]
+        },
+        "muzzle_primary": {
+          "frame": "gun_pitch",
+          "position": [
+            0.0,
+            2.475,
+            4.22413793
+          ]
+        },
+        "breech_secondary": {
+          "frame": "gun_pitch",
+          "position": [
+            1.01129032,
+            2.82857143,
+            0.06034483
+          ]
+        },
+        "muzzle_secondary": {
+          "frame": "gun_pitch",
+          "position": [
+            1.01129032,
+            2.82857143,
+            1.62931034
+          ]
+        }
+      }
+    },
+    "tank": {
+      "dimensions": [
+        4.0,
+        8.0,
+        3.4
+      ],
+      "referenceStatus": {
+        "status": "Original adapted model after actual Prototype 2 gameplay views",
+        "viewed": [
+          "https://www.igcd.net/vehicle.php?id=50317"
+        ],
+        "confirmed": "Wide low tracked hull with seven visible road wheels, side skirts, separate broad turret, long cannon, roof-mounted multiple-barrel gun, front plough teeth, rear stowage.",
+        "adapted": "Exact scale, mounts, seats, simplified plough and two palettes are mod choices; no real model or caliber assertion."
+      },
+      "bones": [
+        {
+          "name": "root",
+          "parent": null,
+          "pivot": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "pivotBlocks": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "name": "body",
+          "parent": "root",
+          "pivot": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "pivotBlocks": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "name": "turret_yaw",
+          "parent": "body",
+          "pivot": [
+            0.0,
+            30.114286,
+            0.0
+          ],
+          "pivotBlocks": [
+            0.0,
+            1.88214286,
+            0.0
+          ]
+        },
+        {
+          "name": "gun_pitch",
+          "parent": "turret_yaw",
+          "pivot": [
+            0.0,
+            10.685714,
+            18.707692
+          ],
+          "pivotBlocks": [
+            0.0,
+            2.55,
+            1.16923077
+          ]
+        },
+        {
+          "name": "track_left",
+          "parent": "body",
+          "pivot": [
+            -25.6,
+            10.685714,
+            0.0
+          ],
+          "pivotBlocks": [
+            -1.6,
+            0.66785714,
+            0.0
+          ]
+        },
+        {
+          "name": "track_left_wheel_1",
+          "parent": "track_left",
+          "pivot": [
+            0.0,
+            0.194286,
+            -51.101538
+          ],
+          "pivotBlocks": [
+            -1.6,
+            0.68,
+            -3.19384615
+          ]
+        },
+        {
+          "name": "track_left_wheel_2",
+          "parent": "track_left",
+          "pivot": [
+            0.0,
+            0.194286,
+            -34.067692
+          ],
+          "pivotBlocks": [
+            -1.6,
+            0.68,
+            -2.12923077
+          ]
+        },
+        {
+          "name": "track_left_wheel_3",
+          "parent": "track_left",
+          "pivot": [
+            0.0,
+            0.194286,
+            -17.033846
+          ],
+          "pivotBlocks": [
+            -1.6,
+            0.68,
+            -1.06461538
+          ]
+        },
+        {
+          "name": "track_left_wheel_4",
+          "parent": "track_left",
+          "pivot": [
+            0.0,
+            0.194286,
+            0.0
+          ],
+          "pivotBlocks": [
+            -1.6,
+            0.68,
+            0.0
+          ]
+        },
+        {
+          "name": "track_left_wheel_5",
+          "parent": "track_left",
+          "pivot": [
+            0.0,
+            0.194286,
+            17.033846
+          ],
+          "pivotBlocks": [
+            -1.6,
+            0.68,
+            1.06461538
+          ]
+        },
+        {
+          "name": "track_left_wheel_6",
+          "parent": "track_left",
+          "pivot": [
+            0.0,
+            0.194286,
+            34.067692
+          ],
+          "pivotBlocks": [
+            -1.6,
+            0.68,
+            2.12923077
+          ]
+        },
+        {
+          "name": "track_left_wheel_7",
+          "parent": "track_left",
+          "pivot": [
+            0.0,
+            0.194286,
+            51.101538
+          ],
+          "pivotBlocks": [
+            -1.6,
+            0.68,
+            3.19384615
+          ]
+        },
+        {
+          "name": "track_right",
+          "parent": "body",
+          "pivot": [
+            25.6,
+            10.685714,
+            0.0
+          ],
+          "pivotBlocks": [
+            1.6,
+            0.66785714,
+            0.0
+          ]
+        },
+        {
+          "name": "track_right_wheel_1",
+          "parent": "track_right",
+          "pivot": [
+            0.0,
+            0.194286,
+            -51.101538
+          ],
+          "pivotBlocks": [
+            1.6,
+            0.68,
+            -3.19384615
+          ]
+        },
+        {
+          "name": "track_right_wheel_2",
+          "parent": "track_right",
+          "pivot": [
+            0.0,
+            0.194286,
+            -34.067692
+          ],
+          "pivotBlocks": [
+            1.6,
+            0.68,
+            -2.12923077
+          ]
+        },
+        {
+          "name": "track_right_wheel_3",
+          "parent": "track_right",
+          "pivot": [
+            0.0,
+            0.194286,
+            -17.033846
+          ],
+          "pivotBlocks": [
+            1.6,
+            0.68,
+            -1.06461538
+          ]
+        },
+        {
+          "name": "track_right_wheel_4",
+          "parent": "track_right",
+          "pivot": [
+            0.0,
+            0.194286,
+            0.0
+          ],
+          "pivotBlocks": [
+            1.6,
+            0.68,
+            0.0
+          ]
+        },
+        {
+          "name": "track_right_wheel_5",
+          "parent": "track_right",
+          "pivot": [
+            0.0,
+            0.194286,
+            17.033846
+          ],
+          "pivotBlocks": [
+            1.6,
+            0.68,
+            1.06461538
+          ]
+        },
+        {
+          "name": "track_right_wheel_6",
+          "parent": "track_right",
+          "pivot": [
+            0.0,
+            0.194286,
+            34.067692
+          ],
+          "pivotBlocks": [
+            1.6,
+            0.68,
+            2.12923077
+          ]
+        },
+        {
+          "name": "track_right_wheel_7",
+          "parent": "track_right",
+          "pivot": [
+            0.0,
+            0.194286,
+            51.101538
+          ],
+          "pivotBlocks": [
+            1.6,
+            0.68,
+            3.19384615
+          ]
+        },
+        {
+          "name": "hatch_commander",
+          "parent": "turret_yaw",
+          "pivot": [
+            3.764706,
+            19.622857,
+            -13.587692
+          ],
+          "pivotBlocks": [
+            0.23529412,
+            3.10857143,
+            -0.84923077
+          ]
+        }
+      ],
+      "parts": [
+        {
+          "name": "track_left_upper",
+          "parent": "track_left",
+          "box": [
+            -5.835294,
+            7.577143,
+            -61.538462,
+            11.670588,
+            3.497143,
+            123.076923
+          ],
+          "uv": [
+            1376,
+            567
+          ],
+          "material": "rubber",
+          "weaponOverhang": false
+        },
+        {
+          "name": "track_left_lower",
+          "parent": "track_left",
+          "box": [
+            -5.835294,
+            -9.714286,
+            -57.993846,
+            11.670588,
+            3.108571,
+            115.987692
+          ],
+          "uv": [
+            1650,
+            567
+          ],
+          "material": "rubber",
+          "weaponOverhang": false
+        },
+        {
+          "name": "track_left_tread_0",
+          "parent": "track_left",
+          "box": [
+            -6.117647,
+            -10.2,
+            -58.584615,
+            12.235294,
+            1.262857,
+            1.969231
+          ],
+          "uv": [
+            1910,
+            567
+          ],
+          "material": "metal",
+          "weaponOverhang": false
+        },
+        {
+          "name": "track_left_tread_1",
+          "parent": "track_left",
+          "box": [
+            -6.117647,
+            -10.2,
+            -52.873846,
+            12.235294,
+            1.262857,
+            1.969231
+          ],
+          "uv": [
+            1943,
+            567
+          ],
+          "material": "metal",
+          "weaponOverhang": false
+        },
+        {
+          "name": "track_left_tread_2",
+          "parent": "track_left",
+          "box": [
+            -6.117647,
+            -10.2,
+            -47.163077,
+            12.235294,
+            1.262857,
+            1.969231
+          ],
+          "uv": [
+            1976,
+            567
+          ],
+          "material": "metal",
+          "weaponOverhang": false
+        },
+        {
+          "name": "track_left_tread_3",
+          "parent": "track_left",
+          "box": [
+            -6.117647,
+            -10.2,
+            -41.452308,
+            12.235294,
+            1.262857,
+            1.969231
+          ],
+          "uv": [
+            2009,
+            567
+          ],
+          "material": "metal",
+          "weaponOverhang": false
+        },
+        {
+          "name": "track_left_tread_4",
+          "parent": "track_left",
+          "box": [
+            -6.117647,
+            -10.2,
+            -35.741538,
+            12.235294,
+            1.262857,
+            1.969231
+          ],
+          "uv": [
+            2,
+            698
+          ],
+          "material": "metal",
+          "weaponOverhang": false
+        },
+        {
+          "name": "track_left_tread_5",
+          "parent": "track_left",
+          "box": [
+            -6.117647,
+            -10.2,
+            -30.030769,
+            12.235294,
+            1.262857,
+            1.969231
+          ],
+          "uv": [
+            35,
+            698
+          ],
+          "material": "metal",
+          "weaponOverhang": false
+        },
+        {
+          "name": "track_left_tread_6",
+          "parent": "track_left",
+          "box": [
+            -6.117647,
+            -10.2,
+            -24.32,
+            12.235294,
+            1.262857,
+            1.969231
+          ],
+          "uv": [
+            68,
+            698
+          ],
+          "material": "metal",
+          "weaponOverhang": false
+        },
+        {
+          "name": "track_left_tread_7",
+          "parent": "track_left",
+          "box": [
+            -6.117647,
+            -10.2,
+            -18.609231,
+            12.235294,
+            1.262857,
+            1.969231
+          ],
+          "uv": [
+            101,
+            698
+          ],
+          "material": "metal",
+          "weaponOverhang": false
+        },
+        {
+          "name": "track_left_tread_8",
+          "parent": "track_left",
+          "box": [
+            -6.117647,
+            -10.2,
+            -12.898462,
+            12.235294,
+            1.262857,
+            1.969231
+          ],
+          "uv": [
+            134,
+            698
+          ],
+          "material": "metal",
+          "weaponOverhang": false
+        },
+        {
+          "name": "track_left_tread_9",
+          "parent": "track_left",
+          "box": [
+            -6.117647,
+            -10.2,
+            -7.187692,
+            12.235294,
+            1.262857,
+            1.969231
+          ],
+          "uv": [
+            167,
+            698
+          ],
+          "material": "metal",
+          "weaponOverhang": false
+        },
+        {
+          "name": "track_left_tread_10",
+          "parent": "track_left",
+          "box": [
+            -6.117647,
+            -10.2,
+            -1.476923,
+            12.235294,
+            1.262857,
+            1.969231
+          ],
+          "uv": [
+            200,
+            698
+          ],
+          "material": "metal",
+          "weaponOverhang": false
+        },
+        {
+          "name": "track_left_tread_11",
+          "parent": "track_left",
+          "box": [
+            -6.117647,
+            -10.2,
+            4.233846,
+            12.235294,
+            1.262857,
+            1.969231
+          ],
+          "uv": [
+            233,
+            698
+          ],
+          "material": "metal",
+          "weaponOverhang": false
+        },
+        {
+          "name": "track_left_tread_12",
+          "parent": "track_left",
+          "box": [
+            -6.117647,
+            -10.2,
+            9.944615,
+            12.235294,
+            1.262857,
+            1.969231
+          ],
+          "uv": [
+            266,
+            698
+          ],
+          "material": "metal",
+          "weaponOverhang": false
+        },
+        {
+          "name": "track_left_tread_13",
+          "parent": "track_left",
+          "box": [
+            -6.117647,
+            -10.2,
+            15.655385,
+            12.235294,
+            1.262857,
+            1.969231
+          ],
+          "uv": [
+            299,
+            698
+          ],
+          "material": "metal",
+          "weaponOverhang": false
+        },
+        {
+          "name": "track_left_tread_14",
+          "parent": "track_left",
+          "box": [
+            -6.117647,
+            -10.2,
+            21.366154,
+            12.235294,
+            1.262857,
+            1.969231
+          ],
+          "uv": [
+            332,
+            698
+          ],
+          "material": "metal",
+          "weaponOverhang": false
+        },
+        {
+          "name": "track_left_tread_15",
+          "parent": "track_left",
+          "box": [
+            -6.117647,
+            -10.2,
+            27.076923,
+            12.235294,
+            1.262857,
+            1.969231
+          ],
+          "uv": [
+            365,
+            698
+          ],
+          "material": "metal",
+          "weaponOverhang": false
+        },
+        {
+          "name": "track_left_tread_16",
+          "parent": "track_left",
+          "box": [
+            -6.117647,
+            -10.2,
+            32.787692,
+            12.235294,
+            1.262857,
+            1.969231
+          ],
+          "uv": [
+            398,
+            698
+          ],
+          "material": "metal",
+          "weaponOverhang": false
+        },
+        {
+          "name": "track_left_tread_17",
+          "parent": "track_left",
+          "box": [
+            -6.117647,
+            -10.2,
+            38.498462,
+            12.235294,
+            1.262857,
+            1.969231
+          ],
+          "uv": [
+            431,
+            698
+          ],
+          "material": "metal",
+          "weaponOverhang": false
+        },
+        {
+          "name": "track_left_tread_18",
+          "parent": "track_left",
+          "box": [
+            -6.117647,
+            -10.2,
+            44.209231,
+            12.235294,
+            1.262857,
+            1.969231
+          ],
+          "uv": [
+            464,
+            698
+          ],
+          "material": "metal",
+          "weaponOverhang": false
+        },
+        {
+          "name": "track_left_tread_19",
+          "parent": "track_left",
+          "box": [
+            -6.117647,
+            -10.2,
+            49.92,
+            12.235294,
+            1.262857,
+            1.969231
+          ],
+          "uv": [
+            497,
+            698
+          ],
+          "material": "metal",
+          "weaponOverhang": false
+        },
+        {
+          "name": "track_left_tread_20",
+          "parent": "track_left",
+          "box": [
+            -6.117647,
+            -10.2,
+            55.630769,
+            12.235294,
+            1.262857,
+            1.969231
+          ],
+          "uv": [
+            530,
+            698
+          ],
+          "material": "metal",
+          "weaponOverhang": false
+        },
+        {
+          "name": "track_left_wheel_1_tire_vertical",
+          "parent": "track_left_wheel_1",
+          "box": [
+            -5.426824,
+            -8.742857,
+            -5.682857,
+            10.853647,
+            17.485714,
+            11.365714
+          ],
+          "uv": [
+            563,
+            698
+          ],
+          "material": "rubber",
+          "weaponOverhang": false
+        },
+        {
+          "name": "track_left_wheel_1_tire_horizontal",
+          "parent": "track_left_wheel_1",
+          "box": [
+            -5.426824,
+            -5.682857,
+            -8.742857,
+            10.853647,
+            11.365714,
+            17.485714
+          ],
+          "uv": [
+            612,
+            698
+          ],
+          "material": "rubber",
+          "weaponOverhang": false
+        },
+        {
+          "name": "track_left_wheel_1_hub",
+          "parent": "track_left_wheel_1",
+          "box": [
+            -6.295153,
+            -3.672,
+            -3.672,
+            12.590306,
+            7.344,
+            7.344
+          ],
+          "uv": [
+            673,
+            698
+          ],
+          "material": "hub",
+          "weaponOverhang": false
+        },
+        {
+          "name": "track_left_wheel_2_tire_vertical",
+          "parent": "track_left_wheel_2",
+          "box": [
+            -5.426824,
+            -8.742857,
+            -5.682857,
+            10.853647,
+            17.485714,
+            11.365714
+          ],
+          "uv": [
+            717,
+            698
+          ],
+          "material": "rubber",
+          "weaponOverhang": false
+        },
+        {
+          "name": "track_left_wheel_2_tire_horizontal",
+          "parent": "track_left_wheel_2",
+          "box": [
+            -5.426824,
+            -5.682857,
+            -8.742857,
+            10.853647,
+            11.365714,
+            17.485714
+          ],
+          "uv": [
+            766,
+            698
+          ],
+          "material": "rubber",
+          "weaponOverhang": false
+        },
+        {
+          "name": "track_left_wheel_2_hub",
+          "parent": "track_left_wheel_2",
+          "box": [
+            -6.295153,
+            -3.672,
+            -3.672,
+            12.590306,
+            7.344,
+            7.344
+          ],
+          "uv": [
+            827,
+            698
+          ],
+          "material": "hub",
+          "weaponOverhang": false
+        },
+        {
+          "name": "track_left_wheel_3_tire_vertical",
+          "parent": "track_left_wheel_3",
+          "box": [
+            -5.426824,
+            -8.742857,
+            -5.682857,
+            10.853647,
+            17.485714,
+            11.365714
+          ],
+          "uv": [
+            871,
+            698
+          ],
+          "material": "rubber",
+          "weaponOverhang": false
+        },
+        {
+          "name": "track_left_wheel_3_tire_horizontal",
+          "parent": "track_left_wheel_3",
+          "box": [
+            -5.426824,
+            -5.682857,
+            -8.742857,
+            10.853647,
+            11.365714,
+            17.485714
+          ],
+          "uv": [
+            920,
+            698
+          ],
+          "material": "rubber",
+          "weaponOverhang": false
+        },
+        {
+          "name": "track_left_wheel_3_hub",
+          "parent": "track_left_wheel_3",
+          "box": [
+            -6.295153,
+            -3.672,
+            -3.672,
+            12.590306,
+            7.344,
+            7.344
+          ],
+          "uv": [
+            981,
+            698
+          ],
+          "material": "hub",
+          "weaponOverhang": false
+        },
+        {
+          "name": "track_left_wheel_4_tire_vertical",
+          "parent": "track_left_wheel_4",
+          "box": [
+            -5.426824,
+            -8.742857,
+            -5.682857,
+            10.853647,
+            17.485714,
+            11.365714
+          ],
+          "uv": [
+            1025,
+            698
+          ],
+          "material": "rubber",
+          "weaponOverhang": false
+        },
+        {
+          "name": "track_left_wheel_4_tire_horizontal",
+          "parent": "track_left_wheel_4",
+          "box": [
+            -5.426824,
+            -5.682857,
+            -8.742857,
+            10.853647,
+            11.365714,
+            17.485714
+          ],
+          "uv": [
+            1074,
+            698
+          ],
+          "material": "rubber",
+          "weaponOverhang": false
+        },
+        {
+          "name": "track_left_wheel_4_hub",
+          "parent": "track_left_wheel_4",
+          "box": [
+            -6.295153,
+            -3.672,
+            -3.672,
+            12.590306,
+            7.344,
+            7.344
+          ],
+          "uv": [
+            1135,
+            698
+          ],
+          "material": "hub",
+          "weaponOverhang": false
+        },
+        {
+          "name": "track_left_wheel_5_tire_vertical",
+          "parent": "track_left_wheel_5",
+          "box": [
+            -5.426824,
+            -8.742857,
+            -5.682857,
+            10.853647,
+            17.485714,
+            11.365714
+          ],
+          "uv": [
+            1179,
+            698
+          ],
+          "material": "rubber",
+          "weaponOverhang": false
+        },
+        {
+          "name": "track_left_wheel_5_tire_horizontal",
+          "parent": "track_left_wheel_5",
+          "box": [
+            -5.426824,
+            -5.682857,
+            -8.742857,
+            10.853647,
+            11.365714,
+            17.485714
+          ],
+          "uv": [
+            1228,
+            698
+          ],
+          "material": "rubber",
+          "weaponOverhang": false
+        },
+        {
+          "name": "track_left_wheel_5_hub",
+          "parent": "track_left_wheel_5",
+          "box": [
+            -6.295153,
+            -3.672,
+            -3.672,
+            12.590306,
+            7.344,
+            7.344
+          ],
+          "uv": [
+            1289,
+            698
+          ],
+          "material": "hub",
+          "weaponOverhang": false
+        },
+        {
+          "name": "track_left_wheel_6_tire_vertical",
+          "parent": "track_left_wheel_6",
+          "box": [
+            -5.426824,
+            -8.742857,
+            -5.682857,
+            10.853647,
+            17.485714,
+            11.365714
+          ],
+          "uv": [
+            1333,
+            698
+          ],
+          "material": "rubber",
+          "weaponOverhang": false
+        },
+        {
+          "name": "track_left_wheel_6_tire_horizontal",
+          "parent": "track_left_wheel_6",
+          "box": [
+            -5.426824,
+            -5.682857,
+            -8.742857,
+            10.853647,
+            11.365714,
+            17.485714
+          ],
+          "uv": [
+            1382,
+            698
+          ],
+          "material": "rubber",
+          "weaponOverhang": false
+        },
+        {
+          "name": "track_left_wheel_6_hub",
+          "parent": "track_left_wheel_6",
+          "box": [
+            -6.295153,
+            -3.672,
+            -3.672,
+            12.590306,
+            7.344,
+            7.344
+          ],
+          "uv": [
+            1443,
+            698
+          ],
+          "material": "hub",
+          "weaponOverhang": false
+        },
+        {
+          "name": "track_left_wheel_7_tire_vertical",
+          "parent": "track_left_wheel_7",
+          "box": [
+            -5.426824,
+            -8.742857,
+            -5.682857,
+            10.853647,
+            17.485714,
+            11.365714
+          ],
+          "uv": [
+            1487,
+            698
+          ],
+          "material": "rubber",
+          "weaponOverhang": false
+        },
+        {
+          "name": "track_left_wheel_7_tire_horizontal",
+          "parent": "track_left_wheel_7",
+          "box": [
+            -5.426824,
+            -5.682857,
+            -8.742857,
+            10.853647,
+            11.365714,
+            17.485714
+          ],
+          "uv": [
+            1536,
+            698
+          ],
+          "material": "rubber",
+          "weaponOverhang": false
+        },
+        {
+          "name": "track_left_wheel_7_hub",
+          "parent": "track_left_wheel_7",
+          "box": [
+            -6.295153,
+            -3.672,
+            -3.672,
+            12.590306,
+            7.344,
+            7.344
+          ],
+          "uv": [
+            1597,
+            698
+          ],
+          "material": "hub",
+          "weaponOverhang": false
+        },
+        {
+          "name": "track_left_front",
+          "parent": "track_left",
+          "box": [
+            -5.835294,
+            -6.994286,
+            58.584615,
+            11.670588,
+            13.988571,
+            2.953846
+          ],
+          "uv": [
+            1641,
+            698
+          ],
+          "material": "rubber",
+          "weaponOverhang": false
+        },
+        {
+          "name": "track_left_rear",
+          "parent": "track_left",
+          "box": [
+            -5.835294,
+            -6.994286,
+            -61.538462,
+            11.670588,
+            13.988571,
+            2.953846
+          ],
+          "uv": [
+            1675,
+            698
+          ],
+          "material": "rubber",
+          "weaponOverhang": false
+        },
+        {
+          "name": "track_right_upper",
+          "parent": "track_right",
+          "box": [
+            -5.835294,
+            7.577143,
+            -61.538462,
+            11.670588,
+            3.497143,
+            123.076923
+          ],
+          "uv": [
+            1709,
+            698
+          ],
+          "material": "rubber",
+          "weaponOverhang": false
+        },
+        {
+          "name": "track_right_lower",
+          "parent": "track_right",
+          "box": [
+            -5.835294,
+            -9.714286,
+            -57.993846,
+            11.670588,
+            3.108571,
+            115.987692
+          ],
+          "uv": [
+            2,
+            829
+          ],
+          "material": "rubber",
+          "weaponOverhang": false
+        },
+        {
+          "name": "track_right_tread_0",
+          "parent": "track_right",
+          "box": [
+            -6.117647,
+            -10.2,
+            -58.584615,
+            12.235294,
+            1.262857,
+            1.969231
+          ],
+          "uv": [
+            262,
+            829
+          ],
+          "material": "metal",
+          "weaponOverhang": false
+        },
+        {
+          "name": "track_right_tread_1",
+          "parent": "track_right",
+          "box": [
+            -6.117647,
+            -10.2,
+            -52.873846,
+            12.235294,
+            1.262857,
+            1.969231
+          ],
+          "uv": [
+            295,
+            829
+          ],
+          "material": "metal",
+          "weaponOverhang": false
+        },
+        {
+          "name": "track_right_tread_2",
+          "parent": "track_right",
+          "box": [
+            -6.117647,
+            -10.2,
+            -47.163077,
+            12.235294,
+            1.262857,
+            1.969231
+          ],
+          "uv": [
+            328,
+            829
+          ],
+          "material": "metal",
+          "weaponOverhang": false
+        },
+        {
+          "name": "track_right_tread_3",
+          "parent": "track_right",
+          "box": [
+            -6.117647,
+            -10.2,
+            -41.452308,
+            12.235294,
+            1.262857,
+            1.969231
+          ],
+          "uv": [
+            361,
+            829
+          ],
+          "material": "metal",
+          "weaponOverhang": false
+        },
+        {
+          "name": "track_right_tread_4",
+          "parent": "track_right",
+          "box": [
+            -6.117647,
+            -10.2,
+            -35.741538,
+            12.235294,
+            1.262857,
+            1.969231
+          ],
+          "uv": [
+            394,
+            829
+          ],
+          "material": "metal",
+          "weaponOverhang": false
+        },
+        {
+          "name": "track_right_tread_5",
+          "parent": "track_right",
+          "box": [
+            -6.117647,
+            -10.2,
+            -30.030769,
+            12.235294,
+            1.262857,
+            1.969231
+          ],
+          "uv": [
+            427,
+            829
+          ],
+          "material": "metal",
+          "weaponOverhang": false
+        },
+        {
+          "name": "track_right_tread_6",
+          "parent": "track_right",
+          "box": [
+            -6.117647,
+            -10.2,
+            -24.32,
+            12.235294,
+            1.262857,
+            1.969231
+          ],
+          "uv": [
+            460,
+            829
+          ],
+          "material": "metal",
+          "weaponOverhang": false
+        },
+        {
+          "name": "track_right_tread_7",
+          "parent": "track_right",
+          "box": [
+            -6.117647,
+            -10.2,
+            -18.609231,
+            12.235294,
+            1.262857,
+            1.969231
+          ],
+          "uv": [
+            493,
+            829
+          ],
+          "material": "metal",
+          "weaponOverhang": false
+        },
+        {
+          "name": "track_right_tread_8",
+          "parent": "track_right",
+          "box": [
+            -6.117647,
+            -10.2,
+            -12.898462,
+            12.235294,
+            1.262857,
+            1.969231
+          ],
+          "uv": [
+            526,
+            829
+          ],
+          "material": "metal",
+          "weaponOverhang": false
+        },
+        {
+          "name": "track_right_tread_9",
+          "parent": "track_right",
+          "box": [
+            -6.117647,
+            -10.2,
+            -7.187692,
+            12.235294,
+            1.262857,
+            1.969231
+          ],
+          "uv": [
+            559,
+            829
+          ],
+          "material": "metal",
+          "weaponOverhang": false
+        },
+        {
+          "name": "track_right_tread_10",
+          "parent": "track_right",
+          "box": [
+            -6.117647,
+            -10.2,
+            -1.476923,
+            12.235294,
+            1.262857,
+            1.969231
+          ],
+          "uv": [
+            592,
+            829
+          ],
+          "material": "metal",
+          "weaponOverhang": false
+        },
+        {
+          "name": "track_right_tread_11",
+          "parent": "track_right",
+          "box": [
+            -6.117647,
+            -10.2,
+            4.233846,
+            12.235294,
+            1.262857,
+            1.969231
+          ],
+          "uv": [
+            625,
+            829
+          ],
+          "material": "metal",
+          "weaponOverhang": false
+        },
+        {
+          "name": "track_right_tread_12",
+          "parent": "track_right",
+          "box": [
+            -6.117647,
+            -10.2,
+            9.944615,
+            12.235294,
+            1.262857,
+            1.969231
+          ],
+          "uv": [
+            658,
+            829
+          ],
+          "material": "metal",
+          "weaponOverhang": false
+        },
+        {
+          "name": "track_right_tread_13",
+          "parent": "track_right",
+          "box": [
+            -6.117647,
+            -10.2,
+            15.655385,
+            12.235294,
+            1.262857,
+            1.969231
+          ],
+          "uv": [
+            691,
+            829
+          ],
+          "material": "metal",
+          "weaponOverhang": false
+        },
+        {
+          "name": "track_right_tread_14",
+          "parent": "track_right",
+          "box": [
+            -6.117647,
+            -10.2,
+            21.366154,
+            12.235294,
+            1.262857,
+            1.969231
+          ],
+          "uv": [
+            724,
+            829
+          ],
+          "material": "metal",
+          "weaponOverhang": false
+        },
+        {
+          "name": "track_right_tread_15",
+          "parent": "track_right",
+          "box": [
+            -6.117647,
+            -10.2,
+            27.076923,
+            12.235294,
+            1.262857,
+            1.969231
+          ],
+          "uv": [
+            757,
+            829
+          ],
+          "material": "metal",
+          "weaponOverhang": false
+        },
+        {
+          "name": "track_right_tread_16",
+          "parent": "track_right",
+          "box": [
+            -6.117647,
+            -10.2,
+            32.787692,
+            12.235294,
+            1.262857,
+            1.969231
+          ],
+          "uv": [
+            790,
+            829
+          ],
+          "material": "metal",
+          "weaponOverhang": false
+        },
+        {
+          "name": "track_right_tread_17",
+          "parent": "track_right",
+          "box": [
+            -6.117647,
+            -10.2,
+            38.498462,
+            12.235294,
+            1.262857,
+            1.969231
+          ],
+          "uv": [
+            823,
+            829
+          ],
+          "material": "metal",
+          "weaponOverhang": false
+        },
+        {
+          "name": "track_right_tread_18",
+          "parent": "track_right",
+          "box": [
+            -6.117647,
+            -10.2,
+            44.209231,
+            12.235294,
+            1.262857,
+            1.969231
+          ],
+          "uv": [
+            856,
+            829
+          ],
+          "material": "metal",
+          "weaponOverhang": false
+        },
+        {
+          "name": "track_right_tread_19",
+          "parent": "track_right",
+          "box": [
+            -6.117647,
+            -10.2,
+            49.92,
+            12.235294,
+            1.262857,
+            1.969231
+          ],
+          "uv": [
+            889,
+            829
+          ],
+          "material": "metal",
+          "weaponOverhang": false
+        },
+        {
+          "name": "track_right_tread_20",
+          "parent": "track_right",
+          "box": [
+            -6.117647,
+            -10.2,
+            55.630769,
+            12.235294,
+            1.262857,
+            1.969231
+          ],
+          "uv": [
+            922,
+            829
+          ],
+          "material": "metal",
+          "weaponOverhang": false
+        },
+        {
+          "name": "track_right_wheel_1_tire_vertical",
+          "parent": "track_right_wheel_1",
+          "box": [
+            -5.426824,
+            -8.742857,
+            -5.682857,
+            10.853647,
+            17.485714,
+            11.365714
+          ],
+          "uv": [
+            955,
+            829
+          ],
+          "material": "rubber",
+          "weaponOverhang": false
+        },
+        {
+          "name": "track_right_wheel_1_tire_horizontal",
+          "parent": "track_right_wheel_1",
+          "box": [
+            -5.426824,
+            -5.682857,
+            -8.742857,
+            10.853647,
+            11.365714,
+            17.485714
+          ],
+          "uv": [
+            1004,
+            829
+          ],
+          "material": "rubber",
+          "weaponOverhang": false
+        },
+        {
+          "name": "track_right_wheel_1_hub",
+          "parent": "track_right_wheel_1",
+          "box": [
+            -6.295153,
+            -3.672,
+            -3.672,
+            12.590306,
+            7.344,
+            7.344
+          ],
+          "uv": [
+            1065,
+            829
+          ],
+          "material": "hub",
+          "weaponOverhang": false
+        },
+        {
+          "name": "track_right_wheel_2_tire_vertical",
+          "parent": "track_right_wheel_2",
+          "box": [
+            -5.426824,
+            -8.742857,
+            -5.682857,
+            10.853647,
+            17.485714,
+            11.365714
+          ],
+          "uv": [
+            1109,
+            829
+          ],
+          "material": "rubber",
+          "weaponOverhang": false
+        },
+        {
+          "name": "track_right_wheel_2_tire_horizontal",
+          "parent": "track_right_wheel_2",
+          "box": [
+            -5.426824,
+            -5.682857,
+            -8.742857,
+            10.853647,
+            11.365714,
+            17.485714
+          ],
+          "uv": [
+            1158,
+            829
+          ],
+          "material": "rubber",
+          "weaponOverhang": false
+        },
+        {
+          "name": "track_right_wheel_2_hub",
+          "parent": "track_right_wheel_2",
+          "box": [
+            -6.295153,
+            -3.672,
+            -3.672,
+            12.590306,
+            7.344,
+            7.344
+          ],
+          "uv": [
+            1219,
+            829
+          ],
+          "material": "hub",
+          "weaponOverhang": false
+        },
+        {
+          "name": "track_right_wheel_3_tire_vertical",
+          "parent": "track_right_wheel_3",
+          "box": [
+            -5.426824,
+            -8.742857,
+            -5.682857,
+            10.853647,
+            17.485714,
+            11.365714
+          ],
+          "uv": [
+            1263,
+            829
+          ],
+          "material": "rubber",
+          "weaponOverhang": false
+        },
+        {
+          "name": "track_right_wheel_3_tire_horizontal",
+          "parent": "track_right_wheel_3",
+          "box": [
+            -5.426824,
+            -5.682857,
+            -8.742857,
+            10.853647,
+            11.365714,
+            17.485714
+          ],
+          "uv": [
+            1312,
+            829
+          ],
+          "material": "rubber",
+          "weaponOverhang": false
+        },
+        {
+          "name": "track_right_wheel_3_hub",
+          "parent": "track_right_wheel_3",
+          "box": [
+            -6.295153,
+            -3.672,
+            -3.672,
+            12.590306,
+            7.344,
+            7.344
+          ],
+          "uv": [
+            1373,
+            829
+          ],
+          "material": "hub",
+          "weaponOverhang": false
+        },
+        {
+          "name": "track_right_wheel_4_tire_vertical",
+          "parent": "track_right_wheel_4",
+          "box": [
+            -5.426824,
+            -8.742857,
+            -5.682857,
+            10.853647,
+            17.485714,
+            11.365714
+          ],
+          "uv": [
+            1417,
+            829
+          ],
+          "material": "rubber",
+          "weaponOverhang": false
+        },
+        {
+          "name": "track_right_wheel_4_tire_horizontal",
+          "parent": "track_right_wheel_4",
+          "box": [
+            -5.426824,
+            -5.682857,
+            -8.742857,
+            10.853647,
+            11.365714,
+            17.485714
+          ],
+          "uv": [
+            1466,
+            829
+          ],
+          "material": "rubber",
+          "weaponOverhang": false
+        },
+        {
+          "name": "track_right_wheel_4_hub",
+          "parent": "track_right_wheel_4",
+          "box": [
+            -6.295153,
+            -3.672,
+            -3.672,
+            12.590306,
+            7.344,
+            7.344
+          ],
+          "uv": [
+            1527,
+            829
+          ],
+          "material": "hub",
+          "weaponOverhang": false
+        },
+        {
+          "name": "track_right_wheel_5_tire_vertical",
+          "parent": "track_right_wheel_5",
+          "box": [
+            -5.426824,
+            -8.742857,
+            -5.682857,
+            10.853647,
+            17.485714,
+            11.365714
+          ],
+          "uv": [
+            1571,
+            829
+          ],
+          "material": "rubber",
+          "weaponOverhang": false
+        },
+        {
+          "name": "track_right_wheel_5_tire_horizontal",
+          "parent": "track_right_wheel_5",
+          "box": [
+            -5.426824,
+            -5.682857,
+            -8.742857,
+            10.853647,
+            11.365714,
+            17.485714
+          ],
+          "uv": [
+            1620,
+            829
+          ],
+          "material": "rubber",
+          "weaponOverhang": false
+        },
+        {
+          "name": "track_right_wheel_5_hub",
+          "parent": "track_right_wheel_5",
+          "box": [
+            -6.295153,
+            -3.672,
+            -3.672,
+            12.590306,
+            7.344,
+            7.344
+          ],
+          "uv": [
+            1681,
+            829
+          ],
+          "material": "hub",
+          "weaponOverhang": false
+        },
+        {
+          "name": "track_right_wheel_6_tire_vertical",
+          "parent": "track_right_wheel_6",
+          "box": [
+            -5.426824,
+            -8.742857,
+            -5.682857,
+            10.853647,
+            17.485714,
+            11.365714
+          ],
+          "uv": [
+            1725,
+            829
+          ],
+          "material": "rubber",
+          "weaponOverhang": false
+        },
+        {
+          "name": "track_right_wheel_6_tire_horizontal",
+          "parent": "track_right_wheel_6",
+          "box": [
+            -5.426824,
+            -5.682857,
+            -8.742857,
+            10.853647,
+            11.365714,
+            17.485714
+          ],
+          "uv": [
+            1774,
+            829
+          ],
+          "material": "rubber",
+          "weaponOverhang": false
+        },
+        {
+          "name": "track_right_wheel_6_hub",
+          "parent": "track_right_wheel_6",
+          "box": [
+            -6.295153,
+            -3.672,
+            -3.672,
+            12.590306,
+            7.344,
+            7.344
+          ],
+          "uv": [
+            1835,
+            829
+          ],
+          "material": "hub",
+          "weaponOverhang": false
+        },
+        {
+          "name": "track_right_wheel_7_tire_vertical",
+          "parent": "track_right_wheel_7",
+          "box": [
+            -5.426824,
+            -8.742857,
+            -5.682857,
+            10.853647,
+            17.485714,
+            11.365714
+          ],
+          "uv": [
+            1879,
+            829
+          ],
+          "material": "rubber",
+          "weaponOverhang": false
+        },
+        {
+          "name": "track_right_wheel_7_tire_horizontal",
+          "parent": "track_right_wheel_7",
+          "box": [
+            -5.426824,
+            -5.682857,
+            -8.742857,
+            10.853647,
+            11.365714,
+            17.485714
+          ],
+          "uv": [
+            1928,
+            829
+          ],
+          "material": "rubber",
+          "weaponOverhang": false
+        },
+        {
+          "name": "track_right_wheel_7_hub",
+          "parent": "track_right_wheel_7",
+          "box": [
+            -6.295153,
+            -3.672,
+            -3.672,
+            12.590306,
+            7.344,
+            7.344
+          ],
+          "uv": [
+            1989,
+            829
+          ],
+          "material": "hub",
+          "weaponOverhang": false
+        },
+        {
+          "name": "track_right_front",
+          "parent": "track_right",
+          "box": [
+            -5.835294,
+            -6.994286,
+            58.584615,
+            11.670588,
+            13.988571,
+            2.953846
+          ],
+          "uv": [
+            2,
+            953
+          ],
+          "material": "rubber",
+          "weaponOverhang": false
+        },
+        {
+          "name": "track_right_rear",
+          "parent": "track_right",
+          "box": [
+            -5.835294,
+            -6.994286,
+            -61.538462,
+            11.670588,
+            13.988571,
+            2.953846
+          ],
+          "uv": [
+            36,
+            953
+          ],
+          "material": "rubber",
+          "weaponOverhang": false
+        },
+        {
+          "name": "lower_hull",
+          "parent": "body",
+          "box": [
+            -20.329412,
+            9.325714,
+            -59.470769,
+            40.658824,
+            13.211429,
+            116.381538
+          ],
+          "uv": [
+            70,
+            953
+          ],
+          "material": "armor_dark",
+          "weaponOverhang": false
+        },
+        {
+          "name": "upper_deck",
+          "parent": "body",
+          "box": [
+            -27.670588,
+            21.177143,
+            -60.455385,
+            55.341176,
+            8.548571,
+            117.169231
+          ],
+          "uv": [
+            389,
+            953
+          ],
+          "material": "armor",
+          "weaponOverhang": false
+        },
+        {
+          "name": "front_armor_step_0",
+          "parent": "body",
+          "box": [
+            -26.917647,
+            21.954286,
+            52.184615,
+            53.835294,
+            3.302857,
+            8.467692
+          ],
+          "uv": [
+            739,
+            953
+          ],
+          "material": "armor_light",
+          "weaponOverhang": false
+        },
+        {
+          "name": "front_armor_step_1",
+          "parent": "body",
+          "box": [
+            -26.917647,
+            25.257143,
+            48.246154,
+            53.835294,
+            3.302857,
+            9.649231
+          ],
+          "uv": [
+            868,
+            953
+          ],
+          "material": "armor_light",
+          "weaponOverhang": false
+        },
+        {
+          "name": "front_armor_step_2",
+          "parent": "body",
+          "box": [
+            -26.917647,
+            28.56,
+            43.716923,
+            53.835294,
+            3.302857,
+            9.058462
+          ],
+          "uv": [
+            999,
+            953
+          ],
+          "material": "armor_light",
+          "weaponOverhang": false
+        },
+        {
+          "name": "left_skirt_0",
+          "parent": "body",
+          "box": [
+            -32.0,
+            16.902857,
+            -57.895385,
+            3.011765,
+            11.657143,
+            17.723077
+          ],
+          "uv": [
+            1129,
+            953
+          ],
+          "material": "armor",
+          "weaponOverhang": false
+        },
+        {
+          "name": "left_skirt_1",
+          "parent": "body",
+          "box": [
+            -32.0,
+            16.902857,
+            -38.990769,
+            3.011765,
+            11.657143,
+            17.723077
+          ],
+          "uv": [
+            1175,
+            953
+          ],
+          "material": "armor",
+          "weaponOverhang": false
+        },
+        {
+          "name": "left_skirt_2",
+          "parent": "body",
+          "box": [
+            -32.0,
+            16.902857,
+            -20.086154,
+            3.011765,
+            11.657143,
+            17.723077
+          ],
+          "uv": [
+            1221,
+            953
+          ],
+          "material": "armor",
+          "weaponOverhang": false
+        },
+        {
+          "name": "left_skirt_3",
+          "parent": "body",
+          "box": [
+            -32.0,
+            16.902857,
+            -1.181538,
+            3.011765,
+            11.657143,
+            17.723077
+          ],
+          "uv": [
+            1267,
+            953
+          ],
+          "material": "armor",
+          "weaponOverhang": false
+        },
+        {
+          "name": "left_skirt_4",
+          "parent": "body",
+          "box": [
+            -32.0,
+            16.902857,
+            17.723077,
+            3.011765,
+            11.657143,
+            17.723077
+          ],
+          "uv": [
+            1313,
+            953
+          ],
+          "material": "armor",
+          "weaponOverhang": false
+        },
+        {
+          "name": "left_skirt_5",
+          "parent": "body",
+          "box": [
+            -32.0,
+            16.902857,
+            36.627692,
+            3.011765,
+            11.657143,
+            17.723077
+          ],
+          "uv": [
+            1359,
+            953
+          ],
+          "material": "armor",
+          "weaponOverhang": false
+        },
+        {
+          "name": "left_fender",
+          "parent": "body",
+          "box": [
+            -32.0,
+            27.782857,
+            -60.652308,
+            3.011765,
+            2.72,
+            117.956923
+          ],
+          "uv": [
+            1405,
+            953
+          ],
+          "material": "armor_light",
+          "weaponOverhang": false
+        },
+        {
+          "name": "left_stowage_0",
+          "parent": "body",
+          "box": [
+            -32.0,
+            30.502857,
+            -47.261538,
+            3.2,
+            4.857143,
+            12.8
+          ],
+          "uv": [
+            1651,
+            953
+          ],
+          "material": "metal",
+          "weaponOverhang": false
+        },
+        {
+          "name": "left_stowage_1",
+          "parent": "body",
+          "box": [
+            -32.0,
+            30.502857,
+            -30.523077,
+            3.2,
+            4.857143,
+            12.8
+          ],
+          "uv": [
+            1687,
+            953
+          ],
+          "material": "metal",
+          "weaponOverhang": false
+        },
+        {
+          "name": "right_skirt_0",
+          "parent": "body",
+          "box": [
+            28.988235,
+            16.902857,
+            -57.895385,
+            3.011765,
+            11.657143,
+            17.723077
+          ],
+          "uv": [
+            1723,
+            953
+          ],
+          "material": "armor",
+          "weaponOverhang": false
+        },
+        {
+          "name": "right_skirt_1",
+          "parent": "body",
+          "box": [
+            28.988235,
+            16.902857,
+            -38.990769,
+            3.011765,
+            11.657143,
+            17.723077
+          ],
+          "uv": [
+            1769,
+            953
+          ],
+          "material": "armor",
+          "weaponOverhang": false
+        },
+        {
+          "name": "right_skirt_2",
+          "parent": "body",
+          "box": [
+            28.988235,
+            16.902857,
+            -20.086154,
+            3.011765,
+            11.657143,
+            17.723077
+          ],
+          "uv": [
+            1815,
+            953
+          ],
+          "material": "armor",
+          "weaponOverhang": false
+        },
+        {
+          "name": "right_skirt_3",
+          "parent": "body",
+          "box": [
+            28.988235,
+            16.902857,
+            -1.181538,
+            3.011765,
+            11.657143,
+            17.723077
+          ],
+          "uv": [
+            1861,
+            953
+          ],
+          "material": "armor",
+          "weaponOverhang": false
+        },
+        {
+          "name": "right_skirt_4",
+          "parent": "body",
+          "box": [
+            28.988235,
+            16.902857,
+            17.723077,
+            3.011765,
+            11.657143,
+            17.723077
+          ],
+          "uv": [
+            1907,
+            953
+          ],
+          "material": "armor",
+          "weaponOverhang": false
+        },
+        {
+          "name": "right_skirt_5",
+          "parent": "body",
+          "box": [
+            28.988235,
+            16.902857,
+            36.627692,
+            3.011765,
+            11.657143,
+            17.723077
+          ],
+          "uv": [
+            1953,
+            953
+          ],
+          "material": "armor",
+          "weaponOverhang": false
+        },
+        {
+          "name": "right_fender",
+          "parent": "body",
+          "box": [
+            28.988235,
+            27.782857,
+            -60.652308,
+            3.011765,
+            2.72,
+            117.956923
+          ],
+          "uv": [
+            2,
+            1087
+          ],
+          "material": "armor_light",
+          "weaponOverhang": false
+        },
+        {
+          "name": "right_stowage_0",
+          "parent": "body",
+          "box": [
+            28.8,
+            30.502857,
+            -47.261538,
+            3.2,
+            4.857143,
+            12.8
+          ],
+          "uv": [
+            248,
+            1087
+          ],
+          "material": "metal",
+          "weaponOverhang": false
+        },
+        {
+          "name": "right_stowage_1",
+          "parent": "body",
+          "box": [
+            28.8,
+            30.502857,
+            -30.523077,
+            3.2,
+            4.857143,
+            12.8
+          ],
+          "uv": [
+            284,
+            1087
+          ],
+          "material": "metal",
+          "weaponOverhang": false
+        },
+        {
+          "name": "turret_ring",
+          "parent": "turret_yaw",
+          "box": [
+            -19.388235,
+            -0.194286,
+            -24.024615,
+            38.776471,
+            3.497143,
+            49.427692
+          ],
+          "uv": [
+            320,
+            1087
+          ],
+          "material": "metal",
+          "weaponOverhang": false
+        },
+        {
+          "name": "turret_base",
+          "parent": "turret_yaw",
+          "box": [
+            -21.835294,
+            3.302857,
+            -28.750769,
+            43.670588,
+            7.577143,
+            53.169231
+          ],
+          "uv": [
+            501,
+            1087
+          ],
+          "material": "armor",
+          "weaponOverhang": false
+        },
+        {
+          "name": "turret_middle",
+          "parent": "turret_yaw",
+          "box": [
+            -20.329412,
+            10.88,
+            -26.584615,
+            40.658824,
+            6.022857,
+            47.852308
+          ],
+          "uv": [
+            699,
+            1087
+          ],
+          "material": "armor_light",
+          "weaponOverhang": false
+        },
+        {
+          "name": "turret_top",
+          "parent": "turret_yaw",
+          "box": [
+            -17.317647,
+            16.902857,
+            -24.024615,
+            34.635294,
+            2.72,
+            41.747692
+          ],
+          "uv": [
+            881,
+            1087
+          ],
+          "material": "armor",
+          "weaponOverhang": false
+        },
+        {
+          "name": "main_mantlet",
+          "parent": "gun_pitch",
+          "box": [
+            -7.529412,
+            -5.245714,
+            -1.378462,
+            15.058824,
+            10.297143,
+            12.406154
+          ],
+          "uv": [
+            1038,
+            1087
+          ],
+          "material": "armor_dark",
+          "weaponOverhang": false
+        },
+        {
+          "name": "main_barrel_sleeve",
+          "parent": "gun_pitch",
+          "box": [
+            -3.388235,
+            -3.497143,
+            10.436923,
+            6.776471,
+            6.994286,
+            14.178462
+          ],
+          "uv": [
+            1097,
+            1087
+          ],
+          "material": "armor_dark",
+          "weaponOverhang": false
+        },
+        {
+          "name": "main_barrel",
+          "parent": "gun_pitch",
+          "box": [
+            -1.882353,
+            -1.942857,
+            23.433846,
+            3.764706,
+            3.885714,
+            48.64
+          ],
+          "uv": [
+            1143,
+            1087
+          ],
+          "material": "metal",
+          "weaponOverhang": true
+        },
+        {
+          "name": "main_muzzle",
+          "parent": "gun_pitch",
+          "box": [
+            -2.447059,
+            -2.525714,
+            71.483077,
+            4.894118,
+            5.051429,
+            6.301538
+          ],
+          "uv": [
+            1252,
+            1087
+          ],
+          "material": "metal",
+          "weaponOverhang": true
+        },
+        {
+          "name": "roof_gun_cradle",
+          "parent": "gun_pitch",
+          "box": [
+            -16.188235,
+            6.8,
+            -10.633846,
+            9.788235,
+            5.828571,
+            9.649231
+          ],
+          "uv": [
+            1279,
+            1087
+          ],
+          "material": "armor_dark",
+          "weaponOverhang": false
+        },
+        {
+          "name": "roof_gun_body",
+          "parent": "gun_pitch",
+          "box": [
+            -15.435294,
+            4.662857,
+            -6.104615,
+            8.282353,
+            8.16,
+            11.224615
+          ],
+          "uv": [
+            1322,
+            1087
+          ],
+          "material": "metal",
+          "weaponOverhang": false
+        },
+        {
+          "name": "roof_gun_barrels",
+          "parent": "gun_pitch",
+          "box": [
+            -13.176471,
+            6.8,
+            4.529231,
+            3.764706,
+            3.885714,
+            21.661538
+          ],
+          "uv": [
+            1366,
+            1087
+          ],
+          "material": "metal",
+          "weaponOverhang": false
+        },
+        {
+          "name": "roof_gun_muzzle",
+          "parent": "gun_pitch",
+          "box": [
+            -14.305882,
+            5.634286,
+            25.993846,
+            6.023529,
+            6.217143,
+            3.544615
+          ],
+          "uv": [
+            1421,
+            1087
+          ],
+          "material": "metal",
+          "weaponOverhang": false
+        },
+        {
+          "name": "commander_hatch",
+          "parent": "hatch_commander",
+          "box": [
+            0.0,
+            0.0,
+            0.0,
+            11.482353,
+            3.108571,
+            13.193846
+          ],
+          "uv": [
+            1445,
+            1087
+          ],
+          "material": "metal",
+          "weaponOverhang": false
+        },
+        {
+          "name": "commander_scope",
+          "parent": "hatch_commander",
+          "box": [
+            2.258824,
+            3.108571,
+            5.513846,
+            5.647059,
+            1.554286,
+            4.726154
+          ],
+          "uv": [
+            1499,
+            1087
+          ],
+          "material": "glass",
+          "weaponOverhang": false
+        },
+        {
+          "name": "rear_turret_basket",
+          "parent": "turret_yaw",
+          "box": [
+            -21.082353,
+            7.188571,
+            -35.052308,
+            42.164706,
+            7.577143,
+            7.089231
+          ],
+          "uv": [
+            1524,
+            1087
+          ],
+          "material": "metal",
+          "weaponOverhang": false
+        },
+        {
+          "name": "rear_turret_pack_0",
+          "parent": "turret_yaw",
+          "box": [
+            -16.941176,
+            9.908571,
+            -36.036923,
+            7.905882,
+            8.354286,
+            8.467692
+          ],
+          "uv": [
+            1627,
+            1087
+          ],
+          "material": "canvas",
+          "weaponOverhang": false
+        },
+        {
+          "name": "rear_turret_pack_1",
+          "parent": "turret_yaw",
+          "box": [
+            -6.964706,
+            9.908571,
+            -36.036923,
+            7.905882,
+            8.354286,
+            8.467692
+          ],
+          "uv": [
+            1664,
+            1087
+          ],
+          "material": "canvas",
+          "weaponOverhang": false
+        },
+        {
+          "name": "rear_turret_pack_2",
+          "parent": "turret_yaw",
+          "box": [
+            3.011765,
+            9.908571,
+            -36.036923,
+            7.905882,
+            8.354286,
+            8.467692
+          ],
+          "uv": [
+            1701,
+            1087
+          ],
+          "material": "canvas",
+          "weaponOverhang": false
+        },
+        {
+          "name": "rear_turret_pack_3",
+          "parent": "turret_yaw",
+          "box": [
+            12.988235,
+            9.908571,
+            -36.036923,
+            7.905882,
+            8.354286,
+            8.467692
+          ],
+          "uv": [
+            1738,
+            1087
+          ],
+          "material": "canvas",
+          "weaponOverhang": false
+        },
+        {
+          "name": "plough_crossbeam",
+          "parent": "body",
+          "box": [
+            -28.235294,
+            10.102857,
+            56.123077,
+            56.470588,
+            4.08,
+            4.726154
+          ],
+          "uv": [
+            1775,
+            1087
+          ],
+          "material": "metal",
+          "weaponOverhang": false
+        },
+        {
+          "name": "plough_tooth_0",
+          "parent": "body",
+          "box": [
+            -26.917647,
+            4.08,
+            59.076923,
+            5.647059,
+            4.274286,
+            4.923077
+          ],
+          "uv": [
+            1902,
+            1087
+          ],
+          "material": "metal",
+          "weaponOverhang": false
+        },
+        {
+          "name": "plough_tooth_riser_0",
+          "parent": "body",
+          "box": [
+            -26.917647,
+            8.354286,
+            57.107692,
+            5.647059,
+            4.468571,
+            3.938462
+          ],
+          "uv": [
+            1928,
+            1087
+          ],
+          "material": "metal",
+          "weaponOverhang": false
+        },
+        {
+          "name": "plough_tooth_1",
+          "parent": "body",
+          "box": [
+            -17.882353,
+            4.08,
+            59.076923,
+            5.647059,
+            4.274286,
+            4.923077
+          ],
+          "uv": [
+            1952,
+            1087
+          ],
+          "material": "metal",
+          "weaponOverhang": false
+        },
+        {
+          "name": "plough_tooth_riser_1",
+          "parent": "body",
+          "box": [
+            -17.882353,
+            8.354286,
+            57.107692,
+            5.647059,
+            4.468571,
+            3.938462
+          ],
+          "uv": [
+            1978,
+            1087
+          ],
+          "material": "metal",
+          "weaponOverhang": false
+        },
+        {
+          "name": "plough_tooth_2",
+          "parent": "body",
+          "box": [
+            -8.847059,
+            4.08,
+            59.076923,
+            5.647059,
+            4.274286,
+            4.923077
+          ],
+          "uv": [
+            2002,
+            1087
+          ],
+          "material": "metal",
+          "weaponOverhang": false
+        },
+        {
+          "name": "plough_tooth_riser_2",
+          "parent": "body",
+          "box": [
+            -8.847059,
+            8.354286,
+            57.107692,
+            5.647059,
+            4.468571,
+            3.938462
+          ],
+          "uv": [
+            2,
+            1212
+          ],
+          "material": "metal",
+          "weaponOverhang": false
+        },
+        {
+          "name": "plough_tooth_3",
+          "parent": "body",
+          "box": [
+            0.188235,
+            4.08,
+            59.076923,
+            5.647059,
+            4.274286,
+            4.923077
+          ],
+          "uv": [
+            26,
+            1212
+          ],
+          "material": "metal",
+          "weaponOverhang": false
+        },
+        {
+          "name": "plough_tooth_riser_3",
+          "parent": "body",
+          "box": [
+            0.188235,
+            8.354286,
+            57.107692,
+            5.647059,
+            4.468571,
+            3.938462
+          ],
+          "uv": [
+            52,
+            1212
+          ],
+          "material": "metal",
+          "weaponOverhang": false
+        },
+        {
+          "name": "plough_tooth_4",
+          "parent": "body",
+          "box": [
+            9.223529,
+            4.08,
+            59.076923,
+            5.647059,
+            4.274286,
+            4.923077
+          ],
+          "uv": [
+            76,
+            1212
+          ],
+          "material": "metal",
+          "weaponOverhang": false
+        },
+        {
+          "name": "plough_tooth_riser_4",
+          "parent": "body",
+          "box": [
+            9.223529,
+            8.354286,
+            57.107692,
+            5.647059,
+            4.468571,
+            3.938462
+          ],
+          "uv": [
+            102,
+            1212
+          ],
+          "material": "metal",
+          "weaponOverhang": false
+        },
+        {
+          "name": "plough_tooth_5",
+          "parent": "body",
+          "box": [
+            18.258824,
+            4.08,
+            59.076923,
+            5.647059,
+            4.274286,
+            4.923077
+          ],
+          "uv": [
+            126,
+            1212
+          ],
+          "material": "metal",
+          "weaponOverhang": false
+        },
+        {
+          "name": "plough_tooth_riser_5",
+          "parent": "body",
+          "box": [
+            18.258824,
+            8.354286,
+            57.107692,
+            5.647059,
+            4.468571,
+            3.938462
+          ],
+          "uv": [
+            152,
+            1212
+          ],
+          "material": "metal",
+          "weaponOverhang": false
+        },
+        {
+          "name": "front_lamp_0",
+          "parent": "body",
+          "box": [
+            -22.588235,
+            26.228571,
+            57.698462,
+            3.764706,
+            2.331429,
+            1.378462
+          ],
+          "uv": [
+            176,
+            1212
+          ],
+          "material": "lamp",
+          "weaponOverhang": false
+        },
+        {
+          "name": "front_lamp_1",
+          "parent": "body",
+          "box": [
+            18.823529,
+            26.228571,
+            57.698462,
+            3.764706,
+            2.331429,
+            1.378462
+          ],
+          "uv": [
+            191,
+            1212
+          ],
+          "material": "lamp",
+          "weaponOverhang": false
+        },
+        {
+          "name": "engine_grille_0",
+          "parent": "body",
+          "box": [
+            -16.564706,
+            29.92,
+            -56.123077,
+            33.129412,
+            0.777143,
+            3.150769
+          ],
+          "uv": [
+            206,
+            1212
+          ],
+          "material": "armor_dark",
+          "weaponOverhang": false
+        },
+        {
+          "name": "engine_grille_1",
+          "parent": "body",
+          "box": [
+            -16.564706,
+            29.92,
+            -50.018462,
+            33.129412,
+            0.777143,
+            3.150769
+          ],
+          "uv": [
+            283,
+            1212
+          ],
+          "material": "armor_dark",
+          "weaponOverhang": false
+        },
+        {
+          "name": "engine_grille_2",
+          "parent": "body",
+          "box": [
+            -16.564706,
+            29.92,
+            -43.913846,
+            33.129412,
+            0.777143,
+            3.150769
+          ],
+          "uv": [
+            360,
+            1212
+          ],
+          "material": "armor_dark",
+          "weaponOverhang": false
+        },
+        {
+          "name": "recognition_bar_0",
+          "parent": "body",
+          "box": [
+            -7.529412,
+            28.56,
+            62.818462,
+            3.2,
+            1.554286,
+            1.181538
+          ],
+          "uv": [
+            437,
+            1212
+          ],
+          "material": "marker",
+          "weaponOverhang": false
+        },
+        {
+          "name": "recognition_bar_1",
+          "parent": "body",
+          "box": [
+            -2.070588,
+            28.56,
+            62.818462,
+            3.2,
+            1.554286,
+            1.181538
+          ],
+          "uv": [
+            450,
+            1212
+          ],
+          "material": "marker",
+          "weaponOverhang": false
+        },
+        {
+          "name": "recognition_bar_2",
+          "parent": "body",
+          "box": [
+            3.388235,
+            28.56,
+            62.818462,
+            3.2,
+            1.554286,
+            1.181538
+          ],
+          "uv": [
+            463,
+            1212
+          ],
+          "material": "marker",
+          "weaponOverhang": false
+        },
+        {
+          "name": "left_hazard_bar_0",
+          "parent": "body",
+          "box": [
+            -32.0,
+            27.588571,
+            -8.861538,
+            0.658824,
+            5.051429,
+            2.56
+          ],
+          "uv": [
+            476,
+            1212
+          ],
+          "material": "hazard",
+          "weaponOverhang": false
+        },
+        {
+          "name": "left_hazard_bar_1",
+          "parent": "body",
+          "box": [
+            -32.0,
+            27.588571,
+            -2.953846,
+            0.658824,
+            5.051429,
+            2.56
+          ],
+          "uv": [
+            487,
+            1212
+          ],
+          "material": "hazard",
+          "weaponOverhang": false
+        },
+        {
+          "name": "left_hazard_bar_2",
+          "parent": "body",
+          "box": [
+            -32.0,
+            27.588571,
+            2.953846,
+            0.658824,
+            5.051429,
+            2.56
+          ],
+          "uv": [
+            498,
+            1212
+          ],
+          "material": "hazard",
+          "weaponOverhang": false
+        },
+        {
+          "name": "right_hazard_bar_0",
+          "parent": "body",
+          "box": [
+            31.341176,
+            27.588571,
+            -8.861538,
+            0.658824,
+            5.051429,
+            2.56
+          ],
+          "uv": [
+            509,
+            1212
+          ],
+          "material": "hazard",
+          "weaponOverhang": false
+        },
+        {
+          "name": "right_hazard_bar_1",
+          "parent": "body",
+          "box": [
+            31.341176,
+            27.588571,
+            -2.953846,
+            0.658824,
+            5.051429,
+            2.56
+          ],
+          "uv": [
+            520,
+            1212
+          ],
+          "material": "hazard",
+          "weaponOverhang": false
+        },
+        {
+          "name": "right_hazard_bar_2",
+          "parent": "body",
+          "box": [
+            31.341176,
+            27.588571,
+            2.953846,
+            0.658824,
+            5.051429,
+            2.56
+          ],
+          "uv": [
+            531,
+            1212
+          ],
+          "material": "hazard",
+          "weaponOverhang": false
+        }
+      ],
+      "anchors": {
+        "seat_driver": {
+          "frame": "body",
+          "position": [
+            0.0,
+            0.06071429,
+            2.03076923
+          ]
+        },
+        "seat_gunner": {
+          "frame": "body",
+          "position": [
+            -0.52941176,
+            0.54642857,
+            0.12307692
+          ]
+        },
+        "seat_commander": {
+          "frame": "body",
+          "position": [
+            0.58823529,
+            0.72857143,
+            -0.55384615
+          ]
+        },
+        "camera_driver": {
+          "frame": "body",
+          "position": [
+            0.0,
+            1.98,
+            3.29
+          ]
+        },
+        "camera_gunner": {
+          "frame": "turret_yaw",
+          "position": [
+            0.55294118,
+            3.35142857,
+            -0.22
+          ]
+        },
+        "camera_commander": {
+          "frame": "turret_yaw",
+          "position": [
+            0.55294118,
+            3.35142857,
+            -0.22
+          ]
+        },
+        "exit_left": {
+          "frame": "body",
+          "position": [
+            -2.70588235,
+            0.1,
+            0.0
+          ]
+        },
+        "exit_right": {
+          "frame": "body",
+          "position": [
+            2.70588235,
+            0.1,
+            0.0
+          ]
+        },
+        "exit_rear": {
+          "frame": "body",
+          "position": [
+            0.0,
+            0.1,
+            -4.8
+          ]
+        },
+        "breech_primary": {
+          "frame": "gun_pitch",
+          "position": [
+            0.0,
+            2.55,
+            1.16923077
+          ]
+        },
+        "muzzle_primary": {
+          "frame": "gun_pitch",
+          "position": [
+            0.0,
+            2.55,
+            6.03076923
+          ]
+        },
+        "breech_secondary": {
+          "frame": "gun_pitch",
+          "position": [
+            -0.70588235,
+            3.09642857,
+            0.73846154
+          ]
+        },
+        "muzzle_secondary": {
+          "frame": "gun_pitch",
+          "position": [
+            -0.70588235,
+            3.09642857,
+            3.01538462
+          ]
+        }
+      }
+    }
+  }
+}

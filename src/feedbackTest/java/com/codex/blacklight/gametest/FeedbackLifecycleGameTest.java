@@ -141,6 +141,42 @@ public final class FeedbackLifecycleGameTest {
         boolean waiting=BiomassSystem.state(p).phase()==BiomassState.READY&&p.position().equals(before);
         cleanup(p);h.assertTrue(waiting,"low tunnel remains crawlable instead of teleporting through its wall");h.succeed();
     }
+    @GameTest(template="wall_test",timeoutTicks=120,batch="feedback_slime_recovery")
+    public static void deathSlimeSurvivesCombatAndAutomaticallyConsumesHealthyPrey(GameTestHelper h){
+        var p=player(h);p.setGameMode(net.minecraft.world.level.GameType.SURVIVAL);for(int i=0;i<65;i++)p.tick();var prey=EntityType.ZOMBIE.create(h.getLevel());
+        h.runAfterDelay(70,()->{try{
+            prey.setNoAi(true);prey.setPos(p.position());prey.getAttribute(net.minecraft.world.entity.ai.attributes.Attributes.MAX_HEALTH).setBaseValue(200);
+            h.getLevel().addFreshEntity(prey);prey.setHealth(prey.getMaxHealth());
+            h.assertTrue(!com.codex.blacklight.combat.ConsumeSystem.healthReady(p,prey),"fixture needs a healthy target above the ordinary grab threshold");
+            h.assertTrue(BiomassSystem.begin(p,true),"fatal recovery starts");
+            p.invulnerableTime=0;float health=p.getHealth();
+            h.assertTrue(!p.hurt(p.damageSources().mobAttack(prey),10000)&&p.isAlive()&&p.getHealth()==health,"ordinary lethal attack cannot kill death slime after its initial grace");
+            h.assertTrue(!p.hurt(p.damageSources().onFire(),10000)&&p.getHealth()==health,"fire cannot end the recovery chance");
+            p.setData(ModAttachments.BIOMASS_FORM,BiomassSystem.state(p).crawl(h.getLevel().getGameTime()-20));p.refreshDimensions();
+            tick(p);
+            h.assertTrue(BiomassSystem.state(p).phase()==BiomassState.ABSORBING&&BiomassSystem.state(p).victim()==prey.getId(),"touching healthy prey starts absorption without E or prior damage");
+            p.setData(ModAttachments.BIOMASS_FORM,BiomassSystem.state(p).absorb(prey.getId(),h.getLevel().getGameTime()-BiomassState.ABSORB_TICKS));
+            tick(p);
+            h.assertTrue(!prey.isAlive()&&BiomassSystem.state(p).consumed()&&p.getHealth()==p.getMaxHealth(),"one confirmed kill restores health and commits reformation");
+            p.setData(ModAttachments.BIOMASS_FORM,BiomassSystem.state(p).reform(h.getLevel().getGameTime()-BiomassState.REFORM_TICKS));
+            tick(p);
+            h.assertTrue(!BiomassSystem.active(p)&&p.isAlive(),"reformation restores the original player body");
+            p.invulnerableTime=0;float restored=p.getHealth();p.hurt(p.damageSources().mobAttack(prey),1);
+            h.assertTrue(p.getHealth()<restored,"restored body must not retain recovery immunity");
+        }finally{prey.discard();cleanup(p);}h.succeed();});
+    }
+    @GameTest(template="wall_test",timeoutTicks=120,batch="feedback_slime_recovery")
+    public static void voluntarySlimeAndAdministrativeDeathRemainDamageable(GameTestHelper h){
+        var p=player(h);p.setGameMode(net.minecraft.world.level.GameType.SURVIVAL);for(int i=0;i<65;i++)p.tick();
+        h.runAfterDelay(70,()->{try{
+            h.assertTrue(BiomassSystem.begin(p,false),"voluntary split starts");
+            p.invulnerableTime=0;float health=p.getHealth();p.hurt(p.damageSources().generic(),1);
+            h.assertTrue(p.getHealth()<health,"voluntary split does not grant fatal recovery immunity");
+            p.setData(ModAttachments.BIOMASS_FORM,new BiomassState(BiomassState.CRAWLING,p.level().getGameTime(),true,"","claws",-1));
+            p.invulnerableTime=0;p.hurt(p.damageSources().genericKill(),Float.MAX_VALUE);
+            h.assertTrue(!p.isAlive()&&!BiomassSystem.active(p),"administrative kill and void bypass recovery protection and release the form");
+        }finally{cleanup(p);}h.succeed();});
+    }
     @GameTest(template="wall_test",timeoutTicks=100,batch="feedback_player_death")
     public static void fatalSlimeThenRealDeathCanSaveAndReleaseTarget(GameTestHelper h) {
         var p=player(h);

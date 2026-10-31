@@ -1,0 +1,7 @@
+﻿id,level,leaf,military_default_size,blackwatch_default_size,name
+tactical_squad,0,True,8,8,战术小队
+section,0,True,8,8,班
+platoon,1,False,24,24,排
+company,2,False,72,72,连
+squadron,1,False,24,24,中队
+battalion,3,False,216,72,大队

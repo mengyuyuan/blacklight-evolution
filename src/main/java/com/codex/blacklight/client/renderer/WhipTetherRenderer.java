@@ -69,6 +69,8 @@ public final class WhipTetherRenderer {
             if(!data.active()||data.form()!=PowerForm.WHIPFIST.ordinal())continue;
             var owner=mc.level.getEntity(data.consumerId());if(owner==null)continue;
             float t=ConsumedMobVisuals.tetherProgress(mob,partial);if(t<.075F||t>.9F)continue;
+            float returnFlow=data.consuming()?ConsumeFracture.phase(mob,partial).returnFlow():0;
+            float extension=WhipConsumeRetraction.cable(returnFlow);if(extension<=.001F)continue;
             Vec3 delta=mob.getPosition(partial).subtract(owner.getPosition(partial));
             // First person / culled owner has no rendered body joint. Keep a local wrist fallback in that case.
             Vec3 right=new Vec3(-delta.z,0,delta.x).normalize().scale(.38);
@@ -77,16 +79,17 @@ public final class WhipTetherRenderer {
             double wrapRadius=mob.getBbWidth()*.58*(1-Math.clamp((t-.85)/.05,0,1));
             Vec3 body=mob.getPosition(partial).add(placement).add(ConsumeVictimPose.effectPoint(mob,new Vec3(wrapRadius,mob.getBbHeight()*.22,0),partial));
             float reach=Math.clamp((t-.075F)/.11F,0,1);
-            Vec3 end=hand.lerp(body,reach);
+            Vec3 end=WhipConsumeRetraction.end(hand,body,reach,returnFlow);
+            if(hand.distanceToSqr(end)<.0036)continue;
             Vec3 side=new Vec3(-delta.z,0,delta.x).normalize();
-            double sweep=Math.sin(Math.PI*reach)*.8;
+            double sweep=Math.sin(Math.PI*reach*extension)*.8*extension;
             Vec3 control=hand.lerp(end,.45).add(side.scale(sweep)).add(0,.28*(1-reach)-.12,0);
             stack.pushPose();stack.translate(hand.x-camera.x,hand.y-camera.y,hand.z-camera.z);
             int light=mc.getEntityRenderDispatcher().getPackedLightCoords(mob,partial);
             var points=new ArrayList<Vec3>();
             for(int i=0;i<=32;i++)points.add(bezier(hand,control,end,i/32.0).subtract(hand));
             // The cutting tip stays outside the wrapped body, never a spear through its center.
-            WhipArmSurface.render(stack,out,light,points,.115,false);
+            WhipArmSurface.render(stack,out,light,points,.115*Math.sqrt(extension),false);
             stack.popPose();
         }
         buffers.endBatch(type);

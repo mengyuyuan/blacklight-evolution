@@ -1,0 +1,89 @@
+{
+  "weapon_values_equal": true,
+  "structure_hashes": [
+    {
+      "id": "blackwatch_checkpoint",
+      "neo_sha256": "9de7f3c962ef2aaf25592e00c5f6552a111f327b8fdb646973b8026cb71f611d",
+      "forge_sha256": "220e9c68c06ef38e26cea56c862c8133f6fbce66ca11a48e74ba6806d5437854",
+      "equal": false,
+      "neo_data_version": 3955,
+      "forge_data_version": 3465,
+      "size_equal": true,
+      "embedded_entities_equal": true,
+      "chest_count_equal": true,
+      "runtime_guards_equal": true
+    },
+    {
+      "id": "blackwatch_outpost",
+      "neo_sha256": "fc6b2eb87373e4e09edbb27d2a15fcabdef45c510cdb5d2bd5ca8c96bd980742",
+      "forge_sha256": "801d6088e76a5566efbb03d874721e7a65013eaa290c68b6b8d9838588827743",
+      "equal": false,
+      "neo_data_version": 3955,
+      "forge_data_version": 3465,
+      "size_equal": true,
+      "embedded_entities_equal": true,
+      "chest_count_equal": true,
+      "runtime_guards_equal": true
+    },
+    {
+      "id": "frozen_research_station",
+      "neo_sha256": "0dc5f32b6582f66384870df8c90de2f41d334de0486482d01a69fa95db7b795a",
+      "forge_sha256": "a6372878b35f88b835316a11fb6378ca5925efa9952a3b93ad2e0b7fe14329f3",
+      "equal": false,
+      "neo_data_version": 3955,
+      "forge_data_version": 3465,
+      "size_equal": true,
+      "embedded_entities_equal": true,
+      "chest_count_equal": true,
+      "runtime_guards_equal": true
+    },
+    {
+      "id": "large_blackwatch_base",
+      "neo_sha256": "06b613cf9fc372c034750bc694989c095d9dabecbc599395182a33fa476ded60",
+      "forge_sha256": "a3615c1dc9416e8da49741a4bd0fac02a826f93845d73ecb48943828cb92ac67",
+      "equal": false,
+      "neo_data_version": 3955,
+      "forge_data_version": 3465,
+      "size_equal": true,
+      "embedded_entities_equal": true,
+      "chest_count_equal": true,
+      "runtime_guards_equal": true
+    },
+    {
+      "id": "large_military_base",
+      "neo_sha256": "90c1715fa57bd839bdfbcde72341d5c9ac1d95b74084b398ea4d628a43c38943",
+      "forge_sha256": "5c91bc9cd581eff2d83f8076538cab05b8d24a7c69d8a886dcfff496abe426ad",
+      "equal": false,
+      "neo_data_version": 3955,
+      "forge_data_version": 3465,
+      "size_equal": true,
+      "embedded_entities_equal": true,
+      "chest_count_equal": true,
+      "runtime_guards_equal": true
+    },
+    {
+      "id": "military_camp",
+      "neo_sha256": "c8b4cef8815da20fc91511a12951f60125943006140adbbdf7a635a2ef430ad9",
+      "forge_sha256": "25f480997fa2921f8a2feb849e4a33dd328e522d89998f4bbfd5cb4a714f21f0",
+      "equal": false,
+      "neo_data_version": 3955,
+      "forge_data_version": 3465,
+      "size_equal": true,
+      "embedded_entities_equal": true,
+      "chest_count_equal": true,
+      "runtime_guards_equal": true
+    },
+    {
+      "id": "military_checkpoint",
+      "neo_sha256": "b828b4ee23a20e17913421ed62c98c954ce8460529bd8c4a4825a8c8a3237ae1",
+      "forge_sha256": "d7798ca6efb4788811b0758faab6f65f7a82f1cb204a36a9d1f0597a526705b8",
+      "equal": false,
+      "neo_data_version": 3955,
+      "forge_data_version": 3465,
+      "size_equal": true,
+      "embedded_entities_equal": true,
+      "chest_count_equal": true,
+      "runtime_guards_equal": true
+    }
+  ]
+}

@@ -1,0 +1,98 @@
+[
+  {
+    "symbol": "RIFLE",
+    "id": "military_rifle",
+    "ammo_id": "rifle_round",
+    "capacity": 30,
+    "cooldown_ticks": 4,
+    "reload_ticks": 40,
+    "player_base_damage": 4.0,
+    "range_blocks": 64.0,
+    "kind": "BULLET",
+    "radius_blocks": 0.0
+  },
+  {
+    "symbol": "CARBINE",
+    "id": "military_carbine",
+    "ammo_id": "rifle_round",
+    "capacity": 24,
+    "cooldown_ticks": 3,
+    "reload_ticks": 32,
+    "player_base_damage": 3.5,
+    "range_blocks": 48.0,
+    "kind": "BULLET",
+    "radius_blocks": 0.0
+  },
+  {
+    "symbol": "MACHINE_GUN",
+    "id": "military_machine_gun",
+    "ammo_id": "machine_gun_round",
+    "capacity": 60,
+    "cooldown_ticks": 3,
+    "reload_ticks": 65,
+    "player_base_damage": 5.0,
+    "range_blocks": 72.0,
+    "kind": "BULLET",
+    "radius_blocks": 0.0
+  },
+  {
+    "symbol": "GRENADE",
+    "id": "grenade_launcher",
+    "ammo_id": "grenade_round",
+    "capacity": 6,
+    "cooldown_ticks": 14,
+    "reload_ticks": 55,
+    "player_base_damage": 12.0,
+    "range_blocks": 40.0,
+    "kind": "GRENADE",
+    "radius_blocks": 3.0
+  },
+  {
+    "symbol": "ROCKET",
+    "id": "rocket_launcher",
+    "ammo_id": "rocket_round",
+    "capacity": 1,
+    "cooldown_ticks": 22,
+    "reload_ticks": 65,
+    "player_base_damage": 20.0,
+    "range_blocks": 80.0,
+    "kind": "ROCKET",
+    "radius_blocks": 4.0
+  },
+  {
+    "symbol": "MISSILE",
+    "id": "missile_launcher",
+    "ammo_id": "missile_round",
+    "capacity": 1,
+    "cooldown_ticks": 28,
+    "reload_ticks": 75,
+    "player_base_damage": 22.0,
+    "range_blocks": 96.0,
+    "kind": "MISSILE",
+    "radius_blocks": 4.0
+  },
+  {
+    "symbol": "THERMOBARIC",
+    "id": "thermobaric_launcher",
+    "ammo_id": "thermobaric_round",
+    "capacity": 1,
+    "cooldown_ticks": 25,
+    "reload_ticks": 70,
+    "player_base_damage": 24.0,
+    "range_blocks": 48.0,
+    "kind": "THERMOBARIC",
+    "radius_blocks": 5.0
+  },
+  {
+    "symbol": "INFECTION",
+    "id": "infection_launcher",
+    "ammo_id": "infection_round",
+    "capacity": 1,
+    "cooldown_ticks": 25,
+    "reload_ticks": 60,
+    "player_base_damage": 0.0,
+    "range_blocks": 40.0,
+    "kind": "INFECTION",
+    "radius_blocks": 3.0
+  }
+]

@@ -1,0 +1,452 @@
+{
+  "schemaVersion": 1,
+  "coordinateSystem": "template-local block boundaries; feet at y=1",
+  "garages": [
+    {
+      "id": "vehicle_garage_military",
+      "template": "blacklight:vehicle_garage_military",
+      "faction": "military",
+      "size": [
+        31,
+        10,
+        27
+      ],
+      "terrainBounds": [
+        0,
+        0,
+        0,
+        30,
+        9,
+        26
+      ],
+      "foundationDepth": 3,
+      "boundsConvention": "repairBounds and gateBounds are min-inclusive max-exclusive block boundaries",
+      "bayFacingYaw": 0,
+      "bayFacing": "south +Z",
+      "longitudinalLaneWidth": 9,
+      "gateWidth": 7,
+      "gateClearanceHeight": 7,
+      "roadConnections": [
+        [
+          5.5,
+          1,
+          26.5
+        ],
+        [
+          15.5,
+          1,
+          26.5
+        ],
+        [
+          25.5,
+          1,
+          26.5
+        ]
+      ],
+      "bays": [
+        {
+          "id": "truck",
+          "chassis": "truck",
+          "center": [
+            5.5,
+            1,
+            12.5
+          ],
+          "repairBounds": [
+            1,
+            1,
+            6,
+            10,
+            8,
+            20
+          ],
+          "container": [
+            5,
+            1,
+            2
+          ],
+          "gateBounds": [
+            2,
+            1,
+            26,
+            9,
+            8,
+            27
+          ]
+        },
+        {
+          "id": "tank",
+          "chassis": "tank",
+          "center": [
+            15.5,
+            1,
+            12.5
+          ],
+          "repairBounds": [
+            10,
+            1,
+            6,
+            21,
+            8,
+            20
+          ],
+          "container": [
+            15,
+            1,
+            2
+          ],
+          "gateBounds": [
+            12,
+            1,
+            26,
+            19,
+            8,
+            27
+          ]
+        },
+        {
+          "id": "apc",
+          "chassis": "apc",
+          "center": [
+            25.5,
+            1,
+            12.5
+          ],
+          "repairBounds": [
+            21,
+            1,
+            6,
+            30,
+            8,
+            20
+          ],
+          "container": [
+            25,
+            1,
+            2
+          ],
+          "gateBounds": [
+            22,
+            1,
+            26,
+            29,
+            8,
+            27
+          ]
+        }
+      ],
+      "supplyContainers": [
+        {
+          "bayId": "truck",
+          "position": [
+            5,
+            1,
+            2
+          ],
+          "items": [
+            {
+              "id": "blacklight:vehicle_repair_parts",
+              "count": 4
+            }
+          ]
+        },
+        {
+          "bayId": "tank",
+          "position": [
+            15,
+            1,
+            2
+          ],
+          "items": [
+            {
+              "id": "blacklight:vehicle_repair_parts",
+              "count": 4
+            },
+            {
+              "id": "blacklight:tank_he_shell",
+              "count": 12
+            },
+            {
+              "id": "blacklight:tank_ap_shell",
+              "count": 8
+            },
+            {
+              "id": "blacklight:machine_gun_round",
+              "count": 64
+            },
+            {
+              "id": "blacklight:machine_gun_round",
+              "count": 64
+            },
+            {
+              "id": "blacklight:machine_gun_round",
+              "count": 64
+            },
+            {
+              "id": "blacklight:machine_gun_round",
+              "count": 48
+            }
+          ]
+        },
+        {
+          "bayId": "apc",
+          "position": [
+            25,
+            1,
+            2
+          ],
+          "items": [
+            {
+              "id": "blacklight:vehicle_repair_parts",
+              "count": 4
+            },
+            {
+              "id": "blacklight:autocannon_round",
+              "count": 64
+            },
+            {
+              "id": "blacklight:autocannon_round",
+              "count": 56
+            },
+            {
+              "id": "blacklight:rocket_round",
+              "count": 4
+            }
+          ]
+        }
+      ],
+      "entitiesEmbedded": false,
+      "lootRefresh": false,
+      "automaticOldWorldAttachment": false,
+      "initialDispatchChassis": [
+        "truck",
+        "apc",
+        "tank"
+      ],
+      "authorship": "Original Blacklight block layout; no imported commercial game assets."
+    },
+    {
+      "id": "vehicle_garage_blackwatch",
+      "template": "blacklight:vehicle_garage_blackwatch",
+      "faction": "blackwatch",
+      "size": [
+        31,
+        10,
+        27
+      ],
+      "terrainBounds": [
+        0,
+        0,
+        0,
+        30,
+        9,
+        26
+      ],
+      "foundationDepth": 3,
+      "boundsConvention": "repairBounds and gateBounds are min-inclusive max-exclusive block boundaries",
+      "bayFacingYaw": 0,
+      "bayFacing": "south +Z",
+      "longitudinalLaneWidth": 9,
+      "gateWidth": 7,
+      "gateClearanceHeight": 7,
+      "roadConnections": [
+        [
+          5.5,
+          1,
+          26.5
+        ],
+        [
+          15.5,
+          1,
+          26.5
+        ],
+        [
+          25.5,
+          1,
+          26.5
+        ]
+      ],
+      "bays": [
+        {
+          "id": "truck",
+          "chassis": "truck",
+          "center": [
+            5.5,
+            1,
+            12.5
+          ],
+          "repairBounds": [
+            1,
+            1,
+            6,
+            10,
+            8,
+            20
+          ],
+          "container": [
+            5,
+            1,
+            2
+          ],
+          "gateBounds": [
+            2,
+            1,
+            26,
+            9,
+            8,
+            27
+          ]
+        },
+        {
+          "id": "tank",
+          "chassis": "tank",
+          "center": [
+            15.5,
+            1,
+            12.5
+          ],
+          "repairBounds": [
+            10,
+            1,
+            6,
+            21,
+            8,
+            20
+          ],
+          "container": [
+            15,
+            1,
+            2
+          ],
+          "gateBounds": [
+            12,
+            1,
+            26,
+            19,
+            8,
+            27
+          ]
+        },
+        {
+          "id": "apc",
+          "chassis": "apc",
+          "center": [
+            25.5,
+            1,
+            12.5
+          ],
+          "repairBounds": [
+            21,
+            1,
+            6,
+            30,
+            8,
+            20
+          ],
+          "container": [
+            25,
+            1,
+            2
+          ],
+          "gateBounds": [
+            22,
+            1,
+            26,
+            29,
+            8,
+            27
+          ]
+        }
+      ],
+      "supplyContainers": [
+        {
+          "bayId": "truck",
+          "position": [
+            5,
+            1,
+            2
+          ],
+          "items": [
+            {
+              "id": "blacklight:vehicle_repair_parts",
+              "count": 4
+            }
+          ]
+        },
+        {
+          "bayId": "tank",
+          "position": [
+            15,
+            1,
+            2
+          ],
+          "items": [
+            {
+              "id": "blacklight:vehicle_repair_parts",
+              "count": 4
+            },
+            {
+              "id": "blacklight:tank_he_shell",
+              "count": 12
+            },
+            {
+              "id": "blacklight:tank_ap_shell",
+              "count": 8
+            },
+            {
+              "id": "blacklight:machine_gun_round",
+              "count": 64
+            },
+            {
+              "id": "blacklight:machine_gun_round",
+              "count": 64
+            },
+            {
+              "id": "blacklight:machine_gun_round",
+              "count": 64
+            },
+            {
+              "id": "blacklight:machine_gun_round",
+              "count": 48
+            }
+          ]
+        },
+        {
+          "bayId": "apc",
+          "position": [
+            25,
+            1,
+            2
+          ],
+          "items": [
+            {
+              "id": "blacklight:vehicle_repair_parts",
+              "count": 4
+            },
+            {
+              "id": "blacklight:autocannon_round",
+              "count": 64
+            },
+            {
+              "id": "blacklight:autocannon_round",
+              "count": 56
+            },
+            {
+              "id": "blacklight:rocket_round",
+              "count": 4
+            }
+          ]
+        }
+      ],
+      "entitiesEmbedded": false,
+      "lootRefresh": false,
+      "automaticOldWorldAttachment": false,
+      "initialDispatchChassis": [
+        "truck",
+        "apc",
+        "tank"
+      ],
+      "authorship": "Original Blacklight block layout; no imported commercial game assets."
+    }
+  ]
+}

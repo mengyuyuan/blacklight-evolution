@@ -1,0 +1,26 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "III",
+    " CR",
+    " SI"
+  ],
+  "key": {
+    "I": {
+      "item": "minecraft:iron_ingot"
+    },
+    "C": {
+      "item": "blacklight:military_circuit"
+    },
+    "R": {
+      "item": "blacklight:infection_round"
+    },
+    "S": {
+      "item": "minecraft:stick"
+    }
+  },
+  "result": {
+    "id": "blacklight:infection_launcher",
+    "count": 1
+  }
+}

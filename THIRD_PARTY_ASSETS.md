@@ -222,3 +222,55 @@ asset. Fixed chest binding, mirrored whole-wing rotations and uniform folding
 are project adaptations using the existing wing-motion controller. No new
 Prototype 2 flyer motion or sound files are included. The classic wing model,
 existing animation lineage and earlier attribution remain unchanged.
+
+### Blackwatch reference rig, cloth and motion (2026-10-25)
+
+Author: **1145homo**. The user supplied `blackwatch_two_hand_sneak.bbmodel`
+(SHA-256 `4d1b2213f160aa7a5ece31131c77102d654474277b46a6f93c8624cba71b4696`)
+and a screenshot in which the author permits direct use. This records the supplied
+permission evidence; it does not invent a separate license. The editable original,
+source index and relevant cropped attribution/permission evidence are kept in
+`docs/制作资料/参考模型/`.
+
+The runtime export retains the source bone data and 2,174 original linear keyframes.
+The native two-segment arm rig, copied or explicitly retinted cloth regions and
+light gun materials derive from this reference. The 5,349-cube source gun is not
+imported as a runtime mesh. Eight lightweight weapon meshes are separately authored;
+reload phases, shoulder constraints, reach correction and first-person hand placement
+are project adaptations. Seven source clips are preserved; dodge has no gameplay
+binding in this implementation and is not advertised as implemented behavior.
+
+`tools/export_blackwatch_reference.py` reproduces the derived production profile,
+atlases and item resources. `tools/preview_blackwatch_reference.py` captures actual
+native model vertices and UVs for CPU previews. See the mapping report for exact
+source regions, coordinate conversion and runtime sampling; these previews do not
+certify an OpenGL client playtest.
+
+### M6 ground vehicles and garages (2026-10-27)
+
+The truck, armored vehicle and tank cuboids, two vehicle pixel palettes/textures,
+editable Blockbench exports, named seat/exit/muzzle mounts, and the two dedicated
+31 x 10 x 27 garage block layouts are project-authored M6 assets. The authoring
+entry is `art/military-vehicles/vehicle-authoring.json`; its current SHA-256 is
+`01e88496b3f291b24e0b76f1f67d69d436522c993ad6b569d7b2920dd781f3fc`.
+Older `4ccafec7...` / `08cdbb98...` / `7c3c0604...` / `5d...` receipts describe historical authoring stages. The current truck driver camera locator includes the subsequently verified visibility correction; body geometry, texture authorship and third-party attribution remain unchanged.
+
+Prototype gameplay screenshots were viewed as silhouette/reference evidence;
+source URLs and observations remain in `art/military-vehicles/reference-observations.json`.
+Those commercial screenshots, extracted commercial vehicle meshes and commercial
+vehicle textures are not included as runtime assets or copied into the M6 making
+catalogue. Dimensions, health, speeds, ammunition, fuel and recipes are project
+gameplay choices, not verified Prototype statistics or real military specifications.
+
+The current eight scenes under `art/military-vehicles/previews/production/` capture
+actual production ModelPart vertices/UVs and use a CPU raster preview. The ninth
+PNG is their contact sheet. They are explicitly not Minecraft/OpenGL screenshots.
+The new garage previews are offline views of the actual serialized NBT geometry
+with approximate vanilla material colors; they are not game screenshots either.
+
+Visible soldier passengers reuse the existing Blackwatch reference-derived rig,
+cloth and source-derived motion described above. The new vehicle/garage authorship
+statement does not relabel those pre-existing soldier assets as entirely original,
+replace their permission evidence, or change their earlier attribution/license.
+Current production data, original editable sources and file hashes are indexed in
+`docs/制作资料/M6/data/source-manifest.json` and `docs/制作资料/M6_载具与车库.md`.

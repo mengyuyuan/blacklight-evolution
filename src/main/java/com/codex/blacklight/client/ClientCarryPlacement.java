@@ -54,10 +54,10 @@ public final class ClientCarryPlacement {
         Vec3 goal=visual.stage()==ConsumeVisual.HOLD
                 ?carryAnchor(owner.getPosition(partial),GrappleMotion.facing(victim,visual,partial),
                     net.minecraft.util.Mth.lerp(partial,owner.xRotO,owner.getXRot()),owner,victim,visual,partial)
-                :ConsumePlacementTrack.anchor(visual.origin(),visual.facing(),victim,form,visual.motionProgress(victim.level().getGameTime(),partial)).orElse(current);
+                :ConsumePlacementTrack.anchor(visual.origin(),visual.facing(),victim,form,visual.motionProgress(victim.level().getGameTime(),partial),visual.variant()).orElse(current);
         float motion=visual.motionProgress(victim.level().getGameTime(),partial);
-        if(visual.stage()==ConsumeVisual.CONSUME&&ConsumePlacementTrack.headGrip(form)&&motion<ConsumePlacementTrack.gripEnd(form))
-            goal=goal.add(owner.getPosition(partial).subtract(ConsumePlacementTrack.actorAnchor(visual.origin(),visual.facing(),form,motion,false)));
+        if(visual.stage()==ConsumeVisual.CONSUME&&ConsumePlacementTrack.headGrip(form,visual.variant())&&motion<ConsumePlacementTrack.gripEnd(form))
+            goal=goal.add(owner.getPosition(partial).subtract(ConsumePlacementTrack.actorAnchor(visual.origin(),visual.facing(),form,motion,false,visual.variant())));
         Vec3 delta=goal.subtract(current);double limit=correctionLimit(owner);
         if(limit<=0||delta.lengthSqr()>limit*limit)return Vec3.ZERO;
         var hit=victim.level().clip(new net.minecraft.world.level.ClipContext(current.add(0,victim.getBbHeight()*.5,0),goal.add(0,victim.getBbHeight()*.5,0),net.minecraft.world.level.ClipContext.Block.COLLIDER,net.minecraft.world.level.ClipContext.Fluid.NONE,victim));

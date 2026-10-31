@@ -27,10 +27,14 @@ public final class BlacklightNeoMod {
 
     public BlacklightNeoMod(IEventBus modBus, ModContainer container) {
         container.registerConfig(net.neoforged.fml.config.ModConfig.Type.CLIENT, com.codex.blacklight.config.PassiveHudConfig.SPEC, "blacklight-client.toml");
+        container.registerConfig(net.neoforged.fml.config.ModConfig.Type.CLIENT,com.codex.blacklight.config.GunplayClientConfig.SPEC,"blacklight-gunplay-client.toml");
         container.registerConfig(net.neoforged.fml.config.ModConfig.Type.SERVER, com.codex.blacklight.city.CityConfig.SPEC, "blacklight-city-server.toml");
+        container.registerConfig(net.neoforged.fml.config.ModConfig.Type.SERVER, com.codex.blacklight.city.MilitaryCampaignConfig.SPEC, "blacklight-military-campaign-server.toml");
         container.registerConfig(net.neoforged.fml.config.ModConfig.Type.SERVER, com.codex.blacklight.infection.BuildingInfectionConfig.SPEC, "blacklight-building-infection-server.toml");
         container.registerConfig(net.neoforged.fml.config.ModConfig.Type.SERVER, com.codex.blacklight.infection.TissueCompetitionConfig.SPEC, "blacklight-evolution-server.toml");
         container.registerConfig(net.neoforged.fml.config.ModConfig.Type.SERVER, com.codex.blacklight.infection.EvolvedBalance.SPEC, "blacklight-evolved-server.toml");
+        container.registerConfig(net.neoforged.fml.config.ModConfig.Type.SERVER, com.codex.blacklight.firearms.FirearmsWorldConfig.SPEC, "blacklight-firearms-server.toml");
+
         container.registerConfig(net.neoforged.fml.config.ModConfig.Type.SERVER, com.codex.blacklight.config.CrossModCombatConfig.SPEC, "blacklight-combat-server.toml");
         container.registerConfig(net.neoforged.fml.config.ModConfig.Type.SERVER, com.codex.blacklight.infection.OutbreakConfig.SPEC, "blacklight-outbreak-server.toml");
         container.registerConfig(net.neoforged.fml.config.ModConfig.Type.SERVER, com.codex.blacklight.power.PlayerEvolutionConfig.SPEC, "blacklight-player-evolution-server.toml");
@@ -44,11 +48,14 @@ public final class BlacklightNeoMod {
         ModEntities.register(modBus);
         ModEffects.register(modBus);
         ModItems.register(modBus);
+        com.codex.blacklight.military.vehicle.VehicleRegistry.register(modBus);
+        com.codex.blacklight.registry.MilitaryFacilityBlocks.register(modBus);
         com.codex.blacklight.registry.ModBlocks.register(modBus);
         com.codex.blacklight.registry.ModBlockEntities.register(modBus);
         com.codex.blacklight.registry.ModWorldgen.register(modBus);
         ModParticles.register(modBus);
         com.codex.blacklight.registry.ModWeaponSounds.register(modBus);
+        com.codex.blacklight.firearms.GunplaySounds.register(modBus);
         com.codex.blacklight.registry.ModInfectedSounds.register(modBus);
         modBus.addListener(ModNetwork::register);
         modBus.addListener((net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent event)->event.enqueueWork(()->{
@@ -71,6 +78,11 @@ public final class BlacklightNeoMod {
         com.codex.blacklight.animation.PlayerActions.install(new com.codex.blacklight.animation.NativePlayerActionBackend());
         NeoForge.EVENT_BUS.register(com.codex.blacklight.animation.NativePlayerActionBackend.class);
         NeoForge.EVENT_BUS.register(BlacklightInfectionSystem.class);
+        NeoForge.EVENT_BUS.register(com.codex.blacklight.entity.BlackwatchSquadSystem.class);
+        NeoForge.EVENT_BUS.register(com.codex.blacklight.military.MilitaryOrganizationSystem.class);
+        NeoForge.EVENT_BUS.register(com.codex.blacklight.military.MilitaryFormationSystem.class);
+        NeoForge.EVENT_BUS.register(com.codex.blacklight.city.CityMilitaryService.class);
+        NeoForge.EVENT_BUS.register(com.codex.blacklight.firearms.FirearmBlockDamage.class);
         NeoForge.EVENT_BUS.register(com.codex.blacklight.world.ResearchStationTrades.class);
         NeoForge.EVENT_BUS.register(com.codex.blacklight.world.SurvivalGuide.class);
         NeoForge.EVENT_BUS.register(com.codex.blacklight.combat.ConsumeSystem.class);

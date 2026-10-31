@@ -1,0 +1,208 @@
+[
+  {
+    "id": "blacklight:infected_host",
+    "name": "黑光感染体",
+    "base_health": 30.0,
+    "attack_attribute": 5.0,
+    "movement_speed": 0.3,
+    "knockback_resistance": 0.0,
+    "all_registered_attributes": {
+      "MAX_HEALTH": 30.0,
+      "ATTACK_DAMAGE": 5.0,
+      "MOVEMENT_SPEED": 0.3,
+      "FLYING_SPEED": 0.35,
+      "FOLLOW_RANGE": 24.0,
+      "STEP_HEIGHT": 1.0,
+      "KNOCKBACK_RESISTANCE": 0.0
+    },
+    "registered_width": 0.9,
+    "registered_height": 1.2,
+    "attributes_source": "return Monster.createMonsterAttributes().add(Attributes.MAX_HEALTH,30).add(Attributes.ATTACK_DAMAGE,5)\n                .add(Attributes.MOVEMENT_SPEED,.30).add(Attributes.FLYING_SPEED,.35).add(Attributes.FOLLOW_RANGE,24)\n                .add(Attributes.STEP_HEIGHT,1).add(Attributes.KNOCKBACK_RESISTANCE,0);",
+    "source": "src/main/java/com/codex/blacklight/entity/BlacklightInfectedHost.java",
+    "note": "宿主数据可重设属性/尺度；这些是空宿主初始属性，非所有宿主固定值",
+    "resource_paths": [],
+    "appearance_note": "按宿主来源物种、作者mesh与形变选择外观"
+  },
+  {
+    "id": "blacklight:blacklight_stalker",
+    "name": "黑光潜猎者",
+    "base_health": 24.0,
+    "attack_attribute": 5.0,
+    "movement_speed": 0.34,
+    "knockback_resistance": 0.1,
+    "all_registered_attributes": {
+      "MAX_HEALTH": 24.0,
+      "ATTACK_DAMAGE": 5.0,
+      "MOVEMENT_SPEED": 0.34,
+      "FOLLOW_RANGE": 28.0,
+      "KNOCKBACK_RESISTANCE": 0.1,
+      "STEP_HEIGHT": 1.0
+    },
+    "registered_width": 0.9,
+    "registered_height": 1.1,
+    "attributes_source": "return Monster.createMonsterAttributes().add(Attributes.MAX_HEALTH,k==Kind.BRUTE?80:k==Kind.SPITTER?28:24).add(Attributes.ATTACK_DAMAGE,k==Kind.BRUTE?10:5).add(Attributes.MOVEMENT_SPEED,k==Kind.STALKER?.34:.24).add(Attributes.FOLLOW_RANGE,28).add(Attributes.KNOCKBACK_RESISTANCE,k==Kind.BRUTE?.7:.1).add(Attributes.STEP_HEIGHT,1);",
+    "source": "src/main/java/com/codex/blacklight/entity/BlacklightMutant.java",
+    "note": "STALKER 分支",
+    "resource_paths": [
+      "src/main/resources/assets/blacklight/geo/blacklight_stalker.geo.json",
+      "src/main/resources/assets/blacklight/animations/blacklight_stalker.animation.json",
+      "src/main/resources/assets/blacklight/textures/entity/infected_species.png"
+    ],
+    "appearance_note": "见具体资源路径；有geo骨架不代表最终只有geo表面，hunter/hydra另绘connected网格"
+  },
+  {
+    "id": "blacklight:blacklight_spitter",
+    "name": "黑光喷吐者",
+    "base_health": 28.0,
+    "attack_attribute": 5.0,
+    "movement_speed": 0.24,
+    "knockback_resistance": 0.1,
+    "all_registered_attributes": {
+      "MAX_HEALTH": 28.0,
+      "ATTACK_DAMAGE": 5.0,
+      "MOVEMENT_SPEED": 0.24,
+      "FOLLOW_RANGE": 28.0,
+      "KNOCKBACK_RESISTANCE": 0.1,
+      "STEP_HEIGHT": 1.0
+    },
+    "registered_width": 0.8,
+    "registered_height": 2.0,
+    "attributes_source": "return Monster.createMonsterAttributes().add(Attributes.MAX_HEALTH,k==Kind.BRUTE?80:k==Kind.SPITTER?28:24).add(Attributes.ATTACK_DAMAGE,k==Kind.BRUTE?10:5).add(Attributes.MOVEMENT_SPEED,k==Kind.STALKER?.34:.24).add(Attributes.FOLLOW_RANGE,28).add(Attributes.KNOCKBACK_RESISTANCE,k==Kind.BRUTE?.7:.1).add(Attributes.STEP_HEIGHT,1);",
+    "source": "src/main/java/com/codex/blacklight/entity/BlacklightMutant.java",
+    "note": "SPITTER 分支；ATTACK_DAMAGE并非唾液伤害",
+    "resource_paths": [
+      "src/main/resources/assets/blacklight/geo/blacklight_spitter.geo.json",
+      "src/main/resources/assets/blacklight/animations/blacklight_spitter.animation.json",
+      "src/main/resources/assets/blacklight/textures/entity/infected_species.png"
+    ],
+    "appearance_note": "见具体资源路径；有geo骨架不代表最终只有geo表面，hunter/hydra另绘connected网格"
+  },
+  {
+    "id": "blacklight:blacklight_brute",
+    "name": "黑光重甲兽",
+    "base_health": 80.0,
+    "attack_attribute": 10.0,
+    "movement_speed": 0.24,
+    "knockback_resistance": 0.7,
+    "all_registered_attributes": {
+      "MAX_HEALTH": 80.0,
+      "ATTACK_DAMAGE": 10.0,
+      "MOVEMENT_SPEED": 0.24,
+      "FOLLOW_RANGE": 28.0,
+      "KNOCKBACK_RESISTANCE": 0.7,
+      "STEP_HEIGHT": 1.0
+    },
+    "registered_width": 1.3,
+    "registered_height": 2.5,
+    "attributes_source": "return Monster.createMonsterAttributes().add(Attributes.MAX_HEALTH,k==Kind.BRUTE?80:k==Kind.SPITTER?28:24).add(Attributes.ATTACK_DAMAGE,k==Kind.BRUTE?10:5).add(Attributes.MOVEMENT_SPEED,k==Kind.STALKER?.34:.24).add(Attributes.FOLLOW_RANGE,28).add(Attributes.KNOCKBACK_RESISTANCE,k==Kind.BRUTE?.7:.1).add(Attributes.STEP_HEIGHT,1);",
+    "source": "src/main/java/com/codex/blacklight/entity/BlacklightMutant.java",
+    "note": "BRUTE 分支",
+    "resource_paths": [
+      "src/main/resources/assets/blacklight/geo/blacklight_brute.geo.json",
+      "src/main/resources/assets/blacklight/animations/blacklight_brute.animation.json",
+      "src/main/resources/assets/blacklight/textures/entity/infected_species.png"
+    ],
+    "appearance_note": "见具体资源路径；有geo骨架不代表最终只有geo表面，hunter/hydra另绘connected网格"
+  },
+  {
+    "id": "blacklight:blacklight_hunter",
+    "name": "黑光猎杀者 · 重爪",
+    "base_health": 96.0,
+    "attack_attribute": 14.0,
+    "movement_speed": 0.32,
+    "knockback_resistance": 0.65,
+    "all_registered_attributes": {
+      "MAX_HEALTH": 96.0,
+      "MOVEMENT_SPEED": 0.32,
+      "ATTACK_DAMAGE": 14.0,
+      "FOLLOW_RANGE": 32.0,
+      "KNOCKBACK_RESISTANCE": 0.65,
+      "STEP_HEIGHT": 1.0
+    },
+    "registered_width": 1.05,
+    "registered_height": 2.35,
+    "attributes_source": "return Monster.createMonsterAttributes().add(Attributes.MAX_HEALTH, HunterBalance.HEALTH).add(Attributes.MOVEMENT_SPEED, HunterBalance.SPEED)\n                .add(Attributes.ATTACK_DAMAGE, HunterBalance.DAMAGE).add(Attributes.FOLLOW_RANGE, 32)\n                .add(Attributes.KNOCKBACK_RESISTANCE, HunterBalance.KNOCKBACK_RESISTANCE).add(Attributes.STEP_HEIGHT, 1);",
+    "source": "src/main/java/com/codex/blacklight/entity/BlacklightHunter.java",
+    "note": "HunterBalance 基础值；动作/难度与防御再缩放",
+    "resource_paths": [
+      "src/main/resources/assets/blacklight/geo/blacklight_hunter_authored.geo.json",
+      "src/main/resources/assets/blacklight/animations/blacklight_hunter.animation.json",
+      "src/main/resources/assets/blacklight/models/hunter_connected.json",
+      "src/main/resources/assets/blacklight/textures/entity/hunter_connected.png",
+      "src/main/resources/assets/blacklight/textures/entity/hunter_authored.png"
+    ],
+    "appearance_note": "见具体资源路径；有geo骨架不代表最终只有geo表面，hunter/hydra另绘connected网格"
+  },
+  {
+    "id": "blacklight:blacklight_hive",
+    "name": "黑光蜂巢",
+    "base_health": 160.0,
+    "attack_attribute": null,
+    "movement_speed": 0.0,
+    "knockback_resistance": 1.0,
+    "all_registered_attributes": {
+      "MAX_HEALTH": 160.0,
+      "MOVEMENT_SPEED": 0.0,
+      "KNOCKBACK_RESISTANCE": 1.0
+    },
+    "registered_width": 4.0,
+    "registered_height": 3.5,
+    "attributes_source": "return Monster.createMonsterAttributes().add(Attributes.MAX_HEALTH,160).add(Attributes.MOVEMENT_SPEED,0).add(Attributes.KNOCKBACK_RESISTANCE,1);",
+    "source": "src/main/java/com/codex/blacklight/entity/BlacklightHive.java",
+    "note": "常规伤害受 HiveDefense 芯片伤害/间隔限制；有限增援波",
+    "resource_paths": [
+      "src/main/resources/assets/blacklight/geo/blacklight_hive.geo.json",
+      "src/main/resources/assets/blacklight/animations/blacklight_hive.animation.json",
+      "src/main/resources/assets/blacklight/textures/entity/infected_species.png"
+    ],
+    "appearance_note": "见具体资源路径；有geo骨架不代表最终只有geo表面，hunter/hydra另绘connected网格"
+  },
+  {
+    "id": "blacklight:blacklight_hydra",
+    "name": "九头蛇",
+    "base_health": 180.0,
+    "attack_attribute": 14.0,
+    "movement_speed": 0.0,
+    "knockback_resistance": 1.0,
+    "all_registered_attributes": {
+      "MAX_HEALTH": 180.0,
+      "ATTACK_DAMAGE": 14.0,
+      "MOVEMENT_SPEED": 0.0,
+      "KNOCKBACK_RESISTANCE": 1.0,
+      "FOLLOW_RANGE": 18.0
+    },
+    "registered_width": 2.4,
+    "registered_height": 5.0,
+    "attributes_source": "return Monster.createMonsterAttributes().add(Attributes.MAX_HEALTH,180).add(Attributes.ATTACK_DAMAGE,14).add(Attributes.MOVEMENT_SPEED,0).add(Attributes.KNOCKBACK_RESISTANCE,1).add(Attributes.FOLLOW_RANGE,18);",
+    "source": "src/main/java/com/codex/blacklight/entity/BlacklightHydra.java",
+    "note": "固定炮台式海德拉；动作命中另读实体源码",
+    "resource_paths": [
+      "src/main/resources/assets/blacklight/geo/blacklight_hydra.geo.json",
+      "src/main/resources/assets/blacklight/animations/blacklight_hydra.animation.json",
+      "src/main/resources/assets/blacklight/models/hydra_connected.json",
+      "src/main/resources/assets/blacklight/textures/entity/hydra_connected.png",
+      "src/main/resources/assets/blacklight/textures/entity/hydra_authored.png"
+    ],
+    "appearance_note": "见具体资源路径；有geo骨架不代表最终只有geo表面，hunter/hydra另绘connected网格"
+  },
+  {
+    "id": "blacklight:biomass_husk",
+    "name": "黑光外壳",
+    "base_health": 40.0,
+    "attack_attribute": null,
+    "movement_speed": 0.0,
+    "knockback_resistance": 1.0,
+    "all_registered_attributes": {
+      "MAX_HEALTH": 40.0,
+      "MOVEMENT_SPEED": 0.0,
+      "KNOCKBACK_RESISTANCE": 1.0
+    },
+    "registered_width": 0.6,
+    "registered_height": 1.8,
+    "attributes_source": "return createMobAttributes().add(Attributes.MAX_HEALTH,40).add(Attributes.MOVEMENT_SPEED,0).add(Attributes.KNOCKBACK_RESISTANCE,1);",
+    "source": "src/main/java/com/codex/blacklight/entity/BiomassHusk.java",
+    "note": "生物质残骸实体，非持枪兵种",
+    "resource_paths": [],
+    "appearance_note": "使用所有者/默认玩家皮肤并由残骸渲染器处理"
+  }
+]

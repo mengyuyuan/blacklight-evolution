@@ -1,0 +1,15 @@
+allprojects { afterEvaluate { sourceSets.main.java.srcDir('src/blackwatchTest/java'); sourceSets.main.resources.srcDir('src/blackwatchTest/resources'); sourceSets.main.java.exclude { e -> !e.directory && e.file.path.replace('\\','/').contains('/src/blackwatchTest/java/') && !e.file.name.equals('FirearmsGameTest.java') } } }
+
+allprojects { afterEvaluate {
+    def stageFirearmsRun = tasks.register('stageFirearmsRun', Sync) {
+        dependsOn tasks.named('classes')
+        from sourceSets.main.output
+        into layout.buildDirectory.dir('firearms-run-mod')
+    }
+    tasks.named('runGameTestServer').configure {
+        dependsOn stageFirearmsRun
+        doFirst { environment 'MOD_CLASSES', 'blacklight%%' + layout.buildDirectory.dir('firearms-run-mod').get().asFile.absolutePath }
+    }
+} }
+
+allprojects { tasks.withType(ProcessResources).configureEach { filteringCharset = 'UTF-8' }; tasks.matching { it.name == 'generateModMetadata' }.configureEach { outputs.upToDateWhen { false } } }

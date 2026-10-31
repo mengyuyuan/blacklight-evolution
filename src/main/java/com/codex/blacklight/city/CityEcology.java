@@ -51,10 +51,13 @@ public final class CityEcology {
             if(cells.containsKey(other)&&history!=null&&history.observed())before.put(other,history.zone());
         }
         var counts=new HashMap<CityEcologyData.Key,int[]>();
-        for(var entity:level.getAllEntities())if(entity instanceof Mob mob&&mob.isAlive()&&BlacklightInfectionSystem.isInfected(mob)
+        for(var entity:level.getAllEntities())if(entity instanceof Mob mob&&mob.isAlive()
                 &&level.isPositionEntityTicking(mob.blockPosition())){
             var k=key(level,mob.blockPosition());if(!cells.containsKey(k))continue;
-            var c=counts.computeIfAbsent(k,v->new int[4]);c[0]++;
+            var c=counts.computeIfAbsent(k,v->new int[5]);
+            if(MilitaryCampaignSystem.controllingSoldier(mob)){c[4]++;continue;}
+            if(!BlacklightInfectionSystem.isInfected(mob))continue;
+            c[0]++;
             if(mob instanceof com.codex.blacklight.entity.BlacklightInfectedHost host){
                 if(host.tissueAge()>=TissueGrowth.MATURITY_TICKS)c[1]++;
                 if(host.isEvolved())c[2]++;
@@ -65,7 +68,7 @@ public final class CityEcology {
             if(!colony.dead&&cells.containsKey(k)&&level.isPositionEntityTicking(colony.origin)
                     &&level.getChunkSource().getChunkNow(colony.origin.getX()>>4,colony.origin.getZ()>>4)!=null
                     &&level.getBlockState(colony.origin).is(com.codex.blacklight.registry.ModBlocks.BUILDING_CORE.get()))
-                counts.computeIfAbsent(k,v->new int[4])[3]+=1+colony.stage;
+                counts.computeIfAbsent(k,v->new int[5])[3]+=1+colony.stage;
         }
         if(CityTravel.isCity(level.dimension())){
             var city=CityData.get(level);
@@ -73,7 +76,7 @@ public final class CityEcology {
                 var port=CitySystem.port(level,hive,0);var k=key(level,port);
                 if(cells.containsKey(k)&&!city.destroyed(hive)&&CityHiveSupply.ready(city,hive)
                         &&level.isPositionEntityTicking(port)&&level.getChunkSource().getChunkNow(port.getX()>>4,port.getZ()>>4)!=null
-                        &&level.getBlockState(port).is(CityBlocks.HATCH.get()))counts.computeIfAbsent(k,v->new int[4])[3]+=4;
+                        &&level.getBlockState(port).is(CityBlocks.HATCH.get()))counts.computeIfAbsent(k,v->new int[5])[3]+=4;
             }
         }
         for(var cell:cells.entrySet()){
@@ -82,8 +85,8 @@ public final class CityEcology {
                 var zone=before.get(new CityEcologyData.Key(k.city(),k.x()+d[0],k.z()+d[1]));
                 if(zone==DistrictThreat.Zone.RED)red++;else if(zone==DistrictThreat.Zone.YELLOW)yellow++;
             }
-            var c=counts.getOrDefault(k,new int[4]);
-            data.observe(k,level.getGameTime(),OutbreakConfig.INTERVAL.get(),authoredStage(level,cell.getValue()),OutbreakConfig.DAY_TICKS.get(),new DistrictThreat.Signal(c[0],c[1],c[2],c[3],red,yellow));
+            var c=counts.getOrDefault(k,new int[5]);
+            data.observe(k,level.getGameTime(),OutbreakConfig.INTERVAL.get(),authoredStage(level,cell.getValue()),OutbreakConfig.DAY_TICKS.get(),new DistrictThreat.Signal(c[0],c[1],c[2],c[3],red,yellow,c[4]));
         }
     }
     public static int stage(ServerLevel level,BlockPos pos){
@@ -105,7 +108,8 @@ public final class CityEcology {
         if(!WorldOutbreakSystem.sanctuary(level,pos))CityEcologyData.get(level).release(key(level,pos));
     }
     public static void cleared(ServerLevel level,BlockPos pos){
-        if(CityTravel.isCity(level.dimension()))CityEcologyData.get(level).clear(key(level,pos),OutbreakConfig.DAY_TICKS.get()*3L);
+        if(MilitaryCampaignSystem.enabled(level)&&WorldOutbreakSystem.active(level))MilitaryCampaignSystem.infectionSourceCleared(level,pos);
+        else if(CityTravel.isCity(level.dimension()))CityEcologyData.get(level).clear(key(level,pos),OutbreakConfig.DAY_TICKS.get()*3L);
     }
     public static void synchronize(ServerPlayer player){
         var level=player.serverLevel();

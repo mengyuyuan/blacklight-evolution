@@ -1,0 +1,15 @@
+allprojects { afterEvaluate {
+    sourceSets.main.java.srcDir('src/garrisonTest/java')
+    sourceSets.main.resources.srcDir('src/blackwatchTest/resources')
+    sourceSets.main.resources.srcDir('src/cityMilitaryTest/resources')
+    def stageGarrison4Run = tasks.register('stageGarrison4Run', Sync) {
+        dependsOn tasks.named('classes')
+        from sourceSets.main.output
+        into layout.buildDirectory.dir('garrison4-run-mod')
+    }
+    tasks.named('runGameTestServer').configure {
+        dependsOn stageGarrison4Run
+        doFirst { environment 'MOD_CLASSES', 'blacklight%%' + layout.buildDirectory.dir('garrison4-run-mod').get().asFile.absolutePath }
+    }
+} }
+allprojects { tasks.withType(ProcessResources).configureEach { filteringCharset = 'UTF-8' }; tasks.matching { it.name == 'generateModMetadata' }.configureEach { outputs.upToDateWhen { false } } }

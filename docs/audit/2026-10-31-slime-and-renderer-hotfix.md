@@ -1,0 +1,7 @@
+# Death-slime recovery and projectile renderer hotfix
+
+A normal Forge .4 user-play session crashed at 16:29 with a null EntityRenderer in EntityRenderDispatcher. FirearmsClient subscribed the mod-lifecycle RegisterRenderers event to the gameplay bus. Both platforms now explicitly use the mod bus. Native acceptance must check every registered Blacklight entity has a real renderer; hiding missing entities is not a fix.
+
+Fatal slime previously restored only 5% health with 40 ticks of grace, then normal attacks could kill it. Its contact predicate also reused the humanoid weakening threshold. Fatal recovery now rejects ordinary damage until reformation, and contact accepts healthy eligible prey without that threshold. Mature protective organs, external invulnerability, region/wall checks, exclusive claims and confirmed-death settlement remain enforced. Voluntary separation retains damage and weakening rules. Void, administrative kill and configured lifetime expiry still bypass recovery protection.
+
+Two server regressions exercise real hurt calls after grace is cleared, automatic healthy-prey contact, confirmed kill, full healing and body restoration, immunity removal, voluntary damage and administrative cleanup. The existing mature-target threshold test now explicitly covers voluntary slime. Actual-client acceptance additionally covers sustained monster attacks, full-skills respawn, complete renderer coverage and automatic contact recovery. Raw failed user-play evidence is preserved separately.

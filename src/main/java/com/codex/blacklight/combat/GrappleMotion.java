@@ -26,7 +26,7 @@ public final class GrappleMotion {
     public static String sceneKey(LivingEntity entity,ConsumeVisual visual){
         if(active(visual))return key(owner(entity,visual),visual);
         var form=com.codex.blacklight.power.PowerForm.values()[Math.clamp(visual.form(),0,com.codex.blacklight.power.PowerForm.values().length-1)];
-        return ConsumeSequence.clipKey(form,ConsumeSequence.mountedStage(visual.stage()));
+        return ConsumeSequence.clipKey(form,ConsumeSequence.mountedStage(visual.stage()),visual.variant());
     }
     public static float sceneProgress(LivingEntity entity,ConsumeVisual visual,float partial){
         return active(visual)?progress(owner(entity,visual),visual,partial):visual.motionProgress(entity.level().getGameTime(),partial);
@@ -35,7 +35,7 @@ public final class GrappleMotion {
         float progress=sceneProgress(entity,visual,partial);
         if(!visual.consuming())return progress;
         var forms=com.codex.blacklight.power.PowerForm.values();
-        return ConsumeSequence.receiverProgress(forms[Math.clamp(visual.form(),0,forms.length-1)],progress,ConsumeSequence.mountedStage(visual.stage()));
+        return ConsumeSequence.receiverProgress(forms[Math.clamp(visual.form(),0,forms.length-1)],progress,ConsumeSequence.mountedStage(visual.stage()),visual.variant());
     }
     /** The same body-relative grip is used by authority and receiver interpolation. */
     public static java.util.Optional<net.minecraft.world.phys.Vec3> carryAnchor(LivingEntity owner,LivingEntity victim,

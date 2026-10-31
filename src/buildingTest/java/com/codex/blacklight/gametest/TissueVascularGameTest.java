@@ -43,8 +43,11 @@ public final class TissueVascularGameTest {
     }
     @GameTest(template="wall_test",timeoutTicks=125,batch="vascular_actual_ai")
     public static void anIdleMatureCarrierActuallyNavigatesToTheCoreAndSelectsItsOwnConnection(GameTestHelper h){
-        var f=new Fixture(h);var host=f.host(1.5,1,true);var initial=host.position();var started=new boolean[1];for(int t=1;t<=95;t++)h.runAfterDelay(t,()->{if(host.vascular().active())started[0]=true;});
-        h.runAfterDelay(100,()->{try{h.assertTrue(started[0]&&host.position().distanceToSqr(initial)>.04&&host.vascular().delivered()>0&&f.colony.supply.reserve()>0,"real unforced navigation and AI approach lead to an actual delivery: pos="+host.position()+" nutrition="+host.tissueNutrition()+" delivered="+host.vascular().delivered());}finally{f.close();}h.succeed();});
+        var f=new Fixture(h);var host=f.host(1.5,1,true);var initial=host.position();var started=new boolean[1];var observedDelivery=new int[1];for(int t=1;t<=95;t++)h.runAfterDelay(t,()->{if(host.vascular().active())started[0]=true;
+            // Delivered is per connection and resets when a later connection starts.
+            // Preserve the first actual transfer instead of requiring a particular random AI phase at tick 260.
+            observedDelivery[0]=Math.max(observedDelivery[0],host.vascular().delivered());});
+        h.runAfterDelay(100,()->{try{h.assertTrue(started[0]&&host.position().distanceToSqr(initial)>.04&&observedDelivery[0]>0&&f.colony.supply.reserve()>0,"real unforced navigation and AI approach lead to an actual delivery: pos="+host.position()+" nutrition="+host.tissueNutrition()+" delivered="+host.vascular().delivered());}finally{f.close();}h.succeed();});
     }
     @GameTest(template="wall_test",timeoutTicks=45,batch="vascular_wall")
     public static void aNewSolidWallCancelsTheConnectionBeforeAnyMaterialCrossesIt(GameTestHelper h){

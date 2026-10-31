@@ -1179,5 +1179,110 @@
         "attenuation_distance": 24
       }
     ]
+  },
+  "firearm.rifle": {
+    "subtitle": "subtitles.blacklight.firearm.rifle",
+    "sounds": [
+      {
+        "name": "blacklight:firearms/rifle_1",
+        "volume": 0.85,
+        "pitch": 1
+      },
+      {
+        "name": "blacklight:firearms/rifle_2",
+        "volume": 0.85,
+        "pitch": 1
+      },
+      {
+        "name": "blacklight:firearms/rifle_3",
+        "volume": 0.85,
+        "pitch": 1
+      }
+    ]
+  },
+  "firearm.heavy": {
+    "subtitle": "subtitles.blacklight.firearm.heavy",
+    "sounds": [
+      {
+        "name": "blacklight:firearms/rifle_1",
+        "volume": 0.85,
+        "pitch": 0.87
+      },
+      {
+        "name": "blacklight:firearms/rifle_3",
+        "volume": 0.85,
+        "pitch": 0.87
+      }
+    ]
+  },
+  "firearm.cannon": {
+    "subtitle": "subtitles.blacklight.firearm.cannon",
+    "sounds": [
+      {
+        "name": "blacklight:firearms/cannon_1",
+        "volume": 0.85,
+        "pitch": 1
+      },
+      {
+        "name": "blacklight:firearms/cannon_2",
+        "volume": 0.85,
+        "pitch": 1
+      }
+    ]
+  },
+  "firearm.launcher": {
+    "subtitle": "subtitles.blacklight.firearm.launcher",
+    "sounds": [
+      {
+        "name": "blacklight:firearms/impact_1",
+        "volume": 0.85,
+        "pitch": 1
+      }
+    ]
+  },
+  "firearm.impact": {
+    "subtitle": "subtitles.blacklight.firearm.impact",
+    "sounds": [
+      {
+        "name": "blacklight:firearms/impact_1",
+        "volume": 0.85,
+        "pitch": 1
+      },
+      {
+        "name": "blacklight:firearms/impact_2",
+        "volume": 0.85,
+        "pitch": 1
+      }
+    ]
+  },
+  "firearm.reload_out": {
+    "subtitle": "subtitles.blacklight.firearm.reload_out",
+    "sounds": [
+      {
+        "name": "blacklight:firearms/reload_out",
+        "volume": 0.85,
+        "pitch": 1
+      }
+    ]
+  },
+  "firearm.reload_insert": {
+    "subtitle": "subtitles.blacklight.firearm.reload_insert",
+    "sounds": [
+      {
+        "name": "blacklight:firearms/reload_insert",
+        "volume": 0.85,
+        "pitch": 1
+      }
+    ]
+  },
+  "firearm.reload_bolt": {
+    "subtitle": "subtitles.blacklight.firearm.reload_bolt",
+    "sounds": [
+      {
+        "name": "blacklight:firearms/reload_bolt",
+        "volume": 0.85,
+        "pitch": 1
+      }
+    ]
   }
 }

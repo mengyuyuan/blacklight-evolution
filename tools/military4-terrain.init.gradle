@@ -1,0 +1,15 @@
+allprojects { afterEvaluate {
+    sourceSets.main.java.srcDir('src/terrainTest/java')
+    sourceSets.main.resources.srcDir('src/blackwatchTest/resources')
+    sourceSets.main.resources.srcDir('src/cityMilitaryTest/resources')
+    def stageTerrain4Run = tasks.register('stageTerrain4Run', Sync) {
+        dependsOn tasks.named('classes')
+        from sourceSets.main.output
+        into layout.buildDirectory.dir('terrain4-run-mod')
+    }
+    tasks.named('runGameTestServer').configure {
+        dependsOn stageTerrain4Run
+        doFirst { environment 'MOD_CLASSES', 'blacklight%%' + layout.buildDirectory.dir('terrain4-run-mod').get().asFile.absolutePath }
+    }
+} }
+allprojects { tasks.withType(ProcessResources).configureEach { filteringCharset = 'UTF-8' }; tasks.matching { it.name == 'generateModMetadata' }.configureEach { outputs.upToDateWhen { false } } }

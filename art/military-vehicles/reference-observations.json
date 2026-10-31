@@ -1,0 +1,304 @@
+{
+  "schemaVersion": 1,
+  "researchCutoff": "2026-10-26T04:55:05.248697+00:00",
+  "scope": "Visual study only. Model dimensions, mounts, seats, canvas conversion and military palette are original mod choices. No source image is included in shipping assets.",
+  "references": [
+    {
+      "file": "prototype1-steam-tank.jpg",
+      "cachePolicy": "ignored internal reference only; never package or display original pixels as mod work",
+      "url": "https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/10150/0000008860.1920x1080.jpg?t=1655760765",
+      "sourcePage": "https://store.steampowered.com/app/10150/Prototype/?l=english",
+      "kind": "Prototype 1 official distribution screenshot",
+      "sha256": "80728e544389f373c6ae5e57761560df6d21bb98f3de662290da5b57a8a79331",
+      "bytes": 222625,
+      "dimensions": [
+        1280,
+        720
+      ],
+      "viewedWith": "view_image",
+      "observation": "Foreground tracked APC-like vehicle: sloped glacis, small cannon turret and visible road wheels. Do not label this as the requested main battle tank.",
+      "observationRecordedAt": "2026-10-26T04:55:05.248697+00:00"
+    },
+    {
+      "file": "prototype2-gamepressure-apc-boarding-reference.jpg",
+      "cachePolicy": "ignored internal reference only; never package or display original pixels as mod work",
+      "url": "https://www.gamepressure.com/prototype2/gfx/word/171720703.jpg",
+      "sourcePage": "https://www.gamepressure.com/prototype2/main-mission-14-enemies-and-allies/z93aa4",
+      "kind": "Prototype 2 gameplay screenshot",
+      "sha256": "53aa7953226f20c08064e8e3801f6a8a4ac22d56c7ff16f20e287fcc02b5e011",
+      "bytes": 28695,
+      "dimensions": [
+        500,
+        281
+      ],
+      "viewedWith": "view_image",
+      "observation": "Heller on vehicle roof, entry prompt, hatch and side twin-opening launcher. Ground gear is outside crop.",
+      "previousM5CacheSha256": "53aa7953226f20c08064e8e3801f6a8a4ac22d56c7ff16f20e287fcc02b5e011",
+      "identicalToPreviousM5Bytes": true,
+      "previousM5CacheNote": "Both caches were viewed; same scene composition where bytes differ. Do not equate image hash with current web page verification.",
+      "observationRecordedAt": "2026-10-26T04:55:05.248697+00:00"
+    },
+    {
+      "file": "prototype2-gamepressure-apc-reference.jpg",
+      "cachePolicy": "ignored internal reference only; never package or display original pixels as mod work",
+      "url": "https://www.gamepressure.com/prototype2/gfx/word/171720843.jpg",
+      "sourcePage": "https://www.gamepressure.com/prototype2/main-mission-14-enemies-and-allies/z93aa4",
+      "kind": "Prototype 2 gameplay screenshot",
+      "sha256": "0085a03a10c77ce0fbd400106bbf481952e8f8879f4779e15f69c429266a0820",
+      "bytes": 32565,
+      "dimensions": [
+        500,
+        281
+      ],
+      "viewedWith": "view_image",
+      "observation": "Rear distant driving view during hydra objective. Supports gameplay context, not reliable road-wheel count.",
+      "previousM5CacheSha256": "e91e67ad401aedb9cebbfce018a9e871f256f5ff949209a2f54c241e92bc0c2b",
+      "identicalToPreviousM5Bytes": false,
+      "previousM5CacheNote": "Both caches were viewed; same scene composition where bytes differ. Do not equate image hash with current web page verification.",
+      "observationRecordedAt": "2026-10-26T04:55:05.248697+00:00"
+    },
+    {
+      "file": "prototype2-newgamenetwork-tank-reference.jpg",
+      "cachePolicy": "ignored internal reference only; never package or display original pixels as mod work",
+      "url": "https://www.newgamenetwork.com/app/uploads/2025/10/prototype2_img04_2.jpg",
+      "sourcePage": "https://www.newgamenetwork.com/media/5518/ps3/prototype-2-ps3-screenshots/",
+      "kind": "Prototype 2 published game screenshot",
+      "sha256": "83c5598645b8cd6612bd84dd9db63ea235919eeec295e2fe5fa257f08ce1463c",
+      "bytes": 223604,
+      "dimensions": [
+        1280,
+        720
+      ],
+      "viewedWith": "view_image",
+      "observation": "Heller holds a complete torn-off tank turret above the damaged hull. Not an intact ordinary tank proportion view.",
+      "previousM5CacheSha256": "5f99b8960f74fbf233b18a23c863387e02538a4c18fd8172da73f2b012c40b58",
+      "identicalToPreviousM5Bytes": false,
+      "previousM5CacheNote": "Both caches were viewed; same scene composition where bytes differ. Do not equate image hash with current web page verification.",
+      "observationRecordedAt": "2026-10-26T04:55:05.248697+00:00"
+    },
+    {
+      "file": "prototype2-gamepressure-tank-front.jpg",
+      "cachePolicy": "ignored internal reference only; never package or display original pixels as mod work",
+      "url": "https://www.gamepressure.com/prototype2/gfx/word/174636984.jpg",
+      "sourcePage": "https://www.gamepressure.com/prototype2/blacknet-mission-9-operation-spotted-cat-p-2/zd3acf",
+      "kind": "Prototype 2 gameplay screenshot",
+      "sha256": "6234ee248c72c526b8ff4434389c35ac518be8bc673c64fd2fa4059a1f10f739",
+      "bytes": 59795,
+      "dimensions": [
+        500,
+        281
+      ],
+      "viewedWith": "view_image",
+      "observation": "Distant complete tank front view in combat; limited shape detail.",
+      "observationRecordedAt": "2026-10-26T04:55:05.248697+00:00"
+    },
+    {
+      "file": "prototype2-gamepressure-tank-group.jpg",
+      "cachePolicy": "ignored internal reference only; never package or display original pixels as mod work",
+      "url": "https://www.gamepressure.com/prototype2/gfx/word/174637046.jpg",
+      "sourcePage": "https://www.gamepressure.com/prototype2/blacknet-mission-9-operation-spotted-cat-p-2/zd3acf",
+      "kind": "Prototype 2 gameplay screenshot",
+      "sha256": "58f192ec09d1730caee800c97b6d454112e0cfe12bd783f31ef43eab543507f7",
+      "bytes": 43219,
+      "dimensions": [
+        500,
+        281
+      ],
+      "viewedWith": "view_image",
+      "observation": "Foreground APC boarding view shows sloped deck, turret and side twin launcher. Objective says tank but does not identify the foreground vehicle as tank.",
+      "observationRecordedAt": "2026-10-26T04:55:05.248697+00:00"
+    },
+    {
+      "file": "prototype2-gamepressure-apc-group.jpg",
+      "cachePolicy": "ignored internal reference only; never package or display original pixels as mod work",
+      "url": "https://www.gamepressure.com/prototype2/gfx/word/174636953.jpg",
+      "sourcePage": "https://www.gamepressure.com/prototype2/blacknet-mission-9-operation-spotted-cat-p-2/zd3acf",
+      "kind": "Prototype 2 gameplay screenshot",
+      "sha256": "b325579d7a6a4676149b1248cf4d92c11d51a0a6282f005be940cba483973afd",
+      "bytes": 61136,
+      "dimensions": [
+        500,
+        281
+      ],
+      "viewedWith": "view_image",
+      "observation": "Distant APC-like front/side combat view; inadequate for unique real-world vehicle identity.",
+      "observationRecordedAt": "2026-10-26T04:55:05.248697+00:00"
+    },
+    {
+      "file": "prototype2-gamepressure-tank-final.jpg",
+      "cachePolicy": "ignored internal reference only; never package or display original pixels as mod work",
+      "url": "https://www.gamepressure.com/prototype2/gfx/word/174637078.jpg",
+      "sourcePage": "https://www.gamepressure.com/prototype2/blacknet-mission-9-operation-spotted-cat-p-2/zd3acf",
+      "kind": "Prototype 2 gameplay screenshot",
+      "sha256": "19bef0960e8c65055829b79e3aaf8640e7abd7fff858bb776a1bcbace5227b3e",
+      "bytes": 49175,
+      "dimensions": [
+        500,
+        281
+      ],
+      "viewedWith": "view_image",
+      "observation": "Distant tank combat view, tendrils obscure hull; limited supplemental evidence.",
+      "observationRecordedAt": "2026-10-26T04:55:05.248697+00:00"
+    },
+    {
+      "file": "prototype2-igcd-truck-50328-front.jpg",
+      "cachePolicy": "ignored internal reference only; never package or display original pixels as mod work",
+      "url": "https://www.igcd.net/images/050/328.jpg",
+      "sourcePage": "https://www.igcd.net/vehicle.php?id=50328",
+      "kind": "Prototype 2 gameplay screenshot / Gentek utility truck",
+      "sha256": "bd47859ae39fc037b58e4958eedbbf0004a5c304b5a1dcf2c9d41c11b1ff4d82",
+      "bytes": 41243,
+      "dimensions": [
+        720,
+        405
+      ],
+      "viewedWith": "view_image",
+      "observation": "front three-quarter view. Six-wheel common chassis, high angular cab, enclosed equipment box and rear roller door. Not the transport-bed variant.",
+      "observationRecordedAt": "2026-10-26T04:55:05.248697+00:00"
+    },
+    {
+      "file": "prototype2-igcd-truck-50328-rear.jpg",
+      "cachePolicy": "ignored internal reference only; never package or display original pixels as mod work",
+      "url": "https://www.igcd.net/images2/050/328.jpg",
+      "sourcePage": "https://www.igcd.net/vehicle.php?id=50328",
+      "kind": "Prototype 2 gameplay screenshot / Gentek utility truck",
+      "sha256": "48dcfcb2c71754d79a63281b42879e60dade1a71efb9ed05ba1d2917beac92a3",
+      "bytes": 42252,
+      "dimensions": [
+        720,
+        405
+      ],
+      "viewedWith": "view_image",
+      "observation": "rear three-quarter view. Six-wheel common chassis, high angular cab, enclosed equipment box and rear roller door. Not the transport-bed variant.",
+      "observationRecordedAt": "2026-10-26T04:55:05.248697+00:00"
+    },
+    {
+      "file": "prototype2-igcd-truck-50329-front.jpg",
+      "cachePolicy": "ignored internal reference only; never package or display original pixels as mod work",
+      "url": "https://www.igcd.net/images/050/329.jpg",
+      "sourcePage": "https://www.igcd.net/vehicle.php?id=50329",
+      "kind": "Prototype 2 gameplay screenshot / military transport truck",
+      "sha256": "cb8e4b41daa69c856af2997214746677168fd60d5d9c907ade5ce919061e01ca",
+      "bytes": 60467,
+      "dimensions": [
+        720,
+        405
+      ],
+      "viewedWith": "view_image",
+      "observation": "front three-quarter view. Six wheels: one front axle and rear tandem; high angular cab, two sloped windscreen panes, low flat nose, open drop-side cargo bed with rails. Canvas is not present.",
+      "observationRecordedAt": "2026-10-26T04:55:05.248697+00:00"
+    },
+    {
+      "file": "prototype2-igcd-truck-50329-rear.jpg",
+      "cachePolicy": "ignored internal reference only; never package or display original pixels as mod work",
+      "url": "https://www.igcd.net/images2/050/329.jpg",
+      "sourcePage": "https://www.igcd.net/vehicle.php?id=50329",
+      "kind": "Prototype 2 gameplay screenshot / military transport truck",
+      "sha256": "15257e8849b79281408e5a3fa071612aa45a130cc631570453e8c47ab52e51a1",
+      "bytes": 40846,
+      "dimensions": [
+        720,
+        405
+      ],
+      "viewedWith": "view_image",
+      "observation": "rear three-quarter view. Six wheels: one front axle and rear tandem; high angular cab, two sloped windscreen panes, low flat nose, open drop-side cargo bed with rails. Canvas is not present.",
+      "observationRecordedAt": "2026-10-26T04:55:05.248697+00:00"
+    },
+    {
+      "file": "prototype2-igcd-truck-50330-front.jpg",
+      "cachePolicy": "ignored internal reference only; never package or display original pixels as mod work",
+      "url": "https://www.igcd.net/images/050/330.jpg",
+      "sourcePage": "https://www.igcd.net/vehicle.php?id=50330",
+      "kind": "Prototype 2 gameplay screenshot / Blacknet terminal truck",
+      "sha256": "c6d7483da65b10c34af0174275302a1d55171f259797e6737d51042da07380c7",
+      "bytes": 32478,
+      "dimensions": [
+        720,
+        405
+      ],
+      "viewedWith": "view_image",
+      "observation": "front three-quarter view. Six-wheel common chassis and high cab, boxed rear module with side screen terminal and roof equipment. Not the troop transport bed.",
+      "observationRecordedAt": "2026-10-26T04:55:05.248697+00:00"
+    },
+    {
+      "file": "prototype2-igcd-truck-50330-rear.jpg",
+      "cachePolicy": "ignored internal reference only; never package or display original pixels as mod work",
+      "url": "https://www.igcd.net/images2/050/330.jpg",
+      "sourcePage": "https://www.igcd.net/vehicle.php?id=50330",
+      "kind": "Prototype 2 gameplay screenshot / Blacknet terminal truck",
+      "sha256": "49a28dce539d9f2e91d23fa6fd81b53d5e63fc38b884acfb8a9a2b6c01d2e846",
+      "bytes": 33872,
+      "dimensions": [
+        720,
+        405
+      ],
+      "viewedWith": "view_image",
+      "observation": "rear three-quarter view. Six-wheel common chassis and high cab, boxed rear module with side screen terminal and roof equipment. Not the troop transport bed.",
+      "observationRecordedAt": "2026-10-26T04:55:05.248697+00:00"
+    },
+    {
+      "file": "prototype2-igcd-50317-images-050-317.jpg",
+      "cachePolicy": "ignored internal reference only; never package or display original pixels as mod work",
+      "url": "https://www.igcd.net/images/050/317.jpg",
+      "sourcePage": "https://www.igcd.net/vehicle.php?id=50317",
+      "kind": "Prototype 2 gameplay screenshot",
+      "sha256": "5157d90f90ee29d7a202c2017077e637cc1cb4b21862288f8ec306260f10935c",
+      "bytes": 44282,
+      "dimensions": [
+        720,
+        405
+      ],
+      "viewedWith": "view_image",
+      "observation": "Front three-quarter view. Low wide tank with seven visible road wheels, long main cannon, independent turret, upper multiple-barrel weapon, front plough teeth, side skirts and rear stowage.",
+      "observationRecordedAt": "2026-10-26T04:55:05.248697+00:00"
+    },
+    {
+      "file": "prototype2-igcd-50317-images2-050-317.jpg",
+      "cachePolicy": "ignored internal reference only; never package or display original pixels as mod work",
+      "url": "https://www.igcd.net/images2/050/317.jpg",
+      "sourcePage": "https://www.igcd.net/vehicle.php?id=50317",
+      "kind": "Prototype 2 gameplay screenshot",
+      "sha256": "4c24b70396fea6d56a04ddea00cb50d3c6e3dd5b7b2090456986dcc5d23ceec2",
+      "bytes": 41463,
+      "dimensions": [
+        720,
+        405
+      ],
+      "viewedWith": "view_image",
+      "observation": "Rear three-quarter view. Low wide tank with seven visible road wheels, long main cannon, independent turret, upper multiple-barrel weapon, front plough teeth, side skirts and rear stowage.",
+      "observationRecordedAt": "2026-10-26T04:55:05.248697+00:00"
+    },
+    {
+      "file": "prototype2-igcd-50318-images-050-318.jpg",
+      "cachePolicy": "ignored internal reference only; never package or display original pixels as mod work",
+      "url": "https://www.igcd.net/images/050/318.jpg",
+      "sourcePage": "https://www.igcd.net/vehicle.php?id=50318",
+      "kind": "Prototype 2 gameplay screenshot",
+      "sha256": "31e6509e56e67e29d84b4935c0120f4c5e02aa5edf60975ef08ab84531728a42",
+      "bytes": 39348,
+      "dimensions": [
+        720,
+        405
+      ],
+      "viewedWith": "view_image",
+      "observation": "Front three-quarter view. Tracked APC with six visible road wheels, steep glacis, small turret, slim cannon, side-mounted twin launcher and rear access door.",
+      "observationRecordedAt": "2026-10-26T04:55:05.248697+00:00"
+    },
+    {
+      "file": "prototype2-igcd-50318-images2-050-318.jpg",
+      "cachePolicy": "ignored internal reference only; never package or display original pixels as mod work",
+      "url": "https://www.igcd.net/images2/050/318.jpg",
+      "sourcePage": "https://www.igcd.net/vehicle.php?id=50318",
+      "kind": "Prototype 2 gameplay screenshot",
+      "sha256": "15e61fff4e4711e8a8705a9ba2e120ba3bfb192c01e30e23468bf92b7fa89a46",
+      "bytes": 34952,
+      "dimensions": [
+        720,
+        405
+      ],
+      "viewedWith": "view_image",
+      "observation": "Rear three-quarter view. Tracked APC with six visible road wheels, steep glacis, small turret, slim cannon, side-mounted twin launcher and rear access door.",
+      "observationRecordedAt": "2026-10-26T04:55:05.248697+00:00"
+    }
+  ]
+}

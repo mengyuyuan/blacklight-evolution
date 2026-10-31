@@ -35,7 +35,12 @@ public final class DistrictZoneGameTest {
             h.assertTrue(saved.get(key).pressure()==pressure&&saved.get(key).zone()==DistrictThreat.Zone.RED,"actual dimension ecology survives NBT serialization");
             level.getDataStorage().set("blacklight_city_ecology",saved);
             level.setBlock(f.origin,Blocks.AIR.defaultBlockState(),3);
-            h.assertTrue(f.colony.dead&&saved.get(key).pressure()==pressure&&CityEcology.zone(level,f.origin)==DistrictThreat.Zone.RED,"the old source destruction lifecycle remains, without adding the other developer's cleansing reward");
+            h.assertTrue(f.colony.dead,"destroying the actual source retires its saved colony");
+            if(MilitaryCampaignSystem.enabled(level)) {
+                h.assertTrue(saved.get(key).pressure()<pressure,"clearing a source in a campaign dimension must reduce recorded infection pressure");
+                int after=saved.get(key).pressure();BuildingInfectionSystem.destroy(level,f.origin);
+                h.assertTrue(saved.get(key).pressure()==after,"the same dead source cannot award a second pressure reduction");
+            } else h.assertTrue(saved.get(key).pressure()==pressure&&CityEcology.zone(level,f.origin)==DistrictThreat.Zone.RED,"dimensions outside the military campaign preserve infection history after source removal");
         }finally{OutbreakConfig.INTERVAL.set(interval);}});
     }
     @GameTest(template="wall_test",timeoutTicks=250,batch="district_architecture_overworld")
@@ -69,7 +74,7 @@ public final class DistrictZoneGameTest {
             var cp=new net.minecraft.world.level.ChunkPos((p.getX()>>4)+x,(p.getZ()>>4)+z);
             if(!f.level.getForcedChunks().contains(cp.toLong())){f.forced.add(cp);f.level.setChunkForced(cp.x,cp.z,true);}f.level.getChunk(cp.x,cp.z);
         }
-        h.startSequence().thenWaitUntil(()->h.assertTrue(f.level.isPositionEntityTicking(left)&&f.level.isPositionEntityTicking(right),"waiting for the two actual occupied frontier chunks"))
+        h.startSequence().thenWaitUntil(()->h.assertTrue(f.occupied(left,right),"waiting for the two actual occupied frontier chunks"))
           .thenExecute(()->{
             OutbreakConfig.INTERVAL.set(24000);
             for(int i=0;i<2;i++){var host=ModEntities.INFECTED_HOST.get().create(f.level);host.setPos(left.east(i*2).getBottomCenter());host.inherit(EntityType.PIG.create(f.level));host.advanceTissue(48000);host.setNoAi(true);host.setNoGravity(true);f.level.addFreshEntity(host);f.born.add(host);}

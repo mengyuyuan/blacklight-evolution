@@ -23,6 +23,9 @@ PROFILE_DATA_NAMES = {
 }
 SKILL_MOTIONS = ('dev_groundspike', 'dev_air_groundspike', 'dev_tendril', 'dev_air_tendril',
                 'dev_critical_pain', 'dev_air_critical_pain', 'bulletdive_drop')
+INACTIVE_RESOURCES = {'data/blacklight/recipe/military_fuel_can.json'}
+# Exact Maven artifact used by the author's pinned compact-map/motion decoder.
+XZ_DEPENDENCY_SHA256 = '95c63c1a55b22dd6453890a419cc1a640f790bbf7d8ae82db1e30aefefb08888'
 
 
 def digest(data: bytes) -> str:
@@ -104,6 +107,10 @@ def forbidden_runtime(name: str, qa_names: set[str]) -> bool:
     if '/preview/' in name or '/gametest/' in name or name.startswith('blacklight/test/'):
         return True
     if name == 'data/blacklight/structure/wall_test.nbt':
+        return True
+    if re.search(r'(?:VehicleViewSmoke|PlayerGL\w*Smoke|VehiclePlayerGL\w*)(?:\$|\.|/)', name, re.I):
+        return True
+    if name.endswith('.java') and any(name.endswith(qa+'.java') for qa in qa_names):
         return True
     if name.endswith('.class'):
         top_level = name[:-6].split('$', 1)[0]
@@ -205,6 +212,29 @@ def source_snapshot(repo: Path, output: Path | None, baseline: dict[str, str] | 
             require(digest(archive.read(name)) == sha, f'Source snapshot identity mismatch: {name}')
     temporary.replace(output)
     return hashes
+
+
+def verify_runtime_dependencies(archive: ZipFile) -> None:
+    """Permit only the declared, byte-pinned XZ decoder required by compact assets."""
+    names = set(archive.namelist())
+    require(not any(name.lower().startswith('software/bernie/geckolib/') for name in names),
+            'GeckoLib leaked into JAR')
+    nested = {name for name in names if name.lower().endswith('.jar')}
+    metadata_name = 'META-INF/jarjar/metadata.json'
+    if not nested:
+        if metadata_name in names:
+            require(json.loads(archive.read(metadata_name)).get('jars') == [], 'Declared embedded dependency is missing')
+        return
+    require(metadata_name in names, 'Nested dependency lacks jarJar metadata')
+    libraries = json.loads(archive.read(metadata_name)).get('jars')
+    require(isinstance(libraries, list) and len(libraries) == 1, 'Unexpected nested dependencies')
+    decoder = libraries[0]
+    require(decoder.get('identifier') == {'group': 'org.tukaani', 'artifact': 'xz'}
+            and decoder.get('version', {}).get('artifactVersion') == '1.10', 'Unexpected embedded decoder')
+    path = decoder.get('path', '')
+    require(path.startswith('META-INF/jarjar/') and '\\' not in path and '..' not in path.split('/')
+            and nested == {path}, 'Embedded decoder path or inventory mismatch')
+    require(digest(archive.read(path)) == XZ_DEPENDENCY_SHA256, 'Embedded XZ decoder differs from the tested 1.10 artifact')
 
 
 def verify_compact_motions(repo: Path, build: Path, jar: Path, profile: Path) -> None:
@@ -342,6 +372,13 @@ def main() -> None:
     with ZipFile(jar) as archive:
         names = set(archive.namelist())
         require(len(names) == len(archive.namelist()), 'Duplicate JAR entries')
+        verify_runtime_dependencies(archive)
+        inactive = {}
+        for name in INACTIVE_RESOURCES:
+            path = repo/'src/main/resources'/name
+            require(path.is_file() and not path.is_symlink(), f'Dormant resource must remain on disk: {name}')
+            require(name not in names, f'Inactive resource leaked into JAR: {name}')
+            inactive[name] = digest(path.read_bytes())
         meta = tomllib.loads(archive.read('META-INF/neoforge.mods.toml').decode('utf-8'))
         mod = next(m for m in meta['mods'] if m['modId'] == props['mod_id'])
         require(mod['version'] == version and mod['authors'] == '末者', 'Version or author mismatch')
@@ -413,6 +450,9 @@ def main() -> None:
                     continue
                 if geographic_city and name.startswith(('data/blacklight/city/los_angeles_full/', 'data/blacklight/city/los_angeles_compact/')):
                     continue
+                if name in INACTIVE_RESOURCES:
+                    require(not path.is_symlink() and digest(path.read_bytes()) == inactive[name], f'Conflicting dormant resource: {name}')
+                    continue
                 if forbidden_runtime(name, qa_names):
                     continue
                 require(not path.is_symlink(), f'Production resource symlink needs explicit review: {name}')
@@ -466,6 +506,7 @@ def main() -> None:
         print(json.dumps({'profile': args.profile, 'version': version, 'motionFilesVerified': len(motions),
                           'repositoryMotionFilesVerified': len(baseline), 'productionClassesVerified': len(classes),
                           'productionResourcesVerified': len(resources),
+                          'inactiveResourcesVerified': inactive, 'geckoLibPackaged': False,
                           'sourceFilesVerified': len(verified_sources), 'distributionDocumentsVerified': len(docs) + len(notices) + 1,
                           'outputWritten': False}, ensure_ascii=False, indent=2))
         return
@@ -489,6 +530,7 @@ def main() -> None:
         'version': version, 'profile': args.profile, 'publicReleaseReady': False,
         'compiledClassesVerified': len(classes), 'motionFiles': len(motions), 'privateFiles': len(motions) if external else 0,
         'productionResourcesVerified': len(resources),
+        'inactiveResourcesVerified': inactive, 'geckoLibPackaged': False,
         'repositoryMotionFiles': len(baseline), 'externalMotionFiles': len(set(motions) - baseline.keys()) if external else 0,
         'baseCommit': git(repo, 'rev-parse', 'HEAD').decode().strip(),
         'workingTreeChanged': bool(git(repo, 'status', '--porcelain', '--untracked-files=normal').strip()),

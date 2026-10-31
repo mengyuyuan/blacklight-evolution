@@ -1,0 +1,303 @@
+{
+  "id": "blackwatch_checkpoint",
+  "platform": "forge",
+  "size": [
+    17,
+    9,
+    17
+  ],
+  "data_version": 3465,
+  "serialized_blocks": 2601,
+  "non_air_blocks": 572,
+  "palette_size": 13,
+  "embedded_entity_count": 3,
+  "embedded_entities": [
+    {
+      "pos": [
+        3.5,
+        1.0,
+        6.5
+      ],
+      "blockPos": [
+        3,
+        1,
+        6
+      ],
+      "id": "blacklight:blackwatch_soldier",
+      "nbt": {
+        "id": "blacklight:blackwatch_soldier",
+        "PersistenceRequired": 1,
+        "Rotation": [
+          180.0,
+          0.0
+        ],
+        "MilitaryRank": "sergeant",
+        "MilitaryDeployment": "blackwatch_checkpoint",
+        "MilitaryDeploymentCapacity": 8,
+        "MilitaryDeploymentX": 5.0,
+        "MilitaryDeploymentY": 0.0,
+        "MilitaryDeploymentZ": 2.0
+      }
+    },
+    {
+      "pos": [
+        13.5,
+        1.0,
+        6.5
+      ],
+      "blockPos": [
+        13,
+        1,
+        6
+      ],
+      "id": "blacklight:blackwatch_soldier",
+      "nbt": {
+        "id": "blacklight:blackwatch_soldier",
+        "PersistenceRequired": 1,
+        "Rotation": [
+          180.0,
+          0.0
+        ],
+        "MilitaryRank": "private",
+        "MilitaryDeployment": "blackwatch_checkpoint",
+        "MilitaryDeploymentCapacity": 8,
+        "MilitaryDeploymentX": -5.0,
+        "MilitaryDeploymentY": 0.0,
+        "MilitaryDeploymentZ": 2.0
+      }
+    },
+    {
+      "pos": [
+        8.5,
+        1.0,
+        12.5
+      ],
+      "blockPos": [
+        8,
+        1,
+        12
+      ],
+      "id": "blacklight:blackwatch_heavy",
+      "nbt": {
+        "id": "blacklight:blackwatch_heavy",
+        "PersistenceRequired": 1,
+        "Rotation": [
+          180.0,
+          0.0
+        ],
+        "MilitaryRank": "corporal",
+        "MilitaryDeployment": "blackwatch_checkpoint",
+        "MilitaryDeploymentCapacity": 8,
+        "MilitaryDeploymentX": 0.0,
+        "MilitaryDeploymentY": 0.0,
+        "MilitaryDeploymentZ": -4.0
+      }
+    }
+  ],
+  "chests": [
+    {
+      "pos": [
+        2,
+        1,
+        13
+      ],
+      "block": {
+        "Name": "minecraft:chest",
+        "Properties": {
+          "facing": "north",
+          "type": "single",
+          "waterlogged": "false"
+        }
+      },
+      "nbt": {
+        "id": "minecraft:chest",
+        "LootTable": "blacklight:chests/blackwatch_supplies"
+      }
+    },
+    {
+      "pos": [
+        4,
+        1,
+        13
+      ],
+      "block": {
+        "Name": "minecraft:chest",
+        "Properties": {
+          "facing": "north",
+          "type": "single",
+          "waterlogged": "false"
+        }
+      },
+      "nbt": {
+        "id": "minecraft:chest",
+        "LootTable": "blacklight:chests/blackwatch_technology"
+      }
+    }
+  ],
+  "block_entities": [
+    {
+      "pos": [
+        2,
+        1,
+        13
+      ],
+      "block": {
+        "Name": "minecraft:chest",
+        "Properties": {
+          "facing": "north",
+          "type": "single",
+          "waterlogged": "false"
+        }
+      },
+      "nbt": {
+        "id": "minecraft:chest",
+        "LootTable": "blacklight:chests/blackwatch_supplies"
+      }
+    },
+    {
+      "pos": [
+        2,
+        2,
+        9
+      ],
+      "block": {
+        "Name": "minecraft:birch_wall_sign",
+        "Properties": {
+          "facing": "north",
+          "waterlogged": "false"
+        }
+      },
+      "nbt": {
+        "id": "minecraft:sign",
+        "is_waxed": 1,
+        "front_text": {
+          "messages": [
+            "{\"translate\":\"sign.blacklight.military_checkpoint.1\"}",
+            "{\"translate\":\"sign.blacklight.military_checkpoint.2\"}",
+            "{\"translate\":\"sign.blacklight.military_checkpoint.3\"}",
+            "{\"translate\":\"sign.blacklight.military_checkpoint.4\"}"
+          ],
+          "color": "black",
+          "has_glowing_text": 0
+        }
+      }
+    },
+    {
+      "pos": [
+        4,
+        1,
+        13
+      ],
+      "block": {
+        "Name": "minecraft:chest",
+        "Properties": {
+          "facing": "north",
+          "type": "single",
+          "waterlogged": "false"
+        }
+      },
+      "nbt": {
+        "id": "minecraft:chest",
+        "LootTable": "blacklight:chests/blackwatch_technology"
+      }
+    },
+    {
+      "pos": [
+        4,
+        2,
+        9
+      ],
+      "block": {
+        "Name": "minecraft:birch_wall_sign",
+        "Properties": {
+          "facing": "north",
+          "waterlogged": "false"
+        }
+      },
+      "nbt": {
+        "id": "minecraft:sign",
+        "is_waxed": 1,
+        "front_text": {
+          "messages": [
+            "{\"translate\":\"sign.blacklight.military_technology.1\"}",
+            "{\"translate\":\"sign.blacklight.military_technology.2\"}",
+            "{\"translate\":\"sign.blacklight.military_technology.3\"}",
+            "{\"translate\":\"sign.blacklight.military_technology.4\"}"
+          ],
+          "color": "black",
+          "has_glowing_text": 0
+        }
+      }
+    }
+  ],
+  "runtime_slots": 0,
+  "runtime_guards": [],
+  "large_base_metadata": null,
+  "source": "src/main/resources/data/blacklight/structures/blackwatch_checkpoint.nbt",
+  "sha256": "220e9c68c06ef38e26cea56c862c8133f6fbce66ca11a48e74ba6806d5437854",
+  "preview": "assets/建筑/blackwatch_checkpoint.png",
+  "palette": [
+    {
+      "Name": "minecraft:polished_andesite"
+    },
+    {
+      "Name": "minecraft:iron_bars"
+    },
+    {
+      "Name": "minecraft:air"
+    },
+    {
+      "Name": "minecraft:gray_concrete"
+    },
+    {
+      "Name": "minecraft:black_concrete"
+    },
+    {
+      "Name": "minecraft:sandstone"
+    },
+    {
+      "Name": "minecraft:chest",
+      "Properties": {
+        "facing": "north",
+        "type": "single",
+        "waterlogged": "false"
+      }
+    },
+    {
+      "Name": "minecraft:birch_wall_sign",
+      "Properties": {
+        "facing": "north",
+        "waterlogged": "false"
+      }
+    },
+    {
+      "Name": "minecraft:sea_lantern"
+    },
+    {
+      "Name": "minecraft:polished_blackstone"
+    },
+    {
+      "Name": "minecraft:red_concrete"
+    },
+    {
+      "Name": "minecraft:yellow_concrete"
+    },
+    {
+      "Name": "minecraft:crafting_table"
+    }
+  ],
+  "block_counts": {
+    "minecraft:polished_andesite": 204,
+    "minecraft:iron_bars": 108,
+    "minecraft:gray_concrete": 143,
+    "minecraft:black_concrete": 66,
+    "minecraft:sandstone": 16,
+    "minecraft:chest": 2,
+    "minecraft:birch_wall_sign": 2,
+    "minecraft:sea_lantern": 4,
+    "minecraft:polished_blackstone": 6,
+    "minecraft:red_concrete": 2,
+    "minecraft:yellow_concrete": 18,
+    "minecraft:crafting_table": 1
+  }
+}

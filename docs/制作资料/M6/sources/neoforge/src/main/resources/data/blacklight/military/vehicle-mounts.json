@@ -1,0 +1,501 @@
+{
+  "schemaVersion": 1,
+  "sourceSha256": "4ccafec7230accdac6d2d84c7ffbd043f2ece8d2b2848e9fe9eb98aa13523a21",
+  "coordinateSystem": {
+    "units": "blocks",
+    "x": "vehicle right",
+    "y": "up",
+    "z": "vehicle front",
+    "origin": "body horizontal center at ground level",
+    "anchorPositions": "absolute vehicle-local rest pose; apply frame pivot before rotations",
+    "seatAnchorMeaning": "Actual passenger Entity feet/base origin while riding; not cushion or pelvis. No additional rider offset.",
+    "yawConvention": "Server mountWorld is authoritative: yaw 0 faces +Z; positive 90 degrees faces +X."
+  },
+  "chassis": {
+    "truck": {
+      "turretPivot": [
+        0,
+        0,
+        0
+      ],
+      "gunPivot": [
+        0,
+        0,
+        0
+      ],
+      "barrelRadius": 0.0,
+      "anchors": {
+        "seat_driver": {
+          "frame": "body",
+          "position": [
+            -0.51555556,
+            0.89,
+            2.05645161
+          ]
+        },
+        "seat_officer": {
+          "frame": "body",
+          "position": [
+            0.51555556,
+            0.89,
+            2.05645161
+          ]
+        },
+        "seat_passenger_1": {
+          "frame": "body",
+          "position": [
+            -0.53703704,
+            1.053125,
+            -0.72580645
+          ]
+        },
+        "seat_passenger_2": {
+          "frame": "body",
+          "position": [
+            0.53703704,
+            1.053125,
+            -0.72580645
+          ]
+        },
+        "seat_passenger_3": {
+          "frame": "body",
+          "position": [
+            -0.53703704,
+            1.053125,
+            -1.69354839
+          ]
+        },
+        "seat_passenger_4": {
+          "frame": "body",
+          "position": [
+            0.53703704,
+            1.053125,
+            -1.69354839
+          ]
+        },
+        "seat_passenger_5": {
+          "frame": "body",
+          "position": [
+            -0.53703704,
+            1.053125,
+            -2.66129032
+          ]
+        },
+        "seat_passenger_6": {
+          "frame": "body",
+          "position": [
+            0.53703704,
+            1.053125,
+            -2.66129032
+          ]
+        },
+        "camera_driver": {
+          "frame": "body",
+          "position": [
+            -0.51555556,
+            2.51,
+            2.05645161
+          ]
+        },
+        "camera_officer": {
+          "frame": "body",
+          "position": [
+            0.51555556,
+            2.51,
+            2.05645161
+          ]
+        },
+        "camera_passenger_1": {
+          "frame": "body",
+          "position": [
+            -0.53703704,
+            2.673125,
+            -0.72580645
+          ]
+        },
+        "camera_passenger_2": {
+          "frame": "body",
+          "position": [
+            0.53703704,
+            2.673125,
+            -0.72580645
+          ]
+        },
+        "camera_passenger_3": {
+          "frame": "body",
+          "position": [
+            -0.53703704,
+            2.673125,
+            -1.69354839
+          ]
+        },
+        "camera_passenger_4": {
+          "frame": "body",
+          "position": [
+            0.53703704,
+            2.673125,
+            -1.69354839
+          ]
+        },
+        "camera_passenger_5": {
+          "frame": "body",
+          "position": [
+            -0.53703704,
+            2.673125,
+            -2.66129032
+          ]
+        },
+        "camera_passenger_6": {
+          "frame": "body",
+          "position": [
+            0.53703704,
+            2.673125,
+            -2.66129032
+          ]
+        },
+        "exit_driver": {
+          "frame": "body",
+          "position": [
+            -2.09444444,
+            0.1,
+            2.47983871
+          ]
+        },
+        "exit_officer": {
+          "frame": "body",
+          "position": [
+            2.09444444,
+            0.1,
+            2.47983871
+          ]
+        },
+        "exit_rear": {
+          "frame": "body",
+          "position": [
+            0.0,
+            0.1,
+            -4.47580645
+          ]
+        }
+      }
+    },
+    "apc": {
+      "turretPivot": [
+        0.0,
+        1.94464286,
+        0.12068966
+      ],
+      "gunPivot": [
+        0.0,
+        2.475,
+        0.54310345
+      ],
+      "barrelRadius": 0.12964286,
+      "anchors": {
+        "seat_driver": {
+          "frame": "body",
+          "position": [
+            -0.69193548,
+            0.23571429,
+            2.11206897
+          ]
+        },
+        "seat_gunner": {
+          "frame": "body",
+          "position": [
+            0.26612903,
+            0.53035714,
+            0.18103448
+          ]
+        },
+        "seat_passenger_1": {
+          "frame": "body",
+          "position": [
+            -0.74516129,
+            0.23571429,
+            -0.84482759
+          ]
+        },
+        "seat_passenger_2": {
+          "frame": "body",
+          "position": [
+            0.74516129,
+            0.23571429,
+            -0.84482759
+          ]
+        },
+        "seat_passenger_3": {
+          "frame": "body",
+          "position": [
+            -0.74516129,
+            0.23571429,
+            -1.75
+          ]
+        },
+        "seat_passenger_4": {
+          "frame": "body",
+          "position": [
+            0.74516129,
+            0.23571429,
+            -1.75
+          ]
+        },
+        "seat_passenger_5": {
+          "frame": "body",
+          "position": [
+            -0.74516129,
+            0.23571429,
+            -2.65517241
+          ]
+        },
+        "camera_driver": {
+          "frame": "body",
+          "position": [
+            -0.69193548,
+            2.15,
+            1.91
+          ]
+        },
+        "camera_gunner": {
+          "frame": "turret_yaw",
+          "position": [
+            0.0,
+            2.88,
+            0.17
+          ]
+        },
+        "camera_passenger_1": {
+          "frame": "body",
+          "position": [
+            -1.45,
+            1.85571429,
+            -0.84482759
+          ]
+        },
+        "camera_passenger_2": {
+          "frame": "body",
+          "position": [
+            1.45,
+            1.85571429,
+            -0.84482759
+          ]
+        },
+        "camera_passenger_3": {
+          "frame": "body",
+          "position": [
+            -1.45,
+            1.85571429,
+            -1.75
+          ]
+        },
+        "camera_passenger_4": {
+          "frame": "body",
+          "position": [
+            1.45,
+            1.85571429,
+            -1.75
+          ]
+        },
+        "camera_passenger_5": {
+          "frame": "body",
+          "position": [
+            -1.45,
+            1.85571429,
+            -2.65517241
+          ]
+        },
+        "camera_passenger_6": {
+          "frame": "body",
+          "position": [
+            1.45,
+            1.85571429,
+            -2.65517241
+          ]
+        },
+        "seat_passenger_6": {
+          "frame": "body",
+          "position": [
+            0.74516129,
+            0.23571429,
+            -2.65517241
+          ]
+        },
+        "exit_driver": {
+          "frame": "body",
+          "position": [
+            -2.23548387,
+            0.1,
+            1.81034483
+          ]
+        },
+        "exit_gunner": {
+          "frame": "body",
+          "position": [
+            2.23548387,
+            0.1,
+            1.81034483
+          ]
+        },
+        "exit_rear": {
+          "frame": "body",
+          "position": [
+            0.0,
+            0.1,
+            -4.22413793
+          ]
+        },
+        "breech_primary": {
+          "frame": "gun_pitch",
+          "position": [
+            0.0,
+            2.475,
+            0.54310345
+          ]
+        },
+        "muzzle_primary": {
+          "frame": "gun_pitch",
+          "position": [
+            0.0,
+            2.475,
+            4.22413793
+          ]
+        },
+        "breech_secondary": {
+          "frame": "gun_pitch",
+          "position": [
+            1.01129032,
+            2.82857143,
+            0.06034483
+          ]
+        },
+        "muzzle_secondary": {
+          "frame": "gun_pitch",
+          "position": [
+            1.01129032,
+            2.82857143,
+            1.62931034
+          ]
+        }
+      }
+    },
+    "tank": {
+      "turretPivot": [
+        0.0,
+        1.88214286,
+        0.0
+      ],
+      "gunPivot": [
+        0.0,
+        2.55,
+        1.16923077
+      ],
+      "barrelRadius": 0.15785714,
+      "anchors": {
+        "seat_driver": {
+          "frame": "body",
+          "position": [
+            0.0,
+            0.06071429,
+            2.03076923
+          ]
+        },
+        "seat_gunner": {
+          "frame": "body",
+          "position": [
+            -0.52941176,
+            0.54642857,
+            0.12307692
+          ]
+        },
+        "seat_commander": {
+          "frame": "body",
+          "position": [
+            0.58823529,
+            0.72857143,
+            -0.55384615
+          ]
+        },
+        "camera_driver": {
+          "frame": "body",
+          "position": [
+            0.0,
+            1.98,
+            3.29
+          ]
+        },
+        "camera_gunner": {
+          "frame": "turret_yaw",
+          "position": [
+            0.55294118,
+            3.35142857,
+            -0.22
+          ]
+        },
+        "camera_commander": {
+          "frame": "turret_yaw",
+          "position": [
+            0.55294118,
+            3.35142857,
+            -0.22
+          ]
+        },
+        "exit_left": {
+          "frame": "body",
+          "position": [
+            -2.70588235,
+            0.1,
+            0.0
+          ]
+        },
+        "exit_right": {
+          "frame": "body",
+          "position": [
+            2.70588235,
+            0.1,
+            0.0
+          ]
+        },
+        "exit_rear": {
+          "frame": "body",
+          "position": [
+            0.0,
+            0.1,
+            -4.8
+          ]
+        },
+        "breech_primary": {
+          "frame": "gun_pitch",
+          "position": [
+            0.0,
+            2.55,
+            1.16923077
+          ]
+        },
+        "muzzle_primary": {
+          "frame": "gun_pitch",
+          "position": [
+            0.0,
+            2.55,
+            6.03076923
+          ]
+        },
+        "breech_secondary": {
+          "frame": "gun_pitch",
+          "position": [
+            -0.70588235,
+            3.09642857,
+            0.73846154
+          ]
+        },
+        "muzzle_secondary": {
+          "frame": "gun_pitch",
+          "position": [
+            -0.70588235,
+            3.09642857,
+            3.01538462
+          ]
+        }
+      }
+    }
+  }
+}
