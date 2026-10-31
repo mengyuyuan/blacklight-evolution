@@ -13,7 +13,12 @@ public final class VehicleFleetSavedData extends SavedData {
     public static final int MAX_FLEETS=128;
     private final Map<UUID,VehicleFleet> fleets=new LinkedHashMap<>();
     private final Map<UUID,UUID> vehicleIndex=new HashMap<>();
+    private long nextPatrolAttempt;
     public VehicleFleetSavedData(){}
+    public boolean claimPatrolAttempt(long now,int interval){
+        if(now<nextPatrolAttempt)return false;
+        nextPatrolAttempt=now+Math.max(100,interval);setDirty();return true;
+    }
     public static VehicleFleetSavedData get(ServerLevel level){return level.getDataStorage().computeIfAbsent(new SavedData.Factory<>(VehicleFleetSavedData::new,VehicleFleetSavedData::load),KEY);}
     public List<VehicleFleet> fleets(){return List.copyOf(fleets.values());}
     public Optional<VehicleFleet> fleet(UUID id){return Optional.ofNullable(fleets.get(id));}
@@ -26,13 +31,14 @@ public final class VehicleFleetSavedData extends SavedData {
         var old=fleets.remove(id);if(old==null)return false;old.vehicles().forEach(vehicleIndex::remove);setDirty();return true;
     }
     @Override public CompoundTag save(CompoundTag tag,HolderLookup.Provider registries){
-        tag.putInt("Schema",1);var list=new ListTag();
+        tag.putInt("Schema",1);tag.putLong("NextPatrolAttempt",nextPatrolAttempt);var list=new ListTag();
         for(var fleet:fleets.values()){
             var entry=new CompoundTag();entry.putUUID("Id",fleet.id());entry.putString("Faction",fleet.faction().id());entry.putUUID("Commander",fleet.formalCommander());
             entry.put("Vehicles",ids(fleet.vehicles()));entry.put("Units",ids(fleet.units()));entry.put("Return",point(fleet.returnPoint()));entry.put("Target",point(fleet.target()));
             entry.putString("Mission",fleet.mission().name());entry.putString("Status",fleet.status().name());entry.putString("PersonnelOrder",fleet.personnelOrder());
             if(fleet.supplyReturn())entry.putBoolean("SupplyReturn",true);
             if(fleet.automaticPatrol())entry.putBoolean("AutomaticPatrol",true);
+            if(fleet.ambientPatrol())entry.putBoolean("AmbientPatrol",true);
             entry.putInt("Contacts",fleet.contacts());entry.putInt("Resolved",fleet.resolved());list.add(entry);
         }
         tag.put("Fleets",list);return tag;
@@ -49,6 +55,7 @@ public final class VehicleFleetSavedData extends SavedData {
     }
     public static VehicleFleetSavedData load(CompoundTag tag,HolderLookup.Provider registries){
         var data=new VehicleFleetSavedData();if(tag.getInt("Schema")!=1)return data;
+        data.nextPatrolAttempt=Math.max(0,tag.getLong("NextPatrolAttempt"));
         var list=tag.getList("Fleets",10);
         for(int i=0;i<list.size()&&i<MAX_FLEETS;i++)try{
             var entry=list.getCompound(i);if(!entry.hasUUID("Id")||!entry.hasUUID("Commander"))continue;
@@ -57,6 +64,7 @@ public final class VehicleFleetSavedData extends SavedData {
             if(!fleet.order(VehicleFleet.Mission.valueOf(entry.getString("Mission")),readPoint(entry.getCompound("Target"))))continue;
             fleet.supplyReturn(entry.getBoolean("SupplyReturn"));
             fleet.automaticPatrol(entry.getBoolean("AutomaticPatrol"));
+            fleet.ambientPatrol(entry.getBoolean("AmbientPatrol"));
             fleet.status(VehicleFleet.Status.valueOf(entry.getString("Status")));fleet.personnelOrder(entry.getString("PersonnelOrder"));fleet.restoreResults(entry.getInt("Contacts"),entry.getInt("Resolved"));data.add(fleet);
         }catch(IllegalArgumentException|NoSuchElementException invalid){data.setDirty();}
         return data;

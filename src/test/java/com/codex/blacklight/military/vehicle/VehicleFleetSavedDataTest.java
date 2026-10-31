@@ -8,6 +8,17 @@ import net.minecraft.nbt.CompoundTag;
 import org.junit.jupiter.api.Test;
 
 class VehicleFleetSavedDataTest {
+    @Test void streetSpawnCooldownAndUnloadedReservationSurviveRestart(){
+        var data=new VehicleFleetSavedData();var id=UUID.randomUUID();
+        var fleet=new VehicleFleet(id,MilitaryFaction.BLACKWATCH,List.of(UUID.randomUUID()),List.of(),UUID.randomUUID(),new MilitaryOrder.Point(1,81,2));
+        fleet.automaticPatrol(true);fleet.ambientPatrol(true);assertTrue(data.add(fleet));
+        assertTrue(data.claimPatrolAttempt(1000,400));assertFalse(data.claimPatrolAttempt(1001,400));
+        var restored=VehicleFleetSavedData.load(data.save(new CompoundTag(),null),null);
+        assertTrue(restored.fleet(id).orElseThrow().ambientPatrol());
+        assertFalse(restored.claimPatrolAttempt(1399,400));assertTrue(restored.claimPatrolAttempt(1400,400));
+        var legacy=data.save(new CompoundTag(),null);legacy.remove("NextPatrolAttempt");legacy.getList("Fleets",10).getCompound(0).remove("AmbientPatrol");
+        var old=VehicleFleetSavedData.load(legacy,null);assertFalse(old.fleet(id).orElseThrow().ambientPatrol());assertTrue(old.claimPatrolAttempt(0,400));
+    }
     @Test void automaticPatrolOwnershipPersistsButExistingManualFleetsRemainManual(){
         var data=new VehicleFleetSavedData();var id=UUID.randomUUID();
         var fleet=new VehicleFleet(id,MilitaryFaction.BLACKWATCH,List.of(UUID.randomUUID()),List.of(),UUID.randomUUID(),new MilitaryOrder.Point(1,81,2));

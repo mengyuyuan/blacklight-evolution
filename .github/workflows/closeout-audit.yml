@@ -91,7 +91,7 @@ jobs:
         shell: bash
         run: |
           bash ./gradlew --no-daemon --max-workers=1 -Dorg.gradle.jvmargs=-Xmx1G \
-            -PvehicleTest -PgameTestMaxHeap=2G \
+            -I tools/military6-vehicle.init.gradle -PgameTestMaxHeap=2G \
             -PgameTestRunDirectory=build/vehicle-closeout-gametest \
             runGameTestServer 2>&1 | tee vehicle-closeout-server.log
           grep -Eq 'All [1-9][0-9]* required tests passed' vehicle-closeout-server.log

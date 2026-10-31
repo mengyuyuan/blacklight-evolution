@@ -81,7 +81,7 @@ public final class VehicleFleetSystem {
     public static Optional<UUID> create(ServerLevel level,List<MilitaryVehicle> selected,UUID formalCommander){
         return create(level,selected,formalCommander,false);
     }
-    /** Only an issued, crewed native garage chassis may start an automatic one-vehicle patrol. */
+    /** A validated street reinforcement or issued native chassis uses its real seated driver. */
     static Optional<UUID> createAutomaticPatrol(ServerLevel level,MilitaryVehicle vehicle){
         if(!VehiclePatrolSystem.eligible(level,vehicle))return Optional.empty();
         var driver=(MilitarySoldier)vehicle.occupant(VehicleDefinition.Job.DRIVER);
@@ -194,7 +194,7 @@ public final class VehicleFleetSystem {
             if(threat!=null&&!state.resupplying.containsKey(fleet.id())){
                 park(vehicles);if(!blocked)status(state,fleet,VehicleFleet.Status.ACTIVE);
                 for(var vehicle:vehicles)VehicleThreatBridge.engage(vehicle,threat);
-                if(fleet.mission()==VehicleFleet.Mission.CLEAR_AREA&&!state.recalling.contains(fleet.id())){
+                if(combatDeployment(fleet)&&!state.recalling.contains(fleet.id())){
                     if(fleet.vehicles().size()==1){deployPassengers(level,state,fleet,vehicles,threat);continue;}
                     if(blocked){status(state,fleet,VehicleFleet.Status.BLOCKED);continue;}
                     if(vehicles.size()!=fleet.vehicles().size()){status(state,fleet,VehicleFleet.Status.UNLOADED);continue;}
@@ -235,7 +235,7 @@ public final class VehicleFleetSystem {
                 continue;
             }
             if(state.combat.containsKey(fleet.id()))clearRoutes(state,fleet);
-            if(fleet.mission()==VehicleFleet.Mission.CLEAR_AREA&&state.deployed.values().stream().anyMatch(d->d.fleet.equals(fleet.id())))state.recalling.add(fleet.id());
+            if(combatDeployment(fleet)&&state.deployed.values().stream().anyMatch(d->d.fleet.equals(fleet.id())))state.recalling.add(fleet.id());
             if(state.recalling.contains(fleet.id())){status(state,fleet,VehicleFleet.Status.PARKED);park(vehicles);continue;}
             if(blocked){status(state,fleet,VehicleFleet.Status.BLOCKED);park(vehicles);continue;}
             if(vehicles.stream().anyMatch(v->!driverReady(v,fleet.faction()))){status(state,fleet,VehicleFleet.Status.NO_DRIVER);park(vehicles);continue;}
@@ -354,6 +354,7 @@ public final class VehicleFleetSystem {
         for(var vehicle:vehicles){var found=VehicleThreatBridge.find(vehicle);if(found.isPresent()){state.targets.put(fleet.id(),found.get().getUUID());fleet.contact();state.data.setDirty();return found.get();}}
         return null;
     }
+    private static boolean combatDeployment(VehicleFleet fleet){return fleet.mission()==VehicleFleet.Mission.CLEAR_AREA||fleet.automaticPatrol()&&fleet.ambientPatrol()&&fleet.mission()==VehicleFleet.Mission.PATROL;}
     private static void deployPassengers(ServerLevel level,Runtime state,VehicleFleet fleet,List<MilitaryVehicle> vehicles,LivingEntity target){
         for(var vehicle:vehicles)if(!occupied(vehicle))for(var passenger:List.copyOf(vehicle.getPassengers()))if(passenger instanceof MilitarySoldier soldier&&soldier.faction()==fleet.faction()&&MilitaryVehicle.crewOperational(soldier)&&soldier.commandRole()==MilitaryRole.TROOPER){
             var seat=vehicle.definition().seats().stream().filter(s->s.id().equals(vehicle.seatOf(soldier.getUUID()))).findFirst().orElse(null);
@@ -378,7 +379,7 @@ public final class VehicleFleetSystem {
                 ||vehicle.getPassengers().stream().noneMatch(p->p instanceof MilitarySoldier s&&s.faction()==fleet.faction()&&MilitaryVehicle.crewOperational(s))){
             state.deployed.remove(soldier.getUUID());soldier.getNavigation().stop();soldier.setTarget(null);return null;
         }
-        return new DeploymentView(vehicle,deployed.objective,state.recalling.contains(fleet.id())||state.resupplying.containsKey(fleet.id())||fleet.mission()!=VehicleFleet.Mission.CLEAR_AREA||fleet.status()==VehicleFleet.Status.COMPLETE||fleet.status()==VehicleFleet.Status.BLOCKED);
+        return new DeploymentView(vehicle,deployed.objective,state.recalling.contains(fleet.id())||state.resupplying.containsKey(fleet.id())||!combatDeployment(fleet)||fleet.status()==VehicleFleet.Status.COMPLETE||fleet.status()==VehicleFleet.Status.BLOCKED);
     }
     public static boolean deploymentAllows(MilitarySoldier soldier,Vec3 position){
         var deployment=deployment(soldier);return deployment!=null&&position!=null&&position.distanceToSqr(deployment.vehicle.position())<=32*32

@@ -2,14 +2,11 @@
 allprojects { afterEvaluate {
     sourceSets.main.java.srcDir('src/vehicleTest/java')
     if (!sourceSets.main.resources.srcDirs.contains(file('src/blackwatchTest/resources'))) sourceSets.main.resources.srcDir('src/blackwatchTest/resources')
-    def stageVehicle6Run = tasks.register('stageVehicle6Run', Sync) {
+    tasks.matching { it.name == 'runGameTestServer' }.configureEach {
         dependsOn tasks.named('classes')
-        from sourceSets.main.output
-        into layout.buildDirectory.dir('vehicle6-run-mod')
-    }
-    tasks.named('runGameTestServer').configure {
-        dependsOn stageVehicle6Run
-        doFirst { environment 'MOD_CLASSES', 'blacklight%%' + layout.buildDirectory.dir('vehicle6-run-mod').get().asFile.absolutePath }
+        // The native loader accepts multiple exploded class/resource roots.
+        // Do not recopy the entire production asset tree for every test run.
+        doFirst { environment 'MOD_CLASSES', sourceSets.main.output.files.collect { 'blacklight%%'+it.absolutePath }.join(File.pathSeparator) }
     }
 } }
 allprojects { tasks.withType(ProcessResources).configureEach { filteringCharset = 'UTF-8' } }
