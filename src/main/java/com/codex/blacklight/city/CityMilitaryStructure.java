@@ -23,9 +23,9 @@ public final class CityMilitaryStructure extends Structure {
             pieces.addPiece(new CityMilitaryPiece(s,checkpoint));
             // This callback only selects NEW starts. Saved old piece lists are
             // loaded as recorded and are never passed through this planner.
-            VehicleGaragePiece.Planner.find(s,checkpoint,context.chunkPos().x,context.chunkPos().z,city,survey)
+            VehicleGaragePiece.Planner.find(s,checkpoint,context.chunkPos().x,context.chunkPos().z,true,city,survey)
                     .ifPresent(garage->pieces.addPiece(new VehicleGaragePiece(VehicleGaragePiece.Planner.baseId(s),
-                            s.blackwatch()?com.codex.blacklight.military.MilitaryFaction.BLACKWATCH:com.codex.blacklight.military.MilitaryFaction.MILITARY,garage)));
+                            s.blackwatch()?com.codex.blacklight.military.MilitaryFaction.BLACKWATCH:com.codex.blacklight.military.MilitaryFaction.MILITARY,garage,!city)));
         }));
     }
     @Override public StructureType<?> type(){return ModWorldgen.CITY_MILITARY.get();}
