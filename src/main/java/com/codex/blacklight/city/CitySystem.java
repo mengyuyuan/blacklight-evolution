@@ -65,6 +65,9 @@ public final class CitySystem {
     @SubscribeEvent public static void unloaded(net.minecraftforge.event.level.LevelEvent.Unload event){
         if(event.getLevel() instanceof ServerLevel level)CityPregenerator.unload(level);
     }
+    @SubscribeEvent public static void stopping(net.minecraftforge.event.server.ServerStoppingEvent event){
+        CityPregenerator.stopping(event.getServer());
+    }
     static void updateLoadedCity(ServerLevel level,long time){
         CityData data=CityData.get(level);
         for(int hive=0;hive<2;hive++){

@@ -121,3 +121,17 @@ Revision `2ee9a702aeb7e7d98b81308c7be4f74ff19582a6` passed all three cloud workf
 The Forge collector now supports verifying an ordinary installation folder without requiring or generating a transport ZIP. It requires the exact built mod and versioned GeckoLib dependency, rejects additional loose JARs, checks production documents, and retains decoded motion/map and reobfuscated-class identity gates. Compiled opt-in private fixtures are distinguished from actual production sources; missing production classes and unrecognized project classes inside the deliverable are still rejected. Thirteen collector tests pass, including missing-class, private-fixture and chunked-content comparison cases.
 
 The eight-mod client presentation combination has not yet passed: its development-runtime attempt failed to load YSM's native library before world entry. An unmodified vendor-JAR run using a normal installed Forge runtime is being prepared to distinguish development remapping from a real installation conflict. Website compatibility status remains open; no Android/FCL or selected custom-YSM-model result is claimed.
+
+## 落地位置确认修复（2026-10-31）
+
+Neo 实际独立客户端／服务端联机 r8 在有伤害的情况下仍观察到落地后向上瞬移；r9 加入严格落地高度断言后失败。只读观测显示，主角已连续三 tick 在 Y251，而原生 `awaitingPositionFromClient` 仍指向 Y265.537；旧确认包到达后，`handleAcceptTeleportPacket` 再把主角传回该空中位置，截断落地伤害窗口。`resetPosition` 只更新移动基准，不会更新这个待确认位置。旧失败和 JSON 诊断保留，不能用后来的成功抹去。
+
+两平台的 `NativeRootMovementMixin` 现在在原生 `resetPosition` 返回时，仅在服务器主线程、存在待确认位置且本模组承诺接管位移的动作期间，将待确认位置协调为当前服务器实际坐标。传送编号、原生确认处理及普通维度传送保留；死亡／已移除实体直接走原版路径，避免 Forge 失效能力访问。没有增加伤害、范围或改变结算时序。
+
+Neo r10 实际联机通过：OFF 命中 7 个静止目标且无破坏／掉落；ON 命中 3 个目标、真实破坏 122 方块、4 个活泥土物品实体。落地后每个早期采样保持 Y251，待确认位置也变为实际落点；清理后恢复普通模式，真实原生返回传送的确认已消耗且玩家位于返回点，客户端和服务端报告通过并正常退出。此运行早于死亡实体的保护分支；新版本仍需构建与回归。
+
+Forge r11 在第二次俯冲中因跨进程读取 QA JSON 的 Windows 文件替换间隙而中止，错误为 `NoSuchFileException`；不是通过。两平台观察器现在仅对此特定短暂缺失在下一 tick 重读，仍保留动作／伤害／掉落／超时断言；不忽略解析错误或生产异常。Forge r12 的完整落地与普通返回确认检查正在执行。
+
+两份 `.2` 普通产物没有新位置确认修复，最终包必须重新构建 `.3`。先前完整回归证据、已确认兼容边界仍分别记录，不宣称任何未测客户端或安卓设备已经通过。
+
+Forge r12 已实际通过：客户端与独立服务端均 COMPLETE/passed，正常退出；OFF／ON 真实命中数分别为 [9, 9]，破坏／活掉落分别为 [(0, 0), (234, 7)]。严格落地不上弹、设置实际落盘和普通返回传送确认通过。

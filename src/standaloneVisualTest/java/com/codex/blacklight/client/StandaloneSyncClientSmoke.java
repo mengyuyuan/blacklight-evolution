@@ -88,7 +88,10 @@ public final class StandaloneSyncClientSmoke {
             }
             require((System.nanoTime()-beganNanos)/1e9<300,"dedicated sync client exceeded five minutes");ticks++;
             var path=OUTPUT.resolve("sync-server-report.json");if(!Files.exists(path))return;
-            serverReport=JsonParser.parseString(Files.readString(path)).getAsJsonObject();stage=serverReport.get("stage").getAsString();
+            // Windows may expose a brief rename gap while the other process
+            // replaces its report. Retry observation on the next client tick.
+            String reportText;try{reportText=Files.readString(path);}catch(NoSuchFileException replacing){return;}
+            serverReport=JsonParser.parseString(reportText).getAsJsonObject();stage=serverReport.get("stage").getAsString();
             if(stage.equals("FAILED"))throw new IllegalStateException("dedicated server rejected sync test: "+serverReport.get("error"));
             String serverOwner=serverReport.get("owner").getAsString();if(serverOwner.isEmpty())return;
             require(serverOwner.equals(mc.player.getUUID().toString()),"dedicated report belongs to a different real player");
