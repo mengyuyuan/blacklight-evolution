@@ -1,0 +1,24 @@
+{
+  "variants": {
+    "facing=north": {
+      "model": "blacklight:block/field_barrier",
+      "y": 0,
+      "uvlock": true
+    },
+    "facing=east": {
+      "model": "blacklight:block/field_barrier",
+      "y": 90,
+      "uvlock": true
+    },
+    "facing=south": {
+      "model": "blacklight:block/field_barrier",
+      "y": 180,
+      "uvlock": true
+    },
+    "facing=west": {
+      "model": "blacklight:block/field_barrier",
+      "y": 270,
+      "uvlock": true
+    }
+  }
+}

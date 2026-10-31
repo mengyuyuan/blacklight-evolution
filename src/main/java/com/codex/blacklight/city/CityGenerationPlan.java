@@ -6,7 +6,17 @@ import java.util.*;
 final class CityGenerationPlan {
     record Cell(int x,int z){}
     private static final List<Cell> FULL=build(false),ARRIVAL=build(true);
-    static List<Cell> cells(int mode){return mode==2?FULL:ARRIVAL;}
+    static List<Cell> cells(int mode){return mode==3?WorldPlan.CELLS:mode==2?FULL:ARRIVAL;}
+    private static final class WorldPlan {
+        // Keep only the global tile index in memory; expand each tile lazily into 4096 chunks.
+        static final List<Cell> CELLS=new AbstractList<>(){
+            @Override public int size(){return Math.multiplyExact(WorldAtlas.CELLS.size(),4096);}
+            @Override public Cell get(int index){
+                Objects.checkIndex(index,size());var tile=WorldAtlas.CELLS.get(index/4096);int local=index%4096;
+                return new Cell(tile.x()*64+local%64,tile.z()*64+local/64);
+            }
+        };
+    }
     private static List<Cell> build(boolean arrival){
         var cells=new ArrayList<Cell>();
         for(int z=0;z<FutianMap.DEPTH/16;z++)for(int x=0;x<FutianMap.WIDTH/16;x++)

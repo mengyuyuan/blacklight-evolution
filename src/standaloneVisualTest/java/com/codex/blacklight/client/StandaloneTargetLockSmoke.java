@@ -21,7 +21,6 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.eventbus.api.*;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 import net.minecraftforge.client.event.*;
-import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.common.MinecraftForge;
 import org.lwjgl.glfw.GLFW;
 
@@ -49,14 +48,12 @@ public final class StandaloneTargetLockSmoke {
     @SubscribeEvent(priority=EventPriority.HIGHEST) public static void mouse(InputEvent.MouseButton.Pre event) {
         if(active()){event.setCanceled(true);Minecraft.getInstance().mouseHandler.releaseMouse();}
     }
-    @SubscribeEvent(priority=EventPriority.HIGHEST) public static void input(TickEvent.ClientTickEvent event) {
-        if(event.phase!=TickEvent.Phase.START)return;
+    @SubscribeEvent(priority=EventPriority.HIGHEST) public static void input(net.minecraftforge.event.TickEvent.ClientTickEvent event){if(event.phase!=net.minecraftforge.event.TickEvent.Phase.START)return;
         if(!active())return;var mc=Minecraft.getInstance();mc.mouseHandler.releaseMouse();
         for(var key:originalKeys.keySet())key.setDown(false);
         if(mc.player!=null){mc.player.setYRot(0);mc.player.yRotO=0;mc.player.setXRot(0);mc.player.xRotO=0;}
     }
-    @SubscribeEvent(priority=EventPriority.LOWEST) public static void tick(TickEvent.ClientTickEvent event) {
-        if(event.phase!=TickEvent.Phase.END)return;
+    @SubscribeEvent(priority=EventPriority.LOWEST) public static void tick(net.minecraftforge.event.TickEvent.ClientTickEvent event){if(event.phase!=net.minecraftforge.event.TickEvent.Phase.END)return;
         if(disabled||completed||System.getProperty(PROPERTY,"").isBlank())return;
         var mc=Minecraft.getInstance();var server=mc.getSingleplayerServer();
         if(server==null||mc.level==null||mc.player==null)return;
@@ -214,8 +211,7 @@ public final class StandaloneTargetLockSmoke {
             s.addProperty("id",serverLock);s.addProperty("alive",p.isAlive());s.addProperty("prototypeMode",com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.PLAYER_STATE).isPrototypeMode());serverRow(s);
         });
     }
-    @SubscribeEvent public static void frame(TickEvent.RenderTickEvent event) {
-        if(event.phase!=TickEvent.Phase.END)return;
+    @SubscribeEvent public static void frame(net.minecraftforge.event.TickEvent.RenderTickEvent event){if(event.phase!=net.minecraftforge.event.TickEvent.Phase.END)return;
         if(!active())return;var mc=Minecraft.getInstance();if(mc.player==null||mc.level==null)return;
         try {
             if(capture!=null) {
@@ -250,7 +246,7 @@ public final class StandaloneTargetLockSmoke {
         if(output==null)return;
         try {
             var report=new JsonObject();report.addProperty("complete",complete);report.addProperty("passed",complete&&violations.isEmpty());
-            report.addProperty("source","Forge InputEvent.Key through real Tab handler, native F5 KeyMapping queue, real packet ACK/server attachment and framebuffer");
+            report.addProperty("source","NeoForge InputEvent.Key through real Tab handler, native F5 KeyMapping queue, real packet ACK/server attachment and framebuffer");
             report.addProperty("targetId",fixtureTarget);report.addProperty("rapidAcquireRequest",rapidAcquireRequest);report.addProperty("rapidClearRequest",rapidClearRequest);
             report.add("clientTicks",clientTicks);report.add("serverTicks",serverTicks);report.add("views",views);report.add("violations",violations);
             var ack=new JsonArray();for(var a:ClientTargetLock.acknowledgementTrace()){var item=new JsonObject();item.addProperty("requestId",a.requestId());item.addProperty("acceptedId",a.acceptedId());item.addProperty("applied",a.applied());item.addProperty("gameTick",a.gameTick());ack.add(item);}report.add("acknowledgements",ack);

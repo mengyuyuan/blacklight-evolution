@@ -72,6 +72,12 @@ public final class CombatScale {
         return !entity.level().isClientSide&&amount>0
                 ?(float)Math.min(Float.MAX_VALUE,(double)amount*units(entity)):amount;
     }
+    /** Forge applies this once at its actual damage-before-absorption boundary. */
+    public static float finalDamage(LivingEntity entity,net.minecraft.world.damagesource.DamageSource source,float damage){
+        return com.codex.blacklight.infection.TissueCompetition.finalDamage(entity,source,
+                com.codex.blacklight.combat.CrossModCombat.defend(entity,source,
+                        InfiniteEvolutionSystem.damage(entity,source,damageUnits(entity,AssimilationSystem.damage(entity,source,damage)))));
+    }
     @SubscribeEvent(priority=EventPriority.LOWEST)
     public static void heal(LivingHealEvent event){
         if (event.getEntity().getPersistentData().getBoolean("adaptive_passives:healing")) return;

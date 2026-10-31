@@ -40,12 +40,11 @@ public final class HydraReleaseSmoke {
     private static boolean everRiding,dead;
     private static float minHealth=20;
     private static final List<String> damageLog=new java.util.concurrent.CopyOnWriteArrayList<>();
-    @SubscribeEvent public static void damage(net.minecraftforge.event.entity.living.LivingDamageEvent e){
+    @SubscribeEvent public static void damage(com.codex.blacklight.combat.ForgeDamageEvent.Post e){
         if(Boolean.getBoolean("blacklight.hydraVisual")&&e.getEntity() instanceof net.minecraft.server.level.ServerPlayer p)
-            damageLog.add("tick="+tick+" source="+e.getSource().getMsgId()+" damage="+e.getAmount()+" held="+HydraTransport.active(p));
+            damageLog.add("tick="+tick+" source="+e.getSource().getMsgId()+" damage="+e.getNewDamage()+" held="+HydraTransport.active(p));
     }
-    @SubscribeEvent public static void tick(net.minecraftforge.event.TickEvent.ClientTickEvent event){
-        if(event.phase!=net.minecraftforge.event.TickEvent.Phase.END)return;
+    @SubscribeEvent public static void tick(net.minecraftforge.event.TickEvent.ClientTickEvent event){if(event.phase!=net.minecraftforge.event.TickEvent.Phase.END)return;
         if(!Boolean.getBoolean("blacklight.hydraVisual")||Boolean.getBoolean("blacklight.creatureCombatVisual"))return;
         var mc=Minecraft.getInstance();
         if(!creating&&mc.screen instanceof TitleScreen){
@@ -70,17 +69,17 @@ public final class HydraReleaseSmoke {
             });return;
         }
         tick++;
-        if(approached&&tick%20==0)server(mc,()->{
+        if(Boolean.getBoolean("blacklight.hydraVisualFast")&&tick==600)server(mc,()->{
             var p=mc.getSingleplayerServer().getPlayerList().getPlayer(mc.player.getUUID());
-            var e=p.serverLevel().getEntity(hydra);
-            if(e instanceof BlacklightHydra h){
-                var target=mc.getSingleplayerServer().getLevel(CityTravel.CITY);
-                var origin=target==null?null:CityTravel.arrivalOrigin(target);
-                write("server-state-"+tick+".txt","action="+h.action()+" time="+h.actionTime()+" held="+h.heldId()+" active="+HydraTransport.active(p)+" player="+p.position()+" safe="+(target==null?null:CityTravel.safePosition(target,origin)));
-            }
+            var e=(BlacklightHydra)p.serverLevel().getEntity(hydra);var tag=new CompoundTag();e.saveWithoutId(tag);tag.putInt("GrowthAge",2399);e.load(tag);
+        });
+        if(tick%20==0)server(mc,()->{
+            var p=mc.getSingleplayerServer().getPlayerList().getPlayer(mc.player.getUUID());
+            for(var l:mc.getSingleplayerServer().getAllLevels())for(var e:l.getAllEntities())if(e instanceof BlacklightHydra h)
+                try{Files.writeString(OUT.resolve("server-telemetry.txt"),"tick="+tick+" dimension="+l.dimension().location()+" player="+p.position()+" hydra="+h.getId()+" uuid="+h.getUUID()+" held="+h.heldId()+" scene="+h.scenePlayerId()+" action="+h.action()+":"+h.actionTime()+"\n",StandardOpenOption.CREATE,StandardOpenOption.APPEND);}catch(Exception ex){throw new RuntimeException(ex);}
         });
         for(var entity:mc.level.entitiesForRendering())if(entity instanceof BlacklightHydra h&&h.scenePlayerId()==mc.player.getId()){
-            if(mc.level.dimension().equals(CityTravel.CITY)){cityEmerging|=h.action()==7;cityToss|=h.action()==8;}
+            if(mc.level.dimension().equals(CityTravel.WORLD)){cityEmerging|=h.action()==7;cityToss|=h.action()==8;}
             else if(entered){homeEmerging|=h.action()==7;homeToss|=h.action()==8;}
         }
         everRiding|=mc.player.isPassenger();dead|=!mc.player.isAlive();minHealth=Math.min(minHealth,mc.player.getHealth());
@@ -112,10 +111,11 @@ public final class HydraReleaseSmoke {
             if(e.growth()>=1&&e.action()==0){
                 approached=true;write("growth.txt","real feeds="+actualFeeds+" age="+e.growthAge()+" client tick="+tick);
                 p.teleportTo(p.serverLevel(),0,101,-2.5,180,0);p.setGameMode(GameType.SURVIVAL);
+                if(Boolean.getBoolean("blacklight.hydraVisualFast"))e.interact(p,net.minecraft.world.InteractionHand.MAIN_HAND);
             }
         });
-        if(mc.level.dimension().equals(CityTravel.CITY)){
-            if(!entered){entered=true;cityTick=tick;write("entered-city.txt","Actual client arrived in blacklight:city at tick "+tick);}
+        if(mc.level.dimension().equals(CityTravel.WORLD)){
+            if(!entered){entered=true;cityTick=tick;write("entered-city.txt","Actual client arrived in blacklight:world at tick "+tick);}
             if(cityEmerging&&cityToss&&!thrown&&tick>cityTick+100&&!HydraTransport.active(mc.player)){
                 thrown=true;write("thrown.txt","Released in city at tick "+tick+" velocity="+mc.player.getDeltaMovement());
             }
@@ -132,14 +132,7 @@ public final class HydraReleaseSmoke {
     }
     private static void server(Minecraft mc,Runnable r){mc.getSingleplayerServer().execute(r);}
     private static void write(String name,String text){try{Files.createDirectories(OUT);Files.writeString(OUT.resolve(name),text);}catch(Exception e){throw new RuntimeException(e);}}
-    private static org.joml.Matrix4f renderedBone(software.bernie.geckolib.cache.object.GeoBone bone){
-        var stack=new com.mojang.blaze3d.vertex.PoseStack();
-        if(bone.getParent()!=null)stack.mulPoseMatrix(renderedBone(bone.getParent()));
-        software.bernie.geckolib.util.RenderUtils.prepMatrixForBone(stack,bone);
-        return new org.joml.Matrix4f(stack.last().pose());
-    }
-    @SubscribeEvent public static void frame(net.minecraftforge.event.TickEvent.RenderTickEvent event){
-        if(event.phase!=net.minecraftforge.event.TickEvent.Phase.END)return;
+    @SubscribeEvent public static void frame(net.minecraftforge.event.TickEvent.RenderTickEvent event){if(event.phase!=net.minecraftforge.event.TickEvent.Phase.END)return;
         if(!Boolean.getBoolean("blacklight.hydraVisual")||done)return;var mc=Minecraft.getInstance();
         if(com.codex.blacklight.client.camera.HydraCinematicCamera.active()){
             int scene=com.codex.blacklight.client.camera.HydraCinematicCamera.sceneId();
@@ -153,19 +146,9 @@ public final class HydraReleaseSmoke {
         try {
             Files.createDirectories(OUT);
             StringBuilder row=new StringBuilder("tick="+tick+" dimension="+mc.level.dimension().location()+" player="+mc.player.getId()+" position="+mc.player.position()+" camera="+mc.gameRenderer.getMainCamera().getPosition()+" type="+mc.options.getCameraType()+" scene="+com.codex.blacklight.client.camera.HydraCinematicCamera.sceneId());
-            for(var entity:mc.level.entitiesForRendering())if(entity instanceof BlacklightHydra hydraEntity)row.append(" hydra="+hydraEntity.getId()+" scenePlayer="+hydraEntity.scenePlayerId()+" held="+hydraEntity.heldId()+" action="+hydraEntity.action()+":"+hydraEntity.actionTime()+" pos="+hydraEntity.position()+" scale="+hydraEntity.visualScale());
+            for(var entity:mc.level.entitiesForRendering())if(entity instanceof BlacklightHydra h)row.append(" hydra="+h.getId()+" scenePlayer="+h.scenePlayerId()+" held="+h.heldId()+" action="+h.action()+":"+h.actionTime()+" pos="+h.position()+" scale="+h.visualScale());
             Files.writeString(OUT.resolve("telemetry.txt"),row+"\n",StandardOpenOption.CREATE,StandardOpenOption.APPEND);
         }catch(Exception e){throw new RuntimeException(e);}
-        var h=HydraTransport.carrier(mc.player);
-        if(h!=null){
-            var renderer=(com.codex.blacklight.client.renderer.BlacklightHydraRenderer)mc.getEntityRenderDispatcher().getRenderer(h);
-            var model=renderer.getGeoModel();
-            var left=renderedBone((software.bernie.geckolib.cache.object.GeoBone)model.getAnimationProcessor().getBone("claw_left")).transformPosition(new org.joml.Vector3f(-24/16F,106/16F,-40/16F));
-            var right=renderedBone((software.bernie.geckolib.cache.object.GeoBone)model.getAnimationProcessor().getBone("claw_right")).transformPosition(new org.joml.Vector3f(24/16F,106/16F,-40/16F));
-            var grip=left.add(right).mul(.5F);
-            var expected=HydraMotion.INSTANCE.grip(h.motionPose(mc.getFrameTime()));
-            write("alignment-"+tick+".txt","action="+h.action()+" time="+h.actionTime()+" yaw="+h.getYRot()+" body="+h.yBodyRot+" prevBody="+h.yBodyRotO+" player="+mc.player.position()+" target="+h.gripPosition(mc.player,0)+" renderedLocal="+grip+" expectedLocal="+expected);
-        }
         try(var shot=Screenshot.takeScreenshot(mc.getMainRenderTarget())){Files.createDirectories(OUT);shot.writeToFile(OUT.resolve(String.format("tick-%04d.png",tick)));}catch(Exception e){throw new RuntimeException(e);}
     }
 }

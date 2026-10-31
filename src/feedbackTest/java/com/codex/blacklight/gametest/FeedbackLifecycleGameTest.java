@@ -28,7 +28,7 @@ public final class FeedbackLifecycleGameTest {
         for(int x=-7;x<=7;x++)for(int z=-7;z<=7;z++)
             h.getLevel().setBlock(p.blockPosition().offset(x,-1,z),Blocks.STONE.defaultBlockState(),2);
         h.getLevel().addNewPlayer(p);
-        var state=ModAttachments.getData(p,ModAttachments.PLAYER_STATE);
+        var state=com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.PLAYER_STATE);
         state.infect();state.setPrototypeMode(true);state.unlock(PowerForm.CLAWS);state.activate(PowerForm.CLAWS);
         return p;
     }
@@ -36,13 +36,17 @@ public final class FeedbackLifecycleGameTest {
     private static void tick(ServerPlayer p) { BiomassSystem.tick(new net.minecraftforge.event.TickEvent.PlayerTickEvent(net.minecraftforge.event.TickEvent.Phase.END,p)); }
     private static void finish(ServerPlayer p,Mob target) {
         target.setPos(p.position());target.setNoAi(true);p.serverLevel().addFreshEntity(target);
-        ModAttachments.setData(p,ModAttachments.BIOMASS_FORM,new BiomassState(BiomassState.ABSORBING,
+        com.codex.blacklight.registry.ModAttachments.setData(p, ModAttachments.BIOMASS_FORM,new BiomassState(BiomassState.ABSORBING,
                 p.level().getGameTime()-BiomassState.ABSORB_TICKS,true,"","claws",target.getId(),10));
         p.refreshDimensions();tick(p);
     }
     @GameTest(template="wall_test",timeoutTicks=60,batch="feedback_hive_death")
     public static void hiveDeathCannotReAddBossBar(GameTestHelper h) throws Exception {
+        var storage=h.getLevel().getServer().overworld().getDataStorage();
+        var original=com.codex.blacklight.infection.OutbreakData.get(h.getLevel().getServer());
+        var outbreak=new com.codex.blacklight.infection.OutbreakData();outbreak.start(h.getLevel().getServer().overworld().getGameTime());storage.set("blacklight_outbreak",outbreak);
         var p=player(h);var hive=ModEntities.BLACKLIGHT_HIVE.get().create(h.getLevel());
+        try {
         hive.setPos(p.position().add(4,0,0));h.getLevel().addFreshEntity(hive);
         var field=BlacklightHive.class.getDeclaredField("boss");field.setAccessible(true);
         var boss=(ServerBossEvent)field.get(hive);
@@ -51,8 +55,8 @@ public final class FeedbackLifecycleGameTest {
         hive.hurt(hive.damageSources().genericKill(),Float.MAX_VALUE);
         hive.tickCount=20;hive.tick();
         boolean clean=boss.getPlayers().isEmpty();
-        hive.discard();cleanup(p);
         h.assertTrue(clean,"dead hive must not re-add its empty boss bar on audience refresh");h.succeed();
+        } finally {hive.discard();cleanup(p);storage.set("blacklight_outbreak",original);}
     }
     @GameTest(template="wall_test",timeoutTicks=60,batch="feedback_execution")
     public static void completedAbsorptionPassesExecutionThreshold(GameTestHelper h) {
@@ -69,14 +73,14 @@ public final class FeedbackLifecycleGameTest {
     }
     @GameTest(template="wall_test",timeoutTicks=60,batch="feedback_reject")
     public static void rejectedMealReleasesClaimAndNextMealWorks(GameTestHelper h) {
-        var p=player(h);int before=ModAttachments.getData(p,ModAttachments.PLAYER_STATE).getBiomass();
+        var p=player(h);int before=com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.PLAYER_STATE).getBiomass();
         Cow protectedCow=new Cow(EntityType.COW,h.getLevel()) {
             @Override public boolean hurt(DamageSource source,float amount) { return false; }
         };
         finish(p,protectedCow);
         h.assertTrue(protectedCow.isAlive()&&BiomassSystem.claimant(protectedCow)==null
                 &&BiomassSystem.state(p).phase()==BiomassState.CRAWLING,"rejected damage releases prey and player");
-        h.assertTrue(ModAttachments.getData(p,ModAttachments.PLAYER_STATE).getBiomass()==before,"rejected meal cannot award biomass");
+        h.assertTrue(com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.PLAYER_STATE).getBiomass()==before,"rejected meal cannot award biomass");
         h.assertTrue(!BiomassSystem.edible(p,protectedCow),"immune target is temporarily skipped, rather than immediately recaptured");
         protectedCow.discard();
         var cow=EntityType.COW.create(h.getLevel());finish(p,cow);
@@ -94,7 +98,7 @@ public final class FeedbackLifecycleGameTest {
         };
         finish(p,cow);
         h.assertTrue(BiomassSystem.state(p).consumed(),"death confirms meal");
-        ModAttachments.setData(p,ModAttachments.BIOMASS_FORM,BiomassSystem.state(p).reform(h.getLevel().getGameTime()-BiomassState.REFORM_TICKS));
+        com.codex.blacklight.registry.ModAttachments.setData(p, ModAttachments.BIOMASS_FORM,BiomassSystem.state(p).reform(h.getLevel().getGameTime()-BiomassState.REFORM_TICKS));
         tick(p);
         boolean restored=!BiomassSystem.active(p)&&h.getLevel().noCollision(p);
         cow.discard();cleanup(p);h.assertTrue(restored,"corpse blocks cannot embed the restored body");h.succeed();
@@ -102,7 +106,7 @@ public final class FeedbackLifecycleGameTest {
     @GameTest(template="wall_test",timeoutTicks=60,batch="feedback_wall")
     public static void contactVisibilityStillRejectsWalls(GameTestHelper h) {
         var p=player(h);
-        ModAttachments.setData(p,ModAttachments.BIOMASS_FORM,new BiomassState(BiomassState.CRAWLING,0,true,"","claws",-1));
+        com.codex.blacklight.registry.ModAttachments.setData(p, ModAttachments.BIOMASS_FORM,new BiomassState(BiomassState.CRAWLING,0,true,"","claws",-1));
         p.refreshDimensions();
         var cow=EntityType.COW.create(h.getLevel());cow.setPos(p.position().add(1.7,0,0));h.getLevel().addFreshEntity(cow);
         for(int y=0;y<3;y++)h.getLevel().setBlock(p.blockPosition().offset(1,y,0),Blocks.STONE.defaultBlockState(),2);
@@ -129,13 +133,49 @@ public final class FeedbackLifecycleGameTest {
     @GameTest(template="wall_test",timeoutTicks=60,batch="feedback_ceiling")
     public static void lowCeilingDoesNotTeleportThroughWall(GameTestHelper h) {
         var p=player(h);
-        ModAttachments.setData(p,ModAttachments.BIOMASS_FORM,new BiomassState(BiomassState.REFORMING,
+        com.codex.blacklight.registry.ModAttachments.setData(p, ModAttachments.BIOMASS_FORM,new BiomassState(BiomassState.REFORMING,
                 h.getLevel().getGameTime()-40,true,"","claws",-1,10));p.refreshDimensions();
         BiomassReformation.prepare(p);var before=p.position();
         h.getLevel().setBlock(p.blockPosition().above(),Blocks.STONE.defaultBlockState(),2);
         tick(p);
         boolean waiting=BiomassSystem.state(p).phase()==BiomassState.READY&&p.position().equals(before);
         cleanup(p);h.assertTrue(waiting,"low tunnel remains crawlable instead of teleporting through its wall");h.succeed();
+    }
+    @GameTest(template="wall_test",timeoutTicks=120,batch="feedback_slime_recovery")
+    public static void deathSlimeSurvivesCombatAndAutomaticallyConsumesHealthyPrey(GameTestHelper h){
+        var p=player(h);p.setGameMode(net.minecraft.world.level.GameType.SURVIVAL);for(int i=0;i<65;i++)p.tick();var prey=EntityType.ZOMBIE.create(h.getLevel());
+        h.runAfterDelay(70,()->{try{
+            prey.setNoAi(true);prey.setPos(p.position());prey.getAttribute(net.minecraft.world.entity.ai.attributes.Attributes.MAX_HEALTH).setBaseValue(200);
+            h.getLevel().addFreshEntity(prey);prey.setHealth(prey.getMaxHealth());
+            h.assertTrue(!com.codex.blacklight.combat.ConsumeSystem.healthReady(p,prey),"fixture needs a healthy target above the ordinary grab threshold");
+            h.assertTrue(BiomassSystem.begin(p,true),"fatal recovery starts");
+            p.invulnerableTime=0;float health=p.getHealth();
+            h.assertTrue(!p.hurt(p.damageSources().mobAttack(prey),10000)&&p.isAlive()&&p.getHealth()==health,"ordinary lethal attack cannot kill death slime after its initial grace");
+            h.assertTrue(!p.hurt(p.damageSources().onFire(),10000)&&p.getHealth()==health,"fire cannot end the recovery chance");
+            com.codex.blacklight.registry.ModAttachments.setData(p,ModAttachments.BIOMASS_FORM,BiomassSystem.state(p).crawl(h.getLevel().getGameTime()-20));p.refreshDimensions();
+            tick(p);
+            h.assertTrue(BiomassSystem.state(p).phase()==BiomassState.ABSORBING&&BiomassSystem.state(p).victim()==prey.getId(),"touching healthy prey starts absorption without E or prior damage");
+            com.codex.blacklight.registry.ModAttachments.setData(p,ModAttachments.BIOMASS_FORM,BiomassSystem.state(p).absorb(prey.getId(),h.getLevel().getGameTime()-BiomassState.ABSORB_TICKS));
+            tick(p);
+            h.assertTrue(!prey.isAlive()&&BiomassSystem.state(p).consumed()&&p.getHealth()==p.getMaxHealth(),"one confirmed kill restores health and commits reformation");
+            com.codex.blacklight.registry.ModAttachments.setData(p,ModAttachments.BIOMASS_FORM,BiomassSystem.state(p).reform(h.getLevel().getGameTime()-BiomassState.REFORM_TICKS));
+            tick(p);
+            h.assertTrue(!BiomassSystem.active(p)&&p.isAlive(),"reformation restores the original player body");
+            p.invulnerableTime=0;float restored=p.getHealth();p.hurt(p.damageSources().mobAttack(prey),1);
+            h.assertTrue(p.getHealth()<restored,"restored body must not retain recovery immunity");
+        }finally{prey.discard();cleanup(p);}h.succeed();});
+    }
+    @GameTest(template="wall_test",timeoutTicks=120,batch="feedback_slime_recovery")
+    public static void voluntarySlimeAndAdministrativeDeathRemainDamageable(GameTestHelper h){
+        var p=player(h);p.setGameMode(net.minecraft.world.level.GameType.SURVIVAL);for(int i=0;i<65;i++)p.tick();
+        h.runAfterDelay(70,()->{try{
+            h.assertTrue(BiomassSystem.begin(p,false),"voluntary split starts");
+            p.invulnerableTime=0;float health=p.getHealth();p.hurt(p.damageSources().generic(),1);
+            h.assertTrue(p.getHealth()<health,"voluntary split does not grant fatal recovery immunity");
+            com.codex.blacklight.registry.ModAttachments.setData(p,ModAttachments.BIOMASS_FORM,new BiomassState(BiomassState.CRAWLING,p.level().getGameTime(),true,"","claws",-1));
+            p.invulnerableTime=0;p.hurt(p.damageSources().genericKill(),Float.MAX_VALUE);
+            h.assertTrue(!p.isAlive()&&!BiomassSystem.active(p),"administrative kill and void bypass recovery protection and release the form");
+        }finally{cleanup(p);}h.succeed();});
     }
     @GameTest(template="wall_test",timeoutTicks=100,batch="feedback_player_death")
     public static void fatalSlimeThenRealDeathCanSaveAndReleaseTarget(GameTestHelper h) {
@@ -144,7 +184,7 @@ public final class FeedbackLifecycleGameTest {
         p.setHealth(0);p.die(p.damageSources().generic());
         h.assertTrue(p.isAlive()&&BiomassSystem.state(p).fatal(),"lethal ordinary damage becomes death slime");
         var cow=EntityType.COW.create(h.getLevel());cow.setPos(p.position());h.getLevel().addFreshEntity(cow);
-        ModAttachments.setData(p,ModAttachments.BIOMASS_FORM,BiomassSystem.state(p).absorb(cow.getId(),h.getLevel().getGameTime()));
+        com.codex.blacklight.registry.ModAttachments.setData(p, ModAttachments.BIOMASS_FORM,BiomassSystem.state(p).absorb(cow.getId(),h.getLevel().getGameTime()));
         p.setHealth(0);p.die(p.damageSources().genericKill());
         h.assertTrue(!p.isAlive()&&!BiomassSystem.active(p)&&BiomassSystem.claimant(cow)==null,"actual death clears slime and victim claim");
         var saved=new net.minecraft.nbt.CompoundTag();p.saveWithoutId(saved);
@@ -156,7 +196,7 @@ public final class FeedbackLifecycleGameTest {
     }
     @GameTest(template="wall_test",timeoutTicks=100,batch="feedback_spore")
     public static void realSporeStahlAbsorption(GameTestHelper h) {
-        var id=net.minecraft.resources.ResourceLocation.fromNamespaceAndPath("spore","stahl");
+        var id=new net.minecraft.resources.ResourceLocation("spore","stahl");
         var type=net.minecraft.core.registries.BuiltInRegistries.ENTITY_TYPE.getOptional(id);
         // Run with the official optional Spore JAR to execute this integration fixture.
         if(type.isEmpty()){h.succeed();return;}
@@ -170,7 +210,7 @@ public final class FeedbackLifecycleGameTest {
         p.setPos((part.minX+part.maxX)/2,Math.floor(part.minY),part.minZ-.45);
         for(int x=-7;x<=7;x++)for(int z=-7;z<=7;z++)
             h.getLevel().setBlock(p.blockPosition().offset(x,-1,z),Blocks.STONE.defaultBlockState(),2);
-        ModAttachments.setData(p,ModAttachments.BIOMASS_FORM,new BiomassState(BiomassState.ABSORBING,h.getLevel().getGameTime()-60,true,"","claws",mob.getId(),10));
+        com.codex.blacklight.registry.ModAttachments.setData(p, ModAttachments.BIOMASS_FORM,new BiomassState(BiomassState.ABSORBING,h.getLevel().getGameTime()-60,true,"","claws",mob.getId(),10));
         p.refreshDimensions();
         String before=" eligible="+com.codex.blacklight.combat.ConsumeSystem.eligibleBiomass(mob)
                 +", edible="+BiomassSystem.edible(p,mob)+", damageable="+com.codex.blacklight.combat.CombatTargeting.damageable(p,mob)
@@ -182,7 +222,7 @@ public final class FeedbackLifecycleGameTest {
         boolean committed=BiomassSystem.state(p).consumed()&&!mob.isAlive();
         String diagnostic=before+" phase="+BiomassSystem.state(p).phase()+", health="+mob.getHealth()+", removed="+mob.isRemoved()+", dead="+((com.codex.blacklight.mixin.LivingDeathAccess)mob).blacklight$deathAccepted()+", player="+p.position();
         if(committed) {
-            ModAttachments.setData(p,ModAttachments.BIOMASS_FORM,BiomassSystem.state(p).reform(h.getLevel().getGameTime()-40));
+            com.codex.blacklight.registry.ModAttachments.setData(p, ModAttachments.BIOMASS_FORM,BiomassSystem.state(p).reform(h.getLevel().getGameTime()-40));
             tick(p);
             committed=!BiomassSystem.active(p)&&h.getLevel().noCollision(p);
         }

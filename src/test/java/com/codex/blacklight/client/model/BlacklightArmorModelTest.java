@@ -48,13 +48,12 @@ class BlacklightArmorModelTest {
         assertTrue(armor.rightArm.visible,"Slot visibility belongs to the vanilla armour layer");
         body.rightArm.visible=true;assertEquals(normal,render(armor).points.size());
     }
-    private static class Capture implements VertexConsumer {
-        public void endVertex(){}public void defaultColor(int r,int g,int b,int a){}public void unsetDefaultColor(){}
+    private static class Capture extends com.codex.blacklight.forge.ForgeVertexConsumer {
         final List<Vector3f> points=new ArrayList<>();boolean uvValid=true,colourValid=true,normalValid=true;
-        public VertexConsumer vertex(double x,double y,double z){assertTrue(Double.isFinite(x+y+z));points.add(new Vector3f((float)x,(float)y,(float)z));return this;}
-        public VertexConsumer color(int r,int g,int b,int a){colourValid&=r==0x3A&&g==0x72&&b==0xB9&&a==255;return this;}
-        public VertexConsumer uv(float u,float v){uvValid&=Float.isFinite(u+v)&&u>=0&&u<=1&&v>=0&&v<=1;return this;}
-        public VertexConsumer overlayCoords(int u,int v){return this;}public VertexConsumer uv2(int u,int v){return this;}
-        public VertexConsumer normal(float x,float y,float z){normalValid&=Double.isFinite(x+y+z)&&Math.abs(x*x+y*y+z*z-1)<1e-4;return this;}
+        public VertexConsumer addVertex(float x,float y,float z){assertTrue(Float.isFinite(x+y+z));points.add(new Vector3f(x,y,z));return this;}
+        public VertexConsumer setColor(int r,int g,int b,int a){colourValid&=r==0x3A&&g==0x72&&b==0xB9&&a==255;return this;}
+        public VertexConsumer setUv(float u,float v){uvValid&=Float.isFinite(u+v)&&u>=0&&u<=1&&v>=0&&v<=1;return this;}
+        public VertexConsumer setUv1(int u,int v){return this;}public VertexConsumer setUv2(int u,int v){return this;}
+        public VertexConsumer setNormal(float x,float y,float z){normalValid&=Float.isFinite(x+y+z)&&Math.abs(x*x+y*y+z*z-1)<1e-4;return this;}
     }
 }

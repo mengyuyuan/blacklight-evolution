@@ -13,7 +13,6 @@ import net.minecraft.world.entity.*;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.util.FakePlayerFactory;
-import net.minecraftforge.event.TickEvent.PlayerTickEvent;
 import net.minecraftforge.gametest.*;
 import java.util.UUID;
 
@@ -29,7 +28,7 @@ public final class ConsumeControlGameTest {
         p.setGameMode(net.minecraft.world.level.GameType.SURVIVAL);
         for(int i=0;i<61;i++)p.tick();
         p.setPos(h.absoluteVec(new Vec3(3,2,3)));p.setYRot(0);p.setOnGround(true);p.tickCount=100;
-        var state=ModAttachments.getData(p,ModAttachments.PLAYER_STATE);state.infect();state.setPrototypeMode(true);state.activate(PowerForm.CLAWS);
+        var state=com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.PLAYER_STATE);state.infect();state.setPrototypeMode(true);state.activate(PowerForm.CLAWS);
         h.getLevel().addNewPlayer(p);p.setHealth(p.getMaxHealth());return p;
     }
     private static Mob spore(GameTestHelper h){
@@ -45,7 +44,7 @@ public final class ConsumeControlGameTest {
         }catch(ReflectiveOperationException e){throw new AssertionError("real Spore pull could not execute",e);}
     }
     private static void release(GameTestHelper h,ServerPlayer p){
-        ConsumeSystem.cancel(p);ModAttachments.setData(p,ModAttachments.BIOMASS_FORM,BiomassState.EMPTY);
+        ConsumeSystem.cancel(p);com.codex.blacklight.registry.ModAttachments.setData(p, ModAttachments.BIOMASS_FORM,BiomassState.EMPTY);
         h.getLevel().removePlayerImmediately(p,Entity.RemovalReason.DISCARDED);
     }
     @GameTest(template="wall_test",timeoutTicks=30)
@@ -53,21 +52,21 @@ public final class ConsumeControlGameTest {
         var p=player(h);var attacker=spore(h);
         pull(attacker,p);h.assertTrue(p.getDeltaMovement().lengthSqr()>0,"actual Spore pull moves an unprotected player");
         p.setDeltaMovement(Vec3.ZERO);
-        ModAttachments.setData(p,ModAttachments.CONSUMING,true);ModAttachments.setData(p,ModAttachments.GRAB_STAGE,ConsumeVisual.HOLD);
+        com.codex.blacklight.registry.ModAttachments.setData(p, ModAttachments.CONSUMING,true);com.codex.blacklight.registry.ModAttachments.setData(p, ModAttachments.GRAB_STAGE,ConsumeVisual.HOLD);
         pull(attacker,p);h.assertTrue(p.getDeltaMovement().lengthSqr()==0,"Spore cannot pull the carrier away from held prey");
         h.assertTrue(!p.startRiding(attacker,true),"forced passenger grab is rejected");
         p.push(2,1,0);p.knockback(1,1,0);
         h.assertTrue(p.getDeltaMovement().lengthSqr()==0,"both impulse and vanilla knockback are rejected");
         p.setDeltaMovement(.1,0,.2);
         h.assertTrue(p.getDeltaMovement().lengthSqr()>0,"holding still permits ordinary movement");
-        ModAttachments.setData(p,ModAttachments.CONSUMING,false);ModAttachments.setData(p,ModAttachments.GRAB_STAGE,ConsumeVisual.NONE);
+        com.codex.blacklight.registry.ModAttachments.setData(p, ModAttachments.CONSUMING,false);com.codex.blacklight.registry.ModAttachments.setData(p, ModAttachments.GRAB_STAGE,ConsumeVisual.NONE);
         p.setDeltaMovement(Vec3.ZERO);pull(attacker,p);
         h.assertTrue(p.getDeltaMovement().lengthSqr()>0,"pull works again after release");
         // Also exercise the shared Entity hook with another kind of living entity.
         var rider=h.spawn(EntityType.COW,8,2,7);var mount=h.spawn(EntityType.MINECART,8,2,8);
-        ModAttachments.setData(rider,ModAttachments.CONSUMING,true);ModAttachments.setData(rider,ModAttachments.GRAB_STAGE,ConsumeVisual.HOLD);
+        com.codex.blacklight.registry.ModAttachments.setData(rider, ModAttachments.CONSUMING,true);com.codex.blacklight.registry.ModAttachments.setData(rider, ModAttachments.GRAB_STAGE,ConsumeVisual.HOLD);
         h.assertTrue(!rider.startRiding(mount,true),"protected entity rejects the real forced mount path");
-        ModAttachments.setData(rider,ModAttachments.CONSUMING,false);ModAttachments.setData(rider,ModAttachments.GRAB_STAGE,ConsumeVisual.NONE);
+        com.codex.blacklight.registry.ModAttachments.setData(rider, ModAttachments.CONSUMING,false);com.codex.blacklight.registry.ModAttachments.setData(rider, ModAttachments.GRAB_STAGE,ConsumeVisual.NONE);
         h.assertTrue(rider.startRiding(mount,true),"real riding works again after release");rider.stopRiding();
         release(h,p);h.succeed();
     }
@@ -76,7 +75,7 @@ public final class ConsumeControlGameTest {
         var p=player(h);var attacker=spore(h);
         var stun=MobEffects.MOVEMENT_SLOWDOWN;
         h.assertTrue(p.addEffect(new MobEffectInstance(stun,200)),"control effect normally applies");
-        ModAttachments.setData(p,ModAttachments.CONSUMING,true);ModAttachments.setData(p,ModAttachments.GRAB_STAGE,ConsumeVisual.CONSUME);
+        com.codex.blacklight.registry.ModAttachments.setData(p, ModAttachments.CONSUMING,true);com.codex.blacklight.registry.ModAttachments.setData(p, ModAttachments.GRAB_STAGE,ConsumeVisual.CONSUME);
         ConsumeControl.releaseControls(p);
         h.assertTrue(!p.hasEffect(stun),"claim releases a pre-existing control effect");
         h.assertTrue(!p.addEffect(new MobEffectInstance(stun,200)),"control effect cannot replace the scene");
@@ -94,12 +93,12 @@ public final class ConsumeControlGameTest {
     public static void fullGrabConsumeSurvivesRepeatedExternalControl(GameTestHelper h){
         var p=player(h);var attacker=spore(h);var cow=h.spawn(EntityType.COW,3,2,5);cow.setNoAi(true);
         ConsumeSystem.request(p);
-        for(int i=0;i<50&&!ConsumeSystem.holding(p);i++){p.tickCount++;ConsumeSystem.tick(new PlayerTickEvent(net.minecraftforge.event.TickEvent.Phase.END,p));}
+        for(int i=0;i<50&&!ConsumeSystem.holding(p);i++){p.tickCount++;ConsumeSystem.tick(new net.minecraftforge.event.TickEvent.PlayerTickEvent(net.minecraftforge.event.TickEvent.Phase.END,p));}
         h.assertTrue(ConsumeSystem.holding(p),"real server claim reaches hold");
         ConsumeSystem.consume(p);h.assertTrue(ConsumeSystem.committed(p),"right click commits the real consume scene");
         for(int i=0;i<220&&!cow.isRemoved();i++){
             pull(attacker,p);p.push(2,1,0);p.startRiding(attacker,true);
-            p.tickCount++;ConsumeSystem.tick(new PlayerTickEvent(net.minecraftforge.event.TickEvent.Phase.END,p));
+            p.tickCount++;ConsumeSystem.tick(new net.minecraftforge.event.TickEvent.PlayerTickEvent(net.minecraftforge.event.TickEvent.Phase.END,p));
         }
         h.assertTrue(cow.isRemoved(),"repeated Spore control cannot prevent actual consume completion");
         h.assertTrue(!ConsumeControl.protectedEntity(p),"completion releases all temporary control protection");
@@ -108,13 +107,13 @@ public final class ConsumeControlGameTest {
     @GameTest(template="wall_test",timeoutTicks=30)
     public static void biomassAbsorptionHasTheSameControlProtection(GameTestHelper h){
         var p=player(h);var attacker=spore(h);var cow=h.spawn(EntityType.COW,3,2,3);cow.setNoAi(true);
-        ModAttachments.setData(p,ModAttachments.BIOMASS_FORM,new BiomassState(BiomassState.ABSORBING,h.getLevel().getGameTime(),true,"","claws",cow.getId()));
+        com.codex.blacklight.registry.ModAttachments.setData(p, ModAttachments.BIOMASS_FORM,new BiomassState(BiomassState.ABSORBING,h.getLevel().getGameTime(),true,"","claws",cow.getId()));
         cow.addEffect(new MobEffectInstance(ModEffects.BIOMASS_CONTACT.get(),100));
         p.setDeltaMovement(Vec3.ZERO);cow.setDeltaMovement(Vec3.ZERO);
         pull(attacker,p);p.setDeltaMovement(2,1,0);cow.push(2,1,0);cow.setDeltaMovement(new Vec3(1,2,0));
         h.assertTrue(p.getDeltaMovement().lengthSqr()==0&&cow.getDeltaMovement().lengthSqr()==0,"slime and claimed prey resist direct displacement");
         h.assertTrue(!p.startRiding(attacker,true)&&!cow.startRiding(attacker,true),"neither member can be stolen into a forced mount");
-        ModAttachments.setData(p,ModAttachments.BIOMASS_FORM,BiomassState.EMPTY);cow.removeEffect(ModEffects.BIOMASS_CONTACT.get());
+        com.codex.blacklight.registry.ModAttachments.setData(p, ModAttachments.BIOMASS_FORM,BiomassState.EMPTY);cow.removeEffect(ModEffects.BIOMASS_CONTACT.get());
         cow.push(1,0,0);h.assertTrue(cow.getDeltaMovement().lengthSqr()>0,"prey is fully released on cancel");
         release(h,p);h.succeed();
     }
@@ -123,14 +122,14 @@ public final class ConsumeControlGameTest {
         for(String id:new String[]{"spore:inf_human","spore:slasher"}){
             var p=player(h);long now=h.getLevel().getGameTime();
             var prey=(Mob)h.spawn(BuiltInRegistries.ENTITY_TYPE.get(new ResourceLocation(id)),3,2,3);prey.setNoAi(true);
-            ModAttachments.setData(p,ModAttachments.BIOMASS_FORM,new BiomassState(BiomassState.CRAWLING,now-20,true,"","claws",-1));
-            BiomassSystem.tick(new PlayerTickEvent(net.minecraftforge.event.TickEvent.Phase.END,p));
+            com.codex.blacklight.registry.ModAttachments.setData(p, ModAttachments.BIOMASS_FORM,new BiomassState(BiomassState.CRAWLING,now-20,true,"","claws",-1));
+            BiomassSystem.tick(new net.minecraftforge.event.TickEvent.PlayerTickEvent(net.minecraftforge.event.TickEvent.Phase.END,p));
             h.assertTrue(BiomassSystem.state(p).phase()==BiomassState.ABSORBING,"real proximity claims "+id);
-            ModAttachments.setData(p,ModAttachments.BIOMASS_FORM,new BiomassState(BiomassState.ABSORBING,now-BiomassState.ABSORB_TICKS,true,"","claws",prey.getId()));
-            BiomassSystem.tick(new PlayerTickEvent(net.minecraftforge.event.TickEvent.Phase.END,p));
+            com.codex.blacklight.registry.ModAttachments.setData(p, ModAttachments.BIOMASS_FORM,new BiomassState(BiomassState.ABSORBING,now-BiomassState.ABSORB_TICKS,true,"","claws",prey.getId()));
+            BiomassSystem.tick(new net.minecraftforge.event.TickEvent.PlayerTickEvent(net.minecraftforge.event.TickEvent.Phase.END,p));
             h.assertTrue(BiomassSystem.state(p).consumed()&&!prey.isAlive(),"actual Spore death and consume commit complete for "+id);
-            ModAttachments.setData(p,ModAttachments.BIOMASS_FORM,new BiomassState(BiomassState.REFORMING,now-BiomassState.REFORM_TICKS,true,"","claws",-1));
-            BiomassSystem.tick(new PlayerTickEvent(net.minecraftforge.event.TickEvent.Phase.END,p));
+            com.codex.blacklight.registry.ModAttachments.setData(p, ModAttachments.BIOMASS_FORM,new BiomassState(BiomassState.REFORMING,now-BiomassState.REFORM_TICKS,true,"","claws",-1));
+            BiomassSystem.tick(new net.minecraftforge.event.TickEvent.PlayerTickEvent(net.minecraftforge.event.TickEvent.Phase.END,p));
             h.assertTrue(!BiomassSystem.active(p)&&!ConsumeControl.protectedEntity(p),"body restoration releases protection after "+id);
             release(h,p);
         }

@@ -51,12 +51,14 @@ public static void metabolize(ServerPlayer p){
         if(advancement!=null)p.getAdvancements().award(advancement,"done");
     }
     public static void updateHealth(ServerPlayer p){
+        AssimilationSystem.updateCrest(p);
         var attribute=p.getAttribute(Attributes.MAX_HEALTH);if(attribute==null)return;
         float before=p.getMaxHealth(),health=p.getHealth();
         boolean infected=com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.PLAYER_STATE).isInfected();
         var growth=com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.GROWTH);
         double bonus=growth.owns(GrowthUpgrade.VITALITY_IV)?70:growth.owns(GrowthUpgrade.VITALITY_III)?45:
                 growth.owns(GrowthUpgrade.VITALITY_II)?25:growth.owns(GrowthUpgrade.VITALITY)?10:0;
+        bonus+=InfiniteEvolutionSystem.effectiveRank(p,EvolutionAttribute.VITALITY)*PlayerEvolutionConfig.HEALTH_PER_LEVEL.get()/CombatScale.UNITS;
         CombatScale.modifier(attribute,HEALTH,infected?bonus:0,AttributeModifier.Operation.ADDITION);
         CombatScale.attributes(p,infected);
         CombatScale.preserveHealthFraction(p,before,health);

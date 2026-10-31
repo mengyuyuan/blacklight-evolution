@@ -13,14 +13,14 @@ class SkillSettingsTest {
         assertFalse(SkillSettings.DEFAULT.shieldBorerBlockBreaking());
         assertTrue(SkillSettings.DEFAULT.prototypeItemPickup());
         assertEquals(SkillSettings.DEFAULT, SkillSettings.CODEC.parse(JsonOps.INSTANCE,
-                JsonParser.parseString("{}")).getOrThrow(false,message->{throw new IllegalStateException(message);}));
+                JsonParser.parseString("{}")).getOrThrow(false, message -> { throw new AssertionError(message); }));
     }
 
     @Test void disablingBlockBreakingSurvivesSaveAndNetworkRoundTrips() {
-        for (boolean enabled : new boolean[]{false, true}) for(boolean borer:new boolean[]{false,true}) for(boolean pickup:new boolean[]{false,true}) {
-            var settings = new SkillSettings(enabled,borer,pickup,35);
-            var saved = SkillSettings.CODEC.encodeStart(JsonOps.INSTANCE, settings).getOrThrow(false,message->{throw new IllegalStateException(message);});
-            assertEquals(settings, SkillSettings.CODEC.parse(JsonOps.INSTANCE, saved).getOrThrow(false,message->{throw new IllegalStateException(message);}));
+        for (boolean enabled : new boolean[]{false, true}) for(boolean borer:new boolean[]{false,true}) for(boolean pickup:new boolean[]{false,true}) for(boolean precision:new boolean[]{false,true}) {
+            var settings = new SkillSettings(enabled,borer,pickup,35,precision);
+            var saved = SkillSettings.CODEC.encodeStart(JsonOps.INSTANCE, settings).getOrThrow(false, message -> { throw new AssertionError(message); });
+            assertEquals(settings, SkillSettings.CODEC.parse(JsonOps.INSTANCE, saved).getOrThrow(false, message -> { throw new AssertionError(message); }));
             var packet = new net.minecraft.network.FriendlyByteBuf(Unpooled.buffer());
             try {
                 SkillSettings.STREAM_CODEC.encode(packet, settings);
@@ -34,7 +34,7 @@ class SkillSettingsTest {
 
     @Test void oldSavesKeepBulletdiveChoiceButDoNotAutoEnableBorer(){
         var settings=SkillSettings.CODEC.parse(JsonOps.INSTANCE,
-                JsonParser.parseString("{\"bulletdive_block_breaking\":false}")).getOrThrow(false,message->{throw new IllegalStateException(message);});
+                JsonParser.parseString("{\"bulletdive_block_breaking\":false}")).getOrThrow(false, message -> { throw new AssertionError(message); });
         assertEquals(new SkillSettings(false,false),settings);
     }
 
@@ -75,5 +75,13 @@ class SkillSettingsTest {
         assertFalse(com.codex.blacklight.network.WingSpeedPayload.valid(0));
         assertTrue(com.codex.blacklight.network.WingSpeedPayload.valid(10));
         assertTrue(com.codex.blacklight.network.WingSpeedPayload.valid(100));
+    }
+    @Test void wingAppearanceChangesOnlyItsOwnSavedChoice(){
+        var old=SkillSettings.DEFAULT.withWingSpeed(45).withBulletdive(false).withShieldBorer(true).withPrototypeItemPickup(false);
+        var request=new com.codex.blacklight.network.SkillSettingsPayload(com.codex.blacklight.network.SkillSettingsPayload.Setting.PRECISION_WINGS,true);
+        var precision=request.apply(old);
+        assertTrue(precision.precisionWings());assertEquals(old,precision.withPrecisionWings(false));
+        assertTrue(precision.withWingSpeed(70).withBulletdive(true).withShieldBorer(false).withPrototypeItemPickup(true).precisionWings());
+        assertFalse(SkillSettings.CODEC.parse(JsonOps.INSTANCE,JsonParser.parseString("{\"wing_speed_percent\":45}")).getOrThrow(false, message -> { throw new AssertionError(message); }).precisionWings(),"Existing saves keep classic wings");
     }
 }

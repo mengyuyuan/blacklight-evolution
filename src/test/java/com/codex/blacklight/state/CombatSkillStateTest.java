@@ -9,6 +9,18 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 class CombatSkillStateTest {
+    @Test void secondRegenerationTierAppendsABitAndPreservesLegacyLearning() {
+        assertEquals(1<<18,CombatSkill.TISSUE_REGENERATION_PERCENT.bit());
+        var state=new BlacklightState();state.infect();state.addEvolutionPoints(2000);
+        assertFalse(state.buyCombatSkill(CombatSkill.TISSUE_REGENERATION_PERCENT));
+        assertTrue(state.buyCombatSkill(CombatSkill.TISSUE_REGENERATION));
+        assertTrue(state.buyCombatSkill(CombatSkill.TISSUE_REGENERATION_PERCENT));
+        var encoded=BlacklightState.CODEC.encodeStart(JsonOps.INSTANCE,state).getOrThrow(false, message -> { throw new AssertionError(message); });
+        var copy=BlacklightState.CODEC.parse(JsonOps.INSTANCE,encoded).getOrThrow(false, message -> { throw new AssertionError(message); });
+        assertTrue(copy.hasCombatSkill(CombatSkill.TISSUE_REGENERATION));
+        assertTrue(copy.hasCombatSkill(CombatSkill.TISSUE_REGENERATION_PERCENT));
+        assertEquals(1150,copy.getEvolutionPoints());
+    }
     @Test void criticalMassBoostsRequireEachPriorTierAndAddStorage() {
         var state=new BlacklightState();state.infect();state.addEvolutionPoints(3000);
         assertFalse(state.buyCombatSkill(CombatSkill.CRITICAL_MASS_BOOST_2));
@@ -51,8 +63,8 @@ class CombatSkillStateTest {
         var state=new BlacklightState();state.infect();state.addEvolutionPoints(2000);
         state.buyCombatSkill(CombatSkill.CRITICAL_MASS);state.buyCombatSkill(CombatSkill.ADRENALINE_SURGE);
         state.setPrototypeMode(true);state.setPrototypeMode(false);
-        var encoded=BlacklightState.CODEC.encodeStart(JsonOps.INSTANCE,state).getOrThrow(false,message->{throw new IllegalStateException(message);});
-        var decoded=BlacklightState.CODEC.parse(JsonOps.INSTANCE,encoded).getOrThrow(false,message->{throw new IllegalStateException(message);});
+        var encoded=BlacklightState.CODEC.encodeStart(JsonOps.INSTANCE,state).getOrThrow(false, message -> { throw new AssertionError(message); });
+        var decoded=BlacklightState.CODEC.parse(JsonOps.INSTANCE,encoded).getOrThrow(false, message -> { throw new AssertionError(message); });
         assertTrue(decoded.hasCombatSkill(CombatSkill.CRITICAL_MASS));
         assertTrue(decoded.hasCombatSkill(CombatSkill.ADRENALINE_SURGE));
         assertEquals(0,decoded.getCombatSkillMask()&~CombatSkill.validMask());
@@ -60,10 +72,10 @@ class CombatSkillStateTest {
     }
     @Test void legacyAndUnknownFlagsCannotCreateSkills() {
         var legacy=JsonParser.parseString("{\"infected\":true,\"prototype_mode\":true}");
-        assertEquals(0,BlacklightState.CODEC.parse(JsonOps.INSTANCE,legacy).getOrThrow(false,message->{throw new IllegalStateException(message);}).getCombatSkillMask());
+        assertEquals(0,BlacklightState.CODEC.parse(JsonOps.INSTANCE,legacy).getOrThrow(false, message -> { throw new AssertionError(message); }).getCombatSkillMask());
         var dirty=JsonParser.parseString("{\"infected\":true,\"combat_skill_mask\":2147483647}");
-        assertEquals(CombatSkill.validMask(),BlacklightState.CODEC.parse(JsonOps.INSTANCE,dirty).getOrThrow(false,message->{throw new IllegalStateException(message);}).getCombatSkillMask());
+        assertEquals(CombatSkill.validMask(),BlacklightState.CODEC.parse(JsonOps.INSTANCE,dirty).getOrThrow(false, message -> { throw new AssertionError(message); }).getCombatSkillMask());
         var negative=JsonParser.parseString("{\"combat_skill_mask\":-1}");
-        assertEquals(0,BlacklightState.CODEC.parse(JsonOps.INSTANCE,negative).getOrThrow(false,message->{throw new IllegalStateException(message);}).getCombatSkillMask());
+        assertEquals(0,BlacklightState.CODEC.parse(JsonOps.INSTANCE,negative).getOrThrow(false, message -> { throw new AssertionError(message); }).getCombatSkillMask());
     }
 }

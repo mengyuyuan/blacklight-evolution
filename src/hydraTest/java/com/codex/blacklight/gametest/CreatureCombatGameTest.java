@@ -47,13 +47,14 @@ public final class CreatureCombatGameTest {
         com.codex.blacklight.power.CombatScale.synchronizeMob(hunter);hunter.setHealth(hunter.getMaxHealth()*.25F);
         var tag=new net.minecraft.nbt.CompoundTag();hunter.addAdditionalSaveData(tag);tag.remove("BlacklightHunterBalanceVersion");
         var copy=ModEntities.BLACKLIGHT_HUNTER.get().create(h.getLevel());copy.readAdditionalSaveData(tag);
-        h.assertTrue(copy.getMaxHealth()==480&&copy.getHealth()==120,"old wounded hunter doubles max HP without healing its health fraction");
+        float maximum=(float)(com.codex.blacklight.combat.HunterBalance.HEALTH*5);
+        h.assertTrue(copy.getMaxHealth()==maximum&&copy.getHealth()==maximum*.25F,"stock migration preserves the wounded health fraction at the current encounter tier");
         h.assertTrue(!com.codex.blacklight.combat.ConsumeSystem.healthReady(copy),"elite cannot be swallowed above the weakening threshold");
-        copy.setHealth(72);
+        copy.setHealth(maximum*.15F);
         h.assertTrue(com.codex.blacklight.combat.ConsumeSystem.healthReady(copy),"15 percent health retains the consume reward window");
-        copy.setHealth(120);
+        copy.setHealth(maximum*.25F);
         var saved=new net.minecraft.nbt.CompoundTag();copy.addAdditionalSaveData(saved);copy.readAdditionalSaveData(saved);
-        h.assertTrue(copy.getMaxHealth()==480&&copy.getHealth()==120,"reload must not multiply stats again");
+        h.assertTrue(copy.getMaxHealth()==maximum&&copy.getHealth()==maximum*.25F,"reload must not multiply stats again");
         hunter.getAttribute(health).setBaseValue(160);hunter.getAttribute(damage).setBaseValue(20);
         hunter.addAdditionalSaveData(tag);tag.remove("BlacklightHunterBalanceVersion");copy.readAdditionalSaveData(tag);
         h.assertTrue(copy.getAttribute(health).getBaseValue()==160&&copy.getAttribute(damage).getBaseValue()==20,"custom attributes are preserved");
@@ -68,8 +69,8 @@ public final class CreatureCombatGameTest {
         var source=p.damageSources().mobAttack(hunter);
         var ordinary=damageEvent(p,source,14);
         h.assertTrue(Math.abs(ordinary.getAmount()-13.44F)<.001,"ordinary players get the reduced duel damage");
-        com.codex.blacklight.registry.ModAttachments.getData(p,ModAttachments.PLAYER_STATE).infect();
-        com.codex.blacklight.registry.ModAttachments.getData(p,ModAttachments.PLAYER_STATE).setPrototypeMode(true);
+        com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.PLAYER_STATE).infect();
+        com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.PLAYER_STATE).setPrototypeMode(true);
         float difficulty=switch(p.level().getDifficulty()){case EASY->.75F;case HARD->1.5F;default->1;};
         float expected=com.codex.blacklight.combat.HunterBalance.infectedDamage(22.4F,CreatureAttack.SLAM,difficulty);
         h.assertTrue(Math.abs(damageEvent(p,source,14).getAmount()-expected)<.001,"registered handler applies hunter budget exactly once");
@@ -98,13 +99,15 @@ public final class CreatureCombatGameTest {
         h.assertTrue(damageEvent(hunter,hunter.damageSources().fellOutOfWorld(),1000).getAmount()==1000,"bypass damage remains intact");
         var arrow=EntityType.ARROW.create(h.getLevel());arrow.setOwner(p);
         h.assertTrue(damageEvent(hunter,p.damageSources().arrow(arrow,p),8).getAmount()==6,"player-owned projectiles use the same encounter rule");
-        h.assertTrue(hunter.getMaxHealth()==480,"hunter health stays fixed rather than following player upgrades");
+        h.assertTrue(hunter.getMaxHealth()==com.codex.blacklight.combat.HunterBalance.HEALTH*5,"hunter health stays fixed rather than following player upgrades");
         h.assertTrue(hunter.beginAttack(CreatureAttack.SLAM,cow),"hunter can target another mob");
         h.assertTrue(Math.abs(damageEvent(cow,cow.damageSources().mobAttack(hunter),14).getAmount()-22.4F)<.001,"hunter damage against other mobs is unchanged");
         hunter.setNoAi(true);
         float before=hunter.getHealth();
+        float expectedLoss=net.minecraft.world.damagesource.CombatRules.getDamageAfterAbsorb(6,hunter.getArmorValue(),
+                (float)hunter.getAttributeValue(net.minecraft.world.entity.ai.attributes.Attributes.ARMOR_TOUGHNESS))*5;
         hunter.hurt(playerAttack,8);
-        h.assertTrue(Math.abs(before-hunter.getHealth()-30)<.001,"real HP loss applies the duel modifier and infected units exactly once");
+        h.assertTrue(Math.abs(before-hunter.getHealth()-expectedLoss)<.001,"real HP loss applies the duel modifier, current armor and infected units exactly once");
         hunter.discard();h.succeed();
     }
     @GameTest(template="wall_test",timeoutTicks=100)
@@ -134,11 +137,11 @@ public final class CreatureCombatGameTest {
     public static void tacticalHopIsDirectionalRateLimitedWithBoundedInvulnerability(GameTestHelper h){
         floor(h);var p=FakePlayerFactory.get(h.getLevel(),new GameProfile(UUID.randomUUID(),"HopQA"));
         p.moveTo(h.absolutePos(new BlockPos(4,2,4)).getCenter());p.setOnGround(true);
-        var s=com.codex.blacklight.registry.ModAttachments.getData(p,ModAttachments.PLAYER_STATE);s.infect();s.setPrototypeMode(true);
-        var movement=com.codex.blacklight.registry.ModAttachments.getData(p,ModAttachments.MOVEMENT_STATE);movement.setCameraYaw(0);
+        var s=com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.PLAYER_STATE);s.infect();s.setPrototypeMode(true);
+        var movement=com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.MOVEMENT_STATE);movement.setCameraYaw(0);
         PrototypeMovementSystem.acceptInput(p,false,true,0,1,false,false);
         h.assertTrue(p.getDeltaMovement().x<-.5&&p.getDeltaMovement().y>0&&p.getDeltaMovement().y<.2,"dodge travels sideways with low rise, not vanilla jump height");
-        h.assertTrue(com.codex.blacklight.registry.ModAttachments.getData(p,ModAttachments.PLAYER_ACTION).clipId().equals("basic_dodge_roll"),"server publishes original dodge roll pose");
+        h.assertTrue(com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.PLAYER_ACTION).clipId().equals("basic_dodge_roll"),"server publishes original dodge roll pose");
         h.assertTrue(movement.hopInvulnerable()&&!p.getAbilities().invulnerable&&p.invulnerableTime==0,"hop uses a bounded window, not persistent invulnerability");
         h.assertTrue(incoming(p,p.damageSources().generic()).isCanceled(),"early hop cancels incoming damage on the registered event bus");
         h.assertTrue(!incoming(p,p.damageSources().fellOutOfWorld()).isCanceled(),"void damage still honors Minecraft bypass rules");

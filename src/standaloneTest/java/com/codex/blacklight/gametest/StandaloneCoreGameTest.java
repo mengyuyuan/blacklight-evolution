@@ -18,7 +18,6 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.common.util.FakePlayerFactory;
-import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.gametest.GameTestHolder;
 import net.minecraftforge.gametest.PrefixGameTestTemplate;
 
@@ -33,7 +32,7 @@ public final class StandaloneCoreGameTest {
         var profile=new GameProfile(UUID.randomUUID(),name);
         ServerPlayer p;
         if(damageable) {
-            // Forge FakePlayer is permanently invulnerable and its tick is a no-op.
+            // NeoForge FakePlayer is permanently invulnerable and its tick is a no-op.
             // Exercise the real ServerPlayer hurt pipeline, with networking isolated.
             p=new ServerPlayer(h.getLevel().getServer(),h.getLevel(),profile);
             // This fixture invokes no inbound movement or interaction handlers.
@@ -155,19 +154,19 @@ public final class StandaloneCoreGameTest {
         p.setDeltaMovement(Vec3.ZERO);p.knockback(2,1,0);
         h.assertTrue(p.getDeltaMovement().horizontalDistanceSqr()<.000001,"native capture super armor suppresses knockback");
         for(int tick=0;tick<ConsumeVisual.captureDuration(PowerForm.MUSCLE_MASS)+5;tick++) {
-            p.tickCount++;ConsumeSystem.tick(new TickEvent.PlayerTickEvent(TickEvent.Phase.END,p));
+            p.tickCount++;ConsumeSystem.tick(new net.minecraftforge.event.TickEvent.PlayerTickEvent(net.minecraftforge.event.TickEvent.Phase.END,p));
         }
         h.assertTrue(ConsumeSystem.holding(p)&&cow.isAlive(),"capture reaches holding without consuming automatically");
         int biomass=com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.PLAYER_STATE).getBiomass(),ep=com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.PLAYER_STATE).getEvolutionPoints();
         ConsumeSystem.consume(p);ConsumeSystem.consume(p);
         for(int tick=0;tick<ConsumeVisual.duration(PowerForm.MUSCLE_MASS)+2;tick++) {
-            p.tickCount++;ConsumeSystem.tick(new TickEvent.PlayerTickEvent(TickEvent.Phase.END,p));
+            p.tickCount++;ConsumeSystem.tick(new net.minecraftforge.event.TickEvent.PlayerTickEvent(net.minecraftforge.event.TickEvent.Phase.END,p));
         }
         h.assertTrue(cow.isRemoved()&&!com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.CONSUMING),"confirmed muscle consume completes and releases both actors");
         h.assertTrue(com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.PLAYER_STATE).getBiomass()>biomass
                 &&com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.PLAYER_STATE).getEvolutionPoints()>ep,"consume retains biomass and evolution rewards");
         int paid=com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.PLAYER_STATE).getEvolutionPoints();
-        ConsumeSystem.consume(p);ConsumeSystem.tick(new TickEvent.PlayerTickEvent(TickEvent.Phase.END,p));
+        ConsumeSystem.consume(p);ConsumeSystem.tick(new net.minecraftforge.event.TickEvent.PlayerTickEvent(net.minecraftforge.event.TickEvent.Phase.END,p));
         h.assertTrue(com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.PLAYER_STATE).getEvolutionPoints()==paid,"repeated confirmation cannot award twice");
         h.succeed();
     }

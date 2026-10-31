@@ -12,7 +12,6 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.util.FakePlayerFactory;
-import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.gametest.GameTestHolder;
 import net.minecraftforge.gametest.PrefixGameTestTemplate;
 import java.util.UUID;
@@ -34,7 +33,7 @@ public final class NativeChargeGameTest {
     }
 
     private static void tick(ServerPlayer p) {
-        p.tickCount++; WeaponCombatSystem.tick(new TickEvent.PlayerTickEvent(TickEvent.Phase.END,p));
+        p.tickCount++; WeaponCombatSystem.tick(new net.minecraftforge.event.TickEvent.PlayerTickEvent(net.minecraftforge.event.TickEvent.Phase.END,p));
     }
 
     private static int windup(LocalWeaponMotion.Definition d) {
@@ -94,7 +93,7 @@ public final class NativeChargeGameTest {
         h.assertTrue(com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.WEAPON_VISUAL).charging(),"fresh press works after cancellation");
         // Advance the authoritative input clock without supplying a keepalive. This
         // models a disconnected/stalled client before the next combat dispatch.
-        p.tickCount+=26;WeaponCombatSystem.tick(new TickEvent.PlayerTickEvent(TickEvent.Phase.END,p));
+        p.tickCount+=26;WeaponCombatSystem.tick(new net.minecraftforge.event.TickEvent.PlayerTickEvent(net.minecraftforge.event.TickEvent.Phase.END,p));
         h.assertTrue(!WeaponCombatSystem.busy(p),"stale held input cancels instead of firing after reconnect");
         WeaponCombatSystem.cancelHeldInput(p);WeaponCombatSystem.cancel(p);h.succeed();
     }

@@ -9,6 +9,6 @@ import net.minecraftforge.registries.DeferredRegister;
 public final class CityWorldgen {
     private static final DeferredRegister<Codec<? extends ChunkGenerator>> GENERATORS =
         DeferredRegister.create(Registries.CHUNK_GENERATOR, "blacklight");
-    static { GENERATORS.register("city", () -> CityChunkGenerator.CODEC); }
+    static { GENERATORS.register("city", () -> CityChunkGenerator.CODEC); GENERATORS.register("world",()->BlacklightWorldGenerator.CODEC); }
     public static void register(IEventBus bus) { GENERATORS.register(bus); }
 }

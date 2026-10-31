@@ -117,7 +117,8 @@ public final class DevastatorSystem {
         com.codex.blacklight.registry.ModAttachments.setData(p, ModAttachments.DEVASTATOR_VISUAL,new DevastatorVisual(kind(s.move),s.id,s.released,s.phase,s.target==null?-1:s.target.getId(),
                 s.origin.x,s.origin.y,s.origin.z,(float)s.direction.x,(float)s.direction.y,(float)s.direction.z,s.timing.radius(),s.timing.effectStart(),s.timing.effectEnd(),
                 Math.max(0,s.highest-(s.landed?s.origin.y:p.getY())),s.peakDown,
-                s.targets.stream().map(plan->new DevastatorVisual.Contact(plan.target().getId(),(float)plan.contact())).toList()));
+                s.targets.stream().map(plan->new DevastatorVisual.Contact(plan.target().getId(),(float)plan.contact())).toList(),
+                s.move==WeaponMove.BULLETDIVE_DROP&&!s.landed&&s.target!=null?s.target.position():null));
         com.codex.blacklight.registry.ModAttachments.syncData(p, ModAttachments.DEVASTATOR_VISUAL);
     }
     @SubscribeEvent public static void tick(PlayerTickEvent event){
@@ -182,7 +183,13 @@ public final class DevastatorSystem {
                 int falling=p.tickCount-s.phaseTick;
                 double down=s.move==WeaponMove.BULLETDIVE_DROP?BulletdivePhysics.downSpeed(falling):Math.min(5.0,.45+falling*.22);
                 s.peakDown=Math.max(s.peakDown,down);
-                var horizontal=s.move==WeaponMove.BULLETDIVE_DROP?p.getDeltaMovement().multiply(.65,0,.65):Vec3.ZERO;
+                Vec3 horizontal=Vec3.ZERO;
+                if(s.move==WeaponMove.BULLETDIVE_DROP){
+                    s.target=CombatTargeting.locked(p);
+                    var movement=com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.MOVEMENT_STATE);var input=movement.wallInput();
+                    horizontal=BulletdiveSteering.horizontal(p.position(),p.getDeltaMovement(),movement.cameraYaw(p.getYRot()),
+                            input.forward(),input.sideways(),s.target==null?null:s.target.position());
+                }
                 p.setDeltaMovement(horizontal.x,-down,horizontal.z);p.hurtMarked=true;
                 if(p.tickCount%2==0)publish(p,s);
                 return;
@@ -252,6 +259,26 @@ public final class DevastatorSystem {
     }
     private static void strike(ServerPlayer p,Session s,double age){
         int kind=kind(s.move);double radius=s.timing.radius();
+        // Mechanical hulls participate in the same finite damage window, never
+        // in living launch/grab reactions. Iterate loaded entities for very high dives.
+        var mechanicalTargets=new java.util.ArrayList<com.codex.blacklight.entity.MilitaryVehicle>();
+        for(var entity:p.serverLevel().getAllEntities())if(entity instanceof com.codex.blacklight.entity.MilitaryVehicle vehicle)mechanicalTargets.add(vehicle);
+        for(var vehicle:mechanicalTargets){
+            if(ACTIVE.get(p)!=s)return;
+            if(s.struck.contains(vehicle.getUUID())
+                    ||s.struck.size()>=s.timing.targets()||!ExplicitTarget.selectable(p,vehicle))continue;
+            var point=ExplicitTarget.closestPoint(kind==2?p.getEyePosition():s.origin,vehicle);
+            double distance=point.distanceTo(kind==2?p.getEyePosition():s.origin);if(distance>radius)continue;
+            if(!CombatTargeting.clearRay(p,p.getEyePosition(),point))continue;
+            if(kind==2){var delta=point.subtract(p.getEyePosition());double along=delta.dot(s.direction);
+                if(along<0||delta.subtract(s.direction.scale(along)).length()>1.25)continue;}
+            double contact=kind==2?s.timing.targetStart():s.timing.contactAt(distance);
+            if(age<contact||age>Math.min(s.timing.damageEnd(),contact+DevastatorCollision.targetDuration(s.move)))continue;
+            float damage=s.timing.damage();if(kind==3)damage=BulletdivePhysics.impactDamage(damage,s.highest-s.origin.y);
+            if(com.codex.blacklight.military.vehicle.VehicleDamageBridge.hurtSpecial(p,vehicle,damage)){
+                s.struck.add(vehicle.getUUID());s.hits++;com.codex.blacklight.firearms.GunplayEffects.metalContact(p,point,s.direction.scale(-1));
+            }
+        }
         for(var plan:s.targets){
             var target=plan.target();
             if(s.struck.size()>=s.timing.targets())break;
@@ -310,7 +337,7 @@ public final class DevastatorSystem {
     }
     private static boolean hurt(ServerPlayer p,LivingEntity target,float damage,boolean bulletdive,HitContext context){
         var prior=HIT_CONTEXT.get();HIT_CONTEXT.set(context);
-        try{return target.hurt(bulletdive?BulletdiveDamage.source(p):p.damageSources().playerAttack(p),damage);}
+        try{return bulletdive?target.hurt(BulletdiveDamage.source(p),damage):DevastatorDamage.hurt(p,target,damage);}
         finally{if(prior==null)HIT_CONTEXT.remove();else HIT_CONTEXT.set(prior);}
     }
     private static void directStrike(ServerPlayer p,Session s,double age){
@@ -340,7 +367,7 @@ public final class DevastatorSystem {
                 var delta=point.subtract(center).multiply(1,0,1);
                 if(track.arc()>0&&track.arc()<360&&delta.lengthSqr()>.000001
                         &&delta.normalize().dot(forward)<Math.cos(Math.toRadians(track.arc()/2)))continue;
-                float damage=track.damage()*.04F;
+                float damage=DevastatorDamage.secondary(track.damage());
                 if(hurt(p,target,damage,s.move==WeaponMove.BULLETDIVE_DROP,new HitContext("direct_"+track.sourceTrack(),track.sourceTrack(),
                         DevastatorCollision.activeStart(s.move,s.timing)+track.begin(),damage))){
                     struck.add(target.getUUID());s.hits++;CombatImpactEffects.target(p,target,s.move);

@@ -1,6 +1,7 @@
 package com.codex.blacklight.client;
 
 import com.codex.blacklight.combat.BulletdivePhysics;
+import com.codex.blacklight.combat.BulletdiveSteering;
 import com.codex.blacklight.combat.DevastatorSystem;
 import com.codex.blacklight.registry.ModAttachments;
 import net.minecraft.client.Minecraft;
@@ -49,8 +50,12 @@ public final class ClientDevastatorMovement {
             p.setDeltaMovement(motion.x*.25,p.onGround()?motion.y:Math.max(-.02,motion.y*.2),motion.z*.25);
         } else if(v.kind()==3&&v.phase()==DevastatorSystem.FLIGHT&&!p.onGround()) {
             double ticks=Math.max(0,(mc.level.getGameTime()-v.released())-Math.ceil(20D/6));
-            var motion=p.getDeltaMovement();
-            p.setDeltaMovement(motion.x*.65,-BulletdivePhysics.downSpeed(ticks),motion.z*.65);
+            var movement=com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.MOVEMENT_STATE);var input=movement.wallInput();
+            var target=mc.level.getEntity(v.targetId());
+            Vec3 aim=target!=null&&target.isAlive()?target.position():v.diveAim();
+            var horizontal=BulletdiveSteering.horizontal(p.position(),p.getDeltaMovement(),movement.cameraYaw(p.getYRot()),
+                    input.forward(),input.sideways(),aim);
+            p.setDeltaMovement(horizontal.x,-BulletdivePhysics.downSpeed(ticks),horizontal.z);
         } else if(v.phase()==DevastatorSystem.RELEASE&&(v.kind()==3||v.kind()==0&&!p.onGround())) {
             p.setDeltaMovement(0,p.onGround()?0:-.015,0);
         } else if(v.phase()==DevastatorSystem.LAND) {

@@ -22,24 +22,21 @@ import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.living.LivingHealEvent;
 import com.codex.blacklight.combat.ForgeDamageEvent;
-import net.minecraftforge.event.entity.living.LivingDamageEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
-import net.minecraftforge.event.TickEvent.PlayerTickEvent;
-
 /** Explicitly invoked disposable-server checks. Real server ticks advance grace and interval;
  * no world clock is changed and no synthetic damage/healing event replaces Player.hurt/heal.
  * Root should await the returned future before installing its next player fixture.
  */
 @EventBusSubscriber(modid="blacklight", value=Dist.CLIENT)
 public final class StandaloneCriticalMassChecks {
-    private static final Path QA=Path.of("D:/Blacklight-Standalone/run-forge-skills-qa").toAbsolutePath().normalize();
+    private static final Path QA=Path.of("D:/Blacklight-Standalone/run-native-qa").toAbsolutePath().normalize();
     private static final Map<ServerPlayer,Run> RUNS=new IdentityHashMap<>();
     private StandaloneCriticalMassChecks() { }
 
     public static CompletableFuture<JsonObject> run(ServerPlayer p) {
         if(!p.server.isSameThread())throw new IllegalStateException("Critical Mass checks require the server thread");
-        if(!p.server.getServerDirectory().toPath().toAbsolutePath().normalize().equals(QA)
+        if(!p.server.getServerDirectory().toAbsolutePath().normalize().equals(QA)
                 ||!p.server.getWorldPath(LevelResource.ROOT).toAbsolutePath().normalize()
                     .equals(QA.resolve("saves/Blacklight Standalone QA v4")))
             throw new IllegalStateException("Critical Mass checks refuse a non-disposable game directory/save");
@@ -50,8 +47,8 @@ public final class StandaloneCriticalMassChecks {
         return run.completion;
     }
     @SubscribeEvent(priority=EventPriority.LOWEST)
-    public static void tick(PlayerTickEvent event){if(event.phase!=net.minecraftforge.event.TickEvent.Phase.END)return;
-        if(!(event.player instanceof ServerPlayer p))return;
+    public static void tick(net.minecraftforge.event.TickEvent.PlayerTickEvent event){if(event.phase!=net.minecraftforge.event.TickEvent.Phase.END)return;
+        if(!(event.getEntity() instanceof ServerPlayer p))return;
         var run=RUNS.get(p);if(run==null)return;
         try { run.advance(); } catch(Throwable error) { run.finish(error); }
     }
@@ -67,6 +64,7 @@ public final class StandaloneCriticalMassChecks {
         final GameType originalMode;
         final int originalUtility, originalInvulnerableTime;
         final float originalHealth, originalAbsorption;
+        final double originalAbsorptionBase;
         final boolean originalInvulnerable;
         long began, surgeStarted, firstRelease;
         int stage;
@@ -76,6 +74,7 @@ public final class StandaloneCriticalMassChecks {
             originalMass=com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.CRITICAL_MASS);originalAdrenaline=com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.ADRENALINE);
             originalMode=p.gameMode.getGameModeForPlayer();originalUtility=com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.UTILITY_POWERS);
             originalHealth=p.getHealth();originalAbsorption=p.getAbsorptionAmount();
+            originalAbsorptionBase=p.getAttribute(Attributes.MAX_ABSORPTION).getBaseValue();
             originalInvulnerable=p.isInvulnerable();originalInvulnerableTime=p.invulnerableTime;
         }
         long now(){return p.level().getGameTime();}
@@ -150,16 +149,17 @@ public final class StandaloneCriticalMassChecks {
             record("damage_crossing_reserve_charges_only_remainder");
 
             com.codex.blacklight.registry.ModAttachments.setData(p, ModAttachments.CRITICAL_MASS,new CriticalMassState(1,true));
+            p.getAttribute(Attributes.MAX_ABSORPTION).setBaseValue(Math.max(originalAbsorptionBase,2/units));
             p.setAbsorptionAmount(2);
             float golden=p.getAbsorptionAmount();health=p.getHealth();hurt(.2F);
             require(golden>0,"golden absorption fixture has no actual absorption");
             near(p.getHealth(),health,"reserve and golden absorption reduced health");
-            require(p.getAbsorptionAmount()<golden,"Forge golden absorption stage was bypassed");
-            p.setAbsorptionAmount(0);record("forge_golden_absorption_precedes_reserve");
+            near(p.getAbsorptionAmount(),golden,"reserve protection stole golden absorption");
+            p.setAbsorptionAmount(0);record("reserve_protection_preserves_golden_absorption");
 
             com.codex.blacklight.registry.ModAttachments.setData(p, ModAttachments.CRITICAL_MASS,new CriticalMassState(1,true));
-            Consumer<LivingDamageEvent> zero=e->{if(e.getEntity()==p)e.setAmount(0);};
-            MinecraftForge.EVENT_BUS.addListener(EventPriority.LOWEST,false,LivingDamageEvent.class,zero);
+            Consumer<LivingDamageEvent.Pre> zero=e->{if(e.getEntity()==p)e.setNewDamage(0);};
+            MinecraftForge.EVENT_BUS.addListener(EventPriority.LOWEST,LivingDamageEvent.Pre.class,zero);
             try { hurt(.2F); } finally { MinecraftForge.EVENT_BUS.unregister(zero); }
             near(mass().reserve(),1,"late zero-damage decision consumed reserve");
             record("late_pre_zero_damage_does_not_consume_reserve");
@@ -213,8 +213,8 @@ public final class StandaloneCriticalMassChecks {
                 com.codex.blacklight.registry.ModAttachments.setData(p, ModAttachments.ADRENALINE,new AdrenalineState(now+100,now+36,true));
                 MinecraftForge.EVENT_BUS.post(new PlayerEvent.PlayerChangedDimensionEvent(p,p.level().dimension(),p.level().dimension()));
                 require(adrenaline().equals(AdrenalineState.EMPTY),"dimension event retained the transient lease");
-                var encoded=CriticalMassState.CODEC.encodeStart(JsonOps.INSTANCE,mass()).getOrThrow(false,message->{throw new IllegalStateException(message);});
-                com.codex.blacklight.registry.ModAttachments.setData(p, ModAttachments.CRITICAL_MASS,CriticalMassState.CODEC.parse(JsonOps.INSTANCE,encoded).getOrThrow(false,message->{throw new IllegalStateException(message);}));
+                var encoded=CriticalMassState.CODEC.encodeStart(JsonOps.INSTANCE,mass()).getOrThrow(false, message -> { throw new AssertionError(message); });
+                com.codex.blacklight.registry.ModAttachments.setData(p, ModAttachments.CRITICAL_MASS,CriticalMassState.CODEC.parse(JsonOps.INSTANCE,encoded).getOrThrow(false, message -> { throw new AssertionError(message); }));
                 require(mass().lastAdrenalineDevastatorAt()==firstRelease,"save/load erased free-release history");
                 p.setHealth(p.getMaxHealth()*.6F);
                 record("lifecycle_and_codec_keep_interval_but_clear_lease");
@@ -274,6 +274,7 @@ public final class StandaloneCriticalMassChecks {
                 com.codex.blacklight.registry.ModAttachments.setData(p, ModAttachments.ADRENALINE,originalAdrenaline);com.codex.blacklight.registry.ModAttachments.syncData(p, ModAttachments.ADRENALINE);
                 com.codex.blacklight.registry.ModAttachments.setData(p, ModAttachments.UTILITY_POWERS,originalUtility);com.codex.blacklight.registry.ModAttachments.syncData(p, ModAttachments.UTILITY_POWERS);
                 p.setGameMode(originalMode);GrowthSystem.updateHealth(p);
+                p.getAttribute(Attributes.MAX_ABSORPTION).setBaseValue(originalAbsorptionBase);
                 p.setHealth(Math.max(1,Math.min(p.getMaxHealth(),originalHealth)));p.setAbsorptionAmount(originalAbsorption);
                 p.setInvulnerable(originalInvulnerable);p.invulnerableTime=originalInvulnerableTime;
             } catch(Throwable restoreError) { report.addProperty("passed",false);report.addProperty("restoreError",restoreError.toString()); }

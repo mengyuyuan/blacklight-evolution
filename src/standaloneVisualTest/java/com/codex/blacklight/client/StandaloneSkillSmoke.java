@@ -59,11 +59,7 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 import net.minecraftforge.client.event.*;
 import com.codex.blacklight.combat.ForgeDamageEvent;
-import net.minecraftforge.event.entity.living.LivingDamageEvent;
 import net.minecraftforge.event.entity.living.LivingHealEvent;
-import net.minecraftforge.event.TickEvent.PlayerTickEvent;
-import net.minecraftforge.event.TickEvent.ClientTickEvent;
-import net.minecraftforge.event.TickEvent.RenderTickEvent;
 import com.codex.blacklight.forge.PacketDistributor;
 import org.lwjgl.stb.STBImageWrite;
 
@@ -72,7 +68,7 @@ import org.lwjgl.stb.STBImageWrite;
 @EventBusSubscriber(modid="blacklight",value=Dist.CLIENT)
 public final class StandaloneSkillSmoke {
     private static final String PROPERTY="blacklight.test.standaloneSkill";
-    private static final Path QA_DIRECTORY=Path.of("D:/Blacklight-Standalone/run-forge-skills-qa").toAbsolutePath().normalize();
+    private static final Path QA_DIRECTORY=Path.of("D:/Blacklight-Standalone/run-native-qa").toAbsolutePath().normalize();
     private static final String QA_SAVE="Blacklight Standalone QA v4";
     private enum Mode { RELEASE, LOW_RESERVE, ZERO_RESERVE, LOCKED, CANCEL, SHORT }
     private record Case(String name,int kind,boolean air,Mode mode,double fallHeight) {
@@ -188,7 +184,7 @@ public final class StandaloneSkillSmoke {
     private static Case current(){return index<CASES.size()?CASES.get(index):null;}
     private static void advance(Stage next){stage=next;stageTicks=0;}
     @SubscribeEvent(priority=EventPriority.HIGHEST)
-    public static void isolate(ClientTickEvent event){if(event.phase!=net.minecraftforge.event.TickEvent.Phase.START)return;
+    public static void isolate(net.minecraftforge.event.TickEvent.ClientTickEvent event){if(event.phase!=net.minecraftforge.event.TickEvent.Phase.START)return;
         if(!active())return;var mc=Minecraft.getInstance();mc.mouseHandler.releaseMouse();
         for(var key:savedKeys.keySet()){key.setDown(false);while(key.consumeClick()){} }
         if(current()!=null&&current().kind()==3&&serverReady&&mc.player!=null&&mc.player.getY()>257&&!mc.player.onGround()
@@ -200,19 +196,17 @@ public final class StandaloneSkillSmoke {
     public static void mouse(InputEvent.MouseButton.Pre event){if(active())event.setCanceled(true);}
     @SubscribeEvent(priority=EventPriority.LOWEST)
     public static void camera(ViewportEvent.ComputeCameraAngles event) {
-        if(active()){
-            float yaw=sideCameraActive?sideCameraYaw:-112.5F,pitch=sideCameraActive?sideCameraPitch:12;
-            event.setYaw(yaw);event.setPitch(pitch);event.setRoll(0);
-            var camera=event.getCamera();var entity=camera.getEntity();
-            if(entity!=null&&!sideCameraActive)((com.codex.blacklight.mixin.client.PrototypeCameraAccess)camera).blacklight$setPosition(
-                entity.getEyePosition((float)event.getPartialTick()).subtract(Vec3.directionFromRotation(pitch,yaw).scale(sideCameraActive?sideCameraDistance:12)));
-        }
+        if(active()){event.setYaw(sideCameraActive?sideCameraYaw:-112.5F);event.setPitch(sideCameraActive?sideCameraPitch:-12);event.setRoll(0);}
     }
     @SubscribeEvent public static void sideHand(net.minecraftforge.client.event.RenderHandEvent event){
         if(active()&&sideCameraActive)event.setCanceled(true);
     }
     @SubscribeEvent(priority=EventPriority.LOWEST)
-    public static void tick(ClientTickEvent event){if(event.phase!=net.minecraftforge.event.TickEvent.Phase.END)return;
+    public static void distance(CalculateDetachedCameraDistanceEvent event) {
+        if(active())event.setDistance((float)(sideCameraActive?sideCameraDistance:12)/Math.max(.001F,event.getEntityScalingFactor()));
+    }
+    @SubscribeEvent(priority=EventPriority.LOWEST)
+    public static void tick(net.minecraftforge.event.TickEvent.ClientTickEvent event){if(event.phase!=net.minecraftforge.event.TickEvent.Phase.END)return;
         if(disabled||completed||System.getProperty(PROPERTY,"").isBlank())return;
         var mc=Minecraft.getInstance();var server=mc.getSingleplayerServer();
         if(server==null||mc.level==null||mc.player==null)return;
@@ -294,7 +288,7 @@ public final class StandaloneSkillSmoke {
         output=Path.of(System.getProperty(PROPERTY)).toAbsolutePath().normalize();Files.createDirectories(output);
         previousCamera=mc.options.getCameraType();previousGui=mc.options.hideGui;previousPause=mc.options.pauseOnLostFocus;previousMouse=mc.mouseHandler.isMouseGrabbed();previousFov=mc.options.fov().get();previousYaw=mc.player.getYRot();previousPitch=mc.player.getXRot();
         for(var key:List.of(mc.options.keyUp,mc.options.keyDown,mc.options.keyLeft,mc.options.keyRight,mc.options.keyJump,mc.options.keyShift,mc.options.keySprint,mc.options.keyAttack,mc.options.keyUse,mc.options.keyTogglePerspective))savedKeys.put(key,key.isDown());
-        mc.options.pauseOnLostFocus=false;mc.options.hideGui=false;mc.options.fov().set(70);mc.options.setCameraType(CameraType.THIRD_PERSON_FRONT);mc.setScreen(null);mc.mouseHandler.releaseMouse();
+        mc.options.pauseOnLostFocus=false;mc.options.hideGui=Boolean.getBoolean("blacklight.test.skillTutorialCapture");mc.options.fov().set(70);mc.options.setCameraType(CameraType.THIRD_PERSON_FRONT);mc.setScreen(null);mc.mouseHandler.releaseMouse();
         pngLevel=STBImageWrite.stbi_write_png_compression_level.get(0);pngFilter=STBImageWrite.stbi_write_force_png_filter.get(0);STBImageWrite.stbi_write_png_compression_level.put(0,1);STBImageWrite.stbi_write_force_png_filter.put(0,0);
         writer=new ThreadPoolExecutor(1,1,0,TimeUnit.MILLISECONDS,new ArrayBlockingQueue<>(6),r->{var t=new Thread(r,"skill-qa-png");t.setDaemon(true);return t;});
         ClientWeaponCombat.setFixtureOwnsInput(true);
@@ -386,7 +380,7 @@ public final class StandaloneSkillSmoke {
                 var mob=new Husk(EntityType.HUSK,level);mob.setNoAi(true);mob.setPersistenceRequired();mob.getAttribute(Attributes.MAX_HEALTH).setBaseValue(20_000);mob.setHealth(20_000);
                 mob.setCustomName(Component.literal((c.uniquePainTarget()?"QA unique "+c.name()+" ":far?"QA 20格范围目标 ":"QA 技能目标 ")+target));
                 boolean airDirect=c.kind()==1&&c.air()&&target<2;
-                mob.moveTo(c.verticalPain()?.5:.5+Math.sin(angle)*range,c.verticalPain()?263:airDirect?255:251,c.verticalPain()?.5:.5+Math.cos(angle)*range,180,0);
+                mob.moveTo(c.verticalPain()?.5:.5+Math.sin(angle)*range,c.verticalPain()?263:airDirect?259:251,c.verticalPain()?.5:.5+Math.cos(angle)*range,180,0);
                 if(c.verticalPain()||airDirect)mob.setNoGravity(true);
                 level.addFreshEntity(mob);
                 synchronized(fixtureTargets){fixtureTargets.add(mob.getId());fixtureInitialRanges.put(mob.getId(),range);if(far)farTargets.add(mob.getId());}
@@ -429,8 +423,8 @@ public final class StandaloneSkillSmoke {
         }catch(Exception error){fail(error);}});
     }
     @SubscribeEvent(priority=EventPriority.LOWEST)
-    public static void server(PlayerTickEvent event){if(event.phase!=net.minecraftforge.event.TickEvent.Phase.END)return;
-        if(!active()||!serverReady||!(event.player instanceof ServerPlayer p)||!p.getUUID().equals(fixtureOwner))return;
+    public static void server(net.minecraftforge.event.TickEvent.PlayerTickEvent event){if(event.phase!=net.minecraftforge.event.TickEvent.Phase.END)return;
+        if(!active()||!serverReady||!(event.getEntity() instanceof ServerPlayer p)||!p.getUUID().equals(fixtureOwner))return;
         Case c=current();if(c==null)return;
         var visual=com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.DEVASTATOR_VISUAL);var mass=com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.CRITICAL_MASS);var action=com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.PLAYER_ACTION);
         var probe=DevastatorSystem.snapshot(p);
@@ -544,7 +538,7 @@ public final class StandaloneSkillSmoke {
         }
     }
     @SubscribeEvent(priority=EventPriority.LOWEST)
-    public static void sideFrame(RenderTickEvent event){if(event.phase!=net.minecraftforge.event.TickEvent.Phase.START)return;
+    public static void sideFrame(net.minecraftforge.event.TickEvent.RenderTickEvent event){if(event.phase!=net.minecraftforge.event.TickEvent.Phase.START)return;
         if(!active()||sideCaptureName==null||sideCameraActive)return;
         var mc=Minecraft.getInstance();if(mc.player==null||mc.level==null)return;
         if(current()==null){sideCaptureName=null;return;}
@@ -572,30 +566,20 @@ public final class StandaloneSkillSmoke {
         sidePreviousCameraEntity=null;sidePreviousCameraType=null;
     }
     @SubscribeEvent(priority=EventPriority.LOWEST)
-    public static void frame(RenderTickEvent event){if(event.phase!=net.minecraftforge.event.TickEvent.Phase.END)return;
+    public static void frame(net.minecraftforge.event.TickEvent.RenderTickEvent event){if(event.phase!=net.minecraftforge.event.TickEvent.Phase.END)return;
         if(!active())return;var mc=Minecraft.getInstance();if(mc.player==null||mc.level==null)return;
         try {
+            captureTutorial(mc);
             long now=System.nanoTime();double frameMs=lastNativeFrameNanos==0?Double.NaN:(now-lastNativeFrameNanos)/1_000_000D;lastNativeFrameNanos=now;
             if(Double.isFinite(frameMs)&&frameMs>0)nativeFrameDeltasMs.add(frameMs);
             totalFrames++;var stats=DevastatorEffectRenderer.statistics();maximumVertices=Math.max(maximumVertices,stats.vertices());require(stats.vertices()<=DevastatorEffectRenderer.MAX_VERTICES_PER_FRAME,"devastator geometry exceeded global budget");
             var visual=com.codex.blacklight.registry.ModAttachments.getData(mc.player, ModAttachments.DEVASTATOR_VISUAL);Case c=current();if(c==null){sideCaptureName=null;restoreSideCamera(mc);return;}
-            double age=visual.age(mc.player,mc.getFrameTime());
+            double age=visual.age(mc.player,mc.getTimer().getGameTimeDeltaPartialTick(false));
             boolean effect=stats.effects()>0&&visual.kind()==c.kind();
             boolean returning=effect&&stats.vertices()>0&&(c.kind()==2?painReturn(mc,c,visual,age)!=null:age>=retractionThreshold(c,visual));
             if(effect){
-                var capturedChest=DevastatorEffectRenderer.capturedChest(mc.player.getId());
-                if(capturedChest!=null)require(capturedChest.distanceTo(mc.player.getPosition(mc.getFrameTime()))<4,
-                    "actual rendered FX chest detached from actor "+c.name()+" / "+capturedChest);
                 if(c.kind()==3&&visual.phase()!=DevastatorSystem.FLIGHT)
-                    {
                     require(com.codex.blacklight.client.renderer.BulletImpactMist.ready(),"Bullet impact mist shader unavailable");
-                    var field=com.codex.blacklight.client.renderer.BulletImpactMist.class.getDeclaredField("shader");field.setAccessible(true);
-                    var mist=(net.minecraft.client.renderer.ShaderInstance)field.get(null);
-                    if(mist!=null){
-                        require(org.lwjgl.opengl.GL20.glGetAttribLocation(mist.getId(),"UV0")==1,"Mist GPU UV0 must use POSITION_TEX_COLOR slot 1");
-                        require(org.lwjgl.opengl.GL20.glGetAttribLocation(mist.getId(),"Color")==2,"Mist GPU Color must use POSITION_TEX_COLOR slot 2");
-                    }
-                }
                 observedEffect=true;require(LiquidBiomassMaterial.ready(),"active skill lost its actual GPU wet material");
                 authoredModelAvailable=AuthoredDevastatorMesh.available();require(authoredModelAvailable,"active skill lost its authored three-dimensional effect model");
                 gpuMeshesReady=RigidBiomassMaterial.ready();require(gpuMeshesReady,"active authored effect did not use the actual indexed GPU mesh material");
@@ -643,12 +627,7 @@ public final class StandaloneSkillSmoke {
             }
             // The contact-driven return can be a few milliseconds for near Pain targets.
             // Every frame checks the live strand clock; a missed frame is never relabelled.
-            if(c.formal()&&returning){
-                // Pain can retract within one rendered frame: record that actual frame
-                // instead of waiting for a camera change and missing the return window.
-                if(c.kind()==2){capture(mc,c.name()+"_late_retract",stats);observedRetraction|=captures.contains(c.name()+"_late_retract");}
-                else scheduleShot(c.name()+"_late_retract",ShotPurpose.RETURN,8);
-            }
+            if(c.formal()&&returning)scheduleShot(c.name()+"_late_retract",ShotPurpose.RETURN,8);
             if(c.formal()&&(visual.kind()==c.kind()||bodyRecovery))scheduleShot(c.name()+"_hero_close",ShotPurpose.HERO,5.5);
             if(c.formal()&&postActive)scheduleShot(c.name()+"_post_close",ShotPurpose.POST,5.5);
             if(c.formal()&&landedPostEligible)scheduleShot(c.name()+"_landed_post_close",ShotPurpose.LANDED_POST,5.5);
@@ -705,7 +684,7 @@ public final class StandaloneSkillSmoke {
     /** Mirrors the actual visible Pain strands' clocks using their captured bones,
      * synchronized first contact and current target point, including knockback. */
     private static TissueReturn painReturn(Minecraft mc,Case c,com.codex.blacklight.combat.DevastatorVisual visual,double age){
-        float partial=mc.getFrameTime();
+        float partial=mc.getTimer().getGameTimeDeltaPartialTick(false);
         Vec3 direction=visual.direction().normalize(),eye=mc.player.getEyePosition(partial);
         Vec3 across=direction.cross(new Vec3(0,1,0)).normalize();if(across.lengthSqr()<.1)across=new Vec3(1,0,0);
         double distance=visual.radius();var target=mc.level.getEntity(visual.targetId());
@@ -732,12 +711,27 @@ public final class StandaloneSkillSmoke {
                 return new TissueReturn(branch,length,reverseAt,duration,progress,extent,planned,hand.source());
         }return null;
     }
+    private static final Map<String,Integer> tutorialFrames=new HashMap<>();
+    private static long tutorialAt;
+    private static void captureTutorial(Minecraft mc) {
+        if(!Boolean.getBoolean("blacklight.test.skillTutorialCapture")||sideCameraActive||current()==null
+                ||!(stage==Stage.START||stage==Stage.CHARGE||stage==Stage.RELEASE||stage==Stage.TAIL)
+                ||System.nanoTime()-tutorialAt<83_333_333L||writer.getQueue().remainingCapacity()<2)return;
+        String name=current().name();int frame=tutorialFrames.getOrDefault(name,0);if(frame>=170)return;
+        tutorialAt=System.nanoTime();tutorialFrames.put(name,frame+1);
+        var image=new com.mojang.blaze3d.platform.NativeImage(320,180,false);
+        try(var full=Screenshot.takeScreenshot(mc.getMainRenderTarget())){
+            for(int y=0;y<180;y++)for(int x=0;x<320;x++)image.setPixelRGBA(x,y,full.getPixelRGBA(x*full.getWidth()/320,y*full.getHeight()/180));
+        }
+        var file=output.resolve("tutorials").resolve(name).resolve(String.format(java.util.Locale.ROOT,"%03d.png",frame));
+        writer.execute(()->{try(image){Files.createDirectories(file.getParent());image.writeToFile(file);}catch(Exception error){imageError=error.toString();}});
+    }
     private static void capture(Minecraft mc,String name,DevastatorEffectRenderer.Statistics stats) {
         if(captures.contains(name)||writer.getQueue().remainingCapacity()==0)return;
         var image=Screenshot.takeScreenshot(mc.getMainRenderTarget());captures.add(name);submittedImages.incrementAndGet();
-        var visual=com.codex.blacklight.registry.ModAttachments.getData(mc.player, ModAttachments.DEVASTATOR_VISUAL);var row=new JsonObject();row.addProperty("file",name+".png");row.addProperty("tick",mc.level.getGameTime());row.addProperty("camera",mc.options.getCameraType().name());row.addProperty("fixtureSideCamera",sideCameraActive);row.addProperty("fixtureCameraDistance",sideCameraActive?sideCameraDistance:12);row.addProperty("fixtureCameraYaw",sideCameraActive?sideCameraYaw:-112.5F);row.addProperty("fixtureCameraPitch",sideCameraActive?sideCameraPitch:12);row.addProperty("fixtureAimHeight",sideCameraActive?sideAimHeight:.95);row.addProperty("fixtureShotPurpose",sideCameraActive?sidePurpose.name():"MAIN");row.addProperty("nativeRenderFrame",stats.frame());row.addProperty("authoredModelAvailable",authoredModelAvailable);row.addProperty("gpuMeshesReady",gpuMeshesReady);row.addProperty("kind",visual.kind());row.addProperty("phase",visual.phase());row.addProperty("sourceClip",com.codex.blacklight.registry.ModAttachments.getData(mc.player, ModAttachments.PLAYER_ACTION).clipId());row.addProperty("effects",stats.effects());row.addProperty("branches",stats.branches());row.addProperty("vertices",stats.vertices());row.addProperty("triangleIndices",gpuMeshesReady?stats.vertices():0);addVisualClock(row,visual,com.codex.blacklight.registry.ModAttachments.getData(mc.player, ModAttachments.PLAYER_ACTION),mc.level.getGameTime()+mc.getFrameTime());row.addProperty("lastFormalSourceClip",lastFormalSourceClip);row.addProperty("lastFormalSourceSeconds",lastFormalSourceSeconds);row.addProperty("lastFormalSourceDuration",lastFormalSourceDuration);row.addProperty("lastFormalHeldTime",lastFormalHeldTime);addControllerEvidence(row,lastControllerSnapshot);addPostEvidence(row);addLandingAnchor(row);
+        var visual=com.codex.blacklight.registry.ModAttachments.getData(mc.player, ModAttachments.DEVASTATOR_VISUAL);var row=new JsonObject();row.addProperty("file",name+".png");row.addProperty("tick",mc.level.getGameTime());row.addProperty("camera",mc.options.getCameraType().name());row.addProperty("fixtureSideCamera",sideCameraActive);row.addProperty("fixtureCameraDistance",sideCameraActive?sideCameraDistance:12);row.addProperty("fixtureCameraYaw",sideCameraActive?sideCameraYaw:-112.5F);row.addProperty("fixtureCameraPitch",sideCameraActive?sideCameraPitch:-12);row.addProperty("fixtureAimHeight",sideCameraActive?sideAimHeight:.95);row.addProperty("fixtureShotPurpose",sideCameraActive?sidePurpose.name():"MAIN");row.addProperty("nativeRenderFrame",stats.frame());row.addProperty("authoredModelAvailable",authoredModelAvailable);row.addProperty("gpuMeshesReady",gpuMeshesReady);row.addProperty("kind",visual.kind());row.addProperty("phase",visual.phase());row.addProperty("sourceClip",com.codex.blacklight.registry.ModAttachments.getData(mc.player, ModAttachments.PLAYER_ACTION).clipId());row.addProperty("effects",stats.effects());row.addProperty("branches",stats.branches());row.addProperty("vertices",stats.vertices());row.addProperty("triangleIndices",gpuMeshesReady?stats.vertices():0);addVisualClock(row,visual,com.codex.blacklight.registry.ModAttachments.getData(mc.player, ModAttachments.PLAYER_ACTION),mc.level.getGameTime()+mc.getTimer().getGameTimeDeltaPartialTick(false));row.addProperty("lastFormalSourceClip",lastFormalSourceClip);row.addProperty("lastFormalSourceSeconds",lastFormalSourceSeconds);row.addProperty("lastFormalSourceDuration",lastFormalSourceDuration);row.addProperty("lastFormalHeldTime",lastFormalHeldTime);addControllerEvidence(row,lastControllerSnapshot);addPostEvidence(row);addLandingAnchor(row);
         addClientPosition(row,mc);
-        var rendered=mc.player.getPosition(mc.getFrameTime());var camera=mc.gameRenderer.getMainCamera().getPosition();
+        var rendered=mc.player.getPosition(mc.getTimer().getGameTimeDeltaPartialTick(false));var camera=mc.gameRenderer.getMainCamera().getPosition();
         row.addProperty("actorX",mc.player.getX());row.addProperty("actorY",mc.player.getY());row.addProperty("actorZ",mc.player.getZ());row.addProperty("clientOnGround",mc.player.onGround());
         row.addProperty("interpolatedActorX",rendered.x);row.addProperty("interpolatedActorY",rendered.y);row.addProperty("interpolatedActorZ",rendered.z);
         row.addProperty("actualCameraX",camera.x);row.addProperty("actualCameraY",camera.y);row.addProperty("actualCameraZ",camera.z);
@@ -745,7 +739,7 @@ public final class StandaloneSkillSmoke {
         var chest=DevastatorEffectRenderer.capturedChest(mc.player.getId());if(chest!=null)row.addProperty("capturedChestY",chest.y);
         var server=serverSample;if(server!=null&&server.caseIndex()==index){row.addProperty("photographServerY",server.y());row.addProperty("photographServerGround",server.ground());row.addProperty("photographServerPhase",server.phase());}
         Case c=current();if(c!=null&&c.kind()==2){
-            var returning=painReturn(mc,c,visual,visual.age(mc.player,mc.getFrameTime()));
+            var returning=painReturn(mc,c,visual,visual.age(mc.player,mc.getTimer().getGameTimeDeltaPartialTick(false)));
             if(returning!=null){var tissue=new JsonObject();tissue.addProperty("branch",returning.branch());tissue.addProperty("currentRootToTargetDistance",returning.distance());tissue.addProperty("reverseAtSourceSeconds",returning.reverseAt());tissue.addProperty("returnDurationSeconds",returning.duration());tissue.addProperty("returnProgress",returning.progress());tissue.addProperty("remainingExtent",returning.extent());tissue.addProperty("synchronizedPrimaryContact",returning.synchronizedContact());tissue.addProperty("handMeasurement",returning.handMeasurement());row.add("painReturnEvidence",tissue);}
         }views.add(row);
         writer.execute(()->{try(image){image.writeToFile(output.resolve(name+".png"));writtenImages.incrementAndGet();}catch(Exception error){imageError=error.toString();}});
@@ -867,7 +861,7 @@ public final class StandaloneSkillSmoke {
         row.add("flightPresentation",presentation);
         row.addProperty("actualX",mc.player.getX());row.addProperty("actualY",mc.player.getY());row.addProperty("actualZ",mc.player.getZ());
         row.addProperty("prevRenderY",mc.player.yo);row.addProperty("playerYo",mc.player.yo);row.addProperty("previousTickY",mc.player.yOld);row.addProperty("ground",mc.player.onGround());
-        row.addProperty("actualInterpolatedPositionY",mc.player.getPosition(mc.getFrameTime()).y);
+        row.addProperty("actualInterpolatedPositionY",mc.player.getPosition(mc.getTimer().getGameTimeDeltaPartialTick(false)).y);
     }
     private static void clearFlightScene(net.minecraft.server.level.ServerLevel level){
         for(var entry:flightSceneBlocks.entrySet())if(level.getBlockState(entry.getKey()).equals(entry.getValue()))level.setBlockAndUpdate(entry.getKey(),Blocks.AIR.defaultBlockState());

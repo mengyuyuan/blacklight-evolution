@@ -35,6 +35,10 @@
     "minecraft:ocelot",
     "minecraft:camel",
     "minecraft:sniffer",
+    {
+      "id": "minecraft:armadillo",
+      "required": false
+    },
     "minecraft:zombie",
     "minecraft:husk",
     "minecraft:drowned",

@@ -34,7 +34,7 @@ final class SourceCameraOrbit {
     }
     void position(Vec3 position){ideal=position;}
     Pose update(LocalPlayer player,String state,Vec3 anchor,double distance,double elevation,
-                LivingEntity target,double dt) {
+                net.minecraft.world.entity.Entity target,double dt) {
         String next=state.startsWith("Ground")?"Ground":state.startsWith("Jump")?"Jump":
                 state.startsWith("WallRun")?"Wall":state;
         if(!next.equals(mode)) {
@@ -112,7 +112,7 @@ final class SourceCameraOrbit {
                         pitch=Mth.clamp(pitch+inputPitch,-80,80);
                         wantedYaw=yaw;wantedPitch=pitch;
                     }
-                    Vec3 center=com.codex.blacklight.combat.CombatTargeting.multipart(target)
+                    Vec3 center=target instanceof LivingEntity living&&com.codex.blacklight.combat.CombatTargeting.multipart(living)
                             ?com.codex.blacklight.client.ClientTargetLock.focusPoint(target)
                             :target.position().add(0,target.getBbHeight()*.5,0);
                     Vec3 delta=center.subtract(anchor);

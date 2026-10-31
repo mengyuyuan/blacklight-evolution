@@ -83,6 +83,7 @@ public final class PowerWheelScreen extends Screen {
         onClose();
     }
     @Override public boolean mouseScrolled(double x,double y,double vertical){if(vertical==0)return false;scrollSelection=true;selected=Math.floorMod(selected+(vertical>0?-1:1),PowerWheel.size(utility));return true;}
+    @Override public void mouseMoved(double x,double y){if(!scrollSelection)super.mouseMoved(x,y);}
     @Override public boolean keyPressed(int key,int scan,int mods){if(key==org.lwjgl.glfw.GLFW.GLFW_KEY_TAB){utility=!utility;selected=-1;return true;}return super.keyPressed(key,scan,mods);}
     @Override public boolean keyReleased(int key,int scan,int mods){if(binding.matches(key,scan)){confirm();return true;}return super.keyReleased(key,scan,mods);}
     @Override public boolean mouseReleased(double x,double y,int button){if(binding.matchesMouse(button)){confirm();return true;}return super.mouseReleased(x,y,button);}

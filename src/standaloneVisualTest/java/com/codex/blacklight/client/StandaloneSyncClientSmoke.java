@@ -23,8 +23,8 @@ import com.codex.blacklight.forge.PacketDistributor;
 @EventBusSubscriber(modid="blacklight",value=Dist.CLIENT)
 public final class StandaloneSyncClientSmoke {
     private static final String PROPERTY="blacklight.test.standaloneSync";
-    private static final Path CLIENT=Path.of("D:/Blacklight-Standalone/run-sync-client-qa").toAbsolutePath().normalize();
-    private static final Path OUTPUT=Path.of("D:/Blacklight-Standalone/sync-dev10-native").toAbsolutePath().normalize();
+    private static final Path CLIENT=Path.of(System.getProperty("blacklight.test.qaDirectory","D:/Blacklight-Standalone/run-sync-client-qa")).toAbsolutePath().normalize();
+    private static final Path OUTPUT=Path.of(System.getProperty(PROPERTY,"D:/Blacklight-Standalone/sync-dev10-native")).toAbsolutePath().normalize();
     private static final JsonArray requests=new JsonArray(),samples=new JsonArray(),settingsAcks=new JsonArray();
     private static final Map<Integer,Set<Integer>> phases=new HashMap<>();
     private static final Map<Integer,Long> sessions=new HashMap<>();
@@ -39,10 +39,12 @@ public final class StandaloneSyncClientSmoke {
     private static String stage="CONNECTING",error;
     private static JsonObject serverReport;
     private static boolean specialSent,releaseSent;
+    private static final long connectionBegan=System.nanoTime();
+    private static String lastScreen="";
     private StandaloneSyncClientSmoke(){}
 
     @SubscribeEvent(priority=EventPriority.HIGHEST)
-    public static void input(ClientTickEvent event){if(event.phase!=net.minecraftforge.event.TickEvent.Phase.START)return;
+    public static void input(net.minecraftforge.event.TickEvent.ClientTickEvent event){if(event.phase!=net.minecraftforge.event.TickEvent.Phase.START)return;
         if(!initialized||completed||failed)return;var mc=Minecraft.getInstance();
         mc.mouseHandler.releaseMouse();mc.options.keyUp.setDown(false);mc.options.keyDown.setDown(false);mc.options.keyLeft.setDown(false);mc.options.keyRight.setDown(false);mc.options.keySprint.setDown(false);mc.options.keyShift.setDown(false);mc.options.keyAttack.setDown(false);mc.options.keyUse.setDown(false);
         boolean preparing=stage.equals("OFF_READY")||stage.equals("ON_READY");
@@ -50,8 +52,29 @@ public final class StandaloneSyncClientSmoke {
         mc.options.keyJump.setDown(preparing&&(visual==null||visual.kind()<0||visual.phase()==DevastatorSystem.CHARGE)&&!releaseSent);
     }
     @SubscribeEvent(priority=EventPriority.LOWEST)
-    public static void tick(ClientTickEvent event){if(event.phase!=net.minecraftforge.event.TickEvent.Phase.END)return;
+    public static void tick(net.minecraftforge.event.TickEvent.ClientTickEvent event){if(event.phase!=net.minecraftforge.event.TickEvent.Phase.END)return;
         if(completed||failed||System.getProperty(PROPERTY,"").isBlank())return;var mc=Minecraft.getInstance();
+        if(mc.gameDirectory.toPath().toAbsolutePath().normalize().equals(CLIENT)) {
+            org.lwjgl.glfw.GLFW.glfwHideWindow(mc.getWindow().getWindow());
+            mc.mouseHandler.releaseMouse();
+            if(!initialized&&mc.player==null) {
+                String screen=mc.screen==null?"none":mc.screen.getClass().getName()+": "+mc.screen.getTitle().getString();
+                if(!screen.equals(lastScreen)){lastScreen=screen;BlacklightNeoMod.LOGGER.info("Dedicated sync prejoin screen: {}",screen);}
+                if(mc.screen instanceof net.minecraft.client.gui.screens.DisconnectedScreen||(System.nanoTime()-connectionBegan)/1e9>240) {
+                    failed=true;error="Client did not join the task-owned loopback server: "+screen;
+                    try {
+                        if(mc.screen!=null)for(var field:mc.screen.getClass().getDeclaredFields())
+                            if(net.minecraft.network.chat.Component.class.isAssignableFrom(field.getType())&&field.trySetAccessible()) {
+                                var value=(net.minecraft.network.chat.Component)field.get(mc.screen);if(value!=null)error+="; "+value.getString();
+                            }
+                        Files.createDirectories(OUTPUT);var report=new JsonObject();report.addProperty("passed",false);report.addProperty("error",error);
+                        Files.writeString(OUTPUT.resolve("sync-client-connect-failure.json"),new GsonBuilder().setPrettyPrinting().create().toJson(report));
+                        try(var picture=Screenshot.takeScreenshot(mc.getMainRenderTarget())){picture.writeToFile(OUTPUT.resolve("connection-failure.png"));}
+                    }catch(Exception failure){BlacklightNeoMod.LOGGER.error("Cannot record sync connection failure",failure);}
+                    BlacklightNeoMod.LOGGER.error(error);mc.stop();return;
+                }
+            }
+        }
         if(mc.player==null||mc.level==null||mc.getConnection()==null)return;
         try{
             if(!initialized){
@@ -65,7 +88,10 @@ public final class StandaloneSyncClientSmoke {
             }
             require((System.nanoTime()-beganNanos)/1e9<300,"dedicated sync client exceeded five minutes");ticks++;
             var path=OUTPUT.resolve("sync-server-report.json");if(!Files.exists(path))return;
-            serverReport=JsonParser.parseString(Files.readString(path)).getAsJsonObject();stage=serverReport.get("stage").getAsString();
+            // Windows may expose a brief rename gap while the other process
+            // replaces its report. Retry observation on the next client tick.
+            String reportText;try{reportText=Files.readString(path);}catch(NoSuchFileException replacing){return;}
+            serverReport=JsonParser.parseString(reportText).getAsJsonObject();stage=serverReport.get("stage").getAsString();
             if(stage.equals("FAILED"))throw new IllegalStateException("dedicated server rejected sync test: "+serverReport.get("error"));
             String serverOwner=serverReport.get("owner").getAsString();if(serverOwner.isEmpty())return;
             require(serverOwner.equals(mc.player.getUUID().toString()),"dedicated report belongs to a different real player");
@@ -111,7 +137,7 @@ public final class StandaloneSyncClientSmoke {
             if(ticks%5==0)write();
         }catch(Throwable problem){failed=true;error=problem.toString();BlacklightNeoMod.LOGGER.error("Dedicated client sync QA failed",problem);restore(mc);write();mc.stop();}
     }
-    @SubscribeEvent public static void frame(RenderTickEvent event){if(event.phase!=net.minecraftforge.event.TickEvent.Phase.END)return;
+    @SubscribeEvent public static void frame(net.minecraftforge.event.TickEvent.RenderTickEvent event){if(event.phase!=net.minecraftforge.event.TickEvent.Phase.END)return;
         if(!initialized||completed||failed)return;var mc=Minecraft.getInstance();if(mc.player==null||mc.level==null)return;
         try{
             var visual=com.codex.blacklight.registry.ModAttachments.getData(mc.player, ModAttachments.DEVASTATOR_VISUAL);if(visual.kind()!=3||caseIndex<0)return;

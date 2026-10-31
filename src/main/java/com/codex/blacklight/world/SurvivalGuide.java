@@ -17,7 +17,5 @@ public final class SurvivalGuide {
         var root = player.server.getAdvancements().getAdvancement(new ResourceLocation("blacklight", "root"));
         if (root == null || player.getAdvancements().getOrStartProgress(root).isDone()) return;
         GrowthSystem.award(player, "root");
-        player.displayClientMessage(Component.translatable("message.blacklight.survival_start",
-                Component.keybind("key.advancements")), false);
     }
 }

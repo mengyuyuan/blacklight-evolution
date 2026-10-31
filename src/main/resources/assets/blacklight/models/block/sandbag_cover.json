@@ -1,0 +1,176 @@
+{
+  "parent": "minecraft:block/block",
+  "ambientocclusion": true,
+  "textures": {
+    "concrete": "blacklight:block/facility_concrete",
+    "hazard": "blacklight:block/facility_hazard",
+    "sandbag": "blacklight:block/facility_sandbag",
+    "crate": "blacklight:block/facility_crate",
+    "metal": "blacklight:block/facility_metal",
+    "screen": "blacklight:block/facility_screen",
+    "lamp": "blacklight:block/facility_lamp",
+    "particle": "blacklight:block/facility_metal"
+  },
+  "elements": [
+    {
+      "from": [
+        0,
+        0,
+        3
+      ],
+      "to": [
+        7.5,
+        4.5,
+        13
+      ],
+      "faces": {
+        "up": {
+          "texture": "#sandbag"
+        },
+        "down": {
+          "texture": "#sandbag"
+        },
+        "north": {
+          "texture": "#sandbag"
+        },
+        "south": {
+          "texture": "#sandbag"
+        },
+        "east": {
+          "texture": "#sandbag"
+        },
+        "west": {
+          "texture": "#sandbag"
+        }
+      }
+    },
+    {
+      "from": [
+        8,
+        0,
+        3
+      ],
+      "to": [
+        16,
+        4.5,
+        13
+      ],
+      "faces": {
+        "up": {
+          "texture": "#sandbag"
+        },
+        "down": {
+          "texture": "#sandbag"
+        },
+        "north": {
+          "texture": "#sandbag"
+        },
+        "south": {
+          "texture": "#sandbag"
+        },
+        "east": {
+          "texture": "#sandbag"
+        },
+        "west": {
+          "texture": "#sandbag"
+        }
+      }
+    },
+    {
+      "from": [
+        0,
+        4.5,
+        4
+      ],
+      "to": [
+        4,
+        9,
+        12
+      ],
+      "faces": {
+        "up": {
+          "texture": "#sandbag"
+        },
+        "down": {
+          "texture": "#sandbag"
+        },
+        "north": {
+          "texture": "#sandbag"
+        },
+        "south": {
+          "texture": "#sandbag"
+        },
+        "east": {
+          "texture": "#sandbag"
+        },
+        "west": {
+          "texture": "#sandbag"
+        }
+      }
+    },
+    {
+      "from": [
+        4.5,
+        4.5,
+        4
+      ],
+      "to": [
+        12,
+        9,
+        12
+      ],
+      "faces": {
+        "up": {
+          "texture": "#sandbag"
+        },
+        "down": {
+          "texture": "#sandbag"
+        },
+        "north": {
+          "texture": "#sandbag"
+        },
+        "south": {
+          "texture": "#sandbag"
+        },
+        "east": {
+          "texture": "#sandbag"
+        },
+        "west": {
+          "texture": "#sandbag"
+        }
+      }
+    },
+    {
+      "from": [
+        12.5,
+        4.5,
+        4
+      ],
+      "to": [
+        16,
+        9,
+        12
+      ],
+      "faces": {
+        "up": {
+          "texture": "#sandbag"
+        },
+        "down": {
+          "texture": "#sandbag"
+        },
+        "north": {
+          "texture": "#sandbag"
+        },
+        "south": {
+          "texture": "#sandbag"
+        },
+        "east": {
+          "texture": "#sandbag"
+        },
+        "west": {
+          "texture": "#sandbag"
+        }
+      }
+    }
+  ]
+}

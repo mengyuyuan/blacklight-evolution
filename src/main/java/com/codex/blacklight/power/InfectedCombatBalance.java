@@ -25,7 +25,7 @@ public final class InfectedCombatBalance {
         if(event.getEntity().level().isClientSide||event.isCanceled()||event.getAmount()<=0)return;
         var source=event.getSource();
         if(event.getEntity() instanceof BlacklightHunter && source.getEntity() instanceof Player
-                && !source.is(com.codex.blacklight.combat.BulletdiveDamage.TYPE)
+                && !com.codex.blacklight.combat.DevastatorDamage.isTrueDamage(source)
                 && !source.is(DamageTypeTags.BYPASSES_INVULNERABILITY))
             event.setAmount(event.getAmount()*HunterBalance.PLAYER_ATTACK_FACTOR);
         var hunter=source.getEntity() instanceof BlacklightHunter h&&source.getDirectEntity()==h?h:null;
@@ -59,6 +59,10 @@ public final class InfectedCombatBalance {
         float difficulty=switch(player.level().getDifficulty()){
             case EASY -> .75F;case HARD -> 1.5F;default -> 1;
         };
+        if(attacker instanceof com.codex.blacklight.entity.BlacklightInfectedHost host&&host.isEvolved()){
+            event.setAmount(com.codex.blacklight.infection.EvolvedBalance.playerDamage(event.getAmount(),player.getMaxHealth(),CombatScale.units(player),difficulty,com.codex.blacklight.infection.EvolvedBalance.rules()));
+            return;
+        }
         if(hunter!=null){
             event.setAmount(com.codex.blacklight.combat.HunterBalance.infectedDamage(event.getAmount(),hunter.attackMove(),difficulty));
             return;

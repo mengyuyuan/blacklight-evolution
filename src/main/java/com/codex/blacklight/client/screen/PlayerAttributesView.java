@@ -35,7 +35,7 @@ final class PlayerAttributesView {
         add(values,"attack_speed",Component.translatable("screen.blacklight.stats.per_second",number(p.getAttributeValue(Attributes.ATTACK_SPEED))));
         add(values,"movement",Component.literal(number(p.getAttributeValue(Attributes.MOVEMENT_SPEED))));
         add(values,"current_speed",Component.translatable("screen.blacklight.stats.blocks_second",number(p.getDeltaMovement().horizontalDistance()*20)));
-        double cap=MovementTuningSettings.sprintMaxSpeed()*MovementUpgrade.sprintMultiplier(state.getMovementUpgradeMask());
+        double cap=MovementTuningSettings.sprintMaxSpeed()*MovementUpgrade.sprintMultiplier(state.getMovementUpgradeMask())*InfiniteEvolutionSystem.mobility(p);
         if(UtilityPowerSystem.active(p,PowerForm.ARMOR))cap*=.75;
         add(values,"sprint",Component.translatable("screen.blacklight.stats.blocks_second",number(cap*20)));
         add(values,"jump",Component.translatable("screen.blacklight.stats.jump_range",

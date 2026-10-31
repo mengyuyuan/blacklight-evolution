@@ -34,6 +34,8 @@ public final class InfectedSpeciesMesh {
         public final float x, y, z;
         private final float[] vertices, normals;
         private final int[] triangles;
+        private final Bone late;
+        private final float[] lateRoots;
         private final int anatomy;
         private final List<Bone> children = new ArrayList<>();
 
@@ -65,6 +67,16 @@ public final class InfectedSpeciesMesh {
                 else normals[n + 1] = 1;
             }
             anatomy = InfectedModelPose.anatomy(species, name);
+            if(data.has("lateGrowth")) {
+                var graft=data.getAsJsonObject("lateGrowth").deepCopy();
+                graft.addProperty("name",name);graft.add("pivot",pivot.deepCopy());
+                late=new Bone(species,graft);
+                lateRoots=new float[late.vertices.length];
+                float[] lo={Float.POSITIVE_INFINITY,Float.POSITIVE_INFINITY,Float.POSITIVE_INFINITY};
+                float[] hi={Float.NEGATIVE_INFINITY,Float.NEGATIVE_INFINITY,Float.NEGATIVE_INFINITY};
+                for(int i=0;i<vertices.length;i++){int axis=i%3;lo[axis]=Math.min(lo[axis],vertices[i]);hi[axis]=Math.max(hi[axis],vertices[i]);}
+                for(int i=0;i<lateRoots.length;i++)lateRoots[i]=vertices.length==0?pivot.get(i%3).getAsFloat():com.codex.blacklight.forge.WingMath.clamp(late.vertices[i],lo[i%3],hi[i%3]);
+            }else{late=null;lateRoots=null;}
         }
 
         private void draw(PoseStack stack, VertexConsumer out, int light, int overlay, int alpha) {
@@ -82,6 +94,28 @@ public final class InfectedSpeciesMesh {
                 }
             }
         }
+
+        private void drawLate(PoseStack stack,VertexConsumer out,int light,int overlay,int alpha,float amount) {
+            if(late==null||amount<=0)return;
+            var pose=stack.last();
+            if(out instanceof ConsumeAnatomy.Consumer consumer)consumer.anatomy(anatomy);
+            for(int i=0;i<late.triangles.length;i+=4){
+                int a=late.triangles[i]*3,b=late.triangles[i+1]*3,c=late.triangles[i+2]*3;
+                float ax=latePoint(a,amount),ay=latePoint(a+1,amount),az=latePoint(a+2,amount);
+                float bx=latePoint(b,amount),by=latePoint(b+1,amount),bz=latePoint(b+2,amount);
+                float cx=latePoint(c,amount),cy=latePoint(c+1,amount),cz=latePoint(c+2,amount);
+                float nx=(by-ay)*(cz-az)-(bz-az)*(cy-ay),ny=(bz-az)*(cx-ax)-(bx-ax)*(cz-az),nz=(bx-ax)*(cy-ay)-(by-ay)*(cx-ax);
+                float length=(float)Math.sqrt(nx*nx+ny*ny+nz*nz);if(length<1e-8F)continue;
+                nx/=length;ny/=length;nz/=length;
+                int color=alpha<<24|late.triangles[i+3]&0xffffff;
+                for(int corner=0;corner<4;corner++){
+                    int v=late.triangles[i+Math.min(corner,2)]*3;
+                    out.vertex(pose.pose(),latePoint(v,amount),latePoint(v+1,amount),latePoint(v+2,amount)).color(color)
+                            .uv(.5F,.5F).overlayCoords(overlay).uv2(light).normal(pose.normal(),nx,ny,nz).endVertex();
+                }
+            }
+        }
+        private float latePoint(int index,float amount){return lateRoots[index]+(late.vertices[index]-lateRoots[index])*amount;}
     }
 
     @FunctionalInterface public interface Pose { void apply(Bone bone, PoseStack stack); }
@@ -145,15 +179,19 @@ public final class InfectedSpeciesMesh {
     public String species() { return species; }
 
     public void render(PoseStack stack, VertexConsumer out, int light, int overlay, int alpha, Pose pose) {
-        for (var root : roots) renderBone(root, stack, out, light, overlay, alpha, pose);
+        render(stack,out,light,overlay,alpha,pose,0);
+    }
+    public void render(PoseStack stack,VertexConsumer out,int light,int overlay,int alpha,Pose pose,float lateBody) {
+        for (var root : roots) renderBone(root, stack, out, light, overlay, alpha, pose,com.codex.blacklight.forge.WingMath.clamp(lateBody,0,1));
     }
 
-    private static void renderBone(Bone bone, PoseStack stack, VertexConsumer out, int light, int overlay, int alpha, Pose pose) {
+    private static void renderBone(Bone bone, PoseStack stack, VertexConsumer out, int light, int overlay, int alpha, Pose pose,float lateBody) {
         stack.pushPose();
         try {
             stack.translate(bone.x, bone.y, bone.z); pose.apply(bone, stack); stack.translate(-bone.x, -bone.y, -bone.z);
             bone.draw(stack, out, light, overlay, alpha);
-            for (var child : bone.children) renderBone(child, stack, out, light, overlay, alpha, pose);
+            bone.drawLate(stack,out,light,overlay,alpha,lateBody);
+            for (var child : bone.children) renderBone(child, stack, out, light, overlay, alpha, pose,lateBody);
         } finally { stack.popPose(); }
     }
 }

@@ -11,6 +11,16 @@ public final class ConsumeTendrils {
     public record Attachment(Vec3 center,double radius) {}
     private ConsumeTendrils(){}
     public static void draw(PoseStack stack,VertexConsumer out,int light,List<Attachment> body,Vec3 chest,ConsumeFracture.Phase phase,int seed){
+        boolean connected=phase.style()==ConsumeFracture.Style.LASH;
+        double matter=connected?1-smooth(phase.returnFlow()/.7):1;
+        if(matter<=.001||body.isEmpty())return;
+        if(connected){
+            // A connected receiver contracts as one body. Emitting two full-width
+            // cables per limb produced a parallel rack after that body disappeared.
+            Vec3 center=Vec3.ZERO;double total=0,radius=0;
+            for(var part:body){double weight=Math.max(.0001,part.radius*part.radius);center=center.add(part.center.scale(weight));total+=weight;radius=Math.max(radius,part.radius);}
+            body=List.of(new Attachment(center.scale(1/total),radius));
+        }
         float age=phase.progress()-phase.contact();
         boolean source=phase.nativeEvents();
         double reach=smooth((age+(source?0:.08))/.115),pull=smooth((age-.10)/Math.max(.12,.86-phase.contact()-.10));
@@ -21,7 +31,7 @@ public final class ConsumeTendrils {
             if(length<.035||length>5)continue;
             Vec3 axis=delta.scale(1/length),u=axis.cross(new Vec3(0,1,0)).normalize();if(u.lengthSqr()<.1)u=new Vec3(1,0,0);
             Vec3 v=axis.cross(u).normalize();
-            for(int strand=0;strand<2;strand++){
+            for(int strand=0;strand<(connected?1:2);strand++){
                 double angle=i*2.399963+seed*.19+strand*Math.PI;
                 Vec3 radial=u.scale(Math.cos(angle)).add(v.scale(Math.sin(angle)));
                 Vec3 start=chest.add(radial.scale(.08*fade));
@@ -30,7 +40,7 @@ public final class ConsumeTendrils {
                 Vec3 c1=start.add(axis.scale(length*.27)).add(radial.scale((.13+length*.10)*(1-pull*.72)));
                 Vec3 c2=latch.subtract(axis.scale(length*.23)).add(radial.scale(.12*(1-pull)));
                 Vec3[] points=new Vec3[29];double[] widths=new double[points.length];
-                double base=(strand==0?.073:.043)*net.minecraft.util.Mth.clamp(.8+radius,.9,1.3)*fade;
+                double base=(connected?.052:strand==0?.073:.043)*com.codex.blacklight.forge.WingMath.clamp(.8+radius,.9,1.3)*fade*Math.sqrt(matter);
                 for(int j=0;j<points.length;j++){
                     double fraction=j/(double)(points.length-1),t=fraction*reach;
                     Vec3 p;

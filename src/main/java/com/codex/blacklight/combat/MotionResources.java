@@ -2,6 +2,8 @@ package com.codex.blacklight.combat;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.codex.blacklight.util.CompactJson;
+import com.codex.blacklight.util.CompactStreams;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
@@ -27,7 +29,8 @@ public final class MotionResources {
     public static boolean contains(String name) {
         validate(name);
         Path path = override(name);
-        return path != null ? Files.isRegularFile(path) : MotionResources.class.getResource(ROOT + name) != null;
+        return path != null ? Files.isRegularFile(path) : MotionResources.class.getResource(ROOT + name + ".jz") != null
+                || MotionResources.class.getResource(ROOT + name) != null;
     }
 
     /** An explicit developer directory replaces the whole profile; never mix profiles per file. */
@@ -35,10 +38,12 @@ public final class MotionResources {
         validate(name);
         Path path = override(name);
         if (path != null && !Files.isRegularFile(path)) return Optional.empty();
+        boolean compact=path==null&&MotionResources.class.getResource(ROOT+name+".jz")!=null;
         try (InputStream input = path != null ? Files.newInputStream(path)
-                : MotionResources.class.getResourceAsStream(ROOT + name)) {
+                : MotionResources.class.getResourceAsStream(ROOT + name+(compact?".jz":""))) {
             if (input == null) return Optional.empty();
-            byte[] bytes = input.readNBytes(maximumBytes + 1);
+            byte[] bytes = compact?CompactJson.decode(CompactStreams.read(input,Math.addExact(Math.multiplyExact(maximumBytes,8),64)),maximumBytes)
+                    :input.readNBytes(maximumBytes + 1);
             if (bytes.length > maximumBytes) throw new IllegalArgumentException("Motion resource too large: " + name);
             return Optional.of(JsonParser.parseString(new String(bytes, StandardCharsets.UTF_8)).getAsJsonObject());
         } catch (IOException | RuntimeException e) {

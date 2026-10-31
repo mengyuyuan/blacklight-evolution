@@ -19,12 +19,12 @@ import net.minecraftforge.client.event.RenderLivingEvent;
 @EventBusSubscriber(modid = BlacklightNeoMod.MOD_ID, value = Dist.CLIENT)
 public final class ConsumedMobVisuals {
     public static final ResourceLocation WHITE = new ResourceLocation("blacklight", "textures/entity/claw_white.png");
-    private static final java.util.Set<LivingEntity> SCALED = java.util.Collections.newSetFromMap(new java.util.IdentityHashMap<>());
     private static final java.util.Set<LivingEntity> RENDERING = java.util.Collections.newSetFromMap(new java.util.IdentityHashMap<>());
     private ConsumedMobVisuals() {}
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     public static void before(RenderLivingEvent.Pre<?, ?> event) {
+        if (!LivingRenderScope.active(event.getPoseStack())) return;
         var mob = event.getEntity();
         if (RENDERING.contains(mob)) return;
         // The dispatcher coats vanilla and custom renderers once, after their posed mesh is emitted.
@@ -36,10 +36,9 @@ public final class ConsumedMobVisuals {
             var hit=com.codex.blacklight.registry.ModAttachments.getData(mob, ModAttachments.HIT_REACTION);
             if(!feeding&&hit.weight(mob.level().getGameTime(),event.getPartialTick())<=0)return;
             if(!feeding&&mob instanceof net.minecraft.client.player.AbstractClientPlayer&&com.codex.blacklight.client.animation.NativeHitPose.available(mob))return;
-            var stack=event.getPoseStack();stack.pushPose();
+            var stack=event.getPoseStack();LivingRenderScope.push(stack);
             if(feeding)DevourerFeedingFx.applyVictim(mob,event.getPartialTick(),stack);
             com.codex.blacklight.client.animation.HitBodyPose.apply(mob,stack,event.getPartialTick());
-            SCALED.add(mob);
             return;
         }
         var owner = mob.level().getEntity(data.consumerId());
@@ -48,7 +47,7 @@ public final class ConsumedMobVisuals {
         Vec3 placement=com.codex.blacklight.client.ClientCarryPlacement.consumeOffset(mob,partial);
         Vec3 delta = owner.getPosition(partial).subtract(mob.getPosition(partial).add(placement));
         var stack = event.getPoseStack();
-        stack.pushPose();stack.translate(placement.x,placement.y,placement.z);
+        LivingRenderScope.push(stack);stack.translate(placement.x,placement.y,placement.z);
         var out = event.getMultiBufferSource().getBuffer(RenderType.entityCutoutNoCull(WHITE));
         whip(mob, stack, out, event.getPackedLight(), delta, tetherProgress(mob,partial));
         if (t >= .995F && !com.codex.blacklight.combat.ConsumeSequence.boss(mob)) { stack.popPose();event.setCanceled(true); return; }
@@ -63,15 +62,11 @@ public final class ConsumedMobVisuals {
                 renderVanilla(event,mob,buffers);
                 if(fragments!=null)fragments.finish();
             } finally { RENDERING.remove(mob);stack.popPose(); }
-        } else SCALED.add(mob);
+        }
     }
     @SuppressWarnings({"rawtypes","unchecked"})
     private static void renderVanilla(RenderLivingEvent.Pre<?,?> event,LivingEntity mob,net.minecraft.client.renderer.MultiBufferSource buffers){
         ((net.minecraft.client.renderer.entity.LivingEntityRenderer)event.getRenderer()).render(mob,mob.getYRot(),event.getPartialTick(),event.getPoseStack(),buffers,event.getPackedLight());
-    }
-    @SubscribeEvent
-    public static void after(RenderLivingEvent.Post<?, ?> event) {
-        if (SCALED.remove(event.getEntity())) event.getPoseStack().popPose();
     }
 
     public static float tetherProgress(LivingEntity mob,float partial) {
@@ -86,16 +81,20 @@ public final class ConsumedMobVisuals {
     }
     /** A thick, continuous cable and tightening coil distinguish whip capture from generic tendrils. */
     public static void whip(LivingEntity mob, PoseStack stack, VertexConsumer out, int light, Vec3 delta, float t) {
-        if (com.codex.blacklight.registry.ModAttachments.getData(mob, ModAttachments.CONSUME_VISUAL).form() != PowerForm.WHIPFIST.ordinal() || t > .9F) return;
+        var visual=com.codex.blacklight.registry.ModAttachments.getData(mob, ModAttachments.CONSUME_VISUAL);
+        if (visual.form() != PowerForm.WHIPFIST.ordinal() || t > .9F) return;
         if (t < .185F) return;
+        float contraction=visual.consuming()?WhipConsumeRetraction.coil(ConsumeFracture.phase(mob,
+                net.minecraft.client.Minecraft.getInstance().getFrameTime()).opening()):1;
+        if(contraction<=.001F)return;
         stack.pushPose();
         com.codex.blacklight.client.ClientPoseMatrices.multiply(stack,com.codex.blacklight.client.animation.ConsumeVictimPose.effectTransform(mob,net.minecraft.client.Minecraft.getInstance().getFrameTime()));
-        double radius = mob.getBbWidth() * .58 * (1-net.minecraft.util.Mth.clamp((t-.85)/.05, 0, 1));
+        double radius = mob.getBbWidth() * .58 * (1-net.minecraft.util.Mth.clamp((t-.85)/.05, 0, 1))*contraction;
         for (int i = 0; i < 48; i++) {
             double a = i / 48.0, b = (i+1) / 48.0;
             Vec3 p = new Vec3(Math.cos(a*Math.PI*5)*radius, mob.getBbHeight()*(.22+.6*a), Math.sin(a*Math.PI*5)*radius);
             Vec3 q = new Vec3(Math.cos(b*Math.PI*5)*radius, mob.getBbHeight()*(.22+.6*b), Math.sin(b*Math.PI*5)*radius);
-            tube(stack, out, light, p, q, .045, i%4==0 ? 0xff833b32 : 0xff35292a);
+            tube(stack, out, light, p, q, .045*contraction, i%4==0 ? 0xff833b32 : 0xff35292a);
         }
         stack.popPose();
     }

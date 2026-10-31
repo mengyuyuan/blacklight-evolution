@@ -34,8 +34,8 @@ jobs:
 
       # Gameplay tests and in-game acceptance remain opt-in. These release
       # checks only inspect inputs and assembled artifacts without launching Minecraft.
-      - name: Assemble with Gradle
-        run: bash ./gradlew assemble --no-daemon
+      - name: Assemble and run JVM regression tests
+        run: bash ./gradlew assemble test --no-daemon --max-workers=1
 
       - name: Verify release artifacts and source inputs
         run: python tools/package_release.py --profile bundled --verify-only

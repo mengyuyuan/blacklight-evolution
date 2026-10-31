@@ -9,7 +9,7 @@ public final class NativeGeckoConsume {
         var visual=com.codex.blacklight.registry.ModAttachments.getData(entity, ModAttachments.CONSUME_VISUAL);if(!visual.consuming()&&!com.codex.blacklight.combat.GrappleMotion.active(visual))return false;
         var form=com.codex.blacklight.power.PowerForm.values()[net.minecraft.util.Mth.clamp(visual.form(),0,com.codex.blacklight.power.PowerForm.values().length-1)];
         boolean large=com.codex.blacklight.combat.ConsumeSequence.mountedStage(visual.stage());
-        var projection=com.codex.blacklight.combat.ConsumePlacementTrack.projection(com.codex.blacklight.combat.GrappleMotion.sceneKey(entity,visual),com.codex.blacklight.combat.GrappleMotion.sceneProgress(entity,visual,partial));
+        var projection=com.codex.blacklight.combat.ConsumePlacementTrack.projection(com.codex.blacklight.combat.GrappleMotion.sceneKey(entity,visual),com.codex.blacklight.combat.GrappleMotion.receiverProgress(entity,visual,partial));
         if(projection.isEmpty())return false;
         double[] frame=projection.get();
         String[] names={"hips","torso","body","head","right_arm","left_arm","right_forearm","left_forearm","right_thigh","left_thigh","right_leg","left_leg","right_shin","left_shin"};

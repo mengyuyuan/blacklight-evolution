@@ -34,8 +34,8 @@ public final class ConsumeControl {
     /** Holding remains walkable; confirmed scenes own their own root motion. */
     public static boolean ownsMotion(Entity entity) {
         if (!(entity instanceof LivingEntity living) || !living.isAlive() || living.isRemoved()) return false;
-        var visual = ModAttachments.peekData(entity,ModAttachments.CONSUME_VISUAL);
-        return ConsumeSystem.committed(living) || visual.active() && visual.stage()!=ConsumeVisual.FLIGHT
+        var visual = ModAttachments.peekData(entity, ModAttachments.CONSUME_VISUAL, ConsumeVisual.EMPTY);
+        return com.codex.blacklight.infection.TissueCompetition.controls(entity)||ConsumeSystem.committed(living) || visual.active() && visual.stage()!=ConsumeVisual.FLIGHT
                 || BiomassSystem.state(entity).immobilized() || biomassPrey(entity);
     }
 
@@ -61,6 +61,8 @@ public final class ConsumeControl {
     public static void releaseControls(LivingEntity entity) {
         for(var effect:java.util.List.copyOf(entity.getActiveEffects()))
             if(controlEffect(effect))entity.removeEffect(effect.getEffect());
+        if (entity instanceof com.codex.blacklight.entity.MilitarySoldier soldier && !soldier.tacticsAvailable())
+            soldier.suspendTactics();
     }
     private ConsumeControl(){}
 }

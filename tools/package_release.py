@@ -4,6 +4,9 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import os
+import re
+import tempfile
 import shutil
 import subprocess
 import tomllib
@@ -14,7 +17,7 @@ from zipfile import ZIP_DEFLATED, ZipFile, ZipInfo
 PROFILE_DATA_NAMES = {
     'combat-motion-tuning.data', 'consume-placement.data', 'consume-receiver-events.data',
     'receiver-poses.data', 'hunter-consume.data', 'hammer-scales.data', 'weapon-attack-scales.data', 'armor-growth.data',
-    'camera-profile.data', 'camera-events.data', 'camera-film.data', 'health-hud.data',
+    'camera-profile.data', 'camera-events.data', 'camera-film.data', 'health-hud.data', 'evolved-poses.data',
 }
 
 
@@ -25,6 +28,35 @@ def digest(data: bytes) -> str:
 def require(condition: bool, message: str) -> None:
     if not condition:
         raise RuntimeError(message)
+
+
+def java_class_names(root: Path) -> set[str]:
+    names = set()
+    for path in root.rglob('*.java'):
+        match = re.search(r'^\s*package\s+([\w.]+)\s*;', path.read_text(encoding='utf-8'), re.MULTILINE)
+        prefix = match.group(1).replace('.', '/') + '/' if match else ''
+        names.add(prefix + path.stem)
+    return names
+
+
+def production_classes(repo: Path, class_root: Path) -> list[Path]:
+    production = {name for name in java_class_names(repo / 'src/main/java')
+                  if name.rsplit('/', 1)[-1] not in ('package-info', 'module-info')}
+    classes = [path for path in class_root.rglob('*.class')
+               if path.relative_to(class_root).as_posix()[:-6].split('$', 1)[0] in production]
+    require(bool(classes), 'No compiled production classes to verify')
+    compiled = {path.relative_to(class_root).as_posix()[:-6].split('$', 1)[0] for path in classes}
+    require(production <= compiled, f'Production sources were not compiled: {sorted(production - compiled)}')
+    return classes
+
+
+def same_stream_content(left, right) -> bool:
+    while True:
+        a, b = left.read(1024 * 1024), right.read(1024 * 1024)
+        if a != b:
+            return False
+        if not a:
+            return True
 
 
 def manifest_values(data: bytes) -> dict[str, str]:
@@ -109,6 +141,80 @@ def source_snapshot(repo: Path, output: Path | None, baseline: dict[str, str] | 
     return hashes
 
 
+
+def verify_compact_motions(repo: Path, build: Path, jar: Path, profile: Path) -> None:
+    """The same bounded Java decoder must restore every original input byte."""
+    classes = build / 'classes/java/resourceTools'
+    require((classes / 'CompactMotionPacker.class').is_file(), 'Compile resourceTools classes before checking compact motions')
+    java_home = os.environ.get('JAVA_HOME')
+    java = str(Path(java_home) / 'bin' / ('java.exe' if os.name == 'nt' else 'java')) if java_home else shutil.which('java')
+    require(bool(java), 'Java 17 is required to verify the exact compact motion originals')
+    temporary_root = build / 'tmp/compact-verification'
+    temporary_root.mkdir(parents=True, exist_ok=True)
+    with tempfile.TemporaryDirectory(prefix='decoder-', dir=temporary_root) as directory:
+        target = Path(directory).resolve()
+        require(target.is_relative_to(temporary_root.resolve()), 'Decoder temporary path escaped its build directory')
+        with ZipFile(jar) as archive:
+            metadata = json.loads(archive.read('META-INF/jarjar/metadata.json'))
+            libraries = [item for item in metadata['jars'] if item['identifier'] == {'group': 'org.tukaani', 'artifact': 'xz'}]
+            require(len(libraries) == 1 and libraries[0]['version']['artifactVersion'] == '1.10', 'Missing tested pure-Java XZ dependency')
+            name = libraries[0]['path']
+            require(name.startswith('META-INF/jarjar/') and '..' not in name.split('/'), 'Invalid embedded decoder path')
+            library = target / 'xz.jar'
+            library.write_bytes(archive.read(name))
+        command = [java, '-Xmx512m', '-XX:ActiveProcessorCount=2', '-cp', os.pathsep.join((str(classes), str(library))),
+                   'CompactMotionPacker', '--verify', str(jar), str(profile)]
+        result = subprocess.run(command, capture_output=True, text=True, encoding='utf-8', errors='replace', timeout=600)
+        require(result.returncode == 0, f'Exact compact motion restoration failed: {result.stdout}\n{result.stderr}')
+
+
+def geographic_city_selected(repo: Path, archive: ZipFile) -> bool:
+    name = 'data/blacklight/city/generation.json'
+    names = set(archive.namelist())
+    if name not in names:
+        return False
+    profile = json.loads(archive.read(name))
+    require(profile.get('schema') == 1 and profile.get('mode') in ('archive', 'geographic'), 'Invalid city generation profile')
+    if profile['mode'] != 'geographic':
+        return False
+    require(archive.read(name) == (repo / 'src/main/resources' / name).read_bytes(), 'Stale geographic generation profile')
+    require(not any(n.startswith(('data/blacklight/city/los_angeles_full/', 'data/blacklight/city/los_angeles_compact/'))
+                    for n in names), 'Baked municipal archives leaked into the geographic package')
+    for city in ('shenzhen', 'los_angeles'):
+        index_name = f'data/blacklight/worldmap/{city}/index.json'
+        index = json.loads(archive.read(index_name))
+        require(index.get('schema') == 1 and index.get('region') == city and index.get('tiles'), f'Missing geographic city: {city}')
+        for tile in index['tiles']:
+            tile_name = f"data/blacklight/worldmap/{city}/{tile['x']}_{tile['z']}.json.gz"
+            require(tile_name in names or tile_name[:-3]+'.xz' in names, f'Missing geographic tile: {tile_name}')
+    require('data/blacklight/city/futian/map.json' in names
+            and 'data/blacklight/city/los_angeles/map.json' in names, 'Authored city cores must be retained')
+    return True
+
+
+def verify_compact_maps(repo: Path, build: Path, jar: Path) -> None:
+    classes = build / 'classes/java/resourceTools'
+    require((classes / 'CompactMapPacker.class').is_file(), 'Compile resourceTools classes before checking compact maps')
+    java_home = os.environ.get('JAVA_HOME')
+    java = str(Path(java_home) / 'bin' / ('java.exe' if os.name == 'nt' else 'java')) if java_home else shutil.which('java')
+    require(bool(java), 'Java 17 is required to verify the compact maps')
+    temporary_root = build / 'tmp/compact-map-verification'
+    temporary_root.mkdir(parents=True, exist_ok=True)
+    with tempfile.TemporaryDirectory(prefix='decoder-', dir=temporary_root) as directory:
+        with ZipFile(jar) as archive:
+            metadata = json.loads(archive.read('META-INF/jarjar/metadata.json'))
+            libraries = [item for item in metadata['jars'] if item['identifier'] == {'group': 'org.tukaani', 'artifact': 'xz'}]
+            require(len(libraries) == 1 and libraries[0]['version']['artifactVersion'] == '1.10', 'Missing tested map decoder')
+            name = libraries[0]['path']
+            require(name.startswith('META-INF/jarjar/') and '..' not in name.split('/'), 'Invalid embedded map decoder path')
+            library = Path(directory) / 'xz.jar'
+            library.write_bytes(archive.read(name))
+        command = [java, '-Xmx384m', '-XX:ActiveProcessorCount=2', '-cp', os.pathsep.join((str(classes), str(library))),
+                   'CompactMapPacker', '--verify', str(jar), str(repo / 'src/main/resources')]
+        result = subprocess.run(command, capture_output=True, text=True, encoding='utf-8', errors='replace', timeout=600)
+        require(result.returncode == 0, f'Exact compact map restoration failed: {result.stdout}\n{result.stderr}')
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--repo', type=Path, default=Path(__file__).resolve().parents[1])
@@ -117,7 +223,10 @@ def main() -> None:
     parser.add_argument('--profile', choices=('bundled', 'external-profile'), default='bundled')
     parser.add_argument('--private-motion-directory', type=Path, help='Exact external-profile build input directory')
     parser.add_argument('--verify-only', action='store_true', help='Verify inputs and artifacts without writing a release directory')
+    parser.add_argument('--directory-only', action='store_true', help='Verify a prepared ordinary folder instead of a transport ZIP; requires --verify-only and --output')
     args = parser.parse_args()
+    if args.directory_only and (not args.verify_only or args.output is None):
+        parser.error('--directory-only requires --verify-only and --output')
     repo = args.repo.resolve()
     build = (args.build_dir or repo / 'build').resolve()
     props = dict(line.split('=', 1) for line in (repo / 'gradle.properties').read_text(encoding='utf-8').splitlines()
@@ -126,7 +235,7 @@ def main() -> None:
     stem = f"{props['mod_archive_name']}-MC{props['minecraft_version']}-Forge-{version}"
     jar = build / 'libs' / f'{stem}-{args.profile}.jar'
     dist = build / 'distributions' / f'{stem}-{args.profile}.zip'
-    require(jar.is_file() and dist.is_file(), f'Build the requested {args.profile} artifacts first')
+    require(jar.is_file() and (args.directory_only or dist.is_file()), f'Build the requested {args.profile} artifacts first')
     notices = ('LICENSE', 'THIRD_PARTY_ASSETS.md', 'THIRD_PARTY_NOTICES.md')
     external = args.profile == 'external-profile'
     baseline = repository_profile(repo)
@@ -152,11 +261,24 @@ def main() -> None:
         for name in notices:
             require(archive.read(name) == (repo / name).read_bytes(), f'Stale or missing notice: {name}')
         motion_prefix = 'blacklight/bundled_motions/'
-        motions = {name[len(motion_prefix):]: digest(archive.read(name)) for name in sorted(names)
-                   if name.startswith(motion_prefix) and not name.endswith('/')}
+        compact_motions = any(name.startswith(motion_prefix) and name.endswith('.jz') for name in names)
+        if compact_motions:
+            verify_compact_motions(repo, build, jar, args.private_motion_directory.resolve() if external else repo / 'art/motion-profile')
+            logical = [name[len(motion_prefix):-3] if name.endswith('.jz') else name[len(motion_prefix):]
+                       for name in names if name.startswith(motion_prefix) and not name.endswith('/')
+                       and name != motion_prefix + 'compact-index.json']
+            require(len(logical) == len(set(logical)) and set(logical) == set(expected), 'Compact logical motion inventory differs')
+            motions = dict(expected)  # Every archived decoded byte was compared above.
+        else:
+            motions = {name[len(motion_prefix):]: digest(archive.read(name)) for name in sorted(names)
+                       if name.startswith(motion_prefix) and not name.endswith('/')}
+        geographic_city = geographic_city_selected(repo, archive)
+        compact_maps = any(name.endswith('.xz') for name in names)
+        if compact_maps:
+            verify_compact_maps(repo, build, jar)
+
         require(motions == expected, 'Bundled resources differ from the exact selected input profile/manifest')
-        classes = list((build / 'classes/java/main').rglob('*.class'))
-        require(bool(classes), 'No compiled classes to verify')
+        classes = production_classes(repo, build / 'classes/java/main')
         for path in classes:
             name = path.relative_to(build / 'classes/java/main').as_posix()
             require(name in names, f'Missing class: {name}')
@@ -169,42 +291,81 @@ def main() -> None:
         require('blacklight.refmap.json' in names, 'Missing Forge Mixin refmap')
         require(not any('/preview/' in name or '/gametest/' in name or name.startswith('blacklight/test/')
                         for name in names), 'Development harness leaked into JAR')
+        shipped = {name[:-6].split('$', 1)[0] for name in names
+                   if name.startswith('com/codex/blacklight/') and name.endswith('.class')}
+        require(shipped <= java_class_names(repo / 'src/main/java'),
+                f'Unrecognized runtime classes or QA harness leaked into JAR: {sorted(shipped - java_class_names(repo / "src/main/java"))}')
         mixins = json.loads(archive.read('blacklight.mixins.json'))
         for name in mixins['mixins'] + mixins['client']:
             require((mixins['package'] + '.' + name).replace('.', '/') + '.class' in names, f'Missing mixin: {name}')
         for language in ('en_us', 'zh_cn'):
             json.loads(archive.read(f'assets/blacklight/lang/{language}.json'))
         resources = {}
+        inactive = {}
         for resource_root in (repo / 'src/main/resources', repo / 'src/generated/resources'):
             for path in resource_root.rglob('*'):
                 if not path.is_file() or path.suffix == '.bbmodel' or '.cache' in path.parts:
                     continue
                 name = path.relative_to(resource_root).as_posix()
+                if geographic_city and name.startswith(('data/blacklight/city/los_angeles_full/', 'data/blacklight/city/los_angeles_compact/')):
+                    continue
+                if name in {'data/blacklight/dimension/city_futian.json', 'data/blacklight/dimension/city_legacy.json'}:
+                    require(name not in names, f'Legacy dimension unexpectedly shipped: {name}')
+                    continue
                 require(not path.is_symlink(), f'Production resource symlink needs explicit review: {name}')
                 data = path.read_bytes()
+                if name == 'data/blacklight/recipes/military_fuel_can.json' or (
+                        name.startswith('data/blacklight/loot_tables/') and name.endswith('.json')
+                        and b'blacklight:military_fuel_can' in data):
+                    require(name not in names, f'Disabled fuel acquisition leaked into runtime: {name}')
+                    require(name not in inactive or inactive[name] == digest(data), f'Conflicting inactive resource: {name}')
+                    inactive[name] = digest(data)
+                    continue
                 require(name not in resources or resources[name] == digest(data), f'Conflicting production resource roots: {name}')
                 resources[name] = digest(data)
+                if compact_maps and name.endswith('.gz') and name[:-3]+'.xz' in names:
+                    require(name not in names, f'Both map encodings shipped: {name}')
+                    continue  # Exact complete logical map bytes were verified above.
                 require(archive.read(name) == data, f'Stale or missing production resource: {name}')
-    with ZipFile(dist) as archive:
-        require(len(set(archive.namelist())) == len(archive.namelist()), 'Duplicate distribution entries')
-        require([name for name in archive.namelist() if name.endswith('.jar')] == ['mods/' + jar.name],
-                'Distribution must contain exactly this build, without dependencies or old JARs')
-        require(archive.read('mods/' + jar.name) == jar.read_bytes(), 'Distribution JAR mismatch')
+    docs = sorted(path for path in (repo / 'docs').rglob('*') if path.is_file())
+    if args.directory_only:
+        folder = args.output.resolve()
+        installed = folder / 'mods' / jar.name
+        dependency_name = f"geckolib-forge-{props['minecraft_version']}-{props['geckolib_version']}.jar"
+        require(installed.is_file(), 'Missing main mod in the ordinary folder')
+        require({path.name for path in (folder / 'mods').glob('*.jar')} == {jar.name, dependency_name},
+                'Ordinary folder must contain exactly this mod and its GeckoLib dependency')
+        require({path.resolve() for path in folder.rglob('*.jar')} == {installed.resolve(), (folder / 'mods' / dependency_name).resolve()},
+                'Unexpected loose dependency or old JAR outside mods/')
+        if not os.path.samefile(installed, jar):
+            with installed.open('rb') as packed, jar.open('rb') as built:
+                require(same_stream_content(packed, built), 'Ordinary-folder JAR differs from the verified build')
         for name in (*notices, 'README.md'):
-            require(archive.read(name) == (repo / name).read_bytes(), f'Distribution document mismatch: {name}')
-        docs = sorted(path for path in (repo / 'docs').rglob('*') if path.is_file())
+            require((folder / name).read_bytes() == (repo / name).read_bytes(), f'Ordinary-folder document mismatch: {name}')
         for path in docs:
-            name = 'docs/' + path.relative_to(repo / 'docs').as_posix()
-            require(not path.is_symlink(), f'Distribution document symlink needs explicit review: {name}')
-            require(archive.read(name) == path.read_bytes(), f'Distribution document mismatch: {name}')
-        require({name for name in archive.namelist() if name.startswith('docs/') and not name.endswith('/')}
-                == {'docs/' + path.relative_to(repo / 'docs').as_posix() for path in docs}, 'Distribution docs inventory mismatch')
+            require(not path.is_symlink(), f'Document symlink needs explicit review: {path}')
+            require((folder / path.relative_to(repo)).read_bytes() == path.read_bytes(), f'Ordinary-folder document mismatch: {path.name}')
+    else:
+        with ZipFile(dist) as archive:
+            require(len(set(archive.namelist())) == len(archive.namelist()), 'Duplicate distribution entries')
+            require([name for name in archive.namelist() if name.endswith('.jar')] == ['mods/' + jar.name],
+                    'Distribution must contain exactly this build, without dependencies or old JARs')
+            with archive.open('mods/' + jar.name) as packed, jar.open('rb') as built:
+                require(same_stream_content(packed, built), 'Distribution JAR mismatch')
+            for name in (*notices, 'README.md'):
+                require(archive.read(name) == (repo / name).read_bytes(), f'Distribution document mismatch: {name}')
+            for path in docs:
+                name = 'docs/' + path.relative_to(repo / 'docs').as_posix()
+                require(not path.is_symlink(), f'Distribution document symlink needs explicit review: {name}')
+                require(archive.read(name) == path.read_bytes(), f'Distribution document mismatch: {name}')
+            require({name for name in archive.namelist() if name.startswith('docs/') and not name.endswith('/')}
+                    == {'docs/' + path.relative_to(repo / 'docs').as_posix() for path in docs}, 'Distribution docs inventory mismatch')
 
     verified_sources = source_snapshot(repo, None, baseline)
     if args.verify_only:
         print(json.dumps({'profile': args.profile, 'version': version, 'motionFilesVerified': len(motions),
                           'repositoryMotionFilesVerified': len(baseline), 'productionClassesVerified': len(classes),
-                          'productionResourcesVerified': len(resources), 'sourceFilesVerified': len(verified_sources),
+                          'productionResourcesVerified': len(resources), 'inactiveResourcesVerified': inactive, 'sourceFilesVerified': len(verified_sources),
                           'distributionDocumentsVerified': len(docs) + len(notices) + 1,
                           'outputWritten': False}, ensure_ascii=False, indent=2))
         return
@@ -227,7 +388,7 @@ def main() -> None:
         'name': props['mod_name'], 'author': mod['authors'], 'minecraft': props['minecraft_version'],
         'version': version, 'profile': args.profile, 'publicReleaseReady': False,
         'compiledClassesVerified': len(classes), 'bundledMotionFiles': len(motions), 'externalProfile': external,
-        'productionResourcesVerified': len(resources), 'repositoryMotionFiles': len(baseline),
+        'productionResourcesVerified': len(resources), 'inactiveResourcesVerified': inactive, 'repositoryMotionFiles': len(baseline),
         'baseCommit': git(repo, 'rev-parse', 'HEAD').decode().strip(),
         'workingTreeChanged': bool(git(repo, 'status', '--porcelain', '--untracked-files=no').strip()),
         'sourceFiles': len(sources),

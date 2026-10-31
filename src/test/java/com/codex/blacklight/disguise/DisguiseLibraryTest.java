@@ -32,8 +32,8 @@ class DisguiseLibraryTest {
     }
     @Test void savedLibraryRoundTripsAndMalformedSaveIsRejected(){
         var library=DisguiseLibrary.EMPTY.remember(identity(4)).remember(identity(7));
-        var nbt=DisguiseLibrary.CODEC.encodeStart(NbtOps.INSTANCE,library).result().orElseThrow();
-        assertEquals(library,DisguiseLibrary.CODEC.parse(NbtOps.INSTANCE,nbt).result().orElseThrow());
+        var nbt=DisguiseLibrary.CODEC.encodeStart(NbtOps.INSTANCE,library).getOrThrow(false, message -> { throw new AssertionError(message); });
+        assertEquals(library,DisguiseLibrary.CODEC.parse(NbtOps.INSTANCE,nbt).getOrThrow(false, message -> { throw new AssertionError(message); }));
         var bad=new CompoundTag();bad.putInt("revision",-1);bad.put("identities",new ListTag());
         assertTrue(DisguiseLibrary.CODEC.parse(NbtOps.INSTANCE,bad).error().isPresent());
     }

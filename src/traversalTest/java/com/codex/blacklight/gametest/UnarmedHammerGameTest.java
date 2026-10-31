@@ -8,12 +8,11 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.item.*;
-import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.gametest.*;
 
 @GameTestHolder("blacklight") @PrefixGameTestTemplate(false)
 public final class UnarmedHammerGameTest {
-    static void tick(ServerPlayer p){p.tickCount++;WeaponCombatSystem.tick(new TickEvent.PlayerTickEvent(TickEvent.Phase.END,p));}
+    static void tick(ServerPlayer p){p.tickCount++;WeaponCombatSystem.tick(new net.minecraftforge.event.TickEvent.PlayerTickEvent(net.minecraftforge.event.TickEvent.Phase.END,p));}
     @GameTest(template="wall_test",timeoutTicks=40)
     public static void ordinaryPunchesDealDamageAndPreserveTheOrdinaryForm(GameTestHelper h){
         var p=MovingCombatGameTest.player(h,PowerForm.NONE);var target=h.spawn(EntityType.IRON_GOLEM,3,25,5);target.setNoAi(true);float hp=target.getHealth();

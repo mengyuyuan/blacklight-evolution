@@ -1,37 +1,31 @@
 package com.codex.blacklight.client.renderer;
-import org.junit.jupiter.api.Test;
+
 import net.minecraft.world.phys.Vec3;
+import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
+
 class TentacleGaitTest {
- @Test void stationaryFeetNeverWander(){
-   var g=new TentacleGait();g.update(0,Vec3.ZERO,0,true,.76,p->p);Vec3[] tips=new Vec3[8];
-   for(int i=0;i<8;i++)tips[i]=g.tip(i);
-   for(int t=1;t<500;t++)g.update(t,Vec3.ZERO,0,true,.76,p->{fail("idle must not resample ground");return p;});
-   for(int i=0;i<8;i++)assertEquals(tips[i],g.tip(i));
- }
- @Test void bodyMovesButSupportTipsRemainPlanted(){
-   var g=new TentacleGait();g.update(0,Vec3.ZERO,0,true,.76,p->p);Vec3 foot=g.tip(1);
-   for(int t=1;t<=6;t++)g.update(t,new Vec3(0,0,t*.06),0,true,.76,p->p);
-   assertTrue(g.swinging(0));assertFalse(g.swinging(1));assertEquals(foot,g.tip(1));
-   assertTrue(g.tip(0).y>.025,"reaching tips lift above ground");
- }
- @Test void consecutiveStridesAlternateSupportGroups(){
-   var g=new TentacleGait();boolean even=false,odd=false;
-   for(int t=0;t<40;t++){g.update(t,new Vec3(0,0,t*.06),0,true,.76,p->p);even|=g.swinging(0);odd|=g.swinging(1);assertFalse(g.swinging(0)&&g.swinging(1));}
-   assertTrue(even&&odd);
- }
- @Test void contactsFollowGroundHeight(){
-   var g=new TentacleGait();g.update(0,Vec3.ZERO,0,true,.76,p->new Vec3(p.x,.35,p.z));
-   for(int i=0;i<8;i++)assertEquals(.35,g.tip(i).y,1e-9);
- }
- @Test void teleportResetsOldContacts(){
-   var g=new TentacleGait();g.update(0,Vec3.ZERO,0,true,.76,p->p);var destination=new Vec3(100,50,-100);
-   g.update(1,destination,0,true,.76,p->p);
-   for(int i=0;i<8;i++)assertTrue(g.tip(i).distanceTo(destination)<1);
- }
- @Test void airborneDoesNotQueryTerrainAndLandingReplants(){
-   var g=new TentacleGait();g.update(0,Vec3.ZERO,0,false,.76,p->{fail("no terrain query in air");return p;});
-   g.update(1,Vec3.ZERO,0,true,.76,p->new Vec3(p.x,.05,p.z));
-   assertEquals(.05,g.tip(0).y,1e-9);
- }
+    @Test void plantedFeetStayInWorldSpaceUntilTheirAlternatingGroupSteps() {
+        for(int count:new int[]{4,6,8}) {
+            var gait=new TentacleGait(count);gait.update(0,Vec3.ZERO,0,true,1,p->new Vec3(p.x,0,p.z));
+            Vec3[] feet=new Vec3[count];for(int i=0;i<count;i++)feet[i]=gait.tip(i);
+            gait.update(1,new Vec3(.1,0,0),0,true,1,p->new Vec3(p.x,0,p.z));
+            for(int i=0;i<count;i++)assertEquals(feet[i],gait.tip(i),"feet must not slide with the torso");
+            gait.update(2,new Vec3(.5,0,0),0,true,1,p->new Vec3(p.x,0,p.z));
+            int support=0;for(int i=0;i<count;i++)if(!gait.swinging(i)){support++;assertEquals(feet[i],gait.tip(i));}
+            assertEquals(count/2,support,"half the feet remain planted during a step");
+            gait.update(4,new Vec3(.65,0,0),0,true,1,p->new Vec3(p.x,0,p.z));
+            assertTrue(gait.tip(0).y>0,"swing tips lift above their ground contacts");
+            gait.update(9,new Vec3(.65,0,0),0,true,1,p->new Vec3(p.x,0,p.z));
+            assertEquals(0,gait.tip(0).y,.00001);
+        }
+    }
+    @Test void teleportAirborneAndOldEightArmCallersResetWithoutStretching() {
+        var gait=new TentacleGait();assertEquals(8,gait.count());
+        gait.update(0,Vec3.ZERO,0,true,1,p->new Vec3(p.x,0,p.z));
+        var destination=new Vec3(100,5,100);gait.update(1,destination,90,true,1,p->new Vec3(p.x,5,p.z));
+        for(int i=0;i<8;i++)assertTrue(gait.tip(i).distanceTo(destination)<1.5);
+        gait.update(2,destination,90,false,1,p->p);
+        for(int i=0;i<8;i++)assertFalse(gait.swinging(i));
+    }
 }

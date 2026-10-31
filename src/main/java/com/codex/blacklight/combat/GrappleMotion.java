@@ -25,11 +25,26 @@ public final class GrappleMotion {
     }
     public static String sceneKey(LivingEntity entity,ConsumeVisual visual){
         if(active(visual))return key(owner(entity,visual),visual);
-        var form=com.codex.blacklight.power.PowerForm.values()[com.codex.blacklight.util.MathCompat.clamp(visual.form(),0,com.codex.blacklight.power.PowerForm.values().length-1)];
-        return ConsumeSequence.clipKey(form,ConsumeSequence.mountedStage(visual.stage()));
+        var form=com.codex.blacklight.power.PowerForm.values()[com.codex.blacklight.forge.WingMath.clamp(visual.form(),0,com.codex.blacklight.power.PowerForm.values().length-1)];
+        return ConsumeSequence.clipKey(form,ConsumeSequence.mountedStage(visual.stage()),visual.variant());
     }
     public static float sceneProgress(LivingEntity entity,ConsumeVisual visual,float partial){
         return active(visual)?progress(owner(entity,visual),visual,partial):visual.motionProgress(entity.level().getGameTime(),partial);
+    }
+    public static float receiverProgress(LivingEntity entity,ConsumeVisual visual,float partial){
+        float progress=sceneProgress(entity,visual,partial);
+        if(!visual.consuming())return progress;
+        var forms=com.codex.blacklight.power.PowerForm.values();
+        return ConsumeSequence.receiverProgress(forms[com.codex.blacklight.forge.WingMath.clamp(visual.form(),0,forms.length-1)],progress,ConsumeSequence.mountedStage(visual.stage()),visual.variant());
+    }
+    /** The same body-relative grip is used by authority and receiver interpolation. */
+    public static java.util.Optional<net.minecraft.world.phys.Vec3> carryAnchor(LivingEntity owner,LivingEntity victim,
+            ConsumeVisual visual,net.minecraft.world.phys.Vec3 feet,float yaw,float partial) {
+        boolean gliding=visual.stage()==ConsumeVisual.HOLD&&!owner.onGround()
+                &&com.codex.blacklight.registry.ModAttachments.getData(owner, ModAttachments.GLIDE_UNTIL)>=owner.level().getGameTime();
+        float weight=com.codex.blacklight.registry.ModAttachments.getData(owner, ModAttachments.MOVEMENT_STATE).carryPosture().sample(owner.tickCount,gliding,partial);
+        var offset=net.minecraft.world.phys.Vec3.directionFromRotation(0,yaw).scale(.20*weight).add(0,-.25*weight,0);
+        return ConsumePlacementTrack.carryAnchor(feet,yaw,victim,key(owner,visual),progress(owner,visual,partial)).map(anchor->anchor.add(offset));
     }
     public static float facing(LivingEntity entity,ConsumeVisual visual){return facing(entity,visual,1);}
     public static float facing(LivingEntity entity,ConsumeVisual visual,float partial){

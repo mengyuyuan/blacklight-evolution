@@ -35,6 +35,10 @@ public final class PrototypeSurvivalLock {
     @SubscribeEvent
     public static void onRightClickBlock(PlayerInteractEvent.RightClickBlock event) {
         if (!isLocked(event.getEntity())) return;
+        if(com.codex.blacklight.firearms.FirearmsCombat.holdingFirearm(event.getEntity())){
+            // Suppress block interaction while permitting vanilla's follow-up item-use path.
+            event.setCancellationResult(InteractionResult.PASS);event.setCanceled(true);return;
+        }
         event.setCancellationResult(InteractionResult.FAIL);
         event.setCanceled(true);
         notifyClient(event.getEntity());
@@ -42,6 +46,7 @@ public final class PrototypeSurvivalLock {
 
     @SubscribeEvent
     public static void onRightClickItem(PlayerInteractEvent.RightClickItem event) {
+        if (event.getItemStack().getItem() instanceof com.codex.blacklight.firearms.FirearmItem) return;
         if (!isLocked(event.getEntity())) return;
         event.setCancellationResult(InteractionResult.FAIL);
         event.setCanceled(true);
@@ -58,6 +63,7 @@ public final class PrototypeSurvivalLock {
 
     @SubscribeEvent
     public static void onEntityInteract(PlayerInteractEvent.EntityInteract event) {
+        if(com.codex.blacklight.military.vehicle.VehicleDamageBridge.vehicle(event.getTarget())!=null)return;
         if (!isLocked(event.getEntity())) return;
         event.setCancellationResult(InteractionResult.FAIL);
         event.setCanceled(true);
@@ -66,6 +72,7 @@ public final class PrototypeSurvivalLock {
 
     @SubscribeEvent
     public static void onEntityInteractSpecific(PlayerInteractEvent.EntityInteractSpecific event) {
+        if(com.codex.blacklight.military.vehicle.VehicleDamageBridge.vehicle(event.getTarget())!=null)return;
         if (!isLocked(event.getEntity())) return;
         event.setCancellationResult(InteractionResult.FAIL);
         event.setCanceled(true);
@@ -75,6 +82,7 @@ public final class PrototypeSurvivalLock {
     /** Prototype combat is sent through its own server-timed actions, never vanilla weapons. */
     @SubscribeEvent
     public static void onVanillaAttack(AttackEntityEvent event) {
+        if(com.codex.blacklight.military.vehicle.VehicleDamageBridge.ownsAttackEvent(event))return;
         if (!isLocked(event.getEntity())) return;
         event.setCanceled(true);
         notifyClient(event.getEntity());
@@ -83,7 +91,8 @@ public final class PrototypeSurvivalLock {
     /** Server-side backstop for packets or other mods that bypass normal interaction events. */
     @SubscribeEvent
     public static void onBreakBlock(BlockEvent.BreakEvent event) {
-        if (isLocked(event.getPlayer())&&!com.codex.blacklight.combat.BulletdiveTerrain.ownsBreakEvent(event)&&!com.codex.blacklight.combat.ShieldBorerSystem.ownsBreakEvent(event)&&!com.codex.blacklight.combat.BlockThrowSystem.ownsBreakEvent(event)
+        if (isLocked(event.getPlayer())&&!com.codex.blacklight.firearms.FirearmBlockDamage.ownsBreakEvent(event)&&!com.codex.blacklight.combat.BulletdiveTerrain.ownsBreakEvent(event)&&!com.codex.blacklight.combat.BlockThrowSystem.ownsBreakEvent(event)
+                &&!com.codex.blacklight.combat.ShieldBorerSystem.ownsBreakEvent(event)
                 &&!com.codex.blacklight.power.BiomassTerrain.ownsBreakEvent(event)) event.setCanceled(true);
     }
 

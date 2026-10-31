@@ -27,9 +27,10 @@ public final class StandalonePlayerRendering {
     private record HandContext(AbstractClientPlayer player,BlacklightPlayerRenderer renderer,float partial) { }
     private static HandContext hands;
     public static boolean nativeHandPass(){return hands!=null;}
+    public static boolean allowFirstPersonHands(boolean mountedVehicle){return !mountedVehicle;}
     @SubscribeEvent public static void hand(RenderHandEvent event) {
         var mc=net.minecraft.client.Minecraft.getInstance();var player=mc.player;
-        if(player==null||player.isScoping()||!com.codex.blacklight.registry.ModAttachments.getData(player, ModAttachments.PLAYER_STATE).isPrototypeMode())return;
+        if(player==null||!allowFirstPersonHands(player.getVehicle() instanceof com.codex.blacklight.entity.MilitaryVehicle)||player.isScoping()||!com.codex.blacklight.registry.ModAttachments.getData(player, ModAttachments.PLAYER_STATE).isPrototypeMode())return;
         if(com.codex.blacklight.power.BiomassSystem.active(player)){event.setCanceled(true);return;}
         var form=com.codex.blacklight.registry.ModAttachments.getData(player, ModAttachments.PLAYER_STATE).getActivePower();
         var morph=WeaponMorphTracker.sample(player,event.getPartialTick());

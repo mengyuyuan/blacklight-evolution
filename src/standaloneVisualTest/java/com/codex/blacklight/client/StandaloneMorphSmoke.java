@@ -48,7 +48,7 @@ import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
-import net.minecraftforge.event.TickEvent;
+import net.minecraftforge.client.event.CalculateDetachedCameraDistanceEvent;
 import net.minecraftforge.client.event.InputEvent;
 import net.minecraftforge.client.event.RenderArmEvent;
 import net.minecraftforge.client.event.RenderPlayerEvent;
@@ -64,7 +64,7 @@ import org.lwjgl.stb.STBImageWrite;
 @EventBusSubscriber(modid=BlacklightNeoMod.MOD_ID,value=Dist.CLIENT)
 public final class StandaloneMorphSmoke {
     private static final String PROPERTY="blacklight.test.standaloneMorph";
-    private static final Path QA_DIRECTORY=Path.of(System.getProperty("blacklight.test.qaDirectory","run-forge-qa")).toAbsolutePath().normalize();
+    private static final Path QA_DIRECTORY=Path.of("D:/Blacklight-Standalone/run-native-qa").toAbsolutePath().normalize();
     private static final String QA_SAVE="Blacklight Standalone QA v4";
     private static final float[] MILESTONES={0,.25F,.5F,.75F,1};
     private enum Kind { SHORT,LONG,RAPID }
@@ -138,8 +138,7 @@ public final class StandaloneMorphSmoke {
     private static void advance(Stage next){stage=next;stageTicks=0;}
 
     @SubscribeEvent(priority=EventPriority.HIGHEST)
-    public static void isolate(TickEvent.ClientTickEvent event) {
-        if (event.phase != TickEvent.Phase.START) return;
+    public static void isolate(net.minecraftforge.event.TickEvent.ClientTickEvent event){if(event.phase!=net.minecraftforge.event.TickEvent.Phase.START)return;
         if(!active())return;var mc=Minecraft.getInstance();mc.mouseHandler.releaseMouse();
         for(var key:savedKeys.keySet()){key.setDown(false);while(key.consumeClick()){} }
         var c=current();if(c!=null)mc.options.setCameraType(c.camera());
@@ -148,8 +147,7 @@ public final class StandaloneMorphSmoke {
     @SubscribeEvent(priority=EventPriority.HIGHEST)
     public static void mouse(InputEvent.MouseButton.Pre event){if(active()){event.setCanceled(true);Minecraft.getInstance().mouseHandler.releaseMouse();}}
     @SubscribeEvent(priority=EventPriority.HIGHEST)
-    public static void beforeFrame(TickEvent.RenderTickEvent event) {
-        if (event.phase != TickEvent.Phase.START) return;if(active()){
+    public static void beforeFrame(net.minecraftforge.event.TickEvent.RenderTickEvent event){if(event.phase!=net.minecraftforge.event.TickEvent.Phase.START)return;if(active()){
         frameStartedNanos=System.nanoTime();frameIntervalNanos=previousFrameStartedNanos==0?0:frameStartedNanos-previousFrameStartedNanos;previousFrameStartedNanos=frameStartedNanos;frameReadbackNanos=0;
         rightNativeArms=0;leftNativeArms=0;thirdPersonPasses=0;
     }}
@@ -159,14 +157,14 @@ public final class StandaloneMorphSmoke {
         var mc=Minecraft.getInstance();if(mc.player==null)return;
         // Photographer fixture only. The actor, body pose and liquid material
         // clock keep their real production animation; native FPS is untouched.
-        // Forge posts this event after Camera.setup. Apply the fixture's angle
-        // and native collision-limited distance together after the normal setup.
+        // Camera.setup posts this event before resetting eye position and then
+        // flips THIRD_PERSON_FRONT by 180 degrees. Compensate that native flip.
         event.setYaw(-145);event.setPitch(-10);event.setRoll(0);
-        var camera=event.getCamera();
-        var access=(com.codex.blacklight.mixin.client.PrototypeCameraAccess)camera;
-        access.blacklight$setRotation(-145,-10);
-        access.blacklight$setPosition(mc.player.getEyePosition((float)event.getPartialTick()));
-        access.blacklight$move(-access.blacklight$getMaxZoom(3.6),0,0);
+    }
+    @SubscribeEvent(priority=EventPriority.LOWEST)
+    public static void distance(CalculateDetachedCameraDistanceEvent event) {
+        if(active()&&current()!=null&&current().camera()!=CameraType.FIRST_PERSON)
+            event.setDistance(3.6F/Math.max(.001F,event.getEntityScalingFactor()));
     }
     @SubscribeEvent(priority=EventPriority.LOWEST,receiveCanceled=true)
     public static void nativeArm(RenderArmEvent event) {
@@ -179,8 +177,7 @@ public final class StandaloneMorphSmoke {
     }
 
     @SubscribeEvent(priority=EventPriority.LOWEST)
-    public static void tick(TickEvent.ClientTickEvent event) {
-        if (event.phase != TickEvent.Phase.END) return;
+    public static void tick(net.minecraftforge.event.TickEvent.ClientTickEvent event){if(event.phase!=net.minecraftforge.event.TickEvent.Phase.END)return;
         if(disabled||completed||System.getProperty(PROPERTY,"").isBlank())return;
         var mc=Minecraft.getInstance();var server=mc.getSingleplayerServer();
         if(server==null||mc.level==null||mc.player==null)return;
@@ -301,12 +298,11 @@ public final class StandaloneMorphSmoke {
     }
 
     @SubscribeEvent(priority=EventPriority.LOWEST)
-    public static void frame(TickEvent.RenderTickEvent event) {
-        if (event.phase != TickEvent.Phase.END) return;
+    public static void frame(net.minecraftforge.event.TickEvent.RenderTickEvent event){if(event.phase!=net.minecraftforge.event.TickEvent.Phase.END)return;
         if(!active())return;var mc=Minecraft.getInstance();if(mc.player==null||mc.level==null)return;
         long qaStartedNanos=System.nanoTime();JsonObject performanceRow=null;
         try {
-            float partial=event.renderTickTime;double now=clock(mc,partial);
+            float partial=event.getPartialTick().getGameTimeDeltaPartialTick(false);double now=clock(mc,partial);
             var sample=WeaponMorphTracker.sample(mc.player,partial);validateFrame(mc,sample,now);
             performanceRow=frameTrace.get(frameTrace.size()-1).getAsJsonObject();
             performanceRow.addProperty("nativeFrameIntervalWallMs",frameIntervalNanos/1E6);

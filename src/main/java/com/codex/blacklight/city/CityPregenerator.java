@@ -12,10 +12,14 @@ public final class CityPregenerator {
     private static final Map<ServerLevel,Work> WORK=new WeakHashMap<>();
     private static final class Work {ChunkPos pending;int requested,next;}
     static void tick(ServerLevel level){
+        if(!level.getServer().isRunning())return;
         if(!CitySystem.futian(level))return;
         var data=CityGenerationData.get(level);
         if(!data.initialized){data.initialized=true;data.running=CityConfig.WARMUP.get();data.setDirty();}
         var work=WORK.computeIfAbsent(level,l->new Work());
+        if(data.running&&data.mode==3&&!data.atlasFingerprint.equals(WorldAtlas.fingerprint())){
+            data.running=false;data.failure="地图数据已更新，请用 start full 重新建立预生成计划";data.setDirty();release(level,work);return;
+        }
         if(!data.running){release(level,work);return;}
         int now=level.getServer().getTickCount();
         if(work.pending!=null){
@@ -30,7 +34,7 @@ public final class CityPregenerator {
         }
         var cells=CityGenerationPlan.cells(data.mode);
         if(data.cursor>=cells.size()){data.running=false;data.setDirty();return;}
-        if(now<work.next||level.getServer().getAverageTickTime()>35.0F)return;
+        if(now<work.next||level.getServer().getAverageTickTime()>35F)return;
         var cell=cells.get(data.cursor);work.pending=new ChunkPos(cell.x(),cell.z());work.requested=now;
         level.getChunkSource().addRegionTicket(TICKET,work.pending,0,work.pending);
     }
@@ -38,9 +42,19 @@ public final class CityPregenerator {
         if(work.pending!=null){level.getChunkSource().removeRegionTicket(TICKET,work.pending,0,work.pending);work.pending=null;}
     }
     static void unload(ServerLevel level){var work=WORK.remove(level);if(work!=null)release(level,work);}
+    /** LevelEvent.Unload is too late: Minecraft drains generation before posting it. */
+    static void stopping(net.minecraft.server.MinecraftServer server){
+        var iterator=WORK.entrySet().iterator();
+        while(iterator.hasNext()){
+            var entry=iterator.next();
+            if(entry.getKey().getServer()!=server)continue;
+            release(entry.getKey(),entry.getValue());iterator.remove();
+        }
+        // Keep the saved running/cursor state so a future server can resume it.
+    }
     static void start(ServerLevel level,int mode){
         unload(level);var d=CityGenerationData.get(level);d.initialized=true;d.mode=mode;d.cursor=0;
-        d.running=true;d.failure="";d.setDirty();
+        d.running=true;d.failure="";d.atlasFingerprint=mode==3?WorldAtlas.fingerprint():"";d.setDirty();
     }
     static void pause(ServerLevel level){
         var d=CityGenerationData.get(level);d.initialized=true;d.running=false;d.setDirty();unload(level);
@@ -50,9 +64,14 @@ public final class CityPregenerator {
         d.failure="";d.setDirty();
     }
     static boolean hasTicket(ServerLevel level){var w=WORK.get(level);return w!=null&&w.pending!=null;}
+    static String diagnostics(ServerLevel level){
+        var data=CityGenerationData.get(level);var work=WORK.get(level);
+        return "cursor="+data.cursor+" running="+data.running+" averageTickMillis="+level.getServer().getAverageTickTime()
+                +" pending="+(work==null?null:work.pending)+" failure="+data.failure;
+    }
     public static String status(ServerLevel level){
         var d=CityGenerationData.get(level);int total=CityGenerationPlan.cells(d.mode).size();
-        return "城市预生成："+(d.mode==2?"完整福田":"出生点周边")+" "+d.cursor+"/"+total+"，"
+        return "城市预生成："+(d.mode==3?"黑光维度已收录地图":d.mode==2?"完整福田":"出生点周边")+" "+d.cursor+"/"+total+"，"
             +(d.cursor>=total?"完成":d.running?"运行中（繁忙时自动等待）":"已暂停")+(d.failure.isEmpty()?"":"；"+d.failure);
     }
     public static com.mojang.brigadier.builder.LiteralArgumentBuilder<CommandSourceStack> command(){
@@ -65,9 +84,9 @@ public final class CityPregenerator {
         return root;
     }
     private static int execute(CommandSourceStack source,String action){
-        var level=source.getServer().getLevel(CityTravel.CITY);
+        var level=CityTravel.commandLevel(source);
         if(level==null||!CitySystem.futian(level)){source.sendFailure(Component.literal("当前存档没有福田城市维度"));return 0;}
-        switch(action){case "near"->start(level,1);case "full"->start(level,2);case "pause"->pause(level);case "resume"->resume(level);default->{}}
+        switch(action){case "near"->start(level,1);case "full"->start(level,level.dimension().equals(CityTravel.WORLD)?3:2);case "pause"->pause(level);case "resume"->resume(level);default->{}}
         source.sendSuccess(()->Component.literal(status(level)),false);return 1;
     }
     private CityPregenerator(){}

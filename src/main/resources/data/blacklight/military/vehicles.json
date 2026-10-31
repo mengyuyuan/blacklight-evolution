@@ -1,0 +1,200 @@
+{
+  "schemaVersion": 1,
+  "balanceOrigin": "mod_proposed_values_not_original_game_statistics",
+  "vehicles": [
+    {
+      "id": "truck",
+      "width": 2.9,
+      "length": 7.5,
+      "height": 3.7,
+      "maxHealth": 100,
+      "maxSpeed": 0.28,
+      "maxFuelTicks": 12000,
+      "armor": "light",
+      "liveries": [
+        "military",
+        "blackwatch"
+      ],
+      "mountsResource": "data/blacklight/military/vehicle-mounts.json",
+      "chassis": "truck",
+      "seats": [
+        {
+          "id": "driver",
+          "job": "driver",
+          "anchorId": "seat_driver"
+        },
+        {
+          "id": "officer",
+          "job": "officer",
+          "anchorId": "seat_officer"
+        },
+        {
+          "id": "passenger_1",
+          "job": "passenger",
+          "anchorId": "seat_passenger_1"
+        },
+        {
+          "id": "passenger_2",
+          "job": "passenger",
+          "anchorId": "seat_passenger_2"
+        },
+        {
+          "id": "passenger_3",
+          "job": "passenger",
+          "anchorId": "seat_passenger_3"
+        },
+        {
+          "id": "passenger_4",
+          "job": "passenger",
+          "anchorId": "seat_passenger_4"
+        },
+        {
+          "id": "passenger_5",
+          "job": "passenger",
+          "anchorId": "seat_passenger_5"
+        },
+        {
+          "id": "passenger_6",
+          "job": "passenger",
+          "anchorId": "seat_passenger_6"
+        }
+      ],
+      "ammunitionCapacities": {},
+      "weapons": []
+    },
+    {
+      "id": "apc",
+      "width": 3.3,
+      "length": 7.0,
+      "height": 3.3,
+      "maxHealth": 240,
+      "maxSpeed": 0.2,
+      "maxFuelTicks": 9000,
+      "armor": "armored",
+      "liveries": [
+        "military",
+        "blackwatch"
+      ],
+      "mountsResource": "data/blacklight/military/vehicle-mounts.json",
+      "chassis": "apc",
+      "seats": [
+        {
+          "id": "driver",
+          "job": "driver",
+          "anchorId": "seat_driver"
+        },
+        {
+          "id": "gunner",
+          "job": "gunner",
+          "anchorId": "seat_gunner"
+        },
+        {
+          "id": "passenger_1",
+          "job": "passenger",
+          "anchorId": "seat_passenger_1"
+        },
+        {
+          "id": "passenger_2",
+          "job": "passenger",
+          "anchorId": "seat_passenger_2"
+        },
+        {
+          "id": "passenger_3",
+          "job": "passenger",
+          "anchorId": "seat_passenger_3"
+        },
+        {
+          "id": "passenger_4",
+          "job": "passenger",
+          "anchorId": "seat_passenger_4"
+        },
+        {
+          "id": "passenger_5",
+          "job": "passenger",
+          "anchorId": "seat_passenger_5"
+        },
+        {
+          "id": "passenger_6",
+          "job": "passenger",
+          "anchorId": "seat_passenger_6"
+        }
+      ],
+      "ammunitionCapacities": {
+        "autocannon_round": 120,
+        "rocket_round": 4
+      },
+      "weapons": [
+        {
+          "id": "autocannon",
+          "ammunitionId": "autocannon_round",
+          "cooldownTicks": 6,
+          "cooldownGroup": "autocannon"
+        },
+        {
+          "id": "vehicle_rocket",
+          "ammunitionId": "rocket_round",
+          "cooldownTicks": 30,
+          "cooldownGroup": "vehicle_rocket"
+        }
+      ]
+    },
+    {
+      "id": "tank",
+      "width": 4.0,
+      "length": 8.0,
+      "height": 3.4,
+      "maxHealth": 420,
+      "maxSpeed": 0.16,
+      "maxFuelTicks": 7200,
+      "armor": "heavy",
+      "liveries": [
+        "military",
+        "blackwatch"
+      ],
+      "mountsResource": "data/blacklight/military/vehicle-mounts.json",
+      "chassis": "tank",
+      "seats": [
+        {
+          "id": "driver",
+          "job": "driver",
+          "anchorId": "seat_driver"
+        },
+        {
+          "id": "gunner",
+          "job": "gunner",
+          "anchorId": "seat_gunner"
+        },
+        {
+          "id": "commander",
+          "job": "commander",
+          "anchorId": "seat_commander"
+        }
+      ],
+      "ammunitionCapacities": {
+        "tank_he_shell": 12,
+        "tank_ap_shell": 8,
+        "machine_gun_round": 240
+      },
+      "weapons": [
+        {
+          "id": "tank_he",
+          "ammunitionId": "tank_he_shell",
+          "cooldownTicks": 80,
+          "cooldownGroup": "tank_main"
+        },
+        {
+          "id": "tank_ap",
+          "ammunitionId": "tank_ap_shell",
+          "cooldownTicks": 80,
+          "cooldownGroup": "tank_main"
+        },
+        {
+          "id": "coaxial_machine_gun",
+          "ammunitionId": "machine_gun_round",
+          "cooldownTicks": 4,
+          "cooldownGroup": "coaxial_machine_gun"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,304 @@
+{
+  "variants": {
+    "age=0,facing=down,variant=0": {
+      "model": "blacklight:block/tissue_attachment_0_0"
+    },
+    "age=0,facing=up,variant=0": {
+      "model": "blacklight:block/tissue_attachment_0_0",
+      "x": 180
+    },
+    "age=0,facing=north,variant=0": {
+      "model": "blacklight:block/tissue_attachment_0_0",
+      "x": 270
+    },
+    "age=0,facing=south,variant=0": {
+      "model": "blacklight:block/tissue_attachment_0_0",
+      "x": 90
+    },
+    "age=0,facing=west,variant=0": {
+      "model": "blacklight:block/tissue_attachment_0_0",
+      "x": 90,
+      "y": 90
+    },
+    "age=0,facing=east,variant=0": {
+      "model": "blacklight:block/tissue_attachment_0_0",
+      "x": 90,
+      "y": 270
+    },
+    "age=0,facing=down,variant=1": {
+      "model": "blacklight:block/tissue_attachment_0_1"
+    },
+    "age=0,facing=up,variant=1": {
+      "model": "blacklight:block/tissue_attachment_0_1",
+      "x": 180
+    },
+    "age=0,facing=north,variant=1": {
+      "model": "blacklight:block/tissue_attachment_0_1",
+      "x": 270
+    },
+    "age=0,facing=south,variant=1": {
+      "model": "blacklight:block/tissue_attachment_0_1",
+      "x": 90
+    },
+    "age=0,facing=west,variant=1": {
+      "model": "blacklight:block/tissue_attachment_0_1",
+      "x": 90,
+      "y": 90
+    },
+    "age=0,facing=east,variant=1": {
+      "model": "blacklight:block/tissue_attachment_0_1",
+      "x": 90,
+      "y": 270
+    },
+    "age=0,facing=down,variant=2": {
+      "model": "blacklight:block/tissue_attachment_0_2"
+    },
+    "age=0,facing=up,variant=2": {
+      "model": "blacklight:block/tissue_attachment_0_2",
+      "x": 180
+    },
+    "age=0,facing=north,variant=2": {
+      "model": "blacklight:block/tissue_attachment_0_2",
+      "x": 270
+    },
+    "age=0,facing=south,variant=2": {
+      "model": "blacklight:block/tissue_attachment_0_2",
+      "x": 90
+    },
+    "age=0,facing=west,variant=2": {
+      "model": "blacklight:block/tissue_attachment_0_2",
+      "x": 90,
+      "y": 90
+    },
+    "age=0,facing=east,variant=2": {
+      "model": "blacklight:block/tissue_attachment_0_2",
+      "x": 90,
+      "y": 270
+    },
+    "age=1,facing=down,variant=0": {
+      "model": "blacklight:block/tissue_attachment_1_0"
+    },
+    "age=1,facing=up,variant=0": {
+      "model": "blacklight:block/tissue_attachment_1_0",
+      "x": 180
+    },
+    "age=1,facing=north,variant=0": {
+      "model": "blacklight:block/tissue_attachment_1_0",
+      "x": 270
+    },
+    "age=1,facing=south,variant=0": {
+      "model": "blacklight:block/tissue_attachment_1_0",
+      "x": 90
+    },
+    "age=1,facing=west,variant=0": {
+      "model": "blacklight:block/tissue_attachment_1_0",
+      "x": 90,
+      "y": 90
+    },
+    "age=1,facing=east,variant=0": {
+      "model": "blacklight:block/tissue_attachment_1_0",
+      "x": 90,
+      "y": 270
+    },
+    "age=1,facing=down,variant=1": {
+      "model": "blacklight:block/tissue_attachment_1_1"
+    },
+    "age=1,facing=up,variant=1": {
+      "model": "blacklight:block/tissue_attachment_1_1",
+      "x": 180
+    },
+    "age=1,facing=north,variant=1": {
+      "model": "blacklight:block/tissue_attachment_1_1",
+      "x": 270
+    },
+    "age=1,facing=south,variant=1": {
+      "model": "blacklight:block/tissue_attachment_1_1",
+      "x": 90
+    },
+    "age=1,facing=west,variant=1": {
+      "model": "blacklight:block/tissue_attachment_1_1",
+      "x": 90,
+      "y": 90
+    },
+    "age=1,facing=east,variant=1": {
+      "model": "blacklight:block/tissue_attachment_1_1",
+      "x": 90,
+      "y": 270
+    },
+    "age=1,facing=down,variant=2": {
+      "model": "blacklight:block/tissue_attachment_1_2"
+    },
+    "age=1,facing=up,variant=2": {
+      "model": "blacklight:block/tissue_attachment_1_2",
+      "x": 180
+    },
+    "age=1,facing=north,variant=2": {
+      "model": "blacklight:block/tissue_attachment_1_2",
+      "x": 270
+    },
+    "age=1,facing=south,variant=2": {
+      "model": "blacklight:block/tissue_attachment_1_2",
+      "x": 90
+    },
+    "age=1,facing=west,variant=2": {
+      "model": "blacklight:block/tissue_attachment_1_2",
+      "x": 90,
+      "y": 90
+    },
+    "age=1,facing=east,variant=2": {
+      "model": "blacklight:block/tissue_attachment_1_2",
+      "x": 90,
+      "y": 270
+    },
+    "age=2,facing=down,variant=0": {
+      "model": "blacklight:block/tissue_attachment_2_0"
+    },
+    "age=2,facing=up,variant=0": {
+      "model": "blacklight:block/tissue_attachment_2_0",
+      "x": 180
+    },
+    "age=2,facing=north,variant=0": {
+      "model": "blacklight:block/tissue_attachment_2_0",
+      "x": 270
+    },
+    "age=2,facing=south,variant=0": {
+      "model": "blacklight:block/tissue_attachment_2_0",
+      "x": 90
+    },
+    "age=2,facing=west,variant=0": {
+      "model": "blacklight:block/tissue_attachment_2_0",
+      "x": 90,
+      "y": 90
+    },
+    "age=2,facing=east,variant=0": {
+      "model": "blacklight:block/tissue_attachment_2_0",
+      "x": 90,
+      "y": 270
+    },
+    "age=2,facing=down,variant=1": {
+      "model": "blacklight:block/tissue_attachment_2_1"
+    },
+    "age=2,facing=up,variant=1": {
+      "model": "blacklight:block/tissue_attachment_2_1",
+      "x": 180
+    },
+    "age=2,facing=north,variant=1": {
+      "model": "blacklight:block/tissue_attachment_2_1",
+      "x": 270
+    },
+    "age=2,facing=south,variant=1": {
+      "model": "blacklight:block/tissue_attachment_2_1",
+      "x": 90
+    },
+    "age=2,facing=west,variant=1": {
+      "model": "blacklight:block/tissue_attachment_2_1",
+      "x": 90,
+      "y": 90
+    },
+    "age=2,facing=east,variant=1": {
+      "model": "blacklight:block/tissue_attachment_2_1",
+      "x": 90,
+      "y": 270
+    },
+    "age=2,facing=down,variant=2": {
+      "model": "blacklight:block/tissue_attachment_2_2"
+    },
+    "age=2,facing=up,variant=2": {
+      "model": "blacklight:block/tissue_attachment_2_2",
+      "x": 180
+    },
+    "age=2,facing=north,variant=2": {
+      "model": "blacklight:block/tissue_attachment_2_2",
+      "x": 270
+    },
+    "age=2,facing=south,variant=2": {
+      "model": "blacklight:block/tissue_attachment_2_2",
+      "x": 90
+    },
+    "age=2,facing=west,variant=2": {
+      "model": "blacklight:block/tissue_attachment_2_2",
+      "x": 90,
+      "y": 90
+    },
+    "age=2,facing=east,variant=2": {
+      "model": "blacklight:block/tissue_attachment_2_2",
+      "x": 90,
+      "y": 270
+    },
+    "age=3,facing=down,variant=0": {
+      "model": "blacklight:block/tissue_attachment_3_0"
+    },
+    "age=3,facing=up,variant=0": {
+      "model": "blacklight:block/tissue_attachment_3_0",
+      "x": 180
+    },
+    "age=3,facing=north,variant=0": {
+      "model": "blacklight:block/tissue_attachment_3_0",
+      "x": 270
+    },
+    "age=3,facing=south,variant=0": {
+      "model": "blacklight:block/tissue_attachment_3_0",
+      "x": 90
+    },
+    "age=3,facing=west,variant=0": {
+      "model": "blacklight:block/tissue_attachment_3_0",
+      "x": 90,
+      "y": 90
+    },
+    "age=3,facing=east,variant=0": {
+      "model": "blacklight:block/tissue_attachment_3_0",
+      "x": 90,
+      "y": 270
+    },
+    "age=3,facing=down,variant=1": {
+      "model": "blacklight:block/tissue_attachment_3_1"
+    },
+    "age=3,facing=up,variant=1": {
+      "model": "blacklight:block/tissue_attachment_3_1",
+      "x": 180
+    },
+    "age=3,facing=north,variant=1": {
+      "model": "blacklight:block/tissue_attachment_3_1",
+      "x": 270
+    },
+    "age=3,facing=south,variant=1": {
+      "model": "blacklight:block/tissue_attachment_3_1",
+      "x": 90
+    },
+    "age=3,facing=west,variant=1": {
+      "model": "blacklight:block/tissue_attachment_3_1",
+      "x": 90,
+      "y": 90
+    },
+    "age=3,facing=east,variant=1": {
+      "model": "blacklight:block/tissue_attachment_3_1",
+      "x": 90,
+      "y": 270
+    },
+    "age=3,facing=down,variant=2": {
+      "model": "blacklight:block/tissue_attachment_3_2"
+    },
+    "age=3,facing=up,variant=2": {
+      "model": "blacklight:block/tissue_attachment_3_2",
+      "x": 180
+    },
+    "age=3,facing=north,variant=2": {
+      "model": "blacklight:block/tissue_attachment_3_2",
+      "x": 270
+    },
+    "age=3,facing=south,variant=2": {
+      "model": "blacklight:block/tissue_attachment_3_2",
+      "x": 90
+    },
+    "age=3,facing=west,variant=2": {
+      "model": "blacklight:block/tissue_attachment_3_2",
+      "x": 90,
+      "y": 90
+    },
+    "age=3,facing=east,variant=2": {
+      "model": "blacklight:block/tissue_attachment_3_2",
+      "x": 90,
+      "y": 270
+    }
+  }
+}

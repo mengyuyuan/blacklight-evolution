@@ -1,0 +1,39 @@
+{
+  "textures": {
+    "flesh": "blacklight:block/hive_flesh",
+    "shell": "blacklight:block/hive_carapace",
+    "vein": "blacklight:block/hive_vein",
+    "particle": "blacklight:block/hive_flesh"
+  },
+  "elements": [
+    {
+      "from": [
+        4,
+        0,
+        4
+      ],
+      "to": [
+        12,
+        0.096,
+        12
+      ],
+      "faces": {
+        "up": {
+          "texture": "#flesh"
+        },
+        "north": {
+          "texture": "#flesh"
+        },
+        "south": {
+          "texture": "#flesh"
+        },
+        "east": {
+          "texture": "#flesh"
+        },
+        "west": {
+          "texture": "#flesh"
+        }
+      }
+    }
+  ]
+}

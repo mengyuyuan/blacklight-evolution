@@ -25,7 +25,7 @@ public final class CityChunkGenerator extends FlatLevelSource {
     public boolean futian(){return futian;}
     @Override protected Codec<? extends ChunkGenerator> codec(){return CODEC;}
     @Override public ChunkGeneratorStructureState createState(HolderLookup<StructureSet> lookup,RandomState random,long seed){this.seed=seed;return super.createState(lookup,random,seed);}
-    @Override public void applyBiomeDecoration(WorldGenLevel level,ChunkAccess chunk,StructureManager structures){}
+    @Override public void applyBiomeDecoration(WorldGenLevel level,ChunkAccess chunk,StructureManager structures){super.applyBiomeDecoration(level,chunk,structures);}
     @Override public int getMinY(){return 0;}
     @Override public int getGenDepth(){return futian?320:256;}
     @Override public int getSeaLevel(){return 60;}

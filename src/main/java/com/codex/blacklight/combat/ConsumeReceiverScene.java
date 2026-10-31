@@ -13,7 +13,8 @@ public final class ConsumeReceiverScene {
     private static Map<String, Profile> profiles;
     private ConsumeReceiverScene() {}
 
-    public static synchronized Profile profile(PowerForm form, boolean large) {
+    public static Profile profile(PowerForm form,boolean large){return profile(form,large,ConsumeVariant.DEFAULT);}
+    public static synchronized Profile profile(PowerForm form, boolean large,int variant) {
         if (large) return null;
         if (profiles == null) {
             var loaded = new HashMap<String, Profile>();
@@ -30,21 +31,22 @@ public final class ConsumeReceiverScene {
                         if(!Float.isFinite(time)||time<0||time>=finish)throw new IllegalArgumentException("Invalid receiver impact");
                         hits.add(time);
                     }
-                    if (!java.util.Set.of("HEAD_CRUSH","HEAD_IMPACT","LASH","ARM_RIP","CHEST_ABSORB").contains(style)
+                    if (!java.util.Set.of("SEVER","HEAD_CRUSH","HEAD_IMPACT","LASH","ARM_RIP","CHEST_ABSORB").contains(style)
                             || !Float.isFinite(effect)||!Float.isFinite(finish)||!Float.isFinite(settle)
                             || !Float.isFinite(deform)||deform<0||deform>=finish
-                            || effect<0||finish<=effect||finish>20||settle<=0||settle>=finish-effect)
+                            || effect<0||finish<=effect||finish>20||settle<=0||settle>=finish-Math.max(effect,deform))
                         throw new IllegalArgumentException("Invalid receiver events: "+entry.getKey());
                     loaded.put(entry.getKey(), new Profile(style,deform,java.util.List.copyOf(hits),effect,finish,settle));
                 }
             });
             profiles=Map.copyOf(loaded);
         }
-        return profiles.get(ConsumeSequence.key(form));
+        return profiles.get(ConsumeSequence.key(form,variant));
     }
 
-    public static float clipSeconds(PowerForm form) {
-        return LocalVisualMotion.find("consume_"+ConsumeSequence.key(form)+"_actor")
+    public static float clipSeconds(PowerForm form){return clipSeconds(form,ConsumeVariant.DEFAULT);}
+    public static float clipSeconds(PowerForm form,int variant) {
+        return LocalVisualMotion.find("consume_"+ConsumeSequence.key(form,variant)+"_actor")
                 .map(clip -> {
                     var times=clip.animation().getAsJsonArray("animation").get(0).getAsJsonObject().getAsJsonArray("time");
                     return Math.max(.05F,times.get(times.size()-1).getAsFloat());

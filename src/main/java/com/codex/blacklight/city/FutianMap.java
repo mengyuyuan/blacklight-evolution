@@ -5,6 +5,7 @@ import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.zip.GZIPInputStream;
+import com.codex.blacklight.util.MapResources;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.Blocks;
@@ -37,9 +38,9 @@ public final class FutianMap {
     }
     private static Tile load(int x,int z){
         short[] blocks=new short[(HEIGHT-63)*256],tops=new short[256];Arrays.fill(tops,(short)63);
-        try(var raw=FutianMap.class.getResourceAsStream(ROOT+x+"_"+z+".bin.gz")){
+        try(var raw=MapResources.open(FutianMap.class,ROOT+x+"_"+z+".bin.gz")){
             if(raw==null)throw new IOException("Missing Futian chunk "+x+","+z);
-            try(var in=new DataInputStream(new GZIPInputStream(raw))){
+            try(var in=new DataInputStream(raw)){
                 if(in.readInt()!=0x42464331)throw new IOException("Invalid Futian chunk header");
                 for(int column=0;column<256;column++){
                     int runs=in.readUnsignedShort();if(runs>HEIGHT)throw new IOException("Too many runs");

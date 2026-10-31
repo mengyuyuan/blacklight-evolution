@@ -36,7 +36,15 @@
     "WingFlightTravelMixin",
     "WingFlightFloatingMixin",
     "HydraTransportMixin",
-    "HydraServerMovementMixin"
+    "HydraServerMovementMixin",
+    "VehicleEntityCollisionMixin",
+    "OptionalLithiumVehicleCollisionMixin",
+    "OptionalLithiumCollisionContextMixin",
+    "OptionalLithiumCollisionIteratorMixin",
+    "VehicleProjectileCollisionMixin",
+    "ShulkerPeekAccess",
+    "PigSteeringAccess",
+    "StriderSteeringAccess"
   ],
   "client": [
     "client.PostChainAccess",
@@ -62,7 +70,9 @@
     "client.DragonConsumePoseMixin",
     "client.VictimModelRootMixin",
     "client.BulletFlightCullingMixin",
-    "client.BlockCarryItemMixin"
+    "client.BlockCarryItemMixin",
+    "client.VehiclePlayerPoseMixin",
+    "client.PrototypeVehiclePickMixin"
   ],
   "injectors": {
     "defaultRequire": 1
