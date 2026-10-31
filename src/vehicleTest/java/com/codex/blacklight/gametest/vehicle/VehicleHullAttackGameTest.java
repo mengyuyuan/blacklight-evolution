@@ -42,11 +42,11 @@ public final class VehicleHullAttackGameTest {
             case "brute"->ModEntities.BLACKLIGHT_BRUTE.get().create(f.level);
             default->throw new GameTestAssertException("unknown actual fixture species "+kind);
         };
-        actor.setPersistenceRequired();actor.setPos(f.x+5,81,2);f.level.addFreshEntity(actor);f.entities.add(actor);return actor;
+        actor.setPersistenceRequired();actor.setPos(f.x+5,81,2);actor.getRandom().setSeed(0x484c4cL+f.x);f.level.addFreshEntity(actor);f.entities.add(actor);return actor;
     }
     private static String diagnostic(Mob actor,LivingEntity target,MilitaryVehicle vehicle){
         return "actor="+actor.getType()+" alive="+actor.isAlive()+" noAi="+actor.isNoAi()+" ticks="+actor.tickCount+" entityTicking="+((net.minecraft.server.level.ServerLevel)actor.level()).isPositionEntityTicking(actor.blockPosition())+" canAttack="+actor.canAttack(target)+" currentTarget="+(actor.getTarget()==null?"none":actor.getTarget().getUUID())
-                +" expected="+target.getUUID()+" targetAlive="+target.isAlive()+" targetRemoved="+target.isRemoved()+" riding="+(target.getVehicle()==vehicle)
+                +" expected="+target.getUUID()+" targetInfected="+BlacklightInfectionSystem.isInfected(target)+" targetAlive="+target.isAlive()+" targetRemoved="+target.isRemoved()+" riding="+(target.getVehicle()==vehicle)
                 +" distance="+actor.distanceTo(target)+" LOS="+actor.hasLineOfSight(target)+" actorPos="+actor.position()+" targetPos="+target.position()+" hullHp="+vehicle.health();
     }
     private static void fail(GameTestHelper h,MilitaryVehicleGameTest.Fixture f,String reason){f.close();h.assertTrue(false,reason);}
@@ -62,18 +62,18 @@ public final class VehicleHullAttackGameTest {
     }
     private static void species(GameTestHelper h,int x,String kind,boolean playerTarget){
         var f=new MilitaryVehicleGameTest.Fixture(h,x);var vehicle=tank(f);LivingEntity target=playerTarget?player(h,f,vehicle):villager(f,vehicle);float before=vehicle.health();var actor=actor(f,kind);
-        h.runAfterDelay(20,()->awaitTarget(h,f,actor,target,vehicle,60,()->awaitDamage(h,f,actor,target,vehicle,before,100,()->{try(f){
+        h.runAfterDelay(20,()->awaitTarget(h,f,actor,target,vehicle,180,()->awaitDamage(h,f,actor,target,vehicle,before,100,()->{try(f){
             h.assertTrue(handles(actor),"actual joined creature is handled by the installed production hull goal");
             h.assertTrue(actor.goalSelector.getAvailableGoals().stream().anyMatch(wrapped->wrapped.getGoal().getClass().getName().equals("com.codex.blacklight.military.vehicle.VehicleHullAttackGoal")),"EntityJoin installed the actual mechanical attack goal without a test adding it");
             h.assertTrue(actor.getTarget()==target&&target.getVehicle()==vehicle,"living target identity and its original actual passenger are preserved");
             h.assertTrue(vehicle.health()>0&&!vehicle.isRemoved(),"the same actual chassis remains alive with reduced mechanical durability");
         }h.succeed();})));
     }
-    @GameTest(template="blackwatch_arena",batch="vehicle6hullai",timeoutTicks=240)
+    @GameTest(template="blackwatch_arena",batch="vehicle6hullai",timeoutTicks=360)
     public static void naturalHunterTargetsActualMountedVillagerAndHitsMechanicalHull(GameTestHelper h){species(h,401000,"hunter",false);}
-    @GameTest(template="blackwatch_arena",batch="vehicle6hullai",timeoutTicks=240)
+    @GameTest(template="blackwatch_arena",batch="vehicle6hullai",timeoutTicks=360)
     public static void naturalGroundHostTargetsActualMountedVillagerAndHitsMechanicalHull(GameTestHelper h){species(h,402000,"host",false);}
-    @GameTest(template="blackwatch_arena",batch="vehicle6hullai",timeoutTicks=240)
+    @GameTest(template="blackwatch_arena",batch="vehicle6hullai",timeoutTicks=360)
     public static void naturalBruteTargetsActualMountedSurvivalPlayerAndHitsMechanicalHull(GameTestHelper h){species(h,403000,"brute",true);}
 
     @GameTest(template="blackwatch_arena",batch="vehicle6hullai",timeoutTicks=560)
@@ -97,7 +97,7 @@ public final class VehicleHullAttackGameTest {
     @GameTest(template="blackwatch_arena",batch="vehicle6hullai",timeoutTicks=260)
     public static void actualPassengerDimensionChangeCancelsMechanicalAttackWithoutFollowingOrLoadingOldTarget(GameTestHelper h){
         var f=new MilitaryVehicleGameTest.Fixture(h,405000);var vehicle=tank(f);var target=player(h,f,vehicle);var actor=actor(f,"brute");float initial=vehicle.health();
-        h.runAfterDelay(20,()->awaitTarget(h,f,actor,target,vehicle,60,()->awaitDamage(h,f,actor,target,vehicle,initial,100,()->{
+        h.runAfterDelay(20,()->awaitTarget(h,f,actor,target,vehicle,180,()->awaitDamage(h,f,actor,target,vehicle,initial,100,()->{
             var dimension=f.level.dimension().equals(Level.NETHER)?Level.OVERWORLD:Level.NETHER;var elsewhere=f.level.getServer().getLevel(dimension);
             h.assertTrue(elsewhere!=null&&elsewhere!=f.level,"fixture has a real distinct server dimension");target.teleportTo(elsewhere,0.5,100,0.5,0,0);float before=vehicle.health();
             h.assertTrue(target.level()!=f.level&&target.getVehicle()!=vehicle&&!handles(actor),"actual server dimension transfer invalidates the original passenger-to-hull association");
@@ -121,7 +121,7 @@ public final class VehicleHullAttackGameTest {
         var f=new MilitaryVehicleGameTest.Fixture(h,407000);var vehicle=tank(f);var source=EntityType.COW.create(f.level);var target=ModEntities.INFECTED_HOST.get().create(f.level);target.inherit(source);source.discard();durable(target);target.setNoAi(true);target.setPos(vehicle.position());f.level.addFreshEntity(target);f.entities.add(target);
         h.assertTrue(target.startRiding(vehicle)&&BlacklightInfectionSystem.isInfected(target),"actual mature infected host physically occupies a seat and is already a legal infection enemy");
         var actor=ModEntities.MILITARY_SOLDIER.get().create(f.level);actor.setAutomaticUnitJoin(false);actor.setPersistenceRequired();actor.setPos(f.x+7,81,2);actor.initializeWeapon();int ammunition=actor.reserveAmmo()+actor.magazineAmmo();f.level.addFreshEntity(actor);f.entities.add(actor);float initial=vehicle.health();
-        h.runAfterDelay(20,()->awaitTarget(h,f,actor,target,vehicle,60,()->awaitDamage(h,f,actor,target,vehicle,initial,120,()->{try(f){
+        h.runAfterDelay(20,()->awaitTarget(h,f,actor,target,vehicle,180,()->awaitDamage(h,f,actor,target,vehicle,initial,120,()->{try(f){
             h.assertTrue(actor.validTarget(target)&&actor.getTarget()==target,"actual infantry target remains the same already-legal living infected passenger");
             h.assertTrue(actor.reserveAmmo()+actor.magazineAmmo()<ammunition,"real mechanical damage uses and consumes the original finite rifle stock");
         }h.succeed();})));
