@@ -54,10 +54,18 @@ public final class CombatImpactEffects {
         if(move.form==PowerForm.BLADE){BladeEffects.hit(p,v,move);return;}
         boolean hammer=move.form==PowerForm.HAMMERFISTS;
         boolean bare=com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.PLAYER_STATE).getActivePower()==PowerForm.NONE;
-        if(!hammer&&!bare)return;
+        boolean finisher=WeaponImpact.finisher(move);
+        // Every confirmed body hit gets a contact burst; size follows weapon weight and finishers.
+        float size=hammer?.8F:move.form==PowerForm.MUSCLE_MASS?.7F:move.form==PowerForm.WHIPFIST?.6F:bare?.38F:.5F;
+        var tier=ImpactTier.of(move);size*=tier.effectScale;
         var c=v.getBoundingBox().getCenter();
-        PacketDistributor.sendToPlayersTrackingEntityAndSelf(p,new CombatImpactPayload(c.x,c.y,c.z,hammer?.8F:.38F,false));
-        p.serverLevel().sendParticles(ParticleTypes.CRIT,c.x,c.y,c.z,hammer?12:5,.18,.24,.18,.08);
+        var eye=p.getEyePosition();
+        var contact=v.getBoundingBox().clip(eye,c).orElse(c).add(eye.subtract(c).normalize().scale(.05));
+        PacketDistributor.sendToPlayersTrackingEntityAndSelf(p,new CombatImpactPayload(contact.x,contact.y,contact.z,size,false));
+        int crits=(hammer||bare?6:3)*(tier.ordinal()+1);
+        p.serverLevel().sendParticles(ParticleTypes.CRIT,c.x,c.y,c.z,crits,.18,.24,.18,.08+.04*tier.ordinal());
+        if(tier.atLeast(ImpactTier.HEAVY))p.serverLevel().sendParticles(ParticleTypes.DAMAGE_INDICATOR,c.x,c.y,c.z,tier==ImpactTier.FINISHER?8:4,.2,.3,.2,.12);
+        if(tier==ImpactTier.FINISHER)p.serverLevel().sendParticles(ParticleTypes.SWEEP_ATTACK,contact.x,contact.y,contact.z,1,0,0,0,0);
 
     }
 }

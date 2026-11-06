@@ -39,6 +39,8 @@ public final class TissueMorphogenesis {
     private record Section(V centre,float width,float depth) {}
     private enum BodyPlan { UPRIGHT, QUADRUPED, RADIAL }
     private static final V X=new V(1,0,0),Y=new V(0,1,0),Z=new V(0,0,1);
+    /** Rounded mature section: pulled-in corners, slightly flattened sides. */
+    private static final float[][] ROUND={{-1,-.56F},{-.56F,-1},{.56F,-1},{1,-.56F},{1,.56F},{.56F,1},{-.56F,1},{-1,.56F}};
     private static final float[][] RING={{-1,-.82F},{-.82F,-1},{.82F,-1},{1,-.82F},{1,.82F},{.82F,1},{-.82F,1},{-1,.82F}};
     private TissueMorphogenesis(){}
 
@@ -557,10 +559,19 @@ public final class TissueMorphogenesis {
     }
     private static Mesh loft(String name,boolean skin,int phase,String motion,V hinge,float[][] pivots,
             List<List<Section>> keys,V a,V b,V up,V forward,long seed) {
+        if(!skin&&keys.get(0).size()==3)keys=smooth(keys);
         int sections=keys.get(0).size();float[][] stages=new float[3][sections*8*3];
         for(int k=0;k<3;k++)for(int r=0;r<sections;r++)for(int s=0;s<8;s++) {
             float x=RING[s][0],y=RING[s][1];if(skin&&k==0){x=Math.copySign(1,x);y=Math.copySign(1,y);}
-            var section=keys.get(k).get(r);V p=section.centre.add(a.mul(x*section.width)).add(b.mul(y*section.depth));
+            float swell=1;
+            if(skin&&k>0){
+                // Grown hide relaxes from the native cuboid toward a rounded,
+                // muscular section; corners pull in, mid-faces bulge unevenly.
+                float round=k==2?1:.45F;
+                x=x+(ROUND[s][0]-x)*round;y=y+(ROUND[s][1]-y)*round;
+                swell=1+(.07F+TissueGrowth.sample(seed,r*8+s+400)*.07F)*round*(r==0||r==sections-1?.4F:1);
+            }
+            var section=keys.get(k).get(r);V p=section.centre.add(a.mul(x*section.width*swell)).add(b.mul(y*section.depth*swell));
             int i=(r*8+s)*3;stages[k][i]=p.x;stages[k][i+1]=p.y;stages[k][i+2]=p.z;
         }
         var faces=new ArrayList<float[]>();
@@ -581,6 +592,26 @@ public final class TissueMorphogenesis {
             }
         }
         return new Mesh(name,skin,phase,motion,hinge.array(),pivots,stages,faces.toArray(float[][]::new));
+    }
+    /** Three authored sections become five on the quadratic through them: horns,
+     * claws and plates read as curved, tapering forms instead of faceted wedges. */
+    private static List<List<Section>> smooth(List<List<Section>> keys) {
+        var result=new ArrayList<List<Section>>();
+        for(var stage:keys) {
+            Section p0=stage.get(0),p1=stage.get(1),p2=stage.get(2);var rings=new ArrayList<Section>();
+            for(float t:new float[]{0,.25F,.5F,.75F,1}) {
+                // Lagrange basis on t=0,.5,1 passes exactly through the authored keys.
+                float l0=2*(t-.5F)*(t-1),l1=-4*t*(t-1),l2=2*t*(t-.5F);
+                V c=p0.centre.mul(l0).add(p1.centre.mul(l1)).add(p2.centre.mul(l2));
+                float lo=Math.min(p0.width,Math.min(p1.width,p2.width)),hi=Math.max(p0.width,Math.max(p1.width,p2.width));
+                float w=Math.max(lo,Math.min(hi,p0.width*l0+p1.width*l1+p2.width*l2));
+                lo=Math.min(p0.depth,Math.min(p1.depth,p2.depth));hi=Math.max(p0.depth,Math.max(p1.depth,p2.depth));
+                float d=Math.max(lo,Math.min(hi,p0.depth*l0+p1.depth*l1+p2.depth*l2));
+                rings.add(new Section(c,w,d));
+            }
+            result.add(rings);
+        }
+        return result;
     }
     private static int material(String name,boolean skin,int ring,int side,int sections,V outward,V up,V forward) {
         if(!skin) {

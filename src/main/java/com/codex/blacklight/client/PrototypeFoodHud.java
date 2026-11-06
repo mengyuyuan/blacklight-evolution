@@ -13,6 +13,6 @@ public final class PrototypeFoodHud {
     @SubscribeEvent
     public static void render(RenderGuiOverlayEvent.Pre event) {
         if (event.getOverlay().id().equals(VanillaGuiOverlay.FOOD_LEVEL.id())
-                && PrototypeMetabolism.active(Minecraft.getInstance().player)) event.setCanceled(true);
+                && PrototypeMetabolism.hungerSuspended(Minecraft.getInstance().player)) event.setCanceled(true);
     }
 }

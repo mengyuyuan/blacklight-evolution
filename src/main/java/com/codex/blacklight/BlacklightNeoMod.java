@@ -40,9 +40,11 @@ public final class BlacklightNeoMod {
         net.minecraftforge.fml.ModLoadingContext.get().registerConfig(net.minecraftforge.fml.config.ModConfig.Type.SERVER, com.codex.blacklight.infection.OutbreakConfig.SPEC, "blacklight-outbreak-server.toml");
         net.minecraftforge.fml.ModLoadingContext.get().registerConfig(net.minecraftforge.fml.config.ModConfig.Type.SERVER, com.codex.blacklight.power.PlayerEvolutionConfig.SPEC, "blacklight-player-evolution-server.toml");
         net.minecraftforge.fml.ModLoadingContext.get().registerConfig(net.minecraftforge.fml.config.ModConfig.Type.SERVER, com.codex.blacklight.config.GameplayBalanceConfig.SPEC, "blacklight-gameplay-server.toml");
+        net.minecraftforge.fml.ModLoadingContext.get().registerConfig(net.minecraftforge.fml.config.ModConfig.Type.SERVER, com.codex.blacklight.config.InfectionEcologyConfig.SPEC, "blacklight-ecology-server.toml");
         com.codex.blacklight.city.CityBlocks.register(modBus);
         com.codex.blacklight.city.CityWorldgen.register(modBus);
         MinecraftForge.EVENT_BUS.register(com.codex.blacklight.city.CitySystem.class);
+        MinecraftForge.EVENT_BUS.register(com.codex.blacklight.world.LairSystem.class);
         MinecraftForge.EVENT_BUS.register(com.codex.blacklight.infection.BuildingInfectionSystem.class);
         MinecraftForge.EVENT_BUS.register(com.codex.blacklight.city.CityTravel.class);
         ModAttachments.register(modBus);
@@ -61,6 +63,7 @@ public final class BlacklightNeoMod {
         ModNetwork.register();
         modBus.addListener((net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent event)->event.enqueueWork(()->{
             com.codex.blacklight.power.BiomassRules.initialize();
+            com.codex.blacklight.power.PrototypeMetabolism.initialize();
             com.codex.blacklight.animation.MotionLibrary.requireInstalled();
             var health=(net.minecraft.world.entity.ai.attributes.RangedAttribute)net.minecraft.world.entity.ai.attributes.Attributes.MAX_HEALTH;
             ((com.codex.blacklight.mixin.HealthAttributeLimitAccessor)health).blacklight$setMaximum(Math.max(health.getMaxValue(),1e24));

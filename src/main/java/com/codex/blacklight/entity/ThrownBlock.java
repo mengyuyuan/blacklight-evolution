@@ -52,7 +52,7 @@ public final class ThrownBlock extends Projectile {
     public void beginPickup(ServerPlayer p,net.minecraft.core.BlockPos source){BlockThrowSystem.trackHeld(p,this);entityData.set(SOURCE,source);setPhase(p,0,"pickup");}
     public Vec3 carryCenter(Player p,Vec3 grip,float partial){
         if(phase()!=0)return grip;
-        var action=com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.PLAYER_ACTION);
+        var action=com.codex.blacklight.registry.ModAttachments.getData(p,ModAttachments.PLAYER_ACTION);
         float t=net.minecraft.util.Mth.clamp((action.seconds(level().getGameTime()+partial)*20/BlockThrowMotion.pickupTicks(twoHanded())-.25F)/.65F,0,1);
         t=t*t*(3-2*t);return Vec3.atLowerCornerOf(entityData.get(SOURCE)).add(cargo().size().scale(.5)).lerp(grip,t);
     }
@@ -125,9 +125,9 @@ public final class ThrownBlock extends Projectile {
                     if(!BlockThrowSystem.canUse(server)){drop();return;}
                     long now=level().getGameTime();
                     String expected=BlockThrowMotion.key(twoHanded(),switch(phase()){case 0->"pickup";case 2->"charge";case 4->"release";default->"hold";});
-                    var action=com.codex.blacklight.registry.ModAttachments.getData(server, ModAttachments.PLAYER_ACTION);
+                    var action=com.codex.blacklight.registry.ModAttachments.getData(server,ModAttachments.PLAYER_ACTION);
                     if(!action.clipId().equals(expected)){
-                        com.codex.blacklight.registry.ModAttachments.setData(server, ModAttachments.PLAYER_ACTION,new com.codex.blacklight.animation.NativeActionState(expected,phaseAt,0,0,com.codex.blacklight.animation.MotionLibrary.duration(expected),com.codex.blacklight.movement.TraversalSteering.cameraYaw(server),phase()==1,-1,action.revision()+1));com.codex.blacklight.registry.ModAttachments.syncData(server, ModAttachments.PLAYER_ACTION);
+                        com.codex.blacklight.registry.ModAttachments.setData(server,ModAttachments.PLAYER_ACTION,new com.codex.blacklight.animation.NativeActionState(expected,phaseAt,0,0,com.codex.blacklight.animation.MotionLibrary.duration(expected),com.codex.blacklight.movement.TraversalSteering.cameraYaw(server),phase()==1,-1,action.revision()+1));com.codex.blacklight.registry.ModAttachments.syncData(server,ModAttachments.PLAYER_ACTION);
                     }
                     server.setYRot(com.codex.blacklight.movement.TraversalSteering.cameraYaw(server));
                     charge.tick(now);entityData.set(CHARGE,charge.ticks(now));
@@ -136,7 +136,7 @@ public final class ThrownBlock extends Projectile {
                     }
                     if(phase()==2&&!pendingRelease&&!charge.active())setPhase(server,1,"hold");
                     if(phase()==2&&pendingRelease&&now-phaseAt>=BlockThrowMotion.windupTicks(twoHanded())){
-                        setPhase(server,4,"release");com.codex.blacklight.registry.ModAttachments.setData(server, ModAttachments.GRAB_STAGE,ConsumeVisual.THROW);com.codex.blacklight.registry.ModAttachments.syncData(server, ModAttachments.GRAB_STAGE);
+                        setPhase(server,4,"release");com.codex.blacklight.registry.ModAttachments.setData(server,ModAttachments.GRAB_STAGE,ConsumeVisual.THROW);com.codex.blacklight.registry.ModAttachments.syncData(server,ModAttachments.GRAB_STAGE);
                     }
                     updateAim(server,false);
                     if(phase()==4&&now-phaseAt>=BlockThrowMotion.releaseTicks(twoHanded())){
@@ -172,9 +172,25 @@ public final class ThrownBlock extends Projectile {
                 if(target.hurt(damageSources().thrown(this,getOwner()),impactDamage)){
                     var push=velocity.normalize().scale(impactKnockback);
                     target.push(push.x,Math.min(.65,.2+impactKnockback*.15),push.z);target.hurtMarked=true;
+                    com.codex.blacklight.combat.WeaponImpact.contact(getOwner() instanceof net.minecraft.server.level.ServerPlayer owner?owner:null,target,
+                            impactDamage>=20?com.codex.blacklight.combat.ImpactTier.FINISHER:com.codex.blacklight.combat.ImpactTier.HEAVY,true,
+                            com.codex.blacklight.network.PhysicalFeedbackPayload.Effect.CLAW_HEAVY);
+                    // A charged block that kills outright bursts the body like a full-charge blow.
+                    if(chargeSnapshot>=com.codex.blacklight.combat.BlockThrowTuning.MAX_CHARGE_TICKS*.9||impactDamage>=target.getMaxHealth()*1.5F)
+                        com.codex.blacklight.combat.HeavyBlow.shatter(target,velocity);
                 }
             }
-            ((net.minecraft.server.level.ServerLevel)level()).sendParticles(new net.minecraft.core.particles.BlockParticleOption(net.minecraft.core.particles.ParticleTypes.BLOCK,block()),getX(),getY(),getZ(),24,.35,.35,.35,.12);
+            var debrisLevel=(net.minecraft.server.level.ServerLevel)level();
+            debrisLevel.sendParticles(new net.minecraft.core.particles.BlockParticleOption(net.minecraft.core.particles.ParticleTypes.BLOCK,block()),getX(),getY(),getZ(),24,.35,.35,.35,.12);
+            // The thrown block breaks apart: real block chunks scatter off the contact, more for a bigger charge.
+            double charge=Math.min(1,chargeSnapshot/(double)com.codex.blacklight.combat.BlockThrowTuning.MAX_CHARGE_TICKS);
+            int chunks=4+(int)Math.round(4*charge)+Math.min(4,cargo().cells().size()/3);
+            var back=velocity.lengthSqr()<1e-6?Vec3.ZERO:velocity.normalize().scale(-.18);
+            for(int i=0;i<chunks;i++){
+                var rnd=new Vec3(random.nextDouble()-.5,random.nextDouble()*.5+.15,random.nextDouble()-.5);
+                com.codex.blacklight.movement.LandingDebrisSystem.fragment(debrisLevel,position().add(rnd.scale(cargo().half().length())),cargo().cells().isEmpty()?block():cargo().cells().get(random.nextInt(cargo().cells().size())).state(),
+                        back.add(rnd.scale(.35+.25*charge)),(float)(.14+random.nextDouble()*.18),22+random.nextInt(12));
+            }
             level().playSound(null,blockPosition(),block().getSoundType().getBreakSound(),net.minecraft.sounds.SoundSource.PLAYERS,1.1F,.7F);
             drop();return;
         }

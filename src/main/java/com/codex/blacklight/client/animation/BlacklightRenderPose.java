@@ -22,8 +22,8 @@ public final class BlacklightRenderPose {
         NativeHeadLook.apply(entity,pose,partial);
         if (!NativeHitPose.apply(entity, skeleton, pose, partial)) ConsumeVictimPose.epic(entity, pose, partial);
         boolean actorOwns=NativeConsumePose.actor(entity, pose, partial);
-        if (!actorOwns && com.codex.blacklight.registry.ModAttachments.getData(entity, ModAttachments.GRAB_STAGE) == ConsumeVisual.HOLD) {
-            String key = com.codex.blacklight.registry.ModAttachments.getData(entity, ModAttachments.PLAYER_STATE).getActivePower() == PowerForm.BLADE && (!(entity instanceof net.minecraft.world.entity.player.Player p)||com.codex.blacklight.combat.BlockThrowSystem.held(p)==null) ? "grab_blade_hold" : "grab_hold";
+        if (!actorOwns && com.codex.blacklight.registry.ModAttachments.getData(entity,ModAttachments.GRAB_STAGE) == ConsumeVisual.HOLD) {
+            String key = com.codex.blacklight.registry.ModAttachments.getData(entity,ModAttachments.PLAYER_STATE).getActivePower() == PowerForm.BLADE && (!(entity instanceof net.minecraft.world.entity.player.Player p)||com.codex.blacklight.combat.BlockThrowSystem.held(p)==null) ? "grab_blade_hold" : "grab_hold";
             var held = MotionLibrary.pose(key, (entity.tickCount + partial) / 20F, true);
             pose=CarryPoseLayer.holdCreature(held,pose,!entity.onGround(),key.equals("grab_blade_hold"));
         }
@@ -60,7 +60,7 @@ public final class BlacklightRenderPose {
         // Fit after locomotion/wall constraints and to the receiver's rendered
         // position. Holding no longer skips contact correction just because a
         // paired actor clip was found.
-        if(!actorOwns||com.codex.blacklight.registry.ModAttachments.getData(entity, ModAttachments.GRAB_STAGE)==ConsumeVisual.HOLD)
+        if(!actorOwns||com.codex.blacklight.registry.ModAttachments.getData(entity,ModAttachments.GRAB_STAGE)==ConsumeVisual.HOLD)
             GrabHoldPose.apply(entity,skeleton,pose,partial);
         return pose;
     }
@@ -72,16 +72,16 @@ public final class BlacklightRenderPose {
     }
     public static float rawFacing(LivingEntity entity,float partial) {
         var dodge=com.codex.blacklight.registry.ModAttachments.getData(entity,ModAttachments.PLAYER_ACTION);
-        if(dodge.clipId().equals("basic_dodge_roll")&&dodge.active(entity.level().getGameTime()+partial))return dodge.yaw();
+        if(dodge.clipId().equals("basic_dodge_roll")&&dodge.active(com.codex.blacklight.animation.PlayerMotionController.actionTime(entity,partial)))return dodge.yaw();
         float body=net.minecraft.util.Mth.rotLerp(partial,entity.yBodyRotO,entity.yBodyRot);
-        var weapon=com.codex.blacklight.registry.ModAttachments.getData(entity, ModAttachments.WEAPON_VISUAL);
+        var weapon=com.codex.blacklight.registry.ModAttachments.getData(entity,ModAttachments.WEAPON_VISUAL);
         float facing=NativeConsumePose.facing(entity,weapon.spec()==null?entity.getYRot():weapon.yaw(),partial);
         if(entity instanceof net.minecraft.client.player.AbstractClientPlayer player) {
             Float movement=com.codex.blacklight.client.PrototypeAnimationController.movementFacing(player,partial);
-            var morph=com.codex.blacklight.registry.ModAttachments.getData(player, ModAttachments.POWER_MORPH);
+            var morph=com.codex.blacklight.registry.ModAttachments.getData(player,ModAttachments.POWER_MORPH);
             if(morph.visible(player,partial))movement=morph.facing();
-            if(com.codex.blacklight.registry.ModAttachments.getData(player, ModAttachments.GRAB_STAGE)==0&&weapon.spec()==null&&movement!=null)return movement;
-            if(com.codex.blacklight.registry.ModAttachments.getData(player, ModAttachments.GRAB_STAGE)==0&&weapon.spec()==null&&!morph.visible(player,partial))return body;
+            if(com.codex.blacklight.registry.ModAttachments.getData(player,ModAttachments.GRAB_STAGE)==0&&weapon.spec()==null&&movement!=null)return movement;
+            if(com.codex.blacklight.registry.ModAttachments.getData(player,ModAttachments.GRAB_STAGE)==0&&weapon.spec()==null&&!morph.visible(player,partial))return body;
         }
         return facing;
     }

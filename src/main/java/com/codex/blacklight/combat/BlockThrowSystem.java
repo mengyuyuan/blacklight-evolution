@@ -129,5 +129,5 @@ public final class BlockThrowSystem {
     }
     @SubscribeEvent public static void logout(PlayerEvent.PlayerLoggedOutEvent event){if(event.getEntity() instanceof ServerPlayer p)release(p);}
     @SubscribeEvent public static void dimension(PlayerEvent.PlayerChangedDimensionEvent event){if(event.getEntity() instanceof ServerPlayer p)clear(p);}
-    private static void release(ServerPlayer p){var block=held(p);if(block!=null)block.drop();}
+    private static void release(ServerPlayer p){var block=held(p);if(block!=null)block.drop();clear(p);}
 }

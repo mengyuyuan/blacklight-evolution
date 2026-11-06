@@ -188,6 +188,22 @@ tasks.named('assemble') {
 // Minecraft 1.20.1 and Forge 47 target Java 17.
 java.toolchain.languageVersion = JavaLanguageVersion.of(17)
 
+// Xiaoxiang live integration tests require a separately installed official dependency.
+if (project.hasProperty('cultivationLiveTest')) {
+    sourceSets.main.java.srcDir('src/cultivationTest/java')
+    sourceSets.main.java.srcDir('src/qaSupport/java')
+    sourceSets.main.resources.srcDir('src/traversalTest/resources')
+}
+
+// Currency settlement regression tests, excluded from production artifacts.
+if (project.hasProperty('infectionScalingTest')) sourceSets.main.java.srcDir('src/statScalingTest/java')
+
+if (project.hasProperty('combatRewardTest')) {
+    sourceSets.main.java.srcDir('src/rewardTest/java')
+    sourceSets.main.java.srcDir('src/qaSupport/java')
+    sourceSets.main.resources.srcDir('src/traversalTest/resources')
+}
+
 // Real optional-mod integration tests, never bundled into release jars.
 if (project.hasProperty('compatLiveTest')) {
     sourceSets.main.java.srcDir('src/compatTest/java')
@@ -737,4 +753,20 @@ if (project.hasProperty('twilightTest')) {
     sourceSets.main.resources.srcDir('src/traversalTest/resources')
     repositories.maven { url = 'https://www.cursemaven.com'; content { includeGroup 'curse.maven' } }
     dependencies { localRuntime fg.deobf('curse.maven:the-twilight-forest-227639:5468648') }
+}
+
+if (project.hasProperty('conversionSafetyTest')) sourceSets.main.java.srcDir('src/conversionSafetyTest/java')
+
+if (project.hasProperty('ecologyTest')) sourceSets.main.java.srcDir('src/ecologyTest/java')
+
+// Mechanism interoperability and lifecycle fault regressions, never production sources.
+if (project.hasProperty('mechanismTest')) { sourceSets.main.java.srcDir('src/mechanismTest/java') }
+
+// Native infection framework regressions are opt-in and never bundled in releases.
+if (project.hasProperty('nativeFrameworkTest')) sourceSets.main.java.srcDir('src/nativeFrameworkTest/java')
+if (project.hasProperty('nativeFrameworkLiveTest')) sourceSets.main.java.srcDir('src/nativeFrameworkLiveTest/java')
+if (project.hasProperty('nativeFrameworkVisualTest')) sourceSets.main.java.srcDir('src/nativeFrameworkVisualTest/java')
+if (['nativeFrameworkTest', 'nativeFrameworkLiveTest'].any { project.hasProperty(it) }) {
+    sourceSets.main.java.srcDir('src/nativeFrameworkSharedTest/java')
+    sourceSets.main.resources.srcDir('src/traversalTest/resources')
 }

@@ -14,6 +14,9 @@ import net.minecraft.client.renderer.entity.player.PlayerRenderer;
 
 /** Standalone player rendering retains vanilla equipment layers and uses Blacklight's own articulated skin. */
 public final class BlacklightPlayerRenderer extends PlayerRenderer {
+    private final BlacklightPlayerModel nativeBody;
+    /** Dedicated native renderer retains its own rig across optional selectors. */
+    public void restoreNativeModel() { if(nativeBody!=null)this.model=nativeBody; }
     @Override public void render(AbstractClientPlayer player,float yaw,float partial,PoseStack stack,
                                  net.minecraft.client.renderer.MultiBufferSource buffers,int light) {
         try(var scope=NativePlayerRenderScope.enter(player)) {
@@ -34,7 +37,7 @@ public final class BlacklightPlayerRenderer extends PlayerRenderer {
     public BlacklightPlayerRenderer(EntityRendererProvider.Context context,boolean slim) {
         super(context,slim);
         slimHands=slim;handModel=new net.minecraft.client.model.PlayerModel<>(context.bakeLayer(slim?ModelLayers.PLAYER_SLIM:ModelLayers.PLAYER),slim);
-        this.model=new BlacklightPlayerModel(context.bakeLayer(slim?ModelLayers.PLAYER_SLIM:ModelLayers.PLAYER),slim);
+        this.model=nativeBody=new BlacklightPlayerModel(context.bakeLayer(slim?ModelLayers.PLAYER_SLIM:ModelLayers.PLAYER),slim);
         // Keep vanilla equipment effects, but deform its cuboids with our body.
         layers.removeIf(layer->layer instanceof net.minecraft.client.renderer.entity.layers.HumanoidArmorLayer<?,?,?>);
         var body=(BlacklightPlayerModel)this.model;
@@ -78,15 +81,15 @@ public final class BlacklightPlayerRenderer extends PlayerRenderer {
             boolean plated=com.codex.blacklight.power.UtilityPowerSystem.visualWeight(player,com.codex.blacklight.power.PowerForm.ARMOR,partial)>0;
             boolean shielded=com.codex.blacklight.power.UtilityPowerSystem.visualWeight(player,com.codex.blacklight.power.PowerForm.SHIELD,partial)>0;
             var pose=new com.codex.blacklight.animation.BlacklightPose();
-            var weapon=com.codex.blacklight.animation.WeaponMotionClock.sample(com.codex.blacklight.registry.ModAttachments.getData(player, ModAttachments.WEAPON_VISUAL),player.level().getGameTime()+partial);
+            var weapon=com.codex.blacklight.animation.WeaponMotionClock.sample(com.codex.blacklight.registry.ModAttachments.getData(player,ModAttachments.WEAPON_VISUAL),player.level().getGameTime()+partial);
             String preview=com.codex.blacklight.animation.PlayerMotionController.previewKey(player);
             if(preview!=null&&!preview.startsWith("basic_idle"))pose=com.codex.blacklight.animation.MotionLibrary.pose(preview,com.codex.blacklight.animation.PlayerMotionController.elapsed(player,partial),false);
             else if(weapon!=null)pose=com.codex.blacklight.animation.BlacklightPose.interpolatePose(pose,
                     com.codex.blacklight.animation.MotionLibrary.pose(weapon.key(),weapon.seconds(),weapon.looping()),weapon.blend());
             else {
-                var action=com.codex.blacklight.registry.ModAttachments.getData(player, ModAttachments.PLAYER_ACTION);
-                if(action.active(player.level().getGameTime()+partial)&&(!action.clipId().startsWith("basic_")||action.clipId().equals("basic_jump_charge"))
-                        ||com.codex.blacklight.registry.ModAttachments.getData(player, ModAttachments.GRAB_STAGE)!=com.codex.blacklight.combat.ConsumeVisual.NONE)
+                var action=com.codex.blacklight.registry.ModAttachments.getData(player,ModAttachments.PLAYER_ACTION);
+                if(action.active(com.codex.blacklight.animation.PlayerMotionController.actionTime(player,partial))&&(!action.clipId().startsWith("basic_")||action.clipId().equals("basic_jump_charge"))
+                        ||com.codex.blacklight.registry.ModAttachments.getData(player,ModAttachments.GRAB_STAGE)!=com.codex.blacklight.combat.ConsumeVisual.NONE)
                     pose=com.codex.blacklight.client.animation.BlacklightRenderPose.sample(player,partial);
             }
             var matrices=com.codex.blacklight.animation.PlayerMotionController.skeleton().getPoseMatrices(pose);

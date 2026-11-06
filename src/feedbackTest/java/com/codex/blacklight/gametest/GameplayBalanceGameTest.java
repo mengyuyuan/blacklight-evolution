@@ -1,6 +1,7 @@
 package com.codex.blacklight.gametest;
 
 import com.codex.blacklight.config.GameplayBalanceConfig;
+import com.codex.blacklight.config.InfectionEcologyConfig;
 import com.codex.blacklight.city.CityEcology;
 import com.codex.blacklight.infection.*;
 import com.codex.blacklight.power.*;
@@ -48,18 +49,38 @@ public final class GameplayBalanceGameTest {
     }
     @GameTest(template="wall_test",timeoutTicks=45,batch="configured_ecology")
     public static void configuredContactProbabilityChangesRealHits(GameTestHelper h){
-        double chance=GameplayBalanceConfig.CONTACT_CHANCE.get();int delay=GameplayBalanceConfig.CONTACT_COOLDOWN.get();
-        var actor=ModEntities.COMMON_INFECTED.get().create(h.getLevel());var prey=EntityType.COW.create(h.getLevel());
-        prey.getAttribute(Attributes.MAX_HEALTH).setBaseValue(1000);prey.setHealth(1000);
+        double chance=GameplayBalanceConfig.CONTACT_CHANCE.get(),share=InfectionEcologyConfig.WORLD_SHARE.get();
+        int delay=GameplayBalanceConfig.CONTACT_COOLDOWN.get(),cap=InfectionEcologyConfig.WORLD_CAP.get();
+        int dimension=OutbreakConfig.DIMENSION_CAP.get(),local=OutbreakConfig.LOCAL_CAP.get(),batch=OutbreakConfig.BATCH.get(),interval=OutbreakConfig.INTERVAL.get();
+        boolean enabled=GameplayBalanceConfig.CONTACT_ENABLED.get(),outbreakEnabled=OutbreakConfig.ENABLED.get();
+        var spawnRule=h.getLevel().getGameRules().getRule(net.minecraft.world.level.GameRules.RULE_DOMOBSPAWNING);boolean oldSpawning=spawnRule.get();
+        var storage=h.getLevel().getServer().overworld().getDataStorage();var original=OutbreakData.get(h.getLevel().getServer());
+        com.codex.blacklight.entity.BlacklightCommonInfected actor=null;net.minecraft.world.entity.animal.Cow prey=null;
         try{
+            // This case tests the probability switch, not a saturated population.
+            // Shared-world capacity has dedicated negative regressions elsewhere.
+            GameplayBalanceConfig.CONTACT_ENABLED.set(true);OutbreakConfig.ENABLED.set(true);spawnRule.set(true,h.getLevel().getServer());
+            InfectionEcologyConfig.WORLD_SHARE.set(1D);InfectionEcologyConfig.WORLD_CAP.set(4096);
+            OutbreakConfig.DIMENSION_CAP.set(1024);OutbreakConfig.LOCAL_CAP.set(128);OutbreakConfig.BATCH.set(16);OutbreakConfig.INTERVAL.set(20);
+            var released=new OutbreakData();released.start(h.getLevel().getGameTime());storage.set("blacklight_outbreak",released);
+            actor=h.spawn(ModEntities.COMMON_INFECTED.get(),3,2,3);actor.setNoAi(true);
+            prey=h.spawn(EntityType.COW,4,2,3);prey.setNoAi(true);prey.getAttribute(Attributes.MAX_HEALTH).setBaseValue(1000);prey.setHealth(1000);
+            h.assertTrue(WorldOutbreakSystem.populationRoom(h.getLevel(),prey.blockPosition())&&InfectionEcology.hasSource(h.getLevel(),prey.blockPosition()),"probability fixture has a real admitted slot and source");
             GameplayBalanceConfig.CONTACT_CHANCE.set(0D);GameplayBalanceConfig.CONTACT_COOLDOWN.set(1);
             prey.invulnerableTime=0;prey.hurt(prey.damageSources().mobAttack(actor),1);
             h.assertTrue(!BlacklightInfectionSystem.isInfected(prey),"zero prevents real contact infection");
             prey.getPersistentData().remove(InfectionRules.NEXT_CONTACT_EXPOSURE);GameplayBalanceConfig.CONTACT_CHANCE.set(1D);
             prey.invulnerableTime=0;prey.hurt(prey.damageSources().mobAttack(actor),1);
-            h.assertTrue(BlacklightInfectionSystem.isInfected(prey),"one guarantees the next accepted eligible contact hit");
-        }finally{GameplayBalanceConfig.CONTACT_CHANCE.set(chance);GameplayBalanceConfig.CONTACT_COOLDOWN.set(delay);actor.discard();prey.discard();}h.succeed();
+            h.assertTrue(BlacklightInfectionSystem.isInfected(prey),"one guarantees the next admitted eligible contact hit");
+        }finally{
+            storage.set("blacklight_outbreak",original);spawnRule.set(oldSpawning,h.getLevel().getServer());
+            GameplayBalanceConfig.CONTACT_CHANCE.set(chance);GameplayBalanceConfig.CONTACT_COOLDOWN.set(delay);GameplayBalanceConfig.CONTACT_ENABLED.set(enabled);
+            InfectionEcologyConfig.WORLD_SHARE.set(share);InfectionEcologyConfig.WORLD_CAP.set(cap);OutbreakConfig.ENABLED.set(outbreakEnabled);
+            OutbreakConfig.DIMENSION_CAP.set(dimension);OutbreakConfig.LOCAL_CAP.set(local);OutbreakConfig.BATCH.set(batch);OutbreakConfig.INTERVAL.set(interval);
+            if(actor!=null)actor.discard();if(prey!=null)prey.discard();
+        }h.succeed();
     }
+
     @GameTest(template="wall_test",timeoutTicks=45,batch="configured_ecology")
     public static void configuredWeightsAndAreaChanceReachTheWorldScheduler(GameTestHelper h){
         var values=GameplayBalanceConfig.TIER_WEIGHTS[0];int[] before=Arrays.stream(values).mapToInt(ForgeConfigSpec.IntValue::get).toArray();
@@ -115,20 +136,34 @@ public final class GameplayBalanceGameTest {
             h.assertTrue(copy.hiveBroodTicks[0]==1500&&com.codex.blacklight.city.CityConfig.populationIntervalTicks()==100,"city incubation survives save and population interval rounds to the actual 20-tick cadence");
         }finally{GameplayBalanceConfig.BROOD_TICKS.set(brood);GameplayBalanceConfig.OCCUPATION_TICKS.set(occupation);GameplayBalanceConfig.BROOD_COST.set(cost);com.codex.blacklight.city.CityConfig.HIVE_BROOD_INTERVAL.set(cityBrood);com.codex.blacklight.city.CityConfig.POPULATION_INTERVAL.set(population);}h.succeed();
     }
-    @GameTest(template="wall_test",timeoutTicks=45,batch="configured_ecology")
+    @GameTest(template="wall_test",timeoutTicks=160,batch="configured_ecology")
     public static void vialRadiusAndDirectChanceChangeRealBurstTargets(GameTestHelper h) throws Exception {
         double radius=GameplayBalanceConfig.VIAL_RADIUS.get(),direct=GameplayBalanceConfig.VIAL_DIRECT.get(),center=GameplayBalanceConfig.VIAL_CENTER.get(),edge=GameplayBalanceConfig.VIAL_EDGE.get();boolean enabled=OutbreakConfig.ENABLED.get();
-        var level=h.getLevel();var at=h.absolutePos(new BlockPos(4,30,4));var hit=EntityType.COW.create(level);hit.setPos(at.getCenter());
-        var far=EntityType.COW.create(level);far.setPos(at.east(20).getCenter());far.setNoAi(true);far.setNoGravity(true);level.getChunkAt(far.blockPosition());level.addFreshEntity(far);
+        var level=h.getLevel();var at=h.absolutePos(new BlockPos(4,30,4));
+        var ticket=java.util.UUID.randomUUID();var ticketType=net.minecraft.server.level.TicketType.create("blacklight_vial_radius_qa",java.util.UUID::compareTo);
+        var chunks=java.util.List.of(new net.minecraft.world.level.ChunkPos(at),new net.minecraft.world.level.ChunkPos(at.east(20)));
+        for(var chunk:chunks){level.getChunkSource().addRegionTicket(ticketType,chunk,3,ticket);level.getChunk(chunk.x,chunk.z);}
+        var hit=EntityType.COW.create(level);hit.setPos(at.getCenter());hit.setNoAi(true);hit.setNoGravity(true);level.addFreshEntity(hit);
+        var far=EntityType.COW.create(level);far.setPos(at.east(20).getCenter());far.setNoAi(true);far.setNoGravity(true);level.addFreshEntity(far);
         var burst=com.codex.blacklight.entity.BlacklightVirusVialEntity.class.getDeclaredMethod("onHit",net.minecraft.world.phys.HitResult.class);burst.setAccessible(true);
-        try{
-            OutbreakConfig.ENABLED.set(false);GameplayBalanceConfig.VIAL_RADIUS.set(1D);GameplayBalanceConfig.VIAL_DIRECT.set(0D);GameplayBalanceConfig.VIAL_CENTER.set(0D);GameplayBalanceConfig.VIAL_EDGE.set(0D);
-            var first=new com.codex.blacklight.entity.BlacklightVirusVialEntity(level,at.getX(),at.getY(),at.getZ());burst.invoke(first,new net.minecraft.world.phys.EntityHitResult(hit));
-            h.assertTrue(!BlacklightInfectionSystem.isInfected(hit)&&!BlacklightInfectionSystem.isInfected(far),"zero chances and short radius infect neither target");
-            GameplayBalanceConfig.VIAL_RADIUS.set(32D);GameplayBalanceConfig.VIAL_DIRECT.set(1D);GameplayBalanceConfig.VIAL_CENTER.set(1D);GameplayBalanceConfig.VIAL_EDGE.set(1D);
-            var second=new com.codex.blacklight.entity.BlacklightVirusVialEntity(level,at.getX(),at.getY(),at.getZ());burst.invoke(second,new net.minecraft.world.phys.EntityHitResult(hit));
-            h.assertTrue(BlacklightInfectionSystem.isInfected(hit)&&BlacklightInfectionSystem.isInfected(far),"configured burst infects direct target and a creature twenty blocks away");
-        }finally{GameplayBalanceConfig.VIAL_RADIUS.set(radius);GameplayBalanceConfig.VIAL_DIRECT.set(direct);GameplayBalanceConfig.VIAL_CENTER.set(center);GameplayBalanceConfig.VIAL_EDGE.set(edge);OutbreakConfig.ENABLED.set(enabled);hit.discard();far.discard();}h.succeed();
+        var closed=new java.util.concurrent.atomic.AtomicBoolean();Runnable cleanup=()->{
+            if(!closed.compareAndSet(false,true))return;
+            GameplayBalanceConfig.VIAL_RADIUS.set(radius);GameplayBalanceConfig.VIAL_DIRECT.set(direct);GameplayBalanceConfig.VIAL_CENTER.set(center);GameplayBalanceConfig.VIAL_EDGE.set(edge);OutbreakConfig.ENABLED.set(enabled);hit.discard();far.discard();for(var chunk:chunks)level.getChunkSource().removeRegionTicket(ticketType,chunk,3,ticket);
+        };h.runAfterDelay(175,cleanup);
+        h.startSequence().thenWaitUntil(()->{
+            var actual=level.getEntitiesOfClass(net.minecraft.world.entity.LivingEntity.class,new net.minecraft.world.phys.AABB(at).inflate(32),e->e==hit||e==far);
+            h.assertTrue(actual.contains(hit)&&actual.contains(far),"both real targets are present in the loaded spatial index before testing radius/chance");
+        }).thenExecute(()->{
+            try{
+                OutbreakConfig.ENABLED.set(false);GameplayBalanceConfig.VIAL_RADIUS.set(1D);GameplayBalanceConfig.VIAL_DIRECT.set(0D);GameplayBalanceConfig.VIAL_CENTER.set(0D);GameplayBalanceConfig.VIAL_EDGE.set(0D);
+                var first=new com.codex.blacklight.entity.BlacklightVirusVialEntity(level,at.getX(),at.getY(),at.getZ());burst.invoke(first,new net.minecraft.world.phys.EntityHitResult(hit));
+                h.assertTrue(!BlacklightInfectionSystem.isInfected(hit)&&!BlacklightInfectionSystem.isInfected(far),"zero chances and short radius infect neither target");
+                GameplayBalanceConfig.VIAL_RADIUS.set(32D);GameplayBalanceConfig.VIAL_DIRECT.set(1D);GameplayBalanceConfig.VIAL_CENTER.set(1D);GameplayBalanceConfig.VIAL_EDGE.set(1D);
+                var second=new com.codex.blacklight.entity.BlacklightVirusVialEntity(level,at.getX(),at.getY(),at.getZ());burst.invoke(second,new net.minecraft.world.phys.EntityHitResult(hit));
+                h.assertTrue(BlacklightInfectionSystem.isInfected(hit)&&BlacklightInfectionSystem.isInfected(far),"configured burst infects direct target and a creature twenty blocks away");h.succeed();
+            }catch(ReflectiveOperationException failure){throw new RuntimeException(failure);}
+            finally{cleanup.run();}
+        });
     }
     @GameTest(template="wall_test",timeoutTicks=45,batch="configured_player_attributes")
     public static void configuredAttributeEffectsAgreeWithRealHealthDamageAndHealing(GameTestHelper h){

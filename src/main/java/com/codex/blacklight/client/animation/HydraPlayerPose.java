@@ -10,10 +10,12 @@ public final class HydraPlayerPose {
     private static final java.util.Map<Player,BlacklightPose> LAST_GRIP=new java.util.WeakHashMap<>();
     private HydraPlayerPose(){}
     public static boolean visible(Player p){
+        if(!ModAttachments.available(p)||!p.isAlive())return false;
         double age=p.level().getGameTime()-com.codex.blacklight.registry.ModAttachments.getData(p,ModAttachments.HYDRA_THROWN_AT);
         return HydraTransport.active(p)||age>=0&&age<24&&!p.onGround();
     }
     public static BlacklightPose sample(Player p,float partial){
+        if(!ModAttachments.available(p)||!p.isAlive()){LAST_GRIP.remove(p);return null;}
         var h=HydraTransport.carrier(p);
         if(h==null){
             double age=p.level().getGameTime()+partial-com.codex.blacklight.registry.ModAttachments.getData(p,ModAttachments.HYDRA_THROWN_AT);

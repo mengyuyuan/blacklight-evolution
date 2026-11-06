@@ -6,8 +6,8 @@ import software.bernie.geckolib.model.GeoModel;
 
 public final class BlacklightHunterModel extends GeoModel<BlacklightHunter> {
     private static ResourceLocation resource(String path) { return new ResourceLocation("blacklight", path); }
-    @Override public ResourceLocation getModelResource(BlacklightHunter entity) { return resource("geo/blacklight_hunter_authored.geo.json"); }
-    @Override public ResourceLocation getTextureResource(BlacklightHunter entity) { return resource("textures/entity/hunter_authored.png"); }
+    @Override public ResourceLocation getModelResource(BlacklightHunter entity) { return resource("geo/blacklight_hunter_mc.geo.json"); }
+    @Override public ResourceLocation getTextureResource(BlacklightHunter entity) { return resource("textures/entity/hunter_mc.png"); }
     @Override public ResourceLocation getAnimationResource(BlacklightHunter entity) { return resource("animations/blacklight_hunter.animation.json"); }
 
     @Override public void setCustomAnimations(BlacklightHunter entity, long instanceId,

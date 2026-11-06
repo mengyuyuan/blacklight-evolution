@@ -2,6 +2,7 @@ package com.codex.blacklight.infection;
 
 import com.codex.blacklight.city.*;
 import com.codex.blacklight.config.GameplayBalanceConfig;
+import com.codex.blacklight.config.InfectionEcologyConfig;
 import com.codex.blacklight.entity.BlacklightInfectedHost;
 import com.codex.blacklight.registry.*;
 import com.codex.blacklight.world.TissueAttachmentBlock;
@@ -22,6 +23,7 @@ public final class WorldOutbreakSystem {
     private static final java.util.Map<ServerLevel,Integer> PROMOTED_AFTER=new java.util.WeakHashMap<>();
     private static final class BirthWindow {
         long window;int births;
+        final java.util.Set<Mob> infections=java.util.Collections.newSetFromMap(new java.util.IdentityHashMap<>());
         // EntityJoinLevel fires before the new mob is visible in the level. Keep
         // its slot reserved while other producers run inside that callback.
         final java.util.Map<Mob,Boolean> pending=new java.util.IdentityHashMap<>();
@@ -40,7 +42,7 @@ public final class WorldOutbreakSystem {
         if(!OutbreakConfig.ENABLED.get())return;
         if(OutbreakData.get(level.getServer()).start(level.getServer().overworld().getGameTime()))
             for(var p:level.getServer().getPlayerList().getPlayers())p.sendSystemMessage(Component.translatable("message.blacklight.outbreak_started"));
-        CityEcology.release(level,pos);seed(level,pos);
+        CityEcology.release(level,pos);InfectionEcology.released(level,pos);seed(level,pos);
     }
     public static boolean sanctuary(ServerLevel level,BlockPos pos){
         if(!CityTravel.isCity(level.dimension()))return false;
@@ -89,9 +91,9 @@ public final class WorldOutbreakSystem {
     }
     /** All scheduled brood and ambient births share the actual loaded population. */
     public static boolean populationRoom(ServerLevel level,BlockPos pos){
-        if(!active(level)||level.getDifficulty()==Difficulty.PEACEFUL||sanctuary(level,pos)
+        if(!active(level)||!InfectionEcologyConfig.naturalDimension(level)||!com.codex.blacklight.compat.NaturalInfectionProtection.allowed(level,pos)||level.getDifficulty()==Difficulty.PEACEFUL||sanctuary(level,pos)
                 ||!level.getGameRules().getBoolean(GameRules.RULE_DOMOBSPAWNING)
-                ||births(level).births+pendingInfected(level)>=OutbreakConfig.BATCH.get())return false;
+                ||births(level).births+pendingInfected(level)+births(level).infections.size()>=OutbreakConfig.BATCH.get())return false;
         if(CityTravel.isCity(level.dimension())&&(!CityConfig.SPAWNS.get()||!CityData.get(level).population))return false;
         int infected=0,mobs=0;
         for(var entity:level.getAllEntities())if(entity instanceof Mob mob&&mob.isAlive()){
@@ -101,9 +103,12 @@ public final class WorldOutbreakSystem {
         for(var entry:births(level).pending.entrySet())if(unpublished(level,entry.getKey())){
             mobs++;if(entry.getValue()){infected++;if(entry.getKey().getBoundingBox().intersects(area))localPending++;}
         }
-        if(infected>=OutbreakConfig.DIMENSION_CAP.get()
+        infected+=births(level).infections.stream().filter(m->!nativeMob(m)).count();
+        if(infected>=InfectionEcologyConfig.dimensionCap(level)
                 ||CityTravel.isCity(level.dimension())&&com.codex.blacklight.city.CityPopulationRules.slots(mobs,infected,CityConfig.MOB_LIMIT.get(),OutbreakConfig.DIMENSION_CAP.get(),true)==0)return false;
-        return localPending+level.getEntitiesOfClass(Mob.class,area,m->m.isAlive()&&nativeMob(m)).size()<CityEcology.populationCap(level,pos);
+        int localMobs=level.getEntitiesOfClass(Mob.class,area,LivingEntity::isAlive).size();
+        int reserved=(int)births(level).infections.stream().filter(m->!nativeMob(m)&&m.getBoundingBox().intersects(area)).count();
+        return localPending+reserved+level.getEntitiesOfClass(Mob.class,area,m->m.isAlive()&&nativeMob(m)).size()<InfectionEcologyConfig.regionalCap(level,localMobs+localPending,CityEcology.populationCap(level,pos));
     }
     /** Includes unpublished reservations held through real entity-join callbacks. */
     public static int cityPopulationSlots(ServerLevel level,boolean infectedBirth){
@@ -111,6 +116,13 @@ public final class WorldOutbreakSystem {
         for(var entity:level.getAllEntities())if(entity instanceof Mob mob&&mob.isAlive()){total++;if(nativeMob(mob))infected++;}
         for(var entry:births(level).pending.entrySet())if(unpublished(level,entry.getKey())){total++;if(entry.getValue())infected++;}
         return com.codex.blacklight.city.CityPopulationRules.slots(total,infected,CityConfig.MOB_LIMIT.get(),OutbreakConfig.DIMENSION_CAP.get(),infectedBirth);
+    }
+    /** Infection is a population transition, so its slot is reserved before addEffect callbacks. */
+    public static boolean infectScheduled(ServerLevel level,Mob mob,java.util.function.BooleanSupplier infection){
+        if(!level.getServer().isSameThread()||births(level).infections.contains(mob)||!populationRoom(level,mob.blockPosition()))return false;
+        var window=births(level);window.infections.add(mob);boolean accepted=false;
+        try{accepted=infection.getAsBoolean();return accepted;}
+        finally{window.infections.remove(mob);if(accepted)births(level).births++;}
     }
     private static boolean unpublished(ServerLevel level,Mob mob){return mob.isAlive()&&!mob.isRemoved()&&level.getEntity(mob.getUUID())!=mob;}
     private static int pendingInfected(ServerLevel level){int count=0;for(boolean infected:births(level).pending.values())if(infected)count++;return count;}
@@ -134,6 +146,21 @@ public final class WorldOutbreakSystem {
         window.pending.put(mob,infected);boolean accepted=false;
         try{accepted=level.addFreshEntity(mob);return accepted;}
         finally{window.pending.remove(mob);if(accepted&&infected)births(level).births++;}
+    }
+    private static void wildHydra(ServerLevel level,net.minecraft.server.level.ServerPlayer player){
+        if(level.random.nextDouble()>=com.codex.blacklight.city.CityConfig.WILD_HYDRA_CHANCE.get())return;
+        var at=player.blockPosition();
+        if(CityEcology.stage(level,at)<3||CityEcology.zone(level,at)!=DistrictThreat.Zone.RED)return;
+        if(!level.getEntitiesOfClass(com.codex.blacklight.entity.BlacklightHydra.class,player.getBoundingBox().inflate(96)).isEmpty())return;
+        for(int attempt=0;attempt<6;attempt++){
+            double angle=level.random.nextDouble()*Math.PI*2;int distance=20+level.random.nextInt(21);
+            int x=player.getBlockX()+(int)Math.round(Math.cos(angle)*distance),z=player.getBlockZ()+(int)Math.round(Math.sin(angle)*distance);
+            var chunk=level.getChunkSource().getChunkNow(x>>4,z>>4);if(chunk==null)continue;
+            var pos=new BlockPos(x,chunk.getHeight(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES,x&15,z&15)+1,z);
+            if(Math.abs(pos.getY()-player.getY())>12||!level.isPositionEntityTicking(pos))continue;
+            var hydra=spawnAt(level,pos,OutbreakRules.Tier.ANCIENT,true);
+            if(hydra!=null){level.playSound(null,pos,net.minecraft.sounds.SoundEvents.RAVAGER_ROAR,net.minecraft.sounds.SoundSource.HOSTILE,3F,.45F);return;}
+        }
     }
     private static EntityType<? extends Mob> hostSpecies(int roll){
         return switch(Math.floorMod(roll,10)){
@@ -224,7 +251,7 @@ public final class WorldOutbreakSystem {
         }return false;
     }
     @SubscribeEvent public static void tick(net.minecraftforge.event.TickEvent.LevelTickEvent event){if(event.phase!=net.minecraftforge.event.TickEvent.Phase.END)return;
-        if(!(event.level instanceof ServerLevel level)||!active(level)||level.players().isEmpty()
+        if(!(event.level instanceof ServerLevel level)||!active(level)||!InfectionEcologyConfig.naturalDimension(level)||level.players().isEmpty()
                 ||level.getGameTime()%OutbreakConfig.INTERVAL.get()!=0||level.getDifficulty()==Difficulty.PEACEFUL
                 ||!level.getGameRules().getBoolean(GameRules.RULE_DOMOBSPAWNING))return;
         if(CityTravel.isCity(level.dimension())&&(!CityConfig.SPAWNS.get()||!CityData.get(level).population))return;
@@ -239,7 +266,7 @@ public final class WorldOutbreakSystem {
             var local=level.getEntitiesOfClass(Mob.class,player.getBoundingBox().inflate(96),m->m.isAlive()&&nativeMob(m));
             if(developSurplusCommon(level,player.blockPosition())!=null)
                 local=level.getEntitiesOfClass(Mob.class,player.getBoundingBox().inflate(96),m->m.isAlive()&&nativeMob(m));
-            if(total>=OutbreakConfig.DIMENSION_CAP.get()
+            if(total>=InfectionEcologyConfig.dimensionCap(level)
                     ||CityTravel.isCity(level.dimension())&&com.codex.blacklight.city.CityPopulationRules.slots(allMobs,total,CityConfig.MOB_LIMIT.get(),OutbreakConfig.DIMENSION_CAP.get(),true)==0)continue;
             if(local.size()>=CityEcology.populationCap(level,player.blockPosition()))continue;
             long common=local.stream().filter(m->m instanceof com.codex.blacklight.entity.BlacklightCommonInfected).count();
@@ -248,6 +275,9 @@ public final class WorldOutbreakSystem {
                 developed++;if(host.tissueAge()>=TissueGrowth.MATURITY_TICKS)mature++;
                 if(host.tissueAge()>=TissueGrowth.ANCIENT_TICKS)ancient++;
             }
+            // Probability belongs to the batch, not to each placement retry.
+            int batchRoll=level.random.nextInt(100);
+            if(!CityEcology.ambientAllowed(level,player.blockPosition(),batchRoll))continue;
             int playerBirths=0,quota=GameplayBalanceConfig.birthsPerPlayer(CityEcology.zone(level,player.blockPosition()));
             for(int attempt=0;attempt<GameplayBalanceConfig.SPAWN_ATTEMPTS.get()&&playerBirths<quota;attempt++){
             int minimum=GameplayBalanceConfig.SPAWN_MIN.get(),maximum=Math.max(minimum,GameplayBalanceConfig.SPAWN_MAX.get());
@@ -258,7 +288,7 @@ public final class WorldOutbreakSystem {
             BlockPos pos=ready(level,near)&&level.getBlockState(near).isAir()&&level.getBlockState(near.below()).isFaceSturdy(level,near.below(),Direction.UP)
                     ?near:new BlockPos(x,chunk.getHeight(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES,x&15,z&15)+1,z);
             int safety=GameplayBalanceConfig.SPAWN_SAFETY.get();
-            if(!ready(level,pos)||!level.isPositionEntityTicking(pos)||!CityEcology.ambientAllowed(level,pos,level.random.nextInt(100))||Math.abs(pos.getY()-player.getY())>GameplayBalanceConfig.SPAWN_HEIGHT.get()
+            if(!ready(level,pos)||!level.isPositionEntityTicking(pos)||!InfectionEcology.hasSource(level,pos)||Math.abs(pos.getY()-player.getY())>GameplayBalanceConfig.SPAWN_HEIGHT.get()
                     ||players.stream().anyMatch(p->p.distanceToSqr(pos.getCenter())<(double)safety*safety))continue;
             var tier=OutbreakRules.ambientTier(CityEcology.stage(level,pos),(int)common,developed,mature,ancient,
                     OutbreakConfig.COMMON_RESERVE.get(),CityEcology.populationCap(level,pos),level.random.nextDouble());
@@ -269,9 +299,12 @@ public final class WorldOutbreakSystem {
             }
             }
         }
+        // Original P1: hydras are not hatched; late in the outbreak they erupt from the ground in
+        // red zones of both the overworld and the city dimension.
+        wildHydra(level,players.get(offset));
         // One exposure per scheduled batch; never scan or generate unloaded chunks.
         var player=players.get(offset);int stage=CityEcology.stage(level,player.blockPosition());
-        var targets=level.getEntitiesOfClass(Mob.class,player.getBoundingBox().inflate(GameplayBalanceConfig.EXPOSURE_RADIUS.get()),m->BlacklightInfectionSystem.canInfect(m)&&!sanctuary(level,m.blockPosition()));
-        if(!targets.isEmpty()&&level.random.nextDouble()<GameplayBalanceConfig.exposureChance(stage)){var target=targets.get(level.random.nextInt(targets.size()));if(CityEcology.ambientAllowed(level,target.blockPosition(),level.random.nextInt(100)))BlacklightInfectionSystem.infect(target,null);}
+        var targets=level.getEntitiesOfClass(Mob.class,player.getBoundingBox().inflate(GameplayBalanceConfig.EXPOSURE_RADIUS.get()),m->InfectionEcology.naturalEligible(m)&&!sanctuary(level,m.blockPosition()));
+        if(!targets.isEmpty()&&level.random.nextDouble()<GameplayBalanceConfig.exposureChance(stage)){var target=targets.get(level.random.nextInt(targets.size()));if(CityEcology.ambientAllowed(level,target.blockPosition(),level.random.nextInt(100)))BlacklightInfectionSystem.infectNaturally(target,null);}
     }
 }

@@ -11,6 +11,7 @@ import shutil
 import subprocess
 import tomllib
 from pathlib import Path
+from release_classes import production_classes as select_source_classes, verify_internal_closure
 from zipfile import ZIP_DEFLATED, ZipFile, ZipInfo
 
 
@@ -42,8 +43,9 @@ def java_class_names(root: Path) -> set[str]:
 def production_classes(repo: Path, class_root: Path) -> list[Path]:
     production = {name for name in java_class_names(repo / 'src/main/java')
                   if name.rsplit('/', 1)[-1] not in ('package-info', 'module-info')}
-    classes = [path for path in class_root.rglob('*.class')
-               if path.relative_to(class_root).as_posix()[:-6].split('$', 1)[0] in production]
+    selected = select_source_classes({path.relative_to(class_root).as_posix(): path.read_bytes()
+                                      for path in class_root.rglob('*.class')}, repo / 'src/main/java')
+    classes = [class_root / name for name in selected]
     require(bool(classes), 'No compiled production classes to verify')
     compiled = {path.relative_to(class_root).as_posix()[:-6].split('$', 1)[0] for path in classes}
     require(production <= compiled, f'Production sources were not compiled: {sorted(production - compiled)}')
@@ -293,8 +295,10 @@ def main() -> None:
                         for name in names), 'Development harness leaked into JAR')
         shipped = {name[:-6].split('$', 1)[0] for name in names
                    if name.startswith('com/codex/blacklight/') and name.endswith('.class')}
-        require(shipped <= java_class_names(repo / 'src/main/java'),
-                f'Unrecognized runtime classes or QA harness leaked into JAR: {sorted(shipped - java_class_names(repo / "src/main/java"))}')
+        allowed = {path.relative_to(build / 'classes/java/main').as_posix()[:-6].split('$', 1)[0] for path in classes}
+        require(shipped <= allowed,
+                f'Unrecognized runtime classes or QA harness leaked into JAR: {sorted(shipped - allowed)}')
+        verify_internal_closure({name: archive.read(name) for name in names if name.endswith('.class')})
         mixins = json.loads(archive.read('blacklight.mixins.json'))
         for name in mixins['mixins'] + mixins['client']:
             require((mixins['package'] + '.' + name).replace('.', '/') + '.class' in names, f'Missing mixin: {name}')

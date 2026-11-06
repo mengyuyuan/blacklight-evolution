@@ -55,7 +55,7 @@ public final class BlacklightInfectionSystem {
     }
 
     public static boolean infectionImmune(LivingEntity target){
-        return target instanceof com.codex.blacklight.entity.MilitarySoldier soldier
+        return com.codex.blacklight.config.InfectionEcologyConfig.immune(target) || target instanceof com.codex.blacklight.entity.MilitarySoldier soldier
                 &&soldier.faction()==com.codex.blacklight.military.MilitaryFaction.BLACKWATCH;
     }
     /** Migrate still-native saved soldiers before any infection conversion/AI tick. */
@@ -65,6 +65,13 @@ public final class BlacklightInfectionSystem {
         if(ModAttachments.peekData(target,ModAttachments.INFECTION_START,-1L)>=0){
             com.codex.blacklight.registry.ModAttachments.setData(target, ModAttachments.INFECTION_START,-1L);com.codex.blacklight.registry.ModAttachments.syncData(target, ModAttachments.INFECTION_START);
         }
+    }
+
+    public static boolean infectNaturally(LivingEntity target, Entity source) {
+        if(!InfectionEcology.naturalEligible(target)||!(target.level() instanceof ServerLevel level)
+                ||!InfectionEcology.hasSource(level,target.blockPosition()))return false;
+        return WorldOutbreakSystem.infectScheduled(level,(Mob)target,()->{var event=new NaturalInfectionEvent(target,source);net.minecraftforge.common.MinecraftForge.EVENT_BUS.post(event);
+            return !event.isCanceled()&&InfectionEcology.naturalEligible(target)&&infect(target,source);});
     }
 
     public static boolean awaken(Player player) {
@@ -84,10 +91,11 @@ public final class BlacklightInfectionSystem {
 
     public static boolean isInfected(LivingEntity entity) {
         if(infectionImmune(entity))return false;
+        if(entity instanceof Mob mob&&entity.level().isClientSide&&NativeInfection.active(mob))return true;
         if (entity instanceof Player player) {
             return ModAttachments.peekData(player, ModAttachments.PLAYER_STATE).isInfected();
         }
-        return entity instanceof com.codex.blacklight.entity.BlacklightCommonInfected || entity instanceof com.codex.blacklight.entity.BlacklightHydra || entity instanceof com.codex.blacklight.entity.HiveTendril || entity instanceof com.codex.blacklight.entity.BlacklightInfectedHost || entity instanceof com.codex.blacklight.entity.BlacklightHunter || entity instanceof com.codex.blacklight.entity.BlacklightMutant || entity instanceof com.codex.blacklight.entity.BlacklightHive || entity.hasEffect(ModEffects.BLACKLIGHT_INFECTION.get())
+        return entity instanceof com.codex.blacklight.entity.BlacklightCommonInfected || entity instanceof com.codex.blacklight.entity.BlacklightHydra || entity instanceof com.codex.blacklight.entity.HiveTendril || entity instanceof com.codex.blacklight.entity.BlacklightInfectedHost || entity instanceof com.codex.blacklight.entity.BlacklightHunter || entity instanceof com.codex.blacklight.entity.BlacklightSupremeHunter || entity instanceof com.codex.blacklight.entity.BlacklightMutant || entity instanceof com.codex.blacklight.entity.BlacklightHive || entity.hasEffect(ModEffects.BLACKLIGHT_INFECTION.get())
                 || (ModAttachments.peekData(entity, ModAttachments.INFECTION_START, -1L)>=0
                     && com.codex.blacklight.entity.InfectedBossProfile.forSpecies(net.minecraft.core.registries.BuiltInRegistries.ENTITY_TYPE.getKey(entity.getType()).toString())!=null);
     }
@@ -116,7 +124,7 @@ public final class BlacklightInfectionSystem {
         // Failed rolls also consume this victim's exposure window. Multiple
         // attackers and save/reload cannot reroll every damage event.
         data.putLong(InfectionRules.NEXT_CONTACT_EXPOSURE, now + com.codex.blacklight.config.GameplayBalanceConfig.CONTACT_COOLDOWN.get());
-        if (attacker.getRandom().nextFloat() < com.codex.blacklight.config.GameplayBalanceConfig.CONTACT_CHANCE.get()) infect(victim, attacker);
+        if (attacker.getRandom().nextFloat() < com.codex.blacklight.config.GameplayBalanceConfig.CONTACT_CHANCE.get()) infectNaturally(victim, attacker);
     }
 
     @SubscribeEvent
@@ -124,7 +132,11 @@ public final class BlacklightInfectionSystem {
         if(event.getEntity() instanceof LivingEntity immune&&infectionImmune(immune)){preserveBlackwatch(immune);return;}
         if (!(event.getEntity() instanceof Mob mob)
                 || !(mob.level() instanceof ServerLevel serverLevel)
-                || !ModAttachments.available(mob) || !mob.isAlive() || mob instanceof com.codex.blacklight.entity.BlacklightCommonInfected || mob instanceof com.codex.blacklight.entity.BlacklightHydra || mob instanceof com.codex.blacklight.entity.HiveTendril || mob instanceof com.codex.blacklight.entity.BlacklightInfectedHost || mob instanceof com.codex.blacklight.entity.BlacklightHunter || mob instanceof com.codex.blacklight.entity.BlacklightMutant || mob instanceof com.codex.blacklight.entity.BlacklightHive || !isInfected(mob)) return;
+                || !ModAttachments.available(mob) || !mob.isAlive() || mob instanceof com.codex.blacklight.entity.BlacklightCommonInfected || mob instanceof com.codex.blacklight.entity.BlacklightHydra || mob instanceof com.codex.blacklight.entity.HiveTendril || mob instanceof com.codex.blacklight.entity.BlacklightInfectedHost || mob instanceof com.codex.blacklight.entity.BlacklightHunter || mob instanceof com.codex.blacklight.entity.BlacklightSupremeHunter || mob instanceof com.codex.blacklight.entity.BlacklightMutant || mob instanceof com.codex.blacklight.entity.BlacklightHive) return;
+        // A cure during capability invalidation is reconciled on the first live tick.
+        if(!isInfected(mob)){if(mob.getPersistentData().contains(NativeInfection.DATA,10))NativeInfection.clear(mob);return;}
+        if(NativeInfection.preserve(mob)){NativeInfection.tick(mob,serverLevel);return;}
+        if(!com.codex.blacklight.config.GameplayBalanceConfig.value(com.codex.blacklight.config.GameplayBalanceConfig.CONVERSION_ENABLED))return;
         long onset=ModAttachments.peekData(mob, ModAttachments.INFECTION_START, -1L);
         // Migrate existing saved infections too, without removing infection or other effects.
         var infection=mob.getEffect(ModEffects.BLACKLIGHT_INFECTION.get());
@@ -137,7 +149,7 @@ public final class BlacklightInfectionSystem {
             return;
         }
         if (mob.getPersistentData().getLong("BlacklightConversionRetry") > serverLevel.getGameTime()) return;
-        convertHost(mob, serverLevel);
+        if(InfectionConversionWork.acquire(serverLevel))convertHost(mob, serverLevel);
     }
 
     private static void convertHost(Mob source, ServerLevel level) {
@@ -158,7 +170,26 @@ public final class BlacklightInfectionSystem {
     private static void publishReplacement(Mob source, ServerLevel level) {
         var infected = com.codex.blacklight.registry.ModEntities.INFECTED_HOST.get().create(level);
         if (infected == null) return;
-        infected.inherit(source);
+        try {
+            // This calls the original mod's attribute and save hooks. No world
+            // publication, inventory transfer or source removal has happened yet.
+            infected.inherit(source);
+        } catch (RuntimeException failure) {
+            // Vanilla wraps entity-save failures, including fatal JVM errors.
+            Throwable cause=failure;
+            for(int depth=0;cause!=null&&depth<32;depth++){
+                if(cause instanceof VirtualMachineError fatal)throw fatal;
+                if(cause instanceof ThreadDeath fatal)throw fatal;
+                Throwable next=cause.getCause();if(next==cause)break;cause=next;
+            }
+            infected.discard();
+            int delay=com.codex.blacklight.config.GameplayBalanceConfig.value(com.codex.blacklight.config.GameplayBalanceConfig.CONVERSION_RETRY_TICKS);
+            source.getPersistentData().putLong("BlacklightConversionRetry",level.getGameTime()+delay);
+            if(InfectionConversionWork.reportFailure(level,source.getType()))
+                com.codex.blacklight.BlacklightNeoMod.LOGGER.warn("Infection conversion preparation failed for {} [{}]; original creature and possessions retained, retry in {} ticks. Repeated failures of this type are rate limited.",
+                        net.minecraft.core.registries.BuiltInRegistries.ENTITY_TYPE.getKey(source.getType()),source.getUUID(),delay,failure);
+            return;
+        }
         // inherit() also prepares equipment for standalone authored fixtures.
         // During a real replacement the source owns those stacks until commit;
         // a join callback must never be able to take a second copy from the host.

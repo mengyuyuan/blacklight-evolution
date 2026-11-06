@@ -81,7 +81,7 @@ public final class ClientTargetLock {
         if(!applied)return;
         if(payload.acceptedEntityId()<0){lockedTarget=null;cachedFocus=null;if(requested>=0)notice("目标不可锁定");}
         else if(mc.level!=null)lockedTarget=ExplicitTarget.resolve(mc.level.getEntity(payload.acceptedEntityId()));
-        REQUEST.observeAttachment(com.codex.blacklight.registry.ModAttachments.getData(mc.player, ModAttachments.TARGET_LOCK_ID));
+        REQUEST.observeAttachment(com.codex.blacklight.registry.ModAttachments.getData(mc.player,ModAttachments.TARGET_LOCK_ID));
     }
     public static void clear(){
         boolean requested=REQUEST.desiredId()>=0||lockedTarget!=null;
@@ -97,18 +97,28 @@ public final class ClientTargetLock {
         // nearest the viewing direction, considering only exposed damage surfaces.
         if(mc.hitResult instanceof net.minecraft.world.phys.EntityHitResult hit){
             var candidate=ExplicitTarget.resolve(hit.getEntity());
-            if(visibleInRange(candidate))lockedTarget=candidate;
+            if(visibleInRange(candidate)||candidate instanceof LivingEntity living&&CombatTargeting.altitudeAcquirable(player,living,range()))lockedTarget=candidate;
         }
         if(lockedTarget==null){
             var camera=mc.gameRenderer.getMainCamera();
             Vec3 origin=camera.getPosition(),view=Vec3.directionFromRotation(camera.getXRot(),camera.getYRot());
             double best=Double.NEGATIVE_INFINITY;
             for(var candidate:ExplicitTarget.candidates(player,range())){
-                if(!visibleInRange(candidate))continue;
                 Vec3 delta=focusPoint(candidate).subtract(origin);
                 double angle=view.dot(delta.normalize());
-                if(angle<.5)continue;
-                double score=angle*4-Math.sqrt(ExplicitTarget.distanceSquared(player,candidate))/range();
+                boolean near=angle>=.5&&visibleInRange(candidate);
+                if(!near&&!(candidate instanceof LivingEntity living&&CombatTargeting.altitudeAcquirable(player,living,range())))continue;
+                double score;
+                if(near){
+                    if(angle<.5)continue;
+                    score=angle*4-Math.sqrt(ExplicitTarget.distanceSquared(player,candidate))/range();
+                }else{
+                    // From altitude the jump/glide camera stays near the horizon: ignore the view cone and
+                    // prefer the target most directly below, breaking ties toward the camera's heading.
+                    Vec3 flat=new Vec3(view.x,0,view.z),side=new Vec3(delta.x,0,delta.z);
+                    double h=side.length(),align=h<1e-3||flat.lengthSqr()<1e-6?1:flat.normalize().dot(side.scale(1/h));
+                    score=-h/range()*4+align*.5;
+                }
                 if(score>best){best=score;lockedTarget=candidate;}
             }
         }
@@ -138,7 +148,7 @@ public final class ClientTargetLock {
                 &&living.getHealth()>0&&com.codex.blacklight.combat.BulletdiveSteering.retainAltitudeLock(
                         p.position(),p.onGround(),lockedTarget.position(),range());
         if(lockedTarget!=null&&(!active()||!altitude&&!visibleInRange(lockedTarget))){clear();return;}
-        if(REQUEST.observeAttachment(com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.TARGET_LOCK_ID))){lockedTarget=null;cachedFocus=null;}
+        if(REQUEST.observeAttachment(com.codex.blacklight.registry.ModAttachments.getData(p,ModAttachments.TARGET_LOCK_ID))){lockedTarget=null;cachedFocus=null;}
         if(REQUEST.desiredId()<0){lockedTarget=null;cachedFocus=null;}
     }
     @SubscribeEvent public static void tick(net.minecraftforge.event.TickEvent.ClientTickEvent event){if(event.phase != net.minecraftforge.event.TickEvent.Phase.END)return;sync();}

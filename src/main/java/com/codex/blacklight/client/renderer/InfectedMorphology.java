@@ -202,7 +202,7 @@ public final class InfectedMorphology implements AutoCloseable {
     }
     /** Compile only selected native cubes through a local face cutter. No shared model mutation. */
     public static boolean renderWounded(ModelPart part,PoseStack.Pose pose,VertexConsumer out,int light,int overlay,int color){
-        var context=ACTIVE.get();if(context==null)return false;
+        var context=ACTIVE.get();if(context==null||!NativeRenderScope.owns(context.proxy,context.trailHost))return false;
         var originalPose=pose;
         if(context.chimera!=null){if(context.chimera.nativeWeight(part)<=.0001F)return true;pose=context.chimera.nativePose(part,pose);context.nativeChimeraPoses.put(part,pose);}
         EvolvedDonorCapture.joint(part,pose);
@@ -251,7 +251,7 @@ public final class InfectedMorphology implements AutoCloseable {
     }
     /** Called inside ModelPart.compile, after its complete animated transform. */
     public static void capture(ModelPart part,PoseStack.Pose pose,int light,int overlay,int color){
-        var context=ACTIVE.get();if(context==null||context.pending.containsKey(part))return;
+        var context=ACTIVE.get();if(context==null||!NativeRenderScope.owns(context.proxy,context.trailHost)||context.pending.containsKey(part))return;
         if(context.chimera!=null){if(context.chimera.nativeWeight(part)<=.0001F)return;var adjusted=context.nativeChimeraPoses.get(part);pose=adjusted==null?context.chimera.nativePose(part,pose):adjusted;}
         EvolvedDonorCapture.joint(part,pose);
         context.trail(part,pose);
@@ -290,7 +290,7 @@ public final class InfectedMorphology implements AutoCloseable {
         context.pending.clear();
     }
     public static RenderType skinType(RenderType type){
-        var context=ACTIVE.get();if(context==null)return type;
+        var context=ACTIVE.get();if(context==null||!NativeRenderScope.owns(context.proxy,context.trailHost))return type;
         for(var entry:context.skins.entrySet()){
             var a=entry.getKey();var b=entry.getValue();if(a.equals(b))continue;
             if(type==RenderType.entityCutoutNoCull(a))return RenderType.entityCutoutNoCull(b);

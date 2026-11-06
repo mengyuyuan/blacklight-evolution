@@ -6,9 +6,7 @@ import com.codex.blacklight.world.BuildingInfectionCoreBlock;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.util.BlockSnapshot;
-import net.minecraftforge.event.level.BlockEvent;
 
 /** One cell per shared colony-work operation, using normal chunk/block synchronization. */
 public final class BuildingBiomassSystem {
@@ -76,15 +74,7 @@ public final class BuildingBiomassSystem {
         try {
             if(!level.setBlock(pos,next,3))return;
             if(placed) {
-                // With a null natural owner NeoForge reports snapshot.getState() as the
-                // placed block. Preserve the OLD snapshot for rollback, but expose the
-                // actual new state to protection listeners.
-                var event=new BlockEvent.EntityPlaceEvent(snapshot,level.getBlockState(pos.below()),null) {
-                    @Override public BlockState getPlacedBlock(){return next;}
-                    @Override public BlockState getState(){return next;}
-                };
-                MinecraftForge.EVENT_BUS.post(event);
-                if(event.isCanceled()) {
+                if(!NaturalInfectionPlacement.permits(level,snapshot,next)) {
                     if(level.getBlockState(pos).equals(next))level.setBlock(pos,before,3);
                     if(c.severed.size()<BuildingBiomassPlan.CELL_LIMIT)c.severed.add(pos.asLong());
                     return;

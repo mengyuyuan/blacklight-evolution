@@ -186,7 +186,7 @@ public final class PrototypeMovementEffects {
     public static void tickSprint(ServerPlayer player, Vec3 forward, double speed) {
         float intensity = PrototypeLocomotion.sprintVisualIntensity(speed,
                 MovementTuningSettings.sprintMaxSpeed() * MovementUpgrade.sprintMultiplier(
-                        com.codex.blacklight.registry.ModAttachments.getData(player, ModAttachments.PLAYER_STATE).getMovementUpgradeMask()));
+                        com.codex.blacklight.registry.ModAttachments.getData(player,ModAttachments.PLAYER_STATE).getMovementUpgradeMask()));
         if (intensity > 0.22F && player.tickCount % 2 == 0) {
             pushSprintSlipstream(player, forward, intensity);
         }
@@ -447,6 +447,9 @@ public final class PrototypeMovementEffects {
             double impulse = impact.knockback() * (0.52D + falloff * 0.48D);
             target.push(away.x * impulse, 0.18D + impulse * 0.48D, away.z * impulse);
             target.hurtMarked = true;
+            // The landing already shakes the camera; struck bodies still get hitstop and a hit cue.
+            com.codex.blacklight.combat.WeaponImpact.contact(player, target, impact.damage() >= 30
+                    ? com.codex.blacklight.combat.ImpactTier.FINISHER : com.codex.blacklight.combat.ImpactTier.HEAVY, false, null);
         }
 
         for (Entity loose : level.getEntities(player, hitBox,

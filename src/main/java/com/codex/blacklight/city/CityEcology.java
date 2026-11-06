@@ -61,7 +61,7 @@ public final class CityEcology {
             if(mob instanceof com.codex.blacklight.entity.BlacklightInfectedHost host){
                 if(host.tissueAge()>=TissueGrowth.MATURITY_TICKS)c[1]++;
                 if(host.isEvolved())c[2]++;
-            }
+            }else if(com.codex.blacklight.infection.NativeInfection.active(mob)&&com.codex.blacklight.infection.NativeInfection.age(mob)>=TissueGrowth.MATURITY_TICKS)c[1]++;
         }
         if(BuildingInfectionConfig.ENABLED.get())for(var colony:BuildingInfectionData.get(level).colonies){
             var k=key(level,colony.origin);

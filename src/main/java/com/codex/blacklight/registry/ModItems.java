@@ -23,6 +23,9 @@ public final class ModItems {
     public static final RegistryObject<net.minecraftforge.common.ForgeSpawnEggItem> HUNTER_SPAWN_EGG = ITEMS.register("blacklight_hunter_spawn_egg", () -> new net.minecraftforge.common.ForgeSpawnEggItem(
                     ModEntities.BLACKLIGHT_HUNTER, 0x242626, 0x9d302b, new Item.Properties()));
 
+    public static final RegistryObject<net.minecraftforge.common.ForgeSpawnEggItem> SUPREME_HUNTER_SPAWN_EGG = ITEMS.register("supreme_hunter_spawn_egg", () -> new net.minecraftforge.common.ForgeSpawnEggItem(
+                    ModEntities.SUPREME_HUNTER, 0x14100f, 0xc4241c, new Item.Properties()));
+
     public static final RegistryObject<com.codex.blacklight.item.HiveTissueItem> LIVING_HIVE_TISSUE=ITEMS.register("living_hive_tissue",()->new com.codex.blacklight.item.HiveTissueItem(new Item.Properties().stacksTo(16).rarity(Rarity.RARE)));
     public static final RegistryObject<net.minecraftforge.common.ForgeSpawnEggItem> HYDRA_SPAWN_EGG=ITEMS.register("blacklight_hydra_spawn_egg",()->new net.minecraftforge.common.ForgeSpawnEggItem(ModEntities.BLACKLIGHT_HYDRA,0x361b22,0xcba886,new Item.Properties()));
     public static final RegistryObject<BlockItem> TISSUE_ATTACHMENT=ITEMS.register("tissue_attachment",()->new BlockItem(ModBlocks.TISSUE_ATTACHMENT.get(),new Item.Properties()));
@@ -52,6 +55,7 @@ public final class ModItems {
     public static final RegistryObject<net.minecraftforge.common.ForgeSpawnEggItem> BLACKWATCH_OFFICER_SPAWN_EGG=registerItem("blackwatch_officer_spawn_egg",p->new net.minecraftforge.common.ForgeSpawnEggItem(ModEntities.BLACKWATCH_OFFICER,0x20262a,0xd3bd80,p),new Item.Properties());
     public static final RegistryObject<net.minecraftforge.common.ForgeSpawnEggItem> BLACKWATCH_COMMANDER_SPAWN_EGG=registerItem("blackwatch_commander_spawn_egg",p->new net.minecraftforge.common.ForgeSpawnEggItem(ModEntities.BLACKWATCH_COMMANDER,0x20262a,0xe7d6a0,p),new Item.Properties());
 
+    public static final RegistryObject<com.codex.blacklight.item.ParasiteSyringeItem> SUPREME_PARASITE_SYRINGE = ITEMS.register("supreme_parasite_syringe",()->new com.codex.blacklight.item.ParasiteSyringeItem(new Item.Properties().stacksTo(4).rarity(Rarity.EPIC)));
     // Legacy registry IDs remain loadable; new crafting and creative access live in the independent mod.
     public static final RegistryObject<com.codex.blacklight.item.PassiveSerumItem> ADAPTATION_SERUM = ITEMS.register("adaptation_serum", () -> new com.codex.blacklight.item.PassiveSerumItem(new Item.Properties().stacksTo(1).rarity(Rarity.RARE), 1));
     public static final RegistryObject<com.codex.blacklight.item.PassiveSerumItem> TISSUE_REGENERATION_SERUM = ITEMS.register("tissue_regeneration_serum", () -> new com.codex.blacklight.item.PassiveSerumItem(new Item.Properties().stacksTo(1).rarity(Rarity.RARE), 2));
@@ -69,7 +73,7 @@ public final class ModItems {
                         output.accept(BLACKWATCH_TEAM_LEADER_SPAWN_EGG.get());
                         output.accept(BLACKWATCH_OFFICER_SPAWN_EGG.get());
                         output.accept(BLACKWATCH_COMMANDER_SPAWN_EGG.get());
-                        output.accept(BLACKLIGHT_SAMPLE.get()); output.accept(HUNTER_SPAWN_EGG.get());
+                        output.accept(BLACKLIGHT_SAMPLE.get()); output.accept(HUNTER_SPAWN_EGG.get()); output.accept(SUPREME_HUNTER_SPAWN_EGG.get());output.accept(SUPREME_PARASITE_SYRINGE.get());
                         output.accept(LIVING_HIVE_TISSUE.get());output.accept(HYDRA_SPAWN_EGG.get());
                         output.accept(INFECTED_SOIL.get()); output.accept(INFECTED_STONE.get());
                         output.accept(TISSUE_ATTACHMENT.get()); output.accept(TISSUE_FIBER.get()); output.accept(HIVE_FLESH.get());

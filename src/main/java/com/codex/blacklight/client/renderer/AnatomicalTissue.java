@@ -47,6 +47,7 @@ final class AnatomicalTissue {
     };
     private final Map<Region, Pending> pending = new IdentityHashMap<>();
     private final ResourceLocation skin;
+    private final boolean metadataOnly;
     private final long seed;
     private final float growth, partial,overgrowth;
     private final boolean procedural,organsOnly;
@@ -61,12 +62,14 @@ final class AnatomicalTissue {
     private final Map<TissueMorphogenesis.Bone,TissueVitalMotion.Field> vitalFields=new IdentityHashMap<>();
     void worldPose(org.joml.Matrix4f pose){worldRelativePose=new org.joml.Matrix4f(pose);}
 
-    private AnatomicalTissue(BlacklightInfectedHost host, List<Region> regions, ResourceLocation skin, float partial,boolean procedural,boolean organsOnly) {
+    private AnatomicalTissue(BlacklightInfectedHost host, List<Region> regions, ResourceLocation skin, float partial,boolean procedural,boolean organsOnly,boolean metadataOnly) {
+        this.metadataOnly=metadataOnly;
         this.host = host; this.regions = regions; this.skin = skin; this.partial = partial;
         digestiveState=host.digestiveVisual();
         digestiveProfile=host.digestiveProfile();
         vitalProfile=host.vitalsProfile();vitalState=host.vitalsVisual();vitalClock=TissueVitalMotion.clock(host.level().getGameTime(),partial);
-        seed = TissueOrgans.seed(host.getUUID()); growth = organsOnly?TissueEvolution.attachmentGrowth(host.tissueAge()):TissueGrowth.progress(host.tissueAge());
+        seed = TissueOrgans.seed(host.getUUID()); growth = organsOnly?TissueEvolution.attachmentGrowth(host.tissueAge()):
+                host.hostData().getBoolean("NativeVisual")?.24F+.76F*TissueGrowth.progress(host.tissueAge()):TissueGrowth.progress(host.tissueAge());
         this.procedural=procedural;this.organsOnly=organsOnly;
         evolution=organsOnly?ChimeraTissue.receiverEvolution(host,true,partial):procedural?ChimeraTissue.receiverEvolution(host,false,partial):TissueEvolution.sample(seed,0);
         overgrowth=procedural&&!organsOnly?TissueGrowth.overgrowth(host.tissueAge()):0;
@@ -112,7 +115,7 @@ final class AnatomicalTissue {
                 :"procedural#"+variant+(coat?"#coat":"");
         var regions=CACHE.computeIfAbsent(model,k->new HashMap<>()).computeIfAbsent(key,k->build(host.speciesId(),model,authored&&k.endsWith("#right"),!authored,variant,coat));
         if(regions.isEmpty())return null;
-        var result=new AnatomicalTissue(host,regions,skin,partial,!authored,organsOnly);
+        var result=new AnatomicalTissue(host,regions,skin,partial,!authored,organsOnly,model instanceof NativeGeometryMetadata);
         if(!coat)result.inherit(model);
         return result;
     }
@@ -252,7 +255,7 @@ final class AnatomicalTissue {
         if (pending.isEmpty()) return;
         // Emit complete passes. Requesting another buffer may end the previous builder.
         var nativeOut = buffers.getBuffer(RenderType.entityCutoutNoCull(skin));
-        if(!organsOnly)for (var p : pending.values()) for (var m : p.region.meshes) if (m.skin) draw(p, m, nativeOut, false);
+        if(!organsOnly&&!metadataOnly)for (var p : pending.values()) for (var m : p.region.meshes) if (m.skin) draw(p, m, nativeOut, false);
         var tissueOut = buffers.getBuffer(RenderType.entityCutoutNoCull(MATERIAL));
         for (var p : pending.values()) for (var m : p.region.meshes) draw(p, m, tissueOut, true);
         pending.clear();
@@ -349,6 +352,7 @@ final class AnatomicalTissue {
         }
         if(graft!=null&&(graft.core==TissueCore.TONGUE||graft.core==TissueCore.EXTRAORAL))
             TissueTongueRender.aim(host,partial,vertices,new org.joml.Matrix4f(posed.last().pose()).scale(1/16F),worldRelativePose);
+        float beat=TissueShading.heartbeat(host.level().getGameTime()+partial,TissueGrowth.sample(seed,977));
         for (int f = 0; f < mesh.faces.length; f++) {
             float[] face = mesh.faces[f]; int material = mandible?Math.max(1,(int)face[4]):(int)face[4];
             if (tissue && material == 0) continue;
@@ -363,6 +367,7 @@ final class AnatomicalTissue {
             centre.mul(.25F);
             Vector3f normal = new Vector3f(points[1]).sub(points[0]).cross(new Vector3f(points[2]).sub(points[0]));
             if (normal.lengthSquared() < 1e-10F) continue; normal.normalize();
+            float faceJitter=TissueGrowth.sample(seed,mesh.name.hashCode()*17+f);
             // The base and cover share shape keys, so there is no switch to a different silhouette.
             for (int j = 0; j < 4; j++) {
                 Vector3f v = points[j];
@@ -381,7 +386,7 @@ final class AnatomicalTissue {
                 }
                 // Native dye/tint belongs to surviving skin, not to new flesh.
                 // Preserve alpha so invisibility/fades remain owned by the caller.
-                out.vertex(posed.last().pose(),v.x/16,v.y/16,v.z/16).color(tissue?p.color|0x00ffffff:p.color)
+                out.vertex(posed.last().pose(),v.x/16,v.y/16,v.z/16).color(tissue?TissueShading.shade(p.color,material,normal.y,(j&1)==0?.35F:1,reveal,faceJitter,beat):p.color)
                         .uv(u,w).overlayCoords(p.overlay).uv2(p.light).normal(posed.last().normal(),normal.x,normal.y,normal.z).endVertex();
             }
         }

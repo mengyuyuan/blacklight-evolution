@@ -121,12 +121,13 @@ final class EvolvedBodyRenderer {
         boolean runnerArms=type==EvolvedArchetype.BLADE||type==EvolvedArchetype.SKIRMISHER||type==EvolvedArchetype.ARMORED;
         VertexConsumer out=null;int material=-1,overlay=OverlayTexture.pack(0,host.hurtTime>0||host.deathTime>0);
         var rightAnchor=matrices[rightWrist].transformPosition(new Vector3f(-5,12,0));var leftAnchor=matrices[leftWrist].transformPosition(new Vector3f(5,12,0));var normal=new Vector3f();var edge=new Vector3f();
-        for(var f:faces){
+        float beat=TissueShading.heartbeat(host.level().getGameTime()+partial,(host.getUUID().getLeastSignificantBits()&1023)/1023F);int faceIndex=0;
+        for(var f:faces){faceIndex++;
             if(f.kind>=4&&!blade||f.kind==0&&blade&&(f.role==2||f.role==3)&&(type==EvolvedArchetype.BLADE||type==EvolvedArchetype.SKIRMISHER||type==EvolvedArchetype.ARMORED&&f.role==2||(vertices[f.ids[0]].point.y+vertices[f.ids[1]].point.y+vertices[f.ids[2]].point.y+vertices[f.ids[3]].point.y)*.25F>6.5F))continue;
             if(f.kind==1&&!blade||f.kind==2&&(blade||grasp)||f.kind==3&&!grasp)continue;float amount=f.kind==0||f.kind>=4?1:f.kind==3?graspDeploy:deploy;if(f.kind==1&&f.role==3)amount*=1-graspDeploy;if(amount<=.001F)continue;
             var q=quad;var anchor=f.role==2?rightAnchor:leftAnchor;for(int k=0;k<4;k++){q[k].set(points[f.ids[k]]);if(f.kind>0)q[k].lerp(anchor,1-amount);}
             var n=normal.set(q[1]).sub(q[0]).cross(edge.set(q[2]).sub(q[0]));if(n.lengthSquared()<1e-10F)continue;n.normalize();int nextMaterial=f.kind==0?0:f.kind==5?2:f.kind==6?3:f.kind==7?4:f.kind==8?5:1;if(material!=nextMaterial){out=buffers.getBuffer(nextMaterial==2||nextMaterial==4?RenderType.entityTranslucentEmissive(nextMaterial==4?PLAYER_WEAPON_GLOW:runnerArms?WEAPON_GLOW:VARIANT_GLOW):RenderType.entityCutoutNoCull(nextMaterial==0?SKIN:nextMaterial==3?PLAYER_WEAPON:nextMaterial==5?ConsumedMobVisuals.WHITE:runnerArms?WEAPON:VARIANT_WEAPON));material=nextMaterial;}var identity=part(nativeModel,f.role);if(out instanceof ConsumeAnatomy.Consumer sink)sink.anatomy(f.role);EvolvedDonorCapture.mesh(identity,f.kind==0?"evolved_player":"evolved_weapon");
-            for(int k=0;k<4;k++)out.vertex(stack.last().pose(),q[k].x/16,q[k].y/16,q[k].z/16).color(f.color).uv(f.uv[k*2],f.uv[k*2+1]).overlayCoords(overlay).uv2(nextMaterial==2||nextMaterial==4?LightTexture.FULL_BRIGHT:light).normal(stack.last().normal(),n.x,n.y,n.z).endVertex();
+            boolean emissive=nextMaterial==2||nextMaterial==4;float jitter=((faceIndex*2654435761L)>>>16&255)/255F;for(int k=0;k<4;k++)out.vertex(stack.last().pose(),q[k].x/16,q[k].y/16,q[k].z/16).color(emissive?f.color:TissueShading.modulate(f.color,f.kind!=0,n.y,(k&1)==0?.35F:1,jitter,beat)).uv(f.uv[k*2],f.uv[k*2+1]).overlayCoords(overlay).uv2(nextMaterial==2||nextMaterial==4?LightTexture.FULL_BRIGHT:light).normal(stack.last().normal(),n.x,n.y,n.z).endVertex();
         }
         if(blade)for(int side=0;side<2;side++)if(tips[side]>=0){
             var inner=side==0?rightAnchor:leftAnchor;

@@ -47,6 +47,7 @@ public final class PrototypeSurvivalLock {
     @SubscribeEvent
     public static void onRightClickItem(PlayerInteractEvent.RightClickItem event) {
         if (event.getItemStack().getItem() instanceof com.codex.blacklight.firearms.FirearmItem) return;
+        if (event.getItemStack().getItem() instanceof com.codex.blacklight.item.ParasiteSyringeItem) return;
         if (!isLocked(event.getEntity())) return;
         event.setCancellationResult(InteractionResult.FAIL);
         event.setCanceled(true);
@@ -64,6 +65,7 @@ public final class PrototypeSurvivalLock {
     @SubscribeEvent
     public static void onEntityInteract(PlayerInteractEvent.EntityInteract event) {
         if(com.codex.blacklight.military.vehicle.VehicleDamageBridge.vehicle(event.getTarget())!=null)return;
+        if(event.getItemStack().getItem() instanceof com.codex.blacklight.item.ParasiteSyringeItem)return;
         if (!isLocked(event.getEntity())) return;
         event.setCancellationResult(InteractionResult.FAIL);
         event.setCanceled(true);
@@ -73,6 +75,7 @@ public final class PrototypeSurvivalLock {
     @SubscribeEvent
     public static void onEntityInteractSpecific(PlayerInteractEvent.EntityInteractSpecific event) {
         if(com.codex.blacklight.military.vehicle.VehicleDamageBridge.vehicle(event.getTarget())!=null)return;
+        if(event.getItemStack().getItem() instanceof com.codex.blacklight.item.ParasiteSyringeItem)return;
         if (!isLocked(event.getEntity())) return;
         event.setCancellationResult(InteractionResult.FAIL);
         event.setCanceled(true);

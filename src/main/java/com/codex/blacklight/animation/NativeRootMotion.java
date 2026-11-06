@@ -61,7 +61,8 @@ public final class NativeRootMotion {
                 () -> new IllegalStateException("Missing independent motion: " + move.id));
         float previous = weaponClock(elapsedTick - 1, offset, definition.transitionSeconds());
         float current = weaponClock(elapsedTick, offset, definition.transitionSeconds());
-        var step = clipStep(MotionLibrary.clip(move.id), previous, current, yaw);
+        var step = clipStep(MotionLibrary.clip(move.id), previous, current, yaw)
+                .scale(switch (com.codex.blacklight.combat.ImpactTier.of(move)) { case LIGHT -> 1.12; case MEDIUM -> 1.2; case HEAVY -> 1.32; case FINISHER -> 1.4; });
         if (!move.rush() && !move.quake()) {
             var target = player.level().getEntity(visual.targetId());
             if (target instanceof LivingEntity living && living.isAlive()) {

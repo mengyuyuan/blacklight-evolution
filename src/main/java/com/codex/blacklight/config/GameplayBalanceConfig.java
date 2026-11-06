@@ -20,6 +20,14 @@ public final class GameplayBalanceConfig {
     public static final ForgeConfigSpec.IntValue[][] TIER_WEIGHTS=new ForgeConfigSpec.IntValue[5][5];
     public static final ForgeConfigSpec.DoubleValue CORE_CHANCE,BROOD_CHANCE,BROOD_COST;
     public static final ForgeConfigSpec.IntValue BROOD_TICKS,HUNTER_EVERY,OCCUPATION_TICKS,OCCUPATION_BASE,OCCUPATION_PER_STAGE;
+    public static final ForgeConfigSpec.BooleanValue KILL_REWARDS;
+    public static final ForgeConfigSpec.DoubleValue KILL_BIOMASS,KILL_EP;
+    public static final ForgeConfigSpec.BooleanValue INFECTION_STATS,INFECTION_NATIVE_UNITS,INFECTION_NATIVE_THREAT;
+    public static final ForgeConfigSpec.DoubleValue INFECTION_HEALTH_THRESHOLD,INFECTION_HEALTH_BONUS,INFECTION_HEALTH_EXCESS,INFECTION_ATTACK_THRESHOLD,INFECTION_ATTACK_BONUS,INFECTION_ATTACK_EXCESS;
+    public static final ForgeConfigSpec.BooleanValue CONSUME_LAST_CHANCE;
+    public static final ForgeConfigSpec.DoubleValue CONSUME_LAST_CHANCE_THRESHOLD;
+    public static final ForgeConfigSpec.BooleanValue CONVERSION_ENABLED;
+    public static final ForgeConfigSpec.IntValue CONVERSION_PER_TICK,CONVERSION_RETRY_TICKS;
     static {
         var b=new ForgeConfigSpec.Builder();
         b.comment("感染传播。概率使用0～1；20 tick约1秒。仅服务端决定结果；不修改强制感染指令。").push("infection");
@@ -85,6 +93,27 @@ public final class GameplayBalanceConfig {
         OCCUPATION_TICKS=b.comment("稳定附着建筑的自主供能间隔刻数。").defineInRange("occupationIncomeIntervalTicks",40,5,240000);
         OCCUPATION_BASE=b.comment("每轮自主供能基础养分；不是玩家背包或物品复制。").defineInRange("occupationBaseNutrients",2,0,10000);
         OCCUPATION_PER_STAGE=b.comment("每个建筑成熟阶段增加的自主养分。").defineInRange("occupationNutrientsPerStage",2,0,10000);b.pop();
+        b.comment("黑光击杀收益。按同一目标吸收的基础资源计算；不触发吸收回血、形态解锁或器官发现。母巢保留自己的专属奖励。").push("combatRewards");
+        KILL_REWARDS=b.comment("已感染玩家的击杀自动获得资源；普通模式和虐杀模式均可。死亡被取消或已经吸收的目标不重复结算。").define("enabled",true);
+        KILL_BIOMASS=b.comment("击杀获得吸收基础生物质的比例；0.5=50%，整数四舍五入，0关闭此项。").defineInRange("killBiomassFraction",.5,0,1);
+        KILL_EP=b.comment("击杀获得吸收基础进化点的比例；不含吸收才能发现的器官研究奖励。").defineInRange("killEvolutionPointFraction",.5,0,1);b.pop();
+        b.comment("只控制初次感染继承，不修改后续无限进化、代数或器官成长。旧宿主保存原生数值后按当前配置重算，保持剩余生命比例。").push("infectionStats");
+        INFECTION_STATS=b.define("enabled",true);
+        INFECTION_HEALTH_THRESHOLD=b.comment("感染前的原生最大生命阈值，按HP计算而非红心；超过部分使用较小百分比，绝非生命上限。").defineInRange("highHealthThreshold",1000D,1,1e24);
+        INFECTION_HEALTH_BONUS=b.comment("阈值以内部分的初次感染额外生命比例，0.4=+40%。").defineInRange("ordinaryHealthBonus",.4,0,100);
+        INFECTION_HEALTH_EXCESS=b.comment("超出阈值部分的额外生命比例，0.05=+5%。默认10000HP变成10850HP，后续进化照常。").defineInRange("excessHealthBonus",.05,0,100);
+        INFECTION_NATIVE_UNITS=b.comment("高血原生生物及其宿主保留原生HP单位，不再额外乘5；低血宿主后续成长超过阈值不触发此项。").define("highHealthUsesNativeUnits",true);
+        INFECTION_ATTACK_THRESHOLD=b.comment("原生近战攻击分段阈值；超过部分使用较小感染增益。也用于识别已成长的强攻击感染体。").defineInRange("highAttackThreshold",100D,1,1e24);
+        INFECTION_ATTACK_BONUS=b.defineInRange("ordinaryAttackBonus",.3,0,100);
+        INFECTION_ATTACK_EXCESS=b.defineInRange("excessAttackBonus",.1,0,100);
+        INFECTION_NATIVE_THREAT=b.comment("高血/高攻击感染体使用现有精英接触伤害预算，不再被当作普通10HP小怪；不强行补高低伤害，不影响玩家攻击。").define("recognizeNativeCombatStrength",true);b.pop();
+        b.comment("可吸收生物的单次残血保命；只处理已感染玩家造成的伤害，次数保存且感染转换不刷新。满血秒杀和吞噬处决不受影响。").push("consumeLastChance");
+        CONSUME_LAST_CHANCE=b.comment("已进入残血线的可吸收生物遭遇致命攻击时留1HP一次；继续攻击仍会死亡。").define("enabled",true);
+        CONSUME_LAST_CHANCE_THRESHOLD=b.comment("受击前的剩余生命比例；0.15=15%。不是每次受击重新获得机会。").defineInRange("healthFraction",.15,0,1);b.pop();
+        b.comment("现有生物自动转换的服务端保护，与新怪物刷怪预算独立；所有维度共享单 tick 额度，不限制后续无限进化。").push("infectionConversion");
+        CONVERSION_ENABLED=b.comment("暂停／恢复原生生物到黑光宿主的自动替换；关闭时保留原生生物、感染和装备。").define("enabled",true);
+        CONVERSION_PER_TICK=b.comment("整个服务器每 tick 最多尝试的自动转换数量，包括失败尝试。剩余生物留在原处，下个 tick 继续；不批量清怪。").defineInRange("maxAttemptsPerServerTick",4,1,64);
+        CONVERSION_RETRY_TICKS=b.comment("第三方生物准备／保存数据失败后，下次尝试的间隔；同物种完整异常日志也按此间隔限流。20 tick约1秒。").defineInRange("preparationFailureRetryTicks",1200,20,24000);b.pop();
         SPEC=b.build();
     }
     private GameplayBalanceConfig(){}

@@ -14,6 +14,54 @@ import net.minecraftforge.gametest.*;
 
 @GameTestHolder("blacklight") @PrefixGameTestTemplate(false)
 public final class InfectionProtectionGameTest {
+    @GameTest(template="wall_test",timeoutTicks=100,batch="infection_actor")
+    public static void naturalGrowthHasAnIsolatedActorAndPreservesClaimVeto(GameTestHelper h) {
+        var level=h.getLevel();var pos=h.absolutePos(new BlockPos(5,30,5));
+        var old=level.getBlockState(pos);level.setBlock(pos,Blocks.AIR.defaultBlockState(),2);
+        var seen=new java.util.concurrent.atomic.AtomicReference<net.minecraft.world.entity.Entity>();
+        var calls=new java.util.concurrent.atomic.AtomicInteger();
+        Consumer<BlockEvent.EntityPlaceEvent> veto=e->{
+            if(!e.getPos().equals(pos))return;
+            // Claim listeners in the reported crash dereference the acting entity.
+            h.assertTrue(e.getEntity().getUUID()!=null,"claim listener receives a real identity");
+            h.assertTrue(e.getEntity() instanceof net.minecraftforge.common.util.FakePlayer,"growth uses its own actor");
+            var actor=(net.minecraft.server.level.ServerPlayer)e.getEntity();seen.set(actor);calls.incrementAndGet();
+            h.assertTrue(actor.serverLevel()==level&&actor.blockPosition().equals(pos),"actor belongs to the placement dimension and position");
+            h.assertTrue(actor.getGameProfile().getName().equals("[Blacklight]")&&!actor.hasPermissions(2),"growth cannot borrow a human or operator identity");
+            h.assertTrue(level.getEntity(actor.getUUID())==null&&!level.getServer().getPlayerList().getPlayers().contains(actor),"actor is never spawned or connected");
+            h.assertTrue(e.getBlockSnapshot().getReplacedBlock().isAir()&&e.getPlacedBlock().is(Blocks.STONE),"old snapshot and new placement remain distinct");
+            e.setCanceled(true);
+        };
+        MinecraftForge.EVENT_BUS.addListener(veto);
+        try {
+            h.assertTrue(!NaturalInfectionPlacement.place(level,pos,Blocks.STONE.defaultBlockState()),"claim veto refuses growth");
+            h.assertTrue(calls.get()==1&&seen.get()!=null&&level.getBlockState(pos).isAir(),"cancelled growth restores the original cell");
+        } finally {MinecraftForge.EVENT_BUS.unregister(veto);level.setBlock(pos,old,2);}
+        h.succeed();
+    }
+
+    @GameTest(template="wall_test",timeoutTicks=100,batch="infection_actor_nested")
+    public static void nestedGrowthRestoresTheOuterActorPosition(GameTestHelper h) {
+        var level=h.getLevel();var outer=h.absolutePos(new BlockPos(5,32,5));var inner=outer.offset(3,0,0);
+        var oldOuter=level.getBlockState(outer);var oldInner=level.getBlockState(inner);
+        level.setBlock(outer,Blocks.AIR.defaultBlockState(),2);level.setBlock(inner,Blocks.AIR.defaultBlockState(),2);
+        var calls=new java.util.concurrent.atomic.AtomicInteger();
+        Consumer<BlockEvent.EntityPlaceEvent> listener=e->{
+            if(!e.getPos().equals(outer)&&!e.getPos().equals(inner))return;
+            h.assertTrue(e.getEntity().blockPosition().equals(e.getPos()),"each recursive event has its own position");calls.incrementAndGet();
+            if(e.getPos().equals(outer)) {
+                var actor=e.getEntity();var position=actor.position();
+                h.assertTrue(NaturalInfectionPlacement.place(level,inner,Blocks.STONE.defaultBlockState()),"nested growth succeeds");
+                h.assertTrue(actor.position().equals(position),"nested listener cannot move the outer event actor");
+            }
+        };
+        MinecraftForge.EVENT_BUS.addListener(listener);
+        try {
+            h.assertTrue(NaturalInfectionPlacement.place(level,outer,Blocks.STONE.defaultBlockState())&&calls.get()==2,"both real placements complete");
+        } finally {MinecraftForge.EVENT_BUS.unregister(listener);level.setBlock(outer,oldOuter,2);level.setBlock(inner,oldInner,2);}
+        h.succeed();
+    }
+
     @GameTest(template="wall_test",timeoutTicks=100,batch="infection_plan_load")
     public static void oversizedSavedPathIsRejectedBeforeTick(GameTestHelper h) {
         var stem=new BuildingBiomassField.Stem(java.util.List.of(new BuildingBiomassField.Point(-200,0,0),

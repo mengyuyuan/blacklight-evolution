@@ -81,6 +81,10 @@ public final class ModAttachments {
                     .serialize(com.mojang.serialization.Codec.LONG)
                     .sync(com.codex.blacklight.forge.codec.ByteBufCodecs.VAR_LONG).build());
 
+    public static final Supplier<AttachmentType<Long>> NATIVE_INFECTION_AGE=ATTACHMENTS.register("native_infection_age",()->AttachmentType.builder(()->0L).serialize(com.mojang.serialization.Codec.LONG).sync(com.codex.blacklight.forge.codec.ByteBufCodecs.VAR_LONG).build());
+    /** Transient bounded presentation values; canonical native tissue stays in its owned persistent compound. */
+    public static final Supplier<AttachmentType<net.minecraft.nbt.CompoundTag>> NATIVE_TISSUE=ATTACHMENTS.register("native_tissue",()->AttachmentType.builder(()->new net.minecraft.nbt.CompoundTag()).sync(com.codex.blacklight.infection.NativeTissueCodec.STREAM_CODEC).build());
+
     /** Transient action lock; never carried through logout/death or persisted. */
     public static final Supplier<AttachmentType<Boolean>> CONSUMING = ATTACHMENTS.register(
             "consuming", () -> AttachmentType.builder(() -> false)
@@ -120,8 +124,16 @@ public final class ModAttachments {
     }
     public static final Supplier<AttachmentType<Integer>> JUMP_CHARGE=ATTACHMENTS.register("jump_charge",
             ()->AttachmentType.builder(()->0).sync(com.codex.blacklight.forge.codec.ByteBufCodecs.VAR_INT).build());
+    /** Visual limb loss on a heavy killing blow (HeavyBlow.DISMEMBER_*). Transient, never saved. */
+    /** Mirror of the blacklightPrototypeHunger game rule for the HUD and sprint gate. Not saved. */
+    /** Game time the held-body throw wind-up started, -1 when not charging. Transient. */
+    public static final Supplier<AttachmentType<Long>> GRAB_THROW_CHARGE=ATTACHMENTS.register("grab_throw_charge",()->AttachmentType.builder(()->-1L).sync(com.codex.blacklight.forge.codec.ByteBufCodecs.VAR_LONG).build());
+    public static final Supplier<AttachmentType<Boolean>> PROTOTYPE_HUNGER=ATTACHMENTS.register("prototype_hunger",()->AttachmentType.builder(()->false).sync(com.codex.blacklight.forge.codec.ByteBufCodecs.BOOL).build());
+    public static final Supplier<AttachmentType<Integer>> DISMEMBER=ATTACHMENTS.register("dismember",()->AttachmentType.builder(()->0).sync(com.codex.blacklight.forge.codec.ByteBufCodecs.VAR_INT).build());
     public static final Supplier<AttachmentType<com.codex.blacklight.combat.HitReaction>> HIT_REACTION=ATTACHMENTS.register("hit_reaction",
             ()->AttachmentType.builder(()->com.codex.blacklight.combat.HitReaction.EMPTY).sync(com.codex.blacklight.combat.HitReaction.CODEC).build());
+    /** ParasiteSystem bits: 1 suppressed, 2 apex. Survives death and is synced. */
+    public static final Supplier<AttachmentType<Integer>> PARASITE=ATTACHMENTS.register("parasite",()->AttachmentType.builder(()->0).serialize(com.mojang.serialization.Codec.INT).copyOnDeath().sync(com.codex.blacklight.forge.codec.ByteBufCodecs.VAR_INT).build());
     public static final Supplier<AttachmentType<Integer>> UTILITY_POWERS=ATTACHMENTS.register("utility_powers",()->AttachmentType.builder(()->0).sync(com.codex.blacklight.forge.codec.ByteBufCodecs.VAR_INT).build());
     public static final Supplier<AttachmentType<com.codex.blacklight.power.PowerMorph>> POWER_MORPH=ATTACHMENTS.register("power_morph",()->AttachmentType.builder(()->com.codex.blacklight.power.PowerMorph.NONE).sync(com.codex.blacklight.power.PowerMorph.CODEC).build());
 
@@ -177,7 +189,7 @@ public final class ModAttachments {
     /** Passive hooks must not create/sync state or revive missing/invalid capabilities. */
     public static <T> T peekData(Entity entity, Supplier<AttachmentType<T>> key) {
         AttachmentType<T> type = key.get();
-        if (entity.isRemoved()) return type.createDefault();
+        if (entity==null || entity.isRemoved()) return type.createDefault();
         return entity.getCapability(BlacklightAttachments.CAPABILITY).resolve()
                 .filter(storage -> storage.has(type)).map(storage -> storage.get(type))
                 .orElseGet(type::createDefault);
@@ -191,7 +203,7 @@ public final class ModAttachments {
     }
 
     public static boolean available(Entity entity) {
-        return !entity.isRemoved() && entity.getCapability(BlacklightAttachments.CAPABILITY).isPresent();
+        return entity!=null && !entity.isRemoved() && entity.getCapability(BlacklightAttachments.CAPABILITY).isPresent();
     }
 
     public static <T> T getData(Entity entity, Supplier<AttachmentType<T>> key) {
