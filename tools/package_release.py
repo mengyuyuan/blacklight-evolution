@@ -11,6 +11,8 @@ import shutil
 import subprocess
 import tomllib
 from pathlib import Path
+import sys
+sys.path.insert(0, str(Path(__file__).resolve().parent))  # sibling helper when loaded by path (tests, CI)
 from release_classes import production_classes as select_source_classes, verify_internal_closure
 from zipfile import ZIP_DEFLATED, ZipFile, ZipInfo
 
