@@ -15,6 +15,10 @@ import com.codex.blacklight.forge.PacketDistributor;
 
 /** Coord drives the physical actor once, on the server, before that tick's swept contacts. */
 public final class NativeRootMotion {
+    /** Committed-swing travel multiplier per hit tier, applied on top of the authored clip path. */
+    public static double travelScale(com.codex.blacklight.combat.WeaponMove move) {
+        return switch (com.codex.blacklight.combat.ImpactTier.of(move)) { case LIGHT -> 1.12; case MEDIUM -> 1.2; case HEAVY -> 1.32; case FINISHER -> 1.4; };
+    }
     private NativeRootMotion() {}
 
     public static boolean controlsGroundRoot(ServerPlayer player) {
@@ -62,7 +66,7 @@ public final class NativeRootMotion {
         float previous = weaponClock(elapsedTick - 1, offset, definition.transitionSeconds());
         float current = weaponClock(elapsedTick, offset, definition.transitionSeconds());
         var step = clipStep(MotionLibrary.clip(move.id), previous, current, yaw)
-                .scale(switch (com.codex.blacklight.combat.ImpactTier.of(move)) { case LIGHT -> 1.12; case MEDIUM -> 1.2; case HEAVY -> 1.32; case FINISHER -> 1.4; });
+                .scale(travelScale(move));
         if (!move.rush() && !move.quake()) {
             var target = player.level().getEntity(visual.targetId());
             if (target instanceof LivingEntity living && living.isAlive()) {

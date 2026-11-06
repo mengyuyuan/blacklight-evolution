@@ -170,12 +170,13 @@ public final class ConsumeSystem {
                 if(dot>.94&&score>best){best=score;target=e;}
             }
         }
-        Vec3 aim=target!=null?CombatTargeting.lockPoint(p,target):null;
-        if(aim==null){
-            var clip=p.level().clip(new net.minecraft.world.level.ClipContext(p.getEyePosition(),p.getEyePosition().add(look.scale(48)),net.minecraft.world.level.ClipContext.Block.COLLIDER,net.minecraft.world.level.ClipContext.Fluid.NONE,p));
-            aim=clip.getLocation();
-        }
-        Vec3 motion=target!=null&&!target.onGround()?Vec3.ZERO:target!=null?target.getDeltaMovement().multiply(1,0,1):Vec3.ZERO;
+        // A free throw (no creature aimed) keeps the original camera throw and inherits half the
+        // carrier's running momentum; only an aimed creature gets the gravity-solved arc.
+        Vec3 carried=p.getDeltaMovement().multiply(.5,0,.5);
+        Vec3 free=look.scale(speed);free=new Vec3(free.x,Math.max(free.y,.12)+.28-.1*charge,free.z).add(carried);
+        if(target==null)return free;
+        Vec3 aim=CombatTargeting.lockPoint(p,target);
+        Vec3 motion=target.onGround()?target.getDeltaMovement().multiply(1,0,1):Vec3.ZERO;
         double sum=0,drop=0,pow=1,fall=0;
         for(int n=1;n<=40;n++){
             sum+=pow;drop+=fall;pow*=.98;fall=(fall+.08)*.98;
@@ -183,7 +184,7 @@ public final class ConsumeSystem {
             if(need.length()<=speed)return need;
         }
         // Out of reach: throw along the camera, never straight into the floor at the player's feet.
-        Vec3 v=look.scale(speed);return new Vec3(v.x,Math.max(v.y,.12)+.28-.1*charge,v.z);
+        return free;
     }
     private static Vec3 anchor(ServerPlayer p,Mob victim) {
         var s=ACTIVE.get(p);

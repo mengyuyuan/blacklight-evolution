@@ -448,8 +448,11 @@ public final class WeaponCombatSystem {
         return tick/20.0<release+transition-.0001;
     }
     /** Actor side of hitstop: the clip holds its contact frame, root motion and contact clocks stop. */
+    private static volatile boolean actorHitstop=true;
+    /** Tick-exact GameTests that predate hitstop disable the actor freeze; hitstop has its own test. */
+    public static boolean actorHitstop(boolean enabled){boolean old=actorHitstop;actorHitstop=enabled;return old;}
     private static void beginHitstop(ServerPlayer p,Session s,ImpactTier tier){
-        if(tier.hitstop<=0||s.hitstop>0||s.traveling||s.charging||s.mobilityStarted>=0)return;
+        if(!actorHitstop||tier.hitstop<=0||s.hitstop>0||s.traveling||s.charging||s.mobilityStarted>=0)return;
         var old=com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.WEAPON_VISUAL);if(old.spec()!=s.move||old.attackPose()>=0)return;
         var sample=com.codex.blacklight.animation.WeaponMotionClock.sample(old,p.level().getGameTime());if(sample==null)return;
         s.hitstop=tier.hitstop;s.hitstopHeld=0;s.hitstopStarted=old.started();

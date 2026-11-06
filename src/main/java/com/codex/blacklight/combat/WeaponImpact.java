@@ -47,8 +47,9 @@ public final class WeaponImpact {
         boolean protectedAttack=v instanceof com.codex.blacklight.entity.BlacklightHive||v.isAlive()&&v instanceof com.codex.blacklight.entity.BlacklightInfectedHost host&&host.giantBoss();
         boolean controlled=false;
         if(!protectedAttack&&ImpactControl.begin(v,profile,p.getYRot())){controlled=true;
-            double force=profile.push()*tier.force*mass*resistance;
-            double lift=profile.lift()<0?profile.lift():profile.lift()+tier.lift;
+            double force=profile.push()*(volume<4?tier.force:1)*mass*resistance;
+            // Tier lift pops ordinary bodies; massive ones stay grounded under the same hit.
+            double lift=profile.lift()<0?profile.lift():profile.lift()+(volume<4?tier.lift:0);
             double vertical=lift==0?Math.max(0,Math.min(v.getDeltaMovement().y,.12)):lift*mass*resistance;
             v.setDeltaMovement(direction.x*force,vertical,direction.z*force);
             if(vertical>0)v.setOnGround(false);

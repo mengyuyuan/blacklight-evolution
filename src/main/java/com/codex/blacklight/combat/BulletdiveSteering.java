@@ -44,7 +44,11 @@ public final class BulletdiveSteering {
     public static Vec3 guided(Vec3 position,Vec3 target,Vec3 targetVelocity,int fallingTick,float yaw,int forward,int right){
         double drop=Math.max(0,position.y-target.y);int n=1;double travelled=0;
         while(n<4000){travelled+=BulletdivePhysics.downSpeed(fallingTick+n);if(travelled>=drop)break;n++;}
-        Vec3 lead=finite(targetVelocity)?new Vec3(targetVelocity.x,0,targetVelocity.z).scale(Math.min(n,40)):Vec3.ZERO;
+        // A horizontal step above two blocks per tick is a teleport or a stale previous position,
+        // not motion; extrapolating it sends the crater far past the target.
+        Vec3 step=finite(targetVelocity)?new Vec3(targetVelocity.x,0,targetVelocity.z):Vec3.ZERO;
+        if(step.lengthSqr()>4)step=Vec3.ZERO;else if(step.lengthSqr()>1)step=step.normalize();
+        Vec3 lead=step.scale(Math.min(n,40));
         Vec3 offset=new Vec3(target.x+lead.x-position.x,0,target.z+lead.z-position.z);
         Vec3 next=offset.scale(1D/n);
         int f=Integer.signum(forward),r=Integer.signum(right);

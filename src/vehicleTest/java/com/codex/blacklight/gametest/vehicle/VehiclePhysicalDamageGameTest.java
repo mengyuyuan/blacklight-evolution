@@ -28,6 +28,8 @@ public final class VehiclePhysicalDamageGameTest {
         var p=MilitaryVehicleGameTest.mockPlayer(h);f.entities.add(p);p.setGameMode(GameType.SURVIVAL);p.setPos(f.x+.5,81,z);p.setYRot(0);p.setXRot(0);
         var state=com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.PLAYER_STATE);state.infect();state.setPrototypeMode(true);com.codex.blacklight.registry.ModAttachments.setData(p, ModAttachments.PLAYER_STATE,state);return p;
     }
+    /** Prototype hits reach hulls in the same CombatScale units as living bodies. */
+    private static float scale(ServerPlayer p){return com.codex.blacklight.military.vehicle.VehicleDamageBridge.prototypeScale(p);}
     private static MilitaryVehicle tank(MilitaryVehicleGameTest.Fixture f,double z){
         var v=ModEntities.MILITARY_TANK.get().create(f.level);v.setPos(f.x+.5,81,z);f.level.addFreshEntity(v);f.entities.add(v);if(!f.level.getEntitiesOfClass(MilitaryVehicle.class,v.getBoundingBox().inflate(.01)).contains(v))throw new GameTestAssertException("fixture must expose the actual chassis in the already ticking forced chunk before testing its hit entry");return v;
     }
@@ -47,7 +49,7 @@ public final class VehiclePhysicalDamageGameTest {
     }
     private static Mob thrownMob(MilitaryVehicleGameTest.Fixture f,ServerPlayer player,double z,Vec3 velocity){
         var mob=EntityType.COW.create(f.level);mob.setNoAi(true);mob.setPos(f.x+.5,81,z);f.level.addFreshEntity(mob);f.entities.add(mob);
-        try{var type=Class.forName(ConsumeSystem.class.getName()+"$Thrown");var constructor=type.getDeclaredConstructor(ServerPlayer.class,int.class,Vec3.class,float.class);constructor.setAccessible(true);thrown().put(mob,constructor.newInstance(player,40,velocity,12F));}
+        try{var type=Class.forName(ConsumeSystem.class.getName()+"$Thrown");var constructor=type.getDeclaredConstructor(ServerPlayer.class,int.class,Vec3.class,float.class,float.class);constructor.setAccessible(true);thrown().put(mob,constructor.newInstance(player,40,velocity,12F,0F));}
         catch(ReflectiveOperationException error){throw new GameTestAssertException("fixture reflection failed: "+error);}return mob;
     }
     private static void step(Mob mob){ConsumeSystem.thrown(new com.codex.blacklight.combat.ForgeEntityTickEvent.Pre(mob));}
@@ -58,7 +60,7 @@ public final class VehiclePhysicalDamageGameTest {
         var f=new MilitaryVehicleGameTest.Fixture(h,290000);
         VehicleTestReadiness.run(h,f,()->{
             var p=player(h,f,-4.5);var v=tank(f,1);float before=v.health();claw(p);
-            h.assertTrue(Math.abs(before-v.health()-5.5F)<.001,"original AUTO_3 server impact applies its actual eleven damage once at explicit heavy physical .5, including prototype event scope");
+            h.assertTrue(Math.abs(before-v.health()-5.5F*scale(p))<.001,"original AUTO_3 server impact applies its actual eleven damage once at explicit heavy physical .5, including prototype event scope");
         });
     }
     @GameTest(template="blackwatch_arena",batch="vehicle6_physical",timeoutTicks=100)
@@ -75,8 +77,8 @@ public final class VehiclePhysicalDamageGameTest {
         var f=new MilitaryVehicleGameTest.Fixture(h,292000);
         VehicleTestReadiness.run(h,f,()->{
             var p=player(h,f,-7);var v=tank(f,3);var second=tank(f,14);var shot=block(f,p,new Vec3(f.x+.5,82,-4),new Vec3(0,0,18));shot.tick();
-            h.assertTrue(Math.abs(v.maxHealth()-v.health()-4)<.001&&second.health()==second.maxHealth(),"actual carried block impact uses original eight damage at physical .5 and stops at nearest real hull");
-            shot.tick();h.assertTrue(Math.abs(v.maxHealth()-v.health()-4)<.001,"settled or removed cargo cannot damage the parent/parts again");
+            h.assertTrue(Math.abs(v.maxHealth()-v.health()-4*scale(p))<.001&&second.health()==second.maxHealth(),"actual carried block impact uses original eight damage at physical .5 and stops at nearest real hull");
+            shot.tick();h.assertTrue(Math.abs(v.maxHealth()-v.health()-4*scale(p))<.001,"settled or removed cargo cannot damage the parent/parts again");
         });
     }
     @GameTest(template="blackwatch_arena",batch="vehicle6_physical",timeoutTicks=100)
@@ -93,7 +95,7 @@ public final class VehiclePhysicalDamageGameTest {
         VehicleTestReadiness.run(h,f,()->{
             var p=player(h,f,-8);var v=tank(f,3);var behind=EntityType.COW.create(f.level);behind.setNoAi(true);behind.setPos(f.x+.5,81,9);f.level.addFreshEntity(behind);f.entities.add(behind);
             var mob=thrownMob(f,p,-5,new Vec3(0,0,15));step(mob);
-            h.assertTrue(Math.abs(v.maxHealth()-v.health()-6)<.001&&behind.getHealth()==behind.getMaxHealth(),"actual thrown-mob Pre uses the actual twelve damage at the first real mechanical contact, excluding a living actor behind it");
+            h.assertTrue(Math.abs(v.maxHealth()-v.health()-6*scale(p))<.001&&behind.getHealth()==behind.getMaxHealth(),"actual thrown-mob Pre uses the actual twelve damage at the first real mechanical contact, excluding a living actor behind it");
             h.assertTrue(!thrown().containsKey(mob)&&mob.position().z<3,"first hull ends the real ballistic record at contact");
         });
     }
@@ -127,7 +129,7 @@ public final class VehiclePhysicalDamageGameTest {
         VehicleTestReadiness.run(h,f,()->{
             var p=player(h,f,-7);var v=tank(f,3);var shot=block(f,p,new Vec3(f.x+3.2,82,-4),new Vec3(0,0,12));
             shot.setCargo(new BlockThrowCargo(List.of(new BlockThrowCargo.Cell(BlockPos.ZERO,Blocks.STONE.defaultBlockState()),new BlockThrowCargo.Cell(new BlockPos(2,0,0),Blocks.STONE.defaultBlockState()))));shot.tick();
-            h.assertTrue(Math.abs(v.maxHealth()-v.health()-4)<.001,"the actual three-wide carried cargo edge hits the real hull even though its center ray misses; cargo shape never multiplies its saved impact damage");
+            h.assertTrue(Math.abs(v.maxHealth()-v.health()-4*scale(p))<.001,"the actual three-wide carried cargo edge hits the real hull even though its center ray misses; cargo shape never multiplies its saved impact damage");
         });
     }
     @GameTest(template="blackwatch_arena",batch="vehicle6_physical",timeoutTicks=100)

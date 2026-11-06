@@ -77,7 +77,8 @@ public final class FeedbackSuggestionsGameTest {
         }finally{FeedbackLifecycleGameTest.cleanup(p);}h.succeed();
     }
     @GameTest(template="wall_test",timeoutTicks=60,batch="feedback_sweeper")
-    public static void closeSweeperHitsExactlyNineTimes(GameTestHelper h) throws Exception {
+    public static void closeSweeperHitsExactlyNineTimes(GameTestHelper h) throws Exception {withoutActorHitstop(()->closeSweeperHitsExactlyNineTimesBody(h));}
+    private static void closeSweeperHitsExactlyNineTimesBody(GameTestHelper h) throws Exception {
         var p=FeedbackLifecycleGameTest.player(h);var contacts=new java.util.concurrent.atomic.AtomicInteger();
         var target=new net.minecraft.world.entity.animal.Cow(EntityType.COW,h.getLevel()){
             @Override public boolean hurt(net.minecraft.world.damagesource.DamageSource source,float amount){
@@ -98,5 +99,11 @@ public final class FeedbackSuggestionsGameTest {
             }
             h.assertTrue(contacts.get()==9,"one close target receives nine real damage contacts, got "+contacts.get());
         }finally{WeaponCombatSystem.cancel(p);target.discard();FeedbackLifecycleGameTest.cleanup(p);}h.succeed();
+    }
+    /** These tick-exact timelines predate hitstop; actor hitstop only extends busy time, so it is disabled here. */
+    private interface Body{void run() throws Exception;}
+    private static void withoutActorHitstop(Body body) throws Exception{
+        boolean old=com.codex.blacklight.combat.WeaponCombatSystem.actorHitstop(false);
+        try{body.run();}finally{com.codex.blacklight.combat.WeaponCombatSystem.actorHitstop(old);}
     }
 }
