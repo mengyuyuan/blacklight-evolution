@@ -249,7 +249,7 @@ public enum WeaponMove {
             if(!aerial()&&!landingAttack()&&!rush()&&!frenzy()&&!groundSpike()){
                 int safe=Math.max(end+1,end-1+10-next.start);
                 int recovery=Math.max(0,sourceTick-safe);
-                sourceTick-=Math.min(recovery,(int)Math.ceil(recovery*.15));
+                sourceTick-=Math.min(recovery,(int)Math.ceil(recovery*.40));
             }
             // A reviewed source hook can still precede Minecraft's hurt-resistance
             // boundary. Extend that hook without removing any source contact.

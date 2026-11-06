@@ -11,6 +11,10 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(Entity.class)
 public abstract class ConsumeControlMixin {
+    @Inject(method="load",at=@At("HEAD"))
+    private void blacklight$releaseOldTissueScene(net.minecraft.nbt.CompoundTag tag,CallbackInfo ci){
+        com.codex.blacklight.infection.TissueCompetition.reloaded((Entity)(Object)this);
+    }
     @Inject(method="startRiding(Lnet/minecraft/world/entity/Entity;Z)Z",at=@At("HEAD"),cancellable=true)
     private void blacklight$preventForcedGrab(Entity vehicle,boolean force,CallbackInfoReturnable<Boolean> cir){
         if(ConsumeControl.protectedEntity((Entity)(Object)this))cir.setReturnValue(false);

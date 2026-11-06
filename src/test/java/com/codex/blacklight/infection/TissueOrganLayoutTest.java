@@ -75,7 +75,8 @@ class TissueOrganLayoutTest {
             int count=0;for(var b:bones)if(layout.mounted(core,b))for(var mesh:functional(core,b,2,42)){count++;faces+=mesh.faces().length;}
             assertTrue(count>0,core.toString());pieces+=count;
         }
-        assertTrue(pieces<=56&&faces<1500,"twenty-seven functional categories share a bounded integrated kit rather than duplicating every weapon or stomach on each leg; pieces="+pieces+" faces="+faces);
+        // smoothed five-ring organ lofts (TissueMorphogenesis.smooth) raise the face budget; piece budget stays.
+        assertTrue(pieces<=56&&faces<2100,"twenty-seven functional categories share a bounded integrated kit rather than duplicating every weapon or stomach on each leg; pieces="+pieces+" faces="+faces);
     }
     @Test void retiringOldWeaponKitsIsContinuousAndDoesNotEraseSkinOrMouthParts(){
         assertTrue(TissueOrganLayout.oldDistalKit("claw_0"));assertTrue(TissueOrganLayout.oldDistalKit("blade_1"));assertTrue(TissueOrganLayout.oldDistalKit("ulnar_blade"));

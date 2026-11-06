@@ -1,0 +1,23 @@
+{
+  "display": {
+    "icon": {
+      "item": "blacklight:supreme_parasite_syringe"
+    },
+    "title": {
+      "translate": "advancement.blacklight.biological_experiment"
+    },
+    "description": {
+      "translate": "advancement.blacklight.biological_experiment.desc"
+    },
+    "frame": "challenge",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "parent": "blacklight:hive_breaker"
+}

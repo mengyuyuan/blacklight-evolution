@@ -15,12 +15,12 @@ import java.util.*;
 /** Short server-authoritative tethers. No riding, teleport, saved NoAI or target modifications. */
 @EventBusSubscriber(modid="blacklight")
 public final class TissueGrapples {
-    private record Hold(WeakReference<BlacklightInfectedHost> owner,long until){}
+    private record Hold(WeakReference<Mob> owner,long until){}
     private static final Map<LivingEntity,Hold> HOLDS=new WeakHashMap<>();
     private TissueGrapples(){}
-    public static boolean grab(BlacklightInfectedHost host,LivingEntity target,int duration) {
-        if(host.level().isClientSide||host==target||!host.isAlive()||!target.isAlive()
-                ||Math.max(host.organPower(TissueCore.EXTRAORAL),Math.max(host.organPower(TissueCore.TONGUE),Math.max(host.organPower(TissueCore.GRASP),Math.max(host.organPower(TissueCore.CHELA),host.organPower(TissueCore.HYDROSTAT)))))<=0
+    public static boolean grab(Mob host,LivingEntity target,int duration) {
+        if(!TissueActions.eligible(host)||!ModAttachments.available(target)||host.level().isClientSide||host==target||!host.isAlive()||!target.isAlive()
+                ||Math.max(TissueActions.power(host,TissueCore.EXTRAORAL),Math.max(TissueActions.power(host,TissueCore.TONGUE),Math.max(TissueActions.power(host,TissueCore.GRASP),Math.max(TissueActions.power(host,TissueCore.CHELA),TissueActions.power(host,TissueCore.HYDROSTAT)))))<=0
                 ||TissueCompetition.controls(target)||TissueCompetition.controls(host)||ConsumeSystem.grappleProtected(target)||target.isPassenger()||target.isVehicle()
                 ||com.codex.blacklight.registry.ModAttachments.getData(target, ModAttachments.CONSUME_VISUAL).active()
                 ||com.codex.blacklight.power.BiomassSystem.claimant(target)!=null
@@ -31,24 +31,24 @@ public final class TissueGrapples {
         HOLDS.put(target,new Hold(new WeakReference<>(host),host.level().getGameTime()+com.codex.blacklight.forge.WingMath.clamp(duration,1,20)));
         return true;
     }
-    public static BlacklightInfectedHost owner(LivingEntity target) {
-        if(target.level().isClientSide)return null;
+    public static Mob owner(LivingEntity target) {
+        if(!ModAttachments.available(target)||target.level().isClientSide)return null;
         var hold=HOLDS.get(target);if(hold==null)return null;
         var host=hold.owner.get();
-        if(host==null||host.isRemoved()||!host.isAlive()||target.isRemoved()||!target.isAlive()
+        if(!TissueActions.eligible(host)||target.isRemoved()||!target.isAlive()
                 ||host.level()!=target.level()||host.level().getGameTime()>=hold.until
-                ||!host.organAbilities().gripActive()&&(host.tissueStrikeElapsed(0)<TissueOrgans.HIT||host.tissueStrikeElapsed(0)>=TissueOrgans.DURATION)
+                ||!TissueActions.gripActive(host)&&!TissueActions.legacyGrip(host)
                 ||host.isNoAi()||com.codex.blacklight.registry.ModAttachments.getData(host, ModAttachments.CONSUME_VISUAL).active()
                 ||com.codex.blacklight.registry.ModAttachments.getData(target, ModAttachments.CONSUME_VISUAL).active()
                 ||com.codex.blacklight.power.BiomassSystem.claimant(target)!=null
                 ||target instanceof Player player&&(player.isCreative()||player.isSpectator())
                 ||target.isPassenger()||target.isVehicle()
-                ||target.distanceTo(host)>host.getBbWidth()+Math.max(host.tissueOrganReach(),host.organActionCore()==TissueCore.TONGUE?TissueOrganCycle.reach(TissueCore.TONGUE):0)+2||!host.hasLineOfSight(target)) {
+                ||target.distanceTo(host)>host.getBbWidth()+TissueActions.gripReach(host)+2||!host.hasLineOfSight(target)) {
             HOLDS.remove(target);return null;
         }
         return host;
     }
-    public static void release(BlacklightInfectedHost host){HOLDS.entrySet().removeIf(e->e.getValue().owner.get()==host);}
+    public static void release(Mob host){HOLDS.entrySet().removeIf(e->e.getValue().owner.get()==host);}
     @SubscribeEvent public static void tick(com.codex.blacklight.combat.ForgeEntityTickEvent.Pre event) {
         if(!(event.getEntity() instanceof LivingEntity target)||target.level().isClientSide)return;
         var host=owner(target);if(host==null)return;
@@ -62,7 +62,7 @@ public final class TissueGrapples {
     @SubscribeEvent public static void leave(net.minecraftforge.event.entity.EntityLeaveLevelEvent event) {
         if(event.getEntity().level().isClientSide)return;
         if(event.getEntity() instanceof LivingEntity entity)HOLDS.remove(entity);
-        if(event.getEntity() instanceof BlacklightInfectedHost host)release(host);
+        if(event.getEntity() instanceof Mob host)release(host);
     }
     @SubscribeEvent public static void stop(net.minecraftforge.event.server.ServerStoppingEvent event){HOLDS.clear();}
 }

@@ -46,16 +46,20 @@ public final class EvolvedCombat {
         var target=host.getTarget();
         if(!valid(target)){if(!host.evolvedAction().isEmpty()||host.evolvedEngaged())interrupt();host.setTarget(null);return false;}
         host.setEvolvedEngaged(true);host.getLookControl().setLookAt(target,30,30);
-        if(host.organActionCore()!=null)return host.organAbilities().tick();
-        if(specials.tick(target,host.evolvedAction().isEmpty()&&cooldown==0))return true;
         double gap=gap(target);
+        // A nearby enemy on another footing needs a path, not a ground combo
+        // which repeatedly stops navigation against the face of the step.
+        boolean changeFooting=Math.abs(target.getY()-host.getY())>.6&&gap<=4.5;
+        if(host.organActionCore()!=null)return host.organAbilities().tick();
+        if(specials.tick(target,host.evolvedAction().isEmpty()&&cooldown==0&&!changeFooting))return true;
         if(host.evolvedAction().startsWith("taunt_")&&(gap<2.8||gap>8||threatening(target)||!host.hasLineOfSight(target))){
             host.setEvolvedAction("");anchor=null;cooldown=2;pathCooldown=0;
         }
         if(host.evolvedAction().isEmpty()){
             comboLength=0;
             face(target);
-            if(target instanceof BlacklightInfectedHost prey&&TissueCompetition.tryStart(host,prey))return true;
+            if(changeFooting){chase(target,gap);return true;}
+            if(target instanceof net.minecraft.world.entity.Mob prey&&TissueCompetition.tryStart(host,prey))return true;
             if(!host.hasLineOfSight(target)){chase(target,gap);return true;}
             boolean pressure=threatening(target);
             if(cooldown>0){if(gap>2.2)chase(target,gap);else circle(target,gap);return true;}
@@ -100,12 +104,23 @@ public final class EvolvedCombat {
         host.setSprinting(gap>4);
         if(pathCooldown==0){host.getNavigation().moveTo(target,gap>4?1.4:1.05);pathCooldown=6;}
         var path=host.getNavigation().getPath();
-        var next=path!=null&&!path.isDone()?path.getNextEntityPos(host).subtract(host.position()).multiply(1,0,1):toward(target);
+        var next=heading(path,target);
         var projected=next.lengthSqr()>.0001?next.normalize().scale(.4):Vec3.ZERO;
         boolean stepDown=path!=null&&!path.isDone()&&path.getNextNode().y<host.getY()-.5&&path.getNextNode().y>=host.getY()-1.25;
-        if(host.onGround()&&projected.lengthSqr()>.0001&&!supported(projected,stepDown)){
+        // Goals tick every other tick, so the host can travel two strides between
+        // checks. Also require footing (at most one block down) under the leading
+        // edge two strides ahead; not the flanks, which may overhang a walkway.
+        var motion=host.getDeltaMovement().multiply(1,0,1);double lead=host.getBbWidth()*.5+2*motion.horizontalDistance();
+        if(host.onGround()&&projected.lengthSqr()>.0001&&(!supported(projected,stepDown)||unsafeDrop(path)
+                ||!supported(projected.add(projected.normalize().scale(lead)),true))){
             host.getNavigation().stop();host.getMoveControl().setWantedPosition(host.getX(),host.getY(),host.getZ(),0);
             host.setXxa(0);host.setZza(0);host.setDeltaMovement(0,host.getDeltaMovement().y,0);pathCooldown=0;return;
+        }
+        // A zigzag wide-mob path can drift sideways off a walkway; when the real stride
+        // leaves footing but the route ahead is safe, steer the stride back onto the route.
+        if(host.onGround()&&motion.lengthSqr()>.0025&&!supported(motion.scale(2),true)){
+            var safe=projected.normalize().scale(motion.horizontalDistance());
+            host.setDeltaMovement(safe.x,host.getDeltaMovement().y,safe.z);
         }
         stalledChaseTicks=lastChasePosition!=null&&host.position().distanceToSqr(lastChasePosition)<.0004?stalledChaseTicks+1:0;
         lastChasePosition=host.position();
@@ -113,22 +128,42 @@ public final class EvolvedCombat {
         // Close a visible, supported gap with ordinary collision movement; never teleport.
         if(gap>1.7&&host.onGround()&&host.hasLineOfSight(target)&&(host.getNavigation().isDone()||stalledChaseTicks>=10)){
             var step=toward(target).scale(.16);var box=host.getBoundingBox().move(step);
-            if(!supported(step)||!host.level().noCollision(host,box))return;
+            if(!supported(step,stepDown)||!host.level().noCollision(host,box))return;
             host.setDeltaMovement(step.x,host.getDeltaMovement().y,step.z);
         }
+    }
+    /** A wide mob's entity position at a node sits on a block corner, which
+     *  points the edge probe 45 degrees off the real route. Probe toward the
+     *  centre of the first node block that is actually ahead instead. */
+    private Vec3 heading(net.minecraft.world.level.pathfinder.Path path,LivingEntity target){
+        if(path==null||path.isDone())return toward(target);
+        for(int i=path.getNextNodeIndex();i<path.getNodeCount();i++){
+            var n=path.getNode(i);var d=new Vec3(n.x+.5-host.getX(),0,n.z+.5-host.getZ());
+            if(d.lengthSqr()>.36)return d;
+        }
+        return toward(target);
+    }
+    /** Some pathfinders route a chase down a cliff; never follow a drop deeper than one block. */
+    private boolean unsafeDrop(net.minecraft.world.level.pathfinder.Path path){
+        if(path==null||path.isDone())return false;
+        for(int i=path.getNextNodeIndex(),end=Math.min(path.getNodeCount(),i+4);i<end;i++)
+            if(path.getNode(i).y<host.getY()-1.25)return true;
+        return false;
     }
     private boolean supported(Vec3 step){
         return supported(step,false);
     }
     private boolean supported(Vec3 step,boolean stepDown){
         var box=host.getBoundingBox().move(step);
-        for(double x:new double[]{box.minX+.05,box.maxX-.05})for(double z:new double[]{box.minZ+.05,box.maxZ-.05}){
-            var floor=net.minecraft.core.BlockPos.containing(x,box.minY-.2,z);
-            if(!host.level().hasChunkAt(floor))return false;
-            if(host.level().getBlockState(floor).getCollisionShape(host.level(),floor).isEmpty()
-                    &&(!stepDown||host.level().getBlockState(floor.below()).getCollisionShape(host.level(),floor.below()).isEmpty()))return false;
-        }
-        return true;
+        // Require support below the feet's centre, not all four corners of a
+        // wide elite's hitbox. The latter rejects legal narrow paths and edges.
+        double x=(box.minX+box.maxX)*.5,z=(box.minZ+box.maxZ)*.5;
+        var feet=new net.minecraft.world.phys.AABB(x-.15,box.minY-(stepDown?1.25:.21),z-.15,
+                x+.15,box.minY-.01,z+.15);
+        var low=net.minecraft.core.BlockPos.containing(feet.minX,feet.minY,feet.minZ);
+        var high=net.minecraft.core.BlockPos.containing(feet.maxX,feet.maxY,feet.maxZ);
+        if(!host.level().hasChunksAt(low,high))return false;
+        return host.level().getBlockCollisions(host,feet).iterator().hasNext();
     }
     private void circle(LivingEntity target,double gap){
         host.getNavigation().stop();host.setSprinting(false);

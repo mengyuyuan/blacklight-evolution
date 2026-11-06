@@ -13,6 +13,9 @@ class NativePlayerRenderScopeTest {
         Object player=new Object();var patch=new Patch(player);
         assertFalse(NativePlayerRenderScope.ownsPatch(patch));
         try(var scope=NativePlayerRenderScope.enter(player)) {
+            assertTrue(NativePlayerRenderScope.owns(player));
+            assertFalse(NativePlayerRenderScope.owns(new Object()));
+            assertFalse(NativePlayerRenderScope.owns(null));
             assertTrue(NativePlayerRenderScope.ownsPatch(patch));
             assertFalse(NativePlayerRenderScope.ownsPatch(new Patch(new Object())));
             assertFalse(NativePlayerRenderScope.ownsPatch(new Object()));

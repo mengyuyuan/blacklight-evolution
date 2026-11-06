@@ -1,3 +1,5 @@
+import shutil
+import os
 import importlib.util
 import io
 import json
@@ -92,25 +94,34 @@ class RepositoryProfileTest(unittest.TestCase):
 
 
 class ProductionClassBoundaryTest(unittest.TestCase):
+    """Selection reads real class metadata, so fixtures are compiled with javac."""
     def setUp(self):
         self.temp = tempfile.TemporaryDirectory()
         self.addCleanup(self.temp.cleanup)
         self.repo = Path(self.temp.name)
         self.root = self.repo / 'build/classes/java/main'
-        self.source = self.repo / 'src/main/java/Live.java'
+        self.source = self.repo / 'src/main/java/com/codex/blacklight/Live.java'
         self.source.parent.mkdir(parents=True)
-        self.source.write_text('package com.codex.blacklight;\npublic class Live {}', encoding='utf-8')
-        self.classes = self.root / 'com/codex/blacklight'
-        self.classes.mkdir(parents=True)
+        self.source.write_text('package com.codex.blacklight;\npublic class Live { static class Nested {} }', encoding='utf-8')
+        javac = Path(os.environ['JAVA_HOME']) / 'bin' / ('javac.exe' if os.name == 'nt' else 'javac') if os.environ.get('JAVA_HOME') else shutil.which('javac')
+        if not javac or not Path(javac).is_file():
+            self.skipTest('A JDK is required for compiled class fixtures')
+        self.javac = str(javac)
+
+    def compile(self, *sources):
+        subprocess.run([self.javac, '-encoding', 'UTF-8', '--release', '17', '-d', str(self.root), *map(str, sources)],
+                       check=True, capture_output=True)
 
     def test_private_fixture_is_not_required_in_production_archive(self):
-        for name in ('Live', 'Live$Nested', 'PrivateQaFixture'):
-            (self.classes / (name + '.class')).write_bytes(b'fixture')
+        qa = self.repo / 'src/qa/java/com/codex/blacklight/PrivateQaFixture.java'
+        qa.parent.mkdir(parents=True)
+        qa.write_text('package com.codex.blacklight;\npublic class PrivateQaFixture {}', encoding='utf-8')
+        self.compile(self.source, qa)
         selected = release.production_classes(self.repo, self.root)
         self.assertEqual({'Live.class', 'Live$Nested.class'}, {p.name for p in selected})
 
     def test_missing_production_source_cannot_be_hidden_by_other_class_files(self):
-        (self.classes / 'Live.class').write_bytes(b'fixture')
+        self.compile(self.source)
         (self.source.parent / 'NewFeature.java').write_text('package com.codex.blacklight;\npublic class NewFeature {}', encoding='utf-8')
         with self.assertRaisesRegex(RuntimeError, 'Production sources were not compiled'):
             release.production_classes(self.repo, self.root)

@@ -265,10 +265,7 @@ public final class ClientMovementEvents {
         // Respawn can replace LocalPlayer without a tick in which player is null.
         // Charge/wall latches belong to the old entity, never the next life.
         if (inputOwner != minecraft.player || minecraft.player == null || minecraft.getConnection() == null) {
-            if(inputOwner!=null){
-                if(PlayerMotionController.isPlaying(inputOwner,PlayerAction.CHARGED_JUMP))
-                    PlayerMotionController.pause(inputOwner,false);
-            }
+            PlayerMotionController.discard(inputOwner);
             inputOwner=minecraft.player;
             DODGE_TAP.reset();directDodge=false;
             weaponMovementOwner=null;ownedWeaponVisual=null;pendingWeaponOwner=null;
@@ -321,7 +318,7 @@ public final class ClientMovementEvents {
         boolean movingHeld=forwardInput!=0 || sidewaysInput!=0;
         boolean sprintKey=minecraft.screen==null && mappingDown(minecraft,minecraft.options.keySprint);
         boolean dodgeEligible=prototype&&minecraft.screen==null&&minecraft.player.onGround()&&!CLIENT_WALL.attached()
-                &&!dodging&&!jumpHeld&&!weaponOwnsMovement(minecraft)&&com.codex.blacklight.registry.ModAttachments.getData(minecraft.player,ModAttachments.GRAB_STAGE)==0;
+                &&!dodging&&!jumpHeld&&(!weaponOwnsMovement(minecraft)||weaponRecovery(minecraft))&&com.codex.blacklight.registry.ModAttachments.getData(minecraft.player,ModAttachments.GRAB_STAGE)==0;
         boolean sprintDodge=DODGE_TAP.update(sprintKey,dodgeEligible);
         boolean dodgePressed=dodgeEligible&&(directDodge||sprintDodge);
         boolean detach=minecraft.screen==null && mappingDown(minecraft,minecraft.options.keyShift);
@@ -529,6 +526,14 @@ public final class ClientMovementEvents {
         return minecraft.player != null && !com.codex.blacklight.city.HydraTransport.active(minecraft.player)
                 && com.codex.blacklight.registry.ModAttachments.getData(minecraft.player, ModAttachments.PLAYER_STATE).isInfected()
                 && com.codex.blacklight.registry.ModAttachments.getData(minecraft.player, ModAttachments.PLAYER_STATE).isPrototypeMode();
+    }
+
+    /** Mirrors WeaponCombatSystem.cancelableRecovery from the synchronized action clock. */
+    static boolean weaponRecovery(Minecraft minecraft) {
+        if(minecraft.player==null||minecraft.level==null)return false;
+        var visual=com.codex.blacklight.registry.ModAttachments.getData(minecraft.player,ModAttachments.WEAPON_VISUAL);var move=visual.spec();
+        if(move==null||visual.charging()||visual.traveling()||move.landingAttack()||move.aerial()&&!move.airCombo())return false;
+        return minecraft.level.getGameTime()-visual.started()>=move.end;
     }
 
     static boolean weaponOwnsMovement(Minecraft minecraft) {

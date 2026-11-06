@@ -68,10 +68,13 @@ public final class ClawCombatSystem {
         if (request == ClawActionPayload.Action.GRAB) { ConsumeSystem.request(player); return; }
         if (request == ClawActionPayload.Action.CONSUME) { ConsumeSystem.consume(player); return; }
         if (request == ClawActionPayload.Action.THROW) { ConsumeSystem.throwTarget(player); return; }
-        if (com.codex.blacklight.registry.ModAttachments.getData(player, ModAttachments.CONSUMING)) return;
+        if (request == ClawActionPayload.Action.GRAB_THROW_START) { ConsumeSystem.startThrowCharge(player); return; }
+        if (request == ClawActionPayload.Action.GRAB_THROW_RELEASE) { ConsumeSystem.releaseThrowCharge(player); return; }
+        if (request == ClawActionPayload.Action.GRAB_THROW_CANCEL) { ConsumeSystem.cancelThrowCharge(player); return; }
+        if (com.codex.blacklight.registry.ModAttachments.getData(player,ModAttachments.CONSUMING)) return;
         if (request == ClawActionPayload.Action.CYCLE_FORM) { com.codex.blacklight.power.PowerFormSystem.cycle(player); return; }
-        BlacklightState state = com.codex.blacklight.registry.ModAttachments.getData(player, ModAttachments.PLAYER_STATE);
-        ClawCombatState combat = com.codex.blacklight.registry.ModAttachments.getData(player, ModAttachments.CLAW_COMBAT);
+        BlacklightState state = com.codex.blacklight.registry.ModAttachments.getData(player,ModAttachments.PLAYER_STATE);
+        ClawCombatState combat = com.codex.blacklight.registry.ModAttachments.getData(player,ModAttachments.CLAW_COMBAT);
         BlacklightNeoMod.LOGGER.debug("Claw request {} from {} (power={}, action={})",
                 request, player.getGameProfile().getName(), state.getActivePower().id(), combat.action());
 
@@ -95,7 +98,7 @@ public final class ClawCombatSystem {
 
         // Any accepted claw action cancels the short post-impact movement damping.
         // The visual landing recovery can still blend out underneath the attack.
-        com.codex.blacklight.registry.ModAttachments.getData(player, ModAttachments.MOVEMENT_STATE).cancelLandingRecovery();
+        com.codex.blacklight.registry.ModAttachments.getData(player,ModAttachments.MOVEMENT_STATE).cancelLandingRecovery();
 
         switch (request) {
             case ATTACK -> requestAttack(player, combat);
@@ -132,8 +135,8 @@ public final class ClawCombatSystem {
                                        boolean activate) {
         if(activate)com.codex.blacklight.disguise.DisguiseSystem.visiblePower(player);
         state.activate(activate ? PowerForm.CLAWS : PowerForm.NONE);
-        com.codex.blacklight.registry.ModAttachments.setData(player, ModAttachments.PLAYER_STATE, state);
-        com.codex.blacklight.registry.ModAttachments.syncData(player, ModAttachments.PLAYER_STATE);
+        com.codex.blacklight.registry.ModAttachments.setData(player,ModAttachments.PLAYER_STATE, state);
+        com.codex.blacklight.registry.ModAttachments.syncData(player,ModAttachments.PLAYER_STATE);
         playPrototypeTransition(player, activate);
         player.displayClientMessage(Component.translatable(
                 activate ? "message.blacklight.claws_enabled" : "message.blacklight.claws_disabled"), true);
@@ -141,7 +144,7 @@ public final class ClawCombatSystem {
 
     /** Plays the biological arm transition after a server-authoritative mode change. */
     public static void playPrototypeTransition(ServerPlayer player, boolean activate) {
-        ClawCombatState combat = com.codex.blacklight.registry.ModAttachments.getData(player, ModAttachments.CLAW_COMBAT);
+        ClawCombatState combat = com.codex.blacklight.registry.ModAttachments.getData(player,ModAttachments.CLAW_COMBAT);
         combat.reset();
         combat.begin(ClawCombatState.Action.TRANSFORM);
         play(player, PlayerAction.TRANSFORM_CLAWS);
@@ -225,9 +228,9 @@ public final class ClawCombatSystem {
         if (!(event.player instanceof ServerPlayer player)) return;
         if(WeaponCombatSystem.busy(player))return;
 
-        if (com.codex.blacklight.registry.ModAttachments.getData(player, ModAttachments.CONSUMING)) return;
-        BlacklightState state = com.codex.blacklight.registry.ModAttachments.getData(player, ModAttachments.PLAYER_STATE);
-        ClawCombatState combat = com.codex.blacklight.registry.ModAttachments.getData(player, ModAttachments.CLAW_COMBAT);
+        if (com.codex.blacklight.registry.ModAttachments.getData(player,ModAttachments.CONSUMING)) return;
+        BlacklightState state = com.codex.blacklight.registry.ModAttachments.getData(player,ModAttachments.PLAYER_STATE);
+        ClawCombatState combat = com.codex.blacklight.registry.ModAttachments.getData(player,ModAttachments.CLAW_COMBAT);
         if (!canUseClaws(state)) {
             combat.reset();
             return;
@@ -310,6 +313,7 @@ public final class ClawCombatSystem {
                         clawDamage(state, 16.0F))) {
                     if(!CombatTargeting.multipart(target))target.push(combat.dashX() * 0.9D, 0.3D, combat.dashZ() * 0.9D);
                     ClawPhysicalEffects.onComboTargetHit(player, target, true);
+                    WeaponImpact.contact(player, target, ImpactTier.HEAVY, false, null);
                 }
             }
             // The slash trail and impact feedback fire on the first sweep tick, in
@@ -417,6 +421,7 @@ public final class ClawCombatSystem {
                 hitCount++;
                 ClawPhysicalEffects.onComboTargetHit(player, target,
                         action == ClawCombatState.Action.AUTO_3);
+                WeaponImpact.contact(player, target, action == ClawCombatState.Action.AUTO_3 ? ImpactTier.FINISHER : ImpactTier.LIGHT, false, null);
             }
         }
         {
@@ -428,11 +433,11 @@ public final class ClawCombatSystem {
     }
 
     static void eruptGroundSpike(ServerPlayer player) {
-        if (!canUseClaws(com.codex.blacklight.registry.ModAttachments.getData(player, ModAttachments.PLAYER_STATE))) return;
+        if (!canUseClaws(com.codex.blacklight.registry.ModAttachments.getData(player,ModAttachments.PLAYER_STATE))) return;
         ServerLevel level = player.serverLevel();
-        BlacklightState state = com.codex.blacklight.registry.ModAttachments.getData(player, ModAttachments.PLAYER_STATE);
+        BlacklightState state = com.codex.blacklight.registry.ModAttachments.getData(player,ModAttachments.PLAYER_STATE);
         double rangeMultiplier = (state.hasClawUpgrade(ClawUpgrade.RANGE) ? 1.25D : 1.0D)*AttackReach.scale(player);
-        var weapon = com.codex.blacklight.registry.ModAttachments.getData(player, ModAttachments.WEAPON_VISUAL);
+        var weapon = com.codex.blacklight.registry.ModAttachments.getData(player,ModAttachments.WEAPON_VISUAL);
         Vec3 forward = weapon.spec() == WeaponMove.CLAW_GROUNDSPIKE
                 ? Vec3.directionFromRotation(0, weapon.yaw()) : player.getLookAngle().multiply(1.0D, 0.0D, 1.0D);
         if (forward.lengthSqr() < 0.001D) forward = new Vec3(0.0D, 0.0D, 1.0D);
@@ -455,6 +460,7 @@ public final class ClawCombatSystem {
         double radius = GroundSpikeRules.BASE_DAMAGE_RADIUS * rangeMultiplier;
         AABB hitBox = new AABB(x - radius, y - 0.5D, z - radius,
                 x + radius, y + 6.5D, z + radius);
+        boolean firstSpike = true;
         for (LivingEntity target : CombatTargeting.candidates(player, hitBox,
                 target -> CombatTargeting.damageable(player,target))) {
             if (target.hurt(player.damageSources().playerAttack(player),
@@ -468,7 +474,7 @@ public final class ClawCombatSystem {
                 } else {
                     away = away.normalize();
                 }
-                WeaponImpact.apply(player,target,WeaponMove.CLAW_GROUNDSPIKE,away.multiply(1,0,1).normalize(),false);
+                WeaponImpact.apply(player,target,WeaponMove.CLAW_GROUNDSPIKE,away.multiply(1,0,1).normalize(),firstSpike);firstSpike=false;
             }
         }
         for (Entity loose : level.getEntities(player, hitBox,

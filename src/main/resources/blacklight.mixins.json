@@ -4,6 +4,8 @@
   "package": "com.codex.blacklight.mixin",
   "compatibilityLevel": "JAVA_17",
   "mixins": [
+    "OptionalCultivationShieldMixin",
+    "OptionalCultivationPersonalShieldMixin",
     "OptionalTwilightHydraMixin",
     "OptionalTwilightLichMixin",
     "CrossModLivingDamageMixin",
@@ -44,7 +46,11 @@
     "VehicleProjectileCollisionMixin",
     "ShulkerPeekAccess",
     "PigSteeringAccess",
-    "StriderSteeringAccess"
+    "StriderSteeringAccess",
+    "NativeTissueAirMixin",
+    "NativeTissueFeedingMixin",
+    "ItemPickupTargetAccess",
+    "PendingChunkReadMixin"
   ],
   "client": [
     "client.PostChainAccess",
@@ -70,9 +76,12 @@
     "client.DragonConsumePoseMixin",
     "client.VictimModelRootMixin",
     "client.BulletFlightCullingMixin",
+    "client.MissingRendererGuardMixin",
     "client.BlockCarryItemMixin",
     "client.VehiclePlayerPoseMixin",
     "client.PrototypeVehiclePickMixin",
+    "client.OptionalMcaNativeBodyMixin",
+    "client.NativePlayerModelOwnershipMixin",
     "client.PrototypeBodyYawMixin"
   ],
   "injectors": {

@@ -1,40 +1,54 @@
 package com.codex.blacklight.client.renderer;
 
 import com.codex.blacklight.entity.BlacklightInfectedHost;
+import com.codex.blacklight.infection.NativeInfection;
+import com.codex.blacklight.infection.NativeTissue;
 import com.codex.blacklight.infection.TissueCompetition;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
+import net.minecraft.world.entity.Mob;
 import net.minecraft.world.phys.Vec3;
 
-/** A short attached bridge carries the collapsing surface into the actual consumer. */
+/** A short attached bridge carries the actual posed surface into its consumer.
+ * Mixed native/converted pairs are validated by reciprocal, transient scene IDs. */
 final class TissueCompetitionFx {
+    private record Scene(int target,long start,boolean prey,int duration){}
     private TissueCompetitionFx(){}
-    static boolean active(BlacklightInfectedHost host){
-        return host.cannibalStarted()>=0&&host.cannibalTargetId()>=0&&host.isAlive()
-                &&host.level().getEntity(host.cannibalTargetId()) instanceof BlacklightInfectedHost peer
-                &&peer.isAlive()&&peer.cannibalTargetId()==host.getId()&&peer.cannibalStarted()==host.cannibalStarted();
+    private static Scene scene(Mob mob){
+        if(mob instanceof BlacklightInfectedHost h)return new Scene(h.cannibalTargetId(),h.cannibalStarted(),h.cannibalPrey(),h.cannibalDuration());
+        if(!NativeInfection.active(mob))return new Scene(-1,-1,false,TissueCompetition.END_TICKS);
+        var s=NativeTissue.snapshot(mob);
+        return new Scene(s.contains("CannibalTarget")?s.getInt("CannibalTarget"):-1,
+                s.contains("CannibalStarted")?s.getLong("CannibalStarted"):-1,s.getBoolean("CannibalPrey"),Math.max(1,s.getInt("CannibalDuration")));
     }
-    static float collapse(BlacklightInfectedHost host,float partial){
-        float elapsed=host.level().getGameTime()-host.cannibalStarted()+partial;
-        float t=com.codex.blacklight.forge.WingMath.clamp((elapsed-TissueCompetition.COVER_TICKS)/(host.cannibalDuration()-TissueCompetition.COVER_TICKS),0,1);
+    private static Mob peer(Mob mob){
+        var s=scene(mob);
+        if(s.start()<0||s.target()<0||!mob.isAlive()||!(mob.level().getEntity(s.target()) instanceof Mob peer)||!peer.isAlive())return null;
+        var other=scene(peer);
+        return other.target()==mob.getId()&&other.start()==s.start()&&other.prey()!=s.prey()?peer:null;
+    }
+    static boolean active(Mob mob){return peer(mob)!=null;}
+    static long started(Mob mob){return scene(mob).start();}
+    static boolean prey(Mob mob){return scene(mob).prey();}
+    static float collapse(Mob mob,float partial){
+        var s=scene(mob);float elapsed=mob.level().getGameTime()-s.start()+partial;
+        float t=net.minecraft.util.Mth.clamp((elapsed-TissueCompetition.COVER_TICKS)/Math.max(1,s.duration()-TissueCompetition.COVER_TICKS),0,1);
         return t*t*(3-2*t);
     }
-    static void apply(BlacklightInfectedHost host,float partial,PoseStack stack){
-        if(!host.cannibalPrey()||!active(host))return;
-        var peer=(BlacklightInfectedHost)host.level().getEntity(host.cannibalTargetId());
-        float t=collapse(host,partial);float scale=1-.92F*t;
-        Vec3 delta=peer.getPosition(partial).add(0,peer.getBbHeight()*.45,0).subtract(host.getPosition(partial).add(0,host.getBbHeight()*.5,0));
-        stack.translate(delta.x*t,host.getBbHeight()*.5+delta.y*t,delta.z*t);
-        stack.scale(scale,scale,scale);stack.translate(0,-host.getBbHeight()*.5,0);
+    static void apply(Mob mob,float partial,PoseStack stack){
+        var peer=peer(mob);if(peer==null||!prey(mob))return;
+        float t=collapse(mob,partial);float scale=1-.92F*t;
+        Vec3 delta=peer.getPosition(partial).add(0,peer.getBbHeight()*.45,0).subtract(mob.getPosition(partial).add(0,mob.getBbHeight()*.5,0));
+        stack.translate(delta.x*t,mob.getBbHeight()*.5+delta.y*t,delta.z*t);
+        stack.scale(scale,scale,scale);stack.translate(0,-mob.getBbHeight()*.5,0);
     }
-    static void render(BlacklightInfectedHost host,float partial,PoseStack stack,MultiBufferSource buffers,int light){
-        if(host.cannibalPrey()||!active(host)||host.isInvisible())return;
-        var prey=(BlacklightInfectedHost)host.level().getEntity(host.cannibalTargetId());
-        Vec3 base=host.getPosition(partial),start=new Vec3(0,host.getBbHeight()*.5,0);
-        Vec3 end=prey.getPosition(partial).subtract(base).add(0,prey.getBbHeight()*.5,0);
-        float age=host.level().getGameTime()-host.cannibalStarted()+partial;
-        float cover=com.codex.blacklight.forge.WingMath.clamp(age/TissueCompetition.COVER_TICKS,0,1),flow=collapse(prey,partial);
+    static void render(Mob mob,float partial,PoseStack stack,MultiBufferSource buffers,int light){
+        var target=peer(mob);if(target==null||prey(mob)||mob.isInvisible())return;
+        Vec3 start=new Vec3(0,mob.getBbHeight()*.5,0);
+        Vec3 end=target.getPosition(partial).subtract(mob.getPosition(partial)).add(0,target.getBbHeight()*.5,0);
+        float age=mob.level().getGameTime()-started(mob)+partial;
+        float cover=net.minecraft.util.Mth.clamp(age/TissueCompetition.COVER_TICKS,0,1),flow=collapse(target,partial);
         var out=buffers.getBuffer(RenderType.entityCutoutNoCull(ConsumedMobVisuals.WHITE));
         for(int strand=0;strand<3;strand++){
             Vec3 previous=start;double phase=strand*Math.PI*2/3;

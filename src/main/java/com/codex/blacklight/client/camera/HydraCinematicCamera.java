@@ -20,7 +20,11 @@ public final class HydraCinematicCamera {
     private static CameraType previous;
     private static Vec3 position;
     private static float yaw,pitch;
-    public static boolean active(){return scene!=null;}
+    public static boolean active(){
+        var mc=Minecraft.getInstance();
+        return scene!=null&&position!=null&&!scene.isRemoved()&&scene.isAlive()&&mc.level!=null&&world==mc.level
+                &&scene.level()==mc.level&&mc.player!=null&&mc.player.isAlive()&&scene.scenePlayerId()==mc.player.getId();
+    }
     public static int sceneId(){return scene==null?-1:scene.getId();}
     public static Vec3 anchor(){return position;}
     private HydraCinematicCamera(){}

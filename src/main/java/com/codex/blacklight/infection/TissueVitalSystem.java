@@ -10,7 +10,7 @@ import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 
 import net.minecraftforge.event.entity.living.LivingBreatheEvent;
 
-/** Only our detached hosts use this physiology; other mods' entities keep their normal breathing hooks. */
+/** Shared physiology for converted hosts; original native hooks are augmented, never replaced. */
 @EventBusSubscriber(modid="blacklight")
 public final class TissueVitalSystem {
     private TissueVitalSystem(){}
@@ -42,6 +42,16 @@ public final class TissueVitalSystem {
                 host.organActionCore()!=null||host.tissueStrikeElapsed(0)>=0,host.getBbWidth()*host.getBbWidth()*host.getBbHeight(),host.getHealth()/Math.max(.001,host.getMaxHealth()));
     }
     @SubscribeEvent public static void breathe(LivingBreatheEvent event){
+        if(event.getEntity() instanceof Mob nativeMob&&NativeTissueVitals.eligible(nativeMob)){
+            var decision=NativeTissueVitals.breathe(nativeMob,event.canBreathe(),!nativeMob.canDrownInFluidType(net.minecraftforge.common.ForgeMod.WATER_TYPE.get()));
+            if(decision!=null){
+                // Augment the source event; never revoke another mod's breathing
+                // or lower its refill amount. Later source listeners still run.
+                event.setCanBreathe(event.canBreathe()||decision.canBreathe());
+                event.setRefillAirAmount(Math.max(event.getRefillAirAmount(),decision.refill()));
+                if(decision.refill()>0)event.setCanRefillAir(true);
+            }return;
+        }
         if(!(event.getEntity() instanceof BlacklightInfectedHost host)||host.level().isClientSide||!host.isAlive()||host.hasMultipartBody()||host.devourerIdentity()||DevourerFeedingSystem.isDevourer(host))return;
         var profile=host.vitalsProfile();boolean headAir=host.getEyeInFluidType().isAir();
         boolean external=event.canBreathe()&&!headAir&&!host.hostData().getBoolean("NativeWaterResp");

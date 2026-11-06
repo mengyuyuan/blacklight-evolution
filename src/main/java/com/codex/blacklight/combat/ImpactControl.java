@@ -39,6 +39,8 @@ public final class ImpactControl {
         // Colossal bodies retain basic AI and gravity under ordinary player hits.
         // Their authored stagger/knockdown windows belong to the later boss moveset.
         if(entity instanceof com.codex.blacklight.entity.BlacklightInfectedHost host&&host.giantBoss())return false;
+        // The Supreme Hunter runs its own poise, flinch and leg-collapse reactions.
+        if(entity instanceof com.codex.blacklight.entity.BlacklightSupremeHunter)return false;
         if(entity instanceof Mob mob){
             ACTIVE.put(mob,new Control(profile.knockdown(),entity.level().getGameTime(),!entity.onGround(),false));
             mob.getNavigation().stop();mob.setXxa(0);mob.setZza(0);
@@ -96,7 +98,7 @@ public final class ImpactControl {
         }else if(hit.kind()==HitReaction.GETUP){
             if(age>=hit.duration())cancel(mob);
         }else if(control.knockdown()&&age>=3&&(control.airborne()||age>=hit.duration())&&(mob.onGround()||mob.isInWater()||mob.isInLava())){
-            publish(mob,new HitReaction(now,18,HitReaction.DOWN,hit.yaw(),ImpactProfile.DOWN));
+            publish(mob,new HitReaction(now,HeavyBlow.recentlyThrown(mob)?32:18,HitReaction.DOWN,hit.yaw(),ImpactProfile.DOWN));
             mob.setDeltaMovement(mob.getDeltaMovement().multiply(.3,1,.3));mob.hurtMarked=true;
             mob.level().playSound(null,mob.blockPosition(),net.minecraft.sounds.SoundEvents.GENERIC_SMALL_FALL,
                     net.minecraft.sounds.SoundSource.HOSTILE,.8F,.65F);

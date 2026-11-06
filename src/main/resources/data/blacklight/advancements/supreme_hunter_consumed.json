@@ -1,0 +1,23 @@
+{
+  "display": {
+    "icon": {
+      "item": "blacklight:supreme_hunter_spawn_egg"
+    },
+    "title": {
+      "translate": "advancement.blacklight.supreme_hunter_consumed"
+    },
+    "description": {
+      "translate": "advancement.blacklight.supreme_hunter_consumed.desc"
+    },
+    "frame": "challenge",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "parent": "blacklight:supreme_hunter"
+}

@@ -17,8 +17,7 @@ public final class TwilightCombat {
         return !target.level().isClientSide && target.isAlive() && !target.isRemoved()
                 && !target.isInvulnerable() && Float.isFinite(amount) && amount > 0
                 && BuiltInRegistries.ENTITY_TYPE.getKey(target.getType()).getNamespace().equals("twilightforest")
-                && CrossModCombatConfig.OFFENSE.get() && CrossModCombatConfig.TRUE_DAMAGE.get()
-                && CrossModCombat.nativeAttack(source);
+                && (com.codex.blacklight.combat.DevastatorDamage.isTrueDamage(source)||CrossModCombatConfig.LEGACY_ADVANTAGE.get()&&CrossModCombatConfig.OFFENSE.get()&&CrossModCombatConfig.TRUE_DAMAGE.get()&&CrossModCombat.nativeAttack(source));
     }
 
     public record Hit(DamageSource source, float amount) {}

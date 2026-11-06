@@ -45,6 +45,7 @@ public final class PlayerMotionController {
     private static final class Runtime {
         Clock override, preview;
         long revision = -1, suppressedRevision = -1;
+        long anchorRevision = Long.MIN_VALUE, anchorStarted; double anchorBias, anchorLast; long anchorNanos;
         String locomotion;
         LocomotionPhase phase;
         long diagnosticsAt=Long.MIN_VALUE;
@@ -61,23 +62,57 @@ public final class PlayerMotionController {
     private PlayerMotionController() {}
     public static BlacklightSkeleton skeleton() { return BlacklightSkeleton.get(); }
     private static Runtime state(LivingEntity player) { return STATES.computeIfAbsent(player, ignored -> new Runtime()); }
+    /** Old LocalPlayer references can outlive capability invalidation during respawn. */
+    private static boolean available(LivingEntity entity) {
+        if (ModAttachments.available(entity)) return true;
+        discard(entity);
+        return false;
+    }
+    /** Retire only this controller's clocks; never read or revive the old entity's data. */
+    public static void discard(LivingEntity entity) {
+        if (entity != null) STATES.remove(entity);
+    }
     private static double now(LivingEntity entity, float partial) { return entity.level().getGameTime() + (double)partial; }
+    /**
+     * Client clock for the synchronized action lease. Between server time packets the
+     * client game time can run ahead of the server (lag spikes) or jump back; a short
+     * clip whose server start already looks expired would then never be shown. The
+     * clock is anchored at the tick the revision was first seen and kept continuous.
+     */
+    public static double actionTime(LivingEntity entity, float partial) {
+        double raw = now(entity, partial);
+        if (!entity.level().isClientSide || !available(entity)) return raw;
+        var action = com.codex.blacklight.registry.ModAttachments.getData(entity,ModAttachments.PLAYER_ACTION);
+        var runtime = state(entity);
+        if (runtime.anchorRevision != action.revision() || runtime.anchorStarted != action.started()) {
+            runtime.anchorRevision = action.revision(); runtime.anchorStarted = action.started();
+            double lead = raw - partial - action.started();
+            runtime.anchorBias = action.clipId().isEmpty() || lead <= 3 ? 0 : lead;
+        } else {
+            double step = raw - runtime.anchorLast;
+            double expected = (System.nanoTime() - runtime.anchorNanos) / 5.0E7;
+            if (step < -1.5) runtime.anchorBias += step;
+            else if (step > expected + 4) runtime.anchorBias += step - expected;
+        }
+        runtime.anchorLast = raw; runtime.anchorNanos = System.nanoTime();
+        return raw - runtime.anchorBias;
+    }
     private static void reconcileAction(LivingEntity entity,Runtime runtime) {
-        long revision=com.codex.blacklight.registry.ModAttachments.getData(entity, ModAttachments.PLAYER_ACTION).revision();
+        long revision=com.codex.blacklight.registry.ModAttachments.getData(entity,ModAttachments.PLAYER_ACTION).revision();
         if(runtime.revision!=revision){runtime.revision=revision;runtime.override=null;}
     }
 
     public static void request(LivingEntity player, PlayerAction action, float offset) { request(player, MotionLibrary.resolve(action), offset); }
     public static void request(LivingEntity player, String key, float offset) {
-        if (player == null) return;
+        if (!available(player)) return;
         key = MotionLibrary.canonical(key); MotionLibrary.clip(key);
         var runtime=state(player);reconcileAction(player,runtime);
-        var action=com.codex.blacklight.registry.ModAttachments.getData(player, ModAttachments.PLAYER_ACTION);
-        var weapon=com.codex.blacklight.registry.ModAttachments.getData(player, ModAttachments.WEAPON_VISUAL);
+        var action=com.codex.blacklight.registry.ModAttachments.getData(player,ModAttachments.PLAYER_ACTION);
+        var weapon=com.codex.blacklight.registry.ModAttachments.getData(player,ModAttachments.WEAPON_VISUAL);
         // A live weapon phase owns its clock even after the initial finite action
         // lease expires during pursuit, an airborne hold or a charged pose.
         if(key.equals(WeaponMotionClock.actionKey(weapon))
-                ||key.equals(action.clipId())&&action.active(now(player,0))) {
+                ||key.equals(action.clipId())&&action.active(actionTime(player,0))) {
             runtime.suppressedRevision=-1;
             if(runtime.override!=null&&!key.equals(runtime.override.key))runtime.override=null;
             return;
@@ -87,7 +122,7 @@ public final class PlayerMotionController {
     }
     public static boolean isPlaying(LivingEntity player, PlayerAction action) { return isPlaying(player, MotionLibrary.resolve(action)); }
     public static boolean isPlaying(LivingEntity player, String key) {
-        if (player == null) return false;
+        if (!available(player)) return false;
         var runtime = state(player); var current = clockKey(player, runtime);
         return MotionLibrary.canonical(key).equals(current) && !ended(player);
     }
@@ -95,27 +130,27 @@ public final class PlayerMotionController {
         reconcileAction(player,runtime);
         if(runtime.preview!=null)return runtime.preview.key;
         if(runtime.override!=null)return runtime.override.key;
-        var weapon=WeaponMotionClock.sample(com.codex.blacklight.registry.ModAttachments.getData(player, ModAttachments.WEAPON_VISUAL),now(player,0));
+        var weapon=WeaponMotionClock.sample(com.codex.blacklight.registry.ModAttachments.getData(player,ModAttachments.WEAPON_VISUAL),now(player,0));
         if(weapon!=null)return weapon.key();
-        var action=com.codex.blacklight.registry.ModAttachments.getData(player, ModAttachments.PLAYER_ACTION);
-        return action.revision()!=runtime.suppressedRevision&&action.active(now(player,0))?action.clipId():runtime.locomotion;
+        var action=com.codex.blacklight.registry.ModAttachments.getData(player,ModAttachments.PLAYER_ACTION);
+        return action.revision()!=runtime.suppressedRevision&&action.active(actionTime(player,0))?action.clipId():runtime.locomotion;
     }
     public static float elapsed(LivingEntity player){return elapsed(player,0);}
     public static float elapsed(LivingEntity player,float partial) {
-        if(player==null)return 0;
+        if(!available(player))return 0;
         var runtime=state(player);reconcileAction(player,runtime);
         var clock=runtime.preview!=null?runtime.preview:runtime.override;
         if(clock!=null)return clock.time(now(player,partial));
-        var weapon=WeaponMotionClock.sample(com.codex.blacklight.registry.ModAttachments.getData(player, ModAttachments.WEAPON_VISUAL),now(player,partial));
+        var weapon=WeaponMotionClock.sample(com.codex.blacklight.registry.ModAttachments.getData(player,ModAttachments.WEAPON_VISUAL),now(player,partial));
         if(weapon!=null)return weapon.seconds();
-        var action=com.codex.blacklight.registry.ModAttachments.getData(player, ModAttachments.PLAYER_ACTION);
-        return action.revision()!=runtime.suppressedRevision&&action.active(now(player,partial))
-                ?action.seconds(now(player,partial)):(float)runtime.gait.seconds(partial);
+        var action=com.codex.blacklight.registry.ModAttachments.getData(player,ModAttachments.PLAYER_ACTION);
+        return action.revision()!=runtime.suppressedRevision&&action.active(actionTime(player,partial))
+                ?action.seconds(actionTime(player,partial)):(float)runtime.gait.seconds(partial);
     }
     public static float duration(PlayerAction action) { return duration(MotionLibrary.resolve(action)); }
     public static float duration(String key) { return MotionLibrary.duration(key); }
     public static boolean ended(LivingEntity player) {
-        if(player==null)return true;
+        if(!available(player))return true;
         var runtime=state(player);reconcileAction(player,runtime);
         var clock=runtime.preview!=null?runtime.preview:runtime.override;
         if(clock!=null){
@@ -125,7 +160,7 @@ public final class PlayerMotionController {
         }
         // A travel/landing/charge hold finishes when the authoritative visual is
         // cleared, rather than when its original one-shot animation lease elapsed.
-        if(com.codex.blacklight.registry.ModAttachments.getData(player, ModAttachments.WEAPON_VISUAL).spec()!=null)return false;
+        if(com.codex.blacklight.registry.ModAttachments.getData(player,ModAttachments.WEAPON_VISUAL).spec()!=null)return false;
         String key=clockKey(player,runtime);
         return key==null||!MotionLibrary.looping(key)&&elapsed(player)>=duration(key)-.0001F;
     }
@@ -141,35 +176,35 @@ public final class PlayerMotionController {
         return runtime.override;
     }
     public static void seek(LivingEntity player, float seconds) {
-        if (player == null) return;
+        if (!available(player)) return;
         if (!Float.isFinite(seconds)) throw new IllegalArgumentException("Non-finite seek time");
         var clock = mutableClock(player); clock.seconds = com.codex.blacklight.util.MathCompat.clamp(seconds, 0, duration(clock.key)); clock.at = now(player, 0);
     }
     public static void pause(LivingEntity player, boolean paused) {
-        if (player == null) return;
+        if (!available(player)) return;
         var clock = mutableClock(player); clock.commit(now(player, 0)); clock.paused = paused;
     }
     public static void reverse(LivingEntity player, boolean reversed) {
-        if (player == null) return;
+        if (!available(player)) return;
         var clock = mutableClock(player); clock.commit(now(player, 0)); clock.reverse = reversed;
     }
     public static void clear(LivingEntity player) {
-        if (player == null) return;
+        if (!available(player)) return;
         var runtime = state(player); runtime.override = null;
-        runtime.suppressedRevision = com.codex.blacklight.registry.ModAttachments.getData(player, ModAttachments.PLAYER_ACTION).revision();
+        runtime.suppressedRevision = com.codex.blacklight.registry.ModAttachments.getData(player,ModAttachments.PLAYER_ACTION).revision();
     }
     public static void preview(LivingEntity player, String key, float seconds) {
-        if (player == null) return;
+        if (!available(player)) return;
         var clock = new Clock(); clock.key = MotionLibrary.canonical(key); clock.seconds = com.codex.blacklight.util.MathCompat.clamp(seconds, 0, duration(key));
         clock.at = now(player, 0); clock.paused = true; state(player).preview = clock;
     }
     /** Selected paused editor/QA clip; real movement has no preview key. */
     public static String previewKey(LivingEntity entity) {
-        var runtime=entity==null?null:STATES.get(entity);
+        var runtime=available(entity)?STATES.get(entity):null;
         return runtime==null||runtime.preview==null?null:runtime.preview.key;
     }
-    public static void seekPreview(LivingEntity player, float seconds) { if (player != null && state(player).preview != null) seek(player, seconds); }
-    public static void clearPreview(LivingEntity player) { if (player != null) state(player).preview = null; }
+    public static void seekPreview(LivingEntity player, float seconds) { if (available(player) && STATES.containsKey(player) && state(player).preview != null) seek(player, seconds); }
+    public static void clearPreview(LivingEntity player) { if (player != null) { var runtime=STATES.get(player); if(runtime!=null)runtime.preview=null; } }
 
     private static BlacklightPose samplePose(String key, float time, boolean loop) {
         var pose = MotionLibrary.pose(key, time, loop);
@@ -182,6 +217,7 @@ public final class PlayerMotionController {
     }
 
     public static BlacklightPose pose(LivingEntity entity, float partial) {
+        if(!available(entity))return new BlacklightPose();
         var runtime=state(entity);
         if(runtime.preview!=null)return utilityPose(entity,partial);
         var raw=runtime.interval.ready()?runtime.interval.sample(partial):utilityPose(entity,partial);
@@ -189,9 +225,11 @@ public final class PlayerMotionController {
     }
     /** Read the already committed distance-driven gait without action overlays. */
     public static BlacklightPose locomotionPose(LivingEntity entity,float partial) {
+        if(!available(entity))return new BlacklightPose();
         return locomotion(entity,state(entity),now(entity,partial),partial);
     }
     public static float facing(LivingEntity entity,float partial) {
+        if(!available(entity))return entity==null?0:net.minecraft.util.Mth.rotLerp(partial,entity.yBodyRotO,entity.yBodyRot);
         var facing=state(entity).facing;
         return facing.ready()?facing.sample(partial)
                 :com.codex.blacklight.client.animation.BlacklightRenderPose.rawFacing(entity,partial);
@@ -204,12 +242,12 @@ public final class PlayerMotionController {
     private static BlacklightPose rawPose(LivingEntity entity, float partial) {
         var runtime = state(entity); double now = now(entity, partial);
         reconcileAction(entity,runtime);
-        var action=com.codex.blacklight.registry.ModAttachments.getData(entity, ModAttachments.PLAYER_ACTION);
+        var action=com.codex.blacklight.registry.ModAttachments.getData(entity,ModAttachments.PLAYER_ACTION);
         BlacklightPose base = locomotion(entity, runtime, now, partial);
         if (runtime.preview != null) return samplePose(runtime.preview.key, runtime.preview.time(now), false);
-        if(runtime.phase==LocomotionPhase.CHARGING&&com.codex.blacklight.registry.ModAttachments.getData(entity, ModAttachments.WEAPON_VISUAL).spec()==null)
+        if(runtime.phase==LocomotionPhase.CHARGING&&com.codex.blacklight.registry.ModAttachments.getData(entity,ModAttachments.WEAPON_VISUAL).spec()==null)
             return base;
-        var activeWeapon=com.codex.blacklight.registry.ModAttachments.getData(entity, ModAttachments.WEAPON_VISUAL).spec();
+        var activeWeapon=com.codex.blacklight.registry.ModAttachments.getData(entity,ModAttachments.WEAPON_VISUAL).spec();
         if(activeWeapon!=null&&(activeWeapon.id.startsWith("dev_")||activeWeapon==com.codex.blacklight.combat.WeaponMove.BULLETDIVE_DROP))
             runtime.override=null; // The synchronized skill owns airborne holds and aim blending.
         if (runtime.override != null) {
@@ -228,11 +266,11 @@ public final class PlayerMotionController {
                 return sampled;
             }
         }
-        var weapon=WeaponMotionClock.sample(com.codex.blacklight.registry.ModAttachments.getData(entity, ModAttachments.WEAPON_VISUAL),now);
+        var weapon=WeaponMotionClock.sample(com.codex.blacklight.registry.ModAttachments.getData(entity,ModAttachments.WEAPON_VISUAL),now);
         if(weapon!=null){
             var sampled=samplePose(weapon.key(),weapon.seconds(),weapon.looping());
-            var dev=com.codex.blacklight.registry.ModAttachments.getData(entity, ModAttachments.DEVASTATOR_VISUAL);
-            if(dev.kind()==2&&!com.codex.blacklight.registry.ModAttachments.getData(entity, ModAttachments.WEAPON_VISUAL).charging()){
+            var dev=com.codex.blacklight.registry.ModAttachments.getData(entity,ModAttachments.DEVASTATOR_VISUAL);
+            if(dev.kind()==2&&!com.codex.blacklight.registry.ModAttachments.getData(entity,ModAttachments.WEAPON_VISUAL).charging()){
                 // The decoded vertical-aim track supplies actual up/down clips.
                 // Blend their source poses using the authoritative release ray.
                 var direction=dev.direction();
@@ -243,9 +281,10 @@ public final class PlayerMotionController {
             }
             return SourceClawRecovery.apply(weapon.key(),weapon.seconds(),sampled);
         }
-        if (action.revision() != runtime.suppressedRevision && action.active(now)
+        double actionNow = actionTime(entity, partial);
+        if (action.revision() != runtime.suppressedRevision && action.active(actionNow)
                 && !isLocomotionAction(action.clipId())) {
-            float actionSeconds=action.seconds(now);
+            float actionSeconds=action.seconds(actionNow);
             var sampled=samplePose(action.clipId(),actionSeconds,action.looping());
             if(action.clipId().equals("basic_dodge_roll")){
                 NativeLandingPose.stripHorizontalRoot(sampled);
@@ -260,7 +299,7 @@ public final class PlayerMotionController {
                 NativeLandingPose.stripHorizontalRoot(sampled);
                 if(movingGrounded(entity,runtime)&&LandingMotionPolicy.permitsStride(action.clipId(),actionSeconds))
                     return NativeLandingPose.blendUpper(base,sampled,LandingMotionPolicy.movingCushionWeight(actionSeconds)
-                            *com.codex.blacklight.util.MathCompat.clamp((float)((now-action.started())/20/Math.max(.001,action.transition())),0,1));
+                            *com.codex.blacklight.util.MathCompat.clamp((float)((actionNow-action.started())/20/Math.max(.001,action.transition())),0,1));
             }
             boolean legacyClawCombo=action.clipId().equals("legacy_claw_auto1")||action.clipId().equals("legacy_claw_auto2")||action.clipId().equals("legacy_claw_auto3");
             if(legacyClawCombo&&sampled.hasTransform("Root")) {
@@ -277,7 +316,7 @@ public final class PlayerMotionController {
                     if(sampled.hasTransform(joint))upper.getJointTransformData().put(joint,sampled.get(joint).copy());
                 sampled=upper;
             }
-            float blend = com.codex.blacklight.util.MathCompat.clamp((float)((now - action.started()) / 20 / Math.max(.001, action.transition())), 0, 1);
+            float blend = com.codex.blacklight.util.MathCompat.clamp((float)((actionNow - action.started()) / 20 / Math.max(.001, action.transition())), 0, 1);
             return action.clipId().startsWith("legacy_claw_") ? sampled : BlacklightPose.interpolatePose(base, sampled, blend);
         }
         return base;
@@ -305,7 +344,7 @@ public final class PlayerMotionController {
         long tick=entity.tickCount;
         if(runtime.gait.key()!=null&&tick<=runtime.gait.tick())return;
         runtime.charge.commit(entity==Minecraft.getInstance().player?ClientMovementEvents.visualJumpCharge()
-                :com.codex.blacklight.registry.ModAttachments.getData(entity, ModAttachments.JUMP_CHARGE),MovementTuningSettings.jumpChargeTicks());
+                :com.codex.blacklight.registry.ModAttachments.getData(entity,ModAttachments.JUMP_CHARGE),MovementTuningSettings.jumpChargeTicks());
         var previous=runtime.last;
         var velocity=entity.getDeltaMovement();
         var travel=runtime.committedPosition==null?net.minecraft.world.phys.Vec3.ZERO:entity.position().subtract(runtime.committedPosition);
@@ -341,13 +380,13 @@ public final class PlayerMotionController {
                     case VAULT -> "basic_wall_vault";case TOP -> "basic_wall_top";case PARKOUR -> "basic_parkour_small";
                     default -> "basic_fall";
                 };
-            } else if(!entity.onGround()&&com.codex.blacklight.registry.ModAttachments.getData(player, ModAttachments.GLIDE_UNTIL)>=entity.level().getGameTime()) {
+            } else if(!entity.onGround()&&com.codex.blacklight.registry.ModAttachments.getData(player,ModAttachments.GLIDE_UNTIL)>=entity.level().getGameTime()) {
                 double yaw=Math.toRadians(entity.yBodyRot);
                 key=TraversalMotionSelector.glide(-velocity.x*Math.sin(yaw)+velocity.z*Math.cos(yaw),right);
             } else {
-                var currentAction=com.codex.blacklight.registry.ModAttachments.getData(entity, ModAttachments.PLAYER_ACTION);
+                var currentAction=com.codex.blacklight.registry.ModAttachments.getData(entity,ModAttachments.PLAYER_ACTION);
                 if(entity.onGround()&&speed>.018&&phase.isLanding()
-                        &&LandingMotionPolicy.permitsStride(currentAction.clipId(),currentAction.seconds(now(entity,0))))
+                        &&LandingMotionPolicy.permitsStride(currentAction.clipId(),currentAction.seconds(actionTime(entity,0))))
                     phase=snapshot.sprint()||player.isSprinting()||speed>=PrototypeLocomotion.RUN_ANIMATION_SPEED?LocomotionPhase.RUN:LocomotionPhase.WALK;
                 ground=phase.isGroundMovement();
                 key=ground?TraversalMotionSelector.stableGround(phase,snapshot.sprint(),speed,runtime.locomotion)
@@ -360,7 +399,7 @@ public final class PlayerMotionController {
                                     :speed>.3?"basic_jump_running":velocity.y<.8?"basic_jump_tactical":"basic_jump_rise";
                             case FALL -> "basic_fall";case LAND_LIGHT -> "basic_land_light";
                             case LAND_HEAVY -> "basic_land_heavy";case LAND_DEVASTATING -> "basic_land_devastating";
-                            default -> switch(com.codex.blacklight.registry.ModAttachments.getData(player, ModAttachments.PLAYER_STATE).getActivePower()) {
+                            default -> switch(com.codex.blacklight.registry.ModAttachments.getData(player,ModAttachments.PLAYER_STATE).getActivePower()) {
                                 case CLAWS -> "basic_idle_claw";case BLADE -> "basic_idle_blade";
                                 case HAMMERFISTS -> "basic_idle_hammer";case WHIPFIST -> "basic_idle_whip";default -> "basic_idle";
                             };
@@ -389,7 +428,7 @@ public final class PlayerMotionController {
             double cadence=nominal>0?Math.min(8,speed/nominal):1;
             BlacklightNeoMod.LOGGER.info("Native committed motion phase={} key={} wall={} time={} distance={} speed={} nominal={} cadence={} action={} weapon={}",
                     phase,key,wall,runtime.gait.current(),distance,speed,nominal,cadence,
-                    com.codex.blacklight.registry.ModAttachments.getData(entity, ModAttachments.PLAYER_ACTION).clipId(),com.codex.blacklight.registry.ModAttachments.getData(entity, ModAttachments.WEAPON_VISUAL).move());
+                    com.codex.blacklight.registry.ModAttachments.getData(entity,ModAttachments.PLAYER_ACTION).clipId(),com.codex.blacklight.registry.ModAttachments.getData(entity,ModAttachments.WEAPON_VISUAL).move());
         }
     }
     private static BlacklightPose locomotion(LivingEntity entity,Runtime runtime,double now,float partial) {
@@ -436,12 +475,12 @@ public final class PlayerMotionController {
     private record WeaponPoseIdentity(int move,long started,String key) {}
     private record LegacyPoseIdentity(long revision,String key) {}
     private static void commitCombat(LivingEntity entity,Runtime runtime) {
-        var visual=com.codex.blacklight.registry.ModAttachments.getData(entity, ModAttachments.WEAPON_VISUAL);
+        var visual=com.codex.blacklight.registry.ModAttachments.getData(entity,ModAttachments.WEAPON_VISUAL);
         var sample=WeaponMotionClock.sample(visual,now(entity,0));
         Object identity=sample==null?null:new WeaponPoseIdentity(visual.move(),visual.started(),sample.key());
         double transition=sample==null?2.4:Math.max(1,MotionLibrary.transition(sample.key())*20);
-        var action=com.codex.blacklight.registry.ModAttachments.getData(entity, ModAttachments.PLAYER_ACTION);
-        if(sample==null&&action.revision()!=runtime.suppressedRevision&&action.active(now(entity,0))
+        var action=com.codex.blacklight.registry.ModAttachments.getData(entity,ModAttachments.PLAYER_ACTION);
+        if(sample==null&&action.revision()!=runtime.suppressedRevision&&action.active(actionTime(entity,0))
                 &&action.clipId().startsWith("legacy_claw_")) {
             identity=new LegacyPoseIdentity(action.revision(),action.clipId());
             transition=Math.max(1,action.transition()*20);
@@ -454,8 +493,8 @@ public final class PlayerMotionController {
     }
     public static void acceptRootMotion(NativeRootMotionPayload packet) {
         var minecraft = Minecraft.getInstance(); var player = minecraft.player;
-        if (player == null || packet.gameTime() < lastRootTick || packet.gameTime() == lastRootTick && packet.revision() <= lastRootRevision) return;
-        if (packet.revision() < com.codex.blacklight.registry.ModAttachments.getData(player, ModAttachments.PLAYER_ACTION).revision()) return;
+        if (!available(player) || packet.gameTime() < lastRootTick || packet.gameTime() == lastRootTick && packet.revision() <= lastRootRevision) return;
+        if (packet.revision() < com.codex.blacklight.registry.ModAttachments.getData(player,ModAttachments.PLAYER_ACTION).revision()) return;
         lastRootTick = packet.gameTime(); lastRootRevision = packet.revision();
         // Keep previous-tick coordinates for render interpolation and preserve the player's freely moving view.
         player.setPos(packet.x(), packet.y(), packet.z());
@@ -465,11 +504,11 @@ public final class PlayerMotionController {
     public static void tick(ClientTickEvent event) {if(event.phase!=net.minecraftforge.event.TickEvent.Phase.END)return;
         var current = Minecraft.getInstance().level;
         if (level != current) { STATES.clear(); level = current; lastRootTick = Long.MIN_VALUE; lastRootRevision = Long.MIN_VALUE; }
-        STATES.keySet().removeIf(entity -> entity.isRemoved() || entity.level() != current);
+        STATES.keySet().removeIf(entity -> !ModAttachments.available(entity) || entity.level() != current);
         if(current==null)return;
         // Input prediction and phase snapshots run at normal priority. Commit the
         // resulting displacement once, after them, before any renderer queries it.
-        for(var player:current.players()){commitLocomotion(player,state(player));commitCombat(player,state(player));}
+        for(var player:current.players())if(available(player)){commitLocomotion(player,state(player));commitCombat(player,state(player));}
         for(var entity:java.util.List.copyOf(STATES.keySet()))
             if(!(entity instanceof AbstractClientPlayer)){commitLocomotion(entity,state(entity));commitCombat(entity,state(entity));}
     }

@@ -73,7 +73,7 @@ public final class BlacklightHydra extends Monster implements GeoEntity {
         age=HydraGrowth.MATURE_TICKS;feeds=HydraGrowth.REQUIRED_FEEDS;entityData.set(GROWTH,1F);
     }
     public boolean availableForArrival(ServerPlayer p){
-        return isAlive()&&planted()&&growth()>=1&&p.getUUID().equals(owner)&&heldId()<0&&(action()==0||action()==11);
+        return com.codex.blacklight.registry.ModAttachments.available(p)&&isAlive()&&planted()&&growth()>=1&&p.getUUID().equals(owner)&&heldId()<0&&(action()==0||action()==11);
     }
     private boolean prepareDestination(ServerLevel source){
         if(link==null)return destination.prepare(source);
@@ -86,9 +86,12 @@ public final class BlacklightHydra extends Monster implements GeoEntity {
     public boolean transporting(){return action()==2||action()==6||action()==7||action()==8;}
     public int scenePlayerId(){return entityData.get(SCENE_PLAYER);}
     public int heldId(){return entityData.get(HELD);}
-    public ServerPlayer heldPlayer(){return level().getEntity(heldId()) instanceof ServerPlayer p?p:null;}
+    public ServerPlayer heldPlayer(){
+        return level().getEntity(heldId()) instanceof ServerPlayer p&&p.isAlive()
+                &&com.codex.blacklight.registry.ModAttachments.available(p)?p:null;
+    }
     public boolean hold(ServerPlayer p){
-        if(!transporting()||heldId()>=0||p.level()!=level()||p.isPassenger()||!p.isAlive()||HydraTransport.active(p)||com.codex.blacklight.power.BiomassSystem.active(p))return false;
+        if(!com.codex.blacklight.registry.ModAttachments.available(p)||!isAlive()||!transporting()||heldId()>=0||p.level()!=level()||p.isPassenger()||!p.isAlive()||HydraTransport.active(p)||com.codex.blacklight.power.BiomassSystem.active(p))return false;
         // Capture is an exclusive action: discard queued attacks and their movement leases.
         com.codex.blacklight.combat.WeaponCombatSystem.cancel(p);
         com.codex.blacklight.combat.DevastatorSystem.cancel(p);
@@ -104,11 +107,11 @@ public final class BlacklightHydra extends Monster implements GeoEntity {
         com.codex.blacklight.registry.ModAttachments.setData(p,com.codex.blacklight.registry.ModAttachments.HYDRA_CARRIER,getId());com.codex.blacklight.registry.ModAttachments.syncData(p,com.codex.blacklight.registry.ModAttachments.HYDRA_CARRIER);return true;
     }
     private void releaseHeld(){
-        var p=heldPlayer();if(p!=null&&com.codex.blacklight.registry.ModAttachments.getData(p,com.codex.blacklight.registry.ModAttachments.HYDRA_CARRIER)==getId()){com.codex.blacklight.registry.ModAttachments.setData(p,com.codex.blacklight.registry.ModAttachments.HYDRA_CARRIER,-1);com.codex.blacklight.registry.ModAttachments.syncData(p,com.codex.blacklight.registry.ModAttachments.HYDRA_CARRIER);}
+        var p=heldPlayer();if(com.codex.blacklight.registry.ModAttachments.available(p)&&com.codex.blacklight.registry.ModAttachments.getData(p,com.codex.blacklight.registry.ModAttachments.HYDRA_CARRIER)==getId()){com.codex.blacklight.registry.ModAttachments.setData(p,com.codex.blacklight.registry.ModAttachments.HYDRA_CARRIER,-1);com.codex.blacklight.registry.ModAttachments.syncData(p,com.codex.blacklight.registry.ModAttachments.HYDRA_CARRIER);}
         entityData.set(HELD,-1);
     }
     public boolean beginArrival(ServerPlayer player){
-        if(heldId()>=0||!isAlive()||player.level()!=level())return false;
+        if(!com.codex.blacklight.registry.ModAttachments.available(player)||heldId()>=0||!isAlive()||player.level()!=level())return false;
         // Retain the destination while the real client loads terrain and begins
         // tracking the carrier; the departure hydra releases its own ticket.
         destination.prepare((ServerLevel)level(),blockPosition());
@@ -132,7 +135,7 @@ public final class BlacklightHydra extends Monster implements GeoEntity {
             if(planted()&&(action()==2||action()==6)&&tickCount%20==0)prepareDestination(level);
             if((action()==3||action()==9||action()==10)&&(isNoAi()||level.getDifficulty()==Difficulty.PEACEFUL
                     ||com.codex.blacklight.combat.ImpactControl.stunned(this))){finishAction();cooldown=40;return;}
-            tickAction(level);var held=heldPlayer();if(held!=null){HydraTransport.place(held);held.connection.resetPosition();}return;}
+            tickAction(level);var held=heldPlayer();if(held!=null){HydraTransport.place(held);if(held.connection!=null)held.connection.resetPosition();}return;}
         if(!planted()){tickWild(level);return;}
         float previousGrowth=growth();
         age=HydraGrowth.age(age+1);entityData.set(GROWTH,HydraGrowth.progress(age,feeds));
@@ -304,12 +307,13 @@ public final class BlacklightHydra extends Monster implements GeoEntity {
     }
     private void finishAction(){food=null;entityData.set(FEED_TARGET,-1);action(0);}
     private void restorePassenger(ServerPlayer p){
+        if(!com.codex.blacklight.registry.ModAttachments.available(p)||!p.isAlive()||p.level()!=level())return;
         if(heldId()==p.getId())releaseHeld();var safe=CityTravel.safePosition((ServerLevel)level(),BlockPos.containing(pickupPosition==null?position().add(3,0,0):pickupPosition));
         if(safe!=null){p.teleportTo(safe.getX()+.5,safe.getY(),safe.getZ()+.5);p.setDeltaMovement(Vec3.ZERO);p.getPersistentData().remove("BlacklightHydraRescue");}
         p.fallDistance=0;p.getPersistentData().putLong("BlacklightHydraLanding",level().getGameTime()+200);
     }
     /** A fatal slime transformation must release the paired animation before changing body shape. */
-    public void abortTransport(ServerPlayer p){if(heldPlayer()==p)abortTravel();}
+    public void abortTransport(ServerPlayer p){if(p!=null&&heldId()==p.getId())abortTravel();}
     private void abortTravel(){
         entityData.set(SCENE_PLAYER,-1);
         if(heldPlayer()!=null)restorePassenger(heldPlayer());

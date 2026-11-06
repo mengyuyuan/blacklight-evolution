@@ -18,6 +18,7 @@ import org.joml.Vector3f;
 
 /** Original CPU skin mesh. Subdivided standard skin surfaces stay connected through the authored pose. */
 public final class BlacklightPlayerModel extends PlayerModel<AbstractClientPlayer> {
+    private NativeModelPartState authoredParts;
     private record SkinPiece(String bone, ModelPart visibility, float x, float y, float z,
                              float w, float h, float d, float u, float v, float from, float to, float inflation, int anatomy) { }
     private final List<SkinPiece> pieces = new ArrayList<>();
@@ -66,6 +67,7 @@ public final class BlacklightPlayerModel extends PlayerModel<AbstractClientPlaye
     @Override public void setupAnim(AbstractClientPlayer player,float swing,float amount,float age,float yaw,float pitch) {
         renderedPlayer=player;
         super.setupAnim(player,swing,amount,age,yaw,pitch);
+        resetNativeVisibility(player);
         float partial=renderPartial;
         pose(BlacklightRenderPose.sample(player,partial));
         mercerFrame=MercerPlayerMesh.active(player)?MercerPlayerMesh.get().sample(player,partial,matrices):null;
@@ -97,7 +99,23 @@ public final class BlacklightPlayerModel extends PlayerModel<AbstractClientPlaye
             if(armor.covers(player,"right_arm",partial))rightBiological=false;
             if(armor.covers(player,"left_arm",partial))leftBiological=false;
         }
-
+        if(authoredParts==null)authoredParts=new NativeModelPartState(head,hat,body,jacket,
+                rightArm,rightSleeve,leftArm,leftSleeve,rightLeg,rightPants,leftLeg,leftPants);
+        authoredParts.capture();
+    }
+    private void resetNativeVisibility(AbstractClientPlayer player) {
+        // Foreign humanoid animation hooks may already have hidden severed limbs
+        // during super.setupAnim. Blacklight builds a complete native body, then
+        // applies its own armor/weapon masks below. Retain vanilla skin toggles.
+        setAllVisible(!player.isSpectator());
+        head.visible=true;
+        hat.visible=player.isSpectator()||player.isModelPartShown(net.minecraft.world.entity.player.PlayerModelPart.HAT);
+        if(player.isSpectator())return;
+        jacket.visible=player.isModelPartShown(net.minecraft.world.entity.player.PlayerModelPart.JACKET);
+        rightSleeve.visible=player.isModelPartShown(net.minecraft.world.entity.player.PlayerModelPart.RIGHT_SLEEVE);
+        leftSleeve.visible=player.isModelPartShown(net.minecraft.world.entity.player.PlayerModelPart.LEFT_SLEEVE);
+        rightPants.visible=player.isModelPartShown(net.minecraft.world.entity.player.PlayerModelPart.RIGHT_PANTS_LEG);
+        leftPants.visible=player.isModelPartShown(net.minecraft.world.entity.player.PlayerModelPart.LEFT_PANTS_LEG);
     }
     private void project(ModelPart part,String name) {
         var bone=PlayerMotionController.skeleton().searchJointByName(name);
@@ -115,6 +133,13 @@ public final class BlacklightPlayerModel extends PlayerModel<AbstractClientPlaye
     public MercerRig.Frame mercerFrame() { return mercerFrame; }
     public Matrix4f[] matrices() { return mercerFrame==null?matrices:mercerFrame.attachments(); }
     @Override public void renderToBuffer(PoseStack stack,VertexConsumer out,int light,int overlay,float red,float green,float blue,float alpha) {
+        // Some mods reset limb visibility/poses after setupAnim, even for custom
+        // PlayerModel subclasses (e.g. The Boys' regeneration renderer). Restore
+        // only this body's authored projection, immediately before its draw;
+        // vanilla equipment layers then copy the same pose. Foreign players,
+        // effects, ticking and the renderer's pose-stack transforms stay intact.
+        if(authoredParts!=null&&com.codex.blacklight.client.renderer.NativePlayerRenderScope.owns(renderedPlayer))
+            authoredParts.restore();
         int color=((int)(alpha*255)<<24)|((int)(red*255)<<16)|((int)(green*255)<<8)|(int)(blue*255);
         if(matrices==null){super.renderToBuffer(stack,out,light,overlay,red,green,blue,alpha);return;}
         int count=mercerFrame==null?matrices.length:mercerFrame.skin().length;

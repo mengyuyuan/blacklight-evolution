@@ -115,7 +115,7 @@ public final class BuildingBiomassGameTest {
         try(var f=new Fixture(h)) {
             int initial=f.colony.massBlocks;
             int before=f.colony.supply.reserve();
-            Consumer<BlockEvent.EntityPlaceEvent> veto=e->{if(e.getPlacedBlock().is(ModBlocks.BUILDING_BIOMASS.get()))e.setCanceled(true);};
+            Consumer<BlockEvent.EntityPlaceEvent> veto=e->{if(e.getPlacedBlock().is(ModBlocks.BUILDING_BIOMASS.get())){h.assertTrue(e.getEntity().getUUID()!=null,"solid growth also supplies a claim-check actor");e.setCanceled(true);}};
             MinecraftForge.EVENT_BUS.addListener(veto);
             try{f.grow();h.assertTrue(f.colony.massBlocks==initial&&!f.colony.severed.isEmpty(),"cancelled placement is restored and not retried endlessly");h.assertTrue(f.colony.supply.reserve()==before,"vetoed solid cells refund the reserved construction materials");}
             finally{MinecraftForge.EVENT_BUS.unregister(veto);}

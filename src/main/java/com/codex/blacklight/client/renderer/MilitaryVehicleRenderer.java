@@ -42,7 +42,7 @@ public final class MilitaryVehicleRenderer extends EntityRenderer<MilitaryVehicl
             String seat=local?entity.seatOf(mc.player.getUUID()):null;
             var view=seat==null?null:com.codex.blacklight.client.vehicle.VehicleCamera.view(entity.definition(),seat,Vec3.ZERO,0,entity.turretYaw(),entity.gunPitch(),
                     mc.player.getViewYRot(partial)+yaw,mc.player.getViewXRot(partial),true,false);
-            interior.render(stack,buffers.getBuffer(RenderType.entityCutout(getTextureLocation(entity))),light,OverlayTexture.NO_OVERLAY,local,view);
+            interior.render(stack,buffers.getBuffer(RenderType.entityCutout(getTextureLocation(entity))),light,entity.hurtFlash(partial)?OverlayTexture.pack(0,3):OverlayTexture.NO_OVERLAY,local,view);
         } finally {stack.popPose();}
         super.render(entity,yaw,partial,stack,buffers,light);
     }

@@ -10,6 +10,9 @@ import net.minecraft.world.phys.Vec3;
 public final class TissueDefenseSystem {
     private TissueDefenseSystem(){}
     public static TissueDefense.Decision incoming(BlacklightInfectedHost host,DamageSource source,float amount){
+        return incoming(host,host.defense(),host.defenseProfile(),source,amount);
+    }
+    public static TissueDefense.Decision incoming(net.minecraft.world.entity.Mob host,TissueDefense defense,TissueDefense.Profile profile,DamageSource source,float amount){
         var direct=source.getDirectEntity();boolean piercing=direct instanceof Projectile;
         boolean physical=(piercing||direct instanceof LivingEntity&&direct==source.getEntity())
                 &&!source.is(DamageTypeTags.BYPASSES_ARMOR)&&!source.is(DamageTypeTags.BYPASSES_INVULNERABILITY)
@@ -20,7 +23,7 @@ public final class TissueDefenseSystem {
         double angle=Math.toRadians(host.yBodyRot);var facing=new Vec3(-Math.sin(angle),0,Math.cos(angle));
         double front=toward==null?0:facing.dot(new Vec3(toward.x,0,toward.z).normalize());
         double height=piercing?(direct.getY()-host.getY())/Math.max(.001,host.getBbHeight()):.55;
-        return host.defense().reduce(host.defenseProfile(),amount,physical,piercing,front,height);
+        return defense.reduce(profile,amount,physical,piercing,front,height);
     }
     public static void tick(BlacklightInfectedHost host){
         if(!host.isAlive()||host.hasMultipartBody()||host.devourerIdentity()||DevourerFeedingSystem.isDevourer(host))return;

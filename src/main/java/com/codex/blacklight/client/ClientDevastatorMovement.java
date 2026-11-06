@@ -27,7 +27,7 @@ public final class ClientDevastatorMovement {
      * retain ordinary positional interpolation, including real crater falls. */
     public static void acceptRoot(net.minecraft.client.player.LocalPlayer player) {
         if(rootLevel.get()!=player.level()){rootLevel=new java.lang.ref.WeakReference<>(player.level());landingSession=Long.MIN_VALUE;}
-        var visual=com.codex.blacklight.registry.ModAttachments.getData(player, ModAttachments.DEVASTATOR_VISUAL);
+        var visual=com.codex.blacklight.registry.ModAttachments.getData(player,ModAttachments.DEVASTATOR_VISUAL);
         if(visual.phase()!=DevastatorSystem.LAND||(visual.kind()!=0&&visual.kind()!=3)
                 ||visual.session()==landingSession)return;
         landingSession=visual.session();
@@ -42,7 +42,7 @@ public final class ClientDevastatorMovement {
         if(event.phase!=net.minecraftforge.event.TickEvent.Phase.START)return;
         var mc=Minecraft.getInstance();var p=mc.player;
         if(p==null||event.player!=p||mc.level==null||!p.isAlive())return;
-        var v=com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.DEVASTATOR_VISUAL);
+        var v=com.codex.blacklight.registry.ModAttachments.getData(p,ModAttachments.DEVASTATOR_VISUAL);
         if(v.kind()<0||v.phase()==DevastatorSystem.RECOVERY)return;
         p.fallDistance=0;
         if(v.phase()==DevastatorSystem.CHARGE) {
@@ -50,10 +50,13 @@ public final class ClientDevastatorMovement {
             p.setDeltaMovement(motion.x*.25,p.onGround()?motion.y:Math.max(-.02,motion.y*.2),motion.z*.25);
         } else if(v.kind()==3&&v.phase()==DevastatorSystem.FLIGHT&&!p.onGround()) {
             double ticks=Math.max(0,(mc.level.getGameTime()-v.released())-Math.ceil(20D/6));
-            var movement=com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.MOVEMENT_STATE);var input=movement.wallInput();
+            var movement=com.codex.blacklight.registry.ModAttachments.getData(p,ModAttachments.MOVEMENT_STATE);var input=movement.wallInput();
             var target=mc.level.getEntity(v.targetId());
             Vec3 aim=target!=null&&target.isAlive()?target.position():v.diveAim();
-            var horizontal=BulletdiveSteering.horizontal(p.position(),p.getDeltaMovement(),movement.cameraYaw(p.getYRot()),
+            var horizontal=target!=null&&target.isAlive()
+                    ?BulletdiveSteering.guided(p.position(),target.position(),target.position().subtract(target.xo,target.yo,target.zo),
+                            (int)ticks,movement.cameraYaw(p.getYRot()),input.forward(),input.sideways())
+                    :BulletdiveSteering.horizontal(p.position(),p.getDeltaMovement(),movement.cameraYaw(p.getYRot()),
                     input.forward(),input.sideways(),aim);
             p.setDeltaMovement(horizontal.x,-BulletdivePhysics.downSpeed(ticks),horizontal.z);
         } else if(v.phase()==DevastatorSystem.RELEASE&&(v.kind()==3||v.kind()==0&&!p.onGround())) {

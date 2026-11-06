@@ -28,6 +28,20 @@ public final class InfectedCombatBalance {
                 && !com.codex.blacklight.combat.DevastatorDamage.isTrueDamage(source)
                 && !source.is(DamageTypeTags.BYPASSES_INVULNERABILITY))
             event.setAmount(event.getAmount()*HunterBalance.PLAYER_ATTACK_FACTOR);
+        if(event.getEntity() instanceof com.codex.blacklight.entity.BlacklightSupremeHunter && source.getEntity() instanceof Player
+                && !com.codex.blacklight.combat.DevastatorDamage.isTrueDamage(source)
+                && !source.is(DamageTypeTags.BYPASSES_INVULNERABILITY))
+            event.setAmount(event.getAmount()*(source.is(net.minecraft.world.damagesource.DamageTypes.THROWN)
+                    ?com.codex.blacklight.combat.SupremeHunterBalance.THROWN_BONUS:com.codex.blacklight.combat.SupremeHunterBalance.PLAYER_ATTACK_FACTOR));
+        var supremeMove=source.getEntity() instanceof com.codex.blacklight.entity.BlacklightSupremeHunter?com.codex.blacklight.combat.SupremeHunterBalance.current():null;
+        if(supremeMove!=null&&!source.is(DamageTypeTags.BYPASSES_INVULNERABILITY)&&event.getEntity() instanceof Player victim){
+            boolean infected=com.codex.blacklight.registry.ModAttachments.getData(victim,ModAttachments.PLAYER_STATE).isInfected();
+            float difficulty=switch(victim.level().getDifficulty()){case EASY -> .75F;case HARD -> 1.5F;default -> 1;};
+            // Infected: fixed per-move budget in converted HP. Ordinary players take the raw hit, reduced.
+            event.setAmount(infected?com.codex.blacklight.combat.SupremeHunterBalance.infectedDamage(supremeMove,difficulty)
+                    :event.getAmount()*com.codex.blacklight.combat.SupremeHunterBalance.ORDINARY_PLAYER_HURT_FACTOR);
+            return;
+        }
         var hunter=source.getEntity() instanceof BlacklightHunter h&&source.getDirectEntity()==h?h:null;
         if(hunter!=null&&!source.is(DamageTypeTags.BYPASSES_INVULNERABILITY))
             event.setAmount(event.getAmount()*com.codex.blacklight.combat.HunterBalance.damageMultiplier(hunter.attackMove()));
@@ -42,6 +56,12 @@ public final class InfectedCombatBalance {
         // commands and environmental damage do not acquire a creature budget.
         if(!(source.getEntity() instanceof Mob attacker)
                 ||source.is(DamageTypeTags.BYPASSES_INVULNERABILITY))return;
+        if(com.codex.blacklight.compat.CultivationCompatibility.lateIncomingBudget(player,source))return;
+        if(com.codex.blacklight.infection.InfectionStatScaling.nativeThreat(attacker)){
+            event.setAmount(com.codex.blacklight.infection.EvolvedBalance.playerDamage(event.getAmount(),player.getMaxHealth(),CombatScale.units(player),
+                    switch(player.level().getDifficulty()){case EASY->.75F;case HARD->1.5F;default->1;},com.codex.blacklight.infection.EvolvedBalance.rules()));
+            return;
+        }
         var type=attacker.getType();
         boolean boss=attacker instanceof BlacklightHive
                 ||attacker instanceof com.codex.blacklight.entity.BlacklightInfectedHost host

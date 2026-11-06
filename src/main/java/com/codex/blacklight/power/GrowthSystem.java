@@ -68,6 +68,7 @@ public static void metabolize(ServerPlayer p){
         if(event.phase != net.minecraftforge.event.TickEvent.Phase.END)return;
         if(!(event.player instanceof ServerPlayer p))return;updateHealth(p);
         if(p.tickCount%20!=0)return;
+        PrototypeMetabolism.sync(p);
         if(!com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.PLAYER_STATE).isInfected())return;
         award(p,"awakening");
         metabolize(p);

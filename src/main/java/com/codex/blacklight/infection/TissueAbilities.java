@@ -11,57 +11,65 @@ import net.minecraft.world.phys.Vec3;
 /** Per-host bounded action controller. Real collision, one contact, finite recovery and nutrition costs. */
 public final class TissueAbilities {
     private static final List<TissueCore> ACTIONS=List.of(TissueCore.TENDON,TissueCore.HYDRAULIC,TissueCore.HYDROSTAT,TissueCore.BLADE,TissueCore.CHELA,TissueCore.HORN,TissueCore.SADDLE,TissueCore.CLUB,TissueCore.TONGUE,TissueCore.CNIDOCYTE,TissueCore.EXTRAORAL);
-    private final BlacklightInfectedHost host;
+    private final net.minecraft.world.entity.Mob host;
     private int cursor,cooldown;
-    private boolean contacted,launched,withdrew;
-    public TissueAbilities(BlacklightInfectedHost host){this.host=host;}
-    public void interrupt(){if(!host.level().isClientSide){host.setOrganAction(null,-1,Vec3.ZERO);TissueGrapples.release(host);cooldown=Math.max(cooldown,20);}}
-    private static boolean gripping(TissueCore core){return core==TissueCore.CHELA||core==TissueCore.HYDROSTAT||core==TissueCore.TONGUE||core==TissueCore.EXTRAORAL;}
-    public boolean gripActive(){var core=host.organActionCore();return gripping(core)&&host.organActionElapsed(0)>=TissueOrganCycle.cycle(core).contact()&&host.organActionElapsed(0)<TissueOrganCycle.cycle(core).retract();}
+    private boolean contacted,launched,withdrew,ownsMotion=true;
+    public TissueAbilities(net.minecraft.world.entity.Mob host){this.host=host;lastNativeTick=host.tickCount;}
+    private int lastNativeTick;
+    private void elapseNativeCooldown(){
+        if(host instanceof BlacklightInfectedHost)return;
+        int elapsed=Math.max(0,host.tickCount-lastNativeTick);lastNativeTick=host.tickCount;cooldown=Math.max(0,cooldown-elapsed);
+    }
+    public void interrupt(){if(!host.level().isClientSide){TissueActions.set(host,null,-1,Vec3.ZERO);TissueGrapples.release(host);cooldown=Math.max(cooldown,20);}}
+    private static boolean gripping(TissueCore core){return TissueActions.gripping(core);}
+    public boolean gripActive(){var core=TissueActions.core(host);return gripping(core)&&TissueActions.elapsed(host,0)>=TissueOrganCycle.cycle(core).contact()&&TissueActions.elapsed(host,0)<TissueOrganCycle.cycle(core).retract();}
     /** Called before ordinary melee starts, so close-range organs cannot be
      * starved forever by a fresh vanilla melee animation every recovery. */
-    public boolean tryStart(LivingEntity target){
-        if(host.level().isClientSide||cooldown>0||host.organActionCore()!=null||host.tissueStrikeElapsed(0)>=0||!host.isAlive()||host.isNoAi()
-                ||host.hasMultipartBody()||host.devourerIdentity()||host.isPassenger()||!valid(target)||!host.hasLineOfSight(target)
+    public boolean tryStart(LivingEntity target){return tryStart(target,true);}
+    public boolean tryStart(LivingEntity target,boolean motion){
+        elapseNativeCooldown();
+        if(host.level().isClientSide||!ModAttachments.available(host)||cooldown>0||TissueActions.core(host)!=null||TissueActions.legacyStrike(host)||!host.isAlive()||host.isNoAi()
+                ||!TissueActions.eligible(host)||host.isPassenger()||!valid(target)||!host.hasLineOfSight(target)
                 ||com.codex.blacklight.registry.ModAttachments.getData(host, ModAttachments.CONSUME_VISUAL).active()||TissueCompetition.controls(host)
                 ||com.codex.blacklight.combat.ImpactControl.stunned(host)||host.level().getDifficulty()==net.minecraft.world.Difficulty.PEACEFUL)return false;
         double gap=Math.max(0,host.distanceTo(target)-(host.getBbWidth()+target.getBbWidth())*.5);
         for(int offset=0;offset<ACTIONS.size();offset++){
             int index=(cursor+offset)%ACTIONS.size();var candidate=ACTIONS.get(index);
             boolean locomotor=candidate==TissueCore.TENDON||candidate==TissueCore.HYDRAULIC||candidate==TissueCore.HORN;
-            if(locomotor&&(!host.onGround()||!host.family().equals("ground")))continue;
-            if(!locomotor&&host.family().equals("water")&&!host.isInWater())continue;
-            if(host.organPower(candidate)<=0||!TissueOrganCycle.range(candidate,gap)||!host.spendTissueNutrition(TissueOrganCycle.cycle(candidate).cost()))continue;
-            cursor=(index+1)%ACTIONS.size();contacted=false;launched=false;withdrew=false;
+            if(locomotor&&!motion)continue;
+            if(locomotor&&(!host.onGround()||!TissueActions.family(host).equals("ground")))continue;
+            if(!locomotor&&TissueActions.family(host).equals("water")&&!host.isInWater())continue;
+            if(TissueActions.power(host,candidate)<=0||!TissueOrganCycle.range(candidate,gap)||!TissueActions.spend(host,TissueOrganCycle.cycle(candidate).cost()))continue;
+            ownsMotion=motion;cursor=(index+1)%ACTIONS.size();contacted=false;launched=false;withdrew=false;
             Vec3 direction=target.position().subtract(host.position()).multiply(1,0,1).normalize();
-            host.setOrganAction(candidate,target.getId(),direction);host.getNavigation().stop();com.codex.blacklight.registry.ModInfectedSounds.play(host,InfectedSoundCue.TENSION);return true;
+            TissueActions.set(host,candidate,target.getId(),direction);if(ownsMotion)host.getNavigation().stop();com.codex.blacklight.registry.ModInfectedSounds.play(host,InfectedSoundCue.TENSION);return true;
         }return false;
     }
     public boolean tick(){
         if(host.level().isClientSide)return false;
-        if(cooldown>0)cooldown--;
-        if(!host.isAlive()||host.isNoAi()||host.hasMultipartBody()||host.devourerIdentity()||host.isPassenger()
+        if(host instanceof BlacklightInfectedHost){if(cooldown>0)cooldown--;}else elapseNativeCooldown();
+        if(!host.isAlive()||host.isNoAi()||!TissueActions.eligible(host)||host.isPassenger()
                 ||com.codex.blacklight.registry.ModAttachments.getData(host, ModAttachments.CONSUME_VISUAL).active()||com.codex.blacklight.combat.ImpactControl.stunned(host)
-                ||host.level().getDifficulty()==net.minecraft.world.Difficulty.PEACEFUL){if(host.organActionCore()!=null)interrupt();return false;}
-        var core=host.organActionCore();
+                ||TissueCompetition.controls(host)||host.level().getDifficulty()==net.minecraft.world.Difficulty.PEACEFUL){if(TissueActions.core(host)!=null)interrupt();return false;}
+        var core=TissueActions.core(host);
         if(core==null){
-            return tryStart(host.getTarget());
+            return tryStart(host.getTarget(),ownsMotion);
         }
-        var cycle=TissueOrganCycle.cycle(core);int tick=(int)host.organActionElapsed(0);
-        var entity=host.level().getEntity(host.organActionTarget());var target=entity instanceof LivingEntity living?living:null;
+        var cycle=TissueOrganCycle.cycle(core);int tick=(int)TissueActions.elapsed(host,0);
+        var entity=host.level().getEntity(TissueActions.target(host));var target=entity instanceof LivingEntity living?living:null;
         if(core==TissueCore.EXTRAORAL&&contacted&&target!=null&&!target.isAlive()&&tick<cycle.retract()){
-            host.retractOrganAction();tick=cycle.retract();
+            TissueActions.retract(host);tick=cycle.retract();
         }
         boolean closing=core==TissueCore.EXTRAORAL&&tick>=cycle.retract();
         if(tick<0||tick>=cycle.end()||!closing&&!valid(target)){
-            host.setOrganAction(null,-1,Vec3.ZERO);TissueGrapples.release(host);cooldown=host.recoverTissueAction(cycle.cooldown());return false;
+            TissueActions.set(host,null,-1,Vec3.ZERO);TissueGrapples.release(host);cooldown=TissueActions.recover(host,cycle.cooldown());return false;
         }
-        host.getNavigation().stop();host.setXxa(0);host.setZza(0);
+        if(ownsMotion){host.getNavigation().stop();host.setXxa(0);host.setZza(0);}
         // Water attacks brace against drift; a land mob's panic-float goal must not eject an aquatic grasper.
-        if(host.isInWater())host.setDeltaMovement(host.getDeltaMovement().scale(.35));
-        if(target!=null&&(core!=TissueCore.HORN||tick<cycle.windup()))host.getLookControl().setLookAt(target,25,25);
-        double power=host.organPower(core);Vec3 direction=host.organActionDirection();
-        if(tick<cycle.windup())host.setDeltaMovement(new Vec3(0,host.getDeltaMovement().y,0));
+        if(ownsMotion&&host.isInWater())host.setDeltaMovement(host.getDeltaMovement().scale(.35));
+        if(ownsMotion&&target!=null&&(core!=TissueCore.HORN||tick<cycle.windup()))host.getLookControl().setLookAt(target,25,25);
+        double power=TissueActions.power(host,core);Vec3 direction=TissueActions.direction(host);
+        if(ownsMotion&&tick<cycle.windup())host.setDeltaMovement(new Vec3(0,host.getDeltaMovement().y,0));
         if(!launched&&tick>=cycle.windup()){
             com.codex.blacklight.registry.ModInfectedSounds.play(host,gripping(core)?InfectedSoundCue.LASH:InfectedSoundCue.SWING);
             launched=true;double speed=TissueOrganCycle.launchSpeed(core,power);
@@ -98,14 +106,27 @@ public final class TissueAbilities {
         }
         return true;
     }
-    private boolean valid(LivingEntity target){return target!=null&&target!=host&&target.isAlive()&&!target.isRemoved()&&target.level()==host.level()&&!host.isAlliedTo(target)
+    private boolean valid(LivingEntity target){return ModAttachments.available(target)&&target!=null&&target!=host&&target.isAlive()&&!target.isRemoved()&&target.level()==host.level()&&!host.isAlliedTo(target)
             &&!(target instanceof Player p&&(p.isCreative()||p.isSpectator()))&&!TissueCompetition.controls(target)
             &&com.codex.blacklight.power.BiomassSystem.claimant(target)==null&&(TissueGrapples.owner(target)==null||TissueGrapples.owner(target)==host)
             &&!com.codex.blacklight.registry.ModAttachments.getData(target, ModAttachments.CONSUME_VISUAL).active();}
     private void hit(LivingEntity target,TissueCore core,double power){
         float factor=switch(core){case CHELA->1.3F;case HORN->1.35F;case SADDLE->1.8F;case CLUB->2.1F;case TONGUE->.65F;case CNIDOCYTE->.35F;case EXTRAORAL->.55F;default->1;};
-        float amount=(float)(host.getAttributeValue(Attributes.ATTACK_DAMAGE)*factor*(1+.045*TissueOrganCycle.boundedPower(power)));
-        if(target.hurt(host.damageSources().mobAttack(host),amount)){
+        double base=host.getAttribute(Attributes.ATTACK_DAMAGE)==null
+                ?com.codex.blacklight.config.InfectionEcologyConfig.value(com.codex.blacklight.config.InfectionEcologyConfig.FALLBACK_DAMAGE)*(1+NativeTissue.combat(host).damage())
+                :host.getAttributeValue(Attributes.ATTACK_DAMAGE);
+        float amount=(float)Math.min(Float.MAX_VALUE/4,base*factor*(1+.045*TissueOrganCycle.boundedPower(power)));
+        if(!Float.isFinite(amount)||amount<=0)return;
+        var before=com.codex.blacklight.compat.NativeCombatAccess.read(target,false);
+        boolean returned=target.hurt(TissueAttackSource.mobAttack(host),amount);
+        var after=com.codex.blacklight.compat.NativeCombatAccess.read(target,false);
+        // Observe the completed foreign override. This controls only our own
+        // secondary effects; it never changes that override's return contract.
+        if(returned||after.health()<before.health()||after.absorption()<before.absorption()){
+            if(!(host instanceof BlacklightInfectedHost)){
+                var cue=switch(core){case CHELA,HORN,SADDLE,CLUB,HYDRAULIC->InfectedSoundCue.CRUSH;case BLADE,EXTRAORAL->InfectedSoundCue.TEAR;default->InfectedSoundCue.PIERCE;};
+                com.codex.blacklight.registry.ModInfectedSounds.play(host,cue,target.getBoundingBox().getCenter());
+            }
             if(core==TissueCore.CNIDOCYTE)target.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.MOVEMENT_SLOWDOWN,40,1),host);
             if(core!=TissueCore.EXTRAORAL){Vec3 d=target.position().subtract(host.position());target.knockback(TissueOrganCycle.knockback(core,power),-d.x,-d.z);}
         }

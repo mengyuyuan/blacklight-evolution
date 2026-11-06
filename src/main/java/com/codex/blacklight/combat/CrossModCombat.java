@@ -28,6 +28,8 @@ public final class CrossModCombat {
     }
     public static boolean nativeAttack(DamageSource source) {
         if (administrative(source)) return false;
+        if (source instanceof com.codex.blacklight.infection.TissueAttackSource) return true;
+        if (source instanceof NativeAttackSource wrapped) return nativeAttack(wrapped.original);
         if (source.typeHolder().unwrapKey().map(k -> k.location().getNamespace().equals("blacklight")).orElse(false)
                 || namespace(source.getDirectEntity()).equals("blacklight")) return true;
         if (!(source.getEntity() instanceof LivingEntity attacker) || source.getDirectEntity() != attacker
@@ -47,12 +49,12 @@ public final class CrossModCombat {
     }
     public static boolean enhanced(LivingEntity victim, DamageSource source) {
         return !(source instanceof NativeAttackSource) && !victim.level().isClientSide && !(victim instanceof Player)
-                && CrossModCombatConfig.OFFENSE.get() && nativeAttack(source)
+                && CrossModCombatConfig.LEGACY_ADVANTAGE.get() && CrossModCombatConfig.OFFENSE.get() && nativeAttack(source)
                 && CrossModDamageRules.externalNamespace(namespace(victim));
     }
     public static boolean bypassTitanLimit(DamageSource source) {
         return DevastatorDamage.isTrueDamage(source) && source.getEntity() instanceof Player p && PrototypeMetabolism.active(p)
-                || CrossModCombatConfig.OFFENSE.get() && CrossModCombatConfig.TRUE_DAMAGE.get() && nativeAttack(source);
+                || CrossModCombatConfig.LEGACY_ADVANTAGE.get() && CrossModCombatConfig.OFFENSE.get() && CrossModCombatConfig.TRUE_DAMAGE.get() && nativeAttack(source);
     }
     public static DamageSource offensiveSource(DamageSource source) {
         return source instanceof NativeAttackSource ? source : new NativeAttackSource(source, CrossModCombatConfig.TRUE_DAMAGE.get());
@@ -60,15 +62,23 @@ public final class CrossModCombat {
     public static float offensiveAmount(float amount) {
         return CrossModDamageRules.multiply(amount, CrossModCombatConfig.OUTGOING.get());
     }
+    public static boolean protectedTier(LivingEntity victim){
+        if(victim instanceof Player p)return PrototypeMetabolism.active(p);
+        if(victim instanceof com.codex.blacklight.entity.BlacklightInfectedHost host)return host.hasMultipartBody()||host.isEvolved()||host.devourerIdentity();
+        return victim instanceof com.codex.blacklight.entity.BlacklightHunter||victim instanceof com.codex.blacklight.entity.BlacklightHydra
+                ||victim instanceof com.codex.blacklight.entity.BlacklightHive||victim instanceof com.codex.blacklight.entity.BlacklightMutant;
+    }
     public static float defend(LivingEntity victim, DamageSource source, float damage) {
         if (victim.level().isClientSide || damage <= 0 || !CrossModCombatConfig.DEFENSE.get()
                 || !(namespace(victim).equals("blacklight") || victim instanceof Player p && PrototypeMetabolism.active(p))
-                || !externalAttack(source)) return damage;
+                || !externalAttack(source)||!CrossModCombatConfig.REDUCE_PLAYER_ATTACKS.get()&&CombatOwnership.player(source)!=null
+                ||!CrossModCombatConfig.PROTECT_COMMON.get()&&!protectedTier(victim)) return damage;
         return budget(victim, damage, victim.getMaxHealth(), false);
     }
     public static float defendItem(ItemEntity item, DamageSource source, float damage) {
         if (item.level().isClientSide || damage <= 0 || !CrossModCombatConfig.DEFENSE.get()
-                || !namespace(item.getItem()).equals("blacklight") || !externalAttack(source)) return damage;
+                || !namespace(item.getItem()).equals("blacklight") || !externalAttack(source)
+                ||!CrossModCombatConfig.REDUCE_PLAYER_ATTACKS.get()&&CombatOwnership.player(source)!=null) return damage;
         // Vanilla item health is integral and starts at five. A fractional subtraction still costs one HP.
         return budget(item, damage, 5, true);
     }

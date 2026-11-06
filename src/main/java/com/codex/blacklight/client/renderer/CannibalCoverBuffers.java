@@ -17,8 +17,11 @@ final class CannibalCoverBuffers implements MultiBufferSource {
     private final float progress,height;
     private final long seed;
     CannibalCoverBuffers(MultiBufferSource delegate,BlacklightInfectedHost host,PoseStack stack,float partial){
+        this(delegate,host,stack,partial,host.cannibalStarted());
+    }
+    CannibalCoverBuffers(MultiBufferSource delegate,net.minecraft.world.entity.Mob host,PoseStack stack,float partial,long started){
         this.delegate=delegate;inverse=new Matrix4f(stack.last().pose()).invert();height=host.getBbHeight();
-        progress=com.codex.blacklight.forge.WingMath.clamp((host.level().getGameTime()-host.cannibalStarted()+partial)/TissueCompetition.COVER_TICKS,0,1);
+        progress=com.codex.blacklight.forge.WingMath.clamp((host.level().getGameTime()-started+partial)/TissueCompetition.COVER_TICKS,0,1);
         seed=host.getUUID().getLeastSignificantBits();
     }
     @Override public VertexConsumer getBuffer(RenderType type){

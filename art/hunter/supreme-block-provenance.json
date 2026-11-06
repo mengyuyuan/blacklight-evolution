@@ -1,0 +1,211 @@
+{
+ "source": "Prototype 1 art/packages/missions/supreme_hunter/supreme_hunter.p3d.rz (local reference, not shipped)",
+ "model": "Own Minecraft cuboid model. Joint pivots follow the original supreme_hunter_skeleton bind pose; proportions measured from the original skin weights. No source mesh or texture copied.",
+ "retarget": "tools: work/shb/rig_def.py. Elbow/knee/ankle/finger chains are aimed at their animated child joints; spine, neck, head, jaw keep source world rotation deltas; root travel removed (server physics).",
+ "clips": [
+  {
+   "clip": "idle",
+   "source": "supreme_hunter_amb_idle",
+   "frames": 56,
+   "sha256": "2a3b1319d6b84523a1df6109e785c2da0d990cbacde3322a14bd238448f6672e"
+  },
+  {
+   "clip": "walk",
+   "source": "supreme_hunter_loco_walk_n",
+   "frames": 60,
+   "sha256": "966d229515cc232a9a595281e429b8ebf525fdb7c064c4af5b5405e7b6d41503"
+  },
+  {
+   "clip": "run",
+   "source": "supreme_hunter_loco_sprint",
+   "frames": 21,
+   "sha256": "d04192a582181757dcea89fc57454e9fadf41c1dcfcda7909280e5679457c142"
+  },
+  {
+   "clip": "run_n",
+   "source": "supreme_hunter_loco_run_n",
+   "frames": 36,
+   "sha256": "133e9c4ef585a8d4a014dc28b710e4303ced56ed39c1d48acca39618a32e53c7"
+  },
+  {
+   "clip": "roar",
+   "source": "supreme_hunter_amb_roar",
+   "frames": 188,
+   "sha256": "a6af218af4bff4b0725d0e39291f82aa1767efea85df6d3ff042ebdfb796332d"
+  },
+  {
+   "clip": "rage",
+   "source": "supreme_hunter_amb_rage",
+   "frames": 64,
+   "sha256": "8bec15b8217bcf5247305ec6cc430435e7f6321ce099ea081ffd46f09f315aeb"
+  },
+  {
+   "clip": "claw_slash",
+   "source": "supreme_hunter_combat_claw_slash",
+   "frames": 87,
+   "sha256": "4d3903e9390c0b74850cc40cccaaadd632d98e379cd035bea9c6e32451471c56"
+  },
+  {
+   "clip": "backhand",
+   "source": "supreme_hunter_combat_backhand",
+   "frames": 75,
+   "sha256": "9c6d33a175a83f81cef3c5b39e826787e6e7d083dd507608b6d3d9618caf7d0b"
+  },
+  {
+   "clip": "overhand",
+   "source": "supreme_hunter_combat_overhand",
+   "frames": 65,
+   "sha256": "549cb05074f9b0697f0d8cd015626c675101707ac97c5492779aeb56dbab61e6"
+  },
+  {
+   "clip": "stomp",
+   "source": "supreme_hunter_combat_stomp",
+   "frames": 61,
+   "sha256": "aa91ab7b60ca2c27363f998006c47f1eca07fd4cd6987aee4a576868fd234ab6"
+  },
+  {
+   "clip": "groundspike",
+   "source": "supreme_hunter_groundspike",
+   "frames": 207,
+   "sha256": "3cda0cc15864f513fe00394f45c487e33a4a4e8dc49547b4e6506d8f4072c847"
+  },
+  {
+   "clip": "devastator",
+   "source": "supreme_hunter_combat_devastator",
+   "frames": 157,
+   "sha256": "09e38631a2af356fa9bfc69e6be151e9a007796c03e5b10b2782d974995c6c7f"
+  },
+  {
+   "clip": "devastator_cycle",
+   "source": "supreme_hunter_combat_devastator_cycle",
+   "frames": 63,
+   "sha256": "8d3381c08c07e5f4c11e520782d5364eea2f8baf7c118ba01b10d873b5b8314a"
+  },
+  {
+   "clip": "devastator_end",
+   "source": "supreme_hunter_combat_devastator_to_idle",
+   "frames": 42,
+   "sha256": "a51dbf1d024222b4a92e27cb882e7f592183a9f1d7b92229d06469abb9e6114c"
+  },
+  {
+   "clip": "pickup_throw",
+   "source": "supreme_hunter_combat_pickup_throw",
+   "frames": 102,
+   "sha256": "031bd0897e52ae87c27a12e032306d4daecae5dfdcde64bf404e97b096b17aa9"
+  },
+  {
+   "clip": "pickup_large_throw",
+   "source": "supreme_hunter_combat_pickup_large_throw",
+   "frames": 83,
+   "sha256": "3020e804cdd5a930193afe590f1ce8b9332f9c0a3978688b6aea11bd52bb5c37"
+  },
+  {
+   "clip": "shoulder_charge",
+   "source": "supreme_hunter_shoulder_charge",
+   "frames": 37,
+   "sha256": "4e4d19f0e6dc20dbe3faaa85d3ff0415f943755bc6298629f5c2ae98437b9f8f"
+  },
+  {
+   "clip": "charge",
+   "source": "supreme_hunter_loco_charge",
+   "frames": 17,
+   "sha256": "ef95066ed385f9a4b6d405ff259df350fb68110ac035ada0aaf5632e930408bb"
+  },
+  {
+   "clip": "leap",
+   "source": "supreme_hunter_loco_leap",
+   "frames": 83,
+   "sha256": "01c9d80ddfcc0cb5e73ca8b86e162185b6038f7219ea9eefcaa2d3c559d2cd44"
+  },
+  {
+   "clip": "fall",
+   "source": "supreme_hunter_fall_cycle",
+   "frames": 31,
+   "sha256": "c0e6446760d6bd932690c091e029408ef38ce77b34b8e28d7dddcc033948b964"
+  },
+  {
+   "clip": "block_into",
+   "source": "supreme_hunter_block_into",
+   "frames": 7,
+   "sha256": "5658f1032a25f234d5f88619bf2ee617506f62569955b9ab903a8c0cc70e4c95"
+  },
+  {
+   "clip": "block",
+   "source": "supreme_hunter_block_cycle",
+   "frames": 31,
+   "sha256": "d69377980a16de22ae342e5d05b26f75df0b7953fa77c6de40f08e8884d7a24b"
+  },
+  {
+   "clip": "block_end",
+   "source": "supreme_hunter_block_to_idle",
+   "frames": 22,
+   "sha256": "424e99d750ecfa491d714389d86253e26f3e112a26b5261de564911ffe5f38b0"
+  },
+  {
+   "clip": "hit_front",
+   "source": "supreme_hunter_gethit_front",
+   "frames": 37,
+   "sha256": "2b6431931cd2da593fedfa4911640a1af86c069567e75bf4d3ebd2b92fcf6492"
+  },
+  {
+   "clip": "hit_back",
+   "source": "supreme_hunter_gethit_back",
+   "frames": 37,
+   "sha256": "2cc934d0ad9ef83c829437438934f3535686f7000b7577a7ccfc1a9abe21573a"
+  },
+  {
+   "clip": "hit_left",
+   "source": "supreme_hunter_gethit_left",
+   "frames": 37,
+   "sha256": "2471c88567f4f6080648ba61e1f1dc1b9741706d6a1e416ab6ea4781fef5e4d3"
+  },
+  {
+   "clip": "hit_right",
+   "source": "supreme_hunter_gethit_right",
+   "frames": 37,
+   "sha256": "76b5bf27192645d0a6d6923da36a86893920353de297d4d17ba1fd9721599837"
+  },
+  {
+   "clip": "leg_medium",
+   "source": "supreme_hunter_gethit_r_leg_medium",
+   "frames": 35,
+   "sha256": "f0d28c9c186fd37627c4e1b2a5014c2aeea5634f9dd4ab1fa166c7bd0639293b"
+  },
+  {
+   "clip": "leg_collapse",
+   "source": "supreme_hunter_gethit_r_leg_collapse",
+   "frames": 117,
+   "sha256": "ba0e607807c7d6f6f8a5be9754474a7504872c7cfef160e70c6b7ab5489ee5c3"
+  },
+  {
+   "clip": "death",
+   "source": "supreme_hunter_gethit_death",
+   "frames": 104,
+   "sha256": "c4414a5c9d1dd2664aad35f74a0f73fc1a1731148f1674c764db16a5a820bac7"
+  },
+  {
+   "clip": "turn_l",
+   "source": "supreme_hunter_amb_turn_l_180",
+   "frames": 54,
+   "sha256": "544b69574c8595ff10da77e6e3b3b073515dbfb5f3e227e48dd170173eddc76c"
+  },
+  {
+   "clip": "turn_r",
+   "source": "supreme_hunter_amb_turn_r_180",
+   "frames": 45,
+   "sha256": "b6781b7a10e1115960bef40667ae7f9c5f76680041589ef8a3ff663727a5e199"
+  },
+  {
+   "clip": "sprint_start",
+   "source": "supreme_hunter_loco_idle_to_sprint",
+   "frames": 42,
+   "sha256": "c6587ab17bfc6742f5d0a93ed36dee489ba0f1bd5502ce444ccd27c430722bab"
+  },
+  {
+   "clip": "run_stop",
+   "source": "supreme_hunter_loco_run_stop",
+   "frames": 34,
+   "sha256": "e95c2645c02ffb9df095df1699d99eb24ffaf3097fe2bc2aafa665f89be55e0c"
+  }
+ ]
+}

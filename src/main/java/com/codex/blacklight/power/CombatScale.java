@@ -37,7 +37,9 @@ public final class CombatScale {
     }
     public static void attributes(LivingEntity entity,boolean scaled){
         float oldUnits=units(entity),absorption=entity.getAbsorptionAmount();
-        modifier(entity.getAttribute(Attributes.MAX_HEALTH),HEALTH,scaled?UNITS-1:0,AttributeModifier.Operation.MULTIPLY_TOTAL);
+        if(!scaled && entity instanceof Mob nativeMob)com.codex.blacklight.infection.NativeInfection.clear(nativeMob);
+        boolean healthScaled=scaled&&!com.codex.blacklight.infection.NativeInfection.preserve(entity)&&!com.codex.blacklight.compat.CultivationCompatibility.nativeHealthUnits(entity)&&!com.codex.blacklight.infection.InfectionStatScaling.nativeHealthUnits(entity);
+        modifier(entity.getAttribute(Attributes.MAX_HEALTH),HEALTH,healthScaled?UNITS-1:0,AttributeModifier.Operation.MULTIPLY_TOTAL);
         if(oldUnits!=units(entity))entity.setAbsorptionAmount(absorption*units(entity)/oldUnits);
         boolean enhanced=scaled && (entity instanceof Mob || entity instanceof Player p && PrototypeMetabolism.active(p));
         modifier(entity.getAttribute(Attributes.MOVEMENT_SPEED),SPEED,enhanced?.08:0,AttributeModifier.Operation.MULTIPLY_TOTAL);
@@ -59,7 +61,7 @@ public final class CombatScale {
         if(!(event.getEntity() instanceof Mob mob)||mob.level().isClientSide||!com.codex.blacklight.registry.ModAttachments.available(mob))return;
         boolean infected=com.codex.blacklight.infection.BlacklightInfectionSystem.isInfected(mob);
         Boolean previous=INFECTION_STATE.get(mob);
-        if(previous==null||previous!=infected)synchronizeMob(mob);
+        if(previous==null||previous!=infected||((units(mob)>1)!=(infected&&!com.codex.blacklight.infection.NativeInfection.preserve(mob)&&!com.codex.blacklight.compat.CultivationCompatibility.nativeHealthUnits(mob)&&!com.codex.blacklight.infection.InfectionStatScaling.nativeHealthUnits(mob))))synchronizeMob(mob);
     }
     @SubscribeEvent public static void join(EntityJoinLevelEvent event){
         if(event.getLevel().isClientSide()||!(event.getEntity() instanceof Mob mob))return;
@@ -74,6 +76,7 @@ public final class CombatScale {
     }
     /** Forge applies this once at its actual damage-before-absorption boundary. */
     public static float finalDamage(LivingEntity entity,net.minecraft.world.damagesource.DamageSource source,float damage){
+        damage=com.codex.blacklight.compat.CultivationCompatibility.afterCultivationDefense(entity,source,damage);
         return com.codex.blacklight.infection.TissueCompetition.finalDamage(entity,source,
                 com.codex.blacklight.combat.CrossModCombat.defend(entity,source,
                         InfiniteEvolutionSystem.damage(entity,source,damageUnits(entity,AssimilationSystem.damage(entity,source,damage)))));

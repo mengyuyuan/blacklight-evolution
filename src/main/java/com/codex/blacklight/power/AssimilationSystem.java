@@ -42,10 +42,22 @@ public final class AssimilationSystem {
             heal*=factor;biomass=Math.round(biomass*factor);ep=Math.round(ep*factor);
             core=host.knownNativeTissueCore();quality=core==null?0:TissueCore.quality(host.tissueAge());
         }
+        if(NativeInfection.active(target)){
+            long age=NativeInfection.age(target);float factor=TissueCore.yieldMultiplier(age);heal*=factor;biomass=Math.round(biomass*factor);ep=Math.round(ep*factor);
+            core=NativeInfection.core(target);quality=TissueCore.quality(age);
+        }
+        // Native effective threat pays resources, not foreign progression/capability copies.
+        double attack=target.getAttribute(Attributes.ATTACK_DAMAGE)==null?0:target.getAttributeValue(Attributes.ATTACK_DAMAGE);
+        double threat=Math.max(1,Math.max(health/40D,Math.max(attack/8D,target.getArmorValue()/10D)));
+        double factor=Math.min(com.codex.blacklight.config.InfectionEcologyConfig.value(com.codex.blacklight.config.InfectionEcologyConfig.REWARD_MAX),
+                1+Math.log(threat)/Math.log(4)*com.codex.blacklight.config.InfectionEcologyConfig.value(com.codex.blacklight.config.InfectionEcologyConfig.REWARD_STRENGTH));
+        if(Double.isFinite(factor)&&factor>1){biomass=(int)Math.min(Integer.MAX_VALUE,Math.round(biomass*factor));ep=(int)Math.min(Integer.MAX_VALUE,Math.round(ep*factor));}
         int jaw=rank(p,TissueCore.JAW);heal*=1+.1F*jaw;biomass=Math.round(biomass*(1+.05F*jaw));
         var samples=new java.util.EnumMap<TissueCore,Integer>(TissueCore.class);
         if(core!=null&&quality>0)samples.put(core,quality);
-        if(tissue(target))for(var entry:((BlacklightInfectedHost)target).tissueInheritance().organs().entrySet()){
+        var inherited=tissue(target)?((BlacklightInfectedHost)target).tissueInheritance()
+                :NativeInfection.active(target)?NativeTissue.inheritance(target):TissueInheritance.EMPTY;
+        for(var entry:inherited.organs().entrySet()){
             var organ=entry.getValue();
             if(organ.mature()&&organ.integrated()>=100)samples.merge(entry.getKey(),(int)Math.min(3,Math.floor(organ.integrated()/100)),Math::max);
         }
@@ -69,6 +81,18 @@ public final class AssimilationSystem {
         var state=com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.PLAYER_STATE);state.addBiomass(reward.biomass());state.addEvolutionPoints(reward.ep()+bonus);
         com.codex.blacklight.registry.ModAttachments.syncData(p, ModAttachments.PLAYER_STATE);GrowthSystem.consumed(p,target);
         if(heal)CriticalMassSystem.healFromConsume(p,reward.healing());
+        PrototypeMetabolism.feed(p,target);
+        return true;
+    }
+    /** Shares the consume settlement marker, but does not grant consume-only progression. */
+    public static boolean settleKill(ServerPlayer p,Mob target,int biomass,int ep){return settleKill(p,target,biomass,ep,true);}
+    static boolean settleKill(ServerPlayer p,Mob target,int biomass,int ep,boolean sync){
+        if(p.level().isClientSide||target.level()!=p.level()||!p.isAlive()||p.isRemoved()||p.isSpectator()
+                ||target.getHealth()>0||target.isAlive()||target.getPersistentData().getBoolean(SETTLED)
+                ||biomass<0||ep<0||biomass==0&&ep==0||!ModAttachments.available(p))return false;
+        var state=ModAttachments.getData(p,ModAttachments.PLAYER_STATE);if(!state.isInfected())return false;
+        target.getPersistentData().putBoolean(SETTLED,true);
+        state.addBiomass(biomass);state.addEvolutionPoints(ep);if(sync)ModAttachments.syncData(p,ModAttachments.PLAYER_STATE);
         return true;
     }
     public static int rank(Player player,TissueCore core){return ModAttachments.peekData(player,ModAttachments.ORGAN_RESEARCH,com.codex.blacklight.state.OrganResearch.EMPTY).rank(core);}

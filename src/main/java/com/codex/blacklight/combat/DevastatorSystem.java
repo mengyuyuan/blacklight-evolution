@@ -41,10 +41,10 @@ public final class DevastatorSystem {
         final Map<Integer,Set<UUID>> directStruck=new HashMap<>();
         final List<TargetPlan> targets=new ArrayList<>();
         Session(ServerPlayer p,WeaponMove move,WeaponMove.Input input){
-            this.move=move;this.input=input;form=com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.PLAYER_STATE).getActivePower();
+            this.move=move;this.input=input;form=com.codex.blacklight.registry.ModAttachments.getData(p,ModAttachments.PLAYER_STATE).getActivePower();
             id=p.level().getGameTime();created=phaseTick=p.tickCount;
             definition=LocalWeaponMotion.find(move.id).orElseThrow();timing=DevastatorTiming.of(move);
-            yaw=com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.MOVEMENT_STATE).cameraYaw(p.getYRot());
+            yaw=com.codex.blacklight.registry.ModAttachments.getData(p,ModAttachments.MOVEMENT_STATE).cameraYaw(p.getYRot());
             direction=Vec3.directionFromRotation(p.getXRot(),yaw).normalize();
             origin=p.position();highest=p.getY();target=CombatTargeting.locked(p);
         }
@@ -53,6 +53,8 @@ public final class DevastatorSystem {
     private DevastatorSystem() { }
     public static int kind(WeaponMove move){return move.id.contains("groundspike")?0:move.id.contains("tendril")?1:move.id.contains("critical_pain")?2:3;}
     public static boolean busy(ServerPlayer p){var s=ACTIVE.get(p);return s!=null&&!s.bodyRecovered;}
+    public static boolean active(ServerPlayer p){return ACTIVE.containsKey(p);}
+    public static int sessionAge(ServerPlayer p){var s=ACTIVE.get(p);return s==null?-1:p.tickCount-s.created;}
     /** A late absolute flight packet must not undo a real landing. This ends
      * with source body recovery; observer-only tails own no physical position. */
     public static boolean controlsLandingPosition(ServerPlayer p){
@@ -66,10 +68,16 @@ public final class DevastatorSystem {
         case PAIN->air?WeaponMove.DEV_AIR_CRITICAL_PAIN:WeaponMove.DEV_CRITICAL_PAIN;
         default->null;
     };}
+    /** At least 8 blocks of open air below the feet (unloaded/void below also counts). */
+    private static boolean highAboveGround(ServerPlayer p){
+        var from=p.position();var to=from.add(0,-8,0);
+        return p.level().clip(new net.minecraft.world.level.ClipContext(from,to,net.minecraft.world.level.ClipContext.Block.COLLIDER,
+                net.minecraft.world.level.ClipContext.Fluid.ANY,p)).getType()==net.minecraft.world.phys.HitResult.Type.MISS;
+    }
     private static boolean eligible(ServerPlayer p){
-        var state=com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.PLAYER_STATE);var movement=com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.MOVEMENT_STATE);
-        return !com.codex.blacklight.city.HydraTransport.active(p)&&p.isAlive()&&!p.isSpectator()&&!p.isPassenger()&&!p.isFallFlying()&&!p.isInWater()&&!p.isInLava()
-                &&state.isInfected()&&state.isPrototypeMode()&&!com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.CONSUMING)
+        var state=com.codex.blacklight.registry.ModAttachments.getData(p,ModAttachments.PLAYER_STATE);var movement=com.codex.blacklight.registry.ModAttachments.getData(p,ModAttachments.MOVEMENT_STATE);
+        return !com.codex.blacklight.power.ParasiteSystem.suppressed(p)&&!com.codex.blacklight.city.HydraTransport.active(p)&&p.isAlive()&&!p.isSpectator()&&!p.isPassenger()&&!p.isFallFlying()&&!p.isInWater()&&!p.isInLava()
+                &&state.isInfected()&&state.isPrototypeMode()&&!com.codex.blacklight.registry.ModAttachments.getData(p,ModAttachments.CONSUMING)
                 &&!movement.wallTraversal().attached()&&movement.chargeTicks()==0
                 &&WeaponMove.controls(state.getActivePower(),p.getMainHandItem().isEmpty()&&p.getOffhandItem().isEmpty());
     }
@@ -86,17 +94,21 @@ public final class DevastatorSystem {
             return true;
         }
         if(!eligible(p)||!keys.pressedSince(before)||!WeaponCombatSystem.canSkillInterrupt(p))return false;
-        var state=com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.PLAYER_STATE);var movement=com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.MOVEMENT_STATE);
-        boolean glide=movement.mode()==MovementState.Mode.GLIDE||com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.GLIDE_UNTIL)>p.level().getGameTime();
+        var state=com.codex.blacklight.registry.ModAttachments.getData(p,ModAttachments.PLAYER_STATE);var movement=com.codex.blacklight.registry.ModAttachments.getData(p,ModAttachments.MOVEMENT_STATE);
+        boolean glide=movement.mode()==MovementState.Mode.GLIDE||com.codex.blacklight.registry.ModAttachments.getData(p,ModAttachments.GLIDE_UNTIL)>p.level().getGameTime();
+        // Glide is not required high up: any long fall or wing flight can start a Bulletdive.
+        boolean wings=com.codex.blacklight.movement.WingFlightSystem.flying(p);
+        if(!glide&&!p.onGround()&&(wings||highAboveGround(p)))glide=true;
         if(special&&!attack&&!action&&!p.onGround()&&before.special()!=special)
             com.codex.blacklight.BlacklightNeoMod.LOGGER.debug("Air special routing for {}: glide={}, mode={}, glideUntil={}, now={}, bulletUnlocked={}, power={}",
-                    p.getGameProfile().getName(),glide,movement.mode(),com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.GLIDE_UNTIL),p.level().getGameTime(),
+                    p.getGameProfile().getName(),glide,movement.mode(),com.codex.blacklight.registry.ModAttachments.getData(p,ModAttachments.GLIDE_UNTIL),p.level().getGameTime(),
                     state.hasCombatSkill(CombatSkill.BULLETDIVE_DROP),state.getActivePower());
         WeaponMove move=null;WeaponMove.Input input=keys.intent();
         if(special&&!attack&&!action&&!p.onGround()&&glide&&state.hasCombatSkill(CombatSkill.BULLETDIVE_DROP)){
             move=WeaponMove.BULLETDIVE_DROP;input=WeaponMove.Input.SPECIAL;
         }else if(input!=null&&input.chord()&&state.hasCombatSkill(skill(input))&&CriticalMassSystem.ready(p))move=move(input,!p.onGround());
         if(move==null||LocalWeaponMotion.find(move.id).isEmpty()||LocalWeaponMotion.find(move.id).orElseThrow().charge().isEmpty())return false;
+        if(move==WeaponMove.BULLETDIVE_DROP&&wings)com.codex.blacklight.movement.WingFlightSystem.stop(p);
         WeaponCombatSystem.cancel(p);
         // cancel does not retain uncommitted ordinary input or traversal leases.
         INPUT.put(p,new Held(keys,p.tickCount));
@@ -104,22 +116,22 @@ public final class DevastatorSystem {
         com.codex.blacklight.BlacklightNeoMod.LOGGER.debug("Devastator begin {} session={} actor={} y={} onGround={}",
                 move.id,s.id,p.getGameProfile().getName(),p.getY(),p.onGround());
         movement.cancelCharge();movement.consumeDashRequest();movement.clearSprintDrive();
-        com.codex.blacklight.registry.ModAttachments.setData(p, ModAttachments.GLIDE_UNTIL,-1L);com.codex.blacklight.registry.ModAttachments.syncData(p, ModAttachments.GLIDE_UNTIL);
+        com.codex.blacklight.registry.ModAttachments.setData(p,ModAttachments.GLIDE_UNTIL,-1L);com.codex.blacklight.registry.ModAttachments.syncData(p,ModAttachments.GLIDE_UNTIL);
         play(p,s,true,0,-1);publish(p,s);return true;
     }
     private static void play(ServerPlayer p,Session s,boolean charging,float offset,float heldPose){
         long clock=p.level().getGameTime()-(charging?0:Math.round(offset*20));
-        com.codex.blacklight.registry.ModAttachments.setData(p, ModAttachments.WEAPON_VISUAL,new WeaponVisual(s.move.ordinal(),clock,s.yaw,charging,offset,s.target==null?-1:s.target.getId(),heldPose));
-        com.codex.blacklight.registry.ModAttachments.syncData(p, ModAttachments.WEAPON_VISUAL);PlayerActions.get().playWeapon(p,s.move,charging,offset);
+        com.codex.blacklight.registry.ModAttachments.setData(p,ModAttachments.WEAPON_VISUAL,new WeaponVisual(s.move.ordinal(),clock,s.yaw,charging,offset,s.target==null?-1:s.target.getId(),heldPose));
+        com.codex.blacklight.registry.ModAttachments.syncData(p,ModAttachments.WEAPON_VISUAL);PlayerActions.get().playWeapon(p,s.move,charging,offset);
         PacketDistributor.sendToPlayer(p,new WeaponAnimationPayload(s.move.ordinal(),charging,offset));
     }
     private static void publish(ServerPlayer p,Session s){
-        com.codex.blacklight.registry.ModAttachments.setData(p, ModAttachments.DEVASTATOR_VISUAL,new DevastatorVisual(kind(s.move),s.id,s.released,s.phase,s.target==null?-1:s.target.getId(),
+        com.codex.blacklight.registry.ModAttachments.setData(p,ModAttachments.DEVASTATOR_VISUAL,new DevastatorVisual(kind(s.move),s.id,s.released,s.phase,s.target==null?-1:s.target.getId(),
                 s.origin.x,s.origin.y,s.origin.z,(float)s.direction.x,(float)s.direction.y,(float)s.direction.z,s.timing.radius(),s.timing.effectStart(),s.timing.effectEnd(),
                 Math.max(0,s.highest-(s.landed?s.origin.y:p.getY())),s.peakDown,
                 s.targets.stream().map(plan->new DevastatorVisual.Contact(plan.target().getId(),(float)plan.contact())).toList(),
                 s.move==WeaponMove.BULLETDIVE_DROP&&!s.landed&&s.target!=null?s.target.position():null));
-        com.codex.blacklight.registry.ModAttachments.syncData(p, ModAttachments.DEVASTATOR_VISUAL);
+        com.codex.blacklight.registry.ModAttachments.syncData(p,ModAttachments.DEVASTATOR_VISUAL);
     }
     @SubscribeEvent public static void tick(PlayerTickEvent event){
         if (!com.codex.blacklight.registry.ModAttachments.available(event.player)) { if (event.player instanceof net.minecraft.server.level.ServerPlayer removed) cancel(removed); return; }
@@ -127,7 +139,7 @@ public final class DevastatorSystem {
         if(!(event.player instanceof ServerPlayer p))return;var s=ACTIVE.get(p);if(s==null)return;
         // A fall can legitimately take arbitrarily long. Source landing is
         // SupportingSurface-driven; only leaving the world cancels a void dive.
-        if(!eligible(p)||com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.PLAYER_STATE).getActivePower()!=s.form
+        if(!eligible(p)||com.codex.blacklight.registry.ModAttachments.getData(p,ModAttachments.PLAYER_STATE).getActivePower()!=s.form
                 ||p.getY()<p.level().getMinBuildHeight()-64){cancel(p);return;}
         if(!s.bodyRecovered)p.fallDistance=0;
         s.highest=Math.max(s.highest,p.getY());
@@ -172,6 +184,11 @@ public final class DevastatorSystem {
                         s.move.id,s.id,p.getY(),p.onGround(),Math.max(0,s.highest-s.origin.y),s.peakDown);
                 if(s.move==WeaponMove.BULLETDIVE_DROP){
                     var terrain=BulletdiveTerrain.begin(p,s.id,s.origin,Math.max(0,s.highest-s.origin.y));
+                    { // Bulletdive shockwave ring: the surface buckles outward from the crater.
+                        double fall=Math.max(0,s.highest-s.origin.y);float strength=(float)Math.max(.5,Math.min(1,.5+fall/36));
+                        float ring=(float)Math.max(7,Math.min(16,terrain.radius()+4+fall/10));
+                        com.codex.blacklight.forge.PacketDistributor.sendToPlayersTrackingEntityAndSelf(p,new com.codex.blacklight.network.CombatImpactPayload(s.origin.x,s.origin.y,s.origin.z,ring,true,false,strength,1,0));
+                    }
                     s.timing=new DevastatorTiming(s.timing.effectStart(),s.timing.effectEnd(),s.timing.damageStart(),s.timing.damageEnd(),
                             s.timing.targetStart(),s.timing.targetStop(),Math.max(6F,(float)terrain.radius()+2F),s.timing.damage(),s.timing.targets());
                 }
@@ -185,9 +202,14 @@ public final class DevastatorSystem {
                 s.peakDown=Math.max(s.peakDown,down);
                 Vec3 horizontal=Vec3.ZERO;
                 if(s.move==WeaponMove.BULLETDIVE_DROP){
-                    s.target=CombatTargeting.locked(p);
-                    var movement=com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.MOVEMENT_STATE);var input=movement.wallInput();
-                    horizontal=BulletdiveSteering.horizontal(p.position(),p.getDeltaMovement(),movement.cameraYaw(p.getYRot()),
+                    // Keep the dive target for the whole fall even if the lock UI drops it near the ground.
+                    var locked=CombatTargeting.locked(p);
+                    if(locked!=null)s.target=locked;
+                    else if(s.target!=null&&(!s.target.isAlive()||s.target.level()!=p.level()))s.target=null;
+                    var movement=com.codex.blacklight.registry.ModAttachments.getData(p,ModAttachments.MOVEMENT_STATE);var input=movement.wallInput();
+                    if(s.target!=null)horizontal=BulletdiveSteering.guided(p.position(),s.target.position(),
+                            s.target.position().subtract(s.target.xo,s.target.yo,s.target.zo),falling,movement.cameraYaw(p.getYRot()),input.forward(),input.sideways());
+                    else horizontal=BulletdiveSteering.horizontal(p.position(),p.getDeltaMovement(),movement.cameraYaw(p.getYRot()),
                             input.forward(),input.sideways(),s.target==null?null:s.target.position());
                 }
                 p.setDeltaMovement(horizontal.x,-down,horizontal.z);p.hurtMarked=true;
@@ -223,8 +245,8 @@ public final class DevastatorSystem {
             // Finished source body recovery releases movement immediately;
             // tissue and scene-distortion fade keep only their observer snapshot.
             s.bodyRecovered=true;s.phase=RECOVERY;
-            if(com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.WEAPON_VISUAL).move()==s.move.ordinal()){
-                com.codex.blacklight.registry.ModAttachments.setData(p, ModAttachments.WEAPON_VISUAL,WeaponVisual.EMPTY);com.codex.blacklight.registry.ModAttachments.syncData(p, ModAttachments.WEAPON_VISUAL);NativePlayerActionBackend.clear(p);
+            if(com.codex.blacklight.registry.ModAttachments.getData(p,ModAttachments.WEAPON_VISUAL).move()==s.move.ordinal()){
+                com.codex.blacklight.registry.ModAttachments.setData(p,ModAttachments.WEAPON_VISUAL,WeaponVisual.EMPTY);com.codex.blacklight.registry.ModAttachments.syncData(p,ModAttachments.WEAPON_VISUAL);NativePlayerActionBackend.clear(p);
             }
             publish(p,s);
         }
@@ -235,12 +257,12 @@ public final class DevastatorSystem {
         var locked=CombatTargeting.locked(p);
         s.target=locked!=null&&CombatTargeting.visibleWithinRange(p,locked,s.timing.radius())?locked:null;
         Vec3 ray=s.target!=null?(CombatTargeting.multipart(s.target)?CombatTargeting.closestPoint(p.getEyePosition(),s.target):s.target.getBoundingBox().getCenter())
-                .subtract(p.getEyePosition()).normalize():Vec3.directionFromRotation(p.getXRot(),com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.MOVEMENT_STATE).cameraYaw(p.getYRot()));
+                .subtract(p.getEyePosition()).normalize():Vec3.directionFromRotation(p.getXRot(),com.codex.blacklight.registry.ModAttachments.getData(p,ModAttachments.MOVEMENT_STATE).cameraYaw(p.getYRot()));
         if(ray.distanceToSqr(s.direction)<.000001&&p.tickCount%10!=0)return;
         s.direction=ray;s.yaw=(float)Math.toDegrees(Math.atan2(-ray.x,ray.z));
-        var v=com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.WEAPON_VISUAL);
-        com.codex.blacklight.registry.ModAttachments.setData(p, ModAttachments.WEAPON_VISUAL,new WeaponVisual(v.move(),v.started(),s.yaw,v.charging(),v.clipOffset(),s.target==null?-1:s.target.getId(),v.travelPose(),v.attackPose()));
-        com.codex.blacklight.registry.ModAttachments.syncData(p, ModAttachments.WEAPON_VISUAL);publish(p,s);
+        var v=com.codex.blacklight.registry.ModAttachments.getData(p,ModAttachments.WEAPON_VISUAL);
+        com.codex.blacklight.registry.ModAttachments.setData(p,ModAttachments.WEAPON_VISUAL,new WeaponVisual(v.move(),v.started(),s.yaw,v.charging(),v.clipOffset(),s.target==null?-1:s.target.getId(),v.travelPose(),v.attackPose()));
+        com.codex.blacklight.registry.ModAttachments.syncData(p,ModAttachments.WEAPON_VISUAL);publish(p,s);
     }
     private static void commitLandingPosition(ServerPlayer p,Session s){
         boolean support=com.codex.blacklight.movement.TerrainTraversal.supportBelow(p,.01);
@@ -253,7 +275,7 @@ public final class DevastatorSystem {
         p.setOnGround(com.codex.blacklight.movement.TerrainTraversal.supportBelow(p,.01));
         p.connection.resetPosition();
         if(p.serverLevel().players().contains(p))p.serverLevel().getChunkSource().move(p);
-        var action=com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.PLAYER_ACTION);
+        var action=com.codex.blacklight.registry.ModAttachments.getData(p,ModAttachments.PLAYER_ACTION);
         PacketDistributor.sendToPlayer(p,new com.codex.blacklight.network.NativeRootMotionPayload(
                 p.level().getGameTime(),action.revision(),p.getX(),p.getY(),p.getZ()));
     }
@@ -307,6 +329,7 @@ public final class DevastatorSystem {
                     target.setDeltaMovement(outward.scale(.6*(1-resistance)).add(0,(kind==0?.8:.15)*(1-resistance),0));target.hurtMarked=true;
                 }
                 CombatImpactEffects.target(p,target,s.move);
+                WeaponImpact.contact(p,target,ImpactTier.FINISHER,false,null);
             }
         }
     }
@@ -377,9 +400,9 @@ public final class DevastatorSystem {
     }
     public static void cancel(ServerPlayer p){
         INPUT.remove(p);var s=ACTIVE.remove(p);if(s==null || !ModAttachments.available(p))return;
-        com.codex.blacklight.registry.ModAttachments.setData(p, ModAttachments.DEVASTATOR_VISUAL,DevastatorVisual.EMPTY);com.codex.blacklight.registry.ModAttachments.syncData(p, ModAttachments.DEVASTATOR_VISUAL);
-        if(com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.WEAPON_VISUAL).move()==s.move.ordinal()){
-            com.codex.blacklight.registry.ModAttachments.setData(p, ModAttachments.WEAPON_VISUAL,WeaponVisual.EMPTY);com.codex.blacklight.registry.ModAttachments.syncData(p, ModAttachments.WEAPON_VISUAL);
+        com.codex.blacklight.registry.ModAttachments.setData(p,ModAttachments.DEVASTATOR_VISUAL,DevastatorVisual.EMPTY);com.codex.blacklight.registry.ModAttachments.syncData(p,ModAttachments.DEVASTATOR_VISUAL);
+        if(com.codex.blacklight.registry.ModAttachments.getData(p,ModAttachments.WEAPON_VISUAL).move()==s.move.ordinal()){
+            com.codex.blacklight.registry.ModAttachments.setData(p,ModAttachments.WEAPON_VISUAL,WeaponVisual.EMPTY);com.codex.blacklight.registry.ModAttachments.syncData(p,ModAttachments.WEAPON_VISUAL);
             NativePlayerActionBackend.clear(p);
         }
         if(!s.bodyRecovered)p.fallDistance=0;

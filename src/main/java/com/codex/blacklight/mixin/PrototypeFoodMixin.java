@@ -16,11 +16,11 @@ public abstract class PrototypeFoodMixin {
     private void blacklight$suspendHunger(FoodData food, Player player, Operation<Void> original) {
         // Keep the saved food state; neither starvation nor food-based healing
         // applies while biomass powers are active.
-        if (!PrototypeMetabolism.active(player)) original.call(food, player);
+        if (!PrototypeMetabolism.hungerSuspended(player)) original.call(food, player);
     }
 
     @Inject(method = "causeFoodExhaustion", at = @At("HEAD"), cancellable = true)
     private void blacklight$skipExhaustion(float exhaustion, CallbackInfo callback) {
-        if (PrototypeMetabolism.active((Player)(Object)this)) callback.cancel();
+        if (PrototypeMetabolism.hungerSuspended((Player)(Object)this)) callback.cancel();
     }
 }
