@@ -72,7 +72,8 @@
     "client.BulletFlightCullingMixin",
     "client.BlockCarryItemMixin",
     "client.VehiclePlayerPoseMixin",
-    "client.PrototypeVehiclePickMixin"
+    "client.PrototypeVehiclePickMixin",
+    "client.PrototypeBodyYawMixin"
   ],
   "injectors": {
     "defaultRequire": 1
