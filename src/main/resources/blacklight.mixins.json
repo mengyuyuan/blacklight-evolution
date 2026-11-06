@@ -48,7 +48,8 @@
     "WingFlightFloatingMixin",
     "HydraServerMovementMixin",
     "NativeTissueAirMixin",
-    "NativeTissueFeedingMixin"
+    "NativeTissueFeedingMixin",
+    "OptionalEpicFightModeMixin"
   ],
   "client": [
     "client.VehiclePlayerPoseMixin",
@@ -78,7 +79,8 @@
     "client.ModelPartChildrenAccessor",
     "client.DragonConsumePoseMixin",
     "client.VictimModelRootMixin",
-    "client.BlockCarryItemMixin"
+    "client.BlockCarryItemMixin",
+    "client.PrototypeBodyYawMixin"
   ],
   "injectors": {
     "defaultRequire": 1

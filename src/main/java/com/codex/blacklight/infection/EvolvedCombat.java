@@ -110,8 +110,11 @@ public final class EvolvedCombat {
         // Goals tick every other tick, so the host can travel two strides between
         // checks. Also require footing (at most one block down) under the leading
         // edge two strides ahead; not the flanks, which may overhang a walkway.
-        if(host.onGround()&&projected.lengthSqr()>.0001&&(!supported(projected,stepDown)
-                ||!supported(projected.add(projected.normalize().scale(host.getBbWidth()*.5+2*host.getDeltaMovement().horizontalDistance())),true))){
+        var motion=host.getDeltaMovement().multiply(1,0,1);double lead=host.getBbWidth()*.5+2*motion.horizontalDistance();
+        if(host.onGround()&&projected.lengthSqr()>.0001&&(!supported(projected,stepDown)||unsafeDrop(path)
+                ||!supported(projected.add(projected.normalize().scale(lead)),true)
+                // A zigzag wide-mob path can point the probe sideways; also check the real stride.
+                ||motion.lengthSqr()>.0025&&!supported(motion.normalize().scale(.4+lead),true))){
             host.getNavigation().stop();host.getMoveControl().setWantedPosition(host.getX(),host.getY(),host.getZ(),0);
             host.setXxa(0);host.setZza(0);host.setDeltaMovement(0,host.getDeltaMovement().y,0);pathCooldown=0;return;
         }
@@ -135,6 +138,13 @@ public final class EvolvedCombat {
             if(d.lengthSqr()>.36)return d;
         }
         return toward(target);
+    }
+    /** Some pathfinders route a chase down a cliff; never follow a drop deeper than one block. */
+    private boolean unsafeDrop(net.minecraft.world.level.pathfinder.Path path){
+        if(path==null||path.isDone())return false;
+        for(int i=path.getNextNodeIndex(),end=Math.min(path.getNodeCount(),i+4);i<end;i++)
+            if(path.getNode(i).y<host.getY()-1.25)return true;
+        return false;
     }
     private boolean supported(Vec3 step){
         return supported(step,false);

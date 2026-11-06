@@ -52,7 +52,14 @@ public final class DisguiseRenderer {
                 ?com.codex.blacklight.client.PrototypeAnimationController.movementFacing(cp,0):null;
         Float facing=p instanceof net.minecraft.client.player.AbstractClientPlayer cp
                 ?com.codex.blacklight.client.PrototypeAnimationController.movementFacing(cp,1):null;
-        mob.yBodyRot=facing==null?p.yBodyRot:facing;mob.yBodyRotO=previousFacing==null?p.yBodyRotO:previousFacing;
+        // The local disguise must follow the player's view, not the free-locomotion travel yaw.
+        // Remote players keep the replicated movement-facing interpolation.
+        if(p==Minecraft.getInstance().player&&DisguiseSystem.active(p)) {
+            mob.yBodyRot=p.getYRot();mob.yBodyRotO=p.yRotO;
+        } else {
+            mob.yBodyRot=facing==null?p.yBodyRot:facing;
+            mob.yBodyRotO=previousFacing==null?p.yBodyRotO:previousFacing;
+        }
         mob.yHeadRot=p.yHeadRot;mob.yHeadRotO=p.yHeadRotO;
         mob.setOnGround(p.onGround());mob.setDeltaMovement(p.getDeltaMovement());
         mob.hurtTime=p.hurtTime;mob.hurtDuration=p.hurtDuration;mob.deathTime=0;

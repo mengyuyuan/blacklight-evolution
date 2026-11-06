@@ -668,7 +668,11 @@ tasks.register('verifyStandaloneBoundary') {
         sourceSets.main.output.classesDirs.files.each { root ->
             fileTree(root).matching { include '**/*.class' }.each { compiled ->
                 def constants = new String(compiled.bytes, java.nio.charset.StandardCharsets.ISO_8859_1)
-                if (constants.contains('yesman/epicfight') || constants.contains('reascer/wom'))
+                // OptionalEpicFightModeMixin stores an @At method descriptor as a
+                // symbolic Mixin selector string, not a JVM class/type linkage.
+                def optionalEpicFightSelector = compiled.name == 'OptionalEpicFightModeMixin.class'
+                if ((constants.contains('yesman/epicfight') && !optionalEpicFightSelector)
+                        || constants.contains('reascer/wom'))
                     linked.add(root.toPath().relativize(compiled.toPath()).toString())
             }
         }
