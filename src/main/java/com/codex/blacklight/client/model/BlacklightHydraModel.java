@@ -6,8 +6,8 @@ import software.bernie.geckolib.animation.AnimationState;
 
 public final class BlacklightHydraModel extends GeoModel<BlacklightHydra> {
     private static ResourceLocation id(String p){return ResourceLocation.fromNamespaceAndPath("blacklight",p);}
-    @Override public ResourceLocation getModelResource(BlacklightHydra e){return id("geo/blacklight_hydra.geo.json");}
-    @Override public ResourceLocation getTextureResource(BlacklightHydra e){return id("textures/entity/hydra_authored.png");}
+    @Override public ResourceLocation getModelResource(BlacklightHydra e){return id("geo/blacklight_hydra_mc.geo.json");}
+    @Override public ResourceLocation getTextureResource(BlacklightHydra e){return id("textures/entity/hydra_mc.png");}
     @Override public ResourceLocation getAnimationResource(BlacklightHydra e){return id("animations/blacklight_hydra.animation.json");}
     @Override public void setCustomAnimations(BlacklightHydra e,long id,AnimationState<BlacklightHydra> s){
         super.setCustomAnimations(e,id,s);

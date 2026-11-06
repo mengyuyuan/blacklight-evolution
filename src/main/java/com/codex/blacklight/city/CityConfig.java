@@ -5,7 +5,7 @@ public final class CityConfig {
     public static final ModConfigSpec.BooleanValue SPAWNS,SPREAD,DESTRUCTION,WARMUP;
     public static final ModConfigSpec.IntValue MOB_LIMIT,MILITARY_GARRISON_LIMIT,SPREAD_SECONDS,TILE_CACHE,PREGEN_INTERVAL,TRAVEL_TIMEOUT;
     public static final ModConfigSpec.IntValue POPULATION_INTERVAL,HIVE_BROOD_INTERVAL;
-    public static final ModConfigSpec.DoubleValue HYDRA_CHANCE;
+    public static final ModConfigSpec.DoubleValue HYDRA_CHANCE,WILD_HYDRA_CHANCE;
     static {var b=new ModConfigSpec.Builder();
         SPAWNS=b.comment("City residents, infected and military population. Server authoritative.").define("population",true);
         SPREAD=b.comment("Slow spread across generated city blocks only; sanctuary remains intact.").define("infectionSpread",true);
@@ -19,7 +19,8 @@ public final class CityConfig {
         TRAVEL_TIMEOUT=b.comment("Maximum active waiting time for asynchronous city arrival, in seconds. Large cold municipal scenes need more than 30 seconds on slower storage. Movement or logout still cancels travel.").defineInRange("travelTimeoutSeconds",120,30,600);
         POPULATION_INTERVAL=b.comment("城市居民和环境人口尝试间隔；按20刻向上取整，以匹配人口更新节拍。").defineInRange("populationIntervalTicks",100,20,240000);
         HIVE_BROOD_INTERVAL=b.comment("已有城市母巢的繁殖等待刻数；需实际供能、区域阶段和人口预算。普通建筑菌落使用gameplay配置中的broodIntervalTicks。").defineInRange("hiveBroodIntervalTicks",200,20,240000);
-        HYDRA_CHANCE=b.comment("城市母巢抽到古老谱系、已有猎手且阶段允许时，改生九头蛇的概率。").defineInRange("hiveHydraChance",1D/12,0,1);
+        HYDRA_CHANCE=b.comment("旧选项：母巢改生九头蛇的概率。原版九头蛇是从地下钻出的独立感染体，不由母巢孵化，默认0。").defineInRange("hiveHydraChance",0D,0,1);
+        WILD_HYDRA_CHANCE=b.comment("每次感染刷怪批次（默认40刻）的九头蛇出现概率。只在后期（感染阶段≥3）的红区生效，主世界和城市维度都会刷，从玩家20–40格外的地下钻出。附近96格已有九头蛇时不生成。").defineInRange("wildHydraChance",.02D,0,1);
         SPEC=b.build();
     }
     public static int populationIntervalTicks(){return ((POPULATION_INTERVAL.get()+19)/20)*20;}

@@ -21,7 +21,7 @@ public final class CityTravel {
         ResourceLocation.fromNamespaceAndPath("blacklight", "city"));
     public static final ResourceKey<Level> WORLD = ResourceKey.create(Registries.DIMENSION,
         ResourceLocation.fromNamespaceAndPath("blacklight", "world"));
-    public static boolean isCity(ResourceKey<Level> key) { return key.equals(CITY)||key.equals(WORLD); }
+    public static boolean isCity(ResourceKey<Level> key) { return CITY.equals(key)||WORLD.equals(key); }
     static ServerLevel commandLevel(net.minecraft.commands.CommandSourceStack source) {
         return isCity(source.getLevel().dimension())?source.getLevel():source.getServer().getLevel(WORLD);
     }
@@ -119,7 +119,7 @@ public final class CityTravel {
         return travel(player,WORLD,new BlockPos(x,WorldAtlas.ground(x,z)+1,z),"city.blacklight.los_angeles_welcome");
     }
     private static int travel(ServerPlayer player,ResourceKey<Level> destination,BlockPos requestedOrigin,String welcome) {
-        if (HydraTransport.active(player)||player.isPassenger()||player.isSleeping()||!player.isAlive()
+        if (!live(player)||destination==null||HydraTransport.active(player)||player.isPassenger()||player.isSleeping()||!player.isAlive()
                 ||com.codex.blacklight.power.BiomassSystem.active(player)
                 ||player.getCooldowns().isOnCooldown(CityBlocks.TRANSIT.get())) return 0;
         if(PENDING.containsKey(player))return 0;
@@ -151,9 +151,13 @@ public final class CityTravel {
         var pending=PENDING.get(player);
         return pending==null?"idle":pending.target.dimension().location()+" "+pending.origin+" "+pending.ticket.diagnostics();
     }
+    private static boolean live(ServerPlayer p){
+        return com.codex.blacklight.registry.ModAttachments.available(p)&&p.isAlive()&&p.getServer()!=null
+                &&!p.getServer().isStopped()&&p.getServer().isSameThread();
+    }
     private static void tickTravel(ServerPlayer p){
         var pending=PENDING.get(p);if(pending==null)return;
-        if(!p.isAlive()||p.isRemoved()||p.serverLevel()!=pending.source||p.position().distanceToSqr(pending.start)>64
+        if(!live(p)||p.server.getLevel(pending.target.dimension())!=pending.target||p.serverLevel()!=pending.source||p.position().distanceToSqr(pending.start)>64
                 ||p.isPassenger()||p.isSleeping()||HydraTransport.active(p)||com.codex.blacklight.power.BiomassSystem.active(p)){
             cancelTravel(p);return;
         }
@@ -172,7 +176,7 @@ public final class CityTravel {
         back.putFloat("yaw",p.getYRot());back.putFloat("pitch",p.getXRot());
         try{
             p.teleportTo(pending.target,safe.getX()+.5,safe.getY(),safe.getZ()+.5,pending.yaw,pending.pitch);
-            if(p.serverLevel()!=pending.target)return; // Another mod may veto dimension travel.
+            if(!live(p)||p.serverLevel()!=pending.target)return; // Hooks may cancel, redirect or invalidate the player.
             if(pending.returning)p.getPersistentData().remove(RETURN);
             else if(!isCity(pending.source.dimension()))p.getPersistentData().put(RETURN,back);
             p.fallDistance=0;p.setDeltaMovement(0,0,0);p.getCooldowns().addCooldown(CityBlocks.TRANSIT.get(),40);
@@ -198,7 +202,9 @@ public final class CityTravel {
     }
     /** Only the server's clamping hydra can choose the endpoint; no client coordinates. */
     public static boolean transferFromHydra(ServerPlayer player,com.codex.blacklight.entity.BlacklightHydra sourceHydra,BlockPos returnPos,float bodySize) {
-        if(!player.isAlive()||player.isPassenger()||HydraTransport.active(player))return false;
+        if(!live(player)||returnPos==null||!Float.isFinite(bodySize)||bodySize<=0||player.isPassenger()||HydraTransport.active(player))return false;
+        if(sourceHydra!=null&&(sourceHydra.isRemoved()||!sourceHydra.isAlive()||sourceHydra.level()!=player.level()))return false;
+        var source=player.serverLevel();var sourcePosition=player.position();float sourceYaw=player.getYRot(),sourcePitch=player.getXRot();
         var link=sourceHydra==null?null:sourceHydra.link();
         if(link==null&&isCity(player.serverLevel().dimension()))return false;
         var target=player.server.getLevel(link==null?WORLD:link.dimension());if(target==null)return false;
@@ -215,38 +221,50 @@ public final class CityTravel {
             if(!(entity instanceof com.codex.blacklight.entity.BlacklightHydra h)||!h.availableForArrival(player))return false;
             carrier=h;
         }
-        boolean created=carrier==null;
-        if(created){
-            carrier=com.codex.blacklight.registry.ModEntities.BLACKLIGHT_HYDRA.get().create(target);
-            if(carrier==null)return false;
-            carrier.setBodySize(bodySize);
-            carrier.moveTo(safe.getX()+.5,safe.getY(),safe.getZ()+.5,180,0);carrier.yBodyRot=180;carrier.yHeadRot=180;
-            if(!target.addFreshEntity(carrier))return false;
+        boolean created=carrier==null,committed=false,moved=false;
+        try{
+            if(created){
+                carrier=com.codex.blacklight.registry.ModEntities.BLACKLIGHT_HYDRA.get().create(target);
+                if(carrier==null)return false;
+                carrier.setBodySize(bodySize);
+                carrier.moveTo(safe.getX()+.5,safe.getY(),safe.getZ()+.5,180,0);carrier.yBodyRot=180;carrier.yHeadRot=180;
+                if(!target.addFreshEntity(carrier))return false;
+            }
+            // Entity-join and dimension hooks are foreign code. Revalidate after
+            // each publication boundary before touching player attachments again.
+            if(!live(player)||player.serverLevel()!=source||carrier.isRemoved()||!carrier.isAlive())return false;
+            if(sourceHydra!=null&&(sourceHydra.isRemoved()||!sourceHydra.isAlive()))return false;
+            if(sourceHydra!=null&&created)carrier.connect(player.getUUID(),new HydraLink(source.dimension(),sourceHydra.blockPosition(),sourceHydra.getUUID()));
+            player.teleportTo(target,safe.getX()+.5,safe.getY(),safe.getZ()+.5,carrier.getYRot(),0);
+            moved=player.serverLevel()==target;
+            if(!moved||!live(player)||carrier.isRemoved()||!carrier.isAlive()||!carrier.beginArrival(player))return false;
+            if(!live(player)||player.serverLevel()!=target||HydraTransport.carrier(player)!=carrier)return false;
+            // Return coordinates are committed only after a real arrival owns the grip.
+            if(!isCity(source.dimension())){
+                CompoundTag tag=new CompoundTag();tag.putString("dimension",source.dimension().location().toString());
+                tag.putDouble("x",returnPos.getX()+.5);tag.putDouble("y",returnPos.getY());tag.putDouble("z",returnPos.getZ()+.5);
+                tag.putFloat("yaw",sourceYaw);tag.putFloat("pitch",0);player.getPersistentData().put(RETURN,tag);
+            }
+            if(sourceHydra!=null&&!sourceHydra.isRemoved())sourceHydra.connect(player.getUUID(),new HydraLink(target.dimension(),carrier.blockPosition(),carrier.getUUID()));
+            player.fallDistance=0;player.setDeltaMovement(0,0,0);player.getCooldowns().addCooldown(CityBlocks.TRANSIT.get(),100);
+            player.displayClientMessage(Component.translatable("hydra.blacklight.arrived"),false);
+            committed=true;return true;
+        }finally{
+            if(!committed){
+                if(carrier!=null&&!carrier.isRemoved()){
+                    carrier.abortTransport(player);
+                    if(created)carrier.discard();
+                }
+                // Respect a foreign redirect/removal. Only undo our own expected handoff.
+                if(moved&&live(player)&&player.serverLevel()==target&&player.server.getLevel(source.dimension())==source)
+                    player.teleportTo(source,sourcePosition.x,sourcePosition.y,sourcePosition.z,sourceYaw,sourcePitch);
+            }
         }
-        var source=player.serverLevel();var sourcePosition=player.position();float sourceYaw=player.getYRot(),sourcePitch=player.getXRot();
-        var previousReturn=player.getPersistentData().getCompound(RETURN).copy();
-        if(sourceHydra!=null&&created)carrier.connect(player.getUUID(),new HydraLink(source.dimension(),sourceHydra.blockPosition(),sourceHydra.getUUID()));
-        if(!isCity(source.dimension())){
-            CompoundTag tag=new CompoundTag();tag.putString("dimension",source.dimension().location().toString());
-            tag.putDouble("x",returnPos.getX()+.5);tag.putDouble("y",returnPos.getY());tag.putDouble("z",returnPos.getZ()+.5);
-            tag.putFloat("yaw",sourceYaw);tag.putFloat("pitch",0);player.getPersistentData().put(RETURN,tag);
-        }
-        player.teleportTo(target,safe.getX()+.5,safe.getY(),safe.getZ()+.5,carrier.getYRot(),0);
-        player.fallDistance=0;player.setDeltaMovement(0,0,0);
-        if(!carrier.beginArrival(player)){
-            if(created)carrier.discard();
-            player.teleportTo(source,sourcePosition.x,sourcePosition.y,sourcePosition.z,sourceYaw,sourcePitch);
-            if(previousReturn.isEmpty())player.getPersistentData().remove(RETURN);else player.getPersistentData().put(RETURN,previousReturn);
-            return false;
-        }
-        if(sourceHydra!=null)sourceHydra.connect(player.getUUID(),new HydraLink(target.dimension(),carrier.blockPosition(),carrier.getUUID()));
-        player.getCooldowns().addCooldown(CityBlocks.TRANSIT.get(),100);
-        player.displayClientMessage(Component.translatable("hydra.blacklight.arrived"),false);
-        return true;
     }
 
     /** Keep new permanent gateways separate inside the already prepared 3x3 chunks. */
     public static BlockPos arrivalPosition(ServerLevel level,BlockPos origin,float size){
+        if(level==null||origin==null||!Float.isFinite(size))return null;
         double width=1.8*Math.max(1.6,Math.min(2.4,size));
         for(int radius=0;radius<=20;radius+=4)for(int dx=-radius;dx<=radius;dx+=4)for(int dz=-radius;dz<=radius;dz+=4){
             if(Math.max(Math.abs(dx),Math.abs(dz))!=radius)continue;
@@ -267,6 +285,7 @@ public final class CityTravel {
     }
 
     public static BlockPos safePosition(ServerLevel level,BlockPos origin) {
+        if(level==null||origin==null||level.getServer().isStopped())return null;
         // Check the saved floor first; if it changed, find nearby ground without destroying blocks.
         for(int radius=0;radius<=8;radius++) for(int dx=-radius;dx<=radius;dx++) for(int dz=-radius;dz<=radius;dz++) {
             if(Math.max(Math.abs(dx),Math.abs(dz))!=radius)continue;
@@ -300,7 +319,7 @@ public final class CityTravel {
     }
     @SubscribeEvent(priority=net.neoforged.bus.api.EventPriority.LOWEST) public static void transitLanding(net.neoforged.neoforge.event.tick.PlayerTickEvent.Post event){
         var player=event.getEntity();
-        if(!player.isAlive()||player.isRemoved()){
+        if(!com.codex.blacklight.registry.ModAttachments.available(player)||!player.isAlive()){
             if(player instanceof ServerPlayer p)cancelTravel(p);
             return;
         }

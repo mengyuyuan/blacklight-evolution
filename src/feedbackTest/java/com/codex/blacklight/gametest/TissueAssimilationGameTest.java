@@ -121,11 +121,25 @@ public final class TissueAssimilationGameTest {
             state.setPrototypeMode(false);AssimilationSystem.updateCrest(p);h.assertTrue(p.getAttributeValue(Attributes.KNOCKBACK_RESISTANCE)==0,"ordinary mode disables the combat effect");
         }finally{cleanup(p);}h.succeed();
     }
-    @GameTest(template="wall_test",timeoutTicks=40,batch="tissue_assimilation")
+    @GameTest(template="wall_test",timeoutTicks=160,batch="tissue_assimilation")
     public static void humanConsumeFinishesWithThePrimaryOrganAndNoDuplicateRewards(GameTestHelper h){
-        var p=player(h);var host=host(p,72000,TissueCore.JAW);
-        try{
+        var p=player(h);var host=host(p,72000,TissueCore.JAW);var level=h.getLevel();
+        var ticketType=net.minecraft.server.level.TicketType.create("blacklight_assimilation_qa",Integer::compareTo);
+        var chunk=new net.minecraft.world.level.ChunkPos(host.blockPosition());int ticket=host.getId();
+        level.getChunkSource().addRegionTicket(ticketType,chunk,3,ticket);level.getChunk(chunk.x,chunk.z);
+        var closed=new java.util.concurrent.atomic.AtomicBoolean();
+        Runnable close=()->{if(closed.getAndSet(true))return;host.discard();cleanup(p);level.getChunkSource().removeRegionTicket(ticketType,chunk,3,ticket);};
+        h.runAfterDelay(150,close);
+        h.startSequence().thenWaitUntil(()->{
+            java.util.concurrent.locks.LockSupport.parkNanos(10_000_000L);
+            h.assertTrue(level.isPositionEntityTicking(host.blockPosition())&&level.getEntity(host.getId())==host
+                    &&level.getEntitiesOfClass(LivingEntity.class,host.getBoundingBox().inflate(.2)).contains(host),"actual consumption body is registered in the loaded spatial index before aiming");
+        }).thenExecute(()->{
+            try{
             host.setHealth(host.getMaxHealth()*.1F);var quoted=AssimilationSystem.quote(p,host);int before=p.getData(ModAttachments.PLAYER_STATE).getEvolutionPoints();
+            // Aim at the actual evolved receiver, including Forge's scaled eye height.
+            var aim=host.getBoundingBox().getCenter().subtract(p.getEyePosition());
+            p.setXRot((float)-Math.toDegrees(Math.atan2(aim.y,aim.horizontalDistance())));
             ConsumeSystem.request(p);
             h.assertTrue(p.getData(ModAttachments.CONSUMING),"actual human capture starts on the weakened evolved receiver");
             for(int i=0;i<80;i++){p.tickCount++;ConsumeSystem.tick(new PlayerTickEvent.Post(p));}
@@ -135,7 +149,9 @@ public final class TissueAssimilationGameTest {
             int paid=p.getData(ModAttachments.PLAYER_STATE).getEvolutionPoints();
             h.assertTrue(paid==before+quoted.ep()+40,"human path settles exactly its quoted reward plus discovery");
             ConsumeSystem.consume(p);ConsumeSystem.tick(new PlayerTickEvent.Post(p));h.assertTrue(p.getData(ModAttachments.PLAYER_STATE).getEvolutionPoints()==paid,"confirmation spam cannot repeat the reward");
-        }finally{host.discard();cleanup(p);}h.succeed();
+
+            }finally{close.run();}h.succeed();
+        });
     }
     @GameTest(template="wall_test",timeoutTicks=40,batch="tissue_assimilation")
     public static void slimeAbsorptionActuallyExecutesAndSharesPrimaryOrganRewards(GameTestHelper h){

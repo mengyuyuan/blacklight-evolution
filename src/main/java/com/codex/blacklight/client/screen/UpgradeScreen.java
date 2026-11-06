@@ -56,7 +56,7 @@ public final class UpgradeScreen extends Screen {
             case BIOLOGY -> {for(var u:CombatSkill.values())if(u.adaptivePassive())entries.add(new Entry(u.id(),u.epCost(),u.requires()==null?null:u.requires().id(),false));for(var u:GrowthUpgrade.values())entries.add(new Entry(u.id,u.cost,u.requires()==null?null:u.requires().id,false));}
             case ORGANS -> {for(var core:com.codex.blacklight.infection.TissueCore.values())if(core.legacy())entries.add(new Entry(core.id,0,null,false));}
             case EVOLUTION -> {for(var a:EvolutionAttribute.values())entries.add(new Entry(a.id,0,null,false));}
-            case SETTINGS -> {for(String id:List.of("bulletdive_blocks","shield_borer_blocks","prototype_item_pickup","passive_stacks","infection_zones","health_hud","wing_speed","wing_appearance"))entries.add(new Entry(id,0,null,true));}
+            case SETTINGS -> {for(String id:List.of("bulletdive_blocks","shield_borer_blocks","prototype_item_pickup","passive_stacks","infection_zones","health_hud","wing_speed","wing_appearance","cinematic_combat","cinematic_strength"))entries.add(new Entry(id,0,null,true));}
             default -> {}
         }
         if(entries.stream().noneMatch(e->e.id.equals(selected)))select(entries.isEmpty()?"":entries.get(0).id);
@@ -88,6 +88,8 @@ public final class UpgradeScreen extends Screen {
             }
             if(e.id.equals("health_hud")||e.id.equals("wing_speed")){minecraft.setScreen(new PresentationSettingsScreen(this,e.id.equals("health_hud")));return;}
             if (e.id.equals("passive_stacks")) { com.codex.blacklight.config.PassiveHudConfig.toggle(); refreshButton(); return; }
+            if(e.id.equals("cinematic_combat")){var option=com.codex.blacklight.config.PassiveHudConfig.CINEMATIC_COMBAT;option.set(!option.get());com.codex.blacklight.config.PassiveHudConfig.SPEC.save();refreshButton();return;}
+            if(e.id.equals("cinematic_strength")){com.codex.blacklight.config.PassiveHudConfig.cycleCinematicStrength();refreshButton();return;}
             if(e.id.equals("infection_zones")){var option=com.codex.blacklight.config.PassiveHudConfig.SHOW_ZONE;option.set(!option.get());com.codex.blacklight.config.PassiveHudConfig.SPEC.save();refreshButton();return;}
             var setting=switch(e.id){
                 case "shield_borer_blocks" -> SkillSettingsPayload.Setting.SHIELD_BORER_BLOCKS;
@@ -103,6 +105,8 @@ public final class UpgradeScreen extends Screen {
         if(id.equals("health_hud")||id.equals("wing_speed"))return true;
         if (id.equals("passive_stacks")) return com.codex.blacklight.config.PassiveHudConfig.SHOW_STACKS.get();
         if(id.equals("infection_zones"))return com.codex.blacklight.config.PassiveHudConfig.SHOW_ZONE.get();
+        if(id.equals("cinematic_combat"))return com.codex.blacklight.config.PassiveHudConfig.CINEMATIC_COMBAT.get();
+        if(id.equals("cinematic_strength"))return true;
         if(minecraft.player==null)return false;
         var settings=minecraft.player.getData(ModAttachments.SKILL_SETTINGS);
         return switch(id){
@@ -129,6 +133,9 @@ public final class UpgradeScreen extends Screen {
             boolean on=settingEnabled(e.id);
             if(e.id.equals("wing_appearance")){
                 purchase.setMessage(Component.translatable(on?"setting.blacklight.wing_appearance.precision":"setting.blacklight.wing_appearance.classic"));purchase.active=minecraft.player!=null;return;
+            }
+            if(e.id.equals("cinematic_strength")){
+                purchase.setMessage(Component.translatable("setting.blacklight.cinematic_strength.value",Math.round(com.codex.blacklight.config.PassiveHudConfig.CINEMATIC_STRENGTH.get()*100)));purchase.active=true;return;
             }
             purchase.setMessage(Component.translatable(e.id.equals("health_hud")||e.id.equals("wing_speed")?"screen.blacklight.configure_setting":on?"screen.blacklight.setting_on":"screen.blacklight.setting_off"));purchase.active=minecraft.player!=null;return;
         }

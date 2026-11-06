@@ -11,6 +11,9 @@ import subprocess
 import tomllib
 import tempfile
 from pathlib import Path
+import sys
+sys.path.insert(0, str(Path(__file__).resolve().parent))  # sibling helper when loaded by path (tests, CI)
+from release_classes import production_classes as select_source_classes, verify_internal_closure
 from zipfile import ZIP_DEFLATED, ZipFile, ZipInfo
 
 
@@ -442,8 +445,12 @@ def main() -> None:
         production = java_class_names(repo / 'src/main/java')
         production = {name for name in production if not forbidden_runtime(name + '.class', qa_names)
                       and name.rsplit('/', 1)[-1] not in ('package-info', 'module-info')}
-        classes = [path for path in class_root.rglob('*.class')
-                   if path.relative_to(class_root).as_posix()[:-6].split('$', 1)[0] in production]
+        compiled_entries = {path.relative_to(class_root).as_posix(): path.read_bytes()
+                            for path in class_root.rglob('*.class')}
+        selected = select_source_classes(compiled_entries, repo / 'src/main/java')
+        classes = [class_root / name for name in selected
+                   if not forbidden_runtime(name, qa_names)]
+        verify_internal_closure({name: archive.read(name) for name in names if name.endswith('.class')})
         require(bool(classes), 'No compiled classes to verify')
         compiled_roots = {path.relative_to(class_root).as_posix()[:-6].split('$', 1)[0] for path in classes}
         require(production <= compiled_roots, f'Production sources were not compiled: {sorted(production - compiled_roots)}')

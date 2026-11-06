@@ -13,7 +13,7 @@ public abstract class LocalPlayerMixin {
     @Inject(method = "hasEnoughFoodToStartSprinting", at = @At("HEAD"), cancellable = true)
     private void blacklight$ignoreSprintHunger(CallbackInfoReturnable<Boolean> callback) {
         // Vanilla uses this for both entering sprint and cancelling an existing sprint.
-        if (com.codex.blacklight.power.PrototypeMetabolism.active((LocalPlayer)(Object)this)) {
+        if (com.codex.blacklight.power.PrototypeMetabolism.hungerSuspended((LocalPlayer)(Object)this)) {
             callback.setReturnValue(true);
         }
     }

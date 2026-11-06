@@ -64,11 +64,19 @@ public final class ModAttachments {
                     .serialize(com.mojang.serialization.Codec.LONG)
                     .sync(net.minecraft.network.codec.ByteBufCodecs.VAR_LONG).build());
 
+    /** Chunk: already rolled for a post-outbreak Lair. */
+    public static final Supplier<AttachmentType<Boolean>> LAIR_ROLLED=ATTACHMENTS.register("lair_rolled",()->AttachmentType.builder(()->false).serialize(com.mojang.serialization.Codec.BOOL).build());
+    public static final Supplier<AttachmentType<Long>> NATIVE_INFECTION_AGE=ATTACHMENTS.register("native_infection_age",()->AttachmentType.builder(()->0L).serialize(com.mojang.serialization.Codec.LONG).sync(net.minecraft.network.codec.ByteBufCodecs.VAR_LONG).build());
+    /** Transient bounded presentation values; canonical native tissue stays in its owned persistent compound. */
+    public static final Supplier<AttachmentType<net.minecraft.nbt.CompoundTag>> NATIVE_TISSUE=ATTACHMENTS.register("native_tissue",()->AttachmentType.builder(()->new net.minecraft.nbt.CompoundTag()).sync(com.codex.blacklight.infection.NativeTissueCodec.STREAM_CODEC).build());
+
     /** Transient action lock; never carried through logout/death or persisted. */
     public static final Supplier<AttachmentType<Boolean>> CONSUMING = ATTACHMENTS.register(
             "consuming", () -> AttachmentType.builder(() -> false)
                     .sync(net.minecraft.network.codec.ByteBufCodecs.BOOL).build());
 
+    /** Game time the held-body throw wind-up started, -1 when not charging. Transient. */
+    public static final Supplier<AttachmentType<Long>> GRAB_THROW_CHARGE=ATTACHMENTS.register("grab_throw_charge",()->AttachmentType.builder(()->-1L).sync(net.minecraft.network.codec.ByteBufCodecs.VAR_LONG).build());
     public static final Supplier<AttachmentType<Integer>> GRAB_STAGE = ATTACHMENTS.register(
             "grab_stage", () -> AttachmentType.builder(() -> 0)
                     .sync(net.minecraft.network.codec.ByteBufCodecs.VAR_INT).build());
@@ -103,8 +111,14 @@ public final class ModAttachments {
     }
     public static final Supplier<AttachmentType<Integer>> JUMP_CHARGE=ATTACHMENTS.register("jump_charge",
             ()->AttachmentType.builder(()->0).sync(net.minecraft.network.codec.ByteBufCodecs.VAR_INT).build());
+    /** Visual limb loss on a heavy killing blow (HeavyBlow.DISMEMBER_*). Transient, never saved. */
+    /** Mirror of the blacklightPrototypeHunger game rule for the HUD and sprint gate. Not saved. */
+    public static final Supplier<AttachmentType<Boolean>> PROTOTYPE_HUNGER=ATTACHMENTS.register("prototype_hunger",()->AttachmentType.builder(()->false).sync(net.minecraft.network.codec.ByteBufCodecs.BOOL).build());
+    public static final Supplier<AttachmentType<Integer>> DISMEMBER=ATTACHMENTS.register("dismember",()->AttachmentType.builder(()->0).sync(net.minecraft.network.codec.ByteBufCodecs.VAR_INT).build());
     public static final Supplier<AttachmentType<com.codex.blacklight.combat.HitReaction>> HIT_REACTION=ATTACHMENTS.register("hit_reaction",
             ()->AttachmentType.builder(()->com.codex.blacklight.combat.HitReaction.EMPTY).sync(com.codex.blacklight.combat.HitReaction.CODEC).build());
+    /** ParasiteSystem bits: 1 suppressed, 2 apex. Survives death and is synced for the HUD. */
+    public static final Supplier<AttachmentType<Integer>> PARASITE=ATTACHMENTS.register("parasite",()->AttachmentType.builder(()->0).serialize(com.mojang.serialization.Codec.INT).copyOnDeath().sync(net.minecraft.network.codec.ByteBufCodecs.VAR_INT).build());
     public static final Supplier<AttachmentType<Integer>> UTILITY_POWERS=ATTACHMENTS.register("utility_powers",()->AttachmentType.builder(()->0).sync(net.minecraft.network.codec.ByteBufCodecs.VAR_INT).build());
     public static final Supplier<AttachmentType<com.codex.blacklight.power.PowerMorph>> POWER_MORPH=ATTACHMENTS.register("power_morph",()->AttachmentType.builder(()->com.codex.blacklight.power.PowerMorph.NONE).sync(com.codex.blacklight.power.PowerMorph.CODEC).build());
 
@@ -146,8 +160,10 @@ public final class ModAttachments {
     /** Observe transient state without allocating or syncing attachments on unrelated entities. */
     public static <T> T peekData(net.minecraft.world.entity.Entity entity,
                                  Supplier<AttachmentType<T>> key, T fallback) {
-        return !entity.isRemoved() && entity.hasData(key) ? entity.getData(key) : fallback;
+        return entity!=null && !entity.isRemoved() && entity.hasData(key) ? entity.getData(key) : fallback;
     }
+
+    public static boolean available(net.minecraft.world.entity.Entity entity){return entity!=null&&!entity.isRemoved();}
 
     public static void register(IEventBus bus) {
         ATTACHMENTS.register(bus);

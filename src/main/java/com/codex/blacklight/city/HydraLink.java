@@ -15,6 +15,7 @@ public record HydraLink(ResourceKey<Level> dimension, BlockPos position, UUID en
         tag.putLong("Position",position.asLong());tag.putUUID("Endpoint",endpoint);return tag;
     }
     public static HydraLink load(CompoundTag tag) {
+        if(tag==null)return null;
         var id=ResourceLocation.tryParse(tag.getString("Dimension"));
         if(id==null||!tag.contains("Position")||!tag.hasUUID("Endpoint"))return null;
         return new HydraLink(ResourceKey.create(Registries.DIMENSION,id),BlockPos.of(tag.getLong("Position")),tag.getUUID("Endpoint"));

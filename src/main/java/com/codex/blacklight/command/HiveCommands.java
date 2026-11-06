@@ -67,6 +67,11 @@ public final class HiveCommands {
                         .then(Commands.argument("radius", IntegerArgumentType.integer(1024, 65536))
                                 .executes(c -> locate(c.getSource().getPlayerOrException(), IntegerArgumentType.getInteger(c, "radius")))))
                 .then(Commands.literal("place").executes(c -> place(c.getSource().getPlayerOrException())))
+                .then(Commands.literal("lair").executes(c -> {
+                    var p = c.getSource().getPlayerOrException();
+                    var result = com.codex.blacklight.world.LairSystem.tryPlace(p.serverLevel(), p.getBlockX(), p.getBlockZ(), true);
+                    p.sendSystemMessage(Component.literal("母巢: " + result + " " + com.codex.blacklight.world.LairSystem.lairs(p.serverLevel())));
+                    return result == com.codex.blacklight.world.LairSystem.Result.PLACED ? 1 : 0; }))
                 .then(Commands.literal("accelerate")
                         .executes(c -> accelerate(c.getSource().getPlayerOrException(), 20))
                         .then(Commands.argument("multiplier", IntegerArgumentType.integer(1, 20))

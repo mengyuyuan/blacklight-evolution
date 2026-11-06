@@ -44,6 +44,11 @@ public final class ExplicitTarget {
     public static List<Entity> candidates(Player p,double range){
         var query=p.getBoundingBox().inflate(range);var result=new LinkedHashSet<Entity>();
         result.addAll(CombatTargeting.candidates(p,query,t->CombatTargeting.selectable(p,t)));
+        // High above the world: also search the column below, any depth, for a Bulletdive lock.
+        if(!p.onGround()&&p.getY()-p.level().getMinBuildHeight()>range){
+            var column=new net.minecraft.world.phys.AABB(p.getX()-range,p.level().getMinBuildHeight(),p.getZ()-range,p.getX()+range,p.getY(),p.getZ()+range);
+            result.addAll(CombatTargeting.candidates(p,column,t->CombatTargeting.selectable(p,t)));
+        }
         for(var entity:p.level().getEntities(p,query,e->VehicleDamageBridge.vehicle(e)!=null)){
             var parent=resolve(entity);if(selectable(p,parent))result.add(parent);
         }

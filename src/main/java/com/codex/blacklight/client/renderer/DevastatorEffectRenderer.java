@@ -94,6 +94,12 @@ public final class DevastatorEffectRenderer {
         BulletFlightVisualRenderer.capture(player,skeletonFrame.last().pose(),poses,
                 Minecraft.getInstance().gameRenderer.getMainCamera().getPosition());
     }
+    /** Boss rigs supply their own launch points; the barrage then draws exactly like the player's. */
+    static void captureCreature(int entityId,Vec3 chest,Vec3 abdomen,Vec3 right,Vec3 left,Vec3 forward,Vec3 rightShoulder,Vec3 leftShoulder,Vec3 rightWrist,Vec3 leftWrist){
+        var front=forward.scale(.45);var side=right.subtract(chest).normalize().scale(.6);
+        BODIES.put(entityId,new BodyRoots(chest,new Vec3[]{chest.add(front),chest.subtract(front),chest.add(side),chest.subtract(side)},
+                new Vec3[]{abdomen.add(front),abdomen.subtract(front),abdomen.add(side),abdomen.subtract(side)},rightShoulder,leftShoulder,rightWrist,leftWrist));
+    }
     public static Vec3 capturedChest(int entityId){var roots=BODIES.get(entityId);return roots==null?null:roots.chest;}
     static BodyRoots bodyRoots(Matrix4f[] poses,Matrix4f frame,Vec3 offset){
         return new BodyRoots(bonePoint(poses,frame,offset,"Chest",0,.16F,0),
@@ -150,6 +156,7 @@ public final class DevastatorEffectRenderer {
         var mc=Minecraft.getInstance();if(mc.level==null)return;
         float partial=event.getPartialTick().getGameTimeDeltaPartialTick(false);
         for(var entity:mc.level.entitiesForRendering()) {
+            if(entity instanceof com.codex.blacklight.entity.BlacklightSupremeHunter boss){supreme(event,boss,partial);continue;}
             if(!(entity instanceof Player player))continue;
             var visual=player.getData(ModAttachments.DEVASTATOR_VISUAL);
             if(visual.kind()<0||visual.phase()==0||visual.released()<0)continue;
@@ -172,6 +179,18 @@ public final class DevastatorEffectRenderer {
                     visual.effectStart(),visual.effectEnd(),visual.origin(),visual.direction(),
                     visual.targetId(),visual.radius(),visual.contacts(),visual.fallHeight()));
         }
+    }
+
+    /** Supreme Hunter's Thousand Tendrils: the player's barrage family, rooted on the boss rig.
+     * Nearby players receive aimed strands at the first damage pulse; the rest fill the radius. */
+    private static void supreme(RenderLevelStageEvent event,com.codex.blacklight.entity.BlacklightSupremeHunter boss,float partial){
+        var move=boss.move();if(move!=com.codex.blacklight.combat.SupremeHunterMove.DEVASTATOR||!BODIES.containsKey(boss.getId()))return;
+        double start=move.event(0)/20.0,end=(move.event(2)+12)/20.0,radius=move.radius;
+        var contacts=new java.util.ArrayList<DevastatorVisual.Contact>();
+        for(var p:boss.level().players())if(p.isAlive()&&!p.isSpectator()&&p.distanceToSqr(boss)<=radius*radius)contacts.add(new DevastatorVisual.Contact(p.getId(),(float)start+.15F));
+        var forward=Vec3.directionFromRotation(0,net.minecraft.util.Mth.rotLerp(partial,boss.yBodyRotO,boss.yBodyRot));
+        draw(event,boss,new Frame(Style.TENDRIL,boss.getId()*31L+boss.tickCount/200,boss.moveAge(partial)/20.0,start,end,
+                boss.getPosition(partial),forward,-1,radius,contacts));
     }
 
     /** Call from the world effect pass for the current synchronized action only.

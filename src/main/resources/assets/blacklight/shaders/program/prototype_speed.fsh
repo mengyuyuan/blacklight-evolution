@@ -42,7 +42,7 @@ void main() {
     float localAngle = abs(fract(angle01 * SECTORS) - 0.5) * 2.0;
     float randomA = hash(sector);
     float randomB = hash(sector + floor(Time * 3.0) * 13.0);
-    float active = smoothstep(0.57, 0.92, randomA);
+    float streakActivity = smoothstep(0.57, 0.92, randomA);
     float angularLine = 1.0 - smoothstep(0.025, 0.13 + randomB * 0.07, localAngle);
 
     float travel = fract(Time * (2.1 + randomA * 2.8) + randomB * 3.7);
@@ -54,7 +54,7 @@ void main() {
 
     float luminance = dot(scene, vec3(0.2126, 0.7152, 0.0722));
     float contrast = mix(0.32, 1.0, smoothstep(0.04, 0.72, luminance));
-    float streak = active * angularLine * radialSegment * edgeMask
+    float streak = streakActivity * angularLine * radialSegment * edgeMask
             * contrast * Intensity * 0.92;
     vec3 streakColor = mix(vec3(0.76, 0.83, 0.85), vec3(0.58, 0.015, 0.025),
             step(0.82, randomB));

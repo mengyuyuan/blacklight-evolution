@@ -172,9 +172,25 @@ public final class ThrownBlock extends Projectile {
                 if(target.hurt(damageSources().thrown(this,getOwner()),impactDamage)){
                     var push=velocity.normalize().scale(impactKnockback);
                     target.push(push.x,Math.min(.65,.2+impactKnockback*.15),push.z);target.hurtMarked=true;
+                    com.codex.blacklight.combat.WeaponImpact.contact(getOwner() instanceof net.minecraft.server.level.ServerPlayer owner?owner:null,target,
+                            impactDamage>=20?com.codex.blacklight.combat.ImpactTier.FINISHER:com.codex.blacklight.combat.ImpactTier.HEAVY,true,
+                            com.codex.blacklight.network.PhysicalFeedbackPayload.Effect.CLAW_HEAVY);
+                    // A charged block that kills outright bursts the body like a full-charge blow.
+                    if(chargeSnapshot>=com.codex.blacklight.combat.BlockThrowTuning.MAX_CHARGE_TICKS*.9||impactDamage>=target.getMaxHealth()*1.5F)
+                        com.codex.blacklight.combat.HeavyBlow.shatter(target,velocity);
                 }
             }
-            ((net.minecraft.server.level.ServerLevel)level()).sendParticles(new net.minecraft.core.particles.BlockParticleOption(net.minecraft.core.particles.ParticleTypes.BLOCK,block()),getX(),getY(),getZ(),24,.35,.35,.35,.12);
+            var debrisLevel=(net.minecraft.server.level.ServerLevel)level();
+            debrisLevel.sendParticles(new net.minecraft.core.particles.BlockParticleOption(net.minecraft.core.particles.ParticleTypes.BLOCK,block()),getX(),getY(),getZ(),24,.35,.35,.35,.12);
+            // The thrown block breaks apart: real block chunks scatter off the contact, more for a bigger charge.
+            double charge=Math.min(1,chargeSnapshot/(double)com.codex.blacklight.combat.BlockThrowTuning.MAX_CHARGE_TICKS);
+            int chunks=4+(int)Math.round(4*charge)+Math.min(4,cargo().cells().size()/3);
+            var back=velocity.lengthSqr()<1e-6?Vec3.ZERO:velocity.normalize().scale(-.18);
+            for(int i=0;i<chunks;i++){
+                var rnd=new Vec3(random.nextDouble()-.5,random.nextDouble()*.5+.15,random.nextDouble()-.5);
+                com.codex.blacklight.movement.LandingDebrisSystem.fragment(debrisLevel,position().add(rnd.scale(cargo().half().length())),cargo().cells().isEmpty()?block():cargo().cells().get(random.nextInt(cargo().cells().size())).state(),
+                        back.add(rnd.scale(.35+.25*charge)),(float)(.14+random.nextDouble()*.18),22+random.nextInt(12));
+            }
             level().playSound(null,blockPosition(),block().getSoundType().getBreakSound(),net.minecraft.sounds.SoundSource.PLAYERS,1.1F,.7F);
             drop();return;
         }

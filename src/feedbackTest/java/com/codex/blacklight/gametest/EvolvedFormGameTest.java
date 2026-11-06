@@ -169,7 +169,7 @@ public final class EvolvedFormGameTest {
         // ticking; a fake connection does not acknowledge client chunk simulation.
         var tickets=new java.util.HashSet<net.minecraft.world.level.ChunkPos>();
         var min=h.absolutePos(new BlockPos(-2,119,-2));var max=h.absolutePos(new BlockPos(22,119,12));
-        for(int x=min.getX()>>4;x<=max.getX()>>4;x++)for(int z=min.getZ()>>4;z<=max.getZ()>>4;z++){
+        for(int x=(min.getX()>>4)-1;x<=(max.getX()>>4)+1;x++)for(int z=(min.getZ()>>4)-1;z<=(max.getZ()>>4)+1;z++){
             var chunk=new net.minecraft.world.level.ChunkPos(x,z);
             if(!h.getLevel().getForcedChunks().contains(chunk.toLong())){h.getLevel().setChunkForced(x,z,true);tickets.add(chunk);}
             h.getLevel().getChunk(x,z);
@@ -192,8 +192,10 @@ public final class EvolvedFormGameTest {
             for(var chunk:tickets)h.getLevel().setChunkForced(chunk.x,chunk.z,false);
         };
         net.neoforged.neoforge.common.NeoForge.EVENT_BUS.addListener(listener);host.setNoAi(false);
+        int initialTicks=host.tickCount;
         h.runAfterDelay(180,()->{
             try{
+                h.assertTrue(host.tickCount-initialTicks>=170,"forced fixture must keep the actual source entity ticking; elapsed="+(host.tickCount-initialTicks)+" entityTicking="+h.getLevel().isPositionEntityTicking(host.blockPosition())+" pos="+host.position());
                 h.assertTrue(host.distanceTo(player)<8,"real navigation reduces the twelve-block player separation");
                 h.assertTrue(hits.get()>0,"real AI contact causes accepted player damage, not only a playing animation; distance="+host.distanceTo(player)+" action="+host.evolvedAction()+" elapsed="+host.evolvedActionElapsed(0)+" target="+host.getTarget()+" sight="+host.hasLineOfSight(player)+" health="+player.getHealth());
                 player.setGameMode(net.minecraft.world.level.GameType.CREATIVE);

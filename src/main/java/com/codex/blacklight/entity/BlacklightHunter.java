@@ -31,6 +31,8 @@ public final class BlacklightHunter extends Monster implements GeoEntity {
     private static final EntityDataAccessor<Integer> CONSUMER = SynchedEntityData.defineId(BlacklightHunter.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Integer> CONSUME_TICKS = SynchedEntityData.defineId(BlacklightHunter.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Long> REMAINS_STARTED = SynchedEntityData.defineId(BlacklightHunter.class, EntityDataSerializers.LONG);
+    /** Infected Hunter (Supreme Parasite injected): 0 none, 1 infected, 2 locked at its last point of health. */
+    private static final EntityDataAccessor<Integer> PARASITE = SynchedEntityData.defineId(BlacklightHunter.class, EntityDataSerializers.INT);
     private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
     private boolean previousNoAi;
     private int attackCooldown;
@@ -49,7 +51,7 @@ public final class BlacklightHunter extends Monster implements GeoEntity {
     }
     @Override protected void defineSynchedData(SynchedEntityData.Builder b) {
         super.defineSynchedData(b); b.define(ATTACK, 0); b.define(CONSUMER, -1); b.define(CONSUME_TICKS, 0);
-        b.define(REMAINS_STARTED, -1L);
+        b.define(REMAINS_STARTED, -1L);b.define(PARASITE,0);
         b.define(MOVE,0);b.define(STARTED,0L);
     }
     @Override protected void registerGoals() {
@@ -66,6 +68,14 @@ public final class BlacklightHunter extends Monster implements GeoEntity {
     @Override public void tick() {
         super.tick();
         if (level().isClientSide || isBeingConsumed() || !isAlive()) return;
+        if(parasiteLocked()){
+            // Endless stagger: refresh the heavy hit pose and pin it in place.
+            getNavigation().stop();setTarget(null);setDeltaMovement(0,getDeltaMovement().y,0);if(committedAttack())cancelAttack();
+            var hit=getData(com.codex.blacklight.registry.ModAttachments.HIT_REACTION);long now=level().getGameTime();
+            if(hit.duration()<=0||now-hit.started()>=hit.duration()-2){setData(com.codex.blacklight.registry.ModAttachments.HIT_REACTION,new com.codex.blacklight.combat.HitReaction(now,30,com.codex.blacklight.combat.HitReaction.HEAVY,getYRot()));syncData(com.codex.blacklight.registry.ModAttachments.HIT_REACTION);}
+            if(tickCount%20==0&&level() instanceof net.minecraft.server.level.ServerLevel s)s.sendParticles(new net.minecraft.core.particles.DustParticleOptions(new org.joml.Vector3f(.75F,.05F,.55F),1.6F),getX(),getY()+1.2,getZ(),8,.4,.6,.4,.02);
+            return;
+        }
         if(com.codex.blacklight.combat.ImpactControl.stunned(this)||isNoAi()){cancelAttack();return;}
         if (attackCooldown > 0) attackCooldown--;
         if(evadeCooldown>0)evadeCooldown--;
@@ -89,6 +99,29 @@ public final class BlacklightHunter extends Monster implements GeoEntity {
         }
     }
     public boolean isBeingConsumed() { return entityData.get(CONSUMER) >= 0; }
+    public boolean parasite(){return entityData.get(PARASITE)>0;}
+    /** Last point of health: endless stagger, health locked, waiting to be consumed. */
+    public boolean parasiteLocked(){return entityData.get(PARASITE)==2;}
+    public void infectParasite(){
+        if(parasite())return;entityData.set(PARASITE,1);setCustomName(net.minecraft.network.chat.Component.translatable("entity.blacklight.infected_hunter"));
+        setPersistenceRequired();
+        var health=getAttribute(Attributes.MAX_HEALTH);if(health!=null){float f=getHealth()/getMaxHealth();health.setBaseValue(health.getBaseValue()*1.5);setHealth(getMaxHealth()*f);}
+        var damage=getAttribute(Attributes.ATTACK_DAMAGE);if(damage!=null)damage.setBaseValue(damage.getBaseValue()*1.25);
+        if(level() instanceof net.minecraft.server.level.ServerLevel s)s.sendParticles(new net.minecraft.core.particles.DustParticleOptions(new org.joml.Vector3f(.75F,.05F,.55F),2F),getX(),getY()+1.5,getZ(),60,.6,1,.6,.05);
+    }
+    @Override public boolean hurt(DamageSource source,float amount){
+        // A locked Infected Hunter only leaves through consumption (or /kill).
+        if(parasiteLocked()&&!source.is(net.minecraft.tags.DamageTypeTags.BYPASSES_INVULNERABILITY))return false;
+        return super.hurt(source,amount);
+    }
+    @Override public void setHealth(float health){
+        if(parasite()&&!isConsumeRemains()&&health<1&&!level().isClientSide&&!isBeingConsumed()&&isAlive()){
+            super.setHealth(1);
+            if(!parasiteLocked()){entityData.set(PARASITE,2);cancelAttack();getNavigation().stop();setTarget(null);playSound(net.minecraft.sounds.SoundEvents.RAVAGER_STUNNED,1.5F,.7F);}
+            return;
+        }
+        super.setHealth(health);
+    }
     public boolean committedAttack(){return entityData.get(ATTACK)>0;}
     /** Light hits still hurt; only repeated AI interruption is resisted. Heavy controls bypass this. */
     public boolean acceptLightStagger() {
@@ -156,6 +189,7 @@ public final class BlacklightHunter extends Monster implements GeoEntity {
     @Override public void addAdditionalSaveData(CompoundTag tag) {
         super.addAdditionalSaveData(tag);
         tag.putInt("BlacklightHunterBalanceVersion",HunterBalance.VERSION);
+        tag.putInt("BlacklightParasite",entityData.get(PARASITE));
         // The transient grab must never persist as a permanently disabled AI after restart.
         if (isBeingConsumed()) tag.putBoolean("NoAI", previousNoAi);
         if (isConsumeRemains()) tag.putLong("BlacklightConsumeRemains",entityData.get(REMAINS_STARTED));
@@ -176,6 +210,7 @@ public final class BlacklightHunter extends Monster implements GeoEntity {
             if(getAttribute(Attributes.FOLLOW_RANGE).getBaseValue()==24)getAttribute(Attributes.FOLLOW_RANGE).setBaseValue(32);
             com.codex.blacklight.power.CombatScale.preserveHealthFraction(this,maximum,health);
         }
+        entityData.set(PARASITE,Math.clamp(tag.getInt("BlacklightParasite"),0,2));
         if(tag.contains("BlacklightConsumeRemains",net.minecraft.nbt.Tag.TAG_LONG)) {
             entityData.set(REMAINS_STARTED,Math.max(0,tag.getLong("BlacklightConsumeRemains")));
             setHealth(0);setNoAi(true);

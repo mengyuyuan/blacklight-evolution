@@ -26,6 +26,10 @@ public final class ModItems {
             "blacklight_hunter_spawn_egg", props -> new net.neoforged.neoforge.common.DeferredSpawnEggItem(
                     ModEntities.BLACKLIGHT_HUNTER, 0x242626, 0x9d302b, props), new Item.Properties());
 
+    public static final DeferredItem<net.neoforged.neoforge.common.DeferredSpawnEggItem> SUPREME_HUNTER_SPAWN_EGG = ITEMS.registerItem(
+            "supreme_hunter_spawn_egg", props -> new net.neoforged.neoforge.common.DeferredSpawnEggItem(
+                    ModEntities.SUPREME_HUNTER, 0x14100f, 0xc4241c, props), new Item.Properties());
+
     public static final DeferredItem<com.codex.blacklight.item.HiveTissueItem> LIVING_HIVE_TISSUE = ITEMS.registerItem("living_hive_tissue",com.codex.blacklight.item.HiveTissueItem::new,new Item.Properties().stacksTo(16).rarity(Rarity.RARE));
     public static final DeferredItem<net.neoforged.neoforge.common.DeferredSpawnEggItem> HYDRA_SPAWN_EGG = ITEMS.registerItem("blacklight_hydra_spawn_egg",p->new net.neoforged.neoforge.common.DeferredSpawnEggItem(ModEntities.BLACKLIGHT_HYDRA,0x361b22,0xcba886,p),new Item.Properties());
     public static final DeferredItem<BlockItem> TISSUE_ATTACHMENT = ITEMS.registerSimpleBlockItem(ModBlocks.TISSUE_ATTACHMENT);
@@ -55,6 +59,7 @@ public final class ModItems {
     public static final DeferredItem<net.neoforged.neoforge.common.DeferredSpawnEggItem> BLACKWATCH_OFFICER_SPAWN_EGG=ITEMS.registerItem("blackwatch_officer_spawn_egg",p->new net.neoforged.neoforge.common.DeferredSpawnEggItem(ModEntities.BLACKWATCH_OFFICER,0x20262a,0xd3bd80,p),new Item.Properties());
     public static final DeferredItem<net.neoforged.neoforge.common.DeferredSpawnEggItem> BLACKWATCH_COMMANDER_SPAWN_EGG=ITEMS.registerItem("blackwatch_commander_spawn_egg",p->new net.neoforged.neoforge.common.DeferredSpawnEggItem(ModEntities.BLACKWATCH_COMMANDER,0x20262a,0xe7d6a0,p),new Item.Properties());
 
+    public static final DeferredItem<com.codex.blacklight.item.ParasiteSyringeItem> SUPREME_PARASITE_SYRINGE = ITEMS.registerItem("supreme_parasite_syringe",com.codex.blacklight.item.ParasiteSyringeItem::new,new Item.Properties().stacksTo(4).rarity(Rarity.EPIC));
     // Legacy registry IDs remain loadable; new crafting and creative access live in the independent mod.
     public static final DeferredItem<com.codex.blacklight.item.PassiveSerumItem> ADAPTATION_SERUM = ITEMS.registerItem("adaptation_serum", props -> new com.codex.blacklight.item.PassiveSerumItem(props, 1), new Item.Properties().stacksTo(1).rarity(Rarity.RARE));
     public static final DeferredItem<com.codex.blacklight.item.PassiveSerumItem> TISSUE_REGENERATION_SERUM = ITEMS.registerItem("tissue_regeneration_serum", props -> new com.codex.blacklight.item.PassiveSerumItem(props, 2), new Item.Properties().stacksTo(1).rarity(Rarity.RARE));
@@ -72,7 +77,7 @@ public final class ModItems {
                         output.accept(BLACKWATCH_TEAM_LEADER_SPAWN_EGG.get());
                         output.accept(BLACKWATCH_OFFICER_SPAWN_EGG.get());
                         output.accept(BLACKWATCH_COMMANDER_SPAWN_EGG.get());
-                        output.accept(BLACKLIGHT_SAMPLE.get()); output.accept(HUNTER_SPAWN_EGG.get());
+                        output.accept(BLACKLIGHT_SAMPLE.get()); output.accept(HUNTER_SPAWN_EGG.get()); output.accept(SUPREME_HUNTER_SPAWN_EGG.get());output.accept(SUPREME_PARASITE_SYRINGE.get());
                         output.accept(LIVING_HIVE_TISSUE.get());output.accept(HYDRA_SPAWN_EGG.get());
                         output.accept(INFECTED_SOIL.get()); output.accept(INFECTED_STONE.get());
                         output.accept(TISSUE_ATTACHMENT.get()); output.accept(TISSUE_FIBER.get()); output.accept(HIVE_FLESH.get());

@@ -50,18 +50,22 @@ public final class AttackMobilityGameTest {
         h.assertTrue(p.getZ()-origin.z<5&&!WeaponCombatSystem.busy(p),"wall blocks body and ends flight");
         for(int x=0;x<7;x++)for(int y=258;y<265;y++)h.setBlock(x,y,8,Blocks.AIR);h.succeed();
     }
-    @GameTest(template="wall_test",timeoutTicks=40) public static void freeAttackCanHitVictimEnteringPath(GameTestHelper h){
+    @GameTest(template="wall_test",timeoutTicks=600,batch="mobility_free_contact") public static void freeAttackCanHitVictimEnteringPath(GameTestHelper h){loadedMobility(h,()->checkFreeAttackContact(h));}
+    private static void checkFreeAttackContact(GameTestHelper h){
         var p=player(h,PowerForm.NONE,false);var origin=p.position();WeaponCombatSystem.request(p,true);
         var mob=h.spawn(EntityType.IRON_GOLEM,3,260,10);mob.setNoAi(true);mob.setNoGravity(true);float hp=mob.getHealth();
+        h.assertTrue(h.getLevel().getEntitiesOfClass(Mob.class,mob.getBoundingBox().inflate(.1)).contains(mob),"actual entering victim is queryable before simulating contact");
         for(int t=0;t<60&&WeaponCombatSystem.busy(p);t++)tick(p);
         h.assertTrue(mob.getHealth()<hp,"unselected target entering physical flight path must be struck");
         h.assertTrue(p.position().distanceTo(origin)>1&&p.distanceTo(mob)<7,"contact must be local");mob.discard();WeaponCombatSystem.cancel(p);h.succeed();
     }
-    @GameTest(template="wall_test",timeoutTicks=60) public static void hammerTossHasBallisticRangeAndCharge(GameTestHelper h){
+    @GameTest(template="wall_test",timeoutTicks=600,batch="mobility_empty_toss") public static void hammerTossHasBallisticRangeAndCharge(GameTestHelper h){loadedMobility(h,()->checkHammerToss(h));}
+    private static void checkHammerToss(GameTestHelper h){
         double[] distances=new double[2];
         for(int charged=0;charged<2;charged++){
             var p=player(h,PowerForm.HAMMERFISTS,true);p.setSprinting(true);var origin=p.position();start(h,p,WeaponMove.Input.SPECIAL,charged==1);
             h.assertTrue(p.getData(ModAttachments.WEAPON_VISUAL).spec()==WeaponMove.HAMMER_RAM,"sprint special is toss");
+            h.assertTrue(p.getData(ModAttachments.WEAPON_VISUAL).targetId()<0,"empty ballistic toss fixture must not acquire a neighbouring test dummy");
             double peak=0;int t=0;
             while(WeaponCombatSystem.busy(p)&&t++<190){
                 p.move(MoverType.SELF,p.getDeltaMovement());
@@ -88,5 +92,19 @@ public final class AttackMobilityGameTest {
         for(int t=0;t<100&&WeaponCombatSystem.busy(p);t++)tick(p);
         double distance=p.position().subtract(origin).horizontalDistance();
         h.assertTrue(distance>5&&distance<12,"blade callback supplies bounded displacement once: "+distance);WeaponCombatSystem.cancel(p);h.succeed();
+    }
+
+    private static final net.minecraft.server.level.TicketType<java.util.UUID> MOBILITY_TICKET=net.minecraft.server.level.TicketType.create("blacklight_mobility_qa",java.util.UUID::compareTo);
+    private static void loadedMobility(GameTestHelper h,Runnable check){
+        var pos=h.absolutePos(new net.minecraft.core.BlockPos(3,260,3));var lease=java.util.UUID.randomUUID();
+        var chunks=new java.util.ArrayList<net.minecraft.world.level.ChunkPos>();
+        for(int x=(pos.getX()>>4)-1;x<=(pos.getX()>>4)+1;x++)for(int z=(pos.getZ()>>4)-1;z<=(pos.getZ()>>4)+10;z++){
+            var c=new net.minecraft.world.level.ChunkPos(x,z);chunks.add(c);h.getLevel().getChunkSource().addRegionTicket(MOBILITY_TICKET,c,3,lease);h.getLevel().getChunk(x,z);
+        }
+        var closed=new java.util.concurrent.atomic.AtomicBoolean();Runnable close=()->{if(closed.getAndSet(true))return;for(var c:chunks)h.getLevel().getChunkSource().removeRegionTicket(MOBILITY_TICKET,c,3,lease);};h.runAfterDelay(610,close);
+        h.startSequence().thenWaitUntil(()->{
+            java.util.concurrent.locks.LockSupport.parkNanos(20_000_000L);
+            for(var c:chunks)h.assertTrue(h.getLevel().isPositionEntityTicking(new net.minecraft.core.BlockPos(c.x<<4,pos.getY(),c.z<<4)),"actual physical mobility corridor must be entity-ticking");
+        }).thenExecute(()->{try{check.run();}finally{close.run();}});
     }
 }

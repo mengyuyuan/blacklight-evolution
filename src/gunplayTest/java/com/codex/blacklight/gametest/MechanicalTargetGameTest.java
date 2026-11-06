@@ -55,7 +55,7 @@ public final class MechanicalTargetGameTest {
                 h.assertTrue(move!=null,"native weapon input starts an action: "+form);
                 for(int tick=0;tick<move.duration+2;tick++){p.tickCount++;WeaponCombatSystem.tick(new PlayerTickEvent.Post(p));}
                 h.assertTrue(tank.health()<health,"authored contact window takes real tank health: "+form);
-                h.assertTrue(health-tank.health()<=move.damageFor(form)*.5+.01,"one accepted mechanical contact per ordinary action: "+form);
+                h.assertTrue(health-tank.health()<=move.damageFor(form)*.5*com.codex.blacklight.military.vehicle.VehicleDamageBridge.prototypeScale(p)+.01,"one accepted mechanical contact per ordinary action: "+form);
                 System.out.println("MECHANICAL_REAL_HIT form="+form+" from="+health+" to="+tank.health());
             }
             WeaponCombatSystem.cancel(p);CombatTargeting.requestLock(p,-1);

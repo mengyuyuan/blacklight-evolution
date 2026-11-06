@@ -368,36 +368,28 @@ public final class BlacklightInfectedHost extends Monster {
         com.codex.blacklight.infection.EvolvedBalance.apply(this);
         CombatScale.preserveHealthFraction(this,maximum,health);
     }
-    private long scaledTissueTime(int lane,long ticks,double speed){
-        var step=TissueMetabolism.timeStep(tissueTimeFractions[lane],ticks,speed);
-        tissueTimeFractions[lane]=step.remainder();return step.ticks();
+    /** Operator time-lapse: runs the same metabolism batches the server would run over the given loaded time. */
+    public void fastForwardTissue(long ticks){
+        if(level().isClientSide)return;
+        for(long left=Math.max(0,ticks);left>0&&isAlive();){int step=(int)Math.min(100,left);tissueClock+=step;left-=step;digestTissue();}
     }
     private void digestTissue() {
         int elapsed=tissueClock;tissueClock=0;
         if(tissueMetabolismActive()){
             var processed=digestion.advance(elapsed,tissueNutrition(),digestiveProfile());entityData.set(TISSUE_NUTRITION,processed.reserve());publishDigestion();
         }
-        var genes=tissueInheritance();
-        boolean integrating=genes.organs().values().stream().anyMatch(o->o.work()>0||!o.mature())||genes.sources().values().stream().anyMatch(s->s.work()>0);
         boolean repairing=tissueRecoveryTicks==0&&getHealth()<getMaxHealth()-.01F&&!getData(ModAttachments.CONSUME_VISUAL).active();
-        double worldSpeed=level() instanceof ServerLevel server?TissueMetabolism.worldSpeed(server.getServer().overworld().getDayTime()):1;
-        int demand=tissueMetabolismActive()?TissueMetabolism.demand(tissueAge(),integrating,repairing,worldSpeed):0;
-        var budget=TissueMetabolism.budget(tissueNutrition(),tissueNutritionDebt,demand);
-        boolean supplied=budget.supplied();tissueNutritionDebt=budget.debt();entityData.set(TISSUE_NUTRITION,budget.reserve());
-        if(tissueMetabolismActive()){
-            double unfed=com.codex.blacklight.config.GameplayBalanceConfig.UNFED_INTEGRATION.get();
-            var developed=tissueInheritance().digest(scaledTissueTime(2,elapsed,worldSpeed*(unfed+(1-unfed)*budget.fraction())*com.codex.blacklight.config.GameplayBalanceConfig.INTEGRATION_SPEED.get()),true,TissueOrgans.seed(getUUID()),tissueAge(),TissueCompetitionConfig.rules(),knownNativeTissueCore());
-            if(supplied&&developed.organs().values().stream().anyMatch(o->o.mature()&&o.pending()==0&&o.integrated()>0)){
-                var cultivation=TissueMetabolism.cultivation(tissueCultivationTicks,scaledTissueTime(3,elapsed,worldSpeed*budget.fraction()));
-                tissueCultivationTicks=cultivation.remainder();
-                developed=developed.cultivate(cultivation.work(),knownNativeTissueCore(),tissueAge(),TissueCompetitionConfig.rules());
-            }
-            publishInheritance(developed);
-        }
-        long natural=scaledTissueTime(0,elapsed,worldSpeed),bonus=supplied&&TissueMetabolism.growing(tissueAge(),integrating)?scaledTissueTime(1,TissueMetabolism.fedBonusTicks(),worldSpeed*budget.fraction()):0;
-        advanceTissue(com.codex.blacklight.infection.TissueGrowth.advance(natural,bonus));
-        if(supplied&&repairing){
-            heal((float)(getMaxHealth()*com.codex.blacklight.config.GameplayBalanceConfig.REPAIR_FRACTION.get()*budget.fraction()/CombatScale.units(this)));vitals.repaired(budget.fraction());
+        double speed=level() instanceof ServerLevel server?TissueMetabolism.worldSpeed(server.getServer().overworld().getDayTime()):1;
+        var step=com.codex.blacklight.infection.TissueDevelopment.advance(tissueAge(),tissueInheritance(),
+                TissueOrgans.seed(getUUID()),knownNativeTissueCore(),tissueNutrition(),tissueNutritionDebt,
+                tissueCultivationTicks,tissueTimeFractions,elapsed,speed,tissueMetabolismActive(),repairing,TissueCompetitionConfig.rules());
+        tissueNutritionDebt=step.debt();tissueCultivationTicks=step.cultivation();
+        System.arraycopy(step.fractions(),0,tissueTimeFractions,0,tissueTimeFractions.length);
+        entityData.set(TISSUE_NUTRITION,step.nutrition());publishInheritance(step.inheritance());
+        advanceTissue(Math.max(0,step.age()-tissueAge()));
+        if(step.repairFraction()>0){
+            heal((float)(getMaxHealth()*com.codex.blacklight.config.GameplayBalanceConfig.REPAIR_FRACTION.get()*step.repairFraction()/CombatScale.units(this)));
+            vitals.repaired(step.repairFraction());
         }
     }
     /** Vanilla invokes this only after its death event accepts the kill. A
@@ -443,6 +435,41 @@ public final class BlacklightInfectedHost extends Monster {
         for(int i=0;i<parts.length;i++)parts[i]=new InfectedHostPart(this);
         setId(ENTITY_COUNTER.getAndAdd(PART_COUNT+1)+1);
         configureParts();
+    }
+    /** Detached client visual context only. Never serializes or ticks the native mob,
+     * copies a capability, publishes an entity, or changes its collision/attributes. */
+    public void sampleNativeVisual(Mob source) {
+        if (!level().isClientSide || source.level()!=level() || level().getEntity(getId())==this)
+            throw new IllegalStateException("Native infection visual must remain detached on the client");
+        setUUID(source.getUUID());copyPosition(source);tickCount=source.tickCount;
+        attackAnim=source.attackAnim;oAttackAnim=source.oAttackAnim;
+        setDeltaMovement(source.getDeltaMovement());setOnGround(source.onGround());
+        var data=new CompoundTag();
+        data.putString("Type",BuiltInRegistries.ENTITY_TYPE.getKey(source.getType()).toString());
+        data.putString("Family",source instanceof net.minecraft.world.entity.animal.WaterAnimal?"water":
+                source instanceof FlyingMob || source instanceof net.minecraft.world.entity.animal.FlyingAnimal?"air":"ground");
+        data.putBoolean("Humanoid",ConsumeSequence.humanoid(source));
+        data.putBoolean("Quadruped",ConsumeSequence.quadruped(source));
+        data.putFloat("Width",source.getBbWidth());data.putFloat("Height",source.getBbHeight());
+        data.putFloat("ModelScale",source.isBaby()?.5F:1);
+        data.putBoolean("NativeVisual",true);
+        var visual=new CompoundTag();visual.putBoolean("IsBaby",source.isBaby());data.put("Visual",visual);
+        data.putString("NativeCore",com.codex.blacklight.infection.NativeTissue.coreId(source));
+        entityData.set(HOST,data);
+        entityData.set(TISSUE_AGE,com.codex.blacklight.infection.NativeInfection.age(source));
+        var snapshot=com.codex.blacklight.infection.NativeTissue.snapshot(source);
+        entityData.set(TISSUE_ACTION,snapshot.getCompound("OrganAction").copy());
+        entityData.set(TISSUE_DIGESTION,snapshot.getCompound("Digestion").copy());
+        entityData.set(TISSUE_VITALS,snapshot.getCompound("Vitals").copy());
+        entityData.set(TISSUE_DEFENSE,snapshot.getCompound("Defense").copy());
+        entityData.set(TISSUE_VASCULAR,snapshot.getCompound("Vascular").copy());
+        entityData.set(CANNIBAL_TARGET,snapshot.contains("CannibalTarget")?snapshot.getInt("CannibalTarget"):-1);
+        entityData.set(CANNIBAL_STARTED,snapshot.contains("CannibalStarted")?snapshot.getLong("CannibalStarted"):-1L);
+        entityData.set(CANNIBAL_PREY,snapshot.getBoolean("CannibalPrey"));
+        entityData.set(CANNIBAL_DURATION,Math.max(1,snapshot.getInt("CannibalDuration")));
+        var genes=snapshot.getCompound("Genes").copy();genes.putLong("SampledAt",snapshot.getLong("SampledAt"));
+        if(!entityData.get(TISSUE_INHERITANCE).equals(genes)){entityData.set(TISSUE_INHERITANCE,genes);inheritanceCache=null;}
+        entityData.set(TISSUE_NUTRITION,com.codex.blacklight.infection.NativeTissue.nutrition(source));
     }
     public static AttributeSupplier.Builder attributes() {
         return Monster.createMonsterAttributes().add(Attributes.MAX_HEALTH,30).add(Attributes.ATTACK_DAMAGE,5)
@@ -586,10 +613,43 @@ public final class BlacklightInfectedHost extends Monster {
         if(speciesId().equals("minecraft:slime")||speciesId().equals("minecraft:magma_cube"))return Mth.clamp(visual.getInt("Size")+1,1,16);
         return 1;
     }
+    private com.codex.blacklight.infection.InfectionStatScaling.Rules appliedInfectionRules;
+    public double infectionSourceHealth(){
+        var data=hostData();
+        if(data.getBoolean("InfectionNoSourceStats"))return 0;
+        double value=data.contains("InfectionSourceHealth",99)?data.getDouble("InfectionSourceHealth"):getAttribute(Attributes.MAX_HEALTH).getBaseValue()/1.4;
+        return com.codex.blacklight.infection.InfectionConversionMath.nonnegative(value);
+    }
+    public void refreshInfectionStats(){
+        if(level().isClientSide||giantBoss()||hostData().getBoolean("InfectionNoSourceStats"))return;
+        var rules=com.codex.blacklight.infection.InfectionStatScaling.rules();
+        if(rules.equals(appliedInfectionRules))return;
+        var data=hostData().copy();
+        // Truly old converted hosts used fixed 1.4/1.3 base gains. Evolution uses
+        // separate modifiers, so migration does not divide or discard earned growth.
+        if(!data.contains("InfectionSourceHealth",99))data.putDouble("InfectionSourceHealth",infectionSourceHealth());
+        if(!data.contains("InfectionSourceAttack",99))data.putDouble("InfectionSourceAttack",com.codex.blacklight.infection.InfectionConversionMath.nonnegative(getAttribute(Attributes.ATTACK_DAMAGE).getBaseValue()/1.3));
+        entityData.set(HOST,data);
+        float maximum=getMaxHealth(),health=getHealth();
+        getAttribute(Attributes.MAX_HEALTH).setBaseValue(com.codex.blacklight.infection.InfectionStatScaling.health(data.getDouble("InfectionSourceHealth"),rules));
+        getAttribute(Attributes.ATTACK_DAMAGE).setBaseValue(com.codex.blacklight.infection.InfectionStatScaling.attack(data.getDouble("InfectionSourceHealth"),data.getDouble("InfectionSourceAttack"),rules));
+        CombatScale.attributes(this,true);CombatScale.preserveHealthFraction(this,maximum,health);
+        appliedInfectionRules=rules;
+    }
+    @Override public double getAttributeValue(net.minecraft.core.Holder<net.minecraft.world.entity.ai.attributes.Attribute> attribute){
+        double value=super.getAttributeValue(attribute);
+        return attribute.equals(Attributes.ATTACK_DAMAGE)?com.codex.blacklight.infection.InfectionStatScaling.attackBeyondVanillaCap(getAttribute(attribute),value):value;
+    }
     public void inherit(Mob source) { inherit(source,false); }
     /** Colossal encounters require an explicit caller; infection never implies this tier. */
     public void inherit(Mob source,boolean colossal) {
         CompoundTag data=new CompoundTag();data.putInt("NativeCombatVersion",1);
+        com.codex.blacklight.combat.ConsumeLastChance.inherit(source,this);
+        float originalHealth=CombatScale.originalMaximum(source);
+        double originalAttack=source.getAttribute(Attributes.ATTACK_DAMAGE)==null?0:source.getAttributeValue(Attributes.ATTACK_DAMAGE);
+        originalAttack=com.codex.blacklight.compat.CultivationCompatibility.inheritedAttack(source,originalAttack);
+        data.putDouble("InfectionSourceHealth",com.codex.blacklight.infection.InfectionConversionMath.nonnegative(originalHealth));
+        data.putDouble("InfectionSourceAttack",com.codex.blacklight.infection.InfectionConversionMath.nonnegative(originalAttack));
         String id=BuiltInRegistries.ENTITY_TYPE.getKey(source.getType()).toString();data.putString("Type",id);
         InfectedBossProfile profile=InfectedBossProfile.forSpecies(id);
         colossal=colossal&&profile!=null;
@@ -630,12 +690,10 @@ public final class BlacklightInfectedHost extends Monster {
         entityData.set(HOST,data);
         data=data.copy();data.putString("NativeCore",TissueCore.forNewHost(TissueOrgans.seed(getUUID()),nativeTissuePlan(),family.equals("water")).key());
         entityData.set(HOST,data);setAirSupply(Math.clamp(source.getAirSupply(),-20,getMaxAirSupply()));refreshDimensions();
-        float originalHealth=CombatScale.originalMaximum(source);
         if(!level().isClientSide&&!hasMultipartBody()&&tissueAge()==0&&tissueNutrition()==0)
             entityData.set(TISSUE_NUTRITION,TissueMetabolism.initialReserve(originalHealth));
-        getAttribute(Attributes.MAX_HEALTH).setBaseValue(colossal?profile.health():Math.max(18,originalHealth*1.4));
-        double originalAttack=source.getAttribute(Attributes.ATTACK_DAMAGE)==null?0:source.getAttributeValue(Attributes.ATTACK_DAMAGE);
-        getAttribute(Attributes.ATTACK_DAMAGE).setBaseValue(colossal?profile.damage():Math.max(Math.clamp(originalHealth*.14,4,18),originalAttack*1.3));
+        getAttribute(Attributes.MAX_HEALTH).setBaseValue(colossal?profile.health():com.codex.blacklight.infection.InfectionStatScaling.health(originalHealth,com.codex.blacklight.infection.InfectionStatScaling.rules()));
+        getAttribute(Attributes.ATTACK_DAMAGE).setBaseValue(colossal?profile.damage():com.codex.blacklight.infection.InfectionStatScaling.attack(originalHealth,originalAttack,com.codex.blacklight.infection.InfectionStatScaling.rules()));
         if(source.getAttribute(Attributes.MOVEMENT_SPEED)!=null)getAttribute(Attributes.MOVEMENT_SPEED).setBaseValue(Math.max(.22,source.getAttributeValue(Attributes.MOVEMENT_SPEED)*1.08));
         if(source.getAttribute(Attributes.FLYING_SPEED)!=null)getAttribute(Attributes.FLYING_SPEED).setBaseValue(Math.max(.35,source.getAttributeValue(Attributes.FLYING_SPEED)*1.08));
         for(var attribute:List.of(Attributes.ARMOR,Attributes.ARMOR_TOUGHNESS,Attributes.KNOCKBACK_RESISTANCE,Attributes.STEP_HEIGHT))
@@ -643,6 +701,7 @@ public final class BlacklightInfectedHost extends Monster {
         for(var slot:EquipmentSlot.values()){setItemSlot(slot,source.getItemBySlot(slot).copy());setDropChance(slot,0);}
         if(colossal)applyBossAttributes(profile);else if(encounterBoss())applyCompactEncounterAttributes(profile);
         setHealth(Math.max(1,getMaxHealth()*source.getHealth()/source.getMaxHealth()));
+        appliedInfectionRules=com.codex.blacklight.infection.InfectionStatScaling.rules();
         setPersistenceRequired();setupNavigation();
         if(!level().isClientSide)updateBossBar(true);
     }
@@ -780,7 +839,7 @@ public final class BlacklightInfectedHost extends Monster {
             @Override public boolean canContinueToUse() { return !getData(ModAttachments.CONSUME_VISUAL).active()&&super.canContinueToUse(); }
             @Override protected void checkAndPerformAttack(LivingEntity target) {
                 if(!nativeAction().isEmpty()||nativeCombat.ownsGroundCombat()||organActionCore()!=null||vascular.active()||TissueCompetition.controls(BlacklightInfectedHost.this))return;
-                if(target instanceof BlacklightInfectedHost prey&&TissueCompetition.tryStart(BlacklightInfectedHost.this,prey))return;
+                if(target instanceof Mob prey&&TissueCompetition.tryStart(BlacklightInfectedHost.this,prey))return;
                 if(organAbilities.tryStart(target))return;
                 if(tissueStrikeElapsed(0)<0&&attackCooldown==0&&isWithinMeleeAttackRange(target)&&getSensing().hasLineOfSight(target)) {
                     resetAttackCooldown();swing(InteractionHand.MAIN_HAND);doHurtTarget(target);attackCooldown=recoverTissueAction(giantBoss()?40:20);
@@ -847,6 +906,7 @@ public final class BlacklightInfectedHost extends Monster {
     }
     @Override public void tick() {
         super.tick();updateParts();if(level().isClientSide)return;setupNavigation();
+        if(tickCount%20==0)refreshInfectionStats();
         TissueDefenseSystem.tick(this);
         if(tissueRecoveryTicks>0)tissueRecoveryTicks--;
         if(isAlive() && ++tissueClock>=20)digestTissue();
@@ -949,7 +1009,7 @@ public final class BlacklightInfectedHost extends Monster {
             if(entity instanceof LivingEntity target) {
                 getLookControl().setLookAt(target,30,30);
                 if(elapsed==TissueOrgans.HIT) {
-                    if(target instanceof BlacklightInfectedHost prey&&TissueCompetition.tryStart(this,prey))return true;
+                    if(target instanceof Mob prey&&TissueCompetition.tryStart(this,prey))return true;
                     rememberTissueContact(target);
                     if(inTissueRange(target)&&hasLineOfSight(target)){
                         swing(InteractionHand.MAIN_HAND);
@@ -1183,6 +1243,7 @@ public final class BlacklightInfectedHost extends Monster {
         if(data.getString("Type").isBlank()) {
             CompoundTag defaults=new CompoundTag();
             defaults.putString("Family","ground");defaults.putBoolean("Quadruped",true);
+            defaults.putBoolean("InfectionNoSourceStats",true);
             defaults.putBoolean("Humanoid",false);defaults.putBoolean("Colossal",false);
             defaults.putInt("FormVersion",2);
             defaults.putFloat("Width",EntityType.PIG.getWidth()*1.12F);
@@ -1239,6 +1300,7 @@ public final class BlacklightInfectedHost extends Monster {
         vitals=TissueVitals.read(tag.getCompound("BlacklightTissueVitals"));vitalsProfile=null;publishVitals();
         defense=TissueDefense.read(tag.getCompound("BlacklightTissueDefense"));publishDefense();
         vascular=com.codex.blacklight.infection.TissueVascular.read(tag.getCompound("BlacklightTissueVascular"));setVascularVisual(new CompoundTag());
+        appliedInfectionRules=null;refreshInfectionStats();
         updateTissueCombat();refreshDimensions();setPersistenceRequired();
     }
 }

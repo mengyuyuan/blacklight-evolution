@@ -97,18 +97,28 @@ public final class ClientTargetLock {
         // nearest the viewing direction, considering only exposed damage surfaces.
         if(mc.hitResult instanceof net.minecraft.world.phys.EntityHitResult hit){
             var candidate=ExplicitTarget.resolve(hit.getEntity());
-            if(visibleInRange(candidate))lockedTarget=candidate;
+            if(visibleInRange(candidate)||candidate instanceof LivingEntity living&&CombatTargeting.altitudeAcquirable(player,living,range()))lockedTarget=candidate;
         }
         if(lockedTarget==null){
             var camera=mc.gameRenderer.getMainCamera();
             Vec3 origin=camera.getPosition(),view=Vec3.directionFromRotation(camera.getXRot(),camera.getYRot());
             double best=Double.NEGATIVE_INFINITY;
             for(var candidate:ExplicitTarget.candidates(player,range())){
-                if(!visibleInRange(candidate))continue;
                 Vec3 delta=focusPoint(candidate).subtract(origin);
                 double angle=view.dot(delta.normalize());
-                if(angle<.5)continue;
-                double score=angle*4-Math.sqrt(ExplicitTarget.distanceSquared(player,candidate))/range();
+                boolean near=angle>=.5&&visibleInRange(candidate);
+                if(!near&&!(candidate instanceof LivingEntity living&&CombatTargeting.altitudeAcquirable(player,living,range())))continue;
+                double score;
+                if(near){
+                    if(angle<.5)continue;
+                    score=angle*4-Math.sqrt(ExplicitTarget.distanceSquared(player,candidate))/range();
+                }else{
+                    // From altitude the jump/glide camera stays near the horizon: ignore the view cone and
+                    // prefer the target most directly below, breaking ties toward the camera's heading.
+                    Vec3 flat=new Vec3(view.x,0,view.z),side=new Vec3(delta.x,0,delta.z);
+                    double h=side.length(),align=h<1e-3||flat.lengthSqr()<1e-6?1:flat.normalize().dot(side.scale(1/h));
+                    score=-h/range()*4+align*.5;
+                }
                 if(score>best){best=score;lockedTarget=candidate;}
             }
         }

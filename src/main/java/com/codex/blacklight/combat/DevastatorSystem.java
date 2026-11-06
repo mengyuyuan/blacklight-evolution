@@ -53,6 +53,8 @@ public final class DevastatorSystem {
     private DevastatorSystem() { }
     public static int kind(WeaponMove move){return move.id.contains("groundspike")?0:move.id.contains("tendril")?1:move.id.contains("critical_pain")?2:3;}
     public static boolean busy(ServerPlayer p){var s=ACTIVE.get(p);return s!=null&&!s.bodyRecovered;}
+    public static boolean active(ServerPlayer p){return ACTIVE.containsKey(p);}
+    public static int sessionAge(ServerPlayer p){var s=ACTIVE.get(p);return s==null?-1:p.tickCount-s.created;}
     /** A late absolute flight packet must not undo a real landing. This ends
      * with source body recovery; observer-only tails own no physical position. */
     public static boolean controlsLandingPosition(ServerPlayer p){
@@ -66,9 +68,15 @@ public final class DevastatorSystem {
         case PAIN->air?WeaponMove.DEV_AIR_CRITICAL_PAIN:WeaponMove.DEV_CRITICAL_PAIN;
         default->null;
     };}
+    /** At least 8 blocks of open air below the feet (unloaded/void below also counts). */
+    private static boolean highAboveGround(ServerPlayer p){
+        var from=p.position();var to=from.add(0,-8,0);
+        return p.level().clip(new net.minecraft.world.level.ClipContext(from,to,net.minecraft.world.level.ClipContext.Block.COLLIDER,
+                net.minecraft.world.level.ClipContext.Fluid.ANY,p)).getType()==net.minecraft.world.phys.HitResult.Type.MISS;
+    }
     private static boolean eligible(ServerPlayer p){
         var state=p.getData(ModAttachments.PLAYER_STATE);var movement=p.getData(ModAttachments.MOVEMENT_STATE);
-        return !com.codex.blacklight.city.HydraTransport.active(p)&&p.isAlive()&&!p.isSpectator()&&!p.isPassenger()&&!p.isFallFlying()&&!p.isInWater()&&!p.isInLava()
+        return !com.codex.blacklight.power.ParasiteSystem.suppressed(p)&&!com.codex.blacklight.city.HydraTransport.active(p)&&p.isAlive()&&!p.isSpectator()&&!p.isPassenger()&&!p.isFallFlying()&&!p.isInWater()&&!p.isInLava()
                 &&state.isInfected()&&state.isPrototypeMode()&&!p.getData(ModAttachments.CONSUMING)
                 &&!movement.wallTraversal().attached()&&movement.chargeTicks()==0
                 &&WeaponMove.controls(state.getActivePower(),p.getMainHandItem().isEmpty()&&p.getOffhandItem().isEmpty());
@@ -88,6 +96,9 @@ public final class DevastatorSystem {
         if(!eligible(p)||!keys.pressedSince(before)||!WeaponCombatSystem.canSkillInterrupt(p))return false;
         var state=p.getData(ModAttachments.PLAYER_STATE);var movement=p.getData(ModAttachments.MOVEMENT_STATE);
         boolean glide=movement.mode()==MovementState.Mode.GLIDE||p.getData(ModAttachments.GLIDE_UNTIL)>p.level().getGameTime();
+        // Glide is not required high up: any long fall or wing flight can start a Bulletdive.
+        boolean wings=com.codex.blacklight.movement.WingFlightSystem.flying(p);
+        if(!glide&&!p.onGround()&&(wings||highAboveGround(p)))glide=true;
         if(special&&!attack&&!action&&!p.onGround()&&before.special()!=special)
             com.codex.blacklight.BlacklightNeoMod.LOGGER.debug("Air special routing for {}: glide={}, mode={}, glideUntil={}, now={}, bulletUnlocked={}, power={}",
                     p.getGameProfile().getName(),glide,movement.mode(),p.getData(ModAttachments.GLIDE_UNTIL),p.level().getGameTime(),
@@ -97,6 +108,7 @@ public final class DevastatorSystem {
             move=WeaponMove.BULLETDIVE_DROP;input=WeaponMove.Input.SPECIAL;
         }else if(input!=null&&input.chord()&&state.hasCombatSkill(skill(input))&&CriticalMassSystem.ready(p))move=move(input,!p.onGround());
         if(move==null||LocalWeaponMotion.find(move.id).isEmpty()||LocalWeaponMotion.find(move.id).orElseThrow().charge().isEmpty())return false;
+        if(move==WeaponMove.BULLETDIVE_DROP&&wings)com.codex.blacklight.movement.WingFlightSystem.stop(p);
         WeaponCombatSystem.cancel(p);
         // cancel does not retain uncommitted ordinary input or traversal leases.
         INPUT.put(p,new Held(keys,p.tickCount));
@@ -170,6 +182,11 @@ public final class DevastatorSystem {
                         s.move.id,s.id,p.getY(),p.onGround(),Math.max(0,s.highest-s.origin.y),s.peakDown);
                 if(s.move==WeaponMove.BULLETDIVE_DROP){
                     var terrain=BulletdiveTerrain.begin(p,s.id,s.origin,Math.max(0,s.highest-s.origin.y));
+                    { // Bulletdive shockwave ring: the surface buckles outward from the crater.
+                        double fall=Math.max(0,s.highest-s.origin.y);float strength=(float)Math.max(.5,Math.min(1,.5+fall/36));
+                        float ring=(float)Math.max(7,Math.min(16,terrain.radius()+4+fall/10));
+                        net.neoforged.neoforge.network.PacketDistributor.sendToPlayersTrackingEntityAndSelf(p,new com.codex.blacklight.network.CombatImpactPayload(s.origin.x,s.origin.y,s.origin.z,ring,true,false,strength,1,0));
+                    }
                     s.timing=new DevastatorTiming(s.timing.effectStart(),s.timing.effectEnd(),s.timing.damageStart(),s.timing.damageEnd(),
                             s.timing.targetStart(),s.timing.targetStop(),Math.max(6F,(float)terrain.radius()+2F),s.timing.damage(),s.timing.targets());
                 }
@@ -183,9 +200,14 @@ public final class DevastatorSystem {
                 s.peakDown=Math.max(s.peakDown,down);
                 Vec3 horizontal=Vec3.ZERO;
                 if(s.move==WeaponMove.BULLETDIVE_DROP){
-                    s.target=CombatTargeting.locked(p);
+                    // Keep the dive target for the whole fall even if the lock UI drops it near the ground.
+                    var locked=CombatTargeting.locked(p);
+                    if(locked!=null)s.target=locked;
+                    else if(s.target!=null&&(!s.target.isAlive()||s.target.level()!=p.level()))s.target=null;
                     var movement=p.getData(ModAttachments.MOVEMENT_STATE);var input=movement.wallInput();
-                    horizontal=BulletdiveSteering.horizontal(p.position(),p.getDeltaMovement(),movement.cameraYaw(p.getYRot()),
+                    if(s.target!=null)horizontal=BulletdiveSteering.guided(p.position(),s.target.position(),
+                            s.target.position().subtract(s.target.xo,s.target.yo,s.target.zo),falling,movement.cameraYaw(p.getYRot()),input.forward(),input.sideways());
+                    else horizontal=BulletdiveSteering.horizontal(p.position(),p.getDeltaMovement(),movement.cameraYaw(p.getYRot()),
                             input.forward(),input.sideways(),s.target==null?null:s.target.position());
                 }
                 p.setDeltaMovement(horizontal.x,-down,horizontal.z);p.hurtMarked=true;
@@ -305,6 +327,7 @@ public final class DevastatorSystem {
                     target.setDeltaMovement(outward.scale(.6*(1-resistance)).add(0,(kind==0?.8:.15)*(1-resistance),0));target.hurtMarked=true;
                 }
                 CombatImpactEffects.target(p,target,s.move);
+                WeaponImpact.contact(p,target,ImpactTier.FINISHER,false,null);
             }
         }
     }
@@ -375,6 +398,7 @@ public final class DevastatorSystem {
     }
     public static void cancel(ServerPlayer p){
         INPUT.remove(p);var s=ACTIVE.remove(p);if(s==null)return;
+        if(com.codex.blacklight.BlacklightNeoMod.LOGGER.isDebugEnabled())com.codex.blacklight.BlacklightNeoMod.LOGGER.debug("Devastator cancel {} session={} phase={}",s.move.id,s.id,s.phase);
         p.setData(ModAttachments.DEVASTATOR_VISUAL,DevastatorVisual.EMPTY);p.syncData(ModAttachments.DEVASTATOR_VISUAL);
         if(p.getData(ModAttachments.WEAPON_VISUAL).move()==s.move.ordinal()){
             p.setData(ModAttachments.WEAPON_VISUAL,WeaponVisual.EMPTY);p.syncData(ModAttachments.WEAPON_VISUAL);

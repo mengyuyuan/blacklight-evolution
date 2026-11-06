@@ -329,9 +329,24 @@ public final class MilitaryVehicle extends Entity {
             if(source.getEntity() instanceof Player attacker&&victim!=attacker&&(!attacker.canHarmPlayer(victim)
                     ||level() instanceof net.minecraft.server.level.ServerLevel server&&!server.getServer().isPvpAllowed()))return false;
         }
-        mechanicalHealth = Math.max(0, mechanicalHealth-amount); markHurt();
+        mechanicalHealth = Math.max(0, mechanicalHealth-amount); markHurt(); lastHurt=level().getGameTime();
+        hitFeedback(source);
         if (mechanicalHealth == 0) destroyOnce(); else syncVehicleState();
         return true;
+    }
+    private long lastHurt=-100;
+    /** Client flash window; the hull flashes like a hurt mob for 8 ticks. */
+    public boolean hurtFlash(float partial){return level().getGameTime()+partial-entityData.get(STATE).getLong("HurtAt")<8;}
+    private void hitFeedback(DamageSource source){
+        if(!(level() instanceof net.minecraft.server.level.ServerLevel server))return;
+        var c=getBoundingBox().getCenter();
+        server.playSound(null,c.x,c.y,c.z,net.minecraft.sounds.SoundEvents.ANVIL_LAND,net.minecraft.sounds.SoundSource.HOSTILE,.55F,.7F+random.nextFloat()*.3F);
+        var at=source.getEntity()!=null?source.getEntity().getEyePosition():c;var hit=getBoundingBox().getCenter().lerp(at,.35);
+        server.sendParticles(net.minecraft.core.particles.ParticleTypes.CRIT,hit.x,hit.y,hit.z,10,.3,.3,.3,.25);
+        server.sendParticles(net.minecraft.core.particles.ParticleTypes.SMOKE,hit.x,hit.y,hit.z,4,.2,.2,.2,.02);
+        if(source.getEntity() instanceof net.minecraft.server.level.ServerPlayer player)
+            player.displayClientMessage(net.minecraft.network.chat.Component.translatable("message.blacklight.vehicle_hull",getDisplayName(),
+                    (int)Math.ceil(mechanicalHealth),(int)maxHealth()),true);
     }
     private void destroyOnce() {
         if (destroyed) return;
@@ -363,7 +378,7 @@ public final class MilitaryVehicle extends Entity {
     @Override protected void defineSynchedData(SynchedEntityData.Builder builder) { builder.define(STATE,new CompoundTag()); }
     public void syncVehicleState() {
         if (definition == null || level().isClientSide) return;
-        var tag=new CompoundTag();tag.putLong("PrimaryShot",primaryShot);tag.putLong("SecondaryShot",secondaryShot);tag.putFloat("Health",mechanicalHealth);tag.putFloat("TurretYaw",turretYaw);tag.putFloat("GunPitch",gunPitch);
+        var tag=new CompoundTag();tag.putLong("PrimaryShot",primaryShot);tag.putLong("SecondaryShot",secondaryShot);tag.putFloat("Health",mechanicalHealth);tag.putLong("HurtAt",lastHurt);tag.putFloat("TurretYaw",turretYaw);tag.putFloat("GunPitch",gunPitch);
         tag.putString("SelectedPrimary",selectedPrimary);tag.putString("StopReason",stopReason.name());tag.put("Inventory",writeInventory());
         var occupants=new CompoundTag();seats.occupants().forEach(occupants::putUUID);tag.put("Seats",occupants);
         var tokens=new CompoundTag();leases.forEach((id,token)->tokens.putUUID(id.toString(),token));tag.put("Leases",tokens);entityData.set(STATE,tag);

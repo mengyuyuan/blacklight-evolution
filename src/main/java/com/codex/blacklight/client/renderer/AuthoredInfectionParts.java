@@ -233,6 +233,11 @@ public final class AuthoredInfectionParts {
                 if(cubes.size()>index)target=new NativePart(target.name,target.part,target.rest,cubes.get(index));
             }
             if(target!=null)grouped.computeIfAbsent(target,k->new ArrayList<>()).add(bone);
+            // Split torsos (wolf mane, chest plates) would otherwise keep a bare native block
+            // beside the infected body: fit the same body tissue to each secondary torso cube.
+            if(target!=null&&bone.get("name").getAsString().equals("body"))
+                for(var extra:parts)if(extra!=target&&extra.part!=target.part&&(extra.name.equals("upper_body")||extra.name.equals("mane")||extra.name.equals("chest")))
+                    {var skinOnly=bone.deepCopy();var empty=new JsonObject();empty.add("vertices",new JsonArray());empty.add("triangles",new JsonArray());skinOnly.add("growth",empty);skinOnly.remove("lateGrowth");grouped.computeIfAbsent(extra,k->new ArrayList<>()).add(skinOnly);}
         }
         for(var group:grouped.entrySet())for(var bone:group.getValue()){
 

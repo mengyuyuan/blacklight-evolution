@@ -11,16 +11,15 @@ public final class BlacklightHydraRenderer extends GeoEntityRenderer<BlacklightH
     public BlacklightHydraRenderer(EntityRendererProvider.Context c){super(c,new BlacklightHydraModel());shadowRadius=1.2F;}
     @Override public void render(BlacklightHydra e,float yaw,float partial,PoseStack pose,MultiBufferSource buffers,int light){
         pose.pushPose();
+        float scale=e.visualScale();
         if(e.planted()&&e.growth()<1){
-            // A planted organ develops before the mature creature first breaks the surface.
-            float size=.65F+e.growth()*.9F;
-            float pulse=1+.035F*(float)Math.sin((e.tickCount+partial)*(e.action()==1?.45F:.12F));
-            pose.scale(size*pulse,size/pulse,size*pulse);pose.translate(-.5,0,-.5);
-            net.minecraft.client.Minecraft.getInstance().getBlockRenderer().renderSingleBlock(
-                com.codex.blacklight.city.CityBlocks.SAC.get().defaultBlockState(),pose,buffers,light,
-                net.minecraft.client.renderer.texture.OverlayTexture.NO_OVERLAY);
+            // Original P1 hydras erupt from the ground. A growing gateway pushes up out of the soil
+            // instead of sitting in an egg sac: only the skull and upper neck clear the surface.
+            float g=e.growth();float pulse=1+.03F*(float)Math.sin((e.tickCount+partial)*(e.action()==1?.45F:.12F));
+            pose.translate(0,-(1-g)*6.2F*scale,0);pose.scale(scale*pulse,scale,scale*pulse);
+            super.render(e,yaw,partial,pose,buffers,light);
         }else{
-            float scale=e.visualScale();pose.scale(scale,scale,scale);
+            pose.scale(scale,scale,scale);
             super.render(e,yaw,partial,pose,buffers,light);
         }
         pose.popPose();
@@ -43,10 +42,6 @@ public final class BlacklightHydraRenderer extends GeoEntityRenderer<BlacklightH
             software.bernie.geckolib.cache.object.GeoBone bone, net.minecraft.client.renderer.RenderType type,
             net.minecraft.client.renderer.MultiBufferSource buffers, com.mojang.blaze3d.vertex.VertexConsumer out,
             boolean reRender,float partial,int light,int overlay,int color){
-        if(bone.getParent()==null&&!bone.isHidden()){
-            var mesh=com.codex.blacklight.client.model.ConnectedCreatureMesh.get("hydra");
-            if(mesh!=null)mesh.render(bone,pose,buffers.getBuffer(net.minecraft.client.renderer.RenderType.entityCutoutNoCull(SKIN)),light,overlay,color);
-        }
         super.renderRecursively(pose,entity,bone,type,buffers,out,reRender,partial,light,overlay,color);
     }
 }
