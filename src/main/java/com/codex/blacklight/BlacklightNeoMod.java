@@ -95,6 +95,9 @@ public final class BlacklightNeoMod {
         if (net.minecraftforge.fml.ModList.get().isLoaded("parcool")) {
             MinecraftForge.EVENT_BUS.register(com.codex.blacklight.integration.parcool.ParCoolCompatibility.class);
         }
+        if (net.minecraftforge.fml.ModList.get().isLoaded("epicfight")) {
+            com.codex.blacklight.compat.EpicFightBlacklightBridge.register(MinecraftForge.EVENT_BUS);
+        }
         LOGGER.info("Blacklight: Ascension initialized with independent player actions, skeletal rendering and GeckoLib entity animations");
     }
 }
