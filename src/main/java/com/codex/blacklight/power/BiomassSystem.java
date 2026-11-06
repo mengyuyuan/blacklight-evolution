@@ -47,10 +47,11 @@ public final class BiomassSystem {
         if(resize)p.refreshDimensions();
     }
     public static boolean begin(ServerPlayer p,boolean fatal){
-        if(!p.server.isSameThread()||!STARTING.add(p))return false;
+        if(!ModAttachments.available(p)||p.server==null||!p.server.isSameThread()||!STARTING.add(p))return false;
         try{return beginReserved(p,fatal);}finally{STARTING.remove(p);}
     }
     private static boolean canBegin(ServerPlayer p,boolean fatal){
+        if(!ModAttachments.available(p))return false;
         var power=p.getData(ModAttachments.PLAYER_STATE);
         if(active(p)||!power.isInfected()||!power.isPrototypeMode()||p.isSpectator()||p.isRemoved())return false;
         if(!fatal&&(com.codex.blacklight.city.HydraTransport.active(p)||!p.isAlive()||p.isPassenger()||p.isSleeping()||p.isFallFlying()
@@ -140,7 +141,7 @@ public final class BiomassSystem {
     /** A claim is transient and valid only while its live player is absorbing nearby. */
     public static Player claimant(Entity victim){
         if(!(victim instanceof Mob))return null;
-        for(var p:victim.level().players()){var s=state(p);
+        for(var p:victim.level().players()){if(!com.codex.blacklight.registry.ModAttachments.available(p))continue;var s=state(p);
             if(p.isAlive()&&s.phase()==BiomassState.ABSORBING&&s.victim()==victim.getId()
                     &&(inContact(p,(LivingEntity)victim)||p instanceof ServerPlayer server&&BiomassAttachment.attached(server,(Mob)victim)))return p;
         }return null;
@@ -152,6 +153,7 @@ public final class BiomassSystem {
         }
     }
     private static void tickPlayer(ServerPlayer p){
+        if(!ModAttachments.available(p))return;
         if(!p.isAlive())return;
         if(!p.getData(ModAttachments.PLAYER_STATE).isInfected()) {publish(p,BiomassState.EMPTY);return;}
         var s=state(p);long now=p.level().getGameTime();
@@ -201,7 +203,7 @@ public final class BiomassSystem {
             // This is the completed consumption execution, not a normal attack.
             // Spore's calamities explicitly permit >= 10000 execution hits past their cap.
             float execution=(float)Math.min(Float.MAX_VALUE,Math.max(10000D,(double)target.getMaxHealth()*20));
-            boolean accepted=target.hurt(target.damageSources().playerAttack(p),execution);
+            boolean accepted=com.codex.blacklight.combat.ConsumeLastChance.execute(target,()->target.hurt(target.damageSources().playerAttack(p),execution));
             // hurt/die dispatch synchronous external callbacks. The player may
             // die, travel, recall or leave this form while the prey is dying.
             // Do not overwrite that newer state with the old scene's full heal.

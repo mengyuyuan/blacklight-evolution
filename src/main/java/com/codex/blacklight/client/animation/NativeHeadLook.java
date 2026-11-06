@@ -19,7 +19,7 @@ public final class NativeHeadLook {
                 ||player.getData(ModAttachments.POWER_MORPH).visible(player,partial)
                 ||player.getData(ModAttachments.HIT_REACTION).weight(player.level().getGameTime(),partial)>0)return;
         var action=player.getData(ModAttachments.PLAYER_ACTION);
-        if(action.active(player.level().getGameTime()+partial)&&!action.clipId().startsWith("basic_"))return;
+        if(action.active(com.codex.blacklight.animation.PlayerMotionController.actionTime(player,partial))&&!action.clipId().startsWith("basic_"))return;
         float headYaw=Mth.rotLerp(partial,player.yHeadRotO,player.yHeadRot);
         float bodyYaw=BlacklightRenderPose.facing(player,partial);
         float yaw=Mth.clamp(Mth.wrapDegrees(headYaw-bodyYaw),-75,75);

@@ -7,6 +7,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.ClipContext;
+import net.minecraft.world.entity.Mob;
 import net.minecraft.world.phys.*;
 
 /** One paid, retractable connection carries existing digested food, never a fresh meal or capture credit. */
@@ -22,48 +23,65 @@ public final class TissueVascular {
     public static float extension(float time){if(!Float.isFinite(time)||time<0||time>=END)return 0;float t=time<CONTACT?time/CONTACT:time<RETRACT?1:(END-time)/(END-RETRACT);t=Math.clamp(t,0,1);return t*t*(3-2*t);}
     public static float visualExtension(CompoundTag state,double now){if(state.isEmpty()||!Double.isFinite(now))return 0;if(!state.contains("CancelledAt"))return extension((float)(now-state.getLong("Started")));float t=(float)Math.clamp((now-state.getLong("CancelledAt"))/8,0,1),from=state.getFloat("CancelFrom");return Float.isFinite(from)?Math.clamp(from,0,1)*(1-t*t*(3-2*t)):0;}
     private static boolean work(ServerLevel level){long now=level.getGameTime();var budget=BUDGETS.computeIfAbsent(level,k->new Budget());if(budget.tick!=now){budget.tick=now;budget.searches=0;}if(budget.searches>=4)return false;budget.searches++;return true;}
-    public static Vec3 root(BlacklightInfectedHost host,float partial){return host.getPosition(partial).add(0,host.getBbHeight()*.48+host.tissueStanceOffset(),0);}
-    private static boolean free(BlacklightInfectedHost host){return TissueFeeding.free(host)&&!host.isNoAi()&&!host.isEvolved()&&host.getHealth()>=host.getMaxHealth()*.6F
+    public static Vec3 root(BlacklightInfectedHost host,float partial){return root((Mob)host,partial);}
+    public static Vec3 root(Mob host,float partial){return host.getPosition(partial).add(0,host.getBbHeight()*.48+(host instanceof BlacklightInfectedHost h?h.tissueStanceOffset():0),0);}
+    private static int nutrition(Mob host){return host instanceof BlacklightInfectedHost h?h.tissueNutrition():NativeTissue.nutrition(host);}
+    private static double power(Mob host){return TissueActions.power(host,TissueCore.VASCULAR);}
+    private static boolean spend(Mob host,int amount){return TissueActions.spend(host,amount);}
+    private static CompoundTag visual(Mob host){return host instanceof BlacklightInfectedHost h?h.vascularVisual():NativeTissue.snapshot(host).getCompound("Vascular").copy();}
+    private static void visual(Mob host,CompoundTag tag){if(host instanceof BlacklightInfectedHost h)h.setVascularVisual(tag);else NativeTissue.vascular(host,tag);}
+    /** Existing host navigation is retained; native sources never surrender theirs. */
+    private static void stopHost(Mob host){if(host instanceof BlacklightInfectedHost)host.getNavigation().stop();}
+    private static boolean free(Mob host){return com.codex.blacklight.registry.ModAttachments.available(host)
+            &&(host instanceof BlacklightInfectedHost h?TissueFeeding.free(h)&&!h.isEvolved():NativeTissueFeeding.free(host)
+                &&host.getDeltaMovement().horizontalDistanceSqr()<.0025&&Math.abs(host.getDeltaMovement().y)<.12)
+            &&!host.isNoAi()&&host.getHealth()>=host.getMaxHealth()*.6F
             &&(host.getTarget()==null||!host.getTarget().isAlive()||host.distanceToSqr(host.getTarget())>16*16);}
-    private ColonyNutrients.Mouth colony(BlacklightInfectedHost host){return host.level() instanceof ServerLevel level&&target!=null?ColonyNutrients.resolve(level,target):null;}
+    private ColonyNutrients.Mouth colony(Mob host){return host.level() instanceof ServerLevel level&&target!=null?ColonyNutrients.resolve(level,target):null;}
     public static Vec3 mouth(ServerLevel level,BlockPos pos){var s=level.getBlockState(pos);return Vec3.atCenterOf(pos).relative(s.getValue(com.codex.blacklight.world.BuildingInfectionCoreBlock.FACING),.7);}
-    private static boolean valid(BlacklightInfectedHost host,ColonyNutrients.Mouth c,boolean contact){
+    private static boolean valid(Mob host,ColonyNutrients.Mouth c,boolean contact){
         if(!(host.level() instanceof ServerLevel level)||c==null||!WorldOutbreakSystem.active(level)
                 ||!level.getGameRules().getBoolean(net.minecraft.world.level.GameRules.RULE_MOBGRIEFING)||!level.hasChunkAt(c.pos())||!level.isPositionEntityTicking(c.pos())
+                ||!(host instanceof BlacklightInfectedHost)&&!NativeTissueVascular.grief(host)
                 ||!ColonyNutrients.isPort(level.getBlockState(c.pos())))return false;
         if(!contact)return host.distanceToSqr(Vec3.atCenterOf(c.pos()))<=16*16;
-        var from=root(host,0);var to=mouth(level,c.pos());if(from.distanceToSqr(to)>25)return false;
+        var from=root(host,1);var to=mouth(level,c.pos());if(from.distanceToSqr(to)>25)return false;
         for(int x:new int[]{(int)Math.floor(Math.min(from.x,to.x)),(int)Math.floor(Math.max(from.x,to.x))})for(int z:new int[]{(int)Math.floor(Math.min(from.z,to.z)),(int)Math.floor(Math.max(from.z,to.z))})if(!level.hasChunkAt(new BlockPos(x,c.pos().getY(),z)))return false;
         return level.clip(new ClipContext(from,to,ClipContext.Block.COLLIDER,ClipContext.Fluid.NONE,host)).getType()==HitResult.Type.MISS;
     }
-    public boolean start(BlacklightInfectedHost host,BuildingInfectionData.Colony c){return host.level() instanceof ServerLevel level&&c!=null&&start(host,ColonyNutrients.resolve(level,c.origin));}
-    public boolean startAt(BlacklightInfectedHost host,BlockPos pos){return host.level() instanceof ServerLevel level&&start(host,ColonyNutrients.resolve(level,pos));}
-    private boolean start(BlacklightInfectedHost host,ColonyNutrients.Mouth c){
-        double power=host.organPower(TissueCore.VASCULAR);if(active()||cooldown>0||!free(host)||!valid(host,c,true)||amount(power,host.tissueNutrition()-OPEN_COST,c.stock().room())==0||!host.spendTissueNutrition(OPEN_COST))return false;
-        target=c.pos();elapsed=0;started=host.level().getGameTime();committed=false;delivered=0;host.getNavigation().stop();publish(host);return true;
+    public boolean start(BlacklightInfectedHost host,BuildingInfectionData.Colony c){return start((Mob)host,c);}
+    public boolean start(Mob host,BuildingInfectionData.Colony c){return host.level() instanceof ServerLevel level&&c!=null&&start(host,ColonyNutrients.resolve(level,c.origin));}
+    public boolean startAt(BlacklightInfectedHost host,BlockPos pos){return startAt((Mob)host,pos);}
+    public boolean startAt(Mob host,BlockPos pos){return host.level() instanceof ServerLevel level&&start(host,ColonyNutrients.resolve(level,pos));}
+    private boolean start(Mob host,ColonyNutrients.Mouth c){
+        double power=power(host);if(active()||cooldown>0||!free(host)||!valid(host,c,true)||amount(power,nutrition(host)-OPEN_COST,c.stock().room())==0||!spend(host,OPEN_COST))return false;
+        target=c.pos();elapsed=0;started=host.level().getGameTime();committed=false;delivered=0;stopHost(host);publish(host);return true;
     }
-    public void interrupt(BlacklightInfectedHost host){
-        if(!active()&&!seeking())return;boolean connected=active();var previous=host.vascularVisual();
-        elapsed=-1;target=null;approach=0;cooldown=Math.max(cooldown,80);host.getNavigation().stop();
-        if(connected&&!previous.isEmpty()){long now=host.level().getGameTime();previous.putFloat("CancelFrom",visualExtension(previous,now));previous.putLong("CancelledAt",now);previous.putBoolean("Committed",false);host.setVascularVisual(previous);visualTail=8;}else publish(host);
+    public void interrupt(BlacklightInfectedHost host){interrupt((Mob)host);}
+    public void interrupt(Mob host){
+        if(!active()&&!seeking())return;boolean connected=active();var previous=visual(host);
+        elapsed=-1;target=null;approach=0;cooldown=Math.max(cooldown,80);stopHost(host);
+        if(connected&&!previous.isEmpty()){long now=host.level().getGameTime();previous.putFloat("CancelFrom",visualExtension(previous,now));previous.putLong("CancelledAt",now);previous.putBoolean("Committed",false);visual(host,previous);visualTail=8;}else publish(host);
     }
-    private void publish(BlacklightInfectedHost host){var tag=new CompoundTag();if(active()&&target!=null){tag.putLong("Target",target.asLong());tag.putLong("Started",started);tag.putInt("Delivered",delivered);tag.putBoolean("Committed",committed);var old=host.level().getBlockState(target);if(old.hasProperty(com.codex.blacklight.world.BuildingInfectionCoreBlock.FACING)){var end=Vec3.atCenterOf(target).relative(old.getValue(com.codex.blacklight.world.BuildingInfectionCoreBlock.FACING),.7);tag.putDouble("EndX",end.x);tag.putDouble("EndY",end.y);tag.putDouble("EndZ",end.z);}}host.setVascularVisual(tag);}
-    public boolean tick(BlacklightInfectedHost host){
+    private void publish(Mob host){var tag=new CompoundTag();if(active()&&target!=null){tag.putLong("Target",target.asLong());tag.putLong("Started",started);tag.putInt("Delivered",delivered);tag.putBoolean("Committed",committed);var old=host.level().getBlockState(target);if(old.hasProperty(com.codex.blacklight.world.BuildingInfectionCoreBlock.FACING)){var end=Vec3.atCenterOf(target).relative(old.getValue(com.codex.blacklight.world.BuildingInfectionCoreBlock.FACING),.7);tag.putDouble("EndX",end.x);tag.putDouble("EndY",end.y);tag.putDouble("EndZ",end.z);}}visual(host,tag);}
+    public boolean tick(BlacklightInfectedHost host){return tick((Mob)host);}
+    public boolean tick(Mob host){
         if(visualTail>0&&--visualTail==0)publish(host);
         if(cooldown>0)cooldown--;
         if(active()){
             var c=colony(host);if(!free(host)||!valid(host,c,true)){interrupt(host);return false;}
-            host.getNavigation().stop();host.setXxa(0);host.setZza(0);host.setDeltaMovement(host.getDeltaMovement().multiply(.35,1,.35));
+            if(host instanceof BlacklightInfectedHost){stopHost(host);host.setXxa(0);host.setZza(0);host.setDeltaMovement(host.getDeltaMovement().multiply(.35,1,.35));}
             elapsed++;
             if(elapsed==CONTACT&&!committed){
-                int n=amount(host.organPower(TissueCore.VASCULAR),host.tissueNutrition(),c.stock().room());
-                if(n>0&&host.spendTissueNutrition(n)){int accepted=c.stock().receive(n);if(accepted!=n)throw new IllegalStateException("Vascular destination changed during a server-owned transfer");delivered=n;c.changed().run();}
+                int n=amount(power(host),nutrition(host),c.stock().room());
+                if(n>0&&spend(host,n)){int accepted=c.stock().receive(n);if(accepted!=n)throw new IllegalStateException("Vascular destination changed during a server-owned transfer");delivered=n;c.changed().run();}
                 committed=true;publish(host);
             }
             if(elapsed>=END){elapsed=-1;target=null;cooldown=160;publish(host);return false;}return true;
         }
-        if(cooldown>0||host.organPower(TissueCore.VASCULAR)<=0||host.tissueNutrition()<192||!free(host)||!(host.level() instanceof ServerLevel level)){if(seeking())interrupt(host);return false;}
+        if(cooldown>0||power(host)<=0||nutrition(host)<192||!free(host)||!(host.level() instanceof ServerLevel level)){if(seeking())interrupt(host);return false;}
         if(seeking()){
+            if(!(host instanceof BlacklightInfectedHost)){interrupt(host);return false;}
             var c=colony(host);if(!valid(host,c,false)||c.stock().reserve()>=TissueMetabolism.MAX_RESERVE/2||++approach>160){interrupt(host);return false;}
             if(start(host,c))return true;
             if(approach%20==0&&work(level)){var entry=mouth(level,c.pos());host.getNavigation().moveTo(entry.x,c.pos().getY(),entry.z,.85);}return false;
@@ -72,7 +90,9 @@ public final class TissueVascular {
         if(!work(level)){nextSearch=now+1+Math.floorMod(host.getId(),5);return false;}
         var choice=ColonyNutrients.nearby(level,host.position(),16).stream().filter(c->c.stock().reserve()<TissueMetabolism.MAX_RESERVE/2&&valid(host,c,false))
                 .min(Comparator.comparingDouble(c->host.distanceToSqr(Vec3.atCenterOf(c.pos())))).orElse(null);
-        if(choice==null)return false;if(start(host,choice))return true;target=choice.pos();approach=0;
+        if(choice==null)return false;if(start(host,choice))return true;
+        if(!(host instanceof BlacklightInfectedHost))return false;
+        target=choice.pos();approach=0;
         var entry=mouth(level,choice.pos());host.getNavigation().moveTo(entry.x,choice.pos().getY(),entry.z,.85);return false;
     }
     public CompoundTag write(){var t=new CompoundTag();t.putInt("Cooldown",Math.max(cooldown,active()?160:0));return t;}

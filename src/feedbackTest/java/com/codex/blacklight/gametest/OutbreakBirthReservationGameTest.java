@@ -116,7 +116,7 @@ public final class OutbreakBirthReservationGameTest {
     private static void encounter(GameTestHelper h,boolean hiveFirst){var f=new Fixture(h);OutbreakConfig.BATCH.set(1);f.run(()->{
         for(int x=-15;x<=15;x++)for(int z=-15;z<=15;z++){var p=f.origin.offset(x,-1,z);f.blocks.putIfAbsent(p,f.level.getBlockState(p));f.level.setBlock(p,Blocks.STONE.defaultBlockState(),2);}
         var player=net.neoforged.neoforge.common.util.FakePlayerFactory.get(f.level,new com.mojang.authlib.GameProfile(UUID.randomUUID(),"BirthHiveQA"));player.setGameMode(GameType.SURVIVAL);player.setPos(f.origin.east(3).getBottomCenter());f.level.addNewPlayer(player);
-        var hive=ModEntities.BLACKLIGHT_HIVE.get().create(f.level);hive.setPos(f.origin.getBottomCenter());var tag=new net.minecraft.nbt.CompoundTag();hive.saveWithoutId(tag);tag.putInt("BlacklightWaveCooldown",0);hive.load(tag);f.level.addFreshEntity(hive);
+        var hive=ModEntities.BLACKLIGHT_HIVE.get().create(f.level);hive.setPos(f.origin.getBottomCenter());var tag=new net.minecraft.nbt.CompoundTag();hive.saveWithoutId(tag);tag.putInt("BlacklightWaveCooldown",0);tag.putFloat("BlacklightGrowth",1F);tag.putString("BlacklightBrood","common");hive.load(tag);f.level.addFreshEntity(hive);
         int[] calls={0};Mob[] nested={null};
         Consumer<EntityJoinLevelEvent> callback=e->{if(e.getLevel()==f.level&&e.getEntity() instanceof com.codex.blacklight.entity.BlacklightCommonInfected&&calls[0]++==0){if(hiveFirst)nested[0]=f.spawn(f.origin.east(5));else{hive.tickCount=20;hive.tick();}}};
         NeoForge.EVENT_BUS.addListener(callback);

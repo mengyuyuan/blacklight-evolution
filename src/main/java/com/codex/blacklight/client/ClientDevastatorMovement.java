@@ -51,7 +51,10 @@ public final class ClientDevastatorMovement {
             var movement=p.getData(ModAttachments.MOVEMENT_STATE);var input=movement.wallInput();
             var target=mc.level.getEntity(v.targetId());
             Vec3 aim=target!=null&&target.isAlive()?target.position():v.diveAim();
-            var horizontal=BulletdiveSteering.horizontal(p.position(),p.getDeltaMovement(),movement.cameraYaw(p.getYRot()),
+            var horizontal=target!=null&&target.isAlive()
+                    ?BulletdiveSteering.guided(p.position(),target.position(),target.position().subtract(target.xo,target.yo,target.zo),
+                            (int)ticks,movement.cameraYaw(p.getYRot()),input.forward(),input.sideways())
+                    :BulletdiveSteering.horizontal(p.position(),p.getDeltaMovement(),movement.cameraYaw(p.getYRot()),
                     input.forward(),input.sideways(),aim);
             p.setDeltaMovement(horizontal.x,-BulletdivePhysics.downSpeed(ticks),horizontal.z);
         } else if(v.phase()==DevastatorSystem.RELEASE&&(v.kind()==3||v.kind()==0&&!p.onGround())) {

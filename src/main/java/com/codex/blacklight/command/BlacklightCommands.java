@@ -22,6 +22,7 @@ public final class BlacklightCommands {
         CommandDispatcher<CommandSourceStack> dispatcher = event.getDispatcher();
         dispatcher.register(Commands.literal("blacklight")
                 .then(HiveCommands.commands())
+                .then(CompatibilityCommands.commands())
                 .then(MilitaryCommands.commands())
                 .then(Commands.literal("infect").requires(source -> source.hasPermission(2)).executes(context -> {
                     ServerPlayer player = context.getSource().getPlayerOrException();
@@ -74,6 +75,16 @@ public final class BlacklightCommands {
 
                     return 1;
                 }))
+                .then(Commands.literal("grow").requires(source -> source.hasPermission(2))
+                        .then(Commands.argument("targets",net.minecraft.commands.arguments.EntityArgument.entities())
+                                .then(Commands.argument("minutes",IntegerArgumentType.integer(1,240)).executes(context->{
+                                    int minutes=IntegerArgumentType.getInteger(context,"minutes"),grown=0;
+                                    for(var target:net.minecraft.commands.arguments.EntityArgument.getEntities(context,"targets"))
+                                        if(target instanceof com.codex.blacklight.entity.BlacklightInfectedHost host&&host.isAlive()){host.fastForwardTissue(minutes*1200L);grown++;}
+                                    int count=grown;
+                                    context.getSource().sendSuccess(()->Component.literal("已让 "+count+" 个感染体快进生长 "+minutes+" 分钟。满足吞噬门槛的会在一秒内开始蜕变。"),false);
+                                    return count;
+                                }))))
                 .then(Commands.literal("infect_mob").requires(source -> source.hasPermission(2))
                         .then(Commands.argument("targets",net.minecraft.commands.arguments.EntityArgument.entities()).executes(context->{
                             int infected=0;
@@ -100,6 +111,13 @@ public final class BlacklightCommands {
                                 .then(Commands.argument("position",net.minecraft.commands.arguments.coordinates.Vec3Argument.vec3())
                                         .executes(context->spawnInfected(context.getSource(),StringArgumentType.getString(context,"species"),
                                                 net.minecraft.commands.arguments.coordinates.Vec3Argument.getVec3(context,"position"),true)))))
+                .then(Commands.literal("spawn_supreme_hunter").requires(source -> source.hasPermission(2)).executes(context->{
+                    var p=context.getSource().getPlayerOrException();
+                    var at=p.position().add(p.getLookAngle().multiply(1,0,1).normalize().scale(12));
+                    var boss=com.codex.blacklight.entity.SupremeHunterRewards.summon(p.serverLevel(),at,p);
+                    if(boss==null){context.getSource().sendFailure(Component.translatable("command.blacklight.supreme_hunter_no_room"));return 0;}
+                    context.getSource().sendSuccess(()->Component.translatable("command.blacklight.supreme_hunter_spawned"),false);return 1;
+                }))
                 .then(Commands.literal("colossus_status").requires(source -> source.hasPermission(2)).executes(context->{
                     var player=context.getSource().getPlayerOrException();
                     context.getSource().sendSuccess(()->com.codex.blacklight.infection.ColossusEvolutionSystem.describe(player),false);

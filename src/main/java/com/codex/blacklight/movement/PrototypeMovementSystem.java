@@ -103,6 +103,10 @@ public final class PrototypeMovementSystem {
         }
         movement.acceptInput(jumpHeld, dashPressed, forward, sideways, sprinting, detach);
         movement.jumpInput().acceptInput(jumpHeld, player, movement.wallTraversal().attached());
+        if (dashPressed && player.onGround() && movement.canHop() && WeaponCombatSystem.cancelableRecovery(player)) {
+            // Recovery frames yield to an explicit dodge: the move's contacts are spent.
+            WeaponCombatSystem.cancel(player);
+        }
         if (WeaponCombatSystem.busy(player)) {
             movement.jumpInput().cancelPendingCharge();
             WeaponCombatSystem.movementInput(player, jumpHeld && !wasJumpHeld);
@@ -355,6 +359,13 @@ public final class PrototypeMovementSystem {
             beginChargedJump(player, movement);
         }
         if (movement.chargeTicks() <= 0) return;
+        // The release edge can arrive while another owner (weapon recovery, hop,
+        // water) swallows acceptInput. A charge whose key is already up must never
+        // keep the planted pose; release it here instead of waiting for an edge.
+        if (!movement.jumpHeld()) {
+            releaseChargedJump(player, movement);
+            return;
+        }
 
         // Never manufacture a grounded state. If the player walks or is pushed off an
         // edge while charging, cancel the charge and let normal falling physics resume.
@@ -707,6 +718,7 @@ public final class PrototypeMovementSystem {
             target.push(forward.x * shove, 0.32D + 0.30D * intensity, forward.z * shove);
             target.hurtMarked = true;
             PrototypeMovementEffects.onSprintBodyCheck(player, target, forward, intensity);
+            if (intensity >= 0.5F) com.codex.blacklight.combat.HitStop.victim(target, intensity >= 0.85F ? 4 : 2);
             if (++hits >= 3) break;
         }
         if (cooldowns.size() > 24) {
@@ -737,6 +749,8 @@ public final class PrototypeMovementSystem {
                     push = push.normalize();
                 }
                 target.push(push.x * 0.85D, 0.42D, push.z * 0.85D);
+                com.codex.blacklight.combat.WeaponImpact.contact(player, target, com.codex.blacklight.combat.ImpactTier.HEAVY,
+                        hit.size() == 1, com.codex.blacklight.network.PhysicalFeedbackPayload.Effect.CLAW_HEAVY);
             }
         }
     }

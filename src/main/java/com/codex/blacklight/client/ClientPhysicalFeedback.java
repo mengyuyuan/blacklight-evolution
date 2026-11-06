@@ -35,6 +35,7 @@ public final class ClientPhysicalFeedback {
     }
 
     public static void accept(PhysicalFeedbackPayload payload) {
+        CombatCinematics.accept(payload);
         if(com.codex.blacklight.client.camera.PrototypeChaseCamera.ownsView()) {
             com.codex.blacklight.client.camera.PrototypeChaseCamera.impact(payload);return;
         }

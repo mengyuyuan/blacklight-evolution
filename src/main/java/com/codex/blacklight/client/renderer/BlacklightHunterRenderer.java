@@ -31,10 +31,6 @@ public final class BlacklightHunterRenderer extends AnatomicalGeoRenderer<Blackl
             software.bernie.geckolib.cache.object.GeoBone bone, net.minecraft.client.renderer.RenderType type,
             net.minecraft.client.renderer.MultiBufferSource buffers, com.mojang.blaze3d.vertex.VertexConsumer out,
             boolean reRender,float partial,int light,int overlay,int color){
-        if(bone.getParent()==null&&!bone.isHidden()){
-            var mesh=com.codex.blacklight.client.model.ConnectedCreatureMesh.get("hunter");
-            if(mesh!=null)mesh.render(bone,pose,buffers.getBuffer(net.minecraft.client.renderer.RenderType.entityCutoutNoCull(SKIN)),light,overlay,color);
-        }
         super.renderRecursively(pose,entity,bone,type,buffers,out,reRender,partial,light,overlay,color);
     }
 }

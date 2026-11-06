@@ -19,8 +19,11 @@ public abstract class LivingConsumePoseMixin {
     @Shadow protected EntityModel<?> model;
     @WrapMethod(method="render(Lnet/minecraft/world/entity/LivingEntity;FFLcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;I)V")
     private void blacklight$scope(LivingEntity entity,float yaw,float partial,PoseStack stack,MultiBufferSource buffer,int light,Operation<Void> original) {
-        try (var scope = LivingRenderScope.begin(stack)) {
-            try { original.call(entity,yaw,partial,stack,buffer,light); }
+        try (var actor = com.codex.blacklight.client.renderer.NativeRenderScope.enter(entity);
+             var scope = LivingRenderScope.begin(stack);
+             var tissue = com.codex.blacklight.client.renderer.NativeInfectionVisuals.begin(entity,model,
+                     ()->((LivingEntityRenderer)(Object)this).getTextureLocation(entity),stack,partial)) {
+            try { original.call(entity,yaw,partial,stack,tissue==null?buffer:com.codex.blacklight.client.renderer.NativeInfectionVisuals.buffers(buffer),light); }
             finally { ConsumeVictimPose.restore(model); }
         }
     }

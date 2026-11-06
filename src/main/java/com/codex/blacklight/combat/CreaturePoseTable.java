@@ -7,17 +7,19 @@ import java.util.*;
 
 /** Sampled rotations, independent of Gecko's local controller clock (including late tracking). */
 public final class CreaturePoseTable {
-    public static final CreaturePoseTable HUNTER=new CreaturePoseTable();
+    public static final CreaturePoseTable HUNTER=new CreaturePoseTable("/assets/blacklight/models/hunter_combat_motion.json");
     public final String[] bones;
     private final Map<String,float[][][]> clips=new HashMap<>();
-    private CreaturePoseTable(){
-        try(var in=Objects.requireNonNull(getClass().getResourceAsStream("/assets/blacklight/models/hunter_combat_motion.json"));
+    private CreaturePoseTable(String path){
+        try(var in=Objects.requireNonNull(CreaturePoseTable.class.getResourceAsStream(path));
             var reader=new InputStreamReader(in,StandardCharsets.UTF_8)){
             var root=JsonParser.parseReader(reader).getAsJsonObject();var gson=new Gson();
             bones=gson.fromJson(root.get("bones"),String[].class);
             root.getAsJsonObject("clips").entrySet().forEach(e->clips.put(e.getKey(),gson.fromJson(e.getValue(),float[][][].class)));
-        }catch(Exception e){throw new IllegalStateException("Invalid hunter combat motion",e);}
+        }catch(Exception e){throw new IllegalStateException("Invalid creature combat motion "+path,e);}
     }
+    public boolean has(String clip){return clips.containsKey(clip);}
+    public float seconds(String clip){var frames=clips.get(clip);return frames==null?0:(frames.length-1)/30F;}
     public float[][] sample(String clip,float ticks){
         var frames=Objects.requireNonNull(clips.get(clip),clip);
         float frame=Math.clamp(ticks*1.5F,0,frames.length-1);int lo=(int)frame,hi=Math.min(lo+1,frames.length-1);

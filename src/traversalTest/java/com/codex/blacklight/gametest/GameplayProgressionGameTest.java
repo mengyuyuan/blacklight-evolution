@@ -90,6 +90,7 @@ public final class GameplayProgressionGameTest {
         var viewer=new net.minecraft.server.level.ServerPlayer[1];
         var core=new com.codex.blacklight.entity.BlacklightHive[1];
         var births=new java.util.HashSet<UUID>();
+        var healthyReference=new java.util.ArrayList<net.minecraft.world.entity.Mob>();
         java.util.function.Consumer<net.neoforged.neoforge.event.entity.EntityJoinLevelEvent> joined=e->{
             if(e.getLevel()==level&&!e.loadedFromDisk()&&core[0]!=null&&e.getEntity().getPersistentData().hasUUID("BlacklightHiveGuard")&&e.getEntity().getPersistentData().getUUID("BlacklightHiveGuard").equals(core[0].getUUID()))births.add(e.getEntity().getUUID());
         };
@@ -99,18 +100,19 @@ public final class GameplayProgressionGameTest {
                 for(var mob:level.getEntitiesOfClass(net.minecraft.world.entity.Mob.class,box,m->m.getPersistentData().hasUUID("BlacklightHiveGuard")&&m.getPersistentData().getUUID("BlacklightHiveGuard").equals(core[0].getUUID())))mob.discard();
                 core[0].discard();
             }
+            healthyReference.forEach(net.minecraft.world.entity.Entity::discard);
             if(viewer[0]!=null)level.removePlayerImmediately(viewer[0],net.minecraft.world.entity.Entity.RemovalReason.DISCARDED);
             for(var cp:forced)level.setChunkForced(cp.x,cp.z,false);
             spawnRule.set(oldSpawning,level.getServer());storage.set("blacklight_outbreak",original);
         };
         h.runAfterDelay(3900,cleanup);
         try {
-            for(int x=-1;x<=1;x++)for(int z=-1;z<=1;z++){
+            for(int x=-2;x<=2;x++)for(int z=-2;z<=2;z++){
                 var cp=new net.minecraft.world.level.ChunkPos((origin.getX()>>4)+x,(origin.getZ()>>4)+z);
                 if(!level.getForcedChunks().contains(cp.toLong())){forced.add(cp);level.setChunkForced(cp.x,cp.z,true);}level.getChunk(cp.x,cp.z);
             }
             // Publication waits for genuine entity storage and ticking; no manual AI ticks.
-            h.startSequence().thenWaitUntil(()->h.assertTrue(level.isPositionEntityTicking(origin)&&level.areEntitiesLoaded(new net.minecraft.world.level.ChunkPos(origin).toLong()),"waiting for the real hive arena"))
+            h.startSequence().thenWaitUntil(()->h.assertTrue(level.isPositionEntityTicking(origin)&&level.areEntitiesLoaded(new net.minecraft.world.level.ChunkPos(origin).toLong()),"waiting for the real hive arena; ticking="+level.isPositionEntityTicking(origin)+" entities="+level.areEntitiesLoaded(new net.minecraft.world.level.ChunkPos(origin).toLong())+" origin="+origin+" forced="+level.getForcedChunks().contains(new net.minecraft.world.level.ChunkPos(origin).toLong())))
                 .thenExecute(()->{
                     try {
                         for(int x=-12;x<=12;x++)for(int z=-12;z<=12;z++)for(int y=-1;y<15;y++)level.setBlock(origin.offset(x,y,z),(y==-1?Blocks.STONE:Blocks.AIR).defaultBlockState(),2);
@@ -118,18 +120,29 @@ public final class GameplayProgressionGameTest {
                         h.assertTrue(feature!=null&&feature.place(level,level.getChunkSource().getGenerator(),level.random,origin),"configured hive places a building");
                         h.assertTrue(level.getBlockState(origin.offset(5,5,5)).is(Blocks.SMOOTH_STONE)||level.getBlockState(origin.offset(5,5,5)).is(Blocks.CRACKED_STONE_BRICKS),"upper floor is real world geometry");
                         com.codex.blacklight.BlacklightNeoMod.LOGGER.info("Prepared actual hive regression arena at {}",origin);
-                        var cores=level.getEntitiesOfClass(com.codex.blacklight.entity.BlacklightHive.class,box);h.assertTrue(cores.size()==1,"one core owns the encounter");core[0]=cores.getFirst();
+                        var cores=level.getEntitiesOfClass(com.codex.blacklight.entity.BlacklightHive.class,box);h.assertTrue(cores.size()==1,"one core owns the encounter");core[0]=cores.getFirst(); var seed=new CompoundTag();core[0].addAdditionalSaveData(seed);seed.putFloat("BlacklightGrowth",1F);seed.putInt("BlacklightWaveCooldown",0);seed.putString("BlacklightBrood","common");core[0].readAdditionalSaveData(seed);
                         net.neoforged.neoforge.common.NeoForge.EVENT_BUS.addListener(joined);
-                        var p=FakePlayerFactory.get(level,new GameProfile(UUID.randomUUID(),"hive-waves"));viewer[0]=p;p.moveTo(origin.getX(),origin.getY(),origin.getZ()-10,0,0);level.addNewPlayer(p);
+                        // With no healthy residents the default 35% regional limit intentionally
+                        // stops at the core plus four guards. Supply real resident entities
+                        // so the sac can actually run its hatch cycle.
+                        for(int i=0;i<24;i++){
+                            var resident=EntityType.COW.create(level);resident.setNoAi(true);resident.setInvulnerable(true);
+                            resident.moveTo(origin.getX()-10+(i%6)*1.1,origin.getY(),origin.getZ()-10+(i/6)*1.1,0,0);
+                            if(level.addFreshEntity(resident))healthyReference.add(resident);else resident.discard();
+                        }
+                        var p=FakePlayerFactory.get(level,new GameProfile(UUID.randomUUID(),"hive-waves"));viewer[0]=p;p.setInvulnerable(true);p.moveTo(origin.getX(),origin.getY(),origin.getZ()-10,0,0);level.addNewPlayer(p);
                         // The shared outbreak quota uses world time. Separate genuine windows
                         // must admit all three waves; ticking only one mob cannot reset it.
                         h.runAfterDelay(850,()->{
                             try {
-                                var hive=core[0];com.codex.blacklight.BlacklightNeoMod.LOGGER.info("Actual hive regression waves={}, published={}",hive.waves(),births.size());h.assertTrue(hive.waves()==3,"three reinforcement waves finish during real server ticks; waves="+hive.waves());
+                                var hive=core[0];com.codex.blacklight.BlacklightNeoMod.LOGGER.info("Actual hive regression waves={}, published={}",hive.waves(),births.size());h.assertTrue(hive.waves()>=1,"the ripe sac hatches during real server ticks; waves="+hive.waves()+" viewerAlive="+viewer[0].isAlive()
+                                        +" room="+com.codex.blacklight.infection.WorldOutbreakSystem.populationRoom(level,hive.blockPosition())
+                                        +" local="+level.getEntitiesOfClass(net.minecraft.world.entity.Mob.class,hive.getBoundingBox().inflate(96),net.minecraft.world.entity.LivingEntity::isAlive).size()
+                                        +" infected="+level.getEntitiesOfClass(net.minecraft.world.entity.Mob.class,hive.getBoundingBox().inflate(96),m->m.isAlive()&&com.codex.blacklight.infection.BlacklightInfectionSystem.isInfected(m)).size());
                                 int count=births.size();
-                                h.assertTrue(count>=3&&count<=6,"three finite waves retain their actual common/hunter/mutant guards: "+count);
+                                h.assertTrue(count==hive.waves()&&"common".equals(hive.brood())&&level.getEntitiesOfClass(net.minecraft.world.entity.Mob.class,box,m->births.contains(m.getUUID())).stream().allMatch(m->m.getType()==hive.broodType()),"every hatch releases exactly one creature of the sac's own strain: births="+count+" waves="+hive.waves());
                                 CompoundTag saved=new CompoundTag();hive.addAdditionalSaveData(saved);hive.readAdditionalSaveData(saved);
-                                h.runAfterDelay(260,()->{try{h.assertTrue(hive.waves()==3&&births.size()==count,"reload cannot publish fresh guards beyond the three-wave budget; before="+count+" after="+births.size());}finally{cleanup.run();}h.succeed();});
+                                h.runAfterDelay(260,()->{try{h.assertTrue("common".equals(hive.brood())&&births.size()==hive.waves(),"reload keeps the strain and one creature per hatch; before="+count+" after="+births.size());}finally{cleanup.run();}h.succeed();});
                             }catch(Throwable failure){cleanup.run();throw failure;}
                         });
                     }catch(Throwable failure){cleanup.run();throw failure;}

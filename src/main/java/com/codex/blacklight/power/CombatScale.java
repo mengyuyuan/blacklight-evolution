@@ -39,8 +39,10 @@ public final class CombatScale {
     }
     public static void attributes(LivingEntity entity,boolean scaled){
         float oldUnits=units(entity),absorption=entity.getAbsorptionAmount();
-        modifier(entity.getAttribute(Attributes.MAX_HEALTH),HEALTH,scaled?UNITS-1:0,AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL);
-        modifier(entity.getAttribute(Attributes.MAX_ABSORPTION),ABSORPTION,scaled?UNITS-1:0,AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL);
+        if(!scaled && entity instanceof Mob nativeMob)com.codex.blacklight.infection.NativeInfection.clear(nativeMob);
+        boolean healthScaled=scaled&&!com.codex.blacklight.infection.NativeInfection.preserve(entity)&&!com.codex.blacklight.compat.CultivationCompatibility.nativeHealthUnits(entity)&&!com.codex.blacklight.infection.InfectionStatScaling.nativeHealthUnits(entity);
+        modifier(entity.getAttribute(Attributes.MAX_HEALTH),HEALTH,healthScaled?UNITS-1:0,AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL);
+        modifier(entity.getAttribute(Attributes.MAX_ABSORPTION),ABSORPTION,healthScaled?UNITS-1:0,AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL);
         if(oldUnits!=units(entity))entity.setAbsorptionAmount(absorption*units(entity)/oldUnits);
         boolean enhanced=scaled && (entity instanceof Mob || entity instanceof Player p && PrototypeMetabolism.active(p));
         modifier(entity.getAttribute(Attributes.MOVEMENT_SPEED),SPEED,enhanced?.08:0,AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL);
@@ -62,7 +64,7 @@ public final class CombatScale {
         if(!(event.getEntity() instanceof Mob mob)||mob.level().isClientSide||mob.isRemoved())return;
         boolean infected=com.codex.blacklight.infection.BlacklightInfectionSystem.isInfected(mob);
         Boolean previous=INFECTION_STATE.get(mob);
-        if(previous==null||previous!=infected)synchronizeMob(mob);
+        if(previous==null||previous!=infected||((units(mob)>1)!=(infected&&!com.codex.blacklight.infection.NativeInfection.preserve(mob)&&!com.codex.blacklight.compat.CultivationCompatibility.nativeHealthUnits(mob)&&!com.codex.blacklight.infection.InfectionStatScaling.nativeHealthUnits(mob))))synchronizeMob(mob);
     }
     @SubscribeEvent public static void join(EntityJoinLevelEvent event){
         if(event.getLevel().isClientSide()||!(event.getEntity() instanceof Mob mob))return;
@@ -73,7 +75,7 @@ public final class CombatScale {
         if(!event.getEntity().level().isClientSide&&event.getNewDamage()>0)
             event.setNewDamage(com.codex.blacklight.infection.TissueCompetition.finalDamage(event.getEntity(),event.getSource(),com.codex.blacklight.combat.CrossModCombat.defend(event.getEntity(), event.getSource(),
                     InfiniteEvolutionSystem.damage(event.getEntity(),event.getSource(),
-                            (float)Math.min(Float.MAX_VALUE,(double)event.getNewDamage()*units(event.getEntity()))))));
+                            (float)Math.min(Float.MAX_VALUE,(double)com.codex.blacklight.compat.CultivationCompatibility.afterCultivationDefense(event.getEntity(),event.getSource(),event.getNewDamage())*units(event.getEntity()))))));
     }
     @SubscribeEvent(priority=EventPriority.LOWEST)
     public static void heal(LivingHealEvent event){

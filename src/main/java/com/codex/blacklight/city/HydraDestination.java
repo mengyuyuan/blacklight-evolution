@@ -13,12 +13,13 @@ public final class HydraDestination {
     private int height;
     private final UUID id=UUID.randomUUID();
     public boolean prepare(ServerLevel source) {
+        if(!usable(source)){release();return false;}
         var next=source.getServer().getLevel(CityTravel.WORLD);
         if(next==null)return false;
         return prepare(next,CityTravel.arrivalOrigin(next));
     }
     public boolean prepare(ServerLevel next,BlockPos position) {
-        if(next==null){release();return false;}
+        if(!usable(next)||position==null){release();return false;}
         height=position.getY();
         var nextCentre=new ChunkPos(position);
         if(target!=next||!nextCentre.equals(centre)){release();target=next;centre=nextCentre;}
@@ -32,13 +33,17 @@ public final class HydraDestination {
                     ||!target.isPositionEntityTicking(new BlockPos((centre.x+x)*16,position.getY(),(centre.z+z)*16)))return false;
         return true;
     }
+    private static boolean usable(ServerLevel level){
+        return level!=null&&level.getServer()!=null&&!level.getServer().isStopped()
+                &&level.getServer().getLevel(level.dimension())==level;
+    }
     public void release() {
-        if(target!=null)target.getChunkSource().removeRegionTicket(TICKET,centre,3,id);
-        target=null;centre=null;
+        var previous=target;var position=centre;target=null;centre=null;
+        if(position!=null&&usable(previous))previous.getChunkSource().removeRegionTicket(TICKET,position,3,id);
     }
     /** Diagnostic reads never request or generate another chunk. */
     public String diagnostics(){
-        if(target==null||centre==null)return "released";
+        if(!usable(target)||centre==null)return "released";
         int full=0,entities=0,ticking=0;
         for(int x=-1;x<=1;x++)for(int z=-1;z<=1;z++){
             var pos=new ChunkPos(centre.x+x,centre.z+z);

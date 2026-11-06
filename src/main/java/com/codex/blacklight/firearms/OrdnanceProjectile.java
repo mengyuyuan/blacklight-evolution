@@ -27,12 +27,16 @@ public final class OrdnanceProjectile extends ThrowableItemProjectile {
         Vec3 center=result.getLocation();
         if(result instanceof BlockHitResult block)center=center.add(Vec3.atLowerCornerOf(block.getDirection().getNormal()).scale(.04));
         setPos(center);var d=definition();LivingEntity owner=getOwner() instanceof LivingEntity living&&living.isAlive()&&!living.isRemoved()&&living.level()==level?living:null;
+        if(d.kind()==WeaponDefinition.Kind.INFECTION&&owner instanceof net.minecraft.world.entity.player.Player)com.codex.blacklight.infection.WorldOutbreakSystem.release(level,blockPosition());
         for(LivingEntity target:level.getEntitiesOfClass(LivingEntity.class,getBoundingBox().inflate(d.radius()),LivingEntity::isAlive)){
             if(owner==null)continue;
             if(FirearmsCombat.protectedTarget(owner,target)||target.distanceToSqr(center)>d.radius()*d.radius())continue;
             var wall=level.clip(new ClipContext(center,target.getBoundingBox().getCenter(),ClipContext.Block.COLLIDER,ClipContext.Fluid.NONE,this));
             if(wall.getType()!=HitResult.Type.MISS)continue;
-            if(d.kind()==WeaponDefinition.Kind.INFECTION)com.codex.blacklight.infection.BlacklightInfectionSystem.infect(target,this);
+            if(d.kind()==WeaponDefinition.Kind.INFECTION){
+                if(owner instanceof net.minecraft.world.entity.player.Player)com.codex.blacklight.infection.BlacklightInfectionSystem.infect(target,this);
+                else com.codex.blacklight.infection.BlacklightInfectionSystem.infectNaturally(target,this);
+            }
             else target.hurt(damageSources().explosion(this,getOwner()),d.damage()*(float)Math.max(.2,1-Math.sqrt(target.distanceToSqr(center))/d.radius()));
         }
         if(owner!=null)com.codex.blacklight.military.vehicle.VehicleDamageBridge.blast(level,owner,d,center,this,null);

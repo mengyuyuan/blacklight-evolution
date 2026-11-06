@@ -55,6 +55,7 @@ public final class HunterGameTest {
     @GameTest(template="wall_test", timeoutTicks=30)
     public static void consumptionClaimsAndPaysOnlyOnce(GameTestHelper h) {
         var p=player(h);var target=victim(h);int biomass=p.getData(ModAttachments.PLAYER_STATE).getBiomass();
+        var quoted=com.codex.blacklight.power.AssimilationSystem.quote(p,target);
         ConsumeSystem.request(p);h.assertTrue(target.isBeingConsumed(),"weakened nearby target must be grabbed");
         var other=player(h);ConsumeSystem.request(other);
         h.assertTrue(!other.getData(ModAttachments.CONSUMING),"second player cannot steal claim");
@@ -64,7 +65,7 @@ public final class HunterGameTest {
         h.assertTrue(!target.isRemoved()&&p.getHealth()==10,"no early removal or reward");
         p.tickCount++;ConsumeSystem.tick(new PlayerTickEvent.Post(p));ConsumeSystem.tick(new PlayerTickEvent.Post(p));
         h.assertTrue(target.isConsumeRemains()&&p.getHealth()==18,"completed consumption removes victim and heals");
-        h.assertTrue(p.getData(ModAttachments.PLAYER_STATE).getBiomass()==biomass+120 && p.getData(ModAttachments.PLAYER_STATE).getEvolutionPoints()==30,"reward exactly once");
+        h.assertTrue(p.getData(ModAttachments.PLAYER_STATE).getBiomass()==Math.min(com.codex.blacklight.state.BlacklightState.MAX_BIOMASS,biomass+quoted.biomass()) && p.getData(ModAttachments.PLAYER_STATE).getEvolutionPoints()==quoted.ep(),"reward exactly once at the current quoted threat-based yield");
         h.assertTrue(!p.getData(ModAttachments.CONSUMING),"action lock must clear");h.succeed();
     }
     @GameTest(template="wall_test", timeoutTicks=30)

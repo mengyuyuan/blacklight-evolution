@@ -1,34 +1,32 @@
 package com.codex.blacklight.infection;
 
-import java.util.*;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
-class TissueDevelopmentTest {
-    @Test void PaidGrowthDevelopsInheritedOrgansWithoutInventingMealsOrDonors(){
-        var organ=new TissueInheritance.Organ(100,0,0,0,TissueInheritance.BLADE,42,1);
-        var before=new TissueInheritance(Map.of(TissueCore.BLADE,organ),6,123,false,null,1,6);
-        var growing=before;
-        for(int second=0;second<1200;second++)growing=growing.cultivate(20,TissueCore.MUSCLE,72000,TissueInheritance.Rules.DEFAULT);
-        assertEquals(120,growing.organ(TissueCore.BLADE).integrated(),.000001);
-        assertTrue(growing.scaleFactor()>before.scaleFactor());
-        assertEquals(6,growing.meals());assertEquals(6,growing.acquiredOrgans());assertEquals(123,growing.points());
-        assertEquals(42,growing.organ(TissueCore.BLADE).variant());
-        assertEquals(TissueInheritance.BLADE,growing.organ(TissueCore.BLADE).weapons());
-        assertTrue(growing.qualified());assertSame(before,before.cultivate(0,TissueCore.MUSCLE,72000,TissueInheritance.Rules.DEFAULT));
-        var forming=new TissueInheritance(Map.of(TissueCore.BLADE,new TissueInheritance.Organ(100,20,10,10,1,42)),0,0,false,null,1);
-        assertSame(forming,forming.cultivate(20,TissueCore.MUSCLE,72000,TissueInheritance.Rules.DEFAULT));
+final class TissueDevelopmentTest {
+    @Test void fractionalUnfedProgressIsConservedAcrossLoadedBatches(){
+        var state=new TissueDevelopment.Step(0,TissueInheritance.EMPTY,0,0,0,new double[4],0);
+        for(int i=0;i<200;i++)state=TissueDevelopment.advance(state.age(),state.inheritance(),5,TissueCore.MUSCLE,
+                state.nutrition(),state.debt(),state.cultivation(),state.fractions(),20,.002,true,false,TissueInheritance.Rules.DEFAULT);
+        assertEquals(8,state.age()+state.fractions()[0],1e-9);
+        assertEquals(0,state.nutrition());assertEquals(0,state.repairFraction());
+        var one=TissueDevelopment.advance(0,TissueInheritance.EMPTY,5,TissueCore.MUSCLE,0,0,0,
+                new double[4],4000,.002,true,false,TissueInheritance.Rules.DEFAULT);
+        assertEquals(one.age()+one.fractions()[0],state.age()+state.fractions()[0],1e-9);
     }
-    @Test void MatureFunctionalOrgansCanSupplyTheEvolvedsStructuralRequirements(){
-        var organs=new EnumMap<TissueCore,TissueInheritance.Organ>(TissueCore.class);
-        for(var core:new TissueCore[]{TissueCore.TENDON,TissueCore.HORN,TissueCore.PHARYNX,TissueCore.BLADE})
-            organs.put(core,new TissueInheritance.Organ(300,0,0,0,1,core.ordinal()));
-        var six=new TissueInheritance(organs,6,1000,false,null,1,6).digest(0,true,1,72000,TissueInheritance.Rules.DEFAULT,TissueCore.CREST);
-        assertTrue(EvolvedForm.eligible(six,72000));
-        var five=new TissueInheritance(organs,5,1000,false,null,1,5).digest(0,true,1,72000,TissueInheritance.Rules.DEFAULT,TissueCore.CREST);
-        assertFalse(EvolvedForm.eligible(five,72000));
-        organs.put(TissueCore.PHARYNX,new TissueInheritance.Organ(300,0,0,1,1,1));
-        var immature=new TissueInheritance(organs,6,1000,false,null,1,6).digest(0,true,1,72000,TissueInheritance.Rules.DEFAULT,TissueCore.CREST);
-        assertFalse(EvolvedForm.eligible(immature,72000));
+    @Test void noElapsedTicksCannotChargeFoodOrGrantOfflineWorkAndSnapshotsOwnTheirClocks(){
+        double[] clocks={.2,.3,.4,.5};
+        var step=TissueDevelopment.advance(48000,TissueInheritance.EMPTY,6,TissueCore.JAW,20,31,45,clocks,
+                0,1000,true,true,TissueInheritance.Rules.DEFAULT);
+        assertEquals(48000,step.age());assertEquals(20,step.nutrition());assertEquals(31,step.debt());
+        assertEquals(45,step.cultivation());assertEquals(0,step.repairFraction());
+        clocks[0]=.9;assertEquals(.2,step.fractions()[0]);
+        var exposed=step.fractions();exposed[1]=.8;assertEquals(.3,step.fractions()[1]);
+    }
+    @Test void saturatedAgeStaysFiniteWithoutCappingAcquiredEvolution(){
+        var step=TissueDevelopment.advance(Long.MAX_VALUE-1,TissueInheritance.EMPTY,9,TissueCore.MUSCLE,
+                0,0,0,new double[4],20,1,true,false,TissueInheritance.Rules.DEFAULT);
+        assertEquals(Long.MAX_VALUE,step.age());assertSame(TissueInheritance.EMPTY,step.inheritance());
+        assertTrue(TissueGrowth.generation(step.age())>1_000_000);
     }
 }

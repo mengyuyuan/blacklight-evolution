@@ -14,6 +14,10 @@ import net.minecraft.client.renderer.entity.player.PlayerRenderer;
 
 /** Standalone player rendering retains vanilla equipment layers and uses Blacklight's own articulated skin. */
 public final class BlacklightPlayerRenderer extends PlayerRenderer {
+    private final BlacklightPlayerModel nativeBody;
+    /** Re-select the renderer's own rig after optional player-model selectors.
+     * Only this dedicated renderer owns this model; vanilla/YSM renderers do not. */
+    public void restoreNativeModel() { if(nativeBody!=null)this.model=nativeBody; }
     @Override public void render(AbstractClientPlayer player,float yaw,float partial,PoseStack stack,
                                  net.minecraft.client.renderer.MultiBufferSource buffers,int light) {
         try(var scope=NativePlayerRenderScope.enter(player)) {
@@ -34,7 +38,7 @@ public final class BlacklightPlayerRenderer extends PlayerRenderer {
     public BlacklightPlayerRenderer(EntityRendererProvider.Context context,boolean slim) {
         super(context,slim);
         slimHands=slim;handModel=new net.minecraft.client.model.PlayerModel<>(context.bakeLayer(slim?ModelLayers.PLAYER_SLIM:ModelLayers.PLAYER),slim);
-        this.model=new BlacklightPlayerModel(context.bakeLayer(slim?ModelLayers.PLAYER_SLIM:ModelLayers.PLAYER),slim);
+        this.model=nativeBody=new BlacklightPlayerModel(context.bakeLayer(slim?ModelLayers.PLAYER_SLIM:ModelLayers.PLAYER),slim);
         // Keep vanilla equipment effects, but deform its cuboids with our body.
         layers.removeIf(layer->layer instanceof net.minecraft.client.renderer.entity.layers.HumanoidArmorLayer<?,?,?>);
         var body=(BlacklightPlayerModel)this.model;
@@ -85,7 +89,7 @@ public final class BlacklightPlayerRenderer extends PlayerRenderer {
                     com.codex.blacklight.animation.MotionLibrary.pose(weapon.key(),weapon.seconds(),weapon.looping()),weapon.blend());
             else {
                 var action=player.getData(ModAttachments.PLAYER_ACTION);
-                if(action.active(player.level().getGameTime()+partial)&&(!action.clipId().startsWith("basic_")||action.clipId().equals("basic_jump_charge"))
+                if(action.active(com.codex.blacklight.animation.PlayerMotionController.actionTime(player,partial))&&(!action.clipId().startsWith("basic_")||action.clipId().equals("basic_jump_charge"))
                         ||player.getData(ModAttachments.GRAB_STAGE)!=com.codex.blacklight.combat.ConsumeVisual.NONE)
                     pose=com.codex.blacklight.client.animation.BlacklightRenderPose.sample(player,partial);
             }

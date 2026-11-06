@@ -68,6 +68,9 @@ public final class ClawCombatSystem {
         if (request == ClawActionPayload.Action.GRAB) { ConsumeSystem.request(player); return; }
         if (request == ClawActionPayload.Action.CONSUME) { ConsumeSystem.consume(player); return; }
         if (request == ClawActionPayload.Action.THROW) { ConsumeSystem.throwTarget(player); return; }
+        if (request == ClawActionPayload.Action.GRAB_THROW_START) { ConsumeSystem.startThrowCharge(player); return; }
+        if (request == ClawActionPayload.Action.GRAB_THROW_RELEASE) { ConsumeSystem.releaseThrowCharge(player); return; }
+        if (request == ClawActionPayload.Action.GRAB_THROW_CANCEL) { ConsumeSystem.cancelThrowCharge(player); return; }
         if (player.getData(ModAttachments.CONSUMING)) return;
         if (request == ClawActionPayload.Action.CYCLE_FORM) { com.codex.blacklight.power.PowerFormSystem.cycle(player); return; }
         BlacklightState state = player.getData(ModAttachments.PLAYER_STATE);
@@ -308,6 +311,7 @@ public final class ClawCombatSystem {
                         clawDamage(state, 16.0F))) {
                     if(!CombatTargeting.multipart(target))target.push(combat.dashX() * 0.9D, 0.3D, combat.dashZ() * 0.9D);
                     ClawPhysicalEffects.onComboTargetHit(player, target, true);
+                    WeaponImpact.contact(player, target, ImpactTier.HEAVY, false, null);
                 }
             }
             // The slash trail and impact feedback fire on the first sweep tick, in
@@ -415,6 +419,7 @@ public final class ClawCombatSystem {
                 hitCount++;
                 ClawPhysicalEffects.onComboTargetHit(player, target,
                         action == ClawCombatState.Action.AUTO_3);
+                WeaponImpact.contact(player, target, action == ClawCombatState.Action.AUTO_3 ? ImpactTier.FINISHER : ImpactTier.LIGHT, false, null);
             }
         }
         {
@@ -453,6 +458,7 @@ public final class ClawCombatSystem {
         double radius = GroundSpikeRules.BASE_DAMAGE_RADIUS * rangeMultiplier;
         AABB hitBox = new AABB(x - radius, y - 0.5D, z - radius,
                 x + radius, y + 6.5D, z + radius);
+        boolean firstSpike = true;
         for (LivingEntity target : CombatTargeting.candidates(player, hitBox,
                 target -> CombatTargeting.damageable(player,target))) {
             if (target.hurt(player.damageSources().playerAttack(player),
@@ -466,7 +472,7 @@ public final class ClawCombatSystem {
                 } else {
                     away = away.normalize();
                 }
-                WeaponImpact.apply(player,target,WeaponMove.CLAW_GROUNDSPIKE,away.multiply(1,0,1).normalize(),false);
+                WeaponImpact.apply(player,target,WeaponMove.CLAW_GROUNDSPIKE,away.multiply(1,0,1).normalize(),firstSpike);firstSpike=false;
             }
         }
         for (Entity loose : level.getEntities(player, hitBox,

@@ -54,6 +54,7 @@ public final class UtilityPowerSystem {
     public static void toggle(ServerPlayer p, PowerForm form) {
         if (!supported(form)) return;
         int old = p.getData(ModAttachments.UTILITY_POWERS);
+        if ((old & form.bit()) == 0 && ParasiteSystem.blocked(p, form)) return;
         int group = form==PowerForm.SOVEREIGN_WINGS ? form.bit() : (form.bit() & DEFENSE) != 0 ? DEFENSE : PowerForm.THERMAL_VISION.bit() | PowerForm.INFECTED_VISION.bit();
         int mask = (old & form.bit()) != 0 ? old & ~form.bit() : (old & ~group) | form.bit();
         if (group == DEFENSE) {

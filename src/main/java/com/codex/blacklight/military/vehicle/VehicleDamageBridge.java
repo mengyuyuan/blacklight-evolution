@@ -64,7 +64,11 @@ public final class VehicleDamageBridge {
         float coefficient=switch(target.definition().armor()){case LIGHT->1F;case ARMORED->.75F;case HEAVY->.5F;};
         var source=projectile!=null?actor.damageSources().thrown(projectile,actor)
                 :actor instanceof Player player?actor.damageSources().playerAttack(player):actor.damageSources().mobAttack(actor);
-        return target.hurt(source,damage*coefficient);
+        return target.hurt(source,damage*coefficient*prototypeScale(actor));
+    }
+    /** Living targets receive prototype melee in CombatScale units; hulls use the same scale so a claw is not five times weaker on steel. */
+    static float prototypeScale(LivingEntity actor){
+        return actor instanceof Player p&&com.codex.blacklight.power.PrototypeMetabolism.active(p)?com.codex.blacklight.power.CombatScale.UNITS:1F;
     }
     /** Devastators use their already-resolved true damage, with identical protection checks. */
     public static boolean hurtSpecial(ServerPlayer actor,MilitaryVehicle target,float damage){

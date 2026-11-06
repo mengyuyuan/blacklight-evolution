@@ -46,6 +46,16 @@ public final class GrabHud {
             g.drawCenteredString(mc.font,Component.translatable("hud.blacklight.throw_style",Component.translatable("hud.blacklight.throw_"+(block.twoHanded()?"two":"one")),Component.translatable("hud.blacklight.throw_"+mode)),x,y+20,0xffe5ddd7);
             return;
         }
+        long chargeAt=mc.player.getData(ModAttachments.GRAB_THROW_CHARGE);
+        if(chargeAt>=0&&stage==ConsumeVisual.HOLD){
+            int max=com.codex.blacklight.combat.ConsumeSystem.THROW_CHARGE_TICKS;
+            int charge=(int)Math.max(0,Math.min(max,mc.level.getGameTime()-chargeAt));
+            int x=mc.getWindow().getGuiScaledWidth()/2,y=mc.getWindow().getGuiScaledHeight()/2+42;var g=event.getGuiGraphics();
+            g.drawCenteredString(mc.font,Component.translatable("hud.blacklight.grab_throw_charge",charge*100/max),x,y,0xffe5ddd7);
+            g.fill(x-45,y+12,x+45,y+16,0xb0202020);
+            g.fill(x-45,y+12,x-45+90*charge/max,y+16,charge>=max?0xffff5a4a:0xffc52c36);
+            return;
+        }
         event.getGuiGraphics().drawCenteredString(mc.font,Component.translatable(com.codex.blacklight.combat.BlockThrowSystem.held(mc.player)!=null?"message.blacklight.block_held":stage==ConsumeVisual.MOUNT_HOLD?"message.blacklight.grab_mounted":"message.blacklight.grab_held"),
                 mc.getWindow().getGuiScaledWidth()/2,mc.getWindow().getGuiScaledHeight()/2+42,0xffe5ddd7);
     }

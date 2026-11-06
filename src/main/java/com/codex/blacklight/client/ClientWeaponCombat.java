@@ -34,7 +34,7 @@ public final class ClientWeaponCombat {
     static void setFixtureOwnsInput(boolean owns){fixtureOwnsInput=owns;}
     private ClientWeaponCombat(){}
     public static boolean active(){
-        var mc=Minecraft.getInstance();if(mc.player==null||mc.screen!=null||com.codex.blacklight.firearms.FirearmsCombat.holdingFirearm(mc.player))return false;
+        var mc=Minecraft.getInstance();if(mc.player==null||mc.screen!=null||com.codex.blacklight.firearms.FirearmsCombat.holdingFirearm(mc.player)||com.codex.blacklight.item.ParasiteSyringeItem.held(mc.player))return false;
         var state=mc.player.getData(ModAttachments.PLAYER_STATE);
         return !com.codex.blacklight.city.HydraTransport.active(mc.player)&&new PersonalCombatInput(state.isInfected(),state.isPrototypeMode(),state.getActivePower(),
                 mc.player.getMainHandItem().isEmpty()&&mc.player.getOffhandItem().isEmpty(),mc.player.getData(ModAttachments.CONSUMING),VehicleControls.ownsInput()).active();

@@ -86,6 +86,9 @@ public final class ModEntities {
     private ModEntities() {
     }
 
+    /** First authored boss; 1.6x the hunter rig. */
+    public static final DeferredHolder<EntityType<?>,EntityType<com.codex.blacklight.entity.BlacklightSupremeHunter>> SUPREME_HUNTER=ENTITIES.register("supreme_hunter",()->EntityType.Builder.<com.codex.blacklight.entity.BlacklightSupremeHunter>of(com.codex.blacklight.entity.BlacklightSupremeHunter::new,MobCategory.MONSTER).sized(2.3F,5.1F).fireImmune().clientTrackingRange(16).updateInterval(1).build("supreme_hunter"));
+    public static final DeferredHolder<EntityType<?>,EntityType<com.codex.blacklight.entity.SupremeHunterDebris>> SUPREME_HUNTER_DEBRIS=ENTITIES.register("supreme_hunter_debris",()->EntityType.Builder.<com.codex.blacklight.entity.SupremeHunterDebris>of(com.codex.blacklight.entity.SupremeHunterDebris::new,MobCategory.MISC).sized(.9F,.9F).clientTrackingRange(10).updateInterval(1).build("supreme_hunter_debris"));
     public static final DeferredHolder<EntityType<?>,EntityType<com.codex.blacklight.entity.BlacklightHydra>> BLACKLIGHT_HYDRA=ENTITIES.register("blacklight_hydra",()->EntityType.Builder.<com.codex.blacklight.entity.BlacklightHydra>of(com.codex.blacklight.entity.BlacklightHydra::new,MobCategory.MONSTER).sized(2.4F,5.0F).clientTrackingRange(12).updateInterval(1).build("blacklight_hydra"));
 
     public static void register(IEventBus bus) {
@@ -112,6 +115,7 @@ public final class ModEntities {
             event.put(BLACKLIGHT_HIVE.get(),com.codex.blacklight.entity.BlacklightHive.attributes().build());
         });
         bus.addListener((net.neoforged.neoforge.event.entity.EntityAttributeCreationEvent event) ->
-                event.put(BLACKLIGHT_HUNTER.get(), com.codex.blacklight.entity.BlacklightHunter.attributes().build()));
+                {event.put(BLACKLIGHT_HUNTER.get(), com.codex.blacklight.entity.BlacklightHunter.attributes().build());
+                event.put(SUPREME_HUNTER.get(),com.codex.blacklight.entity.BlacklightSupremeHunter.attributes().build());});
     }
 }

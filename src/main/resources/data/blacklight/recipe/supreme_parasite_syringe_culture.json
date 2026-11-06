@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    {
+      "item": "blacklight:supreme_parasite_syringe"
+    },
+    {
+      "item": "blacklight:blacklight_sample"
+    },
+    {
+      "item": "blacklight:living_hive_tissue"
+    },
+    {
+      "item": "blacklight:living_hive_tissue"
+    }
+  ],
+  "result": {
+    "id": "blacklight:supreme_parasite_syringe",
+    "count": 2
+  }
+}

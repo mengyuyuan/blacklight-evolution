@@ -45,7 +45,8 @@ public final class CombatTargeting {
         var entity=ExplicitTarget.resolve(player.serverLevel().getEntity(entityId));
         if(ExplicitTarget.enabled(player)
                 && entity != null && ExplicitTarget.selectable(player,entity)
-                && ExplicitTarget.visibleWithinRange(player,entity,viewRange(player))) {
+                && (ExplicitTarget.visibleWithinRange(player,entity,viewRange(player))
+                    || entity instanceof LivingEntity living&&altitudeAcquirable(player,living,viewRange(player)))) {
             LOCKS.put(player,entity);syncLock(player,entity.getId());
         } else {LOCKS.remove(player);syncLock(player,-1);}
     }
@@ -59,9 +60,9 @@ public final class CombatTargeting {
     }
     /** Persistent owned attacks resolve in their origin's world even after the owner travels. */
     public static boolean damageableFrom(Player player, LivingEntity target, Entity origin) {
-        return target!=null && target!=player && target.level()==origin.level()
+        return player!=null && origin!=null && target!=null && target!=player && target.level()==origin.level()
                 && target.isAlive() && !target.isRemoved() && !target.isSpectator() && !target.isInvulnerable()
-                && !player.isAlliedTo(target) && !target.getData(ModAttachments.CONSUME_VISUAL).active()
+                && !player.isAlliedTo(target) && !ModAttachments.peekData(target, ModAttachments.CONSUME_VISUAL, ConsumeVisual.EMPTY).active()
                 && (!(target instanceof Player other) || !other.getAbilities().invulnerable && player.canHarmPlayer(other)
                     && (!(player instanceof ServerPlayer server) || server.server.isPvpAllowed()));
     }
@@ -145,6 +146,22 @@ public final class CombatTargeting {
     }
     public static boolean visible(Player player,Vec3 from,AABB box) {
         return clearRay(player,from,closestPoint(from,box));
+    }
+    /** Bulletdive from any height: an airborne player may lock a visible target below inside the
+     * horizontal view radius. Vertical distance is unbounded; the same rule keeps the lock (retainAltitudeLock). */
+    public static boolean altitudeAcquirable(Player player,LivingEntity target,double range) {
+        if(target==null||target.level()!=player.level()||player.onGround()||!selectable(player,target))return false;
+        Vec3 eye=player.getEyePosition(),centre=target.getBoundingBox().getCenter();
+        return BulletdiveSteering.retainAltitudeLock(player.position(),false,target.position(),range)
+                &&Math.hypot(eye.x-centre.x,eye.z-centre.z)<=range&&exposedFromAbove(player,eye,target);
+    }
+    /** Trees, roofs and other cover within 16 blocks above the target do not block a dive lock
+     * (Bulletdive breaks through). A target sealed deep underground stays unlockable. */
+    private static boolean exposedFromAbove(Player player,Vec3 eye,LivingEntity target){
+        Vec3 point=lockPoint(player,target);
+        if(clearRay(player,eye,point))return true;
+        double cover=Math.min(eye.y,target.getBoundingBox().maxY+16);
+        return cover>point.y&&clearRay(player,eye,new Vec3(point.x,cover,point.z));
     }
     public static boolean visibleWithinRange(Player player,LivingEntity target,double range) {
         if(target==null||target.level()!=player.level()||range<0)return false;

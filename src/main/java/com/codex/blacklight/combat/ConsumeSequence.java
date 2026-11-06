@@ -70,7 +70,7 @@ public final class ConsumeSequence {
                 || target.getBbWidth()*target.getBbWidth()*target.getBbHeight()>=3.2F;
     }
     public static boolean boss(LivingEntity target) {
-        return target instanceof EnderDragon||target instanceof WitherBoss
+        return target instanceof EnderDragon||target instanceof WitherBoss||target instanceof com.codex.blacklight.entity.BlacklightSupremeHunter
                 ||target instanceof com.codex.blacklight.entity.BlacklightInfectedHost host&&(host.giantBoss()||host.encounterBoss());
     }
     public static boolean humanoid(LivingEntity target) {

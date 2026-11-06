@@ -39,6 +39,7 @@ public final class BlacklightNeoMod {
         container.registerConfig(net.neoforged.fml.config.ModConfig.Type.SERVER, com.codex.blacklight.infection.OutbreakConfig.SPEC, "blacklight-outbreak-server.toml");
         container.registerConfig(net.neoforged.fml.config.ModConfig.Type.SERVER, com.codex.blacklight.power.PlayerEvolutionConfig.SPEC, "blacklight-player-evolution-server.toml");
         container.registerConfig(net.neoforged.fml.config.ModConfig.Type.SERVER, com.codex.blacklight.config.GameplayBalanceConfig.SPEC, "blacklight-gameplay-server.toml");
+        container.registerConfig(net.neoforged.fml.config.ModConfig.Type.SERVER, com.codex.blacklight.config.InfectionEcologyConfig.SPEC, "blacklight-ecology-server.toml");
         com.codex.blacklight.city.CityBlocks.register(modBus);
         com.codex.blacklight.city.CityWorldgen.register(modBus);
         NeoForge.EVENT_BUS.register(com.codex.blacklight.city.CitySystem.class);
@@ -60,11 +61,13 @@ public final class BlacklightNeoMod {
         modBus.addListener(ModNetwork::register);
         modBus.addListener((net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent event)->event.enqueueWork(()->{
             com.codex.blacklight.power.BiomassRules.initialize();
+            com.codex.blacklight.power.PrototypeMetabolism.initialize();
             com.codex.blacklight.animation.MotionLibrary.requireInstalled();
             var health=(net.minecraft.world.entity.ai.attributes.RangedAttribute)net.minecraft.world.entity.ai.attributes.Attributes.MAX_HEALTH.value();
             ((com.codex.blacklight.mixin.HealthAttributeLimitAccessor)health).blacklight$setMaximum(Math.max(health.getMaxValue(),1e24));
         }));
         NeoForge.EVENT_BUS.register(BlacklightCommands.class);
+        NeoForge.EVENT_BUS.register(com.codex.blacklight.world.LairSystem.class);
         NeoForge.EVENT_BUS.register(ClawCombatSystem.class);
         NeoForge.EVENT_BUS.register(com.codex.blacklight.power.GrowthSystem.class);
         NeoForge.EVENT_BUS.register(com.codex.blacklight.power.UtilityPowerSystem.class);

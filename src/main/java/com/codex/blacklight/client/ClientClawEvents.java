@@ -126,6 +126,8 @@ public final class ClientClawEvents {
         event.registerEntityRenderer(ModEntities.EVOLVED_QUILL.get(),com.codex.blacklight.client.renderer.EvolvedQuillRenderer::new);
         event.registerEntityRenderer(ModEntities.INFECTED_TUMOR.get(),com.codex.blacklight.client.renderer.InfectedTumorRenderer::new);
         event.registerEntityRenderer(ModEntities.BLACKLIGHT_HUNTER.get(), com.codex.blacklight.client.renderer.BlacklightHunterRenderer::new);
+        event.registerEntityRenderer(ModEntities.SUPREME_HUNTER.get(), com.codex.blacklight.client.renderer.SupremeHunterRenderer::new);
+        event.registerEntityRenderer(ModEntities.SUPREME_HUNTER_DEBRIS.get(), context->new net.minecraft.client.renderer.entity.ThrownItemRenderer<>(context,2.6F,false));
         event.registerEntityRenderer(ModEntities.BLACKLIGHT_HYDRA.get(), com.codex.blacklight.client.renderer.BlacklightHydraRenderer::new);
         event.registerEntityRenderer(ModEntities.BLACKLIGHT_VIRUS_VIAL.get(), com.codex.blacklight.client.renderer.VirusVialRenderer::new);
     }
@@ -253,7 +255,7 @@ public final class ClientClawEvents {
                 && (SkillBindings.mouse(minecraft.options.keyAttack,event.getButton())||SkillBindings.mouse(minecraft.options.keyUse,event.getButton()))) {
             event.setCanceled(true);tickGrabButtons();return;
         }
-        if(com.codex.blacklight.firearms.FirearmsCombat.holdingFirearm(minecraft.player))return;
+        if(com.codex.blacklight.firearms.FirearmsCombat.holdingFirearm(minecraft.player)||com.codex.blacklight.item.ParasiteSyringeItem.held(minecraft.player))return;
         if (!state.isInfected() || !state.isPrototypeMode()
                 || state.getActivePower() != PowerForm.CLAWS) return;
 
@@ -303,15 +305,31 @@ public final class ClientClawEvents {
             mc.options.keyAttack.setDown(false);mc.options.keyUse.setDown(false);
             int stage=mc.player.getData(ModAttachments.GRAB_STAGE);
             boolean holding=com.codex.blacklight.combat.ConsumeVisual.holding(stage);
-            if(right&&!lastGrabRight&&(holding||com.codex.blacklight.combat.ConsumeVisual.acquiring(stage)))
+            if(right&&!lastGrabRight&&(holding||com.codex.blacklight.combat.ConsumeVisual.acquiring(stage))){
+                if(grabThrowCharging)PacketDistributor.sendToServer(new ClawActionPayload(ClawActionPayload.Action.GRAB_THROW_CANCEL));
+                grabThrowCharging=false;
                 PacketDistributor.sendToServer(new ClawActionPayload(ClawActionPayload.Action.CONSUME));
-            else if(left&&!lastGrabLeft&&holding)
-                PacketDistributor.sendToServer(new ClawActionPayload(ClawActionPayload.Action.THROW));
+            }
+            else if(holding&&!right){
+                // Hold to wind up, release to throw: same lease scheme as block throws.
+                if(left&&!lastGrabLeft){PacketDistributor.sendToServer(new ClawActionPayload(ClawActionPayload.Action.GRAB_THROW_START));grabThrowCharging=true;grabThrowSentAt=mc.player.tickCount;}
+                else if(left&&grabThrowCharging&&mc.player.tickCount-grabThrowSentAt>=10){PacketDistributor.sendToServer(new ClawActionPayload(ClawActionPayload.Action.GRAB_THROW_START));grabThrowSentAt=mc.player.tickCount;}
+                else if(!left&&lastGrabLeft&&grabThrowCharging){
+                    ClientMovementEvents.sendAttackDirection(mc);
+                    PacketDistributor.sendToServer(new ClawActionPayload(ClawActionPayload.Action.GRAB_THROW_START));
+                    PacketDistributor.sendToServer(new ClawActionPayload(ClawActionPayload.Action.GRAB_THROW_RELEASE));grabThrowCharging=false;
+                }
+            }
+            if(!holding)grabThrowCharging=false;
+        } else if(grabThrowCharging){
+            if(mc.getConnection()!=null)PacketDistributor.sendToServer(new ClawActionPayload(ClawActionPayload.Action.GRAB_THROW_CANCEL));
+            grabThrowCharging=false;
         }
         lastGrabLeft=left;lastGrabRight=right;
     }
 
-    private static int deferredGrabTick=-1;
+    private static int deferredGrabTick=-1,grabThrowSentAt;
+    private static boolean grabThrowCharging;
     private static void resetInputOwner(){
         var mc=Minecraft.getInstance();
         if(inputOwner==mc.player)return;
@@ -322,7 +340,7 @@ public final class ClientClawEvents {
         clearLeftAttackHold();
         groundSpikeHeld=groundSpikePosePaused=groundSpikeAutoReleased=groundSpikeReversing=false;
         groundSpikeEruptionTicks=groundSpikeStartupWaitTicks=0;
-        deferredGrabTick=-1;lastGrabDown=physicalGrabDown();
+        deferredGrabTick=-1;grabThrowCharging=false;lastGrabDown=physicalGrabDown();
         lastPhysicalLeftDown=lastGrabLeft=lastGrabRight=false;
     }
     /** Callback preserves short taps; polling covers keys swallowed by other input handlers. */
@@ -531,7 +549,7 @@ public final class ClientClawEvents {
         if(state.isPrototypeMode()&&minecraft.player.getData(ModAttachments.CONSUMING)) {
             event.setSwingHand(false);event.setCanceled(true);tickGrabButtons();return;
         }
-        if(com.codex.blacklight.firearms.FirearmsCombat.holdingFirearm(minecraft.player))return;
+        if(com.codex.blacklight.firearms.FirearmsCombat.holdingFirearm(minecraft.player)||com.codex.blacklight.item.ParasiteSyringeItem.held(minecraft.player))return;
         if (!state.isInfected() || !state.isPrototypeMode()
                 || state.getActivePower() != PowerForm.CLAWS) return;
 

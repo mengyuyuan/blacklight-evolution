@@ -24,16 +24,17 @@ public final class TissueFeeding {
     private static final class Budget {long tick=Long.MIN_VALUE;int queries;}
     public record Food(TissueDigestion.Kind kind,int value,ItemStack remainder){}
     private TissueFeeding(){}
-    public static Food food(BlacklightInfectedHost host,ItemStack stack){
-        if(stack.isEmpty())return null;var profile=host.digestiveProfile();
-        var properties=stack.getFoodProperties(host);
+    public static Food food(BlacklightInfectedHost host,ItemStack stack){return food(host,host.digestiveProfile(),stack);}
+    public static Food food(net.minecraft.world.entity.Mob mob,TissueDigestion.Profile profile,ItemStack stack){
+        if(stack.isEmpty())return null;
+        var properties=stack.getFoodProperties(mob);
         if(properties!=null&&properties.nutrition()>0){
             int value=(int)Math.clamp((long)properties.nutrition()*2,1,64);
             return new Food(stack.is(ItemTags.MEAT)?TissueDigestion.Kind.MEAT:TissueDigestion.Kind.SOFT,value,properties.usingConvertsTo().map(ItemStack::copy).orElse(ItemStack.EMPTY));
         }
         if(profile.gizzard()>0&&stack.is(GRIND))return new Food(TissueDigestion.Kind.FIBRE,6,ItemStack.EMPTY);
         if(profile.ferment()>0&&stack.is(FERMENT))return new Food(TissueDigestion.Kind.FERMENT,8,ItemStack.EMPTY);
-        if(profile.filter()>0&&host.isInWater()&&stack.is(FILTER))return new Food(TissueDigestion.Kind.FILTER,2,ItemStack.EMPTY);
+        if(profile.filter()>0&&mob.isInWater()&&stack.is(FILTER))return new Food(TissueDigestion.Kind.FILTER,2,ItemStack.EMPTY);
         return null;
     }
     public static boolean free(BlacklightInfectedHost host){return !host.level().isClientSide&&host.isAlive()&&!host.isRemoved()&&!host.hasMultipartBody()&&!host.devourerIdentity()

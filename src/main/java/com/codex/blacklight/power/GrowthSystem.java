@@ -66,6 +66,7 @@ public final class GrowthSystem {
     @SubscribeEvent public static void tick(PlayerTickEvent.Post event){
         if(!(event.getEntity() instanceof ServerPlayer p))return;updateHealth(p);
         if(p.tickCount%20!=0)return;
+        PrototypeMetabolism.sync(p);
         if(!p.getData(ModAttachments.PLAYER_STATE).isInfected())return;
         award(p,"awakening");
         metabolize(p);

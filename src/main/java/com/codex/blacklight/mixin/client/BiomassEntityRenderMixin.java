@@ -20,12 +20,24 @@ public abstract class BiomassEntityRenderMixin {
     @WrapOperation(method="render",at=@At(value="INVOKE",target="Lnet/minecraft/client/renderer/entity/EntityRenderer;render(Lnet/minecraft/world/entity/Entity;FFLcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;I)V"))
     private void blacklight$coat(EntityRenderer<?> renderer,Entity entity,float yaw,float partial,
                                 PoseStack stack,MultiBufferSource buffers,int light,Operation<Void> original){
-        var owner=entity instanceof LivingEntity?BiomassSystem.claimant(entity):null;
-        if(owner==null){original.call(renderer,entity,yaw,partial,stack,buffers,light);return;}
-        float progress=BiomassSystem.state(owner).progress(entity.level().getGameTime()+partial,com.codex.blacklight.power.ConsumeProgression.absorbTicks(owner));
-        var coat=new BiomassCoatBuffers((LivingEntity)entity,stack,buffers,
-                Math.min(1,progress*1.45F),com.codex.blacklight.client.renderer.BiomassSurfaceBounds.ease((progress-.65F)/.35F),entity.tickCount+partial);
-        original.call(renderer,entity,yaw,partial,stack,coat,light);
-        coat.finish();
+        com.codex.blacklight.client.renderer.NativeInfectionVisuals.vascular(entity,stack,buffers,partial,light);
+        try(var renderScope=com.codex.blacklight.client.renderer.NativeRenderScope.enter(entity);
+            var scene=com.codex.blacklight.client.renderer.NativeInfectionVisuals.competition(entity,stack,buffers,partial,light);
+            var tissue=com.codex.blacklight.client.renderer.NativeInfectionVisuals.beginCustom(entity,renderer,stack,partial)){
+            var base=scene==null?buffers:scene.buffers();
+            var source=tissue==null?base:com.codex.blacklight.client.renderer.NativeInfectionVisuals.buffers(base);
+            var owner=entity instanceof LivingEntity?BiomassSystem.claimant(entity):null;
+            if(owner==null){
+                original.call(renderer,entity,yaw,partial,stack,source,light);
+                if(tissue!=null)com.codex.blacklight.client.renderer.InfectedMorphology.flush((LivingEntity)entity,source);
+                return;
+            }
+                float progress=BiomassSystem.state(owner).progress(entity.level().getGameTime()+partial,com.codex.blacklight.power.ConsumeProgression.absorbTicks(owner));
+                var coat=new BiomassCoatBuffers((LivingEntity)entity,stack,source,
+                        Math.min(1,progress*1.45F),com.codex.blacklight.client.renderer.BiomassSurfaceBounds.ease((progress-.65F)/.35F),entity.tickCount+partial);
+                original.call(renderer,entity,yaw,partial,stack,coat,light);
+                if(tissue!=null)com.codex.blacklight.client.renderer.InfectedMorphology.flush((LivingEntity)entity,coat);
+                coat.finish();
+        }
     }
 }

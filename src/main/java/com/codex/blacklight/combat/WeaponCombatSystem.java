@@ -31,8 +31,8 @@ public final class WeaponCombatSystem {
         final WeaponMove move;int started;final int created;float yaw,previousYaw;Vec3 direction;float clipOffset;double pursuitTravel;
         final com.codex.blacklight.power.PowerForm form;
         final Map<UUID,Integer> closeSweepHits=new HashMap<>();
-        final Set<UUID> hit=new HashSet<>();boolean effect,charging,released,queuedHeld,jumpQueued,tookOff,lifted,impactEffect,groundEffect,locked;
-        WeaponMove.Input input,queued;int landed=-1,contact=-1,flight=-1,travelStarted,travelBudget,stuckTicks;boolean pounceCommitted,traveling;float chargePower;double travelSpeed;Vec3 lastTargetPosition;
+        final Set<UUID> hit=new HashSet<>();int hitstop,hitstopHeld;long hitstopStarted;boolean effect,charging,released,queuedHeld,jumpQueued,tookOff,lifted,impactEffect,groundEffect,locked;
+        WeaponMove.Input input,queued,early;boolean earlyHeld;int landed=-1,contact=-1,flight=-1,travelStarted,travelBudget,stuckTicks;boolean pounceCommitted,traveling;float chargePower;double travelSpeed;Vec3 lastTargetPosition;
         Vec3 previousFeet;LivingEntity target,queuedTarget;com.codex.blacklight.entity.MilitaryVehicle mechanicalTarget;final Map<UUID,List<AABB>> previousTargets=new HashMap<>();
         int mobilityStarted=-1;boolean mobilityFinished;Vec3 releaseDirection;double ballisticY;
         final Set<net.minecraft.core.BlockPos> terrainContacts=new HashSet<>();
@@ -44,6 +44,15 @@ public final class WeaponCombatSystem {
         int age=p.tickCount-s.started;return age>=0&&age<s.move.start&&p.tickCount-s.created<=s.move.start+2;
     }
     public static boolean busy(ServerPlayer p){return ACTIVE.containsKey(p)||DevastatorSystem.busy(p);}
+    public static boolean active(ServerPlayer p){return ACTIVE.containsKey(p);}
+    /** Ticks since the current session was created, or -1 without one. */
+    public static int sessionAge(ServerPlayer p){var s=ACTIVE.get(p);return s==null?-1:p.tickCount-s.created;}
+    /** Authored contacts are over: movement, dodge and jump may take the actor back. */
+    public static boolean cancelableRecovery(ServerPlayer p){
+        var s=ACTIVE.get(p);if(s==null||s.charging||s.traveling||s.queued!=null||s.move.landingAttack())return false;
+        if(s.move.aerial()&&!s.move.airCombo())return false;
+        return p.tickCount-s.started>=s.move.end;
+    }
     /** A form swap cancels only a weapon-owned action, never a grab or devastator. */
     public static boolean canSwitchForm(ServerPlayer p){
         return !DevastatorSystem.busy(p) && (ACTIVE.containsKey(p)
@@ -122,6 +131,9 @@ public final class WeaponCombatSystem {
             if((!active.charging||active.released)&&followUp!=null&&p.tickCount-active.started>=active.move.comboBufferTick()){
                 active.queued=input;active.queuedHeld=held;
                 active.queuedTarget=null;active.queuedTarget=acquireTarget(p,followUp);
+            }else if(followUp!=null&&(!active.charging||active.released)){
+                // A press during startup is remembered, not dropped; it queues once the buffer opens.
+                active.early=input;active.earlyHeld=held;
             }
             return;
         }
@@ -238,6 +250,7 @@ public final class WeaponCombatSystem {
         if(!p.isAlive()||p.isSpectator()||!state.isPrototypeMode()||state.getActivePower()!=s.form||p.getData(ModAttachments.CONSUMING)
                 ||!WeaponMove.controls(s.form,p.getMainHandItem().isEmpty()&&p.getOffhandItem().isEmpty())){cancel(p);return;}
         if(CombatMotion.stationaryWhip(s.move)&&(p.isInWater()||p.isInLava()||p.isPassenger()||p.getAbilities().flying)){cancel(p);return;}
+        if(s.hitstop>0&&tickHitstop(p,s))return;
         int t=p.tickCount-s.started;
         if(s.target!=null){
             // A teleport is not ordinary target motion; do not chase stale IDs.
@@ -293,7 +306,7 @@ public final class WeaponCombatSystem {
                     if(launcher!=null){move=launcher;releaseTime=0;}
                 }
                 start(p,move,false,s.input,releaseTime);
-                var released=ACTIVE.get(p);released.jumpQueued=s.jumpQueued;released.queued=s.queued;released.queuedHeld=s.queuedHeld;released.queuedTarget=s.queuedTarget;
+                var released=ACTIVE.get(p);released.jumpQueued=s.jumpQueued;released.queued=s.queued;released.queuedHeld=s.queuedHeld;released.queuedTarget=s.queuedTarget;released.early=s.early;released.earlyHeld=s.earlyHeld;
                 // Some source moves strengthen the same release clip instead of
                 // selecting a second animation. Preserve their actual held charge.
                 if(move==WeaponMove.AIR_KICK||move==WeaponMove.AIR_PAIN||move==WeaponMove.CLAW_POUNCE||move==WeaponMove.BLADE_DIVE||move==WeaponMove.HAMMER_DROP||move==WeaponMove.HAMMER_RAM||move==WeaponMove.BLADE_RUSH)
@@ -392,9 +405,14 @@ public final class WeaponCombatSystem {
         // Keep all authored contacts, then let movement leave the recovery.
         // Buffered combos have priority; committed aerial/landing travel keeps its owner.
         var travelInput=p.getData(ModAttachments.MOVEMENT_STATE).wallInput();
-        if(s.queued==null&&(!s.move.aerial()||s.move.airCombo())&&t>=s.move.end+2
+        if(s.queued==null&&(!s.move.aerial()||s.move.airCombo())&&t>=s.move.end
                 &&(travelInput.forward()!=0||travelInput.sideways()!=0)){
             cancel(p);return;
+        }
+        if(s.early!=null&&s.queued==null&&t>=s.move.comboBufferTick()){
+            var followUp=s.move.followUp(s.early,s.form,!p.onGround(),p.isSprinting());
+            if(followUp!=null){s.queued=s.early;s.queuedHeld=s.earlyHeld;s.queuedTarget=acquireTarget(p,followUp);}
+            s.early=null;
         }
         if(s.queued!=null&&t>=s.move.comboLinkTick()&&canRequest(p)){
             // Replace the session directly and blend from the current follow-through pose.
@@ -419,6 +437,29 @@ public final class WeaponCombatSystem {
                 .orElse(s.move.start/20.0);
         double transition=local.map(d->(double)d.transitionSeconds()).orElse(0D);
         return tick/20.0<release+transition-.0001;
+    }
+    /** Actor side of hitstop: the clip holds its contact frame, root motion and contact clocks stop. */
+    private static void beginHitstop(ServerPlayer p,Session s,ImpactTier tier){
+        if(tier.hitstop<=0||s.hitstop>0||s.traveling||s.charging||s.mobilityStarted>=0)return;
+        var old=p.getData(ModAttachments.WEAPON_VISUAL);if(old.spec()!=s.move||old.attackPose()>=0)return;
+        var sample=com.codex.blacklight.animation.WeaponMotionClock.sample(old,p.level().getGameTime());if(sample==null)return;
+        s.hitstop=tier.hitstop;s.hitstopHeld=0;s.hitstopStarted=old.started();
+        p.setData(ModAttachments.WEAPON_VISUAL,new WeaponVisual(old.move(),old.started(),old.yaw(),false,old.clipOffset(),old.targetId(),old.travelPose(),sample.seconds()));
+        p.syncData(ModAttachments.WEAPON_VISUAL);
+        var v=p.getDeltaMovement();p.setDeltaMovement(0,p.onGround()?v.y:0,0);p.hurtMarked=true;
+    }
+    /** Returns true while the frame is held; the session clock is pushed back one tick per held tick. */
+    private static boolean tickHitstop(ServerPlayer p,Session s){
+        s.hitstop--;s.hitstopHeld++;s.started++;
+        var v=p.getDeltaMovement();p.setDeltaMovement(0,p.onGround()?v.y:0,0);p.fallDistance=0;p.hurtMarked=true;
+        if(s.hitstop>0)return true;
+        var old=p.getData(ModAttachments.WEAPON_VISUAL);
+        if(old.spec()==s.move){
+            p.setData(ModAttachments.WEAPON_VISUAL,new WeaponVisual(old.move(),s.hitstopStarted+s.hitstopHeld,old.yaw(),false,old.clipOffset(),old.targetId(),old.travelPose(),-1));
+            p.syncData(ModAttachments.WEAPON_VISUAL);
+        }
+        s.previousFeet=p.position();
+        return true;
     }
     private static void syncHeading(ServerPlayer p,Session s,float yaw){
         s.yaw=yaw;s.direction=Vec3.directionFromRotation(0,yaw);p.yBodyRot=yaw;
@@ -574,7 +615,8 @@ public final class WeaponCombatSystem {
                     if(!s.lifted){s.lifted=true;p.setOnGround(false);p.setDeltaMovement(s.direction.scale(.12).add(0,.72,0));p.hurtMarked=true;}
                 }else if(!resistsControl&&!CombatTargeting.multipart(v)&&(s.move.quake()||s.move.airCombo())){v.setDeltaMovement(v.getDeltaMovement().add(0,s.move==WeaponMove.AIR_AUTO4?-.6:.3,0));v.hurtMarked=true;}
                 var push=s.move.quake()?v.position().subtract(p.position()).multiply(1,0,1).normalize():s.direction;
-                WeaponImpact.apply(p,v,s.move,push,s.hit.size()==1);
+                WeaponImpact.apply(p,v,s.move,push,s.hit.size()==1,s.chargePower);
+                if(s.hit.size()==1)beginHitstop(p,s,ImpactTier.of(s.move));
                 if(s.move.form==com.codex.blacklight.power.PowerForm.HAMMERFISTS&&!s.move.quake()&&!s.impactEffect){
                     s.impactEffect=true;hammerSplash(p,s,v);
                 }

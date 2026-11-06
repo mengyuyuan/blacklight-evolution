@@ -16,6 +16,8 @@ public final class NativePlayerRenderScope implements AutoCloseable {
     private NativePlayerRenderScope(Object player){previous=CURRENT.get();CURRENT.set(player);}
     public static NativePlayerRenderScope enter(Object player){return new NativePlayerRenderScope(player);}
     public static boolean active(){return CURRENT.get()!=null;}
+    public static Object current(){return CURRENT.get();}
+    public static boolean owns(Object entity){return entity!=null&&CURRENT.get()==entity;}
     public static boolean ownsPatch(Object patch) {
         Object player=CURRENT.get();
         if(player==null||patch==null)return false;

@@ -72,7 +72,7 @@ public final class BlacklightRenderPose {
     }
     public static float rawFacing(LivingEntity entity,float partial) {
         var dodge=entity.getData(ModAttachments.PLAYER_ACTION);
-        if(dodge.clipId().equals("basic_dodge_roll")&&dodge.active(entity.level().getGameTime()+partial))return dodge.yaw();
+        if(dodge.clipId().equals("basic_dodge_roll")&&dodge.active(com.codex.blacklight.animation.PlayerMotionController.actionTime(entity,partial)))return dodge.yaw();
         float body=net.minecraft.util.Mth.rotLerp(partial,entity.yBodyRotO,entity.yBodyRot);
         var weapon=entity.getData(ModAttachments.WEAPON_VISUAL);
         float facing=NativeConsumePose.facing(entity,weapon.spec()==null?entity.getYRot():weapon.yaw(),partial);

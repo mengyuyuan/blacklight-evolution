@@ -16,7 +16,7 @@ public abstract class HydraServerMovementMixin {
     @Shadow private boolean clientIsFloating;
     @Inject(method="handleMovePlayer",at=@At("HEAD"),cancellable=true)
     private void blacklight$serverOwnedGrip(ServerboundMovePlayerPacket packet,CallbackInfo ci){
-        if(!player.server.isSameThread()||!HydraTransport.active(player))return;
+        if(!com.codex.blacklight.registry.ModAttachments.available(player)||player.server==null||player.connection==null||!player.server.isSameThread()||!HydraTransport.active(player))return;
         HydraTransport.place(player);player.connection.resetPosition();clientIsFloating=false;ci.cancel();
     }
 }

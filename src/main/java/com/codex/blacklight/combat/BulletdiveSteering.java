@@ -37,6 +37,25 @@ public final class BulletdiveSteering {
         if(offset!=null && next.dot(offset)>0 && next.lengthSqr()>offset.lengthSqr())next=offset;
         return next;
     }
+    /** Locked dive: solve the remaining fall time against the real dive speed curve and
+     * spread the horizontal correction over it, leading a moving target, so the
+     * crater lands on the target instead of drifting by the capped steering error. */
+    public static final double GUIDED_MAX=14;
+    public static Vec3 guided(Vec3 position,Vec3 target,Vec3 targetVelocity,int fallingTick,float yaw,int forward,int right){
+        double drop=Math.max(0,position.y-target.y);int n=1;double travelled=0;
+        while(n<4000){travelled+=BulletdivePhysics.downSpeed(fallingTick+n);if(travelled>=drop)break;n++;}
+        Vec3 lead=finite(targetVelocity)?new Vec3(targetVelocity.x,0,targetVelocity.z).scale(Math.min(n,40)):Vec3.ZERO;
+        Vec3 offset=new Vec3(target.x+lead.x-position.x,0,target.z+lead.z-position.z);
+        Vec3 next=offset.scale(1D/n);
+        int f=Integer.signum(forward),r=Integer.signum(right);
+        if((f!=0||r!=0)&&Float.isFinite(yaw)){
+            // Movement keys only nudge the guided line; they no longer cancel the lock.
+            double angle=Math.toRadians(yaw)+Math.atan2(r,f);
+            next=next.add(-Math.sin(angle)*.35,0,Math.cos(angle)*.35);
+        }
+        if(next.lengthSqr()>GUIDED_MAX*GUIDED_MAX)next=next.normalize().scale(GUIDED_MAX);
+        return next;
+    }
     private static boolean finite(Vec3 vector) {
         return vector!=null&&Double.isFinite(vector.x)&&Double.isFinite(vector.y)&&Double.isFinite(vector.z);
     }

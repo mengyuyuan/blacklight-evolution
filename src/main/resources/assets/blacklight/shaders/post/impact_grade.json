@@ -1,0 +1,7 @@
+{
+  "targets": ["blacklight_impact_swap"],
+  "passes": [
+    {"name": "blacklight:impact_grade", "intarget": "minecraft:main", "outtarget": "blacklight_impact_swap"},
+    {"name": "blit", "intarget": "blacklight_impact_swap", "outtarget": "minecraft:main"}
+  ]
+}
