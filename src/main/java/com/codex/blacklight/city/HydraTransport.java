@@ -8,7 +8,8 @@ import net.minecraft.world.entity.player.Player;
 public final class HydraTransport {
     private HydraTransport(){}
     public static BlacklightHydra carrier(Player p){
-        if(!ModAttachments.available(p)||!p.isAlive())return null;
+        // A dying player must still resolve its carrier so the fatal slime can release it.
+        if(!ModAttachments.available(p)||p.isRemoved())return null;
         int id=p.hasData(ModAttachments.HYDRA_CARRIER)?p.getData(ModAttachments.HYDRA_CARRIER):-1;
         return id>=0&&p.level().getEntity(id) instanceof BlacklightHydra h&&h.isAlive()&&h.heldId()==p.getId()&&h.transporting()?h:null;
     }

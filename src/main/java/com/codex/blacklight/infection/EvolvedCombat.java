@@ -104,10 +104,14 @@ public final class EvolvedCombat {
         host.setSprinting(gap>4);
         if(pathCooldown==0){host.getNavigation().moveTo(target,gap>4?1.4:1.05);pathCooldown=6;}
         var path=host.getNavigation().getPath();
-        var next=path!=null&&!path.isDone()?path.getNextEntityPos(host).subtract(host.position()).multiply(1,0,1):toward(target);
+        var next=heading(path,target);
         var projected=next.lengthSqr()>.0001?next.normalize().scale(.4):Vec3.ZERO;
         boolean stepDown=path!=null&&!path.isDone()&&path.getNextNode().y<host.getY()-.5&&path.getNextNode().y>=host.getY()-1.25;
-        if(host.onGround()&&projected.lengthSqr()>.0001&&!supported(projected,stepDown)){
+        // Goals tick every other tick, so the host can travel two strides between
+        // checks. Also require footing (at most one block down) under the leading
+        // edge two strides ahead; not the flanks, which may overhang a walkway.
+        if(host.onGround()&&projected.lengthSqr()>.0001&&(!supported(projected,stepDown)
+                ||!supported(projected.add(projected.normalize().scale(host.getBbWidth()*.5+2*host.getDeltaMovement().horizontalDistance())),true))){
             host.getNavigation().stop();host.getMoveControl().setWantedPosition(host.getX(),host.getY(),host.getZ(),0);
             host.setXxa(0);host.setZza(0);host.setDeltaMovement(0,host.getDeltaMovement().y,0);pathCooldown=0;return;
         }
@@ -120,6 +124,17 @@ public final class EvolvedCombat {
             if(!supported(step,stepDown)||!host.level().noCollision(host,box))return;
             host.setDeltaMovement(step.x,host.getDeltaMovement().y,step.z);
         }
+    }
+    /** A wide mob's entity position at a node sits on a block corner, which
+     *  points the edge probe 45 degrees off the real route. Probe toward the
+     *  centre of the first node block that is actually ahead instead. */
+    private Vec3 heading(net.minecraft.world.level.pathfinder.Path path,LivingEntity target){
+        if(path==null||path.isDone())return toward(target);
+        for(int i=path.getNextNodeIndex();i<path.getNodeCount();i++){
+            var n=path.getNode(i);var d=new Vec3(n.x+.5-host.getX(),0,n.z+.5-host.getZ());
+            if(d.lengthSqr()>.36)return d;
+        }
+        return toward(target);
     }
     private boolean supported(Vec3 step){
         return supported(step,false);

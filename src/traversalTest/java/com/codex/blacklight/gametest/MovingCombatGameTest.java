@@ -54,7 +54,7 @@ public final class MovingCombatGameTest {
     }
     @GameTest(template="wall_test",timeoutTicks=600,batch="ground_rear_escape")
     public static void pursuitCannotTurnBehindOrChaseEscapingTarget(GameTestHelper h){
-        AerialSpecialGameTest.loadedFlight(h,()->checkRearEscape(h));
+        AerialSpecialGameTest.loadedFlight(h,()->{boolean old=com.codex.blacklight.combat.WeaponCombatSystem.actorHitstop(false);try{checkRearEscape(h);}finally{com.codex.blacklight.combat.WeaponCombatSystem.actorHitstop(old);}});
     }
     private static void checkRearEscape(GameTestHelper h){
         // Separate altitude from the flight fixtures, and remove the support
@@ -75,6 +75,7 @@ public final class MovingCombatGameTest {
         double authoredPath=0;
         for(int frame=1;frame<=80;frame++)authoredPath+=com.codex.blacklight.animation.NativeRootMotion
                 .clipStep(clip,clip.duration()*(frame-1)/80,clip.duration()*frame/80,0).length();
+        authoredPath*=com.codex.blacklight.animation.NativeRootMotion.travelScale(WeaponMove.BLADE_CUT);
         h.assertTrue(mob.getHealth()==hp&&displacement.z>.25&&displacement.z<=authoredPath+.02
                 &&Math.abs(displacement.x)<.05&&Math.abs(p.getYRot())<.1,
                 "escaping behind cannot redirect the bounded authored forward lunge or guarantee damage: movement="+displacement+" authoredPath="+authoredPath);

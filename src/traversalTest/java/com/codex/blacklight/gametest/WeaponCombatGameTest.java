@@ -42,7 +42,8 @@ public final class WeaponCombatGameTest {
         movement.reset();WeaponCombatSystem.cancel(p);h.succeed();
     }
     @GameTest(template="wall_test",timeoutTicks=40)
-    public static void queuedComboLinksFromFollowThroughAndKeepsBothFullHits(GameTestHelper h){
+    public static void queuedComboLinksFromFollowThroughAndKeepsBothFullHits(GameTestHelper h) throws Exception {withoutActorHitstop(()->queuedComboLinksFromFollowThroughAndKeepsBothFullHitsBody(h));}
+    private static void queuedComboLinksFromFollowThroughAndKeepsBothFullHitsBody(GameTestHelper h) throws Exception {
         for(int x=0;x<=12;x++)for(int z=0;z<=12;z++)h.setBlock(x,1,z,net.minecraft.world.level.block.Blocks.STONE);
         for(var form:new PowerForm[]{PowerForm.BLADE,PowerForm.HAMMERFISTS,PowerForm.WHIPFIST,PowerForm.MUSCLE_MASS}){
             var p=FakePlayerFactory.get(h.getLevel(),new GameProfile(UUID.randomUUID(),"combo-qa"));
@@ -105,7 +106,8 @@ public final class WeaponCombatGameTest {
         for(int i=0;i<ticks;i++){p.tickCount++;WeaponCombatSystem.tick(new PlayerTickEvent.Post(p));}
     }
     @GameTest(template="wall_test",timeoutTicks=40)
-    public static void adaptedMotionsKeepSingleServerHitAndRecovery(GameTestHelper h){
+    public static void adaptedMotionsKeepSingleServerHitAndRecovery(GameTestHelper h) throws Exception {withoutActorHitstop(()->adaptedMotionsKeepSingleServerHitAndRecoveryBody(h));}
+    private static void adaptedMotionsKeepSingleServerHitAndRecoveryBody(GameTestHelper h) throws Exception {
         for(var referenced:WeaponMove.values()){
             // Aliases reuse the same dependency wrapper; their input ordering is
             // covered separately by explicit chain and charge tests.
@@ -147,7 +149,8 @@ public final class WeaponCombatGameTest {
         h.succeed();
     }
     @GameTest(template="wall_test",timeoutTicks=40)
-    public static void bladeSpecialUsesDashOnceFromStandingAndSprintAndWhipReachesBehind(GameTestHelper h){
+    public static void bladeSpecialUsesDashOnceFromStandingAndSprintAndWhipReachesBehind(GameTestHelper h) throws Exception {withoutActorHitstop(()->bladeSpecialUsesDashOnceFromStandingAndSprintAndWhipReachesBehindBody(h));}
+    private static void bladeSpecialUsesDashOnceFromStandingAndSprintAndWhipReachesBehindBody(GameTestHelper h) throws Exception {
         for(int x=0;x<=12;x++)for(int z=0;z<=12;z++)h.setBlock(x,1,z,net.minecraft.world.level.block.Blocks.STONE);
         var p=FakePlayerFactory.get(h.getLevel(),new GameProfile(UUID.randomUUID(),"frenzy-qa"));
         Vec3 home=h.absoluteVec(new Vec3(5,2,5));p.setPos(home);p.setYRot(0);p.setOnGround(true);p.tickCount=100;
@@ -197,7 +200,8 @@ public final class WeaponCombatGameTest {
         behind.discard();h.succeed();
     }
     @GameTest(template="wall_test",timeoutTicks=40)
-    public static void eachWeaponHasTimedDamageAndFormSwitchCancelsOldContacts(GameTestHelper h){
+    public static void eachWeaponHasTimedDamageAndFormSwitchCancelsOldContacts(GameTestHelper h) throws Exception {withoutActorHitstop(()->eachWeaponHasTimedDamageAndFormSwitchCancelsOldContactsBody(h));}
+    private static void eachWeaponHasTimedDamageAndFormSwitchCancelsOldContactsBody(GameTestHelper h) throws Exception {
         for(var form:new PowerForm[]{PowerForm.BLADE,PowerForm.HAMMERFISTS,PowerForm.WHIPFIST}){
             for(int x=1;x<12;x++)for(int z=1;z<12;z++)h.setBlock(x,1,z,Blocks.STONE);
             var p=FakePlayerFactory.get(h.getLevel(),new GameProfile(UUID.randomUUID(),"weapon-qa"));
@@ -233,5 +237,11 @@ public final class WeaponCombatGameTest {
         WeaponCombatSystem.request(p,false);s.setPrototypeMode(false);p.tickCount++;WeaponCombatSystem.tick(new PlayerTickEvent.Post(p));
         h.assertTrue(!WeaponCombatSystem.busy(p)&&p.getData(ModAttachments.WEAPON_VISUAL).spec()==null,"exit clears transient combat state");
         mob.discard();h.succeed();
+    }
+    /** These tick-exact timelines predate hitstop; actor hitstop only extends busy time, so it is disabled here. */
+    private interface Body{void run() throws Exception;}
+    private static void withoutActorHitstop(Body body) throws Exception{
+        boolean old=com.codex.blacklight.combat.WeaponCombatSystem.actorHitstop(false);
+        try{body.run();}finally{com.codex.blacklight.combat.WeaponCombatSystem.actorHitstop(old);}
     }
 }

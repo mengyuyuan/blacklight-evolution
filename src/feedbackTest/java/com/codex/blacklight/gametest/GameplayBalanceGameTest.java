@@ -84,14 +84,14 @@ public final class GameplayBalanceGameTest {
     @GameTest(template="wall_test",timeoutTicks=45,batch="configured_ecology")
     public static void configuredWeightsAndAreaChanceReachTheWorldScheduler(GameTestHelper h){
         var values=GameplayBalanceConfig.TIER_WEIGHTS[0];int[] before=Arrays.stream(values).mapToInt(ModConfigSpec.IntValue::get).toArray();
-        boolean floors=GameplayBalanceConfig.LINEAGE_GUARANTEES.get();int green=GameplayBalanceConfig.GREEN_CHANCE.get();
+        boolean floors=GameplayBalanceConfig.LINEAGE_GUARANTEES.get();int green=GameplayBalanceConfig.GREEN_CHANCE.get(),yellow=GameplayBalanceConfig.YELLOW_CHANCE.get(),red=GameplayBalanceConfig.RED_CHANCE.get();
         var pos=h.absolutePos(new BlockPos(4,2,4));
         try{
             GameplayBalanceConfig.LINEAGE_GUARANTEES.set(false);for(var v:values)v.set(0);values[3].set(1);
             h.assertTrue(WorldOutbreakSystem.tierForPopulation(h.getLevel(),pos,.9999)==OutbreakRules.Tier.HUNTER,"server scheduler uses the custom weight rather than hardcoded common births");
-            GameplayBalanceConfig.GREEN_CHANCE.set(0);h.assertTrue(!CityEcology.ambientAllowed(h.getLevel(),pos,0),"zero area chance blocks a candidate");
-            GameplayBalanceConfig.GREEN_CHANCE.set(100);h.assertTrue(CityEcology.ambientAllowed(h.getLevel(),pos,99),"100 percent permits a candidate");
-        }finally{for(int i=0;i<5;i++)values[i].set(before[i]);GameplayBalanceConfig.LINEAGE_GUARANTEES.set(floors);GameplayBalanceConfig.GREEN_CHANCE.set(green);}h.succeed();
+            // Earlier tests may leave this position yellow or red; set every zone..ambientAllowed(h.getLevel(),pos,0),"zero area chance blocks a candidate");
+            GameplayBalanceConfig.GREEN_CHANCE.set(100);GameplayBalanceConfig.YELLOW_CHANCE.set(100);GameplayBalanceConfig.RED_CHANCE.set(100);h.assertTrue(CityEcology.ambientAllowed(h.getLevel(),pos,99),"100 percent permits a candidate");
+        }finally{for(int i=0;i<5;i++)values[i].set(before[i]);GameplayBalanceConfig.LINEAGE_GUARANTEES.set(floors);GameplayBalanceConfig.GREEN_CHANCE.set(green);GameplayBalanceConfig.YELLOW_CHANCE.set(yellow);GameplayBalanceConfig.RED_CHANCE.set(red);}h.succeed();
     }
     private static com.codex.blacklight.entity.BlacklightInfectedHost host(GameTestHelper h){
         var host=ModEntities.INFECTED_HOST.get().create(h.getLevel());host.inherit(EntityType.COW.create(h.getLevel()));host.setNoAi(true);host.setNoGravity(true);return host;

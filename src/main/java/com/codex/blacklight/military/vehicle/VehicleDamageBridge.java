@@ -67,7 +67,7 @@ public final class VehicleDamageBridge {
         return target.hurt(source,damage*coefficient*prototypeScale(actor));
     }
     /** Living targets receive prototype melee in CombatScale units; hulls use the same scale so a claw is not five times weaker on steel. */
-    static float prototypeScale(LivingEntity actor){
+    public static float prototypeScale(LivingEntity actor){
         return actor instanceof Player p&&com.codex.blacklight.power.PrototypeMetabolism.active(p)?com.codex.blacklight.power.CombatScale.UNITS:1F;
     }
     /** Devastators use their already-resolved true damage, with identical protection checks. */
