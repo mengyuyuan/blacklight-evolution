@@ -41,7 +41,8 @@
     "AdaptivePlayerDamageMixin",
     "WingFlightTravelMixin",
     "WingFlightFloatingMixin",
-    "HydraServerMovementMixin"
+    "HydraServerMovementMixin",
+    "OptionalEpicFightModeMixin"
   ],
   "client": [
     "client.VehiclePlayerPoseMixin",
@@ -68,7 +69,8 @@
     "client.ModelPartChildrenAccessor",
     "client.DragonConsumePoseMixin",
     "client.VictimModelRootMixin",
-    "client.BlockCarryItemMixin"
+    "client.BlockCarryItemMixin",
+    "client.PrototypeBodyYawMixin"
   ],
   "injectors": {
     "defaultRequire": 1
