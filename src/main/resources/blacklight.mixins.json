@@ -81,7 +81,8 @@
     "client.VehiclePlayerPoseMixin",
     "client.PrototypeVehiclePickMixin",
     "client.OptionalMcaNativeBodyMixin",
-    "client.NativePlayerModelOwnershipMixin"
+    "client.NativePlayerModelOwnershipMixin",
+    "client.PrototypeBodyYawMixin"
   ],
   "injectors": {
     "defaultRequire": 1
