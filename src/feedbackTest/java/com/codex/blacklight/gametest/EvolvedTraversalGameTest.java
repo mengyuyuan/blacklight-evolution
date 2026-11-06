@@ -42,6 +42,12 @@ public final class EvolvedTraversalGameTest {
 
     private static void run(GameTestHelper h,String kind,int terrain,boolean playerTarget){
         var level=h.getLevel();
+        // The course spans chunk borders; keep every chunk entity-ticking so the host
+        // never freezes mid-stride when it walks into a neighbouring chunk.
+        var lo=h.absolutePos(new BlockPos(0,30,0));var hi=h.absolutePos(new BlockPos(21,30,10));
+        var forced=new java.util.ArrayList<net.minecraft.world.level.ChunkPos>();
+        for(int cx=Math.min(lo.getX(),hi.getX())>>4;cx<=Math.max(lo.getX(),hi.getX())>>4;cx++)for(int cz=Math.min(lo.getZ(),hi.getZ())>>4;cz<=Math.max(lo.getZ(),hi.getZ())>>4;cz++)
+            if(level.setChunkForced(cx,cz,true))forced.add(new net.minecraft.world.level.ChunkPos(cx,cz));
         for(int x=1;x<=20;x++)for(int z=1;z<=9;z++)for(int y=29;y<=35;y++)
             level.setBlock(h.absolutePos(new BlockPos(x,y,z)),Blocks.AIR.defaultBlockState(),2);
         for(int x=1;x<=20;x++)for(int z=1;z<=9;z++){
@@ -83,6 +89,6 @@ public final class EvolvedTraversalGameTest {
             if(terrain==3){h.assertTrue(lowest[0]>=start.y-.35,"cliff safety retained: "+detail);h.assertTrue(closest[0]>4,"cannot cross unsupported air: "+detail);}
             else if(terrain==0||terrain==4){h.assertTrue(highest[0]>=start.y+(terrain==4?1.8:.8),"must physically climb to target footing: "+detail);h.assertTrue(closest[0]<3,"closes height separation: "+detail);}
             else {h.assertTrue(host.getX()>start.x+5,"must make real chase progress: "+detail);h.assertTrue(closest[0]<4,"approaches target using collision movement: "+detail);}
-        }finally{host.discard();if(!(target instanceof net.minecraft.world.entity.player.Player))target.discard();}h.succeed();});
+        }finally{for(var c:forced)level.setChunkForced(c.x,c.z,false);host.discard();if(!(target instanceof net.minecraft.world.entity.player.Player))target.discard();}h.succeed();});
     }
 }

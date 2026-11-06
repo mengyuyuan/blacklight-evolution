@@ -112,11 +112,15 @@ public final class EvolvedCombat {
         // edge two strides ahead; not the flanks, which may overhang a walkway.
         var motion=host.getDeltaMovement().multiply(1,0,1);double lead=host.getBbWidth()*.5+2*motion.horizontalDistance();
         if(host.onGround()&&projected.lengthSqr()>.0001&&(!supported(projected,stepDown)||unsafeDrop(path)
-                ||!supported(projected.add(projected.normalize().scale(lead)),true)
-                // A zigzag wide-mob path can point the probe sideways; also check the real stride.
-                ||motion.lengthSqr()>.0025&&!supported(motion.normalize().scale(.4+lead),true))){
+                ||!supported(projected.add(projected.normalize().scale(lead)),true))){
             host.getNavigation().stop();host.getMoveControl().setWantedPosition(host.getX(),host.getY(),host.getZ(),0);
             host.setXxa(0);host.setZza(0);host.setDeltaMovement(0,host.getDeltaMovement().y,0);pathCooldown=0;return;
+        }
+        // A zigzag wide-mob path can drift sideways off a walkway; when the real stride
+        // leaves footing but the route ahead is safe, steer the stride back onto the route.
+        if(host.onGround()&&motion.lengthSqr()>.0025&&!supported(motion.scale(2),true)){
+            var safe=projected.normalize().scale(motion.horizontalDistance());
+            host.setDeltaMovement(safe.x,host.getDeltaMovement().y,safe.z);
         }
         stalledChaseTicks=lastChasePosition!=null&&host.position().distanceToSqr(lastChasePosition)<.0004?stalledChaseTicks+1:0;
         lastChasePosition=host.position();
