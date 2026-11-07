@@ -28,18 +28,11 @@ public final class VehicleKinematics {
         Vec3 before = vehicle.position();
         var shape = VehicleHullShape.from(vehicle.definition(),vehicle.turretYaw(),vehicle.gunPitch());
         var origin = point(vehicle.position());
-        float initialYaw = vehicle.getYRot(), targetYaw = initialYaw+yaw;
-        if (yaw != 0) {
-            var sweep = shape.sweepRotation(origin,initialYaw,targetYaw);
-            for (int i=0;i<sweep.size();i++) {
-                StopReason reason = checkEnvelope(vehicle,sweep.get(i));
-                if (reason != StopReason.NONE) return result(vehicle,0,0,reason == StopReason.BLOCKED ? StopReason.ROTATION_BLOCKED : reason);
-                var support = support(vehicle,vehicle.getX(),vehicle.getY(),vehicle.getZ(),initialYaw+yaw*(i+1)/sweep.size());
-                if (support.reason != StopReason.NONE || support.height > vehicle.getY()+EPSILON)
-                    return result(vehicle,0,0,support.reason == StopReason.NONE ? StopReason.UNSUPPORTED : support.reason);
-            }
-            vehicle.setYRot(net.minecraft.util.Mth.wrapDegrees(targetYaw));
-        }
+        // A blocked turn only cancels the turn. Throttle still drives the hull, so a
+        // vehicle pressed against a wall can always reverse or slide out while steering.
+        StopReason turn = yaw == 0 ? StopReason.NONE : rotate(vehicle,shape,origin,yaw);
+        float turned = turn == StopReason.NONE ? yaw : 0;
+        if (distance == 0) return result(vehicle,0,turned,turn);
         int steps = Math.max(1,(int)Math.ceil(Math.abs(distance)/MAX_STEP));
         double stride = distance/steps, completed=0;
         double radians = Math.toRadians(vehicle.getYRot());
@@ -48,17 +41,31 @@ public final class VehicleKinematics {
             Vec3 start = vehicle.position();
             double x=start.x+Math.sin(radians)*stride,z=start.z+Math.cos(radians)*stride;
             var support = support(vehicle,x,start.y,z,vehicle.getYRot());
-            if (support.reason != StopReason.NONE) { setMotion(vehicle,before); return result(vehicle,completed,yaw,support.reason); }
+            if (support.reason != StopReason.NONE) { setMotion(vehicle,before); return result(vehicle,completed,turned,support.reason); }
             Vec3 destination = new Vec3(x,support.height,z);
             // A step rises before forward motion; a descent moves above the edge before lowering.
             Vec3 bend = destination.y > start.y ? new Vec3(start.x,destination.y,start.z) : new Vec3(destination.x,start.y,destination.z);
             StopReason reason = sweep(vehicle,shape,start,bend);
             if (reason == StopReason.NONE) reason = sweep(vehicle,shape,bend,destination);
-            if (reason != StopReason.NONE) { setMotion(vehicle,before); return result(vehicle,completed,yaw,reason); }
+            if (reason != StopReason.NONE) { setMotion(vehicle,before); return result(vehicle,completed,turned,reason); }
             vehicle.setPos(destination.x,destination.y,destination.z);completed+=stride;
         }
         for (var passenger:vehicle.getPassengers()) vehicle.positionRider(passenger);
-        setMotion(vehicle,before);return result(vehicle,completed,yaw,StopReason.NONE);
+        // Still report a refused turn so AI drivers treat their manoeuvre as failed.
+        setMotion(vehicle,before);return result(vehicle,completed,turned,turn);
+    }
+    private static StopReason rotate(MilitaryVehicle vehicle,VehicleHullShape shape,VehicleDefinition.Vec3 origin,float yaw) {
+        float initialYaw = vehicle.getYRot(), targetYaw = initialYaw+yaw;
+        var sweep = shape.sweepRotation(origin,initialYaw,targetYaw);
+        for (int i=0;i<sweep.size();i++) {
+            StopReason reason = checkEnvelope(vehicle,sweep.get(i));
+            if (reason != StopReason.NONE) return reason == StopReason.BLOCKED ? StopReason.ROTATION_BLOCKED : reason;
+            var support = support(vehicle,vehicle.getX(),vehicle.getY(),vehicle.getZ(),initialYaw+yaw*(i+1)/sweep.size());
+            if (support.reason != StopReason.NONE || support.height > vehicle.getY()+EPSILON)
+                return support.reason == StopReason.NONE ? StopReason.UNSUPPORTED : support.reason;
+        }
+        vehicle.setYRot(net.minecraft.util.Mth.wrapDegrees(targetYaw));
+        return StopReason.NONE;
     }
     public static boolean placementReady(MilitaryVehicle vehicle){
         if(!(vehicle.level() instanceof ServerLevel))return false;

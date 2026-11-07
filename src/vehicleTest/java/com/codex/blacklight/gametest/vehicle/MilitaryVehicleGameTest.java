@@ -59,6 +59,23 @@ public final class MilitaryVehicleGameTest {
         }h.succeed();
     }
     @GameTest(template="blackwatch_arena",batch="vehicle6",timeoutTicks=100)
+    public static void truckPressedIntoWallStillReversesAndSlidesOutWhileSteering(GameTestHelper h){
+        try(var f=new Fixture(h,181500)){
+            var v=f.truck();assertClearFixture(h,f,v,"wall approach");
+            for(int x=-10;x<=10;x++)for(int y=81;y<86;y++)f.level.setBlock(new BlockPos(f.x+x,y,10),Blocks.STONE.defaultBlockState(),2);
+            for(int i=0;i<40;i++)v.moveVehicle(.28,0);
+            h.assertTrue(v.getBoundingBox().maxZ>9.5&&f.level.noCollision(v,v.getBoundingBox()),"truck drives right up to the wall without penetrating it: box="+v.getBoundingBox());
+            // Keep steering into the wall until the long front corner is jammed against the stone.
+            VehicleKinematics.MoveResult forward=null;for(int i=0;i<20;i++)forward=v.moveVehicle(.28,3);
+            h.assertTrue(forward.reason()!=VehicleKinematics.StopReason.NONE&&f.level.noCollision(v,v.getBoundingBox()),"forward plus steer into the wall is refused without penetrating: "+forward);
+            h.assertTrue(v.moveVehicle(0,3).reason()==VehicleKinematics.StopReason.ROTATION_BLOCKED,"fixture precondition: the jammed hull cannot turn in place");
+            double before=v.getZ();for(int i=0;i<10;i++)v.moveVehicle(-.28,3);
+            h.assertTrue(v.getZ()<before-1,"reverse while steering still backs the truck away from the wall: z="+v.getZ()+" stop="+v.stopReason());
+            for(int i=0;i<20;i++)v.moveVehicle(-.28,3);
+            h.assertTrue(Math.abs(v.getYRot())>5,"once clear of the wall the same steering input turns the hull again: yaw="+v.getYRot());
+            h.assertTrue(f.level.noCollision(v,v.getBoundingBox()),"escaping truck never clips into the wall");
+        }h.succeed();
+    }    @GameTest(template="blackwatch_arena",batch="vehicle6",timeoutTicks=100)
     public static void realTruckClimbsOneStepAndRefusesThreeDeepPit(GameTestHelper h){
         try(var f=new Fixture(h,182000)){
             var v=f.truck();
