@@ -8,8 +8,16 @@ import net.minecraft.client.player.LocalPlayer;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 
-/** Transfer vanilla mouse deltas to Blacklight's independent orbit controller. */
-@Mixin(MouseHandler.class)
+/**
+ * Transfer vanilla mouse deltas to Blacklight's independent orbit controller.
+ *
+ * <p>Epic Fight wraps the same {@code LocalPlayer.turn} call and, when its camera declines the delta, calls
+ * {@code player.turn} itself instead of {@code original.call}. At equal priority it applies after this mixin, so it
+ * becomes the outer wrapper and the delta never reaches this handler: the head follows the mouse while the body
+ * stays on the orbit yaw. The higher priority keeps this wrapper outside. Whenever Blacklight does not own the view,
+ * including Epic Fight's own third-person and lock-on cameras, {@code original.call} still hands the delta inward.
+ */
+@Mixin(value=MouseHandler.class,priority=1100)
 public abstract class PrototypeTargetLockMixin {
     @WrapOperation(method="turnPlayer",at=@At(value="INVOKE",
             target="Lnet/minecraft/client/player/LocalPlayer;turn(DD)V"))
