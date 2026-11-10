@@ -79,6 +79,8 @@ public final class WorldOutbreakSystem {
                 ||!level.getGameRules().getBoolean(GameRules.RULE_DOMOBSPAWNING)
                 ||!com.codex.blacklight.compat.NaturalInfectionProtection.allowed(level,pos))return false;
         if(CityTravel.isCity(level.dimension())&&(!CityConfig.SPAWNS.get()||!CityData.get(level).population))return false;
+        // An unfinished birth (ambient or another sac) still owns its ticket until its join event returns.
+        if(pendingInfected(level)>0)return false;
         int infected=0;for(var entity:level.getAllEntities())if(entity instanceof Mob mob&&mob.isAlive()&&nativeMob(mob))infected++;
         if(infected>=InfectionEcologyConfig.dimensionCap(level))return false;
         return level.getEntitiesOfClass(Mob.class,new AABB(pos).inflate(48),m->m.isAlive()&&nativeMob(m)).size()<BROOD_LOCAL_CAP;
@@ -92,7 +94,9 @@ public final class WorldOutbreakSystem {
         for(int x=net.minecraft.util.Mth.floor(box.minX)>>4;x<=net.minecraft.util.Mth.floor(box.maxX)>>4;x++)
             for(int z=net.minecraft.util.Mth.floor(box.minZ)>>4;z<=net.minecraft.util.Mth.floor(box.maxZ)>>4;z++)
                 if(level.getChunkSource().getChunkNow(x,z)==null)return false;
-        return level.addFreshEntity(mob);
+        var window=births(level);if(window.pending.containsKey(mob))return false;
+        window.pending.put(mob,nativeMob(mob));
+        try{return level.addFreshEntity(mob);}finally{window.pending.remove(mob);}
     }
     public static boolean sanctuary(ServerLevel level,BlockPos pos){
         if(!CityTravel.isCity(level.dimension()))return false;

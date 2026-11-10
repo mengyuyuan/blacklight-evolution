@@ -123,7 +123,7 @@ public final class CitySpawnAuditGameTest {
     public static void denseAmbientBirthsShareTheActualWindowBudget(GameTestHelper h){ambientLoop(h,3,2);}
     private static void ambientLoop(GameTestHelper h,int perPlayer,int batch){
         var f=new Fixture(h);var level=f.level;var server=level.getServer();var old=com.codex.blacklight.infection.OutbreakData.get(server);var ecology=CityEcologyData.get(level);var difficulty=level.getDifficulty();
-        var active=new com.codex.blacklight.infection.OutbreakData();active.start(server.overworld().getGameTime());server.overworld().getDataStorage().set("blacklight_outbreak",active);level.getDataStorage().set("blacklight_city_ecology",new CityEcologyData());
+        var active=new com.codex.blacklight.infection.OutbreakData();active.start(server.overworld().getGameTime());active.markSeeded(level.dimension().location().toString());server.overworld().getDataStorage().set("blacklight_outbreak",active);level.getDataStorage().set("blacklight_city_ecology",new CityEcologyData());
         var values=new LinkedHashMap<net.neoforged.neoforge.common.ModConfigSpec.ConfigValue<?>,Object>();
         setting(values,com.codex.blacklight.infection.OutbreakConfig.ENABLED,true);setting(values,com.codex.blacklight.infection.OutbreakConfig.INTERVAL,20);setting(values,com.codex.blacklight.infection.OutbreakConfig.BATCH,batch);setting(values,com.codex.blacklight.config.GameplayBalanceConfig.GREEN_BIRTHS,perPlayer);
         setting(values,com.codex.blacklight.config.GameplayBalanceConfig.SPAWN_MIN,12);setting(values,com.codex.blacklight.config.GameplayBalanceConfig.SPAWN_MAX,12);setting(values,com.codex.blacklight.config.GameplayBalanceConfig.SPAWN_SAFETY,4);
