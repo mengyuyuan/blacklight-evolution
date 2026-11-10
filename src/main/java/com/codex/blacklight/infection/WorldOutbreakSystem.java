@@ -44,7 +44,55 @@ public final class WorldOutbreakSystem {
         if(!OutbreakConfig.ENABLED.get())return;
         if(OutbreakData.get(level.getServer()).start(level.getServer().overworld().getGameTime()))
             for(var p:level.getServer().getPlayerList().getPlayers())p.sendSystemMessage(Component.translatable("message.blacklight.outbreak_started"));
+        OutbreakData.get(level.getServer()).markSeeded(level.dimension().location().toString());
         CityEcology.release(level,pos);InfectionEcology.released(level,pos);seed(level,pos);
+    }
+    /** The outbreak clock is shared by every dimension, but local sources are not. The first time a
+     * natural dimension is visited after the release, a small source (tissue plus a few fresh
+     * infected) appears 24-40 blocks from a player, as if the virus had already reached it. */
+    private static void seedDimension(ServerLevel level){
+        if(level.getGameTime()%100!=0||!active(level)||!InfectionEcologyConfig.naturalDimension(level)||level.getDifficulty()==Difficulty.PEACEFUL
+                ||!level.getGameRules().getBoolean(GameRules.RULE_DOMOBSPAWNING))return;
+        var data=OutbreakData.get(level.getServer());String key=level.dimension().location().toString();
+        if(data.seeded(key))return;
+        if(CityTravel.isCity(level.dimension())&&(!CityConfig.SPAWNS.get()||!CityData.get(level).population))return;
+        var players=level.players().stream().filter(p->p.isAlive()&&!p.isSpectator()).toList();if(players.isEmpty())return;
+        var player=players.get(level.random.nextInt(players.size()));
+        BlockPos origin=null;int born=0;
+        for(int attempt=0;attempt<24&&born<3;attempt++){
+            int x,z;
+            if(origin==null){double a=level.random.nextDouble()*Math.PI*2;int d=24+level.random.nextInt(17);
+                x=player.getBlockX()+(int)Math.round(Math.cos(a)*d);z=player.getBlockZ()+(int)Math.round(Math.sin(a)*d);}
+            else{x=origin.getX()+level.random.nextInt(9)-4;z=origin.getZ()+level.random.nextInt(9)-4;}
+            var chunk=level.getChunkSource().getChunkNow(x>>4,z>>4);if(chunk==null)continue;
+            var pos=new BlockPos(x,chunk.getHeight(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES,x&15,z&15)+1,z);
+            if(!ready(level,pos)||sanctuary(level,pos)||!level.isPositionEntityTicking(pos)||!level.getFluidState(pos.below()).isEmpty())continue;
+            if(origin==null){origin=pos;data.markSeeded(key);CityEcology.release(level,pos);InfectionEcology.released(level,pos);seed(level,pos);
+                com.codex.blacklight.BlacklightNeoMod.LOGGER.info("Blacklight outbreak reached {} at {}",key,pos);}
+            if(spawnAt(level,pos,OutbreakRules.Tier.FRESH)!=null)born++;
+        }
+    }
+    /** Brood sacs (Lairs, colonies) keep their own per-sac cap, so the ambient chunk and crowd
+     * budgets do not stall them. Only the dimension cap and a local ceiling apply. */
+    public static boolean broodRoom(ServerLevel level,BlockPos pos){
+        if(!active(level)||!InfectionEcologyConfig.naturalDimension(level)||level.getDifficulty()==Difficulty.PEACEFUL||sanctuary(level,pos)
+                ||!level.getGameRules().getBoolean(GameRules.RULE_DOMOBSPAWNING)
+                ||!com.codex.blacklight.compat.NaturalInfectionProtection.allowed(level,pos))return false;
+        if(CityTravel.isCity(level.dimension())&&(!CityConfig.SPAWNS.get()||!CityData.get(level).population))return false;
+        int infected=0;for(var entity:level.getAllEntities())if(entity instanceof Mob mob&&mob.isAlive()&&nativeMob(mob))infected++;
+        if(infected>=InfectionEcologyConfig.dimensionCap(level))return false;
+        return level.getEntitiesOfClass(Mob.class,new AABB(pos).inflate(48),m->m.isAlive()&&nativeMob(m)).size()<BROOD_LOCAL_CAP;
+    }
+    public static final int BROOD_LOCAL_CAP=28;
+    public static boolean addBrood(ServerLevel level,Mob mob){
+        if(!level.getServer().isSameThread()||mob==null||mob.level()!=level||!mob.isAlive()||mob.isRemoved()
+                ||level.getEntity(mob.getUUID())!=null||!broodRoom(level,mob.blockPosition()))return false;
+        var box=mob.getBoundingBox();
+        if(!level.isInWorldBounds(mob.blockPosition())||!level.getWorldBorder().isWithinBounds(box))return false;
+        for(int x=net.minecraft.util.Mth.floor(box.minX)>>4;x<=net.minecraft.util.Mth.floor(box.maxX)>>4;x++)
+            for(int z=net.minecraft.util.Mth.floor(box.minZ)>>4;z<=net.minecraft.util.Mth.floor(box.maxZ)>>4;z++)
+                if(level.getChunkSource().getChunkNow(x,z)==null)return false;
+        return level.addFreshEntity(mob);
     }
     public static boolean sanctuary(ServerLevel level,BlockPos pos){
         if(!CityTravel.isCity(level.dimension()))return false;
@@ -96,6 +144,7 @@ public final class WorldOutbreakSystem {
         if(!active(level)||!InfectionEcologyConfig.naturalDimension(level)||!com.codex.blacklight.compat.NaturalInfectionProtection.allowed(level,pos)||level.getDifficulty()==Difficulty.PEACEFUL||sanctuary(level,pos)
                 ||!level.getGameRules().getBoolean(GameRules.RULE_DOMOBSPAWNING)
                 ||births(level).births+pendingInfected(level)+births(level).infections.size()>=OutbreakConfig.BATCH.get())return false;
+        if(!PopulationGuard.allows(level,pos))return false;
         if(CityTravel.isCity(level.dimension())&&(!CityConfig.SPAWNS.get()||!CityData.get(level).population))return false;
         int infected=0,mobs=0;
         for(var entity:level.getAllEntities())if(entity instanceof Mob mob&&mob.isAlive()){
@@ -253,6 +302,7 @@ public final class WorldOutbreakSystem {
         }return false;
     }
     @SubscribeEvent public static void tick(LevelTickEvent.Post event){
+        if(event.getLevel() instanceof ServerLevel trimmed){PopulationGuard.trim(trimmed);seedDimension(trimmed);}
         if(!(event.getLevel() instanceof ServerLevel level)||!active(level)||!InfectionEcologyConfig.naturalDimension(level)||level.players().isEmpty()
                 ||level.getGameTime()%OutbreakConfig.INTERVAL.get()!=0||level.getDifficulty()==Difficulty.PEACEFUL
                 ||!level.getGameRules().getBoolean(GameRules.RULE_DOMOBSPAWNING))return;

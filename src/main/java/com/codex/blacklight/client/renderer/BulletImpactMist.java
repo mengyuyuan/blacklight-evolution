@@ -28,8 +28,25 @@ public final class BulletImpactMist extends RenderType {
                 DefaultVertexFormat.POSITION_TEX_COLOR),loaded->shader=loaded);
     }
     public static boolean ready(){return shader!=null;}
+    private static ResourceLocation puff;
+    /** Soft round puff for the shader-pack path; the custom mist program is unknown to Iris/Oculus. */
+    private static ResourceLocation puff(){
+        if(puff!=null)return puff;
+        var image=new com.mojang.blaze3d.platform.NativeImage(32,32,false);
+        for(int y=0;y<32;y++)for(int x=0;x<32;x++){
+            double dx=(x+.5)/16-1,dy=(y+.5)/16-1,r=Math.sqrt(dx*dx+dy*dy);
+            double billow=.5+.5*Math.sin(x*1.7+y*.9)*Math.cos(y*1.3-x*.4);
+            int a=(int)(255*Math.clamp((1-r)*(1-r)*(.75+.25*billow)*1.6,0,1));
+            image.setPixelRGBA(x,y,(a<<24)|0xFFFFFF);
+        }
+        puff=ResourceLocation.fromNamespaceAndPath("blacklight","dynamic/impact_puff");
+        Minecraft.getInstance().getTextureManager().register(puff,new net.minecraft.client.renderer.texture.DynamicTexture(image));
+        return puff;
+    }
     public static int draw(PoseStack stack,DevastatorEffectRenderer.Frame frame,int budget) {
-        if(shader==null||budget<4)return 0;
+        boolean packed=com.codex.blacklight.client.ShaderPackCompat.active();
+        if((shader==null&&!packed)||budget<4)return 0;
+        RenderType material=packed?RenderType.entityTranslucentEmissive(puff()):MIST;
         double age=frame.elapsedSeconds()-frame.effectStartSeconds();
         var mc=Minecraft.getInstance();var camera=mc.gameRenderer.getMainCamera();
         var rotation=camera.rotation();
@@ -38,7 +55,7 @@ public final class BulletImpactMist extends RenderType {
         var right=new Vec3(rx.x,rx.y,rx.z);var up=new Vec3(uy.x,uy.y,uy.z);
         // Visual coverage is bounded; actual terrain depth/energy remain uncapped.
         double radius=Math.min(32,Math.max(4,frame.radius()));
-        var buffers=mc.renderBuffers().bufferSource();var out=buffers.getBuffer(MIST);int count=0;
+        var buffers=com.codex.blacklight.client.ShaderPackCompat.buffers();var out=buffers.getBuffer(material);int count=0;
         var profile=com.codex.blacklight.combat.DevastatorEffectTimeline.impact(frame.fallHeight());
         // Short, upright red impact clusters at every height. Only a fall over
         // 50 blocks adds the broad, lingering ground mist behind those clusters.
@@ -63,17 +80,19 @@ public final class BulletImpactMist extends RenderType {
             var horizontal=tiltedRight.scale(size*(cluster?.8:band==3?1:1.55));var vertical=tiltedUp.scale(size*(cluster?2.6:band==3?1.3:.65));
             int red=(int)(cluster?165+seed*45:100+seed*45),green=(int)(8+seed*11),blue=(int)(15+seed*13);
             int a=(int)(alpha*(cluster?185:band==3?44:66));
-            vertex(stack,out,center.subtract(horizontal).subtract(vertical),0,0,red,green,blue,a);
-            vertex(stack,out,center.add(horizontal).subtract(vertical),1,0,red,green,blue,a);
-            vertex(stack,out,center.add(horizontal).add(vertical),1,1,red,green,blue,a);
-            vertex(stack,out,center.subtract(horizontal).add(vertical),0,1,red,green,blue,a);
+            vertex(stack,out,packed,center.subtract(horizontal).subtract(vertical),0,0,red,green,blue,a);
+            vertex(stack,out,packed,center.add(horizontal).subtract(vertical),1,0,red,green,blue,a);
+            vertex(stack,out,packed,center.add(horizontal).add(vertical),1,1,red,green,blue,a);
+            vertex(stack,out,packed,center.subtract(horizontal).add(vertical),0,1,red,green,blue,a);
             count+=4;
         }
-        buffers.endBatch(MIST);return count;
+        buffers.endBatch(material);return count;
     }
     private static double noise(int id,long session){return .5+.5*Math.sin(id*12.9898+(session&1023)*.071);}
-    private static void vertex(PoseStack stack,VertexConsumer out,Vec3 p,float u,float v,int r,int g,int b,int a){
-        out.addVertex(stack.last(),(float)p.x,(float)p.y,(float)p.z).setColor(r,g,b,a).setUv(u,v);
+    private static void vertex(PoseStack stack,VertexConsumer out,boolean packed,Vec3 p,float u,float v,int r,int g,int b,int a){
+        var vertex=out.addVertex(stack.last(),(float)p.x,(float)p.y,(float)p.z).setColor(r,g,b,a).setUv(u,v);
+        if(packed)vertex.setOverlay(net.minecraft.client.renderer.texture.OverlayTexture.NO_OVERLAY)
+                .setLight(net.minecraft.client.renderer.LightTexture.FULL_BRIGHT).setNormal(stack.last(),0,1,0);
     }
 }
 

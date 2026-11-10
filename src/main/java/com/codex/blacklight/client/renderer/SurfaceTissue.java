@@ -108,7 +108,7 @@ final class SurfaceTissue {
                     float length=((high[b]-low[b])*.25F+.012F)*size;
                     float depth=(.06F+.20F*local)*visible;
                     // Neighbouring patches merge into a continuous shell over every face.
-                    int shell=role==ConsumeAnatomy.BODY?0x41333a:0x50353a;
+                    int shell=role==ConsumeAnatomy.BODY?0x54465a:0x5e4652;
                     plate(out,p,center,axis,a,b,sign,width,length,depth,shell);
                     float[] seam=center.clone();seam[axis]+=sign*.025F;
                     if(cell.rank()%3==0)wedge(out,p,seam,axis,a,b,sign,Math.min(.14F,width*.14F),length*.92F,depth+.02F,0x6a343d,0x412a31);
@@ -438,9 +438,10 @@ final class SurfaceTissue {
                 skin[ring][s]=new Vector3f(path[ring]).fma((float)Math.cos(angle)*widths[ring],a).fma((float)Math.sin(angle)*depths[ring],b);
             }
         }
-        int[] flesh={0x563137,0x79424a,0x62343c,0x442b32,0x37292e,0x502d35,0x85505a,0x60363e};
-        int[] shell={0x333238,0x494047,0x5d323b,0x342e35,0x24282e,0x40383e,0x75404b,0x42383d};
+        int[] flesh={0x7a2a36,0xa03a46,0x8a303c,0x5e2430,0x4a2230,0x6e2a36,0xb8505a,0x86323e};
+        int[] shell={0x4a4050,0x5e5266,0x8a2a38,0x463c4c,0x382f40,0x54485c,0xb0303e,0x50445a};
         int[] colors=kind==TissueOrgans.Kind.MUSCLE?flesh:shell;
+        if(AnatomicalTissue.DEBUG_TINT){int c=kind==TissueOrgans.Kind.MUSCLE?0x30ff30:kind==TissueOrgans.Kind.TENDRIL?0x20e0ff:0x3050ff;colors=new int[sides];java.util.Arrays.fill(colors,c);}
         for(int r=0;r<path.length-1;r++)for(int s=0;s<sides;s++) {
             int next=(s+1)%sides,rgb=colors[s];
             if(kind==TissueOrgans.Kind.TENDRIL&&r>path.length-4)rgb=s%3==0?0x4d4147:0x2c2b31;

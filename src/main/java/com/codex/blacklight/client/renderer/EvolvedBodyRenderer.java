@@ -140,11 +140,25 @@ final class EvolvedBodyRenderer {
         if(!host.isMetamorphosing())return;float t=host.evolvedProgress(partial),cover=EvolvedForm.cover(t);if(cover<=.001F)return;
         float height=Math.max(2.4F,host.getBbHeight()*EvolvedForm.oldBody(t)),radius=Math.max(1,host.getBbWidth()*.6F*EvolvedForm.oldBody(t));
         var out=buffers.getBuffer(RenderType.entityCutoutNoCull(ConsumedMobVisuals.WHITE));
-        for(int band=0;band<5;band++)for(int side=0;side<8;side++){
-            var points=new Vector3f[4];for(int k=0;k<4;k++){int row=band+(k>=2?1:0),s=side+(k==1||k==2?1:0);float v=row/5F,a=s*(float)Math.PI/4;
-                float wide=(.5F+.5F*(float)Math.sin(Math.PI*v))*(1+.025F*(float)Math.sin(host.tickCount*.2F+side));points[k]=new Vector3f((float)Math.cos(a)*radius*wide*cover,v*height*cover,(float)Math.sin(a)*radius*wide*cover);}
-            var normal=new Vector3f(points[1]).sub(points[0]).cross(new Vector3f(points[2]).sub(points[0])).normalize();int color=(side+band)%4==0?0xff67282d:0xff29252a;
-            for(var p:points)out.addVertex(pose.last(),p.x,p.y,p.z).setColor(color).setUv(.5F,.5F).setOverlay(net.minecraft.client.renderer.texture.OverlayTexture.NO_OVERLAY).setLight(light).setNormal(pose.last(),normal.x,normal.y,normal.z);
+        // MC-style cocoon: stacked square layers stepped in whole pixels, not a
+        // smooth octagonal egg. The middle layers stay widest; layers pulse in turn.
+        float[] widths={.62F,.88F,1,.94F,.72F,.44F};int layers=widths.length;float pixel=1/16F;
+        for(int layer=0;layer<layers;layer++){
+            float pulse=1+.035F*(float)Math.sin(host.tickCount*.2F+layer*1.3F);
+            float half=Math.max(pixel,Math.round(radius*widths[layer]*pulse*cover/pixel)*pixel);
+            float y0=layer*height*cover/layers,y1=(layer+1)*height*cover/layers;
+            int color=layer%2==0?0xff29252a:0xff3a2128,seam=0xff8a2230;
+            cocoonBox(out,pose,-half,y0,-half,half,y1,half,color,light);
+            // A thin blood seam between layers keeps the stacked read.
+            if(layer>0)cocoonBox(out,pose,-half-pixel*.5F,y0-pixel,-half-pixel*.5F,half+pixel*.5F,y0+pixel,half+pixel*.5F,seam,light);
         }
+    }
+    private static void cocoonBox(VertexConsumer out,PoseStack pose,float x0,float y0,float z0,float x1,float y1,float z1,int color,int light){
+        float[][][] faces={
+            {{x0,y0,z0},{x1,y0,z0},{x1,y0,z1},{x0,y0,z1},{0,-1,0}},{{x0,y1,z1},{x1,y1,z1},{x1,y1,z0},{x0,y1,z0},{0,1,0}},
+            {{x0,y0,z0},{x0,y1,z0},{x1,y1,z0},{x1,y0,z0},{0,0,-1}},{{x1,y0,z1},{x1,y1,z1},{x0,y1,z1},{x0,y0,z1},{0,0,1}},
+            {{x0,y0,z1},{x0,y1,z1},{x0,y1,z0},{x0,y0,z0},{-1,0,0}},{{x1,y0,z0},{x1,y1,z0},{x1,y1,z1},{x1,y0,z1},{1,0,0}}};
+        for(var f:faces){var n=f[4];for(int k=0;k<4;k++)out.addVertex(pose.last(),f[k][0],f[k][1],f[k][2]).setColor(color).setUv(.5F,.5F)
+                .setOverlay(net.minecraft.client.renderer.texture.OverlayTexture.NO_OVERLAY).setLight(light).setNormal(pose.last(),n[0],n[1],n[2]);}
     }
 }

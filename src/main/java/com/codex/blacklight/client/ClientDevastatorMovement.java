@@ -51,8 +51,11 @@ public final class ClientDevastatorMovement {
             var movement=p.getData(ModAttachments.MOVEMENT_STATE);var input=movement.wallInput();
             var target=mc.level.getEntity(v.targetId());
             Vec3 aim=target!=null&&target.isAlive()?target.position():v.diveAim();
-            var horizontal=target!=null&&target.isAlive()
-                    ?BulletdiveSteering.guided(p.position(),target.position(),target.position().subtract(target.xo,target.yo,target.zo),
+            // A lock beyond client tracking range still arrives as the synced aim point; solve the same
+            // guided line to it, the capped free steering cannot close a large offset in a short fall.
+            boolean live=target!=null&&target.isAlive();
+            var horizontal=live||aim!=null
+                    ?BulletdiveSteering.guided(p.position(),aim,live?target.position().subtract(target.xo,target.yo,target.zo):Vec3.ZERO,
                             (int)ticks,movement.cameraYaw(p.getYRot()),input.forward(),input.sideways())
                     :BulletdiveSteering.horizontal(p.position(),p.getDeltaMovement(),movement.cameraYaw(p.getYRot()),
                     input.forward(),input.sideways(),aim);

@@ -206,6 +206,13 @@ public final class PlayerMotionController {
     public static void seekPreview(LivingEntity player, float seconds) { if (available(player) && STATES.containsKey(player) && state(player).preview != null) seek(player, seconds); }
     public static void clearPreview(LivingEntity player) { if (player != null) { var runtime=STATES.get(player); if(runtime!=null)runtime.preview=null; } }
 
+    /** A looping clip sample with its last frames eased into frame zero, so the cycle seam never pops. */
+    private static BlacklightPose loopedPose(String key,float time,float clipDuration,boolean looping) {
+        var pose=samplePose(key,time,looping);
+        if(!looping||clipDuration<=0)return pose;
+        float cycle=time%clipDuration,window=Math.min(.06F,clipDuration*.25F);
+        return cycle>clipDuration-window?BlacklightPose.interpolatePose(pose,samplePose(key,0,true),(cycle-clipDuration+window)/window):pose;
+    }
     private static BlacklightPose samplePose(String key, float time, boolean loop) {
         var pose = MotionLibrary.pose(key, time, loop);
         var action = key.equals("legacy_claw_groundspike")
@@ -387,7 +394,7 @@ public final class PlayerMotionController {
                 var currentAction=entity.getData(ModAttachments.PLAYER_ACTION);
                 if(entity.onGround()&&speed>.018&&phase.isLanding()
                         &&LandingMotionPolicy.permitsStride(currentAction.clipId(),currentAction.seconds(actionTime(entity,0))))
-                    phase=snapshot.sprint()||player.isSprinting()||speed>=PrototypeLocomotion.RUN_ANIMATION_SPEED?LocomotionPhase.RUN:LocomotionPhase.WALK;
+                    phase=snapshot.sprint()||player.isSprinting()||speed>=PrototypeLocomotion.WALK_VISUAL_MAX?LocomotionPhase.RUN:LocomotionPhase.WALK;
                 ground=phase.isGroundMovement();
                 key=ground?TraversalMotionSelector.stableGround(phase,snapshot.sprint(),speed,runtime.locomotion)
                         :switch(phase) {
@@ -448,10 +455,9 @@ public final class PlayerMotionController {
         if (key.equals("basic_jump_charge")) {
             time = duration(key)*runtime.charge.ratio(partial,MovementTuningSettings.jumpChargeTicks());
         }
-        var pose=samplePose(key,time,looping);
+        var pose=loopedPose(key,time,clipDuration,looping);
         if(looping&&clipDuration>0) {
-            float cycle=time%clipDuration,window=Math.min(.06F,clipDuration*.25F);
-            if(cycle>clipDuration-window)pose=BlacklightPose.interpolatePose(pose,samplePose(key,0,true),(cycle-clipDuration+window)/window);
+            // loopedPose already closed the cycle seam.
         } else if((runtime.phase==LocomotionPhase.RISE||runtime.phase==LocomotionPhase.JUMP_LAUNCH)
                 &&runtime.gait.seconds(partial)>clipDuration) {
             float age=(float)(runtime.gait.seconds(partial)-clipDuration);
@@ -461,6 +467,7 @@ public final class PlayerMotionController {
         boolean armored=entity instanceof net.minecraft.world.entity.player.Player p
                 &&com.codex.blacklight.power.UtilityPowerSystem.active(p,com.codex.blacklight.power.PowerForm.ARMOR);
         GroundGaitPose.apply(pose,key,armored);
+        pose=steadyRunningArms(entity,pose,key,time);
         double blendAge=runtime.gait.tick()-runtime.changed+(double)Math.clamp(partial,0,1);
         if(runtime.from!=null&&blendAge<2.4) {
             float weight=(float)Math.clamp(blendAge/2.4,0,1);
@@ -470,6 +477,13 @@ public final class PlayerMotionController {
                     :BlacklightPose.interpolatePose(runtime.from,pose,weight);
         }
         return pose;
+    }
+    /** Weapon runs keep the authored rhythm at reduced amplitude; walking and bare hands are untouched. */
+    private static BlacklightPose steadyRunningArms(LivingEntity entity,BlacklightPose pose,String key,float time){
+        if(!(entity instanceof net.minecraft.world.entity.player.Player player))return pose;
+        var power=player.getData(ModAttachments.PLAYER_STATE).getActivePower();
+        String guard=switch(power){case CLAWS->"basic_idle_claw";case BLADE->"basic_idle_blade";case HAMMERFISTS->"basic_idle_hammer";case WHIPFIST->"basic_idle_whip";default->"basic_idle";};
+        return RunningArmLayer.apply(pose,key,guard);
     }
     private record WeaponPoseIdentity(int move,long started,String key) {}
     private record LegacyPoseIdentity(long revision,String key) {}

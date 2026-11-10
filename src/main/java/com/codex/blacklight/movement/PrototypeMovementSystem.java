@@ -190,8 +190,10 @@ public final class PrototypeMovementSystem {
         }
 
         // Prototype physiology steps straight over curbs, cars and one-block ledges.
+        // Armor keeps the same step: only the vault is disabled. A shorter armored
+        // step turned every one-block rise into a wall-run mantle lunge.
         var stepHeight = player.getAttribute(Attributes.STEP_HEIGHT);
-        double terrainStepHeight = com.codex.blacklight.power.UtilityPowerSystem.parkourAllowed(player) ? 1.0D : .6D;
+        double terrainStepHeight = 1.0D;
         if (stepHeight != null && stepHeight.getBaseValue() != terrainStepHeight) {
             stepHeight.setBaseValue(terrainStepHeight);
         }
@@ -482,6 +484,11 @@ public final class PrototypeMovementSystem {
             movement.cancelLandingRecovery();
             player.setDeltaMovement(frame.x(), frame.y(), frame.z());
             player.setOnGround(false); player.resetFallDistance(); player.hurtMarked = true;
+            if (wall.kickedOff()) {
+                float yaw=(float)Math.toDegrees(Math.atan2(-frame.x(),frame.z()));
+                player.setYRot(yaw);player.setYHeadRot(yaw);player.yBodyRot=yaw;
+                PrototypeMovementEffects.onWallMantle(player,new Vec3(frame.x(),0,frame.z()));
+            }
             player.setSprinting(movement.sprinting() && (frame.mode() == WallTraversal.Mode.RUN
                     || frame.mode() == WallTraversal.Mode.LEAP || WallTraversal.crossingTop(frame.mode())));
             movement.setMode(switch (frame.mode()) {
@@ -604,7 +611,7 @@ public final class PrototypeMovementSystem {
             if (movement.runningAnimation() && !shortStep) {
                 movement.setRunningAnimation(false);
             }
-            player.setSprinting(movement.sprinting() && player.onGround());
+            player.setSprinting(movement.sprinting() && movement.forwardHeld() && player.onGround());
             return;
         }
         player.setSprinting(true);

@@ -90,6 +90,9 @@ public final class CombatCinematics {
 
     @SubscribeEvent(priority=EventPriority.LOW)
     public static void render(RenderLevelStageEvent event){
+        if(event.getStage()==RenderLevelStageEvent.Stage.AFTER_LEVEL)ShaderPackCompat.afterLevel(()->apply(event));
+    }
+    private static void apply(RenderLevelStageEvent event){
         if(event.getStage()!=RenderLevelStageEvent.Stage.AFTER_LEVEL||failed)return;
         var mc=Minecraft.getInstance();
         if(mc.screen!=null||blocked(mc)||!PassiveHudConfig.CINEMATIC_COMBAT.get())return;

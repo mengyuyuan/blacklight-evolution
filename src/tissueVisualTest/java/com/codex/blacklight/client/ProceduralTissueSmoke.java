@@ -32,14 +32,23 @@ public final class ProceduralTissueSmoke {
     private static final boolean EVOLVED=Boolean.getBoolean("blacklight.tissueEvolvedRegression");
     private static final boolean TENTACLES=Boolean.getBoolean("blacklight.tissueTentaclePreview");
     private static final boolean CONTRAST=Boolean.getBoolean("blacklight.tissueContrastPreview");
-    private static final boolean SILHOUETTE=Boolean.getBoolean("blacklight.tissueSilhouettePreview")||CONTRAST;
+    private static final boolean SHOWCASE=Boolean.getBoolean("blacklight.tissueShowcase");
+    // Showcase after real inheritance: the host devours donors through the same
+    // inheritTissue path as in-game feeding, then metabolism digests them.
+    private static final boolean DEVOUR=SHOWCASE&&Boolean.getBoolean("blacklight.tissueDevour");
+    private static final String[] DONORS={"minecraft:zombie","minecraft:spider","minecraft:wolf","minecraft:cow","minecraft:skeleton","minecraft:chicken"};
+    private static final int[] DONOR_PLANS={0,2,1,1,0,1};
+    private static int devoured;
+    /** QA iteration: only seed0 of each species. */
+    private static final boolean QUICK=Boolean.getBoolean("blacklight.tissueQuick");
+    private static final boolean SILHOUETTE=Boolean.getBoolean("blacklight.tissueSilhouettePreview")||CONTRAST||SHOWCASE;
     private static final boolean FRAMED=DEVELOPMENT||EVOLUTION||EVOLVED||TENTACLES||SILHOUETTE;
     private static final int[] VARIANT_IDS={0,1,8,11};
-    private static final List<EntityType<?>> TYPES=CONTRAST?List.of(EntityType.PIGLIN,EntityType.PIGLIN,EntityType.PIGLIN,EntityType.PIGLIN,EntityType.PIGLIN,EntityType.COW,EntityType.COW,EntityType.COW,EntityType.COW,EntityType.COW,EntityType.SLIME,EntityType.SPIDER):SILHOUETTE?List.of(EntityType.PIG,EntityType.CHICKEN,EntityType.OCELOT,EntityType.CAVE_SPIDER,EntityType.ZOMBIE,EntityType.COW):TENTACLES?List.of(EntityType.COW,EntityType.ZOMBIE,EntityType.WOLF):DEVELOPMENT||EVOLUTION?List.of(EntityType.COW,EntityType.ZOMBIE,EntityType.SPIDER):VARIANTS
+    private static final List<EntityType<?>> TYPES=SHOWCASE?List.of(EntityType.PIG,EntityType.PIG,EntityType.PIG,EntityType.PIG,EntityType.PIG,EntityType.ZOMBIE,EntityType.ZOMBIE,EntityType.ZOMBIE,EntityType.ZOMBIE,EntityType.ZOMBIE):CONTRAST?List.of(EntityType.PIGLIN,EntityType.PIGLIN,EntityType.PIGLIN,EntityType.PIGLIN,EntityType.PIGLIN,EntityType.COW,EntityType.COW,EntityType.COW,EntityType.COW,EntityType.COW,EntityType.SLIME,EntityType.SPIDER):SILHOUETTE?List.of(EntityType.PIG,EntityType.CHICKEN,EntityType.OCELOT,EntityType.CAVE_SPIDER,EntityType.ZOMBIE,EntityType.COW):TENTACLES?List.of(EntityType.COW,EntityType.ZOMBIE,EntityType.WOLF):DEVELOPMENT||EVOLUTION?List.of(EntityType.COW,EntityType.ZOMBIE,EntityType.SPIDER):VARIANTS
             ?List.of(EntityType.COW,EntityType.COW,EntityType.COW,EntityType.COW,EntityType.WOLF,EntityType.WOLF,EntityType.WOLF,EntityType.WOLF)
             :List.of(EntityType.COW,EntityType.PIG,EntityType.ZOMBIE,EntityType.SPIDER,EntityType.HORSE,EntityType.SHEEP,
             EntityType.WOLF,EntityType.CHICKEN,EntityType.VILLAGER,EntityType.SKELETON,EntityType.CREEPER,EntityType.WITCH);
-    private static final String[] PHASES=CONTRAST?new String[]{"mature-front","mature-side","hypertrophic-front","hypertrophic-side","transition-front","transition-side","ancient-front","ancient-side","generation8-front","generation8-side","generation32-front","generation32-side","walk","attack","windup","contact","retract","rest"}:SILHOUETTE?new String[]{"mature-front","mature-side","ancient-front","ancient-side","generation8-front","generation8-side","generation32-front","generation32-side","walk","attack","windup","contact","retract","rest"}:TENTACLES?new String[]{"emerging","grown-front","grown-side","grown-back","walk","attack","windup","contact","grip","retract","rest"}:EVOLUTION?new String[]{"ancient-front","ancient-side","ancient-back",
+    private static final String[] PHASES=DEVOUR?new String[]{"ancient-front","devour2-front","devour2-side","devour5-front","devour5-side","cocoon-front","evolved-front","evolved-side"}:SHOWCASE?new String[]{"mature-front","ancient-front","ancient-side","generation8-front"}:CONTRAST?new String[]{"mature-front","mature-side","hypertrophic-front","hypertrophic-side","transition-front","transition-side","ancient-front","ancient-side","generation8-front","generation8-side","generation32-front","generation32-side","walk","attack","windup","contact","retract","rest"}:SILHOUETTE?new String[]{"mature-front","mature-side","ancient-front","ancient-side","generation8-front","generation8-side","generation32-front","generation32-side","walk","attack","windup","contact","retract","rest"}:TENTACLES?new String[]{"emerging","grown-front","grown-side","grown-back","walk","attack","windup","contact","grip","retract","rest"}:EVOLUTION?new String[]{"ancient-front","ancient-side","ancient-back",
             "generation1-front","generation1-side","generation1-back","generation3-front","generation3-side","generation3-back",
             "generation8-front","generation8-side","generation8-back","generation32-front","generation32-side","generation32-back",
             "walk","attack","windup","contact","retract","rest"}:EVOLVED?new String[]{"ancient","generation1","generation8","walk","attack","windup","contact","retract","rest"}:DEVELOPMENT?new String[]{"mature-front","mature-side","mature-back","rooting-front",
@@ -121,7 +130,9 @@ public final class ProceduralTissueSmoke {
                 ||com.codex.blacklight.infection.TissueEvolution.tentacleCount(seed)!=(index==1?6:4);seed++);
         if(VARIANTS)for(seed=1;(com.codex.blacklight.infection.TissueGrowth.mix(seed)&15)!=VARIANT_IDS[index%4];seed++);
         host.setUUID(new UUID(0,seed));host.setNoAi(true);host.setInvulnerable(true);
-        if(VARIANTS||LATE||FRAMED)host.advanceTissue(TENTACLES?108000:EVOLUTION||EVOLVED?48000:com.codex.blacklight.infection.TissueGrowth.MATURITY_TICKS);
+        devoured=0;
+        if(DEVOUR)host.advanceTissue(48000);
+        else if(VARIANTS||LATE||FRAMED)host.advanceTissue(TENTACLES?108000:EVOLUTION||EVOLVED?48000:com.codex.blacklight.infection.TissueGrowth.MATURITY_TICKS);
         host.moveTo(0,101,0,30,0);host.yBodyRot=30;host.yHeadRot=30;l.addFreshEntity(host);actor=host.getId();ready=true;
         positionCamera(host,false);
     }
@@ -131,11 +142,14 @@ public final class ProceduralTissueSmoke {
         float scale=Math.clamp(host.getBbHeight()/host.tissueBodyScale()/1.8F,.7F,1.65F);
         if(FRAMED) {
             // Every generation uses the same world scale and camera distance.
-            double distance=(CONTRAST?5.8:EVOLUTION||EVOLVED||SILHOUETTE?8:TENTACLES?6.5:5.2)*scale,bearing=Math.toRadians(viewYaw()-180);
+            double distance=(SHOWCASE?4.6:CONTRAST?5.8:EVOLUTION||EVOLVED||SILHOUETTE?8:TENTACLES?6.5:5.2)*scale,bearing=Math.toRadians(viewYaw()-180);
             double bodyTarget=EVOLUTION||EVOLVED||TENTACLES||SILHOUETTE?host.getBbHeight()/host.tissueBodyScale()*.85:host.getBbHeight()*.6;
             // Normalize projected body height, so the contrast review cannot
             // mistake global size growth for anatomical shape development.
             if(CONTRAST){distance*=host.tissueBodyScale();bodyTarget=host.getBbHeight()*.65;}
+            // Devour review keeps one fixed camera so real size growth stays visible.
+            if(DEVOUR){distance*=1.9;bodyTarget=host.getBbHeight()*.55;}
+            else if(SHOWCASE){distance*=host.tissueBodyScale()*1.15;bodyTarget=host.getBbHeight()*.55;}
             double eyeTarget=bodyTarget+distance*Math.tan(Math.toRadians(10));
             player.teleportTo(l,host.getX()-Math.sin(bearing)*distance,host.getY()+eyeTarget-player.getEyeHeight(),host.getZ()+Math.cos(bearing)*distance,viewYaw(),10);
             return;
@@ -172,6 +186,8 @@ public final class ProceduralTissueSmoke {
         if(ticks<mark+(step==0?40:phase.equals("walk")?18:strike||phase.equals("attack")?0:25))return;
         float partial=mc.getTimer().getGameTimeDeltaPartialTick(false);
         if(phase.equals("walk")&&h.walkAnimation.speed()<.035F)return;
+        if(phase.startsWith("cocoon")&&(!h.isMetamorphosing()||h.evolvedProgress(partial)<.45F))return;
+        if(phase.startsWith("evolved")&&(!h.isEvolved()||h.isMetamorphosing()))return;
         if(phase.equals("attack")&&h.getAttackAnim(partial)<.25F)return;
         float elapsed=h.tissueStrikeElapsed(partial);
         if(phase.equals("windup")&&(elapsed<2||elapsed>=com.codex.blacklight.infection.TissueOrgans.WINDUP))return;
@@ -183,7 +199,7 @@ public final class ProceduralTissueSmoke {
             var output=mc.gameDirectory.toPath().resolve("procedural-captures");Files.createDirectories(output);
             String name=BuiltInRegistries.ENTITY_TYPE.getKey(TYPES.get(fixture)).getPath()
                     +(CONTRAST?"-core-"+com.codex.blacklight.infection.TissueCore.forSeed(com.codex.blacklight.infection.TissueOrgans.seed(h.getUUID())).name().toLowerCase(java.util.Locale.ROOT):"")
-                    +(VARIANTS?"-variant-"+VARIANT_IDS[fixture%4]:"")+"-"+PHASES[step];
+                    +(SHOWCASE?"-seed"+(fixture%5):"")+(VARIANTS?"-variant-"+VARIANT_IDS[fixture%4]:"")+"-"+PHASES[step];
             try(var image=Screenshot.takeScreenshot(mc.getMainRenderTarget())){
                 if(image.getWidth()!=1280||image.getHeight()!=800)return;
                 image.writeToFile(output.resolve(name+".png"));
@@ -195,13 +211,25 @@ public final class ProceduralTissueSmoke {
                     +(FRAMED?"; yaw="+mc.player.getYRot()+"; pitch="+mc.player.getXRot()+"; visible=1":"")+"\n",StandardOpenOption.CREATE,StandardOpenOption.APPEND);
             ready=false;mark=ticks;
             if(++step==PHASES.length) {
-                step=0;if(++fixture==TYPES.size()){complete=true;return;}
+                step=0;do fixture++;while(QUICK&&fixture<TYPES.size()&&fixture%5!=0);if(fixture>=TYPES.size()){complete=true;return;}
                 int next=fixture;mc.getSingleplayerServer().execute(()->spawn(next));
             } else {
                 int next=step;mc.getSingleplayerServer().execute(()->{
                     var l=mc.getSingleplayerServer().overworld();if(!(l.getEntity(actor) instanceof BlacklightInfectedHost host))return;
                     String action=PHASES[next];
                     if(VARIANTS){positionCamera(host,true);ready=true;return;}
+                    if(DEVOUR&&(action.startsWith("cocoon")||action.startsWith("evolved"))){long fs=com.codex.blacklight.infection.TissueOrgans.seed(host.getUUID());
+                        // The sixth real meal qualifies the body; digestion then metamorphosis.
+                        for(;devoured<6;devoured++)host.inheritTissue(new UUID(7,fs*31+devoured),com.codex.blacklight.infection.TissueInheritance.EMPTY,
+                                fs*977+devoured*131+5,48000,DONOR_PLANS[devoured],com.codex.blacklight.infection.TissueCore.forSeed(fs*977+devoured*131+5),DONORS[devoured]);
+                        if(!host.isEvolved()&&!host.isMetamorphosing()){host.fastForwardTissue(9000);host.removeAllGoals(goal->true);if(!host.beginEvolvedMetamorphosis())System.out.println("SHOWCASE cocoon refused: eligible="+com.codex.blacklight.infection.EvolvedForm.eligible(host.tissueInheritance(),host.tissueAge()));}positionCamera(host,false);ready=true;return;}
+                    if(DEVOUR&&action.startsWith("devour")){
+                        int want=action.startsWith("devour2")?2:5;long fixtureSeed=com.codex.blacklight.infection.TissueOrgans.seed(host.getUUID());
+                        for(;devoured<want;devoured++)host.inheritTissue(new UUID(7,fixtureSeed*31+devoured),com.codex.blacklight.infection.TissueInheritance.EMPTY,
+                                fixtureSeed*977+devoured*131+5,48000,DONOR_PLANS[devoured],com.codex.blacklight.infection.TissueCore.forSeed(fixtureSeed*977+devoured*131+5),DONORS[devoured]);
+                        host.fastForwardTissue(action.contains("g8")?8*24000:9000);
+                        positionCamera(host,false);ready=true;return;
+                    }
                     if((DEVELOPMENT||EVOLUTION||TENTACLES||SILHOUETTE)&&snapshotAge(action)>=0){host.advanceTissue(Math.max(0,snapshotAge(action)-host.tissueAge()));positionCamera(host,false);ready=true;return;}
                     if(!DEVELOPMENT&&!EVOLUTION&&!TENTACLES&&!SILHOUETTE&&(next==1||next==2))host.advanceTissue(EVOLVED?next==1?24000:168000:!LATE?6000:next==1?12000:24000);
                     if(action.equals("walk")){if(FRAMED)positionCamera(host,false);host.getAttribute(Attributes.MOVEMENT_SPEED).setBaseValue(.13);host.setNoAi(false);host.setTarget(null);}

@@ -75,7 +75,8 @@ public final class RigidBiomassMaterial extends RenderType {
         event.registerReloadListener((ResourceManagerReloadListener)manager->
                 Minecraft.getInstance().execute(AuthoredDevastatorMesh::clearRigidBuffers));
     }
-    public static boolean ready(){return shader!=null;}
+    /** Custom instanced shader; shader packs only understand vanilla entity programs. */
+    public static boolean ready(){return shader!=null&&!com.codex.blacklight.client.ShaderPackCompat.active();}
     static ShaderInstance shader(){return shader;}
     static RenderType mesh(ResourceLocation texture){return MESH.apply(texture);}
     static void instance(Matrix4f pose,Matrix3f normal,int light,int alpha,Curve curve){

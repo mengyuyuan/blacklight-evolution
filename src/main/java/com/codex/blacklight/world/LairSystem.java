@@ -36,7 +36,7 @@ public final class LairSystem {
     private LairSystem(){}
     /** Source interiors (structure_*_lair_interior_* tod.p3d) span about 130 x 120 m with platform
      * tiers at 43-49 m and a ceiling near 65 m. Here: 2/3 of that footprint, 4 tiers, ~20 high. */
-    private static final int DROP=28,RX=46,RZ=40,CAP_QUEUE=4096,VERSION=5;
+    private static final int RX=46,RZ=40,CAP_QUEUE=4096,VERSION=5;
     private static final Map<ResourceKey<Level>,LinkedHashSet<Long>> SEEN=new HashMap<>();
     private record Pending(long chunk,long deadline){}
     private static final Map<ResourceKey<Level>,ArrayDeque<Pending>> PENDING=new HashMap<>();
@@ -48,7 +48,7 @@ public final class LairSystem {
         if(!WorldOutbreakSystem.active(level))return 0;
         var server=level.getServer();
         double days=OutbreakData.get(server).elapsed(server.overworld().getGameTime())/(double)Math.max(1,OutbreakConfig.DAY_TICKS.get());
-        return Math.min(OutbreakConfig.LAIR_MAX_CHANCE.get(),OutbreakConfig.LAIR_CHANCE_PER_DAY.get()*(1+Math.max(0,days)));
+        return LairSiting.chance(days,OutbreakConfig.LAIR_CHANCE_PER_DAY.get(),OutbreakConfig.LAIR_MAX_CHANCE.get());
     }
     @SubscribeEvent public static void load(ChunkEvent.Load event){
         if(!(event.getLevel() instanceof ServerLevel level)||!(event.getChunk() instanceof LevelChunk chunk)||!dimension(level))return;
@@ -57,6 +57,7 @@ public final class LairSystem {
     }
     @SubscribeEvent public static void tick(LevelTickEvent.Post event){
         if(!(event.getLevel() instanceof ServerLevel level)||!dimension(level))return;
+        ambientRoll(level);
         var set=SEEN.get(level.dimension());
         if(set!=null&&!set.isEmpty()){
             boolean active=WorldOutbreakSystem.active(level);double chance=active?chance(level):0;
@@ -68,7 +69,7 @@ public final class LairSystem {
                 if(chunk==null||chunk.getData(ModAttachments.LAIR_ROLLED))continue;
                 chunk.setData(ModAttachments.LAIR_ROLLED,true);chunk.setUnsaved(true);
                 // Never surprise a place players have lived in.
-                if(level.dimension()==Level.OVERWORLD&&chunk.getInhabitedTime()>6000)continue;
+                if(level.dimension()==Level.OVERWORLD&&chunk.getInhabitedTime()>72000)continue;
                 if(level.random.nextDouble()<chance)
                     PENDING.computeIfAbsent(level.dimension(),k->new ArrayDeque<>()).add(new Pending(key,level.getGameTime()+1200));
             }
@@ -84,19 +85,33 @@ public final class LairSystem {
     @SubscribeEvent public static void stopping(net.neoforged.neoforge.event.server.ServerStoppingEvent e){
         for(var j:JOBS){var l=e.getServer().getLevel(j.dim);if(l!=null)flush(l,j,Long.MAX_VALUE/4);}JOBS.clear();}
     public enum Result{PLACED,WAIT,REJECTED}
+    /** Chunks that stay loaded around a player never fire a new load event. Every five seconds each
+     * player offers one loaded, not yet rolled chunk 2-6 chunks away to the normal roll. */
+    private static void ambientRoll(ServerLevel level){
+        if(level.getGameTime()%100!=0||!WorldOutbreakSystem.active(level))return;
+        var set=SEEN.computeIfAbsent(level.dimension(),k->new LinkedHashSet<>());
+        for(var player:level.players()){
+            if(player.isSpectator()||set.size()>=CAP_QUEUE)continue;
+            double a=level.random.nextDouble()*Math.PI*2;int r=2+level.random.nextInt(5);
+            int cx=(player.getBlockX()>>4)+(int)Math.round(Math.cos(a)*r),cz=(player.getBlockZ()>>4)+(int)Math.round(Math.sin(a)*r);
+            var chunk=level.getChunkSource().getChunkNow(cx,cz);if(chunk==null)continue;
+            long key=ChunkPos.asLong(cx,cz);
+            if(!chunk.getData(ModAttachments.LAIR_ROLLED))set.add(key);
+        }
+    }
 
     /** Force=true is the operator command: skips the spacing rule only. */
     public static Result tryPlace(ServerLevel level,int x,int z,boolean force){
         var data=Data.get(level);
         int spacing=OutbreakConfig.LAIR_SPACING.get();
-        if(!force)for(long l:data.lairs){var b=BlockPos.of(l);if((long)(b.getX()-x)*(b.getX()-x)+(long)(b.getZ()-z)*(b.getZ()-z)<(long)spacing*spacing)return Result.REJECTED;}
-        if(WorldOutbreakSystem.sanctuary(level,new BlockPos(x,64,z)))return Result.REJECTED;
-        int span=RX+8;
-        for(int cx=(x-span)>>4;cx<=(x+span)>>4;cx++)for(int cz=(z-span)>>4;cz<=(z+span)>>4;cz++)
-            if(level.getChunkSource().getChunkNow(cx,cz)==null)return Result.WAIT;
-        var dirs=new ArrayList<>(Direction.Plane.HORIZONTAL.stream().toList());Collections.shuffle(dirs,new Random(level.random.nextLong()));
-        for(int ox=0;ox<=8;ox+=8)for(var d:dirs){
-            int sx=x+ox,sz=z+ox;
+        // Search a spiral of candidates around the rolled point instead of the single spot.
+        boolean waiting=false;var data2=data;
+        for(var o:LairSiting.offsets()){
+            int sx=x+o[0],sz=z+o[1];
+            if(!force&&crowded(data2,sx,sz,spacing))continue;
+            if(WorldOutbreakSystem.sanctuary(level,new BlockPos(sx,64,sz)))continue;
+            if(!loaded(level,sx,sz)){waiting=true;continue;}
+            var d=Direction.from2DDataValue(level.random.nextInt(4));
             var plan=plan(level,sx,sz,d);
             if(plan==null)continue;
             build(level,plan);
@@ -104,7 +119,18 @@ public final class LairSystem {
             com.codex.blacklight.BlacklightNeoMod.LOGGER.info("Blacklight lair placed at {} facing {} in {}",plan.entrance,d,level.dimension().location());
             return Result.PLACED;
         }
+        if(waiting)return Result.WAIT;
         return Result.REJECTED;
+    }
+    private static boolean crowded(Data data,int x,int z,int spacing){
+        for(long l:data.lairs){var b=BlockPos.of(l);if((long)(b.getX()-x)*(b.getX()-x)+(long)(b.getZ()-z)*(b.getZ()-z)<(long)spacing*spacing)return true;}
+        return false;
+    }
+    private static boolean loaded(ServerLevel level,int x,int z){
+        int span=RX+8;
+        for(int cx=(x-span)>>4;cx<=(x+span)>>4;cx++)for(int cz=(z-span)>>4;cz<=(z+span)>>4;cz++)
+            if(level.getChunkSource().getChunkNow(cx,cz)==null)return false;
+        return true;
     }
     private record Plan(BlockPos entrance,Direction d,int surface,int floor,BlockPos centre){}
     private static BlockPos at(BlockPos s,Direction d,int along,int right,int y){
@@ -119,25 +145,22 @@ public final class LairSystem {
         for(int a=-8;a<=8;a++)for(int r=-8;r<=8;r++){
             if(a*a+r*r>(MOUND+2.5)*(MOUND+2.5))continue;
             var c=at(s,d,a,r,0);int h=level.getHeight(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES,c.getX(),c.getZ());
-            if(Math.abs(h-sy)>2)return null;
+            if(Math.abs(h-sy)>LairSiting.MOUND_STEP)return null;
             var g=level.getBlockState(new BlockPos(c.getX(),h-1,c.getZ()));
             if(!g.getFluidState().isEmpty()||!g.isSolid())return null;
             for(int y=h;y<=sy+6;y++)if(!clearAbove(level.getBlockState(new BlockPos(c.getX(),y,c.getZ()))))return null;
         }
-        int floor=sy-DROP;
-        if(floor-4<=level.getMinBuildHeight()+2)return null;
-        var centre=new BlockPos(x,floor,z);
-        // Hall stays sealed below ground; no fluid, bedrock or block entities anywhere in the work volume.
+        // The hall floor follows the lowest ground over the footprint so slopes and valleys still
+        // keep rock above its ceiling. Fluids are sealed and bedrock/block entities skipped while
+        // building, so they no longer veto the whole site.
+        int lowest=sy;
         for(int dx=-RX-4;dx<=RX+4;dx++)for(int dz=-RZ-4;dz<=RZ+4;dz++){
-            if(dx*dx/(double)((RX+4)*(RX+4))+dz*dz/(double)((RZ+4)*(RZ+4))>1)continue;
-            int cx=x+dx,cz=z+dz;boolean shaft=dx*dx+dz*dz<=16;
-            int top=shaft?sy-1:floor+24;
-            if(!shaft&&level.getHeight(Heightmap.Types.OCEAN_FLOOR,cx,cz)<top+4)return null;
-            for(int y=floor-4;y<=top;y++){
-                var q=new BlockPos(cx,y,cz);var st=level.getBlockState(q);
-                if(!st.getFluidState().isEmpty()||st.is(Blocks.BEDROCK)||level.getBlockEntity(q)!=null)return null;
-            }
+            if(dx*dx/(double)((RX+4)*(RX+4))+dz*dz/(double)((RZ+4)*(RZ+4))>1||dx*dx+dz*dz<=16)continue;
+            lowest=Math.min(lowest,level.getHeight(Heightmap.Types.OCEAN_FLOOR,x+dx,z+dz));
         }
+        int floor=LairSiting.floor(sy,lowest,level.getMinBuildHeight());
+        if(floor==Integer.MIN_VALUE)return null;
+        var centre=new BlockPos(x,floor,z);
         return new Plan(s,d,sy,floor,centre);
     }
     private static long hash(int x,int y,int z){long h=x*3129871L^z*116129781L^y*7919L;h=h*h*42317861L+h*11L;return h>>>16;}
@@ -165,7 +188,10 @@ public final class LairSystem {
     private static double shaftR(BlockPos s,int y){return 1.55+.55*noise(s.getX(),y>>1,s.getZ());}
     private static void build(ServerLevel l,Plan p){
         stage=new LinkedHashMap<>();stagedHives=new ArrayList<>();long t0=System.nanoTime();
-        try{buildStaged(l,p);JOBS.add(new Job(l.dimension(),stage,stagedHives));
+        try{buildStaged(l,p);var ordered=new LinkedHashMap<Long,BlockState>();
+            for(var e:stage.entrySet())if(!e.getValue().isAir())ordered.put(e.getKey(),e.getValue());
+            for(var e:stage.entrySet())if(e.getValue().isAir())ordered.put(e.getKey(),e.getValue());
+            JOBS.add(new Job(l.dimension(),ordered,stagedHives));
             com.codex.blacklight.BlacklightNeoMod.LOGGER.info("Blacklight lair staged {} blocks in {} ms",stage.size(),(System.nanoTime()-t0)/1000000);}
         finally{stage=null;stagedHives=null;}
     }
@@ -178,7 +204,7 @@ public final class LairSystem {
             double ox=.6*(noise(s.getX(),y>>2,1)-.5),oz=.6*(noise(s.getZ(),y>>2,2)-.5);
             double dist=Math.sqrt((dx-ox)*(dx-ox)+(dz-oz)*(dz-oz)),R=shaftR(s,y);
             if(dist<=R){set(l,pos,b(Blocks.AIR));continue;}
-            if(dist>R+1.4||get(l,pos).isAir())continue;
+            if(dist>R+1.4||get(l,pos).isAir()&&get(l,pos).getFluidState().isEmpty())continue;
             double n=noise(pos.getX(),pos.getY(),pos.getZ()),tissue=.35+.5*(sy-y)/(double)(sy-roof);
             set(l,pos,n<tissue*.5?b(n<tissue*.12?ModBlocks.HIVE_SAC.get():n<tissue*.3?ModBlocks.HIVE_FLESH.get():ModBlocks.HIVE_VEIN.get())
                     :n>.8?b(ModBlocks.INFECTED_STONE.get()):n>.6?b(Blocks.TUFF):n>.35?b(Blocks.COBBLED_DEEPSLATE):b(Blocks.DEEPSLATE));
@@ -310,7 +336,7 @@ public final class LairSystem {
                 int kind=-1;int nx=x,ny=y,nz=z; // nearest open neighbour: 0 floor,1 ceiling,2 wall
                 if(B.open(x,y+1,z)){kind=0;ny=y+1;}else if(B.open(x,y-1,z)){kind=1;ny=y-1;}
                 else for(var d:dirs)if(B.open(x+d[0],y,z+d[1])){kind=2;nx=x+d[0];nz=z+d[1];break;}
-                if(kind<0){if(get(l,pos).isAir()||y==0||y==HY-1)set(l,pos,b(Blocks.DEEPSLATE));continue;}
+                if(kind<0){var here=get(l,pos);if(here.isAir()||!here.getFluidState().isEmpty()||y==0||y==HY-1)set(l,pos,b(Blocks.DEEPSLATE));continue;}
                 int k=B.i(nx,ny,nz);set(l,pos,shell(pos,kind,B.zone[k],B.inf[k],y));
             }
         }

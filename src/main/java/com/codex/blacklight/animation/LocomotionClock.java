@@ -7,6 +7,10 @@ public final class LocomotionClock {
     private boolean looping;
     private long tick=Long.MIN_VALUE;
     private double previous,current;
+    private double lastNominal,lastCap;
+    /** Stride rate and per-interval cap used by the last committed advance (diagnostics). */
+    public double lastNominal(){return lastNominal;}
+    public double lastCap(){return lastCap;}
     public String key(){return key;}
     public long tick(){return tick;}
     public boolean looping(){return looping;}
@@ -38,7 +42,8 @@ public final class LocomotionClock {
         // still allowing distance-driven slowing/stopping and phase-continuous swaps.
         boolean sourceSprint=nextKey.equals("basic_sprint") || nextKey.equals("basic_sprint_fast")
                 || nextKey.equals("basic_sprint_fastest");
-        if(!fresh)current+=Math.min(advance,ticks/20*(sourceSprint?Math.min(1,maxRate):maxRate));
+        lastNominal=nominalBlocksPerTick;lastCap=ticks/20*(sourceSprint?Math.min(1,maxRate):maxRate);
+        if(!fresh)current+=Math.min(advance,lastCap);
         tick=nextTick;
         return changed;
     }

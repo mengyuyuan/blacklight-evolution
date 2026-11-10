@@ -13,10 +13,11 @@ public final class BlacklightCreatureModel<T extends LivingEntity & GeoEntity> e
     @Override public ResourceLocation getAnimationResource(T entity){return id("animations/"+asset.apply(entity)+".animation.json");}
     /** Heartbeat swell of the bulb, and the crown flaps peeling open while a brood hatches. */
     private void hive(com.codex.blacklight.entity.BlacklightHive hive,float partial){
-        float t=hive.tickCount+partial;float beat=(float)Math.pow(Math.max(0,Math.sin(t*.16F)),6)+.5F*(float)Math.pow(Math.max(0,Math.sin(t*.16F-.9F)),8);
+        float t=(hive.tickCount+partial)*1.6F;float beat=(float)Math.pow(Math.max(0,Math.sin(t*.16F)),6)+.5F*(float)Math.pow(Math.max(0,Math.sin(t*.16F-.9F)),8);
         float age=hive.hatchAge(partial);float open=age<0||age>50?0:age<8?age/8F:age>20?(50-age)/30F:1;
         var torso=getAnimationProcessor().getBone("torso");
-        if(torso!=null){float s=1+.05F*beat;torso.setScaleX(s);torso.setScaleZ(s);torso.setScaleY(1+.03F*beat);}
+        float ripe=.6F+.9F*hive.growth();
+        if(torso!=null){float s=1+.05F*ripe*beat;torso.setScaleX(s);torso.setScaleZ(s);torso.setScaleY(1+.035F*ripe*beat);}
         for(int i=0;i<6;i++){var petal=getAnimationProcessor().getBone("petal"+i);if(petal==null)continue;
             double a=i*Math.PI/3;float tilt=.12F*beat+1.1F*open;
             // Tip each flap outward around the horizontal axis tangent to the rim.

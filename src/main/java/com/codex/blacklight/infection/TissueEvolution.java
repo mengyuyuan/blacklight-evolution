@@ -126,22 +126,25 @@ public final class TissueEvolution {
         if(!s.active())return p;
         Box box=b.box();V c=box.centre(),d=p.sub(c),right=b.right(),up=b.up(),forward=b.forward();
         if(b.role()==0) {
-            V along=axis(box);float length=span(box,along),t=Math.clamp(d.dot(along)/length+.5F,0,1);
-            float support=(float)Math.sin(Math.PI*t);
+            // Separable, per-axis growth: each displacement depends only on its
+            // own coordinate, so every native/authored cuboid stays a cuboid.
+            // A sin(t) bulge along the trunk bent the blocks into an arch.
+            V along=axis(box);
             boolean upright=Math.abs(along.dot(up))>.65F;
             V dorsal=upright?forward.mul(-1):up;
             float side=d.dot(right),back=d.dot(dorsal);
-            return p.add(right.mul(side*(.38F*s.muscle+.14F*s.carapace)*support))
-                    .add(dorsal.mul(back*(.26F*s.muscle+.22F*s.carapace)*support))
-                    .add(dorsal.mul(span(box,dorsal)*.10F*s.crest*support));
+            float crest=back>0?.20F*s.crest:0;
+            return p.add(right.mul(side*(.26F*s.muscle+.10F*s.carapace)))
+                    .add(dorsal.mul(back*(.18F*s.muscle+.15F*s.carapace+crest)));
         }
         if(b.role()==1) {
             float depth=span(box,forward);V hinge=c.sub(forward.mul(depth*.4F));
             float front=Math.max(0,p.sub(hinge).dot(forward));
-            float weight=Math.clamp(front/(depth*.9F),0,1);
+            // Constant cross-section scale: a blocky skull, not a tapered wedge.
             return p.add(forward.mul(front*(.48F*s.jaw+.04F*s.grasp)))
-                    .add(right.mul(d.dot(right)*(.26F*s.jaw+.14F*s.carapace)*weight))
-                    .add(up.mul(d.dot(up)*(.12F*s.jaw+.13F*s.carapace)*weight));
+                    .add(right.mul(d.dot(right)*(.16F*s.jaw+.09F*s.carapace)))
+                    // Vertical growth rises from the neck plane; the cervical root stays buried.
+                    .add(up.mul(Math.max(0,p.dot(up)-(c.dot(up)-span(box,up)*.5F))*(.08F*s.jaw+.08F*s.carapace)));
         }
         if(b.role()<2||b.role()>5)return p;
         V along=axis(box);float length=span(box,along);
@@ -149,9 +152,9 @@ public final class TissueEvolution {
         float sign=Math.abs(box.low().dot(along))>Math.abs(box.high().dot(along))?-1:1;
         float distal=sign>0?t:1-t;
         V section=c.add(along.mul(d.dot(along))),radial=p.sub(section);
-        float belly=(float)Math.sin(Math.PI*t);
-        float width=1+.38F*s.muscle*belly+.12F*s.grasp*distal;
-        float depth=1+.38F*s.muscle*belly+.10F*s.carapace*distal;
+        // Flat girth: a sin(t) belly turned square legs into barrels.
+        float width=1+.26F*s.muscle+.06F*s.grasp;
+        float depth=1+.26F*s.muscle+.05F*s.carapace;
         V across=right.sub(along.mul(right.dot(along)));
         if(across.length()<.1F)across=forward.sub(along.mul(forward.dot(along)));
         across=across.unit();V thickness=along.cross(across).unit();
@@ -161,7 +164,6 @@ public final class TissueEvolution {
         float beyond=Math.max(0,sign>0?raw-1:-raw);
         if(!planted)result=result.add(along.mul(sign*length*.22F*s.grasp*beyond));
         else {
-            result=result.add(forward.mul(length*.10F*s.grasp*distal));
             float floor=c.dot(up)-span(box,up)*.5F;
             result=result.add(up.mul(Math.max(0,floor-result.dot(up))));
         }

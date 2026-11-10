@@ -45,6 +45,9 @@ public final class InfectedMorphology implements AutoCloseable {
     private final InfectedMorphology previous;
     private final java.util.Set<AuthoredInfectionParts.Binding> coatGrowth=java.util.Collections.newSetFromMap(new java.util.IdentityHashMap<>());
     private final Map<ResourceLocation,ResourceLocation> skins=new HashMap<>();
+    private final Map<ResourceLocation,ResourceLocation> glows=new HashMap<>();
+    private final Map<ResourceLocation,GlowMesh> glowMeshes=new HashMap<>();
+    private int blightLevel,blightVariant;
     private final Map<ModelPart,Attachment> attachments;
     private final Map<ModelPart,Pending> pending = new IdentityHashMap<>();
     private final Map<ModelPart,PoseStack.Pose> nativeChimeraPoses=new IdentityHashMap<>();
@@ -65,7 +68,7 @@ public final class InfectedMorphology implements AutoCloseable {
         var approved=Boolean.getBoolean("blacklight.proceduralTissueOnly")?new AuthoredInfectionParts.Binding():AuthoredInfectionParts.bind(type,model);
         anatomical=approved.available()?null:AnatomicalTissue.bind(host,model,nativeTexture,partial);
         authored=approved;
-        lateOrgans=authored.available()?AnatomicalTissue.grafts(host,model,nativeTexture,partial):null;
+        lateOrgans=authored.available()&&!Boolean.getBoolean("blacklight.noLateOrgans")?AnatomicalTissue.grafts(host,model,nativeTexture,partial):null;
         if(anatomical!=null)anatomical.worldPose(worldRelativePose);
         if(lateOrgans!=null)lateOrgans.worldPose(worldRelativePose);
         if(chimera!=null)chimera.worldPose(worldRelativePose);
@@ -76,7 +79,10 @@ public final class InfectedMorphology implements AutoCloseable {
         authored.digestion(host.digestiveProfile(),host.digestiveVisual(),com.codex.blacklight.infection.TissueDigestiveMotion.clock(host.level().getGameTime(),partial));
         authored.vitals(host.vitalsProfile(),host.vitalsVisual(),TissueVitalMotion.clock(host.level().getGameTime(),partial));
         surface=new SurfaceTissue(host,model,root,partial,anatomical,authored);
-        if(anatomical==null)skins.put(nativeTexture,InfectedWoundTextures.get(nativeTexture,type,authored.wounds()));
+        blightLevel=InfectedWoundTextures.level(host.tissueAge());
+        // Evolved/devoured hosts are wholly blighted: chitin and exposed flesh, no vanilla skin patches.
+        {var evo=ChimeraTissue.receiverEvolution(host,false,partial);if(evo!=null&&evo.active())blightLevel=InfectedWoundTextures.LEVELS+1;}blightVariant=(int)(com.codex.blacklight.infection.TissueGrowth.mix(tissueSeed)&3);
+        skin(nativeTexture,authored.wounds());
         var species=DEFINITIONS.getAsJsonObject("species");
         profile=species.has(type)?species.get(type).getAsString():switch(type){
             case "minecraft:skeleton_horse","minecraft:zombie_horse"->"equine";
@@ -90,7 +96,51 @@ public final class InfectedMorphology implements AutoCloseable {
         attachments=anatomical!=null||authored.available()?new IdentityHashMap<>():new IdentityHashMap<>(CACHE.computeIfAbsent(model,k->new HashMap<>()).computeIfAbsent(profile,k->bind(model,k)));
         ACTIVE.set(this);
     }
-    @Override public void close(){pending.clear();authored.clear();coats.forEach(AuthoredInfectionParts.Binding::clear);if(previous==null)ACTIVE.remove();else ACTIVE.set(previous);}
+    private void skin(ResourceLocation texture,List<AuthoredInfectionParts.Wound> wounds){
+        var blight=InfectedWoundTextures.blight(texture,speciesId,wounds,blightLevel,blightVariant);
+        skins.put(texture,blight.texture());if(blight.glow()!=null)glows.put(blight.texture(),blight.glow());
+    }
+    /** Skin vertices sent to an infected texture are also kept for the
+     * full-bright seam pass, so the glow follows every animated vertex. */
+    static VertexConsumer glowSink(RenderType requested){
+        var context=ACTIVE.get();if(context==null||context.glows.isEmpty()||!NativeRenderScope.owns(context.proxy,context.trailHost))return null;
+        for(var entry:context.skins.entrySet()){
+            var a=entry.getKey();var glow=context.glows.get(entry.getValue());if(glow==null)continue;
+            if(requested==RenderType.entityCutoutNoCull(a)||requested==RenderType.entityCutoutNoCull(a,false)||requested==RenderType.entityCutout(a)
+                    ||requested==RenderType.entityTranslucent(a)||requested==RenderType.entityTranslucentCull(a))
+                return context.glowMeshes.computeIfAbsent(glow,k->new GlowMesh());
+        }
+        return null;
+    }
+    private void flushGlow(MultiBufferSource buffers){
+        if(glowMeshes.isEmpty())return;
+        float pulse=.78F+.22F*(float)Math.sin((proxy.tickCount+(tissueSeed&63))*.21F);
+        for(var entry:glowMeshes.entrySet())entry.getValue().replay(buffers.getBuffer(RenderType.eyes(entry.getKey())),pulse);
+        glowMeshes.clear();
+    }
+    private static final class GlowMesh implements VertexConsumer {
+        private float[] f=new float[11*256];private int[] c=new int[256];private int n=-1;
+        @Override public VertexConsumer addVertex(float x,float y,float z){
+            n++;if(n>=c.length){f=java.util.Arrays.copyOf(f,f.length*2);c=java.util.Arrays.copyOf(c,c.length*2);}
+            int o=n*11;f[o]=x;f[o+1]=y;f[o+2]=z;f[o+5]=0;f[o+6]=1;f[o+7]=0;c[n]=-1;return this;
+        }
+        @Override public VertexConsumer setColor(int r,int g,int b,int a){if(n>=0)c[n]=(a&255)<<24|(r&255)<<16|(g&255)<<8|(b&255);return this;}
+        @Override public VertexConsumer setUv(float u,float v){if(n>=0){f[n*11+3]=u;f[n*11+4]=v;}return this;}
+        @Override public VertexConsumer setUv1(int u,int v){return this;}
+        @Override public VertexConsumer setUv2(int u,int v){return this;}
+        @Override public VertexConsumer setNormal(float x,float y,float z){if(n>=0){int o=n*11;f[o+5]=x;f[o+6]=y;f[o+7]=z;}return this;}
+        void replay(VertexConsumer out,float pulse){
+            for(int i=0;i<=n;i++){
+                int o=i*11,argb=c[i];
+                int r=Math.round((argb>>16&255)*pulse),g=Math.round((argb>>8&255)*pulse),b=Math.round((argb&255)*pulse);
+                out.addVertex(f[o],f[o+1],f[o+2]).setColor(r,g,b,argb>>>24).setUv(f[o+3],f[o+4])
+                        .setOverlay(net.minecraft.client.renderer.texture.OverlayTexture.NO_OVERLAY)
+                        .setLight(net.minecraft.client.renderer.LightTexture.FULL_BRIGHT).setNormal(f[o+5],f[o+6],f[o+7]);
+            }
+            n=-1;
+        }
+    }
+    @Override public void close(){glowMeshes.clear();pending.clear();authored.clear();coats.forEach(AuthoredInfectionParts.Binding::clear);if(previous==null)ACTIVE.remove();else ACTIVE.set(previous);}
     /** Fur must reveal the same bite instead of covering it with an intact outer coat.
      * Only clip the copied coat; do not emit a second set of body mutations. */
     public static void copiedSkinLayer(LivingEntity entity,EntityModel<?> model,ResourceLocation texture){
@@ -106,7 +156,7 @@ public final class InfectedMorphology implements AutoCloseable {
         if(context.authored.available()){
             var coat=AuthoredInfectionParts.bind(context.speciesId,model,path.contains("sheep_fur"));coat.growth(context.tissueGrowth,context.tissueSeed);coat.evolution(context.authored.age(),context.authored.tentacles(),context.authored.development());coat.digestion(context.authored);coat.vitals(context.authored);context.coats.add(coat);
             if(path.contains("sheep_fur")||path.contains("slime"))context.coatGrowth.add(coat);
-            context.skins.put(texture,InfectedWoundTextures.get(texture,context.speciesId,coat.wounds()));return;
+            context.skin(texture,coat.wounds());return;
         }
         var layer=CACHE.computeIfAbsent(model,k->new HashMap<>()).computeIfAbsent(context.profile,k->bind(model,k));
         layer.forEach((part,attachment)->context.attachments.putIfAbsent(part,
@@ -275,6 +325,7 @@ public final class InfectedMorphology implements AutoCloseable {
      * through its model; context never mutates the shared species skeleton. */
     public static void flush(LivingEntity entity,MultiBufferSource buffers){
         var context=ACTIVE.get();if(context==null||context.proxy!=entity)return;
+        context.flushGlow(buffers);
         if(context.chimera!=null)context.chimera.flush(buffers);
         if(context.anatomical!=null){context.anatomical.flush(buffers);context.anatomicalCoats.forEach(coat->coat.flush(buffers));context.surface.flush(buffers);return;}
         context.authored.flush(buffers,!context.coatGrowth.isEmpty(),false);

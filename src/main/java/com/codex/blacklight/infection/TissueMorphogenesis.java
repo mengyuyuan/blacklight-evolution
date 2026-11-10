@@ -478,15 +478,15 @@ public final class TissueMorphogenesis {
             float asym=side==(TissueGrowth.sample(key,29)>.5F?1:-1)?1.12F:.84F;
             V c=box.centre().add(across.mul(side*width*.35F)).add(normal.mul(extent*.15F));
             organ(out,"scapular_plate_"+side,0,"",X,null,List.of(
-                    new Section(c.sub(along.mul(length*.30F)).add(normal.mul(extent*.65F)),width*.40F,extent*.16F*plate),
-                    new Section(c.add(along.mul(length*.12F)).add(normal.mul(extent*(.90F+.22F*asym*plate))),width*.48F,extent*.16F*plate),
-                    new Section(c.add(along.mul(length*.34F)).add(normal.mul(extent*.82F)),width*.28F,extent*.16F*plate)),across,normal,b,key);
+                    new Section(c.sub(along.mul(length*.26F)).add(normal.mul(extent*.58F)),width*.36F,extent*.13F*plate),
+                    new Section(c.add(along.mul(length*.08F)).add(normal.mul(extent*(.74F+.12F*asym*plate))),width*.40F,extent*.13F*plate),
+                    new Section(c.add(along.mul(length*.28F)).add(normal.mul(extent*.66F)),width*.24F,extent*.11F*plate)),across,normal,b,key);
             // Only two load-bearing crests, swept rearward from the shoulder.
             V root=c.add(along.mul(length*.06F)).add(normal.mul(extent*.88F));
             organ(out,"shoulder_crest_"+side,1,"",X,null,List.of(
                     new Section(root,width*.22F*(.55F+.45F*crest),extent*.24F*(.55F+.45F*crest)),
-                    new Section(root.sub(along.mul(length*.18F*crest)).add(normal.mul(extent*.52F*asym*crest)),width*.16F*(.55F+.45F*crest),extent*.15F),
-                    new Section(root.sub(along.mul(length*.42F*crest)).add(normal.mul(extent*.90F*asym*crest)),.025F,.025F)),across,normal,b,key);
+                    new Section(root.sub(along.mul(length*.08F*crest)).add(normal.mul(extent*.30F*asym*crest)),width*.18F*(.55F+.45F*crest),extent*.17F),
+                    new Section(root.sub(along.mul(length*.20F*crest)).add(normal.mul(extent*.52F*asym*crest)),width*.07F,extent*.07F)),across,normal,b,key);
         }
     }
     private static void ribCage(List<Mesh> out,Bone b,long key,boolean upright,TissueCore core) {
@@ -500,8 +500,8 @@ public final class TissueMorphogenesis {
             float w=width*(rib==0?.94F:1.04F),thickness=Math.clamp(length*.038F,.22F,.60F);
             organ(out,"costal_arch_"+side+"_"+rib,1,"",X,null,List.of(
                     new Section(c.add(right.mul(side*w*.64F)).add(normal.mul(height*.85F)),thickness,height*.20F),
-                    new Section(c.add(right.mul(side*w*1.14F)).add(normal.mul(height*.22F)),thickness,height*.17F),
-                    new Section(c.add(right.mul(side*w*.95F)).sub(normal.mul(height*.60F)).add(along.mul(length*.09F)),thickness*.65F,height*.10F)),along,right,b,key);
+                    new Section(c.add(right.mul(side*w*1.03F)).add(normal.mul(height*.22F)),thickness,height*.17F),
+                    new Section(c.add(right.mul(side*w*.90F)).sub(normal.mul(height*.28F)).add(along.mul(length*.06F)),thickness*.65F,height*.10F)),along,right,b,key);
         }
     }
     private static void extremity(List<Mesh> out,Bone b,long key,int phase,boolean upright,int donorPlan) {
@@ -525,11 +525,11 @@ public final class TissueMorphogenesis {
                     // Toes sweep along the ground from a real distal joint. No
                     // growth may extend below the original support plane.
                     keys.add(List.of(new Section(root,radius,Math.max(.025F,width*.22F*g)),
-                            new Section(root.add(b.forward.mul((width*1.25F+length*.18F)*(dominant?1.35F:1)*g)).add(direction.mul(length*.07F*g)),radius*.78F,Math.max(.025F,width*.15F*g)),
-                            new Section(root.add(b.forward.mul((width*1.8F+length*.29F)*(dominant?1.35F:1)*g)).add(direction.mul(length*.17F*g)),.025F,.025F)));
+                            new Section(root.add(b.forward.mul((width*1.05F+length*.16F)*(dominant?1.2F:1)*g)).add(direction.mul(length*.06F*g)),radius*.85F,Math.max(.025F,width*.17F*g)),
+                            new Section(root.add(b.forward.mul((width*1.5F+length*.25F)*(dominant?1.2F:1)*g)).add(direction.mul(length*.12F*g)),Math.max(.025F,radius*.40F),Math.max(.025F,width*.08F*g))));
                 } else keys.add(List.of(new Section(root,radius,Math.max(.025F,box.span(v)*.25F*g)),
-                        new Section(root.add(direction.mul(length*.28F*g)).sub(depth.mul(width*1.15F*g)),radius*.85F,Math.max(.025F,radius*.65F)),
-                        new Section(root.add(direction.mul(length*(dominant?.64F:.44F)*g)).sub(depth.mul(width*.55F*g)),.025F,.025F)));
+                        new Section(root.add(direction.mul(length*.20F*g)).sub(depth.mul(width*.75F*g)),radius*.88F,Math.max(.025F,radius*.70F)),
+                        new Section(root.add(direction.mul(length*(dominant?.40F:.30F)*g)).sub(depth.mul(width*.45F*g)),Math.max(.025F,radius*.38F),Math.max(.025F,radius*.30F))));
             }
             float[][] pivots=new float[3][];
             for(int k=0;k<3;k++)pivots[k]=keys.get(k).getFirst().centre.array();
@@ -541,8 +541,8 @@ public final class TissueMorphogenesis {
             V root=centre.sub(direction.mul(length*.20F)).add(side.mul(box.span(principal(side))*.38F));
             organ(out,"ulnar_blade",phase,"",X,null,List.of(
                     new Section(root,width*.55F,width*.55F),
-                    new Section(root.add(direction.mul(length*.23F)).add(back.mul(width*1.45F)),width*.38F,width*.64F),
-                    new Section(root.add(direction.mul(length*.58F)).add(back.mul(width*2.15F)),.025F,.025F)),side,back,b,key);
+                    new Section(root.add(direction.mul(length*.18F)).add(back.mul(width*.95F)),width*.42F,width*.62F),
+                    new Section(root.add(direction.mul(length*.40F)).add(back.mul(width*1.35F)),width*.10F,width*.12F)),side,back,b,key);
         }
     }
     /** A small authored vocabulary of organs, fitted procedurally to native
@@ -560,16 +560,16 @@ public final class TissueMorphogenesis {
     private static Mesh loft(String name,boolean skin,int phase,String motion,V hinge,float[][] pivots,
             List<List<Section>> keys,V a,V b,V up,V forward,long seed) {
         if(!skin&&keys.getFirst().size()==3)keys=smooth(keys);
+        if(!skin)return blocks(name,phase,motion,hinge,pivots,keys,a,b,up,forward,seed);
         int sections=keys.getFirst().size();float[][] stages=new float[3][sections*8*3];
         for(int k=0;k<3;k++)for(int r=0;r<sections;r++)for(int s=0;s<8;s++) {
-            float x=RING[s][0],y=RING[s][1];if(skin&&k==0){x=Math.copySign(1,x);y=Math.copySign(1,y);}
+            float x=RING[s][0],y=RING[s][1];if(skin){x=Math.copySign(1,x);y=Math.copySign(1,y);}
             float swell=1;
             if(skin&&k>0){
-                // Grown hide relaxes from the native cuboid toward a rounded,
-                // muscular section; corners pull in, mid-faces bulge unevenly.
-                float round=k==2?1:.45F;
-                x=x+(ROUND[s][0]-x)*round;y=y+(ROUND[s][1]-y)*round;
-                swell=1+(.07F+TissueGrowth.sample(seed,r*8+s+400)*.07F)*round*(r==0||r==sections-1?.4F:1);
+                // Grown hide stays a cuboid section (MC style). One swell per
+                // ring: per-corner noise and ROUND corners made a soft, curved hull.
+                float grow=k==2?1:.45F;
+                swell=1+(.07F+TissueGrowth.sample(seed,r*8+400)*.07F)*grow*(r==0||r==sections-1?.4F:1);
             }
             var section=keys.get(k).get(r);V p=section.centre.add(a.mul(x*section.width*swell)).add(b.mul(y*section.depth*swell));
             int i=(r*8+s)*3;stages[k][i]=p.x;stages[k][i+1]=p.y;stages[k][i+2]=p.z;
@@ -592,6 +592,98 @@ public final class TissueMorphogenesis {
             }
         }
         return new Mesh(name,skin,phase,motion,hinge.array(),pivots,stages,faces.toArray(float[][]::new));
+    }
+    /** Minecraft-style organ: every span between two sections is one oriented
+     * cuboid, pixel snapped and stepping down toward the tip, like the rotated
+     * cubes of a Blockbench horn. The shared layout of eight-vertex rings along
+     * the centre line is kept (two rings per block), so growth, hypertrophy,
+     * bending and tongue fitting keep reading root and tip from the same slots. */
+    private static Mesh blocks(String name,int phase,String motion,V hinge,float[][] pivots,
+            List<List<Section>> keys,V a,V b,V up,V forward,long seed) {
+        int sections=keys.get(0).size(),spans=Math.max(1,sections-1);
+        boolean pointed=pointed(name);
+        var mature=keys.get(2);
+        float[] matureW=new float[spans],matureD=new float[spans];
+        for(int s=0;s<spans;s++){
+            var low=mature.get(s);var high=mature.get(Math.min(sections-1,s+1));
+            // A chunky block reads better than a needle at native pixel density.
+            matureW[s]=snap((low.width*.62F+high.width*.38F)*1.18F);
+            matureD[s]=snap((low.depth*.62F+high.depth*.38F)*1.18F);
+            if(s>0){matureW[s]=Math.min(matureW[s],Math.max(matureW[s-1],snap(low.width*1.18F)));matureD[s]=Math.min(matureD[s],Math.max(matureD[s-1],snap(low.depth*1.18F)));}
+        }
+        float[][] stages=new float[3][spans*2*8*3];
+        V[] centres=new V[spans];V[] axes=new V[spans];
+        for(int k=0;k<3;k++){
+            var stage=keys.get(k);
+            for(int s=0;s<spans;s++){
+                V p0=stage.get(s).centre,p1=stage.get(Math.min(sections-1,s+1)).centre;
+                V matureAxis=mature.get(Math.min(sections-1,s+1)).centre.sub(mature.get(s).centre);
+                V axis=p1.sub(p0).length()>.02F?p1.sub(p0).unit():matureAxis.length()>.02F?matureAxis.unit():a.cross(b).unit();
+                V u=a.sub(axis.mul(a.dot(axis)));if(u.length()<.05F)u=b.cross(axis);u=u.unit();
+                V v=axis.cross(u).unit();if(v.dot(b)<0)v=v.mul(-1);
+                float ratio=matureW[s]<=0?0:Math.max(0,Math.min(1.2F,stage.get(s).width/Math.max(.015F,mature.get(s).width)));
+                float ratioD=matureD[s]<=0?0:Math.max(0,Math.min(1.2F,stage.get(s).depth/Math.max(.015F,mature.get(s).depth)));
+                float hw=matureW[s]*ratio,hd=matureD[s]*ratioD;
+                // Neighbouring blocks overlap a little at the joint, so a bent
+                // horn shows a stepped elbow instead of a wedge-shaped gap.
+                float overlap=s<spans-1?Math.min(Math.max(hw,hd)*.55F,p1.sub(p0).length()*.35F):0;
+                V start=p0,end=p1.add(axis.mul(overlap));
+                if(k==2){centres[s]=start.add(end).mul(.5F);axes[s]=axis;}
+                for(int ring=0;ring<2;ring++){
+                    V c=ring==0?start:end;
+                    for(int i=0;i<8;i++){
+                        float x=SQUARE[i][0],y=SQUARE[i][1];
+                        V point=c.add(u.mul(x*hw)).add(v.mul(y*hd));
+                        int index=((s*2+ring)*8+i)*3;
+                        stages[k][index]=point.x;stages[k][index+1]=point.y;stages[k][index+2]=point.z;
+                    }
+                }
+            }
+        }
+        if(motion.equals("toe"))for(int k=0;k<3;k++){
+            // Planted toes keep the sole of the smooth form: no block may sink below the native foot contact plane.
+            float limit=-Float.MAX_VALUE;for(var s:keys.get(k))limit=Math.max(limit,s.centre.y+Math.abs(a.y)*s.width+Math.abs(b.y)*s.depth);
+            for(int i=1;i<stages[k].length;i+=3)stages[k][i]=Math.min(stages[k][i],limit);
+        }
+        var faces=new ArrayList<float[]>();
+        for(int s=0;s<spans;s++){
+            int r0=s*2*8,r1=r0+8;boolean tip=s==spans-1&&spans>1;
+            for(int i=0;i<8;i++){
+                int[] ids={r0+i,r1+i,r1+(i+1)%8,r0+(i+1)%8};
+                V mid=vertex(stages[2],ids[0]).add(vertex(stages[2],ids[1])).add(vertex(stages[2],ids[2])).add(vertex(stages[2],ids[3])).mul(.25F);
+                V outward=mid.sub(centres[s]);
+                addFace(faces,stages[2],ids,outward,blockMaterial(name,pointed,tip,s,i/2),.22F,.60F);
+            }
+            addFace(faces,stages[2],new int[]{r0,r0+2,r0+4,r0+6},axes[s].mul(-1),pointed&&!tip?3:blockMaterial(name,pointed,false,s,4),.15F,.58F);
+            addFace(faces,stages[2],new int[]{r1,r1+2,r1+4,r1+6},axes[s],blockMaterial(name,pointed,tip,s,5),.15F,.58F);
+        }
+        return new Mesh(name,false,phase,motion,hinge.array(),pivots,stages,faces.toArray(float[][]::new));
+    }
+    /** Corner/edge ring of a square block: corners at even slots, edge midpoints at odd slots. */
+    private static final float[][] SQUARE={{-1,-1},{0,-1},{1,-1},{1,0},{1,1},{0,1},{-1,1},{-1,0}};
+    /** Half extents snap to the quarter/half pixel grid of native mob cubes. */
+    private static float snap(float half){
+        float step=half<.6F?.25F:.5F;
+        return Math.max(.25F,Math.round(half/step)*step);
+    }
+    private static boolean pointed(String name){
+        for(String word:new String[]{"blade","claw","fang","horn","crest","quill","chela","spike","spine","barb","hook","talon","edge","crown"})
+            if(name.contains(word))return true;
+        return false;
+    }
+    /** face 0..3 are the four sides (-depth, +across, +depth, -across), 4 root cap, 5 tip cap.
+     * Atlas: 1 red flesh, 2 dark flesh, 3 charcoal plate, 4 bone, 5 pale flesh, 6 near black, 7 grey. */
+    private static int blockMaterial(String name,boolean pointed,boolean tip,int span,int face){
+        if(name.equals("palate"))return 6;
+        if(name.startsWith("fang"))return 4;
+        if(name.contains("gland"))return face==1?1:2;
+        if(name.startsWith("costal"))return face==0||face==2?7:4;
+        // Bleached horn/claw tips over a charcoal shaft, like vanilla goat horns.
+        if(pointed&&tip)return face==4?3:4;
+        if(face>=4)return 3;
+        // One wet blood seam along the inner edge; the rest alternates plate bands.
+        if(face==1)return span%2==0?1:2;
+        return span%2==0?3:face==3?6:3;
     }
     /** Three authored sections become five on the quadratic through them: horns,
      * claws and plates read as curved, tapering forms instead of faceted wedges. */

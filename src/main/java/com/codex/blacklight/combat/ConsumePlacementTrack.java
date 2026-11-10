@@ -114,6 +114,19 @@ public final class ConsumePlacementTrack {
             return goal;
         });
     }
+    /** Largest actor lag the receiver follows; beyond it the pair was broken by a teleport or wall. */
+    public static final double MAX_ACTOR_DRIFT=3;
+    /** Keeps the paired scene rigid around the actor's real position. Collision, the
+     * per-tick speed clamp and network lag all move the actor off its authored root
+     * path; the receiver follows that same drift for the whole scene instead of only
+     * during a head grip, so the bodies never separate or interpenetrate. */
+    public static Vec3 pairedGoal(Vec3 trackGoal,Vec3 actorActual,Vec3 actorGoal){
+        Vec3 drift=actorActual.subtract(actorGoal);
+        if(!Double.isFinite(drift.lengthSqr()))return trackGoal;
+        double length=drift.length();
+        if(length>MAX_ACTOR_DRIFT)drift=drift.scale(MAX_ACTOR_DRIFT/length);
+        return trackGoal.add(drift);
+    }
     public static float gripEnd(PowerForm form){return form==PowerForm.CLAWS?.72F:ConsumeSequence.release(form);}
     public static boolean headGrip(PowerForm form){
         return headGrip(form,ConsumeVariant.DEFAULT);
@@ -148,7 +161,11 @@ public final class ConsumePlacementTrack {
         double support=Math.abs(nx*axisX.x+nz*axisX.z)*halfW+Math.abs(nx*axisY.x+nz*axisY.z)*halfH+Math.abs(nx*axisZ.x+nz*axisZ.z)*halfD;
         double vertical=Math.abs(axisX.y)*halfW+Math.abs(axisY.y)*halfH+Math.abs(axisZ.y)*halfD;
         double minimum=.30+support+.06;
-        if(Math.abs(gap.y)<vertical+.4&&distance<minimum)goal=goal.add(direction.scale(minimum-distance));
+        // Push toward the actor's front, not along the gap: the gap direction flips when the
+        // authored path crosses the actor's centre, which teleported the receiver to the
+        // other side. The vertical cut-off also fades instead of switching on in one frame.
+        double overlap=Math.clamp((vertical+.4+.25-Math.abs(gap.y))/.25,0,1);
+        if(overlap>0&&distance<minimum)goal=goal.add(forward.scale((minimum-distance)*overlap));
         return goal;
     }
     /** Receiver-space contact shared by placement and the actor's final grip fitting. */
@@ -195,7 +212,11 @@ public final class ConsumePlacementTrack {
             if(rigidReceiver(victim))receiverBody=rigidCenter(victim,form,t,variant);
             Vec3 separation=local.add(receiverBody).subtract(actorBody);
             double radius=Math.max(.42,.30+victim.getBbWidth()*.5-.08),horizontal=separation.horizontalDistance();
-            if(Math.abs(separation.y)<.75 && horizontal<radius){Vec3 direction=horizontal>.02?separation.multiply(1,0,1).scale(1/horizontal):new Vec3(0,0,1);local=local.add(direction.scale(radius-horizontal));}
+            // Clear the actor's body along its own front (local +Z). Pushing along the separation
+            // flipped side when the authored path crossed the actor's centre and snapped the receiver
+            // ~0.7 blocks in one frame; the vertical cut-off fades instead of switching.
+            double clear=Math.clamp((.9-Math.abs(separation.y))/.15,0,1);
+            if(clear>0 && horizontal<radius){double front=Math.sqrt(radius*radius-separation.x*separation.x);if(separation.z<front)local=local.add(0,0,(front-separation.z)*clear);}
             double sole=rigidReceiver(victim)?rigidFloor(victim,form,t,variant):ConsumeSequence.humanoid(victim)?p[6]*scale:0;
             local=new Vec3(local.x,Math.max(local.y,-sole),local.z);
             Vec3 forward=Vec3.directionFromRotation(0,yaw),right=new Vec3(-forward.z,0,forward.x);

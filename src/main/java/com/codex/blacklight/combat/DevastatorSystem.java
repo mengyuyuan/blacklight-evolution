@@ -68,12 +68,6 @@ public final class DevastatorSystem {
         case PAIN->air?WeaponMove.DEV_AIR_CRITICAL_PAIN:WeaponMove.DEV_CRITICAL_PAIN;
         default->null;
     };}
-    /** At least 8 blocks of open air below the feet (unloaded/void below also counts). */
-    private static boolean highAboveGround(ServerPlayer p){
-        var from=p.position();var to=from.add(0,-8,0);
-        return p.level().clip(new net.minecraft.world.level.ClipContext(from,to,net.minecraft.world.level.ClipContext.Block.COLLIDER,
-                net.minecraft.world.level.ClipContext.Fluid.ANY,p)).getType()==net.minecraft.world.phys.HitResult.Type.MISS;
-    }
     private static boolean eligible(ServerPlayer p){
         var state=p.getData(ModAttachments.PLAYER_STATE);var movement=p.getData(ModAttachments.MOVEMENT_STATE);
         return !com.codex.blacklight.power.ParasiteSystem.suppressed(p)&&!com.codex.blacklight.city.HydraTransport.active(p)&&p.isAlive()&&!p.isSpectator()&&!p.isPassenger()&&!p.isFallFlying()&&!p.isInWater()&&!p.isInLava()
@@ -96,9 +90,9 @@ public final class DevastatorSystem {
         if(!eligible(p)||!keys.pressedSince(before)||!WeaponCombatSystem.canSkillInterrupt(p))return false;
         var state=p.getData(ModAttachments.PLAYER_STATE);var movement=p.getData(ModAttachments.MOVEMENT_STATE);
         boolean glide=movement.mode()==MovementState.Mode.GLIDE||p.getData(ModAttachments.GLIDE_UNTIL)>p.level().getGameTime();
-        // Glide is not required high up: any long fall or wing flight can start a Bulletdive.
+        // Bulletdive needs a real glide (or wing flight). A plain fall or jump apex is not a glide.
         boolean wings=com.codex.blacklight.movement.WingFlightSystem.flying(p);
-        if(!glide&&!p.onGround()&&(wings||highAboveGround(p)))glide=true;
+        if(!glide&&!p.onGround()&&wings)glide=true;
         if(special&&!attack&&!action&&!p.onGround()&&before.special()!=special)
             com.codex.blacklight.BlacklightNeoMod.LOGGER.debug("Air special routing for {}: glide={}, mode={}, glideUntil={}, now={}, bulletUnlocked={}, power={}",
                     p.getGameProfile().getName(),glide,movement.mode(),p.getData(ModAttachments.GLIDE_UNTIL),p.level().getGameTime(),

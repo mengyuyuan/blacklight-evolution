@@ -61,6 +61,9 @@ public final class ClientDevastatorPostEffect {
     }
     @SubscribeEvent(priority=EventPriority.LOWEST)
     public static void render(RenderLevelStageEvent event){
+        if(event.getStage()==RenderLevelStageEvent.Stage.AFTER_LEVEL)com.codex.blacklight.client.ShaderPackCompat.afterLevel(()->apply(event));
+    }
+    private static void apply(RenderLevelStageEvent event){
         if(event.getStage()!=RenderLevelStageEvent.Stage.AFTER_LEVEL)return;
         var mc=Minecraft.getInstance();var player=mc.player;
         if(player==null||mc.level==null||!player.isAlive()){close();return;}
