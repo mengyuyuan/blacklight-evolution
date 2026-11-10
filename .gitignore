@@ -42,6 +42,7 @@ repo/
 ### Local artifacts ###
 tmp/
 run-wall-gametest/
+run-ragdoll/
 *.log
 hs_err_pid*.log
 .env

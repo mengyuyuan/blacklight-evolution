@@ -48,7 +48,7 @@ public final class BladeEffects {
         PacketDistributor.sendToPlayersTrackingEntityAndSelf(player,new CombatImpactPayload(contact.x,contact.y,contact.z,size,false,true,(float)cut.x,(float)cut.y,(float)cut.z));
         boolean metal=target instanceof net.minecraft.world.entity.animal.IronGolem;
         int count=heavy?18:11;
-        for(int i=0;i<count;i++){
+        for(int i=0;i<(RagdollImpact.supportedBody(target)?0:count);i++){
             double along=(i/(double)(count-1)-.5)*size;
             var point=contact.add(cut.scale(along));
             var velocity=cut.scale(.12+player.getRandom().nextDouble()*.2).add(forward.scale(.04)).add(0,player.getRandom().nextDouble()*.1,0);

@@ -410,6 +410,7 @@ public final class ConsumeSystem {
                     net.neoforged.neoforge.network.PacketDistributor.sendToPlayer(player,new com.codex.blacklight.network.PhysicalFeedbackPayload(com.codex.blacklight.network.PhysicalFeedbackPayload.Effect.CLAW_HEAVY,1.2F));
                 target.setData(ModAttachments.CONSUME_VISUAL,new ConsumeVisual(player.getId(),player.level().getGameTime(),40,session.form.ordinal(),ConsumeVisual.FLIGHT));
                 target.syncData(ModAttachments.CONSUME_VISUAL);
+                RagdollImpact.send(target,ImpactProfile.FALL,55,false,target.getDeltaMovement());
                 player.level().playSound(null,target.blockPosition(),SoundEvents.PLAYER_ATTACK_SWEEP,SoundSource.PLAYERS,.8F,.7F);
             }
             return;
@@ -642,8 +643,16 @@ public final class ConsumeSystem {
             THROWN.remove(mob);release(mob);mob.setDeltaMovement(Vec3.ZERO);
             boolean full=shot.charge()>=.9F;var tier=full?ImpactTier.FINISHER:ImpactTier.HEAVY;
             if(hit!=null&&hit.getEntity().hurt(mob.damageSources().thrown(mob,shot.owner()),shot.damage())&&hit.getEntity() instanceof LivingEntity struck){
+                boolean physical=RagdollImpact.supportedBody(struck)&&ImpactControl.begin(struck,
+                        new ImpactProfile(HitReaction.HEAVY,ImpactProfile.FALL,40,.5,.25,true),mob.getYRot());
+                if(physical){
+                    double resist=Math.clamp(1-struck.getAttributeValue(net.minecraft.world.entity.ai.attributes.Attributes.KNOCKBACK_RESISTANCE),0,1);
+                    Vec3 push=shot.velocity().scale(.35*resist);
+                    struck.setDeltaMovement(push.x,Math.max(.15*resist,push.y),push.z);struck.setOnGround(false);struck.hurtMarked=true;
+                }
                 WeaponImpact.contact(shot.owner() instanceof ServerPlayer owner?owner:null,struck,tier,true,com.codex.blacklight.network.PhysicalFeedbackPayload.Effect.CLAW_HEAVY);
-                if(full||shot.damage()>=struck.getMaxHealth()*1.5F)HeavyBlow.shatter(struck,shot.velocity());
+                if(physical||!struck.isAlive())RagdollImpact.send(struck,ImpactProfile.FALL,45,false,HitStop.launchVelocity(struck));
+                if(!RagdollImpact.supportedBody(struck)&&(full||shot.damage()>=struck.getMaxHealth()*1.5F))HeavyBlow.shatter(struck,shot.velocity());
             }
             if(mechanical!=null)com.codex.blacklight.military.vehicle.VehicleDamageBridge.hurtPhysical(shot.owner(),mechanical.vehicle(),shot.damage(),mob);
             // The thrown body takes the same hit; a charged throw that kills it bursts it against the wall.
@@ -653,7 +662,9 @@ public final class ConsumeSystem {
             if(shot.charge()>=.5F)ConsumeLastChance.execute(mob,()->mob.hurt(mob.damageSources().thrown(mob,shot.owner()),selfDamage));
             else mob.hurt(mob.damageSources().thrown(mob,shot.owner()),selfDamage);
             boolean slam=hit!=null||mechanical!=null||mob.horizontalCollision&&shot.velocity().horizontalDistance()>.8;
-            if(shot.charge()>=.5F&&(slam||full))HeavyBlow.shatter(mob,shot.velocity());
+            if(mob.isAlive())ImpactControl.begin(mob,new ImpactProfile(HitReaction.DOWN,ImpactProfile.DOWN,32,0,0,true),mob.getYRot());
+            RagdollImpact.send(mob,ImpactProfile.FALL,48,false,shot.velocity().scale(.18));
+            if(!RagdollImpact.supportedBody(mob)&&shot.charge()>=.5F&&(slam||full))HeavyBlow.shatter(mob,shot.velocity());
             if(full&&shot.owner() instanceof ServerPlayer owner)net.neoforged.neoforge.network.PacketDistributor.sendToPlayer(owner,new com.codex.blacklight.network.PhysicalFeedbackPayload(com.codex.blacklight.network.PhysicalFeedbackPayload.Effect.CLAW_HEAVY,1.6F));
             mob.level().playSound(null,mob.blockPosition(),SoundEvents.GENERIC_BIG_FALL,SoundSource.PLAYERS,.8F+.5F*shot.charge(),.8F-.2F*shot.charge());
         } else THROWN.put(mob,new Thrown(shot.owner(),shot.remaining()-1,shot.velocity().add(0,-.08,0).scale(.98),shot.damage(),shot.charge()));

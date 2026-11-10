@@ -41,7 +41,13 @@ public final class HeavyBlow {
         boolean full=charge>=.9F;
         boolean killed=!v.isAlive()||v.getHealth()<=0;
         float dealt=move.damageFor(move.form)*(1+.5F*charge);
-        if(killed){if((tier.atLeast(ImpactTier.HEAVY)||full)&&!burst(p,v,direction,tier,full,dealt))dismember(p,v,move,direction);return false;}
+        // Supported human and pig rigs retain a physical corpse; other rigs keep their previous effects.
+        if(killed){
+            boolean sharp=move.form==com.codex.blacklight.power.PowerForm.CLAWS||move.form==com.codex.blacklight.power.PowerForm.BLADE||move.form==com.codex.blacklight.power.PowerForm.WHIPFIST;
+            if(!sharp&&!RagdollImpact.supportedBody(v)&&(tier.atLeast(ImpactTier.HEAVY)||full)
+                    &&!burst(p,v,direction,tier,full,dealt))dismember(p,v,move,direction);
+            return false;
+        }
         if(!controlled||!(tier.atLeast(ImpactTier.HEAVY)||full)||CombatTargeting.multipart(v)||v instanceof Player)return false;
         double resistance=Math.max(0,Math.min(1,1-v.getAttributeValue(net.minecraft.world.entity.ai.attributes.Attributes.KNOCKBACK_RESISTANCE)));
         double volume=v.getBbWidth()*v.getBbWidth()*v.getBbHeight();

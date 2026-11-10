@@ -20,6 +20,11 @@ public final class WeaponImpact {
      * devastators, groundspikes and thrown bodies. Call after the knockback is set so the hold
      * keeps the launch. Feedback goes to the attacker once per action ({@code first}). */
     public static void contact(ServerPlayer p,LivingEntity v,ImpactTier tier,boolean first,PhysicalFeedbackPayload.Effect effect){
+        if(!v.level().isClientSide&&tier.atLeast(ImpactTier.HEAVY)){
+            var state=v.getData(ModAttachments.HIT_REACTION);
+            if(!v.isAlive()||state.weight(v.level().getGameTime(),0)>0)
+                RagdollImpact.send(v,ImpactProfile.FALL,Math.max(18,state.duration()),false,HitStop.launchVelocity(v));
+        }
         if(v.level().isClientSide||!v.isAlive())return;
         HitStop.victim(v,tier.hitstop);
         float pitch=switch(tier){case LIGHT->1.1F;case MEDIUM->1F;case HEAVY->.88F;case FINISHER->.78F;};
@@ -33,6 +38,10 @@ public final class WeaponImpact {
     }
     public static void apply(ServerPlayer p,LivingEntity v,WeaponMove move,Vec3 direction,boolean first){apply(p,v,move,direction,first,0F);}
     public static void apply(ServerPlayer p,LivingEntity v,WeaponMove move,Vec3 direction,boolean first,float charge) {
+        apply(p,v,move,direction,first,charge,WeaponCutContact.Report.NONE);
+    }
+    public static void apply(ServerPlayer p,LivingEntity v,WeaponMove move,Vec3 direction,boolean first,float charge,WeaponCutContact.Report cut) {
+        if(cut.contacts().isEmpty())cut=WeaponCutContact.impact(p,v,direction);
         var profile=ImpactProfile.of(move);var tier=ImpactTier.of(move);
         boolean slam=profile.kind()==HitReaction.SLAM||move.quake();
         boolean heavy=profile.kind()!=HitReaction.STAGGER;
@@ -51,15 +60,23 @@ public final class WeaponImpact {
             // Tier lift pops ordinary bodies; massive ones stay grounded under the same hit.
             double lift=profile.lift()<0?profile.lift():profile.lift()+(volume<4?tier.lift:0);
             double vertical=lift==0?Math.max(0,Math.min(v.getDeltaMovement().y,.12)):lift*mass*resistance;
-            v.setDeltaMovement(direction.x*force,vertical,direction.z*force);
+            Vec3 inherited=v.isDeadOrDying()?HitStop.launchVelocity(v):Vec3.ZERO;
+            v.setDeltaMovement(new Vec3(direction.x*force,vertical,direction.z*force).add(inherited));
             if(vertical>0)v.setOnGround(false);
             v.hurtMarked=true;
             if(v instanceof Mob mob){mob.getNavigation().stop();mob.setXxa(0);mob.setZza(0);}
             if(first)HitStop.victim(v,tier.hitstop);
         }
         HeavyBlow.apply(p,v,move,tier,charge,direction,controlled);
+        WeaponDismemberment.weapon(v,cut);
+        boolean sharp=move.form==PowerForm.BLADE||move.form==PowerForm.CLAWS||move.form==PowerForm.WHIPFIST;
+        if(controlled||!v.isAlive()||!cut.contacts().isEmpty()){
+            // Light cuts retain directional flinch; heavy cuts and lethal hits take over the body.
+            int physicalTicks=!v.isAlive()?60:canFall?profile.stun():8;
+            RagdollImpact.send(v,profile.motion(),physicalTicks,sharp,HitStop.launchVelocity(v),cut);
+        }
         boolean blade=move.form==PowerForm.BLADE;
-        if(!blade)ClawPhysicalEffects.onComboTargetHit(p,v,heavy||slam);
+        if(!blade&&!RagdollImpact.supportedBody(v))ClawPhysicalEffects.onComboTargetHit(p,v,heavy||slam);
         CombatImpactEffects.target(p,v,move);
         if(first){
             float pitch=switch(tier){case LIGHT->1.1F;case MEDIUM->1F;case HEAVY->.88F;case FINISHER->.78F;};
