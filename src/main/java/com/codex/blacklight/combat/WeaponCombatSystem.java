@@ -589,7 +589,9 @@ public final class WeaponCombatSystem {
             }
             if(!currentSession(p,s))return;
         }
+        if(candidates.isEmpty())return;
         candidates.sort(Comparator.comparingInt((LivingEntity v)->v==s.target?0:1).thenComparingDouble(v->CombatTargeting.distanceSquared(p.getEyePosition(),v)));
+        var cutting=WeaponCutContact.sweep(p,s.move,fromTime,toTime,previousFeet,s.previousYaw,s.yaw,whip);
         for(var v:candidates){
             if(!currentSession(p,s))return;
             if(s.hit.size()>=(s.move.quake()?48:8)&&!s.hit.contains(v.getUUID()))continue;
@@ -600,6 +602,12 @@ public final class WeaponCombatSystem {
             // the victim's actual current reach (teleports, dash or stale movement).
             if(!CombatTargeting.inReach(p,v,whip==null?moveReach+1.0:30.0*AttackReach.scale(p)))continue;
             if(!close&&!contact(p,s,v,bounds,whip,fromTime,toTime,bodyFlight,moveReach,direction,arc))continue;
+            var boxes=CombatTargeting.hitboxes(v);
+            Vec3 oldVictim=v.position().add(previousBox(s,v,boxes,0).getCenter().subtract(boxes.getFirst().getCenter()));
+            var cut=cutting.trace(p,v,oldVictim);
+            // Do not kill a small receiver with the broad reach box before the visible edge arrives.
+            // Body charges and ground shockwaves retain their own contact rules.
+            if(cutting.sharp()&&!bodyFlight&&RagdollImpact.supportedBody(v)&&cut.contacts().isEmpty())continue;
             int resistance=v.invulnerableTime;
             var last=LAST_CONTACT.get(v);
             boolean ownPrevious=last!=null&&last.owner.equals(p.getUUID())&&p.level().getGameTime()-last.time<=10;
@@ -618,7 +626,7 @@ public final class WeaponCombatSystem {
                     if(!s.lifted){s.lifted=true;p.setOnGround(false);p.setDeltaMovement(s.direction.scale(.12).add(0,.72,0));p.hurtMarked=true;}
                 }else if(!resistsControl&&!CombatTargeting.multipart(v)&&(s.move.quake()||s.move.airCombo())){v.setDeltaMovement(v.getDeltaMovement().add(0,s.move==WeaponMove.AIR_AUTO4?-.6:.3,0));v.hurtMarked=true;}
                 var push=s.move.quake()?v.position().subtract(p.position()).multiply(1,0,1).normalize():s.direction;
-                WeaponImpact.apply(p,v,s.move,push,s.hit.size()==1,s.chargePower);
+                WeaponImpact.apply(p,v,s.move,push,s.hit.size()==1,s.chargePower,cut);
                 if(s.hit.size()==1)beginHitstop(p,s,ImpactTier.of(s.move));
                 if(s.move.form==com.codex.blacklight.power.PowerForm.HAMMERFISTS&&!s.move.quake()&&!s.impactEffect){
                     s.impactEffect=true;hammerSplash(p,s,v);

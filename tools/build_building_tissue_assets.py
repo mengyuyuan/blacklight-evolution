@@ -1,5 +1,6 @@
 """Connected surface tissue, authored in block-model JSON; existing pixel textures are retained."""
 import json
+import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1] / "src/main/resources"
@@ -15,22 +16,42 @@ def box(lo, hi, texture, omit=()):
     return {"from": lo, "to": hi, "faces": {face: {"texture": "#" + texture}
             for face in ("up", "down", "north", "south", "east", "west") if face not in omit}}
 
-# The server chooses variants from a multi-block spatial field. Variant 0 is a thin membrane,
-# 1 a fleshy root shoulder, 2 a thick main trunk. Do not put a tiny repeated vein in every cell.
+def surface_model(age, variant):
+    """Closed volume with shared internal faces removed, rather than intersecting paper-thin plates."""
+    scale = (.08, .24, .55, 1)[age]
+    base = max(.75, (1.2, 4.8, 10.5)[variant] * scale)
+    margin = (4, 2, 0, 0)[age]
+    if variant == 0:
+        columns = [(margin, 16-margin, 0, "flesh")]
+    elif variant == 1:
+        columns = [(margin, 6, max(.35, .65*scale), "vein"), (6, 16-margin, 0, "flesh")]
+    else:
+        columns = [(margin, 6, max(.35, 1.2*scale), "shell"), (6, 10, 0, "flesh"),
+                   (10, 16-margin, max(.35, .7*scale), "vein")]
+    parts = []
+    for index, (left, right, rise, material) in enumerate(columns):
+        omitted = []
+        if index > 0:
+            omitted.append("west")
+        if index < len(columns)-1:
+            omitted.append("east")
+        if rise:
+            omitted.append("up")
+        parts.append(box([left, 0, margin], [right, base, 16-margin], "flesh", omitted))
+        if rise:
+            # Meet the base exactly. Its covered top and this rib's underside are internal.
+            parts.append(box([left, base, margin], [right, base+rise, 16-margin], material, ("down",)))
+    return {"textures": TEXTURES, "elements": parts}
+
+
+# The server still owns spread, growth and support orientation. Geometry stays inside its cell.
 for age in range(4):
     for variant in range(3):
-        parts = []
-        scale = (.08,.24,.55,1)[age]
-        base = (1.2,4.8,10.5)[variant]*scale
-        margin = (4, 2, 0, 0)[age]
-        parts.append(box([margin, 0, margin], [16-margin, base, 16-margin], "flesh", ("down",)))
-        if variant==1:
-            parts.append(box([margin,base-.04,margin],[6,base+.65*scale,16-margin],"vein",("down",)))
-        if variant==2:
-            parts.append(box([margin,base-.04,margin],[6,base+1.2*scale,16-margin],"shell",("down",)))
-            parts.append(box([10,base-.04,margin],[16-margin,base+.7*scale,16-margin],"vein",("down",)))
-        write(ASSETS/f"models/block/tissue_attachment_{age}_{variant}.json",
-              {"textures": TEXTURES, "elements": parts})
+        write(ASSETS/f"models/block/tissue_attachment_{age}_{variant}.json", surface_model(age, variant))
+
+# Resource-only repairs should not regenerate recipes, translations or the incubation core.
+if "--surface-only" in sys.argv:
+    raise SystemExit(0)
 
 states = {}
 for age in range(4):

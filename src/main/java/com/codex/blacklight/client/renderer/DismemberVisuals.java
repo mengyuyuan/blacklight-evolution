@@ -1,109 +1,193 @@
 package com.codex.blacklight.client.renderer;
 
-import com.codex.blacklight.combat.HeavyBlow;
-import com.codex.blacklight.combat.HitReaction;
+import com.codex.blacklight.client.animation.ImpactRagdoll;
+import com.codex.blacklight.combat.WeaponDismemberment;
+import com.codex.blacklight.mixin.client.ModelPartChildrenAccessor;
 import com.codex.blacklight.registry.ModAttachments;
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.math.Axis;
-import net.minecraft.client.model.HumanoidModel;
-import net.minecraft.client.model.PlayerModel;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.model.*;
 import net.minecraft.client.model.geom.ModelPart;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.client.renderer.*;
 import net.minecraft.client.renderer.entity.LivingEntityRenderer;
 import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.core.BlockPos;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.*;
+import net.minecraft.world.level.ClipContext;
+import net.minecraft.world.phys.*;
 import net.neoforged.api.distmarker.Dist;
-import net.neoforged.bus.api.EventPriority;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.client.event.RenderLivingEvent;
+import net.neoforged.neoforge.client.event.*;
+import org.joml.Quaternionf;
+import org.joml.Vector3f;
+import java.util.*;
 
-/**
- * Corpse side of HeavyBlow.dismember: the struck part is hidden on the dying body and a copy
- * of it is thrown along the blow. Shared models are restored after every render, even when a
- * later handler cancelled the render and no Post event arrives.
- */
+/** Persistent detached copies, captured AFTER animation; never references a shared mutable model.
+ * Dead-body parts have their own velocity, rotation, block collisions and lifetime. */
 @EventBusSubscriber(modid="blacklight",value=Dist.CLIENT)
 public final class DismemberVisuals {
-    private static final java.util.List<ModelPart> HIDDEN=new java.util.ArrayList<>();
-    private static final java.util.Map<LivingEntity,Long> STARTED=new java.util.WeakHashMap<>();
-    private record Thrown(LivingEntity mob,ModelPart part,net.minecraft.client.model.geom.PartPose pose,net.minecraft.resources.ResourceLocation texture,int light,float age){}
-    private static final java.util.List<Thrown> QUEUE=new java.util.ArrayList<>(),PENDING=new java.util.ArrayList<>();
-    private DismemberVisuals(){}
+    private static final int LIMIT=96, LIFETIME=100;
+    private static final List<Fragment> FRAGMENTS=new ArrayList<>();
+    private static final Map<LivingEntity,Integer> SEEN=new WeakHashMap<>();
+    private static final ThreadLocal<VisibilityScope> SCOPE=new ThreadLocal<>();
+    private static ClientLevel scene;
+    private DismemberVisuals() {}
 
-    @SubscribeEvent(priority=EventPriority.LOWEST,receiveCanceled=true)
-    public static void before(RenderLivingEvent.Pre<?,?> event){
-        restore();
-        if(event.isCanceled())return;
-        var mob=event.getEntity();
-        int mask=ModAttachments.peekData(mob,ModAttachments.DISMEMBER,0);
-        if(mask==0||!(event.getRenderer().getModel() instanceof HumanoidModel<?> model))return;
-        long now=mob.level().getGameTime();
-        long started=STARTED.computeIfAbsent(mob,m->now);
-        var parts=parts(model,mask);
-        float age=now-started+event.getPartialTick();
-        for(var part:parts){
-            if(!part.visible)continue;
-            thrown(event,mob,part,age,mask);
-            part.visible=false;HIDDEN.add(part);
+    public static final class VisibilityScope implements AutoCloseable {
+        private final VisibilityScope parent=SCOPE.get();
+        private final Map<ModelPart,Boolean> saved=new IdentityHashMap<>();
+        private VisibilityScope(){SCOPE.set(this);}
+        @Override public void close(){saved.forEach((part,visible)->part.visible=visible);if(parent==null)SCOPE.remove();else SCOPE.set(parent);}
+    }
+    public static VisibilityScope scope(){return new VisibilityScope();}
+    static void hide(ModelPart part){
+        var scope=SCOPE.get();if(scope==null)return;
+        scope.saved.putIfAbsent(part,part.visible);part.visible=false;
+    }
+    private static int mask(LivingEntity e){return e.getData(ModAttachments.DISMEMBER)&WeaponDismemberment.ALL;}
+    public static boolean missingArm(LivingEntity e,HumanoidArm arm){return (mask(e)&(arm==HumanoidArm.LEFT?WeaponDismemberment.LEFT_ARM:WeaponDismemberment.RIGHT_ARM))!=0;}
+    public static boolean missingHead(LivingEntity e){return (mask(e)&WeaponDismemberment.HEAD)!=0;}
+    private static ModelPart part(HumanoidModel<?> m,int bit){return switch(bit){
+        case 1->m.head;case 2->m.rightArm;case 4->m.leftArm;case 8->m.rightLeg;case 16->m.leftLeg;default->m.body;};}
+    public static void hideParts(HumanoidModel<?> model,LivingEntity entity){
+        int bits=mask(entity);
+        for(int bit=1;bit<=32;bit<<=1)if((bits&bit)!=0)hide(part(model,bit));
+        if((bits&1)!=0)hide(model.hat);
+        if(model instanceof PlayerModel<?> p){
+            if((bits&2)!=0)hide(p.rightSleeve);if((bits&4)!=0)hide(p.leftSleeve);
+            if((bits&8)!=0)hide(p.rightPants);if((bits&16)!=0)hide(p.leftPants);if((bits&32)!=0)hide(p.jacket);
         }
     }
-    @SubscribeEvent public static void after(RenderLivingEvent.Post<?,?> event){
-        // The shared model now holds this body's posed joints; the torn part leaves from there.
-        for(var q:PENDING)if(q.mob()==event.getEntity())QUEUE.add(new Thrown(q.mob(),q.part(),q.part().storePose(),q.texture(),q.light(),q.age()));
-        PENDING.clear();restore();
+    @SuppressWarnings({"rawtypes","unchecked"})
+    public static void pose(EntityModel<?> model,LivingEntity entity,float partial){
+        WoundBlood.capturePose(model,entity,partial);
+        if(PigRagdoll.pose(model,entity,partial))return;
+        if(!(model instanceof HumanoidModel<?> humanoid)||mask(entity)==0||entity.isInvisible())return;
+        var mc=Minecraft.getInstance();if(mc.level==null)return;
+        if(scene!=mc.level){FRAGMENTS.clear();SEEN.clear();scene=mc.level;}
+        int pending=mask(entity)&~SEEN.getOrDefault(entity,0);
+        if(pending!=0){
+            var renderer=mc.getEntityRenderDispatcher().getRenderer(entity);
+            ResourceLocation texture=((LivingEntityRenderer)renderer).getTextureLocation(entity);
+            for(int bit=1;bit<=32;bit<<=1)if((pending&bit)!=0){
+                ModelPart original=part(humanoid,bit);
+                if(!original.visible)continue;
+                ModelPart copy=copy(original);copy.setPos(0,0,0);copy.setRotation(0,0,0);
+                if(bit==1&&humanoid.hat.visible){
+                    // Hat and head stay together as one physical fragment.
+                    ModelPart hat=copy(humanoid.hat);hat.setPos(0,0,0);hat.setRotation(0,0,0);
+                    ((ModelPartChildrenAccessor)(Object)copy).blacklight$children().put("severed_hat",hat);
+                }
+                if(FRAGMENTS.size()>=LIMIT)FRAGMENTS.removeFirst();
+                FRAGMENTS.add(new Fragment(entity,original,copy,texture,bit,partial));
+            }
+            SEEN.put(entity,mask(entity));
+        }
+        hideParts(humanoid,entity);
     }
-    private static void restore(){for(var part:HIDDEN)part.visible=true;HIDDEN.clear();PENDING.clear();}
-
-    private static java.util.List<ModelPart> parts(HumanoidModel<?> m,int mask){
-        var out=new java.util.ArrayList<ModelPart>();
-        if((mask&HeavyBlow.DISMEMBER_HEAD)!=0){out.add(m.head);out.add(m.hat);}
-        if((mask&HeavyBlow.DISMEMBER_RIGHT_ARM)!=0){out.add(m.rightArm);if(m instanceof PlayerModel<?> p)out.add(p.rightSleeve);}
-        if((mask&HeavyBlow.DISMEMBER_LEFT_ARM)!=0){out.add(m.leftArm);if(m instanceof PlayerModel<?> p)out.add(p.leftSleeve);}
-        return out;
+    private static ModelPart copy(ModelPart source){
+        var access=(ModelPartChildrenAccessor)(Object)source;
+        Map<String,ModelPart> children=new HashMap<>();access.blacklight$children().forEach((name,child)->children.put(name,copy(child)));
+        var result=new ModelPart(List.copyOf(access.blacklight$cubes()),children);
+        result.copyFrom(source);result.visible=source.visible;result.skipDraw=source.skipDraw;return result;
     }
-
-    @SuppressWarnings({"unchecked","rawtypes"})
-    private static void thrown(RenderLivingEvent.Pre<?,?> event,LivingEntity mob,ModelPart part,float age,int mask){
-        var texture=((LivingEntityRenderer)event.getRenderer()).getTextureLocation(mob);
-        if(QUEUE.size()+PENDING.size()<64)PENDING.add(new Thrown(mob,part,null,texture,event.getPackedLight(),age));
+    private static final class Fragment {
+        final LivingEntity owner;final int region;final Vec3 bindPivot;final Quaternionf inverseBind;
+        final ClientLevel level;
+        final ModelPart model;
+        final ResourceLocation texture;
+        final Vec3 center,half;
+        final long started;
+        Vec3 pos,old,velocity;
+        Quaternionf rotation,oldRotation;
+        Vector3f spin;
+        int still;
+        Fragment(LivingEntity entity,ModelPart source,ModelPart copy,ResourceLocation texture,int bit,float partial){
+            owner=entity;region=bit;var initial=source.getInitialPose();
+            bindPivot=new Vec3(initial.x/16,initial.y/16,initial.z/16);
+            inverseBind=new Quaternionf().rotationZYX(initial.zRot,initial.yRot,initial.xRot).conjugate();
+            level=(ClientLevel)entity.level();this.model=copy;this.texture=texture;started=level.getGameTime();
+            center=bit==1?new Vec3(0,-.25,0):bit==2?new Vec3(-.0625,.25,0):bit==4?new Vec3(.0625,.25,0):new Vec3(0,.375,0);
+            half=bit==1?new Vec3(.25,.25,.25):bit==32?new Vec3(.25,.375,.125):new Vec3(.125,.375,.125);
+            float yaw=net.minecraft.util.Mth.rotLerp(partial,entity.yBodyRotO,entity.yBodyRot);
+            float angle=(float)Math.toRadians(180-yaw);
+            rotation=new Quaternionf().rotationY(angle).rotateZ((float)Math.PI).rotateZYX(source.zRot,source.yRot,source.xRot);
+            oldRotation=new Quaternionf(rotation);
+            Vec3 pivot=new Vec3(-source.x/16,1.501-source.y/16,source.z/16).yRot(angle).add(entity.getPosition(partial));
+            Vector3f offset=rotation.transform(new Vector3f((float)center.x,(float)center.y,(float)center.z));
+            pos=pivot.add(offset.x,offset.y,offset.z);old=pos;
+            double side=bit==2||bit==8?-1:bit==4||bit==16?1:0;
+            Vec3 outward=Vec3.directionFromRotation(0,yaw+90).scale(side*.22);
+            velocity=ImpactRagdoll.cutVelocity(entity,bit).add(outward.scale(.35)).add(0,bit==1?.20:.12,0);
+            if(velocity.lengthSqr()>2.25)velocity=velocity.normalize().scale(1.5);
+            spin=new Vector3f(.12F+(bit%3)*.06F,(float)side*.12F,.10F+(bit%5)*.03F);
+            // Start clear of a nearby floor, including fragments detached from a prone corpse.
+            floorSupport();old=pos;
+        }
+        Vec3 extent(){
+            var m=new org.joml.Matrix3f().rotation(rotation);
+            return new Vec3(Math.abs(m.m00())*half.x+Math.abs(m.m10())*half.y+Math.abs(m.m20())*half.z,
+                    Math.abs(m.m01())*half.x+Math.abs(m.m11())*half.y+Math.abs(m.m21())*half.z,
+                    Math.abs(m.m02())*half.x+Math.abs(m.m12())*half.y+Math.abs(m.m22())*half.z);
+        }
+        void floorSupport(){
+            Vec3 ext=extent();
+            var hit=level.clip(new ClipContext(pos.add(0,.7,0),pos.add(0,-ext.y-.03,0),ClipContext.Block.COLLIDER,ClipContext.Fluid.NONE,net.minecraft.world.phys.shapes.CollisionContext.empty()));
+            if(hit.getType()==HitResult.Type.BLOCK&&hit.getDirection()==net.minecraft.core.Direction.UP&&pos.y-ext.y<hit.getLocation().y)
+                pos=new Vec3(pos.x,hit.getLocation().y+ext.y+.002,pos.z);
+        }
+        void tick(){
+            old=pos;oldRotation=new Quaternionf(rotation);if(still>=12)return;
+            boolean grounded=false;
+            for(int sub=0;sub<2;sub++){
+                rotation.rotateXYZ(spin.x*.5F,spin.y*.5F,spin.z*.5F).normalize();floorSupport();
+                Vec3 ext=extent();boolean water=!level.getFluidState(BlockPos.containing(pos)).isEmpty();
+                velocity=velocity.scale(water?.82:.99).add(0,water?-.005:-.04,0);
+                Vec3 requested=velocity.scale(.5);
+                Vec3 allowed=Entity.collideBoundingBox(null,requested,new AABB(pos.subtract(ext),pos.add(ext)),level,List.of());
+                pos=pos.add(allowed);
+                boolean x=Math.abs(allowed.x-requested.x)>1e-5,y=Math.abs(allowed.y-requested.y)>1e-5,z=Math.abs(allowed.z-requested.z)>1e-5;
+                if(x||y||z){
+                    grounded|=y&&requested.y<0;
+                    double bounce=velocity.lengthSqr()>.035?.22:0;
+                    velocity=new Vec3(x?-velocity.x*bounce:velocity.x*.65,y?-velocity.y*bounce:velocity.y*.65,z?-velocity.z*bounce:velocity.z*.65);
+                    spin.mul(.60F);
+                }
+            }
+            still=grounded&&velocity.lengthSqr()<.002&&spin.lengthSquared()<.002?still+1:0;
+        }
+        void render(PoseStack stack,MultiBufferSource buffers,Vec3 camera,float partial){
+            Vec3 at=old.lerp(pos,partial).subtract(camera);stack.pushPose();
+            try{
+                stack.translate(at.x,at.y,at.z);stack.mulPose(new Quaternionf(oldRotation).slerp(rotation,partial));
+                stack.translate(-center.x,-center.y,-center.z);
+                model.render(stack,buffers.getBuffer(RenderType.entityCutoutNoCull(texture)),LevelRenderer.getLightColor(level,BlockPos.containing(pos)),OverlayTexture.NO_OVERLAY);
+            }finally{stack.popPose();}
+        }
     }
-
-    /** The torn part follows a short ballistic arc along the blow, tumbling until it lands. */
-    @SubscribeEvent public static void world(net.neoforged.neoforge.client.event.RenderLevelStageEvent event){
-        if(event.getStage()!=net.neoforged.neoforge.client.event.RenderLevelStageEvent.Stage.AFTER_ENTITIES||QUEUE.isEmpty())return;
-        var mc=net.minecraft.client.Minecraft.getInstance();
+    static WoundBlood.Anchor woundAnchor(LivingEntity entity,int region,Vec3 point,Vec3 direction){
+        for(int i=FRAGMENTS.size()-1;i>=0;i--){
+            var f=FRAGMENTS.get(i);if(f.owner!=entity||f.region!=region)continue;
+            Vec3 local=WoundBlood.rotate(new Vec3(-point.x,1.501-point.y,point.z).subtract(f.bindPivot),f.inverseBind);
+            Vec3 normal=WoundBlood.rotate(new Vec3(-direction.x,-direction.y,direction.z),f.inverseBind);
+            return new WoundBlood.Anchor(f.pos.add(WoundBlood.rotate(local.subtract(f.center),f.rotation)),WoundBlood.rotate(normal,f.rotation),f.velocity);
+        }
+        return null;
+    }
+    @SubscribeEvent public static void tick(ClientTickEvent.Post event){
+        var mc=Minecraft.getInstance();
+        if(mc.level!=scene){FRAGMENTS.clear();SEEN.clear();scene=mc.level;}
+        if(mc.level==null||mc.isPaused())return;
+        FRAGMENTS.removeIf(f->f.level!=mc.level||mc.level.getGameTime()-f.started>LIFETIME||mc.player==null||mc.player.position().distanceToSqr(f.pos)>64*64||!mc.level.hasChunkAt(BlockPos.containing(f.pos)));
+        for(var fragment:FRAGMENTS)fragment.tick();
+    }
+    @SubscribeEvent public static void render(RenderLevelStageEvent event){
+        if(event.getStage()!=RenderLevelStageEvent.Stage.AFTER_ENTITIES)return;
+        var mc=Minecraft.getInstance();if(mc.level==null)return;
         float partial=event.getPartialTick().getGameTimeDeltaPartialTick(false);
-        var camera=event.getCamera().getPosition();var stack=event.getPoseStack();var buffers=mc.renderBuffers().bufferSource();
-        for(var q:QUEUE){
-            var mob=q.mob();var part=q.part();
-            var hit=ModAttachments.peekData(mob,ModAttachments.HIT_REACTION,HitReaction.EMPTY);
-            float yaw=hit.started()==0?mob.getYRot():hit.yaw();
-            double rad=Math.toRadians(yaw),dx=-Math.sin(rad),dz=Math.cos(rad);
-            float pivot=(24-q.pose().y)/16F;
-            // Rise and fall (v=.32, g=.045 blocks/tick) until the part reaches the floor.
-            double floor=-(1.5-pivot)+.12,disc=.32*.32-4*.045*floor;
-            float land=(float)((.32+Math.sqrt(Math.max(0,disc)))/(2*.045));
-            float t=Math.min(q.age(),land);
-            double up=.32*t-.045*t*t,out=.24*t;
-            var at=mob.getPosition(partial).subtract(camera);
-            stack.pushPose();
-            stack.translate(at.x+dx*out,at.y+up,at.z+dz*out);
-            stack.mulPose(Axis.YP.rotationDegrees(180-mob.yBodyRot));
-            stack.scale(-1,-1,1);
-            stack.translate(0,-1.501F,0);
-            var saved=part.storePose();boolean was=part.visible;
-            part.loadPose(q.pose());
-            // Tumble around the part's own joint.
-            stack.translate(part.x/16F,part.y/16F,part.z/16F);
-            stack.mulPose(Axis.XP.rotationDegrees(t*31));stack.mulPose(Axis.ZP.rotationDegrees(t*17));
-            stack.translate(-part.x/16F,-part.y/16F,-part.z/16F);
-            part.visible=true;
-            part.render(stack,buffers.getBuffer(RenderType.entityCutoutNoCull(q.texture())),q.light(),OverlayTexture.NO_OVERLAY);
-            part.visible=was;part.loadPose(saved);
-            stack.popPose();
-        }
-        QUEUE.clear();
-        buffers.endBatch();
+        for(var fragment:FRAGMENTS)if(fragment.level==mc.level)fragment.render(event.getPoseStack(),mc.renderBuffers().bufferSource(),event.getCamera().getPosition(),partial);
     }
 }

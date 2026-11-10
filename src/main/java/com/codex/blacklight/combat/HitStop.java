@@ -29,6 +29,8 @@ public final class HitStop {
     }
 
     public static boolean held(LivingEntity v) { return HELD.containsKey(v); }
+    public static Vec3 launchVelocity(LivingEntity v){var hold=HELD.get(v);return hold==null?v.getDeltaMovement():hold.velocity();}
+    public static int remainingTicks(LivingEntity v){var hold=HELD.get(v);return hold==null||!v.isAlive()?0:Math.clamp(hold.until()-v.tickCount,0,8);}
 
     @SubscribeEvent
     public static void tick(EntityTickEvent.Pre event) {

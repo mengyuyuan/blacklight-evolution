@@ -52,6 +52,10 @@
     "OptionalEpicFightModeMixin"
   ],
   "client": [
+    "client.RagdollSaddleMixin",
+    "client.SeveredArmorMixin",
+    "client.SeveredHeldItemMixin",
+    "client.SeveredHeadLayerMixin",
     "client.VehiclePlayerPoseMixin",
     "client.OptionalEpicFightPlayerRenderMixin",
     "client.OptionalPlayerAnimatorRenderMixin",

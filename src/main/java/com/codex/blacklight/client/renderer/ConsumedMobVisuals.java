@@ -26,6 +26,7 @@ public final class ConsumedMobVisuals {
     public static void before(RenderLivingEvent.Pre<?, ?> event) {
         if (!LivingRenderScope.active(event.getPoseStack())) return;
         var mob = event.getEntity();
+        if(com.codex.blacklight.client.animation.ImpactRagdoll.active(mob))return;
         if (RENDERING.contains(mob)) return;
         // The dispatcher coats vanilla and custom renderers once, after their posed mesh is emitted.
         if(com.codex.blacklight.power.BiomassSystem.claimant(mob)!=null)return;
