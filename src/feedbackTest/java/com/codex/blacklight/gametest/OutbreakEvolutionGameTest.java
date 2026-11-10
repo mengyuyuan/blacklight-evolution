@@ -134,7 +134,7 @@ public final class OutbreakEvolutionGameTest {
             for(int i=0;i<130;i++)h.assertTrue(InfiniteEvolutionSystem.purchase(p,EvolutionAttribute.VITALITY),"repeatable purchase accepted at rank "+i);
             h.assertTrue(InfiniteEvolutionSystem.rank(p,EvolutionAttribute.VITALITY)==130,"no gameplay rank 99 boundary");
             h.assertTrue(p.getData(ModAttachments.PLAYER_STATE).getEvolutionPoints()==1_000_000-130*price,"same fixed cost at rank zero and 129");
-            h.assertTrue(Math.abs(p.getMaxHealth()-initial-1300)<.1&&Math.abs(p.getHealth()/p.getMaxHealth()-.5)<.001,"health is actual HP and purchases preserve the injured fraction beyond 1024 HP");
+            h.assertTrue(Math.abs(p.getMaxHealth()-initial-130*PlayerEvolutionConfig.value(PlayerEvolutionConfig.HEALTH_PER_LEVEL))<.1&&Math.abs(p.getHealth()/p.getMaxHealth()-.5)<.001,"health is actual HP and purchases preserve the injured fraction beyond 1024 HP");
             var state=p.getData(ModAttachments.PLAYER_STATE);state.addEvolutionPoints(-Integer.MAX_VALUE);
             h.assertTrue(!InfiniteEvolutionSystem.purchase(p,EvolutionAttribute.VITALITY)&&InfiniteEvolutionSystem.rank(p,EvolutionAttribute.VITALITY)==130,"insufficient EP cannot mutate ranks");
             var encoded=new CompoundTag();p.saveWithoutId(encoded);var reloaded=player(h);try{reloaded.load(encoded);h.assertTrue(InfiniteEvolutionSystem.rank(reloaded,EvolutionAttribute.VITALITY)==130,"actual player NBT preserves repeatable ranks");}finally{reloaded.discard();}
@@ -147,13 +147,13 @@ public final class OutbreakEvolutionGameTest {
         try{
             for(var a:EvolutionAttribute.values())h.assertTrue(InfiniteEvolutionSystem.purchase(p,a),"every attribute has a real purchase path");
             float before=cow.getHealth();cow.hurt(p.damageSources().playerAttack(p),10);
-            h.assertTrue(Math.abs(before-cow.getHealth()-10.2)<.02,"ordinary attack applies strength exactly once");
+            h.assertTrue(Math.abs(before-cow.getHealth()-10*(1+PlayerEvolutionConfig.value(PlayerEvolutionConfig.ATTACK_PER_LEVEL)))<.02,"ordinary attack applies strength exactly once");
             cow.invulnerableTime=0;before=cow.getHealth();DevastatorDamage.hurt(p,cow,2000);
-            h.assertTrue(Math.abs(before-cow.getHealth()-2080)<.02,"native true damage receives real skill power");
-            h.assertTrue(Math.abs(InfiniteEvolutionSystem.damage(p,p.damageSources().generic(),100)-100/1.025)<.01,"resilience has its own actual damage multiplier");
+            h.assertTrue(Math.abs(before-cow.getHealth()-2000*(1+PlayerEvolutionConfig.value(PlayerEvolutionConfig.SKILL_PER_LEVEL)))<.02,"native true damage receives real skill power");
+            h.assertTrue(Math.abs(InfiniteEvolutionSystem.damage(p,p.damageSources().generic(),100)-100/(1+PlayerEvolutionConfig.value(PlayerEvolutionConfig.DEFENSE_PER_LEVEL)))<.01,"resilience has its own actual damage multiplier");
             p.setData(ModAttachments.INFINITE_EVOLUTION,p.getData(ModAttachments.INFINITE_EVOLUTION).buy(EvolutionAttribute.RECOVERY).buy(EvolutionAttribute.RECOVERY).buy(EvolutionAttribute.RECOVERY));
             p.setHealth(p.getMaxHealth()*.5F);before=p.getHealth();p.tickCount=20;InfiniteEvolutionSystem.tick(new PlayerTickEvent.Post(p));
-            h.assertTrue(Math.abs(p.getHealth()-before-1)<.02,"four recovery ranks restore one actual HP, not five scaled HP");
+            h.assertTrue(Math.abs(p.getHealth()-before-4*PlayerEvolutionConfig.value(PlayerEvolutionConfig.RECOVERY_PER_LEVEL))<.02,"four recovery ranks restore their configured actual HP, not scaled HP");
             h.assertTrue(p.getAttributeValue(Attributes.MOVEMENT_SPEED)>.108,"mobility changes the real movement attribute");
         }finally{p.discard();cow.discard();}h.succeed();
     }

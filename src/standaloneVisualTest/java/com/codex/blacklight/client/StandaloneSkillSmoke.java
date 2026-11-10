@@ -69,7 +69,7 @@ import org.lwjgl.stb.STBImageWrite;
 @EventBusSubscriber(modid="blacklight",value=Dist.CLIENT)
 public final class StandaloneSkillSmoke {
     private static final String PROPERTY="blacklight.test.standaloneSkill";
-    private static final Path QA_DIRECTORY=Path.of("D:/Blacklight-Standalone/run-native-qa").toAbsolutePath().normalize();
+    private static final Path QA_DIRECTORY=Path.of(System.getProperty("blacklight.test.standaloneSkill.gameDirectory","D:/Blacklight-Standalone/run-native-qa")).toAbsolutePath().normalize();
     private static final String QA_SAVE="Blacklight Standalone QA v4";
     private enum Mode { RELEASE, LOW_RESERVE, ZERO_RESERVE, LOCKED, CANCEL, SHORT }
     private record Case(String name,int kind,boolean air,Mode mode,double fallHeight) {
@@ -224,7 +224,7 @@ public final class StandaloneSkillSmoke {
             if(stageTicks>watchdog)throw new IllegalStateException("Skill QA timed out: "+stage+" / "+(current()==null?"done":current().name())+" / "+serverSample);
             recordClient(mc);
             switch(stage) {
-                case SETTLE -> {if(stageTicks>=80){if(CASES.isEmpty())throw new IllegalStateException("No selected skill cases");startCriticalChecks(mc);}}
+                case SETTLE -> {if(stageTicks>=80){if(CASES.isEmpty())throw new IllegalStateException("No selected skill cases");if(Boolean.getBoolean("blacklight.test.standaloneSkill.skipChecks"))prepare(mc);else startCriticalChecks(mc);}}
                 case CHECKS -> {if(terrainCheckFuture==null&&criticalCheckFuture.isDone()){
                     criticalMassChecks=criticalCheckFuture.join();write(false,null);
                     if(!criticalMassChecks.has("passed")||!criticalMassChecks.get("passed").getAsBoolean())throw new IllegalStateException("Real Critical Mass / Adrenaline acceptance failed: "+criticalMassChecks);

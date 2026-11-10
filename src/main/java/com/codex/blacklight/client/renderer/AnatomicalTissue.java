@@ -26,6 +26,17 @@ import java.util.*;
 final class AnatomicalTissue {
     private static final ResourceLocation MATERIAL = ResourceLocation.fromNamespaceAndPath("blacklight", "textures/entity/tissue_anatomy.png");
     private static final Map<String, Optional<JsonObject>> SOURCES = new HashMap<>();
+    private static final Set<String> DUMPED=new HashSet<>();
+    /** QA only: colour each tissue system/organ family so screenshots identify the source. */
+    static final boolean DEBUG_TINT=Boolean.getBoolean("blacklight.debugTint");
+    private static int debugTint(String name,boolean skin){
+        if(skin)return 0xffe040; // yellow: procedural skin shell
+        if(name.startsWith("shoulder_crest")||name.startsWith("scapular"))return 0xff2020; // red
+        if(name.startsWith("claw")||name.startsWith("blade_")||name.startsWith("ulnar")||name.startsWith("cutting"))return 0xff8a00; // orange
+        if(name.startsWith("fang")||name.startsWith("cheek")||name.startsWith("palate"))return 0xc040ff; // purple
+        if(name.startsWith("costal"))return 0xff70c0; // pink
+        return 0xffffff; // white: other organs
+    }
     private static final Map<EntityModel<?>, Map<String, List<Region>>> CACHE = new WeakHashMap<>();
     private record ModuleKey(TissueCore core,int plan,boolean fallback,int side){}
     private static final Map<TissueMorphogenesis.Bone,Map<ModuleKey,List<Mesh>>> MODULES=new WeakHashMap<>();
@@ -193,6 +204,8 @@ final class AnatomicalTissue {
             }
             functional.add(new Region(r.name,r.part,r.cube,r.anatomy,List.copyOf(meshes),r.outlet,r.frame,r.groundSupport));
         }regions=List.copyOf(functional);
+        if(Boolean.getBoolean("blacklight.chimeraDump")&&DUMPED.add(host.getUUID()+"|"+expressed)){System.out.println("[organs] host="+host.speciesId()+" uuid="+host.getUUID()+" expressed="+expressed);
+            for(var r:regions)for(var m:r.meshes){var g=grafts.get(m);if(!m.skin)System.out.println("[organs]  "+r.name+" "+m.name+" faces="+m.faces.length+(g==null?"":" core="+g.core()+" expr="+g.progress()));}}
         if(mature)MATURE_GRAFTS.put(host.getUUID(),new Resolved(original,genome.revision(),regions,Map.copyOf(grafts)));
     }
     AnatomicalTissue coat(EntityModel<?> model,ResourceLocation texture){return bind(host,model,texture,partial,true);}
@@ -214,10 +227,31 @@ final class AnatomicalTissue {
         var selected=regions.stream().filter(r->r.part==part).toList();
         if(selected.isEmpty())return false;
         PoseStack.Pose posed = pose(selected.getFirst(), pose);
+        // The native block grows with the same field as its plates, ribs and
+        // claws, so they stay attached instead of floating outside an old box.
+        PoseStack.Pose grown=grown(selected,posed);
         for (var cube : ((ModelPartChildrenAccessor)(Object)part).blacklight$cubes())
-            if(selected.stream().noneMatch(r->r.cube==cube&&r.meshes.stream().anyMatch(Mesh::skin)))cube.compile(posed, out, light, overlay, color);
+            if(selected.stream().noneMatch(r->r.cube==cube&&r.meshes.stream().anyMatch(Mesh::skin)))cube.compile(grown, out, light, overlay, color);
         for(var region:selected)pending.putIfAbsent(region,new Pending(region,pose(region,pose),light,overlay,color));
         return true;
+    }
+    /** Per-axis affine of the region's real cube under the evolution field.
+     * The field is separable, so the grown block is still a block. */
+    private PoseStack.Pose grown(List<Region> selected,PoseStack.Pose posed){
+        if(!procedural||organsOnly||!evolution.active())return posed;
+        Region r=selected.stream().filter(x->x.frame!=null&&x.meshes.stream().noneMatch(Mesh::skin)).findFirst().orElse(null);
+        if(r==null)return posed;var c=r.cube;
+        float[] lo={Float.POSITIVE_INFINITY,Float.POSITIVE_INFINITY,Float.POSITIVE_INFINITY},hi={Float.NEGATIVE_INFINITY,Float.NEGATIVE_INFINITY,Float.NEGATIVE_INFINITY};
+        for(int i=0;i<8;i++){
+            var v=TissueEvolution.develop(r.frame,new TissueMorphogenesis.V((i&1)==0?c.minX:c.maxX,(i&2)==0?c.minY:c.maxY,(i&4)==0?c.minZ:c.maxZ),evolution,r.groundSupport);
+            float[] a={v.x(),v.y(),v.z()};for(int k=0;k<3;k++){if(!Float.isFinite(a[k]))return posed;lo[k]=Math.min(lo[k],a[k]);hi[k]=Math.max(hi[k],a[k]);}
+        }
+        float[] oldLo={c.minX,c.minY,c.minZ},oldHi={c.maxX,c.maxY,c.maxZ},scale=new float[3];
+        for(int k=0;k<3;k++){float span=oldHi[k]-oldLo[k];scale[k]=span<.01F?1:Math.clamp((hi[k]-lo[k])/span,.5F,3F);if(span<.01F)lo[k]=oldLo[k];}
+        if(Math.abs(scale[0]-1)<.002F&&Math.abs(scale[1]-1)<.002F&&Math.abs(scale[2]-1)<.002F&&Math.abs(lo[0]-oldLo[0])+Math.abs(lo[1]-oldLo[1])+Math.abs(lo[2]-oldLo[2])<.01F)return posed;
+        var stack=new PoseStack();stack.last().pose().set(posed.pose());stack.last().normal().set(posed.normal());
+        stack.translate(lo[0]/16,lo[1]/16,lo[2]/16);stack.scale(scale[0],scale[1],scale[2]);stack.translate(-oldLo[0]/16,-oldLo[1]/16,-oldLo[2]/16);
+        return stack.last();
     }
     void capture(ModelPart part, PoseStack.Pose pose, int light, int overlay, int color) {
         for (var r : regions) if (r.part == part) pending.putIfAbsent(r, new Pending(r, pose(r, pose), light, overlay, color));
@@ -386,7 +420,9 @@ final class AnatomicalTissue {
                 }
                 // Native dye/tint belongs to surviving skin, not to new flesh.
                 // Preserve alpha so invisibility/fades remain owned by the caller.
-                out.addVertex(posed.last(),v.x/16,v.y/16,v.z/16).setColor(tissue?TissueShading.shade(p.color,material,normal.y,(j&1)==0?.35F:1,reveal,faceJitter,beat):p.color)
+                int debug=tissue&&DEBUG_TINT?debugTint(mesh.name,mesh.skin):0;
+                if(debug!=0){u=(3*16+8F)/128;w=8F/32;}
+                out.addVertex(posed.last(),v.x/16,v.y/16,v.z/16).setColor(debug!=0?(p.color&0xff000000)|debug:tissue?TissueShading.shade(p.color,material,normal.y,mesh.skin?((j&1)==0?.35F:1):.55F,reveal,faceJitter,beat):p.color)
                         .setUv(u,w).setOverlay(p.overlay).setLight(p.light).setNormal(posed.last(),normal.x,normal.y,normal.z);
             }
         }

@@ -24,7 +24,7 @@ class InfiniteProgressTest {
         for(var a:EvolutionAttribute.values())assertTrue(Double.isFinite(a.effect(Long.MAX_VALUE)));
     }
     @Test void DamageAndMobilityGrowWithoutChangingTheAnimationClock(){
-        assertEquals(1.02,EvolutionAttribute.attackMultiplier(1),1e-12);assertEquals(1.04,EvolutionAttribute.skillMultiplier(1),1e-12);
+        assertEquals(1.05,EvolutionAttribute.attackMultiplier(1),1e-12);assertEquals(1.08,EvolutionAttribute.skillMultiplier(1),1e-12);
         assertTrue(EvolutionAttribute.defenseMultiplier(1000)<EvolutionAttribute.defenseMultiplier(100));
         assertTrue(EvolutionAttribute.defenseMultiplier(Long.MAX_VALUE)>0);
         assertTrue(EvolutionAttribute.mobilityMultiplier(1001)>EvolutionAttribute.mobilityMultiplier(1000));

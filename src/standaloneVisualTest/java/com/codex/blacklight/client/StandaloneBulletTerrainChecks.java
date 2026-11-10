@@ -37,7 +37,7 @@ import net.neoforged.neoforge.event.tick.ServerTickEvent;
 /** Explicit disposable-world acceptance: actual queued begin() calls, block changes and cancellation. */
 @EventBusSubscriber(modid="blacklight",value=Dist.CLIENT)
 public final class StandaloneBulletTerrainChecks {
-    private static final Path QA=Path.of("D:/Blacklight-Standalone/run-native-qa").toAbsolutePath().normalize();
+    private static final Path QA=Path.of(System.getProperty("blacklight.test.standaloneSkill.gameDirectory","D:/Blacklight-Standalone/run-native-qa")).toAbsolutePath().normalize();
     private static Run active;
     private StandaloneBulletTerrainChecks() { }
     public static CompletableFuture<JsonObject> run(ServerPlayer p) {

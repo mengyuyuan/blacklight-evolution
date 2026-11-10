@@ -32,7 +32,7 @@ import net.neoforged.neoforge.event.tick.PlayerTickEvent;
  */
 @EventBusSubscriber(modid="blacklight", value=Dist.CLIENT)
 public final class StandaloneCriticalMassChecks {
-    private static final Path QA=Path.of("D:/Blacklight-Standalone/run-native-qa").toAbsolutePath().normalize();
+    private static final Path QA=Path.of(System.getProperty("blacklight.test.standaloneSkill.gameDirectory","D:/Blacklight-Standalone/run-native-qa")).toAbsolutePath().normalize();
     private static final Map<ServerPlayer,Run> RUNS=new IdentityHashMap<>();
     private StandaloneCriticalMassChecks() { }
 

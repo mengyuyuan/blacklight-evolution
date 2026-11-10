@@ -21,10 +21,13 @@ class TissueHypertrophyTest {
     @Test void enlargedShoulderPreservesBothSkinSocketsAndItsGlandOutlet() {
         var region=generate(11,List.of(body()),true).regions().getFirst();
         var skin=region.meshes().stream().filter(Mesh::skin).findFirst().orElseThrow();
-        for(int stage=3;stage<5;stage++) {
-            assertArrayEquals(Arrays.copyOfRange(skin.stages()[2],0,24),Arrays.copyOfRange(skin.stages()[stage],0,24),.0001F);
-            int end=skin.stages()[2].length;
-            assertArrayEquals(Arrays.copyOfRange(skin.stages()[2],end-24,end),Arrays.copyOfRange(skin.stages()[stage],end-24,end),.0001F);
+        // Blocky growth: the socket planes keep their axial position and stay
+        // flat rectangles that cover at least the native section.
+        int end=skin.stages()[2].length;
+        for(int stage=3;stage<5;stage++)for(int from:new int[]{0,end-24}) {
+            float plane=skin.stages()[2][from+1];
+            for(int i=from;i<from+24;i+=3)assertEquals(plane,skin.stages()[stage][i+1],.0001F,"socket plane stays flat and in place");
+            assertTrue(extent(Arrays.copyOfRange(skin.stages()[stage],from,from+24),0)>=extent(Arrays.copyOfRange(skin.stages()[2],from,from+24),0)-.0001F);
         }
         var gland=region.meshes().stream().filter(m->m.name().equals("tendril_gland")).findFirst().orElseThrow();
         for(int stage=0;stage<5;stage++)for(int a=0;a<3;a++) {
@@ -55,9 +58,9 @@ class TissueHypertrophyTest {
         float depth=extent(skin.stages()[4],2)/extent(skin.stages()[2],2);
         assertTrue(width>1.1F&&depth>1.1F&&Math.max(width,depth)/Math.min(width,depth)<1.2F,"the growing shoulder gains a coherent cross-section");
         assertEquals(extent(skin.stages()[2],1),extent(skin.stages()[4],1),.0001F);
-        for(int a=0;a<3;a++) {
+        for(int a:new int[]{0,2}) {
             float change=0;for(int i=a;i<skin.stages()[2].length;i+=3)change=Math.max(change,Math.abs(skin.stages()[4][i]-skin.stages()[2][i]));
-            assertTrue(change>.01F,"internal sections develop along every axis while the neck/hip sockets stay put");
+            assertTrue(change>.01F,"the cross-section grows in both axes while trunk length stays fixed");
         }
     }
     @Test void shoulderBladeDevelopsABroadRootInsteadOfOnlyLengthening() {

@@ -28,7 +28,7 @@ public final class BlacklightHive extends Monster implements GeoEntity {
     private static final net.minecraft.network.syncher.EntityDataAccessor<Float> GROWTH=net.minecraft.network.syncher.SynchedEntityData.defineId(BlacklightHive.class,net.minecraft.network.syncher.EntityDataSerializers.FLOAT);
     private static final net.minecraft.network.syncher.EntityDataAccessor<Long> HATCHED=net.minecraft.network.syncher.SynchedEntityData.defineId(BlacklightHive.class,net.minecraft.network.syncher.EntityDataSerializers.LONG);
     /** Ticks for a fresh hive to swell from a seed to its full size (original: it grows on Blacklight tissue). */
-    public static final int GROW_TICKS=20*90,OPEN_TICKS=20,SHRINK_TICKS=30;
+    public static final int GROW_TICKS=20*20,OPEN_TICKS=20,SHRINK_TICKS=30;
     @Override protected void defineSynchedData(net.minecraft.network.syncher.SynchedEntityData.Builder b){super.defineSynchedData(b);b.define(GROWTH,.3F);b.define(HATCHED,-1000L);}
     public float growth(){return entityData.get(GROWTH);}
     public void setGrowth(float g){entityData.set(GROWTH,Math.clamp(g,.3F,1F));refreshDimensions();}
@@ -84,12 +84,12 @@ public final class BlacklightHive extends Monster implements GeoEntity {
         if(growth()<1F||sinceHatch<OPEN_TICKS+SHRINK_TICKS)return;
         // Ripe: one creature of this sac's strain per cycle, while its own brood is below the cap.
         int alive=level().getEntitiesOfClass(Mob.class,getBoundingBox().inflate(48),this::ownGuard).size();
-        if(alive>=BROOD_CAP[brood]||!com.codex.blacklight.infection.WorldOutbreakSystem.populationRoom(server,blockPosition())){cooldown=80;return;}
+        if(alive>=BROOD_CAP[brood]||!com.codex.blacklight.infection.WorldOutbreakSystem.broodRoom(server,blockPosition())){cooldown=40;return;}
         Mob mob=broodType().create(level());
-        if(mob==null||!place(mob,getBbWidth()*.5+1.2,1.5)&&!placeGuard(mob)){cooldown=80;return;}
+        if(mob==null||!place(mob,getBbWidth()*.5+1.2,1.5)&&!placeGuard(mob)){cooldown=20;return;}
         mob.setPersistenceRequired();mob.restrictTo(blockPosition(),24);
         mob.getPersistentData().putUUID("BlacklightHiveGuard",getUUID());
-        if(!com.codex.blacklight.infection.WorldOutbreakSystem.addScheduled(server,mob)){cooldown=80;return;}
+        if(!com.codex.blacklight.infection.WorldOutbreakSystem.addBrood(server,mob)){cooldown=40;return;}
         waves++;cooldown=0;entityData.set(HATCHED,level().getGameTime());
         playSound(net.minecraft.sounds.SoundEvents.SNIFFER_EGG_HATCH,2F,.5F);playSound(net.minecraft.sounds.SoundEvents.SLIME_SQUISH,1.6F,.3F);
         server.sendParticles(new net.minecraft.core.particles.DustParticleOptions(new org.joml.Vector3f(.55F,.05F,.05F),2.2F),getX(),getY()+getBbHeight(),getZ(),60,.9,.4,.9,.08);
@@ -97,7 +97,7 @@ public final class BlacklightHive extends Monster implements GeoEntity {
     private boolean ownGuard(Mob m){return m.isAlive()&&m.getPersistentData().hasUUID("BlacklightHiveGuard")&&m.getPersistentData().getUUID("BlacklightHiveGuard").equals(getUUID());}
     /** Strain keys, regrow time after each hatch, and the cap on this sac's living brood. */
     private static final String[] BROOD_KEYS={"common","stalker","spitter","brute","hunter"};
-    private static final int[] BROOD_REGROW={20*30,20*35,20*45,20*70,20*75},BROOD_CAP={4,4,3,2,2};
+    private static final int[] BROOD_REGROW={20*8,20*10,20*14,20*20,20*24},BROOD_CAP={5,4,3,2,2};
     public EntityType<? extends Mob> broodType(){
         return switch(Math.max(0,brood)){
             case 1->ModEntities.BLACKLIGHT_STALKER.get();case 2->ModEntities.BLACKLIGHT_SPITTER.get();

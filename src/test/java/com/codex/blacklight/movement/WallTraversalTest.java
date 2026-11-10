@@ -25,6 +25,23 @@ class WallTraversalTest {
         var resumed=step(wall,input(1,0,true,false));
         assertEquals(WallTraversal.Mode.RUN,resumed.mode());assertTrue(resumed.y()>climb.y()*2);
     }
+    @Test void backAndJumpTurnsAwayAndSpringsOff() {
+        var wall=new WallTraversal();step(wall,input(1,0,false,false));
+        var kick=step(wall,input(-1,0,false,true));
+        assertTrue(kick.handled());assertTrue(wall.kickedOff());assertEquals(WallTraversal.Mode.NONE,kick.mode());
+        assertTrue(kick.z()<-.5,"springs away from the wall, not into it");assertTrue(kick.y()>.9);
+        assertFalse(wall.attached());
+    }
+    @Test void kicksCanChainWithoutAnyLimit() {
+        var wall=new WallTraversal();int kicks=0;
+        for(int round=0;round<8;round++){
+            for(int t=0;t<4;t++)step(wall,input(0,0,false,false));
+            step(wall,input(1,0,false,false));
+            step(wall,input(-1,0,false,true));if(wall.kickedOff())kicks++;
+            step(wall,input(-1,0,false,false));
+        }
+        assertEquals(8,kicks);
+    }
     @Test void wallJumpGoesUpwardAndReturnsToRunningWithoutKickingAway() {
         var wall=new WallTraversal();var run=step(wall,input(1,0,true,false));
         for(int t=0;t<20;t++)assertEquals(WallTraversal.Mode.RUN,step(wall,input(1,0,true,true)).mode());

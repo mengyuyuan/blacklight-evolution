@@ -69,6 +69,9 @@ final class ChimeraTissue {
                     .min(Comparator.comparingDouble(b->b.centre().z())).orElse(snapshot.anchorBox());
             assembly=TissueChimera.assemble(snapshot.anchorBox(),host.nativeTissuePlan(),donors,thorax,snapshot.body().bounds().high().y(),socketBudget);
             visuals=Map.copyOf(visualMap);modules=upperModules(host,assembly,visuals);
+            if(Boolean.getBoolean("blacklight.chimeraDump")){System.out.println("[chimera] host="+host.speciesId()+" uuid="+host.getUUID()+" anchor="+snapshot.anchorBox()+" bounds="+snapshot.body().bounds()+" donors="+keys);
+                for(var pc:assembly.pieces()){var b=TissueChimera.bounds(pc.vertices());System.out.println("[chimera]  "+pc.species()+" role="+pc.role()+" "+pc.name()+" lo="+b.low()+" hi="+b.high());}
+                for(var m:modules)System.out.println("[chimera]  module "+m.core+" "+m.mesh.name()+" support="+m.support);}
             var heads=Collections.newSetFromMap(new IdentityHashMap<net.minecraft.client.model.geom.ModelPart,Boolean>());
             for(var p:snapshot.body().parts())if(p.role()==1){var node=snapshot.paths().get(p.name().substring(0,p.name().lastIndexOf('#')));if(node!=null)heads.add(node);}
             cached=new Cached(model,Set.copyOf(sourceKeys),assembly,visuals,modules,heads,socketBudget,remodeling(assembly,visuals));CACHE.put(host.getUUID(),cached);
@@ -216,7 +219,7 @@ final class ChimeraTissue {
     private void draw(TissueChimera.Piece piece,List<TissueMorphogenesis.V> vertices,VertexConsumer out,Matrix4f inverse,int override){
         for(int f=0;f<piece.faces().size();f++){var face=piece.faces().get(f);var uv=piece.uv().get(f);
             var a=vertices.get(face[0]);var b=vertices.get(face[1]);var c=vertices.get(face[2]);var cross=b.sub(a).cross(c.sub(a));if(cross.length()<.000001F)continue;
-            var normal=cross.unit();var n=inverse.transformDirection(new Vector3f(normal.x(),normal.y(),normal.z())).normalize();int color=override==0?piece.colors().get(f):override;
+            var normal=cross.unit();var n=inverse.transformDirection(new Vector3f(normal.x(),normal.y(),normal.z())).normalize();int color=AnatomicalTissue.DEBUG_TINT?0xff808080:override==0?piece.colors().get(f):override;
             for(int i=0;i<4;i++){var v=vertices.get(face[i]);var local=inverse.transformPosition(new Vector3f(v.x(),v.y(),v.z()));
                 out.addVertex(pose,local.x/16,local.y/16,local.z/16).setColor(color).setUv(uv[i*2],uv[i*2+1]).setOverlay(overlay).setLight(light).setNormal(pose,n.x,n.y,n.z);
             }

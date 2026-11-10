@@ -21,6 +21,13 @@ import java.util.*;
 /** Approved species-specific geometry, fitted once to the native rest skeleton.
  * Native UVs, child details and all actual animated ModelPart matrices are retained. */
 public final class AuthoredInfectionParts {
+    private static final boolean LEGACY_COVER=Boolean.getBoolean("blacklight.legacyTissueCover");
+    /** Slight darkening only; colour comes from the blighted native pixels. */
+    private static int shade(int color,float development){
+        float a=Math.max(0,Math.min(1,development))*.16F;
+        int r=Math.round((color>>>16&255)*(1-.25F*a)),g=Math.round((color>>>8&255)*(1-a)),b=Math.round((color&255)*(1-.85F*a));
+        return color&0xff000000|r<<16|g<<8|b;
+    }
     private static final ResourceLocation TISSUE=ResourceLocation.fromNamespaceAndPath("blacklight","textures/entity/tissue_anatomy.png");
     private static final Map<String,Optional<JsonObject>> SOURCES=new HashMap<>();
     private static final Map<EntityModel<?>,Map<String,Binding>> BINDINGS=new WeakHashMap<>();
@@ -99,8 +106,10 @@ public final class AuthoredInfectionParts {
             var posed=pose(part,pose);
             Set<ModelPart.Cube> replaced=Collections.newSetFromMap(new IdentityHashMap<>());
             for(var p:matches)if(!p.skin.isEmpty()&&replaced.add(p.cube)) {
-                if(age<TissueGrowth.ANCIENT_TICKS) {
-                    int tint=TissueSkin.tint(color,growthSeed,p.anatomy,TissueEvolution.attachmentGrowth(age));
+                // The host's own blighted texture now carries late infection;
+                // the old stripe cover replaced the whole species once ancient.
+                if(!LEGACY_COVER||age<TissueGrowth.ANCIENT_TICKS) {
+                    int tint=LEGACY_COVER?TissueSkin.tint(color,growthSeed,p.anatomy,TissueEvolution.attachmentGrowth(age)):shade(color,TissueEvolution.attachmentGrowth(age));
                     for(var triangle:p.skin)emit(remodel(develop(triangle,frames.get(part),evolution),frames.get(part)),posed,out,light,overlay,tint,true);
                 }
             }
@@ -136,6 +145,7 @@ public final class AuthoredInfectionParts {
             }
             // Use the exact same developed vertices for the tissue cover. A
             // thin normal offset avoids z-fighting without adding body volume.
+            if(!LEGACY_COVER){pending.clear();return;}
             var tissue=buffers.getBuffer(RenderType.entityCutoutNoCull(TISSUE));
             for(var entry:pending.entrySet())for(var piece:pieces.get(entry.getKey())) {
                 if(omitBody&&piece.anatomy==ConsumeAnatomy.BODY||onlyBody&&piece.anatomy!=ConsumeAnatomy.BODY)continue;
@@ -271,6 +281,7 @@ public final class AuthoredInfectionParts {
             if(skin.isEmpty())growth.clear(); // No matching native surface: retain its original cube.
             triangles(bone.getAsJsonObject("growth"),inverse,ratio,srcCentre,centre,cube,false,skin,growth);
             if(bone.has("lateGrowth"))triangles(bone.getAsJsonObject("lateGrowth"),inverse,ratio,srcCentre,centre,cube,false,skin,late);
+            {long voxelSeed=species.hashCode()*31L+name.hashCode();var g=blocky(growth,cube,voxelSeed);var l=blocky(late,cube,voxelSeed+7);growth.clear();growth.addAll(g);late.clear();late.addAll(l);}
             var frame=binding.frames.get(target.part);var sectioned=new ArrayList<Triangle>();
             for(var triangle:skin)for(var section:TissueSkin.sections(frame,value(triangle.a),value(triangle.b),value(triangle.c)))
                 sectioned.add(new Triangle(vector(section.a()),vector(section.b()),vector(section.c()),triangle.normal,triangle.color,triangle.face));
@@ -305,6 +316,29 @@ public final class AuthoredInfectionParts {
         BlacklightNeoMod.LOGGER.info("Bound authored infection growth {}: {} native parts, {} source assignments, coat={}",species,binding.pieces.size(),binding.assignments.size(),fur);
         return binding;
     }
+    /** Protruding smooth growth becomes pixel blocks on the native cube grid.
+     * Recessed wound beds stay as authored; they are cut into the hide. */
+    private static List<Triangle> blocky(List<Triangle> source,ModelPart.Cube cube,long seed){
+        if(source.isEmpty()||Boolean.getBoolean("blacklight.smoothGrowth"))return source;
+        float[][] tris=new float[source.size()][];int[] colors=new int[source.size()];
+        for(int i=0;i<tris.length;i++){var t=source.get(i);tris[i]=new float[]{t.a.x,t.a.y,t.a.z,t.b.x,t.b.y,t.b.z,t.c.x,t.c.y,t.c.z};colors[i]=t.color;}
+        var voxels=TissueVoxels.convert(tris,colors,new float[]{cube.minX,cube.minY,cube.minZ},new float[]{cube.maxX,cube.maxY,cube.maxZ},.9F,seed);
+        var result=new ArrayList<Triangle>(voxels.size());
+        for(var v:voxels){var p=v.p();result.add(new Triangle(new Vector3f(p[0],p[1],p[2]),new Vector3f(p[3],p[4],p[5]),new Vector3f(p[6],p[7],p[8]),new Vector3f(v.nx(),v.ny(),v.nz()),v.color(),null));}
+        return result;
+    }
+    /** Authored meshes were painted in neutral greys; map them onto the
+     * shared blacklight palette: violet-black chitin, crimson flesh, ivory bone. */
+    static int palette(int argb){
+        if(LEGACY_COVER)return argb;
+        int alpha=argb&0xff000000;
+        return alpha|switch(argb&0xffffff){
+            case 0x262726->0x1c1622; case 0x353835->0x2c2334; case 0x131112->0x0c080d;
+            case 0x46403b->0x3e3346; case 0x5c1d1c->0x5a1220; case 0x852a25->0xb0202c;
+            case 0x797666->0xd8ccb0; default->argb&0xffffff;
+        };
+    }
+    static boolean glows(int rgb){int r=rgb>>16&255,g=rgb>>8&255,b=rgb&255;return r>110&&g<48&&b<58&&r>g*3;}
     private static List<Triangle> localTriangles(JsonObject data){
         var points=new ArrayList<Vector3f>();var vs=data.getAsJsonArray("vertices");
         for(int i=0;i<vs.size();i+=3)points.add(new Vector3f(vs.get(i).getAsFloat(),vs.get(i+1).getAsFloat(),vs.get(i+2).getAsFloat()));
@@ -312,7 +346,7 @@ public final class AuthoredInfectionParts {
         for(int i=0;i<ts.size();i+=4){
             var a=points.get(ts.get(i).getAsInt());var b=points.get(ts.get(i+1).getAsInt());var c=points.get(ts.get(i+2).getAsInt());
             var normal=new Vector3f(b).sub(a).cross(new Vector3f(c).sub(a));if(normal.lengthSquared()<1e-10F)continue;normal.normalize();
-            result.add(new Triangle(a,b,c,normal,ts.get(i+3).getAsInt(),null));
+            result.add(new Triangle(a,b,c,normal,palette(ts.get(i+3).getAsInt()),null));
         }
         return List.copyOf(result);
     }
@@ -405,7 +439,7 @@ public final class AuthoredInfectionParts {
             Vector3f a=vertices.get(ts.get(i).getAsInt()),b=vertices.get(ts.get(i+1).getAsInt()),c=vertices.get(ts.get(i+2).getAsInt());
             Vector3f normal=new Vector3f(b).sub(a).cross(new Vector3f(c).sub(a));if(normal.lengthSquared()<1e-10F)continue;normal.normalize();
             Face face=base?face(cube,a,b,c):null;
-            int color=base&&face==null?0x5e262a:ts.get(i+3).getAsInt();
+            int color=base&&face==null?0x5e262a:palette(ts.get(i+3).getAsInt());
             var triangle=new Triangle(a,b,c,normal,color,face);
             if(face!=null)skin.add(triangle);else growth.add(triangle);
         }
@@ -432,6 +466,8 @@ public final class AuthoredInfectionParts {
     }
     private static void emit(Triangle t,PoseStack.Pose pose,VertexConsumer out,int light,int overlay,int color,boolean skin){
         int rgba=skin?color:(color&0xff000000)|t.color;
+        // Eye slits and blood seams are the only saturated reds: they glow.
+        if(!skin&&!LEGACY_COVER&&glows(t.color))light=net.minecraft.client.renderer.LightTexture.FULL_BRIGHT;
         for(int j=0;j<4;j++){
             Vector3f v=j==0?t.a:j==1?t.b:t.c;float u=.5F,w=.5F;
             if(skin){var p=t.face;var a=p.positions[0];var b=p.positions[1];var d=p.positions[3];

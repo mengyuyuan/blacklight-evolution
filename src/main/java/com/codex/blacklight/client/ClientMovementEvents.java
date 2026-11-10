@@ -226,6 +226,11 @@ public final class ClientMovementEvents {
         if (!frame.handled()) return false;
         if (jump) JUMP_INPUT.claimCharge();
         player.setDeltaMovement(frame.x(),frame.y(),frame.z());player.setOnGround(false);player.resetFallDistance();
+        if (CLIENT_WALL.kickedOff()) {
+            // Turn round to face away from the wall so aerial attacks and gliding follow the spring.
+            float yaw=(float)Math.toDegrees(Math.atan2(-frame.x(),frame.z()));
+            player.setYRot(yaw);player.yRotO=yaw;player.setYHeadRot(yaw);player.yBodyRot=yaw;
+        }
         player.setSprinting(sprinting && (frame.mode()==WallTraversal.Mode.RUN
                 || frame.mode()==WallTraversal.Mode.LEAP || WallTraversal.crossingTop(frame.mode())));
         if (lastChargingAnimation) {
@@ -323,7 +328,7 @@ public final class ClientMovementEvents {
         // an explicitly held sprint key returns to the slower climbing mode.
         boolean sprinting=minecraft.screen==null && !detach && (CLIENT_WALL.attached()
                 ? movingHeld && (sprintKey || (lastSprinting && !lastSprintKey))
-                : physicalSprint(minecraft) || (forwardHeld && lastSprinting));
+                : com.codex.blacklight.movement.SprintIntent.resolve(sprintKey,forwardHeld,lastForwardHeld,lastSprinting,minecraft.player.isSprinting()));
         // The server also suspends traversal in fluids. Cancel the local charge,
         // including its frozen pose, and resend held inputs when leaving the water.
         if (!prototype || minecraft.player.isInWater() && !WaterRunning.onSurface(minecraft.player) || minecraft.player.isInLava()) {
@@ -433,6 +438,18 @@ public final class ClientMovementEvents {
 
         // Release the previous action hold before the next phase is sampled.
         updateFinalChargedJumpPose(minecraft);
+
+        // Sprinting down stairs: stay on the steps instead of sailing off them into a fall.
+        if (!wallHandled && sprinting && forwardHeld && !isChargingJump()) {
+            double drop = com.codex.blacklight.movement.TerrainTraversal.stairFollow(minecraft.player, jumpHeld, clientOffGroundTicks);
+            if (drop > 0) {
+                var player = minecraft.player;
+                player.setPos(player.getX(), player.getY() - drop, player.getZ());
+                player.setOnGround(true);player.resetFallDistance();
+                player.setDeltaMovement(player.getDeltaMovement().x, -.08, player.getDeltaMovement().z);
+                clientOffGroundTicks = 0;
+            }
+        }
 
         // Stabilize locomotion once per tick; the pose runtime keeps a continuing
         // stride on one clock even when terrain correction flickers for a frame.

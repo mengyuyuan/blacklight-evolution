@@ -430,8 +430,8 @@ public final class VehicleFleetSystem {
             double t=(double)i/steps,x=from.x+delta.x*t,z=from.z+delta.z*t;
             double ground=ground(vehicle,x,previous.y,z,yaw);if(!Double.isFinite(ground))return null;
             var at=new Vec3(x,ground,z);var bend=ground>previous.y?new Vec3(previous.x,ground,previous.z):new Vec3(x,previous.y,z);
-            for(var envelope:shape.sweepTranslation(local(previous),local(bend),yaw))if(VehicleKinematics.checkEnvelope(vehicle,envelope)!=VehicleKinematics.StopReason.NONE)return null;
-            for(var envelope:shape.sweepTranslation(local(bend),local(at),yaw))if(VehicleKinematics.checkEnvelope(vehicle,envelope)!=VehicleKinematics.StopReason.NONE)return null;
+            if(VehicleKinematics.clearTranslation(vehicle,shape,previous,bend,yaw)!=VehicleKinematics.StopReason.NONE)return null;
+            if(VehicleKinematics.clearTranslation(vehicle,shape,bend,at,yaw)!=VehicleKinematics.StopReason.NONE)return null;
             previous=at;
         }
         return previous;

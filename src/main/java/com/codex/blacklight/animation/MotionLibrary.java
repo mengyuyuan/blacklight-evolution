@@ -88,6 +88,27 @@ public final class MotionLibrary {
                 || key.startsWith("basic_glide") || key.endsWith("grab_hold") || key.equals("grab_blade_hold");
     }
     private static Optional<Definition> definition(String id) { return CLIPS.computeIfAbsent(canonical(id), MotionLibrary::read); }
+    private static final java.util.Set<String> WARMED = ConcurrentHashMap.newKeySet();
+    private static final java.util.concurrent.ExecutorService WARMER = java.util.concurrent.Executors.newSingleThreadExecutor(r -> {
+        var thread = new Thread(r, "blacklight-motion-warm"); thread.setDaemon(true); thread.setPriority(Thread.MIN_PRIORITY); return thread;
+    });
+    /**
+     * Consume clips are 100-400 KB of compact JSON; parsing one on first use stalled the
+     * frame that confirmed the consume by 100-200 ms. Parse the form's scene clips in the
+     * background as soon as the form is worn. CLIPS.computeIfAbsent makes a caller that
+     * arrives mid-parse wait for that single result instead of parsing it twice.
+     */
+    public static void warmConsume(com.codex.blacklight.power.PowerForm form) {
+        if (form == null || !WARMED.add(form.name())) return;
+        var ids = new java.util.LinkedHashSet<String>();
+        for (int variant : new int[]{com.codex.blacklight.combat.ConsumeVariant.DEFAULT, com.codex.blacklight.combat.ConsumeVariant.CLASSIC})
+            for (boolean large : new boolean[]{false, true}) {
+                String key = com.codex.blacklight.combat.ConsumeSequence.clipKey(form, large, variant);
+                ids.add("consume_" + key + "_actor"); ids.add("consume_" + key + "_victim");
+            }
+        for (String id : new String[]{"consume_capture_actor", "consume_capture_victim", "consume_hold_actor", "consume_hold_victim"}) ids.add(id);
+        for (String id : ids) WARMER.execute(() -> { try { com.codex.blacklight.combat.LocalVisualMotion.find(id); } catch (RuntimeException ignored) { } try { definition(id); } catch (RuntimeException ignored) { } });
+    }
     private static Optional<Definition> read(String id) {
         Optional<JsonObject> data = id.startsWith("legacy_")
                 ?resource("/assets/blacklight/native_animations/biped/combat/"+id.substring(7)+".json")

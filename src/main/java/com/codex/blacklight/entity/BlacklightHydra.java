@@ -91,7 +91,8 @@ public final class BlacklightHydra extends Monster implements GeoEntity {
                 &&com.codex.blacklight.registry.ModAttachments.available(p)?p:null;
     }
     public boolean hold(ServerPlayer p){
-        if(!com.codex.blacklight.registry.ModAttachments.available(p)||!isAlive()||!transporting()||heldId()>=0||p.level()!=level()||p.isPassenger()||!p.isAlive()||HydraTransport.active(p)||com.codex.blacklight.power.BiomassSystem.active(p))return false;
+        if(!com.codex.blacklight.registry.ModAttachments.available(p)||!isAlive()||!transporting()||heldId()>=0||p.level()!=level()||p.isPassenger()||!p.isAlive()||HydraTransport.active(p)||com.codex.blacklight.power.BiomassSystem.active(p)
+                ||com.codex.blacklight.combat.ConsumeSystem.grappleProtected(p))return false;
         // Capture is an exclusive action: discard queued attacks and their movement leases.
         com.codex.blacklight.combat.WeaponCombatSystem.cancel(p);
         com.codex.blacklight.combat.DevastatorSystem.cancel(p);

@@ -226,7 +226,7 @@ public final class BlacklightSupremeHunter extends Monster {
             }
             case GRAB_THROW->{
                 if(t==move.event(0)&&heldId()<0&&actionTarget!=null&&actionTarget.isAlive()&&distanceTo(actionTarget)<move.reach+actionTarget.getBbWidth()
-                        &&!(actionTarget instanceof Player p&&p.isCreative())){
+                        &&!(actionTarget instanceof Player p&&p.isCreative())&&!com.codex.blacklight.combat.ConsumeSystem.grappleProtected(actionTarget)){
                     entityData.set(HELD,actionTarget.getId());playSound(SoundEvents.WARDEN_ATTACK_IMPACT,1.5F,.8F);
                 }
                 if(t==move.event(1)&&level.getEntity(heldId()) instanceof LivingEntity held){

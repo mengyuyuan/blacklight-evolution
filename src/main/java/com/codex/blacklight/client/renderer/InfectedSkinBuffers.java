@@ -14,17 +14,17 @@ final class InfectedSkinBuffers implements MultiBufferSource {
         if(type.isOutline()||name.contains("eyes")||name.contains("glint")||name.contains("shadow")||name.contains("infected_morphology"))return delegate.getBuffer(type);
         // Asking for another render type can flush BufferSource's current builder.
         // Never cache a consumer that may have been ended by a copied model layer.
-        return new Skin(delegate.getBuffer(InfectedMorphology.skinType(type)));
+        return new Skin(delegate.getBuffer(InfectedMorphology.skinType(type)),InfectedMorphology.glowSink(type));
     }
-    private record Skin(VertexConsumer out) implements VertexConsumer,ConsumeAnatomy.Consumer {
-        @Override public VertexConsumer addVertex(float x,float y,float z){out.addVertex(x,y,z);return this;}
+    private record Skin(VertexConsumer out,VertexConsumer glow) implements VertexConsumer,ConsumeAnatomy.Consumer {
+        @Override public VertexConsumer addVertex(float x,float y,float z){out.addVertex(x,y,z);if(glow!=null)glow.addVertex(x,y,z);return this;}
         // Decay is local geometry, not an opaque dark-red coat over every species.
         // Keep sheep colours, cow spots, fish variants and village clothing readable.
-        @Override public VertexConsumer setColor(int r,int g,int b,int a){out.setColor(r,g,b,a);return this;}
-        @Override public VertexConsumer setUv(float u,float v){out.setUv(u,v);return this;}
+        @Override public VertexConsumer setColor(int r,int g,int b,int a){out.setColor(r,g,b,a);if(glow!=null)glow.setColor(r,g,b,a);return this;}
+        @Override public VertexConsumer setUv(float u,float v){out.setUv(u,v);if(glow!=null)glow.setUv(u,v);return this;}
         @Override public VertexConsumer setUv1(int u,int v){out.setUv1(u,v);return this;}
         @Override public VertexConsumer setUv2(int u,int v){out.setUv2(u,v);return this;}
-        @Override public VertexConsumer setNormal(float x,float y,float z){out.setNormal(x,y,z);return this;}
+        @Override public VertexConsumer setNormal(float x,float y,float z){out.setNormal(x,y,z);if(glow!=null)glow.setNormal(x,y,z);return this;}
         @Override public void anatomy(int id){if(out instanceof ConsumeAnatomy.Consumer c)c.anatomy(id);}
         @Override public void anatomy(float[] weights){if(out instanceof ConsumeAnatomy.Consumer c)c.anatomy(weights);}
         @Override public void anatomy(ModelPart p){if(out instanceof ConsumeAnatomy.Consumer c)c.anatomy(p);}

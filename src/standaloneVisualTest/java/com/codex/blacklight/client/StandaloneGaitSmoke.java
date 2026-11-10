@@ -52,6 +52,32 @@ public final class StandaloneGaitSmoke {
     private static boolean jumpOnly(){return Boolean.getBoolean(PROPERTY+".jumpOnly");}
     private static boolean claws(){return Boolean.getBoolean(PROPERTY+".claws");}
     private static boolean standingCharge(){return Boolean.getBoolean(PROPERTY+".standingCharge");}
+    private static boolean stairs(){return Boolean.getBoolean(PROPERTY+".stairs");}
+    /** Hold forward only: the plain walk, without the sprint key. */
+    private static boolean walk(){return Boolean.getBoolean(PROPERTY+".walk");}
+    /** Stair course on the lane: 6 stairs up, plateau, 6 stairs down, then 2 full-block steps up and down. */
+    static final int COURSE_START=40,COURSE_END=78;
+    private static boolean inCourse(double z){return stairs()&&z>=COURSE_START-1&&z<=COURSE_END+1;}
+    private static final JsonArray serverCollisions=new JsonArray();
+    private static Field collidingField,kickField,strengthField;
+    private static boolean serverColliding;
+    private static float lastKick;
+    private static void buildCourse(net.minecraft.server.level.ServerLevel level){
+        var up=Blocks.OAK_STAIRS.defaultBlockState().setValue(net.minecraft.world.level.block.StairBlock.FACING,net.minecraft.core.Direction.SOUTH);
+        var down=Blocks.OAK_STAIRS.defaultBlockState().setValue(net.minecraft.world.level.block.StairBlock.FACING,net.minecraft.core.Direction.NORTH);
+        var solid=Blocks.STONE_BRICKS.defaultBlockState();
+        for(int x=-4;x<=4;x++){
+            // Stairs up: the stair at step i sits on i solid layers.
+            for(int i=0;i<6;i++){int z=COURSE_START+i;for(int y=251;y<251+i;y++)level.setBlockAndUpdate(new BlockPos(x,y,z),solid);level.setBlockAndUpdate(new BlockPos(x,251+i,z),up);}
+            for(int z=COURSE_START+6;z<COURSE_START+10;z++)for(int y=251;y<257;y++)level.setBlockAndUpdate(new BlockPos(x,y,z),solid);
+            for(int i=0;i<6;i++){int z=COURSE_START+10+i,h=5-i;for(int y=251;y<251+h;y++)level.setBlockAndUpdate(new BlockPos(x,y,z),solid);level.setBlockAndUpdate(new BlockPos(x,251+h,z),down);}
+            // Full-block steps: up 1, up 2, plateau, down 1, ground.
+            int b=COURSE_START+24;
+            for(int z=b;z<b+3;z++)level.setBlockAndUpdate(new BlockPos(x,251,z),solid);
+            for(int z=b+3;z<b+7;z++){level.setBlockAndUpdate(new BlockPos(x,251,z),solid);level.setBlockAndUpdate(new BlockPos(x,252,z),solid);}
+            for(int z=b+7;z<b+10;z++)level.setBlockAndUpdate(new BlockPos(x,251,z),solid);
+        }
+    }
     private static long latestTick=Long.MIN_VALUE;
     private static Path output;
     private static CameraType previousCamera;
@@ -97,7 +123,7 @@ public final class StandaloneGaitSmoke {
         }
         boolean run=serverReady&&sprinting()&&!(standingCharge()&&stage==Stage.JUMP_SPRINT);
         boolean probe=serverReady&&standingCharge()&&stage==Stage.JUMP_SPRINT&&stageTicks>=25&&stageTicks<20+jumpHoldTicks;
-        mc.options.keyUp.setDown(run||probe);mc.options.keySprint.setDown(run||probe);
+        mc.options.keyUp.setDown(run||probe);mc.options.keySprint.setDown((run||probe)&&!walk());
         if(probe&&mc.player!=null)mc.player.setDeltaMovement(.3,mc.player.getDeltaMovement().y,.2);
         mc.options.keyDown.setDown(false);mc.options.keyLeft.setDown(false);mc.options.keyRight.setDown(probe);
         mc.options.keyJump.setDown(serverReady&&stage==Stage.JUMP_SPRINT&&stageTicks>=20&&stageTicks<20+jumpHoldTicks);mc.options.keyShift.setDown(false);
@@ -112,6 +138,17 @@ public final class StandaloneGaitSmoke {
             maximumChargeServerDrift=Math.max(maximumChargeServerDrift,p.position().subtract(plantedServer).horizontalDistance());
             chargeServerSamples++;
         }
+    }
+    @SubscribeEvent(priority=EventPriority.LOWEST)
+    public static void observeServerCollision(net.neoforged.neoforge.event.tick.PlayerTickEvent.Post event){
+        if(!active()||!serverReady||!stairs()||!(event.getEntity() instanceof ServerPlayer p))return;
+        try{
+            if(collidingField==null){collidingField=MovementState.class.getDeclaredField("sprintColliding");collidingField.setAccessible(true);}
+            boolean colliding=collidingField.getBoolean(p.getData(ModAttachments.MOVEMENT_STATE));
+            if(colliding&&!serverColliding){var row=new JsonObject();row.addProperty("stage",stage.name());row.addProperty("z",p.getZ());row.addProperty("y",p.getY());
+                row.addProperty("armor",UtilityPowerSystem.active(p,PowerForm.ARMOR));synchronized(serverCollisions){serverCollisions.add(row);}}
+            serverColliding=colliding;
+        }catch(Exception e){fail(e);}
     }
     @SubscribeEvent(priority=EventPriority.HIGHEST)
     public static void humanPerspective(InputEvent.Key event) {
@@ -176,8 +213,9 @@ public final class StandaloneGaitSmoke {
                         // A 384-block lane covers the complete 120-tick default sprint.
                         for(int x=-4;x<=4;x++)for(int z=-8;z<=384;z++) {
                             level.setBlockAndUpdate(new BlockPos(x,250,z),(z%8==0?Blocks.WHITE_CONCRETE:Blocks.GRAY_CONCRETE).defaultBlockState());
-                            for(int y=251;y<=255;y++)level.setBlockAndUpdate(new BlockPos(x,y,z),Blocks.AIR.defaultBlockState());
+                            for(int y=251;y<=262;y++)level.setBlockAndUpdate(new BlockPos(x,y,z),Blocks.AIR.defaultBlockState());
                         }
+                        if(stairs())buildCourse(level);
                         var p=server.getPlayerList().getPlayer(uuid);if(p==null)throw new IllegalStateException("QA actor missing");
                         var state=new BlacklightState();state.infect();state.setPrototypeMode(true);state.unlock(PowerForm.NONE);state.unlock(PowerForm.CLAWS);state.unlock(PowerForm.ARMOR);state.activate(claws()?PowerForm.CLAWS:PowerForm.NONE);state.addBiomass(1000);
                         p.setData(ModAttachments.PLAYER_STATE,state);p.syncData(ModAttachments.PLAYER_STATE);
@@ -280,14 +318,25 @@ public final class StandaloneGaitSmoke {
                 violation("landing stole ground stride at "+clock.tick()+": "+clock.key());
         }
         row.addProperty("armor",UtilityPowerSystem.active(mc.player,PowerForm.ARMOR));row.addProperty("onGround",mc.player.onGround());
+        if(kickField==null){kickField=ClientPhysicalFeedback.class.getDeclaredField("verticalKick");kickField.setAccessible(true);
+            strengthField=ClientPhysicalFeedback.class.getDeclaredField("strength");strengthField.setAccessible(true);}
+        float kick=kickField.getFloat(null);row.addProperty("cameraKick",kick);row.addProperty("feedbackStrength",strengthField.getFloat(null));
+        row.addProperty("sprintFlag",mc.player.isSprinting());row.addProperty("vy",mc.player.getDeltaMovement().y);
+        // JUMP_SPRINT deliberately jumps at stage tick 20, which can be over the course start.
+        if(stairs()&&sprinting()&&stage!=Stage.JUMP_SPRINT&&inCourse(position.z)){
+            if(kick>lastKick+.05F)violation(stage+" camera kick on course at z="+position.z+" y="+position.y+" kick="+kick);
+            String k=clock.key();
+            if(!(k.equals("basic_walk")||k.equals("basic_run")||k.startsWith("basic_sprint")))violation(stage+" stride broke on course at z="+position.z+" y="+position.y+": "+k+" phase="+row.get("phase").getAsString());
+        }
+        lastKick=kick;
         row.addProperty("activePower",mc.player.getData(ModAttachments.PLAYER_STATE).getActivePower().name());
-        double nominal=MotionLibrary.nominalSpeed(clock.key())*mc.player.getScale();row.addProperty("nominalBlocksPerTick",nominal);
+        double nominal=clock.lastNominal();row.addProperty("nominalBlocksPerTick",nominal);
         if(previousTick!=null) {
             double dx=position.x-previousTick.get("x").getAsDouble(),dy=position.y-previousTick.get("y").getAsDouble(),dz=position.z-previousTick.get("z").getAsDouble();
             double distance=Math.hypot(dx,dz);row.addProperty("distance",distance);row.addProperty("verticalDistance",dy);
             long delta=clock.tick()-previousTick.get("tick").getAsLong();
             if(previousTick.get("key").getAsString().equals(clock.key())&&clock.looping()&&nominal>0&&distance<4&&delta>0) {
-                double expected=Math.min(distance/(nominal*20),delta/20.0*8),actual=clock.current()-previousTick.get("currentSeconds").getAsDouble();
+                double expected=Math.min(distance/(nominal*20),clock.lastCap()),actual=clock.current()-previousTick.get("currentSeconds").getAsDouble();
                 row.addProperty("expectedPhaseAdvance",expected);row.addProperty("actualPhaseAdvance",actual);
                 if(Math.abs(expected-actual)>.00001)violation("distance-clock mismatch at "+clock.tick()+": "+actual+" != "+expected);
                 if(actual<-.000001)violation("clock rewound at "+clock.tick());
@@ -317,7 +366,9 @@ public final class StandaloneGaitSmoke {
         mc.mouseHandler.releaseMouse();
         try {
             recordTick(mc);renderFrame++;captureSequence=null;
-            if((stage==Stage.SPRINT||stage==Stage.ARMOR_SPRINT)&&stageTicks>=25)captureSequence=stage.name().toLowerCase(Locale.ROOT);
+            if(!stairs()&&(stage==Stage.SPRINT||stage==Stage.ARMOR_SPRINT)&&stageTicks>=25)captureSequence=stage.name().toLowerCase(Locale.ROOT);
+            boolean course=stairs()&&(stage==Stage.SPRINT||stage==Stage.ARMOR_SPRINT)&&inCourse(mc.player.getZ());
+            if(course)captureSequence="stairs_"+stage.name().toLowerCase(Locale.ROOT);
             if(stage==Stage.JUMP_SPRINT&&stageTicks>=20){
                 if(stageTicks<20+jumpHoldTicks)captureSequence="jump_charge";
                 else if(!mc.player.onGround())captureSequence="jump_flight";
@@ -328,8 +379,8 @@ public final class StandaloneGaitSmoke {
             // hardening, and landing smoke must clear before inspecting limbs.
             if(ordinal>=8&&((stage==Stage.SPRINT||stage==Stage.ARMOR_SPRINT)&&stageTicks<75
                     ||"jump_landing".equals(captureSequence)&&latestTick-jumpContactTick<22))captureSequence=null;
-            if(ordinal>=16)captureSequence=null;
-            observerDistance=ordinal<8?12:5;
+            if(ordinal>=(course?40:16))captureSequence=null;
+            observerDistance=course?7:ordinal<8?12:5;
             if(captureSequence!=null&&writer.getQueue().remainingCapacity()>0)capturePending=true;
             else if(captureSequence!=null){queueMisses++;captureSequence=null;}
             if(stage==Stage.DONE)capturePending=true;
@@ -398,7 +449,7 @@ public final class StandaloneGaitSmoke {
         }catch(Exception e){fail(e);}
     }
     private static void finish(Minecraft mc) {
-        for(String sequence:jumpOnly()?new String[]{"jump_charge","jump_flight","jump_landing"}:new String[]{"sprint","armor_sprint","jump_charge","jump_flight","jump_landing"}){
+        for(String sequence:jumpOnly()?new String[]{"jump_charge","jump_flight","jump_landing"}:stairs()?new String[]{"stairs_sprint","stairs_armor_sprint","jump_charge","jump_flight","jump_landing"}:new String[]{"sprint","armor_sprint","jump_charge","jump_flight","jump_landing"}){
             if(sequenceFrames.getOrDefault(sequence,0)<8)violation("fewer than 8 actual rendered body frames for "+sequence);
             if(writtenSequences.getOrDefault(sequence,new AtomicInteger()).get()<8)violation("fewer than 8 actual framebuffer images written for "+sequence);
         }
@@ -406,14 +457,14 @@ public final class StandaloneGaitSmoke {
             int count=0,running=0,grounded=0;double distance=0;
             for(var element:ticks) {
                 var row=element.getAsJsonObject();if(!row.get("stage").getAsString().equals(phase.name()))continue;
-                count++;if(row.get("phase").getAsString().equals("RUN"))running++;
+                count++;if(row.get("phase").getAsString().equals("RUN")||walk()&&row.get("phase").getAsString().equals("WALK"))running++;
                 if(row.get("onGround").getAsBoolean())grounded++;
                 if(row.has("distance"))distance+=row.get("distance").getAsDouble();
             }
             if(count<100)violation(phase+" captured only "+count+" committed ticks");
-            if(distance<30)violation(phase+" native input did not produce continuous travel: "+distance+" blocks");
+            if(distance<(walk()?15:30))violation(phase+" native input did not produce continuous travel: "+distance+" blocks");
             if(running<60)violation(phase+" never established running gait: "+running+" ticks");
-            if(grounded<count*.8)violation(phase+" left the flat lane: "+grounded+"/"+count+" grounded");
+            if(!stairs()&&grounded<count*.8)violation(phase+" left the flat lane: "+grounded+"/"+count+" grounded");
         }
         if(!standingCharge()&&!movingLandingObserved)violation("native jump did not exercise the moving/light landing action");
         if(standingCharge()&&!standingChargeObserved)violation("native standing jump did not exercise grounded stationary charge");
@@ -466,11 +517,11 @@ public final class StandaloneGaitSmoke {
             report.addProperty("chargeClientSamples",chargeClientSamples);report.addProperty("chargeServerSamples",chargeServerSamples);
             report.addProperty("maximumChargeClientDrift",maximumChargeClientDrift);report.addProperty("maximumChargeServerDrift",maximumChargeServerDrift);
             report.addProperty("jumpInput",standingCharge()?"stationary Space charge from tick20 including 12-tick full hold; inject W/D/sprint and residual XZ velocity from tick25; verify client/server planted position, then actual takeoff/contact":"W+sprint140 ticks; Space held from tick20 for configured charge yielding a light impact, then released; actual airborne and real ground contact observed");
-            report.add("committedTicks",ticks);report.add("renderFrames",frames);report.add("violations",violations);if(error!=null)report.addProperty("error",error);
+            report.addProperty("stairs",stairs());synchronized(serverCollisions){report.add("serverSprintCollisions",serverCollisions.deepCopy());}report.add("committedTicks",ticks);report.add("renderFrames",frames);report.add("violations",violations);if(error!=null)report.addProperty("error",error);
             var images=new JsonArray();captureNames.stream().sorted().forEach(images::add);report.add("images",images);
             Path pending=output.resolve("continuous-gait-report.pending.json");Files.writeString(pending,new GsonBuilder().setPrettyPrinting().create().toJson(report));
             Files.move(pending,output.resolve("continuous-gait-report.json"),StandardCopyOption.REPLACE_EXISTING);
-            String[] columns={"tick","stage","stageTick","phase","key","x","y","z","distance","currentSeconds","expectedPhaseAdvance","actualPhaseAdvance","playerYaw","playerPitch","movementYaw","observerYaw","yawBeforeInputLock","mouseGrabbed","windowFocused","onGround","armor","cameraType","chaseOwnsView","nativeAction","nativeActionSeconds","ticksSinceJumpContact","bodyRootX","bodyRootY","bodyRootZ"};
+            String[] columns={"tick","stage","stageTick","phase","key","x","y","z","distance","currentSeconds","expectedPhaseAdvance","actualPhaseAdvance","playerYaw","playerPitch","movementYaw","observerYaw","yawBeforeInputLock","mouseGrabbed","windowFocused","onGround","armor","cameraType","chaseOwnsView","nativeAction","nativeActionSeconds","ticksSinceJumpContact","bodyRootX","bodyRootY","bodyRootZ","cameraKick","feedbackStrength","sprintFlag","vy","verticalDistance"};
             var csv=new StringBuilder(String.join(",",columns)).append('\n');
             for(var element:ticks){var row=element.getAsJsonObject();for(int i=0;i<columns.length;i++){if(i>0)csv.append(',');var value=row.get(columns[i]);if(value!=null)csv.append(value.isJsonPrimitive()&&value.getAsJsonPrimitive().isString()?value.getAsString():value.toString());}csv.append('\n');}
             Files.writeString(output.resolve("continuous-gait-ticks.csv"),csv);

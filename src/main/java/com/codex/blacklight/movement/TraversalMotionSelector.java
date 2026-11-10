@@ -11,7 +11,7 @@ public final class TraversalMotionSelector {
     public static String ground(LocomotionPhase phase,boolean sprint,double speed){
         if(phase==LocomotionPhase.BRAKE)return sprint?"basic_sprint_brake":"basic_brake";
         if(phase==LocomotionPhase.TURN)return "basic_turn";
-        if(!sprint)return speed>.22?"basic_run":"basic_walk";
+        if(!sprint)return speed>PrototypeLocomotion.WALK_VISUAL_MAX?"basic_run":"basic_walk";
         return speed>1.1?"basic_sprint_fastest":speed>.8?"basic_sprint_fast":"basic_sprint";
     }
     /** Keep small speed changes near a boundary from rebuilding the source blend. */
@@ -23,8 +23,8 @@ public final class TraversalMotionSelector {
             if (previous.equals("basic_sprint_fast") && speed > .72 && speed < 1.18) return previous;
             if (previous.equals("basic_sprint") && speed < .88) return previous;
         } else {
-            if (previous.equals("basic_run") && speed > .19) return previous;
-            if (previous.equals("basic_walk") && speed < .25) return previous;
+            if (previous.equals("basic_run") && speed > .25) return previous;
+            if (previous.equals("basic_walk") && speed < .31) return previous;
         }
         return ground(phase, sprint, speed);
     }

@@ -60,10 +60,17 @@ final class SourceActionCamera {
     }
     private static Values sample(SourceCameraEvents.Event e,Values from,double time) {
         double age=time-e.start();var target=new Values(e.dolly(),e.zoom(),e.reAim()?1:0,e.offset());
-        if(age<e.inTime())return from.blend(target,age/Math.max(.000001,e.inTime()));
+        double in=inSeconds(e.inTime());
+        if(age<in)return from.blend(target,ease(age/in));
         if(time<e.end()-e.outTime())return target;
-        return target.blend(Values.NEUTRAL,Math.clamp((time-e.end()+e.outTime())/Math.max(.000001,e.outTime()),0,1));
+        return target.blend(Values.NEUTRAL,ease(Math.clamp((time-e.end()+e.outTime())/Math.max(.000001,e.outTime()),0,1)));
     }
+    /** Source punch-ins ramp in 0.07-0.17 s at constant speed; on a third-person chase rig that is
+     * a 1.5-block cut with a hard start and stop. Keep the authored target, ease both ends, and give
+     * the push at least {@link #MIN_IN_SECONDS}. */
+    static final double MIN_IN_SECONDS=.18;
+    static double inSeconds(double authored){return Math.max(MIN_IN_SECONDS,authored);}
+    static double ease(double t){t=Math.max(0,Math.min(1,t));return t*t*(3-2*t);}
     private static double lastOut(Clock clock) {
         double out=0;
         for(var e:SourceCameraEvents.events(clock.key))if(e.kind().equals("punchinCamera")&&e.start()<=clock.seconds)out=e.outTime();

@@ -35,11 +35,12 @@ public final class NativeConsumePose {
         return copy;
     }
     public static boolean actor(LivingEntity entity,BlacklightPose pose,float partial) {
-        if(recovery(entity,pose,partial))return true;
+        if(recovery(entity,pose,partial,false))return true;
         int stage=entity.getData(ModAttachments.GRAB_STAGE);
         if(stage!=ConsumeVisual.CONSUME&&stage!=ConsumeVisual.CAPTURE&&stage!=ConsumeVisual.HOLD&&!ConsumeSequence.mountedStage(stage))return false;
         var victims=entity.level().getEntitiesOfClass(LivingEntity.class,entity.getBoundingBox().inflate(18),e->e.getData(ModAttachments.CONSUME_VISUAL).consumerId()==entity.getId());
-        if(victims.isEmpty())return false;
+        // The victim scene may clear one packet before CONSUMING/GRAB_STAGE; keep sampling the recovery copy.
+        if(victims.isEmpty())return recovery(entity,pose,partial,true);
         var visual=victims.getFirst().getData(ModAttachments.CONSUME_VISUAL);
         if(stage==ConsumeVisual.MOUNT||stage==ConsumeVisual.MOUNT_HOLD) {
             float age=entity.level().getGameTime()-visual.started()+partial;
@@ -79,12 +80,12 @@ public final class NativeConsumePose {
             sample.orElseEmpty("Leg_L").rotation().rotationXYZ(1.5F,0,0);
             sample.orElseEmpty("Leg_R").rotation().rotationXYZ(1.5F,0,0);
         }
-        float enter=Math.clamp((entity.level().getGameTime()-visual.started()+partial)/4F,0,1);
+        float enter=PhaseEntryBlend.CONSUME_ACTOR.weight(entity,visual.started(),visual.stage(),partial,4F);
         pose.getJointTransformData().putAll(BlacklightPose.interpolatePose(pose,sample,enter).getJointTransformData());return true;
     }
-    private static boolean recovery(LivingEntity entity,BlacklightPose pose,float partial) {
+    private static boolean recovery(LivingEntity entity,BlacklightPose pose,float partial,boolean lingering) {
         var visual=entity.getData(ModAttachments.CONSUME_RECOVERY);
-        if(!visual.active()||!entity.isAlive()||entity.getData(ModAttachments.CONSUMING)
+        if(!visual.active()||!entity.isAlive()||!lingering&&entity.getData(ModAttachments.CONSUMING)
                 ||!entity.getData(ModAttachments.PLAYER_STATE).isPrototypeMode()
                 ||entity.getData(ModAttachments.WEAPON_VISUAL).spec()!=null)return false;
         float progress=visual.phaseProgress(entity.level().getGameTime(),partial);

@@ -10,6 +10,7 @@ import java.util.UUID;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.Mth;
+import net.minecraft.world.phys.Vec3;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
@@ -64,14 +65,37 @@ public final class VehicleControls {
         int actions=seat.fireActions(mc.options.keyAttack.isDown(),mc.options.keyUse.isDown())
                 |(driver&&mc.options.keyJump.isDown()?VehicleControlAuthority.BRAKE:0)
                 |(nextAmmo&&seat.weaponOperator()?VehicleControlAuthority.NEXT_AMMUNITION:0);
-        float aimYaw=mc.player.getYRot(),aimPitch=mc.player.getXRot();var target=ClientTargetLock.entityTarget();
-        if(target!=null&&ClientTargetLock.visibleInRange(target)){
-            var delta=com.codex.blacklight.combat.ExplicitTarget.point(mc.player,target).subtract(mc.player.getEyePosition());
-            aimYaw=(float)Math.toDegrees(Math.atan2(-delta.x,delta.z));aimPitch=(float)-Math.toDegrees(Math.atan2(delta.y,delta.horizontalDistance()));
-        }
+        // The gun must converge on what the crosshair covers. The chase camera orbits above the hull,
+        // so the player's raw yaw/pitch is parallel to the view ray but offset from the barrel.
+        var target=ClientTargetLock.entityTarget();
+        Vec3 aimPoint=target!=null&&ClientTargetLock.visibleInRange(target)?com.codex.blacklight.combat.ExplicitTarget.point(mc.player,target):crosshairPoint(mc,vehicle);
+        Vec3 gun=gunOrigin(vehicle,mc.player.getEyePosition());
+        float aimYaw=com.codex.blacklight.military.vehicle.VehicleAim.yaw(gun,aimPoint),aimPitch=com.codex.blacklight.military.vehicle.VehicleAim.pitch(gun,aimPoint);
         PacketDistributor.sendToServer(new VehicleControlPayload(vehicleId,lease,sequence++,forward,steering,
                 Mth.wrapDegrees(aimYaw),Mth.clamp(aimPitch,-90,90),actions));
         nextAmmo=false;
+    }
+    private static Vec3 gunOrigin(MilitaryVehicle vehicle,Vec3 fallback){
+        var definition=vehicle.definition();
+        if(!definition.anchors().containsKey("breech_primary"))return fallback;
+        var p=definition.mountWorld("breech_primary",new VehicleDefinition.Vec3(vehicle.getX(),vehicle.getY(),vehicle.getZ()),vehicle.getYRot(),vehicle.turretYaw(),vehicle.gunPitch());
+        return new Vec3(p.x(),p.y(),p.z());
+    }
+    private static Vec3 crosshairPoint(Minecraft mc,MilitaryVehicle vehicle){
+        var camera=mc.gameRenderer.getMainCamera();Vec3 from=camera.getPosition();
+        var look=camera.getLookVector();Vec3 end=from.add(new Vec3(look.x(),look.y(),look.z()).scale(160));
+        var block=mc.level.clip(new net.minecraft.world.level.ClipContext(from,end,net.minecraft.world.level.ClipContext.Block.COLLIDER,net.minecraft.world.level.ClipContext.Fluid.NONE,mc.player));
+        if(block.getType()!=net.minecraft.world.phys.HitResult.Type.MISS)end=block.getLocation();
+        var entity=net.minecraft.world.entity.projectile.ProjectileUtil.getEntityHitResult(mc.player,from,end,new net.minecraft.world.phys.AABB(from,end).inflate(1),
+                e->!ownVehicle(vehicle,e)&&e.isPickable()&&!e.isSpectator(),from.distanceToSqr(end));
+        Vec3 point=entity!=null?entity.getLocation():end;
+        // Never converge on our own hull: the chase camera sits inside the hull's broad-phase box.
+        if(vehicle.getBoundingBox().inflate(.5).contains(point))point=from.add(new Vec3(look.x(),look.y(),look.z()).scale(160));
+        return point;
+    }
+    /** The vehicle itself, its hull proxy, and everyone riding it are never aim targets. */
+    static boolean ownVehicle(MilitaryVehicle vehicle,net.minecraft.world.entity.Entity e){
+        return e==vehicle||com.codex.blacklight.military.vehicle.VehicleDamageBridge.vehicle(e)==vehicle||e.getRootVehicle()==vehicle;
     }
     record SeatInput(VehicleDefinition definition,String id,java.util.Set<String> occupied){
         boolean driver(){return definition.seats().stream().anyMatch(s->s.id().equals(id)&&s.job()==VehicleDefinition.Job.DRIVER);}

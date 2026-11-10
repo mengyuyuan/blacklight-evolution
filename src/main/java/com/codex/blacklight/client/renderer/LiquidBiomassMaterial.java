@@ -58,6 +58,6 @@ public final class LiquidBiomassMaterial extends RenderType {
     }
 
     public static boolean ready() {
-        return shader != null;
+        return shader != null && !com.codex.blacklight.client.ShaderPackCompat.active();
     }
 }

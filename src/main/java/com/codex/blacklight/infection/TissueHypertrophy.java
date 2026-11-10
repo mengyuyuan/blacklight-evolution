@@ -75,21 +75,19 @@ public final class TissueHypertrophy {
     }
     private static V body(Bone bone,V p,Growth g,long seed) {
         Box box=bone.box();V along=longAxis(box),centre=box.centre(),d=p.sub(centre);
-        float t=Math.clamp(d.dot(along)/span(box,along)+.5F,0,1);
         boolean upright=Math.abs(along.dot(bone.up()))>.65F;
-        float peak=upright||along.dot(bone.forward())<=0?1/3F:2/3F;
-        float shoulder=TissueAnatomy.smooth(t<=peak?t/peak:(1-t)/(1-peak));
+        // Flat plateau, not a tent profile along the trunk: a position-dependent
+        // scale arched the authored cuboids. Each axis scales on its own.
+        float shoulder=1;
         V dorsal=upright?bone.forward().mul(-1):bone.up();
         float side=d.dot(bone.right()),rise=d.dot(dorsal);
         float preferred=TissueOrgans.dominantArm(seed)==3?1:-1;
         float asym=side*preferred>=0?1.07F:.94F;
         float mass=(.45F*g.root+.55F*g.core)*g.vigor;
-        float axialDirection=upright?-1:Math.signum(along.dot(bone.forward()));
         // Shoulder, chest and waist change as connected volumes. The neck/hip
         // sockets stay put while intermediate sections can shift in depth too.
         return p.add(bone.right().mul(side*.14F*mass*asym*shoulder))
                 .add(dorsal.mul(rise*(rise>0?.14F:.09F)*mass*shoulder))
-                .add(along.mul(span(box,along)*.035F*g.core*shoulder*axialDirection))
                 .add(dorsal.mul(span(box,dorsal)*.02F*g.root*shoulder));
     }
     private static V head(Bone bone,V p,Growth g) {
@@ -97,28 +95,23 @@ public final class TissueHypertrophy {
         float depth=span(box,forward)*.5F;
         V hinge=centre.sub(forward.mul(depth*.8F));
         float front=Math.max(0,p.sub(hinge).dot(forward));
-        float weight=Math.clamp(front/(depth*1.8F),0,1);
         // Skull, palate, jaw and tooth roots share this field and their actual
-        // hinges, so the expanding cranium cannot leave the mouth behind.
+        // hinges. Constant cross-section scale keeps the skull a box.
         return p.add(forward.mul(front*(.08F*g.tip+.025F*g.core)*g.vigor))
-                .add(right.mul(p.sub(centre).dot(right)*(.13F*g.root+.11F*g.core)*weight*g.vigor))
-                .add(bone.up().mul(p.sub(centre).dot(bone.up())*(.11F*g.root+.13F*g.core)*weight*g.vigor));
+                .add(right.mul(p.sub(centre).dot(right)*(.08F*g.root+.07F*g.core)*g.vigor))
+                .add(bone.up().mul(Math.max(0,p.dot(bone.up())-(centre.dot(bone.up())-span(box,bone.up())*.5F))*(.07F*g.root+.08F*g.core)*g.vigor));
     }
     private static V limb(Bone bone,V p,Growth g) {
         Box box=bone.box();V along=longAxis(box),d=p.sub(box.centre());
         float t=Math.clamp(d.dot(along)/span(box,along)+.5F,0,1);
         float distal=Math.abs(box.low().dot(along))>Math.abs(box.high().dot(along))?1-t:t;
-        float belly=(float)Math.sin(Math.PI*t),palm=TissueAnatomy.smooth(distal);
         V section=box.centre().add(along.mul(d.dot(along)));
         V first=axis((principal(along)+1)%3),second=axis((principal(along)+2)%3);
         V radial=p.sub(section);
-        float width=1+(.16F*g.core*belly+.12F*g.root*palm)*g.vigor;
-        float depth=1+(.16F*g.core*belly+.11F*g.root*palm)*g.vigor;
-        // Small centre-line reshaping complements both cross-section axes.
-        // The joint and planted end centres are stationary, not longer legs.
-        V bend=bone.forward().mul(span(box,along)*.020F*g.core*belly)
-                .add(along.mul(span(box,along)*.018F*g.core*(float)Math.sin(t*Math.PI*2)));
-        return TissueSilhouette.fit(bone,section.add(bend).add(first.mul(radial.dot(first)*width)).add(second.mul(radial.dot(second)*depth)));
+        // Constant cross-section: blocks thicken as blocks, never bow.
+        float width=1+(.11F*g.core+.07F*g.root)*g.vigor;
+        float depth=1+(.11F*g.core+.06F*g.root)*g.vigor;
+        return TissueSilhouette.fit(bone,section.add(first.mul(radial.dot(first)*width)).add(second.mul(radial.dot(second)*depth)));
     }
     private static V organCentre(Bone bone,Mesh mesh,V root,V section,float t,float length,Growth g,long seed) {
         V socket=surface(bone,root,g,seed),d=section.sub(root);

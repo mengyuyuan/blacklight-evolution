@@ -152,7 +152,7 @@ public final class DevastatorEffectRenderer {
 
     @SubscribeEvent
     public static void render(RenderLevelStageEvent event) {
-        if(event.getStage()!=RenderLevelStageEvent.Stage.AFTER_TRANSLUCENT_BLOCKS)return;
+        if(event.getStage()!=com.codex.blacklight.client.ShaderPackCompat.effectStage())return;
         var mc=Minecraft.getInstance();if(mc.level==null)return;
         float partial=event.getPartialTick().getGameTimeDeltaPartialTick(false);
         for(var entity:mc.level.entitiesForRendering()) {
@@ -197,7 +197,7 @@ public final class DevastatorEffectRenderer {
      * A cancelled/finished action supplies no Frame, so no deferred particle state can leak. */
     public static void draw(RenderLevelStageEvent event,LivingEntity owner,Frame frame) {
         var mc=Minecraft.getInstance();
-        if(event.getStage()!=RenderLevelStageEvent.Stage.AFTER_TRANSLUCENT_BLOCKS
+        if(event.getStage()!=com.codex.blacklight.client.ShaderPackCompat.effectStage()
                 ||mc.level==null||owner==null||owner.level()!=mc.level||!owner.isAlive()
                 ||frame==null||!frame.visible()||renderedVertices>=MAX_VERTICES_PER_FRAME
                 ||VisionPowerRenderer.drawingSilhouettes())return;
@@ -205,7 +205,7 @@ public final class DevastatorEffectRenderer {
         var camera=event.getCamera().getPosition();
         if(owner.getPosition(partial).distanceToSqr(camera)>96*96)return;
         var material=LiquidBiomassMaterial.mesh(ConsumedMobVisuals.WHITE);
-        var buffers=mc.renderBuffers().bufferSource();var out=buffers.getBuffer(material);
+        var buffers=com.codex.blacklight.client.ShaderPackCompat.buffers();var out=buffers.getBuffer(material);
         var stack=event.getPoseStack();stack.pushPose();stack.translate(-camera.x,-camera.y,-camera.z);
         int light=mc.getEntityRenderDispatcher().getPackedLightCoords(owner,partial);
         // Named return clocks govern each tissue family; body recovery has a
@@ -225,6 +225,7 @@ public final class DevastatorEffectRenderer {
             if(renderedVertices>verticesBefore)renderedEffects++;
         } finally {
             stack.popPose();buffers.endBatch(material);AuthoredDevastatorMesh.finish(buffers);
+            if(com.codex.blacklight.client.ShaderPackCompat.active())buffers.endBatch();
         }
     }
 
@@ -361,10 +362,17 @@ public final class DevastatorEffectRenderer {
         int count=BulletImpactMist.draw(stack,frame,MAX_VERTICES_PER_FRAME-renderedVertices);
         renderedVertices+=count;renderedQuads+=count/4;
     }
+    private static int packedSinceFlush;
+    /** Shader packs lose very large single draws; submit the CPU fallback in bounded batches. */
+    private static void flushPacked(int count){
+        if(!com.codex.blacklight.client.ShaderPackCompat.active())return;
+        packedSinceFlush+=count;
+        if(packedSinceFlush>=16_384){com.codex.blacklight.client.ShaderPackCompat.buffers().endBatch();packedSinceFlush=0;}
+    }
     private static void nativeStrand(PoseStack stack,int light,String id,Vec3 root,Vec3 control,Vec3 tip,double width,int alpha,double twist){
         if(renderedVertices+AuthoredDevastatorMesh.vertices(id)>MAX_VERTICES_PER_FRAME)return;
-        int count=AuthoredDevastatorMesh.strand(stack,Minecraft.getInstance().renderBuffers().bufferSource(),light,id,root,control,tip,width,alpha,twist);
-        if(count>0){renderedBranches++;renderedVertices+=count;renderedQuads+=count/4;}
+        int count=AuthoredDevastatorMesh.strand(stack,com.codex.blacklight.client.ShaderPackCompat.buffers(),light,id,root,control,tip,width,alpha,twist);
+        if(count>0){renderedBranches++;renderedVertices+=count;renderedQuads+=count/4;flushPacked(count);}
     }
     private record Arrival(double launch,double speed) { }
     /** Use source speed whenever there is enough preparation. Acceleration for
@@ -377,8 +385,8 @@ public final class DevastatorEffectRenderer {
     private static void nativeSpike(PoseStack stack,int light,String id,Vec3 base,float yaw,double growth,double size,int alpha){
         if(base.distanceToSqr(Minecraft.getInstance().gameRenderer.getMainCamera().getPosition())>12*12)id+="_lod";
         if(renderedVertices+AuthoredDevastatorMesh.vertices(id)>MAX_VERTICES_PER_FRAME)return;
-        int count=AuthoredDevastatorMesh.spike(stack,Minecraft.getInstance().renderBuffers().bufferSource(),light,id,base,yaw,growth,size,alpha);
-        if(count>0){renderedBranches++;renderedVertices+=count;renderedQuads+=count/4;}
+        int count=AuthoredDevastatorMesh.spike(stack,com.codex.blacklight.client.ShaderPackCompat.buffers(),light,id,base,yaw,growth,size,alpha);
+        if(count>0){renderedBranches++;renderedVertices+=count;renderedQuads+=count/4;flushPacked(count);}
     }
     private static Vec3 hand(LivingEntity owner,float partial,boolean left) {
         Vec3[] hands=HANDS.get(owner.getId());if(hands!=null&&hands[left?1:0]!=null)return hands[left?1:0];

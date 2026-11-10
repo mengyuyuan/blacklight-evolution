@@ -38,23 +38,19 @@ public final class TissueAggregate {
         if(bone.role()==0){
             boolean upright=span(box,up)>=span(box,front)*.85F;
             V along=upright?up:front,dorsal=upright?front.mul(-1):up;
-            float t=Math.clamp(d.dot(along)/span(box,along)+.5F,0,1);
-            float shoulder=(float)Math.exp(-Math.pow((t-.70F)/.34F,2));
-            // Broad connected thorax, pinched abdomen and an off-centre dorsal
-            // keel replace the straight native trunk with a new weight-bearing shape.
-            return point.add(right.mul(d.dot(right)*a*(.30F+.65F*shoulder+.15F*form.radial())))
-                    .add(dorsal.mul(d.dot(dorsal)*a*(.25F+.45F*shoulder)))
-                    .add(dorsal.mul(span(box,dorsal)*a*.22F*shoulder))
-                    .add(along.mul(span(box,along)*a*(.10F*form.quadruped()+.05F*form.upright())*shoulder))
-                    .add(right.mul(span(box,right)*a*.07F*form.handedness()*shoulder));
+            // Separable per-axis scale keeps cuboids rectangular. The keel is a
+            // taller back half, not a Gaussian hump that arches every block.
+            float back=d.dot(dorsal),side=d.dot(right);
+            float hand=side*form.handedness()>0?.10F:0;
+            return point.add(right.mul(side*a*(.55F+.15F*form.radial()+hand)))
+                    .add(dorsal.mul(back*a*(back>0?.75F:.35F)));
         }
         if(bone.role()==1){
             float depth=span(box,front),height=span(box,up);
             float face=Math.clamp(d.dot(front)/depth+.5F,0,1);
-            float neck=Math.clamp((point.dot(up)-(centre.dot(up)-height*.5F))/height,0,1);
-            return point.add(front.mul(depth*a*(.22F*neck+(.32F+.14F*form.quadruped())*face*face)))
-                    .add(right.mul(d.dot(right)*a*(.25F+.32F*form.radial())*face))
-                    .add(up.mul(-height*a*.12F*face));
+            return point.add(front.mul(depth*a*(.11F+(.32F+.14F*form.quadruped())*face*face)))
+                    .add(right.mul(d.dot(right)*a*(.18F+.22F*form.radial())))
+                    .add(up.mul(-height*a*.06F));
         }
         if(bone.role()<2||bone.role()>5)return point;
         V along=axis(box);float length=span(box,along);
@@ -64,12 +60,9 @@ public final class TissueAggregate {
         boolean arm=!groundSupport;float side=bone.modelCentre().x()<0?-1:1;
         float dominant=1+.22F*side*form.handedness();
         V section=centre.add(along.mul(d.dot(along))),radial=point.sub(section);
-        float proximal=(float)Math.sin(Math.PI*Math.clamp(t*.85F+.08F,0,1));
-        float girth=1+a*(arm?.75F:.35F)*proximal*dominant;
+        float girth=1+a*(arm?.50F:.24F)*dominant;
         V result=section.add(radial.mul(girth));
-        // Elbow/foreleg bends change the whole limb silhouette, rather than
-        // stretching only the weapon tip. The native joint root stays fixed.
-        result=result.add(front.mul(length*a*(arm?.22F:.10F)*(float)Math.sin(Math.PI*t)*dominant));
+        // No curved bend: shearing a limb along sin(t) turned square limbs into arcs.
         if(arm)result=result.add(along.mul(sign*length*a*.18F*t*t*dominant));
         if(planted){
             float floor=centre.dot(up)-span(box,up)*.5F;

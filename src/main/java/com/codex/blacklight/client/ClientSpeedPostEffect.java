@@ -119,6 +119,10 @@ public final class ClientSpeedPostEffect {
 
     @SubscribeEvent
     public static void onRenderLevel(RenderLevelStageEvent event) {
+        if (event.getStage() == RenderLevelStageEvent.Stage.AFTER_LEVEL) ShaderPackCompat.afterLevel(() -> apply(event));
+    }
+
+    private static void apply(RenderLevelStageEvent event) {
         if (event.getStage() != RenderLevelStageEvent.Stage.AFTER_LEVEL || failed) return;
         Minecraft minecraft = Minecraft.getInstance();
         if (minecraft.level == null || minecraft.player == null || minecraft.screen != null) return;

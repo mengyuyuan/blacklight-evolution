@@ -74,3 +74,4 @@ __pycache__/
 /art/sovereign-wings/*.png
 /art/sovereign-wings/*.glb
 /art/sovereign-wings/*.blend
+/run-native-qa/

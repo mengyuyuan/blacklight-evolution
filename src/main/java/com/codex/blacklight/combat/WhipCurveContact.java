@@ -30,7 +30,42 @@ public final class WhipCurveContact {
         return worldPoints(curve,time,feet,yaw,1);
     }
     public static List<Vec3> worldPoints(WhipCurve curve,double time,Vec3 feet,float yaw,Entity actor){
-        return worldPoints(curve,time,feet,yaw,AttackReach.scale(actor));
+        double scale=AttackReach.scale(actor);
+        return pitched(worldPoints(curve,time,feet,yaw,scale),feet,yaw,aimPitch(actor),shoulder(actor));
+    }
+    /** Lash elevation; within the dead zone the authored ground-level strike is kept exactly. */
+    public static final float PITCH_DEAD_ZONE=12F,PITCH_LIMIT=80F;
+    public static double shoulder(Entity actor){return actor.getBbHeight()*.78;}
+    /** Toward the locked or struck target when there is one, otherwise where the actor looks. */
+    public static float aimPitch(Entity actor){
+        float pitch=actor.getXRot();
+        if(actor instanceof net.minecraft.world.entity.LivingEntity living&&com.codex.blacklight.registry.ModAttachments.available(living)){
+            var visual=living.getData(com.codex.blacklight.registry.ModAttachments.WEAPON_VISUAL);
+            var target=visual.targetId()<0?null:actor.level().getEntity(visual.targetId());
+            if(target!=null&&target!=actor){
+                Vec3 from=actor.position().add(0,shoulder(actor),0),to=target.getBoundingBox().getCenter();
+                double horizontal=Math.sqrt((to.x-from.x)*(to.x-from.x)+(to.z-from.z)*(to.z-from.z));
+                pitch=(float)Math.toDegrees(Math.atan2(from.y-to.y,Math.max(1e-6,horizontal)));
+            }
+        }
+        return effectivePitch(pitch);
+    }
+    public static float effectivePitch(float pitch){
+        if(!Float.isFinite(pitch)||Math.abs(pitch)<PITCH_DEAD_ZONE)return 0;
+        return Math.clamp(pitch,-PITCH_LIMIT,PITCH_LIMIT);
+    }
+    /** Tilts the authored lash about the shoulder in the actor's forward/up plane;
+     * positive pitch follows Minecraft and points down. */
+    public static List<Vec3> pitched(List<Vec3> points,Vec3 feet,float yaw,float pitch,double shoulder){
+        if(pitch==0)return points;
+        Vec3 forward=Vec3.directionFromRotation(0,yaw),pivot=feet.add(0,shoulder,0);
+        double a=Math.toRadians(pitch),cos=Math.cos(a),sin=Math.sin(a);
+        return points.stream().map(p->{
+            Vec3 d=p.subtract(pivot);double f=d.x*forward.x+d.z*forward.z,u=d.y;
+            Vec3 side=d.subtract(forward.scale(f)).multiply(1,0,1);
+            double nf=f*cos+u*sin,nu=-f*sin+u*cos;
+            return pivot.add(side).add(forward.scale(nf)).add(0,nu,0);
+        }).toList();
     }
     private static List<Vec3> worldPoints(WhipCurve curve,double time,Vec3 feet,float yaw,double scale){
         Vec3 forward = Vec3.directionFromRotation(0, yaw);
@@ -59,7 +94,12 @@ public final class WhipCurveContact {
         return sweptBoundsScaled(curve,fromTime,toTime,fromFeet,toFeet,yaw,1);
     }
     public static AABB sweptBounds(WhipCurve curve,double fromTime,double toTime,Vec3 fromFeet,Vec3 toFeet,float yaw,Entity actor){
-        return sweptBoundsScaled(curve,fromTime,toTime,fromFeet,toFeet,yaw,AttackReach.scale(actor));
+        var bounds=sweptBoundsScaled(curve,fromTime,toTime,fromFeet,toFeet,yaw,AttackReach.scale(actor));
+        float pitch=aimPitch(actor);if(pitch==0)return bounds;
+        // Conservative: the pitched lash stays inside a sphere of the flat sweep's extent about the shoulder.
+        double extent=Math.max(bounds.getXsize(),Math.max(bounds.getYsize(),bounds.getZsize()));
+        Vec3 pivot=toFeet.add(0,shoulder(actor),0);
+        return bounds.minmax(new AABB(pivot,pivot).inflate(extent));
     }
     private static AABB sweptBoundsScaled(WhipCurve curve,double fromTime,double toTime,Vec3 fromFeet,Vec3 toFeet,float yaw,double scale){
         var start = worldPoints(curve, fromTime, fromFeet, yaw,scale);

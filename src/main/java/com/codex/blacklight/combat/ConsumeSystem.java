@@ -316,7 +316,14 @@ public final class ConsumeSystem {
                 ||player.getData(ModAttachments.WEAPON_VISUAL).spec()!=null||ModAttachments.peekData(player, ModAttachments.CONSUMING, false)))clearRecovery(player);
         Session session = ACTIVE.get(player); if (session == null) return;
         Mob target = session.victim();
-        if (!valid(player,session) || (!session.large && session.stage!=ConsumeVisual.CONSUME && ConsumeVisual.blocksTravel(session.stage) && player.position().distanceToSqr(session.start)>1)) {
+        // Capture locks travel input, so drift here comes from outside: explosion lift, a launch,
+        // another player's heavy hit. Pull the actor back before the reach check instead of dropping the grab.
+        if(!session.large && session.stage==ConsumeVisual.CAPTURE && player.isAlive() && player.position().distanceToSqr(session.start)>1){
+            // setPos moves the server body; teleportTo also corrects the owning client.
+            player.setPos(session.start);player.teleportTo(session.start.x,session.start.y,session.start.z);
+            player.setDeltaMovement(Vec3.ZERO);player.fallDistance=0;
+        }
+        if (!valid(player,session)) {
             cancel(player);return;
         }
         int elapsed=player.tickCount-session.started;
@@ -480,8 +487,7 @@ public final class ConsumeSystem {
         player.fallDistance=0;player.setDeltaMovement(Vec3.ZERO);
         if(before.distanceToSqr(player.position())>.000001)player.connection.teleport(player.getX(),player.getY(),player.getZ(),session.facing,player.getXRot());
         Vec3 goal=ConsumePlacementTrack.anchor(session.start,session.facing,target,session.form,t,session.variant).orElse(session.consumeTargetStart==null?target.position():session.consumeTargetStart);
-        if(ConsumePlacementTrack.headGrip(session.form,session.variant)&&t<ConsumePlacementTrack.gripEnd(session.form))
-            goal=goal.add(player.position().subtract(actorGoal));
+        goal=ConsumePlacementTrack.pairedGoal(goal,player.position(),actorGoal);
         Vec3 delta=goal.subtract(target.position());
         target.move(MoverType.SELF,delta.length()>1.25?delta.normalize().scale(1.25):delta);
         target.setDeltaMovement(Vec3.ZERO);target.fallDistance=0;
@@ -528,6 +534,9 @@ public final class ConsumeSystem {
         // Release before death callbacks; rewards are only paid once after successful completion.
         var recovery=ModAttachments.peekData(target, ModAttachments.CONSUME_VISUAL, ConsumeVisual.EMPTY);
         ACTIVE.remove(player);
+        // Publish the recovery pose before the victim scene is cleared, so no client frame sees
+        // neither and drops the actor to its idle pose for a frame.
+        player.setData(ModAttachments.CONSUME_RECOVERY,recovery);player.syncData(ModAttachments.CONSUME_RECOVERY);
         release(target);unlock(player);
         if(ConsumeSequence.boss(target)) {
             var source=target.damageSources().playerAttack(player);
@@ -538,14 +547,13 @@ public final class ConsumeSystem {
                     : target.hurt(source,Math.max(1000,target.getMaxHealth()*20)));
             // Zero HP (or the dragon's DYING phase) alone does not prove death was accepted.
             if(!accepted||!((com.codex.blacklight.mixin.LivingDeathAccess)target).blacklight$deathAccepted()){
-                message(player,"consume_cancelled");return;
+                clearRecovery(player);message(player,"consume_cancelled");return;
             }
         } else if(target instanceof BlacklightHunter hunter){
             if(hunter.parasite())com.codex.blacklight.power.ParasiteSystem.consumedInfectedHunter(player);
             hunter.beginConsumeRemains();
         }
         else target.discard();
-        player.setData(ModAttachments.CONSUME_RECOVERY,recovery);player.syncData(ModAttachments.CONSUME_RECOVERY);
         // Locomotion owns the base layer; the client samples the remaining source
         // pose independently, even after the receiver entity has disappeared.
         play(player,PlayerAction.CLAW_IDLE);
