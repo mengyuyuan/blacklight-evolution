@@ -22,6 +22,11 @@ public record InfiniteProgress(Map<String,Long> ranks) {
         public void encode(FriendlyByteBuf b,InfiniteProgress p){b.writeVarInt(p.ranks.size());for(var a:EvolutionAttribute.values())if(p.rank(a)>0){b.writeUtf(a.id);b.writeVarLong(p.rank(a));}}
     };
     public long rank(EvolutionAttribute attribute){return ranks.getOrDefault(attribute.id,0L);}
+    /** Adds n ranks at once, saturating at Long.MAX_VALUE. */
+    public InfiniteProgress buy(EvolutionAttribute attribute,long count){
+        long n=Math.max(0,count),rank=rank(attribute);if(n==0||rank==Long.MAX_VALUE)return this;
+        var next=new HashMap<>(ranks);next.put(attribute.id,rank>Long.MAX_VALUE-n?Long.MAX_VALUE:rank+n);return new InfiniteProgress(next);
+    }
     public InfiniteProgress buy(EvolutionAttribute attribute){
         if(rank(attribute)==Long.MAX_VALUE)return this;
         var next=new HashMap<>(ranks);next.put(attribute.id,rank(attribute)+1);return new InfiniteProgress(next);

@@ -15,9 +15,13 @@ public final class LocalVisualMotion {
 
     private LocalVisualMotion() {}
 
-    public static synchronized Optional<Definition> find(String id) {
+    public static Optional<Definition> find(String id) {
         if (!LocalMotionAnimation.validId(id)) throw new IllegalArgumentException("Invalid motion id: " + id);
-        return LOADED.computeIfAbsent(id, LocalVisualMotion::read);
+        synchronized (LOADED) { var known = LOADED.get(id); if (known != null) return known; }
+        // Parse outside the lock: a 100-400 KB clip took 100-200 ms and the render thread's
+        // lookup of any other clip waited behind it. A rare duplicate parse keeps the first result.
+        var parsed = read(id);
+        synchronized (LOADED) { return LOADED.computeIfAbsent(id, ignored -> parsed); }
     }
 
     private static Optional<Definition> read(String id) {

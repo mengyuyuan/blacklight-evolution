@@ -64,7 +64,7 @@ public final class AuthoredDevastatorMesh {
         net.minecraft.client.renderer.RenderType material=null;
         try{
             var shader=RigidBiomassMaterial.shader();
-            if(shader==null)return; // A resource reload also clears this queue.
+            if(shader==null||!RigidBiomassMaterial.ready())return; // A resource reload or shader-pack toggle also clears this queue.
             for(var draw:RIGID_DRAWS){
                 var next=RigidBiomassMaterial.mesh(draw.texture);
                 if(material!=next){
@@ -101,9 +101,13 @@ public final class AuthoredDevastatorMesh {
         // underground. Their dimensions/normals stay intact during emergence.
         double underground=(1-com.codex.blacklight.util.MathCompat.clamp(growth,0,1))*m.max[1]*scale;
         for(int face=0;face<m.indices.length;face+=3)for(int corner=0;corner<4;corner++){
-            int index=m.indices[face+Math.min(corner,2)],p=index*3,u=index*2;
-            double x=m.p[p]*scale,z=m.p[p+2]*scale;
-            double y=m.p[p+1]*scale-underground;
+            // Corner 3 closes the triangle at the midpoint of its third edge, never on a
+            // repeated vertex: shader packs derive quad normals/tangents, which a
+            // degenerate quad turns into NaN and an invisible face.
+            int index=m.indices[face+(corner==3?0:corner)],p=index*3,u=index*2;
+            int far=m.indices[face+2]*3;double mix=corner==3?.5:0;
+            double x=(m.p[p]+(m.p[far]-m.p[p])*mix)*scale,z=(m.p[p+2]+(m.p[far+2]-m.p[p+2])*mix)*scale;
+            double y=(m.p[p+1]+(m.p[far+1]-m.p[p+1])*mix)*scale-underground;
             double nx=m.n[p],nz=m.n[p+2],ny=m.n[p+1];
             double len=Math.sqrt(nx*nx+ny*ny+nz*nz);
             out.vertex(stack.last().pose(),(float)(base.x+x*cosine-z*sine),(float)(base.y+y),(float)(base.z+x*sine+z*cosine))
@@ -193,8 +197,11 @@ public final class AuthoredDevastatorMesh {
             m.shaped[q+3]=(float)(ox/nm);m.shaped[q+4]=(float)(oy/nm);m.shaped[q+5]=(float)(oz/nm);
         }
         for(int face=0;face<m.indices.length;face+=3)for(int corner=0;corner<4;corner++){
-            int index=m.indices[face+Math.min(corner,2)],q=index*6,u=index*2;
-            out.vertex(stack.last().pose(),m.shaped[q],m.shaped[q+1],m.shaped[q+2]).color((alpha<<24)|(m.colors[index]&0xFFFFFF))
+            // See spike(): a midpoint closes the triangle without a degenerate quad.
+            int index=m.indices[face+(corner==3?0:corner)],q=index*6,u=index*2,far=m.indices[face+2]*6;
+            float mix=corner==3?.5F:0;
+            out.vertex(stack.last().pose(),m.shaped[q]+(m.shaped[far]-m.shaped[q])*mix,
+                    m.shaped[q+1]+(m.shaped[far+1]-m.shaped[q+1])*mix,m.shaped[q+2]+(m.shaped[far+2]-m.shaped[q+2])*mix).color((alpha<<24)|(m.colors[index]&0xFFFFFF))
                     .uv(.8F,.5F).overlayCoords(OverlayTexture.NO_OVERLAY).uv2(light)
                     .normal(stack.last().normal(),m.shaped[q+3],m.shaped[q+4],m.shaped[q+5]).endVertex();
         }

@@ -281,13 +281,13 @@ public final class StandaloneGaitSmoke {
         }
         row.addProperty("armor",UtilityPowerSystem.active(mc.player,PowerForm.ARMOR));row.addProperty("onGround",mc.player.onGround());
         row.addProperty("activePower",com.codex.blacklight.registry.ModAttachments.getData(mc.player, ModAttachments.PLAYER_STATE).getActivePower().name());
-        double nominal=MotionLibrary.nominalSpeed(clock.key())*mc.player.getScale();row.addProperty("nominalBlocksPerTick",nominal);
+        double nominal=clock.lastNominal();row.addProperty("nominalBlocksPerTick",nominal);
         if(previousTick!=null) {
             double dx=position.x-previousTick.get("x").getAsDouble(),dy=position.y-previousTick.get("y").getAsDouble(),dz=position.z-previousTick.get("z").getAsDouble();
             double distance=Math.hypot(dx,dz);row.addProperty("distance",distance);row.addProperty("verticalDistance",dy);
             long delta=clock.tick()-previousTick.get("tick").getAsLong();
             if(previousTick.get("key").getAsString().equals(clock.key())&&clock.looping()&&nominal>0&&distance<4&&delta>0) {
-                double expected=Math.min(distance/(nominal*20),delta/20.0*8),actual=clock.current()-previousTick.get("currentSeconds").getAsDouble();
+                double expected=Math.min(distance/(nominal*20),clock.lastCap()),actual=clock.current()-previousTick.get("currentSeconds").getAsDouble();
                 row.addProperty("expectedPhaseAdvance",expected);row.addProperty("actualPhaseAdvance",actual);
                 if(Math.abs(expected-actual)>.00001)violation("distance-clock mismatch at "+clock.tick()+": "+actual+" != "+expected);
                 if(actual<-.000001)violation("clock rewound at "+clock.tick());

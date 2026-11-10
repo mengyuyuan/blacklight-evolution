@@ -42,7 +42,32 @@ public final class VehicleHullShape {
         for(Bounds b:parts) r=Math.max(r,Math.hypot(Math.max(Math.abs(b.minX),Math.abs(b.maxX)),Math.max(Math.abs(b.minZ),Math.abs(b.maxZ))));
         radius=r;
     }
-    public static VehicleHullShape from(VehicleDefinition definition, double turretYaw, double pitch) {
+    /** Hull-local boxes (body first, then barrels); oriented by body yaw for exact terrain tests. */
+    public List<Bounds> localParts() { return parts; }
+    public double radius() { return radius; }
+    /** Hull-local articulation sweep: the fixed body once, then each segment's swept barrel boxes. */
+    public static List<Bounds> sweepArticulationLocal(VehicleDefinition definition,
+            double startTurretYaw, double endTurretYaw, double startPitch, double endPitch) {
+        VehicleDefinition.finiteAngle(startPitch); VehicleDefinition.finiteAngle(endPitch);
+        double dy=shortestDelta(startTurretYaw,endTurretYaw), dp=endPitch-startPitch;
+        if(Math.abs(dp)>180) throw new IllegalArgumentException("Unbounded gun pitch sweep");
+        double maxRadius=0;
+        for(var anchor:definition.anchors().values()) if(anchor.frame()!=VehicleDefinition.Frame.BODY) {
+            Vec3 t=VehicleDefinition.subtract(anchor.position(),definition.turretPivot());
+            Vec3 g=VehicleDefinition.subtract(anchor.position(),definition.gunPivot());
+            maxRadius=Math.max(maxRadius,Math.sqrt(t.x()*t.x()+t.y()*t.y()+t.z()*t.z())+Math.sqrt(g.x()*g.x()+g.y()*g.y()+g.z()*g.z())+definition.barrelRadius());
+        }
+        int segments=segments(maxRadius*Math.toRadians(Math.abs(dy)+Math.abs(dp)),CORNER_ARC_STEP);
+        double margin=maxRadius*Math.toRadians(Math.abs(dy)+Math.abs(dp))/segments;
+        VehicleHullShape previous=from(definition,startTurretYaw,startPitch);
+        var result=new ArrayList<Bounds>();result.add(previous.parts.get(0));
+        for(int i=1;i<=segments;i++) {
+            VehicleHullShape next=from(definition,startTurretYaw+dy*i/segments,startPitch+dp*i/segments);
+            for(int part=1;part<previous.parts.size();part++) result.add(previous.parts.get(part).union(next.parts.get(part)).inflate(margin+1e-9));
+            previous=next;
+        }
+        return List.copyOf(result);
+    }    public static VehicleHullShape from(VehicleDefinition definition, double turretYaw, double pitch) {
         VehicleDefinition.finiteAngle(turretYaw); VehicleDefinition.finiteAngle(pitch);
         var body=new VehicleHullShape(definition.width(),definition.length(),definition.height());
         var boxes=new ArrayList<>(body.parts);

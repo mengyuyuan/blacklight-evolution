@@ -114,7 +114,7 @@ public final class MilitaryVehicleGameTest {
             assertClearFixture(h,f,v,"intermediate-corner pillar");
             boolean blocked=false;for(int i=0;i<30;i++)if(v.moveVehicle(0,3).reason()==com.codex.blacklight.military.vehicle.VehicleKinematics.StopReason.ROTATION_BLOCKED)blocked=true;
             h.assertTrue(blocked&&v.getYRot()<85,"rotation sweep catches the intermediate long-car corner, not just two clear endpoints");
-            h.assertTrue(f.level.noCollision(v,v.getBoundingBox()),"actual entity bounding box remains outside the real pillar");
+            h.assertTrue(VehicleKinematics.placementReady(v),"the real rotated hull stays outside the pillar (the axis-aligned entity box of a diagonal hull may overhang it)");
         }h.succeed();
     }
     @GameTest(template="blackwatch_arena",batch="vehicle6",timeoutTicks=100)

@@ -14,6 +14,13 @@ public final class UpgradeSystem {
     }
 
     public static void purchase(ServerPlayer player, String upgradeId) {
+        int star=upgradeId.indexOf('*');
+        if(star>0){
+            var bulk=EvolutionAttribute.byId(upgradeId.substring(0,star));String amount=upgradeId.substring(star+1);
+            long count=amount.equals("max")?InfiniteEvolutionSystem.MAX_BULK:amount.matches("\\d{1,4}")?Long.parseLong(amount):0;
+            if(bulk!=null&&count>0)InfiniteEvolutionSystem.purchase(player,bulk,count);
+            return;
+        }
         var attribute=EvolutionAttribute.byId(upgradeId);
         if(attribute!=null){InfiniteEvolutionSystem.purchase(player,attribute);return;}
         var organ=com.codex.blacklight.infection.TissueCore.byId(upgradeId);

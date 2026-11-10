@@ -28,7 +28,7 @@ public final class ConsumeGripPose {
         // retain its authored pose, even though both scenes use the same weapon.
         if(!ConsumePlacementTrack.headGrip(PowerForm.CLAWS,visual.variant()))return;
         float time=visual.motionProgress(actor.level().getGameTime(),partial),end=ConsumePlacementTrack.gripEnd(PowerForm.CLAWS);
-        float weight=net.minecraft.util.Mth.clamp((actor.level().getGameTime()-visual.started()+partial)/4F,0,1)*net.minecraft.util.Mth.clamp((end-time)/.06F,0,1);
+        float weight=PhaseEntryBlend.CONSUME_GRIP.weight(actor,visual.started(),visual.stage(),partial,4F)*net.minecraft.util.Mth.clamp((end-time)/.06F,0,1);
         if(weight<=0)return;
         Vec3 forward=Vec3.directionFromRotation(0,visual.facing()),left=new Vec3(forward.z,0,-forward.x);
         boolean quad=ConsumeSequence.quadruped(victim);

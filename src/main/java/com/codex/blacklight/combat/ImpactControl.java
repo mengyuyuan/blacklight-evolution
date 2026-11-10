@@ -32,6 +32,21 @@ public final class ImpactControl {
         if(hunterLight&&!((com.codex.blacklight.entity.BlacklightHunter)entity).acceptLightStagger())return false;
         boolean evolved=entity.isAlive()&&entity instanceof com.codex.blacklight.entity.BlacklightInfectedHost host&&host.isEvolved();
         if(evolved&&!((com.codex.blacklight.entity.BlacklightInfectedHost)entity).acceptEvolvedImpact())return false;
+        // Players get a short flinch with recovery immunity, so trading blows never chain-locks
+        // either side and a committed attack keeps its animation.
+        if(entity instanceof net.minecraft.server.level.ServerPlayer player&&player.isAlive()){
+            var previous=ModAttachments.peekData(player,ModAttachments.HIT_REACTION,HitReaction.EMPTY);
+            long now=player.level().getGameTime();int kind=PlayerPoise.kind(profile.kind());
+            // Claw combos and grab/consume were missing here: the flinch replaced their pose for
+            // every observer while the attack carried on, so fights looked like nothing played.
+            boolean committed=WeaponCombatSystem.busy(player)||ConsumeSystem.active(player)
+                    ||com.codex.blacklight.power.BiomassSystem.active(player)
+                    ||ModAttachments.getData(player,ModAttachments.CLAW_COMBAT).action()!=ClawCombatState.Action.IDLE;
+            int ticks=PlayerPoise.duration(previous.started(),previous.duration(),now,kind,committed);
+            if(ticks<=0)return false;
+            int motion=profile.motion()==ImpactProfile.DOWN||profile.motion()==ImpactProfile.RISE?ImpactProfile.FALL:profile.motion();
+            publish(player,new HitReaction(now,ticks,kind,yaw,motion));return true;
+        }
         cancel(entity);
         if(!entity.isAlive()){
             publish(entity,new HitReaction(entity.level().getGameTime(),20,HitReaction.DEATH,yaw,ImpactProfile.FALL));return true;

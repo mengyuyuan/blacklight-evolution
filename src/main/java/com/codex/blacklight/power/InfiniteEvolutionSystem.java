@@ -19,13 +19,21 @@ public final class InfiniteEvolutionSystem {
     private InfiniteEvolutionSystem(){}
     public static long rank(Player p,EvolutionAttribute a){return com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.INFINITE_EVOLUTION).rank(a);}
     public static long effectiveRank(Player p,EvolutionAttribute a){return EvolutionProgression.infiniteUnlocked(p)?rank(p,a):0;}
-    public static boolean purchase(ServerPlayer p,EvolutionAttribute a){
+    public static boolean purchase(ServerPlayer p,EvolutionAttribute a){return purchase(p,a,1)>0;}
+    /** One request may buy several ranks; the count is clamped to what the EP balance pays for. */
+    public static long purchase(ServerPlayer p,EvolutionAttribute a,long requested){
         var state=com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.PLAYER_STATE);var progress=com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.INFINITE_EVOLUTION);
         int cost=PlayerEvolutionConfig.COST.get();
-        if(!p.isAlive()||p.isSpectator()||!EvolutionProgression.infiniteUnlocked(p)||progress.rank(a)==Long.MAX_VALUE||state.getEvolutionPoints()<cost)return false;
-        state.addEvolutionPoints(-cost);com.codex.blacklight.registry.ModAttachments.setData(p, ModAttachments.INFINITE_EVOLUTION,progress.buy(a));
+        if(!p.isAlive()||p.isSpectator()||!EvolutionProgression.infiniteUnlocked(p)||progress.rank(a)==Long.MAX_VALUE||state.getEvolutionPoints()<cost)return 0;
+        long count=bulkCount(requested,state.getEvolutionPoints(),cost,progress.rank(a));
+        state.addEvolutionPoints((int)-(count*cost));com.codex.blacklight.registry.ModAttachments.setData(p, ModAttachments.INFINITE_EVOLUTION,progress.buy(a,count));
         com.codex.blacklight.registry.ModAttachments.syncData(p, ModAttachments.INFINITE_EVOLUTION);com.codex.blacklight.registry.ModAttachments.syncData(p, ModAttachments.PLAYER_STATE);EvolutionProgression.refresh(p);GrowthSystem.updateHealth(p);updateMobility(p);
-        return true;
+        return count;
+    }
+    public static final int MAX_BULK=1000;
+    static long bulkCount(long requested,int balance,int cost,long rank){
+        if(cost<=0||balance<cost||rank==Long.MAX_VALUE)return 0;
+        return Math.max(1,Math.min(Math.min(requested,MAX_BULK),Math.min((long)balance/cost,Long.MAX_VALUE-rank)));
     }
     public static double mobility(Player p){return PrototypeMetabolism.active(p)?EvolutionAttribute.mobilityMultiplier(effectiveRank(p,EvolutionAttribute.MOBILITY)):1;}
     private static void updateMobility(ServerPlayer p){CombatScale.modifier(p.getAttribute(Attributes.MOVEMENT_SPEED),SPEED,mobility(p)-1,AttributeModifier.Operation.MULTIPLY_TOTAL);}

@@ -4,6 +4,13 @@ package com.codex.blacklight.movement;
 public final class PrototypeLocomotion {
     public static final int CHARGE_GROUND_GRACE_TICKS = 5;
     public static final double RUN_ANIMATION_SPEED = 0.18D;
+    /**
+     * Fastest speed still drawn as a walk when no sprint was asked for. Unarmored
+     * forward travel is about 0.233: above RUN_ANIMATION_SPEED, so it used to play the
+     * sprint clip at 70% cadence (hands flapping at face height, crouched, floaty).
+     * It now plays the same walk as armor; only sprinting or real speed shows a run.
+     */
+    public static final double WALK_VISUAL_MAX = 0.28D;
     public static final float MIN_PLAYBACK_SPEED = 0.55F;
     public static final float MAX_PLAYBACK_SPEED = 2.75F;
     public static final int GAIT_CONFIRM_TICKS = 3;

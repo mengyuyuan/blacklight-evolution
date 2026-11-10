@@ -31,7 +31,7 @@ public final class OutbreakPopulationGameTest {
     @GameTest(template="wall_test",timeoutTicks=600,batch="population_early_mix")
     public static void actualEarlyPopulationAddsAGrowingAnimalLineageAfterItsFoodReserve(GameTestHelper h){var f=fixture(h);f.after(1,()->seed(f,6),()->{
         var tier=WorldOutbreakSystem.tierForPopulation(f.level,f.origin,0);h.assertTrue(tier==OutbreakRules.Tier.GROWING,"the real early neighborhood cannot keep selecting ordinary zombies after its six food slots");
-        double share=com.codex.blacklight.config.InfectionEcologyConfig.WORLD_SHARE.get();Mob mob;try{com.codex.blacklight.config.InfectionEcologyConfig.WORLD_SHARE.set(1D);mob=WorldOutbreakSystem.spawnFromBuilding(f.level,f.origin.east(5).north(2),tier);}finally{com.codex.blacklight.config.InfectionEcologyConfig.WORLD_SHARE.set(share);}if(mob!=null)f.born.add(mob);
+        double share=com.codex.blacklight.config.InfectionEcologyConfig.WORLD_SHARE.get();int chunkCap=OutbreakConfig.CHUNK_CAP.get();Mob mob;try{com.codex.blacklight.config.InfectionEcologyConfig.WORLD_SHARE.set(1D);OutbreakConfig.CHUNK_CAP.set(0);mob=WorldOutbreakSystem.spawnFromBuilding(f.level,f.origin.east(5).north(2),tier);}finally{com.codex.blacklight.config.InfectionEcologyConfig.WORLD_SHARE.set(share);OutbreakConfig.CHUNK_CAP.set(chunkCap);}if(mob!=null)f.born.add(mob);
         h.assertTrue(mob instanceof BlacklightInfectedHost host&&host.tissueAge()==6000&&!host.isEvolved()&&host.tissueInheritance().meals()==0,"the actual shared producer creates a developing source rig, not a fake command-spawned evolved elite; result="+mob);
     });}
 

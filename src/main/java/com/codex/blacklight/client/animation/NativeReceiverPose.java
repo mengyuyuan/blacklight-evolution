@@ -34,7 +34,7 @@ public final class NativeReceiverPose {
             key=visual.consuming()?"hunter_consume":"hunter_grab";
             progress=visual.consuming()?visual.motionProgress(entity.level().getGameTime(),partial):
                     visual.stage()==ConsumeVisual.MOUNT_HOLD?1:visual.phaseProgress(entity.level().getGameTime(),partial);
-            weight=net.minecraft.util.Mth.clamp((entity.level().getGameTime()-visual.started()+partial)/3F,0,1);
+            weight=PhaseEntryBlend.RECEIVER.weight(entity,visual.started(),visual.stage(),partial,3F);
             var clip=ReceiverMotions.clip(key);
             if(clip!=null&&visual.consuming())progress=visual.stage()==ConsumeVisual.HUNTER_CONSUME
                     ?net.minecraft.util.Mth.clamp(HunterConsume.seconds(visual,entity.level().getGameTime(),partial)/clip.seconds(),0,1)

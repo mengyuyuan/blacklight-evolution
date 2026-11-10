@@ -20,11 +20,11 @@ public final class PlayerEvolutionConfig {
                 .defineInRange("passiveTierTwoAttributeRank",150,1,1000000);
         KEEP_LEGACY_PASSIVES=b.comment("Keep old learned passives active without new qualifications. False preserves learning/stacks but suspends effects until qualified.")
                 .define("keepLegacyPassivesActive",false);
-        HEALTH_PER_LEVEL=b.comment("每级生命无限强化增加的实际HP。").defineInRange("healthPerLevel",10D,0,1000000);
-        ATTACK_PER_LEVEL=b.comment("每级普通攻击增幅，0.02=2%。").defineInRange("attackFractionPerLevel",.02,0,100);
-        SKILL_PER_LEVEL=b.comment("每级黑光技能伤害增幅，0.04=4%。").defineInRange("skillFractionPerLevel",.04,0,100);
-        DEFENSE_PER_LEVEL=b.comment("防御：受到伤害除以1+本值×等级；不影响虚空或管理击杀。").defineInRange("defenseCoefficientPerLevel",.025,0,100);
-        RECOVERY_PER_LEVEL=b.comment("每级脱战后每秒恢复的实际HP；不是适应性或组织再生层数。").defineInRange("recoveryHpPerLevel",.25,0,1000000);
+        HEALTH_PER_LEVEL=b.comment("每级生命无限强化增加的实际HP。").defineInRange("healthPerLevel",25D,0,1000000);
+        ATTACK_PER_LEVEL=b.comment("每级普通攻击增幅，0.02=2%。").defineInRange("attackFractionPerLevel",.05,0,100);
+        SKILL_PER_LEVEL=b.comment("每级黑光技能伤害增幅，0.04=4%。").defineInRange("skillFractionPerLevel",.08,0,100);
+        DEFENSE_PER_LEVEL=b.comment("防御：受到伤害除以1+本值×等级；不影响虚空或管理击杀。").defineInRange("defenseCoefficientPerLevel",.05,0,100);
+        RECOVERY_PER_LEVEL=b.comment("每级脱战后每秒恢复的实际HP；不是适应性或组织再生层数。").defineInRange("recoveryHpPerLevel",1D,0,1000000);
         RECOVERY_DELAY=b.comment("无限恢复属性的脱战等待刻数；20刻约1秒。").defineInRange("recoveryDelayTicks",80,0,240000);
         MOBILITY_PER_LEVEL=b.comment("移速倍率=1+本值×ln(1+等级)，不改变动作播放速度。").defineInRange("mobilityLogCoefficient",.025,0,10);
         SPEC=b.build();
