@@ -274,6 +274,7 @@ public final class AuthoredInfectionParts {
             if(skin.isEmpty())growth.clear(); // No matching native surface: retain its original cube.
             triangles(bone.getAsJsonObject("growth"),inverse,ratio,srcCentre,centre,cube,false,skin,growth);
             if(bone.has("lateGrowth"))triangles(bone.getAsJsonObject("lateGrowth"),inverse,ratio,srcCentre,centre,cube,false,skin,late);
+            {long voxelSeed=species.hashCode()*31L+name.hashCode();var g=blocky(growth,cube,voxelSeed);var l=blocky(late,cube,voxelSeed+7);growth.clear();growth.addAll(g);late.clear();late.addAll(l);}
             var frame=binding.frames.get(target.part);var sectioned=new ArrayList<Triangle>();
             for(var triangle:skin)for(var section:TissueSkin.sections(frame,value(triangle.a),value(triangle.b),value(triangle.c)))
                 sectioned.add(new Triangle(vector(section.a()),vector(section.b()),vector(section.c()),triangle.normal,triangle.color,triangle.face));
@@ -307,6 +308,17 @@ public final class AuthoredInfectionParts {
         }
         BlacklightNeoMod.LOGGER.info("Bound authored infection growth {}: {} native parts, {} source assignments, coat={}",species,binding.pieces.size(),binding.assignments.size(),fur);
         return binding;
+    }
+    /** Protruding smooth growth becomes pixel blocks on the native cube grid.
+     * Recessed wound beds stay as authored; they are cut into the hide. */
+    private static List<Triangle> blocky(List<Triangle> source,ModelPart.Cube cube,long seed){
+        if(source.isEmpty()||Boolean.getBoolean("blacklight.smoothGrowth"))return source;
+        float[][] tris=new float[source.size()][];int[] colors=new int[source.size()];
+        for(int i=0;i<tris.length;i++){var t=source.get(i);tris[i]=new float[]{t.a.x,t.a.y,t.a.z,t.b.x,t.b.y,t.b.z,t.c.x,t.c.y,t.c.z};colors[i]=t.color;}
+        var voxels=TissueVoxels.convert(tris,colors,new float[]{cube.minX,cube.minY,cube.minZ},new float[]{cube.maxX,cube.maxY,cube.maxZ},.9F,seed);
+        var result=new ArrayList<Triangle>(voxels.size());
+        for(var v:voxels){var p=v.p();result.add(new Triangle(new Vector3f(p[0],p[1],p[2]),new Vector3f(p[3],p[4],p[5]),new Vector3f(p[6],p[7],p[8]),new Vector3f(v.nx(),v.ny(),v.nz()),v.color(),null));}
+        return result;
     }
     private static List<Triangle> localTriangles(JsonObject data){
         var points=new ArrayList<Vector3f>();var vs=data.getAsJsonArray("vertices");

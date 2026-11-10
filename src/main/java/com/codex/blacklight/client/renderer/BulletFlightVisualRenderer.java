@@ -65,7 +65,7 @@ public final class BulletFlightVisualRenderer {
         if(flight==null||!flight.optics.active()||budget<4||VisionPowerRenderer.drawingSilhouettes())return EMPTY;
         var mc=Minecraft.getInstance();var camera=event.getCamera().getPosition();
         if(flight.origin.distanceToSqr(camera)>96*96)return EMPTY;
-        var buffers=mc.renderBuffers().bufferSource();var stack=event.getPoseStack();
+        var buffers=com.codex.blacklight.client.ShaderPackCompat.buffers();var stack=event.getPoseStack();
         // Subtract the camera in double precision BEFORE the vertex float cast.
         // At y=9,999,999 absolute float vertices otherwise snap by whole blocks.
         stack.pushPose();

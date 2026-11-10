@@ -11,9 +11,24 @@ public final class NativeHitPose {
     public static boolean available(net.minecraft.world.entity.LivingEntity entity){
         return entity!=null && MotionLibrary.find(key(com.codex.blacklight.registry.ModAttachments.getData(entity, ModAttachments.HIT_REACTION).motion())).isPresent();
     }
-    public static boolean apply(net.minecraft.world.entity.LivingEntity entity,com.codex.blacklight.animation.BlacklightSkeleton armature,BlacklightPose pose,float partial){
+    /** The flinch weight this client actually draws for the entity: 0 when a newer own action,
+     * consume or committed weapon move outranks it. Shared by the renderer and multiplayer QA. */
+    public static float visibleWeight(net.minecraft.world.entity.LivingEntity entity,float partial){
         var hit=com.codex.blacklight.registry.ModAttachments.getData(entity, ModAttachments.HIT_REACTION);
-        if(com.codex.blacklight.registry.ModAttachments.getData(entity, ModAttachments.CONSUME_VISUAL).active()||hit.weight(entity.level().getGameTime(),partial)<=0||!available(entity))return false;
+        if(com.codex.blacklight.registry.ModAttachments.getData(entity, ModAttachments.CONSUME_VISUAL).active()||hit.weight(entity.level().getGameTime(),partial)<=0||!available(entity))return 0;
+        // A player's own grab or consume outranks any flinch; the server rejects it too.
+        if(entity instanceof net.minecraft.world.entity.player.Player&&com.codex.blacklight.registry.ModAttachments.getData(entity, ModAttachments.CONSUMING)
+                &&com.codex.blacklight.registry.ModAttachments.getData(entity, ModAttachments.GRAB_STAGE)!=com.codex.blacklight.combat.ConsumeVisual.NONE)return 0;
+        // A player's own committed attack outranks an incoming flinch.
+        if(entity instanceof net.minecraft.world.entity.player.Player&&com.codex.blacklight.registry.ModAttachments.getData(entity, ModAttachments.WEAPON_VISUAL).spec()!=null)return 0;
+        // Any player action started at or after the hit (combo swing, dodge, landing) supersedes the flinch.
+        if(entity instanceof net.minecraft.world.entity.player.Player){var action=com.codex.blacklight.registry.ModAttachments.getData(entity,ModAttachments.PLAYER_ACTION);
+            if(action.started()>=hit.started()&&action.active(com.codex.blacklight.animation.PlayerMotionController.actionTime(entity,partial)))return 0;}
+        return hit.weight(entity.level().getGameTime(),partial);
+    }
+    public static boolean apply(net.minecraft.world.entity.LivingEntity entity,com.codex.blacklight.animation.BlacklightSkeleton armature,BlacklightPose pose,float partial){
+        if(visibleWeight(entity,partial)<=0)return false;
+        var hit=com.codex.blacklight.registry.ModAttachments.getData(entity, ModAttachments.HIT_REACTION);
         var clip=MotionLibrary.find(key(hit.motion())).orElseThrow();
         float age=entity.level().getGameTime()-hit.started()+partial;
         float progress=hit.kind()==HitReaction.GETUP?hit.progress(entity.level().getGameTime(),partial):

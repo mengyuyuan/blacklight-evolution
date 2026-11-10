@@ -14,7 +14,10 @@ public final class GroundGaitPose {
         return armor&&key.equals("basic_walk")?Math.max(authored,.14*scale):authored;
     }
     public static double rateLimit(String key,boolean armor) {
-        return armor&&key.equals("basic_walk")?1.2:8;
+        // Walking travel outpaces the authored stroll, so the clip is capped instead
+        // of quadrupling into quick short steps. Unarmored walking is a little brisker.
+        if(key.equals("basic_walk"))return armor?1.2:1.4;
+        return 8;
     }
     public static void apply(BlacklightPose pose,String key,boolean armor) {
         // A stride's root carries the authored pelvis twist and lateral weight

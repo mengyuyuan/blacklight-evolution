@@ -25,6 +25,7 @@ public final class UpgradeScreen extends Screen {
     private record Entry(String id,int cost,String required,boolean free) {}
     private Category category=Category.BASIC;
     private final List<Entry> entries=new ArrayList<>();
+    private final java.util.Map<String,List<String>> tiers=new java.util.HashMap<>();
     private String selected="mode";
     private int rail,listX,listWidth,detailX,detailWidth,bottom,listScroll,detailScroll,detailHeight;
     private Button purchase;
@@ -59,8 +60,49 @@ public final class UpgradeScreen extends Screen {
             case SETTINGS -> {for(String id:List.of("bulletdive_blocks","shield_borer_blocks","prototype_item_pickup","passive_stacks","infection_zones","health_hud","wing_speed","wing_appearance","cinematic_combat","cinematic_strength"))entries.add(new Entry(id,0,null,true));}
             default -> {}
         }
+        tierEntries.clear();for(var e:entries)tierEntries.put(e.id,e);
+        if(category!=Category.SETTINGS&&category!=Category.EVOLUTION&&category!=Category.ORGANS&&!entries.isEmpty())collapseTiers();else tiers.clear();
         if(entries.stream().noneMatch(e->e.id.equals(selected)))select(entries.isEmpty()?"":entries.get(0).id);
         listScroll=com.codex.blacklight.util.MathCompat.clamp(listScroll,0,maxListScroll());purchase.visible=category!=Category.ATTRIBUTES;refreshButton();
+    }
+    /** Tiers 1/2/3 of one ability share a row; the row always offers the next tier still to learn. */
+    private void collapseTiers(){
+        tiers.clear();
+        var byId=new java.util.LinkedHashMap<String,Entry>();for(var e:entries)byId.put(e.id,e);
+        var chains=new java.util.LinkedHashMap<String,List<Entry>>();
+        for(var e:entries){
+            var root=e;int guard=0;
+            while(root.required!=null&&byId.containsKey(root.required)&&tierBase(root.id).equals(tierBase(root.required))&&guard++<16)root=byId.get(root.required);
+            chains.computeIfAbsent(root.id,k->new ArrayList<>()).add(e);
+        }
+        entries.clear();
+        for(var chain:chains.values()){
+            var ids=chain.stream().map(Entry::id).toList();
+            if(ids.size()>1)for(String id:ids)tiers.put(id,ids);
+            entries.add(currentTier(chain.get(0)));
+        }
+        if(tiers.containsKey(selected))selected=currentTier(entries.stream().filter(e->tiers.get(e.id)==tiers.get(selected)).findFirst().orElse(entries.get(0))).id;
+    }
+    static String tierBase(String id){return id.replaceAll("_(\\d+|i{1,3}|iv|plus)$","");}
+    private Entry currentTier(Entry any){
+        var ids=tiers.get(any.id);if(ids==null)return any;
+        for(String id:ids){var e=tierEntry(id);if(e!=null&&!owns(e))return e;}
+        var last=tierEntry(ids.get(ids.size()-1));return last==null?any:last;
+    }
+    private final java.util.Map<String,Entry> tierEntries=new java.util.HashMap<>();
+    private Entry tierEntry(String id){return tierEntries.get(id);}
+    /** After a purchase syncs, move the row (and the selection) on to the next tier. */
+    private void advanceTiers(){
+        for(int i=0;i<entries.size();i++){
+            var e=entries.get(i);if(!tiers.containsKey(e.id))continue;
+            var next=currentTier(e);
+            if(next!=e){entries.set(i,next);if(selected.equals(e.id))selected=next.id;}
+        }
+    }
+    private Component tierLabel(Entry e){
+        var ids=tiers.get(e.id);if(ids==null)return label(e.id);
+        int learned=0;for(String id:ids){var t=tierEntry(id);if(t!=null&&owns(t))learned++;}
+        return Component.empty().append(label(e.id)).append(Component.literal(" ["+learned+"/"+ids.size()+"]"));
     }
     private void select(String id){
         selected=id;detailScroll=0;selectedAt=System.nanoTime();paused=false;
@@ -97,6 +139,9 @@ public final class UpgradeScreen extends Screen {
                 default -> SkillSettingsPayload.Setting.BULLETDIVE_BLOCKS;
             };
             PacketDistributor.sendToServer(new SkillSettingsPayload(setting,!settingEnabled(e.id)));return;
+        }
+        if(category==Category.EVOLUTION&&EvolutionAttribute.byId(e.id)!=null&&(hasShiftDown()||hasControlDown())){
+            if(prerequisite(e)&&balance()>=cost(e))PacketDistributor.sendToServer(new UpgradePurchasePayload(e.id+(hasControlDown()?"*max":"*10")));return;
         }
         if(!owns(e)&&prerequisite(e)&&balance()>=cost(e))PacketDistributor.sendToServer(new UpgradePurchasePayload(e.id));
     }
@@ -155,12 +200,13 @@ public final class UpgradeScreen extends Screen {
         }
         if(category==Category.ATTRIBUTES)renderAttributes(g);
         else {
+            advanceTiers();
             g.enableScissor(listX,TOP,listX+listWidth,bottom);y=TOP-listScroll;
             for(var e:entries){
                 boolean chosen=e.id.equals(selected),hover=mx>=listX&&mx<listX+listWidth&&my>=y&&my<y+ROW-3;
                 g.fill(listX,y,listX+listWidth,y+ROW-3,chosen?0xFF682C29:hover?0xFF302627:PANEL);
                 if(chosen)g.fill(listX,y,listX+2,y+ROW-3,RED);
-                g.drawString(font,font.plainSubstrByWidth(label(e.id).getString(),listWidth-12),listX+7,y+5,TEXT,false);
+                g.drawString(font,font.plainSubstrByWidth(tierLabel(e).getString(),listWidth-12),listX+7,y+5,TEXT,false);
                 var organ=com.codex.blacklight.infection.TissueCore.byId(e.id);
                 var evolution=EvolutionAttribute.byId(e.id);
                 var status=category==Category.SETTINGS&&e.id.equals("wing_appearance")?Component.translatable(settingEnabled(e.id)?"setting.blacklight.wing_appearance.row_precision":"setting.blacklight.wing_appearance.row_classic"):
@@ -177,9 +223,9 @@ public final class UpgradeScreen extends Screen {
     private void renderDetail(GuiGraphics g,int mx,int my){
         var e=entry();if(e==null)return;
         g.fill(detailX-3,TOP-4,width-8,bottom,0xFF16181B);g.enableScissor(detailX,TOP,width-10,bottom);
-        int y=paragraph(g,label(e.id),TOP-detailScroll,TEXT)+6;
+        int y=paragraph(g,tierLabel(e),TOP-detailScroll,TEXT)+6;
         if(category==Category.EVOLUTION&&minecraft.player!=null){
-            if(EvolutionProgression.infiniteUnlocked(minecraft.player))y=paragraph(g,Component.translatable("screen.blacklight.evolution_unlocked"),y,0xFFB1BEAE)+8;
+            if(EvolutionProgression.infiniteUnlocked(minecraft.player)){y=paragraph(g,Component.translatable("screen.blacklight.evolution_unlocked"),y,0xFFB1BEAE)+8;y=paragraph(g,Component.literal("Shift+点击：一次升 10 级；Ctrl+点击：用光 EP 升到最高（单次最多 1000 级）"),y,0xFFE6C68A)+8;}
             else{
                 var missing=EvolutionProgression.missing(minecraft.player);int total=BaseEvolutionCatalog.REQUIREMENTS.size();
                 y=paragraph(g,Component.translatable("screen.blacklight.evolution_curriculum",total-missing.size(),total),y,RED)+5;

@@ -560,6 +560,7 @@ public final class TissueMorphogenesis {
     private static Mesh loft(String name,boolean skin,int phase,String motion,V hinge,float[][] pivots,
             List<List<Section>> keys,V a,V b,V up,V forward,long seed) {
         if(!skin&&keys.get(0).size()==3)keys=smooth(keys);
+        if(!skin)return blocks(name,phase,motion,hinge,pivots,keys,a,b,up,forward,seed);
         int sections=keys.get(0).size();float[][] stages=new float[3][sections*8*3];
         for(int k=0;k<3;k++)for(int r=0;r<sections;r++)for(int s=0;s<8;s++) {
             float x=RING[s][0],y=RING[s][1];if(skin&&k==0){x=Math.copySign(1,x);y=Math.copySign(1,y);}
@@ -592,6 +593,98 @@ public final class TissueMorphogenesis {
             }
         }
         return new Mesh(name,skin,phase,motion,hinge.array(),pivots,stages,faces.toArray(float[][]::new));
+    }
+    /** Minecraft-style organ: every span between two sections is one oriented
+     * cuboid, pixel snapped and stepping down toward the tip, like the rotated
+     * cubes of a Blockbench horn. The shared layout of eight-vertex rings along
+     * the centre line is kept (two rings per block), so growth, hypertrophy,
+     * bending and tongue fitting keep reading root and tip from the same slots. */
+    private static Mesh blocks(String name,int phase,String motion,V hinge,float[][] pivots,
+            List<List<Section>> keys,V a,V b,V up,V forward,long seed) {
+        int sections=keys.get(0).size(),spans=Math.max(1,sections-1);
+        boolean pointed=pointed(name);
+        var mature=keys.get(2);
+        float[] matureW=new float[spans],matureD=new float[spans];
+        for(int s=0;s<spans;s++){
+            var low=mature.get(s);var high=mature.get(Math.min(sections-1,s+1));
+            // A chunky block reads better than a needle at native pixel density.
+            matureW[s]=snap((low.width*.62F+high.width*.38F)*1.18F);
+            matureD[s]=snap((low.depth*.62F+high.depth*.38F)*1.18F);
+            if(s>0){matureW[s]=Math.min(matureW[s],Math.max(matureW[s-1],snap(low.width*1.18F)));matureD[s]=Math.min(matureD[s],Math.max(matureD[s-1],snap(low.depth*1.18F)));}
+        }
+        float[][] stages=new float[3][spans*2*8*3];
+        V[] centres=new V[spans];V[] axes=new V[spans];
+        for(int k=0;k<3;k++){
+            var stage=keys.get(k);
+            for(int s=0;s<spans;s++){
+                V p0=stage.get(s).centre,p1=stage.get(Math.min(sections-1,s+1)).centre;
+                V matureAxis=mature.get(Math.min(sections-1,s+1)).centre.sub(mature.get(s).centre);
+                V axis=p1.sub(p0).length()>.02F?p1.sub(p0).unit():matureAxis.length()>.02F?matureAxis.unit():a.cross(b).unit();
+                V u=a.sub(axis.mul(a.dot(axis)));if(u.length()<.05F)u=b.cross(axis);u=u.unit();
+                V v=axis.cross(u).unit();if(v.dot(b)<0)v=v.mul(-1);
+                float ratio=matureW[s]<=0?0:Math.max(0,Math.min(1.2F,stage.get(s).width/Math.max(.015F,mature.get(s).width)));
+                float ratioD=matureD[s]<=0?0:Math.max(0,Math.min(1.2F,stage.get(s).depth/Math.max(.015F,mature.get(s).depth)));
+                float hw=matureW[s]*ratio,hd=matureD[s]*ratioD;
+                // Neighbouring blocks overlap a little at the joint, so a bent
+                // horn shows a stepped elbow instead of a wedge-shaped gap.
+                float overlap=s<spans-1?Math.min(Math.max(hw,hd)*.55F,p1.sub(p0).length()*.35F):0;
+                V start=p0,end=p1.add(axis.mul(overlap));
+                if(k==2){centres[s]=start.add(end).mul(.5F);axes[s]=axis;}
+                for(int ring=0;ring<2;ring++){
+                    V c=ring==0?start:end;
+                    for(int i=0;i<8;i++){
+                        float x=SQUARE[i][0],y=SQUARE[i][1];
+                        V point=c.add(u.mul(x*hw)).add(v.mul(y*hd));
+                        int index=((s*2+ring)*8+i)*3;
+                        stages[k][index]=point.x;stages[k][index+1]=point.y;stages[k][index+2]=point.z;
+                    }
+                }
+            }
+        }
+        if(motion.equals("toe"))for(int k=0;k<3;k++){
+            // Planted toes keep the sole of the smooth form: no block may sink below the native foot contact plane.
+            float limit=-Float.MAX_VALUE;for(var s:keys.get(k))limit=Math.max(limit,s.centre.y+Math.abs(a.y)*s.width+Math.abs(b.y)*s.depth);
+            for(int i=1;i<stages[k].length;i+=3)stages[k][i]=Math.min(stages[k][i],limit);
+        }
+        var faces=new ArrayList<float[]>();
+        for(int s=0;s<spans;s++){
+            int r0=s*2*8,r1=r0+8;boolean tip=s==spans-1&&spans>1;
+            for(int i=0;i<8;i++){
+                int[] ids={r0+i,r1+i,r1+(i+1)%8,r0+(i+1)%8};
+                V mid=vertex(stages[2],ids[0]).add(vertex(stages[2],ids[1])).add(vertex(stages[2],ids[2])).add(vertex(stages[2],ids[3])).mul(.25F);
+                V outward=mid.sub(centres[s]);
+                addFace(faces,stages[2],ids,outward,blockMaterial(name,pointed,tip,s,i/2),.22F,.60F);
+            }
+            addFace(faces,stages[2],new int[]{r0,r0+2,r0+4,r0+6},axes[s].mul(-1),pointed&&!tip?3:blockMaterial(name,pointed,false,s,4),.15F,.58F);
+            addFace(faces,stages[2],new int[]{r1,r1+2,r1+4,r1+6},axes[s],blockMaterial(name,pointed,tip,s,5),.15F,.58F);
+        }
+        return new Mesh(name,false,phase,motion,hinge.array(),pivots,stages,faces.toArray(float[][]::new));
+    }
+    /** Corner/edge ring of a square block: corners at even slots, edge midpoints at odd slots. */
+    private static final float[][] SQUARE={{-1,-1},{0,-1},{1,-1},{1,0},{1,1},{0,1},{-1,1},{-1,0}};
+    /** Half extents snap to the quarter/half pixel grid of native mob cubes. */
+    private static float snap(float half){
+        float step=half<.6F?.25F:.5F;
+        return Math.max(.25F,Math.round(half/step)*step);
+    }
+    private static boolean pointed(String name){
+        for(String word:new String[]{"blade","claw","fang","horn","crest","quill","chela","spike","spine","barb","hook","talon","edge","crown"})
+            if(name.contains(word))return true;
+        return false;
+    }
+    /** face 0..3 are the four sides (-depth, +across, +depth, -across), 4 root cap, 5 tip cap.
+     * Atlas: 1 red flesh, 2 dark flesh, 3 charcoal plate, 4 bone, 5 pale flesh, 6 near black, 7 grey. */
+    private static int blockMaterial(String name,boolean pointed,boolean tip,int span,int face){
+        if(name.equals("palate"))return 6;
+        if(name.startsWith("fang"))return 4;
+        if(name.contains("gland"))return face==1?1:2;
+        if(name.startsWith("costal"))return face==0||face==2?7:4;
+        // Bleached horn/claw tips over a charcoal shaft, like vanilla goat horns.
+        if(pointed&&tip)return face==4?3:4;
+        if(face>=4)return 3;
+        // One wet blood seam along the inner edge; the rest alternates plate bands.
+        if(face==1)return span%2==0?1:2;
+        return span%2==0?3:face==3?6:3;
     }
     /** Three authored sections become five on the quadratic through them: horns,
      * claws and plates read as curved, tapering forms instead of faceted wedges. */

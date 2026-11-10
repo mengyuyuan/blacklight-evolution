@@ -41,26 +41,15 @@ public final class BlacklightCommands {
                     com.codex.blacklight.world.HiveBuilding.build(p.serverLevel(),pos);
                     hive.moveTo(pos.getX()+.5,pos.getY()+1,pos.getZ()+.5,0,0);p.serverLevel().addFreshEntity(hive);return 1;
                 }))
-                .then(Commands.literal("evolved_sample").requires(source -> source.hasPermission(2)).executes(context->{
-                    var player=context.getSource().getPlayerOrException();var level=player.serverLevel();
-                    var host=com.codex.blacklight.registry.ModEntities.INFECTED_HOST.get().create(level);if(host==null)return 0;
-                    host.inherit(net.minecraft.world.entity.EntityType.ZOMBIE.create(level));
-                    var genes=new java.util.EnumMap<com.codex.blacklight.infection.TissueCore,com.codex.blacklight.infection.TissueInheritance.Organ>(com.codex.blacklight.infection.TissueCore.class);
-                    for(var core:new com.codex.blacklight.infection.TissueCore[]{com.codex.blacklight.infection.TissueCore.MUSCLE,com.codex.blacklight.infection.TissueCore.CARAPACE,com.codex.blacklight.infection.TissueCore.JAW,com.codex.blacklight.infection.TissueCore.GRASP,com.codex.blacklight.infection.TissueCore.BLADE,com.codex.blacklight.infection.TissueCore.HYDROSTAT}){
-                        int weapons=core==com.codex.blacklight.infection.TissueCore.BLADE?com.codex.blacklight.infection.TissueInheritance.BLADE:core==com.codex.blacklight.infection.TissueCore.GRASP?com.codex.blacklight.infection.TissueInheritance.CLAWS:core==com.codex.blacklight.infection.TissueCore.HYDROSTAT?com.codex.blacklight.infection.TissueInheritance.TENDRIL:0;
-                        genes.put(core,new com.codex.blacklight.infection.TissueInheritance.Organ(350,0,0,0,weapons,71+core.ordinal()));
-                    }
-                    long seed=com.codex.blacklight.infection.TissueOrgans.seed(host.getUUID());
-                    var inventory=new com.codex.blacklight.infection.TissueInheritance(genes,6,2100,false,null,1,6).digest(1,true,seed,504000,com.codex.blacklight.infection.TissueInheritance.Rules.DEFAULT,com.codex.blacklight.infection.TissueCore.MUSCLE);
-                    var tag=new net.minecraft.nbt.CompoundTag();host.saveWithoutId(tag);tag.getCompound("BlacklightHost").putString("NativeCore",com.codex.blacklight.infection.TissueCore.MUSCLE.key());
-                    tag.putLong("BlacklightTissueAge",504000);tag.put("BlacklightTissueInheritance",com.codex.blacklight.infection.TissueInheritanceCodec.write(inventory));tag.putInt("BlacklightTissueNutrition",100);host.load(tag);host.advanceTissue(0);
-                    var pos=player.position().add(player.getLookAngle().multiply(1,0,1).normalize().scale(8));host.moveTo(pos.x,pos.y,pos.z,player.getYRot()+180,0);
-                    if(!level.noCollision(host,host.getBoundingBox())||!level.addFreshEntity(host)){context.getSource().sendFailure(Component.literal("这里空间不足，进化者样本未生成。"));return 0;}
-                    // Metamorphosis assigns the selected archetype's real name.
-                    host.setPersistenceRequired();
-                    if(!host.beginEvolvedMetamorphosis()){host.discard();context.getSource().sendFailure(Component.literal("这里没有完整蜕变所需空间。"));return 0;}
-                    context.getSource().sendSuccess(()->Component.literal("已生成预置成熟器官的试玩样本，开始十秒蜕变。自然进化仍需满足真实吞噬门槛。"),false);return 1;
-                }))
+                .then(Commands.literal("evolved_sample").requires(source -> source.hasPermission(2))
+                        .executes(context->evolvedSample(context.getSource(),null))
+                        .then(Commands.argument("type",StringArgumentType.word())
+                                .suggests((context,builder)->net.minecraft.commands.SharedSuggestionProvider.suggest(com.codex.blacklight.infection.EvolvedSamplePreset.keys(),builder))
+                                .executes(context->{
+                                    var type=com.codex.blacklight.infection.EvolvedSamplePreset.byKey(StringArgumentType.getString(context,"type"));
+                                    if(type.isEmpty()){context.getSource().sendFailure(Component.literal("未知进化者类型；可用："+String.join(", ",com.codex.blacklight.infection.EvolvedSamplePreset.keys())));return 0;}
+                                    return evolvedSample(context.getSource(),type.get());
+                                })))
                 .then(Commands.literal("infected_sample").requires(source -> source.hasPermission(2)).executes(context -> {
                     ServerPlayer player = context.getSource().getPlayerOrException();
                     var level=player.serverLevel();
@@ -181,6 +170,23 @@ public final class BlacklightCommands {
     private static void sync(ServerPlayer player, BlacklightState state) {
         com.codex.blacklight.registry.ModAttachments.setData(player, ModAttachments.PLAYER_STATE, state);
         com.codex.blacklight.registry.ModAttachments.syncData(player, ModAttachments.PLAYER_STATE);
+    }
+
+    private static int evolvedSample(CommandSourceStack source,com.codex.blacklight.infection.EvolvedArchetype archetype) throws com.mojang.brigadier.exceptions.CommandSyntaxException{
+        var player=source.getPlayerOrException();var level=player.serverLevel();
+        var host=com.codex.blacklight.registry.ModEntities.INFECTED_HOST.get().create(level);if(host==null)return 0;
+        host.inherit(net.minecraft.world.entity.EntityType.ZOMBIE.create(level));
+        var genes=com.codex.blacklight.infection.EvolvedSamplePreset.organs(archetype);
+        long seed=com.codex.blacklight.infection.TissueOrgans.seed(host.getUUID());
+        var inventory=new com.codex.blacklight.infection.TissueInheritance(genes,6,2100,false,null,1,6).digest(1,true,seed,504000,com.codex.blacklight.infection.TissueInheritance.Rules.DEFAULT,com.codex.blacklight.infection.TissueCore.MUSCLE);
+        var tag=new net.minecraft.nbt.CompoundTag();host.saveWithoutId(tag);tag.getCompound("BlacklightHost").putString("NativeCore",com.codex.blacklight.infection.TissueCore.MUSCLE.key());
+        tag.putLong("BlacklightTissueAge",504000);tag.put("BlacklightTissueInheritance",com.codex.blacklight.infection.TissueInheritanceCodec.write(inventory));tag.putInt("BlacklightTissueNutrition",100);host.load(tag);host.advanceTissue(0);
+        var pos=player.position().add(player.getLookAngle().multiply(1,0,1).normalize().scale(8));host.moveTo(pos.x,pos.y,pos.z,player.getYRot()+180,0);
+        if(!level.noCollision(host,host.getBoundingBox())||!level.addFreshEntity(host)){source.sendFailure(Component.literal("这里空间不足，进化者样本未生成。"));return 0;}
+        // Metamorphosis assigns the selected archetype's real name.
+        host.setPersistenceRequired();
+        if(!host.beginEvolvedMetamorphosis()){host.discard();source.sendFailure(Component.literal("这里没有完整蜕变所需空间。"));return 0;}
+        source.sendSuccess(()->Component.literal("已生成预置成熟器官的试玩样本，开始十秒蜕变。自然进化仍需满足真实吞噬门槛。"),false);return 1;
     }
 
     private static int spawnInfected(CommandSourceStack source,String species,net.minecraft.world.phys.Vec3 requested,boolean colossal){

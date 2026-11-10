@@ -386,7 +386,7 @@ final class AnatomicalTissue {
                 }
                 // Native dye/tint belongs to surviving skin, not to new flesh.
                 // Preserve alpha so invisibility/fades remain owned by the caller.
-                out.vertex(posed.last().pose(),v.x/16,v.y/16,v.z/16).color(tissue?TissueShading.shade(p.color,material,normal.y,(j&1)==0?.35F:1,reveal,faceJitter,beat):p.color)
+                out.vertex(posed.last().pose(),v.x/16,v.y/16,v.z/16).color(tissue?TissueShading.shade(p.color,material,normal.y,mesh.skin?((j&1)==0?.35F:1):.55F,reveal,faceJitter,beat):p.color)
                         .uv(u,w).overlayCoords(p.overlay).uv2(p.light).normal(posed.last().normal(),normal.x,normal.y,normal.z).endVertex();
             }
         }

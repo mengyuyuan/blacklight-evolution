@@ -51,6 +51,7 @@ public final class PrototypeAnimationController {
                 LocomotionVisualState.remove(player.getId());
                 continue;
             }
+            com.codex.blacklight.animation.MotionLibrary.warmConsume(blacklight.getActivePower());
             boolean local = player == minecraft.player;
             RuntimeState runtime = STATES.computeIfAbsent(player, ignored -> new RuntimeState());
             WallTraversal.Mode wallMode=ClientWallMotion.modeFor(player);
@@ -253,8 +254,10 @@ public final class PrototypeAnimationController {
                 phase = landingPhase(landing);
                 if (landingTicks == 0) landing = LandingImpact.Strength.NONE;
             } else {
+                // Plain forward travel is drawn as a walk; the run clips need a sprint
+                // request or genuinely run-level speed.
                 boolean running = nowMoving && (sprintIntent || player.isSprinting()
-                        || Math.sqrt(horizontalSqr) >= RUN_SPEED);
+                        || Math.sqrt(horizontalSqr) >= PrototypeLocomotion.WALK_VISUAL_MAX);
                 LocomotionPhase resolved = LocomotionPhase.resolve(charging, grounded,
                         velocity.y, nowMoving, running, moving, hardTurn,
                         LandingImpact.Strength.NONE);

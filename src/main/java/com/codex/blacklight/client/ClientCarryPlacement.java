@@ -44,6 +44,7 @@ public final class ClientCarryPlacement {
             victim.setYHeadRot(victim.getYRot());victim.yHeadRotO=victim.yRotO;victim.yBodyRot=victim.getYRot();victim.yBodyRotO=victim.yRotO;
         }
     }
+    private static final java.util.Map<LivingEntity,long[]> ENTER_SEEN=new java.util.WeakHashMap<>();
     /** Render-time pairing avoids the receiver's network interpolation trailing the actor. */
     public static Vec3 consumeOffset(LivingEntity victim,float partial){
         var visual=com.codex.blacklight.registry.ModAttachments.getData(victim, ModAttachments.CONSUME_VISUAL);
@@ -56,13 +57,20 @@ public final class ClientCarryPlacement {
                     net.minecraft.util.Mth.lerp(partial,owner.xRotO,owner.getXRot()),owner,victim,visual,partial)
                 :ConsumePlacementTrack.anchor(visual.origin(),visual.facing(),victim,form,visual.motionProgress(victim.level().getGameTime(),partial),visual.variant()).orElse(current);
         float motion=visual.motionProgress(victim.level().getGameTime(),partial);
-        if(visual.stage()==ConsumeVisual.CONSUME&&ConsumePlacementTrack.headGrip(form,visual.variant())&&motion<ConsumePlacementTrack.gripEnd(form))
-            goal=goal.add(owner.getPosition(partial).subtract(ConsumePlacementTrack.actorAnchor(visual.origin(),visual.facing(),form,motion,false,visual.variant())));
-        Vec3 delta=goal.subtract(current);double limit=correctionLimit(owner);
+        if(visual.stage()==ConsumeVisual.CONSUME)
+            goal=ConsumePlacementTrack.pairedGoal(goal,owner.getPosition(partial),ConsumePlacementTrack.actorAnchor(visual.origin(),visual.facing(),form,motion,false,visual.variant()));
+        // A consume scene's goal is the server's own scripted track; fast whip lifts outrun the
+        // receiver's 3-tick interpolation by up to ~4 blocks, so the teleport guard stays wider there.
+        Vec3 delta=goal.subtract(current);double limit=visual.stage()==ConsumeVisual.CONSUME?Math.max(10,correctionLimit(owner)):correctionLimit(owner);
         if(limit<=0||delta.lengthSqr()>limit*limit)return Vec3.ZERO;
         var hit=victim.level().clip(new net.minecraft.world.level.ClipContext(current.add(0,victim.getBbHeight()*.5,0),goal.add(0,victim.getBbHeight()*.5,0),net.minecraft.world.level.ClipContext.Block.COLLIDER,net.minecraft.world.level.ClipContext.Fluid.NONE,victim));
         if(hit.getType()!=net.minecraft.world.phys.HitResult.Type.MISS)return Vec3.ZERO;
-        float enter=net.minecraft.util.Mth.clamp((victim.level().getGameTime()-visual.started()+partial)/4F,0,1);
+        // Blend from the frame this client first drew the phase, not the server's start tick:
+        // the visual arrives a few ticks late and the blend was already complete, so the
+        // receiver jumped from its hold pose to the scene in one frame.
+        long phase=visual.started()*16+visual.stage(),now=victim.level().getGameTime();
+        var seen=ENTER_SEEN.get(victim);if(seen==null||seen[0]!=phase){seen=new long[]{phase,now};ENTER_SEEN.put(victim,seen);}
+        float enter=(float)Math.max(0,Math.min(1,(now-seen[1]+partial)/4.0));
         return delta.scale(enter);
     }
     private static double correctionLimit(LivingEntity owner){

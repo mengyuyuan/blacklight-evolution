@@ -57,6 +57,7 @@ public final class BlacklightRenderPose {
         var weapon=ModAttachments.getData(entity,ModAttachments.WEAPON_VISUAL);
         if(wall==null&&entity.onGround()&&weapon.spec()==com.codex.blacklight.combat.WeaponMove.HAMMER_RAM
                 &&!weapon.charging())HammerGroundContact.apply(pose);
+        if(wall==null)WhipAimPose.apply(entity,skeleton,pose);
         // Fit after locomotion/wall constraints and to the receiver's rendered
         // position. Holding no longer skips contact correction just because a
         // paired actor clip was found.

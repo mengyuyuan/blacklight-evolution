@@ -62,6 +62,13 @@ public final class ClientDevastatorPostEffect {
     @SubscribeEvent(priority=EventPriority.LOWEST)
     public static void render(RenderLevelStageEvent event){
         if(event.getStage()!=RenderLevelStageEvent.Stage.AFTER_LEVEL)return;
+        // Snapshot the frame matrices; with a shader pack the pass runs later in the frame.
+        var view=new org.joml.Matrix4f(event.getPoseStack().last().pose());
+        var projection=new org.joml.Matrix4f(event.getProjectionMatrix());
+        com.codex.blacklight.client.ShaderPackCompat.afterLevel(()->apply(event,view,projection));
+    }
+    private static void apply(RenderLevelStageEvent event,org.joml.Matrix4f view,org.joml.Matrix4f projection){
+        if(event.getStage()!=RenderLevelStageEvent.Stage.AFTER_LEVEL)return;
         var mc=Minecraft.getInstance();var player=mc.player;
         if(player==null||mc.level==null||!player.isAlive()){close();return;}
         var visual=com.codex.blacklight.registry.ModAttachments.getData(player, ModAttachments.DEVASTATOR_VISUAL);
@@ -96,7 +103,7 @@ public final class ClientDevastatorPostEffect {
                 var attached=DevastatorEffectRenderer.capturedChest(player.getId());
                 var origin=(attached==null?player.getPosition(partial).add(0,player.getBbHeight()*.58,0):attached).subtract(camera);
                 var projected=new Vector4f((float)origin.x,(float)origin.y,(float)origin.z,1);
-                projected.mul(event.getPoseStack().last().pose()).mul(event.getProjectionMatrix());
+                projected.mul(view).mul(projection);
                 if(projected.w>.001F){
                     centreX=com.codex.blacklight.util.MathCompat.clamp(projected.x/projected.w*.5F+.5F,.05F,.95F);
                     centreY=com.codex.blacklight.util.MathCompat.clamp(projected.y/projected.w*.5F+.5F,.05F,.95F);
@@ -107,7 +114,7 @@ public final class ClientDevastatorPostEffect {
             lastFlowX=lastFlowY=0;lastFlightAxis=1;
             if(flight!=null){
                 var flow=flight.airflow();
-                var viewed=new Vector4f((float)flow.x,(float)flow.y,(float)flow.z,0).mul(event.getPoseStack().last().pose());
+                var viewed=new Vector4f((float)flow.x,(float)flow.y,(float)flow.z,0).mul(view);
                 float aspect=width/(float)Math.max(1,height);
                 lastFlowX=viewed.x/aspect;lastFlowY=viewed.y;lastFlightAxis=Math.abs(viewed.z);
             }

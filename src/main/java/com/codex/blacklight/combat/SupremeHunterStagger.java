@@ -10,7 +10,7 @@ import net.minecraft.world.effect.MobEffects;
 public final class SupremeHunterStagger {
     private SupremeHunterStagger(){}
     public static void apply(ServerPlayer player,int ticks,float yaw){
-        if(ticks<=0||com.codex.blacklight.power.ParasiteSystem.superArmor(player)||!player.isAlive()||player.isCreative()||player.isSpectator())return;
+        if(ticks<=0||ConsumeSystem.grappleProtected(player)||com.codex.blacklight.power.ParasiteSystem.superArmor(player)||!player.isAlive()||player.isCreative()||player.isSpectator())return;
         long now=player.level().getGameTime();
         var kind=ticks>=36?HitReaction.HEAVY:HitReaction.STAGGER;
         com.codex.blacklight.registry.ModAttachments.setData(player,ModAttachments.HIT_REACTION,new HitReaction(now,Math.min(ticks,40),kind,yaw,ImpactProfile.BODY));

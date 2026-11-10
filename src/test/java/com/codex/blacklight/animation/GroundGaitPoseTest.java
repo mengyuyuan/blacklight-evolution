@@ -37,6 +37,19 @@ class GroundGaitPoseTest {
   assertEquals(.3,GroundGaitPose.nominal("basic_run",.3,1,true));
   assertEquals(.056,GroundGaitPose.nominal("basic_walk",.056,1,false));
  }
+ @Test void plainForwardTravelIsDrawnAsAWalkNotASlowedSprint() {
+  double forward=.233;
+  assertEquals("basic_walk",com.codex.blacklight.movement.TraversalMotionSelector.ground(com.codex.blacklight.movement.LocomotionPhase.WALK,false,forward));
+  assertEquals("basic_walk",com.codex.blacklight.movement.TraversalMotionSelector.stableGround(com.codex.blacklight.movement.LocomotionPhase.WALK,false,forward,"basic_walk"));
+  assertTrue(forward<com.codex.blacklight.movement.PrototypeLocomotion.WALK_VISUAL_MAX);
+  // Unarmored walk cadence is capped near a brisk stride instead of 4x the authored stroll.
+  double nominal=GroundGaitPose.nominal("basic_walk",MotionLibrary.nominalSpeed("basic_walk"),1,false);
+  float duration=MotionLibrary.duration("basic_walk");
+  var clock=new LocomotionClock();clock.commit(0,"basic_walk",duration,true,false,0,nominal,GroundGaitPose.rateLimit("basic_walk",false));
+  for(int t=1;t<=20;t++)clock.commit(t,"basic_walk",duration,true,true,forward,nominal,GroundGaitPose.rateLimit("basic_walk",false));
+  assertEquals(1.4,clock.current(),.0001);
+  assertEquals(8,GroundGaitPose.rateLimit("basic_sprint",false));
+ }
  @Test void armorWalkRetainsAuthoredKneeAndHipRotationsAcrossTheEntireCycle() {
   for(int i=0;i<=240;i++) {
    var pose=MotionLibrary.pose("basic_walk",MotionLibrary.duration("basic_walk")*i/240F,false);

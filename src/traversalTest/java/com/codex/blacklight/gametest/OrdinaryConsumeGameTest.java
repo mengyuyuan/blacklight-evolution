@@ -42,6 +42,23 @@ public final class OrdinaryConsumeGameTest {
         h.succeed();
     }
     @GameTest(template="wall_test", timeoutTicks=30)
+    public static void externalLiftDuringCaptureDoesNotDropTheGrab(GameTestHelper h) {
+        // Explosions and launches push a capturing player; travel input is locked, so that drift
+        // must not cancel the grab. The actor is pulled back and the capture reaches HOLD.
+        var p=player(h,PowerForm.CLAWS);var cow=h.spawn(EntityType.COW,3,2,5);cow.setNoAi(true);
+        ConsumeSystem.request(p);
+        h.assertTrue(com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.CONSUMING),"capture starts");
+        var start=p.position();
+        for(int i=0;i<ConsumeVisual.captureDuration(PowerForm.CLAWS)+2;i++){
+            if(i==6)p.setPos(start.add(0,3,0));
+            if(i==12)p.setPos(start.add(2,0,0));
+            tick(p);
+        }
+        h.assertTrue(ConsumeSystem.holding(p)&&cow.isAlive(),"external displacement must not interrupt capture; drift="+p.position().distanceTo(start));
+        h.assertTrue(p.position().distanceToSqr(start)<1,"actor is pulled back to the capture spot");
+        ConsumeSystem.cancel(p);cow.discard();h.succeed();
+    }
+    @GameTest(template="wall_test", timeoutTicks=30)
     public static void hammerPairedSceneKeepsVictimUntilCompletion(GameTestHelper h) {
         var p=player(h,PowerForm.HAMMERFISTS);var pig=h.spawn(EntityType.PIG,3,2,5);pig.setNoAi(true);
         ConsumeSystem.request(p);

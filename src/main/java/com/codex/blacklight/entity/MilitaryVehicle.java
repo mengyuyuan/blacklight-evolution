@@ -113,8 +113,7 @@ public final class MilitaryVehicle extends Entity {
         if(desiredPitch < -25||desiredPitch > 15)return false;
         float nextYaw=turretYaw+net.minecraft.util.Mth.clamp(net.minecraft.util.Mth.wrapDegrees(desiredYaw-turretYaw),-3,3);
         float nextPitch=gunPitch+net.minecraft.util.Mth.clamp(desiredPitch-gunPitch,-2,2);
-        for(var envelope:VehicleHullShape.sweepArticulation(definition,origin,getYRot(),turretYaw,nextYaw,gunPitch,nextPitch))
-            if(VehicleKinematics.checkEnvelope(this,envelope)!=VehicleKinematics.StopReason.NONE)return false;
+        if(VehicleKinematics.clearArticulation(this,turretYaw,nextYaw,gunPitch,nextPitch)!=VehicleKinematics.StopReason.NONE)return false;
         turretYaw=net.minecraft.util.Mth.wrapDegrees(nextYaw);gunPitch=nextPitch;setBoundingBox(makeBoundingBox());updateHullPart();syncVehicleState();
         return Math.abs(net.minecraft.util.Mth.wrapDegrees(desiredYaw-turretYaw))<.5 && Math.abs(desiredPitch-gunPitch)<.5;
     }
@@ -290,9 +289,7 @@ public final class MilitaryVehicle extends Entity {
                 float nextPitch = gunPitch + net.minecraft.util.Mth.clamp((float)input.aimPitch()-gunPitch, -2, 2);
                 nextPitch = net.minecraft.util.Mth.clamp(nextPitch, -25, 15);
                 var origin = new VehicleDefinition.Vec3(getX(),getY(),getZ());
-                boolean clear = true;
-                for (var envelope : VehicleHullShape.sweepArticulation(definition,origin,getYRot(),turretYaw,nextYaw,gunPitch,nextPitch))
-                    if (VehicleKinematics.checkEnvelope(this,envelope) != VehicleKinematics.StopReason.NONE) { clear = false; break; }
+                boolean clear = VehicleKinematics.clearArticulation(this,turretYaw,nextYaw,gunPitch,nextPitch) == VehicleKinematics.StopReason.NONE;
                 if (clear) { turretYaw = net.minecraft.util.Mth.wrapDegrees(nextYaw); gunPitch = nextPitch; setBoundingBox(makeBoundingBox()); updateHullPart(); }
             }
             if(input.primaryFire()&&!selectedPrimary.isEmpty())VehicleAttackService.fire(this,player,selectedPrimary);

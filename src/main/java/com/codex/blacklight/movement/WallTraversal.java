@@ -25,6 +25,10 @@ public final class WallTraversal {
     private double leapCharge;
     private double mantleTop = Double.NaN, carrySpeed;
     private boolean finishedOnTop;
+    /** Back + jump on a wall turns away and springs off. Unlimited: wall running already climbs freely. */
+    public static final double KICK_OUT=.62,KICK_UP=.95;
+    private boolean kickedOff;
+    public boolean kickedOff(){return kickedOff;}
     public int chargeTicks(){return chargeTicks;}
     public int visualChargeTicks(){return Math.round(chargeTicks/20F*MovementTuningSettings.jumpChargeTicks());}
 
@@ -40,6 +44,7 @@ public final class WallTraversal {
     public Frame tick(Input input, Surface surface, double y, double incomingSpeed,
                       double configuredRun, double upgrade) {
         finishedOnTop = false;
+        kickedOff = false;
         boolean jumpPressed = input.jump() && !previousJump;
         boolean jumpReleased = !input.jump() && previousJump;
         previousJump = input.jump();
@@ -59,6 +64,11 @@ public final class WallTraversal {
             double length = Math.hypot(surface.normalX(), surface.normalZ());
             if (!Double.isFinite(length) || length < .001) { clearSurface(); return idle(); }
             normalX = surface.normalX()/length; normalZ = surface.normalZ()/length;
+        }
+        if (wasAttached && jumpPressed && input.forward() < 0) {
+            double x = normalX * KICK_OUT, z = normalZ * KICK_OUT;
+            clearSurface(); detachTicks = 3; kickedOff = true;
+            return new Frame(Mode.NONE, true, x, KICK_UP, z);
         }
         boolean reachableTop = Double.isFinite(surface.ledgeY());
         boolean lowObstacle = !wasAttached && surface.grounded() && input.sprint() && !input.jump()
@@ -148,5 +158,5 @@ public final class WallTraversal {
         mode=Mode.NONE;normalX=normalZ=runSpeed=0;lastY=Double.NaN;leapTicks=arcTicks=stallTicks=chargeTicks=0;leapCharge=0;
         mantleTop=Double.NaN;carrySpeed=0;
     }
-    public void reset() { clearSurface();previousJump=false;detachTicks=0;finishedOnTop=false; }
+    public void reset() { clearSurface();previousJump=false;detachTicks=0;finishedOnTop=false;kickedOff=false; }
 }
