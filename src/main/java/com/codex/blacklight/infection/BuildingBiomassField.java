@@ -74,6 +74,52 @@ public final class BuildingBiomassField {
         return List.copyOf(result);
     }
     public static List<Triangle> mesh(int mask) { return MESH.get(mask&255); }
+    /** Four shared face corners, in the same diagonal order as the tetrahedra. */
+    public static int faceMask(int mask,int axis,boolean positive) {
+        int result=0;
+        for(int i=0;i<4;i++) {
+            var p=facePoint(axis,positive,i);int corner=(int)p.x()+2*(int)p.y()+4*(int)p.z();
+            if((mask&(1<<corner))!=0)result|=1<<i;
+        }
+        return result;
+    }
+    private static Point facePoint(int axis,boolean positive,int corner) {
+        double plane=positive?1:0,u=corner==1||corner==2?1:0,v=corner>=2?1:0;
+        return switch(axis){case 0->new Point(plane,u,v);case 1->new Point(u,plane,v);case 2->new Point(u,v,plane);default->throw new IllegalArgumentException("Invalid axis");};
+    }
+    private record FaceVertex(Point point,double own,double neighbour) {
+        FaceVertex lerp(FaceVertex p,double t){return new FaceVertex(point.lerp(p.point,t),own+(p.own-own)*t,neighbour+(p.neighbour-neighbour)*t);}
+    }
+    /** Close only the occupied part of this face that the actual neighbour does not fill.
+     *  Growth updates one cell at a time; ideal-field seams alone cannot close that world. */
+    public static List<Triangle> boundary(int own,int neighbour,int axis,boolean positive) {
+        if(own==0||neighbour==15||own==neighbour)return List.of();
+        var result=new ArrayList<Triangle>();
+        var normal=switch(axis){case 0->new Point(positive?1:-1,0,0);case 1->new Point(0,positive?1:-1,0);case 2->new Point(0,0,positive?1:-1);default->throw new IllegalArgumentException("Invalid axis");};
+        for(int[] face:new int[][]{{0,1,2},{0,2,3}}) {
+            List<FaceVertex> polygon=new ArrayList<>();
+            for(int i:face)polygon.add(new FaceVertex(facePoint(axis,positive,i),sign(own,i),-sign(neighbour,i)));
+            polygon=clipFace(clipFace(polygon,false),true);
+            for(int i=1;i<polygon.size()-1;i++) {
+                var a=polygon.getFirst().point;var b=polygon.get(i).point;var c=polygon.get(i+1).point;
+                var cross=b.sub(a).cross(c.sub(a));if(cross.length()<1e-9)continue;
+                if(cross.dot(normal)<0){var swap=b;b=c;c=swap;}
+                result.add(new Triangle(a,b,c,normal));
+            }
+        }
+        return List.copyOf(result);
+    }
+    private static List<FaceVertex> clipFace(List<FaceVertex> input,boolean neighbour) {
+        var output=new ArrayList<FaceVertex>();if(input.isEmpty())return output;
+        var previous=input.getLast();double before=neighbour?previous.neighbour:previous.own;
+        for(var current:input) {
+            double after=neighbour?current.neighbour:current.own;
+            if((before>=0)!=(after>=0))output.add(previous.lerp(current,before/(before-after)));
+            if(after>=0)output.add(current);
+            previous=current;before=after;
+        }
+        return output;
+    }
     private static List<Triangle> triangulate(int mask) {
         var output=new ArrayList<Triangle>();
         for(var tet:TETS) {
