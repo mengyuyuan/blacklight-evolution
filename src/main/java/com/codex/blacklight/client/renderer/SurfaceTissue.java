@@ -493,9 +493,10 @@ final class SurfaceTissue {
         normal.normalize();
         int axis=Math.abs(normal.x)>Math.abs(normal.y)?0:1;if(Math.abs(normal.z)>Math.abs(normal.get(axis)))axis=2;
         int u=(axis+1)%3,w=(axis+2)%3;
-        for(var v:new Vector3f[]{a,b,c,c})
+        try(var owner=AdaptiveRagdoll.attachment(p.part)){for(var v:new Vector3f[]{a,b,c,c})
             out.addVertex(p.pose,v.x/16,v.y/16,v.z/16).setColor((p.color&0xff000000)|rgb)
                     .setUv(v.get(u)/16,v.get(w)/16).setOverlay(p.overlay).setLight(p.light)
                     .setNormal(p.pose,normal.x,normal.y,normal.z);
+        }
     }
 }

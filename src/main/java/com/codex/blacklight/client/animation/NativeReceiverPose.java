@@ -40,6 +40,7 @@ public final class NativeReceiverPose {
                     ?Math.clamp(HunterConsume.seconds(visual,entity.level().getGameTime(),partial)/clip.seconds(),0,1)
                     :Math.clamp(progress*(visual.duration()-1)/(20*clip.seconds()),0,1);
         }else{
+            if(com.codex.blacklight.client.renderer.AdaptiveRagdoll.active(entity))return false;
             var hit=entity.getData(ModAttachments.HIT_REACTION);weight=hit.weight(entity.level().getGameTime(),partial);if(weight<=0)return false;
             key=ReceiverMotions.hitKey(entity,hit.kind(),hit.motion());progress=hit.progress(entity.level().getGameTime(),partial);
         }

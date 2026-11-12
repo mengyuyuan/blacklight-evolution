@@ -23,7 +23,8 @@ public final class WeaponImpact {
         if(!v.level().isClientSide&&tier.atLeast(ImpactTier.HEAVY)){
             var state=v.getData(ModAttachments.HIT_REACTION);
             if(!v.isAlive()||state.weight(v.level().getGameTime(),0)>0)
-                RagdollImpact.send(v,ImpactProfile.FALL,Math.max(18,state.duration()),false,HitStop.launchVelocity(v));
+                RagdollImpact.send(v,ImpactProfile.FALL,Math.max(18,state.duration()),false,HitStop.launchVelocity(v),
+                        p==null?WeaponCutContact.Report.NONE:WeaponCutContact.impact(p,v,HitStop.launchVelocity(v)));
         }
         if(v.level().isClientSide||!v.isAlive())return;
         HitStop.victim(v,tier.hitstop);
@@ -41,7 +42,9 @@ public final class WeaponImpact {
         apply(p,v,move,direction,first,charge,WeaponCutContact.Report.NONE);
     }
     public static void apply(ServerPlayer p,LivingEntity v,WeaponMove move,Vec3 direction,boolean first,float charge,WeaponCutContact.Report cut) {
-        if(cut.contacts().isEmpty())cut=WeaponCutContact.impact(p,v,direction);
+        // A confirmed ordinary hit still has impact feedback when no sharp face touched.
+        // Keep that fallback separate from the report allowed to authorize dismemberment.
+        var impact=cut.contacts().isEmpty()?WeaponCutContact.impact(p,v,direction):cut;
         var profile=ImpactProfile.of(move);var tier=ImpactTier.of(move);
         boolean slam=profile.kind()==HitReaction.SLAM||move.quake();
         boolean heavy=profile.kind()!=HitReaction.STAGGER;
@@ -65,15 +68,21 @@ public final class WeaponImpact {
             if(vertical>0)v.setOnGround(false);
             v.hurtMarked=true;
             if(v instanceof Mob mob){mob.getNavigation().stop();mob.setXxa(0);mob.setZza(0);}
-            if(first)HitStop.victim(v,tier.hitstop);
+            // Every struck victim reacts; only attacker sound/camera is limited to the first.
+            HitStop.victim(v,tier.hitstop);
         }
         HeavyBlow.apply(p,v,move,tier,charge,direction,controlled);
         WeaponDismemberment.weapon(v,cut);
         boolean sharp=move.form==PowerForm.BLADE||move.form==PowerForm.CLAWS||move.form==PowerForm.WHIPFIST;
-        if(controlled||!v.isAlive()||!cut.contacts().isEmpty()){
+        if(sharp&&v.isDeadOrDying()&&RagdollImpact.supportedBody(v)){
+            // Capture connected skin once, including blade-back contacts before an edge crosses it.
+            // This adapter flag does not sever anything; only confirmed planes may do that.
+            v.setData(ModAttachments.DISMEMBER,v.getData(ModAttachments.DISMEMBER)|WeaponDismemberment.MESH_CUT);v.syncData(ModAttachments.DISMEMBER);
+        }
+        if(controlled||!v.isAlive()||!impact.contacts().isEmpty()){
             // Light cuts retain directional flinch; heavy cuts and lethal hits take over the body.
             int physicalTicks=!v.isAlive()?60:canFall?profile.stun():8;
-            RagdollImpact.send(v,profile.motion(),physicalTicks,sharp,HitStop.launchVelocity(v),cut);
+            RagdollImpact.send(v,profile.motion(),physicalTicks,sharp,HitStop.launchVelocity(v),impact,tier.hitstop);
         }
         boolean blade=move.form==PowerForm.BLADE;
         if(!blade&&!RagdollImpact.supportedBody(v))ClawPhysicalEffects.onComboTargetHit(p,v,heavy||slam);

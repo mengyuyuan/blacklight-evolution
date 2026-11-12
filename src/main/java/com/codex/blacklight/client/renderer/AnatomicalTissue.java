@@ -289,9 +289,13 @@ final class AnatomicalTissue {
         if (pending.isEmpty()) return;
         // Emit complete passes. Requesting another buffer may end the previous builder.
         var nativeOut = buffers.getBuffer(RenderType.entityCutoutNoCull(skin));
-        if(!organsOnly&&!metadataOnly)for (var p : pending.values()) for (var m : p.region.meshes) if (m.skin) draw(p, m, nativeOut, false);
+        if(!organsOnly&&!metadataOnly)for (var p : pending.values())try(var owner=AdaptiveRagdoll.attachment(p.region.part)){
+            for (var m : p.region.meshes) if (m.skin) draw(p, m, nativeOut, false);
+        }
         var tissueOut = buffers.getBuffer(RenderType.entityCutoutNoCull(MATERIAL));
-        for (var p : pending.values()) for (var m : p.region.meshes) draw(p, m, tissueOut, true);
+        for (var p : pending.values())try(var owner=AdaptiveRagdoll.attachment(p.region.part)){
+            for (var m : p.region.meshes) draw(p, m, tissueOut, true);
+        }
         pending.clear();
     }
     private void draw(Pending p, Mesh mesh, VertexConsumer out, boolean tissue) {

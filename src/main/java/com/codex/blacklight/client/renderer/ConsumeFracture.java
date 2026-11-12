@@ -37,6 +37,8 @@ public final class ConsumeFracture implements MultiBufferSource {
     private final boolean headOnly;
     private final boolean bisect;
     private final boolean sourcedReceiver;
+    private final boolean physicalPull;
+    private final float materialFront;
     private final Vector3f cutNormal;
     private final Vector3f cutCenter=new Vector3f();
     private final Vector3f up,side,spinAxis,ground;
@@ -70,7 +72,8 @@ public final class ConsumeFracture implements MultiBufferSource {
             float seconds=(mob.level().getGameTime()-v.started()+partial)/20F;
             // Some source branches begin the consume shader before spawnGib.
             // Never pull the complete body away before its actual separation.
-            float flowStart=Math.max(scene.effectSeconds(),scene.deformSeconds())+scene.settleSeconds();
+            float sourceAbsorb=com.codex.blacklight.combat.ConsumeReceiverScene.absorptionSeconds(form,v.variant());
+            float flowStart=Math.clamp(sourceAbsorb,scene.deformSeconds(),scene.finishSeconds()-.05F);
             return new Phase(form,Math.clamp(seconds/scene.finishSeconds(),0,1),
                     smooth((seconds-scene.deformSeconds())/scene.settleSeconds()),
                     smooth((seconds-flowStart)/(scene.finishSeconds()-flowStart)),
@@ -85,8 +88,12 @@ public final class ConsumeFracture implements MultiBufferSource {
     private static float smooth(float t){t=Math.clamp(t,0,1);return t*t*(3-2*t);}
     public static float cutHeight(PowerForm form){return form==PowerForm.NONE?.8F:.6F;}
     public static boolean visible(LivingEntity mob,float partial){
+        if(AdaptiveRagdoll.active(mob))return false;
         var v=mob.getData(ModAttachments.CONSUME_VISUAL);if(!v.consuming())return false;
         var p=phase(mob,partial);
+        // Unsupported renderers must not substitute an anatomical/fixed split
+        // for a missing visible blade sweep.
+        if(p.style()==Style.SEVER)return false;
         var scene=com.codex.blacklight.combat.ConsumeReceiverScene.profile(p.form(),ConsumeSequence.mountedStage(v.stage()),v.variant());
         return scene!=null?(mob.level().getGameTime()-v.started()+partial)/20F>=Math.min(scene.deformSeconds(),scene.effectSeconds()):p.progress()>=Math.max(0,p.contact()-.08F);
     }
@@ -95,6 +102,10 @@ public final class ConsumeFracture implements MultiBufferSource {
         this.target=target;phase=phase(mob,partial);seed=mob.getId();
         headOnly=mob.getData(ModAttachments.CONSUME_VISUAL).stage()==ConsumeVisual.HUNTER_CONSUME;
         sourcedReceiver=phase.nativeEvents();
+        physicalPull=com.codex.blacklight.client.animation.ImpactRagdoll.absorbing(mob);
+        var materialScene=com.codex.blacklight.combat.ConsumeReceiverScene.profile(phase.form(),ConsumeSequence.mountedStage(mob.getData(ModAttachments.CONSUME_VISUAL).stage()),mob.getData(ModAttachments.CONSUME_VISUAL).variant());
+        float seconds=(mob.level().getGameTime()-mob.getData(ModAttachments.CONSUME_VISUAL).started()+partial)/20F;
+        materialFront=materialScene==null?phase.opening():Math.clamp((seconds-materialScene.effectSeconds())*1.4F,0,1);
         bisect=phase.style()==Style.SEVER&&!ConsumeSequence.mountedStage(mob.getData(ModAttachments.CONSUME_VISUAL).stage());
         cutNormal=ConsumeSequence.quadruped(mob)?new Vector3f(0,0,1):new Vector3f(0,1,0);
         light=net.minecraft.client.Minecraft.getInstance().getEntityRenderDispatcher().getPackedLightCoords(mob,partial);
@@ -212,7 +223,7 @@ public final class ConsumeFracture implements MultiBufferSource {
             // Two coherent halves: attached head/limbs share their half's transform.
             float sign=d==0?-1:1,open=phase.opening(),flow=phase.returnFlow();
             if(open<=0)return frame.transformPosition(new Vector3f(p));
-            float shrink=com.codex.blacklight.combat.CorpseFragmentMotion.shrink(flow),travel=smooth((flow-.30F)/.70F);
+            float shrink=com.codex.blacklight.combat.CorpseFragmentMotion.shrink(flow),travel=physicalPull?0:smooth((flow-.30F)/.70F);
             Vector3f pivotPiece=pieceCenter[d];
             Vector3f offset=new Vector3f(side).mul(sign*(spread*.65F+Math.min(fragmentAge,.6F)*.12F)*open)
                     .fma(com.codex.blacklight.combat.CorpseFragmentMotion.drop(fragmentAge,pieceFloor[d])*open,up);
@@ -229,7 +240,7 @@ public final class ConsumeFracture implements MultiBufferSource {
         float open=sourcedReceiver?phase.opening():opening(part),flow=phase.returnFlow();
         if(sourcedReceiver&&(phase.style()==Style.HEAD_CRUSH||phase.style()==Style.HEAD_IMPACT))
             flow=part==ConsumeAnatomy.HEAD?smooth(flow/.7F):smooth((flow-.16F)/.84F);
-        float shrink=smooth(flow/.6F),travel=smooth((flow-.4F)/.6F);
+        float shrink=smooth(flow/.6F),travel=physicalPull?0:smooth((flow-.4F)/.6F);
         if(phase.style()==Style.LASH||phase.style()==Style.CHEST_ABSORB){
             // Lash has no spawnGib event. Keep the receiver connected as it
             // contracts into the absorption stream; do not spin every limb apart.
@@ -270,7 +281,10 @@ public final class ConsumeFracture implements MultiBufferSource {
         return frame.transformPosition(result);
     }
     private void emit(VertexConsumer out,V v,int piece){
-        Vector3f p=displaced(v.p,piece);float dark=headOnly&&piece/divisions!=ConsumeAnatomy.HEAD?0:phase.returnFlow();
+        Vector3f p=displaced(v.p,piece);
+        int start=(phase.style()==Style.HEAD_CRUSH||phase.style()==Style.HEAD_IMPACT)?ConsumeAnatomy.HEAD:ConsumeAnatomy.BODY;
+        float distance=v.p.distance(centers[start]);
+        float dark=headOnly&&piece/divisions!=ConsumeAnatomy.HEAD?0:Math.max(phase.returnFlow(),smooth((materialFront-distance/Math.max(.2F,radii[start]+.9F))/.22F)*.8F);
         out.addVertex(p.x,p.y,p.z).setColor((int)(v.r*(1-dark)+66*dark),(int)(v.g*(1-dark)+12*dark),(int)(v.b*(1-dark)+19*dark),v.a).setUv(v.u,v.v).setOverlay(v.overlay).setLight(v.light).setNormal(v.nx,v.ny,v.nz);
     }
     private void tissueBridges(){

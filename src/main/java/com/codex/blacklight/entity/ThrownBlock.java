@@ -167,7 +167,7 @@ public final class ThrownBlock extends Projectile {
             Vec3 impact=mechanical!=null?mechanical.point():victim!=null?victim.getLocation():wall;
             setPos(impact);
             if(mechanical!=null&&getOwner() instanceof LivingEntity actor)
-                com.codex.blacklight.military.vehicle.VehicleDamageBridge.hurtPhysical(actor,mechanical.vehicle(),impactDamage,this);
+                com.codex.blacklight.military.vehicle.VehicleDamageBridge.hurtPhysical(actor,mechanical.vehicle(),impactDamage,this,mechanical.point());
             if(victim!=null&&victim.getEntity() instanceof LivingEntity target&&allowed(target)){
                 if(target.hurt(damageSources().thrown(this,getOwner()),impactDamage)){
                     var push=velocity.normalize().scale(impactKnockback);

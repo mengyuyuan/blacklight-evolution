@@ -120,8 +120,10 @@ public final class InfectedMorphology implements AutoCloseable {
     }
     private static final class GlowMesh implements VertexConsumer {
         private float[] f=new float[11*256];private int[] c=new int[256];private int n=-1;
+        private Object[] owners=new Object[256];
         @Override public VertexConsumer addVertex(float x,float y,float z){
-            n++;if(n>=c.length){f=java.util.Arrays.copyOf(f,f.length*2);c=java.util.Arrays.copyOf(c,c.length*2);}
+            n++;if(n>=c.length){f=java.util.Arrays.copyOf(f,f.length*2);c=java.util.Arrays.copyOf(c,c.length*2);owners=java.util.Arrays.copyOf(owners,owners.length*2);}
+            owners[n]=AdaptiveRagdoll.attachmentOwner();
             int o=n*11;f[o]=x;f[o+1]=y;f[o+2]=z;f[o+5]=0;f[o+6]=1;f[o+7]=0;c[n]=-1;return this;
         }
         @Override public VertexConsumer setColor(int r,int g,int b,int a){if(n>=0)c[n]=(a&255)<<24|(r&255)<<16|(g&255)<<8|(b&255);return this;}
@@ -130,7 +132,7 @@ public final class InfectedMorphology implements AutoCloseable {
         @Override public VertexConsumer setUv2(int u,int v){return this;}
         @Override public VertexConsumer setNormal(float x,float y,float z){if(n>=0){int o=n*11;f[o+5]=x;f[o+6]=y;f[o+7]=z;}return this;}
         void replay(VertexConsumer out,float pulse){
-            for(int i=0;i<=n;i++){
+            for(int i=0;i<=n;i++)try(var owner=AdaptiveRagdoll.attachment(owners[i])){
                 int o=i*11,argb=c[i];
                 int r=Math.round((argb>>16&255)*pulse),g=Math.round((argb>>8&255)*pulse),b=Math.round((argb&255)*pulse);
                 out.addVertex(f[o],f[o+1],f[o+2]).setColor(r,g,b,argb>>>24).setUv(f[o+3],f[o+4])
@@ -334,7 +336,7 @@ public final class InfectedMorphology implements AutoCloseable {
         if(context.surface!=null)context.surface.flush(buffers);
         if(context.pending.isEmpty())return;
         var out=buffers.getBuffer(TYPE);
-        for(var p:context.pending.values()){
+        for(var entry:context.pending.entrySet())try(var owner=AdaptiveRagdoll.attachment(entry.getKey())){var p=entry.getValue();
             if(out instanceof ConsumeAnatomy.Consumer consumer)consumer.anatomy(p.attachment.anatomy);
             for(var box:p.attachment.boxes)draw(box,p,out);
         }

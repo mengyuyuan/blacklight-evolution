@@ -19,17 +19,18 @@ public abstract class LivingConsumePoseMixin {
     @Shadow protected EntityModel<?> model;
     @Inject(method="getOverlayCoords",at=@At("HEAD"),cancellable=true)
     private static void blacklight$corpseOverlay(LivingEntity entity,float white,org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable<Integer> ci){
-        if(entity.isDeadOrDying()&&com.codex.blacklight.client.animation.ImpactRagdoll.active(entity))
-            ci.setReturnValue(net.minecraft.client.renderer.texture.OverlayTexture.NO_OVERLAY);
+        if(entity.isDeadOrDying()&&(com.codex.blacklight.client.animation.ImpactRagdoll.active(entity)||com.codex.blacklight.client.renderer.AdaptiveRagdoll.active(entity)))
+            ci.setReturnValue(net.minecraft.client.renderer.texture.OverlayTexture.pack(white,com.codex.blacklight.client.animation.RagdollDrive.hurtFlash(entity)));
     }
     @Inject(method="setupRotations",at=@At("HEAD"),cancellable=true)
     private void blacklight$physicalRoot(LivingEntity entity,PoseStack stack,float bob,float bodyYaw,float partial,float scale,CallbackInfo ci){
-        if(com.codex.blacklight.client.animation.ImpactRagdoll.active(entity)){
+        if(com.codex.blacklight.client.animation.ImpactRagdoll.active(entity)||com.codex.blacklight.client.renderer.AdaptiveRagdoll.active(entity)){
             stack.mulPose(com.mojang.math.Axis.YP.rotationDegrees(180-bodyYaw));ci.cancel();
         }
     }
     @WrapMethod(method="render(Lnet/minecraft/world/entity/LivingEntity;FFLcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;I)V")
     private void blacklight$scope(LivingEntity entity,float yaw,float partial,PoseStack stack,MultiBufferSource buffer,int light,Operation<Void> original) {
+        com.codex.blacklight.client.renderer.AdaptiveRagdoll.bindModel(entity,model);
         try (var actor = com.codex.blacklight.client.renderer.NativeRenderScope.enter(entity);
              var severed = com.codex.blacklight.client.renderer.DismemberVisuals.scope();
              var scope = LivingRenderScope.begin(stack);
@@ -42,7 +43,7 @@ public abstract class LivingConsumePoseMixin {
     @Inject(method="render(Lnet/minecraft/world/entity/LivingEntity;FFLcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;I)V",
             at=@At(value="INVOKE",target="Lnet/minecraft/client/model/EntityModel;setupAnim(Lnet/minecraft/world/entity/Entity;FFFFF)V",shift=At.Shift.AFTER))
     private void blacklight$victim(LivingEntity entity,float yaw,float partial,PoseStack stack,MultiBufferSource buffer,int light,CallbackInfo ci) {
-        if(!com.codex.blacklight.client.renderer.PigRagdoll.active(entity))ConsumeVictimPose.vanilla(model,entity,partial);
+        ConsumeVictimPose.vanilla(model,entity,partial);
         com.codex.blacklight.client.renderer.DismemberVisuals.pose(model,entity,partial);
     }
     @Inject(method="render(Lnet/minecraft/world/entity/LivingEntity;FFLcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;I)V",at=@At("RETURN"))
