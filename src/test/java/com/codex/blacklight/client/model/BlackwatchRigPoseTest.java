@@ -7,6 +7,41 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 class BlackwatchRigPoseTest {
+    @Test void aimingRaisesTheGunAndAlignsTheActualBarrelForEitherHand(){
+        for(boolean left:new boolean[]{false,true}){
+            var root=BlackwatchModel.layer(false,false).bakeRoot();var model=new BlackwatchModel(root,false);
+            model.applyReferencePose(BlackwatchRigPose.animated(0,0,left,0,1,0,0,0,Double.POSITIVE_INFINITY,Double.POSITIVE_INFINITY,0));
+            var before=model.muzzlePosition(new PoseStack(),"military_rifle");
+            model.applyReferencePose(BlackwatchRigPose.animated(0,0,left,0,1,0,0,0,Double.POSITIVE_INFINITY,Double.POSITIVE_INFINITY,1));
+            var body=root.getChild("body");var carry=body.getChild("carry");var mount=carry.getChild("weapon_mount");
+            var direction=point(0,0,-1,body,carry,mount).sub(point(0,0,0,body,carry,mount)).normalize();
+            assertTrue(direction.distance(new Vector3f(0,0,-1))<.001,"Aimed model barrel faces the target, not across the chest");
+            assertTrue(model.muzzlePosition(new PoseStack(),"military_rifle").y<before.y-.1,"Y-down native muzzle rises when aiming");
+            for(boolean main:new boolean[]{false,true}){
+                var arm=root.getChild(main?(left?"left_arm":"right_arm"):(left?"right_arm":"left_arm"));
+                assertTrue(point(0,6,0,arm,arm.getChild("forearm")).distance(point(0,0,0,body,carry,carry.getChild(main?"main_grip":"support_grip")))<.15);
+            }
+            for(String weapon:java.util.List.of("military_rifle","military_carbine","military_machine_gun","grenade_launcher","rocket_launcher","missile_launcher","thermobaric_launcher","infection_launcher"))
+                assertNotNull(model.muzzlePosition(new PoseStack(),weapon),"Every carried gun has an actual mesh muzzle");
+        }
+    }
+    @Test void stockStrikeKeepsWristsOnTheWeaponAndShouldersOnTheBody(){
+        for(boolean left:new boolean[]{false,true}){
+            var root=BlackwatchModel.layer(false,false).bakeRoot();var model=new BlackwatchModel(root,false);
+            Vector3f previous=null;
+            for(int frame=0;frame<=60;frame++){
+                var pose=BlackwatchRigPose.animated(.2,-.1,left,0,1,0,0,0,Double.POSITIVE_INFINITY,frame/60d);
+                model.applyReferencePose(pose);var body=root.getChild("body");var carry=body.getChild("carry");
+                for(boolean main:new boolean[]{false,true}){
+                    var arm=root.getChild(main?(left?"left_arm":"right_arm"):(left?"right_arm":"left_arm"));
+                    var wrist=point(0,6,0,arm,arm.getChild("forearm"));
+                    assertTrue(wrist.distance(point(0,0,0,body,carry,carry.getChild(main?"main_grip":"support_grip")))<.15);
+                    assertTrue(point(0,0,0,arm).distance(point(arm==root.getChild("right_arm")?-6:6,0,0,body))<.02);
+                    if(main){if(previous!=null)assertTrue(previous.distance(wrist)<2,"No strike-frame hand teleport");previous=wrist;}
+                }
+            }
+        }
+    }
     private static Object solve(double yaw,double pitch,boolean left,double reload,double weight) throws Exception {
         Class<?> type;
         try{type=Class.forName("com.codex.blacklight.client.model.BlackwatchRigPose");}

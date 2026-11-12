@@ -1,5 +1,7 @@
 package com.codex.blacklight.client.model;
 
+import com.codex.blacklight.animation.P1MilitaryMotion;
+
 import com.codex.blacklight.entity.MilitarySoldier;
 import com.codex.blacklight.firearms.FirearmItem;
 import com.codex.blacklight.firearms.FirearmViewState;
@@ -15,27 +17,50 @@ public final class BlackwatchModel extends HumanoidModel<MilitarySoldier> {
     private final boolean military;
     private final ModelPart[] equipment;
     private final ModelPart[] ranks = new ModelPart[8];
-    private final ModelPart modelRoot,carry,rightForearm,leftForearm;
+    private final ModelPart modelRoot,carry,rightForearm,leftForearm,rightShin,leftShin,rightFoot,leftFoot;
     private final Map<String,ModelPart> weapons = new LinkedHashMap<>();
     private final ModelPart[] forearmEquipment = new ModelPart[2];
     private final ModelPart[][] forearmCommands = new ModelPart[3][2];
+    private final ModelPart[] shinEquipment = new ModelPart[2];
+    private final ModelPart[][] shinCommands = new ModelPart[3][2];
     private static final BlackwatchReferenceProfile REFERENCE=BlackwatchReferenceProfile.load();
     private static final Map<String,java.util.List<BlackwatchReferenceProfile.WeaponPart>> WEAPON_PARTS=REFERENCE.weapons();
     private static final class ActorState {
         final FirearmViewState view=new FirearmViewState();
-        double at=Double.NaN,movement,crouch,aimYaw,aimPitch;
+        double at=Double.NaN,movement,crouch,aimYaw,aimPitch,aimWeight;
     }
     // Shared renderer models never share animation clocks or a strong reference to an entity.
     private final Map<MilitarySoldier,ActorState> actors=new WeakHashMap<>();
     private final ModelPart[][] commandParts = new ModelPart[3][6];
     private final ModelPart[] hoodShell;
     private final ModelPart[] patrolPacks = new ModelPart[5];
+    private MilitarySoldier drawnActor;
+    public org.joml.Vector3f muzzlePosition(com.mojang.blaze3d.vertex.PoseStack pose,String weapon){
+        var parts=WEAPON_PARTS.get(weapon);if(parts==null)return null;
+        var tip=parts.stream().filter(p->p.name().equals("muzzle")||p.name().equals("front_ring")).findFirst().orElse(null);
+        if(tip==null)return null;var b=tip.box();pose.pushPose();
+        try{
+            body.translateAndRotate(pose);carry.translateAndRotate(pose);carry.getChild("weapon_mount").translateAndRotate(pose);
+            return pose.last().pose().transformPosition(new org.joml.Vector3f((b[0]+b[3]/2)/16,(b[1]+b[4]/2)/16,b[2]/16));
+        }finally{pose.popPose();}
+    }
+    @Override public void renderToBuffer(com.mojang.blaze3d.vertex.PoseStack pose,com.mojang.blaze3d.vertex.VertexConsumer out,int light,int overlay,int color){
+        var actor=drawnActor;drawnActor=null;
+        super.renderToBuffer(pose,out,light,overlay,color);
+        if(actor==null||!carry.visible||!(actor.getMainHandItem().getItem() instanceof FirearmItem gun))return;
+        var point=muzzlePosition(pose,gun.definition().id());if(point==null)return;
+        var camera=net.minecraft.client.Minecraft.getInstance().gameRenderer.getMainCamera().getPosition();
+        com.codex.blacklight.client.renderer.GunplayVisuals.militaryMuzzle(actor,gun.definition(),camera.add(point.x,point.y,point.z));
+    }
     public BlackwatchModel(ModelPart root) { this(root, false); }
     public BlackwatchModel(ModelPart root, boolean military) {
         super(root);
         this.military=military;
         modelRoot=root;carry=body.getChild("carry");
         rightForearm=rightArm.getChild("forearm");leftForearm=leftArm.getChild("forearm");
+        rightShin=rightLeg.getChild("shin");leftShin=leftLeg.getChild("shin");
+        rightFoot=rightShin.getChild("foot");leftFoot=leftShin.getChild("foot");
+        shinEquipment[0]=rightShin.getChild("equipment");shinEquipment[1]=leftShin.getChild("equipment");
         forearmEquipment[0]=rightForearm.getChild("equipment");forearmEquipment[1]=leftForearm.getChild("equipment");
         hat.visible = false;
         equipment = new ModelPart[]{head.getChild("equipment"), body.getChild("equipment"),
@@ -49,6 +74,8 @@ public final class BlackwatchModel extends HumanoidModel<MilitarySoldier> {
             commandParts[i][j]=root.getChild(parents[j]).getChild("role_"+roles[i]);
         for(int i=0;i<roles.length;i++)for(int j=0;j<2;j++)
             forearmCommands[i][j]=(j==0?rightForearm:leftForearm).getChild("role_"+roles[i]);
+        for(int i=0;i<roles.length;i++)for(int j=0;j<2;j++)
+            shinCommands[i][j]=(j==0?rightShin:leftShin).getChild("role_"+roles[i]);
         String[] shellNames=military?new String[0]:new String[]{"gear_hood_crown","gear_hood_rim",
             "gear_hood_rear","gear_hood_right","gear_hood_left"};
         hoodShell=new ModelPart[shellNames.length];
@@ -78,6 +105,12 @@ public final class BlackwatchModel extends HumanoidModel<MilitarySoldier> {
             var lower=root.getChild(arm).addOrReplaceChild("forearm",CubeListBuilder.create(),PartPose.offset(0,6,0));
             lower.addOrReplaceChild("equipment",CubeListBuilder.create(),PartPose.ZERO);
             for(String role:new String[]{"team_leader","officer","commander"})lower.addOrReplaceChild("role_"+role,CubeListBuilder.create(),PartPose.ZERO);
+        }
+        for(String leg:new String[]{"right_leg","left_leg"}) {
+            var shin=root.getChild(leg).addOrReplaceChild("shin",CubeListBuilder.create(),PartPose.offset(0,6,0));
+            shin.addOrReplaceChild("foot",CubeListBuilder.create(),PartPose.offset(0,5,0));
+            shin.addOrReplaceChild("equipment",CubeListBuilder.create(),PartPose.ZERO);
+            for(String role:new String[]{"team_leader","officer","commander"})shin.addOrReplaceChild("role_"+role,CubeListBuilder.create(),PartPose.ZERO);
         }
         var origin=REFERENCE.vector("carry_origin");
         var carry=root.getChild("body").addOrReplaceChild("carry",CubeListBuilder.create(),PartPose.offset((float)origin[0],(float)origin[1],(float)origin[2]));
@@ -336,7 +369,7 @@ public final class BlackwatchModel extends HumanoidModel<MilitarySoldier> {
         piece(root,military,heavy,"bwRole_commander","body","role_command_back_tab",116,195,-1.65F,3.25F,4.62F,3.3F,2F,0.25F);
         return LayerDefinition.create(mesh,256,256);
     }
-    /** Retain original role/gear filtering while moving lower-arm pieces onto the real elbow. */
+    /** Retain role/gear filtering while binding cloth, armour and boots to the real joints. */
     private static void piece(PartDefinition root,boolean military,boolean heavy,String group,
                               String parent,String name,int u,int v,
                               float x,float y,float z,float w,float h,float d) {
@@ -356,6 +389,16 @@ public final class BlackwatchModel extends HumanoidModel<MilitarySoldier> {
             lower=y+h*.5F>=6;
             if(lower){target=target.getChild("forearm");y-=6;}
         }
+        if(parent.endsWith("_leg")){
+            if(name.equals("uniform_trouser")){
+                target.addOrReplaceChild(name,CubeListBuilder.create().texOffs(u,v).addBox(x,0,z,w,6,d),PartPose.ZERO);
+                var shin=target.getChild("shin");
+                shin.addOrReplaceChild(name,CubeListBuilder.create().texOffs(u,v+6).addBox(x,0,z,w,5,d),PartPose.ZERO);
+                shin.getChild("foot").addOrReplaceChild(name,CubeListBuilder.create().texOffs(u,v+11).addBox(x,0,z,w,1,d),PartPose.ZERO);return;
+            }
+            if(name.equals("uniform_boot")||name.equals("uniform_sole")){target=target.getChild("shin").getChild("foot");y-=11;}
+            else if(y+h*.5F>=6){target=target.getChild("shin");y-=6;}
+        }
         if(group.contains("Role_"))target=target.getChild("role_"+group.substring(group.indexOf("Role_")+5));
         else if(group.startsWith("rank_"))target=target.getChild(group);
         else if(name.startsWith("gear_"))target=target.getChild("equipment");
@@ -373,6 +416,9 @@ public final class BlackwatchModel extends HumanoidModel<MilitarySoldier> {
         position(head,pose.headPosition());rotation(head,pose.headRotation());
         position(rightLeg,pose.rightLegPosition());rotation(rightLeg,pose.rightLegRotation());
         position(leftLeg,pose.leftLegPosition());rotation(leftLeg,pose.leftLegRotation());
+        rightShin.setPos(0,6,0);leftShin.setPos(0,6,0);rightFoot.setPos(0,5,0);leftFoot.setPos(0,5,0);
+        rotation(rightShin,pose.rightKneeRotation());rotation(leftShin,pose.leftKneeRotation());
+        rotation(rightFoot,pose.rightFootRotation());rotation(leftFoot,pose.leftFootRotation());
         if(pose.weight()<=0){rightForearm.setRotation(0,0,0);leftForearm.setRotation(0,0,0);}
     }
     /** Seated pose uses the actual split joints; the held gun remains in the entity inventory. */
@@ -389,19 +435,30 @@ public final class BlackwatchModel extends HumanoidModel<MilitarySoldier> {
         // Level, parallel legs tuck into the seat instead of splaying through its walls and floor.
         rightLeg.setPos(-1.9F,11+drop,0);leftLeg.setPos(1.9F,11+drop,0);
         rightLeg.setRotation(-(float)Math.PI/2,0,0);leftLeg.setRotation(-(float)Math.PI/2,0,0);
+        rightShin.setRotation(0,0,0);leftShin.setRotation(0,0,0);rightFoot.setRotation(0,0,0);leftFoot.setRotation(0,0,0);
         for(String hem:List.of("role_coat_front_right","role_coat_front_left","role_coat_rear"))
             commandParts[2][1].getChild(hem).setPos(0,-.5F,0);
     }
     private static double blend(double current,double target,double delta){return current+(target-current)*(1-Math.exp(-Math.max(0,delta)*.3));}
+    static P1MilitaryMotion.Frame kneelingFrame(P1MilitaryMotion motion,double crouch,double reload,double shotAge){
+        double frame=Math.max(0,Math.min(1,crouch))*Math.min(11,motion.frames("crouch"));
+        if(reload>0&&reload<1){
+            double weight=Math.max(0,Math.min(1,(crouch-.5)*2))*Math.min(1,(1-reload)/.08);
+            return motion.blend("crouch",frame,"reload_kneel",reload*motion.frames("reload_kneel"),weight);
+        }
+        if(crouch>=1&&motion.hasClip("fire_kneel"))return motion.sample("fire_kneel",Double.isFinite(shotAge)?Math.min(motion.frames("fire_kneel"),shotAge*30):0);
+        return motion.sample("crouch",frame);
+    }
     @Override public void setupAnim(MilitarySoldier entity,float swing,float amount,float age,float yaw,float pitch){
+        drawnActor=entity;
         // These objects are shared across NPCs and disguise/grab views: restore the entire added hierarchy first.
         modelRoot.getAllParts().forEach(ModelPart::resetPose);
         super.setupAnim(entity,swing,amount,age,yaw,pitch);hat.visible=false;carry.visible=false;
         rightForearm.visible=true;leftForearm.visible=true;
         rightArm.x=-6;rightArm.y=0;leftArm.x=6;leftArm.y=0;
-        for(var part:equipment)part.visible=entity.equipped();for(var part:forearmEquipment)part.visible=entity.equipped();
+        for(var part:equipment)part.visible=entity.equipped();for(var part:forearmEquipment)part.visible=entity.equipped();for(var part:shinEquipment)part.visible=entity.equipped();
         int role=switch(entity.commandRole()){case TEAM_LEADER->0;case OFFICER->1;case COMMANDER->2;default->-1;};
-        for(int i=0;i<3;i++){for(var part:commandParts[i])part.visible=entity.equipped()&&i==role;for(var part:forearmCommands[i])part.visible=entity.equipped()&&i==role;}
+        for(int i=0;i<3;i++){for(var part:commandParts[i])part.visible=entity.equipped()&&i==role;for(var part:forearmCommands[i])part.visible=entity.equipped()&&i==role;for(var part:shinCommands[i])part.visible=entity.equipped()&&i==role;}
         boolean commandHead=role>=1;if(military&&commandHead)equipment[0].visible=false;
         for(var part:hoodShell)part.visible=!commandHead;for(var part:patrolPacks)if(part!=null)part.visible=!commandHead;
         for(int i=0;i<ranks.length;i++)ranks[i].visible=entity.equipped()&&i==entity.rank().ordinal();
@@ -418,10 +475,28 @@ public final class BlackwatchModel extends HumanoidModel<MilitarySoldier> {
         var ammo=FirearmItem.state(stack,0);var definition=gun.definition();long tick=entity.level().getGameTime();
         state.view.observe(definition.id(),0,ammo.magazine(),ammo.readyAt(),definition.cooldownTicks(),definition.reloadTicks(),tick,true,com.codex.blacklight.firearms.FirearmReloadSystem.started(stack));
         double clock=tick+(age-Math.floor(age)),delta=Double.isFinite(state.at)?Math.min(3,Math.max(0,clock-state.at)):1;
-        state.at=clock;state.movement=blend(state.movement,amount,delta);state.crouch=blend(state.crouch,entity.isCrouching()?1:0,delta);
+        state.at=clock;state.movement=blend(state.movement,amount,delta);
+        state.crouch=entity.isCrouching()?Math.min(1,state.crouch+delta/8):Math.max(0,state.crouch-delta/8);
         state.aimYaw=blend(state.aimYaw,Math.toRadians(yaw)*.65,delta);state.aimPitch=blend(state.aimPitch,Math.toRadians(pitch)*.75,delta);
-        applyReferencePose(BlackwatchRigPose.animated(state.aimYaw,state.aimPitch,entity.getMainArm()==net.minecraft.world.entity.HumanoidArm.LEFT,
-                state.view.reloadProgress(clock),1,age/20d,state.movement,state.crouch,state.view.shotAgeSeconds(clock)));
+        state.aimWeight=blend(state.aimWeight,entity.phase()==1||entity.phase()==2?1:0,delta);
+        double meleeAge=entity.meleeStarted()<0?Double.POSITIVE_INFINITY:(clock-entity.meleeStarted())/20;
+        double reloadProgress=state.view.reloadProgress(clock);
+        var rigPose=BlackwatchRigPose.animated(state.aimYaw,state.aimPitch,entity.getMainArm()==net.minecraft.world.entity.HumanoidArm.LEFT,
+                state.view.reloadProgress(clock),1,age/20d,state.movement,state.crouch,state.view.shotAgeSeconds(clock),
+                meleeAge,state.aimWeight);
+        var original=P1MilitaryMotion.local();
+        if(original!=null){
+            String clip="aim";double frame=(age/20d*30)%original.frames(clip),influence=state.aimWeight;
+            P1MilitaryMotion.Frame selected=null;
+            if(meleeAge>=0&&meleeAge<1){clip="melee";frame=Math.min(44,meleeAge*45);influence=Math.min(1,Math.min(meleeAge/.10,(1-meleeAge)/.10));}
+            else if(state.crouch>0&&original.hasClip("crouch")){clip="crouch";selected=kneelingFrame(original,state.crouch,reloadProgress,state.view.shotAgeSeconds(clock));influence=Math.min(1,state.crouch*4);}
+            else if(reloadProgress>0&&reloadProgress<1){clip=state.crouch>.5?"reload_kneel":"reload";frame=reloadProgress*original.frames(clip);influence=Math.min(1,Math.min(reloadProgress/.08,(1-reloadProgress)/.08));}
+            else if(state.crouch>=1&&original.hasClip("fire_kneel")){clip="fire_kneel";frame=Double.isFinite(state.view.shotAgeSeconds(clock))?Math.min(original.frames(clip),state.view.shotAgeSeconds(clock)*30):0;influence=1;}
+            else if(state.view.shotAgeSeconds(clock)>=0&&state.view.shotAgeSeconds(clock)<original.frames("fire")/30){clip="fire";frame=state.view.shotAgeSeconds(clock)*30;}
+            double legInfluence=clip.equals("melee")||state.movement<.03?influence:0;
+            rigPose=BlackwatchRigPose.original(rigPose,selected!=null?selected:original.sample(clip,frame),influence,reloadProgress,state.aimYaw,state.aimPitch,legInfluence);
+        }
+        applyReferencePose(rigPose);
         var reload=com.codex.blacklight.firearms.FirearmReloadMotion.sample(state.view.reloadProgress(clock));
         for(var entry:weapons.entrySet()){
             entry.getValue().visible=entry.getKey().equals(definition.id());

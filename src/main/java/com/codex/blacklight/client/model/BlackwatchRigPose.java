@@ -1,5 +1,7 @@
 package com.codex.blacklight.client.model;
 
+import com.codex.blacklight.animation.P1MilitaryMotion;
+
 /** Pure retargeting math. Units are model pixels; rotations are native ZYX radians. */
 public final class BlackwatchRigPose {
     public record Vec(double x,double y,double z){
@@ -11,6 +13,7 @@ public final class BlackwatchRigPose {
     public record Arm(Vec shoulder,Vec upper,Vec forearm){}
     public record Pose(Arm right,Arm left,Vec torsoPosition,Vec torsoRotation,Vec carryPosition,Vec carryRotation,
                        Vec headPosition,Vec headRotation,Vec rightLegPosition,Vec rightLegRotation,Vec leftLegPosition,Vec leftLegRotation,
+                       Vec rightKneeRotation,Vec leftKneeRotation,Vec rightFootRotation,Vec leftFootRotation,
                        boolean leftHanded,double supportWeight,double weight){}
     private record Matrix(double[] v){
         Vec point(Vec p){return new Vec(v[0]*p.x+v[1]*p.y+v[2]*p.z,v[3]*p.x+v[4]*p.y+v[5]*p.z,v[6]*p.x+v[7]*p.y+v[8]*p.z);}
@@ -61,6 +64,14 @@ public final class BlackwatchRigPose {
     }
     public static Pose animated(double yaw,double pitch,boolean leftHanded,double reloadProgress,double equippedWeight,
                                 double seconds,double movement,double crouchWeight,double shotAge){
+        return animated(yaw,pitch,leftHanded,reloadProgress,equippedWeight,seconds,movement,crouchWeight,shotAge,Double.POSITIVE_INFINITY);
+    }
+    public static Pose animated(double yaw,double pitch,boolean leftHanded,double reloadProgress,double equippedWeight,
+                                double seconds,double movement,double crouchWeight,double shotAge,double meleeAge){
+        return animated(yaw,pitch,leftHanded,reloadProgress,equippedWeight,seconds,movement,crouchWeight,shotAge,meleeAge,0);
+    }
+    public static Pose animated(double yaw,double pitch,boolean leftHanded,double reloadProgress,double equippedWeight,
+                                double seconds,double movement,double crouchWeight,double shotAge,double meleeAge,double aimWeight){
         double weight=clamp(equippedWeight),move=clamp(movement*2),run=clamp((movement-.55)/.3),crouch=clamp(crouchWeight);
         Vec idleCarry=vec(PROFILE.sample("idle","Two Hand Carry","rotation",seconds));
         Vec carryAuth=mix(idleCarry,mix(vec(PROFILE.sample("walk","Two Hand Carry","rotation",seconds)),vec(PROFILE.sample("run","Two Hand Carry","rotation",seconds)),run),move);
@@ -73,10 +84,26 @@ public final class BlackwatchRigPose {
         carryAuth=mix(carryAuth,vec(PROFILE.sample("crouch","Two Hand Carry","rotation",crouchClock)),crouch);
         rootAuth=mix(rootAuth,vec(PROFILE.sample("crouch","Blackwatch Rig","position",crouchClock)),crouch);
         headAuth=mix(headAuth,vec(PROFILE.sample("crouch","Head","rotation",crouchClock)),crouch);
+        // Raise the carried weapon and cancel its authored across-chest mount yaw.
+        // Both hands are still solved against the same rigid grips below.
+        double aim=clamp(aimWeight);
+        var aimBasis=rotation(vec(PROFILE.vector("weapon_mount_rotation"))).transpose();
+        var aimAngles=(leftHanded?aimBasis.mirror():aimBasis).angles();
+        carryAuth=mix(carryAuth,new Vec(-Math.toDegrees(aimAngles.x),Math.toDegrees(aimAngles.y),-Math.toDegrees(aimAngles.z)),aim);
+        carryPos=carryPos.add(new Vec(0,3.25,0).mul(aim));
         if(Double.isFinite(shotAge)&&shotAge>=0&&shotAge<=.5){
             String shot=crouch>.5?"shoot_crouching":"shoot_standing";
             carryAuth=carryAuth.add(vec(PROFILE.sample(shot,"Two Hand Carry","rotation",shotAge)).sub(vec(PROFILE.sample(shot,"Two Hand Carry","rotation",0))));
             carryPos=carryPos.add(vec(PROFILE.sample(shot,"Two Hand Carry","position",shotAge)).sub(vec(PROFILE.sample(shot,"Two Hand Carry","position",0))));
+        }
+        // Authored stock-strike fallback for installations without the user's local P1 curves.
+        if(Double.isFinite(meleeAge)&&meleeAge>=0&&meleeAge<=1){
+            double wind=smooth(meleeAge/.30)*(1-smooth((meleeAge-.30)/.15));
+            double strike=smooth((meleeAge-.30)/.15)*(1-smooth((meleeAge-.5)/.5));
+            double side=leftHanded?-1:1;
+            bodyAuth=bodyAuth.add(new Vec(8*strike,side*(-22*wind+32*strike),0));
+            carryAuth=carryAuth.add(new Vec(-12*wind+8*strike,side*(-25*wind+48*strike),side*12*strike));
+            carryPos=carryPos.add(new Vec(side*1.5*strike,0,2*wind-3*strike));
         }
         double progress=clamp(reloadProgress);var reload=com.codex.blacklight.firearms.FirearmReloadMotion.sample(progress);double release=reload.release();
         double lookYaw=Double.isFinite(yaw)?yaw:0,lookPitch=Double.isFinite(pitch)?pitch:0;
@@ -105,9 +132,73 @@ public final class BlackwatchRigPose {
         Vec rPos=vec(PROFILE.sample("crouch","Left Leg","position",crouchClock)).mul(crouch),lPos=vec(PROFILE.sample("crouch","Right Leg","position",crouchClock)).mul(crouch);
         return new Pose(right,left,torsoPosition,torsoRotation,carryPosition,carryRotation,torsoPosition,headRotation,
                 new Vec(-1.9,12-rPos.y,rPos.z).add(bob),nativeDegrees(new double[]{rLeg.x,rLeg.y,rLeg.z}),
-                new Vec(1.9,12-lPos.y,lPos.z).add(bob),nativeDegrees(new double[]{lLeg.x,lLeg.y,lLeg.z}),leftHanded,1-release,weight);
+                new Vec(1.9,12-lPos.y,lPos.z).add(bob),nativeDegrees(new double[]{lLeg.x,lLeg.y,lLeg.z}),ZERO,ZERO,ZERO,ZERO,leftHanded,1-release,weight);
     }
     private static Arm poseArm(Reference reference,Matrix torso,Vec torsoPosition,double weight){
         return new Arm(torsoPosition.add(torso.point(reference.shoulder)),torso.mul(reference.upper).angles().mul(weight),reference.lower.angles().mul(weight));
     }
+    /** Retarget original wrist/spine motion onto fixed native shoulders and one rigid firearm. */
+    public static Pose original(Pose fallback,P1MilitaryMotion.Frame frame,double influence,double reloadProgress,double yaw,double pitch){
+        return original(fallback,frame,influence,reloadProgress,yaw,pitch,influence);
+    }
+    public static Pose original(Pose fallback,P1MilitaryMotion.Frame frame,double influence,double reloadProgress,double yaw,double pitch,double legInfluence){
+        if(frame==null||influence<=0)return fallback;
+        boolean left=fallback.leftHanded;double weight=clamp(influence);
+        Matrix torso=sourceDelta(frame,"Spine_3",left);
+        Vec torsoPosition=WAIST.sub(torso.point(WAIST));
+        Matrix aim=rotation(vec(PROFILE.vector("weapon_mount_rotation"))).transpose();if(left)aim=aim.mirror();
+        Reference main=left?mirror(MAIN):MAIN,support=left?mirror(SUPPORT):SUPPORT;
+        Vec neutral=fitCarry(CARRY.add(new Vec(0,-3.25,0)),aim,main,support);
+        Vec anchor=neutral.add(aim.point(main.wrist.sub(CARRY)));
+        Vec target=anchor.add(sourceHandDelta(frame,"Wrist_R",left));
+        Matrix worldGun=sourceDelta(frame,"Wrist_R",left).mul(aim);
+        // Aim remains relative to the NPC, while source root travel stays server-owned.
+        Matrix look=rotation(new Vec(pitch,yaw,0));worldGun=look.mul(worldGun);target=look.point(target);
+        Matrix carry=torso.transpose().mul(worldGun);
+        Vec localTarget=torso.transpose().point(target.sub(torsoPosition));
+        Vec carryPosition=localTarget.sub(carry.point(main.wrist.sub(CARRY)));
+        carryPosition=fitCarry(carryPosition,carry,main,support);
+        Vec supportTarget=carryPosition.add(carry.point(support.wrist.sub(CARRY)));
+        double release=com.codex.blacklight.firearms.FirearmReloadMotion.sample(clamp(reloadProgress)).release();
+        if(release>0){
+            Vec supportAnchor=neutral.add(aim.point(support.wrist.sub(CARRY)));
+            Vec moving=look.point(supportAnchor.add(sourceHandDelta(frame,"Wrist_L",left)));
+            supportTarget=mix(supportTarget,torso.transpose().point(moving.sub(torsoPosition)),release);
+        }
+        Vec head=look.mul(sourceDelta(frame,"Head",left)).angles();
+        Vec torsoBlend=blendRotation(fallback.torsoRotation,torso.angles(),weight),positionBlend=mix(fallback.torsoPosition,torsoPosition,weight);
+        Vec carryBlend=blendRotation(fallback.carryRotation,carry.angles(),weight);Matrix blendedTorso=rotation(torsoBlend),blendedCarry=rotation(carryBlend);
+        Vec originBlend=fitCarry(mix(fallback.carryPosition,carryPosition,weight),blendedCarry,main,support);
+        Vec finalMain=originBlend.add(blendedCarry.point(main.wrist.sub(CARRY)));
+        Vec finalSupport=originBlend.add(blendedCarry.point(support.wrist.sub(CARRY)));
+        if(release>0){
+            var fallbackSupport=left?fallback.right:fallback.left;
+            Vec from=wrist(fallbackSupport),to=torsoPosition.add(torso.point(supportTarget));
+            finalSupport=blendedTorso.transpose().point(mix(from,to,weight).sub(positionBlend));
+        }
+        Reference mainPose=reach(main,finalMain),supportPose=reach(support,finalSupport);
+        Arm right=poseArm(left?supportPose:mainPose,blendedTorso,positionBlend,1),leftArm=poseArm(left?mainPose:supportPose,blendedTorso,positionBlend,1);
+        var upper=new Pose(right,leftArm,positionBlend,torsoBlend,originBlend,carryBlend,
+                mix(fallback.headPosition,torsoPosition,weight),blendRotation(fallback.headRotation,head,weight),
+                fallback.rightLegPosition,fallback.rightLegRotation,fallback.leftLegPosition,fallback.leftLegRotation,
+                fallback.rightKneeRotation,fallback.leftKneeRotation,fallback.rightFootRotation,fallback.leftFootRotation,left,1-release,fallback.weight);
+        return BlackwatchLegPose.original(upper,frame,legInfluence);
+    }
+    private static Vec sourceHandDelta(P1MilitaryMotion.Frame frame,String joint,boolean left){
+        var current=new org.joml.Vector3d(frame.joint(joint).position()).sub(frame.joint("Neck").position());
+        var reference=new org.joml.Vector3d(frame.rest(joint).position()).sub(frame.rest("Neck").position());current.sub(reference);
+        // The source has approximately 0.6 m arms; the native rig has two 6-pixel segments.
+        return new Vec(current.x*(left?-20:20),-current.y*20,current.z*20);
+    }
+    private static Matrix sourceDelta(P1MilitaryMotion.Frame frame,String joint,boolean left){
+        var q=new org.joml.Quaterniond(frame.joint(joint).rotation()).mul(new org.joml.Quaterniond(frame.rest(joint).rotation()).invert());
+        q.set(-q.x,q.y,-q.z,q.w);if(left)q.set(q.x,-q.y,-q.z,q.w);
+        var m=new org.joml.Matrix3d().set(q);return new Matrix(new double[]{m.m00(),m.m10(),m.m20(),m.m01(),m.m11(),m.m21(),m.m02(),m.m12(),m.m22()});
+    }
+    private static Vec wrist(Arm arm){var upper=rotation(arm.upper);return arm.shoulder.add(upper.point(new Vec(0,6,0))).add(upper.mul(rotation(arm.forearm)).point(new Vec(0,6,0)));}
+    private static Vec blendRotation(Vec a,Vec b,double t){
+        var q=new org.joml.Quaterniond().rotationZYX(a.z,a.y,a.x).slerp(new org.joml.Quaterniond().rotationZYX(b.z,b.y,b.x),t);
+        var m=new org.joml.Matrix3d().set(q);return new Matrix(new double[]{m.m00(),m.m10(),m.m20(),m.m01(),m.m11(),m.m21(),m.m02(),m.m12(),m.m22()}).angles();
+    }
+    private static double smooth(double x){double t=clamp(x);return t*t*(3-2*t);}
 }
