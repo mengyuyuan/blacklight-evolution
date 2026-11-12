@@ -510,7 +510,10 @@ public final class ConsumeSystem {
             com.codex.blacklight.registry.ModInfectedSounds.play(session.victim,hammer?
                     com.codex.blacklight.infection.InfectedSoundCue.CRUSH:animationForm==PowerForm.NONE?
                     com.codex.blacklight.infection.InfectedSoundCue.PIERCE:com.codex.blacklight.infection.InfectedSoundCue.TEAR,point);
-            player.serverLevel().sendParticles(new net.minecraft.core.particles.DustParticleOptions(new org.joml.Vector3f(.28F,.018F,.025F),.75F),point.x,point.y,point.z,9,.14,.12,.14,.08);
+            // Small receivers have client-side posed/physical bodies. Their blood follows
+            // that wound from the synchronized phase, not this upright server AABB.
+            if(ConsumeSequence.mountedStage(session.stage))
+                player.serverLevel().sendParticles(new net.minecraft.core.particles.DustParticleOptions(new org.joml.Vector3f(.28F,.018F,.025F),.75F),point.x,point.y,point.z,9,.14,.12,.14,.08);
             session.victim.hurtTime=8;session.victim.hurtDuration=8;
             player.serverLevel().broadcastEntityEvent(session.victim,(byte)2);
             if(hammer){
@@ -519,7 +522,7 @@ public final class ConsumeSystem {
                         session.victim.getX(),session.victim.getY()+.1,session.victim.getZ(),24,.5,.1,.5,.1);
             }
         }
-        if((receiverScene!=null?elapsed>=receiverScene.effectSeconds()*20:
+        if(ConsumeSequence.mountedStage(session.stage)&&(receiverScene!=null?elapsed>=receiverScene.effectSeconds()*20:
                 session.stage==ConsumeVisual.HUNTER_CONSUME?elapsed>=HunterConsume.EFFECT_REVERSE_SECONDS*20:t>.55F)&&elapsed%3==0) {
             Vec3 toward=player.position().add(0,1.1,0).subtract(point);
             for(int i=0;i<4;i++) {
@@ -654,7 +657,7 @@ public final class ConsumeSystem {
                 if(physical||!struck.isAlive())RagdollImpact.send(struck,ImpactProfile.FALL,45,false,HitStop.launchVelocity(struck));
                 if(!RagdollImpact.supportedBody(struck)&&(full||shot.damage()>=struck.getMaxHealth()*1.5F))HeavyBlow.shatter(struck,shot.velocity());
             }
-            if(mechanical!=null)com.codex.blacklight.military.vehicle.VehicleDamageBridge.hurtPhysical(shot.owner(),mechanical.vehicle(),shot.damage(),mob);
+            if(mechanical!=null)com.codex.blacklight.military.vehicle.VehicleDamageBridge.hurtPhysical(shot.owner(),mechanical.vehicle(),shot.damage(),mob,mechanical.point());
             // The thrown body takes the same hit; a charged throw that kills it bursts it against the wall.
             // A full wind-up is always lethal for the (already grabbable) body.
             // Charged throws are executions: the one-time last-chance save must not keep the body intact.

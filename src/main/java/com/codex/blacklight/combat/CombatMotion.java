@@ -82,15 +82,17 @@ public final class CombatMotion {
     }
     public static double tossGravity(){return value(fields(WeaponMove.HAMMER_RAM,"jump"),"Gravity",45)*.87/400;}
     public static boolean directionalDive(WeaponMove move){return move==WeaponMove.BLADE_DIVE||move==WeaponMove.HAMMER_DROP;}
-    public static double bladeRushSpeed(float charge,int tick){
+    public static double bladeRushStep(float charge,double fromRelease,double toRelease){
         var f=fields(WeaponMove.BLADE_RUSH,"displacement");
-        // This callback replaces (never adds to) the clip's root displacement.
+        // Callback times belong to the release, while the installed pose includes
+        // its anticipation and transition. Integrate partial boundary ticks so a
+        // fractional release seek cannot add or lose a full rush step.
         double begin=value(f,"TimeBegin",1.0/15),end=value(f,"TimeEnd",17.0/30);
-        double time=tick/20.0;
-        if(time<begin||time>=end)return 0;
+        double overlap=Math.max(0,Math.min(toRelease,end)-Math.max(fromRelease,begin));
+        if(overlap==0||end<=begin)return 0;
         double min=f.has("DistanceMin")?Math.abs(f.getAsJsonArray("DistanceMin").get(2).getAsDouble()):7;
         double max=f.has("DistanceMax")?Math.abs(f.getAsJsonArray("DistanceMax").get(2).getAsDouble()):10;
-        return (min+(max-min)*charge)*.87/(20*(end-begin));
+        return (min+(max-min)*Math.clamp(charge,0,1))*.87*overlap/(end-begin);
     }
     public static float travelPose(WeaponMove move){
         if(move==WeaponMove.CLAW_POUNCE)return .4F;

@@ -112,10 +112,7 @@ public final class ConsumeVictimPose {
     }
     public static void vanilla(EntityModel<?> model,LivingEntity entity,float partial) {
         restore(model);
-        if(ImpactRagdoll.active(entity)){
-            var physical=new IdentityHashMap<ModelPart,PartPose>();
-            if(ImpactRagdoll.pose(model,entity,partial,physical)){SAVED.put(model,physical);return;}
-        }
+        try {
         if (!entity.getData(ModAttachments.CONSUME_VISUAL).active()) { hit(model,entity,partial); return; }
         var p=reaction(entity,partial);
         var saved=new IdentityHashMap<ModelPart,PartPose>();SAVED.put(model,saved);
@@ -149,6 +146,10 @@ public final class ConsumeVictimPose {
                 }
                 index++;
             }
+        }
+        } finally {
+            var physical=SAVED.computeIfAbsent(model,ignored->new IdentityHashMap<>());
+            ImpactRagdoll.pose(model,entity,partial,physical);
         }
     }
     private static boolean applyNative(EntityModel<?> model,Map<ModelPart,PartPose> saved,LivingEntity entity,float partial) {
@@ -310,6 +311,9 @@ public final class ConsumeVictimPose {
         }
     }
     private static void hit(EntityModel<?> model,LivingEntity entity,float partial) {
+        // A full physical receiver captures its own current species pose. Adding a scripted
+        // flinch first changes the skin under the authoritative blade path before handoff.
+        if(com.codex.blacklight.client.renderer.AdaptiveRagdoll.active(entity))return;
         var hit=entity.getData(ModAttachments.HIT_REACTION);float w=hit.weight(entity.level().getGameTime(),partial);
         if(w<=0)return;
         float bend=(hit.kind()==com.codex.blacklight.combat.HitReaction.SLAM?.60F:-.24F)*w;

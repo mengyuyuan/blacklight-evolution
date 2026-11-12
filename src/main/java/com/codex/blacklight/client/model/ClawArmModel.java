@@ -199,7 +199,8 @@ public final class ClawArmModel extends Model {
         }
         var growthPoint=new org.joml.Vector3f();var growthNormal=new org.joml.Vector3f();
         PoseStack.Pose pose=stack.last();
-        for (Triangle face : faces) {
+        for (int faceIndex=0;faceIndex<faces.length;faceIndex++) {
+            Triangle face=faces[faceIndex];
             if (face.emissive != emissivePass) continue;
             if(forearm&&Math.max(face.points[0][1],Math.max(face.points[1][1],face.points[2][1]))>distalLimit)continue;
             // QUADS require a repeated final vertex for triangular authored surfaces.
@@ -244,6 +245,10 @@ public final class ClawArmModel extends Model {
                 boolean useAtlas = textured && (emissivePass || !liquid.liquid());
                 if (useAtlas) color = 0xFFFFFFFF;
                 color=(Math.round(surface.opacity[index]*255)<<24)|(color&0xFFFFFF);
+                if(!emissivePass&&v<3&&face.color==0xff9ca69d&&surface.opacity[index]>.95F
+                        &&com.codex.blacklight.client.renderer.ConsumeBladeContact.accepts(faceIndex))
+                    com.codex.blacklight.client.renderer.ConsumeBladeContact.vertex(faceIndex,v,
+                            new net.minecraft.world.phys.Vec3(p[0],p[1],p[2]),new net.minecraft.world.phys.Vec3(x,y,z));
                 consumer.addVertex(pose,x,y,z).setColor(color)
                         .setUv(useAtlas?face.uv[corner][0]:liquid.liquid()?wet:.5F,useAtlas?face.uv[corner][1]:.5F)
                         .setOverlay(overlay).setLight(emissivePass?0xF000F0:light)

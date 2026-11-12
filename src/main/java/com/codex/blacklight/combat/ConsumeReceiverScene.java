@@ -45,6 +45,21 @@ public final class ConsumeReceiverScene {
     }
 
     public static float clipSeconds(PowerForm form){return clipSeconds(form,ConsumeVariant.DEFAULT);}
+    /** P1 ConsumeByParent times matched by receiver animation hash, in seconds on the
+     * receiver's clock. Split variants start their gib's own consume track at spawn.
+     * These event times are source observations; MC finish times and solver gains are adaptations. */
+    public static float absorptionSeconds(PowerForm form,int variant) {
+        return switch(ConsumeSequence.key(form,variant)) {
+            case "normal" -> 1.833333F; // chest punch, FIG 96484
+            case "claws_head" -> 2.5F; // head crush, FIG 7224
+            case "hammer" -> 1.933333F; // head drop, FIG 19280
+            case "whip_lash" -> 1.4F; // lash, FIG 37456
+            default -> {
+                var scene=profile(form,false,variant);
+                yield scene==null?ConsumeSequence.splitSeconds(form,false,variant):scene.deformSeconds();
+            }
+        };
+    }
     public static float clipSeconds(PowerForm form,int variant) {
         return LocalVisualMotion.find("consume_"+ConsumeSequence.key(form,variant)+"_actor")
                 .map(clip -> {

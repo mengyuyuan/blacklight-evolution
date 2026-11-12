@@ -20,7 +20,7 @@ public final class ModNetwork {
 
     public static void register(RegisterPayloadHandlersEvent event) {
         // Configurable ecology, consume variants and military payloads share one negotiated layout.
-        event.registrar("standalone-51-contact-wound-blood")
+        event.registrar("standalone-57-contact-hitstop-clock")
                 .playToClient(RagdollImpactPayload.TYPE,RagdollImpactPayload.CODEC,(payload,context)->context.enqueueWork(()->com.codex.blacklight.client.animation.ImpactRagdoll.accept(payload)))
                 .playToServer(FirearmReloadPayload.TYPE,FirearmReloadPayload.STREAM_CODEC,(payload,context)->context.enqueueWork(()->{if(context.player() instanceof ServerPlayer player)payload.handle(player);}))
                 .playToClient(GunplayFeedbackPayload.TYPE,GunplayFeedbackPayload.STREAM_CODEC,(payload,context)->context.enqueueWork(()->com.codex.blacklight.client.renderer.GunplayVisuals.accept(payload)))

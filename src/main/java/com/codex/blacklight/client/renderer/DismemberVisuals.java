@@ -47,12 +47,16 @@ public final class DismemberVisuals {
         var scope=SCOPE.get();if(scope==null)return;
         scope.saved.putIfAbsent(part,part.visible);part.visible=false;
     }
-    private static int mask(LivingEntity e){return e.getData(ModAttachments.DISMEMBER)&WeaponDismemberment.ALL;}
+    private static int mask(LivingEntity e){
+        int state=e.getData(ModAttachments.DISMEMBER);
+        return (state&WeaponDismemberment.MESH_CUT)!=0?0:state&WeaponDismemberment.ALL;
+    }
     public static boolean missingArm(LivingEntity e,HumanoidArm arm){return (mask(e)&(arm==HumanoidArm.LEFT?WeaponDismemberment.LEFT_ARM:WeaponDismemberment.RIGHT_ARM))!=0;}
     public static boolean missingHead(LivingEntity e){return (mask(e)&WeaponDismemberment.HEAD)!=0;}
     private static ModelPart part(HumanoidModel<?> m,int bit){return switch(bit){
         case 1->m.head;case 2->m.rightArm;case 4->m.leftArm;case 8->m.rightLeg;case 16->m.leftLeg;default->m.body;};}
     public static void hideParts(HumanoidModel<?> model,LivingEntity entity){
+        if(AdaptiveRagdoll.supports(entity))return;
         int bits=mask(entity);
         for(int bit=1;bit<=32;bit<<=1)if((bits&bit)!=0)hide(part(model,bit));
         if((bits&1)!=0)hide(model.hat);
@@ -64,6 +68,7 @@ public final class DismemberVisuals {
     @SuppressWarnings({"rawtypes","unchecked"})
     public static void pose(EntityModel<?> model,LivingEntity entity,float partial){
         WoundBlood.capturePose(model,entity,partial);
+        if(AdaptiveRagdoll.supports(entity))return;
         if(PigRagdoll.pose(model,entity,partial))return;
         if(!(model instanceof HumanoidModel<?> humanoid)||mask(entity)==0||entity.isInvisible())return;
         var mc=Minecraft.getInstance();if(mc.level==null)return;

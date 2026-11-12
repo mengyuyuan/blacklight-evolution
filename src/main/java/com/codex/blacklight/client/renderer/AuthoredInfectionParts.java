@@ -128,7 +128,7 @@ public final class AuthoredInfectionParts {
         public void flush(MultiBufferSource buffers,boolean omitBody,boolean onlyBody){
             if(pending.isEmpty())return;
             var out=buffers.getBuffer(RenderType.entityCutoutNoCull(ConsumedMobVisuals.WHITE));
-            for(var e:pending.entrySet())for(var p:pieces.get(e.getKey())) {
+            for(var e:pending.entrySet())try(var owner=AdaptiveRagdoll.attachment(e.getKey())){for(var p:pieces.get(e.getKey())) {
                 if(omitBody&&p.anatomy==ConsumeAnatomy.BODY||onlyBody&&p.anatomy!=ConsumeAnatomy.BODY)continue;
                 if(out instanceof ConsumeAnatomy.Consumer consumer)consumer.anatomy(e.getKey());
                 EvolvedDonorCapture.mesh(e.getKey(),"authored_growth");
@@ -143,11 +143,12 @@ public final class AuthoredInfectionParts {
                 float late=TissueLateBody.progress(age);
                 if(late>0)for(var triangle:p.late)emit(remodel(develop(grow(triangle,p.cube,late),frames.get(e.getKey()),evolution),frames.get(e.getKey())),q.pose,out,q.light,q.overlay,q.color,false);
             }
+            }
             // Use the exact same developed vertices for the tissue cover. A
             // thin normal offset avoids z-fighting without adding body volume.
             if(!LEGACY_COVER){pending.clear();return;}
             var tissue=buffers.getBuffer(RenderType.entityCutoutNoCull(TISSUE));
-            for(var entry:pending.entrySet())for(var piece:pieces.get(entry.getKey())) {
+            for(var entry:pending.entrySet())try(var owner=AdaptiveRagdoll.attachment(entry.getKey())){for(var piece:pieces.get(entry.getKey())) {
                 if(omitBody&&piece.anatomy==ConsumeAnatomy.BODY||onlyBody&&piece.anatomy!=ConsumeAnatomy.BODY)continue;
                 var posed=entry.getValue();var frame=frames.get(entry.getKey());
                 if(tissue instanceof ConsumeAnatomy.Consumer consumer)consumer.anatomy(entry.getKey());
@@ -155,6 +156,7 @@ public final class AuthoredInfectionParts {
                 for(var triangle:piece.skin) {
                     if(TissueEvolution.attachmentGrowth(age)>0)emitTissue(triangle,remodel(develop(triangle,frame,evolution),frame),frame,posed.pose,tissue,posed.light,posed.overlay,posed.color,growthSeed,age,piece.anatomy);
                 }
+            }
             }
             pending.clear();
         }

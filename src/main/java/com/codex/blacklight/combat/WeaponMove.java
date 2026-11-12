@@ -269,6 +269,15 @@ public enum WeaponMove {
             return localMotion.contactWindows().stream().anyMatch(window->window.contains(tick))?0:-1;
         return frenzy()?((tick-start)%10<3?(tick-start)/10:-1):0;
     }
+    /** Cutting arcs have independent geometry even when damage shares one ledger. */
+    public int cutIndex(int tick){
+        if(tick<start||tick>=end)return -1;
+        if(localMotion!=null&&!localMotion.contactWindows().isEmpty()){
+            for(int i=0;i<localMotion.contactWindows().size();i++)if(localMotion.contactWindows().get(i).contains(tick))return i;
+            return -1;
+        }
+        return contactIndex(tick);
+    }
     public double contactProgress(double tick){
         if(localMotion!=null&&!localMotion.contactWindows().isEmpty())
             return localMotion.contactWindows().stream().filter(window->window.contains(tick))

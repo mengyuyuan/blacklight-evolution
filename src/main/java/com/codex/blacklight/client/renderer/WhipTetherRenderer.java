@@ -78,6 +78,11 @@ public final class WhipTetherRenderer {
             Vec3 placement=com.codex.blacklight.client.ClientCarryPlacement.consumeOffset(mob,partial);
             double wrapRadius=mob.getBbWidth()*.58*(1-Math.clamp((t-.85)/.05,0,1));
             Vec3 body=mob.getPosition(partial).add(placement).add(ConsumeVictimPose.effectPoint(mob,new Vec3(wrapRadius,mob.getBbHeight()*.22,0),partial));
+            // Once the receiver is physical, the authored animated effect
+            // anchor can be outside its actual skin. Aim the visible hook at
+            // the physical torso; its emitted sharp profile still confirms contact.
+            var physical=AdaptiveRagdoll.contact(mob,32,partial);
+            if(physical!=null)body=physical;
             float reach=Math.clamp((t-.075F)/.11F,0,1);
             Vec3 end=WhipConsumeRetraction.end(hand,body,reach,returnFlow);
             if(hand.distanceToSqr(end)<.0036)continue;
@@ -88,8 +93,10 @@ public final class WhipTetherRenderer {
             int light=mc.getEntityRenderDispatcher().getPackedLightCoords(mob,partial);
             var points=new ArrayList<Vec3>();
             for(int i=0;i<=32;i++)points.add(bezier(hand,control,end,i/32.0).subtract(hand));
-            // The cutting tip stays outside the wrapped body, never a spear through its center.
-            WhipArmSurface.render(stack,out,light,points,.115*Math.sqrt(extension),false);
+            // The visible terminal supplies its own finite sharp contact. The
+            // cable itself never substitutes a hidden plane through the receiver.
+            WhipArmSurface.render(stack,out,light,points,.115*Math.sqrt(extension),true,
+                    owner instanceof AbstractClientPlayer player?player:null,partial);
             stack.popPose();
         }
         buffers.endBatch(type);

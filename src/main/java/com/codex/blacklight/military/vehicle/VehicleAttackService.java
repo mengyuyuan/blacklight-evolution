@@ -48,7 +48,7 @@ public final class VehicleAttackService {
         var living=net.minecraft.world.entity.projectile.ProjectileUtil.getEntityHitResult(level,actor,start,end,new AABB(start,end).inflate(.3),entity->entity!=actor
                 &&entity instanceof LivingEntity target&&target.isAlive()&&!(entity.getVehicle() instanceof MilitaryVehicle)&&entity.isPickable());
         if(mechanical!=null&&(living==null||mechanical.distance()<=start.distanceTo(living.getLocation()))){
-            end=mechanical.point();impact=3;VehicleDamageBridge.hurt(actor,mechanical.vehicle(),definition,definition.damage(),null);
+            end=mechanical.point();impact=VehicleDamageBridge.hurt(actor,mechanical.vehicle(),definition,definition.damage(),null,end,direction)?0:3;
         }else if(living!=null){
             end=living.getLocation();impact=2;var target=(LivingEntity)living.getEntity();
             if(!FirearmsCombat.protectedTarget(actor,target)&&(!(actor instanceof Player p)||!(target instanceof Player q)||p.canHarmPlayer(q)&&level.getServer().isPvpAllowed()))

@@ -177,7 +177,7 @@ public final class BlackwatchSquadGameTest {
     }
 
     @GameTest(template = "blackwatch_arena", timeoutTicks = 220)
-    public static void pairAlternatesActualAimAndBurstWhileReloading(GameTestHelper h) {
+    public static void pairAlternatesActualAimAndBurstWhileRecovering(GameTestHelper h) {
         arena(h);
         var a = soldier(h, 5, 3, false); var b = soldier(h, 8, 3, true);
         a.setAutomaticUnitJoin(false); b.setAutomaticUnitJoin(false);
@@ -206,7 +206,7 @@ public final class BlackwatchSquadGameTest {
             // Spawn the threat only after readiness: native target selection must not fire on it earlier.
             target[0] = infected(h, 6, 12); a.setTarget(target[0]); b.setTarget(target[0]);
         });
-        var fired = new HashSet<UUID>(); var reloaded = new HashSet<UUID>();
+        var fired = new HashSet<UUID>(); var recovered = new HashSet<UUID>();
         boolean[] finished = {false};
         h.onEachTick(() -> {
             if (finished[0] || target[0] == null) return;
@@ -232,7 +232,7 @@ public final class BlackwatchSquadGameTest {
             for (var member : List.of(a, b)) {
                 if (member.phase() == 1 || member.phase() == 2) shooters++;
                 if (member.phase() == 2) fired.add(member.getUUID());
-                if (member.phase() == 3) reloaded.add(member.getUUID());
+                if (member.phase() == com.codex.blacklight.military.MilitaryFireControl.RECOVER) recovered.add(member.getUUID());
             }
             String diagnostic="pair never simultaneously occupies both aim/burst slots";
             if(shooters>1){
@@ -249,7 +249,7 @@ public final class BlackwatchSquadGameTest {
         });
         h.runAtTickTime(180, () -> {
             h.assertTrue(target[0] != null, "same-squad readiness must activate the real firing scenario before tick180");
-            h.assertTrue(fired.size() == 2 && reloaded.size() == 2, "both members receive a turn and visibly reload");
+            h.assertTrue(fired.size() == 2 && recovered.size() == 2, "both members receive a turn and recover without pretending to reload");
             h.assertTrue(target[0].isAlive() && target[0].getHealth() < target[0].getMaxHealth(), "real burst raycasts damage the same persistent target");
             finished[0] = true;
             h.succeed();
@@ -303,7 +303,7 @@ public final class BlackwatchSquadGameTest {
     }
 
     @GameTest(template = "blackwatch_arena", timeoutTicks = 80)
-    public static void reloadingSoldierCanActuallyWalkToAnotherFiringPosition(GameTestHelper h) {
+    public static void recoveringSoldierCanActuallyWalkToAnotherFiringPosition(GameTestHelper h) {
         arena(h);
         var member = soldier(h, 6, 3, false);
         var target = infected(h, 6, 12); member.setTarget(target);

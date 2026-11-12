@@ -35,6 +35,8 @@ public final class WoundBlood {
     private static final List<Splat> SPLATS=new ArrayList<>();
     private static final Map<LivingEntity,Map<Integer,Frame>> FRAMES=new WeakHashMap<>();
     private static final Map<LivingEntity,Integer> SEVERED=new WeakHashMap<>();
+    private record ConsumeMark(long started,int tick) {}
+    private static final Map<LivingEntity,ConsumeMark> CONSUME_HITS=new WeakHashMap<>();
     private static ClientLevel scene;
     public record Anchor(Vec3 point,Vec3 direction,Vec3 velocity) {}
     private WoundBlood() {}
@@ -43,7 +45,7 @@ public final class WoundBlood {
     }
     private static void reset(){
         var level=Minecraft.getInstance().level;
-        if(scene!=level){scene=level;EMITTERS.clear();DROPS.clear();SPLATS.clear();FRAMES.clear();SEVERED.clear();}
+        if(scene!=level){scene=level;EMITTERS.clear();DROPS.clear();SPLATS.clear();FRAMES.clear();SEVERED.clear();CONSUME_HITS.clear();}
     }
     private static boolean available(LivingEntity entity){
         var consume=entity.getData(ModAttachments.CONSUME_VISUAL);
@@ -53,6 +55,9 @@ public final class WoundBlood {
         reset();if(scene==null||!available(entity))return;
         for(var wound:hit.wounds())add(entity,wound.region(),wound.point(),wound.direction(),wound.strength(),
                 (hit.severMask()&wound.region())!=0?20:hit.sharp()?10:6,false);
+        // Generic contact bits identify wounds, not proven amputation. The mesh solver
+        // emits stump blood only after its finite cutting surface actually separates skin.
+        if(AdaptiveRagdoll.supports(entity))return;
         int newSevers=hit.severMask()&~SEVERED.getOrDefault(entity,0);
         if(newSevers!=0){
             SEVERED.put(entity,hit.severMask());
@@ -64,6 +69,11 @@ public final class WoundBlood {
             }
             if((newSevers&32)!=0)for(var plane:hit.planes())add(entity,32,plane.point(),plane.normal(),.8F,22,true);
         }
+    }
+    static void meshCut(LivingEntity entity,int region,Vec3 point,Vec3 normal){
+        reset();if(scene==null||!available(entity))return;
+        add(entity,region,point.add(normal.scale(.015)),normal,.8F,22,true);
+        add(entity,region,point.add(normal.scale(-.015)),normal.scale(-1),.8F,22,true);
     }
     private static void add(LivingEntity e,int region,Vec3 point,Vec3 direction,float strength,int lifetime,boolean stump){
         if(EMITTERS.size()>=MAX_EMITTERS)EMITTERS.removeFirst();
@@ -96,14 +106,20 @@ public final class WoundBlood {
         }
     }
     private static void bind(Map<Integer,Frame> frames,LivingEntity e,int region,ModelPart part,float partial){
-        float angle=(float)Math.toRadians(180-net.minecraft.util.Mth.rotLerp(partial,e.yBodyRotO,e.yBodyRot));var initial=part.getInitialPose();
-        Vec3 pivot=new Vec3(-part.x/16,1.501-part.y/16,part.z/16).yRot(angle).add(e.getPosition(partial));
+        var initial=part.getInitialPose();
+        var frame=com.codex.blacklight.client.animation.RagdollDrive.frame(e,partial);
+        Vec3 pivot=com.codex.blacklight.client.animation.RagdollDrive.transform(frame,new Vec3(-part.x/16,1.501-part.y/16,part.z/16));
         frames.put(region,new Frame(pivot,new Vec3(initial.x/16,initial.y/16,initial.z/16),
-                new Quaternionf().rotationY(angle).rotateZ((float)Math.PI).rotateZYX(part.zRot,part.yRot,part.xRot),
+                frame.getUnnormalizedRotation(new Quaternionf()).normalize().rotateZ((float)Math.PI).rotateZYX(part.zRot,part.yRot,part.xRot),
                 new Quaternionf().rotationZYX(initial.zRot,initial.yRot,initial.xRot).conjugate(),e.level().getGameTime()));
     }
     private static List<Anchor> anchors(Emitter emitter){
         var e=emitter.entity;
+        if(emitter.consumeStarted!=Long.MIN_VALUE){
+            Vec3 point=com.codex.blacklight.client.animation.RagdollDrive.contact(e,emitter.region,1);
+            return List.of(new Anchor(point,emitter.direction,e.getDeltaMovement()));
+        }
+        var adaptive=AdaptiveRagdoll.woundAnchors(e,emitter.point,emitter.direction);if(!adaptive.isEmpty())return adaptive;
         var pig=PigRagdoll.woundAnchors(e,emitter.region,emitter.point,emitter.direction);if(!pig.isEmpty())return pig;
         var detached=DismemberVisuals.woundAnchor(e,emitter.region,emitter.point,emitter.direction);if(detached!=null)return List.of(detached);
         var frames=FRAMES.get(e);var frame=frames==null?null:frames.get(emitter.region);
@@ -114,7 +130,7 @@ public final class WoundBlood {
     }
     private static final class Emitter {
         final LivingEntity entity;final int region,lifetime;final Vec3 point,direction;final float strength;final boolean stump;final long started;
-        boolean emitted;
+        boolean emitted;long consumeStarted=Long.MIN_VALUE;
         Emitter(LivingEntity entity,int region,Vec3 point,Vec3 direction,float strength,int lifetime,boolean stump,long started){
             this.entity=entity;this.region=region;this.point=point;this.direction=direction;this.strength=strength;this.lifetime=lifetime;this.stump=stump;this.started=started;
         }
@@ -137,6 +153,39 @@ public final class WoundBlood {
             }
             emitted=true;
         }
+    }
+    /** The synchronized receiver phase authorizes the effect; the rendered body owns its position. */
+    private static void consumeHits(){
+        var active=Collections.newSetFromMap(new IdentityHashMap<LivingEntity,Boolean>());
+        var player=Minecraft.getInstance().player;if(player==null)return;
+        for(var entity:scene.entitiesForRendering()){
+            if(!(entity instanceof LivingEntity e)||e.isInvisible()||e.distanceToSqr(player)>64*64)continue;
+            var visual=e.getData(ModAttachments.CONSUME_VISUAL);
+            if(!visual.consuming()||com.codex.blacklight.combat.ConsumeSequence.mountedStage(visual.stage()))continue;
+            active.add(e);int elapsed=(int)(scene.getGameTime()-visual.started());
+            var old=CONSUME_HITS.put(e,new ConsumeMark(visual.started(),elapsed));
+            int previous=old!=null&&old.started==visual.started()?old.tick:elapsed-1;
+            var phase=ConsumeFracture.phase(e,1);
+            var profile=com.codex.blacklight.combat.ConsumeReceiverScene.profile(phase.form(),false,visual.variant());
+            int fallback=Math.round(visual.duration()*com.codex.blacklight.combat.ConsumeSequence.contact(phase.form(),false))-1;
+            boolean impact=false;
+            for(int t=Math.max(previous+1,elapsed-4);t<=elapsed;t++)if(profile!=null?profile.impactAt(t):t==fallback){impact=true;break;}
+            if(!impact)continue;
+            int region=switch(phase.style()){case HEAD_CRUSH,HEAD_IMPACT->1;case ARM_RIP,RIP->2;default->32;};
+            Vec3 point=com.codex.blacklight.client.animation.RagdollDrive.contact(e,region,1);
+            var owner=scene.getEntity(visual.consumerId());
+            Vec3 direction=owner==null?new Vec3(0,1,0):point.subtract(owner.position().add(0,owner.getBbHeight()*.6,0)).add(0,.2,0).normalize();
+            if(direction.lengthSqr()<.5)direction=new Vec3(0,1,0);
+            if(EMITTERS.size()>=MAX_EMITTERS)EMITTERS.removeFirst();
+            var emitter=new Emitter(e,region,Vec3.ZERO,direction,1.1F,12,true,scene.getGameTime());
+            emitter.consumeStarted=visual.started();EMITTERS.add(emitter);
+        }
+        CONSUME_HITS.keySet().removeIf(e->!active.contains(e));
+    }
+    private static boolean available(Emitter emitter){
+        if(emitter.consumeStarted==Long.MIN_VALUE)return available(emitter.entity);
+        var e=emitter.entity;var visual=e.getData(ModAttachments.CONSUME_VISUAL);
+        return e.level()==scene&&!e.isInvisible()&&!e.isRemoved()&&visual.consuming()&&visual.started()==emitter.consumeStarted;
     }
     private static final class Drop {
         Vec3 pos,old,velocity;final float radius;final int red;int age;
@@ -189,7 +238,8 @@ public final class WoundBlood {
     }
     @SubscribeEvent public static void tick(ClientTickEvent.Post event){
         reset();var mc=Minecraft.getInstance();if(scene==null||mc.isPaused())return;long now=scene.getGameTime();
-        EMITTERS.removeIf(e->!available(e.entity)||now-e.started>=e.lifetime||mc.player==null||mc.player.distanceToSqr(e.entity)>64*64);
+        consumeHits();
+        EMITTERS.removeIf(e->!available(e)||now-e.started>=e.lifetime||mc.player==null||mc.player.distanceToSqr(e.entity)>64*64);
         for(var e:EMITTERS)e.tick();
         DROPS.removeIf(d->!d.tick()||mc.player==null||mc.player.position().distanceToSqr(d.pos)>64*64);
         SPLATS.removeIf(s->now-s.started>160||scene.getBlockState(s.block).isAir()||mc.player==null||mc.player.position().distanceToSqr(s.center)>64*64);

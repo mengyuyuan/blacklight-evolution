@@ -23,9 +23,14 @@ import java.util.EnumSet;
 import com.codex.blacklight.firearms.*;
 import net.minecraft.world.item.*;
 
-/** A visible burst / reload cycle gives the player room to close, grab and consume. */
+/** Separate aiming, weapon-rate fire, recovery, finite reload and contact-timed melee. */
 public abstract class MilitarySoldier extends Monster {
+    @Override protected EntityDimensions getDefaultDimensions(Pose pose){
+        var standing=super.getDefaultDimensions(pose);
+        return pose==Pose.CROUCHING?standing.scale(1,.78F):standing;
+    }
     private static final EntityDataAccessor<Integer> PHASE=SynchedEntityData.defineId(MilitarySoldier.class,EntityDataSerializers.INT);
+    private static final EntityDataAccessor<Long> MELEE_STARTED=SynchedEntityData.defineId(MilitarySoldier.class,EntityDataSerializers.LONG);
     private static final EntityDataAccessor<Integer> RANK=SynchedEntityData.defineId(MilitarySoldier.class,EntityDataSerializers.INT);
     private static final EntityDataAccessor<Boolean> EQUIPPED=SynchedEntityData.defineId(MilitarySoldier.class,EntityDataSerializers.BOOLEAN);
     private static final EntityDataAccessor<Integer> COMMAND_ROLE=SynchedEntityData.defineId(MilitarySoldier.class,EntityDataSerializers.INT);
@@ -110,6 +115,11 @@ public abstract class MilitarySoldier extends Monster {
     /** Caller must debit precisely the returned amount from its matching finite supply inventory. */
     public int receiveAmmo(int offered){return receiveAmmo(requiredAmmoItem(),offered);}
     public int magazineAmmo(){return FirearmItem.state(ammunitionWeapon(),reserveAmmo()).magazine();}
+    public long meleeStarted(){return entityData.get(MELEE_STARTED);}
+    private boolean reloadingWeapon(){
+        var stack=getMainHandItem();var d=definition(stack);
+        return d!=null&&MilitaryFireControl.reloading(FirearmItem.state(stack,0),d,FirearmReloadSystem.started(stack),level().getGameTime());
+    }
     private boolean readyWeapon(){
         if(!equipped()||!(getMainHandItem().getItem() instanceof FirearmItem))return false;
         var d=weaponDefinition();long now=level().getGameTime();var state=FirearmItem.state(getMainHandItem(),reserveAmmo(d.ammoId()));
@@ -141,10 +151,9 @@ public abstract class MilitarySoldier extends Monster {
                 entity->entity!=this&&entity instanceof LivingEntity&&entity.isAlive()&&entity.isPickable());
         if(hit!=null)return false;
         if(com.codex.blacklight.military.vehicle.VehicleDamageBridge.nearest(server,this,null,start,wall.getLocation())!=null)return false;
-        long now=server.getGameTime();int age=(int)Math.floorMod(now,profile().cycleTicks());
-        if(age<profile().aimTicks()||age>=profile().burstTicks()){entityData.set(PHASE,age<profile().aimTicks()?1:3);return true;}
-        entityData.set(PHASE,2);
-        if((age-profile().aimTicks())%8!=0||!readyWeapon())return true;
+        long now=server.getGameTime();var plan=MilitaryFireControl.plan(d,profile());int age=(int)Math.floorMod(now,plan.cycleTicks());
+        boolean ready=readyWeapon();entityData.set(PHASE,reloadingWeapon()?MilitaryFireControl.RELOAD:plan.phase(age));
+        if(!ready||!plan.canShoot(age,FirearmItem.state(getMainHandItem(),0),now))return true;
         var state=FirearmItem.state(getMainHandItem(),reserveAmmo(d.ammoId()));
         FirearmItem.store(getMainHandItem(),state.fire(d,now));
         FirearmsCombat.fire(this,d,end.subtract(start).normalize(),profile().damage()/d.damage());return true;
@@ -195,7 +204,7 @@ public abstract class MilitarySoldier extends Monster {
     @Override protected net.minecraft.world.entity.ai.navigation.PathNavigation createNavigation(Level level){return new MilitaryGroundNavigation(this,level);}
     public boolean heavy(){return getType()==com.codex.blacklight.registry.ModEntities.BLACKWATCH_HEAVY.get()||getType()==com.codex.blacklight.registry.ModEntities.MILITARY_HEAVY.get();}
     public int phase(){return entityData.get(PHASE);}
-    @Override protected void defineSynchedData(SynchedEntityData.Builder builder){super.defineSynchedData(builder);builder.define(PHASE,0);builder.define(RANK,0);builder.define(EQUIPPED,true);builder.define(COMMAND_ROLE,0);}
+    @Override protected void defineSynchedData(SynchedEntityData.Builder builder){super.defineSynchedData(builder);builder.define(PHASE,0);builder.define(MELEE_STARTED,-1L);builder.define(RANK,0);builder.define(EQUIPPED,true);builder.define(COMMAND_ROLE,0);}
     public static AttributeSupplier.Builder attributes(boolean heavy){return attributes(MilitaryFaction.BLACKWATCH,heavy);}
     public static AttributeSupplier.Builder attributes(MilitaryFaction faction,boolean heavy){
         var p=MilitaryCombatProfile.of(faction,heavy);
@@ -325,23 +334,33 @@ public abstract class MilitarySoldier extends Monster {
         @Override public void stop() { getNavigation().stop(); }
     }
     private final class FireTeamGoal extends Goal {
-        private long burstAt = -1, readyAt;
+        private long burstAt=-1,readyAt,meleeReadyAt;
+        private MilitaryFireControl.Plan plan;
+        private String firingWeapon="";
+        private java.util.UUID meleeTarget;
+        private ItemStack meleeWeapon=ItemStack.EMPTY;
+        private Vec3 meleeDirection=Vec3.ZERO;
+        private long meleeMotionAge;
+        private Vec3 meleeWrist;
+        private boolean meleeHit,coverPose;
         FireTeamGoal(){setFlags(EnumSet.of(Flag.MOVE,Flag.LOOK));}
         @Override public boolean canUse(){return equipped() && tacticsAvailable() && validTarget(getTarget());}
         @Override public void stop(){interrupt();entityData.set(PHASE,0);getNavigation().stop();}
         @Override public boolean requiresUpdateEveryTick(){return true;}
         @Override public void tick(){
             var target=getTarget();if(target==null)return;
-            selectWeapon(target);
-            if(!readyWeapon()){entityData.set(PHASE,3);return;}
             if (!tacticsAvailable() || !validTarget(target) || !BlackwatchSquadSystem.withinTerritory(MilitarySoldier.this, position())) {
                 setTarget(null); stop(); return;
             }
             long now = level().getGameTime();
+            if(coverPose&&!reloadingWeapon())leaveCoverPose();
+            if(meleeStarted()>=0){tickMelee(target,now);return;}
+            selectWeapon(target);
+            if(burstAt>=0&&!weaponDefinition().id().equals(firingWeapon))interrupt();
             double distance=distanceToSqr(target);boolean sight=hasLineOfSight(target);
             var contact = BlackwatchSquadSystem.contact(MilitarySoldier.this);
             if (!sight || distance > 22 * 22) {
-                interrupt(); entityData.set(PHASE, now < readyAt ? 3 : 0);
+                interrupt(); entityData.set(PHASE,reloadingWeapon()?MilitaryFireControl.RELOAD:MilitaryFireControl.IDLE);
                 if (contact.isPresent()) {
                     var point = BlackwatchSquadSystem.vector(contact.get().position());
                     getLookControl().setLookAt(point.x, point.y + 1, point.z, 30, 30);
@@ -351,29 +370,51 @@ public abstract class MilitarySoldier extends Monster {
             }
             if (!BlackwatchSquadSystem.withinTerritory(MilitarySoldier.this, target.position())) { setTarget(null); stop(); return; }
             getLookControl().setLookAt(target,30,30);
+            if(now>=meleeReadyAt&&distance<=MilitaryFireControl.MELEE_RANGE*MilitaryFireControl.MELEE_RANGE
+                    &&getMainHandItem().getItem() instanceof FirearmItem&&weaponDefinition().kind()==WeaponDefinition.Kind.BULLET
+                    &&!reloadingWeapon()&&!FirearmsCombat.protectedTarget(MilitarySoldier.this,target)&&clearLine(target)){
+                interrupt();getNavigation().stop();meleeTarget=target.getUUID();meleeHit=false;meleeMotionAge=0;meleeWrist=null;
+                meleeWeapon=getMainHandItem();
+                meleeDirection=target.position().subtract(position()).multiply(1,0,1).normalize();
+                setYRot((float)Math.toDegrees(Math.atan2(-meleeDirection.x,meleeDirection.z)));setYBodyRot(getYRot());
+                entityData.set(MELEE_STARTED,now);entityData.set(PHASE,MilitaryFireControl.MELEE);
+                meleeReadyAt=now+MilitaryFireControl.MELEE_COOLDOWN;return;
+            }
+            readyWeapon(); // Only an empty magazine initiates reload; shot cooldown is not reload.
+            if(reloadingWeapon()){
+                interrupt(false);entityData.set(PHASE,MilitaryFireControl.RELOAD);
+                if(nearLowCover(target)){coverPose=true;setPose(Pose.CROUCHING);getNavigation().stop();}
+                else {leaveCoverPose();BlackwatchSquadSystem.reposition(MilitarySoldier.this,target);}return;
+            }
+            if(!hasBattleAmmunition()){
+                interrupt();entityData.set(PHASE,MilitaryFireControl.IDLE);
+                BlackwatchSquadSystem.reposition(MilitarySoldier.this,target);return;
+            }
             if (distance < 5 * 5) BlackwatchSquadSystem.reposition(MilitarySoldier.this, target);
             else if (distance > 14 * 14 && contact.isPresent())
                 BlackwatchSquadSystem.navigate(MilitarySoldier.this, BlackwatchSquadSystem.vector(contact.get().position()), .8);
-            else if (burstAt >= 0 && now - burstAt < profile().burstTicks()) getNavigation().stop();
+            else if (burstAt >= 0 && now - burstAt < plan.leaseTicks()) getNavigation().stop();
             var squad = BlackwatchSquadSystem.squad(MilitarySoldier.this);
             if (burstAt >= 0 && now >= readyAt) {
                 burstAt = -1; BlackwatchSquadSystem.release(MilitarySoldier.this);
             }
             if (burstAt >= 0) {
                 int age = (int) (now - burstAt);
-                if (age < profile().burstTicks() && (!squad.hasFirePermit(getUUID(), now) || !clearShot(target))) {
-                    interrupt(); entityData.set(PHASE, now < readyAt ? 3 : 0); return;
+                if (age < plan.leaseTicks() && (!squad.hasFirePermit(getUUID(), now) || !clearShot(target))) {
+                    interrupt(); entityData.set(PHASE,MilitaryFireControl.IDLE); return;
                 }
-                if (age >= profile().burstTicks()) { BlackwatchSquadSystem.release(MilitarySoldier.this); entityData.set(PHASE, 3); }
-                else if (age < profile().aimTicks()) entityData.set(PHASE, 1);
-                else { entityData.set(PHASE, 2); if (age == profile().aimTicks() || age == profile().aimTicks()+8 || age == profile().aimTicks()+16) fire(target); }
-                if (age >= profile().burstTicks()) BlackwatchSquadSystem.reposition(MilitarySoldier.this, target);
+                entityData.set(PHASE,plan.phase(age));
+                if(plan.canShoot(age,FirearmItem.state(getMainHandItem(),0),now))fire(target);
+                if(age>=plan.leaseTicks()){
+                    BlackwatchSquadSystem.release(MilitarySoldier.this);BlackwatchSquadSystem.reposition(MilitarySoldier.this,target);
+                }
                 return;
             }
-            if (now < readyAt) { entityData.set(PHASE, 3); return; }
+            if (now < readyAt) { entityData.set(PHASE,MilitaryFireControl.RECOVER); return; }
             if (!clearShot(target)) { BlackwatchSquadSystem.release(MilitarySoldier.this); entityData.set(PHASE, 0); return; }
-            if (squad.requestFire(getUUID(), now, profile().burstTicks())) {
-                burstAt = now; readyAt = now + profile().cycleTicks(); entityData.set(PHASE, 1);
+            plan=MilitaryFireControl.plan(weaponDefinition(),profile());
+            if (squad.requestFire(getUUID(), now, plan.leaseTicks())) {
+                firingWeapon=weaponDefinition().id();burstAt=now;readyAt=now+plan.cycleTicks();entityData.set(PHASE,MilitaryFireControl.AIM);
                 if (distance >= 5 * 5) getNavigation().stop();
             } else {
                 entityData.set(PHASE, 0);
@@ -381,9 +422,74 @@ public abstract class MilitarySoldier extends Monster {
             }
         }
         private void interrupt() {
+            interrupt(true);
+        }
+        private void interrupt(boolean releasePose) {
             long now = level().getGameTime();
             if (burstAt >= 0 && now - burstAt < profile().aimTicks()) readyAt = now;
             burstAt = -1; BlackwatchSquadSystem.release(MilitarySoldier.this);
+            entityData.set(MELEE_STARTED,-1L);meleeTarget=null;meleeWeapon=ItemStack.EMPTY;
+            meleeWrist=null;
+            if(releasePose)leaveCoverPose();
+        }
+        private void leaveCoverPose(){
+            if(!coverPose)return;
+            if(getPose()!=Pose.CROUCHING){coverPose=false;return;}
+            if(level().noCollision(MilitarySoldier.this,getDimensions(Pose.STANDING).makeBoundingBox(position()))){coverPose=false;setPose(Pose.STANDING);}
+        }
+        private boolean nearLowCover(LivingEntity target){
+            if(!onGround()||isInWaterOrBubble()||isPassenger()||distanceToSqr(target)<36||weaponDefinition().kind()!=WeaponDefinition.Kind.BULLET)return false;
+            Vec3 low=position().add(0,.55*getScale(),0),towards=target.getBoundingBox().getCenter();
+            if(!com.codex.blacklight.military.vehicle.VehicleDamageBridge.loaded((ServerLevel)level(),low,towards))return false;
+            var hit=level().clip(new ClipContext(low,towards,ClipContext.Block.COLLIDER,ClipContext.Fluid.NONE,MilitarySoldier.this));
+            if(hit.getType()!=HitResult.Type.BLOCK||low.distanceToSqr(hit.getLocation())>2.5*2.5)return false;
+            Vec3 high=position().add(0,getDimensions(Pose.STANDING).eyeHeight(),0);
+            return level().clip(new ClipContext(high,towards,ClipContext.Block.COLLIDER,ClipContext.Fluid.NONE,MilitarySoldier.this)).getType()==HitResult.Type.MISS;
+        }
+        private void tickMelee(LivingEntity target,long now){
+            long age=now-meleeStarted();getNavigation().stop();
+            if(getMainHandItem()!=meleeWeapon){interrupt();entityData.set(PHASE,MilitaryFireControl.IDLE);return;}
+            if(age<0||age>=MilitaryFireControl.MELEE_TICKS||!target.getUUID().equals(meleeTarget)){
+                interrupt();entityData.set(PHASE,MilitaryFireControl.RECOVER);return;
+            }
+            entityData.set(PHASE,MilitaryFireControl.MELEE);
+            var original=com.codex.blacklight.animation.P1MilitaryMotion.local();
+            Vec3 previousWrist=meleeWrist;
+            if(original!=null){
+                var pose=original.sample("melee",Math.min(44,age*2.25));
+                var before=original.sample("melee",Math.min(44,meleeMotionAge*2.25));
+                var step=new org.joml.Vector3d(pose.joint("Motion_Root").position()).sub(before.joint("Motion_Root").position());
+                Vec3 desired=originalWorldVector(step.x,0,step.z);
+                // Native collision clips the authored stride; never teleport through blocks or force-load terrain.
+                if(desired.lengthSqr()<=1&&BlackwatchSquadSystem.withinTerritory(MilitarySoldier.this,position().add(desired))
+                        &&com.codex.blacklight.military.vehicle.VehicleDamageBridge.loaded((ServerLevel)level(),position(),position().add(desired)))
+                    move(net.minecraft.world.entity.MoverType.SELF,desired);
+                meleeMotionAge=age;
+                var start=original.sample("melee",0).joint("Motion_Root").position();
+                var wrist=new org.joml.Vector3d(pose.joint("Wrist_R").position()).sub(pose.joint("Motion_Root").position()).add(start);
+                meleeWrist=position().add(originalWorldVector(wrist.x,wrist.y,wrist.z));
+                if(previousWrist==null)previousWrist=meleeWrist;
+            }
+            if(meleeHit||!MilitaryFireControl.meleeContact(age)||!clearLine(target)
+                    ||FirearmsCombat.protectedTarget(MilitarySoldier.this,target))return;
+            // P1 uses Wrist_R with radius 1. Without the user's local curves, keep the authored fallback.
+            Vec3 from=original!=null?previousWrist:getEyePosition().add(0,-.3,0),to=original!=null?meleeWrist:from.add(meleeDirection.scale(2.1));
+            double radius=original!=null?getScale():.25;
+            LivingEntity first=null;double nearest=Double.POSITIVE_INFINITY;
+            for(var other:level().getEntitiesOfClass(LivingEntity.class,new AABB(from,to).inflate(radius+.15),e->e!=MilitarySoldier.this&&e.isAlive())){
+                var box=other.getBoundingBox().inflate(radius);var contact=box.contains(from)?java.util.Optional.of(from):box.clip(from,to);
+                if(contact.isPresent()&&from.distanceToSqr(contact.get())<nearest){nearest=from.distanceToSqr(contact.get());first=other;}
+            }
+            if(first!=target)return;
+            meleeHit=true;
+            if(target.hurt(damageSources().mobAttack(MilitarySoldier.this),profile().damage()*2.5F)){
+                target.knockback(.35,-meleeDirection.x,-meleeDirection.z);
+                playSound(net.minecraft.sounds.SoundEvents.PLAYER_ATTACK_STRONG,.7F,1);
+            }
+        }
+        private Vec3 originalWorldVector(double x,double y,double z){
+            double side=getMainArm()==net.minecraft.world.entity.HumanoidArm.LEFT?1:-1;
+            return new Vec3(meleeDirection.z*side*x-meleeDirection.x*z,y,-meleeDirection.x*side*x-meleeDirection.z*z).scale(getScale());
         }
     }
     private boolean clearShot(LivingEntity target) {

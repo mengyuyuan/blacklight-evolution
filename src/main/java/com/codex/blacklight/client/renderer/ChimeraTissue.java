@@ -217,12 +217,14 @@ final class ChimeraTissue {
         }pose=null;
     }
     private void draw(TissueChimera.Piece piece,List<TissueMorphogenesis.V> vertices,VertexConsumer out,Matrix4f inverse,int override){
-        for(int f=0;f<piece.faces().size();f++){var face=piece.faces().get(f);var uv=piece.uv().get(f);
+        // The whole graft is rooted in this receiver joint, matching its animated pose.
+        try(var owner=AdaptiveRagdoll.attachment(nativeBody.anchor())){for(int f=0;f<piece.faces().size();f++){var face=piece.faces().get(f);var uv=piece.uv().get(f);
             var a=vertices.get(face[0]);var b=vertices.get(face[1]);var c=vertices.get(face[2]);var cross=b.sub(a).cross(c.sub(a));if(cross.length()<.000001F)continue;
             var normal=cross.unit();var n=inverse.transformDirection(new Vector3f(normal.x(),normal.y(),normal.z())).normalize();int color=AnatomicalTissue.DEBUG_TINT?0xff808080:override==0?piece.colors().get(f):override;
             for(int i=0;i<4;i++){var v=vertices.get(face[i]);var local=inverse.transformPosition(new Vector3f(v.x(),v.y(),v.z()));
                 out.addVertex(pose,local.x/16,local.y/16,local.z/16).setColor(color).setUv(uv[i*2],uv[i*2+1]).setOverlay(overlay).setLight(light).setNormal(pose,n.x,n.y,n.z);
             }
+        }
         }
     }
 }

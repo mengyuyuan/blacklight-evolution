@@ -16,6 +16,15 @@ public final class GunplayEffects {
         for(int i=0;i<VehicleWeaponDefinition.ALL.size();i++)if(VehicleWeaponDefinition.ALL.get(i).weapon().equals(d))return 8+i;return 0;}
     public static boolean bullet(int id){return id>=0&&id<3||id==12;}
     public static boolean cannon(int id){return id==8||id==10||id==11;}
+    public static void vehicleImpact(MilitaryVehicle vehicle,Vec3 at,Vec3 normal,float strength,boolean bullet){
+        if(!(vehicle.level() instanceof ServerLevel level))return;
+        var packet=new GunplayFeedbackPayload(vehicle.getId(),bullet?0:10,2,3,at.x,at.y,at.z,at.x,at.y,at.z,
+                (float)normal.x,(float)normal.y,(float)normal.z,.5F+strength*2,level.random.nextLong());
+        if(packet.valid())PacketDistributor.sendToPlayersNear(level,null,at.x,at.y,at.z,96,packet);
+        level.playSound(null,at.x,at.y,at.z,bullet?net.minecraft.sounds.SoundEvents.CHAIN_HIT:net.minecraft.sounds.SoundEvents.ANVIL_HIT,
+                net.minecraft.sounds.SoundSource.HOSTILE,bullet?.35F:.8F+strength*.5F,bullet?1.35F:.65F);
+        if(!bullet)GunplaySounds.impact(level,at,.5F+strength);
+    }
     public static void metalContact(LivingEntity actor,Vec3 at,Vec3 normal){
         if(!(actor.level() instanceof ServerLevel level))return;
         var packet=new GunplayFeedbackPayload(actor.getId(),0,2,3,at.x,at.y,at.z,at.x,at.y,at.z,(float)normal.x,(float)normal.y,(float)normal.z,1,level.random.nextLong());

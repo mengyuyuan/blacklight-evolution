@@ -1,0 +1,6 @@
+// Isolated real-server combat checks; never loaded or packaged by a normal build.
+allprojects { afterEvaluate {
+    sourceSets.main.java.srcDir('src/p1MilitaryTest/java')
+    sourceSets.main.resources.srcDir('src/blackwatchTest/resources')
+    tasks.withType(ProcessResources).configureEach { filteringCharset='UTF-8' }
+} }

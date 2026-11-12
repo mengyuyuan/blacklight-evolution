@@ -35,7 +35,7 @@ public final class InfectedZombieLayer extends RenderLayer<Zombie,ZombieModel<Zo
             var delta=new Matrix4f().translation(px,py,pz).rotateZ(-part.zRot).rotateY(-part.yRot).rotateX(-part.xRot).translate(-px,-py,-pz);
             var posed=new Matrix4f(delta).mul(poses[joint.getId()]);
             stack.pushPose();
-            try {
+            try (var owner=com.codex.blacklight.client.renderer.AdaptiveRagdoll.attachment(part)) {
                 BlacklightBoneRendering.skeletonFrame(stack);BlacklightBoneRendering.apply(stack,posed);
                 int overlay=OverlayTexture.pack(OverlayTexture.u(0),OverlayTexture.v(zombie.hurtTime>0||zombie.deathTime>0));
                 model.render(name,stack,buffer.getBuffer(RenderType.entityCutoutNoCull(WHITE)),light,overlay,InfectionTimeline.growth(name,t));

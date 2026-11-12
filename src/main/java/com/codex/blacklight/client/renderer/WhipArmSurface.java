@@ -12,6 +12,10 @@ public final class WhipArmSurface {
         render(stack,out,light,points,radius,true);
     }
     public static void render(PoseStack stack,VertexConsumer out,int light,List<Vec3> points,double radius,boolean drawTip){
+        render(stack,out,light,points,radius,drawTip,null,0);
+    }
+    public static void render(PoseStack stack,VertexConsumer out,int light,List<Vec3> points,double radius,boolean drawTip,
+                              net.minecraft.client.player.AbstractClientPlayer consumer,float partial){
         if(points.size()<2)return;
         for(int i=1;i<points.size();i++){
             double t=(i-1.)/(points.size()-1),r=Math.max(.033,radius*(1-.68*t));
@@ -31,7 +35,9 @@ public final class WhipArmSurface {
         if(terminal==null)terminal=new com.codex.blacklight.client.model.ClawArmModel("whip_tip");
         stack.pushPose();stack.translate(end.x,end.y,end.z);
         stack.mulPose(new org.joml.Quaternionf().rotationTo(new org.joml.Vector3f(0,1,0),new org.joml.Vector3f((float)axis.x,(float)axis.y,(float)axis.z)));
-        terminal.renderJoint("Hand_R",stack,out,light,net.minecraft.client.renderer.texture.OverlayTexture.NO_OVERLAY,1,1);
+        try(var cutting=consumer==null?null:ConsumeBladeContact.begin(consumer,com.codex.blacklight.power.PowerForm.WHIPFIST,terminal,"Hand_R",stack,partial)){
+            terminal.renderJoint("Hand_R",stack,out,light,net.minecraft.client.renderer.texture.OverlayTexture.NO_OVERLAY,1,1);
+        }
         stack.popPose();
     }
     private static void blade(PoseStack stack,VertexConsumer out,int light,Vec3 root,Vec3 tip,Vec3 shoulder,int color){

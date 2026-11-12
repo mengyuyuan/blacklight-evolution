@@ -28,8 +28,12 @@ public final class CombatImpactEffects {
         if(move==WeaponMove.BLADE_DIVE){BladeEffects.ground(p);return;}
         var level=p.serverLevel();var center=p.position().add(forward.scale(move.quake()?0:1.05));
         var hit=level.clip(new ClipContext(center.add(0,.9,0),center.add(0,-1.2,0),ClipContext.Block.COLLIDER,ClipContext.Fluid.NONE,p));
+        ground(p,move,hit);
+    }
+    /** The physical fist sweep supplies its actual block surface, including slabs and slopes. */
+    public static void ground(ServerPlayer p,WeaponMove move,BlockHitResult hit){
         if(hit.getType()!=HitResult.Type.BLOCK||hit.getDirection()!=net.minecraft.core.Direction.UP)return;
-        center=hit.getLocation();float radius=(float)(move.quake()?AttackReach.reach(p,move):(move==move.uncharged()?1.65:2.2)*AttackReach.scale(p));
+        var level=p.serverLevel();var center=hit.getLocation();float radius=(float)(move.quake()?AttackReach.reach(p,move):(move==move.uncharged()?1.65:2.2)*AttackReach.scale(p));
         PacketDistributor.sendToPlayersTrackingEntityAndSelf(p,new CombatImpactPayload(center.x,center.y,center.z,radius,true));
         // Each fragment uses the struck terrain and stays on a supported local surface.
         for(int ring=0;ring<3;ring++)for(int i=0;i<16;i++){

@@ -10,6 +10,7 @@ import com.mojang.math.Axis;
 public final class HitBodyPose {
     private HitBodyPose(){}
     public static void apply(LivingEntity e,PoseStack stack,float partial){
+        if(com.codex.blacklight.client.renderer.AdaptiveRagdoll.active(e))return;
         var hit=e.getData(ModAttachments.HIT_REACTION);float weight=hit.weight(e.level().getGameTime(),partial);if(weight<=0)return;
         float progress=hit.progress(e.level().getGameTime(),partial),prone;
         if(hit.kind()==HitReaction.DOWN)prone=1;

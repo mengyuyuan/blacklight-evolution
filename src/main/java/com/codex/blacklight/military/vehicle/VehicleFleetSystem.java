@@ -194,6 +194,8 @@ public final class VehicleFleetSystem {
             if(threat!=null&&!state.resupplying.containsKey(fleet.id())){
                 park(vehicles);if(!blocked)status(state,fleet,VehicleFleet.Status.ACTIVE);
                 for(var vehicle:vehicles)VehicleThreatBridge.engage(vehicle,threat);
+                boolean regrouping=false;for(var vehicle:vehicles)regrouping|=VehicleCombatSpacing.tick(vehicle,threat);
+                if(regrouping)continue;
                 if(combatDeployment(fleet)&&!state.recalling.contains(fleet.id())){
                     if(fleet.vehicles().size()==1){deployPassengers(level,state,fleet,vehicles,threat);continue;}
                     if(blocked){status(state,fleet,VehicleFleet.Status.BLOCKED);continue;}

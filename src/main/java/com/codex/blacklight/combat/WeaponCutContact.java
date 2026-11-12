@@ -3,6 +3,7 @@ package com.codex.blacklight.combat;
 import com.codex.blacklight.animation.*;
 import com.codex.blacklight.power.PowerForm;
 import com.codex.blacklight.registry.ModAttachments;
+import com.codex.blacklight.network.RagdollImpactPayload.BladeSpan;
 import com.google.gson.*;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.LivingEntity;
@@ -15,10 +16,14 @@ import java.util.*;
 import java.lang.Math;
 
 /** Sharp faces from the shipped visible mesh, sampled on the authoritative attack clock.
- * Broad combat bounds collect candidates; sharp contact authorizes damage and cuts. */
+ * Authored combat contact authorizes damage; sharp contact separately authorizes cuts. */
 public final class WeaponCutContact {
     public enum Kind { NONE, SLICE, PUNCTURE }
-    public record Contact(int region,String edge,Vec3 point,Vec3 travel,Vec3 normal) {}
+    public record Contact(int region,String edge,Vec3 point,Vec3 travel,Vec3 normal,long stroke,List<BladeSpan> path) {
+        public Contact {path=List.copyOf(path);}
+        public Contact(int region,String edge,Vec3 point,Vec3 travel,Vec3 normal){this(region,edge,point,travel,normal,0,List.of());}
+        public Contact path(long id,List<BladeSpan> spans){return new Contact(region,edge,point,travel,normal,id,spans);}
+    }
     public record Report(Kind kind,List<Contact> contacts){
         public static final Report NONE=new Report(Kind.NONE,List.of());
         public int severMask(){
@@ -27,14 +32,19 @@ public final class WeaponCutContact {
             return mask&63;
         }
         public Vec3 direction(){Vec3 v=Vec3.ZERO;for(var c:contacts)v=v.add(c.travel());return v.normalize();}
+        public Report stroke(long id){return new Report(kind,contacts.stream().map(c->c.path(id,c.path())).toList());}
     }
-    private record Face(String edge,String bone,Vec3 a,Vec3 b,Vec3 c) {}
-    private record Triangle(String edge,Vec3 a,Vec3 b,Vec3 c){
+    record Face(String edge,String bone,Vec3 a,Vec3 b,Vec3 c,Vec3 root,Vec3 tip,List<Vec3> profile,boolean sharp) {
+        Face(String edge,String bone,Vec3 a,Vec3 b,Vec3 c,Vec3 root,Vec3 tip,List<Vec3> profile){this(edge,bone,a,b,c,root,tip,profile,true);}
+        Face(String edge,String bone,Vec3 a,Vec3 b,Vec3 c,Vec3 root,Vec3 tip){this(edge,bone,a,b,c,root,tip,List.of(root,tip));}
+    }
+    private record Triangle(String edge,Vec3 a,Vec3 b,Vec3 c,Vec3 root,Vec3 tip,List<Vec3> profile,boolean sharp){
         Vec3 center(){return a.add(b).add(c).scale(1.0/3);}
     }
     private record Frame(double alpha,List<Triangle> faces) {}
     private record Zone(int bit,AABB box) {}
     private static final Map<PowerForm,List<Face>> GEOMETRY=new EnumMap<>(PowerForm.class);
+    private static final Map<PowerForm,List<Face>> BLUNT_GEOMETRY=new EnumMap<>(PowerForm.class);
     private static final List<Zone> ZONES=List.of(
             new Zone(1,new AABB(-.25,1.50,-.25,.25,2.02,.25)),
             new Zone(2,new AABB(.25,.72,-.15,.51,1.52,.15)),
@@ -51,13 +61,20 @@ public final class WeaponCutContact {
             new Zone(8,new AABB(.0625,.001,.3125,.3125,.376,.5625)),
             new Zone(16,new AABB(-.3125,.001,.3125,-.0625,.376,.5625)),
             new Zone(32,new AABB(-.3125,.376,-.5,.3125,.876,.5)));
-    private static List<Zone> zones(LivingEntity v){return v instanceof net.minecraft.world.entity.animal.Pig?PIG_ZONES:ZONES;}
-    private static double bodyScale(LivingEntity v){return v instanceof net.minecraft.world.entity.animal.Pig?1:v.getBbHeight()/1.95;}
+    private static List<Zone> zones(LivingEntity v){
+        if(!RagdollImpact.legacyBody(v)){
+            double r=v.getBbWidth()*.5;
+            return List.of(new Zone(32,new AABB(-r,0,-r,r,v.getBbHeight(),r)));
+        }
+        return v instanceof net.minecraft.world.entity.animal.Pig?PIG_ZONES:ZONES;
+    }
+    private static double bodyScale(LivingEntity v){return !RagdollImpact.legacyBody(v)||v instanceof net.minecraft.world.entity.animal.Pig?1:v.getBbHeight()/1.95;}
 
     /** Created once per strike tick, shared across its victims. Nothing here trusts client hit reports. */
     public static Sweep sweep(ServerPlayer player,WeaponMove move,double from,double to,Vec3 oldFeet,float oldYaw,float yaw,WhipCurve whip){
         if(move.quake()||move.groundSpike()||!(move.form==PowerForm.CLAWS||move.form==PowerForm.BLADE||move.form==PowerForm.WHIPFIST))return Sweep.EMPTY;
-        var geometry=geometry(move.form);if(geometry.isEmpty()||MotionLibrary.find(move.id).isEmpty())return Sweep.EMPTY;
+        var geometry=new ArrayList<>(geometry(move.form));if(geometry.isEmpty()||MotionLibrary.find(move.id).isEmpty())return Sweep.EMPTY;
+        if(move.form==PowerForm.CLAWS||move.form==PowerForm.BLADE)geometry.addAll(bluntGeometry(move.form));
         Kind kind=move.uncharged()==WeaponMove.WHIP_LONGSHOT||move.uncharged()==WeaponMove.WHIP_LUNGE?Kind.PUNCTURE:Kind.SLICE;
         // Eight intervals per tick plus authored whip reversals. No future/recovery frames.
         var alphas=new TreeSet<Double>();for(int i=0;i<=8;i++)alphas.add(i/8.0);
@@ -87,21 +104,47 @@ public final class WeaponCutContact {
                 Map<String,Matrix4f> transforms=new HashMap<>();
                 for(var face:geometry){
                     var transform=transforms.computeIfAbsent(face.bone(),bone->new Matrix4f(world).mul(matrices[skeleton.searchJointByName(bone).getId()]));
-                    var triangle=offset(transform(face,transform),feet);
-                    // Match the shared combat reach progression rather than client-only appearance tuning.
-                    triangles.add(new Triangle(triangle.edge(),reach(player,feet,triangle.a()),reach(player,feet,triangle.b()),reach(player,feet,triangle.c())));
+                    var shape=WeaponAttackScales.sample(move.id,(float)time,face.bone().endsWith("_L"));
+                    var actual=new Face(face.edge(),face.bone(),surface(face.a(),move.form,face.bone(),shape),
+                            surface(face.b(),move.form,face.bone(),shape),surface(face.c(),move.form,face.bone(),shape),
+                            surface(face.root(),move.form,face.bone(),shape),surface(face.tip(),move.form,face.bone(),shape),
+                            face.profile().stream().map(v->surface(v,move.form,face.bone(),shape)).toList(),face.sharp());
+                    // Damage reach may grow, but an invisible enlargement must never authorize a cut.
+                    triangles.add(offset(transform(actual,transform),feet));
                 }
             }
             frames.add(new Frame(alpha,List.copyOf(triangles)));
         }
-        return new Sweep(kind,List.copyOf(frames));
+        // The receiver orders blade samples by absolute tick. A brand-new world reports
+        // game time 0, so "one tick ago" must never mint a negative sample time: a span at
+        // -1 reads as untimed while its neighbour at -0.5..0 reads as timed, and the
+        // payload's own consistency check then rejects the whole cut plane.
+        return new Sweep(kind,List.copyOf(frames),Math.max(0L,player.level().getGameTime()-1));
     }
     public static final class Sweep {
-        private static final Sweep EMPTY=new Sweep(Kind.NONE,List.of());
-        private final Kind kind;private final List<Frame> frames;
-        private Sweep(Kind kind,List<Frame> frames){this.kind=kind;this.frames=frames;}
+        private static final Sweep EMPTY=new Sweep(Kind.NONE,List.of(),0);
+        private final Kind kind;private final List<Frame> frames;private final long fromTick;
+        private Sweep(Kind kind,List<Frame> frames,long fromTick){this.kind=kind;this.frames=frames;this.fromTick=fromTick;}
         public boolean sharp(){return kind!=Kind.NONE;}
+        public Kind kind(){return kind;}
+        /** Receiver-local ribbon samples, including the exit after the last triangle contact. */
+        public List<BladeSpan> path(String edge,LivingEntity victim,Vec3 previousPosition){
+            var spans=new ArrayList<BladeSpan>();
+            for(var frame:frames)for(var face:frame.faces())if(face.sharp()&&face.edge().equals(edge)){
+                Vec3 origin=previousPosition.lerp(victim.position(),frame.alpha());
+                float yaw=net.minecraft.util.Mth.rotLerp((float)frame.alpha(),victim.yBodyRotO,victim.yBodyRot);
+                spans.add(new BladeSpan(face.profile().stream().map(p->local(p,origin,yaw,1)).toList(),fromTick+frame.alpha(),origin,yaw));break;
+            }
+            return List.copyOf(spans);
+        }
         public Report trace(ServerPlayer attacker,LivingEntity victim,Vec3 previousPosition){
+            return trace(attacker,victim,previousPosition,true);
+        }
+        /** The visible blade's back/flat can hit, but never supplies cutting planes. */
+        public Report bluntContact(ServerPlayer attacker,LivingEntity victim,Vec3 previousPosition){
+            return trace(attacker,victim,previousPosition,false);
+        }
+        private Report trace(ServerPlayer attacker,LivingEntity victim,Vec3 previousPosition,boolean sharp){
             if(kind==Kind.NONE||!RagdollImpact.supportedBody(victim))return Report.NONE;
             Map<String,Contact> found=new LinkedHashMap<>();
             double scale=bodyScale(victim);
@@ -110,6 +153,7 @@ public final class WeaponCutContact {
                 if(a.faces().size()!=b.faces().size())continue;
                 for(int j=0;j<b.faces().size();j++){
                     Triangle first=a.faces().get(j),last=b.faces().get(j);
+                    if(last.sharp()!=sharp)continue;
                     Vec3 travel=last.center().subtract(first.center()).scale(1/Math.max(.001,b.alpha()-a.alpha()));
                     if(travel.lengthSqr()<.0009)continue;
                     // Subdivide fast tip travel; sample the moving sharp triangles, not a swept AABB.
@@ -125,9 +169,9 @@ public final class WeaponCutContact {
                             Vec3 localPoint=intersectionCenter(la,lb,lc,zone.box().inflate(.025));
                             Vec3 point=localPoint.scale(scale).yRot((float)Math.toRadians(180-facing)).add(origin);
                             if(!CombatTargeting.clearRay(attacker,attacker.getEyePosition(),point))continue;
-                            Vec3 edge=wb.subtract(wa);
-                            if(wc.distanceToSqr(wa)>edge.lengthSqr())edge=wc.subtract(wa);
-                            if(wc.distanceToSqr(wb)>edge.lengthSqr())edge=wc.subtract(wb);
+                            // A tessellation diagonal is not the long axis of a blade. Use the
+                            // full exported sharp part so adjacent faces cannot invent crossing cuts.
+                            Vec3 edge=first.tip().lerp(last.tip(),t).subtract(first.root().lerp(last.root(),t));
                             Vec3 normal=edge.cross(travel).normalize();
                             if(normal.lengthSqr()<.5)normal=wb.subtract(wa).cross(wc.subtract(wa)).normalize();
                             found.put(key,new Contact(zone.bit(),last.edge(),point,travel,normal));
@@ -135,7 +179,7 @@ public final class WeaponCutContact {
                     }
                 }
             }
-            return found.isEmpty()?Report.NONE:new Report(kind,List.copyOf(found.values()));
+            return found.isEmpty()?Report.NONE:new Report(sharp?kind:Kind.NONE,found.values().stream().map(c->c.path(0,sharp?path(c.edge(),victim,previousPosition):List.of())).toList());
         }
     }
     /** Ordinary items have no shared animated mesh: use the actual aimed contact, never a fixed limb. */
@@ -172,13 +216,32 @@ public final class WeaponCutContact {
         }
         return p.scale(scale);
     }
-    private static synchronized List<Face> geometry(PowerForm form){return GEOMETRY.computeIfAbsent(form,WeaponCutContact::load);}
+    static synchronized List<Face> geometry(PowerForm form){return GEOMETRY.computeIfAbsent(form,WeaponCutContact::load);}
+    /** Local profiles of independent sharpened patches, shared with rendered consume contact. */
+    public static Map<String,List<Vec3>> sharpProfiles(PowerForm form,String joint){
+        if(form!=PowerForm.CLAWS&&form!=PowerForm.BLADE&&form!=PowerForm.WHIPFIST)return Map.of();
+        var profiles=new LinkedHashMap<String,List<Vec3>>();
+        for(var face:geometry(form))if(face.bone().equals(joint))profiles.putIfAbsent(face.edge(),face.profile());
+        return Collections.unmodifiableMap(profiles);
+    }
+    static synchronized List<Face> bluntGeometry(PowerForm form){return form==PowerForm.CLAWS||form==PowerForm.BLADE?BLUNT_GEOMETRY.computeIfAbsent(form,f->load(f,false)):List.of();}
     private static List<Face> load(PowerForm form){
+        return load(form,true);
+    }
+    private static List<Face> load(PowerForm form,boolean sharp){
         String file=form==PowerForm.CLAWS?"claw_blender":form==PowerForm.BLADE?"form_blade":"whip_tip";
         String path="/assets/blacklight/models/"+file+".json";
         try(var input=WeaponCutContact.class.getResourceAsStream(path)){
             if(input==null)throw new IllegalStateException("Missing cutting geometry: "+path);
             var json=JsonParser.parseReader(new InputStreamReader(input,StandardCharsets.UTF_8)).getAsJsonObject();
+            // ClawArmModel applies this approved display shape while loading.
+            // Derive profiles from those same vertices, so render barycentric
+            // bindings include the long blade instead of silently losing it.
+            if(form==PowerForm.BLADE&&!json.has("approvedProportions"))for(var element:json.getAsJsonObject("joints").getAsJsonArray("Hand_R")){
+                var positions=element.getAsJsonObject().getAsJsonArray("p");
+                for(int i=0;i<positions.size();i++){var p=positions.get(i).getAsJsonArray();var shaped=com.codex.blacklight.client.model.BladeShape.point(p.get(0).getAsFloat(),p.get(1).getAsFloat(),p.get(2).getAsFloat());
+                    var value=new JsonArray();value.add((float)shaped.x);value.add((float)shaped.y);value.add((float)shaped.z);positions.set(i,value);}
+            }
             var result=new ArrayList<Face>();
             if(form==PowerForm.WHIPFIST){
                 var faces=json.getAsJsonObject("joints").getAsJsonArray("Hand_R");
@@ -190,26 +253,105 @@ public final class WeaponCutContact {
                 var part=entry.getValue().getAsJsonObject();String joint=part.get("joint").getAsString();
                 var faces=json.getAsJsonObject("joints").getAsJsonArray(joint);
                 int start=part.get("start").getAsInt(),count=part.get("count").getAsInt();
-                add(result,name,joint,faces,start,count,false);
-                if(form==PowerForm.CLAWS)add(result,name.replace("_R","_L"),joint.replace("_R","_L"),faces,start,count,true);
+                if(sharp){
+                    add(result,name,joint,faces,start,count,false);
+                    if(form==PowerForm.CLAWS)add(result,name.replace("_R","_L"),joint.replace("_R","_L"),faces,start,count,true);
+                }else{
+                    addBlunt(result,name,joint,faces,start,count,false);
+                    if(form==PowerForm.CLAWS)addBlunt(result,name.replace("_R","_L"),joint.replace("_R","_L"),faces,start,count,true);
+                }
             }
-            if(result.isEmpty())throw new IllegalStateException("No sharp surfaces in "+path);
+            if(result.isEmpty())throw new IllegalStateException("No weapon surfaces in "+path);
             return List.copyOf(result);
         }catch(IOException error){throw new IllegalStateException("Cannot read cutting geometry",error);}
     }
+    private static void addBlunt(List<Face> out,String name,String bone,JsonArray faces,int start,int count,boolean mirror){
+        for(int i=start;i<start+count;i++){
+            var face=faces.get(i).getAsJsonObject();var color=face.getAsJsonArray("c");
+            if(color.get(0).getAsInt()==156&&color.get(1).getAsInt()==166&&color.get(2).getAsInt()==157)continue;
+            var p=face.getAsJsonArray("p");var a=read(p,0,mirror);var b=read(p,1,mirror);var c=read(p,2,mirror);
+            out.add(new Face(name+" [blunt]",bone,a,b,c,a,b,List.of(a,b),false));
+        }
+    }
     private static void add(List<Face> out,String name,String bone,JsonArray faces,int start,int count,boolean mirror){
+        var selected=new ArrayList<Face>();
         for(int i=start;i<start+count;i++){
             var face=faces.get(i).getAsJsonObject();var color=face.getAsJsonArray("c");
             // The exported edge material identifies sharpened faces; no palm, spine or decorative spurs.
             if(color.get(0).getAsInt()!=156||color.get(1).getAsInt()!=166||color.get(2).getAsInt()!=157)continue;
-            var p=face.getAsJsonArray("p");out.add(new Face(name,bone,read(p,0,mirror),read(p,1,mirror),read(p,2,mirror)));
+            var p=face.getAsJsonArray("p");var a=read(p,0,mirror);var b=read(p,1,mirror);var c=read(p,2,mirror);
+            selected.add(new Face(name,bone,a,b,c,a,b));
+        }
+        var groups=connectedSharpFaces(selected);
+        for(int index=0;index<groups.size();index++){
+            String edge=groups.size()==1?name:name+" [edge "+(index+1)+"]";
+            addAxis(out,edge,bone,groups.get(index));
         }
     }
-    private static Vec3 read(JsonArray p,int i,boolean mirror){var v=p.get(i).getAsJsonArray();return new Vec3(v.get(0).getAsDouble()*(mirror?-1:1),v.get(1).getAsDouble(),v.get(2).getAsDouble());}
+    /** Sharpened surfaces separated by a blunt hilt/spine cannot form one cutting span. */
+    private static List<List<Face>> connectedSharpFaces(List<Face> faces){
+        var result=new ArrayList<List<Face>>();var remaining=new LinkedHashSet<>(faces);
+        while(!remaining.isEmpty()){
+            var group=new ArrayList<Face>();var queue=new ArrayDeque<Face>();queue.add(remaining.iterator().next());
+            while(!queue.isEmpty()){
+                var face=queue.removeFirst();if(!remaining.remove(face))continue;group.add(face);
+                for(var other:remaining){int shared=0;
+                    for(var a:List.of(face.a(),face.b(),face.c()))if(List.of(other.a(),other.b(),other.c()).stream().anyMatch(b->a.distanceToSqr(b)<1e-12))shared++;
+                    if(shared>=2)queue.add(other);
+                }
+            }result.add(group);
+        }return result;
+    }
+    private static void addAxis(List<Face> out,String name,String bone,List<Face> faces){
+        var vertices=new ArrayList<Vec3>();for(var face:faces){vertices.add(face.a());vertices.add(face.b());vertices.add(face.c());}
+        if(vertices.isEmpty())return;
+        Vec3 root=vertices.getFirst(),tip=root;double longest=0;
+        for(int i=0;i<vertices.size();i++)for(int j=i+1;j<vertices.size();j++){
+            double length=vertices.get(i).distanceToSqr(vertices.get(j));if(length>longest){longest=length;root=vertices.get(i);tip=vertices.get(j);}
+        }
+        var axis=tip.subtract(root).normalize();double low=root.dot(axis),high=tip.dot(axis),band=(high-low)*.12;
+        Vec3 lowMean=Vec3.ZERO,highMean=Vec3.ZERO;int lows=0,highs=0;
+        for(var p:vertices){double projection=p.dot(axis);if(projection<=low+band){lowMean=lowMean.add(p);lows++;}if(projection>=high-band){highMean=highMean.add(p);highs++;}}
+        if(lows>0&&highs>0){root=lowMean.scale(1.0/lows);tip=highMean.scale(1.0/highs);root=root.add(axis.scale(low-root.dot(axis)));tip=tip.add(axis.scale(high-tip.dot(axis)));}
+        // Averaging the two narrow end bands can slightly change the axis. Refit
+        // its endpoints against that final direction, not the preceding diagonal.
+        axis=tip.subtract(root).normalize();low=Double.POSITIVE_INFINITY;high=Double.NEGATIVE_INFINITY;
+        for(var p:vertices){low=Math.min(low,p.dot(axis));high=Math.max(high,p.dot(axis));}
+        root=root.add(axis.scale(low-root.dot(axis)));tip=tip.add(axis.scale(high-tip.dot(axis)));
+        var profile=sharpProfile(faces,axis,low,high);
+        for(var f:faces)out.add(new Face(name,bone,f.a(),f.b(),f.c(),profile.getFirst(),profile.getLast(),profile));
+    }
+    private static List<Vec3> sharpProfile(List<Face> faces,Vec3 axis,double low,double high){
+        var profile=new ArrayList<Vec3>();
+        for(int index=0;index<com.codex.blacklight.network.RagdollImpactPayload.MAX_BLADE_POINTS;index++){
+            double section=low+(high-low)*index/(com.codex.blacklight.network.RagdollImpactPayload.MAX_BLADE_POINTS-1);
+            var points=new ArrayList<Vec3>();
+            for(var face:faces){var vertices=List.of(face.a(),face.b(),face.c());
+                for(int i=0;i<3;i++){
+                    var a=vertices.get(i);var b=vertices.get((i+1)%3);double da=a.dot(axis)-section,db=b.dot(axis)-section;
+                    Vec3 point=Math.abs(da)<1e-7?a:da*db<0?a.lerp(b,da/(da-db)):null;
+                    if(point!=null&&points.stream().noneMatch(v->v.distanceToSqr(point)<1e-12))points.add(point);
+                }
+            }
+            if(points.isEmpty())throw new IllegalStateException("Sharp profile section misses its own mesh");
+            Vec3 center=Vec3.ZERO;for(var point:points)center=center.add(point);center=center.scale(1.0/points.size());
+            // Stay inside the sharpened bevel. A concave cross-section must not
+            // bridge empty space just because its samples average to that point.
+            var probe=new AABB(center,center).inflate(.02);boolean near=false;
+            for(var face:faces)if(triangleBox(face.a(),face.b(),face.c(),probe)){near=true;break;}
+            if(!near){Vec3 mean=center;center=points.stream().min(Comparator.comparingDouble(p->p.distanceToSqr(mean))).orElseThrow();}
+            profile.add(center);
+        }return List.copyOf(profile);
+    }
+    private static Vec3 read(JsonArray p,int i,boolean mirror){var v=p.get(i).getAsJsonArray();return new Vec3(v.get(0).getAsFloat()*(mirror?-1:1),v.get(1).getAsFloat(),v.get(2).getAsFloat());}
     private static Vector3f vector(Vec3 p){return new Vector3f((float)p.x,(float)p.y,(float)p.z);}
+    static Vec3 surface(Vec3 point,PowerForm form,String bone,WeaponAttackScales.Shape shape){
+        if(!bone.startsWith("Hand_"))return point;
+        var p=shape.point(vector(point));return new Vec3(p.x,p.y,p.z);
+    }
     private static Vec3 transform(Vec3 p,Matrix4f matrix){var v=matrix.transformPosition(vector(p));return new Vec3(v.x,v.y,v.z);}
-    private static Triangle transform(Face f,Matrix4f m){return new Triangle(f.edge(),transform(f.a(),m),transform(f.b(),m),transform(f.c(),m));}
-    private static Triangle offset(Triangle t,Vec3 p){return new Triangle(t.edge(),t.a().add(p),t.b().add(p),t.c().add(p));}
+    private static Triangle transform(Face f,Matrix4f m){return new Triangle(f.edge(),transform(f.a(),m),transform(f.b(),m),transform(f.c(),m),transform(f.root(),m),transform(f.tip(),m),f.profile().stream().map(p->transform(p,m)).toList(),f.sharp());}
+    private static Triangle offset(Triangle t,Vec3 p){return new Triangle(t.edge(),t.a().add(p),t.b().add(p),t.c().add(p),t.root().add(p),t.tip().add(p),t.profile().stream().map(v->v.add(p)).toList(),t.sharp());}
     private static Vec3 reach(ServerPlayer p,Vec3 origin,Vec3 point){var d=point.subtract(origin);return origin.add(d.x*AttackReach.scale(p),d.y,d.z*AttackReach.scale(p));}
     private static Vec3 local(Vec3 p,Vec3 origin,float yaw,double scale){return p.subtract(origin).yRot((float)Math.toRadians(yaw-180)).scale(1/scale);}
     private static Vec3 closest(Vec3 p,AABB b){return new Vec3(Math.clamp(p.x,b.minX,b.maxX),Math.clamp(p.y,b.minY,b.maxY),Math.clamp(p.z,b.minZ,b.maxZ));}

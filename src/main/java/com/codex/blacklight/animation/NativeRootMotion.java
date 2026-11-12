@@ -28,7 +28,7 @@ public final class NativeRootMotion {
                 || player.getData(ModAttachments.CONSUMING)) return false;
         var visual = player.getData(ModAttachments.WEAPON_VISUAL);
         var move = visual.spec();
-        if (move != null) return !move.aerial() && !visual.traveling() && move != WeaponMove.BLADE_RUSH
+        if (move != null) return !move.aerial() && !visual.traveling()
                 && player.level().getGameTime() - visual.started() <= (visual.charging() ? 180 : move.duration);
         return switch (player.getData(ModAttachments.CLAW_COMBAT).action()) {
             case AUTO_1, AUTO_2, AUTO_3 -> true;
@@ -82,6 +82,27 @@ public final class NativeRootMotion {
     public static float weaponClock(int elapsedTick,float offset,float transition) {
         float correction=offset-Math.round(offset*20)/20F;
         return Math.max(offset,elapsedTick/20F-transition+correction);
+    }
+
+    /** The displacement callback owns the same tick as its sharp-edge sweep.
+     * A velocity packet lets client frame/packet timing move this attack an extra
+     * tick, changing which tissue the otherwise identical ribbon intersects. */
+    public static void bladeRush(ServerPlayer player,Vec3 direction,double distance) {
+        bladeRush(player,direction,distance,null);
+    }
+
+    /** A committed rush closes the gap to its own receiver and stops at blade spacing;
+     * it never phases the actor through a living body it is about to cut. */
+    public static void bladeRush(ServerPlayer player,Vec3 direction,double distance,LivingEntity target) {
+        player.setDeltaMovement(0,player.getDeltaMovement().y,0);
+        player.hurtMarked=true;
+        var step=direction.scale(distance);
+        if (target!=null && target.isAlive() && target.level()==player.level()) {
+            var delta=target.position().subtract(player.position()).multiply(1,0,1);
+            double spacing=Math.max(.8,(player.getBbWidth()+target.getBbWidth())*.5+.15);
+            step=standOff(step,delta,Math.max(0,delta.length()-spacing));
+        }
+        apply(player,step);
     }
 
     public static void claw(ServerPlayer player, ClawCombatState combat) {

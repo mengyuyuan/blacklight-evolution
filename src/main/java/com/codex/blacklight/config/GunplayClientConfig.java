@@ -7,7 +7,7 @@ public final class GunplayClientConfig {
     public static final ModConfigSpec.IntValue EFFECT_LIMIT;
     static{
         var b=new ModConfigSpec.Builder();
-        CAMERA_KICK=b.comment("轻微本地开火镜头反馈，不修改玩家朝向或瞄准方向。").define("cameraKick",true);
+        CAMERA_KICK=b.comment("本地开火及载具受击镜头反馈，不修改玩家朝向或瞄准方向。").define("cameraKick",true);
         TRACERS=b.comment("显示短暂曳光线，伤害仍由服务端判定。").define("tracers",true);
         CASINGS=b.comment("显示短寿命弹壳；不创建服务端物品实体。").define("casings",true);
         COMPACT_VEHICLE_HUD=b.comment("载具默认只显示角落内的生命和弹药；按住目标详情键可查看完整操作提示。").define("compactVehicleHud",true);
