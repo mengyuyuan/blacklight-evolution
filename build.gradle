@@ -227,6 +227,7 @@ if (project.hasProperty('wingTest')) sourceSets.main.java.srcDir('src/wingTest/j
 if (project.hasProperty('hydraVisualTest')) sourceSets.main.java.srcDir('src/hydraVisualTest/java')
 if (project.hasProperty('cityVisualTest')) sourceSets.main.java.srcDir('src/cityVisualTest/java')
 if (project.hasProperty('weaponModelPreview')) sourceSets.main.java.srcDir('src/weaponVisualTest/java')
+if (project.hasProperty('ragdollVisual')) sourceSets.main.java.srcDir('src/ragdollVisualTest/java')
 if (project.hasProperty('leanArmorPreview')) sourceSets.main.java.srcDir('src/armorVisualTest/java')
 if (project.hasProperty('hiveFeedingTest')) {
     sourceSets.main.java.srcDir('src/hiveTest/java')
@@ -292,6 +293,7 @@ tasks.named('jar', Jar).configure {
             'Blacklight-Bundled-Motions': 'true',
             'Blacklight-Asset-Notice': 'THIRD_PARTY_ASSETS.md')
     exclude 'com/codex/blacklight/gametest/**'
+    exclude 'com/codex/blacklight/client/RagdollVisualAudit*.class'
     exclude 'data/blacklight/structure/wall_test.nbt', 'data/blacklight/structures/wall_test.nbt'
     exclude 'com/codex/blacklight/client/vehicle/VehicleViewSmoke*.class', 'com/codex/blacklight/client/vehicle/VehicleViewBootstrap*.class'
     exclude 'com/codex/blacklight/city/*GameTest*.class'
@@ -375,6 +377,13 @@ neoForge {
             if (project.hasProperty('weaponModelPreview')) {
                 systemProperty 'blacklight.test.weaponModels', file(project.property('weaponModelPreview')).absolutePath
                 programArguments.addAll '--width', '1280', '--height', '900'
+            }
+            if (project.hasProperty('ragdollVisual')) {
+                systemProperty 'blacklight.test.ragdollVisual', file(project.property('ragdollVisual')).absolutePath
+                if(project.hasProperty('ragdollCases')) systemProperty 'blacklight.test.ragdollCases', project.property('ragdollCases').toString()
+                if(project.hasProperty('ragdollCameraSide')) systemProperty 'blacklight.test.ragdollCameraSide', project.property('ragdollCameraSide').toString()
+                if(project.hasProperty('ragdollFov')) systemProperty 'blacklight.test.ragdollFov', project.property('ragdollFov').toString()
+                programArguments.addAll '--width', '960', '--height', '640'
             }
             if (project.hasProperty('standaloneVisual')) {
                 systemProperty 'blacklight.test.standaloneVisual', file(project.property('standaloneVisual')).absolutePath

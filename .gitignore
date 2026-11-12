@@ -43,6 +43,7 @@ repo/
 tmp/
 run-wall-gametest/
 run-ragdoll/
+run-ragdoll-qa/
 *.log
 hs_err_pid*.log
 .env
@@ -76,3 +77,7 @@ __pycache__/
 /art/sovereign-wings/*.glb
 /art/sovereign-wings/*.blend
 /run-native-qa/
+# Optional user-local original military curves; never publish commercial assets.
+**/p1-military-motion.json
+# Local agent hand-off exports (Codex session history, never published).
+.codex-share/
