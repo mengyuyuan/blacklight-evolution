@@ -11,6 +11,61 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 class MilitaryVehicleModelTest {
+    @Test void dentsBendInteriorFaceVerticesAndNeverLeakToTheNextVehicle(){
+        var model=new MilitaryVehicleModel("tank");model.pose(0,0,0);
+        var dent=new com.codex.blacklight.military.vehicle.VehicleDeformation.Dent("body",new Vec3(2,1.6,.4),new Vec3(-1,0,0),.9,.4);
+        var counts=new int[3];var bent=new AtomicInteger();
+        VertexConsumer collector=(VertexConsumer)Proxy.newProxyInstance(VertexConsumer.class.getClassLoader(),new Class<?>[]{VertexConsumer.class},(proxy,method,args)->{
+            if(method.getName().equals("addVertex")&&args.length>=11){
+                counts[0]++;double x=((Number)args[0]).doubleValue(),y=((Number)args[1]).doubleValue(),z=((Number)args[2]).doubleValue();
+                if(x>1.5&&x<1.8&&y>1.45&&y<1.75&&z>.2&&z<.6) bent.incrementAndGet();
+                for(int axis=0;axis<3;axis++)assertTrue(Double.isFinite(((Number)args[axis]).doubleValue()));
+            }
+            return method.getReturnType()==void.class?null:proxy;
+        });
+        model.render(new PoseStack(),collector,15728880,0);counts[1]=counts[0];assertEquals(0,bent.get());
+        counts[0]=0;model.deformation(java.util.List.of(dent));model.render(new PoseStack(),collector,15728880,0);
+        assertTrue(counts[0]>counts[1]);assertTrue(bent.get()>8,"dent needs interior surface vertices, not a translated whole cuboid");
+        counts[0]=0;model.deformation(java.util.List.of());model.render(new PoseStack(),collector,15728880,0);assertEquals(counts[1],counts[0]);
+    }
+    @Test void actualRoofLeansWithIncomingForceAndAgainstFiringDirection(){
+        var model=new MilitaryVehicleModel("tank");
+        for(var push:java.util.List.of(new Vec3(1,0,0),new Vec3(-1,0,0),new Vec3(0,0,1),new Vec3(0,0,-1))){
+            model.pose(0,0,0);
+            model.feedback(com.codex.blacklight.military.vehicle.VehicleFeedbackMotion.sample("",-1,-1,0,1,1,push));
+            var stack=new PoseStack();model.root().getChild("body").translateAndRotate(stack);
+            var roof=stack.last().pose().transformPosition(new org.joml.Vector3f(0,2,0));
+            assertTrue(roof.x*push.x+roof.z*push.z>.02,"roof tips away from the impact source");
+        }
+        for(double yaw:new double[]{0,90,180,-90}){
+            model.pose(yaw,0,0);
+            model.feedback(com.codex.blacklight.military.vehicle.VehicleFeedbackMotion.sample("tank_he",1,-1,yaw,-1,0,Vec3.ZERO));
+            var stack=new PoseStack();model.root().getChild("body").translateAndRotate(stack);
+            var roof=stack.last().pose().transformPosition(new org.joml.Vector3f(0,2,0));
+            assertTrue(roof.x*Math.sin(Math.toRadians(yaw))+roof.z*Math.cos(Math.toRadians(yaw))<-.01,"firing drives body against barrel direction");
+        }
+    }
+    @Test void recoilMovesOnlyTheFiredBarrelAlongItsPitchedAxis(){
+        var model=new MilitaryVehicleModel("tank");model.pose(65,15,0);
+        var before=model.anchorWorld("muzzle_primary",Vec3.ZERO,0);var secondary=model.anchorWorld("muzzle_secondary",Vec3.ZERO,0);
+        var axis=before.subtract(model.anchorWorld("breech_primary",Vec3.ZERO,0)).normalize();
+        model.feedback(new com.codex.blacklight.military.vehicle.VehicleFeedbackMotion.Pose(0,0,0,.4,0));
+        assertTrue(model.anchorWorld("muzzle_primary",Vec3.ZERO,0).distanceTo(before.subtract(axis.scale(.4)))<1e-5);
+        assertTrue(model.anchorWorld("muzzle_secondary",Vec3.ZERO,0).distanceTo(secondary)<1e-5);
+        model.pose(65,15,0);assertTrue(model.anchorWorld("muzzle_primary",Vec3.ZERO,0).distanceTo(before)<1e-5);
+    }
+    @Test void rockingSprungBodyKeepsTrackedAndWheeledGroundContactsFixed(){
+        for(String id:java.util.List.of("tank","apc","truck")){
+            var model=new MilitaryVehicleModel(id);model.pose(0,0,0);var body=model.root().getChild("body");
+            var contact=body.getChild(id.equals("truck")?"left_wheel_1":"track_left");
+            var before=new PoseStack();body.translateAndRotate(before);contact.translateAndRotate(before);var matrix=new org.joml.Matrix4f(before.last().pose());
+            model.feedback(new com.codex.blacklight.military.vehicle.VehicleFeedbackMotion.Pose(3,-2,-.04,0,0));
+            var after=new PoseStack();body.translateAndRotate(after);contact.translateAndRotate(after);
+            for(var point:java.util.List.of(new org.joml.Vector3f(),new org.joml.Vector3f(1,1,1),new org.joml.Vector3f(-1,0,2))){
+                assertTrue(matrix.transformPosition(new org.joml.Vector3f(point)).distance(after.last().pose().transformPosition(new org.joml.Vector3f(point)))<1e-5,id+" contact stays on ground");
+            }
+        }
+    }
     @Test void actualBakedRenderingContainsAll377AuthoredCuboids() {
         for(var entry:java.util.Map.of("truck",78,"apc",138,"tank",161).entrySet()) {
             var model=new MilitaryVehicleModel(entry.getKey());

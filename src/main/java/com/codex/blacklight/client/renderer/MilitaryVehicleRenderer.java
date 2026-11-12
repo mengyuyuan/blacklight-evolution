@@ -33,7 +33,12 @@ public final class MilitaryVehicleRenderer extends EntityRenderer<MilitaryVehicl
         }
         distance%=Math.PI*100;movement.put(entity,new Travel(at,distance));
         model.pose(entity.turretYaw(),entity.gunPitch(),distance);
-        model.recoil(entity.level().getGameTime()+partial-entity.primaryShot(),entity.chassisId().equals("tank"));
+        model.feedback(entity.feedback(partial));
+        model.deformation(entity.dents());
+        for(String id:entity.definition().weapons().keySet()){
+            var weapon=com.codex.blacklight.military.vehicle.VehicleWeaponDefinition.require(id);
+            GunplayVisuals.vehicleMuzzle(entity,weapon.weapon(),model.anchorWorld(weapon.muzzle(),at,yaw));
+        }
         stack.pushPose();
         try {
             stack.mulPose(Axis.YP.rotationDegrees(yaw));
@@ -42,7 +47,7 @@ public final class MilitaryVehicleRenderer extends EntityRenderer<MilitaryVehicl
             String seat=local?entity.seatOf(mc.player.getUUID()):null;
             var view=seat==null?null:com.codex.blacklight.client.vehicle.VehicleCamera.view(entity.definition(),seat,Vec3.ZERO,0,entity.turretYaw(),entity.gunPitch(),
                     mc.player.getViewYRot(partial)+yaw,mc.player.getViewXRot(partial),true,false);
-            interior.render(stack,buffers.getBuffer(RenderType.entityCutout(getTextureLocation(entity))),light,entity.hurtFlash(partial)?OverlayTexture.pack(0,3):OverlayTexture.NO_OVERLAY,local,view);
+            interior.render(stack,buffers.getBuffer(RenderType.entityCutout(getTextureLocation(entity))),light,OverlayTexture.NO_OVERLAY,local,view);
         } finally {stack.popPose();}
         super.render(entity,yaw,partial,stack,buffers,light);
     }

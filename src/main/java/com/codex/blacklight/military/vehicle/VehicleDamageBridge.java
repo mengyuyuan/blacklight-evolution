@@ -59,12 +59,15 @@ public final class VehicleDamageBridge {
     }
     /** Heavy contact has its own explicit gameplay armor balance, never a fabricated firearm identity. */
     public static boolean hurtPhysical(LivingEntity actor,MilitaryVehicle target,float damage,Entity projectile){
+        return hurtPhysical(actor,target,damage,projectile,null);
+    }
+    public static boolean hurtPhysical(LivingEntity actor,MilitaryVehicle target,float damage,Entity projectile,Vec3 contact){
         if(projectile!=null&&(projectile.isRemoved()||projectile.level()!=target.level()))return false;
         if(!permitted(actor,target,damage))return false;
         float coefficient=switch(target.definition().armor()){case LIGHT->1F;case ARMORED->.75F;case HEAVY->.5F;};
         var source=projectile!=null?actor.damageSources().thrown(projectile,actor)
                 :actor instanceof Player player?actor.damageSources().playerAttack(player):actor.damageSources().mobAttack(actor);
-        return target.hurt(source,damage*coefficient*prototypeScale(actor));
+        return target.hurtAt(source,damage*coefficient*prototypeScale(actor),contact,incoming(actor,projectile,contact),VehicleFeedbackMotion.Impact.HEAVY);
     }
     /** Living targets receive prototype melee in CombatScale units; hulls use the same scale so a claw is not five times weaker on steel. */
     public static float prototypeScale(LivingEntity actor){
@@ -75,6 +78,15 @@ public final class VehicleDamageBridge {
         return permitted(actor,target,damage)&&target.hurt(actor.damageSources().playerAttack(actor),damage);
     }
     public static boolean hurt(LivingEntity actor,MilitaryVehicle target,WeaponDefinition definition,float damage,Entity projectile){
+        return hurt(actor,target,definition,damage,projectile,null);
+    }
+    private static Vec3 incoming(LivingEntity actor,Entity projectile,Vec3 contact){
+        return projectile!=null&&projectile.getDeltaMovement().lengthSqr()>1e-8?projectile.getDeltaMovement():contact==null||actor==null?null:contact.subtract(actor.getEyePosition());
+    }
+    public static boolean hurt(LivingEntity actor,MilitaryVehicle target,WeaponDefinition definition,float damage,Entity projectile,Vec3 contact){
+        return hurt(actor,target,definition,damage,projectile,contact,incoming(actor,projectile,contact));
+    }
+    public static boolean hurt(LivingEntity actor,MilitaryVehicle target,WeaponDefinition definition,float damage,Entity projectile,Vec3 contact,Vec3 direction){
         if(!permitted(actor,target,damage))return false;
         VehicleWeaponDefinition specific=VehicleWeaponDefinition.ALL.stream().filter(value->value.weapon().id().equals(definition.id())).findFirst().orElse(null);
         float amount;
@@ -83,7 +95,8 @@ public final class VehicleDamageBridge {
             boolean bullet=definition.kind()==WeaponDefinition.Kind.BULLET;var armor=target.definition().armor();
             amount=damage*(armor==VehicleDefinition.Armor.LIGHT?1:bullet?(armor==VehicleDefinition.Armor.ARMORED?.25F:.10F):(armor==VehicleDefinition.Armor.ARMORED?.75F:.50F));
         }
-        return target.hurt(actor.damageSources().mobProjectile(projectile==null?actor:projectile,actor),amount);
+        return target.hurtAt(actor.damageSources().mobProjectile(projectile==null?actor:projectile,actor),amount,contact,direction,
+                definition.kind()==WeaponDefinition.Kind.BULLET?VehicleFeedbackMotion.Impact.BULLET:VehicleFeedbackMotion.Impact.EXPLOSIVE);
     }
     public static int blast(ServerLevel level,LivingEntity actor,WeaponDefinition definition,Vec3 center,Entity projectile,MilitaryVehicle direct){
         if(!valid(actor,level)||definition.radius()<=0)return 0;
@@ -95,7 +108,7 @@ public final class VehicleDamageBridge {
             double distance=center.distanceTo(surface);if(distance>radius||!loaded(level,center,surface))continue;
             var wall=level.clip(new ClipContext(center,surface,ClipContext.Block.COLLIDER,ClipContext.Fluid.NONE,projectile));
             if(wall.getType()!=HitResult.Type.MISS)continue;
-            if(hurt(actor,target,definition,definition.damage()*(float)Math.max(.2,1-distance/radius),projectile))hits++;
+            if(hurt(actor,target,definition,definition.damage()*(float)Math.max(.2,1-distance/radius),projectile,surface,surface.subtract(center)))hits++;
             if(seen.size()>=64)break;
         }
         return hits;
@@ -109,8 +122,8 @@ public final class VehicleDamageBridge {
         var living=net.minecraft.world.entity.projectile.ProjectileUtil.getEntityHitResult(level,actor,from,hit.point,new AABB(from,hit.point).inflate(.3),entity->entity!=actor&&entity instanceof LivingEntity target&&target.isAlive()&&entity.isPickable());
         if(living!=null&&living.getLocation().distanceTo(from)<hit.distance-.001)return false;
         if(level.clip(new ClipContext(from,hit.point,ClipContext.Block.COLLIDER,ClipContext.Fluid.NONE,actor)).getType()!=HitResult.Type.MISS)return false;
-        hurt(actor,hit.vehicle,definition,definition.damage()*scale,null);
-          com.codex.blacklight.firearms.GunplayEffects.shot(actor,definition,com.codex.blacklight.firearms.GunplayEffects.muzzle(actor,direction),hit.point,3,direction.normalize().scale(-1));
+        boolean accepted=hurt(actor,hit.vehicle,definition,definition.damage()*scale,null,hit.point,direction);
+          com.codex.blacklight.firearms.GunplayEffects.shot(actor,definition,com.codex.blacklight.firearms.GunplayEffects.muzzle(actor,direction),hit.point,accepted?0:3,direction.normalize().scale(-1));
         return true;
     }
 }

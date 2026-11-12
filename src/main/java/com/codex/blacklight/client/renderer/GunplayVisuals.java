@@ -18,6 +18,18 @@ import java.util.*;
 public final class GunplayVisuals {
     private record Effect(GunplayFeedbackPayload data,double at){}
     private static final ArrayDeque<Effect> ACTIVE=new ArrayDeque<>();
+    private record Muzzle(int weapon,Vec3 position,long tick){}
+    private static final Map<com.codex.blacklight.entity.MilitarySoldier,Muzzle> MILITARY_MUZZLES=new WeakHashMap<>();
+    private static final Map<com.codex.blacklight.entity.MilitaryVehicle,Map<Integer,Muzzle>> VEHICLE_MUZZLES=new WeakHashMap<>();
+    public static void vehicleMuzzle(com.codex.blacklight.entity.MilitaryVehicle vehicle,com.codex.blacklight.firearms.WeaponDefinition weapon,Vec3 position){
+        if(vehicle.level()!=Minecraft.getInstance().level||!Double.isFinite(position.lengthSqr())||position.distanceToSqr(vehicle.position())>1024)return;
+        int id=GunplayEffects.weapon(weapon);VEHICLE_MUZZLES.computeIfAbsent(vehicle,v->new HashMap<>()).put(id,new Muzzle(id,position,vehicle.level().getGameTime()));
+    }
+    /** The actual rendered weapon basis, after body, arm IK and model transforms. */
+    public static void militaryMuzzle(com.codex.blacklight.entity.MilitarySoldier actor,com.codex.blacklight.firearms.WeaponDefinition weapon,Vec3 position){
+        if(actor.level()!=Minecraft.getInstance().level||!Double.isFinite(position.lengthSqr())||position.distanceToSqr(actor.position())>25)return;
+        MILITARY_MUZZLES.put(actor,new Muzzle(GunplayEffects.weapon(weapon),position,actor.level().getGameTime()));
+    }
     private static ClientLevel world;
     private static long window=-1,received;
     private static int count;
@@ -31,9 +43,9 @@ public final class GunplayVisuals {
         if(count++>=32&&p.event()==0)return;
         while(ACTIVE.size()>=com.codex.blacklight.config.GunplayClientConfig.EFFECT_LIMIT.get())ACTIVE.removeFirst();ACTIVE.addLast(new Effect(p,now));received++;
         boolean own=p.actor()==mc.player.getId()||mc.player.getVehicle()!=null&&p.actor()==mc.player.getVehicle().getId();
-        if(own&&p.event()==0){kickAt=now;kickStrength=GunplayEffects.cannon(p.weapon())?.65:.14;}
+        if(own&&p.event()==0&&!(mc.player.getVehicle() instanceof com.codex.blacklight.entity.MilitaryVehicle)){kickAt=now;kickStrength=GunplayEffects.cannon(p.weapon())?.65:.14;}
     }
-    @SubscribeEvent public static void unload(net.neoforged.neoforge.event.level.LevelEvent.Unload e){if(e.getLevel()==world){ACTIVE.clear();world=null;kickAt=-1000;}}
+    @SubscribeEvent public static void unload(net.neoforged.neoforge.event.level.LevelEvent.Unload e){if(e.getLevel()==world){ACTIVE.clear();MILITARY_MUZZLES.clear();VEHICLE_MUZZLES.clear();world=null;kickAt=-1000;}}
     @SubscribeEvent public static void camera(ViewportEvent.ComputeCameraAngles e){
         var mc=Minecraft.getInstance();if(mc.level!=world||mc.player==null||mc.screen!=null||mc.isPaused()||!com.codex.blacklight.config.GunplayClientConfig.CAMERA_KICK.get()
                 ||!mc.options.getCameraType().isFirstPerson())return;
@@ -51,6 +63,14 @@ public final class GunplayVisuals {
             if(start.distanceToSqr(camera)>96*96)continue;
             if(p.event()==1){explosion(pose,out,end,p,age);continue;}
             if(p.event()==2){if(age<10)impact(pose,out,end,p,age);continue;}
+            if(mc.level.getEntity(p.actor()) instanceof com.codex.blacklight.entity.MilitarySoldier soldier){
+                var muzzle=MILITARY_MUZZLES.get(soldier);
+                if(muzzle!=null&&muzzle.weapon()==p.weapon()&&mc.level.getGameTime()>=muzzle.tick()&&mc.level.getGameTime()-muzzle.tick()<=1)start=muzzle.position();
+            }
+            if(mc.level.getEntity(p.actor()) instanceof com.codex.blacklight.entity.MilitaryVehicle vehicle){
+                var mounts=VEHICLE_MUZZLES.get(vehicle);var muzzle=mounts==null?null:mounts.get(p.weapon());
+                if(muzzle!=null&&mc.level.getGameTime()-muzzle.tick()<=1)start=muzzle.position();
+            }
             var axis=end.subtract(start).normalize();if(axis.lengthSqr()<.01)axis=new Vec3(0,0,1);
             boolean local=mc.player!=null&&p.actor()==mc.player.getId()&&mc.options.getCameraType().isFirstPerson();
             if(age<1.8&&!local){double size=(GunplayEffects.cannon(p.weapon())?.85:GunplayEffects.bullet(p.weapon())?.23:.4)*(1-age/1.8);
@@ -76,11 +96,24 @@ public final class GunplayVisuals {
         var n=new Vec3(p.nx(),p.ny(),p.nz()).normalize();if(n.lengthSqr()<.01)n=new Vec3(0,1,0);
         var u=n.cross(new Vec3(0,1,0));if(u.lengthSqr()<.01)u=new Vec3(1,0,0);u=u.normalize();var v=n.cross(u);double t=age/20;
         int rgb=p.impact()==2?0x872b34:p.impact()==3?0xffd490:0xa19b8c;
-        for(int i=0;i<(p.impact()==3?6:4);i++){
-            double a=i*2.399+(p.seed()&15),speed=.55+i*.12;var d=u.scale(Math.cos(a)*speed).add(v.scale(Math.sin(a)*speed)).add(n.scale(.8));
+        double force=p.impact()==3?Math.clamp(p.size(),.5,3):1;
+        for(int i=0;i<(p.impact()==3?6+(int)(force*4):4);i++){
+            double a=i*2.399+(p.seed()&15),speed=(.55+i*.12)*force;var d=u.scale(Math.cos(a)*speed).add(v.scale(Math.sin(a)*speed)).add(n.scale(.8*force));
             var head=end.add(n.scale(.025)).add(d.scale(t)).add(0,-t*t*1.8,0);
             if(p.impact()==3)GunplayGeometry.rod(pose,out,head.subtract(d.scale(.025)),head,.009,0,GunplayGeometry.alpha(rgb,1-age/10),LightTexture.FULL_BRIGHT);
             else GunplayGeometry.box(pose,out,head,.025,.025,.025,GunplayGeometry.alpha(rgb,1-age/10),0x00b000b0);
+        }
+        if(p.impact()==3&&age<2){double flash=(1-age/2)*.09*force;
+            GunplayGeometry.rod(pose,out,end.add(n.scale(.025)),end.add(n.scale(.10*force)),flash,0,GunplayGeometry.alpha(0xffeed0,1-age/2),LightTexture.FULL_BRIGHT);}
+        // Heavy hull contacts shed short-lived visual chips; bullets retain their small spark response.
+        if(p.event()==2&&p.impact()==3&&p.weapon()==10&&force>1){
+            for(int i=0;i<6;i++){
+                double angle=i*2.399+(p.seed()&15),fade=Math.max(0,1-age/10);
+                var velocity=n.scale(1.2*force).add(u.scale(Math.cos(angle)*force)).add(v.scale(Math.sin(angle)*force)).add(0,.6,0);
+                var at=end.add(n.scale(.04)).add(velocity.scale(t)).add(0,-t*t*3,0);
+                double size=(.018+.009*(i%3))*Math.min(force,2);
+                GunplayGeometry.box(pose,out,at,size,size*.45,size*.75,GunplayGeometry.alpha(i%2==0?0x777b79:0x333b39,fade),0x00b000b0);
+            }
         }
     }
     private static void explosion(PoseStack pose,VertexConsumer out,Vec3 at,GunplayFeedbackPayload p,double age){

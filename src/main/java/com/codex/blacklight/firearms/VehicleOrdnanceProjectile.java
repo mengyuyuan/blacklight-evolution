@@ -89,7 +89,7 @@ public final class VehicleOrdnanceProjectile extends ThrowableItemProjectile {
         var specification=VehicleWeaponDefinition.require(weaponId());var definition=specification.weapon();Vec3 center=result.getLocation();
         if(result instanceof BlockHitResult block)center=center.add(Vec3.atLowerCornerOf(block.getDirection().getNormal()).scale(.04));
         MilitaryVehicle direct=result instanceof EntityHitResult hit?VehicleDamageBridge.vehicle(hit.getEntity()):null;
-        if(direct!=null)VehicleDamageBridge.hurt(actor,direct,definition,definition.damage(),this);
+        if(direct!=null)VehicleDamageBridge.hurt(actor,direct,definition,definition.damage(),this,center);
         LivingEntity directLiving=result instanceof EntityHitResult hit&&hit.getEntity() instanceof LivingEntity target?target:null;
         if(directLiving!=null&&allowedLiving(level,actor,directLiving))directLiving.hurt(damageSources().explosion(this,actor),definition.damage());
         double radius=Math.min(4,definition.radius());

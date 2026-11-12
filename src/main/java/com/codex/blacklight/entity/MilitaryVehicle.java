@@ -50,6 +50,13 @@ public final class MilitaryVehicle extends Entity {
     private String currentHome = "";
     private UUID playerOwner;
     private long primaryShot=-1,secondaryShot=-1;
+    private String lastPrimaryWeapon="";
+    private long impactAt=-100;
+    private float impactStrength;
+    private Vec3 impactPush=Vec3.ZERO,impactPoint=Vec3.ZERO,impactLever=Vec3.ZERO;
+    private List<VehicleDeformation.Dent> dents=List.of(),clientDents=List.of();
+    private net.minecraft.nbt.ListTag clientDentTag;
+    private long lastAiAimTick=Long.MIN_VALUE;
     private String selectedPrimary;
     private VehicleKinematics.StopReason stopReason = VehicleKinematics.StopReason.NONE;
 
@@ -89,7 +96,23 @@ public final class MilitaryVehicle extends Entity {
     public String currentHome() { return currentHome; }
     public long primaryShot(){return level().isClientSide?(entityData.get(STATE).contains("PrimaryShot")?entityData.get(STATE).getLong("PrimaryShot"):-1):primaryShot;}
     public long secondaryShot(){return level().isClientSide?(entityData.get(STATE).contains("SecondaryShot")?entityData.get(STATE).getLong("SecondaryShot"):-1):secondaryShot;}
-    public void recordShot(String weapon){if(level().isClientSide)return;if(weapon.equals(secondaryWeapon()))secondaryShot=level().getGameTime();else primaryShot=level().getGameTime();syncVehicleState();}
+    public void recordShot(String weapon){if(level().isClientSide)return;if(weapon.equals(secondaryWeapon()))secondaryShot=level().getGameTime();else {primaryShot=level().getGameTime();lastPrimaryWeapon=weapon;}syncVehicleState();}
+    public String lastPrimaryWeapon(){return level().isClientSide?entityData.get(STATE).getString("ShotWeapon"):lastPrimaryWeapon;}
+    public long impactAt(){return level().isClientSide?(entityData.get(STATE).contains("ImpactAt")?entityData.get(STATE).getLong("ImpactAt"):-100):impactAt;}
+    public float impactStrength(){return level().isClientSide?entityData.get(STATE).getFloat("ImpactStrength"):impactStrength;}
+    public Vec3 impactPush(){var s=entityData.get(STATE);return level().isClientSide?new Vec3(s.getFloat("ImpactX"),s.getFloat("ImpactY"),s.getFloat("ImpactZ")):impactPush;}
+    public Vec3 impactPoint(){var s=entityData.get(STATE);return level().isClientSide?new Vec3(s.getDouble("ContactX"),s.getDouble("ContactY"),s.getDouble("ContactZ")):impactPoint;}
+    public Vec3 impactLever(){var s=entityData.get(STATE);return level().isClientSide?new Vec3(s.getFloat("ImpactLeverX"),0,s.getFloat("ImpactLeverZ")):impactLever;}
+    public List<VehicleDeformation.Dent> dents(){
+        if(!level().isClientSide)return dents;
+        var tag=entityData.get(STATE).getList("Dents",10);
+        if(tag!=clientDentTag){clientDentTag=tag;clientDents=VehicleDeformation.read(chassisId(),tag);}
+        return clientDents;
+    }
+    public VehicleFeedbackMotion.Pose feedback(float partial){
+        double now=level().getGameTime()+partial;
+        return VehicleFeedbackMotion.sample(lastPrimaryWeapon(),primaryShot()<0?-1:now-primaryShot(),secondaryShot()<0?-1:now-secondaryShot(),turretYaw(),now-impactAt(),impactStrength(),impactPush(),impactLever());
+    }
     public boolean restoreResourcesIfUnchanged(VehicleInventory.Snapshot before,VehicleInventory.Snapshot expected){
         if(level().isClientSide||!inventory.snapshot().equals(expected))return false;
         inventory=VehicleInventory.restore(definition,before);syncVehicleState();return true;
@@ -98,19 +121,24 @@ public final class MilitaryVehicle extends Entity {
     public float repair(float amount){
         if(level().isClientSide||destroyed||isRemoved()||mechanicalHealth<=0||!Float.isFinite(amount)||amount<=0)return 0;
         float before=mechanicalHealth;mechanicalHealth=Math.min(maxHealth(),mechanicalHealth+amount);
-        if(mechanicalHealth!=before)syncVehicleState();return mechanicalHealth-before;
+        if(mechanicalHealth!=before){dents=VehicleDeformation.repair(dents,(mechanicalHealth-before)/(maxHealth()-before));syncVehicleState();}return mechanicalHealth-before;
     }
     public boolean controlLocked(){return VehicleHijackSystem.claimed(this);}
     public boolean aimAiWeapon(MilitarySoldier actor,LivingEntity target){
+        return aimAiWeapon(actor,target,selectedPrimary);
+    }
+    public boolean aimAiWeapon(MilitarySoldier actor,LivingEntity target,String weapon){
         if(level().isClientSide||controlLocked()||playerOwner!=null||target==null||target.level()!=level()||!target.isAlive()
                 ||actor==null||weaponOperator()!=actor||actor.getVehicle()!=this||!crewOperational(actor)
-                ||getPassengers().stream().anyMatch(Player.class::isInstance)||!actor.validTarget(target)||selectedPrimary.isEmpty())return false;
+                ||getPassengers().stream().anyMatch(Player.class::isInstance)||!actor.validTarget(target)||!definition.weapons().containsKey(weapon))return false;
         var origin=new VehicleDefinition.Vec3(getX(),getY(),getZ());
-        var anchor=definition.mountWorld("breech_primary",origin,getYRot(),turretYaw,gunPitch);
+        var anchor=definition.mountWorld(VehicleWeaponDefinition.require(weapon).breech(),origin,getYRot(),turretYaw,gunPitch);
         var delta=target.getBoundingBox().getCenter().subtract(anchor.x(),anchor.y(),anchor.z());
         float desiredYaw=net.minecraft.util.Mth.wrapDegrees((float)Math.toDegrees(Math.atan2(delta.x,delta.z))-getYRot());
         float desiredPitch=(float)-Math.toDegrees(Math.atan2(delta.y,Math.sqrt(delta.x*delta.x+delta.z*delta.z)));
         if(desiredPitch < -25||desiredPitch > 15)return false;
+        if(lastAiAimTick==level().getGameTime())return Math.abs(net.minecraft.util.Mth.wrapDegrees(desiredYaw-turretYaw))<.5&&Math.abs(desiredPitch-gunPitch)<.5;
+        lastAiAimTick=level().getGameTime();
         float nextYaw=turretYaw+net.minecraft.util.Mth.clamp(net.minecraft.util.Mth.wrapDegrees(desiredYaw-turretYaw),-3,3);
         float nextPitch=gunPitch+net.minecraft.util.Mth.clamp(desiredPitch-gunPitch,-2,2);
         if(VehicleKinematics.clearArticulation(this,turretYaw,nextYaw,gunPitch,nextPitch)!=VehicleKinematics.StopReason.NONE)return false;
@@ -320,6 +348,12 @@ public final class MilitaryVehicle extends Entity {
     @Override public boolean isPushable() { return false; }
     @Override public void push(double x, double y, double z) { /* Mechanical movement goes through the terrain sweep. */ }
     @Override public boolean hurt(DamageSource source, float amount) {
+        var kind=source.is(net.minecraft.tags.DamageTypeTags.IS_EXPLOSION)?VehicleFeedbackMotion.Impact.EXPLOSIVE
+                :source.is(net.minecraft.tags.DamageTypeTags.IS_PROJECTILE)?VehicleFeedbackMotion.Impact.BULLET:VehicleFeedbackMotion.Impact.HEAVY;
+        return hurtAt(source,amount,null,null,kind);
+    }
+    /** Server-resolved surface contact; absent contact uses the actual articulated hull. */
+    public boolean hurtAt(DamageSource source,float amount,Vec3 contact,Vec3 incoming,VehicleFeedbackMotion.Impact kind){
         if (level().isClientSide || destroyed || isRemoved() || isInvulnerableTo(source) || !Float.isFinite(amount) || amount <= 0) return false;
         for(Entity passenger:getPassengers())if(passenger instanceof Player victim){
             if(victim.isCreative()||victim.isSpectator())return false;
@@ -327,20 +361,39 @@ public final class MilitaryVehicle extends Entity {
                     ||level() instanceof net.minecraft.server.level.ServerLevel server&&!server.getServer().isPvpAllowed()))return false;
         }
         mechanicalHealth = Math.max(0, mechanicalHealth-amount); markHurt(); lastHurt=level().getGameTime();
-        hitFeedback(source);
+        hitFeedback(source,amount,contact,incoming,kind);
         if (mechanicalHealth == 0) destroyOnce(); else syncVehicleState();
         return true;
     }
     private long lastHurt=-100;
-    /** Client flash window; the hull flashes like a hurt mob for 8 ticks. */
+    /** Legacy receipt window retained for integrations; the hull renderer uses metallic contact feedback. */
     public boolean hurtFlash(float partial){return level().getGameTime()+partial-entityData.get(STATE).getLong("HurtAt")<8;}
-    private void hitFeedback(DamageSource source){
+    private void hitFeedback(DamageSource source,float amount,Vec3 contact,Vec3 incoming,VehicleFeedbackMotion.Impact kind){
         if(!(level() instanceof net.minecraft.server.level.ServerLevel server))return;
-        var c=getBoundingBox().getCenter();
-        server.playSound(null,c.x,c.y,c.z,net.minecraft.sounds.SoundEvents.ANVIL_LAND,net.minecraft.sounds.SoundSource.HOSTILE,.55F,.7F+random.nextFloat()*.3F);
-        var at=source.getEntity()!=null?source.getEntity().getEyePosition():c;var hit=getBoundingBox().getCenter().lerp(at,.35);
-        server.sendParticles(net.minecraft.core.particles.ParticleTypes.CRIT,hit.x,hit.y,hit.z,10,.3,.3,.3,.25);
-        server.sendParticles(net.minecraft.core.particles.ParticleTypes.SMOKE,hit.x,hit.y,hit.z,4,.2,.2,.2,.02);
+        var direct=source.getDirectEntity();var from=direct!=null&&direct!=source.getEntity()?direct.position():source.getSourcePosition();
+        if(from==null||!Double.isFinite(from.lengthSqr()))from=position().add(0,definition.height()+1,0);
+        if(contact==null||!Double.isFinite(contact.lengthSqr())||contact.distanceToSqr(position())>1024){
+            var p=VehicleHullShape.from(definition,turretYaw,gunPitch).closestPoint(new VehicleDefinition.Vec3(getX(),getY(),getZ()),getYRot(),new VehicleDefinition.Vec3(from.x,from.y,from.z));
+            contact=new Vec3(p.x(),p.y(),p.z());
+        }
+        if(incoming==null||!Double.isFinite(incoming.lengthSqr())||incoming.lengthSqr()<1e-8)incoming=contact.subtract(from);
+        if(incoming.lengthSqr()<1e-8&&direct!=null)incoming=direct.getDeltaMovement();
+        if(incoming.lengthSqr()<1e-8)incoming=position().add(0,definition.height()*.5,0).subtract(contact);
+        incoming=incoming.normalize();
+        if(source.getEntity() instanceof Player&&kind==VehicleFeedbackMotion.Impact.HEAVY){
+            Vec3 p=contact.subtract(position()).yRot((float)Math.toRadians(-getYRot()));
+            Vec3 push=incoming.yRot((float)Math.toRadians(-getYRot()));
+            dents=VehicleDeformation.add(dents,VehicleDeformation.contact(chassisId(),p,push,turretYaw,gunPitch,amount,maxHealth()));
+        }
+        double strength=VehicleFeedbackMotion.strength(amount,maxHealth(),kind);
+        // A grazing bullet cannot erase the heavy impulse that just rocked this hull.
+        if(level().getGameTime()-impactAt>=5||strength>=impactStrength*.55){
+            impactAt=level().getGameTime();impactStrength=(float)strength;
+            impactPush=incoming.yRot((float)Math.toRadians(-getYRot()));impactPoint=contact;
+            var local=contact.subtract(position()).yRot((float)Math.toRadians(-getYRot()));
+            impactLever=new Vec3(local.x/(definition.width()*.5),0,local.z/(definition.length()*.5));
+        }
+        com.codex.blacklight.firearms.GunplayEffects.vehicleImpact(this,contact,incoming.scale(-1),(float)strength,kind==VehicleFeedbackMotion.Impact.BULLET);
         if(source.getEntity() instanceof net.minecraft.server.level.ServerPlayer player)
             player.displayClientMessage(net.minecraft.network.chat.Component.translatable("message.blacklight.vehicle_hull",getDisplayName(),
                     (int)Math.ceil(mechanicalHealth),(int)maxHealth()),true);
@@ -376,6 +429,11 @@ public final class MilitaryVehicle extends Entity {
     public void syncVehicleState() {
         if (definition == null || level().isClientSide) return;
         var tag=new CompoundTag();tag.putLong("PrimaryShot",primaryShot);tag.putLong("SecondaryShot",secondaryShot);tag.putFloat("Health",mechanicalHealth);tag.putLong("HurtAt",lastHurt);tag.putFloat("TurretYaw",turretYaw);tag.putFloat("GunPitch",gunPitch);
+        tag.putString("ShotWeapon",lastPrimaryWeapon);tag.putLong("ImpactAt",impactAt);tag.putFloat("ImpactStrength",impactStrength);
+        tag.putFloat("ImpactX",(float)impactPush.x);tag.putFloat("ImpactY",(float)impactPush.y);tag.putFloat("ImpactZ",(float)impactPush.z);
+        tag.putFloat("ImpactLeverX",(float)impactLever.x);tag.putFloat("ImpactLeverZ",(float)impactLever.z);
+        tag.putDouble("ContactX",impactPoint.x);tag.putDouble("ContactY",impactPoint.y);tag.putDouble("ContactZ",impactPoint.z);
+        tag.put("Dents",VehicleDeformation.write(dents));
         tag.putString("SelectedPrimary",selectedPrimary);tag.putString("StopReason",stopReason.name());tag.put("Inventory",writeInventory());
         var occupants=new CompoundTag();seats.occupants().forEach(occupants::putUUID);tag.put("Seats",occupants);
         var tokens=new CompoundTag();leases.forEach((id,token)->tokens.putUUID(id.toString(),token));tag.put("Leases",tokens);entityData.set(STATE,tag);
@@ -393,6 +451,7 @@ public final class MilitaryVehicle extends Entity {
         return VehicleInventory.restore(definition,new VehicleInventory.Snapshot(tag.getInt("SchemaVersion"),tag.getString("VehicleId"),tag.getBoolean("InitialLoadoutIssued"),tag.getLong("FuelTicks"),ammo,cooldown));
     }
     @Override public void addAdditionalSaveData(CompoundTag tag) {
+        tag.put("VehicleDents",VehicleDeformation.write(dents));
         tag.putInt("VehicleSchemaVersion",1);tag.putString("VehicleChassis",chassisId());tag.putString("VehicleFaction",faction.id());tag.putFloat("VehicleHealth",mechanicalHealth);
         if(playerOwner!=null)tag.putUUID("VehiclePlayerOwner",playerOwner);
         tag.putFloat("VehicleTurretYaw",turretYaw);tag.putFloat("VehicleGunPitch",gunPitch);tag.putString("VehicleSelectedPrimary",selectedPrimary);tag.put("VehicleInventory",writeInventory());
@@ -407,6 +466,7 @@ public final class MilitaryVehicle extends Entity {
         }
         boolean valid=tag.getInt("VehicleSchemaVersion")==1 && chassisId().equals(tag.getString("VehicleChassis")) && faction.id().equals(tag.getString("VehicleFaction"));
         float hp=tag.getFloat("VehicleHealth");mechanicalHealth=valid && Float.isFinite(hp)?net.minecraft.util.Mth.clamp(hp,0,maxHealth()):0;
+        dents=valid?VehicleDeformation.read(chassisId(),tag.getList("VehicleDents",10)):List.of();
         try { inventory=valid?readInventory(tag.getCompound("VehicleInventory")):new VehicleInventory(definition); }
         catch (IllegalArgumentException failure) { inventory=new VehicleInventory(definition); }
         float yaw=tag.getFloat("VehicleTurretYaw"),pitch=tag.getFloat("VehicleGunPitch");turretYaw=Float.isFinite(yaw)?net.minecraft.util.Mth.wrapDegrees(yaw):0;gunPitch=Float.isFinite(pitch)?net.minecraft.util.Mth.clamp(pitch,-25,15):0;

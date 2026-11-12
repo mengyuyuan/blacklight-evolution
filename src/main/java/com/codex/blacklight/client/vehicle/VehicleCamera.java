@@ -70,6 +70,7 @@ public final class VehicleCamera {
         var pivot=clear(view.eye(),view.pivot(),hit);
         var position=view.enclosed()||type.isFirstPerson()?pivot:clear(pivot,view.position(),hit);
         place(camera,new View(view.eye(),pivot,position,view.yaw(),view.pitch(),view.enclosed()));
+        VehicleCombatVisuals.camera(camera,vehicle,partial);
         return true;
     }
     public static void place(Camera camera,View view) {
