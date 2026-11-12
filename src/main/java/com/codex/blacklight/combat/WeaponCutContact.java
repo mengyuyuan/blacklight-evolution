@@ -115,7 +115,11 @@ public final class WeaponCutContact {
             }
             frames.add(new Frame(alpha,List.copyOf(triangles)));
         }
-        return new Sweep(kind,List.copyOf(frames),player.level().getGameTime()-1);
+        // The receiver orders blade samples by absolute tick. A brand-new world reports
+        // game time 0, so "one tick ago" must never mint a negative sample time: a span at
+        // -1 reads as untimed while its neighbour at -0.5..0 reads as timed, and the
+        // payload's own consistency check then rejects the whole cut plane.
+        return new Sweep(kind,List.copyOf(frames),Math.max(0L,player.level().getGameTime()-1));
     }
     public static final class Sweep {
         private static final Sweep EMPTY=new Sweep(Kind.NONE,List.of(),0);

@@ -328,7 +328,7 @@ public final class WeaponCombatSystem {
             double release=definition.charge().orElseThrow().releaseTime();
             double from=com.codex.blacklight.animation.NativeRootMotion.weaponClock(t-1,s.clipOffset,definition.transitionSeconds())-release;
             double to=com.codex.blacklight.animation.NativeRootMotion.weaponClock(t,s.clipOffset,definition.transitionSeconds())-release;
-            com.codex.blacklight.animation.NativeRootMotion.bladeRush(p,s.direction,CombatMotion.bladeRushStep(s.chargePower,from,to));
+            com.codex.blacklight.animation.NativeRootMotion.bladeRush(p,s.direction,CombatMotion.bladeRushStep(s.chargePower,from,to),s.target);
         }
         if(s.move==WeaponMove.CLAW_POUNCE){
             tickPounce(p,s,t);t=p.tickCount-s.started;
@@ -724,8 +724,11 @@ public final class WeaponCombatSystem {
             if(contact.lethal())for(var blade:contact.blades().entrySet()){
                 if(newBlades.contains(blade.getKey()))continue;
                 var old=blade.getValue();var path=new ArrayList<>(old.path());
+                // One ribbon must stay on one monotonic clock: a repeated receiver frame
+                // (stalled world clock, or a second sweep inside the same game tick) would
+                // otherwise append an older sample and the payload rejects the whole plane.
                 for(var span:cutting.path(blade.getKey(),victim,previous)){
-                    if(!path.isEmpty()&&path.getLast().near(span))continue;
+                    if(!path.isEmpty()&&(path.getLast().near(span)||span.time()<path.getLast().time()))continue;
                     path.add(span);
                 }
                 while(path.size()>RagdollImpactPayload.MAX_BLADE_SPANS)for(int i=path.size()-2;i>0;i-=2)path.remove(i);

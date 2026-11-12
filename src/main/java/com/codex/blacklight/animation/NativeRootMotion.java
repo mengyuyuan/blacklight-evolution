@@ -88,9 +88,21 @@ public final class NativeRootMotion {
      * A velocity packet lets client frame/packet timing move this attack an extra
      * tick, changing which tissue the otherwise identical ribbon intersects. */
     public static void bladeRush(ServerPlayer player,Vec3 direction,double distance) {
+        bladeRush(player,direction,distance,null);
+    }
+
+    /** A committed rush closes the gap to its own receiver and stops at blade spacing;
+     * it never phases the actor through a living body it is about to cut. */
+    public static void bladeRush(ServerPlayer player,Vec3 direction,double distance,LivingEntity target) {
         player.setDeltaMovement(0,player.getDeltaMovement().y,0);
         player.hurtMarked=true;
-        apply(player,direction.scale(distance));
+        var step=direction.scale(distance);
+        if (target!=null && target.isAlive() && target.level()==player.level()) {
+            var delta=target.position().subtract(player.position()).multiply(1,0,1);
+            double spacing=Math.max(.8,(player.getBbWidth()+target.getBbWidth())*.5+.15);
+            step=standOff(step,delta,Math.max(0,delta.length()-spacing));
+        }
+        apply(player,step);
     }
 
     public static void claw(ServerPlayer player, ClawCombatState combat) {

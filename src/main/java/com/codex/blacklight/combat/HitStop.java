@@ -24,7 +24,11 @@ public final class HitStop {
         // A later hit during the hold keeps the newer launch, never stacks the freeze.
         int until = Math.max(previous == null ? 0 : previous.until(), v.tickCount + ticks);
         HELD.put(v, new Hold(v.getDeltaMovement(), Math.min(until, v.tickCount + 8)));
-        v.setDeltaMovement(Vec3.ZERO);
+        // The hold owns the whole body from the next entity tick on; it must not erase the
+        // contact frame's own impulse here. Zeroing eagerly hid every launch from anything
+        // that reads the victim in the same tick (observers, follow-up rules, tests) even
+        // though the hold had already stored the exact velocity to restore. The entity-tick
+        // handler below still pins the body every held tick, so no motion leaks out.
         v.hurtMarked = true;
     }
 
