@@ -45,7 +45,7 @@ public final class EvolvedVariantsGameTest {
         }h.succeed();
     }
     private static void attack(GameTestHelper h,EvolvedArchetype type,double distance){
-        var body=host(h,type);var target=enemy(h,body,distance);var seen=new java.util.concurrent.atomic.AtomicBoolean();var connected=new java.util.concurrent.atomic.AtomicBoolean();float[] health={target.getHealth()};body.setNoAi(false);body.setTarget(target);double initial=body.getZ();int budget=type==EvolvedArchetype.SENSORY?330:170;var first=new java.util.concurrent.atomic.AtomicInteger(-1);
+        var body=host(h,type);var target=enemy(h,body,distance);var seen=new java.util.concurrent.atomic.AtomicBoolean();var connected=new java.util.concurrent.atomic.AtomicBoolean();float[] health={target.getHealth()};body.setNoAi(false);body.setTarget(target);double initial=body.getZ();int budget=170;var first=new java.util.concurrent.atomic.AtomicInteger(-1);
         for(int i=1;i<budget;i++){final int observedTick=i;h.runAfterDelay(i,()->{if(body.evolvedAction().equals(EvolvedSpecialMove.of(type).key)){first.compareAndSet(-1,observedTick);seen.set(true);if(target.getHealth()<health[0])connected.set(true);}health[0]=target.getHealth();});}
         h.runAfterDelay(budget+5,()->{try{com.codex.blacklight.BlacklightNeoMod.LOGGER.info("Evolved special fixture {}: firstSpecial={}, connected={}, targetHealth={}",type,first.get(),connected.get(),target.getHealth());h.assertTrue(seen.get(),"actual AI started its own specialized windup: "+type+" last="+body.evolvedAction());h.assertTrue(connected.get(),"damage was accepted during the actual special, not only by a later generic swing: "+type);if(type==EvolvedArchetype.PREDATOR||type==EvolvedArchetype.SKIRMISHER)h.assertTrue(body.getZ()>initial+.5,"collision-based advance, not stationary attacking: "+type);}finally{body.discard();target.discard();}h.succeed();});
     }
@@ -53,7 +53,42 @@ public final class EvolvedVariantsGameTest {
     @GameTest(template="wall_test",timeoutTicks=210,batch="variant_armor") public static void shieldAiUsesItsOwnBash(GameTestHelper h){attack(h,EvolvedArchetype.ARMORED,2.4);}
     @GameTest(template="wall_test",timeoutTicks=210,batch="variant_predator") public static void predatorAiActuallyPouncesIntoContact(GameTestHelper h){attack(h,EvolvedArchetype.PREDATOR,5);}
     @GameTest(template="wall_test",timeoutTicks=210,batch="variant_mobility") public static void mobileAiActuallyDashesIntoContact(GameTestHelper h){attack(h,EvolvedArchetype.SKIRMISHER,6);}
-    @GameTest(template="wall_test",timeoutTicks=380,batch="variant_quill") public static void rangedAiFiresRealCollidingProjectiles(GameTestHelper h){attack(h,EvolvedArchetype.SENSORY,12);}
+    @GameTest(template="wall_test",timeoutTicks=180,batch="variant_quill")
+    public static void rangedAiFiresRealCollidingProjectiles(GameTestHelper h){
+        var body=host(h,EvolvedArchetype.SENSORY);
+        var target=enemy(h,body,12);
+        // Exercise the attack AI against this target even when another suite has living mobs nearby.
+        body.targetSelector.removeAllGoals(goal->true);
+        body.setTarget(target);
+        body.setNoAi(false);
+        var volley=new java.util.concurrent.atomic.AtomicBoolean();
+        var emitted=new java.util.concurrent.atomic.AtomicBoolean();
+        var hit=new java.util.concurrent.atomic.AtomicBoolean();
+        float[] previousHealth={target.getHealth()};
+        h.onEachTick(()->{
+            if(body.evolvedAction().equals(EvolvedSpecialMove.VOLLEY.key)&&body.evolvedSpecialTarget()==target.getId())
+                volley.set(true);
+            if(!emitted.get()&&!h.getLevel().getEntitiesOfClass(EvolvedQuill.class,
+                    body.getBoundingBox().inflate(24),quill->quill.getOwner()==body).isEmpty())
+                emitted.set(true);
+            var source=target.getLastDamageSource();
+            float health=target.getHealth();
+            if(health<previousHealth[0]&&source!=null&&source.getDirectEntity() instanceof EvolvedQuill&&source.getEntity()==body)
+                hit.set(true);
+            previousHealth[0]=health;
+        });
+        h.runAfterDelay(141,()->{
+            try{
+                h.assertTrue(volley.get(),"the sensory AI committed a volley against the assigned target");
+                h.assertTrue(emitted.get(),"the caster emitted a physical quill");
+                h.assertTrue(hit.get(),"a quill fired by this caster damaged the assigned target");
+            }finally{
+                body.discard();
+                target.discard();
+            }
+            h.succeed();
+        });
+    }
     @GameTest(template="wall_test",timeoutTicks=180,batch="variant_tendril")
     public static void lashActuallyPullsAndALaterWallStopsContact(GameTestHelper h){
         var body=host(h,EvolvedArchetype.TENDRIL);var target=enemy(h,body,8);target.setNoAi(false);target.goalSelector.removeAllGoals(g->true);target.targetSelector.removeAllGoals(g->true);body.setNoAi(false);body.setTarget(target);double start=target.getZ();var actions=new java.util.ArrayList<String>();

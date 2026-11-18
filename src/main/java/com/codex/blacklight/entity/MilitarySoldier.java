@@ -33,6 +33,12 @@ public abstract class MilitarySoldier extends Monster {
     public long radioStarted(){return entityData.get(RADIO_STARTED);}
     public void beginRadio(){entityData.set(RADIO_STARTED,level().getGameTime());entityData.set(PHASE,6);}
     public void cancelRadio(){entityData.set(RADIO_STARTED,-1L);}
+    @Override public void setTarget(@javax.annotation.Nullable LivingEntity target) {
+        var previous = getTarget();
+        super.setTarget(target);
+        // Target-change listeners can veto or replace the requested contact.
+        if (!level().isClientSide && previous != getTarget() && radioStarted() >= 0) cancelRadio();
+    }
     private static final EntityDataAccessor<Long> HIT_STARTED=SynchedEntityData.defineId(MilitarySoldier.class,EntityDataSerializers.LONG);
     public long hitStarted(){return entityData.get(HIT_STARTED);}
     @Override public boolean hurt(net.minecraft.world.damagesource.DamageSource source,float amount){boolean hit=super.hurt(source,amount);if(hit){com.codex.blacklight.military.MilitaryTactics.hurt(this);if(!level().isClientSide&&isAlive()&&amount>0)entityData.set(HIT_STARTED,level().getGameTime());}return hit;}
@@ -311,6 +317,7 @@ public abstract class MilitarySoldier extends Monster {
     }
     @Override public void readAdditionalSaveData(CompoundTag tag) {
         if(fireTeamGoal!=null)fireTeamGoal.interrupt();
+        cancelRadio();
         cover.clear();entityData.set(HIT_STARTED,-1L);
         super.readAdditionalSaveData(tag);
         // Vanilla bare /summon calls load before finalizeSpawn; only persisted equipment closes new issue.

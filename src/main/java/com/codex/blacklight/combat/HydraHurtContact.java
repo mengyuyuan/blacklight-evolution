@@ -33,10 +33,22 @@ public final class HydraHurtContact {
             to=from.add(travel).add(travel.normalize().scale(.05));
         }else{
             from=direct!=null?direct.getEyePosition():source.getSourcePosition();if(from==null)from=region.bounds().getCenter();
-            to=region.bounds().getCenter();
+            to=null; // Vanilla mob damage supplies a selected part, without a weapon ray.
         }
-        final Vec3 start=from;Vec3 point=region.boxes().stream().map(b->b.clip(start,to)).flatMap(Optional::stream).min(Comparator.comparingDouble(start::distanceToSqr)).orElse(null);
-        if(point==null||!clear(hydra,from,point))return null;
+        final Vec3 start=from;
+        Vec3 point;
+        if(to==null){
+            // The union of articulated cubes can have an empty centre. Use a visible
+            // surface of the selected part when the caller did not supply a ray.
+            point=region.boxes().stream().map(box->box.nearest(start))
+                    .sorted(Comparator.comparingDouble(start::distanceToSqr))
+                    .filter(candidate->clear(hydra,start,candidate)).findFirst().orElse(null);
+        }else{
+            point=region.boxes().stream().map(box->box.clip(start,to)).flatMap(Optional::stream)
+                    .min(Comparator.comparingDouble(start::distanceToSqr)).orElse(null);
+            if(point!=null&&!clear(hydra,start,point))return null;
+        }
+        if(point==null)return null;
         var normal=from.subtract(point).normalize();if(normal.lengthSqr()<.01)normal=new Vec3(0,1,0);
         InfectedAttackStyle style=direct instanceof Projectile?InfectedAttackStyle.PIERCE:direct instanceof Mob mob?InfectedAttackStyle.of(mob,source):InfectedAttackStyle.CRUSH;
         if(direct instanceof LivingEntity living&&(living.getMainHandItem().is(net.minecraft.tags.ItemTags.SWORDS)||living.getMainHandItem().is(net.minecraft.tags.ItemTags.AXES)))style=InfectedAttackStyle.TEAR;
