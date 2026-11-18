@@ -1,73 +1,175 @@
 package com.codex.blacklight.city;
 
+import com.codex.blacklight.config.GameplayBalanceConfig;
+import com.codex.blacklight.infection.OutbreakConfig;
+import com.codex.blacklight.infection.OutbreakData;
 import com.mojang.authlib.GameProfile;
+import net.minecraft.core.BlockPos;
 import net.minecraft.gametest.framework.*;
-import net.minecraft.resources.*;
-import net.minecraft.core.registries.Registries;
-import net.minecraft.world.entity.*;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.Difficulty;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.Mob;
+import net.minecraft.world.level.ChunkPos;
+import net.minecraft.world.level.GameRules;
+import net.minecraft.world.level.GameType;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.AABB;
+import net.neoforged.neoforge.common.util.FakePlayer;
 import net.neoforged.neoforge.common.util.FakePlayerFactory;
 import net.neoforged.neoforge.gametest.*;
+
+import java.util.*;
 
 @GameTestHolder("blacklight") @PrefixGameTestTemplate(false)
 public class HiveLifecycleGameTest {
     @GameTest(template="wall_test",timeoutTicks=500,batch="city_hive_mutation")
     public static void sevenPortsStopProductionAndSpread(GameTestHelper h){
-        var key=CityTravel.WORLD;
-        var level=h.getLevel().getServer().getLevel(key);
-        var storage=level.getServer().overworld().getDataStorage();
-        var original=com.codex.blacklight.infection.OutbreakData.get(level.getServer());
-        var outbreak=new com.codex.blacklight.infection.OutbreakData();outbreak.start(level.getServer().overworld().getGameTime());storage.set("blacklight_outbreak",outbreak);
-        var spawnRule=level.getGameRules().getRule(net.minecraft.world.level.GameRules.RULE_DOMOBSPAWNING);
-        boolean oldSpawning=spawnRule.get(),oldPopulation=CityConfig.SPAWNS.get();var oldDifficulty=level.getServer().getWorldData().getDifficulty();
-        spawnRule.set(true,level.getServer());CityConfig.SPAWNS.set(true);level.getServer().setDifficulty(net.minecraft.world.Difficulty.NORMAL,true);
-        var oldCity=CityData.get(level);var data=new CityData();level.getDataStorage().set("blacklight_city",data);data.population=true;data.facade=false;data.spread=false;data.populatedMask=-1;
-        data.destroyedMask=0;java.util.Arrays.fill(data.brokenPorts,0);
-        var forced=new java.util.HashSet<net.minecraft.world.level.ChunkPos>();
-        for(int hive=0;hive<2;hive++)for(int i=0;i<7;i++){
-            var p=CitySystem.port(level,hive,i);var cp=new net.minecraft.world.level.ChunkPos(p);
-            level.getChunkAt(p);level.setBlock(p,FutianLayout.state(level.getSeed(),p.getX(),p.getY(),p.getZ()),3);
-            for(int dx=-1;dx<=1;dx++)for(int dz=-1;dz<=1;dz++)forced.add(new net.minecraft.world.level.ChunkPos(cp.x+dx,cp.z+dz));
-        }
-        for(var cp:forced)level.setChunkForced(cp.x,cp.z,true);
-        var player=FakePlayerFactory.get(level,new GameProfile(java.util.UUID.fromString("cc9c8931-40de-4b8d-a393-260990a3afef"),"CityHiveTest"));
-        var port=CitySystem.port(level,0,0);player.setPos(port.getX()+.5,65,port.getZ()+.5);level.addNewPlayer(player);
-        h.runAfterDelay(100,()->{
-            try {
-            long before=mobs(level);
-            // This lifecycle fixture isolates destruction with finite, already digested food.
-            // Survival-slot consumption and real digestion are checked by CityHiveSupplyGameTest.
-            data.hiveSupply[0].receive(64);data.hiveBroodTicks[0]=200;
-            CitySystem.updateLoadedCity(level,200);
-            h.assertTrue(mobs(level)>before,"live hive did not produce a mob in loaded chunks after outbreak release with spawning enabled");
-            for(int i=0;i<6;i++)level.destroyBlock(CitySystem.port(level,0,i),false);
-            CitySystem.updateLoadedCity(level,220);
-            h.assertTrue(!data.destroyed(0),"hive died before seventh port");
-            level.destroyBlock(CitySystem.port(level,0,6),false);
-            CitySystem.updateLoadedCity(level,240);
-            h.assertTrue(data.destroyed(0)&&data.brokenPorts[0]==127,"seventh port did not deactivate hive");
-            long alive=mobs(level);
-            for(int i=0;i<7;i++)level.destroyBlock(CitySystem.port(level,1,i),false);
-            data.spread=true;data.nextSpread=0;long infection=data.infectedMask;
-            CitySystem.updateLoadedCity(level,400);CitySystem.updateLoadedCity(level,600);
-            h.assertTrue(data.destroyedMask==3&&data.infectedMask==infection,"destroyed hives continued expanding");
-            h.assertTrue(mobs(level)==alive,"destroyed hives produced mobs or removed existing survivors");
-            } finally {
-            level.removePlayerImmediately(player,Entity.RemovalReason.DISCARDED);
-            for(var cp:forced)level.setChunkForced(cp.x,cp.z,false);
-            // Restore the generated ports so a repeated suite does not inherit our destruction.
-            for(int hive=0;hive<2;hive++)for(int i=0;i<7;i++){
-                var pos=CitySystem.port(level,hive,i);
-                level.setBlock(pos,FutianLayout.state(level.getSeed(),pos.getX(),pos.getY(),pos.getZ()),3);
+        var f=new Fixture(h);
+        h.startSequence().thenWaitUntil(()->{
+            for(var p:f.ports.keySet())
+                h.assertTrue(f.level.isPositionEntityTicking(p),"waiting for generated hive port to tick at "+p);
+        }).thenExecute(()->{
+            f.level.getAllEntities().forEach(e->{if(e instanceof Mob)f.originalMobs.add(e.getUUID());});
+            f.data.hiveSupply[0].receive(128);
+            f.data.hiveBroodTicks[0]=CityConfig.HIVE_BROOD_INTERVAL.get();
+        }).thenWaitUntil(()->{
+            h.assertTrue(f.data.hiveSustained[0]&&f.data.hiveBroodTicks[0]==0,
+                    "waiting for a real city tick to reject the ready brood at zero chance");
+        }).thenExecute(()->{
+            h.assertTrue(f.data.hiveBirths[0]==0&&f.data.hiveSupply[0].reserve()==128,
+                    "rejected brood recorded a birth or spent its material");
+            GameplayBalanceConfig.BROOD_CHANCE.set(1d);
+            f.data.hiveBroodTicks[0]=CityConfig.HIVE_BROOD_INTERVAL.get();
+        }).thenWaitUntil(()->{
+            h.assertTrue(f.data.hiveBirths[0]>0,"funded live hive did not publish a birth on a city tick");
+        }).thenExecute(()->{
+            h.assertTrue(f.data.hiveBirths[0]==1&&f.data.hiveBirths[1]==0&&f.data.hiveSupply[0].reserve()<128,
+                    "the emitting hive must pay for and count exactly one child");
+            for(int i=0;i<7;i++){
+                var port=CitySystem.port(f.level,0,i);
+                var state=f.level.getBlockState(port);
+                if(!state.getValue(CityHatchBlock.OPEN))continue;
+                var outside=port.relative(state.getValue(CityHatchBlock.FACING),3).below();
+                var children=f.level.getEntitiesOfClass(Mob.class,new AABB(outside).inflate(2),
+                        mob->mob.isAlive()&&mob.getTags().contains("BlacklightCityPopulation")&&!f.originalMobs.contains(mob.getUUID()));
+                h.assertTrue(children.size()==1,"expected one new city mob at the emitting hatch "+port);
+                f.child=children.get(0);
             }
-            data.destroyedMask=0;java.util.Arrays.fill(data.brokenPorts,0);data.population=false;data.spread=false;data.setDirty();
-            level.getDataStorage().set("blacklight_city",oldCity);
-            storage.set("blacklight_outbreak",original);
-            spawnRule.set(oldSpawning,level.getServer());CityConfig.SPAWNS.set(oldPopulation);level.getServer().setDifficulty(oldDifficulty,true);
+            h.assertTrue(f.child!=null,"paid birth did not open its hatch with a live child outside");
+            for(int i=0;i<6;i++)f.level.destroyBlock(CitySystem.port(f.level,0,i),false);
+        }).thenWaitUntil(()->{
+            h.assertTrue(f.data.brokenPorts[0]==63,"waiting for six broken ports to be recorded");
+        }).thenExecute(()->{
+            h.assertTrue(!f.data.destroyed(0),"hive died before the seventh port");
+            f.level.destroyBlock(CitySystem.port(f.level,0,6),false);
+            for(int i=0;i<7;i++)f.level.destroyBlock(CitySystem.port(f.level,1,i),false);
+            for(int hive=0;hive<2;hive++){
+                f.data.hiveSupply[hive].receive(128);
+                f.data.hiveBroodTicks[hive]=CityConfig.HIVE_BROOD_INTERVAL.get();
             }
-            h.succeed();
-        });
+            f.infectedAtDestruction=f.data.infectedMask;
+            f.data.spread=true;
+            f.data.nextSpread=0;
+        }).thenWaitUntil(()->{
+            h.assertTrue(f.data.nextSpread>f.level.getGameTime(),"waiting for the real spread scheduler after destruction");
+        }).thenExecute(()->{
+            h.assertTrue(f.data.destroyedMask==3&&f.data.brokenPorts[0]==127&&f.data.brokenPorts[1]==127,
+                    "both hives must deactivate when their seventh port breaks");
+            h.assertTrue(f.child.isAlive()&&f.level.getEntity(f.child.getUUID())==f.child,"destroying its hive removed the existing child");
+        }).thenIdle(40).thenExecute(()->{
+            h.assertTrue(f.data.infectedMask==f.infectedAtDestruction,"destroyed hives continued spreading");
+            h.assertTrue(f.data.hiveBirths[0]==1&&f.data.hiveBirths[1]==0,"destroyed hives produced another brood");
+        }).thenSucceed();
     }
-    private static long mobs(net.minecraft.server.level.ServerLevel level){
-        long count=0;for(var e:level.getAllEntities())if(e instanceof Mob&&e.isAlive())count++;return count;
+
+    private static final class Fixture {
+        final ServerLevel level;
+        final FakePlayer observer;
+        final Map<BlockPos,BlockState> ports=new LinkedHashMap<>();
+        final Set<ChunkPos> forced=new LinkedHashSet<>();
+        final Set<UUID> originalMobs=new HashSet<>();
+        final CityData oldCity,data=new CityData();
+        final OutbreakData oldOutbreak;
+        final CityEcologyData oldEcology;
+        final MilitaryCampaignData oldCampaign;
+        final Difficulty difficulty;
+        final boolean spawnRule,griefRule,outbreakEnabled,spawnsEnabled,spreadEnabled;
+        final double broodChance;
+        long infectedAtDestruction;
+        Mob child;
+
+        Fixture(GameTestHelper h){
+            level=h.getLevel().getServer().getLevel(CityTravel.WORLD);
+            var server=level.getServer();
+            oldCity=CityData.get(level);
+            oldOutbreak=OutbreakData.get(server);
+            oldEcology=CityEcologyData.get(level);
+            oldCampaign=MilitaryCampaignData.get(level);
+            difficulty=level.getDifficulty();
+            spawnRule=level.getGameRules().getBoolean(GameRules.RULE_DOMOBSPAWNING);
+            griefRule=level.getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING);
+            outbreakEnabled=OutbreakConfig.ENABLED.get();
+            spawnsEnabled=CityConfig.SPAWNS.get();
+            spreadEnabled=CityConfig.SPREAD.get();
+            broodChance=GameplayBalanceConfig.BROOD_CHANCE.get();
+            observer=FakePlayerFactory.get(level,new GameProfile(UUID.randomUUID(),"CityHiveTest"));
+
+            h.testInfo.addListener(new GameTestListener(){
+                public void testStructureLoaded(GameTestInfo info){}
+                public void testPassed(GameTestInfo info,GameTestRunner runner){close();}
+                public void testFailed(GameTestInfo info,GameTestRunner runner){close();}
+                public void testAddedForRerun(GameTestInfo original,GameTestInfo retry,GameTestRunner runner){}
+            });
+            var active=new OutbreakData();
+            active.start(server.overworld().getGameTime());
+            server.overworld().getDataStorage().set("blacklight_outbreak",active);
+            data.facade=false;
+            data.spread=false;
+            data.populatedMask=-1;
+            level.getDataStorage().set("blacklight_city",data);
+            level.getDataStorage().set("blacklight_city_ecology",new CityEcologyData());
+            level.getDataStorage().set("blacklight_military_campaign",new MilitaryCampaignData());
+            OutbreakConfig.ENABLED.set(true);
+            CityConfig.SPAWNS.set(true);
+            CityConfig.SPREAD.set(true);
+            GameplayBalanceConfig.BROOD_CHANCE.set(0d);
+            level.getGameRules().getRule(GameRules.RULE_DOMOBSPAWNING).set(true,server);
+            level.getGameRules().getRule(GameRules.RULE_MOBGRIEFING).set(true,server);
+            server.setDifficulty(Difficulty.NORMAL,true);
+            for(int hive=0;hive<2;hive++)for(int i=0;i<7;i++){
+                var p=CitySystem.port(level,hive,i);
+                var cp=new ChunkPos(p);
+                for(int dx=-1;dx<=1;dx++)for(int dz=-1;dz<=1;dz++){
+                    var neighbor=new ChunkPos(cp.x+dx,cp.z+dz);
+                    if(level.setChunkForced(neighbor.x,neighbor.z,true))forced.add(neighbor);
+                }
+                ports.put(p,level.getBlockState(p));
+                level.setBlock(p,FutianLayout.state(level.getSeed(),p.getX(),p.getY(),p.getZ()),3);
+            }
+            var port=CitySystem.port(level,0,0);
+            // Nearby creative players count for ordinary ambient retention without provoking the brood.
+            observer.setGameMode(GameType.CREATIVE);
+            observer.setPos(port.getX()+.5,70,port.getZ()+.5);
+            level.addNewPlayer(observer);
+        }
+        void close(){
+            var server=level.getServer();
+            if(child!=null)child.discard();
+            level.removePlayerImmediately(observer,Entity.RemovalReason.DISCARDED);
+            ports.forEach((p,state)->level.setBlock(p,state,3));
+            for(var cp:forced)level.setChunkForced(cp.x,cp.z,false);
+            level.getDataStorage().set("blacklight_city",oldCity);
+            level.getDataStorage().set("blacklight_city_ecology",oldEcology);
+            level.getDataStorage().set("blacklight_military_campaign",oldCampaign);
+            server.overworld().getDataStorage().set("blacklight_outbreak",oldOutbreak);
+            GameplayBalanceConfig.BROOD_CHANCE.set(broodChance);
+            OutbreakConfig.ENABLED.set(outbreakEnabled);
+            CityConfig.SPAWNS.set(spawnsEnabled);
+            CityConfig.SPREAD.set(spreadEnabled);
+            level.getGameRules().getRule(GameRules.RULE_DOMOBSPAWNING).set(spawnRule,server);
+            level.getGameRules().getRule(GameRules.RULE_MOBGRIEFING).set(griefRule,server);
+            server.setDifficulty(difficulty,true);
+        }
     }
 }
