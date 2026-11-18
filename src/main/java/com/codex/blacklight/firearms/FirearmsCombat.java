@@ -17,12 +17,15 @@ public final class FirearmsCombat {
                     ||!com.codex.blacklight.combat.CombatTargeting.multipart(target));
     }
     public static EntityHitResult firstBulletBody(ServerLevel level,LivingEntity owner,Vec3 from,Vec3 to){
+        return firstBulletBody(level,owner,owner,from,to,e->true);
+    }
+    public static EntityHitResult firstBulletBody(ServerLevel level,LivingEntity owner,Entity emitter,Vec3 from,Vec3 to,java.util.function.Predicate<Entity> allowed){
         var query=new AABB(from,to).inflate(.3);
-        var nearest=ProjectileUtil.getEntityHitResult(level,owner,from,to,query,
-                e->!(e instanceof com.codex.blacklight.entity.BlackwatchHelicopter)&&bulletCandidate(owner,e));
+        var nearest=ProjectileUtil.getEntityHitResult(level,emitter,from,to,query,
+                e->!(e instanceof com.codex.blacklight.entity.BlackwatchHelicopter)&&allowed.test(e)&&bulletCandidate(owner,e));
         double distance=nearest==null?Double.POSITIVE_INFINITY:from.distanceToSqr(nearest.getLocation());
         for(var craft:level.getEntitiesOfClass(com.codex.blacklight.entity.BlackwatchHelicopter.class,query,
-                c->c!=owner.getRootVehicle()&&bulletCandidate(owner,c))){
+                c->c!=owner.getRootVehicle()&&allowed.test(c)&&bulletCandidate(owner,c))){
             var point=com.codex.blacklight.military.aircraft.HelicopterSkinContact.raycast(craft,from,to);
             if(point.isPresent()&&from.distanceToSqr(point.get())<distance){
                 nearest=new EntityHitResult(craft,point.get());

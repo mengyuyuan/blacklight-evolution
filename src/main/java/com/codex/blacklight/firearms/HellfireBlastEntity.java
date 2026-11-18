@@ -75,7 +75,10 @@ public final class HellfireBlastEntity extends Entity {
         for(var target:CombatTargeting.candidates(this,area,LivingEntity::isAlive)){
             if(wave.contacted(target.getUUID())||!VehicleOrdnanceProjectile.allowedLiving(level,owner,target))continue;
             var surface=OrdnanceBodyContact.nearest(target,position(),point->exposed(level,point,radius));if(surface==null)continue;
-            if(wave.contact(target.getUUID()))surface.hurt(damageSources().explosion(this,owner),damage);
+            if(wave.contact(target.getUUID())&&surface.hurt(damageSources().explosion(this,owner),damage)){
+                double weight=Math.max(.25,1-position().distanceTo(surface.point())/radius);
+                VehicleOrdnanceProjectile.impactImpulse(target,target.getBoundingBox().getCenter().subtract(position()),1.15*weight);
+            }
         }
     }
     @Override protected void addAdditionalSaveData(CompoundTag tag){if(ownerId!=null)tag.putUUID("BlastOwner",ownerId);if(wave!=null)tag.put("BlastWave",wave.save());tag.putLong("BlastLastTick",lastTick);}

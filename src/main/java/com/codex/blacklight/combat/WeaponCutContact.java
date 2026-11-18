@@ -177,7 +177,7 @@ public final class WeaponCutContact {
             }
             return null;
         }
-        Vec3 aircraftContact(ServerPlayer actor,List<HydraContact.Box> skin,double lashRadius){
+        Vec3 hullContact(ServerPlayer actor,List<HydraContact.Box> skin,double lashRadius){
             for(var frame:frames){
                 for(int i=1;i<frame.lash.size();i++){
                     var from=frame.lash.get(i-1);

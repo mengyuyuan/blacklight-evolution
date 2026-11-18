@@ -156,20 +156,25 @@ public final class HelicopterCombat {
         boolean switching=(input.actions()&VehicleControlAuthority.NEXT_AMMUNITION)!=0;
         if(!player.getUUID().equals(manualOperator)){manualOperator=player.getUUID();switchHeld=false;}
         if(switching&&!switchHeld)rapidSelected=!rapidSelected;switchHeld=switching;
-        if(!input.brake())craft.aimWeapon(craft.weaponPoint(HelicopterArmament.GUN).add(Vec3.directionFromRotation((float)input.aimPitch(),(float)input.aimYaw()).scale(weaponRange())));
-        if(input.primaryFire()&&rounds>0&&gunWait==0&&manualFire(player,false)){rounds--;gunWait=4;recordShot(false);}
+        var pivot=craft.weaponPoint(HelicopterArmament.GUN);
+        var freeAim=pivot.add(Vec3.directionFromRotation((float)input.aimPitch(),(float)input.aimYaw()).scale(weaponRange()));
+        var selection=input.brake()?null:CombatTargeting.lockedSelection(player);
+        var aim=HelicopterManualAim.resolve(player,craft,selection,freeAim,weaponRange());
+        if(!input.brake())craft.aimWeapon(aim.point(),true);
+        var lock=aim.locked()?selection:null;
+        if(input.primaryFire()&&rounds>0&&gunWait==0&&manualFire(player,false,lock,aim.point())){rounds--;gunWait=4;recordShot(false);}
         if(input.secondaryFire()){
-            if(rapidSelected){int side=rapid.readySide();if(side!=0&&manualRapid(player,input,side))rapid.fired(side);}
-            else if(rockets>0&&rocketWait==0&&manualFire(player,true)){rockets--;rocketWait=60;recordShot(true);}
+            if(rapidSelected){int side=rapid.readySide();if(side!=0&&manualRapid(player,aim,side))rapid.fired(side);}
+            else if(rockets>0&&rocketWait==0&&manualFire(player,true,lock,aim.point())){rockets--;rocketWait=60;recordShot(true);}
         }
     }
-    private boolean manualRapid(net.minecraft.server.level.ServerPlayer player,VehicleControlAuthority.State input,int side){
+    private boolean manualRapid(net.minecraft.server.level.ServerPlayer player,HelicopterManualAim.Solution solution,int side){
         var level=player.serverLevel();Vec3 pivot=HelicopterHellfireRack.rapidPod(side),breech=craft.weaponPoint(pivot);
         Vec3 muzzle=craft.weaponPoint(pivot.add(0,0,.748163));
         if(!VehicleDamageBridge.loaded(level,breech,muzzle)||level.clip(new ClipContext(breech,muzzle,ClipContext.Block.COLLIDER,ClipContext.Fluid.NONE,craft)).getType()!=HitResult.Type.MISS)return false;
-        Vec3 target=craft.weaponPoint(HelicopterArmament.GUN).add(Vec3.directionFromRotation((float)input.aimPitch(),(float)input.aimYaw()).scale(weaponRange()));
+        Vec3 target=solution.point();
         var aim=HelicopterArmament.aim(target.subtract(muzzle),craft.getYRot(),craft.bank());
-        Vec3 direction=HelicopterArmament.rotate(HelicopterArmament.direction(Math.max(-10,Math.min(10,aim.yaw())),Math.max(-60,Math.min(35,aim.pitch()))),craft.getYRot(),craft.bank());
+        Vec3 direction=solution.locked()?target.subtract(muzzle).normalize():HelicopterArmament.rotate(HelicopterArmament.direction(Math.max(-10,Math.min(10,aim.yaw())),Math.max(-60,Math.min(35,aim.pitch()))),craft.getYRot(),craft.bank());
         var projectile=new VehicleOrdnanceProjectile(level,player,craft,"helicopter_70mm");projectile.setPos(muzzle);projectile.launchRapid(direction,craft.getDeltaMovement());
         if(!level.addFreshEntity(projectile))return false;
         GunplayEffects.shot(player,craft,VehicleWeaponDefinition.require("helicopter_70mm").weapon(),muzzle,muzzle.add(direction.scale(12)),0,direction.scale(-1));craft.recordAirShot();return true;
@@ -178,13 +183,17 @@ public final class HelicopterCombat {
         if(shots<Integer.MAX_VALUE)shots++;
         if(rocket){if(rocketShots<Integer.MAX_VALUE)rocketShots++;}else if(gunShots<Integer.MAX_VALUE)gunShots++;
     }
-    private boolean manualFire(net.minecraft.server.level.ServerPlayer player,boolean rocket){
+    private boolean manualFire(net.minecraft.server.level.ServerPlayer player,boolean rocket,TargetSelection lock,Vec3 point){
         var level=player.serverLevel();var definition=VehicleWeaponDefinition.require(rocket?"helicopter_hellfire":"helicopter_30mm").weapon();int side=rockets%2==0?-1:1;
         var aim=rocket?craft.podAim(side):new HelicopterArmament.Aim(craft.gunYaw(),craft.gunPitch());
         Vec3 direction=HelicopterArmament.rotate(HelicopterArmament.direction(aim.yaw(),aim.pitch()),craft.getYRot(),craft.bank());
         Vec3 breech=craft.weaponPoint(rocket?HelicopterHellfireRack.mount(side):HelicopterArmament.GUN);
         Vec3 muzzle=rocket?craft.hellfireLaunchPoint(side,(8-rockets)/2%4):breech.add(direction.scale(1.2));
         if(!VehicleDamageBridge.loaded(level,breech,muzzle)||level.clip(new ClipContext(breech,muzzle,ClipContext.Block.COLLIDER,ClipContext.Fluid.NONE,player)).getType()!=HitResult.Type.MISS)return false;
+        if(!rocket&&lock!=null){
+            var toTarget=point.subtract(breech);
+            if(toTarget.lengthSqr()>definition.range()*definition.range()||direction.dot(toTarget.normalize())<.99999)return false;
+        }
         if(rocket){
             Vec3 end=muzzle;
             for(double d=1;d<=definition.range();d++){var next=muzzle.add(direction.scale(d));if(!VehicleDamageBridge.loaded(level,muzzle,next))break;end=next;}
@@ -196,7 +205,12 @@ public final class HelicopterCombat {
             // on the following flight tick. Preserve the actual ray's aim point,
             // but track the same persistent living body used by AI targeting.
             var trackedBody=CombatTargeting.resolveTarget(tracked);if(trackedBody!=null)tracked=trackedBody;
-            var launch=HelicopterHellfireRack.launchDirection(end.subtract(muzzle),craft.getYRot(),craft.bank(),true);
+            if(lock!=null&&point.distanceTo(muzzle)<=definition.range()&&VehicleDamageBridge.loaded(level,muzzle,point)
+                    &&level.clip(new ClipContext(muzzle,point,ClipContext.Block.COLLIDER,ClipContext.Fluid.NONE,craft)).getType()==HitResult.Type.MISS){
+                end=point;tracked=lock.target();
+            }
+            var launch=lock!=null&&tracked==lock.target()?end.subtract(muzzle).normalize():
+                    HelicopterHellfireRack.launchDirection(end.subtract(muzzle),craft.getYRot(),craft.bank(),true);
             var projectile=new VehicleOrdnanceProjectile(level,player,craft,"helicopter_hellfire");projectile.setPos(muzzle);projectile.launchHellfire(launch,craft.getDeltaMovement(),tracked,end,true);
             if(!level.addFreshEntity(projectile))return false;
             GunplayEffects.shot(player,craft,definition,muzzle,muzzle.add(launch.scale(12)),0,launch.scale(-1));
@@ -204,8 +218,7 @@ public final class HelicopterCombat {
             Vec3 end=muzzle;for(double d=.5;d<=definition.range();d+=.5){var next=muzzle.add(direction.scale(d));if(!VehicleDamageBridge.loaded(level,muzzle,next))break;end=next;}
             var wall=level.clip(new ClipContext(muzzle,end,ClipContext.Block.COLLIDER,ClipContext.Fluid.NONE,player));if(wall.getType()!=HitResult.Type.MISS)end=wall.getLocation();
             var mechanical=VehicleDamageBridge.nearest(level,craft,null,muzzle,end);
-            var hit=ProjectileUtil.getEntityHitResult(level,craft,muzzle,end,new AABB(muzzle,end).inflate(.3),e->e.getRootVehicle()!=craft&&e.isAlive()&&e.isPickable()
-                    &&VehicleDamageBridge.vehicle(e)==null);
+            var hit=FirearmsCombat.firstBulletBody(level,player,craft,muzzle,end,e->e.getRootVehicle()!=craft&&VehicleDamageBridge.vehicle(e)==null);
             int impact=0;Vec3 normal=direction.scale(-1);
             if(mechanical!=null&&(hit==null||mechanical.distance()<muzzle.distanceTo(hit.getLocation()))){end=mechanical.point();VehicleDamageBridge.hurt(player,mechanical.vehicle(),definition,definition.damage(),null,end,direction);impact=3;}
             else if(hit!=null){
@@ -294,12 +307,14 @@ public final class HelicopterCombat {
                 &&com.codex.blacklight.power.ProjectileDefenseSystem.hitscan(defender,from,to,damage,4))return;
         var source=actor.damageSources().mobProjectile(craft,actor);
         var body=AnimatedHurtBody.of(victim);
+        boolean damaged;
         if(first!=victim&&body!=null){
             // Extend only the narrowed mesh contact by roundoff tolerance. Never
             // rebuild the ray from the player's eye or the aircraft center.
             var contact=gunBodyContact(body,from,to.add(to.subtract(from).normalize().scale(.0001)));
-            if(contact!=null)body.hurtAt(source,damage,contact);
-        }else first.hurt(source,damage);
+            damaged=contact!=null&&body.hurtAt(source,damage,contact);
+        }else damaged=first.hurt(source,damage);
+        if(damaged)VehicleOrdnanceProjectile.impactImpulse(victim,to.subtract(from),.65);
     }
     private static HydraHurtContact.Contact gunBodyContact(AnimatedHurtBody body,Vec3 from,Vec3 to){
         return HydraHurtContact.ray(body.hurtRegions(0),from,to,com.codex.blacklight.infection.InfectedAttackStyle.PIERCE);
