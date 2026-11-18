@@ -64,7 +64,7 @@ allprojects {
         path.startsWith(sourceRoot) && !path.startsWith(sourceRoot + 'main/java/')
     }
     tasks.named('test', Test).configure {
-        include '**/Helicopter*Test.class', '**/RagdollJointMathTest.class'
+        include '**/Helicopter*Test.class', '**/RagdollJointMathTest.class', '**/TargetLockRequestStateTest.class'
     }
     tasks.named('compileJava').configure { dependsOn prepare }
     tasks.named('processResources').configure { dependsOn prepare }
