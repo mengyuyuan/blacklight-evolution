@@ -262,6 +262,11 @@ if (project.hasProperty('standaloneInfected')) {
 if (project.hasProperty('standaloneTest')) {
     sourceSets.main.java.srcDir('src/standaloneTest/java')
 }
+if (project.hasProperty('encounterContactTest')) {
+    sourceSets.main.java.srcDir('src/encounterTest/java')
+    sourceSets.main.resources.srcDir('src/blackwatchTest/resources')
+}
+
 if (project.hasProperty('cityTest')) {
     sourceSets.main.java.srcDir('src/cityTest/java')
     sourceSets.main.resources.srcDir('src/cityTest/resources')
