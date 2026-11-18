@@ -101,7 +101,10 @@ public final class WeaponImpact {
         var soundPoint=v instanceof AnimatedHurtBody hydra&&hydra.animatedHurtBody()?hydra.incomingPoint():v.position();
         if(first){
             float pitch=switch(tier){case LIGHT->1.1F;case MEDIUM->1F;case HEAVY->.88F;case FINISHER->.78F;};
-            com.codex.blacklight.registry.ModWeaponSounds.play(p,com.codex.blacklight.registry.ModWeaponSounds.equipped(p),tier.atLeast(ImpactTier.HEAVY)||heavy||slam?"heavy":"hit",soundPoint,.8F+.15F*tier.ordinal(),pitch);
+            var form=com.codex.blacklight.registry.ModWeaponSounds.equipped(p);
+            boolean chargedCrush=fullyCharged && (form==PowerForm.MUSCLE_MASS || form==PowerForm.HAMMERFISTS);
+            if(chargedCrush)pitch=Math.min(pitch,.78F);
+            com.codex.blacklight.registry.ModWeaponSounds.play(p,form,tier.atLeast(ImpactTier.HEAVY)||heavy||slam||chargedCrush?"heavy":"hit",soundPoint,chargedCrush?1.15F:.8F+.15F*tier.ordinal(),pitch);
             // Layered body: heavier tiers add a low thump, finishers a crushing tail.
             if(tier.atLeast(ImpactTier.HEAVY))p.level().playSound(null,soundPoint.x,soundPoint.y,soundPoint.z,SoundEvents.PLAYER_ATTACK_KNOCKBACK,SoundSource.PLAYERS,.9F,.62F);
             if(tier==ImpactTier.FINISHER){

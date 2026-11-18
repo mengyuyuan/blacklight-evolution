@@ -33,6 +33,8 @@ public final class InfectedImpactVisuals {
         if(current!=mc.level){ACTIVE.clear();current=mc.level;}
         while(ACTIVE.size()>=128)ACTIVE.removeFirst();var victim=mc.level.getEntity(data.victim());
         var anchor=victim instanceof com.codex.blacklight.combat.AnimatedHurtBody hydra&&hydra.animatedHurtBody()?HydraWoundAnchor.capture(hydra,point,new Vec3(data.dx(),data.dy(),data.dz()),(float)Math.max(0,Math.min(1,started-mc.level.getGameTime()))):null;
+        if (victim instanceof net.minecraft.world.entity.LivingEntity living)
+            com.codex.blacklight.client.animation.FleshRecoil.accept(living, data, started);
         var axis=new Vec3(data.dx(),data.dy(),data.dz());
         var path=new SprayEmitterPath(anchor==null?point:anchor.point(),anchor==null?axis:anchor.normal(),victim!=null);
         ACTIVE.addLast(new Impact(data,started,victim==null?point:victim.getPosition((float)Math.clamp(started-mc.level.getGameTime(),0,1)),anchor,path,victim instanceof com.codex.blacklight.entity.BlacklightHunter));accepted++;

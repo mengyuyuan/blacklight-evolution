@@ -5,12 +5,12 @@ import net.minecraft.world.phys.Vec3;
 
 /** Additional ragdoll motions used only for a confirmed lethal weapon contact. */
 public enum FatalWeaponImpact {
-    FIST(9,.28,.07,.42,.19),
-    WHIP(10,.62,.13,.67,.38),
-    HAMMER(11,.50,.05,.62,.33),
-    MUSCLE(12,1.55,.70,.93,.39),
-    HAMMER_BREAK(13,.54,-.48,.76,.44),
-    MUSCLE_BURST(14,1.8,.8,.96,.45);
+    FIST(9,.31,.08,.35,.28),
+    WHIP(10,.76,.12,.58,.74),
+    HAMMER(11,.40,-.28,.58,.62),
+    MUSCLE(12,1.65,.91,.94,.47),
+    HAMMER_BREAK(13,.44,-.76,.80,.77),
+    MUSCLE_BURST(14,1.85,1.06,.96,.54);
 
     public final int motion;
     public final double bodyTransfer, turn;
