@@ -76,6 +76,12 @@ public final class RagdollVisualAudit {
             new Case("claws_skeleton",PowerForm.CLAWS,"minecraft:skeleton",false,false),
             new Case("claws_cow_survive",PowerForm.CLAWS,"minecraft:cow",false,false),
             new Case("claws_cow_miss",PowerForm.CLAWS,"minecraft:cow",false,false),
+            new Case("fist_zombie_lethal",PowerForm.NONE,"minecraft:zombie",false,false),
+            new Case("whip_zombie_lethal",PowerForm.WHIPFIST,"minecraft:zombie",false,false),
+            new Case("hammer_zombie_lethal",PowerForm.HAMMERFISTS,"minecraft:zombie",false,false),
+            new Case("hammer_charged_zombie_lethal",PowerForm.HAMMERFISTS,"minecraft:zombie",false,false),
+            new Case("muscle_charged_zombie_lethal",PowerForm.MUSCLE_MASS,"minecraft:zombie",false,false),
+            new Case("muscle_zombie_lethal",PowerForm.MUSCLE_MASS,"minecraft:zombie",false,false),
             new Case("hammer_zombie",PowerForm.HAMMERFISTS,"minecraft:zombie",false,true),
             new Case("claws_consume",PowerForm.CLAWS,"minecraft:villager",true,false),
             new Case("blade_consume",PowerForm.BLADE,"minecraft:villager",true,false),
@@ -186,7 +192,9 @@ public final class RagdollVisualAudit {
                 }
             });
             if(c.name().endsWith("_lethal")&&tick==(c.name().equals("hammer_brute_lethal")?145:115))PacketDistributor.sendToServer(new WeaponInputPayload(true,false));
-            if(c.name().endsWith("_lethal")&&tick==(c.name().equals("hammer_brute_lethal")?147:117))PacketDistributor.sendToServer(new WeaponInputPayload(false,false));
+            boolean chargedDeath=c.name().contains("_charged_zombie_");
+            if(chargedDeath&&tick>115&&tick<150&&tick%5==0)PacketDistributor.sendToServer(new WeaponInputPayload(true,false));
+            if(c.name().endsWith("_lethal")&&tick==(c.name().equals("hammer_brute_lethal")?147:chargedDeath?150:117))PacketDistributor.sendToServer(new WeaponInputPayload(false,false));
             if(c.name().startsWith("thrown_")&&tick==80)PacketDistributor.sendToServer(new ClawActionPayload(ClawActionPayload.Action.GRAB_THROW_START));
             if(c.name().startsWith("thrown_")&&tick==82)PacketDistributor.sendToServer(new ClawActionPayload(ClawActionPayload.Action.GRAB_THROW_RELEASE));
             if(c.consume()&&tick==80)PacketDistributor.sendToServer(new ClawActionPayload(ClawActionPayload.Action.CONSUME));
@@ -254,7 +262,19 @@ public final class RagdollVisualAudit {
         // partial cut can retain a bridge, and two blades can meet the same cut.
         if(c.name().equals("claws_cow"))passed&=edgeCount==4&&cuts>0&&components>=2&&bodies.size()==1&&monotonic;
         if(c.name().equals("claws_skeleton"))passed&=minimum==0&&components>=2&&bodies.size()==1&&monotonic;
-        if(c.name().equals("hammer_zombie"))passed&=minimum==0&&cuts==0&&components==1&&bodies.size()==1&&monotonic;
+        if(c.name().equals("hammer_zombie"))passed&=minimum==0&&cuts>0&&components>=2&&bodies.size()==1&&monotonic;
+        if(c.name().endsWith("_zombie_lethal")){
+            var expected=c.name().equals("muscle_charged_zombie_lethal")?FatalWeaponImpact.MUSCLE_BURST:c.name().equals("hammer_charged_zombie_lethal")?FatalWeaponImpact.HAMMER_BREAK:FatalWeaponImpact.forForm(c.form());
+            double deformation=0;
+            for(var element:rows){
+                var sample=element.getAsJsonObject();
+                if(sample.has("fatalStyle")&&sample.get("fatalStyle").getAsString().equals(expected.name()))
+                    deformation=Math.max(deformation,sample.get("skinDisplacement").getAsDouble());
+            }
+            result.addProperty("expectedFatalStyle",expected.name());
+            result.addProperty("maxSkinDisplacement",deformation);
+            passed&=deformation>.001&&bodies.size()==1&&((expected==FatalWeaponImpact.HAMMER_BREAK||expected==FatalWeaponImpact.MUSCLE_BURST)?cuts>0&&components>=2:cuts==0&&components==1);
+        }
         double floorClearance=Double.POSITIVE_INFINITY;int penetrations=0;
         for(var e:rows){var r=e.getAsJsonObject();if(r.has("floorClearance")){double clearance=r.get("floorClearance").getAsDouble();floorClearance=Math.min(floorClearance,clearance);if(clearance<-.02)penetrations++;}}
         if(Double.isFinite(floorClearance))result.addProperty("minFloorClearance",floorClearance);
@@ -472,7 +492,7 @@ public final class RagdollVisualAudit {
                     com.codex.blacklight.infection.NativeInfection.tick(v,level);
                 }
                 float facing=c.name().contains("_side")?90:180;
-                v.moveTo(c.name().equals("blade_pig_offset")?1.3:.5,c.name().contains("_frontslab_")?251.5:251,c.consume()||c.name().endsWith("_survive")||c.name().endsWith("_close")?2.2:c.name().equals("hammer_brute_sideblock_miss")?12:c.name().endsWith("_miss")?6:3.0,facing,0);v.setYHeadRot(facing);v.yBodyRot=facing;v.setNoAi(!c.type().equals("blacklight:blacklight_brute"));v.setPersistenceRequired();
+                v.moveTo(c.name().equals("blade_pig_offset")?1.3:.5,c.name().contains("_frontslab_")?251.5:251,c.consume()||c.name().endsWith("_survive")||(c.name().endsWith("_close")||c.name().endsWith("_zombie_lethal"))?2.2:c.name().equals("hammer_brute_sideblock_miss")?12:c.name().endsWith("_miss")?6:3.0,facing,0);v.setYHeadRot(facing);v.yBodyRot=facing;v.setNoAi(!c.type().equals("blacklight:blacklight_brute"));v.setPersistenceRequired();
                 if(c.type().equals("blacklight:blacklight_brute")){
                     v.getAttribute(net.minecraft.world.entity.ai.attributes.Attributes.MOVEMENT_SPEED).setBaseValue(0);
                     v.getAttribute(net.minecraft.world.entity.ai.attributes.Attributes.FOLLOW_RANGE).setBaseValue(.05);
@@ -579,6 +599,18 @@ public final class RagdollVisualAudit {
             var bodies=(Map<?,?>)f.get(null);
             for(var entry:bodies.entrySet())if(entry.getKey() instanceof LivingEntity l&&l.getId()==victimId){
                 var body=entry.getValue();row.addProperty("bodyStarted",(Long)field(body,"started"));row.addProperty("cuts",(Integer)field(body,"appliedCuts"));row.addProperty("components",(Integer)field(body,"components"));
+                if(current().name().endsWith("_zombie_lethal")&&field(body,"fatalImpact") instanceof FatalWeaponImpact style){
+                    row.addProperty("fatalStyle",style.name());
+                    double displacement=0;
+                    for(var p:(List<?>)field(body,"parts")){
+                        var mesh=(List<?>)field(p,"mesh");
+                        if(mesh.isEmpty()||field(p,"imprint")==null)continue;
+                        var skinPoint=p.getClass().getDeclaredMethod("skinPoint",mesh.get(0).getClass());
+                        skinPoint.setAccessible(true);
+                        for(var v:mesh)displacement=Math.max(displacement,((Vec3)skinPoint.invoke(p,v)).distanceTo((Vec3)field(v,"p")));
+                    }
+                    row.addProperty("skinDisplacement",displacement);
+                }
                 row.addProperty("attachmentVertices",(Integer)field(body,"attachmentVertices"));row.addProperty("unboundAttachmentVertices",(Integer)field(body,"unboundAttachmentVertices"));
                 row.addProperty("rootRegion",(Integer)field(field(field(body,"root"),"bind"),"region"));
                 var rootKey=field(field(field(body,"root"),"bind"),"key");if(rootKey instanceof software.bernie.geckolib.cache.object.GeoBone rootBone)row.addProperty("rootBone",rootBone.getName());
