@@ -126,6 +126,9 @@ public final class StandaloneCoreGameTest {
         } finally {buffer.release();}
         var enemy=h.spawn(EntityType.COW,3,2,5);enemy.setNoAi(true);CombatTargeting.requestLock(p,enemy.getId());
         h.assertTrue(com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.TARGET_LOCK_ID)==enemy.getId(),"target facing is synchronized by Blacklight");
+        com.codex.blacklight.mode.PrototypeModeSystem.handle(p,false);
+        h.assertTrue(!com.codex.blacklight.mode.PrototypeModeSystem.isActive(p),"player really left prototype mode");
+        // The mode transition plays its arm animation; the ordinary-mode presentation tick clears it.
         PlayerActions.get().synchronizeMode(p,false);
         h.assertTrue(com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.PLAYER_ACTION).clipId().isEmpty()
                 &&com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.TARGET_LOCK_ID)==-1,"ordinary mode clears transient action and target lock");

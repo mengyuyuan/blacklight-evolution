@@ -18,10 +18,15 @@ import net.minecraftforge.gametest.*;
 public final class VehicleFireGameTest {
     private static final Set<UUID> REJECT=new HashSet<>();
     private static final Map<UUID,Integer> REJECTIONS=new HashMap<>();
+    private static final Map<UUID,List<VehicleOrdnanceProjectile>> OBSERVED=new HashMap<>();
     @SubscribeEvent public static void spawning(EntityJoinLevelEvent event){
-        if(event.getEntity() instanceof VehicleOrdnanceProjectile projectile&&projectile.getOwner()!=null&&REJECT.contains(projectile.getOwner().getUUID())){
-            REJECTIONS.merge(projectile.getOwner().getUUID(),1,Integer::sum);event.setCanceled(true);
+        if(!(event.getEntity() instanceof VehicleOrdnanceProjectile projectile)||projectile.getOwner()==null)return;
+        UUID owner=projectile.getOwner().getUUID();
+        if(REJECT.contains(owner)){
+            REJECTIONS.merge(owner,1,Integer::sum);event.setCanceled(true);return;
         }
+        var shots=OBSERVED.get(owner);
+        if(shots!=null)shots.add(projectile);
     }
     private static MilitaryVehicle apc(MilitaryVehicleGameTest.Fixture f){var v=ModEntities.MILITARY_APC.get().create(f.level);v.setPos(f.x+.5,81,.5);f.level.addFreshEntity(v);f.entities.add(v);return v;}
     private static net.minecraft.server.level.ServerPlayer driver(GameTestHelper h,MilitaryVehicleGameTest.Fixture f,MilitaryVehicle vehicle){
@@ -30,14 +35,31 @@ public final class VehicleFireGameTest {
     @GameTest(template="blackwatch_arena",batch="vehicle6_fire",timeoutTicks=120)
     public static void actualGunMuzzleOwnerIdentityAmmoAndCooldownAreOneShot(GameTestHelper h){
         var f=new MilitaryVehicleGameTest.Fixture(h,195000);var v=apc(f);var p=driver(h,f,v);v.inventory().addAmmunition("autocannon_round",2);
-        h.runAfterDelay(20,()->{try(f){
-            h.assertTrue(VehicleAttackService.fire(v,p,"autocannon"),"actual valid driver fires one real autocannon projectile");
-            h.assertTrue(!VehicleAttackService.fire(v,p,"autocannon")&&v.inventory().ammunition("autocannon_round")==1,"same-tick spam cannot bypass actual stock and cooldown");
-            var shells=f.level.getEntitiesOfClass(VehicleOrdnanceProjectile.class,v.getBoundingBox().inflate(8));
-            h.assertTrue(shells.size()==1,"exactly one real projectile was registered");var shell=shells.get(0);f.entities.add(shell);
+        h.runAfterDelay(20,()->{try{
+            // Observe the spawn at fire time, before entity tracking publishes the chunk.
+            var shells=new ArrayList<VehicleOrdnanceProjectile>();
+            OBSERVED.put(p.getUUID(),shells);
+            try{
+                h.assertTrue(VehicleAttackService.fire(v,p,"autocannon"),"actual valid driver fires one real autocannon projectile");
+                h.assertTrue(!VehicleAttackService.fire(v,p,"autocannon")&&v.inventory().ammunition("autocannon_round")==1,"same-tick spam cannot bypass actual stock and cooldown");
+            }finally{
+                OBSERVED.remove(p.getUUID());
+                f.entities.addAll(shells);
+            }
+            h.assertTrue(shells.size()==1,"exactly one real projectile joined for this driver");var shell=shells.get(0);
             var mount=v.definition().mountWorld("muzzle_primary",new VehicleDefinition.Vec3(v.getX(),v.getY(),v.getZ()),v.getYRot(),v.turretYaw(),v.gunPitch());
             h.assertTrue(shell.position().distanceTo(new Vec3(mount.x(),mount.y(),mount.z()))<.05&&shell.getOwner()==p&&shell.weaponId().equals("autocannon"),"projectile starts at actual gun muzzle and keeps actual actor and weapon identity");
-        }h.succeed();});
+            awaitPublishedShell(h,f,shell,60);
+        }catch(RuntimeException|Error failure){f.close();throw failure;}});
+    }
+    private static void awaitPublishedShell(GameTestHelper h,MilitaryVehicleGameTest.Fixture f,VehicleOrdnanceProjectile shell,int remaining){
+        if(f.level.getEntity(shell.getUUID())==shell){
+            f.close();h.succeed();return;
+        }
+        if(remaining==0||shell.isRemoved()){
+            f.close();h.fail("accepted projectile never became visible to the world by its actual UUID");return;
+        }
+        h.runAfterDelay(1,()->awaitPublishedShell(h,f,shell,remaining-1));
     }
     @GameTest(template="blackwatch_arena",batch="vehicle6_fire",timeoutTicks=120)
     public static void blockedBarrelAndEmptyStockNeverFireOrSpendAmmo(GameTestHelper h){

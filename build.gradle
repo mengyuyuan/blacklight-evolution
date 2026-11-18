@@ -228,6 +228,9 @@ if (project.hasProperty('compatLiveTest')) {
 if (['hydraReleaseTest','entityLifecycleTest','hiveFeedingTest','wallTraversalTest','standaloneTest','cityTest'].any { project.hasProperty(it) }) {
     sourceSets.main.resources.srcDir('src/traversalTest/resources')
 }
+if (['hydraReleaseTest','blackwatchTest'].any { project.hasProperty(it) }) {
+    sourceSets.main.resources.srcDir('src/blackwatchTest/resources')
+}
 if (project.hasProperty('hydraReleaseTest')) {
     sourceSets.main.java.srcDir('src/hydraTest/java')
 }
@@ -285,7 +288,7 @@ if(closeoutSuites.keySet().any {project.hasProperty(it)} ||
 if(project.hasProperty('feedbackTest'))sourceSets.main.resources.srcDir('src/feedbackTest/resources')
 if(project.hasProperty('gunplayTest'))sourceSets.main.resources.srcDir('src/campaignTest/resources')
 tasks.named('processResources') {
-    filesMatching(['data/blacklight/structures/wall_test.nbt','data/minecraft/worldgen/world_preset/flat.json']) {
+    filesMatching(['data/blacklight/structures/wall_test.nbt','data/blacklight/structures/blackwatch_arena.nbt','data/minecraft/worldgen/world_preset/flat.json']) {
         duplicatesStrategy=DuplicatesStrategy.EXCLUDE
     }
 }

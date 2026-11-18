@@ -13,7 +13,9 @@ class GreeneEmergenceShapeTest {
         assertEquals(20*scale,samples.get(0).radius(),1e-12);
         // A surface target can touch the sphere while its source is underground.
         assertNotNull(GreeneEmergenceShape.contact(samples.get(0),new AABB(9.9,0,19.9,10.1,1,20.1)));
-        assertNull(GreeneEmergenceShape.contact(samples.get(0),new AABB(20,0,20,21,1,21)));
+        double surfaceEdge=root.x+Math.sqrt(Math.pow(20*scale,2)-root.y*root.y);
+        assertNotNull(GreeneEmergenceShape.contact(samples.get(0),new AABB(surfaceEdge-.02,0,20,surfaceEdge,1,21)));
+        assertNull(GreeneEmergenceShape.contact(samples.get(0),new AABB(surfaceEdge+.02,0,20,surfaceEdge+1,1,21)));
     }
     @Test void smallSphereUsesDiscreteRootSamplesRatherThanAnAnalyticCapsule(){
         // Radius3 * 1/3 =>1. Source yaw180 maps to identity root rotation.

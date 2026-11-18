@@ -118,6 +118,7 @@ public final class CommonInfectedLeapGameTest {
                         "same-object load releases transient driver and synchronized action clocks instead of reusing a prior leap");
                 h.assertTrue(!f.actor.isNoGravity(),"loading transient motion does not retain a gravity ownership flag");
             }finally{done[0]=true;}
+            h.assertTrue(f.actor.attackStarted()<0,"removed actors expose no attack pose to late observers");
             h.succeed();
         });
     }
@@ -125,6 +126,7 @@ public final class CommonInfectedLeapGameTest {
     public static void actualAiLaunchesThenOpensOneDelayedWristHit(GameTestHelper h){
         var f=fixture(h);boolean[] entered={false},air={false},punch={false},finished={false};int[] hits={0};float[] hp={f.prey.getHealth()};
         h.onEachTick(()->{
+            if(f.actor.isRemoved())return;
             f.prey.invulnerableTime=0;
             boolean active=f.actor.attackStarted()>=0&&f.actor.attackHand()==CommonInfectedLeap.HAND;
             if(active){entered[0]=true;air[0]|=!f.actor.onGround();punch[0]|=f.actor.leapPunchAge(0)>=0;
@@ -166,6 +168,7 @@ public final class CommonInfectedLeapGameTest {
         var f=fixture(h);boolean[] moved={false},entered={false},turned={false},curved={false};float health=f.prey.getHealth();
         float[] yaw={0};double initialX=f.actor.getX();
         h.onEachTick(()->{
+            if(f.actor.isRemoved())return;
             if(f.actor.attackStarted()>=0&&f.actor.attackHand()==CommonInfectedLeap.HAND){
                 entered[0]=true;long age=h.getLevel().getGameTime()-f.actor.attackStarted();
                 if(!moved[0]&&age>CommonInfectedLeap.LAUNCH_TICK&&!f.actor.onGround()){
@@ -207,7 +210,9 @@ public final class CommonInfectedLeapGameTest {
         BlacklightCommonInfected[] control={null};
         h.onEachTick(()->{
             if(stage[0]==0){
-                if(f.actor.attackStarted()<0||f.actor.attackHand()!=CommonInfectedLeap.HAND||f.actor.onGround())return;
+                long started=f.actor.attackStarted();
+                if(started<0||h.getLevel().getGameTime()-started<CommonInfectedLeap.LAUNCH_TICK
+                        ||f.actor.attackHand()!=CommonInfectedLeap.HAND||f.actor.onGround())return;
                 before[0]=f.actor.position();center[0]=f.actor.getBoundingBox().getCenter();velocity[0]=f.actor.getDeltaMovement();stage[0]=1;
             }else if(stage[0]==1){
                 h.assertTrue(!f.actor.onGround()&&f.actor.attackStarted()>=0,"the second released frame remains in actual flight");

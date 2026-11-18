@@ -32,7 +32,8 @@ public final class OrdinaryConsumeGameTest {
             for(int i=0;i<ConsumeVisual.captureDuration(form)+80;i++)tick(p);
             h.assertTrue(ConsumeSystem.holding(p)&&cow.isAlive()&&p.getHealth()==10,"E must hold indefinitely without reward "+form);
             ConsumeSystem.consume(p);ConsumeSystem.consume(p);
-            for(int i=0;i<ConsumeSequence.completionTick(form,false)-1;i++)tick(p);
+            int completion = ConsumeSequence.completionTick(form,false,ModAttachments.getData(cow, ModAttachments.CONSUME_VISUAL).variant());
+            for(int i=0;i<completion-1;i++)tick(p);
             h.assertTrue(!cow.isRemoved()&&p.getHealth()==10,"no early award in "+form);
             tick(p);tick(p);
             h.assertTrue(cow.isRemoved()&&!com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.CONSUMING),"complete releases target and player "+form);

@@ -108,7 +108,7 @@ public final class HelicopterCombat {
     }
     private boolean visible(LivingEntity target){
         Vec3 from=craft.weaponPoint(HelicopterArmament.GUN),to=targetPoint(target);
-        return VehicleDamageBridge.loaded((ServerLevel)craft.level(),from,to)
+        return HelicopterShotPath.loaded((ServerLevel)craft.level(),from,to)
                 &&craft.level().clip(new ClipContext(from,to,ClipContext.Block.COLLIDER,ClipContext.Fluid.NONE,craft)).getType()==HitResult.Type.MISS;
     }
     public void tick(){
@@ -194,8 +194,7 @@ public final class HelicopterCombat {
             if(toTarget.lengthSqr()>definition.range()*definition.range()||direction.dot(toTarget.normalize())<.99999)return false;
         }
         if(rocket){
-            Vec3 end=muzzle;
-            for(double d=1;d<=definition.range();d++){var next=muzzle.add(direction.scale(d));if(!VehicleDamageBridge.loaded(level,muzzle,next))break;end=next;}
+            Vec3 end=HelicopterShotPath.loadedEnd(level,muzzle,muzzle.add(direction.scale(definition.range())));
             var wall=level.clip(new ClipContext(muzzle,end,ClipContext.Block.COLLIDER,ClipContext.Fluid.NONE,craft));if(wall.getType()!=HitResult.Type.MISS)end=wall.getLocation();
             var hull=VehicleDamageBridge.nearest(level,craft,null,muzzle,end);
             var hit=FirearmsCombat.firstSurface(level,craft,muzzle,end,e->!craft.hasPassenger(e)&&e.isAlive()&&e.isPickable()&&VehicleDamageBridge.vehicle(e)==null);
@@ -204,7 +203,7 @@ public final class HelicopterCombat {
             // on the following flight tick. Preserve the actual ray's aim point,
             // but track the same persistent living body used by AI targeting.
             var trackedBody=CombatTargeting.resolveTarget(tracked);if(trackedBody!=null)tracked=trackedBody;
-            if(lock!=null&&point.distanceTo(muzzle)<=definition.range()&&VehicleDamageBridge.loaded(level,muzzle,point)
+            if(lock!=null&&point.distanceTo(muzzle)<=definition.range()&&HelicopterShotPath.loaded(level,muzzle,point)
                     &&level.clip(new ClipContext(muzzle,point,ClipContext.Block.COLLIDER,ClipContext.Fluid.NONE,craft)).getType()==HitResult.Type.MISS){
                 end=point;tracked=lock.target();
             }
@@ -214,7 +213,7 @@ public final class HelicopterCombat {
             if(!level.addFreshEntity(projectile))return false;
             GunplayEffects.shot(player,craft,definition,muzzle,muzzle.add(launch.scale(12)),0,launch.scale(-1));
         }else{
-            Vec3 end=muzzle;for(double d=.5;d<=definition.range();d+=.5){var next=muzzle.add(direction.scale(d));if(!VehicleDamageBridge.loaded(level,muzzle,next))break;end=next;}
+            Vec3 end=HelicopterShotPath.loadedEnd(level,muzzle,muzzle.add(direction.scale(definition.range())));
             var wall=level.clip(new ClipContext(muzzle,end,ClipContext.Block.COLLIDER,ClipContext.Fluid.NONE,player));if(wall.getType()!=HitResult.Type.MISS)end=wall.getLocation();
             var mechanical=VehicleDamageBridge.nearest(level,craft,null,muzzle,end);
             var hit=FirearmsCombat.firstBulletBody(level,player,craft,muzzle,end,e->e.getRootVehicle()!=craft&&VehicleDamageBridge.vehicle(e)==null);
@@ -251,12 +250,12 @@ public final class HelicopterCombat {
         // the native actor-local XZ envelope (ordinary60 / strafe100 above).
         if(delta.length()>definition.range()||delta.length()< (rocket?14:8)||!rocket&&direction.dot(delta.normalize())<.9995)return false;
         if(rocket)direction=HelicopterHellfireRack.launchDirection(delta,craft.getYRot(),craft.bank(),false);
-        if(!VehicleDamageBridge.loaded(level,breech,targetPoint)
+        if(!HelicopterShotPath.loaded(level,breech,targetPoint)
                 ||level.clip(new ClipContext(breech,targetPoint,ClipContext.Block.COLLIDER,ClipContext.Fluid.NONE,craft)).getType()!=HitResult.Type.MISS)return false;
         // Guided launch heading is distinct from the observation ray used to
         // validate the intended target. Native flight still collides with walls.
         Vec3 sightDirection=rocket?delta.normalize():direction;
-        Vec3 end=muzzle.add(sightDirection.scale(Math.min(definition.range(),delta.length()+2)));
+        Vec3 end=HelicopterShotPath.loadedEnd(level,muzzle,muzzle.add(sightDirection.scale(Math.min(definition.range(),delta.length()+2))));
         var wall=level.clip(new ClipContext(muzzle,end,ClipContext.Block.COLLIDER,ClipContext.Fluid.NONE,craft));
         if(wall.getType()!=HitResult.Type.MISS)end=wall.getLocation();
         var mechanical=VehicleDamageBridge.nearest(level,craft,null,muzzle,end);
@@ -292,7 +291,7 @@ public final class HelicopterCombat {
         int side=rocketShots%2==0?-1:1;Vec3 point=targetPoint(target),breech=craft.weaponPoint(HelicopterHellfireRack.mount(side));
         double range=craft.hellfireLaunchPoint(side,rocketShots/2%4).distanceTo(point);
         return range>=14&&range<=VehicleWeaponDefinition.require("helicopter_hellfire").weapon().range()
-                &&VehicleDamageBridge.loaded(level,breech,point)
+                &&HelicopterShotPath.loaded(level,breech,point)
                 &&level.clip(new ClipContext(breech,point,ClipContext.Block.COLLIDER,ClipContext.Fluid.NONE,craft)).getType()==HitResult.Type.MISS
                 &&safeExplosiveImpact(level,point);
     }

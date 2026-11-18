@@ -6,7 +6,7 @@ class GunplayFeedbackPayloadTest {
     @Test void renderReceiptsRejectNonfiniteAndUnboundedGeometry(){
         assertTrue(new GunplayFeedbackPayload(1,0,0,1,0,80,0,60,80,0,0,1,0,1,7).valid());
         assertTrue(new GunplayFeedbackPayload(1,13,0,1,0,80,0,60,80,0,0,1,0,1,7).valid());
-        assertFalse(new GunplayFeedbackPayload(1,15,0,1,0,80,0,60,80,0,0,1,0,1,7).valid());
+        assertFalse(new GunplayFeedbackPayload(1,16,0,1,0,80,0,60,80,0,0,1,0,1,7).valid());
         assertFalse(new GunplayFeedbackPayload(1,0,0,1,Double.NaN,80,0,60,80,0,0,1,0,1,7).valid());
         assertFalse(new GunplayFeedbackPayload(1,0,0,1,0,80,0,6000,80,0,0,1,0,1,7).valid());
     }
@@ -17,6 +17,10 @@ class GunplayFeedbackPayloadTest {
         assertEquals(13,GunplayEffects.weapon(hellfire));assertEquals(WeaponDefinition.Kind.MISSILE,hellfire.kind());assertFalse(GunplayEffects.bullet(13));assertFalse(GunplayEffects.cannon(13));
         var rapid=com.codex.blacklight.military.vehicle.VehicleWeaponDefinition.require("helicopter_70mm").weapon();assertEquals(14,GunplayEffects.weapon(rapid));assertEquals(WeaponDefinition.Kind.ROCKET,rapid.kind());assertFalse(GunplayEffects.bullet(14));assertFalse(GunplayEffects.cannon(14));
         assertTrue(new GunplayFeedbackPayload(1,14,0,1,0,80,0,60,80,0,0,1,0,1,7).valid());
+        var cannon=com.codex.blacklight.military.vehicle.VehicleWeaponDefinition.require("helicopter_30mm").weapon();
+        int id=GunplayEffects.weapon(cannon);
+        assertEquals(15,id);assertTrue(GunplayEffects.bullet(id));assertTrue(GunplayEffects.cannon(id));
+        assertTrue(new GunplayFeedbackPayload(1,id,0,1,0,80,0,175,80,0,0,1,0,1,7).valid());
         assertEquals(10,GunplayEffects.weapon(he));assertTrue(GunplayEffects.cannon(10));assertFalse(GunplayEffects.bullet(10));
     }
 }

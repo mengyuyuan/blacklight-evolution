@@ -21,8 +21,16 @@ public final class EvolvedVariantsGameTest {
         var host=ModEntities.INFECTED_HOST.get().create(h.getLevel());host.inherit(EntityType.ZOMBIE.create(h.getLevel()));var core=core(type);
         var genes=new TissueInheritance(Map.of(core,new TissueInheritance.Organ(900,0,0,0,type==EvolvedArchetype.BLADE?1:0,81)),6,2100,true,null,1,6);
         var tag=new CompoundTag();host.saveWithoutId(tag);tag.getCompound("BlacklightHost").putString("NativeCore",core.key());tag.putLong("BlacklightTissueAge",504000);tag.putInt("BlacklightTissueNutrition",100);tag.put("BlacklightTissueInheritance",TissueInheritanceCodec.write(genes));host.load(tag);
-        var origin=h.absolutePos(BlockPos.ZERO);host.setNoAi(true);host.setPos(net.minecraft.world.phys.Vec3.atBottomCenterOf(new BlockPos((origin.getX()&~15)+8,origin.getY()+30,(origin.getZ()&~15)+2)));h.getLevel().addFreshEntity(host);
-        h.assertTrue(host.beginEvolvedMetamorphosis(),"actual mature lineage qualifies: "+type);for(int i=0;i<200;i++)host.tick();
+        var spawn=h.absolutePos(new BlockPos(5,30,5));
+        // Shared suites can leave a raised platform across this arena. Prepare the actual combat lane.
+        for(var pos:BlockPos.betweenClosed(spawn.offset(-1,0,-1),spawn.offset(1,3,13)))
+            h.getLevel().setBlock(pos,Blocks.AIR.defaultBlockState(),2);
+        host.setNoAi(true);
+        host.setPos(net.minecraft.world.phys.Vec3.atBottomCenterOf(spawn));
+        h.assertTrue(EvolvedForm.eligible(host.tissueInheritance(),host.tissueAge()),"loaded lineage qualifies for metamorphosis: "+type);
+        h.assertTrue(h.getLevel().addFreshEntity(host),"mature host enters its test arena: "+type);
+        h.assertTrue(host.beginEvolvedMetamorphosis(),"mature host can transform in the prepared arena: "+type);
+        for(int i=0;i<EvolvedForm.DURATION;i++)host.tick();
         h.assertTrue(host.isEvolved()&&!host.isMetamorphosing()&&host.evolvedArchetype()==type&&!host.evolvedChoice().orElseThrow().fallback(),"actual chosen body matches its strongest inherited bias: "+host.evolvedChoice());
         host.setOnGround(true);host.setHealth(host.getMaxHealth());return host;
     }

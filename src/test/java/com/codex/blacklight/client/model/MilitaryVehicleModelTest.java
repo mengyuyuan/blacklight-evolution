@@ -66,8 +66,8 @@ class MilitaryVehicleModelTest {
             }
         }
     }
-    @Test void actualBakedRenderingContainsAll377AuthoredCuboids() {
-        for(var entry:java.util.Map.of("truck",78,"apc",138,"tank",161).entrySet()) {
+    @Test void actualBakedRenderingMatchesAuthoredCuboidsAndWorldBounds() {
+        for(var entry:java.util.Map.of("truck",135,"apc",178,"tank",201).entrySet()) {
             var model=new MilitaryVehicleModel(entry.getKey());
             var count=new AtomicInteger();
             var bounds=new double[]{Double.POSITIVE_INFINITY,Double.POSITIVE_INFINITY,Double.POSITIVE_INFINITY,

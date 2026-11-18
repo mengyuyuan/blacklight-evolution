@@ -25,7 +25,10 @@ public final class HunterCounterGameTest {
         }
         var hunter=ModEntities.BLACKLIGHT_HUNTER.get().create(h.getLevel());
         hunter.setPos(h.absoluteVec(new Vec3(5.5,2,5.5)));hunter.setOnGround(true);hunter.setPersistenceRequired();
-        if(!autonomous){hunter.goalSelector.removeAllGoals(g->true);hunter.targetSelector.removeAllGoals(g->true);}
+        // The stationary zombie is assigned below. Other residents must not replace it while the
+        // normal swipe goal chooses and commits the counter, then evaluates its barrage release.
+        hunter.targetSelector.removeAllGoals(g->true);
+        if(!autonomous)hunter.goalSelector.removeAllGoals(g->true);
         // Native forward travel now reaches this standing body before release.
         var prey=EntityType.ZOMBIE.create(h.getLevel());prey.setPos(hunter.position().add(0,0,2.1));prey.setNoAi(true);prey.setPersistenceRequired();
         prey.setItemSlot(EquipmentSlot.HEAD,new ItemStack(Items.IRON_HELMET));
@@ -98,7 +101,9 @@ public final class HunterCounterGameTest {
         var s=scene(h,true);boolean[] opening={false},release={false};
         h.onEachTick(()->{opening[0]|=s.hunter.attackMove()==CreatureAttack.COUNTER;release[0]|=s.hunter.counterBarrage();});
         h.runAfterDelay(165,()->{try(s){
-            h.assertTrue(opening[0]&&release[0],"ordinary grounded Hunter AI reaches both source phases without scripted beginAttack");
+            h.assertTrue(opening[0]&&release[0],"ordinary grounded Hunter AI reaches both source phases without scripted beginAttack; opening="
+                    +opening[0]+" release="+release[0]+" assignedTarget="+(s.hunter.getTarget()==s.prey)
+                    +" distance="+s.hunter.distanceTo(s.prey)+" move="+s.hunter.attackMove());
         }h.succeed();});
     }
     @GameTest(template="wall_test",timeoutTicks=105,batch="hunter_counter_root")

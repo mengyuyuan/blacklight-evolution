@@ -172,8 +172,7 @@ public abstract class MilitarySoldier extends Monster {
         if(start.distanceToSqr(end)>28*28||!com.codex.blacklight.military.vehicle.VehicleDamageBridge.loaded(server,start,end))return false;
         var wall=server.clip(new ClipContext(start,end,ClipContext.Block.COLLIDER,ClipContext.Fluid.NONE,this));
         if(wall.getType()!=HitResult.Type.BLOCK||!wall.getBlockPos().equals(at))return false;
-        var hit=ProjectileUtil.getEntityHitResult(server,this,start,wall.getLocation(),new AABB(start,end).inflate(.3),
-                entity->FirearmsCombat.bulletCandidate(this,entity));
+        var hit=FirearmsCombat.firstBulletBody(server,this,start,wall.getLocation());
         if(hit!=null)return false;
         if(com.codex.blacklight.military.vehicle.VehicleDamageBridge.nearest(server,this,null,start,wall.getLocation())!=null)return false;
         long now=server.getGameTime();var plan=MilitaryFireControl.plan(d,profile());int age=(int)Math.floorMod(now,plan.cycleTicks());
@@ -652,9 +651,7 @@ public abstract class MilitarySoldier extends Monster {
         // Source rifle LoF gates (startup315356/316044) must see the same
         // receiving bodies as the actual gun. LivingEntity-only picking misses
         // friendly aircraft and animated parts, wasting an otherwise safe burst.
-        // ProjectileUtil's existing part narrow phase preserves real skin gaps.
-        var hit=ProjectileUtil.getEntityHitResult(level(),this,start,end,new AABB(start,end).inflate(.3),
-                entity->FirearmsCombat.bulletCandidate(this,entity));
+        var hit=FirearmsCombat.firstBulletBody(server,this,start,end);
         // Match ordinary-bullet ordering: a farther protected chassis cannot
         // veto a nearer legitimate body that would already receive the shot.
         if(mechanical!=null&&(hit==null||mechanical.distance()<=start.distanceTo(hit.getLocation())+.001))

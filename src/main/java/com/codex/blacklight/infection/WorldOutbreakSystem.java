@@ -80,8 +80,9 @@ public final class WorldOutbreakSystem {
         // An unfinished birth (ambient or another sac) still owns its ticket until its join event returns.
         if(pendingInfected(level)>0)return false;
         int infected=0;for(var entity:level.getAllEntities())if(entity instanceof Mob mob&&mob.isAlive()&&nativeMob(mob))infected++;
-        if(infected>=InfectionEcologyConfig.dimensionCap(level))return false;
-        return level.getEntitiesOfClass(Mob.class,new AABB(pos).inflate(48),m->m.isAlive()&&nativeMob(m)).size()<BROOD_LOCAL_CAP;
+        if(infected+pendingConversions(level,null)>=InfectionEcologyConfig.dimensionCap(level))return false;
+        var area=new AABB(pos).inflate(48);
+        return pendingConversions(level,area)+level.getEntitiesOfClass(Mob.class,area,m->m.isAlive()&&nativeMob(m)).size()<BROOD_LOCAL_CAP;
     }
     public static final int BROOD_LOCAL_CAP=28;
     public static boolean addBrood(ServerLevel level,Mob mob){
@@ -156,11 +157,11 @@ public final class WorldOutbreakSystem {
         for(var entry:births(level).pending.entrySet())if(unpublished(level,entry.getKey())){
             mobs++;if(entry.getValue()){infected++;if(entry.getKey().getBoundingBox().intersects(area))localPending++;}
         }
-        infected+=births(level).infections.stream().filter(m->!nativeMob(m)).count();
+        infected+=pendingConversions(level,null);
         if(infected>=InfectionEcologyConfig.dimensionCap(level)
                 ||CityTravel.isCity(level.dimension())&&com.codex.blacklight.city.CityPopulationRules.slots(mobs,infected,CityConfig.MOB_LIMIT.get(),OutbreakConfig.DIMENSION_CAP.get(),true)==0)return false;
         int localMobs=level.getEntitiesOfClass(Mob.class,area,LivingEntity::isAlive).size();
-        int reserved=(int)births(level).infections.stream().filter(m->!nativeMob(m)&&m.getBoundingBox().intersects(area)).count();
+        int reserved=pendingConversions(level,area);
         return localPending+reserved+level.getEntitiesOfClass(Mob.class,area,m->m.isAlive()&&nativeMob(m)).size()<InfectionEcologyConfig.regionalCap(level,localMobs+localPending,CityEcology.populationCap(level,pos));
     }
     /** Includes unpublished reservations held through real entity-join callbacks. */
@@ -168,6 +169,7 @@ public final class WorldOutbreakSystem {
         int total=0,infected=0;
         for(var entity:level.getAllEntities())if(entity instanceof Mob mob&&mob.isAlive()){total++;if(nativeMob(mob))infected++;}
         for(var entry:births(level).pending.entrySet())if(unpublished(level,entry.getKey())){total++;if(entry.getValue())infected++;}
+        if(infectedBirth)infected+=pendingConversions(level,null);
         return com.codex.blacklight.city.CityPopulationRules.slots(total,infected,CityConfig.MOB_LIMIT.get(),OutbreakConfig.DIMENSION_CAP.get(),infectedBirth);
     }
     /** Infection is a population transition, so its slot is reserved before addEffect callbacks. */
@@ -178,6 +180,13 @@ public final class WorldOutbreakSystem {
         finally{window.infections.remove(mob);if(accepted)births(level).births++;}
     }
     private static boolean unpublished(ServerLevel level,Mob mob){return mob.isAlive()&&!mob.isRemoved()&&level.getEntity(mob.getUUID())!=mob;}
+    // A conversion reserves one infected slot before the effect makes it visible to the ordinary mob count.
+    private static int pendingConversions(ServerLevel level,AABB area){
+        int count=0;
+        for(var mob:births(level).infections)
+            if(!nativeMob(mob)&&(area==null||area.intersects(mob.getBoundingBox())))count++;
+        return count;
+    }
     private static int pendingInfected(ServerLevel level){int count=0;for(boolean infected:births(level).pending.values())if(infected)count++;return count;}
     /** All scheduled producers commit or release the same slot around the real join event. */
     public static boolean addScheduled(ServerLevel level,Mob mob){

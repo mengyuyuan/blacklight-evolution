@@ -66,7 +66,8 @@ public final class MilitaryLauncherGameTest {
     public static void actualRpgCarrierUsesItsRealCarbineAtCloseRangeWithoutSpendingRockets(GameTestHelper h){
         var f=new MilitaryVehicleGameTest.Fixture(h,263000);var s=soldier(f);
         issue(h,f,s,"qa-near");
-        var target=target(f,4);s.setTarget(target);float health=healthFraction(target);
+        s.getAttribute(Attributes.MOVEMENT_SPEED).setBaseValue(0);
+        var target=target(f,8);s.setTarget(target);float health=healthFraction(target);
         h.runAfterDelay(140,()->{try(f){h.assertTrue(s.getMainHandItem().getItem()==FirearmsRegistry.weapon("military_carbine")&&healthFraction(target)<health,"actual NPC goal shoots the real carbine at the close legal target");h.assertTrue(rocketTotal(s)==3,"safe-distance refusal does not consume or refill its three actual rockets");}h.succeed();});
     }
     @GameTest(template="blackwatch_arena",batch="vehicle6_loadout",timeoutTicks=300)
@@ -85,7 +86,9 @@ public final class MilitaryLauncherGameTest {
     public static void actualAlliedSoldierInTheLinePreventsLauncherAndCarbineAmmoConsumption(GameTestHelper h){
         var f=new MilitaryVehicleGameTest.Fixture(h,265000);var s=soldier(f);
         issue(h,f,s,"qa-ally");
-        var ally=ModEntities.BLACKWATCH_SOLDIER.get().create(f.level);ally.setNoAi(true);ally.setAutomaticUnitJoin(false);ally.setPos(f.x+.5,81,8);f.level.addFreshEntity(ally);f.entities.add(ally);
+        // Keep the obstruction on the ray while the ordinary firing goal runs.
+        s.getAttribute(Attributes.MOVEMENT_SPEED).setBaseValue(0);
+        var ally=ModEntities.BLACKWATCH_SOLDIER.get().create(f.level);ally.setNoAi(true);ally.setPersistenceRequired();ally.setAutomaticUnitJoin(false);ally.setPos(f.x+.5,81,8);f.level.addFreshEntity(ally);f.entities.add(ally);
         var target=target(f,16);s.setTarget(target);float health=healthFraction(target);
         h.runAfterDelay(120,()->{try(f){h.assertTrue(rocketTotal(s)==3&&FirearmItem.state(s.getMainHandItem(),0).magazine()==24,"actual allied line obstruction prevents both weapon debits");h.assertTrue(Math.abs(healthFraction(target)-health)<1e-6,"no projectile passes through the actual allied soldier");}h.succeed();});
     }
@@ -95,8 +98,9 @@ public final class MilitaryLauncherGameTest {
         FirearmItem.store(seed.getOffhandItem(),new AmmoState(0,0,0));var saved=seed.saveWithoutId(new CompoundTag());
         saved.getCompound("MilitaryLoadout").getCompound("Reserves").putInt("rocket_round",0);seed.discard();
         var s=ModEntities.MILITARY_SOLDIER.get().create(f.level);s.load(saved);f.level.addFreshEntity(s);f.entities.add(s);
+        s.getAttribute(Attributes.MOVEMENT_SPEED).setBaseValue(0);
         var carbine=s.getMainHandItem();var rocket=s.getOffhandItem();s.setItemSlot(EquipmentSlot.MAINHAND,rocket);s.setItemSlot(EquipmentSlot.OFFHAND,carbine);
-        var target=target(f,4);s.setTarget(target);float health=healthFraction(target);
+        var target=target(f,16);s.setTarget(target);float health=healthFraction(target);
         h.runAfterDelay(140,()->{try(f){h.assertTrue(s.getMainHandItem()==carbine&&s.getOffhandItem()==rocket&&healthFraction(target)<health,"the real empty launcher yields to the same carried carbine through the actual NPC goal");h.assertTrue(rocketTotal(s)==0,"no magazine or typed reserve is created for the empty launcher");}h.succeed();});
     }
     @GameTest(template="blackwatch_arena",batch="vehicle6_loadout",timeoutTicks=140)

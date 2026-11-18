@@ -128,6 +128,7 @@ public final class ConsumeVictimPose {
             limb(saved,humanoid.leftArm,-p.brace()*1.65F,-.15F,.25F+p.brace()*.22F);
             limb(saved,humanoid.rightLeg,p.kick()*.66F,0,.12F);
             limb(saved,humanoid.leftLeg,-p.kick()*.48F,0,-.12F);
+            followClothing(humanoid, saved);
         } else if (model instanceof HierarchicalModel<?> hierarchy) {
             var root=hierarchy.root();
             if(root.hasChild("head"))head(saved,root.getChild("head"),p);
@@ -202,10 +203,7 @@ public final class ConsumeVictimPose {
         position(saved,h.hat,linked.hat().add(shift),h.young,false);position(saved,h.rightArm,linked.rightArm().add(shift),h.young,false);
         position(saved,h.leftArm,linked.leftArm().add(shift),h.young,false);position(saved,h.rightLeg,linked.rightLeg().add(shift),h.young,false);
         position(saved,h.leftLeg,linked.leftLeg().add(shift),h.young,false);
-        if(h instanceof PlayerModel<?> player) {
-            copyPart(saved,player.jacket,h.body);copyPart(saved,player.rightSleeve,h.rightArm);copyPart(saved,player.leftSleeve,h.leftArm);
-            copyPart(saved,player.rightPants,h.rightLeg);copyPart(saved,player.leftPants,h.leftLeg);
-        }
+        followClothing(h, saved);
         // Segmented receivers have actual elbow/knee children. Clearing their
         // locomotion without applying these joints left the captured body rigid.
         projectSegment(saved,h.rightArm,"forearm",frame,7);
@@ -245,6 +243,15 @@ public final class ConsumeVictimPose {
         saved.putIfAbsent(part,part.storePose());var local=NativeReceiverPose.modelPosition(rendered,young,head);part.setPos(local.x,local.y,local.z);
     }
     private static void copyPart(Map<ModelPart,PartPose> saved,ModelPart to,ModelPart from){saved.putIfAbsent(to,to.storePose());to.copyFrom(from);}
+    private static void followClothing(HumanoidModel<?> body, Map<ModelPart,PartPose> saved) {
+        if (body instanceof PlayerModel<?> player) {
+            copyPart(saved, player.jacket, body.body);
+            copyPart(saved, player.rightSleeve, body.rightArm);
+            copyPart(saved, player.leftSleeve, body.leftArm);
+            copyPart(saved, player.rightPants, body.rightLeg);
+            copyPart(saved, player.leftPants, body.leftLeg);
+        }
+    }
     private static void restrain(EntityModel<?> model,Map<ModelPart,PartPose> saved){
         var parts=new java.util.HashSet<ModelPart>();
         var root=ReceiverModelPose.root(model);
@@ -320,7 +327,7 @@ public final class ConsumeVictimPose {
             pose.orElseEmpty("Leg_"+side).rotation().rotationXYZ(p.kick()*.95F,0,0);
         }
     }
-    private static void strikePose(EntityModel<?> model, Map<ModelPart,PartPose> saved, FleshRecoil.Pose pose) {
+    static void strikePose(EntityModel<?> model, Map<ModelPart,PartPose> saved, FleshRecoil.Pose pose) {
         float pitch = pose.pitch(), twist = pose.twist(), roll = pose.roll();
         if (model instanceof HumanoidModel<?> h) {
             // Vanilla humanoid shoulders, head and body are siblings. Rotate their
@@ -338,6 +345,7 @@ public final class ConsumeVictimPose {
             rotate(saved, h.leftArm, -.42F*pose.brace(), 0, .55F*pose.brace());
             rotate(saved, h.rightLeg, .22F*pose.brace(), 0, .09F*roll);
             rotate(saved, h.leftLeg, -.26F*pose.brace(), 0, .09F*roll);
+            followClothing(h, saved);
         } else if (model instanceof HierarchicalModel<?> h) {
             var root = h.root();
             if (root.hasChild("body")) rotate(saved,root.getChild("body"),pitch*.58F,twist*.62F,roll*.60F);
@@ -372,6 +380,7 @@ public final class ConsumeVictimPose {
             rotate(saved,h.body,bend,twist,twist*.5F);rotate(saved,h.head,-bend*.6F,0,0);rotate(saved,h.hat,-bend*.6F,0,0);
             rotate(saved,h.rightArm,-.45F*w,0,-.22F*w);rotate(saved,h.leftArm,-.35F*w,0,.22F*w);
             rotate(saved,h.rightLeg,.18F*w,0,0);rotate(saved,h.leftLeg,-.14F*w,0,0);
+            followClothing(h, saved);
         }else if(model instanceof HierarchicalModel<?> h){
             var root=h.root();
             if(root.hasChild("body"))rotate(saved,root.getChild("body"),bend,twist,0);

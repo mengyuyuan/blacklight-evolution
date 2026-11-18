@@ -91,7 +91,7 @@ public final class GrabInteractionGameTest {
         ClawCombatSystem.handle(p,Action.GRAB);ClawCombatSystem.handle(p,Action.CONSUME);
         tick(p,ConsumeVisual.captureDuration(PowerForm.CLAWS));
         h.assertTrue(com.codex.blacklight.registry.ModAttachments.getData(cow, ModAttachments.CONSUME_VISUAL).stage()==ConsumeVisual.CONSUME&&cow.isAlive()&&p.getHealth()==10,"RC49 queued right click starts consume only after capture");
-        tick(p,ConsumeSequence.completionTick(PowerForm.CLAWS,false)-1);
+        tick(p,ConsumeSequence.completionTick(PowerForm.CLAWS,false,ModAttachments.getData(cow, ModAttachments.CONSUME_VISUAL).variant())-1);
         h.assertTrue(cow.isAlive()&&p.getHealth()==10,"queue cannot shorten the consume sequence");
         tick(p,2);ClawCombatSystem.handle(p,Action.CONSUME);tick(p,20);
         h.assertTrue(cow.isRemoved()&&p.getHealth()==12&&com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.PLAYER_STATE).getEvolutionPoints()==2,"queued consume and repeated input pay exactly once");h.succeed();
