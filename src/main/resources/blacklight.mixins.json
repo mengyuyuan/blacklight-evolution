@@ -50,7 +50,10 @@
     "NativeTissueAirMixin",
     "NativeTissueFeedingMixin",
     "ItemPickupTargetAccess",
-    "PendingChunkReadMixin"
+    "PendingChunkReadMixin",
+    "GreeneHealthFloorMixin",
+    "HydraDeathGuardMixin",
+    "HydraProjectileContactMixin"
   ],
   "client": [
     "client.PostChainAccess",
@@ -84,7 +87,8 @@
     "client.NativePlayerModelOwnershipMixin",
     "client.PrototypeBodyYawMixin",
     "client.ConsumeTeleportSmoothingMixin",
-    "client.SceneClockMixin"
+    "client.SceneClockMixin",
+    "client.HydraPickClockMixin"
   ],
   "injectors": {
     "defaultRequire": 1

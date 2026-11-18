@@ -30,8 +30,10 @@ public final class WhipCurveContact {
         return worldPoints(curve,time,feet,yaw,1);
     }
     public static List<Vec3> worldPoints(WhipCurve curve,double time,Vec3 feet,float yaw,Entity actor){
-        double scale=AttackReach.scale(actor);
-        return pitched(worldPoints(curve,time,feet,yaw,scale),feet,yaw,aimPitch(actor),shoulder(actor));
+        return worldPoints(curve,time,feet,yaw,actor,aimPitch(actor));
+    }
+    static List<Vec3> worldPoints(WhipCurve curve,double time,Vec3 feet,float yaw,Entity actor,float pitch){
+        return pitched(worldPoints(curve,time,feet,yaw,AttackReach.scale(actor)),feet,yaw,pitch,shoulder(actor));
     }
     /** Lash elevation; within the dead zone the authored ground-level strike is kept exactly. */
     public static final float PITCH_DEAD_ZONE=12F,PITCH_LIMIT=80F;
@@ -43,7 +45,10 @@ public final class WhipCurveContact {
             var visual=com.codex.blacklight.registry.ModAttachments.getData(living,com.codex.blacklight.registry.ModAttachments.WEAPON_VISUAL);
             var target=visual.targetId()<0?null:actor.level().getEntity(visual.targetId());
             if(target!=null&&target!=actor){
-                Vec3 from=actor.position().add(0,shoulder(actor),0),to=target.getBoundingBox().getCenter();
+                Vec3 from=actor.position().add(0,shoulder(actor),0);
+                Vec3 to=actor instanceof net.minecraft.world.entity.player.Player player
+                        &&target instanceof net.minecraft.world.entity.LivingEntity victim&&CombatTargeting.multipart(victim)
+                        ?CombatTargeting.aimPoint(player,from,victim):target.getBoundingBox().getCenter();
                 double horizontal=Math.sqrt((to.x-from.x)*(to.x-from.x)+(to.z-from.z)*(to.z-from.z));
                 pitch=(float)Math.toDegrees(Math.atan2(from.y-to.y,Math.max(1e-6,horizontal)));
             }
@@ -125,6 +130,7 @@ public final class WhipCurveContact {
     public static boolean hits(WhipCurve curve, double fromTime, double toTime,
                                Vec3 fromFeet, Vec3 toFeet, float fromYaw,float yaw,AABB beforeTarget,AABB target,
                                Level level, Entity actor) {
+        float pitch=aimPitch(actor);
         var times = new ArrayList<Double>();
         times.add(fromTime);
         for (var sample : curve.samples())
@@ -134,8 +140,8 @@ public final class WhipCurveContact {
             double begin = times.get(interval - 1), end = times.get(interval);
             Vec3 beginFeet = feetAt(begin, fromTime, toTime, fromFeet, toFeet);
             Vec3 endFeet = feetAt(end, fromTime, toTime, fromFeet, toFeet);
-            var a = worldPoints(curve, begin, beginFeet, fromYaw,actor);
-            var b = worldPoints(curve, end, endFeet, yaw,actor);
+            var a = worldPoints(curve, begin, beginFeet, fromYaw,actor,pitch);
+            var b = worldPoints(curve, end, endFeet, yaw,actor,pitch);
             double travel = Math.min(2,beforeTarget.getCenter().distanceTo(target.getCenter()));
             for (int node = 0; node < a.size(); node++) travel = Math.max(travel, a.get(node).distanceTo(b.get(node)));
             int steps = Math.max(1, (int)Math.ceil(travel / Math.max(.025, curve.collisionRadius() * .4)));
@@ -146,7 +152,7 @@ public final class WhipCurveContact {
                 double frameAlpha=com.codex.blacklight.util.MathCompat.clamp((time-fromTime)/Math.max(1e-9,toTime-fromTime),0,1);
                 float turn=fromYaw+net.minecraft.util.Mth.wrapDegrees(yaw-fromYaw)*(float)frameAlpha;
                 AABB expanded=CombatPursuit.interpolate(beforeTarget,target,frameAlpha).inflate(curve.collisionRadius());
-                var points = worldPoints(curve,time,beginFeet.lerp(endFeet,alpha),turn,actor);
+                var points = worldPoints(curve,time,beginFeet.lerp(endFeet,alpha),turn,actor,pitch);
                 var visible = visiblePoints(points, level, actor);
                 for (int segment = 1; segment < visible.size(); segment++) {
                     Vec3 first = visible.get(segment - 1), last = visible.get(segment);

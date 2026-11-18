@@ -22,6 +22,9 @@ public final class ModParticles {
     public static final RegistryObject<SimpleParticleType> SPRINT_SHOCKWAVE =
             PARTICLES.register("sprint_shockwave", () -> new SimpleParticleType(false));
 
+    public static final RegistryObject<SimpleParticleType> CONTACT_DUST =
+            PARTICLES.register("contact_dust", () -> new SimpleParticleType(false));
+
     private ModParticles() {
     }
 

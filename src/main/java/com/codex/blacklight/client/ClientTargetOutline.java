@@ -15,6 +15,7 @@ public final class ClientTargetOutline {
         var target=ClientTargetLock.entityTarget();
         // Parent identity also covers multipart renderers, and cannot match an old
         // world's entity merely because its numeric ID has been reused.
-        return target!=null&&target.level()==mc.level&&com.codex.blacklight.combat.ExplicitTarget.resolve(entity)==target;
+        return target!=null&&target.level()==mc.level&&com.codex.blacklight.combat.ExplicitTarget.resolve(entity)==target
+                &&ClientTargetLock.selection(target).goliathPart()==null;
     }
 }

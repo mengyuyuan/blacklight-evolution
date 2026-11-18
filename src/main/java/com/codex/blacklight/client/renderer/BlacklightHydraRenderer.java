@@ -9,6 +9,7 @@ import software.bernie.geckolib.renderer.GeoEntityRenderer;
 public final class BlacklightHydraRenderer extends GeoEntityRenderer<BlacklightHydra> {
     private static final net.minecraft.resources.ResourceLocation SKIN = new net.minecraft.resources.ResourceLocation("blacklight", "textures/entity/hydra_connected.png");
     public BlacklightHydraRenderer(EntityRendererProvider.Context c){super(c,new BlacklightHydraModel());shadowRadius=1.2F;}
+    @Override protected float getDeathMaxRotation(BlacklightHydra entity){return entity.nativeDying()?0:super.getDeathMaxRotation(entity);}
     @Override public void render(BlacklightHydra e,float yaw,float partial,PoseStack pose,MultiBufferSource buffers,int light){
         pose.pushPose();
         float scale=e.visualScale();
@@ -42,6 +43,9 @@ public final class BlacklightHydraRenderer extends GeoEntityRenderer<BlacklightH
             software.bernie.geckolib.cache.object.GeoBone bone, net.minecraft.client.renderer.RenderType type,
             net.minecraft.client.renderer.MultiBufferSource buffers, com.mojang.blaze3d.vertex.VertexConsumer out,
             boolean reRender,float partial,int light,int overlay,float red,float green,float blue,float alpha){
+        // Ref218 hides every one of the source model's nine body skins. This
+        // gates only the authored body draw, not entity lifetime or world FX.
+        if(entity.nativeDeathBodyHidden(partial))return;
         int color=((int)(alpha*255)<<24)|((int)(red*255)<<16)|((int)(green*255)<<8)|(int)(blue*255);
         super.renderRecursively(pose,entity,bone,type,buffers,out,reRender,partial,light,overlay,red,green,blue,alpha);
     }

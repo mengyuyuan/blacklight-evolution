@@ -144,3 +144,9 @@ independent player skeleton. `art/motion-profile/basic_dodge_roll.json` includes
 source hash and frame segments. The source's end frame 55 is clamped to the
 actual last frame 52. Six invulnerability ticks and MC displacement are gameplay
 adaptations, not verified original values.
+
+## Encounter collision and animation
+
+Goliath and Elizabeth Greene use the authored bind geometry in `art/encounters` and the joint samples in `assets/blacklight/models/encounter_*_source.json`. Client rendering, server contact and target selection sample the same rig. The original P2 behemoth subtarget records identify Head, Knee_R and Elbow_R. The bind data and source references are available in [the encounter art directory](art/encounters).
+
+Greene's projectile loops and the Hydra death sounds use project-authored or adapted Foley. The JAR includes their notices in `META-INF/licenses/blacklight-audio`. See [Greene projectile credits](art/encounters/greene-projectile-loop-audio-LICENSE.md) and [Hydra audio credits](art/creature-audio/hydra-death-LICENSE.md).

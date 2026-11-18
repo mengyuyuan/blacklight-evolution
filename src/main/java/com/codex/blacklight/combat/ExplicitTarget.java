@@ -13,6 +13,7 @@ public final class ExplicitTarget {
     public static boolean enabled(Player p){return p!=null&&p.isAlive()&&!p.isSpectator()
             &&(com.codex.blacklight.power.PrototypeMetabolism.active(p)
             ||com.codex.blacklight.firearms.FirearmsCombat.holdingFirearm(p)||p.getVehicle() instanceof MilitaryVehicle);}
+    public static boolean mechanical(Entity e){return e instanceof MilitaryVehicle;}
     public static Entity resolve(Entity e){
         var vehicle=VehicleDamageBridge.vehicle(e);return vehicle!=null?vehicle:CombatTargeting.resolveTarget(e);
     }

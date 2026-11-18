@@ -53,10 +53,10 @@ public final class TargetLockHud {
             if(!notice.isBlank())panel(g,notice,g.guiWidth()/2,g.guiHeight()-54,0xFFFFCA77);
             return;
         }
-        String name=(ClientTargetLock.pending()?"锁定中 · ":"锁定 · ")+target.getDisplayName().getString();
+        String name=(ClientTargetLock.pending()?"锁定中 · ":"锁定 · ")+ClientTargetLock.selection(target).label();
         var captured=world;
         if(captured!=null&&captured.level==mc.level&&captured.frame==frame) {
-            var focus=ClientTargetLock.focusPoint(target).add(target.getPosition(captured.partial).subtract(target.position()));
+            var focus=ClientTargetLock.renderedFocus(target,captured.partial);
             var eye=captured.camera;
             var point=WorldHudProjection.project(captured.view,captured.projection,eye.x,eye.y,eye.z,
                     focus.x,focus.y,focus.z,g.guiWidth(),g.guiHeight());
@@ -66,7 +66,7 @@ public final class TargetLockHud {
                 brackets(g,x,y,color);
             }
         }
-        String status=name+"  "+Math.round(Math.sqrt(com.codex.blacklight.combat.ExplicitTarget.distanceSquared(mc.player,target)))+"m"
+        String status=name+"  "+Math.round(Math.sqrt(ClientTargetLock.selection(target).distanceSquared(mc.player)))+"m"
                 +(marker==null||!marker.onScreen()?" · 目标在视野外":"");
         if(target instanceof net.minecraft.world.entity.Mob mob&&ready(mc,mob))status+=" · "+net.minecraft.network.chat.Component.translatable("hud.blacklight.consume_ready_short",SkillBindings.label("key.blacklight.grab")).getString();
         var shown=mc.font.plainSubstrByWidth(status,182);int statusY=g.guiHeight()-108;

@@ -131,6 +131,11 @@ public final class ClientClawEvents {
         event.registerEntityRenderer(ModEntities.SUPREME_HUNTER.get(), com.codex.blacklight.client.renderer.SupremeHunterRenderer::new);
         event.registerEntityRenderer(ModEntities.SUPREME_HUNTER_DEBRIS.get(), context->new net.minecraft.client.renderer.entity.ThrownItemRenderer<>(context,2.6F,false));
         event.registerEntityRenderer(ModEntities.BLACKLIGHT_HYDRA.get(), com.codex.blacklight.client.renderer.BlacklightHydraRenderer::new);
+        com.codex.blacklight.registry.EncounterEntities.CREATURES.values().forEach(type->event.registerEntityRenderer(type.get(),context->new com.codex.blacklight.client.renderer.BlacklightCreatureRenderer<com.codex.blacklight.entity.EncounterMob>(context,com.codex.blacklight.entity.EncounterMob::asset)));
+        event.registerEntityRenderer(com.codex.blacklight.registry.EncounterEntities.PROJECTILE.get(),context->new net.minecraft.client.renderer.entity.ThrownItemRenderer<>(context));
+        event.registerEntityRenderer(com.codex.blacklight.registry.EncounterEntities.GREENE_PROJECTILE.get(),com.codex.blacklight.client.renderer.GreeneProjectileRenderer::new);
+        event.registerEntityRenderer(com.codex.blacklight.registry.EncounterEntities.GREENE_SEGMENT_CORPSE.get(),com.codex.blacklight.client.renderer.GreeneSegmentCorpseRenderer::new);
+        event.registerEntityRenderer(ModEntities.HYDRA_DEBRIS.get(),com.codex.blacklight.client.renderer.HydraDebrisRenderer::new);
         event.registerEntityRenderer(ModEntities.BLACKLIGHT_VIRUS_VIAL.get(), com.codex.blacklight.client.renderer.VirusVialRenderer::new);
     }
 
