@@ -23,14 +23,14 @@ class ConsumeGripPoseTest {
             }
         }
     }
-    @Test void footSweepPreservesEveryAuthoredActorFrameWithoutLookingForAHeadContact() {
+    @Test void missingReceiverPreservesEveryAuthoredActorFrame() {
         assertFalse(ConsumePlacementTrack.headGrip(PowerForm.CLAWS));
         var skeleton=BlacklightSkeleton.get();
         float duration=MotionLibrary.duration("consume_claws_actor");
         for(int frame=0;frame<=120;frame++) {
             var pose=MotionLibrary.pose("consume_claws_actor",duration*frame/120F,false);
             var expected=pose.copy();
-            // A scene without palm fitting must not require a victim/world query.
+            // Previewing without an actor/receiver must preserve the source choreography.
             var visual=new com.codex.blacklight.combat.ConsumeVisual(1,0,88,PowerForm.CLAWS.ordinal(),com.codex.blacklight.combat.ConsumeVisual.CONSUME);
             ConsumeGripPose.applyForScene(null,null,skeleton,pose,visual,.5F);
             assertEquals(expected.getJointTransformData().keySet(),pose.getJointTransformData().keySet());

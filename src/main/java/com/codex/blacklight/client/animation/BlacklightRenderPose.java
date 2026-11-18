@@ -10,6 +10,7 @@ import net.minecraft.world.entity.LivingEntity;
 public final class BlacklightRenderPose {
     private BlacklightRenderPose() { }
     public static BlacklightPose sample(LivingEntity entity, float partial) {
+        if(entity instanceof net.minecraft.world.entity.player.Player&&entity.getVehicle() instanceof com.codex.blacklight.entity.BlackwatchHelicopter craft)return com.codex.blacklight.client.vehicle.HelicopterPose.skeleton(craft,entity,partial);
         if(entity instanceof net.minecraft.world.entity.player.Player&&entity.getVehicle() instanceof com.codex.blacklight.entity.MilitaryVehicle vehicle){
             String seat=vehicle.seatOf(entity.getUUID());
             boolean driver=vehicle.definition().seats().stream().anyMatch(s->s.id().equals(seat)&&s.job()==com.codex.blacklight.military.vehicle.VehicleDefinition.Job.DRIVER);
@@ -22,7 +23,7 @@ public final class BlacklightRenderPose {
         NativeHeadLook.apply(entity,pose,partial);
         if (!NativeHitPose.apply(entity, skeleton, pose, partial)) ConsumeVictimPose.epic(entity, pose, partial);
         boolean actorOwns=NativeConsumePose.actor(entity, pose, partial);
-        if (!actorOwns && com.codex.blacklight.registry.ModAttachments.getData(entity,ModAttachments.GRAB_STAGE) == ConsumeVisual.HOLD) {
+        if (!actorOwns && ConsumeVisual.carrying(com.codex.blacklight.registry.ModAttachments.getData(entity,ModAttachments.GRAB_STAGE))) {
             String key = com.codex.blacklight.registry.ModAttachments.getData(entity,ModAttachments.PLAYER_STATE).getActivePower() == PowerForm.BLADE && (!(entity instanceof net.minecraft.world.entity.player.Player p)||com.codex.blacklight.combat.BlockThrowSystem.held(p)==null) ? "grab_blade_hold" : "grab_hold";
             var held = MotionLibrary.pose(key, (entity.tickCount + partial) / 20F, true);
             pose=CarryPoseLayer.holdCreature(held,pose,!entity.onGround(),key.equals("grab_blade_hold"));
@@ -57,15 +58,26 @@ public final class BlacklightRenderPose {
         var weapon=ModAttachments.getData(entity,ModAttachments.WEAPON_VISUAL);
         if(wall==null&&entity.onGround()&&weapon.spec()==com.codex.blacklight.combat.WeaponMove.HAMMER_RAM
                 &&!weapon.charging())HammerGroundContact.apply(pose);
+        if(wall==null&&entity.onGround()&&!weapon.charging()
+                &&(weapon.spec()==com.codex.blacklight.combat.WeaponMove.HAMMER_QUAKE||weapon.spec()==com.codex.blacklight.combat.WeaponMove.HAMMER_QUAKE_CHARGED)){
+            var clock=WeaponMotionClock.sample(weapon,entity.level().getGameTime()+partial);
+            if(clock!=null){
+                var shapes=entity instanceof net.minecraft.client.player.AbstractClientPlayer player
+                        ?com.codex.blacklight.client.renderer.WeaponScaleRenderer.sample(player,partial)
+                        :new com.codex.blacklight.combat.WeaponAttackScales.Shape[]{com.codex.blacklight.combat.WeaponAttackScales.sample(clock.key(),clock.seconds(),false),com.codex.blacklight.combat.WeaponAttackScales.sample(clock.key(),clock.seconds(),true)};
+                com.codex.blacklight.combat.HammerGroundPose.quake(entity,pose,clock.key(),clock.seconds(),entity.getPosition(partial),BlacklightRenderPose.facing(entity,partial),shapes[0],shapes[1]);
+            }
+        }
         if(wall==null)WhipAimPose.apply(entity,skeleton,pose);
         // Fit after locomotion/wall constraints and to the receiver's rendered
         // position. Holding no longer skips contact correction just because a
         // paired actor clip was found.
-        if(!actorOwns||com.codex.blacklight.registry.ModAttachments.getData(entity,ModAttachments.GRAB_STAGE)==ConsumeVisual.HOLD)
+        if(!actorOwns||ConsumeVisual.carrying(com.codex.blacklight.registry.ModAttachments.getData(entity,ModAttachments.GRAB_STAGE))||com.codex.blacklight.registry.ModAttachments.getData(entity,ModAttachments.GRAB_STAGE)==ConsumeVisual.CAPTURE)
             GrabHoldPose.apply(entity,skeleton,pose,partial);
         return pose;
     }
     public static float facing(LivingEntity entity,float partial) {
+        if(entity.getVehicle() instanceof com.codex.blacklight.entity.BlackwatchHelicopter craft)return -net.minecraft.util.Mth.rotLerp(partial,craft.yRotO,craft.getYRot());
         if(entity.getVehicle() instanceof com.codex.blacklight.entity.MilitaryVehicle vehicle)return -net.minecraft.util.Mth.rotLerp(partial,vehicle.yRotO,vehicle.getYRot());
         if(entity instanceof net.minecraft.world.entity.player.Player p){var h=com.codex.blacklight.city.HydraTransport.carrier(p);if(h!=null)return h.getYRot();}
         if(entity instanceof net.minecraft.world.entity.player.Player p&&com.codex.blacklight.combat.BlockThrowMotion.active(p))return com.codex.blacklight.combat.BlockThrowMotion.yaw(p,partial);

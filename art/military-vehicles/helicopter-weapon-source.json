@@ -1,0 +1,3427 @@
+{
+  "schema": 1,
+  "scope": "Standard P1 helicopter/Black Hawk source and engage_apache structural weapon-controller audit; not a complete engine port",
+  "sources": [
+    {
+      "file": "heli_bh_marine.p3d.rz",
+      "path": "D:\\PrototypeReference\\p1\\input\\helicopter\\heli_bh_marine.p3d.rz",
+      "sha256": "fddf85d61e3dd5d71a3469318b6f03dbe42966a37013a847edbc6a7187bac07d",
+      "compressedBytes": 690138,
+      "inflatedBytes": 1395832
+    },
+    {
+      "file": "heli_bh_marine_fig.p3d.rz",
+      "path": "D:\\PrototypeReference\\p1\\input\\helicopter\\heli_bh_marine_fig.p3d.rz",
+      "sha256": "536cf415ea7b759fab6ea12a0c0b57567c834ddc541f45d791488bf30ec52dc5",
+      "compressedBytes": 28410,
+      "inflatedBytes": 314176
+    },
+    {
+      "file": "heli_bh_marine_tod.p3d.rz",
+      "path": "D:\\PrototypeReference\\p1\\input\\helicopter\\heli_bh_marine_tod.p3d.rz",
+      "sha256": "21db2dad1613856955e2c9d25e6aa2da86d7ee4be6fb0b19399ba43215070efe",
+      "compressedBytes": 4994,
+      "inflatedBytes": 27508
+    },
+    {
+      "file": "heli_gunship_marine_core.p3d.rz",
+      "path": "D:\\PrototypeReference\\p1\\input\\helicopter\\heli_gunship_marine_core.p3d.rz",
+      "sha256": "724b3cb49b206c00f0d194fb2f8af684b4750fa46d27c99fffcbf449a7f4ac9e",
+      "compressedBytes": 617877,
+      "inflatedBytes": 1197678
+    },
+    {
+      "file": "heli_gunship_marine_core_fig.p3d.rz",
+      "path": "D:\\PrototypeReference\\p1\\input\\helicopter\\heli_gunship_marine_core_fig.p3d.rz",
+      "sha256": "a69a4fa0c360fe9f686843071d1e658077c92b4229946aa5d7c77d5fb2712f82",
+      "compressedBytes": 28557,
+      "inflatedBytes": 312892
+    },
+    {
+      "file": "heli_gunship_marine_core_tod.p3d.rz",
+      "path": "D:\\PrototypeReference\\p1\\input\\helicopter\\heli_gunship_marine_core_tod.p3d.rz",
+      "sha256": "880d0a40db4b8665183c567ffb380d1d789937111ad5e55d061550b802da1624",
+      "compressedBytes": 4350,
+      "inflatedBytes": 22436
+    },
+    {
+      "file": "startup_fig.p3d.rz",
+      "path": "D:\\PrototypeReference\\p1\\input\\startup_fig.p3d.rz",
+      "sha256": "96d84271e461cbe4566fb984359653b164257f88392c5bceb213c30f88527779",
+      "compressedBytes": 506696,
+      "inflatedBytes": 3974552
+    }
+  ],
+  "schemaAuthority": {
+    "repository": "https://github.com/Elan-S/EditP3D",
+    "revision": "6966de776f7650e4f5a9150ebe4cf9377f7933d3",
+    "note": "Third-party reverse-engineered binary layouts. Original game files provide the values. Nested Vector/BranchReference reads and TargetConditionGroup handling are implemented by the independent reader."
+  },
+  "reader": {
+    "file": "D:/CodexCache/work/helicopter-weapons-complete.mjs",
+    "sha256": "11bfe280baf8fe3464f802bf031339363b29e50fa1a55ffc60c27b402eb4b038"
+  },
+  "audit": {
+    "file": "D:\\PrototypeReference\\p1\\helicopter-weapons-complete.json",
+    "sha256": "70955751e9386c6b312918cc0843e6b808d1144dbede5b25181cf012314308fa",
+    "fullyConsumedTrees": 151,
+    "selectedRecords": 20738,
+    "apacheRecords": 1010,
+    "apacheTypedDecoded": 388,
+    "apacheUnresolvedTyped": 0,
+    "validatedLocalBranchReferences": 147,
+    "remainingReaderErrors": [
+      "PrimitiveDisplay: Consumed 4/28",
+      "PrimitiveDisplay: Consumed 4/92"
+    ]
+  },
+  "findings": [
+    "ChinGunBurstTime is set to 4 seconds; its recovery Wait has both minimum and maximum 4 seconds. Source-based Minecraft cycle uses 80/80 ticks.",
+    "SimpleEngage includes Rocket weight 80, alternate weight 20, and WeaponSelected 2/1. However the referenced legacy rocket controller also has a literal False condition. These weights alone do not prove the actual engine weapon policy.",
+    "Hellfire hover requires TimeAvoidHellfire <= 0, blackwatchVariety != 0 and target line of fire; the source initializes the avoidance timer to 15 seconds and sets it to 10 at hover entry.",
+    "Hellfire hover includes a 1–2 second pre-aim wait, AimingAtTarget, a 0.2 second Action pulse, then another 1–2 second wait; outer branch permits reevaluation after 5 seconds.",
+    "The standard gunship package contains distinct NoseGun/30mm, RocketPodLeft/Right and HellfireLeft/Right paths, including an explicit AI Hellfire user profile and a special AI 30mm profile for tank targets.",
+    "Hellfire final has several timed Hit tracks with distinct radii/damage. Current Minecraft rocket damage is not a copy of these original values."
+  ],
+  "combatRecords": [
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 69684,
+      "payload": 69696,
+      "length": 28,
+      "type": "TimerSet",
+      "kind": "TrackHash",
+      "owner": "engage_apache/engage",
+      "group": "TrackHash",
+      "parentOffset": 69628,
+      "treeOffset": 69504,
+      "fields": {
+        "Unknown1": 1,
+        "TimeBegin": 0,
+        "Timer": {
+          "hash": "10881217989349568899",
+          "name": "TimeAvoidHellfire"
+        },
+        "Time": 15,
+        "Incrementing": false,
+        "RandomRange": 0
+      },
+      "schema": "TimerSetTrack",
+      "end": 69732
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 72112,
+      "payload": 72124,
+      "length": 20,
+      "type": "TimerCompare",
+      "kind": "ConditionHash",
+      "owner": "engage_apache/engage/engage/#99b01523062c909d",
+      "group": "ConditionHash",
+      "parentOffset": 72100,
+      "treeOffset": 69504,
+      "fields": {
+        "Timer": {
+          "hash": "10881217989349568899",
+          "name": "TimeAvoidHellfire"
+        },
+        "Compare": {
+          "hash": "3935993",
+          "name": "LessThanOrEqual"
+        },
+        "Time": 0
+      },
+      "schema": "TimerCompareCondition",
+      "end": 72152
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 72152,
+      "payload": 72164,
+      "length": 20,
+      "type": "VariableIntCompare",
+      "kind": "ConditionHash",
+      "owner": "engage_apache/engage/engage/#99b01523062c909d",
+      "group": "ConditionHash",
+      "parentOffset": 72100,
+      "treeOffset": 69504,
+      "fields": {
+        "Variable": {
+          "hash": "7712363393100529610",
+          "name": "blackwatchVariety"
+        },
+        "Compare": {
+          "hash": "2164770",
+          "name": "NotEqual"
+        },
+        "Value": 0
+      },
+      "schema": "VariableIntCompareCondition",
+      "end": 72192
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 72192,
+      "payload": 72204,
+      "length": 36,
+      "type": "TargetHasLoF",
+      "kind": "ConditionHash",
+      "owner": "engage_apache/engage/engage/#99b01523062c909d",
+      "group": "ConditionHash",
+      "parentOffset": 72100,
+      "treeOffset": 69504,
+      "fields": {
+        "TimeTolerance": 0.5,
+        "DistanceTolerance": 2,
+        "CollisionFlags": {
+          "hash": "4601230196676155154",
+          "name": "collide_static_and_moving"
+        },
+        "CollideWithType": 16449,
+        "Offset": [
+          0,
+          -1,
+          0
+        ],
+        "Radius": 0.20000000298023224
+      },
+      "schema": "TargetHasLoFCondition",
+      "end": 72248
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 72248,
+      "payload": 72260,
+      "length": 4,
+      "type": "Random",
+      "kind": "ConditionHash",
+      "owner": "engage_apache/engage/engage/#99b01523062c909d",
+      "group": "ConditionHash",
+      "parentOffset": 72100,
+      "treeOffset": 69504,
+      "fields": {
+        "Weight": 10000
+      },
+      "schema": "RandomCondition",
+      "end": 72272
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 72292,
+      "payload": 72304,
+      "length": 20,
+      "type": "Spawn",
+      "kind": "TrackHash",
+      "owner": "engage_apache/engage/engage/#99b01523062c909d",
+      "group": "TrackHash",
+      "parentOffset": 72280,
+      "treeOffset": 69504,
+      "fields": {
+        "Unknown1": 0,
+        "TimeBegin": 0,
+        "TimeEnd": -1,
+        "BranchRef": {
+          "name": "",
+          "index": 120
+        }
+      },
+      "schema": "SpawnTrack",
+      "end": 72352
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 72352,
+      "payload": 72364,
+      "length": 28,
+      "type": "Opportunity",
+      "kind": "TrackHash",
+      "owner": "engage_apache/engage/engage/#99b01523062c909d",
+      "group": "TrackHash",
+      "parentOffset": 72280,
+      "treeOffset": 69504,
+      "fields": {
+        "Unknown1": 1,
+        "TimeBegin": 5,
+        "TimeEnd": -1,
+        "TimeHook": 0,
+        "BranchRef": {
+          "name": "",
+          "index": 2
+        },
+        "Priority": 0
+      },
+      "schema": "OpportunityTrack",
+      "end": 72420
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 92736,
+      "payload": 92748,
+      "length": 20,
+      "type": "VariableIntCompare",
+      "kind": "ConditionHash",
+      "owner": "engage_apache/engage/tactics/simpleEngage/attack/#52c6de05d63abd86/Rocket",
+      "group": "ConditionHash",
+      "parentOffset": 92724,
+      "treeOffset": 69504,
+      "fields": {
+        "Variable": {
+          "hash": "4555966873988132371",
+          "name": "useRocketsSimpleEngage"
+        },
+        "Compare": {
+          "hash": "2164770",
+          "name": "NotEqual"
+        },
+        "Value": 0
+      },
+      "schema": "VariableIntCompareCondition",
+      "end": 92776
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 92776,
+      "payload": 92788,
+      "length": 4,
+      "type": "Random",
+      "kind": "ConditionHash",
+      "owner": "engage_apache/engage/tactics/simpleEngage/attack/#52c6de05d63abd86/Rocket",
+      "group": "ConditionHash",
+      "parentOffset": 92724,
+      "treeOffset": 69504,
+      "fields": {
+        "Weight": 80
+      },
+      "schema": "RandomCondition",
+      "end": 92800
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 92988,
+      "payload": 93000,
+      "length": 32,
+      "type": "VariableIntSet",
+      "kind": "TrackHash",
+      "owner": "engage_apache/engage/tactics/simpleEngage/attack/#52c6de05d63abd86/Rocket",
+      "group": "TrackHash",
+      "parentOffset": 92808,
+      "treeOffset": 69504,
+      "fields": {
+        "Unknown1": 1,
+        "TimeBegin": 0,
+        "Variable": {
+          "hash": "11377063296380899135",
+          "name": "WeaponSelected"
+        },
+        "Operator": {
+          "hash": "61",
+          "name": "#3d"
+        },
+        "Value": 2,
+        "Persistent": false
+      },
+      "schema": "VariableIntSetTrack",
+      "end": 93040
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 93268,
+      "payload": 93280,
+      "length": 4,
+      "type": "Random",
+      "kind": "ConditionHash",
+      "owner": "engage_apache/engage/tactics/simpleEngage/attack/#52c6de05d63abd86/#62f258c78dd56a2a",
+      "group": "ConditionHash",
+      "parentOffset": 93256,
+      "treeOffset": 69504,
+      "fields": {
+        "Weight": 20
+      },
+      "schema": "RandomCondition",
+      "end": 93292
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 93420,
+      "payload": 93432,
+      "length": 32,
+      "type": "VariableIntSet",
+      "kind": "TrackHash",
+      "owner": "engage_apache/engage/tactics/simpleEngage/attack/#52c6de05d63abd86/#62f258c78dd56a2a",
+      "group": "TrackHash",
+      "parentOffset": 93300,
+      "treeOffset": 69504,
+      "fields": {
+        "Unknown1": 1,
+        "TimeBegin": 0,
+        "Variable": {
+          "hash": "11377063296380899135",
+          "name": "WeaponSelected"
+        },
+        "Operator": {
+          "hash": "61",
+          "name": "#3d"
+        },
+        "Value": 1,
+        "Persistent": false
+      },
+      "schema": "VariableIntSetTrack",
+      "end": 93472
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 93828,
+      "payload": 93840,
+      "length": 28,
+      "type": "SetUserTooltip",
+      "kind": "TrackHash",
+      "owner": "engage_apache/engage/tactics/#99b01523062c909d",
+      "group": "TrackHash",
+      "parentOffset": 93816,
+      "treeOffset": 69504,
+      "fields": {
+        "Unknown1": 1,
+        "TimeBegin": 0,
+        "Tooltip": "HELLFIRE HOVER"
+      },
+      "schema": "SetUserTooltipTrack",
+      "end": 93876
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 93976,
+      "payload": 93988,
+      "length": 28,
+      "type": "TimerSet",
+      "kind": "TrackHash",
+      "owner": "engage_apache/engage/tactics/#99b01523062c909d",
+      "group": "TrackHash",
+      "parentOffset": 93816,
+      "treeOffset": 69504,
+      "fields": {
+        "Unknown1": 1,
+        "TimeBegin": 0,
+        "Timer": {
+          "hash": "10881217989349568899",
+          "name": "TimeAvoidHellfire"
+        },
+        "Time": 10,
+        "Incrementing": false,
+        "RandomRange": 0
+      },
+      "schema": "TimerSetTrack",
+      "end": 94024
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 94096,
+      "payload": 94108,
+      "length": 16,
+      "type": "Wait",
+      "kind": "TrackHash",
+      "owner": "engage_apache/engage/tactics/#99b01523062c909d/#7bbf989dbe744ba3",
+      "group": "TrackHash",
+      "parentOffset": 94084,
+      "treeOffset": 69504,
+      "fields": {
+        "Unknown1": 0,
+        "TimeBegin": 0,
+        "TimeEndMin": 1,
+        "TimeEndMax": 2
+      },
+      "schema": "WaitTrack",
+      "end": 94132
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 94428,
+      "payload": 94440,
+      "length": 40,
+      "type": "AimingAtTarget",
+      "kind": "ConditionHash",
+      "owner": "engage_apache/engage/tactics/#99b01523062c909d/#7bbf989dbe744ba3/#5df32a0b5d89686b",
+      "group": "ConditionHash",
+      "parentOffset": 94416,
+      "treeOffset": 69504,
+      "fields": {
+        "Joint": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "Tolerance": 0.10000000149011612,
+        "Is3D": false,
+        "Heading": [
+          0,
+          0,
+          -1
+        ],
+        "Offset": [
+          0,
+          0,
+          0
+        ]
+      },
+      "schema": "AimingAtTargetCondition",
+      "end": 94488
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 94640,
+      "payload": 94652,
+      "length": 20,
+      "type": "Action",
+      "kind": "TrackHash",
+      "owner": "engage_apache/engage/tactics/#99b01523062c909d/inPosition/shoot",
+      "group": "TrackHash",
+      "parentOffset": 94628,
+      "treeOffset": 69504,
+      "fields": {
+        "Unknown1": 0,
+        "TimeBegin": 0,
+        "TimeEnd": 0.20000000298023224,
+        "Button": {
+          "hash": "382516289658763350",
+          "name": "Action"
+        }
+      },
+      "schema": "ActionTrack",
+      "end": 94680
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 94820,
+      "payload": 94832,
+      "length": 16,
+      "type": "Wait",
+      "kind": "TrackHash",
+      "owner": "engage_apache/engage/tactics/#99b01523062c909d/inPosition/#43342ca903db1d8f",
+      "group": "TrackHash",
+      "parentOffset": 94808,
+      "treeOffset": 69504,
+      "fields": {
+        "Unknown1": 0,
+        "TimeBegin": 0,
+        "TimeEndMin": 1,
+        "TimeEndMax": 2
+      },
+      "schema": "WaitTrack",
+      "end": 94856
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 96912,
+      "payload": 96924,
+      "length": 16,
+      "type": "Wait",
+      "kind": "TrackHash",
+      "owner": "engage_apache/engage/tactics/#ecdcb3134ef3dcd/#7cb91c66cb0b226e/control/#60e8dadce8b372e2/#4efee78ab0e67e27",
+      "group": "TrackHash",
+      "parentOffset": 96900,
+      "treeOffset": 69504,
+      "fields": {
+        "Unknown1": 0,
+        "TimeBegin": 0,
+        "TimeEndMin": 4,
+        "TimeEndMax": 4
+      },
+      "schema": "WaitTrack",
+      "end": 96948
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 97344,
+      "payload": 97356,
+      "length": 28,
+      "type": "TimerSet",
+      "kind": "TrackHash",
+      "owner": "engage_apache/engage/tactics/#ecdcb3134ef3dcd/#7cb91c66cb0b226e/control/#9da89db2b224248d/#9da89db2b224248d",
+      "group": "TrackHash",
+      "parentOffset": 97332,
+      "treeOffset": 69504,
+      "fields": {
+        "Unknown1": 0,
+        "TimeBegin": 0,
+        "Timer": {
+          "hash": "15734636954077742067",
+          "name": "ChinGunBurstTime"
+        },
+        "Time": 4,
+        "Incrementing": false,
+        "RandomRange": 0
+      },
+      "schema": "TimerSetTrack",
+      "end": 97392
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 97472,
+      "payload": 97484,
+      "length": 0,
+      "type": "False",
+      "kind": "ConditionHash",
+      "owner": "engage_apache/engage/tactics/#ecdcb3134ef3dcd/#1f38a064ac3243dd",
+      "group": "ConditionHash",
+      "parentOffset": 97460,
+      "treeOffset": 69504,
+      "fields": {},
+      "schema": "FalseCondition",
+      "end": 97492
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 99224,
+      "payload": 99236,
+      "length": 28,
+      "type": "TimerSet",
+      "kind": "TrackHash",
+      "owner": "engage_apache/engage/tactics/#ecdcb3134ef3dcd/#1f38a064ac3243dd/#9da89db2b224248d/#9da89db2b224248d",
+      "group": "TrackHash",
+      "parentOffset": 99212,
+      "treeOffset": 69504,
+      "fields": {
+        "Unknown1": 0,
+        "TimeBegin": 0,
+        "Timer": {
+          "hash": "10447084904599930265",
+          "name": "RocketBurstTime"
+        },
+        "Time": 3.5,
+        "Incrementing": false,
+        "RandomRange": 1.5
+      },
+      "schema": "TimerSetTrack",
+      "end": 99272
+    }
+  ],
+  "weaponAndImpactRecords": [
+    {
+      "source": "heli_gunship_marine_core_fig.p3d.rz",
+      "offset": 2888,
+      "payload": 2900,
+      "length": 72,
+      "type": "Sound",
+      "kind": "TrackHash",
+      "owner": "heli_gunship_marine_hellfire_missile/default/mid",
+      "group": "TrackHash",
+      "parentOffset": 288,
+      "treeOffset": 76,
+      "fields": {
+        "Unknown1": 0,
+        "TimeBegin": 0,
+        "Patch": {
+          "hash": "11294510414790182717",
+          "name": "#9cbe2961a184c73d"
+        },
+        "Trigger": {
+          "hash": "31616665440155042",
+          "name": "play"
+        },
+        "VolumeFactor": 1,
+        "MinDistance": 0,
+        "MaxDistance": 0,
+        "MinPitch": 1,
+        "MaxPitch": 1,
+        "CyclicPhase": 0,
+        "InstanceName": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "Frequency": 1,
+        "PolledLifetime": false,
+        "TriggerType": {
+          "hash": "13522664087197083521",
+          "name": "Retrigger"
+        }
+      },
+      "schema": "SoundTrack",
+      "end": 2980
+    },
+    {
+      "source": "heli_gunship_marine_core_fig.p3d.rz",
+      "offset": 2980,
+      "payload": 2992,
+      "length": 72,
+      "type": "Sound",
+      "kind": "TrackHash",
+      "owner": "heli_gunship_marine_hellfire_missile/default/mid",
+      "group": "TrackHash",
+      "parentOffset": 288,
+      "treeOffset": 76,
+      "fields": {
+        "Unknown1": 1,
+        "TimeBegin": 0.5,
+        "Patch": {
+          "hash": "3104097392610402726",
+          "name": "#2b13f821e2c261a6"
+        },
+        "Trigger": {
+          "hash": "31616665440155042",
+          "name": "play"
+        },
+        "VolumeFactor": 1,
+        "MinDistance": 35,
+        "MaxDistance": 75,
+        "MinPitch": 1,
+        "MaxPitch": 1,
+        "CyclicPhase": 0,
+        "InstanceName": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "Frequency": 1,
+        "PolledLifetime": false,
+        "TriggerType": {
+          "hash": "6266415434618234495",
+          "name": "StopExisting"
+        }
+      },
+      "schema": "SoundTrack",
+      "end": 3072
+    },
+    {
+      "source": "heli_gunship_marine_core_fig.p3d.rz",
+      "offset": 3680,
+      "payload": 3692,
+      "length": 276,
+      "type": "Hit",
+      "kind": "TrackHash",
+      "owner": "heli_gunship_marine_hellfire_missile/default/final",
+      "group": "TrackHash",
+      "parentOffset": 3668,
+      "treeOffset": 76,
+      "fields": {
+        "Unknown1": 0,
+        "BeginTime": 0,
+        "EndTime": 0.03333330154418945,
+        "UseShapecast": false,
+        "CollisionCountMax": -1,
+        "TimeBetweenHits": -1,
+        "jointName": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "jointEnd": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "OffsetX": 0,
+        "OffsetY": 0,
+        "OffsetZ": 0,
+        "Radius": 1,
+        "ArcOffset": 0,
+        "ArcRange": 0,
+        "CollideWith": 48,
+        "DamageMin": 500,
+        "DamageMax": 500,
+        "UseTransformationDamageMultiplier": true,
+        "UseWeaponDamageMultiplier": true,
+        "FriendlyFire": 0.05000000074505806,
+        "AttackType": {
+          "hash": "9949716209054956141",
+          "name": "MissileExplosion"
+        },
+        "HitTypeName": {
+          "hash": "8994176190371311496",
+          "name": "#7cd1bb978a5baf88"
+        },
+        "DamageType": {
+          "hash": "22018610510307286",
+          "name": "None"
+        },
+        "EffectTypeName": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "ScaleX": 3,
+        "ScaleY": 3,
+        "EffectScale": 1,
+        "PropAreaEmissionScale": 0,
+        "PropAreaEmissionScaleFunction": {
+          "hash": "4206860010037910535",
+          "name": "Linear"
+        },
+        "PropAreaSizeScale": 0,
+        "propAreaSizeScaleFunction": {
+          "hash": "10152029351150224597",
+          "name": "Logarithmic"
+        },
+        "ImpulseMinX": 0,
+        "ImpulseMinY": 9000,
+        "ImpulseMinZ": -10000,
+        "ImpulseMaxX": 0,
+        "ImpulseMaxY": 9000,
+        "ImpulseMaxZ": -10000,
+        "ImpulseRandomPlusMinus": 2500,
+        "UseMotion": false,
+        "CollisionDirectionX": 0,
+        "CollisionDirectionY": 0,
+        "CollisionDirectionZ": 0,
+        "DeformDirStr": 1,
+        "DeformStr": 0.9100000262260437,
+        "CollisionFlagName": {
+          "hash": "5441101953451253237",
+          "name": "#4b82ad6602255df5"
+        },
+        "GiverBranchRef": {
+          "name": "",
+          "index": -1
+        },
+        "ReceiverBranchRef": {
+          "name": "",
+          "index": -1
+        },
+        "UseDamageOriginator": true,
+        "SendAlert": true,
+        "SendOnlyToAIManager": false,
+        "UseOriginatorToValidate": false,
+        "IsThrown": false,
+        "MomentumDamageVelocity": 0,
+        "MomentumDamageMax": 0,
+        "TravelVelocity": 0,
+        "TravelTowardsTarget": {
+          "hash": "22018610510307286",
+          "name": "None"
+        },
+        "IgnorePowerTarget": false
+      },
+      "schema": "CollisionHitTrack",
+      "end": 3976
+    },
+    {
+      "source": "heli_gunship_marine_core_fig.p3d.rz",
+      "offset": 3976,
+      "payload": 3988,
+      "length": 276,
+      "type": "Hit",
+      "kind": "TrackHash",
+      "owner": "heli_gunship_marine_hellfire_missile/default/final",
+      "group": "TrackHash",
+      "parentOffset": 3668,
+      "treeOffset": 76,
+      "fields": {
+        "Unknown1": 0,
+        "BeginTime": 0.03333330154418945,
+        "EndTime": 0.10000000149011612,
+        "UseShapecast": false,
+        "CollisionCountMax": -1,
+        "TimeBetweenHits": -1,
+        "jointName": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "jointEnd": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "OffsetX": 0,
+        "OffsetY": 0,
+        "OffsetZ": 0,
+        "Radius": 4,
+        "ArcOffset": 0,
+        "ArcRange": 0,
+        "CollideWith": 48,
+        "DamageMin": 100,
+        "DamageMax": 100,
+        "UseTransformationDamageMultiplier": true,
+        "UseWeaponDamageMultiplier": true,
+        "FriendlyFire": 0.05000000074505806,
+        "AttackType": {
+          "hash": "9949716209054956141",
+          "name": "MissileExplosion"
+        },
+        "HitTypeName": {
+          "hash": "8994176190371311496",
+          "name": "#7cd1bb978a5baf88"
+        },
+        "DamageType": {
+          "hash": "22018610510307286",
+          "name": "None"
+        },
+        "EffectTypeName": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "ScaleX": 3,
+        "ScaleY": 3,
+        "EffectScale": 1,
+        "PropAreaEmissionScale": 0,
+        "PropAreaEmissionScaleFunction": {
+          "hash": "4206860010037910535",
+          "name": "Linear"
+        },
+        "PropAreaSizeScale": 0,
+        "propAreaSizeScaleFunction": {
+          "hash": "10152029351150224597",
+          "name": "Logarithmic"
+        },
+        "ImpulseMinX": 0,
+        "ImpulseMinY": 9000,
+        "ImpulseMinZ": -10000,
+        "ImpulseMaxX": 0,
+        "ImpulseMaxY": 9000,
+        "ImpulseMaxZ": -10000,
+        "ImpulseRandomPlusMinus": 2500,
+        "UseMotion": false,
+        "CollisionDirectionX": 0,
+        "CollisionDirectionY": 0,
+        "CollisionDirectionZ": 0,
+        "DeformDirStr": 1,
+        "DeformStr": 0.9100000262260437,
+        "CollisionFlagName": {
+          "hash": "5441101953451253237",
+          "name": "#4b82ad6602255df5"
+        },
+        "GiverBranchRef": {
+          "name": "",
+          "index": -1
+        },
+        "ReceiverBranchRef": {
+          "name": "",
+          "index": -1
+        },
+        "UseDamageOriginator": true,
+        "SendAlert": true,
+        "SendOnlyToAIManager": false,
+        "UseOriginatorToValidate": false,
+        "IsThrown": false,
+        "MomentumDamageVelocity": 0,
+        "MomentumDamageMax": 0,
+        "TravelVelocity": 0,
+        "TravelTowardsTarget": {
+          "hash": "22018610510307286",
+          "name": "None"
+        },
+        "IgnorePowerTarget": false
+      },
+      "schema": "CollisionHitTrack",
+      "end": 4272
+    },
+    {
+      "source": "heli_gunship_marine_core_fig.p3d.rz",
+      "offset": 4272,
+      "payload": 4284,
+      "length": 276,
+      "type": "Hit",
+      "kind": "TrackHash",
+      "owner": "heli_gunship_marine_hellfire_missile/default/final",
+      "group": "TrackHash",
+      "parentOffset": 3668,
+      "treeOffset": 76,
+      "fields": {
+        "Unknown1": 0,
+        "BeginTime": 0.10000000149011612,
+        "EndTime": 0.20000000298023224,
+        "UseShapecast": false,
+        "CollisionCountMax": -1,
+        "TimeBetweenHits": -1,
+        "jointName": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "jointEnd": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "OffsetX": 0,
+        "OffsetY": 0,
+        "OffsetZ": 0,
+        "Radius": 7,
+        "ArcOffset": 0,
+        "ArcRange": 0,
+        "CollideWith": 48,
+        "DamageMin": 35,
+        "DamageMax": 35,
+        "UseTransformationDamageMultiplier": true,
+        "UseWeaponDamageMultiplier": false,
+        "FriendlyFire": 0,
+        "AttackType": {
+          "hash": "9949716209054956141",
+          "name": "MissileExplosion"
+        },
+        "HitTypeName": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "DamageType": {
+          "hash": "22018610510307286",
+          "name": "None"
+        },
+        "EffectTypeName": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "ScaleX": 3,
+        "ScaleY": 3,
+        "EffectScale": 1,
+        "PropAreaEmissionScale": 0,
+        "PropAreaEmissionScaleFunction": {
+          "hash": "4206860010037910535",
+          "name": "Linear"
+        },
+        "PropAreaSizeScale": 0,
+        "propAreaSizeScaleFunction": {
+          "hash": "4206860010037910535",
+          "name": "Linear"
+        },
+        "ImpulseMinX": 0,
+        "ImpulseMinY": 6000,
+        "ImpulseMinZ": -7500,
+        "ImpulseMaxX": 0,
+        "ImpulseMaxY": 6000,
+        "ImpulseMaxZ": -7500,
+        "ImpulseRandomPlusMinus": 1500,
+        "UseMotion": false,
+        "CollisionDirectionX": 0,
+        "CollisionDirectionY": 0,
+        "CollisionDirectionZ": 0,
+        "DeformDirStr": 1,
+        "DeformStr": 0.9100000262260437,
+        "CollisionFlagName": {
+          "hash": "5441101953451253237",
+          "name": "#4b82ad6602255df5"
+        },
+        "GiverBranchRef": {
+          "name": "",
+          "index": -1
+        },
+        "ReceiverBranchRef": {
+          "name": "",
+          "index": -1
+        },
+        "UseDamageOriginator": true,
+        "SendAlert": true,
+        "SendOnlyToAIManager": false,
+        "UseOriginatorToValidate": false,
+        "IsThrown": false,
+        "MomentumDamageVelocity": 0,
+        "MomentumDamageMax": 0,
+        "TravelVelocity": 0,
+        "TravelTowardsTarget": {
+          "hash": "22018610510307286",
+          "name": "None"
+        },
+        "IgnorePowerTarget": false
+      },
+      "schema": "CollisionHitTrack",
+      "end": 4568
+    },
+    {
+      "source": "heli_gunship_marine_core_fig.p3d.rz",
+      "offset": 4568,
+      "payload": 4580,
+      "length": 276,
+      "type": "Hit",
+      "kind": "TrackHash",
+      "owner": "heli_gunship_marine_hellfire_missile/default/final",
+      "group": "TrackHash",
+      "parentOffset": 3668,
+      "treeOffset": 76,
+      "fields": {
+        "Unknown1": 0,
+        "BeginTime": 0.20000000298023224,
+        "EndTime": 0.30000001192092896,
+        "UseShapecast": false,
+        "CollisionCountMax": -1,
+        "TimeBetweenHits": -1,
+        "jointName": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "jointEnd": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "OffsetX": 0,
+        "OffsetY": 0,
+        "OffsetZ": 0,
+        "Radius": 9,
+        "ArcOffset": 0,
+        "ArcRange": 0,
+        "CollideWith": 48,
+        "DamageMin": 15,
+        "DamageMax": 15,
+        "UseTransformationDamageMultiplier": true,
+        "UseWeaponDamageMultiplier": false,
+        "FriendlyFire": 0,
+        "AttackType": {
+          "hash": "9949716209054956141",
+          "name": "MissileExplosion"
+        },
+        "HitTypeName": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "DamageType": {
+          "hash": "22018610510307286",
+          "name": "None"
+        },
+        "EffectTypeName": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "ScaleX": 3,
+        "ScaleY": 3,
+        "EffectScale": 1,
+        "PropAreaEmissionScale": 0,
+        "PropAreaEmissionScaleFunction": {
+          "hash": "4206860010037910535",
+          "name": "Linear"
+        },
+        "PropAreaSizeScale": 0,
+        "propAreaSizeScaleFunction": {
+          "hash": "4206860010037910535",
+          "name": "Linear"
+        },
+        "ImpulseMinX": 0,
+        "ImpulseMinY": 3500,
+        "ImpulseMinZ": -5000,
+        "ImpulseMaxX": 0,
+        "ImpulseMaxY": 3500,
+        "ImpulseMaxZ": -5000,
+        "ImpulseRandomPlusMinus": 1000,
+        "UseMotion": false,
+        "CollisionDirectionX": 0,
+        "CollisionDirectionY": 0,
+        "CollisionDirectionZ": 0,
+        "DeformDirStr": 1,
+        "DeformStr": 0.9100000262260437,
+        "CollisionFlagName": {
+          "hash": "5441101953451253237",
+          "name": "#4b82ad6602255df5"
+        },
+        "GiverBranchRef": {
+          "name": "",
+          "index": -1
+        },
+        "ReceiverBranchRef": {
+          "name": "",
+          "index": -1
+        },
+        "UseDamageOriginator": true,
+        "SendAlert": true,
+        "SendOnlyToAIManager": false,
+        "UseOriginatorToValidate": false,
+        "IsThrown": false,
+        "MomentumDamageVelocity": 0,
+        "MomentumDamageMax": 0,
+        "TravelVelocity": 0,
+        "TravelTowardsTarget": {
+          "hash": "22018610510307286",
+          "name": "None"
+        },
+        "IgnorePowerTarget": false
+      },
+      "schema": "CollisionHitTrack",
+      "end": 4864
+    },
+    {
+      "source": "heli_gunship_marine_core_fig.p3d.rz",
+      "offset": 5172,
+      "payload": 5184,
+      "length": 72,
+      "type": "Sound",
+      "kind": "TrackHash",
+      "owner": "heli_gunship_marine_hellfire_missile/default/final",
+      "group": "TrackHash",
+      "parentOffset": 3668,
+      "treeOffset": 76,
+      "fields": {
+        "Unknown1": 0,
+        "TimeBegin": 0,
+        "Patch": {
+          "hash": "11294510414790182717",
+          "name": "#9cbe2961a184c73d"
+        },
+        "Trigger": {
+          "hash": "32462977145219048",
+          "name": "stop"
+        },
+        "VolumeFactor": 1,
+        "MinDistance": 0,
+        "MaxDistance": 0,
+        "MinPitch": 1,
+        "MaxPitch": 1,
+        "CyclicPhase": 0,
+        "InstanceName": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "Frequency": 1,
+        "PolledLifetime": false,
+        "TriggerType": {
+          "hash": "13522664087197083521",
+          "name": "Retrigger"
+        }
+      },
+      "schema": "SoundTrack",
+      "end": 5264
+    },
+    {
+      "source": "heli_gunship_marine_core_fig.p3d.rz",
+      "offset": 5332,
+      "payload": 5344,
+      "length": 8,
+      "type": "Destroy",
+      "kind": "TrackHash",
+      "owner": "heli_gunship_marine_hellfire_missile/default/final",
+      "group": null,
+      "parentOffset": 5272,
+      "treeOffset": 76,
+      "fields": {
+        "Unknown1": 0,
+        "TimeBegin": 3
+      },
+      "schema": "DestroyTrack",
+      "end": 5360
+    },
+    {
+      "source": "heli_gunship_marine_core_fig.p3d.rz",
+      "offset": 38048,
+      "payload": 38060,
+      "length": 80,
+      "type": "Shoot",
+      "kind": "TrackHash",
+      "owner": "helicopter/opening/loco/loco/attack/player/player/#4922f2ca8c484f17/#a871daee899a95f/shoot/shoot/shoot",
+      "group": "TrackHash",
+      "parentOffset": 37968,
+      "treeOffset": 29116,
+      "fields": {
+        "Unknown1": 0,
+        "TimeBegin": 0,
+        "TimeEnd": -0.03333330154418945,
+        "ApplyOnParent": false,
+        "GrabSlot": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "WeaponEntry": {
+          "hash": "758607699299117407",
+          "name": "#a871daee899a95f"
+        },
+        "Shooter": {
+          "hash": "5382756063772278986",
+          "name": "Driver"
+        },
+        "AmmoProfile": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "UserProfile": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "FixedDirection": 0,
+        "FixedDirectionSpace": {
+          "hash": "5062814898204701870",
+          "name": "WorldSpace"
+        },
+        "FixedDirectionDirection": [
+          0,
+          0,
+          0
+        ]
+      },
+      "schema": "ShootTrack",
+      "end": 38148
+    },
+    {
+      "source": "heli_gunship_marine_core_fig.p3d.rz",
+      "offset": 40636,
+      "payload": 40648,
+      "length": 80,
+      "type": "Shoot",
+      "kind": "TrackHash",
+      "owner": "helicopter/opening/loco/loco/attack/player/player/#4922f2ca8c484f17/#99593456a64db9fb/fire/#bd39f83fa432da3b/#c1400e46cb8c575b",
+      "group": "TrackHash",
+      "parentOffset": 40624,
+      "treeOffset": 29116,
+      "fields": {
+        "Unknown1": 1,
+        "TimeBegin": 0,
+        "TimeEnd": 0,
+        "ApplyOnParent": false,
+        "GrabSlot": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "WeaponEntry": {
+          "hash": "13410961929987372674",
+          "name": "RocketPodLeft"
+        },
+        "Shooter": {
+          "hash": "5382756063772278986",
+          "name": "Driver"
+        },
+        "AmmoProfile": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "UserProfile": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "FixedDirection": 0,
+        "FixedDirectionSpace": {
+          "hash": "5062814898204701870",
+          "name": "WorldSpace"
+        },
+        "FixedDirectionDirection": [
+          0,
+          0,
+          0
+        ]
+      },
+      "schema": "ShootTrack",
+      "end": 40736
+    },
+    {
+      "source": "heli_gunship_marine_core_fig.p3d.rz",
+      "offset": 41228,
+      "payload": 41240,
+      "length": 80,
+      "type": "Shoot",
+      "kind": "TrackHash",
+      "owner": "helicopter/opening/loco/loco/attack/player/player/#4922f2ca8c484f17/#99593456a64db9fb/fire/#bd39f83fa432da3b/#933ab50cfad1181a",
+      "group": "TrackHash",
+      "parentOffset": 41216,
+      "treeOffset": 29116,
+      "fields": {
+        "Unknown1": 1,
+        "TimeBegin": 0,
+        "TimeEnd": 0,
+        "ApplyOnParent": false,
+        "GrabSlot": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "WeaponEntry": {
+          "hash": "2158706610979590785",
+          "name": "RocketPodRight"
+        },
+        "Shooter": {
+          "hash": "5382756063772278986",
+          "name": "Driver"
+        },
+        "AmmoProfile": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "UserProfile": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "FixedDirection": 0,
+        "FixedDirectionSpace": {
+          "hash": "5062814898204701870",
+          "name": "WorldSpace"
+        },
+        "FixedDirectionDirection": [
+          0,
+          0,
+          0
+        ]
+      },
+      "schema": "ShootTrack",
+      "end": 41328
+    },
+    {
+      "source": "heli_gunship_marine_core_fig.p3d.rz",
+      "offset": 42944,
+      "payload": 42956,
+      "length": 80,
+      "type": "Shoot",
+      "kind": "TrackHash",
+      "owner": "helicopter/opening/loco/loco/attack/player/player/#4922f2ca8c484f17/#a454e11661d9b3e1/#a454e11661d9b3e1/shoot/#bb89ff14f699c6df",
+      "group": "TrackHash",
+      "parentOffset": 42932,
+      "treeOffset": 29116,
+      "fields": {
+        "Unknown1": 1,
+        "TimeBegin": 0,
+        "TimeEnd": 0,
+        "ApplyOnParent": false,
+        "GrabSlot": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "WeaponEntry": {
+          "hash": "1065963745669803638",
+          "name": "HellfireLeft"
+        },
+        "Shooter": {
+          "hash": "5382756063772278986",
+          "name": "Driver"
+        },
+        "AmmoProfile": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "UserProfile": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "FixedDirection": 0,
+        "FixedDirectionSpace": {
+          "hash": "5062814898204701870",
+          "name": "WorldSpace"
+        },
+        "FixedDirectionDirection": [
+          0,
+          0,
+          0
+        ]
+      },
+      "schema": "ShootTrack",
+      "end": 43044
+    },
+    {
+      "source": "heli_gunship_marine_core_fig.p3d.rz",
+      "offset": 43484,
+      "payload": 43496,
+      "length": 80,
+      "type": "Shoot",
+      "kind": "TrackHash",
+      "owner": "helicopter/opening/loco/loco/attack/player/player/#4922f2ca8c484f17/#a454e11661d9b3e1/#a454e11661d9b3e1/shoot/#144028607ec40996",
+      "group": "TrackHash",
+      "parentOffset": 43472,
+      "treeOffset": 29116,
+      "fields": {
+        "Unknown1": 1,
+        "TimeBegin": 0,
+        "TimeEnd": 0,
+        "ApplyOnParent": false,
+        "GrabSlot": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "WeaponEntry": {
+          "hash": "12572895996697800061",
+          "name": "HellfireRight"
+        },
+        "Shooter": {
+          "hash": "5382756063772278986",
+          "name": "Driver"
+        },
+        "AmmoProfile": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "UserProfile": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "FixedDirection": 0,
+        "FixedDirectionSpace": {
+          "hash": "5062814898204701870",
+          "name": "WorldSpace"
+        },
+        "FixedDirectionDirection": [
+          0,
+          0,
+          0
+        ]
+      },
+      "schema": "ShootTrack",
+      "end": 43584
+    },
+    {
+      "source": "heli_gunship_marine_core_fig.p3d.rz",
+      "offset": 45548,
+      "payload": 45560,
+      "length": 80,
+      "type": "Shoot",
+      "kind": "TrackHash",
+      "owner": "helicopter/opening/loco/loco/attack/player/player/#4922f2ca8c484f17/#7b2bca407f02519c/#37113581a66966e7/#60fce9c0991d79b7/#6cdb4e19948378b5",
+      "group": "TrackHash",
+      "parentOffset": 45536,
+      "treeOffset": 29116,
+      "fields": {
+        "Unknown1": 1,
+        "TimeBegin": 0,
+        "TimeEnd": -1,
+        "ApplyOnParent": false,
+        "GrabSlot": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "WeaponEntry": {
+          "hash": "6819105427209032256",
+          "name": "GunPodLeft"
+        },
+        "Shooter": {
+          "hash": "5382756063772278986",
+          "name": "Driver"
+        },
+        "AmmoProfile": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "UserProfile": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "FixedDirection": 0,
+        "FixedDirectionSpace": {
+          "hash": "5062814898204701870",
+          "name": "WorldSpace"
+        },
+        "FixedDirectionDirection": [
+          0,
+          0,
+          0
+        ]
+      },
+      "schema": "ShootTrack",
+      "end": 45648
+    },
+    {
+      "source": "heli_gunship_marine_core_fig.p3d.rz",
+      "offset": 46260,
+      "payload": 46272,
+      "length": 80,
+      "type": "Shoot",
+      "kind": "TrackHash",
+      "owner": "helicopter/opening/loco/loco/attack/player/player/#4922f2ca8c484f17/#7b2bca407f02519c/#37113581a66966e7/#60fce9c0991d79b4/#6cdb4e19948378b6",
+      "group": "TrackHash",
+      "parentOffset": 46248,
+      "treeOffset": 29116,
+      "fields": {
+        "Unknown1": 1,
+        "TimeBegin": 0.06666669994592667,
+        "TimeEnd": -1,
+        "ApplyOnParent": false,
+        "GrabSlot": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "WeaponEntry": {
+          "hash": "11822692879678252999",
+          "name": "GunPodRight"
+        },
+        "Shooter": {
+          "hash": "5382756063772278986",
+          "name": "Driver"
+        },
+        "AmmoProfile": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "UserProfile": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "FixedDirection": 0,
+        "FixedDirectionSpace": {
+          "hash": "5062814898204701870",
+          "name": "WorldSpace"
+        },
+        "FixedDirectionDirection": [
+          0,
+          0,
+          0
+        ]
+      },
+      "schema": "ShootTrack",
+      "end": 46360
+    },
+    {
+      "source": "heli_gunship_marine_core_fig.p3d.rz",
+      "offset": 53120,
+      "payload": 53132,
+      "length": 80,
+      "type": "Shoot",
+      "kind": "TrackHash",
+      "owner": "helicopter/opening/loco/loco/attack/ai/#d52a79399a08fec0/heli_gunship_marine_core/weapons/#4922f2ca8c484f17/#a454e11661d9b3e1/#a454e11661d9b3e1/#60fce9c0991d79b7/#bb89ff14f699c6df",
+      "group": "TrackHash",
+      "parentOffset": 53108,
+      "treeOffset": 29116,
+      "fields": {
+        "Unknown1": 0,
+        "TimeBegin": 0,
+        "TimeEnd": 0,
+        "ApplyOnParent": false,
+        "GrabSlot": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "WeaponEntry": {
+          "hash": "1065963745669803638",
+          "name": "HellfireLeft"
+        },
+        "Shooter": {
+          "hash": "5382756063772278986",
+          "name": "Driver"
+        },
+        "AmmoProfile": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "UserProfile": {
+          "hash": "16856646367871049074",
+          "name": "heli_gunship_hellfire_user_ai"
+        },
+        "FixedDirection": 0,
+        "FixedDirectionSpace": {
+          "hash": "5062814898204701870",
+          "name": "WorldSpace"
+        },
+        "FixedDirectionDirection": [
+          0,
+          0,
+          0
+        ]
+      },
+      "schema": "ShootTrack",
+      "end": 53220
+    },
+    {
+      "source": "heli_gunship_marine_core_fig.p3d.rz",
+      "offset": 53676,
+      "payload": 53688,
+      "length": 80,
+      "type": "Shoot",
+      "kind": "TrackHash",
+      "owner": "helicopter/opening/loco/loco/attack/ai/#d52a79399a08fec0/heli_gunship_marine_core/weapons/#4922f2ca8c484f17/#a454e11661d9b3e1/#a454e11661d9b3e1/#60fce9c0991d79b7/#144028607ec40996",
+      "group": "TrackHash",
+      "parentOffset": 53664,
+      "treeOffset": 29116,
+      "fields": {
+        "Unknown1": 0,
+        "TimeBegin": 0,
+        "TimeEnd": 0,
+        "ApplyOnParent": false,
+        "GrabSlot": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "WeaponEntry": {
+          "hash": "12572895996697800061",
+          "name": "HellfireRight"
+        },
+        "Shooter": {
+          "hash": "5382756063772278986",
+          "name": "Driver"
+        },
+        "AmmoProfile": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "UserProfile": {
+          "hash": "16856646367871049074",
+          "name": "heli_gunship_hellfire_user_ai"
+        },
+        "FixedDirection": 0,
+        "FixedDirectionSpace": {
+          "hash": "5062814898204701870",
+          "name": "WorldSpace"
+        },
+        "FixedDirectionDirection": [
+          0,
+          0,
+          0
+        ]
+      },
+      "schema": "ShootTrack",
+      "end": 53776
+    },
+    {
+      "source": "heli_gunship_marine_core_fig.p3d.rz",
+      "offset": 56740,
+      "payload": 56752,
+      "length": 80,
+      "type": "Shoot",
+      "kind": "TrackHash",
+      "owner": "helicopter/opening/loco/loco/attack/#3efb61432f944a15/#3325e05ce998ff/#83ad9a27fd96ce1e",
+      "group": "TrackHash",
+      "parentOffset": 56728,
+      "treeOffset": 29116,
+      "fields": {
+        "Unknown1": 0,
+        "TimeBegin": 0,
+        "TimeEnd": -0.03333330154418945,
+        "ApplyOnParent": false,
+        "GrabSlot": {
+          "hash": "1571849554683822641",
+          "name": "NoseGun"
+        },
+        "WeaponEntry": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "Shooter": {
+          "hash": "5382756063772278986",
+          "name": "Driver"
+        },
+        "AmmoProfile": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "UserProfile": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "FixedDirection": 0,
+        "FixedDirectionSpace": {
+          "hash": "5062814898204701870",
+          "name": "WorldSpace"
+        },
+        "FixedDirectionDirection": [
+          0,
+          0,
+          0
+        ]
+      },
+      "schema": "ShootTrack",
+      "end": 56840
+    },
+    {
+      "source": "heli_gunship_marine_core_fig.p3d.rz",
+      "offset": 57780,
+      "payload": 57792,
+      "length": 80,
+      "type": "Shoot",
+      "kind": "TrackHash",
+      "owner": "helicopter/opening/loco/loco/attack/#3efb61432f944a15/#3325e05ce998ff/#e0e056a311fbd3e3/#add8641d40f32ac5",
+      "group": "TrackHash",
+      "parentOffset": 57768,
+      "treeOffset": 29116,
+      "fields": {
+        "Unknown1": 0,
+        "TimeBegin": 0,
+        "TimeEnd": -1,
+        "ApplyOnParent": false,
+        "GrabSlot": {
+          "hash": "1571849554683822641",
+          "name": "NoseGun"
+        },
+        "WeaponEntry": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "Shooter": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "AmmoProfile": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "UserProfile": {
+          "hash": "4557333117713476493",
+          "name": "heli_gunship_30mm_user_ai_vs_APC"
+        },
+        "FixedDirection": 0,
+        "FixedDirectionSpace": {
+          "hash": "5062814898204701870",
+          "name": "WorldSpace"
+        },
+        "FixedDirectionDirection": [
+          0,
+          0,
+          0
+        ]
+      },
+      "schema": "ShootTrack",
+      "end": 57880
+    },
+    {
+      "source": "heli_gunship_marine_core_fig.p3d.rz",
+      "offset": 58752,
+      "payload": 58764,
+      "length": 80,
+      "type": "Shoot",
+      "kind": "TrackHash",
+      "owner": "helicopter/opening/loco/loco/attack/#3efb61432f944a15/#3325e05ce998ff/#e0e056a311fbd3e3/#4b13da6973c72bd8",
+      "group": "TrackHash",
+      "parentOffset": 58740,
+      "treeOffset": 29116,
+      "fields": {
+        "Unknown1": 0,
+        "TimeBegin": 0,
+        "TimeEnd": -1,
+        "ApplyOnParent": false,
+        "GrabSlot": {
+          "hash": "1571849554683822641",
+          "name": "NoseGun"
+        },
+        "WeaponEntry": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "Shooter": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "AmmoProfile": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "UserProfile": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "FixedDirection": 0,
+        "FixedDirectionSpace": {
+          "hash": "5062814898204701870",
+          "name": "WorldSpace"
+        },
+        "FixedDirectionDirection": [
+          0,
+          0,
+          0
+        ]
+      },
+      "schema": "ShootTrack",
+      "end": 58852
+    },
+    {
+      "source": "heli_gunship_marine_core_fig.p3d.rz",
+      "offset": 59880,
+      "payload": 59892,
+      "length": 80,
+      "type": "Shoot",
+      "kind": "TrackHash",
+      "owner": "helicopter/opening/loco/loco/attack/#3efb61432f944a15/#5b649ae0ce6c440c/#bb89ff14f699c6df",
+      "group": "TrackHash",
+      "parentOffset": 59868,
+      "treeOffset": 29116,
+      "fields": {
+        "Unknown1": 0,
+        "TimeBegin": 0,
+        "TimeEnd": 0,
+        "ApplyOnParent": false,
+        "GrabSlot": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "WeaponEntry": {
+          "hash": "1065963745669803638",
+          "name": "HellfireLeft"
+        },
+        "Shooter": {
+          "hash": "5382756063772278986",
+          "name": "Driver"
+        },
+        "AmmoProfile": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "UserProfile": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "FixedDirection": 0,
+        "FixedDirectionSpace": {
+          "hash": "5062814898204701870",
+          "name": "WorldSpace"
+        },
+        "FixedDirectionDirection": [
+          0,
+          0,
+          0
+        ]
+      },
+      "schema": "ShootTrack",
+      "end": 59980
+    },
+    {
+      "source": "heli_gunship_marine_core_fig.p3d.rz",
+      "offset": 60316,
+      "payload": 60328,
+      "length": 80,
+      "type": "Shoot",
+      "kind": "TrackHash",
+      "owner": "helicopter/opening/loco/loco/attack/#3efb61432f944a15/#5b649ae0ce6c440c/#144028607ec40996",
+      "group": "TrackHash",
+      "parentOffset": 60304,
+      "treeOffset": 29116,
+      "fields": {
+        "Unknown1": 0,
+        "TimeBegin": 0,
+        "TimeEnd": 0,
+        "ApplyOnParent": false,
+        "GrabSlot": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "WeaponEntry": {
+          "hash": "12572895996697800061",
+          "name": "HellfireRight"
+        },
+        "Shooter": {
+          "hash": "5382756063772278986",
+          "name": "Driver"
+        },
+        "AmmoProfile": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "UserProfile": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "FixedDirection": 0,
+        "FixedDirectionSpace": {
+          "hash": "5062814898204701870",
+          "name": "WorldSpace"
+        },
+        "FixedDirectionDirection": [
+          0,
+          0,
+          0
+        ]
+      },
+      "schema": "ShootTrack",
+      "end": 60416
+    },
+    {
+      "source": "heli_gunship_marine_core_fig.p3d.rz",
+      "offset": 61080,
+      "payload": 61092,
+      "length": 80,
+      "type": "Shoot",
+      "kind": "TrackHash",
+      "owner": "helicopter/opening/loco/loco/attack/#3efb61432f944a15/#ed9834399947b9db/ai/shoot/#c1400e46cb8c575b",
+      "group": "TrackHash",
+      "parentOffset": 61068,
+      "treeOffset": 29116,
+      "fields": {
+        "Unknown1": 0,
+        "TimeBegin": 0,
+        "TimeEnd": 0,
+        "ApplyOnParent": false,
+        "GrabSlot": {
+          "hash": "11618309857433235381",
+          "name": "MissileSlot_Left1"
+        },
+        "WeaponEntry": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "Shooter": {
+          "hash": "5382756063772278986",
+          "name": "Driver"
+        },
+        "AmmoProfile": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "UserProfile": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "FixedDirection": 0,
+        "FixedDirectionSpace": {
+          "hash": "5062814898204701870",
+          "name": "WorldSpace"
+        },
+        "FixedDirectionDirection": [
+          0,
+          0,
+          0
+        ]
+      },
+      "schema": "ShootTrack",
+      "end": 61180
+    },
+    {
+      "source": "heli_gunship_marine_core_fig.p3d.rz",
+      "offset": 61572,
+      "payload": 61584,
+      "length": 80,
+      "type": "Shoot",
+      "kind": "TrackHash",
+      "owner": "helicopter/opening/loco/loco/attack/#3efb61432f944a15/#ed9834399947b9db/ai/shoot/#933ab50cfad1181a",
+      "group": "TrackHash",
+      "parentOffset": 61560,
+      "treeOffset": 29116,
+      "fields": {
+        "Unknown1": 0,
+        "TimeBegin": 0,
+        "TimeEnd": 0,
+        "ApplyOnParent": false,
+        "GrabSlot": {
+          "hash": "5179150437891741924",
+          "name": "MissileSlot_Right1"
+        },
+        "WeaponEntry": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "Shooter": {
+          "hash": "5382756063772278986",
+          "name": "Driver"
+        },
+        "AmmoProfile": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "UserProfile": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "FixedDirection": 0,
+        "FixedDirectionSpace": {
+          "hash": "5062814898204701870",
+          "name": "WorldSpace"
+        },
+        "FixedDirectionDirection": [
+          0,
+          0,
+          0
+        ]
+      },
+      "schema": "ShootTrack",
+      "end": 61672
+    },
+    {
+      "source": "heli_gunship_marine_core_fig.p3d.rz",
+      "offset": 62412,
+      "payload": 62424,
+      "length": 80,
+      "type": "Shoot",
+      "kind": "TrackHash",
+      "owner": "helicopter/opening/loco/loco/attack/#3efb61432f944a15/#ed9834399947b9db/#bb61b4e9270f5758/shoot/#c1400e46cb8c575b",
+      "group": "TrackHash",
+      "parentOffset": 62400,
+      "treeOffset": 29116,
+      "fields": {
+        "Unknown1": 0,
+        "TimeBegin": 0,
+        "TimeEnd": 0,
+        "ApplyOnParent": false,
+        "GrabSlot": {
+          "hash": "11618309857433235381",
+          "name": "MissileSlot_Left1"
+        },
+        "WeaponEntry": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "Shooter": {
+          "hash": "5382756063772278986",
+          "name": "Driver"
+        },
+        "AmmoProfile": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "UserProfile": {
+          "hash": "13675174768303510517",
+          "name": "#bdc7faff621d93f5"
+        },
+        "FixedDirection": 0,
+        "FixedDirectionSpace": {
+          "hash": "5062814898204701870",
+          "name": "WorldSpace"
+        },
+        "FixedDirectionDirection": [
+          0,
+          0,
+          0
+        ]
+      },
+      "schema": "ShootTrack",
+      "end": 62512
+    },
+    {
+      "source": "heli_gunship_marine_core_fig.p3d.rz",
+      "offset": 62904,
+      "payload": 62916,
+      "length": 80,
+      "type": "Shoot",
+      "kind": "TrackHash",
+      "owner": "helicopter/opening/loco/loco/attack/#3efb61432f944a15/#ed9834399947b9db/#bb61b4e9270f5758/shoot/#933ab50cfad1181a",
+      "group": "TrackHash",
+      "parentOffset": 62892,
+      "treeOffset": 29116,
+      "fields": {
+        "Unknown1": 0,
+        "TimeBegin": 0,
+        "TimeEnd": 0,
+        "ApplyOnParent": false,
+        "GrabSlot": {
+          "hash": "5179150437891741924",
+          "name": "MissileSlot_Right1"
+        },
+        "WeaponEntry": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "Shooter": {
+          "hash": "5382756063772278986",
+          "name": "Driver"
+        },
+        "AmmoProfile": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "UserProfile": {
+          "hash": "13675174768303510517",
+          "name": "#bdc7faff621d93f5"
+        },
+        "FixedDirection": 0,
+        "FixedDirectionSpace": {
+          "hash": "5062814898204701870",
+          "name": "WorldSpace"
+        },
+        "FixedDirectionDirection": [
+          0,
+          0,
+          0
+        ]
+      },
+      "schema": "ShootTrack",
+      "end": 63004
+    },
+    {
+      "source": "heli_gunship_marine_core_fig.p3d.rz",
+      "offset": 64440,
+      "payload": 64452,
+      "length": 80,
+      "type": "Shoot",
+      "kind": "TrackHash",
+      "owner": "helicopter/opening/loco/loco/attack/#3efb61432f944a15/#9e8e5a5dc77d30ff/#e0e056a311fbd3e3/shoot/#38ee78979a0f18da/#2c4ad56a5ad92a1d/dead",
+      "group": "TrackHash",
+      "parentOffset": 64428,
+      "treeOffset": 29116,
+      "fields": {
+        "Unknown1": 0,
+        "TimeBegin": 0,
+        "TimeEnd": -1,
+        "ApplyOnParent": false,
+        "GrabSlot": {
+          "hash": "11618309857433235382",
+          "name": "MissileSlot_Left2"
+        },
+        "WeaponEntry": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "Shooter": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "AmmoProfile": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "UserProfile": {
+          "hash": "9474071596029273889",
+          "name": "heli_bh_gunPod_user_ai_dead"
+        },
+        "FixedDirection": 0,
+        "FixedDirectionSpace": {
+          "hash": "5062814898204701870",
+          "name": "WorldSpace"
+        },
+        "FixedDirectionDirection": [
+          0,
+          0,
+          0
+        ]
+      },
+      "schema": "ShootTrack",
+      "end": 64540
+    },
+    {
+      "source": "heli_gunship_marine_core_fig.p3d.rz",
+      "offset": 64540,
+      "payload": 64552,
+      "length": 80,
+      "type": "Shoot",
+      "kind": "TrackHash",
+      "owner": "helicopter/opening/loco/loco/attack/#3efb61432f944a15/#9e8e5a5dc77d30ff/#e0e056a311fbd3e3/shoot/#38ee78979a0f18da/#2c4ad56a5ad92a1d/dead",
+      "group": "TrackHash",
+      "parentOffset": 64428,
+      "treeOffset": 29116,
+      "fields": {
+        "Unknown1": 0,
+        "TimeBegin": 0.06666669994592667,
+        "TimeEnd": -1,
+        "ApplyOnParent": false,
+        "GrabSlot": {
+          "hash": "5179150437891741927",
+          "name": "MissileSlot_Right2"
+        },
+        "WeaponEntry": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "Shooter": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "AmmoProfile": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "UserProfile": {
+          "hash": "9474071596029273889",
+          "name": "heli_bh_gunPod_user_ai_dead"
+        },
+        "FixedDirection": 0,
+        "FixedDirectionSpace": {
+          "hash": "5062814898204701870",
+          "name": "WorldSpace"
+        },
+        "FixedDirectionDirection": [
+          0,
+          0,
+          0
+        ]
+      },
+      "schema": "ShootTrack",
+      "end": 64640
+    },
+    {
+      "source": "heli_gunship_marine_core_fig.p3d.rz",
+      "offset": 64720,
+      "payload": 64732,
+      "length": 80,
+      "type": "Shoot",
+      "kind": "TrackHash",
+      "owner": "helicopter/opening/loco/loco/attack/#3efb61432f944a15/#9e8e5a5dc77d30ff/#e0e056a311fbd3e3/shoot/#38ee78979a0f18da/#2c4ad56a5ad92a1d/default",
+      "group": "TrackHash",
+      "parentOffset": 64708,
+      "treeOffset": 29116,
+      "fields": {
+        "Unknown1": 0,
+        "TimeBegin": 0,
+        "TimeEnd": -1,
+        "ApplyOnParent": false,
+        "GrabSlot": {
+          "hash": "11618309857433235382",
+          "name": "MissileSlot_Left2"
+        },
+        "WeaponEntry": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "Shooter": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "AmmoProfile": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "UserProfile": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "FixedDirection": 0,
+        "FixedDirectionSpace": {
+          "hash": "5062814898204701870",
+          "name": "WorldSpace"
+        },
+        "FixedDirectionDirection": [
+          0,
+          0,
+          0
+        ]
+      },
+      "schema": "ShootTrack",
+      "end": 64820
+    },
+    {
+      "source": "heli_gunship_marine_core_fig.p3d.rz",
+      "offset": 64820,
+      "payload": 64832,
+      "length": 80,
+      "type": "Shoot",
+      "kind": "TrackHash",
+      "owner": "helicopter/opening/loco/loco/attack/#3efb61432f944a15/#9e8e5a5dc77d30ff/#e0e056a311fbd3e3/shoot/#38ee78979a0f18da/#2c4ad56a5ad92a1d/default",
+      "group": "TrackHash",
+      "parentOffset": 64708,
+      "treeOffset": 29116,
+      "fields": {
+        "Unknown1": 0,
+        "TimeBegin": 0.06666669994592667,
+        "TimeEnd": -1,
+        "ApplyOnParent": false,
+        "GrabSlot": {
+          "hash": "5179150437891741927",
+          "name": "MissileSlot_Right2"
+        },
+        "WeaponEntry": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "Shooter": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "AmmoProfile": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "UserProfile": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "FixedDirection": 0,
+        "FixedDirectionSpace": {
+          "hash": "5062814898204701870",
+          "name": "WorldSpace"
+        },
+        "FixedDirectionDirection": [
+          0,
+          0,
+          0
+        ]
+      },
+      "schema": "ShootTrack",
+      "end": 64920
+    },
+    {
+      "source": "heli_gunship_marine_core_fig.p3d.rz",
+      "offset": 65008,
+      "payload": 65020,
+      "length": 80,
+      "type": "Shoot",
+      "kind": "TrackHash",
+      "owner": "helicopter/opening/loco/loco/attack/#3efb61432f944a15/#9e8e5a5dc77d30ff/#e0e056a311fbd3e3/shoot/#38ee78979a0f18da/#4b13da6973c72bd8",
+      "group": "TrackHash",
+      "parentOffset": 64996,
+      "treeOffset": 29116,
+      "fields": {
+        "Unknown1": 0,
+        "TimeBegin": 0,
+        "TimeEnd": -1,
+        "ApplyOnParent": false,
+        "GrabSlot": {
+          "hash": "11618309857433235382",
+          "name": "MissileSlot_Left2"
+        },
+        "WeaponEntry": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "Shooter": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "AmmoProfile": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "UserProfile": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "FixedDirection": 0,
+        "FixedDirectionSpace": {
+          "hash": "5062814898204701870",
+          "name": "WorldSpace"
+        },
+        "FixedDirectionDirection": [
+          0,
+          0,
+          0
+        ]
+      },
+      "schema": "ShootTrack",
+      "end": 65108
+    },
+    {
+      "source": "heli_gunship_marine_core_fig.p3d.rz",
+      "offset": 65108,
+      "payload": 65120,
+      "length": 80,
+      "type": "Shoot",
+      "kind": "TrackHash",
+      "owner": "helicopter/opening/loco/loco/attack/#3efb61432f944a15/#9e8e5a5dc77d30ff/#e0e056a311fbd3e3/shoot/#38ee78979a0f18da/#4b13da6973c72bd8",
+      "group": "TrackHash",
+      "parentOffset": 64996,
+      "treeOffset": 29116,
+      "fields": {
+        "Unknown1": 0,
+        "TimeBegin": 0.06666669994592667,
+        "TimeEnd": -1,
+        "ApplyOnParent": false,
+        "GrabSlot": {
+          "hash": "5179150437891741927",
+          "name": "MissileSlot_Right2"
+        },
+        "WeaponEntry": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "Shooter": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "AmmoProfile": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "UserProfile": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "FixedDirection": 0,
+        "FixedDirectionSpace": {
+          "hash": "5062814898204701870",
+          "name": "WorldSpace"
+        },
+        "FixedDirectionDirection": [
+          0,
+          0,
+          0
+        ]
+      },
+      "schema": "ShootTrack",
+      "end": 65208
+    }
+  ],
+  "branchReferences": [
+    {
+      "offset": 69732,
+      "field": "BranchRef",
+      "index": 2,
+      "targetOffset": 69940,
+      "target": "engage_apache/engage/engage"
+    },
+    {
+      "offset": 70188,
+      "field": "BranchRef",
+      "index": 13,
+      "targetOffset": 72996,
+      "target": "engage_apache/engage/tactics/circleStrafe"
+    },
+    {
+      "offset": 70248,
+      "field": "BranchRef",
+      "index": 2,
+      "targetOffset": 69940,
+      "target": "engage_apache/engage/engage"
+    },
+    {
+      "offset": 70308,
+      "field": "BranchRef",
+      "index": 2,
+      "targetOffset": 69940,
+      "target": "engage_apache/engage/engage"
+    },
+    {
+      "offset": 70376,
+      "field": "BranchRef",
+      "index": 2,
+      "targetOffset": 69940,
+      "target": "engage_apache/engage/engage"
+    },
+    {
+      "offset": 70764,
+      "field": "BranchRef",
+      "index": 24,
+      "targetOffset": 74732,
+      "target": "engage_apache/engage/tactics/strafeRun"
+    },
+    {
+      "offset": 70896,
+      "field": "BranchRef",
+      "index": 2,
+      "targetOffset": 69940,
+      "target": "engage_apache/engage/engage"
+    },
+    {
+      "offset": 71060,
+      "field": "BranchRef",
+      "index": 87,
+      "targetOffset": 84720,
+      "target": "engage_apache/engage/tactics/simpleEngage"
+    },
+    {
+      "offset": 71120,
+      "field": "BranchRef",
+      "index": 2,
+      "targetOffset": 69940,
+      "target": "engage_apache/engage/engage"
+    },
+    {
+      "offset": 71188,
+      "field": "BranchRef",
+      "index": 2,
+      "targetOffset": 69940,
+      "target": "engage_apache/engage/engage"
+    },
+    {
+      "offset": 71248,
+      "field": "Branch",
+      "index": 6,
+      "targetOffset": 71528,
+      "target": "engage_apache/engage/engage/simpleEngage/tryOpenStrafeRun"
+    },
+    {
+      "offset": 71716,
+      "field": "IfFound",
+      "index": 11,
+      "targetOffset": 72564,
+      "target": "engage_apache/engage/engage/#35d7142e4807baf2/simpleOpenStrafeRun"
+    },
+    {
+      "offset": 71916,
+      "field": "IfFound",
+      "index": 11,
+      "targetOffset": 72564,
+      "target": "engage_apache/engage/engage/#35d7142e4807baf2/simpleOpenStrafeRun"
+    },
+    {
+      "offset": 72292,
+      "field": "BranchRef",
+      "index": 120,
+      "targetOffset": 93764,
+      "target": "engage_apache/engage/tactics/#99b01523062c909d"
+    },
+    {
+      "offset": 72352,
+      "field": "BranchRef",
+      "index": 2,
+      "targetOffset": 69940,
+      "target": "engage_apache/engage/engage"
+    },
+    {
+      "offset": 72420,
+      "field": "BranchRef",
+      "index": 2,
+      "targetOffset": 69940,
+      "target": "engage_apache/engage/engage"
+    },
+    {
+      "offset": 72652,
+      "field": "BranchRef",
+      "index": 63,
+      "targetOffset": 80932,
+      "target": "engage_apache/engage/tactics/simpleOpenStrafeRun"
+    },
+    {
+      "offset": 72744,
+      "field": "BranchRef",
+      "index": 2,
+      "targetOffset": 69940,
+      "target": "engage_apache/engage/engage"
+    },
+    {
+      "offset": 72804,
+      "field": "BranchRef",
+      "index": 2,
+      "targetOffset": 69940,
+      "target": "engage_apache/engage/engage"
+    },
+    {
+      "offset": 73108,
+      "field": "BranchRef",
+      "index": 15,
+      "targetOffset": 73492,
+      "target": "engage_apache/engage/tactics/circleStrafe/circleStrafe/specific"
+    },
+    {
+      "offset": 73424,
+      "field": "BranchRef",
+      "index": 18,
+      "targetOffset": 73960,
+      "target": "engage_apache/engage/tactics/circleStrafe/attack"
+    },
+    {
+      "offset": 74072,
+      "field": "BranchRef",
+      "index": 20,
+      "targetOffset": 74140,
+      "target": "engage_apache/engage/tactics/circleStrafe/attack/attack/#52c6de05d63abd86"
+    },
+    {
+      "offset": 74252,
+      "field": "BranchRef",
+      "index": 127,
+      "targetOffset": 94936,
+      "target": "engage_apache/engage/tactics/#ecdcb3134ef3dcd/#7cb91c66cb0b226e"
+    },
+    {
+      "offset": 74360,
+      "field": "BranchRef",
+      "index": 20,
+      "targetOffset": 74140,
+      "target": "engage_apache/engage/tactics/circleStrafe/attack/attack/#52c6de05d63abd86"
+    },
+    {
+      "offset": 74616,
+      "field": "BranchRef",
+      "index": 22,
+      "targetOffset": 74504,
+      "target": "engage_apache/engage/tactics/circleStrafe/attack/attack/control"
+    },
+    {
+      "offset": 74844,
+      "field": "BranchRef",
+      "index": 54,
+      "targetOffset": 79472,
+      "target": "engage_apache/engage/tactics/strafeRun/#e0c62934304df0f3/#c256ae6ac086ca79"
+    },
+    {
+      "offset": 75096,
+      "field": "BranchRef",
+      "index": 26,
+      "targetOffset": 75224,
+      "target": "engage_apache/engage/tactics/strafeRun/strafeRun/attack"
+    },
+    {
+      "offset": 75156,
+      "field": "BranchRef",
+      "index": 31,
+      "targetOffset": 75924,
+      "target": "engage_apache/engage/tactics/strafeRun/strafeRun/#702a086138c31a58"
+    },
+    {
+      "offset": 75288,
+      "field": "BranchRef",
+      "index": 27,
+      "targetOffset": 75356,
+      "target": "engage_apache/engage/tactics/strafeRun/strafeRun/attack/#52c6de05d63abd86"
+    },
+    {
+      "offset": 75468,
+      "field": "BranchRef",
+      "index": 29,
+      "targetOffset": 75536,
+      "target": "engage_apache/engage/tactics/strafeRun/strafeRun/attack/#52c6de05d63abd86/#52c6de05d63abd86/normal"
+    },
+    {
+      "offset": 75648,
+      "field": "BranchRef",
+      "index": 151,
+      "targetOffset": 99304,
+      "target": "engage_apache/engage/tactics/#ecdcb3134ef3dcd/#c2e89cb9c7f836ec"
+    },
+    {
+      "offset": 75756,
+      "field": "BranchRef",
+      "index": 29,
+      "targetOffset": 75536,
+      "target": "engage_apache/engage/tactics/strafeRun/strafeRun/attack/#52c6de05d63abd86/#52c6de05d63abd86/normal"
+    },
+    {
+      "offset": 75988,
+      "field": "BranchRef",
+      "index": 175,
+      "targetOffset": 103240,
+      "target": "engage_apache/engage/tactics/#ecdcb3134ef3dcd/#ac88e78ced6595f/#9da89db2b224248d"
+    },
+    {
+      "offset": 76048,
+      "field": "BranchRef",
+      "index": 165,
+      "targetOffset": 101552,
+      "target": "engage_apache/engage/tactics/#ecdcb3134ef3dcd/#c2e89cb9c7f836ec/control/#9da89db2b224248d/#9da89db2b224248d"
+    },
+    {
+      "offset": 76108,
+      "field": "BranchRef",
+      "index": 32,
+      "targetOffset": 76184,
+      "target": "engage_apache/engage/tactics/strafeRun/strafeRun/#152688dae6a3722a"
+    },
+    {
+      "offset": 76396,
+      "field": "BranchRef",
+      "index": 57,
+      "targetOffset": 79916,
+      "target": "engage_apache/engage/tactics/strafeRun/#e0c62934304df0f3/#44167b9762df84a"
+    },
+    {
+      "offset": 76496,
+      "field": "BranchRef",
+      "index": 34,
+      "targetOffset": 76564,
+      "target": "engage_apache/engage/tactics/strafeRun/strafeRun/#152688dae6a3722a/#54a60aaa368b5bea/attack"
+    },
+    {
+      "offset": 76628,
+      "field": "BranchRef",
+      "index": 35,
+      "targetOffset": 76696,
+      "target": "engage_apache/engage/tactics/strafeRun/strafeRun/#152688dae6a3722a/#54a60aaa368b5bea/attack/#52c6de05d63abd86"
+    },
+    {
+      "offset": 76808,
+      "field": "BranchRef",
+      "index": 37,
+      "targetOffset": 76876,
+      "target": "engage_apache/engage/tactics/strafeRun/strafeRun/#152688dae6a3722a/#54a60aaa368b5bea/attack/#52c6de05d63abd86/#52c6de05d63abd86/normal"
+    },
+    {
+      "offset": 76988,
+      "field": "BranchRef",
+      "index": 151,
+      "targetOffset": 99304,
+      "target": "engage_apache/engage/tactics/#ecdcb3134ef3dcd/#c2e89cb9c7f836ec"
+    },
+    {
+      "offset": 77096,
+      "field": "BranchRef",
+      "index": 37,
+      "targetOffset": 76876,
+      "target": "engage_apache/engage/tactics/strafeRun/strafeRun/#152688dae6a3722a/#54a60aaa368b5bea/attack/#52c6de05d63abd86/#52c6de05d63abd86/normal"
+    },
+    {
+      "offset": 77556,
+      "field": "BranchRef",
+      "index": 40,
+      "targetOffset": 77304,
+      "target": "engage_apache/engage/tactics/strafeRun/strafeRun/#152688dae6a3722a/#54a60aaa368b5bea/attack/control/#527e879b67612619"
+    },
+    {
+      "offset": 77704,
+      "field": "BranchRef",
+      "index": 40,
+      "targetOffset": 77304,
+      "target": "engage_apache/engage/tactics/strafeRun/strafeRun/#152688dae6a3722a/#54a60aaa368b5bea/attack/control/#527e879b67612619"
+    },
+    {
+      "offset": 77984,
+      "field": "BranchRef",
+      "index": 60,
+      "targetOffset": 80416,
+      "target": "engage_apache/engage/tactics/strafeRun/#e0c62934304df0f3/#5c18edc7e772893b"
+    },
+    {
+      "offset": 78084,
+      "field": "BranchRef",
+      "index": 44,
+      "targetOffset": 78152,
+      "target": "engage_apache/engage/tactics/strafeRun/strafeRun/#152688dae6a3722a/#ac7d907887cbec9b/attack"
+    },
+    {
+      "offset": 78216,
+      "field": "BranchRef",
+      "index": 45,
+      "targetOffset": 78284,
+      "target": "engage_apache/engage/tactics/strafeRun/strafeRun/#152688dae6a3722a/#ac7d907887cbec9b/attack/#52c6de05d63abd86"
+    },
+    {
+      "offset": 78396,
+      "field": "BranchRef",
+      "index": 47,
+      "targetOffset": 78464,
+      "target": "engage_apache/engage/tactics/strafeRun/strafeRun/#152688dae6a3722a/#ac7d907887cbec9b/attack/#52c6de05d63abd86/#52c6de05d63abd86/normal"
+    },
+    {
+      "offset": 78576,
+      "field": "BranchRef",
+      "index": 166,
+      "targetOffset": 101704,
+      "target": "engage_apache/engage/tactics/#ecdcb3134ef3dcd/#ac88e78ced6595f"
+    },
+    {
+      "offset": 78636,
+      "field": "BranchRef",
+      "index": 47,
+      "targetOffset": 78464,
+      "target": "engage_apache/engage/tactics/strafeRun/strafeRun/#152688dae6a3722a/#ac7d907887cbec9b/attack/#52c6de05d63abd86/#52c6de05d63abd86/normal"
+    },
+    {
+      "offset": 79144,
+      "field": "BranchRef",
+      "index": 50,
+      "targetOffset": 78892,
+      "target": "engage_apache/engage/tactics/strafeRun/strafeRun/#152688dae6a3722a/#ac7d907887cbec9b/attack/control/#527e879b67612619"
+    },
+    {
+      "offset": 79292,
+      "field": "BranchRef",
+      "index": 50,
+      "targetOffset": 78892,
+      "target": "engage_apache/engage/tactics/strafeRun/strafeRun/#152688dae6a3722a/#ac7d907887cbec9b/attack/control/#527e879b67612619"
+    },
+    {
+      "offset": 81092,
+      "field": "BranchRef",
+      "index": 81,
+      "targetOffset": 83816,
+      "target": "engage_apache/engage/tactics/simpleOpenStrafeRun/#e0c62934304df0f3/#eb358a47ad76a0a"
+    },
+    {
+      "offset": 81240,
+      "field": "BranchRef",
+      "index": 65,
+      "targetOffset": 81308,
+      "target": "engage_apache/engage/tactics/simpleOpenStrafeRun/#c9cc312cdb857e62/attack"
+    },
+    {
+      "offset": 81372,
+      "field": "BranchRef",
+      "index": 66,
+      "targetOffset": 81440,
+      "target": "engage_apache/engage/tactics/simpleOpenStrafeRun/#c9cc312cdb857e62/attack/#52c6de05d63abd86"
+    },
+    {
+      "offset": 81552,
+      "field": "BranchRef",
+      "index": 151,
+      "targetOffset": 99304,
+      "target": "engage_apache/engage/tactics/#ecdcb3134ef3dcd/#c2e89cb9c7f836ec"
+    },
+    {
+      "offset": 82084,
+      "field": "BranchRef",
+      "index": 69,
+      "targetOffset": 81832,
+      "target": "engage_apache/engage/tactics/simpleOpenStrafeRun/#c9cc312cdb857e62/attack/control/#527e879b67612619"
+    },
+    {
+      "offset": 82232,
+      "field": "BranchRef",
+      "index": 69,
+      "targetOffset": 81832,
+      "target": "engage_apache/engage/tactics/simpleOpenStrafeRun/#c9cc312cdb857e62/attack/control/#527e879b67612619"
+    },
+    {
+      "offset": 82476,
+      "field": "BranchRef",
+      "index": 84,
+      "targetOffset": 84260,
+      "target": "engage_apache/engage/tactics/simpleOpenStrafeRun/#e0c62934304df0f3/#99593456a64db9fb"
+    },
+    {
+      "offset": 82624,
+      "field": "BranchRef",
+      "index": 73,
+      "targetOffset": 82692,
+      "target": "engage_apache/engage/tactics/simpleOpenStrafeRun/#715f4cc657a82ff3/attack"
+    },
+    {
+      "offset": 82756,
+      "field": "BranchRef",
+      "index": 74,
+      "targetOffset": 82824,
+      "target": "engage_apache/engage/tactics/simpleOpenStrafeRun/#715f4cc657a82ff3/attack/#52c6de05d63abd86"
+    },
+    {
+      "offset": 83020,
+      "field": "BranchRef",
+      "index": 166,
+      "targetOffset": 101704,
+      "target": "engage_apache/engage/tactics/#ecdcb3134ef3dcd/#ac88e78ced6595f"
+    },
+    {
+      "offset": 83504,
+      "field": "BranchRef",
+      "index": 77,
+      "targetOffset": 83252,
+      "target": "engage_apache/engage/tactics/simpleOpenStrafeRun/#715f4cc657a82ff3/attack/control/#527e879b67612619"
+    },
+    {
+      "offset": 83652,
+      "field": "BranchRef",
+      "index": 77,
+      "targetOffset": 83252,
+      "target": "engage_apache/engage/tactics/simpleOpenStrafeRun/#715f4cc657a82ff3/attack/control/#527e879b67612619"
+    },
+    {
+      "offset": 84784,
+      "field": "BranchRef",
+      "index": 88,
+      "targetOffset": 85040,
+      "target": "engage_apache/engage/tactics/simpleEngage/move"
+    },
+    {
+      "offset": 84892,
+      "field": "BranchRef",
+      "index": 113,
+      "targetOffset": 92436,
+      "target": "engage_apache/engage/tactics/simpleEngage/attack"
+    },
+    {
+      "offset": 85180,
+      "field": "BranchRef",
+      "index": 88,
+      "targetOffset": 85040,
+      "target": "engage_apache/engage/tactics/simpleEngage/move"
+    },
+    {
+      "offset": 85648,
+      "field": "BranchRef",
+      "index": 102,
+      "targetOffset": 89060,
+      "target": "engage_apache/engage/tactics/simpleEngage/move/inPosition"
+    },
+    {
+      "offset": 85708,
+      "field": "BranchRef",
+      "index": 88,
+      "targetOffset": 85040,
+      "target": "engage_apache/engage/tactics/simpleEngage/move"
+    },
+    {
+      "offset": 85988,
+      "field": "WhenFound",
+      "index": 91,
+      "targetOffset": 85420,
+      "target": "engage_apache/engage/tactics/simpleEngage/move/going_to_destination/going"
+    },
+    {
+      "offset": 86296,
+      "field": "BranchRef",
+      "index": 103,
+      "targetOffset": 89108,
+      "target": "engage_apache/engage/tactics/simpleEngage/move/inPosition/Reaction"
+    },
+    {
+      "offset": 86364,
+      "field": "BranchRef",
+      "index": 94,
+      "targetOffset": 86440,
+      "target": "engage_apache/engage/tactics/simpleEngage/move/#87a0a169d714644c/#473a231186a3dd75/#96b34dbbe344101e"
+    },
+    {
+      "offset": 86552,
+      "field": "WhenFound",
+      "index": 91,
+      "targetOffset": 85420,
+      "target": "engage_apache/engage/tactics/simpleEngage/move/going_to_destination/going"
+    },
+    {
+      "offset": 86860,
+      "field": "BranchRef",
+      "index": 108,
+      "targetOffset": 90220,
+      "target": "engage_apache/engage/tactics/simpleEngage/move/inPosition/Reaction/targetInRange"
+    },
+    {
+      "offset": 87044,
+      "field": "WhenFound",
+      "index": 91,
+      "targetOffset": 85420,
+      "target": "engage_apache/engage/tactics/simpleEngage/move/going_to_destination/going"
+    },
+    {
+      "offset": 87352,
+      "field": "BranchRef",
+      "index": 103,
+      "targetOffset": 89108,
+      "target": "engage_apache/engage/tactics/simpleEngage/move/inPosition/Reaction"
+    },
+    {
+      "offset": 87420,
+      "field": "BranchRef",
+      "index": 97,
+      "targetOffset": 87496,
+      "target": "engage_apache/engage/tactics/simpleEngage/move/#87a0a169d714644c/#2681628ed57afdfc/#96b34dbbe344101e"
+    },
+    {
+      "offset": 87608,
+      "field": "WhenFound",
+      "index": 91,
+      "targetOffset": 85420,
+      "target": "engage_apache/engage/tactics/simpleEngage/move/going_to_destination/going"
+    },
+    {
+      "offset": 87916,
+      "field": "BranchRef",
+      "index": 108,
+      "targetOffset": 90220,
+      "target": "engage_apache/engage/tactics/simpleEngage/move/inPosition/Reaction/targetInRange"
+    },
+    {
+      "offset": 88080,
+      "field": "WhenFound",
+      "index": 91,
+      "targetOffset": 85420,
+      "target": "engage_apache/engage/tactics/simpleEngage/move/going_to_destination/going"
+    },
+    {
+      "offset": 88388,
+      "field": "BranchRef",
+      "index": 103,
+      "targetOffset": 89108,
+      "target": "engage_apache/engage/tactics/simpleEngage/move/inPosition/Reaction"
+    },
+    {
+      "offset": 88456,
+      "field": "BranchRef",
+      "index": 100,
+      "targetOffset": 88532,
+      "target": "engage_apache/engage/tactics/simpleEngage/move/#87a0a169d714644c/#be4fe365ad3635a2/#96b34dbbe344101e"
+    },
+    {
+      "offset": 88644,
+      "field": "WhenFound",
+      "index": 91,
+      "targetOffset": 85420,
+      "target": "engage_apache/engage/tactics/simpleEngage/move/going_to_destination/going"
+    },
+    {
+      "offset": 88952,
+      "field": "BranchRef",
+      "index": 108,
+      "targetOffset": 90220,
+      "target": "engage_apache/engage/tactics/simpleEngage/move/inPosition/Reaction/targetInRange"
+    },
+    {
+      "offset": 89308,
+      "field": "WhenFound",
+      "index": 91,
+      "targetOffset": 85420,
+      "target": "engage_apache/engage/tactics/simpleEngage/move/going_to_destination/going"
+    },
+    {
+      "offset": 89616,
+      "field": "BranchRef",
+      "index": 106,
+      "targetOffset": 89692,
+      "target": "engage_apache/engage/tactics/simpleEngage/move/inPosition/Reaction/#98dc0826bfe70e61/#87a0a169d714644c/#96b34dbbe344101e"
+    },
+    {
+      "offset": 89804,
+      "field": "WhenFound",
+      "index": 91,
+      "targetOffset": 85420,
+      "target": "engage_apache/engage/tactics/simpleEngage/move/going_to_destination/going"
+    },
+    {
+      "offset": 90112,
+      "field": "BranchRef",
+      "index": 108,
+      "targetOffset": 90220,
+      "target": "engage_apache/engage/tactics/simpleEngage/move/inPosition/Reaction/targetInRange"
+    },
+    {
+      "offset": 90628,
+      "field": "BranchRef",
+      "index": 102,
+      "targetOffset": 89060,
+      "target": "engage_apache/engage/tactics/simpleEngage/move/inPosition"
+    },
+    {
+      "offset": 90696,
+      "field": "BranchRef",
+      "index": 92,
+      "targetOffset": 85800,
+      "target": "engage_apache/engage/tactics/simpleEngage/move/#87a0a169d714644c"
+    },
+    {
+      "offset": 90764,
+      "field": "Branch",
+      "index": 92,
+      "targetOffset": 85800,
+      "target": "engage_apache/engage/tactics/simpleEngage/move/#87a0a169d714644c"
+    },
+    {
+      "offset": 91284,
+      "field": "BranchRef",
+      "index": 102,
+      "targetOffset": 89060,
+      "target": "engage_apache/engage/tactics/simpleEngage/move/inPosition"
+    },
+    {
+      "offset": 91352,
+      "field": "BranchRef",
+      "index": 92,
+      "targetOffset": 85800,
+      "target": "engage_apache/engage/tactics/simpleEngage/move/#87a0a169d714644c"
+    },
+    {
+      "offset": 91420,
+      "field": "Branch",
+      "index": 92,
+      "targetOffset": 85800,
+      "target": "engage_apache/engage/tactics/simpleEngage/move/#87a0a169d714644c"
+    },
+    {
+      "offset": 92000,
+      "field": "BranchRef",
+      "index": 102,
+      "targetOffset": 89060,
+      "target": "engage_apache/engage/tactics/simpleEngage/move/inPosition"
+    },
+    {
+      "offset": 92068,
+      "field": "BranchRef",
+      "index": 92,
+      "targetOffset": 85800,
+      "target": "engage_apache/engage/tactics/simpleEngage/move/#87a0a169d714644c"
+    },
+    {
+      "offset": 92136,
+      "field": "Branch",
+      "index": 92,
+      "targetOffset": 85800,
+      "target": "engage_apache/engage/tactics/simpleEngage/move/#87a0a169d714644c"
+    },
+    {
+      "offset": 92336,
+      "field": "BranchRef",
+      "index": 92,
+      "targetOffset": 85800,
+      "target": "engage_apache/engage/tactics/simpleEngage/move/#87a0a169d714644c"
+    },
+    {
+      "offset": 92500,
+      "field": "BranchRef",
+      "index": 114,
+      "targetOffset": 92644,
+      "target": "engage_apache/engage/tactics/simpleEngage/attack/#52c6de05d63abd86"
+    },
+    {
+      "offset": 92820,
+      "field": "BranchRef",
+      "index": 140,
+      "targetOffset": 97432,
+      "target": "engage_apache/engage/tactics/#ecdcb3134ef3dcd/#1f38a064ac3243dd"
+    },
+    {
+      "offset": 92928,
+      "field": "BranchRef",
+      "index": 116,
+      "targetOffset": 93048,
+      "target": "engage_apache/engage/tactics/simpleEngage/attack/#52c6de05d63abd86/Rocket/#ef33b84f7f39da38"
+    },
+    {
+      "offset": 93312,
+      "field": "BranchRef",
+      "index": 127,
+      "targetOffset": 94936,
+      "target": "engage_apache/engage/tactics/#ecdcb3134ef3dcd/#7cb91c66cb0b226e"
+    },
+    {
+      "offset": 93656,
+      "field": "BranchRef",
+      "index": 118,
+      "targetOffset": 93544,
+      "target": "engage_apache/engage/tactics/simpleEngage/attack/control"
+    },
+    {
+      "offset": 93916,
+      "field": "BranchRef",
+      "index": 121,
+      "targetOffset": 94032,
+      "target": "engage_apache/engage/tactics/#99b01523062c909d/#7bbf989dbe744ba3"
+    },
+    {
+      "offset": 94188,
+      "field": "BranchRef",
+      "index": 122,
+      "targetOffset": 94256,
+      "target": "engage_apache/engage/tactics/#99b01523062c909d/#7bbf989dbe744ba3/#5df32a0b5d89686b"
+    },
+    {
+      "offset": 94376,
+      "field": "BranchRef",
+      "index": 123,
+      "targetOffset": 94528,
+      "target": "engage_apache/engage/tactics/#99b01523062c909d/inPosition"
+    },
+    {
+      "offset": 94680,
+      "field": "BranchRef",
+      "index": 125,
+      "targetOffset": 94756,
+      "target": "engage_apache/engage/tactics/#99b01523062c909d/inPosition/#43342ca903db1d8f"
+    },
+    {
+      "offset": 95048,
+      "field": "BranchRef",
+      "index": 138,
+      "targetOffset": 97232,
+      "target": "engage_apache/engage/tactics/#ecdcb3134ef3dcd/#7cb91c66cb0b226e/control/#9da89db2b224248d"
+    },
+    {
+      "offset": 95108,
+      "field": "BranchRef",
+      "index": 129,
+      "targetOffset": 95176,
+      "target": "engage_apache/engage/tactics/#ecdcb3134ef3dcd/#7cb91c66cb0b226e/control/#60e8dadce8b372e2"
+    },
+    {
+      "offset": 96012,
+      "field": "BranchRef",
+      "index": 133,
+      "targetOffset": 96248,
+      "target": "engage_apache/engage/tactics/#ecdcb3134ef3dcd/#7cb91c66cb0b226e/control/#60e8dadce8b372e2/#60e8dadce8b372e2/shoot/#9ae585061ef13fa8/#9da89db2b224248d"
+    },
+    {
+      "offset": 96072,
+      "field": "BranchRef",
+      "index": 129,
+      "targetOffset": 95176,
+      "target": "engage_apache/engage/tactics/#ecdcb3134ef3dcd/#7cb91c66cb0b226e/control/#60e8dadce8b372e2"
+    },
+    {
+      "offset": 96352,
+      "field": "BranchRef",
+      "index": 138,
+      "targetOffset": 97232,
+      "target": "engage_apache/engage/tactics/#ecdcb3134ef3dcd/#7cb91c66cb0b226e/control/#9da89db2b224248d"
+    },
+    {
+      "offset": 96508,
+      "field": "BranchRef",
+      "index": 129,
+      "targetOffset": 95176,
+      "target": "engage_apache/engage/tactics/#ecdcb3134ef3dcd/#7cb91c66cb0b226e/control/#60e8dadce8b372e2"
+    },
+    {
+      "offset": 96704,
+      "field": "BranchRef",
+      "index": 138,
+      "targetOffset": 97232,
+      "target": "engage_apache/engage/tactics/#ecdcb3134ef3dcd/#7cb91c66cb0b226e/control/#9da89db2b224248d"
+    },
+    {
+      "offset": 96764,
+      "field": "BranchRef",
+      "index": 129,
+      "targetOffset": 95176,
+      "target": "engage_apache/engage/tactics/#ecdcb3134ef3dcd/#7cb91c66cb0b226e/control/#60e8dadce8b372e2"
+    },
+    {
+      "offset": 96948,
+      "field": "BranchRef",
+      "index": 137,
+      "targetOffset": 97016,
+      "target": "engage_apache/engage/tactics/#ecdcb3134ef3dcd/#7cb91c66cb0b226e/control/#60e8dadce8b372e2/#4efee78ab0e67e27/#a726c0c910a5c2fe"
+    },
+    {
+      "offset": 97080,
+      "field": "BranchRef",
+      "index": 138,
+      "targetOffset": 97232,
+      "target": "engage_apache/engage/tactics/#ecdcb3134ef3dcd/#7cb91c66cb0b226e/control/#9da89db2b224248d"
+    },
+    {
+      "offset": 97140,
+      "field": "BranchRef",
+      "index": 129,
+      "targetOffset": 95176,
+      "target": "engage_apache/engage/tactics/#ecdcb3134ef3dcd/#7cb91c66cb0b226e/control/#60e8dadce8b372e2"
+    },
+    {
+      "offset": 97948,
+      "field": "BranchRef",
+      "index": 144,
+      "targetOffset": 98136,
+      "target": "engage_apache/engage/tactics/#ecdcb3134ef3dcd/#1f38a064ac3243dd/#60e8dadce8b372e2/shoot/#9ae585061ef13fa8/#9da89db2b224248d"
+    },
+    {
+      "offset": 98008,
+      "field": "BranchRef",
+      "index": 140,
+      "targetOffset": 97432,
+      "target": "engage_apache/engage/tactics/#ecdcb3134ef3dcd/#1f38a064ac3243dd"
+    },
+    {
+      "offset": 98240,
+      "field": "BranchRef",
+      "index": 149,
+      "targetOffset": 99112,
+      "target": "engage_apache/engage/tactics/#ecdcb3134ef3dcd/#1f38a064ac3243dd/#9da89db2b224248d"
+    },
+    {
+      "offset": 98396,
+      "field": "BranchRef",
+      "index": 140,
+      "targetOffset": 97432,
+      "target": "engage_apache/engage/tactics/#ecdcb3134ef3dcd/#1f38a064ac3243dd"
+    },
+    {
+      "offset": 98592,
+      "field": "BranchRef",
+      "index": 149,
+      "targetOffset": 99112,
+      "target": "engage_apache/engage/tactics/#ecdcb3134ef3dcd/#1f38a064ac3243dd/#9da89db2b224248d"
+    },
+    {
+      "offset": 98652,
+      "field": "BranchRef",
+      "index": 140,
+      "targetOffset": 97432,
+      "target": "engage_apache/engage/tactics/#ecdcb3134ef3dcd/#1f38a064ac3243dd"
+    },
+    {
+      "offset": 98836,
+      "field": "BranchRef",
+      "index": 148,
+      "targetOffset": 98904,
+      "target": "engage_apache/engage/tactics/#ecdcb3134ef3dcd/#1f38a064ac3243dd/#4efee78ab0e67e27/#a726c0c910a5c2fe"
+    },
+    {
+      "offset": 98968,
+      "field": "BranchRef",
+      "index": 149,
+      "targetOffset": 99112,
+      "target": "engage_apache/engage/tactics/#ecdcb3134ef3dcd/#1f38a064ac3243dd/#9da89db2b224248d"
+    },
+    {
+      "offset": 99028,
+      "field": "BranchRef",
+      "index": 140,
+      "targetOffset": 97432,
+      "target": "engage_apache/engage/tactics/#ecdcb3134ef3dcd/#1f38a064ac3243dd"
+    },
+    {
+      "offset": 99416,
+      "field": "Branch",
+      "index": 163,
+      "targetOffset": 101376,
+      "target": "engage_apache/engage/tactics/#ecdcb3134ef3dcd/#c2e89cb9c7f836ec/control/#9da89db2b224248d"
+    },
+    {
+      "offset": 99552,
+      "field": "BranchRef",
+      "index": 153,
+      "targetOffset": 99620,
+      "target": "engage_apache/engage/tactics/#ecdcb3134ef3dcd/#c2e89cb9c7f836ec/control/#60e8dadce8b372e2"
+    },
+    {
+      "offset": 100076,
+      "field": "BranchRef",
+      "index": 164,
+      "targetOffset": 101424,
+      "target": "engage_apache/engage/tactics/#ecdcb3134ef3dcd/#c2e89cb9c7f836ec/control/#9da89db2b224248d/#a35054a45d7cf2bc"
+    },
+    {
+      "offset": 100136,
+      "field": "BranchRef",
+      "index": 153,
+      "targetOffset": 99620,
+      "target": "engage_apache/engage/tactics/#ecdcb3134ef3dcd/#c2e89cb9c7f836ec/control/#60e8dadce8b372e2"
+    },
+    {
+      "offset": 100436,
+      "field": "BranchRef",
+      "index": 165,
+      "targetOffset": 101552,
+      "target": "engage_apache/engage/tactics/#ecdcb3134ef3dcd/#c2e89cb9c7f836ec/control/#9da89db2b224248d/#9da89db2b224248d"
+    },
+    {
+      "offset": 100496,
+      "field": "BranchRef",
+      "index": 153,
+      "targetOffset": 99620,
+      "target": "engage_apache/engage/tactics/#ecdcb3134ef3dcd/#c2e89cb9c7f836ec/control/#60e8dadce8b372e2"
+    },
+    {
+      "offset": 100644,
+      "field": "BranchRef",
+      "index": 153,
+      "targetOffset": 99620,
+      "target": "engage_apache/engage/tactics/#ecdcb3134ef3dcd/#c2e89cb9c7f836ec/control/#60e8dadce8b372e2"
+    },
+    {
+      "offset": 100848,
+      "field": "BranchRef",
+      "index": 163,
+      "targetOffset": 101376,
+      "target": "engage_apache/engage/tactics/#ecdcb3134ef3dcd/#c2e89cb9c7f836ec/control/#9da89db2b224248d"
+    },
+    {
+      "offset": 100908,
+      "field": "BranchRef",
+      "index": 153,
+      "targetOffset": 99620,
+      "target": "engage_apache/engage/tactics/#ecdcb3134ef3dcd/#c2e89cb9c7f836ec/control/#60e8dadce8b372e2"
+    },
+    {
+      "offset": 101092,
+      "field": "BranchRef",
+      "index": 162,
+      "targetOffset": 101160,
+      "target": "engage_apache/engage/tactics/#ecdcb3134ef3dcd/#c2e89cb9c7f836ec/control/#60e8dadce8b372e2/#4efee78ab0e67e27/#a726c0c910a5c2fe"
+    },
+    {
+      "offset": 101224,
+      "field": "BranchRef",
+      "index": 163,
+      "targetOffset": 101376,
+      "target": "engage_apache/engage/tactics/#ecdcb3134ef3dcd/#c2e89cb9c7f836ec/control/#9da89db2b224248d"
+    },
+    {
+      "offset": 101284,
+      "field": "BranchRef",
+      "index": 153,
+      "targetOffset": 99620,
+      "target": "engage_apache/engage/tactics/#ecdcb3134ef3dcd/#c2e89cb9c7f836ec/control/#60e8dadce8b372e2"
+    },
+    {
+      "offset": 102076,
+      "field": "BranchRef",
+      "index": 170,
+      "targetOffset": 102264,
+      "target": "engage_apache/engage/tactics/#ecdcb3134ef3dcd/#ac88e78ced6595f/#60e8dadce8b372e2/shoot/#9ae585061ef13fa8/#9da89db2b224248d"
+    },
+    {
+      "offset": 102136,
+      "field": "BranchRef",
+      "index": 166,
+      "targetOffset": 101704,
+      "target": "engage_apache/engage/tactics/#ecdcb3134ef3dcd/#ac88e78ced6595f"
+    },
+    {
+      "offset": 102368,
+      "field": "BranchRef",
+      "index": 175,
+      "targetOffset": 103240,
+      "target": "engage_apache/engage/tactics/#ecdcb3134ef3dcd/#ac88e78ced6595f/#9da89db2b224248d"
+    },
+    {
+      "offset": 102524,
+      "field": "BranchRef",
+      "index": 166,
+      "targetOffset": 101704,
+      "target": "engage_apache/engage/tactics/#ecdcb3134ef3dcd/#ac88e78ced6595f"
+    },
+    {
+      "offset": 102720,
+      "field": "BranchRef",
+      "index": 175,
+      "targetOffset": 103240,
+      "target": "engage_apache/engage/tactics/#ecdcb3134ef3dcd/#ac88e78ced6595f/#9da89db2b224248d"
+    },
+    {
+      "offset": 102780,
+      "field": "BranchRef",
+      "index": 166,
+      "targetOffset": 101704,
+      "target": "engage_apache/engage/tactics/#ecdcb3134ef3dcd/#ac88e78ced6595f"
+    },
+    {
+      "offset": 102964,
+      "field": "BranchRef",
+      "index": 174,
+      "targetOffset": 103032,
+      "target": "engage_apache/engage/tactics/#ecdcb3134ef3dcd/#ac88e78ced6595f/#4efee78ab0e67e27/#a726c0c910a5c2fe"
+    },
+    {
+      "offset": 103096,
+      "field": "BranchRef",
+      "index": 175,
+      "targetOffset": 103240,
+      "target": "engage_apache/engage/tactics/#ecdcb3134ef3dcd/#ac88e78ced6595f/#9da89db2b224248d"
+    },
+    {
+      "offset": 103156,
+      "field": "BranchRef",
+      "index": 166,
+      "targetOffset": 101704,
+      "target": "engage_apache/engage/tactics/#ecdcb3134ef3dcd/#ac88e78ced6595f"
+    }
+  ],
+  "implementationThisCheckpoint": {
+    "mechanism": "Chin-gun firing/rest window only",
+    "sourceSeconds": [
+      4,
+      4
+    ],
+    "minecraftTicks": [
+      80,
+      80
+    ],
+    "adaptation": "Window begins on the first accepted native AI shot. Existing Minecraft four-tick round cadence, damage, range, aiming and friendly-fire rules remain. Manual pilot controls keep their existing cadence."
+  },
+  "remaining": [
+    "Do not mark original weapon selection or guided Hellfire complete. Current helicopter still uses its earlier Minecraft gun/unguided-rocket choice.",
+    "MetaObjectData weapon/flight profiles are opaque beyond container boundaries and embedded names. Guidance coefficients and runtime algorithms have not been decoded from them.",
+    "Decoding all 388 Apache typed payloads proves layout consistency, not the engine interpretation or complete execution of its branch tree.",
+    "Full maneuver reproduction, rendered/audio verification, multiplayer and the broad creature/military/model/audio goal remain open."
+  ]
+}

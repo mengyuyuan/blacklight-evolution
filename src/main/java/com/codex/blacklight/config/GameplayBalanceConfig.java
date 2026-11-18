@@ -4,8 +4,6 @@ import net.minecraftforge.common.ForgeConfigSpec;
 
 /** Server-owned simulation tuning. Combat and infection intensity are independently configurable. */
 public final class GameplayBalanceConfig {
-    public static final ForgeConfigSpec.IntValue GREENE_EXPOSED_TICKS;
-    public static final ForgeConfigSpec.BooleanValue GREENE_SOURCE_TIMER;
     public static final ForgeConfigSpec SPEC;
     public static final ForgeConfigSpec.BooleanValue CONTACT_ENABLED,LINEAGE_GUARANTEES;
     public static final ForgeConfigSpec.DoubleValue CONTACT_CHANCE,VIAL_RADIUS,VIAL_CENTER,VIAL_EDGE,VIAL_DIRECT;
@@ -30,6 +28,8 @@ public final class GameplayBalanceConfig {
     public static final ForgeConfigSpec.DoubleValue CONSUME_LAST_CHANCE_THRESHOLD;
     public static final ForgeConfigSpec.BooleanValue CONVERSION_ENABLED;
     public static final ForgeConfigSpec.IntValue CONVERSION_PER_TICK,CONVERSION_RETRY_TICKS;
+    public static final ForgeConfigSpec.IntValue GREENE_EXPOSED_TICKS;
+    public static final ForgeConfigSpec.BooleanValue GREENE_SOURCE_TIMER;
     static {
         var b=new ForgeConfigSpec.Builder();
         b.comment("感染传播。概率使用0～1；20 tick约1秒。仅服务端决定结果；不修改强制感染指令。").push("infection");

@@ -1,0 +1,209 @@
+{
+  "schema": 1,
+  "date": "2026-11-17",
+  "status": "source frozen; new regression cases pending root execution",
+  "changes": [
+    {
+      "file": "src/main/java/com/codex/blacklight/animation/NativeRootMotion.java",
+      "problem": "Existing Coord forward step stopped against mother root/width although aim and pursuit used selected posed skin.",
+      "fix": "Regional locks constrain unchanged Coord toward selected skin with player margin only. No additional travel. Nonregional weapon/claw behavior retained."
+    },
+    {
+      "file": "src/main/java/com/codex/blacklight/combat/WeaponCutContact.java",
+      "problem": "Real sub-tick triangle receiver reduced to anatomical bit32; later current-pose nearest lookup could choose different tissue.",
+      "fix": "Server-only receivingBone stores actual triangle region and survives path/stroke. No network or client-authorized hit data."
+    },
+    {
+      "file": "src/main/java/com/codex/blacklight/combat/HydraHurtContact.java",
+      "fix": "Honor exact receivingBone only if still live with receiving boxes. Broken, hidden and unknown receivers reject without retargeting; block LOS retained."
+    }
+  ],
+  "sourcePoseExample": {
+    "asset": "src/main/resources/assets/blacklight/models/encounter_elizabeth_greene_source.json",
+    "clip": "mother_amb_idle_a / idle",
+    "fps": 24,
+    "oldFrame": 0,
+    "newFrame": 1,
+    "origin": [
+      0,
+      0,
+      0
+    ],
+    "yaw": 0,
+    "presentationScale": 1.5,
+    "point": [
+      0.7389640237677464,
+      5.112649713712703,
+      0.22943394222028923
+    ],
+    "sampledReceiver": "weak_0",
+    "currentFrameNearest": "weak_2",
+    "boundary": "MC authored cuboids following source pose; not a claim of native player melee algorithm.",
+    "overlappingCore": "neck_upper",
+    "correction": "Original audit stopped at first containing geo cube; runtime region order is weak_0,weak_1,weak_2 then core. Updated regression verifies both overlaps and original Jaw3 exiting before asserting the wrong child."
+  },
+  "pendingTests": {
+    "HydraHurtContactTest": 3,
+    "ExplicitTargetLockGameTestTotal": 8,
+    "newEntityCases": [
+      "groundedClawsReachEachLockedSlugThroughTheRealWeaponInput",
+      "groundedBladeReachesEachLockedSlugThroughTheRealWeaponInput"
+    ],
+    "entityRequirements": [
+      "Actual ground WeaponCombatSystem.request hits each of 3 selected Slugs using claws and blade.",
+      "Fixture chooses real ground skin/weapon triangles without trial damage. Only physically reached armor child loses health.",
+      "Ground assist never lifts player. Third Slug proves existing Coord is not clipped by irrelevant parent root width."
+    ]
+  },
+  "limits": [
+    "No attack bounds, sharp triangles, model scale or reach enlarged.",
+    "High tissue outside ground weapon mesh remains unreachable; ground fixtures use reachable real lower skin.",
+    "No Java, Gradle, GameTest or client run by this branch. Root owns execution and player acceptance."
+  ],
+  "staticChecks": {
+    "javaDelimiterFiles": 10,
+    "identicalNewImplementationSections": 4,
+    "identicalUnitFile": true
+  },
+  "files": [
+    "src/main/java/com/codex/blacklight/animation/NativeRootMotion.java",
+    "src/main/java/com/codex/blacklight/combat/WeaponCutContact.java",
+    "src/main/java/com/codex/blacklight/combat/HydraHurtContact.java",
+    "src/gunplayTest/java/com/codex/blacklight/gametest/ExplicitTargetLockGameTest.java",
+    "src/test/java/com/codex/blacklight/combat/HydraHurtContactTest.java"
+  ],
+  "sourcePoseProof": {
+    "asset": "encounter_elizabeth_greene_source.json",
+    "nativeClip": "mother_amb_idle_a",
+    "point": [
+      0.7389640237677464,
+      5.112649713712703,
+      0.22943394222028923
+    ],
+    "frames": [
+      {
+        "frame": 0,
+        "containing": [
+          {
+            "region": "neck_upper",
+            "leaf": "neck_upper",
+            "cube": 9,
+            "normalizedBoxCoordinates": [
+              -0.5079231825430507,
+              -0.38153474628433054,
+              -0.6010150932104993
+            ],
+            "maxAbs": 0.6010150932104993,
+            "contains": true
+          },
+          {
+            "region": "weak_0",
+            "leaf": "weak_0_Slug_01_Jaw_3",
+            "cube": 0,
+            "normalizedBoxCoordinates": [
+              -1.0,
+              -1.0,
+              -4.272204028588685e-17
+            ],
+            "maxAbs": 1.0,
+            "contains": true
+          },
+          {
+            "region": "weak_2",
+            "leaf": "weak_2_Slug_03_Spine_4",
+            "cube": 0,
+            "normalizedBoxCoordinates": [
+              0.28255189206820003,
+              0.7966192408080105,
+              -0.8811419519288268
+            ],
+            "maxAbs": 0.8811419519288268,
+            "contains": true
+          },
+          {
+            "region": "weak_2",
+            "leaf": "weak_2_Slug_03_Spine_5",
+            "cube": 0,
+            "normalizedBoxCoordinates": [
+              0.2152471618074844,
+              -0.4448200275111935,
+              -0.8013358858435244
+            ],
+            "maxAbs": 0.8013358858435244,
+            "contains": true
+          }
+        ],
+        "weak0ClosestBoxByCoordinate": {
+          "region": "weak_0",
+          "leaf": "weak_0_Slug_01_Jaw_3",
+          "cube": 0,
+          "normalizedBoxCoordinates": [
+            -1.0,
+            -1.0,
+            -4.272204028588685e-17
+          ],
+          "maxAbs": 1.0,
+          "contains": true
+        }
+      },
+      {
+        "frame": 1,
+        "containing": [
+          {
+            "region": "neck_upper",
+            "leaf": "neck_upper",
+            "cube": 9,
+            "normalizedBoxCoordinates": [
+              -0.5226856886915925,
+              -0.328515640575938,
+              -0.614878273090491
+            ],
+            "maxAbs": 0.614878273090491,
+            "contains": true
+          },
+          {
+            "region": "weak_2",
+            "leaf": "weak_2_Slug_03_Spine_4",
+            "cube": 0,
+            "normalizedBoxCoordinates": [
+              0.2810875347286901,
+              0.8144617593290573,
+              -0.8817445929520428
+            ],
+            "maxAbs": 0.8817445929520428,
+            "contains": true
+          },
+          {
+            "region": "weak_2",
+            "leaf": "weak_2_Slug_03_Spine_5",
+            "cube": 0,
+            "normalizedBoxCoordinates": [
+              0.21866306229201576,
+              -0.4246724855224563,
+              -0.7989246590652797
+            ],
+            "maxAbs": 0.7989246590652797,
+            "contains": true
+          }
+        ],
+        "weak0ClosestBoxByCoordinate": {
+          "region": "weak_0",
+          "leaf": "weak_0_Slug_01_Jaw_3",
+          "cube": 0,
+          "normalizedBoxCoordinates": [
+            -1.0199281987332594,
+            -1.0080942270544766,
+            0.03055292693797069
+          ],
+          "maxAbs": 1.0199281987332594,
+          "contains": false
+        }
+      }
+    ],
+    "errorExplanation": "First audit stopped at the first containing cube in geo storage order. Runtime GreeneContact.regions deliberately orders weak_0/1/2 before core regions; all containing boxes must be inspected."
+  },
+  "checksObservedByRoot": {
+    "HydraHurtContactTestFirstRun": "2 passed, 1 fixture expected-name failed before corrected source overlap proof; rerun pending",
+    "productionCodeChangedForThisCorrection": false
+  }
+}

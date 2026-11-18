@@ -1,0 +1,817 @@
+{
+  "schema": 2,
+  "source": "D:\\PrototypeReference\\p2\\input\\p2\\behemoth.p3d",
+  "sourceSha256": "3737ff61e7042391bf12c95c2018e034f52a1945983d0a7053608a01d69240c7",
+  "skeleton": "behemoth_skeleton",
+  "indexConvention": "Zero-based 0x23001 skeleton record order; skin uint16 index streams refer to these entries.",
+  "finding": "Authored right arm is the giant fist; source giant-fist weighted skin uses L arm. The previous same-suffix mapping put slender claws on the slam arm. Source L finger chains have zero positive skin weights in all decoded skin buffers and zero front-slam tracks; they are not deformation evidence for mapping authored fingers.",
+  "correctedMapping": {
+    "left_arm": "Shoulder_R",
+    "left_forearm": "Elbow_R",
+    "left_hand": "Wrist_R",
+    "right_arm": "Shoulder_L",
+    "right_forearm": "Elbow_L",
+    "right_hand": "Wrist_L"
+  },
+  "usedHandJoints": [
+    {
+      "index": 37,
+      "name": "Wrist_L",
+      "skinRecords": [
+        {
+          "skin": "behemoth_L_ArmShape000_skin",
+          "skinNodeOffset": 3281250,
+          "positiveWeightVertices": 808
+        },
+        {
+          "skin": "behemoth_SinueShape000_skin",
+          "skinNodeOffset": 3566317,
+          "positiveWeightVertices": 16
+        }
+      ]
+    },
+    {
+      "index": 38,
+      "name": "Shield_L_2",
+      "skinRecords": [
+        {
+          "skin": "behemoth_L_ArmShape000_skin",
+          "skinNodeOffset": 3281250,
+          "positiveWeightVertices": 220
+        },
+        {
+          "skin": "behemoth_SinueShape000_skin",
+          "skinNodeOffset": 3566317,
+          "positiveWeightVertices": 102
+        }
+      ]
+    },
+    {
+      "index": 39,
+      "name": "Shield_L_3",
+      "skinRecords": [
+        {
+          "skin": "behemoth_L_ArmShape000_skin",
+          "skinNodeOffset": 3281250,
+          "positiveWeightVertices": 127
+        },
+        {
+          "skin": "behemoth_SinueShape000_skin",
+          "skinNodeOffset": 3566317,
+          "positiveWeightVertices": 96
+        }
+      ]
+    },
+    {
+      "index": 40,
+      "name": "Shield_L_1",
+      "skinRecords": [
+        {
+          "skin": "behemoth_L_ArmShape000_skin",
+          "skinNodeOffset": 3281250,
+          "positiveWeightVertices": 171
+        },
+        {
+          "skin": "behemoth_SinueShape000_skin",
+          "skinNodeOffset": 3566317,
+          "positiveWeightVertices": 113
+        }
+      ]
+    },
+    {
+      "index": 65,
+      "name": "Wrist_R",
+      "skinRecords": [
+        {
+          "skin": "behemoth_R_ArmShape001_skin",
+          "skinNodeOffset": 3480498,
+          "positiveWeightVertices": 174
+        }
+      ]
+    }
+  ],
+  "unusedFingerChains": [
+    {
+      "jointIndex": 41,
+      "name": "Index_Base_L",
+      "parentIndex": 37,
+      "parent": "Wrist_L",
+      "positiveSkinWeights": 0,
+      "slamTracks": 0
+    },
+    {
+      "jointIndex": 42,
+      "name": "Index_L",
+      "parentIndex": 41,
+      "parent": "Index_Base_L",
+      "positiveSkinWeights": 0,
+      "slamTracks": 0
+    },
+    {
+      "jointIndex": 43,
+      "name": "Index_L_End",
+      "parentIndex": 42,
+      "parent": "Index_L",
+      "positiveSkinWeights": 0,
+      "slamTracks": 0
+    },
+    {
+      "jointIndex": 44,
+      "name": "Middle_Base_L",
+      "parentIndex": 37,
+      "parent": "Wrist_L",
+      "positiveSkinWeights": 0,
+      "slamTracks": 0
+    },
+    {
+      "jointIndex": 45,
+      "name": "Middle_L",
+      "parentIndex": 44,
+      "parent": "Middle_Base_L",
+      "positiveSkinWeights": 0,
+      "slamTracks": 0
+    },
+    {
+      "jointIndex": 46,
+      "name": "Ring_Base_L",
+      "parentIndex": 37,
+      "parent": "Wrist_L",
+      "positiveSkinWeights": 0,
+      "slamTracks": 0
+    },
+    {
+      "jointIndex": 47,
+      "name": "Ring_L",
+      "parentIndex": 46,
+      "parent": "Ring_Base_L",
+      "positiveSkinWeights": 0,
+      "slamTracks": 0
+    },
+    {
+      "jointIndex": 48,
+      "name": "Pink_Base_L",
+      "parentIndex": 37,
+      "parent": "Wrist_L",
+      "positiveSkinWeights": 0,
+      "slamTracks": 0
+    },
+    {
+      "jointIndex": 49,
+      "name": "Pink_L",
+      "parentIndex": 48,
+      "parent": "Pink_Base_L",
+      "positiveSkinWeights": 0,
+      "slamTracks": 0
+    },
+    {
+      "jointIndex": 50,
+      "name": "Thumb_Base_L",
+      "parentIndex": 37,
+      "parent": "Wrist_L",
+      "positiveSkinWeights": 0,
+      "slamTracks": 0
+    },
+    {
+      "jointIndex": 51,
+      "name": "Thumb_L",
+      "parentIndex": 50,
+      "parent": "Thumb_Base_L",
+      "positiveSkinWeights": 0,
+      "slamTracks": 0
+    }
+  ],
+  "legAudit": [
+    {
+      "authoredBone": "right_leg",
+      "sourceJoint": "Hip_R",
+      "index": 5,
+      "authoredMirroredBindX": 14.4,
+      "sourceMirroredBindX": 1.2998899221420288,
+      "positiveSkinWeightRecords": [
+        {
+          "skin": "behemoth_R_LegShape000_skin",
+          "skinNodeOffset": 3507817,
+          "positiveWeightVertices": 39
+        },
+        {
+          "skin": "behemoth_R_LegShape001_skin",
+          "skinNodeOffset": 3511698,
+          "positiveWeightVertices": 109
+        },
+        {
+          "skin": "behemoth_TorsoShape000_skin",
+          "skinNodeOffset": 3606102,
+          "positiveWeightVertices": 48
+        },
+        {
+          "skin": "behemoth_TorsoShape001_skin",
+          "skinNodeOffset": 3621687,
+          "positiveWeightVertices": 185
+        }
+      ],
+      "decision": "Same spatial side and expected leg hierarchy; mapping retained."
+    },
+    {
+      "authoredBone": "right_shin",
+      "sourceJoint": "Knee_R",
+      "index": 7,
+      "authoredMirroredBindX": 14.4,
+      "sourceMirroredBindX": 1.6638586523455139,
+      "positiveSkinWeightRecords": [
+        {
+          "skin": "behemoth_R_LegShape000_skin",
+          "skinNodeOffset": 3507817,
+          "positiveWeightVertices": 25
+        },
+        {
+          "skin": "behemoth_R_LegShape001_skin",
+          "skinNodeOffset": 3511698,
+          "positiveWeightVertices": 266
+        },
+        {
+          "skin": "behemoth_TorsoShape000_skin",
+          "skinNodeOffset": 3606102,
+          "positiveWeightVertices": 44
+        },
+        {
+          "skin": "behemoth_TorsoShape001_skin",
+          "skinNodeOffset": 3621687,
+          "positiveWeightVertices": 27
+        }
+      ],
+      "decision": "Same spatial side and expected leg hierarchy; mapping retained."
+    },
+    {
+      "authoredBone": "left_leg",
+      "sourceJoint": "Hip_L",
+      "index": 4,
+      "authoredMirroredBindX": -14.4,
+      "sourceMirroredBindX": -1.2998931407928467,
+      "positiveSkinWeightRecords": [
+        {
+          "skin": "behemoth_TorsoShape001_skin",
+          "skinNodeOffset": 3621687,
+          "positiveWeightVertices": 233
+        }
+      ],
+      "decision": "Same spatial side and expected leg hierarchy; mapping retained."
+    },
+    {
+      "authoredBone": "left_shin",
+      "sourceJoint": "Knee_L",
+      "index": 6,
+      "authoredMirroredBindX": -14.4,
+      "sourceMirroredBindX": -1.8023814212454985,
+      "positiveSkinWeightRecords": [
+        {
+          "skin": "behemoth_TorsoShape001_skin",
+          "skinNodeOffset": 3621687,
+          "positiveWeightVertices": 342
+        }
+      ],
+      "decision": "Same spatial side and expected leg hierarchy; mapping retained."
+    }
+  ],
+  "thinHandFit": {
+    "skinNodeOffset": 3480498,
+    "joint": "Wrist_R",
+    "jointIndex": 65,
+    "fullyWeightedVertices": 108,
+    "distalVertices": 22,
+    "selection": "weight > 0.99; farthest 20 percent by distance to raw-bind Wrist_R",
+    "sourceTipBind": [
+      -14.40967082977295,
+      9.754191398620605,
+      -0.8250734210014343
+    ],
+    "authoredTipBind": [
+      -70.82451982847326,
+      5.8120004090631205,
+      -36.54712792729738
+    ],
+    "operation": "Minimal rotation about unchanged wrist aligns authored mean claw-tip axis to actual source weighted hand axis; inherited uniform length scale unchanged. This is an MC mesh fit, not an original finger animation."
+  },
+  "staticSkinComparison": [
+    {
+      "sourceFrame": 0,
+      "boundsIncludeRenderLift": 0.01,
+      "before_left_hand": {
+        "min": [
+          -1.2952442309262364,
+          0.3744712463781552,
+          3.5119478429087723
+        ],
+        "max": [
+          1.2132652540545341,
+          3.0103999326526205,
+          5.890038803351686
+        ]
+      },
+      "after_left_hand": {
+        "min": [
+          0.4756417510963067,
+          0.07012187328703877,
+          -5.469380761522134
+        ],
+        "max": [
+          2.1865839851679194,
+          1.3295318068925457,
+          -3.918125790908182
+        ]
+      },
+      "before_left_finger": {
+        "min": [
+          -1.8031379898570785,
+          -1.7271598322338222,
+          4.839818256036382
+        ],
+        "max": [
+          0.678467877640812,
+          1.6522370487476887,
+          5.992907964617346
+        ]
+      },
+      "after_left_finger": {
+        "min": [
+          1.0616716910094488,
+          -0.7046128881663456,
+          -4.797906545652898
+        ],
+        "max": [
+          2.9229452799811027,
+          0.8054413514269727,
+          -3.3791441255483234
+        ]
+      },
+      "before_right_hand": {
+        "min": [
+          -0.5326594541111727,
+          -0.9062690487777709,
+          -6.404681456078355
+        ],
+        "max": [
+          3.0529514961339133,
+          2.847650667465005,
+          -3.3806185591539526
+        ]
+      },
+      "after_right_hand": {
+        "min": [
+          -2.607154488656166,
+          -1.1564088150429734,
+          1.6511572241022074
+        ],
+        "max": [
+          4.003988850964063,
+          5.037205964847967,
+          7.168546487553553
+        ]
+      },
+      "before_right_finger": {
+        "min": [
+          -0.5455584682985202,
+          -0.9419353588193654,
+          -4.841582845506818
+        ],
+        "max": [
+          2.669195417137753,
+          1.78956645507576,
+          -2.9048556287102043
+        ]
+      },
+      "after_right_finger": {
+        "min": [
+          -2.528312489389515,
+          -0.6660197313017204,
+          4.452664485117301
+        ],
+        "max": [
+          2.5709611226247158,
+          3.3108866782067974,
+          7.84481545153082
+        ]
+      }
+    },
+    {
+      "sourceFrame": 42,
+      "boundsIncludeRenderLift": 0.01,
+      "before_left_hand": {
+        "min": [
+          -2.6770764676541896,
+          14.628786769699248,
+          -1.5483588141088132
+        ],
+        "max": [
+          -0.4397023496154051,
+          17.32338528561851,
+          0.9474297189802612
+        ]
+      },
+      "after_left_hand": {
+        "min": [
+          1.20622726212596,
+          -1.2662954627330087,
+          -2.004749045817069
+        ],
+        "max": [
+          2.923160692903993,
+          0.3403837903686464,
+          -0.38642528664763587
+        ]
+      },
+      "before_left_finger": {
+        "min": [
+          -3.1730638177349775,
+          16.33848495242657,
+          -0.9358934490681996
+        ],
+        "max": [
+          -0.729993636324222,
+          19.426520037110148,
+          0.12875384052349137
+        ]
+      },
+      "after_left_finger": {
+        "min": [
+          1.6600218602292933,
+          -0.8747194844026727,
+          -1.024704904652039
+        ],
+        "max": [
+          2.7240770368070004,
+          0.4702981384861131,
+          0.8153938037691902
+        ]
+      },
+      "before_right_hand": {
+        "min": [
+          -0.025222900898735023,
+          -2.67781805817713,
+          -3.6075242974394337
+        ],
+        "max": [
+          4.120249528023575,
+          1.3516828940987367,
+          0.664362096436812
+        ]
+      },
+      "after_right_hand": {
+        "min": [
+          -5.3777733322026515,
+          11.730730111613113,
+          -3.9784084625812834
+        ],
+        "max": [
+          2.166394775011975,
+          19.26946814909406,
+          2.985434743843802
+        ]
+      },
+      "before_right_finger": {
+        "min": [
+          0.1699713591472285,
+          -2.5640052607146635,
+          -2.0128445212469113
+        ],
+        "max": [
+          3.1371975037972897,
+          0.8509753161783522,
+          0.7011041836140457
+        ]
+      },
+      "after_right_finger": {
+        "min": [
+          -4.794762423602653,
+          14.502322135381407,
+          -1.9061477644606022
+        ],
+        "max": [
+          1.0471869992291702,
+          19.273253131509904,
+          3.2190828984708832
+        ]
+      }
+    },
+    {
+      "sourceFrame": 48,
+      "boundsIncludeRenderLift": 0.01,
+      "before_left_hand": {
+        "min": [
+          0.25979066044307586,
+          -1.2083877421556053,
+          8.130786178998745
+        ],
+        "max": [
+          3.0194303894510037,
+          1.6762711329329416,
+          10.565570591679801
+        ]
+      },
+      "after_left_hand": {
+        "min": [
+          1.0065328044723625,
+          1.644751423728116,
+          -4.795502404534682
+        ],
+        "max": [
+          2.4560744895811197,
+          2.9177583732177657,
+          -3.3702925477434666
+        ]
+      },
+      "before_left_finger": {
+        "min": [
+          1.0727685393381847,
+          -1.1583996453297265,
+          9.432849373070777
+        ],
+        "max": [
+          3.513971467768124,
+          0.3928984329975649,
+          12.702314828487802
+        ]
+      },
+      "after_left_finger": {
+        "min": [
+          1.9253265338072867,
+          1.792307435715434,
+          -4.041189773909012
+        ],
+        "max": [
+          3.7296648025985046,
+          3.184376024550468,
+          -3.633386451137527
+        ]
+      },
+      "before_right_hand": {
+        "min": [
+          -0.8410051731305548,
+          0.25737607711467514,
+          -6.284617435349137
+        ],
+        "max": [
+          3.6882203957216,
+          4.298074033901627,
+          -2.3939324071440624
+        ]
+      },
+      "after_right_hand": {
+        "min": [
+          -2.3713891236718094,
+          -2.640200209303077,
+          6.320943777486827
+        ],
+        "max": [
+          4.692166006545743,
+          3.4870160732595252,
+          12.296734716225028
+        ]
+      },
+      "before_right_finger": {
+        "min": [
+          0.5918922656764045,
+          0.14152136091607304,
+          -5.265851984242797
+        ],
+        "max": [
+          3.6518884344318234,
+          3.076588868348087,
+          -2.393539648918436
+        ]
+      },
+      "after_right_finger": {
+        "min": [
+          -0.767546865196354,
+          -3.4142794498261093,
+          7.510773855377703
+        ],
+        "max": [
+          4.6701914780242,
+          1.0647190654200795,
+          11.885103297149907
+        ]
+      }
+    },
+    {
+      "sourceFrame": 52,
+      "boundsIncludeRenderLift": 0.01,
+      "before_left_hand": {
+        "min": [
+          0.23865235800304763,
+          -0.6808093624659202,
+          8.18279419846403
+        ],
+        "max": [
+          2.997766563300887,
+          2.2036647889572176,
+          10.61921916192416
+        ]
+      },
+      "after_left_hand": {
+        "min": [
+          -0.4943477139372532,
+          3.417031408098489,
+          -5.585144125448483
+        ],
+        "max": [
+          1.0985106573739993,
+          4.75932639945174,
+          -3.961789720596305
+        ]
+      },
+      "before_left_finger": {
+        "min": [
+          1.05100659007761,
+          -0.6278352207733586,
+          9.48624495934704
+        ],
+        "max": [
+          3.491510662490681,
+          0.9201319349663806,
+          12.756378982590991
+        ]
+      },
+      "after_left_finger": {
+        "min": [
+          0.48715762044710065,
+          3.6198874908119265,
+          -4.980146250572736
+        ],
+        "max": [
+          2.317374856505433,
+          5.109633290758032,
+          -4.403230988381085
+        ]
+      },
+      "before_right_hand": {
+        "min": [
+          -2.1405552724252104,
+          2.2030565736283947,
+          -6.8365875328533505
+        ],
+        "max": [
+          2.1811721104600426,
+          5.969745369186111,
+          -3.1886280624904955
+        ]
+      },
+      "after_right_hand": {
+        "min": [
+          -2.3926953614323243,
+          -2.11422794992919,
+          6.371689442443081
+        ],
+        "max": [
+          4.6705779007604455,
+          4.016242060334671,
+          12.350300044134585
+        ]
+      },
+      "before_right_finger": {
+        "min": [
+          -0.5778973048989728,
+          1.9675359219524224,
+          -6.215335406258141
+        ],
+        "max": [
+          2.206309405236536,
+          4.7717847024475954,
+          -3.3749966642053177
+        ]
+      },
+      "after_right_finger": {
+        "min": [
+          -0.7899147075244096,
+          -2.887405437927769,
+          7.565109998073054
+        ],
+        "max": [
+          4.6480516158684715,
+          1.5927493180300447,
+          11.93763220461751
+        ]
+      }
+    },
+    {
+      "sourceFrame": 88,
+      "boundsIncludeRenderLift": 0.01,
+      "before_left_hand": {
+        "min": [
+          -1.2952442309262364,
+          0.3744712463781552,
+          3.5119478429087723
+        ],
+        "max": [
+          1.2132652540545341,
+          3.0103999326526205,
+          5.890038803351686
+        ]
+      },
+      "after_left_hand": {
+        "min": [
+          0.4756417510963067,
+          0.07012187328703877,
+          -5.469380761522134
+        ],
+        "max": [
+          2.1865839851679194,
+          1.3295318068925457,
+          -3.918125790908182
+        ]
+      },
+      "before_left_finger": {
+        "min": [
+          -1.8031379898570785,
+          -1.7271598322338222,
+          4.839818256036382
+        ],
+        "max": [
+          0.678467877640812,
+          1.6522370487476887,
+          5.992907964617346
+        ]
+      },
+      "after_left_finger": {
+        "min": [
+          1.0616716910094488,
+          -0.7046128881663456,
+          -4.797906545652898
+        ],
+        "max": [
+          2.9229452799811027,
+          0.8054413514269727,
+          -3.3791441255483234
+        ]
+      },
+      "before_right_hand": {
+        "min": [
+          -0.5326594541111727,
+          -0.9062690487777709,
+          -6.404681456078355
+        ],
+        "max": [
+          3.0529514961339133,
+          2.847650667465005,
+          -3.3806185591539526
+        ]
+      },
+      "after_right_hand": {
+        "min": [
+          -2.607154488656166,
+          -1.1564088150429734,
+          1.6511572241022074
+        ],
+        "max": [
+          4.003988850964063,
+          5.037205964847967,
+          7.168546487553553
+        ]
+      },
+      "before_right_finger": {
+        "min": [
+          -0.5455584682985202,
+          -0.9419353588193654,
+          -4.841582845506818
+        ],
+        "max": [
+          2.669195417137753,
+          1.78956645507576,
+          -2.9048556287102043
+        ]
+      },
+      "after_right_finger": {
+        "min": [
+          -2.528312489389515,
+          -0.6660197313017204,
+          4.452664485117301
+        ],
+        "max": [
+          2.5709611226247158,
+          3.3108866782067974,
+          7.84481545153082
+        ]
+      }
+    }
+  ],
+  "independentCornerCheck": {
+    "fixtures": 30,
+    "corners": 240,
+    "maxErrorBlocks": 7.232877782764483e-06
+  },
+  "sourceJointPolicy": "All wrist positions and source rotations remain decoded values. Only authored geometry correspondence/bind orientation changed; no hand lift, endpoint clamp or invented finger channels.",
+  "remaining": [
+    "The giant fist still has support-plane penetration after it is put on the actual slam arm; full support/terrain controller behavior and authored giant-hand fit remain unresolved.",
+    "Raw linear-blend reconstruction of source wrist-weighted skin can itself cross the root plane; this is not proof that the original rendered game penetrates terrain. Its external controllers/root/ground interpretation need verification.",
+    "Other action/phase clocks remain MC adapters. Native rendering, terrain and player acceptance have not run."
+  ],
+  "validation": "Local raw skin/skeleton/clip decoding and numeric matrix checks only; no Gradle, unit tests, GameTests or client.",
+  "followupGiantSupportAudit": "goliath-giant-support-audit.json: deepest authored knuckle, full four-weight source skin comparison, and explicit source META solver evidence; no runtime geometry change in that audit.",
+  "groundingRuntimeFollowup": "goliath-grounding-runtime-audit.json now includes JointStuckAction begin/end and its consumer, plus native TRS, segment-scale compensation and skin palette construction. External participation and final actor-to-ground transform remain unresolved.",
+  "scalePoseFollowup": {
+    "report": "goliath-bind-correction.json",
+    "status": "Earlier point/bounds values in this finger audit are historical: the old source reader ignored SCL. Current Goliath sampler preserves source SCL, native inverse-parent-scale compensation and the same weighted-skin side mapping.",
+    "sourceImpactWristsBlocks": {"slenderWristR": [-0.8156144168183513, 3.0527516372028223, 2.9828631568648554], "giantWristL": [-1.4267102916199572, 0.3602343833391933, -8.870414998771462]},
+    "independentCornerCheck": {"fixtures": 48, "corners": 384, "includes": "HAMMER half frame and ERUPTION original minimum/maximum SCL", "maxErrorBlocks": 2.3013400179097535e-7},
+    "remaining": "SCL fixes the slender source R arm. It does not solve giant-fist source L grounding or justify raising its wrist/shrinking its cuboids. All native/player acceptance remains deferred."
+  }
+}

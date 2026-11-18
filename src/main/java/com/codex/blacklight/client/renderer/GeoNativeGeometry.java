@@ -52,6 +52,7 @@ public final class GeoNativeGeometry extends HierarchicalModel<Mob> implements N
     public ModelPart joint(GeoBone bone){return parts.get(bone);}
     public boolean capture(GeoBone bone,PoseStack stack,int light,int overlay){
         var part=parts.get(bone);if(part==null||bone.isHidden())return false;
+        AdaptiveRagdoll.attachmentAlias(part,bone);
         stack.pushPose();
         try{
             // Gecko's layer callback follows translateAwayFromPivotPoint. Rebase to

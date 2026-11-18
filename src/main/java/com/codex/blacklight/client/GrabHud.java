@@ -47,7 +47,7 @@ public final class GrabHud {
             return;
         }
         long chargeAt=com.codex.blacklight.registry.ModAttachments.getData(mc.player,ModAttachments.GRAB_THROW_CHARGE);
-        if(chargeAt>=0&&stage==ConsumeVisual.HOLD){
+        if(chargeAt>=0&&ConsumeVisual.carrying(stage)){
             int max=com.codex.blacklight.combat.ConsumeSystem.THROW_CHARGE_TICKS;
             int charge=(int)Math.max(0,Math.min(max,mc.level.getGameTime()-chargeAt));
             int x=mc.getWindow().getGuiScaledWidth()/2,y=mc.getWindow().getGuiScaledHeight()/2+42;var g=event.getGuiGraphics();

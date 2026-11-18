@@ -17,7 +17,8 @@ import net.minecraftforge.event.server.ServerStoppedEvent;
 /** Loaded-only hierarchy movement, immutable sighting relays and a single navigation work queue. */
 public final class MilitaryFormationSystem {
     private static final Map<ServerLevel,State> LEVELS=new WeakHashMap<>();
-    private record Job(Vec3 point,double speed,long at){}
+    private record Job(Vec3 point,double speed,long at,boolean exact){}
+    public record PlanResult(Vec3 requested,long at,boolean reachable){}
     private record Alarm(BlackwatchSquad.Contact contact,Vec3 relay,Set<UUID> visited){}
     private record CommandKey(UUID unit,UUID scope){}
     private static final class Route {
@@ -25,6 +26,7 @@ public final class MilitaryFormationSystem {
     }
     private static final class State {
         final Map<UUID,Job> jobs=new HashMap<>();
+        final Map<UUID,PlanResult> results=new HashMap<>();
         final Map<UUID,Route> routes=new HashMap<>();
         final Map<UUID,Alarm> alarms=new LinkedHashMap<>();
         final Map<UUID,Long> relayed=new HashMap<>(),planned=new HashMap<>();
@@ -134,26 +136,47 @@ public final class MilitaryFormationSystem {
     }
     public static void navigate(MilitarySoldier soldier,Vec3 destination,double speed){
         if(!(soldier.level() instanceof ServerLevel level)||!soldier.tacticsAvailable()||!Double.isFinite(destination.lengthSqr()))return;
-        request(soldier,destination,speed);var s=state(level);var budget=MilitaryOrganizationSystem.budget(level);
+        request(soldier,destination,speed);service(level);
+    }
+    /** Tactical cover must end at the checked shelter, not at a nearby exposed fallback cell. */
+    public static void navigateExact(MilitarySoldier soldier,BlockPos destination,double speed){
+        if(!(soldier.level() instanceof ServerLevel level)||!soldier.tacticsAvailable())return;
+        request(soldier,Vec3.atBottomCenterOf(destination),speed,true);service(level);
+    }
+    public static Optional<PlanResult> lastPlan(MilitarySoldier soldier){
+        if(!(soldier.level() instanceof ServerLevel level))return Optional.empty();var s=LEVELS.get(level);
+        return s==null?Optional.empty():Optional.ofNullable(s.results.get(soldier.getUUID()));
+    }
+    private static void service(ServerLevel level){
+        var s=state(level);var budget=MilitaryOrganizationSystem.budget(level);
         for(var id:budget.drain(MilitaryWorkBudget.Kind.NAVIGATION,level.getGameTime())){
             var job=s.jobs.remove(id);
             if(job==null||level.getGameTime()-job.at()>100||!(level.getEntity(id) instanceof MilitarySoldier member)||!member.tacticsAvailable())continue;
             Vec3 delta=job.point().subtract(member.position());var local=delta.length()>16?member.position().add(delta.normalize().scale(16)):job.point();
-            var point=standing(member,local);if(point==null){s.failed.add(id);continue;}
+            var point=job.exact()?standingAt(member,job.point()):standing(member,local);
+            if(point==null||job.exact()&&(delta.length()>16||!point.equals(BlockPos.containing(job.point())))){
+                s.failed.add(id);s.results.put(id,new PlanResult(job.point(),level.getGameTime(),false));continue;
+            }
             if(s.planTick!=level.getGameTime()){s.planTick=level.getGameTime();s.inTick=0;}
             s.peak=Math.max(s.peak,++s.inTick);s.total++;var before=s.planned.put(id,level.getGameTime());if(before!=null)s.shortest=Math.min(s.shortest,(int)(level.getGameTime()-before));
             var path=((MilitaryGroundNavigation)member.getNavigation()).plan(point);
-            if(path!=null&&path.canReach()){member.getNavigation().moveTo(path,job.speed());s.failed.remove(id);}else s.failed.add(id);
+            boolean reachable=path!=null&&path.canReach();
+            if(reachable){member.getNavigation().moveTo(path,job.speed());s.failed.remove(id);}else s.failed.add(id);
+            s.results.put(id,new PlanResult(job.point(),level.getGameTime(),reachable));
         }
         s.jobs.entrySet().removeIf(e->level.getGameTime()-e.getValue().at()>100);
+        s.results.entrySet().removeIf(e->level.getGameTime()-e.getValue().at()>100);
     }
     static void request(MilitarySoldier soldier,Vec3 destination,double speed){
+        request(soldier,destination,speed,false);
+    }
+    private static void request(MilitarySoldier soldier,Vec3 destination,double speed,boolean exact){
         if(!(soldier.level() instanceof ServerLevel level)||!soldier.tacticsAvailable()||!Double.isFinite(destination.lengthSqr()))return;
-        state(level).jobs.put(soldier.getUUID(),new Job(destination,speed,level.getGameTime()));
+        state(level).jobs.put(soldier.getUUID(),new Job(destination,speed,level.getGameTime(),exact));
         MilitaryOrganizationSystem.budget(level).enqueue(MilitaryWorkBudget.Kind.NAVIGATION,soldier.getUUID(),level.getGameTime());
     }
     static void cancel(MilitarySoldier soldier){
-        if(soldier.level() instanceof ServerLevel level){var s=LEVELS.get(level);if(s!=null)s.jobs.remove(soldier.getUUID());}
+        if(soldier.level() instanceof ServerLevel level){var s=LEVELS.get(level);if(s!=null){s.jobs.remove(soldier.getUUID());s.results.remove(soldier.getUUID());}}
     }
     public static BlockPos standing(MilitarySoldier soldier,Vec3 destination){
         var exact=standingAt(soldier,destination);if(exact!=null)return exact;
@@ -200,7 +223,7 @@ public final class MilitaryFormationSystem {
         if(point.distanceToSqr(territory(soldier))>48*48){soldier.getLookControl().setLookAt(point.x,point.y+1,point.z);return Optional.empty();}
         return Optional.of(c);
     }
-    @SubscribeEvent public static void leave(EntityLeaveLevelEvent e){if(e.getLevel() instanceof ServerLevel l&&e.getEntity() instanceof MilitarySoldier soldier){var s=LEVELS.get(l);if(s!=null){s.jobs.remove(soldier.getUUID());s.planned.remove(soldier.getUUID());s.failed.remove(soldier.getUUID());}}}
+    @SubscribeEvent public static void leave(EntityLeaveLevelEvent e){if(e.getLevel() instanceof ServerLevel l&&e.getEntity() instanceof MilitarySoldier soldier){var s=LEVELS.get(l);if(s!=null){s.jobs.remove(soldier.getUUID());s.results.remove(soldier.getUUID());s.planned.remove(soldier.getUUID());s.failed.remove(soldier.getUUID());}}}
     @SubscribeEvent public static void unload(LevelEvent.Unload e){if(e.getLevel() instanceof ServerLevel l)LEVELS.remove(l);}
     @SubscribeEvent public static void stop(ServerStoppedEvent e){LEVELS.clear();}
 }

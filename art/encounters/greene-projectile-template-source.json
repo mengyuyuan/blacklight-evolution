@@ -1,0 +1,1852 @@
+{
+  "schema": 1,
+  "date": "2026-11-17",
+  "status": "Static metadata reading and authored source/assets only; no compilation, test execution, engine/native execution, game rendering or audio playback.",
+  "sources": [
+    {
+      "path": "D:\\PrototypeReference\\p1\\input\\projectile-search\\art\\locations\\manhattan\\props.p3d.rz",
+      "sha256": "859c202da1393d29dd1430b9f3e9360b9041d3e9f0c761d269cf0e93d86caf5b"
+    },
+    {
+      "path": "D:\\PrototypeReference\\p1\\input\\remote-metadata\\art\\locations\\manhattan\\props_fig.p3d.rz",
+      "sha256": "ddf4b65bf8fcea3fa0292aa3380a6cea5a236a9be43367bf68c0e3c8c5784d77"
+    },
+    {
+      "path": "D:\\PrototypeReference\\p1\\input\\remote-metadata\\art\\locations\\manhattan\\props_tod.p3d.rz",
+      "sha256": "33788169a4808126cfc71f3a50c5362df9cfecb9c48c15ee34d7789f18593792"
+    },
+    {
+      "path": "D:\\PrototypeReference\\p1\\input\\prototypeenginef.dll",
+      "sha256": "8cba8da3412df4f49cd61d02445e87a0cda551dea4f2fc1e66b19c1bfe28a760"
+    },
+    {
+      "path": "D:\\PrototypeReference\\p1\\input\\projectile-search\\Audio\\mother.p3d",
+      "sha256": "81682c712d45e19d6d21745f0c24be72ca0fc7f5333a944a6759a00e84e4941c"
+    },
+    {
+      "path": "D:\\PrototypeReference\\p1\\input\\projectile-search\\Audio\\sfx_shared.p3d",
+      "sha256": "c4085a8d4ea0533100a74c6c3a4eb5e419abfe78ef974f68997e3c27334c3a02"
+    }
+  ],
+  "templates": [
+    {
+      "name": "Projectile_VomitMissile",
+      "objectOffset": 48162,
+      "metaOffset": 48277,
+      "metaBytes": 582,
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "render": "goreGibTorso001",
+      "playback": "//goreGibTorso001/motherVomit",
+      "collisionAudio": null
+    },
+    {
+      "name": "Projectile_VomitMissile2",
+      "objectOffset": 119169,
+      "metaOffset": 119284,
+      "metaBytes": 672,
+      "scale": [
+        1.2999999523162842,
+        1.2999999523162842,
+        1.2999999523162842
+      ],
+      "render": "debrisBreakableAsphaltBig",
+      "playback": "//debrisBreakableAsphaltBig/motherVomit",
+      "collisionAudio": "concrete_physics"
+    },
+    {
+      "name": "Projectile_VomitMissile3",
+      "objectOffset": 119956,
+      "metaOffset": 120071,
+      "metaBytes": 611,
+      "scale": [
+        1.5,
+        1.5,
+        1.5
+      ],
+      "render": "debrisBreakableAsphaltBig",
+      "playback": "//debrisBreakableAsphaltBig/motherVomit",
+      "collisionAudio": null
+    }
+  ],
+  "sourceMeshes": [
+    {
+      "shape": "goreGibTorso001_initialShape",
+      "meshOffset": 13226533,
+      "boundsOffset": 13254946,
+      "vertices": 639,
+      "shader": "a8ab232afdfcfc4636e3cbd37dd76b01",
+      "sourceTextures": [
+        "manhattanprop_06_plane0"
+      ],
+      "minimum": [
+        -0.2629188597202301,
+        -0.4527003765106201,
+        -0.17348481714725494
+      ],
+      "maximum": [
+        0.2784145772457123,
+        0.487006276845932,
+        0.13360454142093658
+      ],
+      "pose": "Composite root and initial joint identity; source forward is -Z."
+    },
+    {
+      "shape": "debrisBreakableAsphaltBig_initialShape",
+      "meshOffset": 10676765,
+      "boundsOffset": 10689323,
+      "vertices": 217,
+      "shader": "8461b469d2602119e593ec257a77d958",
+      "sourceTextures": [
+        "park_rock00_diffuse.dds",
+        "park_rock00_normal.dds"
+      ],
+      "minimum": [
+        -0.7196590304374695,
+        -0.551108717918396,
+        -0.30169597268104553
+      ],
+      "maximum": [
+        0.7196590304374695,
+        0.551108717918396,
+        0.30169594287872314
+      ],
+      "pose": "Composite root and initial joint identity; source forward is -Z."
+    }
+  ],
+  "primitiveDisplay": [
+    {
+      "offset": 176896,
+      "owner": "debrisBreakableAsphaltBig/motherVomit/initial",
+      "shape": "debrisBreakableAsphaltBig_initialShape",
+      "time": 0.0,
+      "visible": true,
+      "stateHash": "0x4f131f"
+    },
+    {
+      "offset": 177596,
+      "owner": "debrisBreakableAsphaltBig/motherVomit/mid",
+      "shape": "debrisBreakableAsphaltBig_initialShape",
+      "time": 0.0,
+      "visible": true,
+      "stateHash": "0x4f131f"
+    },
+    {
+      "offset": 178324,
+      "owner": "debrisBreakableAsphaltBig/motherVomit/final",
+      "shape": "debrisBreakableAsphaltBig_initialShape",
+      "time": 0.0,
+      "visible": false,
+      "stateHash": "0x4f268cb2cf"
+    },
+    {
+      "offset": 334356,
+      "owner": "goreGibTorso001/motherVomit/initial",
+      "shape": "goreGibTorso001_initialShape",
+      "time": 0.0,
+      "visible": true,
+      "stateHash": "0x4f131f"
+    },
+    {
+      "offset": 335588,
+      "owner": "goreGibTorso001/motherVomit/mid",
+      "shape": "goreGibTorso001_initialShape",
+      "time": 0.0,
+      "visible": false,
+      "stateHash": "0x4f268cb2cf"
+    },
+    {
+      "offset": 336500,
+      "owner": "goreGibTorso001/motherVomit/final",
+      "shape": "goreGibTorso001_initialShape",
+      "time": 0.0,
+      "visible": false,
+      "stateHash": "0x4f268cb2cf"
+    }
+  ],
+  "playbackTracks": [
+    {
+      "offset": 177000,
+      "owner": "debrisBreakableAsphaltBig/motherVomit/mid",
+      "type": "Effect",
+      "fields": {
+        "Unknown1": 1,
+        "TimeBegin": 0,
+        "TimeEnd": -1,
+        "EffectName": {
+          "hash": "6002189901566937692",
+          "name": "missileTrail004"
+        },
+        "ParentObjectName": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "EmitSpace": {
+          "hash": "15800074974379949085",
+          "name": "GameObjectSpace"
+        },
+        "EmitJoint": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "Offset": [
+          0,
+          0,
+          0
+        ],
+        "Orientation": [
+          0,
+          0,
+          0
+        ],
+        "AttachSpace": {
+          "hash": "15800074974379949085",
+          "name": "GameObjectSpace"
+        },
+        "AttachJoint": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "AbortWhenInterrupted": true,
+        "SlotName": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "AbortBelowJointScale": -1,
+        "FadeTime": 0.33333298563957214,
+        "EffectController": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "EffectStore": {
+          "hash": "13278221393172672664",
+          "name": "Gameplay"
+        },
+        "HighPriority": true,
+        "Scale": 1,
+        "Collides": false,
+        "Restitution": 1,
+        "Friction": 1,
+        "RenderOffset": 0,
+        "UsePropScaling": false,
+        "CloneName": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "CloneTint": [
+          1,
+          1,
+          1,
+          1
+        ],
+        "Biases": [
+          1,
+          0,
+          0,
+          0
+        ],
+        "BiasesEmissionRate": 1,
+        "BiasesEmissionRateAreaScale": 0,
+        "BiasesEmissionRateScaleFunction": {
+          "hash": "4206860010037910535",
+          "name": "Linear"
+        },
+        "BiasesLifeSpan": 0.4000000059604645,
+        "BiasesLifeSpanVariance": 0.4000000059604645,
+        "BiasesSpeed": 1,
+        "BiasesSpeedVariance": 1,
+        "BiasesSize1D": 1,
+        "BiasesSize1DVariance": 1,
+        "BiasesSize1DAreaScale": 0,
+        "BiasesSize1DScaleFunction": {
+          "hash": "4206860010037910535",
+          "name": "Linear"
+        },
+        "BiasesSpin1D": 1,
+        "BiasesSpin1DVariance": 1,
+        "BiasesWeight": 1,
+        "BiasesWeightVariance": 1,
+        "BiasesAngle": 1,
+        "BiasesAngleVariance": 1,
+        "BiasesGravity": 1,
+        "BiasesDrag": 1,
+        "BiasesColourRed": 1,
+        "BiasesColourGreen": 1,
+        "BiasesColourBlue": 1,
+        "BiasesAlpha": 0.699999988079071,
+        "BiasesColourOverLifeRed": 1,
+        "BiasesColourOverLifeGreen": 1,
+        "BiasesColourOverLifeBlue": 1,
+        "BiasesAlphaOverLife": 0.699999988079071,
+        "BiasesColourVariance": 1,
+        "BiasesAlphaVariance": 1,
+        "BiasesGeneratorRadius": 1,
+        "BiasesGeneratorRadial": 1,
+        "BiasesGeneratorHorizSpread": 1,
+        "BiasesGeneratorVertSpread": 1,
+        "BiasesGeneratorWidth": 1,
+        "BiasesGeneratorHeight": 1,
+        "BiasesMeshGeneratorScale": [
+          1,
+          1,
+          1
+        ],
+        "Overrides": [
+          1,
+          0,
+          0,
+          0
+        ],
+        "OverridesEmissionRate": -1,
+        "OverridesEmissionRatePerMeter": 0.6000000238418579,
+        "OverridesMaxParticles": -1,
+        "OverridesParticleAllocation": -1,
+        "OverridesLifeSpan": -1,
+        "OverridesLifeSpanVariance": -1,
+        "OverridesSpeed": -1,
+        "OverridesSpeedVariance": -1,
+        "OverridesSize1D": -1,
+        "OverridesSize1DVariance": -1,
+        "OverridesSpin1D": -1,
+        "OverridesSpin1DVariance": -1,
+        "OverridesWeight": -1,
+        "OverridesWeightVariance": -1,
+        "OverridesAngle": -1,
+        "OverridesAngleVariance": -1,
+        "OverridesGravity": -1,
+        "OverridesDrag": -1,
+        "OverridesColourRed": -1,
+        "OverridesColourGreen": -1,
+        "OverridesColourBlue": -1,
+        "OverridesAlpha": -1,
+        "OverridesColourVariance": -1,
+        "OverridesAlphaVariance": -1,
+        "OverridesGeneratorWidth": -1,
+        "OverridesGeneratorHeight": -1
+      }
+    },
+    {
+      "offset": 177484,
+      "owner": "debrisBreakableAsphaltBig/motherVomit/mid",
+      "type": "Sound",
+      "fields": {
+        "Unknown1": 1,
+        "TimeBegin": 0,
+        "Patch": {
+          "hash": "28793708610358500",
+          "name": "fire"
+        },
+        "Trigger": {
+          "hash": "31616665440155042",
+          "name": "play"
+        },
+        "VolumeFactor": 1,
+        "MinDistance": 2,
+        "MaxDistance": 25,
+        "MinPitch": 1,
+        "MaxPitch": 1.2000000476837158,
+        "CyclicPhase": 0,
+        "InstanceName": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "Frequency": 1,
+        "PolledLifetime": true,
+        "TriggerType": {
+          "hash": "13522664087197083521",
+          "name": "Retrigger"
+        }
+      }
+    },
+    {
+      "offset": 177700,
+      "owner": "debrisBreakableAsphaltBig/motherVomit/final",
+      "type": "Sound",
+      "fields": {
+        "Unknown1": 1,
+        "TimeBegin": 0,
+        "Patch": {
+          "hash": "8649376493881069221",
+          "name": "#7808c21846650ea5"
+        },
+        "Trigger": {
+          "hash": "31616665440155042",
+          "name": "play"
+        },
+        "VolumeFactor": 1,
+        "MinDistance": 10,
+        "MaxDistance": 45,
+        "MinPitch": 1.100000023841858,
+        "MaxPitch": 1.899999976158142,
+        "CyclicPhase": 0,
+        "InstanceName": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "Frequency": 1,
+        "PolledLifetime": false,
+        "TriggerType": {
+          "hash": "6266415434618234495",
+          "name": "StopExisting"
+        }
+      }
+    },
+    {
+      "offset": 177792,
+      "owner": "debrisBreakableAsphaltBig/motherVomit/final",
+      "type": "Effect",
+      "fields": {
+        "Unknown1": 0,
+        "TimeBegin": 0,
+        "TimeEnd": 0.10000000149011612,
+        "EffectName": {
+          "hash": "8570539693703351445",
+          "name": "debrisConcrete001"
+        },
+        "ParentObjectName": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "EmitSpace": {
+          "hash": "15800074974379949085",
+          "name": "GameObjectSpace"
+        },
+        "EmitJoint": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "Offset": [
+          0,
+          0,
+          0
+        ],
+        "Orientation": [
+          0,
+          0,
+          0
+        ],
+        "AttachSpace": {
+          "hash": "15800074974379949085",
+          "name": "GameObjectSpace"
+        },
+        "AttachJoint": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "AbortWhenInterrupted": false,
+        "SlotName": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "AbortBelowJointScale": -1,
+        "FadeTime": 1,
+        "EffectController": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "EffectStore": {
+          "hash": "1312132684818588012",
+          "name": "General"
+        },
+        "HighPriority": false,
+        "Scale": 4,
+        "Collides": false,
+        "Restitution": 0.5,
+        "Friction": 1,
+        "RenderOffset": 0,
+        "UsePropScaling": true,
+        "CloneName": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "CloneTint": [
+          1,
+          1,
+          1,
+          1
+        ],
+        "Biases": [
+          1,
+          0,
+          0,
+          0
+        ],
+        "BiasesEmissionRate": 0.5,
+        "BiasesEmissionRateAreaScale": 0,
+        "BiasesEmissionRateScaleFunction": {
+          "hash": "4206860010037910535",
+          "name": "Linear"
+        },
+        "BiasesLifeSpan": 1,
+        "BiasesLifeSpanVariance": 0.5,
+        "BiasesSpeed": 1,
+        "BiasesSpeedVariance": 1,
+        "BiasesSize1D": 2,
+        "BiasesSize1DVariance": 4,
+        "BiasesSize1DAreaScale": 0,
+        "BiasesSize1DScaleFunction": {
+          "hash": "4206860010037910535",
+          "name": "Linear"
+        },
+        "BiasesSpin1D": 1,
+        "BiasesSpin1DVariance": 1,
+        "BiasesWeight": 1,
+        "BiasesWeightVariance": 1,
+        "BiasesAngle": 1,
+        "BiasesAngleVariance": 1,
+        "BiasesGravity": 1,
+        "BiasesDrag": 2,
+        "BiasesColourRed": 1,
+        "BiasesColourGreen": 1,
+        "BiasesColourBlue": 1,
+        "BiasesAlpha": 1,
+        "BiasesColourOverLifeRed": 1,
+        "BiasesColourOverLifeGreen": 1,
+        "BiasesColourOverLifeBlue": 1,
+        "BiasesAlphaOverLife": 1,
+        "BiasesColourVariance": 1,
+        "BiasesAlphaVariance": 1,
+        "BiasesGeneratorRadius": 1,
+        "BiasesGeneratorRadial": 1,
+        "BiasesGeneratorHorizSpread": 10,
+        "BiasesGeneratorVertSpread": 10,
+        "BiasesGeneratorWidth": 1,
+        "BiasesGeneratorHeight": 1,
+        "BiasesMeshGeneratorScale": [
+          1,
+          1,
+          1
+        ],
+        "Overrides": [
+          1,
+          0,
+          0,
+          0
+        ],
+        "OverridesEmissionRate": -1,
+        "OverridesEmissionRatePerMeter": -1,
+        "OverridesMaxParticles": -1,
+        "OverridesParticleAllocation": -1,
+        "OverridesLifeSpan": -1,
+        "OverridesLifeSpanVariance": -1,
+        "OverridesSpeed": -1,
+        "OverridesSpeedVariance": -1,
+        "OverridesSize1D": -1,
+        "OverridesSize1DVariance": -1,
+        "OverridesSpin1D": -1,
+        "OverridesSpin1DVariance": -1,
+        "OverridesWeight": -1,
+        "OverridesWeightVariance": -1,
+        "OverridesAngle": -1,
+        "OverridesAngleVariance": -1,
+        "OverridesGravity": -1,
+        "OverridesDrag": -1,
+        "OverridesColourRed": -1,
+        "OverridesColourGreen": -1,
+        "OverridesColourBlue": -1,
+        "OverridesAlpha": -1,
+        "OverridesColourVariance": -1,
+        "OverridesAlphaVariance": -1,
+        "OverridesGeneratorWidth": -1,
+        "OverridesGeneratorHeight": -1
+      }
+    },
+    {
+      "offset": 178296,
+      "owner": "debrisBreakableAsphaltBig/motherVomit/final",
+      "type": "Destroy",
+      "fields": {
+        "Unknown1": 0,
+        "TimeBegin": 0.2666670083999634
+      }
+    },
+    {
+      "offset": 334460,
+      "owner": "goreGibTorso001/motherVomit/mid",
+      "type": "MotionTrail",
+      "fields": {
+        "Unknown1": 0,
+        "TimeBegin": 0,
+        "TimeEnd": -1,
+        "Shader": {
+          "hash": "3662874082868539152",
+          "name": "bulletTracer001"
+        },
+        "GenerateTime": 8.333330154418945,
+        "FadeInTime": 0,
+        "FadeOutTime": 100,
+        "TextureTime": 0.33333298563957214,
+        "FadeTime": 1,
+        "FadeInTrailTime": 0.016666699200868607,
+        "ShrinkTime": 3,
+        "Dragged": false,
+        "ShrinkJoint": {
+          "hash": "10135106878356211485",
+          "name": "Motion_Root"
+        },
+        "ShrinkOffset": [
+          0,
+          0,
+          0
+        ],
+        "NumJoints": 2,
+        "Joint1": {
+          "hash": "10135106878356211485",
+          "name": "Motion_Root"
+        },
+        "JointOffset1": [
+          0,
+          -0.5,
+          0
+        ],
+        "Joint2": {
+          "hash": "10135106878356211485",
+          "name": "Motion_Root"
+        },
+        "JointOffset2": [
+          0,
+          0.5,
+          0
+        ],
+        "Joint3": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "JointOffset3": [
+          0,
+          0,
+          0
+        ],
+        "Joint4": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "JointOffset4": [
+          0,
+          0,
+          0
+        ],
+        "Joint5": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "JointOffset5": [
+          0,
+          0,
+          0
+        ],
+        "Joint6": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "JointOffset6": [
+          0,
+          0,
+          0
+        ],
+        "AbortWhenInterrupted": true,
+        "RunTillStop": false,
+        "Slot": 0
+      }
+    },
+    {
+      "offset": 334688,
+      "owner": "goreGibTorso001/motherVomit/mid",
+      "type": "Effect",
+      "fields": {
+        "Unknown1": 0,
+        "TimeBegin": 0,
+        "TimeEnd": -1,
+        "EffectName": {
+          "hash": "4045365908771618073",
+          "name": "motherProjectile001"
+        },
+        "ParentObjectName": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "EmitSpace": {
+          "hash": "15800074974379949085",
+          "name": "GameObjectSpace"
+        },
+        "EmitJoint": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "Offset": [
+          0,
+          0,
+          0
+        ],
+        "Orientation": [
+          0,
+          0,
+          0
+        ],
+        "AttachSpace": {
+          "hash": "15800074974379949085",
+          "name": "GameObjectSpace"
+        },
+        "AttachJoint": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "AbortWhenInterrupted": false,
+        "SlotName": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "AbortBelowJointScale": -1,
+        "FadeTime": 0,
+        "EffectController": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "EffectStore": {
+          "hash": "16626996011609549067",
+          "name": "Devastator"
+        },
+        "HighPriority": false,
+        "Scale": 1,
+        "Collides": false,
+        "Restitution": 0.5,
+        "Friction": 1,
+        "RenderOffset": 0,
+        "UsePropScaling": true,
+        "CloneName": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "CloneTint": [
+          1,
+          1,
+          1,
+          1
+        ],
+        "Biases": [
+          1,
+          0,
+          0,
+          0
+        ],
+        "BiasesEmissionRate": 2.5,
+        "BiasesEmissionRateAreaScale": 0,
+        "BiasesEmissionRateScaleFunction": {
+          "hash": "4206860010037910535",
+          "name": "Linear"
+        },
+        "BiasesLifeSpan": 0.5,
+        "BiasesLifeSpanVariance": 0.5,
+        "BiasesSpeed": 1,
+        "BiasesSpeedVariance": 1,
+        "BiasesSize1D": 0.4000000059604645,
+        "BiasesSize1DVariance": 0.4000000059604645,
+        "BiasesSize1DAreaScale": 0,
+        "BiasesSize1DScaleFunction": {
+          "hash": "4206860010037910535",
+          "name": "Linear"
+        },
+        "BiasesSpin1D": 1,
+        "BiasesSpin1DVariance": 1,
+        "BiasesWeight": 1,
+        "BiasesWeightVariance": 1,
+        "BiasesAngle": 1,
+        "BiasesAngleVariance": 1,
+        "BiasesGravity": 1,
+        "BiasesDrag": 1,
+        "BiasesColourRed": 0,
+        "BiasesColourGreen": 1,
+        "BiasesColourBlue": 0,
+        "BiasesAlpha": 1,
+        "BiasesColourOverLifeRed": 0,
+        "BiasesColourOverLifeGreen": 1,
+        "BiasesColourOverLifeBlue": 0,
+        "BiasesAlphaOverLife": 1,
+        "BiasesColourVariance": 1,
+        "BiasesAlphaVariance": 0,
+        "BiasesGeneratorRadius": 1,
+        "BiasesGeneratorRadial": 1,
+        "BiasesGeneratorHorizSpread": 1,
+        "BiasesGeneratorVertSpread": 1,
+        "BiasesGeneratorWidth": 1,
+        "BiasesGeneratorHeight": 1,
+        "BiasesMeshGeneratorScale": [
+          1,
+          1,
+          1
+        ],
+        "Overrides": [
+          1,
+          0,
+          0,
+          0
+        ],
+        "OverridesEmissionRate": -1,
+        "OverridesEmissionRatePerMeter": -1,
+        "OverridesMaxParticles": -1,
+        "OverridesParticleAllocation": -1,
+        "OverridesLifeSpan": -1,
+        "OverridesLifeSpanVariance": -1,
+        "OverridesSpeed": -1,
+        "OverridesSpeedVariance": -1,
+        "OverridesSize1D": -1,
+        "OverridesSize1DVariance": -1,
+        "OverridesSpin1D": -1,
+        "OverridesSpin1DVariance": -1,
+        "OverridesWeight": -1,
+        "OverridesWeightVariance": -1,
+        "OverridesAngle": -1,
+        "OverridesAngleVariance": -1,
+        "OverridesGravity": -1,
+        "OverridesDrag": -1,
+        "OverridesColourRed": -1,
+        "OverridesColourGreen": -1,
+        "OverridesColourBlue": -1,
+        "OverridesAlpha": -1,
+        "OverridesColourVariance": -1,
+        "OverridesAlphaVariance": -1,
+        "OverridesGeneratorWidth": -1,
+        "OverridesGeneratorHeight": -1
+      }
+    },
+    {
+      "offset": 335476,
+      "owner": "goreGibTorso001/motherVomit/mid",
+      "type": "Sound",
+      "fields": {
+        "Unknown1": 1,
+        "TimeBegin": 0,
+        "Patch": {
+          "hash": "3404788125536626173",
+          "name": "#2f403cc2c61425fd"
+        },
+        "Trigger": {
+          "hash": "31616665440155042",
+          "name": "play"
+        },
+        "VolumeFactor": 1,
+        "MinDistance": 0,
+        "MaxDistance": 0,
+        "MinPitch": 1,
+        "MaxPitch": 1,
+        "CyclicPhase": 0,
+        "InstanceName": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "Frequency": 1,
+        "PolledLifetime": true,
+        "TriggerType": {
+          "hash": "13522664087197083521",
+          "name": "Retrigger"
+        }
+      }
+    },
+    {
+      "offset": 335692,
+      "owner": "goreGibTorso001/motherVomit/final",
+      "type": "Sound",
+      "fields": {
+        "Unknown1": 1,
+        "TimeBegin": 0,
+        "Patch": {
+          "hash": "17981552108112106071",
+          "name": "#f98b4e5f3a32d257"
+        },
+        "Trigger": {
+          "hash": "31616665440155042",
+          "name": "play"
+        },
+        "VolumeFactor": 1,
+        "MinDistance": 50,
+        "MaxDistance": 100,
+        "MinPitch": 1,
+        "MaxPitch": 1,
+        "CyclicPhase": 0,
+        "InstanceName": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "Frequency": 1,
+        "PolledLifetime": false,
+        "TriggerType": {
+          "hash": "6266415434618234495",
+          "name": "StopExisting"
+        }
+      }
+    },
+    {
+      "offset": 335784,
+      "owner": "goreGibTorso001/motherVomit/final",
+      "type": "Sound",
+      "fields": {
+        "Unknown1": 1,
+        "TimeBegin": 0,
+        "Patch": {
+          "hash": "12993403993737071102",
+          "name": "#b451d8171dd709fe"
+        },
+        "Trigger": {
+          "hash": "31616665440155042",
+          "name": "play"
+        },
+        "VolumeFactor": 1,
+        "MinDistance": 2,
+        "MaxDistance": 35,
+        "MinPitch": 1.2999999523162842,
+        "MaxPitch": 1.5,
+        "CyclicPhase": 0,
+        "InstanceName": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "Frequency": 1,
+        "PolledLifetime": false,
+        "TriggerType": {
+          "hash": "6266415434618234495",
+          "name": "StopExisting"
+        }
+      }
+    },
+    {
+      "offset": 335876,
+      "owner": "goreGibTorso001/motherVomit/final",
+      "type": "Effect",
+      "fields": {
+        "Unknown1": 0,
+        "TimeBegin": 0,
+        "TimeEnd": 2,
+        "EffectName": {
+          "hash": "6221130511279888161",
+          "name": "explosionElectric001"
+        },
+        "ParentObjectName": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "EmitSpace": {
+          "hash": "15800074974379949085",
+          "name": "GameObjectSpace"
+        },
+        "EmitJoint": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "Offset": [
+          0,
+          0,
+          0
+        ],
+        "Orientation": [
+          0,
+          0,
+          0
+        ],
+        "AttachSpace": {
+          "hash": "15800074974379949085",
+          "name": "GameObjectSpace"
+        },
+        "AttachJoint": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "AbortWhenInterrupted": false,
+        "SlotName": {
+          "hash": "4045366274545672679",
+          "name": "#3824073184a3e1e7"
+        },
+        "AbortBelowJointScale": -1,
+        "FadeTime": 0.6666669845581055,
+        "EffectController": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "EffectStore": {
+          "hash": "6119690315119812053",
+          "name": "Explosion"
+        },
+        "HighPriority": false,
+        "Scale": 0.5,
+        "Collides": false,
+        "Restitution": 0.5,
+        "Friction": 1,
+        "RenderOffset": 0,
+        "UsePropScaling": true,
+        "CloneName": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "CloneTint": [
+          1,
+          1,
+          1,
+          1
+        ],
+        "Biases": [
+          1,
+          0,
+          0,
+          0
+        ],
+        "BiasesEmissionRate": 0.30000001192092896,
+        "BiasesEmissionRateAreaScale": 0,
+        "BiasesEmissionRateScaleFunction": {
+          "hash": "4206860010037910535",
+          "name": "Linear"
+        },
+        "BiasesLifeSpan": 1,
+        "BiasesLifeSpanVariance": 1,
+        "BiasesSpeed": 1,
+        "BiasesSpeedVariance": 1,
+        "BiasesSize1D": 0.699999988079071,
+        "BiasesSize1DVariance": 0.699999988079071,
+        "BiasesSize1DAreaScale": 0,
+        "BiasesSize1DScaleFunction": {
+          "hash": "4206860010037910535",
+          "name": "Linear"
+        },
+        "BiasesSpin1D": 1,
+        "BiasesSpin1DVariance": 1,
+        "BiasesWeight": 1,
+        "BiasesWeightVariance": 1,
+        "BiasesAngle": 1,
+        "BiasesAngleVariance": 1,
+        "BiasesGravity": 1,
+        "BiasesDrag": 1,
+        "BiasesColourRed": 1,
+        "BiasesColourGreen": 0,
+        "BiasesColourBlue": 0,
+        "BiasesAlpha": 1,
+        "BiasesColourOverLifeRed": 1,
+        "BiasesColourOverLifeGreen": 0.699999988079071,
+        "BiasesColourOverLifeBlue": 0.699999988079071,
+        "BiasesAlphaOverLife": 1,
+        "BiasesColourVariance": 1,
+        "BiasesAlphaVariance": 1,
+        "BiasesGeneratorRadius": 1,
+        "BiasesGeneratorRadial": 1,
+        "BiasesGeneratorHorizSpread": 1,
+        "BiasesGeneratorVertSpread": 1,
+        "BiasesGeneratorWidth": 1,
+        "BiasesGeneratorHeight": 1,
+        "BiasesMeshGeneratorScale": [
+          1,
+          1,
+          1
+        ],
+        "Overrides": [
+          1,
+          0,
+          0,
+          0
+        ],
+        "OverridesEmissionRate": -1,
+        "OverridesEmissionRatePerMeter": -1,
+        "OverridesMaxParticles": -1,
+        "OverridesParticleAllocation": -1,
+        "OverridesLifeSpan": -1,
+        "OverridesLifeSpanVariance": -1,
+        "OverridesSpeed": -1,
+        "OverridesSpeedVariance": -1,
+        "OverridesSize1D": -1,
+        "OverridesSize1DVariance": -1,
+        "OverridesSpin1D": -1,
+        "OverridesSpin1DVariance": -1,
+        "OverridesWeight": -1,
+        "OverridesWeightVariance": -1,
+        "OverridesAngle": -1,
+        "OverridesAngleVariance": -1,
+        "OverridesGravity": -1,
+        "OverridesDrag": -1,
+        "OverridesColourRed": 0,
+        "OverridesColourGreen": -1,
+        "OverridesColourBlue": 0,
+        "OverridesAlpha": -1,
+        "OverridesColourVariance": -1,
+        "OverridesAlphaVariance": -1,
+        "OverridesGeneratorWidth": -1,
+        "OverridesGeneratorHeight": -1
+      }
+    },
+    {
+      "offset": 336360,
+      "owner": "goreGibTorso001/motherVomit/final",
+      "type": "Sound",
+      "fields": {
+        "Unknown1": 1,
+        "TimeBegin": 0,
+        "Patch": {
+          "hash": "3404788125536626173",
+          "name": "#2f403cc2c61425fd"
+        },
+        "Trigger": {
+          "hash": "32462977145219048",
+          "name": "stop"
+        },
+        "VolumeFactor": 1,
+        "MinDistance": 0,
+        "MaxDistance": 0,
+        "MinPitch": 1,
+        "MaxPitch": 1,
+        "CyclicPhase": 0,
+        "InstanceName": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "Frequency": 1,
+        "PolledLifetime": false,
+        "TriggerType": {
+          "hash": "13522664087197083521",
+          "name": "Retrigger"
+        }
+      }
+    },
+    {
+      "offset": 336472,
+      "owner": "goreGibTorso001/motherVomit/final",
+      "type": "Destroy",
+      "fields": {
+        "Unknown1": 0,
+        "TimeBegin": 0.30000001192092896
+      }
+    }
+  ],
+  "audio": [
+    {
+      "package": "mother.p3d",
+      "patch": {
+        "kind": "Patch",
+        "name": "mother_projectile",
+        "hash": "3404788125536626173",
+        "chunkOffset": 1861342,
+        "version": 1,
+        "player": "3D_Clip_Player",
+        "flags": 0,
+        "properties": {
+          "max": 55.0,
+          "min": 10.0,
+          "pos": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "loop": true,
+          "spread": 1.0,
+          "bus_name": [
+            "sfx",
+            "master",
+            "bossfx"
+          ],
+          "max_pitch": 1.100000023841858,
+          "files": [
+            "mother_projectile"
+          ],
+          "min_pitch": 0.8999999761581421,
+          "volume": 1.0,
+          "vel": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "doppler": 4.0,
+          "group": "weapon_loop",
+          "reverb_send": 0.6904760003089905
+        },
+        "propertyEvidence": {
+          "max": {
+            "type": "Float32",
+            "valueByteOffset": 1861465
+          },
+          "min": {
+            "type": "Float32",
+            "valueByteOffset": 1861507
+          },
+          "pos": {
+            "type": "Vector",
+            "valueByteOffset": 1861548
+          },
+          "loop": {
+            "type": "Bool",
+            "valueByteOffset": 1861596
+          },
+          "spread": {
+            "type": "Float32",
+            "valueByteOffset": 1861638
+          },
+          "bus_name": {
+            "type": "String List",
+            "valueByteOffset": 1861689
+          },
+          "max_pitch": {
+            "type": "Float32",
+            "valueByteOffset": 1861767
+          },
+          "files": {
+            "type": "String List",
+            "valueByteOffset": 1861815
+          },
+          "min_pitch": {
+            "type": "Float32",
+            "valueByteOffset": 1861885
+          },
+          "volume": {
+            "type": "Float32",
+            "valueByteOffset": 1861930
+          },
+          "vel": {
+            "type": "Vector",
+            "valueByteOffset": 1861971
+          },
+          "doppler": {
+            "type": "Float32",
+            "valueByteOffset": 1862025
+          },
+          "group": {
+            "type": "String",
+            "valueByteOffset": 1862068
+          },
+          "reverb_send": {
+            "type": "Float32",
+            "valueByteOffset": 1862130
+          }
+        }
+      },
+      "audioFiles": [
+        {
+          "kind": "AudioFile",
+          "name": "mother_projectile",
+          "hash": "3404788125536626173",
+          "chunkOffset": 1198163,
+          "version": 2,
+          "alias": "mother_projectile",
+          "codec": "RADP",
+          "channels": 1,
+          "sampleRate": 48000,
+          "sampleFrames": 138016,
+          "seconds": 2.8753333333333333,
+          "encodedSha256": "711b93d1bc851e905cdcbeffc5a58cddf0d15bcd6b93d23163f3daf31cc1f234"
+        }
+      ]
+    },
+    {
+      "package": "mother.p3d",
+      "patch": {
+        "kind": "Patch",
+        "name": "mother_projectile_hit",
+        "hash": "17981552108112106071",
+        "chunkOffset": 1862134,
+        "version": 1,
+        "player": "3D_Clip_Player",
+        "flags": 0,
+        "properties": {
+          "max": 100.0,
+          "min": 25.0,
+          "pos": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "loop": false,
+          "spread": 0.9642860293388367,
+          "bus_name": [
+            "bossfx",
+            "master",
+            "sfx"
+          ],
+          "max_pitch": 1.0,
+          "files": [
+            "mother_projectile_hit01",
+            "mother_projectile_hit02"
+          ],
+          "min_pitch": 0.8999999761581421,
+          "volume": 1.0,
+          "vel": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "doppler": 1.0,
+          "group": "one_shot_high",
+          "reverb_send": 0.6011899709701538
+        },
+        "propertyEvidence": {
+          "max": {
+            "type": "Float32",
+            "valueByteOffset": 1862261
+          },
+          "min": {
+            "type": "Float32",
+            "valueByteOffset": 1862303
+          },
+          "pos": {
+            "type": "Vector",
+            "valueByteOffset": 1862344
+          },
+          "loop": {
+            "type": "Bool",
+            "valueByteOffset": 1862392
+          },
+          "spread": {
+            "type": "Float32",
+            "valueByteOffset": 1862434
+          },
+          "bus_name": {
+            "type": "String List",
+            "valueByteOffset": 1862485
+          },
+          "max_pitch": {
+            "type": "Float32",
+            "valueByteOffset": 1862563
+          },
+          "files": {
+            "type": "String List",
+            "valueByteOffset": 1862611
+          },
+          "min_pitch": {
+            "type": "Float32",
+            "valueByteOffset": 1862715
+          },
+          "volume": {
+            "type": "Float32",
+            "valueByteOffset": 1862760
+          },
+          "vel": {
+            "type": "Vector",
+            "valueByteOffset": 1862801
+          },
+          "doppler": {
+            "type": "Float32",
+            "valueByteOffset": 1862855
+          },
+          "group": {
+            "type": "String",
+            "valueByteOffset": 1862898
+          },
+          "reverb_send": {
+            "type": "Float32",
+            "valueByteOffset": 1862962
+          }
+        }
+      },
+      "audioFiles": [
+        {
+          "kind": "AudioFile",
+          "name": "mother_projectile_hit01",
+          "hash": "13104218997764723414",
+          "chunkOffset": 1284534,
+          "version": 2,
+          "alias": "mother_projectile_hit01",
+          "codec": "RADP",
+          "channels": 1,
+          "sampleRate": 48000,
+          "sampleFrames": 20128,
+          "seconds": 0.41933333333333334,
+          "encodedSha256": "0b48048f0a2c4476980187bf271d18d03fc5d1a5c2c24f51c2a2076d0f7e524a"
+        },
+        {
+          "kind": "AudioFile",
+          "name": "mother_projectile_hit02",
+          "hash": "13104218997764723413",
+          "chunkOffset": 1297237,
+          "version": 2,
+          "alias": "mother_projectile_hit02",
+          "codec": "RADP",
+          "channels": 1,
+          "sampleRate": 48000,
+          "sampleFrames": 22752,
+          "seconds": 0.474,
+          "encodedSha256": "c7df5adbf3a314f72c278e0034bc10bdd61ff328bca03b9177a52c5120f97c68"
+        }
+      ]
+    },
+    {
+      "package": "sfx_shared.p3d",
+      "patch": {
+        "kind": "Patch",
+        "name": "blood_gush_large",
+        "hash": "12993403993737071102",
+        "chunkOffset": 13390031,
+        "version": 1,
+        "player": "3D_Clip_Player",
+        "flags": 0,
+        "properties": {
+          "max": 45.0,
+          "min": 5.0,
+          "pos": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "loop": false,
+          "spread": 0.40625,
+          "bus_name": [
+            "sfx",
+            "master",
+            "generic"
+          ],
+          "max_pitch": 1.100000023841858,
+          "files": [
+            "blood_gush_large_03",
+            "blood_gush_large_02",
+            "blood_gush_large_01"
+          ],
+          "min_pitch": 1.0,
+          "volume": 0.421875,
+          "vel": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "doppler": 1.0,
+          "group": "one_shot_high",
+          "reverb_send": 1.0
+        },
+        "propertyEvidence": {
+          "max": {
+            "type": "Float32",
+            "valueByteOffset": 13390153
+          },
+          "min": {
+            "type": "Float32",
+            "valueByteOffset": 13390195
+          },
+          "pos": {
+            "type": "Vector",
+            "valueByteOffset": 13390236
+          },
+          "loop": {
+            "type": "Bool",
+            "valueByteOffset": 13390284
+          },
+          "spread": {
+            "type": "Float32",
+            "valueByteOffset": 13390326
+          },
+          "bus_name": {
+            "type": "String List",
+            "valueByteOffset": 13390377
+          },
+          "max_pitch": {
+            "type": "Float32",
+            "valueByteOffset": 13390456
+          },
+          "files": {
+            "type": "String List",
+            "valueByteOffset": 13390504
+          },
+          "min_pitch": {
+            "type": "Float32",
+            "valueByteOffset": 13390624
+          },
+          "volume": {
+            "type": "Float32",
+            "valueByteOffset": 13390669
+          },
+          "vel": {
+            "type": "Vector",
+            "valueByteOffset": 13390710
+          },
+          "doppler": {
+            "type": "Float32",
+            "valueByteOffset": 13390764
+          },
+          "group": {
+            "type": "String",
+            "valueByteOffset": 13390807
+          },
+          "reverb_send": {
+            "type": "Float32",
+            "valueByteOffset": 13390871
+          }
+        }
+      },
+      "audioFiles": [
+        {
+          "kind": "AudioFile",
+          "name": "blood_gush_large_01",
+          "hash": "6762617434366169948",
+          "chunkOffset": 1149998,
+          "version": 2,
+          "alias": "blood_gush_large_01",
+          "codec": "RADP",
+          "channels": 1,
+          "sampleRate": 48000,
+          "sampleFrames": 58080,
+          "seconds": 1.21,
+          "encodedSha256": "4e34acca2ff63b862fd491cd5d1164b5c9df30104578be017c041eaa478a5816"
+        },
+        {
+          "kind": "AudioFile",
+          "name": "blood_gush_large_02",
+          "hash": "6762617434366169951",
+          "chunkOffset": 1186413,
+          "version": 2,
+          "alias": "blood_gush_large_02",
+          "codec": "RADP",
+          "channels": 1,
+          "sampleRate": 48000,
+          "sampleFrames": 67520,
+          "seconds": 1.4066666666666667,
+          "encodedSha256": "8fd30ac9de5ad12e37baceb8daceb7c805b089d07ca77f4fb5171ccb27f70182"
+        },
+        {
+          "kind": "AudioFile",
+          "name": "blood_gush_large_03",
+          "hash": "6762617434366169950",
+          "chunkOffset": 1228728,
+          "version": 2,
+          "alias": "blood_gush_large_03",
+          "codec": "RADP",
+          "channels": 1,
+          "sampleRate": 48000,
+          "sampleFrames": 65664,
+          "seconds": 1.368,
+          "encodedSha256": "b69397936f66253163035b048e467c12735a723aadce92eeaeb924eda9afb9f3"
+        }
+      ]
+    },
+    {
+      "package": "sfx_shared.p3d",
+      "patch": {
+        "kind": "Patch",
+        "name": "fire",
+        "hash": "28793708610358500",
+        "chunkOffset": 13415074,
+        "version": 1,
+        "player": "3D_Clip_Player_fadeout",
+        "flags": 0,
+        "properties": {
+          "max": 35.0,
+          "min": 3.0,
+          "pos": [
+            5.0,
+            0.0,
+            5.0
+          ],
+          "loop": true,
+          "spread": 0.0,
+          "fade_out_time": 1000.0,
+          "bus_name": [
+            "sfx",
+            "master",
+            "generic"
+          ],
+          "max_pitch": 1.2000000476837158,
+          "volume": 1.4047620296478271,
+          "files": [
+            "fire_loop"
+          ],
+          "min_pitch": 0.800000011920929,
+          "fade_in_time": 500.0,
+          "vel": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "group": "loop_med",
+          "reverb_send": 1.0
+        },
+        "propertyEvidence": {
+          "max": {
+            "type": "Float32",
+            "valueByteOffset": 13415192
+          },
+          "min": {
+            "type": "Float32",
+            "valueByteOffset": 13415234
+          },
+          "pos": {
+            "type": "Vector",
+            "valueByteOffset": 13415275
+          },
+          "loop": {
+            "type": "Bool",
+            "valueByteOffset": 13415323
+          },
+          "spread": {
+            "type": "Float32",
+            "valueByteOffset": 13415365
+          },
+          "fade_out_time": {
+            "type": "Float32",
+            "valueByteOffset": 13415417
+          },
+          "bus_name": {
+            "type": "String List",
+            "valueByteOffset": 13415468
+          },
+          "max_pitch": {
+            "type": "Float32",
+            "valueByteOffset": 13415547
+          },
+          "volume": {
+            "type": "Float32",
+            "valueByteOffset": 13415592
+          },
+          "files": {
+            "type": "String List",
+            "valueByteOffset": 13415640
+          },
+          "min_pitch": {
+            "type": "Float32",
+            "valueByteOffset": 13415702
+          },
+          "fade_in_time": {
+            "type": "Float32",
+            "valueByteOffset": 13415753
+          },
+          "vel": {
+            "type": "Vector",
+            "valueByteOffset": 13415794
+          },
+          "group": {
+            "type": "String",
+            "valueByteOffset": 13415845
+          },
+          "reverb_send": {
+            "type": "Float32",
+            "valueByteOffset": 13415904
+          }
+        }
+      },
+      "audioFiles": [
+        {
+          "kind": "AudioFile",
+          "name": "fire_loop",
+          "hash": "3878997971415170145",
+          "chunkOffset": 3385320,
+          "version": 2,
+          "alias": "fire_loop",
+          "codec": "RADP",
+          "channels": 1,
+          "sampleRate": 44100,
+          "sampleFrames": 255264,
+          "seconds": 5.788299319727892,
+          "encodedSha256": "4bd45d4f5a143a443fdbc50b5e422f573f47e5c553968e0366f7ac87cefb27ae"
+        }
+      ]
+    },
+    {
+      "package": "sfx_shared.p3d",
+      "patch": {
+        "kind": "Patch",
+        "name": "rock_explode",
+        "hash": "8649376493881069221",
+        "chunkOffset": 13468975,
+        "version": 1,
+        "player": "3D_Clip_Player",
+        "flags": 0,
+        "properties": {
+          "max": 40.0,
+          "min": 12.0,
+          "pos": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "loop": false,
+          "spread": 1.0,
+          "bus_name": [
+            "sfx",
+            "master",
+            "explode"
+          ],
+          "max_pitch": 1.2000000476837158,
+          "files": [
+            "rock_explode_02",
+            "rock_explode_01"
+          ],
+          "min_pitch": 0.800000011920929,
+          "volume": 1.0,
+          "vel": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "doppler": 1.0,
+          "group": "one_shot_high",
+          "reverb_send": 1.0
+        },
+        "propertyEvidence": {
+          "max": {
+            "type": "Float32",
+            "valueByteOffset": 13469093
+          },
+          "min": {
+            "type": "Float32",
+            "valueByteOffset": 13469135
+          },
+          "pos": {
+            "type": "Vector",
+            "valueByteOffset": 13469176
+          },
+          "loop": {
+            "type": "Bool",
+            "valueByteOffset": 13469224
+          },
+          "spread": {
+            "type": "Float32",
+            "valueByteOffset": 13469266
+          },
+          "bus_name": {
+            "type": "String List",
+            "valueByteOffset": 13469317
+          },
+          "max_pitch": {
+            "type": "Float32",
+            "valueByteOffset": 13469396
+          },
+          "files": {
+            "type": "String List",
+            "valueByteOffset": 13469444
+          },
+          "min_pitch": {
+            "type": "Float32",
+            "valueByteOffset": 13469532
+          },
+          "volume": {
+            "type": "Float32",
+            "valueByteOffset": 13469577
+          },
+          "vel": {
+            "type": "Vector",
+            "valueByteOffset": 13469618
+          },
+          "doppler": {
+            "type": "Float32",
+            "valueByteOffset": 13469672
+          },
+          "group": {
+            "type": "String",
+            "valueByteOffset": 13469715
+          },
+          "reverb_send": {
+            "type": "Float32",
+            "valueByteOffset": 13469779
+          }
+        }
+      },
+      "audioFiles": [
+        {
+          "kind": "AudioFile",
+          "name": "rock_explode_01",
+          "hash": "12166574242836147397",
+          "chunkOffset": 9218845,
+          "version": 2,
+          "alias": "rock_explode_01",
+          "codec": "RADP",
+          "channels": 1,
+          "sampleRate": 44100,
+          "sampleFrames": 116704,
+          "seconds": 2.6463492063492065,
+          "encodedSha256": "699cc3be0b2501a1055500bb563dcce021e43f5179e687a4539f4db3924e5a4f"
+        },
+        {
+          "kind": "AudioFile",
+          "name": "rock_explode_02",
+          "hash": "12166574242836147398",
+          "chunkOffset": 9291892,
+          "version": 2,
+          "alias": "rock_explode_02",
+          "codec": "RADP",
+          "channels": 1,
+          "sampleRate": 44100,
+          "sampleFrames": 122016,
+          "seconds": 2.7668027210884354,
+          "encodedSha256": "978dae8875614f57ccb5b6ac52345ae7ffe8d25efaf17068caa039b979556f76"
+        }
+      ]
+    }
+  ],
+  "gunMapping": {
+    "1..7": "Projectile_VomitMissile (DeathFlower/InsectSwarm)",
+    "8/9": "Projectile_VomitMissile2 (Rifle uses 9; Shotgun uses 8 and 9)",
+    "10": "Projectile_VomitMissile3 (AntiAir/AntiTank)"
+  },
+  "runtimeEvidence": {
+    "0x1089bca0": "PrimitiveDisplay instance reads list from track+2c; resolves primitive hash and enum at 1089be34..6f, skips enum 2, emits bool(enum==0) in category 8 subtype 1 at 1089be85..bb. The source payload explicitly supplies shape and On/Off hashes; generic PrimitiveDisplayTrack.cs does not decode the list.",
+    "0x10468800": "Spin profile axes normalized independently, multiplied by per-axis lerped radians/second. motherVomit_Spin axis1=(1,0,0), axis2=(0,0,1), min1=max1=-10, min2=max2=10, randomOrient=true; angular velocity=(-10,0,10).",
+    "0x107be440": "Negates axis-angle before sin/cos and 107bb720. 107bdb70 multiplies row oldWorld*delta; column representation is delta*oldWorld. Spin bypasses ordinary flight alignment in 1046c0c0.",
+    "0x1046ac20": "1046b198..1046b232 randomOrient selects each Euler independently in [-pi,pi], using constants 10d9b0a0 and 10e05af0, before 107bb870.",
+    "0x1046c0c0": "1046c216..258 compares old-new absolute components with float 10e05afc = 9.999999747378752e-6. Movement above any component threshold: 1046c2fb..346 normalizes old-new, 1046c287..2ac negates into +A4 heading. Tiny motion retains heading. Actual movement thus feeds subsequent guidance and acceleration.",
+    "0x1046c680": "1046c74d aliases previous position +8c for sweep; 1046cd29..39 copies current +80..88 to previous +8c..94 at collision-processing completion."
+  },
+  "implementation": {
+    "units": "Source spatial units 1:1 blocks for projectile templates; seconds are source seconds. Direct damage scaling is owned separately by GreeneProjectile.",
+    "geometry": "11 authored torso cuboids and 9 authored asphalt cuboids, normalized to source bounds. No original mesh vertices, UVs or textures exported. Existing project hive flesh and vanilla block textures are presentation adapters.",
+    "visibility": "Torso mesh is Off in flight and final; green effect/trail is its visible flight representation. Asphalt mesh is On in flight, Off immediately on impact. No invented opaque final linger or fade.",
+    "lifetime": "Source final Destroy at .3000000119 (torso) / .2666670084 (asphalt), rounded up to 6 server ticks. Final effects persist independently; source final contains no WorldDamage/AOE.",
+    "spin": "UUID-derived deterministic independent Euler samples retain the source randomOrient distribution, not its RNG sequence. Source world-axis angular velocity applies to synced flight seconds.",
+    "particles": "Authored MC dust/smoke/electric/gravel particle types and counts; no original particle materials or emitters. Asphalt emission density uses explicit source .6/metre, stochastic rounding with MC five-particle safety ceiling. Torso mid green bias recorded; final bias-versus-override priority is not assumed.",
+    "audio": "Five exact original Patch-to-AudioFile chains recorded; waveforms remain private. Existing budgeted authored infection BURST (torso) / CRUSH (stone) are impact role adapters. Stone preserves FIG 1.1..1.9 pitch. Neither loop waveforms nor original composite two-layer hit mix is claimed.",
+    "flightCorrection": "After native acceleration, direction is updated from real displacement with source component epsilon, preserving inherited drift in the next guidance step.",
+    "audioLoopFollowup": "greene-projectile-loop-audio-source.json: two polled loops with native sentinel/pitch/gain/range/fade parameters; project Foley and bounded client lifecycle."
+  },
+  "unresolved": [
+    "MotionTrail GenerateTime/FadeOutTime timer units and GPU trail material semantics are not yet decoded.",
+    "Effect RGB bias versus override priority and all native emitter parameter transforms remain undecoded; MC particles are explicit visual adapters.",
+    "MC client interpolation, model visibility and particle density await the user-authorized later test session."
+  ],
+  "staticReview": {
+    "modelContracts": {
+      "torso": {
+        "authoredCuboids": 11,
+        "normalizedBounds": [
+          0,
+          0,
+          0,
+          1,
+          1,
+          1
+        ]
+      },
+      "asphalt": {
+        "authoredCuboids": 9,
+        "normalizedBounds": [
+          0,
+          0,
+          0,
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    "authoredAppearanceCases": 4,
+    "executedTests": false,
+    "builtJava": false
+  },
+  "implementationFiles": [
+    {
+      "path": "src/main/java/com/codex/blacklight/combat/GreeneProjectileAppearance.java",
+      "sha256": "546194a84e2a88f5d587f886385f807524af78fe59a7493516cd0b3b0eece76f"
+    },
+    {
+      "path": "src/main/java/com/codex/blacklight/combat/GreeneProjectileEffects.java",
+      "sha256": "9f1b04dcccb9397abd0c8331f78f74465c8822c39f57e6f1c7d46a5761730c3e"
+    },
+    {
+      "path": "src/main/java/com/codex/blacklight/combat/GreeneMissileFlight.java",
+      "sha256": "d15b7db0b984d51fe41278e66caa03822bbaeccc5865e760d78ed96952bfa0d7"
+    },
+    {
+      "path": "src/test/java/com/codex/blacklight/combat/GreeneProjectileAppearanceTest.java",
+      "sha256": "89af8d37eb7c2ba7cfa57065133861cc310517daec8b361d85f69db5292ade32"
+    },
+    {
+      "path": "src/test/java/com/codex/blacklight/combat/GreeneMissileFlightTest.java",
+      "sha256": "2c375bd3d1432c4c0ccc2972d041da0aab6a520c6e0d422c93c5f118edc8d7c2"
+    },
+    {
+      "path": "src/main/resources/assets/blacklight/models/greene_projectile_shapes.json",
+      "sha256": "add9363c6759d501bbda5979de76923b1c1b906515266e5d69fd9e03d5c57a8f"
+    }
+  ],
+  "rendererImplementations": {
+    "D:\\blacklight-evolution": "7c9a7f9d147c8f2fd9db2d31248e7630de42292dd311298f65b270bb24831f44",
+    "D:\\blacklight-evolution-forge-1.20.1": "563fd958fe14250ed1ed936cfed722be1bb35b1a72ff13e2291cce25b11341b5"
+  }
+}

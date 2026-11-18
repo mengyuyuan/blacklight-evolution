@@ -1,0 +1,195 @@
+{
+  "date": "2026-11-17",
+  "status": "Implemented in both source trees; compile, unit tests, GameTests and direct-player acceptance are pending at the user's request.",
+  "scope": "Common infected jump_attack only. Existing three close attacks remain authored Minecraft moves; this change does not claim a complete P1 creature port.",
+  "source": {
+    "game": "Prototype 1",
+    "compressedFile": "D:/PrototypeReference/p1/input/comparison/infected2_all_fig.p3d.rz",
+    "sha256": "C6699A17E82E5940D7EFD8EB6FE931F6E81C0CD4D7D9E5C7C5BAFB541E7CDA4F",
+    "decodedAudit": "D:/PrototypeReference/p1/infected-fig-audit.json",
+    "offsetMeaning": "Record offsets in the decoded FIG stream, not byte positions in the compressed .rz file.",
+    "branch": "infected2/opening/surface/ground/attacks/jump_attack",
+    "records": [
+      {
+        "offset": 12256,
+        "type": "Bank",
+        "meaning": "jump_attack branch"
+      },
+      {
+        "offset": 12648,
+        "type": "PuppetAnimation",
+        "animation": "infect_loco_jump_into",
+        "seconds": [
+          0,
+          0.333333
+        ],
+        "rootMotion": true
+      },
+      {
+        "offset": 12776,
+        "type": "AutoTarget",
+        "seconds": [
+          0,
+          0.233333
+        ],
+        "turningDegreesPerSecond": 720
+      },
+      {
+        "offset": 13028,
+        "type": "JumpTo",
+        "limitation": "Parameters and airborne tracking are now independently decoded from P1 runtime; see continuation record. Full native launch calculation remains unported."
+      },
+      {
+        "offset": 13208,
+        "type": "SupportingSurfaceStick",
+        "stick": false
+      },
+      {
+        "offset": 13816,
+        "type": "Hit",
+        "beginSeconds": 0.233333,
+        "joint": "Motion_Root",
+        "offsetXYZ": [
+          0,
+          -1.5,
+          -3
+        ],
+        "radius": 0.8,
+        "damage": 0,
+        "giverBranchIndex": 47
+      },
+      {
+        "offset": 14112,
+        "type": "Hit",
+        "beginSeconds": 0.233333,
+        "joint": "Motion_Root",
+        "offsetXYZ": [
+          0,
+          -1.5,
+          -1.5
+        ],
+        "radius": 0.8,
+        "damage": 0,
+        "giverBranchIndex": 47
+      },
+      {
+        "offset": 14488,
+        "type": "PuppetAnimation",
+        "animation": "infect_combat_2hand_punch_Ani1",
+        "frames": [
+          40,
+          61
+        ],
+        "speed": 1.2,
+        "rootMotion": false,
+        "ending": "HoldEndFrame"
+      },
+      {
+        "offset": 14616,
+        "type": "Hit",
+        "joint": "Wrist_R",
+        "seconds": [
+          0.166667,
+          0.566667
+        ],
+        "radius": 0.8,
+        "damage": 50,
+        "damageType": "Crush",
+        "impulseXYZ": [
+          0,
+          1250,
+          -2500
+        ]
+      },
+      {
+        "offset": 15076,
+        "type": "SupportingSurface",
+        "meaning": "Exit requires supporting surface; condition payload is not decoded."
+      },
+      {
+        "offset": 15108,
+        "type": "Node",
+        "meaning": "exit/land"
+      },
+      {
+        "offset": 15300,
+        "type": "SupportingSurfaceStick",
+        "stick": true
+      }
+    ]
+  },
+  "previousGap": "The common infected only cycled three grounded authored hand attacks. The decoded jump windup, finite targeting window, zero-damage approach probe, conditional wrist strike and landing branch had no runtime counterpart.",
+  "implemented": [
+    "Separate synchronized leap action with seven-tick windup and five-tick fast-aim cutoff. Airborne tracking now follows the verified P1 50-degree/second bounded-direction rule; see continuation record.",
+    "One actual vanilla-physics launch. After five release ticks, two approach probes may arm the punch branch; the probes never call hurt.",
+    "Only the rendered right wrist's swept path can damage the committed valid target during punch ticks 4..11, with one lawful doHurtTarget attempt per leap.",
+    "Living target validity, allies, disguise, creative/spectator, consume protection, incoming-hit interruption and existing damage-event rules remain in the path. Seated vehicle occupants do not become leap targets through their hull.",
+    "Landing has a separate synchronized recovery clock. Wall collision, water, target invalidation, restraint, changed windup cover and timeout abort the action.",
+    "A failed geometry check also starts an 80-tick retry cooldown; existing ordinary movement may continue instead of retrying the leap every tick.",
+    "Each coarse swept body envelope and its one-block collision-query border is checked with VehicleKinematics.loaded/getChunkNow before noCollision. The check does not request new chunks.",
+    "The visible trail follows the rendered right wrist and the conditional punch window; the old generic left-hand/absolute-clock fallback is not used for this action."
+  ],
+  "minecraftAdaptations": [
+    "20 Hz rounded timing: windup 7 ticks, aiming first 5 ticks at up to 36 degrees per tick after commitment, approach probes 5 ticks after launch, punch damage ticks 4..11.",
+    "Entry uses horizontal range 3..5 blocks and vertical separation at most 0.8 blocks, with visibility and grounded/adult/non-water availability.",
+    "Launch speed is clamp(distance/8,0.25,0.65), vertical velocity 0.45. This is a Minecraft gravity adapter, not decoded JumpTo parameters.",
+    "Clearance is a ten-step coarse estimate using move then horizontal drag 0.91 and vertical (vy-0.08)*0.98; it conservatively rejects obstructed starts. Vanilla living collision/physics controls actual motion, so this is not a deterministic root-motion reproduction.",
+    "Two zero-damage probe regions use forward distances 1.5 and 0.75, center height 0.75 and 0.4 half-extent. Wrist sweep uses the actual block-person arm/forearm and a 0.25 target expansion.",
+    "Original source damage 50 and source impulse values are retained as evidence only. Damage uses the mob's existing ATTACK_DAMAGE and combat balance; accepted hits use existing knockback with strength 0.4.",
+    "Landing recovery 10 ticks, timeout 48 ticks and retry cooldown 80 ticks are Minecraft pacing values; original landing duration is not decoded.",
+    "The visible joint curves are authored block-person animation aligned to the decoded states. No original P1 animation clip/mesh retargeting or original sounds are claimed."
+  ],
+  "changedFiles": [
+    "src/main/java/com/codex/blacklight/entity/BlacklightCommonInfected.java",
+    "src/main/java/com/codex/blacklight/infection/CommonInfectedLeap.java",
+    "src/main/java/com/codex/blacklight/infection/CommonInfectedMotion.java",
+    "src/main/java/com/codex/blacklight/client/model/CommonInfectedModel.java",
+    "src/main/java/com/codex/blacklight/client/renderer/CommonInfectedRenderer.java",
+    "src/main/java/com/codex/blacklight/client/renderer/InfectedLimbTrails.java",
+    "src/test/java/com/codex/blacklight/infection/CommonInfectedLeapTest.java",
+    "src/feedbackTest/java/com/codex/blacklight/gametest/CommonInfectedLeapGameTest.java"
+  ],
+  "validation": {
+    "performed": [
+      "Read and cross-checked local decoded source records and compressed-file SHA256.",
+      "Scoped git diff --check in both trees.",
+      "Read-through of model-to-world wrist transforms, source/platform API variants, action cancellation and loaded-chunk guards."
+    ],
+    "notPerformed": [
+      "No Gradle/build/Java execution.",
+      "No unit tests or GameTests executed.",
+      "No game/client launch or direct-player acceptance."
+    ],
+    "authoredUnitTests": [
+      "sourceProbeIsNotTheDamagingPunchWindow",
+      "damageSweepMatchesTheActuallyRenderedRightWrist",
+      "rangedEntryIsBoundedAndDoesNotReplaceCloseMelee",
+      "nativeAirTrackingTurnsInThreeDimensionsWithoutAddingSpeed",
+      "nativeTrackingLeadsMotionAndStaysOffAfterPassingTheTarget",
+      "sidestepCannotInstantlyRedirectFlightAndInvalidMotionCannotPropagate",
+      "turningWristUsesTheSameShortestYawPathAsRendering"
+    ],
+    "authoredGameTests": [
+      "actualAiLaunchesThenOpensOneDelayedWristHit",
+      "lowCeilingRejectsLaunchWithoutRepeatedJumpAttempts",
+      "newCoverDuringWindupAbortsBeforeLaunchAndDamage",
+      "sourceAirTrackingBendsTowardASidestepWithoutSnappingToIt",
+      "coverAddedInFlightCancelsTrackingAndDamage"
+    ],
+    "gameTestClass": "com.codex.blacklight.gametest.CommonInfectedLeapGameTest",
+    "queuedRunner": "tools/player-creature-regression.init.gradle / playerCreatureServer (root-thread owned, not executed)"
+  },
+  "playerAcceptancePending": [
+    "On a normal outdoor ground surface, approach from 3..5 blocks: see windup, single leap, delayed physical punch and landing recovery; compare with close-range three-move attacks.",
+    "Sidestep after release: see gradual bounded airborne correction, verify a large sidestep can still miss, and moving behind the infected does not trigger a U-turn.",
+    "Repeat at a doorway, corner, low ceiling, slab and stair edge: verify no wall hit, no launch loop and no permanent attack pose.",
+    "During windup and flight, damage, grab/consume, remove the target and enter a vehicle; verify cancellation and no stale fist/trail.",
+    "Observe client/server synchronized action and native keyboard player movement at ordinary frame rate. These code-only changes have not been accepted as playable."
+  ],
+  "continuation": "art/encounters/common-infected-jumpto-source-20261117.json",
+  "launchContinuation": "art/encounters/common-infected-launch-source-20261117.json replaces this initial snapshot's .45 lift, distance/8 speed and vanilla trajectory; tracking continuation remains in common-infected-jumpto-source-20261117.json.",
+  "rootExitContinuation": {
+    "record": "art/encounters/common-infected-root-exit-source-20261117.json",
+    "meaning": "Later static proof identifies .333333 as root-motion driver weight, not skeletal pose blending. Bounded horizontal MC exit now integrated; this document retains its earlier historical file snapshots."
+  }
+}

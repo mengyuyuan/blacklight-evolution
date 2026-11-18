@@ -1,0 +1,11 @@
+allprojects { afterEvaluate {
+    sourceSets.main.java.srcDir('src/motionVisual/java')
+    def mode=project.findProperty('motionMode')?:'source'
+    minecraft.runs.client {
+        property 'blacklight.test.militaryMotion',"D:/CodexCache/military-motion-qa/forge-$mode"
+        property 'blacklight.test.expectPrivateMotion',(mode=='source').toString()
+        property 'blacklight.test.hiddenRagdoll','true'
+        args '--width','1000','--height','760'
+    }
+    tasks.withType(Jar).configureEach {doFirst {throw new GradleException('Hidden motion QA cannot create a release JAR')}}
+} }

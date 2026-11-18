@@ -1,0 +1,734 @@
+{
+  "schema": 1,
+  "date": "2026-11-17",
+  "status": "implemented-code-only-pending-compilation-and-player-validation",
+  "scope": "Source-backed rifleSoldier firing posture bank; not a claim that all soldier AI is complete.",
+  "before": "The port had an actual crouch collision shape and extracted crouch/fire_kneel animation, but FireTeamGoal only selected crouching during near-low-cover reload. Normal rifle/SAW engagements never invoked the source standing/crouching firing bank.",
+  "sources": [
+    {
+      "path": "D:\\PrototypeReference\\p1\\input\\startup_fig.p3d.rz",
+      "sha256": "96d84271e461cbe4566fb984359653b164257f88392c5bceb213c30f88527779",
+      "offset_space": "inflated startup_fig.p3d; offsets are record headers, payload fields retain their own offsets",
+      "records": [
+        {
+          "source": "startup_fig.p3d.rz",
+          "offset": 301264,
+          "payload": 301276,
+          "length": 16,
+          "type": "Bank",
+          "kind": "BranchHash",
+          "owner": "engage_soldier/#d912518989f17d14/#d912518989f17d14/soldiers/rifleSoldier",
+          "end": 317692
+        },
+        {
+          "source": "startup_fig.p3d.rz",
+          "offset": 301304,
+          "payload": 301316,
+          "length": 24,
+          "type": "GrabSlotClassName",
+          "kind": "ConditionHash",
+          "owner": "engage_soldier/#d912518989f17d14/#d912518989f17d14/soldiers/rifleSoldier",
+          "fields": {
+            "GrabSlotHash": {
+              "hash": "10464599244845980941",
+              "name": "Holding"
+            },
+            "Compare": {
+              "hash": "4001598",
+              "name": "#3d0f3e"
+            },
+            "ClassnameHash": {
+              "hash": "8123004041450973238",
+              "name": "rifle"
+            }
+          },
+          "schema": "GrabSlotClassNameCondition",
+          "end": 301348
+        },
+        {
+          "source": "startup_fig.p3d.rz",
+          "offset": 301348,
+          "payload": 301360,
+          "length": 0,
+          "type": "Or",
+          "kind": "ConditionHash",
+          "owner": "engage_soldier/#d912518989f17d14/#d912518989f17d14/soldiers/rifleSoldier",
+          "fields": {},
+          "schema": "OrCondition",
+          "end": 301368
+        },
+        {
+          "source": "startup_fig.p3d.rz",
+          "offset": 301368,
+          "payload": 301380,
+          "length": 24,
+          "type": "GrabSlotClassName",
+          "kind": "ConditionHash",
+          "owner": "engage_soldier/#d912518989f17d14/#d912518989f17d14/soldiers/rifleSoldier",
+          "fields": {
+            "GrabSlotHash": {
+              "hash": "10464599244845980941",
+              "name": "Holding"
+            },
+            "Compare": {
+              "hash": "4001598",
+              "name": "#3d0f3e"
+            },
+            "ClassnameHash": {
+              "hash": "494869147299",
+              "name": "saw"
+            }
+          },
+          "schema": "GrabSlotClassNameCondition",
+          "end": 301412
+        },
+        {
+          "source": "startup_fig.p3d.rz",
+          "offset": 301412,
+          "payload": 301424,
+          "length": 0,
+          "type": "Or",
+          "kind": "ConditionHash",
+          "owner": "engage_soldier/#d912518989f17d14/#d912518989f17d14/soldiers/rifleSoldier",
+          "fields": {},
+          "schema": "OrCondition",
+          "end": 301432
+        },
+        {
+          "source": "startup_fig.p3d.rz",
+          "offset": 301432,
+          "payload": 301444,
+          "length": 24,
+          "type": "GrabSlotClassName",
+          "kind": "ConditionHash",
+          "owner": "engage_soldier/#d912518989f17d14/#d912518989f17d14/soldiers/rifleSoldier",
+          "fields": {
+            "GrabSlotHash": {
+              "hash": "10464599244845980941",
+              "name": "Holding"
+            },
+            "Compare": {
+              "hash": "4001598",
+              "name": "#3d0f3e"
+            },
+            "ClassnameHash": {
+              "hash": "10201727653069515053",
+              "name": "sniper"
+            }
+          },
+          "schema": "GrabSlotClassNameCondition",
+          "end": 301476
+        },
+        {
+          "source": "startup_fig.p3d.rz",
+          "offset": 315656,
+          "payload": 315668,
+          "length": 16,
+          "type": "Bank",
+          "kind": "BranchHash",
+          "owner": "engage_soldier/#d912518989f17d14/#d912518989f17d14/soldiers/rifleSoldier/engage/#d912518989f17d14/attack/shoot/#6b1e2701259883b7/#137b12d7f0938d56/#6960d507d70f0d97",
+          "end": 316428
+        },
+        {
+          "source": "startup_fig.p3d.rz",
+          "offset": 315704,
+          "payload": 315716,
+          "length": 20,
+          "type": "Node",
+          "kind": "BranchHash",
+          "owner": "engage_soldier/#d912518989f17d14/#d912518989f17d14/soldiers/rifleSoldier/engage/#d912518989f17d14/attack/shoot/#6b1e2701259883b7/#137b12d7f0938d56/#6960d507d70f0d97/stand",
+          "end": 315904
+        },
+        {
+          "source": "startup_fig.p3d.rz",
+          "offset": 315748,
+          "payload": 315760,
+          "length": 4,
+          "type": "Random",
+          "kind": "ConditionHash",
+          "owner": "engage_soldier/#d912518989f17d14/#d912518989f17d14/soldiers/rifleSoldier/engage/#d912518989f17d14/attack/shoot/#6b1e2701259883b7/#137b12d7f0938d56/#6960d507d70f0d97/stand",
+          "fields": {
+            "Weight": 3
+          },
+          "schema": "RandomCondition",
+          "end": 315772
+        },
+        {
+          "source": "startup_fig.p3d.rz",
+          "offset": 315792,
+          "payload": 315804,
+          "length": 16,
+          "type": "Wait",
+          "kind": "TrackHash",
+          "owner": "engage_soldier/#d912518989f17d14/#d912518989f17d14/soldiers/rifleSoldier/engage/#d912518989f17d14/attack/shoot/#6b1e2701259883b7/#137b12d7f0938d56/#6960d507d70f0d97/stand",
+          "fields": {
+            "Unknown1": 0,
+            "TimeBegin": 0,
+            "TimeEndMin": 3,
+            "TimeEndMax": 4
+          },
+          "schema": "WaitTrack",
+          "end": 315828
+        },
+        {
+          "source": "startup_fig.p3d.rz",
+          "offset": 315828,
+          "payload": 315840,
+          "length": 20,
+          "type": "Sequence",
+          "kind": "TrackHash",
+          "owner": "engage_soldier/#d912518989f17d14/#d912518989f17d14/soldiers/rifleSoldier/engage/#d912518989f17d14/attack/shoot/#6b1e2701259883b7/#137b12d7f0938d56/#6960d507d70f0d97/stand",
+          "fields": {
+            "Unknown1": 1,
+            "TimeBegin": 0,
+            "BranchRef": {
+              "name": "",
+              "index": 131
+            },
+            "Priority": 1
+          },
+          "schema": "SequenceTrack",
+          "end": 315888
+        },
+        {
+          "source": "startup_fig.p3d.rz",
+          "offset": 315904,
+          "payload": 315916,
+          "length": 16,
+          "type": "Bank",
+          "kind": "BranchHash",
+          "owner": "engage_soldier/#d912518989f17d14/#d912518989f17d14/soldiers/rifleSoldier/engage/#d912518989f17d14/attack/shoot/#6b1e2701259883b7/#137b12d7f0938d56/#6960d507d70f0d97/#6960d507d70f0d97",
+          "end": 316420
+        },
+        {
+          "source": "startup_fig.p3d.rz",
+          "offset": 315944,
+          "payload": 315956,
+          "length": 4,
+          "type": "Random",
+          "kind": "ConditionHash",
+          "owner": "engage_soldier/#d912518989f17d14/#d912518989f17d14/soldiers/rifleSoldier/engage/#d912518989f17d14/attack/shoot/#6b1e2701259883b7/#137b12d7f0938d56/#6960d507d70f0d97/#6960d507d70f0d97",
+          "fields": {
+            "Weight": 1
+          },
+          "schema": "RandomCondition",
+          "end": 315968
+        },
+        {
+          "source": "startup_fig.p3d.rz",
+          "offset": 315968,
+          "payload": 315980,
+          "length": 4,
+          "type": "NearRoofsEdge",
+          "kind": "ConditionHash",
+          "owner": "engage_soldier/#d912518989f17d14/#d912518989f17d14/soldiers/rifleSoldier/engage/#d912518989f17d14/attack/shoot/#6b1e2701259883b7/#137b12d7f0938d56/#6960d507d70f0d97/#6960d507d70f0d97",
+          "fields": {
+            "NearEdge": false
+          },
+          "schema": "NearRoofsEdgeCondition",
+          "end": 315992
+        },
+        {
+          "source": "startup_fig.p3d.rz",
+          "offset": 316000,
+          "payload": 316012,
+          "length": 20,
+          "type": "Node",
+          "kind": "BranchHash",
+          "owner": "engage_soldier/#d912518989f17d14/#d912518989f17d14/soldiers/rifleSoldier/engage/#d912518989f17d14/attack/shoot/#6b1e2701259883b7/#137b12d7f0938d56/#6960d507d70f0d97/#6960d507d70f0d97/#bb47aed0ffd13981",
+          "end": 316272
+        },
+        {
+          "source": "startup_fig.p3d.rz",
+          "offset": 316044,
+          "payload": 316056,
+          "length": 36,
+          "type": "TargetHasLoF",
+          "kind": "ConditionHash",
+          "owner": "engage_soldier/#d912518989f17d14/#d912518989f17d14/soldiers/rifleSoldier/engage/#d912518989f17d14/attack/shoot/#6b1e2701259883b7/#137b12d7f0938d56/#6960d507d70f0d97/#6960d507d70f0d97/#bb47aed0ffd13981",
+          "fields": {
+            "TimeTolerance": 0.5,
+            "DistanceTolerance": 0.4000000059604645,
+            "CollisionFlags": {
+              "hash": "4601230196676155154",
+              "name": "collide_static_and_moving"
+            },
+            "CollideWithType": 51267,
+            "Offset": [
+              0,
+              -0.25,
+              0
+            ],
+            "Radius": 0
+          },
+          "schema": "TargetHasLoFCondition",
+          "end": 316100
+        },
+        {
+          "source": "startup_fig.p3d.rz",
+          "offset": 316120,
+          "payload": 316132,
+          "length": 16,
+          "type": "Wait",
+          "kind": "TrackHash",
+          "owner": "engage_soldier/#d912518989f17d14/#d912518989f17d14/soldiers/rifleSoldier/engage/#d912518989f17d14/attack/shoot/#6b1e2701259883b7/#137b12d7f0938d56/#6960d507d70f0d97/#6960d507d70f0d97/#bb47aed0ffd13981",
+          "fields": {
+            "Unknown1": 0,
+            "TimeBegin": 0,
+            "TimeEndMin": 4,
+            "TimeEndMax": 6
+          },
+          "schema": "WaitTrack",
+          "end": 316156
+        },
+        {
+          "source": "startup_fig.p3d.rz",
+          "offset": 316156,
+          "payload": 316168,
+          "length": 20,
+          "type": "Action",
+          "kind": "TrackHash",
+          "owner": "engage_soldier/#d912518989f17d14/#d912518989f17d14/soldiers/rifleSoldier/engage/#d912518989f17d14/attack/shoot/#6b1e2701259883b7/#137b12d7f0938d56/#6960d507d70f0d97/#6960d507d70f0d97/#bb47aed0ffd13981",
+          "fields": {
+            "Unknown1": 1,
+            "TimeBegin": 0,
+            "TimeEnd": -1,
+            "Button": {
+              "hash": "5976174382536286616",
+              "name": "Taunt"
+            }
+          },
+          "schema": "ActionTrack",
+          "end": 316196
+        },
+        {
+          "source": "startup_fig.p3d.rz",
+          "offset": 316196,
+          "payload": 316208,
+          "length": 20,
+          "type": "Sequence",
+          "kind": "TrackHash",
+          "owner": "engage_soldier/#d912518989f17d14/#d912518989f17d14/soldiers/rifleSoldier/engage/#d912518989f17d14/attack/shoot/#6b1e2701259883b7/#137b12d7f0938d56/#6960d507d70f0d97/#6960d507d70f0d97/#bb47aed0ffd13981",
+          "fields": {
+            "Unknown1": 1,
+            "TimeBegin": 0,
+            "BranchRef": {
+              "name": "",
+              "index": 131
+            },
+            "Priority": 1
+          },
+          "schema": "SequenceTrack",
+          "end": 316256
+        },
+        {
+          "source": "startup_fig.p3d.rz",
+          "offset": 316272,
+          "payload": 316284,
+          "length": 20,
+          "type": "Node",
+          "kind": "BranchHash",
+          "owner": "engage_soldier/#d912518989f17d14/#d912518989f17d14/soldiers/rifleSoldier/engage/#d912518989f17d14/attack/shoot/#6b1e2701259883b7/#137b12d7f0938d56/#6960d507d70f0d97/#6960d507d70f0d97/#6cdb4e01889bff44",
+          "end": 316412
+        },
+        {
+          "source": "startup_fig.p3d.rz",
+          "offset": 316336,
+          "payload": 316348,
+          "length": 20,
+          "type": "Execute",
+          "kind": "TrackHash",
+          "owner": "engage_soldier/#d912518989f17d14/#d912518989f17d14/soldiers/rifleSoldier/engage/#d912518989f17d14/attack/shoot/#6b1e2701259883b7/#137b12d7f0938d56/#6960d507d70f0d97/#6960d507d70f0d97/#6cdb4e01889bff44",
+          "fields": {
+            "Unknown1": 0,
+            "TimeBegin": 0,
+            "TimeEnd": -1,
+            "BranchRef": {
+              "name": "",
+              "index": 132
+            }
+          },
+          "schema": "ExecuteTrack",
+          "end": 316396
+        },
+        {
+          "source": "startup_fig.p3d.rz",
+          "offset": 1211988,
+          "payload": 1212000,
+          "length": 16,
+          "type": "Bank",
+          "kind": "BranchHash",
+          "owner": "human/opening/surface/ground/soldier/#6960d507d70f0d97",
+          "end": 1222152
+        },
+        {
+          "source": "startup_fig.p3d.rz",
+          "offset": 1212028,
+          "payload": 1212040,
+          "length": 40,
+          "type": "CharacterInput",
+          "kind": "ConditionHash",
+          "owner": "human/opening/surface/ground/soldier/#6960d507d70f0d97",
+          "fields": {
+            "Button": {
+              "hash": "5976174382536286616",
+              "name": "Taunt"
+            },
+            "ButtonState": {
+              "hash": "1627680294656923098",
+              "name": "Pressed"
+            },
+            "CompareTime": {
+              "hash": "4067199",
+              "name": "#3e0f7f"
+            },
+            "Time": 0,
+            "CompareValue": {
+              "hash": "4067199",
+              "name": "#3e0f7f"
+            },
+            "Value": 0
+          },
+          "schema": "InputCondition",
+          "end": 1212088
+        },
+        {
+          "source": "startup_fig.p3d.rz",
+          "offset": 1212200,
+          "payload": 1212212,
+          "length": 108,
+          "type": "PuppetAnimation",
+          "kind": "TrackHash",
+          "owner": "human/opening/surface/ground/soldier/#6960d507d70f0d97/transition",
+          "fields": {
+            "Unknown1": 0,
+            "TimeBegin": 0,
+            "TimeEnd": -1,
+            "Animation": {
+              "hash": "12043092256114747120",
+              "name": "sol_cover_crouch2_001_b"
+            },
+            "Speed": 1,
+            "RandomSpeedVariation": 0,
+            "InitFrame": 0,
+            "StartFrame": 0,
+            "EndFrame": -1,
+            "Cyclic": {
+              "hash": "11831687089686836166",
+              "name": "FromAnimation"
+            },
+            "SyncFrame": false,
+            "PhaseMatch": false,
+            "ReuseExistingDriver": false,
+            "SyncPhase": {
+              "hash": "3349652082457766725",
+              "name": "Legacy"
+            },
+            "SyncPhaseMinFrame": 0,
+            "SyncPhaseMaxFrame": -1,
+            "HasRootTranslation": true,
+            "HasRootRotation": true,
+            "Partition": {
+              "hash": "0",
+              "name": "#0"
+            },
+            "Weight": 1,
+            "Priority": 0,
+            "BlendInTime": 0.10000000149011612,
+            "BlendOutTime": 0.20000000298023224
+          },
+          "schema": "PuppetAnimationTrack",
+          "end": 1212328
+        },
+        {
+          "source": "startup_fig.p3d.rz",
+          "offset": 1212328,
+          "payload": 1212340,
+          "length": 92,
+          "type": "AutoTarget",
+          "kind": "TrackHash",
+          "owner": "human/opening/surface/ground/soldier/#6960d507d70f0d97/transition",
+          "fields": {
+            "Unknown1": 1,
+            "TimeBegin": 0,
+            "TimeEnd": -1,
+            "TurningVelocity": 300,
+            "UseInput": false,
+            "UseCamera": false,
+            "Direction": [
+              0,
+              0,
+              -1
+            ],
+            "Arc": 360,
+            "MaxDistance": 300,
+            "CheckArc": false,
+            "CheckDistance": false,
+            "OrientOffsetFromTarget": 0,
+            "TargetFilter": 2,
+            "TargetOverrides": 0,
+            "MinPriorityTargetClass": {
+              "hash": "16840447804245826439",
+              "name": "autoMin"
+            },
+            "MaxPriorityTargetClass": {
+              "hash": "16840447804246351257",
+              "name": "autoMax"
+            },
+            "Priority": -5,
+            "BlendInTime": 0,
+            "BlendOutTime": 0
+          },
+          "schema": "AutoTargetTrack",
+          "end": 1212440
+        },
+        {
+          "source": "startup_fig.p3d.rz",
+          "offset": 1214680,
+          "payload": 1214692,
+          "length": 40,
+          "type": "CharacterInput",
+          "kind": "ConditionHash",
+          "owner": "human/opening/surface/ground/soldier/#6960d507d70f0d97/transition/#ac89e79f99133b5/#50fa050202f0cce6/attack/#a53904e4f5eaccc6",
+          "fields": {
+            "Button": {
+              "hash": "17648781240126830036",
+              "name": "Attack"
+            },
+            "ButtonState": {
+              "hash": "19195649384759944",
+              "name": "Down"
+            },
+            "CompareTime": {
+              "hash": "4067199",
+              "name": "#3e0f7f"
+            },
+            "Time": 0,
+            "CompareValue": {
+              "hash": "4067199",
+              "name": "#3e0f7f"
+            },
+            "Value": 0
+          },
+          "schema": "InputCondition",
+          "end": 1214740
+        },
+        {
+          "source": "startup_fig.p3d.rz",
+          "offset": 1215456,
+          "payload": 1215468,
+          "length": 40,
+          "type": "CharacterInput",
+          "kind": "ConditionHash",
+          "owner": "human/opening/surface/ground/soldier/#6960d507d70f0d97/transition/#ac89e79f99133b5/#50fa050202f0cce6/attack/#a53904e4f5eaccc6/#a34dd859714b69fc/#35d1f579ab149b43",
+          "fields": {
+            "Button": {
+              "hash": "17648781240126830036",
+              "name": "Attack"
+            },
+            "ButtonState": {
+              "hash": "19195649384759944",
+              "name": "Down"
+            },
+            "CompareTime": {
+              "hash": "4067199",
+              "name": "#3e0f7f"
+            },
+            "Time": 0,
+            "CompareValue": {
+              "hash": "4067199",
+              "name": "#3e0f7f"
+            },
+            "Value": 0
+          },
+          "schema": "InputCondition",
+          "end": 1215516
+        },
+        {
+          "source": "startup_fig.p3d.rz",
+          "offset": 1222244,
+          "payload": 1222256,
+          "length": 40,
+          "type": "CharacterInput",
+          "kind": "ConditionHash",
+          "owner": "human/opening/surface/ground/soldier/#84d46cda2c01bd2e/transition_to_idle",
+          "fields": {
+            "Button": {
+              "hash": "5976174382536286616",
+              "name": "Taunt"
+            },
+            "ButtonState": {
+              "hash": "5575835",
+              "name": "Up"
+            },
+            "CompareTime": {
+              "hash": "4067199",
+              "name": "#3e0f7f"
+            },
+            "Time": 0,
+            "CompareValue": {
+              "hash": "4067199",
+              "name": "#3e0f7f"
+            },
+            "Value": 0
+          },
+          "schema": "InputCondition",
+          "end": 1222304
+        },
+        {
+          "source": "startup_fig.p3d.rz",
+          "offset": 1222324,
+          "payload": 1222336,
+          "length": 108,
+          "type": "PuppetAnimation",
+          "kind": "TrackHash",
+          "owner": "human/opening/surface/ground/soldier/#84d46cda2c01bd2e/transition_to_idle",
+          "fields": {
+            "Unknown1": 0,
+            "TimeBegin": 0,
+            "TimeEnd": -1,
+            "Animation": {
+              "hash": "12043092256114747120",
+              "name": "sol_cover_crouch2_001_b"
+            },
+            "Speed": -1,
+            "RandomSpeedVariation": 0,
+            "InitFrame": 11,
+            "StartFrame": 0,
+            "EndFrame": 11,
+            "Cyclic": {
+              "hash": "11831687089686836166",
+              "name": "FromAnimation"
+            },
+            "SyncFrame": false,
+            "PhaseMatch": false,
+            "ReuseExistingDriver": false,
+            "SyncPhase": {
+              "hash": "3349652082457766725",
+              "name": "Legacy"
+            },
+            "SyncPhaseMinFrame": 0,
+            "SyncPhaseMaxFrame": -1,
+            "HasRootTranslation": true,
+            "HasRootRotation": true,
+            "Partition": {
+              "hash": "0",
+              "name": "#0"
+            },
+            "Weight": 1,
+            "Priority": 0,
+            "BlendInTime": 0.10000000149011612,
+            "BlendOutTime": 0.10000000149011612
+          },
+          "schema": "PuppetAnimationTrack",
+          "end": 1222452
+        }
+      ]
+    },
+    {
+      "path": "D:\\PrototypeReference\\p1\\blackwatch-fig-audit.json",
+      "sha256": "3af4b69ad4a021a99b2459da3282bfe096b474ddbabb5fd6345416b4e520beb5",
+      "role": "Decoded FIG hierarchy and field values, selected records embedded above"
+    },
+    {
+      "path": "D:\\PrototypeReference\\p1\\private\\rapid-runtime-10a7e250.txt",
+      "sha256": "5cc73ed33e81927a13e0825e71101079a570dccd555d5d3aac997c7dceca86b6",
+      "role": "Previously extracted shared native Bank callback 0x10a7e250: condition/weight pass, random draw, condition/select pass. This patch only reads static text, never invokes or emulates native code. No aircraft Java helper dependency."
+    },
+    {
+      "path": "D:\\PrototypeReference\\p1\\private\\military-motion.json",
+      "sha256": "de70bab58bec146fecdf8e353ac67eefea124fe239c04060fcfb5e3f26313a65",
+      "role": "Existing user-local sampled motion metadata: crouch=sol_cover_crouch2_001_b, 12 frames at 30 fps; fire_kneel=36 frames; reload_kneel=61 frames. Curves are not embedded or redistributed by this review."
+    }
+  ],
+  "source_semantics": [
+    "rifleSoldier OR conditions admit rifle, saw and sniper; launcher and commander branches are separate.",
+    "Outer posture bank weights: standing 3 at 315748, crouching 1 at 315944. NearRoofsEdge=false controls crouch eligibility in both bank passes.",
+    "Standing Wait 3..4 seconds at 315792 and crouching Wait 4..6 seconds at 316120 loop through Sequence index 131.",
+    "Lower TargetHasLoF belongs inside the chosen crouch branch (316044), with Offset Y=-0.25. A failure executes standing branch index 132 at 316336; it does not reweight the outer bank.",
+    "Action Taunt at 316156 is not a guessed emote: soldier CharacterInput Taunt Pressed at 1212028 selects sol_cover_crouch2_001_b at 1212200; Taunt Up at 1222244 reverses frames 11..0 at 1222324.",
+    "Existing local motion sampling already supplies crouch/fire_kneel/reload_kneel; the new AI selects the actual pose so real collision, eye/muzzle and current model follow it."
+  ],
+  "implementation": [
+    "Independent MilitaryRiflePosture clock preserves 3:1 weights, selected-branch low-LoF fallback and condition re-evaluation. A normal finite burst/recovery does not resample the posture wait.",
+    "Rifle/carbine/SAW soldiers in the existing stationary firing band can kneel only on supported dry terrain, with loaded collision envelope and both the lowered source probe and actual future crouched muzzle clear. Officers/commanders and non-bullet launchers are excluded.",
+    "A crouched firing wait stops navigation. Existing finite ammunition, squad fire permits, protected-target checks and real FirearmsCombat bullets remain authoritative.",
+    "Crouch changes the existing real entity dimensions and eye height. Posture changes delay shooting for the existing eight-tick animation blend, rather than emitting from a standing muzzle during descent.",
+    "Reload explicitly takes over the current crouch ownership; no every-tick firing/reload pose tug-of-war. Interruptions clear the transient clock and identity. Safe expansion is retried from the outer entity tick even when NoAI, disarmed or targetless.",
+    "A low ceiling prevents standing collision expansion. The stopped action stays canceled; only the legal shortened body is retained until headroom is clear. Invalid target, controlled motion, riding, death and load use existing stop/suspend paths."
+  ],
+  "minecraft_adaptations": [
+    "The source supports rifle/saw/sniper. This port currently has rifle/carbine/SAW bullet guns, so carbine is an explicit family mapping; no new sniper weapon is invented.",
+    "Original continuous seconds are quantized to inclusive 20 Hz ranges: standing 60..80 ticks, crouching 80..120. Existing eight-tick visual transition corresponds to the source 11-frame stand segment at 30 fps.",
+    "Existing MC 5..14-block firing-position band, 22-block engagement limit, squad leases and finite gun timings remain unchanged; source parent distance <=30 is not presented as ported here.",
+    "NearRoofsEdge uses source navigation geometry. The MC adapter conservatively checks nine dry UP-sturdy support samples at +/-0.75 scaled blocks and loaded bounding-box margin; slabs/stairs/edges can remain standing.",
+    "Source low-LoF tolerances and collision bitmask have no identical MC semantics. Use fresh block/ally/protected-hull checks, plus the actual MC crouched muzzle; do not fire through stale or unsafe clearance.",
+    "Fresh loss of low clearance/support cancels kneeling into a full standing wait; this is conservative MC collision safety, not an assertion about every native branch abort callback.",
+    "Physical crouch height remains the pre-existing 0.78 standing-height adapter, not an original P1 collision measurement. Original motion curves stay user-local and are not copied into distributable resources."
+  ],
+  "pending_validation": {
+    "policy": "User requested code first and testing later. No Gradle, javac, unit, GameTest, client or native emulation has run for this change.",
+    "unit_class": "com.codex.blacklight.military.MilitaryRiflePostureTest",
+    "unit_cases": [
+      "3:1 draw boundary and both wait endpoints",
+      "edge exclusion and nested low-LoF standing fallback",
+      "second condition pass invalidation",
+      "posture wait survives normal fire recovery, but cancellation resamples",
+      "lost low clearance holds standing and rejects invalid sampler"
+    ],
+    "gametest_class": "com.codex.blacklight.gametest.MilitaryPostureGameTest",
+    "gametests": [
+      {
+        "method": "sourceKneelingFiresRealBulletsAndHandsItsPoseToFiniteReload",
+        "batch": "soldierPostureFire",
+        "intent": "Registered soldier with real rifle damage, physical crouch, finite reload behind low cover, resumed fire, disarm and no delayed volley"
+      },
+      {
+        "method": "standingOnlyMuzzleClearanceRejectsTheChosenKneel",
+        "batch": "soldierPostureMuzzle",
+        "intent": "Real low firing slit blocks crouched muzzle while standing fallback can damage target; side walls and roof keep navigation inside the cell"
+      },
+      {
+        "method": "interruptedKneelCannotStandThroughALowBeamAndRecoversAfterItsRemoval",
+        "batch": "soldierPostureCeiling",
+        "intent": "Real ceiling intersects standing shape but not crouch; canceled NoAI/disarmed actor cannot expand until beam removed, then safely stands without firing"
+      }
+    ],
+    "fixture_boundary": "Only firingPostureSample is overridden to select the authored crouch branch deterministically. No muzzle geometry, live goal, gun damage, finite ammo, collision or navigation checks are bypassed. Emptying a magazine is deliberate setup before real reload.",
+    "player_checks": [
+      "Normal city street: watch a rifleman alternate standing and crouching, actually aim/fire from lower height; compare heavy SAW and launcher.",
+      "Real curb, rooftop edge, stairs and low firing slit: do not crouch where support/low muzzle is unsafe; standing must still engage if its line is legal.",
+      "Low cover reload: no pose flicker each tick and no unlimited reserve; grab/disarm/board/kill during crouch or transition and check delayed fire stops.",
+      "Low beam: interrupt while crouched; no head clipping on stand, safe recovery after leaving/removing beam; then acquire a fresh target normally."
+    ]
+  },
+  "remaining_source_gaps": [
+    "Full rifleSoldier movement/hide/hearing/tracking hierarchy is not implemented by this patch.",
+    "The source R_Wrist_Grapple AimingAtTarget dot tolerance at 315176 remains a separate aim gate gap; current port real-bullet aim path is unchanged.",
+    "Client animation appearance, ordinary uneven-world navigation and multiplayer ownership handoffs require the deferred player session."
+  ],
+  "static_review": {
+    "performed": [
+      "Decoded original FIG records and read shared native Bank disassembly as text; no native execution.",
+      "Both MilitarySoldier files pass git diff --check.",
+      "No trailing whitespace or conflict markers in this change set; recorded file hashes match current files.",
+      "Posture helper and unit fixture are identical across both repositories; GameTest differs only by loader annotation imports.",
+      "MilitarySoldier mirror diff contains only existing loader/version differences and the required Neo dimensions-eyeHeight versus Forge getEyeHeight(Pose) API adapter."
+    ],
+    "not_a_test_result": true
+  },
+  "files": {
+    "neo": {
+      "src/main/java/com/codex/blacklight/entity/MilitarySoldier.java": "073fc203a00aec8b1b2af3de2502d75dd9303bb488b481d08fe15d29848f961d",
+      "src/main/java/com/codex/blacklight/military/MilitaryRiflePosture.java": "ca30a7032d9185595ad878c57eb8507df66fac7d8b087910a1fcab3e5678a7a0",
+      "src/test/java/com/codex/blacklight/military/MilitaryRiflePostureTest.java": "21d5e1cce2cd112021e494705c7466ba9632e6d5a55cff2a1ca734d18baf7200",
+      "src/blackwatchTest/java/com/codex/blacklight/gametest/MilitaryPostureGameTest.java": "f6f66d64d18bf5a1030d89e8ed23e175f26a94cc2a6beba4ff51f17f51f0945d"
+    },
+    "forge": {
+      "src/main/java/com/codex/blacklight/entity/MilitarySoldier.java": "cfc94b88ab579552234c44456211f04a50505cf97cedab997fd4ad04493cc191",
+      "src/main/java/com/codex/blacklight/military/MilitaryRiflePosture.java": "ca30a7032d9185595ad878c57eb8507df66fac7d8b087910a1fcab3e5678a7a0",
+      "src/test/java/com/codex/blacklight/military/MilitaryRiflePostureTest.java": "21d5e1cce2cd112021e494705c7466ba9632e6d5a55cff2a1ca734d18baf7200",
+      "src/blackwatchTest/java/com/codex/blacklight/gametest/MilitaryPostureGameTest.java": "08fbb7f50afc6603eed57190b5eaf9ecad19bf3b3a10cbcecdf185d3c2f4c40a"
+    }
+  }
+}

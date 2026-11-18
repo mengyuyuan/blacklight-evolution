@@ -1,0 +1,2349 @@
+{
+  "schema": 1,
+  "date": "2026-11-17",
+  "state": "Static source evidence and corpse pose asset export; no Java/build/tests/game/native execution/media playback.",
+  "sources": {
+    "input\\comparison\\mother_fig.p3d.rz": "f446c9299ac8f06022b907e0c62b9b75e82f1def2729dc0da90a6f92f8043167",
+    "input\\comparison\\mother_tod.p3d.rz": "1977fad275c92e99fed57639005a5cfb06e289b435dba7a7a5f6e50005ca9776",
+    "private\\comparison\\mother.p3d": "f67e081a7497191554de61995bdb75fad58cfca1cb53adeb9bd0b15ef8b97df6",
+    "input\\prototypeenginef.dll": "8cba8da3412df4f49cd61d02445e87a0cda551dea4f2fc1e66b19c1bfe28a760"
+  },
+  "templates": [
+    {
+      "segment": 0,
+      "liveTemplate": "Mother_Segment_1",
+      "liveObjectOffset": 16136,
+      "liveMetaOffset": 16235,
+      "deadTemplate": "Mother_Segment_1DeadBody",
+      "deadObjectOffset": 17438,
+      "deadMetaOffset": 17553,
+      "renderModel": "mother_segment_1",
+      "physicsResource": "mother_segment1",
+      "deadClass": "deadbody",
+      "canGoUnderground": true,
+      "corpseWeight": 0.0010000000474974513,
+      "deadBehaviours": [
+        "PhysicsBehaviour",
+        "proto::HitReactionBehaviour",
+        "PuppetBehaviour",
+        "MotionTreeBehaviour",
+        "RenderBehaviour"
+      ],
+      "motionTree": "//mother_segment/reaction/death_routines/segment_corpse_death",
+      "noExplicitBehaviours": [
+        "GrabbableBehaviour",
+        "AdvancedHealthBehaviour",
+        "AudioEmitterBehaviour",
+        "LifetimeBehaviour"
+      ],
+      "boundary": "Behaviour list records explicit META only; does not exclude dynamic factory/global behavior."
+    },
+    {
+      "segment": 1,
+      "liveTemplate": "Mother_Segment_2",
+      "liveObjectOffset": 18168,
+      "liveMetaOffset": 18267,
+      "deadTemplate": "Mother_Segment_2DeadBody",
+      "deadObjectOffset": 19512,
+      "deadMetaOffset": 19627,
+      "renderModel": "mother_segment_2",
+      "physicsResource": "mother_segment2",
+      "deadClass": "deadbody",
+      "canGoUnderground": true,
+      "corpseWeight": 0.0010000000474974513,
+      "deadBehaviours": [
+        "PhysicsBehaviour",
+        "proto::HitReactionBehaviour",
+        "PuppetBehaviour",
+        "MotionTreeBehaviour",
+        "RenderBehaviour"
+      ],
+      "motionTree": "//mother_segment/reaction/death_routines/segment_corpse_death",
+      "noExplicitBehaviours": [
+        "GrabbableBehaviour",
+        "AdvancedHealthBehaviour",
+        "AudioEmitterBehaviour",
+        "LifetimeBehaviour"
+      ],
+      "boundary": "Behaviour list records explicit META only; does not exclude dynamic factory/global behavior."
+    },
+    {
+      "segment": 2,
+      "liveTemplate": "Mother_Segment_3",
+      "liveObjectOffset": 20242,
+      "liveMetaOffset": 20341,
+      "deadTemplate": "Mother_Segment_3DeadBody",
+      "deadObjectOffset": 21586,
+      "deadMetaOffset": 21701,
+      "renderModel": "mother_segment_3",
+      "physicsResource": "mother_segment3",
+      "deadClass": "deadbody",
+      "canGoUnderground": true,
+      "corpseWeight": 0.0010000000474974513,
+      "deadBehaviours": [
+        "PhysicsBehaviour",
+        "proto::HitReactionBehaviour",
+        "PuppetBehaviour",
+        "MotionTreeBehaviour",
+        "RenderBehaviour"
+      ],
+      "motionTree": "//mother_segment/reaction/death_routines/segment_corpse_death",
+      "noExplicitBehaviours": [
+        "GrabbableBehaviour",
+        "AdvancedHealthBehaviour",
+        "AudioEmitterBehaviour",
+        "LifetimeBehaviour"
+      ],
+      "boundary": "Behaviour list records explicit META only; does not exclude dynamic factory/global behavior."
+    }
+  ],
+  "deathFlow": {
+    "entry": {
+      "healthConditionOffset": 100736,
+      "condition": "Health <= 0, absolute",
+      "detachOffset": 100844,
+      "detachTime": 0,
+      "motionStateOffset": 100872,
+      "motionState": "GettingHit",
+      "executeOffset": 100916,
+      "executeReference": 40
+    },
+    "selection": {
+      "dieOffset": 105196,
+      "executeReference41Offset": 105304,
+      "templateConditionOffsets": [
+        105464,
+        105624,
+        105784
+      ],
+      "deathOffsets": [
+        105520,
+        105680,
+        105840
+      ],
+      "timeBegin": 0,
+      "copyDrawable": true,
+      "grabberIsOriginator": false
+    },
+    "corpse": {
+      "entryOffset": 105916,
+      "animationExecuteOffset": 105980,
+      "animationReference": 46,
+      "uninterruptibleOffset": 106040,
+      "ignoreHits": true,
+      "ignoreGrabs": true,
+      "allowDevastatorGrabs": false,
+      "deathFxExecuteOffset": 106084,
+      "deathFxReference": 56,
+      "finishSequenceOffset": 106144,
+      "finishReference": 49,
+      "finishDeathOffset": 106968,
+      "finishDeadTemplate": null,
+      "finishCopyDrawable": false
+    },
+    "branchIndexProof": "Complete tree 100604..117796 has60 BranchHash records, zero-based preorder including root Chunk. ref40/41/46/49/56 map to die/stop/animation bank/final Death/death FX. Three serialized mother_segment copies retain the same corresponding death fields.",
+    "normalRagdollReachability": "Branch48 ragdoll at106664 has EnableRagdoll106728 and Sequence106784 back to48. No explicit normal-death path targets48; corpse45 instead sequences49 final Death. Do not add mandatory physical ragdoll to the normal sequence merely because this stored branch exists.",
+    "primitiveVisibility": "No PrimitiveDisplay track occurs anywhere in the three mother_segment trees. Live/dead models share the same segment render resource; death uses CopyDrawable and separate corpse motion rather than a demonstrated primitive swap."
+  },
+  "animation": {
+    "name": "mother_segment_1_die",
+    "offset": 4123792,
+    "hash": "0x2acff81c24e45e70",
+    "frames": 96,
+    "fps": 30,
+    "lastValidFrame": 95,
+    "loop": false,
+    "coversAllThreeSegments": true,
+    "motionRootChannels": false,
+    "slugTracks": [
+      {
+        "bone": "Slug_02_Spine_Base",
+        "tag": "TRAN",
+        "keys": 28,
+        "firstFrame": 68,
+        "lastFrame": 95,
+        "firstValue": [
+          -3.505115270614624,
+          -1.726473331451416,
+          -1.5268304347991943
+        ],
+        "lastValue": [
+          -3.505115270614624,
+          -19.717998504638672,
+          -1.5268304347991943
+        ]
+      },
+      {
+        "bone": "Slug_02_Spine_1",
+        "tag": "ROT",
+        "keys": 78,
+        "firstFrame": 0,
+        "lastFrame": 83,
+        "firstValue": [
+          -0.06869716483046968,
+          0.2847376934110538,
+          0.09225745414593951,
+          0.9516794143248649
+        ],
+        "lastValue": [
+          -0.018860438856166267,
+          -0.4959562974944304,
+          -0.0033875545518356883,
+          0.8681360258023666
+        ]
+      },
+      {
+        "bone": "Slug_02_Spine_2",
+        "tag": "ROT",
+        "keys": 74,
+        "firstFrame": 0,
+        "lastFrame": 83,
+        "firstValue": [
+          0.030152287362285226,
+          0.0,
+          -0.01705984679708243,
+          0.9993997204292596
+        ],
+        "lastValue": [
+          -0.0004272591326639607,
+          0.06711020233771782,
+          0.004760887478255562,
+          0.9977341189626842
+        ]
+      },
+      {
+        "bone": "Slug_02_Spine_3",
+        "tag": "ROT",
+        "keys": 71,
+        "firstFrame": 0,
+        "lastFrame": 83,
+        "firstValue": [
+          0.051850947599719234,
+          0.0,
+          -0.03100680562761315,
+          0.9981733603126176
+        ],
+        "lastValue": [
+          0.0017090365306558428,
+          -0.065157017731254,
+          -0.021790215765861997,
+          0.9976356192174491
+        ]
+      },
+      {
+        "bone": "Slug_02_Spine_4",
+        "tag": "ROT",
+        "keys": 80,
+        "firstFrame": 0,
+        "lastFrame": 83,
+        "firstValue": [
+          0.10403759880367443,
+          0.0,
+          -0.065218054750206,
+          0.9924327601252212
+        ],
+        "lastValue": [
+          0.006988738670003357,
+          0.01977599414044618,
+          0.017090365306558428,
+          0.9996339264957187
+        ]
+      },
+      {
+        "bone": "Slug_02_Spine_5",
+        "tag": "ROT",
+        "keys": 80,
+        "firstFrame": 0,
+        "lastFrame": 83,
+        "firstValue": [
+          0.18005920590838345,
+          0.0,
+          -0.11609241004669334,
+          0.9767810577080173
+        ],
+        "lastValue": [
+          -0.00958281197546312,
+          -0.024872585222937716,
+          -0.016937772759178446,
+          0.9995011936325685
+        ]
+      },
+      {
+        "bone": "Slug_02_Jaw_1",
+        "tag": "ROT",
+        "keys": 84,
+        "firstFrame": 0,
+        "lastFrame": 83,
+        "firstValue": [
+          -0.017212439344462416,
+          -0.17264320810571612,
+          -0.09591967528305917,
+          0.980151758923266
+        ],
+        "lastValue": [
+          -0.19544053468428602,
+          0.10150456251716666,
+          -0.3315836054567095,
+          0.917361506595327
+        ]
+      },
+      {
+        "bone": "Slug_02_Jaw_2",
+        "tag": "ROT",
+        "keys": 84,
+        "firstFrame": 0,
+        "lastFrame": 83,
+        "firstValue": [
+          -0.7172460097048861,
+          0.4704733420819727,
+          -0.15628528702658162,
+          0.4896814321695857
+        ],
+        "lastValue": [
+          -0.6249275185399945,
+          0.7424542985320597,
+          -0.13351847895748772,
+          0.20099757943714366
+        ]
+      },
+      {
+        "bone": "Slug_02_Jaw_3",
+        "tag": "ROT",
+        "keys": 84,
+        "firstFrame": 0,
+        "lastFrame": 83,
+        "firstValue": [
+          0.7018951994384595,
+          -0.6389355143894773,
+          0.11981566820276497,
+          0.2911163738270731
+        ],
+        "lastValue": [
+          0.47022919400616475,
+          -0.6852015747550889,
+          -0.09015167699209571,
+          0.5488679096039153
+        ]
+      },
+      {
+        "bone": "Slug_01_Spine_Base",
+        "tag": "TRAN",
+        "keys": 30,
+        "firstFrame": 64,
+        "lastFrame": 95,
+        "firstValue": [
+          2.7125768661499023,
+          -1.726473331451416,
+          -0.05944659560918808
+        ],
+        "lastValue": [
+          2.7125768661499023,
+          -18.799345016479492,
+          -0.05944659560918808
+        ]
+      },
+      {
+        "bone": "Slug_01_Spine_1",
+        "tag": "ROT",
+        "keys": 70,
+        "firstFrame": 0,
+        "lastFrame": 94,
+        "firstValue": [
+          -0.026001770073549608,
+          0.2863246559038057,
+          -0.08331553086947234,
+          0.9541491611328637
+        ],
+        "lastValue": [
+          -0.020508438367870117,
+          0.01208532975249489,
+          0.016937772759178446,
+          0.9995731392021513
+        ]
+      },
+      {
+        "bone": "Slug_01_Spine_2",
+        "tag": "ROT",
+        "keys": 83,
+        "firstFrame": 0,
+        "lastFrame": 95,
+        "firstValue": [
+          -0.020630512405774102,
+          0.0,
+          0.07315286721396527,
+          0.9971073362363007
+        ],
+        "lastValue": [
+          -0.003814813684499649,
+          -0.10226752525406659,
+          -0.0086977752006592,
+          0.99471159095565
+        ]
+      },
+      {
+        "bone": "Slug_01_Spine_3",
+        "tag": "ROT",
+        "keys": 81,
+        "firstFrame": 0,
+        "lastFrame": 95,
+        "firstValue": [
+          -0.03677480391857662,
+          0.0,
+          0.12411877803888058,
+          0.991585670900344
+        ],
+        "lastValue": [
+          -0.02816858424634541,
+          0.13830988494521929,
+          0.035828730124820705,
+          0.989339784242825
+        ]
+      },
+      {
+        "bone": "Slug_01_Spine_4",
+        "tag": "ROT",
+        "keys": 91,
+        "firstFrame": 0,
+        "lastFrame": 95,
+        "firstValue": [
+          -0.05456709494308298,
+          0.0,
+          0.1781975768303476,
+          0.9824805625361068
+        ],
+        "lastValue": [
+          0.01925717947935423,
+          0.0015564439832758568,
+          0.0067445905941953795,
+          0.9997906025855332
+        ]
+      },
+      {
+        "bone": "Slug_01_Spine_5",
+        "tag": "ROT",
+        "keys": 88,
+        "firstFrame": 0,
+        "lastFrame": 95,
+        "firstValue": [
+          -0.05471968749046297,
+          0.0,
+          0.17465742973113196,
+          0.9831075923014027
+        ],
+        "lastValue": [
+          -0.004486220892971587,
+          0.00988799707022309,
+          -0.05710013122959075,
+          0.9983094091260496
+        ]
+      },
+      {
+        "bone": "Slug_01_Head",
+        "tag": "ROT",
+        "keys": 96,
+        "firstFrame": 0,
+        "lastFrame": 95,
+        "firstValue": [
+          0.16486098818933687,
+          0.2900784325693534,
+          0.05862605670339061,
+          0.9408710554623059
+        ],
+        "lastValue": [
+          0.046815393536179695,
+          0.030274361400189215,
+          0.2813196203497421,
+          0.9579932427612109
+        ]
+      },
+      {
+        "bone": "Slug_03_Spine_Base",
+        "tag": "TRAN",
+        "keys": 30,
+        "firstFrame": 64,
+        "lastFrame": 94,
+        "firstValue": [
+          -0.15586641430854797,
+          -1.726473331451416,
+          2.1778461933135986
+        ],
+        "lastValue": [
+          -0.15586641430854797,
+          -18.89085578918457,
+          2.1778461933135986
+        ]
+      },
+      {
+        "bone": "Slug_03_Spine_1",
+        "tag": "ROT",
+        "keys": 48,
+        "firstFrame": 0,
+        "lastFrame": 72,
+        "firstValue": [
+          -0.0619830927457503,
+          0.2869045075838496,
+          0.022553178502761926,
+          0.9556857505902048
+        ],
+        "lastValue": [
+          -0.010956144901882995,
+          0.2860194708090457,
+          0.021973326822717982,
+          0.9579091805152222
+        ]
+      },
+      {
+        "bone": "Slug_03_Spine_2",
+        "tag": "ROT",
+        "keys": 71,
+        "firstFrame": 0,
+        "lastFrame": 80,
+        "firstValue": [
+          0.055909909360026856,
+          0.0,
+          0.02426221503341777,
+          0.9981409855110779
+        ],
+        "lastValue": [
+          -0.041108432264168215,
+          -0.14084292123172704,
+          -0.031006805627613147,
+          0.9886920381698576
+        ]
+      },
+      {
+        "bone": "Slug_03_Spine_3",
+        "tag": "ROT",
+        "keys": 63,
+        "firstFrame": 0,
+        "lastFrame": 80,
+        "firstValue": [
+          0.12283700064088872,
+          0.0,
+          0.04541154210028383,
+          0.9913873426252852
+        ],
+        "lastValue": [
+          0.017548142948698386,
+          -0.012329477828302866,
+          0.005676442762535478,
+          0.9997538820395233
+        ]
+      },
+      {
+        "bone": "Slug_03_Spine_4",
+        "tag": "ROT",
+        "keys": 73,
+        "firstFrame": 0,
+        "lastFrame": 80,
+        "firstValue": [
+          0.19922482985930967,
+          0.0,
+          0.06711020233771782,
+          0.9776531531733121
+        ],
+        "lastValue": [
+          -0.05691702017273476,
+          0.020050660725730154,
+          0.004791405987731559,
+          0.9981660514402295
+        ]
+      },
+      {
+        "bone": "Slug_03_Spine_5",
+        "tag": "ROT",
+        "keys": 79,
+        "firstFrame": 0,
+        "lastFrame": 88,
+        "firstValue": [
+          0.18195135349589525,
+          0.0,
+          0.05783257545701468,
+          0.9816053678424036
+        ],
+        "lastValue": [
+          0.0,
+          0.0,
+          0.00018311105685598318,
+          0.9999999832351704
+        ]
+      },
+      {
+        "bone": "Slug_03_Head",
+        "tag": "ROT",
+        "keys": 88,
+        "firstFrame": 0,
+        "lastFrame": 88,
+        "firstValue": [
+          -0.03662221137119663,
+          0.29422894985808895,
+          0.08990752891628773,
+          0.9507916569595342
+        ],
+        "lastValue": [
+          0.2433545945616016,
+          0.7431562242500076,
+          0.1098055970946379,
+          0.6135471444892568
+        ]
+      }
+    ],
+    "first": {
+      "trackOffset": 106324,
+      "startFrame": 20,
+      "endFrame": 66,
+      "timeBegin": 0,
+      "timeEnd": 1.533329963684082,
+      "authoredSpeed": 1,
+      "effectiveFramesPerSecond": 30.000065928065016,
+      "blendIn": 0.2666670083999634,
+      "blendOut": 0
+    },
+    "tail": {
+      "trackOffset": 106452,
+      "startFrame": 66,
+      "authoredEndFrame": -1,
+      "effectiveEndFrame": 95,
+      "timeBegin": 1.533329963684082,
+      "timeEnd": -1,
+      "speed": 0.6000000238418579,
+      "seconds": 1.61111104709131,
+      "blendIn": 0,
+      "blendOut": 0
+    },
+    "nominalTotalSeconds": 3.1444410107753917,
+    "singleTimeline20HzFirstCompletionTick": 63,
+    "nativeClockEvidence": [
+      "10941ca0:10941cb0..10941cc6 maps negative end to frameCount+negativeEnd, so96+(-1)=95;10941680 clamps[0,frameCount-1].",
+      "10941ca0:10941cd7..10941d29 fits positive duration to selected frame interval;10941d3a..10941d40 retains explicit speed when duration is negative.",
+      "10941da0 increments fps*speed*dt and clamps noncyclic frame;10941850 completion accepts current>=end. Positive blend-in changes weights, not an extra delay. See greene-puppet-animation-exit-proof.json for cached native chain."
+    ],
+    "motionMeaning": "All three Slug Spine_Base TRAN channels sink the dying limb into the ground. This is source skeletal travel, not an added gravity, radial throw, mother actor translation or guessed lift.",
+    "timingBoundary": "63 ticks is a20Hz adapter calculation, not observed native scheduling. Source sampling and callback ordering still require game validation."
+  },
+  "lifetimeAndHandles": {
+    "manageLifetime": {
+      "offset": 105260,
+      "type": "ManageLifetime",
+      "owner": "mother_segment/reaction/death_routines/die",
+      "payloadHex": "010000000000000001000000010000001525564a57a64a31",
+      "flags": 1,
+      "timeBegin": 0.0,
+      "manageLifetime": true,
+      "attachedToParent": true,
+      "grabSlot": {
+        "hash": "0x314aa6574a562515",
+        "name": "Crater"
+      }
+    },
+    "manageLifetimeMeaning": "The t0 ManageLifetime record targets the current Crater grab slot, not self. Its field bytes match the existing native schema proof in greene-crater-playback-source.json. Mother_Segment_i META declares no Crater slot. Never interpret this record as a corpse TTL or immediate segment deletion.",
+    "slotVersusObject": "GrabbedDetach occurs at t0 before the Death track. That establishes the requested detachment point; it does not by itself prove a MotherHealth child GameObject handle becomes invalid at that instruction.",
+    "healthChildren": "MotherHealth stores three GameObject handles and redirects to valid handles without checking health. Exact old-handle invalidation relative to Death replacement / corpse creation is not proved by FIG/TOD. Do not equate health0, detach, corpse visibility and handle invalidation.",
+    "missionCount": "MotherSegmentsAlive FIG66452/P14 reads Segment1..3 via go_GetGrabbedObject, requires go_IsValid and go_GetHealth>0. FIG83316 posts SegmentsDead once when count0. Thus phase progression is based on live attached children, not waiting for the visible corpse animation to finish.",
+    "respawn": "MotherSpawnSegments P4 creates a child only if the grab slot no longer yields a valid object; sets current wave health, AddHealthChild, attach, SharePose, physics and exclusion group. RestoreSegments P5 only reattaches/shares existing named children; it does not reset health or re-add the health child.",
+    "unsharePoseBoundary": "There is no explicit unshare call in segment death FIG or task Lua. DeadBody has independent Pose/Puppet and CopyDrawable=true, but exact copy-vs-reference and source pose share unlink inside native Death/GrabbedDetach require a focused consumer audit; do not claim an explicit Lua unshare.",
+    "lateSpawn": {
+      "offset": 106580,
+      "timeBegin": 3.666670083999634,
+      "storedTimeEnd": 3.0,
+      "reference": 52,
+      "boundary": "Begin is after nominal3.144441s foreground death animation completion. Normal node completion should clear unstarted tracks under the established scheduler; no guaranteed late burst is claimed. Raw end<begin is retained, not silently normalized."
+    }
+  },
+  "effects": {
+    "death": [
+      {
+        "offset": 112616,
+        "owner": "mother_segment/effects/death/#fa5df7d34110e777",
+        "fields": {
+          "Unknown1": 0,
+          "TimeBegin": 0,
+          "TimeEnd": 4,
+          "EffectName": {
+            "hash": "6236262353681375262",
+            "name": "#568ba791cd51e01e"
+          },
+          "ParentObjectName": {
+            "hash": "0",
+            "name": "#0"
+          },
+          "EmitSpace": {
+            "hash": "17857802742059722934",
+            "name": "JointSpace"
+          },
+          "EmitJoint": {
+            "hash": "12344884956301604362",
+            "name": "Slug_01_Head"
+          },
+          "Offset": [
+            0,
+            1.5,
+            0
+          ],
+          "Orientation": [
+            0,
+            0,
+            0
+          ],
+          "AttachSpace": {
+            "hash": "17857802742059722934",
+            "name": "JointSpace"
+          },
+          "AttachJoint": {
+            "hash": "12344884956301604362",
+            "name": "Slug_01_Head"
+          },
+          "AbortWhenInterrupted": false,
+          "SlotName": {
+            "hash": "0",
+            "name": "#0"
+          },
+          "AbortBelowJointScale": -1,
+          "FadeTime": 3,
+          "EffectController": {
+            "hash": "0",
+            "name": "#0"
+          },
+          "EffectStore": {
+            "hash": "1312132684818588012",
+            "name": "General"
+          },
+          "HighPriority": false,
+          "Scale": 1,
+          "Collides": false,
+          "Restitution": 0.5,
+          "Friction": 1,
+          "RenderOffset": 0,
+          "UsePropScaling": true,
+          "CloneName": {
+            "hash": "0",
+            "name": "#0"
+          },
+          "CloneTint": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "Biases": [
+            1,
+            0,
+            0,
+            0
+          ],
+          "BiasesEmissionRate": 4,
+          "BiasesEmissionRateAreaScale": 0,
+          "BiasesEmissionRateScaleFunction": {
+            "hash": "4206860010037910535",
+            "name": "Linear"
+          },
+          "BiasesLifeSpan": 2,
+          "BiasesLifeSpanVariance": 2,
+          "BiasesSpeed": 1.5,
+          "BiasesSpeedVariance": 1.5,
+          "BiasesSize1D": 1.2000000476837158,
+          "BiasesSize1DVariance": 1.2000000476837158,
+          "BiasesSize1DAreaScale": 0,
+          "BiasesSize1DScaleFunction": {
+            "hash": "4206860010037910535",
+            "name": "Linear"
+          },
+          "BiasesSpin1D": 1,
+          "BiasesSpin1DVariance": 1,
+          "BiasesWeight": 0.5,
+          "BiasesWeightVariance": 1,
+          "BiasesAngle": 1,
+          "BiasesAngleVariance": 1,
+          "BiasesGravity": 2,
+          "BiasesDrag": 1,
+          "BiasesColourRed": 1,
+          "BiasesColourGreen": 1,
+          "BiasesColourBlue": 1,
+          "BiasesAlpha": 1,
+          "BiasesColourOverLifeRed": 1,
+          "BiasesColourOverLifeGreen": 1,
+          "BiasesColourOverLifeBlue": 1,
+          "BiasesAlphaOverLife": 1,
+          "BiasesColourVariance": 1,
+          "BiasesAlphaVariance": 1,
+          "BiasesGeneratorRadius": 1,
+          "BiasesGeneratorRadial": 1,
+          "BiasesGeneratorHorizSpread": 1,
+          "BiasesGeneratorVertSpread": 1,
+          "BiasesGeneratorWidth": 1,
+          "BiasesGeneratorHeight": 0.10000000149011612,
+          "BiasesMeshGeneratorScale": [
+            1,
+            1,
+            1
+          ],
+          "Overrides": [
+            1,
+            0,
+            0,
+            0
+          ],
+          "OverridesEmissionRate": 5,
+          "OverridesEmissionRatePerMeter": -1,
+          "OverridesMaxParticles": -1,
+          "OverridesParticleAllocation": -1,
+          "OverridesLifeSpan": -1,
+          "OverridesLifeSpanVariance": -1,
+          "OverridesSpeed": -1,
+          "OverridesSpeedVariance": -1,
+          "OverridesSize1D": -1,
+          "OverridesSize1DVariance": -1,
+          "OverridesSpin1D": -1,
+          "OverridesSpin1DVariance": -1,
+          "OverridesWeight": -1,
+          "OverridesWeightVariance": -1,
+          "OverridesAngle": -1,
+          "OverridesAngleVariance": -1,
+          "OverridesGravity": -1,
+          "OverridesDrag": -1,
+          "OverridesColourRed": -1,
+          "OverridesColourGreen": -1,
+          "OverridesColourBlue": -1,
+          "OverridesAlpha": -1,
+          "OverridesColourVariance": -1,
+          "OverridesAlphaVariance": -1,
+          "OverridesGeneratorWidth": -1,
+          "OverridesGeneratorHeight": -1
+        }
+      },
+      {
+        "offset": 113100,
+        "owner": "mother_segment/effects/death/#fa5df7d34110e777",
+        "fields": {
+          "Unknown1": 0,
+          "TimeBegin": 0,
+          "TimeEnd": 4,
+          "EffectName": {
+            "hash": "1504754981071609599",
+            "name": "#14e1f6aec8c5deff"
+          },
+          "ParentObjectName": {
+            "hash": "0",
+            "name": "#0"
+          },
+          "EmitSpace": {
+            "hash": "17857802742059722934",
+            "name": "JointSpace"
+          },
+          "EmitJoint": {
+            "hash": "12344884956301604362",
+            "name": "Slug_01_Head"
+          },
+          "Offset": [
+            0,
+            1.5,
+            0
+          ],
+          "Orientation": [
+            0,
+            0,
+            0
+          ],
+          "AttachSpace": {
+            "hash": "17857802742059722934",
+            "name": "JointSpace"
+          },
+          "AttachJoint": {
+            "hash": "12344884956301604362",
+            "name": "Slug_01_Head"
+          },
+          "AbortWhenInterrupted": false,
+          "SlotName": {
+            "hash": "0",
+            "name": "#0"
+          },
+          "AbortBelowJointScale": -1,
+          "FadeTime": 3,
+          "EffectController": {
+            "hash": "0",
+            "name": "#0"
+          },
+          "EffectStore": {
+            "hash": "1312132684818588012",
+            "name": "General"
+          },
+          "HighPriority": false,
+          "Scale": 1,
+          "Collides": false,
+          "Restitution": 0.5,
+          "Friction": 1,
+          "RenderOffset": 0,
+          "UsePropScaling": true,
+          "CloneName": {
+            "hash": "0",
+            "name": "#0"
+          },
+          "CloneTint": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "Biases": [
+            1,
+            0,
+            0,
+            0
+          ],
+          "BiasesEmissionRate": 1,
+          "BiasesEmissionRateAreaScale": 0,
+          "BiasesEmissionRateScaleFunction": {
+            "hash": "4206860010037910535",
+            "name": "Linear"
+          },
+          "BiasesLifeSpan": 1,
+          "BiasesLifeSpanVariance": 1,
+          "BiasesSpeed": 8,
+          "BiasesSpeedVariance": 8,
+          "BiasesSize1D": 8,
+          "BiasesSize1DVariance": 8,
+          "BiasesSize1DAreaScale": 0,
+          "BiasesSize1DScaleFunction": {
+            "hash": "4206860010037910535",
+            "name": "Linear"
+          },
+          "BiasesSpin1D": 1,
+          "BiasesSpin1DVariance": 1,
+          "BiasesWeight": 2,
+          "BiasesWeightVariance": 1,
+          "BiasesAngle": 1,
+          "BiasesAngleVariance": 1,
+          "BiasesGravity": 3,
+          "BiasesDrag": 1,
+          "BiasesColourRed": 1,
+          "BiasesColourGreen": 1,
+          "BiasesColourBlue": 1,
+          "BiasesAlpha": 1,
+          "BiasesColourOverLifeRed": 1,
+          "BiasesColourOverLifeGreen": 1,
+          "BiasesColourOverLifeBlue": 1,
+          "BiasesAlphaOverLife": 1,
+          "BiasesColourVariance": 1,
+          "BiasesAlphaVariance": 1,
+          "BiasesGeneratorRadius": 1,
+          "BiasesGeneratorRadial": 1,
+          "BiasesGeneratorHorizSpread": 1,
+          "BiasesGeneratorVertSpread": 1,
+          "BiasesGeneratorWidth": 5,
+          "BiasesGeneratorHeight": 5,
+          "BiasesMeshGeneratorScale": [
+            1,
+            1,
+            1
+          ],
+          "Overrides": [
+            1,
+            0,
+            0,
+            0
+          ],
+          "OverridesEmissionRate": -1,
+          "OverridesEmissionRatePerMeter": -1,
+          "OverridesMaxParticles": -1,
+          "OverridesParticleAllocation": -1,
+          "OverridesLifeSpan": -1,
+          "OverridesLifeSpanVariance": -1,
+          "OverridesSpeed": -1,
+          "OverridesSpeedVariance": -1,
+          "OverridesSize1D": -1,
+          "OverridesSize1DVariance": -1,
+          "OverridesSpin1D": -1,
+          "OverridesSpin1DVariance": -1,
+          "OverridesWeight": -1,
+          "OverridesWeightVariance": -1,
+          "OverridesAngle": -1,
+          "OverridesAngleVariance": -1,
+          "OverridesGravity": -1,
+          "OverridesDrag": -1,
+          "OverridesColourRed": -1,
+          "OverridesColourGreen": -1,
+          "OverridesColourBlue": -1,
+          "OverridesAlpha": -1,
+          "OverridesColourVariance": -1,
+          "OverridesAlphaVariance": -1,
+          "OverridesGeneratorWidth": -1,
+          "OverridesGeneratorHeight": -1
+        }
+      },
+      {
+        "offset": 113584,
+        "owner": "mother_segment/effects/death/#fa5df7d34110e777",
+        "fields": {
+          "Unknown1": 0,
+          "TimeBegin": 0,
+          "TimeEnd": 0.33333298563957214,
+          "EffectName": {
+            "hash": "1504754981071609597",
+            "name": "#14e1f6aec8c5defd"
+          },
+          "ParentObjectName": {
+            "hash": "0",
+            "name": "#0"
+          },
+          "EmitSpace": {
+            "hash": "17857802742059722934",
+            "name": "JointSpace"
+          },
+          "EmitJoint": {
+            "hash": "12344884956301604362",
+            "name": "Slug_01_Head"
+          },
+          "Offset": [
+            0,
+            1.5,
+            0
+          ],
+          "Orientation": [
+            0,
+            0,
+            0
+          ],
+          "AttachSpace": {
+            "hash": "17857802742059722934",
+            "name": "JointSpace"
+          },
+          "AttachJoint": {
+            "hash": "12344884956301604362",
+            "name": "Slug_01_Head"
+          },
+          "AbortWhenInterrupted": false,
+          "SlotName": {
+            "hash": "0",
+            "name": "#0"
+          },
+          "AbortBelowJointScale": -1,
+          "FadeTime": 3,
+          "EffectController": {
+            "hash": "0",
+            "name": "#0"
+          },
+          "EffectStore": {
+            "hash": "1312132684818588012",
+            "name": "General"
+          },
+          "HighPriority": false,
+          "Scale": 1,
+          "Collides": false,
+          "Restitution": 0.5,
+          "Friction": 1,
+          "RenderOffset": 0,
+          "UsePropScaling": true,
+          "CloneName": {
+            "hash": "0",
+            "name": "#0"
+          },
+          "CloneTint": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "Biases": [
+            1,
+            0,
+            0,
+            0
+          ],
+          "BiasesEmissionRate": 2,
+          "BiasesEmissionRateAreaScale": 0,
+          "BiasesEmissionRateScaleFunction": {
+            "hash": "4206860010037910535",
+            "name": "Linear"
+          },
+          "BiasesLifeSpan": 1,
+          "BiasesLifeSpanVariance": 1,
+          "BiasesSpeed": 1.5,
+          "BiasesSpeedVariance": 1.5,
+          "BiasesSize1D": 1.5,
+          "BiasesSize1DVariance": 1.5,
+          "BiasesSize1DAreaScale": 0,
+          "BiasesSize1DScaleFunction": {
+            "hash": "4206860010037910535",
+            "name": "Linear"
+          },
+          "BiasesSpin1D": 1,
+          "BiasesSpin1DVariance": 1,
+          "BiasesWeight": 1,
+          "BiasesWeightVariance": 1,
+          "BiasesAngle": 1,
+          "BiasesAngleVariance": 1,
+          "BiasesGravity": 1,
+          "BiasesDrag": 1,
+          "BiasesColourRed": 1,
+          "BiasesColourGreen": 1,
+          "BiasesColourBlue": 1,
+          "BiasesAlpha": 1,
+          "BiasesColourOverLifeRed": 1,
+          "BiasesColourOverLifeGreen": 1,
+          "BiasesColourOverLifeBlue": 1,
+          "BiasesAlphaOverLife": 1,
+          "BiasesColourVariance": 1,
+          "BiasesAlphaVariance": 1,
+          "BiasesGeneratorRadius": 1,
+          "BiasesGeneratorRadial": 1,
+          "BiasesGeneratorHorizSpread": 2,
+          "BiasesGeneratorVertSpread": 2,
+          "BiasesGeneratorWidth": 1,
+          "BiasesGeneratorHeight": 1,
+          "BiasesMeshGeneratorScale": [
+            1,
+            1,
+            1
+          ],
+          "Overrides": [
+            1,
+            0,
+            0,
+            0
+          ],
+          "OverridesEmissionRate": -1,
+          "OverridesEmissionRatePerMeter": -1,
+          "OverridesMaxParticles": -1,
+          "OverridesParticleAllocation": -1,
+          "OverridesLifeSpan": -1,
+          "OverridesLifeSpanVariance": -1,
+          "OverridesSpeed": -1,
+          "OverridesSpeedVariance": -1,
+          "OverridesSize1D": -1,
+          "OverridesSize1DVariance": -1,
+          "OverridesSpin1D": -1,
+          "OverridesSpin1DVariance": -1,
+          "OverridesWeight": -1,
+          "OverridesWeightVariance": -1,
+          "OverridesAngle": -1,
+          "OverridesAngleVariance": -1,
+          "OverridesGravity": -1,
+          "OverridesDrag": -1,
+          "OverridesColourRed": -1,
+          "OverridesColourGreen": -1,
+          "OverridesColourBlue": -1,
+          "OverridesAlpha": -1,
+          "OverridesColourVariance": -1,
+          "OverridesAlphaVariance": -1,
+          "OverridesGeneratorWidth": -1,
+          "OverridesGeneratorHeight": -1
+        }
+      },
+      {
+        "offset": 114368,
+        "owner": "mother_segment/effects/death/#fa5df7d34110e774",
+        "fields": {
+          "Unknown1": 0,
+          "TimeBegin": 0,
+          "TimeEnd": 4,
+          "EffectName": {
+            "hash": "6236262353681375262",
+            "name": "#568ba791cd51e01e"
+          },
+          "ParentObjectName": {
+            "hash": "0",
+            "name": "#0"
+          },
+          "EmitSpace": {
+            "hash": "17857802742059722934",
+            "name": "JointSpace"
+          },
+          "EmitJoint": {
+            "hash": "14572565176387791455",
+            "name": "Slug_02_Head"
+          },
+          "Offset": [
+            0,
+            1.5,
+            0
+          ],
+          "Orientation": [
+            0,
+            0,
+            0
+          ],
+          "AttachSpace": {
+            "hash": "17857802742059722934",
+            "name": "JointSpace"
+          },
+          "AttachJoint": {
+            "hash": "14572565176387791455",
+            "name": "Slug_02_Head"
+          },
+          "AbortWhenInterrupted": false,
+          "SlotName": {
+            "hash": "0",
+            "name": "#0"
+          },
+          "AbortBelowJointScale": -1,
+          "FadeTime": 3,
+          "EffectController": {
+            "hash": "0",
+            "name": "#0"
+          },
+          "EffectStore": {
+            "hash": "1312132684818588012",
+            "name": "General"
+          },
+          "HighPriority": false,
+          "Scale": 1,
+          "Collides": false,
+          "Restitution": 0.5,
+          "Friction": 1,
+          "RenderOffset": 0,
+          "UsePropScaling": true,
+          "CloneName": {
+            "hash": "0",
+            "name": "#0"
+          },
+          "CloneTint": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "Biases": [
+            1,
+            0,
+            0,
+            0
+          ],
+          "BiasesEmissionRate": 4,
+          "BiasesEmissionRateAreaScale": 0,
+          "BiasesEmissionRateScaleFunction": {
+            "hash": "4206860010037910535",
+            "name": "Linear"
+          },
+          "BiasesLifeSpan": 2,
+          "BiasesLifeSpanVariance": 2,
+          "BiasesSpeed": 1.5,
+          "BiasesSpeedVariance": 1.5,
+          "BiasesSize1D": 1.2000000476837158,
+          "BiasesSize1DVariance": 1.2000000476837158,
+          "BiasesSize1DAreaScale": 0,
+          "BiasesSize1DScaleFunction": {
+            "hash": "4206860010037910535",
+            "name": "Linear"
+          },
+          "BiasesSpin1D": 1,
+          "BiasesSpin1DVariance": 1,
+          "BiasesWeight": 0.5,
+          "BiasesWeightVariance": 1,
+          "BiasesAngle": 1,
+          "BiasesAngleVariance": 1,
+          "BiasesGravity": 2,
+          "BiasesDrag": 1,
+          "BiasesColourRed": 1,
+          "BiasesColourGreen": 1,
+          "BiasesColourBlue": 1,
+          "BiasesAlpha": 1,
+          "BiasesColourOverLifeRed": 1,
+          "BiasesColourOverLifeGreen": 1,
+          "BiasesColourOverLifeBlue": 1,
+          "BiasesAlphaOverLife": 1,
+          "BiasesColourVariance": 1,
+          "BiasesAlphaVariance": 1,
+          "BiasesGeneratorRadius": 1,
+          "BiasesGeneratorRadial": 1,
+          "BiasesGeneratorHorizSpread": 1,
+          "BiasesGeneratorVertSpread": 1,
+          "BiasesGeneratorWidth": 1,
+          "BiasesGeneratorHeight": 0.10000000149011612,
+          "BiasesMeshGeneratorScale": [
+            1,
+            1,
+            1
+          ],
+          "Overrides": [
+            1,
+            0,
+            0,
+            0
+          ],
+          "OverridesEmissionRate": 5,
+          "OverridesEmissionRatePerMeter": -1,
+          "OverridesMaxParticles": -1,
+          "OverridesParticleAllocation": -1,
+          "OverridesLifeSpan": -1,
+          "OverridesLifeSpanVariance": -1,
+          "OverridesSpeed": -1,
+          "OverridesSpeedVariance": -1,
+          "OverridesSize1D": -1,
+          "OverridesSize1DVariance": -1,
+          "OverridesSpin1D": -1,
+          "OverridesSpin1DVariance": -1,
+          "OverridesWeight": -1,
+          "OverridesWeightVariance": -1,
+          "OverridesAngle": -1,
+          "OverridesAngleVariance": -1,
+          "OverridesGravity": -1,
+          "OverridesDrag": -1,
+          "OverridesColourRed": -1,
+          "OverridesColourGreen": -1,
+          "OverridesColourBlue": -1,
+          "OverridesAlpha": -1,
+          "OverridesColourVariance": -1,
+          "OverridesAlphaVariance": -1,
+          "OverridesGeneratorWidth": -1,
+          "OverridesGeneratorHeight": -1
+        }
+      },
+      {
+        "offset": 114852,
+        "owner": "mother_segment/effects/death/#fa5df7d34110e774",
+        "fields": {
+          "Unknown1": 0,
+          "TimeBegin": 0,
+          "TimeEnd": 4,
+          "EffectName": {
+            "hash": "1504754981071609599",
+            "name": "#14e1f6aec8c5deff"
+          },
+          "ParentObjectName": {
+            "hash": "0",
+            "name": "#0"
+          },
+          "EmitSpace": {
+            "hash": "17857802742059722934",
+            "name": "JointSpace"
+          },
+          "EmitJoint": {
+            "hash": "14572565176387791455",
+            "name": "Slug_02_Head"
+          },
+          "Offset": [
+            0,
+            1.5,
+            0
+          ],
+          "Orientation": [
+            0,
+            0,
+            0
+          ],
+          "AttachSpace": {
+            "hash": "17857802742059722934",
+            "name": "JointSpace"
+          },
+          "AttachJoint": {
+            "hash": "14572565176387791455",
+            "name": "Slug_02_Head"
+          },
+          "AbortWhenInterrupted": false,
+          "SlotName": {
+            "hash": "0",
+            "name": "#0"
+          },
+          "AbortBelowJointScale": -1,
+          "FadeTime": 3,
+          "EffectController": {
+            "hash": "0",
+            "name": "#0"
+          },
+          "EffectStore": {
+            "hash": "1312132684818588012",
+            "name": "General"
+          },
+          "HighPriority": false,
+          "Scale": 1,
+          "Collides": false,
+          "Restitution": 0.5,
+          "Friction": 1,
+          "RenderOffset": 0,
+          "UsePropScaling": true,
+          "CloneName": {
+            "hash": "0",
+            "name": "#0"
+          },
+          "CloneTint": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "Biases": [
+            1,
+            0,
+            0,
+            0
+          ],
+          "BiasesEmissionRate": 1,
+          "BiasesEmissionRateAreaScale": 0,
+          "BiasesEmissionRateScaleFunction": {
+            "hash": "4206860010037910535",
+            "name": "Linear"
+          },
+          "BiasesLifeSpan": 1,
+          "BiasesLifeSpanVariance": 1,
+          "BiasesSpeed": 8,
+          "BiasesSpeedVariance": 8,
+          "BiasesSize1D": 8,
+          "BiasesSize1DVariance": 8,
+          "BiasesSize1DAreaScale": 0,
+          "BiasesSize1DScaleFunction": {
+            "hash": "4206860010037910535",
+            "name": "Linear"
+          },
+          "BiasesSpin1D": 1,
+          "BiasesSpin1DVariance": 1,
+          "BiasesWeight": 2,
+          "BiasesWeightVariance": 1,
+          "BiasesAngle": 1,
+          "BiasesAngleVariance": 1,
+          "BiasesGravity": 3,
+          "BiasesDrag": 1,
+          "BiasesColourRed": 1,
+          "BiasesColourGreen": 1,
+          "BiasesColourBlue": 1,
+          "BiasesAlpha": 1,
+          "BiasesColourOverLifeRed": 1,
+          "BiasesColourOverLifeGreen": 1,
+          "BiasesColourOverLifeBlue": 1,
+          "BiasesAlphaOverLife": 1,
+          "BiasesColourVariance": 1,
+          "BiasesAlphaVariance": 1,
+          "BiasesGeneratorRadius": 1,
+          "BiasesGeneratorRadial": 1,
+          "BiasesGeneratorHorizSpread": 1,
+          "BiasesGeneratorVertSpread": 1,
+          "BiasesGeneratorWidth": 5,
+          "BiasesGeneratorHeight": 5,
+          "BiasesMeshGeneratorScale": [
+            1,
+            1,
+            1
+          ],
+          "Overrides": [
+            1,
+            0,
+            0,
+            0
+          ],
+          "OverridesEmissionRate": -1,
+          "OverridesEmissionRatePerMeter": -1,
+          "OverridesMaxParticles": -1,
+          "OverridesParticleAllocation": -1,
+          "OverridesLifeSpan": -1,
+          "OverridesLifeSpanVariance": -1,
+          "OverridesSpeed": -1,
+          "OverridesSpeedVariance": -1,
+          "OverridesSize1D": -1,
+          "OverridesSize1DVariance": -1,
+          "OverridesSpin1D": -1,
+          "OverridesSpin1DVariance": -1,
+          "OverridesWeight": -1,
+          "OverridesWeightVariance": -1,
+          "OverridesAngle": -1,
+          "OverridesAngleVariance": -1,
+          "OverridesGravity": -1,
+          "OverridesDrag": -1,
+          "OverridesColourRed": -1,
+          "OverridesColourGreen": -1,
+          "OverridesColourBlue": -1,
+          "OverridesAlpha": -1,
+          "OverridesColourVariance": -1,
+          "OverridesAlphaVariance": -1,
+          "OverridesGeneratorWidth": -1,
+          "OverridesGeneratorHeight": -1
+        }
+      },
+      {
+        "offset": 115336,
+        "owner": "mother_segment/effects/death/#fa5df7d34110e774",
+        "fields": {
+          "Unknown1": 0,
+          "TimeBegin": 0,
+          "TimeEnd": 0.33333298563957214,
+          "EffectName": {
+            "hash": "1504754981071609597",
+            "name": "#14e1f6aec8c5defd"
+          },
+          "ParentObjectName": {
+            "hash": "0",
+            "name": "#0"
+          },
+          "EmitSpace": {
+            "hash": "17857802742059722934",
+            "name": "JointSpace"
+          },
+          "EmitJoint": {
+            "hash": "14572565176387791455",
+            "name": "Slug_02_Head"
+          },
+          "Offset": [
+            0,
+            1.5,
+            0
+          ],
+          "Orientation": [
+            0,
+            0,
+            0
+          ],
+          "AttachSpace": {
+            "hash": "17857802742059722934",
+            "name": "JointSpace"
+          },
+          "AttachJoint": {
+            "hash": "14572565176387791455",
+            "name": "Slug_02_Head"
+          },
+          "AbortWhenInterrupted": false,
+          "SlotName": {
+            "hash": "0",
+            "name": "#0"
+          },
+          "AbortBelowJointScale": -1,
+          "FadeTime": 3,
+          "EffectController": {
+            "hash": "0",
+            "name": "#0"
+          },
+          "EffectStore": {
+            "hash": "1312132684818588012",
+            "name": "General"
+          },
+          "HighPriority": false,
+          "Scale": 1,
+          "Collides": false,
+          "Restitution": 0.5,
+          "Friction": 1,
+          "RenderOffset": 0,
+          "UsePropScaling": true,
+          "CloneName": {
+            "hash": "0",
+            "name": "#0"
+          },
+          "CloneTint": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "Biases": [
+            1,
+            0,
+            0,
+            0
+          ],
+          "BiasesEmissionRate": 2,
+          "BiasesEmissionRateAreaScale": 0,
+          "BiasesEmissionRateScaleFunction": {
+            "hash": "4206860010037910535",
+            "name": "Linear"
+          },
+          "BiasesLifeSpan": 1,
+          "BiasesLifeSpanVariance": 1,
+          "BiasesSpeed": 1.5,
+          "BiasesSpeedVariance": 1.5,
+          "BiasesSize1D": 1.5,
+          "BiasesSize1DVariance": 1.5,
+          "BiasesSize1DAreaScale": 0,
+          "BiasesSize1DScaleFunction": {
+            "hash": "4206860010037910535",
+            "name": "Linear"
+          },
+          "BiasesSpin1D": 1,
+          "BiasesSpin1DVariance": 1,
+          "BiasesWeight": 1,
+          "BiasesWeightVariance": 1,
+          "BiasesAngle": 1,
+          "BiasesAngleVariance": 1,
+          "BiasesGravity": 1,
+          "BiasesDrag": 1,
+          "BiasesColourRed": 1,
+          "BiasesColourGreen": 1,
+          "BiasesColourBlue": 1,
+          "BiasesAlpha": 1,
+          "BiasesColourOverLifeRed": 1,
+          "BiasesColourOverLifeGreen": 1,
+          "BiasesColourOverLifeBlue": 1,
+          "BiasesAlphaOverLife": 1,
+          "BiasesColourVariance": 1,
+          "BiasesAlphaVariance": 1,
+          "BiasesGeneratorRadius": 1,
+          "BiasesGeneratorRadial": 1,
+          "BiasesGeneratorHorizSpread": 2,
+          "BiasesGeneratorVertSpread": 2,
+          "BiasesGeneratorWidth": 1,
+          "BiasesGeneratorHeight": 1,
+          "BiasesMeshGeneratorScale": [
+            1,
+            1,
+            1
+          ],
+          "Overrides": [
+            1,
+            0,
+            0,
+            0
+          ],
+          "OverridesEmissionRate": -1,
+          "OverridesEmissionRatePerMeter": -1,
+          "OverridesMaxParticles": -1,
+          "OverridesParticleAllocation": -1,
+          "OverridesLifeSpan": -1,
+          "OverridesLifeSpanVariance": -1,
+          "OverridesSpeed": -1,
+          "OverridesSpeedVariance": -1,
+          "OverridesSize1D": -1,
+          "OverridesSize1DVariance": -1,
+          "OverridesSpin1D": -1,
+          "OverridesSpin1DVariance": -1,
+          "OverridesWeight": -1,
+          "OverridesWeightVariance": -1,
+          "OverridesAngle": -1,
+          "OverridesAngleVariance": -1,
+          "OverridesGravity": -1,
+          "OverridesDrag": -1,
+          "OverridesColourRed": -1,
+          "OverridesColourGreen": -1,
+          "OverridesColourBlue": -1,
+          "OverridesAlpha": -1,
+          "OverridesColourVariance": -1,
+          "OverridesAlphaVariance": -1,
+          "OverridesGeneratorWidth": -1,
+          "OverridesGeneratorHeight": -1
+        }
+      },
+      {
+        "offset": 116120,
+        "owner": "mother_segment/effects/death/#fa5df7d34110e775",
+        "fields": {
+          "Unknown1": 0,
+          "TimeBegin": 0,
+          "TimeEnd": 4,
+          "EffectName": {
+            "hash": "6236262353681375262",
+            "name": "#568ba791cd51e01e"
+          },
+          "ParentObjectName": {
+            "hash": "0",
+            "name": "#0"
+          },
+          "EmitSpace": {
+            "hash": "17857802742059722934",
+            "name": "JointSpace"
+          },
+          "EmitJoint": {
+            "hash": "16542733293566093668",
+            "name": "Slug_03_Head"
+          },
+          "Offset": [
+            0,
+            1.5,
+            0
+          ],
+          "Orientation": [
+            0,
+            0,
+            0
+          ],
+          "AttachSpace": {
+            "hash": "17857802742059722934",
+            "name": "JointSpace"
+          },
+          "AttachJoint": {
+            "hash": "16542733293566093668",
+            "name": "Slug_03_Head"
+          },
+          "AbortWhenInterrupted": false,
+          "SlotName": {
+            "hash": "0",
+            "name": "#0"
+          },
+          "AbortBelowJointScale": -1,
+          "FadeTime": 3,
+          "EffectController": {
+            "hash": "0",
+            "name": "#0"
+          },
+          "EffectStore": {
+            "hash": "1312132684818588012",
+            "name": "General"
+          },
+          "HighPriority": false,
+          "Scale": 1,
+          "Collides": false,
+          "Restitution": 0.5,
+          "Friction": 1,
+          "RenderOffset": 0,
+          "UsePropScaling": true,
+          "CloneName": {
+            "hash": "0",
+            "name": "#0"
+          },
+          "CloneTint": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "Biases": [
+            1,
+            0,
+            0,
+            0
+          ],
+          "BiasesEmissionRate": 4,
+          "BiasesEmissionRateAreaScale": 0,
+          "BiasesEmissionRateScaleFunction": {
+            "hash": "4206860010037910535",
+            "name": "Linear"
+          },
+          "BiasesLifeSpan": 2,
+          "BiasesLifeSpanVariance": 2,
+          "BiasesSpeed": 1.5,
+          "BiasesSpeedVariance": 1.5,
+          "BiasesSize1D": 1.2000000476837158,
+          "BiasesSize1DVariance": 1.2000000476837158,
+          "BiasesSize1DAreaScale": 0,
+          "BiasesSize1DScaleFunction": {
+            "hash": "4206860010037910535",
+            "name": "Linear"
+          },
+          "BiasesSpin1D": 1,
+          "BiasesSpin1DVariance": 1,
+          "BiasesWeight": 0.5,
+          "BiasesWeightVariance": 1,
+          "BiasesAngle": 1,
+          "BiasesAngleVariance": 1,
+          "BiasesGravity": 2,
+          "BiasesDrag": 1,
+          "BiasesColourRed": 1,
+          "BiasesColourGreen": 1,
+          "BiasesColourBlue": 1,
+          "BiasesAlpha": 1,
+          "BiasesColourOverLifeRed": 1,
+          "BiasesColourOverLifeGreen": 1,
+          "BiasesColourOverLifeBlue": 1,
+          "BiasesAlphaOverLife": 1,
+          "BiasesColourVariance": 1,
+          "BiasesAlphaVariance": 1,
+          "BiasesGeneratorRadius": 1,
+          "BiasesGeneratorRadial": 1,
+          "BiasesGeneratorHorizSpread": 1,
+          "BiasesGeneratorVertSpread": 1,
+          "BiasesGeneratorWidth": 1,
+          "BiasesGeneratorHeight": 0.10000000149011612,
+          "BiasesMeshGeneratorScale": [
+            1,
+            1,
+            1
+          ],
+          "Overrides": [
+            1,
+            0,
+            0,
+            0
+          ],
+          "OverridesEmissionRate": 5,
+          "OverridesEmissionRatePerMeter": -1,
+          "OverridesMaxParticles": -1,
+          "OverridesParticleAllocation": -1,
+          "OverridesLifeSpan": -1,
+          "OverridesLifeSpanVariance": -1,
+          "OverridesSpeed": -1,
+          "OverridesSpeedVariance": -1,
+          "OverridesSize1D": -1,
+          "OverridesSize1DVariance": -1,
+          "OverridesSpin1D": -1,
+          "OverridesSpin1DVariance": -1,
+          "OverridesWeight": -1,
+          "OverridesWeightVariance": -1,
+          "OverridesAngle": -1,
+          "OverridesAngleVariance": -1,
+          "OverridesGravity": -1,
+          "OverridesDrag": -1,
+          "OverridesColourRed": -1,
+          "OverridesColourGreen": -1,
+          "OverridesColourBlue": -1,
+          "OverridesAlpha": -1,
+          "OverridesColourVariance": -1,
+          "OverridesAlphaVariance": -1,
+          "OverridesGeneratorWidth": -1,
+          "OverridesGeneratorHeight": -1
+        }
+      },
+      {
+        "offset": 116604,
+        "owner": "mother_segment/effects/death/#fa5df7d34110e775",
+        "fields": {
+          "Unknown1": 0,
+          "TimeBegin": 0,
+          "TimeEnd": 4,
+          "EffectName": {
+            "hash": "1504754981071609599",
+            "name": "#14e1f6aec8c5deff"
+          },
+          "ParentObjectName": {
+            "hash": "0",
+            "name": "#0"
+          },
+          "EmitSpace": {
+            "hash": "17857802742059722934",
+            "name": "JointSpace"
+          },
+          "EmitJoint": {
+            "hash": "16542733293566093668",
+            "name": "Slug_03_Head"
+          },
+          "Offset": [
+            0,
+            1.5,
+            0
+          ],
+          "Orientation": [
+            0,
+            0,
+            0
+          ],
+          "AttachSpace": {
+            "hash": "17857802742059722934",
+            "name": "JointSpace"
+          },
+          "AttachJoint": {
+            "hash": "16542733293566093668",
+            "name": "Slug_03_Head"
+          },
+          "AbortWhenInterrupted": false,
+          "SlotName": {
+            "hash": "0",
+            "name": "#0"
+          },
+          "AbortBelowJointScale": -1,
+          "FadeTime": 3,
+          "EffectController": {
+            "hash": "0",
+            "name": "#0"
+          },
+          "EffectStore": {
+            "hash": "1312132684818588012",
+            "name": "General"
+          },
+          "HighPriority": false,
+          "Scale": 1,
+          "Collides": false,
+          "Restitution": 0.5,
+          "Friction": 1,
+          "RenderOffset": 0,
+          "UsePropScaling": true,
+          "CloneName": {
+            "hash": "0",
+            "name": "#0"
+          },
+          "CloneTint": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "Biases": [
+            1,
+            0,
+            0,
+            0
+          ],
+          "BiasesEmissionRate": 1,
+          "BiasesEmissionRateAreaScale": 0,
+          "BiasesEmissionRateScaleFunction": {
+            "hash": "4206860010037910535",
+            "name": "Linear"
+          },
+          "BiasesLifeSpan": 1,
+          "BiasesLifeSpanVariance": 1,
+          "BiasesSpeed": 8,
+          "BiasesSpeedVariance": 8,
+          "BiasesSize1D": 8,
+          "BiasesSize1DVariance": 8,
+          "BiasesSize1DAreaScale": 0,
+          "BiasesSize1DScaleFunction": {
+            "hash": "4206860010037910535",
+            "name": "Linear"
+          },
+          "BiasesSpin1D": 1,
+          "BiasesSpin1DVariance": 1,
+          "BiasesWeight": 2,
+          "BiasesWeightVariance": 1,
+          "BiasesAngle": 1,
+          "BiasesAngleVariance": 1,
+          "BiasesGravity": 3,
+          "BiasesDrag": 1,
+          "BiasesColourRed": 1,
+          "BiasesColourGreen": 1,
+          "BiasesColourBlue": 1,
+          "BiasesAlpha": 1,
+          "BiasesColourOverLifeRed": 1,
+          "BiasesColourOverLifeGreen": 1,
+          "BiasesColourOverLifeBlue": 1,
+          "BiasesAlphaOverLife": 1,
+          "BiasesColourVariance": 1,
+          "BiasesAlphaVariance": 1,
+          "BiasesGeneratorRadius": 1,
+          "BiasesGeneratorRadial": 1,
+          "BiasesGeneratorHorizSpread": 1,
+          "BiasesGeneratorVertSpread": 1,
+          "BiasesGeneratorWidth": 5,
+          "BiasesGeneratorHeight": 5,
+          "BiasesMeshGeneratorScale": [
+            1,
+            1,
+            1
+          ],
+          "Overrides": [
+            1,
+            0,
+            0,
+            0
+          ],
+          "OverridesEmissionRate": -1,
+          "OverridesEmissionRatePerMeter": -1,
+          "OverridesMaxParticles": -1,
+          "OverridesParticleAllocation": -1,
+          "OverridesLifeSpan": -1,
+          "OverridesLifeSpanVariance": -1,
+          "OverridesSpeed": -1,
+          "OverridesSpeedVariance": -1,
+          "OverridesSize1D": -1,
+          "OverridesSize1DVariance": -1,
+          "OverridesSpin1D": -1,
+          "OverridesSpin1DVariance": -1,
+          "OverridesWeight": -1,
+          "OverridesWeightVariance": -1,
+          "OverridesAngle": -1,
+          "OverridesAngleVariance": -1,
+          "OverridesGravity": -1,
+          "OverridesDrag": -1,
+          "OverridesColourRed": -1,
+          "OverridesColourGreen": -1,
+          "OverridesColourBlue": -1,
+          "OverridesAlpha": -1,
+          "OverridesColourVariance": -1,
+          "OverridesAlphaVariance": -1,
+          "OverridesGeneratorWidth": -1,
+          "OverridesGeneratorHeight": -1
+        }
+      },
+      {
+        "offset": 117088,
+        "owner": "mother_segment/effects/death/#fa5df7d34110e775",
+        "fields": {
+          "Unknown1": 0,
+          "TimeBegin": 0,
+          "TimeEnd": 0.33333298563957214,
+          "EffectName": {
+            "hash": "1504754981071609597",
+            "name": "#14e1f6aec8c5defd"
+          },
+          "ParentObjectName": {
+            "hash": "0",
+            "name": "#0"
+          },
+          "EmitSpace": {
+            "hash": "17857802742059722934",
+            "name": "JointSpace"
+          },
+          "EmitJoint": {
+            "hash": "16542733293566093668",
+            "name": "Slug_03_Head"
+          },
+          "Offset": [
+            0,
+            1.5,
+            0
+          ],
+          "Orientation": [
+            0,
+            0,
+            0
+          ],
+          "AttachSpace": {
+            "hash": "17857802742059722934",
+            "name": "JointSpace"
+          },
+          "AttachJoint": {
+            "hash": "16542733293566093668",
+            "name": "Slug_03_Head"
+          },
+          "AbortWhenInterrupted": false,
+          "SlotName": {
+            "hash": "0",
+            "name": "#0"
+          },
+          "AbortBelowJointScale": -1,
+          "FadeTime": 3,
+          "EffectController": {
+            "hash": "0",
+            "name": "#0"
+          },
+          "EffectStore": {
+            "hash": "1312132684818588012",
+            "name": "General"
+          },
+          "HighPriority": false,
+          "Scale": 1,
+          "Collides": false,
+          "Restitution": 0.5,
+          "Friction": 1,
+          "RenderOffset": 0,
+          "UsePropScaling": true,
+          "CloneName": {
+            "hash": "0",
+            "name": "#0"
+          },
+          "CloneTint": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "Biases": [
+            1,
+            0,
+            0,
+            0
+          ],
+          "BiasesEmissionRate": 2,
+          "BiasesEmissionRateAreaScale": 0,
+          "BiasesEmissionRateScaleFunction": {
+            "hash": "4206860010037910535",
+            "name": "Linear"
+          },
+          "BiasesLifeSpan": 1,
+          "BiasesLifeSpanVariance": 1,
+          "BiasesSpeed": 1.5,
+          "BiasesSpeedVariance": 1.5,
+          "BiasesSize1D": 1.5,
+          "BiasesSize1DVariance": 1.5,
+          "BiasesSize1DAreaScale": 0,
+          "BiasesSize1DScaleFunction": {
+            "hash": "4206860010037910535",
+            "name": "Linear"
+          },
+          "BiasesSpin1D": 1,
+          "BiasesSpin1DVariance": 1,
+          "BiasesWeight": 1,
+          "BiasesWeightVariance": 1,
+          "BiasesAngle": 1,
+          "BiasesAngleVariance": 1,
+          "BiasesGravity": 1,
+          "BiasesDrag": 1,
+          "BiasesColourRed": 1,
+          "BiasesColourGreen": 1,
+          "BiasesColourBlue": 1,
+          "BiasesAlpha": 1,
+          "BiasesColourOverLifeRed": 1,
+          "BiasesColourOverLifeGreen": 1,
+          "BiasesColourOverLifeBlue": 1,
+          "BiasesAlphaOverLife": 1,
+          "BiasesColourVariance": 1,
+          "BiasesAlphaVariance": 1,
+          "BiasesGeneratorRadius": 1,
+          "BiasesGeneratorRadial": 1,
+          "BiasesGeneratorHorizSpread": 2,
+          "BiasesGeneratorVertSpread": 2,
+          "BiasesGeneratorWidth": 1,
+          "BiasesGeneratorHeight": 1,
+          "BiasesMeshGeneratorScale": [
+            1,
+            1,
+            1
+          ],
+          "Overrides": [
+            1,
+            0,
+            0,
+            0
+          ],
+          "OverridesEmissionRate": -1,
+          "OverridesEmissionRatePerMeter": -1,
+          "OverridesMaxParticles": -1,
+          "OverridesParticleAllocation": -1,
+          "OverridesLifeSpan": -1,
+          "OverridesLifeSpanVariance": -1,
+          "OverridesSpeed": -1,
+          "OverridesSpeedVariance": -1,
+          "OverridesSize1D": -1,
+          "OverridesSize1DVariance": -1,
+          "OverridesSpin1D": -1,
+          "OverridesSpin1DVariance": -1,
+          "OverridesWeight": -1,
+          "OverridesWeightVariance": -1,
+          "OverridesAngle": -1,
+          "OverridesAngleVariance": -1,
+          "OverridesGravity": -1,
+          "OverridesDrag": -1,
+          "OverridesColourRed": -1,
+          "OverridesColourGreen": -1,
+          "OverridesColourBlue": -1,
+          "OverridesAlpha": -1,
+          "OverridesColourVariance": -1,
+          "OverridesAlphaVariance": -1,
+          "OverridesGeneratorWidth": -1,
+          "OverridesGeneratorHeight": -1
+        }
+      }
+    ],
+    "sounds": [
+      {
+        "source": "comparison/mother_fig.p3d.rz",
+        "offset": 114068,
+        "payload": 114080,
+        "length": 72,
+        "type": "Sound",
+        "kind": "TrackHash",
+        "owner": "mother_segment/effects/death/#fa5df7d34110e777",
+        "fields": {
+          "Unknown1": 1,
+          "TimeBegin": 0,
+          "Patch": {
+            "hash": "12993403993737071102",
+            "name": "#b451d8171dd709fe"
+          },
+          "Trigger": {
+            "hash": "31616665440155042",
+            "name": "play"
+          },
+          "VolumeFactor": 1,
+          "MinDistance": 100,
+          "MaxDistance": 200,
+          "MinPitch": 1,
+          "MaxPitch": 1,
+          "CyclicPhase": 0,
+          "InstanceName": {
+            "hash": "0",
+            "name": "#0"
+          },
+          "Frequency": 1,
+          "PolledLifetime": false,
+          "TriggerType": {
+            "hash": "6266415434618234495",
+            "name": "StopExisting"
+          }
+        },
+        "schema": "SoundTrack",
+        "end": 114160
+      },
+      {
+        "source": "comparison/mother_fig.p3d.rz",
+        "offset": 114160,
+        "payload": 114172,
+        "length": 72,
+        "type": "Sound",
+        "kind": "TrackHash",
+        "owner": "mother_segment/effects/death/#fa5df7d34110e777",
+        "fields": {
+          "Unknown1": 1,
+          "TimeBegin": 0,
+          "Patch": {
+            "hash": "11988792399713239450",
+            "name": "#a660bf2b0ecf819a"
+          },
+          "Trigger": {
+            "hash": "31616665440155042",
+            "name": "play"
+          },
+          "VolumeFactor": 1,
+          "MinDistance": 55,
+          "MaxDistance": 250,
+          "MinPitch": 1,
+          "MaxPitch": 1,
+          "CyclicPhase": 0,
+          "InstanceName": {
+            "hash": "0",
+            "name": "#0"
+          },
+          "Frequency": 1,
+          "PolledLifetime": false,
+          "TriggerType": {
+            "hash": "13522664087197083521",
+            "name": "Retrigger"
+          }
+        },
+        "schema": "SoundTrack",
+        "end": 114252
+      },
+      {
+        "source": "comparison/mother_fig.p3d.rz",
+        "offset": 115820,
+        "payload": 115832,
+        "length": 72,
+        "type": "Sound",
+        "kind": "TrackHash",
+        "owner": "mother_segment/effects/death/#fa5df7d34110e774",
+        "fields": {
+          "Unknown1": 1,
+          "TimeBegin": 0,
+          "Patch": {
+            "hash": "12993403993737071102",
+            "name": "#b451d8171dd709fe"
+          },
+          "Trigger": {
+            "hash": "31616665440155042",
+            "name": "play"
+          },
+          "VolumeFactor": 1,
+          "MinDistance": 100,
+          "MaxDistance": 200,
+          "MinPitch": 1,
+          "MaxPitch": 1,
+          "CyclicPhase": 0,
+          "InstanceName": {
+            "hash": "0",
+            "name": "#0"
+          },
+          "Frequency": 1,
+          "PolledLifetime": false,
+          "TriggerType": {
+            "hash": "6266415434618234495",
+            "name": "StopExisting"
+          }
+        },
+        "schema": "SoundTrack",
+        "end": 115912
+      },
+      {
+        "source": "comparison/mother_fig.p3d.rz",
+        "offset": 115912,
+        "payload": 115924,
+        "length": 72,
+        "type": "Sound",
+        "kind": "TrackHash",
+        "owner": "mother_segment/effects/death/#fa5df7d34110e774",
+        "fields": {
+          "Unknown1": 1,
+          "TimeBegin": 0,
+          "Patch": {
+            "hash": "11988792399713239450",
+            "name": "#a660bf2b0ecf819a"
+          },
+          "Trigger": {
+            "hash": "31616665440155042",
+            "name": "play"
+          },
+          "VolumeFactor": 1,
+          "MinDistance": 55,
+          "MaxDistance": 250,
+          "MinPitch": 1,
+          "MaxPitch": 1,
+          "CyclicPhase": 0,
+          "InstanceName": {
+            "hash": "0",
+            "name": "#0"
+          },
+          "Frequency": 1,
+          "PolledLifetime": false,
+          "TriggerType": {
+            "hash": "13522664087197083521",
+            "name": "Retrigger"
+          }
+        },
+        "schema": "SoundTrack",
+        "end": 116004
+      },
+      {
+        "source": "comparison/mother_fig.p3d.rz",
+        "offset": 117572,
+        "payload": 117584,
+        "length": 72,
+        "type": "Sound",
+        "kind": "TrackHash",
+        "owner": "mother_segment/effects/death/#fa5df7d34110e775",
+        "fields": {
+          "Unknown1": 1,
+          "TimeBegin": 0,
+          "Patch": {
+            "hash": "11988792399713239450",
+            "name": "#a660bf2b0ecf819a"
+          },
+          "Trigger": {
+            "hash": "31616665440155042",
+            "name": "play"
+          },
+          "VolumeFactor": 1,
+          "MinDistance": 55,
+          "MaxDistance": 250,
+          "MinPitch": 1,
+          "MaxPitch": 1,
+          "CyclicPhase": 0,
+          "InstanceName": {
+            "hash": "0",
+            "name": "#0"
+          },
+          "Frequency": 1,
+          "PolledLifetime": false,
+          "TriggerType": {
+            "hash": "13522664087197083521",
+            "name": "Retrigger"
+          }
+        },
+        "schema": "SoundTrack",
+        "end": 117664
+      },
+      {
+        "source": "comparison/mother_fig.p3d.rz",
+        "offset": 117664,
+        "payload": 117676,
+        "length": 72,
+        "type": "Sound",
+        "kind": "TrackHash",
+        "owner": "mother_segment/effects/death/#fa5df7d34110e775",
+        "fields": {
+          "Unknown1": 1,
+          "TimeBegin": 0,
+          "Patch": {
+            "hash": "12993403993737071102",
+            "name": "#b451d8171dd709fe"
+          },
+          "Trigger": {
+            "hash": "31616665440155042",
+            "name": "play"
+          },
+          "VolumeFactor": 1,
+          "MinDistance": 100,
+          "MaxDistance": 200,
+          "MinPitch": 1,
+          "MaxPitch": 1,
+          "CyclicPhase": 0,
+          "InstanceName": {
+            "hash": "0",
+            "name": "#0"
+          },
+          "Frequency": 1,
+          "PolledLifetime": false,
+          "TriggerType": {
+            "hash": "6266415434618234495",
+            "name": "StopExisting"
+          }
+        },
+        "schema": "SoundTrack",
+        "end": 117756
+      }
+    ],
+    "scope": "3 emitters per corpse template at its corresponding Slug Head, local offset[0,1.5,0], two0..4s and one0...333333s, fade3. Native hashes/parameters retained; no media playback or replacement asset fabricated."
+  },
+  "export": {
+    "clipKey": "segment_death",
+    "poseRows": 96,
+    "bones": 107,
+    "allClipsSourceFrames": 1546,
+    "independentFixtures": 180,
+    "fixtureFrames": [
+      0,
+      20,
+      32,
+      66,
+      80,
+      95
+    ],
+    "preserved": "Every existing geometry byte, nine live clip objects and all prior fixture arrays checked equal against pre-change Forge data before synchronization.",
+    "fixturePath": "src/test/resources/greene-skin-reference.json#segmentsDeath",
+    "adapter": "Render only one captured health child; retain same shared rig and source-bound cubes; root owns corpse entity/lifecycle integration."
+  },
+  "remaining": [
+    "Focused Death CopyDrawable / detach consumer proof for exact original old-handle invalidation and share-pose unlink.",
+    "Original effect/audio assets and late-Spawn scheduling are not ported by this source/pose export.",
+    "Normal gameplay visual/collision verification and corpse lifetime across load/unload remain deferred; no build/tests/game run."
+  ],
+  "privateProof": "D:/PrototypeReference/p1/private/greene-segment-death-proof.json"
+}

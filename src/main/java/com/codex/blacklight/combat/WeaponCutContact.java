@@ -4,6 +4,7 @@ import com.codex.blacklight.animation.*;
 import com.codex.blacklight.entity.BlacklightHydra;
 import com.codex.blacklight.power.PowerForm;
 import com.codex.blacklight.registry.ModAttachments;
+import com.codex.blacklight.network.RagdollImpactPayload.BladeSpan;
 import com.google.gson.*;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.LivingEntity;
@@ -18,22 +19,25 @@ import java.lang.Math;
 /** Sharp faces from the shipped visible mesh, sampled on the authoritative attack clock.
  * Authored combat contact authorizes damage; sharp contact separately authorizes cuts. */
 public final class WeaponCutContact {
-    public enum Kind { NONE, SLICE, PUNCTURE }
-    public record Contact(int region,String edge,Vec3 point,Vec3 travel,Vec3 normal,long stroke,String receivingBone) {
-        public Contact(int region,String edge,Vec3 point,Vec3 travel,Vec3 normal){this(region,edge,point,travel,normal,0,null);}
-        public Contact onBody(String bone){return new Contact(region,edge,point,travel,normal,stroke,bone);}
+    public enum Kind { NONE, SLICE, PUNCTURE, BLUNT }
+    public record Contact(int region,String edge,Vec3 point,Vec3 travel,Vec3 normal,long stroke,List<BladeSpan> path,String receivingBone) {
+        public Contact {path=List.copyOf(path);}
+        public Contact(int region,String edge,Vec3 point,Vec3 travel,Vec3 normal,long stroke,List<BladeSpan> path){this(region,edge,point,travel,normal,stroke,path,null);}
+        public Contact(int region,String edge,Vec3 point,Vec3 travel,Vec3 normal){this(region,edge,point,travel,normal,0,List.of(),null);}
+        /** Logical receiver from the actual sub-tick skin intersection, not an
+         * anatomical dismemberment bit or a client supplied lock selection. */
+        public Contact onBody(String bone){return new Contact(region,edge,point,travel,normal,stroke,path,bone);}
+        public Contact path(long id,List<BladeSpan> spans){return new Contact(region,edge,point,travel,normal,id,spans,receivingBone);}
     }
     public record Report(Kind kind,List<Contact> contacts){
         public static final Report NONE=new Report(Kind.NONE,List.of());
-        public Report stroke(long id){
-            return new Report(kind,contacts.stream().map(c->new Contact(c.region(),c.edge(),c.point(),c.travel(),c.normal(),id,c.receivingBone())).toList());
-        }
         public int severMask(){
             if(kind!=Kind.SLICE)return 0;
             int mask=0;for(var contact:contacts)if(contact.travel().lengthSqr()>.0009)mask|=contact.region();
             return mask&63;
         }
         public Vec3 direction(){Vec3 v=Vec3.ZERO;for(var c:contacts)v=v.add(c.travel());return v.normalize();}
+        public Report stroke(long id){return new Report(kind,contacts.stream().map(c->c.path(id,c.path())).toList());}
     }
     record Face(String edge,String bone,Vec3 a,Vec3 b,Vec3 c,Vec3 root,Vec3 tip,List<Vec3> profile,boolean sharp) {
         Face(String edge,String bone,Vec3 a,Vec3 b,Vec3 c,Vec3 root,Vec3 tip,List<Vec3> profile){this(edge,bone,a,b,c,root,tip,profile,true);}
@@ -63,13 +67,21 @@ public final class WeaponCutContact {
             new Zone(16,new AABB(-.3125,.001,.3125,-.0625,.376,.5625)),
             new Zone(32,new AABB(-.3125,.376,-.5,.3125,.876,.5)));
     private static List<Zone> zones(LivingEntity v){
-        if(!WeaponReceiverBody.legacyBody(v)){
+        if(!RagdollImpact.legacyBody(v)){
             double r=v.getBbWidth()*.5;
             return List.of(new Zone(32,new AABB(-r,0,-r,r,v.getBbHeight(),r)));
         }
         return v instanceof net.minecraft.world.entity.animal.Pig?PIG_ZONES:ZONES;
     }
-    private static double bodyScale(LivingEntity v){return !WeaponReceiverBody.legacyBody(v)||v instanceof net.minecraft.world.entity.animal.Pig?1:v.getBbHeight()/1.95;}
+    private static double bodyScale(LivingEntity v){return !RagdollImpact.legacyBody(v)||v instanceof net.minecraft.world.entity.animal.Pig?1:v.getBbHeight()/1.95;}
+
+    static Kind contactKind(WeaponMove move){
+        return switch(move.uncharged()){
+            case WHIP_LASH, WHIP_RETURN, WHIP_COMBO_C -> Kind.BLUNT;
+            case WHIP_LONGSHOT, WHIP_LUNGE -> Kind.PUNCTURE;
+            default -> Kind.SLICE;
+        };
+    }
 
     /** Created once per strike tick, shared across its victims. Nothing here trusts client hit reports. */
     public static Sweep sweep(ServerPlayer player,WeaponMove move,double from,double to,Vec3 oldFeet,float oldYaw,float yaw,WhipCurve whip){
@@ -77,7 +89,7 @@ public final class WeaponCutContact {
         var geometry=new ArrayList<>(geometry(move.form));
         if(whip==null && (geometry.isEmpty() || MotionLibrary.find(move.id).isEmpty()))return Sweep.EMPTY;
         if(move.form==PowerForm.CLAWS||move.form==PowerForm.BLADE)geometry.addAll(bluntGeometry(move.form));
-        Kind kind=move.uncharged()==WeaponMove.WHIP_LONGSHOT||move.uncharged()==WeaponMove.WHIP_LUNGE?Kind.PUNCTURE:Kind.SLICE;
+        Kind kind=contactKind(move);
         // Eight intervals per tick plus authored whip reversals. No future/recovery frames.
         var alphas=new TreeSet<Double>();for(int i=0;i<=8;i++)alphas.add(i/8.0);
         if(whip!=null&&to>from)for(var sample:whip.samples())if(sample.time()>from&&sample.time()<to)alphas.add((sample.time()-from)/(to-from));
@@ -173,7 +185,7 @@ public final class WeaponCutContact {
             }
             return null;
         }
-        Vec3 aircraftContact(ServerPlayer actor,List<HydraContact.Box> skin,double lashRadius){
+        Vec3 hullContact(ServerPlayer actor,List<HydraContact.Box> skin,double lashRadius){
             for(var frame:frames){
                 for(int i=1;i<frame.lash.size();i++){
                     var from=frame.lash.get(i-1);
@@ -198,7 +210,15 @@ public final class WeaponCutContact {
         }
         public Kind kind(){return kind;}
         /** Receiver-local ribbon samples, including the exit after the last triangle contact. */
-
+        public List<BladeSpan> path(String edge,LivingEntity victim,Vec3 previousPosition){
+            var spans=new ArrayList<BladeSpan>();
+            for(var frame:frames)for(var face:frame.faces())if(face.sharp()&&face.edge().equals(edge)){
+                Vec3 origin=previousPosition.lerp(victim.position(),frame.alpha());
+                float yaw=net.minecraft.util.Mth.rotLerp((float)frame.alpha(),victim.yBodyRotO,victim.yBodyRot);
+                spans.add(new BladeSpan(face.profile().stream().map(p->local(p,origin,yaw,1)).toList(),fromTick+frame.alpha(),origin,yaw));break;
+            }
+            return List.copyOf(spans);
+        }
         public Report trace(ServerPlayer attacker,LivingEntity victim,Vec3 previousPosition){
             return trace(attacker,victim,previousPosition,true);
         }
@@ -207,10 +227,10 @@ public final class WeaponCutContact {
             return trace(attacker,victim,previousPosition,false);
         }
         private Report trace(ServerPlayer attacker,LivingEntity victim,Vec3 previousPosition,boolean sharp){
-            if(kind==Kind.NONE || AnimatedHurtBody.of(victim)==null && !WeaponReceiverBody.supportedBody(victim))return Report.NONE;
+            if(kind==Kind.NONE || AnimatedHurtBody.of(victim)==null && !RagdollImpact.supportedBody(victim))return Report.NONE;
             Map<String,Contact> found=new LinkedHashMap<>();
             double scale=bodyScale(victim);
-            boolean generic=AnimatedHurtBody.of(victim)==null && !WeaponReceiverBody.legacyBody(victim);
+            boolean generic=AnimatedHurtBody.of(victim)==null && !RagdollImpact.legacyBody(victim);
             var receiverZones=generic?List.of(new Zone(32,victim.getBoundingBox().move(victim.position().scale(-1)))):zones(victim);
             Map<Double,List<HydraContact.Region>> hydraPoses=new HashMap<>();
             for(int i=1;i<frames.size();i++){
@@ -256,7 +276,7 @@ public final class WeaponCutContact {
                     }
                 }
             }
-            return found.isEmpty()?Report.NONE:new Report(sharp?kind:Kind.NONE,List.copyOf(found.values()));
+            return found.isEmpty()?Report.NONE:new Report(sharp?kind:Kind.NONE,found.values().stream().map(c->c.path(0,sharp&&kind==Kind.SLICE?path(c.edge(),victim,previousPosition):List.of())).toList());
         }
     }
     /** Ordinary items have no shared animated mesh: use the actual aimed contact, never a fixed limb. */
@@ -274,7 +294,7 @@ public final class WeaponCutContact {
     }
     /** Accepted blunt contact gets a local wound, but can never authorize a slice. */
     public static Report impact(ServerPlayer player,LivingEntity victim,Vec3 direction){
-        if(!WeaponReceiverBody.supportedBody(victim))return Report.NONE;
+        if(!RagdollImpact.supportedBody(victim))return Report.NONE;
         if(victim instanceof AnimatedHurtBody hydra&&hydra.animatedHurtBody())return new Report(Kind.NONE,List.of(new Contact(32,"impact",hydra.incomingPoint(),direction.normalize().scale(.25),Vec3.ZERO)));
         Vec3 eye=player.getEyePosition(),center=victim.getBoundingBox().getCenter();
         Vec3 aimed=victim.getBoundingBox().clip(eye,eye.add(player.getLookAngle().scale(4))).orElse(null);
@@ -406,8 +426,8 @@ public final class WeaponCutContact {
     }
     private static List<Vec3> sharpProfile(List<Face> faces,Vec3 axis,double low,double high){
         var profile=new ArrayList<Vec3>();
-        for(int index=0;index<6;index++){
-            double section=low+(high-low)*index/(6-1);
+        for(int index=0;index<com.codex.blacklight.network.RagdollImpactPayload.MAX_BLADE_POINTS;index++){
+            double section=low+(high-low)*index/(com.codex.blacklight.network.RagdollImpactPayload.MAX_BLADE_POINTS-1);
             var points=new ArrayList<Vec3>();
             for(var face:faces){var vertices=List.of(face.a(),face.b(),face.c());
                 for(int i=0;i<3;i++){

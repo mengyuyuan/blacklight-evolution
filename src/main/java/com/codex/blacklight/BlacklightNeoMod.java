@@ -60,6 +60,7 @@ public final class BlacklightNeoMod {
         ModParticles.register(modBus);
         com.codex.blacklight.registry.ModWeaponSounds.register(modBus);
         com.codex.blacklight.firearms.GunplaySounds.register(modBus);
+        com.codex.blacklight.military.vehicle.VehicleSounds.register(modBus);
         com.codex.blacklight.registry.ModInfectedSounds.register(modBus);
         ModNetwork.register();
         modBus.addListener((net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent event)->event.enqueueWork(()->{

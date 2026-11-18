@@ -1,0 +1,8 @@
+allprojects { afterEvaluate {
+    sourceSets.main.java.srcDir('src/vehicleTest/java')
+    sourceSets.main.java.exclude { item -> item.path.startsWith('com/codex/blacklight/gametest/vehicle/') && !['MilitaryVehicleGameTest.java','VehicleUsabilityGameTest.java'].contains(item.file.name) }
+    sourceSets.main.resources.srcDir('src/blackwatchTest/resources')
+    sourceSets.main.java.srcDir('src/helicopterTest/java')
+    sourceSets.main.resources.srcDir('src/helicopterTest/resources')
+    tasks.withType(Jar).configureEach { doFirst {throw new GradleException('QA cannot produce a release JAR')} }
+} }

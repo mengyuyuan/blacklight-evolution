@@ -30,7 +30,7 @@ public final class TissueAbilities {
         elapseNativeCooldown();
         if(host.level().isClientSide||!ModAttachments.available(host)||cooldown>0||TissueActions.core(host)!=null||TissueActions.legacyStrike(host)||!host.isAlive()||host.isNoAi()
                 ||!TissueActions.eligible(host)||host.isPassenger()||!valid(target)||!host.hasLineOfSight(target)
-                ||com.codex.blacklight.registry.ModAttachments.getData(host, ModAttachments.CONSUME_VISUAL).active()||TissueCompetition.controls(host)
+                ||ModAttachments.peekData(host,ModAttachments.CONSUME_VISUAL,com.codex.blacklight.combat.ConsumeVisual.EMPTY).active()||TissueCompetition.controls(host)
                 ||com.codex.blacklight.combat.ImpactControl.stunned(host)||host.level().getDifficulty()==net.minecraft.world.Difficulty.PEACEFUL)return false;
         double gap=Math.max(0,host.distanceTo(target)-(host.getBbWidth()+target.getBbWidth())*.5);
         for(int offset=0;offset<ACTIONS.size();offset++){
@@ -49,7 +49,7 @@ public final class TissueAbilities {
         if(host.level().isClientSide)return false;
         if(host instanceof BlacklightInfectedHost){if(cooldown>0)cooldown--;}else elapseNativeCooldown();
         if(!host.isAlive()||host.isNoAi()||!TissueActions.eligible(host)||host.isPassenger()
-                ||com.codex.blacklight.registry.ModAttachments.getData(host, ModAttachments.CONSUME_VISUAL).active()||com.codex.blacklight.combat.ImpactControl.stunned(host)
+                ||ModAttachments.peekData(host,ModAttachments.CONSUME_VISUAL,com.codex.blacklight.combat.ConsumeVisual.EMPTY).active()||com.codex.blacklight.combat.ImpactControl.stunned(host)
                 ||TissueCompetition.controls(host)||host.level().getDifficulty()==net.minecraft.world.Difficulty.PEACEFUL){if(TissueActions.core(host)!=null)interrupt();return false;}
         var core=TissueActions.core(host);
         if(core==null){
@@ -109,7 +109,7 @@ public final class TissueAbilities {
     private boolean valid(LivingEntity target){return ModAttachments.available(target)&&target!=null&&target!=host&&target.isAlive()&&!target.isRemoved()&&target.level()==host.level()&&!host.isAlliedTo(target)
             &&!(target instanceof Player p&&(p.isCreative()||p.isSpectator()))&&!TissueCompetition.controls(target)
             &&com.codex.blacklight.power.BiomassSystem.claimant(target)==null&&(TissueGrapples.owner(target)==null||TissueGrapples.owner(target)==host)
-            &&!com.codex.blacklight.registry.ModAttachments.getData(target, ModAttachments.CONSUME_VISUAL).active();}
+            &&!ModAttachments.peekData(target,ModAttachments.CONSUME_VISUAL,com.codex.blacklight.combat.ConsumeVisual.EMPTY).active();}
     private void hit(LivingEntity target,TissueCore core,double power){
         float factor=switch(core){case CHELA->1.3F;case HORN->1.35F;case SADDLE->1.8F;case CLUB->2.1F;case TONGUE->.65F;case CNIDOCYTE->.35F;case EXTRAORAL->.55F;default->1;};
         double base=host.getAttribute(Attributes.ATTACK_DAMAGE)==null

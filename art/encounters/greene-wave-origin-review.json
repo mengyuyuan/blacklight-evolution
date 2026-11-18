@@ -1,0 +1,39 @@
+{
+  "date": "2026-11-17",
+  "status": "implemented_pending_parent_build_and_runtime_verification",
+  "scope": "Greene radial-wave contact and cover correction; not whole-boss completion",
+  "source": {
+    "audit": "D:/PrototypeReference/p1/boss-fig-audit.json",
+    "file": "comparison/mother_fig.p3d.rz",
+    "owner": "mother_core/opening/outside/attacks/#523cabf028eb90/pose/roar",
+    "hitOffsets": [17116, 17412, 17708, 18004, 18300, 18596, 18892],
+    "localOffsetEveryHit": [0, 2, 0],
+    "radii": [8, 12, 16, 20, 25, 30, 40],
+    "damage": [5000, 4000, 2500, 2500, 2500, 2500, 2500]
+  },
+  "confirmedCodeDefect": "The wave used feet-to-feet distance, an unrelated 4.8-block vertical cap and Greene's eye-to-eye ray. These differ from the decoded Hit sphere center and can allow damage through cover below her eye ray while missing elevated targets inside the sphere.",
+  "change": "Retain decoded timing and relative damage; compute the closest point on the victim AABB to each active source sphere, then trace from that sphere origin to that contact point. Broaden candidate lookup vertically to include the sphere.",
+  "adaptationBoundary": "One original world unit maps to one Minecraft block. Per-attack hit deduplication, tuned damage/knockback, block cover protection and cloud rings remain Minecraft adaptations. The source Hit fields do not prove original-engine block occlusion behavior.",
+  "verification": {
+    "neoDiffCheck": "passed",
+    "forgeDiffCheck": "passed",
+    "sourceOffsetsAndBothResourceTables": "verified",
+    "unitAdded": "GreeneMotionTest.radialWaveUsesDecodedHitOriginAndSphereContactInsteadOfRootDistance",
+    "serverTestsAdded": [
+      "GreeneCycleGameTest.radialWaveIsBlockedByCoverBelowTheBossEyeRay",
+      "GreeneCycleGameTest.radialWaveHitsRaisedTargetInsideItsFirstSphere"
+    ],
+    "gradle": "delegated_to_parent_not_run_by_this_agent",
+    "playerAcceptance": "pending"
+  },
+  "playerReproduction": [
+    "Place Greene and a survival target about eight blocks apart on flat terrain. Add a two-block-high wall between them, leaving her head above it. Her HOWL may begin because she can see over the wall; all seven wave stages should leave the covered target unharmed.",
+    "Place an unobstructed target seven blocks above Greene's root and four blocks horizontally away. It lies inside the first radius-eight sphere centered two blocks above her root. The wave should first hurt at action tick 67, never during windup.",
+    "During an actual player fight, verify unobstructed ground damage, wall protection, attack cancellation when all appendages break, and readable wave feedback. Automated fixtures do not replace this acceptance."
+  ],
+  "remainingGreeneWork": [
+    "The current ORBS five-projectile fan borrows the anti-tank/anti-air branch timing; the current VOLLEY single aimed projectile borrows DeathFlower timing. They do not implement the decoded ammo variants, socket layout, fixed directions or full branch selection.",
+    "Decoded Shoot records include anti-tank/anti-air at offsets 13224/13424; DeathFlower five guns at 22304/22404/22504/22604/22704; shotgun pair at 23948/24048; insect swarm at 25972/26072/26172; rifle at 27528. These require weapon-user/ammo-profile and socket interpretation before implementation.",
+    "Source projectile sockets, entry/death choreography, full audio identity and original transition/target strategy remain incomplete. ERUPTION remains a generic authored move."
+  ]
+}

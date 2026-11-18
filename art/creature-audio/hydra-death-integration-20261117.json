@@ -1,0 +1,423 @@
+{
+  "schema": 1,
+  "date": "2026-11-17",
+  "state": "Source sound roles and authored client audio integrated; no compilation, playback or player acceptance.",
+  "source": {
+    "deathFig": {
+      "input/comparison/Hydra_fig.p3d.rz": "6a9c1ab979ee6ee36b88a8fd2d3510094dec4a5095f006667735cf0f12c5d27e",
+      "private/comparison/Hydra.p3d": "b4bd053853eeb705699a0e7e24229e5f75dcd2cd8baa0eeef0fbeb75528ad5b1"
+    },
+    "audioPath": "audio/hydra.p3d",
+    "privateAudioSha256": "4d14eb3524134ef294d0e40155be193be201779c1070f05260526cf70e654596",
+    "privatePatchMapSha256": "6097ee3aa43173dfd7e46ea6c48deb466612eeb9b2308ee28c7a4083a30ae1ba",
+    "parsing": "Length-delimited P3D Patch names/hashes/file bindings and RADP header durations only; no original audio decoded, copied into resources or played.",
+    "normalAndSinkTracks": [
+      {
+        "offset": 7200,
+        "fields": {
+          "Unknown1": 1,
+          "TimeBegin": 0,
+          "Patch": {
+            "hash": "7696709824372853067",
+            "name": "#6ad034ce6d00c94b"
+          },
+          "Trigger": {
+            "hash": "31616665440155042",
+            "name": "play"
+          },
+          "VolumeFactor": 1,
+          "MinDistance": 100,
+          "MaxDistance": 400,
+          "MinPitch": 0.699999988079071,
+          "MaxPitch": 0.800000011920929,
+          "CyclicPhase": 0,
+          "InstanceName": {
+            "hash": "0",
+            "name": "#0"
+          },
+          "Frequency": 1,
+          "PolledLifetime": false,
+          "TriggerType": {
+            "hash": "6266415434618234495",
+            "name": "StopExisting"
+          }
+        },
+        "sourceClock": "normal death node",
+        "patch": {
+          "offset": 1497326,
+          "name": "hydra_roar",
+          "hash": "7696709824372853067",
+          "loop": false,
+          "files": [
+            "hydra_roar_temp_01",
+            "hydra_roar_temp_02",
+            "hydra_roar_temp_03"
+          ]
+        },
+        "referenceWaves": [
+          {
+            "offset": 1103782,
+            "name": "hydra_roar_temp_01",
+            "alias": "hydra_roar_temp_01",
+            "channels": 1,
+            "rate": 48000,
+            "bytes": 83940,
+            "seconds": 2.798
+          },
+          {
+            "offset": 1187835,
+            "name": "hydra_roar_temp_02",
+            "alias": "hydra_roar_temp_02",
+            "channels": 1,
+            "rate": 48000,
+            "bytes": 98260,
+            "seconds": 3.275333333333333
+          },
+          {
+            "offset": 1286208,
+            "name": "hydra_roar_temp_03",
+            "alias": "hydra_roar_temp_03",
+            "channels": 1,
+            "rate": 48000,
+            "bytes": 86180,
+            "seconds": 2.8726666666666665
+          }
+        ],
+        "implemented": true
+      },
+      {
+        "offset": 7292,
+        "fields": {
+          "Unknown1": 1,
+          "TimeBegin": 1.5,
+          "Patch": {
+            "hash": "14110809045209754445",
+            "name": "#c3d3aa107918ab4d"
+          },
+          "Trigger": {
+            "hash": "31616665440155042",
+            "name": "play"
+          },
+          "VolumeFactor": 1,
+          "MinDistance": 0,
+          "MaxDistance": 0,
+          "MinPitch": 1,
+          "MaxPitch": 1,
+          "CyclicPhase": 0,
+          "InstanceName": {
+            "hash": "0",
+            "name": "#0"
+          },
+          "Frequency": 1,
+          "PolledLifetime": false,
+          "TriggerType": {
+            "hash": "6266415434618234495",
+            "name": "StopExisting"
+          }
+        },
+        "sourceClock": "normal death node",
+        "patch": {
+          "offset": 1500600,
+          "name": "hydra_whoosh",
+          "hash": "14110809045209754445",
+          "loop": false,
+          "files": [
+            "hammer_whoosh_02"
+          ]
+        },
+        "referenceWaves": [
+          {
+            "offset": 135519,
+            "name": "hammer_whoosh_02",
+            "alias": "hammer_whoosh_02",
+            "channels": 1,
+            "rate": 48000,
+            "bytes": 11760,
+            "seconds": 0.392
+          }
+        ],
+        "implemented": true
+      },
+      {
+        "offset": 7384,
+        "fields": {
+          "Unknown1": 1,
+          "TimeBegin": 2,
+          "Patch": {
+            "hash": "7696709824372853067",
+            "name": "#6ad034ce6d00c94b"
+          },
+          "Trigger": {
+            "hash": "31616665440155042",
+            "name": "play"
+          },
+          "VolumeFactor": 1,
+          "MinDistance": 100,
+          "MaxDistance": 400,
+          "MinPitch": 0.6000000238418579,
+          "MaxPitch": 0.699999988079071,
+          "CyclicPhase": 0,
+          "InstanceName": {
+            "hash": "0",
+            "name": "#0"
+          },
+          "Frequency": 1,
+          "PolledLifetime": false,
+          "TriggerType": {
+            "hash": "6266415434618234495",
+            "name": "StopExisting"
+          }
+        },
+        "sourceClock": "normal death node",
+        "patch": {
+          "offset": 1497326,
+          "name": "hydra_roar",
+          "hash": "7696709824372853067",
+          "loop": false,
+          "files": [
+            "hydra_roar_temp_01",
+            "hydra_roar_temp_02",
+            "hydra_roar_temp_03"
+          ]
+        },
+        "referenceWaves": [
+          {
+            "offset": 1103782,
+            "name": "hydra_roar_temp_01",
+            "alias": "hydra_roar_temp_01",
+            "channels": 1,
+            "rate": 48000,
+            "bytes": 83940,
+            "seconds": 2.798
+          },
+          {
+            "offset": 1187835,
+            "name": "hydra_roar_temp_02",
+            "alias": "hydra_roar_temp_02",
+            "channels": 1,
+            "rate": 48000,
+            "bytes": 98260,
+            "seconds": 3.275333333333333
+          },
+          {
+            "offset": 1286208,
+            "name": "hydra_roar_temp_03",
+            "alias": "hydra_roar_temp_03",
+            "channels": 1,
+            "rate": 48000,
+            "bytes": 86180,
+            "seconds": 2.8726666666666665
+          }
+        ],
+        "implemented": true
+      },
+      {
+        "offset": 7476,
+        "fields": {
+          "Unknown1": 1,
+          "TimeBegin": 3,
+          "Patch": {
+            "hash": "14110809045209754445",
+            "name": "#c3d3aa107918ab4d"
+          },
+          "Trigger": {
+            "hash": "31616665440155042",
+            "name": "play"
+          },
+          "VolumeFactor": 1,
+          "MinDistance": 0,
+          "MaxDistance": 0,
+          "MinPitch": 1,
+          "MaxPitch": 1,
+          "CyclicPhase": 0,
+          "InstanceName": {
+            "hash": "0",
+            "name": "#0"
+          },
+          "Frequency": 1,
+          "PolledLifetime": false,
+          "TriggerType": {
+            "hash": "6266415434618234495",
+            "name": "StopExisting"
+          }
+        },
+        "sourceClock": "normal death node",
+        "patch": {
+          "offset": 1500600,
+          "name": "hydra_whoosh",
+          "hash": "14110809045209754445",
+          "loop": false,
+          "files": [
+            "hammer_whoosh_02"
+          ]
+        },
+        "referenceWaves": [
+          {
+            "offset": 135519,
+            "name": "hammer_whoosh_02",
+            "alias": "hammer_whoosh_02",
+            "channels": 1,
+            "rate": 48000,
+            "bytes": 11760,
+            "seconds": 0.392
+          }
+        ],
+        "implemented": true
+      },
+      {
+        "offset": 7944,
+        "fields": {
+          "Unknown1": 1,
+          "TimeBegin": 0,
+          "Patch": {
+            "hash": "8649376493881069221",
+            "name": "#7808c21846650ea5"
+          },
+          "Trigger": {
+            "hash": "31616665440155042",
+            "name": "play"
+          },
+          "VolumeFactor": 1,
+          "MinDistance": 0,
+          "MaxDistance": 0,
+          "MinPitch": 0.699999988079071,
+          "MaxPitch": 0.800000011920929,
+          "CyclicPhase": 0,
+          "InstanceName": {
+            "hash": "0",
+            "name": "#0"
+          },
+          "Frequency": 1,
+          "PolledLifetime": false,
+          "TriggerType": {
+            "hash": "13522664087197083521",
+            "name": "Retrigger"
+          }
+        },
+        "sourceClock": "sink node",
+        "patch": null,
+        "referenceWaves": [],
+        "implemented": false
+      },
+      {
+        "offset": 8036,
+        "fields": {
+          "Unknown1": 1,
+          "TimeBegin": 0.20000000298023224,
+          "Patch": {
+            "hash": "6342337272149414978",
+            "name": "#58048225582f9442"
+          },
+          "Trigger": {
+            "hash": "31616665440155042",
+            "name": "play"
+          },
+          "VolumeFactor": 1,
+          "MinDistance": 0,
+          "MaxDistance": 0,
+          "MinPitch": 1,
+          "MaxPitch": 1,
+          "CyclicPhase": 0,
+          "InstanceName": {
+            "hash": "0",
+            "name": "#0"
+          },
+          "Frequency": 1,
+          "PolledLifetime": true,
+          "TriggerType": {
+            "hash": "13522664087197083521",
+            "name": "Retrigger"
+          }
+        },
+        "sourceClock": "sink node",
+        "patch": {
+          "offset": 1496487,
+          "name": "hydra_debris",
+          "hash": "6342337272149414978",
+          "loop": true,
+          "files": [
+            "hydra_debris_01"
+          ]
+        },
+        "referenceWaves": [
+          {
+            "offset": 1050075,
+            "name": "hydra_debris_01",
+            "alias": "hydra_debris_01",
+            "channels": 1,
+            "rate": 44100,
+            "bytes": 53600,
+            "seconds": 1.944671201814059
+          }
+        ],
+        "implemented": true
+      }
+    ],
+    "thermalTrack": {
+      "offset": 6576,
+      "localSeconds": 0,
+      "patch": {
+        "offset": 1497326,
+        "name": "hydra_roar",
+        "hash": "7696709824372853067",
+        "loop": false,
+        "files": [
+          "hydra_roar_temp_01",
+          "hydra_roar_temp_02",
+          "hydra_roar_temp_03"
+        ]
+      },
+      "pitch": [
+        0.7,
+        0.8
+      ],
+      "clock": "Outer death node, outside delayed TrackGroup6252 (group end6576)."
+    },
+    "thermalClockProof": "art/hydra/thermobaric-death-source.json"
+  },
+  "integration": {
+    "normal": "Observed death ages0/30/40/60 trigger roar/whoosh/roar/whoosh. Second roar replaces the first matching actor patch; source pitch intervals retained.",
+    "sink": "Polled hydra_debris loop starts at normal age66+4=70 and stops at103 or lost ownership. Source float.200000003 is snapped to four20Hz sink ticks; no fifth-tick float-ceil artifact.",
+    "thermal": "Only outer track6576 roar at age0; no ordinary whoosh or sink loop. Finite unpolled roar can finish at last position after40tick deletion.",
+    "observation": "Existing synchronized death kind/age owns all timing. First tracking of a corpse baselines its snapshot; one-shot history is not replayed. Active polled debris may resume. Large gaps consume obsolete cues; no extra network field or server death clock.",
+    "replacement": "Kind replacement, age rewind or return to alive stops the old actor patch set and rebases; cues are consumed before calling playback.",
+    "lifecycle": "Entity identity and world are checked. Untracking/removal stops polled loops; unpolled finite tails retain last position. World unload/replacement stops all voices. Pause freezes observations; mute consumes cues and clears voices.",
+    "budget": "Nearest tracked actors considered first;24global voices,20tick loop retry,6observer-tick backend grace,180observer-tick finite safety cap. Grace is independent of SoundEngine.tick so failed startup cannot leak the voice budget.",
+    "mcAdapters": "FIG roar100/400 mapped directly to blocks with linear attenuation; source-world acoustic unit equivalence is not proven. Zero-distance tracks do not establish attenuation; whoosh24/debris48block caps are MC mix choices. Gain.35/.25 and UUID/tick-seeded pitch choice are authored adapters. Native probability, Patch DSP/randomization and exact source attenuation are not replicated.",
+    "audio": "Three authored Socapex Foley roar variants and one debris loop; existing licensed swing sounds supply whoosh. Reference durations guide authoring, not original waveforms. CC BY-SA3.0 credit/transforms retained."
+  },
+  "limits": [
+    "Sink track7944 hash7808c21846650ea5 has no proven Patch mapping and is deliberately unimplemented.",
+    "Original particle effects, Crater lifetime, weighted Hydra mesh and native actor physics remain outside this audio change.",
+    "No audio listening, client/subtitle/mix acceptance, compilation or automated test execution performed."
+  ],
+  "validation": {
+    "type": "static source/data/provenance only",
+    "unitMethodsWritten": 4,
+    "compilation": "not run",
+    "tests": "not run",
+    "audioPlayback": "not played",
+    "client": "not launched"
+  },
+  "snapshots": {
+    "src/main/java/com/codex/blacklight/combat/HydraDeathAudioState.java": "abafbc559cb98474723c483dfd27e315302db9b1a3a2a52b3d0b9f75f14da6a3",
+    "src/main/java/com/codex/blacklight/client/audio/HydraDeathAudio.java": "ea64241feca3af58078f9812d29f27408c64b2ff1c8b5057da04f9659e3fe4c8",
+    "src/main/java/com/codex/blacklight/client/audio/HydraDeathAudioEvents.java": "62592e2a6b7e09fbc171dee8b7414182a982c74526280d6785957e55b3e66a25",
+    "src/test/java/com/codex/blacklight/combat/HydraDeathAudioStateTest.java": "273513dff6b51cb1cc856c82f4a8f8f73da8a340cced766091a77deb01ca6dbc",
+    "src/main/resources/assets/blacklight/sounds.json": "c8935b95c8fe5ace33203ae272cfd3f67a1b529bef1c5f534ee57e5c55db9105",
+    "src/main/resources/assets/blacklight/lang/zh_cn.json": "98d74deb77b2c6f877cf177e0d4567fbb3cc2e8f1023a0b891942cbf5f506beb",
+    "src/main/resources/assets/blacklight/lang/en_us.json": "2f94dab76c0b5410bb8306e9fddfc1e6472e643d6cf2ed975922251921990980",
+    "src/main/resources/assets/blacklight/sounds/hydra/death_roar_1.ogg": "3c4dbbd7398844836216080c669f32dd12aae98a35e80a8f74858b5dde9822d4",
+    "src/main/resources/assets/blacklight/sounds/hydra/death_roar_2.ogg": "02826f405bb9234c2986d67647703abdf995f6d860d79e824bf4d44a23eb824d",
+    "src/main/resources/assets/blacklight/sounds/hydra/death_roar_3.ogg": "48f51ffa796928f2629bd6f7d8377e94d3b7c6b9b6ccd7f19778f632daecbdaa",
+    "src/main/resources/assets/blacklight/sounds/hydra/death_debris_loop.ogg": "7bb282ffdfb0f3c727626f175582f81c41a80fbc26ced64300d4f9cd99a72396",
+    "src/main/resources/assets/blacklight/sounds/infection/swing_1.ogg": "b7996345083f9e01306b43d22727f2ec3a6212b15b5d6114f5adf96695cd786b",
+    "src/main/resources/assets/blacklight/sounds/infection/swing_2.ogg": "ac00d4cddc487d262853c5596c0c80491773569aaccd0398cdd92289e4d1ff42",
+    "src/main/resources/assets/blacklight/sounds/infection/swing_3.ogg": "b3d860b9e0f9a92a59c414cf564390f9f201f6b3106e4bd8c1771540034c1b47",
+    "art/creature-audio/hydra-death-authored-20261117.json": "62e4c1c2bf3594fe23db43e65a2771063de3c4a7bd6b10ad418ed2caa5033da6",
+    "art/creature-audio/hydra-death-LICENSE.md": "89c032f416ef4e7095e5929045558c83fdde2de8fb72be1d2a7ae0c2ec1ac5b2",
+    "tools/build_hydra_death_audio.py": "9076c60b0ae5e00ec54137a51bbc8639e05fb6d0938f38df805edd3771a9ba64",
+    "tools/record_hydra_death_audio.py": "2f116a421c2d04c827611462c8a5da87afff5bc90ac139d5fef475bb6b7b3ead",
+    "tools/player-fix-unit.init.gradle": "ddaec86b0c4524c6a856db90d12184d1c89e93969ad05663040017110271e9b1"
+  }
+}

@@ -10,14 +10,32 @@ public final class FirearmsCombat {
     /** Damage policy is checked on the parent after picking: friendly bodies still stop a bullet. */
     public static boolean bulletCandidate(LivingEntity owner,Entity entity){
         if(entity==owner||entity.isRemoved()||!entity.isPickable())return false;
+        if(entity instanceof com.codex.blacklight.entity.BlackwatchHelicopter craft)return craft.health()>0;
         var target=com.codex.blacklight.combat.CombatTargeting.resolveTarget(entity);
         return target!=null&&target!=owner&&target.isAlive()&&!target.isRemoved()
                 &&(entity!=target||com.codex.blacklight.combat.AnimatedHurtBody.of(target)==null
                     ||!com.codex.blacklight.combat.CombatTargeting.multipart(target));
     }
     public static EntityHitResult firstBulletBody(ServerLevel level,LivingEntity owner,Vec3 from,Vec3 to){
+        return firstBulletBody(level,owner,owner,from,to,e->true);
+    }
+    public static EntityHitResult firstBulletBody(ServerLevel level,LivingEntity owner,Entity emitter,Vec3 from,Vec3 to,java.util.function.Predicate<Entity> allowed){
+        return firstSurface(level,emitter,from,to,e->e!=owner.getRootVehicle()&&allowed.test(e)&&bulletCandidate(owner,e));
+    }
+    public static EntityHitResult firstSurface(ServerLevel level,Entity emitter,Vec3 from,Vec3 to,java.util.function.Predicate<Entity> allowed){
         var query=new AABB(from,to).inflate(.3);
-        return ProjectileUtil.getEntityHitResult(level,owner,from,to,query,e->bulletCandidate(owner,e));
+        var nearest=ProjectileUtil.getEntityHitResult(level,emitter,from,to,query,
+                e->!(e instanceof com.codex.blacklight.entity.BlackwatchHelicopter)&&allowed.test(e));
+        double distance=nearest==null?Double.POSITIVE_INFINITY:from.distanceToSqr(nearest.getLocation());
+        for(var craft:level.getEntitiesOfClass(com.codex.blacklight.entity.BlackwatchHelicopter.class,query,
+                c->c!=emitter&&allowed.test(c))){
+            var point=com.codex.blacklight.military.aircraft.HelicopterSkinContact.raycast(craft,from,to);
+            if(point.isPresent()&&from.distanceToSqr(point.get())<distance){
+                nearest=new EntityHitResult(craft,point.get());
+                distance=from.distanceToSqr(point.get());
+            }
+        }
+        return nearest;
     }
     public static boolean holdingFirearm(LivingEntity owner){return owner!=null&&(owner.getMainHandItem().getItem() instanceof FirearmItem||owner.getOffhandItem().getItem() instanceof FirearmItem);}
     public static boolean protectedTarget(LivingEntity owner,LivingEntity target){
@@ -40,6 +58,9 @@ public final class FirearmsCombat {
             if(hit!=null){
                 Vec3 rayEnd=end;
                 end=hit.getLocation();
+                if(hit.getEntity() instanceof com.codex.blacklight.entity.BlackwatchHelicopter craft
+                        &&!com.codex.blacklight.military.vehicle.VehicleDamageBridge.protectedAircraft(owner,craft))
+                    craft.hurtAt(owner.damageSources().mobProjectile(owner,owner),definition.damage()*scale,end);
                 var target=com.codex.blacklight.combat.CombatTargeting.resolveTarget(hit.getEntity());
                 if(target!=null&&!protectedTarget(owner,target)
                         &&(!(owner instanceof Player attacker)||!(target instanceof Player playerTarget)
@@ -59,7 +80,9 @@ public final class FirearmsCombat {
                 }
             }
             if(hit==null&&wall.getType()==HitResult.Type.BLOCK)FirearmBlockDamage.bullet(owner,definition,wall);
-            visualEnd=end;impact=hit!=null?2:wall.getType()==HitResult.Type.BLOCK?1:0;
+            visualEnd=end;
+            if(hit!=null)impact=hit.getEntity() instanceof com.codex.blacklight.entity.BlackwatchHelicopter?3:2;
+            else if(wall.getType()==HitResult.Type.BLOCK)impact=1;
             if(impact==1)normal=Vec3.atLowerCornerOf(wall.getDirection().getNormal());
         }
         GunplayEffects.shot(owner,definition,GunplayEffects.muzzle(owner,direction),visualEnd,impact,normal);

@@ -1,0 +1,149 @@
+{
+  "auditPath": "D:\\PrototypeReference\\p1\\private\\uav\\audio-audit.json",
+  "auditSha256": "f6b890d82b3efe52d007de0a89a2bec9b5ab575a47df4cb1c5f28fecbb15cca9",
+  "samples": [
+    {
+      "name": "uav_alerted",
+      "seconds": 2.466,
+      "sampleRate": 48000,
+      "pcmSha256": "4f8a474b69d2a51dea07d9be618b08d3d27934097e007b80a5d18682abcb0d9c",
+      "crossCheckRoundingLSB": 10
+    },
+    {
+      "name": "uav_idle_01",
+      "seconds": 1.5473333333333332,
+      "sampleRate": 48000,
+      "pcmSha256": "3b3c74b2d3e5b5114ebc8f64ecfa8749716fd18c5202924eb2b40527e4a2a8e0",
+      "crossCheckRoundingLSB": 9
+    },
+    {
+      "name": "uav_seeing_01",
+      "seconds": 1.0246666666666666,
+      "sampleRate": 48000,
+      "pcmSha256": "c1bba5072332b59116633bff30502023922684d3bb44fce912210197258b3f95",
+      "crossCheckRoundingLSB": 11
+    },
+    {
+      "name": "uav_start_scan",
+      "seconds": 0.53,
+      "sampleRate": 48000,
+      "pcmSha256": "be7d3e21a324b7d3ec793103d5c11924caaeb9512de7a2316701f5762b721cd3",
+      "crossCheckRoundingLSB": 11
+    }
+  ],
+  "method": "RADP private decoder checked against vgmstream 6802153 layout and an independent FFmpeg RAD decode. Shift/add versus multiply rounding differs by at most 11 int16 LSB; multiply variant matches FFmpeg exactly. No subjective listening review claimed.",
+  "runtime": "Four source state roles now mapped to authored runtime cues; native loop channel/lifecycle checks passed in both loaders. Source-identical timbre and subjective listening remain unverified.",
+  "stateAudit": {
+    "audit": "D:\\PrototypeReference\\p1\\uav-audio-state-source.json",
+    "sha256": "9c85ce6a8c794b9137accdcc81c4245fbb0033377c3551a199c67c6eb49dc6de",
+    "sourceAudioSha256": "6c1a48ddb61fe61242ee9c5f308f6cc870e0a85a5e46da7e700a78b90a062493",
+    "sourceFigAuditSha256": "e5335f093e72d0f48a9e48cdd6ab327e0947c1cf2db8f46ee1e61c60a2b768d5",
+    "patchLoopFields": [
+      {
+        "patch": "UAV_alert",
+        "chunkOffset": 167458,
+        "loopBooleanByteOffset": 167704,
+        "loop": false,
+        "rawBooleanByte": 0
+      },
+      {
+        "patch": "UAV_idle",
+        "chunkOffset": 168238,
+        "loopBooleanByteOffset": 168483,
+        "loop": true,
+        "rawBooleanByte": 1
+      },
+      {
+        "patch": "UAV_seeing",
+        "chunkOffset": 169014,
+        "loopBooleanByteOffset": 169261,
+        "loop": true,
+        "rawBooleanByte": 1
+      },
+      {
+        "patch": "UAV_servotalk",
+        "chunkOffset": 169794,
+        "loopBooleanByteOffset": 170044,
+        "loop": false,
+        "rawBooleanByte": 0
+      }
+    ],
+    "tracks": [
+      {
+        "owner": "apache/opening/uav/#fbe03cce39b07a82/alert",
+        "offset": 25328,
+        "patch": "UAV_alert",
+        "trigger": "play",
+        "polledLifetime": false,
+        "timeBegin": 0,
+        "pitch": [
+          1,
+          1
+        ]
+      },
+      {
+        "owner": "apache/opening/uav/#fbe03cce39b07a82/alert",
+        "offset": 25420,
+        "patch": "UAV_idle",
+        "trigger": "play",
+        "polledLifetime": true,
+        "timeBegin": 0,
+        "pitch": [
+          1,
+          1
+        ]
+      },
+      {
+        "owner": "apache/opening/uav/#fbe03cce39b07a82/#920f4e626fa8456f",
+        "offset": 26840,
+        "patch": "UAV_servotalk",
+        "trigger": "play",
+        "polledLifetime": false,
+        "timeBegin": 0,
+        "pitch": [
+          1,
+          1
+        ]
+      },
+      {
+        "owner": "apache/opening/uav/#fbe03cce39b07a82/#920f4e626fa8456f",
+        "offset": 26932,
+        "patch": "UAV_seeing",
+        "trigger": "play",
+        "polledLifetime": true,
+        "timeBegin": 0,
+        "pitch": [
+          1,
+          1
+        ]
+      },
+      {
+        "owner": "apache/opening/uav/#fbe03cce39b07a82/idle",
+        "offset": 28244,
+        "patch": "UAV_idle",
+        "trigger": "play",
+        "polledLifetime": true,
+        "timeBegin": 0,
+        "pitch": [
+          1,
+          1
+        ]
+      }
+    ],
+    "mapping": {
+      "idle": [
+        "UAV_idle loop"
+      ],
+      "seeing": [
+        "UAV_servotalk entry",
+        "UAV_seeing loop"
+      ],
+      "alert": [
+        "UAV_alert entry",
+        "UAV_idle loop"
+      ]
+    },
+    "scope": "Direct fields and track roles, not engine-level detection state timing. Entry clips are non-polled; loop flag separately checked against each Patch Bool property byte."
+  },
+  "validation": "art/military2/uav-audio-validation.json"
+}

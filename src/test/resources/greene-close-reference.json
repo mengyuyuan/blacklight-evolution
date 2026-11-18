@@ -1,0 +1,216 @@
+{
+  "sourceSha256": "f67e081a7497191554de61995bdb75fad58cfca1cb53adeb9bd0b15ef8b97df6",
+  "method": "Direct native source matrices including parent scale compensation; before presentation multiplier.",
+  "fixtures": [
+    {
+      "clip": "close_left",
+      "frame": 0,
+      "joint": "Slug_02_Spine_5",
+      "localOffset": [
+        -2,
+        0,
+        0
+      ],
+      "pointModelBlocks": [
+        -0.6100138316968233,
+        4.183979952911578,
+        -0.3372255337412449
+      ]
+    },
+    {
+      "clip": "close_left",
+      "frame": 15,
+      "joint": "Slug_02_Spine_5",
+      "localOffset": [
+        -2,
+        0,
+        0
+      ],
+      "pointModelBlocks": [
+        -1.7308408287303623,
+        2.428693555049813,
+        -0.5421067146139
+      ]
+    },
+    {
+      "clip": "close_left",
+      "frame": 30,
+      "joint": "Slug_02_Spine_5",
+      "localOffset": [
+        -2,
+        0,
+        0
+      ],
+      "pointModelBlocks": [
+        -3.8267491809597454,
+        2.3532469446832924,
+        0.04704000518455442
+      ]
+    },
+    {
+      "clip": "close_left",
+      "frame": 34,
+      "joint": "Slug_02_Spine_5",
+      "localOffset": [
+        -2,
+        0,
+        0
+      ],
+      "pointModelBlocks": [
+        -2.633847427308313,
+        3.3446879004778918,
+        1.2470243355027795
+      ]
+    },
+    {
+      "clip": "close_left",
+      "frame": 39,
+      "joint": "Slug_02_Spine_5",
+      "localOffset": [
+        -2,
+        0,
+        0
+      ],
+      "pointModelBlocks": [
+        -1.956717096880162,
+        0.25299622174696745,
+        -4.723034951225697
+      ]
+    },
+    {
+      "clip": "close_left",
+      "frame": 50,
+      "joint": "Slug_02_Spine_5",
+      "localOffset": [
+        -2,
+        0,
+        0
+      ],
+      "pointModelBlocks": [
+        -2.58316682625912,
+        1.3249448168897489,
+        -2.696938245134835
+      ]
+    },
+    {
+      "clip": "close_left",
+      "frame": 75,
+      "joint": "Slug_02_Spine_5",
+      "localOffset": [
+        -2,
+        0,
+        0
+      ],
+      "pointModelBlocks": [
+        -0.6100138316968233,
+        4.183979952911578,
+        -0.3372255337412449
+      ]
+    },
+    {
+      "clip": "close_right",
+      "frame": 0,
+      "joint": "Slug_01_Spine_5",
+      "localOffset": [
+        -2,
+        0,
+        0
+      ],
+      "pointModelBlocks": [
+        0.007897277686368942,
+        2.939966427616972,
+        -0.8122505399170044
+      ]
+    },
+    {
+      "clip": "close_right",
+      "frame": 15,
+      "joint": "Slug_01_Spine_5",
+      "localOffset": [
+        -2,
+        0,
+        0
+      ],
+      "pointModelBlocks": [
+        0.47704107648866256,
+        2.215348153072111,
+        -0.8754125541645981
+      ]
+    },
+    {
+      "clip": "close_right",
+      "frame": 30,
+      "joint": "Slug_01_Spine_5",
+      "localOffset": [
+        -2,
+        0,
+        0
+      ],
+      "pointModelBlocks": [
+        3.227136857361778,
+        2.485285114988209,
+        0.7204258596224198
+      ]
+    },
+    {
+      "clip": "close_right",
+      "frame": 34,
+      "joint": "Slug_01_Spine_5",
+      "localOffset": [
+        -2,
+        0,
+        0
+      ],
+      "pointModelBlocks": [
+        1.2111135637702084,
+        2.4387429607081588,
+        1.8194720472183799
+      ]
+    },
+    {
+      "clip": "close_right",
+      "frame": 39,
+      "joint": "Slug_01_Spine_5",
+      "localOffset": [
+        -2,
+        0,
+        0
+      ],
+      "pointModelBlocks": [
+        -0.00828109722056558,
+        1.344383851951586,
+        -2.993095640358247
+      ]
+    },
+    {
+      "clip": "close_right",
+      "frame": 50,
+      "joint": "Slug_01_Spine_5",
+      "localOffset": [
+        -2,
+        0,
+        0
+      ],
+      "pointModelBlocks": [
+        2.3833580460495774,
+        3.3051074399140496,
+        -2.7048981795322167
+      ]
+    },
+    {
+      "clip": "close_right",
+      "frame": 75,
+      "joint": "Slug_01_Spine_5",
+      "localOffset": [
+        -2,
+        0,
+        0
+      ],
+      "pointModelBlocks": [
+        0.007897277686368942,
+        2.939966427616972,
+        -0.8122505399170044
+      ]
+    }
+  ]
+}

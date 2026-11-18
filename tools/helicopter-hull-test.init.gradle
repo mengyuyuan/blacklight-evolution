@@ -1,0 +1,12 @@
+allprojects { afterEvaluate {
+    if (project.hasProperty('airHullVehicleRegression')) {
+        sourceSets.main.java.srcDir('src/vehicleTest/java')
+        sourceSets.main.java.exclude { item -> item.path.startsWith('com/codex/blacklight/gametest/vehicle/') && !['MilitaryVehicleGameTest.java','VehicleTestReadiness.java','VehicleProjectileHullGameTest.java','VehiclePermissionGameTest.java','VehicleFireGameTest.java'].contains(item.file.name) }
+        sourceSets.main.resources.srcDir('src/blackwatchTest/resources')
+    } else {
+        sourceSets.main.java.srcDir('src/helicopterTest/java')
+        sourceSets.main.resources.srcDir('src/helicopterTest/resources')
+    }
+    tasks.named('test',Test).configure { include '**/Helicopter*Test.class'; include '**/VehicleControlAuthorityTest.class' }
+    tasks.withType(Jar).configureEach { doFirst {throw new GradleException('QA cannot produce a release JAR')} }
+} }

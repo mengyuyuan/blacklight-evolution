@@ -28,8 +28,12 @@ public abstract class BiomassEntityRenderMixin {
             var source=tissue==null?base:com.codex.blacklight.client.renderer.NativeInfectionVisuals.buffers(base);
             var owner=entity instanceof LivingEntity?BiomassSystem.claimant(entity):null;
             if(owner==null){
-                original.call(renderer,entity,yaw,partial,stack,source,light);
-                if(tissue!=null)com.codex.blacklight.client.renderer.InfectedMorphology.flush((LivingEntity)entity,source);
+                try(var physics=com.codex.blacklight.client.renderer.AdaptiveRagdoll.begin(entity,stack,source,partial)){
+                    var output=physics==null?source:physics.buffers();
+                    original.call(renderer,entity,yaw,partial,stack,output,light);
+                    if(tissue!=null)com.codex.blacklight.client.renderer.InfectedMorphology.flush((LivingEntity)entity,output);
+                    if(physics!=null)physics.finish();
+                }
                 return;
             }
                 float progress=BiomassSystem.state(owner).progress(entity.level().getGameTime()+partial,com.codex.blacklight.power.ConsumeProgression.absorbTicks(owner));

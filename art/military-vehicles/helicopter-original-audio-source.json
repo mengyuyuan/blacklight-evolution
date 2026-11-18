@@ -1,0 +1,1537 @@
+{
+  "schemaVersion": 2,
+  "date": "2026-11-17",
+  "status": "Source binary parsing and DLL disassembly complete for the five normal Helicopters voice roles. Five-layer authored-Foley mixer implemented in both ports. Static review and asset encoding only; no compilation, unit/GameTests, client, native execution or media playback.",
+  "engine": {
+    "path": "D:/PrototypeReference/p1/input/prototypeenginef.dll",
+    "sha256": "8cba8da3412df4f49cd61d02445e87a0cda551dea4f2fc1e66b19c1bfe28a760",
+    "rtti": ".?AVSoundPlayerHelicopter@proto@@",
+    "vtable": "0x10e0bfb4",
+    "constructor": "0x104a6590",
+    "destructor": "0x104a5e50",
+    "configuration": "0x104a73a0",
+    "trigger": "0x104a67b0",
+    "update": "0x104a6e30",
+    "stopAll": "0x104a6b20",
+    "smoothing": "0x104a5f60"
+  },
+  "roles": [
+    {
+      "name": "startup_sound",
+      "nameInitialization": "0x10d5cba5",
+      "nameGlobal": "0x1126c718",
+      "voiceHandleOffset": "0x14",
+      "assignment": "0x104a797d..0x104a79b0"
+    },
+    {
+      "name": "rotor_sound",
+      "nameInitialization": "0x10d5cc05",
+      "nameGlobal": "0x1126c6e8",
+      "voiceHandleOffset": "0x0c",
+      "assignment": "0x104a79c2..0x104a79f2"
+    },
+    {
+      "name": "engine_sound",
+      "nameInitialization": "0x10d5cc65",
+      "nameGlobal": "0x1126c658",
+      "voiceHandleOffset": "0x1c",
+      "assignment": "0x104a7a2d..0x104a7a52"
+    },
+    {
+      "name": "jet_sound",
+      "nameInitialization": "0x10d5ccc5",
+      "nameGlobal": "0x1126c6e0",
+      "voiceHandleOffset": "0x18",
+      "assignment": "0x104a7a6c..0x104a7a91"
+    },
+    {
+      "name": "winddown_sound",
+      "nameInitialization": "0x10d5cd25",
+      "nameGlobal": "0x1126c728",
+      "voiceHandleOffset": "0x10",
+      "assignment": "0x104a7aae..0x104a7ad3"
+    }
+  ],
+  "otherHandles": {
+    "rotorDamage": {
+      "voiceHandleOffset": "0x20",
+      "fileProperty": "rotor_damage_file",
+      "enableByte": "+0x49"
+    },
+    "alarmDamage": {
+      "voiceHandleOffset": "0x24",
+      "fileProperty": "alarm_damage_file",
+      "enableByte": "+0x4a"
+    },
+    "scope": "Named files, volumes and default false flags are resolved. Source damage-threshold producer is not resolved, so these layers are not added to gameplay in this batch."
+  },
+  "pitchControls": {
+    "rotor": {
+      "value": "velocity",
+      "valueOffset": "0x30",
+      "curveProperty": "velocity_pitch_map",
+      "curveOffset": "0x4c",
+      "smoothedOffset": "0x28",
+      "smoothUpProperty": "velocity_smooth_up",
+      "smoothUpOffset": "0x38",
+      "smoothDownProperty": "velocity_smooth_down",
+      "smoothDownOffset": "0x3c",
+      "updateRange": "0x104a6ed2..0x104a6f67"
+    },
+    "engine": {
+      "value": "throttle",
+      "valueOffset": "0x34",
+      "curveProperty": "throttle_pitch_map",
+      "curveOffset": "0x50",
+      "smoothedOffset": "0x2c",
+      "smoothUpProperty": "throttle_smooth_up",
+      "smoothUpOffset": "0x40",
+      "smoothDownProperty": "throttle_smooth_down",
+      "smoothDownOffset": "0x44",
+      "updateRange": "0x104a6e33..0x104a6ecd"
+    },
+    "scope": "0x104a6e30 sends normalized control values through the distinct curves, using input range [0,1] and output range [.5,2], then changes pitch linearly by dt/smooth_ms towards the target. Both profiles have 3500 ms rise and 7500 ms fall. The original vehicle producer normalization is not inferred; Minecraft uses the documented actual-motion adapter below.",
+    "curveEvaluator": {
+      "wrapper": "0x1086ce30",
+      "getEnvelope": "0x104a3a90",
+      "evaluate": "0x1086c830",
+      "formula": "pitch = 0.5 + 1.5 * piecewiseLinearEnvelopeY(clamp(input,0,1))",
+      "initialSmoothedPitch": 0.5,
+      "initializationEvidence": "0x104a6590, fields +0x28/+0x2c; const 0x10d93cc4"
+    },
+    "smoothingFormula": "For increasing target, min(target,current+dt_ms/3500); for decreasing target, max(target,current-dt_ms/7500). 0x104a5f60 has a near-zero-duration direct assignment, unused by these profiles."
+  },
+  "triggerLifecycle": {
+    "play": {
+      "nameInitialization": "0x10d5cb10",
+      "nameGlobal": "0x1126c738",
+      "evidence": "0x104a67cd sets active byte +48, starts +14/+18/+0c/+1c and conditionally +20/+24."
+    },
+    "stop": {
+      "nameInitialization": "0x10d5cb70",
+      "nameGlobal": "0x1126c698",
+      "evidence": "0x104a68fe clears active byte +48, stops +1c/+14/+18/+0c/+20/+24, starts +10 winddown."
+    },
+    "winddown": {
+      "nameInitialization": "0x10d5cb40",
+      "nameGlobal": "0x1126c638",
+      "evidence": "0x104a6a41..0x104a6a61 calls 0x104a6450 to set voice +0x10 fade-out to 1000 ms, then 0x104a3b20 to play it. This separate command does not clear +0x48 like stop. The MC power edge uses stop semantics; it does not invent a separate winddown trigger."
+    }
+  },
+  "serializedFigSoundTracks": [
+    {
+      "source": "uav/PermanentCharactersPackage_fig.p3d.rz",
+      "offset": 29328,
+      "payload": 29340,
+      "length": 72,
+      "type": "Sound",
+      "kind": "TrackHash",
+      "owner": "apache/sound/#f582c8016487a000",
+      "fields": {
+        "Unknown1": 0,
+        "TimeBegin": 0,
+        "Patch": {
+          "hash": "1484446424304228745",
+          "name": "#1499d02870c09989"
+        },
+        "Trigger": {
+          "hash": "31616665440155042",
+          "name": "play"
+        },
+        "VolumeFactor": 1,
+        "MinDistance": 0,
+        "MaxDistance": 0,
+        "MinPitch": 1,
+        "MaxPitch": 1,
+        "CyclicPhase": 0,
+        "InstanceName": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "Frequency": 1,
+        "PolledLifetime": false,
+        "TriggerType": {
+          "hash": "13522664087197083521",
+          "name": "Retrigger"
+        }
+      },
+      "schema": "SoundTrack",
+      "end": 29420
+    },
+    {
+      "source": "uav/PermanentCharactersPackage_fig.p3d.rz",
+      "offset": 29420,
+      "payload": 29432,
+      "length": 72,
+      "type": "Sound",
+      "kind": "TrackHash",
+      "owner": "apache/sound/#f582c8016487a000",
+      "fields": {
+        "Unknown1": 0,
+        "TimeBegin": 0,
+        "Patch": {
+          "hash": "18403988920887264044",
+          "name": "#ff681a6a3fb5c32c"
+        },
+        "Trigger": {
+          "hash": "31616665440155042",
+          "name": "play"
+        },
+        "VolumeFactor": 1,
+        "MinDistance": 0,
+        "MaxDistance": 0,
+        "MinPitch": 1,
+        "MaxPitch": 1,
+        "CyclicPhase": 0,
+        "InstanceName": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "Frequency": 1,
+        "PolledLifetime": false,
+        "TriggerType": {
+          "hash": "13522664087197083521",
+          "name": "Retrigger"
+        }
+      },
+      "schema": "SoundTrack",
+      "end": 29512
+    },
+    {
+      "source": "uav/PermanentCharactersPackage_fig.p3d.rz",
+      "offset": 29512,
+      "payload": 29524,
+      "length": 72,
+      "type": "Sound",
+      "kind": "TrackHash",
+      "owner": "apache/sound/#f582c8016487a000",
+      "fields": {
+        "Unknown1": 0,
+        "TimeBegin": 0,
+        "Patch": {
+          "hash": "1484446424304294486",
+          "name": "#1499d02870c19a56"
+        },
+        "Trigger": {
+          "hash": "31616665440155042",
+          "name": "play"
+        },
+        "VolumeFactor": 1,
+        "MinDistance": 0,
+        "MaxDistance": 0,
+        "MinPitch": 1,
+        "MaxPitch": 1,
+        "CyclicPhase": 0,
+        "InstanceName": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "Frequency": 1,
+        "PolledLifetime": false,
+        "TriggerType": {
+          "hash": "13522664087197083521",
+          "name": "Retrigger"
+        }
+      },
+      "schema": "SoundTrack",
+      "end": 29604
+    },
+    {
+      "source": "uav/PermanentCharactersPackage_fig.p3d.rz",
+      "offset": 29684,
+      "payload": 29696,
+      "length": 72,
+      "type": "Sound",
+      "kind": "TrackHash",
+      "owner": "apache/sound/#33309cdf5d68619e",
+      "fields": {
+        "Unknown1": 0,
+        "TimeBegin": 0,
+        "Patch": {
+          "hash": "18403988920887264044",
+          "name": "#ff681a6a3fb5c32c"
+        },
+        "Trigger": {
+          "hash": "32462977145219048",
+          "name": "stop"
+        },
+        "VolumeFactor": 1,
+        "MinDistance": 0,
+        "MaxDistance": 0,
+        "MinPitch": 1,
+        "MaxPitch": 1,
+        "CyclicPhase": 0,
+        "InstanceName": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "Frequency": 1,
+        "PolledLifetime": false,
+        "TriggerType": {
+          "hash": "13522664087197083521",
+          "name": "Retrigger"
+        }
+      },
+      "schema": "SoundTrack",
+      "end": 29776
+    },
+    {
+      "source": "uav/PermanentCharactersPackage_fig.p3d.rz",
+      "offset": 29776,
+      "payload": 29788,
+      "length": 72,
+      "type": "Sound",
+      "kind": "TrackHash",
+      "owner": "apache/sound/#33309cdf5d68619e",
+      "fields": {
+        "Unknown1": 0,
+        "TimeBegin": 0,
+        "Patch": {
+          "hash": "16285766894087489241",
+          "name": "#e202aab458e6c6d9"
+        },
+        "Trigger": {
+          "hash": "31616665440155042",
+          "name": "play"
+        },
+        "VolumeFactor": 1,
+        "MinDistance": 0,
+        "MaxDistance": 0,
+        "MinPitch": 1,
+        "MaxPitch": 1,
+        "CyclicPhase": 0,
+        "InstanceName": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "Frequency": 1,
+        "PolledLifetime": false,
+        "TriggerType": {
+          "hash": "13522664087197083521",
+          "name": "Retrigger"
+        }
+      },
+      "schema": "SoundTrack",
+      "end": 29868
+    },
+    {
+      "source": "uav/PermanentCharactersPackage_fig.p3d.rz",
+      "offset": 29868,
+      "payload": 29880,
+      "length": 72,
+      "type": "Sound",
+      "kind": "TrackHash",
+      "owner": "apache/sound/#33309cdf5d68619e",
+      "fields": {
+        "Unknown1": 0,
+        "TimeBegin": 0,
+        "Patch": {
+          "hash": "1484446424304294486",
+          "name": "#1499d02870c19a56"
+        },
+        "Trigger": {
+          "hash": "32462977145219048",
+          "name": "stop"
+        },
+        "VolumeFactor": 1,
+        "MinDistance": 0,
+        "MaxDistance": 0,
+        "MinPitch": 1,
+        "MaxPitch": 1,
+        "CyclicPhase": 0,
+        "InstanceName": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "Frequency": 1,
+        "PolledLifetime": false,
+        "TriggerType": {
+          "hash": "13522664087197083521",
+          "name": "Retrigger"
+        }
+      },
+      "schema": "SoundTrack",
+      "end": 29960
+    }
+  ],
+  "figSource": {
+    "path": "D:/PrototypeReference/p1/helicopter-fig-complete.json",
+    "sha256": "a6821f8fbaac919704d2c158873e65d643db7cfea7bf1a557bb8c8c7dc3e71d7",
+    "interpretation": "apache/sound has six explicit play/stop tracks with unresolved branch labels and four distinct patch hashes. These historical FIG tracks remain separate from the directly resolved blackhawk/apache engine profiles; no engine cue or waveform identity is inferred from the unresolved hash."
+  },
+  "privateDisassemblyEvidence": {
+    "private/rapid-refs-10e0bfb4.txt": "09881642df5eef7875a2b7c6f05682d7eaa9a1a818adaac501529190928052f4",
+    "private/rapid-runtime-104a73a0.txt": "7f6bf055d262a7c38992560f131cb11b050a12309c50f97ffad4cd8b1666befd",
+    "private/rapid-runtime-104a67b0.txt": "5bfdb3ef3b42467fc14a87fb02dcc48c0692eca9b39a1414d445f82d638fab11",
+    "private/rapid-runtime-104a6e30.txt": "2a6d39a18b194209c12a76a5e049f5f4be1cc365e53c5ad2a2169ff366c3e27b",
+    "private/rapid-runtime-104a5f60.txt": "ca024774ddba183fe430b9545e4b337308de44e9942a5b77b204f3e5d441b25a",
+    "private/rapid-runtime-104a6b20.txt": "c7b9979fb52f14e9dc8fd528ba6c20b022b058633afc5d54521dec3f7face838",
+    "private/rapid-refs-1126c738.txt": "f7fb89088b1774c6f949e3986a5a80f5633bc25cf03d136ec01e8c0e46419b13",
+    "private/rapid-refs-1126c698.txt": "38457404f59b4f8098624fe3a860591faf05af88f6c3e43fda50351e69aa2932",
+    "private/rapid-refs-1126c638.txt": "05c329382e22b166ece2e7d880d103fb0d0121a33ba16c1a3b11231b81389112",
+    "private/rapid-runtime-104a5df0.txt": "8ddcbfe387ef4c2a3361d8ad46d0a6d36f1a3fa8ff63366052b3b44ec5b8312b",
+    "private/rapid-runtime-1086ce30.txt": "51b8e03c5467b60d00b3600288eaea14fbbbc64d722acfe6872724596783e60e",
+    "private/rapid-runtime-1086c830.txt": "2fe0f2b07fc657867dec5cc7f069fd0bbb0824c636d39b533d2411c3a8d9a630",
+    "private/rapid-runtime-104a3a90.txt": "cb9fe71ab423e9f7ce98acae0eb2f9b0a387bf5e3c4e650de1da0d456339e02d",
+    "private/rapid-runtime-104a6400.txt": "1510c6101058addcc4f5384df6670df6c4093d9344124c2966e946e2da6b86c9",
+    "private/rapid-runtime-104a6ca0.txt": "5c7ca333b0d30a2a6312104febc331029a4eeb8a928d6348ab467917c8af9797",
+    "private/rapid-runtime-104a6450.txt": "781e6172c9244fe505ad24e616e174bbb5b435ea9f1e654535cef606cf9bf396",
+    "private/rapid-runtime-104a3b20.txt": "44e579362af73ea4bca2ef4217346bb057d232d98ea602365d4e37d598369194"
+  },
+  "currentMinecraft": {
+    "selectedProfile": "Blackhawk: the existing transport is based on heli_bh_marine; Apache constants are retained separately and not substituted into the transport mix.",
+    "layers": {
+      "rotor": "existing project-authored helicopter_rotor loop, source rotor balance and velocity pitch map",
+      "engine": "existing project-authored helicopter_turbine loop, source engine balance and throttle pitch map",
+      "jet": "new authored helicopter_jet loop, source jet balance, pitch 1",
+      "startup": "new authored helicopter_startup one-shot, source role duration and volume 1",
+      "winddown": "new authored helicopter_winddown one-shot, source role duration and volume 1"
+    },
+    "actualMotionAdapter": {
+      "producer": "BlackwatchHelicopter server tick finally block, including early-return pilot/combat paths",
+      "powered": "health > 0, phase is neither IDLE nor CRASH",
+      "velocity": "clamp(length(completedPositionDelta) / HelicopterFlight.MAX_SPEED (.65),0,1)",
+      "throttle": "clamp(max(velocity,length(appliedVelocityDelta)/HelicopterFlight.ACCELERATION (.035),max(0,completedPositionDelta.y)/.35),0,1) * synchronized rotor",
+      "quantization": "Round both controls to 1/255 before syncing two new float entity-data fields. These are audio-only values; they do not affect flight or player input.",
+      "boundary": "MC has no turbine/collective solver. Speed, acceleration and positive climb load are an explicit adapter, not a claim of recovered original input units; target distance is never used."
+    },
+    "lifecycle": [
+      "Create at most four groups within 96 blocks; evict beyond 100, removal, silence or world change.",
+      "Three running loops share one mixer update per unpaused client tick. Entering range of an already fully spun-up craft does not replay startup.",
+      "Power edges replace the transition one-shot. On stop the loop gain fades to zero while the winddown one-shot can finish.",
+      "Stopped/reloaded loops can restart without replaying ignition. A bounded one-shot lifetime permits cleanup after resource reload or muted audio."
+    ],
+    "adaptations": [
+      "Linear fade envelope, 50 ms unpaused tick time, 96-block vanilla attenuation, four concurrent groups and two synced/quantized controls are MC policies.",
+      "Source min/max attenuation 35/285, reverb .5 and bus routing are retained as evidence, not represented as exact Minecraft acoustics.",
+      "All shipped waves are project-authored Foley. Original RADP data stays private and is never decoded, copied or relabeled as authored audio."
+    ],
+    "foleyRecord": "art/military-vehicles/helicopter-source-layer-foley.json"
+  },
+  "sourceAudioPackages": [
+    {
+      "original": "E:/虐杀原形/Prototype-1/Prototype/audio/helicopters_global.p3d",
+      "local": "D:\\CodexCache\\work\\p1-helicopter-audio\\helicopters_global.p3d",
+      "bytes": 1179293,
+      "sha256": "b043fd4026ea5aa3e6889b4c8c69fff9322a14df47e97ab97f7ba24e5448b670"
+    },
+    {
+      "original": "E:/虐杀原形/Prototype-1/Prototype/audio/heli_bh_marine.p3d",
+      "local": "D:\\CodexCache\\work\\p1-helicopter-audio\\heli_bh_marine.p3d",
+      "bytes": 1163156,
+      "sha256": "e2a3d3e2573dd43214b7b869262c81d4c96e8caa0b3114e12847100e0464cb40"
+    },
+    {
+      "original": "E:/虐杀原形/Prototype-1/Prototype/audio/heli_gunship_marine.p3d",
+      "local": "D:\\CodexCache\\work\\p1-helicopter-audio\\heli_gunship_marine.p3d",
+      "bytes": 1184560,
+      "sha256": "ae32d11071b49cd629742e28aacaf1a072a1ec7767695492446d337dae09fca7"
+    }
+  ],
+  "metadataReader": {
+    "tool": "tools/inspect_helicopter_audio_source.py",
+    "privateReport": "D:\\CodexCache\\work\\p1-helicopter-audio\\decoded-metadata.json",
+    "privateReportSha256": "76d4f8974939591e4c6618a689396aad59cfd8244cbbcc22852772133271fd3a",
+    "format": "Patch typed properties are consumed to the exact chunk end; explicit ASCII names must equal uint64 hash = (hash * 65599) XOR next character. AudioFile RADP frame counts are metadata only: 20 bytes/channel encode 32 frames. No original PCM is decoded/exported."
+  },
+  "resolvedProfiles": [
+    {
+      "source": "heli_bh_marine.p3d",
+      "sourceSha256": "e2a3d3e2573dd43214b7b869262c81d4c96e8caa0b3114e12847100e0464cb40",
+      "kind": "Patch",
+      "name": "blackhawk",
+      "hash": "4578699032500184694",
+      "chunkOffset": 1157112,
+      "version": 1,
+      "player": "Helicopters",
+      "flags": 0,
+      "properties": {
+        "max": 285.0,
+        "min": 35.0,
+        "pos": [
+          1.6666669845581055,
+          0.0,
+          1.6666669845581055
+        ],
+        "vel": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "loop": true,
+        "rotor_sound": [
+          "blackhawk_rotor_loop"
+        ],
+        "winddown_sound": [
+          "apache_wind_down_temp"
+        ],
+        "startup_sound": [
+          "apache_startup_temp"
+        ],
+        "engine_sound": [
+          "pure_engine_diesel_stereo_loop"
+        ],
+        "jet_sound": [
+          "apache_jet_engine_02"
+        ],
+        "velocity": 1.0,
+        "throttle": 1.0,
+        "startup_winddown_volume": 1.0,
+        "engine_volume": 0.6607149839401245,
+        "jet_volume": 0.4464290142059326,
+        "rotors_volume": 0.773809015750885,
+        "busses": [
+          "heli",
+          "master",
+          "sfx"
+        ],
+        "velocity_pitch_map": [
+          [
+            0.0,
+            0.27941200137138367
+          ],
+          [
+            1.0,
+            0.4558820128440857
+          ]
+        ],
+        "throttle_pitch_map": [
+          [
+            0.0,
+            0.18181799352169037
+          ],
+          [
+            1.0,
+            0.39772701263427734
+          ]
+        ],
+        "xfade_ms": 2500.0,
+        "group": "loop_high",
+        "throttle_smooth_up": 3500.0,
+        "velocity_smooth_up": 3500.0,
+        "throttle_smooth_down": 7500.0,
+        "velocity_smooth_down": 7500.0,
+        "reverb_send": 0.5,
+        "rotor_damage_file": "heli_engine_trouble_01",
+        "alarm_damage_file": "heli_engine_trouble_03",
+        "alarm_damage_vol": 1.0,
+        "rotor_damage_vol": 1.0,
+        "rotor_damage": false,
+        "alarm_damage": false,
+        "disabled": false
+      },
+      "propertyEvidence": {
+        "max": {
+          "type": "Float32",
+          "valueByteOffset": 1157224
+        },
+        "min": {
+          "type": "Float32",
+          "valueByteOffset": 1157266
+        },
+        "pos": {
+          "type": "Vector",
+          "valueByteOffset": 1157307
+        },
+        "vel": {
+          "type": "Vector",
+          "valueByteOffset": 1157356
+        },
+        "loop": {
+          "type": "Bool",
+          "valueByteOffset": 1157404
+        },
+        "rotor_sound": {
+          "type": "String List",
+          "valueByteOffset": 1157455
+        },
+        "winddown_sound": {
+          "type": "String List",
+          "valueByteOffset": 1157537
+        },
+        "startup_sound": {
+          "type": "String List",
+          "valueByteOffset": 1157619
+        },
+        "engine_sound": {
+          "type": "String List",
+          "valueByteOffset": 1157698
+        },
+        "jet_sound": {
+          "type": "String List",
+          "valueByteOffset": 1157785
+        },
+        "velocity": {
+          "type": "Float32",
+          "valueByteOffset": 1157857
+        },
+        "throttle": {
+          "type": "Float32",
+          "valueByteOffset": 1157904
+        },
+        "startup_winddown_volume": {
+          "type": "Float32",
+          "valueByteOffset": 1157966
+        },
+        "engine_volume": {
+          "type": "Float32",
+          "valueByteOffset": 1158018
+        },
+        "jet_volume": {
+          "type": "Float32",
+          "valueByteOffset": 1158067
+        },
+        "rotors_volume": {
+          "type": "Float32",
+          "valueByteOffset": 1158119
+        },
+        "busses": {
+          "type": "String List",
+          "valueByteOffset": 1158168
+        },
+        "velocity_pitch_map": {
+          "type": "EnvelopeData",
+          "valueByteOffset": 1158258
+        },
+        "throttle_pitch_map": {
+          "type": "EnvelopeData",
+          "valueByteOffset": 1158336
+        },
+        "xfade_ms": {
+          "type": "Float32",
+          "valueByteOffset": 1158399
+        },
+        "group": {
+          "type": "String",
+          "valueByteOffset": 1158442
+        },
+        "throttle_smooth_up": {
+          "type": "Float32",
+          "valueByteOffset": 1158509
+        },
+        "velocity_smooth_up": {
+          "type": "Float32",
+          "valueByteOffset": 1158566
+        },
+        "throttle_smooth_down": {
+          "type": "Float32",
+          "valueByteOffset": 1158625
+        },
+        "velocity_smooth_down": {
+          "type": "Float32",
+          "valueByteOffset": 1158684
+        },
+        "reverb_send": {
+          "type": "Float32",
+          "valueByteOffset": 1158734
+        },
+        "rotor_damage_file": {
+          "type": "String",
+          "valueByteOffset": 1158789
+        },
+        "alarm_damage_file": {
+          "type": "String",
+          "valueByteOffset": 1158867
+        },
+        "alarm_damage_vol": {
+          "type": "Float32",
+          "valueByteOffset": 1158945
+        },
+        "rotor_damage_vol": {
+          "type": "Float32",
+          "valueByteOffset": 1159000
+        },
+        "rotor_damage": {
+          "type": "Bool",
+          "valueByteOffset": 1159048
+        },
+        "alarm_damage": {
+          "type": "Bool",
+          "valueByteOffset": 1159093
+        },
+        "disabled": {
+          "type": "Bool",
+          "valueByteOffset": 1159134
+        }
+      },
+      "runtimePitchEndpoints": {
+        "rotor": [
+          0.9191180020570755,
+          1.1838230192661285
+        ],
+        "engine": [
+          0.7727269902825356,
+          1.096590518951416
+        ]
+      },
+      "linkedAudioMetadata": {
+        "rotor_sound": [
+          {
+            "source": "heli_bh_marine.p3d",
+            "kind": "AudioFile",
+            "name": "blackhawk_rotor_loop",
+            "hash": "8674651860521132332",
+            "chunkOffset": 827943,
+            "version": 2,
+            "alias": "blackhawk_rotor_loop",
+            "codec": "RADP",
+            "channels": 1,
+            "sampleRate": 44100,
+            "sampleFrames": 128768,
+            "seconds": 2.919909297052154,
+            "encodedSha256": "e69eba29aa1a56ffe3b71a5ae8ba7d09c9b1883dcc0762890232eae6afcca53e"
+          }
+        ],
+        "engine_sound": [
+          {
+            "source": "heli_bh_marine.p3d",
+            "kind": "AudioFile",
+            "name": "pure_engine_diesel_stereo_loop",
+            "hash": "8111135693047230308",
+            "chunkOffset": 1072348,
+            "version": 2,
+            "alias": "pure_engine_diesel_stereo_loop",
+            "codec": "RADP",
+            "channels": 1,
+            "sampleRate": 44100,
+            "sampleFrames": 130880,
+            "seconds": 2.967800453514739,
+            "encodedSha256": "620e976d42ccd6c9252ff744386d0a3f732709ea8133a20677eed6700b97dc71"
+          },
+          {
+            "source": "heli_gunship_marine.p3d",
+            "kind": "AudioFile",
+            "name": "pure_engine_diesel_stereo_loop",
+            "hash": "8111135693047230308",
+            "chunkOffset": 1098948,
+            "version": 2,
+            "alias": "pure_engine_diesel_stereo_loop",
+            "codec": "RADP",
+            "channels": 1,
+            "sampleRate": 44100,
+            "sampleFrames": 130880,
+            "seconds": 2.967800453514739,
+            "encodedSha256": "620e976d42ccd6c9252ff744386d0a3f732709ea8133a20677eed6700b97dc71"
+          }
+        ],
+        "jet_sound": [
+          {
+            "source": "heli_bh_marine.p3d",
+            "kind": "AudioFile",
+            "name": "apache_jet_engine_02",
+            "hash": "9214451460269033012",
+            "chunkOffset": 12,
+            "version": 2,
+            "alias": "apache_jet_engine_02",
+            "codec": "RADP",
+            "channels": 1,
+            "sampleRate": 48000,
+            "sampleFrames": 172096,
+            "seconds": 3.5853333333333333,
+            "encodedSha256": "978039a56000e54f0f7290ff908cb2a88a756f1db07be9048c4dc545cf83c516"
+          },
+          {
+            "source": "heli_gunship_marine.p3d",
+            "kind": "AudioFile",
+            "name": "apache_jet_engine_02",
+            "hash": "9214451460269033012",
+            "chunkOffset": 12,
+            "version": 2,
+            "alias": "apache_jet_engine_02",
+            "codec": "RADP",
+            "channels": 1,
+            "sampleRate": 48000,
+            "sampleFrames": 172096,
+            "seconds": 3.5853333333333333,
+            "encodedSha256": "978039a56000e54f0f7290ff908cb2a88a756f1db07be9048c4dc545cf83c516"
+          }
+        ],
+        "startup_sound": [
+          {
+            "source": "heli_bh_marine.p3d",
+            "kind": "AudioFile",
+            "name": "apache_startup_temp",
+            "hash": "4163186438338240209",
+            "chunkOffset": 107689,
+            "version": 2,
+            "alias": "apache_startup_temp",
+            "codec": "RADP",
+            "channels": 1,
+            "sampleRate": 44100,
+            "sampleFrames": 605184,
+            "seconds": 13.722993197278912,
+            "encodedSha256": "cb90b2ae5749436ef4fbf9ae8698eab85d2c0b2486a3e694409cdca7af184327"
+          },
+          {
+            "source": "heli_gunship_marine.p3d",
+            "kind": "AudioFile",
+            "name": "apache_startup_temp",
+            "hash": "4163186438338240209",
+            "chunkOffset": 215366,
+            "version": 2,
+            "alias": "apache_startup_temp",
+            "codec": "RADP",
+            "channels": 1,
+            "sampleRate": 44100,
+            "sampleFrames": 605184,
+            "seconds": 13.722993197278912,
+            "encodedSha256": "cb90b2ae5749436ef4fbf9ae8698eab85d2c0b2486a3e694409cdca7af184327"
+          }
+        ],
+        "winddown_sound": [
+          {
+            "source": "heli_bh_marine.p3d",
+            "kind": "AudioFile",
+            "name": "apache_wind_down_temp",
+            "hash": "35447753520657499",
+            "chunkOffset": 486044,
+            "version": 2,
+            "alias": "apache_wind_down_temp",
+            "codec": "RADP",
+            "channels": 1,
+            "sampleRate": 44100,
+            "sampleFrames": 546848,
+            "seconds": 12.400181405895692,
+            "encodedSha256": "7647eb2699df4e3f3733796b50057961a572c4a09334177925ce91d8bf42cbc2"
+          },
+          {
+            "source": "heli_gunship_marine.p3d",
+            "kind": "AudioFile",
+            "name": "apache_wind_down_temp",
+            "hash": "35447753520657499",
+            "chunkOffset": 593721,
+            "version": 2,
+            "alias": "apache_wind_down_temp",
+            "codec": "RADP",
+            "channels": 1,
+            "sampleRate": 44100,
+            "sampleFrames": 546848,
+            "seconds": 12.400181405895692,
+            "encodedSha256": "7647eb2699df4e3f3733796b50057961a572c4a09334177925ce91d8bf42cbc2"
+          }
+        ],
+        "rotor_damage_file": [
+          {
+            "source": "helicopters_global.p3d",
+            "kind": "AudioFile",
+            "name": "heli_engine_trouble_01",
+            "hash": "16510755967374400993",
+            "chunkOffset": 262028,
+            "version": 2,
+            "alias": "heli_engine_trouble_01",
+            "codec": "RADP",
+            "channels": 1,
+            "sampleRate": 48000,
+            "sampleFrames": 75008,
+            "seconds": 1.5626666666666666,
+            "encodedSha256": "7cb079d7cf1327ab8c235af24333099741dd44663fe6dc49247b343eda703905"
+          },
+          {
+            "source": "heli_bh_marine.p3d",
+            "kind": "AudioFile",
+            "name": "heli_engine_trouble_01",
+            "hash": "16510755967374400993",
+            "chunkOffset": 908540,
+            "version": 2,
+            "alias": "heli_engine_trouble_01",
+            "codec": "RADP",
+            "channels": 1,
+            "sampleRate": 48000,
+            "sampleFrames": 75008,
+            "seconds": 1.5626666666666666,
+            "encodedSha256": "7cb079d7cf1327ab8c235af24333099741dd44663fe6dc49247b343eda703905"
+          },
+          {
+            "source": "heli_gunship_marine.p3d",
+            "kind": "AudioFile",
+            "name": "heli_engine_trouble_01",
+            "hash": "16510755967374400993",
+            "chunkOffset": 935620,
+            "version": 2,
+            "alias": "heli_engine_trouble_01",
+            "codec": "RADP",
+            "channels": 1,
+            "sampleRate": 48000,
+            "sampleFrames": 75008,
+            "seconds": 1.5626666666666666,
+            "encodedSha256": "7cb079d7cf1327ab8c235af24333099741dd44663fe6dc49247b343eda703905"
+          }
+        ],
+        "alarm_damage_file": [
+          {
+            "source": "helicopters_global.p3d",
+            "kind": "AudioFile",
+            "name": "heli_engine_trouble_03",
+            "hash": "16510755967374400995",
+            "chunkOffset": 309029,
+            "version": 2,
+            "alias": "heli_engine_trouble_03",
+            "codec": "RADP",
+            "channels": 1,
+            "sampleRate": 48000,
+            "sampleFrames": 94432,
+            "seconds": 1.9673333333333334,
+            "encodedSha256": "73b672881cdff6963842c093136258a4082eb07bba6b7b2d68999658bd891940"
+          },
+          {
+            "source": "heli_bh_marine.p3d",
+            "kind": "AudioFile",
+            "name": "heli_engine_trouble_03",
+            "hash": "16510755967374400995",
+            "chunkOffset": 955541,
+            "version": 2,
+            "alias": "heli_engine_trouble_03",
+            "codec": "RADP",
+            "channels": 1,
+            "sampleRate": 48000,
+            "sampleFrames": 94432,
+            "seconds": 1.9673333333333334,
+            "encodedSha256": "73b672881cdff6963842c093136258a4082eb07bba6b7b2d68999658bd891940"
+          },
+          {
+            "source": "heli_gunship_marine.p3d",
+            "kind": "AudioFile",
+            "name": "heli_engine_trouble_03",
+            "hash": "16510755967374400995",
+            "chunkOffset": 982621,
+            "version": 2,
+            "alias": "heli_engine_trouble_03",
+            "codec": "RADP",
+            "channels": 1,
+            "sampleRate": 48000,
+            "sampleFrames": 94432,
+            "seconds": 1.9673333333333334,
+            "encodedSha256": "73b672881cdff6963842c093136258a4082eb07bba6b7b2d68999658bd891940"
+          }
+        ]
+      }
+    },
+    {
+      "source": "heli_gunship_marine.p3d",
+      "sourceSha256": "ae32d11071b49cd629742e28aacaf1a072a1ec7767695492446d337dae09fca7",
+      "kind": "Patch",
+      "name": "apache",
+      "hash": "11407210809716012286",
+      "chunkOffset": 1180885,
+      "version": 1,
+      "player": "Helicopters",
+      "flags": 0,
+      "properties": {
+        "max": 285.0,
+        "min": 35.0,
+        "pos": [
+          1.6666669845581055,
+          0.0,
+          1.6666669845581055
+        ],
+        "vel": [
+          1.6666669845581055,
+          0.0,
+          1.6666669845581055
+        ],
+        "loop": true,
+        "rotor_sound": [
+          "apache_rotor_loop_02"
+        ],
+        "winddown_sound": [
+          "apache_wind_down_temp"
+        ],
+        "startup_sound": [
+          "apache_startup_temp"
+        ],
+        "engine_sound": [
+          "pure_engine_diesel_stereo_loop"
+        ],
+        "jet_sound": [
+          "apache_jet_engine_02"
+        ],
+        "velocity": 0.0,
+        "throttle": 0.0,
+        "startup_winddown_volume": 1.0,
+        "engine_volume": 0.2976189851760864,
+        "jet_volume": 0.25,
+        "rotors_volume": 0.75,
+        "busses": [
+          "master",
+          "heli",
+          "sfx"
+        ],
+        "velocity_pitch_map": [
+          [
+            0.0,
+            0.27941200137138367
+          ],
+          [
+            1.0,
+            0.4264709949493408
+          ]
+        ],
+        "throttle_pitch_map": [
+          [
+            0.0,
+            0.2045450061559677
+          ],
+          [
+            1.0,
+            0.3295449912548065
+          ]
+        ],
+        "xfade_ms": 5000.0,
+        "group": "loop_high",
+        "throttle_smooth_up": 3500.0,
+        "velocity_smooth_up": 3500.0,
+        "throttle_smooth_down": 7500.0,
+        "velocity_smooth_down": 7500.0,
+        "reverb_send": 0.5,
+        "rotor_damage_file": "heli_engine_trouble_01",
+        "alarm_damage_file": "heli_engine_trouble_03",
+        "alarm_damage_vol": 1.0,
+        "rotor_damage_vol": 1.0,
+        "rotor_damage": false,
+        "alarm_damage": false,
+        "disabled": false
+      },
+      "propertyEvidence": {
+        "max": {
+          "type": "Float32",
+          "valueByteOffset": 1180994
+        },
+        "min": {
+          "type": "Float32",
+          "valueByteOffset": 1181036
+        },
+        "pos": {
+          "type": "Vector",
+          "valueByteOffset": 1181077
+        },
+        "vel": {
+          "type": "Vector",
+          "valueByteOffset": 1181126
+        },
+        "loop": {
+          "type": "Bool",
+          "valueByteOffset": 1181174
+        },
+        "rotor_sound": {
+          "type": "String List",
+          "valueByteOffset": 1181225
+        },
+        "winddown_sound": {
+          "type": "String List",
+          "valueByteOffset": 1181307
+        },
+        "startup_sound": {
+          "type": "String List",
+          "valueByteOffset": 1181389
+        },
+        "engine_sound": {
+          "type": "String List",
+          "valueByteOffset": 1181468
+        },
+        "jet_sound": {
+          "type": "String List",
+          "valueByteOffset": 1181555
+        },
+        "velocity": {
+          "type": "Float32",
+          "valueByteOffset": 1181627
+        },
+        "throttle": {
+          "type": "Float32",
+          "valueByteOffset": 1181674
+        },
+        "startup_winddown_volume": {
+          "type": "Float32",
+          "valueByteOffset": 1181736
+        },
+        "engine_volume": {
+          "type": "Float32",
+          "valueByteOffset": 1181788
+        },
+        "jet_volume": {
+          "type": "Float32",
+          "valueByteOffset": 1181837
+        },
+        "rotors_volume": {
+          "type": "Float32",
+          "valueByteOffset": 1181889
+        },
+        "busses": {
+          "type": "String List",
+          "valueByteOffset": 1181938
+        },
+        "velocity_pitch_map": {
+          "type": "EnvelopeData",
+          "valueByteOffset": 1182028
+        },
+        "throttle_pitch_map": {
+          "type": "EnvelopeData",
+          "valueByteOffset": 1182106
+        },
+        "xfade_ms": {
+          "type": "Float32",
+          "valueByteOffset": 1182169
+        },
+        "group": {
+          "type": "String",
+          "valueByteOffset": 1182212
+        },
+        "throttle_smooth_up": {
+          "type": "Float32",
+          "valueByteOffset": 1182279
+        },
+        "velocity_smooth_up": {
+          "type": "Float32",
+          "valueByteOffset": 1182336
+        },
+        "throttle_smooth_down": {
+          "type": "Float32",
+          "valueByteOffset": 1182395
+        },
+        "velocity_smooth_down": {
+          "type": "Float32",
+          "valueByteOffset": 1182454
+        },
+        "reverb_send": {
+          "type": "Float32",
+          "valueByteOffset": 1182504
+        },
+        "rotor_damage_file": {
+          "type": "String",
+          "valueByteOffset": 1182559
+        },
+        "alarm_damage_file": {
+          "type": "String",
+          "valueByteOffset": 1182637
+        },
+        "alarm_damage_vol": {
+          "type": "Float32",
+          "valueByteOffset": 1182715
+        },
+        "rotor_damage_vol": {
+          "type": "Float32",
+          "valueByteOffset": 1182770
+        },
+        "rotor_damage": {
+          "type": "Bool",
+          "valueByteOffset": 1182818
+        },
+        "alarm_damage": {
+          "type": "Bool",
+          "valueByteOffset": 1182863
+        },
+        "disabled": {
+          "type": "Bool",
+          "valueByteOffset": 1182904
+        }
+      },
+      "runtimePitchEndpoints": {
+        "rotor": [
+          0.9191180020570755,
+          1.1397064924240112
+        ],
+        "engine": [
+          0.8068175092339516,
+          0.9943174868822098
+        ]
+      },
+      "linkedAudioMetadata": {
+        "rotor_sound": [
+          {
+            "source": "heli_gunship_marine.p3d",
+            "kind": "AudioFile",
+            "name": "apache_rotor_loop_02",
+            "hash": "7658951911859705969",
+            "chunkOffset": 107689,
+            "version": 2,
+            "alias": "apache_rotor_loop_02",
+            "codec": "RADP",
+            "channels": 1,
+            "sampleRate": 48000,
+            "sampleFrames": 172096,
+            "seconds": 3.5853333333333333,
+            "encodedSha256": "f3e5627554ef6f795cec92ecbd5ff21ffb29c9799b32e7fcf4bca1bd7f955c17"
+          }
+        ],
+        "engine_sound": [
+          {
+            "source": "heli_bh_marine.p3d",
+            "kind": "AudioFile",
+            "name": "pure_engine_diesel_stereo_loop",
+            "hash": "8111135693047230308",
+            "chunkOffset": 1072348,
+            "version": 2,
+            "alias": "pure_engine_diesel_stereo_loop",
+            "codec": "RADP",
+            "channels": 1,
+            "sampleRate": 44100,
+            "sampleFrames": 130880,
+            "seconds": 2.967800453514739,
+            "encodedSha256": "620e976d42ccd6c9252ff744386d0a3f732709ea8133a20677eed6700b97dc71"
+          },
+          {
+            "source": "heli_gunship_marine.p3d",
+            "kind": "AudioFile",
+            "name": "pure_engine_diesel_stereo_loop",
+            "hash": "8111135693047230308",
+            "chunkOffset": 1098948,
+            "version": 2,
+            "alias": "pure_engine_diesel_stereo_loop",
+            "codec": "RADP",
+            "channels": 1,
+            "sampleRate": 44100,
+            "sampleFrames": 130880,
+            "seconds": 2.967800453514739,
+            "encodedSha256": "620e976d42ccd6c9252ff744386d0a3f732709ea8133a20677eed6700b97dc71"
+          }
+        ],
+        "jet_sound": [
+          {
+            "source": "heli_bh_marine.p3d",
+            "kind": "AudioFile",
+            "name": "apache_jet_engine_02",
+            "hash": "9214451460269033012",
+            "chunkOffset": 12,
+            "version": 2,
+            "alias": "apache_jet_engine_02",
+            "codec": "RADP",
+            "channels": 1,
+            "sampleRate": 48000,
+            "sampleFrames": 172096,
+            "seconds": 3.5853333333333333,
+            "encodedSha256": "978039a56000e54f0f7290ff908cb2a88a756f1db07be9048c4dc545cf83c516"
+          },
+          {
+            "source": "heli_gunship_marine.p3d",
+            "kind": "AudioFile",
+            "name": "apache_jet_engine_02",
+            "hash": "9214451460269033012",
+            "chunkOffset": 12,
+            "version": 2,
+            "alias": "apache_jet_engine_02",
+            "codec": "RADP",
+            "channels": 1,
+            "sampleRate": 48000,
+            "sampleFrames": 172096,
+            "seconds": 3.5853333333333333,
+            "encodedSha256": "978039a56000e54f0f7290ff908cb2a88a756f1db07be9048c4dc545cf83c516"
+          }
+        ],
+        "startup_sound": [
+          {
+            "source": "heli_bh_marine.p3d",
+            "kind": "AudioFile",
+            "name": "apache_startup_temp",
+            "hash": "4163186438338240209",
+            "chunkOffset": 107689,
+            "version": 2,
+            "alias": "apache_startup_temp",
+            "codec": "RADP",
+            "channels": 1,
+            "sampleRate": 44100,
+            "sampleFrames": 605184,
+            "seconds": 13.722993197278912,
+            "encodedSha256": "cb90b2ae5749436ef4fbf9ae8698eab85d2c0b2486a3e694409cdca7af184327"
+          },
+          {
+            "source": "heli_gunship_marine.p3d",
+            "kind": "AudioFile",
+            "name": "apache_startup_temp",
+            "hash": "4163186438338240209",
+            "chunkOffset": 215366,
+            "version": 2,
+            "alias": "apache_startup_temp",
+            "codec": "RADP",
+            "channels": 1,
+            "sampleRate": 44100,
+            "sampleFrames": 605184,
+            "seconds": 13.722993197278912,
+            "encodedSha256": "cb90b2ae5749436ef4fbf9ae8698eab85d2c0b2486a3e694409cdca7af184327"
+          }
+        ],
+        "winddown_sound": [
+          {
+            "source": "heli_bh_marine.p3d",
+            "kind": "AudioFile",
+            "name": "apache_wind_down_temp",
+            "hash": "35447753520657499",
+            "chunkOffset": 486044,
+            "version": 2,
+            "alias": "apache_wind_down_temp",
+            "codec": "RADP",
+            "channels": 1,
+            "sampleRate": 44100,
+            "sampleFrames": 546848,
+            "seconds": 12.400181405895692,
+            "encodedSha256": "7647eb2699df4e3f3733796b50057961a572c4a09334177925ce91d8bf42cbc2"
+          },
+          {
+            "source": "heli_gunship_marine.p3d",
+            "kind": "AudioFile",
+            "name": "apache_wind_down_temp",
+            "hash": "35447753520657499",
+            "chunkOffset": 593721,
+            "version": 2,
+            "alias": "apache_wind_down_temp",
+            "codec": "RADP",
+            "channels": 1,
+            "sampleRate": 44100,
+            "sampleFrames": 546848,
+            "seconds": 12.400181405895692,
+            "encodedSha256": "7647eb2699df4e3f3733796b50057961a572c4a09334177925ce91d8bf42cbc2"
+          }
+        ],
+        "rotor_damage_file": [
+          {
+            "source": "helicopters_global.p3d",
+            "kind": "AudioFile",
+            "name": "heli_engine_trouble_01",
+            "hash": "16510755967374400993",
+            "chunkOffset": 262028,
+            "version": 2,
+            "alias": "heli_engine_trouble_01",
+            "codec": "RADP",
+            "channels": 1,
+            "sampleRate": 48000,
+            "sampleFrames": 75008,
+            "seconds": 1.5626666666666666,
+            "encodedSha256": "7cb079d7cf1327ab8c235af24333099741dd44663fe6dc49247b343eda703905"
+          },
+          {
+            "source": "heli_bh_marine.p3d",
+            "kind": "AudioFile",
+            "name": "heli_engine_trouble_01",
+            "hash": "16510755967374400993",
+            "chunkOffset": 908540,
+            "version": 2,
+            "alias": "heli_engine_trouble_01",
+            "codec": "RADP",
+            "channels": 1,
+            "sampleRate": 48000,
+            "sampleFrames": 75008,
+            "seconds": 1.5626666666666666,
+            "encodedSha256": "7cb079d7cf1327ab8c235af24333099741dd44663fe6dc49247b343eda703905"
+          },
+          {
+            "source": "heli_gunship_marine.p3d",
+            "kind": "AudioFile",
+            "name": "heli_engine_trouble_01",
+            "hash": "16510755967374400993",
+            "chunkOffset": 935620,
+            "version": 2,
+            "alias": "heli_engine_trouble_01",
+            "codec": "RADP",
+            "channels": 1,
+            "sampleRate": 48000,
+            "sampleFrames": 75008,
+            "seconds": 1.5626666666666666,
+            "encodedSha256": "7cb079d7cf1327ab8c235af24333099741dd44663fe6dc49247b343eda703905"
+          }
+        ],
+        "alarm_damage_file": [
+          {
+            "source": "helicopters_global.p3d",
+            "kind": "AudioFile",
+            "name": "heli_engine_trouble_03",
+            "hash": "16510755967374400995",
+            "chunkOffset": 309029,
+            "version": 2,
+            "alias": "heli_engine_trouble_03",
+            "codec": "RADP",
+            "channels": 1,
+            "sampleRate": 48000,
+            "sampleFrames": 94432,
+            "seconds": 1.9673333333333334,
+            "encodedSha256": "73b672881cdff6963842c093136258a4082eb07bba6b7b2d68999658bd891940"
+          },
+          {
+            "source": "heli_bh_marine.p3d",
+            "kind": "AudioFile",
+            "name": "heli_engine_trouble_03",
+            "hash": "16510755967374400995",
+            "chunkOffset": 955541,
+            "version": 2,
+            "alias": "heli_engine_trouble_03",
+            "codec": "RADP",
+            "channels": 1,
+            "sampleRate": 48000,
+            "sampleFrames": 94432,
+            "seconds": 1.9673333333333334,
+            "encodedSha256": "73b672881cdff6963842c093136258a4082eb07bba6b7b2d68999658bd891940"
+          },
+          {
+            "source": "heli_gunship_marine.p3d",
+            "kind": "AudioFile",
+            "name": "heli_engine_trouble_03",
+            "hash": "16510755967374400995",
+            "chunkOffset": 982621,
+            "version": 2,
+            "alias": "heli_engine_trouble_03",
+            "codec": "RADP",
+            "channels": 1,
+            "sampleRate": 48000,
+            "sampleFrames": 94432,
+            "seconds": 1.9673333333333334,
+            "encodedSha256": "73b672881cdff6963842c093136258a4082eb07bba6b7b2d68999658bd891940"
+          }
+        ]
+      }
+    }
+  ],
+  "vehicleTodBindings": [
+    {
+      "source": "D:\\PrototypeReference\\p1\\input\\helicopter\\heli_bh_marine_tod.p3d.rz",
+      "sha256": "21db2dad1613856955e2c9d25e6aa2da86d7ee4be6fb0b19399ba43215070efe",
+      "inflatedPatchStringOffset": 12813,
+      "patch": "blackhawk",
+      "adjacentControls": [
+        "play",
+        "throttle",
+        "velocity",
+        "stop"
+      ],
+      "interpretation": "Exact vehicle TOD patch reference; this, not similar audio filenames, selects the profile."
+    },
+    {
+      "source": "D:\\PrototypeReference\\p1\\input\\helicopter\\heli_gunship_marine_core_tod.p3d.rz",
+      "sha256": "880d0a40db4b8665183c567ffb380d1d789937111ad5e55d061550b802da1624",
+      "inflatedPatchStringOffset": 6096,
+      "patch": "apache",
+      "adjacentControls": [
+        "play",
+        "throttle",
+        "velocity",
+        "stop"
+      ],
+      "interpretation": "Exact vehicle TOD patch reference; this, not similar audio filenames, selects the profile."
+    }
+  ],
+  "crossfade": {
+    "property": "xfade_ms",
+    "blackhawkMilliseconds": 2500,
+    "apacheMilliseconds": 5000,
+    "fadeInSetter": "0x104a6400 -> callback 0x1003914e",
+    "fadeOutSetter": "0x104a6ca0 -> callback 0x1001aa28",
+    "scope": "Source supplies durations to per-voice fades. The exact downstream voice envelope was not decoded; Minecraft uses a linear gain ramp over the source duration."
+  },
+  "remainingBoundaries": [
+    "Original rotor/alarm damage-control producer and source thresholds remain unresolved; no guessed damage layers added.",
+    "Runtime hearing, transitions, pause/resource reload, remote passenger views and loudness must be checked later under the user-deferred test pass.",
+    "Six unit scenarios are authored but unrun. Compilation and Minecraft/Forge API linkage remain unverified this batch.",
+    "Root integrator bumped protocols for the added audio entity metadata: Neo standalone-77-source-audio-pose; Forge forge-1.20.1-37-source-audio-pose."
+  ],
+  "implementationSnapshot": {
+    "blacklight-evolution": {
+      "src/main/java/com/codex/blacklight/military/aircraft/HelicopterAudioState.java": "30f49426a711997f738f62415bb7cccf2cc40573412efa1c350426634b9e4b69",
+      "src/main/java/com/codex/blacklight/client/vehicle/HelicopterAudio.java": "38d440b3b89b538fc24a2dd1477c6641cd556d6aa7cbc3506bcb1d3f4981349f",
+      "src/main/java/com/codex/blacklight/entity/BlackwatchHelicopter.java": "84a9f1a8e51a16b2094c26fe4c79fa2952b17172f34b181a928d78881e583b75",
+      "src/main/java/com/codex/blacklight/military/vehicle/VehicleSounds.java": "2a98959857bf7c7bf4a13dc5cb544f3b811fe515fc767ad4f218525e5d60450b",
+      "src/test/java/com/codex/blacklight/military/aircraft/HelicopterAudioStateTest.java": "70bbb6c4f18a41fb88c2b3d88292e08f6313e53f9844d86a087af382cfac4348",
+      "tools/inspect_helicopter_audio_source.py": "d09a15c009569a84482ee524a5fb7d3159520bf12aa5cf7df976ed3a6aad5d66",
+      "tools/build_helicopter_source_layers.py": "3199607b071b66a5702b0c7b6dfc494d2c4a589d98357a81df3c944d202c409e",
+      "src/main/resources/assets/blacklight/sounds.json": "671882ba3298eb4f882cc775452c67124f4197ccd343110c5961617ba5538af3",
+      "art/military-vehicles/helicopter-source-layer-foley.json": "1e1271eef759eb383d2a40b8ab6babd23e4a505ef6a803b0c64f1b81f517a934",
+      "src/main/resources/assets/blacklight/sounds/vehicles/helicopter_jet.ogg": "fd1e9ef37cfb6d48abdc0336601784adfde0c58895360c707fdfbb20f71249aa",
+      "src/main/resources/assets/blacklight/sounds/vehicles/helicopter_startup.ogg": "b28404cf65c50c124ec2ed41585a845fb3ca6698fd260701955d8817f9d2e0f5",
+      "src/main/resources/assets/blacklight/sounds/vehicles/helicopter_winddown.ogg": "3aec036a08cd04fd3281e8fa6f2fde895a13310046caeffec94b88a7da267d33"
+    },
+    "blacklight-evolution-forge-1.20.1": {
+      "src/main/java/com/codex/blacklight/military/aircraft/HelicopterAudioState.java": "30f49426a711997f738f62415bb7cccf2cc40573412efa1c350426634b9e4b69",
+      "src/main/java/com/codex/blacklight/client/vehicle/HelicopterAudio.java": "67ad0f25197780440c311c7432e7364271ed6060127b8813d93dc30ed403e1ee",
+      "src/main/java/com/codex/blacklight/entity/BlackwatchHelicopter.java": "cbfa3913adc93b4672ecf8e9ab296edc2a08f6f9fba8ab6a51446fc1a2214bdc",
+      "src/main/java/com/codex/blacklight/military/vehicle/VehicleSounds.java": "d99f10c9e0edc348e3a0fa21204a7383d7f739793fe459889503ec77fbcc9b12",
+      "src/test/java/com/codex/blacklight/military/aircraft/HelicopterAudioStateTest.java": "70bbb6c4f18a41fb88c2b3d88292e08f6313e53f9844d86a087af382cfac4348",
+      "tools/inspect_helicopter_audio_source.py": "d09a15c009569a84482ee524a5fb7d3159520bf12aa5cf7df976ed3a6aad5d66",
+      "tools/build_helicopter_source_layers.py": "3199607b071b66a5702b0c7b6dfc494d2c4a589d98357a81df3c944d202c409e",
+      "src/main/resources/assets/blacklight/sounds.json": "671882ba3298eb4f882cc775452c67124f4197ccd343110c5961617ba5538af3",
+      "art/military-vehicles/helicopter-source-layer-foley.json": "1e1271eef759eb383d2a40b8ab6babd23e4a505ef6a803b0c64f1b81f517a934",
+      "src/main/resources/assets/blacklight/sounds/vehicles/helicopter_jet.ogg": "fd1e9ef37cfb6d48abdc0336601784adfde0c58895360c707fdfbb20f71249aa",
+      "src/main/resources/assets/blacklight/sounds/vehicles/helicopter_startup.ogg": "b28404cf65c50c124ec2ed41585a845fb3ca6698fd260701955d8817f9d2e0f5",
+      "src/main/resources/assets/blacklight/sounds/vehicles/helicopter_winddown.ogg": "3aec036a08cd04fd3281e8fa6f2fde895a13310046caeffec94b88a7da267d33"
+    }
+  },
+  "staticValidation": {
+    "pythonSyntax": [
+      "blacklight-evolution/tools/inspect_helicopter_audio_source.py",
+      "blacklight-evolution/tools/build_helicopter_source_layers.py",
+      "blacklight-evolution-forge-1.20.1/tools/inspect_helicopter_audio_source.py",
+      "blacklight-evolution-forge-1.20.1/tools/build_helicopter_source_layers.py"
+    ],
+    "oggHeaders": [
+      {
+        "repository": "blacklight-evolution",
+        "cue": "jet",
+        "pages": 6,
+        "channels": 1,
+        "sampleRate": 44100,
+        "finalGranule": 158113,
+        "seconds": 3.585328798185941,
+        "scope": "Container bytes only; no decode or playback."
+      },
+      {
+        "repository": "blacklight-evolution",
+        "cue": "startup",
+        "pages": 16,
+        "channels": 1,
+        "sampleRate": 44100,
+        "finalGranule": 605184,
+        "seconds": 13.722993197278912,
+        "scope": "Container bytes only; no decode or playback."
+      },
+      {
+        "repository": "blacklight-evolution",
+        "cue": "winddown",
+        "pages": 15,
+        "channels": 1,
+        "sampleRate": 44100,
+        "finalGranule": 546848,
+        "seconds": 12.400181405895692,
+        "scope": "Container bytes only; no decode or playback."
+      },
+      {
+        "repository": "blacklight-evolution-forge-1.20.1",
+        "cue": "jet",
+        "pages": 6,
+        "channels": 1,
+        "sampleRate": 44100,
+        "finalGranule": 158113,
+        "seconds": 3.585328798185941,
+        "scope": "Container bytes only; no decode or playback."
+      },
+      {
+        "repository": "blacklight-evolution-forge-1.20.1",
+        "cue": "startup",
+        "pages": 16,
+        "channels": 1,
+        "sampleRate": 44100,
+        "finalGranule": 605184,
+        "seconds": 13.722993197278912,
+        "scope": "Container bytes only; no decode or playback."
+      },
+      {
+        "repository": "blacklight-evolution-forge-1.20.1",
+        "cue": "winddown",
+        "pages": 15,
+        "channels": 1,
+        "sampleRate": 44100,
+        "finalGranule": 546848,
+        "seconds": 12.400181405895692,
+        "scope": "Container bytes only; no decode or playback."
+      }
+    ],
+    "mirror": [
+      "src/main/java/com/codex/blacklight/military/aircraft/HelicopterAudioState.java",
+      "src/test/java/com/codex/blacklight/military/aircraft/HelicopterAudioStateTest.java",
+      "tools/inspect_helicopter_audio_source.py",
+      "tools/build_helicopter_source_layers.py",
+      "src/main/resources/assets/blacklight/sounds.json",
+      "art/military-vehicles/helicopter-source-layer-foley.json",
+      "src/main/resources/assets/blacklight/sounds/vehicles/helicopter_jet.ogg",
+      "src/main/resources/assets/blacklight/sounds/vehicles/helicopter_startup.ogg",
+      "src/main/resources/assets/blacklight/sounds/vehicles/helicopter_winddown.ogg"
+    ],
+    "diffWhitespace": "git diff --check over the owned file set reported no tracked whitespace errors in either repository. New authored text is also inspected for trailing whitespace.",
+    "platformAudioMixer": "HelicopterAudio is byte-equivalent after the known imports/event and Forge END-phase guard are normalized. No runtime invocation.",
+    "testsExecuted": false
+  }
+}

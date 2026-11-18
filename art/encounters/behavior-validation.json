@@ -1,0 +1,63 @@
+{
+  "date": "2026-11-14T08:32:15.143Z",
+  "revision": "species-tactics-r7",
+  "deferred": [
+    "alex_mercer"
+  ],
+  "suites": [
+    {
+      "platform": "neo",
+      "unit": 19,
+      "gameTests": 44,
+      "passed": true
+    },
+    {
+      "platform": "forge",
+      "unit": 19,
+      "gameTests": 44,
+      "passed": true
+    }
+  ],
+  "spawnEggs": 33,
+  "visual": {
+    "directory": "D:/CodexCache/encounter-qa/autonomous/",
+    "totalCapturedScenes": 15,
+    "totalCapturedFrames": 222,
+    "reviewedInScopeScenes": 12,
+    "reviewedInScopeFrames": 184,
+    "scenes": [
+      "juggernaut_p0",
+      "goliath_p0",
+      "elizabeth_greene_p0",
+      "roland_p0",
+      "archer_p0",
+      "galloway_p0",
+      "koenig_p0",
+      "captain_cross_p0",
+      "leader_hunter_p0",
+      "brawler_p0",
+      "flyer_p0",
+      "super_soldier_p0"
+    ],
+    "method": "Normal autonomous AI; no begin(), setTarget(), or forced pose. All captured frames reviewed in contact sheets. Summoners may damage via brood; later infection conversion is not counted as damage evidence.",
+    "limitations": "Not original-game frame equivalence; not every ability or phase visually covered. Alex draft excluded from delivery scope."
+  },
+  "code": [
+    {
+      "file": "entity/EncounterMob.java",
+      "sha256": "849b4b670c4ed34bf0141baad00806f793c007a42871d664ae6d66e6e0d691ff"
+    },
+    {
+      "file": "combat/EncounterTactics.java",
+      "sha256": "dc34daeb510ff763e4f934194e1efb68cef6050ad33274e513fc4090ce201605"
+    },
+    {
+      "file": "client/model/EncounterPose.java",
+      "sha256": "c64d829d3ed05bf0f39141f719e0f9477b653836dd46fe795ed1aa40a3ab8c37"
+    },
+    {
+      "file": "registry/EncounterEntities.java",
+      "sha256": "96f2566ebf6806f8bb85f2dfe377a960152544cdd02622bd5348a14ece025c2c"
+    }
+  ]
+}

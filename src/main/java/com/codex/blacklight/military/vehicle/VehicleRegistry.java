@@ -29,16 +29,23 @@ public final class VehicleRegistry {
             String id=faction.id()+"_"+chassis+"_chassis";
             ALL.put(id,ITEMS.register(id,()->new ChassisItem(new Item.Properties().stacksTo(1),faction,chassis)));
         }
-        for(String id:new String[]{"autocannon_round","tank_he_shell","tank_ap_shell","military_fuel_can","vehicle_repair_parts"})
-            ALL.put(id,ITEMS.register(id,()->new Item(new Item.Properties()) {
-                @Override public void appendHoverText(ItemStack stack,net.minecraft.world.level.Level context,List<Component> tooltip,TooltipFlag flag){
-                    super.appendHoverText(stack,context,tooltip,flag);tooltip.add(Component.translatable("tooltip.blacklight."+id));
-                }
-            }));
+        ALL.put("blackwatch_helicopter_chassis",ITEMS.register("blackwatch_helicopter_chassis",()->new com.codex.blacklight.military.aircraft.HelicopterChassisItem(new Item.Properties().stacksTo(1))));
+        for(String id:new String[]{"autocannon_round","tank_he_shell","tank_ap_shell","military_fuel_can","vehicle_repair_parts","helicopter_cannon_round","helicopter_hellfire_missile","helicopter_70mm_rocket"})
+            ALL.put(id,ITEMS.register(id,()->new SupplyItem(new Item.Properties(),id)));
         TABS.register("military_vehicles",()->CreativeModeTab.builder().title(Component.translatable("itemGroup.blacklight.military_vehicles"))
                 .icon(()->item("military_tank_chassis").getDefaultInstance()).displayItems((parameters,output)->ALL.forEach((id,value)->{if(!id.equals("military_fuel_can"))output.accept(value.get());})).build());
     }
     private VehicleRegistry(){}
+    /** Explicit logistics items keep normal use while Prototype combat owns empty hands. */
+    public static boolean isVehicleTool(ItemStack stack){return stack.getItem() instanceof ChassisItem
+            ||stack.getItem() instanceof com.codex.blacklight.military.aircraft.HelicopterChassisItem||stack.getItem() instanceof SupplyItem;}
+    public static final class SupplyItem extends Item {
+        private final String id;
+        SupplyItem(Properties properties,String id){super(properties);this.id=id;}
+        @Override public void appendHoverText(ItemStack stack,net.minecraft.world.level.Level context,List<Component> tooltip,TooltipFlag flag){
+            super.appendHoverText(stack,context,tooltip,flag);tooltip.add(Component.translatable("tooltip.blacklight."+id));
+        }
+    }
     public static Item item(String id){var value=ALL.get(id);if(value==null)throw new IllegalArgumentException("Unknown vehicle item: "+id);return value.get();}
     public static void register(IEventBus bus){ITEMS.register(bus);TABS.register(bus);}
     public static EntityType<? extends MilitaryVehicle> type(MilitaryFaction faction,String chassis){
@@ -87,10 +94,19 @@ public final class VehicleRegistry {
             if(context.getLevel().isClientSide)return InteractionResult.SUCCESS;
             if(!(context.getPlayer() instanceof net.minecraft.server.level.ServerPlayer player)||!player.isAlive()||player.isSpectator()
                     ||!player.mayBuild()||!context.getLevel().mayInteract(player,context.getClickedPos()))return InteractionResult.FAIL;
-            var at=context.getClickedPos().relative(context.getClickedFace());
+            var clicked=context.getClickedPos();
+            boolean replaceable=context.getLevel().getBlockState(clicked).canBeReplaced();
+            var at=replaceable?clicked:clicked.relative(context.getClickedFace());
+            double height=!replaceable&&context.getClickedFace()==net.minecraft.core.Direction.UP?context.getClickLocation().y:at.getY();
             var vehicle=type(faction,chassis).create(context.getLevel());if(vehicle==null)return InteractionResult.FAIL;
-            vehicle.setPos(at.getX()+.5,at.getY(),at.getZ()+.5);vehicle.setYRot(net.minecraft.util.Mth.wrapDegrees(-player.getYRot()));
-            if(!VehicleKinematics.placementReady(vehicle)){vehicle.discard();return InteractionResult.FAIL;}
+            vehicle.setPos(at.getX()+.5,height,at.getZ()+.5);vehicle.setYRot(net.minecraft.util.Mth.wrapDegrees(-player.getYRot()));
+            var placement=VehicleKinematics.settlePlacement(vehicle);
+            if(placement!=VehicleKinematics.StopReason.NONE){
+                vehicle.discard();
+                String reason=switch(placement){case WATER->"water";case UNSUPPORTED->"unsupported";case UNKNOWN_CHUNK->"unloaded";default->"blocked";};
+                player.displayClientMessage(Component.translatable("message.blacklight.vehicle_place_"+reason),true);
+                return InteractionResult.FAIL;
+            }
             vehicle.setPlayerOwner(player.getUUID());
             if(!context.getLevel().addFreshEntity(vehicle)){vehicle.discard();return InteractionResult.FAIL;}
             context.getItemInHand().shrink(1);return InteractionResult.CONSUME;

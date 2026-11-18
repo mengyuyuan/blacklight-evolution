@@ -1,0 +1,55 @@
+{
+  "schema": 1,
+  "source": "D:\\PrototypeReference\\p1\\private\\comparison\\Hydra.p3d",
+  "sourceSha256": "b4bd053853eeb705699a0e7e24229e5f75dcd2cd8baa0eeef0fbeb75528ad5b1",
+  "sourceOffset": 922035,
+  "sourceFrames": 164,
+  "exportedFrames": 99,
+  "fps": 30,
+  "mapping": {
+    "neck_0": "full_rig_body1",
+    "neck_1": "full_rig_body2",
+    "neck_2": "full_rig_body3",
+    "neck_3": "full_rig_body4",
+    "neck_4": "full_rig_body5",
+    "neck_5": "Neck_2",
+    "neck_6": "Neck_5",
+    "head": "Head",
+    "jaw": "Gum",
+    "pincer_left": "Lip_L",
+    "pincer_right": "Lip_R",
+    "claw_left": "Claw_L",
+    "claw_right": "Claw_R"
+  },
+  "reference": "hyd_act_idle",
+  "sourceUnitBlocks": 1.262773195650223,
+  "rootSampledPositions": {
+    "0": [
+      0.0,
+      -0.6083984375,
+      0.60205078125
+    ],
+    "27": [
+      0.0,
+      -0.608306884765625,
+      0.602294921875
+    ],
+    "54": [
+      0.0,
+      -0.6083984375,
+      0.60205078125
+    ],
+    "98": [
+      0.0,
+      -0.6081787109375001,
+      0.6023925781250001
+    ]
+  },
+  "method": "Original animated world rotation times inverse idle world rotation, expressed relative to each mapped target parent. Character_Root Y displacement uses the existing Hydra head-height scale. Original horizontal root locomotion remains excluded, matching existing rooted Hydra adaptation.",
+  "existingRetract": "hyd_exit already present in hydra_motion.json; death uses native InitFrame27 and holds frame54.",
+  "limits": [
+    "Static asset conversion only; no Java, tests or game run.",
+    "Existing rigid authored rig proportions and rotation mapping are retained, not original weighted skin.",
+    "No synthetic death keyframes, extra root depth, source audio or blood FX substitution."
+  ]
+}

@@ -1,0 +1,28 @@
+{
+  "revision": "2026-11-14",
+  "source": "Prototype 1 / Brawler / Brawler_fig.p3d.rz",
+  "sourceSha256": "08ce8b8f93c542fdeffbe5e186249bcf7281148bb1b8f26f37b5b4adb42861d1",
+  "sourceOffsets": {
+    "swipeWindup": 40416,
+    "swipeRelease": 40676,
+    "swipeRightWristHit": 40804,
+    "barrageRelease": 54684,
+    "barrageWristHits": [54812, 55108, 55404, 55700, 55996],
+    "slamWindup": 29504,
+    "slamRelease": 29764,
+    "slamRightWristHit": 29996,
+    "slamGroundHit": 30292,
+    "leapWristHit": 20984,
+    "leapAirSlash": 21924
+  },
+  "authoredRig": "geo/blacklight_hunter_mc.geo.json",
+  "windowOrder": {"swipe": ["right"], "barrage": ["right", "right", "left", "right", "right"], "slam": ["right"], "leap": ["right"]},
+  "minecraftAdaptations": [
+    "Counter barrage is selected by the existing Minecraft AI; its .4 second anticipation is an adaptation, not a decoded full original transition.",
+    "The existing authored Hunter model, skeleton, textures, health tier, parasite mechanics and consumption remain the baseline.",
+    "Source wrists are mapped onto the authored forearm/palm/claw capsule; .32 block radius fits this rig instead of copying source-unit radii.",
+    "Four substeps per server tick sweep curved hand motion. Each accepted window is deduplicated; vanilla immunity and cancellation are honored.",
+    "Ground pulse uses the source low/primary damage ratio 25/150, a 2-block MC radius, actual upward-facing block contact, and no duplicate primary damage.",
+    "Source clip joins, root movement, recovery cooldowns and spatial sound bank remain Minecraft adaptations. This is not a claim of complete original AI or original audio extraction."
+  ]
+}

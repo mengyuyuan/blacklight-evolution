@@ -1,0 +1,100 @@
+// Disposable helicopter integration: player relaunch/supplies/capture and natural NPC fire.
+// Do not combine with -PfeedbackTest or other broad test init scripts.
+// Existing build.gradle supplies -PgameTestRunDirectory and -PgameTestMaxHeap.
+allprojects {
+    // Keep the currently running player's loose classes/resources untouched.
+    layout.buildDirectory.set(project.file('build/helicopter-integration-check'))
+    afterEvaluate {
+    def selected = [
+        'src/helicopterTest/java/com/codex/blacklight/gametest/HelicopterRelaunchGameTest.java',
+        'src/helicopterTest/java/com/codex/blacklight/gametest/HelicopterTargetLockGameTest.java',
+        'src/helicopterTest/java/com/codex/blacklight/gametest/HelicopterManualBodyGameTest.java',
+        'src/helicopterTest/java/com/codex/blacklight/gametest/HelicopterLogisticsGameTest.java',
+        'src/helicopterTest/java/com/codex/blacklight/gametest/HelicopterCombatGameTest.java',
+        'src/helicopterTest/java/com/codex/blacklight/gametest/HelicopterVehicleCombatGameTest.java',
+        'src/helicopterTest/java/com/codex/blacklight/gametest/HelicopterPilotGameTest.java',
+        'src/helicopterTest/java/com/codex/blacklight/gametest/HelicopterLongRangeGameTest.java',
+        'src/helicopterTest/java/com/codex/blacklight/gametest/HelicopterSupportCombatGameTest.java',
+        'src/helicopterTest/java/com/codex/blacklight/gametest/HelicopterLongRangeAiGameTest.java'
+    ]
+    def keep = [
+        'HelicopterCombatGameTest.java': ['TroopsBesideTheEnemySuppressRocketsButAllowAClearGunShot', 'sourceAiFiresBeyondEightRocketsWithEmptyPlayerStoresAndPersistsCounters'],
+        'HelicopterVehicleCombatGameTest.java': ['nearbyFriendlyAircraftSuppressesRocketUntilItLeaves'],
+        'HelicopterPilotGameTest.java': ['timedHijackKeepsSameCraftCrewAndIssuesFirstPlayerLoadout', 'actualManualShotsUseFiniteStoresAndPersistWithoutLeases']
+    ]
+    def structureFolder = plugins.hasPlugin('net.neoforged.moddev') ? 'structure' : 'structures'
+    def structures = [
+        "src/helicopterTest/resources/data/blacklight/${structureFolder}/helicopter_arena.nbt",
+        "src/blackwatchTest/resources/data/blacklight/${structureFolder}/blackwatch_arena.nbt"
+    ]
+    def generatedJava = layout.buildDirectory.dir('generated/helicopterIntegration/java')
+    def generatedResources = layout.buildDirectory.dir('generated/helicopterIntegration/resources')
+    def prepare = tasks.register('prepareHelicopterIntegrationSources') {
+        inputs.files(selected.collect { project.file(it) } + structures.collect { project.file(it) })
+        inputs.property('testSelection', keep.toString())
+        outputs.dir(generatedJava)
+        outputs.dir(generatedResources)
+        doLast {
+            def packageDirectory = new File(generatedJava.get().asFile, 'com/codex/blacklight/gametest')
+            packageDirectory.mkdirs()
+            selected.each { path ->
+                def original = project.file(path)
+                def body = original.getText('UTF-8')
+                if (keep.containsKey(original.name)) {
+                    body = body.replaceAll(/@GameTest\([^)]*\)(\s+public static void (\w+)\()/) { full, signature, name ->
+                        keep[original.name].contains(name) ? full : signature
+                    }
+                }
+                new File(packageDirectory, original.name).setText(body, 'UTF-8')
+            }
+            structures.each { path ->
+                def original = project.file(path)
+                def target = new File(generatedResources.get().asFile, "data/blacklight/${structureFolder}/${original.name}")
+                target.parentFile.mkdirs()
+                target.bytes = original.bytes
+            }
+        }
+    }
+    sourceSets.main.java.srcDir(generatedJava)
+    sourceSets.main.resources.srcDir(generatedResources)
+    // This init adds generated copies only; do not inherit optional broad fixture sources.
+    sourceSets.main.java.exclude { entry ->
+        if (entry.directory) return false
+        def path = entry.file.absolutePath.replace('\\', '/')
+        def sourceRoot = project.file('src').absolutePath.replace('\\', '/') + '/'
+        path.startsWith(sourceRoot) && !path.startsWith(sourceRoot + 'main/java/')
+    }
+    tasks.named('test', Test).configure {
+        include '**/Helicopter*Test.class', '**/RagdollJointMathTest.class', '**/TargetLockRequestStateTest.class'
+    }
+    tasks.named('compileJava').configure { dependsOn prepare }
+    tasks.named('processResources').configure { dependsOn prepare }
+    def stage = tasks.register('stageHelicopterIntegrationClasses', Sync) {
+        dependsOn tasks.named('classes')
+        from(sourceSets.main.output.classesDirs) {
+            // A previous broad QA compilation may have left loose classes behind.
+            // Stage only actual production sources and this exact generated fixture set.
+            exclude { entry ->
+                if (entry.directory || !entry.path.endsWith('.class')) return false
+                def source = entry.path.replaceFirst(/\$.*\.class$/, '.class').replaceFirst(/\.class$/, '.java')
+                !project.file('src/main/java/' + source).isFile() && !new File(generatedJava.get().asFile, source).isFile()
+            }
+        }
+        into layout.buildDirectory.dir('helicopter-integration-run-classes')
+    }
+    tasks.matching { it.name == 'runGameTestServer' }.configureEach {
+        dependsOn stage
+        doFirst {
+            if (!project.hasProperty('gameTestRunDirectory'))
+                throw new GradleException('Set -PgameTestRunDirectory to a disposable feedback world directory')
+            environment 'MOD_CLASSES', [layout.buildDirectory.dir('helicopter-integration-run-classes').get().asFile, sourceSets.main.output.resourcesDir]
+                .collect { 'blacklight%%' + it.absolutePath }.join(File.pathSeparator)
+        }
+    }
+    tasks.withType(Jar).configureEach { doFirst { throw new GradleException('QA cannot produce a release JAR') } }
+} }
+
+
+
+
+

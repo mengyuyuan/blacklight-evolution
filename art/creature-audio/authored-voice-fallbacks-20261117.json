@@ -1,0 +1,248 @@
+{
+  "schema": 1,
+  "date": "2026-11-17",
+  "kind": "authored-fallback-not-P1-waveforms",
+  "source_archive": "art\\weapon-audio\\combat-0.zip",
+  "source_archive_sha256": "613765eeb67a2a50bec26b669b37840533ad7299aa1ddee55370892c3773d98c",
+  "credits": "Socapex - Evol Online SFX; existing project CC BY-SA 3.0 attribution and upstream contributors retained in art/weapon-audio/README.md and Socapex-LICENSES.txt.",
+  "sources": {
+    "hurt": {
+      "archive_entry": "Socapex - Evol Online SFX - Punches and hits/Socapex - hurt.wav",
+      "sha256": "39ce5dc1140333d724c187e97362c2809ba2e4f64c622027d768e147bf8aff6b",
+      "seconds": 0.42342403628117914
+    },
+    "Monster_Hurt": {
+      "archive_entry": "Socapex - Evol Online SFX - Punches and hits/Socapex - Monster_Hurt.wav",
+      "sha256": "14571074f3f7c49024e1f2f3064e3977e5d6237ce2944534fc846446b1d84b82",
+      "seconds": 0.6275963718820862
+    },
+    "blub_hurt2": {
+      "archive_entry": "Socapex - Evol Online SFX - Punches and hits/Socapex - blub_hurt2.wav",
+      "sha256": "ec7036a21ddbdbc3d2b183760c0b2eb2744bb4bc935f985301209b7857ed3e34",
+      "seconds": 0.730204081632653
+    },
+    "slow squish": {
+      "archive_entry": "Socapex - Evol Online SFX - Punches and hits/Socapex - slow squish.wav",
+      "sha256": "7832909ef8657e85ac667623e8adda1a3c261d35e76000dc7ef635b97ea2f85b",
+      "seconds": 1.127596371882086
+    }
+  },
+  "method": "Recorded voices only; mono downmix, bounded resampling, optional existing wet Foley layer, filters, short fade, limiter. No synthetic oscillator/noise and no original-game waveform.",
+  "assets": [
+    {
+      "file": "sounds/infection/common_attack_1.ogg",
+      "source": "hurt",
+      "secondary": null,
+      "source_rate_factor": 0.96,
+      "maximum_seconds": 0.6,
+      "authored_seconds": 0.44106670445956164,
+      "channels": 1,
+      "sample_rate": 44100,
+      "sha256": "ad415eebb05136ea7d62f4512773bf63ee7b0e26b49177e9960003e22c8411c6",
+      "bytes": 8123
+    },
+    {
+      "file": "sounds/infection/common_attack_2.ogg",
+      "source": "hurt",
+      "secondary": null,
+      "source_rate_factor": 1,
+      "maximum_seconds": 0.6,
+      "authored_seconds": 0.42342403628117914,
+      "channels": 1,
+      "sample_rate": 44100,
+      "sha256": "6c244391b9e0360beafc68710f58f13c6ae9f12b07df962232ee30adaabacc56",
+      "bytes": 8352
+    },
+    {
+      "file": "sounds/infection/common_attack_3.ogg",
+      "source": "hurt",
+      "secondary": null,
+      "source_rate_factor": 0.91,
+      "maximum_seconds": 0.6,
+      "authored_seconds": 0.46530113877052653,
+      "channels": 1,
+      "sample_rate": 44100,
+      "sha256": "c168f5ef96f954fe5fa0330093bff3e54d96beb70e6d246a6c94cd177115284f",
+      "bytes": 8520
+    },
+    {
+      "file": "sounds/infection/common_death_1.ogg",
+      "source": "hurt",
+      "secondary": "blub_hurt2",
+      "source_rate_factor": 0.8,
+      "maximum_seconds": 1.15,
+      "authored_seconds": 0.8902040816326531,
+      "channels": 1,
+      "sample_rate": 44100,
+      "sha256": "045deded38ebaafde082a40f299332f9cfe6153f0258e657dc39d8584c01e168",
+      "bytes": 11832
+    },
+    {
+      "file": "sounds/infection/common_death_2.ogg",
+      "source": "hurt",
+      "secondary": "blub_hurt2",
+      "source_rate_factor": 0.84,
+      "maximum_seconds": 1.15,
+      "authored_seconds": 0.8902040816326531,
+      "channels": 1,
+      "sample_rate": 44100,
+      "sha256": "c0e3249577b2259f419d0a69273c318b49d866e8c867142a691cba2e766bc300",
+      "bytes": 12130
+    },
+    {
+      "file": "sounds/infection/common_death_3.ogg",
+      "source": "hurt",
+      "secondary": "blub_hurt2",
+      "source_rate_factor": 0.77,
+      "maximum_seconds": 1.15,
+      "authored_seconds": 0.8902040816326531,
+      "channels": 1,
+      "sample_rate": 44100,
+      "sha256": "260c00025faafa5ebd3bf190478b7fe5e0c106637b3872935a19b935529d3bd3",
+      "bytes": 12200
+    },
+    {
+      "file": "sounds/infection/hunter_grunt_1.ogg",
+      "source": "Monster_Hurt",
+      "secondary": null,
+      "source_rate_factor": 0.85,
+      "maximum_seconds": 0.68,
+      "authored_seconds": 0.68,
+      "channels": 1,
+      "sample_rate": 44100,
+      "sha256": "c03ee032753cf2bb9d6acad281d517aeeb8b0b6204069a84bacc26338ab1533a",
+      "bytes": 10446
+    },
+    {
+      "file": "sounds/infection/hunter_grunt_2.ogg",
+      "source": "Monster_Hurt",
+      "secondary": null,
+      "source_rate_factor": 0.9,
+      "maximum_seconds": 0.68,
+      "authored_seconds": 0.68,
+      "channels": 1,
+      "sample_rate": 44100,
+      "sha256": "6b88919a0504c96a2bbd6972c8df5ea85964fd74de47fd1330d7b5b71053960d",
+      "bytes": 10370
+    },
+    {
+      "file": "sounds/infection/hunter_grunt_3.ogg",
+      "source": "Monster_Hurt",
+      "secondary": null,
+      "source_rate_factor": 0.8,
+      "maximum_seconds": 0.68,
+      "authored_seconds": 0.68,
+      "channels": 1,
+      "sample_rate": 44100,
+      "sha256": "7a3ccd7bed37674067052e9bbb5046af4f50d3f2bb777e2d8217d29fb6cb7f2f",
+      "bytes": 9968
+    },
+    {
+      "file": "sounds/infection/hunter_roar_1.ogg",
+      "source": "Monster_Hurt",
+      "secondary": null,
+      "source_rate_factor": 0.58,
+      "maximum_seconds": 1.2,
+      "authored_seconds": 1.0820627101415279,
+      "channels": 1,
+      "sample_rate": 44100,
+      "sha256": "1025db1d4af806fa14f092962385702d6d0d1e0d9aadf4ad1ef6d81a0a73eb08",
+      "bytes": 12405
+    },
+    {
+      "file": "sounds/infection/hunter_roar_2.ogg",
+      "source": "Monster_Hurt",
+      "secondary": null,
+      "source_rate_factor": 0.62,
+      "maximum_seconds": 1.2,
+      "authored_seconds": 1.0122522127130422,
+      "channels": 1,
+      "sample_rate": 44100,
+      "sha256": "15cbada78ab9ca6b6973b0b814a1ea85425b24d68e18fdbbb19aab9b26043c7b",
+      "bytes": 12458
+    },
+    {
+      "file": "sounds/infection/hunter_roar_3.ogg",
+      "source": "Monster_Hurt",
+      "secondary": null,
+      "source_rate_factor": 0.66,
+      "maximum_seconds": 1.2,
+      "authored_seconds": 0.9509035937607365,
+      "channels": 1,
+      "sample_rate": 44100,
+      "sha256": "5e40208cca04cdfebc7f2715a69108e5c2b29e3eff2dc84f26fc5b9b6978c199",
+      "bytes": 11795
+    },
+    {
+      "file": "sounds/infection/hunter_death_1.ogg",
+      "source": "Monster_Hurt",
+      "secondary": "slow squish",
+      "source_rate_factor": 0.45,
+      "maximum_seconds": 1.5,
+      "authored_seconds": 1.3946586041824136,
+      "channels": 1,
+      "sample_rate": 44100,
+      "sha256": "5bac1461fa0701dfd777cc9720a4a9d82d15a738e3898c5ac2cfb9fcc0305fee",
+      "bytes": 14723
+    },
+    {
+      "file": "sounds/infection/hunter_death_2.ogg",
+      "source": "Monster_Hurt",
+      "secondary": "slow squish",
+      "source_rate_factor": 0.48,
+      "maximum_seconds": 1.5,
+      "authored_seconds": 1.307492441421013,
+      "channels": 1,
+      "sample_rate": 44100,
+      "sha256": "2b866646a1bc4b4bd6076eecce38b560a52381b590f3ef1771abb038eb6d2b08",
+      "bytes": 15219
+    },
+    {
+      "file": "sounds/infection/hunter_death_3.ogg",
+      "source": "Monster_Hurt",
+      "secondary": "slow squish",
+      "source_rate_factor": 0.5,
+      "maximum_seconds": 1.5,
+      "authored_seconds": 1.287596371882086,
+      "channels": 1,
+      "sample_rate": 44100,
+      "sha256": "1d67e2318a373d54514f2d351cfa90860919d4172a1818539bb8509d45cfb585",
+      "bytes": 14897
+    }
+  ],
+  "events": {
+    "common_attack": [
+      "common_attack",
+      0.9
+    ],
+    "common_death": [
+      "common_death",
+      0.7
+    ],
+    "hunter_grunt": [
+      "hunter_grunt",
+      0.9
+    ],
+    "hunter_roar": [
+      "hunter_roar",
+      0.85
+    ],
+    "hunter_hurt": [
+      "hunter_grunt",
+      0.75
+    ],
+    "hunter_death": [
+      "hunter_death",
+      0.85
+    ],
+    "hunter_whoosh": [
+      "swing",
+      1
+    ],
+    "common_land": [
+      "ground",
+      0.65
+    ]
+  },
+  "acceptance": "Resource production only; not auditioned, no game/client/unit/GameTest execution. Subjective mix and species identity remain pending."
+}

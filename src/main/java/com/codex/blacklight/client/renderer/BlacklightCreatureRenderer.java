@@ -29,6 +29,7 @@ public final class BlacklightCreatureRenderer<T extends LivingEntity & GeoEntity
     @Override protected float getDeathMaxRotation(T entity){
         if(entity instanceof com.codex.blacklight.entity.EncounterMob mob
                 &&mob.kind()==com.codex.blacklight.entity.EncounterKind.GOLIATH)return 0; // The source pose already supplies the fall.
+        if(entity instanceof com.codex.blacklight.entity.BlacklightMutant mutant&&mutant.kind()==com.codex.blacklight.entity.BlacklightMutant.Kind.BRUTE&&AdaptiveRagdoll.active(entity))return 0;
         return super.getDeathMaxRotation(entity);
     }
     public BlacklightCreatureRenderer(EntityRendererProvider.Context context,Function<T,String> asset){super(context,new BlacklightCreatureModel<>(asset));shadowRadius=.65F;}

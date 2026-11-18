@@ -1,0 +1,705 @@
+{
+  "schema": 1,
+  "createdLocal": "2026-11-16T22:24:10",
+  "status": "Player70mm controls, paired finite inventory and ordinary flight checkpoint. Original staged70mm impact and complete AI/whole-project goal remain unfinished.",
+  "source": {
+    "file": "D:\\blacklight-evolution\\art\\military-vehicles\\helicopter-rapid-source.json",
+    "sha256": "38b9eb0de769ce4d4d4dc363ab169ea4c7d0c9c756d5426d52a48d86b6b47ccf"
+  },
+  "platforms": {
+    "neo": {
+      "unitTests": 68,
+      "nativeHelicopterTests": 71,
+      "nativeVehicleRegression": 29,
+      "groundAttacks": [
+        {
+          "target": "tank",
+          "damage": 1.2000122,
+          "altitude": 8.0
+        },
+        {
+          "target": "infantry",
+          "damage": 12.0,
+          "altitude": 8.0
+        }
+      ],
+      "logs": {
+        "hellfireUnit": {
+          "file": "D:\\CodexCache\\helicopter-rapid-qa\\neo-hellfireUnit-passed.log",
+          "sha256": "767bbf9c0696060e2e605ff7fcd193aff02fedfb30bd035aba8d5664749291a7"
+        },
+        "helicopterHullServer": {
+          "file": "D:\\CodexCache\\helicopter-rapid-qa\\neo-helicopterHullServer-passed.log",
+          "sha256": "d5dbdfa258c574c19a107a0b89b7b884d480ffc5cd3f3563b6b1638626c175cb"
+        },
+        "helicopterHullRegression": {
+          "file": "D:\\CodexCache\\helicopter-rapid-qa\\neo-helicopterHullRegression-passed.log",
+          "sha256": "d2fda97c663e7c145ec136ac2c9035c487d71530c4027ee955abf18709b3bfff"
+        },
+        "helicopterRapidVisual": {
+          "file": "D:\\CodexCache\\helicopter-rapid-qa\\neo-helicopterRapidVisual-passed.log",
+          "sha256": "30f76d1832c45a3afbfc010188de65bbd35a32d79f770a6ead078805c9ad9a35"
+        }
+      },
+      "unitSuites": [
+        {
+          "suite": "com.codex.blacklight.firearms.GunplayFeedbackPayloadTest",
+          "tests": 2,
+          "file": "D:\\CodexCache\\helicopter-rapid-qa\\neo-unit-xml\\TEST-com.codex.blacklight.firearms.GunplayFeedbackPayloadTest.xml",
+          "sha256": "40823cfcfcc48d5720571568482351a4da46f257672802e1004dccf0efa1e7ad"
+        },
+        {
+          "suite": "com.codex.blacklight.military.aircraft.HelicopterArmamentTest",
+          "tests": 2,
+          "file": "D:\\CodexCache\\helicopter-rapid-qa\\neo-unit-xml\\TEST-com.codex.blacklight.military.aircraft.HelicopterArmamentTest.xml",
+          "sha256": "e7650c31de9c24526c9ff968f35660d2775a809d9e3cce50e00fb48472a1cdc3"
+        },
+        {
+          "suite": "com.codex.blacklight.military.aircraft.HelicopterAuthorityTest",
+          "tests": 2,
+          "file": "D:\\CodexCache\\helicopter-rapid-qa\\neo-unit-xml\\TEST-com.codex.blacklight.military.aircraft.HelicopterAuthorityTest.xml",
+          "sha256": "7e0e3c90a429dce58c7ff12651398bc4cc11581fc084f569d208b1bd1d1d3f9c"
+        },
+        {
+          "suite": "com.codex.blacklight.military.aircraft.HelicopterBlastWaveTest",
+          "tests": 4,
+          "file": "D:\\CodexCache\\helicopter-rapid-qa\\neo-unit-xml\\TEST-com.codex.blacklight.military.aircraft.HelicopterBlastWaveTest.xml",
+          "sha256": "8e90a5e613cae7482ea3f7905bc9cb6b84ab5aa1174a6557fcc84a7bbed60780"
+        },
+        {
+          "suite": "com.codex.blacklight.military.aircraft.HelicopterControlPayloadTest",
+          "tests": 2,
+          "file": "D:\\CodexCache\\helicopter-rapid-qa\\neo-unit-xml\\TEST-com.codex.blacklight.military.aircraft.HelicopterControlPayloadTest.xml",
+          "sha256": "0e8049eac0ba23f6d8f5cdad48c6115fadb0b03a2baaaf95ae230e7a4b699354"
+        },
+        {
+          "suite": "com.codex.blacklight.military.aircraft.HelicopterFlightTest",
+          "tests": 4,
+          "file": "D:\\CodexCache\\helicopter-rapid-qa\\neo-unit-xml\\TEST-com.codex.blacklight.military.aircraft.HelicopterFlightTest.xml",
+          "sha256": "890ef22746cccedd79b41c37d3dc5541cc752ebf9e5b3326d444cd30ab3c31ad"
+        },
+        {
+          "suite": "com.codex.blacklight.military.aircraft.HelicopterGunCycleTest",
+          "tests": 3,
+          "file": "D:\\CodexCache\\helicopter-rapid-qa\\neo-unit-xml\\TEST-com.codex.blacklight.military.aircraft.HelicopterGunCycleTest.xml",
+          "sha256": "ec5f39e3f2a372d0f05cd5fc9c86d6377a5ca496656d2324c3c9748cc9d09dd3"
+        },
+        {
+          "suite": "com.codex.blacklight.military.aircraft.HelicopterHellfireAttackTest",
+          "tests": 6,
+          "file": "D:\\CodexCache\\helicopter-rapid-qa\\neo-unit-xml\\TEST-com.codex.blacklight.military.aircraft.HelicopterHellfireAttackTest.xml",
+          "sha256": "db2d2b43f8355cdecc1094492303c7cc49962c83179e014e2ca6a71d2eaa20b3"
+        },
+        {
+          "suite": "com.codex.blacklight.military.aircraft.HelicopterHellfireRackTest",
+          "tests": 4,
+          "file": "D:\\CodexCache\\helicopter-rapid-qa\\neo-unit-xml\\TEST-com.codex.blacklight.military.aircraft.HelicopterHellfireRackTest.xml",
+          "sha256": "4c11ec45d81c29c4451fefba369be7b26bd1dfa6da143e50db06fe980eb34cba"
+        },
+        {
+          "suite": "com.codex.blacklight.military.aircraft.HelicopterMissileFlightTest",
+          "tests": 9,
+          "file": "D:\\CodexCache\\helicopter-rapid-qa\\neo-unit-xml\\TEST-com.codex.blacklight.military.aircraft.HelicopterMissileFlightTest.xml",
+          "sha256": "0b95492f20c914d61962208e5e62378e19c33e010e2b1f5769bc4be0e413f01d"
+        },
+        {
+          "suite": "com.codex.blacklight.military.aircraft.HelicopterRapidTest",
+          "tests": 5,
+          "file": "D:\\CodexCache\\helicopter-rapid-qa\\neo-unit-xml\\TEST-com.codex.blacklight.military.aircraft.HelicopterRapidTest.xml",
+          "sha256": "0112e6360becec6eef2a3882016bcf481a63cb856f7f9f49ce0e86807563882d"
+        },
+        {
+          "suite": "com.codex.blacklight.military.aircraft.HelicopterRouteTest",
+          "tests": 8,
+          "file": "D:\\CodexCache\\helicopter-rapid-qa\\neo-unit-xml\\TEST-com.codex.blacklight.military.aircraft.HelicopterRouteTest.xml",
+          "sha256": "cc1f990eb25ca7cd8ae6feab735cb40bdd29b53509e252b64ddd7168a8a04517"
+        },
+        {
+          "suite": "com.codex.blacklight.military.vehicle.VehicleControlAuthorityTest",
+          "tests": 11,
+          "file": "D:\\CodexCache\\helicopter-rapid-qa\\neo-unit-xml\\TEST-com.codex.blacklight.military.vehicle.VehicleControlAuthorityTest.xml",
+          "sha256": "599436a2f86b6b1e398f6ee7012c5868c1a983f58a4a6cade5e0eb3fb76f7213"
+        },
+        {
+          "suite": "com.codex.blacklight.military.vehicle.VehicleWeaponDefinitionTest",
+          "tests": 6,
+          "file": "D:\\CodexCache\\helicopter-rapid-qa\\neo-unit-xml\\TEST-com.codex.blacklight.military.vehicle.VehicleWeaponDefinitionTest.xml",
+          "sha256": "397d60ae65081d9ff164c361768a2e7424383314d462d362540d1ff6505d33d4"
+        }
+      ],
+      "client": {
+        "frames": 139,
+        "rapidCount": 8,
+        "hellfireCount": 1,
+        "maximumMuzzleError": 0.0,
+        "rapidHud": true,
+        "hellfireHud": true,
+        "spentRails": 1,
+        "activeSounds": [
+          "blacklight:firearm.impact",
+          "blacklight:vehicle.helicopter_rotor",
+          "blacklight:vehicle.helicopter_turbine",
+          "blacklight:vehicle.rocket"
+        ],
+        "launches": [
+          {
+            "age": 122,
+            "weapon": "helicopter_70mm",
+            "flightAge": 0,
+            "speed": 7.499999999999999
+          },
+          {
+            "age": 127,
+            "weapon": "helicopter_70mm",
+            "flightAge": 0,
+            "speed": 7.5
+          },
+          {
+            "age": 132,
+            "weapon": "helicopter_70mm",
+            "flightAge": 0,
+            "speed": 7.5
+          },
+          {
+            "age": 137,
+            "weapon": "helicopter_70mm",
+            "flightAge": 0,
+            "speed": 7.5
+          },
+          {
+            "age": 142,
+            "weapon": "helicopter_70mm",
+            "flightAge": 0,
+            "speed": 7.5
+          },
+          {
+            "age": 147,
+            "weapon": "helicopter_70mm",
+            "flightAge": 0,
+            "speed": 7.5
+          },
+          {
+            "age": 152,
+            "weapon": "helicopter_70mm",
+            "flightAge": 0,
+            "speed": 7.499999999999999
+          },
+          {
+            "age": 157,
+            "weapon": "helicopter_70mm",
+            "flightAge": 0,
+            "speed": 7.499999999999999
+          },
+          {
+            "age": 198,
+            "weapon": "helicopter_hellfire",
+            "flightAge": 0,
+            "speed": 0.0
+          }
+        ],
+        "evidence": {
+          "file": "D:\\CodexCache\\helicopter-rapid-qa\\neo-frames\\evidence.json",
+          "sha256": "29ffa223302fa96712e19d5da5e63ff669509e4013450b2d6832ce0c0530c528"
+        },
+        "reviewSheet": {
+          "file": "D:\\CodexCache\\helicopter-rapid-qa\\neo-review.png",
+          "sha256": "4ad3241b0c3852045e08d791d7a6c49592dad4979e1a50b01b21dcccecebcd90"
+        },
+        "reviewedFrames": [
+          {
+            "image": "rapid-100.png",
+            "age": 100,
+            "file": "D:\\CodexCache\\helicopter-rapid-qa\\neo-frames\\rapid-100.png",
+            "sha256": "4ec3570d9f2e7998507b9732608d2827115c09cc07896c83ce9b5bf7f44f1b73"
+          },
+          {
+            "image": "rapid-110.png",
+            "age": 111,
+            "file": "D:\\CodexCache\\helicopter-rapid-qa\\neo-frames\\rapid-110.png",
+            "sha256": "17c6da78ce519f9ec297e031208394c2b762b00a3d7f5916ac6773816a0d92bf"
+          },
+          {
+            "image": "rapid-119.png",
+            "age": 120,
+            "file": "D:\\CodexCache\\helicopter-rapid-qa\\neo-frames\\rapid-119.png",
+            "sha256": "b3529bf5f5364e7f2a5077bfcf4c146b037e08d65b7edb237746d4bd50354b2d"
+          },
+          {
+            "image": "rapid-121.png",
+            "age": 122,
+            "file": "D:\\CodexCache\\helicopter-rapid-qa\\neo-frames\\rapid-121.png",
+            "sha256": "e12d5fabdc42a47b066def381f36758c42a337dd34d16bc8fa7f6a2d468a94e5"
+          },
+          {
+            "image": "rapid-125.png",
+            "age": 126,
+            "file": "D:\\CodexCache\\helicopter-rapid-qa\\neo-frames\\rapid-125.png",
+            "sha256": "36f84d8ada4fa4be2c7a02ad0fd3886b8d943587a07fd7076b1657db763b4d68"
+          },
+          {
+            "image": "rapid-130.png",
+            "age": 131,
+            "file": "D:\\CodexCache\\helicopter-rapid-qa\\neo-frames\\rapid-130.png",
+            "sha256": "b6205ea71842ced78f91dac84393887a09aafad1da8e36159d40eb835891ad07"
+          },
+          {
+            "image": "rapid-135.png",
+            "age": 136,
+            "file": "D:\\CodexCache\\helicopter-rapid-qa\\neo-frames\\rapid-135.png",
+            "sha256": "4e2d06241c00330dd1890997893aee682624f773b524a90d67338d4d2996381c"
+          },
+          {
+            "image": "rapid-141.png",
+            "age": 141,
+            "file": "D:\\CodexCache\\helicopter-rapid-qa\\neo-frames\\rapid-141.png",
+            "sha256": "ea4438efe3fc3cf2bdc35a4db8ddf21b3cef0da7ce338240aafcc7609ed5cb8e"
+          },
+          {
+            "image": "rapid-146.png",
+            "age": 146,
+            "file": "D:\\CodexCache\\helicopter-rapid-qa\\neo-frames\\rapid-146.png",
+            "sha256": "1fb4c9deacbcd3c9cdf53a0d15b2fbb8a5a9657917c257950c08935ced5425f6"
+          },
+          {
+            "image": "rapid-150.png",
+            "age": 151,
+            "file": "D:\\CodexCache\\helicopter-rapid-qa\\neo-frames\\rapid-150.png",
+            "sha256": "ed7ad6a1350ff65b25eaf06b990759979104532f4c5dacac73ec3b14943d2197"
+          },
+          {
+            "image": "rapid-155.png",
+            "age": 156,
+            "file": "D:\\CodexCache\\helicopter-rapid-qa\\neo-frames\\rapid-155.png",
+            "sha256": "93888a2a77e7821b842239b702a99f859d3791133a4f8add775c3364b8cbc7bc"
+          },
+          {
+            "image": "rapid-165.png",
+            "age": 165,
+            "file": "D:\\CodexCache\\helicopter-rapid-qa\\neo-frames\\rapid-165.png",
+            "sha256": "eb83216d60d01af1c3ff5fa850341745827c396f5569ba56b4e85a0d63f3f17f"
+          },
+          {
+            "image": "rapid-183.png",
+            "age": 183,
+            "file": "D:\\CodexCache\\helicopter-rapid-qa\\neo-frames\\rapid-183.png",
+            "sha256": "d318b75ed134f7f29528c4089dadd380f9624728d83d55adfef80623067c30e7"
+          },
+          {
+            "image": "rapid-195.png",
+            "age": 195,
+            "file": "D:\\CodexCache\\helicopter-rapid-qa\\neo-frames\\rapid-195.png",
+            "sha256": "9fe81d3413d1f9e42ebcb16c5b4d8f6acd5f0a0b32b9048193b9f7740705a790"
+          },
+          {
+            "image": "rapid-210.png",
+            "age": 210,
+            "file": "D:\\CodexCache\\helicopter-rapid-qa\\neo-frames\\rapid-210.png",
+            "sha256": "784ba7cce59f3a9af4c5225c07d820bb9f79549c0f6d902cc417f4022d6112f9"
+          },
+          {
+            "image": "rapid-224.png",
+            "age": 224,
+            "file": "D:\\CodexCache\\helicopter-rapid-qa\\neo-frames\\rapid-224.png",
+            "sha256": "6fc54c4a7e6ea21fc53e2b9525dc9aff5c26b4a6aad43201f6d5909e1ec49e45"
+          }
+        ]
+      },
+      "failedClient": {
+        "file": "D:\\CodexCache\\helicopter-rapid-qa\\neo-frames-network-rejected\\evidence.json",
+        "sha256": "c74ebfa9f84a6243a683bd8ee5e8410677d979b030a4c4a95a2e2e377c768aea"
+      },
+      "initialUnitFailure": {
+        "file": "D:\\CodexCache\\helicopter-rapid-qa\\neo-initial-speed-bound.log",
+        "sha256": "bfabd7bd535abbb8730641470bd3f0f2f2c5409d9a3f8e22e603c886d6724c9d"
+      },
+      "code": {
+        "src/main/java/com/codex/blacklight/military/aircraft/HelicopterRapidFlight.java": "1144e28a7300e8f493e9ea142a6872ae70bdb6f793cc975d71ae98fc5e6492b0",
+        "src/main/java/com/codex/blacklight/military/aircraft/HelicopterRapidMagazine.java": "e3c8b03465d5a86a16a35494a87f3a38ce6fb163c9c9ca6892b982f23d3f403c",
+        "src/main/java/com/codex/blacklight/military/aircraft/HelicopterCombat.java": "30d480cb51830bacd75d05b075198703e66f691dde1051284c355a500d7fb2fa",
+        "src/main/java/com/codex/blacklight/military/aircraft/HelicopterPilot.java": "bfb5614a0dc8dd51a6e42cc2dd91eadd4ce2908baa5f61ce17bd30d3b9b3ac2d",
+        "src/main/java/com/codex/blacklight/military/vehicle/VehicleWeaponDefinition.java": "cd0c46cf54cb27f69f998dcf7cc029eaa297889a54a3c5c5c860b0c97e714c4f",
+        "src/main/java/com/codex/blacklight/military/vehicle/VehicleControlAuthority.java": "e9d3a832ac97dc33feb50468ab640fcf5b89041950225fa675a0fabc81a8e164",
+        "src/main/java/com/codex/blacklight/military/vehicle/VehicleSounds.java": "38b351a8a5eec7fd61c4349393af85cdcd237b051960d33b3b956c6770c62889",
+        "src/main/java/com/codex/blacklight/firearms/VehicleOrdnanceProjectile.java": "95c56ddbc78cc78b4cf3e76e1055f8d322ff7a69f07772b25fb75d1883da3ca5",
+        "src/main/java/com/codex/blacklight/firearms/OrdnanceTrail.java": "6a4f564554e2619fad4d46de72970eb014bcac17867822e3419e029c81646ac6",
+        "src/main/java/com/codex/blacklight/client/renderer/OrdnanceRenderer.java": "42e5f5b0eaa9c42a86248108a1055ad964708c800ae3de92b0d2c0c97c139e9b",
+        "src/main/java/com/codex/blacklight/client/VehicleControls.java": "9f13c3a08d9f4cbfa232953829185d6402455099bc2e51eaa8d4d28f75a828cb",
+        "src/main/java/com/codex/blacklight/client/vehicle/HelicopterControls.java": "a93ddf4646d0672336fa22fcb5ee0a3ad2eab2ed3ed01c78b2d7c99383649a67",
+        "src/main/java/com/codex/blacklight/network/HelicopterControlPayload.java": "b2f081c721997e65f72703662cd8fff1a7253b313315875b03eba493455554f9",
+        "src/main/java/com/codex/blacklight/network/GunplayFeedbackPayload.java": "84ce60030dd71e1c08c41b3ddeff3f92c4291fb235c0e828de1cd8ba555fab4e",
+        "src/main/java/com/codex/blacklight/network/ModNetwork.java": "9915124e1badbb79de70be014e2050538bcd2aad7502a8ec52e7b86715860273",
+        "src/test/java/com/codex/blacklight/military/aircraft/HelicopterRapidTest.java": "0e07844a57c60cc7f80bddc60c889f36fb5d8123a702037dbd55965c42cb4688",
+        "src/test/java/com/codex/blacklight/military/aircraft/HelicopterControlPayloadTest.java": "f484f0b1243222fe2f82673fead519a2703375760f7d5018cdfd9bebc8c07ac0",
+        "src/test/java/com/codex/blacklight/military/aircraft/HelicopterAuthorityTest.java": "49505ad86e3d69200c29c8128cb14bdbbf6b9fd88e74c57c9476ac4efae77a90",
+        "src/helicopterTest/java/com/codex/blacklight/gametest/HelicopterRapidGameTest.java": "0603f3fd0637d346ebf2f37b9b8c30c17515eabdc3d1f9100b8edddd2a35bed1",
+        "src/rapidVisual/java/com/codex/blacklight/client/HelicopterRapidVisual.java": "028eea6a40781c9b6af7572ce6004afc9ef2a396c12d3bfbb9baeae048b68bbe",
+        "tools/helicopter-rapid-visual.init.gradle": "53fd1a0071d0a60d2c4316580cc910a520ea9204552eb051762a9e59a1c3df6d",
+        "src/main/resources/assets/blacklight/lang/en_us.json": "fd13a2f2ae369e7f7cc520e988e44c54d06a2b3304bbc3dad24f9e463324ab93",
+        "src/main/resources/assets/blacklight/lang/zh_cn.json": "81ce3c534617e92572e01722344243a32204ec3d67c6491d053c745305267463"
+      }
+    },
+    "forge": {
+      "unitTests": 68,
+      "nativeHelicopterTests": 71,
+      "nativeVehicleRegression": 29,
+      "groundAttacks": [
+        {
+          "target": "tank",
+          "damage": 1.2000122,
+          "altitude": 8.0
+        },
+        {
+          "target": "infantry",
+          "damage": 12.0,
+          "altitude": 8.0
+        }
+      ],
+      "logs": {
+        "hellfireUnit": {
+          "file": "D:\\CodexCache\\helicopter-rapid-qa\\forge-hellfireUnit-passed.log",
+          "sha256": "68e9978b9233902501b43398423479a943c1e09733b9d9e0a33e6e4daca703e6"
+        },
+        "helicopterHullServer": {
+          "file": "D:\\CodexCache\\helicopter-rapid-qa\\forge-helicopterHullServer-passed.log",
+          "sha256": "2e6c60e941b1137f0efa13785067fd30d446971a50ea038412098ce77dd78b6e"
+        },
+        "helicopterHullRegression": {
+          "file": "D:\\CodexCache\\helicopter-rapid-qa\\forge-helicopterHullRegression-passed.log",
+          "sha256": "e708ea76874bc0aac005c151b926df69cb2bd4efdaa98c5d6c57075cf220fa71"
+        },
+        "helicopterRapidVisual": {
+          "file": "D:\\CodexCache\\helicopter-rapid-qa\\forge-helicopterRapidVisual-passed.log",
+          "sha256": "f4cf73522881b7ab717397ca226e97c3a256875dfb039d18b4684d61708ee7d0"
+        }
+      },
+      "unitSuites": [
+        {
+          "suite": "com.codex.blacklight.firearms.GunplayFeedbackPayloadTest",
+          "tests": 2,
+          "file": "D:\\CodexCache\\helicopter-rapid-qa\\forge-unit-xml\\TEST-com.codex.blacklight.firearms.GunplayFeedbackPayloadTest.xml",
+          "sha256": "77d16ef712fcb453a27ad801924605e6a1e477454f06cd4771b1b2f7c631b30b"
+        },
+        {
+          "suite": "com.codex.blacklight.military.aircraft.HelicopterArmamentTest",
+          "tests": 2,
+          "file": "D:\\CodexCache\\helicopter-rapid-qa\\forge-unit-xml\\TEST-com.codex.blacklight.military.aircraft.HelicopterArmamentTest.xml",
+          "sha256": "3c0f6e8e20a89c25f5e66daf926e65e638e8f9bd7d8011c6981d7b5b8f2aa0d6"
+        },
+        {
+          "suite": "com.codex.blacklight.military.aircraft.HelicopterAuthorityTest",
+          "tests": 2,
+          "file": "D:\\CodexCache\\helicopter-rapid-qa\\forge-unit-xml\\TEST-com.codex.blacklight.military.aircraft.HelicopterAuthorityTest.xml",
+          "sha256": "36e9b00c4da35798890a3296c5737aea209c25e12626033064896d57510d1543"
+        },
+        {
+          "suite": "com.codex.blacklight.military.aircraft.HelicopterBlastWaveTest",
+          "tests": 4,
+          "file": "D:\\CodexCache\\helicopter-rapid-qa\\forge-unit-xml\\TEST-com.codex.blacklight.military.aircraft.HelicopterBlastWaveTest.xml",
+          "sha256": "fc811603485bf54553928b9d8f8e3bf0c82a501087162bfe687ff56892ae2304"
+        },
+        {
+          "suite": "com.codex.blacklight.military.aircraft.HelicopterControlPayloadTest",
+          "tests": 2,
+          "file": "D:\\CodexCache\\helicopter-rapid-qa\\forge-unit-xml\\TEST-com.codex.blacklight.military.aircraft.HelicopterControlPayloadTest.xml",
+          "sha256": "56545d993d0814c15f52440439903e258e298ab65ae61984d68bba50048eb92b"
+        },
+        {
+          "suite": "com.codex.blacklight.military.aircraft.HelicopterFlightTest",
+          "tests": 4,
+          "file": "D:\\CodexCache\\helicopter-rapid-qa\\forge-unit-xml\\TEST-com.codex.blacklight.military.aircraft.HelicopterFlightTest.xml",
+          "sha256": "e8f87c7cdebd2e3a727180200203e5ad1b0dc5f7db10ad638981ac63c14952b0"
+        },
+        {
+          "suite": "com.codex.blacklight.military.aircraft.HelicopterGunCycleTest",
+          "tests": 3,
+          "file": "D:\\CodexCache\\helicopter-rapid-qa\\forge-unit-xml\\TEST-com.codex.blacklight.military.aircraft.HelicopterGunCycleTest.xml",
+          "sha256": "195045812efa077f4ba7612845c0b24f6df7902ed1d7d42885e60ec1bbc86f53"
+        },
+        {
+          "suite": "com.codex.blacklight.military.aircraft.HelicopterHellfireAttackTest",
+          "tests": 6,
+          "file": "D:\\CodexCache\\helicopter-rapid-qa\\forge-unit-xml\\TEST-com.codex.blacklight.military.aircraft.HelicopterHellfireAttackTest.xml",
+          "sha256": "fb5fcd584d60dfe9bb01667f532c29ef1a6cee9d95f3b79d31e071e1639f7143"
+        },
+        {
+          "suite": "com.codex.blacklight.military.aircraft.HelicopterHellfireRackTest",
+          "tests": 4,
+          "file": "D:\\CodexCache\\helicopter-rapid-qa\\forge-unit-xml\\TEST-com.codex.blacklight.military.aircraft.HelicopterHellfireRackTest.xml",
+          "sha256": "ba666092fceb5fa2ab90b4722ddfe7fe2d5f0ac353f67d85bf93b18c31c2814a"
+        },
+        {
+          "suite": "com.codex.blacklight.military.aircraft.HelicopterMissileFlightTest",
+          "tests": 9,
+          "file": "D:\\CodexCache\\helicopter-rapid-qa\\forge-unit-xml\\TEST-com.codex.blacklight.military.aircraft.HelicopterMissileFlightTest.xml",
+          "sha256": "7cf16e609a3965e9cb677462ea04bdbee2bc1a6b196ebb16bf180d48865a3ea5"
+        },
+        {
+          "suite": "com.codex.blacklight.military.aircraft.HelicopterRapidTest",
+          "tests": 5,
+          "file": "D:\\CodexCache\\helicopter-rapid-qa\\forge-unit-xml\\TEST-com.codex.blacklight.military.aircraft.HelicopterRapidTest.xml",
+          "sha256": "af4ec10211f41a72fb11b1f6a61f6f7eea3e743b21892d5b576030cdfcf481c8"
+        },
+        {
+          "suite": "com.codex.blacklight.military.aircraft.HelicopterRouteTest",
+          "tests": 8,
+          "file": "D:\\CodexCache\\helicopter-rapid-qa\\forge-unit-xml\\TEST-com.codex.blacklight.military.aircraft.HelicopterRouteTest.xml",
+          "sha256": "319fbb55662fed919ac858febd180c0fc31fca3a44ae32559596d6d9d104f449"
+        },
+        {
+          "suite": "com.codex.blacklight.military.vehicle.VehicleControlAuthorityTest",
+          "tests": 11,
+          "file": "D:\\CodexCache\\helicopter-rapid-qa\\forge-unit-xml\\TEST-com.codex.blacklight.military.vehicle.VehicleControlAuthorityTest.xml",
+          "sha256": "2559ea7f2d7f05b065ba02e1095863df600553350c0b3e348e8abc344d172a17"
+        },
+        {
+          "suite": "com.codex.blacklight.military.vehicle.VehicleWeaponDefinitionTest",
+          "tests": 6,
+          "file": "D:\\CodexCache\\helicopter-rapid-qa\\forge-unit-xml\\TEST-com.codex.blacklight.military.vehicle.VehicleWeaponDefinitionTest.xml",
+          "sha256": "f1238da2a1420ab19c863cb9f9771e63f520904a442fe19fa6ed542ca4aa3010"
+        }
+      ],
+      "client": {
+        "frames": 138,
+        "rapidCount": 9,
+        "hellfireCount": 1,
+        "maximumMuzzleError": 0.0,
+        "rapidHud": true,
+        "hellfireHud": true,
+        "spentRails": 1,
+        "activeSounds": [
+          "blacklight:firearm.impact",
+          "blacklight:vehicle.helicopter_rotor",
+          "blacklight:vehicle.helicopter_turbine",
+          "blacklight:vehicle.rocket"
+        ],
+        "launches": [
+          {
+            "age": 122,
+            "weapon": "helicopter_70mm",
+            "flightAge": 0,
+            "speed": 7.499999999999999
+          },
+          {
+            "age": 127,
+            "weapon": "helicopter_70mm",
+            "flightAge": 0,
+            "speed": 7.499999999999999
+          },
+          {
+            "age": 132,
+            "weapon": "helicopter_70mm",
+            "flightAge": 0,
+            "speed": 7.499999999999999
+          },
+          {
+            "age": 137,
+            "weapon": "helicopter_70mm",
+            "flightAge": 0,
+            "speed": 7.499999999999999
+          },
+          {
+            "age": 142,
+            "weapon": "helicopter_70mm",
+            "flightAge": 0,
+            "speed": 7.499999999999999
+          },
+          {
+            "age": 147,
+            "weapon": "helicopter_70mm",
+            "flightAge": 0,
+            "speed": 7.499999999999999
+          },
+          {
+            "age": 152,
+            "weapon": "helicopter_70mm",
+            "flightAge": 0,
+            "speed": 7.499999999999999
+          },
+          {
+            "age": 157,
+            "weapon": "helicopter_70mm",
+            "flightAge": 0,
+            "speed": 7.499999999999999
+          },
+          {
+            "age": 162,
+            "weapon": "helicopter_70mm",
+            "flightAge": 0,
+            "speed": 7.499999999999999
+          },
+          {
+            "age": 197,
+            "weapon": "helicopter_hellfire",
+            "flightAge": 0,
+            "speed": 0.0
+          }
+        ],
+        "evidence": {
+          "file": "D:\\CodexCache\\helicopter-rapid-qa\\forge-frames\\evidence.json",
+          "sha256": "03b075c735e468adeb603ed451c1139a3eea7bd956673b08754a71623eae9579"
+        },
+        "reviewSheet": {
+          "file": "D:\\CodexCache\\helicopter-rapid-qa\\forge-review.png",
+          "sha256": "2a83a7fb5276836c478c92ede69acaff4165219e8e80763a5c0833762277a4fd"
+        },
+        "reviewedFrames": [
+          {
+            "image": "rapid-100.png",
+            "age": 100,
+            "file": "D:\\CodexCache\\helicopter-rapid-qa\\forge-frames\\rapid-100.png",
+            "sha256": "4ef2eabf2edde1e3cd5ca84b9c91c5f8e551ad44611967532c69a9d144981a46"
+          },
+          {
+            "image": "rapid-111.png",
+            "age": 112,
+            "file": "D:\\CodexCache\\helicopter-rapid-qa\\forge-frames\\rapid-111.png",
+            "sha256": "111de34d363a4546b2263dbe2980798d7fae634763f502eab26cc19849219726"
+          },
+          {
+            "image": "rapid-120.png",
+            "age": 120,
+            "file": "D:\\CodexCache\\helicopter-rapid-qa\\forge-frames\\rapid-120.png",
+            "sha256": "f416bd3318b9e4e662a30b5cd4c7c0e30892bc9be270fd6016c833446ea7cd5d"
+          },
+          {
+            "image": "rapid-122.png",
+            "age": 122,
+            "file": "D:\\CodexCache\\helicopter-rapid-qa\\forge-frames\\rapid-122.png",
+            "sha256": "10e99db35560ac03c40b8c98257c10af4f1ba80f32d340cc20031d6709a97c8a"
+          },
+          {
+            "image": "rapid-126.png",
+            "age": 126,
+            "file": "D:\\CodexCache\\helicopter-rapid-qa\\forge-frames\\rapid-126.png",
+            "sha256": "c94919b1f960ed39e591f4c36caa983b0ccc2593ba754048ff92b953d042b5f0"
+          },
+          {
+            "image": "rapid-131.png",
+            "age": 131,
+            "file": "D:\\CodexCache\\helicopter-rapid-qa\\forge-frames\\rapid-131.png",
+            "sha256": "2b19ffc1c538c9ebfcac1e88b57953024f0c9da9bd4f2e7080b4546fccf9a173"
+          },
+          {
+            "image": "rapid-136.png",
+            "age": 136,
+            "file": "D:\\CodexCache\\helicopter-rapid-qa\\forge-frames\\rapid-136.png",
+            "sha256": "fc65eab43ee7cd7a8c256269a74da98ef44390c5597250f673ebcb151b095c60"
+          },
+          {
+            "image": "rapid-141.png",
+            "age": 141,
+            "file": "D:\\CodexCache\\helicopter-rapid-qa\\forge-frames\\rapid-141.png",
+            "sha256": "6da037260420f5b534cc9834a7100b1d3fe4620bda496968dd9fd77771be5edf"
+          },
+          {
+            "image": "rapid-145.png",
+            "age": 146,
+            "file": "D:\\CodexCache\\helicopter-rapid-qa\\forge-frames\\rapid-145.png",
+            "sha256": "9c38a38993ca78fb5e54b1d5a1d267eee6430164cf4338e7d46d7356fcab47fa"
+          },
+          {
+            "image": "rapid-151.png",
+            "age": 151,
+            "file": "D:\\CodexCache\\helicopter-rapid-qa\\forge-frames\\rapid-151.png",
+            "sha256": "e57e2b7cab5af6079a19919e009e65b463fdce48f9ec2ac41c18f9304b0425bc"
+          },
+          {
+            "image": "rapid-156.png",
+            "age": 156,
+            "file": "D:\\CodexCache\\helicopter-rapid-qa\\forge-frames\\rapid-156.png",
+            "sha256": "42c3d30d3cefce658e638070b14db0daec6680a27796871be76e6dd508b8df81"
+          },
+          {
+            "image": "rapid-165.png",
+            "age": 165,
+            "file": "D:\\CodexCache\\helicopter-rapid-qa\\forge-frames\\rapid-165.png",
+            "sha256": "6a2fa61fb1c86bf50075cdda174da798085507fe31249f4548c4a8596cf2499a"
+          },
+          {
+            "image": "rapid-184.png",
+            "age": 184,
+            "file": "D:\\CodexCache\\helicopter-rapid-qa\\forge-frames\\rapid-184.png",
+            "sha256": "0921e8685b4a64bb9fef04a2fcd5851083bf3463078928815410f530210b3d75"
+          },
+          {
+            "image": "rapid-196.png",
+            "age": 196,
+            "file": "D:\\CodexCache\\helicopter-rapid-qa\\forge-frames\\rapid-196.png",
+            "sha256": "c96a4d5d702ff301b9ea0d92f70fa19d3ce3f798c396758c2b9b1dded83e370c"
+          },
+          {
+            "image": "rapid-210.png",
+            "age": 210,
+            "file": "D:\\CodexCache\\helicopter-rapid-qa\\forge-frames\\rapid-210.png",
+            "sha256": "80d06a7660e5f439dceecdddfe020dc0c1d40773f8d5b7c9f8aa8e83566eb210"
+          },
+          {
+            "image": "rapid-223.png",
+            "age": 223,
+            "file": "D:\\CodexCache\\helicopter-rapid-qa\\forge-frames\\rapid-223.png",
+            "sha256": "df466a0c88379f7e22372010e852a5ce4ccd46aacaf1a8b696adbf651d3c7d9f"
+          }
+        ]
+      },
+      "failedClient": {
+        "file": "D:\\CodexCache\\helicopter-rapid-qa\\forge-frames-network-rejected\\evidence.json",
+        "sha256": "48f4e84d7d5db6ead113e3b89fe089741a11f74943c1777f2749b9f7192c8d19"
+      },
+      "initialUnitFailure": {
+        "file": "D:\\CodexCache\\helicopter-rapid-qa\\forge-initial-speed-bound.log",
+        "sha256": "10a62bfc8d191872ca26a687774f592696b88bc757354c9ef33a5da1919d2a56"
+      },
+      "code": {
+        "src/main/java/com/codex/blacklight/military/aircraft/HelicopterRapidFlight.java": "0014043479116c89cd8b77b16383c93400df9ca086a3598e615ec7ec354aaf0b",
+        "src/main/java/com/codex/blacklight/military/aircraft/HelicopterRapidMagazine.java": "109aab0d3773b9b4f276809a9f07f121284fcb11ef51440f1558dec3529f00e0",
+        "src/main/java/com/codex/blacklight/military/aircraft/HelicopterCombat.java": "30d480cb51830bacd75d05b075198703e66f691dde1051284c355a500d7fb2fa",
+        "src/main/java/com/codex/blacklight/military/aircraft/HelicopterPilot.java": "353c0c037ad8546392e85929653bada9cfc8fa894826ba2edffac5c0f8ce03bf",
+        "src/main/java/com/codex/blacklight/military/vehicle/VehicleWeaponDefinition.java": "cd0c46cf54cb27f69f998dcf7cc029eaa297889a54a3c5c5c860b0c97e714c4f",
+        "src/main/java/com/codex/blacklight/military/vehicle/VehicleControlAuthority.java": "e9d3a832ac97dc33feb50468ab640fcf5b89041950225fa675a0fabc81a8e164",
+        "src/main/java/com/codex/blacklight/military/vehicle/VehicleSounds.java": "9f243bc433001a39dcfd87c581cb364e74afb5886aed40f4abd318ea7774fa04",
+        "src/main/java/com/codex/blacklight/firearms/VehicleOrdnanceProjectile.java": "7109ff7e1c71ea007c3a3d49e4370d82274b99a226e10003d8c376ea7f11ba2f",
+        "src/main/java/com/codex/blacklight/firearms/OrdnanceTrail.java": "6a4f564554e2619fad4d46de72970eb014bcac17867822e3419e029c81646ac6",
+        "src/main/java/com/codex/blacklight/client/renderer/OrdnanceRenderer.java": "42e5f5b0eaa9c42a86248108a1055ad964708c800ae3de92b0d2c0c97c139e9b",
+        "src/main/java/com/codex/blacklight/client/VehicleControls.java": "7b16529799ead1a94a9ac5b9c71b729eac6af6212e7284b4686ee2a5034369f5",
+        "src/main/java/com/codex/blacklight/client/vehicle/HelicopterControls.java": "41607399982f16e461810bb133fff48187f8759ffc21b47c0d237cdd28daa965",
+        "src/main/java/com/codex/blacklight/network/HelicopterControlPayload.java": "3686c90529e81ad6768ecc3903332a4c7a61cd74d6a7a6b69bdce679464ed537",
+        "src/main/java/com/codex/blacklight/network/GunplayFeedbackPayload.java": "db089655d2b7f39d5546a3140beb4f5394950e05be8d9fe28d840e591fb03e1d",
+        "src/main/java/com/codex/blacklight/network/ModNetwork.java": "0d9492868bb0551cb317a4381bcbc87b052116420c2520e512e37576f4d8d304",
+        "src/test/java/com/codex/blacklight/military/aircraft/HelicopterRapidTest.java": "53f3749c74663578418f92361691d82522f7c1847f15a62afbea1956c8782ccb",
+        "src/test/java/com/codex/blacklight/military/aircraft/HelicopterControlPayloadTest.java": "f484f0b1243222fe2f82673fead519a2703375760f7d5018cdfd9bebc8c07ac0",
+        "src/test/java/com/codex/blacklight/military/aircraft/HelicopterAuthorityTest.java": "49505ad86e3d69200c29c8128cb14bdbbf6b9fd88e74c57c9476ac4efae77a90",
+        "src/helicopterTest/java/com/codex/blacklight/gametest/HelicopterRapidGameTest.java": "47070d18a7dea93c69d339b288b5e7ab13451537916ebb47c50203f88cdb737c",
+        "src/rapidVisual/java/com/codex/blacklight/client/HelicopterRapidVisual.java": "8abf8f8b3bd83186923fa868b8c632217771f05d2612ba145e30bc9ba3ed43a4",
+        "tools/helicopter-rapid-visual.init.gradle": "3d8c094ccb75719704aceb1a5925ba2db19f9ef93717fb8a7100533660fa4798",
+        "src/main/resources/assets/blacklight/lang/en_us.json": "3992b3801d70b2da48242f8f9aec0ddc1999924a10d31fd42db6dfcc90b5105b",
+        "src/main/resources/assets/blacklight/lang/zh_cn.json": "8dcf467b950356bf221260faaa1904f5188038f32546bc5854529f4e8a31e5b9"
+      }
+    }
+  },
+  "coverage": [
+    "Both actual platforms use normal helicopter packet validation/handler and real server pilot.150 accepted rockets alternate between fixed outer pod muzzles at5-tick intervals. Reload after75 shots preserves mode, sides and cooldown. Both75-round pods exhaust; switching back fires one Hellfire without refilling rapid inventory.",
+    "All150 native first flight updates have speed6.25 blocks/tick, preserving source initial150 state then125 ordinary-update behavior and avoiding generic native .99 drag. No Hellfire target or flight state is attached.",
+    "Additional real downward aim/fire packets at8-block aircraft altitude launch one rocket at ground infantry and one at a ground tank in separate scenes. Both actually lose health; aircraft/pilot remain intact and only one left-pod round is consumed. These observed damage values use the explicitly interim MC impact path, not source staged blast balance.",
+    "Normal client input update and packet transport perform one switch to70mm, a held burst, release, switch back and one Hellfire. No server input injection, direct projectile spawn or ammo manipulation is used in client firing.",
+    "Real client synchronized left/right stock and selected weapon HUD, actual fixed-pod muzzle positions, native rocket/impact/rotor/turbine playback, and exactly one hidden spent Hellfire rail are checked."
+  ],
+  "failuresFoundAndFixed": [
+    "Initial unit run rejected source initial speed7.5 at old generic weapon bound5; finite bound increased to8 and all suites rerun. Initial logs retained.",
+    "First actual client run exposed missed wire action mask: authority accepted4 but HelicopterControlPayload still rejected it. Client fired two Hellfires and zero rapid rockets. Corrected both payload masks115->119, added real codec round-trip and bounded-action tests, updated native firing to enter through payload.handle, and reran clients. Failed evidence remains in separate network-rejected directories."
+  ],
+  "review": {
+    "method": "Both native framebuffer16-frame contact sheets and one full-size active-burst frame per platform visually inspected. Actual HUD selection/stores, small smoke/flame trail and impact puffs visible. This is current authored visual presentation, not original FX fidelity approval.",
+    "sound": "SoundManager.isActive proves four native sound categories while physical OpenAL listener gain is0. Logical sound settings1; no human listening/source waveform identity claim."
+  },
+  "limits": [
+    "70mm still uses generic immediate direct2.4/radius4 MC impact, pending original direct60 and final FIG delayed radius2/6 damage100/50 relationship. This is not a completed source-faithful70mm explosion.",
+    "AI rapid entry/controller, full original weighted maneuvers, player accuracy/dead reckoning/upgrades and exact weapon-switch UI remain open.",
+    "Vehicle ammunition key is existing user-configurable and unbound by default; native client test queues its same internal switch request, not an OS keyboard click or settings binding.",
+    "All client runs are integrated singleplayer; dedicated multiplayer not tested. Authored model/effects/audio remain adaptations. Broad creature/soldier/item/model/audio goal active.",
+    "Previous destruction checkpoint remains historical; no new destruction rerun claimed here. No release, install, commit or user-world change."
+  ],
+  "qaDriver": {
+    "file": "D:\\CodexCache\\creature-combat-run.ps1",
+    "sha256": "a57099a7f0e807cbb3ba07038dde5b7b755990a140f33060a8b7b7799c4c9ae2"
+  }
+}

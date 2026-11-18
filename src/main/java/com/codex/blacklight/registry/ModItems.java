@@ -65,16 +65,10 @@ public final class ModItems {
                     .title(Component.translatable("itemGroup.blacklight"))
                     .icon(() -> BLACKLIGHT_SAMPLE.get().getDefaultInstance())
                     .displayItems((parameters, output) -> {
-                        output.accept(BLACKWATCH_SOLDIER_SPAWN_EGG.get()); output.accept(BLACKWATCH_HEAVY_SPAWN_EGG.get()); output.accept(MILITARY_CIRCUIT.get()); output.accept(FIELD_SCANNER.get());
-                        output.accept(MILITARY_SOLDIER_SPAWN_EGG.get());output.accept(MILITARY_HEAVY_SPAWN_EGG.get());
-                        output.accept(MILITARY_TEAM_LEADER_SPAWN_EGG.get());
-                        output.accept(MILITARY_OFFICER_SPAWN_EGG.get());
-                        output.accept(MILITARY_COMMANDER_SPAWN_EGG.get());
-                        output.accept(BLACKWATCH_TEAM_LEADER_SPAWN_EGG.get());
-                        output.accept(BLACKWATCH_OFFICER_SPAWN_EGG.get());
-                        output.accept(BLACKWATCH_COMMANDER_SPAWN_EGG.get());
-                        output.accept(BLACKLIGHT_SAMPLE.get()); output.accept(HUNTER_SPAWN_EGG.get()); output.accept(SUPREME_HUNTER_SPAWN_EGG.get());output.accept(SUPREME_PARASITE_SYRINGE.get());
-                        output.accept(LIVING_HIVE_TISSUE.get());output.accept(HYDRA_SPAWN_EGG.get());
+                        // Spawn eggs have a single home in EncounterEntities' creatures and bosses tab.
+                        output.accept(BLACKLIGHT_SAMPLE.get()); output.accept(SUPREME_PARASITE_SYRINGE.get());
+                        output.accept(MILITARY_CIRCUIT.get()); output.accept(FIELD_SCANNER.get());
+                        output.accept(LIVING_HIVE_TISSUE.get());
                         output.accept(INFECTED_SOIL.get()); output.accept(INFECTED_STONE.get());
                         output.accept(TISSUE_ATTACHMENT.get()); output.accept(TISSUE_FIBER.get()); output.accept(HIVE_FLESH.get());
                         output.accept(BUILDING_CORE.get());

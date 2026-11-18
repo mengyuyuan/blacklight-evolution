@@ -23,8 +23,11 @@ class TissueSkinTest {
         // An old four-corner cuboid sampled only sin(0) and sin(pi), so no
         // amount of stronger coefficients could create a shoulder silhouette.
         var state=new TissueEvolution.State(8,1,.2F,.2F,.2F,.2F);
-        assertEquals(a,TissueEvolution.develop(BODY,a,state));
+        // MC-style growth: a side face stays one flat plane from socket to
+        // shoulder (no arched block), and the trunk keeps its length.
+        var socket=TissueEvolution.develop(BODY,a,state);assertEquals(a.y(),socket.y(),.0001F);
         var shoulder=new V(4,4,-2);assertTrue(TissueEvolution.develop(BODY,shoulder,state).x()>5);
+        assertEquals(socket.x(),TissueEvolution.develop(BODY,new V(-4,6,-2),state).x(),.0001F);
     }
     @Test void coplanarCutsDoNotDuplicateFacesOrDegenerateTriangles() {
         var pieces=TissueSkin.sections(BODY,new V(-4,4,-2),new V(4,4,-2),new V(4,4,2));

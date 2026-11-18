@@ -1,0 +1,956 @@
+{
+  "date": "2026-11-14",
+  "status": "contact_obstacle_checks_passed",
+  "tests": [
+    {
+      "platform": "neo",
+      "unitTests": 27,
+      "combatGameTests": 67,
+      "gatewayGameTests": 11
+    },
+    {
+      "platform": "forge",
+      "unitTests": 27,
+      "combatGameTests": 67,
+      "gatewayGameTests": 11
+    }
+  ],
+  "visual": [
+    {
+      "platform": "neo",
+      "directory": "D:/CodexCache/creature-combat-qa/neo-hydra-frames/",
+      "frames": 1107,
+      "maxPoseErrorBlocks": 0.0003299229170218613,
+      "maxPresentationDelayTicks": 0.7200040817260742,
+      "scenes": [
+        {
+          "scene": 0,
+          "frames": 167,
+          "maxPoseErrorBlocks": 0.00004049816359343327,
+          "maxDebris": 32,
+          "hits": [
+            {
+              "scene": 0,
+              "age": 51,
+              "damage": 14,
+              "style": "CRUSH",
+              "at": {
+                "x": 0.01076490464028848,
+                "y": 82.37662562616181,
+                "z": 9.316998619976776
+              }
+            }
+          ],
+          "ground": [
+            {
+              "scene": 0,
+              "age": 46,
+              "at": {
+                "x": -1.2544198652001881,
+                "y": 81,
+                "z": 2.7596599607294046
+              }
+            },
+            {
+              "scene": 0,
+              "age": 51,
+              "at": {
+                "x": 0.40549949448056516,
+                "y": 81,
+                "z": 9.550887099241457
+              }
+            }
+          ],
+          "presentations": [
+            {
+              "serial": 1,
+              "tick": 133280,
+              "shown": 133280.50000226498,
+              "kind": 0,
+              "surfaceCount": 48,
+              "soundCount": 2,
+              "scene": 0,
+              "firstImage": "0-slam-046-sub1.png",
+              "firstObservedPoseAge": 46.500004,
+              "contactAge": 46
+            },
+            {
+              "serial": 2,
+              "tick": 133285,
+              "shown": 133285.40000224113,
+              "kind": 1,
+              "surfaceCount": 0,
+              "soundCount": 1,
+              "scene": 0,
+              "firstImage": "0-slam-051-sub1.png",
+              "firstObservedPoseAge": 51.4,
+              "contactAge": 51
+            },
+            {
+              "serial": 3,
+              "tick": 133285,
+              "shown": 133285.40000224113,
+              "kind": 0,
+              "surfaceCount": 48,
+              "soundCount": 2,
+              "scene": 0,
+              "firstImage": "0-slam-051-sub1.png",
+              "firstObservedPoseAge": 51.4,
+              "contactAge": 51
+            },
+            {
+              "serial": 4,
+              "tick": 133294,
+              "shown": 133294.20000195503,
+              "kind": 0,
+              "surfaceCount": 48,
+              "soundCount": 2,
+              "scene": 0,
+              "firstImage": "0-slam-060.png",
+              "firstObservedPoseAge": 60.2,
+              "contactAge": 60
+            },
+            {
+              "serial": 5,
+              "tick": 133296,
+              "shown": 133296.70000195503,
+              "kind": 0,
+              "surfaceCount": 48,
+              "soundCount": 1,
+              "scene": 0,
+              "firstImage": "0-slam-062-sub2.png",
+              "firstObservedPoseAge": 62.7,
+              "contactAge": 62
+            },
+            {
+              "serial": 6,
+              "tick": 133298,
+              "shown": 133298.3800020218,
+              "kind": 0,
+              "surfaceCount": 48,
+              "soundCount": 2,
+              "scene": 0,
+              "firstImage": "0-slam-064-sub1.png",
+              "firstObservedPoseAge": 64.380005,
+              "contactAge": 64
+            }
+          ],
+          "obstacles": [],
+          "maxWallOverlap": 0
+        },
+        {
+          "scene": 1,
+          "frames": 76,
+          "maxPoseErrorBlocks": 0.0003299229170218613,
+          "maxDebris": 0,
+          "hits": [
+            {
+              "scene": 1,
+              "age": 29,
+              "damage": 8.400001,
+              "style": "TEAR",
+              "at": {
+                "x": 0.5449489951133728,
+                "y": 82.98640972657921,
+                "z": 12.848220204213009
+              }
+            }
+          ],
+          "ground": [],
+          "presentations": [
+            {
+              "serial": 7,
+              "tick": 133455,
+              "shown": 133455.60000121593,
+              "kind": 2,
+              "surfaceCount": 0,
+              "soundCount": 1,
+              "scene": 1,
+              "firstImage": "1-sweep-029-sub1.png",
+              "firstObservedPoseAge": 29.6,
+              "contactAge": 29
+            }
+          ],
+          "obstacles": [],
+          "maxWallOverlap": 0
+        },
+        {
+          "scene": 2,
+          "frames": 105,
+          "maxPoseErrorBlocks": 0.00015583339750461388,
+          "maxDebris": 0,
+          "hits": [
+            {
+              "scene": 2,
+              "age": 42,
+              "damage": 14,
+              "style": "CRUSH",
+              "at": {
+                "x": 9.223117343454964,
+                "y": 83.05674313022772,
+                "z": 3.9838656783103943
+              }
+            }
+          ],
+          "ground": [],
+          "presentations": [
+            {
+              "serial": 8,
+              "tick": 133569,
+              "shown": 133569.26000118256,
+              "kind": 1,
+              "surfaceCount": 0,
+              "soundCount": 1,
+              "scene": 2,
+              "firstImage": "2-side-042.png",
+              "firstObservedPoseAge": 42.260002,
+              "contactAge": 42
+            }
+          ],
+          "obstacles": [],
+          "maxWallOverlap": 0
+        },
+        {
+          "scene": 3,
+          "frames": 75,
+          "maxPoseErrorBlocks": 0.00004027814212334314,
+          "maxDebris": 0,
+          "hits": [],
+          "ground": [],
+          "presentations": [],
+          "obstacles": [],
+          "maxWallOverlap": 0
+        },
+        {
+          "scene": 4,
+          "frames": 172,
+          "maxPoseErrorBlocks": 0.00018824945246832502,
+          "maxDebris": 0,
+          "hits": [
+            {
+              "scene": 4,
+              "age": 51,
+              "damage": 14,
+              "style": "CRUSH",
+              "at": {
+                "x": 0.01076490464028848,
+                "y": 94.37662562616181,
+                "z": 9.316998619976776
+              }
+            }
+          ],
+          "ground": [],
+          "presentations": [
+            {
+              "serial": 9,
+              "tick": 133806,
+              "shown": 133806.36000299454,
+              "kind": 1,
+              "surfaceCount": 0,
+              "soundCount": 1,
+              "scene": 4,
+              "firstImage": "4-air-051-sub1.png",
+              "firstObservedPoseAge": 51.360004,
+              "contactAge": 51
+            }
+          ],
+          "obstacles": [],
+          "maxWallOverlap": 0
+        },
+        {
+          "scene": 5,
+          "frames": 171,
+          "maxPoseErrorBlocks": 0.00002529593753897987,
+          "maxDebris": 0,
+          "hits": [],
+          "ground": [],
+          "presentations": [
+            {
+              "serial": 10,
+              "tick": 133992,
+              "shown": 133992.04000389576,
+              "kind": 5,
+              "surfaceCount": 1,
+              "soundCount": 2,
+              "scene": 5,
+              "firstImage": "5-wall-045.png",
+              "firstObservedPoseAge": 45.040005,
+              "contactAge": 45
+            }
+          ],
+          "obstacles": [
+            {
+              "scene": 5,
+              "age": 45,
+              "stop": 44.05664
+            }
+          ],
+          "maxWallOverlap": 0
+        },
+        {
+          "scene": 6,
+          "frames": 169,
+          "maxPoseErrorBlocks": 0.00003990754623645561,
+          "maxDebris": 32,
+          "hits": [
+            {
+              "scene": 6,
+              "age": 50,
+              "damage": 14,
+              "style": "CRUSH",
+              "at": {
+                "x": 0.021162864291689988,
+                "y": 81.89999997615814,
+                "z": 7.3356523895928225
+              }
+            }
+          ],
+          "ground": [
+            {
+              "scene": 6,
+              "age": 46,
+              "at": {
+                "x": -1.0036148079667329,
+                "y": 80.5,
+                "z": 2.208232909170015
+              }
+            },
+            {
+              "scene": 6,
+              "age": 51,
+              "at": {
+                "x": 0.32431859373887456,
+                "y": 80.5,
+                "z": 7.640967750070558
+              }
+            }
+          ],
+          "presentations": [
+            {
+              "serial": 11,
+              "tick": 134185,
+              "shown": 134185.44000411034,
+              "kind": 0,
+              "surfaceCount": 48,
+              "soundCount": 2,
+              "scene": 6,
+              "firstImage": "6-slab_small-046-sub1.png",
+              "firstObservedPoseAge": 46.440002,
+              "contactAge": 46
+            },
+            {
+              "serial": 12,
+              "tick": 134189,
+              "shown": 134189.22000408173,
+              "kind": 1,
+              "surfaceCount": 0,
+              "soundCount": 1,
+              "scene": 6,
+              "firstImage": "6-slab_small-050.png",
+              "firstObservedPoseAge": 50.220005,
+              "contactAge": 50
+            },
+            {
+              "serial": 13,
+              "tick": 134190,
+              "shown": 134190.7000041008,
+              "kind": 0,
+              "surfaceCount": 48,
+              "soundCount": 2,
+              "scene": 6,
+              "firstImage": "6-slab_small-051-sub2.png",
+              "firstObservedPoseAge": 51.700005,
+              "contactAge": 51
+            },
+            {
+              "serial": 14,
+              "tick": 134199,
+              "shown": 134199.72000408173,
+              "kind": 0,
+              "surfaceCount": 48,
+              "soundCount": 2,
+              "scene": 6,
+              "firstImage": "6-slab_small-060-sub2.png",
+              "firstObservedPoseAge": 60.720005,
+              "contactAge": 60
+            },
+            {
+              "serial": 15,
+              "tick": 134201,
+              "shown": 134201.24000406265,
+              "kind": 0,
+              "surfaceCount": 48,
+              "soundCount": 1,
+              "scene": 6,
+              "firstImage": "6-slab_small-062.png",
+              "firstObservedPoseAge": 62.240005,
+              "contactAge": 62
+            },
+            {
+              "serial": 16,
+              "tick": 134203,
+              "shown": 134203.50000405312,
+              "kind": 0,
+              "surfaceCount": 48,
+              "soundCount": 2,
+              "scene": 6,
+              "firstImage": "6-slab_small-064-sub1.png",
+              "firstObservedPoseAge": 64.50001,
+              "contactAge": 64
+            }
+          ],
+          "obstacles": [],
+          "maxWallOverlap": 0
+        },
+        {
+          "scene": 7,
+          "frames": 172,
+          "maxPoseErrorBlocks": 0.000026837256065835766,
+          "maxDebris": 0,
+          "hits": [],
+          "ground": [],
+          "presentations": [],
+          "obstacles": [],
+          "maxWallOverlap": 0
+        }
+      ],
+      "evidenceSha256": "521a090d21dbf212b63efcbb2fd0341e801267207e275b3be4c2d3e2a23f87b3",
+      "reviewPages": [
+        "hydra-review-0-0.jpg",
+        "hydra-review-0-1.jpg",
+        "hydra-review-1-0.jpg",
+        "hydra-review-1-1.jpg",
+        "hydra-review-2-0.jpg",
+        "hydra-review-2-1.jpg",
+        "hydra-review-3-0.jpg",
+        "hydra-review-3-1.jpg",
+        "hydra-review-4-0.jpg",
+        "hydra-review-5-0.jpg",
+        "hydra-review-5-1.jpg",
+        "hydra-review-6-0.jpg",
+        "hydra-review-6-1.jpg",
+        "hydra-review-7-0.jpg"
+      ]
+    },
+    {
+      "platform": "forge",
+      "directory": "D:/CodexCache/creature-combat-qa/forge-hydra-frames/",
+      "frames": 1102,
+      "maxPoseErrorBlocks": 0.00017587161730890158,
+      "maxPresentationDelayTicks": 1.3599979877471924,
+      "scenes": [
+        {
+          "scene": 0,
+          "frames": 166,
+          "maxPoseErrorBlocks": 0.000028626483434546833,
+          "maxDebris": 32,
+          "hits": [
+            {
+              "scene": 0,
+              "age": 51,
+              "damage": 14,
+              "style": "CRUSH",
+              "at": {
+                "x": 0.01076490464028848,
+                "y": 82.37662562616181,
+                "z": 9.316998619976776
+              }
+            }
+          ],
+          "ground": [
+            {
+              "scene": 0,
+              "age": 46,
+              "at": {
+                "x": -1.2544198652001881,
+                "y": 81,
+                "z": 2.7596599607294046
+              }
+            },
+            {
+              "scene": 0,
+              "age": 51,
+              "at": {
+                "x": 0.40549949448056516,
+                "y": 81,
+                "z": 9.550887099241457
+              }
+            }
+          ],
+          "presentations": [
+            {
+              "serial": 1,
+              "tick": 68443,
+              "shown": 68443.8199980259,
+              "kind": 0,
+              "surfaceCount": 48,
+              "soundCount": 2,
+              "scene": 0,
+              "firstImage": "0-slam-046-sub2.png",
+              "firstObservedPoseAge": 46.82,
+              "contactAge": 46
+            },
+            {
+              "serial": 2,
+              "tick": 68448,
+              "shown": 68449.35999798775,
+              "kind": 1,
+              "surfaceCount": 0,
+              "soundCount": 1,
+              "scene": 0,
+              "firstImage": "0-slam-052-sub1.png",
+              "firstObservedPoseAge": 52.359997,
+              "contactAge": 51
+            },
+            {
+              "serial": 3,
+              "tick": 68448,
+              "shown": 68449.35999798775,
+              "kind": 0,
+              "surfaceCount": 48,
+              "soundCount": 2,
+              "scene": 0,
+              "firstImage": "0-slam-052-sub1.png",
+              "firstObservedPoseAge": 52.359997,
+              "contactAge": 51
+            },
+            {
+              "serial": 4,
+              "tick": 68457,
+              "shown": 68457.61999773979,
+              "kind": 0,
+              "surfaceCount": 48,
+              "soundCount": 2,
+              "scene": 0,
+              "firstImage": "0-slam-060-sub1.png",
+              "firstObservedPoseAge": 60.62,
+              "contactAge": 60
+            },
+            {
+              "serial": 5,
+              "tick": 68459,
+              "shown": 68459.97999763489,
+              "kind": 0,
+              "surfaceCount": 48,
+              "soundCount": 1,
+              "scene": 0,
+              "firstImage": "0-slam-062-sub2.png",
+              "firstObservedPoseAge": 62.979996,
+              "contactAge": 62
+            },
+            {
+              "serial": 6,
+              "tick": 68461,
+              "shown": 68461.59999752045,
+              "kind": 0,
+              "surfaceCount": 48,
+              "soundCount": 2,
+              "scene": 0,
+              "firstImage": "0-slam-064-sub1.png",
+              "firstObservedPoseAge": 64.6,
+              "contactAge": 64
+            }
+          ],
+          "obstacles": [],
+          "maxWallOverlap": 0
+        },
+        {
+          "scene": 1,
+          "frames": 75,
+          "maxPoseErrorBlocks": 0.000058236599821639626,
+          "maxDebris": 0,
+          "hits": [
+            {
+              "scene": 1,
+              "age": 29,
+              "damage": 8.400001,
+              "style": "TEAR",
+              "at": {
+                "x": 0.5449489951133728,
+                "y": 82.98640972657921,
+                "z": 12.848220204213009
+              }
+            }
+          ],
+          "ground": [],
+          "presentations": [
+            {
+              "serial": 7,
+              "tick": 68618,
+              "shown": 68618.2199985981,
+              "kind": 2,
+              "surfaceCount": 0,
+              "soundCount": 1,
+              "scene": 1,
+              "firstImage": "1-sweep-029.png",
+              "firstObservedPoseAge": 29.22,
+              "contactAge": 29
+            }
+          ],
+          "obstacles": [],
+          "maxWallOverlap": 0
+        },
+        {
+          "scene": 2,
+          "frames": 105,
+          "maxPoseErrorBlocks": 0.00003288521419326898,
+          "maxDebris": 0,
+          "hits": [
+            {
+              "scene": 2,
+              "age": 42,
+              "damage": 14,
+              "style": "CRUSH",
+              "at": {
+                "x": 9.223117343454964,
+                "y": 83.05674313022772,
+                "z": 3.9838656783103943
+              }
+            }
+          ],
+          "ground": [],
+          "presentations": [
+            {
+              "serial": 8,
+              "tick": 68733,
+              "shown": 68733.2199985981,
+              "kind": 1,
+              "surfaceCount": 0,
+              "soundCount": 1,
+              "scene": 2,
+              "firstImage": "2-side-042.png",
+              "firstObservedPoseAge": 42.219997,
+              "contactAge": 42
+            }
+          ],
+          "obstacles": [],
+          "maxWallOverlap": 0
+        },
+        {
+          "scene": 3,
+          "frames": 74,
+          "maxPoseErrorBlocks": 0.00005506852783884392,
+          "maxDebris": 0,
+          "hits": [],
+          "ground": [],
+          "presentations": [],
+          "obstacles": [],
+          "maxWallOverlap": 0
+        },
+        {
+          "scene": 4,
+          "frames": 173,
+          "maxPoseErrorBlocks": 0.00017587161730890158,
+          "maxDebris": 0,
+          "hits": [
+            {
+              "scene": 4,
+              "age": 51,
+              "damage": 14,
+              "style": "CRUSH",
+              "at": {
+                "x": 0.01076490464028848,
+                "y": 94.37662562616181,
+                "z": 9.316998619976776
+              }
+            }
+          ],
+          "ground": [],
+          "presentations": [
+            {
+              "serial": 9,
+              "tick": 68970,
+              "shown": 68970.12000000477,
+              "kind": 1,
+              "surfaceCount": 0,
+              "soundCount": 1,
+              "scene": 4,
+              "firstImage": "4-air-051.png",
+              "firstObservedPoseAge": 51.12,
+              "contactAge": 51
+            }
+          ],
+          "obstacles": [],
+          "maxWallOverlap": 0
+        },
+        {
+          "scene": 5,
+          "frames": 170,
+          "maxPoseErrorBlocks": 0.00002552566685292626,
+          "maxDebris": 0,
+          "hits": [],
+          "ground": [],
+          "presentations": [
+            {
+              "serial": 10,
+              "tick": 69155,
+              "shown": 69155.52000045776,
+              "kind": 5,
+              "surfaceCount": 1,
+              "soundCount": 2,
+              "scene": 5,
+              "firstImage": "5-wall-045-sub1.png",
+              "firstObservedPoseAge": 45.52,
+              "contactAge": 45
+            }
+          ],
+          "obstacles": [
+            {
+              "scene": 5,
+              "age": 45,
+              "stop": 44.05664
+            }
+          ],
+          "maxWallOverlap": 0
+        },
+        {
+          "scene": 6,
+          "frames": 167,
+          "maxPoseErrorBlocks": 0.000027376264639345126,
+          "maxDebris": 32,
+          "hits": [
+            {
+              "scene": 6,
+              "age": 50,
+              "damage": 14,
+              "style": "CRUSH",
+              "at": {
+                "x": 0.021162864291689988,
+                "y": 81.89999997615814,
+                "z": 7.3356523895928225
+              }
+            }
+          ],
+          "ground": [
+            {
+              "scene": 6,
+              "age": 46,
+              "at": {
+                "x": -1.0036148079667329,
+                "y": 80.5,
+                "z": 2.208232909170015
+              }
+            },
+            {
+              "scene": 6,
+              "age": 51,
+              "at": {
+                "x": 0.32431859373887456,
+                "y": 80.5,
+                "z": 7.640967750070558
+              }
+            }
+          ],
+          "presentations": [
+            {
+              "serial": 11,
+              "tick": 69349,
+              "shown": 69349.18000078201,
+              "kind": 0,
+              "surfaceCount": 48,
+              "soundCount": 2,
+              "scene": 6,
+              "firstImage": "6-slab_small-046.png",
+              "firstObservedPoseAge": 46.18,
+              "contactAge": 46
+            },
+            {
+              "serial": 12,
+              "tick": 69353,
+              "shown": 69353.5200009346,
+              "kind": 1,
+              "surfaceCount": 0,
+              "soundCount": 1,
+              "scene": 6,
+              "firstImage": "6-slab_small-050-sub1.png",
+              "firstObservedPoseAge": 50.52,
+              "contactAge": 50
+            },
+            {
+              "serial": 13,
+              "tick": 69354,
+              "shown": 69354.26000094414,
+              "kind": 0,
+              "surfaceCount": 48,
+              "soundCount": 2,
+              "scene": 6,
+              "firstImage": "6-slab_small-051.png",
+              "firstObservedPoseAge": 51.260002,
+              "contactAge": 51
+            },
+            {
+              "serial": 14,
+              "tick": 69363,
+              "shown": 69363.40000104904,
+              "kind": 0,
+              "surfaceCount": 48,
+              "soundCount": 2,
+              "scene": 6,
+              "firstImage": "6-slab_small-060-sub1.png",
+              "firstObservedPoseAge": 60.4,
+              "contactAge": 60
+            },
+            {
+              "serial": 15,
+              "tick": 69365,
+              "shown": 69365.70000100136,
+              "kind": 0,
+              "surfaceCount": 48,
+              "soundCount": 1,
+              "scene": 6,
+              "firstImage": "6-slab_small-062-sub2.png",
+              "firstObservedPoseAge": 62.7,
+              "contactAge": 62
+            },
+            {
+              "serial": 16,
+              "tick": 69367,
+              "shown": 69367.34000086784,
+              "kind": 0,
+              "surfaceCount": 48,
+              "soundCount": 2,
+              "scene": 6,
+              "firstImage": "6-slab_small-064-sub1.png",
+              "firstObservedPoseAge": 64.340004,
+              "contactAge": 64
+            }
+          ],
+          "obstacles": [],
+          "maxWallOverlap": 0
+        },
+        {
+          "scene": 7,
+          "frames": 172,
+          "maxPoseErrorBlocks": 0.00003207736265077847,
+          "maxDebris": 0,
+          "hits": [],
+          "ground": [],
+          "presentations": [],
+          "obstacles": [],
+          "maxWallOverlap": 0
+        }
+      ],
+      "evidenceSha256": "1b29091145713a5b4342cf6036ab2c73ae77719f44fd84e3e755acc897371f82",
+      "reviewPages": [
+        "hydra-review-0-0.jpg",
+        "hydra-review-0-1.jpg",
+        "hydra-review-1-0.jpg",
+        "hydra-review-1-1.jpg",
+        "hydra-review-2-0.jpg",
+        "hydra-review-2-1.jpg",
+        "hydra-review-3-0.jpg",
+        "hydra-review-4-0.jpg",
+        "hydra-review-5-0.jpg",
+        "hydra-review-5-1.jpg",
+        "hydra-review-6-0.jpg",
+        "hydra-review-6-1.jpg",
+        "hydra-review-7-0.jpg"
+      ]
+    }
+  ],
+  "openVisualFindings": [],
+  "resolvedVisualFindings": [
+    {
+      "scene": 5,
+      "issue": "The old attack crossed the wall despite damage occlusion. A one-frame network overshoot and idle horn penetration were also found in the first obstacle QA run.",
+      "fix": "Server geometry reserves the next tick; client geometry forecasts two draw ticks until authoritative recoil metadata arrives. Recoil reverses the accepted source path, cancels remaining attack events, and a bounded neck bend keeps the final resting horns clear.",
+      "evidence": "Each captured wall frame is checked against the wall collision shape; unconstrained source poses intersect the same fixture. Review includes approach, impact, recoil and settled idle."
+    }
+  ],
+  "source": {
+    "source": "D:\\PrototypeReference\\p1\\private\\comparison\\Hydra.p3d",
+    "sha256": "b4bd053853eeb705699a0e7e24229e5f75dcd2cd8baa0eeef0fbeb75528ad5b1",
+    "mapping": {
+      "neck_0": "full_rig_body1",
+      "neck_1": "full_rig_body2",
+      "neck_2": "full_rig_body3",
+      "neck_3": "full_rig_body4",
+      "neck_4": "full_rig_body5",
+      "neck_5": "Neck_2",
+      "neck_6": "Neck_4",
+      "head": "Head",
+      "jaw": "Gum",
+      "pincer_left": "Lip_L",
+      "pincer_right": "Lip_R",
+      "claw_left": "Claw_L",
+      "claw_right": "Claw_R"
+    },
+    "method": "Fixed authored segment lengths; original animated child directions with original world twist; calibrated head/jaw and pincers. Combat only. MC pivots are authoritative.",
+    "unchanged": "Authored geometry, texture, idle, capture, dive, arrival, toss, feeding and transport logic.",
+    "clips": {
+      "slam": {
+        "source": "hyd_slam",
+        "frames": 74,
+        "fps": 30
+      },
+      "sweep": {
+        "source": "hyd_sweep",
+        "frames": 71,
+        "fps": 30
+      },
+      "sidesweep": {
+        "source": "hyd_sidesweep",
+        "frames": 125,
+        "fps": 30
+      }
+    }
+  },
+  "fig": {
+    "file": "art/hydra/contact-source-provenance.json",
+    "sha256": "ccb97541fc24c2fa7236586d7a126223696f51bd975996a010ee018151cdce0e"
+  },
+  "changes": [
+    "Corrected source-to-authored-rig rest axes for combat only; the previously airborne horns now follow the source ground sweep.",
+    "Retained FIG segmented slam and sweep playback, all seven sidesweep joints and early turning windows.",
+    "Exact authored cuboid contacts sampled at 1/16 tick; active windows, wall occlusion, damage vetoes and one shared victim ledger.",
+    "Body scrape and articulated head/jaw ground contact each release once; three source expansion events propagate from the actual support, with actual material fragments and item impulses.",
+    "Timestamped accepted-hit tissue/crush effects and spatial audio; no success feedback on a miss.",
+    "Head, neck, jaw and horn cuboids participate in obstacle checks. Confirmed wall impact produces material chips and sound, without ground ripples or victim blood.",
+    "Ordinary cancellation retracts the accepted pose and retires all pending hit, ground and wave events."
+  ],
+  "regressionNotes": [
+    "The older autonomous Hydra test expected damage at the rooted owner radius. It now places the target in the visible slam reach and verifies autonomous choice, windup, one accepted blow and recovery.",
+    "Hydra GameTests use a 32-block arena to keep their enlarged reach out of adjacent encounter fixtures.",
+    "Gecko diagnostic world matrices cancel the outer body-size transform; QA restores that known outer render transform, the .01 local draw lift, interpolated body yaw and six-tick entry blend before comparison."
+  ],
+  "limitations": [
+    "Source joints, curves and FIG fields are verified; exact original transition conditions, target strategy, procedural controllers and sound patch waveforms remain incomplete.",
+    "Fixed-length block-model retargeting, cuboid collision, source damage ratios against the MC attack attribute, and support-based waves are explicit MC adaptations.",
+    "Obstacle rewind, two-tick visual prediction and at most 0.6 radians of backwards rest bending are MC adaptations, not recovered original procedural controllers. Enclosed obstacles that cannot be cleared by this bounded bend still require a broader solver.",
+    "Terrain displacement is visual with physical loose-item response, not persistent excavation or world block deformation.",
+    "Hidden muted QA verifies cue scheduling and resources, not subjective listening or original audio identity.",
+    "Incoming multipart hit detection, original victim reaction clips, player absorb combinations and other creatures still need the full-goal review. No release package is asserted by this report."
+  ],
+  "implementation": [
+    {
+      "root": "D:/blacklight-evolution/",
+      "files": {
+        "src/main/java/com/codex/blacklight/combat/ContactEffects.java": "e56ee650396ac432e51bc3a274b65961fbe5629384ab129dc96161ac8877a788",
+        "src/main/java/com/codex/blacklight/network/ContactEffectsPayload.java": "638dca6344715988eb6276e36f83153e6bebfdfccd7183d9c1ec04738138c3ba",
+        "src/main/java/com/codex/blacklight/client/renderer/ContactEffectsPresentation.java": "92587322dc1ccd0a895b9f813835b274ebc749ad94589c66cf081dc4fa628a2a",
+        "src/main/java/com/codex/blacklight/combat/HydraContact.java": "880e7e3200b6c2a10d272ab224d34f9dca3f4f0c9f55627b74f7a3babd6da74c",
+        "src/main/java/com/codex/blacklight/combat/HydraCombatAction.java": "a34a04969ad9579f0b8addf51ccd24132b04d3c66eb74abeb64f0376e379914b",
+        "src/main/java/com/codex/blacklight/city/HydraMotion.java": "a726e291a23c099c4216b601614bf9ddeebcf35381d281264c71f8acbae35195",
+        "src/main/java/com/codex/blacklight/entity/BlacklightHydra.java": "5fe3bb1f1db2bdf654206c9d4aa47ad84ab3709c5c92a244569391811981015b",
+        "src/main/resources/assets/blacklight/models/hydra_motion.json": "ffa56ea8c42ec404606f3273e50b4e7e5e9c833244f0fb666b5bd5b1087e0b4b",
+        "src/main/resources/assets/blacklight/models/hydra_combat.json": "c442bcf6549e0df45408f9734e64d88a5123150cd108c061d24158eec7063d76",
+        "src/main/resources/assets/blacklight/animations/blacklight_hydra.animation.json": "1c4816814555f6f886cd8edab8121dbe218d6d7f65f6cc590660c2e9a0deb322"
+      }
+    },
+    {
+      "root": "D:/blacklight-evolution-forge-1.20.1/",
+      "files": {
+        "src/main/java/com/codex/blacklight/combat/ContactEffects.java": "e0b599707c7bf6435e042fcbefa2b87d047a7a424e58dbf33476b74a97f96068",
+        "src/main/java/com/codex/blacklight/network/ContactEffectsPayload.java": "f568e94283d888f3e522cbc34eaf83e734eacc829282ae5ef94d3c1bccf9b4d0",
+        "src/main/java/com/codex/blacklight/client/renderer/ContactEffectsPresentation.java": "3976b95e015ebcab965062fb6be03e867118c0b4633df5828d9cd2ca0a960d97",
+        "src/main/java/com/codex/blacklight/combat/HydraContact.java": "880e7e3200b6c2a10d272ab224d34f9dca3f4f0c9f55627b74f7a3babd6da74c",
+        "src/main/java/com/codex/blacklight/combat/HydraCombatAction.java": "a34a04969ad9579f0b8addf51ccd24132b04d3c66eb74abeb64f0376e379914b",
+        "src/main/java/com/codex/blacklight/city/HydraMotion.java": "bb6083e00317be2ecfcfffa00b1bed9e75ce3de1499ca3612570318db2000e87",
+        "src/main/java/com/codex/blacklight/entity/BlacklightHydra.java": "f06c152b8802a98552e3019adbadba93359290fe7ba68fc1da8ac836971ceab1",
+        "src/main/resources/assets/blacklight/models/hydra_motion.json": "ffa56ea8c42ec404606f3273e50b4e7e5e9c833244f0fb666b5bd5b1087e0b4b",
+        "src/main/resources/assets/blacklight/models/hydra_combat.json": "c442bcf6549e0df45408f9734e64d88a5123150cd108c061d24158eec7063d76",
+        "src/main/resources/assets/blacklight/animations/blacklight_hydra.animation.json": "1c4816814555f6f886cd8edab8121dbe218d6d7f65f6cc590660c2e9a0deb322"
+      }
+    }
+  ]
+}

@@ -44,6 +44,7 @@ public final class ConsumeVictimPose {
         var matrix=new org.joml.Matrix4f();
         var visual=com.codex.blacklight.registry.ModAttachments.getData(entity, ModAttachments.CONSUME_VISUAL);
         if(entity instanceof com.codex.blacklight.entity.BlacklightHunter&&NativeReceiverPose.available(entity,partial))return matrix;
+        if(com.codex.blacklight.combat.ConsumeSequence.bruteMount(entity)&&com.codex.blacklight.combat.ConsumeSequence.mountedStage(visual.stage()))return matrix;
         if(com.codex.blacklight.combat.ConsumeSequence.mountedStage(visual.stage()))
             return matrix.rotateY((float)Math.toRadians(-entity.yBodyRot)).translate(0,h*.65F,0)
                     .rotateX(p.bend()*.16F).rotateZ(p.twist()*.20F).translate(0,-h*.65F,0).rotateY((float)Math.toRadians(entity.yBodyRot));
@@ -112,6 +113,7 @@ public final class ConsumeVictimPose {
     }
     public static void vanilla(EntityModel<?> model,LivingEntity entity,float partial) {
         restore(model);
+        try {
         if (!com.codex.blacklight.registry.ModAttachments.getData(entity, ModAttachments.CONSUME_VISUAL).active()) { hit(model,entity,partial); return; }
         var p=reaction(entity,partial);
         var saved=new IdentityHashMap<ModelPart,PartPose>();SAVED.put(model,saved);
@@ -126,6 +128,7 @@ public final class ConsumeVictimPose {
             limb(saved,humanoid.leftArm,-p.brace()*1.65F,-.15F,.25F+p.brace()*.22F);
             limb(saved,humanoid.rightLeg,p.kick()*.66F,0,.12F);
             limb(saved,humanoid.leftLeg,-p.kick()*.48F,0,-.12F);
+            followClothing(humanoid, saved);
         } else if (model instanceof HierarchicalModel<?> hierarchy) {
             var root=hierarchy.root();
             if(root.hasChild("head"))head(saved,root.getChild("head"),p);
@@ -145,6 +148,10 @@ public final class ConsumeVictimPose {
                 }
                 index++;
             }
+        }
+        } finally {
+            var physical=SAVED.computeIfAbsent(model,ignored->new IdentityHashMap<>());
+            ImpactRagdoll.pose(model,entity,partial,physical);
         }
     }
     private static boolean applyNative(EntityModel<?> model,Map<ModelPart,PartPose> saved,LivingEntity entity,float partial) {
@@ -196,10 +203,7 @@ public final class ConsumeVictimPose {
         position(saved,h.hat,linked.hat().add(shift),h.young,false);position(saved,h.rightArm,linked.rightArm().add(shift),h.young,false);
         position(saved,h.leftArm,linked.leftArm().add(shift),h.young,false);position(saved,h.rightLeg,linked.rightLeg().add(shift),h.young,false);
         position(saved,h.leftLeg,linked.leftLeg().add(shift),h.young,false);
-        if(h instanceof PlayerModel<?> player) {
-            copyPart(saved,player.jacket,h.body);copyPart(saved,player.rightSleeve,h.rightArm);copyPart(saved,player.leftSleeve,h.leftArm);
-            copyPart(saved,player.rightPants,h.rightLeg);copyPart(saved,player.leftPants,h.leftLeg);
-        }
+        followClothing(h, saved);
         // Segmented receivers have actual elbow/knee children. Clearing their
         // locomotion without applying these joints left the captured body rigid.
         projectSegment(saved,h.rightArm,"forearm",frame,7);
@@ -239,6 +243,15 @@ public final class ConsumeVictimPose {
         saved.putIfAbsent(part,part.storePose());var local=NativeReceiverPose.modelPosition(rendered,young,head);part.setPos(local.x,local.y,local.z);
     }
     private static void copyPart(Map<ModelPart,PartPose> saved,ModelPart to,ModelPart from){saved.putIfAbsent(to,to.storePose());to.copyFrom(from);}
+    private static void followClothing(HumanoidModel<?> body, Map<ModelPart,PartPose> saved) {
+        if (body instanceof PlayerModel<?> player) {
+            copyPart(saved, player.jacket, body.body);
+            copyPart(saved, player.rightSleeve, body.rightArm);
+            copyPart(saved, player.leftSleeve, body.leftArm);
+            copyPart(saved, player.rightPants, body.rightLeg);
+            copyPart(saved, player.leftPants, body.leftLeg);
+        }
+    }
     private static void restrain(EntityModel<?> model,Map<ModelPart,PartPose> saved){
         var parts=new java.util.HashSet<ModelPart>();
         var root=ReceiverModelPose.root(model);
@@ -274,6 +287,15 @@ public final class ConsumeVictimPose {
     }
     public static void epic(LivingEntity entity,BlacklightPose pose,float partial) {
         if(!com.codex.blacklight.registry.ModAttachments.getData(entity, ModAttachments.CONSUME_VISUAL).active()) {
+            var recoil = FleshRecoil.sample(entity, partial);
+            if (recoil != null && !ImpactRagdoll.active(entity) && !com.codex.blacklight.client.renderer.AdaptiveRagdoll.active(entity)) {
+                pose.orElseEmpty("Torso").rotation().rotateXYZ(recoil.pitch()*.45F,recoil.twist()*.48F,recoil.roll()*.42F);
+                pose.orElseEmpty("Chest").rotation().rotateXYZ(recoil.pitch()*.55F,recoil.twist()*.52F,recoil.roll()*.58F);
+                pose.orElseEmpty("Head").rotation().rotateX(recoil.head());
+                pose.orElseEmpty("Arm_R").rotation().rotateZ(-.54F*recoil.brace());
+                pose.orElseEmpty("Arm_L").rotation().rotateZ(.56F*recoil.brace());
+                return;
+            }
             var hit=com.codex.blacklight.registry.ModAttachments.getData(entity, ModAttachments.HIT_REACTION);float w=hit.weight(entity.level().getGameTime(),partial);
             if(w>0){
                 float bend=(hit.kind()==com.codex.blacklight.combat.HitReaction.SLAM?.65F:-.22F)*w;
@@ -305,7 +327,49 @@ public final class ConsumeVictimPose {
             pose.orElseEmpty("Leg_"+side).rotation().rotationXYZ(p.kick()*.95F,0,0);
         }
     }
+    static void strikePose(EntityModel<?> model, Map<ModelPart,PartPose> saved, FleshRecoil.Pose pose) {
+        float pitch = pose.pitch(), twist = pose.twist(), roll = pose.roll();
+        if (model instanceof HumanoidModel<?> h) {
+            // Vanilla humanoid shoulders, head and body are siblings. Rotate their
+            // anchor points about the same waist or the head floats off a bent torso.
+            var waist = new org.joml.Quaternionf().rotationZYX(roll, twist, pitch);
+            for (var part : List.of(h.body, h.head, h.hat, h.leftArm, h.rightArm)) {
+                saved.putIfAbsent(part, part.storePose());
+                var anchor = waist.transform(new org.joml.Vector3f(part.x, part.y-10, part.z));
+                part.setPos(anchor.x, anchor.y+10+pose.dip(), anchor.z);
+                rotate(saved, part, pitch, twist, roll);
+            }
+            rotate(saved, h.head, pose.head(), -.28F*twist, -.22F*roll);
+            rotate(saved, h.hat, pose.head(), -.28F*twist, -.22F*roll);
+            rotate(saved, h.rightArm, -.65F*pose.brace(), 0, -.45F*pose.brace());
+            rotate(saved, h.leftArm, -.42F*pose.brace(), 0, .55F*pose.brace());
+            rotate(saved, h.rightLeg, .22F*pose.brace(), 0, .09F*roll);
+            rotate(saved, h.leftLeg, -.26F*pose.brace(), 0, .09F*roll);
+            followClothing(h, saved);
+        } else if (model instanceof HierarchicalModel<?> h) {
+            var root = h.root();
+            if (root.hasChild("body")) rotate(saved,root.getChild("body"),pitch*.58F,twist*.62F,roll*.60F);
+            if (root.hasChild("head")) rotate(saved,root.getChild("head"),pose.head(),twist*.47F,roll*.55F);
+        } else if (model instanceof AgeableModelAccessor a) {
+            for (var head : a.blacklight$heads()) rotate(saved,head,pose.head(),twist*.6F,roll*.6F);
+            int i = 0;
+            for (var part : a.blacklight$body()) {
+                if (i++ == 0) rotate(saved,part,pitch*.48F,twist*.46F,roll*.5F);
+                else rotate(saved,part,(i%2==0?.34F:-.22F)*pose.brace(),0,roll*.2F);
+            }
+        }
+    }
     private static void hit(EntityModel<?> model,LivingEntity entity,float partial) {
+        // A full physical receiver captures its own current species pose. Adding a scripted
+        // flinch first changes the skin under the authoritative blade path before handoff.
+        if(com.codex.blacklight.client.renderer.AdaptiveRagdoll.active(entity))return;
+        var recoil = FleshRecoil.sample(entity, partial);
+        if (recoil != null && !ImpactRagdoll.active(entity)) {
+            var saved = new IdentityHashMap<ModelPart,PartPose>();
+            SAVED.put(model, saved);
+            strikePose(model, saved, recoil);
+            return;
+        }
         var hit=com.codex.blacklight.registry.ModAttachments.getData(entity, ModAttachments.HIT_REACTION);float w=hit.weight(entity.level().getGameTime(),partial);
         if(w<=0)return;
         float bend=(hit.kind()==com.codex.blacklight.combat.HitReaction.SLAM?.60F:-.24F)*w;
@@ -316,6 +380,7 @@ public final class ConsumeVictimPose {
             rotate(saved,h.body,bend,twist,twist*.5F);rotate(saved,h.head,-bend*.6F,0,0);rotate(saved,h.hat,-bend*.6F,0,0);
             rotate(saved,h.rightArm,-.45F*w,0,-.22F*w);rotate(saved,h.leftArm,-.35F*w,0,.22F*w);
             rotate(saved,h.rightLeg,.18F*w,0,0);rotate(saved,h.leftLeg,-.14F*w,0,0);
+            followClothing(h, saved);
         }else if(model instanceof HierarchicalModel<?> h){
             var root=h.root();
             if(root.hasChild("body"))rotate(saved,root.getChild("body"),bend,twist,0);

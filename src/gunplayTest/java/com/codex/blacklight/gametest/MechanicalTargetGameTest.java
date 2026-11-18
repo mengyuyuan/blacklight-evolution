@@ -38,6 +38,12 @@ public final class MechanicalTargetGameTest {
             com.codex.blacklight.animation.PlayerActions.get().synchronizeMode(p,false);
             h.assertTrue(CombatTargeting.lockedEntity(p)==tank,"ordinary-mode synchronization preserves a gun user's accepted lock");
             h.assertTrue(CombatTargeting.locked(p)==null&&CombatTargeting.lockedEntity(p)==tank,"living-body query must not clear mechanical lock");
+            var parked=tank.position();
+            tank.setPos(p.getX(),p.getY(),p.getZ()+12);
+            tank.setDeltaMovement(new Vec3(.35,0,0));
+            var thrown=BlockThrowAim.solve(p,p.getEyePosition(),civilian.getBoundingBox().getCenter(),true,2);
+            h.assertTrue(thrown.target()==tank.getId()&&thrown.velocity().x>0,"a locked moving hull gets a leading throw even with a mob under the crosshair");
+            tank.setPos(parked);tank.setDeltaMovement(Vec3.ZERO);
             p.setYRot(90);float before=tank.health();rifle.use(l,p,InteractionHand.MAIN_HAND);
             h.assertTrue(tank.health()<before,"actual right-click rifle takes tank health with off-axis accepted lock");
             h.assertTrue(FirearmItem.state(stack,0).magazine()==29,"lock shot consumes one actual round");

@@ -40,14 +40,8 @@ public final class ClawPhysicalEffects {
     }
 
     public static void onComboTargetHit(ServerPlayer player, LivingEntity target, boolean heavy) {
-        ServerLevel level = player.serverLevel();
-        Vec3 center = target.getBoundingBox().getCenter();
-        level.sendParticles(BLOOD_RED, center.x, center.y, center.z,
-                heavy ? 18 : 10, 0.34D, target.getBbHeight() * 0.30D, 0.34D, heavy ? 0.12D : 0.075D);
-        level.sendParticles(BIOMASS_DARK, center.x, center.y, center.z,
-                heavy ? 12 : 6, 0.30D, target.getBbHeight() * 0.26D, 0.30D, 0.055D);
-        level.sendParticles(ParticleTypes.DAMAGE_INDICATOR, center.x, center.y, center.z,
-                heavy ? 7 : 3, 0.28D, 0.3D, 0.28D, 0.10D);
+        PlayerHitEffects.emit(player,target,heavy?com.codex.blacklight.infection.InfectedAttackStyle.CRUSH:com.codex.blacklight.infection.InfectedAttackStyle.TEAR,
+                heavy?.8F:.5F,WeaponCutContact.Report.NONE);
     }
 
     public static void onComboImpact(ServerPlayer player, ClawCombatState.Action action,
@@ -113,7 +107,7 @@ public final class ClawPhysicalEffects {
                         0, Math.cos(angle) * 0.18D, 0.22D + ring * 0.045D,
                         Math.sin(angle) * 0.18D, 1.0D);
                 if (point % 6 == 0) {
-                    level.sendParticles(ParticleTypes.POOF,
+                    level.sendParticles(com.codex.blacklight.registry.ModParticles.CONTACT_DUST.get(),
                             x, center.y + 0.09D, z, 1,
                             0.07D, 0.035D, 0.07D, 0.025D);
                 }

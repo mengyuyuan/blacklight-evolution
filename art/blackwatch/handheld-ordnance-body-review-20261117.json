@@ -1,0 +1,71 @@
+{
+  "schema": 1,
+  "date": "2026-11-17",
+  "status": "code_and_static_review_only_tests_not_run",
+  "actual_gap": "The registered handheld OrdnanceProjectile impact queried only living root boxes and measured explosion distance to root position. A true Hydra head collision more than five blocks from the root could therefore consume the thermobaric round without hurting Hydra or reaching its thermal death branch.",
+  "source_scope": {
+    "record": "art/hydra/thermobaric-death-source.json",
+    "source_condition": "P1 Hydra_fig ReactionCondition at5852 selects Thermobaric1; PuppetAnimation5920, independent TrackGroup begins1 second later, hides nine skins at child1/6 second and deletes at child1 second.",
+    "source_review": "Read-only review of HydraDeath/BlacklightHydra/BodyRenderer and nine existing HydraDeathGameTest methods found the actual projectile reception gap. Death kind commit, normal/thermal distinct duration, healthy load clearing and consumed corpse lifetime remain owned by that change.",
+    "not_native_claim": "This patch connects existing Minecraft handheld thermobaric definitions to that source-backed death selection. It does not claim original P1 blast radius, target taxonomy, damage falloff or Minecraft block LoS."
+  },
+  "implementation": [
+    "Set OrdnanceDetonated before super.onHit or any infection, damage, terrain or FX callback. Move entity to HitResult.location (existing block normal offset0.04 retained) before callbacks so damage provenance and saved position use the actual impact.",
+    "CombatTargeting.candidates includes real multipart surfaces near the explosion even when the root box is outside. Preserve an actual direct part ray contact where available; otherwise use OrdnanceBodyContact nearest exposed real skin point.",
+    "One parent UUID receipt is recorded before infection/hurt; refusal or callback cancellation cannot retry another part. No extra direct hit damage is added.",
+    "Retain the original weapon definition radius and damage, existing infection branch, FirearmsCombat parent friendship/creative protection and explicit player PvP permission.",
+    "Saved OrdnanceDetonated discards on the first server tick before super.tick, with no collision, repeat damage or FX. Loading increments impactEpoch; guards stop this entry after each external operation if the projectile was replaced/removed or lost its valid owner.",
+    "Existing VehicleDamageBridge.blast and FirearmBlockDamage.blast arguments and order are retained. No vehicle/aircraft bridge files, explosion hull radius or mounted-occupant policy were changed."
+  ],
+  "explicit_mc_behavior_changes": {
+    "surface_falloff": "Both animated bodies and ordinary living targets now measure blast reception and damage attenuation from the nearest exposed receiving surface instead of entity root. Ordinary edge damage/reach can therefore differ.",
+    "cover": "Living blast reception now requires a loaded unobstructed COLLIDER ray from blast center to the chosen real surface. Previous handheld living damage could pass through walls; this is a deliberate MC cover adapter, not recovered native behavior.",
+    "owner_missing": "Preserves old handheld policy: an absent/dead/removed/cross-world owner causes no living/infection/hull/terrain damage; presentation FX still occurs. Owner validity is not invented after loss.",
+    "mounted_living": "Preserves old handheld policy allowing lawful mounted LivingEntity candidates. Vehicle projectile occupant exclusions are separate and were not transplanted into this patch."
+  },
+  "regressions_authored_not_run": [
+    "HandheldOrdnanceBodyGameTest.realHeadImpactSelectsThermalDeathAndCallbackSpentSaveCannotReplay: native registered projectile collides with actual head outside old root range/query; fatal event captures spent save before onHit returns; assert thermal death, one fatal event, reload spent projectile beside new living witness and assert no repeat damage.",
+    "HandheldOrdnanceBodyGameTest.realTerrainImpactCannotBlastNearbyBodyThroughSolidCeiling: real falling projectile hits solid cover with actual body surface within radius; health and incoming effects stay unchanged.",
+    "HandheldOrdnanceBodyGameTest.realPartImpactUsesParentFriendshipWithoutDamagingIt: real physical head part consumes projectile but scoreboard protection on the living parent prevents damage."
+  ],
+  "fixture_boundaries": [
+    "Tests use the actual registered projectile tick/onHit and active picking mixin. They never directly invoke onHit or target.hurt, and do not hand-construct a DamageSource.",
+    "Source idle Hydra pose, noAI/noGravity actor marks, size2 and test-only straight projectile velocity isolate collision. The fixture first asserts a real exposed head ray outside the root AABB query; live idle movement may still affect that mark and remains unexecuted.",
+    "Only fixture-added forced chunks are released, fixture entities/teams are discarded, and explicitly placed ceiling block states are restored.",
+    "Tests have not been compiled or executed. Runtime fixture timing, head positioning, game event ordering and visible effects remain pending; the spent regression checks repeat damage, not a measured particle/sound count."
+  ],
+  "remaining_existing_boundaries": [
+    "Impact epoch guards operate before/after each external call made by this entry. Internal multiple-hull/block work inside VehicleDamageBridge.blast or FirearmBlockDamage.blast cannot be individually interrupted by this entry before those calls return.",
+    "If an onHit callback replaces this same projectile with an unspent snapshot, ThrowableProjectile.super.tick can still perform the old tick remaining position update once. This patch does not claim a complete transaction around vanilla tick or all downstream callbacks.",
+    "Source selection and renderer hide are statically reviewed only; actual normal-versus-thermal animation, hide/delete timing and client effects await user-authorized testing."
+  ],
+  "test_entry": "tools/player-military-regression.init.gradle explicitly whitelists HandheldOrdnanceBodyGameTest; queued playerMilitaryServer. No Java, Gradle, test, client, game, original binary or media playback executed.",
+  "static_checks": [
+    "Normalized Neo/Forge test text and projectile APIs compared.",
+    "Three GameTest annotations counted; whitelist and structure resource existence checked.",
+    "git diff --check limited to the modified branch paths.",
+    "All listed snapshot files hashed from current disk; JSON parsed and identical review copies mirrored."
+  ],
+  "snapshots": {
+    "neo": {
+      "src/main/java/com/codex/blacklight/firearms/OrdnanceProjectile.java": "c141ff44326c7f97d2d23f4baba2c0f636dcb7ae0356af5e043627b15b05c8e0",
+      "src/blackwatchTest/java/com/codex/blacklight/gametest/HandheldOrdnanceBodyGameTest.java": "0230368b3afab532934ea804e7252fef4f6ff249683d221beab08579a72993e6",
+      "tools/player-military-regression.init.gradle": "344165b65b7717485b94cff7047458f3124df5f185fa56d6346cf770719185ab",
+      "src/main/java/com/codex/blacklight/firearms/OrdnanceBodyContact.java": "baa106ffc428e1d3d45d88abe9c4af50b6b0c5287b176a03624ea454439d1fc5",
+      "src/main/java/com/codex/blacklight/combat/HydraHurtContact.java": "1c4ce212a2c845bad3cd020874f0a9eed303da8d6de7e5af17666cb002f65170",
+      "src/main/java/com/codex/blacklight/combat/CombatTargeting.java": "2bbda98af4b9f6b6cb67c3c25f80990d8645b99e9ff475e70361225a35ce5590",
+      "src/main/java/com/codex/blacklight/mixin/HydraProjectileContactMixin.java": "1fa77f4b5f4d0e184bdf0bb97b1b408ad0b999728be0ab00900013f81688c13a",
+      "src/main/java/com/codex/blacklight/firearms/WeaponCatalog.java": "54d0e1d1afee93cda5624705f40cf78b44ff467fd77a4ec0d5369023c77d311e"
+    },
+    "forge": {
+      "src/main/java/com/codex/blacklight/firearms/OrdnanceProjectile.java": "f5b649689a4f6db4f08635f71cb373ee9897b527620aba6b0fb57210b7c3b5d1",
+      "src/blackwatchTest/java/com/codex/blacklight/gametest/HandheldOrdnanceBodyGameTest.java": "16c39c38e3d2dffabe15ef2a4c32f66f465734016e37b7a17f42514e6221314c",
+      "tools/player-military-regression.init.gradle": "344165b65b7717485b94cff7047458f3124df5f185fa56d6346cf770719185ab",
+      "src/main/java/com/codex/blacklight/firearms/OrdnanceBodyContact.java": "baa106ffc428e1d3d45d88abe9c4af50b6b0c5287b176a03624ea454439d1fc5",
+      "src/main/java/com/codex/blacklight/combat/HydraHurtContact.java": "071576e7f738e30e54f4bcc2ade8cb41aeace4ea4fa4b1bf3d7009f4c114679f",
+      "src/main/java/com/codex/blacklight/combat/CombatTargeting.java": "2d4c8eb1a689dba870ea0385928ccc075b0a348f9fa688c46960a2be66cda7ed",
+      "src/main/java/com/codex/blacklight/mixin/HydraProjectileContactMixin.java": "1fa77f4b5f4d0e184bdf0bb97b1b408ad0b999728be0ab00900013f81688c13a",
+      "src/main/java/com/codex/blacklight/firearms/WeaponCatalog.java": "54d0e1d1afee93cda5624705f40cf78b44ff467fd77a4ec0d5369023c77d311e"
+    }
+  }
+}

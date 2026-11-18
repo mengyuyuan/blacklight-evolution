@@ -25,9 +25,10 @@ public final class ShaderPackCompat {
     private static final List<Runnable> DEFERRED=new ArrayList<>();
     private static java.lang.reflect.Method inUse;
     private static Object api;
-    private static boolean missing,checked;
+    private static boolean missing,checked,reported;
     private static long checkedAt;
     private static boolean cached;
+    private static final boolean FORCED="1".equals(System.getenv("BLACKLIGHT_FORCE_SHADERPACK_PATH"));
     private ShaderPackCompat(){}
 
     /** True while an Oculus/Iris shader pack renders the world. Never throws. */
@@ -36,7 +37,8 @@ public final class ShaderPackCompat {
         // checkedAt starts unset: subtracting a sentinel such as Long.MIN_VALUE overflows
         // to a negative age and would pin the first cached answer forever.
         if(checked&&now-checkedAt<50_000_000L)return cached;
-        checked=true;checkedAt=now;cached=false;
+        checked=true;checkedAt=now;cached=FORCED;
+        if(FORCED)return true;
         if(missing)return cached;
         try{
             if(api==null){
@@ -47,8 +49,10 @@ public final class ShaderPackCompat {
             cached=Boolean.TRUE.equals(inUse.invoke(api));
         }catch(ClassNotFoundException|NoSuchMethodException|LinkageError absent){
             missing=true; // No Oculus/Iris installed: never probe again.
+            com.mojang.logging.LogUtils.getLogger().info("Shader pack API unavailable: {}",absent.toString());
         }catch(Throwable early){
             // Early answers can throw before the pack loads; retry on the next check.
+            if(!reported){reported=true;com.mojang.logging.LogUtils.getLogger().info("Shader pack probe not ready yet: {}",early.toString());}
         }
         return cached;
     }

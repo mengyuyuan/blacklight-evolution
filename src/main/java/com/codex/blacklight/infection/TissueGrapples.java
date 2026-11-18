@@ -22,7 +22,7 @@ public final class TissueGrapples {
         if(!TissueActions.eligible(host)||!ModAttachments.available(target)||host.level().isClientSide||host==target||!host.isAlive()||!target.isAlive()
                 ||Math.max(TissueActions.power(host,TissueCore.EXTRAORAL),Math.max(TissueActions.power(host,TissueCore.TONGUE),Math.max(TissueActions.power(host,TissueCore.GRASP),Math.max(TissueActions.power(host,TissueCore.CHELA),TissueActions.power(host,TissueCore.HYDROSTAT)))))<=0
                 ||TissueCompetition.controls(target)||TissueCompetition.controls(host)||ConsumeSystem.grappleProtected(target)||target.isPassenger()||target.isVehicle()
-                ||com.codex.blacklight.registry.ModAttachments.getData(target, ModAttachments.CONSUME_VISUAL).active()
+                ||ModAttachments.peekData(target,ModAttachments.CONSUME_VISUAL,com.codex.blacklight.combat.ConsumeVisual.EMPTY).active()
                 ||com.codex.blacklight.power.BiomassSystem.claimant(target)!=null
                 ||target instanceof Player p&&(p.isCreative()||p.isSpectator())
                 ||target.getBbWidth()>host.getBbWidth()*2||target.getBbHeight()>host.getBbHeight()*2
@@ -38,8 +38,8 @@ public final class TissueGrapples {
         if(!TissueActions.eligible(host)||target.isRemoved()||!target.isAlive()
                 ||host.level()!=target.level()||host.level().getGameTime()>=hold.until
                 ||!TissueActions.gripActive(host)&&!TissueActions.legacyGrip(host)
-                ||host.isNoAi()||com.codex.blacklight.registry.ModAttachments.getData(host, ModAttachments.CONSUME_VISUAL).active()
-                ||com.codex.blacklight.registry.ModAttachments.getData(target, ModAttachments.CONSUME_VISUAL).active()
+                ||host.isNoAi()||ModAttachments.peekData(host,ModAttachments.CONSUME_VISUAL,com.codex.blacklight.combat.ConsumeVisual.EMPTY).active()
+                ||ModAttachments.peekData(target,ModAttachments.CONSUME_VISUAL,com.codex.blacklight.combat.ConsumeVisual.EMPTY).active()
                 ||com.codex.blacklight.power.BiomassSystem.claimant(target)!=null
                 ||target instanceof Player player&&(player.isCreative()||player.isSpectator())
                 ||target.isPassenger()||target.isVehicle()

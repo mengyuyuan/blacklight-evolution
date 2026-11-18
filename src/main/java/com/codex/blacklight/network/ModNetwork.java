@@ -19,7 +19,7 @@ import net.minecraftforge.network.NetworkRegistry;
 import net.minecraftforge.network.simple.SimpleChannel;
 
 public final class ModNetwork {
-    private static final String PROTOCOL = "forge-1.20.1-encounter-contact-1";
+    private static final String PROTOCOL = "forge-1.20.1-49-torso-air-cannon";
     private static final SimpleChannel CHANNEL = NetworkRegistry.newSimpleChannel(
             new ResourceLocation(BlacklightNeoMod.MOD_ID, "main"), () -> PROTOCOL, PROTOCOL::equals, PROTOCOL::equals);
     private static boolean registered;
@@ -34,10 +34,14 @@ public final class ModNetwork {
         // Configurable ecology, consume variants and military payloads share one negotiated layout.
         new ForgePayloadRegistrar(CHANNEL)
                 .playToClient(ContactEffectsPayload.class,ContactEffectsPayload.STREAM_CODEC,(payload,context)->context.enqueueWork(()->com.codex.blacklight.client.renderer.ContactEffectsPresentation.accept(payload)))
+                .playToServer(ContextActionPayload.class,ContextActionPayload.STREAM_CODEC,(payload,context)->context.enqueueWork(()->{if(context.player() instanceof ServerPlayer player)com.codex.blacklight.combat.ContextActionSystem.request(player);}))
+                .playToClient(RagdollImpactPayload.class,RagdollImpactPayload.CODEC,(payload,context)->context.enqueueWork(()->com.codex.blacklight.client.animation.ImpactRagdoll.accept(payload)))
                 .playToServer(FirearmReloadPayload.class,FirearmReloadPayload.STREAM_CODEC,(payload,context)->context.enqueueWork(()->{if(context.player() instanceof ServerPlayer player)payload.handle(player);}))
                 .playToClient(GunplayFeedbackPayload.class,GunplayFeedbackPayload.STREAM_CODEC,(payload,context)->context.enqueueWork(()->com.codex.blacklight.client.renderer.GunplayVisuals.accept(payload)))
+                .playToClient(VehicleDestructionPayload.class,VehicleDestructionPayload.STREAM_CODEC,(payload,context)->context.enqueueWork(()->com.codex.blacklight.client.renderer.VehicleDestructionVisuals.accept(payload)))
                 .playToClient(InfectedImpactPayload.class,InfectedImpactPayload.STREAM_CODEC,(payload,context)->context.enqueueWork(()->com.codex.blacklight.client.renderer.InfectedImpactVisuals.accept(payload)))
                 .playToClient(DistrictZonePayload.class,DistrictZonePayload.STREAM_CODEC,(payload,context)->context.enqueueWork(()->com.codex.blacklight.client.DistrictZoneHud.accept(payload)))
+                .playToServer(HelicopterControlPayload.class,HelicopterControlPayload.STREAM_CODEC,(payload,context)->context.enqueueWork(()->{if(context.player() instanceof ServerPlayer p)payload.handle(p);}))
                 .playToServer(VehicleControlPayload.class,VehicleControlPayload.STREAM_CODEC,(payload,context)->context.enqueueWork(()->{if(context.player() instanceof ServerPlayer p)payload.handle(p);}))
                 .playToServer(VehicleSeatPayload.class,VehicleSeatPayload.STREAM_CODEC,(payload,context)->context.enqueueWork(()->{if(context.player() instanceof ServerPlayer p)payload.handle(p);}))
                 .playToServer(DisguiseSelectPayload.class,DisguiseSelectPayload.STREAM_CODEC,(payload,context)->context.enqueueWork(()->{
@@ -52,8 +56,8 @@ public final class ModNetwork {
                 }))
                 .playToServer(WingSpeedPayload.class,WingSpeedPayload.STREAM_CODEC,(payload,context)->context.enqueueWork(()->{
                     if(context.player() instanceof ServerPlayer player&&WingSpeedPayload.valid(payload.percent())){
-                        com.codex.blacklight.registry.ModAttachments.setData(player,com.codex.blacklight.registry.ModAttachments.SKILL_SETTINGS,com.codex.blacklight.registry.ModAttachments.getData(player,com.codex.blacklight.registry.ModAttachments.SKILL_SETTINGS).withWingSpeed(payload.percent()));
-                        com.codex.blacklight.registry.ModAttachments.syncData(player,com.codex.blacklight.registry.ModAttachments.SKILL_SETTINGS);
+                        com.codex.blacklight.registry.ModAttachments.setData(player, com.codex.blacklight.registry.ModAttachments.SKILL_SETTINGS,com.codex.blacklight.registry.ModAttachments.getData(player, com.codex.blacklight.registry.ModAttachments.SKILL_SETTINGS).withWingSpeed(payload.percent()));
+                        com.codex.blacklight.registry.ModAttachments.syncData(player, com.codex.blacklight.registry.ModAttachments.SKILL_SETTINGS);
                     }
                 }))
                 .playToServer(SkillSettingsPayload.class,SkillSettingsPayload.STREAM_CODEC,(payload,context)->
@@ -212,3 +216,4 @@ public final class ModNetwork {
 
     }
 }
+

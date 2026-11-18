@@ -20,7 +20,7 @@ public final class GrabHoldPose {
         boolean blade=com.codex.blacklight.registry.ModAttachments.getData(player, ModAttachments.PLAYER_STATE).getActivePower()==PowerForm.BLADE&&(!(player instanceof net.minecraft.world.entity.player.Player p)||com.codex.blacklight.combat.BlockThrowSystem.held(p)==null);
         var held=player.level().getEntitiesOfClass(LivingEntity.class,player.getBoundingBox().inflate(4),e->{
             var visual=com.codex.blacklight.registry.ModAttachments.getData(e, ModAttachments.CONSUME_VISUAL);
-            return visual.consumerId()==player.getId()&&(visual.stage()==ConsumeVisual.HOLD || blade &&
+            return visual.consumerId()==player.getId()&&(ConsumeVisual.holding(visual.stage()) || blade &&
                     (visual.stage()==ConsumeVisual.CONSUME || visual.stage()==ConsumeVisual.THROW || visual.stage()==ConsumeVisual.CAPTURE &&
                      visual.phaseProgress(player.level().getGameTime(),partial)>=.6F));
         });
@@ -50,6 +50,8 @@ public final class GrabHoldPose {
             double height=net.minecraft.util.Mth.clamp(GrabPlacement.bladeContact(ownerPos,yaw,pitch,progress).y-mobPos.y,mob.getBbHeight()*.15,mob.getBbHeight()*.85);
             target=mobPos.add(ConsumeVictimPose.point(mob,new Vec3(0,height,0),partial)).subtract(ownerPos);
         }
+        if(mob instanceof com.codex.blacklight.entity.EncounterMob flyer&&flyer.kind()==com.codex.blacklight.entity.EncounterKind.FLYER)
+            target=FlyerCarryPose.contact(flyer,target.add(ownerPos),partial,blade).subtract(ownerPos);
         var desired=new org.joml.Vector3f((float)(-target.dot(left)/.9375),(float)(target.y/.9375),(float)(-target.dot(forward)/.9375));
         String side=blade||paired?"R":"L",tool="Tool_"+side;
         boolean claws=com.codex.blacklight.registry.ModAttachments.getData(player, ModAttachments.PLAYER_STATE).getActivePower()==PowerForm.CLAWS;
@@ -57,7 +59,11 @@ public final class GrabHoldPose {
         palmLocal=WeaponModelAnchors.get(com.codex.blacklight.registry.ModAttachments.getData(player, ModAttachments.PLAYER_STATE).getActivePower(),blade?"bladeGrip_R":"palm_"+side,palmLocal);
         var wrist=armature.searchJointByName(tool);
         if(wrist==null)return;
-        var endpoint=new org.joml.Matrix4f(wrist.getLocalTransform()).invert().transformPosition(palmLocal);
-        BlacklightBoneIk.reach(armature,pose,side,desired,endpoint,16);
+        var endpoint=new org.joml.Matrix4f(wrist.getLocalTransform()).invert().transformPosition(new org.joml.Vector3f(palmLocal));
+        // The blade is rigidly drawn on Hand_R; unlike the claws its mesh does
+        // not receive Tool_R wrist deformation. Express that real grip in the
+        // posed wrist's frame before solving the same shoulder/elbow chain.
+        if(blade)BlacklightBoneIk.reachHand(armature,pose,side,desired,palmLocal,16);
+        else BlacklightBoneIk.reach(armature,pose,side,desired,endpoint,16);
     }
 }

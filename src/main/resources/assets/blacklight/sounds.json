@@ -1234,9 +1234,9 @@
     "subtitle": "subtitles.blacklight.firearm.launcher",
     "sounds": [
       {
-        "name": "blacklight:firearms/impact_1",
+        "name": "blacklight:vehicles/rocket",
         "volume": 0.85,
-        "pitch": 1
+        "attenuation_distance": 32
       }
     ]
   },
@@ -1282,6 +1282,404 @@
         "name": "blacklight:firearms/reload_bolt",
         "volume": 0.85,
         "pitch": 1
+      }
+    ]
+  },
+  "vehicle.truck_engine": {
+    "subtitle": "subtitles.blacklight.vehicle.truck_engine",
+    "sounds": [
+      {
+        "name": "blacklight:vehicles/truck_engine",
+        "attenuation_distance": 32,
+        "preload": true
+      }
+    ]
+  },
+  "vehicle.apc_engine": {
+    "subtitle": "subtitles.blacklight.vehicle.apc_engine",
+    "sounds": [
+      {
+        "name": "blacklight:vehicles/apc_engine",
+        "attenuation_distance": 32,
+        "preload": true
+      }
+    ]
+  },
+  "vehicle.tank_engine": {
+    "subtitle": "subtitles.blacklight.vehicle.tank_engine",
+    "sounds": [
+      {
+        "name": "blacklight:vehicles/tank_engine",
+        "attenuation_distance": 32,
+        "preload": true
+      }
+    ]
+  },
+  "vehicle.wheels": {
+    "subtitle": "subtitles.blacklight.vehicle.wheels",
+    "sounds": [
+      {
+        "name": "blacklight:vehicles/wheels",
+        "attenuation_distance": 32,
+        "preload": true
+      }
+    ]
+  },
+  "vehicle.tracks": {
+    "subtitle": "subtitles.blacklight.vehicle.tracks",
+    "sounds": [
+      {
+        "name": "blacklight:vehicles/tracks",
+        "attenuation_distance": 32,
+        "preload": true
+      }
+    ]
+  },
+  "vehicle.autocannon": {
+    "subtitle": "subtitles.blacklight.vehicle.autocannon",
+    "sounds": [
+      {
+        "name": "blacklight:vehicles/autocannon_1",
+        "attenuation_distance": 48,
+        "preload": true
+      },
+      {
+        "name": "blacklight:vehicles/autocannon_2",
+        "attenuation_distance": 48,
+        "preload": true
+      }
+    ]
+  },
+  "vehicle.coaxial": {
+    "subtitle": "subtitles.blacklight.vehicle.coaxial",
+    "sounds": [
+      {
+        "name": "blacklight:vehicles/coaxial_1",
+        "attenuation_distance": 32,
+        "preload": true
+      },
+      {
+        "name": "blacklight:vehicles/coaxial_2",
+        "attenuation_distance": 32,
+        "preload": true
+      }
+    ]
+  },
+  "vehicle.cannon": {
+    "subtitle": "subtitles.blacklight.vehicle.cannon",
+    "sounds": [
+      {
+        "name": "blacklight:firearms/cannon_1",
+        "attenuation_distance": 64,
+        "preload": true
+      },
+      {
+        "name": "blacklight:firearms/cannon_2",
+        "attenuation_distance": 64,
+        "preload": true
+      }
+    ]
+  },
+  "vehicle.rocket": {
+    "subtitle": "subtitles.blacklight.vehicle.rocket",
+    "sounds": [
+      {
+        "name": "blacklight:vehicles/rocket",
+        "attenuation_distance": 32,
+        "preload": true
+      }
+    ]
+  },
+  "vehicle.helicopter_rotor": {
+    "sounds": [
+      {
+        "name": "blacklight:vehicles/helicopter_rotor",
+        "stream": false,
+        "attenuation_distance": 96
+      }
+    ]
+  },
+  "vehicle.helicopter_turbine": {
+    "sounds": [
+      {
+        "name": "blacklight:vehicles/helicopter_turbine",
+        "stream": false,
+        "attenuation_distance": 96
+      }
+    ]
+  },
+  "vehicle.helicopter_door": {
+    "sounds": [
+      {
+        "name": "blacklight:vehicles/helicopter_door",
+        "stream": false,
+        "attenuation_distance": 32
+      }
+    ]
+  },
+  "vehicle.helicopter_alarm": {
+    "sounds": [
+      {
+        "name": "blacklight:vehicles/helicopter_alarm",
+        "stream": false,
+        "attenuation_distance": 32
+      }
+    ]
+  },
+  "vehicle.uav_rotor": {
+    "subtitle": "subtitles.blacklight.uav_rotor",
+    "sounds": [
+      {
+        "name": "blacklight:vehicles/uav_rotor",
+        "stream": false,
+        "attenuation_distance": 40
+      }
+    ]
+  },
+  "vehicle.uav_scan": {
+    "subtitle": "subtitles.blacklight.uav_scan",
+    "sounds": [
+      {
+        "name": "blacklight:vehicles/uav_scan",
+        "stream": false,
+        "attenuation_distance": 40
+      }
+    ]
+  },
+  "vehicle.uav_transmit": {
+    "subtitle": "subtitles.blacklight.uav_transmit",
+    "sounds": [
+      {
+        "name": "blacklight:vehicles/uav_transmit",
+        "stream": false,
+        "attenuation_distance": 32
+      }
+    ]
+  },
+  "vehicle.uav_confirm": {
+    "subtitle": "subtitles.blacklight.uav_confirm",
+    "sounds": [
+      {
+        "name": "blacklight:vehicles/uav_confirm",
+        "stream": false,
+        "attenuation_distance": 32
+      }
+    ]
+  },
+  "vehicle.uav_break": {
+    "subtitle": "subtitles.blacklight.uav_break",
+    "sounds": [
+      {
+        "name": "blacklight:vehicles/uav_break",
+        "stream": false,
+        "attenuation_distance": 32
+      }
+    ]
+  },
+  "vehicle.uav_seeing": {
+    "subtitle": "subtitles.blacklight.uav_seeing",
+    "sounds": [
+      {
+        "name": "blacklight:vehicles/uav_seeing",
+        "stream": false,
+        "attenuation_distance": 40
+      }
+    ]
+  },
+  "vehicle.uav_alert": {
+    "subtitle": "subtitles.blacklight.uav_alert",
+    "sounds": [
+      {
+        "name": "blacklight:vehicles/uav_alert",
+        "stream": false,
+        "attenuation_distance": 40
+      }
+    ]
+  },
+  "infection.common_attack": {
+    "subtitle": "subtitle.blacklight.infection.common_attack",
+    "sounds": [
+      {
+        "name": "blacklight:infection/common_attack_1",
+        "volume": 0.9,
+        "attenuation_distance": 24
+      },
+      {
+        "name": "blacklight:infection/common_attack_2",
+        "volume": 0.9,
+        "attenuation_distance": 24
+      },
+      {
+        "name": "blacklight:infection/common_attack_3",
+        "volume": 0.9,
+        "attenuation_distance": 24
+      }
+    ]
+  },
+  "infection.common_death": {
+    "subtitle": "subtitle.blacklight.infection.common_death",
+    "sounds": [
+      {
+        "name": "blacklight:infection/common_death_1",
+        "volume": 0.7,
+        "attenuation_distance": 24
+      },
+      {
+        "name": "blacklight:infection/common_death_2",
+        "volume": 0.7,
+        "attenuation_distance": 24
+      },
+      {
+        "name": "blacklight:infection/common_death_3",
+        "volume": 0.7,
+        "attenuation_distance": 24
+      }
+    ]
+  },
+  "infection.hunter_grunt": {
+    "subtitle": "subtitle.blacklight.infection.hunter_grunt",
+    "sounds": [
+      {
+        "name": "blacklight:infection/hunter_grunt_1",
+        "volume": 0.9,
+        "attenuation_distance": 24
+      },
+      {
+        "name": "blacklight:infection/hunter_grunt_2",
+        "volume": 0.9,
+        "attenuation_distance": 24
+      },
+      {
+        "name": "blacklight:infection/hunter_grunt_3",
+        "volume": 0.9,
+        "attenuation_distance": 24
+      }
+    ]
+  },
+  "infection.hunter_roar": {
+    "subtitle": "subtitle.blacklight.infection.hunter_roar",
+    "sounds": [
+      {
+        "name": "blacklight:infection/hunter_roar_1",
+        "volume": 0.85,
+        "attenuation_distance": 24
+      },
+      {
+        "name": "blacklight:infection/hunter_roar_2",
+        "volume": 0.85,
+        "attenuation_distance": 24
+      },
+      {
+        "name": "blacklight:infection/hunter_roar_3",
+        "volume": 0.85,
+        "attenuation_distance": 24
+      }
+    ]
+  },
+  "infection.hunter_hurt": {
+    "subtitle": "subtitle.blacklight.infection.hunter_hurt",
+    "sounds": [
+      {
+        "name": "blacklight:infection/hunter_grunt_1",
+        "volume": 0.75,
+        "attenuation_distance": 24
+      },
+      {
+        "name": "blacklight:infection/hunter_grunt_2",
+        "volume": 0.75,
+        "attenuation_distance": 24
+      },
+      {
+        "name": "blacklight:infection/hunter_grunt_3",
+        "volume": 0.75,
+        "attenuation_distance": 24
+      }
+    ]
+  },
+  "infection.hunter_death": {
+    "subtitle": "subtitle.blacklight.infection.hunter_death",
+    "sounds": [
+      {
+        "name": "blacklight:infection/hunter_death_1",
+        "volume": 0.85,
+        "attenuation_distance": 24
+      },
+      {
+        "name": "blacklight:infection/hunter_death_2",
+        "volume": 0.85,
+        "attenuation_distance": 24
+      },
+      {
+        "name": "blacklight:infection/hunter_death_3",
+        "volume": 0.85,
+        "attenuation_distance": 24
+      }
+    ]
+  },
+  "infection.hunter_whoosh": {
+    "subtitle": "subtitle.blacklight.infection.hunter_whoosh",
+    "sounds": [
+      {
+        "name": "blacklight:infection/swing_1",
+        "volume": 1,
+        "attenuation_distance": 24
+      },
+      {
+        "name": "blacklight:infection/swing_2",
+        "volume": 1,
+        "attenuation_distance": 24
+      },
+      {
+        "name": "blacklight:infection/swing_3",
+        "volume": 1,
+        "attenuation_distance": 24
+      }
+    ]
+  },
+  "infection.common_land": {
+    "subtitle": "subtitle.blacklight.infection.common_land",
+    "sounds": [
+      {
+        "name": "blacklight:infection/ground_1",
+        "volume": 0.65,
+        "attenuation_distance": 24
+      },
+      {
+        "name": "blacklight:infection/ground_2",
+        "volume": 0.65,
+        "attenuation_distance": 24
+      },
+      {
+        "name": "blacklight:infection/ground_3",
+        "volume": 0.65,
+        "attenuation_distance": 24
+      }
+    ]
+  },
+  "vehicle.helicopter_jet": {
+    "sounds": [
+      {
+        "name": "blacklight:vehicles/helicopter_jet",
+        "stream": false,
+        "attenuation_distance": 96
+      }
+    ]
+  },
+  "vehicle.helicopter_startup": {
+    "sounds": [
+      {
+        "name": "blacklight:vehicles/helicopter_startup",
+        "stream": false,
+        "attenuation_distance": 96
+      }
+    ]
+  },
+  "vehicle.helicopter_winddown": {
+    "sounds": [
+      {
+        "name": "blacklight:vehicles/helicopter_winddown",
+        "stream": false,
+        "attenuation_distance": 96
       }
     ]
   },

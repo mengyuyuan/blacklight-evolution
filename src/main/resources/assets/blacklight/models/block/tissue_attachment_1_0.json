@@ -14,11 +14,14 @@
       ],
       "to": [
         14,
-        0.288,
+        0.75,
         14
       ],
       "faces": {
         "up": {
+          "texture": "#flesh"
+        },
+        "down": {
           "texture": "#flesh"
         },
         "north": {

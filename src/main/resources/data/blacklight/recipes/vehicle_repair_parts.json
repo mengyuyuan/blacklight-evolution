@@ -12,7 +12,7 @@
     }
   ],
   "result": {
-    "count": 1,
-    "item": "blacklight:vehicle_repair_parts"
+    "item": "blacklight:vehicle_repair_parts",
+    "count": 1
   }
 }

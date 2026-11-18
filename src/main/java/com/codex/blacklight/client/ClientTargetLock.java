@@ -167,7 +167,22 @@ public final class ClientTargetLock {
         boolean altitude=lockedTarget instanceof LivingEntity living&&!selection(lockedTarget).regional()&&active()&&lockedTarget.level()==p.level()
                 &&living.getHealth()>0&&com.codex.blacklight.combat.BulletdiveSteering.retainAltitudeLock(
                         p.position(),p.onGround(),lockedTarget.position(),range());
-        if(lockedTarget!=null&&(!active()||!altitude&&!visibleInRange(lockedTarget))){clear();return;}
+        if (lockedTarget != null && !altitude) {
+            if (!active() || !valid(lockedTarget)) { clear(); return; }
+            boolean visible = visibleInRange(lockedTarget);
+            if (lockedTarget instanceof com.codex.blacklight.entity.BlackwatchHelicopter aircraft) {
+                // Destruction, protection and range loss invalidate immediately. Only
+                // temporary terrain occlusion of an already acquired hull has a grace period.
+                double range = range();
+                if (!visible && p.getEyePosition().distanceToSqr(
+                        com.codex.blacklight.military.aircraft.HelicopterSkinContact.closestPoint(aircraft, p.getEyePosition())) > range * range) {
+                    clear();
+                    return;
+                }
+                visible = REQUEST.retainAircraftSight(visible, p.level().getGameTime());
+            }
+            if (!visible) { clear(); return; }
+        }
         if(REQUEST.observeAttachment(ModAttachments.getData(p,ModAttachments.TARGET_LOCK_ID),ModAttachments.getData(p,ModAttachments.TARGET_LOCK_REGION))){lockedTarget=null;lockedRegion=-1;cachedFocus=null;}
         if(REQUEST.desiredId()<0){lockedTarget=null;lockedRegion=-1;cachedFocus=null;}
     }

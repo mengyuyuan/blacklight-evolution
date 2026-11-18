@@ -1,0 +1,77 @@
+{
+  "schema": 1,
+  "recordedLocal": "2026-11-17T01:30:29.9366592+08:00",
+  "status": "code implemented; not compiled or executed",
+  "scope": "Actual multipart receiving surfaces for manual helicopter guns and vehicle ordnance",
+  "confirmedCodeDefects": [
+    "Manual helicopter cannon ignored PartEntity hits while the AI cannon had an explicit animated receiver.",
+    "Manual Hellfire stored transient part UUIDs, but flight resolves targets through ServerLevel.getEntity(UUID).",
+    "Vehicle projectile collision wrapper replaced the native animated surface point with the coarse proxy AABB intersection.",
+    "Vehicle ordnance direct hits only recognized LivingEntity; blast candidates and distances only used parent root AABBs."
+  ],
+  "changes": [
+    "Shared HydraHurtContact.ray selects the nearest real cuboid contact for guns.",
+    "Player cannon applies parent permissions and the real barrel ray to hurtAt; persistent parent used for guided target identity.",
+    "Collision wrapper retains already-narrowed animated part points, preserving first-wall ordering.",
+    "Direct shells/rapid rockets resolve the parent and preserve the impact bone.",
+    "Explosion candidates include loaded multipart bodies and use one nearest actual skin surface per entity; independent Greene appendage armor receives the damage.",
+    "Existing cover, PvP, allied protection, source blast timing/ratios and per-entity wave contact history remain in their owning paths.",
+    "Manual cannon excludes ground-vehicle coarse pick boxes; only the oriented mechanical hull query may receive that hit.",
+    "Explosion surface selection now checks exposure before choosing the nearest limb; a hidden near limb cannot suppress an exposed farther limb within radius."
+  ],
+  "testsWritten": [
+    "Two HydraContactTest cases: nearest region ordering, cover-limited endpoint, empty rotated proxy corner.",
+    "Four HelicopterManualBodyGameTest cases: actual player cannon damages Hydra, Greene appendage and tank hull; wall protection.",
+    "Two VehicleOrdnanceBodyGameTest cases: native AP collision to appendage; first Hellfire sphere on limb outside parent root box.",
+    "OrdnanceBodyContactTest: blocked near limb, exposed farther limb, radius limit and complete cover."
+  ],
+  "verification": {
+    "static": "Targeted diff/whitespace checks passed",
+    "runtime": "Not run: user requested code first, testing later after JVM memory exhaustion",
+    "sourceFidelity": "These changes repair Minecraft receiving geometry; they do not establish complete original weapon or boss AI fidelity."
+  },
+  "remaining": [
+    "Compile both platforms and run new unit/GameTests.",
+    "Recheck existing native projectile event cancellation, blast timing, allegiance and reload regressions.",
+    "Use a normal client with real player aiming/fire/seat changes; scripted tests alone are insufficient.",
+    "Moving multipart Hellfire lock needs runtime validation."
+  ],
+  "sources": [
+    {
+      "file": "src/main/java/com/codex/blacklight/combat/CombatTargeting.java",
+      "sha256": "2d4c8eb1a689dba870ea0385928ccc075b0a348f9fa688c46960a2be66cda7ed"
+    },
+    {
+      "file": "src/main/java/com/codex/blacklight/combat/HydraHurtContact.java",
+      "sha256": "071576e7f738e30e54f4bcc2ade8cb41aeace4ea4fa4b1bf3d7009f4c114679f"
+    },
+    {
+      "file": "src/main/java/com/codex/blacklight/firearms/OrdnanceBodyContact.java",
+      "sha256": "baa106ffc428e1d3d45d88abe9c4af50b6b0c5287b176a03624ea454439d1fc5"
+    },
+    {
+      "file": "src/main/java/com/codex/blacklight/firearms/VehicleOrdnanceProjectile.java",
+      "sha256": "449a001b61aedfbb185338d4bfe54682c1ed8b660ad7f1f6bcf054630e11162f"
+    },
+    {
+      "file": "src/main/java/com/codex/blacklight/firearms/HellfireBlastEntity.java",
+      "sha256": "bbc4530fbdcfa89ae93ac514ca4ca3025880df7c6857a8995a09acdae77f1b4f"
+    },
+    {
+      "file": "src/main/java/com/codex/blacklight/military/aircraft/HelicopterCombat.java",
+      "sha256": "013af2b2e4013f838659f069af7bc670ff93efcdf0efd612b0ce232be64df390"
+    },
+    {
+      "file": "src/test/java/com/codex/blacklight/combat/HydraContactTest.java",
+      "sha256": "9e5663e1b067191d2adf0ea8e8db5f44ba9b132ac3420b396781b4e3156f43b8"
+    },
+    {
+      "file": "src/helicopterTest/java/com/codex/blacklight/gametest/HelicopterManualBodyGameTest.java",
+      "sha256": "786df22ebf11f79c9833523d9508c9d91f4c67d96e8d8dce0d8501f6e79ec835"
+    },
+    {
+      "file": "src/helicopterTest/java/com/codex/blacklight/gametest/VehicleOrdnanceBodyGameTest.java",
+      "sha256": "9eb7de19986d479063af2e38d6e0bfacd3ff02f2eeda5b29f97dbc5444d5b1e0"
+    }
+  ]
+}

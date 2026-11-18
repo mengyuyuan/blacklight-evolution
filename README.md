@@ -4,7 +4,7 @@
 
 **Blacklight: Ascension · Forge 1.20.1 独立维护版。** 原作者：末者；本分支维护者：雨夜。模组包含生物武器、抓取吸收、伪装、强化移动、感染生物与组织蜂巢，不要求 Epic Fight、Epic ParCool 或 Weapons of Miracles。
 
-维护版本：**0.3.0-forge-1.20.1-dev.5**，分支：`forge-1.20.1`。已接入上游 dev.7 的完整动作、镜头、HUD、液态武器变形及感染结构资料。dev.4 同步 NeoForge dev.13 的临界质量、毁灭技、俯冲分层效果、真实破坏和原地蓄力防滑；完整新技能交付包使用 251 文件 external-profile。保留 dev.3 的抓取持有转向与双人姿态插值修复。默认构建包含 224 个运行资料文件；旧 source-only 产物及其缺动作启动失败属于 dev.1 历史，不作为本版安装包。Forge 验收结果见 [移植状态](docs/FORGE_1_20_1_STATUS.md)。
+当前候选：**1.0.1-dev.1，Minecraft 1.20.1 Forge**。以既有 `forge-1.20.1` 分支为基础，对齐当前 1.21.1 的布娃娃、刀刃接触切割、抓取吸收、感染组织、军方/黑色守望、载具受击变形和音效，并补齐全解锁指令与重击慢动作。保留 Forge、Java 17 与 GeckoLib 接口。范围、平台差异及实测结果见 [本次对齐记录](docs/FORGE_1_20_1_RAGDOLL_VEHICLES_ZH.md)；早期 dev.1–dev.5 记录见 [历史移植状态](docs/FORGE_1_20_1_STATUS.md)。
 
 跨版本功能和修复按 [多版本协作规范](docs/MULTIVERSION_WORKFLOW_ZH.md) 单独适配：本分支 PR 的 base 选 `forge-1.20.1`，NeoForge 1.21.1 的 base 选 `main`。各版本进度分别记录，不将整套平台分支互相合并。
 
@@ -20,7 +20,7 @@
 | GeckoLib | 4.8.4，Forge 1.20.1 版 | 必需，单独安装 |
 | ParCool | 1.20.1-3.4.3.3 | 可选兼容 |
 
-Blacklight 内嵌 MixinExtras Forge 0.4.1，由 Forge 自动加载；不内置 GeckoLib。完整安装包作为开发预发布提供：独立客户端已进入测试存档，构建与 224 个资源文件校验通过，单元测试 202/206 通过；多人、生存流程与全部视觉效果仍待验收。
+Blacklight 内嵌 MixinExtras Forge 0.4.1，由 Forge 自动加载；不内置 GeckoLib。安装包包含完整仓库动作资料。本次验证使用独立 Forge 客户端和服务端，结果见对齐记录；历史版本的测试计数不代表当前候选。未覆盖全部第三方整合包、多人组合和完整生存流程。
 
 - [此前的 Forge dev.2 预发布安装包（不含 dev.3 转向修复）](https://github.com/lingweiliang2510579032/blacklight-evolution/releases/tag/v0.3.0-forge-1.20.1-dev.2)
 
@@ -69,6 +69,7 @@ Blacklight 内嵌 MixinExtras Forge 0.4.1，由 Forge 自动加载；不内置 G
 | --- | --- |
 | `/blacklight status` | 查看感染、模式、生物质、EP 与当前形态 |
 | `/blacklight grant_ep 1000` | 给自己追加 1000 进化点；单次范围 1～100000 |
+| `/blacklight unlock_all` | 调试时解锁全部支持的形态、技能、成长与器官，并补足 EP |
 | `/blacklight infect` | 让自己感染，供调试使用 |
 | `/blacklight spawn_infected zombie` | 在前方生成普通感染僵尸，需空间可用 |
 | `/blacklight spawn_colossus iron_golem` | 生成成熟巨构；也支持 warden、wither、ender_dragon，需足够空地 |

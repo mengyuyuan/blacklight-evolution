@@ -4,6 +4,18 @@ package com.codex.blacklight.client;
 public final class TargetLockRequestState {
     private int requestId,desiredId=-1,acknowledgedId=-1,desiredRegion=-1,acknowledgedRegion=-1;
     private boolean pending,attachmentObserved;
+    private long firstOccludedTick = -1;
+
+    /** A banking aircraft can briefly pass behind a terrain edge. Repeated frame
+     * queries during one game tick must not consume the sight-loss allowance. */
+    public boolean retainAircraftSight(boolean visible, long tick) {
+        if (visible) {
+            firstOccludedTick = -1;
+            return true;
+        }
+        if (firstOccludedTick < 0) firstOccludedTick = tick;
+        return tick - firstOccludedTick < 10;
+    }
     public int requestId(){return requestId;}
     public int desiredId(){return desiredId;}
     public int acknowledgedId(){return acknowledgedId;}
@@ -15,6 +27,7 @@ public final class TargetLockRequestState {
         if(region< -1||region>2||id<0&&region!=-1)throw new IllegalArgumentException("Invalid target region");
         if(id< -1)throw new IllegalArgumentException("Invalid target ID");
         requestId=requestId==Integer.MAX_VALUE?1:requestId+1;
+        firstOccludedTick = -1;
         desiredId=id;desiredRegion=region;pending=true;attachmentObserved=false;return requestId;
     }
     public boolean acknowledge(int sequence,int acceptedId){return acknowledge(sequence,acceptedId,-1);}
@@ -31,6 +44,7 @@ public final class TargetLockRequestState {
         desiredId=acknowledgedId=desiredRegion=acknowledgedRegion=-1;attachmentObserved=false;return true;
     }
     public void resetOwner() {
+        firstOccludedTick = -1;
         // Keep sequence monotonic across respawn/world changes, invalidating old replies.
         requestId=requestId==Integer.MAX_VALUE?1:requestId+1;
         desiredId=acknowledgedId=desiredRegion=acknowledgedRegion=-1;pending=false;attachmentObserved=false;

@@ -1,0 +1,511 @@
+{
+  "schema": 1,
+  "date": "2026-11-17",
+  "state": "Dual-loader source/code integration; not built, installed or player-accepted",
+  "source": {
+    "figSha256": "96d84271e461cbe4566fb984359653b164257f88392c5bceb213c30f88527779",
+    "decodedSha256": "eff8ab13c58461b914fdb80887d39f45939759b20644e181ff3244289128dd10",
+    "nativeSha256": "8cba8da3412df4f49cd61d02445e87a0cda551dea4f2fc1e66b19c1bfe28a760",
+    "opportunityProofSha256": "40cff1d9bd05465ba2fa6fbee9e34e2c3a38b67e3e88f57588223506a4db2b21",
+    "branchReferences": {
+      "8": 266112,
+      "13": 267516,
+      "34": 272948,
+      "39": 273540
+    },
+    "naturalGate": "Ordered attack bank first prefers helicopter/tank, then ForceThunderousRoar, then natural roar. Natural: XZ<35, fd0e timer>=6, 242e timer<=0, ThunderousRoarForbidden=0, target not Devastator.",
+    "concurrentDwell": "Close node273040 uses XZ<=36 and sets increasing fd0e=0 on entry; far node273296 resets stopped fd0e=0. Opportunity10a8ea4b..51 compares candidate to current branch and does not re-enter the same node every update.",
+    "entry": "Execute ref13 is node267516. It spawns ref39 roar request273540, resets increasing fd0e=0 and sets decreasing242e=15 immediately. It does not wait for the7.166667second pose to finish before starting recharge.",
+    "forcedLimit": "Cinematic Lua12384 sets ForceThunderousRoar=1 at pc151..155 and clears it at pc392..396. Entry75836 also sets1. There is no proof this is a self-consuming one-shot; no invented first-spawn single roar is added.",
+    "records": [
+      {
+        "source": "startup_fig.p3d.rz",
+        "offset": 266204,
+        "payload": 266216,
+        "length": 0,
+        "type": "TargetIsHelicopter",
+        "kind": "ConditionHash",
+        "owner": "engage_mother/mother_core/engage/engage/#d21eea72961db6e0/attack/#1a13bae93ae7cc6c",
+        "fields": {},
+        "schema": "TargetIsHelicopterCondition",
+        "end": 266224
+      },
+      {
+        "source": "startup_fig.p3d.rz",
+        "offset": 266244,
+        "payload": 266256,
+        "length": 0,
+        "type": "TargetIsTank",
+        "kind": "ConditionHash",
+        "owner": "engage_mother/mother_core/engage/engage/#d21eea72961db6e0/attack/#1a13bae93ae7cc6c",
+        "fields": {},
+        "schema": "TargetIsTankCondition",
+        "end": 266264
+      },
+      {
+        "source": "startup_fig.p3d.rz",
+        "offset": 266840,
+        "payload": 266852,
+        "length": 20,
+        "type": "VariableIntCompare",
+        "kind": "ConditionHash",
+        "owner": "engage_mother/mother_core/engage/engage/#d21eea72961db6e0/attack/#929d3222b68cd1d6",
+        "fields": {
+          "Variable": {
+            "hash": "5608811361720514208",
+            "name": "ForceThunderousRoar"
+          },
+          "Compare": {
+            "hash": "4001598",
+            "name": "Equal"
+          },
+          "Value": 1
+        },
+        "schema": "VariableIntCompareCondition",
+        "end": 266880
+      },
+      {
+        "source": "startup_fig.p3d.rz",
+        "offset": 266900,
+        "payload": 266912,
+        "length": 20,
+        "type": "Execute",
+        "kind": "TrackHash",
+        "owner": "engage_mother/mother_core/engage/engage/#d21eea72961db6e0/attack/#929d3222b68cd1d6",
+        "fields": {
+          "Unknown1": 0,
+          "TimeBegin": 0,
+          "TimeEnd": -1,
+          "BranchRef": {
+            "name": "",
+            "index": 13
+          }
+        },
+        "schema": "ExecuteTrack",
+        "end": 266960
+      },
+      {
+        "source": "startup_fig.p3d.rz",
+        "offset": 267012,
+        "payload": 267024,
+        "length": 20,
+        "type": "VariableIntCompare",
+        "kind": "ConditionHash",
+        "owner": "engage_mother/mother_core/engage/engage/#d21eea72961db6e0/attack/#929d3222b68cd1d6",
+        "fields": {
+          "Variable": {
+            "hash": "5608811361720514208",
+            "name": "ForceThunderousRoar"
+          },
+          "Compare": {
+            "hash": "4001598",
+            "name": "Equal"
+          },
+          "Value": 0
+        },
+        "schema": "VariableIntCompareCondition",
+        "end": 267052
+      },
+      {
+        "source": "startup_fig.p3d.rz",
+        "offset": 267152,
+        "payload": 267164,
+        "length": 20,
+        "type": "TargetDistance",
+        "kind": "ConditionHash",
+        "owner": "engage_mother/mother_core/engage/engage/#d21eea72961db6e0/attack/#fdc4d6fc933f8139",
+        "fields": {
+          "Direction": {
+            "hash": "5772786",
+            "name": "XZ"
+          },
+          "Compare": {
+            "hash": "60",
+            "name": "LessThan"
+          },
+          "Distance": 35
+        },
+        "schema": "TargetDistanceCondition",
+        "end": 267192
+      },
+      {
+        "source": "startup_fig.p3d.rz",
+        "offset": 267192,
+        "payload": 267204,
+        "length": 20,
+        "type": "TimerCompare",
+        "kind": "ConditionHash",
+        "owner": "engage_mother/mother_core/engage/engage/#d21eea72961db6e0/attack/#fdc4d6fc933f8139",
+        "fields": {
+          "Timer": {
+            "hash": "18234622832252203814",
+            "name": "#fd0e64dad19eb326"
+          },
+          "Compare": {
+            "hash": "4067199",
+            "name": "MoreThanOrEqual"
+          },
+          "Time": 6
+        },
+        "schema": "TimerCompareCondition",
+        "end": 267232
+      },
+      {
+        "source": "startup_fig.p3d.rz",
+        "offset": 267232,
+        "payload": 267244,
+        "length": 20,
+        "type": "TimerCompare",
+        "kind": "ConditionHash",
+        "owner": "engage_mother/mother_core/engage/engage/#d21eea72961db6e0/attack/#fdc4d6fc933f8139",
+        "fields": {
+          "Timer": {
+            "hash": "2607086710125133039",
+            "name": "#242e3b8cc7a67cef"
+          },
+          "Compare": {
+            "hash": "3935993",
+            "name": "LessThanOrEqual"
+          },
+          "Time": 0
+        },
+        "schema": "TimerCompareCondition",
+        "end": 267272
+      },
+      {
+        "source": "startup_fig.p3d.rz",
+        "offset": 267272,
+        "payload": 267284,
+        "length": 20,
+        "type": "VariableIntCompare",
+        "kind": "ConditionHash",
+        "owner": "engage_mother/mother_core/engage/engage/#d21eea72961db6e0/attack/#fdc4d6fc933f8139",
+        "fields": {
+          "Variable": {
+            "hash": "4083274086678806048",
+            "name": "ThunderousRoarForbidden"
+          },
+          "Compare": {
+            "hash": "4001598",
+            "name": "Equal"
+          },
+          "Value": 0
+        },
+        "schema": "VariableIntCompareCondition",
+        "end": 267312
+      },
+      {
+        "source": "startup_fig.p3d.rz",
+        "offset": 267356,
+        "payload": 267368,
+        "length": 20,
+        "type": "MotionState",
+        "kind": "ConditionHash",
+        "owner": "engage_mother/mother_core/engage/engage/#d21eea72961db6e0/attack/#fdc4d6fc933f8139",
+        "fields": {
+          "State": {
+            "hash": "16828631463063897445",
+            "name": "#e98b4f275be2c565"
+          },
+          "Name": {
+            "hash": "13902508776967827755",
+            "name": "devastator"
+          },
+          "Match": true
+        },
+        "schema": "MotionStateCondition",
+        "end": 267396
+      },
+      {
+        "source": "startup_fig.p3d.rz",
+        "offset": 267448,
+        "payload": 267460,
+        "length": 20,
+        "type": "Execute",
+        "kind": "TrackHash",
+        "owner": "engage_mother/mother_core/engage/engage/#d21eea72961db6e0/attack/#fdc4d6fc933f8139",
+        "fields": {
+          "Unknown1": 0,
+          "TimeBegin": 0,
+          "TimeEnd": -1,
+          "BranchRef": {
+            "name": "",
+            "index": 13
+          }
+        },
+        "schema": "ExecuteTrack",
+        "end": 267508
+      },
+      {
+        "source": "startup_fig.p3d.rz",
+        "offset": 267580,
+        "payload": 267592,
+        "length": 20,
+        "type": "Spawn",
+        "kind": "TrackHash",
+        "owner": "engage_mother/mother_core/engage/engage/#d21eea72961db6e0/attack/#fdc4d6fc933f8139/#523cabf028eb90",
+        "fields": {
+          "Unknown1": 0,
+          "TimeBegin": 0,
+          "TimeEnd": -1,
+          "BranchRef": {
+            "name": "",
+            "index": 39
+          }
+        },
+        "schema": "SpawnTrack",
+        "end": 267640
+      },
+      {
+        "source": "startup_fig.p3d.rz",
+        "offset": 267640,
+        "payload": 267652,
+        "length": 28,
+        "type": "TimerSet",
+        "kind": "TrackHash",
+        "owner": "engage_mother/mother_core/engage/engage/#d21eea72961db6e0/attack/#fdc4d6fc933f8139/#523cabf028eb90",
+        "fields": {
+          "Unknown1": 1,
+          "TimeBegin": 0,
+          "Timer": {
+            "hash": "18234622832252203814",
+            "name": "#fd0e64dad19eb326"
+          },
+          "Time": 0,
+          "Incrementing": true,
+          "RandomRange": 0
+        },
+        "schema": "TimerSetTrack",
+        "end": 267688
+      },
+      {
+        "source": "startup_fig.p3d.rz",
+        "offset": 267688,
+        "payload": 267700,
+        "length": 28,
+        "type": "TimerSet",
+        "kind": "TrackHash",
+        "owner": "engage_mother/mother_core/engage/engage/#d21eea72961db6e0/attack/#fdc4d6fc933f8139/#523cabf028eb90",
+        "fields": {
+          "Unknown1": 1,
+          "TimeBegin": 0,
+          "Timer": {
+            "hash": "2607086710125133039",
+            "name": "#242e3b8cc7a67cef"
+          },
+          "Time": 15,
+          "Incrementing": false,
+          "RandomRange": 0
+        },
+        "schema": "TimerSetTrack",
+        "end": 267736
+      },
+      {
+        "source": "startup_fig.p3d.rz",
+        "offset": 273040,
+        "payload": 273052,
+        "length": 20,
+        "type": "TargetDistance",
+        "kind": "ConditionHash",
+        "owner": "engage_mother/mother_core/engage/engage/#d21eea72961db6e0/#57f6ca2f91607a0e/close",
+        "fields": {
+          "Direction": {
+            "hash": "5772786",
+            "name": "XZ"
+          },
+          "Compare": {
+            "hash": "3935993",
+            "name": "LessThanOrEqual"
+          },
+          "Distance": 36
+        },
+        "schema": "TargetDistanceCondition",
+        "end": 273080
+      },
+      {
+        "source": "startup_fig.p3d.rz",
+        "offset": 273100,
+        "payload": 273112,
+        "length": 28,
+        "type": "TimerSet",
+        "kind": "TrackHash",
+        "owner": "engage_mother/mother_core/engage/engage/#d21eea72961db6e0/#57f6ca2f91607a0e/close",
+        "fields": {
+          "Unknown1": 1,
+          "TimeBegin": 0,
+          "Timer": {
+            "hash": "18234622832252203814",
+            "name": "#fd0e64dad19eb326"
+          },
+          "Time": 0,
+          "Incrementing": true,
+          "RandomRange": 0
+        },
+        "schema": "TimerSetTrack",
+        "end": 273148
+      },
+      {
+        "source": "startup_fig.p3d.rz",
+        "offset": 273296,
+        "payload": 273308,
+        "length": 28,
+        "type": "TimerSet",
+        "kind": "TrackHash",
+        "owner": "engage_mother/mother_core/engage/engage/#d21eea72961db6e0/#57f6ca2f91607a0e/far",
+        "fields": {
+          "Unknown1": 1,
+          "TimeBegin": 0,
+          "Timer": {
+            "hash": "18234622832252203814",
+            "name": "#fd0e64dad19eb326"
+          },
+          "Time": 0,
+          "Incrementing": false,
+          "RandomRange": 0
+        },
+        "schema": "TimerSetTrack",
+        "end": 273344
+      },
+      {
+        "source": "startup_fig.p3d.rz",
+        "offset": 273604,
+        "payload": 273616,
+        "length": 20,
+        "type": "Action",
+        "kind": "TrackHash",
+        "owner": "engage_mother/mother_core/engage/engage/#be2fe875d343603f/#5d58515f16f68b0f/#72549fe7a1ca28",
+        "fields": {
+          "Unknown1": 0,
+          "TimeBegin": 0,
+          "TimeEnd": 1,
+          "Button": {
+            "hash": "17648781240126830036",
+            "name": "Attack"
+          }
+        },
+        "schema": "ActionTrack",
+        "end": 273644
+      },
+      {
+        "source": "startup_fig.p3d.rz",
+        "offset": 273644,
+        "payload": 273656,
+        "length": 20,
+        "type": "Action",
+        "kind": "TrackHash",
+        "owner": "engage_mother/mother_core/engage/engage/#be2fe875d343603f/#5d58515f16f68b0f/#72549fe7a1ca28",
+        "fields": {
+          "Unknown1": 1,
+          "TimeBegin": 0,
+          "TimeEnd": 1,
+          "Button": {
+            "hash": "20889331387467136",
+            "name": "Jump"
+          }
+        },
+        "schema": "ActionTrack",
+        "end": 273684
+      },
+      {
+        "source": "startup_fig.p3d.rz",
+        "offset": 273740,
+        "payload": 273752,
+        "length": 36,
+        "type": "OnEvent",
+        "kind": "TrackHash",
+        "owner": "engage_mother/mother_core/engage/engage/#be2fe875d343603f/#5d58515f16f68b0f/#72549fe7a1ca28",
+        "fields": {
+          "Unknown1": 1,
+          "BeginTime": 0,
+          "EndTime": -1,
+          "HookTime": 0,
+          "EventMask": 524288,
+          "InitialTest": true,
+          "BranchRef": {
+            "name": "",
+            "index": 40
+          },
+          "Priority": 0
+        },
+        "schema": "OnEventTrack",
+        "end": 273852
+      },
+      {
+        "source": "startup_fig.p3d.rz",
+        "offset": 274040,
+        "payload": 274052,
+        "length": 28,
+        "type": "Opportunity",
+        "kind": "TrackHash",
+        "owner": "engage_mother/mother_core/engage/engage/#be2fe875d343603f/#5d58515f16f68b0f/#72549fe7a1ca28/#89005766a0a37baa",
+        "fields": {
+          "Unknown1": 0,
+          "TimeBegin": 0,
+          "TimeEnd": 10,
+          "TimeHook": 0,
+          "BranchRef": {
+            "name": "",
+            "index": 41
+          },
+          "Priority": 0
+        },
+        "schema": "OpportunityTrack",
+        "end": 274244
+      },
+      {
+        "source": "startup_fig.p3d.rz",
+        "offset": 274172,
+        "payload": 274184,
+        "length": 20,
+        "type": "MotionState",
+        "kind": "ConditionHash",
+        "owner": "engage_mother/mother_core/engage/engage/#be2fe875d343603f/#5d58515f16f68b0f/#72549fe7a1ca28/#89005766a0a37baa",
+        "fields": {
+          "State": {
+            "hash": "16828631463063897445",
+            "name": "#e98b4f275be2c565"
+          },
+          "Name": {
+            "hash": "13902508776967827755",
+            "name": "devastator"
+          },
+          "Match": true
+        },
+        "schema": "MotionStateCondition",
+        "end": 274212
+      }
+    ]
+  },
+  "implementation": {
+    "selection": "Replaces the d<12 immediate-roar shortcut. Real FightGoal supplies dwell, distance, mechanical priority and current target Devastator gates; ordinary weapons remain eligible while the concurrent timer accrues.",
+    "space": "This roar adapter divides Minecraft XZ distance by the existing Greene source-model blocks/unit exactly once, matching the already converted radial-wave geometry. It does not change the separately tuned1:1 on-foot shooting thresholds.",
+    "timing": "Six seconds is120 observed20Hz updates; fifteen seconds is300 updates from accepted roar entry. Duplicate observations in one game tick and absent unloaded updates cannot advance the timers. No variable-frame-rate numerical equality is claimed.",
+    "engagement": "The MC observer starts with a valid hostile target and a cycle eligible to attack; inactive cycle or missing target resets dwell. NoAI freezes the observer. Exact full native concurrent AI/task lifecycle is outside this adapter.",
+    "save": "Version1 GreeneRoar stores clamped relative dwell/recharge, near/far state and forbidden flag. Legacy EncounterRecharge.HOWL migrates with300tick cap and no fabricated accrued dwell. Same-object load replaces prior state.",
+    "actionBoundary": "Explicit begin(HOWL,target) remains a low-level scripted action request like the other moves; only autonomous FightGoal imposes dwell/priority. It still checks live action ownership, cooldown, enemy, sight, cycle, restriction and source-scaled35 distance. The existing post-action MC recovery remains separate."
+  },
+  "remaining": [
+    "Full cinematic forced-roar lifecycle and scripted attack unlocks are unported; standalone Forbidden defaults false unless saved state supplies it.",
+    "Original roar pose/hit/audio/category and native variable-dt limits remain those of the existing source-action integration; this change does not claim full original mechanics.",
+    "Real first-entry roar frequency, visuals, input and player avoidance still require later gameplay observation."
+  ],
+  "validation": {
+    "staticOnly": true,
+    "compilation": "not run",
+    "tests": "written, not run",
+    "client": "not launched",
+    "release": "not built or installed",
+    "unitMethodsWritten": 5,
+    "gameTestMethodsWritten": 2
+  },
+  "snapshots": {
+    "src/main/java/com/codex/blacklight/combat/GreeneRoarTiming.java": "5a904664241d47e06f817f30a286ff3681bcd8fd500f096d60b8b72a53ba2562",
+    "src/main/java/com/codex/blacklight/combat/EncounterTactics.java": "e70c3a74fcf61b044fb99d905df9484e02c712c8a39c2e9c9cded7a01c699fd4",
+    "src/main/java/com/codex/blacklight/entity/EncounterMob.java": "b27b4c7ae909f0cffcc7fcc966ea67ba86bf265455d8a65c1eba32be9fc0ba0e",
+    "src/test/java/com/codex/blacklight/combat/GreeneRoarTimingTest.java": "5a83ad39707876be5f80de5d294be782aaf31089dfa00c5740cdc9084e8c21a0",
+    "src/test/java/com/codex/blacklight/combat/GreeneWeaponProgramTest.java": "1bf37b5f030556d784c0f9c5f2c21a15b3944cf6c33427b2a3cdbb5d586506f4",
+    "src/greeneTest/java/com/codex/blacklight/gametest/GreeneRoarGameTest.java": "4266ad6a2a414396b1a9bcb811eb45c83993ed4bfc6e811640c9a70f597cab01",
+    "tools/record_greene_roar.py": "eeb1c5c0b3360de0784fc0bcac5bc2f2052be5f3fabea0412b33443f4882ce20"
+  },
+  "fullGoalComplete": false
+}

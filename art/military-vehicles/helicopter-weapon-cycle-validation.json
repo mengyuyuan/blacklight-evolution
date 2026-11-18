@@ -1,0 +1,148 @@
+{
+  "schema": 1,
+  "createdLocal": "2026-11-16T18:14:09",
+  "status": "source-based chin-gun burst/rest checkpoint passed; complete goal active",
+  "source": {
+    "file": "art/military-vehicles/helicopter-weapon-source.json",
+    "sha256": "15a1b86d26ad654a941e1e0801ef8945376a56097667c442f25da1a32148247d"
+  },
+  "change": "Replaced eight-round/30-tick AI pauses with the source chin-gun four-second firing and four-second rest windows. Persisted separate bounded burst/rest counters. Existing Minecraft individual round cadence and first-accepted-shot start remain explicit adaptations.",
+  "platforms": {
+    "neo": {
+      "unit": {
+        "file": "D:\\CodexCache\\helicopter-weapon-cycle-qa\\neo-unit-passed.log",
+        "sha256": "6561ba40534fd7d89b28f8b166bd915e097f5e5fa6f12c2c8bf059cc4f0eefc3",
+        "passed": 30,
+        "suites": [
+          {
+            "name": "com.codex.blacklight.military.aircraft.HelicopterArmamentTest",
+            "tests": 2,
+            "file": "D:\\CodexCache\\helicopter-weapon-cycle-qa\\neo-TEST-com.codex.blacklight.military.aircraft.HelicopterArmamentTest.xml",
+            "sha256": "c2c7154462417f29acab1249324f06b05165d3bfa934061fb6b3572c83d9380e"
+          },
+          {
+            "name": "com.codex.blacklight.military.aircraft.HelicopterAuthorityTest",
+            "tests": 2,
+            "file": "D:\\CodexCache\\helicopter-weapon-cycle-qa\\neo-TEST-com.codex.blacklight.military.aircraft.HelicopterAuthorityTest.xml",
+            "sha256": "afebb086eefd7bc1975eb6b2a07f656f441e44ffb556f323a1d44e1247a5e9b0"
+          },
+          {
+            "name": "com.codex.blacklight.military.aircraft.HelicopterFlightTest",
+            "tests": 4,
+            "file": "D:\\CodexCache\\helicopter-weapon-cycle-qa\\neo-TEST-com.codex.blacklight.military.aircraft.HelicopterFlightTest.xml",
+            "sha256": "4f859a88d153cd0ca8fc981fac7a245ee79790ae70bcf8282eedd25a358e1ae4"
+          },
+          {
+            "name": "com.codex.blacklight.military.aircraft.HelicopterGunCycleTest",
+            "tests": 3,
+            "file": "D:\\CodexCache\\helicopter-weapon-cycle-qa\\neo-TEST-com.codex.blacklight.military.aircraft.HelicopterGunCycleTest.xml",
+            "sha256": "6330602e5a72079a6a078d7537f65984bcd88ff7238831c69075dba5c76cd832"
+          },
+          {
+            "name": "com.codex.blacklight.military.aircraft.HelicopterRouteTest",
+            "tests": 8,
+            "file": "D:\\CodexCache\\helicopter-weapon-cycle-qa\\neo-TEST-com.codex.blacklight.military.aircraft.HelicopterRouteTest.xml",
+            "sha256": "ff61c3513e79501c5dbfa2282c4c40fa4905e96b2c5bea73cc87f20d2e09c1c6"
+          },
+          {
+            "name": "com.codex.blacklight.military.vehicle.VehicleControlAuthorityTest",
+            "tests": 11,
+            "file": "D:\\CodexCache\\helicopter-weapon-cycle-qa\\neo-TEST-com.codex.blacklight.military.vehicle.VehicleControlAuthorityTest.xml",
+            "sha256": "ef5f3610cef90a3eb426adaffcadeca815b25224cf347e1598997cd3e85b56af"
+          }
+        ]
+      },
+      "server": {
+        "file": "D:\\CodexCache\\helicopter-weapon-cycle-qa\\neo-server-passed.log",
+        "sha256": "456202432f649e53433eca061ebbfc9a19d713e084121061a84b24c58dc771a7",
+        "passed": 48,
+        "gunCycle": {
+          "firstShotTick": 35,
+          "initialShots": 20,
+          "resumeAfterTicks": 160,
+          "restSurvivedSaveLoad": true,
+          "remainingRounds": 218
+        }
+      },
+      "files": {
+        "src/main/java/com/codex/blacklight/military/aircraft/HelicopterCombat.java": "a736ced04f43239cc7662830de00d988aa588180010210734cb90eb6a6f50e4b",
+        "src/main/java/com/codex/blacklight/military/aircraft/HelicopterGunCycle.java": "e107970e0754c7125b9a45a190b434a7bfcf5caee145669169e03ca90247fd7d",
+        "src/test/java/com/codex/blacklight/military/aircraft/HelicopterGunCycleTest.java": "44f99f5ef67b1491aa3a89990953ca2333b51e8ff6f5cdf75666ca8c833be22e",
+        "src/helicopterTest/java/com/codex/blacklight/gametest/HelicopterVehicleCombatGameTest.java": "1c240743f6ff218ebb9d1be94308cb3bd6a78f15b3e0d8382b1d1b3e868573da",
+        "tools/helicopter-test.init.gradle": "4994bfffcd5e71c5777fb1eb6ab884e7dc1b9d6af3285d57cbc76a8108c3de72",
+        "tools/helicopter-hull-test.init.gradle": "09fe6f28473fceeea5930c76ff1e06ab4c92465ab1ccea5c66b45be87ace83b7"
+      }
+    },
+    "forge": {
+      "unit": {
+        "file": "D:\\CodexCache\\helicopter-weapon-cycle-qa\\forge-unit-passed.log",
+        "sha256": "27ce8fb9eb173a9d3dbfe56ed63470322824b1184f2a4fdeaab6a932dc396bd9",
+        "passed": 30,
+        "suites": [
+          {
+            "name": "com.codex.blacklight.military.aircraft.HelicopterArmamentTest",
+            "tests": 2,
+            "file": "D:\\CodexCache\\helicopter-weapon-cycle-qa\\forge-TEST-com.codex.blacklight.military.aircraft.HelicopterArmamentTest.xml",
+            "sha256": "14c3963503998e4785014594d7d62cab3884b93119911d4b38883998d184e116"
+          },
+          {
+            "name": "com.codex.blacklight.military.aircraft.HelicopterAuthorityTest",
+            "tests": 2,
+            "file": "D:\\CodexCache\\helicopter-weapon-cycle-qa\\forge-TEST-com.codex.blacklight.military.aircraft.HelicopterAuthorityTest.xml",
+            "sha256": "2a6b9051b16a87de343bc47f109e4b045209005f8331c36bfec524a6ab50b68b"
+          },
+          {
+            "name": "com.codex.blacklight.military.aircraft.HelicopterFlightTest",
+            "tests": 4,
+            "file": "D:\\CodexCache\\helicopter-weapon-cycle-qa\\forge-TEST-com.codex.blacklight.military.aircraft.HelicopterFlightTest.xml",
+            "sha256": "ec01e66a651f4214a3128a4453a0bb01b55611f739217303fb9ca054a7627bb7"
+          },
+          {
+            "name": "com.codex.blacklight.military.aircraft.HelicopterGunCycleTest",
+            "tests": 3,
+            "file": "D:\\CodexCache\\helicopter-weapon-cycle-qa\\forge-TEST-com.codex.blacklight.military.aircraft.HelicopterGunCycleTest.xml",
+            "sha256": "3267ee1ba09dc593e0a63d988eb44d99f905fc88698faeba5bdf718e3d68de03"
+          },
+          {
+            "name": "com.codex.blacklight.military.aircraft.HelicopterRouteTest",
+            "tests": 8,
+            "file": "D:\\CodexCache\\helicopter-weapon-cycle-qa\\forge-TEST-com.codex.blacklight.military.aircraft.HelicopterRouteTest.xml",
+            "sha256": "8b4c2425efdb2194bd2848a1a5b4d95c18a060a9aa61e8086dffde4d1b1ec8c4"
+          },
+          {
+            "name": "com.codex.blacklight.military.vehicle.VehicleControlAuthorityTest",
+            "tests": 11,
+            "file": "D:\\CodexCache\\helicopter-weapon-cycle-qa\\forge-TEST-com.codex.blacklight.military.vehicle.VehicleControlAuthorityTest.xml",
+            "sha256": "62fb857c20823a97be2285545856b35dcbe179dab488b2642cba493c08508b65"
+          }
+        ]
+      },
+      "server": {
+        "file": "D:\\CodexCache\\helicopter-weapon-cycle-qa\\forge-server-passed.log",
+        "sha256": "a42c87acf966285651a05007cfb1f48d46d3a2bc94004910d28abb200c93c757",
+        "passed": 48,
+        "gunCycle": {
+          "firstShotTick": 35,
+          "initialShots": 20,
+          "resumeAfterTicks": 160,
+          "restSurvivedSaveLoad": true,
+          "remainingRounds": 218
+        }
+      },
+      "files": {
+        "src/main/java/com/codex/blacklight/military/aircraft/HelicopterCombat.java": "a736ced04f43239cc7662830de00d988aa588180010210734cb90eb6a6f50e4b",
+        "src/main/java/com/codex/blacklight/military/aircraft/HelicopterGunCycle.java": "e107970e0754c7125b9a45a190b434a7bfcf5caee145669169e03ca90247fd7d",
+        "src/test/java/com/codex/blacklight/military/aircraft/HelicopterGunCycleTest.java": "44f99f5ef67b1491aa3a89990953ca2333b51e8ff6f5cdf75666ca8c833be22e",
+        "src/helicopterTest/java/com/codex/blacklight/gametest/HelicopterVehicleCombatGameTest.java": "075c1b34685fdf6fce4d5239160dd329d9c676e1e36b3dc8c65af856d6f5f326",
+        "tools/helicopter-test.init.gradle": "4994bfffcd5e71c5777fb1eb6ab884e7dc1b9d6af3285d57cbc76a8108c3de72",
+        "tools/helicopter-hull-test.init.gradle": "09fe6f28473fceeea5930c76ff1e06ab4c92465ab1ccea5c66b45be87ace83b7"
+      }
+    }
+  },
+  "limitations": [
+    "This does not finish original weapon selection or guided Hellfire. Existing rocket selection/flight remains the prior Minecraft implementation.",
+    "No new client visual/audio or multiplayer review; this checkpoint is native server and unit verification.",
+    "Complete creature, military, detailed modeling and sound objective remains active."
+  ],
+  "deployment": "No package, install, commit, publication or user-world change; D-drive disposable QA only."
+}

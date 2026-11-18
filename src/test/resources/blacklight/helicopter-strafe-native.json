@@ -1,0 +1,3814 @@
+{
+  "schema": 1,
+  "dllSHA256": "8cba8da3412df4f49cd61d02445e87a0cda551dea4f2fc1e66b19c1bfe28a760",
+  "entry": "103e1cc0",
+  "emulator": "unicorn 2.1.4",
+  "cases": [
+    {
+      "name": "flat",
+      "size": 129,
+      "base": 100,
+      "rectangles": [],
+      "farthest": false,
+      "native": {
+        "accepted": true,
+        "targetGround": [
+          64.0,
+          100.0,
+          64.0
+        ],
+        "start": [
+          64.0,
+          100.0,
+          58.0
+        ],
+        "end": [
+          64.0,
+          100.0,
+          70.0
+        ],
+        "relativeRise": 0.0,
+        "externalCalls": {
+          "0x103b8af0": 1,
+          "0x10360ba0": 1,
+          "0x40000100": 138
+        }
+      }
+    },
+    {
+      "name": "flat_far",
+      "size": 129,
+      "base": 100,
+      "rectangles": [],
+      "farthest": true,
+      "native": {
+        "accepted": true,
+        "targetGround": [
+          64.0,
+          100.0,
+          64.0
+        ],
+        "start": [
+          64.0,
+          100.0,
+          25.0
+        ],
+        "end": [
+          64.0,
+          100.0,
+          103.0
+        ],
+        "relativeRise": 0.0,
+        "externalCalls": {
+          "0x103b8af0": 1,
+          "0x10360ba0": 1,
+          "0x40000100": 138
+        }
+      }
+    },
+    {
+      "name": "east_wall",
+      "size": 129,
+      "base": 100,
+      "rectangles": [
+        [
+          77,
+          0,
+          128,
+          128,
+          140
+        ]
+      ],
+      "farthest": false,
+      "native": {
+        "accepted": true,
+        "targetGround": [
+          64.0,
+          100.0,
+          64.0
+        ],
+        "start": [
+          64.0,
+          100.0,
+          58.0
+        ],
+        "end": [
+          64.0,
+          100.0,
+          70.0
+        ],
+        "relativeRise": 0.0,
+        "externalCalls": {
+          "0x103b8af0": 1,
+          "0x10360ba0": 1,
+          "0x40000100": 112
+        }
+      }
+    },
+    {
+      "name": "east_wall_far",
+      "size": 129,
+      "base": 100,
+      "rectangles": [
+        [
+          77,
+          0,
+          128,
+          128,
+          140
+        ]
+      ],
+      "farthest": true,
+      "native": {
+        "accepted": true,
+        "targetGround": [
+          64.0,
+          100.0,
+          64.0
+        ],
+        "start": [
+          64.0,
+          100.0,
+          25.0
+        ],
+        "end": [
+          64.0,
+          100.0,
+          103.0
+        ],
+        "relativeRise": 0.0,
+        "externalCalls": {
+          "0x103b8af0": 1,
+          "0x10360ba0": 1,
+          "0x40000100": 112
+        }
+      }
+    },
+    {
+      "name": "east_west",
+      "size": 129,
+      "base": 100,
+      "rectangles": [
+        [
+          0,
+          0,
+          51,
+          128,
+          140
+        ],
+        [
+          77,
+          0,
+          128,
+          128,
+          140
+        ]
+      ],
+      "farthest": false,
+      "native": {
+        "accepted": true,
+        "targetGround": [
+          64.0,
+          100.0,
+          64.0
+        ],
+        "start": [
+          64.0,
+          100.0,
+          58.0
+        ],
+        "end": [
+          64.0,
+          100.0,
+          70.0
+        ],
+        "relativeRise": 0.0,
+        "externalCalls": {
+          "0x103b8af0": 1,
+          "0x10360ba0": 1,
+          "0x40000100": 86
+        }
+      }
+    },
+    {
+      "name": "east_west_far",
+      "size": 129,
+      "base": 100,
+      "rectangles": [
+        [
+          0,
+          0,
+          51,
+          128,
+          140
+        ],
+        [
+          77,
+          0,
+          128,
+          128,
+          140
+        ]
+      ],
+      "farthest": true,
+      "native": {
+        "accepted": true,
+        "targetGround": [
+          64.0,
+          100.0,
+          64.0
+        ],
+        "start": [
+          64.0,
+          100.0,
+          25.0
+        ],
+        "end": [
+          64.0,
+          100.0,
+          103.0
+        ],
+        "relativeRise": 0.0,
+        "externalCalls": {
+          "0x103b8af0": 1,
+          "0x10360ba0": 1,
+          "0x40000100": 86
+        }
+      }
+    },
+    {
+      "name": "north_south",
+      "size": 129,
+      "base": 100,
+      "rectangles": [
+        [
+          0,
+          0,
+          128,
+          51,
+          140
+        ],
+        [
+          0,
+          77,
+          128,
+          128,
+          140
+        ]
+      ],
+      "farthest": false,
+      "native": {
+        "accepted": true,
+        "targetGround": [
+          64.0,
+          100.0,
+          64.0
+        ],
+        "start": [
+          57.0,
+          100.0,
+          64.0
+        ],
+        "end": [
+          70.0,
+          100.0,
+          64.0
+        ],
+        "relativeRise": 0.0,
+        "externalCalls": {
+          "0x103b8af0": 1,
+          "0x10360ba0": 1,
+          "0x40000100": 86
+        }
+      }
+    },
+    {
+      "name": "north_south_far",
+      "size": 129,
+      "base": 100,
+      "rectangles": [
+        [
+          0,
+          0,
+          128,
+          51,
+          140
+        ],
+        [
+          0,
+          77,
+          128,
+          128,
+          140
+        ]
+      ],
+      "farthest": true,
+      "native": {
+        "accepted": true,
+        "targetGround": [
+          64.0,
+          100.0,
+          64.0
+        ],
+        "start": [
+          25.0,
+          100.0,
+          64.0
+        ],
+        "end": [
+          103.0,
+          100.0,
+          64.0
+        ],
+        "relativeRise": 0.0,
+        "externalCalls": {
+          "0x103b8af0": 1,
+          "0x10360ba0": 1,
+          "0x40000100": 86
+        }
+      }
+    },
+    {
+      "name": "closed",
+      "size": 129,
+      "base": 100,
+      "rectangles": [
+        [
+          0,
+          0,
+          54,
+          128,
+          140
+        ],
+        [
+          74,
+          0,
+          128,
+          128,
+          140
+        ],
+        [
+          0,
+          0,
+          128,
+          54,
+          140
+        ],
+        [
+          0,
+          74,
+          128,
+          128,
+          140
+        ]
+      ],
+      "farthest": false,
+      "native": {
+        "accepted": false,
+        "targetGround": [
+          64.0,
+          100.0,
+          64.0
+        ],
+        "start": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "end": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "relativeRise": 0.0,
+        "externalCalls": {
+          "0x103b8af0": 1,
+          "0x10360ba0": 1,
+          "0x40000100": 20
+        }
+      }
+    },
+    {
+      "name": "closed_far",
+      "size": 129,
+      "base": 100,
+      "rectangles": [
+        [
+          0,
+          0,
+          54,
+          128,
+          140
+        ],
+        [
+          74,
+          0,
+          128,
+          128,
+          140
+        ],
+        [
+          0,
+          0,
+          128,
+          54,
+          140
+        ],
+        [
+          0,
+          74,
+          128,
+          128,
+          140
+        ]
+      ],
+      "farthest": true,
+      "native": {
+        "accepted": false,
+        "targetGround": [
+          64.0,
+          100.0,
+          64.0
+        ],
+        "start": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "end": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "relativeRise": 0.0,
+        "externalCalls": {
+          "0x103b8af0": 1,
+          "0x10360ba0": 1,
+          "0x40000100": 20
+        }
+      }
+    },
+    {
+      "name": "height10",
+      "size": 129,
+      "base": 100,
+      "rectangles": [
+        [
+          64,
+          45,
+          64,
+          63,
+          110
+        ]
+      ],
+      "farthest": false,
+      "native": {
+        "accepted": true,
+        "targetGround": [
+          64.0,
+          100.0,
+          64.0
+        ],
+        "start": [
+          64.0,
+          110.0,
+          58.0
+        ],
+        "end": [
+          64.0,
+          110.0,
+          70.0
+        ],
+        "relativeRise": 10.0,
+        "externalCalls": {
+          "0x103b8af0": 1,
+          "0x10360ba0": 1,
+          "0x40000100": 138
+        }
+      }
+    },
+    {
+      "name": "height10_far",
+      "size": 129,
+      "base": 100,
+      "rectangles": [
+        [
+          64,
+          45,
+          64,
+          63,
+          110
+        ]
+      ],
+      "farthest": true,
+      "native": {
+        "accepted": true,
+        "targetGround": [
+          64.0,
+          100.0,
+          64.0
+        ],
+        "start": [
+          64.0,
+          110.0,
+          25.0
+        ],
+        "end": [
+          64.0,
+          110.0,
+          103.0
+        ],
+        "relativeRise": 10.0,
+        "externalCalls": {
+          "0x103b8af0": 1,
+          "0x10360ba0": 1,
+          "0x40000100": 138
+        }
+      }
+    },
+    {
+      "name": "height11",
+      "size": 129,
+      "base": 100,
+      "rectangles": [
+        [
+          64,
+          45,
+          64,
+          63,
+          111
+        ]
+      ],
+      "farthest": false,
+      "native": {
+        "accepted": true,
+        "targetGround": [
+          64.0,
+          100.0,
+          64.0
+        ],
+        "start": [
+          57.0,
+          111.0,
+          64.0
+        ],
+        "end": [
+          70.0,
+          111.0,
+          64.0
+        ],
+        "relativeRise": 0.0,
+        "externalCalls": {
+          "0x103b8af0": 1,
+          "0x10360ba0": 1,
+          "0x40000100": 104
+        }
+      }
+    },
+    {
+      "name": "height11_far",
+      "size": 129,
+      "base": 100,
+      "rectangles": [
+        [
+          64,
+          45,
+          64,
+          63,
+          111
+        ]
+      ],
+      "farthest": true,
+      "native": {
+        "accepted": true,
+        "targetGround": [
+          64.0,
+          100.0,
+          64.0
+        ],
+        "start": [
+          25.0,
+          100.0,
+          64.0
+        ],
+        "end": [
+          103.0,
+          100.0,
+          64.0
+        ],
+        "relativeRise": 0.0,
+        "externalCalls": {
+          "0x103b8af0": 1,
+          "0x10360ba0": 1,
+          "0x40000100": 104
+        }
+      }
+    },
+    {
+      "name": "height19",
+      "size": 129,
+      "base": 100,
+      "rectangles": [
+        [
+          60,
+          44,
+          68,
+          48,
+          119
+        ]
+      ],
+      "farthest": false,
+      "native": {
+        "accepted": true,
+        "targetGround": [
+          64.0,
+          100.0,
+          64.0
+        ],
+        "start": [
+          64.0,
+          119.0,
+          58.0
+        ],
+        "end": [
+          64.0,
+          100.0,
+          70.0
+        ],
+        "relativeRise": 0.0,
+        "externalCalls": {
+          "0x103b8af0": 1,
+          "0x10360ba0": 1,
+          "0x40000100": 138
+        }
+      }
+    },
+    {
+      "name": "height19_far",
+      "size": 129,
+      "base": 100,
+      "rectangles": [
+        [
+          60,
+          44,
+          68,
+          48,
+          119
+        ]
+      ],
+      "farthest": true,
+      "native": {
+        "accepted": true,
+        "targetGround": [
+          64.0,
+          100.0,
+          64.0
+        ],
+        "start": [
+          64.0,
+          100.0,
+          25.0
+        ],
+        "end": [
+          64.0,
+          100.0,
+          103.0
+        ],
+        "relativeRise": 0.0,
+        "externalCalls": {
+          "0x103b8af0": 1,
+          "0x10360ba0": 1,
+          "0x40000100": 138
+        }
+      }
+    },
+    {
+      "name": "height20",
+      "size": 129,
+      "base": 100,
+      "rectangles": [
+        [
+          60,
+          44,
+          68,
+          48,
+          120
+        ]
+      ],
+      "farthest": false,
+      "native": {
+        "accepted": true,
+        "targetGround": [
+          64.0,
+          100.0,
+          64.0
+        ],
+        "start": [
+          57.0,
+          100.0,
+          64.0
+        ],
+        "end": [
+          70.0,
+          100.0,
+          64.0
+        ],
+        "relativeRise": 0.0,
+        "externalCalls": {
+          "0x103b8af0": 1,
+          "0x10360ba0": 1,
+          "0x40000100": 115
+        }
+      }
+    },
+    {
+      "name": "height20_far",
+      "size": 129,
+      "base": 100,
+      "rectangles": [
+        [
+          60,
+          44,
+          68,
+          48,
+          120
+        ]
+      ],
+      "farthest": true,
+      "native": {
+        "accepted": true,
+        "targetGround": [
+          64.0,
+          100.0,
+          64.0
+        ],
+        "start": [
+          25.0,
+          100.0,
+          64.0
+        ],
+        "end": [
+          103.0,
+          100.0,
+          64.0
+        ],
+        "relativeRise": 0.0,
+        "externalCalls": {
+          "0x103b8af0": 1,
+          "0x10360ba0": 1,
+          "0x40000100": 115
+        }
+      }
+    },
+    {
+      "name": "target_height_98",
+      "size": 129,
+      "base": 100,
+      "target": [
+        64,
+        98,
+        64
+      ],
+      "rectangles": [],
+      "native": {
+        "accepted": true,
+        "targetGround": [
+          64.0,
+          100.0,
+          64.0
+        ],
+        "start": [
+          64.0,
+          100.0,
+          58.0
+        ],
+        "end": [
+          64.0,
+          100.0,
+          70.0
+        ],
+        "relativeRise": 0.0,
+        "externalCalls": {
+          "0x103b8af0": 1,
+          "0x10360ba0": 1,
+          "0x40000100": 138
+        }
+      }
+    },
+    {
+      "name": "target_height_99",
+      "size": 129,
+      "base": 100,
+      "target": [
+        64,
+        99,
+        64
+      ],
+      "rectangles": [],
+      "native": {
+        "accepted": true,
+        "targetGround": [
+          64.0,
+          100.0,
+          64.0
+        ],
+        "start": [
+          64.0,
+          100.0,
+          58.0
+        ],
+        "end": [
+          64.0,
+          100.0,
+          70.0
+        ],
+        "relativeRise": 0.0,
+        "externalCalls": {
+          "0x103b8af0": 1,
+          "0x10360ba0": 1,
+          "0x40000100": 138
+        }
+      }
+    },
+    {
+      "name": "target_height_100",
+      "size": 129,
+      "base": 100,
+      "target": [
+        64,
+        100,
+        64
+      ],
+      "rectangles": [],
+      "native": {
+        "accepted": true,
+        "targetGround": [
+          64.0,
+          100.0,
+          64.0
+        ],
+        "start": [
+          64.0,
+          100.0,
+          58.0
+        ],
+        "end": [
+          64.0,
+          100.0,
+          70.0
+        ],
+        "relativeRise": 0.0,
+        "externalCalls": {
+          "0x103b8af0": 1,
+          "0x10360ba0": 1,
+          "0x40000100": 138
+        }
+      }
+    },
+    {
+      "name": "target_height_101",
+      "size": 129,
+      "base": 100,
+      "target": [
+        64,
+        101,
+        64
+      ],
+      "rectangles": [],
+      "native": {
+        "accepted": true,
+        "targetGround": [
+          64.0,
+          100.0,
+          64.0
+        ],
+        "start": [
+          64.0,
+          100.0,
+          58.0
+        ],
+        "end": [
+          64.0,
+          100.0,
+          70.0
+        ],
+        "relativeRise": 0.0,
+        "externalCalls": {
+          "0x103b8af0": 1,
+          "0x10360ba0": 1,
+          "0x40000100": 138
+        }
+      }
+    },
+    {
+      "name": "target_height_102",
+      "size": 129,
+      "base": 100,
+      "target": [
+        64,
+        102,
+        64
+      ],
+      "rectangles": [],
+      "native": {
+        "accepted": true,
+        "targetGround": [
+          64.0,
+          100.0,
+          64.0
+        ],
+        "start": [
+          64.0,
+          100.0,
+          58.0
+        ],
+        "end": [
+          64.0,
+          100.0,
+          70.0
+        ],
+        "relativeRise": 0.0,
+        "externalCalls": {
+          "0x103b8af0": 1,
+          "0x10360ba0": 1,
+          "0x40000100": 138
+        }
+      }
+    },
+    {
+      "name": "target_height_103",
+      "size": 129,
+      "base": 100,
+      "target": [
+        64,
+        103,
+        64
+      ],
+      "rectangles": [],
+      "native": {
+        "accepted": false,
+        "targetGround": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "start": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "end": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "relativeRise": 0.0,
+        "externalCalls": {
+          "0x103b8af0": 1,
+          "0x10360ba0": 1
+        }
+      }
+    },
+    {
+      "name": "target_height_105",
+      "size": 129,
+      "base": 100,
+      "target": [
+        64,
+        105,
+        64
+      ],
+      "rectangles": [],
+      "native": {
+        "accepted": false,
+        "targetGround": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "start": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "end": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "relativeRise": 0.0,
+        "externalCalls": {
+          "0x103b8af0": 1,
+          "0x10360ba0": 1
+        }
+      }
+    },
+    {
+      "name": "cell_0.5",
+      "size": 129,
+      "base": 100,
+      "cell": 0.5,
+      "target": [
+        32.0,
+        100,
+        32.0
+      ],
+      "craft": [
+        20.0,
+        120,
+        20.0
+      ],
+      "rectangles": [],
+      "native": {
+        "accepted": true,
+        "targetGround": [
+          32.0,
+          100.0,
+          32.0
+        ],
+        "start": [
+          32.0,
+          100.0,
+          29.0
+        ],
+        "end": [
+          32.0,
+          100.0,
+          35.0
+        ],
+        "relativeRise": 0.0,
+        "externalCalls": {
+          "0x103b8af0": 1,
+          "0x10360ba0": 1,
+          "0x40000100": 138
+        }
+      }
+    },
+    {
+      "name": "cell_2",
+      "size": 129,
+      "base": 100,
+      "cell": 2,
+      "target": [
+        128,
+        100,
+        128
+      ],
+      "craft": [
+        80,
+        120,
+        80
+      ],
+      "rectangles": [],
+      "native": {
+        "accepted": true,
+        "targetGround": [
+          128.0,
+          100.0,
+          128.0
+        ],
+        "start": [
+          128.0,
+          100.0,
+          116.0
+        ],
+        "end": [
+          128.0,
+          100.0,
+          140.0
+        ],
+        "relativeRise": 0.0,
+        "externalCalls": {
+          "0x103b8af0": 1,
+          "0x10360ba0": 1,
+          "0x40000100": 138
+        }
+      }
+    },
+    {
+      "name": "cell_4",
+      "size": 129,
+      "base": 100,
+      "cell": 4,
+      "target": [
+        256,
+        100,
+        256
+      ],
+      "craft": [
+        160,
+        120,
+        160
+      ],
+      "rectangles": [],
+      "native": {
+        "accepted": true,
+        "targetGround": [
+          256.0,
+          100.0,
+          256.0
+        ],
+        "start": [
+          256.0,
+          100.0,
+          232.0
+        ],
+        "end": [
+          256.0,
+          100.0,
+          280.0
+        ],
+        "relativeRise": 0.0,
+        "externalCalls": {
+          "0x103b8af0": 1,
+          "0x10360ba0": 1,
+          "0x40000100": 138
+        }
+      }
+    },
+    {
+      "name": "craft_[70, 120, 90]",
+      "size": 129,
+      "base": 100,
+      "craft": [
+        70,
+        120,
+        90
+      ],
+      "rectangles": [],
+      "native": {
+        "accepted": true,
+        "targetGround": [
+          64.0,
+          100.0,
+          64.0
+        ],
+        "start": [
+          64.0,
+          100.0,
+          70.0
+        ],
+        "end": [
+          64.0,
+          100.0,
+          58.0
+        ],
+        "relativeRise": 0.0,
+        "externalCalls": {
+          "0x103b8af0": 1,
+          "0x10360ba0": 1,
+          "0x40000100": 138
+        }
+      }
+    },
+    {
+      "name": "craft_[90, 120, 40]",
+      "size": 129,
+      "base": 100,
+      "craft": [
+        90,
+        120,
+        40
+      ],
+      "rectangles": [],
+      "native": {
+        "accepted": true,
+        "targetGround": [
+          64.0,
+          100.0,
+          64.0
+        ],
+        "start": [
+          64.0,
+          100.0,
+          58.0
+        ],
+        "end": [
+          64.0,
+          100.0,
+          70.0
+        ],
+        "relativeRise": 0.0,
+        "externalCalls": {
+          "0x103b8af0": 1,
+          "0x10360ba0": 1,
+          "0x40000100": 138
+        }
+      }
+    },
+    {
+      "name": "craft_[64, 120, 64]",
+      "size": 129,
+      "base": 100,
+      "craft": [
+        64,
+        120,
+        64
+      ],
+      "rectangles": [],
+      "native": {
+        "accepted": true,
+        "targetGround": [
+          64.0,
+          100.0,
+          64.0
+        ],
+        "start": [
+          64.0,
+          100.0,
+          58.0
+        ],
+        "end": [
+          64.0,
+          100.0,
+          70.0
+        ],
+        "relativeRise": 0.0,
+        "externalCalls": {
+          "0x103b8af0": 1,
+          "0x10360ba0": 1,
+          "0x40000100": 138
+        }
+      }
+    },
+    {
+      "name": "limits_0_10",
+      "size": 129,
+      "base": 100,
+      "minimum": 0,
+      "maximum": 10,
+      "rectangles": [],
+      "native": {
+        "accepted": true,
+        "targetGround": [
+          64.0,
+          100.0,
+          64.0
+        ],
+        "start": [
+          64.0,
+          100.0,
+          63.0
+        ],
+        "end": [
+          64.0,
+          100.0,
+          65.0
+        ],
+        "relativeRise": 0.0,
+        "externalCalls": {
+          "0x103b8af0": 1,
+          "0x10360ba0": 1,
+          "0x40000100": 38
+        }
+      }
+    },
+    {
+      "name": "limits_5_6",
+      "size": 129,
+      "base": 100,
+      "minimum": 5,
+      "maximum": 6,
+      "rectangles": [],
+      "native": {
+        "accepted": false,
+        "targetGround": [
+          64.0,
+          100.0,
+          64.0
+        ],
+        "start": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "end": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "relativeRise": 0.0,
+        "externalCalls": {
+          "0x103b8af0": 1,
+          "0x10360ba0": 1
+        }
+      }
+    },
+    {
+      "name": "limits_5_7",
+      "size": 129,
+      "base": 100,
+      "minimum": 5,
+      "maximum": 7,
+      "rectangles": [],
+      "native": {
+        "accepted": true,
+        "targetGround": [
+          64.0,
+          100.0,
+          64.0
+        ],
+        "start": [
+          64.0,
+          100.0,
+          58.0
+        ],
+        "end": [
+          64.0,
+          100.0,
+          70.0
+        ],
+        "relativeRise": 0.0,
+        "externalCalls": {
+          "0x103b8af0": 1,
+          "0x10360ba0": 1,
+          "0x40000100": 6
+        }
+      }
+    },
+    {
+      "name": "limits_10_20",
+      "size": 129,
+      "base": 100,
+      "minimum": 10,
+      "maximum": 20,
+      "rectangles": [],
+      "native": {
+        "accepted": true,
+        "targetGround": [
+          64.0,
+          100.0,
+          64.0
+        ],
+        "start": [
+          64.0,
+          100.0,
+          53.0
+        ],
+        "end": [
+          64.0,
+          100.0,
+          75.0
+        ],
+        "relativeRise": 0.0,
+        "externalCalls": {
+          "0x103b8af0": 1,
+          "0x10360ba0": 1,
+          "0x40000100": 38
+        }
+      }
+    },
+    {
+      "name": "limits_20_40",
+      "size": 129,
+      "base": 100,
+      "minimum": 20,
+      "maximum": 40,
+      "rectangles": [],
+      "native": {
+        "accepted": true,
+        "targetGround": [
+          64.0,
+          100.0,
+          64.0
+        ],
+        "start": [
+          64.0,
+          100.0,
+          43.0
+        ],
+        "end": [
+          64.0,
+          100.0,
+          85.0
+        ],
+        "relativeRise": 0.0,
+        "externalCalls": {
+          "0x103b8af0": 1,
+          "0x10360ba0": 1,
+          "0x40000100": 78
+        }
+      }
+    },
+    {
+      "name": "rectangles_0",
+      "size": 129,
+      "base": 100,
+      "rectangles": [
+        [
+          34,
+          41,
+          48,
+          52,
+          105
+        ],
+        [
+          44,
+          61,
+          56,
+          62,
+          119
+        ],
+        [
+          87,
+          85,
+          104,
+          96,
+          119
+        ],
+        [
+          83,
+          83,
+          100,
+          99,
+          105
+        ],
+        [
+          57,
+          63,
+          74,
+          74,
+          90
+        ]
+      ],
+      "farthest": false,
+      "native": {
+        "accepted": true,
+        "targetGround": [
+          64.0,
+          100.0,
+          54.0
+        ],
+        "start": [
+          64.0,
+          119.0,
+          60.0
+        ],
+        "end": [
+          64.0,
+          100.0,
+          48.0
+        ],
+        "relativeRise": 0.0,
+        "externalCalls": {
+          "0x103b8af0": 1,
+          "0x10360ba0": 1,
+          "0x40000100": 138
+        }
+      }
+    },
+    {
+      "name": "rectangles_1",
+      "size": 129,
+      "base": 100,
+      "rectangles": [
+        [
+          69,
+          31,
+          74,
+          47,
+          110
+        ],
+        [
+          41,
+          52,
+          49,
+          68,
+          119
+        ],
+        [
+          81,
+          50,
+          92,
+          51,
+          140
+        ],
+        [
+          55,
+          51,
+          58,
+          63,
+          140
+        ],
+        [
+          62,
+          37,
+          69,
+          39,
+          120
+        ]
+      ],
+      "farthest": true,
+      "native": {
+        "accepted": false,
+        "targetGround": [
+          64.0,
+          100.0,
+          64.0
+        ],
+        "start": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "end": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "relativeRise": 0.0,
+        "externalCalls": {
+          "0x103b8af0": 1,
+          "0x10360ba0": 1,
+          "0x40000100": 98
+        }
+      }
+    },
+    {
+      "name": "rectangles_2",
+      "size": 129,
+      "base": 100,
+      "rectangles": [
+        [
+          50,
+          88,
+          61,
+          90,
+          105
+        ],
+        [
+          80,
+          66,
+          84,
+          79,
+          120
+        ],
+        [
+          72,
+          81,
+          73,
+          88,
+          110
+        ],
+        [
+          45,
+          44,
+          60,
+          49,
+          120
+        ],
+        [
+          77,
+          57,
+          85,
+          73,
+          110
+        ]
+      ],
+      "farthest": false,
+      "native": {
+        "accepted": true,
+        "targetGround": [
+          64.0,
+          100.0,
+          64.0
+        ],
+        "start": [
+          64.0,
+          100.0,
+          33.0
+        ],
+        "end": [
+          64.0,
+          100.0,
+          70.0
+        ],
+        "relativeRise": 0.0,
+        "externalCalls": {
+          "0x103b8af0": 1,
+          "0x10360ba0": 1,
+          "0x40000100": 138
+        }
+      }
+    },
+    {
+      "name": "rectangles_3",
+      "size": 129,
+      "base": 100,
+      "rectangles": [
+        [
+          47,
+          72,
+          63,
+          77,
+          140
+        ],
+        [
+          82,
+          75,
+          95,
+          88,
+          140
+        ],
+        [
+          63,
+          88,
+          66,
+          93,
+          119
+        ],
+        [
+          36,
+          84,
+          38,
+          89,
+          90
+        ],
+        [
+          79,
+          52,
+          85,
+          56,
+          120
+        ]
+      ],
+      "farthest": true,
+      "native": {
+        "accepted": true,
+        "targetGround": [
+          64.0,
+          100.0,
+          64.0
+        ],
+        "start": [
+          64.0,
+          100.0,
+          25.0
+        ],
+        "end": [
+          64.0,
+          119.0,
+          103.0
+        ],
+        "relativeRise": 0.0,
+        "externalCalls": {
+          "0x103b8af0": 1,
+          "0x10360ba0": 1,
+          "0x40000100": 138
+        }
+      }
+    },
+    {
+      "name": "rectangles_4",
+      "size": 129,
+      "base": 100,
+      "rectangles": [
+        [
+          49,
+          75,
+          64,
+          90,
+          105
+        ],
+        [
+          40,
+          74,
+          44,
+          81,
+          140
+        ],
+        [
+          66,
+          55,
+          72,
+          68,
+          90
+        ],
+        [
+          79,
+          34,
+          92,
+          43,
+          120
+        ],
+        [
+          76,
+          54,
+          88,
+          56,
+          90
+        ]
+      ],
+      "farthest": false,
+      "native": {
+        "accepted": true,
+        "targetGround": [
+          64.0,
+          100.0,
+          64.0
+        ],
+        "start": [
+          64.0,
+          100.0,
+          58.0
+        ],
+        "end": [
+          64.0,
+          105.0,
+          70.0
+        ],
+        "relativeRise": 0.0,
+        "externalCalls": {
+          "0x103b8af0": 1,
+          "0x10360ba0": 1,
+          "0x40000100": 138
+        }
+      }
+    },
+    {
+      "name": "rectangles_5",
+      "size": 129,
+      "base": 100,
+      "rectangles": [
+        [
+          80,
+          53,
+          84,
+          69,
+          110
+        ],
+        [
+          51,
+          51,
+          64,
+          52,
+          119
+        ],
+        [
+          76,
+          81,
+          87,
+          82,
+          119
+        ],
+        [
+          33,
+          66,
+          40,
+          79,
+          140
+        ],
+        [
+          64,
+          88,
+          79,
+          90,
+          140
+        ]
+      ],
+      "farthest": true,
+      "native": {
+        "accepted": true,
+        "targetGround": [
+          64.0,
+          100.0,
+          64.0
+        ],
+        "start": [
+          64.0,
+          100.0,
+          25.0
+        ],
+        "end": [
+          64.0,
+          100.0,
+          70.0
+        ],
+        "relativeRise": 0.0,
+        "externalCalls": {
+          "0x103b8af0": 1,
+          "0x10360ba0": 1,
+          "0x40000100": 123
+        }
+      }
+    },
+    {
+      "name": "rectangles_6",
+      "size": 129,
+      "base": 100,
+      "rectangles": [
+        [
+          72,
+          69,
+          77,
+          70,
+          105
+        ],
+        [
+          42,
+          50,
+          52,
+          53,
+          140
+        ],
+        [
+          61,
+          71,
+          66,
+          85,
+          110
+        ],
+        [
+          53,
+          38,
+          70,
+          46,
+          110
+        ],
+        [
+          51,
+          85,
+          63,
+          95,
+          110
+        ]
+      ],
+      "farthest": false,
+      "native": {
+        "accepted": true,
+        "targetGround": [
+          64.0,
+          100.0,
+          64.0
+        ],
+        "start": [
+          64.0,
+          100.0,
+          58.0
+        ],
+        "end": [
+          64.0,
+          110.0,
+          70.0
+        ],
+        "relativeRise": 0.0,
+        "externalCalls": {
+          "0x103b8af0": 1,
+          "0x10360ba0": 1,
+          "0x40000100": 138
+        }
+      }
+    },
+    {
+      "name": "rectangles_7",
+      "size": 129,
+      "base": 100,
+      "rectangles": [
+        [
+          80,
+          49,
+          97,
+          59,
+          140
+        ],
+        [
+          48,
+          88,
+          61,
+          98,
+          119
+        ],
+        [
+          73,
+          53,
+          84,
+          54,
+          110
+        ],
+        [
+          54,
+          47,
+          65,
+          60,
+          110
+        ],
+        [
+          55,
+          66,
+          63,
+          70,
+          110
+        ]
+      ],
+      "farthest": true,
+      "native": {
+        "accepted": true,
+        "targetGround": [
+          64.0,
+          100.0,
+          64.0
+        ],
+        "start": [
+          64.0,
+          110.0,
+          25.0
+        ],
+        "end": [
+          64.0,
+          119.0,
+          103.0
+        ],
+        "relativeRise": 10.0,
+        "externalCalls": {
+          "0x103b8af0": 1,
+          "0x10360ba0": 1,
+          "0x40000100": 138
+        }
+      }
+    },
+    {
+      "name": "rectangles_8",
+      "size": 129,
+      "base": 100,
+      "rectangles": [
+        [
+          35,
+          49,
+          46,
+          51,
+          90
+        ],
+        [
+          44,
+          39,
+          59,
+          56,
+          119
+        ],
+        [
+          80,
+          68,
+          83,
+          77,
+          90
+        ],
+        [
+          34,
+          45,
+          36,
+          54,
+          90
+        ],
+        [
+          63,
+          46,
+          70,
+          55,
+          120
+        ]
+      ],
+      "farthest": false,
+      "native": {
+        "accepted": true,
+        "targetGround": [
+          64.0,
+          100.0,
+          64.0
+        ],
+        "start": [
+          52.0,
+          119.0,
+          64.0
+        ],
+        "end": [
+          82.0,
+          100.0,
+          64.0
+        ],
+        "relativeRise": 0.0,
+        "externalCalls": {
+          "0x103b8af0": 1,
+          "0x10360ba0": 1,
+          "0x40000100": 108
+        }
+      }
+    },
+    {
+      "name": "rectangles_9",
+      "size": 129,
+      "base": 100,
+      "rectangles": [
+        [
+          68,
+          48,
+          81,
+          56,
+          105
+        ],
+        [
+          59,
+          41,
+          76,
+          51,
+          119
+        ],
+        [
+          57,
+          79,
+          63,
+          88,
+          140
+        ],
+        [
+          44,
+          63,
+          57,
+          64,
+          119
+        ],
+        [
+          58,
+          71,
+          59,
+          77,
+          105
+        ]
+      ],
+      "farthest": true,
+      "native": {
+        "accepted": true,
+        "targetGround": [
+          64.0,
+          100.0,
+          64.0
+        ],
+        "start": [
+          64.0,
+          100.0,
+          25.0
+        ],
+        "end": [
+          64.0,
+          100.0,
+          103.0
+        ],
+        "relativeRise": 0.0,
+        "externalCalls": {
+          "0x103b8af0": 1,
+          "0x10360ba0": 1,
+          "0x40000100": 138
+        }
+      }
+    },
+    {
+      "name": "rectangles_10",
+      "size": 129,
+      "base": 100,
+      "rectangles": [
+        [
+          79,
+          37,
+          84,
+          50,
+          110
+        ],
+        [
+          37,
+          78,
+          52,
+          81,
+          119
+        ],
+        [
+          59,
+          62,
+          60,
+          67,
+          140
+        ],
+        [
+          89,
+          54,
+          97,
+          70,
+          119
+        ],
+        [
+          31,
+          38,
+          48,
+          52,
+          119
+        ]
+      ],
+      "farthest": false,
+      "native": {
+        "accepted": true,
+        "targetGround": [
+          64.0,
+          100.0,
+          64.0
+        ],
+        "start": [
+          64.0,
+          100.0,
+          51.0
+        ],
+        "end": [
+          64.0,
+          100.0,
+          78.0
+        ],
+        "relativeRise": 0.0,
+        "externalCalls": {
+          "0x103b8af0": 1,
+          "0x10360ba0": 1,
+          "0x40000100": 104
+        }
+      }
+    },
+    {
+      "name": "rectangles_11",
+      "size": 129,
+      "base": 100,
+      "rectangles": [
+        [
+          57,
+          37,
+          67,
+          40,
+          120
+        ],
+        [
+          49,
+          49,
+          53,
+          64,
+          140
+        ],
+        [
+          47,
+          64,
+          60,
+          80,
+          110
+        ],
+        [
+          78,
+          42,
+          89,
+          44,
+          140
+        ],
+        [
+          74,
+          36,
+          91,
+          53,
+          120
+        ]
+      ],
+      "farthest": true,
+      "native": {
+        "accepted": true,
+        "targetGround": [
+          64.0,
+          100.0,
+          64.0
+        ],
+        "start": [
+          25.0,
+          110.0,
+          64.0
+        ],
+        "end": [
+          103.0,
+          110.0,
+          64.0
+        ],
+        "relativeRise": 10.0,
+        "externalCalls": {
+          "0x103b8af0": 1,
+          "0x10360ba0": 1,
+          "0x40000100": 123
+        }
+      }
+    },
+    {
+      "name": "rectangles_12",
+      "size": 129,
+      "base": 100,
+      "rectangles": [
+        [
+          75,
+          35,
+          78,
+          40,
+          120
+        ],
+        [
+          53,
+          32,
+          57,
+          46,
+          110
+        ],
+        [
+          77,
+          30,
+          80,
+          35,
+          90
+        ],
+        [
+          44,
+          70,
+          58,
+          72,
+          105
+        ],
+        [
+          64,
+          40,
+          69,
+          57,
+          105
+        ]
+      ],
+      "farthest": false,
+      "native": {
+        "accepted": true,
+        "targetGround": [
+          64.0,
+          100.0,
+          64.0
+        ],
+        "start": [
+          64.0,
+          105.0,
+          58.0
+        ],
+        "end": [
+          64.0,
+          105.0,
+          70.0
+        ],
+        "relativeRise": 0.0,
+        "externalCalls": {
+          "0x103b8af0": 1,
+          "0x10360ba0": 1,
+          "0x40000100": 138
+        }
+      }
+    },
+    {
+      "name": "rectangles_13",
+      "size": 129,
+      "base": 100,
+      "rectangles": [
+        [
+          87,
+          74,
+          89,
+          87,
+          120
+        ],
+        [
+          81,
+          76,
+          98,
+          90,
+          110
+        ],
+        [
+          48,
+          54,
+          50,
+          63,
+          90
+        ],
+        [
+          75,
+          56,
+          83,
+          60,
+          120
+        ],
+        [
+          74,
+          65,
+          85,
+          80,
+          110
+        ]
+      ],
+      "farthest": true,
+      "native": {
+        "accepted": true,
+        "targetGround": [
+          64.0,
+          100.0,
+          64.0
+        ],
+        "start": [
+          64.0,
+          100.0,
+          25.0
+        ],
+        "end": [
+          64.0,
+          100.0,
+          103.0
+        ],
+        "relativeRise": 0.0,
+        "externalCalls": {
+          "0x103b8af0": 1,
+          "0x10360ba0": 1,
+          "0x40000100": 138
+        }
+      }
+    },
+    {
+      "name": "rectangles_14",
+      "size": 129,
+      "base": 100,
+      "rectangles": [
+        [
+          75,
+          64,
+          79,
+          70,
+          105
+        ],
+        [
+          55,
+          36,
+          69,
+          47,
+          120
+        ],
+        [
+          48,
+          33,
+          50,
+          34,
+          120
+        ],
+        [
+          48,
+          57,
+          50,
+          71,
+          140
+        ],
+        [
+          67,
+          63,
+          84,
+          76,
+          140
+        ]
+      ],
+      "farthest": false,
+      "native": {
+        "accepted": false,
+        "targetGround": [
+          64.0,
+          100.0,
+          64.0
+        ],
+        "start": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "end": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "relativeRise": 0.0,
+        "externalCalls": {
+          "0x103b8af0": 1,
+          "0x10360ba0": 1,
+          "0x40000100": 55
+        }
+      }
+    },
+    {
+      "name": "rectangles_15",
+      "size": 129,
+      "base": 100,
+      "rectangles": [
+        [
+          89,
+          43,
+          105,
+          60,
+          90
+        ],
+        [
+          61,
+          82,
+          69,
+          88,
+          140
+        ],
+        [
+          54,
+          77,
+          60,
+          83,
+          140
+        ],
+        [
+          40,
+          84,
+          51,
+          95,
+          120
+        ],
+        [
+          77,
+          89,
+          83,
+          104,
+          119
+        ]
+      ],
+      "farthest": true,
+      "native": {
+        "accepted": true,
+        "targetGround": [
+          64.0,
+          100.0,
+          64.0
+        ],
+        "start": [
+          25.0,
+          100.0,
+          64.0
+        ],
+        "end": [
+          103.0,
+          100.0,
+          64.0
+        ],
+        "relativeRise": 0.0,
+        "externalCalls": {
+          "0x103b8af0": 1,
+          "0x10360ba0": 1,
+          "0x40000100": 117
+        }
+      }
+    },
+    {
+      "name": "rectangles_16",
+      "size": 129,
+      "base": 100,
+      "rectangles": [
+        [
+          81,
+          71,
+          87,
+          87,
+          119
+        ],
+        [
+          40,
+          32,
+          57,
+          43,
+          110
+        ],
+        [
+          48,
+          63,
+          57,
+          74,
+          140
+        ],
+        [
+          80,
+          67,
+          90,
+          80,
+          119
+        ],
+        [
+          43,
+          88,
+          50,
+          95,
+          140
+        ]
+      ],
+      "farthest": false,
+      "native": {
+        "accepted": true,
+        "targetGround": [
+          64.0,
+          100.0,
+          64.0
+        ],
+        "start": [
+          64.0,
+          110.0,
+          52.0
+        ],
+        "end": [
+          64.0,
+          100.0,
+          85.0
+        ],
+        "relativeRise": 0.0,
+        "externalCalls": {
+          "0x103b8af0": 1,
+          "0x10360ba0": 1,
+          "0x40000100": 106
+        }
+      }
+    },
+    {
+      "name": "rectangles_17",
+      "size": 129,
+      "base": 100,
+      "rectangles": [
+        [
+          39,
+          82,
+          51,
+          94,
+          140
+        ],
+        [
+          39,
+          38,
+          40,
+          42,
+          110
+        ],
+        [
+          55,
+          74,
+          70,
+          75,
+          90
+        ],
+        [
+          48,
+          53,
+          54,
+          66,
+          110
+        ],
+        [
+          83,
+          33,
+          85,
+          38,
+          119
+        ]
+      ],
+      "farthest": true,
+      "native": {
+        "accepted": true,
+        "targetGround": [
+          64.0,
+          100.0,
+          64.0
+        ],
+        "start": [
+          64.0,
+          100.0,
+          25.0
+        ],
+        "end": [
+          64.0,
+          100.0,
+          103.0
+        ],
+        "relativeRise": 0.0,
+        "externalCalls": {
+          "0x103b8af0": 1,
+          "0x10360ba0": 1,
+          "0x40000100": 138
+        }
+      }
+    },
+    {
+      "name": "rectangles_18",
+      "size": 129,
+      "base": 100,
+      "rectangles": [
+        [
+          43,
+          38,
+          57,
+          52,
+          119
+        ],
+        [
+          32,
+          38,
+          46,
+          52,
+          140
+        ],
+        [
+          31,
+          33,
+          34,
+          48,
+          110
+        ],
+        [
+          48,
+          49,
+          49,
+          63,
+          120
+        ],
+        [
+          86,
+          56,
+          88,
+          68,
+          140
+        ]
+      ],
+      "farthest": false,
+      "native": {
+        "accepted": true,
+        "targetGround": [
+          64.0,
+          100.0,
+          64.0
+        ],
+        "start": [
+          64.0,
+          119.0,
+          58.0
+        ],
+        "end": [
+          64.0,
+          100.0,
+          70.0
+        ],
+        "relativeRise": 0.0,
+        "externalCalls": {
+          "0x103b8af0": 1,
+          "0x10360ba0": 1,
+          "0x40000100": 121
+        }
+      }
+    },
+    {
+      "name": "rectangles_19",
+      "size": 129,
+      "base": 100,
+      "rectangles": [
+        [
+          80,
+          53,
+          84,
+          70,
+          105
+        ],
+        [
+          83,
+          54,
+          90,
+          56,
+          110
+        ],
+        [
+          88,
+          66,
+          104,
+          68,
+          119
+        ],
+        [
+          44,
+          52,
+          50,
+          55,
+          120
+        ],
+        [
+          61,
+          58,
+          63,
+          68,
+          105
+        ]
+      ],
+      "farthest": true,
+      "native": {
+        "accepted": true,
+        "targetGround": [
+          64.0,
+          100.0,
+          64.0
+        ],
+        "start": [
+          64.0,
+          100.0,
+          25.0
+        ],
+        "end": [
+          64.0,
+          100.0,
+          103.0
+        ],
+        "relativeRise": 0.0,
+        "externalCalls": {
+          "0x103b8af0": 1,
+          "0x10360ba0": 1,
+          "0x40000100": 138
+        }
+      }
+    },
+    {
+      "name": "relocate_center_bump",
+      "size": 129,
+      "base": 100,
+      "rectangles": [
+        [
+          64,
+          64,
+          64,
+          64,
+          103
+        ]
+      ],
+      "farthest": false,
+      "native": {
+        "accepted": true,
+        "targetGround": [
+          64.0,
+          100.0,
+          54.0
+        ],
+        "start": [
+          64.0,
+          100.0,
+          48.0
+        ],
+        "end": [
+          64.0,
+          103.0,
+          60.0
+        ],
+        "relativeRise": 0.0,
+        "externalCalls": {
+          "0x103b8af0": 1,
+          "0x10360ba0": 1,
+          "0x40000100": 138
+        }
+      }
+    },
+    {
+      "name": "relocate_center_bump_far",
+      "size": 129,
+      "base": 100,
+      "rectangles": [
+        [
+          64,
+          64,
+          64,
+          64,
+          103
+        ]
+      ],
+      "farthest": true,
+      "native": {
+        "accepted": true,
+        "targetGround": [
+          64.0,
+          100.0,
+          54.0
+        ],
+        "start": [
+          64.0,
+          100.0,
+          15.0
+        ],
+        "end": [
+          64.0,
+          103.0,
+          93.0
+        ],
+        "relativeRise": 3.0,
+        "externalCalls": {
+          "0x103b8af0": 1,
+          "0x10360ba0": 1,
+          "0x40000100": 138
+        }
+      }
+    },
+    {
+      "name": "relocate_center_pit",
+      "size": 129,
+      "base": 100,
+      "rectangles": [
+        [
+          64,
+          64,
+          64,
+          64,
+          97
+        ]
+      ],
+      "farthest": false,
+      "native": {
+        "accepted": true,
+        "targetGround": [
+          64.0,
+          100.0,
+          54.0
+        ],
+        "start": [
+          64.0,
+          100.0,
+          48.0
+        ],
+        "end": [
+          64.0,
+          100.0,
+          60.0
+        ],
+        "relativeRise": 0.0,
+        "externalCalls": {
+          "0x103b8af0": 1,
+          "0x10360ba0": 1,
+          "0x40000100": 138
+        }
+      }
+    },
+    {
+      "name": "relocate_center_pit_far",
+      "size": 129,
+      "base": 100,
+      "rectangles": [
+        [
+          64,
+          64,
+          64,
+          64,
+          97
+        ]
+      ],
+      "farthest": true,
+      "native": {
+        "accepted": true,
+        "targetGround": [
+          64.0,
+          100.0,
+          54.0
+        ],
+        "start": [
+          64.0,
+          100.0,
+          15.0
+        ],
+        "end": [
+          64.0,
+          100.0,
+          93.0
+        ],
+        "relativeRise": 0.0,
+        "externalCalls": {
+          "0x103b8af0": 1,
+          "0x10360ba0": 1,
+          "0x40000100": 138
+        }
+      }
+    },
+    {
+      "name": "relocate_first_column_blocked",
+      "size": 129,
+      "base": 100,
+      "rectangles": [
+        [
+          62,
+          62,
+          62,
+          66,
+          103
+        ],
+        [
+          64,
+          64,
+          64,
+          64,
+          103
+        ]
+      ],
+      "farthest": false,
+      "native": {
+        "accepted": false,
+        "targetGround": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "start": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "end": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "relativeRise": 0.0,
+        "externalCalls": {
+          "0x103b8af0": 1,
+          "0x10360ba0": 1
+        }
+      }
+    },
+    {
+      "name": "relocate_first_column_blocked_far",
+      "size": 129,
+      "base": 100,
+      "rectangles": [
+        [
+          62,
+          62,
+          62,
+          66,
+          103
+        ],
+        [
+          64,
+          64,
+          64,
+          64,
+          103
+        ]
+      ],
+      "farthest": true,
+      "native": {
+        "accepted": false,
+        "targetGround": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "start": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "end": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "relativeRise": 0.0,
+        "externalCalls": {
+          "0x103b8af0": 1,
+          "0x10360ba0": 1
+        }
+      }
+    },
+    {
+      "name": "relocate_narrow_matching_strip",
+      "size": 129,
+      "base": 100,
+      "rectangles": [
+        [
+          0,
+          0,
+          128,
+          128,
+          103
+        ],
+        [
+          62,
+          62,
+          63,
+          63,
+          100
+        ]
+      ],
+      "farthest": false,
+      "native": {
+        "accepted": true,
+        "targetGround": [
+          63.0,
+          100.0,
+          62.0
+        ],
+        "start": [
+          63.0,
+          103.0,
+          56.0
+        ],
+        "end": [
+          63.0,
+          103.0,
+          68.0
+        ],
+        "relativeRise": 3.0,
+        "externalCalls": {
+          "0x103b8af0": 1,
+          "0x10360ba0": 1,
+          "0x40000100": 138
+        }
+      }
+    },
+    {
+      "name": "relocate_narrow_matching_strip_far",
+      "size": 129,
+      "base": 100,
+      "rectangles": [
+        [
+          0,
+          0,
+          128,
+          128,
+          103
+        ],
+        [
+          62,
+          62,
+          63,
+          63,
+          100
+        ]
+      ],
+      "farthest": true,
+      "native": {
+        "accepted": true,
+        "targetGround": [
+          63.0,
+          100.0,
+          62.0
+        ],
+        "start": [
+          63.0,
+          103.0,
+          23.0
+        ],
+        "end": [
+          63.0,
+          103.0,
+          101.0
+        ],
+        "relativeRise": 3.0,
+        "externalCalls": {
+          "0x103b8af0": 1,
+          "0x10360ba0": 1,
+          "0x40000100": 138
+        }
+      }
+    },
+    {
+      "name": "relocate_height_exactly_two",
+      "size": 129,
+      "base": 100,
+      "rectangles": [
+        [
+          0,
+          0,
+          128,
+          128,
+          102
+        ],
+        [
+          64,
+          64,
+          64,
+          64,
+          103
+        ]
+      ],
+      "farthest": false,
+      "native": {
+        "accepted": false,
+        "targetGround": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "start": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "end": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "relativeRise": 0.0,
+        "externalCalls": {
+          "0x103b8af0": 1,
+          "0x10360ba0": 1
+        }
+      }
+    },
+    {
+      "name": "relocate_height_exactly_two_far",
+      "size": 129,
+      "base": 100,
+      "rectangles": [
+        [
+          0,
+          0,
+          128,
+          128,
+          102
+        ],
+        [
+          64,
+          64,
+          64,
+          64,
+          103
+        ]
+      ],
+      "farthest": true,
+      "native": {
+        "accepted": false,
+        "targetGround": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "start": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "end": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "relativeRise": 0.0,
+        "externalCalls": {
+          "0x103b8af0": 1,
+          "0x10360ba0": 1
+        }
+      }
+    },
+    {
+      "name": "relocate_height_one",
+      "size": 129,
+      "base": 100,
+      "rectangles": [
+        [
+          0,
+          0,
+          128,
+          128,
+          101
+        ],
+        [
+          64,
+          64,
+          64,
+          64,
+          103
+        ]
+      ],
+      "farthest": false,
+      "native": {
+        "accepted": true,
+        "targetGround": [
+          64.0,
+          101.0,
+          54.0
+        ],
+        "start": [
+          64.0,
+          101.0,
+          48.0
+        ],
+        "end": [
+          64.0,
+          103.0,
+          60.0
+        ],
+        "relativeRise": 0.0,
+        "externalCalls": {
+          "0x103b8af0": 1,
+          "0x10360ba0": 1,
+          "0x40000100": 138
+        }
+      }
+    },
+    {
+      "name": "relocate_height_one_far",
+      "size": 129,
+      "base": 100,
+      "rectangles": [
+        [
+          0,
+          0,
+          128,
+          128,
+          101
+        ],
+        [
+          64,
+          64,
+          64,
+          64,
+          103
+        ]
+      ],
+      "farthest": true,
+      "native": {
+        "accepted": true,
+        "targetGround": [
+          64.0,
+          101.0,
+          54.0
+        ],
+        "start": [
+          64.0,
+          101.0,
+          15.0
+        ],
+        "end": [
+          64.0,
+          103.0,
+          93.0
+        ],
+        "relativeRise": 2.0,
+        "externalCalls": {
+          "0x103b8af0": 1,
+          "0x10360ba0": 1,
+          "0x40000100": 138
+        }
+      }
+    },
+    {
+      "name": "terraced_rise",
+      "size": 129,
+      "base": 100,
+      "rectangles": [
+        [
+          60,
+          50,
+          68,
+          59,
+          105
+        ],
+        [
+          60,
+          44,
+          68,
+          49,
+          109
+        ]
+      ],
+      "farthest": false,
+      "native": {
+        "accepted": true,
+        "targetGround": [
+          64.0,
+          100.0,
+          64.0
+        ],
+        "start": [
+          64.0,
+          109.0,
+          58.0
+        ],
+        "end": [
+          64.0,
+          105.0,
+          70.0
+        ],
+        "relativeRise": 5.0,
+        "externalCalls": {
+          "0x103b8af0": 1,
+          "0x10360ba0": 1,
+          "0x40000100": 138
+        }
+      }
+    },
+    {
+      "name": "terraced_rise_far",
+      "size": 129,
+      "base": 100,
+      "rectangles": [
+        [
+          60,
+          50,
+          68,
+          59,
+          105
+        ],
+        [
+          60,
+          44,
+          68,
+          49,
+          109
+        ]
+      ],
+      "farthest": true,
+      "native": {
+        "accepted": true,
+        "targetGround": [
+          64.0,
+          100.0,
+          64.0
+        ],
+        "start": [
+          64.0,
+          109.0,
+          25.0
+        ],
+        "end": [
+          64.0,
+          109.0,
+          103.0
+        ],
+        "relativeRise": 9.0,
+        "externalCalls": {
+          "0x103b8af0": 1,
+          "0x10360ba0": 1,
+          "0x40000100": 138
+        }
+      }
+    },
+    {
+      "name": "uneven_endpoints",
+      "size": 129,
+      "base": 100,
+      "rectangles": [
+        [
+          60,
+          55,
+          68,
+          60,
+          105
+        ],
+        [
+          60,
+          69,
+          68,
+          73,
+          109
+        ]
+      ],
+      "farthest": false,
+      "native": {
+        "accepted": true,
+        "targetGround": [
+          64.0,
+          100.0,
+          64.0
+        ],
+        "start": [
+          64.0,
+          109.0,
+          58.0
+        ],
+        "end": [
+          64.0,
+          109.0,
+          70.0
+        ],
+        "relativeRise": 9.0,
+        "externalCalls": {
+          "0x103b8af0": 1,
+          "0x10360ba0": 1,
+          "0x40000100": 138
+        }
+      }
+    },
+    {
+      "name": "uneven_endpoints_far",
+      "size": 129,
+      "base": 100,
+      "rectangles": [
+        [
+          60,
+          55,
+          68,
+          60,
+          105
+        ],
+        [
+          60,
+          69,
+          68,
+          73,
+          109
+        ]
+      ],
+      "farthest": true,
+      "native": {
+        "accepted": true,
+        "targetGround": [
+          64.0,
+          100.0,
+          64.0
+        ],
+        "start": [
+          64.0,
+          109.0,
+          25.0
+        ],
+        "end": [
+          64.0,
+          109.0,
+          103.0
+        ],
+        "relativeRise": 9.0,
+        "externalCalls": {
+          "0x103b8af0": 1,
+          "0x10360ba0": 1,
+          "0x40000100": 138
+        }
+      }
+    },
+    {
+      "name": "origin_(-100, -200)_False",
+      "size": 129,
+      "base": 100,
+      "origin": [
+        -100,
+        -200
+      ],
+      "target": [
+        -36,
+        100,
+        -136
+      ],
+      "craft": [
+        -60,
+        120,
+        -160
+      ],
+      "rectangles": [],
+      "farthest": false,
+      "native": {
+        "accepted": true,
+        "targetGround": [
+          -36.0,
+          100.0,
+          -136.0
+        ],
+        "start": [
+          -36.0,
+          100.0,
+          -142.0
+        ],
+        "end": [
+          -36.0,
+          100.0,
+          -130.0
+        ],
+        "relativeRise": 0.0,
+        "externalCalls": {
+          "0x103b8af0": 1,
+          "0x10360ba0": 1,
+          "0x40000100": 138
+        }
+      }
+    },
+    {
+      "name": "origin_(-100, -200)_True",
+      "size": 129,
+      "base": 100,
+      "origin": [
+        -100,
+        -200
+      ],
+      "target": [
+        -36,
+        100,
+        -136
+      ],
+      "craft": [
+        -60,
+        120,
+        -160
+      ],
+      "rectangles": [],
+      "farthest": true,
+      "native": {
+        "accepted": true,
+        "targetGround": [
+          -36.0,
+          100.0,
+          -136.0
+        ],
+        "start": [
+          -36.0,
+          100.0,
+          -175.0
+        ],
+        "end": [
+          -36.0,
+          100.0,
+          -97.0
+        ],
+        "relativeRise": 0.0,
+        "externalCalls": {
+          "0x103b8af0": 1,
+          "0x10360ba0": 1,
+          "0x40000100": 138
+        }
+      }
+    },
+    {
+      "name": "origin_(1000, 2000)_False",
+      "size": 129,
+      "base": 100,
+      "origin": [
+        1000,
+        2000
+      ],
+      "target": [
+        1064,
+        100,
+        2064
+      ],
+      "craft": [
+        1040,
+        120,
+        2040
+      ],
+      "rectangles": [],
+      "farthest": false,
+      "native": {
+        "accepted": true,
+        "targetGround": [
+          1064.0,
+          100.0,
+          2064.0
+        ],
+        "start": [
+          1064.0,
+          100.0,
+          2058.0
+        ],
+        "end": [
+          1064.0,
+          100.0,
+          2070.0
+        ],
+        "relativeRise": 0.0,
+        "externalCalls": {
+          "0x103b8af0": 1,
+          "0x10360ba0": 1,
+          "0x40000100": 138
+        }
+      }
+    },
+    {
+      "name": "origin_(1000, 2000)_True",
+      "size": 129,
+      "base": 100,
+      "origin": [
+        1000,
+        2000
+      ],
+      "target": [
+        1064,
+        100,
+        2064
+      ],
+      "craft": [
+        1040,
+        120,
+        2040
+      ],
+      "rectangles": [],
+      "farthest": true,
+      "native": {
+        "accepted": true,
+        "targetGround": [
+          1064.0,
+          100.0,
+          2064.0
+        ],
+        "start": [
+          1064.0,
+          100.0,
+          2025.0
+        ],
+        "end": [
+          1064.0,
+          100.0,
+          2103.0
+        ],
+        "relativeRise": 0.0,
+        "externalCalls": {
+          "0x103b8af0": 1,
+          "0x10360ba0": 1,
+          "0x40000100": 138
+        }
+      }
+    },
+    {
+      "name": "origin_(-64, -64)_False",
+      "size": 129,
+      "base": 100,
+      "origin": [
+        -64,
+        -64
+      ],
+      "target": [
+        0,
+        100,
+        0
+      ],
+      "craft": [
+        -24,
+        120,
+        -24
+      ],
+      "rectangles": [],
+      "farthest": false,
+      "native": {
+        "accepted": true,
+        "targetGround": [
+          0.0,
+          100.0,
+          0.0
+        ],
+        "start": [
+          0.0,
+          100.0,
+          -6.0
+        ],
+        "end": [
+          0.0,
+          100.0,
+          6.0
+        ],
+        "relativeRise": 0.0,
+        "externalCalls": {
+          "0x103b8af0": 1,
+          "0x10360ba0": 1,
+          "0x40000100": 138
+        }
+      }
+    },
+    {
+      "name": "origin_(-64, -64)_True",
+      "size": 129,
+      "base": 100,
+      "origin": [
+        -64,
+        -64
+      ],
+      "target": [
+        0,
+        100,
+        0
+      ],
+      "craft": [
+        -24,
+        120,
+        -24
+      ],
+      "rectangles": [],
+      "farthest": true,
+      "native": {
+        "accepted": true,
+        "targetGround": [
+          0.0,
+          100.0,
+          0.0
+        ],
+        "start": [
+          0.0,
+          100.0,
+          -39.0
+        ],
+        "end": [
+          0.0,
+          100.0,
+          39.0
+        ],
+        "relativeRise": 0.0,
+        "externalCalls": {
+          "0x103b8af0": 1,
+          "0x10360ba0": 1,
+          "0x40000100": 138
+        }
+      }
+    },
+    {
+      "name": "rounding_64.49_64.49",
+      "size": 129,
+      "base": 100,
+      "target": [
+        64.49,
+        100,
+        64.49
+      ],
+      "rectangles": [],
+      "native": {
+        "accepted": true,
+        "targetGround": [
+          64.48999786376953,
+          100.0,
+          64.48999786376953
+        ],
+        "start": [
+          64.0,
+          100.0,
+          58.0
+        ],
+        "end": [
+          64.0,
+          100.0,
+          70.0
+        ],
+        "relativeRise": 0.0,
+        "externalCalls": {
+          "0x103b8af0": 1,
+          "0x10360ba0": 1,
+          "0x40000100": 138
+        }
+      }
+    },
+    {
+      "name": "rounding_64.5_64.5",
+      "size": 129,
+      "base": 100,
+      "target": [
+        64.5,
+        100,
+        64.5
+      ],
+      "rectangles": [],
+      "native": {
+        "accepted": true,
+        "targetGround": [
+          64.5,
+          100.0,
+          64.5
+        ],
+        "start": [
+          65.0,
+          100.0,
+          59.0
+        ],
+        "end": [
+          65.0,
+          100.0,
+          71.0
+        ],
+        "relativeRise": 0.0,
+        "externalCalls": {
+          "0x103b8af0": 1,
+          "0x10360ba0": 1,
+          "0x40000100": 138
+        }
+      }
+    },
+    {
+      "name": "rounding_64.51_64.51",
+      "size": 129,
+      "base": 100,
+      "target": [
+        64.51,
+        100,
+        64.51
+      ],
+      "rectangles": [],
+      "native": {
+        "accepted": true,
+        "targetGround": [
+          64.51000213623047,
+          100.0,
+          64.51000213623047
+        ],
+        "start": [
+          65.0,
+          100.0,
+          59.0
+        ],
+        "end": [
+          65.0,
+          100.0,
+          71.0
+        ],
+        "relativeRise": 0.0,
+        "externalCalls": {
+          "0x103b8af0": 1,
+          "0x10360ba0": 1,
+          "0x40000100": 138
+        }
+      }
+    }
+  ],
+  "mismatches": []
+}

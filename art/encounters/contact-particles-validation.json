@@ -1,0 +1,320 @@
+{
+  "date": "2026-11-15",
+  "status": "native_flyer_weapon_and_ground_particles_verified",
+  "scope": "Actual native flyer claw/blade/hammer contacts, intentional miss, hammer finisher landing and recovery. Shared dust implemented at seven existing emission sites; other scenarios are not newly visually accepted by this report.",
+  "diagnosis": [
+    "Both engines generated and submitted the expected particles; the missing Forge puffs were a disposable-camera error. ComputeCameraAngles rotated the displayed world without synchronizing Camera.rotation used by billboards. Synchronizing the test observer restored visible native particles without a production render-state workaround.",
+    "A separate real port difference replaced 1.21.1 DUST_PLUME with 1.20.1 POOF. Both now use contact_dust with shared launch, drag, size, lifetime and generic sprite sequence. Existing block-state fragments, impact clocks and damage are preserved."
+  ],
+  "sourceBoundary": "Contact dust is a Minecraft presentation adaptation using locally inspected Minecraft 1.21.1 DustPlumeParticle parameters and vanilla generic sprites, not decoded Prototype dust constants or a claim of complete source-game VFX parity.",
+  "platforms": [
+    {
+      "platform": "neo",
+      "frames": 556,
+      "manifestSha256": "43e2ed7021ac3baff93af45c8d2aa7bafb65900c88a44ca45b326acb44178c40",
+      "forgeCameraOffAxisMax": null,
+      "scenes": [
+        {
+          "scene": 0,
+          "activePeak": {},
+          "drawnPeak": {}
+        },
+        {
+          "scene": 1,
+          "activePeak": {},
+          "drawnPeak": {}
+        },
+        {
+          "scene": 2,
+          "activePeak": {
+            "ExplodeParticle": 5,
+            "CritParticle": 3
+          },
+          "drawnPeak": {
+            "ExplodeParticle": 5,
+            "CritParticle": 3
+          }
+        },
+        {
+          "scene": 3,
+          "activePeak": {},
+          "drawnPeak": {}
+        },
+        {
+          "scene": 4,
+          "activePeak": {
+            "ExplodeParticle": 13,
+            "CritParticle": 3,
+            "ContactDustParticle": 24,
+            "TerrainParticle": 48,
+            "PlayerCloudParticle": 8
+          },
+          "drawnPeak": {
+            "ExplodeParticle": 13,
+            "CritParticle": 3,
+            "ContactDustParticle": 24,
+            "TerrainParticle": 48,
+            "PlayerCloudParticle": 8
+          },
+          "firstDustImage": "4-hammer_finisher-052.png",
+          "firstDustDelay": 0.8399999141693115,
+          "ground": {
+            "serial": 5,
+            "tick": 152599,
+            "shown": 152600.54000091553,
+            "kind": 0,
+            "surfaceCount": 48,
+            "soundCount": 2,
+            "scene": 4,
+            "firstImage": "4-hammer_finisher-051.png"
+          }
+        }
+      ],
+      "sheets": [
+        {
+          "file": "D:/CodexCache/creature-combat-qa/neo-flyer-weapon-frames/weapon-review-0.jpg",
+          "sha256": "9db99e54595c2aaf51486652f4a20a6fb09c608fe9272637a83f628f58f0598e"
+        },
+        {
+          "file": "D:/CodexCache/creature-combat-qa/neo-flyer-weapon-frames/weapon-review-1.jpg",
+          "sha256": "f4d0359377e472e2472ff2fad22339c39144d420161babf60f9f079ece43a9ce"
+        },
+        {
+          "file": "D:/CodexCache/creature-combat-qa/neo-flyer-weapon-frames/weapon-review-2.jpg",
+          "sha256": "4ce99fab36875d4717cb570f740833dd482cb4153ef7e3372c8d951ccdca067d"
+        },
+        {
+          "file": "D:/CodexCache/creature-combat-qa/neo-flyer-weapon-frames/weapon-review-3.jpg",
+          "sha256": "7b68430d8cd6150fd8d3d3031690269345ace8d580a6068d86caf6db7a4e7025"
+        },
+        {
+          "file": "D:/CodexCache/creature-combat-qa/neo-flyer-weapon-frames/weapon-review-4.jpg",
+          "sha256": "3a91bc3df2c9a74cb3f98182208bc169ae974fea15fce18da03af9736835bdb7"
+        },
+        {
+          "file": "D:/CodexCache/creature-combat-qa/neo-flyer-weapon-frames/heavy-recovery-review.jpg",
+          "sha256": "48cb28fb5f1a6544874c54a98a0cf6450dda0b425ef1038b48b501d442941a89"
+        }
+      ],
+      "files": [
+        {
+          "file": "src/main/java/com/codex/blacklight/client/particle/ContactDustParticle.java",
+          "sha256": "4fd768cb66294ce6bb316fedf8b020544c191c660f4fb0da9c62b7bf5f709dd4"
+        },
+        {
+          "file": "src/main/resources/assets/blacklight/particles/contact_dust.json",
+          "sha256": "40da6e690115a66fab5e9aa0ace19f373fe32d213ea2e6dc7a82b9e9cd3ea4fe"
+        },
+        {
+          "file": "src/main/java/com/codex/blacklight/registry/ModParticles.java",
+          "sha256": "51de8b4da09de8469716af22b6bbba5b52ce8fabc6804ff77e9937198e7d2ec3"
+        },
+        {
+          "file": "src/main/java/com/codex/blacklight/client/ClientParticleEvents.java",
+          "sha256": "58127849145afa49a58c1e9d3fa6495b70de373469873de41d6b88f7cb36db40"
+        },
+        {
+          "file": "src/flyerWeaponVisual/java/com/codex/blacklight/client/FlyerWeaponVisual.java",
+          "sha256": "61fe5a9c9ca637909092b0f9fc8988e0169229134e138bfaf522eb3cfa51cd94"
+        },
+        {
+          "file": "src/flyerWeaponVisual/java/com/codex/blacklight/client/ParticleProbe.java",
+          "sha256": "97049befd82c4b89d920b140ccd1244eb8c03938a51f525263f5060ec51e4b41"
+        },
+        {
+          "file": "src/flyerWeaponVisual/java/com/codex/blacklight/client/qaparticle/ParticleProbeMixin.java",
+          "sha256": "7b967b1f35b5ab26de9310821d551a84383885435ea462293827d61a790ab07f"
+        },
+        {
+          "file": "src/flyerWeaponVisual/resources/blacklight.particle-qa.mixins.json",
+          "sha256": "331f6d5d8e310aa23050caf3c6c11d990c77d594b9cf64f1325d6c320d653847"
+        },
+        {
+          "file": "tools/flyer-weapon-visual.init.gradle",
+          "sha256": "b63c750ad87cee75fe24b46d2ec5a9ef2261827a8fb646e8ff6d08ff37989877"
+        },
+        {
+          "file": "src/main/java/com/codex/blacklight/combat/CombatEnvironmentEffects.java",
+          "sha256": "bbea2bf60c8c617936507767e4e0b1575b404f6e840bbf59e16a19db1acc7137"
+        },
+        {
+          "file": "src/main/java/com/codex/blacklight/combat/ClawPhysicalEffects.java",
+          "sha256": "7b3ea3bf5b2be6e6f0ff01353b7885148dcfe66b87063a320215e9c656baa049"
+        },
+        {
+          "file": "src/main/java/com/codex/blacklight/combat/BladeEffects.java",
+          "sha256": "f8d6f63c89d5b45305881d850d0fdf9116dd2ec181f2613dd6a16529da60eb54"
+        },
+        {
+          "file": "src/main/java/com/codex/blacklight/combat/TerrainImpactEffects.java",
+          "sha256": "f4fe68c4ebb48d37582723ccfa4c5b4dc820a2b2e27601e4a449481c5543fe64"
+        },
+        {
+          "file": "src/main/java/com/codex/blacklight/movement/PrototypeMovementEffects.java",
+          "sha256": "57c89df8a029d4e3cd38beca1ad2b719890ab59dd8e9c6aa68d8364ab2d776c8"
+        },
+        {
+          "file": "src/main/java/com/codex/blacklight/client/renderer/ContactEffectsPresentation.java",
+          "sha256": "69ba52be0acce1df3593933939355f8a4293f3155e6e80b55ac89b9ce5889636"
+        }
+      ]
+    },
+    {
+      "platform": "forge",
+      "frames": 552,
+      "manifestSha256": "2e349f1ccdc47052a74765ac9cb8a7788d6d74c804ae51dead19ca7a81442c9b",
+      "forgeCameraOffAxisMax": 6.434885106432198e-7,
+      "scenes": [
+        {
+          "scene": 0,
+          "activePeak": {},
+          "drawnPeak": {}
+        },
+        {
+          "scene": 1,
+          "activePeak": {},
+          "drawnPeak": {}
+        },
+        {
+          "scene": 2,
+          "activePeak": {
+            "ExplodeParticle": 5,
+            "CritParticle": 3
+          },
+          "drawnPeak": {
+            "ExplodeParticle": 5,
+            "CritParticle": 3
+          }
+        },
+        {
+          "scene": 3,
+          "activePeak": {},
+          "drawnPeak": {}
+        },
+        {
+          "scene": 4,
+          "activePeak": {
+            "ExplodeParticle": 13,
+            "CritParticle": 3,
+            "ContactDustParticle": 24,
+            "TerrainParticle": 48,
+            "PlayerCloudParticle": 8
+          },
+          "drawnPeak": {
+            "ExplodeParticle": 13,
+            "CritParticle": 3,
+            "ContactDustParticle": 24,
+            "TerrainParticle": 48,
+            "PlayerCloudParticle": 8
+          },
+          "firstDustImage": "4-hammer_finisher-053.png",
+          "firstDustDelay": 1.2200000286102295,
+          "ground": {
+            "serial": 5,
+            "tick": 84985,
+            "shown": 84985.62000751495,
+            "kind": 0,
+            "surfaceCount": 48,
+            "soundCount": 2,
+            "scene": 4,
+            "firstImage": "4-hammer_finisher-052.png"
+          }
+        }
+      ],
+      "sheets": [
+        {
+          "file": "D:/CodexCache/creature-combat-qa/forge-flyer-weapon-frames/weapon-review-0.jpg",
+          "sha256": "2ac5b7bb7f2912995f83aaf37d6716fd412e9460817c47fe0ee5ca1ac61b6765"
+        },
+        {
+          "file": "D:/CodexCache/creature-combat-qa/forge-flyer-weapon-frames/weapon-review-1.jpg",
+          "sha256": "dc8a6b2999ac3bece7faba7b013d9ab8aa1b57a5cf2ddc27c585c03c8aec6a38"
+        },
+        {
+          "file": "D:/CodexCache/creature-combat-qa/forge-flyer-weapon-frames/weapon-review-2.jpg",
+          "sha256": "debc01fac7ebdc0e7ca7df01323effd79ee05116e5c1cec2e3bc934a272f6c5e"
+        },
+        {
+          "file": "D:/CodexCache/creature-combat-qa/forge-flyer-weapon-frames/weapon-review-3.jpg",
+          "sha256": "63831d7dc9b1f8dc8d54ac63abc76ae2439151e16d03dc76f8cde19aa9870ae7"
+        },
+        {
+          "file": "D:/CodexCache/creature-combat-qa/forge-flyer-weapon-frames/weapon-review-4.jpg",
+          "sha256": "fc2287b196dc0709ace684f0c929b6069d30e647b3ebe2d7915d6e85702d2c62"
+        },
+        {
+          "file": "D:/CodexCache/creature-combat-qa/forge-flyer-weapon-frames/heavy-recovery-review.jpg",
+          "sha256": "3f45a5023a1554567aa08aa00c2fc48b56abd044e74f020bbff48001c7a36d9e"
+        }
+      ],
+      "files": [
+        {
+          "file": "src/main/java/com/codex/blacklight/client/particle/ContactDustParticle.java",
+          "sha256": "4fd768cb66294ce6bb316fedf8b020544c191c660f4fb0da9c62b7bf5f709dd4"
+        },
+        {
+          "file": "src/main/resources/assets/blacklight/particles/contact_dust.json",
+          "sha256": "40da6e690115a66fab5e9aa0ace19f373fe32d213ea2e6dc7a82b9e9cd3ea4fe"
+        },
+        {
+          "file": "src/main/java/com/codex/blacklight/registry/ModParticles.java",
+          "sha256": "10ee18f390b102bceb91a582e32f2b95a77be2850e5f30a2b5b222c8666b7ebe"
+        },
+        {
+          "file": "src/main/java/com/codex/blacklight/client/ClientParticleEvents.java",
+          "sha256": "608967005b446a22b2d54fc00a9054bda4d6084a95c6c16477ef2e199dccd21e"
+        },
+        {
+          "file": "src/flyerWeaponVisual/java/com/codex/blacklight/client/FlyerWeaponVisual.java",
+          "sha256": "ae0b881a1b1ed74dd35e035ed66ca897e302f4d39de5d0801f6f5981eaaa4e0c"
+        },
+        {
+          "file": "src/flyerWeaponVisual/java/com/codex/blacklight/client/ParticleProbe.java",
+          "sha256": "97049befd82c4b89d920b140ccd1244eb8c03938a51f525263f5060ec51e4b41"
+        },
+        {
+          "file": "src/flyerWeaponVisual/java/com/codex/blacklight/client/qaparticle/ParticleProbeMixin.java",
+          "sha256": "7b967b1f35b5ab26de9310821d551a84383885435ea462293827d61a790ab07f"
+        },
+        {
+          "file": "src/flyerWeaponVisual/resources/blacklight.particle-qa.mixins.json",
+          "sha256": "b273bffeb458d5f0e28ff34a8481209b64d3395acb85b938b7f8932878f581be"
+        },
+        {
+          "file": "tools/flyer-weapon-visual.init.gradle",
+          "sha256": "03db64d2376cf3192da6139bff9236fce48f61e7250dae9df51500aaae0733cf"
+        },
+        {
+          "file": "src/main/java/com/codex/blacklight/combat/CombatEnvironmentEffects.java",
+          "sha256": "4c2ddfdb3fcf12bce6f94a3c0c166f5d2c24dec303a73fe6404d9abacefb2afb"
+        },
+        {
+          "file": "src/main/java/com/codex/blacklight/combat/ClawPhysicalEffects.java",
+          "sha256": "f164b2af95ee66c197d7939d802b302ef3b0833d0ce8e8d880e666f4334949fa"
+        },
+        {
+          "file": "src/main/java/com/codex/blacklight/combat/BladeEffects.java",
+          "sha256": "db46480695a48f16c5fbf0c2594a99d74527ac30fbfda7760d290f01a4412844"
+        },
+        {
+          "file": "src/main/java/com/codex/blacklight/combat/TerrainImpactEffects.java",
+          "sha256": "f691ca5b59d902290bd8d4b51d47143a3b81e2fd80649b58265219da29a2850a"
+        },
+        {
+          "file": "src/main/java/com/codex/blacklight/movement/PrototypeMovementEffects.java",
+          "sha256": "818019773fad27f8a41314ff45ac43b9cd2b1f68a5afc30bd796a555f34dc84b"
+        },
+        {
+          "file": "src/main/java/com/codex/blacklight/client/renderer/ContactEffectsPresentation.java",
+          "sha256": "360df6c4c25f4eaf05f3e526e77cb0c1fe224c61b1c02183d2c1f9628cc430b9"
+        }
+      ]
+    }
+  ],
+  "validation": "Native builds and five actual player-weapon scenes rerun on both versions, every frame measured, twelve review sheets inspected. Prior 100 server combat and 37 contact-unit results remain the preceding physics checkpoint; they were not rerun for this particle-only delta.",
+  "pending": [
+    "Native downed-flyer grab/hold/absorption and lethal-cut handoff",
+    "High-speed thin slabs, stairs and narrow walls; network/crowd/mod matrix",
+    "Full remaining creature, audio and source-game visual acceptance"
+  ]
+}

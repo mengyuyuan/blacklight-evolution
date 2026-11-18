@@ -144,6 +144,12 @@ public final class BlacklightCommands {
                                             "已获得 " + amount + " EP"), false);
                                     return amount;
                                 })))
+                .then(Commands.literal("unlock_all").requires(source -> source.hasPermission(2)).executes(context -> {
+                    ServerPlayer player = context.getSource().getPlayerOrException();
+                    unlockAll(player);
+                    context.getSource().sendSuccess(() -> Component.literal("已解锁全部形态、技能、成长和器官，并补足 EP"), false);
+                    return 1;
+                }))
                 .then(Commands.literal("claw_upgrade").requires(source -> source.hasPermission(2))
                         .then(Commands.argument("id", StringArgumentType.word()).executes(context -> {
                             ServerPlayer player = context.getSource().getPlayerOrException();
@@ -165,6 +171,35 @@ public final class BlacklightCommands {
                                     "已解锁利爪升级：" + id), false);
                             return 1;
                         }))));
+    }
+
+    /** Same operator-only unlock route as the 1.21.1 branch. */
+    private static void unlockAll(ServerPlayer player) {
+        BlacklightState state = ModAttachments.getData(player, ModAttachments.PLAYER_STATE);
+        if (!state.isInfected()) state.infect();
+        state.setPrototypeMode(true);
+        state.addEvolutionPoints(Integer.MAX_VALUE);
+        for (var form : com.codex.blacklight.power.PowerForm.values())
+            if (form != com.codex.blacklight.power.PowerForm.NONE && com.codex.blacklight.power.PowerFormSystem.supported(form)) state.unlock(form);
+        ModAttachments.setData(player, ModAttachments.EVOLUTION_MILESTONES,
+                ModAttachments.getData(player, ModAttachments.EVOLUTION_MILESTONES).grant(com.codex.blacklight.state.EvolutionMilestones.PERCENT));
+        ModAttachments.syncData(player, ModAttachments.EVOLUTION_MILESTONES);
+        for (int pass = 0; pass < 6; pass++) {
+            for (var claw : ClawUpgrade.values()) state.buyClawUpgrade(claw);
+            for (var move : com.codex.blacklight.power.MovementUpgrade.values()) state.buyMovementUpgrade(move);
+            for (var skill : com.codex.blacklight.power.CombatSkill.values()) state.buyCombatSkill(skill);
+            state.addEvolutionPoints(Integer.MAX_VALUE);
+        }
+        sync(player, state);
+        for (int pass = 0; pass < 6; pass++) {
+            for (var growth : com.codex.blacklight.power.GrowthUpgrade.values())
+                com.codex.blacklight.power.UpgradeSystem.purchase(player, growth.id);
+            for (var core : com.codex.blacklight.infection.TissueCore.values())
+                com.codex.blacklight.power.UpgradeSystem.purchase(player, core.id);
+            state = ModAttachments.getData(player, ModAttachments.PLAYER_STATE);
+            state.addEvolutionPoints(Integer.MAX_VALUE);
+            sync(player, state);
+        }
     }
 
     private static void sync(ServerPlayer player, BlacklightState state) {

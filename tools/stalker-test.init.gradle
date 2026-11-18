@@ -1,0 +1,5 @@
+allprojects { afterEvaluate {
+    sourceSets.main.java.srcDir('src/stalkerTest/java')
+    sourceSets.main.resources.srcDir('src/blackwatchTest/resources')
+    tasks.named('test', Test).configure { include '**/StalkerContactTest.class','**/MutantCombatTest.class','**/SpitterMouthTest.class','**/ContactEffectsQueueTest.class' }
+} }

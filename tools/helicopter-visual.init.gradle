@@ -1,0 +1,13 @@
+allprojects { afterEvaluate {
+    sourceSets.main.java.srcDir('src/helicopterVisual/java')
+    minecraft.runs.client {
+        property 'blacklight.test.helicopterNavigation',project.hasProperty('helicopterNavigation')?'D:/CodexCache/helicopter-qa/forge-navigation-visual':''
+        property 'blacklight.test.helicopterPilot',project.hasProperty('helicopterPilot')?'D:/CodexCache/helicopter-qa/forge-pilot-visual':''
+        property 'blacklight.test.vehicleView','true'
+        property 'blacklight.test.helicopterVisual',(project.hasProperty('helicopterPilot')||project.hasProperty('helicopterNavigation'))?'':project.hasProperty('helicopterCombat')?'D:/CodexCache/helicopter-qa/forge-combat-visual':'D:/CodexCache/helicopter-qa/forge-visual'
+        property 'blacklight.test.helicopterCombat',project.hasProperty('helicopterCombat')?'true':'false'
+        property 'blacklight.test.hiddenRagdoll','true'
+        args '--width','1100','--height','760'
+    }
+    tasks.withType(Jar).configureEach { doFirst {throw new GradleException('Hidden QA profile cannot produce a release JAR')} }
+} }

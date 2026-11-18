@@ -1,0 +1,19 @@
+Blacklight creature voice fallback recordings
+
+common_attack_1..3, common_death_1..3, hunter_grunt_1..3,
+hunter_roar_1..3 and hunter_death_1..3 (assets/blacklight/sounds/infection):
+
+Adapted from Philippe Groarke / Socapex (tarfmagougou),
+"Punches, hits, swords and squishes", CC BY-SA 3.0.
+https://opengameart.org/content/punches-hits-swords-and-squishes
+https://creativecommons.org/licenses/by-sa/3.0/
+
+Original recordings used: Socapex - hurt.wav, Monster_Hurt.wav,
+blub_hurt2.wav and slow squish.wav. Changes by the Blacklight project:
+mono conversion, bounded resampling, layered recorded Foley, filtering,
+fades, limiting and OGG encoding. These adaptations are CC BY-SA 3.0.
+Complete upstream contributor credits are in the adjacent Socapex-LICENSES.txt.
+
+These are authored fallback recordings, not Prototype game waveforms.
+The source-game event timing and the actual licensed audio are documented
+separately. This notice does not change the license of mod code or other assets.

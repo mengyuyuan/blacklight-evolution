@@ -1,0 +1,128 @@
+{
+  "schema": 1,
+  "date": "2026-11-17",
+  "status": "implemented_both_trees_static_only_not_compiled_or_executed",
+  "source_proof": "D:\\PrototypeReference\\p1\\private\\common-infected-root-exit-proof.json",
+  "source_proof_sha256": "9a22a333e679a8f451dcf1d4f64324c17e355e77b20d91b5d334f406bdba425a",
+  "source": {
+    "record": 13028,
+    "payload": 13040,
+    "payload_length": 100,
+    "blend_out_offset": 13136,
+    "blend_out_seconds": 0.33333298563957214,
+    "offset_space": "decompressed FIG bytes"
+  },
+  "native_meaning": "The .333333 JumpTo value is the outgoing choreo root-motion driver weight duration. It is not a PuppetAnimation bone pose blend duration.",
+  "native_chain": [
+    {
+      "address": "100e2990:100e2aa6..100e2adf",
+      "meaning": "Registers newly created jumpTo driver with targetWeight1, track+1c blendIn and track+20 blendOut, through10939260."
+    },
+    {
+      "address": "10939260 / 10939190",
+      "meaning": "Driver-list entry stores blendOut at+24, live blend factor at+28; initial entry factor0 and blendIn0 becomes1 on first active update."
+    },
+    {
+      "address": "100e12a0:100e12e2..100e12f3 ->10939340:109393c6..109393d3",
+      "meaning": "JumpTo end removes its listener, requests driver removal with immediate=false; list entry time becomes-1 and indefinite flagfalse, retaining the driver for fade rather than immediate deletion."
+    },
+    {
+      "address": "1093b3b0:1093b4ed..1093b551",
+      "meaning": "Fading entry subtracts dt/blendOut from current factor before evaluation. Factor<=0 leaves the active list. This is linear, not smoothstep/easing and not a fixed pose delay."
+    },
+    {
+      "address": "1093b584..1093b589 ->109483f0; type9 table111ea10c=109487f0 ->10941350 ->109410c0",
+      "meaning": "A still-positive fading driver continues update(dt), which converts the retained translation velocity into a root displacement each frame. JumpTo action update100e2b60 has ended, so it no longer changes that velocity by target tracking/source gravity."
+    },
+    {
+      "address": "10941260,100e2a9c..100e2aa1,10941330",
+      "meaning": "JumpTo constructs a type9 DeltaTransform driver and selects flag1 (root translation). This is separate from a skeletal PuppetAnimation track."
+    },
+    {
+      "address": "109413d0:10941413..10941476",
+      "meaning": "Root translation output is interpolated with caller supplied blend weight; the other flag2 path handles root rotation. No skeleton joint loop is involved."
+    }
+  ],
+  "actual_gap": "BlacklightCommonInfected previously cleared horizontal velocity immediately at landing and handed the full outgoing horizontal velocity to vanilla travel after ordinary cancellation. There was no bounded outgoing root-driver blend matching the native .333333 parameter.",
+  "implemented": [
+    "CommonInfectedLeap.RootExit retains the final horizontal source-driver velocity and uses the exact decoded duration. At20Hz the first evaluation has weight1-.05/duration, about0.85; the seventh evaluation reaches zero. Repeated release cannot restart or replace an active driver.",
+    "Real ground contact and ordinary action stop/timeout release the driver. Once released there is no target tracking, source gravity update, probe or late wrist hit from that driver.",
+    "BlacklightCommonInfected.travel calls ordinary travel once. Only that call's SELF move is replaced by the mixed horizontal step; no extra move/teleport is appended and the normal baseline velocity is not overwritten with the outgoing root component.",
+    "Landing clears duplicate baseline horizontal momentum, so the root tail cannot remain as vanilla inertia after its duration. Ordinary locomotion acceleration may blend in. A new melee/leap cannot begin during the short outgoing tail.",
+    "Hurt, capture/consume, NoAI, passenger state, fluid state, horizontal collision or unavailable combat ownership immediately clear the outgoing tail; new external knockback is not erased. Unknown chunk envelope clears the tail and rejects its horizontal step without loading columns.",
+    "Same-object readAdditionalSaveData now cancels all transient leap/action clocks as well as flight/root-tail ownership; no transient driver is restored or caught up offline.",
+    "Attack generation advances at each new action and every cancellation/end, including readAdditionalSaveData. tickLeap checks retained generation/ownership after swing, hurt and knockback callbacks before writing previous contact, landing clocks, root tail or landing sound. A replaced action is left intact rather than canceled by its old caller."
+  ],
+  "mc_adaptations": [
+    "Source linear driver weight and duration are retained. Only X/Z are adapted; vertical momentum, gravity, ground contact and stepping remain vanilla living movement after release, avoiding a retained downward native delta pushing into a floor.",
+    "Frozen velocity uses world horizontal axes. The full native local driver priority/normalization graph is not claimed to be reproduced.",
+    "Safety cancellation and loaded-chunk guards are MC ownership/collision rules, not newly inferred native JumpTo exit conditions.",
+    "No network accessor or shared sound/registry changes. The server remains authoritative for movement; normal position updates expose the result to clients.",
+    "CommonInfectedMotion and CommonInfectedModel were reviewed but deliberately unchanged: .333333 is not bone blending. Existing authored10tick landing pose and missing original release/land clips remain explicit incomplete work; no new original skeleton/animation claim."
+  ],
+  "pending_regressions": {
+    "unit_class": "CommonInfectedLeapTest",
+    "new_unit_methods": [
+      "rootDriverExitFadesLinearlyOnceBeforeEvaluationAndDoesNotMultiplyOrdinaryMomentum",
+      "captureAndInvalidRootInputsCannotLeaveADeferredMovementTail"
+    ],
+    "game_class": "CommonInfectedLeapGameTest",
+    "new_game_methods": [
+      "realLandingRetainsOnlyABoundedRootTailThenStopsWithoutMomentumCarry",
+      "sameObjectLoadDuringLandingClearsTransientRootDriverAndAttackPose",
+      "actualWristDamageReloadCannotCommitTheOldLandingOrRootTail"
+    ],
+    "retained_game_case": "releasedFlightMovesOnceWithoutVanillaDragAndNoAiReleasesIt still verifies that capture/NoAI immediately returns to ordinary travel rather than allowing a tail.",
+    "entries": "Existing playerFixUnit includes CommonInfectedLeapTest; playerCreatureServer / player-creature-regression.init.gradle already selects CommonInfectedLeapGameTest. No runner/source-set changes required.",
+    "limitations": "These cases are only authored and statically checked. Real fixture timing and whether the old trajectory reaches its marked landing remain unverified; no claimed test pass."
+  },
+  "callback_followup": {
+    "reported_by": "creature_boss_completion independent static review",
+    "trigger": "Actual AI right-wrist doHurtTarget invokes a victim hurt event whose handler loads a healthy ground snapshot with ordinary XZ Motion into the same attacker. Without a generation guard, the old tickLeap stack resumes, sets LEAP_LANDED and starts a root tail from the newly loaded ordinary velocity.",
+    "fix_scope": "Common infected action-generation guard only; no shared combat/network transaction changes or original-native claim.",
+    "regression": "New real GameTest uses Neo LivingIncomingDamageEvent / Forge LivingAttackEvent, armed for this exact prey/attacker. It requires the real wrist callback, loads NoAI=false/OnGround=true plus explicit XZ Motion, and then checks cleared action/punch/landing clocks and zero root-tail weight. It does not directly call hurt or manufacture a damage source.",
+    "execution": "Authored only, not compiled/run. Sound packet counts and broader vanilla travel reentrancy are not asserted."
+  },
+  "player_checks_pending": [
+    "Leap on flat ground, slab and stair edge: bounded landing glide settles without a second root step, relaunch or persistent sliding.",
+    "Interrupt during flight and during landing with damage/capture/NoAI, vehicle entry or fluids: no outgoing root tail fights the new motion owner.",
+    "Lose the target or add a wall while airborne: no tracking continuation, late fist damage or movement through cover.",
+    "Observe client pose continuity separately: original landing/release skeleton clips are still missing and this root-driver change does not certify visual acceptance."
+  ],
+  "static_checks": [
+    "Raw compressed FIG decoded to confirm float at13136.",
+    "Native DLL only disassembled; root driver end, weight update and delta evaluation linked by concrete addresses.",
+    "Neo/Forge helper and test mirrors, platform entity APIs, queued whitelist entries and scoped git diff --check inspected."
+  ],
+  "not_run": [
+    "Java/javac",
+    "Gradle",
+    "unit tests",
+    "GameTests",
+    "game/client",
+    "native binary execution or simulation",
+    "media playback"
+  ],
+  "snapshots": {
+    "neo": {
+      "src/main/java/com/codex/blacklight/entity/BlacklightCommonInfected.java": "064c78bb61b475e59f889c6545320ea523ec0750c2ae32c0ae73e2422edc545a",
+      "src/main/java/com/codex/blacklight/infection/CommonInfectedLeap.java": "32d5527e1249d34c4234f1e0d134953ad927d4126c818098f5cd955de41ff91b",
+      "src/test/java/com/codex/blacklight/infection/CommonInfectedLeapTest.java": "4cbe3783742101a8b34b123b610cf3478b27cd6fbe61cb9c8d9d3e98aa61db47",
+      "src/feedbackTest/java/com/codex/blacklight/gametest/CommonInfectedLeapGameTest.java": "d8e74961425fcc657d4a2049c5b5e3f692c7b656bdd17bc260491e72e22d613a",
+      "src/main/java/com/codex/blacklight/infection/CommonInfectedMotion.java": "01687b6e7ccc36ce5f817ff009c72de6a40131fa397d8fed96ade95e68e514f2",
+      "src/main/java/com/codex/blacklight/client/model/CommonInfectedModel.java": "36dfcf233802afde6637fa3a7b408cf1f82d5308e0c7fa4ccad3077bfb4c0435",
+      "tools/player-fix-unit.init.gradle": "ddaec86b0c4524c6a856db90d12184d1c89e93969ad05663040017110271e9b1",
+      "tools/player-creature-regression.init.gradle": "a74d36d9c860ca1524f5d86a3818a3e24f7752f9e38e7283ac0eaa7062682fbf"
+    },
+    "forge": {
+      "src/main/java/com/codex/blacklight/entity/BlacklightCommonInfected.java": "04c86292e7453c790f5717769175b78b0e89f891621bfa47655e93f7f67ad19e",
+      "src/main/java/com/codex/blacklight/infection/CommonInfectedLeap.java": "32d5527e1249d34c4234f1e0d134953ad927d4126c818098f5cd955de41ff91b",
+      "src/test/java/com/codex/blacklight/infection/CommonInfectedLeapTest.java": "4cbe3783742101a8b34b123b610cf3478b27cd6fbe61cb9c8d9d3e98aa61db47",
+      "src/feedbackTest/java/com/codex/blacklight/gametest/CommonInfectedLeapGameTest.java": "bc3fd8f48c973871fd3400472ceb36d7e14f72e6f884c8eb6f3daf8234e822fa",
+      "src/main/java/com/codex/blacklight/infection/CommonInfectedMotion.java": "5558e391fa9616d14f2f2a15d61efecdafb9021ef6d5da5da4d866ccc97c052d",
+      "src/main/java/com/codex/blacklight/client/model/CommonInfectedModel.java": "1a8328c0b2e8e39074c5e08e7128c4adc62f37ec60311d3f0fd97e04c1fe8982",
+      "tools/player-fix-unit.init.gradle": "ddaec86b0c4524c6a856db90d12184d1c89e93969ad05663040017110271e9b1",
+      "tools/player-creature-regression.init.gradle": "a74d36d9c860ca1524f5d86a3818a3e24f7752f9e38e7283ac0eaa7062682fbf"
+    }
+  }
+}

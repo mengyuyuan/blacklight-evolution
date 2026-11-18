@@ -47,7 +47,7 @@ public final class JuggernautContact {
         float start=Math.max(before,window.begin()*20),end=Math.min(now,window.end()*20);Vec3 previous=null;
         for(int step=0;step<=4;step++){
             var fist=fist(move,start+(end-start)*step/4,window.joint().equals("Wrist_L"),origin,yaw);
-            if(HydraContact.capsuleTouches(target,previous==null?fist.center:previous,fist.center,RADIUS))return HydraContact.nearest(target,fist.center);
+            if(HunterContactPose.capsuleTouches(target,previous==null?fist.center:previous,fist.center,RADIUS))return HunterContactPose.nearest(target,fist.center);
             previous=fist.center;
         }return null;
     }
@@ -63,7 +63,7 @@ public final class JuggernautContact {
     }
     public static boolean canReach(EncounterMove move,Vec3 origin,float yaw,AABB target){
         if(!uses(move))return false;double a=Math.toRadians(yaw),c=Math.cos(a),s=Math.sin(a);
-        for(var p:Reach.SAMPLES.get(move)){var q=origin.add(p.x*c-p.z*s,p.y,p.x*s+p.z*c);if(HydraContact.nearest(target,q).distanceToSqr(q)<=RADIUS*RADIUS)return true;
+        for(var p:Reach.SAMPLES.get(move)){var q=origin.add(p.x*c-p.z*s,p.y,p.x*s+p.z*c);if(HunterContactPose.nearest(target,q).distanceToSqr(q)<=RADIUS*RADIUS)return true;
             // A grounded victim between the two fists can be reached by the small
             // impact shock. The server still requires actual fist/block contact.
             if(move==EncounterMove.SLAM&&p.y<1&&Math.abs(target.minY-origin.y)<.5&&target.getCenter().subtract(q).horizontalDistance()<2.1)return true;

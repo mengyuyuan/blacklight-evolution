@@ -1,0 +1,40 @@
+{
+  "date": "2026-11-17",
+  "status": "Implemented on NeoForge 1.21.1 and Forge 1.20.1; static review only. User deferred compilation and gameplay.",
+  "rootCause": "FirearmsCombat and the earlier VehicleDamageBridge interceptor admitted only LivingEntity or helicopter entities. HydraPart, GreenePart and FlyerPart are PartEntity proxies rather than LivingEntity, so ordinary soldier shots skipped their visible geometry and could be intercepted by a rear vehicle.",
+  "changes": [
+    "Shared FirearmsCombat.bulletCandidate accepts live multipart proxies by resolving their living parent. Animated multipart parent broad boxes are excluded. Friendly/creative/PvP-protected targets remain blockers.",
+    "FirearmsCombat evaluates friendly, creative/spectator, player PvP and defender hitscan policies against the resolved parent before damage.",
+    "Animated receiving damage uses HydraHurtContact.ray on the actual wall-clipped shot segment and hurtAt with PIERCE; no new eye-to-region-center ray or regional damage multiplier.",
+    "VehicleDamageBridge.interceptOrdinaryBullet uses the same candidate predicate so earlier real multipart contact wins over a rear mechanical hull.",
+    "Aircraft ordinary-bullet damage now respects the existing protectedAircraft crew/PvP policy."
+  ],
+  "sources": [
+    "src/main/java/com/codex/blacklight/firearms/FirearmsCombat.java",
+    "src/main/java/com/codex/blacklight/military/vehicle/VehicleDamageBridge.java"
+  ],
+  "sharedDependencies": [
+    "HydraProjectileContactMixin narrows proxy boxes to the visible receiving geometry.",
+    "HydraHurtContact.ray is authored by the coordinating agent and shared with aircraft/ordnance paths."
+  ],
+  "pendingTests": [
+    "-PblackwatchTest MilitaryBulletMultipartGameTest.soldierBulletReachesHydrasActualAnimatedSurface",
+    "-PblackwatchTest MilitaryBulletMultipartGameTest.soldierBulletDamagesOnlyTheContactedGreeneAppendage",
+    "-PblackwatchTest MilitaryBulletMultipartGameTest.multipartAndAlliedParentStopBulletsBeforeRearVehicle",
+    "-PblackwatchTest MilitaryBulletMultipartGameTest.ordinaryBulletHonorsServerPvpWithoutRemovingPlayerCollision"
+  ],
+  "pendingPlayerChecks": [
+    "Real Blackwatch rifle AI against Hydra and Greene weak appendages.",
+    "Visible limbs stop shots from hitting vehicles behind them; test near a normal wall and on uneven ground.",
+    "Friendly parent and PvP protections stop both damage and penetration."
+  ],
+  "staticChecks": [
+    "Scoped git diff --check passed.",
+    "Forge game-test imports adapted; shared source production changes are platform-identical.",
+    "No build, Java launch, client control or saved-world changes were executed by this agent."
+  ],
+  "limitations": [
+    "Authored new GameTests have not compiled or run yet.",
+    "No claim is made that player-visible death hopping or multipart shooting is runtime verified."
+  ]
+}

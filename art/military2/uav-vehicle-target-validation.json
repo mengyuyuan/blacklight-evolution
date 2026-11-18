@@ -1,0 +1,96 @@
+{
+  "schema": 1,
+  "createdLocal": "2026-11-16T17:08:54",
+  "status": "SOURCE VEHICLE-TARGET BRANCH CHECKPOINT PASSED; full goal remains active",
+  "source": {
+    "file": "art/military2/uav-vehicle-target-source.json",
+    "sha256": "1c04a1acf273eed83c096a19cbf506a09978cefb5543618305f059dc00fa51d1"
+  },
+  "implementation": [
+    "Seeing acquisition excludes our helicopter and explicit tank chassis root vehicles. Entering either before recognition cancels the incomplete scan and signal; dismount permits a new ordinary scan.",
+    "A previously confirmed infected contact may be followed in the same helicopter or tank. Visible confirmed contact retains red alert without a new seeing state. Occlusion clears the contact; vehicle tracking cannot complete the existing ground-transport request.",
+    "Helicopter destination candidates are 20..35 away; ordinary candidates 4..10. Near/far reactions use 15/40 versus 3/15. Arrival tolerance .5, at most 20 candidates and a 60-tick in-position wait precede another selection.",
+    "Changing carrier invalidates the old destination. Destination movement/height changes trigger new selection. Candidate path checks the UAV volume at bounded .75-block intervals; loaded-region, world-border and transport landing reservations remain enforced."
+  ],
+  "protocols": {
+    "neo": "standalone-70-uav-vehicle-targets",
+    "forge": "forge-1.20.1-30-uav-vehicle-targets"
+  },
+  "platforms": {
+    "neo": {
+      "unit": {
+        "passed": 10,
+        "file": "D:\\CodexCache\\uav-vehicle-target-qa\\neo-unit.xml",
+        "sha256": "cf5daf0610688ef925f62086535dbe20cb7bf4cf7cd0020772dded02e23cec00",
+        "tests": [
+          "detectionPrecedesASeparateInterruptibleTransmission()",
+          "failedDispatchRetriesAfterABoundedBackoffAndFreshTransmission()",
+          "successfulSortieBlocksNewCallsButKeepsDetectionAlive()",
+          "recognizedVehicleContactKeepsAlertButCancelsGroundTransmissionAndExpiresOnOcclusion()",
+          "anotherTargetCannotInheritAcquisitionOrMissItsOwnDetection()",
+          "enclosedTargetsCannotStartOrInheritAnIncompleteViralScan()",
+          "DisabledAndDamageInterruptionsNeverCreateDelayedRequests()",
+          "occlusionImmediatelyCancelsThePendingTransmission()",
+          "followingKnownVehicleStillConsumesCooldownAndCannotSurviveDisable()",
+          "reloadPreservesCooldownWithoutResumingAStaleTarget()"
+        ]
+      },
+      "server": {
+        "passed": 11,
+        "file": "D:\\CodexCache\\uav-vehicle-target-qa\\neo-server.log",
+        "sha256": "e60abe2d50735b44650b2a17edf28b06b87a392235935ff60f63d44958fddc45",
+        "aircraftTravel": 5.590000000000014,
+        "postMoveHoverSamples": 60,
+        "nativeTrace": "[17:06:24] [Server thread/INFO] [co.co.bl.BlacklightNeoMod/]: UAV_AIR_TARGET_VERIFIED aircraftTravel=5.590000000000014 postMoveHoverSamples=60 scanner=(442580.86010517227, 93.99999187756558, -10.11417135518462) aircraft=(442568.0, 91.0, 10.590000000000014)"
+      },
+      "files": {
+        "src/main/java/com/codex/blacklight/entity/MilitaryUav.java": "4b1eaddd581d70c584d9801979cc1e965b21821cb95e9e24160564e6830a91c6",
+        "src/main/java/com/codex/blacklight/military/UavRecon.java": "3f7116f1aa3fb648a929742ec1262eb72f1cb3f39f7e3ddc71198ea36a77a166",
+        "src/main/java/com/codex/blacklight/network/ModNetwork.java": "2b890f53af871d52c1bdd682c136e6cac8acc4685164c63de9f8e2e2f2eb137c",
+        "src/test/java/com/codex/blacklight/military/UavReconTest.java": "9158fd85b4feffdac0b952ddfe15add9e049529f4abadce2e13ec23e8734ff35",
+        "src/uavTest/java/com/codex/blacklight/gametest/UavReconGameTest.java": "1f0094057c65d006340a9d54eb0fa2d6dec7bf283e595140aa940a3ac2fd40b6"
+      }
+    },
+    "forge": {
+      "unit": {
+        "passed": 10,
+        "file": "D:\\CodexCache\\uav-vehicle-target-qa\\forge-unit.xml",
+        "sha256": "b5ee94d2ae84b3dc61d47e8e12be208fed95bdbe0f3f86a2b35b2ca6dd6bdece",
+        "tests": [
+          "detectionPrecedesASeparateInterruptibleTransmission()",
+          "failedDispatchRetriesAfterABoundedBackoffAndFreshTransmission()",
+          "successfulSortieBlocksNewCallsButKeepsDetectionAlive()",
+          "recognizedVehicleContactKeepsAlertButCancelsGroundTransmissionAndExpiresOnOcclusion()",
+          "anotherTargetCannotInheritAcquisitionOrMissItsOwnDetection()",
+          "enclosedTargetsCannotStartOrInheritAnIncompleteViralScan()",
+          "DisabledAndDamageInterruptionsNeverCreateDelayedRequests()",
+          "occlusionImmediatelyCancelsThePendingTransmission()",
+          "followingKnownVehicleStillConsumesCooldownAndCannotSurviveDisable()",
+          "reloadPreservesCooldownWithoutResumingAStaleTarget()"
+        ]
+      },
+      "server": {
+        "passed": 11,
+        "file": "D:\\CodexCache\\uav-vehicle-target-qa\\forge-server.log",
+        "sha256": "3518afe859c56a7f541e7fb0f2cc73343c87e9233bf13a6698182566bad388e9",
+        "aircraftTravel": 5.590000000000014,
+        "postMoveHoverSamples": 119,
+        "nativeTrace": "[17:07:08] [Server thread/INFO] [co.co.bl.BlacklightNeoMod/]: UAV_AIR_TARGET_VERIFIED aircraftTravel=5.590000000000014 postMoveHoverSamples=119 scanner=(442570.89462817454, 93.9999852133083, 31.64129147059367) aircraft=(442568.0, 91.0, 10.590000000000014)"
+      },
+      "files": {
+        "src/main/java/com/codex/blacklight/entity/MilitaryUav.java": "a1b31c048d2656a7be30921c63541d52a6f3ee62f53f99aec62aad8f92706e23",
+        "src/main/java/com/codex/blacklight/military/UavRecon.java": "ddbdfb8254547949a0954fe3264e5db12c9586324f836058b8a7aa1027c38d86",
+        "src/main/java/com/codex/blacklight/network/ModNetwork.java": "764009183fa04ad1709578e2e5316516f5b2569ebd1aaf1bbbe33b20cdd5d87e",
+        "src/test/java/com/codex/blacklight/military/UavReconTest.java": "971b466208b32aec4667a9f77b29aea2dfdd10abc32f28d0034fb9fc14ca5c0f",
+        "src/uavTest/java/com/codex/blacklight/gametest/UavReconGameTest.java": "2aee68b2316a2a78b3be3d4d6db8815648dd85cf6ccfa68c302b9219d90f3c00"
+      }
+    }
+  },
+  "limits": [
+    "Recognized occupant tracking is a Minecraft bridge, not a reconstruction of the original target-alert engine. Acquisition of already-hostile aircraft from other observers and native strike-team dispatch remain incomplete.",
+    "Explicit helicopter and tank classes only; original TargetIsTank classification for APC/other vehicles still needs verification.",
+    "Native tests cover stationary and slowly piloted aircraft, and full occlusion. Fast pursuit, complex obstacle routing and multiplayer remain unverified.",
+    "This checkpoint changes AI/state logic, not model/audio assets. It does not claim a new rendered client or subjective audio review; prior model/audio reports remain historical."
+  ],
+  "scope": "10 state tests and 11 actual server scenarios per loader, including the existing eight ground scan/support cases. No release packaging, install, commit, or user-world changes."
+}

@@ -1,0 +1,7 @@
+allprojects { afterEvaluate {
+    sourceSets.main.java.srcDir('src/coverTest/java')
+    sourceSets.main.resources.srcDir('src/blackwatchTest/resources')
+    tasks.named('test',Test).configure {
+        include '**/MilitaryWorkBudgetTest.class'; include '**/MilitaryFireControlTest.class'; include '**/BlackwatchSquadTest.class'
+    }
+} }

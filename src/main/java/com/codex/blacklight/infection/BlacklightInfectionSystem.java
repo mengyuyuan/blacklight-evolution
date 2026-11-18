@@ -55,7 +55,7 @@ public final class BlacklightInfectionSystem {
     }
 
     public static boolean infectionImmune(LivingEntity target){
-        return com.codex.blacklight.config.InfectionEcologyConfig.immune(target) || target instanceof com.codex.blacklight.entity.MilitarySoldier soldier
+        return target instanceof com.codex.blacklight.entity.MilitaryUav || target instanceof com.codex.blacklight.entity.EncounterMob encounter && encounter.kind().military || com.codex.blacklight.config.InfectionEcologyConfig.immune(target) || target instanceof com.codex.blacklight.entity.MilitarySoldier soldier
                 &&soldier.faction()==com.codex.blacklight.military.MilitaryFaction.BLACKWATCH;
     }
     /** Migrate still-native saved soldiers before any infection conversion/AI tick. */
@@ -95,7 +95,7 @@ public final class BlacklightInfectionSystem {
         if (entity instanceof Player player) {
             return ModAttachments.peekData(player, ModAttachments.PLAYER_STATE).isInfected();
         }
-        return entity instanceof com.codex.blacklight.entity.BlacklightCommonInfected || entity instanceof com.codex.blacklight.entity.BlacklightHydra || entity instanceof com.codex.blacklight.entity.HiveTendril || entity instanceof com.codex.blacklight.entity.BlacklightInfectedHost || entity instanceof com.codex.blacklight.entity.BlacklightHunter || entity instanceof com.codex.blacklight.entity.BlacklightSupremeHunter || entity instanceof com.codex.blacklight.entity.BlacklightMutant || entity instanceof com.codex.blacklight.entity.BlacklightHive || entity.hasEffect(ModEffects.BLACKLIGHT_INFECTION.get())
+        return entity instanceof com.codex.blacklight.entity.EncounterMob encounter && !encounter.kind().military || entity instanceof com.codex.blacklight.entity.BlacklightCommonInfected || entity instanceof com.codex.blacklight.entity.BlacklightHydra || entity instanceof com.codex.blacklight.entity.HiveTendril || entity instanceof com.codex.blacklight.entity.BlacklightInfectedHost || entity instanceof com.codex.blacklight.entity.BlacklightHunter || entity instanceof com.codex.blacklight.entity.BlacklightSupremeHunter || entity instanceof com.codex.blacklight.entity.BlacklightMutant || entity instanceof com.codex.blacklight.entity.BlacklightHive || entity.hasEffect(ModEffects.BLACKLIGHT_INFECTION.get())
                 || (ModAttachments.peekData(entity, ModAttachments.INFECTION_START, -1L)>=0
                     && com.codex.blacklight.entity.InfectedBossProfile.forSpecies(net.minecraft.core.registries.BuiltInRegistries.ENTITY_TYPE.getKey(entity.getType()).toString())!=null);
     }
@@ -132,7 +132,7 @@ public final class BlacklightInfectionSystem {
         if(event.getEntity() instanceof LivingEntity immune&&infectionImmune(immune)){preserveBlackwatch(immune);return;}
         if (!(event.getEntity() instanceof Mob mob)
                 || !(mob.level() instanceof ServerLevel serverLevel)
-                || !ModAttachments.available(mob) || !mob.isAlive() || mob instanceof com.codex.blacklight.entity.BlacklightCommonInfected || mob instanceof com.codex.blacklight.entity.BlacklightHydra || mob instanceof com.codex.blacklight.entity.HiveTendril || mob instanceof com.codex.blacklight.entity.BlacklightInfectedHost || mob instanceof com.codex.blacklight.entity.BlacklightHunter || mob instanceof com.codex.blacklight.entity.BlacklightSupremeHunter || mob instanceof com.codex.blacklight.entity.BlacklightMutant || mob instanceof com.codex.blacklight.entity.BlacklightHive) return;
+                || !ModAttachments.available(mob) || !mob.isAlive() || mob instanceof com.codex.blacklight.entity.EncounterMob || mob instanceof com.codex.blacklight.entity.BlacklightCommonInfected || mob instanceof com.codex.blacklight.entity.BlacklightHydra || mob instanceof com.codex.blacklight.entity.HiveTendril || mob instanceof com.codex.blacklight.entity.BlacklightInfectedHost || mob instanceof com.codex.blacklight.entity.BlacklightHunter || mob instanceof com.codex.blacklight.entity.BlacklightSupremeHunter || mob instanceof com.codex.blacklight.entity.BlacklightMutant || mob instanceof com.codex.blacklight.entity.BlacklightHive) return;
         // A cure during capability invalidation is reconciled on the first live tick.
         if(!isInfected(mob)){if(mob.getPersistentData().contains(NativeInfection.DATA,10))NativeInfection.clear(mob);return;}
         if(NativeInfection.preserve(mob)){NativeInfection.tick(mob,serverLevel);return;}

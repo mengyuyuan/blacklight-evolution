@@ -1,6 +1,6 @@
 {
   "parent": "minecraft:item/generated",
   "textures": {
-    "layer0": "blacklight:block/hive_sac"
+    "layer0": "blacklight:item/living_hive_tissue"
   }
 }

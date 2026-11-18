@@ -1,0 +1,18 @@
+// Real grab/consume and ordinary-bullet regressions without unrelated campaign fixtures.
+allprojects { afterEvaluate {
+    sourceSets.main.java.srcDir('src/blackwatchTest/java')
+    sourceSets.main.resources.srcDir('src/blackwatchTest/resources')
+    sourceSets.main.java.exclude { entry -> !entry.directory
+        && entry.file.path.replace('\\','/').contains('/src/blackwatchTest/')
+        && !['MilitaryFactionGameTest.java','MilitaryBulletMultipartGameTest.java','MilitaryPostureGameTest.java','MilitaryAimGameTest.java','MilitaryRifleRangeGameTest.java','MilitaryFireLineGameTest.java','HandheldOrdnanceBodyGameTest.java'].contains(entry.file.name) }
+    def stagePlayerMilitary=tasks.register('stagePlayerMilitary',Sync) {
+        dependsOn tasks.named('classes')
+        from sourceSets.main.output.classesDirs
+        into layout.buildDirectory.dir('player-military-run-classes')
+    }
+    tasks.matching { it.name == 'runGameTestServer' }.configureEach {
+        dependsOn stagePlayerMilitary
+        doFirst { environment 'MOD_CLASSES', [layout.buildDirectory.dir('player-military-run-classes').get().asFile,sourceSets.main.output.resourcesDir].collect { 'blacklight%%'+it.absolutePath }.join(File.pathSeparator) }
+    }
+    tasks.withType(Jar).configureEach { doFirst {throw new GradleException('QA cannot produce a release JAR')} }
+} }

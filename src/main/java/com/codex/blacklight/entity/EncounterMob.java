@@ -200,7 +200,7 @@ public final class EncounterMob extends Monster implements GeoEntity,AnimatedHur
         if(incomingContact==null||amount<=0)return;
         var c=incomingContact;lastIncomingPoint=c.point();lastIncomingTick=level().getGameTime();incomingEffects++;
         var n=c.normal();var attacker=source.getEntity();
-        var tissue=new com.codex.blacklight.network.InfectedImpactPayload(attacker==null?getId():attacker.getId(),getId(),c.style().ordinal(),c.point().x,c.point().y,c.point().z,(float)n.x,(float)n.y,(float)n.z,kind==EncounterKind.ELIZABETH_GREENE?1.25F:.5F,level().getGameTime()*31+getId());
+        var tissue=new com.codex.blacklight.network.InfectedImpactPayload(attacker==null?getId():attacker.getId(),getId(),c.appearance(),c.point().x,c.point().y,c.point().z,(float)n.x,(float)n.y,(float)n.z,kind==EncounterKind.ELIZABETH_GREENE?1.25F:.5F,level().getGameTime()*31+getId());
         var sound=ModInfectedSounds.prepare(this,com.codex.blacklight.infection.InfectedSoundCue.contact(c.style()),c.point());
         if(kind==EncounterKind.ELIZABETH_GREENE){
             int slot=c.bone()!=null&&c.bone().startsWith("weak_")?Integer.parseInt(c.bone().substring(5,6)):3;
@@ -332,7 +332,7 @@ public final class EncounterMob extends Monster implements GeoEntity,AnimatedHur
         return kind!=null&&kind.military?BlacklightInfectionSystem.isInfected(target)||getLastHurtByMob()==target:!BlacklightInfectionSystem.isInfected(target);
     }
     @Override public boolean isAlliedTo(Entity other){if(kind!=null&&other instanceof LivingEntity living&&!(other instanceof Player)){
-        if(kind.military&&(other instanceof MilitarySoldier||other instanceof EncounterMob m&&m.kind.military))return true;
+        if(kind.military&&(other instanceof MilitarySoldier||other instanceof MilitaryUav||other instanceof EncounterMob m&&m.kind.military))return true;
         if(!kind.military&&BlacklightInfectionSystem.isInfected(living))return true;
     }return super.isAlliedTo(other);}
     private boolean disabled(){return !kind.enabled()||!isAlive()||isNoAi()||isPassenger()||ImpactControl.stunned(this)||ModAttachments.peekData(this,ModAttachments.CONSUME_VISUAL,ConsumeVisual.EMPTY).active()||com.codex.blacklight.power.BiomassSystem.claimant(this)!=null||level().getDifficulty()==net.minecraft.world.Difficulty.PEACEFUL;}
@@ -767,8 +767,8 @@ public final class EncounterMob extends Monster implements GeoEntity,AnimatedHur
                 lastGroundAge=age;lastGroundPoint=at;groundImpacts++;
                 TerrainImpactEffects.emit(this,contact,3.2F,true);
                 for(var victim:level().getEntitiesOfClass(LivingEntity.class,new AABB(at,at).inflate(2.1,.8,2.1),this::enemy)){
-                    if(struck.contains(victim.getUUID())||!supportedForShock(victim)||!hasLineOfSight(victim)||HydraContact.nearest(victim.getBoundingBox(),at).distanceToSqr(at)>4.41)continue;
-                    damageContact=HydraContact.nearest(victim.getBoundingBox(),at);
+                    if(struck.contains(victim.getUUID())||!supportedForShock(victim)||!hasLineOfSight(victim)||HunterContactPose.nearest(victim.getBoundingBox(),at).distanceToSqr(at)>4.41)continue;
+                    damageContact=HunterContactPose.nearest(victim.getBoundingBox(),at);
                     try{if(victim.hurt(damageSources().mobAttack(this),(float)getAttributeValue(Attributes.ATTACK_DAMAGE)*.25F)){
                         struck.add(victim.getUUID());fistHits.computeIfAbsent(0,k->new HashSet<>()).add(victim.getUUID());
                         victim.knockback(.35,at.x-victim.getX(),at.z-victim.getZ());EncounterImpact.confirmed(this,victim,true,.45F);
@@ -1166,3 +1166,6 @@ public final class EncounterMob extends Monster implements GeoEntity,AnimatedHur
         @Override public void stop(){cancelAttack();}
     }
 }
+
+
+

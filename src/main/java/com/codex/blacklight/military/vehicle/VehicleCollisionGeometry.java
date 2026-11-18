@@ -18,9 +18,9 @@ public final class VehicleCollisionGeometry {
     }
     private static final Grid EMPTY=new Grid(new double[]{0},new double[]{0},new double[]{0},new BitSet(),0);
     private record Projection(double x,double y,double z,double radius){}
-    private static final class Box {
+    public static final class Box {
         final Vec3 center;final Bounds bounds;final List<Projection> projections;final boolean axisAligned;
-        Box(Vec3 center,Vec3 half,Vec3 right,Vec3 up,Vec3 forward){
+        public Box(Vec3 center,Vec3 half,Vec3 right,Vec3 up,Vec3 forward){
             this.center=center;
             Vec3[] axes={right,up,forward},world={new Vec3(1,0,0),new Vec3(0,1,0),new Vec3(0,0,1)};
             var separating=new ArrayList<Vec3>(15);separating.addAll(List.of(world));separating.addAll(List.of(axes));
@@ -47,6 +47,15 @@ public final class VehicleCollisionGeometry {
     private final List<Box> parts;
     private final Bounds envelope;
     public VehicleCollisionGeometry(VehicleDefinition definition,double bodyYaw,double turretYaw,double pitch){
+        this(groundParts(definition,bodyYaw,turretYaw,pitch));
+    }
+    public VehicleCollisionGeometry(List<Box> boxes){
+        parts=List.copyOf(boxes);
+        Bounds all=parts.get(0).bounds;
+        for(int i=1;i<parts.size();i++)all=all.union(parts.get(i).bounds);
+        envelope=all;
+    }
+    private static List<Box> groundParts(VehicleDefinition definition,double bodyYaw,double turretYaw,double pitch){
         VehicleDefinition.finiteAngle(bodyYaw);VehicleDefinition.finiteAngle(turretYaw);VehicleDefinition.finiteAngle(pitch);
         var boxes=new ArrayList<Box>();Vec3 zero=new Vec3(0,0,0);
         boxes.add(new Box(new Vec3(0,definition.height()/2,0),new Vec3(definition.width()/2,definition.height()/2,definition.length()/2),
@@ -64,7 +73,7 @@ public final class VehicleCollisionGeometry {
             double r=definition.barrelRadius();
             boxes.add(new Box(scale(VehicleDefinition.add(a,b),.5),new Vec3(r,r,length/2),right,cross(forward,right),forward));
         }
-        parts=List.copyOf(boxes);Bounds all=parts.get(0).bounds;for(int i=1;i<parts.size();i++)all=all.union(parts.get(i).bounds);envelope=all;
+        return boxes;
     }
     /** Conservative cells cover every contact. Their excess distance is at most sqrt(3)*cell size. */
     public Grid rasterize(Bounds query){

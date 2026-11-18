@@ -478,15 +478,15 @@ public final class TissueMorphogenesis {
             float asym=side==(TissueGrowth.sample(key,29)>.5F?1:-1)?1.12F:.84F;
             V c=box.centre().add(across.mul(side*width*.35F)).add(normal.mul(extent*.15F));
             organ(out,"scapular_plate_"+side,0,"",X,null,List.of(
-                    new Section(c.sub(along.mul(length*.30F)).add(normal.mul(extent*.65F)),width*.40F,extent*.16F*plate),
-                    new Section(c.add(along.mul(length*.12F)).add(normal.mul(extent*(.90F+.22F*asym*plate))),width*.48F,extent*.16F*plate),
-                    new Section(c.add(along.mul(length*.34F)).add(normal.mul(extent*.82F)),width*.28F,extent*.16F*plate)),across,normal,b,key);
+                    new Section(c.sub(along.mul(length*.26F)).add(normal.mul(extent*.58F)),width*.36F,extent*.13F*plate),
+                    new Section(c.add(along.mul(length*.08F)).add(normal.mul(extent*(.74F+.12F*asym*plate))),width*.40F,extent*.13F*plate),
+                    new Section(c.add(along.mul(length*.28F)).add(normal.mul(extent*.66F)),width*.24F,extent*.11F*plate)),across,normal,b,key);
             // Only two load-bearing crests, swept rearward from the shoulder.
             V root=c.add(along.mul(length*.06F)).add(normal.mul(extent*.88F));
             organ(out,"shoulder_crest_"+side,1,"",X,null,List.of(
                     new Section(root,width*.22F*(.55F+.45F*crest),extent*.24F*(.55F+.45F*crest)),
-                    new Section(root.sub(along.mul(length*.18F*crest)).add(normal.mul(extent*.52F*asym*crest)),width*.16F*(.55F+.45F*crest),extent*.15F),
-                    new Section(root.sub(along.mul(length*.42F*crest)).add(normal.mul(extent*.90F*asym*crest)),.025F,.025F)),across,normal,b,key);
+                    new Section(root.sub(along.mul(length*.08F*crest)).add(normal.mul(extent*.30F*asym*crest)),width*.18F*(.55F+.45F*crest),extent*.17F),
+                    new Section(root.sub(along.mul(length*.20F*crest)).add(normal.mul(extent*.52F*asym*crest)),width*.07F,extent*.07F)),across,normal,b,key);
         }
     }
     private static void ribCage(List<Mesh> out,Bone b,long key,boolean upright,TissueCore core) {
@@ -500,8 +500,8 @@ public final class TissueMorphogenesis {
             float w=width*(rib==0?.94F:1.04F),thickness=com.codex.blacklight.forge.WingMath.clamp(length*.038F,.22F,.60F);
             organ(out,"costal_arch_"+side+"_"+rib,1,"",X,null,List.of(
                     new Section(c.add(right.mul(side*w*.64F)).add(normal.mul(height*.85F)),thickness,height*.20F),
-                    new Section(c.add(right.mul(side*w*1.14F)).add(normal.mul(height*.22F)),thickness,height*.17F),
-                    new Section(c.add(right.mul(side*w*.95F)).sub(normal.mul(height*.60F)).add(along.mul(length*.09F)),thickness*.65F,height*.10F)),along,right,b,key);
+                    new Section(c.add(right.mul(side*w*1.03F)).add(normal.mul(height*.22F)),thickness,height*.17F),
+                    new Section(c.add(right.mul(side*w*.90F)).sub(normal.mul(height*.28F)).add(along.mul(length*.06F)),thickness*.65F,height*.10F)),along,right,b,key);
         }
     }
     private static void extremity(List<Mesh> out,Bone b,long key,int phase,boolean upright,int donorPlan) {
@@ -525,11 +525,11 @@ public final class TissueMorphogenesis {
                     // Toes sweep along the ground from a real distal joint. No
                     // growth may extend below the original support plane.
                     keys.add(List.of(new Section(root,radius,Math.max(.025F,width*.22F*g)),
-                            new Section(root.add(b.forward.mul((width*1.25F+length*.18F)*(dominant?1.35F:1)*g)).add(direction.mul(length*.07F*g)),radius*.78F,Math.max(.025F,width*.15F*g)),
-                            new Section(root.add(b.forward.mul((width*1.8F+length*.29F)*(dominant?1.35F:1)*g)).add(direction.mul(length*.17F*g)),.025F,.025F)));
+                            new Section(root.add(b.forward.mul((width*1.05F+length*.16F)*(dominant?1.2F:1)*g)).add(direction.mul(length*.06F*g)),radius*.85F,Math.max(.025F,width*.17F*g)),
+                            new Section(root.add(b.forward.mul((width*1.5F+length*.25F)*(dominant?1.2F:1)*g)).add(direction.mul(length*.12F*g)),Math.max(.025F,radius*.40F),Math.max(.025F,width*.08F*g))));
                 } else keys.add(List.of(new Section(root,radius,Math.max(.025F,box.span(v)*.25F*g)),
-                        new Section(root.add(direction.mul(length*.28F*g)).sub(depth.mul(width*1.15F*g)),radius*.85F,Math.max(.025F,radius*.65F)),
-                        new Section(root.add(direction.mul(length*(dominant?.64F:.44F)*g)).sub(depth.mul(width*.55F*g)),.025F,.025F)));
+                        new Section(root.add(direction.mul(length*.20F*g)).sub(depth.mul(width*.75F*g)),radius*.88F,Math.max(.025F,radius*.70F)),
+                        new Section(root.add(direction.mul(length*(dominant?.40F:.30F)*g)).sub(depth.mul(width*.45F*g)),Math.max(.025F,radius*.38F),Math.max(.025F,radius*.30F))));
             }
             float[][] pivots=new float[3][];
             for(int k=0;k<3;k++)pivots[k]=keys.get(k).get(0).centre.array();
@@ -541,8 +541,8 @@ public final class TissueMorphogenesis {
             V root=centre.sub(direction.mul(length*.20F)).add(side.mul(box.span(principal(side))*.38F));
             organ(out,"ulnar_blade",phase,"",X,null,List.of(
                     new Section(root,width*.55F,width*.55F),
-                    new Section(root.add(direction.mul(length*.23F)).add(back.mul(width*1.45F)),width*.38F,width*.64F),
-                    new Section(root.add(direction.mul(length*.58F)).add(back.mul(width*2.15F)),.025F,.025F)),side,back,b,key);
+                    new Section(root.add(direction.mul(length*.18F)).add(back.mul(width*.95F)),width*.42F,width*.62F),
+                    new Section(root.add(direction.mul(length*.40F)).add(back.mul(width*1.35F)),width*.10F,width*.12F)),side,back,b,key);
         }
     }
     /** A small authored vocabulary of organs, fitted procedurally to native
@@ -563,14 +563,13 @@ public final class TissueMorphogenesis {
         if(!skin)return blocks(name,phase,motion,hinge,pivots,keys,a,b,up,forward,seed);
         int sections=keys.get(0).size();float[][] stages=new float[3][sections*8*3];
         for(int k=0;k<3;k++)for(int r=0;r<sections;r++)for(int s=0;s<8;s++) {
-            float x=RING[s][0],y=RING[s][1];if(skin&&k==0){x=Math.copySign(1,x);y=Math.copySign(1,y);}
+            float x=RING[s][0],y=RING[s][1];if(skin){x=Math.copySign(1,x);y=Math.copySign(1,y);}
             float swell=1;
             if(skin&&k>0){
-                // Grown hide relaxes from the native cuboid toward a rounded,
-                // muscular section; corners pull in, mid-faces bulge unevenly.
-                float round=k==2?1:.45F;
-                x=x+(ROUND[s][0]-x)*round;y=y+(ROUND[s][1]-y)*round;
-                swell=1+(.07F+TissueGrowth.sample(seed,r*8+s+400)*.07F)*round*(r==0||r==sections-1?.4F:1);
+                // Grown hide stays a cuboid section (MC style). One swell per
+                // ring: per-corner noise and ROUND corners made a soft, curved hull.
+                float grow=k==2?1:.45F;
+                swell=1+(.07F+TissueGrowth.sample(seed,r*8+400)*.07F)*grow*(r==0||r==sections-1?.4F:1);
             }
             var section=keys.get(k).get(r);V p=section.centre.add(a.mul(x*section.width*swell)).add(b.mul(y*section.depth*swell));
             int i=(r*8+s)*3;stages[k][i]=p.x;stages[k][i+1]=p.y;stages[k][i+2]=p.z;

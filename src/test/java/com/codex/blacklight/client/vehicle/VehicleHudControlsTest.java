@@ -20,7 +20,8 @@ class VehicleHudControlsTest {
     private static KeyMapping mapping(String name,int code){return new KeyMapping(name,InputConstants.Type.KEYSYM,code,"key.categories.movement");}
     private static KeyMapping[] remapped(){return new KeyMapping[]{mapping("key.forward",GLFW.GLFW_KEY_I),mapping("key.back",GLFW.GLFW_KEY_K),
         mapping("key.left",GLFW.GLFW_KEY_J),mapping("key.right",GLFW.GLFW_KEY_L),mapping("key.jump",GLFW.GLFW_KEY_P),mapping("key.sneak",GLFW.GLFW_KEY_LEFT_CONTROL),
-        mapping("key.blacklight.vehicle_next_seat",GLFW.GLFW_KEY_F23),mapping("key.blacklight.vehicle_next_ammo",GLFW.GLFW_KEY_F24)};}
+        mapping("key.blacklight.vehicle_next_seat",GLFW.GLFW_KEY_F23),mapping("key.blacklight.vehicle_next_ammo",GLFW.GLFW_KEY_F24),
+        mapping("key.attack",GLFW.GLFW_KEY_F21),mapping("key.use",GLFW.GLFW_KEY_F22)};}
     private static void language(String locale,Runnable run)throws Exception{
         Language old=Language.getInstance();var map=new HashMap<String,String>();
         for(String path:new String[]{"assets/minecraft/lang/en_us.json","assets/blacklight/lang/"+locale+".json"}){

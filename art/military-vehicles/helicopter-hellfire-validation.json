@@ -1,0 +1,356 @@
+{
+  "schema": 1,
+  "createdLocal": "2026-11-16T19:17:48",
+  "status": "Source-based Hellfire integrated into actual helicopter projectiles; server and unit checkpoint passed, complete objective active",
+  "source": {
+    "file": "art/military-vehicles/helicopter-hellfire-source.json",
+    "sha256": "a1cc4729d7b0caf8de1ef7eecfbe981d999c49741e6f27fc2330a4efbd4ae6ab"
+  },
+  "changes": [
+    "Added separate helicopter_hellfire identity; AI fires at its legitimate original target and manual fire uses the actual reticle ray/free-aim point. The ground vehicle_rocket remains separate.",
+    "Source-derived cold launch, inherited motion, ignition, acceleration, delayed tracking, intercept lead, speed-scaled turn, lateral friction, lost-lock coast and bounded lifetime. Saved target/flight state resumes without restarting physics.",
+    "Native projectile collision/event cancellation/real vehicle hull handling retained; synchronized heading/age drives missile orientation and delayed smoke/flame. Existing rocket sound reused.",
+    "Appended feedback ID13 and updated both protocol versions without shifting existing weapon IDs."
+  ],
+  "platforms": {
+    "neo": {
+      "unit": {
+        "file": "D:\\CodexCache\\helicopter-hellfire-qa\\neo-unit-passed.log",
+        "sha256": "6d230195a042816dd0c5cbba24236e4e8c45344f1fd3e6a3c4694c634e6d0708",
+        "passed": 47,
+        "suites": [
+          {
+            "name": "com.codex.blacklight.firearms.GunplayFeedbackPayloadTest",
+            "tests": 2,
+            "file": "D:\\CodexCache\\helicopter-hellfire-qa\\neo-TEST-com.codex.blacklight.firearms.GunplayFeedbackPayloadTest.xml",
+            "sha256": "a1712b0d9a1f37233434211bc5bb0dd48a63aa92765e193d4a4ed8f8f4b73626"
+          },
+          {
+            "name": "com.codex.blacklight.military.aircraft.HelicopterArmamentTest",
+            "tests": 2,
+            "file": "D:\\CodexCache\\helicopter-hellfire-qa\\neo-TEST-com.codex.blacklight.military.aircraft.HelicopterArmamentTest.xml",
+            "sha256": "c3941a9d8445c689934cc36f707a767ff455faf2ed268b7d1024cef7351587de"
+          },
+          {
+            "name": "com.codex.blacklight.military.aircraft.HelicopterAuthorityTest",
+            "tests": 2,
+            "file": "D:\\CodexCache\\helicopter-hellfire-qa\\neo-TEST-com.codex.blacklight.military.aircraft.HelicopterAuthorityTest.xml",
+            "sha256": "6e6e8340f6d01d3ea79ab71abc3215c284c5d09b3597e3b0fba2e056456ce650"
+          },
+          {
+            "name": "com.codex.blacklight.military.aircraft.HelicopterFlightTest",
+            "tests": 4,
+            "file": "D:\\CodexCache\\helicopter-hellfire-qa\\neo-TEST-com.codex.blacklight.military.aircraft.HelicopterFlightTest.xml",
+            "sha256": "abc25b0d2f44b193864f2dafe33e8f81a7f5a5607799d5ae2b786df98389a6c7"
+          },
+          {
+            "name": "com.codex.blacklight.military.aircraft.HelicopterGunCycleTest",
+            "tests": 3,
+            "file": "D:\\CodexCache\\helicopter-hellfire-qa\\neo-TEST-com.codex.blacklight.military.aircraft.HelicopterGunCycleTest.xml",
+            "sha256": "7f2a76c136f9f954065c911480890d64fcbbadf9719e2dd131de96295ad9fa0a"
+          },
+          {
+            "name": "com.codex.blacklight.military.aircraft.HelicopterMissileFlightTest",
+            "tests": 9,
+            "file": "D:\\CodexCache\\helicopter-hellfire-qa\\neo-TEST-com.codex.blacklight.military.aircraft.HelicopterMissileFlightTest.xml",
+            "sha256": "8e74bf3fa681c2fa00612092f1e744fdabdd9a07b30896a2ae9254386a472073"
+          },
+          {
+            "name": "com.codex.blacklight.military.aircraft.HelicopterRouteTest",
+            "tests": 8,
+            "file": "D:\\CodexCache\\helicopter-hellfire-qa\\neo-TEST-com.codex.blacklight.military.aircraft.HelicopterRouteTest.xml",
+            "sha256": "178a4d0d0bc72d113ab8319dbedcb7b5978e7ad94bc7b3b6074d194b308374d9"
+          },
+          {
+            "name": "com.codex.blacklight.military.vehicle.VehicleControlAuthorityTest",
+            "tests": 11,
+            "file": "D:\\CodexCache\\helicopter-hellfire-qa\\neo-TEST-com.codex.blacklight.military.vehicle.VehicleControlAuthorityTest.xml",
+            "sha256": "c0887ad09e099ad3e842045b9e13c63ab3ea45412409d342a8947bd1acddaf98"
+          },
+          {
+            "name": "com.codex.blacklight.military.vehicle.VehicleWeaponDefinitionTest",
+            "tests": 6,
+            "file": "D:\\CodexCache\\helicopter-hellfire-qa\\neo-TEST-com.codex.blacklight.military.vehicle.VehicleWeaponDefinitionTest.xml",
+            "sha256": "5dc7cc3cbdcda2da9d157549bae33fa646661a93e9a6035be8bf298536cde591"
+          }
+        ]
+      },
+      "server": {
+        "file": "D:\\CodexCache\\helicopter-hellfire-qa\\neo-server-passed.log",
+        "sha256": "c44d02ba966d578c4eeb45d9117dac8f714f8771b203e6b184e6fc24befcb972",
+        "passed": 57,
+        "flightCases": [
+          {
+            "case": "rear-lock-loss",
+            "frame": 19,
+            "age": 19,
+            "position": "(272067.1248316354, 99.84807459545907, 0.0)",
+            "targetHealth": 5000.0,
+            "lost": true
+          },
+          {
+            "case": "removed-target",
+            "frame": 18,
+            "age": 18,
+            "position": "(271552.3656733709, 99.8276982634594, 3.231279725090864)",
+            "targetHealth": 5000.0,
+            "lost": true
+          },
+          {
+            "case": "expiry-corruption",
+            "frame": 4,
+            "age": 200,
+            "position": "(273072.125, 100.0, 0.0)",
+            "targetHealth": 5000.0,
+            "lost": false
+          },
+          {
+            "case": "reload-intercept",
+            "frame": 34,
+            "age": 34,
+            "position": "(271085.18901090283, 100.00472709524414, 16.36015963764679)",
+            "targetHealth": 4900.0,
+            "lost": false
+          },
+          {
+            "case": "moving-intercept",
+            "frame": 28,
+            "age": 28,
+            "position": "(270554.0377367036, 100.01279884411554, 8.585818263266944)",
+            "targetHealth": 4900.0,
+            "lost": false
+          },
+          {
+            "case": "cold-delay",
+            "frame": 10,
+            "age": 10,
+            "position": "(270006.68330406264, 99.79101764880694, 0.2571821710563022)",
+            "targetHealth": 5000.0,
+            "lost": false
+          },
+          {
+            "case": "unloaded-boundary",
+            "frame": 0,
+            "age": 1,
+            "position": "(278584.0, 100.0, 0.0)",
+            "targetHealth": 5000.0,
+            "lost": false
+          },
+          {
+            "case": "native-wall",
+            "frame": 20,
+            "age": 20,
+            "position": "(272581.3745448629, 99.89283984715628, 0.0)",
+            "targetHealth": 5000.0,
+            "lost": false
+          }
+        ]
+      },
+      "vehicleRegression": {
+        "file": "D:\\CodexCache\\helicopter-hellfire-qa\\neo-vehicleRegression-passed.log",
+        "sha256": "c88ff999ddc2dd050f1a188d6be5c57bc506de8cdf2c4f1b4cea5d8ddcc982b3",
+        "passed": 29
+      },
+      "files": {
+        "src/main/java/com/codex/blacklight/military/aircraft/HelicopterMissileFlight.java": "54af8d70433bf1385cabc52616eaa19ac4d3ebd52bcb2256bc4b14fccac5c26a",
+        "src/main/java/com/codex/blacklight/military/aircraft/HelicopterCombat.java": "7106660086774eb37eaa66e54e07d188276ab0cafde66eac35cde4116fc358f0",
+        "src/main/java/com/codex/blacklight/military/vehicle/VehicleDamageBridge.java": "ff26c32056a410478657901f1a3d44ad03bc02b41a8556e39efb4bfc21fca2c9",
+        "src/main/java/com/codex/blacklight/military/vehicle/VehicleWeaponDefinition.java": "f43a1572785a3dcc6acfa6db707f29a0e6682da08e25e7911563df7adaafcb2f",
+        "src/main/java/com/codex/blacklight/military/vehicle/VehicleSounds.java": "5ef09ec39e6aabe0ba45ae06601224c353f4dd0660f5761231de8a1fc1110f85",
+        "src/main/java/com/codex/blacklight/firearms/VehicleOrdnanceProjectile.java": "ef7085d52f35d222f1536359308ae5de0fc7ad67d37d096da60abfbcecf609b9",
+        "src/main/java/com/codex/blacklight/firearms/OrdnanceTrail.java": "27688abe86d8c86955c625a82fdb4a0de185ff80207c8062159cc58581bc2b6d",
+        "src/main/java/com/codex/blacklight/client/renderer/OrdnanceRenderer.java": "3304c0052fa792f8f4c83a7b3e7fce5a8e286e1f1c1a869dc16ee178edc58b91",
+        "src/main/java/com/codex/blacklight/network/GunplayFeedbackPayload.java": "73e3e3c5081307641bd911116fc76bb315779c99e28df74c0a3e3bde94262a1a",
+        "src/main/java/com/codex/blacklight/network/ModNetwork.java": "be76eaf861401c504001d4d6b2e8e882bef56cd0add856f776fd2b156abe669c",
+        "src/test/java/com/codex/blacklight/military/aircraft/HelicopterMissileFlightTest.java": "5c7c75236e6f85fdd07e68e0dad647a91885557ad9058b872f3b733e0b1e3a8a",
+        "src/test/java/com/codex/blacklight/military/vehicle/VehicleWeaponDefinitionTest.java": "6804d9dd72b3cba9a539859eb89caff3ebfebcdee2ac6da0d645fd61737cfc1a",
+        "src/test/java/com/codex/blacklight/firearms/GunplayFeedbackPayloadTest.java": "1be266808a1360a9dd2c6ccc07d72335d8803aeb563ebee9b7f28241e9651a29",
+        "src/helicopterTest/java/com/codex/blacklight/gametest/HelicopterHellfireGameTest.java": "04c1464421ae43209dfc13ba1777ec0b018be91c20198d3a61284f2f82ac2aa2",
+        "src/helicopterTest/java/com/codex/blacklight/gametest/HelicopterCombatGameTest.java": "92a7c2fc8f43da4fe3d755d632dc84a16ad9230a25a9346c12724d633a00a41e",
+        "tools/helicopter-hellfire-unit.init.gradle": "91c64bac3f49b5e628686ba97f5836ee87e8737a8f61d3ee7d6402084380b403"
+      },
+      "protocol": "standalone-72-helicopter-hellfire"
+    },
+    "forge": {
+      "unit": {
+        "file": "D:\\CodexCache\\helicopter-hellfire-qa\\forge-unit-passed.log",
+        "sha256": "07091fcbf2096ecb3dec6a65931c06b3b730be0e3fa1b9811ac8d580cc85c88a",
+        "passed": 47,
+        "suites": [
+          {
+            "name": "com.codex.blacklight.firearms.GunplayFeedbackPayloadTest",
+            "tests": 2,
+            "file": "D:\\CodexCache\\helicopter-hellfire-qa\\forge-TEST-com.codex.blacklight.firearms.GunplayFeedbackPayloadTest.xml",
+            "sha256": "de9dfaafb48aa189c01ca2ae15877e7d96cbf0c765309748395a622407af3708"
+          },
+          {
+            "name": "com.codex.blacklight.military.aircraft.HelicopterArmamentTest",
+            "tests": 2,
+            "file": "D:\\CodexCache\\helicopter-hellfire-qa\\forge-TEST-com.codex.blacklight.military.aircraft.HelicopterArmamentTest.xml",
+            "sha256": "2d4171c643091988957cb197bbd1ca0dbfe376f79d5d1bd009eb653ec0f40d77"
+          },
+          {
+            "name": "com.codex.blacklight.military.aircraft.HelicopterAuthorityTest",
+            "tests": 2,
+            "file": "D:\\CodexCache\\helicopter-hellfire-qa\\forge-TEST-com.codex.blacklight.military.aircraft.HelicopterAuthorityTest.xml",
+            "sha256": "a541cde416367bd02b66dce5012559e2d5e79c521bbd6e052b3f62bc9ab64f4a"
+          },
+          {
+            "name": "com.codex.blacklight.military.aircraft.HelicopterFlightTest",
+            "tests": 4,
+            "file": "D:\\CodexCache\\helicopter-hellfire-qa\\forge-TEST-com.codex.blacklight.military.aircraft.HelicopterFlightTest.xml",
+            "sha256": "ddf8463f44af86abc3e8d994b6fa09313d1d2d5741ef1b5c783d97c3ef70a862"
+          },
+          {
+            "name": "com.codex.blacklight.military.aircraft.HelicopterGunCycleTest",
+            "tests": 3,
+            "file": "D:\\CodexCache\\helicopter-hellfire-qa\\forge-TEST-com.codex.blacklight.military.aircraft.HelicopterGunCycleTest.xml",
+            "sha256": "551255c7a83067e8cc435e82178229344c54875265de7196c4e94ed5b880069a"
+          },
+          {
+            "name": "com.codex.blacklight.military.aircraft.HelicopterMissileFlightTest",
+            "tests": 9,
+            "file": "D:\\CodexCache\\helicopter-hellfire-qa\\forge-TEST-com.codex.blacklight.military.aircraft.HelicopterMissileFlightTest.xml",
+            "sha256": "bf1b4701614d1b1549e58392df3a665555e4afb242960a33dcdc718a6f245099"
+          },
+          {
+            "name": "com.codex.blacklight.military.aircraft.HelicopterRouteTest",
+            "tests": 8,
+            "file": "D:\\CodexCache\\helicopter-hellfire-qa\\forge-TEST-com.codex.blacklight.military.aircraft.HelicopterRouteTest.xml",
+            "sha256": "1e6a7d389bfe07074008cd002aba725757c883975a663facbfa97f4c02e1595d"
+          },
+          {
+            "name": "com.codex.blacklight.military.vehicle.VehicleControlAuthorityTest",
+            "tests": 11,
+            "file": "D:\\CodexCache\\helicopter-hellfire-qa\\forge-TEST-com.codex.blacklight.military.vehicle.VehicleControlAuthorityTest.xml",
+            "sha256": "a4e66a3c765620483aa777e264e64509617eff9b774bbd046e6c493e6e843d49"
+          },
+          {
+            "name": "com.codex.blacklight.military.vehicle.VehicleWeaponDefinitionTest",
+            "tests": 6,
+            "file": "D:\\CodexCache\\helicopter-hellfire-qa\\forge-TEST-com.codex.blacklight.military.vehicle.VehicleWeaponDefinitionTest.xml",
+            "sha256": "17bc6130da1ef8d372b3da2534151cb9282061d26c0165c08e47afddc1d16645"
+          }
+        ]
+      },
+      "server": {
+        "file": "D:\\CodexCache\\helicopter-hellfire-qa\\forge-server-passed.log",
+        "sha256": "333fcfe43a233c630c955f3c7ad60027eb870b08ed8563b1d43471e263eced57",
+        "passed": 57,
+        "flightCases": [
+          {
+            "case": "rear-lock-loss",
+            "frame": 19,
+            "age": 19,
+            "position": "(272067.1248316354, 99.84807459545907, 0.0)",
+            "targetHealth": 5000.0,
+            "lost": true
+          },
+          {
+            "case": "removed-target",
+            "frame": 18,
+            "age": 18,
+            "position": "(271552.3656733709, 99.8276982634594, 3.231279725090864)",
+            "targetHealth": 5000.0,
+            "lost": true
+          },
+          {
+            "case": "expiry-corruption",
+            "frame": 4,
+            "age": 200,
+            "position": "(273072.125, 100.0, 0.0)",
+            "targetHealth": 5000.0,
+            "lost": false
+          },
+          {
+            "case": "reload-intercept",
+            "frame": 34,
+            "age": 34,
+            "position": "(271085.18901090283, 100.00472709524414, 16.36015963764679)",
+            "targetHealth": 4900.0,
+            "lost": false
+          },
+          {
+            "case": "moving-intercept",
+            "frame": 28,
+            "age": 28,
+            "position": "(270554.0377367036, 100.01279884411554, 8.585818263266944)",
+            "targetHealth": 4900.0,
+            "lost": false
+          },
+          {
+            "case": "cold-delay",
+            "frame": 10,
+            "age": 10,
+            "position": "(270006.68330406264, 99.79101764880694, 0.2571821710563022)",
+            "targetHealth": 5000.0,
+            "lost": false
+          },
+          {
+            "case": "unloaded-boundary",
+            "frame": 0,
+            "age": 1,
+            "position": "(278584.0, 100.0, 0.0)",
+            "targetHealth": 5000.0,
+            "lost": false
+          },
+          {
+            "case": "native-wall",
+            "frame": 20,
+            "age": 20,
+            "position": "(272581.3745448629, 99.89283984715628, 0.0)",
+            "targetHealth": 5000.0,
+            "lost": false
+          }
+        ]
+      },
+      "vehicleRegression": {
+        "file": "D:\\CodexCache\\helicopter-hellfire-qa\\forge-vehicleRegression-passed.log",
+        "sha256": "5936aebc17c10c31dfef0fec3c9e697ed0e3de1cba9c274b49ae4e7378ab55c0",
+        "passed": 29
+      },
+      "files": {
+        "src/main/java/com/codex/blacklight/military/aircraft/HelicopterMissileFlight.java": "7c85828098d153cace68bf6ac68419d15f901e513549f0f1637d488f4e39d3a4",
+        "src/main/java/com/codex/blacklight/military/aircraft/HelicopterCombat.java": "7106660086774eb37eaa66e54e07d188276ab0cafde66eac35cde4116fc358f0",
+        "src/main/java/com/codex/blacklight/military/vehicle/VehicleDamageBridge.java": "033f5ead6b4b8e35b6faca8065e05d2d58c9f6e0def38cda9242bc5c30ae2e76",
+        "src/main/java/com/codex/blacklight/military/vehicle/VehicleWeaponDefinition.java": "f43a1572785a3dcc6acfa6db707f29a0e6682da08e25e7911563df7adaafcb2f",
+        "src/main/java/com/codex/blacklight/military/vehicle/VehicleSounds.java": "11c24db81e39b05ed1a611013c0ce02d08371b0698d4ea1ea4d727e214e4ec95",
+        "src/main/java/com/codex/blacklight/firearms/VehicleOrdnanceProjectile.java": "2b639898dda4f7e38e7444394b173f0faf932666c6cfb194f54e5867625f62e6",
+        "src/main/java/com/codex/blacklight/firearms/OrdnanceTrail.java": "27688abe86d8c86955c625a82fdb4a0de185ff80207c8062159cc58581bc2b6d",
+        "src/main/java/com/codex/blacklight/client/renderer/OrdnanceRenderer.java": "3304c0052fa792f8f4c83a7b3e7fce5a8e286e1f1c1a869dc16ee178edc58b91",
+        "src/main/java/com/codex/blacklight/network/GunplayFeedbackPayload.java": "327245e9c09c31de4665596672b90dc3572616a318fa048e486d583d0c1219a7",
+        "src/main/java/com/codex/blacklight/network/ModNetwork.java": "cd794f453940aecffb687e23676a8f8f8467b7731547cbc076849074fa8b94cc",
+        "src/test/java/com/codex/blacklight/military/aircraft/HelicopterMissileFlightTest.java": "c275811aff18a517e3238e18631057be390bdb9221f372f324f18064923a2cd1",
+        "src/test/java/com/codex/blacklight/military/vehicle/VehicleWeaponDefinitionTest.java": "6804d9dd72b3cba9a539859eb89caff3ebfebcdee2ac6da0d645fd61737cfc1a",
+        "src/test/java/com/codex/blacklight/firearms/GunplayFeedbackPayloadTest.java": "1be266808a1360a9dd2c6ccc07d72335d8803aeb563ebee9b7f28241e9651a29",
+        "src/helicopterTest/java/com/codex/blacklight/gametest/HelicopterHellfireGameTest.java": "ea7d108e36bf5231904d1bb5ac493ba1e188c3bf525732a68003113e51837086",
+        "src/helicopterTest/java/com/codex/blacklight/gametest/HelicopterCombatGameTest.java": "75bbfbbe6ea424c312598102e91fc61ad757b3694f6ca6292783f03dd4536e49",
+        "tools/helicopter-hellfire-unit.init.gradle": "91c64bac3f49b5e628686ba97f5836ee87e8737a8f61d3ee7d6402084380b403"
+      },
+      "protocol": "forge-1.20.1-32-helicopter-hellfire"
+    }
+  },
+  "rejectedRuns": {
+    "logs": [
+      "D:\\CodexCache\\helicopter-hellfire-qa\\forge-server-rejected-damage-units.log",
+      "D:\\CodexCache\\helicopter-hellfire-qa\\forge-server-rejected-health-baseline.log",
+      "D:\\CodexCache\\helicopter-hellfire-qa\\forge-unit-rejected-sync-fixture.log",
+      "D:\\CodexCache\\helicopter-hellfire-qa\\neo-server-rejected-damage-units.log",
+      "D:\\CodexCache\\helicopter-hellfire-qa\\neo-server-rejected-health-baseline.log",
+      "D:\\CodexCache\\helicopter-hellfire-qa\\neo-server-rejected-occupied-landing.log",
+      "D:\\CodexCache\\helicopter-hellfire-qa\\neo-unit-rejected-sync-fixture.log"
+    ],
+    "causes": [
+      "New target fixtures initially assumed unscaled health/damage; corrected to actual initial health and CombatScale health-unit conversion. Direct hit remains one authored20 damage (100 native health units for this infected fixture).",
+      "Existing long-sortie fixture placed its target inside the landing envelope, producing timing-dependent deployment failure. Both affected isolated scenarios now deploy to an actually empty landing area. Production landing validation unchanged.",
+      "The synchronization helper accidentally changed the new positive packet-ID13 test to ID14. Restricted its migration to the negative-boundary assertion and reran both unit suites; actual packet code already allowed13 and rejected14."
+    ]
+  },
+  "limitations": [
+    "No new native-client screenshots, listening or multiplayer acceptance. Renderer/particles/network fields are wired and compiled, not visually accepted in this checkpoint.",
+    "This does not complete source weapon-selection/hover, separate rapid-missile racks, exact player ammo capacity, timed impact stages, original sound identity or complete helicopter motions.",
+    "MC damage/radius/cadence/inventory, profile175 range independent of original world altitude, and 20Hz double-precision integration remain documented adaptations.",
+    "Other creatures, soldiers, detailed vehicle/item modeling and sounds remain part of the unchanged active objective."
+  ],
+  "deployment": "D-drive source/reference/disposable QA only; no release JAR, installation, commit, publication or user-world changes."
+}

@@ -1,0 +1,115 @@
+{
+  "schema": 1,
+  "state": "source logic integrated; runtime validation deferred",
+  "source": {
+    "runtime": "D:\\PrototypeReference\\p1\\input\\prototypeenginef.dll",
+    "runtimeSha256": "8cba8da3412df4f49cd61d02445e87a0cda551dea4f2fc1e66b19c1bfe28a760",
+    "fig": "D:\\PrototypeReference\\p1\\input\\startup_fig.p3d.rz",
+    "figSha256": "96d84271e461cbe4566fb984359653b164257f88392c5bceb213c30f88527779",
+    "records": "D:\\PrototypeReference\\p1\\private\\greene-ai-complete.json",
+    "recordsSha256": "eff8ab13c58461b914fdb80887d39f45939759b20644e181ff3244289128dd10"
+  },
+  "privateProofSha256": "c107105e69806ef32bb2f812d3930664e522c1b1431ad9faebe4363b81a8c435",
+  "selection": {
+    "bank": "startup_fig decompressed offset269856 shoot/shoot",
+    "children": [
+      {
+        "offset": 269944,
+        "conditionOffset": 269988,
+        "state": "DeathFlower",
+        "strictXZGreaterThan": 60
+      },
+      {
+        "offset": 270568,
+        "conditionOffset": 270612,
+        "state": "Rifle",
+        "strictXZGreaterThan": 40
+      },
+      {
+        "offset": 271192,
+        "conditionOffset": 271236,
+        "state": "ShotgunBlast",
+        "strictXZGreaterThan": 25
+      },
+      {
+        "offset": 271864,
+        "conditionOffset": 271908,
+        "state": "InsectSwarm",
+        "strictXZGreaterThan": 1
+      }
+    ],
+    "conclusion": "First eligible child in this source order. At 60 chooses Rifle, at40 ShotgunBlast, at25 InsectSwarm, at1 or below no shooting candidate. Parent on-foot distance gate is strict XZ<150.",
+    "proof": [
+      "Bank slot10 10a882f0 runs its own Conditions then10a7ea00->10a7e250. Iterator starts at branch+1c and follows child+20.",
+      "10a7e283 evaluates child with output weight initialized0. Successful child with weight<=0 takes10a7e29b directly to10a7e32a and returns that child. Positive-weight-only cases use two-pass random sum, irrelevant to these four conditions.",
+      "Node vtable10e9931c slot10=10a85cb0: evaluate Conditions at+2c and return this/null. It neither initializes a nonzero weight nor consults Override for candidate selection.",
+      "TargetDistance vtable10dc2e0c slot9=1011e650 obtains target relative position and calls107de5a0 comparison; it does not read/write weight output. Each of the four direct Conditions contains just that condition, no RandomCondition.",
+      "Raw four Node payloads are name64,empty path32,siblings32=4,override32=1. Source loader10a7e4b0 reads branches sequentially and dispatches virtual load10a7f0d0. This calls10a7ed50 insertion,10a7de90 index traversal,10a7de50 link write. Default negative insertion appends; where read sibling offset4 applies it is clamped to the end of this initially empty four-child bank. No redirection path or sorting field changes the file order.",
+      "Base ctor10a7f220 initializes child/sibling null and order marker+14=-1; later merge/branch insertion semantics exist but are not present in these four source payloads."
+    ]
+  },
+  "gatesAndTimers": [
+    {
+      "offset": 267864,
+      "meaning": "On-foot parent Node267820 only enters for strict XZ<150. It is not a sensing-radius statement."
+    },
+    {
+      "offset": 269896,
+      "meaning": "shoot/shoot Bank has TimerCompare #26b21f8d9bf95838 Equal0 before distance candidates."
+    },
+    {
+      "offset": 271564,
+      "meaning": "Shotgun wait Node271520 enters on ShotgunBlast OnEnter event. Its TimerSet271680 atTimeBegin0 writes #26b21f8d9bf95838=2.666670083999634, Incrementing=false. Timer starts at that event, not after weapon completion."
+    },
+    {
+      "runtime": "101290f0 -> event0x23/subtype5 ->10067c60 ->10066a00",
+      "meaning": "TimerSet action activation immediately stores value and incrementing bool in the owner FightVariables timer array."
+    },
+    {
+      "runtime": "10066c80,10066cb7..10066cf3",
+      "meaning": "Behavior update takes dt; incrementing timer adds dt, decrementing timer subtracts dt then clamps negative result to exact zero."
+    },
+    {
+      "runtime": "10128890 -> event0x23/subtype4 ->100669a0",
+      "meaning": "TimerCompare reads current stored value and applies the source compare enum, so Equal0 works after decrement reaches zero."
+    },
+    {
+      "offset": 272636,
+      "meaning": "Outer shoot Bank269808 has fallback wait Node272496. Opportunity begins .16666699945926666 seconds after that wait node enters. It is not proof of mandatory4tick reload after every successful shooting program; direct next selection may already have an eligible inner Bank."
+    },
+    {
+      "offset": 268292,
+      "meaning": "Parallel close-hit branch268248 requires XZ<25, close timer#62e73e73b9c7ff89 Equal0 and one of two GrabSlots. It is not a prerequisite for shooting."
+    },
+    {
+      "offset": 269444,
+      "meaning": "Close-hit wait/reset branch requires XZ>=17 and resets close timer#62e73e73b9c7ff89 to0. Does not gate shooting."
+    },
+    {
+      "offset": 273040,
+      "meaning": "Separate concurrently spawned distance timer bank: close<=36 sets timer#fd0e64dad19eb326=0 and Incrementing=true (273100); far fallback resets same timer to0 Incrementing=false (273296)."
+    },
+    {
+      "offset": 267084,
+      "meaning": "Higher-priority natural roar node: XZ<35 AND fd0e timer>=6 AND #242e3b8cc7a67cef<=0 AND ThunderousRoarForbidden=0 AND target not devastator. Its continuation resets fd0e incrementing0 and sets242e decrementing15. Full concurrent-event graph is not implemented by the selector proof."
+    }
+  ],
+  "integration": {
+    "selector": "GreeneWeaponProgram.onFoot uses XZ, strict parent <150 and the four original ordered thresholds. Exact 60/40/25 boundaries fall to the next child. <=1 has no shooting candidate.",
+    "timer": "ShotgunBlast sets the shared shooting gate to 54 server ticks from successful begin, mapping that begin to original emotional-state OnEnter. Active MOVE independently excludes overlap. Other on-foot programs add no invented reload after clip completion.",
+    "fallback": "The original fallback Opportunity begins .166667 seconds after that wait node enters. MC checks eligibility each actual server update; no universal four-tick reload is claimed. Closed shoot gates do not trigger the former distant fallback roar.",
+    "range": "Acquisition and explicit launch safety cap use existing missile displacement range175 as an MC adapter, not a recovered sensing radius. The source on-foot <150 XZ entry gate is checked separately. Old saves may retain explicitly serialized attribute overrides.",
+    "save": "Legacy round-robin tag is ignored. Existing saved EncounterRecharge countdown holds the source Shotgun gate; socket firing cooldowns are separate."
+  },
+  "remaining": [
+    "Full forced/forbidden mission attack-flag lifecycle, parallel grab attacks and full e08m04 mission choreography are not ported. Natural close-roar scheduling, target Devastator gates and recurring cycle gates are now connected.",
+    "Tank/aircraft acquisition and scheduling remain stated MC encounter adapters.",
+    "Source aim-error distribution, original impulse/friendly-fire delivery, complete original audio and particle assets remain incomplete."
+  ],
+  "validation": {
+    "compilation": "not run",
+    "unitTests": "written only",
+    "gameTests": "written only",
+    "client": "not launched"
+  }
+}

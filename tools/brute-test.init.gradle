@@ -1,0 +1,5 @@
+allprojects { afterEvaluate {
+    sourceSets.main.java.srcDir('src/bruteTest/java')
+    sourceSets.main.resources.srcDir('src/blackwatchTest/resources')
+    tasks.named('test', Test).configure { include '**/RagdollTerrainSupportTest.class','**/RagdollJointMathTest.class','**/RagdollJointProjectionTest.class','**/RagdollHingeTest.class','**/BruteKnockdownTest.class','**/RagdollRecoveryTest.class','**/BruteRiderPoseTest.class','**/BruteContactTest.class','**/BruteFlinchTest.class','**/MutantCombatTest.class','**/StalkerContactTest.class','**/SpitterMouthTest.class','**/ContactEffectsQueueTest.class' }
+} }

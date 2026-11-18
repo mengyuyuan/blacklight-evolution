@@ -31,22 +31,29 @@ public final class VehicleThreatBridge {
     }
     public static boolean engage(MilitaryVehicle vehicle,LivingEntity target){
         if(!legalTarget(vehicle,target))return false;var actor=actor(vehicle);
-        if(!vehicle.aimAiWeapon(actor,target))return false;
-        var weapons=new ArrayList<>(vehicle.definition().weapons().keySet());weapons.sort(Comparator.comparingInt((String id)->id.equals("coaxial_machine_gun")?0:id.equals("autocannon")?1:2).thenComparing(Comparator.naturalOrder()));
+        boolean armored=target.getVehicle() instanceof MilitaryVehicle;
+        boolean largeOrGroup=target.getBbWidth()>1.4F||target.getBbHeight()>3
+                ||vehicle.level().getEntitiesOfClass(LivingEntity.class,target.getBoundingBox().inflate(3),other->other!=target&&legalTarget(vehicle,other)).size()>=2;
+        var weapons=new ArrayList<>(vehicle.definition().weapons().keySet());
+        weapons.sort(Comparator.comparingInt((String id)->VehicleFireControl.priority(VehicleWeaponDefinition.require(id),armored,largeOrGroup)).thenComparing(Comparator.naturalOrder()));
         for(var id:weapons){
             var spec=VehicleWeaponDefinition.require(id);var weapon=spec.weapon();if(vehicle.inventory().ammunition(weapon.ammoId())==0)continue;
-            var origin=new VehicleDefinition.Vec3(vehicle.getX(),vehicle.getY(),vehicle.getZ());var mount=vehicle.definition().mountWorld(spec.muzzle(),origin,vehicle.getYRot(),vehicle.turretYaw(),vehicle.gunPitch());
-            var muzzle=new Vec3(mount.x(),mount.y(),mount.z());var end=target.getBoundingBox().getCenter();
-            if(!VehicleKinematics.loaded(vehicle.level(),new AABB(muzzle,end).inflate(1))||vehicle.level().clip(new ClipContext(muzzle,end,ClipContext.Block.COLLIDER,ClipContext.Fluid.NONE,actor)).getType()!=HitResult.Type.MISS)continue;
-            var hull=VehicleDamageBridge.nearest((ServerLevel)vehicle.level(),actor,vehicle,muzzle,end);
-            if(hull!=null&&(hull.vehicle()!=target.getVehicle()||VehicleDamageBridge.protectedHull(actor,hull.vehicle())))continue;
+            if(vehicle.level().getGameTime()<vehicle.inventory().cooldownUntil(id))continue;
+            // Select one safe weapon before rotating. Never turn the turret several times per tick.
+            var end=target.getBoundingBox().getCenter();
             if(weapon.radius()>0){
                 if(vehicle.distanceToSqr(target)<100)continue;
                 if(!((ServerLevel)vehicle.level()).getEntitiesOfClass(LivingEntity.class,target.getBoundingBox().inflate(weapon.radius()+2),other->other!=target&&!legalTarget(vehicle,other)).isEmpty())continue;
             }
+            if(!vehicle.aimAiWeapon(actor,target,id))return false;
+            var origin=new VehicleDefinition.Vec3(vehicle.getX(),vehicle.getY(),vehicle.getZ());var mount=vehicle.definition().mountWorld(spec.muzzle(),origin,vehicle.getYRot(),vehicle.turretYaw(),vehicle.gunPitch());
+            var muzzle=new Vec3(mount.x(),mount.y(),mount.z());
+            if(!VehicleKinematics.loaded(vehicle.level(),new AABB(muzzle,end).inflate(1))||vehicle.level().clip(new ClipContext(muzzle,end,ClipContext.Block.COLLIDER,ClipContext.Fluid.NONE,actor)).getType()!=HitResult.Type.MISS)return false;
+            var hull=VehicleDamageBridge.nearest((ServerLevel)vehicle.level(),actor,vehicle,muzzle,end);
+            if(hull!=null&&(hull.vehicle()!=target.getVehicle()||VehicleDamageBridge.protectedHull(actor,hull.vehicle())))return false;
             var hit=net.minecraft.world.entity.projectile.ProjectileUtil.getEntityHitResult(vehicle.level(),actor,muzzle,end,new AABB(muzzle,end).inflate(.4),entity->entity instanceof LivingEntity&&entity!=actor&&entity.getVehicle()!=vehicle);
-            if(hit!=null&&hit.getEntity()!=target)continue;
-            if(VehicleAttackService.fire(vehicle,actor,id))return true;
+            if(hit!=null&&hit.getEntity()!=target)return false;
+            return VehicleAttackService.fire(vehicle,actor,id);
         }
         return false;
     }

@@ -1,0 +1,835 @@
+{
+  "status": "Static source inspection and implementation only; no compilation, test execution, native emulation or game launch.",
+  "input": {
+    "file": "D:\\PrototypeReference\\p1\\input\\prototypeenginef.dll",
+    "sha256": "8cba8da3412df4f49cd61d02445e87a0cda551dea4f2fc1e66b19c1bfe28a760"
+  },
+  "evidence": [
+    {
+      "file": "D:\\PrototypeReference\\p1\\private\\rapid-runtime-101e6e30.txt",
+      "sha256": "a706f081fc87d68e95d5aaae386929339f3b7999d283a5c9d1003169cf8e4ca7"
+    },
+    {
+      "file": "D:\\PrototypeReference\\p1\\private\\rapid-runtime-103b9cf0.txt",
+      "sha256": "6e108da0782041b96793177b48ace358c4efb1fea282200aa78e8fdcfca90b58"
+    },
+    {
+      "file": "D:\\PrototypeReference\\p1\\private\\rapid-runtime-103b95a0.txt",
+      "sha256": "5b3f2ff5ca83c3a3a98234ab46c522278895c41c2896e92cf70089ecaf3092a2"
+    },
+    {
+      "file": "D:\\PrototypeReference\\p1\\private\\rapid-runtime-107badf0.txt",
+      "sha256": "635cee90b85af08853fe7cf93c18a4be6fe86e6308efa3b9953bf594eddc94ec"
+    },
+    {
+      "file": "D:\\PrototypeReference\\p1\\private\\rapid-runtime-10937e00.txt",
+      "sha256": "0c2988d8bede10ef7614ed6a425344ec2b2036348e7da7d3560d28f9449d1cfb"
+    },
+    {
+      "file": "D:\\PrototypeReference\\p1\\private\\rapid-runtime-103c4d60.txt",
+      "sha256": "42a19aebc6a5ca94bd5849b7e0664bcf3f91b79e227c407d7060a3e68da9853f"
+    },
+    {
+      "file": "D:\\PrototypeReference\\p1\\private\\rapid-runtime-103c4bc0.txt",
+      "sha256": "765c8484a780101b0ceb58b45510b8d7f007fae5b7b2d74684ba89b121b838df"
+    },
+    {
+      "file": "D:\\PrototypeReference\\p1\\private\\rapid-runtime-103c37f0.txt",
+      "sha256": "579c4a18b909d1c86b7ff72b21d8dcdb93ff8ab804ceb45c455358be0ddfa16e"
+    },
+    {
+      "file": "D:\\PrototypeReference\\p1\\private\\rapid-runtime-103c33f0.txt",
+      "sha256": "0d54e3007f3e44106e9b93a140392245b55c7ad81d3db2e5ed3cfdf945d5e95e"
+    },
+    {
+      "file": "D:\\PrototypeReference\\p1\\private\\rapid-runtime-103bcfa0.txt",
+      "sha256": "0719f79709824e4ab443f71d45b9f9bc38d82910e7f429027e3b2c2cdaeb6c95"
+    },
+    {
+      "file": "D:\\PrototypeReference\\p1\\private\\rapid-runtime-103bd200.txt",
+      "sha256": "e89f9c0c8e1b19ea0de48ee655c6d33ccb8576cc6a728f1ff9374f984dc00d6c"
+    },
+    {
+      "file": "D:\\PrototypeReference\\p1\\private\\rapid-runtime-103c4fb0.txt",
+      "sha256": "48cdec630c1e39cb3388753c4804fe6032af56a2b2dad35b24be3456f45348f3"
+    }
+  ],
+  "api": "HelicopterCombatDestination.find(BlackwatchHelicopter craft, Vec3 observedTarget, boolean hydra, boolean targetHelicopter, HelicopterAirspace space) -> Vec3 or null",
+  "authoredTracks": [
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 85988,
+      "payload": 86000,
+      "length": 212,
+      "type": "CombatDestinationFind",
+      "kind": "TrackHash",
+      "owner": "engage_apache/engage/tactics/simpleEngage/move/#87a0a169d714644c/#473a231186a3dd75",
+      "fields": {
+        "Unknown1": 0,
+        "TimeBegin": 0,
+        "TimeEnd": -1,
+        "MinDistance": 20,
+        "MaxDistance": 35,
+        "MinAngle": -90,
+        "MaxAngle": 90,
+        "NumTries": 20,
+        "IgnoreRestrictions": false,
+        "CheckNotReserved": true,
+        "CheckCanGo": true,
+        "UseNavMeshHeight": false,
+        "HeightDifferenceCheck": {
+          "hash": "11751081574227249751",
+          "name": "Absolute"
+        },
+        "MaxHeightDifference": 40,
+        "MinHeightDifference": 15,
+        "LookJustCloser": 0,
+        "MinDistanceFromCurrent": 8,
+        "FreeRadiusAround": 18,
+        "AllowedAreas": 0,
+        "IgnoreAreasWhenAgentOutside": false,
+        "MaxDistanceToGround": 0,
+        "MaxAbsoluteHeight": 395,
+        "ReferenceOffset": [
+          0,
+          0,
+          0
+        ],
+        "AirDestination": true,
+        "Offset": [
+          0,
+          8,
+          0
+        ],
+        "CameraVisibility": {
+          "hash": "31052086116886518",
+          "name": "none"
+        },
+        "CollisionFlagsLOF": {
+          "hash": "16259960673298584331",
+          "name": "collide_none"
+        },
+        "CollideWithTypeLOF": 0,
+        "OffsetLOF": [
+          0,
+          0,
+          0
+        ],
+        "Heuristic": {
+          "hash": "10939952618956733516",
+          "name": "lowestValid"
+        },
+        "InitialHeuristic": 0,
+        "InitialHeuristicTimer": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "InitialHeuristicMinTimer": 0,
+        "InitialHeuristicMinTimerFactor": 0,
+        "InitialHeuristicMaxTimer": 0,
+        "InitialHeuristicMaxTimerFactor": 0,
+        "ReferencePosition": {
+          "hash": "12772528083933579047",
+          "name": "target"
+        },
+        "DeadReckoningTime": 0,
+        "WhenFound": {
+          "name": "",
+          "index": 91
+        },
+        "Priority": 0
+      },
+      "schema": "CombatDestinationFindTrack",
+      "end": 86240
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 86552,
+      "payload": 86564,
+      "length": 212,
+      "type": "CombatDestinationFind",
+      "kind": "TrackHash",
+      "owner": "engage_apache/engage/tactics/simpleEngage/move/#87a0a169d714644c/#473a231186a3dd75/#96b34dbbe344101e/#7756b9cbe044c2a6",
+      "fields": {
+        "Unknown1": 0,
+        "TimeBegin": 0,
+        "TimeEnd": -1,
+        "MinDistance": 10,
+        "MaxDistance": 40,
+        "MinAngle": -180,
+        "MaxAngle": 180,
+        "NumTries": 20,
+        "IgnoreRestrictions": false,
+        "CheckNotReserved": true,
+        "CheckCanGo": true,
+        "UseNavMeshHeight": false,
+        "HeightDifferenceCheck": {
+          "hash": "11751081574227249751",
+          "name": "Absolute"
+        },
+        "MaxHeightDifference": 100,
+        "MinHeightDifference": 15,
+        "LookJustCloser": 0,
+        "MinDistanceFromCurrent": 5,
+        "FreeRadiusAround": 18,
+        "AllowedAreas": 0,
+        "IgnoreAreasWhenAgentOutside": false,
+        "MaxDistanceToGround": 0,
+        "MaxAbsoluteHeight": 395,
+        "ReferenceOffset": [
+          0,
+          0,
+          0
+        ],
+        "AirDestination": true,
+        "Offset": [
+          0,
+          8,
+          0
+        ],
+        "CameraVisibility": {
+          "hash": "31052086116886518",
+          "name": "none"
+        },
+        "CollisionFlagsLOF": {
+          "hash": "16259960673298584331",
+          "name": "collide_none"
+        },
+        "CollideWithTypeLOF": 0,
+        "OffsetLOF": [
+          0,
+          0,
+          0
+        ],
+        "Heuristic": {
+          "hash": "10939952618956733516",
+          "name": "lowestValid"
+        },
+        "InitialHeuristic": 0,
+        "InitialHeuristicTimer": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "InitialHeuristicMinTimer": 0,
+        "InitialHeuristicMinTimerFactor": 0,
+        "InitialHeuristicMaxTimer": 0,
+        "InitialHeuristicMaxTimerFactor": 0,
+        "ReferencePosition": {
+          "hash": "12772528083933579047",
+          "name": "target"
+        },
+        "DeadReckoningTime": 0,
+        "WhenFound": {
+          "name": "",
+          "index": 91
+        },
+        "Priority": 0
+      },
+      "schema": "CombatDestinationFindTrack",
+      "end": 86804
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 87044,
+      "payload": 87056,
+      "length": 212,
+      "type": "CombatDestinationFind",
+      "kind": "TrackHash",
+      "owner": "engage_apache/engage/tactics/simpleEngage/move/#87a0a169d714644c/#2681628ed57afdfc",
+      "fields": {
+        "Unknown1": 0,
+        "TimeBegin": 0,
+        "TimeEnd": -1,
+        "MinDistance": 10,
+        "MaxDistance": 25,
+        "MinAngle": -90,
+        "MaxAngle": 90,
+        "NumTries": 20,
+        "IgnoreRestrictions": false,
+        "CheckNotReserved": true,
+        "CheckCanGo": true,
+        "UseNavMeshHeight": false,
+        "HeightDifferenceCheck": {
+          "hash": "11751081574227249751",
+          "name": "Absolute"
+        },
+        "MaxHeightDifference": 60,
+        "MinHeightDifference": 0,
+        "LookJustCloser": 0,
+        "MinDistanceFromCurrent": 8,
+        "FreeRadiusAround": 18,
+        "AllowedAreas": 0,
+        "IgnoreAreasWhenAgentOutside": false,
+        "MaxDistanceToGround": 0,
+        "MaxAbsoluteHeight": 395,
+        "ReferenceOffset": [
+          0,
+          0,
+          0
+        ],
+        "AirDestination": true,
+        "Offset": [
+          0,
+          8,
+          0
+        ],
+        "CameraVisibility": {
+          "hash": "31052086116886518",
+          "name": "none"
+        },
+        "CollisionFlagsLOF": {
+          "hash": "16259960673298584331",
+          "name": "collide_none"
+        },
+        "CollideWithTypeLOF": 0,
+        "OffsetLOF": [
+          0,
+          0,
+          0
+        ],
+        "Heuristic": {
+          "hash": "10939952618956733516",
+          "name": "lowestValid"
+        },
+        "InitialHeuristic": 0,
+        "InitialHeuristicTimer": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "InitialHeuristicMinTimer": 0,
+        "InitialHeuristicMinTimerFactor": 0,
+        "InitialHeuristicMaxTimer": 0,
+        "InitialHeuristicMaxTimerFactor": 0,
+        "ReferencePosition": {
+          "hash": "12772528083933579047",
+          "name": "target"
+        },
+        "DeadReckoningTime": 0,
+        "WhenFound": {
+          "name": "",
+          "index": 91
+        },
+        "Priority": 0
+      },
+      "schema": "CombatDestinationFindTrack",
+      "end": 87296
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 87608,
+      "payload": 87620,
+      "length": 212,
+      "type": "CombatDestinationFind",
+      "kind": "TrackHash",
+      "owner": "engage_apache/engage/tactics/simpleEngage/move/#87a0a169d714644c/#2681628ed57afdfc/#96b34dbbe344101e/#7756b9cbe044c2a6",
+      "fields": {
+        "Unknown1": 0,
+        "TimeBegin": 0,
+        "TimeEnd": -1,
+        "MinDistance": 5,
+        "MaxDistance": 40,
+        "MinAngle": -180,
+        "MaxAngle": 180,
+        "NumTries": 20,
+        "IgnoreRestrictions": false,
+        "CheckNotReserved": true,
+        "CheckCanGo": true,
+        "UseNavMeshHeight": false,
+        "HeightDifferenceCheck": {
+          "hash": "11751081574227249751",
+          "name": "Absolute"
+        },
+        "MaxHeightDifference": 100,
+        "MinHeightDifference": 0,
+        "LookJustCloser": 0,
+        "MinDistanceFromCurrent": 5,
+        "FreeRadiusAround": 18,
+        "AllowedAreas": 0,
+        "IgnoreAreasWhenAgentOutside": false,
+        "MaxDistanceToGround": 0,
+        "MaxAbsoluteHeight": 395,
+        "ReferenceOffset": [
+          0,
+          0,
+          0
+        ],
+        "AirDestination": true,
+        "Offset": [
+          0,
+          8,
+          0
+        ],
+        "CameraVisibility": {
+          "hash": "31052086116886518",
+          "name": "none"
+        },
+        "CollisionFlagsLOF": {
+          "hash": "16259960673298584331",
+          "name": "collide_none"
+        },
+        "CollideWithTypeLOF": 0,
+        "OffsetLOF": [
+          0,
+          0,
+          0
+        ],
+        "Heuristic": {
+          "hash": "10939952618956733516",
+          "name": "lowestValid"
+        },
+        "InitialHeuristic": 0,
+        "InitialHeuristicTimer": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "InitialHeuristicMinTimer": 0,
+        "InitialHeuristicMinTimerFactor": 0,
+        "InitialHeuristicMaxTimer": 0,
+        "InitialHeuristicMaxTimerFactor": 0,
+        "ReferencePosition": {
+          "hash": "12772528083933579047",
+          "name": "target"
+        },
+        "DeadReckoningTime": 0,
+        "WhenFound": {
+          "name": "",
+          "index": 91
+        },
+        "Priority": 0
+      },
+      "schema": "CombatDestinationFindTrack",
+      "end": 87860
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 88080,
+      "payload": 88092,
+      "length": 212,
+      "type": "CombatDestinationFind",
+      "kind": "TrackHash",
+      "owner": "engage_apache/engage/tactics/simpleEngage/move/#87a0a169d714644c/#be4fe365ad3635a2",
+      "fields": {
+        "Unknown1": 0,
+        "TimeBegin": 0,
+        "TimeEnd": -1,
+        "MinDistance": 10,
+        "MaxDistance": 25,
+        "MinAngle": -90,
+        "MaxAngle": 90,
+        "NumTries": 20,
+        "IgnoreRestrictions": false,
+        "CheckNotReserved": true,
+        "CheckCanGo": true,
+        "UseNavMeshHeight": false,
+        "HeightDifferenceCheck": {
+          "hash": "11751081574227249751",
+          "name": "Absolute"
+        },
+        "MaxHeightDifference": 40,
+        "MinHeightDifference": 8,
+        "LookJustCloser": 0,
+        "MinDistanceFromCurrent": 8,
+        "FreeRadiusAround": 18,
+        "AllowedAreas": 0,
+        "IgnoreAreasWhenAgentOutside": false,
+        "MaxDistanceToGround": 0,
+        "MaxAbsoluteHeight": 395,
+        "ReferenceOffset": [
+          0,
+          0,
+          0
+        ],
+        "AirDestination": true,
+        "Offset": [
+          0,
+          8,
+          0
+        ],
+        "CameraVisibility": {
+          "hash": "31052086116886518",
+          "name": "none"
+        },
+        "CollisionFlagsLOF": {
+          "hash": "16259960673298584331",
+          "name": "collide_none"
+        },
+        "CollideWithTypeLOF": 0,
+        "OffsetLOF": [
+          0,
+          0,
+          0
+        ],
+        "Heuristic": {
+          "hash": "10939952618956733516",
+          "name": "lowestValid"
+        },
+        "InitialHeuristic": 0,
+        "InitialHeuristicTimer": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "InitialHeuristicMinTimer": 0,
+        "InitialHeuristicMinTimerFactor": 0,
+        "InitialHeuristicMaxTimer": 0,
+        "InitialHeuristicMaxTimerFactor": 0,
+        "ReferencePosition": {
+          "hash": "12772528083933579047",
+          "name": "target"
+        },
+        "DeadReckoningTime": 0,
+        "WhenFound": {
+          "name": "",
+          "index": 91
+        },
+        "Priority": 0
+      },
+      "schema": "CombatDestinationFindTrack",
+      "end": 88332
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 88644,
+      "payload": 88656,
+      "length": 212,
+      "type": "CombatDestinationFind",
+      "kind": "TrackHash",
+      "owner": "engage_apache/engage/tactics/simpleEngage/move/#87a0a169d714644c/#be4fe365ad3635a2/#96b34dbbe344101e/#7756b9cbe044c2a6",
+      "fields": {
+        "Unknown1": 0,
+        "TimeBegin": 0,
+        "TimeEnd": -1,
+        "MinDistance": 5,
+        "MaxDistance": 40,
+        "MinAngle": -180,
+        "MaxAngle": 180,
+        "NumTries": 20,
+        "IgnoreRestrictions": false,
+        "CheckNotReserved": true,
+        "CheckCanGo": true,
+        "UseNavMeshHeight": false,
+        "HeightDifferenceCheck": {
+          "hash": "11751081574227249751",
+          "name": "Absolute"
+        },
+        "MaxHeightDifference": 100,
+        "MinHeightDifference": 8,
+        "LookJustCloser": 0,
+        "MinDistanceFromCurrent": 5,
+        "FreeRadiusAround": 18,
+        "AllowedAreas": 0,
+        "IgnoreAreasWhenAgentOutside": false,
+        "MaxDistanceToGround": 0,
+        "MaxAbsoluteHeight": 395,
+        "ReferenceOffset": [
+          0,
+          0,
+          0
+        ],
+        "AirDestination": true,
+        "Offset": [
+          0,
+          8,
+          0
+        ],
+        "CameraVisibility": {
+          "hash": "31052086116886518",
+          "name": "none"
+        },
+        "CollisionFlagsLOF": {
+          "hash": "16259960673298584331",
+          "name": "collide_none"
+        },
+        "CollideWithTypeLOF": 0,
+        "OffsetLOF": [
+          0,
+          0,
+          0
+        ],
+        "Heuristic": {
+          "hash": "10939952618956733516",
+          "name": "lowestValid"
+        },
+        "InitialHeuristic": 0,
+        "InitialHeuristicTimer": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "InitialHeuristicMinTimer": 0,
+        "InitialHeuristicMinTimerFactor": 0,
+        "InitialHeuristicMaxTimer": 0,
+        "InitialHeuristicMaxTimerFactor": 0,
+        "ReferencePosition": {
+          "hash": "12772528083933579047",
+          "name": "target"
+        },
+        "DeadReckoningTime": 0,
+        "WhenFound": {
+          "name": "",
+          "index": 91
+        },
+        "Priority": 0
+      },
+      "schema": "CombatDestinationFindTrack",
+      "end": 88896
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 89308,
+      "payload": 89320,
+      "length": 212,
+      "type": "CombatDestinationFind",
+      "kind": "TrackHash",
+      "owner": "engage_apache/engage/tactics/simpleEngage/move/inPosition/Reaction/#98dc0826bfe70e61/#87a0a169d714644c",
+      "fields": {
+        "Unknown1": 0,
+        "TimeBegin": 0,
+        "TimeEnd": -1,
+        "MinDistance": 10,
+        "MaxDistance": 30,
+        "MinAngle": -90,
+        "MaxAngle": 90,
+        "NumTries": 10,
+        "IgnoreRestrictions": false,
+        "CheckNotReserved": true,
+        "CheckCanGo": true,
+        "UseNavMeshHeight": false,
+        "HeightDifferenceCheck": {
+          "hash": "11751081574227249751",
+          "name": "Absolute"
+        },
+        "MaxHeightDifference": 20,
+        "MinHeightDifference": 8,
+        "LookJustCloser": 0,
+        "MinDistanceFromCurrent": 8,
+        "FreeRadiusAround": 18,
+        "AllowedAreas": 0,
+        "IgnoreAreasWhenAgentOutside": false,
+        "MaxDistanceToGround": 0,
+        "MaxAbsoluteHeight": 395,
+        "ReferenceOffset": [
+          0,
+          0,
+          0
+        ],
+        "AirDestination": true,
+        "Offset": [
+          0,
+          8,
+          0
+        ],
+        "CameraVisibility": {
+          "hash": "31052086116886518",
+          "name": "none"
+        },
+        "CollisionFlagsLOF": {
+          "hash": "16259960673298584331",
+          "name": "collide_none"
+        },
+        "CollideWithTypeLOF": 0,
+        "OffsetLOF": [
+          0,
+          0,
+          0
+        ],
+        "Heuristic": {
+          "hash": "15358102762283197128",
+          "name": "firstValid"
+        },
+        "InitialHeuristic": 0,
+        "InitialHeuristicTimer": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "InitialHeuristicMinTimer": 0,
+        "InitialHeuristicMinTimerFactor": 0,
+        "InitialHeuristicMaxTimer": 0,
+        "InitialHeuristicMaxTimerFactor": 0,
+        "ReferencePosition": {
+          "hash": "12772528083933579047",
+          "name": "target"
+        },
+        "DeadReckoningTime": 0,
+        "WhenFound": {
+          "name": "",
+          "index": 91
+        },
+        "Priority": 0
+      },
+      "schema": "CombatDestinationFindTrack",
+      "end": 89560
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 89804,
+      "payload": 89816,
+      "length": 212,
+      "type": "CombatDestinationFind",
+      "kind": "TrackHash",
+      "owner": "engage_apache/engage/tactics/simpleEngage/move/inPosition/Reaction/#98dc0826bfe70e61/#87a0a169d714644c/#96b34dbbe344101e/#7756b9cbe044c2a6",
+      "fields": {
+        "Unknown1": 0,
+        "TimeBegin": 0,
+        "TimeEnd": -1,
+        "MinDistance": 5,
+        "MaxDistance": 40,
+        "MinAngle": -180,
+        "MaxAngle": 180,
+        "NumTries": 20,
+        "IgnoreRestrictions": false,
+        "CheckNotReserved": true,
+        "CheckCanGo": true,
+        "UseNavMeshHeight": false,
+        "HeightDifferenceCheck": {
+          "hash": "11751081574227249751",
+          "name": "Absolute"
+        },
+        "MaxHeightDifference": 100,
+        "MinHeightDifference": 8,
+        "LookJustCloser": 0,
+        "MinDistanceFromCurrent": 5,
+        "FreeRadiusAround": 18,
+        "AllowedAreas": 0,
+        "IgnoreAreasWhenAgentOutside": false,
+        "MaxDistanceToGround": 0,
+        "MaxAbsoluteHeight": 395,
+        "ReferenceOffset": [
+          0,
+          0,
+          0
+        ],
+        "AirDestination": true,
+        "Offset": [
+          0,
+          8,
+          0
+        ],
+        "CameraVisibility": {
+          "hash": "31052086116886518",
+          "name": "none"
+        },
+        "CollisionFlagsLOF": {
+          "hash": "16259960673298584331",
+          "name": "collide_none"
+        },
+        "CollideWithTypeLOF": 0,
+        "OffsetLOF": [
+          0,
+          0,
+          0
+        ],
+        "Heuristic": {
+          "hash": "10939952618956733516",
+          "name": "lowestValid"
+        },
+        "InitialHeuristic": 0,
+        "InitialHeuristicTimer": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "InitialHeuristicMinTimer": 0,
+        "InitialHeuristicMinTimerFactor": 0,
+        "InitialHeuristicMaxTimer": 0,
+        "InitialHeuristicMaxTimerFactor": 0,
+        "ReferencePosition": {
+          "hash": "12772528083933579047",
+          "name": "target"
+        },
+        "DeadReckoningTime": 0,
+        "WhenFound": {
+          "name": "",
+          "index": 91
+        },
+        "Priority": 0
+      },
+      "schema": "CombatDestinationFindTrack",
+      "end": 90056
+    }
+  ],
+  "queryMapping": {
+    "function": "101e6e30 constructs query at stack+58 and dispatches103c4fb0 at101e72ea",
+    "fieldsHex": {
+      "00": "MinDistance (track+a4)",
+      "04": "MaxDistance (track+94)",
+      "08": "MinAngle radians (track+a0)",
+      "0c": "MaxAngle radians (track+90)",
+      "10": "NumTries (track+c8)",
+      "14": "IgnoreRestrictions (track+e0)",
+      "15": "CheckNotReserved (track+de)",
+      "16": "CheckCanGo (track+dd)",
+      "18": "HeightDifferenceCheck (track+c0)",
+      "1c": "MaxHeightDifference (track+9c)",
+      "20": "MinHeightDifference (track+ac)",
+      "24": "LookJustCloser (track+88)",
+      "28": "MinDistanceFromCurrent (track+a8)",
+      "2c": "FreeRadiusAround (track+74)",
+      "30": "AllowedAreas (track+d4)",
+      "34": "IgnoreAreasWhenAgentOutside (track+df)",
+      "35": "UseNavMeshHeight (track+e2)",
+      "38": "MaxDistanceToGround (track+98)",
+      "3c": "MaxAbsoluteHeight (track+8c)",
+      "40": "AirDestination (track+dc)",
+      "44": "CameraVisibility (track+b8)",
+      "48": "CollisionFlagsLOF (track+d8)",
+      "4c": "CollideWithTypeLOF (track+bc)",
+      "50": "OffsetLOF (track+54)",
+      "5c": "Offset (track+48)",
+      "68": "Heuristic (track+c4)",
+      "6c": "InitialHeuristic multiplier, constructor1; optional timer interpolation",
+      "70": "ReferencePosition target=0/self=1"
+    },
+    "validationArguments": "103c37f0(actor,candidate,target,actorPosition,ignore,checkNotReserved,checkCanGo,heightDifference,maxDifference,minDifference,lookCloser,minMove,freeWidth,allowedAreas,ignoreOutside,useNavHeight,maxGroundDistance,maxAbsoluteHeight,air,camera,flagsLOF,typeLOF,offsetLOF,referenceMode,debug,heuristic)"
+  },
+  "generation": {
+    "function": "103c4d60 ->103b95a0 (radial) and103c4bc0 (AirDestination)",
+    "sampling": "Draw uniform radius first in[min,max), then uniform angle in[minAngle,maxAngle). Horizontal direction is normalized craft-target; source107badf0 length-squared<1e-10F gives0 then103b95a0 length<=1e-5F uses+Z. Rotate X=dx*cos+dz*sin,Z=dz*cos-dx*sin (10937e00). Center targetXZ.",
+    "height": "Y=max(ground(target)+MinHeightDifference,max(ground(target),areaHeight(candidate,FreeRadiusAround=18))+Offset.y=8). No random flight height.",
+    "rounds": "Each initial target-class track uses20 attempts and lowestValid. Its authored failure branch uses a separate20-attempt fallback with larger/full-angle range. Do not enter fallback if primary produced any valid point.",
+    "relocation": "Independent in-position Reaction pair.89308: uniform radius10..30,angle-90..90,10 attempts,maxYDifference20,minHeight8,minMove8,firstValid.89804 fallback:radius5..40,angle-180..180,20 attempts,maxYDifference100,minHeight8,minMove5,lowestValid. Both retain FreeRadiusAround18,Offset.y8,MaxAbsoluteHeight395,target reference and same route/reservation checks. Trigger/branch selection remains caller-owned; this helper does not infer when to relocate."
+  },
+  "validation": {
+    "airHeightEvidence": "103c37f0 pushes query+40 as argument8 of103c33f0; at103c33f3 (entryesp+20) true ->103c3407 ->103c34da. This is the AIR path, not the ground path.",
+    "airHeight": "Compare abs(reference.y-candidate.y)<=MaxHeightDifference. If exceeded and reference.y>candidate.y, set candidate.y=reference.y and continue; otherwise reject. Non-air ground-height differences in103c3424/103c360e must not replace this air branch.",
+    "minimumHeight": "Only candidate generation uses MinHeightDifference for these air tracks; it is not an additional random/range requirement.",
+    "ceiling": "103c37f0 clamps air maximum to395(10df9898);103c36bf accepts candidate.y<=MaxAbsoluteHeight. All authored tracks specify395.",
+    "reservation": "103c3a49 air branch calls10382830(candidate,FreeRadiusAround*.5=9,actorHandle). Reads at103c3a7e include two pushes, so old stack+c0 is FreeRadiusAround, not old+c8.",
+    "minimumMovement": "103c3bad ->103bcfa0(candidate,actorPosition,reference,LookJustCloser=0,MinDistanceFromCurrent). Euclidean3D squared distance>=minMove^2 is accepted; lookCloser0 disables its extra check.",
+    "disabledAuthoredOptions": "AllowedAreas0, IgnoreAreasWhenAgentOutside=false, UseNavMeshHeight=false, MaxDistanceToGround0, CameraVisibility none, CollisionFlagsLOF collide_none, OffsetLOF zero, DeadReckoningTime0."
+  },
+  "ranking": {
+    "enum": "103c551c table:0firstValid->103c51a6,1lowestValid->103c51d4,2->103c5212,3->103c5296.",
+    "initial": "103bd2d0 table enum1->103bd219 returns10d936e4=FLT_MAX.103b9cf0 initializes query+6c=1.101e6e30 preserves1 unless valid InitialHeuristicTimer flag at track+e1 triggers interpolation. FIG InitialHeuristic0 and zero timer hash do not make lowestValid initial score zero.",
+    "selection": "103c51d4 lowestValid strictly replaces only if bestHeight>candidate.y, so first equal-height valid candidate wins and the full configured attempt count is consumed.103c51a6 firstValid marksflag+12 and103c5435 exits immediately; relocation primary uses this branch with at most10 attempts."
+  },
+  "minecraftAdaptation": [
+    "Global native random is adapted to ServerLevel.random.nextFloat; Vec3 and trigonometry use Java doubles, not bit-identical native SSE/x87 arithmetic.",
+    "Terrain comes only from HelicopterAirspace groundAt/areaHeight loaded chunk heightmaps. No new chunk loads. Unknown terrain is NaN and rejected, unlike native fallback-to-zero for invalid map samples.",
+    "CheckCanGo/native navigation projection is conservatively adapted to craft.clearAirRoute(origin,candidate,origin,yaw): loaded swept body+rotor geometry, world border, solid/liquid route and Minecraft build bounds.",
+    "Owned reservation check delegates pointAvailable(candidate,9,craft) so an aircraft ignores its own volume but cannot occupy another reservation.",
+    "Retain native395 absolute ceiling in addition to Minecraft world bounds. Native nonzero nav-area/visibility/LOF modes, timer-driven heuristic factors and other reference modes are outside these zero-config authored tracks.",
+    "In-position reaction relocation tracks89308/89804 use a separate reposition API. Initial find remains target-class-specific and scans20 candidates per round; reposition primary uses10 attempts/firstValid and different limits. Caller owns trigger selection."
+  ],
+  "files": [
+    "src/main/java/com/codex/blacklight/military/aircraft/HelicopterCombatDestination.java",
+    "src/test/java/com/codex/blacklight/military/aircraft/HelicopterCombatDestinationTest.java"
+  ],
+  "unrunTests": {
+    "class": "HelicopterCombatDestinationTest",
+    "count": 13,
+    "cases": [
+      "20 candidates and no unnecessary fallback",
+      "target class radii and floors",
+      "uniform radius and target-relative angle",
+      "lowest valid with stable ties",
+      "reserved primary uses fallback",
+      "blocked/reserved all fail",
+      "missing loaded terrain fails closed",
+      "air Y raise and maximum difference fallback",
+      "inclusive395 ceiling",
+      "3D minimum movement and inclusive equality",
+      "relocation firstValid returns before lower later candidates",
+      "relocation primary height rejection followed by lowestValid fallback",
+      "relocation exhausts exactly10 primary and20 fallback attempts"
+    ]
+  },
+  "repositionApi": "HelicopterCombatDestination.reposition(BlackwatchHelicopter craft, Vec3 observedTarget, HelicopterAirspace space) -> Vec3 or null"
+}

@@ -1,0 +1,135 @@
+{
+  "schema": 1,
+  "date": "2026-11-17",
+  "state": "code connected; uncompiled and untested at user request",
+  "userConstraint": "Continue code first. No Gradle/Java compilation, tests, native DLL execution/emulation, client launch, save changes or media playback.",
+  "scope": [
+    "Six Greene weapon programs / thirteen original Shoot tracks",
+    "Goliath front-slam world contacts",
+    "Common infected finite air tracking"
+  ],
+  "greene": {
+    "programs": [
+      {
+        "id": "DEATH_FLOWER",
+        "sourceExecute": 21916,
+        "slots": [
+          2,
+          6,
+          4,
+          7,
+          3
+        ],
+        "seconds": 6.133329916000366
+      },
+      {
+        "id": "SHOTGUN",
+        "sourceExecute": 23564,
+        "slots": [
+          9,
+          8
+        ],
+        "seconds": 2.333329916000366
+      },
+      {
+        "id": "INSECT_SWARM",
+        "sourceExecute": 25532,
+        "slots": [
+          1,
+          2,
+          5
+        ],
+        "seconds": 6.133329916000366
+      },
+      {
+        "id": "RIFLE",
+        "sourceExecute": 27144,
+        "slots": [
+          9
+        ],
+        "seconds": 2.7333333333333334
+      },
+      {
+        "id": "ANTI_TANK",
+        "sourceExecute": 12636,
+        "slots": [
+          10
+        ],
+        "seconds": 1.8333300352096558
+      },
+      {
+        "id": "ANTI_AIR",
+        "sourceExecute": 12636,
+        "slots": [
+          10
+        ],
+        "seconds": 1.8333300352096558
+      }
+    ],
+    "animation": "Synced program identity selects the same original clip slices for visible pose, receiving skin, muzzle position and direction. Existing move IDs and projectile ID are retained; greene_projectile is a separate new registration.",
+    "firing": "Ten persistent per-socket cooldowns, one spawn attempt per 20 Hz update, successful spawn only consumes cooldown; original fire-rate is not an inner pellet batch. Half-open Shoot windows have a documented 20 us boundary tolerance.",
+    "direction": "Actual weapon GameObject context, empty-joint fallback and attached Mouth basis established by native instruction traces. Parent scale/shear affects position; original Gram-Schmidt final attachment basis determines direction.",
+    "flight": "Six native profiles: no vanilla gravity/drag; braking, acceleration, delayed tracking, lateral friction, lifetime and displacement range are retained. A synced float vector avoids the vanilla velocity-packet 3.9-block/tick cap for source 80-unit/s shots.",
+    "collision": "Source thickness is a swept-sphere radius. Analytic sphere-to-affine-cuboid first contact checks block shapes, animated regions and articulated vehicle boxes. Real blocks win ties; owned body parts do not block their own missile. Entire swept volume must already be loaded and inside the border.",
+    "proximity": "Strict original-target-origin trigger ends the missile. Until original projectile final-action template bodies are available, a stated MC fallback delivers single-target damage only through an unobstructed real target surface; it never creates an area blast. Mounted targets drop stale living guidance.",
+    "acquisition": "Four on-foot states use an explicit MC cycle. Tank/aircraft attacks require the matching occupied hostile hull and crew protections. Empty parked hulls and unrelated on-foot targets cannot satisfy anti-vehicle gates.",
+    "damage": "Living base damage = original player/NPC field * .06 (preserves previous rifle base6 at source100); mechanical hits use source NPC field through existing armor/protection rules. Native force and friendly-fire behavior are not claimed.",
+    "presentation": "Existing slime item and licensed biological Foley are placeholders. One windup cue and one release cue per newly firing Shoot track, coalesced across simultaneous ports. Original missile meshes/trails/spin/audio remain unresolved.",
+    "lifecycle": "Breaking defenses, disabled actor, removed or invalid target cancel remaining requests. Already released valid missiles retain their lifetime. Socket cooldowns and on-foot selector save/load separately; attacks resume idle after load."
+  },
+  "goliath": {
+    "integration": "GoliathGroundImpact runs after the posed body update on every committed tick, including 39/40/41 after contact38. The fake root-centered CRIT ring/golem landing cue is excluded for source front slam. A target killed by contact38 does not cancel the follow-up ground effect; actor death/disable/exposure still cancel.",
+    "sourceFix": "The front-slam local damage origin now applies its required source-X to model-X mirror. Greene has a different established axis contract and is not mirrored again.",
+    "remaining": "Native giant fist/support-plane penetration and other moves/AI remain unresolved."
+  },
+  "commonInfected": "Air tracking now follows the original bounded 3D target prediction/rotation and permanently stops after the target is passed; wrist contact uses the visible yaw interpolation. Initial launch physics and missing source clips remain MC adapters.",
+  "deferred": {
+    "javaCompilation": "not run",
+    "unitTests": "written/queued only",
+    "gameTests": "18 GreeneCycle cases present, not run",
+    "clientAndPlayerAcceptance": "not run",
+    "releaseInstallation": "not done"
+  },
+  "sourceRecords": [
+    "art/encounters/greene-weapon-source-20261117.json",
+    "art/encounters/greene-missile-flight-source.json",
+    "art/encounters/greene-mouth-attachment-source.json",
+    "art/encounters/projectile-sphere-contact-20261117.json",
+    "art/encounters/goliath-ground-impact-provenance.json",
+    "art/encounters/common-infected-jumpto-source-20261117.json"
+  ],
+  "fullGoalComplete": false,
+  "snapshots": {
+    "src/main/java/com/codex/blacklight/entity/EncounterMob.java": "15a916f4e7e8efdf90240960ea3aa034a2ab01d572afaae370d2c21b39f87dc6",
+    "src/main/java/com/codex/blacklight/entity/GreeneProjectile.java": "e82993e9757070b29c3b759d3eecdbe77bf83d8a0368f024bc59871f04595754",
+    "src/main/java/com/codex/blacklight/registry/EncounterEntities.java": "5faa5f469a81a42529be370579bb196d935f588c1fbc19977c64997a0ac05930",
+    "src/main/java/com/codex/blacklight/client/ClientClawEvents.java": "38d64530f87fc1d7613643c108d7ef8879b27dbb627901f70cabb6a21b27102a",
+    "src/main/java/com/codex/blacklight/client/model/SourceBossPose.java": "cdd349b887c168bbc2b239ef6b56473c110e8db5377ad4e050a5043b22ee5bca",
+    "src/main/java/com/codex/blacklight/network/ModNetwork.java": "e0c493377f4236b6e38d2811238daa60981dfba8baa4b9578e315f253963c576",
+    "src/main/java/com/codex/blacklight/military/vehicle/VehicleHullShape.java": "10ce6dc041d09f0835a8e33993395516af449436376cb2c6e88433392ac5c6ee",
+    "src/main/java/com/codex/blacklight/combat/GreeneWeaponProgram.java": "e6fb13ebd5f9baffdf6c2e18c3116a344493d3449488d54754f3549548d16a1f",
+    "src/main/java/com/codex/blacklight/combat/GreeneWeaponController.java": "04f7e6db15688f164a31100a2112f3cfa344dca7d7f56a1db4a28409ef89bcea",
+    "src/main/java/com/codex/blacklight/combat/GreeneWeaponTarget.java": "5f989be96f4c9fb1d3e72bcd0cb45a1ae85a88d032c6bb728b402f4a042bc97f",
+    "src/main/java/com/codex/blacklight/combat/GreeneMissileFlight.java": "38f0a6c910a6ce9ea3a12a2c7ce148a56898dc133e67739b0f37d580c6bfb6d1",
+    "src/main/java/com/codex/blacklight/combat/GreeneWeaponCadence.java": "f29dacdf4ffd119b1aba51cfa971fd4b4492bfef24be0218b2c9a5b576e2e1ff",
+    "src/main/java/com/codex/blacklight/combat/GreeneMouth.java": "a16f7c514dac0e9b8512223269024f9f3df0580f8e2332430a67a4f59a281e25",
+    "src/main/java/com/codex/blacklight/combat/GreeneMotion.java": "dd01547fa9fa1c5d7ac697f3333a60e8d0c5b7ebc1ca672b03a298ff6aa50254",
+    "src/main/java/com/codex/blacklight/combat/ProjectileSphereContact.java": "0ef19a07494241402d1c660103331928d97e0d4c1b99fceffe20b06516f8dd1f",
+    "src/main/java/com/codex/blacklight/combat/SourceBossAction.java": "91f1d520973ce5d6f87505e3557b101c8bbd750f397107938812240d8bf9c59c",
+    "src/main/java/com/codex/blacklight/combat/EncounterTactics.java": "ece6861e8b22e73e71103f9bba286b496b54aa2eb7141e0aee73c11e1bd60679",
+    "src/main/java/com/codex/blacklight/combat/GoliathGroundImpact.java": "86a7646254bf9a7f6d14c27aef03980c03ce7f74549a6a3125ae3495bf770f52",
+    "src/main/resources/assets/blacklight/models/greene_weapon_programs.json": "53ecb122a0e6b130ae2cf7a05f2760d2945aba1ecc65e02cd37d3c3c6a19d870",
+    "src/main/resources/assets/blacklight/models/goliath_ground_impact.json": "2989490f3cb359f61fc67586b29250bade5c3ab21aff4b1e9e26d0e454d8370b",
+    "src/greeneTest/java/com/codex/blacklight/gametest/GreeneCycleGameTest.java": "bd093edfdeb82135ed8b84b2bc1f7d4283f43258a882175848fd89b568d2de64",
+    "tools/player-fix-unit.init.gradle": "ebac926085118880a86686bf50f001b9c6b97ce252eff672ab67c8eb7d52bb21",
+    "src/test/java/com/codex/blacklight/combat/GreeneWeaponProgramTest.java": "0e0eda7f054e19582ea69a53adf528c2964878ce8d54e10b0ded3ec7017615b8",
+    "src/test/java/com/codex/blacklight/combat/GreeneMissileFlightTest.java": "2c453422f5f693477060d6d79f0ce3a25f22c225e8b291f2df84a8096702eeb4",
+    "src/test/java/com/codex/blacklight/combat/GreeneWeaponCadenceTest.java": "772ab37273a44de56ea6f52d34dad115f33fa9b0a8a767e151f8b95042226dd6",
+    "src/test/java/com/codex/blacklight/combat/GreeneMouthTest.java": "722e344f812974b51f0ae017babf5b447611e8b2f5911417ac7e888cb7710ebd",
+    "src/test/java/com/codex/blacklight/combat/ProjectileSphereContactTest.java": "bf1b455649fc7601af913f7b3d15474ac131bf5d26050c575a1164b367e78edf",
+    "src/test/java/com/codex/blacklight/combat/GoliathGroundImpactTest.java": "6b04404f46e03ef9c1104c50cfcef7e780da82e609a8cb7c15f11a1265826c57"
+  },
+  "historicalSnapshot": true,
+  "followupRecord": "art/encounters/boss-combat-followup-20261117.json",
+  "followupNote": "This retains prior-turn source hashes and then-open gaps. Later selector/projectile/common launch/charge work is recorded in the linked follow-up; do not treat earlier gap text as current status."
+}

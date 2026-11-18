@@ -26,6 +26,7 @@ public final class ConsumedMobVisuals {
     public static void before(RenderLivingEvent.Pre<?, ?> event) {
         if (!LivingRenderScope.active(event.getPoseStack())) return;
         var mob = event.getEntity();
+        if((com.codex.blacklight.client.animation.ImpactRagdoll.active(mob)||AdaptiveRagdoll.active(mob))&&!com.codex.blacklight.client.animation.RagdollDrive.captured(mob))return;
         if (RENDERING.contains(mob)) return;
         // The dispatcher coats vanilla and custom renderers once, after their posed mesh is emitted.
         if(com.codex.blacklight.power.BiomassSystem.claimant(mob)!=null)return;
@@ -51,7 +52,7 @@ public final class ConsumedMobVisuals {
         var out = event.getMultiBufferSource().getBuffer(RenderType.entityCutoutNoCull(WHITE));
         whip(mob, stack, out, event.getPackedLight(), delta, tetherProgress(mob,partial));
         if (t >= .995F && !com.codex.blacklight.combat.ConsumeSequence.boss(mob)) { stack.popPose();event.setCanceled(true); return; }
-        ConsumeFracture fragments=ConsumeFracture.visible(mob,partial)?new ConsumeFracture(mob,partial,stack,event.getMultiBufferSource(),ConsumeAbsorptionFx.destination(mob,partial,placement)):null;
+        ConsumeFracture fragments=!PigRagdoll.active(mob)&&!AdaptiveRagdoll.active(mob)&&ConsumeFracture.visible(mob,partial)?new ConsumeFracture(mob,partial,stack,event.getMultiBufferSource(),ConsumeAbsorptionFx.destination(mob,partial,placement)):null;
         if(fragments!=null)fragments.bindModel(event.getRenderer().getModel());
         com.codex.blacklight.client.animation.ConsumeVictimPose.body(mob, stack, partial);
         if (fragments!=null) {
@@ -75,7 +76,7 @@ public final class ConsumedMobVisuals {
             return Math.min(.44F,(mob.level().getGameTime()-data.started()+partial)/60F);
         if(data.stage()==com.codex.blacklight.combat.ConsumeVisual.CAPTURE)
             return (mob.level().getGameTime()-data.started()+partial)/60F;
-        if(data.stage()==com.codex.blacklight.combat.ConsumeVisual.HOLD)return .44F;
+        if(com.codex.blacklight.combat.ConsumeVisual.carrying(data.stage()))return .44F;
         if(data.consuming())return .44F+data.progress(mob.level().getGameTime(),partial)*.5F;
         return 1;
     }

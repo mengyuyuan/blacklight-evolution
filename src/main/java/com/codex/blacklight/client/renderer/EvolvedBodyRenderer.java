@@ -56,7 +56,7 @@ final class EvolvedBodyRenderer {
     static void reload(){instance=null;INSTANCES.clear();}
     static void render(BlacklightInfectedHost host,float partial,PoseStack stack,MultiBufferSource buffers,int light){
         instance=INSTANCES.computeIfAbsent(host.evolvedArchetype(),EvolvedBodyRenderer::new);
-        var visual=com.codex.blacklight.registry.ModAttachments.getData(host, com.codex.blacklight.registry.ModAttachments.CONSUME_VISUAL);
+        var visual=com.codex.blacklight.registry.ModAttachments.getData(host,com.codex.blacklight.registry.ModAttachments.CONSUME_VISUAL);
         if(!visual.active()){instance.draw(host,partial,stack,buffers,light);return;}
         if(visual.consuming()&&visual.progress(host.level().getGameTime(),partial)>=.995F)return;
         var placement=com.codex.blacklight.client.ClientCarryPlacement.consumeOffset(host,partial);
@@ -70,8 +70,8 @@ final class EvolvedBodyRenderer {
     private static ModelPart part(HumanoidModel<?> m,int role){return switch(role){case 1->m.head;case 2->m.rightArm;case 3->m.leftArm;case 4->m.rightLeg;case 5->m.leftLeg;default->m.body;};}
     private void draw(BlacklightInfectedHost host,float partial,PoseStack stack,MultiBufferSource buffers,int light){
         String clip=host.evolvedAction();float time=host.evolvedActionElapsed(partial);boolean loop=false;
-        var visual=com.codex.blacklight.registry.ModAttachments.getData(host, com.codex.blacklight.registry.ModAttachments.CONSUME_VISUAL);
-        var hit=com.codex.blacklight.registry.ModAttachments.getData(host, com.codex.blacklight.registry.ModAttachments.HIT_REACTION);
+        var visual=com.codex.blacklight.registry.ModAttachments.getData(host,com.codex.blacklight.registry.ModAttachments.CONSUME_VISUAL);
+        var hit=com.codex.blacklight.registry.ModAttachments.getData(host,com.codex.blacklight.registry.ModAttachments.HIT_REACTION);
         if(visual.active()){clip="victim";time=visual.progress(host.level().getGameTime(),partial)*EvolvedMotions.clip(clip).seconds()*20;}
         else if(host.cannibalTargetId()>=0){clip=host.cannibalPrey()?"victim":"consume";time=com.codex.blacklight.forge.WingMath.clamp((host.level().getGameTime()+partial-host.cannibalStarted())/host.cannibalDuration(),0,1)*EvolvedMotions.clip(clip).seconds()*20;}
         else if(host.organActionCore()!=null){clip="consume";time=host.organActionElapsed(partial)/TissueOrganCycle.cycle(host.organActionCore()).end()*EvolvedMotions.clip(clip).seconds()*20;}
@@ -140,11 +140,25 @@ final class EvolvedBodyRenderer {
         if(!host.isMetamorphosing())return;float t=host.evolvedProgress(partial),cover=EvolvedForm.cover(t);if(cover<=.001F)return;
         float height=Math.max(2.4F,host.getBbHeight()*EvolvedForm.oldBody(t)),radius=Math.max(1,host.getBbWidth()*.6F*EvolvedForm.oldBody(t));
         var out=buffers.getBuffer(RenderType.entityCutoutNoCull(ConsumedMobVisuals.WHITE));
-        for(int band=0;band<5;band++)for(int side=0;side<8;side++){
-            var points=new Vector3f[4];for(int k=0;k<4;k++){int row=band+(k>=2?1:0),s=side+(k==1||k==2?1:0);float v=row/5F,a=s*(float)Math.PI/4;
-                float wide=(.5F+.5F*(float)Math.sin(Math.PI*v))*(1+.025F*(float)Math.sin(host.tickCount*.2F+side));points[k]=new Vector3f((float)Math.cos(a)*radius*wide*cover,v*height*cover,(float)Math.sin(a)*radius*wide*cover);}
-            var normal=new Vector3f(points[1]).sub(points[0]).cross(new Vector3f(points[2]).sub(points[0])).normalize();int color=(side+band)%4==0?0xff67282d:0xff29252a;
-            for(var p:points)out.vertex(pose.last().pose(),p.x,p.y,p.z).color(color).uv(.5F,.5F).overlayCoords(net.minecraft.client.renderer.texture.OverlayTexture.NO_OVERLAY).uv2(light).normal(pose.last().normal(),normal.x,normal.y,normal.z).endVertex();
+        // MC-style cocoon: stacked square layers stepped in whole pixels, not a
+        // smooth octagonal egg. The middle layers stay widest; layers pulse in turn.
+        float[] widths={.62F,.88F,1,.94F,.72F,.44F};int layers=widths.length;float pixel=1/16F;
+        for(int layer=0;layer<layers;layer++){
+            float pulse=1+.035F*(float)Math.sin(host.tickCount*.2F+layer*1.3F);
+            float half=Math.max(pixel,Math.round(radius*widths[layer]*pulse*cover/pixel)*pixel);
+            float y0=layer*height*cover/layers,y1=(layer+1)*height*cover/layers;
+            int color=layer%2==0?0xff29252a:0xff3a2128,seam=0xff8a2230;
+            cocoonBox(out,pose,-half,y0,-half,half,y1,half,color,light);
+            // A thin blood seam between layers keeps the stacked read.
+            if(layer>0)cocoonBox(out,pose,-half-pixel*.5F,y0-pixel,-half-pixel*.5F,half+pixel*.5F,y0+pixel,half+pixel*.5F,seam,light);
         }
+    }
+    private static void cocoonBox(VertexConsumer out,PoseStack pose,float x0,float y0,float z0,float x1,float y1,float z1,int color,int light){
+        float[][][] faces={
+            {{x0,y0,z0},{x1,y0,z0},{x1,y0,z1},{x0,y0,z1},{0,-1,0}},{{x0,y1,z1},{x1,y1,z1},{x1,y1,z0},{x0,y1,z0},{0,1,0}},
+            {{x0,y0,z0},{x0,y1,z0},{x1,y1,z0},{x1,y0,z0},{0,0,-1}},{{x1,y0,z1},{x1,y1,z1},{x0,y1,z1},{x0,y0,z1},{0,0,1}},
+            {{x0,y0,z1},{x0,y1,z1},{x0,y1,z0},{x0,y0,z0},{-1,0,0}},{{x1,y0,z0},{x1,y1,z0},{x1,y1,z1},{x1,y0,z1},{1,0,0}}};
+        for(var f:faces){var n=f[4];for(int k=0;k<4;k++)out.vertex(pose.last().pose(),f[k][0],f[k][1],f[k][2]).color(color).uv(.5F,.5F)
+                .overlayCoords(net.minecraft.client.renderer.texture.OverlayTexture.NO_OVERLAY).uv2(light).normal(pose.last().normal(),n[0],n[1],n[2]).endVertex();}
     }
 }

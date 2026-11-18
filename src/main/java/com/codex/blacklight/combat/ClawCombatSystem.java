@@ -43,7 +43,7 @@ public final class ClawCombatSystem {
     private static final int COMBO_GRACE_TICKS = 16;
 
     /** Per-combat-state targets already struck during the current dashing slice. */
-    private static final Map<ClawCombatState, Set<LivingEntity>> DASH_HITS = new WeakHashMap<>();
+    private static final Map<ClawCombatState, Set<Entity>> DASH_HITS = new WeakHashMap<>();
 
     private ClawCombatSystem() {
     }
@@ -205,7 +205,7 @@ public final class ClawCombatSystem {
 
         if (canBlendFromAttack) combat.finish(0);
 
-        Vec3 forward = player.getLookAngle().multiply(1.0D, 0.0D, 1.0D);
+        Vec3 forward = attackForward(player);
         combat.beginDash(forward.x, forward.z);
         player.setDeltaMovement(0.0D, Math.max(0.0D, player.getDeltaMovement().y), 0.0D);
         play(player, PlayerAction.CLAW_DASHING_SLICE);
@@ -215,7 +215,7 @@ public final class ClawCombatSystem {
     /** Short left-click while running: a flowing slash that preserves forward momentum. */
     private static void requestSprintAttack(ServerPlayer player, ClawCombatState combat) {
         if (combat.action() != ClawCombatState.Action.IDLE || !player.onGround()) return;
-        Vec3 forward = player.getLookAngle().multiply(1.0D, 0.0D, 1.0D);
+        Vec3 forward = attackForward(player);
         combat.beginSprintAttack(forward.x, forward.z);
         play(player, PlayerAction.CLAW_SPRINT_ATTACK);
         ClawPhysicalEffects.onDashStarted(player, forward);
@@ -302,7 +302,7 @@ public final class ClawCombatSystem {
             if (firstSweep) {
                 combat.markImpactTriggered();
             }
-            Set<LivingEntity> alreadyHit = DASH_HITS.computeIfAbsent(combat,
+            Set<Entity> alreadyHit = DASH_HITS.computeIfAbsent(combat,
                     ignored -> new HashSet<>());
             AABB sweep = player.getBoundingBox().inflate(1.25D, 0.6D, 1.25D);
             for (LivingEntity target : CombatTargeting.candidates(player, sweep,
@@ -312,10 +312,10 @@ public final class ClawCombatSystem {
                 if (target.hurt(player.damageSources().playerAttack(player),
                         clawDamage(state, 16.0F))) {
                     if(!CombatTargeting.anchoredBody(target))target.push(combat.dashX() * 0.9D, 0.3D, combat.dashZ() * 0.9D);
-                    ClawPhysicalEffects.onComboTargetHit(player, target, true);
                     WeaponImpact.contact(player, target, ImpactTier.HEAVY, false, null);
                 }
             }
+            hitHulls(player,sweep,clawDamage(state,16F),alreadyHit,Integer.MAX_VALUE);
             // The slash trail and impact feedback fire on the first sweep tick, in
             // sync with the visible hit, instead of waiting for the dash to end.
             if (firstSweep) {
@@ -353,6 +353,7 @@ public final class ClawCombatSystem {
                         ClawPhysicalEffects.onComboTargetHit(player, target, false);
                     }
                 }
+                hitCount+=hitHulls(player,sweep,clawDamage(state,9F),new HashSet<>(),3-hitCount);
                 ClawPhysicalEffects.onComboImpact(player,
                         ClawCombatState.Action.AUTO_2, forward, hitCount);
             }
@@ -375,7 +376,7 @@ public final class ClawCombatSystem {
     }
 
     private static Vec3 horizontalLook(ServerPlayer player) {
-        Vec3 forward = player.getLookAngle().multiply(1.0D, 0.0D, 1.0D);
+        Vec3 forward = attackForward(player);
         if (forward.lengthSqr() < 1.0E-5D) return new Vec3(0.0D, 0.0D, 1.0D);
         return forward.normalize();
     }
@@ -419,16 +420,10 @@ public final class ClawCombatSystem {
                         action == ClawCombatState.Action.AUTO_3 ? 0.28D : 0.08D,
                         forward.z * knockback);
                 hitCount++;
-                ClawPhysicalEffects.onComboTargetHit(player, target,
-                        action == ClawCombatState.Action.AUTO_3);
                 WeaponImpact.contact(player, target, action == ClawCombatState.Action.AUTO_3 ? ImpactTier.FINISHER : ImpactTier.LIGHT, false, null);
             }
         }
-        {
-            var mechanical=com.codex.blacklight.military.vehicle.VehiclePhysicalDamageBridge.clawContacts(player,sweep,attackOrigin,forward);
-            for(var contact:mechanical.stream().limit(Math.max(0,maxTargets-targets.size())).toList())
-                if(com.codex.blacklight.military.vehicle.VehicleDamageBridge.hurtPhysical(player,contact.vehicle(),damage,null))hitCount++;
-        }
+        hitCount+=hitHulls(player,sweep,damage,new HashSet<>(),maxTargets-targets.size());
         ClawPhysicalEffects.onComboImpact(player, action, forward, hitCount);
     }
 
@@ -442,12 +437,10 @@ public final class ClawCombatSystem {
                 ? Vec3.directionFromRotation(0, weapon.yaw()) : player.getLookAngle().multiply(1.0D, 0.0D, 1.0D);
         if (forward.lengthSqr() < 0.001D) forward = new Vec3(0.0D, 0.0D, 1.0D);
         forward = forward.normalize();
-        LivingEntity lockedTarget = lockedGroundSpikeTarget(player);
-        if (CombatTargeting.locked(player)!=null && lockedTarget==null) return;
-        Vec3 requested = lockedTarget == null
-                ? player.position().add(forward.scale(
-                GroundSpikeRules.BASE_CAST_DISTANCE * rangeMultiplier))
-                : CombatTargeting.aimPoint(player,player.position(),lockedTarget);
+        Entity lockedTarget=CombatTargeting.lockedEntity(player);
+        if(lockedTarget!=null&&!ExplicitTarget.visibleWithinRange(player,lockedTarget,GroundSpikeRules.MAX_LOCKED_TARGET_DISTANCE*AttackReach.scale(player)))return;
+        Vec3 requested=lockedTarget instanceof LivingEntity living?CombatTargeting.aimPoint(player,player.position(),living):
+                lockedTarget!=null?ExplicitTarget.point(player,lockedTarget):player.position().add(forward.scale(GroundSpikeRules.BASE_CAST_DISTANCE*rangeMultiplier));
         BlockPos surface = level.getHeightmapPos(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES,
                 BlockPos.containing(requested));
         double x = surface.getX() + 0.5D;
@@ -477,6 +470,7 @@ public final class ClawCombatSystem {
                 WeaponImpact.apply(player,target,WeaponMove.CLAW_GROUNDSPIKE,away.multiply(1,0,1).normalize(),firstSpike);firstSpike=false;
             }
         }
+        hitHulls(player,hitBox,clawDamage(state,14F),new HashSet<>(),Integer.MAX_VALUE);
         for (Entity loose : level.getEntities(player, hitBox,
                 entity -> entity instanceof ItemEntity || entity instanceof ExperienceOrb)) {
             Vec3 away = loose.position().subtract(x, loose.getY(), z)
@@ -531,12 +525,28 @@ public final class ClawCombatSystem {
     }
 
     /** Epic Fight already synchronizes its lock-on target to the server player patch. */
-    private static LivingEntity lockedGroundSpikeTarget(ServerPlayer player) {
-        LivingEntity target = CombatTargeting.locked(player);
-        double maxDistance = GroundSpikeRules.MAX_LOCKED_TARGET_DISTANCE*AttackReach.scale(player);
-        if (target == null || !CombatTargeting.inReach(player,target,maxDistance)
-                || !CombatTargeting.visible(player,target)) return null;
-        return target;
+    private static Vec3 attackForward(ServerPlayer player){
+        var target=CombatTargeting.lockedEntity(player);
+        if(ExplicitTarget.mechanical(target)&&ExplicitTarget.visibleWithinRange(player,target,CombatTargeting.viewRange(player)))
+            return ExplicitTarget.point(player,target).subtract(player.position()).multiply(1,0,1).normalize();
+        return player.getLookAngle().multiply(1,0,1);
+    }
+    private static int hitHulls(ServerPlayer player,AABB area,float damage,Set<Entity> alreadyHit,int limit){
+        int hits=0;
+        for(var hull:ExplicitTarget.hullsIn(player,area)){
+            if(hits>=limit)break;
+            if(alreadyHit.contains(hull))continue;
+            for(var box:ExplicitTarget.hullBoxes(hull)){
+                if(!box.touches(area))continue;
+                var point=box.contact(area);
+                if(!CombatTargeting.clearRay(player,player.getEyePosition(),point))continue;
+                if(ExplicitTarget.hurtHull(player,hull,damage,point,()->canUseClaws(ModAttachments.getData(player,ModAttachments.PLAYER_STATE)))){
+                    alreadyHit.add(hull);hits++;
+                }
+                break;
+            }
+        }
+        return hits;
     }
 
     private static void lockGroundSpikePose(ServerPlayer player) {

@@ -35,7 +35,7 @@ public final class ContactEffectsPresentation {
         if(e.getStage()!=RenderLevelStageEvent.Stage.AFTER_ENTITIES)return;
         var mc=Minecraft.getInstance();world(mc.level);if(world==null||mc.player==null)return;
         double time=ContactEffectsQueue.renderTime(world.getGameTime(),e.getPartialTick());
-        QUEUE.drain(time,p->FlyerContactPresentation.ready(p,time,e.getPartialTick()),p->show(p,time));
+        QUEUE.drain(time,p->FlyerContactPresentation.ready(p,time,e.getPartialTick())&&StalkerContactPresentation.ready(p,time,e.getPartialTick())&&BruteContactPresentation.ready(p,time,e.getPartialTick()),p->show(p,time));
     }
     @SubscribeEvent public static void debris(RenderLevelStageEvent e){
         if(e.getStage()!=RenderLevelStageEvent.Stage.AFTER_TRANSLUCENT_BLOCKS)return;
@@ -45,9 +45,9 @@ public final class ContactEffectsPresentation {
     private static void show(ContactEffectsPayload p,double time){
         var mc=Minecraft.getInstance();var level=mc.level;if(level==null)return;
         while(RECEIPTS.size()>=128)RECEIPTS.removeFirst();RECEIPTS.addLast(new Receipt(p.serial(),p.tick(),time,p.kind(),p.terrain().size(),p.sounds().size()));
-        if(p.kind()==ContactEffectsPayload.GROUND||p.kind()==ContactEffectsPayload.GUARD)CombatImpactRenderer.accept(p.flash());
+        if(p.kind()==ContactEffectsPayload.GROUND||p.kind()==ContactEffectsPayload.GUARD)CombatImpactRenderer.acceptAt(p.flash(),time);
         if(p.tissue()!=null){
-            InfectedImpactVisuals.accept(p.tissue());
+            InfectedImpactVisuals.acceptAt(p.tissue(),time);
             if(level.getEntity(p.tissue().victim()) instanceof com.codex.blacklight.entity.EncounterMob mob&&mob.kind()==com.codex.blacklight.entity.EncounterKind.ELIZABETH_GREENE){
                 if(mc.player!=null&&com.codex.blacklight.registry.ModAttachments.getData(mc.player,com.codex.blacklight.registry.ModAttachments.WEAPON_VISUAL).spec()==null&&p.tissue().attacker()==mc.player.getId()&&mc.player.position().distanceToSqr(p.flash().x(),p.flash().y(),p.flash().z())<64)
                     com.codex.blacklight.client.ClientPhysicalFeedback.accept(new com.codex.blacklight.network.PhysicalFeedbackPayload(com.codex.blacklight.network.PhysicalFeedbackPayload.Effect.CLAW_HIT,.25F));

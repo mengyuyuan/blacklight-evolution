@@ -9,6 +9,7 @@ import net.minecraft.world.phys.*;
 /** MC acquisition/crew protection adapter; not the original emotional-state AI. */
 public final class GreeneWeaponTarget {
     public static GreeneWeaponProgram mechanicalProgram(Entity target){
+        if(target instanceof BlackwatchHelicopter)return GreeneWeaponProgram.ANTI_AIR;
         if(target instanceof MilitaryVehicle v&&v.definition().id().equals("tank"))return GreeneWeaponProgram.ANTI_TANK;
         return null;
     }
@@ -19,9 +20,10 @@ public final class GreeneWeaponTarget {
         if(target==null||target==owner||target.isRemoved()||!target.isAlive()||target.level()!=owner.level()||!owner.level().hasChunkAt(target.blockPosition()))return false;
         if(target instanceof LivingEntity living){
             var root=living.getRootVehicle();
-            return !(root instanceof MilitaryVehicle)&&owner.enemy(living);
+            return !(root instanceof MilitaryVehicle)&&!(root instanceof BlackwatchHelicopter)&&owner.enemy(living);
         }
         if(target instanceof MilitaryVehicle v){if(v.health()<=0||VehicleDamageBridge.protectedHull(owner,v))return false;}
+        else if(target instanceof BlackwatchHelicopter h){if(h.health()<=0||VehicleDamageBridge.protectedAircraft(owner,h))return false;}
         else return false;
         // Saved ownership alone is not a current hostile crew. Empty vehicles do
         // not lure a boss away from the player or enable griefing parked hulls.

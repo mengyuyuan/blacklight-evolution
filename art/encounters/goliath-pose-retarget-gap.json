@@ -1,0 +1,324 @@
+{
+  "date": "2026-11-17",
+  "status": "historical_orientation_only_retarget_gap_numerically_corrected_native_acceptance_pending",
+  "evidence": [
+    {
+      "frame": 0,
+      "hands": {
+        "left": {
+          "sourceWrist": [
+            0.20045071392280756,
+            2.8516720200586576,
+            -5.986209974635979
+          ],
+          "scaledSourceWrist": [
+            -0.15159429501589003,
+            2.156625940797629,
+            -4.527174102615039
+          ],
+          "retargetedPivot": [
+            1.570445775494477,
+            3.566938968728226,
+            -3.6416703956989456
+          ],
+          "difference": [
+            1.722040070510367,
+            1.4103130279305969,
+            0.8855037069160931
+          ]
+        },
+        "right": {
+          "sourceWrist": [
+            1.539004901023771,
+            1.1827522368224117,
+            6.431528804818899
+          ],
+          "scaledSourceWrist": [
+            -1.1638988878160963,
+            0.894476692104012,
+            4.863954116004652
+          ],
+          "retargetedPivot": [
+            5.082547565630467,
+            -0.89309633381424,
+            0.6943309161584655
+          ],
+          "difference": [
+            6.246446453446563,
+            -1.787573025918252,
+            -4.169623199846186
+          ]
+        }
+      }
+    },
+    {
+      "frame": 42,
+      "hands": {
+        "left": {
+          "sourceWrist": [
+            -1.9461305832129288,
+            20.41473705924492,
+            0.28798865132518436
+          ],
+          "scaledSourceWrist": [
+            1.4717946770927357,
+            15.438995511000135,
+            0.21779636358407048
+          ],
+          "retargetedPivot": [
+            1.3017241346405122,
+            12.044518311437628,
+            1.1769577537261835
+          ],
+          "difference": [
+            -0.17007054245222353,
+            -3.394477199562507,
+            0.959161390142113
+          ]
+        },
+        "right": {
+          "sourceWrist": [
+            2.65540216542826,
+            -0.6954459307083911,
+            1.983734280062576
+          ],
+          "scaledSourceWrist": [
+            -2.0081934924251867,
+            -0.5259429289336773,
+            1.5002331186545288
+          ],
+          "retargetedPivot": [
+            3.280606953561328,
+            1.6834640442842397,
+            -1.479698998943106
+          ],
+          "difference": [
+            5.2888004459865146,
+            2.209406973217917,
+            -2.9799321175976345
+          ]
+        }
+      }
+    },
+    {
+      "frame": 48,
+      "hands": {
+        "left": {
+          "sourceWrist": [
+            1.8865162207209758,
+            0.47633216878191437,
+            -11.72920800950288
+          ],
+          "scaledSourceWrist": [
+            -1.4267102916199579,
+            0.36023438333919644,
+            -8.870414998771464
+          ],
+          "retargetedPivot": [
+            -0.519372475504225,
+            2.555561539314449,
+            -6.493624134208938
+          ],
+          "difference": [
+            0.9073378161157328,
+            2.1953271559752525,
+            2.376790864562526
+          ]
+        },
+        "right": {
+          "sourceWrist": [
+            1.8837368107723995,
+            2.9441488354053567,
+            5.468109982450312
+          ],
+          "scaledSourceWrist": [
+            -1.4246083151117734,
+            2.2265631206332475,
+            4.135352085491319
+          ],
+          "retargetedPivot": [
+            1.4839970836331204,
+            -1.5155287355997928,
+            1.0763718982403225
+          ],
+          "difference": [
+            2.9086053987448937,
+            -3.7420918562330403,
+            -3.0589801872509965
+          ]
+        }
+      }
+    },
+    {
+      "frame": 49,
+      "hands": {
+        "left": {
+          "sourceWrist": [
+            1.8832202966488403,
+            1.9054816762574072,
+            -11.725641466437464
+          ],
+          "scaledSourceWrist": [
+            -1.4242176924350347,
+            1.4410532430888547,
+            -8.867717739325165
+          ],
+          "retargetedPivot": [
+            -0.54642216709667,
+            2.9592266311792113,
+            -6.720069413207941
+          ],
+          "difference": [
+            0.8777955253383647,
+            1.5181733880903565,
+            2.147648326117224
+          ]
+        },
+        "right": {
+          "sourceWrist": [
+            0.9421884854294308,
+            3.9126522722759383,
+            5.542810733521714
+          ],
+          "scaledSourceWrist": [
+            -0.7125462235857485,
+            2.95901047818869,
+            4.191845811426301
+          ],
+          "retargetedPivot": [
+            1.6205211830619288,
+            -1.3380008346951509,
+            1.8390467163317628
+          ],
+          "difference": [
+            2.333067406647677,
+            -4.297011312883841,
+            -2.3527990950945386
+          ]
+        }
+      }
+    },
+    {
+      "frame": 52,
+      "hands": {
+        "left": {
+          "sourceWrist": [
+            1.8584647444996163,
+            1.1733117783446083,
+            -11.798814626418457
+          ],
+          "scaledSourceWrist": [
+            -1.4054958809615374,
+            0.8873371832463858,
+            -8.923056198262634
+          ],
+          "retargetedPivot": [
+            -0.4762122549703536,
+            2.635559032776727,
+            -6.674026249046474
+          ],
+          "difference": [
+            0.9292836259911839,
+            1.7482218495303412,
+            2.24902994921616
+          ]
+        },
+        "right": {
+          "sourceWrist": [
+            -0.006486916509386043,
+            5.303346639338552,
+            6.305456282473217
+          ],
+          "scaledSourceWrist": [
+            0.0049058420188316685,
+            4.010746977558867,
+            4.768609605766446
+          ],
+          "retargetedPivot": [
+            2.0363145926314794,
+            -0.6299620479354049,
+            2.347152249963719
+          ],
+          "difference": [
+            2.031408750612648,
+            -4.640709025494272,
+            -2.4214573558027275
+          ]
+        }
+      }
+    },
+    {
+      "frame": 88,
+      "hands": {
+        "left": {
+          "sourceWrist": [
+            0.20045071392280756,
+            2.8516720200586576,
+            -5.986209974635979
+          ],
+          "scaledSourceWrist": [
+            -0.15159429501589003,
+            2.156625940797629,
+            -4.527174102615039
+          ],
+          "retargetedPivot": [
+            1.570445775494477,
+            3.566938968728226,
+            -3.6416703956989456
+          ],
+          "difference": [
+            1.722040070510367,
+            1.4103130279305969,
+            0.8855037069160931
+          ]
+        },
+        "right": {
+          "sourceWrist": [
+            1.539004901023771,
+            1.1827522368224117,
+            6.431528804818899
+          ],
+          "scaledSourceWrist": [
+            -1.1638988878160963,
+            0.894476692104012,
+            4.863954116004652
+          ],
+          "retargetedPivot": [
+            5.082547565630467,
+            -0.89309633381424,
+            0.6943309161584655
+          ],
+          "difference": [
+            6.246446453446563,
+            -1.787573025918252,
+            -4.169623199846186
+          ]
+        }
+      }
+    }
+  ],
+  "source": "D:/PrototypeReference/p2/input/p2/behemoth.p3d",
+  "clip": "behemoth_com_biped_front_slam_to_biped",
+  "method": "Decode source world joints; apply exactly the Motion_Root skin rebase; mirror source X and apply pixelsPerSourceUnit/16. Compare with the wrist pivots from the existing retarget table using the same Rz*Ry*Rx hierarchical matrices as SourceBossMotion.",
+  "finding": "At contact frame 48, the source left wrist is close to ground but the retargeted wrist is about 2.56 blocks high; the right retargeted wrist is about 1.52 blocks below ground. A high raised hand during anticipation is expected and is not itself a defect.",
+  "fixLocations": [
+    "tools/export_encounter_source_motion.py mapping_for/export: reference orientation correction, arm aim chains and Character_Root positional retarget",
+    "src/main/java/com/codex/blacklight/combat/SourceBossMotion.java transforms/actionPose: preserve the shared server/render transform convention",
+    "src/main/java/com/codex/blacklight/client/model/SourceBossPose.java: enable only after pose/support acceptance",
+    "src/main/java/com/codex/blacklight/entity/EncounterMob.java updateParts: leg armor must follow any newly enabled source pose"
+  ],
+  "nextAcceptance": [
+    "Compare source and retargeted shoulders/elbows/wrists across the entire slam, including source root travel removal",
+    "Fix support/contact position while preserving actual source movement; do not merely clamp one rendered joint",
+    "Revalidate visible armor/hit volumes against the newly posed legs",
+    "Inspect a real player fight and dodge/cover timing after compilation is available"
+  ],
+  "tests": "Source binary prefix assertions, all 89 sampled Motion_Root transforms, resource JSON consistency and git diff whitespace checks only; Java/MC runtime not executed in this stage.",
+  "resolution": {
+    "report": "goliath-bind-correction.json",
+    "historicalEvidence": "Original evidence below deliberately retained; it describes the pre-fix pivots, not the current rebound pose.",
+    "fix": "Source ancestors, ROT/TRAN/SCL, verified native reciprocal-parent-scale compensation and consistent authored bind fit for all clips; SourceBossPose enables GoliathMotion. goliath-bind-correction.json supersedes earlier rotation/translation-only point values.",
+    "remaining": "Original decision/phase clocks, giant-hand skin/support/controller fit and native validation. The arm-side/unused-finger evidence and slender-hand bind correction are now in goliath-finger-retarget-gap.json."
+  },
+  "historicalRuntimeDecision": "Keep SourceBossPose Goliath gate closed. Existing EncounterAnatomyPose visual is explicitly retimed by GoliathSlam.authoredPoseAge to the source contact/recovery clock. This does not reproduce the original motion."
+}

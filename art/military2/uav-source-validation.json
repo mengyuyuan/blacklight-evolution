@@ -1,0 +1,213 @@
+{
+  "schema": 1,
+  "createdLocal": "2026-11-16T15:26:44",
+  "status": "SOURCE MODEL / LAMPS / WRECK CHECKPOINT PASSED; full UAV and broader goal remain in progress",
+  "source": {
+    "auditPath": "D:\\PrototypeReference\\p1\\uav-source-audit.json",
+    "auditSha256": "e5335f093e72d0f48a9e48cdd6ab327e0947c1cf2db8f46ee1e61c60a2b768d5",
+    "records": 497,
+    "coverage": {
+      "independentEngageUavRecords": 164,
+      "fullyConsumedFigTrees": 132,
+      "decodedUavRecords": 166,
+      "decodeErrors": [],
+      "readerCorrections": "Overlapping track/condition enum hashes now resolve by containing property group. Speed and MotionState are tracks; Lua death hook is a 128-byte LuaTrack; AnyPlayerDistance includes its 12-byte Offset deserialization."
+    },
+    "remote": "WIN-20251114GJY / 192.168.0.100; existing strict SSH host key verified; rediscovery helper D:/CodexCache/ssh/find-laptop.ps1",
+    "transferManifestSha256": "6d29b4cc240da66203b11ae10dca8f9716c5b735be38caa7014f44f36e71d4cf"
+  },
+  "confirmed": [
+    "Original alert / seeing / idle effects are lightGlowRed / Yellow / Green at (-.155,.428,-.964); raw hashes and locator independently re-read. HUD PULSE_FAST is separate.",
+    "Original skeleton has one rotor at Y=.58468759 and fixed upper sensor, annular body and underside guards. No original camera gimbal.",
+    "engage_uav ordinary-target selection uses 4..10 standoff, height difference 1..5, 20 attempts and a 3-second opportunity track. Minecraft velocity/acquisition/cooldowns remain adaptations.",
+    "Death spawns uav001Husk at time zero; initial source fire .166667..26.6667s with 6.66667s fade; second smoke ends 83.3333s; fire sound stops at 27s.",
+    "Track/condition enum hashes overlap. Resolving the containing property group fixes Speed, MotionState and Lua; reading AnyPlayerDistance.Offset consumes the last 12 bytes. 166 selected UAV records now decode with no schema-length errors.",
+    "The 128-byte death Lua track contains ai_patrol_AgentKilled / context / gameObject. This is not proof of the complete viral-detection engine algorithm."
+  ],
+  "implementation": [
+    "Authored 225-cube single-rotor model; three mutually exclusive emissive lamps at the source coordinate. Open bezel fixes an initial hidden-glass defect.",
+    "Loaded, collision-checked, target-relative recon movement; transport landing reservations begin during SPIN_UP/CLIMB. A scanner already overlapping a new reservation takes a checked axis-aligned exit, without entering deeper or weakening helicopter collision checks.",
+    "One accepted death emits one bounded shared cosmetic wreck receipt and replaces the live UAV; no default biological death roll/poof. Ring body, detached blade/sensor, falling wreck, fire, smoke, electrical sparks, fade and cleanup.",
+    "Source timing converted to 20 ticks/second: fire 4..534 then fade to 667; sound stops by 540; smoke to 1667; cosmetic cleanup at 1800. Per-client scene cap 8 / receipt dedupe 64. Submerged presentation uses bubbles and suppresses fire.",
+    "Protocol versions advanced to standalone-68-uav-wreck / forge-1.20.1-28-uav-wreck for the appended UAV chassis type. Existing truck/APC/tank/helicopter ordinal values and 360-tick lifetimes preserved."
+  ],
+  "audioReference": {
+    "auditPath": "D:\\PrototypeReference\\p1\\private\\uav\\audio-audit.json",
+    "auditSha256": "f6b890d82b3efe52d007de0a89a2bec9b5ab575a47df4cb1c5f28fecbb15cca9",
+    "samples": [
+      {
+        "name": "uav_alerted",
+        "seconds": 2.466,
+        "sampleRate": 48000,
+        "pcmSha256": "4f8a474b69d2a51dea07d9be618b08d3d27934097e007b80a5d18682abcb0d9c",
+        "crossCheckRoundingLSB": 10
+      },
+      {
+        "name": "uav_idle_01",
+        "seconds": 1.5473333333333332,
+        "sampleRate": 48000,
+        "pcmSha256": "3b3c74b2d3e5b5114ebc8f64ecfa8749716fd18c5202924eb2b40527e4a2a8e0",
+        "crossCheckRoundingLSB": 9
+      },
+      {
+        "name": "uav_seeing_01",
+        "seconds": 1.0246666666666666,
+        "sampleRate": 48000,
+        "pcmSha256": "c1bba5072332b59116633bff30502023922684d3bb44fce912210197258b3f95",
+        "crossCheckRoundingLSB": 11
+      },
+      {
+        "name": "uav_start_scan",
+        "seconds": 0.53,
+        "sampleRate": 48000,
+        "pcmSha256": "be7d3e21a324b7d3ec793103d5c11924caaeb9512de7a2316701f5762b721cd3",
+        "crossCheckRoundingLSB": 11
+      }
+    ],
+    "method": "RADP private decoder checked against vgmstream 6802153 layout and an independent FFmpeg RAD decode. Shift/add versus multiply rounding differs by at most 11 int16 LSB; multiply variant matches FFmpeg exactly. No subjective listening review claimed.",
+    "runtime": "Current five runtime cues are still authored synthesis. Original four-role state audio mapping and comparison remain pending."
+  },
+  "platforms": {
+    "neo": {
+      "server": {
+        "passed": 8,
+        "sha256": "8f012cf7230edb74d2db9423f3c31bbf29679591a3024282ec7b7d4f61b8d377",
+        "scope": "Acquisition, six real crew/four target handoffs, wall, damage/death, lease budget, no landing, disabled/forged request, infected player/disguise, and new reservation-edge retreat coverage (eight scenarios total)"
+      },
+      "vehicleAndHelicopterRegression": {
+        "passed": 48,
+        "sha256": "625df0262b0c8687e88ac0dab1d2665e868d25588feeb3ee746e98201ec1bfa1"
+      },
+      "earlierEncounterAndHelicopterRegression": {
+        "passed": 132,
+        "sha256": "09bd50f9347683484ce786247035a7255f046cb2ca3bf51322a073cf14cd54ea",
+        "scope": "Completed after source-like bounds/flight; before latest cosmetic wreck and reservation-exit amendment"
+      },
+      "destructionUnit": {
+        "passed": 5,
+        "sha256": "197edcaa1e908ae2a59bf559c71b1accdc84da8fc99a202387e0c66ad0099848"
+      },
+      "native": {
+        "frames": 960,
+        "reviewed": 24,
+        "lampStates": [
+          "green",
+          "red",
+          "yellow"
+        ],
+        "nightRed": true,
+        "maxSourceLampLocatorError": 1.2114703781004169e-05,
+        "lowestWreckVertex": 80.99699067696929,
+        "results": [
+          {
+            "case": "scan_and_sortie",
+            "actualCrew": 6,
+            "deliveredWithTarget": 4,
+            "cooldown": 2983
+          },
+          {
+            "case": "occlusion",
+            "preventedDispatch": true
+          },
+          {
+            "case": "destroyed",
+            "preventedDispatch": true
+          },
+          {
+            "case": "submerged_destroyed",
+            "preventedDispatch": true
+          }
+        ],
+        "evidenceSha256": "f12d60a897ec27fe520be5cca26934286f48b8bcb2f46bc5854e775c024f1e67",
+        "reviewSha256": "496e22b3ff902d4b0032cda780f9230855d59a182b0e7b344efa22bd199642ea",
+        "scope": "Model, exposed lamps, native camera locator, transport, death/water, once-only receipt and full 1800-tick cleanup. Native run precedes the final reservation-exit amendment, which is covered by the eight server scenarios."
+      },
+      "files": {
+        "tools/author_uav_model.py": "3dccf83163db282f89506d2eca5b324109885164eae565382973fadcf40ccf51",
+        "src/main/java/com/codex/blacklight/entity/MilitaryUav.java": "a723e3abdb73c2ce8140a836acfc97572d372a3dbaae7b025f289196fa6e0342",
+        "src/main/java/com/codex/blacklight/client/model/UavWreckModel.java": "98c1678712bdfd8e39e89297017aef518aca1925899daf19642a932939fa9c8f",
+        "src/main/java/com/codex/blacklight/client/renderer/UavRenderer.java": "f82e82d651b6203d20d0d7c9785a2bbc4fb15e43ae4acf7e23877ab967ec1dbd",
+        "src/main/java/com/codex/blacklight/client/renderer/VehicleDestructionVisuals.java": "c7fe89ed6eceed858c195b116d98bd9905cc7c146d69408beb97c9204abb2fa4",
+        "src/main/java/com/codex/blacklight/military/vehicle/VehicleDestruction.java": "def18fd8e9054e0764c4e5e19be1a61f78b282d26de88523f55ba79c9ca4e07e",
+        "src/main/java/com/codex/blacklight/network/ModNetwork.java": "5576674fdd0e42ef3285feee9515f4560cde3ae6b78255cd1a1582c97263ac53",
+        "src/uavTest/java/com/codex/blacklight/gametest/UavReconGameTest.java": "5d3f8ddef0efd69d8a1e9eeb21c9e134335c138d86d825002caf065713cd1185",
+        "src/uavVisual/java/com/codex/blacklight/client/UavReconVisual.java": "8430170658e5ec98d10b5747380c77fd285ebe2a23174d652db79ebcf7d48a84",
+        "art/military2/uav-model-source.json": "e81bb7d56e3b1f80fa07db2187cfea2c4187fea47d637986755b5651caa68620"
+      }
+    },
+    "forge": {
+      "server": {
+        "passed": 8,
+        "sha256": "b7c8c95282d2e54741e1e4a293b5947bc051595fdf7fa8fe9be76a4e49c5fca6",
+        "scope": "Acquisition, six real crew/four target handoffs, wall, damage/death, lease budget, no landing, disabled/forged request, infected player/disguise, and new reservation-edge retreat coverage (eight scenarios total)"
+      },
+      "vehicleAndHelicopterRegression": {
+        "passed": 48,
+        "sha256": "8b14f5ecf57e16242c6801dadd24be1363b5beb4fb1d8cee530126a256337635"
+      },
+      "earlierEncounterAndHelicopterRegression": {
+        "passed": 132,
+        "sha256": "c68a0f4b1b38622b12218175c5938bee713ef68e7fc63a4aba34f01a4e95d1ac",
+        "scope": "Completed after source-like bounds/flight; before latest cosmetic wreck and reservation-exit amendment"
+      },
+      "destructionUnit": {
+        "passed": 5,
+        "sha256": "c1af6804ff3ea6d8bd3118ec0360ff9dd449ab61f52a170967ec2cbcf5877abc"
+      },
+      "native": {
+        "frames": 960,
+        "reviewed": 24,
+        "lampStates": [
+          "green",
+          "red",
+          "yellow"
+        ],
+        "nightRed": true,
+        "maxSourceLampLocatorError": 7.00930331965363e-05,
+        "lowestWreckVertex": 80.99699067696929,
+        "results": [
+          {
+            "case": "scan_and_sortie",
+            "actualCrew": 6,
+            "deliveredWithTarget": 4,
+            "cooldown": 2983
+          },
+          {
+            "case": "occlusion",
+            "preventedDispatch": true
+          },
+          {
+            "case": "destroyed",
+            "preventedDispatch": true
+          },
+          {
+            "case": "submerged_destroyed",
+            "preventedDispatch": true
+          }
+        ],
+        "evidenceSha256": "a5c7c9227c3cc6d07f39b2b0ff58b3968d97fa05c6ede881aa2a15a76668a88e",
+        "reviewSha256": "f72bbed1b3b75fb8e4b1dbe6bb0e7bfeb152aab9b51b5394794c3f9ef8eff0c5",
+        "scope": "Model, exposed lamps, native camera locator, transport, death/water, once-only receipt and full 1800-tick cleanup. Native run precedes the final reservation-exit amendment, which is covered by the eight server scenarios."
+      },
+      "files": {
+        "tools/author_uav_model.py": "3dccf83163db282f89506d2eca5b324109885164eae565382973fadcf40ccf51",
+        "src/main/java/com/codex/blacklight/entity/MilitaryUav.java": "adc4a45e915affc16e87d05565c018c60bb24411973ef9be26d309f30f6a21ca",
+        "src/main/java/com/codex/blacklight/client/model/UavWreckModel.java": "98c1678712bdfd8e39e89297017aef518aca1925899daf19642a932939fa9c8f",
+        "src/main/java/com/codex/blacklight/client/renderer/UavRenderer.java": "f82e82d651b6203d20d0d7c9785a2bbc4fb15e43ae4acf7e23877ab967ec1dbd",
+        "src/main/java/com/codex/blacklight/client/renderer/VehicleDestructionVisuals.java": "a2cb7b0196f02a0ae77b16c4e383706a42e2810aadbcf1ee272edd8c2b3573a7",
+        "src/main/java/com/codex/blacklight/military/vehicle/VehicleDestruction.java": "def18fd8e9054e0764c4e5e19be1a61f78b282d26de88523f55ba79c9ca4e07e",
+        "src/main/java/com/codex/blacklight/network/ModNetwork.java": "4f67c5c93a4c1fa51bbf81f48a2d43163bd4e2ac64ee2040c34047da9c916d19",
+        "src/uavTest/java/com/codex/blacklight/gametest/UavReconGameTest.java": "a54d6e972f9b8b7a8c0ce4301b7af32bf80da212249fd5b8d25725abfc6af059",
+        "src/uavVisual/java/com/codex/blacklight/client/UavReconVisual.java": "ee9333ca3a19976680b0e3865de1eb95d464422ae878fa030a236191521045cd",
+        "art/military2/uav-model-source.json": "e81bb7d56e3b1f80fa07db2187cfea2c4187fea47d637986755b5651caa68620"
+      }
+    }
+  },
+  "remaining": [
+    "Align the authored audio with original UAV_idle / UAV_seeing / UAV_servotalk / UAV_alert state roles; compare listening and sample characteristics. Current five cues are not source-identical audio.",
+    "Original helicopter-target standoff 20..35 variant and full virus detection / dispatch engine conditions.",
+    "Original light sprite internal animation, full emitter semantics and second Husk final-state activation. Current bounded cosmetic debris/electric placement and renderer primitives are adaptations; no unproven timed second explosion.",
+    "Multiplayer / moving target / terrain coverage beyond the completed tests. Continue all other creatures, Greene/Goliath, soldiers and helicopter source gaps under the active goal."
+  ],
+  "release": "No release JAR, install, commit, publish or user-world modification."
+}

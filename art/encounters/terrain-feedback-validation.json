@@ -1,0 +1,706 @@
+{
+  "date": "2026-11-14",
+  "status": "focused_checks_passed",
+  "tests": [
+    {
+      "platform": "neo",
+      "unitTests": 45,
+      "requiredGameTests": 56
+    },
+    {
+      "platform": "forge",
+      "unitTests": 45,
+      "requiredGameTests": 56
+    }
+  ],
+  "changes": [
+    "Player heavy punches, Hunter slam and Juggernaut slam share the same terrain response.",
+    "Surface-block rise, cracks, local material fragments and supported loose-drop impulse.",
+    "Accepted CRUSH hits receive pressure flash plus the existing directional tissue effect; frontal guard flashes follow the fists."
+  ],
+  "visual": {
+    "platform": "Forge 1.20.1",
+    "directory": "D:/CodexCache/creature-combat-qa/terrain-impact-frames/",
+    "frames": 620,
+    "scenes": [
+      {
+        "scene": 0,
+        "frames": 73,
+        "maxGround": 0,
+        "maxBody": 1,
+        "maxTissue": 1,
+        "maxTerrain": 0,
+        "maxDebris": 0
+      },
+      {
+        "scene": 1,
+        "frames": 82,
+        "maxGround": 1,
+        "maxBody": 1,
+        "maxTissue": 1,
+        "maxTerrain": 95,
+        "maxDebris": 8
+      },
+      {
+        "scene": 2,
+        "frames": 58,
+        "maxGround": 0,
+        "maxBody": 1,
+        "maxTissue": 0,
+        "maxTerrain": 0,
+        "maxDebris": 0
+      },
+      {
+        "scene": 3,
+        "frames": 103,
+        "maxGround": 0,
+        "maxBody": 1,
+        "maxTissue": 0,
+        "maxTerrain": 0,
+        "maxDebris": 0
+      },
+      {
+        "scene": 4,
+        "frames": 74,
+        "maxGround": 0,
+        "maxBody": 0,
+        "maxTissue": 0,
+        "maxTerrain": 0,
+        "maxDebris": 0
+      },
+      {
+        "scene": 5,
+        "frames": 75,
+        "maxGround": 0,
+        "maxBody": 0,
+        "maxTissue": 0,
+        "maxTerrain": 0,
+        "maxDebris": 0
+      },
+      {
+        "scene": 6,
+        "frames": 82,
+        "maxGround": 1,
+        "maxBody": 1,
+        "maxTissue": 1,
+        "maxTerrain": 61,
+        "maxDebris": 8
+      },
+      {
+        "scene": 7,
+        "frames": 73,
+        "maxGround": 0,
+        "maxBody": 0,
+        "maxTissue": 0,
+        "maxTerrain": 0,
+        "maxDebris": 0
+      }
+    ],
+    "maxFistErrorBlocks": 0.000011400258294862144,
+    "maxVisualLeadTicks": 0,
+    "review": "Contact sheets inspected around combo hits, slam, guard/break, dodge, wall/slab terrain and invulnerable target; sub-tick captures around fist contacts. Receipts independently audit simultaneous custom visual/audio release.",
+    "earlyEffectFrames": [],
+    "presentations": [
+      {
+        "serial": 1,
+        "tick": 62068,
+        "shown": 62068.00000023842,
+        "kind": 1,
+        "surfaceCount": 0,
+        "soundCount": 1,
+        "scene": 0,
+        "firstImage": "0-hammer-017.png",
+        "firstObservedPoseAge": 17,
+        "contactAge": 17
+      },
+      {
+        "serial": 2,
+        "tick": 62092,
+        "shown": 62092.400000572205,
+        "kind": 1,
+        "surfaceCount": 0,
+        "soundCount": 1,
+        "scene": 0,
+        "firstImage": "0-hammer-042-sub2.png",
+        "firstObservedPoseAge": 41.72,
+        "contactAge": 41
+      },
+      {
+        "serial": 3,
+        "tick": 62203,
+        "shown": 62203.10000228882,
+        "kind": 0,
+        "surfaceCount": 48,
+        "soundCount": 2,
+        "scene": 1,
+        "firstImage": "1-slam-043.png",
+        "firstObservedPoseAge": 43.100002,
+        "contactAge": 43
+      },
+      {
+        "serial": 4,
+        "tick": 62203,
+        "shown": 62203.10000228882,
+        "kind": 1,
+        "surfaceCount": 0,
+        "soundCount": 1,
+        "scene": 1,
+        "firstImage": "1-slam-043.png",
+        "firstObservedPoseAge": 43.100002,
+        "contactAge": 43
+      },
+      {
+        "serial": 5,
+        "tick": 62292,
+        "shown": 62292.30000305176,
+        "kind": 3,
+        "surfaceCount": 0,
+        "soundCount": 1,
+        "scene": 2,
+        "firstImage": "2-guard-016.png",
+        "firstObservedPoseAge": 16.300003,
+        "contactAge": 16
+      },
+      {
+        "serial": 6,
+        "tick": 62386,
+        "shown": 62386.26000356674,
+        "kind": 3,
+        "surfaceCount": 0,
+        "soundCount": 1,
+        "scene": 3,
+        "firstImage": "3-guard-016.png",
+        "firstObservedPoseAge": 16.260004,
+        "contactAge": 16
+      },
+      {
+        "serial": 7,
+        "tick": 62398,
+        "shown": 62398.460003852844,
+        "kind": 3,
+        "surfaceCount": 0,
+        "soundCount": 1,
+        "scene": 3,
+        "firstImage": "3-guard-029.png",
+        "firstObservedPoseAge": 28.800003,
+        "contactAge": 28
+      },
+      {
+        "serial": 8,
+        "tick": 62800,
+        "shown": 62800.20000958443,
+        "kind": 0,
+        "surfaceCount": 45,
+        "soundCount": 2,
+        "scene": 6,
+        "firstImage": "6-slam-043.png",
+        "firstObservedPoseAge": 43.20001,
+        "contactAge": 43
+      },
+      {
+        "serial": 9,
+        "tick": 62800,
+        "shown": 62800.20000958443,
+        "kind": 1,
+        "surfaceCount": 0,
+        "soundCount": 1,
+        "scene": 6,
+        "firstImage": "6-slam-043.png",
+        "firstObservedPoseAge": 43.20001,
+        "contactAge": 43
+      }
+    ],
+    "hits": [
+      {
+        "scene": 0,
+        "move": "HAMMER",
+        "age": 17,
+        "damage": 11.900001,
+        "contact": {
+          "x": -0.2059711217880249,
+          "y": 82.33245802879334,
+          "z": 2.724569082260132
+        }
+      },
+      {
+        "scene": 0,
+        "move": "HAMMER",
+        "age": 41,
+        "damage": 11.900001,
+        "contact": {
+          "x": -0.44999998807907104,
+          "y": 82.39999997615814,
+          "z": 2.550000011920929
+        }
+      },
+      {
+        "scene": 1,
+        "move": "SLAM",
+        "age": 43,
+        "damage": 3.5,
+        "contact": {
+          "x": -0.44999998807907104,
+          "y": 81,
+          "z": 2.550000011920929
+        }
+      },
+      {
+        "scene": 6,
+        "move": "SLAM",
+        "age": 43,
+        "damage": 3.5,
+        "contact": {
+          "x": -0.44999998807907104,
+          "y": 81,
+          "z": 2.550000011920929
+        }
+      }
+    ],
+    "groundHits": [
+      {
+        "scene": 1,
+        "age": 43
+      },
+      {
+        "scene": 6,
+        "age": 43
+      }
+    ],
+    "evidenceSha256": "faab629b672ae5f36071968010a6f61cf74f416725e739b006025cac6941fa6a"
+  },
+  "hunter": {
+    "directory": "D:/CodexCache/creature-combat-qa/hunter-source-frames/",
+    "frames": 266,
+    "maxPalmErrorBlocks": 0.000012092212973812433,
+    "presentations": [
+      {
+        "serial": 1,
+        "tick": 63018,
+        "shown": 63018.239996790886,
+        "kind": 2,
+        "surfaceCount": 0,
+        "soundCount": 1,
+        "scene": 0,
+        "firstImage": "0-swipe-012.png",
+        "firstObservedPoseAge": 12.239997,
+        "contactAge": 12
+      },
+      {
+        "serial": 2,
+        "tick": 63096,
+        "shown": 63096.239996910095,
+        "kind": 2,
+        "surfaceCount": 0,
+        "soundCount": 1,
+        "scene": 1,
+        "firstImage": "1-barrage-013.png",
+        "firstObservedPoseAge": 13.239997,
+        "contactAge": 13
+      },
+      {
+        "serial": 3,
+        "tick": 63109,
+        "shown": 63109.13999700546,
+        "kind": 2,
+        "surfaceCount": 0,
+        "soundCount": 1,
+        "scene": 1,
+        "firstImage": "1-barrage-026.png",
+        "firstObservedPoseAge": 26.139997,
+        "contactAge": 26
+      },
+      {
+        "serial": 4,
+        "tick": 63125,
+        "shown": 63125.25999701023,
+        "kind": 2,
+        "surfaceCount": 0,
+        "soundCount": 1,
+        "scene": 1,
+        "firstImage": "1-barrage-042.png",
+        "firstObservedPoseAge": 42.26,
+        "contactAge": 42
+      },
+      {
+        "serial": 5,
+        "tick": 63193,
+        "shown": 63193.259997844696,
+        "kind": 1,
+        "surfaceCount": 0,
+        "soundCount": 1,
+        "scene": 2,
+        "firstImage": "2-slam-013.png",
+        "firstObservedPoseAge": 13.259998,
+        "contactAge": 13
+      },
+      {
+        "serial": 6,
+        "tick": 63195,
+        "shown": 63195.3399977684,
+        "kind": 0,
+        "surfaceCount": 48,
+        "soundCount": 2,
+        "scene": 2,
+        "firstImage": "2-slam-015-sub1.png",
+        "firstObservedPoseAge": 15.339998,
+        "contactAge": 15
+      },
+      {
+        "serial": 7,
+        "tick": 63289,
+        "shown": 63289.29999876022,
+        "kind": 2,
+        "surfaceCount": 0,
+        "soundCount": 1,
+        "scene": 3,
+        "firstImage": "3-leap-026.png",
+        "firstObservedPoseAge": 26.3,
+        "contactAge": 26
+      }
+    ],
+    "groundHits": [
+      {
+        "scene": 2,
+        "age": 15,
+        "contact": {
+          "x": -0.5465640425682068,
+          "y": 81,
+          "z": 1.1574344635009766
+        }
+      }
+    ],
+    "hits": [
+      {
+        "scene": 0,
+        "move": "SWIPE",
+        "age": 12,
+        "damage": 28,
+        "contact": {
+          "x": -0.44999998807907104,
+          "y": 82.37240082979203,
+          "z": 1.6945643424987793
+        }
+      },
+      {
+        "scene": 1,
+        "move": "BARRAGE",
+        "age": 13,
+        "damage": 21,
+        "contact": {
+          "x": 0.44999998807907104,
+          "y": 82.39999997615814,
+          "z": 1.7779807448387146
+        }
+      },
+      {
+        "scene": 1,
+        "move": "BARRAGE",
+        "age": 26,
+        "damage": 21,
+        "contact": {
+          "x": -0.1614609882235527,
+          "y": 82.39999997615814,
+          "z": 1.1497988104820251
+        }
+      },
+      {
+        "scene": 1,
+        "move": "BARRAGE",
+        "age": 42,
+        "damage": 21,
+        "contact": {
+          "x": 0.16389395808801055,
+          "y": 82.39810461759568,
+          "z": 1.050000011920929
+        }
+      },
+      {
+        "scene": 2,
+        "move": "SLAM",
+        "age": 13,
+        "damage": 44.8,
+        "contact": {
+          "x": -0.2733854502439499,
+          "y": 82.39999997615814,
+          "z": 1.2503165006637573
+        }
+      },
+      {
+        "scene": 3,
+        "move": "LEAP",
+        "age": 26,
+        "damage": 35,
+        "contact": {
+          "x": 0.34463098272681236,
+          "y": 82.39999997615814,
+          "z": 5.346151154908902
+        }
+      }
+    ],
+    "evidenceSha256": "19b677cae50ec36c358bfb407deb6ad634ef2c49290ea194ca6b13b2245451e2"
+  },
+  "native": [
+    {
+      "platform": "NeoForge 1.21.1",
+      "kind": "terrain",
+      "directory": "D:/CodexCache/creature-combat-qa/neo-terrain-frames/",
+      "frames": 617,
+      "maxPoseErrorBlocks": 0.000012248942683870951,
+      "maxPresentationDelayTicks": 1.0199978351593018,
+      "presentations": [
+        {
+          "serial": 1,
+          "tick": 125777,
+          "shown": 125777.37999629974,
+          "kind": 1,
+          "surfaceCount": 0,
+          "soundCount": 1,
+          "scene": 0,
+          "firstImage": "0-hammer-018-sub1.png",
+          "firstObservedPoseAge": 17.379997,
+          "contactAge": 17
+        },
+        {
+          "serial": 2,
+          "tick": 125801,
+          "shown": 125801.03999638557,
+          "kind": 1,
+          "surfaceCount": 0,
+          "soundCount": 1,
+          "scene": 0,
+          "firstImage": "0-hammer-041.png",
+          "firstObservedPoseAge": 41.039997,
+          "contactAge": 41
+        },
+        {
+          "serial": 3,
+          "tick": 125912,
+          "shown": 125912.55999708176,
+          "kind": 0,
+          "surfaceCount": 48,
+          "soundCount": 2,
+          "scene": 1,
+          "firstImage": "1-slam-044-sub1.png",
+          "firstObservedPoseAge": 43.559998,
+          "contactAge": 43
+        },
+        {
+          "serial": 4,
+          "tick": 125912,
+          "shown": 125912.55999708176,
+          "kind": 1,
+          "surfaceCount": 0,
+          "soundCount": 1,
+          "scene": 1,
+          "firstImage": "1-slam-044-sub1.png",
+          "firstObservedPoseAge": 43.559998,
+          "contactAge": 43
+        },
+        {
+          "serial": 5,
+          "tick": 126002,
+          "shown": 126003.01999783516,
+          "kind": 3,
+          "surfaceCount": 0,
+          "soundCount": 1,
+          "scene": 2,
+          "firstImage": "2-guard-017.png",
+          "firstObservedPoseAge": 17.019999,
+          "contactAge": 16
+        },
+        {
+          "serial": 6,
+          "tick": 126096,
+          "shown": 126096.0599989891,
+          "kind": 3,
+          "surfaceCount": 0,
+          "soundCount": 1,
+          "scene": 3,
+          "firstImage": "3-guard-017.png",
+          "firstObservedPoseAge": 16.06,
+          "contactAge": 16
+        },
+        {
+          "serial": 7,
+          "tick": 126108,
+          "shown": 126108.15999913216,
+          "kind": 3,
+          "surfaceCount": 0,
+          "soundCount": 1,
+          "scene": 3,
+          "firstImage": "3-guard-029.png",
+          "firstObservedPoseAge": 28.5,
+          "contactAge": 28
+        },
+        {
+          "serial": 8,
+          "tick": 126510,
+          "shown": 126510.660004735,
+          "kind": 0,
+          "surfaceCount": 45,
+          "soundCount": 2,
+          "scene": 6,
+          "firstImage": "6-slam-044-sub1.png",
+          "firstObservedPoseAge": 43.660004,
+          "contactAge": 43
+        },
+        {
+          "serial": 9,
+          "tick": 126510,
+          "shown": 126510.660004735,
+          "kind": 1,
+          "surfaceCount": 0,
+          "soundCount": 1,
+          "scene": 6,
+          "firstImage": "6-slam-044-sub1.png",
+          "firstObservedPoseAge": 43.660004,
+          "contactAge": 43
+        }
+      ],
+      "evidenceSha256": "6bd1e03539bd9e6366b2b4aadc63356e3a715b10760770fb80cd8b694cfb73b9"
+    },
+    {
+      "platform": "NeoForge 1.21.1",
+      "kind": "hunter",
+      "directory": "D:/CodexCache/creature-combat-qa/neo-hunter-frames/",
+      "frames": 265,
+      "maxPoseErrorBlocks": 0.00021840493324389073,
+      "maxPresentationDelayTicks": 0.3400062322616577,
+      "presentations": [
+        {
+          "serial": 1,
+          "tick": 126733,
+          "shown": 126733.20000457764,
+          "kind": 2,
+          "surfaceCount": 0,
+          "soundCount": 1,
+          "scene": 0,
+          "firstImage": "0-swipe-012.png",
+          "firstObservedPoseAge": 12.200005,
+          "contactAge": 12
+        },
+        {
+          "serial": 2,
+          "tick": 126811,
+          "shown": 126811.06000494957,
+          "kind": 2,
+          "surfaceCount": 0,
+          "soundCount": 1,
+          "scene": 1,
+          "firstImage": "1-barrage-013.png",
+          "firstObservedPoseAge": 13.060005,
+          "contactAge": 13
+        },
+        {
+          "serial": 3,
+          "tick": 126824,
+          "shown": 126824.04000496864,
+          "kind": 2,
+          "surfaceCount": 0,
+          "soundCount": 1,
+          "scene": 1,
+          "firstImage": "1-barrage-026.png",
+          "firstObservedPoseAge": 26.040005,
+          "contactAge": 26
+        },
+        {
+          "serial": 4,
+          "tick": 126840,
+          "shown": 126840.28000533581,
+          "kind": 2,
+          "surfaceCount": 0,
+          "soundCount": 1,
+          "scene": 1,
+          "firstImage": "1-barrage-042.png",
+          "firstObservedPoseAge": 42.280006,
+          "contactAge": 42
+        },
+        {
+          "serial": 5,
+          "tick": 126908,
+          "shown": 126908.2200062275,
+          "kind": 1,
+          "surfaceCount": 0,
+          "soundCount": 1,
+          "scene": 2,
+          "firstImage": "2-slam-013.png",
+          "firstObservedPoseAge": 13.220006,
+          "contactAge": 13
+        },
+        {
+          "serial": 6,
+          "tick": 126910,
+          "shown": 126910.34000623226,
+          "kind": 0,
+          "surfaceCount": 48,
+          "soundCount": 2,
+          "scene": 2,
+          "firstImage": "2-slam-015-sub1.png",
+          "firstObservedPoseAge": 15.340006,
+          "contactAge": 15
+        },
+        {
+          "serial": 7,
+          "tick": 127004,
+          "shown": 127004.1400065422,
+          "kind": 2,
+          "surfaceCount": 0,
+          "soundCount": 1,
+          "scene": 3,
+          "firstImage": "3-leap-026.png",
+          "firstObservedPoseAge": 26.140007,
+          "contactAge": 26
+        }
+      ],
+      "evidenceSha256": "123567a78faeff6a33b4aef44b42025ac2fc08d396f57c1c55f5f3d98f8390af"
+    }
+  ],
+  "implementation": [
+    {
+      "root": "D:/blacklight-evolution/",
+      "files": {
+        "combat/TerrainImpactEffects.java": "da44ff92113d690a1fed4a4892735cddddca03001f8b8c958e25f82b1790f68d",
+        "combat/CombatImpactEffects.java": "983f90265ace726c0e133834325656bea589960f77f506088fbf080df8155ebc",
+        "combat/ContactEffects.java": "32d77f016d2683cae2da7b8eb34709534a5d106458b84710dc0857bd3553ef29",
+        "combat/ContactEffectsQueue.java": "a843c756896cdbb80caed35ced15f120ff625adc445a12fa8c80d3b078403c43",
+        "network/ContactEffectsPayload.java": "1ca7c95924407cd3f2723ffd707ea2acc7264d02f30c147c0f1fd522f6417914",
+        "network/ModNetwork.java": "f0b44e9f6f0ea58b37c23240c9ae9fbcdcc154d3e7cc4a8a546b48fb721cdc65",
+        "registry/ModInfectedSounds.java": "59e2c966da0a5ec6d91d19206534449fe1f4f973c26c48ccef9c685d0ad7b317",
+        "entity/EncounterMob.java": "f2a4e973043adfb1109b687606b230d131e14e4754fbe342491f865695063603",
+        "entity/BlacklightHunter.java": "e3e718d1888f9098ec8cf3da838e2be4a630225182783a17b77247b970216f98",
+        "infection/InfectedAttackEffects.java": "8201fa21ab1028f6ec327fe21857cd577932f27353791e976c39d0ffabf9d085",
+        "client/renderer/TerrainRipple.java": "0dc564fab327b743d818313ac69ae63b5b816cac8117f6d3755eafdbca06a883",
+        "client/renderer/ContactTerrainDebris.java": "52bfbdd4f1dba431d3301d2e34ef7adb3cbae368459225fbbb877a65df5cf479",
+        "client/renderer/ContactEffectsPresentation.java": "b66d2e8e7e5640694607db2b4d95bff0797c0ad255489270304aaddc64caf2d7",
+        "client/renderer/CombatImpactRenderer.java": "9518ef40be864f674ace648bd7ef2d6a05b83672cabcebd2d87a27439a034058",
+        "client/renderer/InfectedImpactVisuals.java": "7f6d919eb5ac20dd9d8d37eabb2cfd652bea7ed882161208fcf78cbe8918fe3d"
+      }
+    },
+    {
+      "root": "D:/blacklight-evolution-forge-1.20.1/",
+      "files": {
+        "combat/TerrainImpactEffects.java": "018e88585dd378196324e926d32c048bac5fc7af5192cd3e47da050c26826bf6",
+        "combat/CombatImpactEffects.java": "ba82b323c3dccee742a34e307e6fa9db5865720abf6ff3f7157a341462f54966",
+        "combat/ContactEffects.java": "78cd123145d557d1625cd23c0fcdadeb65e9b67ebe4a0acf8b9ec0bf12fbd2ea",
+        "combat/ContactEffectsQueue.java": "a843c756896cdbb80caed35ced15f120ff625adc445a12fa8c80d3b078403c43",
+        "network/ContactEffectsPayload.java": "f639c90aedc84f2d08967a04610915eee47c69577f36ea0c0b06d3474c79d49d",
+        "network/ModNetwork.java": "9932a1703c9859c78efc3f3c4825e3cffd3a6bb13ace8be68d6e55c666a8c95d",
+        "registry/ModInfectedSounds.java": "e46cfe4576b4275db977f87fe087e56e802c7b395a96918f549a58593cd9fc63",
+        "entity/EncounterMob.java": "9c35589cc798712a504508db7876a35af0ff3e210e31c95b02c2bec225b29a86",
+        "entity/BlacklightHunter.java": "185a720599c2eb56022e0694cbe24c0a162003f505cbb4c551f9991a4dc80ea6",
+        "infection/InfectedAttackEffects.java": "5d9364be98dede56cc8260ae33ae21a862a28d6ff6c627c5f782df565feddbcb",
+        "client/renderer/TerrainRipple.java": "0dc564fab327b743d818313ac69ae63b5b816cac8117f6d3755eafdbca06a883",
+        "client/renderer/ContactTerrainDebris.java": "52bfbdd4f1dba431d3301d2e34ef7adb3cbae368459225fbbb877a65df5cf479",
+        "client/renderer/ContactEffectsPresentation.java": "003488f361640a149487e050a32284bf0f81fda373902cb1bf01500977c6b22c",
+        "client/renderer/CombatImpactRenderer.java": "b67010c1e5aaf25ea6ecfc460a30c4170e09c16a990d7f5e96f055805b180900",
+        "client/renderer/InfectedImpactVisuals.java": "7d4b9a99871155ee351cbaa53e0422afc5b2749b1604c0f6a51d51dc4bcfaca2"
+      }
+    }
+  ],
+  "limitations": [
+    "Custom contact layers share a render-clock receipt. Network/frame scheduling can delay presentation; the native audit records the maximum observed delay. Vanilla hurt-red/velocity and authoritative damage keep their engine timing and were not retimed.",
+    "This is the existing player-style visual terrain displacement, not persistent removal or deformation of world blocks.",
+    "Only verified Hunter/Juggernaut ground contacts are connected so far; other creatures still require individual contact calibration.",
+    "Other creature moves, player consumption combinations, audio listening and full goal acceptance remain pending."
+  ]
+}

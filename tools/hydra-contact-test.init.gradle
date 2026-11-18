@@ -1,0 +1,5 @@
+allprojects { afterEvaluate {
+    tasks.named('test', Test).configure {
+        include '**/HydraContactTest.class','**/HydraMotionTest.class','**/HydraGrowthTest.class','**/ContactEffectsQueueTest.class','**/ContactEffectsPayloadTest.class','**/HydraWoundAnchorTest.class'
+    }
+} }

@@ -1,6 +1,7 @@
 // Explicit opt-in only. Production build keeps gametest package excluded.
 allprojects { afterEvaluate {
     sourceSets.main.java.srcDir('src/vehicleTest/java')
+    sourceSets.main.java.srcDir('src/qaSupport/java')
     if (!sourceSets.main.resources.srcDirs.contains(file('src/blackwatchTest/resources'))) sourceSets.main.resources.srcDir('src/blackwatchTest/resources')
     def stageVehicle6Classes=tasks.register('stageVehicle6Classes',Sync){
         dependsOn tasks.named('classes')

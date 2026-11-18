@@ -1,0 +1,212 @@
+{
+  "date": "2026-11-17",
+  "status": "Code and source-derived assets synchronized; no compilation, unit test, GameTest, Blender or game launch performed. Direct-player acceptance remains pending.",
+  "species": "P1 Brawler / canonical BlacklightHunter",
+  "priorGap": "The MC choice named BARRAGE skipped the original left-wrist counter start and played a separately authored 0.4-second anticipation. The decoded counter start -> release chain had no runtime counterpart.",
+  "sources": {
+    "fig": {
+      "file": "D:/PrototypeReference/p1/input/comparison/Brawler_fig.p3d.rz",
+      "sha256": "08CE8B8F93C542FDEFFBE5E186249BCF7281148BB1B8F26F37B5B4ADB42861D1",
+      "audit": "D:/PrototypeReference/p1/creature-fig-audit.json",
+      "offsetMeaning": "Decoded FIG-stream record offsets, not compressed-file positions"
+    },
+    "animation": {
+      "file": "D:/PrototypeReference/p1/private/comparison/Brawler.p3d",
+      "sha256": "D4CC80232801A5145C4E48BD3FB36CA388707DB6AE3A3F97EC15459EBFB439E5",
+      "name": "brawler_pnch_claw_counter",
+      "offset": 1803939,
+      "frames": 78,
+      "fps": 30
+    },
+    "skeleton": {
+      "file": "D:/PrototypeReference/p1/input/startup.p3d.rz",
+      "sha256": "5CE4925BF3C07A30531B9E009AB35288B94B73057186327F6CC0B029B19FAAB5",
+      "name": "brawler_master_skeleton_skeleton",
+      "decodedOffset": 12
+    },
+    "records": [
+      {
+        "offset": 53492,
+        "type": "TargetDistance",
+        "direction": "XZ",
+        "distance": 2,
+        "limitation": "Comparison hash unresolved; not substituted with an invented original AI rule."
+      },
+      {
+        "offset": 53820,
+        "type": "PuppetAnimation",
+        "name": "brawler_pnch_claw_counter",
+        "frames": [
+          0,
+          42
+        ],
+        "speed": 0.9,
+        "blendInSeconds": 0.3,
+        "blendOutSeconds": 0.2,
+        "rootMotion": true
+      },
+      {
+        "offset": 53948,
+        "type": "Hit",
+        "joint": "Wrist_L",
+        "seconds": [
+          1.066667,
+          1.166667
+        ],
+        "radius": 0.95,
+        "damage": 75,
+        "style": "Slash",
+        "impulseXYZ": [
+          0,
+          5000,
+          -5000
+        ]
+      },
+      {
+        "offset": 54244,
+        "type": "Sequence",
+        "branchIndex": 152,
+        "meaning": "start/release child at 54620"
+      },
+      {
+        "offset": 54304,
+        "type": "AutoTarget",
+        "turningDegreesPerSecond": 0,
+        "maxDistance": 8,
+        "checkDistance": true
+      },
+      {
+        "offset": 54416,
+        "type": "Spawn",
+        "seconds": [
+          0.366667,
+          1.1
+        ],
+        "branch": "//hunter/effects/motiontrails/punch/l_hand"
+      },
+      {
+        "offset": 54620,
+        "type": "Node",
+        "meaning": "start/release"
+      },
+      {
+        "offset": 54684,
+        "type": "PuppetAnimation",
+        "name": "brawler_claw_barrage",
+        "frames": [
+          3,
+          76
+        ],
+        "speed": 1,
+        "blendInSeconds": 0.166667
+      },
+      {
+        "offsets": [
+          54812,
+          55108,
+          55404,
+          55700,
+          55996
+        ],
+        "type": "Hit",
+        "joints": [
+          "Wrist_R",
+          "Wrist_R",
+          "Wrist_L",
+          "Wrist_R",
+          "Wrist_R"
+        ],
+        "damageEach": 150
+      },
+      {
+        "offset": 62068,
+        "type": "VariableIntSet",
+        "variable": "hitReactionCounter",
+        "value": 0,
+        "limitation": "Reset evidence does not decode its trigger threshold or entire original AI."
+      }
+    ]
+  },
+  "implementation": [
+    "Append COUNTER enum id without changing previous ids. Existing MC close-action sequence now chooses COUNTER in the former barrage slot; no unproven hit-count trigger is added.",
+    "Decode original counter frames 0..42 at speed 0.9 and retarget using the existing Hunter rest-axis, limb-aim and sole-contact calibration. 49 pose samples / 12 existing bones; original mesh remains unchanged.",
+    "Only the left rendered wrist uses the 1.066667..1.166667 second opening window. Existing actual wrist capsule and accepted-damage rules remain authoritative.",
+    "Complete counter at tick 32, then revalidate the original committed target, fixed yaw, grounded status, consume/stun/NoAI/parasite status, visibility, vehicle occupancy and real barrage reach.",
+    "Start release at existing barrage clip tick 8 (source frame 3), bypassing its old standalone .4-second anticipation. The transition returns before any new damage evaluation that tick.",
+    "Opening and five barrage windows have distinct deduplication; new-stage flags are reset, victim invulnerability is never reset by production code. Counter interruption clears the synchronized continuation flag immediately.",
+    "Keep last counter pose through the stage join. Source .166667-second release blend ends before the first release hit, so rendered and authoritative wrist poses agree throughout active contact.",
+    "Opening damage factor and infected-player cap are half their existing barrage values, retaining source 75:150 ratio. Existing barrage and other attacks retain their damage.",
+    "Counter trail uses source left-hand timing and the actual posed claw; subsequent chain trails follow active source wrists.",
+    "Older asset schedule regeneration preserves the appended counter clip instead of silently removing its pose table.",
+    "Source Motion_Root43 counter frames and74 release frames now supply separate phase differences; actual accepted Entity.move, support restoration, loaded/world-border restrictions and interrupted-load cancellation are documented in rootMotionFollowup. No pose horizontal offset is added twice."
+  ],
+  "adaptationsAndLimits": [
+    "Source 42 frames at 30 fps and speed .9 lasts 1.555556 seconds; 20 Hz phase completion rounds up to 32 ticks and holds the last frame briefly.",
+    "Horizontal Motion_Root counter/release differences now move the actual entity through MC collision; see rootMotionFollowup. Original large impulse and native root blend/physics solver are not ported.",
+    "Source animations are retargeted onto the existing authored block model; source geometry and exact original body proportions are not replaced.",
+    "Continuation visibility/contact checks and existing deterministic attack selection are explicit MC safety/playability adapters, not a complete decoded P1 AI tree.",
+    "Raw source damage is not inserted as a new damage amount; the existing Hunter balance and player budgets supply absolute damage.",
+    "No original audio patch was extracted by this change; existing local combat sound handling remains.",
+    "Full run-time acceptability of the source pose, recovery join, attacks against moving players, rough ground and capture remains unverified."
+  ],
+  "changedFiles": [
+    "src/main/java/com/codex/blacklight/combat/CreatureAttack.java",
+    "src/main/java/com/codex/blacklight/combat/HunterBalance.java",
+    "src/main/java/com/codex/blacklight/combat/HunterContactPose.java",
+    "src/main/java/com/codex/blacklight/entity/BlacklightHunter.java",
+    "src/main/java/com/codex/blacklight/client/model/BlacklightHunterModel.java",
+    "src/main/java/com/codex/blacklight/client/renderer/InfectedLimbTrails.java",
+    "src/main/resources/assets/blacklight/animations/blacklight_hunter.animation.json",
+    "src/main/resources/assets/blacklight/models/hunter_combat_motion.json",
+    "tools/export_hunter_counter.py",
+    "tools/build_creature_combat.py",
+    "src/test/java/com/codex/blacklight/combat/HunterCounterTest.java",
+    "src/feedbackTest/java/com/codex/blacklight/gametest/HunterCounterGameTest.java",
+    "src/main/java/com/codex/blacklight/combat/HunterCounterMotion.java",
+    "src/main/resources/assets/blacklight/models/hunter_counter_root.json",
+    "src/test/resources/hunter-counter-root-reference.json",
+    "tools/export_hunter_counter_root.py",
+    "art/hunter/counter-root-source-20261117.json"
+  ],
+  "staticChecks": {
+    "performed": [
+      "Read local FIG and source animation; verified source hashes.",
+      "CPU-only source-data export and finite asset values; no rendering or gameplay execution.",
+      "Static matrix inspection: at 1.1 seconds the left claw tip is approximately (0.0202,1.1251,1.5279) relative to the standing Hunter at yaw 0.",
+      "Scoped git diff --check and both-platform API/phase/cancellation review."
+    ],
+    "notPerformed": [
+      "Gradle or Java compilation",
+      "Unit tests",
+      "GameTests",
+      "Client/game testing"
+    ],
+    "unitClass": "com.codex.blacklight.combat.HunterCounterTest",
+    "unitCases": [
+      "sourceCounterOpensWithTheLeftWristBeforeAnyBarrageWindow",
+      "releaseKeepsTheLastCounterPoseThenFinishesBlendingBeforeContact",
+      "source75To150RatioDoesNotDoubleTheExistingBarrageBudget",
+      "sourceRootFixturesUseSeparatePhaseOriginsAndTheExistingRigScale",
+      "skinPoseDoesNotAlreadyContainTheHorizontalRootTravel"
+    ],
+    "gameTestClass": "com.codex.blacklight.gametest.HunterCounterGameTest",
+    "gameTestCases": [
+      "sourceLeftOpeningContinuesOnceWithoutRepeatingTheBarrageWindup",
+      "movingBehindTheCommittedHunterPreventsRetargetedContinuation",
+      "noAiInterruptionCannotLeaveADelayedBarrage",
+      "actualConsumeClaimAndReleaseCannotResumeTheCounterChain",
+      "existingAutonomousChoiceNowEntersTheSourceCounterOpening",
+      "nativeRootAdvancesEntityAndHasNoJumpOrDuplicateTickAtRelease",
+      "fullHeightWallBlocksRootAndRemovingItDoesNotRepayLostTravel",
+      "sameObjectLoadCancelsRootAndPendingCounterRelease"
+    ]
+  },
+  "playerAcceptancePending": [
+    "Fight a normal Hunter on ordinary ground: distinguish the delayed left counter opening from the following five source wrist windows.",
+    "Move behind or out of claw reach before release; verify there is no turn-to-new-target continuation or ranged melee damage.",
+    "Place cover, enter a vehicle, stun or consume-claim during the opening; verify the old chain never resumes after recovery/release.",
+    "Repeat near stairs and doorways and compare client/server pose and real claw contacts; verify the newly ported root differences against actual accepted collision movement.",
+    "Verify ordinary standalone barrage, swipe, slam, leap and the existing Hunter/Supreme consume paths remain intact."
+  ],
+  "rootMotionFollowup": "art/hunter/counter-root-source-20261117.json"
+}

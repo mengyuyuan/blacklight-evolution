@@ -1,0 +1,172 @@
+{
+  "schemaVersion": 1,
+  "date": "2026-11-16",
+  "scope": "11 three-dimensional vehicle and supply item models; six miniatures use unchanged production vehicle meshes",
+  "overallGoalComplete": false,
+  "generatorTests": {
+    "passed": 8,
+    "bothRecipeFormats": true,
+    "log": "D:\\CodexCache\\vehicle-item-unit.log",
+    "sha256": "6808e0186eed5a75a4524c05713588a12cd821d9a454c16ecf111dfa5ef86ac4"
+  },
+  "generatorSource": {
+    "tools/build_vehicle_items.py": "57a06e4d6ab96c1b00cd054dad3f4fdbe94dc678d8f2a1fcf2c1b61a2e603252",
+    "tools/vehicle_item_models.py": "4a6e150a9e38c75307c19cd316938cb823aed44387e366e11561b18f79d67179",
+    "tools/test_build_vehicle_items.py": "4a9a725e4c1ef13631f81475a820d68f2c7ce42513f54a60790fd07dd622e37d",
+    "tools/record_vehicle_items.py": "586bee49b679b7c1c50d51e49bb325b07f355fdd124518c0755e0b82d270083a"
+  },
+  "preservedContract": {
+    "activeModels": 10,
+    "reservedInactiveModels": [
+      "military_fuel_can"
+    ],
+    "drivingRequiresFuel": false,
+    "persistedIdsChanged": false
+  },
+  "limits": [
+    "No player world opened; static native ItemRenderer contexts only.",
+    "Actual player-arm grips, dropped-item animation and item-frame world lighting remain unverified.",
+    "Placed vehicle geometry, helicopter flight/delivery, soldier AI and sounds were not changed by this batch.",
+    "Hidden QA profile does not produce a release jar; no player installation was updated."
+  ],
+  "platforms": {
+    "neo": {
+      "root": "D:\\blacklight-evolution",
+      "nativeEvidence": "D:\\CodexCache\\vehicle-item-qa\\neo",
+      "models": 11,
+      "guiIcons": 11,
+      "displayContexts": 88,
+      "nativeScreenshots": 12,
+      "geometryParts": {
+        "military_truck_chassis": 78,
+        "military_apc_chassis": 138,
+        "military_tank_chassis": 161,
+        "blackwatch_truck_chassis": 78,
+        "blackwatch_apc_chassis": 138,
+        "blackwatch_tank_chassis": 161,
+        "military_fuel_can": 42,
+        "tank_he_shell": 105,
+        "tank_ap_shell": 101,
+        "autocannon_round": 200,
+        "vehicle_repair_parts": 65
+      },
+      "loadedResourcesSha256": {
+        "src/main/resources/assets/blacklight/models/item/military_truck_chassis.json": "3999a738dac86e2765ae95759f5fea3f3b20a22a571f0b8a8a036f5472721aff",
+        "src/main/resources/assets/blacklight/textures/entity/military_vehicles_military.png": "a05858c5609c5eced700a12393bf25955cd563b31591dad974f6d2ce6b6d6445",
+        "src/main/resources/assets/blacklight/models/item/military_apc_chassis.json": "a2f87745f5e18fa9a5ed4ab16e6e42655d538296849b8a461f60650e13ac5422",
+        "src/main/resources/assets/blacklight/models/item/military_tank_chassis.json": "513e76f8a07e5a2d388ca98313549ef2259861223cb84ec57ef4e794f54c9a4d",
+        "src/main/resources/assets/blacklight/models/item/blackwatch_truck_chassis.json": "d92c59dcfea45c6459303ec510cc896cb0dd7c05ffd1f801f8f173156fbf8bf3",
+        "src/main/resources/assets/blacklight/textures/entity/military_vehicles_blackwatch.png": "5f878d6f5cf0bfb333b6959422a2c71466674e4d4960723d12c06ceeead0283b",
+        "src/main/resources/assets/blacklight/models/item/blackwatch_apc_chassis.json": "9ebc79dedd8075cddc4c3b14bfec55fbe3bf1f664c0b6265f173bc5bfd24df94",
+        "src/main/resources/assets/blacklight/models/item/blackwatch_tank_chassis.json": "37248e689c8db8bd6e23e1c0bf020e947339cc6a45fffaf3b4b13bf2fd3a1868",
+        "src/main/resources/assets/blacklight/models/item/military_fuel_can.json": "b4e453fc54e32d2981043dff1a6e8e85f28ece4d421b3d847ae236b1758da3be",
+        "src/main/resources/assets/blacklight/textures/item/military_fuel_can.png": "8bb062ccfaccbc65c060d0336acc1994f686278ec90ed5b6a7afbee13ccb6a71",
+        "src/main/resources/assets/blacklight/models/item/tank_he_shell.json": "821507bef9ce54c69fe0072bbf24c2bb73991af0da0bf5dce04dba69e4f0f131",
+        "src/main/resources/assets/blacklight/textures/item/tank_he_shell.png": "a9ebe0bb74013bf626d9691b9254bc76d3a58c38f92aaf9e6730618eaded9be1",
+        "src/main/resources/assets/blacklight/models/item/tank_ap_shell.json": "420f4987dd7824a64398fc14ea9e9028f400bbe82bb2653fd71e330a9b8d1e05",
+        "src/main/resources/assets/blacklight/textures/item/tank_ap_shell.png": "1b00d047e1bd182a27409e1ee8df8d1b772f2834d17f7ab3eb31853eeebe813d",
+        "src/main/resources/assets/blacklight/models/item/autocannon_round.json": "91d2c2121ba84dd4038fad91fae760355747e3e5659d8f02128312770512036d",
+        "src/main/resources/assets/blacklight/textures/item/autocannon_round.png": "6aafa060566996e0fb84f2b94c5a77391e522cd93bd93a0abeaee2b7e33b3b2f",
+        "src/main/resources/assets/blacklight/models/item/vehicle_repair_parts.json": "22c3b009d1a6b62a0ce1f4d8dd76fa3baf8a49132f0d0ca9c1086c2c5410ebf7",
+        "src/main/resources/assets/blacklight/textures/item/vehicle_repair_parts.png": "29fb294fbfad56ed6740eb60aa6187b839eb780b9c249f85452ca46e0767443a",
+        "src/main/resources/assets/minecraft/atlases/blocks.json": "af02aa8cf6cd06cfc0b80c8219dfeb5aae74b62671b178818741d03cba4f9b8f"
+      },
+      "qaSourceSha256": {
+        "src/vehicleItemVisual/java/com/codex/blacklight/client/vehicle/VehicleItemVisual.java": "22cdf831a4edca9acf0840ad8449faa70002b16f874982b3a9b93d8ee1bede45",
+        "tools/vehicle-item-visual.init.gradle": "8be88423888b5bea9c567fc50e242283962f4dd2c88a2fde4c04fcee1af55681"
+      },
+      "capturesSha256": {
+        "inventory-board.png": "e88654f8880733ec82233521522e8ff2e6ca60d357bd81e1c51652740f000323",
+        "military_truck_chassis-contexts.png": "8153948e670ff68412d182d19c6cdac520d441683cdae43be681cf1eb6675a74",
+        "military_apc_chassis-contexts.png": "b182c7b26e8e8059540631c7d86542ffe0ad2c2f1764ec300c952460926cb05d",
+        "military_tank_chassis-contexts.png": "2a849ba39f5034a2c238a2d86b5b283da424f470dac11a9576c48676aa56cc2d",
+        "blackwatch_truck_chassis-contexts.png": "8f67638f780053e7a4ddd97d45099cb9414552dab061844cd787e011689fa6d6",
+        "blackwatch_apc_chassis-contexts.png": "e13733ca3ad1ce87b7b1a80b0ad1128e8815393b4a670bc24fef3911e71a20d1",
+        "blackwatch_tank_chassis-contexts.png": "e1bd6715b3fcd87de14ff96f9a484f80e5bcce0d153d80d51a52b78e726e14bb",
+        "military_fuel_can-contexts.png": "372ca245944a6cac7895c6bc032f6b1483b723c162350698891151174f7021fc",
+        "tank_he_shell-contexts.png": "328b53868fde945c1bade67fc38feffb1edaecb4c892ffb013a9bfe350585f52",
+        "tank_ap_shell-contexts.png": "1d6ad4f8e285581bb480dbbcbc867168ae1243f32e2216d1989e3e877a938d8b",
+        "autocannon_round-contexts.png": "dd514988d3fb33af5cda304c19e78b23d5aebb1b87acb091a1ac98ce507b5f15",
+        "vehicle_repair_parts-contexts.png": "ab9887538ecb7e360a949f537ae95afffd7561a14fe67a2704dde7398491bf76"
+      },
+      "reviewedSheetsSha256": {
+        "inventory-board.png": "e88654f8880733ec82233521522e8ff2e6ca60d357bd81e1c51652740f000323",
+        "context-sheet-1.png": "a97f273c70e56a092fac3c3808baefcdba25e0fe9263bf4f102628657e6e4cb8",
+        "context-sheet-2.png": "01d2d270bef8f5b8b454ff649a537ce8a8930005e0bc7f602c927242c3412980",
+        "context-sheet-3.png": "d2a57ccafd6d954c7a5dad870447d93b7af4dc8c4ac55dc784232bced9c593ce"
+      },
+      "nativeReceiptSha256": "5801c2a89f92ccfbe3c9e9cc32bfacaac79bf51f47a5b7cc25d4f0c47ac93b65",
+      "buildLogSha256": "bd4ae5c89f52b6183297e5d6b936bf17fe95ef8205223a4f3e7606179d970fe5",
+      "review": "All eleven forms visible; no missing textures or clipped geometry in the boards and static context contact sheets."
+    },
+    "forge": {
+      "root": "D:\\blacklight-evolution-forge-1.20.1",
+      "nativeEvidence": "D:\\CodexCache\\vehicle-item-qa\\forge",
+      "models": 11,
+      "guiIcons": 11,
+      "displayContexts": 88,
+      "nativeScreenshots": 12,
+      "geometryParts": {
+        "military_truck_chassis": 78,
+        "military_apc_chassis": 138,
+        "military_tank_chassis": 161,
+        "blackwatch_truck_chassis": 78,
+        "blackwatch_apc_chassis": 138,
+        "blackwatch_tank_chassis": 161,
+        "military_fuel_can": 42,
+        "tank_he_shell": 105,
+        "tank_ap_shell": 101,
+        "autocannon_round": 200,
+        "vehicle_repair_parts": 65
+      },
+      "loadedResourcesSha256": {
+        "src/main/resources/assets/blacklight/models/item/military_truck_chassis.json": "3999a738dac86e2765ae95759f5fea3f3b20a22a571f0b8a8a036f5472721aff",
+        "src/main/resources/assets/blacklight/textures/entity/military_vehicles_military.png": "a05858c5609c5eced700a12393bf25955cd563b31591dad974f6d2ce6b6d6445",
+        "src/main/resources/assets/blacklight/models/item/military_apc_chassis.json": "a2f87745f5e18fa9a5ed4ab16e6e42655d538296849b8a461f60650e13ac5422",
+        "src/main/resources/assets/blacklight/models/item/military_tank_chassis.json": "513e76f8a07e5a2d388ca98313549ef2259861223cb84ec57ef4e794f54c9a4d",
+        "src/main/resources/assets/blacklight/models/item/blackwatch_truck_chassis.json": "d92c59dcfea45c6459303ec510cc896cb0dd7c05ffd1f801f8f173156fbf8bf3",
+        "src/main/resources/assets/blacklight/textures/entity/military_vehicles_blackwatch.png": "5f878d6f5cf0bfb333b6959422a2c71466674e4d4960723d12c06ceeead0283b",
+        "src/main/resources/assets/blacklight/models/item/blackwatch_apc_chassis.json": "9ebc79dedd8075cddc4c3b14bfec55fbe3bf1f664c0b6265f173bc5bfd24df94",
+        "src/main/resources/assets/blacklight/models/item/blackwatch_tank_chassis.json": "37248e689c8db8bd6e23e1c0bf020e947339cc6a45fffaf3b4b13bf2fd3a1868",
+        "src/main/resources/assets/blacklight/models/item/military_fuel_can.json": "b4e453fc54e32d2981043dff1a6e8e85f28ece4d421b3d847ae236b1758da3be",
+        "src/main/resources/assets/blacklight/textures/item/military_fuel_can.png": "8bb062ccfaccbc65c060d0336acc1994f686278ec90ed5b6a7afbee13ccb6a71",
+        "src/main/resources/assets/blacklight/models/item/tank_he_shell.json": "821507bef9ce54c69fe0072bbf24c2bb73991af0da0bf5dce04dba69e4f0f131",
+        "src/main/resources/assets/blacklight/textures/item/tank_he_shell.png": "a9ebe0bb74013bf626d9691b9254bc76d3a58c38f92aaf9e6730618eaded9be1",
+        "src/main/resources/assets/blacklight/models/item/tank_ap_shell.json": "420f4987dd7824a64398fc14ea9e9028f400bbe82bb2653fd71e330a9b8d1e05",
+        "src/main/resources/assets/blacklight/textures/item/tank_ap_shell.png": "1b00d047e1bd182a27409e1ee8df8d1b772f2834d17f7ab3eb31853eeebe813d",
+        "src/main/resources/assets/blacklight/models/item/autocannon_round.json": "91d2c2121ba84dd4038fad91fae760355747e3e5659d8f02128312770512036d",
+        "src/main/resources/assets/blacklight/textures/item/autocannon_round.png": "6aafa060566996e0fb84f2b94c5a77391e522cd93bd93a0abeaee2b7e33b3b2f",
+        "src/main/resources/assets/blacklight/models/item/vehicle_repair_parts.json": "22c3b009d1a6b62a0ce1f4d8dd76fa3baf8a49132f0d0ca9c1086c2c5410ebf7",
+        "src/main/resources/assets/blacklight/textures/item/vehicle_repair_parts.png": "29fb294fbfad56ed6740eb60aa6187b839eb780b9c249f85452ca46e0767443a",
+        "src/main/resources/assets/minecraft/atlases/blocks.json": "af02aa8cf6cd06cfc0b80c8219dfeb5aae74b62671b178818741d03cba4f9b8f"
+      },
+      "qaSourceSha256": {
+        "src/vehicleItemVisual/java/com/codex/blacklight/client/vehicle/VehicleItemVisual.java": "6e0e362cba995abe0f5395bdb225dc8d71a20a7117dcdf8e62ec0d3fea86a873",
+        "tools/vehicle-item-visual.init.gradle": "0ab0852193ce31cd7032308e58a79960642594d98786ca46176db05d7f12a01f"
+      },
+      "capturesSha256": {
+        "inventory-board.png": "fffd48fedde895c108ec229e30ef9afa06e062f66e87f719166fb899561facd4",
+        "military_truck_chassis-contexts.png": "d8f04a3775b43b198a0153dc7a86d3161212769f6ec38e63d80b1705207b3269",
+        "military_apc_chassis-contexts.png": "cb30787d7326af91852bd47034849e79f4c863563078c6e424a8707a213360f4",
+        "military_tank_chassis-contexts.png": "34b3b096c3abe19584e8be1d0d672a9a11419c18d8a3ba14071ac7d05fe73669",
+        "blackwatch_truck_chassis-contexts.png": "73d5b1fc802613dc0cad1822801d8de3d8fb015f5796da2e33757084ddf10362",
+        "blackwatch_apc_chassis-contexts.png": "b51481ccd956f21e37c02e8587eb13f8ad653374dd1ea4ddbe21001466c578ee",
+        "blackwatch_tank_chassis-contexts.png": "360e99a58edd6243092f8358c8ba18f27d9e93eef061c69176def171a75f1524",
+        "military_fuel_can-contexts.png": "ae07206b3cebc002aed6b9ad2a2b989d227037b7523db80bb57f9faff74e4276",
+        "tank_he_shell-contexts.png": "cb169ee8a5b5bccda30694dec60d9552b29af82dafe5029766030fc1a943eabd",
+        "tank_ap_shell-contexts.png": "c9c9c309064c00bfc012c843202202810efbd51c1d4613a6b97f1a5bb481a82f",
+        "autocannon_round-contexts.png": "ebd5798bff5dfea25c794fc848eb4dae279355438a4e0645efcf5560fec0ca4d",
+        "vehicle_repair_parts-contexts.png": "38258b6fd7a63b716e7bd64e241da6d25c556ce57c41342cfb4af5c61083adf7"
+      },
+      "reviewedSheetsSha256": {
+        "inventory-board.png": "fffd48fedde895c108ec229e30ef9afa06e062f66e87f719166fb899561facd4",
+        "context-sheet-1.png": "440e7d3abd22accf6cb2583795d905625004ebd519381d11acd2fb868bc12ce2",
+        "context-sheet-2.png": "2e8d707461d919868766b52eed434866edb83749752f0349bac559cad4319c87",
+        "context-sheet-3.png": "8bbce44bea11e1b03a04d95e79ecb69e8de2cfb92fd072a7608d77b3aa2f5863"
+      },
+      "nativeReceiptSha256": "5801c2a89f92ccfbe3c9e9cc32bfacaac79bf51f47a5b7cc25d4f0c47ac93b65",
+      "buildLogSha256": "5c82c540dffaedd33ba9d727be87e5ef4dda6c268c1b6e0185bc75c60a1ec350",
+      "review": "All eleven forms visible; no missing textures or clipped geometry in the boards and static context contact sheets."
+    }
+  }
+}

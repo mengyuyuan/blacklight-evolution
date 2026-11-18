@@ -46,12 +46,15 @@ public final class BuildingBiomassPlan {
         return null;
     }
     public static BuildingBiomassPlan find(ServerLevel l,BlockPos origin,Direction normal) {
+        return find(l, origin, normal, origin.asLong() ^ l.getSeed());
+    }
+    /** Build a site plan from its deterministic seed and the actual supporting terrain. */
+    public static BuildingBiomassPlan find(ServerLevel l,BlockPos origin,Direction normal,long seed) {
         if(!support(l,origin.relative(normal.getOpposite()),normal))return null;
         Direction side=normal.getClockWise();int top=0;
         for(int y=3;y<=Math.min(72,BuildingInfectionConfig.HEIGHT.get()-3);y++)
             if(support(l,origin.relative(normal.getOpposite()).above(y),normal))top=y;
         if(top<8)return null;
-        long seed=origin.asLong()^l.getSeed();
         var n=new Point(normal.getStepX(),0,normal.getStepZ());var s=new Point(side.getStepX(),0,side.getStepZ());
         var root=new Point(.5,-.35,.5).add(n.mul(.75));
         var stems=new ArrayList<Stem>();var supports=new ArrayList<BlockPos>();

@@ -1,6 +1,5 @@
 package com.codex.blacklight.world;
 
-import com.codex.blacklight.entity.BlacklightHive;
 import com.codex.blacklight.infection.OutbreakConfig;
 import com.codex.blacklight.infection.OutbreakData;
 import com.codex.blacklight.infection.WorldOutbreakSystem;
@@ -10,7 +9,8 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.LongArrayTag;
-import net.minecraft.resources.ResourceKey;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.Tag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
@@ -35,9 +35,7 @@ public final class LairSystem {
     /** Source interiors (structure_*_lair_interior_* tod.p3d) span about 130 x 120 m with platform
      * tiers at 43-49 m and a ceiling near 65 m. Here: 2/3 of that footprint, 4 tiers, ~20 high. */
     private static final int RX=46,RZ=40,CAP_QUEUE=4096,VERSION=5;
-    private static final Map<ResourceKey<Level>,LinkedHashSet<Long>> SEEN=new HashMap<>();
     private record Pending(long chunk,long deadline){}
-    private static final Map<ResourceKey<Level>,ArrayDeque<Pending>> PENDING=new HashMap<>();
 
     static boolean dimension(ServerLevel level){
         return level.dimension()==Level.OVERWORLD||com.codex.blacklight.city.CityTravel.isCity(level.dimension());
@@ -50,14 +48,16 @@ public final class LairSystem {
     }
     @SubscribeEvent public static void load(ChunkEvent.Load event){
         if(!(event.getLevel() instanceof ServerLevel level)||!(event.getChunk() instanceof LevelChunk chunk)||!dimension(level))return;
-        var set=SEEN.computeIfAbsent(level.dimension(),k->new LinkedHashSet<>());
+        var set=Data.get(level).seen;
         if(set.size()<CAP_QUEUE)set.add(chunk.getPos().toLong());
     }
     @SubscribeEvent public static void tick(TickEvent.LevelTickEvent event){
         if(event.phase!=TickEvent.Phase.END||!(event.level instanceof ServerLevel level)||!dimension(level))return;
+        if(level.noSave())return; // Respect /save-off until journals and chunks may be committed again.
         ambientRoll(level);
-        var set=SEEN.get(level.dimension());
-        if(set!=null&&!set.isEmpty()){
+        var data=Data.get(level);
+        var set=data.seen;
+        if(!set.isEmpty()){
             boolean active=WorldOutbreakSystem.active(level);double chance=active?chance(level):0;
             var it=set.iterator();
             for(int n=0;n<64&&it.hasNext();n++){
@@ -70,25 +70,39 @@ public final class LairSystem {
                 // Never surprise a place players have lived in.
                 if(level.dimension()==Level.OVERWORLD&&chunk.getInhabitedTime()>72000)continue;
                 if(level.random.nextDouble()<chance)
-                    PENDING.computeIfAbsent(level.dimension(),k->new ArrayDeque<>()).add(new Pending(key,level.getGameTime()+1200));
+                    data.pending.add(new Pending(key,level.getGameTime()+1200));
             }
         }
-        for(var j:JOBS)if(j.dim==level.dimension()){flush(level,j,20_000_000L);if(!j.it.hasNext()&&j.hives.isEmpty())JOBS.remove(j);return;}
+        for(var it=data.jobs.iterator();it.hasNext();){
+            var job=it.next();
+            if(level.getGameTime()<job.nextHiveAttempt)continue;
+            boolean ready=true;
+            for(long chunk:job.requiredChunks)
+                if(level.getChunkSource().getChunkNow(ChunkPos.getX(chunk),ChunkPos.getZ(chunk))==null){ready=false;break;}
+            if(!ready)continue;
+            if(job.cursor==job.positions.length&&!hivesLoaded(level,job))continue;
+            if(finish(level,job)){
+                it.remove();
+                if(!data.lairs.contains(job.entrance.asLong()))data.lairs.add(job.entrance.asLong());
+                checkpoint(level,data);
+            }
+            return;
+        }
         if(level.getGameTime()%40==0)rebuildStale(level);
-        var queue=PENDING.get(level.dimension());
-        if(queue==null||queue.isEmpty()||level.getGameTime()%10!=0)return;
-        var p=queue.poll();var cp=new ChunkPos(p.chunk);
-        var result=tryPlace(level,cp.getMiddleBlockX(),cp.getMiddleBlockZ(),false);
-        if(result==Result.WAIT&&level.getGameTime()<p.deadline)queue.add(p);
+        var queue=data.pending;
+        if(queue.isEmpty()||level.getGameTime()%10!=0)return;
+        if(!WorldOutbreakSystem.active(level)){queue.clear();return;}
+        var p=queue.remove();
+        if(level.getGameTime()>=p.deadline)return;
+        var cp=new ChunkPos(p.chunk);
+        if(tryPlace(level,cp.getMiddleBlockX(),cp.getMiddleBlockZ(),false)==Result.WAIT)queue.add(p);
     }
-    @SubscribeEvent public static void stopping(net.minecraftforge.event.server.ServerStoppingEvent e){
-        for(var j:JOBS){var l=e.getServer().getLevel(j.dim);if(l!=null)flush(l,j,Long.MAX_VALUE/4);}JOBS.clear();}
     public enum Result{PLACED,WAIT,REJECTED}
     /** Chunks that stay loaded around a player never fire a new load event. Every five seconds each
      * player offers one loaded, not yet rolled chunk 2-6 chunks away to the normal roll. */
     private static void ambientRoll(ServerLevel level){
         if(level.getGameTime()%100!=0||!WorldOutbreakSystem.active(level))return;
-        var set=SEEN.computeIfAbsent(level.dimension(),k->new LinkedHashSet<>());
+        var set=Data.get(level).seen;
         for(var player:level.players()){
             if(player.isSpectator()||set.size()>=CAP_QUEUE)continue;
             double a=level.random.nextDouble()*Math.PI*2;int r=2+level.random.nextInt(5);
@@ -101,12 +115,14 @@ public final class LairSystem {
 
     /** Force=true is the operator command: skips the spacing rule only. */
     public static Result tryPlace(ServerLevel level,int x,int z,boolean force){
+        if(level.noSave())return Result.WAIT;
         var data=Data.get(level);
         int spacing=OutbreakConfig.LAIR_SPACING.get();
         // Search a spiral of candidates around the rolled point instead of the single spot.
         boolean waiting=false;var data2=data;
         for(var o:LairSiting.offsets()){
             int sx=x+o[0],sz=z+o[1];
+            if(force&&data.jobs.stream().anyMatch(job->job.entrance.getX()==sx&&job.entrance.getZ()==sz))return Result.PLACED;
             if(!force&&crowded(data2,sx,sz,spacing))continue;
             if(WorldOutbreakSystem.sanctuary(level,new BlockPos(sx,64,sz)))continue;
             if(!loaded(level,sx,sz)){waiting=true;continue;}
@@ -114,7 +130,6 @@ public final class LairSystem {
             var plan=plan(level,sx,sz,d);
             if(plan==null)continue;
             build(level,plan);
-            data.lairs.add(plan.entrance.asLong());data.setDirty();
             com.codex.blacklight.BlacklightNeoMod.LOGGER.info("Blacklight lair placed at {} facing {} in {}",plan.entrance,d,level.dimension().location());
             return Result.PLACED;
         }
@@ -123,6 +138,10 @@ public final class LairSystem {
     }
     private static boolean crowded(Data data,int x,int z,int spacing){
         for(long l:data.lairs){var b=BlockPos.of(l);if((long)(b.getX()-x)*(b.getX()-x)+(long)(b.getZ()-z)*(b.getZ()-z)<(long)spacing*spacing)return true;}
+        for(var job:data.jobs){
+            var b=job.entrance;
+            if((long)(b.getX()-x)*(b.getX()-x)+(long)(b.getZ()-z)*(b.getZ()-z)<(long)spacing*spacing)return true;
+        }
         return false;
     }
     private static boolean loaded(ServerLevel level,int x,int z){
@@ -164,35 +183,95 @@ public final class LairSystem {
     }
     private static long hash(int x,int y,int z){long h=x*3129871L^z*116129781L^y*7919L;h=h*h*42317861L+h*11L;return h>>>16;}
     private static double noise(int x,int y,int z){return (hash(x,y,z)%1000)/1000D;}
-    /** Builds are staged in memory, then placed over several ticks so a new Lair does not stall the server. */
-    private static final class Job{final ResourceKey<Level> dim;final Iterator<Map.Entry<Long,BlockState>> it;final List<BlacklightHive> hives;int placed;
-        Job(ResourceKey<Level> dim,LinkedHashMap<Long,BlockState> blocks,List<BlacklightHive> hives){this.dim=dim;this.it=blocks.entrySet().iterator();this.hives=hives;}}
-    private static final ArrayDeque<Job> JOBS=new ArrayDeque<>();
-    private static LinkedHashMap<Long,BlockState> stage;private static List<BlacklightHive> stagedHives;
-    private static BlockState get(ServerLevel l,BlockPos p){var st=stage==null?null:stage.get(p.asLong());return st!=null?st:l.getBlockState(p);}
-    private static void set(ServerLevel l,BlockPos p,BlockState s){
-        if(stage!=null){if(!l.getBlockState(p).is(Blocks.BEDROCK)&&l.getBlockEntity(p)==null)stage.put(p.asLong(),s);return;}
-        if(!l.getBlockState(p).is(Blocks.BEDROCK)&&l.getBlockEntity(p)==null)l.setBlock(p,s,2);}
-    private static void flush(ServerLevel l,Job j,long budgetNanos){
-        long end=System.nanoTime()+budgetNanos;var cursor=new BlockPos.MutableBlockPos();
-        while(j.it.hasNext()){var e=j.it.next();cursor.set(e.getKey());
-            if(l.getBlockState(cursor)!=e.getValue())l.setBlock(cursor,e.getValue(),2);
-            if((++j.placed&255)==0&&System.nanoTime()>end)return;}
-        for(var h:j.hives)l.addFreshEntity(h);j.hives.clear();
-        com.codex.blacklight.BlacklightNeoMod.LOGGER.info("Blacklight lair finished placing {} blocks",j.placed);
+    private static final class Stage {
+        final Map<Long,LairConstruction.Edit> edits=new LinkedHashMap<>();
+        final List<CompoundTag> hives=new ArrayList<>();
+    }
+
+    private static BlockState get(ServerLevel level,BlockPos pos){
+        var stage=Data.get(level).staging;
+        var edit=stage==null?null:stage.edits.get(pos.asLong());
+        return edit==null?level.getBlockState(pos):edit.target();
+    }
+
+    private static void set(ServerLevel level,BlockPos pos,BlockState state){
+        var original=level.getBlockState(pos);
+        if(original.is(Blocks.BEDROCK)||original.hasBlockEntity()||level.getBlockEntity(pos)!=null)return;
+        var stage=Data.get(level).staging;
+        if(stage==null){level.setBlock(pos,state,2);return;}
+        stage.edits.put(pos.asLong(),new LairConstruction.Edit(original,state));
+    }
+
+    private static void checkpoint(ServerLevel level,Data data){
+        data.setDirty();
+        level.getDataStorage().save();
+    }
+
+    static void placeBlocks(ServerLevel level,LairConstruction job,long deadline){
+        while(job.cursor<job.positions.length){
+            int index=job.cursor++;
+            var pos=BlockPos.of(job.positions[index]);
+            var current=level.getBlockState(pos);
+            var edit=job.edit(index);
+            if(edit.canApply(current,current.hasBlockEntity()||level.getBlockEntity(pos)!=null))
+                level.setBlock(pos,edit.target(),2);
+            if((job.cursor&255)==0&&System.nanoTime()>=deadline)return;
+        }
+    }
+
+    private static boolean hivesLoaded(ServerLevel level,LairConstruction job){
+        // Wait until saved entities can be resolved by UUID before replaying a spawn.
+        for(var nbt:job.hives){
+            var coords=nbt.getList("Pos",Tag.TAG_DOUBLE);
+            var pos=BlockPos.containing(coords.getDouble(0),coords.getDouble(1),coords.getDouble(2));
+            if(!level.areEntitiesLoaded(new ChunkPos(pos).toLong()))return false;
+        }
+        return true;
+    }
+
+    static boolean spawnHives(ServerLevel level,LairConstruction job){
+        if(!hivesLoaded(level,job))return false;
+        boolean complete=true;
+        for(var nbt:job.hives){
+            var existing=level.getEntity(nbt.getUUID("UUID"));
+            if(existing!=null){
+                if(existing.getType()!=ModEntities.BLACKLIGHT_HIVE.get())complete=false;
+                continue;
+            }
+            var hive=ModEntities.BLACKLIGHT_HIVE.get().create(level);
+            if(hive==null){complete=false;continue;}
+            hive.load(nbt);
+            if(!level.addFreshEntity(hive))complete=false;
+        }
+        return complete;
+    }
+
+    private static boolean finish(ServerLevel level,LairConstruction job){
+        placeBlocks(level,job,System.nanoTime()+20_000_000L);
+        if(job.cursor<job.positions.length)return false;
+        if(!spawnHives(level,job)){
+            // A cancelled spawn keeps its journal and yields to other construction jobs.
+            job.nextHiveAttempt=level.getGameTime()+100;
+            return false;
+        }
+        // Both chunk and entity storage must commit before dropping the redo journal.
+        level.save(null,true,false);
+        return true;
     }
     private static BlockState b(net.minecraft.world.level.block.Block block){return block.defaultBlockState();}
 
     private static final double MOUND=4.6;
     private static double shaftR(BlockPos s,int y){return 1.55+.55*noise(s.getX(),y>>1,s.getZ());}
     private static void build(ServerLevel l,Plan p){
-        stage=new LinkedHashMap<>();stagedHives=new ArrayList<>();long t0=System.nanoTime();
-        try{buildStaged(l,p);var ordered=new LinkedHashMap<Long,BlockState>();
-            for(var e:stage.entrySet())if(!e.getValue().isAir())ordered.put(e.getKey(),e.getValue());
-            for(var e:stage.entrySet())if(e.getValue().isAir())ordered.put(e.getKey(),e.getValue());
-            JOBS.add(new Job(l.dimension(),ordered,stagedHives));
-            com.codex.blacklight.BlacklightNeoMod.LOGGER.info("Blacklight lair staged {} blocks in {} ms",stage.size(),(System.nanoTime()-t0)/1000000);}
-        finally{stage=null;stagedHives=null;}
+        var data=Data.get(l);
+        var stage=new Stage();
+        data.staging=stage;
+        try{
+            buildStaged(l,p);
+            data.jobs.add(LairConstruction.plan(p.entrance,stage.edits,stage.hives));
+            // A persisted partial chunk must always have a persisted plan to replay.
+            checkpoint(l,data);
+        }finally{data.staging=null;}
     }
     private static void buildStaged(ServerLevel l,Plan p){
         var s=p.entrance;var d=p.d;int sy=p.surface;
@@ -379,7 +458,7 @@ public final class LairSystem {
         for(var br:breaches)if(spots.size()<10&&rnd.nextFloat()<.5){for(int y=1;y<6;y++)if(B.open(br[0],y,br[2])&&!B.open(br[0],y-1,br[2])){spots.add(new int[]{br[0],br[2],y});break;}}
         for(var sp:spots){var hive=ModEntities.BLACKLIGHT_HIVE.get().create(l);if(hive==null)break;int y=sp.length>2?sp[2]:1;
             hive.moveTo(c.getX()+sp[0]+.5,floor+y-1,c.getZ()+sp[1]+.5,rnd.nextFloat()*360,0);
-            hive.setGrowth(.3F+rnd.nextFloat()*.3F);hive.getPersistentData().putBoolean("BlacklightLair",true);if(stagedHives!=null)stagedHives.add(hive);else l.addFreshEntity(hive);}
+            hive.setGrowth(.3F+rnd.nextFloat()*.3F);hive.getPersistentData().putBoolean("BlacklightLair",true);Data.get(l).staging.hives.add(hive.saveWithoutId(new CompoundTag()));}
         return floor+15;
     }
     private static BlockState shell(BlockPos pos,int kind,byte zone,float inf,int y){
@@ -431,12 +510,12 @@ public final class LairSystem {
                 if(l.getChunkSource().getChunkNow(cx,cz)==null){loaded=false;break;}
             if(!loaded)continue;
             it.remove();data.setDirty();clearOld(l,e);
-            int spacing=OutbreakConfig.LAIR_SPACING.get();boolean crowded=false;
-            for(long o:data.lairs){var b=BlockPos.of(o);if(b.distSqr(new BlockPos(e.getX(),b.getY(),e.getZ()))<(double)spacing*spacing)crowded=true;}
-            if(crowded){com.codex.blacklight.BlacklightNeoMod.LOGGER.info("Old lair at {} removed (too close to another)",e);return;}
+            if(crowded(data,e.getX(),e.getZ(),OutbreakConfig.LAIR_SPACING.get())){
+                com.codex.blacklight.BlacklightNeoMod.LOGGER.info("Old lair at {} removed (too close to another)",e);return;
+            }
             var plan=plan(l,e.getX(),e.getZ(),Direction.NORTH);
             if(plan==null){com.codex.blacklight.BlacklightNeoMod.LOGGER.info("Old lair at {} removed (no room for the new hall)",e);return;}
-            build(l,plan);data.lairs.add(plan.entrance.asLong());
+            build(l,plan);
             com.codex.blacklight.BlacklightNeoMod.LOGGER.info("Old lair at {} rebuilt",e);
             return; // one per pass
         }
@@ -445,6 +524,10 @@ public final class LairSystem {
 
     public static final class Data extends SavedData {
         final List<Long> lairs=new ArrayList<>(),stale=new ArrayList<>();
+        Stage staging;
+        final List<LairConstruction> jobs=new ArrayList<>();
+        final LinkedHashSet<Long> seen=new LinkedHashSet<>();
+        final ArrayDeque<Pending> pending=new ArrayDeque<>();
         /** Chunks that already rolled for a Lair (NeoForge keeps this as a chunk attachment). */
         final Set<Long> rolled=new HashSet<>();
         static Data get(ServerLevel level){return level.getDataStorage().computeIfAbsent(Data::load,Data::new,"blacklight_lairs");}
@@ -453,7 +536,12 @@ public final class LairSystem {
             for(long l:tag.getLongArray("Stale"))d.stale.add(l);
             if(tag.getInt("Version")<VERSION){for(long l:tag.getLongArray("Lairs"))d.stale.add(l);d.setDirty();}
             else for(long l:tag.getLongArray("Lairs"))d.lairs.add(l);
+            for(var job:tag.getList("Construction",Tag.TAG_COMPOUND))
+                d.jobs.add(LairConstruction.load((CompoundTag)job));
             return d;}
-        @Override public CompoundTag save(CompoundTag tag){tag.put("Rolled",new LongArrayTag(new ArrayList<>(rolled)));tag.putInt("Version",VERSION);tag.put("Lairs",new LongArrayTag(lairs));tag.put("Stale",new LongArrayTag(stale));return tag;}
+        @Override public CompoundTag save(CompoundTag tag){tag.put("Rolled",new LongArrayTag(new ArrayList<>(rolled)));var construction=new ListTag();
+            for(var job:jobs)construction.add(job.save());
+            tag.put("Construction",construction);
+            tag.putInt("Version",VERSION);tag.put("Lairs",new LongArrayTag(lairs));tag.put("Stale",new LongArrayTag(stale));return tag;}
     }
 }

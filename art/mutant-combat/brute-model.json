@@ -1,0 +1,929 @@
+{
+  "revision": "authored-brute-anatomy-knees-2",
+  "geometry": "a4db6ee1550d87605640183b0a87dd1da8da20a5d124d7915dcbb0dcdbfeaae3",
+  "texture": "02575facf8ce6d5dfb18f5eec98c9a3bd5246b796cccebecb1c9b0f4b1ab0e77",
+  "bones": 11,
+  "cuboids": 152,
+  "contactCuboids": 120,
+  "features": [
+    "Separated pectorals, abdominal bands, scapular ridges and dorsal nodules",
+    "Recessed eyes, separate teeth, cheeks and jaw volumes",
+    "Tapered forearms, individual knuckles, curled fingers and thumb",
+    "Haunches, kneecaps, calves, insteps and separated toes"
+  ],
+  "boundary": "Authored Minecraft anatomy; not an extracted original-game species. Existing atlas pixels reused unchanged. Elbow rig retained, independent knee channels added; no independent finger channels.",
+  "parts": [
+    {
+      "name": "ribcage",
+      "bone": "torso",
+      "cube": 0,
+      "material": "flesh"
+    },
+    {
+      "name": "trapezius",
+      "bone": "torso",
+      "cube": 1,
+      "material": "flesh"
+    },
+    {
+      "name": "lower_abdomen",
+      "bone": "torso",
+      "cube": 2,
+      "material": "fold"
+    },
+    {
+      "name": "sternal_seam",
+      "bone": "torso",
+      "cube": 3,
+      "material": "fold"
+    },
+    {
+      "name": "right_pectoral",
+      "bone": "torso",
+      "cube": 4,
+      "material": "muscle"
+    },
+    {
+      "name": "right_lower_pectoral",
+      "bone": "torso",
+      "cube": 5,
+      "material": "flesh"
+    },
+    {
+      "name": "right_clavicle",
+      "bone": "torso",
+      "cube": 6,
+      "material": "flesh"
+    },
+    {
+      "name": "right_latissimus",
+      "bone": "torso",
+      "cube": 7,
+      "material": "flesh"
+    },
+    {
+      "name": "right_scapula",
+      "bone": "torso",
+      "cube": 8,
+      "material": "fold"
+    },
+    {
+      "name": "right_scapular_ridge",
+      "bone": "torso",
+      "cube": 9,
+      "material": "flesh"
+    },
+    {
+      "name": "right_abdominal_0",
+      "bone": "torso",
+      "cube": 10,
+      "material": "muscle"
+    },
+    {
+      "name": "right_abdominal_1",
+      "bone": "torso",
+      "cube": 11,
+      "material": "muscle"
+    },
+    {
+      "name": "right_abdominal_2",
+      "bone": "torso",
+      "cube": 12,
+      "material": "muscle"
+    },
+    {
+      "name": "left_pectoral",
+      "bone": "torso",
+      "cube": 13,
+      "material": "muscle"
+    },
+    {
+      "name": "left_lower_pectoral",
+      "bone": "torso",
+      "cube": 14,
+      "material": "flesh"
+    },
+    {
+      "name": "left_clavicle",
+      "bone": "torso",
+      "cube": 15,
+      "material": "flesh"
+    },
+    {
+      "name": "left_latissimus",
+      "bone": "torso",
+      "cube": 16,
+      "material": "flesh"
+    },
+    {
+      "name": "left_scapula",
+      "bone": "torso",
+      "cube": 17,
+      "material": "fold"
+    },
+    {
+      "name": "left_scapular_ridge",
+      "bone": "torso",
+      "cube": 18,
+      "material": "flesh"
+    },
+    {
+      "name": "left_abdominal_0",
+      "bone": "torso",
+      "cube": 19,
+      "material": "muscle"
+    },
+    {
+      "name": "left_abdominal_1",
+      "bone": "torso",
+      "cube": 20,
+      "material": "muscle"
+    },
+    {
+      "name": "left_abdominal_2",
+      "bone": "torso",
+      "cube": 21,
+      "material": "muscle"
+    },
+    {
+      "name": "spine_root_0",
+      "bone": "torso",
+      "cube": 22,
+      "material": "fold"
+    },
+    {
+      "name": "spinal_nodule_0",
+      "bone": "torso",
+      "cube": 23,
+      "material": "bone"
+    },
+    {
+      "name": "spine_root_1",
+      "bone": "torso",
+      "cube": 24,
+      "material": "fold"
+    },
+    {
+      "name": "spinal_nodule_1",
+      "bone": "torso",
+      "cube": 25,
+      "material": "bone"
+    },
+    {
+      "name": "spine_root_2",
+      "bone": "torso",
+      "cube": 26,
+      "material": "fold"
+    },
+    {
+      "name": "spinal_nodule_2",
+      "bone": "torso",
+      "cube": 27,
+      "material": "bone"
+    },
+    {
+      "name": "spine_root_3",
+      "bone": "torso",
+      "cube": 28,
+      "material": "fold"
+    },
+    {
+      "name": "spinal_nodule_3",
+      "bone": "torso",
+      "cube": 29,
+      "material": "bone"
+    },
+    {
+      "name": "spine_root_4",
+      "bone": "torso",
+      "cube": 30,
+      "material": "fold"
+    },
+    {
+      "name": "spinal_nodule_4",
+      "bone": "torso",
+      "cube": 31,
+      "material": "bone"
+    },
+    {
+      "name": "cranial_vault",
+      "bone": "head",
+      "cube": 0,
+      "material": "fold"
+    },
+    {
+      "name": "crown",
+      "bone": "head",
+      "cube": 1,
+      "material": "flesh"
+    },
+    {
+      "name": "maw_recess",
+      "bone": "head",
+      "cube": 2,
+      "material": "fold"
+    },
+    {
+      "name": "mandible",
+      "bone": "head",
+      "cube": 3,
+      "material": "flesh"
+    },
+    {
+      "name": "chin",
+      "bone": "head",
+      "cube": 4,
+      "material": "fold"
+    },
+    {
+      "name": "nasal_bridge",
+      "bone": "head",
+      "cube": 5,
+      "material": "flesh"
+    },
+    {
+      "name": "brow_-1",
+      "bone": "head",
+      "cube": 6,
+      "material": "flesh"
+    },
+    {
+      "name": "orbital_recess_-1",
+      "bone": "head",
+      "cube": 7,
+      "material": "fold"
+    },
+    {
+      "name": "eye_-1",
+      "bone": "head",
+      "cube": 8,
+      "material": "muscle"
+    },
+    {
+      "name": "cheek_-1",
+      "bone": "head",
+      "cube": 9,
+      "material": "flesh"
+    },
+    {
+      "name": "jaw_hinge_-1",
+      "bone": "head",
+      "cube": 10,
+      "material": "muscle"
+    },
+    {
+      "name": "nostril_-1",
+      "bone": "head",
+      "cube": 11,
+      "material": "fold"
+    },
+    {
+      "name": "brow_1",
+      "bone": "head",
+      "cube": 12,
+      "material": "flesh"
+    },
+    {
+      "name": "orbital_recess_1",
+      "bone": "head",
+      "cube": 13,
+      "material": "fold"
+    },
+    {
+      "name": "eye_1",
+      "bone": "head",
+      "cube": 14,
+      "material": "muscle"
+    },
+    {
+      "name": "cheek_1",
+      "bone": "head",
+      "cube": 15,
+      "material": "flesh"
+    },
+    {
+      "name": "jaw_hinge_1",
+      "bone": "head",
+      "cube": 16,
+      "material": "muscle"
+    },
+    {
+      "name": "nostril_1",
+      "bone": "head",
+      "cube": 17,
+      "material": "fold"
+    },
+    {
+      "name": "upper_tooth_0",
+      "bone": "head",
+      "cube": 18,
+      "material": "bone"
+    },
+    {
+      "name": "lower_tooth_0",
+      "bone": "head",
+      "cube": 19,
+      "material": "bone"
+    },
+    {
+      "name": "upper_tooth_1",
+      "bone": "head",
+      "cube": 20,
+      "material": "bone"
+    },
+    {
+      "name": "lower_tooth_1",
+      "bone": "head",
+      "cube": 21,
+      "material": "bone"
+    },
+    {
+      "name": "upper_tooth_2",
+      "bone": "head",
+      "cube": 22,
+      "material": "bone"
+    },
+    {
+      "name": "lower_tooth_2",
+      "bone": "head",
+      "cube": 23,
+      "material": "bone"
+    },
+    {
+      "name": "upper_tooth_3",
+      "bone": "head",
+      "cube": 24,
+      "material": "bone"
+    },
+    {
+      "name": "lower_tooth_3",
+      "bone": "head",
+      "cube": 25,
+      "material": "bone"
+    },
+    {
+      "name": "upper_tooth_4",
+      "bone": "head",
+      "cube": 26,
+      "material": "bone"
+    },
+    {
+      "name": "lower_tooth_4",
+      "bone": "head",
+      "cube": 27,
+      "material": "bone"
+    },
+    {
+      "name": "upper_tooth_5",
+      "bone": "head",
+      "cube": 28,
+      "material": "bone"
+    },
+    {
+      "name": "lower_tooth_5",
+      "bone": "head",
+      "cube": 29,
+      "material": "bone"
+    },
+    {
+      "name": "right_humerus",
+      "bone": "right_arm",
+      "cube": 0,
+      "material": "fold"
+    },
+    {
+      "name": "right_deltoid",
+      "bone": "right_arm",
+      "cube": 1,
+      "material": "flesh"
+    },
+    {
+      "name": "right_deltoid_cap",
+      "bone": "right_arm",
+      "cube": 2,
+      "material": "flesh"
+    },
+    {
+      "name": "right_outer_deltoid",
+      "bone": "right_arm",
+      "cube": 3,
+      "material": "fold"
+    },
+    {
+      "name": "right_biceps",
+      "bone": "right_arm",
+      "cube": 4,
+      "material": "muscle"
+    },
+    {
+      "name": "right_biceps_tendon",
+      "bone": "right_arm",
+      "cube": 5,
+      "material": "flesh"
+    },
+    {
+      "name": "right_triceps",
+      "bone": "right_arm",
+      "cube": 6,
+      "material": "flesh"
+    },
+    {
+      "name": "right_elbow_cap",
+      "bone": "right_arm",
+      "cube": 7,
+      "material": "fold"
+    },
+    {
+      "name": "right_shoulder_growth",
+      "bone": "right_arm",
+      "cube": 8,
+      "material": "bone"
+    },
+    {
+      "name": "right_forearm_core",
+      "bone": "right_forearm",
+      "cube": 0,
+      "material": "flesh"
+    },
+    {
+      "name": "right_palm",
+      "bone": "right_forearm",
+      "cube": 1,
+      "material": "fold"
+    },
+    {
+      "name": "right_ulna",
+      "bone": "right_forearm",
+      "cube": 2,
+      "material": "flesh"
+    },
+    {
+      "name": "right_extensor_0",
+      "bone": "right_forearm",
+      "cube": 3,
+      "material": "muscle"
+    },
+    {
+      "name": "right_extensor_1",
+      "bone": "right_forearm",
+      "cube": 4,
+      "material": "muscle"
+    },
+    {
+      "name": "right_extensor_2",
+      "bone": "right_forearm",
+      "cube": 5,
+      "material": "muscle"
+    },
+    {
+      "name": "right_knuckle_0",
+      "bone": "right_forearm",
+      "cube": 6,
+      "material": "flesh"
+    },
+    {
+      "name": "right_knuckle_plate_0",
+      "bone": "right_forearm",
+      "cube": 7,
+      "material": "bone"
+    },
+    {
+      "name": "right_curled_digit_0",
+      "bone": "right_forearm",
+      "cube": 8,
+      "material": "flesh"
+    },
+    {
+      "name": "right_knuckle_1",
+      "bone": "right_forearm",
+      "cube": 9,
+      "material": "flesh"
+    },
+    {
+      "name": "right_knuckle_plate_1",
+      "bone": "right_forearm",
+      "cube": 10,
+      "material": "bone"
+    },
+    {
+      "name": "right_curled_digit_1",
+      "bone": "right_forearm",
+      "cube": 11,
+      "material": "flesh"
+    },
+    {
+      "name": "right_knuckle_2",
+      "bone": "right_forearm",
+      "cube": 12,
+      "material": "flesh"
+    },
+    {
+      "name": "right_knuckle_plate_2",
+      "bone": "right_forearm",
+      "cube": 13,
+      "material": "bone"
+    },
+    {
+      "name": "right_curled_digit_2",
+      "bone": "right_forearm",
+      "cube": 14,
+      "material": "flesh"
+    },
+    {
+      "name": "right_knuckle_3",
+      "bone": "right_forearm",
+      "cube": 15,
+      "material": "flesh"
+    },
+    {
+      "name": "right_knuckle_plate_3",
+      "bone": "right_forearm",
+      "cube": 16,
+      "material": "bone"
+    },
+    {
+      "name": "right_curled_digit_3",
+      "bone": "right_forearm",
+      "cube": 17,
+      "material": "flesh"
+    },
+    {
+      "name": "right_thumb_base",
+      "bone": "right_forearm",
+      "cube": 18,
+      "material": "muscle"
+    },
+    {
+      "name": "right_thumb_curl",
+      "bone": "right_forearm",
+      "cube": 19,
+      "material": "flesh"
+    },
+    {
+      "name": "right_thigh_core",
+      "bone": "right_leg",
+      "cube": 0,
+      "material": "fold"
+    },
+    {
+      "name": "right_quadriceps",
+      "bone": "right_leg",
+      "cube": 1,
+      "material": "flesh"
+    },
+    {
+      "name": "right_outer_haunch",
+      "bone": "right_leg",
+      "cube": 2,
+      "material": "flesh"
+    },
+    {
+      "name": "right_knee",
+      "bone": "right_leg",
+      "cube": 3,
+      "material": "fold"
+    },
+    {
+      "name": "right_kneecap",
+      "bone": "right_leg",
+      "cube": 4,
+      "material": "bone"
+    },
+    {
+      "name": "right_shin",
+      "bone": "right_shin",
+      "cube": 0,
+      "material": "flesh"
+    },
+    {
+      "name": "right_shin_tendon",
+      "bone": "right_shin",
+      "cube": 1,
+      "material": "muscle"
+    },
+    {
+      "name": "right_calf",
+      "bone": "right_shin",
+      "cube": 2,
+      "material": "fold"
+    },
+    {
+      "name": "right_heel",
+      "bone": "right_shin",
+      "cube": 3,
+      "material": "fold"
+    },
+    {
+      "name": "right_instep",
+      "bone": "right_shin",
+      "cube": 4,
+      "material": "flesh"
+    },
+    {
+      "name": "right_toe_0",
+      "bone": "right_shin",
+      "cube": 5,
+      "material": "fold"
+    },
+    {
+      "name": "right_toenail_0",
+      "bone": "right_shin",
+      "cube": 6,
+      "material": "bone"
+    },
+    {
+      "name": "right_toe_1",
+      "bone": "right_shin",
+      "cube": 7,
+      "material": "fold"
+    },
+    {
+      "name": "right_toenail_1",
+      "bone": "right_shin",
+      "cube": 8,
+      "material": "bone"
+    },
+    {
+      "name": "right_toe_2",
+      "bone": "right_shin",
+      "cube": 9,
+      "material": "fold"
+    },
+    {
+      "name": "right_toenail_2",
+      "bone": "right_shin",
+      "cube": 10,
+      "material": "bone"
+    },
+    {
+      "name": "left_humerus",
+      "bone": "left_arm",
+      "cube": 0,
+      "material": "fold"
+    },
+    {
+      "name": "left_deltoid",
+      "bone": "left_arm",
+      "cube": 1,
+      "material": "flesh"
+    },
+    {
+      "name": "left_deltoid_cap",
+      "bone": "left_arm",
+      "cube": 2,
+      "material": "flesh"
+    },
+    {
+      "name": "left_outer_deltoid",
+      "bone": "left_arm",
+      "cube": 3,
+      "material": "fold"
+    },
+    {
+      "name": "left_biceps",
+      "bone": "left_arm",
+      "cube": 4,
+      "material": "muscle"
+    },
+    {
+      "name": "left_biceps_tendon",
+      "bone": "left_arm",
+      "cube": 5,
+      "material": "flesh"
+    },
+    {
+      "name": "left_triceps",
+      "bone": "left_arm",
+      "cube": 6,
+      "material": "flesh"
+    },
+    {
+      "name": "left_elbow_cap",
+      "bone": "left_arm",
+      "cube": 7,
+      "material": "fold"
+    },
+    {
+      "name": "left_shoulder_growth",
+      "bone": "left_arm",
+      "cube": 8,
+      "material": "bone"
+    },
+    {
+      "name": "left_forearm_core",
+      "bone": "left_forearm",
+      "cube": 0,
+      "material": "flesh"
+    },
+    {
+      "name": "left_palm",
+      "bone": "left_forearm",
+      "cube": 1,
+      "material": "fold"
+    },
+    {
+      "name": "left_ulna",
+      "bone": "left_forearm",
+      "cube": 2,
+      "material": "flesh"
+    },
+    {
+      "name": "left_extensor_0",
+      "bone": "left_forearm",
+      "cube": 3,
+      "material": "muscle"
+    },
+    {
+      "name": "left_extensor_1",
+      "bone": "left_forearm",
+      "cube": 4,
+      "material": "muscle"
+    },
+    {
+      "name": "left_extensor_2",
+      "bone": "left_forearm",
+      "cube": 5,
+      "material": "muscle"
+    },
+    {
+      "name": "left_knuckle_0",
+      "bone": "left_forearm",
+      "cube": 6,
+      "material": "flesh"
+    },
+    {
+      "name": "left_knuckle_plate_0",
+      "bone": "left_forearm",
+      "cube": 7,
+      "material": "bone"
+    },
+    {
+      "name": "left_curled_digit_0",
+      "bone": "left_forearm",
+      "cube": 8,
+      "material": "flesh"
+    },
+    {
+      "name": "left_knuckle_1",
+      "bone": "left_forearm",
+      "cube": 9,
+      "material": "flesh"
+    },
+    {
+      "name": "left_knuckle_plate_1",
+      "bone": "left_forearm",
+      "cube": 10,
+      "material": "bone"
+    },
+    {
+      "name": "left_curled_digit_1",
+      "bone": "left_forearm",
+      "cube": 11,
+      "material": "flesh"
+    },
+    {
+      "name": "left_knuckle_2",
+      "bone": "left_forearm",
+      "cube": 12,
+      "material": "flesh"
+    },
+    {
+      "name": "left_knuckle_plate_2",
+      "bone": "left_forearm",
+      "cube": 13,
+      "material": "bone"
+    },
+    {
+      "name": "left_curled_digit_2",
+      "bone": "left_forearm",
+      "cube": 14,
+      "material": "flesh"
+    },
+    {
+      "name": "left_knuckle_3",
+      "bone": "left_forearm",
+      "cube": 15,
+      "material": "flesh"
+    },
+    {
+      "name": "left_knuckle_plate_3",
+      "bone": "left_forearm",
+      "cube": 16,
+      "material": "bone"
+    },
+    {
+      "name": "left_curled_digit_3",
+      "bone": "left_forearm",
+      "cube": 17,
+      "material": "flesh"
+    },
+    {
+      "name": "left_thumb_base",
+      "bone": "left_forearm",
+      "cube": 18,
+      "material": "muscle"
+    },
+    {
+      "name": "left_thumb_curl",
+      "bone": "left_forearm",
+      "cube": 19,
+      "material": "flesh"
+    },
+    {
+      "name": "left_thigh_core",
+      "bone": "left_leg",
+      "cube": 0,
+      "material": "fold"
+    },
+    {
+      "name": "left_quadriceps",
+      "bone": "left_leg",
+      "cube": 1,
+      "material": "flesh"
+    },
+    {
+      "name": "left_outer_haunch",
+      "bone": "left_leg",
+      "cube": 2,
+      "material": "flesh"
+    },
+    {
+      "name": "left_knee",
+      "bone": "left_leg",
+      "cube": 3,
+      "material": "fold"
+    },
+    {
+      "name": "left_kneecap",
+      "bone": "left_leg",
+      "cube": 4,
+      "material": "bone"
+    },
+    {
+      "name": "left_shin",
+      "bone": "left_shin",
+      "cube": 0,
+      "material": "flesh"
+    },
+    {
+      "name": "left_shin_tendon",
+      "bone": "left_shin",
+      "cube": 1,
+      "material": "muscle"
+    },
+    {
+      "name": "left_calf",
+      "bone": "left_shin",
+      "cube": 2,
+      "material": "fold"
+    },
+    {
+      "name": "left_heel",
+      "bone": "left_shin",
+      "cube": 3,
+      "material": "fold"
+    },
+    {
+      "name": "left_instep",
+      "bone": "left_shin",
+      "cube": 4,
+      "material": "flesh"
+    },
+    {
+      "name": "left_toe_0",
+      "bone": "left_shin",
+      "cube": 5,
+      "material": "fold"
+    },
+    {
+      "name": "left_toenail_0",
+      "bone": "left_shin",
+      "cube": 6,
+      "material": "bone"
+    },
+    {
+      "name": "left_toe_1",
+      "bone": "left_shin",
+      "cube": 7,
+      "material": "fold"
+    },
+    {
+      "name": "left_toenail_1",
+      "bone": "left_shin",
+      "cube": 8,
+      "material": "bone"
+    },
+    {
+      "name": "left_toe_2",
+      "bone": "left_shin",
+      "cube": 9,
+      "material": "fold"
+    },
+    {
+      "name": "left_toenail_2",
+      "bone": "left_shin",
+      "cube": 10,
+      "material": "bone"
+    }
+  ]
+}

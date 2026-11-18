@@ -1,0 +1,127 @@
+{
+  "date": "2026-11-17",
+  "boundary": "Read actual runtime classes and relevant source records. Existing validation manifests are historical evidence of limited checks, never proof of complete playable creatures. No creature below received new native-player acceptance in this review.",
+  "rows": [
+    {
+      "creature": "common infected",
+      "runtime": "BlacklightCommonInfected + CommonInfectedMotion + CommonInfectedLeap",
+      "present": "Three authored close attacks plus P1 source-timed jump windup, proximity probes, conditional right-wrist attack and landing adapter; pursuit, promotion and four appearances. Successful leap release/landing use original FIG sound timing; separate death cough uses project-licensed Foley. Native JumpTo bounded 3D air tracking, intercept prediction and passed-target latch now replace the old frozen-heading assumption; right-wrist contact interpolates displayed yaw. Native stationary/dynamic JumpTo launch and gravity30 now drive one released-flight movement step; ordinary travel resumes on interruption or landing. Source .333333 root-driver fade now mixes retained horizontal motion into the single ordinary travel step after landing/ordinary target loss. Explicit ownership changes clear the tail. Action generations prevent old wrist-damage callbacks from restoring landing/root state after same-object load.",
+      "gapType": "authored adaptation / not fully accepted",
+      "gap": "Native full root-driver/physics blending, complete original clips and species AI remain incomplete. Current horizontal fade plus ordinary MC gravity/collision is an explicit adapter. Compilation and player combat acceptance remain deferred.",
+      "record": "art/encounters/common-infected-leap-source-20261117.json",
+      "trackingRecord": "art/encounters/common-infected-jumpto-source-20261117.json",
+      "launchRecord": "art/encounters/common-infected-launch-source-20261117.json",
+      "rootExitRecord": "art/encounters/common-infected-root-exit-source-20261117.json"
+    },
+    {
+      "creature": "infected host",
+      "runtime": "BlacklightInfectedHost",
+      "present": "Saved host anatomy, tissue organs, digestion, metamorphosis, defense, inheritance and boss profiles.",
+      "gapType": "integration not accepted",
+      "gap": "Large custom MC-host system is present. Whole-species visual, movement, combat and consume matrix has not been established by this inspection; no complete original counterpart is claimed."
+    },
+    {
+      "creature": "stalker",
+      "runtime": "BlacklightMutant / MutantMove",
+      "present": "Claw, pounce, double claw, timed skin contact and committed attack cancellation.",
+      "gapType": "partial implementation",
+      "gap": "Authored species moves and current low-detail model; species silhouette, hurt/death/consume choreography, visible claw recoil against cover and player/network matrix remain open."
+    },
+    {
+      "creature": "spitter",
+      "runtime": "BlacklightMutant / BlacklightSpit",
+      "present": "Single spit, three-release volley, retreat and physical projectile collision.",
+      "gapType": "partial implementation",
+      "gap": "Authored attack set; species hurt/death/consume choreography, silhouette, full audio mix and original-game equivalence remain open."
+    },
+    {
+      "creature": "brute",
+      "runtime": "BlacklightMutant / BruteContact / BruteRecovery",
+      "present": "Hammer, slam, charge, contact response, mount/rider and recovery paths.",
+      "gapType": "partial implementation",
+      "gap": "Authored attack set; complete guard/knockdown/death/consume choreography, constrained-space transitions and player combat pacing remain open."
+    },
+    {
+      "creature": "hunter",
+      "runtime": "BlacklightHunter / HunterContactPose / HunterConsume",
+      "present": "Source close-attack contact plus P1 left-wrist counter animation/timing chained into five-window barrage, preserving committed target/yaw with cancellation guards. Counter and barrage sounds now follow original FIG event times, with independent hurt/death cues and project-licensed Foley. Counter and chained barrage now use the decoded Motion_Root translation relative to each clip start, with collision, loaded-region/border/restriction gates and generation-safe contact alignment.",
+      "gapType": "not fully accepted",
+      "gap": "Original AI counter trigger thresholds, native root-velocity blending, non-root bone scale and large source impulse remain incomplete. Compile, unit/GameTests and real-player acceptance deferred.",
+      "record": "art/hunter/counter-chain-source-20261117.json",
+      "audioRecord": "art/creature-audio/source-event-review-20261117.json",
+      "rootRecord": "art/hunter/counter-root-source-20261117.json"
+    },
+    {
+      "creature": "hydra",
+      "runtime": "BlacklightHydra / HydraCombatAction / HydraThrow",
+      "present": "Source joint contact, pickup/hold/throw, sweep/ground wave, incoming multipart contact and authored body adaptation. Source ordinary death/sink clocks and explicit Thermobaric1 death/hide/retirement branch are code-connected. Proven roar/whoosh/debris Patch roles drive authored licensed Foley with client cleanup and no historical one-shot replay.",
+      "gapType": "partial source port",
+      "gap": "Full source target strategy, procedural controllers, native physics and death particle/Crater lifecycle remain incomplete. Sink sound7944 is unmapped. Audio uses project Foley, has not been heard or tested in the client, and does not reproduce original waveforms. Ground displacement is visual rather than persistent terrain excavation.",
+      "deathRecord": "art/hydra/death-source-provenance.json",
+      "deathAudioRecord": "art/creature-audio/hydra-death-integration-20261117.json"
+    },
+    {
+      "creature": "juggernaut",
+      "runtime": "EncounterMob / JuggernautContact",
+      "present": "Decoded nested fist windows and guarded receiving surfaces; block/hammer/slam and charge.",
+      "gapType": "partial source port",
+      "gap": "CHARGE is still the authored body-contact move; original transitions and root travel are not fully ported, with full player/audio acceptance pending."
+    },
+    {
+      "creature": "flyer",
+      "runtime": "EncounterMob / FlyerFlight / FlyerMotion / FlyerPhysics",
+      "present": "Dedicated flight/dive, source pose and physics handoff with multipart receiving surfaces.",
+      "gapType": "partial implementation",
+      "gap": "Full capture/hold/consume continuity, thin-obstacle/high-speed cases, broad receiver shapes and player/network/audio matrix remain unaccepted."
+    },
+    {
+      "creature": "hive",
+      "runtime": "BlacklightHive",
+      "present": "Growth/open/release/shrink/regrow loop, fixed strain, own-brood caps, tissue spread and defense.",
+      "gapType": "partial source adaptation",
+      "gap": "Spawning is gated on the outbreak being active, nearby audience and mob-spawning rules; an inactive hive is not automatically a missing-spawn defect. Full original choreography/audio and player progression integration still need acceptance."
+    },
+    {
+      "creature": "Elizabeth Greene",
+      "runtime": "EncounterMob / GreeneMotion / GreeneContact",
+      "present": "Native P1 ROT/TRAN/SCL hierarchy, segment-scale compensation, source-informed binding of138authored cuboids, shared posed receiving regions and live Mouth-based projectile origin; three source-bound Slug defenses and collapse/down/rise cycle remain. Six source weapon programs now drive thirteen Shoot tracks and ten physical mouth sockets, per-port cooldowns, native flight and swept-sphere collision. Original ordered XZ shooting selector and Shotgun entry-relative timer replace round-robin/reload. Projectile templates, visibility, spin and author-made effect geometry now have dedicated rendering and a saved, non-damaging final state. Native signed collapse timer (26.6667+/-1s from collapse entry) now chooses and saves each recovery deadline. Two source-profile projectile loops use credited Foley and explicit client lifecycle cleanup. Core hurt now distributes raw incoming/attached slots*.6 before own immunity, retaining cooling slots in the divisor. Guard/collapse no longer leaks8% core chip; DOWN/RISING accepts full own damage. One original physical contact gives one feedback event, not three child impacts. The former42-cube orbit/ring is removed:30joint-bound Slug cuboids share MotherCore pose;108core cubes are retained. Independent broken-segment corpses use the original death curve. Eight persistent phases connect underground, emergence, source health-floor/wave progression, owned brood and fresh first-rise placement. Original26%early recovery and close-roar dwell/recharge/priority gates are integrated.",
+      "gapType": "actual defect repaired + missing mechanisms",
+      "gap": "Full mission/cinematic force flags, Crater, Hunter underground birth, native impulse and complete receiver categories remain incomplete. The model uses rigid cuboid approximations rather than original weighted skin; core1400balance, immediate broken-slot detachment,10tick child cooldown,20Hz scheduling and MC collision remain explicit adapters. No compilation/gameplay/visual/audio acceptance or release installation.",
+      "weaponRecord": "art/encounters/greene-weapon-source-20261117.json",
+      "poseRecords": [
+        "art/encounters/greene-native-bind-correction.json",
+        "art/encounters/greene-native-scale-source.json",
+        "art/encounters/greene-segment-shared-pose-source.json"
+      ],
+      "weaponIntegrationRecord": "art/encounters/greene-program-integration-20261117.json",
+      "selectorRecord": "art/encounters/greene-selector-source-20261117.json",
+      "projectileRecord": "art/encounters/greene-projectile-template-source.json",
+      "latestIntegrationRecord": "art/encounters/boss-combat-followup-20261117.json",
+      "recoveryRecord": "art/encounters/greene-recovery-source-20261117.json",
+      "projectileAudioRecord": "art/encounters/greene-projectile-loop-audio-source.json",
+      "healthRoutingRecord": "art/encounters/greene-mother-health-integration-20261117.json",
+      "segmentDeathRecord": "art/encounters/greene-segment-death-integration-20261117.json",
+      "cycleRecord": "art/encounters/greene-battle-cycle-integration-20261117.json",
+      "roarRecord": "art/encounters/greene-natural-roar-integration-20261117.json"
+    },
+    {
+      "creature": "Goliath",
+      "runtime": "EncounterMob / GoliathMotion / GoliathContact / GoliathCharge",
+      "present": "Source front-slam contact and three WorldCone ground pulses, native local ROT/TRAN/SCL and authored receiving skin. Bullrush uses thirteen source phases with569-branch reference resolution, native loop/exit predicates and normal return-to-taunt/recovery/howl continuation. Synced phase drives body/root/contact; outgoing Player hits precede repeat decisions. Ordinary taunt uses independent original joint sweep windows and100/750/400 relative damage, shared inner/outer groups, source chest/path/surface cover gates and continuous observed transforms. Target removal after exit no longer cuts off recovery. Actual completion anchors recharge; ownership guards stop callback-cancelled damage.",
+      "gapType": "partial source mechanism and numerical rig correction; not compiled or player accepted",
+      "gap": "Giant fist/support-plane penetration, native root-delta blending/repeat-hit rules, damaged-limb/grapple/story taunt alternatives, special-exit successor and full AI remain incomplete. P2 native sound timing/fields are decoded but audio waveforms are missing.20Hz rounding, committed-player support proxy, zero unbound script flags, MC damage/cover and strongest accepted hit per window are explicit adapters. No compilation, server or player acceptance.",
+      "groundEffectRecord": "art/encounters/goliath-ground-impact-provenance.json",
+      "chargeRecord": "art/encounters/goliath-charge-provenance.json",
+      "actorPoseRecord": "art/encounters/goliath-actor-pose-followup.json",
+      "chargeControlRecord": "art/encounters/goliath-charge-fig-control.json",
+      "controlRecord": "art/encounters/goliath-charge-fig-control.json",
+      "tauntRecord": "art/encounters/goliath-taunt-provenance.json"
+    }
+  ],
+  "highestImpactNext": [
+    "Continue source-proven Greene mission flags, Crater/birth choreography and model/receiver limits; the persistent cycle and health floors are now integrated in code but uncompiled and unaccepted.",
+    "Continue Goliath native root blending/support-plane grounding, damaged-limb/grapple/story taunt alternatives, special-exit successor, repeat-hit and source waveform routing; ordinary followthrough is now code-connected but uncompiled.",
+    "Continue species-specific gaps recorded above; perform compilation, automated checks and direct player acceptance only after the user resumes testing."
+  ],
+  "followup": "Updated against current records after the shared Slug pose, recurring cycle, source root-motion and Hydra audio integration; no test/runtime pass is implied."
+}

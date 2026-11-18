@@ -20,7 +20,7 @@
     }
   },
   "result": {
-    "count": 1,
-    "item": "blacklight:military_apc_chassis"
+    "item": "blacklight:military_apc_chassis",
+    "count": 1
   }
 }
