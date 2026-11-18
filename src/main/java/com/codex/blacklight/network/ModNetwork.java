@@ -20,7 +20,8 @@ public final class ModNetwork {
 
     public static void register(RegisterPayloadHandlersEvent event) {
         // Configurable ecology, consume variants and military payloads share one negotiated layout.
-        event.registrar("standalone-57-contact-hitstop-clock")
+        event.registrar("standalone-encounter-contact-1")
+                .playToClient(ContactEffectsPayload.TYPE,ContactEffectsPayload.STREAM_CODEC,(payload,context)->context.enqueueWork(()->com.codex.blacklight.client.renderer.ContactEffectsPresentation.accept(payload)))
                 .playToClient(RagdollImpactPayload.TYPE,RagdollImpactPayload.CODEC,(payload,context)->context.enqueueWork(()->com.codex.blacklight.client.animation.ImpactRagdoll.accept(payload)))
                 .playToServer(FirearmReloadPayload.TYPE,FirearmReloadPayload.STREAM_CODEC,(payload,context)->context.enqueueWork(()->{if(context.player() instanceof ServerPlayer player)payload.handle(player);}))
                 .playToClient(GunplayFeedbackPayload.TYPE,GunplayFeedbackPayload.STREAM_CODEC,(payload,context)->context.enqueueWork(()->com.codex.blacklight.client.renderer.GunplayVisuals.accept(payload)))
@@ -66,9 +67,9 @@ public final class ModNetwork {
                 .playToServer(TargetLockPayload.TYPE,TargetLockPayload.STREAM_CODEC,(payload,context)->
                     context.enqueueWork(()->{
                         if(context.player() instanceof ServerPlayer player){
-                            com.codex.blacklight.combat.CombatTargeting.requestLock(player,payload.entityId());
+                            com.codex.blacklight.combat.CombatTargeting.requestLock(player,payload.entityId(),payload.region());
                             PacketDistributor.sendToPlayer(player,new TargetLockAckPayload(payload.requestId(),
-                                    player.getData(com.codex.blacklight.registry.ModAttachments.TARGET_LOCK_ID)));
+                                    player.getData(com.codex.blacklight.registry.ModAttachments.TARGET_LOCK_ID),player.getData(com.codex.blacklight.registry.ModAttachments.TARGET_LOCK_REGION)));
                         }
                     }))
                 .playToClient(TargetLockAckPayload.TYPE,TargetLockAckPayload.STREAM_CODEC,(payload,context)->

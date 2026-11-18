@@ -1005,5 +1005,20 @@
   "message.blacklight.apex_granted": "你站上了食物链顶端：极速再生；虐杀模式获得霸体，常规状态承受伤害降低 80%。",
   "hud.blacklight.supreme_weakened": "可吞噬",
   "advancement.blacklight.biological_experiment": "生物实验",
-  "advancement.blacklight.biological_experiment.desc": "I've Back!——获得最强进化形态，以一种特别的方式。"
+  "advancement.blacklight.biological_experiment.desc": "I've Back!——获得最强进化形态，以一种特别的方式。",
+  "hud.blacklight.goliath_part.head": "头部",
+  "hud.blacklight.goliath_part.right_leg": "右腿",
+  "hud.blacklight.goliath_part.right_arm": "右臂",
+  "itemGroup.blacklight.encounters": "黑光：生物与首领",
+  "entity.blacklight.goliath": "歌利亚",
+  "item.blacklight.goliath_spawn_egg": "歌利亚刷怪蛋",
+  "entity.blacklight.flyer": "飞行感染体",
+  "item.blacklight.flyer_spawn_egg": "飞行感染体刷怪蛋",
+  "entity.blacklight.elizabeth_greene": "伊丽莎白·格林",
+  "item.blacklight.elizabeth_greene_spawn_egg": "伊丽莎白·格林刷怪蛋",
+  "subtitle.blacklight.greene.projectile_biomass_loop": "格林生物弹掠过",
+  "subtitle.blacklight.greene.projectile_fire_loop": "格林岩块呼啸",
+  "subtitle.blacklight.hydra.death_roar": "九头蛇：死亡嘶吼",
+  "subtitle.blacklight.hydra.death_whoosh": "九头蛇：身体倒落",
+  "subtitle.blacklight.hydra.death_debris": "九头蛇：碎石下落"
 }

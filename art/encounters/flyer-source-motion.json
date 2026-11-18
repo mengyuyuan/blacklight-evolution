@@ -1,0 +1,79 @@
+{
+  "source": "D:\\PrototypeReference\\p2\\input\\p2\\flyer.p3d",
+  "sourceSha256": "a5a528705863763c2509b1329cf3cfc8134145bc26a61dd3d2636298d21b27fc",
+  "skeleton": "flyer_skeleton",
+  "mapping": {
+    "root": "Character_Root",
+    "torso": "Spine_3",
+    "head": "Head",
+    "jaw": "Jaw",
+    "left_arm": "Shoulder_L",
+    "left_forearm": "Elbow_L",
+    "left_hand": "Wrist_L",
+    "right_arm": "Shoulder_R",
+    "right_forearm": "Elbow_R",
+    "right_hand": "Wrist_R",
+    "tail": "Tail_1",
+    "left_leg": "Knee_L",
+    "right_leg": "Knee_R"
+  },
+  "reference": "flyer_com_idle",
+  "rootMotion": "Source ground is Y=0. Motion_Root travel and heading are removed from the skin; the Minecraft server supplies actor movement. Skin retains Character_Root lean and vertical displacement.",
+  "entity": "flyer",
+  "clips": {
+    "idle": {
+      "source": "flyer_com_idle",
+      "fps": 30.0,
+      "seconds": 1.1
+    },
+    "flap": {
+      "source": "flyer_loco_casual_flapping",
+      "fps": 30.0,
+      "seconds": 1.1
+    },
+    "glide": {
+      "source": "flyer_gliding_idle",
+      "fps": 30.0,
+      "seconds": 2.3333333333333335
+    },
+    "boost": {
+      "source": "flyer_com_attackspeed",
+      "fps": 30.0,
+      "seconds": 0.6
+    },
+    "ram": {
+      "source": "flyer_com_air_ram",
+      "fps": 30.0,
+      "seconds": 0.9333333333333333
+    },
+    "collision": {
+      "source": "flyer_gethit_surface_collision",
+      "fps": 30.0,
+      "seconds": 1.6
+    },
+    "hit_front": {
+      "source": "flyer_gethit_front",
+      "fps": 30.0,
+      "seconds": 0.8333333333333334
+    },
+    "hit_back": {
+      "source": "flyer_gethit_behind",
+      "fps": 30.0,
+      "seconds": 0.8333333333333334
+    },
+    "birth": {
+      "source": "flyer_birth_from_pustule",
+      "fps": 30.0,
+      "seconds": 1.5
+    }
+  },
+  "outputSha256": "460f0a2dcca3f2707540df303d10b0a41b5f70699ff4a9b712f06961daae1497",
+  "geometry": "Existing authored 63 cuboids and UVs preserved; wings articulated at authored elbow/wrist endpoints.",
+  "geometrySha256": "5ebd9e07d19c3a9816f40e7cb12d01ac50ac96e6943a509ca39e14b18a221809",
+  "boundary": "Clip names/curves/skeleton verified in P2. FIG dive controller hash 3cbd105ad588347f references idle/attackspeed/air_ram; collision references surface_collision. Unknown packed controller fields are NOT labeled as decoded speed, damage or timing. Phase transition and flight steering constants are Minecraft adaptations.",
+  "controllerOffsets": [
+    984801,
+    985329,
+    985865
+  ]
+}

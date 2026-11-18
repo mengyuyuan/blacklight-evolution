@@ -59,6 +59,7 @@ public final class AdaptiveRagdoll {
         return RagdollImpact.supportedBody(e);
     }
     public static boolean active(LivingEntity e){
+        if(com.codex.blacklight.combat.NativeBossBodyControl.ownsPose(e)||com.codex.blacklight.combat.FlyerPhysics.ownsLive(e))return false;
         var owner=renderOwner(e);if(owner!=e)return active(owner);
         if(RagdollDrive.captured(e)&&!e.getData(com.codex.blacklight.registry.ModAttachments.CONSUME_VISUAL).consuming())return false;
         return supports(e)&&!e.isInvisible()&&!COOLDOWN.containsKey(e)
@@ -80,6 +81,7 @@ public final class AdaptiveRagdoll {
         if(scene!=level){scene=level;PENDING.clear();BODIES.clear();HISTORY.clear();COOLDOWN.clear();}
     }
     public static void accept(LivingEntity e,RagdollImpactPayload hit){
+        if(com.codex.blacklight.combat.NativeBossBodyControl.ownsPose(e)||com.codex.blacklight.combat.FlyerPhysics.ownsLive(e))return;
         reset();if(scene==null||!supports(e)||e.isInvisible())return;
         var body=BODIES.get(e);
         if(body!=null)body.receive(hit);
