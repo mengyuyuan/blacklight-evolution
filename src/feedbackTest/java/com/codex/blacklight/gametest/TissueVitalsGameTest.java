@@ -108,29 +108,57 @@ public final class TissueVitalsGameTest {
 
     @GameTest(template="wall_test",timeoutTicks=560,batch="vitals_heart_combat")
     public static void thePaidHeartActuallyShortensRealMeleeIntervalsInsteadOfOnlyAnUnusedCounter(GameTestHelper h){
-        floor(h);var host=actor(h,EntityType.COW,TissueCore.HEART,3,3);var control=actor(h,EntityType.COW,TissueCore.HEART,3,7);
-        var target=passive(h,host.position().add(4,0,0));var other=passive(h,control.position().add(4,0,0));
-        var hits=new ArrayList<Long>();var normal=new ArrayList<Long>();var contacts=new ArrayList<Integer>();var normalContacts=new ArrayList<Integer>();
+        floor(h);
+        // Mature infected can hunt one another. Each pair needs an independent line of sight.
+        for(int x=1;x<=9;x++)for(int z=1;z<=9;z++)if(x==1||x==9||z==1||z==5||z==9){
+            for(int y=2;y<=6;y++)h.setBlock(new BlockPos(x,y,z),Blocks.STONE);
+        }
+        var host=actor(h,EntityType.COW,TissueCore.HEART,3,3);
+        var control=actor(h,EntityType.COW,TissueCore.HEART,3,7);
+        var target=passive(h,host.position().add(4,0,0));
+        var other=passive(h,control.position().add(4,0,0));
+        var paid=new ArrayList<HeartContact>();
+        var baseline=new ArrayList<HeartContact>();
         java.util.function.Consumer<net.neoforged.neoforge.event.entity.living.LivingDamageEvent.Post> listener=e->{
             if(e.getNewDamage()<=0)return;
-            if(e.getEntity()==target&&e.getSource().getEntity()==host){hits.add(h.getLevel().getGameTime());contacts.add((int)host.tissueStrikeElapsed(0));}
-            if(e.getEntity()==other&&e.getSource().getEntity()==control){normal.add(h.getLevel().getGameTime());normalContacts.add((int)control.tissueStrikeElapsed(0));}
+            if(e.getEntity()==target&&e.getSource().getEntity()==host)paid.add(HeartContact.at(host));
+            if(e.getEntity()==other&&e.getSource().getEntity()==control)baseline.add(HeartContact.at(control));
         };
-        net.neoforged.neoforge.common.NeoForge.EVENT_BUS.addListener(listener);var before=new int[]{0};
-        h.runAfterDelay(300,()->{
-            h.assertTrue(host.vitals().oxygen()>=50&&control.vitals().oxygen()>=50,"actual air exchange fills both work buffers: "+state(host)+state(control));
-            before[0]=host.tissueNutrition();control.spendTissueNutrition(control.tissueNutrition());
-            target.setPos(host.position().add(1.7,0,0));other.setPos(control.position().add(1.7,0,0));host.setNoAi(false);control.setNoAi(false);host.setTarget(target);control.setTarget(other);
+        h.runAfterDelay(305,()->{
+            h.assertTrue(host.vitals().oxygen()>=50&&control.vitals().oxygen()>=50&&host.tissueNutrition()>0,
+                    "real air exchange and nutrition are available before combat: "+state(host)+state(control));
+            // Exactly one dose buys one recovery. Both hosts keep breathing in the same environment.
+            host.spendTissueNutrition(host.tissueNutrition()-1);
+            control.spendTissueNutrition(control.tissueNutrition());
+            beginHeartCombat(h,host,target);
+            beginHeartCombat(h,control,other);
+            net.neoforged.neoforge.common.NeoForge.EVENT_BUS.addListener(listener);
         });
-        for(int tick=301;tick<490;tick++)h.runAfterDelay(tick,()->{host.setTarget(target);control.setTarget(other);});
         h.runAfterDelay(490,()->{try{
-            var paid=intervals(strikes(hits,contacts));var baseline=intervals(strikes(normal,normalContacts));
-            h.assertTrue(paid.size()>=2&&baseline.size()>=2&&Collections.min(paid)<Collections.min(baseline)&&host.tissueNutrition()<before[0],"accepted real attack cycles shorten only with paid recovery: paid="+hits+" control="+normal+" host="+host.position()+" prey="+target.position()+" living="+target.isAlive()+" "+state(host));
-            h.assertTrue(contacts.stream().anyMatch(t->t==TissueOrgans.HIT)&&normalContacts.stream().anyMatch(t->t==TissueOrgans.HIT),"both real strikes retain the same source contact frame: "+contacts+" / "+normalContacts);
+            String hits=" paid="+paid+" control="+baseline;
+            h.assertTrue(paid.size()>=3&&baseline.size()>=3,"both tissue attacks must repeatedly deal actual damage:"+hits);
+            h.assertTrue(paid.stream().allMatch(c->c.frame()==TissueOrgans.HIT)&&baseline.stream().allMatch(c->c.frame()==TissueOrgans.HIT),
+                    "every measured hit must occur on the tissue strike contact frame:"+hits);
+            h.assertTrue(host.tissueNutrition()==0&&paid.get(0).pumped()&&paid.stream().skip(1).noneMatch(HeartContact::pumped)&&baseline.stream().noneMatch(HeartContact::pumped),
+                    "only the first strike used cardiac recovery:"+hits);
+            long normal=baseline.get(1).tick()-baseline.get(0).tick();
+            h.assertTrue(paid.get(1).tick()-paid.get(0).tick()<normal,"paid recovery must shorten the next actual hit interval:"+hits);
+            for(int i=2;i<baseline.size();i++)h.assertTrue(baseline.get(i).tick()-baseline.get(i-1).tick()==normal,"the unfunded control keeps its cadence:"+hits);
+            for(int i=2;i<paid.size();i++)h.assertTrue(paid.get(i).tick()-paid.get(i-1).tick()==normal,"depleting the reserve restores the control cadence:"+hits);
         }finally{net.neoforged.neoforge.common.NeoForge.EVENT_BUS.unregister(listener);clean(host,control);target.discard();other.discard();}h.succeed();});
     }
-    private static List<Long> strikes(List<Long> times,List<Integer> contacts){var result=new ArrayList<Long>();for(int i=0;i<times.size();i++)if(contacts.get(i)==TissueOrgans.HIT)result.add(times.get(i));return result;}
-    private static List<Long> intervals(List<Long> times){var result=new ArrayList<Long>();for(int i=1;i<times.size();i++)result.add(times.get(i)-times.get(i-1));return result;}
+    private record HeartContact(long tick,int frame,boolean pumped){
+        static HeartContact at(BlacklightInfectedHost host){
+            return new HeartContact(host.level().getGameTime(),(int)host.tissueStrikeElapsed(0),host.vitals().flash()>0);
+        }
+    }
+    private static void beginHeartCombat(GameTestHelper h,BlacklightInfectedHost host,Mob prey){
+        double distance=(host.getBbWidth()+prey.getBbWidth())*.5+host.tissueOrganReach()*.75;
+        prey.setPos(host.position().add(distance,0,0));
+        h.assertTrue(!host.isWithinMeleeAttackRange(prey)&&host.hasLineOfSight(prey),"only the extended organ can reach this prey");
+        host.setTarget(prey);
+        host.setNoAi(false);
+    }
     private static Mob passive(GameTestHelper h,Vec3 position){var target=EntityType.COW.create(h.getLevel());target.setNoAi(true);target.getAttribute(Attributes.MAX_HEALTH).setBaseValue(10000);target.getAttribute(Attributes.KNOCKBACK_RESISTANCE).setBaseValue(1);target.setHealth(10000);target.getPersistentData().putLong(InfectionRules.NEXT_CONTACT_EXPOSURE,Long.MAX_VALUE);target.moveTo(position);h.getLevel().addFreshEntity(target);return target;}
 
     @GameTest(template="wall_test",timeoutTicks=200,batch="vitals_branchial_heart")
