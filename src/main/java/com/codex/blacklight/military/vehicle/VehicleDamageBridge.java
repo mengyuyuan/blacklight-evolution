@@ -92,6 +92,12 @@ public final class VehicleDamageBridge {
         return hurtPhysicalAircraft(actor,target,damage,null,current);
     }
     public static boolean hurtPhysicalAircraft(ServerPlayer actor,com.codex.blacklight.entity.BlackwatchHelicopter target,float damage,Entity projectile,java.util.function.BooleanSupplier current){
+        return hurtAircraft(actor,target,damage*prototypeScale(actor),projectile,current);
+    }
+    public static boolean hurtSpecialAircraft(ServerPlayer actor,com.codex.blacklight.entity.BlackwatchHelicopter target,float damage,java.util.function.BooleanSupplier current){
+        return hurtAircraft(actor,target,damage,null,current);
+    }
+    private static boolean hurtAircraft(ServerPlayer actor,com.codex.blacklight.entity.BlackwatchHelicopter target,float damage,Entity projectile,java.util.function.BooleanSupplier current){
         if(!(target.level() instanceof ServerLevel level)||!valid(actor,level)||actor.isSpectator()||target.isRemoved()||target.health()<=0
                 ||!Float.isFinite(damage)||damage<=0||protectedAircraft(actor,target)||!level.mayInteract(actor,target.blockPosition())||!current.getAsBoolean())return false;
         var actorAt=actor.position();var targetAt=target.position();float targetYaw=target.getYRot(),targetBank=target.bank();
@@ -100,7 +106,7 @@ public final class VehicleDamageBridge {
         if(event.isCanceled()||!current.getAsBoolean()||!valid(actor,level)||target.isRemoved()||target.health()<=0||protectedAircraft(actor,target)
                 ||!actorAt.equals(actor.position())||!targetAt.equals(target.position())||targetYaw!=target.getYRot()||targetBank!=target.bank())return false;
         var source=projectile==null?actor.damageSources().playerAttack(actor):actor.damageSources().thrown(projectile,actor);
-        return target.hurt(source,damage*prototypeScale(actor));
+        return target.hurt(source,damage);
     }
     /** Living targets receive prototype melee in CombatScale units; hulls use the same scale so a claw is not five times weaker on steel. */
     public static float prototypeScale(LivingEntity actor){

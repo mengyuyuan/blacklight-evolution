@@ -8,6 +8,7 @@ allprojects {
     def selected = [
         'src/helicopterTest/java/com/codex/blacklight/gametest/HelicopterRelaunchGameTest.java',
         'src/helicopterTest/java/com/codex/blacklight/gametest/HelicopterTargetLockGameTest.java',
+        'src/helicopterTest/java/com/codex/blacklight/gametest/HelicopterManualBodyGameTest.java',
         'src/helicopterTest/java/com/codex/blacklight/gametest/HelicopterLogisticsGameTest.java',
         'src/helicopterTest/java/com/codex/blacklight/gametest/HelicopterCombatGameTest.java',
         'src/helicopterTest/java/com/codex/blacklight/gametest/HelicopterVehicleCombatGameTest.java',

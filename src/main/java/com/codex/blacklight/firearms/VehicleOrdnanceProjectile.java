@@ -181,8 +181,10 @@ public final class VehicleOrdnanceProjectile extends ThrowableItemProjectile {
             if(body!=null){
                 var contact=HydraHurtContact.ray(body.hurtRegions(0),position(),
                         center.add(getDeltaMovement().normalize().scale(.0001)),com.codex.blacklight.infection.InfectedAttackStyle.PIERCE);
-                if(contact!=null)body.hurtAt(damageSources().explosion(this,actor),definition.damage(),contact);
-            }else directLiving.hurt(damageSources().explosion(this,actor),definition.damage());
+                if(contact!=null&&body.hurtAt(damageSources().explosion(this,actor),definition.damage(),contact))
+                    impactImpulse(directLiving,getDeltaMovement(),.95);
+            }else if(directLiving.hurt(damageSources().explosion(this,actor),definition.damage()))
+                impactImpulse(directLiving,getDeltaMovement(),.95);
         }
         if(rapidRocket()){
             // The ordinary missile contact handles source60 first. Its final FIG
@@ -201,12 +203,23 @@ public final class VehicleOrdnanceProjectile extends ThrowableItemProjectile {
                     &&level.clip(new ClipContext(blastCenter,point,ClipContext.Block.COLLIDER,ClipContext.Fluid.NONE,this)).getType()==HitResult.Type.MISS);
             if(surface==null)continue;
             Vec3 point=surface.point();double distance=center.distanceTo(point);
-            surface.hurt(damageSources().explosion(this,actor),definition.damage()*(float)Math.max(.2,1-distance/Math.max(.1,radius)));
+            double falloff=Math.max(.2,1-distance/Math.max(.1,radius));
+            if(surface.hurt(damageSources().explosion(this,actor),definition.damage()*(float)falloff))
+                impactImpulse(target,target.getBoundingBox().getCenter().subtract(center),falloff);
         }
         VehicleDamageBridge.blast(level,actor,definition,center,this,directAircraft==null?direct:directAircraft);
         if(VehicleKinematics.loaded(level,new AABB(center,center).inflate(radius+1)))FirearmBlockDamage.blast(level,actor,definition,center);
         GunplayEffects.explosion(level,actor,definition,center,result instanceof BlockHitResult block?Vec3.atLowerCornerOf(block.getDirection().getNormal()):new Vec3(0,1,0));
         discard();
+    }
+    /** Gameplay impulse for an accepted vehicle hit. Anchored bosses retain their authored reactions. */
+    public static void impactImpulse(LivingEntity target,Vec3 incoming,double strength){
+        if(CombatTargeting.anchoredBody(target)||target.isPassenger())return;
+        var horizontal=incoming.normalize().multiply(1,0,1);
+        double force=strength*(1-target.getAttributeValue(net.minecraft.world.entity.ai.attributes.Attributes.KNOCKBACK_RESISTANCE));
+        if(force<=0)return;
+        target.push(horizontal.x*force,.32*force,horizontal.z*force);
+        target.hurtMarked=true;
     }
     static boolean allowedLiving(ServerLevel level,LivingEntity actor,LivingEntity target){
         if(!target.isAlive()||target.isRemoved()||target.level()!=level||target.getRootVehicle() instanceof MilitaryVehicle||target.getRootVehicle() instanceof com.codex.blacklight.entity.BlackwatchHelicopter||FirearmsCombat.protectedTarget(actor,target))return false;

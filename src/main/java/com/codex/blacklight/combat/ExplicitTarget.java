@@ -37,6 +37,39 @@ public final class ExplicitTarget {
         if(e instanceof BlackwatchHelicopter craft){var point=com.codex.blacklight.military.aircraft.HelicopterSkinContact.visiblePoint(p,craft,Double.MAX_VALUE);return point!=null?point:com.codex.blacklight.military.aircraft.HelicopterSkinContact.closestPoint(craft,p.getEyePosition());}
         return e.getBoundingBox().getCenter();
     }
+    static Set<Entity> hullsIn(Player player,AABB area){
+        var result=new LinkedHashSet<Entity>();
+        for(Entity part:player.level().getEntities(player,area.inflate(2),e->e instanceof BlackwatchHelicopter||VehicleDamageBridge.vehicle(e)!=null)){
+            Entity hull=resolve(part);
+            if(selectable(player,hull))result.add(hull);
+        }
+        return result;
+    }
+    static boolean hurtHull(net.minecraft.server.level.ServerPlayer player,Entity hull,float damage,Vec3 point,java.util.function.BooleanSupplier current){
+        if(!current.getAsBoolean())return false;
+        boolean hit=hull instanceof BlackwatchHelicopter craft?VehicleDamageBridge.hurtPhysicalAircraft(player,craft,damage,current):
+                VehicleDamageBridge.hurtPhysical(player,(MilitaryVehicle)hull,damage,null,point);
+        if(hit&&hull instanceof BlackwatchHelicopter)
+            com.codex.blacklight.firearms.GunplayEffects.metalContact(player,point,player.getEyePosition().subtract(point).normalize());
+        return hit;
+    }
+    static List<HydraContact.Box> hullBoxes(Entity hull){
+        if(hull instanceof BlackwatchHelicopter craft)return com.codex.blacklight.military.aircraft.HelicopterSkinContact.boxes(craft);
+        var vehicle=(MilitaryVehicle)hull;
+        var shape=VehicleHullShape.from(vehicle.definition(),vehicle.turretYaw(),vehicle.gunPitch());
+        var origin=new VehicleDefinition.Vec3(vehicle.getX(),vehicle.getY(),vehicle.getZ());
+        var result=new ArrayList<HydraContact.Box>();
+        for(var corners:shape.worldCorners(origin,vehicle.getYRot())){
+            var low=worldPoint(corners.get(0));
+            var right=worldPoint(corners.get(1)).subtract(low);
+            var up=worldPoint(corners.get(2)).subtract(low);
+            var forward=worldPoint(corners.get(4)).subtract(low);
+            var half=new Vec3(right.length()/2,up.length()/2,forward.length()/2);
+            result.add(HydraContact.oriented(low.lerp(worldPoint(corners.get(7)),.5),half,right.normalize(),up.normalize(),forward.normalize()));
+        }
+        return result;
+    }
+    private static Vec3 worldPoint(VehicleDefinition.Vec3 p){return new Vec3(p.x(),p.y(),p.z());}
     public static Vec3 closestPoint(Vec3 eye,MilitaryVehicle v){
             var at=v.position();
             var hit=VehicleHullShape.from(v.definition(),v.turretYaw(),v.gunPitch()).closestPoint(

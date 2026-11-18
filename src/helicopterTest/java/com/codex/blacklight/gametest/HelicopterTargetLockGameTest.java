@@ -24,14 +24,17 @@ public final class HelicopterTargetLockGameTest {
     public static void emptyHandPilotLockDrivesActualOffAxisCannonHit(GameTestHelper h){manual(h,false,351008);}
     @GameTest(template="helicopter_arena",batch="airTargetLockCopilot",timeoutTicks=240)
     public static void emptyHandCopilotLockDrivesActualOffAxisCannonHit(GameTestHelper h){manual(h,true,352032);}
-    private static void manual(GameTestHelper h,boolean copilot,int x){
+    @GameTest(template="helicopter_arena",batch="airTargetLockBelow",timeoutTicks=240)
+    public static void lockedCannonHitsTargetDirectlyUnderFuselage(GameTestHelper h){manual(h,false,369440,true);}
+    private static void manual(GameTestHelper h,boolean copilot,int x){manual(h,copilot,x,false);}
+    private static void manual(GameTestHelper h,boolean copilot,int x,boolean below){
         var f=new HelicopterPilotGameTest.Fixture(h,x);var craft=f.craft(12);
         var driver=HelicopterPilotGameTest.player(h,f,false);h.assertTrue(driver.startRiding(craft,true),"real driver boards");
         var operator=copilot?HelicopterPilotGameTest.player(h,f,false):driver;
         if(copilot)h.assertTrue(operator.startRiding(craft,true)&&craft.pilot().slot(operator.getUUID())==1,"real second player occupies copilot seat");
         h.assertTrue(operator.getMainHandItem().isEmpty()&&!com.codex.blacklight.power.PrototypeMetabolism.active(operator),"fixture relies on aircraft access, not a held gun or prototype mode");
         craft.combat().emptyPlayerStores();craft.combat().addPlayerAmmunition(HelicopterSupplies.CANNON,1);
-        var target=ModEntities.COMMON_INFECTED.get().create(f.level);Vec3 anchor=new Vec3(x+8,81,18);
+        var target=ModEntities.COMMON_INFECTED.get().create(f.level);Vec3 anchor=below?new Vec3(x,81,0):new Vec3(x+8,81,18);
         target.setPos(anchor);target.setNoAi(true);target.setNoGravity(true);target.setPersistenceRequired();target.getAttribute(Attributes.MAX_HEALTH).setBaseValue(500);target.setHealth(500);f.entities.add(target);
         int[] time={0};long[] sequence={0};boolean[] inserted={false},done={false},accepted={false};float[] beforeShot={Float.NaN};
         h.onEachTick(()->{
@@ -76,6 +79,45 @@ public final class HelicopterTargetLockGameTest {
         h.runAfterDelay(220,()->{if(!done[0]){done[0]=true;String detail="seat="+craft.pilot().slot(operator.getUUID())+" enabled="+ExplicitTarget.enabled(operator)+" accepted="+accepted[0]+" shots="+craft.combat().shots()+" health="+target.getHealth()+" phase="+craft.phase()+" rotor="+craft.rotor()+" gun="+craft.gunYaw()+","+craft.gunPitch();CombatTargeting.requestLock(operator,-1);f.close();h.fail("locked cannon failed: "+detail);}});
     }
 
+    @GameTest(template="helicopter_arena",batch="airLockUnderMissile",timeoutTicks=260)
+    public static void lockedMissileHitsBelowAndPushesGroundTarget(GameTestHelper h){rocketBelow(h,false,370464);}
+    @GameTest(template="helicopter_arena",batch="airLockUnderRapid",timeoutTicks=260)
+    public static void lockedRapidRocketHitsBelowAndPushesGroundTarget(GameTestHelper h){rocketBelow(h,true,371488);}
+    private static void rocketBelow(GameTestHelper h,boolean rapid,int x){
+        var f=new HelicopterPilotGameTest.Fixture(h,x);var craft=f.craft(14);
+        var operator=HelicopterPilotGameTest.player(h,f,false);
+        h.assertTrue(operator.startRiding(craft,true),"driver boards");
+        craft.combat().emptyPlayerStores();
+        craft.combat().addPlayerAmmunition(rapid?HelicopterSupplies.RAPID:HelicopterSupplies.HELLFIRE,1);
+        var target=net.minecraft.world.entity.EntityType.COW.create(f.level);
+        target.setNoAi(true);target.setNoGravity(true);target.setPos(x,81,0);
+        target.getAttribute(Attributes.MAX_HEALTH).setBaseValue(1000);target.setHealth(1000);
+        f.entities.add(target);
+        int[] time={0};boolean[] spawned={false},done={false};
+        h.onEachTick(()->{
+            if(done[0])return;
+            try{
+                if(!spawned[0]){
+                    if(!f.level.isPositionEntityTicking(target.blockPosition()))return;
+                    spawned[0]=f.level.addFreshEntity(target);
+                }
+                int tick=++time[0];
+                if(tick==100)CombatTargeting.requestLock(operator,target.getId());
+                if(tick>=100&&tick%2==0){
+                    h.assertTrue(CombatTargeting.lockedEntity(operator)==target,"operator retains target below");
+                    int actions=rapid&&tick==104?VehicleControlAuthority.NEXT_AMMUNITION:tick>=140?VehicleControlAuthority.SECONDARY_FIRE:0;
+                    craft.pilot().accept(operator,craft.pilot().lease(operator.getUUID()),tick,0,0,90,0,actions);
+                }
+                if(target.getHealth()<1000){
+                    h.assertTrue(target.getLastDamageSource()!=null&&target.getLastDamageSource().getEntity()==operator,"actual projectile or its blast damaged the selected ground body");
+                    h.assertTrue(target.getDeltaMovement().y>.02||target.getY()>81.02,"accepted impact displaced the grounded target");
+                    done[0]=true;f.close();h.succeed();
+                }
+                if(tick>218)h.fail("projectile failed to reach locked ground target, rapid="+rapid+" shots="+craft.combat().rocketShots());
+            }catch(RuntimeException|Error error){done[0]=true;f.close();throw error;}
+        });
+    }
+
     @GameTest(template="helicopter_arena",batch="airTargetLockFoot",timeoutTicks=100)
     public static void onFootPrototypeAndRifleSelectAircraftSkinInsteadOfCrew(GameTestHelper h){
         var f=new HelicopterPilotGameTest.Fixture(h,353056);var player=HelicopterPilotGameTest.player(h,f,true);
@@ -107,13 +149,23 @@ public final class HelicopterTargetLockGameTest {
 
     @GameTest(template="helicopter_arena",batch="airTargetLockSafety",timeoutTicks=100)
     public static void ownCrewProtectedCrewCrashAndCoverCannotBecomeAircraftLocks(GameTestHelper h){
-        var f=new HelicopterPilotGameTest.Fixture(h,354080);var own=f.craft(0);var player=HelicopterPilotGameTest.player(h,f,false);player.startRiding(own,true);
-        var copilot=HelicopterPilotGameTest.player(h,f,false);copilot.startRiding(own,true);
-        h.runAfterDelay(25,()->{try(f){
-            var target=f.craft(0);target.setPos(f.x+12,81,18);
+        var f=new HelicopterPilotGameTest.Fixture(h,354080);
+        boolean[] ready={false};
+        h.onEachTick(()->{
+            if(ready[0]||!f.level.isPositionEntityTicking(new BlockPos(f.x,81,0))||
+                    !f.level.isPositionEntityTicking(new BlockPos(f.x+12,81,18)))return;
+            ready[0]=true;
+            try(f){
+            var own=f.craft(0);var player=HelicopterPilotGameTest.player(h,f,false);
+            var copilot=HelicopterPilotGameTest.player(h,f,false);
+            h.assertTrue(player.startRiding(own,true)&&copilot.startRiding(own,true),"both operators board the registered aircraft");
+            own.positionRider(player);own.positionRider(copilot);
+            var target=ModEntities.BLACKWATCH_HELICOPTER.get().create(f.level);
+            target.setPos(f.x+12,81,18);f.entities.add(target);
+            h.assertTrue(f.level.addFreshEntity(target)&&f.level.getEntity(target.getId())==target,"target registered in its final ticking chunk");
             h.assertTrue(!ExplicitTarget.selectable(player,own)&&!ExplicitTarget.selectable(player,copilot),"own hull and own occupants are never lock candidates");
             CombatTargeting.requestLock(player,copilot.getId());h.assertTrue(CombatTargeting.lockedEntity(player)==null,"requesting own copilot cannot bypass own-aircraft rejection");
-            CombatTargeting.requestLock(player,target.getId());h.assertTrue(CombatTargeting.lockedEntity(player)==target,"uncovered live target initially locks");
+            CombatTargeting.requestLock(player,target.getId());h.assertTrue(CombatTargeting.lockedEntity(player)==target,"uncovered live target initially locks; eye="+player.getEyePosition()+" target="+target.position()+" enabled="+ExplicitTarget.enabled(player)+" visible="+ExplicitTarget.visibleWithinRange(player,target,64));
             Vec3 fallback=own.weaponPoint(HelicopterArmament.GUN).add(-40,0,0);var selected=new TargetSelection(target,-1);
             for(int x=-20;x<=30;x++)for(int y=81;y<=112;y++)f.level.setBlock(new BlockPos(f.x+x,y,8),Blocks.BEDROCK.defaultBlockState(),2);
             h.assertTrue(!selected.visibleWithinRange(player,64),"complete cover blocks all aircraft skin sightlines");

@@ -1,7 +1,10 @@
 package com.codex.blacklight.gametest;
 
 import com.codex.blacklight.entity.BlackwatchHelicopter;
+import com.codex.blacklight.registry.ModEntities;
 import com.codex.blacklight.combat.BlockThrowAim;
+import com.codex.blacklight.combat.DevastatorSystem;
+import com.codex.blacklight.power.CombatSkill;
 import com.codex.blacklight.combat.CombatTargeting;
 import com.codex.blacklight.combat.WeaponCombatSystem;
 import com.codex.blacklight.firearms.FirearmsCombat;
@@ -19,6 +22,83 @@ import net.minecraftforge.gametest.*;
 /** Player input crosses the same server authority as the real cockpit. */
 @GameTestHolder("blacklight") @PrefixGameTestTemplate(false)
 public final class HelicopterRelaunchGameTest {
+    @GameTest(template="helicopter_arena",batch="airCriticalPain",timeoutTicks=260)
+    public static void chargedCriticalPainHitsLockedAircraft(GameTestHelper h){
+        var f=new HelicopterPilotGameTest.Fixture(h,372512);
+        var player=HelicopterPilotGameTest.player(h,f,true);var craft=f.craft(8);
+        var state=ModAttachments.getData(player,ModAttachments.PLAYER_STATE);state.unlock(PowerForm.CLAWS);state.activate(PowerForm.CLAWS);state.addEvolutionPoints(10000);
+        for(var skill:java.util.List.of(CombatSkill.CRITICAL_MASS,CombatSkill.GROUNDSPIKE_GRAVEYARD,CombatSkill.TENDRIL_BARRAGE,CombatSkill.CRITICAL_PAIN))state.buyCombatSkill(skill);
+        ModAttachments.setData(player,ModAttachments.CRITICAL_MASS,new com.codex.blacklight.power.CriticalMassState(1,false,-1000));
+        float initial=craft.health();int[] time={0};boolean[] done={false};
+        h.onEachTick(()->{
+            if(done[0])return;
+            try{
+                int age=++time[0];if(age<25)return;
+                craft.setPos(f.x,89,0);player.setPos(f.x,81,12);player.setOnGround(true);player.setYRot(90);player.setXRot(0);
+                if(age==25)CombatTargeting.requestLock(player,craft.getId());
+                player.tickCount++;
+                DevastatorSystem.acceptInput(player,true,false,true,false);
+                DevastatorSystem.tick(new net.minecraftforge.event.TickEvent.PlayerTickEvent(net.minecraftforge.event.TickEvent.Phase.END,player));
+                if(craft.health()<initial){
+                    h.assertTrue(DevastatorSystem.snapshot(player).spent(),"real charged skill spent its reserve at the aircraft contact");
+                    done[0]=true;DevastatorSystem.cancel(player);f.close();h.succeed();
+                }
+                if(age>230)h.fail("critical pain missed overhead aircraft: "+DevastatorSystem.snapshot(player));
+            }catch(RuntimeException|Error error){done[0]=true;DevastatorSystem.cancel(player);f.close();throw error;}
+        });
+    }
+
+    @GameTest(template="helicopter_arena",batch="air_locked_overhead_whip",timeoutTicks=100)
+    public static void groundChargedWhipHitsLockedOverheadAircraft(GameTestHelper h){
+        var f=new HelicopterPilotGameTest.Fixture(h,367392);
+        h.runAfterDelay(25,()->{try(f){
+            var craft=f.craft(8);
+            var player=HelicopterPilotGameTest.player(h,f,true);
+            player.setPos(f.x,81,7);player.setOnGround(true);player.setYRot(90);player.setXRot(0);
+            var state=ModAttachments.getData(player,ModAttachments.PLAYER_STATE);state.unlock(PowerForm.WHIPFIST);state.activate(PowerForm.WHIPFIST);
+            CombatTargeting.requestLock(player,craft.getId());
+            float initial=craft.health();
+            boolean charged=false;
+            for(int tick=0;tick<100&&craft.health()==initial;tick++){
+                WeaponCombatSystem.acceptInput(player,false,true);
+                var visual=ModAttachments.getData(player,ModAttachments.WEAPON_VISUAL);
+                if(visual.spec()!=null){
+                    h.assertTrue(visual.targetId()==craft.getId(),"charge, release and sweep retain the aircraft identity");
+                    h.assertTrue(com.codex.blacklight.combat.WhipCurveContact.aimPitch(player)<-25,"level camera still pitches the actual lash upward");
+                    charged|=visual.spec()==com.codex.blacklight.combat.WeaponMove.WHIP_LONGSHOT_CHARGED;
+                }
+                player.tickCount++;
+                WeaponCombatSystem.tick(new net.minecraftforge.event.TickEvent.PlayerTickEvent(net.minecraftforge.event.TickEvent.Phase.END,player));
+            }
+            h.assertTrue(charged&&craft.health()<initial,"charged longshot makes actual overhead skin contact, move="+ModAttachments.getData(player,ModAttachments.WEAPON_VISUAL).spec()+" hp="+craft.health());
+            WeaponCombatSystem.cancelHeldInput(player);WeaponCombatSystem.cancel(player);
+        }h.succeed();});
+    }
+
+    @GameTest(template="helicopter_arena",batch="ground_locked_hull_whip",timeoutTicks=100)
+    public static void groundWhipDamagesEveryRegisteredVehicle(GameTestHelper h){
+        var f=new HelicopterPilotGameTest.Fixture(h,368416);
+        h.runAfterDelay(25,()->{try(f){
+            var player=HelicopterPilotGameTest.player(h,f,true);
+            var state=ModAttachments.getData(player,ModAttachments.PLAYER_STATE);state.unlock(PowerForm.WHIPFIST);state.activate(PowerForm.WHIPFIST);
+            var types=java.util.List.of(ModEntities.MILITARY_TRUCK.get(),ModEntities.MILITARY_APC.get(),ModEntities.MILITARY_TANK.get(),
+                    ModEntities.BLACKWATCH_TRUCK.get(),ModEntities.BLACKWATCH_APC.get(),ModEntities.BLACKWATCH_TANK.get());
+            for(var type:types){
+                var hull=type.create(f.level);hull.setPos(f.x,81,0);hull.setYRot(35);f.level.addFreshEntity(hull);f.entities.add(hull);
+                player.setPos(f.x+6,81,0);player.setOnGround(true);player.setYRot(0);player.setXRot(0);
+                CombatTargeting.requestLock(player,hull.getId());
+                float initial=hull.health();WeaponCombatSystem.request(player,true);
+                h.assertTrue(ModAttachments.getData(player,ModAttachments.WEAPON_VISUAL).targetId()==hull.getId(),"locked heavy attack uses "+type);
+                for(int tick=0;tick<60&&hull.health()==initial;tick++){
+                    player.tickCount++;
+                    WeaponCombatSystem.tick(new net.minecraftforge.event.TickEvent.PlayerTickEvent(net.minecraftforge.event.TickEvent.Phase.END,player));
+                }
+                h.assertTrue(hull.health()<initial,"actual whip contact on "+type);
+                WeaponCombatSystem.cancel(player);hull.discard();
+            }
+        }h.succeed();});
+    }
+
     @GameTest(template="helicopter_arena",batch="air_walk_weapons",timeoutTicks=100)
     public static void groundWeaponsStrikeSideAndMissEmptyTailSpace(GameTestHelper h){
         var f=new HelicopterPilotGameTest.Fixture(h,289000);

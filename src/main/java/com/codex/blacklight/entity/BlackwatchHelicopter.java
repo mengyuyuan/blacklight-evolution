@@ -104,10 +104,16 @@ public final class BlackwatchHelicopter extends Entity {
         // Narrow pod traverse keeps an inward shot outside the cabin; the chin gun has its own wider arc.
         return new HelicopterArmament.Aim(Mth.clamp(aim.yaw(),-10,10),Mth.clamp(aim.pitch(),0,65));
     }
-    public void aimWeapon(Vec3 point){
+    public void aimWeapon(Vec3 point){aimWeapon(point,false);}
+    public void aimWeapon(Vec3 point,boolean manual){
         if(level().isClientSide||!HelicopterFlight.finite(point))return;
-        Vec3 delta=point.subtract(weaponPoint(HelicopterArmament.GUN));var aim=HelicopterArmament.limit(HelicopterArmament.aim(delta,getYRot(),bank()));
-        entityData.set(GUN_YAW,HelicopterArmament.approach(gunYaw(),aim.yaw()));entityData.set(GUN_PITCH,HelicopterArmament.approach(gunPitch(),aim.pitch()));entityData.set(GUN_RANGE,(float)Math.min(HelicopterCombat.weaponRange(),delta.length()));
+        Vec3 delta=point.subtract(weaponPoint(HelicopterArmament.GUN));
+        var desired=HelicopterArmament.aim(delta,getYRot(),bank());
+        var aim=manual?new HelicopterArmament.Aim(desired.yaw(),Mth.clamp(desired.pitch(),-20,90)):HelicopterArmament.limit(desired);
+        float step=manual?16F:2.5F;
+        entityData.set(GUN_YAW,Mth.wrapDegrees(Mth.approachDegrees(gunYaw(),aim.yaw(),step)));
+        entityData.set(GUN_PITCH,Mth.approach(gunPitch(),aim.pitch(),step));
+        entityData.set(GUN_RANGE,(float)Math.min(HelicopterCombat.weaponRange(),delta.length()));
     }
     public Vec3 podMuzzle(int side,int tube){
         var aim=podAim(side);var offset=HelicopterArmament.mountOffset(HelicopterArmament.tube(tube),aim.yaw(),aim.pitch());

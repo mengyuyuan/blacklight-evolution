@@ -46,7 +46,8 @@ public final class WhipCurveContact {
             var target=visual.targetId()<0?null:actor.level().getEntity(visual.targetId());
             if(target!=null&&target!=actor){
                 Vec3 from=actor.position().add(0,shoulder(actor),0);
-                Vec3 to=actor instanceof net.minecraft.world.entity.player.Player player
+                Vec3 to=actor instanceof net.minecraft.world.entity.player.Player operator&&ExplicitTarget.mechanical(target)
+                        ?ExplicitTarget.point(operator,target):actor instanceof net.minecraft.world.entity.player.Player player
                         &&target instanceof net.minecraft.world.entity.LivingEntity victim&&CombatTargeting.multipart(victim)
                         ?CombatTargeting.aimPoint(player,from,victim):target.getBoundingBox().getCenter();
                 double horizontal=Math.sqrt((to.x-from.x)*(to.x-from.x)+(to.z-from.z)*(to.z-from.z));
