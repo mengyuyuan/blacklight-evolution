@@ -15,7 +15,8 @@ public final class HelicopterRenderer extends EntityRenderer<BlackwatchHelicopte
     @Override public ResourceLocation getTextureLocation(BlackwatchHelicopter entity){return ResourceLocation.fromNamespaceAndPath("blacklight","textures/entity/blackwatch_helicopter.png");}
     @Override public void render(BlackwatchHelicopter entity,float yaw,float partial,PoseStack pose,MultiBufferSource buffers,int light){
         pose.pushPose();pose.mulPose(Axis.YP.rotationDegrees(yaw));pose.mulPose(Axis.ZP.rotationDegrees(entity.bank()));
-        model.pose(entity,partial).render(pose,buffers.getBuffer(RenderType.entityCutout(getTextureLocation(entity))),light,OverlayTexture.NO_OVERLAY);
+        model.pose(entity,partial);
+        model.render(pose,buffers.getBuffer(RenderType.entityCutout(getTextureLocation(entity))),light,OverlayTexture.NO_OVERLAY,entity.dents());
         pose.popPose();ropes(entity,partial,pose,buffers);super.render(entity,yaw,partial,pose,buffers,light);
     }
     @Override public boolean shouldRender(BlackwatchHelicopter entity,net.minecraft.client.renderer.culling.Frustum frustum,double x,double y,double z){

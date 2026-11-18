@@ -5,6 +5,8 @@ import com.codex.blacklight.military.aircraft.HelicopterArmament;
 import com.codex.blacklight.military.aircraft.HelicopterCombat;
 import com.codex.blacklight.military.vehicle.VehicleKinematics;
 import com.codex.blacklight.military.vehicle.VehicleSounds;
+import com.codex.blacklight.military.vehicle.VehicleDeformation;
+import com.codex.blacklight.military.aircraft.HelicopterSkinContact;
 import java.util.*;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -32,12 +34,26 @@ public final class BlackwatchHelicopter extends Entity {
     private final com.codex.blacklight.military.aircraft.HelicopterPilot pilot=new com.codex.blacklight.military.aircraft.HelicopterPilot(this);
     private final com.codex.blacklight.military.aircraft.HelicopterNavigation navigation=new com.codex.blacklight.military.aircraft.HelicopterNavigation(this);
     public com.codex.blacklight.military.aircraft.HelicopterNavigation navigation(){return navigation;}
+    public static final float MAX_HEALTH=360F;
+    private static final EntityDataAccessor<CompoundTag> HULL_DAMAGE=SynchedEntityData.defineId(BlackwatchHelicopter.class,EntityDataSerializers.COMPOUND_TAG);
+    private CompoundTag dentCacheTag;
+    private List<VehicleDeformation.Dent> dentCache=List.of();
+    public List<VehicleDeformation.Dent> dents(){
+        var tag=entityData.get(HULL_DAMAGE);
+        if(tag!=dentCacheTag){
+            dentCacheTag=tag;dentCache=VehicleDeformation.read(tag.getList("Dents",10),HelicopterSkinContact::damageBone);
+        }
+        return dentCache;
+    }
+    private void setDents(List<VehicleDeformation.Dent> value){
+        var tag=new CompoundTag();tag.put("Dents",VehicleDeformation.write(value));entityData.set(HULL_DAMAGE,tag);
+    }
     private Vec3 home,landing;
     private int phaseAge,blockedTicks,missionAge;
     private int lerpSteps;private double lerpX,lerpY,lerpZ;private float lerpYaw;
     private float rotorAngle,previousRotorAngle;
     public BlackwatchHelicopter(EntityType<? extends BlackwatchHelicopter> type,Level level){super(type,level);setNoGravity(true);}
-    @Override protected void defineSynchedData(SynchedEntityData.Builder builder){builder.define(PHASE,0);builder.define(HEALTH,360F);builder.define(ROTOR,0F);builder.define(BANK,0F);builder.define(GUN_YAW,0F);builder.define(GUN_PITCH,0F);builder.define(GUN_RANGE,30F);builder.define(AIR_SHOTS,0);builder.define(CONTROL,new CompoundTag());builder.define(AUDIO_VELOCITY,0F);builder.define(AUDIO_THROTTLE,0F);builder.define(DEPLOYMENT,new CompoundTag());}
+    @Override protected void defineSynchedData(SynchedEntityData.Builder builder){builder.define(PHASE,0);builder.define(HEALTH,MAX_HEALTH);builder.define(HULL_DAMAGE,new CompoundTag());builder.define(ROTOR,0F);builder.define(BANK,0F);builder.define(GUN_YAW,0F);builder.define(GUN_PITCH,0F);builder.define(GUN_RANGE,30F);builder.define(AIR_SHOTS,0);builder.define(CONTROL,new CompoundTag());builder.define(AUDIO_VELOCITY,0F);builder.define(AUDIO_THROTTLE,0F);builder.define(DEPLOYMENT,new CompoundTag());}
     public Phase phase(){return Phase.values()[Mth.clamp(entityData.get(PHASE),0,Phase.values().length-1)];}
     public float health(){return entityData.get(HEALTH);}public float rotor(){return entityData.get(ROTOR);}public float bank(){return entityData.get(BANK);}
     public boolean audioRunning(){return health()>0&&phase()!=Phase.IDLE&&phase()!=Phase.CRASH;}
@@ -354,10 +370,21 @@ public final class BlackwatchHelicopter extends Entity {
     @Override public boolean canCollideWith(Entity other){return !isPassengerOfSameVehicle(other)&&other.canBeCollidedWith();}
     @Override public boolean isPushable(){return false;}
     @Override public void push(double x,double y,double z){/* Flight and crash movement use the airframe sweep, like other mechanical vehicles. */}
-    @Override public boolean hurt(DamageSource source,float amount){
+    @Override public boolean hurt(DamageSource source,float amount){return hurtAt(source,amount,null);}
+    public boolean hurtAt(DamageSource source,float amount,Vec3 contact){
         if(level().isClientSide||isRemoved()||crashExploded||health()<=0||isInvulnerableTo(source)||!Float.isFinite(amount)||amount<=0||source.getEntity()!=null&&hasPassenger(source.getEntity()))return false;
         if(source.getEntity() instanceof LivingEntity actor&&com.codex.blacklight.military.vehicle.VehicleDamageBridge.protectedAircraft(actor,this))return false;
         entityData.set(HEALTH,Math.max(0,health()-amount));markHurt();
+        Vec3 from=source.getSourcePosition();
+        if(source.getDirectEntity() instanceof LivingEntity living)from=living.getEyePosition();
+        if(from!=null&&Double.isFinite(from.lengthSqr())){
+            if(contact==null)contact=HelicopterSkinContact.closestPoint(this,from);
+            var incoming=contact.subtract(from);
+            if(incoming.lengthSqr()<1e-8&&source.getDirectEntity()!=null)incoming=source.getDirectEntity().getDeltaMovement();
+            if(incoming.lengthSqr()<1e-8)incoming=weaponPoint(new Vec3(0,1.5,0)).subtract(contact);
+            var dent=HelicopterSkinContact.dent(this,contact,incoming,amount);
+            if(dent!=null)setDents(VehicleDeformation.add(dents(),dent));
+        }
         if(health()<=0){phase(Phase.CRASH);playSound(VehicleSounds.event("helicopter_alarm"),2,1);}
         return true;
     }
@@ -404,14 +431,15 @@ public final class BlackwatchHelicopter extends Entity {
     @Override protected void addAdditionalSaveData(CompoundTag tag){
         combat.save(tag);pilot.save(tag);deployment.save(tag);
         tag.putBoolean("CrashExplosionCommitted",crashExploded);
-        tag.putFloat("MechanicalHealth",health());tag.putInt("FlightPhase",phase().ordinal());tag.putInt("PhaseAge",phaseAge);tag.putInt("MissionAge",missionAge);
+        tag.put("AirframeDents",VehicleDeformation.write(dents()));tag.putFloat("MechanicalHealth",health());tag.putInt("FlightPhase",phase().ordinal());tag.putInt("PhaseAge",phaseAge);tag.putInt("MissionAge",missionAge);
         if(home!=null){tag.putDouble("HomeX",home.x);tag.putDouble("HomeY",home.y);tag.putDouble("HomeZ",home.z);}
         if(landing!=null){tag.putDouble("LandingX",landing.x);tag.putDouble("LandingY",landing.y);tag.putDouble("LandingZ",landing.z);}
     }
     @Override protected void readAdditionalSaveData(CompoundTag tag){
         destructionEpoch++;
         navigation.reset();combat.load(tag);pilot.load(tag);deployment.load(tag);
-        float health=tag.contains("MechanicalHealth")?tag.getFloat("MechanicalHealth"):360;entityData.set(HEALTH,Float.isFinite(health)?Mth.clamp(health,0,360):360F);
+        setDents(VehicleDeformation.read(tag.getList("AirframeDents",10),HelicopterSkinContact::damageBone));
+        float health=tag.contains("MechanicalHealth")?tag.getFloat("MechanicalHealth"):MAX_HEALTH;entityData.set(HEALTH,Float.isFinite(health)?Mth.clamp(health,0,MAX_HEALTH):MAX_HEALTH);
         crashExploded=tag.getBoolean("CrashExplosionCommitted");if(crashExploded)entityData.set(HEALTH,0F);
         home=readPoint(tag,"Home");landing=readPoint(tag,"Landing");
         int phase=tag.getInt("FlightPhase");entityData.set(PHASE,phase>=0&&phase<Phase.values().length?phase:0);

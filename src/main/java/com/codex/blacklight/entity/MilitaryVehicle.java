@@ -396,7 +396,7 @@ public final class MilitaryVehicle extends Entity {
         if(incoming.lengthSqr()<1e-8&&direct!=null)incoming=direct.getDeltaMovement();
         if(incoming.lengthSqr()<1e-8)incoming=position().add(0,definition.height()*.5,0).subtract(contact);
         incoming=incoming.normalize();
-        if(source.getEntity() instanceof Player&&kind==VehicleFeedbackMotion.Impact.HEAVY){
+        if(source.getEntity()!=null||source.getSourcePosition()!=null){
             Vec3 p=contact.subtract(position()).yRot((float)Math.toRadians(-getYRot()));
             Vec3 push=incoming.yRot((float)Math.toRadians(-getYRot()));
             dents=VehicleDeformation.add(dents,VehicleDeformation.contact(chassisId(),p,push,turretYaw,gunPitch,amount,maxHealth()));

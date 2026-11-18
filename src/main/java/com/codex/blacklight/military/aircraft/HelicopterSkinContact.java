@@ -3,6 +3,7 @@ package com.codex.blacklight.military.aircraft;
 import com.codex.blacklight.combat.HydraContact;
 import com.codex.blacklight.entity.BlackwatchHelicopter;
 import com.google.gson.*;
+import com.codex.blacklight.military.vehicle.VehicleDeformation;
 import com.codex.blacklight.military.vehicle.VehicleCollisionGeometry;
 import com.codex.blacklight.military.vehicle.VehicleCollisionShapes;
 import com.codex.blacklight.military.vehicle.VehicleDefinition;
@@ -22,8 +23,10 @@ import org.joml.Vector3f;
 public final class HelicopterSkinContact {
     private record Cube(String parent,Vec3 bone,Vec3 center,Vec3 half,Matrix4f local){}
     private static final List<Cube> CUBES=load();
+    private static final Set<String> DAMAGE_BONES=CUBES.stream().map(Cube::parent).collect(java.util.stream.Collectors.toUnmodifiableSet());
+    public static boolean damageBone(String name){return DAMAGE_BONES.contains(name);}
     private record Pose(Vec3 position,float yaw,float bank,float gunYaw,float gunPitch,boolean doors,boolean hijack,int side,int age){}
-    private record Cached(Pose pose,List<HydraContact.Box> boxes){}
+    private record Cached(Pose pose,List<HydraContact.Box> boxes,Map<String,Matrix4f> parents){}
     private static final Map<BlackwatchHelicopter,Cached> CACHE=Collections.synchronizedMap(new WeakHashMap<>());
     private static Vec3 vector(JsonArray a){return new Vec3(a.get(0).getAsDouble(),a.get(1).getAsDouble(),a.get(2).getAsDouble());}
     private static List<Cube> load(){
@@ -62,7 +65,29 @@ public final class HelicopterSkinContact {
             var matrix=new Matrix4f(parent).mul(cube.local);var c=matrix.transformPosition(cube.center.toVector3f());
             var x=matrix.transformDirection(new Vector3f(1,0,0));var y=matrix.transformDirection(new Vector3f(0,1,0));var z=matrix.transformDirection(new Vector3f(0,0,1));
             result.add(HydraContact.affine(craft.position().add(c.x,c.y,c.z),cube.half,new Vec3(x.x,x.y,x.z),new Vec3(y.x,y.y,y.z),new Vec3(z.x,z.y,z.z)));
-        }var boxes=List.copyOf(result);CACHE.put(craft,new Cached(pose,boxes));return boxes;
+        }var boxes=List.copyOf(result);CACHE.put(craft,new Cached(pose,boxes,parents));return boxes;
+    }
+    public static VehicleDeformation.Dent dent(BlackwatchHelicopter craft,Vec3 contact,Vec3 incoming,float damage){
+        if(damage<=0||!Double.isFinite(contact.lengthSqr())||!Double.isFinite(incoming.lengthSqr())||incoming.lengthSqr()<1e-8)return null;
+        var skin=boxes(craft);
+        var direction=incoming.normalize();
+        var from=contact.subtract(direction.scale(1.5));
+        var to=contact.add(direction.scale(1.5));
+        int nearest=-1;double best=Double.POSITIVE_INFINITY;Vec3 surface=null;
+        for(int i=0;i<skin.size();i++){
+            var box=skin.get(i);
+            if(box.bounds.distanceToSqr(contact)>=best)continue;
+            var crossing=box.clip(from,to);
+            var point=crossing.orElseGet(()->box.nearest(contact));
+            double distance=point.distanceToSqr(contact);
+            if(distance<best){best=distance;nearest=i;surface=point;}
+        }
+        if(nearest<0||best>2.25)return null;
+        var bone=CUBES.get(nearest).parent;
+        var inverse=new Matrix4f(CACHE.get(craft).parents.get(bone)).invert();
+        var point=inverse.transformPosition(surface.subtract(craft.position()).toVector3f());
+        var push=inverse.transformDirection(direction.toVector3f());
+        return VehicleDeformation.dent(bone,new Vec3(point.x,point.y,point.z),new Vec3(push.x,push.y,push.z),damage,BlackwatchHelicopter.MAX_HEALTH);
     }
     private record WalkHull(List<HydraContact.Box> pose, VehicleCollisionGeometry geometry) {}
     private static final Map<BlackwatchHelicopter, WalkHull> WALK_HULLS=Collections.synchronizedMap(new WeakHashMap<>());

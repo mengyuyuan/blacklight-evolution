@@ -69,8 +69,8 @@ public final class HellfireBlastEntity extends Entity {
         // padding. Broaden candidates, then use the actual surface/radius below.
         for(var hull:level.getEntitiesOfClass(BlackwatchHelicopter.class,area.inflate(8),c->c.health()>0&&!c.isRemoved())){
             if(wave.contacted(hull.getUUID())||VehicleDamageBridge.protectedAircraft(owner,hull))continue;
-            Vec3 surface=com.codex.blacklight.combat.CombatTargeting.closestPoint(position(),hull.getBoundingBox());
-            if(exposed(level,surface,radius)&&wave.contact(hull.getUUID()))hull.hurt(damageSources().explosion(this,owner),damage);
+            Vec3 surface=com.codex.blacklight.military.aircraft.HelicopterSkinContact.closestPoint(hull,position());
+            if(exposed(level,surface,radius)&&wave.contact(hull.getUUID()))hull.hurtAt(damageSources().explosion(this,owner),damage,surface);
         }
         for(var target:CombatTargeting.candidates(this,area,LivingEntity::isAlive)){
             if(wave.contacted(target.getUUID())||!VehicleOrdnanceProjectile.allowedLiving(level,owner,target))continue;

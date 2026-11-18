@@ -92,12 +92,18 @@ public final class VehicleDamageBridge {
         return hurtPhysicalAircraft(actor,target,damage,null,current);
     }
     public static boolean hurtPhysicalAircraft(ServerPlayer actor,com.codex.blacklight.entity.BlackwatchHelicopter target,float damage,Entity projectile,java.util.function.BooleanSupplier current){
-        return hurtAircraft(actor,target,damage*prototypeScale(actor),projectile,current);
+        return hurtPhysicalAircraft(actor,target,damage,projectile,null,current);
+    }
+    public static boolean hurtPhysicalAircraft(ServerPlayer actor,com.codex.blacklight.entity.BlackwatchHelicopter target,float damage,Entity projectile,Vec3 point,java.util.function.BooleanSupplier current){
+        return hurtAircraft(actor,target,damage*prototypeScale(actor),projectile,point,current);
     }
     public static boolean hurtSpecialAircraft(ServerPlayer actor,com.codex.blacklight.entity.BlackwatchHelicopter target,float damage,java.util.function.BooleanSupplier current){
-        return hurtAircraft(actor,target,damage,null,current);
+        return hurtSpecialAircraft(actor,target,damage,null,current);
     }
-    private static boolean hurtAircraft(ServerPlayer actor,com.codex.blacklight.entity.BlackwatchHelicopter target,float damage,Entity projectile,java.util.function.BooleanSupplier current){
+    public static boolean hurtSpecialAircraft(ServerPlayer actor,com.codex.blacklight.entity.BlackwatchHelicopter target,float damage,Vec3 point,java.util.function.BooleanSupplier current){
+        return hurtAircraft(actor,target,damage,null,point,current);
+    }
+    private static boolean hurtAircraft(ServerPlayer actor,com.codex.blacklight.entity.BlackwatchHelicopter target,float damage,Entity projectile,Vec3 point,java.util.function.BooleanSupplier current){
         if(!(target.level() instanceof ServerLevel level)||!valid(actor,level)||actor.isSpectator()||target.isRemoved()||target.health()<=0
                 ||!Float.isFinite(damage)||damage<=0||protectedAircraft(actor,target)||!level.mayInteract(actor,target.blockPosition())||!current.getAsBoolean())return false;
         var actorAt=actor.position();var targetAt=target.position();float targetYaw=target.getYRot(),targetBank=target.bank();
@@ -106,7 +112,7 @@ public final class VehicleDamageBridge {
         if(event.isCanceled()||!current.getAsBoolean()||!valid(actor,level)||target.isRemoved()||target.health()<=0||protectedAircraft(actor,target)
                 ||!actorAt.equals(actor.position())||!targetAt.equals(target.position())||targetYaw!=target.getYRot()||targetBank!=target.bank())return false;
         var source=projectile==null?actor.damageSources().playerAttack(actor):actor.damageSources().thrown(projectile,actor);
-        return target.hurt(source,damage);
+        return target.hurtAt(source,damage,point);
     }
     /** Living targets receive prototype melee in CombatScale units; hulls use the same scale so a claw is not five times weaker on steel. */
     public static float prototypeScale(LivingEntity actor){
@@ -114,7 +120,10 @@ public final class VehicleDamageBridge {
     }
     /** Devastators use their already-resolved true damage, with identical protection checks. */
     public static boolean hurtSpecial(ServerPlayer actor,MilitaryVehicle target,float damage){
-        return permitted(actor,target,damage)&&target.hurt(actor.damageSources().playerAttack(actor),damage);
+        return hurtSpecial(actor,target,damage,null);
+    }
+    public static boolean hurtSpecial(ServerPlayer actor,MilitaryVehicle target,float damage,Vec3 point){
+        return permitted(actor,target,damage)&&target.hurtAt(actor.damageSources().playerAttack(actor),damage,point,incoming(actor,null,point),VehicleFeedbackMotion.Impact.HEAVY);
     }
     public static boolean hurt(LivingEntity actor,MilitaryVehicle target,WeaponDefinition definition,float damage,Entity projectile){
         return hurt(actor,target,definition,damage,projectile,null);
@@ -151,10 +160,10 @@ public final class VehicleDamageBridge {
             if(seen.size()>=64)break;
         }
         for(var craft:level.getEntitiesOfClass(com.codex.blacklight.entity.BlackwatchHelicopter.class,new AABB(center,center).inflate(radius),c->c!=direct&&c.health()>0)){
-            var bounds=craft.getBoundingBox();Vec3 surface=new Vec3(net.minecraft.util.Mth.clamp(center.x,bounds.minX,bounds.maxX),net.minecraft.util.Mth.clamp(center.y,bounds.minY,bounds.maxY),net.minecraft.util.Mth.clamp(center.z,bounds.minZ,bounds.maxZ));
+            Vec3 surface=com.codex.blacklight.military.aircraft.HelicopterSkinContact.closestPoint(craft,center);
             double distance=surface.distanceTo(center);if(distance>radius||!loaded(level,center,surface))continue;
             if(level.clip(new ClipContext(center,surface,ClipContext.Block.COLLIDER,ClipContext.Fluid.NONE,projectile)).getType()!=HitResult.Type.MISS)continue;
-            if(craft.hurt(actor.damageSources().explosion(projectile,actor),definition.damage()*(float)Math.max(.2,1-distance/radius)))hits++;
+            if(craft.hurtAt(actor.damageSources().explosion(projectile,actor),definition.damage()*(float)Math.max(.2,1-distance/radius),surface))hits++;
         }
         return hits;
     }

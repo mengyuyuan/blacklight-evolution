@@ -1,6 +1,10 @@
 package com.codex.blacklight.client.model;
 
 import com.codex.blacklight.entity.BlackwatchHelicopter;
+import com.codex.blacklight.client.vehicle.VehicleDentMesh;
+import com.codex.blacklight.military.vehicle.VehicleDeformation.Dent;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.google.gson.*;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
@@ -11,6 +15,7 @@ import net.minecraft.client.model.geom.builders.*;
 /** Positive-Y authored cabin with separate main/tail rotors and sliding doors. */
 public final class HelicopterModel {
     private final ModelPart root;
+    private final Map<String,ModelPart> bones=new LinkedHashMap<>();
     public HelicopterModel(){
         JsonObject data;
         try(var input=HelicopterModel.class.getResourceAsStream("/assets/blacklight/military/helicopter-model.json")){
@@ -36,6 +41,7 @@ public final class HelicopterModel {
                     .addBox(b.get(0).getAsFloat(),b.get(1).getAsFloat(),b.get(2).getAsFloat(),b.get(3).getAsFloat(),b.get(4).getAsFloat(),b.get(5).getAsFloat()),pose);
         }
         root=LayerDefinition.create(mesh,data.get("textureWidth").getAsInt(),data.get("textureHeight").getAsInt()).bakeRoot();
+        for(String name:data.getAsJsonObject("bones").keySet())this.bones.put(name,root.getChild(name));
     }
     public ModelPart pose(BlackwatchHelicopter entity,float partial){
         root.getAllParts().forEach(ModelPart::resetPose);
@@ -50,6 +56,21 @@ public final class HelicopterModel {
         var hijack=entity.pilot().hijack();
         if(hijack.active())root.getChild(hijack.side()<0?"cockpit_left":"cockpit_right").yRot=hijack.side()*(float)Math.toRadians(75)*Math.min(1,(hijack.ticks()+partial)/18F);
         return root;
+    }
+    public void render(PoseStack stack,VertexConsumer out,int light,int overlay,List<Dent> dents){
+        if(dents.isEmpty()){root.render(stack,out,light,overlay);return;}
+        for(var entry:bones.entrySet()){
+            var bone=entry.getValue();if(!bone.visible)continue;
+            var local=dents.stream().filter(d->d.bone().equals(entry.getKey())).toList();
+            var vertices=out;
+            if(!local.isEmpty()){
+                stack.pushPose();
+                bone.translateAndRotate(stack);
+                vertices=new VehicleDentMesh(out,stack,local);
+                stack.popPose();
+            }
+            bone.render(stack,vertices,light,overlay);
+        }
     }
     public ModelPart wreckPose(float age,long seed){
         root.getAllParts().forEach(ModelPart::resetPose);

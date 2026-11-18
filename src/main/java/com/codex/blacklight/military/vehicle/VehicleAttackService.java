@@ -50,8 +50,8 @@ public final class VehicleAttackService {
         var mechanical=VehicleDamageBridge.nearest(level,actor,origin,start,end);
         // Shared native picking includes animated proxies and aircraft. Protected
         // bodies stay in the query: permission never lets a bullet pass through them.
-        var surface=net.minecraft.world.entity.projectile.ProjectileUtil.getEntityHitResult(level,actor,start,end,new AABB(start,end).inflate(.3),entity->
-                FirearmsCombat.bulletCandidate(actor,entity)&&entity.getRootVehicle()!=origin
+        var surface=FirearmsCombat.firstBulletBody(level,actor,origin,start,end,entity->
+                entity.getRootVehicle()!=origin
                         &&!(entity.getRootVehicle() instanceof MilitaryVehicle)
                         &&(entity instanceof com.codex.blacklight.entity.BlackwatchHelicopter
                             ||!(entity.getRootVehicle() instanceof com.codex.blacklight.entity.BlackwatchHelicopter)));
@@ -65,7 +65,8 @@ public final class VehicleAttackService {
         }else if(surface!=null){
             end=surface.getLocation();impact=2;var target=CombatTargeting.resolveTarget(surface.getEntity());
             if(surface.getEntity() instanceof com.codex.blacklight.entity.BlackwatchHelicopter craft){
-                if(!VehicleDamageBridge.protectedAircraft(actor,craft))craft.hurt(actor.damageSources().mobProjectile(origin,actor),definition.damage());
+                impact=3;
+                if(!VehicleDamageBridge.protectedAircraft(actor,craft))craft.hurtAt(actor.damageSources().mobProjectile(origin,actor),definition.damage(),end);
             }else if(target!=null&&!FirearmsCombat.protectedTarget(actor,target)&&(!(actor instanceof Player p)||!(target instanceof Player q)||p.canHarmPlayer(q)&&level.getServer().isPvpAllowed()))
                 if(!(target instanceof ServerPlayer defender)||!com.codex.blacklight.power.ProjectileDefenseSystem.hitscan(defender,start,end,definition.damage(),4))
                     hurtContact(origin,actor,surface.getEntity(),target,start,end,definition.damage());
