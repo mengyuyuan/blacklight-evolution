@@ -1,0 +1,2717 @@
+{
+  "schema": 1,
+  "status": "source_bind_and_pose_corrected_not_native_validated",
+  "rootCause": "Old retargeting retained authored pivot positions/limb lengths, omitted articulated translations and retained only Character_Root vertical displacement. Correct direction alone cannot preserve endpoints on a differently proportioned hierarchy.",
+  "solution": "Original limb bind fits are retained. The formerly chest-only torso is rebound through Pelvis/Spine_1/Spine_2/Spine_3, retaining its authored cross-sections except the pelvis fitted to the actual hip span; one middle cube is partitioned with continuous side UVs and longitudinal lengths follow source spine spacing. True source ancestor TRS including SCL and original reciprocal-parent-scale compensation drives the mesh through two constant inverse-reference-bind factors. GoliathMotion recomputes compensation after interpolation/blending. Authored giant right arm maps to source L arm and slender left arm to source R according to actual skin weights, not name suffixes. No endpoint height clamp or invented keyframes.",
+  "scaleCorrection": {
+    "cause": "Shared Python source reader ignored SCL. Goliath now uses its own verified TRS reader; shared encounter readers are untouched.",
+    "sourceHierarchyBones": 35,
+    "tracks": [
+      {
+        "clip": "idle",
+        "source": "behemoth_loco_biped_idle",
+        "animationChunkOffset": 2954974,
+        "joint": "Shoulder_R",
+        "min": [
+          0.5805490612983704,
+          1.0,
+          1.0
+        ],
+        "max": [
+          0.636848509311676,
+          1.0,
+          1.0
+        ],
+        "drivesAuthoredSkin": true
+      },
+      {
+        "clip": "idle",
+        "source": "behemoth_loco_biped_idle",
+        "animationChunkOffset": 2954974,
+        "joint": "Shoulder_Con_R",
+        "min": [
+          1.0009765625,
+          1.0,
+          1.0
+        ],
+        "max": [
+          1.0009765625,
+          1.0,
+          1.0
+        ],
+        "drivesAuthoredSkin": false
+      },
+      {
+        "clip": "walk",
+        "source": "behemoth_loco_biped_walk",
+        "animationChunkOffset": 2977829,
+        "joint": "Shoulder_R",
+        "min": [
+          0.5540158152580261,
+          1.0,
+          1.0
+        ],
+        "max": [
+          0.7326610088348389,
+          1.0,
+          1.0
+        ],
+        "drivesAuthoredSkin": true
+      },
+      {
+        "clip": "walk",
+        "source": "behemoth_loco_biped_walk",
+        "animationChunkOffset": 2977829,
+        "joint": "Shoulder_Con_R",
+        "min": [
+          1.0009765625,
+          1.0,
+          1.0
+        ],
+        "max": [
+          1.0009765625,
+          1.0,
+          1.0
+        ],
+        "drivesAuthoredSkin": false
+      },
+      {
+        "clip": "HAMMER",
+        "source": "behemoth_com_biped_front_slam_to_biped",
+        "animationChunkOffset": 2256349,
+        "joint": "Shoulder_R",
+        "min": [
+          0.5549400448799133,
+          1.0,
+          1.0
+        ],
+        "max": [
+          0.8930103778839111,
+          1.0,
+          1.0
+        ],
+        "drivesAuthoredSkin": true
+      },
+      {
+        "clip": "HAMMER",
+        "source": "behemoth_com_biped_front_slam_to_biped",
+        "animationChunkOffset": 2256349,
+        "joint": "Shoulder_Con_R",
+        "min": [
+          1.0009765625,
+          1.0,
+          1.0
+        ],
+        "max": [
+          1.0009765625,
+          1.0,
+          1.0
+        ],
+        "drivesAuthoredSkin": false
+      },
+      {
+        "clip": "SLAM",
+        "source": "behemoth_com_biped_slam",
+        "animationChunkOffset": 2327641,
+        "joint": "Shoulder_R",
+        "min": [
+          0.5351189970970154,
+          1.0,
+          1.0
+        ],
+        "max": [
+          0.9019747972488403,
+          1.0,
+          1.0
+        ],
+        "drivesAuthoredSkin": true
+      },
+      {
+        "clip": "SLAM",
+        "source": "behemoth_com_biped_slam",
+        "animationChunkOffset": 2327641,
+        "joint": "Shoulder_Con_R",
+        "min": [
+          0.5351189970970154,
+          1.0,
+          1.0
+        ],
+        "max": [
+          0.9019747972488403,
+          1.0,
+          1.0
+        ],
+        "drivesAuthoredSkin": false
+      },
+      {
+        "clip": "CHARGE",
+        "source": "behemoth_com_biped_bullrush",
+        "animationChunkOffset": 2222710,
+        "joint": "Shoulder_R",
+        "min": [
+          0.5287323594093323,
+          1.0,
+          1.0
+        ],
+        "max": [
+          0.8439726233482361,
+          1.0,
+          1.0
+        ],
+        "drivesAuthoredSkin": true
+      },
+      {
+        "clip": "CHARGE",
+        "source": "behemoth_com_biped_bullrush",
+        "animationChunkOffset": 2222710,
+        "joint": "Shoulder_Con_R",
+        "min": [
+          1.0009765625,
+          1.0,
+          1.0
+        ],
+        "max": [
+          1.0009765625,
+          1.0,
+          1.0
+        ],
+        "drivesAuthoredSkin": false
+      },
+      {
+        "clip": "ERUPTION",
+        "source": "behemoth_com_crawl_front_spike",
+        "animationChunkOffset": 2525247,
+        "joint": "Shoulder_R",
+        "min": [
+          0.3814825415611267,
+          1.0,
+          1.0
+        ],
+        "max": [
+          2.058668375015259,
+          1.0,
+          1.0
+        ],
+        "drivesAuthoredSkin": true
+      },
+      {
+        "clip": "ERUPTION",
+        "source": "behemoth_com_crawl_front_spike",
+        "animationChunkOffset": 2525247,
+        "joint": "Shoulder_Con_R",
+        "min": [
+          1.0009765625,
+          1.0,
+          1.0
+        ],
+        "max": [
+          1.0009765625,
+          1.0,
+          1.0
+        ],
+        "drivesAuthoredSkin": false
+      },
+      {
+        "clip": "exposed",
+        "source": "behemoth_com_biped_leg_stun_to_biped",
+        "animationChunkOffset": 2299815,
+        "joint": "Shoulder_R",
+        "min": [
+          0.4600563645362854,
+          1.0,
+          1.0
+        ],
+        "max": [
+          0.8232741355895996,
+          1.0,
+          1.0
+        ],
+        "drivesAuthoredSkin": true
+      },
+      {
+        "clip": "exposed",
+        "source": "behemoth_com_biped_leg_stun_to_biped",
+        "animationChunkOffset": 2299815,
+        "joint": "Shoulder_Con_R",
+        "min": [
+          1.0009765625,
+          1.0,
+          1.0
+        ],
+        "max": [
+          1.0009765625,
+          1.0,
+          1.0
+        ],
+        "drivesAuthoredSkin": false
+      },
+      {
+        "clip": "collapse",
+        "source": "behemoth_com_biped_leg_dismember_to_crawl",
+        "animationChunkOffset": 2288418,
+        "joint": "Shoulder_R",
+        "min": [
+          0.17254538834095,
+          1.0,
+          1.0
+        ],
+        "max": [
+          0.8657663464546204,
+          1.0,
+          1.0
+        ],
+        "drivesAuthoredSkin": true
+      },
+      {
+        "clip": "collapse",
+        "source": "behemoth_com_biped_leg_dismember_to_crawl",
+        "animationChunkOffset": 2288418,
+        "joint": "Shoulder_Con_R",
+        "min": [
+          0.17254538834095,
+          1.0,
+          1.0
+        ],
+        "max": [
+          0.8657663464546204,
+          1.0,
+          1.0
+        ],
+        "drivesAuthoredSkin": false
+      },
+      {
+        "clip": "crawl_idle",
+        "source": "behemoth_loco_crawl_idle",
+        "animationChunkOffset": 2988093,
+        "joint": "Shoulder_R",
+        "min": [
+          0.5648344159126282,
+          1.0,
+          1.0
+        ],
+        "max": [
+          0.7724843621253967,
+          1.0,
+          1.0
+        ],
+        "drivesAuthoredSkin": true
+      },
+      {
+        "clip": "crawl_idle",
+        "source": "behemoth_loco_crawl_idle",
+        "animationChunkOffset": 2988093,
+        "joint": "Shoulder_Con_R",
+        "min": [
+          0.5648344159126282,
+          1.0,
+          1.0
+        ],
+        "max": [
+          0.7724843621253967,
+          1.0,
+          1.0
+        ],
+        "drivesAuthoredSkin": false
+      },
+      {
+        "clip": "crawl",
+        "source": "behemoth_com_crawl",
+        "animationChunkOffset": 2436274,
+        "joint": "Shoulder_R",
+        "min": [
+          0.4444597661495209,
+          1.0,
+          1.0
+        ],
+        "max": [
+          0.9811254739761353,
+          1.0,
+          1.0
+        ],
+        "drivesAuthoredSkin": true
+      },
+      {
+        "clip": "crawl",
+        "source": "behemoth_com_crawl",
+        "animationChunkOffset": 2436274,
+        "joint": "Shoulder_Con_R",
+        "min": [
+          0.4444597661495209,
+          1.0,
+          1.0
+        ],
+        "max": [
+          0.9811254739761353,
+          1.0,
+          1.0
+        ],
+        "drivesAuthoredSkin": false
+      },
+      {
+        "clip": "crawl_slam",
+        "source": "behemoth_com_crawl_front_body_slam",
+        "animationChunkOffset": 2476605,
+        "joint": "Shoulder_R",
+        "min": [
+          0.3321217894554138,
+          1.0,
+          1.0
+        ],
+        "max": [
+          0.9300809502601624,
+          1.0,
+          1.0
+        ],
+        "drivesAuthoredSkin": true
+      },
+      {
+        "clip": "crawl_slam",
+        "source": "behemoth_com_crawl_front_body_slam",
+        "animationChunkOffset": 2476605,
+        "joint": "Shoulder_Con_R",
+        "min": [
+          1.0009765625,
+          1.0,
+          1.0
+        ],
+        "max": [
+          1.0009765625,
+          1.0,
+          1.0
+        ],
+        "drivesAuthoredSkin": false
+      },
+      {
+        "clip": "rise",
+        "source": "behemoth_com_prone_to_biped",
+        "animationChunkOffset": 2869533,
+        "joint": "Shoulder_R",
+        "min": [
+          0.5426762700080872,
+          1.0,
+          1.0
+        ],
+        "max": [
+          0.8282734751701355,
+          1.0,
+          1.0
+        ],
+        "drivesAuthoredSkin": true
+      },
+      {
+        "clip": "rise",
+        "source": "behemoth_com_prone_to_biped",
+        "animationChunkOffset": 2869533,
+        "joint": "Shoulder_Con_R",
+        "min": [
+          1.0009765625,
+          1.0,
+          1.0
+        ],
+        "max": [
+          1.0009765625,
+          1.0,
+          1.0
+        ],
+        "drivesAuthoredSkin": false
+      },
+      {
+        "clip": "death",
+        "source": "behemoth_com_biped_death_v2",
+        "animationChunkOffset": 2245174,
+        "joint": "Shoulder_R",
+        "min": [
+          0.5608758926391602,
+          1.0,
+          1.0
+        ],
+        "max": [
+          1.0094014406204224,
+          1.0,
+          1.0
+        ],
+        "drivesAuthoredSkin": true
+      },
+      {
+        "clip": "death",
+        "source": "behemoth_com_biped_death_v2",
+        "animationChunkOffset": 2245174,
+        "joint": "Shoulder_Con_R",
+        "min": [
+          1.0009765625,
+          1.0,
+          1.0
+        ],
+        "max": [
+          1.0009765625,
+          1.0,
+          1.0
+        ],
+        "drivesAuthoredSkin": false
+      },
+      {
+        "clip": "CHARGE_RETURN",
+        "source": "behemoth_bullrush_to_aggro",
+        "animationChunkOffset": 2170454,
+        "joint": "Shoulder_R",
+        "min": [
+          0.39589375257492065,
+          1.0,
+          1.0
+        ],
+        "max": [
+          1.2439380884170532,
+          1.0,
+          1.0
+        ],
+        "drivesAuthoredSkin": true
+      },
+      {
+        "clip": "CHARGE_RETURN",
+        "source": "behemoth_bullrush_to_aggro",
+        "animationChunkOffset": 2170454,
+        "joint": "Shoulder_Con_R",
+        "min": [
+          0.39589375257492065,
+          1.0,
+          1.0
+        ],
+        "max": [
+          1.2439380884170532,
+          1.0,
+          1.0
+        ],
+        "drivesAuthoredSkin": false
+      },
+      {
+        "clip": "TAUNT_TELL",
+        "source": "behemoth_biped_to_aggro_head_tell",
+        "animationChunkOffset": 2149131,
+        "joint": "Shoulder_R",
+        "min": [
+          0.49506083130836487,
+          1.0,
+          1.0
+        ],
+        "max": [
+          0.8562616109848022,
+          1.0,
+          1.0
+        ],
+        "drivesAuthoredSkin": true
+      },
+      {
+        "clip": "TAUNT_TELL",
+        "source": "behemoth_biped_to_aggro_head_tell",
+        "animationChunkOffset": 2149131,
+        "joint": "Shoulder_Con_R",
+        "min": [
+          1.0009765625,
+          1.0,
+          1.0
+        ],
+        "max": [
+          1.0009765625,
+          1.0,
+          1.0
+        ],
+        "drivesAuthoredSkin": false
+      },
+      {
+        "clip": "TAUNT",
+        "source": "behemoth_com_biped_aggro_to_biped",
+        "animationChunkOffset": 2193340,
+        "joint": "Shoulder_R",
+        "min": [
+          0.5246748328208923,
+          1.0,
+          1.0
+        ],
+        "max": [
+          1.0130362510681152,
+          1.0,
+          1.0
+        ],
+        "drivesAuthoredSkin": true
+      },
+      {
+        "clip": "TAUNT",
+        "source": "behemoth_com_biped_aggro_to_biped",
+        "animationChunkOffset": 2193340,
+        "joint": "Shoulder_Con_R",
+        "min": [
+          1.0009765625,
+          1.0,
+          1.0
+        ],
+        "max": [
+          1.0009765625,
+          1.0,
+          1.0
+        ],
+        "drivesAuthoredSkin": false
+      },
+      {
+        "clip": "TAUNT_HOWL",
+        "source": "behemoth_com_biped_howl",
+        "animationChunkOffset": 2270387,
+        "joint": "Shoulder_R",
+        "min": [
+          0.5544751882553101,
+          1.0,
+          1.0
+        ],
+        "max": [
+          1.1991313695907593,
+          1.0,
+          1.0
+        ],
+        "drivesAuthoredSkin": true
+      },
+      {
+        "clip": "TAUNT_HOWL",
+        "source": "behemoth_com_biped_howl",
+        "animationChunkOffset": 2270387,
+        "joint": "Shoulder_Con_R",
+        "min": [
+          1.0009765625,
+          1.0,
+          1.0
+        ],
+        "max": [
+          1.0009765625,
+          1.0,
+          1.0
+        ],
+        "drivesAuthoredSkin": false
+      }
+    ],
+    "rigAuxiliaryFields": [
+      {
+        "name": "Motion_Root",
+        "offset": 3058590,
+        "auxiliary": [
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          1.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "matrixType": 1,
+        "flag": 1
+      },
+      {
+        "name": "Balance_Root",
+        "offset": 3058737,
+        "auxiliary": [
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          1.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "matrixType": 1,
+        "flag": 1
+      },
+      {
+        "name": "Character_Root",
+        "offset": 3058884,
+        "auxiliary": [
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          1.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "matrixType": 1,
+        "flag": 1
+      },
+      {
+        "name": "Pelvis",
+        "offset": 3059035,
+        "auxiliary": [
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          1.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "matrixType": 1,
+        "flag": 1
+      },
+      {
+        "name": "Hip_L",
+        "offset": 3059178,
+        "auxiliary": [
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          1.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "matrixType": 1,
+        "flag": 1
+      },
+      {
+        "name": "Hip_R",
+        "offset": 3059321,
+        "auxiliary": [
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          1.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "matrixType": 1,
+        "flag": 1
+      },
+      {
+        "name": "Knee_L",
+        "offset": 3059464,
+        "auxiliary": [
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          1.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "matrixType": 1,
+        "flag": 1
+      },
+      {
+        "name": "Knee_R",
+        "offset": 3059607,
+        "auxiliary": [
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          1.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "matrixType": 1,
+        "flag": 1
+      },
+      {
+        "name": "Ankle_L",
+        "offset": 3059750,
+        "auxiliary": [
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          1.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "matrixType": 1,
+        "flag": 1
+      },
+      {
+        "name": "Ankle_R",
+        "offset": 3059893,
+        "auxiliary": [
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          1.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "matrixType": 1,
+        "flag": 1
+      },
+      {
+        "name": "Ball_L_Extra_2",
+        "offset": 3060036,
+        "auxiliary": [
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          1.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "matrixType": 1,
+        "flag": 1
+      },
+      {
+        "name": "Ball_R_Extra_3",
+        "offset": 3060187,
+        "auxiliary": [
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          1.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "matrixType": 1,
+        "flag": 1
+      },
+      {
+        "name": "Ball_L_Extra_1",
+        "offset": 3060338,
+        "auxiliary": [
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          1.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "matrixType": 1,
+        "flag": 1
+      },
+      {
+        "name": "Ball_L",
+        "offset": 3060489,
+        "auxiliary": [
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          1.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "matrixType": 1,
+        "flag": 1
+      },
+      {
+        "name": "Ball_R",
+        "offset": 3060632,
+        "auxiliary": [
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          1.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "matrixType": 1,
+        "flag": 1
+      },
+      {
+        "name": "Ball_R1",
+        "offset": 3060775,
+        "auxiliary": [
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          1.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "matrixType": 1,
+        "flag": 1
+      },
+      {
+        "name": "Ball_R_Extra_1",
+        "offset": 3060918,
+        "auxiliary": [
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          1.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "matrixType": 1,
+        "flag": 1
+      },
+      {
+        "name": "Spine_1",
+        "offset": 3061069,
+        "auxiliary": [
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          1.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "matrixType": 1,
+        "flag": 1
+      },
+      {
+        "name": "Spine_2",
+        "offset": 3061212,
+        "auxiliary": [
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          1.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "matrixType": 1,
+        "flag": 1
+      },
+      {
+        "name": "Rib_L_2",
+        "offset": 3061355,
+        "auxiliary": [
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          1.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "matrixType": 1,
+        "flag": 1
+      },
+      {
+        "name": "Rib_R_3",
+        "offset": 3061498,
+        "auxiliary": [
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          1.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "matrixType": 1,
+        "flag": 1
+      },
+      {
+        "name": "Rib_L_3",
+        "offset": 3061641,
+        "auxiliary": [
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          1.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "matrixType": 1,
+        "flag": 1
+      },
+      {
+        "name": "Rib_R_2",
+        "offset": 3061784,
+        "auxiliary": [
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          1.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "matrixType": 1,
+        "flag": 1
+      },
+      {
+        "name": "Spine_3",
+        "offset": 3061927,
+        "auxiliary": [
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          1.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "matrixType": 1,
+        "flag": 1
+      },
+      {
+        "name": "Rib_R_1",
+        "offset": 3062070,
+        "auxiliary": [
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          1.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "matrixType": 1,
+        "flag": 1
+      },
+      {
+        "name": "Rib_L_1",
+        "offset": 3062213,
+        "auxiliary": [
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          1.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "matrixType": 1,
+        "flag": 1
+      },
+      {
+        "name": "Clavicle_L",
+        "offset": 3062356,
+        "auxiliary": [
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          1.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "matrixType": 1,
+        "flag": 1
+      },
+      {
+        "name": "Chest_L_Root",
+        "offset": 3062503,
+        "auxiliary": [
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          1.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "matrixType": 1,
+        "flag": 1
+      },
+      {
+        "name": "Chest_R_Root",
+        "offset": 3062650,
+        "auxiliary": [
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          1.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "matrixType": 1,
+        "flag": 1
+      },
+      {
+        "name": "Chest_R",
+        "offset": 3062797,
+        "auxiliary": [
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          1.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "matrixType": 1,
+        "flag": 1
+      },
+      {
+        "name": "Chest_L",
+        "offset": 3062940,
+        "auxiliary": [
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          1.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "matrixType": 1,
+        "flag": 1
+      },
+      {
+        "name": "Shoulder_Helper_L",
+        "offset": 3063083,
+        "auxiliary": [
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          1.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "matrixType": 1,
+        "flag": 1
+      },
+      {
+        "name": "Shoulder_L",
+        "offset": 3063238,
+        "auxiliary": [
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          1.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "matrixType": 1,
+        "flag": 1
+      },
+      {
+        "name": "Chest_R_End",
+        "offset": 3063385,
+        "auxiliary": [
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          1.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "matrixType": 1,
+        "flag": 1
+      },
+      {
+        "name": "Elbow_L",
+        "offset": 3063532,
+        "auxiliary": [
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          1.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "matrixType": 1,
+        "flag": 1
+      },
+      {
+        "name": "Chest_L_End",
+        "offset": 3063675,
+        "auxiliary": [
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          1.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "matrixType": 1,
+        "flag": 1
+      },
+      {
+        "name": "Forarm_L",
+        "offset": 3063822,
+        "auxiliary": [
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          1.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "matrixType": 1,
+        "flag": 1
+      },
+      {
+        "name": "Wrist_L",
+        "offset": 3063965,
+        "auxiliary": [
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          1.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "matrixType": 1,
+        "flag": 1
+      },
+      {
+        "name": "Shield_L_2",
+        "offset": 3064108,
+        "auxiliary": [
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          1.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "matrixType": 1,
+        "flag": 1
+      },
+      {
+        "name": "Shield_L_3",
+        "offset": 3064255,
+        "auxiliary": [
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          1.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "matrixType": 1,
+        "flag": 1
+      },
+      {
+        "name": "Shield_L_1",
+        "offset": 3064402,
+        "auxiliary": [
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          1.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "matrixType": 1,
+        "flag": 1
+      },
+      {
+        "name": "Index_Base_L",
+        "offset": 3064549,
+        "auxiliary": [
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          1.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "matrixType": 1,
+        "flag": 1
+      },
+      {
+        "name": "Index_L",
+        "offset": 3064696,
+        "auxiliary": [
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          1.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "matrixType": 1,
+        "flag": 1
+      },
+      {
+        "name": "Index_L_End",
+        "offset": 3064839,
+        "auxiliary": [
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          1.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "matrixType": 1,
+        "flag": 1
+      },
+      {
+        "name": "Middle_Base_L",
+        "offset": 3064986,
+        "auxiliary": [
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          1.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "matrixType": 1,
+        "flag": 0
+      },
+      {
+        "name": "Middle_L",
+        "offset": 3065137,
+        "auxiliary": [
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          1.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "matrixType": 1,
+        "flag": 1
+      },
+      {
+        "name": "Ring_Base_L",
+        "offset": 3065280,
+        "auxiliary": [
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          1.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "matrixType": 1,
+        "flag": 1
+      },
+      {
+        "name": "Ring_L",
+        "offset": 3065427,
+        "auxiliary": [
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          1.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "matrixType": 1,
+        "flag": 1
+      },
+      {
+        "name": "Pink_Base_L",
+        "offset": 3065570,
+        "auxiliary": [
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          1.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "matrixType": 1,
+        "flag": 1
+      },
+      {
+        "name": "Pink_L",
+        "offset": 3065717,
+        "auxiliary": [
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          1.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "matrixType": 1,
+        "flag": 1
+      },
+      {
+        "name": "Thumb_Base_L",
+        "offset": 3065860,
+        "auxiliary": [
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          1.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "matrixType": 1,
+        "flag": 1
+      },
+      {
+        "name": "Thumb_L",
+        "offset": 3066007,
+        "auxiliary": [
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          1.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "matrixType": 1,
+        "flag": 1
+      },
+      {
+        "name": "Shoulder_Con_L",
+        "offset": 3066150,
+        "auxiliary": [
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          1.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "matrixType": 1,
+        "flag": 1
+      },
+      {
+        "name": "Neck",
+        "offset": 3066301,
+        "auxiliary": [
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          1.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "matrixType": 1,
+        "flag": 1
+      },
+      {
+        "name": "Neck_2",
+        "offset": 3066440,
+        "auxiliary": [
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          1.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "matrixType": 1,
+        "flag": 1
+      },
+      {
+        "name": "Head",
+        "offset": 3066583,
+        "auxiliary": [
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          1.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "matrixType": 1,
+        "flag": 1
+      },
+      {
+        "name": "Brow",
+        "offset": 3066722,
+        "auxiliary": [
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          1.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "matrixType": 1,
+        "flag": 1
+      },
+      {
+        "name": "Jaw",
+        "offset": 3066861,
+        "auxiliary": [
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          1.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "matrixType": 1,
+        "flag": 1
+      },
+      {
+        "name": "Tongue",
+        "offset": 3067000,
+        "auxiliary": [
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          1.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "matrixType": 1,
+        "flag": 1
+      },
+      {
+        "name": "Eye_R",
+        "offset": 3067143,
+        "auxiliary": [
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          1.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "matrixType": 1,
+        "flag": 1
+      },
+      {
+        "name": "Eye_L",
+        "offset": 3067286,
+        "auxiliary": [
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          1.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "matrixType": 1,
+        "flag": 1
+      },
+      {
+        "name": "Clavicle_R",
+        "offset": 3067429,
+        "auxiliary": [
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          1.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "matrixType": 1,
+        "flag": 1
+      },
+      {
+        "name": "Shoulder_R",
+        "offset": 3067576,
+        "auxiliary": [
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          1.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "matrixType": 1,
+        "flag": 1
+      },
+      {
+        "name": "Elbow_R",
+        "offset": 3067723,
+        "auxiliary": [
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          1.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "matrixType": 1,
+        "flag": 1
+      },
+      {
+        "name": "Forarm_R",
+        "offset": 3067866,
+        "auxiliary": [
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          1.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "matrixType": 1,
+        "flag": 1
+      },
+      {
+        "name": "Wrist_R",
+        "offset": 3068009,
+        "auxiliary": [
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          1.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "matrixType": 1,
+        "flag": 1
+      },
+      {
+        "name": "Shoulder_Con_R",
+        "offset": 3068152,
+        "auxiliary": [
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          1.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "matrixType": 1,
+        "flag": 1
+      },
+      {
+        "name": "Root_Grapple",
+        "offset": 3068303,
+        "auxiliary": [
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          1.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "matrixType": 1,
+        "flag": 1
+      },
+      {
+        "name": "L_Wrist_Grapple",
+        "offset": 3068450,
+        "auxiliary": [
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          1.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "matrixType": 1,
+        "flag": 1
+      },
+      {
+        "name": "R_Wrist_Grapple",
+        "offset": 3068601,
+        "auxiliary": [
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          1.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "matrixType": 1,
+        "flag": 1
+      },
+      {
+        "name": "Tentacle_Orient_Root",
+        "offset": 3068752,
+        "auxiliary": [
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          1.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "matrixType": 1,
+        "flag": 1
+      },
+      {
+        "name": "Tentacle_Root",
+        "offset": 3068907,
+        "auxiliary": [
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          1.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "matrixType": 1,
+        "flag": 1
+      },
+      {
+        "name": "Tentacle_Jnt1",
+        "offset": 3069058,
+        "auxiliary": [
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          1.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "matrixType": 1,
+        "flag": 1
+      },
+      {
+        "name": "Tentacle_Jnt2",
+        "offset": 3069209,
+        "auxiliary": [
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          1.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "matrixType": 1,
+        "flag": 1
+      },
+      {
+        "name": "Tentacle_Jnt3",
+        "offset": 3069360,
+        "auxiliary": [
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          1.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "matrixType": 1,
+        "flag": 1
+      },
+      {
+        "name": "Tentacle_Jnt4",
+        "offset": 3069511,
+        "auxiliary": [
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          1.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "matrixType": 1,
+        "flag": 1
+      },
+      {
+        "name": "Tentacle_Jnt5",
+        "offset": 3069662,
+        "auxiliary": [
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          1.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "matrixType": 1,
+        "flag": 1
+      },
+      {
+        "name": "Tentacle_Jnt6",
+        "offset": 3069813,
+        "auxiliary": [
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          1.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "matrixType": 1,
+        "flag": 1
+      },
+      {
+        "name": "Tentacle_Jnt7",
+        "offset": 3069964,
+        "auxiliary": [
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          1.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "matrixType": 1,
+        "flag": 1
+      },
+      {
+        "name": "Tentacle_Jnt8",
+        "offset": 3070115,
+        "auxiliary": [
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          1.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "matrixType": 1,
+        "flag": 1
+      },
+      {
+        "name": "Tentacle_Jnt9",
+        "offset": 3070266,
+        "auxiliary": [
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          1.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "matrixType": 1,
+        "flag": 1
+      },
+      {
+        "name": "Tentacle_Jnt10",
+        "offset": 3070417,
+        "auxiliary": [
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          1.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "matrixType": 1,
+        "flag": 1
+      }
+    ],
+    "runtimeEvidence": "goliath-grounding-runtime-audit.json: original Pure3D local/world/skin palette pipeline",
+    "boundary": "Animated SCL affects source R slender arm; source L giant-fist support gap is not explained or fixed by this change."
+  },
+  "source": "D:\\PrototypeReference\\p2\\input\\p2\\behemoth.p3d",
+  "sourceSha256": "3737ff61e7042391bf12c95c2018e034f52a1945983d0a7053608a01d69240c7",
+  "authoredBindInput": "D:\\blacklight-evolution\\art\\encounters\\goliath-authored-bind.geo.json",
+  "bindFactors": {
+    "root": 1.0,
+    "torso": 0.7754687624256505,
+    "right_arm": 1.6570314148469711,
+    "right_forearm": 1.7103558112048545,
+    "right_hand": 1.7103558112048545,
+    "right_finger_0": 1.7103558112048545,
+    "right_finger_1": 1.7103558112048545,
+    "right_finger_2": 1.7103558112048545,
+    "right_finger_3": 1.7103558112048545,
+    "right_leg": 0.9428652665813718,
+    "right_shin": 0.9428652665813718,
+    "weak_0": 0.9428652665813718,
+    "left_arm": 1.101073887791104,
+    "left_forearm": 0.981837103127773,
+    "left_hand": 0.981837103127773,
+    "left_finger_0": 0.981837103127773,
+    "left_finger_1": 0.981837103127773,
+    "left_finger_2": 0.981837103127773,
+    "left_finger_3": 0.981837103127773,
+    "left_leg": 0.9428630538122547,
+    "left_shin": 0.9428630538122547,
+    "weak_1": 0.9428630538122547,
+    "head": 0.7754687624256505,
+    "jaw": 0.7754687624256505,
+    "torso_middle": 0.7754687624256505,
+    "torso_waist": 0.7754687624256505,
+    "torso_lower": 1.0922947727464938
+  },
+  "thinHandBindFit": {
+    "skinNodeOffset": 3480498,
+    "joint": "Wrist_R",
+    "jointIndex": 65,
+    "fullyWeightedVertices": 108,
+    "distalVertices": 22,
+    "selection": "weight > 0.99; farthest 20 percent by distance to raw-bind Wrist_R",
+    "sourceTipBind": [
+      -14.40967082977295,
+      9.754191398620605,
+      -0.8250734210014343
+    ],
+    "authoredTipBind": [
+      -70.82451982847326,
+      5.8120004090631205,
+      -36.54712792729738
+    ],
+    "operation": "Minimal rotation about unchanged wrist aligns authored mean claw-tip axis to actual source weighted hand axis; inherited uniform length scale unchanged. This is an MC mesh fit, not an original finger animation."
+  },
+  "torsoBindCorrection": [
+    {
+      "bone": "torso",
+      "source": "Spine_3",
+      "originalCubeIndices": [
+        0,
+        3,
+        4,
+        6,
+        7,
+        10,
+        11,
+        12,
+        14,
+        15,
+        18
+      ],
+      "authoredPivot": [
+        0,
+        92,
+        4
+      ],
+      "sourceReferencePivotPixels": [
+        30.35080559804017,
+        94.0016396725485,
+        20.32729519423716
+      ],
+      "sourceSpan": [
+        "Spine_2",
+        "Spine_3"
+      ],
+      "authoredSpanPixels": 18.8,
+      "crossSectionScale": 0.7754687624256505,
+      "originalMiddleCubeHalf": null,
+      "orientation": "Raw-bind spine axis followed by source reference * inverse raw joint basis; preserves source pelvis/chest twist",
+      "crossSectionBasis": "Unchanged authored chest cross-section scale",
+      "longitudinalScale": 1.2872635687544889,
+      "authoredLongitudinalFit": 1.6599812025025413
+    },
+    {
+      "bone": "torso_middle",
+      "source": "Spine_2",
+      "originalCubeIndices": [
+        1,
+        5,
+        8,
+        13,
+        16
+      ],
+      "authoredPivot": [
+        0,
+        73.2,
+        4
+      ],
+      "sourceReferencePivotPixels": [
+        27.17741987620791,
+        70.02678855515154,
+        21.746183726047132
+      ],
+      "sourceSpan": [
+        "Spine_2",
+        "Spine_3"
+      ],
+      "authoredSpanPixels": 18.8,
+      "crossSectionScale": 0.7754687624256505,
+      "originalMiddleCubeHalf": "upper",
+      "orientation": "Raw-bind spine axis followed by source reference * inverse raw joint basis; preserves source pelvis/chest twist",
+      "crossSectionBasis": "Unchanged authored chest cross-section scale",
+      "longitudinalScale": 1.2872635687544889,
+      "authoredLongitudinalFit": 1.6599812025025413
+    },
+    {
+      "bone": "torso_waist",
+      "source": "Spine_1",
+      "originalCubeIndices": [
+        1,
+        9,
+        17
+      ],
+      "authoredPivot": [
+        0,
+        56,
+        4
+      ],
+      "sourceReferencePivotPixels": [
+        25.854884023269385,
+        46.061397588073156,
+        24.840942950314332
+      ],
+      "sourceSpan": [
+        "Pelvis",
+        "Spine_2"
+      ],
+      "authoredSpanPixels": 17.2,
+      "crossSectionScale": 0.7754687624256505,
+      "originalMiddleCubeHalf": "lower",
+      "orientation": "Raw-bind spine axis followed by source reference * inverse raw joint basis; preserves source pelvis/chest twist",
+      "crossSectionBasis": "Unchanged authored chest cross-section scale",
+      "longitudinalScale": 1.4072139487974527,
+      "authoredLongitudinalFit": 1.8146623268172866
+    },
+    {
+      "bone": "torso_lower",
+      "source": "Pelvis",
+      "originalCubeIndices": [
+        2
+      ],
+      "authoredPivot": [
+        0,
+        56,
+        4
+      ],
+      "sourceReferencePivotPixels": [
+        25.854884023269385,
+        46.05786735673383,
+        24.838650007729548
+      ],
+      "sourceSpan": [
+        "Pelvis",
+        "Spine_2"
+      ],
+      "authoredSpanPixels": 17.2,
+      "crossSectionScale": 1.0922947727464938,
+      "originalMiddleCubeHalf": null,
+      "orientation": "Raw-bind spine axis followed by source reference * inverse raw joint basis; preserves source pelvis/chest twist",
+      "crossSectionBasis": "Source hip span / authored hip span",
+      "longitudinalScale": 1.4072139487974527,
+      "authoredLongitudinalFit": 1.288309697993993
+    }
+  ],
+  "checks": [
+    {
+      "clip": "idle",
+      "frames": 86,
+      "maxJointErrorBlocks": 1.364971365458546e-07,
+      "maxAffineElementErrorPixels": 2.4990203453013893e-06
+    },
+    {
+      "clip": "walk",
+      "frames": 44,
+      "maxJointErrorBlocks": 9.48312157733053e-08,
+      "maxAffineElementErrorPixels": 2.328636306003773e-06
+    },
+    {
+      "clip": "HAMMER",
+      "frames": 89,
+      "maxJointErrorBlocks": 1.5100351797328894e-07,
+      "maxAffineElementErrorPixels": 2.997658341996612e-06
+    },
+    {
+      "clip": "SLAM",
+      "frames": 181,
+      "maxJointErrorBlocks": 1.461296298455579e-07,
+      "maxAffineElementErrorPixels": 3.475111242323692e-06
+    },
+    {
+      "clip": "CHARGE",
+      "frames": 151,
+      "maxJointErrorBlocks": 1.487348262479957e-07,
+      "maxAffineElementErrorPixels": 3.1327387830515363e-06
+    },
+    {
+      "clip": "ERUPTION",
+      "frames": 211,
+      "maxJointErrorBlocks": 1.5652630137896438e-07,
+      "maxAffineElementErrorPixels": 3.884667307829659e-06
+    },
+    {
+      "clip": "exposed",
+      "frames": 291,
+      "maxJointErrorBlocks": 1.8379579101912875e-07,
+      "maxAffineElementErrorPixels": 3.255543732372246e-06
+    },
+    {
+      "clip": "collapse",
+      "frames": 51,
+      "maxJointErrorBlocks": 1.417458344689136e-07,
+      "maxAffineElementErrorPixels": 3.2340619142701144e-06
+    },
+    {
+      "clip": "crawl_idle",
+      "frames": 121,
+      "maxJointErrorBlocks": 1.2984764034144626e-07,
+      "maxAffineElementErrorPixels": 3.353319669940902e-06
+    },
+    {
+      "clip": "crawl",
+      "frames": 59,
+      "maxJointErrorBlocks": 1.5414213564704129e-07,
+      "maxAffineElementErrorPixels": 3.4340817549605163e-06
+    },
+    {
+      "clip": "crawl_slam",
+      "frames": 136,
+      "maxJointErrorBlocks": 1.7558984874419354e-07,
+      "maxAffineElementErrorPixels": 3.944070305905711e-06
+    },
+    {
+      "clip": "rise",
+      "frames": 81,
+      "maxJointErrorBlocks": 1.2221723733294772e-07,
+      "maxAffineElementErrorPixels": 3.2519738795144804e-06
+    },
+    {
+      "clip": "death",
+      "frames": 56,
+      "maxJointErrorBlocks": 1.545744137035392e-07,
+      "maxAffineElementErrorPixels": 2.6659541561002698e-06
+    },
+    {
+      "clip": "CHARGE_RETURN",
+      "frames": 146,
+      "maxJointErrorBlocks": 1.6865683291894694e-07,
+      "maxAffineElementErrorPixels": 2.943497634078085e-06
+    },
+    {
+      "clip": "TAUNT_TELL",
+      "frames": 197,
+      "maxJointErrorBlocks": 1.3615707250700392e-07,
+      "maxAffineElementErrorPixels": 2.8263324765021025e-06
+    },
+    {
+      "clip": "TAUNT",
+      "frames": 201,
+      "maxJointErrorBlocks": 1.2432497006548856e-07,
+      "maxAffineElementErrorPixels": 2.945214539806784e-06
+    },
+    {
+      "clip": "TAUNT_HOWL",
+      "frames": 111,
+      "maxJointErrorBlocks": 1.3735986408982278e-07,
+      "maxAffineElementErrorPixels": 2.6381673321473897e-06
+    }
+  ],
+  "wristSamples": [
+    {
+      "frame": 0,
+      "bone": "right_hand",
+      "sourceBlocks": [
+        -0.15159429501588967,
+        2.1566259407976274,
+        -4.527174102615037
+      ],
+      "runtimeBlocks": [
+        -0.15159437411259807,
+        2.1566259142841178,
+        -4.527174115353543
+      ],
+      "error": 8.438912852885156e-08
+    },
+    {
+      "frame": 0,
+      "bone": "left_hand",
+      "sourceBlocks": [
+        -1.1868646143053534,
+        2.3356377867471623,
+        4.303413725099597
+      ],
+      "runtimeBlocks": [
+        -1.1868646254456166,
+        2.335637746207175,
+        4.303413731341228
+      ],
+      "error": 4.2503576309556964e-08
+    },
+    {
+      "frame": 42,
+      "bone": "right_hand",
+      "sourceBlocks": [
+        1.4717946770927366,
+        15.438995511000133,
+        0.21779636358406773
+      ],
+      "runtimeBlocks": [
+        1.4717946937700326,
+        15.438995481688364,
+        0.21779634986510388
+      ],
+      "error": 3.6407718595485517e-08
+    },
+    {
+      "frame": 42,
+      "bone": "left_hand",
+      "sourceBlocks": [
+        -1.5580769750522867,
+        0.643983691273652,
+        1.687721634944241
+      ],
+      "runtimeBlocks": [
+        -1.5580769316584773,
+        0.643983672443388,
+        1.6877216533049184
+      ],
+      "error": 5.0741659525086066e-08
+    },
+    {
+      "frame": 48,
+      "bone": "right_hand",
+      "sourceBlocks": [
+        -1.4267102916199572,
+        0.3602343833391933,
+        -8.870414998771462
+      ],
+      "runtimeBlocks": [
+        -1.4267103179646023,
+        0.36023439815701774,
+        -8.870415010723493
+      ],
+      "error": 3.250321955733339e-08
+    },
+    {
+      "frame": 48,
+      "bone": "left_hand",
+      "sourceBlocks": [
+        -0.8156144168183513,
+        3.0527516372028223,
+        2.9828631568648554
+      ],
+      "runtimeBlocks": [
+        -0.815614430101617,
+        3.052751615119994,
+        2.9828631645535078
+      ],
+      "error": 2.6892598162230135e-08
+    },
+    {
+      "frame": 49,
+      "bone": "right_hand",
+      "sourceBlocks": [
+        -1.4242176924350345,
+        1.4410532430888559,
+        -8.867717739325164
+      ],
+      "runtimeBlocks": [
+        -1.424217656221607,
+        1.4410532391379007,
+        -8.867717728830678
+      ],
+      "error": 3.7909848396849386e-08
+    },
+    {
+      "frame": 49,
+      "bone": "left_hand",
+      "sourceBlocks": [
+        -0.3890059915753879,
+        3.5264934118431714,
+        2.9985110196533316
+      ],
+      "runtimeBlocks": [
+        -0.3890059851887835,
+        3.526493432987973,
+        2.998511023653454
+      ],
+      "error": 2.2447546070375618e-08
+    },
+    {
+      "frame": 52,
+      "bone": "right_hand",
+      "sourceBlocks": [
+        -1.4054958809615399,
+        0.8873371832463862,
+        -8.923056198262627
+      ],
+      "runtimeBlocks": [
+        -1.4054957664238819,
+        0.8873372511650892,
+        -8.923056204650957
+      ],
+      "error": 1.3331405057525678e-07
+    },
+    {
+      "frame": 52,
+      "bone": "left_hand",
+      "sourceBlocks": [
+        0.14044772353978335,
+        4.231585834702146,
+        3.141495663255928
+      ],
+      "runtimeBlocks": [
+        0.14044764324327197,
+        4.231585847462489,
+        3.141495667471094
+      ],
+      "error": 8.141328942985365e-08
+    },
+    {
+      "frame": 88,
+      "bone": "right_hand",
+      "sourceBlocks": [
+        -0.15159429501588967,
+        2.1566259407976274,
+        -4.527174102615037
+      ],
+      "runtimeBlocks": [
+        -0.15159437411259807,
+        2.1566259142841178,
+        -4.527174115353543
+      ],
+      "error": 8.438912852885156e-08
+    },
+    {
+      "frame": 88,
+      "bone": "left_hand",
+      "sourceBlocks": [
+        -1.1868646143053534,
+        2.3356377867471623,
+        4.303413725099597
+      ],
+      "runtimeBlocks": [
+        -1.1868646254456166,
+        2.335637746207175,
+        4.303413731341228
+      ],
+      "error": 4.2503576309556964e-08
+    }
+  ],
+  "conventions": {
+    "geometryUnits": "pixels; 16 pixels per Minecraft block",
+    "sourceScalePixelsPerUnit": 12.100274789683661,
+    "sourceToRuntimeAxes": "mirror X using diag(-1,1,1); source -Z is forward",
+    "runtimeRotation": "Rz * Ry * Rx",
+    "worldYaw": "rotateY(180 - entityYaw) after source pose; render origin Y offset 0.01",
+    "unmappedChildren": "Weak plates/fingers retain authored cuboids and static zero bone rotation/translation; only their mapped ancestor moves. Their pivot translations cancel around zero rotation. P2 left finger chains carry no positive skin weights and are not blindly used as deformation joints.",
+    "hitScaling": "FIG spheres were already converted with the same pixelsPerSourceUnit/16 by build_goliath_slam.py; contact performs no second geometry scale."
+  },
+  "boundary": [
+    "Numerical source-joint agreement is not rendered geometry/player acceptance",
+    "Only front slam has source FIG timing/contact; other move/phase clocks remain MC adapters",
+    "Original source meshes/textures are not imported",
+    "Broad contact/terrain/receive-volume acceptance remains pending",
+    "Slender-hand side and bind-axis correction clears its front-slam impact fingers, without modifying source joints. Giant-hand support/volume and external source controller semantics remain unresolved; unused source finger chains are not new deformation joints. No endpoint clamp or invented pose is applied."
+  ]
+}

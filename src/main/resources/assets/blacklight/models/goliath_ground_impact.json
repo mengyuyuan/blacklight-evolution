@@ -1,0 +1,89 @@
+{
+  "schema": 1,
+  "source": "D:\\PrototypeReference\\p2\\input\\p2\\behemoth.p3d",
+  "sourceSha256": "3737ff61e7042391bf12c95c2018e034f52a1945983d0a7053608a01d69240c7",
+  "move": "HAMMER",
+  "blocksPerSourceUnit": 0.7562671743552288,
+  "pulses": [
+    {
+      "atTick": 39,
+      "position": [
+        2.5,
+        0.0,
+        -13.0
+      ],
+      "direction": [
+        0.0,
+        -1.0,
+        0.0
+      ],
+      "up": [
+        0.0,
+        1.0,
+        0.0
+      ],
+      "minAngle": 5.0,
+      "maxAngle": 15.0,
+      "startDistance": 0.0,
+      "length": 17.0,
+      "minDecals": 5,
+      "maxDecals": 10,
+      "minDecalScale": 6.0,
+      "maxDecalScale": 6.0
+    },
+    {
+      "atTick": 40,
+      "position": [
+        2.5,
+        0.0,
+        -13.0
+      ],
+      "direction": [
+        0.0,
+        -1.0,
+        0.0
+      ],
+      "up": [
+        0.0,
+        1.0,
+        0.0
+      ],
+      "minAngle": 15.0,
+      "maxAngle": 25.0,
+      "startDistance": 0.0,
+      "length": 17.0,
+      "minDecals": 5,
+      "maxDecals": 10,
+      "minDecalScale": 8.0,
+      "maxDecalScale": 8.0
+    },
+    {
+      "atTick": 41,
+      "position": [
+        2.5,
+        0.0,
+        -13.0
+      ],
+      "direction": [
+        0.0,
+        -1.0,
+        0.0
+      ],
+      "up": [
+        0.0,
+        1.0,
+        0.0
+      ],
+      "minAngle": 25.0,
+      "maxAngle": 35.0,
+      "startDistance": 5.0,
+      "length": 20.0,
+      "minDecals": 5,
+      "maxDecals": 10,
+      "minDecalScale": 10.0,
+      "maxDecalScale": 10.0
+    }
+  ],
+  "origin": "Reference Motion_Root in the same source pose as the authored skin, plus source actor-local position. Source X is mirrored once before render yaw.",
+  "adaptation": "Original ray geometry/timing; real Minecraft collision contacts drive existing material/debris/audio feedback. No original decal texture, extra damage, block removal, or claimed actor solver reproduction."
+}

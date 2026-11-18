@@ -1,0 +1,3262 @@
+{
+  "format_version": "1.12.0",
+  "minecraft:geometry": [
+    {
+      "description": {
+        "identifier": "geometry.elizabeth_greene_segment_corpse",
+        "texture_width": 512,
+        "texture_height": 512,
+        "visible_bounds_width": 12,
+        "visible_bounds_height": 10,
+        "visible_bounds_offset": [
+          0,
+          4,
+          0
+        ]
+      },
+      "bones": [
+        {
+          "name": "root",
+          "pivot": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "name": "native_Motion_Root",
+          "pivot": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "name": "native_Balance_Root",
+          "pivot": [
+            0,
+            0,
+            0
+          ],
+          "parent": "native_Motion_Root"
+        },
+        {
+          "name": "native_Character_Root",
+          "pivot": [
+            0,
+            0,
+            0
+          ],
+          "parent": "native_Balance_Root"
+        },
+        {
+          "name": "native_Spine_Base",
+          "pivot": [
+            0,
+            0,
+            0
+          ],
+          "parent": "native_Character_Root"
+        },
+        {
+          "name": "native_Spine_1",
+          "pivot": [
+            0,
+            0,
+            0
+          ],
+          "parent": "native_Spine_Base"
+        },
+        {
+          "name": "native_Spine_2",
+          "pivot": [
+            0,
+            0,
+            0
+          ],
+          "parent": "native_Spine_1"
+        },
+        {
+          "name": "native_Spine_3",
+          "pivot": [
+            0,
+            0,
+            0
+          ],
+          "parent": "native_Spine_2"
+        },
+        {
+          "name": "native_Spine_4",
+          "pivot": [
+            0,
+            0,
+            0
+          ],
+          "parent": "native_Spine_3"
+        },
+        {
+          "name": "native_Head",
+          "pivot": [
+            0,
+            0,
+            0
+          ],
+          "parent": "native_Spine_4"
+        },
+        {
+          "name": "native_Head_End",
+          "pivot": [
+            0,
+            0,
+            0
+          ],
+          "parent": "native_Head"
+        },
+        {
+          "name": "native_Heart_1",
+          "pivot": [
+            0,
+            0,
+            0
+          ],
+          "parent": "native_Head"
+        },
+        {
+          "name": "native_Heart_2",
+          "pivot": [
+            0,
+            0,
+            0
+          ],
+          "parent": "native_Head"
+        },
+        {
+          "name": "native_Heart_3",
+          "pivot": [
+            0,
+            0,
+            0
+          ],
+          "parent": "native_Head"
+        },
+        {
+          "name": "native_Heart_4",
+          "pivot": [
+            0,
+            0,
+            0
+          ],
+          "parent": "native_Head"
+        },
+        {
+          "name": "native_Mouth",
+          "pivot": [
+            0,
+            0,
+            0
+          ],
+          "parent": "native_Head"
+        },
+        {
+          "name": "native_Heart_5",
+          "pivot": [
+            0,
+            0,
+            0
+          ],
+          "parent": "native_Head"
+        },
+        {
+          "name": "native_Heart_6",
+          "pivot": [
+            0,
+            0,
+            0
+          ],
+          "parent": "native_Head"
+        },
+        {
+          "name": "native_Heart_7",
+          "pivot": [
+            0,
+            0,
+            0
+          ],
+          "parent": "native_Head"
+        },
+        {
+          "name": "native_Horn",
+          "pivot": [
+            0,
+            0,
+            0
+          ],
+          "parent": "native_Head"
+        },
+        {
+          "name": "native_Body_Root",
+          "pivot": [
+            0,
+            0,
+            0
+          ],
+          "parent": "native_Head"
+        },
+        {
+          "name": "native_Body_offset",
+          "parent": "native_Body_Root",
+          "pivot": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "name": "native_Body_parent_scale",
+          "parent": "native_Body_offset",
+          "pivot": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "name": "native_Body",
+          "pivot": [
+            0,
+            0,
+            0
+          ],
+          "parent": "native_Body_parent_scale"
+        },
+        {
+          "name": "native_Chest_R",
+          "pivot": [
+            0,
+            0,
+            0
+          ],
+          "parent": "native_Body"
+        },
+        {
+          "name": "native_Chest_L",
+          "pivot": [
+            0,
+            0,
+            0
+          ],
+          "parent": "native_Body"
+        },
+        {
+          "name": "native_Slug_02_Spine_Base",
+          "pivot": [
+            0,
+            0,
+            0
+          ],
+          "parent": "native_Motion_Root"
+        },
+        {
+          "name": "native_Slug_02_Spine_1",
+          "pivot": [
+            0,
+            0,
+            0
+          ],
+          "parent": "native_Slug_02_Spine_Base"
+        },
+        {
+          "name": "native_Slug_02_Spine_2",
+          "pivot": [
+            0,
+            0,
+            0
+          ],
+          "parent": "native_Slug_02_Spine_1"
+        },
+        {
+          "name": "native_Slug_02_Spine_3",
+          "pivot": [
+            0,
+            0,
+            0
+          ],
+          "parent": "native_Slug_02_Spine_2"
+        },
+        {
+          "name": "native_Slug_02_Spine_4",
+          "pivot": [
+            0,
+            0,
+            0
+          ],
+          "parent": "native_Slug_02_Spine_3"
+        },
+        {
+          "name": "native_Slug_02_Spine_5",
+          "pivot": [
+            0,
+            0,
+            0
+          ],
+          "parent": "native_Slug_02_Spine_4"
+        },
+        {
+          "name": "native_Slug_02_Head",
+          "pivot": [
+            0,
+            0,
+            0
+          ],
+          "parent": "native_Slug_02_Spine_5"
+        },
+        {
+          "name": "native_Slug_02_Jaw_1",
+          "pivot": [
+            0,
+            0,
+            0
+          ],
+          "parent": "native_Slug_02_Head"
+        },
+        {
+          "name": "native_Slug_02_Jaw_2",
+          "pivot": [
+            0,
+            0,
+            0
+          ],
+          "parent": "native_Slug_02_Head"
+        },
+        {
+          "name": "native_Slug_02_Jaw_3",
+          "pivot": [
+            0,
+            0,
+            0
+          ],
+          "parent": "native_Slug_02_Head"
+        },
+        {
+          "name": "native_Slug_01_Spine_Base",
+          "pivot": [
+            0,
+            0,
+            0
+          ],
+          "parent": "native_Motion_Root"
+        },
+        {
+          "name": "native_Slug_01_Spine_1",
+          "pivot": [
+            0,
+            0,
+            0
+          ],
+          "parent": "native_Slug_01_Spine_Base"
+        },
+        {
+          "name": "native_Slug_01_Spine_2",
+          "pivot": [
+            0,
+            0,
+            0
+          ],
+          "parent": "native_Slug_01_Spine_1"
+        },
+        {
+          "name": "native_Slug_01_Spine_3",
+          "pivot": [
+            0,
+            0,
+            0
+          ],
+          "parent": "native_Slug_01_Spine_2"
+        },
+        {
+          "name": "native_Slug_01_Spine_4",
+          "pivot": [
+            0,
+            0,
+            0
+          ],
+          "parent": "native_Slug_01_Spine_3"
+        },
+        {
+          "name": "native_Slug_01_Spine_5",
+          "pivot": [
+            0,
+            0,
+            0
+          ],
+          "parent": "native_Slug_01_Spine_4"
+        },
+        {
+          "name": "native_Slug_01_Head",
+          "pivot": [
+            0,
+            0,
+            0
+          ],
+          "parent": "native_Slug_01_Spine_5"
+        },
+        {
+          "name": "native_Slug_01_Jaw_1",
+          "pivot": [
+            0,
+            0,
+            0
+          ],
+          "parent": "native_Slug_01_Head"
+        },
+        {
+          "name": "native_Slug_01_Jaw_2",
+          "pivot": [
+            0,
+            0,
+            0
+          ],
+          "parent": "native_Slug_01_Head"
+        },
+        {
+          "name": "native_Slug_01_Jaw_3",
+          "pivot": [
+            0,
+            0,
+            0
+          ],
+          "parent": "native_Slug_01_Head"
+        },
+        {
+          "name": "native_Slug_03_Spine_Base",
+          "pivot": [
+            0,
+            0,
+            0
+          ],
+          "parent": "native_Motion_Root"
+        },
+        {
+          "name": "native_Slug_03_Spine_1",
+          "pivot": [
+            0,
+            0,
+            0
+          ],
+          "parent": "native_Slug_03_Spine_Base"
+        },
+        {
+          "name": "native_Slug_03_Spine_2",
+          "pivot": [
+            0,
+            0,
+            0
+          ],
+          "parent": "native_Slug_03_Spine_1"
+        },
+        {
+          "name": "native_Slug_03_Spine_3",
+          "pivot": [
+            0,
+            0,
+            0
+          ],
+          "parent": "native_Slug_03_Spine_2"
+        },
+        {
+          "name": "native_Slug_03_Spine_4",
+          "pivot": [
+            0,
+            0,
+            0
+          ],
+          "parent": "native_Slug_03_Spine_3"
+        },
+        {
+          "name": "native_Slug_03_Spine_5",
+          "pivot": [
+            0,
+            0,
+            0
+          ],
+          "parent": "native_Slug_03_Spine_4"
+        },
+        {
+          "name": "native_Slug_03_Head",
+          "pivot": [
+            0,
+            0,
+            0
+          ],
+          "parent": "native_Slug_03_Spine_5"
+        },
+        {
+          "name": "native_Slug_03_Jaw_1",
+          "pivot": [
+            0,
+            0,
+            0
+          ],
+          "parent": "native_Slug_03_Head"
+        },
+        {
+          "name": "native_Slug_03_Jaw_2",
+          "pivot": [
+            0,
+            0,
+            0
+          ],
+          "parent": "native_Slug_03_Head"
+        },
+        {
+          "name": "native_Slug_03_Jaw_3",
+          "pivot": [
+            0,
+            0,
+            0
+          ],
+          "parent": "native_Slug_03_Head"
+        },
+        {
+          "name": "neck_base",
+          "parent": "native_Spine_Base",
+          "pivot": [
+            0,
+            0,
+            4
+          ]
+        },
+        {
+          "name": "neck_mid",
+          "parent": "native_Spine_1",
+          "pivot": [
+            0,
+            6,
+            4
+          ]
+        },
+        {
+          "name": "neck_top",
+          "parent": "native_Spine_2",
+          "pivot": [
+            0,
+            32,
+            4
+          ]
+        },
+        {
+          "name": "neck_upper",
+          "parent": "native_Spine_3",
+          "pivot": [
+            3.9995570288977967e-17,
+            43.00411006839016,
+            2.2645526230014365e-05
+          ]
+        },
+        {
+          "name": "neck_crown",
+          "parent": "native_Spine_4",
+          "pivot": [
+            1.4565888706084079e-15,
+            64.50616933289905,
+            2.2295624782910333e-05
+          ]
+        },
+        {
+          "name": "torso",
+          "parent": "native_Head",
+          "pivot": [
+            0,
+            64,
+            4
+          ]
+        },
+        {
+          "name": "crown_tip",
+          "parent": "native_Head_End",
+          "pivot": [
+            3.658146899775416e-12,
+            123.06375182118346,
+            -0.00013595009528077537
+          ]
+        },
+        {
+          "name": "mouth",
+          "parent": "native_Mouth",
+          "pivot": [
+            6.543779019068692,
+            98.24386615734446,
+            -13.582006161055524
+          ]
+        },
+        {
+          "name": "left_arm",
+          "parent": "native_Horn",
+          "pivot": [
+            -20,
+            104,
+            4
+          ]
+        },
+        {
+          "name": "head",
+          "parent": "native_Body_Root",
+          "pivot": [
+            3.2,
+            100,
+            -16
+          ]
+        },
+        {
+          "name": "host_body",
+          "parent": "native_Body",
+          "pivot": [
+            5.696720634442704,
+            100.71226488492476,
+            -15.324418814973594
+          ]
+        },
+        {
+          "name": "host_left",
+          "parent": "native_Chest_L",
+          "pivot": [
+            4.907333180010997,
+            101.96602611045365,
+            -16.318519262799487
+          ]
+        },
+        {
+          "name": "host_right",
+          "parent": "native_Chest_R",
+          "pivot": [
+            6.162683305414228,
+            102.21831947425969,
+            -16.25026319138138
+          ]
+        },
+        {
+          "name": "lobe_1",
+          "parent": "native_Heart_1",
+          "pivot": [
+            -10.957454009329195,
+            106.09915588185203,
+            -14.633762254450806
+          ]
+        },
+        {
+          "name": "lobe_2",
+          "parent": "native_Heart_2",
+          "pivot": [
+            -13.189584128537202,
+            83.19788848755448,
+            -12.655703383455716
+          ]
+        },
+        {
+          "name": "lobe_3",
+          "parent": "native_Heart_3",
+          "pivot": [
+            23.224292570071015,
+            83.83406645594192,
+            -10.910967498816973
+          ]
+        },
+        {
+          "name": "lobe_4",
+          "parent": "native_Heart_4",
+          "pivot": [
+            25.346434745836824,
+            106.09528736174231,
+            2.129255976402702
+          ]
+        },
+        {
+          "name": "lobe_5",
+          "parent": "native_Heart_5",
+          "pivot": [
+            12.119909993522949,
+            114.23903766412963,
+            -10.64928421237426
+          ]
+        },
+        {
+          "name": "lobe_6",
+          "parent": "native_Heart_6",
+          "pivot": [
+            -1.9194811413917634,
+            103.27923360088074,
+            22.320768968130206
+          ]
+        },
+        {
+          "name": "lobe_7",
+          "parent": "native_Heart_7",
+          "pivot": [
+            -4.839253321918486,
+            120.23926955362062,
+            -8.337319058972083
+          ]
+        },
+        {
+          "name": "right_arm",
+          "parent": "native_Head",
+          "pivot": [
+            24,
+            96,
+            4
+          ]
+        },
+        {
+          "name": "weak_0_Slug_01_Jaw_3",
+          "parent": "native_Slug_01_Jaw_3",
+          "pivot": [
+            -13.872671420036085,
+            77.75573079924966,
+            2.4451796760483537
+          ],
+          "cubes": [
+            {
+              "origin": [
+                -14.038094051535168,
+                68.29349647257926,
+                -5.238268974850747
+              ],
+              "size": [
+                14.183126597397788,
+                24.510861468053818,
+                13.232646047711285
+              ],
+              "uv": {
+                "east": {
+                  "uv": [
+                    225,
+                    173
+                  ],
+                  "uv_size": [
+                    14,
+                    15
+                  ]
+                },
+                "west": {
+                  "uv": [
+                    241,
+                    173
+                  ],
+                  "uv_size": [
+                    14,
+                    15
+                  ]
+                },
+                "north": {
+                  "uv": [
+                    447,
+                    173
+                  ],
+                  "uv_size": [
+                    5,
+                    15
+                  ]
+                },
+                "south": {
+                  "uv": [
+                    454,
+                    173
+                  ],
+                  "uv_size": [
+                    5,
+                    15
+                  ]
+                },
+                "up": {
+                  "uv": [
+                    145,
+                    207
+                  ],
+                  "uv_size": [
+                    5,
+                    14
+                  ]
+                },
+                "down": {
+                  "uv": [
+                    152,
+                    207
+                  ],
+                  "uv_size": [
+                    5,
+                    14
+                  ]
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "weak_0_Slug_01_Head",
+          "parent": "native_Slug_01_Head",
+          "pivot": [
+            -13.872669526246964,
+            77.75573461403933,
+            2.4451807118382733
+          ],
+          "cubes": [
+            {
+              "origin": [
+                -26.56671029580126,
+                71.07033139570036,
+                -7.314742952330222
+              ],
+              "size": [
+                24.555943177766032,
+                15.018482235143523,
+                23.07787686818584
+              ],
+              "uv": {
+                "north": {
+                  "uv": [
+                    283,
+                    238
+                  ],
+                  "uv_size": [
+                    11,
+                    10
+                  ]
+                },
+                "south": {
+                  "uv": [
+                    296,
+                    238
+                  ],
+                  "uv_size": [
+                    11,
+                    10
+                  ]
+                },
+                "up": {
+                  "uv": [
+                    309,
+                    238
+                  ],
+                  "uv_size": [
+                    11,
+                    10
+                  ]
+                },
+                "down": {
+                  "uv": [
+                    322,
+                    238
+                  ],
+                  "uv_size": [
+                    11,
+                    10
+                  ]
+                },
+                "east": {
+                  "uv": [
+                    439,
+                    238
+                  ],
+                  "uv_size": [
+                    10,
+                    10
+                  ]
+                },
+                "west": {
+                  "uv": [
+                    451,
+                    238
+                  ],
+                  "uv_size": [
+                    10,
+                    10
+                  ]
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "weak_0_Slug_01_Jaw_1",
+          "parent": "native_Slug_01_Jaw_1",
+          "pivot": [
+            -13.872671420036085,
+            77.75573079924966,
+            2.4451796760483537
+          ],
+          "cubes": [
+            {
+              "origin": [
+                -26.56671029580126,
+                73.96631277503766,
+                -6.861800498015076
+              ],
+              "size": [
+                14.675810574523979,
+                22.62198924553141,
+                13.242261633580263
+              ],
+              "uv": {
+                "east": {
+                  "uv": [
+                    225,
+                    173
+                  ],
+                  "uv_size": [
+                    14,
+                    15
+                  ]
+                },
+                "west": {
+                  "uv": [
+                    241,
+                    173
+                  ],
+                  "uv_size": [
+                    14,
+                    15
+                  ]
+                },
+                "north": {
+                  "uv": [
+                    447,
+                    173
+                  ],
+                  "uv_size": [
+                    5,
+                    15
+                  ]
+                },
+                "south": {
+                  "uv": [
+                    454,
+                    173
+                  ],
+                  "uv_size": [
+                    5,
+                    15
+                  ]
+                },
+                "up": {
+                  "uv": [
+                    145,
+                    207
+                  ],
+                  "uv_size": [
+                    5,
+                    14
+                  ]
+                },
+                "down": {
+                  "uv": [
+                    152,
+                    207
+                  ],
+                  "uv_size": [
+                    5,
+                    14
+                  ]
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "weak_0_Slug_01_Spine_5",
+          "parent": "native_Slug_01_Spine_5",
+          "pivot": [
+            -14.53287209763463,
+            63.45322997527301,
+            3.14256650864542
+          ],
+          "cubes": [
+            {
+              "origin": [
+                -28.95071940062474,
+                57.763044084996274,
+                -7.314742952330222
+              ],
+              "size": [
+                26.856585520503906,
+                20.751968834508297,
+                25.14694007757978
+              ],
+              "uv": {
+                "north": {
+                  "uv": [
+                    172,
+                    190
+                  ],
+                  "uv_size": [
+                    16,
+                    14
+                  ]
+                },
+                "south": {
+                  "uv": [
+                    190,
+                    190
+                  ],
+                  "uv_size": [
+                    16,
+                    14
+                  ]
+                },
+                "up": {
+                  "uv": [
+                    208,
+                    190
+                  ],
+                  "uv_size": [
+                    16,
+                    14
+                  ]
+                },
+                "down": {
+                  "uv": [
+                    226,
+                    190
+                  ],
+                  "uv_size": [
+                    16,
+                    14
+                  ]
+                },
+                "east": {
+                  "uv": [
+                    454,
+                    190
+                  ],
+                  "uv_size": [
+                    14,
+                    14
+                  ]
+                },
+                "west": {
+                  "uv": [
+                    470,
+                    190
+                  ],
+                  "uv_size": [
+                    14,
+                    14
+                  ]
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "weak_0_Slug_01_Jaw_2",
+          "parent": "native_Slug_01_Jaw_2",
+          "pivot": [
+            -13.872671420036085,
+            77.75573079924966,
+            2.4451796760483537
+          ],
+          "cubes": [
+            {
+              "origin": [
+                -19.23837103834104,
+                74.34466822170945,
+                4.9179441100913595
+              ],
+              "size": [
+                13.617492057565384,
+                19.809870402555575,
+                10.83115176810411
+              ],
+              "uv": {
+                "east": {
+                  "uv": [
+                    225,
+                    173
+                  ],
+                  "uv_size": [
+                    14,
+                    15
+                  ]
+                },
+                "west": {
+                  "uv": [
+                    241,
+                    173
+                  ],
+                  "uv_size": [
+                    14,
+                    15
+                  ]
+                },
+                "north": {
+                  "uv": [
+                    447,
+                    173
+                  ],
+                  "uv_size": [
+                    5,
+                    15
+                  ]
+                },
+                "south": {
+                  "uv": [
+                    454,
+                    173
+                  ],
+                  "uv_size": [
+                    5,
+                    15
+                  ]
+                },
+                "up": {
+                  "uv": [
+                    145,
+                    207
+                  ],
+                  "uv_size": [
+                    5,
+                    14
+                  ]
+                },
+                "down": {
+                  "uv": [
+                    152,
+                    207
+                  ],
+                  "uv_size": [
+                    5,
+                    14
+                  ]
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "weak_0_Slug_01_Spine_4",
+          "parent": "native_Slug_01_Spine_4",
+          "pivot": [
+            -15.351591783604139,
+            47.605451289413836,
+            3.987122780766554
+          ],
+          "cubes": [
+            {
+              "origin": [
+                -30.820999553793232,
+                44.46624557224204,
+                -7.453839997673912
+              ],
+              "size": [
+                25.20099549392835,
+                18.732367706681366,
+                27.038331115380466
+              ],
+              "uv": {
+                "north": {
+                  "uv": [
+                    172,
+                    190
+                  ],
+                  "uv_size": [
+                    16,
+                    14
+                  ]
+                },
+                "south": {
+                  "uv": [
+                    190,
+                    190
+                  ],
+                  "uv_size": [
+                    16,
+                    14
+                  ]
+                },
+                "up": {
+                  "uv": [
+                    208,
+                    190
+                  ],
+                  "uv_size": [
+                    16,
+                    14
+                  ]
+                },
+                "down": {
+                  "uv": [
+                    226,
+                    190
+                  ],
+                  "uv_size": [
+                    16,
+                    14
+                  ]
+                },
+                "east": {
+                  "uv": [
+                    454,
+                    190
+                  ],
+                  "uv_size": [
+                    14,
+                    14
+                  ]
+                },
+                "west": {
+                  "uv": [
+                    470,
+                    190
+                  ],
+                  "uv_size": [
+                    14,
+                    14
+                  ]
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "weak_0_Slug_01_Spine_3",
+          "parent": "native_Slug_01_Spine_3",
+          "pivot": [
+            -16.123985255840207,
+            31.753360447162486,
+            4.793523879568664
+          ],
+          "cubes": [
+            {
+              "origin": [
+                -34.06101624001335,
+                24.38017870115669,
+                -8.095739736267356
+              ],
+              "size": [
+                28.087835060487517,
+                26.408669162143465,
+                29.916104912092223
+              ],
+              "uv": {
+                "north": {
+                  "uv": [
+                    172,
+                    190
+                  ],
+                  "uv_size": [
+                    16,
+                    14
+                  ]
+                },
+                "south": {
+                  "uv": [
+                    190,
+                    190
+                  ],
+                  "uv_size": [
+                    16,
+                    14
+                  ]
+                },
+                "up": {
+                  "uv": [
+                    208,
+                    190
+                  ],
+                  "uv_size": [
+                    16,
+                    14
+                  ]
+                },
+                "down": {
+                  "uv": [
+                    226,
+                    190
+                  ],
+                  "uv_size": [
+                    16,
+                    14
+                  ]
+                },
+                "east": {
+                  "uv": [
+                    454,
+                    190
+                  ],
+                  "uv_size": [
+                    14,
+                    14
+                  ]
+                },
+                "west": {
+                  "uv": [
+                    470,
+                    190
+                  ],
+                  "uv_size": [
+                    14,
+                    14
+                  ]
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "weak_0_Slug_01_Spine_2",
+          "parent": "native_Slug_01_Spine_2",
+          "pivot": [
+            -16.708150796918392,
+            15.886094111573566,
+            5.444948235666544
+          ],
+          "cubes": [
+            {
+              "origin": [
+                -36.04908262079459,
+                5.859561933633634,
+                -8.095739736267356
+              ],
+              "size": [
+                30.817042758150862,
+                29.90347964955508,
+                31.992693808382732
+              ],
+              "uv": {
+                "north": {
+                  "uv": [
+                    172,
+                    190
+                  ],
+                  "uv_size": [
+                    16,
+                    14
+                  ]
+                },
+                "south": {
+                  "uv": [
+                    190,
+                    190
+                  ],
+                  "uv_size": [
+                    16,
+                    14
+                  ]
+                },
+                "up": {
+                  "uv": [
+                    208,
+                    190
+                  ],
+                  "uv_size": [
+                    16,
+                    14
+                  ]
+                },
+                "down": {
+                  "uv": [
+                    226,
+                    190
+                  ],
+                  "uv_size": [
+                    16,
+                    14
+                  ]
+                },
+                "east": {
+                  "uv": [
+                    454,
+                    190
+                  ],
+                  "uv_size": [
+                    14,
+                    14
+                  ]
+                },
+                "west": {
+                  "uv": [
+                    470,
+                    190
+                  ],
+                  "uv_size": [
+                    14,
+                    14
+                  ]
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "weak_0_Slug_01_Spine_1",
+          "parent": "native_Slug_01_Spine_1",
+          "pivot": [
+            -16.947831661536974,
+            2.5554799631858374,
+            5.7852905425599275
+          ],
+          "cubes": [
+            {
+              "origin": [
+                -36.04908262079459,
+                -2.403125998561614,
+                -8.80084311209964
+              ],
+              "size": [
+                30.817042758150862,
+                19.26324839768506,
+                32.69779718421502
+              ],
+              "uv": {
+                "north": {
+                  "uv": [
+                    172,
+                    190
+                  ],
+                  "uv_size": [
+                    16,
+                    14
+                  ]
+                },
+                "south": {
+                  "uv": [
+                    190,
+                    190
+                  ],
+                  "uv_size": [
+                    16,
+                    14
+                  ]
+                },
+                "up": {
+                  "uv": [
+                    208,
+                    190
+                  ],
+                  "uv_size": [
+                    16,
+                    14
+                  ]
+                },
+                "down": {
+                  "uv": [
+                    226,
+                    190
+                  ],
+                  "uv_size": [
+                    16,
+                    14
+                  ]
+                },
+                "east": {
+                  "uv": [
+                    454,
+                    190
+                  ],
+                  "uv_size": [
+                    14,
+                    14
+                  ]
+                },
+                "west": {
+                  "uv": [
+                    470,
+                    190
+                  ],
+                  "uv_size": [
+                    14,
+                    14
+                  ]
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "weak_0_Slug_01_Spine_Base",
+          "parent": "native_Slug_01_Spine_Base",
+          "pivot": [
+            -16.947831511598483,
+            -5.2068901585337795,
+            5.868440586606575
+          ],
+          "cubes": [
+            {
+              "origin": [
+                -36.04908262079459,
+                -2.403125998561614,
+                -8.80084311209964
+              ],
+              "size": [
+                30.1207543813776,
+                9.917786670173445,
+                32.69779718421502
+              ],
+              "uv": {
+                "north": {
+                  "uv": [
+                    172,
+                    190
+                  ],
+                  "uv_size": [
+                    16,
+                    14
+                  ]
+                },
+                "south": {
+                  "uv": [
+                    190,
+                    190
+                  ],
+                  "uv_size": [
+                    16,
+                    14
+                  ]
+                },
+                "up": {
+                  "uv": [
+                    208,
+                    190
+                  ],
+                  "uv_size": [
+                    16,
+                    14
+                  ]
+                },
+                "down": {
+                  "uv": [
+                    226,
+                    190
+                  ],
+                  "uv_size": [
+                    16,
+                    14
+                  ]
+                },
+                "east": {
+                  "uv": [
+                    454,
+                    190
+                  ],
+                  "uv_size": [
+                    14,
+                    14
+                  ]
+                },
+                "west": {
+                  "uv": [
+                    470,
+                    190
+                  ],
+                  "uv_size": [
+                    14,
+                    14
+                  ]
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "weak_1_Slug_02_Spine_1",
+          "parent": "native_Slug_02_Spine_1",
+          "pivot": [
+            18.11080729748934,
+            2.555479949414833,
+            -2.4142180030084996
+          ],
+          "cubes": [
+            {
+              "origin": [
+                6.2365421994403,
+                -1.5581546814952636,
+                -19.91352289803355
+              ],
+              "size": [
+                29.805356500438492,
+                19.565771740524802,
+                32.4276585176944
+              ],
+              "uv": {
+                "north": {
+                  "uv": [
+                    244,
+                    190
+                  ],
+                  "uv_size": [
+                    16,
+                    14
+                  ]
+                },
+                "south": {
+                  "uv": [
+                    262,
+                    190
+                  ],
+                  "uv_size": [
+                    16,
+                    14
+                  ]
+                },
+                "up": {
+                  "uv": [
+                    280,
+                    190
+                  ],
+                  "uv_size": [
+                    16,
+                    14
+                  ]
+                },
+                "down": {
+                  "uv": [
+                    298,
+                    190
+                  ],
+                  "uv_size": [
+                    16,
+                    14
+                  ]
+                },
+                "east": {
+                  "uv": [
+                    486,
+                    190
+                  ],
+                  "uv_size": [
+                    14,
+                    14
+                  ]
+                },
+                "west": {
+                  "uv": [
+                    1,
+                    207
+                  ],
+                  "uv_size": [
+                    14,
+                    14
+                  ]
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "weak_1_Slug_02_Spine_2",
+          "parent": "native_Slug_02_Spine_2",
+          "pivot": [
+            17.972460105621433,
+            15.886094932184605,
+            -2.021610830914059
+          ],
+          "cubes": [
+            {
+              "origin": [
+                6.160596672023383,
+                6.742381910636675,
+                -19.628486652411144
+              ],
+              "size": [
+                29.818557211445757,
+                30.15206569891337,
+                31.831848484852713
+              ],
+              "uv": {
+                "north": {
+                  "uv": [
+                    244,
+                    190
+                  ],
+                  "uv_size": [
+                    16,
+                    14
+                  ]
+                },
+                "south": {
+                  "uv": [
+                    262,
+                    190
+                  ],
+                  "uv_size": [
+                    16,
+                    14
+                  ]
+                },
+                "up": {
+                  "uv": [
+                    280,
+                    190
+                  ],
+                  "uv_size": [
+                    16,
+                    14
+                  ]
+                },
+                "down": {
+                  "uv": [
+                    298,
+                    190
+                  ],
+                  "uv_size": [
+                    16,
+                    14
+                  ]
+                },
+                "east": {
+                  "uv": [
+                    486,
+                    190
+                  ],
+                  "uv_size": [
+                    14,
+                    14
+                  ]
+                },
+                "west": {
+                  "uv": [
+                    1,
+                    207
+                  ],
+                  "uv_size": [
+                    14,
+                    14
+                  ]
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "weak_1_Slug_02_Spine_Base",
+          "parent": "native_Slug_02_Spine_Base",
+          "pivot": [
+            18.088246489212917,
+            -5.2068901585337795,
+            -2.494250207599501
+          ],
+          "cubes": [
+            {
+              "origin": [
+                6.258592940519613,
+                -1.5581546814952636,
+                -19.91352289803355
+              ],
+              "size": [
+                29.78330575935918,
+                10.229478739862307,
+                32.4276585176944
+              ],
+              "uv": {
+                "north": {
+                  "uv": [
+                    244,
+                    190
+                  ],
+                  "uv_size": [
+                    16,
+                    14
+                  ]
+                },
+                "south": {
+                  "uv": [
+                    262,
+                    190
+                  ],
+                  "uv_size": [
+                    16,
+                    14
+                  ]
+                },
+                "up": {
+                  "uv": [
+                    280,
+                    190
+                  ],
+                  "uv_size": [
+                    16,
+                    14
+                  ]
+                },
+                "down": {
+                  "uv": [
+                    298,
+                    190
+                  ],
+                  "uv_size": [
+                    16,
+                    14
+                  ]
+                },
+                "east": {
+                  "uv": [
+                    486,
+                    190
+                  ],
+                  "uv_size": [
+                    14,
+                    14
+                  ]
+                },
+                "west": {
+                  "uv": [
+                    1,
+                    207
+                  ],
+                  "uv_size": [
+                    14,
+                    14
+                  ]
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "weak_1_Slug_02_Spine_3",
+          "parent": "native_Slug_02_Spine_3",
+          "pivot": [
+            17.586959323587475,
+            31.753363123188425,
+            -1.2361252241764518
+          ],
+          "cubes": [
+            {
+              "origin": [
+                6.160596672023383,
+                25.245601935323563,
+                -18.222345207087837
+              ],
+              "size": [
+                27.833074581479146,
+                26.60847922514113,
+                30.425707039529406
+              ],
+              "uv": {
+                "north": {
+                  "uv": [
+                    244,
+                    190
+                  ],
+                  "uv_size": [
+                    16,
+                    14
+                  ]
+                },
+                "south": {
+                  "uv": [
+                    262,
+                    190
+                  ],
+                  "uv_size": [
+                    16,
+                    14
+                  ]
+                },
+                "up": {
+                  "uv": [
+                    280,
+                    190
+                  ],
+                  "uv_size": [
+                    16,
+                    14
+                  ]
+                },
+                "down": {
+                  "uv": [
+                    298,
+                    190
+                  ],
+                  "uv_size": [
+                    16,
+                    14
+                  ]
+                },
+                "east": {
+                  "uv": [
+                    486,
+                    190
+                  ],
+                  "uv_size": [
+                    14,
+                    14
+                  ]
+                },
+                "west": {
+                  "uv": [
+                    1,
+                    207
+                  ],
+                  "uv_size": [
+                    14,
+                    14
+                  ]
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "weak_1_Slug_02_Spine_4",
+          "parent": "native_Slug_02_Spine_4",
+          "pivot": [
+            17.06233777940424,
+            47.60545735478389,
+            -0.2504032518532499
+          ],
+          "cubes": [
+            {
+              "origin": [
+                5.656540552039154,
+                45.31467278418519,
+                -16.07777563956227
+              ],
+              "size": [
+                25.384344398462204,
+                18.958698809786824,
+                26.983617799518917
+              ],
+              "uv": {
+                "north": {
+                  "uv": [
+                    244,
+                    190
+                  ],
+                  "uv_size": [
+                    16,
+                    14
+                  ]
+                },
+                "south": {
+                  "uv": [
+                    262,
+                    190
+                  ],
+                  "uv_size": [
+                    16,
+                    14
+                  ]
+                },
+                "up": {
+                  "uv": [
+                    280,
+                    190
+                  ],
+                  "uv_size": [
+                    16,
+                    14
+                  ]
+                },
+                "down": {
+                  "uv": [
+                    298,
+                    190
+                  ],
+                  "uv_size": [
+                    16,
+                    14
+                  ]
+                },
+                "east": {
+                  "uv": [
+                    486,
+                    190
+                  ],
+                  "uv_size": [
+                    14,
+                    14
+                  ]
+                },
+                "west": {
+                  "uv": [
+                    1,
+                    207
+                  ],
+                  "uv_size": [
+                    14,
+                    14
+                  ]
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "weak_1_Slug_02_Spine_5",
+          "parent": "native_Slug_02_Spine_5",
+          "pivot": [
+            16.503480275700916,
+            63.45324112412886,
+            0.7846123625846665
+          ],
+          "cubes": [
+            {
+              "origin": [
+                1.9603079342193188,
+                58.61451301416829,
+                -14.400635986276708
+              ],
+              "size": [
+                27.044530109460432,
+                20.818770413109696,
+                25.04480416864147
+              ],
+              "uv": {
+                "north": {
+                  "uv": [
+                    244,
+                    190
+                  ],
+                  "uv_size": [
+                    16,
+                    14
+                  ]
+                },
+                "south": {
+                  "uv": [
+                    262,
+                    190
+                  ],
+                  "uv_size": [
+                    16,
+                    14
+                  ]
+                },
+                "up": {
+                  "uv": [
+                    280,
+                    190
+                  ],
+                  "uv_size": [
+                    16,
+                    14
+                  ]
+                },
+                "down": {
+                  "uv": [
+                    298,
+                    190
+                  ],
+                  "uv_size": [
+                    16,
+                    14
+                  ]
+                },
+                "east": {
+                  "uv": [
+                    486,
+                    190
+                  ],
+                  "uv_size": [
+                    14,
+                    14
+                  ]
+                },
+                "west": {
+                  "uv": [
+                    1,
+                    207
+                  ],
+                  "uv_size": [
+                    14,
+                    14
+                  ]
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "weak_1_Slug_02_Head",
+          "parent": "native_Slug_02_Head",
+          "pivot": [
+            16.057262576235264,
+            77.75573809610293,
+            1.634966990184544
+          ],
+          "cubes": [
+            {
+              "origin": [
+                1.865393326850949,
+                71.88704955994763,
+                -12.4191468917954
+              ],
+              "size": [
+                24.549730085839364,
+                15.172748563543706,
+                23.063315074160162
+              ],
+              "uv": {
+                "north": {
+                  "uv": [
+                    335,
+                    238
+                  ],
+                  "uv_size": [
+                    11,
+                    10
+                  ]
+                },
+                "south": {
+                  "uv": [
+                    348,
+                    238
+                  ],
+                  "uv_size": [
+                    11,
+                    10
+                  ]
+                },
+                "up": {
+                  "uv": [
+                    361,
+                    238
+                  ],
+                  "uv_size": [
+                    11,
+                    10
+                  ]
+                },
+                "down": {
+                  "uv": [
+                    374,
+                    238
+                  ],
+                  "uv_size": [
+                    11,
+                    10
+                  ]
+                },
+                "east": {
+                  "uv": [
+                    463,
+                    238
+                  ],
+                  "uv_size": [
+                    10,
+                    10
+                  ]
+                },
+                "west": {
+                  "uv": [
+                    475,
+                    238
+                  ],
+                  "uv_size": [
+                    10,
+                    10
+                  ]
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "weak_1_Slug_02_Jaw_1",
+          "parent": "native_Slug_02_Jaw_1",
+          "pivot": [
+            16.057262576235264,
+            77.75573809610293,
+            1.634966990184544
+          ],
+          "cubes": [
+            {
+              "origin": [
+                11.507410095159365,
+                74.97579378775912,
+                -2.9595703577194636
+              ],
+              "size": [
+                14.907713317530948,
+                22.615037725482523,
+                13.223834893519545
+              ],
+              "uv": {
+                "east": {
+                  "uv": [
+                    289,
+                    173
+                  ],
+                  "uv_size": [
+                    14,
+                    15
+                  ]
+                },
+                "west": {
+                  "uv": [
+                    305,
+                    173
+                  ],
+                  "uv_size": [
+                    14,
+                    15
+                  ]
+                },
+                "north": {
+                  "uv": [
+                    475,
+                    173
+                  ],
+                  "uv_size": [
+                    5,
+                    15
+                  ]
+                },
+                "south": {
+                  "uv": [
+                    482,
+                    173
+                  ],
+                  "uv_size": [
+                    5,
+                    15
+                  ]
+                },
+                "up": {
+                  "uv": [
+                    173,
+                    207
+                  ],
+                  "uv_size": [
+                    5,
+                    14
+                  ]
+                },
+                "down": {
+                  "uv": [
+                    180,
+                    207
+                  ],
+                  "uv_size": [
+                    5,
+                    14
+                  ]
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "weak_1_Slug_02_Jaw_2",
+          "parent": "native_Slug_02_Jaw_2",
+          "pivot": [
+            16.057262576235264,
+            77.75573809610293,
+            1.634966990184544
+          ],
+          "cubes": [
+            {
+              "origin": [
+                5.550426059877196,
+                75.21607577819962,
+                -12.4191468917954
+              ],
+              "size": [
+                13.627385755501212,
+                19.836719538004886,
+                10.693940523361192
+              ],
+              "uv": {
+                "east": {
+                  "uv": [
+                    289,
+                    173
+                  ],
+                  "uv_size": [
+                    14,
+                    15
+                  ]
+                },
+                "west": {
+                  "uv": [
+                    305,
+                    173
+                  ],
+                  "uv_size": [
+                    14,
+                    15
+                  ]
+                },
+                "north": {
+                  "uv": [
+                    475,
+                    173
+                  ],
+                  "uv_size": [
+                    5,
+                    15
+                  ]
+                },
+                "south": {
+                  "uv": [
+                    482,
+                    173
+                  ],
+                  "uv_size": [
+                    5,
+                    15
+                  ]
+                },
+                "up": {
+                  "uv": [
+                    173,
+                    207
+                  ],
+                  "uv_size": [
+                    5,
+                    14
+                  ]
+                },
+                "down": {
+                  "uv": [
+                    180,
+                    207
+                  ],
+                  "uv_size": [
+                    5,
+                    14
+                  ]
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "weak_1_Slug_02_Jaw_3",
+          "parent": "native_Slug_02_Jaw_3",
+          "pivot": [
+            16.057262576235264,
+            77.75573809610293,
+            1.634966990184544
+          ],
+          "cubes": [
+            {
+              "origin": [
+                -0.4610730135967411,
+                69.13519089470124,
+                -4.861173790233048
+              ],
+              "size": [
+                14.333530182551485,
+                24.504983093184563,
+                13.320256048051899
+              ],
+              "uv": {
+                "east": {
+                  "uv": [
+                    289,
+                    173
+                  ],
+                  "uv_size": [
+                    14,
+                    15
+                  ]
+                },
+                "west": {
+                  "uv": [
+                    305,
+                    173
+                  ],
+                  "uv_size": [
+                    14,
+                    15
+                  ]
+                },
+                "north": {
+                  "uv": [
+                    475,
+                    173
+                  ],
+                  "uv_size": [
+                    5,
+                    15
+                  ]
+                },
+                "south": {
+                  "uv": [
+                    482,
+                    173
+                  ],
+                  "uv_size": [
+                    5,
+                    15
+                  ]
+                },
+                "up": {
+                  "uv": [
+                    173,
+                    207
+                  ],
+                  "uv_size": [
+                    5,
+                    14
+                  ]
+                },
+                "down": {
+                  "uv": [
+                    180,
+                    207
+                  ],
+                  "uv_size": [
+                    5,
+                    14
+                  ]
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "weak_2_Slug_03_Spine_Base",
+          "parent": "native_Slug_03_Spine_Base",
+          "pivot": [
+            1.117149472077218,
+            -5.2068901585337795,
+            15.609390489406008
+          ],
+          "cubes": [
+            {
+              "origin": [
+                -11.232798566365412,
+                -2.652405832860858,
+                2.2218595168693414
+              ],
+              "size": [
+                32.98820086456542,
+                10.423438837287872,
+                29.53766017905796
+              ],
+              "uv": {
+                "north": {
+                  "uv": [
+                    316,
+                    190
+                  ],
+                  "uv_size": [
+                    16,
+                    14
+                  ]
+                },
+                "south": {
+                  "uv": [
+                    334,
+                    190
+                  ],
+                  "uv_size": [
+                    16,
+                    14
+                  ]
+                },
+                "up": {
+                  "uv": [
+                    352,
+                    190
+                  ],
+                  "uv_size": [
+                    16,
+                    14
+                  ]
+                },
+                "down": {
+                  "uv": [
+                    370,
+                    190
+                  ],
+                  "uv_size": [
+                    16,
+                    14
+                  ]
+                },
+                "east": {
+                  "uv": [
+                    17,
+                    207
+                  ],
+                  "uv_size": [
+                    14,
+                    14
+                  ]
+                },
+                "west": {
+                  "uv": [
+                    33,
+                    207
+                  ],
+                  "uv_size": [
+                    14,
+                    14
+                  ]
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "weak_2_Slug_03_Spine_1",
+          "parent": "native_Slug_03_Spine_1",
+          "pivot": [
+            1.0364527573098405,
+            2.5554791014730145,
+            15.629442488771396
+          ],
+          "cubes": [
+            {
+              "origin": [
+                -11.232798566365412,
+                -2.652405832860858,
+                2.2218595168693414
+              ],
+              "size": [
+                32.98820086456542,
+                19.631659308731383,
+                29.53766017905796
+              ],
+              "uv": {
+                "north": {
+                  "uv": [
+                    316,
+                    190
+                  ],
+                  "uv_size": [
+                    16,
+                    14
+                  ]
+                },
+                "south": {
+                  "uv": [
+                    334,
+                    190
+                  ],
+                  "uv_size": [
+                    16,
+                    14
+                  ]
+                },
+                "up": {
+                  "uv": [
+                    352,
+                    190
+                  ],
+                  "uv_size": [
+                    16,
+                    14
+                  ]
+                },
+                "down": {
+                  "uv": [
+                    370,
+                    190
+                  ],
+                  "uv_size": [
+                    16,
+                    14
+                  ]
+                },
+                "east": {
+                  "uv": [
+                    17,
+                    207
+                  ],
+                  "uv_size": [
+                    14,
+                    14
+                  ]
+                },
+                "west": {
+                  "uv": [
+                    33,
+                    207
+                  ],
+                  "uv_size": [
+                    14,
+                    14
+                  ]
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "weak_2_Slug_03_Spine_2",
+          "parent": "native_Slug_03_Spine_2",
+          "pivot": [
+            0.6483566104736797,
+            15.886093269512026,
+            15.478907905692799
+          ],
+          "cubes": [
+            {
+              "origin": [
+                -11.489933891732667,
+                6.526352061399118,
+                2.3152321188532223
+              ],
+              "size": [
+                33.09781973965271,
+                29.219495275297042,
+                29.44428757707408
+              ],
+              "uv": {
+                "north": {
+                  "uv": [
+                    316,
+                    190
+                  ],
+                  "uv_size": [
+                    16,
+                    14
+                  ]
+                },
+                "south": {
+                  "uv": [
+                    334,
+                    190
+                  ],
+                  "uv_size": [
+                    16,
+                    14
+                  ]
+                },
+                "up": {
+                  "uv": [
+                    352,
+                    190
+                  ],
+                  "uv_size": [
+                    16,
+                    14
+                  ]
+                },
+                "down": {
+                  "uv": [
+                    370,
+                    190
+                  ],
+                  "uv_size": [
+                    16,
+                    14
+                  ]
+                },
+                "east": {
+                  "uv": [
+                    17,
+                    207
+                  ],
+                  "uv_size": [
+                    14,
+                    14
+                  ]
+                },
+                "west": {
+                  "uv": [
+                    33,
+                    207
+                  ],
+                  "uv_size": [
+                    14,
+                    14
+                  ]
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "weak_2_Slug_03_Spine_3",
+          "parent": "native_Slug_03_Spine_3",
+          "pivot": [
+            -0.12471188521629771,
+            31.753359656495178,
+            15.069070688484837
+          ],
+          "cubes": [
+            {
+              "origin": [
+                -11.489933891732667,
+                24.91952813956014,
+                2.5019783908396738
+              ],
+              "size": [
+                30.660736086845475,
+                26.19578825921123,
+                27.82905861760135
+              ],
+              "uv": {
+                "north": {
+                  "uv": [
+                    316,
+                    190
+                  ],
+                  "uv_size": [
+                    16,
+                    14
+                  ]
+                },
+                "south": {
+                  "uv": [
+                    334,
+                    190
+                  ],
+                  "uv_size": [
+                    16,
+                    14
+                  ]
+                },
+                "up": {
+                  "uv": [
+                    352,
+                    190
+                  ],
+                  "uv_size": [
+                    16,
+                    14
+                  ]
+                },
+                "down": {
+                  "uv": [
+                    370,
+                    190
+                  ],
+                  "uv_size": [
+                    16,
+                    14
+                  ]
+                },
+                "east": {
+                  "uv": [
+                    17,
+                    207
+                  ],
+                  "uv_size": [
+                    14,
+                    14
+                  ]
+                },
+                "west": {
+                  "uv": [
+                    33,
+                    207
+                  ],
+                  "uv_size": [
+                    14,
+                    14
+                  ]
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "weak_2_Slug_03_Spine_4",
+          "parent": "native_Slug_03_Spine_4",
+          "pivot": [
+            -1.093574618609437,
+            47.60545561950333,
+            14.513931064440337
+          ],
+          "cubes": [
+            {
+              "origin": [
+                -12.113939617987919,
+                44.96012475573387,
+                2.544229423816165
+              ],
+              "size": [
+                28.42353853996663,
+                18.83851338498907,
+                24.99761953012882
+              ],
+              "uv": {
+                "north": {
+                  "uv": [
+                    316,
+                    190
+                  ],
+                  "uv_size": [
+                    16,
+                    14
+                  ]
+                },
+                "south": {
+                  "uv": [
+                    334,
+                    190
+                  ],
+                  "uv_size": [
+                    16,
+                    14
+                  ]
+                },
+                "up": {
+                  "uv": [
+                    352,
+                    190
+                  ],
+                  "uv_size": [
+                    16,
+                    14
+                  ]
+                },
+                "down": {
+                  "uv": [
+                    370,
+                    190
+                  ],
+                  "uv_size": [
+                    16,
+                    14
+                  ]
+                },
+                "east": {
+                  "uv": [
+                    17,
+                    207
+                  ],
+                  "uv_size": [
+                    14,
+                    14
+                  ]
+                },
+                "west": {
+                  "uv": [
+                    33,
+                    207
+                  ],
+                  "uv_size": [
+                    14,
+                    14
+                  ]
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "weak_2_Slug_03_Spine_5",
+          "parent": "native_Slug_03_Spine_5",
+          "pivot": [
+            -2.110638284983686,
+            63.453230852746955,
+            13.923033833858922
+          ],
+          "cubes": [
+            {
+              "origin": [
+                -12.113939617987919,
+                58.113244850172194,
+                1.4043223958906532
+              ],
+              "size": [
+                25.80046242276428,
+                21.18575872326106,
+                25.3203794775012
+              ],
+              "uv": {
+                "north": {
+                  "uv": [
+                    316,
+                    190
+                  ],
+                  "uv_size": [
+                    16,
+                    14
+                  ]
+                },
+                "south": {
+                  "uv": [
+                    334,
+                    190
+                  ],
+                  "uv_size": [
+                    16,
+                    14
+                  ]
+                },
+                "up": {
+                  "uv": [
+                    352,
+                    190
+                  ],
+                  "uv_size": [
+                    16,
+                    14
+                  ]
+                },
+                "down": {
+                  "uv": [
+                    370,
+                    190
+                  ],
+                  "uv_size": [
+                    16,
+                    14
+                  ]
+                },
+                "east": {
+                  "uv": [
+                    17,
+                    207
+                  ],
+                  "uv_size": [
+                    14,
+                    14
+                  ]
+                },
+                "west": {
+                  "uv": [
+                    33,
+                    207
+                  ],
+                  "uv_size": [
+                    14,
+                    14
+                  ]
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "weak_2_Slug_03_Head",
+          "parent": "native_Slug_03_Head",
+          "pivot": [
+            -2.9466484445582863,
+            77.75573206659786,
+            13.450486071415181
+          ],
+          "cubes": [
+            {
+              "origin": [
+                -12.084682741204059,
+                71.9395994971509,
+                1.186848264978733
+              ],
+              "size": [
+                22.985261705056843,
+                14.263821937684568,
+                23.85814216612226
+              ],
+              "uv": {
+                "north": {
+                  "uv": [
+                    387,
+                    238
+                  ],
+                  "uv_size": [
+                    11,
+                    10
+                  ]
+                },
+                "south": {
+                  "uv": [
+                    400,
+                    238
+                  ],
+                  "uv_size": [
+                    11,
+                    10
+                  ]
+                },
+                "up": {
+                  "uv": [
+                    413,
+                    238
+                  ],
+                  "uv_size": [
+                    11,
+                    10
+                  ]
+                },
+                "down": {
+                  "uv": [
+                    426,
+                    238
+                  ],
+                  "uv_size": [
+                    11,
+                    10
+                  ]
+                },
+                "east": {
+                  "uv": [
+                    487,
+                    238
+                  ],
+                  "uv_size": [
+                    10,
+                    10
+                  ]
+                },
+                "west": {
+                  "uv": [
+                    499,
+                    238
+                  ],
+                  "uv_size": [
+                    10,
+                    10
+                  ]
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "weak_2_Slug_03_Jaw_2",
+          "parent": "native_Slug_03_Jaw_2",
+          "pivot": [
+            -2.9466484445582863,
+            77.75573206659786,
+            13.450486071415181
+          ],
+          "cubes": [
+            {
+              "origin": [
+                -1.8199608798009606,
+                75.26511919644018,
+                3.5156366382610864
+              ],
+              "size": [
+                12.157108719830255,
+                19.622562139134487,
+                12.612588786552621
+              ],
+              "uv": {
+                "east": {
+                  "uv": [
+                    353,
+                    173
+                  ],
+                  "uv_size": [
+                    14,
+                    15
+                  ]
+                },
+                "west": {
+                  "uv": [
+                    369,
+                    173
+                  ],
+                  "uv_size": [
+                    14,
+                    15
+                  ]
+                },
+                "north": {
+                  "uv": [
+                    503,
+                    173
+                  ],
+                  "uv_size": [
+                    5,
+                    15
+                  ]
+                },
+                "south": {
+                  "uv": [
+                    1,
+                    190
+                  ],
+                  "uv_size": [
+                    5,
+                    15
+                  ]
+                },
+                "up": {
+                  "uv": [
+                    201,
+                    207
+                  ],
+                  "uv_size": [
+                    5,
+                    14
+                  ]
+                },
+                "down": {
+                  "uv": [
+                    208,
+                    207
+                  ],
+                  "uv_size": [
+                    5,
+                    14
+                  ]
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "weak_2_Slug_03_Jaw_3",
+          "parent": "native_Slug_03_Jaw_3",
+          "pivot": [
+            -2.9466484445582863,
+            77.75573206659786,
+            13.450486071415181
+          ],
+          "cubes": [
+            {
+              "origin": [
+                -11.751260122439119,
+                69.03391196395971,
+                0.38668495113484946
+              ],
+              "size": [
+                12.069727489093019,
+                24.44713578327935,
+                12.788532022790188
+              ],
+              "uv": {
+                "east": {
+                  "uv": [
+                    353,
+                    173
+                  ],
+                  "uv_size": [
+                    14,
+                    15
+                  ]
+                },
+                "west": {
+                  "uv": [
+                    369,
+                    173
+                  ],
+                  "uv_size": [
+                    14,
+                    15
+                  ]
+                },
+                "north": {
+                  "uv": [
+                    503,
+                    173
+                  ],
+                  "uv_size": [
+                    5,
+                    15
+                  ]
+                },
+                "south": {
+                  "uv": [
+                    1,
+                    190
+                  ],
+                  "uv_size": [
+                    5,
+                    15
+                  ]
+                },
+                "up": {
+                  "uv": [
+                    201,
+                    207
+                  ],
+                  "uv_size": [
+                    5,
+                    14
+                  ]
+                },
+                "down": {
+                  "uv": [
+                    208,
+                    207
+                  ],
+                  "uv_size": [
+                    5,
+                    14
+                  ]
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "weak_2_Slug_03_Jaw_1",
+          "parent": "native_Slug_03_Jaw_1",
+          "pivot": [
+            -2.9466484445582863,
+            77.75573206659786,
+            13.450486071415181
+          ],
+          "cubes": [
+            {
+              "origin": [
+                -11.471252108808798,
+                73.93601863850216,
+                13.230621511482695
+              ],
+              "size": [
+                14.942166105241208,
+                22.768333438497336,
+                12.377486473154427
+              ],
+              "uv": {
+                "east": {
+                  "uv": [
+                    353,
+                    173
+                  ],
+                  "uv_size": [
+                    14,
+                    15
+                  ]
+                },
+                "west": {
+                  "uv": [
+                    369,
+                    173
+                  ],
+                  "uv_size": [
+                    14,
+                    15
+                  ]
+                },
+                "north": {
+                  "uv": [
+                    503,
+                    173
+                  ],
+                  "uv_size": [
+                    5,
+                    15
+                  ]
+                },
+                "south": {
+                  "uv": [
+                    1,
+                    190
+                  ],
+                  "uv_size": [
+                    5,
+                    15
+                  ]
+                },
+                "up": {
+                  "uv": [
+                    201,
+                    207
+                  ],
+                  "uv_size": [
+                    5,
+                    14
+                  ]
+                },
+                "down": {
+                  "uv": [
+                    208,
+                    207
+                  ],
+                  "uv_size": [
+                    5,
+                    14
+                  ]
+                }
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

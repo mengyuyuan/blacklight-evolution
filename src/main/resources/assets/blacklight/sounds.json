@@ -1284,5 +1284,49 @@
         "pitch": 1
       }
     ]
+  },
+  "greene.projectile_biomass_loop": {
+    "subtitle": "subtitle.blacklight.greene.projectile_biomass_loop",
+    "sounds": [
+      {
+        "name": "blacklight:greene/projectile_biomass_loop",
+        "volume": 1,
+        "pitch": 1,
+        "preload": true
+      }
+    ]
+  },
+  "greene.projectile_fire_loop": {
+    "subtitle": "subtitle.blacklight.greene.projectile_fire_loop",
+    "sounds": [
+      {
+        "name": "blacklight:greene/projectile_fire_loop",
+        "volume": 1,
+        "pitch": 1,
+        "preload": true
+      }
+    ]
+  },
+  "hydra.death_roar": {
+    "subtitle": "subtitle.blacklight.hydra.death_roar",
+    "sounds": [
+      "blacklight:hydra/death_roar_1",
+      "blacklight:hydra/death_roar_2",
+      "blacklight:hydra/death_roar_3"
+    ]
+  },
+  "hydra.death_whoosh": {
+    "subtitle": "subtitle.blacklight.hydra.death_whoosh",
+    "sounds": [
+      "blacklight:infection/swing_1",
+      "blacklight:infection/swing_2",
+      "blacklight:infection/swing_3"
+    ]
+  },
+  "hydra.death_debris": {
+    "subtitle": "subtitle.blacklight.hydra.death_debris",
+    "sounds": [
+      "blacklight:hydra/death_debris_loop"
+    ]
   }
 }
