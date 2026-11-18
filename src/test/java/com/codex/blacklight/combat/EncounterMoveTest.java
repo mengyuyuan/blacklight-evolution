@@ -21,7 +21,10 @@ class EncounterMoveTest {
         assertEquals(-1.4267103,right.x,.002);assertEquals(.3602344,right.y,.002);assertEquals(-8.870415,right.z,.002);
         var regions=GoliathContact.regions(pose,net.minecraft.world.phys.Vec3.ZERO,0,0);
         assertEquals("weak_0",regions.get(0).bone());assertEquals("weak_1",regions.get(1).bone());
-        assertEquals(96,regions.stream().mapToInt(r->r.boxes().size()).sum(),"the authored middle torso cube is split between two source spine joints");
+        assertEquals(99,regions.stream().mapToInt(r->r.boxes().size()).sum(),"all authored Goliath skin cubes receive contact");
+        var torso=regions.stream().filter(r->r.bone().startsWith("torso")).collect(
+                java.util.stream.Collectors.toMap(r->r.bone(),r->r.boxes().size()));
+        assertEquals(java.util.Map.of("torso",11,"torso_middle",5,"torso_waist",3,"torso_lower",1),torso);
         assertTrue(regions.stream().anyMatch(r->r.bone().equals("left_hand")&&!r.boxes().isEmpty()));
         var broken=GoliathContact.regions(pose,net.minecraft.world.phys.Vec3.ZERO,0,1);
         assertTrue(broken.get(0).boxes().isEmpty());assertFalse(broken.get(1).boxes().isEmpty());

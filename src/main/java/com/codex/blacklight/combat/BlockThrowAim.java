@@ -1,7 +1,6 @@
 package com.codex.blacklight.combat;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.phys.*;
 /** Server chooses exposed, reachable targets. Aim assist changes launch velocity only, never homes in flight. */
 public final class BlockThrowAim {
@@ -12,12 +11,13 @@ public final class BlockThrowAim {
   if(direction.lengthSqr()<.5)direction=p.getLookAngle();
   if(assist){
    var locked=CombatTargeting.lockedEntity(p);
-   if(locked instanceof com.codex.blacklight.entity.BlackwatchHelicopter craft&&ExplicitTarget.selectable(p,craft)){
-    var point=com.codex.blacklight.military.aircraft.HelicopterSkinContact.visiblePoint(p,craft,96);
-    if(point!=null){
-     var shot=BlockThrowBallistics.solve(origin,point,craft.getDeltaMovement(),speed);
-     if(shot!=null&&clear(p,origin,shot))return new Result(shot.velocity(),craft.getId());
+   if(ExplicitTarget.mechanical(locked)){
+    if(ExplicitTarget.visibleWithinRange(p,locked,96)){
+     var shot=BlockThrowBallistics.solve(origin,ExplicitTarget.point(p,locked),locked.getDeltaMovement(),speed);
+     if(shot!=null&&clear(p,origin,shot))return new Result(shot.velocity(),locked.getId());
     }
+    // A blocked or unreachable locked hull must not redirect the throw into a nearby mob.
+    return unassisted(origin,aim,direction,speed);
    }
    var result=locked instanceof LivingEntity living?target(p,origin,living,speed):null;
    if(result!=null)return result;
@@ -27,6 +27,9 @@ public final class BlockThrowAim {
    candidates.sort(java.util.Comparator.comparingDouble((LivingEntity e)->-view.dot(CombatTargeting.lockPoint(p,e).subtract(p.getEyePosition()).normalize())*8+Math.sqrt(CombatTargeting.distanceSquared(p.getEyePosition(),e))/96.0).thenComparingInt(LivingEntity::getId));
    for(int i=0;i<Math.min(8,candidates.size());i++){result=target(p,origin,candidates.get(i),speed);if(result!=null)return result;}
   }
+  return unassisted(origin,aim,direction,speed);
+ }
+ private static Result unassisted(Vec3 origin,Vec3 aim,Vec3 direction,double speed){
   var shot=BlockThrowBallistics.solve(origin,aim,Vec3.ZERO,speed);
   return new Result(shot==null?direction.scale(speed):shot.velocity(),-1);
  }

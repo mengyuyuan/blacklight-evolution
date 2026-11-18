@@ -15,9 +15,13 @@ public final class PassiveEvents {
     @SubscribeEvent public static void server(ServerTickEvent.Post e) { PassiveSystem.finishDeaths(); }
     @SubscribeEvent(priority=EventPriority.LOWEST) public static void death(LivingDeathEvent e) { if (!e.isCanceled()) PassiveSystem.queueDeath(e.getEntity(), e.getSource()); }
     @SubscribeEvent public static void clone(PlayerEvent.Clone e) {
-        // Copy on death as well as the End return. Never clone from client packets.
-        var saved = e.getOriginal().getPersistentData().getCompound(Player.PERSISTED_NBT_TAG).copy();
-        e.getEntity().getPersistentData().put(Player.PERSISTED_NBT_TAG, saved);
+        var original = e.getOriginal().getPersistentData().getCompound(Player.PERSISTED_NBT_TAG);
+        if (original.get(PassiveData.KEY) instanceof net.minecraft.nbt.CompoundTag passives) {
+            var destination = e.getEntity().getPersistentData();
+            var persisted = destination.getCompound(Player.PERSISTED_NBT_TAG);
+            persisted.put(PassiveData.KEY, passives.copy());
+            destination.put(Player.PERSISTED_NBT_TAG, persisted);
+        }
         if (e.getEntity() instanceof ServerPlayer p) HealthGrowth.apply(p, PassiveData.read(p).bonusHealth);
     }
     @SubscribeEvent public static void login(PlayerEvent.PlayerLoggedInEvent e) { if (e.getEntity() instanceof ServerPlayer p) PassiveSystem.sync(p, true); }

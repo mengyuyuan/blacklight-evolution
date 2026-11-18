@@ -4,7 +4,6 @@ import com.codex.blacklight.entity.*;
 import com.codex.blacklight.military.vehicle.VehicleHullAttackGoal;
 import com.codex.blacklight.registry.ModEntities;
 import net.minecraft.gametest.framework.*;
-import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.level.GameType;
@@ -13,15 +12,9 @@ import net.neoforged.neoforge.gametest.*;
 /** Natural old windups must release a living passenger when its real mechanical goal takes over. */
 @GameTestHolder("blacklight") @PrefixGameTestTemplate(false)
 public final class VehicleHullBoardingGameTest {
-    @SuppressWarnings("unchecked") private static int mutantPending(BlacklightMutant actor){
-        try{
-            var field=BlacklightMutant.class.getDeclaredField("ATTACK");field.setAccessible(true);
-            return actor.getEntityData().get((EntityDataAccessor<Integer>)field.get(null));
-        }catch(ReflectiveOperationException failure){throw new GameTestAssertException("cannot observe the actual existing mutant windup: "+failure);}
-    }
     private static boolean pending(Mob actor){
         if(actor instanceof BlacklightHunter hunter)return hunter.committedAttack();
-        if(actor instanceof BlacklightMutant mutant)return mutantPending(mutant)>0;
+        if(actor instanceof BlacklightMutant mutant)return mutant.committedAttack();
         return actor instanceof BlacklightInfectedHost host&&host.tissueStrikeElapsed(0)>=0;
     }
     private static String diagnostic(Mob actor,LivingEntity target,MilitaryVehicle vehicle){

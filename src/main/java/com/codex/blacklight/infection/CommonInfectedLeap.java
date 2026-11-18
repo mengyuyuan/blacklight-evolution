@@ -186,7 +186,9 @@ public final class CommonInfectedLeap {
     /** Match the renderer's shortest body-yaw interpolation while the flight turns. */
     public static boolean touches(Vec3 before,Vec3 now,float previousYaw,float yaw,float leapAge,float punchAge,AABB target){
         if(!damageWindow(punchAge))return false;
-        var box=target.inflate(.25);Vec3 previous=null;
+        // The first active frame can coincide with ground contact. Allow one additional
+        // model pixel around the wrist for a grazing blow on a narrow standing target.
+        var box=target.inflate(5.0/16.0);Vec3 previous=null;
         for(int i=0;i<=8;i++){
             float fraction=i/8F,age=punchAge-1+fraction;if(age<PUNCH_BEGIN)continue;
             var point=wrist(before.lerp(now,fraction),net.minecraft.util.Mth.rotLerp(fraction,previousYaw,yaw),leapAge-1+fraction,age);

@@ -17,23 +17,23 @@ import net.neoforged.neoforge.gametest.*;
 @GameTestHolder("blacklight") @PrefixGameTestTemplate(false)
 public final class HelicopterLongRangeGameTest {
     @GameTest(template="helicopter_arena",batch="airLongCannon",timeoutTicks=460)
-    public static void playerCannonHitsGroundEnemyAt130Blocks(GameTestHelper h){run(h,false,340000);}
+    public static void playerCannonHitsGroundEnemyAt160Blocks(GameTestHelper h){run(h,false,340000);}
     @GameTest(template="helicopter_arena",batch="airLongMissile",timeoutTicks=460)
-    public static void playerHellfireLaunchesAndDamagesGroundEnemyAt130Blocks(GameTestHelper h){run(h,true,341024);}
+    public static void playerHellfireLaunchesAndDamagesGroundEnemyAt160Blocks(GameTestHelper h){run(h,true,341024);}
     private static void run(GameTestHelper h,boolean missile,int x){
         var f=new HelicopterPilotGameTest.Fixture(h,x);var level=f.level;
         // Loaded, empty flight corridor; use only this disposable fixture's remote chunks.
-        for(int cx=(x-16)>>4;cx<=(x+16)>>4;cx++)for(int cz=-1;cz<=10;cz++){
+        for(int cx=(x-16)>>4;cx<=(x+16)>>4;cx++)for(int cz=-1;cz<=11;cz++){
             long key=ChunkPos.asLong(cx,cz);f.forced.putIfAbsent(key,level.getForcedChunks().contains(key));level.setChunkForced(cx,cz,true);
         }
-        for(int dx=-5;dx<=5;dx++)for(int z=25;z<=150;z++){
+        for(int dx=-5;dx<=5;dx++)for(int z=25;z<=170;z++){
             level.setBlock(new BlockPos(x+dx,80,z),Blocks.SMOOTH_STONE.defaultBlockState(),2);
             for(int y=81;y<=110;y++){var at=new BlockPos(x+dx,y,z);if(!level.getBlockState(at).isAir())level.setBlock(at,Blocks.AIR.defaultBlockState(),2);}
         }
         var craft=f.craft(20);var player=HelicopterPilotGameTest.player(h,f,false);
         h.assertTrue(player.startRiding(craft,true),"real connected pilot boards");
         craft.combat().emptyPlayerStores();craft.combat().addPlayerAmmunition(missile?HelicopterSupplies.HELLFIRE:HelicopterSupplies.CANNON,1);
-        var target=ModEntities.COMMON_INFECTED.get().create(level);Vec3 anchor=new Vec3(x,81,130);
+        var target=ModEntities.COMMON_INFECTED.get().create(level);Vec3 anchor=new Vec3(x,81,160);
         // The real player is beyond vanilla Monster's immediate 128-block despawn
         // radius. Keep the fixture target in the world, as the natural-chain fixture does.
         target.setPos(anchor);target.setNoAi(true);target.setNoGravity(true);target.setPersistenceRequired();target.getAttribute(Attributes.MAX_HEALTH).setBaseValue(1000);target.setHealth(1000);f.entities.add(target);
@@ -43,7 +43,7 @@ public final class HelicopterLongRangeGameTest {
             if(!ready[0]){
                 // setChunkForced schedules visibility; FULL block data alone does
                 // not yet place remote mobs in ServerLevel's entity lookup.
-                for(int z=0;z<=144;z+=16)if(!level.isPositionEntityTicking(new BlockPos(f.x,81,z)))return;
+                for(int z=0;z<=160;z+=16)if(!level.isPositionEntityTicking(new BlockPos(f.x,81,z)))return;
                 if(!level.addFreshEntity(target)){done[0]=true;f.close();h.fail("long-range fixture target insertion rejected in ticking chunks");return;}
                 ready[0]=true;
             }
@@ -61,7 +61,7 @@ public final class HelicopterLongRangeGameTest {
             if(craft.combat().shots()>0&&shotDistance[0]==0){shotDistance[0]=craft.position().distanceTo(target.position());shotGeometry[0]=geometry(level,craft,target);}
             var source=target.getLastDamageSource();
             if(source!=null&&source.getEntity()==player&&(missile?source.getDirectEntity() instanceof HellfireBlastEntity:source.getDirectEntity()==craft)){
-                h.assertTrue(accepted[0]&&shotDistance[0]>120,"input-fired weapon reaches beyond former 72/96-block limits: "+shotDistance[0]);
+                h.assertTrue(accepted[0]&&shotDistance[0]>150,"input-fired weapon reaches beyond former 72/96-block limits: "+shotDistance[0]);
                 h.assertTrue(target.getHealth()<target.getMaxHealth(),"actual ground target accepted aircraft damage");
                 h.assertTrue(craft.combat().shots()==1&&craft.combat().rounds()==0&&craft.combat().rockets()==0,"one accepted shot consumes the one finite player round");
                 com.codex.blacklight.BlacklightNeoMod.LOGGER.info("HELI_LONG_RANGE_VERIFIED weapon={} launchDistance={} remainingHealth={} shots={}",missile?"Hellfire":"30mm",shotDistance[0],target.getHealth(),craft.combat().shots());

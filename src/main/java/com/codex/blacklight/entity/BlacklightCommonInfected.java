@@ -28,7 +28,10 @@ public final class BlacklightCommonInfected extends Monster {
     private final com.codex.blacklight.infection.CommonInfectedLeap.RootExit leapExit=new com.codex.blacklight.infection.CommonInfectedLeap.RootExit();
     public BlacklightCommonInfected(EntityType<? extends BlacklightCommonInfected> type, Level level) { super(type, level); xpReward=3; }
     @Override protected void defineSynchedData(SynchedEntityData.Builder builder){super.defineSynchedData(builder);builder.define(ATTACK_STARTED,-1L);builder.define(ATTACK_HAND,0);builder.define(APPEARANCE,-1);builder.define(LEAP_PUNCH,-1L);builder.define(LEAP_LANDED,-1L);}
-    public long attackStarted(){return getData(com.codex.blacklight.registry.ModAttachments.CONSUME_VISUAL).active()?-1:entityData.get(ATTACK_STARTED);}
+    public long attackStarted(){
+        if(isRemoved())return -1;
+        return getData(com.codex.blacklight.registry.ModAttachments.CONSUME_VISUAL).active()?-1:entityData.get(ATTACK_STARTED);
+    }
     public void cancelAttack(){endAttack(false);}
     private void endAttack(boolean releaseRoot){
         if(level().isClientSide)return;
