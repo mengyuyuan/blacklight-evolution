@@ -9,7 +9,6 @@ import java.util.*;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.*;
-import net.minecraft.world.entity.projectile.ProjectileUtil;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.phys.*;
 
@@ -199,7 +198,7 @@ public final class HelicopterCombat {
             for(double d=1;d<=definition.range();d++){var next=muzzle.add(direction.scale(d));if(!VehicleDamageBridge.loaded(level,muzzle,next))break;end=next;}
             var wall=level.clip(new ClipContext(muzzle,end,ClipContext.Block.COLLIDER,ClipContext.Fluid.NONE,craft));if(wall.getType()!=HitResult.Type.MISS)end=wall.getLocation();
             var hull=VehicleDamageBridge.nearest(level,craft,null,muzzle,end);
-            var hit=ProjectileUtil.getEntityHitResult(level,craft,muzzle,end,new AABB(muzzle,end).inflate(.3),e->!craft.hasPassenger(e)&&e.isAlive()&&e.isPickable()&&VehicleDamageBridge.vehicle(e)==null);
+            var hit=FirearmsCombat.firstSurface(level,craft,muzzle,end,e->!craft.hasPassenger(e)&&e.isAlive()&&e.isPickable()&&VehicleDamageBridge.vehicle(e)==null);
             Entity tracked=hull!=null&&(hit==null||hull.distance()<=muzzle.distanceTo(hit.getLocation()))?hull.vehicle():hit==null?null:hit.getEntity();
             // Multipart pick proxies are transient and cannot be resolved by UUID
             // on the following flight tick. Preserve the actual ray's aim point,
@@ -224,7 +223,10 @@ public final class HelicopterCombat {
             else if(hit!=null){
                 end=hit.getLocation();impact=2;
                 var target=CombatTargeting.resolveTarget(hit.getEntity());
-                if(hit.getEntity() instanceof BlackwatchHelicopter helicopter)helicopter.hurt(player.damageSources().mobProjectile(craft,player),definition.damage());
+                if(hit.getEntity() instanceof BlackwatchHelicopter helicopter){
+                    impact=3;
+                    helicopter.hurtAt(player.damageSources().mobProjectile(craft,player),definition.damage(),end);
+                }
                 else if(target!=null&&!FirearmsCombat.protectedTarget(player,target)
                         &&(!(target instanceof net.minecraft.world.entity.player.Player other)||level.getServer().isPvpAllowed()&&player.canHarmPlayer(other)))
                     hurtGunContact(player,hit.getEntity(),target,muzzle,end,definition.damage());
@@ -260,7 +262,7 @@ public final class HelicopterCombat {
         var mechanical=VehicleDamageBridge.nearest(level,craft,null,muzzle,end);
         // Ground hulls use their oriented shape rather than their broad outer AABB.
         // Seated occupants are protected by the first real hull contact.
-        var hit=ProjectileUtil.getEntityHitResult(level,craft,muzzle,end,new AABB(muzzle,end).inflate(.3),e->!craft.hasPassenger(e)&&e.isPickable()&&e.isAlive()
+        var hit=FirearmsCombat.firstSurface(level,craft,muzzle,end,e->!craft.hasPassenger(e)&&e.isPickable()&&e.isAlive()
                 &&VehicleDamageBridge.vehicle(e)==null&&(!(e instanceof LivingEntity living)||targetBody(living)==living));
         boolean groundFirst=mechanical!=null&&(hit==null||mechanical.distance()<=muzzle.distanceTo(hit.getLocation()));
         Entity first=groundFirst?mechanical.vehicle():hit==null?null:hit.getEntity();
@@ -278,7 +280,7 @@ public final class HelicopterCombat {
             GunplayEffects.shot(actor,craft,definition,muzzle,muzzle.add(direction.scale(12)),0,direction.scale(-1));
         }else{
             if(first instanceof MilitaryVehicle vehicle)VehicleDamageBridge.hurt(actor,vehicle,definition,definition.damage(),null,impact,direction);
-            else if(first instanceof BlackwatchHelicopter helicopter)helicopter.hurt(actor.damageSources().mobProjectile(craft,actor),definition.damage());
+            else if(first instanceof BlackwatchHelicopter helicopter)helicopter.hurtAt(actor.damageSources().mobProjectile(craft,actor),definition.damage(),impact);
             else hurtGunContact(actor,first,victim,muzzle,impact,definition.damage());
             GunplayEffects.shot(actor,craft,definition,muzzle,impact,hullHit?3:2,direction.scale(-1));
         }

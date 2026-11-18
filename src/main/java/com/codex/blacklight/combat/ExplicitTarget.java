@@ -47,7 +47,7 @@ public final class ExplicitTarget {
     }
     static boolean hurtHull(net.minecraft.server.level.ServerPlayer player,Entity hull,float damage,Vec3 point,java.util.function.BooleanSupplier current){
         if(!current.getAsBoolean())return false;
-        boolean hit=hull instanceof BlackwatchHelicopter craft?VehicleDamageBridge.hurtPhysicalAircraft(player,craft,damage,current):
+        boolean hit=hull instanceof BlackwatchHelicopter craft?VehicleDamageBridge.hurtPhysicalAircraft(player,craft,damage,null,point,current):
                 VehicleDamageBridge.hurtPhysical(player,(MilitaryVehicle)hull,damage,null,point);
         if(hit&&hull instanceof BlackwatchHelicopter)
             com.codex.blacklight.firearms.GunplayEffects.metalContact(player,point,player.getEyePosition().subtract(point).normalize());

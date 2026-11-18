@@ -172,7 +172,7 @@ public final class VehicleOrdnanceProjectile extends ThrowableItemProjectile {
         }
         Entity directAircraft=result instanceof EntityHitResult aircraftHit&&aircraftHit.getEntity() instanceof com.codex.blacklight.entity.BlackwatchHelicopter?aircraftHit.getEntity():null;
         if(directAircraft instanceof com.codex.blacklight.entity.BlackwatchHelicopter craft)
-            craft.hurt(actor.damageSources().thrown(this,actor),definition.damage());
+            craft.hurtAt(actor.damageSources().thrown(this,actor),definition.damage(),center);
         MilitaryVehicle direct=result instanceof EntityHitResult hit?VehicleDamageBridge.vehicle(hit.getEntity()):null;
         if(direct!=null)VehicleDamageBridge.hurt(actor,direct,definition,definition.damage(),this,center);
         LivingEntity directLiving=result instanceof EntityHitResult hit?CombatTargeting.resolveTarget(hit.getEntity()):null;

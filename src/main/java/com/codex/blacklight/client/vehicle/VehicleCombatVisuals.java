@@ -2,6 +2,7 @@ package com.codex.blacklight.client.vehicle;
 import net.minecraftforge.event.TickEvent.ClientTickEvent;
 
 import com.codex.blacklight.entity.MilitaryVehicle;
+import com.codex.blacklight.entity.BlackwatchHelicopter;
 import com.codex.blacklight.military.vehicle.VehicleFeedbackMotion;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.particles.ParticleTypes;
@@ -35,11 +36,24 @@ public final class VehicleCombatVisuals {
         var mc=Minecraft.getInstance();if(mc.level==null||mc.player==null||mc.isPaused())return;
         int budget=8;
         for(var entity:mc.level.entitiesForRendering()){
-            if(!(entity instanceof MilitaryVehicle v)||v.isRemoved()||v.health()<=0||v.health()>v.maxHealth()*.35||v.distanceToSqr(mc.player)>48*48||--budget<0)continue;
-            if((v.tickCount+v.getId())%5!=0)continue;
-            Vec3 engine=v.position().add(new Vec3(0,v.definition().height()*.65,-v.definition().length()*.28).yRot((float)Math.toRadians(v.getYRot())));
-            mc.level.addParticle(ParticleTypes.SMOKE,engine.x,engine.y,engine.z,0,.035,0);
-            if(v.health()<v.maxHealth()*.15&&(v.tickCount+v.getId())%10==0)mc.level.addParticle(ParticleTypes.FLAME,engine.x,engine.y,engine.z,0,.02,0);
+            if(entity.isRemoved()||entity.distanceToSqr(mc.player)>64*64)continue;
+            double fraction;
+            Vec3 engine;
+            int age=entity.tickCount+entity.getId();
+            if(entity instanceof MilitaryVehicle v){
+                fraction=v.health()/v.maxHealth();
+                if(fraction<=0||fraction>.6)continue;
+                engine=v.position().add(new Vec3(0,v.definition().height()*.65,-v.definition().length()*.28).yRot((float)Math.toRadians(v.getYRot())));
+            }else if(entity instanceof BlackwatchHelicopter craft){
+                fraction=craft.health()/BlackwatchHelicopter.MAX_HEALTH;
+                if(fraction>.6)continue;
+                engine=craft.weaponPoint(new Vec3((age&4)==0?.62:-.62,3.35,-1.1));
+            }else continue;
+            int interval=fraction<=.2?3:fraction<=.35?5:10;
+            if(age%interval!=0)continue;
+            mc.level.addParticle(fraction<=.35?ParticleTypes.LARGE_SMOKE:ParticleTypes.SMOKE,engine.x,engine.y,engine.z,0,.055,0);
+            if(fraction<=.2&&age%2==0)mc.level.addParticle(ParticleTypes.FLAME,engine.x,engine.y,engine.z,0,.04,0);
+            if(--budget==0)break;
         }
     }
     private VehicleCombatVisuals(){}

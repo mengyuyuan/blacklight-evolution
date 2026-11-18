@@ -201,7 +201,7 @@ public final class ThrownBlock extends Projectile {
             if(mechanical!=null&&getOwner() instanceof LivingEntity actor)
                 com.codex.blacklight.military.vehicle.VehicleDamageBridge.hurtPhysical(actor,mechanical.vehicle(),impactDamage,this,mechanical.point());
             if(victim!=null&&victim.getEntity() instanceof BlackwatchHelicopter craft&&getOwner() instanceof ServerPlayer owner){
-                com.codex.blacklight.military.vehicle.VehicleDamageBridge.hurtPhysicalAircraft(owner,craft,impactDamage,this,
+                com.codex.blacklight.military.vehicle.VehicleDamageBridge.hurtPhysicalAircraft(owner,craft,impactDamage,this,impact,
                         ()->!isRemoved()&&getOwner()==owner&&level()==craft.level());
             }
             if(victim!=null&&victim.getEntity() instanceof LivingEntity target&&allowed(target)){

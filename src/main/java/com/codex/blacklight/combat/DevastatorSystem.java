@@ -295,7 +295,7 @@ public final class DevastatorSystem {
             double contact=kind==2?s.timing.targetStart():s.timing.contactAt(distance);
             if(age<contact||age>Math.min(s.timing.damageEnd(),contact+DevastatorCollision.targetDuration(s.move)))continue;
             float damage=s.timing.damage();if(kind==3)damage=BulletdivePhysics.impactDamage(damage,s.highest-s.origin.y);
-            if(hurtHull(p,s,vehicle,damage)){
+            if(hurtHull(p,s,vehicle,damage,point)){
                 s.struck.add(vehicle.getUUID());s.hits++;com.codex.blacklight.firearms.GunplayEffects.metalContact(p,point,s.direction.scale(-1));
             }
         }
@@ -356,10 +356,10 @@ public final class DevastatorSystem {
         return hit.getType()==net.minecraft.world.phys.HitResult.Type.BLOCK&&hit.getDirection()==net.minecraft.core.Direction.UP
                 &&point.y>=hit.getLocation().y-.1&&point.y-hit.getLocation().y<=1.8;
     }
-    private static boolean hurtHull(ServerPlayer p,Session s,Entity hull,float damage){
+    private static boolean hurtHull(ServerPlayer p,Session s,Entity hull,float damage,Vec3 point){
         if(hull instanceof com.codex.blacklight.entity.MilitaryVehicle vehicle)
-            return com.codex.blacklight.military.vehicle.VehicleDamageBridge.hurtSpecial(p,vehicle,damage);
-        return com.codex.blacklight.military.vehicle.VehicleDamageBridge.hurtSpecialAircraft(p,(com.codex.blacklight.entity.BlackwatchHelicopter)hull,damage,()->ACTIVE.get(p)==s);
+            return com.codex.blacklight.military.vehicle.VehicleDamageBridge.hurtSpecial(p,vehicle,damage,point);
+        return com.codex.blacklight.military.vehicle.VehicleDamageBridge.hurtSpecialAircraft(p,(com.codex.blacklight.entity.BlackwatchHelicopter)hull,damage,point,()->ACTIVE.get(p)==s);
     }
     private static boolean hurt(ServerPlayer p,LivingEntity target,float damage,boolean bulletdive,HitContext context){
         var prior=HIT_CONTEXT.get();HIT_CONTEXT.set(context);
@@ -389,7 +389,7 @@ public final class DevastatorSystem {
                     if(hit==null||!CombatTargeting.clearRay(p,p.getEyePosition(),hit.point()))continue;
                     var horizontal=hit.point().subtract(center).multiply(1,0,1);
                     if(track.arc()>0&&track.arc()<360&&horizontal.lengthSqr()>1e-6&&horizontal.normalize().dot(forward)<Math.cos(Math.toRadians(track.arc()/2)))continue;
-                    if(hurtHull(p,s,hull,DevastatorDamage.secondary(track.damage()))){
+                    if(hurtHull(p,s,hull,DevastatorDamage.secondary(track.damage()),hit.point())){
                         struck.add(hull.getUUID());s.hits++;com.codex.blacklight.firearms.GunplayEffects.metalContact(p,hit.point(),hit.normal());
                     }
                     break;

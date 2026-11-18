@@ -71,6 +71,14 @@ public final class HelicopterRelaunchGameTest {
                 WeaponCombatSystem.tick(new net.minecraftforge.event.TickEvent.PlayerTickEvent(net.minecraftforge.event.TickEvent.Phase.END,player));
             }
             h.assertTrue(charged&&craft.health()<initial,"charged longshot makes actual overhead skin contact, move="+ModAttachments.getData(player,ModAttachments.WEAPON_VISUAL).spec()+" hp="+craft.health());
+            h.assertTrue(!craft.dents().isEmpty(),"charged lash leaves a dent on the aircraft skin");
+            var saved=craft.saveWithoutId(new net.minecraft.nbt.CompoundTag());
+            var restored=ModEntities.BLACKWATCH_HELICOPTER.get().create(f.level);
+            restored.load(saved);
+            h.assertTrue(restored.dents().size()==craft.dents().size() && restored.dents().get(0).point().distanceTo(craft.dents().get(0).point())<1e-6,"airframe keeps its local damage after loading");
+            saved.remove("AirframeDents");
+            restored.load(saved);
+            h.assertTrue(restored.dents().isEmpty() && restored.health()==craft.health(),"legacy save clears stale dents and retains mechanical health");
             WeaponCombatSystem.cancelHeldInput(player);WeaponCombatSystem.cancel(player);
         }h.succeed();});
     }
@@ -94,6 +102,12 @@ public final class HelicopterRelaunchGameTest {
                     WeaponCombatSystem.tick(new net.minecraftforge.event.TickEvent.PlayerTickEvent(net.minecraftforge.event.TickEvent.Phase.END,player));
                 }
                 h.assertTrue(hull.health()<initial,"actual whip contact on "+type);
+                h.assertTrue(!hull.dents().isEmpty(),"heavy strike dents "+type);
+                hull.repair(hull.maxHealth());
+                h.assertTrue(hull.dents().isEmpty(),"full repair smooths the hull of "+type);
+                var point=com.codex.blacklight.combat.ExplicitTarget.point(player,hull);
+                var marked=com.codex.blacklight.military.vehicle.VehicleDamageBridge.hurt(player,hull,WeaponCatalog.RIFLE,4F,null,point);
+                h.assertTrue(marked && !hull.dents().isEmpty(),"an ordinary rifle round marks "+type);
                 WeaponCombatSystem.cancel(player);hull.discard();
             }
         }h.succeed();});
@@ -114,6 +128,9 @@ public final class HelicopterRelaunchGameTest {
             player.setPos(f.x-7,81,1.9);
             FirearmsCombat.fire(player,rifle,aim,1);
             h.assertTrue(craft.health()<before,"rifle pointing at the visible cabin damages it");
+            h.assertTrue(!craft.dents().isEmpty(),"rifle leaves a mark at the cabin");
+            var scar=craft.dents().get(0);
+            h.assertTrue(scar.inward().x>.8 && scar.depth()>0,"side shot pushes the panel inward");
 
             CombatTargeting.requestLock(player,craft.getId());
             var throwAim=BlockThrowAim.solve(player,player.getEyePosition(),craft.position(),true,2.2);
