@@ -67,7 +67,7 @@ public final class VehicleViewRendering {
     public void render(PoseStack stack,VertexConsumer out,int light,int overlay,boolean localFirstPerson,VehicleCamera.View view) {
         if(localFirstPerson&&enclosed&&view!=null)out=new VehicleOpticClipper(out,stack,view.position(),net.minecraft.world.phys.Vec3.directionFromRotation(view.pitch(),view.yaw()));
         try(var windows=open(localFirstPerson)) {
-            model.root().render(stack,out,light,overlay);
+            model.render(stack,out,light,overlay);
             if(localFirstPerson)renderWindowFrames(stack,out,light,overlay);
         }
     }

@@ -20,7 +20,7 @@
     }
   },
   "result": {
-    "count": 1,
-    "item": "blacklight:military_tank_chassis"
+    "item": "blacklight:military_tank_chassis",
+    "count": 1
   }
 }

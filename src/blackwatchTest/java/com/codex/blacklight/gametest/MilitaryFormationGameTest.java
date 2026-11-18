@@ -132,10 +132,16 @@ public final class MilitaryFormationGameTest {
             if(mode.equals("guard")){
                 var target=ModEntities.INFECTED_HOST.get().create(h.getLevel());target.inherit(net.minecraft.world.entity.EntityType.COW.create(h.getLevel()));target.setNoAi(true);target.setPersistenceRequired();target.setPos(goal.add(8,0,0));
                 target.getAttribute(net.minecraft.world.entity.ai.attributes.Attributes.MAX_HEALTH).setBaseValue(1000);h.getLevel().addFreshEntity(target);target.setHealth(target.getMaxHealth());target.getAttribute(net.minecraft.world.entity.ai.attributes.Attributes.KNOCKBACK_RESISTANCE).setBaseValue(1);
-                victim[0]=target;health[0]=target.getHealth();soldier.setTarget(target);
+                victim[0]=target;health[0]=target.getHealth()/target.getMaxHealth();soldier.setTarget(target);
             }
         });
-        h.runAtTickTime(1060,()->{if(victim[0]!=null)h.assertTrue(victim[0].getHealth()<health[0],"guard at the new post actually fires after arriving");h.succeed();});
+        // The appointed captain may finish a 77-tick support call. Native host maturation rescales maximum health, so compare its injured fraction and real attacker.
+        h.runAtTickTime(1060,()->{if(victim[0]==null)h.succeed();else h.succeedWhen(()->{
+            var from=soldier.getEyePosition().add(0,-.18,0);var to=victim[0].getBoundingBox().getCenter();
+            var wall=h.getLevel().clip(new net.minecraft.world.level.ClipContext(from,to,net.minecraft.world.level.ClipContext.Block.COLLIDER,net.minecraft.world.level.ClipContext.Fluid.NONE,soldier));
+            var hit=net.minecraft.world.entity.projectile.ProjectileUtil.getEntityHitResult(h.getLevel(),soldier,from,to,new net.minecraft.world.phys.AABB(from,to).inflate(.3),e->e!=soldier&&e.isPickable()&&e instanceof net.minecraft.world.entity.LivingEntity);
+            h.assertTrue(victim[0].getHealth()/victim[0].getMaxHealth()<health[0]&&victim[0].getLastHurtByMob()==soldier,"guard at the new post actually fires after arriving: phase="+soldier.phase()+" radio="+soldier.radioStarted()+" ammo="+soldier.magazineAmmo()+" targetTicks="+victim[0].tickCount+" sight="+soldier.hasLineOfSight(victim[0])+" chosen="+(soldier.getTarget()==victim[0])+" health="+victim[0].getHealth()+" wall="+wall.getType()+" ray="+(hit==null?"null":hit.getEntity().getType()+"/expected="+(hit.getEntity()==victim[0]))+" positions="+soldier.position()+" -> "+victim[0].position());
+        });});
     }
     @GameTest(template="military_march_arena",batch="militaryFormation",timeoutTicks=1150) public static void guardCoordinatesEstablishANewFiringTerritory(GameTestHelper h){coordinates(h,"guard");}
     @GameTest(template="military_march_arena",batch="militaryFormation",timeoutTicks=1150) public static void patrolCoordinatesMoveTheActualPatrolCenter(GameTestHelper h){coordinates(h,"patrol");}

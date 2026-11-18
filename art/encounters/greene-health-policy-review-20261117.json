@@ -1,0 +1,132 @@
+{
+  "schema": 1,
+  "date": "2026-11-17",
+  "status": "Policy and platform-specific floor event hooks written; entity lifecycle and actuallyHurt final-write guard owned by root integration. No build, tests or runtime execution.",
+  "source": [
+    {
+      "path": "D:\\PrototypeReference\\p1\\input\\remote-metadata\\art\\missions\\e08m04\\e08m04_fig.p3d.rz",
+      "sha256": "230c93e227d1bb97bfcd28f68cf350b09a47ac7ddff0a2393857a820ec094e01"
+    },
+    {
+      "path": "D:\\PrototypeReference\\p1\\private\\greene-mission-stage-reachability-proof.json",
+      "sha256": "4210271789b82fde606b411f77ec61825c99c3ed063c4d705bcbe2518ed1969a"
+    },
+    {
+      "path": "D:\\PrototypeReference\\p1\\private\\greene-mother-health-proof.json",
+      "sha256": "637caf50b1027a8b6f8f18a12f81518b730fbed506cb6a7cdab235e732d3ce93"
+    }
+  ],
+  "normalPath": {
+    "outer": [
+      10,
+      19,
+      30,
+      38
+    ],
+    "initialWave": 1,
+    "waveAdvance": "Lua65288 initializes1. Lua77396 increments before initialStunnedHealth capture and before any stun debit. Current armour wave remains separate until next regeneration.",
+    "floors": [
+      "wave1 collapse: .6550000086426735 * max",
+      "wave2 normal path after military camera/checkpoint corresponds to outer30: -.03499997407197952 * max, not outer16 .31",
+      "wave3+ outer38: wait out Devastator, then60 server ticks from collapse-event handling, then zero"
+    ],
+    "knownException": "Native restore/external-event path10->16 not implicitly mapped to normal wave2. Original cross-FSM checkpoint scheduling remains outside this normal standalone policy."
+  },
+  "arithmetic": {
+    "scale": "Source6000 core health is scaled against actual Minecraft maxHealth; source segments500/700/900/1000 use this same ratio; final tier repeats without a four-wave cap.",
+    "stun": "Snapshot before debit and before Devastator wait; evaluate then-current health after the wait. Strict(.08500000089406967*max + 50/6000*max < health) uses stun amount, otherwise health/2.",
+    "recovery": "After accepted damage, health>0 and initial/max-current/max>=.25999999046325684 requests recovery. Stun contributes to this total. Triggering hit is not capped at26%.",
+    "positiveFloor": "Normal floor<=current amount is capped before health deduction. float nextDown correction prevents a tiny positive floor from rounding to zero after subtraction.",
+    "higherFloor": "floor>current leaves incoming damage unchanged; actuallyHurt final-write guard, not this event, owns the native final write which can raise health to the floor. This is not an after-hurt resurrection."
+  },
+  "api": {
+    "sourceToMinecraft(sourceAmount,maxHealth)": "Scale source units against6000.",
+    "segmentHealth(armourWave,maxHealth)": "Current restored appendage amount; input1-based and saturates at final tier.",
+    "nextWaveCount(waveCount)": "Increase source count without int overflow.",
+    "enterDown(waveCount,currentHealth)": "Returns DownEntry(nextWaveCount,initialStunnedHealth). Call once, persist it; reload must not repeat stun.",
+    "collapseFloor(armourWave,maxHealth)": "Requested source floor; negative result remains visible as source data.",
+    "finalFloorDelayTicks(armourWave)": "60 only for normal wave3+, otherwise0; caller waits out Devastator before starting.",
+    "releaseFloorOnEmergence(health,maxHealth)": "Source500 threshold releases min health at repeat rise.",
+    "stunDamage(currentHealth,maxHealth)": "Evaluate only after Devastator wait; no direct entity mutation.",
+    "recoveryRequested(initialStunnedHealth,currentHealth,maxHealth)": "Post-damage request; lifecycle latches and schedules it.",
+    "limitFinalDamage(health,incomingFinal,floor)": "Forge post-absorption amount.",
+    "limitBeforeAbsorption(health,incoming,absorption,floor)": "Neo final pre-absorption amount, after all damage-Pre listeners, with passed absorption spend retained."
+  },
+  "entityContract": {
+    "requiredInterfaces": [
+      "EncounterMob.greeneMinimumHealth()",
+      "EncounterMob.greeneOwnDamageActive()"
+    ],
+    "scope": "Own-damage-active is true only within the current Greene core superclass hurt path; a reentrant BYPASSES_INVULNERABILITY hit temporarily clears depth and restores it in finally. GreeneHealthFloorMixin modifies only vanilla actuallyHurt->setHealth(F)V while owner is still alive. Child redirect and unrelated administrative setHealth/kill writes are not clamped or undone.",
+    "suggestedPersistentFields": [
+      "GreeneWaveCount (next armour index after DOWN)",
+      "GreeneArmourWave (current armour identity)",
+      "GreeneInitialStunnedHealth",
+      "GreeneMinimumHealth",
+      "DOWN entry captured / stun pending or applied marker",
+      "pending floor flag plus Devastator-wait marker and relative remaining ticks",
+      "early recovery request latch"
+    ],
+    "persistenceOwner": "This helper is stateless. Entity integration owns saved field names, lifecycle phase and ticking. Offline time must not replay actions or pay stun damage again."
+  },
+  "platformHooks": {
+    "Neo21.1.244": "LivingEntity.actuallyHurt source lines1785-1805: armor and magic reduction, onLivingDamagePre at1789, absorption deduction at1790-1794, recordDamage/setHealth at1800-1801, Post at1805. GreeneHealthEvents subscribes LivingIncomingDamageEvent at LOWEST to register an ABSORPTION reduction modifier. The modifier runs after ALL Pre listeners, caps health loss using the passed absorption, then returns that same spent absorption. DamageContainer.setReduction subtracts the returned value after the callback.",
+    "Forge47.4.10": "Cached LivingEntity.java.patch hunk -1583/+1614 inserts onLivingHurt before armor/magic; hunk -1596/+1629 inserts onLivingDamage after absorption and immediately before recordDamage/setHealth. GreeneHealthEvents subscribes LivingDamageEvent at LOWEST; cap final amount directly.",
+    "priorityBoundary": "Neo CombatScale.damage also uses Pre/LOWEST, so a separate Pre listener would not guarantee final floor accounting. Registering the final absorption modifier avoids that existing repository ordering conflict. Root actuallyHurt final-write guard remains the safety invariant against later foreign reduction modifiers or Forge same-priority hooks. Floor>current also intentionally uses that final-write guard, only while alive. No post-hurt health refill is used."
+  },
+  "cachedApiEvidence": [
+    {
+      "path": "D:\\CodexCache\\work\\greene-health-hook-neo-LivingEntity.java",
+      "sha256": "9da7dbb77b0ae9e152d4a419d9518ce0d0cd9ba746b5216582917203d8ac6895"
+    },
+    {
+      "path": "D:\\CodexCache\\work\\greene-health-hook-neo-LivingDamageEvent.java",
+      "sha256": "1277e64708a8eac40263d6584641cfbb7b33d2105a197d0bfd7bfa4b544d16f7"
+    },
+    {
+      "path": "D:\\CodexCache\\work\\greene-health-hook-neo-DamageContainer.java",
+      "sha256": "7940c1f1c700c276f4f9f69575ae5c7e65044771b1b4f49a8bd5b1e03ed6d0c7"
+    },
+    {
+      "path": "D:\\CodexCache\\work\\greene-health-hook-neo-LivingIncomingDamageEvent.java",
+      "sha256": "03ff4dbe0b1064adb2ec666f971e810e3844acbbd4a94a22fddf2906202283e2"
+    },
+    {
+      "path": "D:\\CodexCache\\work\\greene-health-hook-forge-user-LivingEntity.java.patch",
+      "sha256": "8c9d14c3fdb2a47a7e32f3a09ef6006adff8c584a1d6ace686b010b6019c963d"
+    },
+    {
+      "path": "D:\\CodexCache\\work\\greene-health-hook-forge-LivingDamageEvent.java",
+      "sha256": "f1424b2d80e229f19b44913b209358bbbfdf980fddf7952722c6f02c7c3bcdc7"
+    }
+  ],
+  "deferredTests": [
+    "downOwnsTheNextWaveButDoesNotRetroactivelyRefillThisArmour",
+    "normalMissionSkipsTheOtherwiseReachableSecondStageFloor",
+    "stunUsesScaledStrictFiftyHpMarginAndSnapshotsBeforeItsDebit",
+    "stunCountsTowardTheTwentySixPercentRequestWithoutMakingItAClamp",
+    "aPositiveFloorIsAppliedBeforeDeathWithoutCreatingNegativeDamage",
+    "neoPreservesAbsorptionBeforeApplyingTheSameHealthFloor"
+  ],
+  "runner": "GreeneBattleHealthTest is covered by existing player-fix-unit include **/Greene*Test.class. Not executed.",
+  "remainingValidation": [
+    "Actual entity health floor before fatal callbacks, including absorption and callbacks that alter damage.",
+    "Neo damage-Pre LOWEST mutation followed by the queued absorption floor modifier: verify combat tracker/Post damage matches health loss and original absorption is spent; no runtime validation performed.",
+    "Full collapse/DOWN/underground/emerge lifecycle and source waveform/body observation are root tasks.",
+    "Save/load while waiting for Devastator or floor countdown must preserve the one-time snapshot, stun and pending recovery."
+  ],
+  "files": {
+    "src/main/java/com/codex/blacklight/combat/GreeneBattleHealth.java": {
+      "neoSha256": "d5c8f540281d54b7212e79fee943f339ea88ad7e3bd9abf44a03c9dbe2571f63",
+      "forgeSha256": "d5c8f540281d54b7212e79fee943f339ea88ad7e3bd9abf44a03c9dbe2571f63"
+    },
+    "src/main/java/com/codex/blacklight/combat/GreeneHealthEvents.java": {
+      "neoSha256": "e1c3dc44fbada035e0ce7000d446ef1d0c270569e2b6a3494dfc6d1231d641a1",
+      "forgeSha256": "84394fe95d03c7f064aeadabfb988af56567d839573f70591f5224d5d4b611cb"
+    },
+    "src/test/java/com/codex/blacklight/combat/GreeneBattleHealthTest.java": {
+      "neoSha256": "860fed6c8ce2b73b48d024c60054e7a6693d929f7d4e7d8999771ec62ee5f275",
+      "forgeSha256": "860fed6c8ce2b73b48d024c60054e7a6693d929f7d4e7d8999771ec62ee5f275"
+    }
+  }
+}

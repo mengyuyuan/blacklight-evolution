@@ -1,0 +1,852 @@
+{
+  "schema": 1,
+  "source": "D:\\PrototypeReference\\p2\\input\\p2\\behemoth.p3d",
+  "sourceSha256": "3737ff61e7042391bf12c95c2018e034f52a1945983d0a7053608a01d69240c7",
+  "method": "Full original four-weight linear blend skinning, reference Motion_Root travel/heading rebase, identical MC scale/axes/render lift. Authored geometry uses the exact exported hierarchical pose/cube-pivot transforms; these are static calculations, not observed game rendering.",
+  "skinEvidence": [
+    {
+      "name": "behemoth_L_ArmShape000_skin",
+      "offset": 3281250,
+      "fistMajorityVertices": 1128,
+      "criterion": "sum of positive weights assigned to Wrist_L/Shield_L_2/Shield_L_3/Shield_L_1 > 0.5; full four-influence skinning retained for those vertices"
+    },
+    {
+      "name": "behemoth_SinueShape000_skin",
+      "offset": 3566317,
+      "fistMajorityVertices": 222,
+      "criterion": "sum of positive weights assigned to Wrist_L/Shield_L_2/Shield_L_3/Shield_L_1 > 0.5; full four-influence skinning retained for those vertices"
+    }
+  ],
+  "comparisons": [
+    {
+      "frame": 0,
+      "sourceWristY": 2.166625940797627,
+      "sourceFullySkinnedFist": {
+        "min": [
+          -2.771713125470351,
+          -0.6530186140414667,
+          2.769372124326882
+        ],
+        "max": [
+          2.432388781486305,
+          7.832153778977157,
+          7.098192493493321
+        ],
+        "mean": [
+          0.20170908626046943,
+          2.5061735559884513,
+          5.125209914812243
+        ]
+      },
+      "sourceWristMajoritySubset": {
+        "min": [
+          -2.771713125470351,
+          -0.6530186140414667,
+          2.769372124326882
+        ],
+        "max": [
+          2.380938328035143,
+          2.7466254459451345,
+          7.039329026450025
+        ],
+        "mean": [
+          -0.14433125299526536,
+          0.9502606320167408,
+          4.783759198398139
+        ]
+      },
+      "authoredGiantSkin": {
+        "min": [
+          -2.60715441919304,
+          -1.1564088917375466,
+          1.6511572519197648
+        ],
+        "max": [
+          4.003988957561663,
+          5.0372058730403,
+          7.844815461870785
+        ],
+        "mean": [
+          0.3385104934959138,
+          1.2051405517806508,
+          5.505091369291606
+        ]
+      },
+      "authoredThinSkin": {
+        "min": [
+          0.4986075205758549,
+          0.7365481902161799,
+          -4.908840403175027
+        ],
+        "max": [
+          2.9459110787704015,
+          2.770692826450243,
+          -2.8186037050850046
+        ],
+        "mean": [
+          1.987768696090371,
+          1.4983541179404851,
+          -3.5539834246829307
+        ]
+      },
+      "giantCubeMinima": [
+        {
+          "bone": "right_hand",
+          "cube": 0,
+          "minY": -1.1564088917375466
+        },
+        {
+          "bone": "right_hand",
+          "cube": 1,
+          "minY": 1.6176980688865383
+        },
+        {
+          "bone": "right_hand",
+          "cube": 2,
+          "minY": 0.18801828189102
+        },
+        {
+          "bone": "right_hand",
+          "cube": 3,
+          "minY": -0.4797952561129329
+        },
+        {
+          "bone": "right_finger_0",
+          "cube": 0,
+          "minY": -0.294999357386706
+        },
+        {
+          "bone": "right_finger_0",
+          "cube": 1,
+          "minY": -0.666019813302903
+        },
+        {
+          "bone": "right_finger_1",
+          "cube": 0,
+          "minY": 0.03813779546144879
+        },
+        {
+          "bone": "right_finger_1",
+          "cube": 1,
+          "minY": -0.619580796385373
+        },
+        {
+          "bone": "right_finger_2",
+          "cube": 0,
+          "minY": -0.11110988583318072
+        },
+        {
+          "bone": "right_finger_2",
+          "cube": 1,
+          "minY": -0.5731417196830101
+        },
+        {
+          "bone": "right_finger_3",
+          "cube": 0,
+          "minY": 0.10972346508498475
+        },
+        {
+          "bone": "right_finger_3",
+          "cube": 1,
+          "minY": -0.5267027054806475
+        }
+      ]
+    },
+    {
+      "frame": 42,
+      "sourceWristY": 15.448995511000133,
+      "sourceFullySkinnedFist": {
+        "min": [
+          -4.3129384119294985,
+          11.770319037634657,
+          -2.682910262640828
+        ],
+        "max": [
+          2.6281819917165925,
+          19.02051939237958,
+          3.261474647086546
+        ],
+        "mean": [
+          -1.3392545766351651,
+          15.445005203997603,
+          0.45543874454776606
+        ]
+      },
+      "sourceWristMajoritySubset": {
+        "min": [
+          -4.3129384119294985,
+          14.52395712906075,
+          -2.682910262640828
+        ],
+        "max": [
+          0.5774034547618435,
+          19.02051939237958,
+          1.5174772464172737
+        ],
+        "mean": [
+          -1.860659793293438,
+          16.62093476059475,
+          -0.5487497018880588
+        ]
+      },
+      "authoredGiantSkin": {
+        "min": [
+          -5.3777745695246235,
+          11.730731036093323,
+          -3.978409254414355
+        ],
+        "max": [
+          2.1663935117250124,
+          19.27325383436718,
+          3.2190813280501684
+        ],
+        "mean": [
+          -2.1378475383482853,
+          16.54151900888314,
+          0.30991554529985144
+        ]
+      },
+      "authoredThinSkin": {
+        "min": [
+          0.7561076333334471,
+          -0.096369024975288,
+          -2.192234548500333
+        ],
+        "max": [
+          2.473041733235436,
+          1.6402248076517136,
+          0.6279081537161577
+        ],
+        "mean": [
+          1.7867266353383258,
+          0.9682153965461272,
+          -0.3573230600992898
+        ]
+      },
+      "giantCubeMinima": [
+        {
+          "bone": "right_hand",
+          "cube": 0,
+          "minY": 12.179061612822371
+        },
+        {
+          "bone": "right_hand",
+          "cube": 1,
+          "minY": 11.730731036093323
+        },
+        {
+          "bone": "right_hand",
+          "cube": 2,
+          "minY": 12.834068813850426
+        },
+        {
+          "bone": "right_hand",
+          "cube": 3,
+          "minY": 16.149369815871005
+        },
+        {
+          "bone": "right_finger_0",
+          "cube": 0,
+          "minY": 16.16964402578565
+        },
+        {
+          "bone": "right_finger_0",
+          "cube": 1,
+          "minY": 17.000925330627197
+        },
+        {
+          "bone": "right_finger_1",
+          "cube": 0,
+          "minY": 15.490400558275875
+        },
+        {
+          "bone": "right_finger_1",
+          "cube": 1,
+          "minY": 16.499046404700355
+        },
+        {
+          "bone": "right_finger_2",
+          "cube": 0,
+          "minY": 15.112927586081437
+        },
+        {
+          "bone": "right_finger_2",
+          "cube": 1,
+          "minY": 15.997167461343826
+        },
+        {
+          "bone": "right_finger_3",
+          "cube": 0,
+          "minY": 14.50232141045362
+        },
+        {
+          "bone": "right_finger_3",
+          "cube": 1,
+          "minY": 15.495288535625027
+        }
+      ]
+    },
+    {
+      "frame": 48,
+      "sourceWristY": 0.3702343833391933,
+      "sourceFullySkinnedFist": {
+        "min": [
+          -0.6588447971541138,
+          -2.4812143206610995,
+          3.292966741461721
+        ],
+        "max": [
+          4.313525754638984,
+          2.2719982049359775,
+          11.692054672858793
+        ],
+        "mean": [
+          1.6298679551438282,
+          -0.16500939579088172,
+          8.487470845264783
+        ]
+      },
+      "sourceWristMajoritySubset": {
+        "min": [
+          -0.6588447971541138,
+          -1.9651349097648787,
+          8.19626005492881
+        ],
+        "max": [
+          4.313525754638984,
+          2.2719982049359775,
+          11.692054672858793
+        ],
+        "mean": [
+          1.720457722868524,
+          0.12296203982460825,
+          10.089710585495896
+        ]
+      },
+      "authoredGiantSkin": {
+        "min": [
+          -2.371392856736159,
+          -3.4142813343779,
+          6.320943327653428
+        ],
+        "max": [
+          4.692161309658263,
+          3.48701325716645,
+          12.296733463722147
+        ],
+        "mean": [
+          1.5606544188471687,
+          -0.6975215962933533,
+          9.74085743139103
+        ]
+      },
+      "authoredThinSkin": {
+        "min": [
+          0.3975383225663003,
+          2.470941385030856,
+          -3.643014034659135
+        ],
+        "max": [
+          3.120669968044111,
+          4.010565191592102,
+          -2.2178039822012927
+        ],
+        "mean": [
+          2.147182405514341,
+          3.3218877571177483,
+          -2.698683884139756
+        ]
+      },
+      "giantCubeMinima": [
+        {
+          "bone": "right_hand",
+          "cube": 0,
+          "minY": -2.6402019780719606
+        },
+        {
+          "bone": "right_hand",
+          "cube": 1,
+          "minY": -2.0526754799455897
+        },
+        {
+          "bone": "right_hand",
+          "cube": 2,
+          "minY": -1.7319608177730774
+        },
+        {
+          "bone": "right_hand",
+          "cube": 3,
+          "minY": -1.8870980190235047
+        },
+        {
+          "bone": "right_finger_0",
+          "cube": 0,
+          "minY": -1.8765542018680417
+        },
+        {
+          "bone": "right_finger_0",
+          "cube": 1,
+          "minY": -0.9858288643047304
+        },
+        {
+          "bone": "right_finger_1",
+          "cube": 0,
+          "minY": -2.445879224230216
+        },
+        {
+          "bone": "right_finger_1",
+          "cube": 1,
+          "minY": -1.4346599637005653
+        },
+        {
+          "bone": "right_finger_2",
+          "cube": 0,
+          "minY": -2.891459407367658
+        },
+        {
+          "bone": "right_finger_2",
+          "cube": 1,
+          "minY": -1.8834911115194728
+        },
+        {
+          "bone": "right_finger_3",
+          "cube": 0,
+          "minY": -3.4142813343779
+        },
+        {
+          "bone": "right_finger_3",
+          "cube": 1,
+          "minY": -2.3323222077956016
+        }
+      ]
+    },
+    {
+      "frame": 52,
+      "sourceWristY": 0.8973371832463862,
+      "sourceFullySkinnedFist": {
+        "min": [
+          -0.680924391403517,
+          -1.954610175474948,
+          3.345930065688295
+        ],
+        "max": [
+          4.291855931530352,
+          2.8006940468253627,
+          11.746309562422125
+        ],
+        "mean": [
+          1.6118257970394292,
+          0.3511351646185156,
+          8.54574380326936
+        ]
+      },
+      "sourceWristMajoritySubset": {
+        "min": [
+          -0.680924391403517,
+          -1.4368073981872067,
+          8.37271947767411
+        ],
+        "max": [
+          4.291855931530352,
+          2.8006940468253627,
+          11.746309562422125
+        ],
+        "mean": [
+          1.6991268753318558,
+          0.6506488547281111,
+          10.141870581481161
+        ]
+      },
+      "authoredGiantSkin": {
+        "min": [
+          -2.3926904182017594,
+          -2.887405723156399,
+          6.3716919202107976
+        ],
+        "max": [
+          4.670582163401709,
+          4.0162422627969265,
+          12.350299749489013
+        ],
+        "mean": [
+          1.5387690054161014,
+          -0.1696083502151495,
+          9.794594626642427
+        ]
+      },
+      "authoredThinSkin": {
+        "min": [
+          -0.6298927491042932,
+          3.6378722487001425,
+          -3.958031707019681
+        ],
+        "max": [
+          2.181830141549171,
+          5.330475869077162,
+          -2.3346767550086334
+        ],
+        "mean": [
+          1.2003548069876648,
+          4.5898153389986724,
+          -3.0971370034583745
+        ]
+      },
+      "giantCubeMinima": [
+        {
+          "bone": "right_hand",
+          "cube": 0,
+          "minY": -2.1142284250199923
+        },
+        {
+          "bone": "right_hand",
+          "cube": 1,
+          "minY": -1.5262665420400878
+        },
+        {
+          "bone": "right_hand",
+          "cube": 2,
+          "minY": -1.2054827548225784
+        },
+        {
+          "bone": "right_hand",
+          "cube": 3,
+          "minY": -1.3607068273183967
+        },
+        {
+          "bone": "right_finger_0",
+          "cube": 0,
+          "minY": -1.3503731385872866
+        },
+        {
+          "bone": "right_finger_0",
+          "cube": 1,
+          "minY": -0.45656446874108947
+        },
+        {
+          "bone": "right_finger_1",
+          "cube": 0,
+          "minY": -1.9196175672074502
+        },
+        {
+          "bone": "right_finger_1",
+          "cube": 1,
+          "minY": -0.9051427619544714
+        },
+        {
+          "bone": "right_finger_2",
+          "cube": 0,
+          "minY": -2.3646062628188096
+        },
+        {
+          "bone": "right_finger_2",
+          "cube": 1,
+          "minY": -1.3537211036649157
+        },
+        {
+          "bone": "right_finger_3",
+          "cube": 0,
+          "minY": -2.887405723156399
+        },
+        {
+          "bone": "right_finger_3",
+          "cube": 1,
+          "minY": -1.8022993937549356
+        }
+      ]
+    },
+    {
+      "frame": 88,
+      "sourceWristY": 2.166625940797627,
+      "sourceFullySkinnedFist": {
+        "min": [
+          -2.771713125470351,
+          -0.6530186140414667,
+          2.769372124326882
+        ],
+        "max": [
+          2.432388781486305,
+          7.832153778977157,
+          7.098192493493321
+        ],
+        "mean": [
+          0.20170908626046943,
+          2.5061735559884513,
+          5.125209914812243
+        ]
+      },
+      "sourceWristMajoritySubset": {
+        "min": [
+          -2.771713125470351,
+          -0.6530186140414667,
+          2.769372124326882
+        ],
+        "max": [
+          2.380938328035143,
+          2.7466254459451345,
+          7.039329026450025
+        ],
+        "mean": [
+          -0.14433125299526536,
+          0.9502606320167408,
+          4.783759198398139
+        ]
+      },
+      "authoredGiantSkin": {
+        "min": [
+          -2.60715441919304,
+          -1.1564088917375466,
+          1.6511572519197648
+        ],
+        "max": [
+          4.003988957561663,
+          5.0372058730403,
+          7.844815461870785
+        ],
+        "mean": [
+          0.3385104934959138,
+          1.2051405517806508,
+          5.505091369291606
+        ]
+      },
+      "authoredThinSkin": {
+        "min": [
+          0.4986075205758549,
+          0.7365481902161799,
+          -4.908840403175027
+        ],
+        "max": [
+          2.9459110787704015,
+          2.770692826450243,
+          -2.8186037050850046
+        ],
+        "mean": [
+          1.987768696090371,
+          1.4983541179404851,
+          -3.5539834246829307
+        ]
+      },
+      "giantCubeMinima": [
+        {
+          "bone": "right_hand",
+          "cube": 0,
+          "minY": -1.1564088917375466
+        },
+        {
+          "bone": "right_hand",
+          "cube": 1,
+          "minY": 1.6176980688865383
+        },
+        {
+          "bone": "right_hand",
+          "cube": 2,
+          "minY": 0.18801828189102
+        },
+        {
+          "bone": "right_hand",
+          "cube": 3,
+          "minY": -0.4797952561129329
+        },
+        {
+          "bone": "right_finger_0",
+          "cube": 0,
+          "minY": -0.294999357386706
+        },
+        {
+          "bone": "right_finger_0",
+          "cube": 1,
+          "minY": -0.666019813302903
+        },
+        {
+          "bone": "right_finger_1",
+          "cube": 0,
+          "minY": 0.03813779546144879
+        },
+        {
+          "bone": "right_finger_1",
+          "cube": 1,
+          "minY": -0.619580796385373
+        },
+        {
+          "bone": "right_finger_2",
+          "cube": 0,
+          "minY": -0.11110988583318072
+        },
+        {
+          "bone": "right_finger_2",
+          "cube": 1,
+          "minY": -0.5731417196830101
+        },
+        {
+          "bone": "right_finger_3",
+          "cube": 0,
+          "minY": 0.10972346508498475
+        },
+        {
+          "bone": "right_finger_3",
+          "cube": 1,
+          "minY": -0.5267027054806475
+        }
+      ]
+    }
+  ],
+  "worstImpactCube": {
+    "bone": "right_finger_3",
+    "cube": 0,
+    "minY": -3.4142813343779
+  },
+  "attribution": {
+    "wristY": 0.3702343833391933,
+    "cubeCenterY": -1.911942926129613,
+    "cubeVerticalHalfSpan": 1.5023384082482871,
+    "centerBelowWrist": 2.2821773094688065,
+    "cubeBelowWrist": 3.784515717717093,
+    "sourceFistMinimumY": -2.4812143206610995,
+    "authoredExcessBelowBareSource": 0.9330670137168005,
+    "finding": "The deepest cuboid is right_finger_3 cube 0, the last authored knuckle. Mapping and native receiving geometry are correct. Extra extension belongs to authored shape/bind fitting, while bare source skin also crosses the root plane before the original pose/character solver. This does not isolate a safe uniform scale correction."
+  },
+  "controllerEvidence": [
+    {
+      "offset": 5696716,
+      "chunkType": "0x7f00000",
+      "payloadBytes": 111,
+      "payloadSha256": "c6ac498cbe17042dbafd5e2557497d23abb1475f3b96dab84e78e8f5b52c32cf",
+      "payloadHex": "34506f7365466978757050726f706572746965732831293a426568656d6f7468506f7365466978757050726f7065727469657300001c426568656d6f7468506f7365466978757050726f706572746965730014506f7365466978757050726f7065727469657300010000005e99f041",
+      "readableNames": [
+        "PoseFixupProperties",
+        "BehemothPoseFixupProperties",
+        "BehemothPoseFixupProperties",
+        "PoseFixupProperties"
+      ]
+    },
+    {
+      "offset": 5696839,
+      "chunkType": "0x7f00001",
+      "payloadBytes": 123,
+      "payloadSha256": "ec790db9f3e974aa9fee198b08ee274e44965c320f05aefd35280b99307947fe",
+      "payloadHex": "770000004d455441020000000c0000006a6f696e745f6f666673657417000000506f736553747261746567794a6f696e744f666673657401002895f96101000000010000000a0000006a6f696e74537475636b16000000506f736553747261746567794a6f696e74537475636b01002895f9610100000001000000",
+      "readableNames": [
+        "META",
+        "joint_offset",
+        "PoseStrategyJointOffset",
+        "jointStuck",
+        "PoseStrategyJointStuck"
+      ]
+    },
+    {
+      "offset": 5700996,
+      "chunkType": "0x7f00000",
+      "payloadBytes": 183,
+      "payloadSha256": "a6ab2d845587e33b0c25251c791a5cf984c9beab134b055a3a0c11aca0527ef5",
+      "payloadHex": "58726176656e706879736963733a3a496e74657273656374696f6e50726f706572746965734c6f616465722831293a426568656d6f7468537570706f7274696e67496e74657273656374696f6e50726f70657274696573000028426568656d6f7468537570706f7274696e67496e74657273656374696f6e50726f706572746965732c726176656e706879736963733a3a496e74657273656374696f6e50726f706572746965734c6f61646572000001000000350e118d",
+      "readableNames": [
+        "Xravenphysics::IntersectionPropertiesLoader",
+        "BehemothSupportingIntersectionProperties",
+        "BehemothSupportingIntersectionProperties",
+        "ravenphysics::IntersectionPropertiesLoader"
+      ]
+    },
+    {
+      "offset": 5701191,
+      "chunkType": "0x7f00001",
+      "payloadBytes": 44,
+      "payloadSha256": "fb3c4e16f6050fe725502cab83527c9838aa08806633ed0a7e8cbbd695f48660",
+      "payloadHex": "280000004d455441010000000f00000053696d756c617465644f626a6563740100000005000000576f726c64",
+      "readableNames": [
+        "META",
+        "SimulatedObject",
+        "World"
+      ]
+    },
+    {
+      "offset": 5701247,
+      "chunkType": "0x7f00000",
+      "payloadBytes": 103,
+      "payloadSha256": "48ef74f5751cf078616f1263d895cc92226cd216e2a30298da143a7aa8e34387",
+      "payloadHex": "30537570706f7274696e674c696d62446566696e6974696f6e2831293a426568656d6f74684c696d6247726f756e64000014426568656d6f74684c696d6247726f756e64000018537570706f7274696e674c696d62446566696e6974696f6e010000008d744b1e",
+      "readableNames": [
+        "SupportingLimbDefinition",
+        "BehemothLimbGround",
+        "BehemothLimbGround",
+        "SupportingLimbDefinition"
+      ]
+    },
+    {
+      "offset": 5701362,
+      "chunkType": "0x7f00001",
+      "payloadBytes": 151,
+      "payloadSha256": "009af903f6d905fd011b839f0dd7e9686c827f85906486e845332a256f12b54b",
+      "payloadHex": "930000004d4554410600000047726f756e64cdcccc3d28426568656d6f7468537570706f7274696e67496e74657273656374696f6e50726f7065727469657300000000000000000000000000000000000080bf000000000000c040000000410000b4420000000000000000ffffffff010000000100000000007a440000000000000000000000000000a041010000006666a63f00004040",
+      "readableNames": [
+        "META",
+        "Ground",
+        "BehemothSupportingIntersectionProperties"
+      ]
+    },
+    {
+      "offset": 5701525,
+      "chunkType": "0x7f00000",
+      "payloadBytes": 103,
+      "payloadSha256": "309261133e16c51a226e93fd548ea28b5a0d8d0912199f8114ce4cf2c92565c0",
+      "payloadHex": "30537570706f7274696e674c696d62446566696e6974696f6e4c6973742831293a426568656d6f74684c696d627300000010426568656d6f74684c696d62730000001c537570706f7274696e674c696d62446566696e6974696f6e4c69737401000000a6cda8ab",
+      "readableNames": [
+        "SupportingLimbDefinitionList",
+        "BehemothLimbs",
+        "BehemothLimbs",
+        "SupportingLimbDefinitionList"
+      ]
+    },
+    {
+      "offset": 5701640,
+      "chunkType": "0x7f00001",
+      "payloadBytes": 31,
+      "payloadSha256": "20defed8b345acf2033d9104636ab1bd9c9ad873bf38ab8a6c5233fae79dd404",
+      "payloadHex": "1b0000004d4554410100000012426568656d6f74684c696d6247726f756e64",
+      "readableNames": [
+        "META",
+        "BehemothLimbGround"
+      ]
+    },
+    {
+      "offset": 5702063,
+      "chunkType": "0x7f00001",
+      "payloadBytes": 4840,
+      "payloadSha256": "06cd4959a0d92a0d1392ce636e0d6f3189b0a13ca26c5eba002230c8bddf49cb",
+      "references": [
+        {
+          "text": "PoseFixupBehaviour",
+          "absoluteOffset": 5703302
+        },
+        {
+          "text": "BehemothPoseFixupProperties",
+          "absoluteOffset": 5703330
+        },
+        {
+          "text": "CharacterSolverBehaviour",
+          "absoluteOffset": 5703510
+        },
+        {
+          "text": "BehemothLimbs",
+          "absoluteOffset": 5703544
+        },
+        {
+          "text": "WallRunnerCharacterSolverProperties",
+          "absoluteOffset": 5703570
+        }
+      ]
+    }
+  ],
+  "knownFigGroundTracks": [],
+  "controllerBoundary": "See goliath-grounding-runtime-audit.json: JointStuckTrack begin/end message producer and consumer are traced, but no such track/activation is present in local behemoth raw/FIG data. Pure3D local TRS, segment-scale compensation, parent accumulation and inverse-bind palette are recovered. Actual post-fixup pose, external event participation, global scheduler and entity-to-ground transform remain unproven. Installed components are not proof of automatic fist IK.",
+  "contactCheck": {
+    "fixtureCount": 48,
+    "corners": 384,
+    "maxCornerErrorBlocks": 2.3013400179097535e-07,
+    "mapping": {
+      "right_hand": "Wrist_L",
+      "left_hand": "Wrist_R"
+    },
+    "conclusion": "Both rendered giant hand and unmapped knuckles use right_hand -> Wrist_L. Worst cuboid is included in independent source-world fixture; no receiving-only ground clamp or shrink."
+  },
+  "decision": "Do not change runtime geometry or wrist trajectory from this audit alone. Uniform/ground-height changes would conceal an unresolved source solver and shape-fitting problem. Decode controller semantics or obtain source-frame reference of the post-fixup pose before another support correction.",
+  "validation": "Source decoding, numeric transforms and resource inspection only. No Gradle, Java tests, GameTests or client."
+}

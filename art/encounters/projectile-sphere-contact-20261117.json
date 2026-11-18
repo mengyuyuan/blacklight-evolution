@@ -1,0 +1,64 @@
+{
+  "date": "2026-11-17",
+  "state": "pure geometry implemented in both source trees; not compiled or executed",
+  "scope": "Only static cuboid swept-sphere narrow phase. Source projectile radius is supplied by the caller; this implementation does not claim a recovered original engine collision algorithm.",
+  "api": {
+    "class": "com.codex.blacklight.combat.ProjectileSphereContact",
+    "methods": "sweep(Vec3 from,Vec3 to,double radius,HydraContact.Box|AABB|Vec3[]|List<Vec3>)",
+    "result": "Hit(fraction,center,point,normal), or null on no contact",
+    "corners": "Bit order X=1,Y=2,Z=4: origin,+X,+Y,+X+Y,+Z,+X+Z,+Y+Z,+X+Y+Z. These are transformed local edges, not world AABB extremes. Corners must form an affine cuboid; planar/linear/point degeneracy is supported.",
+    "boxAdapter": "HydraContact.Box.points is a 27-point x-major/y/z grid. Corner indices in the required bit order are [0,18,6,24,2,20,8,26]."
+  },
+  "mathBoundary": [
+    "For a fixed convex cuboid K, a sphere of radius r touches iff its center belongs to K plus the Euclidean ball B(r). First entry from outside belongs to an offset face patch, finite edge cylinder or vertex sphere.",
+    "The helper enumerates all six finite face patches at signed plane distance +/-r, twelve finite edge cylinders and eight vertex spheres. Both plane signs retain degenerate planar boxes. Full edge/vertex primitives introduce no false earlier entry: every accepted candidate has an actual point of K within r plus tolerance.",
+    "Quadratic roots use closest-line projection: t0=-dot(offset,travel)/|travel|^2 and t=t0 +/- sqrt((r^2-distanceToLine^2)/|travel|^2), avoiding subtraction of large discriminant terms. Edge axial bounds and face parallelogram coordinates reject infinite-feature extensions.",
+    "Initial solid containment or distance <= r returns fraction 0 and the nearest actual surface point. Zero radius, stationary segments and end-of-segment contacts have defined behavior. For nonzero separated first contact, normal is the actual contact-point-to-center unit vector.",
+    "Returns the least valid fraction in [0,1]. There is no per-tick sampling, iterative convergence stop or inflated-AABB narrow-phase result."
+  ],
+  "numerics": {
+    "arithmetic": "double, near-origin coordinates relative to corner 0",
+    "spatialTolerance": "1e-9 * max(1,radius,maxCornerDistance) + 8*ulp(maxAbsoluteInputWorldCoordinate)",
+    "candidateCheck": "Every candidate is clamped to segment endpoints and checked again against an actual cuboid point at radius + spatialTolerance. A near tangent within this tolerance counts as touching.",
+    "limits": "Affine input corner consistency allows four spatial tolerances. Nonfinite inputs/derived squared distances, face areas or volume are rejected with IllegalArgumentException. Features beneath floating-point representation or extreme ill-conditioning are limited by the supplied corner precision; no exact-arithmetic claim is made.",
+    "normalization": "Uses explicit division instead of Minecraft Vec3.normalize, whose small-vector cutoff would collapse normals of thin faces.",
+    "pose": "One static receiving pose per call. Continuous motion/deformation of the receiver, world queries, loaded chunks, ownership, PvP and candidate ordering remain caller responsibilities."
+  },
+  "pendingTests": {
+    "class": "com.codex.blacklight.combat.ProjectileSphereContactTest",
+    "methods": [
+      "faceHitDistinguishesProjectileCenterFromReceivingSurface",
+      "inflatedAabbEmptyCornerIsNotASphereHit",
+      "edgeAndVertexUseRoundedFirstContactRatherThanExpandedPlanes",
+      "shearedFacesUseTheirTrueWorldNormalAndCornerOverloadsAgree",
+      "translatedFastSweepKeepsThinGeometryAndEndpointContacts",
+      "tangentInitialOverlapAndZeroRadiusHaveDefinedResults",
+      "planarAndPointBoxesRemainRealSurfaces",
+      "rejectsInvalidInputAndNonAffineCornerOrdering"
+    ],
+    "runner": "Root thread owns adding this class to player-fix-unit.init.gradle; this task did not modify shared runners."
+  },
+  "staticValidation": [
+    "Reviewed face/edge/vertex decomposition and finite feature filters",
+    "Source/test are byte-identical across platforms",
+    "Trailing whitespace scan for these new untracked files"
+  ],
+  "notRun": [
+    "Gradle",
+    "javac",
+    "unit tests",
+    "GameTests",
+    "game/client",
+    "native DLL execution/emulation"
+  ],
+  "files": [
+    {
+      "file": "src/main/java/com/codex/blacklight/combat/ProjectileSphereContact.java",
+      "sha256": "0ef19a07494241402d1c660103331928d97e0d4c1b99fceffe20b06516f8dd1f"
+    },
+    {
+      "file": "src/test/java/com/codex/blacklight/combat/ProjectileSphereContactTest.java",
+      "sha256": "bf1b455649fc7601af913f7b3d15474ac131bf5d26050c575a1164b367e78edf"
+    }
+  ]
+}

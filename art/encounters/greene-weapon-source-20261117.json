@@ -1,0 +1,2029 @@
+{
+  "schema": 2,
+  "date": "2026-11-17",
+  "state": "six source weapon programs connected; compilation and gameplay deferred",
+  "userConstraint": "Continue code only. Compilation, tests and native gameplay are deferred.",
+  "sources": [
+    {
+      "path": "D:\\PrototypeReference\\p1\\input\\prototypeenginef.dll",
+      "sha256": "8cba8da3412df4f49cd61d02445e87a0cda551dea4f2fc1e66b19c1bfe28a760"
+    },
+    {
+      "path": "D:\\PrototypeReference\\p1\\input\\comparison\\mother_tod.p3d.rz",
+      "sha256": "1977fad275c92e99fed57639005a5cfb06e289b435dba7a7a5f6e50005ca9776"
+    },
+    {
+      "path": "D:\\PrototypeReference\\p1\\input\\comparison\\mother_fig.p3d.rz",
+      "sha256": "f446c9299ac8f06022b907e0c62b9b75e82f1def2729dc0da90a6f92f8043167"
+    },
+    {
+      "path": "D:\\PrototypeReference\\p1\\private\\comparison\\mother.p3d",
+      "sha256": "f67e081a7497191554de61995bdb75fad58cfca1cb53adeb9bd0b15ef8b97df6"
+    }
+  ],
+  "sockets": {
+    "VomitGun1": {
+      "bone": "native_Mouth",
+      "sourceJoint": "Mouth",
+      "sourceOffset": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "offset": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "sourceFile": "comparison/mother_tod.p3d.rz",
+      "sourceOffsetBytes": 13957
+    },
+    "VomitGun2": {
+      "bone": "native_Mouth",
+      "sourceJoint": "Mouth",
+      "sourceOffset": [
+        0.0,
+        1.399999976158142,
+        0.0
+      ],
+      "offset": [
+        0.0,
+        10.034292770584466,
+        0.0
+      ],
+      "sourceFile": "comparison/mother_tod.p3d.rz",
+      "sourceOffsetBytes": 14066
+    },
+    "VomitGun3": {
+      "bone": "native_Mouth",
+      "sourceJoint": "Mouth",
+      "sourceOffset": [
+        0.800000011920929,
+        0.699999988079071,
+        0.0
+      ],
+      "offset": [
+        5.733881766280041,
+        5.017146385292233,
+        0.0
+      ],
+      "sourceFile": "comparison/mother_tod.p3d.rz",
+      "sourceOffsetBytes": 14175
+    },
+    "VomitGun4": {
+      "bone": "native_Mouth",
+      "sourceJoint": "Mouth",
+      "sourceOffset": [
+        0.800000011920929,
+        -0.6000000238418579,
+        0.0
+      ],
+      "offset": [
+        5.733881766280041,
+        -4.3004114315119,
+        0.0
+      ],
+      "sourceFile": "comparison/mother_tod.p3d.rz",
+      "sourceOffsetBytes": 14284
+    },
+    "VomitGun5": {
+      "bone": "native_Mouth",
+      "sourceJoint": "Mouth",
+      "sourceOffset": [
+        0.0,
+        -0.800000011920929,
+        0.0
+      ],
+      "offset": [
+        0.0,
+        -5.733881766280041,
+        0.0
+      ],
+      "sourceFile": "comparison/mother_tod.p3d.rz",
+      "sourceOffsetBytes": 14393
+    },
+    "VomitGun6": {
+      "bone": "native_Mouth",
+      "sourceJoint": "Mouth",
+      "sourceOffset": [
+        -0.800000011920929,
+        -0.6000000238418579,
+        0.0
+      ],
+      "offset": [
+        -5.733881766280041,
+        -4.3004114315119,
+        0.0
+      ],
+      "sourceFile": "comparison/mother_tod.p3d.rz",
+      "sourceOffsetBytes": 14502
+    },
+    "VomitGun7": {
+      "bone": "native_Mouth",
+      "sourceJoint": "Mouth",
+      "sourceOffset": [
+        -0.800000011920929,
+        0.699999988079071,
+        0.0
+      ],
+      "offset": [
+        -5.733881766280041,
+        5.017146385292233,
+        0.0
+      ],
+      "sourceFile": "comparison/mother_tod.p3d.rz",
+      "sourceOffsetBytes": 14611
+    },
+    "VomitGun8": {
+      "bone": "native_Mouth",
+      "sourceJoint": "Mouth",
+      "sourceOffset": [
+        0.0,
+        0.5,
+        0.0
+      ],
+      "offset": [
+        0.0,
+        3.5836760505240917,
+        0.0
+      ],
+      "sourceFile": "comparison/mother_tod.p3d.rz",
+      "sourceOffsetBytes": 14721
+    },
+    "VomitGun9": {
+      "bone": "native_Mouth",
+      "sourceJoint": "Mouth",
+      "sourceOffset": [
+        0.0,
+        -0.4000000059604645,
+        0.0
+      ],
+      "offset": [
+        0.0,
+        -2.8669408831400207,
+        0.0
+      ],
+      "sourceFile": "comparison/mother_tod.p3d.rz",
+      "sourceOffsetBytes": 14831
+    },
+    "VomitGun10": {
+      "bone": "native_Mouth",
+      "sourceJoint": "Mouth",
+      "sourceOffset": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "offset": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "sourceFile": "comparison/mother_tod.p3d.rz",
+      "sourceOffsetBytes": 14942
+    }
+  },
+  "socketProvenance": {
+    "source": "D:\\PrototypeReference\\p1\\input\\comparison\\mother_tod.p3d.rz",
+    "sha256": "1977fad275c92e99fed57639005a5cfb06e289b435dba7a7a5f6e50005ca9776",
+    "state": "Original native Mouth hierarchy, independent of the embedded human Body_Root; same local ROT/TRAN/SCL as the posed outer-skin leaves.",
+    "registration": "prototypeenginef.dll 0x102c84c0",
+    "objectOffset": 11273
+  },
+  "sourceSkeleton": {
+    "name": "mother_core_skeleton",
+    "offset": 4265598,
+    "mouthIndex": 15,
+    "mouthParent": 9,
+    "headIndex": 9,
+    "headParent": 8,
+    "headParentName": "Spine_4"
+  },
+  "retargetBoundary": {
+    "reference": "original skeleton bind; native local channels, not an idle-frame delta",
+    "finding": "Original skin palettes distinguish outer Head/Mouth/Horn from the embedded human Body_Root/Body/Chest branches. The authored cubes now follow these native joint owners, with local ROT/TRAN/SCL and verified P1 parent-scale compensation.",
+    "decision": "The live six-program controller uses all thirteen original Shoot tracks and their actual VomitGun slots. Animation, hurt skin and full-scale Mouth position share one program pose; direction uses the proven attachment orthonormalization. Anti programs use slot10 and require the matching occupied hostile hull.",
+    "meshAdaptation": "All 150 authored cubes and UV values are retained. Rigid cuboid ownership approximates original blended vertex weights; client visual acceptance is deferred.",
+    "records": [
+      "art/encounters/greene-native-bind-correction.json",
+      "art/encounters/greene-native-scale-source.json"
+    ]
+  },
+  "ammo": [
+    {
+      "name": "motherVomit_DeathFlower_ammo",
+      "source": "startup_tod.p3d.rz",
+      "dataOffset": 276452,
+      "dataLength": 198,
+      "fullyConsumed": true,
+      "fields": {
+        "clipCapacity": 1000000,
+        "clipCapacityUnlockableAdd": 0,
+        "clipCapacityUnlockableFirst": 0,
+        "clipCapacityUnlockableLast": 0,
+        "fireRate": 0.20000000298023224,
+        "offCameraFireRateMultiplier": 1.0,
+        "fireRateUnlockableMultiplier": 0.0,
+        "fireRateUnlockableFirst": 0,
+        "fireRateUnlockableLast": 0,
+        "damageType": 35,
+        "attackType": 20,
+        "damageOnPlayer": 200.0,
+        "damageOnNPC": 35.0,
+        "damageUnlockableMultiplier": 0.0,
+        "damageUnlockableFirst": 0,
+        "damageUnlockableLast": 0,
+        "friendlyFire": 1.0,
+        "impulse": 100.0,
+        "speed": 40.0,
+        "distanceToLive": 175.0,
+        "tracerParams": "",
+        "initialVelocity": 12.0,
+        "initialDeceleration": 4.0,
+        "acceleration": 4.0,
+        "gravity": 0.0,
+        "timeToLive": 15.0,
+        "maxTurningVelocity": 0.5,
+        "interpolateMaxTurningVelocity": false,
+        "airFriction": 0.0,
+        "airFrictionIncreaseRate": 50.0,
+        "length": 0.0,
+        "timeToLockon": 0.0,
+        "performTracking": true,
+        "perfectlyAccurateTracking": false,
+        "proximity": 0.0,
+        "minDotBetweenHeadings": -1.0,
+        "inheritSpawnerVelocity": true,
+        "useOriginatorToValidateCollision": false,
+        "trackingPosition": 0,
+        "trackingDelay": 1.0,
+        "startTrackingWhenHigher": false,
+        "changingAccuracySpeed": -1.0,
+        "effectScale": 1.0,
+        "effectScaleX": 1.0,
+        "effectScaleY": 1.0,
+        "thickness": 0.0,
+        "spin": "",
+        "useOriginatorToRequestToken": false,
+        "intersectionProperties": "Missile"
+      },
+      "fieldOffsets": {
+        "clipCapacity": 276456,
+        "clipCapacityUnlockableAdd": 276460,
+        "clipCapacityUnlockableFirst": 276464,
+        "clipCapacityUnlockableLast": 276468,
+        "fireRate": 276472,
+        "offCameraFireRateMultiplier": 276476,
+        "fireRateUnlockableMultiplier": 276480,
+        "fireRateUnlockableFirst": 276484,
+        "fireRateUnlockableLast": 276488,
+        "damageType": 276492,
+        "attackType": 276496,
+        "damageOnPlayer": 276500,
+        "damageOnNPC": 276504,
+        "damageUnlockableMultiplier": 276508,
+        "damageUnlockableFirst": 276512,
+        "damageUnlockableLast": 276516,
+        "friendlyFire": 276520,
+        "impulse": 276524,
+        "speed": 276528,
+        "distanceToLive": 276532,
+        "tracerParams": 276536,
+        "initialVelocity": 276537,
+        "initialDeceleration": 276541,
+        "acceleration": 276545,
+        "gravity": 276549,
+        "timeToLive": 276553,
+        "maxTurningVelocity": 276557,
+        "interpolateMaxTurningVelocity": 276561,
+        "airFriction": 276565,
+        "airFrictionIncreaseRate": 276569,
+        "length": 276573,
+        "timeToLockon": 276577,
+        "performTracking": 276581,
+        "perfectlyAccurateTracking": 276585,
+        "proximity": 276589,
+        "minDotBetweenHeadings": 276593,
+        "inheritSpawnerVelocity": 276597,
+        "useOriginatorToValidateCollision": 276601,
+        "trackingPosition": 276605,
+        "trackingDelay": 276609,
+        "startTrackingWhenHigher": 276613,
+        "changingAccuracySpeed": 276617,
+        "effectScale": 276621,
+        "effectScaleX": 276625,
+        "effectScaleY": 276629,
+        "thickness": 276633,
+        "spin": 276637,
+        "useOriginatorToRequestToken": 276638,
+        "intersectionProperties": 276642
+      }
+    },
+    {
+      "name": "motherVomit_InsectSwarm_ammo",
+      "source": "startup_tod.p3d.rz",
+      "dataOffset": 276797,
+      "dataLength": 198,
+      "fullyConsumed": true,
+      "fields": {
+        "clipCapacity": 1000000,
+        "clipCapacityUnlockableAdd": 0,
+        "clipCapacityUnlockableFirst": 0,
+        "clipCapacityUnlockableLast": 0,
+        "fireRate": 6.0,
+        "offCameraFireRateMultiplier": 1.0,
+        "fireRateUnlockableMultiplier": 0.0,
+        "fireRateUnlockableFirst": 0,
+        "fireRateUnlockableLast": 0,
+        "damageType": 35,
+        "attackType": 20,
+        "damageOnPlayer": 60.0,
+        "damageOnNPC": 25.0,
+        "damageUnlockableMultiplier": 0.0,
+        "damageUnlockableFirst": 0,
+        "damageUnlockableLast": 0,
+        "friendlyFire": 0.0,
+        "impulse": 56.0,
+        "speed": 10.0,
+        "distanceToLive": 175.0,
+        "tracerParams": "",
+        "initialVelocity": 5.0,
+        "initialDeceleration": -1.0,
+        "acceleration": 3.0,
+        "gravity": 0.0,
+        "timeToLive": 5.0,
+        "maxTurningVelocity": 10.0,
+        "interpolateMaxTurningVelocity": false,
+        "airFriction": 0.0,
+        "airFrictionIncreaseRate": 50.0,
+        "length": 0.0,
+        "timeToLockon": 0.0,
+        "performTracking": true,
+        "perfectlyAccurateTracking": true,
+        "proximity": 1.0,
+        "minDotBetweenHeadings": -1.0,
+        "inheritSpawnerVelocity": true,
+        "useOriginatorToValidateCollision": false,
+        "trackingPosition": 0,
+        "trackingDelay": 1.0,
+        "startTrackingWhenHigher": false,
+        "changingAccuracySpeed": -1.0,
+        "effectScale": 1.0,
+        "effectScaleX": 1.0,
+        "effectScaleY": 1.0,
+        "thickness": 0.75,
+        "spin": "",
+        "useOriginatorToRequestToken": false,
+        "intersectionProperties": "Missile"
+      },
+      "fieldOffsets": {
+        "clipCapacity": 276801,
+        "clipCapacityUnlockableAdd": 276805,
+        "clipCapacityUnlockableFirst": 276809,
+        "clipCapacityUnlockableLast": 276813,
+        "fireRate": 276817,
+        "offCameraFireRateMultiplier": 276821,
+        "fireRateUnlockableMultiplier": 276825,
+        "fireRateUnlockableFirst": 276829,
+        "fireRateUnlockableLast": 276833,
+        "damageType": 276837,
+        "attackType": 276841,
+        "damageOnPlayer": 276845,
+        "damageOnNPC": 276849,
+        "damageUnlockableMultiplier": 276853,
+        "damageUnlockableFirst": 276857,
+        "damageUnlockableLast": 276861,
+        "friendlyFire": 276865,
+        "impulse": 276869,
+        "speed": 276873,
+        "distanceToLive": 276877,
+        "tracerParams": 276881,
+        "initialVelocity": 276882,
+        "initialDeceleration": 276886,
+        "acceleration": 276890,
+        "gravity": 276894,
+        "timeToLive": 276898,
+        "maxTurningVelocity": 276902,
+        "interpolateMaxTurningVelocity": 276906,
+        "airFriction": 276910,
+        "airFrictionIncreaseRate": 276914,
+        "length": 276918,
+        "timeToLockon": 276922,
+        "performTracking": 276926,
+        "perfectlyAccurateTracking": 276930,
+        "proximity": 276934,
+        "minDotBetweenHeadings": 276938,
+        "inheritSpawnerVelocity": 276942,
+        "useOriginatorToValidateCollision": 276946,
+        "trackingPosition": 276950,
+        "trackingDelay": 276954,
+        "startTrackingWhenHigher": 276958,
+        "changingAccuracySpeed": 276962,
+        "effectScale": 276966,
+        "effectScaleX": 276970,
+        "effectScaleY": 276974,
+        "thickness": 276978,
+        "spin": 276982,
+        "useOriginatorToRequestToken": 276983,
+        "intersectionProperties": 276987
+      }
+    },
+    {
+      "name": "motherVomit_ammo",
+      "source": "startup_tod.p3d.rz",
+      "dataOffset": 281316,
+      "dataLength": 214,
+      "fullyConsumed": true,
+      "fields": {
+        "clipCapacity": 1000000,
+        "clipCapacityUnlockableAdd": 0,
+        "clipCapacityUnlockableFirst": 0,
+        "clipCapacityUnlockableLast": 0,
+        "fireRate": 10.0,
+        "offCameraFireRateMultiplier": 1.0,
+        "fireRateUnlockableMultiplier": 0.0,
+        "fireRateUnlockableFirst": 0,
+        "fireRateUnlockableLast": 0,
+        "damageType": 35,
+        "attackType": 20,
+        "damageOnPlayer": 100.0,
+        "damageOnNPC": 25.0,
+        "damageUnlockableMultiplier": 0.0,
+        "damageUnlockableFirst": 0,
+        "damageUnlockableLast": 0,
+        "friendlyFire": 0.5,
+        "impulse": 56.0,
+        "speed": 60.0,
+        "distanceToLive": 175.0,
+        "tracerParams": "",
+        "initialVelocity": 10.0,
+        "initialDeceleration": -1.0,
+        "acceleration": -1.0,
+        "gravity": 0.0,
+        "timeToLive": 6.0,
+        "maxTurningVelocity": 1.0,
+        "interpolateMaxTurningVelocity": false,
+        "airFriction": 0.0,
+        "airFrictionIncreaseRate": 50.0,
+        "length": 0.0,
+        "timeToLockon": 0.0,
+        "performTracking": false,
+        "perfectlyAccurateTracking": false,
+        "proximity": 1.0,
+        "minDotBetweenHeadings": 0.0,
+        "inheritSpawnerVelocity": true,
+        "useOriginatorToValidateCollision": false,
+        "trackingPosition": 0,
+        "trackingDelay": 0.0,
+        "startTrackingWhenHigher": false,
+        "changingAccuracySpeed": -1.0,
+        "effectScale": 1.0,
+        "effectScaleX": 1.0,
+        "effectScaleY": 1.0,
+        "thickness": 0.5,
+        "spin": "motherVomit_Spin",
+        "useOriginatorToRequestToken": false,
+        "intersectionProperties": "Missile"
+      },
+      "fieldOffsets": {
+        "clipCapacity": 281320,
+        "clipCapacityUnlockableAdd": 281324,
+        "clipCapacityUnlockableFirst": 281328,
+        "clipCapacityUnlockableLast": 281332,
+        "fireRate": 281336,
+        "offCameraFireRateMultiplier": 281340,
+        "fireRateUnlockableMultiplier": 281344,
+        "fireRateUnlockableFirst": 281348,
+        "fireRateUnlockableLast": 281352,
+        "damageType": 281356,
+        "attackType": 281360,
+        "damageOnPlayer": 281364,
+        "damageOnNPC": 281368,
+        "damageUnlockableMultiplier": 281372,
+        "damageUnlockableFirst": 281376,
+        "damageUnlockableLast": 281380,
+        "friendlyFire": 281384,
+        "impulse": 281388,
+        "speed": 281392,
+        "distanceToLive": 281396,
+        "tracerParams": 281400,
+        "initialVelocity": 281401,
+        "initialDeceleration": 281405,
+        "acceleration": 281409,
+        "gravity": 281413,
+        "timeToLive": 281417,
+        "maxTurningVelocity": 281421,
+        "interpolateMaxTurningVelocity": 281425,
+        "airFriction": 281429,
+        "airFrictionIncreaseRate": 281433,
+        "length": 281437,
+        "timeToLockon": 281441,
+        "performTracking": 281445,
+        "perfectlyAccurateTracking": 281449,
+        "proximity": 281453,
+        "minDotBetweenHeadings": 281457,
+        "inheritSpawnerVelocity": 281461,
+        "useOriginatorToValidateCollision": 281465,
+        "trackingPosition": 281469,
+        "trackingDelay": 281473,
+        "startTrackingWhenHigher": 281477,
+        "changingAccuracySpeed": 281481,
+        "effectScale": 281485,
+        "effectScaleX": 281489,
+        "effectScaleY": 281493,
+        "thickness": 281497,
+        "spin": 281501,
+        "useOriginatorToRequestToken": 281518,
+        "intersectionProperties": 281522
+      }
+    },
+    {
+      "name": "motherVomit_ShotgunBlast_ammo",
+      "source": "startup_tod.p3d.rz",
+      "dataOffset": 281681,
+      "dataLength": 214,
+      "fullyConsumed": true,
+      "fields": {
+        "clipCapacity": 1000000,
+        "clipCapacityUnlockableAdd": 0,
+        "clipCapacityUnlockableFirst": 0,
+        "clipCapacityUnlockableLast": 0,
+        "fireRate": 150.0,
+        "offCameraFireRateMultiplier": 1.0,
+        "fireRateUnlockableMultiplier": 0.0,
+        "fireRateUnlockableFirst": 0,
+        "fireRateUnlockableLast": 0,
+        "damageType": 3,
+        "attackType": 20,
+        "damageOnPlayer": 50.0,
+        "damageOnNPC": 50.0,
+        "damageUnlockableMultiplier": 0.0,
+        "damageUnlockableFirst": 0,
+        "damageUnlockableLast": 0,
+        "friendlyFire": 0.20000000298023224,
+        "impulse": 56.0,
+        "speed": 40.0,
+        "distanceToLive": 175.0,
+        "tracerParams": "",
+        "initialVelocity": 40.0,
+        "initialDeceleration": -1.0,
+        "acceleration": -1.0,
+        "gravity": 0.0,
+        "timeToLive": 6.0,
+        "maxTurningVelocity": 1.0,
+        "interpolateMaxTurningVelocity": false,
+        "airFriction": 0.0,
+        "airFrictionIncreaseRate": 50.0,
+        "length": 0.0,
+        "timeToLockon": 0.0,
+        "performTracking": false,
+        "perfectlyAccurateTracking": false,
+        "proximity": 2.0,
+        "minDotBetweenHeadings": 0.0,
+        "inheritSpawnerVelocity": true,
+        "useOriginatorToValidateCollision": false,
+        "trackingPosition": 0,
+        "trackingDelay": 0.0,
+        "startTrackingWhenHigher": false,
+        "changingAccuracySpeed": -1.0,
+        "effectScale": 1.0,
+        "effectScaleX": 1.0,
+        "effectScaleY": 1.0,
+        "thickness": 0.0,
+        "spin": "motherVomit_Spin",
+        "useOriginatorToRequestToken": false,
+        "intersectionProperties": "Missile"
+      },
+      "fieldOffsets": {
+        "clipCapacity": 281685,
+        "clipCapacityUnlockableAdd": 281689,
+        "clipCapacityUnlockableFirst": 281693,
+        "clipCapacityUnlockableLast": 281697,
+        "fireRate": 281701,
+        "offCameraFireRateMultiplier": 281705,
+        "fireRateUnlockableMultiplier": 281709,
+        "fireRateUnlockableFirst": 281713,
+        "fireRateUnlockableLast": 281717,
+        "damageType": 281721,
+        "attackType": 281725,
+        "damageOnPlayer": 281729,
+        "damageOnNPC": 281733,
+        "damageUnlockableMultiplier": 281737,
+        "damageUnlockableFirst": 281741,
+        "damageUnlockableLast": 281745,
+        "friendlyFire": 281749,
+        "impulse": 281753,
+        "speed": 281757,
+        "distanceToLive": 281761,
+        "tracerParams": 281765,
+        "initialVelocity": 281766,
+        "initialDeceleration": 281770,
+        "acceleration": 281774,
+        "gravity": 281778,
+        "timeToLive": 281782,
+        "maxTurningVelocity": 281786,
+        "interpolateMaxTurningVelocity": 281790,
+        "airFriction": 281794,
+        "airFrictionIncreaseRate": 281798,
+        "length": 281802,
+        "timeToLockon": 281806,
+        "performTracking": 281810,
+        "perfectlyAccurateTracking": 281814,
+        "proximity": 281818,
+        "minDotBetweenHeadings": 281822,
+        "inheritSpawnerVelocity": 281826,
+        "useOriginatorToValidateCollision": 281830,
+        "trackingPosition": 281834,
+        "trackingDelay": 281838,
+        "startTrackingWhenHigher": 281842,
+        "changingAccuracySpeed": 281846,
+        "effectScale": 281850,
+        "effectScaleX": 281854,
+        "effectScaleY": 281858,
+        "thickness": 281862,
+        "spin": 281866,
+        "useOriginatorToRequestToken": 281883,
+        "intersectionProperties": 281887
+      }
+    },
+    {
+      "name": "motherVomit_AntiTank_ammo",
+      "source": "startup_tod.p3d.rz",
+      "dataOffset": 282038,
+      "dataLength": 214,
+      "fullyConsumed": true,
+      "fields": {
+        "clipCapacity": 1000000,
+        "clipCapacityUnlockableAdd": 0,
+        "clipCapacityUnlockableFirst": 0,
+        "clipCapacityUnlockableLast": 0,
+        "fireRate": 5.0,
+        "offCameraFireRateMultiplier": 1.0,
+        "fireRateUnlockableMultiplier": 0.0,
+        "fireRateUnlockableFirst": 0,
+        "fireRateUnlockableLast": 0,
+        "damageType": 3,
+        "attackType": 20,
+        "damageOnPlayer": 400.0,
+        "damageOnNPC": 400.0,
+        "damageUnlockableMultiplier": 0.0,
+        "damageUnlockableFirst": 0,
+        "damageUnlockableLast": 0,
+        "friendlyFire": 0.0,
+        "impulse": 2500.0,
+        "speed": 80.0,
+        "distanceToLive": 175.0,
+        "tracerParams": "",
+        "initialVelocity": 60.0,
+        "initialDeceleration": -1.0,
+        "acceleration": -1.0,
+        "gravity": 0.0,
+        "timeToLive": 6.0,
+        "maxTurningVelocity": 1.0,
+        "interpolateMaxTurningVelocity": false,
+        "airFriction": 0.0,
+        "airFrictionIncreaseRate": 50.0,
+        "length": 0.0,
+        "timeToLockon": 0.0,
+        "performTracking": false,
+        "perfectlyAccurateTracking": false,
+        "proximity": 0.0,
+        "minDotBetweenHeadings": 0.0,
+        "inheritSpawnerVelocity": true,
+        "useOriginatorToValidateCollision": false,
+        "trackingPosition": 0,
+        "trackingDelay": 0.0,
+        "startTrackingWhenHigher": false,
+        "changingAccuracySpeed": -1.0,
+        "effectScale": 1.0,
+        "effectScaleX": 1.0,
+        "effectScaleY": 1.0,
+        "thickness": 2.0,
+        "spin": "motherVomit_Spin",
+        "useOriginatorToRequestToken": false,
+        "intersectionProperties": "Missile"
+      },
+      "fieldOffsets": {
+        "clipCapacity": 282042,
+        "clipCapacityUnlockableAdd": 282046,
+        "clipCapacityUnlockableFirst": 282050,
+        "clipCapacityUnlockableLast": 282054,
+        "fireRate": 282058,
+        "offCameraFireRateMultiplier": 282062,
+        "fireRateUnlockableMultiplier": 282066,
+        "fireRateUnlockableFirst": 282070,
+        "fireRateUnlockableLast": 282074,
+        "damageType": 282078,
+        "attackType": 282082,
+        "damageOnPlayer": 282086,
+        "damageOnNPC": 282090,
+        "damageUnlockableMultiplier": 282094,
+        "damageUnlockableFirst": 282098,
+        "damageUnlockableLast": 282102,
+        "friendlyFire": 282106,
+        "impulse": 282110,
+        "speed": 282114,
+        "distanceToLive": 282118,
+        "tracerParams": 282122,
+        "initialVelocity": 282123,
+        "initialDeceleration": 282127,
+        "acceleration": 282131,
+        "gravity": 282135,
+        "timeToLive": 282139,
+        "maxTurningVelocity": 282143,
+        "interpolateMaxTurningVelocity": 282147,
+        "airFriction": 282151,
+        "airFrictionIncreaseRate": 282155,
+        "length": 282159,
+        "timeToLockon": 282163,
+        "performTracking": 282167,
+        "perfectlyAccurateTracking": 282171,
+        "proximity": 282175,
+        "minDotBetweenHeadings": 282179,
+        "inheritSpawnerVelocity": 282183,
+        "useOriginatorToValidateCollision": 282187,
+        "trackingPosition": 282191,
+        "trackingDelay": 282195,
+        "startTrackingWhenHigher": 282199,
+        "changingAccuracySpeed": 282203,
+        "effectScale": 282207,
+        "effectScaleX": 282211,
+        "effectScaleY": 282215,
+        "thickness": 282219,
+        "spin": 282223,
+        "useOriginatorToRequestToken": 282240,
+        "intersectionProperties": 282244
+      }
+    },
+    {
+      "name": "motherVomit_AntiAir_ammo",
+      "source": "startup_tod.p3d.rz",
+      "dataOffset": 282391,
+      "dataLength": 214,
+      "fullyConsumed": true,
+      "fields": {
+        "clipCapacity": 1000000,
+        "clipCapacityUnlockableAdd": 0,
+        "clipCapacityUnlockableFirst": 0,
+        "clipCapacityUnlockableLast": 0,
+        "fireRate": 5.0,
+        "offCameraFireRateMultiplier": 1.0,
+        "fireRateUnlockableMultiplier": 0.0,
+        "fireRateUnlockableFirst": 0,
+        "fireRateUnlockableLast": 0,
+        "damageType": 3,
+        "attackType": 11,
+        "damageOnPlayer": 100.0,
+        "damageOnNPC": 1000.0,
+        "damageUnlockableMultiplier": 0.0,
+        "damageUnlockableFirst": 0,
+        "damageUnlockableLast": 0,
+        "friendlyFire": 0.0,
+        "impulse": 5000.0,
+        "speed": 80.0,
+        "distanceToLive": 175.0,
+        "tracerParams": "",
+        "initialVelocity": 60.0,
+        "initialDeceleration": -1.0,
+        "acceleration": -1.0,
+        "gravity": 0.0,
+        "timeToLive": 6.0,
+        "maxTurningVelocity": 1.0,
+        "interpolateMaxTurningVelocity": false,
+        "airFriction": 0.0,
+        "airFrictionIncreaseRate": 50.0,
+        "length": 0.0,
+        "timeToLockon": 0.0,
+        "performTracking": false,
+        "perfectlyAccurateTracking": false,
+        "proximity": 0.0,
+        "minDotBetweenHeadings": 0.0,
+        "inheritSpawnerVelocity": true,
+        "useOriginatorToValidateCollision": false,
+        "trackingPosition": 0,
+        "trackingDelay": 0.0,
+        "startTrackingWhenHigher": false,
+        "changingAccuracySpeed": -1.0,
+        "effectScale": 1.0,
+        "effectScaleX": 1.0,
+        "effectScaleY": 1.0,
+        "thickness": 2.0,
+        "spin": "motherVomit_Spin",
+        "useOriginatorToRequestToken": false,
+        "intersectionProperties": "Missile"
+      },
+      "fieldOffsets": {
+        "clipCapacity": 282395,
+        "clipCapacityUnlockableAdd": 282399,
+        "clipCapacityUnlockableFirst": 282403,
+        "clipCapacityUnlockableLast": 282407,
+        "fireRate": 282411,
+        "offCameraFireRateMultiplier": 282415,
+        "fireRateUnlockableMultiplier": 282419,
+        "fireRateUnlockableFirst": 282423,
+        "fireRateUnlockableLast": 282427,
+        "damageType": 282431,
+        "attackType": 282435,
+        "damageOnPlayer": 282439,
+        "damageOnNPC": 282443,
+        "damageUnlockableMultiplier": 282447,
+        "damageUnlockableFirst": 282451,
+        "damageUnlockableLast": 282455,
+        "friendlyFire": 282459,
+        "impulse": 282463,
+        "speed": 282467,
+        "distanceToLive": 282471,
+        "tracerParams": 282475,
+        "initialVelocity": 282476,
+        "initialDeceleration": 282480,
+        "acceleration": 282484,
+        "gravity": 282488,
+        "timeToLive": 282492,
+        "maxTurningVelocity": 282496,
+        "interpolateMaxTurningVelocity": 282500,
+        "airFriction": 282504,
+        "airFrictionIncreaseRate": 282508,
+        "length": 282512,
+        "timeToLockon": 282516,
+        "performTracking": 282520,
+        "perfectlyAccurateTracking": 282524,
+        "proximity": 282528,
+        "minDotBetweenHeadings": 282532,
+        "inheritSpawnerVelocity": 282536,
+        "useOriginatorToValidateCollision": 282540,
+        "trackingPosition": 282544,
+        "trackingDelay": 282548,
+        "startTrackingWhenHigher": 282552,
+        "changingAccuracySpeed": 282556,
+        "effectScale": 282560,
+        "effectScaleX": 282564,
+        "effectScaleY": 282568,
+        "thickness": 282572,
+        "spin": 282576,
+        "useOriginatorToRequestToken": 282593,
+        "intersectionProperties": 282597
+      }
+    }
+  ],
+  "users": [
+    {
+      "name": "motherVomit_AntiAir_user_ai",
+      "source": "startup_tod.p3d.rz",
+      "dataOffset": 293908,
+      "dataLength": 140,
+      "fullyConsumed": true,
+      "fields": {
+        "infiniteAmmo": true,
+        "accuracyMin": -10.0,
+        "accuracyMax": 10.0,
+        "accuracyAngleMin": -50.0,
+        "accuracyAngleMax": 50.0,
+        "accuracyGainTime": 0.30000001192092896,
+        "accuracyGainTimer": "",
+        "accuracyMinWithSpeed": 0.0,
+        "accuracyMaxWithSpeed": 0.0,
+        "speedForMinAccuracy": -1.0,
+        "accuracyNonPlayerTargetScalar": 1.0,
+        "accuracyMinUnlockableMultiplier": 0.0,
+        "accuracyMinUnlockableMultiplierConfig": 0,
+        "accuracyUnlockableFirst": 0,
+        "accuracyUnlockableLast": 0,
+        "sameDirConsecutiveShots": false,
+        "resetAccuracyWhenNotShooting": false,
+        "pitchMinAngle": -180.0,
+        "pitchMaxAngle": 180.0,
+        "yawMinAngle": -180.0,
+        "yawMaxAngle": 180.0,
+        "lookAt": 2,
+        "useIntentionWhenNoTarget": false,
+        "useFreeAimingWhenNoTarget": false,
+        "useDeadReckoning": true,
+        "useAutoTarget": false,
+        "useGroundAccuracy": true,
+        "useRandomAccuracy": true,
+        "fixVerticalSign": true,
+        "heatMax": 0.0,
+        "cooldownDelay": 0.0,
+        "cooldownRate": 0.0,
+        "cooldownAmount": 0.0,
+        "heatPerShot": 0.0
+      },
+      "fieldOffsets": {
+        "infiniteAmmo": 293912,
+        "accuracyMin": 293916,
+        "accuracyMax": 293920,
+        "accuracyAngleMin": 293924,
+        "accuracyAngleMax": 293928,
+        "accuracyGainTime": 293932,
+        "accuracyGainTimer": 293936,
+        "accuracyMinWithSpeed": 293940,
+        "accuracyMaxWithSpeed": 293944,
+        "speedForMinAccuracy": 293948,
+        "accuracyNonPlayerTargetScalar": 293952,
+        "accuracyMinUnlockableMultiplier": 293956,
+        "accuracyMinUnlockableMultiplierConfig": 293960,
+        "accuracyUnlockableFirst": 293964,
+        "accuracyUnlockableLast": 293968,
+        "sameDirConsecutiveShots": 293972,
+        "resetAccuracyWhenNotShooting": 293976,
+        "pitchMinAngle": 293980,
+        "pitchMaxAngle": 293984,
+        "yawMinAngle": 293988,
+        "yawMaxAngle": 293992,
+        "lookAt": 293996,
+        "useIntentionWhenNoTarget": 294000,
+        "useFreeAimingWhenNoTarget": 294004,
+        "useDeadReckoning": 294008,
+        "useAutoTarget": 294012,
+        "useGroundAccuracy": 294016,
+        "useRandomAccuracy": 294020,
+        "fixVerticalSign": 294024,
+        "heatMax": 294028,
+        "cooldownDelay": 294032,
+        "cooldownRate": 294036,
+        "cooldownAmount": 294040,
+        "heatPerShot": 294044
+      }
+    },
+    {
+      "name": "motherVomit_DeathFlower_user_ai",
+      "source": "startup_tod.p3d.rz",
+      "dataOffset": 294203,
+      "dataLength": 140,
+      "fullyConsumed": true,
+      "fields": {
+        "infiniteAmmo": true,
+        "accuracyMin": 2.0,
+        "accuracyMax": 4.0,
+        "accuracyAngleMin": -1.1399999856948853,
+        "accuracyAngleMax": 1.1399999856948853,
+        "accuracyGainTime": 0.5,
+        "accuracyGainTimer": "",
+        "accuracyMinWithSpeed": 0.0,
+        "accuracyMaxWithSpeed": 0.0,
+        "speedForMinAccuracy": -1.0,
+        "accuracyNonPlayerTargetScalar": 0.0,
+        "accuracyMinUnlockableMultiplier": 0.0,
+        "accuracyMinUnlockableMultiplierConfig": 0,
+        "accuracyUnlockableFirst": 0,
+        "accuracyUnlockableLast": 0,
+        "sameDirConsecutiveShots": false,
+        "resetAccuracyWhenNotShooting": false,
+        "pitchMinAngle": -180.0,
+        "pitchMaxAngle": 180.0,
+        "yawMinAngle": -180.0,
+        "yawMaxAngle": 180.0,
+        "lookAt": 0,
+        "useIntentionWhenNoTarget": false,
+        "useFreeAimingWhenNoTarget": false,
+        "useDeadReckoning": true,
+        "useAutoTarget": false,
+        "useGroundAccuracy": false,
+        "useRandomAccuracy": false,
+        "fixVerticalSign": true,
+        "heatMax": 0.0,
+        "cooldownDelay": 0.0,
+        "cooldownRate": 0.0,
+        "cooldownAmount": 0.0,
+        "heatPerShot": 0.0
+      },
+      "fieldOffsets": {
+        "infiniteAmmo": 294207,
+        "accuracyMin": 294211,
+        "accuracyMax": 294215,
+        "accuracyAngleMin": 294219,
+        "accuracyAngleMax": 294223,
+        "accuracyGainTime": 294227,
+        "accuracyGainTimer": 294231,
+        "accuracyMinWithSpeed": 294235,
+        "accuracyMaxWithSpeed": 294239,
+        "speedForMinAccuracy": 294243,
+        "accuracyNonPlayerTargetScalar": 294247,
+        "accuracyMinUnlockableMultiplier": 294251,
+        "accuracyMinUnlockableMultiplierConfig": 294255,
+        "accuracyUnlockableFirst": 294259,
+        "accuracyUnlockableLast": 294263,
+        "sameDirConsecutiveShots": 294267,
+        "resetAccuracyWhenNotShooting": 294271,
+        "pitchMinAngle": 294275,
+        "pitchMaxAngle": 294279,
+        "yawMinAngle": 294283,
+        "yawMaxAngle": 294287,
+        "lookAt": 294291,
+        "useIntentionWhenNoTarget": 294295,
+        "useFreeAimingWhenNoTarget": 294299,
+        "useDeadReckoning": 294303,
+        "useAutoTarget": 294307,
+        "useGroundAccuracy": 294311,
+        "useRandomAccuracy": 294315,
+        "fixVerticalSign": 294319,
+        "heatMax": 294323,
+        "cooldownDelay": 294327,
+        "cooldownRate": 294331,
+        "cooldownAmount": 294335,
+        "heatPerShot": 294339
+      }
+    },
+    {
+      "name": "motherVomit_InsectSwarm_user_ai",
+      "source": "startup_tod.p3d.rz",
+      "dataOffset": 294498,
+      "dataLength": 140,
+      "fullyConsumed": true,
+      "fields": {
+        "infiniteAmmo": true,
+        "accuracyMin": 8.0,
+        "accuracyMax": 16.0,
+        "accuracyAngleMin": -1.1399999856948853,
+        "accuracyAngleMax": 1.1399999856948853,
+        "accuracyGainTime": 0.5,
+        "accuracyGainTimer": "",
+        "accuracyMinWithSpeed": 0.0,
+        "accuracyMaxWithSpeed": 0.0,
+        "speedForMinAccuracy": -1.0,
+        "accuracyNonPlayerTargetScalar": 0.0,
+        "accuracyMinUnlockableMultiplier": 0.0,
+        "accuracyMinUnlockableMultiplierConfig": 0,
+        "accuracyUnlockableFirst": 0,
+        "accuracyUnlockableLast": 0,
+        "sameDirConsecutiveShots": false,
+        "resetAccuracyWhenNotShooting": false,
+        "pitchMinAngle": -180.0,
+        "pitchMaxAngle": 180.0,
+        "yawMinAngle": -180.0,
+        "yawMaxAngle": 180.0,
+        "lookAt": 0,
+        "useIntentionWhenNoTarget": false,
+        "useFreeAimingWhenNoTarget": false,
+        "useDeadReckoning": true,
+        "useAutoTarget": false,
+        "useGroundAccuracy": false,
+        "useRandomAccuracy": false,
+        "fixVerticalSign": true,
+        "heatMax": 0.0,
+        "cooldownDelay": 0.0,
+        "cooldownRate": 0.0,
+        "cooldownAmount": 0.0,
+        "heatPerShot": 0.0
+      },
+      "fieldOffsets": {
+        "infiniteAmmo": 294502,
+        "accuracyMin": 294506,
+        "accuracyMax": 294510,
+        "accuracyAngleMin": 294514,
+        "accuracyAngleMax": 294518,
+        "accuracyGainTime": 294522,
+        "accuracyGainTimer": 294526,
+        "accuracyMinWithSpeed": 294530,
+        "accuracyMaxWithSpeed": 294534,
+        "speedForMinAccuracy": 294538,
+        "accuracyNonPlayerTargetScalar": 294542,
+        "accuracyMinUnlockableMultiplier": 294546,
+        "accuracyMinUnlockableMultiplierConfig": 294550,
+        "accuracyUnlockableFirst": 294554,
+        "accuracyUnlockableLast": 294558,
+        "sameDirConsecutiveShots": 294562,
+        "resetAccuracyWhenNotShooting": 294566,
+        "pitchMinAngle": 294570,
+        "pitchMaxAngle": 294574,
+        "yawMinAngle": 294578,
+        "yawMaxAngle": 294582,
+        "lookAt": 294586,
+        "useIntentionWhenNoTarget": 294590,
+        "useFreeAimingWhenNoTarget": 294594,
+        "useDeadReckoning": 294598,
+        "useAutoTarget": 294602,
+        "useGroundAccuracy": 294606,
+        "useRandomAccuracy": 294610,
+        "fixVerticalSign": 294614,
+        "heatMax": 294618,
+        "cooldownDelay": 294622,
+        "cooldownRate": 294626,
+        "cooldownAmount": 294630,
+        "heatPerShot": 294634
+      }
+    },
+    {
+      "name": "motherVomit_ShotgunBlast_user_ai",
+      "source": "startup_tod.p3d.rz",
+      "dataOffset": 294793,
+      "dataLength": 140,
+      "fullyConsumed": true,
+      "fields": {
+        "infiniteAmmo": true,
+        "accuracyMin": 1.0,
+        "accuracyMax": 4.0,
+        "accuracyAngleMin": -1.1399999856948853,
+        "accuracyAngleMax": 1.1399999856948853,
+        "accuracyGainTime": 0.30000001192092896,
+        "accuracyGainTimer": "",
+        "accuracyMinWithSpeed": 0.0,
+        "accuracyMaxWithSpeed": 0.0,
+        "speedForMinAccuracy": -1.0,
+        "accuracyNonPlayerTargetScalar": 0.0,
+        "accuracyMinUnlockableMultiplier": 0.0,
+        "accuracyMinUnlockableMultiplierConfig": 0,
+        "accuracyUnlockableFirst": 0,
+        "accuracyUnlockableLast": 0,
+        "sameDirConsecutiveShots": false,
+        "resetAccuracyWhenNotShooting": false,
+        "pitchMinAngle": -180.0,
+        "pitchMaxAngle": 180.0,
+        "yawMinAngle": -180.0,
+        "yawMaxAngle": 180.0,
+        "lookAt": 0,
+        "useIntentionWhenNoTarget": false,
+        "useFreeAimingWhenNoTarget": false,
+        "useDeadReckoning": false,
+        "useAutoTarget": false,
+        "useGroundAccuracy": false,
+        "useRandomAccuracy": true,
+        "fixVerticalSign": true,
+        "heatMax": 0.0,
+        "cooldownDelay": 0.0,
+        "cooldownRate": 0.0,
+        "cooldownAmount": 0.0,
+        "heatPerShot": 0.0
+      },
+      "fieldOffsets": {
+        "infiniteAmmo": 294797,
+        "accuracyMin": 294801,
+        "accuracyMax": 294805,
+        "accuracyAngleMin": 294809,
+        "accuracyAngleMax": 294813,
+        "accuracyGainTime": 294817,
+        "accuracyGainTimer": 294821,
+        "accuracyMinWithSpeed": 294825,
+        "accuracyMaxWithSpeed": 294829,
+        "speedForMinAccuracy": 294833,
+        "accuracyNonPlayerTargetScalar": 294837,
+        "accuracyMinUnlockableMultiplier": 294841,
+        "accuracyMinUnlockableMultiplierConfig": 294845,
+        "accuracyUnlockableFirst": 294849,
+        "accuracyUnlockableLast": 294853,
+        "sameDirConsecutiveShots": 294857,
+        "resetAccuracyWhenNotShooting": 294861,
+        "pitchMinAngle": 294865,
+        "pitchMaxAngle": 294869,
+        "yawMinAngle": 294873,
+        "yawMaxAngle": 294877,
+        "lookAt": 294881,
+        "useIntentionWhenNoTarget": 294885,
+        "useFreeAimingWhenNoTarget": 294889,
+        "useDeadReckoning": 294893,
+        "useAutoTarget": 294897,
+        "useGroundAccuracy": 294901,
+        "useRandomAccuracy": 294905,
+        "fixVerticalSign": 294909,
+        "heatMax": 294913,
+        "cooldownDelay": 294917,
+        "cooldownRate": 294921,
+        "cooldownAmount": 294925,
+        "heatPerShot": 294929
+      }
+    },
+    {
+      "name": "motherVomit_user_ai",
+      "source": "startup_tod.p3d.rz",
+      "dataOffset": 295064,
+      "dataLength": 140,
+      "fullyConsumed": true,
+      "fields": {
+        "infiniteAmmo": true,
+        "accuracyMin": 2.0,
+        "accuracyMax": 4.0,
+        "accuracyAngleMin": -1.1399999856948853,
+        "accuracyAngleMax": 1.1399999856948853,
+        "accuracyGainTime": 0.5,
+        "accuracyGainTimer": "",
+        "accuracyMinWithSpeed": 0.0,
+        "accuracyMaxWithSpeed": 0.0,
+        "speedForMinAccuracy": -1.0,
+        "accuracyNonPlayerTargetScalar": 0.0,
+        "accuracyMinUnlockableMultiplier": 0.0,
+        "accuracyMinUnlockableMultiplierConfig": 0,
+        "accuracyUnlockableFirst": 0,
+        "accuracyUnlockableLast": 0,
+        "sameDirConsecutiveShots": false,
+        "resetAccuracyWhenNotShooting": false,
+        "pitchMinAngle": -180.0,
+        "pitchMaxAngle": 180.0,
+        "yawMinAngle": -180.0,
+        "yawMaxAngle": 180.0,
+        "lookAt": 0,
+        "useIntentionWhenNoTarget": false,
+        "useFreeAimingWhenNoTarget": false,
+        "useDeadReckoning": true,
+        "useAutoTarget": false,
+        "useGroundAccuracy": false,
+        "useRandomAccuracy": false,
+        "fixVerticalSign": true,
+        "heatMax": 0.0,
+        "cooldownDelay": 0.0,
+        "cooldownRate": 0.0,
+        "cooldownAmount": 0.0,
+        "heatPerShot": 0.0
+      },
+      "fieldOffsets": {
+        "infiniteAmmo": 295068,
+        "accuracyMin": 295072,
+        "accuracyMax": 295076,
+        "accuracyAngleMin": 295080,
+        "accuracyAngleMax": 295084,
+        "accuracyGainTime": 295088,
+        "accuracyGainTimer": 295092,
+        "accuracyMinWithSpeed": 295096,
+        "accuracyMaxWithSpeed": 295100,
+        "speedForMinAccuracy": 295104,
+        "accuracyNonPlayerTargetScalar": 295108,
+        "accuracyMinUnlockableMultiplier": 295112,
+        "accuracyMinUnlockableMultiplierConfig": 295116,
+        "accuracyUnlockableFirst": 295120,
+        "accuracyUnlockableLast": 295124,
+        "sameDirConsecutiveShots": 295128,
+        "resetAccuracyWhenNotShooting": 295132,
+        "pitchMinAngle": 295136,
+        "pitchMaxAngle": 295140,
+        "yawMinAngle": 295144,
+        "yawMaxAngle": 295148,
+        "lookAt": 295152,
+        "useIntentionWhenNoTarget": 295156,
+        "useFreeAimingWhenNoTarget": 295160,
+        "useDeadReckoning": 295164,
+        "useAutoTarget": 295168,
+        "useGroundAccuracy": 295172,
+        "useRandomAccuracy": 295176,
+        "fixVerticalSign": 295180,
+        "heatMax": 295184,
+        "cooldownDelay": 295188,
+        "cooldownRate": 295192,
+        "cooldownAmount": 295196,
+        "heatPerShot": 295200
+      }
+    }
+  ],
+  "shootTracks": [
+    {
+      "source": "comparison/mother_fig.p3d.rz",
+      "offset": 13224,
+      "payload": 13236,
+      "length": 80,
+      "type": "Shoot",
+      "kind": "TrackHash",
+      "owner": "mother_core/opening/outside/attacks/#6a161751d18c9d89/shoot",
+      "fields": {
+        "Unknown1": 0,
+        "TimeBegin": 0,
+        "TimeEnd": 0.6666669845581055,
+        "ApplyOnParent": false,
+        "GrabSlot": {
+          "hash": "4130956212638112182",
+          "name": "VomitGun10"
+        },
+        "WeaponEntry": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "Shooter": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "AmmoProfile": {
+          "hash": "14683949136568950814",
+          "name": "motherVomit_AntiTank_ammo"
+        },
+        "UserProfile": {
+          "hash": "646115330911538108",
+          "name": "motherVomit_AntiAir_user_ai"
+        },
+        "FixedDirection": 0,
+        "FixedDirectionSpace": {
+          "hash": "15800074974379949085",
+          "name": "GameObjectSpace"
+        },
+        "FixedDirectionDirection": [
+          0,
+          120,
+          0
+        ]
+      },
+      "schema": "ShootTrack",
+      "end": 13324
+    },
+    {
+      "source": "comparison/mother_fig.p3d.rz",
+      "offset": 13424,
+      "payload": 13436,
+      "length": 80,
+      "type": "Shoot",
+      "kind": "TrackHash",
+      "owner": "mother_core/opening/outside/attacks/#6a161751d18c9d89/shoot",
+      "fields": {
+        "Unknown1": 0,
+        "TimeBegin": 0,
+        "TimeEnd": 0.6666669845581055,
+        "ApplyOnParent": false,
+        "GrabSlot": {
+          "hash": "4130956212638112182",
+          "name": "VomitGun10"
+        },
+        "WeaponEntry": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "Shooter": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "AmmoProfile": {
+          "hash": "11296417862971168516",
+          "name": "motherVomit_AntiAir_ammo"
+        },
+        "UserProfile": {
+          "hash": "646115330911538108",
+          "name": "motherVomit_AntiAir_user_ai"
+        },
+        "FixedDirection": 0,
+        "FixedDirectionSpace": {
+          "hash": "15800074974379949085",
+          "name": "GameObjectSpace"
+        },
+        "FixedDirectionDirection": [
+          0,
+          120,
+          0
+        ]
+      },
+      "schema": "ShootTrack",
+      "end": 13524
+    },
+    {
+      "source": "comparison/mother_fig.p3d.rz",
+      "offset": 22304,
+      "payload": 22316,
+      "length": 80,
+      "type": "Shoot",
+      "kind": "TrackHash",
+      "owner": "mother_core/opening/outside/attacks/#fc7f04ceefd03173/shoot/#685d5070bf562e9c/shoot",
+      "fields": {
+        "Unknown1": 0,
+        "TimeBegin": 0,
+        "TimeEnd": 0.16666699945926666,
+        "ApplyOnParent": false,
+        "GrabSlot": {
+          "hash": "17089150978820039929",
+          "name": "VomitGun2"
+        },
+        "WeaponEntry": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "Shooter": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "AmmoProfile": {
+          "hash": "12137971231204465565",
+          "name": "motherVomit_DeathFlower_ammo"
+        },
+        "UserProfile": {
+          "hash": "1663892914892600055",
+          "name": "motherVomit_DeathFlower_user_ai"
+        },
+        "FixedDirection": 1,
+        "FixedDirectionSpace": {
+          "hash": "17857802742059722934",
+          "name": "JointSpace"
+        },
+        "FixedDirectionDirection": [
+          90,
+          0,
+          0
+        ]
+      },
+      "schema": "ShootTrack",
+      "end": 22404
+    },
+    {
+      "source": "comparison/mother_fig.p3d.rz",
+      "offset": 22404,
+      "payload": 22416,
+      "length": 80,
+      "type": "Shoot",
+      "kind": "TrackHash",
+      "owner": "mother_core/opening/outside/attacks/#fc7f04ceefd03173/shoot/#685d5070bf562e9c/shoot",
+      "fields": {
+        "Unknown1": 0,
+        "TimeBegin": 0,
+        "TimeEnd": 0.16666699945926666,
+        "ApplyOnParent": false,
+        "GrabSlot": {
+          "hash": "17089150978820039933",
+          "name": "VomitGun6"
+        },
+        "WeaponEntry": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "Shooter": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "AmmoProfile": {
+          "hash": "12137971231204465565",
+          "name": "motherVomit_DeathFlower_ammo"
+        },
+        "UserProfile": {
+          "hash": "1663892914892600055",
+          "name": "motherVomit_DeathFlower_user_ai"
+        },
+        "FixedDirection": 1,
+        "FixedDirectionSpace": {
+          "hash": "15800074974379949085",
+          "name": "GameObjectSpace"
+        },
+        "FixedDirectionDirection": [
+          90,
+          0,
+          90
+        ]
+      },
+      "schema": "ShootTrack",
+      "end": 22504
+    },
+    {
+      "source": "comparison/mother_fig.p3d.rz",
+      "offset": 22504,
+      "payload": 22516,
+      "length": 80,
+      "type": "Shoot",
+      "kind": "TrackHash",
+      "owner": "mother_core/opening/outside/attacks/#fc7f04ceefd03173/shoot/#685d5070bf562e9c/shoot",
+      "fields": {
+        "Unknown1": 0,
+        "TimeBegin": 0,
+        "TimeEnd": 0.16666699945926666,
+        "ApplyOnParent": false,
+        "GrabSlot": {
+          "hash": "17089150978820039935",
+          "name": "VomitGun4"
+        },
+        "WeaponEntry": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "Shooter": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "AmmoProfile": {
+          "hash": "12137971231204465565",
+          "name": "motherVomit_DeathFlower_ammo"
+        },
+        "UserProfile": {
+          "hash": "1663892914892600055",
+          "name": "motherVomit_DeathFlower_user_ai"
+        },
+        "FixedDirection": 1,
+        "FixedDirectionSpace": {
+          "hash": "15800074974379949085",
+          "name": "GameObjectSpace"
+        },
+        "FixedDirectionDirection": [
+          90,
+          0,
+          -90
+        ]
+      },
+      "schema": "ShootTrack",
+      "end": 22604
+    },
+    {
+      "source": "comparison/mother_fig.p3d.rz",
+      "offset": 22604,
+      "payload": 22616,
+      "length": 80,
+      "type": "Shoot",
+      "kind": "TrackHash",
+      "owner": "mother_core/opening/outside/attacks/#fc7f04ceefd03173/shoot/#685d5070bf562e9c/shoot",
+      "fields": {
+        "Unknown1": 0,
+        "TimeBegin": 0,
+        "TimeEnd": 0.16666699945926666,
+        "ApplyOnParent": false,
+        "GrabSlot": {
+          "hash": "17089150978820039932",
+          "name": "VomitGun7"
+        },
+        "WeaponEntry": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "Shooter": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "AmmoProfile": {
+          "hash": "12137971231204465565",
+          "name": "motherVomit_DeathFlower_ammo"
+        },
+        "UserProfile": {
+          "hash": "1663892914892600055",
+          "name": "motherVomit_DeathFlower_user_ai"
+        },
+        "FixedDirection": 1,
+        "FixedDirectionSpace": {
+          "hash": "15800074974379949085",
+          "name": "GameObjectSpace"
+        },
+        "FixedDirectionDirection": [
+          90,
+          0,
+          45
+        ]
+      },
+      "schema": "ShootTrack",
+      "end": 22704
+    },
+    {
+      "source": "comparison/mother_fig.p3d.rz",
+      "offset": 22704,
+      "payload": 22716,
+      "length": 80,
+      "type": "Shoot",
+      "kind": "TrackHash",
+      "owner": "mother_core/opening/outside/attacks/#fc7f04ceefd03173/shoot/#685d5070bf562e9c/shoot",
+      "fields": {
+        "Unknown1": 0,
+        "TimeBegin": 0,
+        "TimeEnd": 0.16666699945926666,
+        "ApplyOnParent": false,
+        "GrabSlot": {
+          "hash": "17089150978820039928",
+          "name": "VomitGun3"
+        },
+        "WeaponEntry": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "Shooter": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "AmmoProfile": {
+          "hash": "12137971231204465565",
+          "name": "motherVomit_DeathFlower_ammo"
+        },
+        "UserProfile": {
+          "hash": "1663892914892600055",
+          "name": "motherVomit_DeathFlower_user_ai"
+        },
+        "FixedDirection": 1,
+        "FixedDirectionSpace": {
+          "hash": "15800074974379949085",
+          "name": "GameObjectSpace"
+        },
+        "FixedDirectionDirection": [
+          90,
+          0,
+          -45
+        ]
+      },
+      "schema": "ShootTrack",
+      "end": 22804
+    },
+    {
+      "source": "comparison/mother_fig.p3d.rz",
+      "offset": 23948,
+      "payload": 23960,
+      "length": 80,
+      "type": "Shoot",
+      "kind": "TrackHash",
+      "owner": "mother_core/opening/outside/attacks/#fc7f04ceefd03173/shoot/#520855e2eadde5f9/shoot",
+      "fields": {
+        "Unknown1": 0,
+        "TimeBegin": 0,
+        "TimeEnd": 0.20000000298023224,
+        "ApplyOnParent": false,
+        "GrabSlot": {
+          "hash": "17089150978820039922",
+          "name": "VomitGun9"
+        },
+        "WeaponEntry": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "Shooter": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "AmmoProfile": {
+          "hash": "8792684349545571518",
+          "name": "motherVomit_ShotgunBlast_ammo"
+        },
+        "UserProfile": {
+          "hash": "11579303632469837450",
+          "name": "motherVomit_ShotgunBlast_user_ai"
+        },
+        "FixedDirection": 0,
+        "FixedDirectionSpace": {
+          "hash": "15800074974379949085",
+          "name": "GameObjectSpace"
+        },
+        "FixedDirectionDirection": [
+          0,
+          120,
+          0
+        ]
+      },
+      "schema": "ShootTrack",
+      "end": 24048
+    },
+    {
+      "source": "comparison/mother_fig.p3d.rz",
+      "offset": 24048,
+      "payload": 24060,
+      "length": 80,
+      "type": "Shoot",
+      "kind": "TrackHash",
+      "owner": "mother_core/opening/outside/attacks/#fc7f04ceefd03173/shoot/#520855e2eadde5f9/shoot",
+      "fields": {
+        "Unknown1": 0,
+        "TimeBegin": 0.23333300650119781,
+        "TimeEnd": 0.4000000059604645,
+        "ApplyOnParent": false,
+        "GrabSlot": {
+          "hash": "17089150978820039923",
+          "name": "VomitGun8"
+        },
+        "WeaponEntry": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "Shooter": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "AmmoProfile": {
+          "hash": "8792684349545571518",
+          "name": "motherVomit_ShotgunBlast_ammo"
+        },
+        "UserProfile": {
+          "hash": "11579303632469837450",
+          "name": "motherVomit_ShotgunBlast_user_ai"
+        },
+        "FixedDirection": 0,
+        "FixedDirectionSpace": {
+          "hash": "15800074974379949085",
+          "name": "GameObjectSpace"
+        },
+        "FixedDirectionDirection": [
+          0,
+          120,
+          0
+        ]
+      },
+      "schema": "ShootTrack",
+      "end": 24148
+    },
+    {
+      "source": "comparison/mother_fig.p3d.rz",
+      "offset": 25972,
+      "payload": 25984,
+      "length": 80,
+      "type": "Shoot",
+      "kind": "TrackHash",
+      "owner": "mother_core/opening/outside/attacks/#fc7f04ceefd03173/shoot/#5f4237b2e81a8ded/shoot",
+      "fields": {
+        "Unknown1": 0,
+        "TimeBegin": 0,
+        "TimeEnd": 0.5,
+        "ApplyOnParent": false,
+        "GrabSlot": {
+          "hash": "17089150978820039930",
+          "name": "VomitGun1"
+        },
+        "WeaponEntry": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "Shooter": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "AmmoProfile": {
+          "hash": "10385617798714453632",
+          "name": "motherVomit_InsectSwarm_ammo"
+        },
+        "UserProfile": {
+          "hash": "14593609179547441456",
+          "name": "motherVomit_InsectSwarm_user_ai"
+        },
+        "FixedDirection": 0,
+        "FixedDirectionSpace": {
+          "hash": "15800074974379949085",
+          "name": "GameObjectSpace"
+        },
+        "FixedDirectionDirection": [
+          20,
+          10,
+          0
+        ]
+      },
+      "schema": "ShootTrack",
+      "end": 26072
+    },
+    {
+      "source": "comparison/mother_fig.p3d.rz",
+      "offset": 26072,
+      "payload": 26084,
+      "length": 80,
+      "type": "Shoot",
+      "kind": "TrackHash",
+      "owner": "mother_core/opening/outside/attacks/#fc7f04ceefd03173/shoot/#5f4237b2e81a8ded/shoot",
+      "fields": {
+        "Unknown1": 0,
+        "TimeBegin": 0.8333330154418945,
+        "TimeEnd": 1.0666699409484863,
+        "ApplyOnParent": false,
+        "GrabSlot": {
+          "hash": "17089150978820039929",
+          "name": "VomitGun2"
+        },
+        "WeaponEntry": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "Shooter": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "AmmoProfile": {
+          "hash": "10385617798714453632",
+          "name": "motherVomit_InsectSwarm_ammo"
+        },
+        "UserProfile": {
+          "hash": "14593609179547441456",
+          "name": "motherVomit_InsectSwarm_user_ai"
+        },
+        "FixedDirection": 0,
+        "FixedDirectionSpace": {
+          "hash": "15800074974379949085",
+          "name": "GameObjectSpace"
+        },
+        "FixedDirectionDirection": [
+          20,
+          -10,
+          0
+        ]
+      },
+      "schema": "ShootTrack",
+      "end": 26172
+    },
+    {
+      "source": "comparison/mother_fig.p3d.rz",
+      "offset": 26172,
+      "payload": 26184,
+      "length": 80,
+      "type": "Shoot",
+      "kind": "TrackHash",
+      "owner": "mother_core/opening/outside/attacks/#fc7f04ceefd03173/shoot/#5f4237b2e81a8ded/shoot",
+      "fields": {
+        "Unknown1": 0,
+        "TimeBegin": 1.5,
+        "TimeEnd": 2.0666699409484863,
+        "ApplyOnParent": false,
+        "GrabSlot": {
+          "hash": "17089150978820039934",
+          "name": "VomitGun5"
+        },
+        "WeaponEntry": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "Shooter": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "AmmoProfile": {
+          "hash": "10385617798714453632",
+          "name": "motherVomit_InsectSwarm_ammo"
+        },
+        "UserProfile": {
+          "hash": "14593609179547441456",
+          "name": "motherVomit_InsectSwarm_user_ai"
+        },
+        "FixedDirection": 0,
+        "FixedDirectionSpace": {
+          "hash": "15800074974379949085",
+          "name": "GameObjectSpace"
+        },
+        "FixedDirectionDirection": [
+          20,
+          -10,
+          0
+        ]
+      },
+      "schema": "ShootTrack",
+      "end": 26272
+    },
+    {
+      "source": "comparison/mother_fig.p3d.rz",
+      "offset": 27528,
+      "payload": 27540,
+      "length": 80,
+      "type": "Shoot",
+      "kind": "TrackHash",
+      "owner": "mother_core/opening/outside/attacks/#fc7f04ceefd03173/shoot/rifle/shoot",
+      "fields": {
+        "Unknown1": 0,
+        "TimeBegin": 0,
+        "TimeEnd": 1,
+        "ApplyOnParent": false,
+        "GrabSlot": {
+          "hash": "17089150978820039922",
+          "name": "VomitGun9"
+        },
+        "WeaponEntry": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "Shooter": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "AmmoProfile": {
+          "hash": "12657474862656811827",
+          "name": "motherVomit_ammo"
+        },
+        "UserProfile": {
+          "hash": "13171000017010108609",
+          "name": "motherVomit_user_ai"
+        },
+        "FixedDirection": 0,
+        "FixedDirectionSpace": {
+          "hash": "15800074974379949085",
+          "name": "GameObjectSpace"
+        },
+        "FixedDirectionDirection": [
+          0,
+          120,
+          0
+        ]
+      },
+      "schema": "ShootTrack",
+      "end": 27628
+    }
+  ],
+  "targetGates": [
+    {
+      "source": "comparison/mother_fig.p3d.rz",
+      "offset": 13184,
+      "payload": 13196,
+      "length": 0,
+      "type": "TargetIsTank",
+      "kind": "ConditionHash",
+      "owner": "mother_core/opening/outside/attacks/#6a161751d18c9d89/shoot",
+      "fields": {},
+      "schema": "TargetIsTankCondition",
+      "end": 13204
+    },
+    {
+      "source": "comparison/mother_fig.p3d.rz",
+      "offset": 13384,
+      "payload": 13396,
+      "length": 0,
+      "type": "TargetIsHelicopter",
+      "kind": "ConditionHash",
+      "owner": "mother_core/opening/outside/attacks/#6a161751d18c9d89/shoot",
+      "fields": {},
+      "schema": "TargetIsHelicopterCondition",
+      "end": 13404
+    }
+  ],
+  "executeTracks": [
+    {
+      "source": "comparison/mother_fig.p3d.rz",
+      "offset": 12636,
+      "payload": 12648,
+      "length": 20,
+      "type": "Execute",
+      "kind": "TrackHash",
+      "owner": "mother_core/opening/outside/attacks/#6a161751d18c9d89",
+      "fields": {
+        "Unknown1": 1,
+        "TimeBegin": 0.6666669845581055,
+        "TimeEnd": -1,
+        "BranchRef": {
+          "name": "",
+          "index": 22
+        }
+      },
+      "schema": "ExecuteTrack",
+      "end": 12696
+    },
+    {
+      "source": "comparison/mother_fig.p3d.rz",
+      "offset": 21916,
+      "payload": 21928,
+      "length": 20,
+      "type": "Execute",
+      "kind": "TrackHash",
+      "owner": "mother_core/opening/outside/attacks/#fc7f04ceefd03173/shoot/#685d5070bf562e9c",
+      "fields": {
+        "Unknown1": 1,
+        "TimeBegin": 2.333329916000366,
+        "TimeEnd": -0.03333330154418945,
+        "BranchRef": {
+          "name": "",
+          "index": 34
+        }
+      },
+      "schema": "ExecuteTrack",
+      "end": 21976
+    },
+    {
+      "source": "comparison/mother_fig.p3d.rz",
+      "offset": 23564,
+      "payload": 23576,
+      "length": 20,
+      "type": "Execute",
+      "kind": "TrackHash",
+      "owner": "mother_core/opening/outside/attacks/#fc7f04ceefd03173/shoot/#520855e2eadde5f9",
+      "fields": {
+        "Unknown1": 1,
+        "TimeBegin": 0.33333298563957214,
+        "TimeEnd": -1,
+        "BranchRef": {
+          "name": "",
+          "index": 36
+        }
+      },
+      "schema": "ExecuteTrack",
+      "end": 23624
+    },
+    {
+      "source": "comparison/mother_fig.p3d.rz",
+      "offset": 25532,
+      "payload": 25544,
+      "length": 20,
+      "type": "Execute",
+      "kind": "TrackHash",
+      "owner": "mother_core/opening/outside/attacks/#fc7f04ceefd03173/shoot/#5f4237b2e81a8ded",
+      "fields": {
+        "Unknown1": 1,
+        "TimeBegin": 2,
+        "TimeEnd": -1,
+        "BranchRef": {
+          "name": "",
+          "index": 38
+        }
+      },
+      "schema": "ExecuteTrack",
+      "end": 25592
+    },
+    {
+      "source": "comparison/mother_fig.p3d.rz",
+      "offset": 27144,
+      "payload": 27156,
+      "length": 20,
+      "type": "Execute",
+      "kind": "TrackHash",
+      "owner": "mother_core/opening/outside/attacks/#fc7f04ceefd03173/shoot/rifle",
+      "fields": {
+        "Unknown1": 1,
+        "TimeBegin": 0.6666669845581055,
+        "TimeEnd": -1,
+        "BranchRef": {
+          "name": "",
+          "index": 40
+        }
+      },
+      "schema": "ExecuteTrack",
+      "end": 27204
+    }
+  ],
+  "nativeStatic": {
+    "GrabAutoSpawn": "0x102c84c0 orders grabSlot, spawnTemplate, parentJoint, parentPositionOffset, parentRotationOffset, childJoint, childPositionOffset, childRotationOffset, aICharacter, initialPlaybackNode.",
+    "ShootAction": "0x101122e0 converts FixedDirectionDirection degrees with constant 0x10d93e54, calls 0x107bb870, negates matrix third row, resolves requested space with 0x10259660, normalizes, then sends a weapon firing event. FixedDirection=false takes a separate targeting event path.",
+    "EulerForward": "For x,y,z radians, negated third row is [-(cos(z)*cos(x)*sin(y)+sin(z)*sin(x)), -(sin(z)*cos(x)*sin(y)-cos(z)*sin(x)), -cos(y)*cos(x)].",
+    "ShootEnd": "0x10111b00 sends weapon stop and restores saved ammo/user profiles.",
+    "closedThisPass": "Weapon-context space mapping, empty-joint fallback, final attachment orthonormalization, one-attempt-per-native-update cadence, and six MissileBehaviour flight profiles now have instruction-level evidence in the linked records.",
+    "remaining": "Original AI emotional-state producer, accuracy/error distribution, projectile-template final-action bodies, spin/visual assets and force delivery are not fully reconstructed."
+  },
+  "implementationRecords": [
+    "art/encounters/greene-missile-flight-source.json",
+    "art/encounters/greene-mouth-attachment-source.json",
+    "art/encounters/greene-program-integration-20261117.json",
+    "art/encounters/projectile-sphere-contact-20261117.json"
+  ],
+  "knownLiveGaps": [
+    "All four on-foot states are reachable through an explicitly identified MC round-robin adapter, not the unported original emotional-state producer.",
+    "MC samples source Shoot windows at 20 Hz with one attempt per socket/update; source shotgun rate150 is frame-limited, not replaced by an invented multi-pellet loop.",
+    "Original accuracy/error sampling and projectile-template bodies are missing: no invented blast radius, Euler spread, spin or original audiovisual claim.",
+    "Living damage preserves source player/NPC ratios through explicit .06 MC balance; mechanical hits use source NPC damage with the existing armor/protection adapter. Source impulse/friendly-fire semantics are not transplanted.",
+    "Proximity ends the missile; direct single-target damage is delivered only to a visible actual target surface, a documented MC fallback until original final-action template bodies are found.",
+    "Aircraft use their current body envelope; animated-body collision samples the current pose, not a continuous moving-target sweep. Client visuals, controls and balance still require gameplay validation."
+  ],
+  "verification": "Static file/byte/transform review only. No Java compilation, unit/GameTests, original-DLL execution or game/client launch."
+}

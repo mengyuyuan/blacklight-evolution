@@ -1,0 +1,226 @@
+{
+  "schema": 1,
+  "status": "implemented_dual_loader_static_checked_not_yet_java_or_game_verified",
+  "source": "D:\\PrototypeReference\\p2\\input\\p2\\behemoth.p3d",
+  "sourceSha256": "3737ff61e7042391bf12c95c2018e034f52a1945983d0a7053608a01d69240c7",
+  "sourceSkin": {
+    "name": "behemoth_TorsoShape001_skin",
+    "chunkType": "0x10040",
+    "offset": 3621687,
+    "vertices": 2225,
+    "positiveWeightThreshold": 0.01,
+    "verticesWithInfluence": {
+      "Pelvis": 485,
+      "Spine_1": 245,
+      "Spine_2": 379,
+      "Spine_3": 925
+    },
+    "coordinateSpace": "All four influences belong to the same behemoth_skeleton raw-bind space; source-world * inverse(raw bind) is used before the common MC axis conversion."
+  },
+  "confirmedCause": {
+    "authoredTorsoPivot": [
+      0,
+      56,
+      4
+    ],
+    "wrongWholeBodyMapping": "Spine_3",
+    "referenceSpine3Pixels": [
+      30.35080559804017,
+      94.0016396725485,
+      20.32729519423716
+    ],
+    "idleBeforeHipGapBlocks": {
+      "left": 1.9649762501238428,
+      "right": 1.8527293510590457
+    },
+    "explanation": "Waist pivot and all chest/abdomen cubes were moved rigidly to the upper chest joint. Source hips remained correct, leaving the abdomen nearly two blocks above them. Source root travel was not responsible."
+  },
+  "implementation": {
+    "sections": [
+      {
+        "bone": "torso",
+        "source": "Spine_3",
+        "originalCubeIndices": [
+          0,
+          3,
+          4,
+          6,
+          7,
+          10,
+          11,
+          12,
+          14,
+          15,
+          18
+        ],
+        "authoredPivot": [
+          0,
+          92,
+          4
+        ],
+        "sourceReferencePivotPixels": [
+          30.35080559804017,
+          94.0016396725485,
+          20.32729519423716
+        ],
+        "sourceSpan": [
+          "Spine_2",
+          "Spine_3"
+        ],
+        "authoredSpanPixels": 18.8,
+        "crossSectionScale": 0.7754687624256505,
+        "originalMiddleCubeHalf": null,
+        "orientation": "Raw-bind spine axis followed by source reference * inverse raw joint basis; preserves source pelvis/chest twist",
+        "crossSectionBasis": "Unchanged authored chest cross-section scale",
+        "longitudinalScale": 1.2872635687544889,
+        "authoredLongitudinalFit": 1.6599812025025413
+      },
+      {
+        "bone": "torso_middle",
+        "source": "Spine_2",
+        "originalCubeIndices": [
+          1,
+          5,
+          8,
+          13,
+          16
+        ],
+        "authoredPivot": [
+          0,
+          73.2,
+          4
+        ],
+        "sourceReferencePivotPixels": [
+          27.17741987620791,
+          70.02678855515154,
+          21.746183726047132
+        ],
+        "sourceSpan": [
+          "Spine_2",
+          "Spine_3"
+        ],
+        "authoredSpanPixels": 18.8,
+        "crossSectionScale": 0.7754687624256505,
+        "originalMiddleCubeHalf": "upper",
+        "orientation": "Raw-bind spine axis followed by source reference * inverse raw joint basis; preserves source pelvis/chest twist",
+        "crossSectionBasis": "Unchanged authored chest cross-section scale",
+        "longitudinalScale": 1.2872635687544889,
+        "authoredLongitudinalFit": 1.6599812025025413
+      },
+      {
+        "bone": "torso_waist",
+        "source": "Spine_1",
+        "originalCubeIndices": [
+          1,
+          9,
+          17
+        ],
+        "authoredPivot": [
+          0,
+          56,
+          4
+        ],
+        "sourceReferencePivotPixels": [
+          25.854884023269385,
+          46.061397588073156,
+          24.840942950314332
+        ],
+        "sourceSpan": [
+          "Pelvis",
+          "Spine_2"
+        ],
+        "authoredSpanPixels": 17.2,
+        "crossSectionScale": 0.7754687624256505,
+        "originalMiddleCubeHalf": "lower",
+        "orientation": "Raw-bind spine axis followed by source reference * inverse raw joint basis; preserves source pelvis/chest twist",
+        "crossSectionBasis": "Unchanged authored chest cross-section scale",
+        "longitudinalScale": 1.4072139487974527,
+        "authoredLongitudinalFit": 1.8146623268172866
+      },
+      {
+        "bone": "torso_lower",
+        "source": "Pelvis",
+        "originalCubeIndices": [
+          2
+        ],
+        "authoredPivot": [
+          0,
+          56,
+          4
+        ],
+        "sourceReferencePivotPixels": [
+          25.854884023269385,
+          46.05786735673383,
+          24.838650007729548
+        ],
+        "sourceSpan": [
+          "Pelvis",
+          "Spine_2"
+        ],
+        "authoredSpanPixels": 17.2,
+        "crossSectionScale": 1.0922947727464938,
+        "originalMiddleCubeHalf": null,
+        "orientation": "Raw-bind spine axis followed by source reference * inverse raw joint basis; preserves source pelvis/chest twist",
+        "crossSectionBasis": "Source hip span / authored hip span",
+        "longitudinalScale": 1.4072139487974527,
+        "authoredLongitudinalFit": 1.288309697993993
+      }
+    ],
+    "rawBindFit": "Longitudinal spans follow native spine distances. Reference * inverse(raw joint) preserves pelvis/chest twist. Pelvis cross section follows source/authored hip-span ratio; upper chest width/depth are unchanged. This is an explicit authored cuboid fit, not native weighted mesh import.",
+    "middleCubePartition": {
+      "originalIndex": 1,
+      "originalOrigin": [
+        -23.6,
+        61.0,
+        -15.0
+      ],
+      "originalSize": [
+        47.2,
+        24.4,
+        38.0
+      ],
+      "cutY": 73.2,
+      "result": "Lower and upper half have exactly the original combined pre-fit volume; north/south/east/west UV rectangles partition at the same midpoint. Internal cap faces reuse existing material. No gap-covering cube was added."
+    },
+    "totalCubesBefore": 95,
+    "totalCubesAfter": 96,
+    "receivingRegionsAdded": [
+      "torso_middle",
+      "torso_waist",
+      "torso_lower"
+    ],
+    "rendererAndContact": "Both load goliath_mc.geo.json and encounter_goliath_source.json. No separate receiving-only enlargement or pose clamp. weak_0/weak_1 and all old non-torso regions retain their identities."
+  },
+  "unchanged": {
+    "oldPoseBones": 97,
+    "newPoseBones": 103,
+    "oldPoseRowsCompared": 214564,
+    "changedOldPoseRows": 0,
+    "sourceFrames": 2212,
+    "oldClips": 17,
+    "oldClipSourcesFpsSecondsUnchanged": true,
+    "oldGeoBonesChanged": [
+      "torso"
+    ],
+    "nonTorsoGeoUnchanged": true,
+    "legacy48HandWeakFixturesByteIdentical": true,
+    "textureUnchanged": true,
+    "attackTimingDamageAndRootMotionUntouched": true
+  },
+  "pendingJavaTests": {
+    "class": "GoliathTorsoBindingTest",
+    "methods": 3,
+    "independentCornerFixtures": 66,
+    "expectedRuns": "All authored torso receiving boxes against source-world corners at 3 yaws; every source frame checks all five body joins; broken weak plates preserve torso regions."
+  },
+  "previews": {
+    "full": "goliath-torso-connections-preview.png",
+    "waist": "goliath-torso-connections-waist-preview.png",
+    "method": "Same numerical Gecko/cube transforms, fixed camera and scale, original atlas face-average colors. Waist sheet deliberately hides arms for diagnosis. This is not a screenshot or final material/lighting acceptance."
+  },
+  "limits": [
+    "Original giant-fist support-plane/controller gap remains; this does not lift any source joint or body root.",
+    "Existing foot/shin/weak-plate attachment concerns are outside this abdomen connection change and were not silently retuned.",
+    "Java/GameTest and actual client verification remain pending; source-frame geometric evidence alone is not a player-visible pass."
+  ]
+}

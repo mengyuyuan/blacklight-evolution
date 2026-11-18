@@ -54,6 +54,18 @@ public final class ConsumeSequence {
         return switch(form){case HAMMERFISTS->"large_hammer";case MUSCLE_MASS->"large_muscle";case WHIPFIST->"large_whip";case CLAWS->"large_claws";case BLADE->"blade";default->"large";};
     }
     public static String key(PowerForm form,int variant) {
+        int selected=ConsumeVariant.normalize(form,variant);
+        if(form==PowerForm.NONE)return switch(selected){
+            case ConsumeVariant.HEAD_STOMP -> "normal_head_stomp";
+            case ConsumeVariant.BEATDOWN -> "normal_beatdown";
+            case ConsumeVariant.KNEE_HEAD -> "normal_knee_head";
+            case ConsumeVariant.STEALTH_NECK -> "stealth_neck";
+            case ConsumeVariant.STEALTH_BEARHUG -> "stealth_bearhug";
+            case ConsumeVariant.STEALTH_NELSON -> "stealth_nelson";
+            case ConsumeVariant.STEALTH_GUILLOTINE -> "stealth_guillotine";
+            case ConsumeVariant.STEALTH_JUGULAR -> "stealth_jugular";
+            default -> "normal";
+        };
         if(ConsumeVariant.normalize(form,variant)==ConsumeVariant.CLASSIC)
             return form==PowerForm.CLAWS?"claws_head":"whip_lash";
         return key(form);
@@ -70,7 +82,7 @@ public final class ConsumeSequence {
                 || target.getBbWidth()*target.getBbWidth()*target.getBbHeight()>=3.2F;
     }
     public static boolean boss(LivingEntity target) {
-        return target instanceof EnderDragon||target instanceof WitherBoss||target instanceof com.codex.blacklight.entity.BlacklightSupremeHunter
+        return target instanceof com.codex.blacklight.entity.EncounterMob encounter && encounter.kind().boss || target instanceof EnderDragon||target instanceof WitherBoss||target instanceof com.codex.blacklight.entity.BlacklightSupremeHunter
                 ||target instanceof com.codex.blacklight.entity.BlacklightInfectedHost host&&(host.giantBoss()||host.encounterBoss());
     }
     public static boolean humanoid(LivingEntity target) {
@@ -104,6 +116,15 @@ public final class ConsumeSequence {
         if(target instanceof com.codex.blacklight.entity.BlacklightInfectedHost host&&host.hasMultipartBody())
             for(var part:host.getParts())if(part.active()&&part.partName().equals("head"))return part.getBoundingBox().getCenter();
         return target.position().add(0,target.getBbHeight()*.72,0);
+    }
+    /** Brute's back socket and its paired actor must share the captured body heading. */
+    public static boolean bruteMount(LivingEntity target){
+        return target instanceof com.codex.blacklight.entity.BlacklightMutant mutant
+                &&mutant.kind()==com.codex.blacklight.entity.BlacklightMutant.Kind.BRUTE;
+    }
+    public static void mountFacing(LivingEntity target,float yaw){
+        target.setYRot(yaw);target.yRotO=yaw;
+        target.setYHeadRot(yaw);target.yHeadRotO=yaw;target.yBodyRot=yaw;target.yBodyRotO=yaw;
     }
     public static Vec3 mount(LivingEntity target) {
         Vec3 forward=Vec3.directionFromRotation(0,target.getYRot());

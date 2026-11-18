@@ -18,7 +18,7 @@
     }
   ],
   "result": {
-    "count": 2,
-    "item": "blacklight:missile_round"
+    "item": "blacklight:missile_round",
+    "count": 2
   }
 }

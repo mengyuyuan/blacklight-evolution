@@ -1,0 +1,110 @@
+{
+  "date": "2026-11-14",
+  "status": "Hunter focused regression passed; overall creature reproduction remains incomplete.",
+  "checks": [
+    {
+      "platform": "neo",
+      "unit": {
+        "tests": 34,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "gameTests": 44
+    },
+    {
+      "platform": "forge",
+      "unit": {
+        "tests": 34,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "gameTests": 44
+    }
+  ],
+  "visual": {
+    "platform": "Forge 1.20.1",
+    "scenes": 6,
+    "capturedImages": 251,
+    "maximumRenderToServerPalmErrorBlocks": 0.00015045266939607064,
+    "acceptedHits": [
+      {
+        "scene": 0,
+        "move": "SWIPE",
+        "age": 12,
+        "damage": 28
+      },
+      {
+        "scene": 1,
+        "move": "BARRAGE",
+        "age": 13,
+        "damage": 21
+      },
+      {
+        "scene": 1,
+        "move": "BARRAGE",
+        "age": 26,
+        "damage": 21
+      },
+      {
+        "scene": 1,
+        "move": "BARRAGE",
+        "age": 42,
+        "damage": 21
+      },
+      {
+        "scene": 2,
+        "move": "SLAM",
+        "age": 13,
+        "damage": 44.8
+      },
+      {
+        "scene": 3,
+        "move": "LEAP",
+        "age": 26,
+        "damage": 35
+      }
+    ],
+    "groundContacts": [
+      {
+        "scene": 2,
+        "age": 15,
+        "contact": {
+          "x": -0.5465640425682068,
+          "y": 81,
+          "z": 1.1574344635009766
+        }
+      }
+    ],
+    "reviewedSheets": [
+      "review-0-0.jpg",
+      "review-0-1.jpg",
+      "review-1-0.jpg",
+      "review-1-1.jpg",
+      "review-2-0.jpg",
+      "review-2-1.jpg",
+      "review-3-0.jpg",
+      "review-3-1.jpg",
+      "review-4-0.jpg",
+      "review-5-0.jpg",
+      "review-5-1.jpg"
+    ],
+    "directory": "D:/CodexCache/creature-combat-qa/hunter-source-frames",
+    "evidenceSha256": "d5856a9e637c25f254295a6fca0d06a2067fbaca4330a0831d8275b6fdfbb8ef",
+    "boundary": "Game-tick screenshots and shared-pose checks, not a capture of every rendered frame or side-by-side original-engine footage. Gecko 4.8.4 diagnostic matrix identity additions are removed only in the measurement copy."
+  },
+  "sound": "Swing/contact/ground sound events wired; original bank extraction and audible mix acceptance are not complete.",
+  "remaining": [
+    "Player-versus-Hunter multi-angle and consumption visual regression",
+    "NeoForge native renderer frame audit",
+    "All other creatures need their own contact, behavior, effects and sound acceptance"
+  ],
+  "assets": {
+    "animations/blacklight_hunter.animation.json": "9ddb9c298f117e47aa4076bc6e17dbeabf676a26b8a86f74f1b24550fb8b498d",
+    "animations/brawler.animation.json": "9ddb9c298f117e47aa4076bc6e17dbeabf676a26b8a86f74f1b24550fb8b498d",
+    "models/hunter_combat_motion.json": "d2795bc552f63e0771d7e543ee22aa0fb409941e5d8a05a44e3d3efcef2f350a",
+    "geo/blacklight_hunter_mc.geo.json": "e5ab3673cd3be85e39ee365a5a4e688178d6e2710e3e5066dee3c51aab610ddd",
+    "textures/entity/hunter_mc.png": "4279ec308b38834b79c8aea1d3352d0b1255accff3dfae6e8670f2814a5ea066"
+  }
+}

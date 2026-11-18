@@ -1,0 +1,130 @@
+{
+  "schemaVersion": 1,
+  "date": "2026-11-17",
+  "scope": "Actual AI support transports hover and deploy independently controlled zipline soldiers; repeated source waves remain budget/target/site gated.",
+  "status": "code-and-static-only; NOT compiled, tested, packaged, installed or observed in-game",
+  "sources": {
+    "proof": "D:\\PrototypeReference\\p1\\private\\helicopter-rappel-source-proof.json",
+    "proofSha256": "15a1a9b03c9b9a4080bf5c65d15f76ba08625f691b73ed6e57e9d83d3fb78e78",
+    "sourceRecords": [
+      {
+        "file": "startup_fig.p3d.rz",
+        "offsets": [
+          443052,
+          443160,
+          443200,
+          443240,
+          443700,
+          443720,
+          488716,
+          490024,
+          490188,
+          490556,
+          492324,
+          1397620,
+          1398196,
+          1399056,
+          1399324,
+          1399660,
+          1399788,
+          1399860,
+          1400088,
+          1400132,
+          1400260
+        ]
+      },
+      {
+        "file": "heli_bh_marine_fig.p3d.rz",
+        "offsets": [
+          83392,
+          83484,
+          83888,
+          84228,
+          84316,
+          84744,
+          85172,
+          85512,
+          85600,
+          86028,
+          86456
+        ]
+      }
+    ]
+  },
+  "confirmed": [
+    "startup @490188 is False on the ordinary-soldier landing branch. AirDestination @488716 uses OffsetY12 and flight tracks MinHeight6; @490556 DontMove holds the transport during deployment.",
+    "Blackhawk ordinary-soldier spawn program has six SpawnObjects at .8/.933333/3.2/3.33333/6.4/6.53333 seconds, alternating right/left, and 7.33333 second Wait. It enters human/initBH/BH_zipline_right/left.",
+    "human/initBH has zipLineRope001 Tendril, GrabbedDetach, initial sol_heli_zipline_back through frame19/.666667s, spec_zipline_down hold0..8, MoveAtVelocity (0,-11,0), SupportingSurface landing then remainder clip; landing flag at .733333 seconds.",
+    "Autonomous retry requires ShouldSpawn, TimeNextSpawn<=0, shouldInterruptTactic0, doNotSpawn0, loaded cell and CanReserveSoldierBudget6. Completion sets TimeNextSpawn20 seconds. No fixed total-wave counter in this path.",
+    "Attack bank under the ordinary-soldier spawn task has False @492324; no claim of simultaneous deployment and firing."
+  ],
+  "implemented": [
+    "UAV/officer Support path now deployRappellingTo; only two flight crew initially aboard. Scheduled six-person waves spawn physical infantry at door anchors; legacy saved support consumes existing cabin troops before creating missing wave slots.",
+    "12-block hover, loaded collider-based two-lane ground checks, timed alternation, actual independent soldier movement at .55 block/tick, collision-supported landing and restored NoAI/NoGravity then adoptFieldPost/squad target handoff.",
+    "Per-soldier persistent rappel ownership/age and per-craft committed slot/age/cooldown survive save/load. Carrier loss, capture, departure, wound, grab, fluid or unloaded swept region releases transient controls without leaving soldiers as seats.",
+    "Native-support deployment can retry after 400 ticks with a currently legal visible combat target and room for six. AI support no longer ends at the old fixed120s mission/combat age; normal operator/health/unseen exits remain.",
+    "Separate synced troop IDs/side arrays drive rope rendering and authored grip pose. Player-owned chassis never enable autonomous spawning.",
+    "Explicit bare deployTo retains legacy manual landing scenarios; old dispatched AirCombat.Enabled saves lacking AirDeployment migrate to the air route. No helicopter spawn egg exists; actual creation entrypoints are Support and owned ChassisItem."
+  ],
+  "mcAdapters": [
+    "Source world distances/speeds follow existing helicopter flight port 1:1 block policy, not source mesh scale. Side3.6/Y.85/Z-.5 offsets fit authored MC fuselage; original Tendril anchors ¡À1/Y.6/Z.5 remain in private source proof.",
+    "Global native reservation/ShouldSpawn implementations are not fully closed. Local cap18 live MilitarySoldiers in64 blocks, target/LOS requirement, bounded loaded heightmap rings12/20/28 and40tick failed-site retry substitute for unavailable global mission policy; not an assertion of unrestricted native infinite spawning.",
+    "Spawn time uses ceil at20Hz (16,19,64,67,128,131). Initial14tick detached door hold and15tick grounded settle implement clip event timing without original root/clip retargeting; authored model arms/legs and rope line are not imported original animation or rope mesh.",
+    "No invulnerability is added. Wounds/grab/invalid carrier abort the controlled descent and restore ordinary gravity. Timeout200tick individual/600tick wave prevents stuck controllers; lost ground may result in normal fall damage.",
+    "All slots are committed before spawn callbacks; capacity and two-lane failures may skip slots rather than wait indefinitely. Source exact reserved-budget reallocation and offscreen support dispatch remain unimplemented."
+  ],
+  "validation": {
+    "executed": [
+      "Static local source decoding and payload SHA256",
+      "Text/platform import mirror inspection",
+      "Scoped git diff --check"
+    ],
+    "notExecuted": [
+      "Java",
+      "Gradle",
+      "unit tests",
+      "GameTests",
+      "game/client",
+      "native original/emulation",
+      "audio playback"
+    ],
+    "newGameTests": [
+      "HelicopterRappelGameTest.sourceWavesHoverDetachLandAndRepeatAfterCooldown",
+      "HelicopterRappelGameTest.midWaveSaveRestoresReceiptAndIndependentSoldierWithoutReplay",
+      "HelicopterRappelGameTest.destroyedCarrierReleasesDetachedTroopsAndCapacityRejectsAnotherWave"
+    ],
+    "runner": "Existing tools/helicopter-test.init.gradle includes all src/helicopterTest/java and its resources; root to schedule gameTest server after user permits.",
+    "existingChange": "HelicopterGameTest officer support assertion now checks two actual flight crew and a scheduled source six-person wave; legacy explicit ground deploy tests unchanged."
+  },
+  "remaining": [
+    "Actual hover/rope player-visible smoothness, stairs/slabs, ground AI combat and multiple-client tracking must be tested in disposable worlds.",
+    "Original zipline clips and sounds are documented but not retargeted/imported this change.",
+    "Entire source global soldier reservation budget/ShouldSpawn/mission selector is still an adapter, not a complete native AI recreation."
+  ],
+  "snapshots": {
+    "neo": {
+      "src/main/java/com/codex/blacklight/entity/BlackwatchHelicopter.java": "d5d0ed1f61220f94afeb3c7ddf271175576f253cc9ffb4aeb9b6e19645f196d4",
+      "src/main/java/com/codex/blacklight/military/aircraft/HelicopterDeployment.java": "e844e04eee85393e06ebf7f5dadc6e05a436afc1b0d18e5d66d9f548b1dcae2e",
+      "src/main/java/com/codex/blacklight/military/aircraft/HelicopterRappel.java": "aad0122a9c0547d83cf4a8be088e9603678c3619cceac7834e8239e2917e4171",
+      "src/main/java/com/codex/blacklight/military/aircraft/HelicopterSupport.java": "e69c1e83536c10b9fd439fef19d0ef809e807d07b4bbf6c0ae974304c300ed2e",
+      "src/main/java/com/codex/blacklight/military/aircraft/HelicopterCombat.java": "560514894f505871913f3ea8db520a6f41dca0e9d354a98fb99b97c107331531",
+      "src/main/java/com/codex/blacklight/client/renderer/HelicopterRenderer.java": "f2e083072f67485e624362ef20e49cc8aacc979de35d1be01e788edbcade65c5",
+      "src/main/java/com/codex/blacklight/client/model/BlackwatchModel.java": "d1236a55da396328497eab553eeaf5a5fddd1e9a775621284ffb5c88b7c737e0",
+      "src/helicopterTest/java/com/codex/blacklight/gametest/HelicopterRappelGameTest.java": "f3a07ffbb14907bac1496697aa99d28582e6d40820955fcd6cf4caae859d02c1",
+      "src/helicopterTest/java/com/codex/blacklight/gametest/HelicopterGameTest.java": "836a69406aa3cff5154541954f5561bf9c60456c842cc033b20765b1639f2909",
+      "tools/helicopter-test.init.gradle": "4994bfffcd5e71c5777fb1eb6ab884e7dc1b9d6af3285d57cbc76a8108c3de72"
+    },
+    "forge": {
+      "src/main/java/com/codex/blacklight/entity/BlackwatchHelicopter.java": "dd60436c31dd4d1d4c67840823b33495bcb7489dbe9699a93bb6344db3315a94",
+      "src/main/java/com/codex/blacklight/military/aircraft/HelicopterDeployment.java": "0e9c88135bc0c746f63844874fe6ac8b080e31b8d3d557bd007c6239d26f491d",
+      "src/main/java/com/codex/blacklight/military/aircraft/HelicopterRappel.java": "30e7b0f979438863be8dd2916e87ccf49e1354955c132019897c576cbfe6eb2c",
+      "src/main/java/com/codex/blacklight/military/aircraft/HelicopterSupport.java": "e69c1e83536c10b9fd439fef19d0ef809e807d07b4bbf6c0ae974304c300ed2e",
+      "src/main/java/com/codex/blacklight/military/aircraft/HelicopterCombat.java": "560514894f505871913f3ea8db520a6f41dca0e9d354a98fb99b97c107331531",
+      "src/main/java/com/codex/blacklight/client/renderer/HelicopterRenderer.java": "6c0687861052149cf4e56b683a37540c4a7de224e36dde94ff06e5a41ce12216",
+      "src/main/java/com/codex/blacklight/client/model/BlackwatchModel.java": "e98b63263eed2778c502f70cb3d51bcfff54b372893b901b2fb4539a15c16ae9",
+      "src/helicopterTest/java/com/codex/blacklight/gametest/HelicopterRappelGameTest.java": "328a3694f2afb52d2dccd89c5c164a5f9cd2924ef4e00610a11a7342708d627b",
+      "src/helicopterTest/java/com/codex/blacklight/gametest/HelicopterGameTest.java": "f38e1a1ed81d997b52dea0f77c34d4bf946b004da3ee153bfdc44011eeecc9ce",
+      "tools/helicopter-test.init.gradle": "4994bfffcd5e71c5777fb1eb6ab884e7dc1b9d6af3285d57cbc76a8108c3de72"
+    }
+  }
+}

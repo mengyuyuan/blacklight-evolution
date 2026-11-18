@@ -12,7 +12,10 @@ import org.lwjgl.glfw.GLFW;
 @EventBusSubscriber(modid="blacklight",value=Dist.CLIENT)
 public final class FirearmControls {
     public static final KeyMapping RELOAD=new KeyMapping("key.blacklight.firearm_reload",InputConstants.Type.KEYSYM,GLFW.GLFW_KEY_R,"key.categories.blacklight");
-    @SubscribeEvent public static void keys(RegisterKeyMappingsEvent event){event.register(RELOAD);}
+    @EventBusSubscriber(modid="blacklight",value=Dist.CLIENT,bus=EventBusSubscriber.Bus.MOD)
+    public static final class Registration {
+        @SubscribeEvent public static void keys(RegisterKeyMappingsEvent event){event.register(RELOAD);}
+    }
     @SubscribeEvent public static void tick(net.minecraftforge.event.TickEvent.ClientTickEvent event){if(event.phase!=net.minecraftforge.event.TickEvent.Phase.END)return;
         var mc=Minecraft.getInstance();while(RELOAD.consumeClick()){
             if(mc.player==null||mc.level==null||mc.screen!=null||mc.isPaused()||!mc.player.isAlive()||mc.player.isSpectator())continue;

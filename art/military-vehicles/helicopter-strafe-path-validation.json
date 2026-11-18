@@ -1,0 +1,265 @@
+{
+  "schema": 1,
+  "createdLocal": "2026-11-17T00:12:17",
+  "status": "Verified unused strafe-geometry prerequisite. Live combat integration and whole-project goal remain active.",
+  "source": {
+    "file": "D:\\blacklight-evolution\\art\\military-vehicles\\helicopter-strafe-path-source.json",
+    "sha256": "9a2979f845fbfa16599ccb9920756292c85d25521e529a5ac0678344c5abbbf1"
+  },
+  "previousGameplayCheckpoint": {
+    "file": "D:\\blacklight-evolution\\art\\military-vehicles\\helicopter-circle-validation.json",
+    "sha256": "5e376850290e04ff783f9c40f615b0adf6a9383d1da51dbdb98aac08e34cbe23"
+  },
+  "platforms": {
+    "neo": {
+      "unitTests": 77,
+      "pathTests": 3,
+      "nativeOracleCasesWithinPathTest": 81,
+      "log": {
+        "file": "D:\\CodexCache\\helicopter-strafe-path-qa\\neo-hellfireUnit-passed.log",
+        "sha256": "44583420d3915c3be6f1fa0c6dd98996bafb731ce710b7a6de16738d4280bbfd"
+      },
+      "unitSuites": [
+        {
+          "suite": "com.codex.blacklight.firearms.GunplayFeedbackPayloadTest",
+          "tests": 2,
+          "file": "D:\\CodexCache\\helicopter-strafe-path-qa\\neo-unit-xml\\TEST-com.codex.blacklight.firearms.GunplayFeedbackPayloadTest.xml",
+          "sha256": "c27fa29d6838f57a49c442f037a35fd9234cbcb0ed3eeae7b2b81ec207eddc05"
+        },
+        {
+          "suite": "com.codex.blacklight.military.aircraft.HelicopterArmamentTest",
+          "tests": 2,
+          "file": "D:\\CodexCache\\helicopter-strafe-path-qa\\neo-unit-xml\\TEST-com.codex.blacklight.military.aircraft.HelicopterArmamentTest.xml",
+          "sha256": "a7cb700ceb67f931b634054f09eff68c3b5bbfbb0fd30d1d3187a08d5695aa7b"
+        },
+        {
+          "suite": "com.codex.blacklight.military.aircraft.HelicopterAuthorityTest",
+          "tests": 2,
+          "file": "D:\\CodexCache\\helicopter-strafe-path-qa\\neo-unit-xml\\TEST-com.codex.blacklight.military.aircraft.HelicopterAuthorityTest.xml",
+          "sha256": "a38d599c3dc38e55ef90585b13bbf4a071ea0c58f82d9a88212cd6b7f856a2d2"
+        },
+        {
+          "suite": "com.codex.blacklight.military.aircraft.HelicopterBlastWaveTest",
+          "tests": 4,
+          "file": "D:\\CodexCache\\helicopter-strafe-path-qa\\neo-unit-xml\\TEST-com.codex.blacklight.military.aircraft.HelicopterBlastWaveTest.xml",
+          "sha256": "0874caaf35a0dc62da3c134c8932b5e463c44e8b0d19ca4a45d7bccc60adbc0f"
+        },
+        {
+          "suite": "com.codex.blacklight.military.aircraft.HelicopterCircleStrafeTest",
+          "tests": 3,
+          "file": "D:\\CodexCache\\helicopter-strafe-path-qa\\neo-unit-xml\\TEST-com.codex.blacklight.military.aircraft.HelicopterCircleStrafeTest.xml",
+          "sha256": "80ea15cf49c62e882605036aa95b507e693ab27127aad319a8f14f08e2e1306d"
+        },
+        {
+          "suite": "com.codex.blacklight.military.aircraft.HelicopterControlPayloadTest",
+          "tests": 2,
+          "file": "D:\\CodexCache\\helicopter-strafe-path-qa\\neo-unit-xml\\TEST-com.codex.blacklight.military.aircraft.HelicopterControlPayloadTest.xml",
+          "sha256": "f68af43d50b116e553b118a655121a0221b49630a84c6ed753291a1de65a923b"
+        },
+        {
+          "suite": "com.codex.blacklight.military.aircraft.HelicopterFlightTest",
+          "tests": 4,
+          "file": "D:\\CodexCache\\helicopter-strafe-path-qa\\neo-unit-xml\\TEST-com.codex.blacklight.military.aircraft.HelicopterFlightTest.xml",
+          "sha256": "8ecd62469df9db19be1956a2784bc2ecbd936e024560ac8b5435b4b9bf06cecd"
+        },
+        {
+          "suite": "com.codex.blacklight.military.aircraft.HelicopterGunCycleTest",
+          "tests": 3,
+          "file": "D:\\CodexCache\\helicopter-strafe-path-qa\\neo-unit-xml\\TEST-com.codex.blacklight.military.aircraft.HelicopterGunCycleTest.xml",
+          "sha256": "10c52b5a6c57ed7e71dd9914fea7f5ebe800d9ce36372d711c0edf1ed4c55284"
+        },
+        {
+          "suite": "com.codex.blacklight.military.aircraft.HelicopterHellfireAttackTest",
+          "tests": 6,
+          "file": "D:\\CodexCache\\helicopter-strafe-path-qa\\neo-unit-xml\\TEST-com.codex.blacklight.military.aircraft.HelicopterHellfireAttackTest.xml",
+          "sha256": "34e2efe574b4410dd689c97d8e9041972ed20b160a984ff4a373a37b98930a6d"
+        },
+        {
+          "suite": "com.codex.blacklight.military.aircraft.HelicopterHellfireRackTest",
+          "tests": 4,
+          "file": "D:\\CodexCache\\helicopter-strafe-path-qa\\neo-unit-xml\\TEST-com.codex.blacklight.military.aircraft.HelicopterHellfireRackTest.xml",
+          "sha256": "f36b06f062f7cf6731b5aeba1b806aa552381adbade11fc9c8354eafa5eba478"
+        },
+        {
+          "suite": "com.codex.blacklight.military.aircraft.HelicopterMissileFlightTest",
+          "tests": 9,
+          "file": "D:\\CodexCache\\helicopter-strafe-path-qa\\neo-unit-xml\\TEST-com.codex.blacklight.military.aircraft.HelicopterMissileFlightTest.xml",
+          "sha256": "7dc5f35fc52cab407b4c8f0deef1e4a701f7276c2da6636c1687a439a838627d"
+        },
+        {
+          "suite": "com.codex.blacklight.military.aircraft.HelicopterRapidBlastTest",
+          "tests": 3,
+          "file": "D:\\CodexCache\\helicopter-strafe-path-qa\\neo-unit-xml\\TEST-com.codex.blacklight.military.aircraft.HelicopterRapidBlastTest.xml",
+          "sha256": "e1541d68127c4addd6dca53d284a87021efa000403a1fb70c39a8af06f3f7bd9"
+        },
+        {
+          "suite": "com.codex.blacklight.military.aircraft.HelicopterRapidTest",
+          "tests": 5,
+          "file": "D:\\CodexCache\\helicopter-strafe-path-qa\\neo-unit-xml\\TEST-com.codex.blacklight.military.aircraft.HelicopterRapidTest.xml",
+          "sha256": "8a5c7abb8b87a36d4b88f2a5520360085650fe502d949418539d4762b7d753da"
+        },
+        {
+          "suite": "com.codex.blacklight.military.aircraft.HelicopterRouteTest",
+          "tests": 8,
+          "file": "D:\\CodexCache\\helicopter-strafe-path-qa\\neo-unit-xml\\TEST-com.codex.blacklight.military.aircraft.HelicopterRouteTest.xml",
+          "sha256": "da29264b7b7c748f6c2a0b32f741fec336f43de11e68fdb191987a4898933950"
+        },
+        {
+          "suite": "com.codex.blacklight.military.aircraft.HelicopterStrafePathTest",
+          "tests": 3,
+          "file": "D:\\CodexCache\\helicopter-strafe-path-qa\\neo-unit-xml\\TEST-com.codex.blacklight.military.aircraft.HelicopterStrafePathTest.xml",
+          "sha256": "3aeebe0381bca4d0946fed657438db60bb041822d63e64813c7dcc16fe935010"
+        },
+        {
+          "suite": "com.codex.blacklight.military.vehicle.VehicleControlAuthorityTest",
+          "tests": 11,
+          "file": "D:\\CodexCache\\helicopter-strafe-path-qa\\neo-unit-xml\\TEST-com.codex.blacklight.military.vehicle.VehicleControlAuthorityTest.xml",
+          "sha256": "130c5555693b77cb3e2446dc49623de541bb46b4e4cfd5e7a2d7fb9c193a271b"
+        },
+        {
+          "suite": "com.codex.blacklight.military.vehicle.VehicleWeaponDefinitionTest",
+          "tests": 6,
+          "file": "D:\\CodexCache\\helicopter-strafe-path-qa\\neo-unit-xml\\TEST-com.codex.blacklight.military.vehicle.VehicleWeaponDefinitionTest.xml",
+          "sha256": "f160a214c22776445c3bc7af1c39b1f228ac01181cd504a9b3ed26719ad30971"
+        }
+      ],
+      "code": {
+        "src/main/java/com/codex/blacklight/military/aircraft/HelicopterStrafePath.java": "434ff45dd0c5cd433733b86da94a22164301a0fa9ae46f814884bfce17e491d6",
+        "src/test/java/com/codex/blacklight/military/aircraft/HelicopterStrafePathTest.java": "fceef39447d526d842dc3a929e29a9b1e5652339b4a2853b77f570064e0d1447",
+        "src/test/resources/blacklight/helicopter-strafe-native.json": "4d81ec7f7ddf14d9b2d3ca99a01ca54fa88931597787843af676db44f5766f5b"
+      },
+      "liveCombatUnchangedFromPreviousCheckpoint": {
+        "file": "D:\\blacklight-evolution\\src\\main\\java\\com\\codex\\blacklight\\military\\aircraft\\HelicopterCombat.java",
+        "sha256": "85f5c37bc5046844a096f4201b50577ba6a5ee0a9ec9b051d2aef2fc23cbf0dd"
+      }
+    },
+    "forge": {
+      "unitTests": 77,
+      "pathTests": 3,
+      "nativeOracleCasesWithinPathTest": 81,
+      "log": {
+        "file": "D:\\CodexCache\\helicopter-strafe-path-qa\\forge-hellfireUnit-passed.log",
+        "sha256": "4aeec48d6c4a54d7608633636abe26cf519838d2e70ef24304422f676f81e932"
+      },
+      "unitSuites": [
+        {
+          "suite": "com.codex.blacklight.firearms.GunplayFeedbackPayloadTest",
+          "tests": 2,
+          "file": "D:\\CodexCache\\helicopter-strafe-path-qa\\forge-unit-xml\\TEST-com.codex.blacklight.firearms.GunplayFeedbackPayloadTest.xml",
+          "sha256": "61b377f6ff6d165b3ad075f2ff4303ab9c6237a91c0fb8e594bb69949e46e799"
+        },
+        {
+          "suite": "com.codex.blacklight.military.aircraft.HelicopterArmamentTest",
+          "tests": 2,
+          "file": "D:\\CodexCache\\helicopter-strafe-path-qa\\forge-unit-xml\\TEST-com.codex.blacklight.military.aircraft.HelicopterArmamentTest.xml",
+          "sha256": "348fcfa4831df7b1b06f4ac74679f44311f2ce16a6ea0defef3de6e835bc6511"
+        },
+        {
+          "suite": "com.codex.blacklight.military.aircraft.HelicopterAuthorityTest",
+          "tests": 2,
+          "file": "D:\\CodexCache\\helicopter-strafe-path-qa\\forge-unit-xml\\TEST-com.codex.blacklight.military.aircraft.HelicopterAuthorityTest.xml",
+          "sha256": "18515aec9af82a2039fdc54566f27a8cd681a9b1e46c85983e35e741b8afde5d"
+        },
+        {
+          "suite": "com.codex.blacklight.military.aircraft.HelicopterBlastWaveTest",
+          "tests": 4,
+          "file": "D:\\CodexCache\\helicopter-strafe-path-qa\\forge-unit-xml\\TEST-com.codex.blacklight.military.aircraft.HelicopterBlastWaveTest.xml",
+          "sha256": "7c45278061d2ba1e9f89414b875243470ddf50f13d431160d6c411bd9fb46379"
+        },
+        {
+          "suite": "com.codex.blacklight.military.aircraft.HelicopterCircleStrafeTest",
+          "tests": 3,
+          "file": "D:\\CodexCache\\helicopter-strafe-path-qa\\forge-unit-xml\\TEST-com.codex.blacklight.military.aircraft.HelicopterCircleStrafeTest.xml",
+          "sha256": "7323a4325b4f67155f8b0d449d78b6b5cdf7a0903301747eb960ab0d7f168b19"
+        },
+        {
+          "suite": "com.codex.blacklight.military.aircraft.HelicopterControlPayloadTest",
+          "tests": 2,
+          "file": "D:\\CodexCache\\helicopter-strafe-path-qa\\forge-unit-xml\\TEST-com.codex.blacklight.military.aircraft.HelicopterControlPayloadTest.xml",
+          "sha256": "a5827446bdf97f64e5bfd3f7ed3b1324d72f706001ec6a0053d1e1e924afca2b"
+        },
+        {
+          "suite": "com.codex.blacklight.military.aircraft.HelicopterFlightTest",
+          "tests": 4,
+          "file": "D:\\CodexCache\\helicopter-strafe-path-qa\\forge-unit-xml\\TEST-com.codex.blacklight.military.aircraft.HelicopterFlightTest.xml",
+          "sha256": "138bd2fe2d4dd6e4c4feb00bbe24227e10722f2f5bc75896a33a1ff2afcff7f1"
+        },
+        {
+          "suite": "com.codex.blacklight.military.aircraft.HelicopterGunCycleTest",
+          "tests": 3,
+          "file": "D:\\CodexCache\\helicopter-strafe-path-qa\\forge-unit-xml\\TEST-com.codex.blacklight.military.aircraft.HelicopterGunCycleTest.xml",
+          "sha256": "24b718fd158bccdbff5d3be24842363fbe43ec9621cd650601497025776e49b4"
+        },
+        {
+          "suite": "com.codex.blacklight.military.aircraft.HelicopterHellfireAttackTest",
+          "tests": 6,
+          "file": "D:\\CodexCache\\helicopter-strafe-path-qa\\forge-unit-xml\\TEST-com.codex.blacklight.military.aircraft.HelicopterHellfireAttackTest.xml",
+          "sha256": "ccfe7337bce0aee1d52625976903a8286111d43404de1519992fa1763e0b23b6"
+        },
+        {
+          "suite": "com.codex.blacklight.military.aircraft.HelicopterHellfireRackTest",
+          "tests": 4,
+          "file": "D:\\CodexCache\\helicopter-strafe-path-qa\\forge-unit-xml\\TEST-com.codex.blacklight.military.aircraft.HelicopterHellfireRackTest.xml",
+          "sha256": "65b555b4353cf7271f5cdc9f01146f2792eabb79a7c03629548ce29e8affdfe0"
+        },
+        {
+          "suite": "com.codex.blacklight.military.aircraft.HelicopterMissileFlightTest",
+          "tests": 9,
+          "file": "D:\\CodexCache\\helicopter-strafe-path-qa\\forge-unit-xml\\TEST-com.codex.blacklight.military.aircraft.HelicopterMissileFlightTest.xml",
+          "sha256": "9e439dd4f062abc30b018316c3218cc17d16b8648aad04a598112cbeed5fc954"
+        },
+        {
+          "suite": "com.codex.blacklight.military.aircraft.HelicopterRapidBlastTest",
+          "tests": 3,
+          "file": "D:\\CodexCache\\helicopter-strafe-path-qa\\forge-unit-xml\\TEST-com.codex.blacklight.military.aircraft.HelicopterRapidBlastTest.xml",
+          "sha256": "041b23ecfdc6e8a9054294295c668df93b2e68492f0762a3055d05f40e78774a"
+        },
+        {
+          "suite": "com.codex.blacklight.military.aircraft.HelicopterRapidTest",
+          "tests": 5,
+          "file": "D:\\CodexCache\\helicopter-strafe-path-qa\\forge-unit-xml\\TEST-com.codex.blacklight.military.aircraft.HelicopterRapidTest.xml",
+          "sha256": "af6b402cdb27acc18d5adb306448854bbf0bd38f23c3d238759fdfc21fd5fb73"
+        },
+        {
+          "suite": "com.codex.blacklight.military.aircraft.HelicopterRouteTest",
+          "tests": 8,
+          "file": "D:\\CodexCache\\helicopter-strafe-path-qa\\forge-unit-xml\\TEST-com.codex.blacklight.military.aircraft.HelicopterRouteTest.xml",
+          "sha256": "838d4590e6419f48d52b3afa67be672aa52b80e1425f258ccbac0194460f10b9"
+        },
+        {
+          "suite": "com.codex.blacklight.military.aircraft.HelicopterStrafePathTest",
+          "tests": 3,
+          "file": "D:\\CodexCache\\helicopter-strafe-path-qa\\forge-unit-xml\\TEST-com.codex.blacklight.military.aircraft.HelicopterStrafePathTest.xml",
+          "sha256": "09cdebd944bca64d5501dc30a9d23b6748e85f57a3425bd229e3682690026e04"
+        },
+        {
+          "suite": "com.codex.blacklight.military.vehicle.VehicleControlAuthorityTest",
+          "tests": 11,
+          "file": "D:\\CodexCache\\helicopter-strafe-path-qa\\forge-unit-xml\\TEST-com.codex.blacklight.military.vehicle.VehicleControlAuthorityTest.xml",
+          "sha256": "5326e7321face99bdecad0938c33602f6e3a24fef975af2518e33de69a1eea99"
+        },
+        {
+          "suite": "com.codex.blacklight.military.vehicle.VehicleWeaponDefinitionTest",
+          "tests": 6,
+          "file": "D:\\CodexCache\\helicopter-strafe-path-qa\\forge-unit-xml\\TEST-com.codex.blacklight.military.vehicle.VehicleWeaponDefinitionTest.xml",
+          "sha256": "d2ed66d6f8b58826517e715613e61d842750e37e421f89ed7d194951e32967af"
+        }
+      ],
+      "code": {
+        "src/main/java/com/codex/blacklight/military/aircraft/HelicopterStrafePath.java": "434ff45dd0c5cd433733b86da94a22164301a0fa9ae46f814884bfce17e491d6",
+        "src/test/java/com/codex/blacklight/military/aircraft/HelicopterStrafePathTest.java": "fceef39447d526d842dc3a929e29a9b1e5652339b4a2853b77f570064e0d1447",
+        "src/test/resources/blacklight/helicopter-strafe-native.json": "4d81ec7f7ddf14d9b2d3ca99a01ca54fa88931597787843af676db44f5766f5b"
+      },
+      "liveCombatUnchangedFromPreviousCheckpoint": {
+        "file": "D:\\blacklight-evolution-forge-1.20.1\\src\\main\\java\\com\\codex\\blacklight\\military\\aircraft\\HelicopterCombat.java",
+        "sha256": "85f5c37bc5046844a096f4201b50577ba6a5ee0a9ec9b051d2aef2fc23cbf0dd"
+      }
+    }
+  },
+  "originalInstructionCases": 81,
+  "limits": [
+    "No new native game/server/client or destruction-visual run. The previous78 native helicopter cases and client evidence remain historical.",
+    "Live combat still uses circle movement plus the earlier hover preference. Passing geometry fixtures does not verify an actual strafe flight.",
+    "No release, installation, commit or player-world modification."
+  ]
+}

@@ -16,18 +16,24 @@ public final class HitStop {
     private HitStop() { }
 
     public static void victim(LivingEntity v, int ticks) {
-        if (com.codex.blacklight.BlacklightNeoMod.LOGGER.isDebugEnabled()) com.codex.blacklight.BlacklightNeoMod.LOGGER.debug("HitStop victim {} ticks={} alive={} multipart={}", v.getType().getDescriptionId(), ticks, v.isAlive(), CombatTargeting.multipart(v));
+        if (com.codex.blacklight.BlacklightNeoMod.LOGGER.isDebugEnabled()) com.codex.blacklight.BlacklightNeoMod.LOGGER.debug("HitStop victim {} ticks={} alive={} multipart={}", v.getType().getDescriptionId(), ticks, v.isAlive(), CombatTargeting.anchoredBody(v));
         // Player movement is client-predicted; a server freeze only rubber-bands the victim.
-        if (ticks <= 0 || v.level().isClientSide || !v.isAlive() || CombatTargeting.multipart(v) || v instanceof net.minecraft.world.entity.player.Player) return;
+        if (ticks <= 0 || v.level().isClientSide || !v.isAlive() || CombatTargeting.anchoredBody(v) || v instanceof net.minecraft.world.entity.player.Player) return;
         var previous = HELD.get(v);
         // A later hit during the hold keeps the newer launch, never stacks the freeze.
         int until = Math.max(previous == null ? 0 : previous.until(), v.tickCount + ticks);
         HELD.put(v, new Hold(v.getDeltaMovement(), Math.min(until, v.tickCount + 8)));
-        v.setDeltaMovement(Vec3.ZERO);
+        // The hold owns the whole body from the next entity tick on; it must not erase the
+        // contact frame's own impulse here. Zeroing eagerly hid every launch from anything
+        // that reads the victim in the same tick (observers, follow-up rules, tests) even
+        // though the hold had already stored the exact velocity to restore. The entity-tick
+        // handler below still pins the body every held tick, so no motion leaks out.
         v.hurtMarked = true;
     }
 
     public static boolean held(LivingEntity v) { return HELD.containsKey(v); }
+    public static Vec3 launchVelocity(LivingEntity v){var hold=HELD.get(v);return hold==null?v.getDeltaMovement():hold.velocity();}
+    public static int remainingTicks(LivingEntity v){var hold=HELD.get(v);return hold==null||!v.isAlive()?0:net.minecraft.util.Mth.clamp(hold.until()-v.tickCount,0,8);}
 
     @SubscribeEvent
     public static void tick(ForgeEntityTickEvent.Pre event) {

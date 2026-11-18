@@ -1,0 +1,7 @@
+allprojects { afterEvaluate {
+    sourceSets.main.java.srcDir('src/encounterVisual/java')
+    minecraft.runs.client.property 'blacklight.test.autonomous','true'
+    if(project.hasProperty('autonomousFilter')) minecraft.runs.client.property 'blacklight.test.autonomousFilter',project.property('autonomousFilter')
+    minecraft.runs.client.args '--width','1100','--height','760'
+    tasks.withType(Jar).configureEach { exclude 'com/codex/blacklight/client/EncounterAutonomousVisual*.class' }
+} }

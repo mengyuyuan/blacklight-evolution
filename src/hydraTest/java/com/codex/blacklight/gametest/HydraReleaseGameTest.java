@@ -161,16 +161,16 @@ public final class HydraReleaseGameTest {
             h.assertTrue(fed,"one killed creature must grant exactly one feed");h.assertTrue(intact,"mobGriefing=false preserves terrain");h.succeed();
         });
     }
-    @GameTest(template="wall_test",timeoutTicks=280)
+    @GameTest(template="blackwatch_facility_arena",batch="hydra_wild_reach",timeoutTicks=280)
     public static void wildHydraHasTelegraphedDamageAndRecovers(GameTestHelper h){
         var level=h.getLevel();var hits=new java.util.concurrent.atomic.AtomicInteger();
         var p=new net.minecraftforge.common.util.FakePlayer(level,new GameProfile(UUID.randomUUID(),"HydraHitQA")){
-            @Override public boolean hurt(net.minecraft.world.damagesource.DamageSource source,float amount){if(amount==14)hits.incrementAndGet();return true;}
+            @Override public boolean hurt(net.minecraft.world.damagesource.DamageSource source,float amount){if(source.getEntity() instanceof BlacklightHydra&&amount>0)hits.incrementAndGet();return true;}
         };
-        for(int x=1;x<9;x++)for(int z=1;z<9;z++)h.setBlock(x,1,z,Blocks.STONE);
-        p.moveTo(h.absolutePos(new BlockPos(5,2,4)).getCenter());level.addNewPlayer(p);
-        var e=h.spawn(ModEntities.BLACKLIGHT_HYDRA.get(),4,2,4);
-        h.runAfterDelay(90,()->h.assertTrue(hits.get()==0&&e.action()==3,"windup before damage"));
-        h.runAfterDelay(235,()->{int action=e.action();e.discard();level.removePlayerImmediately(p,Entity.RemovalReason.DISCARDED);h.assertTrue(hits.get()==1,"slam must dispatch one damage event");h.assertTrue(action==0,"slam must return to idle");h.succeed();});
+        for(int x=0;x<32;x++)for(int z=0;z<32;z++){h.setBlock(x,1,z,Blocks.STONE);for(int y=2;y<20;y++)h.setBlock(x,y,z,Blocks.AIR);}
+        p.moveTo(h.absolutePos(new BlockPos(10,2,19)).getCenter());p.setNoGravity(true);level.addNewPlayer(p);
+        var e=h.spawn(ModEntities.BLACKLIGHT_HYDRA.get(),10,2,10);e.setBodySize(2);
+        h.runAfterDelay(110,()->h.assertTrue(hits.get()==0&&e.action()==3,"reachable target selects a telegraphed slam: action="+e.action()));
+        h.runAfterDelay(250,()->{int action=e.action();e.discard();level.removePlayerImmediately(p,Entity.RemovalReason.DISCARDED);h.assertTrue(hits.get()==1,"body and waves must share one damage event: "+hits.get());h.assertTrue(action==0,"slam must return to idle");h.succeed();});
     }
 }

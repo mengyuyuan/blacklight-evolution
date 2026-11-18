@@ -1,0 +1,535 @@
+{
+  "status": "ordinary_and_hammer_finisher_receiving_verified_capture_and_extreme_contacts_pending",
+  "date": "2026-11-15",
+  "scope": "Connected live flyer heavy fall, actual player weapon hit, authored skin receiving surfaces, terrain landing, interpolated recovery. This is a bounded checkpoint, not whole-species acceptance.",
+  "platforms": [
+    {
+      "platform": "neo",
+      "gameTests": 100,
+      "unitTests": 37,
+      "unitSuites": [
+        {
+          "file": "TEST-com.codex.blacklight.city.HydraGrowthTest.xml",
+          "tests": 4,
+          "failures": 0,
+          "errors": 0,
+          "sha256": "ee20dee44c16a1413a77fc38c34a0c760e48032ed9351d0362d21f7ed21d5901"
+        },
+        {
+          "file": "TEST-com.codex.blacklight.city.HydraMotionTest.xml",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "sha256": "3ada8c69d729f8e215951b71f4f24f1052e32c56335b3d1ab5800357d3528d8f"
+        },
+        {
+          "file": "TEST-com.codex.blacklight.client.renderer.HydraWoundAnchorTest.xml",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "sha256": "70c940c808425632c87f0cc3be8bb4d58aa6efa066b903e6071c58d3f2c94ced"
+        },
+        {
+          "file": "TEST-com.codex.blacklight.combat.ContactEffectsQueueTest.xml",
+          "tests": 8,
+          "failures": 0,
+          "errors": 0,
+          "sha256": "f493e86d2c03ddba6ca01576577598344cc854f92b6cfb3fb5d9c125b00c0220"
+        },
+        {
+          "file": "TEST-com.codex.blacklight.combat.HydraContactTest.xml",
+          "tests": 16,
+          "failures": 0,
+          "errors": 0,
+          "sha256": "5226891497c383febab82347df3c4fb55d565441d6cdb4960d81c0b36b23c705"
+        },
+        {
+          "file": "TEST-com.codex.blacklight.network.ContactEffectsPayloadTest.xml",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "sha256": "d5ecda5aa9f61f313954654098f5fed2f27c50b607617596fd3c1d96f12879f0"
+        }
+      ],
+      "frames": 556,
+      "manifestSha256": "43e2ed7021ac3baff93af45c8d2aa7bafb65900c88a44ca45b326acb44178c40",
+      "recoverySheet": "D:/CodexCache/creature-combat-qa/neo-flyer-weapon-frames/heavy-recovery-review.jpg",
+      "scenes": [
+        {
+          "scene": 0,
+          "frames": 104,
+          "hits": [
+            {
+              "scene": 0,
+              "age": 26,
+              "tick": 152086,
+              "damage": 40,
+              "bone": "left_hand",
+              "at": {
+                "x": 1.0911716457083147,
+                "y": 85.76870744265273,
+                "z": 0.5191444165082328
+              },
+              "surfaceError": 5.1764099332474396e-8
+            }
+          ],
+          "receipts": [
+            {
+              "serial": 1,
+              "tick": 152086,
+              "shown": 152086.64000034332,
+              "kind": 2,
+              "surfaceCount": 0,
+              "soundCount": 1,
+              "scene": 0,
+              "firstImage": "0-claw-027-sub1.png"
+            }
+          ],
+          "serverBodyFrames": 0,
+          "skinToReceiverMax": 0.000023910275921683162,
+          "lowestDrawnY": 83.57713317871094,
+          "manualSheet": "D:/CodexCache/creature-combat-qa/neo-flyer-weapon-frames/weapon-review-0.jpg"
+        },
+        {
+          "scene": 1,
+          "frames": 106,
+          "hits": [
+            {
+              "scene": 1,
+              "age": 28,
+              "tick": 152210,
+              "damage": 45,
+              "bone": "left_forearm",
+              "at": {
+                "x": 0.7969034337740892,
+                "y": 85.70870793739293,
+                "z": 0.08100570694573979
+              },
+              "surfaceError": 2.410802006935119e-8
+            }
+          ],
+          "receipts": [
+            {
+              "serial": 2,
+              "tick": 152210,
+              "shown": 152211.44000029564,
+              "kind": 2,
+              "surfaceCount": 0,
+              "soundCount": 1,
+              "scene": 1,
+              "firstImage": "1-blade-029-sub1.png"
+            }
+          ],
+          "serverBodyFrames": 0,
+          "skinToReceiverMax": 0.00002498081058930215,
+          "lowestDrawnY": 83.56464385986328,
+          "manualSheet": "D:/CodexCache/creature-combat-qa/neo-flyer-weapon-frames/weapon-review-1.jpg"
+        },
+        {
+          "scene": 2,
+          "frames": 105,
+          "hits": [
+            {
+              "scene": 2,
+              "age": 27,
+              "tick": 152331,
+              "damage": 55,
+              "bone": "head",
+              "at": {
+                "x": 0.10343069173786144,
+                "y": 85.21516460473907,
+                "z": 0.6373117834104223
+              },
+              "surfaceError": 0.07785374341783836
+            }
+          ],
+          "receipts": [
+            {
+              "serial": 3,
+              "tick": 152331,
+              "shown": 152331.0200010538,
+              "kind": 1,
+              "surfaceCount": 0,
+              "soundCount": 1,
+              "scene": 2,
+              "firstImage": "2-hammer-028.png"
+            }
+          ],
+          "serverBodyFrames": 0,
+          "skinToReceiverMax": 0.000024559038127698735,
+          "lowestDrawnY": 83.5641098022461,
+          "manualSheet": "D:/CodexCache/creature-combat-qa/neo-flyer-weapon-frames/weapon-review-2.jpg"
+        },
+        {
+          "scene": 3,
+          "frames": 107,
+          "hits": [],
+          "receipts": [],
+          "serverBodyFrames": 0,
+          "skinToReceiverMax": 0.000025077067292442835,
+          "lowestDrawnY": 83.98096466064453,
+          "manualSheet": "D:/CodexCache/creature-combat-qa/neo-flyer-weapon-frames/weapon-review-3.jpg"
+        },
+        {
+          "scene": 4,
+          "frames": 134,
+          "hits": [
+            {
+              "scene": 4,
+              "age": 33,
+              "tick": 152581,
+              "damage": 70,
+              "bone": "left_hand",
+              "at": {
+                "x": 0.927463598762831,
+                "y": 85.88771994068847,
+                "z": 0.24278605941752762
+              },
+              "surfaceError": 0.07581461504680265
+            }
+          ],
+          "receipts": [
+            {
+              "serial": 4,
+              "tick": 152581,
+              "shown": 152581.6000007391,
+              "kind": 1,
+              "surfaceCount": 0,
+              "soundCount": 1,
+              "scene": 4,
+              "firstImage": "4-hammer_finisher-034.png"
+            },
+            {
+              "serial": 5,
+              "tick": 152599,
+              "shown": 152600.54000091553,
+              "kind": 0,
+              "surfaceCount": 48,
+              "soundCount": 2,
+              "scene": 4,
+              "firstImage": "4-hammer_finisher-051.png"
+            }
+          ],
+          "serverBodyFrames": 63,
+          "skinToReceiverMax": 0.000023545962066958216,
+          "lowestDrawnY": 80.99999816673346,
+          "manualSheet": "D:/CodexCache/creature-combat-qa/neo-flyer-weapon-frames/weapon-review-4.jpg"
+        }
+      ],
+      "files": [
+        {
+          "file": "src/main/java/com/codex/blacklight/combat/FlyerPhysics.java",
+          "sha256": "dc57b3bffe23a90a2546b7f0991cd7e52b1c36d49d9b9b2effb7badf9e4ad3d2"
+        },
+        {
+          "file": "src/main/java/com/codex/blacklight/combat/FlyerContact.java",
+          "sha256": "450c8d663656c140dfa2a35c08861901276bc09341167197014b076d210e58b4"
+        },
+        {
+          "file": "src/main/java/com/codex/blacklight/combat/HydraContact.java",
+          "sha256": "38333c461753e1dcdc572bd7016b463193fa28bfa0b737b09ded3f53bed4b338"
+        },
+        {
+          "file": "src/main/java/com/codex/blacklight/combat/RagdollImpact.java",
+          "sha256": "ad96f0cde6808a43c9521eac056bb2efde71bd572339d9a2806bac1ea6cdaec2"
+        },
+        {
+          "file": "src/main/java/com/codex/blacklight/entity/EncounterMob.java",
+          "sha256": "3bf3a1e117a5e0f1d3474a1b0042d0649e0e2c606e9e936ecf50cab1a61aa4c5"
+        },
+        {
+          "file": "src/main/java/com/codex/blacklight/client/renderer/AdaptiveRagdoll.java",
+          "sha256": "39f9939cb507847ff048b75f91ac3c5529bd5cb5d9904df2cb3d290d6fc1e671"
+        },
+        {
+          "file": "src/main/java/com/codex/blacklight/client/renderer/BlacklightCreatureRenderer.java",
+          "sha256": "d26cc7cc93df34ef2e65508d6bf51aff84417f9b9ae909f176a5c31a32005d25"
+        },
+        {
+          "file": "src/encounterTest/java/com/codex/blacklight/gametest/FlyerHurtGameTest.java",
+          "sha256": "8db6e38a94a09b361db299972e4e06308a0b031392c492eb72ff2e4ca066376f"
+        },
+        {
+          "file": "src/encounterTest/java/com/codex/blacklight/gametest/EncounterGameTest.java",
+          "sha256": "86cca595a934f473aff52cd4b5a1adb8248f366e637ac2e806f8024f8a59262c"
+        },
+        {
+          "file": "src/flyerWeaponVisual/java/com/codex/blacklight/client/FlyerWeaponVisual.java",
+          "sha256": "61fe5a9c9ca637909092b0f9fc8988e0169229134e138bfaf522eb3cfa51cd94"
+        }
+      ]
+    },
+    {
+      "platform": "forge",
+      "gameTests": 100,
+      "unitTests": 37,
+      "unitSuites": [
+        {
+          "file": "TEST-com.codex.blacklight.city.HydraGrowthTest.xml",
+          "tests": 4,
+          "failures": 0,
+          "errors": 0,
+          "sha256": "84d2a818914fe847883e7d7c0b2e2b372b19e5afdd4cb1a6c3c5ea48df732a27"
+        },
+        {
+          "file": "TEST-com.codex.blacklight.city.HydraMotionTest.xml",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "sha256": "e84a8e3bdb3ded27283d960be41c7eac88794aa1961bb9dda0dfafc813c5a0b2"
+        },
+        {
+          "file": "TEST-com.codex.blacklight.client.renderer.HydraWoundAnchorTest.xml",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "sha256": "b83f46fbb2b663e6461388604c292422c2d3fb3392dd41004450f261c8097342"
+        },
+        {
+          "file": "TEST-com.codex.blacklight.combat.ContactEffectsQueueTest.xml",
+          "tests": 8,
+          "failures": 0,
+          "errors": 0,
+          "sha256": "9a53cbc1d58244f1079a42c7eea5de0dd41113ad39b4172d7822e3dec25a596a"
+        },
+        {
+          "file": "TEST-com.codex.blacklight.combat.HydraContactTest.xml",
+          "tests": 16,
+          "failures": 0,
+          "errors": 0,
+          "sha256": "cfcdff83c4ea62818aba35f2a1ce15d8bfbf1405e431c85f21e80f0b896af65c"
+        },
+        {
+          "file": "TEST-com.codex.blacklight.network.ContactEffectsPayloadTest.xml",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "sha256": "86c79f75df473da03611b8c9916c0cf5733b39d3c6978bcd6b422add9e132515"
+        }
+      ],
+      "frames": 552,
+      "manifestSha256": "2e349f1ccdc47052a74765ac9cb8a7788d6d74c804ae51dead19ca7a81442c9b",
+      "recoverySheet": "D:/CodexCache/creature-combat-qa/forge-flyer-weapon-frames/heavy-recovery-review.jpg",
+      "scenes": [
+        {
+          "scene": 0,
+          "frames": 102,
+          "hits": [
+            {
+              "scene": 0,
+              "age": 26,
+              "tick": 84472,
+              "damage": 40,
+              "bone": "left_hand",
+              "at": {
+                "x": 1.0911716457083147,
+                "y": 85.76870744265273,
+                "z": 0.5191444165082328
+              },
+              "surfaceError": 5.1764099332474396e-8
+            }
+          ],
+          "receipts": [
+            {
+              "serial": 1,
+              "tick": 84472,
+              "shown": 84473.50000321865,
+              "kind": 2,
+              "surfaceCount": 0,
+              "soundCount": 1,
+              "scene": 0,
+              "firstImage": "0-claw-028-sub1.png"
+            }
+          ],
+          "serverBodyFrames": 0,
+          "skinToReceiverMax": 0.00002549659257756365,
+          "lowestDrawnY": 83.5638656616211,
+          "manualSheet": "D:/CodexCache/creature-combat-qa/forge-flyer-weapon-frames/weapon-review-0.jpg"
+        },
+        {
+          "scene": 1,
+          "frames": 107,
+          "hits": [
+            {
+              "scene": 1,
+              "age": 28,
+              "tick": 84596,
+              "damage": 45,
+              "bone": "left_forearm",
+              "at": {
+                "x": 0.7969034337740892,
+                "y": 85.70870793739293,
+                "z": 0.08100570694573979
+              },
+              "surfaceError": 2.410802006935119e-8
+            }
+          ],
+          "receipts": [
+            {
+              "serial": 2,
+              "tick": 84596,
+              "shown": 84596.48000478745,
+              "kind": 2,
+              "surfaceCount": 0,
+              "soundCount": 1,
+              "scene": 1,
+              "firstImage": "1-blade-028-sub1.png"
+            }
+          ],
+          "serverBodyFrames": 0,
+          "skinToReceiverMax": 0.000026035354664175043,
+          "lowestDrawnY": 83.5791015625,
+          "manualSheet": "D:/CodexCache/creature-combat-qa/forge-flyer-weapon-frames/weapon-review-1.jpg"
+        },
+        {
+          "scene": 2,
+          "frames": 104,
+          "hits": [
+            {
+              "scene": 2,
+              "age": 27,
+              "tick": 84717,
+              "damage": 55,
+              "bone": "head",
+              "at": {
+                "x": 0.10343069173786144,
+                "y": 85.21516460473907,
+                "z": 0.6373117834104223
+              },
+              "surfaceError": 0.07785374341783836
+            }
+          ],
+          "receipts": [
+            {
+              "serial": 3,
+              "tick": 84717,
+              "shown": 84717.9200053215,
+              "kind": 1,
+              "surfaceCount": 0,
+              "soundCount": 1,
+              "scene": 2,
+              "firstImage": "2-hammer-028-sub2.png"
+            }
+          ],
+          "serverBodyFrames": 0,
+          "skinToReceiverMax": 0.00002283602350132972,
+          "lowestDrawnY": 83.60269165039062,
+          "manualSheet": "D:/CodexCache/creature-combat-qa/forge-flyer-weapon-frames/weapon-review-2.jpg"
+        },
+        {
+          "scene": 3,
+          "frames": 106,
+          "hits": [],
+          "receipts": [],
+          "serverBodyFrames": 0,
+          "skinToReceiverMax": 0.000025432681812212947,
+          "lowestDrawnY": 83.97592163085938,
+          "manualSheet": "D:/CodexCache/creature-combat-qa/forge-flyer-weapon-frames/weapon-review-3.jpg"
+        },
+        {
+          "scene": 4,
+          "frames": 133,
+          "hits": [
+            {
+              "scene": 4,
+              "age": 33,
+              "tick": 84967,
+              "damage": 70,
+              "bone": "left_hand",
+              "at": {
+                "x": 0.927463598762831,
+                "y": 85.88771994068847,
+                "z": 0.24278605941752762
+              },
+              "surfaceError": 0.07581461504680265
+            }
+          ],
+          "receipts": [
+            {
+              "serial": 4,
+              "tick": 84967,
+              "shown": 84968.24000763893,
+              "kind": 1,
+              "surfaceCount": 0,
+              "soundCount": 1,
+              "scene": 4,
+              "firstImage": "4-hammer_finisher-034.png"
+            },
+            {
+              "serial": 5,
+              "tick": 84985,
+              "shown": 84985.62000751495,
+              "kind": 0,
+              "surfaceCount": 48,
+              "soundCount": 2,
+              "scene": 4,
+              "firstImage": "4-hammer_finisher-052.png"
+            }
+          ],
+          "serverBodyFrames": 63,
+          "skinToReceiverMax": 0.000026162628212743017,
+          "lowestDrawnY": 80.99998882347637,
+          "manualSheet": "D:/CodexCache/creature-combat-qa/forge-flyer-weapon-frames/weapon-review-4.jpg"
+        }
+      ],
+      "files": [
+        {
+          "file": "src/main/java/com/codex/blacklight/combat/FlyerPhysics.java",
+          "sha256": "dc57b3bffe23a90a2546b7f0991cd7e52b1c36d49d9b9b2effb7badf9e4ad3d2"
+        },
+        {
+          "file": "src/main/java/com/codex/blacklight/combat/FlyerContact.java",
+          "sha256": "450c8d663656c140dfa2a35c08861901276bc09341167197014b076d210e58b4"
+        },
+        {
+          "file": "src/main/java/com/codex/blacklight/combat/HydraContact.java",
+          "sha256": "38333c461753e1dcdc572bd7016b463193fa28bfa0b737b09ded3f53bed4b338"
+        },
+        {
+          "file": "src/main/java/com/codex/blacklight/combat/RagdollImpact.java",
+          "sha256": "4077ff8c5428131fd0740cd49a765a2ec26dc1c652477d5a02ff41ed2d7d5e72"
+        },
+        {
+          "file": "src/main/java/com/codex/blacklight/entity/EncounterMob.java",
+          "sha256": "a8e71357f61da2f3ee74008e89485719a837bc7f419ccf8c5c65542d857f9594"
+        },
+        {
+          "file": "src/main/java/com/codex/blacklight/client/renderer/AdaptiveRagdoll.java",
+          "sha256": "7b63106efcb69e8e75032993895b0305d4d15d88ed20ec17c5060ef94002f153"
+        },
+        {
+          "file": "src/main/java/com/codex/blacklight/client/renderer/BlacklightCreatureRenderer.java",
+          "sha256": "334ab8a92939c30358c9b54afe4be3c585d67f4815ba45360638d5344eb76ad3"
+        },
+        {
+          "file": "src/encounterTest/java/com/codex/blacklight/gametest/FlyerHurtGameTest.java",
+          "sha256": "60ff56d37303bdc279c2b36283ded76e040c2cfc64edfa698bf748faff0e0123"
+        },
+        {
+          "file": "src/encounterTest/java/com/codex/blacklight/gametest/EncounterGameTest.java",
+          "sha256": "39a7a34d28b0554173e2ca9c0e99c2eaa3a1e2b08322e3616b51adcc8f359f66"
+        },
+        {
+          "file": "src/flyerWeaponVisual/java/com/codex/blacklight/client/FlyerWeaponVisual.java",
+          "sha256": "ae0b881a1b1ed74dd35e035ed66ca897e302f4d39de5d0801f6f5981eaaa4e0c"
+        }
+      ]
+    }
+  ],
+  "latestParticleEvidence": "contact-particles-validation.json",
+  "serverRegressionBoundary": "100 server and 37 unit checks are the preceding physics checkpoint. The particle-only delta reran both native clients and frame/skin/receipt checks; see contact-particles-validation.json.",
+  "fixes": [
+    "Server-owned connected rigid parts drive both Gecko source bones and native receiving surfaces; the server carrier follows the physical root.",
+    "Local-coordinate physics preserves precision far from the world origin.",
+    "Contact effects remain localized; a real supporting block contact emits terrain debris/sound through the shared player-hammer system.",
+    "A single snapshot interpolates body pose and root; intermediate rotating skin is projected out of actual terrain for rendering and fractional contact queries.",
+    "Hitstop preserves exact endpoint snapshots; repeated impulses retain the body; server lethal handoff retains the last pose."
+  ],
+  "evidenceBoundary": "Native skin metrics reconstruct baked Gecko cube vertices using tracked renderer matrices and the explicit outer root translation (Gecko tracking strips entityRenderTranslations). Screenshots provide the separate visible check. Server lethal handoff is tested, but native corpse/cut/grab/consume handoff is not yet accepted.",
+  "pending": [
+    "Native grab/hold/consume and lethal-cut transitions from the downed flyer",
+    "High-speed impacts against thin slabs, stairs and narrow walls; continuous collision coverage",
+    "Multiplayer snapshot ordering, multiple simultaneous bodies and broader mod/legacy matrix",
+    "Remaining original audio validation and full creature-goal scope"
+  ]
+}

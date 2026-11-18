@@ -1,0 +1,127 @@
+{
+  "origin": "Authored voxel mesh and procedural surface measured against private P1 original UAV geometry; original assets are not embedded",
+  "sourcePackageSha256": "deb7ddceb62f5ef91c6230d02170d992c3b93af6fa837524872d04d039ee27a5",
+  "sourceMeshBounds": [
+    [
+      -0.9459512,
+      -0.00281513,
+      -0.96015084
+    ],
+    [
+      0.94595075,
+      1.7288846,
+      0.94595104
+    ]
+  ],
+  "sourceRotorJoint": [
+    0,
+    0.5846875905990601,
+    0
+  ],
+  "sourceLampOffset": [
+    -0.155,
+    0.428,
+    -0.964
+  ],
+  "bedrockLamp": [
+    2.48,
+    6.848,
+    -15.424
+  ],
+  "rotors": 1,
+  "cubes": 258,
+  "stateEffects": {
+    "idle": "lightGlowGreen",
+    "seeing": "lightGlowYellow",
+    "alert": "lightGlowRed"
+  },
+  "limits": [
+    "Voxel surface approximates curved source geometry",
+    "Detection-duration and lease values remain Minecraft adaptations, not decoded original timing"
+  ],
+  "headCorrection": {
+    "sourceProof": "D:/PrototypeReference/p1/private/uav/head-measurements.json",
+    "method": "1002-vertex P1 main mesh, welded triangle-connected components: solid cap86 points, rear barrel33 points, three struts6 points each. No native mesh or texture copied.",
+    "sourceCapBounds": [
+      [
+        -0.3339794,
+        1.49146235,
+        -0.20075928
+      ],
+      [
+        0.33397949,
+        1.72888458,
+        -0.03665394
+      ]
+    ],
+    "sourceBarrelBounds": [
+      [
+        -0.15757427,
+        1.54857337,
+        -0.16645387
+      ],
+      [
+        0.15757425,
+        1.66432357,
+        0.16645387
+      ]
+    ],
+    "sourceStrutEndpointCentroids": [
+      [
+        [
+          -0.499,
+          0.597924,
+          -0.362583
+        ],
+        [
+          -0.041923,
+          1.573165,
+          -0.033779
+        ]
+      ],
+      [
+        [
+          0.499356,
+          0.597924,
+          -0.362583
+        ],
+        [
+          0.042279,
+          1.573165,
+          -0.033779
+        ]
+      ],
+      [
+        [
+          0,
+          0.603426,
+          0.617719
+        ],
+        [
+          0,
+          1.555918,
+          0.067797
+        ]
+      ]
+    ],
+    "mapping": "Bedrock [-X,Y,Z]*16. New solid voxel ellipse and rear elliptical cylinder replace hollow segmented trim and square backing blocks. Existing torso shell, single rotor and lamp placement remain unchanged.",
+    "adaptation": "Cap uses9x5 ellipsoid bands; barrel7 bands; strut square width.46px approximates original triangular cross-section. Strut upper endpoints and direction use measured source, while each lower end is extended along that same line to authored Y8.25 to intersect the retained inner shroud lip rather than float above it. Rear termination band and crosshatch are authored material cues. Exact native cap curvature/asymmetric barrel contour are approximations.",
+    "status": "Static source/asset generation only; no Java/client or game verification."
+  },
+  "runtimeRotationCorrection": {
+    "cause": "The prior beam angles used mathematical authoring Euler directly as Gecko JSON. Mirrored vertices plus Gecko Euler(-X,-Y,+Z) reversed the horizontal lean of non-horizontal beams; the previous preview omitted that conversion and falsely showed attached struts.",
+    "encoding": "Authoring Rz(z)*Ry(y)*Rx(x) becomes JSON[-x,y,-z]; Gecko baked Euler[-JSON.x,-JSON.y,JSON.z] then correctly transforms the mirrored-X vertices.",
+    "scope": "Three upper support rods and underside skid frames. Head remains fixed, its measured bounds unchanged; shell, rotor origin, light location and textures retain their authored values. Wreck export uses baked Gecko angles so its geometry stays aligned with the live model.",
+    "evidence": "art/military2/uav-gecko-rotation-review-20261117.json",
+    "preview": "preview_uav_head.py now reconstructs the actual Gecko cube transform, shown back in authoring axes for comparison.",
+    "validation": "Static endpoints/geometry only; no game or JVM executed."
+  },
+  "files": {
+    "src/main/resources/assets/blacklight/geo/recon_uav_mc.geo.json": "5592e37d7fc323a97f7bb89ca6add566e41b49fc81d9b22e043c63946fb9d5e2",
+    "src/main/resources/assets/blacklight/animations/recon_uav.animation.json": "6ce9ca6cf4eb296e182c37bfb8e06827a8d091eae222674b7f751576ff6e074f",
+    "src/main/resources/assets/blacklight/textures/entity/recon_uav_mc.png": "5fef328c714bed8d8b5bfe3a10a5313a4a3531e6726db6ede982f59c0951a18e",
+    "src/main/resources/assets/blacklight/textures/entity/recon_uav_mc_glowmask.png": "0c9132dc930f2b699c9650179ec8e0a068af5e0ca65c7f1624a2e254e4a88d28",
+    "src/main/resources/assets/blacklight/military/recon-uav-wreck.json": "c1acef6101f254786cae7c009765c99fe0d152def443686cb75dcd1ef2bf292f",
+    "src/main/resources/assets/blacklight/textures/entity/recon_uav_wreck.png": "fb91f41b1bef68b23a286a2c5e3f11d30e051b0821f0accd22c33890e9a58d51"
+  }
+}

@@ -1,0 +1,608 @@
+{
+  "schema": 1,
+  "createdLocal": "2026-11-16T21:00:41",
+  "status": "Verified source-paced Hellfire hover checkpoint; full creatures/military/models/audio objective remains active.",
+  "source": {
+    "file": "D:\\blacklight-evolution\\art\\military-vehicles\\helicopter-hover-source.json",
+    "sha256": "d067a7b1b42937c2e731ed8f3325054b1e5c44df835334f5f759b4ec3126f09c"
+  },
+  "platforms": {
+    "neo": {
+      "unitTests": 57,
+      "nativeHelicopterTests": 67,
+      "nativeVehicleRegression": 29,
+      "logs": {
+        "hellfireUnit": {
+          "file": "D:\\CodexCache\\helicopter-hover-qa\\neo-hellfireUnit-passed.log",
+          "sha256": "fb0b32d525f5321ab5804e832af85009356e2d720092a115ad0798bb141bf692"
+        },
+        "helicopterHullServer": {
+          "file": "D:\\CodexCache\\helicopter-hover-qa\\neo-helicopterHullServer-passed.log",
+          "sha256": "8a4d1ed9b7d9b11ac2fced6fc6994742f982a86e4dd9e4685dda6db00e15f84c"
+        },
+        "helicopterHullRegression": {
+          "file": "D:\\CodexCache\\helicopter-hover-qa\\neo-helicopterHullRegression-passed.log",
+          "sha256": "187890c08e6351a7d834d06c5e3e86c995556b717338f9bfa7ca32dd918af0ed"
+        },
+        "helicopterHoverVisual": {
+          "file": "D:\\CodexCache\\helicopter-hover-qa\\neo-helicopterHoverVisual-passed.log",
+          "sha256": "fac7c437d380e83088d1d6367c8b7943c56500b89fc6f63715551487ad017948"
+        }
+      },
+      "unitSuites": [
+        {
+          "suite": "com.codex.blacklight.firearms.GunplayFeedbackPayloadTest",
+          "tests": 2,
+          "file": "D:\\CodexCache\\helicopter-hover-qa\\neo-unit-xml\\TEST-com.codex.blacklight.firearms.GunplayFeedbackPayloadTest.xml",
+          "sha256": "e34be9644c97253b9fa767b1e8eb9148c43264495def0e0a74ffd08c8880fde2"
+        },
+        {
+          "suite": "com.codex.blacklight.military.aircraft.HelicopterArmamentTest",
+          "tests": 2,
+          "file": "D:\\CodexCache\\helicopter-hover-qa\\neo-unit-xml\\TEST-com.codex.blacklight.military.aircraft.HelicopterArmamentTest.xml",
+          "sha256": "592d214b4f677ff19b5d4b8154003d6e126a09686f017e73d0737923a54ad687"
+        },
+        {
+          "suite": "com.codex.blacklight.military.aircraft.HelicopterAuthorityTest",
+          "tests": 2,
+          "file": "D:\\CodexCache\\helicopter-hover-qa\\neo-unit-xml\\TEST-com.codex.blacklight.military.aircraft.HelicopterAuthorityTest.xml",
+          "sha256": "365f433f8c188b25d6a71f75cb903210b30a58ed741386b543f0e12339c7f8a6"
+        },
+        {
+          "suite": "com.codex.blacklight.military.aircraft.HelicopterBlastWaveTest",
+          "tests": 4,
+          "file": "D:\\CodexCache\\helicopter-hover-qa\\neo-unit-xml\\TEST-com.codex.blacklight.military.aircraft.HelicopterBlastWaveTest.xml",
+          "sha256": "d25574695a6e43952d6aa05c2148ef4af91f773de4de4f8b420a214c969c8589"
+        },
+        {
+          "suite": "com.codex.blacklight.military.aircraft.HelicopterFlightTest",
+          "tests": 4,
+          "file": "D:\\CodexCache\\helicopter-hover-qa\\neo-unit-xml\\TEST-com.codex.blacklight.military.aircraft.HelicopterFlightTest.xml",
+          "sha256": "2a3f8bb148c553569d2a3523b5292d47acbf701ee689d09c7867f045ae77defd"
+        },
+        {
+          "suite": "com.codex.blacklight.military.aircraft.HelicopterGunCycleTest",
+          "tests": 3,
+          "file": "D:\\CodexCache\\helicopter-hover-qa\\neo-unit-xml\\TEST-com.codex.blacklight.military.aircraft.HelicopterGunCycleTest.xml",
+          "sha256": "2ff8ca1f02b1c6b3116cfa6371c1d521d0493bc030e3d4542290e1f8001b8b9b"
+        },
+        {
+          "suite": "com.codex.blacklight.military.aircraft.HelicopterHellfireAttackTest",
+          "tests": 6,
+          "file": "D:\\CodexCache\\helicopter-hover-qa\\neo-unit-xml\\TEST-com.codex.blacklight.military.aircraft.HelicopterHellfireAttackTest.xml",
+          "sha256": "60ecc117d09e0831a3571b3bb41741a1215790e9addb19cfe74c909ff9959fce"
+        },
+        {
+          "suite": "com.codex.blacklight.military.aircraft.HelicopterMissileFlightTest",
+          "tests": 9,
+          "file": "D:\\CodexCache\\helicopter-hover-qa\\neo-unit-xml\\TEST-com.codex.blacklight.military.aircraft.HelicopterMissileFlightTest.xml",
+          "sha256": "0db7acfa47af482e84e85701b7e45b5386fa285255d74fe5c132eaac82571f57"
+        },
+        {
+          "suite": "com.codex.blacklight.military.aircraft.HelicopterRouteTest",
+          "tests": 8,
+          "file": "D:\\CodexCache\\helicopter-hover-qa\\neo-unit-xml\\TEST-com.codex.blacklight.military.aircraft.HelicopterRouteTest.xml",
+          "sha256": "c39b33b0ab1bbae3af46cb587b095a88ec87c51bcc7a548c19ac2c7fac37aa22"
+        },
+        {
+          "suite": "com.codex.blacklight.military.vehicle.VehicleControlAuthorityTest",
+          "tests": 11,
+          "file": "D:\\CodexCache\\helicopter-hover-qa\\neo-unit-xml\\TEST-com.codex.blacklight.military.vehicle.VehicleControlAuthorityTest.xml",
+          "sha256": "7a81381db14defb0d4201d4811bdb6514d771e51aef0a0d60d5d712bc1e10959"
+        },
+        {
+          "suite": "com.codex.blacklight.military.vehicle.VehicleWeaponDefinitionTest",
+          "tests": 6,
+          "file": "D:\\CodexCache\\helicopter-hover-qa\\neo-unit-xml\\TEST-com.codex.blacklight.military.vehicle.VehicleWeaponDefinitionTest.xml",
+          "sha256": "3e03f909d69c6ff143a97abae04f044a3e53efb2044ab20aadf259933936404a"
+        }
+      ],
+      "client": {
+        "frames": 109,
+        "firstHover": 300,
+        "firstShot": 328,
+        "launchSpeed": 0.008429628592273737,
+        "activeSounds": [
+          "blacklight:firearm.impact",
+          "blacklight:vehicle.coaxial",
+          "blacklight:vehicle.helicopter_rotor",
+          "blacklight:vehicle.helicopter_turbine",
+          "blacklight:vehicle.rocket"
+        ],
+        "finalTrace": {
+          "age": 429,
+          "stage": "STRAFE",
+          "phase": "STRAFE",
+          "avoid": 71,
+          "hoverAge": 0,
+          "gun": 52,
+          "rocket": 1,
+          "speed": 0.22342270352302898,
+          "health": 49520.0,
+          "position": {
+            "x": 23.549494507637924,
+            "y": 93.97512581743969,
+            "z": -6.525928870243311
+          }
+        },
+        "evidence": {
+          "file": "D:\\CodexCache\\helicopter-hover-qa\\neo-frames\\evidence.json",
+          "sha256": "422eb1f7ef14ba000119f228bb1fffbd3e700087b131ccdb7881824c2f744631"
+        },
+        "reviewSheet": {
+          "file": "D:\\CodexCache\\helicopter-hover-qa\\neo-hover-review.png",
+          "sha256": "c88617074d10484bc08e58748cc69431201b2711ce82c01de3bcbae63d2e64f7"
+        },
+        "reviewedFrames": [
+          {
+            "image": "hover-100-STRAFE.png",
+            "age": 101,
+            "stage": "STRAFE",
+            "file": "D:\\CodexCache\\helicopter-hover-qa\\neo-frames\\hover-100-STRAFE.png",
+            "sha256": "595672636e77740292ac4ad016fb2f1b51e7379ac9d0da8904f8594addb2e5a9"
+          },
+          {
+            "image": "hover-250-STRAFE.png",
+            "age": 250,
+            "stage": "STRAFE",
+            "file": "D:\\CodexCache\\helicopter-hover-qa\\neo-frames\\hover-250-STRAFE.png",
+            "sha256": "2f46de46658599ce3a830523b8fec1046b9ebbfda1cd60eeb4a403c6f3bd1b2f"
+          },
+          {
+            "image": "hover-297-STRAFE.png",
+            "age": 297,
+            "stage": "STRAFE",
+            "file": "D:\\CodexCache\\helicopter-hover-qa\\neo-frames\\hover-297-STRAFE.png",
+            "sha256": "9468b49f6dc0b8f6cc7469a289d83990a26e09a61b0e2592fedc95a8c41ca1d1"
+          },
+          {
+            "image": "hover-300-WAIT.png",
+            "age": 300,
+            "stage": "WAIT",
+            "file": "D:\\CodexCache\\helicopter-hover-qa\\neo-frames\\hover-300-WAIT.png",
+            "sha256": "978fbcfc233028982c55daaf6acec90528b7ed956c33035769435627087aebfe"
+          },
+          {
+            "image": "hover-304-WAIT.png",
+            "age": 305,
+            "stage": "WAIT",
+            "file": "D:\\CodexCache\\helicopter-hover-qa\\neo-frames\\hover-304-WAIT.png",
+            "sha256": "f8a2e693f1d4fe68033321d3ede19f13da2364bf0ef20b3d256b891ec248e34f"
+          },
+          {
+            "image": "hover-312-WAIT.png",
+            "age": 312,
+            "stage": "WAIT",
+            "file": "D:\\CodexCache\\helicopter-hover-qa\\neo-frames\\hover-312-WAIT.png",
+            "sha256": "7e3cc20a56ad1d02de081dab9cb5d2d5aaea1db3b21f72987503902eb6924d40"
+          },
+          {
+            "image": "hover-326-WAIT.png",
+            "age": 326,
+            "stage": "WAIT",
+            "file": "D:\\CodexCache\\helicopter-hover-qa\\neo-frames\\hover-326-WAIT.png",
+            "sha256": "fb8b2b2a80ed35aa573427cad11d95d020f2bf24eb6ec12d7ed4b7f2c9460e57"
+          },
+          {
+            "image": "hover-327-AIM.png",
+            "age": 328,
+            "stage": "FIRE",
+            "file": "D:\\CodexCache\\helicopter-hover-qa\\neo-frames\\hover-327-AIM.png",
+            "sha256": "8997a1c8fc8bf8324b7318b604427a4d7a1d87b4da12d40e5e6bf75e6a021e2a"
+          },
+          {
+            "image": "hover-329-FIRE.png",
+            "age": 330,
+            "stage": "FIRE",
+            "file": "D:\\CodexCache\\helicopter-hover-qa\\neo-frames\\hover-329-FIRE.png",
+            "sha256": "596ae8f31264d34345136981ade54ef8a7807bb5b596e889f2f6d8567a1fe794"
+          },
+          {
+            "image": "hover-332-RECOVER.png",
+            "age": 333,
+            "stage": "RECOVER",
+            "file": "D:\\CodexCache\\helicopter-hover-qa\\neo-frames\\hover-332-RECOVER.png",
+            "sha256": "44568ae9e9feb882f3dc85389d95eac5023475ad32d50e643b09a97c1a86702e"
+          },
+          {
+            "image": "hover-337-RECOVER.png",
+            "age": 337,
+            "stage": "RECOVER",
+            "file": "D:\\CodexCache\\helicopter-hover-qa\\neo-frames\\hover-337-RECOVER.png",
+            "sha256": "918a84b4bb17eccfb862304a63645a1d33d87e6a972dda80d59479699b26a16e"
+          },
+          {
+            "image": "hover-348-RECOVER.png",
+            "age": 348,
+            "stage": "RECOVER",
+            "file": "D:\\CodexCache\\helicopter-hover-qa\\neo-frames\\hover-348-RECOVER.png",
+            "sha256": "bb1da9c30adeacd14c7a0a24db60e4afd3c5a75c4048da765cae19e7c1346d44"
+          },
+          {
+            "image": "hover-351-RECOVER.png",
+            "age": 352,
+            "stage": "RECOVER",
+            "file": "D:\\CodexCache\\helicopter-hover-qa\\neo-frames\\hover-351-RECOVER.png",
+            "sha256": "7d43d3a23aab11968fe3d54796a1109c15f0eb47a8ca0c8b2b882e1a5ea54541"
+          },
+          {
+            "image": "hover-370-RECOVER.png",
+            "age": 370,
+            "stage": "RECOVER",
+            "file": "D:\\CodexCache\\helicopter-hover-qa\\neo-frames\\hover-370-RECOVER.png",
+            "sha256": "6a86f32e936a7127f200a8591290a1a99a00a8871793d55cc5505d499291c584"
+          },
+          {
+            "image": "hover-400-STRAFE.png",
+            "age": 401,
+            "stage": "STRAFE",
+            "file": "D:\\CodexCache\\helicopter-hover-qa\\neo-frames\\hover-400-STRAFE.png",
+            "sha256": "f9c482a13a334d7021be62fed6f0e7091530a3cea61ec1813a05baaea13d1367"
+          },
+          {
+            "image": "hover-420-STRAFE.png",
+            "age": 420,
+            "stage": "STRAFE",
+            "file": "D:\\CodexCache\\helicopter-hover-qa\\neo-frames\\hover-420-STRAFE.png",
+            "sha256": "80e8c907be070660d2787f96364a58a3f86bfcd72c27a6ac1e9e0a506a509d86"
+          }
+        ]
+      },
+      "code": {
+        "src/main/java/com/codex/blacklight/military/aircraft/HelicopterHellfireAttack.java": "9d8988649b8e41c0a51847b9c26391ab0cac22ab5815eda2e9df12a04a8e61c2",
+        "src/main/java/com/codex/blacklight/military/aircraft/HelicopterCombat.java": "13aee6d0fe66e92ee147224b629934490e80628e87aa4368b665b5a53bf148c8",
+        "src/main/java/com/codex/blacklight/firearms/VehicleOrdnanceProjectile.java": "d40fca8e8a47e0316a23c6b5520634108248b371a02cacf0caf810b58edad82c",
+        "src/main/java/com/codex/blacklight/firearms/HellfireBlastEntity.java": "efb56702e5ba0477f86d79f67ee732b7db154389347c2b3a8e9757ff20f2a81f",
+        "src/test/java/com/codex/blacklight/military/aircraft/HelicopterHellfireAttackTest.java": "bbcb69d51814b598489a374d2f1c6a81513fc7ff11545e3b4699cc045024cd44",
+        "src/helicopterTest/java/com/codex/blacklight/gametest/HelicopterHoverGameTest.java": "c99ddd86feefef357db7dd3486ff5498e6770b26eea39c321baae744ccd12e10",
+        "src/helicopterTest/java/com/codex/blacklight/gametest/HelicopterCombatGameTest.java": "a8a8a8a067454d37bd31a62005ec07198a8fdffc6cd1ca5bd63bc267e893e103",
+        "src/helicopterTest/java/com/codex/blacklight/gametest/HelicopterVehicleCombatGameTest.java": "4746b39202fc84374a6f0d45445cefe17e8d438fb696400c054eb75bce64bfb1",
+        "src/hoverVisual/java/com/codex/blacklight/client/HelicopterHoverVisual.java": "d01deef89a67648fff973ed2be05dfcd5bbae47bdf178e94ddae7062a1649ae1",
+        "tools/helicopter-hover-visual.init.gradle": "416189d5e0923027b95e0bd238ac0b201f37cb9570e98a4a63a04e7235164d78",
+        "tools/helicopter-hull-test.init.gradle": "09fe6f28473fceeea5930c76ff1e06ab4c92465ab1ccea5c66b45be87ace83b7",
+        "tools/helicopter-hellfire-unit.init.gradle": "91c64bac3f49b5e628686ba97f5836ee87e8737a8f61d3ee7d6402084380b403"
+      }
+    },
+    "forge": {
+      "unitTests": 57,
+      "nativeHelicopterTests": 67,
+      "nativeVehicleRegression": 29,
+      "logs": {
+        "hellfireUnit": {
+          "file": "D:\\CodexCache\\helicopter-hover-qa\\forge-hellfireUnit-passed.log",
+          "sha256": "9f443faf6d46f83ad20e88bd707153e60b91f96f65a837d06469d1e56fb459fa"
+        },
+        "helicopterHullServer": {
+          "file": "D:\\CodexCache\\helicopter-hover-qa\\forge-helicopterHullServer-passed.log",
+          "sha256": "af743194458f507ca58bc20bd6f58b22031ff9b6001caf0cf61b0adf4ffeba46"
+        },
+        "helicopterHullRegression": {
+          "file": "D:\\CodexCache\\helicopter-hover-qa\\forge-helicopterHullRegression-passed.log",
+          "sha256": "2a9116f687bdcbc449bd373faa74c386ccd550fa62933c96b1740e77933491d2"
+        },
+        "helicopterHoverVisual": {
+          "file": "D:\\CodexCache\\helicopter-hover-qa\\forge-helicopterHoverVisual-passed.log",
+          "sha256": "e0517f6359f5e2d932c9eeb137b3af278dc33ca4ad21f3c8b85523b9ed2cce37"
+        }
+      },
+      "unitSuites": [
+        {
+          "suite": "com.codex.blacklight.firearms.GunplayFeedbackPayloadTest",
+          "tests": 2,
+          "file": "D:\\CodexCache\\helicopter-hover-qa\\forge-unit-xml\\TEST-com.codex.blacklight.firearms.GunplayFeedbackPayloadTest.xml",
+          "sha256": "be6fce1b6174618ca10f2f5787cd9f816cf642d6320bbe35e02ad61a9f2c5182"
+        },
+        {
+          "suite": "com.codex.blacklight.military.aircraft.HelicopterArmamentTest",
+          "tests": 2,
+          "file": "D:\\CodexCache\\helicopter-hover-qa\\forge-unit-xml\\TEST-com.codex.blacklight.military.aircraft.HelicopterArmamentTest.xml",
+          "sha256": "fc1108d738781f58a54b5bd5adb093d75703de7037d6564eddaabfed7c686153"
+        },
+        {
+          "suite": "com.codex.blacklight.military.aircraft.HelicopterAuthorityTest",
+          "tests": 2,
+          "file": "D:\\CodexCache\\helicopter-hover-qa\\forge-unit-xml\\TEST-com.codex.blacklight.military.aircraft.HelicopterAuthorityTest.xml",
+          "sha256": "159dacb46683107be54490b89208ed69c49851a8522c2a10033522a990c5048c"
+        },
+        {
+          "suite": "com.codex.blacklight.military.aircraft.HelicopterBlastWaveTest",
+          "tests": 4,
+          "file": "D:\\CodexCache\\helicopter-hover-qa\\forge-unit-xml\\TEST-com.codex.blacklight.military.aircraft.HelicopterBlastWaveTest.xml",
+          "sha256": "f970e2ecb69be6069a9765185b1a893e1326aa54403e142996264e848bea1b7a"
+        },
+        {
+          "suite": "com.codex.blacklight.military.aircraft.HelicopterFlightTest",
+          "tests": 4,
+          "file": "D:\\CodexCache\\helicopter-hover-qa\\forge-unit-xml\\TEST-com.codex.blacklight.military.aircraft.HelicopterFlightTest.xml",
+          "sha256": "43c8adb4b2ade74cd32ce0f2eb1e9766fe4071f3d00a7f05a2c673f424e253ae"
+        },
+        {
+          "suite": "com.codex.blacklight.military.aircraft.HelicopterGunCycleTest",
+          "tests": 3,
+          "file": "D:\\CodexCache\\helicopter-hover-qa\\forge-unit-xml\\TEST-com.codex.blacklight.military.aircraft.HelicopterGunCycleTest.xml",
+          "sha256": "2f41740f09eb387485201a825a5a2f4f0c71edfdf6b47d8b23f679e504390d54"
+        },
+        {
+          "suite": "com.codex.blacklight.military.aircraft.HelicopterHellfireAttackTest",
+          "tests": 6,
+          "file": "D:\\CodexCache\\helicopter-hover-qa\\forge-unit-xml\\TEST-com.codex.blacklight.military.aircraft.HelicopterHellfireAttackTest.xml",
+          "sha256": "a26891caa027a485f09dd4350f9859e702b3e10560a5b923a8ea05f77dede386"
+        },
+        {
+          "suite": "com.codex.blacklight.military.aircraft.HelicopterMissileFlightTest",
+          "tests": 9,
+          "file": "D:\\CodexCache\\helicopter-hover-qa\\forge-unit-xml\\TEST-com.codex.blacklight.military.aircraft.HelicopterMissileFlightTest.xml",
+          "sha256": "5947d82db7c0a77d135dc8cd77d95725371bb018a6372325c0748dcc632ad135"
+        },
+        {
+          "suite": "com.codex.blacklight.military.aircraft.HelicopterRouteTest",
+          "tests": 8,
+          "file": "D:\\CodexCache\\helicopter-hover-qa\\forge-unit-xml\\TEST-com.codex.blacklight.military.aircraft.HelicopterRouteTest.xml",
+          "sha256": "27f30bcb285dcd300237337649e8a3d466e2d23f6fcce14fece3d425fed1e79c"
+        },
+        {
+          "suite": "com.codex.blacklight.military.vehicle.VehicleControlAuthorityTest",
+          "tests": 11,
+          "file": "D:\\CodexCache\\helicopter-hover-qa\\forge-unit-xml\\TEST-com.codex.blacklight.military.vehicle.VehicleControlAuthorityTest.xml",
+          "sha256": "507a5a29f6d7ee7b3179a8e4ecf398e5ce028fb37ced4073453e16516f0f404e"
+        },
+        {
+          "suite": "com.codex.blacklight.military.vehicle.VehicleWeaponDefinitionTest",
+          "tests": 6,
+          "file": "D:\\CodexCache\\helicopter-hover-qa\\forge-unit-xml\\TEST-com.codex.blacklight.military.vehicle.VehicleWeaponDefinitionTest.xml",
+          "sha256": "867d56614678b3dfda6857231bd66ecc9b5072361385b7161803014f6cc736b5"
+        }
+      ],
+      "client": {
+        "frames": 116,
+        "firstHover": 300,
+        "firstShot": 335,
+        "launchSpeed": 0.007060586045213595,
+        "activeSounds": [
+          "blacklight:firearm.impact",
+          "blacklight:vehicle.coaxial",
+          "blacklight:vehicle.helicopter_rotor",
+          "blacklight:vehicle.helicopter_turbine",
+          "blacklight:vehicle.rocket"
+        ],
+        "finalTrace": {
+          "age": 436,
+          "stage": "STRAFE",
+          "phase": "STRAFE",
+          "avoid": 64,
+          "hoverAge": 0,
+          "gun": 55,
+          "rocket": 1,
+          "speed": 0.22253843310485794,
+          "health": 49500.0,
+          "position": {
+            "x": 24.092638322647275,
+            "y": 93.9750951150996,
+            "z": -4.133757206741994
+          }
+        },
+        "evidence": {
+          "file": "D:\\CodexCache\\helicopter-hover-qa\\forge-frames\\evidence.json",
+          "sha256": "af6918d2e6a4242fbd7bff684de3e59021edc16f70e1b05070338cf8183abb54"
+        },
+        "reviewSheet": {
+          "file": "D:\\CodexCache\\helicopter-hover-qa\\forge-hover-review.png",
+          "sha256": "11ad2a452fbd79d881dd0cd9077bb78e556d66b80ad95af2974e0fa3d23a7244"
+        },
+        "reviewedFrames": [
+          {
+            "image": "hover-100-STRAFE.png",
+            "age": 101,
+            "stage": "STRAFE",
+            "file": "D:\\CodexCache\\helicopter-hover-qa\\forge-frames\\hover-100-STRAFE.png",
+            "sha256": "a8017147f51f62bd7541a6788fa69c2489ebad976dff0d9927a289021c57f26a"
+          },
+          {
+            "image": "hover-250-STRAFE.png",
+            "age": 251,
+            "stage": "STRAFE",
+            "file": "D:\\CodexCache\\helicopter-hover-qa\\forge-frames\\hover-250-STRAFE.png",
+            "sha256": "bec1c81e3c7b7b905d38952451b4c42424f1201acdb67b8309113b0acdd74944"
+          },
+          {
+            "image": "hover-297-STRAFE.png",
+            "age": 297,
+            "stage": "STRAFE",
+            "file": "D:\\CodexCache\\helicopter-hover-qa\\forge-frames\\hover-297-STRAFE.png",
+            "sha256": "3ad86e3d1b041062d8a047ba745fe501ebe4581a86a75ef95fcc10c531223c71"
+          },
+          {
+            "image": "hover-300-WAIT.png",
+            "age": 300,
+            "stage": "WAIT",
+            "file": "D:\\CodexCache\\helicopter-hover-qa\\forge-frames\\hover-300-WAIT.png",
+            "sha256": "bccf2c113e4c52e58e3acf5b6d425e3d35c3d6fcab13b9d6e657251ce90bd99d"
+          },
+          {
+            "image": "hover-305-WAIT.png",
+            "age": 305,
+            "stage": "WAIT",
+            "file": "D:\\CodexCache\\helicopter-hover-qa\\forge-frames\\hover-305-WAIT.png",
+            "sha256": "8009534e78aada7fe942f58849cec9c69b2d4e8024272f6348e24bc2c22483a0"
+          },
+          {
+            "image": "hover-312-WAIT.png",
+            "age": 312,
+            "stage": "WAIT",
+            "file": "D:\\CodexCache\\helicopter-hover-qa\\forge-frames\\hover-312-WAIT.png",
+            "sha256": "aabcc7dfb20198c35add1906222b5c5f37a456ea07a71ec34655156a4bc01c6f"
+          },
+          {
+            "image": "hover-334-AIM.png",
+            "age": 334,
+            "stage": "AIM",
+            "file": "D:\\CodexCache\\helicopter-hover-qa\\forge-frames\\hover-334-AIM.png",
+            "sha256": "de4cf7aabb9e2fb696d778542e97a989c62686045d26d20dd524674d74421885"
+          },
+          {
+            "image": "hover-335-FIRE.png",
+            "age": 336,
+            "stage": "FIRE",
+            "file": "D:\\CodexCache\\helicopter-hover-qa\\forge-frames\\hover-335-FIRE.png",
+            "sha256": "9ae630342d66d219c2c13c4d249de2e034911640a32455aae91d1c26cf98db17"
+          },
+          {
+            "image": "hover-337-FIRE.png",
+            "age": 337,
+            "stage": "FIRE",
+            "file": "D:\\CodexCache\\helicopter-hover-qa\\forge-frames\\hover-337-FIRE.png",
+            "sha256": "25714e7fd5c429202bd0e987fff0319a2464b2d6653a730000d738f5fc95cfbf"
+          },
+          {
+            "image": "hover-339-RECOVER.png",
+            "age": 339,
+            "stage": "RECOVER",
+            "file": "D:\\CodexCache\\helicopter-hover-qa\\forge-frames\\hover-339-RECOVER.png",
+            "sha256": "ee2ad5731e21814b8e6ec47b3a578e0e1b320632d5a4c42f3b54a03650411469"
+          },
+          {
+            "image": "hover-345-RECOVER.png",
+            "age": 345,
+            "stage": "RECOVER",
+            "file": "D:\\CodexCache\\helicopter-hover-qa\\forge-frames\\hover-345-RECOVER.png",
+            "sha256": "6b93ec61ec60fa8629687b8f88b2a64b75f2915fcb91474bc3edc6a59634751c"
+          },
+          {
+            "image": "hover-354-RECOVER.png",
+            "age": 354,
+            "stage": "RECOVER",
+            "file": "D:\\CodexCache\\helicopter-hover-qa\\forge-frames\\hover-354-RECOVER.png",
+            "sha256": "eab6263a91f51953022d36058835a8e9eadec5f50d4e3da1c6ec8f7bec208e0e"
+          },
+          {
+            "image": "hover-359-RECOVER.png",
+            "age": 359,
+            "stage": "RECOVER",
+            "file": "D:\\CodexCache\\helicopter-hover-qa\\forge-frames\\hover-359-RECOVER.png",
+            "sha256": "a2a4731e8b76f41878c6509153e00e17664095ae39b481a43e4f34590b25f58d"
+          },
+          {
+            "image": "hover-370-STRAFE.png",
+            "age": 371,
+            "stage": "STRAFE",
+            "file": "D:\\CodexCache\\helicopter-hover-qa\\forge-frames\\hover-370-STRAFE.png",
+            "sha256": "14747d129721be4ef4168ae8423cdb30ae31760f3d4778e8ac1a835db6ded656"
+          },
+          {
+            "image": "hover-400-STRAFE.png",
+            "age": 400,
+            "stage": "STRAFE",
+            "file": "D:\\CodexCache\\helicopter-hover-qa\\forge-frames\\hover-400-STRAFE.png",
+            "sha256": "35414243abe9b99001f82473e619ab818f277961624819f5c4e5e97504cffc61"
+          },
+          {
+            "image": "hover-430-STRAFE.png",
+            "age": 430,
+            "stage": "STRAFE",
+            "file": "D:\\CodexCache\\helicopter-hover-qa\\forge-frames\\hover-430-STRAFE.png",
+            "sha256": "01619f0b186f0f2d0f11c5854bc86f7bc821c888d0a5c55910edb82b60ac6f15"
+          }
+        ]
+      },
+      "code": {
+        "src/main/java/com/codex/blacklight/military/aircraft/HelicopterHellfireAttack.java": "8e54009b8428c5fcb48a8393ed9f8a6a1eea583e1cbdbc576d5e51db867a5a42",
+        "src/main/java/com/codex/blacklight/military/aircraft/HelicopterCombat.java": "13aee6d0fe66e92ee147224b629934490e80628e87aa4368b665b5a53bf148c8",
+        "src/main/java/com/codex/blacklight/firearms/VehicleOrdnanceProjectile.java": "e85fd0e3bb0bd4f285737a57c462ca913908b900a316b68cace15c71379e1bb5",
+        "src/main/java/com/codex/blacklight/firearms/HellfireBlastEntity.java": "c5f34e12a2049500f6123690d9e91947d4ec150ef182d38a2513f70c17102c4f",
+        "src/test/java/com/codex/blacklight/military/aircraft/HelicopterHellfireAttackTest.java": "1fc714f1113b4f44cd834531ea3e4ac2f950d5ad1d68c6b07220911408e0d061",
+        "src/helicopterTest/java/com/codex/blacklight/gametest/HelicopterHoverGameTest.java": "80b31564aa92b31bc673f5e3603dc6504f1880fec87d5cbd06a03f36623a737e",
+        "src/helicopterTest/java/com/codex/blacklight/gametest/HelicopterCombatGameTest.java": "c8237e603ad33f62edbb103375e7f77d5789db3c1b4fdd5a5a69c6d194430fbf",
+        "src/helicopterTest/java/com/codex/blacklight/gametest/HelicopterVehicleCombatGameTest.java": "c5ca080c792fb0d06be6ce2680ffd3ce1850e75de52bbec007fde9c41646b1c0",
+        "src/hoverVisual/java/com/codex/blacklight/client/HelicopterHoverVisual.java": "8fa1d839da8f6f22abdca2f139b560073547fcdc0b20eaa7f6956aa643a097b7",
+        "tools/helicopter-hover-visual.init.gradle": "189570a89a576e5d8a2ba26199543dd79cfd62952c22248c2a86e985be5a2583",
+        "tools/helicopter-hull-test.init.gradle": "09fe6f28473fceeea5930c76ff1e06ab4c92465ab1ccea5c66b45be87ace83b7",
+        "tools/helicopter-hellfire-unit.init.gradle": "91c64bac3f49b5e628686ba97f5836ee87e8737a8f61d3ee7d6402084380b403"
+      }
+    }
+  },
+  "coverage": [
+    "Source initial 300-tick avoidance, repeat 200-tick avoidance, 20..40-tick preparation/recovery, XZ 1-dot <= .1 aim gate, four-tick Action pulse and one accepted missile; current movement physically brakes at a fixed anchor and resumes orbit/gun afterward.",
+    "Actual entity reload during preparation preserves timing and anchor. Reload after accepted fire preserves the consumed pulse and cannot duplicate the shot. Real wall cancels pending fire, retains last observation and avoidance, then permits fresh preparation after reacquisition.",
+    "Original AI infinite ammo remains separate from finite player stores. Real empty-store sortie fires a ninth missile at natural source pacing, with counters restored midway; manual controls remain finite.",
+    "Four actual guided missiles approach the occupied airframe diagonally and each inflict exactly 20 hull damage, total 80, without harming the seated player. Actual airborne/ground targets, radio designation, allied occupants and friendly splash protection still pass.",
+    "Explicit airframe sweep and expanded blast candidate query repair large-body broad-phase misses. Actual body contact, first obstruction, surface distance and permissions still decide collision/damage; eight-block query padding is not additional blast damage range.",
+    "Delivered troop handoff is checked after its isolated chunk exposes the target to UUID lookup; real wall and out-of-territory target both reject assignment."
+  ],
+  "visualReview": {
+    "scope": "Sixteen selected native framebuffer frames per platform show strafing, deceleration/hover, the real guided flight and ground impact, smoke, and resumed gun/flight. Full server trace establishes intermediate stages; screenshots are samples, not an original-engine animation comparison.",
+    "method": "Actual autonomous HelicopterCombat drives the aircraft and mounted weapons after initial post-delivery setup. QA only positions a harmless stationary target, spectator and detached camera in guarded disposable worlds. No generated/composited game imagery.",
+    "sound": "Native SoundManager.isActive records coaxial, rocket, impact, rotor and turbine. Logical volumes are 1 while OpenAL listener gain is verified 0. This is playback-state verification, not listening or source-waveform identity."
+  },
+  "rejectedAttempts": [
+    {
+      "file": "D:\\CodexCache\\helicopter-hover-qa\\forge-old-random-api.log",
+      "reason": "Forge Entity lacks getRandom; production uses the shared server level RNG on both platforms.",
+      "sha256": "eafca523f50d6b54e6e9d64dbba167c55290a83d661873fdffe24efe177b5bb9"
+    },
+    {
+      "file": "D:\\CodexCache\\helicopter-hover-qa\\neo-native-air-missed-contact.log",
+      "reason": "Guided missile positions crossed the live airframe while ordinary entity collision missed it; explicit aircraft body sweep added before the unchanged impact hook.",
+      "sha256": "bc622a6b93f8d439496036ba8db9cdb7a3ce6915a71e12308711e8ccee0c5f11"
+    },
+    {
+      "file": "D:\\CodexCache\\helicopter-hover-qa\\neo-first-air-sweep-query-failure.log",
+      "reason": "After collision repair, blast core candidate selection still missed the oversized aircraft, yielding outer-ring 4 instead of direct 20; query padding fixed before surface-distance tests.",
+      "sha256": "44de768872d5622b60c14d07b426b2ae857b4e5bdb25dff95793a57f13ad2b74"
+    },
+    {
+      "file": "D:\\CodexCache\\helicopter-hover-qa\\forge-first-air-sweep-query-failure.log",
+      "reason": "Same pre-fix native query issue on Forge; this failed run is not current acceptance evidence.",
+      "sha256": "60718cf28bd88d816dd339588abd4fc7ef5669e821a4d3aa80c6a614aef52ea1"
+    },
+    {
+      "file": "D:\\CodexCache\\helicopter-hover-qa\\neo-diagonal-timeout-cascade.log",
+      "reason": "Diagonal fixture called finish() and its pilot departed before the fourth missile arrived. Native timeout bypassed fixture cleanup and left a fake player; many later nonpersistent target tests failed to observe damage. The downstream cascade disappeared once early cleanup ran, consistent with distant-player despawning. Added explicit failure/cleanup before timeout and kept the real origin/crew active while isolating its automatic weapons.",
+      "sha256": "ee1e7ebeb3d3be4f8619a70ff189e7f1815d1f2ef7fbc0fed8fdd8e081038bc0"
+    },
+    {
+      "file": "D:\\CodexCache\\helicopter-hover-qa\\forge-diagonal-timeout-cascade.log",
+      "reason": "Same failed fixture lifecycle and downstream interference; fresh all-67 run required after correction.",
+      "sha256": "973bcc03ed7e26d3e04e6fab94f688794789c87b9d61f12069fc932bc56c2fe5"
+    },
+    {
+      "file": "D:\\CodexCache\\helicopter-hover-qa\\neo-diagonal-owner-return.log",
+      "reason": "Diagnostic run confirmed three impacts followed by operator=null/RETURN on the fourth missile. Cleanup prevented the cascade; separate immediate handoff test was corrected to wait for actual target UUID visibility.",
+      "sha256": "a9b2c66292f6b41cf248c009e2ec4d7987bf489a22c069e69e7eac2d62ba347b"
+    },
+    {
+      "file": "D:\\CodexCache\\helicopter-hover-qa\\forge-observer-outside-sound-range.log",
+      "reason": "Autonomous cycle passed but fixed spectator lay outside vanilla short-range gun/launch sound broadcast. Observer now follows within range; no production sound bypass added.",
+      "sha256": "33798ddd2931588302c5dee9861be3d621f7b2b87aebdc868bf3724749ce1931"
+    }
+  ],
+  "limits": [
+    "The source full conditional weighted maneuver bank, circle/strafe token coordination and other variants remain open. Current eligible weight-10000 hover is selected deterministically over existing orbit movement; this is explicitly an adaptation.",
+    "Source LoF tolerance/mask and five-second Opportunity scheduler are not bit-exact MC equivalents. Current immediate occlusion cancellation and stalled-aim timeout are documented safeguards.",
+    "No original executable was run. Source evidence is decoded records plus static engine disassembly. Missile/blast scale, player 240/8 stores and manual cooldown remain labeled MC adaptations.",
+    "Separate rapid unguided rack, source player capacities, full original movement, source FX/audio identity, impulse units and dedicated multiplayer verification remain open.",
+    "This checkpoint does not newly validate vehicle-destruction visuals or claim final model quality; those are separate prior/future work under the same active objective.",
+    "No release JAR, installation, commit or user-world changes."
+  ],
+  "qaDriver": {
+    "file": "D:\\CodexCache\\creature-combat-run.ps1",
+    "sha256": "a956f0384f00659fb39d257c16f3b5a70e9198f1a0982dfccc187661483602a0"
+  },
+  "additionalCameraAttempts": [
+    {
+      "file": "D:\\CodexCache\\helicopter-hover-qa\\neo-craft-close.log",
+      "sha256": "677420da9b5e6a9e6b7b7aa0cbf8afa634cd0bd9bd5fd1ed58e70bd055934fa8"
+    },
+    {
+      "file": "D:\\CodexCache\\helicopter-hover-qa\\neo-wide-clipped.log",
+      "sha256": "fdc1d676990a584c2d0b8c9bbef45a715b4b38f4608525db6b4496d282461b38"
+    },
+    {
+      "file": "D:\\CodexCache\\helicopter-hover-qa\\forge-craft-close.log",
+      "sha256": "97cf9c4526c637a2e483dffd85e1e958131e1267e37589097633ae0b070114af"
+    },
+    {
+      "file": "D:\\CodexCache\\helicopter-hover-qa\\forge-wide-clipped.log",
+      "sha256": "da015fe68ca50c01643129331fb6f37b61305061bae3c34231173055cee2d98d"
+    }
+  ]
+}

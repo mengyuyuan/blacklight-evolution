@@ -14,11 +14,12 @@ import java.util.LinkedHashSet;
 import java.util.function.Predicate;
 import net.minecraft.world.entity.Entity;
 import com.codex.blacklight.entity.BlacklightInfectedHost;
+import com.codex.blacklight.entity.BlacklightHydra;
 import net.minecraftforge.entity.PartEntity;
 
 /** Selection is independent of camera pitch when the player explicitly locks a target. */
 public final class CombatTargeting {
-    private static final Map<ServerPlayer, Entity> LOCKS = new WeakHashMap<>();
+    private static final Map<ServerPlayer, TargetSelection> LOCKS = new WeakHashMap<>();
     private CombatTargeting() {}
     /** Search loaded, visible actors. This does not enlarge a weapon's contact volume. */
     public static double viewRange(ServerPlayer player) {
@@ -31,30 +32,45 @@ public final class CombatTargeting {
         return lockedEntity(player) instanceof LivingEntity living?living:null;
     }
     public static Entity lockedEntity(ServerPlayer player) {
-        var target=LOCKS.get(player);
-        if (!ExplicitTarget.enabled(player)
-                || !ExplicitTarget.selectable(player,target) || !(ExplicitTarget.distanceSquared(player,target)<=viewRange(player)*viewRange(player)
-                || target instanceof LivingEntity&&BulletdiveSteering.retainAltitudeLock(player.position(),player.onGround(),target.position(),viewRange(player)))) {
-            LOCKS.remove(player); syncLock(player, -1); return null;
+        var selection=lockedSelection(player);return selection==null?null:selection.target();
+    }
+    public static TargetSelection lockedSelection(ServerPlayer player) {
+        var selection=LOCKS.get(player);
+        if(!ExplicitTarget.enabled(player)||selection==null||!selection.selectable(player)
+                ||!(selection.distanceSquared(player)<=viewRange(player)*viewRange(player)
+                || !selection.regional()&&selection.target() instanceof LivingEntity&&BulletdiveSteering.retainAltitudeLock(player.position(),player.onGround(),selection.target().position(),viewRange(player)))){
+            LOCKS.remove(player);syncLock(player,-1,-1);return null;
         }
-        return target;
+        return selection;
     }
-    /** Explicit camera lock only; ordinary crosshair focus is never authoritative. */
-    public static void requestLock(ServerPlayer player, int entityId) {
-        if(entityId<0){ConsumeSystem.releaseUncommitted(player,true);LOCKS.remove(player);syncLock(player,-1);return;}
+    public static void requestLock(ServerPlayer player,int entityId){requestLock(player,entityId,-1);}
+    /** Stable parent ID plus a validated region; never trust transient part IDs. */
+    public static void requestLock(ServerPlayer player,int entityId,int region) {
+        if(entityId<0){ConsumeSystem.releaseUncommitted(player,true);LOCKS.remove(player);syncLock(player,-1,-1);return;}
         var entity=ExplicitTarget.resolve(player.serverLevel().getEntity(entityId));
-        if(ExplicitTarget.enabled(player)
-                && entity != null && ExplicitTarget.selectable(player,entity)
-                && (ExplicitTarget.visibleWithinRange(player,entity,viewRange(player))
-                    || entity instanceof LivingEntity living&&altitudeAcquirable(player,living,viewRange(player)))) {
-            LOCKS.put(player,entity);syncLock(player,entity.getId());
-        } else {LOCKS.remove(player);syncLock(player,-1);}
+        var selection=new TargetSelection(entity,region);
+        if(ExplicitTarget.enabled(player)&&selection.selectable(player)
+                &&(selection.visibleWithinRange(player,viewRange(player))
+                    || !selection.regional()&&entity instanceof LivingEntity living&&altitudeAcquirable(player,living,viewRange(player)))){
+            LOCKS.put(player,selection);syncLock(player,entity.getId(),region);
+        }else{LOCKS.remove(player);syncLock(player,-1,-1);}
     }
-    private static void syncLock(ServerPlayer player,int id) {
-        if (!ModAttachments.available(player)) return;
-        if(com.codex.blacklight.registry.ModAttachments.getData(player,ModAttachments.TARGET_LOCK_ID)==id)return;
-        com.codex.blacklight.registry.ModAttachments.setData(player,ModAttachments.TARGET_LOCK_ID,id);
-        if(!player.isRemoved())com.codex.blacklight.registry.ModAttachments.syncData(player,ModAttachments.TARGET_LOCK_ID);
+    private static void syncLock(ServerPlayer player,int id,int region) {
+        if(ModAttachments.getData(player,ModAttachments.TARGET_LOCK_REGION)!=region){ModAttachments.setData(player,ModAttachments.TARGET_LOCK_REGION,region);if(!player.isRemoved())ModAttachments.syncData(player,ModAttachments.TARGET_LOCK_REGION);}
+        if(ModAttachments.getData(player,ModAttachments.TARGET_LOCK_ID)!=id){ModAttachments.setData(player,ModAttachments.TARGET_LOCK_ID,id);if(!player.isRemoved())ModAttachments.syncData(player,ModAttachments.TARGET_LOCK_ID);}
+    }
+    /** Observer pose and aim helpers retain the server's logical health region. */
+    public static TargetSelection selectionFor(Player player,Entity target){
+        if(player==null||target==null)return null;
+        if(player instanceof ServerPlayer server){var selected=lockedSelection(server);return selected!=null&&selected.target()==target?selected:null;}
+        if(ModAttachments.peekData(player,ModAttachments.TARGET_LOCK_ID,-1)!=target.getId())return null;
+        var selected=new TargetSelection(target,ModAttachments.peekData(player,ModAttachments.TARGET_LOCK_REGION,-1));
+        return selected.selectable(player)?selected:null;
+    }
+    /** Only aim assistance changes. Physical attack volumes still choose the actual skin they touch. */
+    public static Vec3 aimPoint(Player player,Vec3 from,LivingEntity target){
+        var selected=selectionFor(player,target);
+        return selected!=null&&selected.regional()?selected.point(player):positionNear(from,target);
     }
     public static boolean damageable(Player player, LivingEntity target) {
         return damageableFrom(player,target,player);
@@ -83,7 +99,10 @@ public final class CombatTargeting {
         return target instanceof BlacklightInfectedHost host&&host.hasMultipartBody()
                 || target.isMultipartEntity() && target.getParts()!=null && target.getParts().length>0;
     }
+    /** Query proxies alone must not make a light flying body immune to knockback. */
+    public static boolean anchoredBody(LivingEntity target){return multipart(target)&&!(target instanceof com.codex.blacklight.entity.EncounterMob mob&&mob.kind()==com.codex.blacklight.entity.EncounterKind.FLYER);}
     public static List<AABB> hitboxes(LivingEntity target) {
+        if(target instanceof AnimatedHurtBody hydra&&hydra.animatedHurtBody())return hydra.hurtRegions(0).stream().flatMap(r->r.boxes().stream()).map(b->b.bounds).toList();
         if(target instanceof BlacklightInfectedHost host&&host.hasMultipartBody())return host.combatHitboxes();
         if(target.isMultipartEntity() && target.getParts()!=null) {
             var boxes=new ArrayList<AABB>();
@@ -97,21 +116,21 @@ public final class CombatTargeting {
     }
     /** Broad phase finds loaded parent entities; the original query must still
      * intersect a real limb. The large search margin never becomes weapon reach. */
-    public static List<LivingEntity> candidates(Player player,AABB query,Predicate<LivingEntity> predicate) {
+    public static List<LivingEntity> candidates(Entity origin,AABB query,Predicate<LivingEntity> predicate) {
         var result=new LinkedHashSet<LivingEntity>();
         // Uncapped dive energy can span thousands of chunks. Walking the spatial
         // index's coordinate range scales with empty space. Visit loaded actors
         // once instead, retaining the same real hitbox/predicate contract.
-        if(player.level() instanceof net.minecraft.server.level.ServerLevel level
+        if(origin.level() instanceof net.minecraft.server.level.ServerLevel level
                 && Math.max(query.getXsize(),Math.max(query.getYsize(),query.getZsize()))>512) {
             for(var entity:level.getAllEntities())
                 if(entity instanceof LivingEntity target && hitboxes(target).stream().anyMatch(query::intersects)
                         && predicate.test(target))result.add(target);
             return new ArrayList<>(result);
         }
-        for(var target:player.level().getEntitiesOfClass(LivingEntity.class,query,predicate))
+        for(var target:origin.level().getEntitiesOfClass(LivingEntity.class,query,predicate))
             if(!multipart(target)||hitboxes(target).stream().anyMatch(query::intersects))result.add(target);
-        for(var target:player.level().getEntitiesOfClass(LivingEntity.class,query.inflate(80),
+        for(var target:origin.level().getEntitiesOfClass(LivingEntity.class,query.inflate(80),
                 host->multipart(host)&&predicate.test(host)))
             if(hitboxes(target).stream().anyMatch(query::intersects))result.add(target);
         return new ArrayList<>(result);
@@ -121,6 +140,7 @@ public final class CombatTargeting {
                 com.codex.blacklight.util.MathCompat.clamp(point.z,box.minZ,box.maxZ));
     }
     public static Vec3 closestPoint(Vec3 point,LivingEntity target) {
+        if(target instanceof AnimatedHurtBody hydra&&hydra.animatedHurtBody())return hydra.hurtRegions(0).stream().flatMap(r->r.boxes().stream()).map(b->b.nearest(point)).min(java.util.Comparator.comparingDouble(point::distanceToSqr)).orElse(target.position());
         Vec3 result=target.getBoundingBox().getCenter();double best=Double.POSITIVE_INFINITY;
         for(var box:hitboxes(target)) {
             var candidate=closestPoint(point,box);double distance=point.distanceToSqr(candidate);
@@ -134,6 +154,7 @@ public final class CombatTargeting {
         return multipart(target)?closestPoint(point,target):target.position();
     }
     public static double distanceSquared(Vec3 point,LivingEntity target) {
+        if(AnimatedHurtBody.of(target)!=null)return point.distanceToSqr(closestPoint(point,target));
         double distance=Double.POSITIVE_INFINITY;
         for(var box:hitboxes(target))distance=Math.min(distance,distanceSquared(point,box));
         return distance;
@@ -143,6 +164,7 @@ public final class CombatTargeting {
         return point.distanceToSqr(new Vec3(x,y,z));
     }
     public static boolean inReach(ServerPlayer player,LivingEntity target,double range) {
+        var selected=selectionFor(player,target);if(selected!=null&&selected.regional())return selected.distanceSquared(player)<=range*range+1e-6;
         return target!=null&&player.level()==target.level()&&distanceSquared(player.getEyePosition(),target)<=range*range+1e-6;
     }
     public static boolean visible(Player player,Vec3 from,AABB box) {
@@ -165,8 +187,10 @@ public final class CombatTargeting {
         return cover>point.y&&clearRay(player,eye,new Vec3(point.x,cover,point.z));
     }
     public static boolean visibleWithinRange(Player player,LivingEntity target,double range) {
+        var selected=selectionFor(player,target);if(selected!=null&&selected.regional())return selected.visibleWithinRange(player,range);
         if(target==null||target.level()!=player.level()||range<0)return false;
         Vec3 eye=player.getEyePosition();double limit=range*range+1e-6;
+        if(target instanceof AnimatedHurtBody hydra&&hydra.animatedHurtBody())return hydraVisiblePoints(player,hydra).stream().anyMatch(p->eye.distanceToSqr(p)<=limit);
         if(!multipart(target))return distanceSquared(eye,target)<=limit&&visible(player,target);
         // The exposed part must itself be in range: a hidden nearby foot must
         // not borrow visibility from an out-of-range wing on the other side.
@@ -191,7 +215,16 @@ public final class CombatTargeting {
         return result;
     }
     /** Stable focus on the closest exposed body surface. Ordinary mob framing is unchanged. */
+    private static List<Vec3> hydraVisiblePoints(Player player,AnimatedHurtBody hydra){
+        var from=player.getEyePosition();var points=new ArrayList<Vec3>();
+        for(var r:hydra.hurtRegions(0))for(var b:r.boxes()){
+            var nearest=b.nearest(from);if(clearRay(player,from,nearest))points.add(nearest);
+            else for(var p:b.points)if(clearRay(player,from,p))points.add(p);
+        }return points;
+    }
     public static Vec3 lockPoint(Player player,LivingEntity target) {
+        var selected=selectionFor(player,target);if(selected!=null&&selected.regional())return selected.point(player);
+        if(target instanceof AnimatedHurtBody hydra&&hydra.animatedHurtBody())return hydraVisiblePoints(player,hydra).stream().min(java.util.Comparator.comparingDouble(player.getEyePosition()::distanceToSqr)).orElseGet(()->closestPoint(player.getEyePosition(),target));
         if(!multipart(target))return target.getBoundingBox().getCenter();
         Vec3 eye=player.getEyePosition(),result=null;double best=Double.POSITIVE_INFINITY;
         for(AABB box:hitboxes(target)){
@@ -202,6 +235,7 @@ public final class CombatTargeting {
         return result==null?closestPoint(eye,target):result;
     }
     public static boolean visibleContact(Player player,LivingEntity target,AABB contact) {
+        if(target instanceof AnimatedHurtBody hydra&&hydra.animatedHurtBody())return hydra.hurtRegions(0).stream().flatMap(r->r.boxes().stream()).anyMatch(b->b.touches(contact)&&clearRay(player,player.getEyePosition(),b.contact(contact)));
         if(!multipart(target))return visible(player,target);
         for(var box:hitboxes(target))if(box.intersects(contact)&&visible(player,player.getEyePosition(),box))return true;
         return false;
@@ -236,12 +270,15 @@ public final class CombatTargeting {
         return blocks.clip(new ClipContext(from,to,ClipContext.Block.COLLIDER,ClipContext.Fluid.NONE,player)).getType()==HitResult.Type.MISS;
     }
     public static boolean visible(Player player,LivingEntity target) {
+        var selected=selectionFor(player,target);if(selected!=null&&selected.regional())return selected.visibleWithinRange(player,Double.MAX_VALUE);
         if(target==null||target.level()!=player.level())return false;
+        if(target instanceof AnimatedHurtBody hydra&&hydra.animatedHurtBody())return !hydraVisiblePoints(player,hydra).isEmpty();
         if(!multipart(target))return clearRay(player,player.getEyePosition(),target.getBoundingBox().getCenter());
         for(var box:hitboxes(target))if(visible(player,player.getEyePosition(),box))return true;
         return false;
     }
     public static double aimScore(ServerPlayer player,LivingEntity target) {
+        if(target instanceof AnimatedHurtBody hydra&&hydra.animatedHurtBody())return hydraVisiblePoints(player,hydra).stream().mapToDouble(p->player.getLookAngle().dot(p.subtract(player.getEyePosition()).normalize())).max().orElse(-1);
         if(!multipart(target))return player.getLookAngle().dot(target.getBoundingBox().getCenter().subtract(player.getEyePosition()).normalize());
         double best=-1;var eye=player.getEyePosition();
         for(var box:hitboxes(target))if(visible(player,eye,box)) {

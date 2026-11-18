@@ -14,22 +14,44 @@ public final class BlacklightCreatureModel<T extends LivingEntity & GeoEntity> e
     /** Heartbeat swell of the bulb, and the crown flaps peeling open while a brood hatches. */
     private void hive(com.codex.blacklight.entity.BlacklightHive hive,float partial){
         float t=(hive.tickCount+partial)*1.6F;float beat=(float)Math.pow(Math.max(0,Math.sin(t*.16F)),6)+.5F*(float)Math.pow(Math.max(0,Math.sin(t*.16F-.9F)),8);
-        float age=hive.hatchAge(partial);float open=age<0||age>50?0:age<8?age/8F:age>20?(50-age)/30F:1;
+        float age=hive.hatchAge(partial);float open=age<0||age>50?0:age<hive.RELEASE_TICK?age/hive.RELEASE_TICK:age>20?(50-age)/30F:1;
         var torso=getAnimationProcessor().getBone("torso");
         float ripe=.6F+.9F*hive.growth();
         if(torso!=null){float s=1+.05F*ripe*beat;torso.setScaleX(s);torso.setScaleZ(s);torso.setScaleY(1+.035F*ripe*beat);}
         for(int i=0;i<6;i++){var petal=getAnimationProcessor().getBone("petal"+i);if(petal==null)continue;
             double a=i*Math.PI/3;float tilt=.12F*beat+1.1F*open;
+            // Tip each flap outward around the horizontal axis tangent to the rim.
             petal.setRotX((float)(Math.sin(a)*tilt));petal.setRotZ((float)(-Math.cos(a)*tilt));}
     }
     @Override public void setCustomAnimations(T entity,long instance,software.bernie.geckolib.core.animation.AnimationState<T> state){
         super.setCustomAnimations(entity,instance,state);
         com.codex.blacklight.client.animation.NativeReceiverPose.resetRoot(this);
         if(entity instanceof com.codex.blacklight.entity.BlacklightHive hive){hive(hive,state.getPartialTick());return;}
+        if(entity instanceof com.codex.blacklight.entity.EncounterMob mob)EncounterPose.apply(this,mob,state.getPartialTick());
+        if(entity instanceof com.codex.blacklight.entity.MilitaryUav drone){EncounterPose.drone(this,drone,state.getPartialTick());return;}
+        if(entity instanceof com.codex.blacklight.entity.BlacklightMutant mutant&&mutant.committedAttack()){
+            var table=com.codex.blacklight.combat.CreaturePoseTable.mutant(mutant.kind().name());
+            var pose=mutant.attackPose(state.getPartialTick());
+            for(int i=0;i<table.bones.length;i++){
+                var bone=getAnimationProcessor().getBone(table.bones[i]);if(bone==null)continue;
+                var p=pose[i];bone.updateRotation(p[0],p[1],p[2]);bone.setPosX(p[3]);bone.setPosY(p[4]);bone.setPosZ(p[5]);
+                if(p.length>=9){bone.setScaleX(p[6]);bone.setScaleY(p[7]);bone.setScaleZ(p[8]);}
+            }
+        }
+        if(entity instanceof com.codex.blacklight.entity.BlacklightMutant mutant&&com.codex.blacklight.client.animation.BruteHitPose.apply(this,mutant,state.getPartialTick()))return;
+        var mounted=com.codex.blacklight.registry.ModAttachments.peekData(entity,com.codex.blacklight.registry.ModAttachments.CONSUME_VISUAL,com.codex.blacklight.combat.ConsumeVisual.EMPTY);
+        if(com.codex.blacklight.combat.ConsumeSequence.bruteMount(entity)&&com.codex.blacklight.combat.ConsumeSequence.mountedStage(mounted.stage())){
+            var table=com.codex.blacklight.combat.CreaturePoseTable.BRUTE;
+            var pose=com.codex.blacklight.combat.BruteMountedBody.pose(mounted,entity.level().getGameTime(),state.getPartialTick(),entity.tickCount);
+            for(int i=0;i<table.bones.length;i++){var b=getAnimationProcessor().getBone(table.bones[i]);if(b==null)continue;var p=pose[i];
+                b.updateRotation(p[0],p[1],p[2]);b.setPosX(p[3]);b.setPosY(p[4]);b.setPosZ(p[5]);b.setScaleX(p[6]);b.setScaleY(p[7]);b.setScaleZ(p[8]);}
+            return;
+        }
+        if(entity instanceof com.codex.blacklight.entity.EncounterMob mob&&mob.sourcePoseCommitted())return;
         if(com.codex.blacklight.client.animation.NativeReceiverPose.apply(this,entity,state.getPartialTick()))return;
-        var visual=com.codex.blacklight.registry.ModAttachments.getData(entity, com.codex.blacklight.registry.ModAttachments.CONSUME_VISUAL);
+        var visual=com.codex.blacklight.registry.ModAttachments.getData(entity,com.codex.blacklight.registry.ModAttachments.CONSUME_VISUAL);
         if(!visual.active()){
-            var hit=com.codex.blacklight.registry.ModAttachments.getData(entity, com.codex.blacklight.registry.ModAttachments.HIT_REACTION);
+            var hit=com.codex.blacklight.registry.ModAttachments.getData(entity,com.codex.blacklight.registry.ModAttachments.HIT_REACTION);
             float w=hit.weight(entity.level().getGameTime(),state.getPartialTick());if(w<=0)return;
             var head=getAnimationProcessor().getBone("head");if(head!=null)head.setRotX(head.getRotX()-.25F*w);
             for(String side:new String[]{"right","left"}){

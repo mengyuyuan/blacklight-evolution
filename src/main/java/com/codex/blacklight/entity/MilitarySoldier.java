@@ -23,13 +23,43 @@ import java.util.EnumSet;
 import com.codex.blacklight.firearms.*;
 import net.minecraft.world.item.*;
 
-/** A visible burst / reload cycle gives the player room to close, grab and consume. */
+/** Separate aiming, weapon-rate fire, recovery, finite reload and contact-timed melee. */
 public abstract class MilitarySoldier extends Monster {
+    @Override public EntityDimensions getDimensions(Pose pose){
+        var standing=super.getDimensions(pose);
+        return pose==Pose.CROUCHING?standing.scale(1,.78F):standing;
+    }
+    private static final EntityDataAccessor<Long> RADIO_STARTED=SynchedEntityData.defineId(MilitarySoldier.class,EntityDataSerializers.LONG);
+    public long radioStarted(){return entityData.get(RADIO_STARTED);}
+    public void beginRadio(){entityData.set(RADIO_STARTED,level().getGameTime());entityData.set(PHASE,6);}
+    public void cancelRadio(){entityData.set(RADIO_STARTED,-1L);}
+    private static final EntityDataAccessor<Long> HIT_STARTED=SynchedEntityData.defineId(MilitarySoldier.class,EntityDataSerializers.LONG);
+    public long hitStarted(){return entityData.get(HIT_STARTED);}
+    @Override public boolean hurt(net.minecraft.world.damagesource.DamageSource source,float amount){boolean hit=super.hurt(source,amount);if(hit){com.codex.blacklight.military.MilitaryTactics.hurt(this);if(!level().isClientSide&&isAlive()&&amount>0)entityData.set(HIT_STARTED,level().getGameTime());}return hit;}
+    private static final EntityDataAccessor<Float> GUN_AIM_YAW=SynchedEntityData.defineId(MilitarySoldier.class,EntityDataSerializers.FLOAT);
+    private float previousGunAimYaw=Float.NaN;
+    /** World bearing shared by the server firing gate and the visible two-hand gun rig. */
+    public float gunAimYaw(float partial){return MilitaryAimControl.interpolate(previousGunAimYaw,entityData.get(GUN_AIM_YAW),partial);}
+    private boolean rifleAimBank(){
+        return weaponDefinition().kind()==WeaponDefinition.Kind.BULLET
+                &&commandRole()!=MilitaryRole.OFFICER&&commandRole()!=MilitaryRole.COMMANDER;
+    }
+    private double firingRange(){return rifleAimBank()?MilitaryFireControl.RIFLE_RANGE:MilitaryFireControl.OTHER_RANGED_RANGE;}
+    private boolean withinFiringRange(LivingEntity target){double range=firingRange();return distanceToSqr(target)<=range*range;}
+    private boolean rifleAimReady(LivingEntity target){
+        if(!rifleAimBank())return true;
+        Vec3 delta=target.getBoundingBox().getCenter().subtract(getEyePosition().add(0,-.18,0));
+        return MilitaryAimControl.aligned(entityData.get(GUN_AIM_YAW),delta.x,delta.z);
+    }
+    private void clearGunAim(){entityData.set(GUN_AIM_YAW,Float.NaN);}
     private static final EntityDataAccessor<Integer> PHASE=SynchedEntityData.defineId(MilitarySoldier.class,EntityDataSerializers.INT);
+    private static final EntityDataAccessor<Long> MELEE_STARTED=SynchedEntityData.defineId(MilitarySoldier.class,EntityDataSerializers.LONG);
     private static final EntityDataAccessor<Integer> RANK=SynchedEntityData.defineId(MilitarySoldier.class,EntityDataSerializers.INT);
     private static final EntityDataAccessor<Boolean> EQUIPPED=SynchedEntityData.defineId(MilitarySoldier.class,EntityDataSerializers.BOOLEAN);
     private static final EntityDataAccessor<Integer> COMMAND_ROLE=SynchedEntityData.defineId(MilitarySoldier.class,EntityDataSerializers.INT);
     private final MilitaryRole entityDefaultRole;
+    private final MilitaryCover cover=new MilitaryCover(this);
+    public MilitaryCover cover(){return cover;}
     public MilitaryRole commandRole(){int ordinal=entityData.get(COMMAND_ROLE);return ordinal>=0&&ordinal<MilitaryRole.values().length?MilitaryRole.values()[ordinal]:MilitaryRole.TROOPER;}
     /** Identity changes neither reissue equipment nor change finite ammunition. */
     public void setCommandRole(MilitaryRole role){
@@ -110,6 +140,11 @@ public abstract class MilitarySoldier extends Monster {
     /** Caller must debit precisely the returned amount from its matching finite supply inventory. */
     public int receiveAmmo(int offered){return receiveAmmo(requiredAmmoItem(),offered);}
     public int magazineAmmo(){return FirearmItem.state(ammunitionWeapon(),reserveAmmo()).magazine();}
+    public long meleeStarted(){return entityData.get(MELEE_STARTED);}
+    private boolean reloadingWeapon(){
+        var stack=getMainHandItem();var d=definition(stack);
+        return d!=null&&MilitaryFireControl.reloading(FirearmItem.state(stack,0),d,FirearmReloadSystem.started(stack),level().getGameTime());
+    }
     private boolean readyWeapon(){
         if(!equipped()||!(getMainHandItem().getItem() instanceof FirearmItem))return false;
         var d=weaponDefinition();long now=level().getGameTime();var state=FirearmItem.state(getMainHandItem(),reserveAmmo(d.ammoId()));
@@ -138,13 +173,12 @@ public abstract class MilitarySoldier extends Monster {
         var wall=server.clip(new ClipContext(start,end,ClipContext.Block.COLLIDER,ClipContext.Fluid.NONE,this));
         if(wall.getType()!=HitResult.Type.BLOCK||!wall.getBlockPos().equals(at))return false;
         var hit=ProjectileUtil.getEntityHitResult(server,this,start,wall.getLocation(),new AABB(start,end).inflate(.3),
-                entity->entity!=this&&entity instanceof LivingEntity&&entity.isAlive()&&entity.isPickable());
+                entity->FirearmsCombat.bulletCandidate(this,entity));
         if(hit!=null)return false;
         if(com.codex.blacklight.military.vehicle.VehicleDamageBridge.nearest(server,this,null,start,wall.getLocation())!=null)return false;
-        long now=server.getGameTime();int age=(int)Math.floorMod(now,profile().cycleTicks());
-        if(age<profile().aimTicks()||age>=profile().burstTicks()){entityData.set(PHASE,age<profile().aimTicks()?1:3);return true;}
-        entityData.set(PHASE,2);
-        if((age-profile().aimTicks())%8!=0||!readyWeapon())return true;
+        long now=server.getGameTime();var plan=MilitaryFireControl.plan(d,profile());int age=(int)Math.floorMod(now,plan.cycleTicks());
+        boolean ready=readyWeapon();entityData.set(PHASE,reloadingWeapon()?MilitaryFireControl.RELOAD:plan.phase(age));
+        if(!ready||!plan.canShoot(age,FirearmItem.state(getMainHandItem(),0),now))return true;
         var state=FirearmItem.state(getMainHandItem(),reserveAmmo(d.ammoId()));
         FirearmItem.store(getMainHandItem(),state.fire(d,now));
         FirearmsCombat.fire(this,d,end.subtract(start).normalize(),profile().damage()/d.damage());return true;
@@ -195,7 +229,9 @@ public abstract class MilitarySoldier extends Monster {
     @Override protected net.minecraft.world.entity.ai.navigation.PathNavigation createNavigation(Level level){return new MilitaryGroundNavigation(this,level);}
     public boolean heavy(){return getType()==com.codex.blacklight.registry.ModEntities.BLACKWATCH_HEAVY.get()||getType()==com.codex.blacklight.registry.ModEntities.MILITARY_HEAVY.get();}
     public int phase(){return entityData.get(PHASE);}
-    @Override protected void defineSynchedData(){super.defineSynchedData();entityData.define(PHASE,0);entityData.define(RANK,0);entityData.define(EQUIPPED,true);entityData.define(COMMAND_ROLE,0);}
+    /** Separate bank sampling permits deterministic actor fixtures without bypassing geometry. */
+    protected double firingPostureSample(){return getRandom().nextDouble();}
+    @Override protected void defineSynchedData(){super.defineSynchedData();entityData.define(PHASE,0);entityData.define(GUN_AIM_YAW,Float.NaN);entityData.define(MELEE_STARTED,-1L);entityData.define(RADIO_STARTED,-1L);entityData.define(HIT_STARTED,-1L);entityData.define(RANK,0);entityData.define(EQUIPPED,true);entityData.define(COMMAND_ROLE,0);}
     public static AttributeSupplier.Builder attributes(boolean heavy){return attributes(MilitaryFaction.BLACKWATCH,heavy);}
     public static AttributeSupplier.Builder attributes(MilitaryFaction faction,boolean heavy){
         var p=MilitaryCombatProfile.of(faction,heavy);
@@ -234,6 +270,13 @@ public abstract class MilitarySoldier extends Monster {
         if (home == null || !dimension.equals(homeDimension)) { home = blockPosition().immutable(); homeDimension = dimension; }
         return home;
     }
+    /** A delivered squad's territory starts at its real dismount position, not its former airborne spawn. */
+    public void adoptFieldPost() {
+        if(level().isClientSide||isPassenger()||!isAlive())return;
+        BlackwatchSquadSystem.release(this);home=blockPosition().immutable();homeDimension=level().dimension().location().toString();
+        // The home patrol service has its own persistent anchor, captured when this troop spawned in the air.
+        com.codex.blacklight.city.MilitaryHomeSystem.chooseField(this);
+    }
     private CompoundTag saveLoadout(){
         var snapshot=loadoutInventory.snapshot();var result=new CompoundTag();
         result.putInt("Schema",snapshot.schemaVersion());result.putBoolean("Initialized",snapshot.initialized());result.putBoolean("NativeIssued",snapshot.nativeIssued());
@@ -268,6 +311,8 @@ public abstract class MilitarySoldier extends Monster {
         tag.putLong("BlackwatchHome", home().asLong()); tag.putString("BlackwatchHomeDimension", homeDimension);
     }
     @Override public void readAdditionalSaveData(CompoundTag tag) {
+        if(fireTeamGoal!=null)fireTeamGoal.interrupt();
+        cover.clear();entityData.set(HIT_STARTED,-1L);
         super.readAdditionalSaveData(tag);
         // Vanilla bare /summon calls load before finalizeSpawn; only persisted equipment closes new issue.
         if(!tag.contains("HandItems")&&tag.getAllKeys().stream().noneMatch(key->key.startsWith("Military")||key.startsWith("Blackwatch")))return;
@@ -298,9 +343,11 @@ public abstract class MilitarySoldier extends Monster {
         homeDimension = tag.getString("BlackwatchHomeDimension");
     }
     @Override public void tick() {
+        previousGunAimYaw=entityData.get(GUN_AIM_YAW);
         if (!level().isClientSide) {
             BlacklightInfectionSystem.preserveBlackwatch(this);
             initializeWeapon();
+            if(fireTeamGoal!=null)fireTeamGoal.recoverPosture();
             home();
             com.codex.blacklight.military.MilitaryOrganizationSystem.ensureMember(this);
             if (!tacticsAvailable()) suspendTactics();
@@ -311,6 +358,8 @@ public abstract class MilitarySoldier extends Monster {
     /** Control can begin between entity ticks; clear both the visible and internal gun cycle now. */
     public void suspendTactics() {
         if (level().isClientSide) return;
+        cover.clear();entityData.set(HIT_STARTED,-1L);
+        cancelRadio();
         if (fireTeamGoal != null) fireTeamGoal.interrupt();
         entityData.set(PHASE, 0); getNavigation().stop(); setTarget(null);
         BlackwatchSquadSystem.release(this); BlackwatchSquadSystem.tick(this);
@@ -325,23 +374,39 @@ public abstract class MilitarySoldier extends Monster {
         @Override public void stop() { getNavigation().stop(); }
     }
     private final class FireTeamGoal extends Goal {
-        private long burstAt = -1, readyAt;
+        private long burstAt=-1,readyAt,meleeReadyAt;
+        private MilitaryFireControl.Plan plan;
+        private String firingWeapon="";
+        private java.util.UUID meleeTarget;
+        private ItemStack meleeWeapon=ItemStack.EMPTY;
+        private Vec3 meleeDirection=Vec3.ZERO;
+        private long meleeMotionAge;
+        private Vec3 meleeWrist;
+        private boolean meleeHit,coverPose,firingCrouch;
+        private final MilitaryRiflePosture riflePosture=new MilitaryRiflePosture();
+        private java.util.UUID postureTarget;
+        private ItemStack postureWeapon=ItemStack.EMPTY;
+        private long postureChangedAt=-1;
+        private java.util.UUID aimingTarget;
         FireTeamGoal(){setFlags(EnumSet.of(Flag.MOVE,Flag.LOOK));}
         @Override public boolean canUse(){return equipped() && tacticsAvailable() && validTarget(getTarget());}
-        @Override public void stop(){interrupt();entityData.set(PHASE,0);getNavigation().stop();}
+        @Override public void stop(){cover.clear();cancelRadio();interrupt();entityData.set(PHASE,0);getNavigation().stop();}
         @Override public boolean requiresUpdateEveryTick(){return true;}
         @Override public void tick(){
             var target=getTarget();if(target==null)return;
-            selectWeapon(target);
-            if(!readyWeapon()){entityData.set(PHASE,3);return;}
             if (!tacticsAvailable() || !validTarget(target) || !BlackwatchSquadSystem.withinTerritory(MilitarySoldier.this, position())) {
                 setTarget(null); stop(); return;
             }
             long now = level().getGameTime();
+            if(aimingTarget!=null&&!aimingTarget.equals(target.getUUID()))interrupt();
+            if(meleeStarted()>=0){tickMelee(target,now);return;}
+            if(com.codex.blacklight.military.MilitaryTactics.tick(MilitarySoldier.this,target)){interrupt();entityData.set(PHASE,radioStarted()>=0?6:MilitaryFireControl.RECOVER);return;}
+            selectWeapon(target);
+            if(burstAt>=0&&!weaponDefinition().id().equals(firingWeapon))interrupt();
             double distance=distanceToSqr(target);boolean sight=hasLineOfSight(target);
             var contact = BlackwatchSquadSystem.contact(MilitarySoldier.this);
-            if (!sight || distance > 22 * 22) {
-                interrupt(); entityData.set(PHASE, now < readyAt ? 3 : 0);
+            if (!sight || !withinFiringRange(target)) {
+                interrupt(); entityData.set(PHASE,reloadingWeapon()?MilitaryFireControl.RELOAD:MilitaryFireControl.IDLE);
                 if (contact.isPresent()) {
                     var point = BlackwatchSquadSystem.vector(contact.get().position());
                     getLookControl().setLookAt(point.x, point.y + 1, point.z, 30, 30);
@@ -351,39 +416,223 @@ public abstract class MilitarySoldier extends Monster {
             }
             if (!BlackwatchSquadSystem.withinTerritory(MilitarySoldier.this, target.position())) { setTarget(null); stop(); return; }
             getLookControl().setLookAt(target,30,30);
-            if (distance < 5 * 5) BlackwatchSquadSystem.reposition(MilitarySoldier.this, target);
+            if(now>=meleeReadyAt&&distance<=MilitaryFireControl.MELEE_RANGE*MilitaryFireControl.MELEE_RANGE
+                    &&getMainHandItem().getItem() instanceof FirearmItem&&weaponDefinition().kind()==WeaponDefinition.Kind.BULLET
+                    &&!reloadingWeapon()&&!FirearmsCombat.protectedTarget(MilitarySoldier.this,target)&&clearLine(target)){
+                interrupt();getNavigation().stop();meleeTarget=target.getUUID();meleeHit=false;meleeMotionAge=0;meleeWrist=null;
+                meleeWeapon=getMainHandItem();
+                meleeDirection=target.position().subtract(position()).multiply(1,0,1).normalize();
+                setYRot((float)Math.toDegrees(Math.atan2(-meleeDirection.x,meleeDirection.z)));setYBodyRot(getYRot());
+                entityData.set(MELEE_STARTED,now);entityData.set(PHASE,MilitaryFireControl.MELEE);
+                meleeReadyAt=now+MilitaryFireControl.MELEE_COOLDOWN;return;
+            }
+            readyWeapon(); // Only an empty magazine initiates reload; shot cooldown is not reload.
+            if(reloadingWeapon()){
+                interrupt(false);entityData.set(PHASE,MilitaryFireControl.RELOAD);
+                if(nearLowCover(target)){firingCrouch=false;coverPose=true;setPose(Pose.CROUCHING);getNavigation().stop();}
+                else {leaveFiringCrouch();leaveCoverPose();BlackwatchSquadSystem.reposition(MilitarySoldier.this,target);}return;
+            }
+            if(!hasBattleAmmunition()){
+                interrupt();entityData.set(PHASE,MilitaryFireControl.IDLE);
+                BlackwatchSquadSystem.reposition(MilitarySoldier.this,target);return;
+            }
+            updateGunAim(target);
+            updateFiringPosture(target,distance,now);
+            boolean holdingPosture=firingCrouch&&riflePosture.stance()==MilitaryRiflePosture.Stance.CROUCHING;
+            if(holdingPosture)getNavigation().stop();
+            else if (distance < 5 * 5) BlackwatchSquadSystem.reposition(MilitarySoldier.this, target);
             else if (distance > 14 * 14 && contact.isPresent())
                 BlackwatchSquadSystem.navigate(MilitarySoldier.this, BlackwatchSquadSystem.vector(contact.get().position()), .8);
-            else if (burstAt >= 0 && now - burstAt < profile().burstTicks()) getNavigation().stop();
+            else if (burstAt >= 0 && now - burstAt < plan.leaseTicks()) getNavigation().stop();
             var squad = BlackwatchSquadSystem.squad(MilitarySoldier.this);
             if (burstAt >= 0 && now >= readyAt) {
                 burstAt = -1; BlackwatchSquadSystem.release(MilitarySoldier.this);
             }
             if (burstAt >= 0) {
                 int age = (int) (now - burstAt);
-                if (age < profile().burstTicks() && (!squad.hasFirePermit(getUUID(), now) || !clearShot(target))) {
-                    interrupt(); entityData.set(PHASE, now < readyAt ? 3 : 0); return;
+                if (age < plan.leaseTicks() && (!squad.hasFirePermit(getUUID(), now) || !clearShot(target))) {
+                    interrupt(); entityData.set(PHASE,MilitaryFireControl.IDLE); return;
                 }
-                if (age >= profile().burstTicks()) { BlackwatchSquadSystem.release(MilitarySoldier.this); entityData.set(PHASE, 3); }
-                else if (age < profile().aimTicks()) entityData.set(PHASE, 1);
-                else { entityData.set(PHASE, 2); if (age == profile().aimTicks() || age == profile().aimTicks()+8 || age == profile().aimTicks()+16) fire(target); }
-                if (age >= profile().burstTicks()) BlackwatchSquadSystem.reposition(MilitarySoldier.this, target);
+                if(age<plan.leaseTicks()&&!rifleAimReady(target)){
+                    // The native bank loses its AimingAtTarget condition. Release
+                    // this MC squad lease without spending ammunition or snapping
+                    // the gun; reacquisition must earn a fresh aiming window.
+                    burstAt=-1;readyAt=now;BlackwatchSquadSystem.release(MilitarySoldier.this);
+                    entityData.set(PHASE,MilitaryFireControl.AIM);getNavigation().stop();return;
+                }
+                entityData.set(PHASE,plan.phase(age));
+                if(plan.canShoot(age,FirearmItem.state(getMainHandItem(),0),now)
+                        &&(postureChangedAt<0||now-postureChangedAt>=MilitaryRiflePosture.TRANSITION_TICKS))fire(target);
+                if(age>=plan.leaseTicks()){
+                    BlackwatchSquadSystem.release(MilitarySoldier.this);if(!holdingPosture)BlackwatchSquadSystem.reposition(MilitarySoldier.this,target);
+                }
                 return;
             }
-            if (now < readyAt) { entityData.set(PHASE, 3); return; }
-            if (!clearShot(target)) { BlackwatchSquadSystem.release(MilitarySoldier.this); entityData.set(PHASE, 0); return; }
-            if (squad.requestFire(getUUID(), now, profile().burstTicks())) {
-                burstAt = now; readyAt = now + profile().cycleTicks(); entityData.set(PHASE, 1);
+            if (now < readyAt) { entityData.set(PHASE,MilitaryFireControl.RECOVER); return; }
+            if (!clearShot(target)) { BlackwatchSquadSystem.release(MilitarySoldier.this); entityData.set(PHASE, 0); BlackwatchSquadSystem.reposition(MilitarySoldier.this,target); return; }
+            if(!rifleAimReady(target)){
+                BlackwatchSquadSystem.release(MilitarySoldier.this);
+                entityData.set(PHASE,MilitaryFireControl.AIM);getNavigation().stop();return;
+            }
+            plan=MilitaryFireControl.plan(weaponDefinition(),profile());
+            if (squad.requestFire(getUUID(), now, plan.leaseTicks())) {
+                firingWeapon=weaponDefinition().id();burstAt=now;readyAt=now+plan.cycleTicks();entityData.set(PHASE,MilitaryFireControl.AIM);
                 if (distance >= 5 * 5) getNavigation().stop();
             } else {
                 entityData.set(PHASE, 0);
-                BlackwatchSquadSystem.reposition(MilitarySoldier.this, target);
+                if(!holdingPosture)BlackwatchSquadSystem.reposition(MilitarySoldier.this, target);
             }
         }
+        private void updateGunAim(LivingEntity target){
+            if(!rifleAimBank()){clearGunAim();aimingTarget=null;return;}
+            aimingTarget=target.getUUID();
+            Vec3 delta=target.getBoundingBox().getCenter().subtract(getEyePosition().add(0,-.18,0));
+            float desired=MilitaryAimControl.bearing(delta.x,delta.z);
+            if(!Float.isFinite(desired)){clearGunAim();return;}
+            // The source uses a posed R_Wrist_Grapple. Our retargeted MC gun has
+            // an authoritative world bearing instead; 30 degrees/tick preserves
+            // the prior LookControl limit. Stationary feet turn with the gun.
+            float old=entityData.get(GUN_AIM_YAW);
+            if(!Float.isFinite(old))old=yBodyRot;
+            if(getNavigation().isDone()){
+                setYRot(MilitaryAimControl.turn(getYRot(),desired));
+                setYBodyRot(MilitaryAimControl.turn(yBodyRot,desired));
+            }
+            // MC anatomical adapter: a running soldier cannot rotate his torso
+            // through 180 degrees. Waiting stops navigation so his feet can turn.
+            float traverse=yBodyRot+Math.max(-75,Math.min(75,MilitaryAimControl.wrap(desired-yBodyRot)));
+            entityData.set(GUN_AIM_YAW,MilitaryAimControl.turn(old,traverse));
+        }
         private void interrupt() {
+            interrupt(true);
+        }
+        private void interrupt(boolean releasePose) {
             long now = level().getGameTime();
             if (burstAt >= 0 && now - burstAt < profile().aimTicks()) readyAt = now;
             burstAt = -1; BlackwatchSquadSystem.release(MilitarySoldier.this);
+            clearGunAim();aimingTarget=null;
+            entityData.set(MELEE_STARTED,-1L);meleeTarget=null;meleeWeapon=ItemStack.EMPTY;
+            meleeWrist=null;
+            riflePosture.clear();postureTarget=null;postureWeapon=ItemStack.EMPTY;
+            if(releasePose){leaveFiringCrouch();leaveCoverPose();}
+        }
+        private void updateFiringPosture(LivingEntity target,double distance,long now){
+            // The authored rifleSoldier bank also admits SAW/sniper. This port's
+            // bullet rifles/carbine/SAW map here; launchers and commanders do not.
+            boolean supported=weaponDefinition().kind()==WeaponDefinition.Kind.BULLET
+                    &&commandRole()!=MilitaryRole.OFFICER&&commandRole()!=MilitaryRole.COMMANDER;
+            // MC firing band and grounded movement remain authoritative. Do not
+            // kneel during a retreat, approach, impact, reload or ownership handoff.
+            if(!supported||!onGround()||isInWaterOrBubble()||distance<25||distance>196||coverPose){
+                riflePosture.clear();postureTarget=null;postureWeapon=ItemStack.EMPTY;leaveFiringCrouch();return;
+            }
+            if(!target.getUUID().equals(postureTarget)||postureWeapon!=getMainHandItem()){
+                riflePosture.clear();leaveFiringCrouch();postureTarget=target.getUUID();postureWeapon=getMainHandItem();
+            }
+            if(riflePosture.stance()==MilitaryRiflePosture.Stance.CROUCHING
+                    &&(!awayFromLedge()||!clearCrouchedLine(target)))riflePosture.stand(now,MilitarySoldier.this::firingPostureSample);
+            var selected=riflePosture.choose(now,this::awayFromLedge,()->clearCrouchedLine(target),MilitarySoldier.this::firingPostureSample);
+            if(selected==MilitaryRiflePosture.Stance.CROUCHING){
+                if(getPose()!=Pose.CROUCHING){setPose(Pose.CROUCHING);postureChangedAt=now;}
+                firingCrouch=true;getNavigation().stop();
+            }else leaveFiringCrouch();
+        }
+        private boolean awayFromLedge(){
+            if(!(level() instanceof ServerLevel server)||!onGround()||isInWaterOrBubble())return false;
+            var box=getDimensions(Pose.STANDING).makeBoundingBox(position()).inflate(1);
+            if(!com.codex.blacklight.military.vehicle.VehicleKinematics.loaded(server,box)
+                    ||!level().getWorldBorder().isWithinBounds(box))return false;
+            // Native NearRoofsEdge uses navigation geometry. The MC adapter
+            // conservatively requires a supported nearby footprint, never a
+            // new chunk or a teleport away from a ledge.
+            for(double dx:new double[]{-.75,0,.75})for(double dz:new double[]{-.75,0,.75}){
+                var below=BlockPos.containing(position().add(dx*getScale(),-.05,dz*getScale()));
+                if(!level().getFluidState(below).isEmpty()||!level().getBlockState(below).isFaceSturdy(level(),below,net.minecraft.core.Direction.UP))return false;
+            }
+            return true;
+        }
+        private boolean clearCrouchedLine(LivingEntity target){
+            if(!(level() instanceof ServerLevel server))return false;
+            var box=getDimensions(Pose.CROUCHING).makeBoundingBox(position());
+            if(!com.codex.blacklight.military.vehicle.VehicleKinematics.loaded(server,box.inflate(1))||!level().noCollision(MilitarySoldier.this,box))return false;
+            // Keep the source lowered LoF probe, then test the actual MC muzzle
+            // after changing dimensions. A standing-only sightline cannot admit kneeling.
+            double standingEye=getEyeHeight(Pose.STANDING),crouchedEye=getEyeHeight(Pose.CROUCHING);
+            return clearLine(target,position().add(0,standingEye-.25,0))
+                    &&clearLine(target,position().add(0,crouchedEye-.18,0));
+        }
+        private void leaveFiringCrouch(){
+            if(!firingCrouch)return;
+            if(getPose()!=Pose.CROUCHING){firingCrouch=false;return;}
+            var box=getDimensions(Pose.STANDING).makeBoundingBox(position());
+            if(com.codex.blacklight.military.vehicle.VehicleKinematics.loaded(level(),box.inflate(1))&&level().noCollision(MilitarySoldier.this,box)){
+                firingCrouch=false;setPose(Pose.STANDING);postureChangedAt=level().getGameTime();
+            }
+        }
+        private void recoverPosture(){
+            // A canceled goal may no longer tick (disarmed, no target). Keep
+            // retrying only safe collision expansion after its low beam clears.
+            if(riflePosture.stance()==null)leaveFiringCrouch();
+            if(coverPose&&!reloadingWeapon())leaveCoverPose();
+        }
+        private void leaveCoverPose(){
+            if(!coverPose)return;
+            if(getPose()!=Pose.CROUCHING){coverPose=false;return;}
+            if(level().noCollision(MilitarySoldier.this,getDimensions(Pose.STANDING).makeBoundingBox(position()))){coverPose=false;setPose(Pose.STANDING);}
+        }
+        private boolean nearLowCover(LivingEntity target){
+            if(!onGround()||isInWaterOrBubble()||isPassenger()||distanceToSqr(target)<36||weaponDefinition().kind()!=WeaponDefinition.Kind.BULLET)return false;
+            Vec3 low=position().add(0,.55*getScale(),0),towards=target.getBoundingBox().getCenter();
+            if(!com.codex.blacklight.military.vehicle.VehicleDamageBridge.loaded((ServerLevel)level(),low,towards))return false;
+            var hit=level().clip(new ClipContext(low,towards,ClipContext.Block.COLLIDER,ClipContext.Fluid.NONE,MilitarySoldier.this));
+            if(hit.getType()!=HitResult.Type.BLOCK||low.distanceToSqr(hit.getLocation())>2.5*2.5)return false;
+            Vec3 high=position().add(0,getEyeHeight(Pose.STANDING),0);
+            return level().clip(new ClipContext(high,towards,ClipContext.Block.COLLIDER,ClipContext.Fluid.NONE,MilitarySoldier.this)).getType()==HitResult.Type.MISS;
+        }
+        private void tickMelee(LivingEntity target,long now){
+            long age=now-meleeStarted();getNavigation().stop();
+            if(getMainHandItem()!=meleeWeapon){interrupt();entityData.set(PHASE,MilitaryFireControl.IDLE);return;}
+            if(age<0||age>=MilitaryFireControl.MELEE_TICKS||!target.getUUID().equals(meleeTarget)){
+                interrupt();entityData.set(PHASE,MilitaryFireControl.RECOVER);return;
+            }
+            entityData.set(PHASE,MilitaryFireControl.MELEE);
+            var original=com.codex.blacklight.animation.P1MilitaryMotion.local();
+            Vec3 previousWrist=meleeWrist;
+            if(original!=null){
+                var pose=original.sample("melee",Math.min(44,age*2.25));
+                var before=original.sample("melee",Math.min(44,meleeMotionAge*2.25));
+                var step=new org.joml.Vector3d(pose.joint("Motion_Root").position()).sub(before.joint("Motion_Root").position());
+                Vec3 desired=originalWorldVector(step.x,0,step.z);
+                // Native collision clips the authored stride; never teleport through blocks or force-load terrain.
+                if(desired.lengthSqr()<=1&&BlackwatchSquadSystem.withinTerritory(MilitarySoldier.this,position().add(desired))
+                        &&com.codex.blacklight.military.vehicle.VehicleDamageBridge.loaded((ServerLevel)level(),position(),position().add(desired)))
+                    move(net.minecraft.world.entity.MoverType.SELF,desired);
+                meleeMotionAge=age;
+                var start=original.sample("melee",0).joint("Motion_Root").position();
+                var wrist=new org.joml.Vector3d(pose.joint("Wrist_R").position()).sub(pose.joint("Motion_Root").position()).add(start);
+                meleeWrist=position().add(originalWorldVector(wrist.x,wrist.y,wrist.z));
+                if(previousWrist==null)previousWrist=meleeWrist;
+            }
+            if(meleeHit||!MilitaryFireControl.meleeContact(age)||!clearLine(target)
+                    ||FirearmsCombat.protectedTarget(MilitarySoldier.this,target))return;
+            // P1 uses Wrist_R with radius 1. Without the user's local curves, keep the authored fallback.
+            Vec3 from=original!=null?previousWrist:getEyePosition().add(0,-.3,0),to=original!=null?meleeWrist:from.add(meleeDirection.scale(2.1));
+            double radius=original!=null?getScale():.25;
+            LivingEntity first=null;double nearest=Double.POSITIVE_INFINITY;
+            for(var other:level().getEntitiesOfClass(LivingEntity.class,new AABB(from,to).inflate(radius+.15),e->e!=MilitarySoldier.this&&e.isAlive())){
+                var box=other.getBoundingBox().inflate(radius);var contact=box.contains(from)?java.util.Optional.of(from):box.clip(from,to);
+                if(contact.isPresent()&&from.distanceToSqr(contact.get())<nearest){nearest=from.distanceToSqr(contact.get());first=other;}
+            }
+            if(first!=target)return;
+            meleeHit=true;
+            if(target.hurt(damageSources().mobAttack(MilitarySoldier.this),profile().damage()*2.5F)){
+                target.knockback(.35,-meleeDirection.x,-meleeDirection.z);
+                playSound(net.minecraft.sounds.SoundEvents.PLAYER_ATTACK_STRONG,.7F,1);
+            }
+        }
+        private Vec3 originalWorldVector(double x,double y,double z){
+            double side=getMainArm()==net.minecraft.world.entity.HumanoidArm.LEFT?1:-1;
+            return new Vec3(meleeDirection.z*side*x-meleeDirection.x*z,y,-meleeDirection.x*side*x-meleeDirection.z*z).scale(getScale());
         }
     }
     private boolean clearShot(LivingEntity target) {
@@ -391,16 +640,30 @@ public abstract class MilitarySoldier extends Monster {
         var d=definition(getMainHandItem());return d!=null&&(d.kind()==WeaponDefinition.Kind.BULLET||safeExplosion(target,d));
     }
     private boolean clearLine(LivingEntity target){
+        return clearLine(target,getEyePosition().add(0,-.18,0));
+    }
+    private boolean clearLine(LivingEntity target,Vec3 start){
         if(!(level() instanceof ServerLevel server)||!validTarget(target))return false;
-        Vec3 start=getEyePosition().add(0,-.18,0),end=target.getBoundingBox().getCenter();
+        Vec3 end=target.getBoundingBox().getCenter();
         if(!com.codex.blacklight.military.vehicle.VehicleDamageBridge.loaded(server,start,end))return false;
         var wall=level().clip(new ClipContext(start,end,ClipContext.Block.COLLIDER,ClipContext.Fluid.NONE,this));
         if(wall.getType()!=HitResult.Type.MISS)return false;
         var mechanical=com.codex.blacklight.military.vehicle.VehicleDamageBridge.nearest(server,this,null,start,end);
-        if(mechanical!=null&&com.codex.blacklight.military.vehicle.VehicleDamageBridge.protectedHull(this,mechanical.vehicle()))return false;
+        // Source rifle LoF gates (startup315356/316044) must see the same
+        // receiving bodies as the actual gun. LivingEntity-only picking misses
+        // friendly aircraft and animated parts, wasting an otherwise safe burst.
+        // ProjectileUtil's existing part narrow phase preserves real skin gaps.
         var hit=ProjectileUtil.getEntityHitResult(level(),this,start,end,new AABB(start,end).inflate(.3),
-                entity->entity!=this&&entity instanceof LivingEntity living&&living.isAlive()&&entity.isPickable());
-        return hit==null||hit.getEntity() instanceof LivingEntity living&&validTarget(living);
+                entity->FirearmsCombat.bulletCandidate(this,entity));
+        // Match ordinary-bullet ordering: a farther protected chassis cannot
+        // veto a nearer legitimate body that would already receive the shot.
+        if(mechanical!=null&&(hit==null||mechanical.distance()<=start.distanceTo(hit.getLocation())+.001))
+            return !com.codex.blacklight.military.vehicle.VehicleDamageBridge.protectedHull(this,mechanical.vehicle());
+        if(hit==null)return true;
+        if(hit.getEntity() instanceof BlackwatchHelicopter craft)
+            return !com.codex.blacklight.military.vehicle.VehicleDamageBridge.protectedAircraft(this,craft);
+        var receiver=com.codex.blacklight.combat.CombatTargeting.resolveTarget(hit.getEntity());
+        return receiver!=null&&validTarget(receiver);
     }
     private Vec3 aimDirection(LivingEntity target,WeaponDefinition d){
         Vec3 delta=target.getBoundingBox().getCenter().subtract(getEyePosition().add(0,-.18,0));
@@ -448,7 +711,7 @@ public abstract class MilitarySoldier extends Monster {
     }
     private void fire(LivingEntity target){
         if(!(level() instanceof ServerLevel level) || !tacticsAvailable() || !validTarget(target)
-                || !hasLineOfSight(target) || !clearShot(target)) return;
+                || !hasLineOfSight(target) || !withinFiringRange(target) || !clearShot(target) || !rifleAimReady(target)) return;
         if(!readyWeapon())return;
         var d=weaponDefinition();var state=FirearmItem.state(getMainHandItem(),reserveAmmo(d.ammoId()));
         FirearmItem.store(getMainHandItem(),state.fire(d,level.getGameTime()));

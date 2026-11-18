@@ -1,0 +1,858 @@
+{
+  "schema": 1,
+  "createdLocal": "2026-11-16T20:38:19",
+  "scope": "Source Hellfire hover timing, aim gate, Action-to-weapon link and native Minecraft cycle; not the complete original weighted maneuver bank.",
+  "sourceFiles": [
+    {
+      "file": "D:\\PrototypeReference\\p1\\input\\startup_fig.p3d.rz",
+      "sha256": "96d84271e461cbe4566fb984359653b164257f88392c5bceb213c30f88527779"
+    },
+    {
+      "file": "D:\\PrototypeReference\\p1\\input\\helicopter\\heli_gunship_marine_core_fig.p3d.rz",
+      "sha256": "a69a4fa0c360fe9f686843071d1e658077c92b4229946aa5d7c77d5fb2712f82"
+    },
+    {
+      "file": "D:\\PrototypeReference\\p1\\input\\prototypeenginef.dll",
+      "sha256": "8cba8da3412df4f49cd61d02445e87a0cda551dea4f2fc1e66b19c1bfe28a760"
+    }
+  ],
+  "decodedSource": {
+    "file": "D:\\PrototypeReference\\p1\\helicopter-weapons-complete.json",
+    "sha256": "70955751e9386c6b312918cc0843e6b808d1144dbede5b25181cf012314308fa"
+  },
+  "controlTracks": [
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 69684,
+      "payload": 69696,
+      "length": 28,
+      "type": "TimerSet",
+      "kind": "TrackHash",
+      "owner": "engage_apache/engage",
+      "group": "TrackHash",
+      "parentOffset": 69628,
+      "treeOffset": 69504,
+      "fields": {
+        "Unknown1": 1,
+        "TimeBegin": 0,
+        "Timer": {
+          "hash": "10881217989349568899",
+          "name": "TimeAvoidHellfire"
+        },
+        "Time": 15,
+        "Incrementing": false,
+        "RandomRange": 0
+      },
+      "schema": "TimerSetTrack",
+      "end": 69732
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 72112,
+      "payload": 72124,
+      "length": 20,
+      "type": "TimerCompare",
+      "kind": "ConditionHash",
+      "owner": "engage_apache/engage/engage/#99b01523062c909d",
+      "group": "ConditionHash",
+      "parentOffset": 72100,
+      "treeOffset": 69504,
+      "fields": {
+        "Timer": {
+          "hash": "10881217989349568899",
+          "name": "TimeAvoidHellfire"
+        },
+        "Compare": {
+          "hash": "3935993",
+          "name": "LessThanOrEqual"
+        },
+        "Time": 0
+      },
+      "schema": "TimerCompareCondition",
+      "end": 72152
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 72152,
+      "payload": 72164,
+      "length": 20,
+      "type": "VariableIntCompare",
+      "kind": "ConditionHash",
+      "owner": "engage_apache/engage/engage/#99b01523062c909d",
+      "group": "ConditionHash",
+      "parentOffset": 72100,
+      "treeOffset": 69504,
+      "fields": {
+        "Variable": {
+          "hash": "7712363393100529610",
+          "name": "blackwatchVariety"
+        },
+        "Compare": {
+          "hash": "2164770",
+          "name": "NotEqual"
+        },
+        "Value": 0
+      },
+      "schema": "VariableIntCompareCondition",
+      "end": 72192
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 72192,
+      "payload": 72204,
+      "length": 36,
+      "type": "TargetHasLoF",
+      "kind": "ConditionHash",
+      "owner": "engage_apache/engage/engage/#99b01523062c909d",
+      "group": "ConditionHash",
+      "parentOffset": 72100,
+      "treeOffset": 69504,
+      "fields": {
+        "TimeTolerance": 0.5,
+        "DistanceTolerance": 2,
+        "CollisionFlags": {
+          "hash": "4601230196676155154",
+          "name": "collide_static_and_moving"
+        },
+        "CollideWithType": 16449,
+        "Offset": [
+          0,
+          -1,
+          0
+        ],
+        "Radius": 0.20000000298023224
+      },
+      "schema": "TargetHasLoFCondition",
+      "end": 72248
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 72248,
+      "payload": 72260,
+      "length": 4,
+      "type": "Random",
+      "kind": "ConditionHash",
+      "owner": "engage_apache/engage/engage/#99b01523062c909d",
+      "group": "ConditionHash",
+      "parentOffset": 72100,
+      "treeOffset": 69504,
+      "fields": {
+        "Weight": 10000
+      },
+      "schema": "RandomCondition",
+      "end": 72272
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 72292,
+      "payload": 72304,
+      "length": 20,
+      "type": "Spawn",
+      "kind": "TrackHash",
+      "owner": "engage_apache/engage/engage/#99b01523062c909d",
+      "group": "TrackHash",
+      "parentOffset": 72280,
+      "treeOffset": 69504,
+      "fields": {
+        "Unknown1": 0,
+        "TimeBegin": 0,
+        "TimeEnd": -1,
+        "BranchRef": {
+          "name": "",
+          "index": 120
+        }
+      },
+      "schema": "SpawnTrack",
+      "end": 72352
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 72352,
+      "payload": 72364,
+      "length": 28,
+      "type": "Opportunity",
+      "kind": "TrackHash",
+      "owner": "engage_apache/engage/engage/#99b01523062c909d",
+      "group": "TrackHash",
+      "parentOffset": 72280,
+      "treeOffset": 69504,
+      "fields": {
+        "Unknown1": 1,
+        "TimeBegin": 5,
+        "TimeEnd": -1,
+        "TimeHook": 0,
+        "BranchRef": {
+          "name": "",
+          "index": 2
+        },
+        "Priority": 0
+      },
+      "schema": "OpportunityTrack",
+      "end": 72420
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 72420,
+      "payload": 72432,
+      "length": 20,
+      "type": "Sequence",
+      "kind": "TrackHash",
+      "owner": "engage_apache/engage/engage/#99b01523062c909d",
+      "group": "TrackHash",
+      "parentOffset": 72280,
+      "treeOffset": 69504,
+      "fields": {
+        "Unknown1": 1,
+        "TimeBegin": 0,
+        "BranchRef": {
+          "name": "",
+          "index": 2
+        },
+        "Priority": 1
+      },
+      "schema": "SequenceTrack",
+      "end": 72480
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 93828,
+      "payload": 93840,
+      "length": 28,
+      "type": "SetUserTooltip",
+      "kind": "TrackHash",
+      "owner": "engage_apache/engage/tactics/#99b01523062c909d",
+      "group": "TrackHash",
+      "parentOffset": 93816,
+      "treeOffset": 69504,
+      "fields": {
+        "Unknown1": 1,
+        "TimeBegin": 0,
+        "Tooltip": "HELLFIRE HOVER"
+      },
+      "schema": "SetUserTooltipTrack",
+      "end": 93876
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 93916,
+      "payload": 93928,
+      "length": 20,
+      "type": "Execute",
+      "kind": "TrackHash",
+      "owner": "engage_apache/engage/tactics/#99b01523062c909d",
+      "group": "TrackHash",
+      "parentOffset": 93816,
+      "treeOffset": 69504,
+      "fields": {
+        "Unknown1": 0,
+        "TimeBegin": 0,
+        "TimeEnd": -1,
+        "BranchRef": {
+          "name": "",
+          "index": 121
+        }
+      },
+      "schema": "ExecuteTrack",
+      "end": 93976
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 93976,
+      "payload": 93988,
+      "length": 28,
+      "type": "TimerSet",
+      "kind": "TrackHash",
+      "owner": "engage_apache/engage/tactics/#99b01523062c909d",
+      "group": "TrackHash",
+      "parentOffset": 93816,
+      "treeOffset": 69504,
+      "fields": {
+        "Unknown1": 1,
+        "TimeBegin": 0,
+        "Timer": {
+          "hash": "10881217989349568899",
+          "name": "TimeAvoidHellfire"
+        },
+        "Time": 10,
+        "Incrementing": false,
+        "RandomRange": 0
+      },
+      "schema": "TimerSetTrack",
+      "end": 94024
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 94096,
+      "payload": 94108,
+      "length": 16,
+      "type": "Wait",
+      "kind": "TrackHash",
+      "owner": "engage_apache/engage/tactics/#99b01523062c909d/#7bbf989dbe744ba3",
+      "group": "TrackHash",
+      "parentOffset": 94084,
+      "treeOffset": 69504,
+      "fields": {
+        "Unknown1": 0,
+        "TimeBegin": 0,
+        "TimeEndMin": 1,
+        "TimeEndMax": 2
+      },
+      "schema": "WaitTrack",
+      "end": 94132
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 94132,
+      "payload": 94144,
+      "length": 36,
+      "type": "Aim",
+      "kind": "TrackHash",
+      "owner": "engage_apache/engage/tactics/#99b01523062c909d/#7bbf989dbe744ba3",
+      "group": "TrackHash",
+      "parentOffset": 94084,
+      "treeOffset": 69504,
+      "fields": {
+        "Unknown1": 1,
+        "TimeBegin": 0,
+        "TimeEnd": -1,
+        "Where": {
+          "hash": "3620576666240029626",
+          "name": "#323edf4b994e13ba"
+        },
+        "Offset": [
+          0,
+          0,
+          0
+        ],
+        "ForceWorldAngles": false
+      },
+      "schema": "AimTrack",
+      "end": 94188
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 94188,
+      "payload": 94200,
+      "length": 20,
+      "type": "Sequence",
+      "kind": "TrackHash",
+      "owner": "engage_apache/engage/tactics/#99b01523062c909d/#7bbf989dbe744ba3",
+      "group": "TrackHash",
+      "parentOffset": 94084,
+      "treeOffset": 69504,
+      "fields": {
+        "Unknown1": 1,
+        "TimeBegin": 0,
+        "BranchRef": {
+          "name": "",
+          "index": 122
+        },
+        "Priority": 1
+      },
+      "schema": "SequenceTrack",
+      "end": 94248
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 94320,
+      "payload": 94332,
+      "length": 36,
+      "type": "Aim",
+      "kind": "TrackHash",
+      "owner": "engage_apache/engage/tactics/#99b01523062c909d/#7bbf989dbe744ba3/#5df32a0b5d89686b",
+      "group": "TrackHash",
+      "parentOffset": 94308,
+      "treeOffset": 69504,
+      "fields": {
+        "Unknown1": 0,
+        "TimeBegin": 0,
+        "TimeEnd": -1,
+        "Where": {
+          "hash": "3620576666240029626",
+          "name": "#323edf4b994e13ba"
+        },
+        "Offset": [
+          0,
+          0,
+          0
+        ],
+        "ForceWorldAngles": false
+      },
+      "schema": "AimTrack",
+      "end": 94376
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 94376,
+      "payload": 94388,
+      "length": 28,
+      "type": "Opportunity",
+      "kind": "TrackHash",
+      "owner": "engage_apache/engage/tactics/#99b01523062c909d/#7bbf989dbe744ba3/#5df32a0b5d89686b",
+      "group": "TrackHash",
+      "parentOffset": 94308,
+      "treeOffset": 69504,
+      "fields": {
+        "Unknown1": 1,
+        "TimeBegin": 0,
+        "TimeEnd": -1,
+        "TimeHook": 0,
+        "BranchRef": {
+          "name": "",
+          "index": 123
+        },
+        "Priority": 0
+      },
+      "schema": "OpportunityTrack",
+      "end": 94504
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 94428,
+      "payload": 94440,
+      "length": 40,
+      "type": "AimingAtTarget",
+      "kind": "ConditionHash",
+      "owner": "engage_apache/engage/tactics/#99b01523062c909d/#7bbf989dbe744ba3/#5df32a0b5d89686b",
+      "group": "ConditionHash",
+      "parentOffset": 94416,
+      "treeOffset": 69504,
+      "fields": {
+        "Joint": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "Tolerance": 0.10000000149011612,
+        "Is3D": false,
+        "Heading": [
+          0,
+          0,
+          -1
+        ],
+        "Offset": [
+          0,
+          0,
+          0
+        ]
+      },
+      "schema": "AimingAtTargetCondition",
+      "end": 94488
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 94640,
+      "payload": 94652,
+      "length": 20,
+      "type": "Action",
+      "kind": "TrackHash",
+      "owner": "engage_apache/engage/tactics/#99b01523062c909d/inPosition/shoot",
+      "group": "TrackHash",
+      "parentOffset": 94628,
+      "treeOffset": 69504,
+      "fields": {
+        "Unknown1": 0,
+        "TimeBegin": 0,
+        "TimeEnd": 0.20000000298023224,
+        "Button": {
+          "hash": "382516289658763350",
+          "name": "Action"
+        }
+      },
+      "schema": "ActionTrack",
+      "end": 94680
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 94680,
+      "payload": 94692,
+      "length": 20,
+      "type": "Sequence",
+      "kind": "TrackHash",
+      "owner": "engage_apache/engage/tactics/#99b01523062c909d/inPosition/shoot",
+      "group": "TrackHash",
+      "parentOffset": 94628,
+      "treeOffset": 69504,
+      "fields": {
+        "Unknown1": 1,
+        "TimeBegin": 0,
+        "BranchRef": {
+          "name": "",
+          "index": 125
+        },
+        "Priority": 1
+      },
+      "schema": "SequenceTrack",
+      "end": 94740
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 94820,
+      "payload": 94832,
+      "length": 16,
+      "type": "Wait",
+      "kind": "TrackHash",
+      "owner": "engage_apache/engage/tactics/#99b01523062c909d/inPosition/#43342ca903db1d8f",
+      "group": "TrackHash",
+      "parentOffset": 94808,
+      "treeOffset": 69504,
+      "fields": {
+        "Unknown1": 0,
+        "TimeBegin": 0,
+        "TimeEndMin": 1,
+        "TimeEndMax": 2
+      },
+      "schema": "WaitTrack",
+      "end": 94856
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 97472,
+      "payload": 97484,
+      "length": 0,
+      "type": "False",
+      "kind": "ConditionHash",
+      "owner": "engage_apache/engage/tactics/#ecdcb3134ef3dcd/#1f38a064ac3243dd",
+      "group": "ConditionHash",
+      "parentOffset": 97460,
+      "treeOffset": 69504,
+      "fields": {},
+      "schema": "FalseCondition",
+      "end": 97492
+    }
+  ],
+  "weaponInputTracks": [
+    {
+      "source": "heli_gunship_marine_core_fig.p3d.rz",
+      "offset": 52528,
+      "payload": 52540,
+      "length": 20,
+      "type": "TimerCompare",
+      "kind": "ConditionHash",
+      "owner": "helicopter/opening/loco/loco/attack/ai/#d52a79399a08fec0/heli_gunship_marine_core/weapons/#4922f2ca8c484f17/#a454e11661d9b3e1/#a454e11661d9b3e1",
+      "group": "ConditionHash",
+      "parentOffset": 52516,
+      "treeOffset": 29116,
+      "fields": {
+        "Timer": {
+          "hash": "6043409801704741110",
+          "name": "tertiaryAttack"
+        },
+        "Compare": {
+          "hash": "3935993",
+          "name": "LessThanOrEqual"
+        },
+        "Time": 0
+      },
+      "schema": "TimerCompareCondition",
+      "end": 52568
+    },
+    {
+      "source": "heli_gunship_marine_core_fig.p3d.rz",
+      "offset": 52568,
+      "payload": 52580,
+      "length": 40,
+      "type": "Input",
+      "kind": "ConditionHash",
+      "owner": "helicopter/opening/loco/loco/attack/ai/#d52a79399a08fec0/heli_gunship_marine_core/weapons/#4922f2ca8c484f17/#a454e11661d9b3e1/#a454e11661d9b3e1",
+      "group": "ConditionHash",
+      "parentOffset": 52516,
+      "treeOffset": 29116,
+      "fields": {
+        "Button": {
+          "hash": "382516289658763350",
+          "name": "Action"
+        },
+        "ButtonState": {
+          "hash": "19195649384759944",
+          "name": "Down"
+        },
+        "CompareTime": {
+          "hash": "4067199",
+          "name": "MoreThanOrEqual"
+        },
+        "Time": 0,
+        "CompareValue": {
+          "hash": "4067199",
+          "name": "MoreThanOrEqual"
+        },
+        "Value": 0
+      },
+      "schema": "InputCondition",
+      "end": 52628
+    },
+    {
+      "source": "heli_gunship_marine_core_fig.p3d.rz",
+      "offset": 52648,
+      "payload": 52660,
+      "length": 20,
+      "type": "Execute",
+      "kind": "TrackHash",
+      "owner": "helicopter/opening/loco/loco/attack/ai/#d52a79399a08fec0/heli_gunship_marine_core/weapons/#4922f2ca8c484f17/#a454e11661d9b3e1/#a454e11661d9b3e1",
+      "group": "TrackHash",
+      "parentOffset": 52636,
+      "treeOffset": 29116,
+      "fields": {
+        "Unknown1": 0,
+        "TimeBegin": 0,
+        "TimeEnd": -1,
+        "BranchRef": {
+          "name": "",
+          "index": 92
+        }
+      },
+      "schema": "ExecuteTrack",
+      "end": 52708
+    },
+    {
+      "source": "heli_gunship_marine_core_fig.p3d.rz",
+      "offset": 52972,
+      "payload": 52984,
+      "length": 20,
+      "type": "VariableIntCompare",
+      "kind": "ConditionHash",
+      "owner": "helicopter/opening/loco/loco/attack/ai/#d52a79399a08fec0/heli_gunship_marine_core/weapons/#4922f2ca8c484f17/#a454e11661d9b3e1/#a454e11661d9b3e1/#60fce9c0991d79b7/#bb89ff14f699c6df",
+      "group": "ConditionHash",
+      "parentOffset": 52960,
+      "treeOffset": 29116,
+      "fields": {
+        "Variable": {
+          "hash": "4995788245388419245",
+          "name": "missile_side_select"
+        },
+        "Compare": {
+          "hash": "4001598",
+          "name": "Equal"
+        },
+        "Value": 0
+      },
+      "schema": "VariableIntCompareCondition",
+      "end": 53012
+    },
+    {
+      "source": "heli_gunship_marine_core_fig.p3d.rz",
+      "offset": 53120,
+      "payload": 53132,
+      "length": 80,
+      "type": "Shoot",
+      "kind": "TrackHash",
+      "owner": "helicopter/opening/loco/loco/attack/ai/#d52a79399a08fec0/heli_gunship_marine_core/weapons/#4922f2ca8c484f17/#a454e11661d9b3e1/#a454e11661d9b3e1/#60fce9c0991d79b7/#bb89ff14f699c6df",
+      "group": "TrackHash",
+      "parentOffset": 53108,
+      "treeOffset": 29116,
+      "fields": {
+        "Unknown1": 0,
+        "TimeBegin": 0,
+        "TimeEnd": 0,
+        "ApplyOnParent": false,
+        "GrabSlot": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "WeaponEntry": {
+          "hash": "1065963745669803638",
+          "name": "HellfireLeft"
+        },
+        "Shooter": {
+          "hash": "5382756063772278986",
+          "name": "Driver"
+        },
+        "AmmoProfile": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "UserProfile": {
+          "hash": "16856646367871049074",
+          "name": "heli_gunship_hellfire_user_ai"
+        },
+        "FixedDirection": 0,
+        "FixedDirectionSpace": {
+          "hash": "5062814898204701870",
+          "name": "WorldSpace"
+        },
+        "FixedDirectionDirection": [
+          0,
+          0,
+          0
+        ]
+      },
+      "schema": "ShootTrack",
+      "end": 53220
+    },
+    {
+      "source": "heli_gunship_marine_core_fig.p3d.rz",
+      "offset": 53220,
+      "payload": 53232,
+      "length": 32,
+      "type": "VariableIntSet",
+      "kind": "TrackHash",
+      "owner": "helicopter/opening/loco/loco/attack/ai/#d52a79399a08fec0/heli_gunship_marine_core/weapons/#4922f2ca8c484f17/#a454e11661d9b3e1/#a454e11661d9b3e1/#60fce9c0991d79b7/#bb89ff14f699c6df",
+      "group": "TrackHash",
+      "parentOffset": 53108,
+      "treeOffset": 29116,
+      "fields": {
+        "Unknown1": 1,
+        "TimeBegin": 0,
+        "Variable": {
+          "hash": "4995788245388419245",
+          "name": "missile_side_select"
+        },
+        "Operator": {
+          "hash": "61",
+          "name": "#3d"
+        },
+        "Value": 1,
+        "Persistent": false
+      },
+      "schema": "VariableIntSetTrack",
+      "end": 53272
+    },
+    {
+      "source": "heli_gunship_marine_core_fig.p3d.rz",
+      "offset": 53676,
+      "payload": 53688,
+      "length": 80,
+      "type": "Shoot",
+      "kind": "TrackHash",
+      "owner": "helicopter/opening/loco/loco/attack/ai/#d52a79399a08fec0/heli_gunship_marine_core/weapons/#4922f2ca8c484f17/#a454e11661d9b3e1/#a454e11661d9b3e1/#60fce9c0991d79b7/#144028607ec40996",
+      "group": "TrackHash",
+      "parentOffset": 53664,
+      "treeOffset": 29116,
+      "fields": {
+        "Unknown1": 0,
+        "TimeBegin": 0,
+        "TimeEnd": 0,
+        "ApplyOnParent": false,
+        "GrabSlot": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "WeaponEntry": {
+          "hash": "12572895996697800061",
+          "name": "HellfireRight"
+        },
+        "Shooter": {
+          "hash": "5382756063772278986",
+          "name": "Driver"
+        },
+        "AmmoProfile": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "UserProfile": {
+          "hash": "16856646367871049074",
+          "name": "heli_gunship_hellfire_user_ai"
+        },
+        "FixedDirection": 0,
+        "FixedDirectionSpace": {
+          "hash": "5062814898204701870",
+          "name": "WorldSpace"
+        },
+        "FixedDirectionDirection": [
+          0,
+          0,
+          0
+        ]
+      },
+      "schema": "ShootTrack",
+      "end": 53776
+    },
+    {
+      "source": "heli_gunship_marine_core_fig.p3d.rz",
+      "offset": 53776,
+      "payload": 53788,
+      "length": 32,
+      "type": "VariableIntSet",
+      "kind": "TrackHash",
+      "owner": "helicopter/opening/loco/loco/attack/ai/#d52a79399a08fec0/heli_gunship_marine_core/weapons/#4922f2ca8c484f17/#a454e11661d9b3e1/#a454e11661d9b3e1/#60fce9c0991d79b7/#144028607ec40996",
+      "group": "TrackHash",
+      "parentOffset": 53664,
+      "treeOffset": 29116,
+      "fields": {
+        "Unknown1": 1,
+        "TimeBegin": 0,
+        "Variable": {
+          "hash": "4995788245388419245",
+          "name": "missile_side_select"
+        },
+        "Operator": {
+          "hash": "61",
+          "name": "#3d"
+        },
+        "Value": 0,
+        "Persistent": false
+      },
+      "schema": "VariableIntSetTrack",
+      "end": 53828
+    }
+  ],
+  "staticRuntime": [
+    {
+      "file": "D:\\PrototypeReference\\p1\\private\\hover-runtime-vtables.json",
+      "sha256": "b93f90b714a40e06cf64b6001fbe66dd5857c06134517b7d98eb4c9702acc0f4"
+    },
+    {
+      "file": "D:\\PrototypeReference\\p1\\private\\hover-runtime-101e5800.txt",
+      "sha256": "504c3c8cc64dd48fcd3cea87241efc67fdf7b2fcaf5d92d6247c3d93f27a8934"
+    }
+  ],
+  "runtimeFindings": [
+    {
+      "function": "0x101e5800",
+      "vtable": "AimingAtTargetCondition 0x10dcf934 slot 9",
+      "evidence": "When Is3D byte +0x34 is false, code at 0x101e5990..0x101e59f8 normalizes heading and target displacement in XZ and computes their dot. 0x101e59fe loads 1.0 from 0x10d936e0, subtracts the dot, then compares against tolerance +0x30. Source .1 is a dot deficit, not .1 radians/degrees."
+    },
+    {
+      "function": "0x10a8da30 / 0x10a8dae0",
+      "vtable": "WaitAction 0x10e9a5e4 start/update",
+      "evidence": "Wait start chooses a duration between configured endpoints; update subtracts dt and completes at nonpositive remaining time. The Minecraft controller samples integer waits 20..40 ticks."
+    },
+    {
+      "function": "0x10202390 / 0x102023e0",
+      "vtable": "AimAction 0x10dcc9e4 start/update",
+      "evidence": "Validates actor, then writes aim state/offset/mode to its requested AI structure. This does not establish full helicopter movement-controller details."
+    }
+  ],
+  "sourceSequence": [
+    "Engage entry sets TimeAvoidHellfire to 15 seconds, decrementing. Hover branch requires timer <= 0, blackwatchVariety != 0 and TargetHasLoF; weight 10000.",
+    "Outer branch spawns tactic index 120 (HELLFIRE HOVER). It permits tactic reevaluation after 5 seconds and sequences back to engage bank when done.",
+    "Tactic entry sets avoidance to 10 seconds, executes pre-aim wait of 1..2 seconds, aims, then waits for AimingAtTarget to allow the inPosition shoot branch.",
+    "Shoot emits Action for .2 seconds, followed by a 1..2 second wait.",
+    "Standard gunship core checks tertiaryAttack<=0 and Action Down. AI Shoot entries choose HellfireLeft/Right, alternate missile_side_select and use heli_gunship_hellfire_user_ai.",
+    "Legacy simple-engage Rocket weight 80 and alternate 20 are not used as a new weapon rule: the referenced legacy controller still has a False condition at 97472."
+  ],
+  "implementation": {
+    "initialAvoidTicks": 300,
+    "repeatAvoidTicks": 200,
+    "waitRangeTicks": [
+      20,
+      40
+    ],
+    "actionPulseTicks": 4,
+    "stalledAimReevaluationTicks": 100,
+    "states": [
+      "STRAFE",
+      "WAIT",
+      "AIM",
+      "FIRE",
+      "RECOVER"
+    ],
+    "movement": "On source hover entry, retain the current position as an entry reference and brake with the existing collision-checked flight. Movement does not pull back to that reference. Continue facing only an observed target and aiming mounts; after recovery return to the weighted maneuver bank. No teleport or artificial velocity zero.",
+    "weapons": "Chin gun fires outside the hover sequence only; one accepted Hellfire during the four-tick pulse. AI weapon guard becomes 20 ticks from source profile fireRate=1; the 200-tick tactic avoidance dominates repeats. Existing manual controls still use their prior 60-tick cooldown and finite 240/8 inventory.",
+    "persistence": "Avoidance, stage, wait, age, accepted-shot latch and hover entry reference survive NBT restoration. Missing/invalid state restarts conservative avoidance; invalid distant entry reference aborts hover. Sight loss cancels pending action while preserving avoidance and never tracks through cover.",
+    "engagement": "New support after a completed sortie resets engagement state; a repeated support request during the same sortie does not reset the timer. Combat uses the existing aircraft 2400-tick mission budget instead of the previous independent 1200-tick combat cutoff, allowing natural source-paced infinite-ammo validation."
+  },
+  "minecraftAdaptations": [
+    "Current BlackwatchHelicopter class supplies the nonzero Blackwatch variety eligibility. Other original helicopter variants are not inferred from this one class.",
+    "Eligible weight-10000 hover is currently preferred deterministically over the existing orbit controller. The source complete conditional weighted circle/strafe/simple-engage bank remains open; no exact probability claim.",
+    "Existing 14..72-block firing geometry and exact line-of-sight/allegiance/crew/event/PvP checks stay authoritative; source TargetHasLoF .5-second tolerance, collision mask 16449 and offset are recorded but not claimed equivalent to the MC ray.",
+    "Five-second outer Opportunity becomes a bounded stalled-aim reevaluation; immediate sight-loss cancellation is an MC observation safeguard, not a bit-exact source scheduler.",
+    "Native tests exposed diagonally missed large airframes and core blast candidate misses. Explicit aircraft body sweeps plus candidate padding 8 fix MC spatial-query gaps while actual envelope, distance, first obstruction and hurt permissions remain authoritative. This is engine integration work, not a source gameplay coefficient."
+  ],
+  "remaining": [
+    "Complete source weighted maneuver bank and strafe-token coordination",
+    "Separate rapid unguided missile rack and source player capacities",
+    "Original full movement/actions, FX/sound identity mapping and impulse units",
+    "Dedicated multiplayer and broader creature/military/model/audio goal"
+  ],
+  "liveIntegrationFollowup": "art/military-vehicles/helicopter-live-tactics-source.json; updated code is not compiled or runtime-validated under the current user test deferral."
+}

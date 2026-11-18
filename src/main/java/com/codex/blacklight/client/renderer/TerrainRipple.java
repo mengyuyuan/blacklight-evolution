@@ -15,7 +15,7 @@ import java.util.*;
  * Copies are drawn over the real terrain; the world itself is never edited. */
 public final class TerrainRipple {
     private record Cell(BlockPos pos,BlockState state,double distance,float jitter,float yaw){}
-    private record Wave(ClientLevel level,Vec3 centre,double radius,float height,double speed,long started,List<Cell> cells){}
+    private record Wave(ClientLevel level,Vec3 centre,double radius,float height,double speed,double started,List<Cell> cells){}
     private static final List<Wave> WAVES=new ArrayList<>();
     private static final int MAX_CELLS=900,MAX_WAVES=6;
     private static final double LIFT_TICKS=5;
@@ -24,6 +24,9 @@ public final class TerrainRipple {
 
     /** strength 0..1: 0.15 light ground hit, ~0.4 heavy slam, 1 bulletdive. */
     public static void accept(double x,double y,double z,double radius,float strength){
+        var level=Minecraft.getInstance().level;if(level!=null)acceptAt(x,y,z,radius,strength,level.getGameTime());
+    }
+    public static void acceptAt(double x,double y,double z,double radius,float strength,double started){
         var mc=Minecraft.getInstance();var level=mc.level;if(level==null||!Double.isFinite(x+y+z+radius)||radius<=.5)return;
         radius=Math.min(radius,16);strength=Math.max(0,Math.min(1,strength));
         var centre=new Vec3(x,y,z);var cells=new ArrayList<Cell>();int r=(int)Math.ceil(radius);
@@ -33,12 +36,21 @@ public final class TerrainRipple {
             double distance=Math.sqrt((dx+.5-(x-Math.floor(x)))*(dx+.5-(x-Math.floor(x)))+(dz+.5-(z-Math.floor(z)))*(dz+.5-(z-Math.floor(z))));
             if(distance>radius)continue;
             int bx=(int)Math.floor(x)+dx,bz=(int)Math.floor(z)+dz;
+            if(!level.hasChunkAt(BlockPos.containing(bx,y,bz)))continue;
             for(int dy=2;dy>=-4;dy--){
                 at.set(bx,(int)Math.floor(y-.01)+dy,bz);var state=level.getBlockState(at);
                 if(state.isAir()||state.getRenderShape()!=RenderShape.MODEL||!state.getFluidState().isEmpty())continue;
                 var above=at.above();
                 if(!level.getBlockState(above).getCollisionShape(level,above).isEmpty())break;
-                if(state.getCollisionShape(level,at).isEmpty())continue;
+                var shape=state.getCollisionShape(level,at);if(shape.isEmpty())continue;
+                // A shock follows nearby exposed terrain, never lifts an unrelated roof
+                // or blocks behind a wall. Use the local shape height for slabs/stairs.
+                var probe=new Vec3(bx+.5,at.getY()+shape.max(net.minecraft.core.Direction.Axis.Y)+.02,bz+.5);
+                var surface=level.clip(new net.minecraft.world.level.ClipContext(probe,probe.add(0,-1.1,0),net.minecraft.world.level.ClipContext.Block.COLLIDER,net.minecraft.world.level.ClipContext.Fluid.NONE,mc.player));
+                if(surface.getType()!=net.minecraft.world.phys.HitResult.Type.BLOCK||surface.getDirection()!=net.minecraft.core.Direction.UP
+                        ||!surface.getBlockPos().equals(at)||Math.abs(surface.getLocation().y-y)>1.25)break;
+                var path=level.clip(new net.minecraft.world.level.ClipContext(centre.add(0,.12,0),surface.getLocation().add(0,.12,0),net.minecraft.world.level.ClipContext.Block.COLLIDER,net.minecraft.world.level.ClipContext.Fluid.NONE,mc.player));
+                if(path.getType()!=net.minecraft.world.phys.HitResult.Type.MISS)break;
                 cells.add(new Cell(at.immutable(),state,distance,.75F+.5F*rng.nextFloat(),(rng.nextFloat()-.5F)*.35F));break;
             }
         }
@@ -46,7 +58,7 @@ public final class TerrainRipple {
         if(cells.size()>MAX_CELLS){cells.sort(Comparator.comparingDouble(Cell::distance));cells.subList(MAX_CELLS,cells.size()).clear();}
         if(WAVES.size()>=MAX_WAVES)WAVES.remove(0);
         float height=.18F+.72F*strength;double speed=.8+.35*strength;
-        WAVES.add(new Wave(level,centre,radius,height,speed,level.getGameTime(),List.copyOf(cells)));
+        WAVES.add(new Wave(level,centre,radius,height,speed,started,List.copyOf(cells)));
     }
 
     public static void render(PoseStack stack,Vec3 camera,double time){

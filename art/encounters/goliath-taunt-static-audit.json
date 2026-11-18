@@ -1,0 +1,18 @@
+{
+  "validation": "Static JSON/Python AST/matrix data correspondence only. No Java compilation, unit/GameTest, game, DLL execution or audio.",
+  "rawJointSamples": 40,
+  "maxNativeExportedJointErrorBlocks": 9.956498783154455e-08,
+  "phases": 13,
+  "normalDurationTicks": 312,
+  "clips": 17,
+  "sourceFrames": 2212,
+  "windows": 11,
+  "independentDamageGroups": 8,
+  "pending": [
+    "Java compilation and all unit/GameTests",
+    "Actual player full-taunt collision and cover validation",
+    "Source waveform bank/playback",
+    "Full original story/grapple/dismember conditions",
+    "Final giant-fist grounding"
+  ]
+}

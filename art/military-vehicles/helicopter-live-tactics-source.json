@@ -1,0 +1,165 @@
+{
+  "schema": 1,
+  "recordedLocal": "2026-11-17T02:42:55",
+  "status": "Implemented in both source trees; compilation, unit tests, GameTests and player/client acceptance explicitly deferred by user. No runtime pass is claimed.",
+  "scope": "Live engage_apache weighted bank, circle/hover, prepare plus committed tight run, simple-engage initial destination and close-range relocation, per-world lease/cache/volume lifecycle. Incomplete source AI, not full parity.",
+  "source": {
+    "file": "D:\\PrototypeReference\\p1\\input\\prototypeenginef.dll",
+    "sha256": "8cba8da3412df4f49cd61d02445e87a0cda551dea4f2fc1e66b19c1bfe28a760"
+  },
+  "decodedFig": {
+    "file": "D:\\PrototypeReference\\p1\\helicopter-weapons-complete.json",
+    "sha256": "70955751e9386c6b312918cc0843e6b808d1144dbede5b25181cf012314308fa"
+  },
+  "bank": {
+    "file": "startup_fig.p3d.rz",
+    "owner": "engage_apache/engage/engage",
+    "offset": 69940,
+    "orderedWeights": {
+      "circle": 50,
+      "strafe": 100,
+      "simple": 30,
+      "hover": 10000
+    },
+    "implementation": "10a7e250 evaluates conditions for total weight then evaluates them again while accumulating the weighted draw. Requesting a strafe token is a side effect on each pass, including when hover ultimately wins. No deterministic preference for the largest weight.",
+    "circle": "Target world Y<300; width60 terrain maximum-targetY<22. Reevaluate after10 seconds, or immediately if width25 terrain maximum-targetY>=10.",
+    "strafe": "Target world Y<300; width25 terrain maximum-targetY>5; candidate query(.5sec,2movement,5minimum,40maximum,false); then request token. Reserve candidate corridor radius5 and refresh token throughout prepare and run.",
+    "simple": "Unconditional weight30 fallback. Initial class-specific two-pass destination searches and close range(<5XZ) firstValid relocation; radius10 position reservation. Ten-second opportunity.",
+    "hover": "Blackwatch nonzero variety, source avoid timer and observed line of fire. Independent source wait/aim/pulse/recover helper; no chin gun while hovering."
+  },
+  "staticEvidence": [
+    {
+      "file": "D:\\PrototypeReference\\p1\\private\\rapid-runtime-10a7e250.txt",
+      "sha256": "5cc73ed33e81927a13e0825e71101079a570dccd555d5d3aac997c7dceca86b6"
+    },
+    {
+      "file": "D:\\PrototypeReference\\p1\\private\\rapid-runtime-101e9940.txt",
+      "sha256": "db9cc912bdc437c690652fd28172ffb86668f335986ff61592bdcce39857fbe6"
+    },
+    {
+      "file": "D:\\PrototypeReference\\p1\\private\\rapid-runtime-101ed200.txt",
+      "sha256": "7ab62ef5543333bdb588ee8a0db00f5042cd37671685e1c9ca05b5ae2fc5eb9a"
+    },
+    {
+      "file": "D:\\PrototypeReference\\p1\\private\\rapid-runtime-10214080.txt",
+      "sha256": "a90340d1406abe33a0fbb39c363707bde4a66eaa3facc91275e8f2f54f2e38ad"
+    },
+    {
+      "file": "D:\\PrototypeReference\\p1\\private\\rapid-runtime-10214460.txt",
+      "sha256": "d78ea25f67bbea15d8cc09e3b2f359266f941287c8b3204aafcf536cc9524057"
+    },
+    {
+      "file": "D:\\PrototypeReference\\p1\\private\\rapid-runtime-10213620.txt",
+      "sha256": "2b9c93d169ee9ddf4603fae32e4a1247d18ffb025ff0547e0f0260dfff44c597"
+    },
+    {
+      "file": "D:\\PrototypeReference\\p1\\private\\rapid-runtime-10213c10.txt",
+      "sha256": "495a4eba9a5c83ed01967a91d5cfa98eb079821ee0c4cc2cb54f0f7b81ad1541"
+    }
+  ],
+  "liveLifecycle": [
+    "Successful prepare begin copies the source candidate into committed cache; reserve refresh continues reading candidate and cannot alter this committed path.",
+    "Prepare approaches raised start, aligns against the same cached raised aim that flight actually faces, waits strictly past .5 seconds and validates source target tolerances. Tight action independently constructs its committed raised end and enters outbound, turnaround and return.",
+    "Body heading during prepare/turn uses cached route aim; gun tracking still uses current observed skin point. This prevents a valid lateral target displacement from making alignment unreachable.",
+    "Leaving combat phase, takeover, destruction and remove/unload clear path/volume state. Short native attack lease expires naturally; no invented release message.",
+    "Save/load preserves local circle sample and tactic opportunity age, or active Hellfire timing. Shared world reservations and tight paths are never restored from entity NBT; these require fresh eligibility.",
+    "Each tactical tick sends at most one flight request. DESCEND final correction now belongs to the single collision-checked movement instead of a second unchecked move."
+  ],
+  "adaptations": [
+    "One MC block per source navigation cell; loaded chunk heightmap substitutes for P1 air navigation heightmap. Unknown terrain returnsNaN and fails closed.",
+    "Large height samples are cached at most20 ticks, invalidated after one block of target movement. New destination attempts use a bounded10-tick retry instead of issuing expensive searches every tick.",
+    "Native movement messages and curved steering are represented by existing Minecraft acceleration, rotor/body sweep, bounded route search and an authored intermediate waypoint. Source normalized speed is scaled by existing MC MAX_SPEED.",
+    "Lost sight immediately releases the maneuver and brakes for the existing reacquisition window; no live target tracking through cover.",
+    "Hover retains the preexisting source braking behavior. Saved hoverPoint is an entry reference, not a spring pulling the aircraft back to its old position.",
+    "Gun/rocket firing retains player/crew/allegiance/multipart/first-obstruction checks. Runtime native collision flags and temporary target types are not claimed identical."
+  ],
+  "staticReviewFixes": [
+    "Corrected cached alignment versus live flight heading mismatch that could stall prepare/turn after a valid sideways target move.",
+    "Moved final landing correction inside the swept flight step, removing DESCEND second move.",
+    "Kept original condition side effects and per-world cache commitment separate from reservation refresh.",
+    "AirDestination height checks compare actual Y values. The terrain-difference branch applies to non-air destinations; the earlier exploratory inference was incorrect."
+  ],
+  "deferredFixtures": [
+    "HelicopterTacticBankTest:5 source-weight and stateful-condition cases.",
+    "HelicopterCombatDestinationTest:13 initial/relocation search cases.",
+    "HelicopterStrafeCacheTest:7 cache/copy cases; HelicopterReservationsTest:6 owner/geometry cases.",
+    "Circle GameTest now restores an explicit active circle fixture and observes movement plus reload before the200-tick bank opportunity. It does not assume the weighted bank always selects circle.",
+    "HelicopterTacticsGameTest:3 real-world controller integration scenarios for weighted motion, accepted lateral target alignment and sight/phase/death/unload cleanup. Mission remains idle so exactly one controller drives Entity.move; full crew/player acceptance is separate. All cases unrun.",
+    "HunterCounterTest and HunterCounterGameTest added to the opt-in deferred player regression stages."
+  ],
+  "pending": [
+    "Source TryOpenStrafeRun/SimpleOpenStrafeRun opportunistic attack, full simpleEngage reaction graph and native steering/temporary-target semantics.",
+    "Native instruction/float-boundary comparisons for the bank/actions; Java arithmetic is not claimed bit-exact.",
+    "Both-platform compilation and actual server/real-player review once the user lifts test deferral.",
+    "Multi-aircraft competition, loaded-chunk boundary, obstacle changes, lateral target motion, maneuver capture/death/unload, save/load and real landing acceptance."
+  ],
+  "related": [
+    "art/military-vehicles/helicopter-strafe-cache-volume-source.json",
+    "art/military-vehicles/helicopter-combat-destination-source.json",
+    "art/military-vehicles/helicopter-strafe-maneuver-source.json",
+    "art/military-vehicles/helicopter-attack-lease-source.json"
+  ],
+  "fullGoalComplete": false,
+  "files": [
+    {
+      "file": "D:\\blacklight-evolution-forge-1.20.1\\src\\main\\java\\com\\codex\\blacklight\\military\\aircraft\\HelicopterTactics.java",
+      "sha256": "cf7568cff602b86e759912b691c400792612753e0221148f881a989a66683b44"
+    },
+    {
+      "file": "D:\\blacklight-evolution-forge-1.20.1\\src\\main\\java\\com\\codex\\blacklight\\military\\aircraft\\HelicopterTacticBank.java",
+      "sha256": "36610f998b629a50a9651729dac34a571d9770310a0241589c0e2264042b2ed5"
+    },
+    {
+      "file": "D:\\blacklight-evolution-forge-1.20.1\\src\\main\\java\\com\\codex\\blacklight\\military\\aircraft\\HelicopterCombatDestination.java",
+      "sha256": "0036dec5966718349f6420969e4afe891999cdf3183adc1e162dc8fe88107a0f"
+    },
+    {
+      "file": "D:\\blacklight-evolution-forge-1.20.1\\src\\main\\java\\com\\codex\\blacklight\\military\\aircraft\\HelicopterCombat.java",
+      "sha256": "486977256fcc5dd0d624ddfcddb3759f03bd7cdf6e34ca592a8409a6c559fd6f"
+    },
+    {
+      "file": "D:\\blacklight-evolution-forge-1.20.1\\src\\main\\java\\com\\codex\\blacklight\\military\\aircraft\\HelicopterStrafeManeuver.java",
+      "sha256": "8357bf7e429dabc0ba9fe80ca83bfdbdb9d079b6d64334da047dcd56f382dfa5"
+    },
+    {
+      "file": "D:\\blacklight-evolution-forge-1.20.1\\src\\main\\java\\com\\codex\\blacklight\\military\\aircraft\\HelicopterStrafeCache.java",
+      "sha256": "f9d16b4fa044507db4fdf830a5bef4318d96a1120972dcdf0907fb58851a85ef"
+    },
+    {
+      "file": "D:\\blacklight-evolution-forge-1.20.1\\src\\main\\java\\com\\codex\\blacklight\\military\\aircraft\\HelicopterAirspace.java",
+      "sha256": "b432944363095cbff4734caafce78698865adec0679892d7a0a65164a32d1d0e"
+    },
+    {
+      "file": "D:\\blacklight-evolution-forge-1.20.1\\src\\main\\java\\com\\codex\\blacklight\\military\\aircraft\\HelicopterReservations.java",
+      "sha256": "55ea5d5ee02e3032baef30f5a56a5c33e603d67dbb47a7c29a36d0ce2d74bcf0"
+    },
+    {
+      "file": "D:\\blacklight-evolution-forge-1.20.1\\src\\main\\java\\com\\codex\\blacklight\\military\\aircraft\\HelicopterAttackLease.java",
+      "sha256": "325ceba1ac1dc0a7f47a72d1eb97a81ef5853d85b62d9a60231e3b979c1abac9"
+    },
+    {
+      "file": "D:\\blacklight-evolution-forge-1.20.1\\src\\test\\java\\com\\codex\\blacklight\\military\\aircraft\\HelicopterTacticBankTest.java",
+      "sha256": "4d72342799daeb025aad27316e928a899816937dca97337146e8236be5f2ca64"
+    },
+    {
+      "file": "D:\\blacklight-evolution-forge-1.20.1\\tools\\player-creature-regression.init.gradle",
+      "sha256": "a74d36d9c860ca1524f5d86a3818a3e24f7752f9e38e7283ac0eaa7062682fbf"
+    },
+    {
+      "file": "D:\\blacklight-evolution-forge-1.20.1\\tools\\player-fix-unit.init.gradle",
+      "sha256": "314b20719dbb64fbeb35aee41d41b0d83f3d756cc3a225170082a18d01e9a5aa"
+    },
+    {
+      "file": "D:\\blacklight-evolution-forge-1.20.1\\src\\main\\java\\com\\codex\\blacklight\\entity\\BlackwatchHelicopter.java",
+      "sha256": "586e775b0b5df6b4bf7dc782f09aa6c4cf39a7d9ba1933b31e9f0faed04c029e"
+    },
+    {
+      "file": "D:\\blacklight-evolution-forge-1.20.1\\src\\helicopterTest\\java\\com\\codex\\blacklight\\military\\aircraft\\HelicopterTacticsGameTest.java",
+      "sha256": "74cad7970572e7ec4abd23baad1f5a2a8fbc7722416ccce3c8897c8262ecaa50"
+    }
+  ],
+  "openStrafeFollowup": {
+    "record": "art/military-vehicles/helicopter-open-strafe-source.json",
+    "status": "Independent candidate/action/volume and live opportunity now written; historical pending entry above describes the earlier checkpoint. All runtime work still deferred."
+  }
+}

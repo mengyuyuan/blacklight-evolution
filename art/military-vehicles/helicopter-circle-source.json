@@ -1,0 +1,1900 @@
+{
+  "schema": 1,
+  "createdLocal": "2026-11-16T23:36:14",
+  "scope": "Source circle strafe movement runtime and variant weapon branch audit. Full conditional weighted tactic selection/strafe-run/token implementation remains open.",
+  "sourceFiles": [
+    {
+      "file": "D:\\PrototypeReference\\p1\\input\\startup_fig.p3d.rz",
+      "sha256": "96d84271e461cbe4566fb984359653b164257f88392c5bceb213c30f88527779"
+    },
+    {
+      "file": "D:\\PrototypeReference\\p1\\input\\prototypeenginef.dll",
+      "sha256": "8cba8da3412df4f49cd61d02445e87a0cda551dea4f2fc1e66b19c1bfe28a760"
+    }
+  ],
+  "decodedSource": {
+    "file": "D:\\PrototypeReference\\p1\\helicopter-weapons-complete.json",
+    "sha256": "70955751e9386c6b312918cc0843e6b808d1144dbede5b25181cf012314308fa"
+  },
+  "movementTracks": [
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 73296,
+      "payload": 73308,
+      "length": 36,
+      "type": "Aim",
+      "kind": "TrackHash",
+      "owner": "engage_apache/engage/tactics/circleStrafe/circleStrafe",
+      "group": "TrackHash",
+      "parentOffset": 73096,
+      "treeOffset": 69504,
+      "fields": {
+        "Unknown1": 1,
+        "TimeBegin": 0,
+        "TimeEnd": -1,
+        "Where": {
+          "hash": "3620576666240029626",
+          "name": "#323edf4b994e13ba"
+        },
+        "Offset": [
+          0,
+          0,
+          0
+        ],
+        "ForceWorldAngles": false
+      },
+      "schema": "AimTrack",
+      "end": 73352
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 73352,
+      "payload": 73364,
+      "length": 12,
+      "type": "HelicopterStrafeMode",
+      "kind": "TrackHash",
+      "owner": "engage_apache/engage/tactics/circleStrafe/circleStrafe",
+      "group": "TrackHash",
+      "parentOffset": 73096,
+      "treeOffset": 69504,
+      "fields": {
+        "Unknown1": 1,
+        "TimeBegin": 0,
+        "TimeEnd": -1
+      },
+      "schema": "HelicopterStrafeModeTrack",
+      "end": 73384
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 73424,
+      "payload": 73436,
+      "length": 20,
+      "type": "Spawn",
+      "kind": "TrackHash",
+      "owner": "engage_apache/engage/tactics/circleStrafe/circleStrafe",
+      "group": "TrackHash",
+      "parentOffset": 73096,
+      "treeOffset": 69504,
+      "fields": {
+        "Unknown1": 1,
+        "TimeBegin": 0,
+        "TimeEnd": -1,
+        "BranchRef": {
+          "name": "",
+          "index": 18
+        }
+      },
+      "schema": "SpawnTrack",
+      "end": 73484
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 73680,
+      "payload": 73692,
+      "length": 64,
+      "type": "CircleStrafe",
+      "kind": "TrackHash",
+      "owner": "engage_apache/engage/tactics/circleStrafe/circleStrafe/specific/hydra",
+      "group": "TrackHash",
+      "parentOffset": 73668,
+      "treeOffset": 69504,
+      "fields": {
+        "Unknown1": 0,
+        "TimeBegin": 0,
+        "TimeEnd": -1,
+        "DistanceMin": 20,
+        "DistanceMax": 30,
+        "HeightMin": 15,
+        "HeightMax": 20,
+        "SafeHeight": 15,
+        "MinSpeed": 0.6000000238418579,
+        "MaxSpeed": 0.800000011920929,
+        "ShootingDistance": 20,
+        "UseMissiles": false,
+        "MinFireTime": 5,
+        "MaxFireTime": 6,
+        "MinWaitTime": 2,
+        "MaxWaitTime": 3
+      },
+      "schema": "CircleStrafeTrack",
+      "end": 73764
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 73844,
+      "payload": 73856,
+      "length": 64,
+      "type": "CircleStrafe",
+      "kind": "TrackHash",
+      "owner": "engage_apache/engage/tactics/circleStrafe/circleStrafe/specific/default",
+      "group": "TrackHash",
+      "parentOffset": 73832,
+      "treeOffset": 69504,
+      "fields": {
+        "Unknown1": 0,
+        "TimeBegin": 0,
+        "TimeEnd": -1,
+        "DistanceMin": 20,
+        "DistanceMax": 30,
+        "HeightMin": 6,
+        "HeightMax": 10,
+        "SafeHeight": 6,
+        "MinSpeed": 0.6000000238418579,
+        "MaxSpeed": 0.800000011920929,
+        "ShootingDistance": 20,
+        "UseMissiles": false,
+        "MinFireTime": 5,
+        "MaxFireTime": 6,
+        "MinWaitTime": 2,
+        "MaxWaitTime": 3
+      },
+      "schema": "CircleStrafeTrack",
+      "end": 73928
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 74252,
+      "payload": 74264,
+      "length": 20,
+      "type": "Spawn",
+      "kind": "TrackHash",
+      "owner": "engage_apache/engage/tactics/circleStrafe/attack/attack/#52c6de05d63abd86/#62f258c78dd56a2a",
+      "group": "TrackHash",
+      "parentOffset": 74240,
+      "treeOffset": 69504,
+      "fields": {
+        "Unknown1": 0,
+        "TimeBegin": 0,
+        "TimeEnd": -1,
+        "BranchRef": {
+          "name": "",
+          "index": 127
+        }
+      },
+      "schema": "SpawnTrack",
+      "end": 74312
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 74428,
+      "payload": 74440,
+      "length": 32,
+      "type": "VariableIntSet",
+      "kind": "TrackHash",
+      "owner": "engage_apache/engage/tactics/circleStrafe/attack/attack/#52c6de05d63abd86/#62f258c78dd56a2a",
+      "group": "TrackHash",
+      "parentOffset": 74240,
+      "treeOffset": 69504,
+      "fields": {
+        "Unknown1": 1,
+        "TimeBegin": 0,
+        "Variable": {
+          "hash": "11377063296380899135",
+          "name": "WeaponSelected"
+        },
+        "Operator": {
+          "hash": "61",
+          "name": "#3d"
+        },
+        "Value": 1,
+        "Persistent": false
+      },
+      "schema": "VariableIntSetTrack",
+      "end": 74480
+    }
+  ],
+  "topLevelSelection": [
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 70056,
+      "payload": 70068,
+      "length": 12,
+      "type": "AbsoluteHeight",
+      "kind": "ConditionHash",
+      "owner": "engage_apache/engage/engage/circleStrafe",
+      "group": "ConditionHash",
+      "parentOffset": 70044,
+      "treeOffset": 69504,
+      "fields": {
+        "Compare": {
+          "hash": "60",
+          "name": "LessThan"
+        },
+        "Distance": 300
+      },
+      "schema": "AbsoluteHeightCondition",
+      "end": 70088
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 70104,
+      "payload": 70116,
+      "length": 20,
+      "type": "TargetFreeHeightRadius",
+      "kind": "ConditionHash",
+      "owner": "engage_apache/engage/engage/circleStrafe",
+      "group": "ConditionHash",
+      "parentOffset": 70020,
+      "treeOffset": 69504,
+      "fields": {
+        "Compare": {
+          "hash": "60",
+          "name": "LessThan"
+        },
+        "Radius": 60,
+        "HeightTolerance": 22,
+        "GroundUnit": false
+      },
+      "schema": "TargetFreeHeightRadiusCondition",
+      "end": 70144
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 70144,
+      "payload": 70156,
+      "length": 4,
+      "type": "Random",
+      "kind": "ConditionHash",
+      "owner": "engage_apache/engage/engage/circleStrafe",
+      "group": "ConditionHash",
+      "parentOffset": 70020,
+      "treeOffset": 69504,
+      "fields": {
+        "Weight": 50
+      },
+      "schema": "RandomCondition",
+      "end": 70168
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 70188,
+      "payload": 70200,
+      "length": 20,
+      "type": "Spawn",
+      "kind": "TrackHash",
+      "owner": "engage_apache/engage/engage/circleStrafe",
+      "group": "TrackHash",
+      "parentOffset": 70176,
+      "treeOffset": 69504,
+      "fields": {
+        "Unknown1": 0,
+        "TimeBegin": 0,
+        "TimeEnd": -1,
+        "BranchRef": {
+          "name": "",
+          "index": 13
+        }
+      },
+      "schema": "SpawnTrack",
+      "end": 70248
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 70248,
+      "payload": 70260,
+      "length": 20,
+      "type": "Sequence",
+      "kind": "TrackHash",
+      "owner": "engage_apache/engage/engage/circleStrafe",
+      "group": "TrackHash",
+      "parentOffset": 70176,
+      "treeOffset": 69504,
+      "fields": {
+        "Unknown1": 1,
+        "TimeBegin": 0,
+        "BranchRef": {
+          "name": "",
+          "index": 2
+        },
+        "Priority": 1
+      },
+      "schema": "SequenceTrack",
+      "end": 70308
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 70308,
+      "payload": 70320,
+      "length": 28,
+      "type": "Opportunity",
+      "kind": "TrackHash",
+      "owner": "engage_apache/engage/engage/circleStrafe",
+      "group": "TrackHash",
+      "parentOffset": 70176,
+      "treeOffset": 69504,
+      "fields": {
+        "Unknown1": 1,
+        "TimeBegin": 10,
+        "TimeEnd": -1,
+        "TimeHook": 0,
+        "BranchRef": {
+          "name": "",
+          "index": 2
+        },
+        "Priority": 0
+      },
+      "schema": "OpportunityTrack",
+      "end": 70376
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 70376,
+      "payload": 70388,
+      "length": 28,
+      "type": "Opportunity",
+      "kind": "TrackHash",
+      "owner": "engage_apache/engage/engage/circleStrafe",
+      "group": "TrackHash",
+      "parentOffset": 70176,
+      "treeOffset": 69504,
+      "fields": {
+        "Unknown1": 1,
+        "TimeBegin": 0,
+        "TimeEnd": -1,
+        "TimeHook": 0,
+        "BranchRef": {
+          "name": "",
+          "index": 2
+        },
+        "Priority": 0
+      },
+      "schema": "OpportunityTrack",
+      "end": 70484
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 70428,
+      "payload": 70440,
+      "length": 20,
+      "type": "TargetFreeHeightRadius",
+      "kind": "ConditionHash",
+      "owner": "engage_apache/engage/engage/circleStrafe",
+      "group": "ConditionHash",
+      "parentOffset": 70416,
+      "treeOffset": 69504,
+      "fields": {
+        "Compare": {
+          "hash": "4067199",
+          "name": "MoreThanOrEqual"
+        },
+        "Radius": 25,
+        "HeightTolerance": 10,
+        "GroundUnit": false
+      },
+      "schema": "TargetFreeHeightRadiusCondition",
+      "end": 70468
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 70568,
+      "payload": 70580,
+      "length": 12,
+      "type": "AbsoluteHeight",
+      "kind": "ConditionHash",
+      "owner": "engage_apache/engage/engage/strafeRun",
+      "group": "ConditionHash",
+      "parentOffset": 70556,
+      "treeOffset": 69504,
+      "fields": {
+        "Compare": {
+          "hash": "60",
+          "name": "LessThan"
+        },
+        "Distance": 300
+      },
+      "schema": "AbsoluteHeightCondition",
+      "end": 70600
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 70616,
+      "payload": 70628,
+      "length": 20,
+      "type": "TargetFreeHeightRadius",
+      "kind": "ConditionHash",
+      "owner": "engage_apache/engage/engage/strafeRun",
+      "group": "ConditionHash",
+      "parentOffset": 70532,
+      "treeOffset": 69504,
+      "fields": {
+        "Compare": {
+          "hash": "62",
+          "name": "MoreThan"
+        },
+        "Radius": 25,
+        "HeightTolerance": 5,
+        "GroundUnit": false
+      },
+      "schema": "TargetFreeHeightRadiusCondition",
+      "end": 70656
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 70656,
+      "payload": 70668,
+      "length": 20,
+      "type": "CanStrafeRun",
+      "kind": "ConditionHash",
+      "owner": "engage_apache/engage/engage/strafeRun",
+      "group": "ConditionHash",
+      "parentOffset": 70532,
+      "treeOffset": 69504,
+      "fields": {
+        "TimeTolerance": 0.5,
+        "DistanceTolerance": 2,
+        "MinDelta": 5,
+        "MaxDelta": 40,
+        "FarthestPossible": false
+      },
+      "schema": "CanStrafeRunCondition",
+      "end": 70696
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 70696,
+      "payload": 70708,
+      "length": 4,
+      "type": "Random",
+      "kind": "ConditionHash",
+      "owner": "engage_apache/engage/engage/strafeRun",
+      "group": "ConditionHash",
+      "parentOffset": 70532,
+      "treeOffset": 69504,
+      "fields": {
+        "Weight": 100
+      },
+      "schema": "RandomCondition",
+      "end": 70720
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 70720,
+      "payload": 70732,
+      "length": 4,
+      "type": "HaveStrafeRunToken",
+      "kind": "ConditionHash",
+      "owner": "engage_apache/engage/engage/strafeRun",
+      "group": "ConditionHash",
+      "parentOffset": 70532,
+      "treeOffset": 69504,
+      "fields": {
+        "RequestIt": true
+      },
+      "schema": "HaveStrafeRunTokenCondition",
+      "end": 70744
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 70764,
+      "payload": 70776,
+      "length": 20,
+      "type": "Spawn",
+      "kind": "TrackHash",
+      "owner": "engage_apache/engage/engage/strafeRun",
+      "group": "TrackHash",
+      "parentOffset": 70752,
+      "treeOffset": 69504,
+      "fields": {
+        "Unknown1": 0,
+        "TimeBegin": 0,
+        "TimeEnd": -1,
+        "BranchRef": {
+          "name": "",
+          "index": 24
+        }
+      },
+      "schema": "SpawnTrack",
+      "end": 70824
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 70824,
+      "payload": 70836,
+      "length": 20,
+      "type": "ReserveVolume",
+      "kind": "TrackHash",
+      "owner": "engage_apache/engage/engage/strafeRun",
+      "group": "TrackHash",
+      "parentOffset": 70752,
+      "treeOffset": 69504,
+      "fields": {
+        "Unknown1": 1,
+        "TimeBegin": 0,
+        "TimeEnd": -1,
+        "Radius": 5,
+        "StrafeRun": true
+      },
+      "schema": "ReserveVolumeTrack",
+      "end": 70864
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 70864,
+      "payload": 70876,
+      "length": 12,
+      "type": "RefreshStrafeRunToken",
+      "kind": "TrackHash",
+      "owner": "engage_apache/engage/engage/strafeRun",
+      "group": "TrackHash",
+      "parentOffset": 70752,
+      "treeOffset": 69504,
+      "fields": {
+        "Unknown1": 1,
+        "TimeBegin": 0,
+        "TimeEnd": -1
+      },
+      "schema": "RefreshStrafeRunTokenTrack",
+      "end": 70896
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 70896,
+      "payload": 70908,
+      "length": 20,
+      "type": "Sequence",
+      "kind": "TrackHash",
+      "owner": "engage_apache/engage/engage/strafeRun",
+      "group": "TrackHash",
+      "parentOffset": 70752,
+      "treeOffset": 69504,
+      "fields": {
+        "Unknown1": 1,
+        "TimeBegin": 0,
+        "BranchRef": {
+          "name": "",
+          "index": 2
+        },
+        "Priority": 1
+      },
+      "schema": "SequenceTrack",
+      "end": 70956
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 71016,
+      "payload": 71028,
+      "length": 4,
+      "type": "Random",
+      "kind": "ConditionHash",
+      "owner": "engage_apache/engage/engage/simpleEngage",
+      "group": "ConditionHash",
+      "parentOffset": 71004,
+      "treeOffset": 69504,
+      "fields": {
+        "Weight": 30
+      },
+      "schema": "RandomCondition",
+      "end": 71040
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 71060,
+      "payload": 71072,
+      "length": 20,
+      "type": "Spawn",
+      "kind": "TrackHash",
+      "owner": "engage_apache/engage/engage/simpleEngage",
+      "group": "TrackHash",
+      "parentOffset": 71048,
+      "treeOffset": 69504,
+      "fields": {
+        "Unknown1": 0,
+        "TimeBegin": 0,
+        "TimeEnd": -1,
+        "BranchRef": {
+          "name": "",
+          "index": 87
+        }
+      },
+      "schema": "SpawnTrack",
+      "end": 71120
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 71120,
+      "payload": 71132,
+      "length": 28,
+      "type": "Opportunity",
+      "kind": "TrackHash",
+      "owner": "engage_apache/engage/engage/simpleEngage",
+      "group": "TrackHash",
+      "parentOffset": 71048,
+      "treeOffset": 69504,
+      "fields": {
+        "Unknown1": 1,
+        "TimeBegin": 10,
+        "TimeEnd": -1,
+        "TimeHook": 0,
+        "BranchRef": {
+          "name": "",
+          "index": 2
+        },
+        "Priority": 0
+      },
+      "schema": "OpportunityTrack",
+      "end": 71188
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 71188,
+      "payload": 71200,
+      "length": 20,
+      "type": "Sequence",
+      "kind": "TrackHash",
+      "owner": "engage_apache/engage/engage/simpleEngage",
+      "group": "TrackHash",
+      "parentOffset": 71048,
+      "treeOffset": 69504,
+      "fields": {
+        "Unknown1": 1,
+        "TimeBegin": 0,
+        "BranchRef": {
+          "name": "",
+          "index": 2
+        },
+        "Priority": 1
+      },
+      "schema": "SequenceTrack",
+      "end": 71248
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 71248,
+      "payload": 71260,
+      "length": 20,
+      "type": "ConditionalExecute",
+      "kind": "TrackHash",
+      "owner": "engage_apache/engage/engage/simpleEngage",
+      "group": "TrackHash",
+      "parentOffset": 71048,
+      "treeOffset": 69504,
+      "fields": {
+        "Unknown1": 1,
+        "TimeBegin": 0,
+        "TimeEnd": -1,
+        "Branch": {
+          "name": "",
+          "index": 6
+        }
+      },
+      "schema": "ConditionalExecuteTrack",
+      "end": 71444
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 71292,
+      "payload": 71304,
+      "length": 20,
+      "type": "TargetDistance",
+      "kind": "ConditionHash",
+      "owner": "engage_apache/engage/engage/simpleEngage",
+      "group": "ConditionHash",
+      "parentOffset": 71280,
+      "treeOffset": 69504,
+      "fields": {
+        "Direction": {
+          "hash": "5772786",
+          "name": "XZ"
+        },
+        "Compare": {
+          "hash": "3935993",
+          "name": "LessThanOrEqual"
+        },
+        "Distance": 300
+      },
+      "schema": "TargetDistanceCondition",
+      "end": 71332
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 71356,
+      "payload": 71368,
+      "length": 12,
+      "type": "AbsoluteHeight",
+      "kind": "ConditionHash",
+      "owner": "engage_apache/engage/engage/simpleEngage",
+      "group": "ConditionHash",
+      "parentOffset": 71344,
+      "treeOffset": 69504,
+      "fields": {
+        "Compare": {
+          "hash": "60",
+          "name": "LessThan"
+        },
+        "Distance": 300
+      },
+      "schema": "AbsoluteHeightCondition",
+      "end": 71388
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 71404,
+      "payload": 71416,
+      "length": 4,
+      "type": "HaveStrafeRunToken",
+      "kind": "ConditionHash",
+      "owner": "engage_apache/engage/engage/simpleEngage",
+      "group": "ConditionHash",
+      "parentOffset": 71280,
+      "treeOffset": 69504,
+      "fields": {
+        "RequestIt": false
+      },
+      "schema": "HaveStrafeRunTokenCondition",
+      "end": 71428
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 71444,
+      "payload": 71456,
+      "length": 56,
+      "type": "Dialogue",
+      "kind": "TrackHash",
+      "owner": "engage_apache/engage/engage/simpleEngage",
+      "group": "TrackHash",
+      "parentOffset": 71048,
+      "treeOffset": 69504,
+      "fields": {
+        "Unknown1": 1,
+        "TimeBegin": 0,
+        "CharacterName": "",
+        "EventName": "npc_commit",
+        "PlayOn": "",
+        "Frequency": 0.30230000615119934,
+        "InstanceFrequencySensitivity": 1,
+        "MinDelay": 0,
+        "MaxDelay": 0,
+        "KillOnExit": false,
+        "IfPlayerCanBeSeen": false
+      },
+      "schema": "DialogueTrack",
+      "end": 71520
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 71644,
+      "payload": 71656,
+      "length": 16,
+      "type": "ClassName",
+      "kind": "ConditionHash",
+      "owner": "engage_apache/engage/engage/simpleEngage/tryOpenStrafeRun/#b97a0756485571ea",
+      "group": "ConditionHash",
+      "parentOffset": 71632,
+      "treeOffset": 69504,
+      "fields": {
+        "Compare": {
+          "hash": "4001598",
+          "name": "Equal"
+        },
+        "Value": {
+          "hash": "7408146997857750184",
+          "name": "hydra"
+        }
+      },
+      "schema": "ClassNameCondition",
+      "end": 71680
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 71716,
+      "payload": 71728,
+      "length": 80,
+      "type": "TryOpenStrafeRun",
+      "kind": "TrackHash",
+      "owner": "engage_apache/engage/engage/simpleEngage/tryOpenStrafeRun/#b97a0756485571ea",
+      "group": "TrackHash",
+      "parentOffset": 71704,
+      "treeOffset": 69504,
+      "fields": {
+        "Unknown1": 0,
+        "TimeBegin": 0,
+        "TimeEnd": -1,
+        "MaxHeightPath": 30,
+        "MaxHeightEnd": 30,
+        "MinHeightWithTarget": 10,
+        "EndHigherThanTarget": 15,
+        "MaxHeightStartWithTarget": 27,
+        "MinHeightStartWithTarget": 15,
+        "MaxLength": 40,
+        "MinLength": 20,
+        "MinLengthAfterTarget": 6,
+        "MinLengthBeforeTarget": 0,
+        "MaxHeightToIgnoreStartLength": 200,
+        "FreeRadiusStart": 20,
+        "FreeRadiusPath": 20,
+        "FreeRadiusEnd": 20,
+        "IfFound": {
+          "name": "",
+          "index": 11
+        },
+        "Priority": 0
+      },
+      "schema": "TryOpenStrafeRunTrack",
+      "end": 71836
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 71916,
+      "payload": 71928,
+      "length": 80,
+      "type": "TryOpenStrafeRun",
+      "kind": "TrackHash",
+      "owner": "engage_apache/engage/engage/simpleEngage/tryOpenStrafeRun/#977ba3c108166ad3",
+      "group": "TrackHash",
+      "parentOffset": 71904,
+      "treeOffset": 69504,
+      "fields": {
+        "Unknown1": 0,
+        "TimeBegin": 0,
+        "TimeEnd": -1,
+        "MaxHeightPath": 30,
+        "MaxHeightEnd": 30,
+        "MinHeightWithTarget": 10,
+        "EndHigherThanTarget": 15,
+        "MaxHeightStartWithTarget": 17,
+        "MinHeightStartWithTarget": 5,
+        "MaxLength": 40,
+        "MinLength": 20,
+        "MinLengthAfterTarget": 4,
+        "MinLengthBeforeTarget": 0,
+        "MaxHeightToIgnoreStartLength": 200,
+        "FreeRadiusStart": 20,
+        "FreeRadiusPath": 20,
+        "FreeRadiusEnd": 20,
+        "IfFound": {
+          "name": "",
+          "index": 11
+        },
+        "Priority": 0
+      },
+      "schema": "TryOpenStrafeRunTrack",
+      "end": 72036
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 72112,
+      "payload": 72124,
+      "length": 20,
+      "type": "TimerCompare",
+      "kind": "ConditionHash",
+      "owner": "engage_apache/engage/engage/#99b01523062c909d",
+      "group": "ConditionHash",
+      "parentOffset": 72100,
+      "treeOffset": 69504,
+      "fields": {
+        "Timer": {
+          "hash": "10881217989349568899",
+          "name": "TimeAvoidHellfire"
+        },
+        "Compare": {
+          "hash": "3935993",
+          "name": "LessThanOrEqual"
+        },
+        "Time": 0
+      },
+      "schema": "TimerCompareCondition",
+      "end": 72152
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 72152,
+      "payload": 72164,
+      "length": 20,
+      "type": "VariableIntCompare",
+      "kind": "ConditionHash",
+      "owner": "engage_apache/engage/engage/#99b01523062c909d",
+      "group": "ConditionHash",
+      "parentOffset": 72100,
+      "treeOffset": 69504,
+      "fields": {
+        "Variable": {
+          "hash": "7712363393100529610",
+          "name": "blackwatchVariety"
+        },
+        "Compare": {
+          "hash": "2164770",
+          "name": "NotEqual"
+        },
+        "Value": 0
+      },
+      "schema": "VariableIntCompareCondition",
+      "end": 72192
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 72192,
+      "payload": 72204,
+      "length": 36,
+      "type": "TargetHasLoF",
+      "kind": "ConditionHash",
+      "owner": "engage_apache/engage/engage/#99b01523062c909d",
+      "group": "ConditionHash",
+      "parentOffset": 72100,
+      "treeOffset": 69504,
+      "fields": {
+        "TimeTolerance": 0.5,
+        "DistanceTolerance": 2,
+        "CollisionFlags": {
+          "hash": "4601230196676155154",
+          "name": "collide_static_and_moving"
+        },
+        "CollideWithType": 16449,
+        "Offset": [
+          0,
+          -1,
+          0
+        ],
+        "Radius": 0.20000000298023224
+      },
+      "schema": "TargetHasLoFCondition",
+      "end": 72248
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 72248,
+      "payload": 72260,
+      "length": 4,
+      "type": "Random",
+      "kind": "ConditionHash",
+      "owner": "engage_apache/engage/engage/#99b01523062c909d",
+      "group": "ConditionHash",
+      "parentOffset": 72100,
+      "treeOffset": 69504,
+      "fields": {
+        "Weight": 10000
+      },
+      "schema": "RandomCondition",
+      "end": 72272
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 72292,
+      "payload": 72304,
+      "length": 20,
+      "type": "Spawn",
+      "kind": "TrackHash",
+      "owner": "engage_apache/engage/engage/#99b01523062c909d",
+      "group": "TrackHash",
+      "parentOffset": 72280,
+      "treeOffset": 69504,
+      "fields": {
+        "Unknown1": 0,
+        "TimeBegin": 0,
+        "TimeEnd": -1,
+        "BranchRef": {
+          "name": "",
+          "index": 120
+        }
+      },
+      "schema": "SpawnTrack",
+      "end": 72352
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 72352,
+      "payload": 72364,
+      "length": 28,
+      "type": "Opportunity",
+      "kind": "TrackHash",
+      "owner": "engage_apache/engage/engage/#99b01523062c909d",
+      "group": "TrackHash",
+      "parentOffset": 72280,
+      "treeOffset": 69504,
+      "fields": {
+        "Unknown1": 1,
+        "TimeBegin": 5,
+        "TimeEnd": -1,
+        "TimeHook": 0,
+        "BranchRef": {
+          "name": "",
+          "index": 2
+        },
+        "Priority": 0
+      },
+      "schema": "OpportunityTrack",
+      "end": 72420
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 72420,
+      "payload": 72432,
+      "length": 20,
+      "type": "Sequence",
+      "kind": "TrackHash",
+      "owner": "engage_apache/engage/engage/#99b01523062c909d",
+      "group": "TrackHash",
+      "parentOffset": 72280,
+      "treeOffset": 69504,
+      "fields": {
+        "Unknown1": 1,
+        "TimeBegin": 0,
+        "BranchRef": {
+          "name": "",
+          "index": 2
+        },
+        "Priority": 1
+      },
+      "schema": "SequenceTrack",
+      "end": 72480
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 72608,
+      "payload": 72620,
+      "length": 4,
+      "type": "HaveStrafeRunToken",
+      "kind": "ConditionHash",
+      "owner": "engage_apache/engage/engage/#35d7142e4807baf2/simpleOpenStrafeRun",
+      "group": "ConditionHash",
+      "parentOffset": 72596,
+      "treeOffset": 69504,
+      "fields": {
+        "RequestIt": true
+      },
+      "schema": "HaveStrafeRunTokenCondition",
+      "end": 72632
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 72652,
+      "payload": 72664,
+      "length": 20,
+      "type": "Spawn",
+      "kind": "TrackHash",
+      "owner": "engage_apache/engage/engage/#35d7142e4807baf2/simpleOpenStrafeRun",
+      "group": "TrackHash",
+      "parentOffset": 72640,
+      "treeOffset": 69504,
+      "fields": {
+        "Unknown1": 0,
+        "TimeBegin": 0,
+        "TimeEnd": -1,
+        "BranchRef": {
+          "name": "",
+          "index": 63
+        }
+      },
+      "schema": "SpawnTrack",
+      "end": 72712
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 72712,
+      "payload": 72724,
+      "length": 12,
+      "type": "RefreshStrafeRunToken",
+      "kind": "TrackHash",
+      "owner": "engage_apache/engage/engage/#35d7142e4807baf2/simpleOpenStrafeRun",
+      "group": "TrackHash",
+      "parentOffset": 72640,
+      "treeOffset": 69504,
+      "fields": {
+        "Unknown1": 1,
+        "TimeBegin": 0,
+        "TimeEnd": -1
+      },
+      "schema": "RefreshStrafeRunTokenTrack",
+      "end": 72744
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 72744,
+      "payload": 72756,
+      "length": 20,
+      "type": "Sequence",
+      "kind": "TrackHash",
+      "owner": "engage_apache/engage/engage/#35d7142e4807baf2/simpleOpenStrafeRun",
+      "group": "TrackHash",
+      "parentOffset": 72640,
+      "treeOffset": 69504,
+      "fields": {
+        "Unknown1": 1,
+        "TimeBegin": 0,
+        "BranchRef": {
+          "name": "",
+          "index": 2
+        },
+        "Priority": 1
+      },
+      "schema": "SequenceTrack",
+      "end": 72804
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 72804,
+      "payload": 72816,
+      "length": 28,
+      "type": "Opportunity",
+      "kind": "TrackHash",
+      "owner": "engage_apache/engage/engage/#35d7142e4807baf2/simpleOpenStrafeRun",
+      "group": "TrackHash",
+      "parentOffset": 72640,
+      "treeOffset": 69504,
+      "fields": {
+        "Unknown1": 1,
+        "TimeBegin": 0,
+        "TimeEnd": -1,
+        "TimeHook": 0,
+        "BranchRef": {
+          "name": "",
+          "index": 2
+        },
+        "Priority": 0
+      },
+      "schema": "OpportunityTrack",
+      "end": 72916
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 72876,
+      "payload": 72888,
+      "length": 4,
+      "type": "HaveStrafeRunToken",
+      "kind": "ConditionHash",
+      "owner": "engage_apache/engage/engage/#35d7142e4807baf2/simpleOpenStrafeRun",
+      "group": "ConditionHash",
+      "parentOffset": 72844,
+      "treeOffset": 69504,
+      "fields": {
+        "RequestIt": true
+      },
+      "schema": "HaveStrafeRunTokenCondition",
+      "end": 72900
+    }
+  ],
+  "variantWeaponEdges": [
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 76300,
+      "payload": 76312,
+      "length": 20,
+      "type": "VariableIntCompare",
+      "kind": "ConditionHash",
+      "owner": "engage_apache/engage/tactics/strafeRun/strafeRun/#152688dae6a3722a/#54a60aaa368b5bea",
+      "group": "ConditionHash",
+      "parentOffset": 76264,
+      "treeOffset": 69504,
+      "fields": {
+        "Variable": {
+          "hash": "7712363393100529610",
+          "name": "blackwatchVariety"
+        },
+        "Compare": {
+          "hash": "2164770",
+          "name": "NotEqual"
+        },
+        "Value": 0
+      },
+      "schema": "VariableIntCompareCondition",
+      "end": 76340
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 76988,
+      "payload": 77000,
+      "length": 20,
+      "type": "Spawn",
+      "kind": "TrackHash",
+      "owner": "engage_apache/engage/tactics/strafeRun/strafeRun/#152688dae6a3722a/#54a60aaa368b5bea/attack/#52c6de05d63abd86/#52c6de05d63abd86/normal/#62f258c78dd56a2a",
+      "group": "TrackHash",
+      "parentOffset": 76976,
+      "treeOffset": 69504,
+      "fields": {
+        "Unknown1": 0,
+        "TimeBegin": 0,
+        "TimeEnd": -1,
+        "BranchRef": {
+          "name": "",
+          "index": 151
+        }
+      },
+      "schema": "SpawnTrack",
+      "end": 77048
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 77164,
+      "payload": 77176,
+      "length": 32,
+      "type": "VariableIntSet",
+      "kind": "TrackHash",
+      "owner": "engage_apache/engage/tactics/strafeRun/strafeRun/#152688dae6a3722a/#54a60aaa368b5bea/attack/#52c6de05d63abd86/#52c6de05d63abd86/normal/#62f258c78dd56a2a",
+      "group": "TrackHash",
+      "parentOffset": 76976,
+      "treeOffset": 69504,
+      "fields": {
+        "Unknown1": 1,
+        "TimeBegin": 0,
+        "Variable": {
+          "hash": "11377063296380899135",
+          "name": "WeaponSelected"
+        },
+        "Operator": {
+          "hash": "61",
+          "name": "#3d"
+        },
+        "Value": 1,
+        "Persistent": false
+      },
+      "schema": "VariableIntSetTrack",
+      "end": 77216
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 77888,
+      "payload": 77900,
+      "length": 20,
+      "type": "VariableIntCompare",
+      "kind": "ConditionHash",
+      "owner": "engage_apache/engage/tactics/strafeRun/strafeRun/#152688dae6a3722a/#ac7d907887cbec9b",
+      "group": "ConditionHash",
+      "parentOffset": 77852,
+      "treeOffset": 69504,
+      "fields": {
+        "Variable": {
+          "hash": "7712363393100529610",
+          "name": "blackwatchVariety"
+        },
+        "Compare": {
+          "hash": "4001598",
+          "name": "Equal"
+        },
+        "Value": 0
+      },
+      "schema": "VariableIntCompareCondition",
+      "end": 77928
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 78576,
+      "payload": 78588,
+      "length": 20,
+      "type": "Spawn",
+      "kind": "TrackHash",
+      "owner": "engage_apache/engage/tactics/strafeRun/strafeRun/#152688dae6a3722a/#ac7d907887cbec9b/attack/#52c6de05d63abd86/#52c6de05d63abd86/normal/Rocket",
+      "group": "TrackHash",
+      "parentOffset": 78564,
+      "treeOffset": 69504,
+      "fields": {
+        "Unknown1": 0,
+        "TimeBegin": 0,
+        "TimeEnd": -1,
+        "BranchRef": {
+          "name": "",
+          "index": 166
+        }
+      },
+      "schema": "SpawnTrack",
+      "end": 78636
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 78752,
+      "payload": 78764,
+      "length": 32,
+      "type": "VariableIntSet",
+      "kind": "TrackHash",
+      "owner": "engage_apache/engage/tactics/strafeRun/strafeRun/#152688dae6a3722a/#ac7d907887cbec9b/attack/#52c6de05d63abd86/#52c6de05d63abd86/normal/Rocket",
+      "group": "TrackHash",
+      "parentOffset": 78564,
+      "treeOffset": 69504,
+      "fields": {
+        "Unknown1": 1,
+        "TimeBegin": 0,
+        "Variable": {
+          "hash": "11377063296380899135",
+          "name": "WeaponSelected"
+        },
+        "Operator": {
+          "hash": "61",
+          "name": "#3d"
+        },
+        "Value": 2,
+        "Persistent": false
+      },
+      "schema": "VariableIntSetTrack",
+      "end": 78804
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 81552,
+      "payload": 81564,
+      "length": 20,
+      "type": "Spawn",
+      "kind": "TrackHash",
+      "owner": "engage_apache/engage/tactics/simpleOpenStrafeRun/#c9cc312cdb857e62/attack/#52c6de05d63abd86/#62f258c78dd56a2a",
+      "group": "TrackHash",
+      "parentOffset": 81540,
+      "treeOffset": 69504,
+      "fields": {
+        "Unknown1": 0,
+        "TimeBegin": 0,
+        "TimeEnd": -1,
+        "BranchRef": {
+          "name": "",
+          "index": 151
+        }
+      },
+      "schema": "SpawnTrack",
+      "end": 81612
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 81660,
+      "payload": 81672,
+      "length": 32,
+      "type": "VariableIntSet",
+      "kind": "TrackHash",
+      "owner": "engage_apache/engage/tactics/simpleOpenStrafeRun/#c9cc312cdb857e62/attack/#52c6de05d63abd86/#62f258c78dd56a2a",
+      "group": "TrackHash",
+      "parentOffset": 81540,
+      "treeOffset": 69504,
+      "fields": {
+        "Unknown1": 1,
+        "TimeBegin": 0,
+        "Variable": {
+          "hash": "11377063296380899135",
+          "name": "WeaponSelected"
+        },
+        "Operator": {
+          "hash": "61",
+          "name": "#3d"
+        },
+        "Value": 1,
+        "Persistent": false
+      },
+      "schema": "VariableIntSetTrack",
+      "end": 81712
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 82416,
+      "payload": 82428,
+      "length": 20,
+      "type": "VariableIntCompare",
+      "kind": "ConditionHash",
+      "owner": "engage_apache/engage/tactics/simpleOpenStrafeRun/#715f4cc657a82ff3",
+      "group": "ConditionHash",
+      "parentOffset": 82380,
+      "treeOffset": 69504,
+      "fields": {
+        "Variable": {
+          "hash": "7712363393100529610",
+          "name": "blackwatchVariety"
+        },
+        "Compare": {
+          "hash": "4001598",
+          "name": "Equal"
+        },
+        "Value": 0
+      },
+      "schema": "VariableIntCompareCondition",
+      "end": 82456
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 83020,
+      "payload": 83032,
+      "length": 20,
+      "type": "Spawn",
+      "kind": "TrackHash",
+      "owner": "engage_apache/engage/tactics/simpleOpenStrafeRun/#715f4cc657a82ff3/attack/#52c6de05d63abd86/Rocket",
+      "group": "TrackHash",
+      "parentOffset": 83008,
+      "treeOffset": 69504,
+      "fields": {
+        "Unknown1": 0,
+        "TimeBegin": 0,
+        "TimeEnd": -1,
+        "BranchRef": {
+          "name": "",
+          "index": 166
+        }
+      },
+      "schema": "SpawnTrack",
+      "end": 83080
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 83128,
+      "payload": 83140,
+      "length": 32,
+      "type": "VariableIntSet",
+      "kind": "TrackHash",
+      "owner": "engage_apache/engage/tactics/simpleOpenStrafeRun/#715f4cc657a82ff3/attack/#52c6de05d63abd86/Rocket",
+      "group": "TrackHash",
+      "parentOffset": 83008,
+      "treeOffset": 69504,
+      "fields": {
+        "Unknown1": 1,
+        "TimeBegin": 0,
+        "Variable": {
+          "hash": "11377063296380899135",
+          "name": "WeaponSelected"
+        },
+        "Operator": {
+          "hash": "61",
+          "name": "#3d"
+        },
+        "Value": 2,
+        "Persistent": false
+      },
+      "schema": "VariableIntSetTrack",
+      "end": 83180
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 92736,
+      "payload": 92748,
+      "length": 20,
+      "type": "VariableIntCompare",
+      "kind": "ConditionHash",
+      "owner": "engage_apache/engage/tactics/simpleEngage/attack/#52c6de05d63abd86/Rocket",
+      "group": "ConditionHash",
+      "parentOffset": 92724,
+      "treeOffset": 69504,
+      "fields": {
+        "Variable": {
+          "hash": "4555966873988132371",
+          "name": "useRocketsSimpleEngage"
+        },
+        "Compare": {
+          "hash": "2164770",
+          "name": "NotEqual"
+        },
+        "Value": 0
+      },
+      "schema": "VariableIntCompareCondition",
+      "end": 92776
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 92776,
+      "payload": 92788,
+      "length": 4,
+      "type": "Random",
+      "kind": "ConditionHash",
+      "owner": "engage_apache/engage/tactics/simpleEngage/attack/#52c6de05d63abd86/Rocket",
+      "group": "ConditionHash",
+      "parentOffset": 92724,
+      "treeOffset": 69504,
+      "fields": {
+        "Weight": 80
+      },
+      "schema": "RandomCondition",
+      "end": 92800
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 92820,
+      "payload": 92832,
+      "length": 20,
+      "type": "Spawn",
+      "kind": "TrackHash",
+      "owner": "engage_apache/engage/tactics/simpleEngage/attack/#52c6de05d63abd86/Rocket",
+      "group": "TrackHash",
+      "parentOffset": 92808,
+      "treeOffset": 69504,
+      "fields": {
+        "Unknown1": 0,
+        "TimeBegin": 0,
+        "TimeEnd": -1,
+        "BranchRef": {
+          "name": "",
+          "index": 140
+        }
+      },
+      "schema": "SpawnTrack",
+      "end": 92880
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 93268,
+      "payload": 93280,
+      "length": 4,
+      "type": "Random",
+      "kind": "ConditionHash",
+      "owner": "engage_apache/engage/tactics/simpleEngage/attack/#52c6de05d63abd86/#62f258c78dd56a2a",
+      "group": "ConditionHash",
+      "parentOffset": 93256,
+      "treeOffset": 69504,
+      "fields": {
+        "Weight": 20
+      },
+      "schema": "RandomCondition",
+      "end": 93292
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 93312,
+      "payload": 93324,
+      "length": 20,
+      "type": "Spawn",
+      "kind": "TrackHash",
+      "owner": "engage_apache/engage/tactics/simpleEngage/attack/#52c6de05d63abd86/#62f258c78dd56a2a",
+      "group": "TrackHash",
+      "parentOffset": 93300,
+      "treeOffset": 69504,
+      "fields": {
+        "Unknown1": 0,
+        "TimeBegin": 0,
+        "TimeEnd": -1,
+        "BranchRef": {
+          "name": "",
+          "index": 127
+        }
+      },
+      "schema": "SpawnTrack",
+      "end": 93372
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 93420,
+      "payload": 93432,
+      "length": 32,
+      "type": "VariableIntSet",
+      "kind": "TrackHash",
+      "owner": "engage_apache/engage/tactics/simpleEngage/attack/#52c6de05d63abd86/#62f258c78dd56a2a",
+      "group": "TrackHash",
+      "parentOffset": 93300,
+      "treeOffset": 69504,
+      "fields": {
+        "Unknown1": 1,
+        "TimeBegin": 0,
+        "Variable": {
+          "hash": "11377063296380899135",
+          "name": "WeaponSelected"
+        },
+        "Operator": {
+          "hash": "61",
+          "name": "#3d"
+        },
+        "Value": 1,
+        "Persistent": false
+      },
+      "schema": "VariableIntSetTrack",
+      "end": 93472
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 97472,
+      "payload": 97484,
+      "length": 0,
+      "type": "False",
+      "kind": "ConditionHash",
+      "owner": "engage_apache/engage/tactics/#ecdcb3134ef3dcd/#1f38a064ac3243dd",
+      "group": "ConditionHash",
+      "parentOffset": 97460,
+      "treeOffset": 69504,
+      "fields": {},
+      "schema": "FalseCondition",
+      "end": 97492
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 102036,
+      "payload": 102048,
+      "length": 20,
+      "type": "Action",
+      "kind": "TrackHash",
+      "owner": "engage_apache/engage/tactics/#ecdcb3134ef3dcd/#ac88e78ced6595f/#60e8dadce8b372e2/shoot/#9ae585061ef13fa8",
+      "group": "TrackHash",
+      "parentOffset": 102024,
+      "treeOffset": 69504,
+      "fields": {
+        "Unknown1": 0,
+        "TimeBegin": 0,
+        "TimeEnd": -1,
+        "Button": {
+          "hash": "14665729337295026497",
+          "name": "Special"
+        }
+      },
+      "schema": "ActionTrack",
+      "end": 102076
+    }
+  ],
+  "nativeFieldMap": {
+    "properties": [
+      {
+        "name": "timeBegin",
+        "registration": "0x1021df2f",
+        "accessor": "0x1021d010",
+        "body": [
+          "FUNCTION 0x1021d010",
+          "1021d010: movss xmm0, dword ptr [esp + 4]",
+          "1021d016: movss dword ptr [ecx + 0x40], xmm0",
+          "1021d01b: mov al, 1",
+          "1021d01d: ret 4"
+        ]
+      },
+      {
+        "name": "timeEnd",
+        "registration": "0x1021df60",
+        "accessor": "0x1021d030",
+        "body": [
+          "FUNCTION 0x1021d030",
+          "1021d030: movss xmm0, dword ptr [esp + 4]",
+          "1021d036: movss dword ptr [ecx + 0x44], xmm0",
+          "1021d03b: mov al, 1",
+          "1021d03d: ret 4"
+        ]
+      },
+      {
+        "name": "distanceMin",
+        "registration": "0x1021df91",
+        "accessor": "0x1021d050",
+        "body": [
+          "FUNCTION 0x1021d050",
+          "1021d050: movss xmm0, dword ptr [esp + 4]",
+          "1021d056: movss dword ptr [ecx + 0x14], xmm0",
+          "1021d05b: mov al, 1",
+          "1021d05d: ret 4"
+        ]
+      },
+      {
+        "name": "distanceMax",
+        "registration": "0x1021dfc2",
+        "accessor": "0x1021d070",
+        "body": [
+          "FUNCTION 0x1021d070",
+          "1021d070: movss xmm0, dword ptr [esp + 4]",
+          "1021d076: movss dword ptr [ecx + 0x10], xmm0",
+          "1021d07b: mov al, 1",
+          "1021d07d: ret 4"
+        ]
+      },
+      {
+        "name": "heightMin",
+        "registration": "0x1021dff3",
+        "accessor": "0x1021d090",
+        "body": [
+          "FUNCTION 0x1021d090",
+          "1021d090: movss xmm0, dword ptr [esp + 4]",
+          "1021d096: movss dword ptr [ecx + 0x1c], xmm0",
+          "1021d09b: mov al, 1",
+          "1021d09d: ret 4"
+        ]
+      },
+      {
+        "name": "heightMax",
+        "registration": "0x1021e024",
+        "accessor": "0x1021d0b0",
+        "body": [
+          "FUNCTION 0x1021d0b0",
+          "1021d0b0: movss xmm0, dword ptr [esp + 4]",
+          "1021d0b6: movss dword ptr [ecx + 0x18], xmm0",
+          "1021d0bb: mov al, 1",
+          "1021d0bd: ret 4"
+        ]
+      },
+      {
+        "name": "safeHeight",
+        "registration": "0x1021e055",
+        "accessor": "0x1021d0d0",
+        "body": [
+          "FUNCTION 0x1021d0d0",
+          "1021d0d0: movss xmm0, dword ptr [esp + 4]",
+          "1021d0d6: movss dword ptr [ecx + 0x38], xmm0",
+          "1021d0db: mov al, 1",
+          "1021d0dd: ret 4"
+        ]
+      },
+      {
+        "name": "minSpeed",
+        "registration": "0x1021e086",
+        "accessor": "0x1021d0f0",
+        "body": [
+          "FUNCTION 0x1021d0f0",
+          "1021d0f0: movss xmm0, dword ptr [esp + 4]",
+          "1021d0f6: movss dword ptr [ecx + 0x30], xmm0",
+          "1021d0fb: mov al, 1",
+          "1021d0fd: ret 4"
+        ]
+      },
+      {
+        "name": "maxSpeed",
+        "registration": "0x1021e0b7",
+        "accessor": "0x1021d110",
+        "body": [
+          "FUNCTION 0x1021d110",
+          "1021d110: movss xmm0, dword ptr [esp + 4]",
+          "1021d116: movss dword ptr [ecx + 0x24], xmm0",
+          "1021d11b: mov al, 1",
+          "1021d11d: ret 4"
+        ]
+      },
+      {
+        "name": "shootingDistance",
+        "registration": "0x1021e0e8",
+        "accessor": "0x1021d130",
+        "body": [
+          "FUNCTION 0x1021d130",
+          "1021d130: movss xmm0, dword ptr [esp + 4]",
+          "1021d136: movss dword ptr [ecx + 0x3c], xmm0",
+          "1021d13b: mov al, 1",
+          "1021d13d: ret 4"
+        ]
+      },
+      {
+        "name": "useMissiles",
+        "registration": "0x1021e119",
+        "accessor": "0x1021d150",
+        "body": [
+          "FUNCTION 0x1021d150",
+          "1021d150: mov al, byte ptr [esp + 4]",
+          "1021d154: mov byte ptr [ecx + 0x48], al",
+          "1021d157: mov al, 1",
+          "1021d159: ret 4"
+        ]
+      },
+      {
+        "name": "minFireTime",
+        "registration": "0x1021e14a",
+        "accessor": "0x1021d160",
+        "body": [
+          "FUNCTION 0x1021d160",
+          "1021d160: movss xmm0, dword ptr [esp + 4]",
+          "1021d166: movss dword ptr [ecx + 0x2c], xmm0",
+          "1021d16b: mov al, 1",
+          "1021d16d: ret 4"
+        ]
+      },
+      {
+        "name": "maxFireTime",
+        "registration": "0x1021e17b",
+        "accessor": "0x1021d180",
+        "body": [
+          "FUNCTION 0x1021d180",
+          "1021d180: movss xmm0, dword ptr [esp + 4]",
+          "1021d186: movss dword ptr [ecx + 0x20], xmm0",
+          "1021d18b: mov al, 1",
+          "1021d18d: ret 4"
+        ]
+      },
+      {
+        "name": "minWaitTime",
+        "registration": "0x1021e1ac",
+        "accessor": "0x1021d1a0",
+        "body": [
+          "FUNCTION 0x1021d1a0",
+          "1021d1a0: movss xmm0, dword ptr [esp + 4]",
+          "1021d1a6: movss dword ptr [ecx + 0x34], xmm0",
+          "1021d1ab: mov al, 1",
+          "1021d1ad: ret 4"
+        ]
+      },
+      {
+        "name": "maxWaitTime",
+        "registration": "0x1021e1dd",
+        "accessor": "0x1021d1c0",
+        "body": [
+          "FUNCTION 0x1021d1c0",
+          "1021d1c0: movss xmm0, dword ptr [esp + 4]",
+          "1021d1c6: movss dword ptr [ecx + 0x28], xmm0",
+          "1021d1cb: mov al, 1",
+          "1021d1cd: ret 4"
+        ]
+      }
+    ],
+    "constants": {
+      "0x10d93664": -0.0,
+      "0x10d93cc4": 0.5,
+      "0x10d94578": 2.0,
+      "0x10d93ff8": -1.0
+    }
+  },
+  "staticEvidence": [
+    {
+      "file": "D:\\PrototypeReference\\p1\\private\\helicopter-maneuver-runtime-vtables.json",
+      "sha256": "91e395691a809a7a063ab221267affa2520338335ae7fb949d300b0c0c306a35"
+    },
+    {
+      "file": "D:\\PrototypeReference\\p1\\private\\circle-strafe-field-map.json",
+      "sha256": "a43d81870518da3fa6d4e2ebf78b1df87aeb7113f31f0016d3b9697d33e7fddc"
+    },
+    {
+      "file": "D:\\PrototypeReference\\p1\\private\\helicopter-ai-bank.txt",
+      "sha256": "75557fe28b35de10a57d87d1bf184ffd359942fe1e7b33d1a6776147b66c2a21"
+    },
+    {
+      "file": "D:\\PrototypeReference\\p1\\private\\rapid-runtime-101e13e0.txt",
+      "sha256": "909217bd07f7070cd09c6fa503ae9e14910c5099ed4b3cd6abafa19ed7f7d247"
+    },
+    {
+      "file": "D:\\PrototypeReference\\p1\\private\\rapid-runtime-101e17a0.txt",
+      "sha256": "c10662baaef2f3a704fd490a5d4cfc3dedc00c15d43c00b4140d0164e89b552d"
+    },
+    {
+      "file": "D:\\PrototypeReference\\p1\\private\\rapid-runtime-101e1190.txt",
+      "sha256": "ec6c242067f9ce93799908fbf596cd075100231cd7a004c4ce99461f189fa11b"
+    },
+    {
+      "file": "D:\\PrototypeReference\\p1\\private\\rapid-runtime-101e0c60.txt",
+      "sha256": "26f1d7e8da76acbb737a26505be92fd3b61bcc77d5bf4f97c1468145af776322"
+    },
+    {
+      "file": "D:\\PrototypeReference\\p1\\private\\rapid-runtime-101e0a70.txt",
+      "sha256": "e6aeb14c9ee1b1dfc5cfa0e4f759e42f0a135e67be0729094e75ee9125438d50"
+    },
+    {
+      "file": "D:\\PrototypeReference\\p1\\private\\rapid-runtime-103b8510.txt",
+      "sha256": "060a36d737ce9c02e0f9901ea854acc2b2080241731a597758f7010f96ab02f5"
+    },
+    {
+      "file": "D:\\PrototypeReference\\p1\\private\\rapid-runtime-10a82970.txt",
+      "sha256": "2e2f04c6fdfe302eef3f6b5df315980585f9cf90ac5c4c59a37ce835bb4286f6"
+    },
+    {
+      "file": "D:\\PrototypeReference\\p1\\private\\rapid-runtime-101ed200.txt",
+      "sha256": "7ab62ef5543333bdb588ee8a0db00f5042cd37671685e1c9ca05b5ae2fc5eb9a"
+    },
+    {
+      "file": "D:\\PrototypeReference\\p1\\private\\rapid-runtime-101e44d0.txt",
+      "sha256": "a7a80dfb4466808426393a34bc088edcfa739792d9963f97cd13410d495b709b"
+    },
+    {
+      "file": "D:\\PrototypeReference\\p1\\private\\rapid-runtime-1020d9e0.txt",
+      "sha256": "9de01b0e3b365dcee8ac17577f6fa7287b96925c88bafbb61afb7215ad0db32c"
+    },
+    {
+      "file": "D:\\PrototypeReference\\p1\\private\\rapid-runtime-10384040.txt",
+      "sha256": "4548050faa09a8890edba298d3ca51f77ce61e952c8575a8f29b37d2cdac55be"
+    }
+  ],
+  "runtimeFindings": [
+    "CircleStrafeAction vtable10dc9850 start slot5=101e13e0 samples one speed between track+30(minSpeed) and+24(maxSpeed). Verified property setters map these offsets; XML/JSON field order is not assumed to match native object layout.",
+    "Update slot7=101e17a0 obtains target position, reads track+10 distanceMax30 and queries the air navigation height map over distanceMax*2=60.101e1190 converts world extent to an odd cell count;101e0c60 takes the maximum over a square of cells.",
+    "101e18dc..101e1922 computes max(0,highestTerrain-targetY). If this exceeds configured heightMin, the new lower band is rise+safeHeight and the upper band preserves original heightMax-heightMin. Default6..10/safe6; hydra15..20/safe15.",
+    "101e1928..101e19d8 normalizes target-minus-actor in XZ and creates tangent(-z,0,x). If distance<20 it subtracts inward*(20-distance); if distance>30 it adds inward*(distance-30). It normalizes this corrected horizontal direction and multiplies by the sampled speed.",
+    "101e1b4a..101e1b84 sets vertical component only when relative actor height lies outside the band, using nearest band boundary minus current height. It normalizes the final request and passes its original length and direction through103b8510 as AI movement message type26/subtype1f.",
+    "The inspected CircleStrafeAction update does not read shootingDistance, useMissiles or the fire/wait fields. The circle FIG separately spawns controller127 with Attack/chin-gun and its own4-second burst/4-second wait; the unused-looking circle timing fields are not made into a new firing rule.",
+    "RandomCondition10a82970 adds weight to a provided accumulator and returns true. This is evidence of weight accumulation, not yet proof of the full Bank selection/scheduler semantics."
+  ],
+  "weaponFindings": [
+    "Tight strafe branch33 requires blackwatchVariety!=0 and spawns chin-gun controller151. The alternate branch43 requires blackwatchVariety==0 and spawns rocket controller166 whose Action is Special.",
+    "Open-strafe gun branch64 has no Blackwatch exclusion; rocket branch72 explicitly requires blackwatchVariety==0. The simple-engage Rocket option references controller140, whose own condition is False.",
+    "The top-level hidden Bank10 is False, but TryOpenStrafeRun explicitly references its child11. Parent-False is not treated as proof that a directly referenced child can never execute. Full reachability and token scheduling still require work.",
+    "This audited engage_apache branch bank does not justify adding unrestricted70mm fire to the current Blackwatch AI. Player70mm remains available; existing Hellfire hover and separate chin-gun attacks remain active. No claim covers all scripted missions or other FIG trees."
+  ],
+  "implementation": {
+    "motion": "HelicopterCircleStrafe replaces fixed angle+.009/radius26/height12 with the source tangent, distance correction, per-engagement speed sample and default/hydra terrain height bands.",
+    "navigation": "MC motion uses existing .65 blocks/tick maximum, .035 acceleration and swept mechanical airframe/rotor navigation. Source request magnitude is capped at1 then scaled by MC maximum. A moving20-block destination expresses the direction through the existing bounded route planner.",
+    "terrain": "A61x61 block-column MOTION_BLOCKING_NO_LEAVES maximum substitutes for the original air navigation map. Every required chunk must be loaded; otherwise brake/hold. Query is cached20 ticks while the last observed target base moves less than1 block. No chunk is generated by this query.",
+    "observation": "Aim point and target base are recorded only with visibility; no live target position or terrain resampling through cover. Missing old save base holds until actual reacquisition. Hydra variant identity is stored with the observed base.",
+    "hover": "Ending circle movement issues zero translation and lets normal acceleration brake the aircraft. It no longer pulls back to the original entry point, which caused residual motion during some1-second pre-aim waits at the new higher tangential speed. Entry point remains only a bounded persistence/reference anchor.",
+    "multipartGun": "MC integration: aim at the nearest actual animated body surface, resolve a first-hit part to its living parent for enemy permission, and submit the actual muzzle ray contact through AnimatedHurtBody.hurtAt. Native ProjectileUtil still orders obstructions and narrows Hydra/Flyer/Greene proxies to mesh boxes. No broadened proxy damage or source-specific new attack branch is inferred.",
+    "persistence": "Speed and last observed target base/profile are saved; finite range validation rejects bad speed or vectors. Terrain query is recomputed after reload. Legacy Orbit field is no longer used.",
+    "protocols": [
+      "standalone-76-circle-motion",
+      "forge-1.20.1-36-circle-motion"
+    ]
+  },
+  "limits": [
+    "Default movement outside Hellfire remains this circle action; top-level conditional weighted selection among circle50/strafe100/simple30/hover10000 is not yet implemented. Eligible hover remains the previous preference. No complete AI claim.",
+    "Native source movement-message handling, speed/acceleration units, original air map resolution and source mesh collision are not reproduced exactly; MC physics and terrain substitutes are explicit.",
+    "One-block STRAFE-phase tolerance and a deterministic heading fallback at coincident XZ coordinates are MC integration choices; the source radius/height bands themselves remain unchanged.",
+    "No source FX/audio remap, new vehicle destruction visuals, model completion, dedicated multiplayer or whole-project completion is claimed."
+  ]
+}

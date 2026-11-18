@@ -1,0 +1,400 @@
+[
+  {
+    "source": "D:\\PrototypeReference\\p1\\private\\comparison\\LeaderHunter.p3d",
+    "sourceSha256": "6fd78db43b551dcfc9c84217a086f53374dd920552e881bae0b814e8d976fccf",
+    "skeleton": "leader_master_skeleton_skeleton",
+    "mapping": {
+      "root": "Character_Root",
+      "torso": "Spine_3",
+      "head": "Head",
+      "jaw": "Jaw",
+      "left_arm": "Shoulder_L",
+      "left_forearm": "Elbow_L",
+      "left_hand": "Wrist_L",
+      "left_leg": "Hip_L",
+      "left_shin": "Knee_L",
+      "right_arm": "Shoulder_R",
+      "right_forearm": "Elbow_R",
+      "right_hand": "Wrist_R",
+      "right_leg": "Hip_R",
+      "right_shin": "Knee_R"
+    },
+    "reference": "leader_act_calm",
+    "rootMotion": "Source ground is Y=0. Motion_Root travel and heading are removed from the skin; the Minecraft server supplies actor movement. Skin retains Character_Root lean and vertical displacement.",
+    "entity": "leader_hunter",
+    "clips": {
+      "idle": {
+        "source": "leader_act_calm",
+        "fps": 30.0,
+        "seconds": 1.4666666666666666
+      },
+      "walk": {
+        "source": "leader_loco_walk_n",
+        "fps": 30.0,
+        "seconds": 1.4666666666666666
+      },
+      "run": {
+        "source": "leader_loco_run_n",
+        "fps": 30.0,
+        "seconds": 0.7333333333333333
+      },
+      "CLAW": {
+        "source": "leader_attack_2",
+        "fps": 30.0,
+        "seconds": 2.033333333333333
+      },
+      "DOUBLE": {
+        "source": "leader_attack_1",
+        "fps": 30.0,
+        "seconds": 2.8333333333333335
+      },
+      "POUNCE": {
+        "source": "leader_pnch_air_slash",
+        "fps": 30.0,
+        "seconds": 2.0
+      },
+      "HOWL": {
+        "source": "leader_act_roar",
+        "fps": 30.0,
+        "seconds": 2.7666666666666666
+      },
+      "exposed": {
+        "source": "leader_gethit_stun",
+        "fps": 30.0,
+        "seconds": 2.8333333333333335
+      },
+      "death": {
+        "source": "leader_gethit_death_collapse",
+        "fps": 30.0,
+        "seconds": 3.0
+      }
+    },
+    "outputSha256": "1b04b1640e556657442e72892c2a3ff0ed66df09fde4cdc9bcd8b9e29c3f0fb3"
+  },
+  {
+    "source": "D:\\PrototypeReference\\p2\\input\\p2\\infected3.p3d",
+    "sourceSha256": "aace036ee1cc1cef7297023c7ea2d861bcbfda782463cf96865633c2d4795b04",
+    "skeleton": "infected3_hammerer_skeleton",
+    "mapping": {
+      "root": "Character_Root",
+      "torso": "Spine_3",
+      "head": "Head",
+      "jaw": "Jaw",
+      "left_arm": "Shoulder_L",
+      "left_forearm": "Elbow_L",
+      "left_hand": "Wrist_L",
+      "left_leg": "Hip_L",
+      "left_shin": "Knee_L",
+      "right_arm": "Shoulder_R",
+      "right_forearm": "Elbow_R",
+      "right_hand": "Wrist_R",
+      "right_leg": "Hip_R",
+      "right_shin": "Knee_R"
+    },
+    "reference": "infected3_com_idle",
+    "rootMotion": "Source ground is Y=0. Motion_Root travel and heading are removed from the skin; the Minecraft server supplies actor movement. Skin retains Character_Root lean and vertical displacement.",
+    "entity": "juggernaut",
+    "clips": {
+      "idle": {
+        "source": "infected3_com_idle",
+        "fps": 30.0,
+        "seconds": 2.3333333333333335
+      },
+      "walk": {
+        "source": "infected3_loco_walk",
+        "fps": 30.0,
+        "seconds": 1.1666666666666667
+      },
+      "run": {
+        "source": "infected3_com_run",
+        "fps": 30.0,
+        "seconds": 0.6333333333333333
+      },
+      "HAMMER": {
+        "source": "infected3_com_2hit_combo",
+        "fps": 30.0,
+        "seconds": 3.0
+      },
+      "SLAM": {
+        "source": "infected3_com_2hand_slam",
+        "fps": 30.0,
+        "seconds": 3.8333333333333335
+      },
+      "GUARD": {
+        "source": "infected3_com_block",
+        "fps": 30.0,
+        "seconds": 2.5
+      },
+      "block_hit": {
+        "source": "infected3_com_block_gethit",
+        "fps": 30.0,
+        "seconds": 0.5
+      },
+      "exposed": {
+        "source": "infected3_com_stuned",
+        "fps": 30.0,
+        "seconds": 1.3333333333333333
+      }
+    },
+    "outputSha256": "c64f4e7a83c280ec82e52445723b7416dd55fb15884361ee6887e3cdfd5abe24"
+  },
+  {
+    "source": "D:\\PrototypeReference\\p2\\input\\p2\\behemoth.p3d",
+    "sourceSha256": "3737ff61e7042391bf12c95c2018e034f52a1945983d0a7053608a01d69240c7",
+    "skeleton": "behemoth_skeleton",
+    "mapping": {
+      "root": "Character_Root",
+      "torso": "Spine_3",
+      "head": "Head",
+      "jaw": "Jaw",
+      "left_arm": "Shoulder_R",
+      "left_forearm": "Elbow_R",
+      "left_hand": "Wrist_R",
+      "left_leg": "Hip_L",
+      "left_shin": "Knee_L",
+      "right_arm": "Shoulder_L",
+      "right_forearm": "Elbow_L",
+      "right_hand": "Wrist_L",
+      "right_leg": "Hip_R",
+      "right_shin": "Knee_R"
+    },
+    "reference": "behemoth_loco_biped_idle",
+    "rootMotion": "Full source joint transforms; source Motion_Root travel/heading removed with referenceMotionRoot * inverse(sampledMotionRoot). All articulated translations are retained relative to the rebound authored bind mesh.",
+    "entity": "goliath",
+    "clips": {
+      "idle": {
+        "source": "behemoth_loco_biped_idle",
+        "fps": 30.0,
+        "seconds": 2.8333333333333335
+      },
+      "walk": {
+        "source": "behemoth_loco_biped_walk",
+        "fps": 30.0,
+        "seconds": 1.4333333333333333
+      },
+      "HAMMER": {
+        "source": "behemoth_com_biped_front_slam_to_biped",
+        "fps": 30.0,
+        "seconds": 2.933333333333333
+      },
+      "SLAM": {
+        "source": "behemoth_com_biped_slam",
+        "fps": 30.0,
+        "seconds": 6.0
+      },
+      "CHARGE": {
+        "source": "behemoth_com_biped_bullrush",
+        "fps": 30.0,
+        "seconds": 5.0
+      },
+      "ERUPTION": {
+        "source": "behemoth_com_crawl_front_spike",
+        "fps": 30.0,
+        "seconds": 7.0
+      },
+      "exposed": {
+        "source": "behemoth_com_biped_leg_stun_to_biped",
+        "fps": 30.0,
+        "seconds": 9.666666666666666
+      },
+      "collapse": {
+        "source": "behemoth_com_biped_leg_dismember_to_crawl",
+        "fps": 30.0,
+        "seconds": 1.6666666666666667
+      },
+      "crawl_idle": {
+        "source": "behemoth_loco_crawl_idle",
+        "fps": 30.0,
+        "seconds": 4.0
+      },
+      "crawl": {
+        "source": "behemoth_com_crawl",
+        "fps": 30.0,
+        "seconds": 1.9333333333333333
+      },
+      "crawl_slam": {
+        "source": "behemoth_com_crawl_front_body_slam",
+        "fps": 30.0,
+        "seconds": 4.5
+      },
+      "rise": {
+        "source": "behemoth_com_prone_to_biped",
+        "fps": 30.0,
+        "seconds": 2.6666666666666665
+      },
+      "death": {
+        "source": "behemoth_com_biped_death_v2",
+        "fps": 30.0,
+        "seconds": 1.8333333333333333
+      }
+    },
+    "outputSha256": "a9962ef274e5098e8f2ee953145b53b4c3d145814767548fffecfa56778a500c"
+  },
+  {
+    "source": "D:\\PrototypeReference\\p1\\private\\comparison\\mother.p3d",
+    "sourceSha256": "f67e081a7497191554de61995bdb75fad58cfca1cb53adeb9bd0b15ef8b97df6",
+    "skeleton": "mother_core_skeleton",
+    "mapping": {
+      "native_Motion_Root": "Motion_Root",
+      "native_Balance_Root": "Balance_Root",
+      "native_Character_Root": "Character_Root",
+      "native_Spine_Base": "Spine_Base",
+      "native_Spine_1": "Spine_1",
+      "native_Spine_2": "Spine_2",
+      "native_Spine_3": "Spine_3",
+      "native_Spine_4": "Spine_4",
+      "native_Head": "Head",
+      "native_Head_End": "Head_End",
+      "native_Heart_1": "Heart_1",
+      "native_Heart_2": "Heart_2",
+      "native_Heart_3": "Heart_3",
+      "native_Heart_4": "Heart_4",
+      "native_Mouth": "Mouth",
+      "native_Heart_5": "Heart_5",
+      "native_Heart_6": "Heart_6",
+      "native_Heart_7": "Heart_7",
+      "native_Horn": "Horn",
+      "native_Body_Root": "Body_Root",
+      "native_Body": "Body",
+      "native_Chest_R": "Chest_R",
+      "native_Chest_L": "Chest_L",
+      "native_Slug_02_Spine_Base": "Slug_02_Spine_Base",
+      "native_Slug_02_Spine_1": "Slug_02_Spine_1",
+      "native_Slug_02_Spine_2": "Slug_02_Spine_2",
+      "native_Slug_02_Spine_3": "Slug_02_Spine_3",
+      "native_Slug_02_Spine_4": "Slug_02_Spine_4",
+      "native_Slug_02_Spine_5": "Slug_02_Spine_5",
+      "native_Slug_02_Head": "Slug_02_Head",
+      "native_Slug_02_Jaw_1": "Slug_02_Jaw_1",
+      "native_Slug_02_Jaw_2": "Slug_02_Jaw_2",
+      "native_Slug_02_Jaw_3": "Slug_02_Jaw_3",
+      "native_Slug_01_Spine_Base": "Slug_01_Spine_Base",
+      "native_Slug_01_Spine_1": "Slug_01_Spine_1",
+      "native_Slug_01_Spine_2": "Slug_01_Spine_2",
+      "native_Slug_01_Spine_3": "Slug_01_Spine_3",
+      "native_Slug_01_Spine_4": "Slug_01_Spine_4",
+      "native_Slug_01_Spine_5": "Slug_01_Spine_5",
+      "native_Slug_01_Head": "Slug_01_Head",
+      "native_Slug_01_Jaw_1": "Slug_01_Jaw_1",
+      "native_Slug_01_Jaw_2": "Slug_01_Jaw_2",
+      "native_Slug_01_Jaw_3": "Slug_01_Jaw_3",
+      "native_Slug_03_Spine_Base": "Slug_03_Spine_Base",
+      "native_Slug_03_Spine_1": "Slug_03_Spine_1",
+      "native_Slug_03_Spine_2": "Slug_03_Spine_2",
+      "native_Slug_03_Spine_3": "Slug_03_Spine_3",
+      "native_Slug_03_Spine_4": "Slug_03_Spine_4",
+      "native_Slug_03_Spine_5": "Slug_03_Spine_5",
+      "native_Slug_03_Head": "Slug_03_Head",
+      "native_Slug_03_Jaw_1": "Slug_03_Jaw_1",
+      "native_Slug_03_Jaw_2": "Slug_03_Jaw_2",
+      "native_Slug_03_Jaw_3": "Slug_03_Jaw_3",
+      "neck_base": "Spine_Base",
+      "neck_mid": "Spine_1",
+      "neck_top": "Spine_2",
+      "neck_upper": "Spine_3",
+      "neck_crown": "Spine_4",
+      "torso": "Head",
+      "crown_tip": "Head_End",
+      "mouth": "Mouth",
+      "left_arm": "Horn",
+      "head": "Body_Root",
+      "host_body": "Body",
+      "host_left": "Chest_L",
+      "host_right": "Chest_R",
+      "lobe_1": "Heart_1",
+      "lobe_2": "Heart_2",
+      "lobe_3": "Heart_3",
+      "lobe_4": "Heart_4",
+      "lobe_5": "Heart_5",
+      "lobe_6": "Heart_6",
+      "lobe_7": "Heart_7",
+      "right_arm": "Head",
+      "weak_0_Slug_01_Jaw_3": "Slug_01_Jaw_3",
+      "weak_0_Slug_01_Head": "Slug_01_Head",
+      "weak_0_Slug_01_Jaw_1": "Slug_01_Jaw_1",
+      "weak_0_Slug_01_Spine_5": "Slug_01_Spine_5",
+      "weak_0_Slug_01_Jaw_2": "Slug_01_Jaw_2",
+      "weak_0_Slug_01_Spine_4": "Slug_01_Spine_4",
+      "weak_0_Slug_01_Spine_3": "Slug_01_Spine_3",
+      "weak_0_Slug_01_Spine_2": "Slug_01_Spine_2",
+      "weak_0_Slug_01_Spine_1": "Slug_01_Spine_1",
+      "weak_0_Slug_01_Spine_Base": "Slug_01_Spine_Base",
+      "weak_1_Slug_02_Spine_1": "Slug_02_Spine_1",
+      "weak_1_Slug_02_Spine_2": "Slug_02_Spine_2",
+      "weak_1_Slug_02_Spine_Base": "Slug_02_Spine_Base",
+      "weak_1_Slug_02_Spine_3": "Slug_02_Spine_3",
+      "weak_1_Slug_02_Spine_4": "Slug_02_Spine_4",
+      "weak_1_Slug_02_Spine_5": "Slug_02_Spine_5",
+      "weak_1_Slug_02_Head": "Slug_02_Head",
+      "weak_1_Slug_02_Jaw_1": "Slug_02_Jaw_1",
+      "weak_1_Slug_02_Jaw_2": "Slug_02_Jaw_2",
+      "weak_1_Slug_02_Jaw_3": "Slug_02_Jaw_3",
+      "weak_2_Slug_03_Spine_Base": "Slug_03_Spine_Base",
+      "weak_2_Slug_03_Spine_1": "Slug_03_Spine_1",
+      "weak_2_Slug_03_Spine_2": "Slug_03_Spine_2",
+      "weak_2_Slug_03_Spine_3": "Slug_03_Spine_3",
+      "weak_2_Slug_03_Spine_4": "Slug_03_Spine_4",
+      "weak_2_Slug_03_Spine_5": "Slug_03_Spine_5",
+      "weak_2_Slug_03_Head": "Slug_03_Head",
+      "weak_2_Slug_03_Jaw_2": "Slug_03_Jaw_2",
+      "weak_2_Slug_03_Jaw_3": "Slug_03_Jaw_3",
+      "weak_2_Slug_03_Jaw_1": "Slug_03_Jaw_1"
+    },
+    "reference": "original skeleton bind; native local channels, not an idle-frame delta",
+    "rootMotion": "Motion_Root controller travel is held at source bind; all remaining original ROT/TRAN/SCL hierarchy is preserved. All three damage segments share the core native Slug pose and bind coordinates, with no ring offsets.",
+    "entity": "elizabeth_greene",
+    "clips": {
+      "idle": {
+        "source": "mother_amb_idle_a",
+        "fps": 24.0,
+        "seconds": 6.875
+      },
+      "HOWL": {
+        "source": "mother_scream",
+        "fps": 30.0,
+        "seconds": 4.066666666666666
+      },
+      "ORBS": {
+        "source": "mother_vomit",
+        "fps": 30.0,
+        "seconds": 6.133333333333334
+      },
+      "VOLLEY": {
+        "source": "mother_vomit",
+        "fps": 30.0,
+        "seconds": 6.133333333333334
+      },
+      "exposed": {
+        "source": "mother_reveal_body",
+        "fps": 24.0,
+        "seconds": 8.708333333333334
+      },
+      "hit": {
+        "source": "mother_collapse_hit",
+        "fps": 30.0,
+        "seconds": 1.0
+      },
+      "exit": {
+        "source": "mother_loco_return_underground",
+        "fps": 30.0,
+        "seconds": 1.4666666666666666
+      },
+      "enter": {
+        "source": "mother_loco_rise_from_ground",
+        "fps": 30.0,
+        "seconds": 8.133333333333333
+      },
+      "death": {
+        "source": "mother_collapse_death",
+        "fps": 30.0,
+        "seconds": 8.633333333333333
+      },
+      "segment_death": {
+        "source": "mother_segment_1_die",
+        "fps": 30.0,
+        "seconds": 3.1666666666666665
+      }
+    },
+    "outputSha256": "12b35cd5bf5b74d47515da5dc04cb5e34ade985afa47b88335e622606f02ea90"
+  }
+]

@@ -3,7 +3,9 @@ package com.codex.blacklight.entity;
 import com.codex.blacklight.infection.BlacklightInfectionSystem;
 import com.codex.blacklight.combat.HunterConsume;
 import com.codex.blacklight.combat.CreatureAttack;
+import com.codex.blacklight.combat.HunterContactPose;
 import com.codex.blacklight.combat.HunterBalance;
+import com.codex.blacklight.combat.HunterCounterMotion;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.*;
@@ -28,6 +30,7 @@ public final class BlacklightHunter extends Monster implements GeoEntity {
     private static final EntityDataAccessor<Integer> ATTACK = SynchedEntityData.defineId(BlacklightHunter.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Integer> MOVE = SynchedEntityData.defineId(BlacklightHunter.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Long> STARTED = SynchedEntityData.defineId(BlacklightHunter.class, EntityDataSerializers.LONG);
+    private static final EntityDataAccessor<Boolean> COUNTER_RELEASE = SynchedEntityData.defineId(BlacklightHunter.class, EntityDataSerializers.BOOLEAN);
     private static final EntityDataAccessor<Integer> CONSUMER = SynchedEntityData.defineId(BlacklightHunter.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Integer> CONSUME_TICKS = SynchedEntityData.defineId(BlacklightHunter.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Long> REMAINS_STARTED = SynchedEntityData.defineId(BlacklightHunter.class, EntityDataSerializers.LONG);
@@ -41,6 +44,12 @@ public final class BlacklightHunter extends Monster implements GeoEntity {
     private Vec3 committedDirection=Vec3.ZERO;
     private float committedYaw;
     private long nextLightStagger = Long.MIN_VALUE;
+    private final boolean[] connectedWindows=new boolean[5];
+    private float previousAttackAge=-1;
+    private Vec3 previousAttackPosition=Vec3.ZERO;
+    private Vec3 damageContact;
+    private Vec3 groundImpact;
+    private long attackEpoch;
 
     public BlacklightHunter(EntityType<? extends BlacklightHunter> type, Level level) { super(type, level); xpReward = 12; }
     public static AttributeSupplier.Builder attributes() {
@@ -53,7 +62,7 @@ public final class BlacklightHunter extends Monster implements GeoEntity {
         super.defineSynchedData(); entityData.define(ATTACK, 0); entityData.define(CONSUMER, -1); entityData.define(CONSUME_TICKS, 0);
         entityData.define(REMAINS_STARTED, -1L);
         entityData.define(PARASITE,0);
-        entityData.define(MOVE,0);entityData.define(STARTED,0L);
+        entityData.define(MOVE,0);entityData.define(STARTED,0L);entityData.define(COUNTER_RELEASE,false);
     }
     @Override protected void registerGoals() {
         goalSelector.addGoal(0, new FloatGoal(this));
@@ -86,17 +95,37 @@ public final class BlacklightHunter extends Monster implements GeoEntity {
         }
         int attack = entityData.get(ATTACK);
         if (attack > 0) {
+            if(!validCombatTarget(swipeTarget)){cancelAttack();return;}
             getNavigation().stop();
-            var move=attackMove();int t=move.ticks-attack;
+            var move=attackMove();float age=attackAge(0);int t=(int)age;
+            long epoch=attackEpoch;
+            if(HunterCounterMotion.uses(move,counterBarrage())&&age<=previousAttackAge)return;
             setYRot(committedYaw);yBodyRot=committedYaw;yHeadRot=committedYaw;
             if(move==CreatureAttack.LEAP&&t==8&&onGround())
                 setDeltaMovement(committedDirection.scale(.68).add(0,.5,0));
             else if(move==CreatureAttack.DODGE&&t>=3&&t<=12&&onGround())
                 setDeltaMovement(committedDirection.scale(.38*Math.sin(Math.PI*(t-2)/11)).add(0,getDeltaMovement().y,0));
             else if(onGround())setDeltaMovement(0,getDeltaMovement().y,0);
-            if(move.hitsAt(t))strike(move);
-            entityData.set(ATTACK, attack - 1);
-            if (attack == 1) {swipeTarget = null;entityData.set(MOVE,0);attackCooldown=move.recovery;}
+            if(HunterCounterMotion.uses(move,counterBarrage())&&!advanceCounterRoot(move,age))return;
+            if(epoch!=attackEpoch||!isAlive()||isBeingConsumed()||isRemoved())return;
+            com.codex.blacklight.infection.HunterSoundTimeline.between(move,previousAttackAge,age,this::playAttackCue);
+            if(epoch!=attackEpoch||!isAlive()||isBeingConsumed()||isRemoved())return;
+            var windows=move.windows();
+            for(int i=0;i<windows.length;i++){
+                var window=windows[i];
+                if(!com.codex.blacklight.infection.HunterSoundTimeline.owns(move)&&previousAttackAge<window.from()*20&&age>=window.from()*20)
+                    com.codex.blacklight.registry.ModInfectedSounds.play(this,com.codex.blacklight.infection.InfectedSoundCue.SWING);
+                if(!connectedWindows[i]&&window.overlaps(previousAttackAge,age))strike(move,window,i,age);
+                if(epoch!=attackEpoch||!isAlive()||isBeingConsumed()||isRemoved())return;
+            }
+            if(move==CreatureAttack.SLAM&&groundImpact==null&&age>=14&&age<=17)slamGround(age);
+            previousAttackAge=age;previousAttackPosition=position();
+            entityData.set(ATTACK,Math.max(0,move.ticks-t));
+            if(t>=move.ticks){
+                if(move==CreatureAttack.COUNTER&&releaseCounter())return;
+                attackEpoch++;
+                swipeTarget=null;entityData.set(MOVE,0);entityData.set(COUNTER_RELEASE,false);attackCooldown=move.recovery;
+            }
         }
     }
     public boolean isBeingConsumed() { return entityData.get(CONSUMER) >= 0; }
@@ -134,27 +163,132 @@ public final class BlacklightHunter extends Monster implements GeoEntity {
     public int attackTicksRemaining(){return entityData.get(ATTACK);}
     public CreatureAttack attackMove(){return CreatureAttack.byId(entityData.get(MOVE));}
     public float attackAge(float partial){return Math.max(0,level().getGameTime()-entityData.get(STARTED)+partial);}
-    private void cancelAttack(){entityData.set(ATTACK,0);entityData.set(MOVE,0);swipeTarget=null;attackCooldown=Math.max(attackCooldown,12);}
+    public boolean counterBarrage(){return entityData.get(COUNTER_RELEASE);}
+    private void cancelAttack(){attackEpoch++;entityData.set(ATTACK,0);entityData.set(MOVE,0);entityData.set(COUNTER_RELEASE,false);swipeTarget=null;attackCooldown=Math.max(attackCooldown,12);previousAttackAge=-1;previousAttackPosition=position();}
+    private boolean advanceCounterRoot(CreatureAttack move,float age){
+        // Never replay unobserved source travel or sweep claws across a teleport.
+        // Loaded attacks are canceled below, rather than stored as root debt.
+        if(previousAttackAge<0||age-previousAttackAge>1.01F||previousAttackPosition.distanceToSqr(position())>64){cancelAttack();return false;}
+        var step=HunterCounterMotion.step(move,counterBarrage(),previousAttackAge,age,committedYaw);
+        var swept=getBoundingBox().minmax(getBoundingBox().move(step));var border=level().getWorldBorder();
+        if(!isWithinRestriction(net.minecraft.core.BlockPos.containing(position().add(step)))
+                ||!com.codex.blacklight.military.vehicle.VehicleKinematics.loaded((net.minecraft.server.level.ServerLevel)level(),swept)
+                ||swept.minX<border.getMinX()||swept.maxX>border.getMaxX()||swept.minZ<border.getMinZ()||swept.maxZ>border.getMaxZ()){
+            cancelAttack();return false;
+        }
+        // Vanilla actual collision shapes and step handling decide accepted
+        // travel. The next source delta starts from this resulting position,
+        // never from an accumulated desired endpoint behind the obstacle.
+        if(step.lengthSqr()>1e-12){
+            long epoch=attackEpoch;boolean grounded=onGround();move(MoverType.SELF,step);
+            if(epoch!=attackEpoch||!isAlive()||isRemoved()||isBeingConsumed())return false;
+            // A second, horizontal-only Entity.move clears vanilla's ground
+            // flag because requestedY=0. Restore it only when the accepted
+            // footprint still touches a real collision surface below it.
+            if(grounded){
+                boolean supported=!level().noCollision(this,getBoundingBox().move(0,-.01,0));
+                if(epoch!=attackEpoch||!isAlive()||isRemoved()||isBeingConsumed())return false;
+                setOnGround(supported);
+            }
+        }
+        return true;
+    }
+    private boolean validCombatTarget(LivingEntity target){
+        return target!=null&&target.isAlive()&&!target.isRemoved()&&target.level()==level()&&canAttack(target)&&!isAlliedTo(target)
+                &&!(target instanceof Player player&&(player.isCreative()||player.isSpectator()))
+                &&(target instanceof Player||!BlacklightInfectionSystem.isInfected(target))
+                &&!com.codex.blacklight.combat.ConsumeControl.protectedEntity(target);
+    }
+    private boolean releaseCounter(){
+        // Continue only the original commitment: no new target, no snap-turn, no deferred task.
+        if(!validCombatTarget(swipeTarget)||!hasLineOfSight(swipeTarget)||!onGround()||isBeingConsumed()||isNoAi()
+                ||parasiteLocked()||com.codex.blacklight.combat.ImpactControl.stunned(this)
+                ||swipeTarget.getVehicle() instanceof MilitaryVehicle||swipeTarget.getVehicle() instanceof BlackwatchHelicopter
+                ||!HunterContactPose.canReach(CreatureAttack.BARRAGE,position(),committedYaw,swipeTarget.getBoundingBox(),true))return false;
+        int entry=CreatureAttack.COUNTER_BARRAGE_ENTRY_TICK;
+        attackEpoch++;
+        entityData.set(MOVE,CreatureAttack.BARRAGE.ordinal());entityData.set(STARTED,level().getGameTime()-entry);
+        entityData.set(ATTACK,CreatureAttack.BARRAGE.ticks-entry);entityData.set(COUNTER_RELEASE,true);
+        // The opening and the five release contacts are distinct source windows. Vanilla victim
+        // immunity is retained, and the new stage is not evaluated again on this transition tick.
+        java.util.Arrays.fill(connectedWindows,false);previousAttackAge=entry;previousAttackPosition=position();
+        // Entry is consumed here, so next tick cannot replay it or resurrect the opening grunt.
+        com.codex.blacklight.infection.HunterSoundTimeline.between(CreatureAttack.BARRAGE,entry-1,entry,this::playAttackCue);
+        getNavigation().stop();return true;
+    }
+    private void playAttackCue(com.codex.blacklight.infection.HunterSoundTimeline.Cue cue){
+        com.codex.blacklight.registry.ModInfectedSounds.play(this,cue.sound(),getBoundingBox().getCenter(),cue.gain(),cue.minPitch(),cue.maxPitch());
+    }
     public boolean beginAttack(CreatureAttack move,LivingEntity target){
-        if(level().isClientSide||move==CreatureAttack.NONE||committedAttack()||isNoAi()||isBeingConsumed()||!isAlive()
-                ||target==null||!target.isAlive()||target.level()!=level()||!hasLineOfSight(target))return false;
+        if(level().isClientSide||move==CreatureAttack.NONE||committedAttack()||attackCooldown>0||isNoAi()||isBeingConsumed()||!isAlive()
+                ||parasiteLocked()||com.codex.blacklight.combat.ImpactControl.stunned(this)
+                ||!validCombatTarget(target)||!hasLineOfSight(target)
+                ||distanceTo(target)>(move==CreatureAttack.LEAP?10:move==CreatureAttack.DODGE?4:3.5))return false;
         swipeTarget=target;var delta=target.position().subtract(position()).multiply(1,0,1);
+        attackEpoch++;
         committedDirection=delta.lengthSqr()<.001?getLookAngle().multiply(1,0,1).normalize():delta.normalize();
         committedYaw=(float)(Math.toDegrees(Math.atan2(-committedDirection.x,committedDirection.z)));
         if(move==CreatureAttack.DODGE)committedDirection=new Vec3(committedDirection.z,0,-committedDirection.x);
         setYRot(committedYaw);yBodyRot=committedYaw;yHeadRot=committedYaw;getNavigation().stop();
-        entityData.set(MOVE,move.ordinal());entityData.set(STARTED,level().getGameTime());entityData.set(ATTACK,move.ticks);
-        playSound(SoundEvents.RAVAGER_ATTACK,.7F,move==CreatureAttack.SLAM?.7F:1.2F);return true;
+        entityData.set(MOVE,move.ordinal());entityData.set(STARTED,level().getGameTime());entityData.set(ATTACK,move.ticks);entityData.set(COUNTER_RELEASE,false);
+        if(HunterCounterMotion.uses(move,false))setDeltaMovement(0,getDeltaMovement().y,0);
+        java.util.Arrays.fill(connectedWindows,false);previousAttackAge=-1;previousAttackPosition=position();groundImpact=null;
+        if(com.codex.blacklight.infection.HunterSoundTimeline.owns(move)){
+            com.codex.blacklight.infection.HunterSoundTimeline.between(move,-1,0,this::playAttackCue);previousAttackAge=0;
+        }else{
+            com.codex.blacklight.registry.ModInfectedSounds.play(this,com.codex.blacklight.infection.InfectedSoundCue.TENSION);
+            playSound(SoundEvents.RAVAGER_ATTACK,.7F,move==CreatureAttack.SLAM?.7F:1.2F);
+        }return true;
     }
-    private void strike(CreatureAttack move){
+    /** Only populated during the synchronous accepted-damage event, never cached on the victim. */
+    public Vec3 damageContact(){return damageContact;}
+    public Vec3 groundImpactPoint(){return groundImpact;}
+    private void strike(CreatureAttack move,CreatureAttack.Window window,int index,float age){
         if(swipeTarget==null||!swipeTarget.isAlive()||swipeTarget.level()!=level())return;
-        double reach=move.reach+swipeTarget.getBbWidth()*.5;
-        if(distanceToSqr(swipeTarget)>reach*reach||!hasLineOfSight(swipeTarget)
-                ||!CreatureAttack.inArc(swipeTarget.getX()-getX(),swipeTarget.getZ()-getZ(),committedYaw,.15))return;
+        if(!hasLineOfSight(swipeTarget))return;
+        var contact=HunterContactPose.contact(move,window,previousAttackAge,age,previousAttackPosition,position(),committedYaw,swipeTarget.getBoundingBox());
+        if(contact==null)return;
         // Honor vanilla immunity frames and other mods' damage cancellation; never reset victim immunity.
-        if(doHurtTarget(swipeTarget)&&move==CreatureAttack.SLAM)swipeTarget.knockback(.7,getX()-swipeTarget.getX(),getZ()-swipeTarget.getZ());
+        damageContact=contact;
+        long epoch=attackEpoch;LivingEntity victim=swipeTarget;
+        try{if(doHurtTarget(victim)&&epoch==attackEpoch&&swipeTarget==victim&&isAlive()&&!isRemoved()){
+            connectedWindows[index]=true;
+            if(move==CreatureAttack.SLAM)victim.knockback(.7,getX()-victim.getX(),getZ()-victim.getZ());
+        }}finally{damageContact=null;}
         // Accepted-hit tissue geometry is broadcast by InfectedAttackEffects;
         // a missed/cancelled swipe must not draw a white successful-hit symbol.
+    }
+    private void slamGround(float age){
+        if(!(level() instanceof net.minecraft.server.level.ServerLevel level))return;
+        net.minecraft.world.phys.BlockHitResult hit=null;
+        float from=Math.max(14,previousAttackAge);
+        // The lowest point can fall between two 20 Hz ticks. Sweep the palm as
+        // well as the claw tips; a tip-only ray misses the fist contacting flat ground.
+        search:for(int step=0;step<=4;step++){
+            float t=from+(age-from)*step/4;
+            var hand=HunterContactPose.hand(CreatureAttack.SLAM,t,false,previousAttackPosition.lerp(position(),age==previousAttackAge?1:(t-previousAttackAge)/(age-previousAttackAge)),committedYaw);
+            for(int point=0;point<=2;point++){
+                var center=hand.palm().lerp(hand.tip(),point*.5);
+                var candidate=level.clip(new net.minecraft.world.level.ClipContext(center.add(0,hand.radius(),0),center.add(0,-hand.radius(),0),net.minecraft.world.level.ClipContext.Block.COLLIDER,net.minecraft.world.level.ClipContext.Fluid.NONE,this));
+                if(candidate.getType()==net.minecraft.world.phys.HitResult.Type.BLOCK&&candidate.getDirection()==net.minecraft.core.Direction.UP){hit=candidate;break search;}
+            }
+        }
+        if(hit==null)return;
+        groundImpact=hit.getLocation();var state=level.getBlockState(hit.getBlockPos());
+        com.codex.blacklight.combat.TerrainImpactEffects.emit(this,hit,2.4F,true);
+        // The FIG has a separate low-damage ground radius. MC adapts its scale to the
+        // authored hand and terrain; the primary fist and ground pulse cannot double-hit.
+        for(var victim:level.getEntitiesOfClass(LivingEntity.class,new net.minecraft.world.phys.AABB(groundImpact,groundImpact).inflate(2,.8,2),v->v!=this&&v.isAlive()&&canAttack(v))){
+            if((victim==swipeTarget&&connectedWindows[0])||(!(victim instanceof Player)&&BlacklightInfectionSystem.isInfected(victim))||!hasLineOfSight(victim))continue;
+            var at=HunterContactPose.nearest(victim.getBoundingBox(),groundImpact);
+            if(at.distanceToSqr(groundImpact)>4)continue;
+            damageContact=at;try{
+                if(victim.hurt(damageSources().mobAttack(this),(float)getAttributeValue(Attributes.ATTACK_DAMAGE)/6)){
+                    if(victim==swipeTarget)connectedWindows[0]=true;
+                    victim.knockback(.35,groundImpact.x-victim.getX(),groundImpact.z-victim.getZ());
+                }
+            }finally{damageContact=null;}
+        }
     }
     public int consumerId() { return entityData.get(CONSUMER); }
     public int consumeTicks() { return entityData.get(CONSUME_TICKS); }
@@ -196,7 +330,11 @@ public final class BlacklightHunter extends Monster implements GeoEntity {
         if (isConsumeRemains()) tag.putLong("BlacklightConsumeRemains",entityData.get(REMAINS_STARTED));
     }
     @Override public void readAdditionalSaveData(CompoundTag tag) {
+        // Attack/target/root progress is deliberately transient. Loading into
+        // this same object must not resume a stale counter or its release.
+        cancelAttack();
         super.readAdditionalSaveData(tag);
+        restoreLegacyBrawlerAttributes(tag);
         // Upgrade only the old stock attributes. Preserve custom mobs and the current health fraction.
         double oldHealth=getAttribute(Attributes.MAX_HEALTH).getBaseValue(),oldDamage=getAttribute(Attributes.ATTACK_DAMAGE).getBaseValue();
         boolean stock=oldHealth==48&&oldDamage==7||oldHealth==96&&oldDamage==14;
@@ -217,8 +355,20 @@ public final class BlacklightHunter extends Monster implements GeoEntity {
             setHealth(0);setNoAi(true);
         }
     }
-    @Override protected SoundEvent getHurtSound(DamageSource source) { return SoundEvents.RAVAGER_HURT; }
-    @Override protected SoundEvent getDeathSound() { return SoundEvents.RAVAGER_DEATH; }
+    @Override protected SoundEvent getHurtSound(DamageSource source) { return com.codex.blacklight.registry.ModInfectedSounds.event(com.codex.blacklight.infection.InfectedSoundCue.HUNTER_HURT); }
+    /** Saved duplicate Brawlers keep their identity and injuries while joining the original species. */
+    private void restoreLegacyBrawlerAttributes(CompoundTag tag) {
+        if(tag.contains("BlacklightHunterBalanceVersion")||!(tag.contains("EncounterPhase")||"blacklight:brawler".equals(tag.getString("id"))))return;
+        float maximum=getMaxHealth(),health=getHealth();
+        if(getAttribute(Attributes.MAX_HEALTH).getBaseValue()==100)getAttribute(Attributes.MAX_HEALTH).setBaseValue(HunterBalance.HEALTH);
+        if(getAttribute(Attributes.ATTACK_DAMAGE).getBaseValue()==9)getAttribute(Attributes.ATTACK_DAMAGE).setBaseValue(HunterBalance.DAMAGE);
+        if(getAttribute(Attributes.ARMOR).getBaseValue()==0)getAttribute(Attributes.ARMOR).setBaseValue(HunterBalance.ARMOR);
+        if(getAttribute(Attributes.ARMOR_TOUGHNESS).getBaseValue()==0)getAttribute(Attributes.ARMOR_TOUGHNESS).setBaseValue(HunterBalance.TOUGHNESS);
+        if(getAttribute(Attributes.KNOCKBACK_RESISTANCE).getBaseValue()==.4)getAttribute(Attributes.KNOCKBACK_RESISTANCE).setBaseValue(HunterBalance.KNOCKBACK_RESISTANCE);
+        if(getAttribute(net.minecraftforge.common.ForgeMod.STEP_HEIGHT_ADDITION.get()).getBaseValue()==0)getAttribute(net.minecraftforge.common.ForgeMod.STEP_HEIGHT_ADDITION.get()).setBaseValue(.4);
+        com.codex.blacklight.power.CombatScale.preserveHealthFraction(this,maximum,health);
+    }
+    @Override protected SoundEvent getDeathSound() { return com.codex.blacklight.registry.ModInfectedSounds.event(com.codex.blacklight.infection.InfectedSoundCue.HUNTER_DEATH); }
     @Override public void registerControllers(AnimatableManager.ControllerRegistrar c) {
         c.add(new AnimationController<>(this, "body", 3, s -> {
             if(!isBeingConsumed()&&entityData.get(ATTACK)>0)return s.setAndContinue(RawAnimation.begin().thenPlayAndHold(attackMove().clip));
@@ -240,7 +390,9 @@ public final class BlacklightHunter extends Monster implements GeoEntity {
             if (attackCooldown == 0 && distance<10 && hasLineOfSight(target)) {
                 boolean evade=evadeCooldown==0&&target instanceof Player p&&p.swinging&&distance<4&&random.nextFloat()<.35F;
                 var move=evade?CreatureAttack.DODGE:CreatureAttack.choose(distance,attackSequence);
-                if((distance<3.5||move==CreatureAttack.LEAP||evade)&&beginAttack(move,target)){
+                float facing=(float)Math.toDegrees(Math.atan2(getX()-target.getX(),target.getZ()-getZ()));
+                boolean reachable=move==CreatureAttack.LEAP||evade||HunterContactPose.canReach(move,position(),facing,target.getBoundingBox());
+                if(reachable&&(distance<3.5||move==CreatureAttack.LEAP||evade)&&beginAttack(move,target)){
                     attackSequence++;if(evade)evadeCooldown=100;
                 }
             }

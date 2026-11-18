@@ -1,0 +1,42 @@
+{
+  "request": "Player feedback: individually selectable Greene protection regions, larger presentation and stronger confirmed-hit feedback; helicopter logistics/rappel/targeting; UAV head geometry",
+  "presentation": {
+    "greene_scale": 1.5,
+    "original_motion_data_unchanged": true,
+    "shared_geometry_and_contact_scale": true,
+    "source_unit_scale_follows": true,
+    "gecko_y_offset_preserved": 0.01,
+    "region_flash_ticks": 7,
+    "contact_visual_size": 1.25,
+    "break_visual_size": 2.4,
+    "status": "Minecraft presentation tuning, not an original game size claim"
+  },
+  "controls": {
+    "target_cycle": "Tab",
+    "target_clear": "Sneak + Tab",
+    "helicopter_secondary": "N"
+  },
+  "verification": {
+    "neo_main_compile": "passed",
+    "forge_main_compile": "passed",
+    "neo_unit_tests": {
+      "tests": 51,
+      "failures": 0
+    },
+    "neo_entity_tests": {
+      "tests": 12,
+      "failures": 0
+    },
+    "log": "D:/CodexCache/work/player-feedback-20261117-final-qa.log",
+    "visual_player_verification": "Client loaded and player tested, then quit cleanly. Subsequent feedback: hit reliability and unattractive generic hit VFX. Follow-up fixes in progress; earlier tests do not certify these new changes."
+  },
+  "test_world": "D:/CodexCache/controls-review-2/saves/controls-copy",
+  "test_world_backup": "D:/CodexCache/controls-review-2-backup-before-feedback-20261117-1520/controls-copy",
+  "original_world_untouched": "D:/blacklight-evolution/run-ragdoll/saves/新的世界",
+  "scope_notes": [
+    "No release JAR installed or published",
+    "Source movement/phase timings and native skeletal curves retained",
+    "Rappel source condition and population budget are not a guarantee of unconditional unlimited troops",
+    "Existing authored Hunter/Brawler animation alias repaired to retain combat_counter"
+  ]
+}

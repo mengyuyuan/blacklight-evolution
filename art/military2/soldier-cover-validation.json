@@ -1,0 +1,330 @@
+{
+  "schemaVersion": 1,
+  "date": "2026-11-16",
+  "overallGoalComplete": false,
+  "scope": "Real suppressed soldiers reserve nearby shielding positions and reach them through the shared bounded path queue; actual helicopter delivery resets both independent home anchors.",
+  "baseline": {
+    "date": "2026-11-16",
+    "scenario": "realHitMakesSoldierWalkBehindNearbyCover",
+    "platforms": {
+      "neo": {
+        "logSha256": "738B883F3F2D1652D68607394EBE52C82CE6E6849822A4C5578CD99C7A148235",
+        "failure": "[08:46:53] [Server thread/ERROR] [minecraft/LogTestReporter]: realhitmakessoldierwalkbehindnearbycover failed at -2130836, -60, -12707007! real soldier must reach shielding cover after a real hit: pos=(281004.66034183797, 81.0, 0.4208290776593865), oldCoverFlag=false, navigation=true",
+        "buildSuccessful": false
+      },
+      "forge": {
+        "logSha256": "64862B5D15F7092BB73CA7C3DD75D6AF6D78A9C4B760E129B2993441B9732A00",
+        "failure": "[08:47:08] [Server thread/ERROR] [minecraft/LogTestReporter]: realhitmakessoldierwalkbehindnearbycover failed! real soldier must reach shielding cover after a real hit: pos=(281004.62329994387, 81.0, 0.5072118305927549), oldCoverFlag=false, navigation=true",
+        "buildSuccessful": false
+      }
+    },
+    "nativeDeliveryFailure": {
+      "neo": {
+        "screenshotSha256": "34D8AC7FE17E874FC58E058768EA6F530EEC2FA5AA7C37FF91710BDA8EF8EE47",
+        "failure": "FAIL: java.lang.IllegalStateException: java.lang.IllegalStateException: not all actual reinforcements reached cover: {\"tick\":341,\"worldTick\":216709,\"members\":[{\"id\":\"c7c1f265-0eb5-4381-8db0-5aae8f7644ae\",\"x\":-23.612288403756516,\"y\":81.0,\"z\":0.8648468341977847,\"health\":80.0,\"ammunition\":240,\"phase\":0,\"suppressed\":false,\"arrived\":false,\"visible\":true},{\"id\":\"326e17d7-6a2f-45b8-9ac4-efce7ddb70b1\",\"x\":-24.442414556854374,\"y\":81.0,\"z\":0.34872754403743744,\"health\":80.0,\"ammunition\":120,\"phase\":0,\"suppressed\":false,\"arrived\":false,\"visible\":true},{\"id\":\"3213d242-e679-4aec-9eb9-51bb5d48db48\",\"x\":-22.94538862966985,\"y\":81.0,\"z\":0.5000235889046325,\"health\":80.0,\"ammunition\":72,\"phase\":0,\"suppressed\":false,\"arrived\":false,\"visible\":true},{\"id\":\"b8cde2f7-5508-43f2-96b8-7f47da89e206\",\"x\":-23.667088360601294,\"y\":81.0,\"z\":0.13867433495068654,\"health\":80.0,\"ammunition\":120,\"phase\":0,\"suppressed\":false,\"arrived\":false,\"visible\":true}],\"everSheltered\":0,\"hitByRealArrows\":0,\"returnedFire\":0,\"arrows\":112}"
+      },
+      "forge": {
+        "screenshotSha256": "8122B656E951D32C06FCAF86735687F6D2750D39BEE5183EE99AB7E8C031B72A",
+        "failure": "FAIL: java.lang.IllegalStateException: java.lang.IllegalStateException: not all actual reinforcements reached cover: {\"tick\":341,\"worldTick\":130664,\"members\":[{\"id\":\"8c1be72b-7db7-46fc-976b-08bded04189d\",\"x\":-23.266356636593756,\"y\":81.0,\"z\":1.4291657928667463,\"health\":80.0,\"ammunition\":240,\"phase\":0,\"suppressed\":false,\"arrived\":false,\"visible\":true},{\"id\":\"016cf499-f539-4024-b7ab-0ba33cfabe99\",\"x\":-23.949385370268853,\"y\":81.0,\"z\":0.7617685454213572,\"health\":80.0,\"ammunition\":96,\"phase\":0,\"suppressed\":false,\"arrived\":false,\"visible\":true},{\"id\":\"e04f559f-8598-421c-8523-cd7d55eab13d\",\"x\":-22.332474825449534,\"y\":81.0,\"z\":0.7901486110735688,\"health\":80.0,\"ammunition\":18,\"phase\":0,\"suppressed\":false,\"arrived\":false,\"visible\":true},{\"id\":\"ca6f447d-e9c5-410f-89f5-f2f942788818\",\"x\":-23.327672013690812,\"y\":81.0,\"z\":0.3987276245743929,\"health\":80.0,\"ammunition\":96,\"phase\":0,\"suppressed\":false,\"arrived\":false,\"visible\":true}],\"everSheltered\":0,\"hitByRealArrows\":0,\"returnedFire\":0,\"arrows\":112}"
+      }
+    },
+    "originalSquadRegressionFailures": {
+      "neo": [
+        "[09:25:42] [Server thread/ERROR] [minecraft/LogTestReporter]: guardcoordinatesestablishanewfiringterritory failed at 10596402, -60, -10068714! guard at the new post actually fires after arriving"
+      ],
+      "forge": [
+        "[09:26:47] [Server thread/ERROR] [minecraft/LogTestReporter]: pairalternatesactualaimandburstwhilereloading failed! both members receive a turn and visibly reload",
+        "[09:26:58] [Server thread/ERROR] [minecraft/LogTestReporter]: guardcoordinatesestablishanewfiringterritory failed! guard at the new post actually fires after arriving"
+      ]
+    },
+    "guardDiagnostic": "Fresh-world diagnostic: chosen target=true, sight=true, nominal bullet ray hit the expected infected host, wall=MISS, magazine=24; host health=5324.135 after its initial 1000 baseline. Corrected the fixture to compare injured health fraction after native maximum-health rescaling and require this soldier as actual attacker."
+  },
+  "baselineSha256": "ff4f9c47fc8588846a3c631797e4cf9e5bc6a025bf471be34fd5de707a714ad1",
+  "regressionFixtureCorrections": [
+    "Guard-coordinate scenario waits within its existing timeout for the real 77-tick radio call, then checks injured health fraction and this soldier as actual attacker; native host maturation rescales maximum health after spawning, invalidating its original absolute-health baseline.",
+    "Forge pair-cadence fixture now uses the existing Neo RECOVER assertion for nonempty magazines; the method was renamed on both loaders. This case does not claim to test a real reload."
+  ],
+  "limits": [
+    "Authored project tactics, not a recovered original-game cover algorithm.",
+    "Native visual fixture retains the original six crew; four troops have AI disabled only until the first ground volley and have 80 health for survival during repeated real arrow attacks.",
+    "A stationary vanilla skeleton fires scripted real projectiles; troop paths, damage, finite ammunition and weapon fire use production behavior.",
+    "Each troop reaches cover during the encounter; this does not require all four to remain sheltered simultaneously.",
+    "Eight selected native frames per loader were reviewed, not every rendered frame.",
+    "Ground camera frames can crop nearby troops during return fire; complete identity, movement and ammunition checks come from the server samples rather than claiming all four are visible in every image.",
+    "Hidden muted QA verifies live sound events, not subjective audio quality.",
+    "No user world, release packaging, installation or publication in this checkpoint.",
+    "Prior helicopter schema 4 visual report remains a historical checkpoint; this report records current server regressions and a new combined troop-delivery encounter."
+  ],
+  "remaining": [
+    "Broader mixed terrain and multiplayer combat coverage",
+    "Source-derived walking, running, radio and hit choreography",
+    "Full retreat and fear behavior",
+    "Remaining creature, model and sound work in the active overall goal"
+  ],
+  "platforms": {
+    "neo": {
+      "sources": {
+        "src/main/java/com/codex/blacklight/military/MilitaryCover.java": "1126fb742335ae75a90f8c05611f3582cd7244b12bcb5923df6ae2ed9a6677a0",
+        "src/main/java/com/codex/blacklight/military/MilitaryFormationSystem.java": "d539c4939eaef61ed93a60f134561458f700d4d8dcf95cbb8b6898ddb661f4ed",
+        "src/main/java/com/codex/blacklight/military/MilitaryGroundNavigation.java": "1f922851e0352bbadc191a76dda4b9fe28d2892e176b445f158e360d58a7cee0",
+        "src/main/java/com/codex/blacklight/military/MilitaryTactics.java": "3addfb1cd767d5aa02c9bb3a64edc39cfb2cc98209e0617c6b911598983ead03",
+        "src/main/java/com/codex/blacklight/military/MilitaryWorkBudget.java": "c3ad760265e5a46a14039d3e5f039c7e4172803d97a4497f06ad606103bf6728",
+        "src/main/java/com/codex/blacklight/military/MilitaryFireControl.java": "bec98f02ea56ec7356cce1906e21e3ec5b6b240bcce7cccf010183d1d23cccf0",
+        "src/main/java/com/codex/blacklight/entity/MilitarySoldier.java": "ae085d11f8dc3b2b6fba04b627e12f21c151e943df39755aa972fc8ba33c567e",
+        "src/main/java/com/codex/blacklight/entity/BlackwatchSquad.java": "21b3ff79e4647c263c135f07c1734a06df6c43b36b0987027485d3efbb936620",
+        "src/main/java/com/codex/blacklight/entity/BlackwatchSquadSystem.java": "98c7b482bb8b8a9523dc7e557a1871c3c711b6c72b502e1767c3be8676f0375c",
+        "src/main/java/com/codex/blacklight/entity/BlackwatchHelicopter.java": "3dc74b462cc5a4b59f9c88d9f8d756fbb22ad709a1072fe72c8481a0f126512b",
+        "src/main/java/com/codex/blacklight/city/MilitaryHomeSystem.java": "5a43a7c66c222e7d50765fc7342899b3354b71538f9cc0ebc986230071a52bb6",
+        "src/coverTest/java/com/codex/blacklight/gametest/MilitaryCoverGameTest.java": "3f02c2215af8011f843eed7346f5a0f5d856ff3fdff1da3b1a3c6c58532e31cc",
+        "src/coverVisual/java/com/codex/blacklight/client/MilitaryCoverVisual.java": "8514afaf5ac6b9e9602d3c7911552c469b3dfc5dcb630662f33616597d469833",
+        "tools/military-cover-test.init.gradle": "c0a0f3e9d433c035c71ed9d90fb8672d8626b44693d4c170d357414ade660056",
+        "tools/military-cover-visual.init.gradle": "dde0e1f96e458c35eead9f5697ea1468eb0a469bd58bdf5a08a77505c365e166",
+        "tools/military-squad-test.init.gradle": "fe86767314ef69e7f8420f52977277ec7e164e04349108320ad23a04d9f93a7a",
+        "src/blackwatchTest/java/com/codex/blacklight/gametest/BlackwatchSquadGameTest.java": "2ad36c58cd0752c726ff28ec79edab77a4920b65c0503473f749e2d7aa34e510",
+        "src/blackwatchTest/java/com/codex/blacklight/gametest/MilitaryFormationGameTest.java": "8cdf2f6d136fa7b867f8a82e96afbba5d7d408dd52c81381c8f5231a403e6ff1"
+      },
+      "regressions": {
+        "coverVerify": {
+          "requiredServerScenarios": 9,
+          "sha256": "e67d0536cf688da3c25dc83da1094c24a86b943921edb0c645cbebcaa5e150a6",
+          "path": "D:\\CodexCache\\creature-combat-neo-coverVerify.log"
+        },
+        "militarySquadServer": {
+          "requiredServerScenarios": 34,
+          "sha256": "3f6eb19fb283562e97187cb94e2c6f1e60701da8ffac7e854447e0d0e98924db",
+          "path": "D:\\CodexCache\\creature-combat-neo-militarySquadServer.log"
+        },
+        "militaryServer": {
+          "requiredServerScenarios": 18,
+          "sha256": "295309c787a4cd35076f8212fdb9cc5d0f0a556d00e247defdb4ab9655998722",
+          "path": "D:\\CodexCache\\creature-combat-neo-militaryServer.log"
+        },
+        "helicopterVerify": {
+          "requiredServerScenarios": 32,
+          "sha256": "69e0a235aa3db55b74088a5c66a5b8c1af331044e1c667f4360d8bdfdcc4fca2",
+          "path": "D:\\CodexCache\\creature-combat-neo-helicopterVerify.log"
+        }
+      },
+      "coverUnitTests": {
+        "entity.BlackwatchSquadTest": {
+          "tests": 16,
+          "sha256": "f37c3451e9ddae039242f1b79e1aae29dbc51a67a4a6f024c3df7be0c9eb303a"
+        },
+        "military.MilitaryFireControlTest": {
+          "tests": 4,
+          "sha256": "80ac7c687e22934cfd968d3c33b41f4eab85b3324d247bb0eebde994f15006be"
+        },
+        "military.MilitaryWorkBudgetTest": {
+          "tests": 4,
+          "sha256": "f74d9538c459d376d6dc8cb918d929649b07a0b1dd9b4c8783221e74067511d6"
+        }
+      },
+      "coverUnitTotal": 24,
+      "helicopterControlUnitTests": {
+        "aircraft.HelicopterFlightTest": {
+          "tests": 4,
+          "sha256": "85601524ce34e9a8eec2f61722d4a04970e7eb4011eacc020490a8f337952ed7"
+        },
+        "aircraft.HelicopterArmamentTest": {
+          "tests": 2,
+          "sha256": "b8116dccb33356854f8139b72e76c74f3700efca7ca50c072623a36385d77707"
+        },
+        "aircraft.HelicopterAuthorityTest": {
+          "tests": 2,
+          "sha256": "84674566869aad283c731e22c100ec2cf9e420398cb58d5181bdcf77876a456f"
+        },
+        "aircraft.HelicopterRouteTest": {
+          "tests": 8,
+          "sha256": "45effbd437282f0234e498513f38704d54a8f4b1c81e9d9e2d92d6eb10c8d17c"
+        },
+        "vehicle.VehicleControlAuthorityTest": {
+          "tests": 11,
+          "sha256": "2f263f076528c016099a2585e684feef6bbfd743c33411cc89afc8a81859ca7b"
+        }
+      },
+      "helicopterControlUnitTotal": 27,
+      "native": {
+        "observedServerTicks": 213,
+        "arrowsLaunched": 40,
+        "shelteredOriginalTroops": 4,
+        "hitOriginalTroops": 4,
+        "originalTroopsReturningFire": 4,
+        "allShelteredAt": 87,
+        "wallRemovedAt": 107,
+        "returnFireAt": 193,
+        "peakPathPlans": 2,
+        "shortestPathInterval": 10,
+        "originalCrew": [
+          "a404e2bf-4086-4fe7-a6db-9628a8943349",
+          "b874fd4d-3b54-41f5-a823-7563488bab28",
+          "a960e43d-7933-403b-90f7-5977d992985d",
+          "2554b72d-1923-46f2-89c5-7a7f25b91686",
+          "316830c5-8462-48a0-9815-7a9f4406f4b8",
+          "af77f328-ec7a-4ffe-ba63-6b0de459df49"
+        ]
+      },
+      "nativeEnemyHealthAtWallRemoval": 1996.9536,
+      "nativeFinalEnemyHealth": 1989.3376,
+      "nativeLogSha256": "dfbdbc3af4662312076d599d563cc3e3de184e9fab537dd11e22629a5275bff5",
+      "nativeSounds": [
+        "block.stone.step",
+        "entity.arrow.hit",
+        "entity.skeleton.shoot",
+        "firearm.heavy",
+        "firearm.rifle",
+        "vehicle.helicopter_door",
+        "vehicle.helicopter_rotor",
+        "vehicle.helicopter_turbine"
+      ],
+      "nativeArtifacts": {
+        "status.txt": "17f621f08ff9ee47d0bb56dd45f9491fc591985aa62edf3c3cb7c5b610118423",
+        "evidence.json": "140a4ef26eacad498740fb346c3df55805ddbdd0d3410385cc26b058fdee9a2b",
+        "sounds.json": "e81d82c2612e71c9aa8daec7d3c99ee2f0cd142d438151ef452343e9b55b9a41",
+        "AIR_APPROACH.png": "aeaeae1b4222385f96d4c12d173b44c7870aac2ad8216159b8964a0bc530de3c",
+        "AIR_UNLOAD.png": "5777bb926dbaef7379af16c0fc296ce673daef496a6a3ff98dd7cc6bda25584b",
+        "TROOPS_READY.png": "e3c3fd981ec637c0c3b3e4ba39c106737a05b56bc6a8b8f59283dfe278431600",
+        "ARROWS.png": "3549b0e38eff862a19e7c22d80cfa59a177a2d38d7f7ece53e473519762f47d7",
+        "SEEKING_COVER.png": "608bc0f2ef4871bdda12c8c1fc3c4e52caa9dbbb5b2994cb514fc62f4364881b",
+        "SHELTERED.png": "adc54aca805f3930dcd46d4784b50f18f1fde25c9ab3c95c3c9d3f5ab2a19480",
+        "WALL_REMOVED.png": "6c97df75e649d8d1ac09d12a59758187f4ad161d8383f0ffa7b03df683c94d8c",
+        "RETURN_FIRE.png": "bfab7a386f1b0ad9e5588e46f40c374847821bda7d16592410539020f13df280"
+      },
+      "reviewedSheets": {
+        "review-1.jpg": "5829f18be543e75ca62f783ce171b364a79a71c54fca3131ad2db6b42e8dd2f9",
+        "review-2.jpg": "29cb21b02ba549617309c337156884418f7a17e1b91be2ff6cfd2211971046ee"
+      }
+    },
+    "forge": {
+      "sources": {
+        "src/main/java/com/codex/blacklight/military/MilitaryCover.java": "1126fb742335ae75a90f8c05611f3582cd7244b12bcb5923df6ae2ed9a6677a0",
+        "src/main/java/com/codex/blacklight/military/MilitaryFormationSystem.java": "b75d6427d270fdf47cb9f682f811d7231eb3a9ac0bbab16aec93c9eae0c27ebd",
+        "src/main/java/com/codex/blacklight/military/MilitaryGroundNavigation.java": "1f922851e0352bbadc191a76dda4b9fe28d2892e176b445f158e360d58a7cee0",
+        "src/main/java/com/codex/blacklight/military/MilitaryTactics.java": "3addfb1cd767d5aa02c9bb3a64edc39cfb2cc98209e0617c6b911598983ead03",
+        "src/main/java/com/codex/blacklight/military/MilitaryWorkBudget.java": "c3ad760265e5a46a14039d3e5f039c7e4172803d97a4497f06ad606103bf6728",
+        "src/main/java/com/codex/blacklight/military/MilitaryFireControl.java": "bec98f02ea56ec7356cce1906e21e3ec5b6b240bcce7cccf010183d1d23cccf0",
+        "src/main/java/com/codex/blacklight/entity/MilitarySoldier.java": "5c5f63322476e61a109edf836c9559e9ad3f757096654810f1487724bbfe20c4",
+        "src/main/java/com/codex/blacklight/entity/BlackwatchSquad.java": "21b3ff79e4647c263c135f07c1734a06df6c43b36b0987027485d3efbb936620",
+        "src/main/java/com/codex/blacklight/entity/BlackwatchSquadSystem.java": "0f34072830e2881142ba406e3209a44aaa8879ce26ff1957e93439391d5949ab",
+        "src/main/java/com/codex/blacklight/entity/BlackwatchHelicopter.java": "2aa71568ff15a193550cf1b7d16aa0835f40c45ecab3a7885e8edfaad17c0bbb",
+        "src/main/java/com/codex/blacklight/city/MilitaryHomeSystem.java": "5a43a7c66c222e7d50765fc7342899b3354b71538f9cc0ebc986230071a52bb6",
+        "src/coverTest/java/com/codex/blacklight/gametest/MilitaryCoverGameTest.java": "d97eae9bd860fea9dccd840e9ed777e09d8c56c7b00e18c6c6d87861504d2b1f",
+        "src/coverVisual/java/com/codex/blacklight/client/MilitaryCoverVisual.java": "8510730ea3bd82b57e418d54a318640b490ea35dc47edf0fad99c803cceb718b",
+        "tools/military-cover-test.init.gradle": "c0a0f3e9d433c035c71ed9d90fb8672d8626b44693d4c170d357414ade660056",
+        "tools/military-cover-visual.init.gradle": "b634e1007026acf551cfed28dc34c3ddafaf52f3995e314f75b8e9b1ef55f955",
+        "tools/military-squad-test.init.gradle": "fe86767314ef69e7f8420f52977277ec7e164e04349108320ad23a04d9f93a7a",
+        "src/blackwatchTest/java/com/codex/blacklight/gametest/BlackwatchSquadGameTest.java": "bea3c927d527dd585766e41b0138aa6fc4dfc950607ff50c3725552fff43fcfa",
+        "src/blackwatchTest/java/com/codex/blacklight/gametest/MilitaryFormationGameTest.java": "e1f31537926cbd30789085090717b6db644187176fca7cd89c1784017e22d253"
+      },
+      "regressions": {
+        "coverVerify": {
+          "requiredServerScenarios": 9,
+          "sha256": "cb57d9ee4e910a8e0d4514b4f2c781f8df5bbf44ff5150806e2ce6abcf874f89",
+          "path": "D:\\CodexCache\\creature-combat-forge-coverVerify.log"
+        },
+        "militarySquadServer": {
+          "requiredServerScenarios": 34,
+          "sha256": "a0ee5fb1030b5f39a1fe4bcd6ea058336877137a0a76b5913ed49b6745fb4f19",
+          "path": "D:\\CodexCache\\creature-combat-forge-militarySquadServer.log"
+        },
+        "militaryServer": {
+          "requiredServerScenarios": 19,
+          "sha256": "c1d938fc814955f32f98339617e5c3553fca18c096edf5b76229eacb48b90485",
+          "path": "D:\\CodexCache\\creature-combat-forge-militaryServer.log"
+        },
+        "helicopterVerify": {
+          "requiredServerScenarios": 32,
+          "sha256": "fcb9c21e00b2fb14408ea44f63660d32661417222e393b015e1f5c5742c62e7f",
+          "path": "D:\\CodexCache\\creature-combat-forge-helicopterVerify.log"
+        }
+      },
+      "coverUnitTests": {
+        "entity.BlackwatchSquadTest": {
+          "tests": 16,
+          "sha256": "a19ea5b1a1a529c8df9b23b32d75d054e4b116a9524fb4444cdc82ab1987ba1d"
+        },
+        "military.MilitaryFireControlTest": {
+          "tests": 4,
+          "sha256": "eb6f0ab59696ed606efafa64cc6620bd4b73048df089c63007604aff730765d7"
+        },
+        "military.MilitaryWorkBudgetTest": {
+          "tests": 4,
+          "sha256": "df5cffa2ce8c91fadc141e65a9ebd537923ec918deb62827bfdcf7f7fdc70ff2"
+        }
+      },
+      "coverUnitTotal": 24,
+      "helicopterControlUnitTests": {
+        "aircraft.HelicopterFlightTest": {
+          "tests": 4,
+          "sha256": "19533637d4aa3dc38ec848b443466008ffd84efd2dcd8953ad276d9251c0c345"
+        },
+        "aircraft.HelicopterArmamentTest": {
+          "tests": 2,
+          "sha256": "f69b17ca55ec74cb9806d7902a3ea38b594e657f675b1197574d86d48373be81"
+        },
+        "aircraft.HelicopterAuthorityTest": {
+          "tests": 2,
+          "sha256": "54300ad2823cb038a1b459d502ecf8012939582e3eb655864c2e7cec1b68bd65"
+        },
+        "aircraft.HelicopterRouteTest": {
+          "tests": 8,
+          "sha256": "87d578a4470fa8650cbcec80d95c49e3e69e6bae92ea9472ab1158c0cac05e11"
+        },
+        "vehicle.VehicleControlAuthorityTest": {
+          "tests": 11,
+          "sha256": "7787b6b00098c40cdc951a0fcd65ae96f2ff0b520cd87aff095daa3e6627ef1a"
+        }
+      },
+      "helicopterControlUnitTotal": 27,
+      "native": {
+        "observedServerTicks": 296,
+        "arrowsLaunched": 64,
+        "shelteredOriginalTroops": 4,
+        "hitOriginalTroops": 4,
+        "originalTroopsReturningFire": 4,
+        "allShelteredAt": 159,
+        "wallRemovedAt": 179,
+        "returnFireAt": 276,
+        "peakPathPlans": 2,
+        "shortestPathInterval": 10,
+        "originalCrew": [
+          "a6ec346a-10a2-41bc-83a0-88e0dd056890",
+          "743b5a98-21bc-4e0f-8070-fe52194358dc",
+          "a130472d-ce6b-4352-be40-20d53cc85a0e",
+          "9194651a-bf5b-4c3b-a10d-787a6555fa20",
+          "ec6feb50-57f5-4930-b0d8-7508694ea5bc",
+          "9fe35d8d-d49d-4c6d-84ab-a52cd5033fb1"
+        ]
+      },
+      "nativeEnemyHealthAtWallRemoval": 1995.4304,
+      "nativeFinalEnemyHealth": 1989.3376,
+      "nativeLogSha256": "01d65e92f36408423672a8b9bd1be4ef534560cc1e7d50cb385b93d8e293d0fd",
+      "nativeSounds": [
+        "block.stone.step",
+        "entity.arrow.hit",
+        "entity.skeleton.shoot",
+        "firearm.rifle",
+        "vehicle.helicopter_door",
+        "vehicle.helicopter_rotor",
+        "vehicle.helicopter_turbine"
+      ],
+      "nativeArtifacts": {
+        "status.txt": "17f621f08ff9ee47d0bb56dd45f9491fc591985aa62edf3c3cb7c5b610118423",
+        "evidence.json": "61d58a6286801ed77f6961c2de6fb8704d73689ff21a633a4667abc5273c9e89",
+        "sounds.json": "28b0dafdc210691ef4b0fe814e73b41316acf20667c9fe13a4c342552379848a",
+        "AIR_APPROACH.png": "4c4c67b4e697fc65d84dd1ad415fc9e57185f6c2ff5a0e76c6ad71d3d0317390",
+        "AIR_UNLOAD.png": "c556a431e2d69350d50688fd5e531cc78deb9fd82e4351eec7105978cdcbd4f9",
+        "TROOPS_READY.png": "9c3a2e2822563b284f8f4d3666490951f5db7bfc04d21f8ee35a2a1801eda608",
+        "ARROWS.png": "e265628ebe6addcebb30794f861b607b9f0ba8b4ff8ba645b383ff50d7aa6b8c",
+        "SEEKING_COVER.png": "efd5c0b1805aa22787a3ed06393718b225f448d7cd67a3303720c654fbd0721f",
+        "SHELTERED.png": "e76308ab1a62ee608d2333720ab7eada00d38ee27761649bf249d8446ed3a478",
+        "WALL_REMOVED.png": "153b920053049a6976c034d4eb7cad3d2a9e0e56068568fff4db690831dc1c69",
+        "RETURN_FIRE.png": "212ef33119071eea408ccb551519508d8e1865dacc8fe508525d8c47022fab4a"
+      },
+      "reviewedSheets": {
+        "review-1.jpg": "4f4dcd51049f5a9058a25f660dd65d16bc08a85a8da203119d3172714ad465ce",
+        "review-2.jpg": "2621d221384b6a1cb220de41394fd18635e813474ea4d62f85cd380d78047bea"
+      }
+    }
+  },
+  "generatorSha256": "a2294f3740974ac0908413981eee188fb004ff89bf792c69831f85079897506d"
+}

@@ -44,6 +44,7 @@ public final class ConsumeVictimPose {
         var matrix=new org.joml.Matrix4f();
         var visual=com.codex.blacklight.registry.ModAttachments.getData(entity, ModAttachments.CONSUME_VISUAL);
         if(entity instanceof com.codex.blacklight.entity.BlacklightHunter&&NativeReceiverPose.available(entity,partial))return matrix;
+        if(com.codex.blacklight.combat.ConsumeSequence.bruteMount(entity)&&com.codex.blacklight.combat.ConsumeSequence.mountedStage(visual.stage()))return matrix;
         if(com.codex.blacklight.combat.ConsumeSequence.mountedStage(visual.stage()))
             return matrix.rotateY((float)Math.toRadians(-entity.yBodyRot)).translate(0,h*.65F,0)
                     .rotateX(p.bend()*.16F).rotateZ(p.twist()*.20F).translate(0,-h*.65F,0).rotateY((float)Math.toRadians(entity.yBodyRot));
@@ -112,6 +113,7 @@ public final class ConsumeVictimPose {
     }
     public static void vanilla(EntityModel<?> model,LivingEntity entity,float partial) {
         restore(model);
+        try {
         if (!com.codex.blacklight.registry.ModAttachments.getData(entity, ModAttachments.CONSUME_VISUAL).active()) { hit(model,entity,partial); return; }
         var p=reaction(entity,partial);
         var saved=new IdentityHashMap<ModelPart,PartPose>();SAVED.put(model,saved);
@@ -145,6 +147,10 @@ public final class ConsumeVictimPose {
                 }
                 index++;
             }
+        }
+        } finally {
+            var physical=SAVED.computeIfAbsent(model,ignored->new IdentityHashMap<>());
+            ImpactRagdoll.pose(model,entity,partial,physical);
         }
     }
     private static boolean applyNative(EntityModel<?> model,Map<ModelPart,PartPose> saved,LivingEntity entity,float partial) {
@@ -306,6 +312,9 @@ public final class ConsumeVictimPose {
         }
     }
     private static void hit(EntityModel<?> model,LivingEntity entity,float partial) {
+        // A full physical receiver captures its own current species pose. Adding a scripted
+        // flinch first changes the skin under the authoritative blade path before handoff.
+        if(com.codex.blacklight.client.renderer.AdaptiveRagdoll.active(entity))return;
         var hit=com.codex.blacklight.registry.ModAttachments.getData(entity, ModAttachments.HIT_REACTION);float w=hit.weight(entity.level().getGameTime(),partial);
         if(w<=0)return;
         float bend=(hit.kind()==com.codex.blacklight.combat.HitReaction.SLAM?.60F:-.24F)*w;

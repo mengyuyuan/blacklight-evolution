@@ -20,7 +20,7 @@ public final class VehicleDamageBridge {
     public record MechanicalHit(MilitaryVehicle vehicle,Vec3 point,double distance){}
     private VehicleDamageBridge(){}
     private static final ThreadLocal<AttackEntityEvent> ATTACK_EVENT=new ThreadLocal<>();
-    public static boolean ownsAttackEvent(AttackEntityEvent event){return ATTACK_EVENT.get()==event && vehicle(event.getTarget())!=null;}
+    public static boolean ownsAttackEvent(AttackEntityEvent event){return ATTACK_EVENT.get()==event && (vehicle(event.getTarget())!=null||event.getTarget() instanceof com.codex.blacklight.entity.BlackwatchHelicopter);}
     public static MilitaryVehicle vehicle(Entity entity){return entity instanceof MilitaryVehicle v?v:entity instanceof VehicleHullPart part?part.getParent():null;}
     private static VehicleDefinition.Vec3 point(Vec3 p){return new VehicleDefinition.Vec3(p.x,p.y,p.z);}
     public static boolean valid(LivingEntity actor,ServerLevel level){return actor!=null&&actor.isAlive()&&!actor.isRemoved()&&actor.level()==level;}
@@ -35,16 +35,33 @@ public final class VehicleDamageBridge {
         }
         return nearest;
     }
+    public static boolean militaryEnemy(MilitarySoldier soldier,LivingEntity target){
+        return soldier.validTarget(target)&&(com.codex.blacklight.infection.BlacklightInfectionSystem.isInfected(target)
+                ||soldier.getTarget()==target
+                ||soldier.getVehicle() instanceof com.codex.blacklight.entity.BlackwatchHelicopter origin
+                    &&origin.combat().designatesTargetFor(soldier,target));
+    }
     public static boolean protectedHull(LivingEntity actor,MilitaryVehicle target){
         boolean legitimateCrew=false;
         for(Entity passenger:target.getPassengers())if(passenger instanceof LivingEntity living){
             if(FirearmsCombat.protectedTarget(actor,living))return true;
             if(actor instanceof Player player&&living instanceof Player other&&(!player.canHarmPlayer(other)
                     ||target.level() instanceof ServerLevel level&&!level.getServer().isPvpAllowed()))return true;
-            if(actor instanceof MilitarySoldier soldier&&soldier.validTarget(living)
-                    &&(com.codex.blacklight.infection.BlacklightInfectionSystem.isInfected(living)||soldier.getTarget()==living))legitimateCrew=true;
+            if(actor instanceof MilitarySoldier soldier&&militaryEnemy(soldier,living))legitimateCrew=true;
         }
         // A troop does not acquire an empty or allied native chassis as a new proactive enemy.
+        return actor instanceof MilitarySoldier&&!legitimateCrew;
+    }
+    /** Aircraft share the occupant allegiance/PvP boundary of ground hulls.
+     * A saved player-owner UUID alone is not a live enemy crew. */
+    public static boolean protectedAircraft(LivingEntity actor,com.codex.blacklight.entity.BlackwatchHelicopter target){
+        boolean legitimateCrew=false;
+        for(Entity passenger:target.getIndirectPassengers())if(passenger instanceof LivingEntity living){
+            if(FirearmsCombat.protectedTarget(actor,living))return true;
+            if(actor instanceof Player player&&living instanceof Player other&&(!player.canHarmPlayer(other)
+                    ||target.level() instanceof ServerLevel level&&!level.getServer().isPvpAllowed()))return true;
+            if(actor instanceof MilitarySoldier soldier&&militaryEnemy(soldier,living))legitimateCrew=true;
+        }
         return actor instanceof MilitarySoldier&&!legitimateCrew;
     }
     private static boolean permitted(LivingEntity actor,MilitaryVehicle target,float damage){
@@ -59,12 +76,31 @@ public final class VehicleDamageBridge {
     }
     /** Heavy contact has its own explicit gameplay armor balance, never a fabricated firearm identity. */
     public static boolean hurtPhysical(LivingEntity actor,MilitaryVehicle target,float damage,Entity projectile){
+        return hurtPhysical(actor,target,damage,projectile,null);
+    }
+    public static boolean hurtPhysical(LivingEntity actor,MilitaryVehicle target,float damage,Entity projectile,Vec3 contact){
         if(projectile!=null&&(projectile.isRemoved()||projectile.level()!=target.level()))return false;
         if(!permitted(actor,target,damage))return false;
         float coefficient=switch(target.definition().armor()){case LIGHT->1F;case ARMORED->.75F;case HEAVY->.5F;};
         var source=projectile!=null?actor.damageSources().thrown(projectile,actor)
                 :actor instanceof Player player?actor.damageSources().playerAttack(player):actor.damageSources().mobAttack(actor);
-        return target.hurt(source,damage*coefficient*prototypeScale(actor));
+        return target.hurtAt(source,damage*coefficient*prototypeScale(actor),contact,incoming(actor,projectile,contact),VehicleFeedbackMotion.Impact.HEAVY);
+    }
+    /** Same player event/occupant policy and health-unit scale as mechanical
+     * melee. Aircraft have no invented native firearm/armor profile here. */
+    public static boolean hurtPhysicalAircraft(ServerPlayer actor,com.codex.blacklight.entity.BlackwatchHelicopter target,float damage,java.util.function.BooleanSupplier current){
+        return hurtPhysicalAircraft(actor,target,damage,null,current);
+    }
+    public static boolean hurtPhysicalAircraft(ServerPlayer actor,com.codex.blacklight.entity.BlackwatchHelicopter target,float damage,Entity projectile,java.util.function.BooleanSupplier current){
+        if(!(target.level() instanceof ServerLevel level)||!valid(actor,level)||actor.isSpectator()||target.isRemoved()||target.health()<=0
+                ||!Float.isFinite(damage)||damage<=0||protectedAircraft(actor,target)||!level.mayInteract(actor,target.blockPosition())||!current.getAsBoolean())return false;
+        var actorAt=actor.position();var targetAt=target.position();float targetYaw=target.getYRot(),targetBank=target.bank();
+        var event=new AttackEntityEvent(actor,target);var previous=ATTACK_EVENT.get();ATTACK_EVENT.set(event);
+        try{MinecraftForge.EVENT_BUS.post(event);}finally{if(previous==null)ATTACK_EVENT.remove();else ATTACK_EVENT.set(previous);}
+        if(event.isCanceled()||!current.getAsBoolean()||!valid(actor,level)||target.isRemoved()||target.health()<=0||protectedAircraft(actor,target)
+                ||!actorAt.equals(actor.position())||!targetAt.equals(target.position())||targetYaw!=target.getYRot()||targetBank!=target.bank())return false;
+        var source=projectile==null?actor.damageSources().playerAttack(actor):actor.damageSources().thrown(projectile,actor);
+        return target.hurt(source,damage*prototypeScale(actor));
     }
     /** Living targets receive prototype melee in CombatScale units; hulls use the same scale so a claw is not five times weaker on steel. */
     public static float prototypeScale(LivingEntity actor){
@@ -75,6 +111,15 @@ public final class VehicleDamageBridge {
         return permitted(actor,target,damage)&&target.hurt(actor.damageSources().playerAttack(actor),damage);
     }
     public static boolean hurt(LivingEntity actor,MilitaryVehicle target,WeaponDefinition definition,float damage,Entity projectile){
+        return hurt(actor,target,definition,damage,projectile,null);
+    }
+    private static Vec3 incoming(LivingEntity actor,Entity projectile,Vec3 contact){
+        return projectile!=null&&projectile.getDeltaMovement().lengthSqr()>1e-8?projectile.getDeltaMovement():contact==null||actor==null?null:contact.subtract(actor.getEyePosition());
+    }
+    public static boolean hurt(LivingEntity actor,MilitaryVehicle target,WeaponDefinition definition,float damage,Entity projectile,Vec3 contact){
+        return hurt(actor,target,definition,damage,projectile,contact,incoming(actor,projectile,contact));
+    }
+    public static boolean hurt(LivingEntity actor,MilitaryVehicle target,WeaponDefinition definition,float damage,Entity projectile,Vec3 contact,Vec3 direction){
         if(!permitted(actor,target,damage))return false;
         VehicleWeaponDefinition specific=VehicleWeaponDefinition.ALL.stream().filter(value->value.weapon().id().equals(definition.id())).findFirst().orElse(null);
         float amount;
@@ -83,9 +128,10 @@ public final class VehicleDamageBridge {
             boolean bullet=definition.kind()==WeaponDefinition.Kind.BULLET;var armor=target.definition().armor();
             amount=damage*(armor==VehicleDefinition.Armor.LIGHT?1:bullet?(armor==VehicleDefinition.Armor.ARMORED?.25F:.10F):(armor==VehicleDefinition.Armor.ARMORED?.75F:.50F));
         }
-        return target.hurt(actor.damageSources().mobProjectile(projectile==null?actor:projectile,actor),amount);
+        return target.hurtAt(actor.damageSources().mobProjectile(projectile==null?actor:projectile,actor),amount,contact,direction,
+                definition.kind()==WeaponDefinition.Kind.BULLET?VehicleFeedbackMotion.Impact.BULLET:VehicleFeedbackMotion.Impact.EXPLOSIVE);
     }
-    public static int blast(ServerLevel level,LivingEntity actor,WeaponDefinition definition,Vec3 center,Entity projectile,MilitaryVehicle direct){
+    public static int blast(ServerLevel level,LivingEntity actor,WeaponDefinition definition,Vec3 center,Entity projectile,Entity direct){
         if(!valid(actor,level)||definition.radius()<=0)return 0;
         double radius=Math.min(4,definition.radius());var seen=new HashSet<UUID>();int hits=0;
         for(Entity entity:level.getEntities(projectile,new AABB(center,center).inflate(radius),entity->vehicle(entity)!=null)){
@@ -95,8 +141,14 @@ public final class VehicleDamageBridge {
             double distance=center.distanceTo(surface);if(distance>radius||!loaded(level,center,surface))continue;
             var wall=level.clip(new ClipContext(center,surface,ClipContext.Block.COLLIDER,ClipContext.Fluid.NONE,projectile));
             if(wall.getType()!=HitResult.Type.MISS)continue;
-            if(hurt(actor,target,definition,definition.damage()*(float)Math.max(.2,1-distance/radius),projectile))hits++;
+            if(hurt(actor,target,definition,definition.damage()*(float)Math.max(.2,1-distance/radius),projectile,surface,surface.subtract(center)))hits++;
             if(seen.size()>=64)break;
+        }
+        for(var craft:level.getEntitiesOfClass(com.codex.blacklight.entity.BlackwatchHelicopter.class,new AABB(center,center).inflate(radius),c->c!=direct&&c.health()>0)){
+            var bounds=craft.getBoundingBox();Vec3 surface=new Vec3(net.minecraft.util.Mth.clamp(center.x,bounds.minX,bounds.maxX),net.minecraft.util.Mth.clamp(center.y,bounds.minY,bounds.maxY),net.minecraft.util.Mth.clamp(center.z,bounds.minZ,bounds.maxZ));
+            double distance=surface.distanceTo(center);if(distance>radius||!loaded(level,center,surface))continue;
+            if(level.clip(new ClipContext(center,surface,ClipContext.Block.COLLIDER,ClipContext.Fluid.NONE,projectile)).getType()!=HitResult.Type.MISS)continue;
+            if(craft.hurt(actor.damageSources().explosion(projectile,actor),definition.damage()*(float)Math.max(.2,1-distance/radius)))hits++;
         }
         return hits;
     }
@@ -106,11 +158,11 @@ public final class VehicleDamageBridge {
                 ||!Double.isFinite(direction.lengthSqr())||direction.lengthSqr()<1e-8||!Float.isFinite(scale)||scale<=0)return false;
         Vec3 from=actor.getEyePosition().add(0,-.18,0),to=from.add(direction.normalize().scale(definition.range()));
         var ignored=vehicle(actor.getVehicle());var hit=nearest(level,actor,ignored,from,to);if(hit==null||!loaded(level,from,hit.point))return false;
-        var living=net.minecraft.world.entity.projectile.ProjectileUtil.getEntityHitResult(level,actor,from,hit.point,new AABB(from,hit.point).inflate(.3),entity->entity!=actor&&entity instanceof LivingEntity target&&target.isAlive()&&entity.isPickable());
+        var living=com.codex.blacklight.firearms.FirearmsCombat.firstBulletBody(level,actor,from,hit.point);
         if(living!=null&&living.getLocation().distanceTo(from)<hit.distance-.001)return false;
         if(level.clip(new ClipContext(from,hit.point,ClipContext.Block.COLLIDER,ClipContext.Fluid.NONE,actor)).getType()!=HitResult.Type.MISS)return false;
-        hurt(actor,hit.vehicle,definition,definition.damage()*scale,null);
-          com.codex.blacklight.firearms.GunplayEffects.shot(actor,definition,com.codex.blacklight.firearms.GunplayEffects.muzzle(actor,direction),hit.point,3,direction.normalize().scale(-1));
+        boolean accepted=hurt(actor,hit.vehicle,definition,definition.damage()*scale,null,hit.point,direction);
+          com.codex.blacklight.firearms.GunplayEffects.shot(actor,definition,com.codex.blacklight.firearms.GunplayEffects.muzzle(actor,direction),hit.point,accepted?0:3,direction.normalize().scale(-1));
         return true;
     }
 }

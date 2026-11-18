@@ -57,6 +57,37 @@ public final class ThrownBlock extends Projectile {
         t=t*t*(3-2*t);return Vec3.atLowerCornerOf(entityData.get(SOURCE)).add(cargo().size().scale(.5)).lerp(grip,t);
     }
     private void setPhase(ServerPlayer p,int phase,String motion){entityData.set(PHASE,phase);phaseAt=level().getGameTime();BlockThrowMotion.play(p,twoHanded(),motion);}
+    /** C uses this already claimed cargo. It never extracts or duplicates a block. */
+    public void slamFrom(ServerPlayer p){
+        if(!validHolder(p)||phase()!=1||pendingRelease||charge.active()||!p.onGround()||p.isInWaterOrBubble()
+                ||WeaponCombatSystem.busy(p)||!BlockSlamMotion.available(twoHanded()))return;
+        cancelCharge();chargeSnapshot=0;
+        impactDamage=BlockThrowTuning.damage(BlockThrowSystem.level(p),0)*ThrowObjectSize.damageFactor(cargo().cells().size());
+        impactKnockback=Math.min(4,1.2*ThrowObjectSize.damageFactor(cargo().cells().size()));
+        entityData.set(THROWING,true);setPhase(p,BlockSlamMotion.PHASE,"slam");
+        com.codex.blacklight.registry.ModAttachments.setData(p,ModAttachments.GRAB_STAGE,ConsumeVisual.GRAB_ATTACK);com.codex.blacklight.registry.ModAttachments.syncData(p,ModAttachments.GRAB_STAGE);
+    }
+    private void tickSlam(ServerPlayer p){
+        var action=com.codex.blacklight.registry.ModAttachments.getData(p,ModAttachments.PLAYER_ACTION);long elapsed=level().getGameTime()-phaseAt;
+        if(!validHolder(p)||!p.onGround()||p.isInWaterOrBubble()||elapsed<0
+                ||!action.clipId().equals(BlockThrowMotion.key(twoHanded(),"slam"))||elapsed>200){drop();return;}
+        p.setYRot(action.yaw());p.setYHeadRot(action.yaw());p.yBodyRot=action.yaw();
+        p.setDeltaMovement(0,p.getDeltaMovement().y,0);
+        Vec3 from=position(),to=anchor(p);
+        if(!BlockThrowCollision.loaded(level(),from,to,cargo().half())){drop();return;}
+        var wall=BlockThrowCollision.block(level(),this,from,to,cargo().half());
+        int release=BlockSlamMotion.releaseTick(twoHanded());
+        // Wind-up hitting a ceiling/wall cancels. It cannot deal an early remote hit.
+        if(wall!=null&&elapsed<release-2){drop();return;}
+        if(elapsed<release&&wall==null){setPos(to);setDeltaMovement(Vec3.ZERO);return;}
+        // Let the existing swept projectile collision, damage and cargo recovery
+        // handle the actual contact on the next tick. Preserve the actor's recovery.
+        entityData.set(HOLDER,-1);BlockThrowSystem.clear(p);
+        // Start the sweep at the previous grip, not past a creature crossed by the swing.
+        Vec3 swing=to.subtract(from);
+        setDeltaMovement(new Vec3(swing.x,Math.min(-1.15,swing.y),swing.z));
+        hasImpulse=true;age=0;
+    }
     public void acceptAim(ServerPlayer p,Vec3 point,boolean assist){
         long now=level().getGameTime();
         if(!validHolder(p)||!BlockThrowBallistics.finite(point)||point.distanceToSqr(p.getEyePosition())>128*128)return;
@@ -72,19 +103,19 @@ public final class ThrownBlock extends Projectile {
         entityData.set(TARGET,aim.target());entityData.set(AIM_X,(float)aim.velocity().x);entityData.set(AIM_Y,(float)aim.velocity().y);entityData.set(AIM_Z,(float)aim.velocity().z);
     }
     public void startCharge(ServerPlayer p){
-        if(!validHolder(p)||pendingRelease||phase()==4)return;
+        if(!validHolder(p)||pendingRelease||phase()>=4)return;
         charge.start(level().getGameTime());if(phase()==1)setPhase(p,2,"charge");
     }
     public void cancelCharge(){charge.cancel();entityData.set(CHARGE,0);}
     public void cancelInput(ServerPlayer p){
-        if(pendingRelease||phase()==4)return;cancelCharge();
+        if(pendingRelease||phase()>=4)return;cancelCharge();
         if(validHolder(p)&&phase()==2)setPhase(p,1,"hold");
     }
     public void releaseCharge(ServerPlayer p){
-        if(!validHolder(p)||pendingRelease||phase()==4)return;
+        if(!validHolder(p)||pendingRelease||phase()>=4)return;
         int ticks=charge.release(level().getGameTime());if(ticks>=0)commitThrow(p,ticks);
     }
-    public void throwFrom(ServerPlayer p){if(validHolder(p)&&!pendingRelease&&phase()!=4)commitThrow(p,0);}
+    public void throwFrom(ServerPlayer p){if(validHolder(p)&&!pendingRelease&&phase()<4)commitThrow(p,0);}
     private void commitThrow(ServerPlayer p,int ticks){
         int tier=BlockThrowSystem.level(p);chargeSnapshot=ticks;
         impactDamage=BlockThrowTuning.damage(tier,ticks)*ThrowObjectSize.damageFactor(cargo().cells().size());impactKnockback=Math.min(4,BlockThrowTuning.knockback(tier,ticks)*ThrowObjectSize.damageFactor(cargo().cells().size()));
@@ -120,6 +151,7 @@ public final class ThrownBlock extends Projectile {
             var entity=level().getEntity(holderId());
             if(entity instanceof Player p&&p.isAlive()&&!p.isSpectator()&&!p.isPassenger()&&(level().isClientSide||getOwner()==p)){
                 BlockThrowSystem.trackHeld(p,this);
+                if(phase()==BlockSlamMotion.PHASE&&!level().isClientSide&&p instanceof ServerPlayer server){tickSlam(server);return;}
                 setPos(anchor(p));setDeltaMovement(Vec3.ZERO);
                 if(!level().isClientSide&&p instanceof ServerPlayer server){
                     if(!BlockThrowSystem.canUse(server)){drop();return;}
@@ -167,9 +199,13 @@ public final class ThrownBlock extends Projectile {
             Vec3 impact=mechanical!=null?mechanical.point():victim!=null?victim.getLocation():wall;
             setPos(impact);
             if(mechanical!=null&&getOwner() instanceof LivingEntity actor)
-                com.codex.blacklight.military.vehicle.VehicleDamageBridge.hurtPhysical(actor,mechanical.vehicle(),impactDamage,this);
+                com.codex.blacklight.military.vehicle.VehicleDamageBridge.hurtPhysical(actor,mechanical.vehicle(),impactDamage,this,mechanical.point());
+            if(victim!=null&&victim.getEntity() instanceof BlackwatchHelicopter craft&&getOwner() instanceof ServerPlayer owner){
+                com.codex.blacklight.military.vehicle.VehicleDamageBridge.hurtPhysicalAircraft(owner,craft,impactDamage,this,
+                        ()->!isRemoved()&&getOwner()==owner&&level()==craft.level());
+            }
             if(victim!=null&&victim.getEntity() instanceof LivingEntity target&&allowed(target)){
-                if(target.hurt(damageSources().thrown(this,getOwner()),impactDamage)){
+                if(BlockThrowCollision.hurt(victim,damageSources().thrown(this,getOwner()),impactDamage)){
                     var push=velocity.normalize().scale(impactKnockback);
                     target.push(push.x,Math.min(.65,.2+impactKnockback*.15),push.z);target.hurtMarked=true;
                     com.codex.blacklight.combat.WeaponImpact.contact(getOwner() instanceof net.minecraft.server.level.ServerPlayer owner?owner:null,target,
@@ -200,7 +236,9 @@ public final class ThrownBlock extends Projectile {
         return getOwner()!=target&&(getOwner()==null||!getOwner().isAlliedTo(target))
                 &&(!(getOwner() instanceof Player p)||!(target instanceof Player q)||p.canHarmPlayer(q));
     }
-    @Override protected boolean canHitEntity(Entity e){return super.canHitEntity(e)&&e!=getOwner()&&e instanceof LivingEntity living&&allowed(living);}
+    @Override protected boolean canHitEntity(Entity e){
+        if(e instanceof BlackwatchHelicopter craft)return craft.health()>0&&super.canHitEntity(e)&&getOwner()!=null&&craft!=getOwner().getRootVehicle();
+        var living=CombatTargeting.resolveTarget(e);return living!=null&&super.canHitEntity(e)&&living!=getOwner()&&allowed(living);}
     @Override protected void addAdditionalSaveData(CompoundTag tag){super.addAdditionalSaveData(tag);tag.put("Block",NbtUtils.writeBlockState(block()));tag.putBoolean("Armed",armed);tag.putBoolean("Recover",settled||holderId()>=0);tag.putInt("Age",age);tag.putFloat("Damage",impactDamage);tag.putBoolean("TwoHanded",twoHanded());tag.put("Cargo",cargo().save());tag.putInt("Recovered",recoveryIndex);tag.putDouble("Knockback",impactKnockback);}
     @Override protected void readAdditionalSaveData(CompoundTag tag){super.readAdditionalSaveData(tag);entityData.set(BLOCK,NbtUtils.readBlockState(level().holderLookup(Registries.BLOCK),tag.getCompound("Block")));setCargo(BlockThrowCargo.load(level(),tag.getCompound("Cargo"),block()));recoveryIndex=Math.max(0,Math.min(cargo().cells().size(),tag.getInt("Recovered")));armed=tag.getBoolean("Armed");settled=tag.getBoolean("Recover");entityData.set(SETTLED,settled);age=tag.getInt("Age");float savedDamage=tag.getFloat("Damage");impactDamage=Float.isFinite(savedDamage)?Math.max(0,Math.min(100,savedDamage)):0;double savedKnockback=tag.getDouble("Knockback");impactKnockback=Double.isFinite(savedKnockback)?Math.max(0,Math.min(4,savedKnockback)):0;}
 }

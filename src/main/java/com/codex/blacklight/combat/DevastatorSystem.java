@@ -317,12 +317,12 @@ public final class DevastatorSystem {
                 s.struck.add(target.getUUID());s.hits++;var outward=point.subtract(s.origin).multiply(1,0,1);
                 if(outward.lengthSqr()<.0001)outward=s.direction;else outward=outward.normalize();
                 ImpactControl.begin(target,new ImpactProfile(kind==0?HitReaction.LAUNCH:HitReaction.HEAVY,kind==0?ImpactProfile.UP:ImpactProfile.FALL,40,.6,kind==0?.8:.15,true),s.yaw);
-                if(!(target instanceof com.codex.blacklight.entity.BlacklightInfectedHost host&&host.giantBoss())
+                if(!NativeBossBodyControl.ownsPose(target)
+                        &&!(target instanceof com.codex.blacklight.entity.BlacklightInfectedHost host&&host.giantBoss())
                         &&!ConsumeSystem.grappleProtected(target)){
                     double resistance=target.getAttributeValue(net.minecraft.world.entity.ai.attributes.Attributes.KNOCKBACK_RESISTANCE);
                     target.setDeltaMovement(outward.scale(.6*(1-resistance)).add(0,(kind==0?.8:.15)*(1-resistance),0));target.hurtMarked=true;
                 }
-                CombatImpactEffects.target(p,target,s.move);
                 WeaponImpact.contact(p,target,ImpactTier.FINISHER,false,null);
             }
         }

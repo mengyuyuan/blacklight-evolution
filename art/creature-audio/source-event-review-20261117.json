@@ -1,0 +1,1383 @@
+{
+  "schema": 1,
+  "date": "2026-11-17",
+  "status": "implemented-source-event-timing-and-authored-fallback-resources; no-build-no-tests-no-listening",
+  "scope": "Canonical Hunter counter/release audio, accepted Hunter hurt/death voice events, common-infected successful leap release/landing/death. Not complete creature audio.",
+  "prior_defects": [
+    "Hunter COUNTER/BARRAGE played the same tension plus vanilla ravager attack at entry and a generic whoosh for every active damage window, despite source counter-release tracks containing only two whooshes and a later short roar.",
+    "Common infected leap release and landing had no audible state entry; death reused PLAYER_DEATH. Hunter hurt and death reused RAVAGER_HURT/DEATH."
+  ],
+  "original_transfers": [
+    {
+      "original": "E:/虐杀原形/Prototype-1/Prototype/audio/infected.p3d",
+      "local": "D:\\CodexCache\\work\\p1-creature-audio\\infected.p3d",
+      "bytes": 1857107,
+      "sha256": "1d2409c6a49514c8c6d000397c896555e607ae926a479cda0db3553d24f9d47b"
+    },
+    {
+      "original": "E:/虐杀原形/Prototype-1/Prototype/audio/infected2.p3d",
+      "local": "D:\\CodexCache\\work\\p1-creature-audio\\infected2.p3d",
+      "bytes": 1854641,
+      "sha256": "85c1db2088bd10f7454de8243d106c4bb1fd33583b0cd1e5363bb4568c02f74e"
+    },
+    {
+      "original": "E:/虐杀原形/Prototype-1/Prototype/audio/brawler.p3d",
+      "local": "D:\\CodexCache\\work\\p1-creature-audio\\brawler.p3d",
+      "bytes": 2702366,
+      "sha256": "289a4f4da8d333e431495ad99c10e03bcc4b65de010a2b6d66578049e50c102a"
+    }
+  ],
+  "original_mapping": {
+    "path": "D:\\CodexCache\\work\\p1-creature-audio\\patch-wave-fig-map.json",
+    "sha256": "509d8a2b7113bfb6d9e8b547cd854daeef1e8f2b56175ba96462dae1b217dbb5",
+    "method": "P3D typed chunks: Patch name, files String List and loop Bool; AudioFile name/alias and RADP header metadata. Match FIG Patch U64 by hash=(hash*65599) XOR next ASCII character modulo 2^64; known hit/bank constants checked. No filename-only assignment.",
+    "total_patches": 38,
+    "total_audio_files": 150,
+    "matched_fig_records_before_audit_deduplication": 338
+  },
+  "selected_original_chains": [
+    {
+      "fig": {
+        "source": "comparison/infected2_all_fig.p3d.rz",
+        "offset": 13416,
+        "payload": 13428,
+        "length": 72,
+        "type": "Sound",
+        "kind": "TrackHash",
+        "owner": "infected2/opening/surface/ground/attacks/jump_attack/jump_attack/pose/release",
+        "fields": {
+          "Unknown1": 1,
+          "TimeBegin": 0,
+          "Patch": {
+            "hash": "13962983156446612451",
+            "name": "#c1c67b33a4c34be3"
+          },
+          "Trigger": {
+            "hash": "31616665440155042",
+            "name": "play"
+          },
+          "VolumeFactor": 1,
+          "MinDistance": 0,
+          "MaxDistance": 0,
+          "MinPitch": 1,
+          "MaxPitch": 1,
+          "CyclicPhase": 0,
+          "InstanceName": {
+            "hash": "0",
+            "name": "#0"
+          },
+          "Frequency": 1,
+          "PolledLifetime": false,
+          "TriggerType": {
+            "hash": "13522664087197083521",
+            "name": "Retrigger"
+          }
+        },
+        "schema": "SoundTrack",
+        "end": 13508
+      },
+      "patch": {
+        "source": "infected2.p3d",
+        "offset": 1851715,
+        "name": "infected2_vox_swipe",
+        "hash": "13962983156446612451",
+        "loop": false,
+        "files": [
+          "infected2_vox_swipe_09",
+          "infected2_vox_swipe_08",
+          "infected2_vox_swipe_04",
+          "infected2_vox_swipe_02",
+          "infected2_vox_swipe_29",
+          "infected2_vox_swipe_20",
+          "infected2_vox_swipe_22",
+          "infected2_vox_swipe_23",
+          "infected2_vox_swipe_24",
+          "infected2_vox_swipe_25",
+          "infected2_vox_swipe_26",
+          "infected2_vox_swipe_27",
+          "infected2_vox_swipe_28"
+        ]
+      },
+      "audio_files": [
+        {
+          "source": "infected2.p3d",
+          "offset": 1411192,
+          "name": "infected2_vox_swipe_09",
+          "alias": "infected2_vox_swipe_09",
+          "channels": 1,
+          "sample_rate": 48000,
+          "encoded_bytes": 10360,
+          "codec": "RADP",
+          "encoded_sha256": "9a800a94e32c238e41f9c7492ee0d3875bd3aac8b1ea90dc79e10187c613adea"
+        },
+        {
+          "source": "infected2.p3d",
+          "offset": 1395711,
+          "name": "infected2_vox_swipe_08",
+          "alias": "infected2_vox_swipe_08",
+          "channels": 1,
+          "sample_rate": 48000,
+          "encoded_bytes": 15360,
+          "codec": "RADP",
+          "encoded_sha256": "4832842e8898f83bcee0ad137d1f13f5b56b53315d2d364251f50a0633ea4635"
+        },
+        {
+          "source": "infected2.p3d",
+          "offset": 1375270,
+          "name": "infected2_vox_swipe_04",
+          "alias": "infected2_vox_swipe_04",
+          "channels": 1,
+          "sample_rate": 48000,
+          "encoded_bytes": 20320,
+          "codec": "RADP",
+          "encoded_sha256": "bb49b38f37c5fd367fd5db6acfff0dfaadbc7f8512fe4380362d6929dd8c4a55"
+        },
+        {
+          "source": "infected2.p3d",
+          "offset": 1358369,
+          "name": "infected2_vox_swipe_02",
+          "alias": "infected2_vox_swipe_02",
+          "channels": 1,
+          "sample_rate": 48000,
+          "encoded_bytes": 16780,
+          "codec": "RADP",
+          "encoded_sha256": "2aa13299610a43c3f128eeeb5f83d7218c19d825518757ba24c5449aac7367af"
+        },
+        {
+          "source": "infected2.p3d",
+          "offset": 1630381,
+          "name": "infected2_vox_swipe_29",
+          "alias": "infected2_vox_swipe_29",
+          "channels": 1,
+          "sample_rate": 48000,
+          "encoded_bytes": 22360,
+          "codec": "RADP",
+          "encoded_sha256": "0132943eab2676d6109e7ab90341f3bf940d612122397bd97a2efdc46f711bf3"
+        },
+        {
+          "source": "infected2.p3d",
+          "offset": 1421673,
+          "name": "infected2_vox_swipe_20",
+          "alias": "infected2_vox_swipe_20",
+          "channels": 1,
+          "sample_rate": 48000,
+          "encoded_bytes": 22540,
+          "codec": "RADP",
+          "encoded_sha256": "cb029bb203f5fa52fab43c20d177c99cdaa92018d759b4c46a0ba5689849321c"
+        },
+        {
+          "source": "infected2.p3d",
+          "offset": 1444334,
+          "name": "infected2_vox_swipe_22",
+          "alias": "infected2_vox_swipe_22",
+          "channels": 1,
+          "sample_rate": 48000,
+          "encoded_bytes": 19280,
+          "codec": "RADP",
+          "encoded_sha256": "509cee3a9b6f68e5a43650df17a8ab5024d2e108c31f5c1d7a83f8a078d01472"
+        },
+        {
+          "source": "infected2.p3d",
+          "offset": 1463735,
+          "name": "infected2_vox_swipe_23",
+          "alias": "infected2_vox_swipe_23",
+          "channels": 1,
+          "sample_rate": 48000,
+          "encoded_bytes": 27100,
+          "codec": "RADP",
+          "encoded_sha256": "8ab4591f24d406eb662acc50a85803dc56b40aa09fc5ba3b0a6b63ce3433f0bf"
+        },
+        {
+          "source": "infected2.p3d",
+          "offset": 1490956,
+          "name": "infected2_vox_swipe_24",
+          "alias": "infected2_vox_swipe_24",
+          "channels": 1,
+          "sample_rate": 48000,
+          "encoded_bytes": 26180,
+          "codec": "RADP",
+          "encoded_sha256": "515b9032e915f6fd3b780ea74f285f239fab166889b339aed927ad694d8a9452"
+        },
+        {
+          "source": "infected2.p3d",
+          "offset": 1517257,
+          "name": "infected2_vox_swipe_25",
+          "alias": "infected2_vox_swipe_25",
+          "channels": 1,
+          "sample_rate": 48000,
+          "encoded_bytes": 35660,
+          "codec": "RADP",
+          "encoded_sha256": "eb90b5a5772c8310721e4b27478b1d3f0e32126f7fa1af5b1f9833cc5005e6f8"
+        },
+        {
+          "source": "infected2.p3d",
+          "offset": 1553038,
+          "name": "infected2_vox_swipe_26",
+          "alias": "infected2_vox_swipe_26",
+          "channels": 1,
+          "sample_rate": 48000,
+          "encoded_bytes": 25540,
+          "codec": "RADP",
+          "encoded_sha256": "44d7a2f0a760a12730a4e03273190ab7ada68e0524dfffccfc6549833d63d9d2"
+        },
+        {
+          "source": "infected2.p3d",
+          "offset": 1578699,
+          "name": "infected2_vox_swipe_27",
+          "alias": "infected2_vox_swipe_27",
+          "channels": 1,
+          "sample_rate": 48000,
+          "encoded_bytes": 28480,
+          "codec": "RADP",
+          "encoded_sha256": "2e0e0ff288afc1070579b70d7334efb315262d243a397ca940e704c9e6fb4b07"
+        },
+        {
+          "source": "infected2.p3d",
+          "offset": 1607300,
+          "name": "infected2_vox_swipe_28",
+          "alias": "infected2_vox_swipe_28",
+          "channels": 1,
+          "sample_rate": 48000,
+          "encoded_bytes": 22960,
+          "codec": "RADP",
+          "encoded_sha256": "e07c7a3fae49f8db9cc911702c801243b2b80a4ead163a67f772bcfa0010883a"
+        }
+      ]
+    },
+    {
+      "fig": {
+        "source": "comparison/infected2_all_fig.p3d.rz",
+        "offset": 15348,
+        "payload": 15360,
+        "length": 72,
+        "type": "Sound",
+        "kind": "TrackHash",
+        "owner": "infected2/opening/surface/ground/attacks/jump_attack/jump_attack/pose/exit/land",
+        "fields": {
+          "Unknown1": 1,
+          "TimeBegin": 0,
+          "Patch": {
+            "hash": "13962983156446612451",
+            "name": "#c1c67b33a4c34be3"
+          },
+          "Trigger": {
+            "hash": "31616665440155042",
+            "name": "play"
+          },
+          "VolumeFactor": 0.6869000196456909,
+          "MinDistance": 0,
+          "MaxDistance": 0,
+          "MinPitch": 1,
+          "MaxPitch": 1,
+          "CyclicPhase": 0,
+          "InstanceName": {
+            "hash": "0",
+            "name": "#0"
+          },
+          "Frequency": 1,
+          "PolledLifetime": false,
+          "TriggerType": {
+            "hash": "13522664087197083521",
+            "name": "Retrigger"
+          }
+        },
+        "schema": "SoundTrack",
+        "end": 15440
+      },
+      "patch": {
+        "source": "infected2.p3d",
+        "offset": 1851715,
+        "name": "infected2_vox_swipe",
+        "hash": "13962983156446612451",
+        "loop": false,
+        "files": [
+          "infected2_vox_swipe_09",
+          "infected2_vox_swipe_08",
+          "infected2_vox_swipe_04",
+          "infected2_vox_swipe_02",
+          "infected2_vox_swipe_29",
+          "infected2_vox_swipe_20",
+          "infected2_vox_swipe_22",
+          "infected2_vox_swipe_23",
+          "infected2_vox_swipe_24",
+          "infected2_vox_swipe_25",
+          "infected2_vox_swipe_26",
+          "infected2_vox_swipe_27",
+          "infected2_vox_swipe_28"
+        ]
+      },
+      "audio_files": [
+        {
+          "source": "infected2.p3d",
+          "offset": 1411192,
+          "name": "infected2_vox_swipe_09",
+          "alias": "infected2_vox_swipe_09",
+          "channels": 1,
+          "sample_rate": 48000,
+          "encoded_bytes": 10360,
+          "codec": "RADP",
+          "encoded_sha256": "9a800a94e32c238e41f9c7492ee0d3875bd3aac8b1ea90dc79e10187c613adea"
+        },
+        {
+          "source": "infected2.p3d",
+          "offset": 1395711,
+          "name": "infected2_vox_swipe_08",
+          "alias": "infected2_vox_swipe_08",
+          "channels": 1,
+          "sample_rate": 48000,
+          "encoded_bytes": 15360,
+          "codec": "RADP",
+          "encoded_sha256": "4832842e8898f83bcee0ad137d1f13f5b56b53315d2d364251f50a0633ea4635"
+        },
+        {
+          "source": "infected2.p3d",
+          "offset": 1375270,
+          "name": "infected2_vox_swipe_04",
+          "alias": "infected2_vox_swipe_04",
+          "channels": 1,
+          "sample_rate": 48000,
+          "encoded_bytes": 20320,
+          "codec": "RADP",
+          "encoded_sha256": "bb49b38f37c5fd367fd5db6acfff0dfaadbc7f8512fe4380362d6929dd8c4a55"
+        },
+        {
+          "source": "infected2.p3d",
+          "offset": 1358369,
+          "name": "infected2_vox_swipe_02",
+          "alias": "infected2_vox_swipe_02",
+          "channels": 1,
+          "sample_rate": 48000,
+          "encoded_bytes": 16780,
+          "codec": "RADP",
+          "encoded_sha256": "2aa13299610a43c3f128eeeb5f83d7218c19d825518757ba24c5449aac7367af"
+        },
+        {
+          "source": "infected2.p3d",
+          "offset": 1630381,
+          "name": "infected2_vox_swipe_29",
+          "alias": "infected2_vox_swipe_29",
+          "channels": 1,
+          "sample_rate": 48000,
+          "encoded_bytes": 22360,
+          "codec": "RADP",
+          "encoded_sha256": "0132943eab2676d6109e7ab90341f3bf940d612122397bd97a2efdc46f711bf3"
+        },
+        {
+          "source": "infected2.p3d",
+          "offset": 1421673,
+          "name": "infected2_vox_swipe_20",
+          "alias": "infected2_vox_swipe_20",
+          "channels": 1,
+          "sample_rate": 48000,
+          "encoded_bytes": 22540,
+          "codec": "RADP",
+          "encoded_sha256": "cb029bb203f5fa52fab43c20d177c99cdaa92018d759b4c46a0ba5689849321c"
+        },
+        {
+          "source": "infected2.p3d",
+          "offset": 1444334,
+          "name": "infected2_vox_swipe_22",
+          "alias": "infected2_vox_swipe_22",
+          "channels": 1,
+          "sample_rate": 48000,
+          "encoded_bytes": 19280,
+          "codec": "RADP",
+          "encoded_sha256": "509cee3a9b6f68e5a43650df17a8ab5024d2e108c31f5c1d7a83f8a078d01472"
+        },
+        {
+          "source": "infected2.p3d",
+          "offset": 1463735,
+          "name": "infected2_vox_swipe_23",
+          "alias": "infected2_vox_swipe_23",
+          "channels": 1,
+          "sample_rate": 48000,
+          "encoded_bytes": 27100,
+          "codec": "RADP",
+          "encoded_sha256": "8ab4591f24d406eb662acc50a85803dc56b40aa09fc5ba3b0a6b63ce3433f0bf"
+        },
+        {
+          "source": "infected2.p3d",
+          "offset": 1490956,
+          "name": "infected2_vox_swipe_24",
+          "alias": "infected2_vox_swipe_24",
+          "channels": 1,
+          "sample_rate": 48000,
+          "encoded_bytes": 26180,
+          "codec": "RADP",
+          "encoded_sha256": "515b9032e915f6fd3b780ea74f285f239fab166889b339aed927ad694d8a9452"
+        },
+        {
+          "source": "infected2.p3d",
+          "offset": 1517257,
+          "name": "infected2_vox_swipe_25",
+          "alias": "infected2_vox_swipe_25",
+          "channels": 1,
+          "sample_rate": 48000,
+          "encoded_bytes": 35660,
+          "codec": "RADP",
+          "encoded_sha256": "eb90b5a5772c8310721e4b27478b1d3f0e32126f7fa1af5b1f9833cc5005e6f8"
+        },
+        {
+          "source": "infected2.p3d",
+          "offset": 1553038,
+          "name": "infected2_vox_swipe_26",
+          "alias": "infected2_vox_swipe_26",
+          "channels": 1,
+          "sample_rate": 48000,
+          "encoded_bytes": 25540,
+          "codec": "RADP",
+          "encoded_sha256": "44d7a2f0a760a12730a4e03273190ab7ada68e0524dfffccfc6549833d63d9d2"
+        },
+        {
+          "source": "infected2.p3d",
+          "offset": 1578699,
+          "name": "infected2_vox_swipe_27",
+          "alias": "infected2_vox_swipe_27",
+          "channels": 1,
+          "sample_rate": 48000,
+          "encoded_bytes": 28480,
+          "codec": "RADP",
+          "encoded_sha256": "2e0e0ff288afc1070579b70d7334efb315262d243a397ca940e704c9e6fb4b07"
+        },
+        {
+          "source": "infected2.p3d",
+          "offset": 1607300,
+          "name": "infected2_vox_swipe_28",
+          "alias": "infected2_vox_swipe_28",
+          "channels": 1,
+          "sample_rate": 48000,
+          "encoded_bytes": 22960,
+          "codec": "RADP",
+          "encoded_sha256": "e07c7a3fae49f8db9cc911702c801243b2b80a4ead163a67f772bcfa0010883a"
+        }
+      ]
+    },
+    {
+      "fig": {
+        "source": "comparison/infected2_all_fig.p3d.rz",
+        "offset": 15440,
+        "payload": 15452,
+        "length": 72,
+        "type": "Sound",
+        "kind": "TrackHash",
+        "owner": "infected2/opening/surface/ground/attacks/jump_attack/jump_attack/pose/exit/land",
+        "fields": {
+          "Unknown1": 1,
+          "TimeBegin": 0,
+          "Patch": {
+            "hash": "3112717416506301520",
+            "name": "#2b3297ff99079c50"
+          },
+          "Trigger": {
+            "hash": "31616665440155042",
+            "name": "play"
+          },
+          "VolumeFactor": 0.6869000196456909,
+          "MinDistance": 0,
+          "MaxDistance": 0,
+          "MinPitch": 1,
+          "MaxPitch": 1,
+          "CyclicPhase": 0,
+          "InstanceName": {
+            "hash": "0",
+            "name": "#0"
+          },
+          "Frequency": 1,
+          "PolledLifetime": false,
+          "TriggerType": {
+            "hash": "13522664087197083521",
+            "name": "Retrigger"
+          }
+        },
+        "schema": "SoundTrack",
+        "end": 15532
+      },
+      "patch": {
+        "source": "infected2.p3d",
+        "offset": 1848935,
+        "name": "infected2_stepland",
+        "hash": "3112717416506301520",
+        "loop": false,
+        "files": [
+          "leader_hunter_foot_04",
+          "leader_hunter_foot_03",
+          "leader_hunter_foot_02",
+          "leader_hunter_foot_01"
+        ]
+      },
+      "audio_files": [
+        {
+          "source": "infected2.p3d",
+          "offset": 1828306,
+          "name": "leader_hunter_foot_04",
+          "alias": "leader_hunter_foot_04",
+          "channels": 1,
+          "sample_rate": 48000,
+          "encoded_bytes": 14800,
+          "codec": "RADP",
+          "encoded_sha256": "6fb912c5bd55b6b62f9f08488893e62b24b2f726e3487b642fadd348b12ad940"
+        },
+        {
+          "source": "infected2.p3d",
+          "offset": 1815127,
+          "name": "leader_hunter_foot_03",
+          "alias": "leader_hunter_foot_03",
+          "channels": 1,
+          "sample_rate": 48000,
+          "encoded_bytes": 13060,
+          "codec": "RADP",
+          "encoded_sha256": "313c32efa7a7a892868f0bee9b9a9030091204427361b287a089b5e801806127"
+        },
+        {
+          "source": "infected2.p3d",
+          "offset": 1790808,
+          "name": "leader_hunter_foot_02",
+          "alias": "leader_hunter_foot_02",
+          "channels": 1,
+          "sample_rate": 48000,
+          "encoded_bytes": 24200,
+          "codec": "RADP",
+          "encoded_sha256": "5c9c88a4e2c83e26470de30900bab91e8765c375098409c6d71eb68c01009839"
+        },
+        {
+          "source": "infected2.p3d",
+          "offset": 1774389,
+          "name": "leader_hunter_foot_01",
+          "alias": "leader_hunter_foot_01",
+          "channels": 1,
+          "sample_rate": 48000,
+          "encoded_bytes": 16300,
+          "codec": "RADP",
+          "encoded_sha256": "ed75615f58af1f53e6f1a1d47dea8f4f6829a772d72fba5babb685905d75f7b0"
+        }
+      ]
+    },
+    {
+      "fig": {
+        "source": "comparison/Brawler_fig.p3d.rz",
+        "offset": 54520,
+        "payload": 54532,
+        "length": 72,
+        "type": "Sound",
+        "kind": "TrackHash",
+        "owner": "brawler_hunter/counter/#305862057bcb8db8/#305862057bcb8db8/start",
+        "fields": {
+          "Unknown1": 1,
+          "TimeBegin": 0,
+          "Patch": {
+            "hash": "17183418460636763670",
+            "name": "#ee77c40c5d24d616"
+          },
+          "Trigger": {
+            "hash": "31616665440155042",
+            "name": "play"
+          },
+          "VolumeFactor": 1,
+          "MinDistance": 0,
+          "MaxDistance": 0,
+          "MinPitch": 1,
+          "MaxPitch": 1,
+          "CyclicPhase": 0,
+          "InstanceName": {
+            "hash": "0",
+            "name": "#0"
+          },
+          "Frequency": 1,
+          "PolledLifetime": false,
+          "TriggerType": {
+            "hash": "13522664087197083521",
+            "name": "Retrigger"
+          }
+        },
+        "schema": "SoundTrack",
+        "end": 54612
+      },
+      "patch": {
+        "source": "brawler.p3d",
+        "offset": 2690129,
+        "name": "brawler_grunt",
+        "hash": "17183418460636763670",
+        "loop": false,
+        "files": [
+          "brawler_grunt_14",
+          "brawler_grunt_15",
+          "brawler_grunt_16",
+          "brawler_grunt_17",
+          "brawler_grunt_18"
+        ]
+      },
+      "audio_files": [
+        {
+          "source": "brawler.p3d",
+          "offset": 999909,
+          "name": "brawler_grunt_14",
+          "alias": "brawler_grunt_14",
+          "channels": 1,
+          "sample_rate": 48000,
+          "encoded_bytes": 24620,
+          "codec": "RADP",
+          "encoded_sha256": "ff9bcfd6a24ef9d93328c08fb07b4b919718334d852f89dd691727b953c26e9c"
+        },
+        {
+          "source": "brawler.p3d",
+          "offset": 1024638,
+          "name": "brawler_grunt_15",
+          "alias": "brawler_grunt_15",
+          "channels": 1,
+          "sample_rate": 48000,
+          "encoded_bytes": 25000,
+          "codec": "RADP",
+          "encoded_sha256": "22cb877b53862aed4fb6249006b871f357fa953b476e1acf73c2e39ffc346b14"
+        },
+        {
+          "source": "brawler.p3d",
+          "offset": 1049747,
+          "name": "brawler_grunt_16",
+          "alias": "brawler_grunt_16",
+          "channels": 1,
+          "sample_rate": 48000,
+          "encoded_bytes": 31140,
+          "codec": "RADP",
+          "encoded_sha256": "1970f2637905a44c26148116bb63bf8fd65a67286f9abdd02a0608f01d6a6d27"
+        },
+        {
+          "source": "brawler.p3d",
+          "offset": 1080996,
+          "name": "brawler_grunt_17",
+          "alias": "brawler_grunt_17",
+          "channels": 1,
+          "sample_rate": 48000,
+          "encoded_bytes": 26260,
+          "codec": "RADP",
+          "encoded_sha256": "a3f700a4ea5a09ed52834811116544150184624d44059fd511c41a1b10d8c9e9"
+        },
+        {
+          "source": "brawler.p3d",
+          "offset": 1107365,
+          "name": "brawler_grunt_18",
+          "alias": "brawler_grunt_18",
+          "channels": 1,
+          "sample_rate": 48000,
+          "encoded_bytes": 23540,
+          "codec": "RADP",
+          "encoded_sha256": "046b7250560865f24545695c8a2f6ca96eccd853f70f433d3e5ee620a14c8d4e"
+        }
+      ]
+    },
+    {
+      "fig": {
+        "source": "comparison/Brawler_fig.p3d.rz",
+        "offset": 56924,
+        "payload": 56936,
+        "length": 72,
+        "type": "Sound",
+        "kind": "TrackHash",
+        "owner": "brawler_hunter/counter/#305862057bcb8db8/#305862057bcb8db8/start/release",
+        "fields": {
+          "Unknown1": 1,
+          "TimeBegin": 0,
+          "Patch": {
+            "hash": "13738982269077750815",
+            "name": "#beaaab94dbc5041f"
+          },
+          "Trigger": {
+            "hash": "31616665440155042",
+            "name": "play"
+          },
+          "VolumeFactor": 1,
+          "MinDistance": 0,
+          "MaxDistance": 0,
+          "MinPitch": 1,
+          "MaxPitch": 1,
+          "CyclicPhase": 0,
+          "InstanceName": {
+            "hash": "0",
+            "name": "#0"
+          },
+          "Frequency": 1,
+          "PolledLifetime": false,
+          "TriggerType": {
+            "hash": "6266415434618234495",
+            "name": "StopExisting"
+          }
+        },
+        "schema": "SoundTrack",
+        "end": 57016
+      },
+      "patch": {
+        "source": "brawler.p3d",
+        "offset": 2701571,
+        "name": "brawler_swipe_whoosh",
+        "hash": "13738982269077750815",
+        "loop": false,
+        "files": [
+          "hammer_whoosh_02"
+        ]
+      },
+      "audio_files": [
+        {
+          "source": "brawler.p3d",
+          "offset": 2531956,
+          "name": "hammer_whoosh_02",
+          "alias": "hammer_whoosh_02",
+          "channels": 1,
+          "sample_rate": 48000,
+          "encoded_bytes": 11760,
+          "codec": "RADP",
+          "encoded_sha256": "5a7d9ffea019a1f3937e3bda9d7e4bd5c6d74a808485d2782fc2de351f27174b"
+        }
+      ]
+    },
+    {
+      "fig": {
+        "source": "comparison/Brawler_fig.p3d.rz",
+        "offset": 57016,
+        "payload": 57028,
+        "length": 72,
+        "type": "Sound",
+        "kind": "TrackHash",
+        "owner": "brawler_hunter/counter/#305862057bcb8db8/#305862057bcb8db8/start/release",
+        "fields": {
+          "Unknown1": 1,
+          "TimeBegin": 1,
+          "Patch": {
+            "hash": "13738982269077750815",
+            "name": "#beaaab94dbc5041f"
+          },
+          "Trigger": {
+            "hash": "31616665440155042",
+            "name": "play"
+          },
+          "VolumeFactor": 1,
+          "MinDistance": 0,
+          "MaxDistance": 0,
+          "MinPitch": 1,
+          "MaxPitch": 1,
+          "CyclicPhase": 0,
+          "InstanceName": {
+            "hash": "0",
+            "name": "#0"
+          },
+          "Frequency": 1,
+          "PolledLifetime": false,
+          "TriggerType": {
+            "hash": "6266415434618234495",
+            "name": "StopExisting"
+          }
+        },
+        "schema": "SoundTrack",
+        "end": 57108
+      },
+      "patch": {
+        "source": "brawler.p3d",
+        "offset": 2701571,
+        "name": "brawler_swipe_whoosh",
+        "hash": "13738982269077750815",
+        "loop": false,
+        "files": [
+          "hammer_whoosh_02"
+        ]
+      },
+      "audio_files": [
+        {
+          "source": "brawler.p3d",
+          "offset": 2531956,
+          "name": "hammer_whoosh_02",
+          "alias": "hammer_whoosh_02",
+          "channels": 1,
+          "sample_rate": 48000,
+          "encoded_bytes": 11760,
+          "codec": "RADP",
+          "encoded_sha256": "5a7d9ffea019a1f3937e3bda9d7e4bd5c6d74a808485d2782fc2de351f27174b"
+        }
+      ]
+    },
+    {
+      "fig": {
+        "source": "comparison/Brawler_fig.p3d.rz",
+        "offset": 57108,
+        "payload": 57120,
+        "length": 72,
+        "type": "Sound",
+        "kind": "TrackHash",
+        "owner": "brawler_hunter/counter/#305862057bcb8db8/#305862057bcb8db8/start/release",
+        "fields": {
+          "Unknown1": 1,
+          "TimeBegin": 1.6666699647903442,
+          "Patch": {
+            "hash": "6407730905863615973",
+            "name": "#58ecd54f2c4af5e5"
+          },
+          "Trigger": {
+            "hash": "31616665440155042",
+            "name": "play"
+          },
+          "VolumeFactor": 3,
+          "MinDistance": 0,
+          "MaxDistance": 0,
+          "MinPitch": 0.5,
+          "MaxPitch": 1,
+          "CyclicPhase": 0,
+          "InstanceName": {
+            "hash": "0",
+            "name": "#0"
+          },
+          "Frequency": 1,
+          "PolledLifetime": false,
+          "TriggerType": {
+            "hash": "6266415434618234495",
+            "name": "StopExisting"
+          }
+        },
+        "schema": "SoundTrack",
+        "end": 57200
+      },
+      "patch": {
+        "source": "brawler.p3d",
+        "offset": 2700617,
+        "name": "brawler_short_roar",
+        "hash": "6407730905863615973",
+        "loop": false,
+        "files": [
+          "brawler_short_roar_01",
+          "brawler_short_roar_02",
+          "brawler_short_roar_03",
+          "brawler_short_roar_04",
+          "brawler_short_roar_05",
+          "brawler_short_roar_06",
+          "brawler_short_roar_07"
+        ]
+      },
+      "audio_files": [
+        {
+          "source": "brawler.p3d",
+          "offset": 2341243,
+          "name": "brawler_short_roar_01",
+          "alias": "brawler_short_roar_01",
+          "channels": 1,
+          "sample_rate": 48000,
+          "encoded_bytes": 28360,
+          "codec": "RADP",
+          "encoded_sha256": "a7b9e1145540f3b968bbee88edef6862d34623dbceb61e8b6dfe81214770fc10"
+        },
+        {
+          "source": "brawler.p3d",
+          "offset": 2369722,
+          "name": "brawler_short_roar_02",
+          "alias": "brawler_short_roar_02",
+          "channels": 1,
+          "sample_rate": 48000,
+          "encoded_bytes": 25100,
+          "codec": "RADP",
+          "encoded_sha256": "fc7952aef270ba6867b5fe848c983cccc091a5e0d5afabd9692293458837eeaa"
+        },
+        {
+          "source": "brawler.p3d",
+          "offset": 2394941,
+          "name": "brawler_short_roar_03",
+          "alias": "brawler_short_roar_03",
+          "channels": 1,
+          "sample_rate": 48000,
+          "encoded_bytes": 24860,
+          "codec": "RADP",
+          "encoded_sha256": "4a980f3a7427d0e831a53ec621f8529c3de734500402fb1fef1599e6b718b274"
+        },
+        {
+          "source": "brawler.p3d",
+          "offset": 2419920,
+          "name": "brawler_short_roar_04",
+          "alias": "brawler_short_roar_04",
+          "channels": 1,
+          "sample_rate": 48000,
+          "encoded_bytes": 31800,
+          "codec": "RADP",
+          "encoded_sha256": "f1c70b93e14b2e1c46948c7fd94f5d82e8d9385ebb4a31a231dcab65049a18be"
+        },
+        {
+          "source": "brawler.p3d",
+          "offset": 2451839,
+          "name": "brawler_short_roar_05",
+          "alias": "brawler_short_roar_05",
+          "channels": 1,
+          "sample_rate": 48000,
+          "encoded_bytes": 27980,
+          "codec": "RADP",
+          "encoded_sha256": "a52a6feeb9ee6728880d3d1c31225fd683ef3711a94168687138db861faf8096"
+        },
+        {
+          "source": "brawler.p3d",
+          "offset": 2479938,
+          "name": "brawler_short_roar_06",
+          "alias": "brawler_short_roar_06",
+          "channels": 1,
+          "sample_rate": 48000,
+          "encoded_bytes": 24980,
+          "codec": "RADP",
+          "encoded_sha256": "301c1221007dba40b7c9aa96207f0d8f363d2d8cb003d4e796bc2811cf31fb07"
+        },
+        {
+          "source": "brawler.p3d",
+          "offset": 2505037,
+          "name": "brawler_short_roar_07",
+          "alias": "brawler_short_roar_07",
+          "channels": 1,
+          "sample_rate": 48000,
+          "encoded_bytes": 26800,
+          "codec": "RADP",
+          "encoded_sha256": "34280c7dbc11f710df3de5d7ab36e09f5a435c8cf9550fd334f21f26ba03af6a"
+        }
+      ]
+    },
+    {
+      "fig": {
+        "source": "startup_fig.p3d.rz",
+        "offset": 878688,
+        "payload": 878700,
+        "length": 72,
+        "type": "Sound",
+        "kind": "TrackHash",
+        "owner": "hitreaction/common/human/on_ground/on_ground_n/dead/character/infected1/#9f3dced6761b27d8",
+        "fields": {
+          "Unknown1": 1,
+          "TimeBegin": 0,
+          "Patch": {
+            "hash": "38854052711691921",
+            "name": "#8a098e19f6f691"
+          },
+          "Trigger": {
+            "hash": "31616665440155042",
+            "name": "play"
+          },
+          "VolumeFactor": 1,
+          "MinDistance": 0,
+          "MaxDistance": 0,
+          "MinPitch": 1,
+          "MaxPitch": 1,
+          "CyclicPhase": 0,
+          "InstanceName": {
+            "hash": "0",
+            "name": "#0"
+          },
+          "Frequency": 1,
+          "PolledLifetime": false,
+          "TriggerType": {
+            "hash": "13522664087197083521",
+            "name": "Retrigger"
+          }
+        },
+        "schema": "SoundTrack",
+        "end": 878780
+      },
+      "patch": {
+        "source": "infected.p3d",
+        "offset": 1852268,
+        "name": "infected1_death_cough",
+        "hash": "38854052711691921",
+        "loop": false,
+        "files": [
+          "infected_death_cough_01",
+          "infected_death_cough_02",
+          "infected_death_cough_03"
+        ]
+      },
+      "audio_files": [
+        {
+          "source": "infected.p3d",
+          "offset": 1385719,
+          "name": "infected_death_cough_01",
+          "alias": "infected_death_cough_01",
+          "channels": 1,
+          "sample_rate": 48000,
+          "encoded_bytes": 15540,
+          "codec": "RADP",
+          "encoded_sha256": "d843f63773e7a89f79a2e8ab5a8e25e2e813538f07886a96ffa75e53b7f59ef3"
+        },
+        {
+          "source": "infected.p3d",
+          "offset": 1401382,
+          "name": "infected_death_cough_02",
+          "alias": "infected_death_cough_02",
+          "channels": 1,
+          "sample_rate": 48000,
+          "encoded_bytes": 80300,
+          "codec": "RADP",
+          "encoded_sha256": "483c868f91b0b5ec67a7582d4b6a9610602e6f253aa016008f5205b7e90d5dc0"
+        },
+        {
+          "source": "infected.p3d",
+          "offset": 1481805,
+          "name": "infected_death_cough_03",
+          "alias": "infected_death_cough_03",
+          "channels": 1,
+          "sample_rate": 48000,
+          "encoded_bytes": 48360,
+          "codec": "RADP",
+          "encoded_sha256": "87b39beb37f59e9e944b68d1fe782a94a346082714f5860ae9ff5ebee2b1ff97"
+        }
+      ]
+    },
+    {
+      "fig": {
+        "source": "startup_fig.p3d.rz",
+        "offset": 947992,
+        "payload": 948004,
+        "length": 72,
+        "type": "Sound",
+        "kind": "TrackHash",
+        "owner": "hitreaction/common/hunter/standing_hit/light/default/pose/specific/blades/#8401826849a6ae69",
+        "fields": {
+          "Unknown1": 1,
+          "TimeBegin": 0,
+          "Patch": {
+            "hash": "17183418460636763670",
+            "name": "#ee77c40c5d24d616"
+          },
+          "Trigger": {
+            "hash": "31616665440155042",
+            "name": "play"
+          },
+          "VolumeFactor": 1,
+          "MinDistance": 0,
+          "MaxDistance": 0,
+          "MinPitch": 1,
+          "MaxPitch": 1,
+          "CyclicPhase": 0,
+          "InstanceName": {
+            "hash": "0",
+            "name": "#0"
+          },
+          "Frequency": 0.5184999704360962,
+          "PolledLifetime": false,
+          "TriggerType": {
+            "hash": "13522664087197083521",
+            "name": "Retrigger"
+          }
+        },
+        "schema": "SoundTrack",
+        "end": 948084
+      },
+      "patch": {
+        "source": "brawler.p3d",
+        "offset": 2690129,
+        "name": "brawler_grunt",
+        "hash": "17183418460636763670",
+        "loop": false,
+        "files": [
+          "brawler_grunt_14",
+          "brawler_grunt_15",
+          "brawler_grunt_16",
+          "brawler_grunt_17",
+          "brawler_grunt_18"
+        ]
+      },
+      "audio_files": [
+        {
+          "source": "brawler.p3d",
+          "offset": 999909,
+          "name": "brawler_grunt_14",
+          "alias": "brawler_grunt_14",
+          "channels": 1,
+          "sample_rate": 48000,
+          "encoded_bytes": 24620,
+          "codec": "RADP",
+          "encoded_sha256": "ff9bcfd6a24ef9d93328c08fb07b4b919718334d852f89dd691727b953c26e9c"
+        },
+        {
+          "source": "brawler.p3d",
+          "offset": 1024638,
+          "name": "brawler_grunt_15",
+          "alias": "brawler_grunt_15",
+          "channels": 1,
+          "sample_rate": 48000,
+          "encoded_bytes": 25000,
+          "codec": "RADP",
+          "encoded_sha256": "22cb877b53862aed4fb6249006b871f357fa953b476e1acf73c2e39ffc346b14"
+        },
+        {
+          "source": "brawler.p3d",
+          "offset": 1049747,
+          "name": "brawler_grunt_16",
+          "alias": "brawler_grunt_16",
+          "channels": 1,
+          "sample_rate": 48000,
+          "encoded_bytes": 31140,
+          "codec": "RADP",
+          "encoded_sha256": "1970f2637905a44c26148116bb63bf8fd65a67286f9abdd02a0608f01d6a6d27"
+        },
+        {
+          "source": "brawler.p3d",
+          "offset": 1080996,
+          "name": "brawler_grunt_17",
+          "alias": "brawler_grunt_17",
+          "channels": 1,
+          "sample_rate": 48000,
+          "encoded_bytes": 26260,
+          "codec": "RADP",
+          "encoded_sha256": "a3f700a4ea5a09ed52834811116544150184624d44059fd511c41a1b10d8c9e9"
+        },
+        {
+          "source": "brawler.p3d",
+          "offset": 1107365,
+          "name": "brawler_grunt_18",
+          "alias": "brawler_grunt_18",
+          "channels": 1,
+          "sample_rate": 48000,
+          "encoded_bytes": 23540,
+          "codec": "RADP",
+          "encoded_sha256": "046b7250560865f24545695c8a2f6ca96eccd853f70f433d3e5ee620a14c8d4e"
+        }
+      ]
+    },
+    {
+      "fig": {
+        "source": "startup_fig.p3d.rz",
+        "offset": 1002028,
+        "payload": 1002040,
+        "length": 72,
+        "type": "Sound",
+        "kind": "TrackHash",
+        "owner": "hitreaction/common/hunter/death/death_n/pose/default",
+        "fields": {
+          "Unknown1": 1,
+          "TimeBegin": 0,
+          "Patch": {
+            "hash": "16928256001269653962",
+            "name": "#eaed3f24b68d61ca"
+          },
+          "Trigger": {
+            "hash": "31616665440155042",
+            "name": "play"
+          },
+          "VolumeFactor": 1,
+          "MinDistance": 45,
+          "MaxDistance": 100,
+          "MinPitch": 1,
+          "MaxPitch": 1,
+          "CyclicPhase": 0,
+          "InstanceName": {
+            "hash": "0",
+            "name": "#0"
+          },
+          "Frequency": 1,
+          "PolledLifetime": false,
+          "TriggerType": {
+            "hash": "6266415434618234495",
+            "name": "StopExisting"
+          }
+        },
+        "schema": "SoundTrack",
+        "end": 1002120
+      },
+      "patch": {
+        "source": "brawler.p3d",
+        "offset": 2687469,
+        "name": "brawler_death",
+        "hash": "16928256001269653962",
+        "loop": false,
+        "files": [
+          "brawler_death_03",
+          "brawler_death_02",
+          "brawler_death_01",
+          "brawler_death_04",
+          "brawler_death_05",
+          "brawler_death_06"
+        ]
+      },
+      "audio_files": [
+        {
+          "source": "brawler.p3d",
+          "offset": 687113,
+          "name": "brawler_death_03",
+          "alias": "brawler_death_03",
+          "channels": 1,
+          "sample_rate": 48000,
+          "encoded_bytes": 76420,
+          "codec": "RADP",
+          "encoded_sha256": "44b4130c2d3c72df3fffbd9977bc9ab0763441b1a34d53dcae044c79189ae5db"
+        },
+        {
+          "source": "brawler.p3d",
+          "offset": 577064,
+          "name": "brawler_death_02",
+          "alias": "brawler_death_02",
+          "channels": 1,
+          "sample_rate": 48000,
+          "encoded_bytes": 109940,
+          "codec": "RADP",
+          "encoded_sha256": "552a1ccb3a4ffef846a6aaea8522a7607b602e752fa477ed5dd606d8927241b3"
+        },
+        {
+          "source": "brawler.p3d",
+          "offset": 481455,
+          "name": "brawler_death_01",
+          "alias": "brawler_death_01",
+          "channels": 1,
+          "sample_rate": 48000,
+          "encoded_bytes": 95500,
+          "codec": "RADP",
+          "encoded_sha256": "96a175dc7cc43571fe010e582bd862f61c2caef1d8c0d4b0b491c58913ee657a"
+        },
+        {
+          "source": "brawler.p3d",
+          "offset": 763642,
+          "name": "brawler_death_04",
+          "alias": "brawler_death_04",
+          "channels": 1,
+          "sample_rate": 48000,
+          "encoded_bytes": 71760,
+          "codec": "RADP",
+          "encoded_sha256": "522b85a95012cb711065b0ad921e5294fd75b8af0e176115dab910519e223d50"
+        },
+        {
+          "source": "brawler.p3d",
+          "offset": 835511,
+          "name": "brawler_death_05",
+          "alias": "brawler_death_05",
+          "channels": 1,
+          "sample_rate": 48000,
+          "encoded_bytes": 66700,
+          "codec": "RADP",
+          "encoded_sha256": "0e7439291100a47a407a12e11d809d264985e27958212099a8fff62514b07672"
+        },
+        {
+          "source": "brawler.p3d",
+          "offset": 902320,
+          "name": "brawler_death_06",
+          "alias": "brawler_death_06",
+          "channels": 1,
+          "sample_rate": 48000,
+          "encoded_bytes": 97480,
+          "codec": "RADP",
+          "encoded_sha256": "aa3ac6c44dc27b592b1f6f65aea453a71864743a50d99003ea023278edc64d16"
+        }
+      ]
+    }
+  ],
+  "runtime_mapping": [
+    {
+      "state": "Hunter COUNTER entry",
+      "fig_offset": 54520,
+      "cue": "infection.hunter_grunt",
+      "tick": 0
+    },
+    {
+      "state": "Hunter release entry",
+      "fig_offset": 56924,
+      "cue": "infection.hunter_whoosh",
+      "tick": 8,
+      "note": "existing composed barrage clock starts at tick 8; entry emitted exactly once at live transition"
+    },
+    {
+      "state": "Hunter release +1 second",
+      "fig_offset": 57016,
+      "cue": "infection.hunter_whoosh",
+      "tick": 28
+    },
+    {
+      "state": "Hunter release +1.66667 seconds",
+      "fig_offset": 57108,
+      "cue": "infection.hunter_roar",
+      "tick": 42,
+      "source_gain": 3,
+      "source_pitch": [
+        0.5,
+        1
+      ]
+    },
+    {
+      "state": "Hunter accepted hurt",
+      "fig_offset": 947992,
+      "cue": "infection.hunter_hurt",
+      "note": "Shared original brawler_grunt Patch role; vanilla accepted-hurt/death timing retained, not a full native random hit-reaction bank port"
+    },
+    {
+      "state": "Hunter death",
+      "fig_offset": 1002028,
+      "cue": "infection.hunter_death"
+    },
+    {
+      "state": "Common successful leap release",
+      "fig_offset": 13416,
+      "cue": "infection.common_attack",
+      "note": "only after actual launch geometry succeeds"
+    },
+    {
+      "state": "Common first landed entry",
+      "fig_offset": 15348,
+      "cue": "infection.common_attack",
+      "source_gain": 0.6869
+    },
+    {
+      "state": "Common first landed entry foot sound",
+      "fig_offset": 15440,
+      "cue": "infection.common_land",
+      "source_gain": 0.6869
+    },
+    {
+      "state": "Common death",
+      "fig_offset": 878688,
+      "cue": "infection.common_death"
+    }
+  ],
+  "deduplication_and_control": [
+    "Counter entry consumes tick 0 immediately; subsequent ticks start from previous age 0. Release transition consumes tick 8 and returns, so the next entity tick cannot replay the entry.",
+    "Counter/barrage no longer emit the legacy tension/ravager attack pair or per-damage-window whooshes. Sound timing is independent of whether the attack hits; existing accepted-contact tissue sounds remain tied to accepted damage.",
+    "Live entity availability/target/consume/stun/NoAI guards precede timeline evaluation; there are no scheduled future playback tasks. Canceling the action stops future tracks, while an already playing non-polled one-shot may finish naturally.",
+    "Common leap sound is emitted only on launched false->true and LEAP_LANDED unset->set. Failed geometry and airborne repeats are silent. Existing landing-state return prevents repeated landing sounds.",
+    "Vocal, motion, contact and landing groups are separate so a voice does not suppress its simultaneous body/foot sound; existing actor and area budgets remain."
+  ],
+  "waveform_boundary": {
+    "original_waveforms_packaged": false,
+    "original_audio_played": false,
+    "actual_audio_manifest": "art/creature-audio/authored-voice-fallbacks-20261117.json",
+    "authored_files": 15,
+    "total_bytes": 173438,
+    "license": "src/main/resources/META-INF/licenses/blacklight-audio/CREATURE-VOICES.txt; art/creature-audio/README.md; art/weapon-audio/README.md; art/weapon-audio/Socapex-LICENSES.txt",
+    "note": "Original Patch/file identities are proven metadata. Packaged voices are clearly labeled Socapex Foley adaptations, not the original timbre. Audio was converted to finite mono OGG only, never played."
+  },
+  "adaptations_and_remaining": [
+    "Source seconds are sampled on existing MC 20 Hz composed clips; fractional late roar occurs at first tick after 1.66667 seconds (34 release ticks).",
+    "Original spatial min/max and native bus/group/StopExisting channel replacement are not reproduced. Finite mono fallbacks and the existing MC 24-block attenuation/area budget are used. The two release whooshes are shorter than their one-second spacing.",
+    "Hunter accepted-hurt event retains vanilla accepted-hit timing rather than the original randomly selected hit-reaction tree (selected source branch Frequency=0.5185).",
+    "Common creature is an existing authored MC civilian whose leap adapts infected2. Generic death event maps the documented infected1 death-cough role; this does not claim an identical native death animation.",
+    "Other Hunter moves still use their earlier authored timing and ravager start layer. Common close attacks, ambient and hurt, stalker/spitter/brute, host and hive audio remain separate gaps; no guessed species waveform names were assigned.",
+    "No original media is redistributed; new sounds have not been auditioned and relative loudness/species identity require later player acceptance."
+  ],
+  "pending_validation": {
+    "compiled": false,
+    "unit_run": false,
+    "gametest_run": false,
+    "client_run": false,
+    "media_played": false,
+    "unit_class": "com.codex.blacklight.infection.HunterSoundTimelineTest",
+    "unit_cases": 4,
+    "player_checks": [
+      "Counter to barrage: one opening grunt, release whooshes at 0/1 second, later roar; compare misses and accepted hits.",
+      "Interrupt counter and release through stagger/consume/death/invalid target; no future one-shots after interruption.",
+      "Common leap: blocked launch silent; successful launch one voice; first landing one voice plus foot sound; no repeated landing every tick.",
+      "Hunter hurt and each creature death: separate finite voice, no legacy duplicate; vanilla accepted-hurt/death pacing remains. Multiple attack/landing voices nearby obey the area budget and remain intelligible."
+    ]
+  },
+  "files": {
+    "neo": {
+      "src/main/java/com/codex/blacklight/entity/BlacklightHunter.java": "033c50eb9acec4a09b3b004f8a90291dcab9f2a7fc20bb56c2d43fea7ab10d66",
+      "src/main/java/com/codex/blacklight/entity/BlacklightCommonInfected.java": "e972b06276feb933bcbd4012d891331df0af688fbb1419a971ab06dde5d60d1c",
+      "src/main/java/com/codex/blacklight/registry/ModInfectedSounds.java": "1f35c45b1a7e0e11779c08edbf90cdf2011c1e52d7304eb1cbae0b388062f830",
+      "src/main/java/com/codex/blacklight/infection/HunterSoundTimeline.java": "87cbd06124953837e35c06bc2b8658e00ddc016fb004d3db4cee3e548a49132d",
+      "src/main/java/com/codex/blacklight/infection/InfectedSoundCue.java": "6454f59ff9d226b5f20709fe38142fd5e7417a762a785e9c1e4dae68b10e30c1",
+      "src/test/java/com/codex/blacklight/infection/HunterSoundTimelineTest.java": "427503c1efeba217d3bbc3c16e65bbb30a995aa9b2f7fb419401eb01423674ea",
+      "src/main/resources/assets/blacklight/sounds.json": "b04a8881cc04fbc23eb76bb173ef91192b6d495543d3ac0b5f373a6740554785",
+      "tools/build-creature-voice-fallbacks.py": "1e36abd09dd55231c0e5155038a9183a55cbd69686217dfbf36a55f9785e9f6f"
+    },
+    "forge": {
+      "src/main/java/com/codex/blacklight/entity/BlacklightHunter.java": "2f3b4f0d3a3abc61857a9f2957ae979c3c1a8f3232f703cf5a1d307933a8a8a7",
+      "src/main/java/com/codex/blacklight/entity/BlacklightCommonInfected.java": "e53040683695b9abaeb3b802f0daddd4beae20b5cf05478c957b35e3f51f7497",
+      "src/main/java/com/codex/blacklight/registry/ModInfectedSounds.java": "b955167fdc213dbf3a2b8cfdcc11abaf76933f81746c03fafd0875d0a69e0c07",
+      "src/main/java/com/codex/blacklight/infection/HunterSoundTimeline.java": "87cbd06124953837e35c06bc2b8658e00ddc016fb004d3db4cee3e548a49132d",
+      "src/main/java/com/codex/blacklight/infection/InfectedSoundCue.java": "6454f59ff9d226b5f20709fe38142fd5e7417a762a785e9c1e4dae68b10e30c1",
+      "src/test/java/com/codex/blacklight/infection/HunterSoundTimelineTest.java": "427503c1efeba217d3bbc3c16e65bbb30a995aa9b2f7fb419401eb01423674ea",
+      "src/main/resources/assets/blacklight/sounds.json": "b04a8881cc04fbc23eb76bb173ef91192b6d495543d3ac0b5f373a6740554785",
+      "tools/build-creature-voice-fallbacks.py": "1e36abd09dd55231c0e5155038a9183a55cbd69686217dfbf36a55f9785e9f6f"
+    }
+  }
+}

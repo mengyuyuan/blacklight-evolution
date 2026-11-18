@@ -2,6 +2,7 @@
   "replace": false,
   "values": [
     "blacklight:hive_tendril",
+    "blacklight:recon_uav",
     "blacklight:biomass_husk"
   ]
 }

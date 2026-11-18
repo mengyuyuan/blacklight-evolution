@@ -1,0 +1,9 @@
+allprojects { afterEvaluate {
+    sourceSets.main.java.srcDir('src/coverVisual/java')
+    minecraft.runs.client {
+        property 'blacklight.test.militaryCover','D:/CodexCache/military-cover-qa/forge-visual'
+        property 'blacklight.test.hiddenRagdoll','true'
+        args '--width','1100','--height','760'
+    }
+    tasks.withType(Jar).configureEach { doFirst {throw new GradleException('Hidden QA profile cannot produce a release JAR')} }
+} }

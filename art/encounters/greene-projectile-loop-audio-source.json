@@ -1,0 +1,356 @@
+{
+  "schema": 1,
+  "date": "2026-11-17",
+  "status": "Implemented; static source/asset inspection only. All Java, unit tests, playback and client testing deferred.",
+  "sourcePatches": [
+    {
+      "package": "mother.p3d",
+      "patch": {
+        "kind": "Patch",
+        "name": "mother_projectile",
+        "hash": "3404788125536626173",
+        "chunkOffset": 1861342,
+        "version": 1,
+        "player": "3D_Clip_Player",
+        "flags": 0,
+        "properties": {
+          "max": 55.0,
+          "min": 10.0,
+          "pos": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "loop": true,
+          "spread": 1.0,
+          "bus_name": [
+            "sfx",
+            "master",
+            "bossfx"
+          ],
+          "max_pitch": 1.100000023841858,
+          "files": [
+            "mother_projectile"
+          ],
+          "min_pitch": 0.8999999761581421,
+          "volume": 1.0,
+          "vel": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "doppler": 4.0,
+          "group": "weapon_loop",
+          "reverb_send": 0.6904760003089905
+        },
+        "propertyEvidence": {
+          "max": {
+            "type": "Float32",
+            "valueByteOffset": 1861465
+          },
+          "min": {
+            "type": "Float32",
+            "valueByteOffset": 1861507
+          },
+          "pos": {
+            "type": "Vector",
+            "valueByteOffset": 1861548
+          },
+          "loop": {
+            "type": "Bool",
+            "valueByteOffset": 1861596
+          },
+          "spread": {
+            "type": "Float32",
+            "valueByteOffset": 1861638
+          },
+          "bus_name": {
+            "type": "String List",
+            "valueByteOffset": 1861689
+          },
+          "max_pitch": {
+            "type": "Float32",
+            "valueByteOffset": 1861767
+          },
+          "files": {
+            "type": "String List",
+            "valueByteOffset": 1861815
+          },
+          "min_pitch": {
+            "type": "Float32",
+            "valueByteOffset": 1861885
+          },
+          "volume": {
+            "type": "Float32",
+            "valueByteOffset": 1861930
+          },
+          "vel": {
+            "type": "Vector",
+            "valueByteOffset": 1861971
+          },
+          "doppler": {
+            "type": "Float32",
+            "valueByteOffset": 1862025
+          },
+          "group": {
+            "type": "String",
+            "valueByteOffset": 1862068
+          },
+          "reverb_send": {
+            "type": "Float32",
+            "valueByteOffset": 1862130
+          }
+        }
+      },
+      "audioFiles": [
+        {
+          "kind": "AudioFile",
+          "name": "mother_projectile",
+          "hash": "3404788125536626173",
+          "chunkOffset": 1198163,
+          "version": 2,
+          "alias": "mother_projectile",
+          "codec": "RADP",
+          "channels": 1,
+          "sampleRate": 48000,
+          "sampleFrames": 138016,
+          "seconds": 2.8753333333333333,
+          "encodedSha256": "711b93d1bc851e905cdcbeffc5a58cddf0d15bcd6b93d23163f3daf31cc1f234"
+        }
+      ]
+    },
+    {
+      "package": "sfx_shared.p3d",
+      "patch": {
+        "kind": "Patch",
+        "name": "fire",
+        "hash": "28793708610358500",
+        "chunkOffset": 13415074,
+        "version": 1,
+        "player": "3D_Clip_Player_fadeout",
+        "flags": 0,
+        "properties": {
+          "max": 35.0,
+          "min": 3.0,
+          "pos": [
+            5.0,
+            0.0,
+            5.0
+          ],
+          "loop": true,
+          "spread": 0.0,
+          "fade_out_time": 1000.0,
+          "bus_name": [
+            "sfx",
+            "master",
+            "generic"
+          ],
+          "max_pitch": 1.2000000476837158,
+          "volume": 1.4047620296478271,
+          "files": [
+            "fire_loop"
+          ],
+          "min_pitch": 0.800000011920929,
+          "fade_in_time": 500.0,
+          "vel": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "group": "loop_med",
+          "reverb_send": 1.0
+        },
+        "propertyEvidence": {
+          "max": {
+            "type": "Float32",
+            "valueByteOffset": 13415192
+          },
+          "min": {
+            "type": "Float32",
+            "valueByteOffset": 13415234
+          },
+          "pos": {
+            "type": "Vector",
+            "valueByteOffset": 13415275
+          },
+          "loop": {
+            "type": "Bool",
+            "valueByteOffset": 13415323
+          },
+          "spread": {
+            "type": "Float32",
+            "valueByteOffset": 13415365
+          },
+          "fade_out_time": {
+            "type": "Float32",
+            "valueByteOffset": 13415417
+          },
+          "bus_name": {
+            "type": "String List",
+            "valueByteOffset": 13415468
+          },
+          "max_pitch": {
+            "type": "Float32",
+            "valueByteOffset": 13415547
+          },
+          "volume": {
+            "type": "Float32",
+            "valueByteOffset": 13415592
+          },
+          "files": {
+            "type": "String List",
+            "valueByteOffset": 13415640
+          },
+          "min_pitch": {
+            "type": "Float32",
+            "valueByteOffset": 13415702
+          },
+          "fade_in_time": {
+            "type": "Float32",
+            "valueByteOffset": 13415753
+          },
+          "vel": {
+            "type": "Vector",
+            "valueByteOffset": 13415794
+          },
+          "group": {
+            "type": "String",
+            "valueByteOffset": 13415845
+          },
+          "reverb_send": {
+            "type": "Float32",
+            "valueByteOffset": 13415904
+          }
+        }
+      },
+      "audioFiles": [
+        {
+          "kind": "AudioFile",
+          "name": "fire_loop",
+          "hash": "3878997971415170145",
+          "chunkOffset": 3385320,
+          "version": 2,
+          "alias": "fire_loop",
+          "codec": "RADP",
+          "channels": 1,
+          "sampleRate": 44100,
+          "sampleFrames": 255264,
+          "seconds": 5.788299319727892,
+          "encodedSha256": "4bd45d4f5a143a443fdbc50b5e422f573f47e5c553968e0366f7ac87cefb27ae"
+        }
+      ]
+    }
+  ],
+  "runtime": {
+    "108cfd20": "PolledLifetime at track+60 re-emits AudioEmitter category15/subtype0 every track update via1008ced0. TriggerType=Retrigger does not imply replaying the polled voice each frame.",
+    "107eac80": "Finds existing same-patch instance at107eac96; creates only if absent. 107ead57 writes polled flag+21 and107ead63..6b refreshes timestamp+24. 107ead94..a9 skips retrigger for existing polled instances.",
+    "107eada9": "Message maxDistance==0 skips both distance setters. Nonzero writes min and max. Thus mother inherits Patch10..55, fire overrides Patch3..35 with FIG2..25.",
+    "107eadd6": "Message minPitch==1 skips its override, maxPitch==1 skips its override. Thus mother retains Patch.9..1.1; fire FIGmin1 leaves Patchmin.8 and max1.2 is set. Do not substitute FIG1..1.2.",
+    "107eae1a": "VolumeFactor only applies below1, by multiplying current patch volume at107eae5a. Both loops use1 and preserve Patch gains1 and1.404762.",
+    "10d754c0": "Registers fade_in_time and fade_in_ms through identical104a6400 property creator, and fade_out_time/fade_out_ms through104a6450. Fire fields500/1000 are milliseconds, hence .5s fade in/1s fade out.",
+    "10928fb0": "AudioEmitter follows source world position and derives velocity from world delta/dt. No target-distance proxy is a source movement parameter."
+  },
+  "effectiveProfiles": {
+    "biomass": {
+      "range": [
+        10,
+        55
+      ],
+      "pitch": [
+        0.9,
+        1.1
+      ],
+      "sourceGain": 1,
+      "fadeInSeconds": 0,
+      "fadeOutSeconds": 0,
+      "polled": true
+    },
+    "fire": {
+      "range": [
+        2,
+        25
+      ],
+      "pitch": [
+        0.8,
+        1.2
+      ],
+      "sourceGain": 1.4047620296478271,
+      "fadeInSeconds": 0.5,
+      "fadeOutSeconds": 1,
+      "polled": true
+    }
+  },
+  "clientContract": {
+    "tick": "GreeneProjectileAudio.tick() at start of ClientTick.Post, before null/player/pause early returns.",
+    "clear": "GreeneProjectileAudio.clear() plus own client LevelEvent.Unload hook; detects world identity changes itself.",
+    "identity": "IdentityHashMap keyed by actual projectile object; level.getEntity(id)==projectile prevents channel retention on untracking/ID reuse. Ammo profile changes replace the entry.",
+    "final": "Biomass stops immediately; existing fire voice enters one bounded release envelope. No new voice/restart for finished projectiles. Entity removal always stops immediately.",
+    "pause": "Retains existing SoundManager handle and freezes envelope/retry state; Minecraft owns device pause/resume. Invalid entity/world still cleans up while paused.",
+    "muteAndReload": "Mute releases channel, suppresses start/retry; unmute resumes only active projectiles. Backend missing/asset reload uses20 unpaused ticks before one retry, preserving envelope and seeded pitch.",
+    "distance": "Out of proven maximum range stops and releases; retracking/reentry creates one fresh local voice. No replayed impact or launch cues.",
+    "budget": "Nearest12 active/tailing voices, stable UUID tie order; tails count against budget and end on original entity teardown."
+  },
+  "adapters": [
+    "Linear source-min/max attenuation is explicit MC presentation; native middleware distance curve/spread/reverb/Doppler are not reproduced.",
+    "Fade durations are verified native values; linear ramp shape and immediate hard-stop on client unload/range/mute are MC lifecycle policy.",
+    "MC mix gain .28 and12-voice nearest budget are explicit volume/performance limits, not source values.",
+    "UUID-seeded pitch is stable through re-tracking/resource reload and retains source ranges, not native RNG sequence.",
+    "Late tracking/reentry starts sample at its beginning with local fade; Minecraft sound API does not seek native playback phase.",
+    "Foley derivative waveform source/license/hash/seam metrics are in greene-projectile-loop-foley.json and greene-projectile-loop-audio-LICENSE.md. No source P1 waveform imported."
+  ],
+  "privateEvidence": [
+    {
+      "path": "D:\\PrototypeReference\\p1\\private\\rapid-runtime-108cfd20.txt",
+      "sha256": "3ef0f8696dfb65207f862f0d76bf480d22fa5a5bc7173e75bc3074ce77177542"
+    },
+    {
+      "path": "D:\\PrototypeReference\\p1\\private\\rapid-runtime-107eac80.txt",
+      "sha256": "63a82a386277adbbee60fd60cb763b176d8ebcc2844b72fdccc691a4d0dcf58a"
+    },
+    {
+      "path": "D:\\PrototypeReference\\p1\\private\\rapid-runtime-1008ced0.txt",
+      "sha256": "8c021df9208d613873832ebe67f82b3fc93685759bc3ec44f933cef7b5f20d32"
+    },
+    {
+      "path": "D:\\PrototypeReference\\p1\\private\\rapid-runtime-104a6400.txt",
+      "sha256": "1510c6101058addcc4f5384df6670df6c4093d9344124c2966e946e2da6b86c9"
+    },
+    {
+      "path": "D:\\PrototypeReference\\p1\\private\\rapid-runtime-104a6450.txt",
+      "sha256": "781e6172c9244fe505ad24e616e174bbb5b435ea9f1e654535cef606cf9bf396"
+    },
+    {
+      "path": "D:\\PrototypeReference\\p1\\private\\rapid-runtime-10928fb0.txt",
+      "sha256": "30fe5138b460297d37717ce9684922b04ff5764e23d3880ec3ae77b14cf76d77"
+    },
+    {
+      "path": "D:\\PrototypeReference\\p1\\private\\rapid-refs-10e7276c.txt",
+      "sha256": "d0f0c1cbd90d08a001ae65c4c378e2146d1e75969f7147dbe79e114ec39be3f8"
+    }
+  ],
+  "files": {
+    "src/main/java/com/codex/blacklight/combat/GreeneProjectileAudioState.java": "fd48b110ba988bc2b614ced2b8d9bac26218f8e912c5cfed7710b0c57c4af885",
+    "src/test/java/com/codex/blacklight/combat/GreeneProjectileAudioStateTest.java": "dbe3f5daeaeb67c86a3a07b2243d9cfb0e686b79a582995d768efc49ff17cdb2",
+    "tools/build_greene_projectile_loops.py": "ae3347015138819b4075a58ee149885bf108ec9b43c6ef45b53f363a27a7af0c",
+    "art/encounters/greene-projectile-loop-foley.json": "fbcb8ec845ce1d1532c10106c07f3beb41243dbbf0419cfed0ffddcff2c7bb7b",
+    "art/encounters/greene-projectile-loop-audio-LICENSE.md": "8b068e202a76454f574cf19d231fe86d21dc14a014f6d4b1558634deab29a68f"
+  },
+  "clientPlatformFiles": {
+    "D:\\blacklight-evolution": {
+      "src/main/java/com/codex/blacklight/client/audio/GreeneProjectileAudio.java": "0da43c253e00eb97ef798371d481258d15fad56401a4dbfdfc57763c0b69a846",
+      "src/main/java/com/codex/blacklight/client/audio/GreeneProjectileAudioEvents.java": "4d7a574e9ef17f679a1a2e7c65f0e0114fd7a92535a4e2dbf340fb63acdddaf0"
+    },
+    "D:\\blacklight-evolution-forge-1.20.1": {
+      "src/main/java/com/codex/blacklight/client/audio/GreeneProjectileAudio.java": "c143571eab72f00a0e6a7a639e74b457291ca6099b13f599e407bc212aff925c",
+      "src/main/java/com/codex/blacklight/client/audio/GreeneProjectileAudioEvents.java": "a1c55213838f97ba0365b1ea44e356626786264dd4408168d4a1339c219876a8"
+    }
+  },
+  "validation": {
+    "authoredDeferredUnitCases": 6,
+    "executedTests": false,
+    "javaOrGradleRun": false,
+    "mediaPlayed": false,
+    "sourceNativeExecuted": false,
+    "subjectiveListening": "Deferred"
+  }
+}

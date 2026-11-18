@@ -27,9 +27,10 @@ public final class VehicleHijackSystem {
     public static boolean active(ServerPlayer player){
         return player!=null&&ACTIVE.getOrDefault(player.serverLevel(),Map.of()).values().stream().anyMatch(s->s.player.equals(player.getUUID()));
     }
-    private static boolean ready(ServerPlayer p){
+    private static boolean ready(ServerPlayer p){return hijackEligible(p,false);}
+    public static boolean hijackEligible(ServerPlayer p,boolean allowPassenger){
         var state=com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.PLAYER_STATE);
-        return p.isAlive()&&!p.isRemoved()&&!p.isSpectator()&&!p.isPassenger()&&state.isInfected()&&state.isPrototypeMode()
+        return p.isAlive()&&!p.isRemoved()&&!p.isSpectator()&&(!p.isPassenger()||allowPassenger)&&state.isInfected()&&state.isPrototypeMode()
                 &&p.getMainHandItem().isEmpty()&&!com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.CONSUMING)&&!WeaponCombatSystem.busy(p)
                 &&com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.CLAW_COMBAT).action()==ClawCombatState.Action.IDLE
                 &&!com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.MOVEMENT_STATE).wallTraversal().attached()

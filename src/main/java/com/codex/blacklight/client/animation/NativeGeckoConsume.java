@@ -7,6 +7,11 @@ public final class NativeGeckoConsume {
     private NativeGeckoConsume() {}
     public static boolean apply(GeoModel<?> model,LivingEntity entity,float partial) {
         var visual=com.codex.blacklight.registry.ModAttachments.getData(entity, ModAttachments.CONSUME_VISUAL);if(!visual.consuming()&&!com.codex.blacklight.combat.GrappleMotion.active(visual))return false;
+        if(entity instanceof com.codex.blacklight.entity.EncounterMob mob&&mob.kind()==com.codex.blacklight.entity.EncounterKind.FLYER){
+            FlyerCarryPose.apply(model,mob,partial);
+            ReceiverPoseDiagnostics.record(entity,model,com.codex.blacklight.combat.GrappleMotion.sceneKey(entity,visual),com.codex.blacklight.combat.FlyerMotion.table().bones.length);
+            return true;
+        }
         var form=com.codex.blacklight.power.PowerForm.values()[net.minecraft.util.Mth.clamp(visual.form(),0,com.codex.blacklight.power.PowerForm.values().length-1)];
         boolean large=com.codex.blacklight.combat.ConsumeSequence.mountedStage(visual.stage());
         var projection=com.codex.blacklight.combat.ConsumePlacementTrack.projection(com.codex.blacklight.combat.GrappleMotion.sceneKey(entity,visual),com.codex.blacklight.combat.GrappleMotion.receiverProgress(entity,visual,partial));

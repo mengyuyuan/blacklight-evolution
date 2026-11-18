@@ -1,0 +1,38 @@
+{
+  "date": "2026-11-18",
+  "status": "automated_dual_loader_checks_pass_player_acceptance_pending",
+  "loaders": ["NeoForge1.21.1", "Forge1.20.1"],
+  "sourceAudit": "art/military-vehicles/helicopter-cannon-range-source-20261118.json",
+  "selectedUnitTests": {"perLoader": 88, "failures": 0},
+  "gameTests": {
+    "perLoader": 5,
+    "failures": 0,
+    "naturalFlatAndHillSupport": "Actual SPIN_UP through six-person rappel, DEPART, PURSUIT and STRAFE. Aircraft-mounted operator inflicts positive post-health-loss damage on a ground infected. Delivered infantry damage is tracked separately and cannot pass the assertion.",
+    "playerCannon": "One finite30mm round fired through connected pilot authority hits a persistent ground target; launch distance131.529 blocks, target health5000 to4900.",
+    "playerHellfire": "One finite missile fired through connected pilot authority explodes on a persistent ground target; launch distance131.529 blocks, target health5000 to4900.",
+    "naturalRemoteAcquisition": "Six real soldiers rappel before AI combat. First target acquisition distance130.947 blocks; sampled native CIRCLE tactic first fires30mm near60 blocks and inflicts100 health damage. No forced phase, direct fire call or fixed tactic random draw.",
+    "distanceBoundary": "The remote AI test proves extended acquisition and subsequent natural combat. It does not prove that ordinary AI cannon fires175 blocks away; native ordinary60 and strafe100 gates remain."
+  },
+  "logs": [
+    "D:/CodexCache/work/air-support-corrected-neo-20261118.log",
+    "D:/CodexCache/work/air-support-corrected-forge-20261118.log",
+    "D:/CodexCache/work/air-support-remote-ai-neo-20261118.log",
+    "D:/CodexCache/work/air-support-remote-ai-forge-20261118.log"
+  ],
+  "fixtureCorrections": [
+    "A130-block Monster target requires persistence to avoid the vanilla128-block despawn rule.",
+    "Force-loading a chunk does not immediately make its entity sections visible; wait for the actual entity-ticking corridor before adding the target, check insertion and continue asserting world registration.",
+    "No product hit permission or damage assertion was weakened to pass the distant-target checks."
+  ],
+  "playerState": {
+    "world": "D:/CodexCache/controls-review-2/saves/controls-copy",
+    "backup": "D:/CodexCache/controls-review-2-backup-before-air-cannon-20261117-230521/controls-copy",
+    "log": "D:/CodexCache/work/air-model-player-20261118.log",
+    "acceptance": "Client launched and fullscreen entered; user physically stopped Computer Use before directed model/combat inspection. No visual model or player control acceptance is claimed."
+  },
+  "outstanding": [
+    "Player visual check of UAV cap/struts/skids and Goliath connected waist across animations.",
+    "Actual player aiming, switching weapons, long-range feedback and combat feel.",
+    "The separately delegated Goliath collision/recovery changes require their own integration checks."
+  ]
+}

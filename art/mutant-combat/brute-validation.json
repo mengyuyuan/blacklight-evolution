@@ -1,0 +1,2203 @@
+{
+  "date": "2026-11-15T14:50:20.449Z",
+  "scope": "Authored Minecraft Brute: swept right-fist hammer, supported two-fist slam and ground wave, committed upper-body charge, terrain interruption/retraction, standing weapon-hit reactions and immediate attack cancellation, existing spatial recorded cues.",
+  "platforms": [
+    {
+      "platform": "neo",
+      "frames": 1580,
+      "units": 37,
+      "logs": [
+        {
+          "stage": "bruteServer",
+          "count": 19,
+          "file": "D:/CodexCache/creature-combat-neo-bruteServer.log",
+          "sha256": "f3d65111900a295ad7d6b9ab1318d547a4949224ef313fcbf69c95df63563e1f"
+        },
+        {
+          "stage": "server",
+          "count": 19,
+          "file": "D:/CodexCache/creature-combat-neo-server.log",
+          "sha256": "82194138633cf110f9ef7c06890dcee4cb2bbf5dd8854900a4e0806dbe7daf8d"
+        },
+        {
+          "stage": "stalkerServer",
+          "count": 11,
+          "file": "D:/CodexCache/creature-combat-neo-stalkerServer.log",
+          "sha256": "47f5278db9e320cbf4d43f26858a16b1c0478568c3a504f522b5626cce7c9bb7"
+        },
+        {
+          "stage": "spitterServer",
+          "count": 10,
+          "file": "D:/CodexCache/creature-combat-neo-spitterServer.log",
+          "sha256": "651b56776eabc006011dcbea931ea4cb438feb00ee12a5673c676549af9b6ddf"
+        }
+      ],
+      "unitEvidence": [
+        {
+          "file": "D:/CodexCache/creature-combat-qa/neo-build/test-results/test/TEST-com.codex.blacklight.combat.BruteContactTest.xml",
+          "sha256": "6b9738be1c04d837bb2ef3312c98b13ea6cb1ceebe2056806acec98477778fe4"
+        },
+        {
+          "file": "D:/CodexCache/creature-combat-qa/neo-build/test-results/test/TEST-com.codex.blacklight.combat.BruteFlinchTest.xml",
+          "sha256": "0d4a716e53edb2c42499ee09a0be97d5e15cc603fd0d8fab58afde9bc90fdfde"
+        },
+        {
+          "file": "D:/CodexCache/creature-combat-qa/neo-build/test-results/test/TEST-com.codex.blacklight.combat.StalkerContactTest.xml",
+          "sha256": "bcb410d01507fd1131e28aa0c8f4331b3945735bbd0ddb24b3836db0b66944e1"
+        },
+        {
+          "file": "D:/CodexCache/creature-combat-qa/neo-build/test-results/test/TEST-com.codex.blacklight.combat.MutantCombatTest.xml",
+          "sha256": "5a1a73721c85711096953d98ea8b2c58978292c0fca59aa6a84754afbdff10fe"
+        },
+        {
+          "file": "D:/CodexCache/creature-combat-qa/neo-build/test-results/test/TEST-com.codex.blacklight.combat.SpitterMouthTest.xml",
+          "sha256": "845bdf1baec80ccd5b7ecfaae514e86b41bdc5554946b02a892062653c6b308b"
+        },
+        {
+          "file": "D:/CodexCache/creature-combat-qa/neo-build/test-results/test/TEST-com.codex.blacklight.combat.ContactEffectsQueueTest.xml",
+          "sha256": "892443e561cd467456d3b49bcf3cec8966272400a9a289bad823c4734609cb3d"
+        }
+      ],
+      "cases": [
+        {
+          "scene": 0,
+          "frames": 97,
+          "bodySamples": 41,
+          "recoverySamples": 0,
+          "maxNativeBodyError": 0.000013362381400349263,
+          "hits": [
+            {
+              "scene": 0,
+              "age": 17,
+              "contactAge": 16.5,
+              "bone": "right_forearm",
+              "cube": 1,
+              "damage": 10,
+              "at": {
+                "x": 0.21857675689196968,
+                "y": 82.39999997615814,
+                "z": 2.0997571405761057
+              },
+              "actor": {
+                "x": 0.5,
+                "y": 81,
+                "z": 0.5
+              }
+            }
+          ],
+          "receipts": [
+            {
+              "serial": 1,
+              "tick": 194943,
+              "shown": 194943.42000174522,
+              "kind": 1,
+              "surfaceCount": 0,
+              "soundCount": 1,
+              "scene": 0,
+              "firstImage": "0-hammer-018-sub1.png",
+              "bodyGapAtPresentation": 4.126203327597789e-9
+            }
+          ],
+          "sounds": [
+            {
+              "scene": 0,
+              "age": 0,
+              "event": "blacklight:infection.tension",
+              "at": {
+                "x": 0.5,
+                "y": 82.25,
+                "z": 0.5
+              },
+              "volume": 0.55,
+              "pitch": 0.9608547
+            },
+            {
+              "scene": 0,
+              "age": 14,
+              "event": "blacklight:infection.swing",
+              "at": {
+                "x": 0.5,
+                "y": 82.25,
+                "z": 0.5
+              },
+              "volume": 0.43,
+              "pitch": 1.01467
+            }
+          ],
+          "last": {
+            "scene": 0,
+            "age": 83,
+            "health": 990,
+            "actorHealth": 400,
+            "noAi": false,
+            "stunned": false,
+            "actor": {
+              "x": 0.5,
+              "y": 81,
+              "z": 0.5
+            },
+            "onGround": true,
+            "move": "NONE",
+            "poseAge": 83,
+            "recoil": -1,
+            "walls": 0
+          },
+          "sheet": {
+            "file": "D:/CodexCache/creature-combat-qa/neo-brute-frames/brute-review-0.jpg",
+            "sha256": "5dd4fb4ab09aa2f1fa868559c39b0f5834bb3d1cfcb82ab87a6c1f257718d7cb"
+          }
+        },
+        {
+          "scene": 1,
+          "frames": 104,
+          "bodySamples": 69,
+          "recoverySamples": 37,
+          "maxNativeBodyError": 0.000014673368942740782,
+          "hits": [
+            {
+              "scene": 1,
+              "age": 26,
+              "contactAge": 26,
+              "bone": "ground_wave",
+              "cube": -1,
+              "damage": 12.5,
+              "at": {
+                "x": 0.5,
+                "y": 81,
+                "z": 3.5
+              },
+              "actor": {
+                "x": 0.5,
+                "y": 81,
+                "z": 0.5
+              }
+            }
+          ],
+          "receipts": [
+            {
+              "serial": 2,
+              "tick": 195056,
+              "shown": 195056.5800011158,
+              "kind": 0,
+              "surfaceCount": 48,
+              "soundCount": 2,
+              "scene": 1,
+              "firstImage": "1-ground_slam-026-sub1.png"
+            },
+            {
+              "serial": 3,
+              "tick": 195056,
+              "shown": 195056.5800011158,
+              "kind": 1,
+              "surfaceCount": 0,
+              "soundCount": 1,
+              "scene": 1,
+              "firstImage": "1-ground_slam-026-sub1.png",
+              "bodyGapAtPresentation": 1.8300047731615532
+            }
+          ],
+          "sounds": [
+            {
+              "scene": 1,
+              "age": 0,
+              "event": "blacklight:infection.tension",
+              "at": {
+                "x": 0.5,
+                "y": 82.25,
+                "z": 0.5
+              },
+              "volume": 0.55,
+              "pitch": 0.9645075
+            },
+            {
+              "scene": 1,
+              "age": 18,
+              "event": "blacklight:infection.swing",
+              "at": {
+                "x": 0.5,
+                "y": 82.25,
+                "z": 0.5
+              },
+              "volume": 0.43,
+              "pitch": 0.9640942
+            }
+          ],
+          "last": {
+            "scene": 1,
+            "age": 83,
+            "health": 987.5,
+            "actorHealth": 400,
+            "noAi": false,
+            "stunned": false,
+            "actor": {
+              "x": 0.5,
+              "y": 81,
+              "z": 0.5
+            },
+            "groundImpact": {
+              "x": -0.501326754125967,
+              "y": 81,
+              "z": 1.1991688679603913
+            },
+            "onGround": true,
+            "move": "NONE",
+            "poseAge": 83,
+            "recoil": -1,
+            "walls": 0
+          },
+          "sheet": {
+            "file": "D:/CodexCache/creature-combat-qa/neo-brute-frames/brute-review-1.jpg",
+            "sha256": "3988596f9c55319022d26fda5afd0bada1cea50777fcf780c874a7310556ab9e"
+          }
+        },
+        {
+          "scene": 2,
+          "frames": 102,
+          "bodySamples": 60,
+          "recoverySamples": 0,
+          "maxNativeBodyError": 0.000014300671716825341,
+          "hits": [
+            {
+              "scene": 2,
+              "age": 23,
+              "contactAge": 22.214285,
+              "bone": "left_forearm",
+              "cube": 9,
+              "damage": 11.5,
+              "at": {
+                "x": 0.6833224208999794,
+                "y": 81.62920114979069,
+                "z": 5.550000011920929
+              },
+              "actor": {
+                "x": 0.5,
+                "y": 81,
+                "z": 4.579999999999999
+              }
+            }
+          ],
+          "receipts": [
+            {
+              "serial": 4,
+              "tick": 195157,
+              "shown": 195158.30000162125,
+              "kind": 1,
+              "surfaceCount": 0,
+              "soundCount": 1,
+              "scene": 2,
+              "firstImage": "2-charge-024.png",
+              "bodyGapAtPresentation": 0.00729229435819734
+            }
+          ],
+          "sounds": [
+            {
+              "scene": 2,
+              "age": 0,
+              "event": "blacklight:infection.tension",
+              "at": {
+                "x": 0.5,
+                "y": 82.25,
+                "z": 0.5
+              },
+              "volume": 0.55,
+              "pitch": 0.9658361
+            },
+            {
+              "scene": 2,
+              "age": 10,
+              "event": "blacklight:infection.swing",
+              "at": {
+                "x": 0.5,
+                "y": 82.25,
+                "z": 0.5
+              },
+              "volume": 0.43,
+              "pitch": 0.968171
+            }
+          ],
+          "last": {
+            "scene": 2,
+            "age": 83,
+            "health": 988.5,
+            "actorHealth": 400,
+            "noAi": false,
+            "stunned": false,
+            "actor": {
+              "x": 0.5,
+              "y": 81,
+              "z": 4.663829996931717
+            },
+            "onGround": true,
+            "move": "NONE",
+            "poseAge": 83,
+            "recoil": -1,
+            "walls": 0
+          },
+          "sheet": {
+            "file": "D:/CodexCache/creature-combat-qa/neo-brute-frames/brute-review-2.jpg",
+            "sha256": "576ba02fbd512b548f82af02f5eceb182ab20f809148294a3e25771f2b0b8378"
+          }
+        },
+        {
+          "scene": 3,
+          "frames": 101,
+          "bodySamples": 60,
+          "recoverySamples": 0,
+          "maxNativeBodyError": 0.000013898058062202495,
+          "hits": [],
+          "receipts": [],
+          "sounds": [
+            {
+              "scene": 3,
+              "age": 0,
+              "event": "blacklight:infection.tension",
+              "at": {
+                "x": 0.5,
+                "y": 82.25,
+                "z": 0.5
+              },
+              "volume": 0.55,
+              "pitch": 0.9710411
+            },
+            {
+              "scene": 3,
+              "age": 10,
+              "event": "blacklight:infection.swing",
+              "at": {
+                "x": 0.5,
+                "y": 82.25,
+                "z": 0.5
+              },
+              "volume": 0.43,
+              "pitch": 0.99529815
+            }
+          ],
+          "last": {
+            "scene": 3,
+            "age": 83,
+            "health": 1000,
+            "actorHealth": 400,
+            "noAi": false,
+            "stunned": false,
+            "actor": {
+              "x": 0.5,
+              "y": 81,
+              "z": 5.599999999999999
+            },
+            "onGround": true,
+            "move": "NONE",
+            "poseAge": 83,
+            "recoil": -1,
+            "walls": 0
+          },
+          "sheet": {
+            "file": "D:/CodexCache/creature-combat-qa/neo-brute-frames/brute-review-3.jpg",
+            "sha256": "a95f549979143e9757c2fdb135d54c59be6491fe37f317dd4c89c736954191f8"
+          }
+        },
+        {
+          "scene": 4,
+          "frames": 111,
+          "bodySamples": 56,
+          "recoverySamples": 0,
+          "maxNativeBodyError": 0.000014555255089571708,
+          "hits": [],
+          "receipts": [
+            {
+              "serial": 5,
+              "tick": 195361,
+              "shown": 195361.8200019598,
+              "kind": 5,
+              "surfaceCount": 1,
+              "soundCount": 2,
+              "scene": 4,
+              "firstImage": "4-charge_wall-019-sub2.png"
+            }
+          ],
+          "sounds": [
+            {
+              "scene": 4,
+              "age": 0,
+              "event": "blacklight:infection.tension",
+              "at": {
+                "x": 0.5,
+                "y": 82.25,
+                "z": 0.5
+              },
+              "volume": 0.55,
+              "pitch": 0.96117324
+            },
+            {
+              "scene": 4,
+              "age": 10,
+              "event": "blacklight:infection.swing",
+              "at": {
+                "x": 0.5,
+                "y": 82.25,
+                "z": 0.5
+              },
+              "volume": 0.43,
+              "pitch": 0.9937574
+            }
+          ],
+          "last": {
+            "scene": 4,
+            "age": 83,
+            "health": 1000,
+            "actorHealth": 400,
+            "noAi": false,
+            "stunned": false,
+            "actor": {
+              "x": 0.5,
+              "y": 81,
+              "z": 2.0858105468750012
+            },
+            "onGround": true,
+            "move": "NONE",
+            "poseAge": 83,
+            "recoil": -1,
+            "walls": 1
+          },
+          "sheet": {
+            "file": "D:/CodexCache/creature-combat-qa/neo-brute-frames/brute-review-4.jpg",
+            "sha256": "60eb2487f1bbdbfdebca6114d70bc8dd60ebb208d8817272740e34e36396d576"
+          }
+        },
+        {
+          "scene": 5,
+          "frames": 110,
+          "bodySamples": 29,
+          "recoverySamples": 0,
+          "maxNativeBodyError": 0.00001393929622833318,
+          "hits": [],
+          "receipts": [
+            {
+              "serial": 6,
+              "tick": 195457,
+              "shown": 195457.42000246048,
+              "kind": 5,
+              "surfaceCount": 1,
+              "soundCount": 2,
+              "scene": 5,
+              "firstImage": "5-hammer_bars-012-sub1.png"
+            }
+          ],
+          "sounds": [
+            {
+              "scene": 5,
+              "age": 0,
+              "event": "blacklight:infection.tension",
+              "at": {
+                "x": 0.5,
+                "y": 82.25,
+                "z": 0.5
+              },
+              "volume": 0.55,
+              "pitch": 0.9955941
+            }
+          ],
+          "last": {
+            "scene": 5,
+            "age": 84,
+            "health": 1000,
+            "actorHealth": 400,
+            "noAi": false,
+            "stunned": false,
+            "actor": {
+              "x": 0.5,
+              "y": 81,
+              "z": 0.5
+            },
+            "onGround": true,
+            "move": "NONE",
+            "poseAge": 84,
+            "recoil": -1,
+            "walls": 1
+          },
+          "sheet": {
+            "file": "D:/CodexCache/creature-combat-qa/neo-brute-frames/brute-review-5.jpg",
+            "sha256": "c2c4dbb417489a4eddf7b2ba83fffb730a7e599e4f852f323dc2d5ec9c790439"
+          }
+        },
+        {
+          "scene": 6,
+          "frames": 111,
+          "bodySamples": 72,
+          "recoverySamples": 40,
+          "maxNativeBodyError": 0.00001298581481504283,
+          "hits": [
+            {
+              "scene": 6,
+              "age": 24,
+              "contactAge": 24,
+              "bone": "ground_wave",
+              "cube": -1,
+              "damage": 12.5,
+              "at": {
+                "x": 0.5,
+                "y": 81,
+                "z": 3.5
+              },
+              "actor": {
+                "x": 0.5,
+                "y": 81,
+                "z": 0.5
+              }
+            }
+          ],
+          "receipts": [
+            {
+              "serial": 7,
+              "tick": 195575,
+              "shown": 195575.04000461102,
+              "kind": 0,
+              "surfaceCount": 19,
+              "soundCount": 2,
+              "scene": 6,
+              "firstImage": "6-slam_slab-025.png"
+            },
+            {
+              "serial": 8,
+              "tick": 195575,
+              "shown": 195575.04000461102,
+              "kind": 1,
+              "surfaceCount": 0,
+              "soundCount": 1,
+              "scene": 6,
+              "firstImage": "6-slam_slab-025.png",
+              "bodyGapAtPresentation": 1.8102746942780361
+            }
+          ],
+          "sounds": [
+            {
+              "scene": 6,
+              "age": 0,
+              "event": "blacklight:infection.tension",
+              "at": {
+                "x": 0.5,
+                "y": 82.25,
+                "z": 0.5
+              },
+              "volume": 0.55,
+              "pitch": 1.0186692
+            },
+            {
+              "scene": 6,
+              "age": 18,
+              "event": "blacklight:infection.swing",
+              "at": {
+                "x": 0.5,
+                "y": 82.25,
+                "z": 0.5
+              },
+              "volume": 0.43,
+              "pitch": 0.9983017
+            }
+          ],
+          "last": {
+            "scene": 6,
+            "age": 83,
+            "health": 987.5,
+            "actorHealth": 400,
+            "noAi": false,
+            "stunned": false,
+            "actor": {
+              "x": 0.5,
+              "y": 81,
+              "z": 0.5
+            },
+            "groundImpact": {
+              "x": -0.5183265357886297,
+              "y": 81.5,
+              "z": 1.7278355509226977
+            },
+            "onGround": true,
+            "move": "NONE",
+            "poseAge": 83,
+            "recoil": -1,
+            "walls": 0
+          },
+          "sheet": {
+            "file": "D:/CodexCache/creature-combat-qa/neo-brute-frames/brute-review-6.jpg",
+            "sha256": "9cf82b4f21cbd32e00197aaa88ced5a4e668b94341301a27fa24382cfebd5caf"
+          }
+        },
+        {
+          "scene": 7,
+          "frames": 97,
+          "bodySamples": 55,
+          "recoverySamples": 0,
+          "maxNativeBodyError": 0.000011463085203591378,
+          "hits": [],
+          "receipts": [],
+          "sounds": [
+            {
+              "scene": 7,
+              "age": 0,
+              "event": "blacklight:infection.tension",
+              "at": {
+                "x": 0.5,
+                "y": 82.25,
+                "z": 0.5
+              },
+              "volume": 0.55,
+              "pitch": 0.9603771
+            },
+            {
+              "scene": 7,
+              "age": 18,
+              "event": "blacklight:infection.swing",
+              "at": {
+                "x": 0.5,
+                "y": 85.66499099849123,
+                "z": 0.5
+              },
+              "volume": 0.43,
+              "pitch": 0.9633388
+            }
+          ],
+          "last": {
+            "scene": 7,
+            "age": 84,
+            "health": 1000,
+            "actorHealth": 400,
+            "noAi": false,
+            "stunned": false,
+            "actor": {
+              "x": 0.5,
+              "y": 81.95905253714358,
+              "z": 0.5
+            },
+            "onGround": false,
+            "move": "NONE",
+            "poseAge": 84,
+            "recoil": -1,
+            "walls": 0
+          },
+          "sheet": {
+            "file": "D:/CodexCache/creature-combat-qa/neo-brute-frames/brute-review-7.jpg",
+            "sha256": "988b6bc48c5c66c9e8ba53839bbb9a77b7546003705a9a321e4a985b7b82cf31"
+          }
+        },
+        {
+          "scene": 8,
+          "frames": 107,
+          "bodySamples": 47,
+          "recoverySamples": 0,
+          "maxNativeBodyError": 0.000012526737081984611,
+          "hits": [],
+          "receipts": [],
+          "sounds": [
+            {
+              "scene": 8,
+              "age": 0,
+              "event": "blacklight:infection.tension",
+              "at": {
+                "x": 0.5,
+                "y": 82.25,
+                "z": 0.5
+              },
+              "volume": 0.55,
+              "pitch": 1.0314004
+            },
+            {
+              "scene": 8,
+              "age": 14,
+              "event": "blacklight:infection.swing",
+              "at": {
+                "x": 0.5,
+                "y": 82.25,
+                "z": 0.5
+              },
+              "volume": 0.43,
+              "pitch": 0.9634726
+            }
+          ],
+          "last": {
+            "scene": 8,
+            "age": 83,
+            "health": 1000,
+            "actorHealth": 400,
+            "noAi": false,
+            "stunned": false,
+            "actor": {
+              "x": 0.5,
+              "y": 81,
+              "z": 0.5
+            },
+            "onGround": true,
+            "move": "NONE",
+            "poseAge": 83,
+            "recoil": -1,
+            "walls": 0
+          },
+          "sheet": {
+            "file": "D:/CodexCache/creature-combat-qa/neo-brute-frames/brute-review-8.jpg",
+            "sha256": "24c9949882e5e1ae306889085700b4bbd5c67475f2ce9c364dec9901e0eb4bfe"
+          }
+        },
+        {
+          "scene": 9,
+          "frames": 102,
+          "bodySamples": 102,
+          "recoverySamples": 0,
+          "maxNativeBodyError": 0.000013348326197653319,
+          "hits": [],
+          "receipts": [],
+          "sounds": [
+            {
+              "scene": 9,
+              "age": 0,
+              "event": "blacklight:infection.tension",
+              "at": {
+                "x": 0.5,
+                "y": 82.25,
+                "z": 0.5
+              },
+              "volume": 0.55,
+              "pitch": 0.9723208
+            },
+            {
+              "scene": 9,
+              "age": 18,
+              "event": "blacklight:infection.swing",
+              "at": {
+                "x": 0.5,
+                "y": 82.25,
+                "z": 0.5
+              },
+              "volume": 0.43,
+              "pitch": 1.0305241
+            }
+          ],
+          "last": {
+            "scene": 9,
+            "age": 83,
+            "health": 1000,
+            "actorHealth": 400,
+            "noAi": true,
+            "stunned": false,
+            "actor": {
+              "x": 0.5,
+              "y": 81,
+              "z": 0.5
+            },
+            "onGround": true,
+            "move": "NONE",
+            "poseAge": 83,
+            "recoil": -1,
+            "walls": 0
+          },
+          "sheet": {
+            "file": "D:/CodexCache/creature-combat-qa/neo-brute-frames/brute-review-9.jpg",
+            "sha256": "49d7afaecb156dd4510a40db55b3340e83086d0498a7594ed1d153e078221190"
+          }
+        }
+      ],
+      "incomingCases": [
+        {
+          "scene": 15,
+          "frames": 109,
+          "nativeSamples": 109,
+          "maxNativeBodyError": 0.000013997713404033537,
+          "healthBefore": 400,
+          "healthAfter": 390,
+          "hits": [],
+          "sheet": {
+            "file": "D:/CodexCache/creature-combat-qa/neo-brute-frames/brute-review-15.jpg",
+            "sha256": "091550f6638d5e0d3df42e367cb31c65657f8f7afafc028d2ad2fa27608abf85"
+          }
+        },
+        {
+          "scene": 16,
+          "frames": 108,
+          "nativeSamples": 108,
+          "maxNativeBodyError": 0.000011930614594926893,
+          "healthBefore": 400,
+          "healthAfter": 390,
+          "hits": [],
+          "sheet": {
+            "file": "D:/CodexCache/creature-combat-qa/neo-brute-frames/brute-review-16.jpg",
+            "sha256": "02f89214a7d6c7de6559516f2dd1658f9d6524e71a8f3c57f308662958e665b9"
+          }
+        },
+        {
+          "scene": 17,
+          "frames": 110,
+          "nativeSamples": 110,
+          "maxNativeBodyError": 0.00001383890744169313,
+          "healthBefore": 400,
+          "healthAfter": 390,
+          "hits": [],
+          "sheet": {
+            "file": "D:/CodexCache/creature-combat-qa/neo-brute-frames/brute-review-17.jpg",
+            "sha256": "e2fcc5d916e5b70bd22bbf4a0c4565257a402b387e5c8e5529195d2c7efea523"
+          }
+        },
+        {
+          "scene": 18,
+          "frames": 103,
+          "nativeSamples": 103,
+          "maxNativeBodyError": 0.000012627351340352835,
+          "healthBefore": 400,
+          "healthAfter": 390,
+          "hits": [
+            {
+              "scene": 18,
+              "age": 24,
+              "contactAge": 24,
+              "bone": "ground_wave",
+              "cube": -1,
+              "damage": 12.5,
+              "at": {
+                "x": 0.5,
+                "y": 81,
+                "z": 3.5
+              },
+              "actor": {
+                "x": 0.5,
+                "y": 81,
+                "z": 0.5
+              }
+            }
+          ],
+          "sheet": {
+            "file": "D:/CodexCache/creature-combat-qa/neo-brute-frames/brute-review-18.jpg",
+            "sha256": "d05cdfbac82d66667deb4028222e0a1a78994513c6592050fdaa421b9987571c"
+          }
+        },
+        {
+          "scene": 19,
+          "frames": 98,
+          "nativeSamples": 98,
+          "maxNativeBodyError": 0.000013962113630682738,
+          "healthBefore": 400,
+          "healthAfter": 370,
+          "hits": [],
+          "sheet": {
+            "file": "D:/CodexCache/creature-combat-qa/neo-brute-frames/brute-review-19.jpg",
+            "sha256": "7b417ee0bc17b4b59510c7c6b096a3190716ac77ae1699a995125837e642751f"
+          }
+        }
+      ],
+      "gallery": [
+        {
+          "scene": 10,
+          "file": "D:/CodexCache/creature-combat-qa/neo-brute-frames/10-model_front-020.png",
+          "sha256": "b40c3cd2106a245bd2946f833322c0eacb989895d8dcba6d26df39ea228b437e"
+        },
+        {
+          "scene": 11,
+          "file": "D:/CodexCache/creature-combat-qa/neo-brute-frames/11-model_threequarter-020.png",
+          "sha256": "03f11754c517e7d96b0ca11a1573c23e271c484fed148c0ff55084618c75e7a4"
+        },
+        {
+          "scene": 12,
+          "file": "D:/CodexCache/creature-combat-qa/neo-brute-frames/12-model_side-020.png",
+          "sha256": "912ce01bbbb93aea75fd798c1f0e47cc2bfba9ef53f4565306a348fecb99c0ea"
+        },
+        {
+          "scene": 13,
+          "file": "D:/CodexCache/creature-combat-qa/neo-brute-frames/13-model_back-020.png",
+          "sha256": "6786af58f957b56e4fbe5e3320ad243d3c80356132c475490643612651a25849"
+        },
+        {
+          "scene": 14,
+          "file": "D:/CodexCache/creature-combat-qa/neo-brute-frames/14-model_face-020.png",
+          "sha256": "8846ac2a8908c97af32fdcc140e0684f135a3da51c91aff8e06e829b50cc3b35"
+        }
+      ],
+      "model": {
+        "file": "art/mutant-combat/brute-model.json",
+        "sha256": "e0e5f539567c133efd9872e8aef42dfb27baf817c75bc6b90e1db8525d450b5c",
+        "cuboids": 152,
+        "contactCuboids": 120
+      },
+      "audio": [
+        {
+          "file": "src/main/resources/assets/blacklight/sounds/infection/tension_1.ogg",
+          "sha256": "aa9efb5f5f00be523cee08cdaaf49637a7982c876b54d8d571d70ac84896c8b8"
+        },
+        {
+          "file": "src/main/resources/assets/blacklight/sounds/infection/tension_2.ogg",
+          "sha256": "4bd53571a5e4943c4277c1fb6b5b141805fef5fd3745e1d59a00fbc6d8c11e3f"
+        },
+        {
+          "file": "src/main/resources/assets/blacklight/sounds/infection/tension_3.ogg",
+          "sha256": "c2eb5cf0a83fdc32f22b06e07581e3d588ba1e3d4b69e7e6d507fb6964eef04d"
+        },
+        {
+          "file": "src/main/resources/assets/blacklight/sounds/infection/swing_1.ogg",
+          "sha256": "b7996345083f9e01306b43d22727f2ec3a6212b15b5d6114f5adf96695cd786b"
+        },
+        {
+          "file": "src/main/resources/assets/blacklight/sounds/infection/swing_2.ogg",
+          "sha256": "ac00d4cddc487d262853c5596c0c80491773569aaccd0398cdd92289e4d1ff42"
+        },
+        {
+          "file": "src/main/resources/assets/blacklight/sounds/infection/swing_3.ogg",
+          "sha256": "b3d860b9e0f9a92a59c414cf564390f9f201f6b3106e4bd8c1771540034c1b47"
+        },
+        {
+          "file": "src/main/resources/assets/blacklight/sounds/infection/ground_1.ogg",
+          "sha256": "b11d2a4fb450a74a85bcd89e881190daae73d8dc6f41898990c198e4438ec708"
+        },
+        {
+          "file": "src/main/resources/assets/blacklight/sounds/infection/ground_2.ogg",
+          "sha256": "039f4b8d821168ad6ac2bc6720d2d09f03256ebebbee09cbc9ae1da8a7477825"
+        },
+        {
+          "file": "src/main/resources/assets/blacklight/sounds/infection/ground_3.ogg",
+          "sha256": "c86f42e5595b94e08cd1a39c601ef86eaa4f79c975168192cc2f3976b3d11c22"
+        },
+        {
+          "file": "src/main/resources/assets/blacklight/sounds/infection/crush_1.ogg",
+          "sha256": "e3447f8a249cad63d137326964b8ca0bb27fb7a4784c3fba36647ffb41f810b4"
+        },
+        {
+          "file": "src/main/resources/assets/blacklight/sounds/infection/crush_2.ogg",
+          "sha256": "40f482c5bea252f1f34a5ffee2d9f741874bb1d98f14bc4bd66826731aba0d21"
+        },
+        {
+          "file": "src/main/resources/assets/blacklight/sounds/infection/crush_3.ogg",
+          "sha256": "62305728cb8c06d2697219a70ede9653fc30ba5f409610df5f4bf980d35cded0"
+        }
+      ],
+      "manifest": {
+        "file": "D:/CodexCache/creature-combat-qa/neo-brute-frames/evidence.json",
+        "sha256": "9ffeaa82671288374bc988847aca9d2023cf8742876580262684e9ab9957a7b2"
+      },
+      "sources": [
+        {
+          "file": "src/main/java/com/codex/blacklight/combat/BruteContact.java",
+          "sha256": "e02e1f8a952095808b36e15ff4d01dcce6eb51491b58f47fcfb147d34f5885c3"
+        },
+        {
+          "file": "src/main/java/com/codex/blacklight/combat/BruteRecovery.java",
+          "sha256": "5fd02563be081637b7a132a21c8ccd415278342297c5271cef6a1f376d58b42e"
+        },
+        {
+          "file": "src/main/java/com/codex/blacklight/combat/BruteFlinch.java",
+          "sha256": "9f26cd3d112fe788f3303dfbc4a77044fea89cdce9c9499bd2c5ad79a47263d1"
+        },
+        {
+          "file": "src/main/java/com/codex/blacklight/combat/ImpactControl.java",
+          "sha256": "ec9e96d4b2b53d29d5d9f73a80c73a8775e129da65446f180a7a91969f482d83"
+        },
+        {
+          "file": "src/main/java/com/codex/blacklight/client/animation/BruteHitPose.java",
+          "sha256": "ad1e82c11080f86ad097db3e72621111358e1c6af142dcde2f45109aa0be4884"
+        },
+        {
+          "file": "src/main/java/com/codex/blacklight/combat/MutantMove.java",
+          "sha256": "8ed6c5ce500faedae4e4305abd76ab8192c749614b53d22e4c17be8c71c3b30e"
+        },
+        {
+          "file": "src/main/java/com/codex/blacklight/combat/HydraContact.java",
+          "sha256": "38333c461753e1dcdc572bd7016b463193fa28bfa0b737b09ded3f53bed4b338"
+        },
+        {
+          "file": "src/main/java/com/codex/blacklight/combat/CreaturePoseTable.java",
+          "sha256": "0ad2ab4ea664a7e2c1513bfe7bedecb10de755914f4cfadef539260f31dbec3c"
+        },
+        {
+          "file": "src/main/java/com/codex/blacklight/entity/BlacklightMutant.java",
+          "sha256": "f95f109fc22d271bf3b9bc8da751c55958a19d5d49d83306f21867b9a33d78cd"
+        },
+        {
+          "file": "src/main/java/com/codex/blacklight/infection/InfectedAttackEffects.java",
+          "sha256": "2f9a7617f7cf4adbb34a52f977c120138eaf3fbf1007c16fbe0c821755391930"
+        },
+        {
+          "file": "src/main/java/com/codex/blacklight/registry/ModEntities.java",
+          "sha256": "66bfc7876413871cb6298ae347bde0c012e3c309f728678b429f7930b04b8ce9"
+        },
+        {
+          "file": "src/main/java/com/codex/blacklight/client/model/BlacklightCreatureModel.java",
+          "sha256": "f5d67564ae4d0aefa8c502587a48445155aa68dedd2b4e22b9b5897c22ebcc05"
+        },
+        {
+          "file": "src/main/java/com/codex/blacklight/client/renderer/ContactEffectsPresentation.java",
+          "sha256": "2a75251c18bc45e6efe96cc111c0f8b1f40aa2f5165638c590643be15a227e4e"
+        },
+        {
+          "file": "src/main/java/com/codex/blacklight/client/renderer/BruteContactPresentation.java",
+          "sha256": "2e36bc2f8260bff78b12f8c5a5e9d38d965fe6dbffdea7c9688e911bbbc898e9"
+        },
+        {
+          "file": "src/main/resources/assets/blacklight/geo/blacklight_brute_mc.geo.json",
+          "sha256": "36627247e5be630591b49645f0dc711d1c6d65d1a502983fd4a0f55eab477cbe"
+        },
+        {
+          "file": "src/main/resources/assets/blacklight/models/brute_combat_motion.json",
+          "sha256": "270dd0e386555caa9310609b5be70491ede3a694a9d741f525547b3cd494aedb"
+        },
+        {
+          "file": "src/main/resources/assets/blacklight/animations/blacklight_brute.animation.json",
+          "sha256": "24ddf028962c1a7b90c11a971bc22fff29919d542b09dd094a82a8d7fee1cdd7"
+        },
+        {
+          "file": "src/test/java/com/codex/blacklight/combat/BruteContactTest.java",
+          "sha256": "1746cb1e2e92f31a944dc8fc2565a6dd8004dfc54844eac77043284b138dc2b8"
+        },
+        {
+          "file": "src/test/java/com/codex/blacklight/combat/BruteFlinchTest.java",
+          "sha256": "65fe3e0facc2f9bc2a4cc893e8069b9b6ae0dc3e402804e472adb25ed645da3c"
+        },
+        {
+          "file": "src/test/java/com/codex/blacklight/combat/MutantCombatTest.java",
+          "sha256": "e5af8bf9b0d374e6dd822c4f6f76c7f8fa0a2947e861912f2d6c8c77b21059b9"
+        },
+        {
+          "file": "src/bruteTest/java/com/codex/blacklight/gametest/BruteContactGameTest.java",
+          "sha256": "c9d5d7a43e4e7e8d98be7659b6ad14ef98c6e846e03e14017270cf2e22371456"
+        },
+        {
+          "file": "src/bruteVisual/java/com/codex/blacklight/client/BruteVisual.java",
+          "sha256": "ca7a6655f71617f66c6bb0a411de17cf97683358c2c73950dc6fdf2aaa220274"
+        },
+        {
+          "file": "src/creatureCombatTest/java/com/codex/blacklight/gametest/CreatureSkillsGameTest.java",
+          "sha256": "6ef999f1dba426d7e4916e9ee299fa96e2eca8e2d4d885fa16d777baffe516c7"
+        },
+        {
+          "file": "tools/brute-test.init.gradle",
+          "sha256": "b0e464ba46136b822a5a8e01cec25b6f403950d666988052e4c1e469f3ca8b10"
+        },
+        {
+          "file": "tools/brute-visual.init.gradle",
+          "sha256": "31f1071ec6cd4be7a8c754da97ecb546923cc47b68cad0f8dec5b992b722c990"
+        },
+        {
+          "file": "tools/review_brute.py",
+          "sha256": "bcf76c5f594441048c11493b3425bb6b52f77a034b586fa0b8e97958edd8e55e"
+        },
+        {
+          "file": "tools/build_mutant_combat.mjs",
+          "sha256": "8861bcaed5c1f41030c61fa5d9079de2c1623f77cc3f8a0ce24b778ec977ef95"
+        },
+        {
+          "file": "tools/articulate_brute.mjs",
+          "sha256": "301f68c8c79047a8373bc68b67c5d0528641f4126c039223f718553b4a230175"
+        },
+        {
+          "file": "tools/detail_brute_model.mjs",
+          "sha256": "74a335a3298eb83e4a74604816d8840e4bcb1b32898255b50c3398a011ea7bfe"
+        }
+      ]
+    },
+    {
+      "platform": "forge",
+      "frames": 1581,
+      "units": 37,
+      "logs": [
+        {
+          "stage": "bruteServer",
+          "count": 19,
+          "file": "D:/CodexCache/creature-combat-forge-bruteServer.log",
+          "sha256": "e1114d573ad90f32a26509c6c3458def87585bdca81696a1c32db511e2a81251"
+        },
+        {
+          "stage": "server",
+          "count": 19,
+          "file": "D:/CodexCache/creature-combat-forge-server.log",
+          "sha256": "532db2ca6d7f854a755a131aaa76d36602b686d3415dcfa1177939ada57e3d6d"
+        },
+        {
+          "stage": "stalkerServer",
+          "count": 11,
+          "file": "D:/CodexCache/creature-combat-forge-stalkerServer.log",
+          "sha256": "1435c71a36a14651d6ebbad9a81e83361916f6fba718d96cbf54f8322bc34373"
+        },
+        {
+          "stage": "spitterServer",
+          "count": 10,
+          "file": "D:/CodexCache/creature-combat-forge-spitterServer.log",
+          "sha256": "4cf0b9ae53cf9085587adf8657d3eaf55cbfd8e5b49426d3445e6c82dabecdf4"
+        }
+      ],
+      "unitEvidence": [
+        {
+          "file": "D:/CodexCache/creature-combat-qa/forge-render-build/test-results/test/TEST-com.codex.blacklight.combat.BruteContactTest.xml",
+          "sha256": "dc3718db9913566350641f648a522d38a9d6c952676997bb4e4ff534428b7669"
+        },
+        {
+          "file": "D:/CodexCache/creature-combat-qa/forge-render-build/test-results/test/TEST-com.codex.blacklight.combat.BruteFlinchTest.xml",
+          "sha256": "e71fadc0060b63946218e91408c266996c70d42cc33f8e46ef39686e5a42b6af"
+        },
+        {
+          "file": "D:/CodexCache/creature-combat-qa/forge-render-build/test-results/test/TEST-com.codex.blacklight.combat.StalkerContactTest.xml",
+          "sha256": "30a58c39bef3eb2a03f22e4a272a2404d048f358f5533b6586b9de514c8668c9"
+        },
+        {
+          "file": "D:/CodexCache/creature-combat-qa/forge-render-build/test-results/test/TEST-com.codex.blacklight.combat.MutantCombatTest.xml",
+          "sha256": "303273a03873220e0fec1873f05f8eb416260b65ea766f00afb27f371d162a3e"
+        },
+        {
+          "file": "D:/CodexCache/creature-combat-qa/forge-render-build/test-results/test/TEST-com.codex.blacklight.combat.SpitterMouthTest.xml",
+          "sha256": "ed38028a9a94527652d13b3b66c69080eefdfe8d8e6bf0d368127f004209affc"
+        },
+        {
+          "file": "D:/CodexCache/creature-combat-qa/forge-render-build/test-results/test/TEST-com.codex.blacklight.combat.ContactEffectsQueueTest.xml",
+          "sha256": "87b62039b8b42a8d9d766615e7722db21c7d9e2a4e75be88ea89152e37d0951d"
+        }
+      ],
+      "cases": [
+        {
+          "scene": 0,
+          "frames": 105,
+          "bodySamples": 43,
+          "recoverySamples": 0,
+          "maxNativeBodyError": 0.00001394771436471871,
+          "hits": [
+            {
+              "scene": 0,
+              "age": 17,
+              "contactAge": 16.5,
+              "bone": "right_forearm",
+              "cube": 1,
+              "damage": 10,
+              "at": {
+                "x": 0.21857675689196968,
+                "y": 82.39999997615814,
+                "z": 2.0997571405761057
+              },
+              "actor": {
+                "x": 0.5,
+                "y": 81,
+                "z": 0.5
+              }
+            }
+          ],
+          "receipts": [
+            {
+              "serial": 1,
+              "tick": 110244,
+              "shown": 110244.41999816895,
+              "kind": 1,
+              "surfaceCount": 0,
+              "soundCount": 1,
+              "scene": 0,
+              "firstImage": "0-hammer-017-sub1.png",
+              "bodyGapAtPresentation": 8.415856772418574e-9
+            }
+          ],
+          "sounds": [
+            {
+              "scene": 0,
+              "age": 0,
+              "event": "blacklight:infection.tension",
+              "at": {
+                "x": 0.5,
+                "y": 82.25,
+                "z": 0.5
+              },
+              "volume": 0.55,
+              "pitch": 1.0067159
+            },
+            {
+              "scene": 0,
+              "age": 14,
+              "event": "blacklight:infection.swing",
+              "at": {
+                "x": 0.5,
+                "y": 82.25,
+                "z": 0.5
+              },
+              "volume": 0.43,
+              "pitch": 1.0069036
+            }
+          ],
+          "last": {
+            "scene": 0,
+            "age": 83,
+            "health": 990,
+            "actorHealth": 400,
+            "noAi": false,
+            "stunned": false,
+            "actor": {
+              "x": 0.5,
+              "y": 81,
+              "z": 0.5
+            },
+            "onGround": true,
+            "move": "NONE",
+            "poseAge": 83,
+            "recoil": -1,
+            "walls": 0
+          },
+          "sheet": {
+            "file": "D:/CodexCache/creature-combat-qa/forge-brute-frames/brute-review-0.jpg",
+            "sha256": "0e7d3c584e6cee52c89117e62fd2a5c7cc8486039c9a14ce545d2d85ee94de70"
+          }
+        },
+        {
+          "scene": 1,
+          "frames": 107,
+          "bodySamples": 73,
+          "recoverySamples": 38,
+          "maxNativeBodyError": 0.00008280791151701105,
+          "hits": [
+            {
+              "scene": 1,
+              "age": 26,
+              "contactAge": 26,
+              "bone": "ground_wave",
+              "cube": -1,
+              "damage": 12.5,
+              "at": {
+                "x": 0.5,
+                "y": 81,
+                "z": 3.5
+              },
+              "actor": {
+                "x": 0.5,
+                "y": 81,
+                "z": 0.5
+              }
+            }
+          ],
+          "receipts": [
+            {
+              "serial": 2,
+              "tick": 110357,
+              "shown": 110357.44000005722,
+              "kind": 0,
+              "surfaceCount": 48,
+              "soundCount": 2,
+              "scene": 1,
+              "firstImage": "1-ground_slam-026-sub1.png"
+            },
+            {
+              "serial": 3,
+              "tick": 110357,
+              "shown": 110357.44000005722,
+              "kind": 1,
+              "surfaceCount": 0,
+              "soundCount": 1,
+              "scene": 1,
+              "firstImage": "1-ground_slam-026-sub1.png",
+              "bodyGapAtPresentation": 1.8300047731615532
+            }
+          ],
+          "sounds": [
+            {
+              "scene": 1,
+              "age": 0,
+              "event": "blacklight:infection.tension",
+              "at": {
+                "x": 0.5,
+                "y": 82.25,
+                "z": 0.5
+              },
+              "volume": 0.55,
+              "pitch": 0.97150826
+            },
+            {
+              "scene": 1,
+              "age": 18,
+              "event": "blacklight:infection.swing",
+              "at": {
+                "x": 0.5,
+                "y": 82.25,
+                "z": 0.5
+              },
+              "volume": 0.43,
+              "pitch": 1.027621
+            }
+          ],
+          "last": {
+            "scene": 1,
+            "age": 83,
+            "health": 987.5,
+            "actorHealth": 400,
+            "noAi": false,
+            "stunned": false,
+            "actor": {
+              "x": 0.5,
+              "y": 81,
+              "z": 0.5
+            },
+            "groundImpact": {
+              "x": -0.501326754125967,
+              "y": 81,
+              "z": 1.1991688679603913
+            },
+            "onGround": true,
+            "move": "NONE",
+            "poseAge": 83,
+            "recoil": -1,
+            "walls": 0
+          },
+          "sheet": {
+            "file": "D:/CodexCache/creature-combat-qa/forge-brute-frames/brute-review-1.jpg",
+            "sha256": "72955c92959d31da0d7bbb91053e7b0a124ec2824bebdea11bd01592067a6882"
+          }
+        },
+        {
+          "scene": 2,
+          "frames": 111,
+          "bodySamples": 66,
+          "recoverySamples": 0,
+          "maxNativeBodyError": 0.00001370889668260649,
+          "hits": [
+            {
+              "scene": 2,
+              "age": 23,
+              "contactAge": 22.214285,
+              "bone": "left_forearm",
+              "cube": 9,
+              "damage": 11.5,
+              "at": {
+                "x": 0.6833224208999794,
+                "y": 81.62920114979069,
+                "z": 5.550000011920929
+              },
+              "actor": {
+                "x": 0.5,
+                "y": 81,
+                "z": 4.579999999999999
+              }
+            }
+          ],
+          "receipts": [
+            {
+              "serial": 4,
+              "tick": 110458,
+              "shown": 110459.30000030994,
+              "kind": 1,
+              "surfaceCount": 0,
+              "soundCount": 1,
+              "scene": 2,
+              "firstImage": "2-charge-024.png",
+              "bodyGapAtPresentation": 0.00729227935187684
+            }
+          ],
+          "sounds": [
+            {
+              "scene": 2,
+              "age": 0,
+              "event": "blacklight:infection.tension",
+              "at": {
+                "x": 0.5,
+                "y": 82.25,
+                "z": 0.5
+              },
+              "volume": 0.55,
+              "pitch": 1.0376469
+            },
+            {
+              "scene": 2,
+              "age": 10,
+              "event": "blacklight:infection.swing",
+              "at": {
+                "x": 0.5,
+                "y": 82.25,
+                "z": 0.5
+              },
+              "volume": 0.43,
+              "pitch": 0.984397
+            }
+          ],
+          "last": {
+            "scene": 2,
+            "age": 83,
+            "health": 988.5,
+            "actorHealth": 400,
+            "noAi": false,
+            "stunned": false,
+            "actor": {
+              "x": 0.5,
+              "y": 81,
+              "z": 4.663829996931717
+            },
+            "onGround": true,
+            "move": "NONE",
+            "poseAge": 83,
+            "recoil": -1,
+            "walls": 0
+          },
+          "sheet": {
+            "file": "D:/CodexCache/creature-combat-qa/forge-brute-frames/brute-review-2.jpg",
+            "sha256": "0dd7d9e0888b8dca1b5e45400812066427ad7328b93500550cfbedf82c9edb6b"
+          }
+        },
+        {
+          "scene": 3,
+          "frames": 109,
+          "bodySamples": 67,
+          "recoverySamples": 0,
+          "maxNativeBodyError": 0.000013191211939794673,
+          "hits": [],
+          "receipts": [],
+          "sounds": [
+            {
+              "scene": 3,
+              "age": 0,
+              "event": "blacklight:infection.tension",
+              "at": {
+                "x": 0.5,
+                "y": 82.25,
+                "z": 0.5
+              },
+              "volume": 0.55,
+              "pitch": 1.0156845
+            },
+            {
+              "scene": 3,
+              "age": 10,
+              "event": "blacklight:infection.swing",
+              "at": {
+                "x": 0.5,
+                "y": 82.25,
+                "z": 0.5
+              },
+              "volume": 0.43,
+              "pitch": 0.9823587
+            }
+          ],
+          "last": {
+            "scene": 3,
+            "age": 83,
+            "health": 1000,
+            "actorHealth": 400,
+            "noAi": false,
+            "stunned": false,
+            "actor": {
+              "x": 0.5,
+              "y": 81,
+              "z": 5.599999999999999
+            },
+            "onGround": true,
+            "move": "NONE",
+            "poseAge": 83,
+            "recoil": -1,
+            "walls": 0
+          },
+          "sheet": {
+            "file": "D:/CodexCache/creature-combat-qa/forge-brute-frames/brute-review-3.jpg",
+            "sha256": "77b47bde82f3175e0ce927a532b4241dcfbf98b0f66214e5e6ca8be9775c9f63"
+          }
+        },
+        {
+          "scene": 4,
+          "frames": 96,
+          "bodySamples": 46,
+          "recoverySamples": 0,
+          "maxNativeBodyError": 0.0000126380381433314,
+          "hits": [],
+          "receipts": [
+            {
+              "serial": 5,
+              "tick": 110662,
+              "shown": 110662.66000282764,
+              "kind": 5,
+              "surfaceCount": 1,
+              "soundCount": 2,
+              "scene": 4,
+              "firstImage": "4-charge_wall-019-sub1.png"
+            }
+          ],
+          "sounds": [
+            {
+              "scene": 4,
+              "age": 0,
+              "event": "blacklight:infection.tension",
+              "at": {
+                "x": 0.5,
+                "y": 82.25,
+                "z": 0.5
+              },
+              "volume": 0.55,
+              "pitch": 1.0162871
+            },
+            {
+              "scene": 4,
+              "age": 10,
+              "event": "blacklight:infection.swing",
+              "at": {
+                "x": 0.5,
+                "y": 82.25,
+                "z": 0.5
+              },
+              "volume": 0.43,
+              "pitch": 0.9726526
+            }
+          ],
+          "last": {
+            "scene": 4,
+            "age": 83,
+            "health": 1000,
+            "actorHealth": 400,
+            "noAi": false,
+            "stunned": false,
+            "actor": {
+              "x": 0.5,
+              "y": 81,
+              "z": 2.0858105468750012
+            },
+            "onGround": true,
+            "move": "NONE",
+            "poseAge": 83,
+            "recoil": -1,
+            "walls": 1
+          },
+          "sheet": {
+            "file": "D:/CodexCache/creature-combat-qa/forge-brute-frames/brute-review-4.jpg",
+            "sha256": "21477dbd7439df41934a1b1727dfc3a7417722162d72783e91bba24372216b8d"
+          }
+        },
+        {
+          "scene": 5,
+          "frames": 112,
+          "bodySamples": 29,
+          "recoverySamples": 0,
+          "maxNativeBodyError": 0.000013598183546783317,
+          "hits": [],
+          "receipts": [
+            {
+              "serial": 6,
+              "tick": 110758,
+              "shown": 110758.02000272274,
+              "kind": 5,
+              "surfaceCount": 1,
+              "soundCount": 2,
+              "scene": 5,
+              "firstImage": "5-hammer_bars-011.png"
+            }
+          ],
+          "sounds": [
+            {
+              "scene": 5,
+              "age": 0,
+              "event": "blacklight:infection.tension",
+              "at": {
+                "x": 0.5,
+                "y": 82.25,
+                "z": 0.5
+              },
+              "volume": 0.55,
+              "pitch": 1.0058602
+            }
+          ],
+          "last": {
+            "scene": 5,
+            "age": 83,
+            "health": 1000,
+            "actorHealth": 400,
+            "noAi": false,
+            "stunned": false,
+            "actor": {
+              "x": 0.5,
+              "y": 81,
+              "z": 0.5
+            },
+            "onGround": true,
+            "move": "NONE",
+            "poseAge": 83,
+            "recoil": -1,
+            "walls": 1
+          },
+          "sheet": {
+            "file": "D:/CodexCache/creature-combat-qa/forge-brute-frames/brute-review-5.jpg",
+            "sha256": "c25a22ab94e01ed8a2afbff1e4a5ff2a532368114ac7d9cab809d6d256585bba"
+          }
+        },
+        {
+          "scene": 6,
+          "frames": 99,
+          "bodySamples": 60,
+          "recoverySamples": 35,
+          "maxNativeBodyError": 0.00001383158956014107,
+          "hits": [
+            {
+              "scene": 6,
+              "age": 24,
+              "contactAge": 24,
+              "bone": "ground_wave",
+              "cube": -1,
+              "damage": 12.5,
+              "at": {
+                "x": 0.5,
+                "y": 81,
+                "z": 3.5
+              },
+              "actor": {
+                "x": 0.5,
+                "y": 81,
+                "z": 0.5
+              }
+            }
+          ],
+          "receipts": [
+            {
+              "serial": 7,
+              "tick": 110875,
+              "shown": 110876.02000439167,
+              "kind": 0,
+              "surfaceCount": 19,
+              "soundCount": 2,
+              "scene": 6,
+              "firstImage": "6-slam_slab-024.png"
+            },
+            {
+              "serial": 8,
+              "tick": 110875,
+              "shown": 110876.02000439167,
+              "kind": 1,
+              "surfaceCount": 0,
+              "soundCount": 1,
+              "scene": 6,
+              "firstImage": "6-slam_slab-024.png",
+              "bodyGapAtPresentation": 1.8102746942780361
+            }
+          ],
+          "sounds": [
+            {
+              "scene": 6,
+              "age": 0,
+              "event": "blacklight:infection.tension",
+              "at": {
+                "x": 0.5,
+                "y": 82.25,
+                "z": 0.5
+              },
+              "volume": 0.55,
+              "pitch": 1.0102774
+            },
+            {
+              "scene": 6,
+              "age": 18,
+              "event": "blacklight:infection.swing",
+              "at": {
+                "x": 0.5,
+                "y": 82.25,
+                "z": 0.5
+              },
+              "volume": 0.43,
+              "pitch": 0.994226
+            }
+          ],
+          "last": {
+            "scene": 6,
+            "age": 83,
+            "health": 987.5,
+            "actorHealth": 400,
+            "noAi": false,
+            "stunned": false,
+            "actor": {
+              "x": 0.5,
+              "y": 81,
+              "z": 0.5
+            },
+            "groundImpact": {
+              "x": -0.5183265357886297,
+              "y": 81.5,
+              "z": 1.7278355509226977
+            },
+            "onGround": true,
+            "move": "NONE",
+            "poseAge": 83,
+            "recoil": -1,
+            "walls": 0
+          },
+          "sheet": {
+            "file": "D:/CodexCache/creature-combat-qa/forge-brute-frames/brute-review-6.jpg",
+            "sha256": "e6d6c3930f27082644c5ddd6bfb2e1ae4df3bdfb246ae455d1510159c503c415"
+          }
+        },
+        {
+          "scene": 7,
+          "frames": 100,
+          "bodySamples": 57,
+          "recoverySamples": 0,
+          "maxNativeBodyError": 0.0000148922208617863,
+          "hits": [],
+          "receipts": [],
+          "sounds": [
+            {
+              "scene": 7,
+              "age": 0,
+              "event": "blacklight:infection.tension",
+              "at": {
+                "x": 0.5,
+                "y": 82.25,
+                "z": 0.5
+              },
+              "volume": 0.55,
+              "pitch": 1.0329161
+            },
+            {
+              "scene": 7,
+              "age": 18,
+              "event": "blacklight:infection.swing",
+              "at": {
+                "x": 0.5,
+                "y": 85.66499099849123,
+                "z": 0.5
+              },
+              "volume": 0.43,
+              "pitch": 1.0260506
+            }
+          ],
+          "last": {
+            "scene": 7,
+            "age": 83,
+            "health": 1000,
+            "actorHealth": 400,
+            "noAi": false,
+            "stunned": false,
+            "actor": {
+              "x": 0.5,
+              "y": 81.97699244523342,
+              "z": 0.5
+            },
+            "onGround": false,
+            "move": "NONE",
+            "poseAge": 83,
+            "recoil": -1,
+            "walls": 0
+          },
+          "sheet": {
+            "file": "D:/CodexCache/creature-combat-qa/forge-brute-frames/brute-review-7.jpg",
+            "sha256": "7c7cfc2f48e908ad2c6f49a625f57083c16bb4f5cf28f2905f1fc60ed8397dd1"
+          }
+        },
+        {
+          "scene": 8,
+          "frames": 106,
+          "bodySamples": 45,
+          "recoverySamples": 0,
+          "maxNativeBodyError": 0.000013733617120477892,
+          "hits": [],
+          "receipts": [],
+          "sounds": [
+            {
+              "scene": 8,
+              "age": 0,
+              "event": "blacklight:infection.tension",
+              "at": {
+                "x": 0.5,
+                "y": 82.25,
+                "z": 0.5
+              },
+              "volume": 0.55,
+              "pitch": 0.98630136
+            },
+            {
+              "scene": 8,
+              "age": 14,
+              "event": "blacklight:infection.swing",
+              "at": {
+                "x": 0.5,
+                "y": 82.25,
+                "z": 0.5
+              },
+              "volume": 0.43,
+              "pitch": 1.0080651
+            }
+          ],
+          "last": {
+            "scene": 8,
+            "age": 83,
+            "health": 1000,
+            "actorHealth": 400,
+            "noAi": false,
+            "stunned": false,
+            "actor": {
+              "x": 0.5,
+              "y": 81,
+              "z": 0.5
+            },
+            "onGround": true,
+            "move": "NONE",
+            "poseAge": 83,
+            "recoil": -1,
+            "walls": 0
+          },
+          "sheet": {
+            "file": "D:/CodexCache/creature-combat-qa/forge-brute-frames/brute-review-8.jpg",
+            "sha256": "a6dd35a9445e23bb3c22e3395a0ed16f1ff959b102088c0aa384e5e9fb7aeb6b"
+          }
+        },
+        {
+          "scene": 9,
+          "frames": 110,
+          "bodySamples": 110,
+          "recoverySamples": 0,
+          "maxNativeBodyError": 0.000013158381865014851,
+          "hits": [],
+          "receipts": [],
+          "sounds": [
+            {
+              "scene": 9,
+              "age": 0,
+              "event": "blacklight:infection.tension",
+              "at": {
+                "x": 0.5,
+                "y": 82.25,
+                "z": 0.5
+              },
+              "volume": 0.55,
+              "pitch": 1.0128325
+            },
+            {
+              "scene": 9,
+              "age": 18,
+              "event": "blacklight:infection.swing",
+              "at": {
+                "x": 0.5,
+                "y": 82.25,
+                "z": 0.5
+              },
+              "volume": 0.43,
+              "pitch": 1.0136659
+            }
+          ],
+          "last": {
+            "scene": 9,
+            "age": 83,
+            "health": 1000,
+            "actorHealth": 400,
+            "noAi": true,
+            "stunned": false,
+            "actor": {
+              "x": 0.5,
+              "y": 81,
+              "z": 0.5
+            },
+            "onGround": true,
+            "move": "NONE",
+            "poseAge": 83,
+            "recoil": -1,
+            "walls": 0
+          },
+          "sheet": {
+            "file": "D:/CodexCache/creature-combat-qa/forge-brute-frames/brute-review-9.jpg",
+            "sha256": "a4705a38f8410a3ab3c1942dae4a3361b6e58dc86c3b621848abe2c873f7f061"
+          }
+        }
+      ],
+      "incomingCases": [
+        {
+          "scene": 15,
+          "frames": 102,
+          "nativeSamples": 102,
+          "maxNativeBodyError": 0.00001564639615208267,
+          "healthBefore": 400,
+          "healthAfter": 390,
+          "hits": [],
+          "sheet": {
+            "file": "D:/CodexCache/creature-combat-qa/forge-brute-frames/brute-review-15.jpg",
+            "sha256": "23f89948a9e7860d9534cf18d2ee2c4d34aa4e6b49235f78299da5bc89cfd331"
+          }
+        },
+        {
+          "scene": 16,
+          "frames": 106,
+          "nativeSamples": 106,
+          "maxNativeBodyError": 0.000013399860640556399,
+          "healthBefore": 400,
+          "healthAfter": 390,
+          "hits": [],
+          "sheet": {
+            "file": "D:/CodexCache/creature-combat-qa/forge-brute-frames/brute-review-16.jpg",
+            "sha256": "99a919cde22ad56f97f7485b6fbfec277b38a2874941a00bb327d4419bdba805"
+          }
+        },
+        {
+          "scene": 17,
+          "frames": 106,
+          "nativeSamples": 106,
+          "maxNativeBodyError": 0.000012767112284411505,
+          "healthBefore": 400,
+          "healthAfter": 390,
+          "hits": [],
+          "sheet": {
+            "file": "D:/CodexCache/creature-combat-qa/forge-brute-frames/brute-review-17.jpg",
+            "sha256": "4309f2e4a159cca69bcc508fd2972a78e314c9c95d9f968a3d304a77dc2efc72"
+          }
+        },
+        {
+          "scene": 18,
+          "frames": 106,
+          "nativeSamples": 106,
+          "maxNativeBodyError": 0.00001362614660355382,
+          "healthBefore": 400,
+          "healthAfter": 390,
+          "hits": [
+            {
+              "scene": 18,
+              "age": 24,
+              "contactAge": 24,
+              "bone": "ground_wave",
+              "cube": -1,
+              "damage": 12.5,
+              "at": {
+                "x": 0.5,
+                "y": 81,
+                "z": 3.5
+              },
+              "actor": {
+                "x": 0.5,
+                "y": 81,
+                "z": 0.5
+              }
+            }
+          ],
+          "sheet": {
+            "file": "D:/CodexCache/creature-combat-qa/forge-brute-frames/brute-review-18.jpg",
+            "sha256": "f4ebfa98b201b174870686c9573e15df72960711a3f9cb0fabb7d53d1b02a2ac"
+          }
+        },
+        {
+          "scene": 19,
+          "frames": 96,
+          "nativeSamples": 96,
+          "maxNativeBodyError": 0.000013580583865454254,
+          "healthBefore": 400,
+          "healthAfter": 370,
+          "hits": [],
+          "sheet": {
+            "file": "D:/CodexCache/creature-combat-qa/forge-brute-frames/brute-review-19.jpg",
+            "sha256": "c36f7046becb1bec9cd93b0693dc28fdcc2a43e15cb1a4ddc174bcb3f150d43a"
+          }
+        }
+      ],
+      "gallery": [
+        {
+          "scene": 10,
+          "file": "D:/CodexCache/creature-combat-qa/forge-brute-frames/10-model_front-020.png",
+          "sha256": "7a4265375d7e4cfe3c13b428e2e0e3ad186a99ace430a704f197cde530e07c50"
+        },
+        {
+          "scene": 11,
+          "file": "D:/CodexCache/creature-combat-qa/forge-brute-frames/11-model_threequarter-020-sub2.png",
+          "sha256": "b9a8faaae3d2983cbddd6a8e6d524f2230de5e493c3902c8a81bc4ec92a12cc4"
+        },
+        {
+          "scene": 12,
+          "file": "D:/CodexCache/creature-combat-qa/forge-brute-frames/12-model_side-020-sub2.png",
+          "sha256": "3c579834f31c3ab6a44169cbe3752da59e89eeeca6848d571e3429efec4eab3c"
+        },
+        {
+          "scene": 13,
+          "file": "D:/CodexCache/creature-combat-qa/forge-brute-frames/13-model_back-020-sub2.png",
+          "sha256": "ecae47704f851d18b4ac844aac9447598b128ef8a98ed6bccde8c1f7dabc0a82"
+        },
+        {
+          "scene": 14,
+          "file": "D:/CodexCache/creature-combat-qa/forge-brute-frames/14-model_face-020.png",
+          "sha256": "217caff283d5979d13122d09bb4be84d3721d2749c12fd70302609e51701e6f7"
+        }
+      ],
+      "model": {
+        "file": "art/mutant-combat/brute-model.json",
+        "sha256": "e0e5f539567c133efd9872e8aef42dfb27baf817c75bc6b90e1db8525d450b5c",
+        "cuboids": 152,
+        "contactCuboids": 120
+      },
+      "audio": [
+        {
+          "file": "src/main/resources/assets/blacklight/sounds/infection/tension_1.ogg",
+          "sha256": "aa9efb5f5f00be523cee08cdaaf49637a7982c876b54d8d571d70ac84896c8b8"
+        },
+        {
+          "file": "src/main/resources/assets/blacklight/sounds/infection/tension_2.ogg",
+          "sha256": "4bd53571a5e4943c4277c1fb6b5b141805fef5fd3745e1d59a00fbc6d8c11e3f"
+        },
+        {
+          "file": "src/main/resources/assets/blacklight/sounds/infection/tension_3.ogg",
+          "sha256": "c2eb5cf0a83fdc32f22b06e07581e3d588ba1e3d4b69e7e6d507fb6964eef04d"
+        },
+        {
+          "file": "src/main/resources/assets/blacklight/sounds/infection/swing_1.ogg",
+          "sha256": "b7996345083f9e01306b43d22727f2ec3a6212b15b5d6114f5adf96695cd786b"
+        },
+        {
+          "file": "src/main/resources/assets/blacklight/sounds/infection/swing_2.ogg",
+          "sha256": "ac00d4cddc487d262853c5596c0c80491773569aaccd0398cdd92289e4d1ff42"
+        },
+        {
+          "file": "src/main/resources/assets/blacklight/sounds/infection/swing_3.ogg",
+          "sha256": "b3d860b9e0f9a92a59c414cf564390f9f201f6b3106e4bd8c1771540034c1b47"
+        },
+        {
+          "file": "src/main/resources/assets/blacklight/sounds/infection/ground_1.ogg",
+          "sha256": "b11d2a4fb450a74a85bcd89e881190daae73d8dc6f41898990c198e4438ec708"
+        },
+        {
+          "file": "src/main/resources/assets/blacklight/sounds/infection/ground_2.ogg",
+          "sha256": "039f4b8d821168ad6ac2bc6720d2d09f03256ebebbee09cbc9ae1da8a7477825"
+        },
+        {
+          "file": "src/main/resources/assets/blacklight/sounds/infection/ground_3.ogg",
+          "sha256": "c86f42e5595b94e08cd1a39c601ef86eaa4f79c975168192cc2f3976b3d11c22"
+        },
+        {
+          "file": "src/main/resources/assets/blacklight/sounds/infection/crush_1.ogg",
+          "sha256": "e3447f8a249cad63d137326964b8ca0bb27fb7a4784c3fba36647ffb41f810b4"
+        },
+        {
+          "file": "src/main/resources/assets/blacklight/sounds/infection/crush_2.ogg",
+          "sha256": "40f482c5bea252f1f34a5ffee2d9f741874bb1d98f14bc4bd66826731aba0d21"
+        },
+        {
+          "file": "src/main/resources/assets/blacklight/sounds/infection/crush_3.ogg",
+          "sha256": "62305728cb8c06d2697219a70ede9653fc30ba5f409610df5f4bf980d35cded0"
+        }
+      ],
+      "manifest": {
+        "file": "D:/CodexCache/creature-combat-qa/forge-brute-frames/evidence.json",
+        "sha256": "3012dbf0b4bee453cd0483ed97e3f8cf368c119d59648a30d222e540955f378d"
+      },
+      "sources": [
+        {
+          "file": "src/main/java/com/codex/blacklight/combat/BruteContact.java",
+          "sha256": "e02e1f8a952095808b36e15ff4d01dcce6eb51491b58f47fcfb147d34f5885c3"
+        },
+        {
+          "file": "src/main/java/com/codex/blacklight/combat/BruteRecovery.java",
+          "sha256": "5fd02563be081637b7a132a21c8ccd415278342297c5271cef6a1f376d58b42e"
+        },
+        {
+          "file": "src/main/java/com/codex/blacklight/combat/BruteFlinch.java",
+          "sha256": "9f26cd3d112fe788f3303dfbc4a77044fea89cdce9c9499bd2c5ad79a47263d1"
+        },
+        {
+          "file": "src/main/java/com/codex/blacklight/combat/ImpactControl.java",
+          "sha256": "de03a10443e417368e4cf22f7e684501eed56d07e2fc0e10c011d392eaa72c10"
+        },
+        {
+          "file": "src/main/java/com/codex/blacklight/client/animation/BruteHitPose.java",
+          "sha256": "ad1e82c11080f86ad097db3e72621111358e1c6af142dcde2f45109aa0be4884"
+        },
+        {
+          "file": "src/main/java/com/codex/blacklight/combat/MutantMove.java",
+          "sha256": "8ed6c5ce500faedae4e4305abd76ab8192c749614b53d22e4c17be8c71c3b30e"
+        },
+        {
+          "file": "src/main/java/com/codex/blacklight/combat/HydraContact.java",
+          "sha256": "38333c461753e1dcdc572bd7016b463193fa28bfa0b737b09ded3f53bed4b338"
+        },
+        {
+          "file": "src/main/java/com/codex/blacklight/combat/CreaturePoseTable.java",
+          "sha256": "d8011d9be75e707df03f4fbb8b7c2a205851534e7f369031d67b298077ed6752"
+        },
+        {
+          "file": "src/main/java/com/codex/blacklight/entity/BlacklightMutant.java",
+          "sha256": "a8495920e53eaf2e84caee426ffc5f01b90ecdae6fa2924e41a8e1616603ad63"
+        },
+        {
+          "file": "src/main/java/com/codex/blacklight/infection/InfectedAttackEffects.java",
+          "sha256": "bf6041d429dc40ec036816b2a24df434284b053ab35b1fbed02b72bd1a7f35ce"
+        },
+        {
+          "file": "src/main/java/com/codex/blacklight/registry/ModEntities.java",
+          "sha256": "5a1454ec7aedac5483ab2e965920f49b31effdd9fed35cf06b6e72ede0df08d3"
+        },
+        {
+          "file": "src/main/java/com/codex/blacklight/client/model/BlacklightCreatureModel.java",
+          "sha256": "c31997ebb76ba478fbffe0f899c006dbf5f86d0f6e8ab6347c60d09b7f3577da"
+        },
+        {
+          "file": "src/main/java/com/codex/blacklight/client/renderer/ContactEffectsPresentation.java",
+          "sha256": "70129812e91467db53f658389c0d1e373fc31e3e4b1064cfdb276cad9d28c52d"
+        },
+        {
+          "file": "src/main/java/com/codex/blacklight/client/renderer/BruteContactPresentation.java",
+          "sha256": "2e36bc2f8260bff78b12f8c5a5e9d38d965fe6dbffdea7c9688e911bbbc898e9"
+        },
+        {
+          "file": "src/main/resources/assets/blacklight/geo/blacklight_brute_mc.geo.json",
+          "sha256": "36627247e5be630591b49645f0dc711d1c6d65d1a502983fd4a0f55eab477cbe"
+        },
+        {
+          "file": "src/main/resources/assets/blacklight/models/brute_combat_motion.json",
+          "sha256": "270dd0e386555caa9310609b5be70491ede3a694a9d741f525547b3cd494aedb"
+        },
+        {
+          "file": "src/main/resources/assets/blacklight/animations/blacklight_brute.animation.json",
+          "sha256": "24ddf028962c1a7b90c11a971bc22fff29919d542b09dd094a82a8d7fee1cdd7"
+        },
+        {
+          "file": "src/test/java/com/codex/blacklight/combat/BruteContactTest.java",
+          "sha256": "1746cb1e2e92f31a944dc8fc2565a6dd8004dfc54844eac77043284b138dc2b8"
+        },
+        {
+          "file": "src/test/java/com/codex/blacklight/combat/BruteFlinchTest.java",
+          "sha256": "65fe3e0facc2f9bc2a4cc893e8069b9b6ae0dc3e402804e472adb25ed645da3c"
+        },
+        {
+          "file": "src/test/java/com/codex/blacklight/combat/MutantCombatTest.java",
+          "sha256": "e5af8bf9b0d374e6dd822c4f6f76c7f8fa0a2947e861912f2d6c8c77b21059b9"
+        },
+        {
+          "file": "src/bruteTest/java/com/codex/blacklight/gametest/BruteContactGameTest.java",
+          "sha256": "d13ce02b3b2049e2a22ff0530d2fe4017e1facd00b36958531373ecc975c3789"
+        },
+        {
+          "file": "src/bruteVisual/java/com/codex/blacklight/client/BruteVisual.java",
+          "sha256": "6a10b433c2af1bffb3895eccfce40d30fce214ce3eb22794d040046dac94fd7f"
+        },
+        {
+          "file": "src/creatureCombatTest/java/com/codex/blacklight/gametest/CreatureSkillsGameTest.java",
+          "sha256": "25ed5126ba475349de05d99b57f978ebdeb0152170c9767a8e3f98dbaf824981"
+        },
+        {
+          "file": "tools/brute-test.init.gradle",
+          "sha256": "b0e464ba46136b822a5a8e01cec25b6f403950d666988052e4c1e469f3ca8b10"
+        },
+        {
+          "file": "tools/brute-visual.init.gradle",
+          "sha256": "691a17a2398f4faf37734a98a3475c8d2123beb1bb2e9f64e6b0ef87752fe46f"
+        },
+        {
+          "file": "tools/review_brute.py",
+          "sha256": "bcf76c5f594441048c11493b3425bb6b52f77a034b586fa0b8e97958edd8e55e"
+        },
+        {
+          "file": "tools/build_mutant_combat.mjs",
+          "sha256": "8861bcaed5c1f41030c61fa5d9079de2c1623f77cc3f8a0ce24b778ec977ef95"
+        },
+        {
+          "file": "tools/articulate_brute.mjs",
+          "sha256": "301f68c8c79047a8373bc68b67c5d0528641f4126c039223f718553b4a230175"
+        },
+        {
+          "file": "tools/detail_brute_model.mjs",
+          "sha256": "74a335a3298eb83e4a74604816d8840e4bcb1b32898255b50c3398a011ea7bfe"
+        }
+      ]
+    }
+  ],
+  "pending": [
+    "The authored anatomy now has separate pectorals, scapulae, maw, fingers, thumbs, knees and toes using the existing atlas. The block silhouette and material palette still need final visual acceptance; fingers and knees have no independent animation channels. Guard/knockdown/death/consume choreography, narrow-space recovery and complete combat pacing remain open.",
+    "Muted captures verify sound dispatch, position and deduplication, not listening acceptance or crowd mixing.",
+    "Standing Brute weapon reactions and attack interruption are covered separately. Knockdowns, lethal impacts, consumption, directional camera/attacker combinations and every constrained-space transition remain outside this acceptance.",
+    "The fixed first-person review camera crops the displaced target in dodge cases and the top of one airborne windup. Their event/matrix checks remain available; these sheets do not accept full-shot framing or complete aerial choreography.",
+    "Earlier captures showed the spectator observer head after delayed Prototype-mode sync changed the QA camera to third person. QA now holds first person and records the detached-camera flag. These checks do not establish general rendering acceptance.",
+    "Moving-player/shield/mod targets, multiplayer latency and every terrain configuration are not accepted. Other creatures, Blackwatch soldiers/helicopters and detailed vehicle items remain in the active goal."
+  ],
+  "boundary": "Existing rig cuboids are transformed with the same pose table as the renderer and swept against native target bounding boxes. Slam waves use supported feet, actual surface height and line-of-sight, sharing the fist hit ledger. This is not arbitrary skin-triangle collision or verified original-game species mapping. Native bone centers are independently sampled after rendering. Only charge tissue/audio waits at most six ticks for the visible body; server damage and vanilla hurt flash are unchanged. No release package was produced.",
+  "visualReview": {
+    "status": "current_combat_and_incoming_hit_keyframes_reviewed_with_open_visual_issues",
+    "reviewedScenes": [
+      0,
+      1,
+      2,
+      4,
+      6,
+      9,
+      15,
+      16,
+      17,
+      18,
+      19
+    ],
+    "reviewedSheets": 22,
+    "framesPerSheet": 8,
+    "modelGeometryUnchangedFromPriorReview": true,
+    "everyCapturedFrameManuallyReviewed": false
+  }
+}

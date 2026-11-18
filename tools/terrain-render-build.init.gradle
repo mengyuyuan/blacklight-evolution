@@ -1,0 +1,4 @@
+// Keep hidden visual QA classes/resources out of another build's output tree.
+allprojects {
+    layout.buildDirectory.set(file('D:/CodexCache/creature-combat-qa/forge-render-build'))
+}

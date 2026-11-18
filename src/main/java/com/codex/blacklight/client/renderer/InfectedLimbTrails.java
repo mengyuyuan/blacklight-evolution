@@ -22,8 +22,18 @@ public final class InfectedLimbTrails {
     private InfectedLimbTrails(){}
     private static boolean active(Mob mob){
         if(mob.isInvisible()||!mob.isAlive()||com.codex.blacklight.registry.ModAttachments.getData(mob, com.codex.blacklight.registry.ModAttachments.CONSUME_VISUAL).active())return false;
-        if(mob instanceof BlacklightCommonInfected civilian){long t=civilian.level().getGameTime()-civilian.attackStarted();return civilian.attackStarted()>=0&&t>=6&&t<=18;}
-        if(mob instanceof BlacklightHunter hunter)return hunter.committedAttack()&&hunter.attackMove()!=com.codex.blacklight.combat.CreatureAttack.DODGE&&hunter.attackAge(0)>6&&hunter.attackAge(0)<34;
+        if(mob instanceof BlacklightCommonInfected civilian){
+            if(civilian.attackStarted()<0)return false;
+            if(civilian.attackHand()==CommonInfectedLeap.HAND)return civilian.leapLandAge(0)<0&&CommonInfectedLeap.damageWindow(civilian.leapPunchAge(0));
+            long t=civilian.level().getGameTime()-civilian.attackStarted();return t>=6&&t<=18;
+        }
+        if(mob instanceof BlacklightHunter hunter){
+            if(!hunter.committedAttack())return false;
+            float age=hunter.attackAge(0);
+            if(hunter.attackMove()==com.codex.blacklight.combat.CreatureAttack.COUNTER)return age>=7.333333F&&age<=22;
+            if(hunter.counterBarrage())return java.util.Arrays.stream(hunter.attackMove().windows()).anyMatch(w->age>=w.from()*20&&age<=w.to()*20);
+            return hunter.attackMove()!=com.codex.blacklight.combat.CreatureAttack.DODGE&&age>6&&age<34;
+        }
         if(mob instanceof BlacklightInfectedHost host){if(host.isEvolved()||!host.nativeAction().isEmpty())return false;float t=host.tissueStrikeElapsed(0);var core=host.organActionCore();boolean organ=false;if(core!=null){var cycle=TissueOrganCycle.cycle(core);float at=host.organActionElapsed(0);organ=at>=cycle.windup()-2&&at<=cycle.retract()+1;}return mob.swinging||t>=7&&t<=19||organ;}
         return mob.swinging;
     }
@@ -32,6 +42,15 @@ public final class InfectedLimbTrails {
         float partial=mc.getFrameTime();double now=mob.level().getGameTime()+partial;
         if(STATES.size()>=128&&!STATES.containsKey(mob))return;
         var point=pose.pose().transformPosition(new Vector3f((float)local.x,(float)local.y,(float)local.z));var world=new Vec3(point.x,point.y,point.z).add(mc.gameRenderer.getMainCamera().getPosition());
+        if(mob instanceof BlacklightHunter hunter&&(hunter.attackMove()==com.codex.blacklight.combat.CreatureAttack.COUNTER||hunter.counterBarrage())){
+            boolean left=hunter.attackMove()==com.codex.blacklight.combat.CreatureAttack.COUNTER;
+            if(!left){
+                float age=hunter.attackAge(0);var window=java.util.Arrays.stream(hunter.attackMove().windows()).filter(w->age>=w.from()*20&&age<=w.to()*20).findFirst();
+                if(window.isEmpty())return;left=window.get().left();
+            }
+            if(slot!=(left?"left_forearm":"right_forearm").hashCode())return;
+            world=com.codex.blacklight.combat.HunterContactPose.hand(hunter.attackMove(),hunter.attackAge(partial),left,hunter.getPosition(partial),net.minecraft.util.Mth.rotLerp(partial,hunter.yBodyRotO,hunter.yBodyRot)).tip();
+        }
         var q=STATES.computeIfAbsent(mob,k->new HashMap<>()).computeIfAbsent(slot,k->new ArrayDeque<>());
         if(!q.isEmpty()){var previous=q.getLast();if(now-previous.at<.08)return;if(now<previous.at||now-previous.at>1.5||world.distanceToSqr(previous.point)>9)q.clear();}
         q.add(new Sample(now,world));while(q.size()>24)q.removeFirst();

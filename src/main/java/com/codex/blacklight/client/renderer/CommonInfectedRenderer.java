@@ -19,7 +19,14 @@ public final class CommonInfectedRenderer extends HumanoidMobRenderer<Blacklight
         super.render(e,yaw,partial,pose,buffers,light);
         if(e.attackStarted()<0)return;
         pose.pushPose();pose.mulPose(com.mojang.math.Axis.YP.rotationDegrees(180-net.minecraft.util.Mth.rotLerp(partial,e.yBodyRotO,e.yBodyRot)));pose.scale(-1,-1,1);pose.translate(0,-1.501,0);
-        model.translateToHand(e.attackHand()==0?net.minecraft.world.entity.HumanoidArm.RIGHT:net.minecraft.world.entity.HumanoidArm.LEFT,pose);
-        InfectedLimbTrails.capture(e,e.attackHand(),pose.last(),new net.minecraft.world.phys.Vec3(0,.625,0));pose.popPose();
+        if(e.attackHand()==com.codex.blacklight.infection.CommonInfectedLeap.HAND){
+            // Use the same rendered right wrist as the server contact, not the old left-hand fallback.
+            model.rightArm.translateAndRotate(pose);model.rightArm.getChild("forearm").translateAndRotate(pose);
+            InfectedLimbTrails.capture(e,e.attackHand(),pose.last(),new net.minecraft.world.phys.Vec3(-1/16D,6/16D,0));
+        }else{
+            model.translateToHand(e.attackHand()==0?net.minecraft.world.entity.HumanoidArm.RIGHT:net.minecraft.world.entity.HumanoidArm.LEFT,pose);
+            InfectedLimbTrails.capture(e,e.attackHand(),pose.last(),new net.minecraft.world.phys.Vec3(0,.625,0));
+        }
+        pose.popPose();
     }
 }

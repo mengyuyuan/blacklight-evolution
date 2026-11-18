@@ -101,12 +101,12 @@ public final class MotionLibrary {
     public static void warmConsume(com.codex.blacklight.power.PowerForm form) {
         if (form == null || !WARMED.add(form.name())) return;
         var ids = new java.util.LinkedHashSet<String>();
-        for (int variant : new int[]{com.codex.blacklight.combat.ConsumeVariant.DEFAULT, com.codex.blacklight.combat.ConsumeVariant.CLASSIC})
+        for (int variant : com.codex.blacklight.combat.ConsumeVariant.variants(form))
             for (boolean large : new boolean[]{false, true}) {
                 String key = com.codex.blacklight.combat.ConsumeSequence.clipKey(form, large, variant);
                 ids.add("consume_" + key + "_actor"); ids.add("consume_" + key + "_victim");
             }
-        for (String id : new String[]{"consume_capture_actor", "consume_capture_victim", "consume_hold_actor", "consume_hold_victim"}) ids.add(id);
+        for (String id : new String[]{"consume_capture_actor", "consume_capture_victim", "consume_hold_actor", "consume_hold_victim", "consume_leg_slam_actor", "consume_leg_slam_victim"}) ids.add(id);
         for (String id : ids) WARMER.execute(() -> { try { com.codex.blacklight.combat.LocalVisualMotion.find(id); } catch (RuntimeException ignored) { } try { definition(id); } catch (RuntimeException ignored) { } });
     }
     private static Optional<Definition> read(String id) {
@@ -164,13 +164,20 @@ public final class MotionLibrary {
         for(String hand:new String[]{"one","two"})for(String phase:new String[]{"pickup","hold","charge","release"})clip("block_throw_"+hand+"_"+phase);
         boolean extension = skillExtensionInstalled();
         for (var action : PlayerAction.values()) clip(resolve(action));
-        for(var form:new com.codex.blacklight.power.PowerForm[]{com.codex.blacklight.power.PowerForm.CLAWS,com.codex.blacklight.power.PowerForm.WHIPFIST})
-            for(int variant:new int[]{com.codex.blacklight.combat.ConsumeVariant.DEFAULT,com.codex.blacklight.combat.ConsumeVariant.CLASSIC}) {
+        for(var form:new com.codex.blacklight.power.PowerForm[]{com.codex.blacklight.power.PowerForm.NONE,com.codex.blacklight.power.PowerForm.CLAWS,com.codex.blacklight.power.PowerForm.WHIPFIST})
+            for(int variant:com.codex.blacklight.combat.ConsumeVariant.variants(form)) {
                 String key=com.codex.blacklight.combat.ConsumeSequence.key(form,variant);
                 clip("consume_"+key+"_actor");clip("consume_"+key+"_victim");
                 if(com.codex.blacklight.combat.ConsumeReceiverScene.profile(form,false,variant)==null)
                     throw new IllegalStateException("Missing consume scene events: "+key);
             }
+        clip("consume_leg_slam_actor");clip("consume_leg_slam_victim");
+        for(String key:new String[]{"carry_sprint","carry_air","air_throw"})for(String role:new String[]{"actor","victim"})clip("consume_"+key+"_"+role);
+        com.codex.blacklight.combat.AerialCarryMotion.releaseTick();
+        for(boolean two:new boolean[]{false,true}){
+            clip(com.codex.blacklight.combat.BlockThrowMotion.key(two,"slam"));
+            com.codex.blacklight.combat.BlockSlamMotion.releaseTick(two);
+        }
         for (var move : com.codex.blacklight.combat.WeaponMove.values()) {
             if (!extension && skillMotion(move.id)) continue;
             clip(move.id);

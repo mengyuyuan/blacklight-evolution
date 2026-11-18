@@ -1,0 +1,167 @@
+{
+  "schema": 1,
+  "createdLocal": "2026-11-16T18:47:03",
+  "status": "Original AI ammunition policy implemented and validated; complete objective active",
+  "source": {
+    "file": "art/military-vehicles/helicopter-ammo-source.json",
+    "sha256": "52522ab1be3f58a2cdbf8e6e30d6e1a765362381b8ba239b1189825790f48ded"
+  },
+  "changes": [
+    "AI infinite firing resources are separate from finite player 240/8 stores, including zero or partly depleted stores. AI does not debit or replenish them.",
+    "Persisted gunShots/rocketShots/total shot counters; AI missile pod and tube alternation now use accepted rocket count, not player ammunition. Old saves infer split counters from prior spent stores; negative values clamp to zero and counters saturate safely.",
+    "Firing permissions, ally/crew/splash checks, real hull collision, existing cooldowns and the source four-second gun burst/rest remain enforced."
+  ],
+  "platforms": {
+    "neo": {
+      "unit": {
+        "file": "D:\\CodexCache\\helicopter-ammo-profile-qa\\neo-unit-passed.log",
+        "sha256": "150b437ece80e55a2e40c0b20865efd25754bf514c4c1729198f3e29f01bd1ee",
+        "passed": 30,
+        "suites": [
+          {
+            "name": "com.codex.blacklight.military.aircraft.HelicopterArmamentTest",
+            "tests": 2,
+            "file": "D:\\CodexCache\\helicopter-ammo-profile-qa\\neo-TEST-com.codex.blacklight.military.aircraft.HelicopterArmamentTest.xml",
+            "sha256": "5a483733c21ea27467a8bad56aaca628e7fb3c1e1c8b329398ffd608fa8e7570"
+          },
+          {
+            "name": "com.codex.blacklight.military.aircraft.HelicopterAuthorityTest",
+            "tests": 2,
+            "file": "D:\\CodexCache\\helicopter-ammo-profile-qa\\neo-TEST-com.codex.blacklight.military.aircraft.HelicopterAuthorityTest.xml",
+            "sha256": "e613992941714fdfc7d14eee32f1148dd795a66ec58dda74f160c28abe486497"
+          },
+          {
+            "name": "com.codex.blacklight.military.aircraft.HelicopterFlightTest",
+            "tests": 4,
+            "file": "D:\\CodexCache\\helicopter-ammo-profile-qa\\neo-TEST-com.codex.blacklight.military.aircraft.HelicopterFlightTest.xml",
+            "sha256": "3ff2d31de57c6480ac6abee70a21b6b7f0fdbef80ffb5930488532efd142e79c"
+          },
+          {
+            "name": "com.codex.blacklight.military.aircraft.HelicopterGunCycleTest",
+            "tests": 3,
+            "file": "D:\\CodexCache\\helicopter-ammo-profile-qa\\neo-TEST-com.codex.blacklight.military.aircraft.HelicopterGunCycleTest.xml",
+            "sha256": "96ccb5dda84f61daa64e5c9f7c7bcddc4d2dfe4babe743dc1277571fafbec1b1"
+          },
+          {
+            "name": "com.codex.blacklight.military.aircraft.HelicopterRouteTest",
+            "tests": 8,
+            "file": "D:\\CodexCache\\helicopter-ammo-profile-qa\\neo-TEST-com.codex.blacklight.military.aircraft.HelicopterRouteTest.xml",
+            "sha256": "34c35320e3d6450a276cc48e523c6ad56e37eb8f2a9d76263b2cd7c6276a3444"
+          },
+          {
+            "name": "com.codex.blacklight.military.vehicle.VehicleControlAuthorityTest",
+            "tests": 11,
+            "file": "D:\\CodexCache\\helicopter-ammo-profile-qa\\neo-TEST-com.codex.blacklight.military.vehicle.VehicleControlAuthorityTest.xml",
+            "sha256": "cc43f27c61b06fc08273ed87e106b16ba90962d3e9c277d204d555d54bb83027"
+          }
+        ]
+      },
+      "server": {
+        "file": "D:\\CodexCache\\helicopter-ammo-profile-qa\\neo-server-passed.log",
+        "sha256": "297e52ba9d9c94442c0d8829630e68fef4c7ef408b5ffe361aad769d106078ed",
+        "passed": 49,
+        "infiniteAmmo": {
+          "gunShots": 61,
+          "rocketShots": 9,
+          "playerRounds": 0,
+          "playerRockets": 0,
+          "midFlightReload": true
+        },
+        "gunCycle": {
+          "firstShot": 35,
+          "initialShots": 20,
+          "resumeAfter": 160,
+          "playerRounds": 240
+        }
+      },
+      "files": {
+        "src/main/java/com/codex/blacklight/military/aircraft/HelicopterCombat.java": "571d6f38ef89b5bb6e8ec72892388fc0934d12ed70397b4568aaff75648fc112",
+        "src/helicopterTest/java/com/codex/blacklight/gametest/HelicopterCombatGameTest.java": "c8a3a9601a383db885b625120028eefe83e232f9ab3fc8a4a6cebf95fc6963fc",
+        "src/helicopterTest/java/com/codex/blacklight/gametest/HelicopterVehicleCombatGameTest.java": "725ae7e5c277685bce8186b7cca7f6a95cb2859b483a1466ab411e070ed2d57e",
+        "src/helicopterTest/java/com/codex/blacklight/gametest/HelicopterPilotGameTest.java": "9e53018d89e923830ab7dcbbd9dac7d616df87141ec0dce5bd0f12a9d9656b0a"
+      }
+    },
+    "forge": {
+      "unit": {
+        "file": "D:\\CodexCache\\helicopter-ammo-profile-qa\\forge-unit-passed.log",
+        "sha256": "9dfc7035dc00a30a0cc08d79a9577c4ef85189be0bd4200a2d3df511e9d67b25",
+        "passed": 30,
+        "suites": [
+          {
+            "name": "com.codex.blacklight.military.aircraft.HelicopterArmamentTest",
+            "tests": 2,
+            "file": "D:\\CodexCache\\helicopter-ammo-profile-qa\\forge-TEST-com.codex.blacklight.military.aircraft.HelicopterArmamentTest.xml",
+            "sha256": "7d2a652cc19c51894ed068271335953fda31c7536397ccebd718e378cd489f75"
+          },
+          {
+            "name": "com.codex.blacklight.military.aircraft.HelicopterAuthorityTest",
+            "tests": 2,
+            "file": "D:\\CodexCache\\helicopter-ammo-profile-qa\\forge-TEST-com.codex.blacklight.military.aircraft.HelicopterAuthorityTest.xml",
+            "sha256": "da9c956fd797f3ef176d4fb6c334d5861bdf1e66a67517f2ed727fe067be343e"
+          },
+          {
+            "name": "com.codex.blacklight.military.aircraft.HelicopterFlightTest",
+            "tests": 4,
+            "file": "D:\\CodexCache\\helicopter-ammo-profile-qa\\forge-TEST-com.codex.blacklight.military.aircraft.HelicopterFlightTest.xml",
+            "sha256": "3fd438ecaf8f3eeec4e6ba85ea08801cf7f9007e9e28eaa0fba3316b3e919465"
+          },
+          {
+            "name": "com.codex.blacklight.military.aircraft.HelicopterGunCycleTest",
+            "tests": 3,
+            "file": "D:\\CodexCache\\helicopter-ammo-profile-qa\\forge-TEST-com.codex.blacklight.military.aircraft.HelicopterGunCycleTest.xml",
+            "sha256": "c8ae984c4c51fd88a1a5f439574c3e801500afdb1c7459013e0d371ffb754d30"
+          },
+          {
+            "name": "com.codex.blacklight.military.aircraft.HelicopterRouteTest",
+            "tests": 8,
+            "file": "D:\\CodexCache\\helicopter-ammo-profile-qa\\forge-TEST-com.codex.blacklight.military.aircraft.HelicopterRouteTest.xml",
+            "sha256": "635a9363ced8ef5d6b4c479353c66b45ee79ec77c3af29bbb7feb2e4541eb2a5"
+          },
+          {
+            "name": "com.codex.blacklight.military.vehicle.VehicleControlAuthorityTest",
+            "tests": 11,
+            "file": "D:\\CodexCache\\helicopter-ammo-profile-qa\\forge-TEST-com.codex.blacklight.military.vehicle.VehicleControlAuthorityTest.xml",
+            "sha256": "c45c66ad6d4bb0d96b1e813ce4be74179d0bedd56e4ef8be699978f2623696ce"
+          }
+        ]
+      },
+      "server": {
+        "file": "D:\\CodexCache\\helicopter-ammo-profile-qa\\forge-server-passed.log",
+        "sha256": "6e36951bb84b37e10c86645fdf770b99ccf436edef81b4967331aa464f1c0270",
+        "passed": 49,
+        "infiniteAmmo": {
+          "gunShots": 61,
+          "rocketShots": 9,
+          "playerRounds": 0,
+          "playerRockets": 0,
+          "midFlightReload": true
+        },
+        "gunCycle": {
+          "firstShot": 35,
+          "initialShots": 20,
+          "resumeAfter": 160,
+          "playerRounds": 240
+        }
+      },
+      "files": {
+        "src/main/java/com/codex/blacklight/military/aircraft/HelicopterCombat.java": "571d6f38ef89b5bb6e8ec72892388fc0934d12ed70397b4568aaff75648fc112",
+        "src/helicopterTest/java/com/codex/blacklight/gametest/HelicopterCombatGameTest.java": "474257b1a456f898d5da8facf485ec3bd21e7d973c3210dcb3d5cef67c01ce47",
+        "src/helicopterTest/java/com/codex/blacklight/gametest/HelicopterVehicleCombatGameTest.java": "1e18cfc033d74f74746be9279175a2de511e33e2f1a657dd2a1427294137bbe5",
+        "src/helicopterTest/java/com/codex/blacklight/gametest/HelicopterPilotGameTest.java": "2b8a418ed4763a5dc823eadf36508d4a9b0cf0767f9c56f514697df3fecf6f9e"
+      }
+    }
+  },
+  "rejectedRuns": {
+    "logs": [
+      "D:\\CodexCache\\helicopter-ammo-profile-qa\\neo-server-rejected-unanchored.log",
+      "D:\\CodexCache\\helicopter-ammo-profile-qa\\forge-server-rejected-unanchored.log"
+    ],
+    "reason": "Initial long-duration fixture only observed 2/5 rockets and did not establish its sustained-fire precondition. Replaced with isolated anchored high-health target; no production permission, cadence or damage rule relaxed."
+  },
+  "limitations": [
+    "Guided Hellfire flight and original weapon selection are still pending. The existing straight vehicle_rocket remains in use.",
+    "Player store capacity 240/8 and MC damage/cadence remain explicit adaptations; source player clip capacity 4/5 is not implemented here.",
+    "No new client visuals/audio, original-engine live validation, multiplayer validation, installation, release build or user-world change.",
+    "Other creatures, military AI, detailed vehicle/item models and sound work remain part of the same active objective."
+  ]
+}

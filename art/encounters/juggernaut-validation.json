@@ -1,0 +1,91 @@
+{
+  "date": "2026-11-14",
+  "species": "juggernaut",
+  "tests": [
+    {
+      "platform": "neo",
+      "unit": 35,
+      "gameTest": 52
+    },
+    {
+      "platform": "forge",
+      "unit": 35,
+      "gameTest": 52
+    }
+  ],
+  "assets": [
+    {
+      "path": "models/encounter_juggernaut_source.json",
+      "sha256": "c64f4e7a83c280ec82e52445723b7416dd55fb15884361ee6887e3cdfd5abe24"
+    },
+    {
+      "path": "models/encounter_source_actions.json",
+      "sha256": "58e58c59bc294b1e84e35d55181d962b6de53b09069a7677980969c6d576ecb2"
+    },
+    {
+      "path": "geo/juggernaut_mc.geo.json",
+      "sha256": "a744ed1b44abc756d8a091d15561ab3adf6dd8b886c42aacf1b018dacbbbfba6"
+    },
+    {
+      "path": "textures/entity/juggernaut_mc.png",
+      "sha256": "054ac4b95b48f9cbb2c7c096ce083649488d73edd35bd77c528f0ac72e2ec327"
+    }
+  ],
+  "source": "art/encounters/juggernaut-combat-provenance.json",
+  "visual": {
+    "platform": "Forge 1.20.1",
+    "directory": "D:/CodexCache/creature-combat-qa/juggernaut-source-frames/",
+    "scenes": 6,
+    "frames": 434,
+    "maxFistErrorBlocks": 0.0000117699638940539,
+    "hits": [
+      {
+        "scene": 0,
+        "move": "HAMMER",
+        "age": 17,
+        "damage": 11.900001,
+        "contact": {
+          "x": -0.2059711217880249,
+          "y": 82.33245802879334,
+          "z": 2.724569082260132
+        }
+      },
+      {
+        "scene": 0,
+        "move": "HAMMER",
+        "age": 41,
+        "damage": 11.900001,
+        "contact": {
+          "x": -0.44999998807907104,
+          "y": 82.39999997615814,
+          "z": 2.550000011920929
+        }
+      },
+      {
+        "scene": 1,
+        "move": "SLAM",
+        "age": 43,
+        "damage": 3.5,
+        "contact": {
+          "x": -0.44999998807907104,
+          "y": 81,
+          "z": 2.550000011920929
+        }
+      }
+    ],
+    "groundHits": [
+      {
+        "scene": 1,
+        "age": 43
+      }
+    ],
+    "evidenceSha256": "bf454c7dcb8ff819c462dc8a6825b31e65be1f1d4d12281371ec0533f37d42b6",
+    "review": "Reviewed all game-tick contact sheets for telegraph, separate fists, recovery, guard reaction, bounded stun, dodge and counterhit. Diagnostics compare rendered matrix with server pose; this is not frame equality against the original game."
+  },
+  "limitations": [
+    "CHARGE remains the previous authored body-contact move.",
+    "Original state-transition conditions and root travel are not fully ported.",
+    "Sound event timing is wired; muted QA does not validate original timbre or audible balance.",
+    "Native NeoForge rendered frames, multiplayer load and mod-pack compatibility need separate acceptance."
+  ]
+}

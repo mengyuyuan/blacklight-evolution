@@ -37,6 +37,7 @@ public final class BlackwatchReferenceProfile {
     public static BlackwatchReferenceProfile load(){return Holder.VALUE;}
     public double[] vector(String key){return vector(root.getAsJsonObject("native").getAsJsonArray(key));}
     public double number(String key){return root.getAsJsonObject("native").get(key).getAsDouble();}
+    public double duration(String animation){var value=animations.get(animation);return value==null?0:value.length;}
     public double[] firstPersonGrip(String weapon,boolean support){
         for(var entry:root.getAsJsonArray("firstperson_models")){
             var model=entry.getAsJsonObject();if(model.get("weapon").getAsString().equals(weapon))return vector(model.getAsJsonArray(support?"support_grip":"main_grip"));

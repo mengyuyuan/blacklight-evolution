@@ -1,0 +1,5 @@
+allprojects { afterEvaluate {
+    tasks.named('test', Test).configure {
+        include '**/JuggernautContactTest.class', '**/EncounterMoveTest.class', '**/HunterContactTest.class', '**/ContactEffectsQueueTest.class', '**/ContactEffectsPayloadTest.class'
+    }
+} }

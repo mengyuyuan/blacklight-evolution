@@ -1,0 +1,1001 @@
+{
+  "date": "2026-11-15T06:55:32.828Z",
+  "scope": "Authored Minecraft spitter: animated mouth, committed physical shots, wall interception, spatial splash audio and safe retreat.",
+  "platforms": [
+    {
+      "platform": "neo",
+      "frames": 541,
+      "units": 14,
+      "serverTests": 10,
+      "cases": [
+        {
+          "scene": 0,
+          "frames": 80,
+          "socketSamples": 42,
+          "maxNativeSocketError": 0.000008831899643064713,
+          "releaseTicks": [
+            14
+          ],
+          "sounds": [
+            {
+              "event": "blacklight:infection.tension",
+              "age": 0,
+              "at": {
+                "x": 0.5,
+                "y": 82,
+                "z": 0.5
+              }
+            },
+            {
+              "event": "blacklight:infection.launch",
+              "age": 14,
+              "at": {
+                "x": 0.3221030533313751,
+                "y": 82.17257619857789,
+                "z": 1.163920521736145
+              }
+            },
+            {
+              "event": "blacklight:infection.burst",
+              "age": 23,
+              "at": {
+                "x": 0.49039672977100063,
+                "y": 81.78858056510276,
+                "z": 9.050000011920929
+              }
+            }
+          ],
+          "last": {
+            "scene": 0,
+            "age": 63,
+            "health": 996,
+            "actor": {
+              "x": 0.5,
+              "y": 81,
+              "z": 0.5
+            },
+            "move": "NONE"
+          },
+          "sheet": {
+            "file": "D:/CodexCache/creature-combat-qa/neo-spitter-frames/spitter-review-0.jpg",
+            "sha256": "1ba4a9635a9bd6f2487bc32b65febf673c2bd343a5d4b2135e70405a1673810a"
+          }
+        },
+        {
+          "scene": 1,
+          "frames": 81,
+          "socketSamples": 64,
+          "maxNativeSocketError": 0.000006687647948726322,
+          "releaseTicks": [
+            14,
+            24,
+            34
+          ],
+          "sounds": [
+            {
+              "event": "blacklight:infection.tension",
+              "age": 0,
+              "at": {
+                "x": 0.5,
+                "y": 82,
+                "z": 0.5
+              }
+            },
+            {
+              "event": "blacklight:infection.launch",
+              "age": 14,
+              "at": {
+                "x": 0.3221030533313751,
+                "y": 82.17257619857789,
+                "z": 1.163920521736145
+              }
+            },
+            {
+              "event": "blacklight:infection.burst",
+              "age": 23,
+              "at": {
+                "x": 0.49039672977100063,
+                "y": 81.78858056510276,
+                "z": 9.050000011920929
+              }
+            },
+            {
+              "event": "blacklight:infection.launch",
+              "age": 24,
+              "at": {
+                "x": 0.3221030533313751,
+                "y": 82.17257619857789,
+                "z": 1.163920521736145
+              }
+            },
+            {
+              "event": "blacklight:infection.burst",
+              "age": 33,
+              "at": {
+                "x": 0.49039672977100063,
+                "y": 81.78858056510276,
+                "z": 9.050000011920929
+              }
+            },
+            {
+              "event": "blacklight:infection.launch",
+              "age": 34,
+              "at": {
+                "x": 0.3221030533313751,
+                "y": 82.17257619857789,
+                "z": 1.163920521736145
+              }
+            },
+            {
+              "event": "blacklight:infection.burst",
+              "age": 43,
+              "at": {
+                "x": 0.49039672977100063,
+                "y": 81.78858056510276,
+                "z": 9.050000011920929
+              }
+            }
+          ],
+          "last": {
+            "scene": 1,
+            "age": 63,
+            "health": 988,
+            "actor": {
+              "x": 0.5,
+              "y": 81,
+              "z": 0.5
+            },
+            "move": "NONE"
+          },
+          "sheet": {
+            "file": "D:/CodexCache/creature-combat-qa/neo-spitter-frames/spitter-review-1.jpg",
+            "sha256": "6419eded4eb57210063aa00c72af58c649bdc15b2b84f3618a593bdddd4d71f8"
+          }
+        },
+        {
+          "scene": 2,
+          "frames": 80,
+          "socketSamples": 62,
+          "maxNativeSocketError": 0.000008101862735598259,
+          "releaseTicks": [
+            14,
+            24,
+            34
+          ],
+          "sounds": [
+            {
+              "event": "blacklight:infection.tension",
+              "age": 0,
+              "at": {
+                "x": 0.5,
+                "y": 82,
+                "z": 0.5
+              }
+            },
+            {
+              "event": "blacklight:infection.launch",
+              "age": 14,
+              "at": {
+                "x": -0.16392052173614502,
+                "y": 82.17257619857789,
+                "z": 0.32210299372673035
+              }
+            },
+            {
+              "event": "blacklight:infection.burst",
+              "age": 23,
+              "at": {
+                "x": -8.050000011920929,
+                "y": 81.78858056824394,
+                "z": 0.49039672655341016
+              }
+            },
+            {
+              "event": "blacklight:infection.launch",
+              "age": 24,
+              "at": {
+                "x": -0.16392052173614502,
+                "y": 82.17257619857789,
+                "z": 0.32210299372673035
+              }
+            },
+            {
+              "event": "blacklight:infection.burst",
+              "age": 33,
+              "at": {
+                "x": -8.050000011920929,
+                "y": 81.78858056824394,
+                "z": 0.49039672655341016
+              }
+            },
+            {
+              "event": "blacklight:infection.launch",
+              "age": 34,
+              "at": {
+                "x": -0.16392052173614502,
+                "y": 82.17257619857789,
+                "z": 0.32210299372673035
+              }
+            },
+            {
+              "event": "blacklight:infection.burst",
+              "age": 43,
+              "at": {
+                "x": -8.050000011920929,
+                "y": 81.78858056824394,
+                "z": 0.49039672655341016
+              }
+            }
+          ],
+          "last": {
+            "scene": 2,
+            "age": 63,
+            "health": 988,
+            "actor": {
+              "x": 0.5,
+              "y": 81,
+              "z": 0.5
+            },
+            "move": "NONE"
+          },
+          "sheet": {
+            "file": "D:/CodexCache/creature-combat-qa/neo-spitter-frames/spitter-review-2.jpg",
+            "sha256": "bbc67c593afb32ff04f80aae218ea16fcf55df91476fbb6672ff9b4953028039"
+          }
+        },
+        {
+          "scene": 3,
+          "frames": 72,
+          "socketSamples": 36,
+          "maxNativeSocketError": 0.000006441296447913621,
+          "releaseTicks": [
+            14
+          ],
+          "sounds": [
+            {
+              "event": "blacklight:infection.tension",
+              "age": 0,
+              "at": {
+                "x": 0.5,
+                "y": 82,
+                "z": 0.5
+              }
+            },
+            {
+              "event": "blacklight:infection.launch",
+              "age": 14,
+              "at": {
+                "x": 0.3221030533313751,
+                "y": 82.17257619857789,
+                "z": 1.163920521736145
+              }
+            },
+            {
+              "event": "blacklight:infection.burst",
+              "age": 18,
+              "at": {
+                "x": 0.3826266940917874,
+                "y": 82.29293494907623,
+                "z": 4
+              }
+            }
+          ],
+          "last": {
+            "scene": 3,
+            "age": 63,
+            "health": 1000,
+            "actor": {
+              "x": 0.5,
+              "y": 81,
+              "z": 0.5
+            },
+            "move": "NONE"
+          },
+          "sheet": {
+            "file": "D:/CodexCache/creature-combat-qa/neo-spitter-frames/spitter-review-3.jpg",
+            "sha256": "a77cf06ed47f52a50bc26d7ce53c1871e1271b2ffb67b1b34547dff5fcddce8a"
+          }
+        },
+        {
+          "scene": 4,
+          "frames": 74,
+          "socketSamples": 40,
+          "maxNativeSocketError": 0.000008101081609513324,
+          "releaseTicks": [],
+          "sounds": [
+            {
+              "event": "blacklight:infection.tension",
+              "age": 0,
+              "at": {
+                "x": 0.5,
+                "y": 82,
+                "z": 0.5
+              }
+            },
+            {
+              "event": "blacklight:infection.burst",
+              "age": 14,
+              "at": {
+                "x": 0.366025413686885,
+                "y": 82.29587262350053,
+                "z": 1
+              }
+            }
+          ],
+          "last": {
+            "scene": 4,
+            "age": 63,
+            "health": 1000,
+            "actor": {
+              "x": 0.5,
+              "y": 81,
+              "z": 0.5
+            },
+            "move": "NONE"
+          },
+          "sheet": {
+            "file": "D:/CodexCache/creature-combat-qa/neo-spitter-frames/spitter-review-4.jpg",
+            "sha256": "d1c39cd175f9e1917764d45d4ef72a9ced9f7aa03fa003ec6e9f9008fd3329cc"
+          }
+        },
+        {
+          "scene": 5,
+          "frames": 77,
+          "socketSamples": 33,
+          "maxNativeSocketError": 0.000008097308131731456,
+          "releaseTicks": [],
+          "sounds": [
+            {
+              "event": "blacklight:infection.tension",
+              "age": 0,
+              "at": {
+                "x": 0.5,
+                "y": 82,
+                "z": 0.5
+              }
+            }
+          ],
+          "last": {
+            "scene": 5,
+            "age": 63,
+            "health": 1000,
+            "actor": {
+              "x": 0.5,
+              "y": 81,
+              "z": -1.8
+            },
+            "move": "NONE"
+          },
+          "sheet": {
+            "file": "D:/CodexCache/creature-combat-qa/neo-spitter-frames/spitter-review-5.jpg",
+            "sha256": "44b22815218bacd765b2983e75a8b1ce53bde7506fe51fb94e82c291604c96b9"
+          }
+        },
+        {
+          "scene": 6,
+          "frames": 77,
+          "socketSamples": 34,
+          "maxNativeSocketError": 0.000009289035149354397,
+          "releaseTicks": [],
+          "sounds": [
+            {
+              "event": "blacklight:infection.tension",
+              "age": 0,
+              "at": {
+                "x": 0.5,
+                "y": 82,
+                "z": 0.5
+              }
+            }
+          ],
+          "last": {
+            "scene": 6,
+            "age": 63,
+            "health": 1000,
+            "actor": {
+              "x": 0.5,
+              "y": 81,
+              "z": 0.04000000000000001
+            },
+            "move": "NONE"
+          },
+          "sheet": {
+            "file": "D:/CodexCache/creature-combat-qa/neo-spitter-frames/spitter-review-6.jpg",
+            "sha256": "589661de4574d259c929a637a00eec77368ad2174b491b32262290aa36fa64a4"
+          }
+        }
+      ],
+      "audio": [
+        {
+          "file": "src/main/resources/assets/blacklight/sounds/infection/tension_1.ogg",
+          "sha256": "aa9efb5f5f00be523cee08cdaaf49637a7982c876b54d8d571d70ac84896c8b8"
+        },
+        {
+          "file": "src/main/resources/assets/blacklight/sounds/infection/tension_2.ogg",
+          "sha256": "4bd53571a5e4943c4277c1fb6b5b141805fef5fd3745e1d59a00fbc6d8c11e3f"
+        },
+        {
+          "file": "src/main/resources/assets/blacklight/sounds/infection/tension_3.ogg",
+          "sha256": "c2eb5cf0a83fdc32f22b06e07581e3d588ba1e3d4b69e7e6d507fb6964eef04d"
+        },
+        {
+          "file": "src/main/resources/assets/blacklight/sounds/infection/launch_1.ogg",
+          "sha256": "94419fff003e6310d4f39ce3177bf1387f69d6cf3816f0c8914b96129c7abb82"
+        },
+        {
+          "file": "src/main/resources/assets/blacklight/sounds/infection/launch_2.ogg",
+          "sha256": "43d92e1c4d7f7a9738a8acd6ac1c6979323c703032033dc766297af2674368e9"
+        },
+        {
+          "file": "src/main/resources/assets/blacklight/sounds/infection/launch_3.ogg",
+          "sha256": "3c0b23348adc2c0b573aed92b5dd8dc36ed5665f7ba63fe16bf072d586e59d6b"
+        },
+        {
+          "file": "src/main/resources/assets/blacklight/sounds/infection/burst_1.ogg",
+          "sha256": "f43c8ef4de4f2cf8233820af5d3ebfcce2a6cf6ce1895ff213fdc12bf1dd0479"
+        },
+        {
+          "file": "src/main/resources/assets/blacklight/sounds/infection/burst_2.ogg",
+          "sha256": "1afeb2a9dedf4d3840b0f1514bbabd786310fb5db7ad8cdcc7acbb4bed092832"
+        },
+        {
+          "file": "src/main/resources/assets/blacklight/sounds/infection/burst_3.ogg",
+          "sha256": "250b51538474acfd9090c1315ff57369da1d50b1651f2eca25af6c3281945c9c"
+        }
+      ],
+      "manifest": {
+        "file": "D:/CodexCache/creature-combat-qa/neo-spitter-frames/evidence.json",
+        "sha256": "b348bf6d95b974728bf0d0d036833ef7595b60380e4ef190f5684a87084c77b8"
+      },
+      "server": {
+        "file": "D:/CodexCache/creature-combat-neo-spitterServer.log",
+        "sha256": "25eecb489c83ca5f33cf744aba0bcdbd034013497929575401477687c8ad172c"
+      },
+      "sources": [
+        {
+          "file": "src/main/java/com/codex/blacklight/combat/SpitterMouth.java",
+          "sha256": "40732a325603c1c7f6115ed07f133403f74c3c067d21c661ea2faede475f6e7c"
+        },
+        {
+          "file": "src/main/java/com/codex/blacklight/entity/BlacklightMutant.java",
+          "sha256": "e991a846797cb83a290640c8ba8152a593798016e52e84954d6d8a9df25f4915"
+        },
+        {
+          "file": "src/main/java/com/codex/blacklight/entity/BlacklightSpit.java",
+          "sha256": "2ce89de6cc8e7689e12f039d4fbf11970dea7910f5a1016078e3b38adadc8576"
+        },
+        {
+          "file": "src/main/java/com/codex/blacklight/infection/InfectedAttackEffects.java",
+          "sha256": "2ff829b68caf5b83943fddedf85d9ade46a17539a029e24d2eaaba3db5566bde"
+        },
+        {
+          "file": "src/main/java/com/codex/blacklight/registry/ModInfectedSounds.java",
+          "sha256": "59e2c966da0a5ec6d91d19206534449fe1f4f973c26c48ccef9c685d0ad7b317"
+        },
+        {
+          "file": "src/main/resources/assets/blacklight/geo/blacklight_spitter_mc.geo.json",
+          "sha256": "b9e3b818a88eb92aba7eba27d63153e2cfe63b1ad409b3a58cf38cbcc0843401"
+        },
+        {
+          "file": "src/main/resources/assets/blacklight/models/spitter_combat_motion.json",
+          "sha256": "3e6cd8192266aec3ddd730bd53348f53ab6d143e844df6e48cefd94e85c866b0"
+        },
+        {
+          "file": "src/test/java/com/codex/blacklight/combat/SpitterMouthTest.java",
+          "sha256": "949f9776073c5f72169b5ad26a4b68e5a0785eacf0657db4b7b7dc9c875ea722"
+        },
+        {
+          "file": "src/spitterTest/java/com/codex/blacklight/gametest/SpitterContactGameTest.java",
+          "sha256": "a70fac5384f12faaacb75089ebce402119582e74884b6300acc8d74d99e5b686"
+        },
+        {
+          "file": "src/spitterVisual/java/com/codex/blacklight/client/SpitterVisual.java",
+          "sha256": "5ab22b5ad664db5f0cb4e6d8d26364609fb9a2e914a797191ddc1bc5fda0b250"
+        }
+      ]
+    },
+    {
+      "platform": "forge",
+      "frames": 556,
+      "units": 14,
+      "serverTests": 10,
+      "cases": [
+        {
+          "scene": 0,
+          "frames": 79,
+          "socketSamples": 41,
+          "maxNativeSocketError": 0.00000860187040317576,
+          "releaseTicks": [
+            14
+          ],
+          "sounds": [
+            {
+              "event": "blacklight:infection.tension",
+              "age": 0,
+              "at": {
+                "x": 0.5,
+                "y": 82,
+                "z": 0.5
+              }
+            },
+            {
+              "event": "blacklight:infection.launch",
+              "age": 14,
+              "at": {
+                "x": 0.3221030533313751,
+                "y": 82.17257619857789,
+                "z": 1.163920521736145
+              }
+            },
+            {
+              "event": "blacklight:infection.burst",
+              "age": 23,
+              "at": {
+                "x": 0.49039672977100063,
+                "y": 81.78858058687983,
+                "z": 9.050000011920929
+              }
+            }
+          ],
+          "last": {
+            "scene": 0,
+            "age": 63,
+            "health": 996,
+            "actor": {
+              "x": 0.5,
+              "y": 81,
+              "z": 0.5
+            },
+            "move": "NONE"
+          },
+          "sheet": {
+            "file": "D:/CodexCache/creature-combat-qa/forge-spitter-frames/spitter-review-0.jpg",
+            "sha256": "a85125a12f30e6e92aee3aef1af86ee0205859bc7b909d9688d0e89d2df7fdea"
+          }
+        },
+        {
+          "scene": 1,
+          "frames": 81,
+          "socketSamples": 63,
+          "maxNativeSocketError": 0.000008000168111212337,
+          "releaseTicks": [
+            14,
+            24,
+            34
+          ],
+          "sounds": [
+            {
+              "event": "blacklight:infection.tension",
+              "age": 0,
+              "at": {
+                "x": 0.5,
+                "y": 82,
+                "z": 0.5
+              }
+            },
+            {
+              "event": "blacklight:infection.launch",
+              "age": 14,
+              "at": {
+                "x": 0.3221030533313751,
+                "y": 82.17257619857789,
+                "z": 1.163920521736145
+              }
+            },
+            {
+              "event": "blacklight:infection.burst",
+              "age": 23,
+              "at": {
+                "x": 0.49039672977100063,
+                "y": 81.78858058687983,
+                "z": 9.050000011920929
+              }
+            },
+            {
+              "event": "blacklight:infection.launch",
+              "age": 24,
+              "at": {
+                "x": 0.3221030533313751,
+                "y": 82.17257619857789,
+                "z": 1.163920521736145
+              }
+            },
+            {
+              "event": "blacklight:infection.burst",
+              "age": 33,
+              "at": {
+                "x": 0.49039672977100063,
+                "y": 81.78858058687983,
+                "z": 9.050000011920929
+              }
+            },
+            {
+              "event": "blacklight:infection.launch",
+              "age": 34,
+              "at": {
+                "x": 0.3221030533313751,
+                "y": 82.17257619857789,
+                "z": 1.163920521736145
+              }
+            },
+            {
+              "event": "blacklight:infection.burst",
+              "age": 43,
+              "at": {
+                "x": 0.49039672977100063,
+                "y": 81.78858058687983,
+                "z": 9.050000011920929
+              }
+            }
+          ],
+          "last": {
+            "scene": 1,
+            "age": 63,
+            "health": 988,
+            "actor": {
+              "x": 0.5,
+              "y": 81,
+              "z": 0.5
+            },
+            "move": "NONE"
+          },
+          "sheet": {
+            "file": "D:/CodexCache/creature-combat-qa/forge-spitter-frames/spitter-review-1.jpg",
+            "sha256": "ccc1c7e1a4d39a9bf6e92097af1e292e20cdbbbddc6dd5642170eac136c03ae8"
+          }
+        },
+        {
+          "scene": 2,
+          "frames": 84,
+          "socketSamples": 66,
+          "maxNativeSocketError": 0.000007928097930874782,
+          "releaseTicks": [
+            14,
+            24,
+            34
+          ],
+          "sounds": [
+            {
+              "event": "blacklight:infection.tension",
+              "age": 0,
+              "at": {
+                "x": 0.5,
+                "y": 82,
+                "z": 0.5
+              }
+            },
+            {
+              "event": "blacklight:infection.launch",
+              "age": 14,
+              "at": {
+                "x": -0.16392052173614502,
+                "y": 82.17257619857789,
+                "z": 0.32210299372673035
+              }
+            },
+            {
+              "event": "blacklight:infection.burst",
+              "age": 23,
+              "at": {
+                "x": -8.050000011920929,
+                "y": 81.78858059002101,
+                "z": 0.49039672655341016
+              }
+            },
+            {
+              "event": "blacklight:infection.launch",
+              "age": 24,
+              "at": {
+                "x": -0.16392052173614502,
+                "y": 82.17257619857789,
+                "z": 0.32210299372673035
+              }
+            },
+            {
+              "event": "blacklight:infection.burst",
+              "age": 33,
+              "at": {
+                "x": -8.050000011920929,
+                "y": 81.78858059002101,
+                "z": 0.49039672655341016
+              }
+            },
+            {
+              "event": "blacklight:infection.launch",
+              "age": 34,
+              "at": {
+                "x": -0.16392052173614502,
+                "y": 82.17257619857789,
+                "z": 0.32210299372673035
+              }
+            },
+            {
+              "event": "blacklight:infection.burst",
+              "age": 43,
+              "at": {
+                "x": -8.050000011920929,
+                "y": 81.78858059002101,
+                "z": 0.49039672655341016
+              }
+            }
+          ],
+          "last": {
+            "scene": 2,
+            "age": 63,
+            "health": 988,
+            "actor": {
+              "x": 0.5,
+              "y": 81,
+              "z": 0.5
+            },
+            "move": "NONE"
+          },
+          "sheet": {
+            "file": "D:/CodexCache/creature-combat-qa/forge-spitter-frames/spitter-review-2.jpg",
+            "sha256": "b80f2d5632fa6c8a05c89f9aea2e2dab78fb89e314c2ab1ade90cca6c01cad5a"
+          }
+        },
+        {
+          "scene": 3,
+          "frames": 79,
+          "socketSamples": 42,
+          "maxNativeSocketError": 0.000007408557414638837,
+          "releaseTicks": [
+            14
+          ],
+          "sounds": [
+            {
+              "event": "blacklight:infection.tension",
+              "age": 0,
+              "at": {
+                "x": 0.5,
+                "y": 82,
+                "z": 0.5
+              }
+            },
+            {
+              "event": "blacklight:infection.launch",
+              "age": 14,
+              "at": {
+                "x": 0.3221030533313751,
+                "y": 82.17257619857789,
+                "z": 1.163920521736145
+              }
+            },
+            {
+              "event": "blacklight:infection.burst",
+              "age": 18,
+              "at": {
+                "x": 0.3826266940917874,
+                "y": 82.29293495113102,
+                "z": 4
+              }
+            }
+          ],
+          "last": {
+            "scene": 3,
+            "age": 63,
+            "health": 1000,
+            "actor": {
+              "x": 0.5,
+              "y": 81,
+              "z": 0.5
+            },
+            "move": "NONE"
+          },
+          "sheet": {
+            "file": "D:/CodexCache/creature-combat-qa/forge-spitter-frames/spitter-review-3.jpg",
+            "sha256": "d95415b2d5ea7641f0aaffc4df532c9ad7e1585dd00301dc9ace927c87f9dddb"
+          }
+        },
+        {
+          "scene": 4,
+          "frames": 77,
+          "socketSamples": 40,
+          "maxNativeSocketError": 0.000007862019409986105,
+          "releaseTicks": [],
+          "sounds": [
+            {
+              "event": "blacklight:infection.tension",
+              "age": 0,
+              "at": {
+                "x": 0.5,
+                "y": 82,
+                "z": 0.5
+              }
+            },
+            {
+              "event": "blacklight:infection.burst",
+              "age": 14,
+              "at": {
+                "x": 0.366025413686885,
+                "y": 82.29587262350053,
+                "z": 1
+              }
+            }
+          ],
+          "last": {
+            "scene": 4,
+            "age": 63,
+            "health": 1000,
+            "actor": {
+              "x": 0.5,
+              "y": 81,
+              "z": 0.5
+            },
+            "move": "NONE"
+          },
+          "sheet": {
+            "file": "D:/CodexCache/creature-combat-qa/forge-spitter-frames/spitter-review-4.jpg",
+            "sha256": "27512e9063c9ba23abf97bb06b6790194f9c4691d659bc398dd705f028689133"
+          }
+        },
+        {
+          "scene": 5,
+          "frames": 79,
+          "socketSamples": 36,
+          "maxNativeSocketError": 0.000009769974008275676,
+          "releaseTicks": [],
+          "sounds": [
+            {
+              "event": "blacklight:infection.tension",
+              "age": 0,
+              "at": {
+                "x": 0.5,
+                "y": 82,
+                "z": 0.5
+              }
+            }
+          ],
+          "last": {
+            "scene": 5,
+            "age": 63,
+            "health": 1000,
+            "actor": {
+              "x": 0.5,
+              "y": 81,
+              "z": -1.8
+            },
+            "move": "NONE"
+          },
+          "sheet": {
+            "file": "D:/CodexCache/creature-combat-qa/forge-spitter-frames/spitter-review-5.jpg",
+            "sha256": "b98a89e516fac916e910d73e332b6384385e246d389f48fe0dfb60234b8477b2"
+          }
+        },
+        {
+          "scene": 6,
+          "frames": 77,
+          "socketSamples": 34,
+          "maxNativeSocketError": 0.000009780479508065994,
+          "releaseTicks": [],
+          "sounds": [
+            {
+              "event": "blacklight:infection.tension",
+              "age": 0,
+              "at": {
+                "x": 0.5,
+                "y": 82,
+                "z": 0.5
+              }
+            }
+          ],
+          "last": {
+            "scene": 6,
+            "age": 63,
+            "health": 1000,
+            "actor": {
+              "x": 0.5,
+              "y": 81,
+              "z": 0.04000000000000001
+            },
+            "move": "NONE"
+          },
+          "sheet": {
+            "file": "D:/CodexCache/creature-combat-qa/forge-spitter-frames/spitter-review-6.jpg",
+            "sha256": "1615756fca3e575afc64d1a28f4a53dbf0dc635c3e49376660ddc07da3f85634"
+          }
+        }
+      ],
+      "audio": [
+        {
+          "file": "src/main/resources/assets/blacklight/sounds/infection/tension_1.ogg",
+          "sha256": "aa9efb5f5f00be523cee08cdaaf49637a7982c876b54d8d571d70ac84896c8b8"
+        },
+        {
+          "file": "src/main/resources/assets/blacklight/sounds/infection/tension_2.ogg",
+          "sha256": "4bd53571a5e4943c4277c1fb6b5b141805fef5fd3745e1d59a00fbc6d8c11e3f"
+        },
+        {
+          "file": "src/main/resources/assets/blacklight/sounds/infection/tension_3.ogg",
+          "sha256": "c2eb5cf0a83fdc32f22b06e07581e3d588ba1e3d4b69e7e6d507fb6964eef04d"
+        },
+        {
+          "file": "src/main/resources/assets/blacklight/sounds/infection/launch_1.ogg",
+          "sha256": "94419fff003e6310d4f39ce3177bf1387f69d6cf3816f0c8914b96129c7abb82"
+        },
+        {
+          "file": "src/main/resources/assets/blacklight/sounds/infection/launch_2.ogg",
+          "sha256": "43d92e1c4d7f7a9738a8acd6ac1c6979323c703032033dc766297af2674368e9"
+        },
+        {
+          "file": "src/main/resources/assets/blacklight/sounds/infection/launch_3.ogg",
+          "sha256": "3c0b23348adc2c0b573aed92b5dd8dc36ed5665f7ba63fe16bf072d586e59d6b"
+        },
+        {
+          "file": "src/main/resources/assets/blacklight/sounds/infection/burst_1.ogg",
+          "sha256": "f43c8ef4de4f2cf8233820af5d3ebfcce2a6cf6ce1895ff213fdc12bf1dd0479"
+        },
+        {
+          "file": "src/main/resources/assets/blacklight/sounds/infection/burst_2.ogg",
+          "sha256": "1afeb2a9dedf4d3840b0f1514bbabd786310fb5db7ad8cdcc7acbb4bed092832"
+        },
+        {
+          "file": "src/main/resources/assets/blacklight/sounds/infection/burst_3.ogg",
+          "sha256": "250b51538474acfd9090c1315ff57369da1d50b1651f2eca25af6c3281945c9c"
+        }
+      ],
+      "manifest": {
+        "file": "D:/CodexCache/creature-combat-qa/forge-spitter-frames/evidence.json",
+        "sha256": "237fa7e903cb91cfe410c2e12efff3e71209b9af8ace24deebf56f6b25912174"
+      },
+      "server": {
+        "file": "D:/CodexCache/creature-combat-forge-spitterServer.log",
+        "sha256": "d33c151b9671765d83693e0e32d377a4f04ce4534e6c65a0e9950922c94eb60b"
+      },
+      "sources": [
+        {
+          "file": "src/main/java/com/codex/blacklight/combat/SpitterMouth.java",
+          "sha256": "40732a325603c1c7f6115ed07f133403f74c3c067d21c661ea2faede475f6e7c"
+        },
+        {
+          "file": "src/main/java/com/codex/blacklight/entity/BlacklightMutant.java",
+          "sha256": "4f262d5d25695f31419ef9f75f33b06b665399f6b98b776cf888d5e1053beb4f"
+        },
+        {
+          "file": "src/main/java/com/codex/blacklight/entity/BlacklightSpit.java",
+          "sha256": "2ce89de6cc8e7689e12f039d4fbf11970dea7910f5a1016078e3b38adadc8576"
+        },
+        {
+          "file": "src/main/java/com/codex/blacklight/infection/InfectedAttackEffects.java",
+          "sha256": "3e16fd0fa8cf1a59eef2898b9d21caa32ee43f6e938ab2bc67ee5cf964ec656b"
+        },
+        {
+          "file": "src/main/java/com/codex/blacklight/registry/ModInfectedSounds.java",
+          "sha256": "e46cfe4576b4275db977f87fe087e56e802c7b395a96918f549a58593cd9fc63"
+        },
+        {
+          "file": "src/main/resources/assets/blacklight/geo/blacklight_spitter_mc.geo.json",
+          "sha256": "b9e3b818a88eb92aba7eba27d63153e2cfe63b1ad409b3a58cf38cbcc0843401"
+        },
+        {
+          "file": "src/main/resources/assets/blacklight/models/spitter_combat_motion.json",
+          "sha256": "3e6cd8192266aec3ddd730bd53348f53ab6d143e844df6e48cefd94e85c866b0"
+        },
+        {
+          "file": "src/test/java/com/codex/blacklight/combat/SpitterMouthTest.java",
+          "sha256": "949f9776073c5f72169b5ad26a4b68e5a0785eacf0657db4b7b7dc9c875ea722"
+        },
+        {
+          "file": "src/spitterTest/java/com/codex/blacklight/gametest/SpitterContactGameTest.java",
+          "sha256": "79b9fb70cc1d5b07465b586e948357685aa8f13658efc79e9e539d0fff808f62"
+        },
+        {
+          "file": "src/spitterVisual/java/com/codex/blacklight/client/SpitterVisual.java",
+          "sha256": "5c74a0571de9fc67385ab1f9c0e4dd34d05d93f173263872dc92f18fb729bdd9"
+        }
+      ]
+    }
+  ],
+  "pending": [
+    "Species-specific hurt/death/consume choreography, silhouette/detail and audible balance in crowds remain open",
+    "Player/network/mod receiver matrix and original-game equivalence are not accepted",
+    "Other creatures, soldiers, helicopters and detailed vehicle items remain part of the active goal"
+  ],
+  "measurementBoundary": "Socket points use the current authored head/torso table and two locators on the existing nozzle. Native head matrices are sampled after rendering, correcting Gecko RenderUtil matrix addition and its current-position origin to the interpolated draw origin. Entity impacts intersect the native target bounding box, not a claim of arbitrary skin-triangle collision. Sound events verify spatial dispatch/timing/duplication; hidden clients were muted and this is not a listening acceptance.",
+  "visualReview": {
+    "status": "fourteen_keyframe_sheets_reviewed",
+    "framesPerSheet": 8,
+    "everyCapturedFrameManuallyReviewed": false
+  }
+}

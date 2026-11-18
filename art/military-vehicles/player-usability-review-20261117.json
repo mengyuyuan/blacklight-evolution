@@ -1,0 +1,56 @@
+{
+  "schema": 1,
+  "recordedLocal": "2026-11-17T01:20:19.3202352+08:00",
+  "status": "code changed; current batch not compiled or played",
+  "scope": "Player vehicle controls, seat instructions and manual helicopter multipart gun contacts",
+  "changes": [
+    "New defaults M for seat and N for ammunition, preserving existing player bindings; current mappings shown in HUD.",
+    "Ground vehicle HUD names current seat in compact mode and limits detailed driving/weapon instructions to the actual seat authority.",
+    "Helicopter HUD distinguishes pilot, copilot, passenger and rotor startup; missing bindings lead to the existing key settings.",
+    "Forge vehicle/reload RegisterKeyMappingsEvent is now registered on the MOD bus.",
+    "Manual helicopter cannon resolves multipart parents for protection and routes its actual barrel ray to the animated hurt contact, sharing the AI gun receiver.",
+    "Manual Hellfire tracks the persistent multipart parent UUID instead of a transient part entity."
+  ],
+  "verification": {
+    "static": "Targeted git diff --check passed; zh_cn/en_us JSON parse passed. No runtime correctness is implied.",
+    "build": "Both first-round greeneUnit invocations aborted with native JVM malloc failure because system commit memory was exhausted. This is not a passing compile or test result.",
+    "userConstraint": "User requested code work first and testing later. No build or game restarted after that instruction.",
+    "existingCursorEvidence": "See player-controls-validation.json for the earlier user-confirmed cursor and WASD result; that does not validate this later batch.",
+    "newServerTests": [
+      "HelicopterManualBodyGameTest.playerCannonDamagesHydraThroughItsActualPart",
+      "HelicopterManualBodyGameTest.playerCannonDamagesGreenesIndependentAppendages",
+      "HelicopterManualBodyGameTest.coverStillBlocksPlayerCannonAgainstMultipartBodies"
+    ],
+    "testState": "written, not executed"
+  },
+  "playerChecksPending": [
+    "Place each of six chassis with main/offhand in prototype mode, including grass and slabs; failed placement must give reason and preserve the item.",
+    "Board driver, gunner and passenger seats; verify movement/fire permissions and live M/N remaps match both HUD modes.",
+    "Fire player cannon at Hydra and Greene appendages; verify actual damage/contact effects, and verify a wall blocks it.",
+    "Fire a player Hellfire at a multipart target and verify tracking survives subsequent ticks.",
+    "Recheck fullscreen inventory pointer and return to flight with the latest combined build."
+  ],
+  "fullGoalComplete": false,
+  "sources": [
+    {
+      "file": "src/main/java/com/codex/blacklight/client/VehicleControls.java",
+      "sha256": "834e2bfb7ff3eb23c5b6a5dfb7e08fe7691a690dbbaa314bfa47b63c556ceae9"
+    },
+    {
+      "file": "src/main/java/com/codex/blacklight/client/VehicleHud.java",
+      "sha256": "06eefd525d71c95015b14c8e2e0b6fea1f5d33e5099082c91763b60924eb2da8"
+    },
+    {
+      "file": "src/main/java/com/codex/blacklight/client/vehicle/HelicopterControls.java",
+      "sha256": "50ee701c2b3b428d68e7619a25c3376c99cb46719bdc268dcd829dd7707268b4"
+    },
+    {
+      "file": "src/main/java/com/codex/blacklight/military/aircraft/HelicopterCombat.java",
+      "sha256": "013af2b2e4013f838659f069af7bc670ff93efcdf0efd612b0ce232be64df390"
+    },
+    {
+      "file": "src/helicopterTest/java/com/codex/blacklight/gametest/HelicopterManualBodyGameTest.java",
+      "sha256": "786df22ebf11f79c9833523d9508c9d91f4c67d96e8d8dce0d8501f6e79ec835"
+    }
+  ]
+}

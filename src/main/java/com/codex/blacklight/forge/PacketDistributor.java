@@ -31,4 +31,10 @@ public final class PacketDistributor {
         if (entity.level().isClientSide) return;
         ModNetwork.channel().send(net.minecraftforge.network.PacketDistributor.TRACKING_ENTITY_AND_SELF.with(() -> entity), payload);
     }
+
+    public static void sendToPlayersTrackingEntity(Entity entity, CustomPacketPayload payload) {
+        ForgePayloadRegistrar.requireDirection(payload, NetworkDirection.PLAY_TO_CLIENT);
+        if (entity.level().isClientSide) return;
+        ModNetwork.channel().send(net.minecraftforge.network.PacketDistributor.TRACKING_ENTITY.with(() -> entity), payload);
+    }
 }

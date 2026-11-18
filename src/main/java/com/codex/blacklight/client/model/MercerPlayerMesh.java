@@ -65,7 +65,7 @@ public final class MercerPlayerMesh {
         if(!active(player))return 1F;
         float armor=MercerArmorMesh.get()!=null?0F:com.codex.blacklight.power.UtilityPowerSystem.visualWeight(player,com.codex.blacklight.power.PowerForm.ARMOR,partial);
         float size=com.codex.blacklight.client.vehicle.VehicleSeatPose.appearanceScale(player.getBbHeight(),get().restHeight,
-                3F/(.9375F*get().restHeight),player.getVehicle() instanceof com.codex.blacklight.entity.MilitaryVehicle);
+                3F/(.9375F*get().restHeight),player.getVehicle() instanceof com.codex.blacklight.entity.MilitaryVehicle||player.getVehicle() instanceof com.codex.blacklight.entity.BlackwatchHelicopter);
         return net.minecraft.util.Mth.lerp(net.minecraft.util.Mth.clamp(armor,0F,1F),size,1F);
     }
     public MercerRig.Frame sample(AbstractClientPlayer player,float partial,Matrix4f[] source) {

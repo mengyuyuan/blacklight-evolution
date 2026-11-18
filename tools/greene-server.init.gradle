@@ -1,0 +1,4 @@
+allprojects { afterEvaluate {
+    sourceSets.main.java.srcDir('src/greeneTest/java')
+    sourceSets.main.resources.srcDir('src/blackwatchTest/resources')
+} }

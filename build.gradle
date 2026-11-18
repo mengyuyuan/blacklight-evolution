@@ -188,6 +188,21 @@ tasks.named('assemble') {
 // Minecraft 1.20.1 and Forge 47 target Java 17.
 java.toolchain.languageVersion = JavaLanguageVersion.of(17)
 
+// Disposable client acceptance for the backported physical bodies and vehicle audio.
+if (project.hasProperty('ragdollVisual')) sourceSets.main.java.srcDir('src/ragdollVisualTest/java')
+if (project.hasProperty('vehicleFeedbackVisual')) sourceSets.main.java.srcDir('src/vehicleFeedbackVisual/java')
+if (project.hasProperty('slowMotionVisual')) sourceSets.main.java.srcDir('src/slowMotionTest/java')
+if (project.hasProperty('silentQa')) {
+    sourceSets.main.java.srcDir('src/silentQa/java')
+    sourceSets.main.resources.srcDir('src/silentQa/resources')
+}
+tasks.withType(Jar).configureEach {
+    exclude 'com/codex/blacklight/client/RagdollVisualAudit*.class'
+    exclude 'com/codex/blacklight/client/vehicle/VehicleFeedbackVisual*.class'
+    exclude 'com/codex/blacklight/client/HeavySlowMotionAudit*.class'
+    exclude 'com/codex/blacklight/silentqa/**', 'blacklight.silent-qa.mixins.json'
+}
+
 // Xiaoxiang live integration tests require a separately installed official dependency.
 if (project.hasProperty('cultivationLiveTest')) {
     sourceSets.main.java.srcDir('src/cultivationTest/java')
@@ -308,6 +323,22 @@ minecraft {
             }
         }
         client {
+            if(project.hasProperty('slowMotionVisual')) {
+                property 'blacklight.test.slowMotion', file(project.property('slowMotionVisual')).absolutePath
+                args '--width', '960', '--height', '640'
+            }
+            if (project.hasProperty('ragdollVisual')) {
+                property 'blacklight.test.ragdollVisual', file(project.property('ragdollVisual')).absolutePath
+                if(project.hasProperty('ragdollCases')) property 'blacklight.test.ragdollCases', project.property('ragdollCases').toString()
+                args '--width', '960', '--height', '640'
+            }
+            if (project.hasProperty('vehicleFeedbackVisual')) {
+                property 'blacklight.test.vehicleFeedback', file(project.property('vehicleFeedbackVisual')).absolutePath
+                if(project.hasProperty('vehicleAudio')) property 'blacklight.test.vehicleAudio', 'true'
+                if(project.hasProperty('vehicleDents')) property 'blacklight.test.vehicleDents', 'true'
+                if(project.hasProperty('vehicleFeedbackCases')) property 'blacklight.test.vehicleFeedbackCases', project.property('vehicleFeedbackCases').toString()
+                args '--width', '960', '--height', '640'
+            }
             if (project.hasProperty('wingTest')) {
                 property 'blacklight.test.wings', 'true'
                 if(project.hasProperty('wingQaDirectory')) property 'blacklight.test.wingDirectory', file(project.property('wingQaDirectory')).absolutePath
@@ -367,6 +398,7 @@ mixin {
     add sourceSets.main, 'blacklight.refmap.json'
     config 'blacklight.mixins.json'
     if(project.hasProperty('standaloneVisual'))config 'blacklight.visual-qa.mixins.json'
+    if(project.hasProperty('silentQa'))config 'blacklight.silent-qa.mixins.json'
 }
 if(project.hasProperty('standaloneVisual')){
     sourceSets.main.java.srcDir('src/visualObserverTest/java')

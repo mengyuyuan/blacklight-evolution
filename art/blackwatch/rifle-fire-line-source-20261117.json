@@ -1,0 +1,281 @@
+{
+  "schema": 1,
+  "date": "2026-11-17",
+  "status": "implemented_both_trees_static_only_tests_not_run",
+  "player_visible_gap": "MilitarySoldier.clearLine selected only pickable LivingEntity bodies. It missed nonliving aircraft and multipart receiving proxies (e.g. Hydra has a nonpickable parent). FirearmsCombat already stopped those actual bullets, so an ally in the lane could consume repeated soldier magazines without damage instead of canceling/repositioning the burst.",
+  "source": {
+    "file": "input/startup_fig.p3d.rz",
+    "sha256": "96d84271e461cbe4566fb984359653b164257f88392c5bceb213c30f88527779",
+    "records": [
+      {
+        "source": "startup_fig.p3d.rz",
+        "offset": 301264,
+        "payload": 301276,
+        "length": 16,
+        "type": "Bank",
+        "kind": "BranchHash",
+        "owner": "engage_soldier/#d912518989f17d14/#d912518989f17d14/soldiers/#5d4f3bb282769c04",
+        "end": 317692
+      },
+      {
+        "source": "startup_fig.p3d.rz",
+        "offset": 301304,
+        "payload": 301316,
+        "length": 24,
+        "type": "GrabSlotClassName",
+        "kind": "ConditionHash",
+        "owner": "engage_soldier/#d912518989f17d14/#d912518989f17d14/soldiers/#5d4f3bb282769c04",
+        "fields": {
+          "GrabSlotHash": {
+            "hash": "10464599244845980941",
+            "name": "Holding"
+          },
+          "Compare": {
+            "hash": "4001598",
+            "name": "Equal"
+          },
+          "ClassnameHash": {
+            "hash": "8123004041450973238",
+            "name": "rifle"
+          }
+        },
+        "schema": "GrabSlotClassNameCondition",
+        "end": 301348
+      },
+      {
+        "source": "startup_fig.p3d.rz",
+        "offset": 301368,
+        "payload": 301380,
+        "length": 24,
+        "type": "GrabSlotClassName",
+        "kind": "ConditionHash",
+        "owner": "engage_soldier/#d912518989f17d14/#d912518989f17d14/soldiers/#5d4f3bb282769c04",
+        "fields": {
+          "GrabSlotHash": {
+            "hash": "10464599244845980941",
+            "name": "Holding"
+          },
+          "Compare": {
+            "hash": "4001598",
+            "name": "Equal"
+          },
+          "ClassnameHash": {
+            "hash": "494869147299",
+            "name": "saw"
+          }
+        },
+        "schema": "GrabSlotClassNameCondition",
+        "end": 301412
+      },
+      {
+        "source": "startup_fig.p3d.rz",
+        "offset": 301432,
+        "payload": 301444,
+        "length": 24,
+        "type": "GrabSlotClassName",
+        "kind": "ConditionHash",
+        "owner": "engage_soldier/#d912518989f17d14/#d912518989f17d14/soldiers/#5d4f3bb282769c04",
+        "fields": {
+          "GrabSlotHash": {
+            "hash": "10464599244845980941",
+            "name": "Holding"
+          },
+          "Compare": {
+            "hash": "4001598",
+            "name": "Equal"
+          },
+          "ClassnameHash": {
+            "hash": "10201727653069515053",
+            "name": "sniper"
+          }
+        },
+        "schema": "GrabSlotClassNameCondition",
+        "end": 301476
+      },
+      {
+        "source": "startup_fig.p3d.rz",
+        "offset": 315096,
+        "payload": 315108,
+        "length": 16,
+        "type": "Bank",
+        "kind": "BranchHash",
+        "owner": "engage_soldier/#d912518989f17d14/#d912518989f17d14/soldiers/#5d4f3bb282769c04/engage/#d912518989f17d14/attack/shoot/#6b1e2701259883b7",
+        "end": 317308
+      },
+      {
+        "source": "startup_fig.p3d.rz",
+        "offset": 315236,
+        "payload": 315248,
+        "length": 48,
+        "type": "TargetHasLoFDistance",
+        "kind": "ConditionHash",
+        "owner": "engage_soldier/#d912518989f17d14/#d912518989f17d14/soldiers/#5d4f3bb282769c04/engage/#d912518989f17d14/attack/shoot/#6b1e2701259883b7",
+        "end": 315304
+      },
+      {
+        "source": "startup_fig.p3d.rz",
+        "offset": 315312,
+        "payload": 315324,
+        "length": 20,
+        "type": "Node",
+        "kind": "BranchHash",
+        "owner": "engage_soldier/#d912518989f17d14/#d912518989f17d14/soldiers/#5d4f3bb282769c04/engage/#d912518989f17d14/attack/shoot/#6b1e2701259883b7/#137b12d7f0938d56",
+        "end": 316436
+      },
+      {
+        "source": "startup_fig.p3d.rz",
+        "offset": 315356,
+        "payload": 315368,
+        "length": 36,
+        "type": "TargetHasLoF",
+        "kind": "ConditionHash",
+        "owner": "engage_soldier/#d912518989f17d14/#d912518989f17d14/soldiers/#5d4f3bb282769c04/engage/#d912518989f17d14/attack/shoot/#6b1e2701259883b7/#137b12d7f0938d56",
+        "fields": {
+          "TimeTolerance": 0.5,
+          "DistanceTolerance": 0.4000000059604645,
+          "CollisionFlags": {
+            "hash": "4601230196676155154",
+            "name": "#3fdada7c4aaed712"
+          },
+          "CollideWithType": 49219,
+          "Offset": [
+            0,
+            0.20000000298023224,
+            0
+          ],
+          "Radius": 0
+        },
+        "schema": "TargetHasLoFCondition",
+        "end": 315412
+      },
+      {
+        "source": "startup_fig.p3d.rz",
+        "offset": 316000,
+        "payload": 316012,
+        "length": 20,
+        "type": "Node",
+        "kind": "BranchHash",
+        "owner": "engage_soldier/#d912518989f17d14/#d912518989f17d14/soldiers/#5d4f3bb282769c04/engage/#d912518989f17d14/attack/shoot/#6b1e2701259883b7/#137b12d7f0938d56/#6960d507d70f0d97/#6960d507d70f0d97/#bb47aed0ffd13981",
+        "end": 316272
+      },
+      {
+        "source": "startup_fig.p3d.rz",
+        "offset": 316044,
+        "payload": 316056,
+        "length": 36,
+        "type": "TargetHasLoF",
+        "kind": "ConditionHash",
+        "owner": "engage_soldier/#d912518989f17d14/#d912518989f17d14/soldiers/#5d4f3bb282769c04/engage/#d912518989f17d14/attack/shoot/#6b1e2701259883b7/#137b12d7f0938d56/#6960d507d70f0d97/#6960d507d70f0d97/#bb47aed0ffd13981",
+        "fields": {
+          "TimeTolerance": 0.5,
+          "DistanceTolerance": 0.4000000059604645,
+          "CollisionFlags": {
+            "hash": "4601230196676155154",
+            "name": "#3fdada7c4aaed712"
+          },
+          "CollideWithType": 51267,
+          "Offset": [
+            0,
+            -0.25,
+            0
+          ],
+          "Radius": 0
+        },
+        "schema": "TargetHasLoFCondition",
+        "end": 316100
+      },
+      {
+        "source": "startup_fig.p3d.rz",
+        "offset": 316480,
+        "payload": 316492,
+        "length": 36,
+        "type": "TargetHasLoF",
+        "kind": "ConditionHash",
+        "owner": "engage_soldier/#d912518989f17d14/#d912518989f17d14/soldiers/#5d4f3bb282769c04/engage/#d912518989f17d14/attack/shoot/#6b1e2701259883b7/#e94c555fcc6b8bcd",
+        "fields": {
+          "TimeTolerance": 0.5,
+          "DistanceTolerance": 0.4000000059604645,
+          "CollisionFlags": {
+            "hash": "4601230196676155154",
+            "name": "#3fdada7c4aaed712"
+          },
+          "CollideWithType": 49219,
+          "Offset": [
+            0,
+            0.800000011920929,
+            0
+          ],
+          "Radius": 0
+        },
+        "schema": "TargetHasLoFCondition",
+        "end": 316536
+      }
+    ],
+    "authored_gate": "Rifle/saw/sniper shoot bank315096 has TargetHasLoFDistance315236. Standing Node315312 requires TargetHasLoF315356; lower crouch Node316000 requires TargetHasLoF316044; raised alternate316480 has its own LoF. LoF is part of action admission, not only a receiving damage filter.",
+    "mask_boundary": "Standing/raised CollideWithType49219=0xC043, crouched51267=0xC843. Prior P1 enum evidence resolves bit1 as SimulatedObject and bit6 as Prop. Exact native aircraft/actor classification and all TimeTolerance/DistanceTolerance caching rules are NOT claimed closed by this patch.",
+    "space_boundary": "No source distance, posture or world-unit conversion is changed in this batch."
+  },
+  "implementation": [
+    "MilitarySoldier.clearLine now calls the existing FirearmsCombat.bulletCandidate predicate through the same ProjectileUtil path used by real bullets.",
+    "Existing HydraProjectileContactMixin clips Hydra/Flyer/Greene proxies to actual posed skin and restores exact closest contact. This patch does not expand proxy AABBs into solid hit volumes or duplicate the geometry solver.",
+    "The closest ordinary/aircraft/part hit is compared to VehicleDamageBridge.nearest real ground-hull contact with the ordinary bullet path's .001 ordering tolerance. A farther protected hull cannot preempt a nearer legal receiver.",
+    "An aircraft first hit uses protectedAircraft, including live crew/protected passenger policy. Part hits resolve to the living parent before validTarget, preserving scoreboard friendship, disguised/creative/spectator player rejection and the target's own legal parts.",
+    "Empty protected aircraft blocks rather than spending a round. A legitimate hostile crew hull or living receiver may still receive the shot under existing firearm policy.",
+    "Actual goal interruption/repositioning, fresh aim interval, finite ammo and final fire recheck are unchanged; they now receive the missing line obstruction.",
+    "The same Soldier campaign-core entry used a second LivingEntity-only filter. It now uses the identical ordinary-bullet candidate predicate and continues rejecting any actor between muzzle and the authorized block."
+  ],
+  "adaptation_limits": [
+    "Fresh MC block/physical receiver checks remain stricter than native LoF cache tolerances; no firing through stale clearance.",
+    "Aircraft contact remains the current actual bullet AABB, not a newly claimed native helicopter skin hull.",
+    "MC explicit allegiance/protected-crew rules are retained. Source collision mask membership alone is not treated as native friendship proof.",
+    "No changes to shared mixins, registrations, network, firearms damage, vehicle control or other creature production."
+  ],
+  "new_unrun_tests": [
+    {
+      "name": "MilitaryFireLineGameTest.protectedEmptyTransportStopsAnActiveBurstWithoutWastingAmmoAndRemovalReaims",
+      "intent": "Real finite rifle first damages target on level stone ground. Protected empty IDLE helicopter enters active firing lane; health and ammunition remain unchanged for35ticks, phase releases. Removing craft must earn fresh aim time before real gunfire resumes. No allied passenger is present that could make the old LivingEntity-only filter pass accidentally."
+    },
+    {
+      "name": "MilitaryFireLineGameTest.alliedHydraSkinBlocksTheGoalAndItsOwnHostilePartsRemainValidTargets",
+      "intent": "Real scoreboard-allied Hydra base skin blocks a nonallied target behind it. Per-tick ProjectileUtil result must be a part with exact HydraHurtContact point; no ammo debit despite root nonpickable. Removing friendship and targeting Hydra then permits finite actual bullets/damage to its own parent-resolved parts."
+    }
+  ],
+  "fixture_limits": "Stationary marks use movement speed0 without bypassing live goal, gun, permission or ammo. Multipart contact-only fixture uses noGravity marks around a real constant idle root/base lane; it is not a claim of natural floating soldiers. Default target acquisition was separately covered by MilitaryRifleRangeGameTest.",
+  "pending_entry": "MilitaryFireLineGameTest added to tools/player-military-regression.init.gradle; queued playerMilitaryServer. Both tests, compilation and all client verification remain unexecuted.",
+  "self_review": [
+    "Own target parts resolve to the legal parent rather than becoming invalid nonliving targets.",
+    "Allegiance evaluated after selecting the nearest physical object; protected objects remain ray blockers.",
+    "Source masks and exact native receiver classification boundaries are explicitly separated from MC policy.",
+    "No geometry implementation or shared mixin edited.",
+    "Neo/Forge test normalized text matches; scoped git diff --check is the only Git validation, not a build."
+  ],
+  "snapshots": {
+    "neo": {
+      "src/main/java/com/codex/blacklight/entity/MilitarySoldier.java": "d92f674783761648ce3f073626a319526ba10ef0876fcb175b0fe8ea6f417168",
+      "src/blackwatchTest/java/com/codex/blacklight/gametest/MilitaryFireLineGameTest.java": "e85c04a6c14ad946a319de2861fcf0e6308fa9fc7525c99efbd0bbc374d4f911",
+      "tools/player-military-regression.init.gradle": "344165b65b7717485b94cff7047458f3124df5f185fa56d6346cf770719185ab",
+      "src/main/java/com/codex/blacklight/firearms/FirearmsCombat.java": "c1caa75d3b6b94b50f72ef1cc197d7c16d266160bb54ec21d14730da214d742b",
+      "src/main/java/com/codex/blacklight/mixin/HydraProjectileContactMixin.java": "1fa77f4b5f4d0e184bdf0bb97b1b408ad0b999728be0ab00900013f81688c13a",
+      "src/main/java/com/codex/blacklight/combat/CombatTargeting.java": "2bbda98af4b9f6b6cb67c3c25f80990d8645b99e9ff475e70361225a35ce5590",
+      "src/main/java/com/codex/blacklight/military/vehicle/VehicleDamageBridge.java": "d73c859c3804b63232b2d512e6516b95acddc023de4ec3e6284baed78724983a"
+    },
+    "forge": {
+      "src/main/java/com/codex/blacklight/entity/MilitarySoldier.java": "bdd037e1b693e1991652ccd05f38e898bc00f87ab7d17b070dcb6a5588b85672",
+      "src/blackwatchTest/java/com/codex/blacklight/gametest/MilitaryFireLineGameTest.java": "4c12c2621a0e6254a2ffe6b9c4a2fca6e4a11522f6b0c4d08b95d1e82bde62bd",
+      "tools/player-military-regression.init.gradle": "344165b65b7717485b94cff7047458f3124df5f185fa56d6346cf770719185ab",
+      "src/main/java/com/codex/blacklight/firearms/FirearmsCombat.java": "c1caa75d3b6b94b50f72ef1cc197d7c16d266160bb54ec21d14730da214d742b",
+      "src/main/java/com/codex/blacklight/mixin/HydraProjectileContactMixin.java": "1fa77f4b5f4d0e184bdf0bb97b1b408ad0b999728be0ab00900013f81688c13a",
+      "src/main/java/com/codex/blacklight/combat/CombatTargeting.java": "2d4c8eb1a689dba870ea0385928ccc075b0a348f9fa688c46960a2be66cda7ed",
+      "src/main/java/com/codex/blacklight/military/vehicle/VehicleDamageBridge.java": "6d0afcfb5d274f54c4d57efaed6c6d06d13c0d0c2d497737f8f147eb41a063ac"
+    }
+  },
+  "handheld_ordnance_qa_followup": {
+    "record": "art/blackwatch/handheld-ordnance-body-review-20261117.json",
+    "date": "2026-11-17",
+    "reason": "The military regression whitelist now also includes three real handheld projectile impact cases. Existing soldier range, human grab and fire-line conclusions and production files are unchanged.",
+    "refreshed_files": [
+      "tools/player-military-regression.init.gradle"
+    ],
+    "validation": "Static text/hash only; no Java, build, test, game or native execution."
+  }
+}

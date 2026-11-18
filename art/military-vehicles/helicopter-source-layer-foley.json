@@ -1,0 +1,34 @@
+{
+  "origin": "Project-authored synthesis; source metadata informs role duration only. No original audio imported.",
+  "generator": "tools/build_helicopter_source_layers.py",
+  "cues": [
+    {
+      "cue": "jet",
+      "sampleRate": 44100,
+      "mono": true,
+      "loop": true,
+      "seconds": 3.585328798185941,
+      "authoredPcmPeak": 0.6200000047683716,
+      "sha256": "fd1e9ef37cfb6d48abdc0336601784adfde0c58895360c707fdfbb20f71249aa"
+    },
+    {
+      "cue": "startup",
+      "sampleRate": 44100,
+      "mono": true,
+      "loop": false,
+      "seconds": 13.722993197278912,
+      "authoredPcmPeak": 0.6200000047683716,
+      "sha256": "b28404cf65c50c124ec2ed41585a845fb3ca6698fd260701955d8817f9d2e0f5"
+    },
+    {
+      "cue": "winddown",
+      "sampleRate": 44100,
+      "mono": true,
+      "loop": false,
+      "seconds": 12.400181405895692,
+      "authoredPcmPeak": 0.6200000047683716,
+      "sha256": "3aec036a08cd04fd3281e8fa6f2fde895a13310046caeffec94b88a7da267d33"
+    }
+  ],
+  "validation": "Asset encoding only. No playback, client rendering, compilation or tests in this batch."
+}

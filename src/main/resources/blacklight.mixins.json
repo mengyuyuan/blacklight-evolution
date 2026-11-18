@@ -4,6 +4,7 @@
   "package": "com.codex.blacklight.mixin",
   "compatibilityLevel": "JAVA_17",
   "mixins": [
+    "HeavySlowMotionServerMixin",
     "OptionalCultivationShieldMixin",
     "OptionalCultivationPersonalShieldMixin",
     "OptionalTwilightHydraMixin",
@@ -14,6 +15,8 @@
     "PotentiaDamageTagsMixin",
     "ShulkerReflectionAccess",
     "LivingDeathAccess",
+    "GreeneHealthFloorMixin",
+    "HydraDeathGuardMixin",
     "ServerEntityTickMixin",
     "ScaledLivingDamageMixin",
     "ScaledPlayerDamageMixin",
@@ -44,15 +47,21 @@
     "OptionalLithiumCollisionContextMixin",
     "OptionalLithiumCollisionIteratorMixin",
     "VehicleProjectileCollisionMixin",
+    "HydraProjectileContactMixin",
     "ShulkerPeekAccess",
     "PigSteeringAccess",
     "StriderSteeringAccess",
     "NativeTissueAirMixin",
     "NativeTissueFeedingMixin",
     "ItemPickupTargetAccess",
-    "PendingChunkReadMixin"
+    "PendingChunkReadMixin",
+    "CityChunkUnloadMixin",
+    "OptionalTheBoysFakeDeathMixin",
+    "OptionalTheBoysRegenDeathMixin",
+    "OptionalTheBoysSeverMixin"
   ],
   "client": [
+    "client.HeavySlowMotionTimerMixin",
     "client.PostChainAccess",
     "client.OptionalEpicFightPlayerRenderMixin",
     "client.OptionalPlayerAnimatorRenderMixin",
@@ -60,6 +69,7 @@
     "client.NativeHandRendererAccess",
     "client.LocalPlayerMixin",
     "client.PrototypeTargetLockMixin",
+    "client.HydraPickClockMixin",
     "client.TargetLockGlowMixin",
     "client.TargetLockOutlineColorMixin",
     "client.PrototypeCameraAccess",
@@ -84,7 +94,13 @@
     "client.NativePlayerModelOwnershipMixin",
     "client.PrototypeBodyYawMixin",
     "client.ConsumeTeleportSmoothingMixin",
-    "client.SceneClockMixin"
+    "client.SceneClockMixin",
+    "client.RagdollSaddleMixin",
+    "client.SeveredArmorMixin",
+    "client.SeveredHeldItemMixin",
+    "client.SeveredHeadLayerMixin",
+    "client.GeoRagdollMixin",
+    "client.OptionalTheBoysBodyRenderMixin"
   ],
   "injectors": {
     "defaultRequire": 1

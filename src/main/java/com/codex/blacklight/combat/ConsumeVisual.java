@@ -14,11 +14,12 @@ public record ConsumeVisual(int consumerId, long started, int duration, int form
     public ConsumeVisual(int consumerId,long started,int duration,int form,int stage,float facing){this(consumerId,started,duration,form,stage,facing,net.minecraft.world.phys.Vec3.ZERO);}
     public ConsumeVisual(int consumerId,long started,int duration,int form,int stage){this(consumerId,started,duration,form,stage,0);}
     public static final int NONE=0, CAPTURE=1, HOLD=2, CONSUME=3, THROW=4, FLIGHT=5, WHIP_PULL=6,
-            MOUNT=7,MOUNT_HOLD=8,MOUNT_CONSUME=9,HUNTER_CONSUME=10;
+            MOUNT=7,MOUNT_HOLD=8,MOUNT_CONSUME=9,HUNTER_CONSUME=10,GRAB_ATTACK=11,AIR_THROW=12,AIR_HOLD=13;
     public static boolean acquiring(int stage){return stage==CAPTURE||stage==WHIP_PULL||stage==MOUNT;}
-    public static boolean holding(int stage){return stage==HOLD||stage==MOUNT_HOLD;}
-    public static boolean blocksTravel(int stage){return stage==CAPTURE||stage==CONSUME||ConsumeSequence.mountedStage(stage);}
-    public static boolean blocksInput(int stage){return blocksTravel(stage)||stage==WHIP_PULL;}
+    public static boolean carrying(int stage){return stage==HOLD||stage==AIR_HOLD;}
+    public static boolean holding(int stage){return carrying(stage)||stage==MOUNT_HOLD;}
+    public static boolean blocksTravel(int stage){return stage==CAPTURE||stage==CONSUME||stage==GRAB_ATTACK||ConsumeSequence.mountedStage(stage);}
+    public static boolean blocksInput(int stage){return blocksTravel(stage)||stage==WHIP_PULL||stage==AIR_THROW;}
     public static final ConsumeVisual EMPTY = new ConsumeVisual(-1,0,46,0,NONE);
     public ConsumeVisual(int owner,long start,int duration,int form) { this(owner,start,duration,form,CONSUME); }
     public static final StreamCodec<FriendlyByteBuf, ConsumeVisual> CODEC = new StreamCodec<>() {

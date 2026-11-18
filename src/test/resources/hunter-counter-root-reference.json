@@ -1,0 +1,118 @@
+{
+  "sourceSha256": "d4cc80232801a5145c4e48bd3fb36ca388707db6ae3a3f97ec15459ebfb439e5",
+  "method": "Independent original Motion_Root world matrices minus each native phase first frame, existing Hunter pelvis scale, source +X -> MC yaw0 +X, source -Z -> MC yaw0 +Z.",
+  "fixtures": [
+    {
+      "clip": "counter",
+      "sourceFrame": 0,
+      "sourcePoint": [
+        0.03905000910162926,
+        1.0,
+        -5.5422210693359375
+      ],
+      "yawZeroOffset": [
+        0.0,
+        0,
+        -0.0
+      ]
+    },
+    {
+      "clip": "counter",
+      "sourceFrame": 6,
+      "sourcePoint": [
+        0.03905000910162926,
+        1.0,
+        -5.5422210693359375
+      ],
+      "yawZeroOffset": [
+        0.0,
+        0,
+        -0.0
+      ]
+    },
+    {
+      "clip": "counter",
+      "sourceFrame": 21,
+      "sourcePoint": [
+        0.03905000910162926,
+        1.0,
+        -5.628742337226868
+      ],
+      "yawZeroOffset": [
+        0.0,
+        0,
+        0.09365500864542706
+      ]
+    },
+    {
+      "clip": "counter",
+      "sourceFrame": 42,
+      "sourcePoint": [
+        0.03905000910162926,
+        1.0,
+        -6.516442537307739
+      ],
+      "yawZeroOffset": [
+        0.0,
+        0,
+        1.0545467285624959
+      ]
+    },
+    {
+      "clip": "release",
+      "sourceFrame": 3,
+      "sourcePoint": [
+        0.07848985493183136,
+        1.0,
+        0.2665512263774872
+      ],
+      "yawZeroOffset": [
+        0.0,
+        0,
+        -0.0
+      ]
+    },
+    {
+      "clip": "release",
+      "sourceFrame": 9,
+      "sourcePoint": [
+        0.23546956479549408,
+        1.0,
+        0.2665512263774872
+      ],
+      "yawZeroOffset": [
+        0.16992279982502584,
+        0,
+        -0.0
+      ]
+    },
+    {
+      "clip": "release",
+      "sourceFrame": 39,
+      "sourcePoint": [
+        0.31395941972732544,
+        1.0,
+        0.2665512263774872
+      ],
+      "yawZeroOffset": [
+        0.25488419973753873,
+        0,
+        -0.0
+      ]
+    },
+    {
+      "clip": "release",
+      "sourceFrame": 76,
+      "sourcePoint": [
+        0.31395941972732544,
+        1.0,
+        0.2665512263774872
+      ],
+      "yawZeroOffset": [
+        0.25488419973753873,
+        0,
+        -0.0
+      ]
+    }
+  ]
+}

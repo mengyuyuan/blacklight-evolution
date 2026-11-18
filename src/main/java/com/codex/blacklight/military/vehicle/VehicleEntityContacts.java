@@ -25,7 +25,10 @@ public final class VehicleEntityContacts {
             MilitaryVehicle vehicle=other instanceof MilitaryVehicle parent?parent:
                     other instanceof VehicleHullPart part?part.getParent():null;
             VoxelShape shape;
-            if(vehicle==null)shape=Shapes.create(other.getBoundingBox());
+            if(other instanceof com.codex.blacklight.entity.BlackwatchHelicopter craft && mover instanceof net.minecraft.world.entity.LivingEntity){
+                if(mover.isPassengerOfSameVehicle(craft))continue;
+                shape=com.codex.blacklight.military.aircraft.HelicopterSkinContact.walkingShape(craft,query);
+            }else if(vehicle==null)shape=Shapes.create(other.getBoundingBox());
             else{
                 if(mover!=null&&(mover.is(vehicle)||mover.isPassengerOfSameVehicle(vehicle)
                         ||mover instanceof VehicleHullPart part&&part.getParent()==vehicle))continue;

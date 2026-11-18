@@ -40,8 +40,14 @@ public final class HeavyBlow {
         boolean full=charge>=.9F;
         boolean killed=!v.isAlive()||v.getHealth()<=0;
         float dealt=move.damageFor(move.form)*(1+.5F*charge);
-        if(killed){if((tier.atLeast(ImpactTier.HEAVY)||full)&&!burst(p,v,direction,tier,full,dealt))dismember(p,v,move,direction);return false;}
-        if(!controlled||!(tier.atLeast(ImpactTier.HEAVY)||full)||CombatTargeting.multipart(v)||v instanceof Player)return false;
+        // Supported human and pig rigs retain a physical corpse; other rigs keep their previous effects.
+        if(killed){
+            boolean sharp=move.form==com.codex.blacklight.power.PowerForm.CLAWS||move.form==com.codex.blacklight.power.PowerForm.BLADE||move.form==com.codex.blacklight.power.PowerForm.WHIPFIST;
+            if(!sharp&&!RagdollImpact.supportedBody(v)&&(tier.atLeast(ImpactTier.HEAVY)||full)
+                    &&!burst(p,v,direction,tier,full,dealt))dismember(p,v,move,direction);
+            return false;
+        }
+        if(!controlled||!(tier.atLeast(ImpactTier.HEAVY)||full)||CombatTargeting.anchoredBody(v)||v instanceof Player)return false;
         double resistance=Math.max(0,Math.min(1,1-v.getAttributeValue(net.minecraft.world.entity.ai.attributes.Attributes.KNOCKBACK_RESISTANCE)));
         double volume=v.getBbWidth()*v.getBbWidth()*v.getBbHeight();
         if(volume>=4||resistance<.05)return false;
@@ -112,7 +118,7 @@ public final class HeavyBlow {
     }
     private static void bowl(ServerLevel level,LivingEntity v,Flight f,ServerPlayer attacker,double speed){
         for(var other:level.getEntitiesOfClass(LivingEntity.class,v.getBoundingBox().inflate(.35),o->o!=v&&o!=attacker&&o.isAlive()&&!f.bowled.contains(o.getUUID()))){
-            if(!CombatTargeting.selectable(attacker,other)||CombatTargeting.multipart(other))continue;
+            if(!CombatTargeting.selectable(attacker,other)||CombatTargeting.anchoredBody(other))continue;
             f.bowled.add(other.getUUID());
             other.invulnerableTime=0;
             other.hurt(attacker.damageSources().playerAttack(attacker),f.damage*.35F);
@@ -128,7 +134,7 @@ public final class HeavyBlow {
     }
     /** Overkill: no ordinary collapse, the body bursts into flesh chunks along the blow. */
     private static boolean burst(ServerPlayer p,LivingEntity v,Vec3 direction,ImpactTier tier,boolean full,float dealt){
-        if(!(v.level() instanceof ServerLevel level)||v instanceof Player||CombatTargeting.multipart(v))return false;
+        if(!(v.level() instanceof ServerLevel level)||v instanceof Player||CombatTargeting.anchoredBody(v))return false;
         // Only blows that clearly outweigh the body: full charge, finishers, or a heavy hit on a small creature.
         if(!full&&tier!=ImpactTier.FINISHER&&v.getMaxHealth()>dealt*1.5F)return false;
         var flat=new Vec3(direction.x,0,direction.z);if(flat.lengthSqr()<1e-4)flat=Vec3.directionFromRotation(0,p.getYRot());
@@ -136,7 +142,7 @@ public final class HeavyBlow {
     }
     /** Bursts a dead, ordinary body into flesh chunks flying along {@code direction}. Thrown bodies and blocks share it. */
     public static boolean shatter(LivingEntity v,Vec3 direction){
-        if(!(v.level() instanceof ServerLevel level)||v instanceof Player||CombatTargeting.multipart(v)||v.isAlive()&&v.getHealth()>0||v.isInvisible())return false;
+        if(!(v.level() instanceof ServerLevel level)||v instanceof Player||CombatTargeting.anchoredBody(v)||v.isAlive()&&v.getHealth()>0||v.isInvisible())return false;
         var c=v.position().add(0,v.getBbHeight()*.55,0);double size=Math.max(.6,Math.min(2.2,v.getBbHeight()));
         var flat=new Vec3(direction.x,0,direction.z);if(flat.lengthSqr()<1e-4)flat=Vec3.directionFromRotation(0,v.getYRot());flat=flat.normalize();
         int chunks=(int)Math.round(5+size*3);
@@ -159,7 +165,7 @@ public final class HeavyBlow {
     /** Prototype's dismember: a heavy killing blow that does not burst the body tears off the struck limb.
      * Purely visual: the client hides the part on the corpse and throws it along the blow. */
     private static void dismember(ServerPlayer p,LivingEntity v,WeaponMove move,Vec3 direction){
-        if(!(v.level() instanceof ServerLevel level)||v instanceof Player||CombatTargeting.multipart(v))return;
+        if(!(v.level() instanceof ServerLevel level)||v instanceof Player||CombatTargeting.anchoredBody(v))return;
         if(v.getBbHeight()<1.3F||v.getBbHeight()>2.7F||v.getBbWidth()>1.1F)return; // humanoid-sized rigs only
         var flat=new Vec3(direction.x,0,direction.z);if(flat.lengthSqr()<1e-4)flat=Vec3.directionFromRotation(0,p.getYRot());flat=flat.normalize();
         // Full charge and finishers burst the body before this point, so this is a heavy blow

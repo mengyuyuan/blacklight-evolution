@@ -8,9 +8,10 @@ import net.minecraft.world.phys.Vec3;
 public final class FirearmAim {
     private FirearmAim(){}
     public static Vec3 direction(ServerPlayer p,WeaponDefinition weapon){
-        var target=CombatTargeting.lockedEntity(p);
-        if(target==null||!ExplicitTarget.visibleWithinRange(p,target,weapon.range()))return p.getLookAngle();
-        var start=p.getEyePosition().add(0,-.18,0);var point=ExplicitTarget.point(p,target);
+        var selection=CombatTargeting.lockedSelection(p);
+        var target=selection==null?null:selection.target();
+        if(target==null||!selection.visibleWithinRange(p,weapon.range()))return p.getLookAngle();
+        var start=p.getEyePosition().add(0,-.18,0);var point=selection.point(p);
         if(!CombatTargeting.clearRay(p,start,point))return p.getLookAngle();
         if(weapon.kind()!=WeaponDefinition.Kind.BULLET){
             boolean gravity=weapon.kind()!=WeaponDefinition.Kind.ROCKET&&weapon.kind()!=WeaponDefinition.Kind.MISSILE;

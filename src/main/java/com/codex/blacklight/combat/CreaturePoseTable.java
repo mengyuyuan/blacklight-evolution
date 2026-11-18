@@ -8,6 +8,10 @@ import java.util.*;
 /** Sampled rotations, independent of Gecko's local controller clock (including late tracking). */
 public final class CreaturePoseTable {
     public static final CreaturePoseTable HUNTER=new CreaturePoseTable("/assets/blacklight/models/hunter_combat_motion.json");
+    public static final CreaturePoseTable STALKER=new CreaturePoseTable("/assets/blacklight/models/stalker_combat_motion.json");
+    public static final CreaturePoseTable SPITTER=new CreaturePoseTable("/assets/blacklight/models/spitter_combat_motion.json");
+    public static final CreaturePoseTable BRUTE=new CreaturePoseTable("/assets/blacklight/models/brute_combat_motion.json");
+    public static CreaturePoseTable mutant(String species){return switch(species){case "STALKER"->STALKER;case "SPITTER"->SPITTER;case "BRUTE"->BRUTE;default->throw new IllegalArgumentException(species);};}
     public final String[] bones;
     private final Map<String,float[][][]> clips=new HashMap<>();
     private CreaturePoseTable(String path){
@@ -16,7 +20,7 @@ public final class CreaturePoseTable {
             var root=JsonParser.parseReader(reader).getAsJsonObject();var gson=new Gson();
             bones=gson.fromJson(root.get("bones"),String[].class);
             root.getAsJsonObject("clips").entrySet().forEach(e->clips.put(e.getKey(),gson.fromJson(e.getValue(),float[][][].class)));
-        }catch(Exception e){throw new IllegalStateException("Invalid hunter combat motion",e);}
+        }catch(Exception e){throw new IllegalStateException("Invalid creature combat motion "+path,e);}
     }
     public boolean has(String clip){return clips.containsKey(clip);}
     public float seconds(String clip){var frames=clips.get(clip);return frames==null?0:(frames.length-1)/30F;}
@@ -31,8 +35,12 @@ public final class CreaturePoseTable {
     public static float[] blend(float[] a,float[] b,float weight){
         var q=new org.joml.Quaternionf().rotationZYX(a[2],a[1],a[0]);
         q.slerp(new org.joml.Quaternionf().rotationZYX(b[2],b[1],b[0]),weight);
-        var angles=q.getEulerAnglesZYX(new org.joml.Vector3f());
-        var out=new float[]{angles.x,angles.y,angles.z,0,0,0};
+        q.normalize();float x=q.x,y=q.y,z=q.z,w=q.w;
+        // Explicit Rz Ry Rx extraction also round-trips the source clips' large Y turns.
+        var out=new float[Math.max(6,Math.max(a.length,b.length))];
+        out[0]=(float)Math.atan2(2*(w*x+y*z),1-2*(x*x+y*y));
+        out[1]=(float)Math.asin(Math.max(-1,Math.min(1,2*(w*y-z*x))));
+        out[2]=(float)Math.atan2(2*(w*z+x*y),1-2*(y*y+z*z));
         for(int k=3;k<Math.min(a.length,b.length);k++)out[k]=a[k]+(b[k]-a[k])*weight;
         return out;
     }

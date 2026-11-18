@@ -21,6 +21,13 @@ import java.util.*;
 /** Approved species-specific geometry, fitted once to the native rest skeleton.
  * Native UVs, child details and all actual animated ModelPart matrices are retained. */
 public final class AuthoredInfectionParts {
+    private static final boolean LEGACY_COVER=Boolean.getBoolean("blacklight.legacyTissueCover");
+    /** Slight darkening only; colour comes from the blighted native pixels. */
+    private static int shade(int color,float development){
+        float a=Math.max(0,Math.min(1,development))*.16F;
+        int r=Math.round((color>>>16&255)*(1-.25F*a)),g=Math.round((color>>>8&255)*(1-a)),b=Math.round((color&255)*(1-.85F*a));
+        return color&0xff000000|r<<16|g<<8|b;
+    }
     private static final ResourceLocation TISSUE=new ResourceLocation("blacklight","textures/entity/tissue_anatomy.png");
     private static final Map<String,Optional<JsonObject>> SOURCES=new HashMap<>();
     private static final Map<EntityModel<?>,Map<String,Binding>> BINDINGS=new WeakHashMap<>();
@@ -30,21 +37,18 @@ public final class AuthoredInfectionParts {
     private static List<Face> faces(ModelPart.Cube cube){return FACES.computeIfAbsent(cube,AuthoredInfectionParts::captureFaces);}
     private static List<Face> captureFaces(ModelPart.Cube cube){
         var result=new ArrayList<Face>();
-        cube.compile(new PoseStack().last(),new VertexConsumer(){
+        cube.compile(new PoseStack().last(),new com.codex.blacklight.forge.ForgeVertexConsumer(){
             Vector3f[] positions=new Vector3f[4];float[] us=new float[4],vs=new float[4];int index;
-            @Override public void vertex(float x,float y,float z,float red,float green,float blue,float alpha,float u,float v,int overlay,int light,float nx,float ny,float nz){
+            @Override public void addVertex(float x,float y,float z,int color,float u,float v,int overlay,int light,float nx,float ny,float nz){
                 positions[index]=new Vector3f(x*16,y*16,z*16);us[index]=u;vs[index]=v;
                 if(++index==4){result.add(new Face(positions,us,vs,new Vector3f(nx,ny,nz)));positions=new Vector3f[4];us=new float[4];vs=new float[4];index=0;}
             }
-            @Override public VertexConsumer vertex(double x,double y,double z){throw new UnsupportedOperationException("Cube must supply complete vertices");}
-            @Override public VertexConsumer color(int r,int g,int b,int a){return this;}
-            @Override public VertexConsumer uv(float u,float v){return this;}
-            @Override public VertexConsumer overlayCoords(int u,int v){return this;}
-            @Override public VertexConsumer uv2(int u,int v){return this;}
-            @Override public VertexConsumer normal(float x,float y,float z){return this;}
-            @Override public void endVertex(){}
-            @Override public void defaultColor(int r,int g,int b,int a){}
-            @Override public void unsetDefaultColor(){}
+            @Override public VertexConsumer addVertex(float x,float y,float z){throw new UnsupportedOperationException("Cube must supply complete vertices");}
+            @Override public VertexConsumer setColor(int r,int g,int b,int a){return this;}
+            @Override public VertexConsumer setUv(float u,float v){return this;}
+            @Override public VertexConsumer setUv1(int u,int v){return this;}
+            @Override public VertexConsumer setUv2(int u,int v){return this;}
+            @Override public VertexConsumer setNormal(float x,float y,float z){return this;}
         },0,0,1,1,1,1);
         return result;
     }
@@ -102,8 +106,10 @@ public final class AuthoredInfectionParts {
             var posed=pose(part,pose);
             Set<ModelPart.Cube> replaced=Collections.newSetFromMap(new IdentityHashMap<>());
             for(var p:matches)if(!p.skin.isEmpty()&&replaced.add(p.cube)) {
-                if(age<TissueGrowth.ANCIENT_TICKS) {
-                    int tint=TissueSkin.tint(color,growthSeed,p.anatomy,TissueEvolution.attachmentGrowth(age));
+                // The host's own blighted texture now carries late infection;
+                // the old stripe cover replaced the whole species once ancient.
+                if(!LEGACY_COVER||age<TissueGrowth.ANCIENT_TICKS) {
+                    int tint=LEGACY_COVER?TissueSkin.tint(color,growthSeed,p.anatomy,TissueEvolution.attachmentGrowth(age)):shade(color,TissueEvolution.attachmentGrowth(age));
                     for(var triangle:p.skin)emit(remodel(develop(triangle,frames.get(part),evolution),frames.get(part)),posed,out,light,overlay,tint,true);
                 }
             }
@@ -122,7 +128,7 @@ public final class AuthoredInfectionParts {
         public void flush(MultiBufferSource buffers,boolean omitBody,boolean onlyBody){
             if(pending.isEmpty())return;
             var out=buffers.getBuffer(RenderType.entityCutoutNoCull(ConsumedMobVisuals.WHITE));
-            for(var e:pending.entrySet())for(var p:pieces.get(e.getKey())) {
+            for(var e:pending.entrySet())try(var owner=AdaptiveRagdoll.attachment(e.getKey())){for(var p:pieces.get(e.getKey())) {
                 if(omitBody&&p.anatomy==ConsumeAnatomy.BODY||onlyBody&&p.anatomy!=ConsumeAnatomy.BODY)continue;
                 if(out instanceof ConsumeAnatomy.Consumer consumer)consumer.anatomy(e.getKey());
                 EvolvedDonorCapture.mesh(e.getKey(),"authored_growth");
@@ -137,10 +143,12 @@ public final class AuthoredInfectionParts {
                 float late=TissueLateBody.progress(age);
                 if(late>0)for(var triangle:p.late)emit(remodel(develop(grow(triangle,p.cube,late),frames.get(e.getKey()),evolution),frames.get(e.getKey())),q.pose,out,q.light,q.overlay,q.color,false);
             }
+            }
             // Use the exact same developed vertices for the tissue cover. A
             // thin normal offset avoids z-fighting without adding body volume.
+            if(!LEGACY_COVER){pending.clear();return;}
             var tissue=buffers.getBuffer(RenderType.entityCutoutNoCull(TISSUE));
-            for(var entry:pending.entrySet())for(var piece:pieces.get(entry.getKey())) {
+            for(var entry:pending.entrySet())try(var owner=AdaptiveRagdoll.attachment(entry.getKey())){for(var piece:pieces.get(entry.getKey())) {
                 if(omitBody&&piece.anatomy==ConsumeAnatomy.BODY||onlyBody&&piece.anatomy!=ConsumeAnatomy.BODY)continue;
                 var posed=entry.getValue();var frame=frames.get(entry.getKey());
                 if(tissue instanceof ConsumeAnatomy.Consumer consumer)consumer.anatomy(entry.getKey());
@@ -148,6 +156,7 @@ public final class AuthoredInfectionParts {
                 for(var triangle:piece.skin) {
                     if(TissueEvolution.attachmentGrowth(age)>0)emitTissue(triangle,remodel(develop(triangle,frame,evolution),frame),frame,posed.pose,tissue,posed.light,posed.overlay,posed.color,growthSeed,age,piece.anatomy);
                 }
+            }
             }
             pending.clear();
         }
@@ -320,6 +329,18 @@ public final class AuthoredInfectionParts {
         for(var v:voxels){var p=v.p();result.add(new Triangle(new Vector3f(p[0],p[1],p[2]),new Vector3f(p[3],p[4],p[5]),new Vector3f(p[6],p[7],p[8]),new Vector3f(v.nx(),v.ny(),v.nz()),v.color(),null));}
         return result;
     }
+    /** Authored meshes were painted in neutral greys; map them onto the
+     * shared blacklight palette: violet-black chitin, crimson flesh, ivory bone. */
+    static int palette(int argb){
+        if(LEGACY_COVER)return argb;
+        int alpha=argb&0xff000000;
+        return alpha|switch(argb&0xffffff){
+            case 0x262726->0x1c1622; case 0x353835->0x2c2334; case 0x131112->0x0c080d;
+            case 0x46403b->0x3e3346; case 0x5c1d1c->0x5a1220; case 0x852a25->0xb0202c;
+            case 0x797666->0xd8ccb0; default->argb&0xffffff;
+        };
+    }
+    static boolean glows(int rgb){int r=rgb>>16&255,g=rgb>>8&255,b=rgb&255;return r>110&&g<48&&b<58&&r>g*3;}
     private static List<Triangle> localTriangles(JsonObject data){
         var points=new ArrayList<Vector3f>();var vs=data.getAsJsonArray("vertices");
         for(int i=0;i<vs.size();i+=3)points.add(new Vector3f(vs.get(i).getAsFloat(),vs.get(i+1).getAsFloat(),vs.get(i+2).getAsFloat()));
@@ -327,7 +348,7 @@ public final class AuthoredInfectionParts {
         for(int i=0;i<ts.size();i+=4){
             var a=points.get(ts.get(i).getAsInt());var b=points.get(ts.get(i+1).getAsInt());var c=points.get(ts.get(i+2).getAsInt());
             var normal=new Vector3f(b).sub(a).cross(new Vector3f(c).sub(a));if(normal.lengthSquared()<1e-10F)continue;normal.normalize();
-            result.add(new Triangle(a,b,c,normal,ts.get(i+3).getAsInt(),null));
+            result.add(new Triangle(a,b,c,normal,palette(ts.get(i+3).getAsInt()),null));
         }
         return List.copyOf(result);
     }
@@ -420,7 +441,7 @@ public final class AuthoredInfectionParts {
             Vector3f a=vertices.get(ts.get(i).getAsInt()),b=vertices.get(ts.get(i+1).getAsInt()),c=vertices.get(ts.get(i+2).getAsInt());
             Vector3f normal=new Vector3f(b).sub(a).cross(new Vector3f(c).sub(a));if(normal.lengthSquared()<1e-10F)continue;normal.normalize();
             Face face=base?face(cube,a,b,c):null;
-            int color=base&&face==null?0x5e262a:ts.get(i+3).getAsInt();
+            int color=base&&face==null?0x5e262a:palette(ts.get(i+3).getAsInt());
             var triangle=new Triangle(a,b,c,normal,color,face);
             if(face!=null)skin.add(triangle);else growth.add(triangle);
         }
@@ -447,6 +468,8 @@ public final class AuthoredInfectionParts {
     }
     private static void emit(Triangle t,PoseStack.Pose pose,VertexConsumer out,int light,int overlay,int color,boolean skin){
         int rgba=skin?color:(color&0xff000000)|t.color;
+        // Eye slits and blood seams are the only saturated reds: they glow.
+        if(!skin&&!LEGACY_COVER&&glows(t.color))light=net.minecraft.client.renderer.LightTexture.FULL_BRIGHT;
         for(int j=0;j<4;j++){
             Vector3f v=j==0?t.a:j==1?t.b:t.c;float u=.5F,w=.5F;
             if(skin){var p=t.face;var a=p.positions[0];var b=p.positions[1];var d=p.positions[3];

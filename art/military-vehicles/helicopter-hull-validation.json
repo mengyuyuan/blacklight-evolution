@@ -1,0 +1,151 @@
+{
+  "schema": 1,
+  "createdLocal": "2026-11-16T17:41:28",
+  "status": "HELICOPTER AI HULL COMBAT CHECKPOINT PASSED; complete military/creature goal remains active",
+  "source": {
+    "file": "art/military-vehicles/helicopter-hull-source.json",
+    "sha256": "8809c285b172065ed9f4ca7c046aeb7c3749e4c8c57845a21fcbcc709a6e850a"
+  },
+  "problem": "AI fire rejected every first mechanical hull and required a LivingEntity first hit. Infected enemies in native tanks and helicopters could be tracked without their vehicle being fired upon.",
+  "implementation": [
+    "Aim and last observation resolve the actual root vehicle body for native ground vehicles and helicopters. On-foot targets retain their original path.",
+    "Ground contacts use actual oriented hull geometry. Conservative hull AABBs and seated bodies are excluded from the ordinary entity ray so they cannot supersede the real hull surface.",
+    "AI permits its selected enemy carrier only with legitimate hostile occupants, rejecting empty, allied or mixed-friendly hulls. Rocket preflight also checks nearby friendly aircraft.",
+    "Machine gun uses existing mechanical armor factors. Rocket uses the actual native VehicleOrdnanceProjectile, finite stores and native collision/impact events.",
+    "Seated helicopter occupants are excluded from vehicle projectile direct and splash damage. Aircraft damage uses actual crew allegiance/creative/PvP rules instead of treating any remembered player owner as an enemy.",
+    "Direct aircraft projectile contact receives full configured direct damage once and is omitted from the same blast pass. This fixes incidental edge falloff and avoids double counting."
+  ],
+  "protocols": {
+    "neo": "standalone-71-helicopter-hulls",
+    "forge": "forge-1.20.1-31-helicopter-hulls"
+  },
+  "platforms": {
+    "neo": {
+      "helicopter": {
+        "passed": 39,
+        "file": "D:\\CodexCache\\helicopter-hull-qa\\neo-helicopter-passed.log",
+        "sha256": "4f634e39b613b5943b28a4bde8ba7cbd61b0243d6f5765a3e5633b44102181cb",
+        "firstHitEvidence": [
+          {
+            "target": "tank",
+            "weapon": "gun",
+            "hullLoss": 0.3999939,
+            "rounds": 239,
+            "rockets": 0,
+            "actualProjectile": false,
+            "occupantHurt": false
+          },
+          {
+            "target": "helicopter",
+            "weapon": "gun",
+            "hullLoss": 4.0,
+            "rounds": 239,
+            "rockets": 0,
+            "actualProjectile": false,
+            "occupantHurt": false
+          },
+          {
+            "target": "tank",
+            "weapon": "rocket",
+            "hullLoss": 10.0,
+            "rounds": 0,
+            "rockets": 7,
+            "actualProjectile": true,
+            "occupantHurt": false
+          },
+          {
+            "target": "helicopter",
+            "weapon": "rocket",
+            "hullLoss": 20.0,
+            "rounds": 0,
+            "rockets": 7,
+            "actualProjectile": true,
+            "occupantHurt": false
+          }
+        ]
+      },
+      "sharedVehicle": {
+        "passed": 29,
+        "file": "D:\\CodexCache\\helicopter-hull-qa\\neo-sharedVehicle-passed.log",
+        "sha256": "f475f5af1447450ee3da46e31d6adb4947ccb733a22a420abcf7d772710eeaa8"
+      },
+      "files": {
+        "src/main/java/com/codex/blacklight/military/aircraft/HelicopterCombat.java": "bb65f97dcadd37b199ef5e5c4e3f3437666c8d979f3720e1b498c9c6ce92e2af",
+        "src/main/java/com/codex/blacklight/military/vehicle/VehicleDamageBridge.java": "91e5dba6c8445cb08798630f06b71819e06861f32269fe1b4c3dbac606e847a8",
+        "src/main/java/com/codex/blacklight/entity/BlackwatchHelicopter.java": "ce66cab2bfee69834b4c048d3a74b7870345add23d89049edc00e9dee7909e1b",
+        "src/main/java/com/codex/blacklight/firearms/VehicleOrdnanceProjectile.java": "c528699f036bdc72c991f8662b543346232ba8bceb61bfda36e9481e5881b6b1",
+        "src/main/java/com/codex/blacklight/network/ModNetwork.java": "5f4630c3170e5ea6433a5b729c4c0ad0fedc79af975158421b8d993883bdc396",
+        "src/helicopterTest/java/com/codex/blacklight/gametest/HelicopterVehicleCombatGameTest.java": "7229f671a434c187c6f6927b9f4c67cd8ff0b1d1bc84196e382a57bda6addc65",
+        "src/vehicleTest/java/com/codex/blacklight/gametest/vehicle/VehicleFireGameTest.java": "4eddec99549aa1c9659ef150effdaf7f130015095ada50cc3d707de69fedbe19",
+        "tools/helicopter-hull-test.init.gradle": "09fe6f28473fceeea5930c76ff1e06ab4c92465ab1ccea5c66b45be87ace83b7"
+      }
+    },
+    "forge": {
+      "helicopter": {
+        "passed": 39,
+        "file": "D:\\CodexCache\\helicopter-hull-qa\\forge-helicopter-passed.log",
+        "sha256": "f43a0c0ec03bf98b3863602e24085ddcac90dbc09cc2dab4a63107868e7755f2",
+        "firstHitEvidence": [
+          {
+            "target": "tank",
+            "weapon": "gun",
+            "hullLoss": 0.3999939,
+            "rounds": 239,
+            "rockets": 0,
+            "actualProjectile": false,
+            "occupantHurt": false
+          },
+          {
+            "target": "helicopter",
+            "weapon": "gun",
+            "hullLoss": 4.0,
+            "rounds": 239,
+            "rockets": 0,
+            "actualProjectile": false,
+            "occupantHurt": false
+          },
+          {
+            "target": "tank",
+            "weapon": "rocket",
+            "hullLoss": 10.0,
+            "rounds": 0,
+            "rockets": 7,
+            "actualProjectile": true,
+            "occupantHurt": false
+          },
+          {
+            "target": "helicopter",
+            "weapon": "rocket",
+            "hullLoss": 20.0,
+            "rounds": 0,
+            "rockets": 7,
+            "actualProjectile": true,
+            "occupantHurt": false
+          }
+        ]
+      },
+      "sharedVehicle": {
+        "passed": 29,
+        "file": "D:\\CodexCache\\helicopter-hull-qa\\forge-sharedVehicle-passed.log",
+        "sha256": "6381af09647a9f07c465ab8787fe8d5745054f66c2dda66c9b9bd16e509043f7"
+      },
+      "files": {
+        "src/main/java/com/codex/blacklight/military/aircraft/HelicopterCombat.java": "bb65f97dcadd37b199ef5e5c4e3f3437666c8d979f3720e1b498c9c6ce92e2af",
+        "src/main/java/com/codex/blacklight/military/vehicle/VehicleDamageBridge.java": "b81ff1b46085487669ee54a00a149ec21876662b47c35a06c467b0c1b1e39019",
+        "src/main/java/com/codex/blacklight/entity/BlackwatchHelicopter.java": "60857a904516e9b66d6d91cde3f331acd2d9f8c02b8612c99ee4591206e9ef1c",
+        "src/main/java/com/codex/blacklight/firearms/VehicleOrdnanceProjectile.java": "7087b9c1f17973ad5037a2962e8d8a26ebbaf23ea9b77a79f234906b18c20375",
+        "src/main/java/com/codex/blacklight/network/ModNetwork.java": "f4fec522ebe1ff8a40684f9444c2f40dfeab672ec2fbfc8e3623c19d5990c294",
+        "src/helicopterTest/java/com/codex/blacklight/gametest/HelicopterVehicleCombatGameTest.java": "fce2fd85eb6fd007ac4f632ec0bf29ddceb6018f38719677f23de352bfcd6581",
+        "src/vehicleTest/java/com/codex/blacklight/gametest/vehicle/VehicleFireGameTest.java": "6f1e9867e942fc1de4502d7ed18336509ef5344cf23bd76f8068b736588e45a7",
+        "tools/helicopter-hull-test.init.gradle": "09fe6f28473fceeea5930c76ff1e06ab4c92465ab1ccea5c66b45be87ace83b7"
+      }
+    }
+  },
+  "limitations": [
+    "Existing machine gun and unguided rocket are Minecraft weapon profiles. Full original Hellfire/gun-pod/rocket selection, guidance, exact damage, timing and motion are not completed by this checkpoint.",
+    "Vehicle-target attack scenarios use infected enemy occupants. Radio-designated noninfected opponents need additional coverage: shared hull impact permission currently checks infection or the actual firing soldier target, while the aircraft keeps a separate designation.",
+    "Moving target interception, complex mixed traffic, multiplayer sessions, and new rendered/client sound review remain outside this server checkpoint.",
+    "Original FIG still contains opaque condition/track types; the source report lists them explicitly. No complete Apache-engine reconstruction is claimed."
+  ],
+  "qaIncident": "An initial combined 68-test process exceeded the 1 GB game heap. NeoForge even returned Gradle success after the server OOM; that run is rejected. Logs preserved under combined-oom. Final runs split 39 helicopter and 29 shared-vehicle scenarios, and separate the 8 firing tests from the 13 basic vehicle tests into another batch without removing any cases."
+}

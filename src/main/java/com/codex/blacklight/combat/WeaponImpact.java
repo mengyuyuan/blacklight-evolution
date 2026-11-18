@@ -20,19 +20,31 @@ public final class WeaponImpact {
      * devastators, groundspikes and thrown bodies. Call after the knockback is set so the hold
      * keeps the launch. Feedback goes to the attacker once per action ({@code first}). */
     public static void contact(ServerPlayer p,LivingEntity v,ImpactTier tier,boolean first,PhysicalFeedbackPayload.Effect effect){
-        if(v.level().isClientSide||!v.isAlive())return;
-        HitStop.victim(v,tier.hitstop);
+        if(!v.level().isClientSide&&tier.atLeast(ImpactTier.HEAVY)){
+            var state=com.codex.blacklight.registry.ModAttachments.getData(v, ModAttachments.HIT_REACTION);
+            if(!v.isAlive()||state.weight(v.level().getGameTime(),0)>0)
+                RagdollImpact.send(v,ImpactProfile.FALL,Math.max(18,state.duration()),false,HitStop.launchVelocity(v),
+                        p==null?WeaponCutContact.Report.NONE:WeaponCutContact.impact(p,v,HitStop.launchVelocity(v)));
+        }
+        if(v.level().isClientSide)return;
+        if(v.isAlive())HitStop.victim(v,tier.hitstop);
         float pitch=switch(tier){case LIGHT->1.1F;case MEDIUM->1F;case HEAVY->.88F;case FINISHER->.78F;};
         if(p!=null)com.codex.blacklight.registry.ModWeaponSounds.play(p,com.codex.blacklight.registry.ModWeaponSounds.equipped(p),tier.atLeast(ImpactTier.HEAVY)?"heavy":"hit",v.position(),.8F+.15F*tier.ordinal(),pitch);
         if(tier.atLeast(ImpactTier.HEAVY))v.level().playSound(null,v.getX(),v.getY(),v.getZ(),SoundEvents.PLAYER_ATTACK_KNOCKBACK,SoundSource.PLAYERS,.9F,.62F);
         if(tier==ImpactTier.FINISHER)v.level().playSound(null,v.getX(),v.getY(),v.getZ(),SoundEvents.WARDEN_ATTACK_IMPACT,SoundSource.PLAYERS,.55F,.85F);
-        if(v.level() instanceof net.minecraft.server.level.ServerLevel level){var c=v.getBoundingBox().getCenter();
-            level.sendParticles(net.minecraft.core.particles.ParticleTypes.CRIT,c.x,c.y,c.z,4*(tier.ordinal()+1),.18,.24,.18,.08+.04*tier.ordinal());
-            if(tier.atLeast(ImpactTier.HEAVY))level.sendParticles(net.minecraft.core.particles.ParticleTypes.DAMAGE_INDICATOR,c.x,c.y,c.z,tier==ImpactTier.FINISHER?8:4,.2,.3,.2,.12);}
+        if(p!=null&&AnimatedHurtBody.of(v)==null)PlayerHitEffects.emit(p,v,
+                tier.atLeast(ImpactTier.HEAVY)?com.codex.blacklight.infection.InfectedAttackStyle.CRUSH:com.codex.blacklight.infection.InfectedAttackStyle.TEAR,
+                .5F*tier.effectScale,WeaponCutContact.impact(p,v,HitStop.launchVelocity(v)));
         if(first&&p!=null&&effect!=null)PacketDistributor.sendToPlayer(p,new PhysicalFeedbackPayload(effect,tier.feedback));
     }
     public static void apply(ServerPlayer p,LivingEntity v,WeaponMove move,Vec3 direction,boolean first){apply(p,v,move,direction,first,0F);}
     public static void apply(ServerPlayer p,LivingEntity v,WeaponMove move,Vec3 direction,boolean first,float charge) {
+        apply(p,v,move,direction,first,charge,WeaponCutContact.Report.NONE);
+    }
+    public static void apply(ServerPlayer p,LivingEntity v,WeaponMove move,Vec3 direction,boolean first,float charge,WeaponCutContact.Report cut) {
+        // A confirmed ordinary hit still has impact feedback when no sharp face touched.
+        // Keep that fallback separate from the report allowed to authorize dismemberment.
+        var impact=cut.contacts().isEmpty()?WeaponCutContact.impact(p,v,direction):cut;
         var profile=ImpactProfile.of(move);var tier=ImpactTier.of(move);
         boolean slam=profile.kind()==HitReaction.SLAM||move.quake();
         boolean heavy=profile.kind()!=HitReaction.STAGGER;
@@ -51,23 +63,37 @@ public final class WeaponImpact {
             // Tier lift pops ordinary bodies; massive ones stay grounded under the same hit.
             double lift=profile.lift()<0?profile.lift():profile.lift()+(volume<4?tier.lift:0);
             double vertical=lift==0?Math.max(0,Math.min(v.getDeltaMovement().y,.12)):lift*mass*resistance;
-            v.setDeltaMovement(direction.x*force,vertical,direction.z*force);
+            Vec3 inherited=v.isDeadOrDying()?HitStop.launchVelocity(v):Vec3.ZERO;
+            v.setDeltaMovement(new Vec3(direction.x*force,vertical,direction.z*force).add(inherited));
             if(vertical>0)v.setOnGround(false);
             v.hurtMarked=true;
             if(v instanceof Mob mob){mob.getNavigation().stop();mob.setXxa(0);mob.setZza(0);}
-            if(first)HitStop.victim(v,tier.hitstop);
+            // Every struck victim reacts; only attacker sound/camera is limited to the first.
+            if(v.isAlive())HitStop.victim(v,tier.hitstop);
         }
         HeavyBlow.apply(p,v,move,tier,charge,direction,controlled);
+        WeaponDismemberment.weapon(v,cut);
+        boolean sharp=move.form==PowerForm.BLADE||move.form==PowerForm.CLAWS||move.form==PowerForm.WHIPFIST;
+        if(sharp&&v.isDeadOrDying()&&RagdollImpact.supportedBody(v)){
+            // Capture connected skin once, including blade-back contacts before an edge crosses it.
+            // This adapter flag does not sever anything; only confirmed planes may do that.
+            com.codex.blacklight.registry.ModAttachments.setData(v, ModAttachments.DISMEMBER,com.codex.blacklight.registry.ModAttachments.getData(v, ModAttachments.DISMEMBER)|WeaponDismemberment.MESH_CUT);com.codex.blacklight.registry.ModAttachments.syncData(v, ModAttachments.DISMEMBER);
+        }
+        if(controlled||!v.isAlive()||!impact.contacts().isEmpty()){
+            // Light cuts retain directional flinch; heavy cuts and lethal hits take over the body.
+            int physicalTicks=!v.isAlive()?60:canFall?profile.stun():8;
+            RagdollImpact.send(v,profile.motion(),physicalTicks,sharp,HitStop.launchVelocity(v),impact,tier.hitstop);
+        }
         boolean blade=move.form==PowerForm.BLADE;
-        if(!blade)ClawPhysicalEffects.onComboTargetHit(p,v,heavy||slam);
-        CombatImpactEffects.target(p,v,move);
+        if(AnimatedHurtBody.of(v)==null)CombatImpactEffects.target(p,v,move,impact);
+        var soundPoint=v instanceof AnimatedHurtBody hydra&&hydra.animatedHurtBody()?hydra.incomingPoint():v.position();
         if(first){
             float pitch=switch(tier){case LIGHT->1.1F;case MEDIUM->1F;case HEAVY->.88F;case FINISHER->.78F;};
-            com.codex.blacklight.registry.ModWeaponSounds.play(p,com.codex.blacklight.registry.ModWeaponSounds.equipped(p),tier.atLeast(ImpactTier.HEAVY)||heavy||slam?"heavy":"hit",v.position(),.8F+.15F*tier.ordinal(),pitch);
-            if(tier.atLeast(ImpactTier.HEAVY))p.level().playSound(null,v.getX(),v.getY(),v.getZ(),SoundEvents.PLAYER_ATTACK_KNOCKBACK,SoundSource.PLAYERS,.9F,.62F);
+            com.codex.blacklight.registry.ModWeaponSounds.play(p,com.codex.blacklight.registry.ModWeaponSounds.equipped(p),tier.atLeast(ImpactTier.HEAVY)||heavy||slam?"heavy":"hit",soundPoint,.8F+.15F*tier.ordinal(),pitch);
+            if(tier.atLeast(ImpactTier.HEAVY))p.level().playSound(null,soundPoint.x,soundPoint.y,soundPoint.z,SoundEvents.PLAYER_ATTACK_KNOCKBACK,SoundSource.PLAYERS,.9F,.62F);
             if(tier==ImpactTier.FINISHER){
-                p.level().playSound(null,v.getX(),v.getY(),v.getZ(),SoundEvents.PLAYER_ATTACK_CRIT,SoundSource.PLAYERS,1F,.7F);
-                p.level().playSound(null,v.getX(),v.getY(),v.getZ(),SoundEvents.WARDEN_ATTACK_IMPACT,SoundSource.PLAYERS,.55F,.85F);
+                p.level().playSound(null,soundPoint.x,soundPoint.y,soundPoint.z,SoundEvents.PLAYER_ATTACK_CRIT,SoundSource.PLAYERS,1F,.7F);
+                p.level().playSound(null,soundPoint.x,soundPoint.y,soundPoint.z,SoundEvents.WARDEN_ATTACK_IMPACT,SoundSource.PLAYERS,.55F,.85F);
             }
         }
         if(first&&blade){

@@ -1,0 +1,4 @@
+allprojects { afterEvaluate {
+    tasks.withType(Jar).configureEach { doFirst {throw new GradleException('Hidden QA profile cannot produce a release JAR')} }
+    minecraft.runs.client.property 'blacklight.test.hiddenRagdoll','true'
+} }

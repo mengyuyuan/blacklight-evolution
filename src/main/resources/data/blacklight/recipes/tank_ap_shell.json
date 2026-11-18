@@ -18,7 +18,7 @@
     }
   ],
   "result": {
-    "count": 1,
-    "item": "blacklight:tank_ap_shell"
+    "item": "blacklight:tank_ap_shell",
+    "count": 1
   }
 }

@@ -1,0 +1,5937 @@
+{
+  "schemaVersion": 1,
+  "textureWidth": 1024,
+  "textureHeight": 1024,
+  "bones": {
+    "body": [
+      0,
+      0,
+      0
+    ],
+    "rotor": [
+      0,
+      4.05,
+      0
+    ],
+    "tail_rotor": [
+      -0.45,
+      2.85,
+      -5.8
+    ],
+    "door_left": [
+      -1.46,
+      1.15,
+      -0.2
+    ],
+    "door_right": [
+      1.46,
+      1.15,
+      -0.2
+    ],
+    "cockpit_left": [
+      -1.4,
+      1.4,
+      2.6
+    ],
+    "cockpit_right": [
+      1.4,
+      1.4,
+      2.6
+    ],
+    "gun": [
+      0,
+      1,
+      3.6
+    ],
+    "pod_left": [
+      -1.9,
+      1.4,
+      1.3
+    ],
+    "pod_right": [
+      1.9,
+      1.4,
+      1.3
+    ],
+    "rapid_left": [
+      -2.6542,
+      1.4,
+      1.3
+    ],
+    "rapid_right": [
+      2.6542,
+      1.4,
+      1.3
+    ],
+    "hellfire_-1_0": [
+      -1.737185,
+      1.534876,
+      1.310615
+    ],
+    "hellfire_-1_1": [
+      -1.737067,
+      1.265124,
+      1.289385
+    ],
+    "hellfire_-1_2": [
+      -2.062933,
+      1.265124,
+      1.289385
+    ],
+    "hellfire_-1_3": [
+      -2.062933,
+      1.534876,
+      1.310615
+    ],
+    "hellfire_1_0": [
+      2.062815,
+      1.534876,
+      1.310615
+    ],
+    "hellfire_1_1": [
+      2.062933,
+      1.265124,
+      1.289385
+    ],
+    "hellfire_1_2": [
+      1.737067,
+      1.265124,
+      1.289385
+    ],
+    "hellfire_1_3": [
+      1.737067,
+      1.534876,
+      1.310615
+    ]
+  },
+  "parts": [
+    {
+      "name": "belly",
+      "parent": "body",
+      "box": [
+        -20.0,
+        11.2,
+        -43.2,
+        40.0,
+        7.2,
+        89.6
+      ],
+      "material": "armor",
+      "uv": [
+        2,
+        2
+      ]
+    },
+    {
+      "name": "cabin_floor",
+      "parent": "body",
+      "box": [
+        -23.2,
+        16.8,
+        -38.4,
+        46.4,
+        3.2,
+        80.0
+      ],
+      "material": "edge",
+      "uv": [
+        265,
+        2
+      ]
+    },
+    {
+      "name": "cabin_roof",
+      "parent": "body",
+      "box": [
+        -23.68,
+        42.4,
+        -40.8,
+        47.36,
+        4.0,
+        84.0
+      ],
+      "material": "armor",
+      "uv": [
+        522,
+        2
+      ]
+    },
+    {
+      "name": "rear_bulkhead",
+      "parent": "body",
+      "box": [
+        -22.88,
+        19.2,
+        -42.4,
+        45.76,
+        23.2,
+        4.8
+      ],
+      "material": "armor",
+      "uv": [
+        789,
+        2
+      ]
+    },
+    {
+      "name": "nose_lower",
+      "parent": "body",
+      "box": [
+        -20.0,
+        18.4,
+        41.6,
+        40.0,
+        8.0,
+        16.8
+      ],
+      "material": "armor",
+      "uv": [
+        894,
+        2
+      ]
+    },
+    {
+      "name": "nose_tip",
+      "parent": "body",
+      "box": [
+        -15.2,
+        23.2,
+        58.4,
+        30.4,
+        4.8,
+        2.4
+      ],
+      "material": "dark",
+      "uv": [
+        2,
+        103
+      ]
+    },
+    {
+      "name": "instrument_panel",
+      "parent": "body",
+      "box": [
+        -17.92,
+        28.8,
+        39.68,
+        35.84,
+        4.0,
+        5.44
+      ],
+      "material": "dark",
+      "uv": [
+        73,
+        103
+      ]
+    },
+    {
+      "name": "windshield_-1",
+      "parent": "body",
+      "box": [
+        -20.8,
+        29.6,
+        44.8,
+        20.0,
+        12.16,
+        1.28
+      ],
+      "material": "glass",
+      "rotation": {
+        "axis": "x",
+        "degrees": -22.5,
+        "origin": [
+          0,
+          2.3,
+          2.8
+        ]
+      },
+      "uv": [
+        160,
+        103
+      ]
+    },
+    {
+      "name": "nose_shoulder_-1",
+      "parent": "body",
+      "box": [
+        -20.8,
+        26.4,
+        41.6,
+        20.0,
+        4.0,
+        12.0
+      ],
+      "material": "armor",
+      "uv": [
+        207,
+        103
+      ]
+    },
+    {
+      "name": "windshield_pillar_-1",
+      "parent": "body",
+      "box": [
+        -21.76,
+        27.2,
+        41.6,
+        1.92,
+        16.0,
+        5.12
+      ],
+      "material": "edge",
+      "uv": [
+        274,
+        103
+      ]
+    },
+    {
+      "name": "cockpit_side_glass_-1",
+      "parent": "cockpit_left",
+      "box": [
+        -0.64,
+        8.0,
+        -21.6,
+        1.28,
+        11.52,
+        21.6
+      ],
+      "material": "glass",
+      "uv": [
+        293,
+        103
+      ]
+    },
+    {
+      "name": "cockpit_door_lower_-1",
+      "parent": "cockpit_left",
+      "box": [
+        -1.12,
+        -3.2,
+        -23.2,
+        2.24,
+        11.2,
+        23.2
+      ],
+      "material": "armor",
+      "uv": [
+        344,
+        103
+      ]
+    },
+    {
+      "name": "cockpit_door_handle_-1",
+      "parent": "cockpit_left",
+      "box": [
+        -2.24,
+        5.6,
+        -19.2,
+        1.28,
+        1.6,
+        5.12
+      ],
+      "material": "metal",
+      "uv": [
+        401,
+        103
+      ]
+    },
+    {
+      "name": "cabin_rear_side_-1",
+      "parent": "body",
+      "box": [
+        -23.84,
+        19.2,
+        -38.4,
+        2.24,
+        23.2,
+        8.8
+      ],
+      "material": "armor",
+      "uv": [
+        420,
+        103
+      ]
+    },
+    {
+      "name": "door_front_pillar_-1",
+      "parent": "body",
+      "box": [
+        -24.0,
+        19.2,
+        15.2,
+        2.24,
+        24.0,
+        3.2
+      ],
+      "material": "edge",
+      "uv": [
+        447,
+        103
+      ]
+    },
+    {
+      "name": "door_track_-1",
+      "parent": "body",
+      "box": [
+        -24.8,
+        42.24,
+        -39.2,
+        1.6,
+        2.24,
+        57.12
+      ],
+      "material": "metal",
+      "uv": [
+        464,
+        103
+      ]
+    },
+    {
+      "name": "sliding_door_lower_-1",
+      "parent": "door_left",
+      "box": [
+        -0.96,
+        0.8,
+        -25.92,
+        1.92,
+        12.0,
+        44.16
+      ],
+      "material": "armor",
+      "uv": [
+        587,
+        103
+      ]
+    },
+    {
+      "name": "sliding_door_window_-1",
+      "parent": "door_left",
+      "box": [
+        -0.64,
+        12.8,
+        -23.2,
+        1.28,
+        9.12,
+        37.6
+      ],
+      "material": "glass",
+      "uv": [
+        684,
+        103
+      ]
+    },
+    {
+      "name": "door_frame_-1_-1.82",
+      "parent": "door_left",
+      "box": [
+        -1.12,
+        12.8,
+        -25.92,
+        2.24,
+        11.2,
+        2.56
+      ],
+      "material": "edge",
+      "uv": [
+        767,
+        103
+      ]
+    },
+    {
+      "name": "door_frame_-1_0.7",
+      "parent": "door_left",
+      "box": [
+        -1.12,
+        12.8,
+        14.4,
+        2.24,
+        11.2,
+        2.56
+      ],
+      "material": "edge",
+      "uv": [
+        782,
+        103
+      ]
+    },
+    {
+      "name": "sliding_door_handle_-1",
+      "parent": "door_left",
+      "box": [
+        -2.24,
+        9.28,
+        12.0,
+        1.28,
+        1.92,
+        4.32
+      ],
+      "material": "white",
+      "uv": [
+        797,
+        103
+      ]
+    },
+    {
+      "name": "engine_nacelle_-1",
+      "parent": "body",
+      "box": [
+        -18.24,
+        46.4,
+        -20.0,
+        13.44,
+        8.8,
+        44.8
+      ],
+      "material": "armor",
+      "uv": [
+        814,
+        103
+      ]
+    },
+    {
+      "name": "engine_intake_-1",
+      "parent": "body",
+      "box": [
+        -17.28,
+        48.0,
+        24.8,
+        11.52,
+        5.6,
+        3.2
+      ],
+      "material": "dark",
+      "uv": [
+        935,
+        103
+      ]
+    },
+    {
+      "name": "intake_grille_-1_0",
+      "parent": "body",
+      "box": [
+        -16.16,
+        48.32,
+        28.0,
+        0.64,
+        4.96,
+        0.64
+      ],
+      "material": "edge",
+      "uv": [
+        970,
+        103
+      ]
+    },
+    {
+      "name": "intake_grille_-1_1",
+      "parent": "body",
+      "box": [
+        -13.44,
+        48.32,
+        28.0,
+        0.64,
+        4.96,
+        0.64
+      ],
+      "material": "edge",
+      "uv": [
+        977,
+        103
+      ]
+    },
+    {
+      "name": "intake_grille_-1_2",
+      "parent": "body",
+      "box": [
+        -10.72,
+        48.32,
+        28.0,
+        0.64,
+        4.96,
+        0.64
+      ],
+      "material": "edge",
+      "uv": [
+        984,
+        103
+      ]
+    },
+    {
+      "name": "intake_grille_-1_3",
+      "parent": "body",
+      "box": [
+        -8.0,
+        48.32,
+        28.0,
+        0.64,
+        4.96,
+        0.64
+      ],
+      "material": "edge",
+      "uv": [
+        991,
+        103
+      ]
+    },
+    {
+      "name": "engine_exhaust_-1",
+      "parent": "body",
+      "box": [
+        -16.64,
+        48.0,
+        -26.4,
+        10.24,
+        5.28,
+        6.88
+      ],
+      "material": "metal",
+      "uv": [
+        2,
+        167
+      ]
+    },
+    {
+      "name": "exhaust_bore_-1",
+      "parent": "body",
+      "box": [
+        -15.52,
+        48.8,
+        -27.2,
+        8.0,
+        3.68,
+        0.96
+      ],
+      "material": "dark",
+      "uv": [
+        41,
+        167
+      ]
+    },
+    {
+      "name": "landing_strut_-1",
+      "parent": "body",
+      "box": [
+        -20.0,
+        5.6,
+        -30.4,
+        3.2,
+        13.6,
+        3.68
+      ],
+      "material": "metal",
+      "uv": [
+        62,
+        167
+      ]
+    },
+    {
+      "name": "landing_axle_-1",
+      "parent": "body",
+      "box": [
+        -25.28,
+        6.08,
+        -30.72,
+        6.88,
+        2.72,
+        4.16
+      ],
+      "material": "metal",
+      "uv": [
+        81,
+        167
+      ]
+    },
+    {
+      "name": "main_tire_-1_0",
+      "parent": "body",
+      "box": [
+        -26.56,
+        0,
+        -32.0,
+        5.76,
+        13.6,
+        7.68
+      ],
+      "material": "rubber",
+      "uv": [
+        108,
+        167
+      ]
+    },
+    {
+      "name": "main_tire_-1_1",
+      "parent": "body",
+      "box": [
+        -26.56,
+        2.4,
+        -34.88,
+        5.76,
+        8.8,
+        13.44
+      ],
+      "material": "rubber",
+      "uv": [
+        139,
+        167
+      ]
+    },
+    {
+      "name": "main_wheel_hub_-1",
+      "parent": "body",
+      "box": [
+        -26.88,
+        4.32,
+        -31.2,
+        6.4,
+        4.8,
+        4.48
+      ],
+      "material": "metal",
+      "uv": [
+        182,
+        167
+      ]
+    },
+    {
+      "name": "step_bracket_-1_0",
+      "parent": "body",
+      "box": [
+        -25.6,
+        12.64,
+        -24.48,
+        6.88,
+        1.44,
+        1.44
+      ],
+      "material": "dark",
+      "uv": [
+        209,
+        167
+      ]
+    },
+    {
+      "name": "step_bracket_-1_1",
+      "parent": "body",
+      "box": [
+        -25.6,
+        12.64,
+        11.68,
+        6.88,
+        1.44,
+        1.44
+      ],
+      "material": "dark",
+      "uv": [
+        230,
+        167
+      ]
+    },
+    {
+      "name": "canopy_hinge_-1_0",
+      "parent": "cockpit_left",
+      "box": [
+        -1.68,
+        6.72,
+        -20.48,
+        1.76,
+        2.72,
+        2.24
+      ],
+      "material": "edge",
+      "uv": [
+        251,
+        167
+      ]
+    },
+    {
+      "name": "canopy_hinge_-1_1",
+      "parent": "cockpit_left",
+      "box": [
+        -1.68,
+        6.72,
+        -4.48,
+        1.76,
+        2.72,
+        2.24
+      ],
+      "material": "edge",
+      "uv": [
+        264,
+        167
+      ]
+    },
+    {
+      "name": "wheel_fairing_-1",
+      "parent": "body",
+      "box": [
+        -20.8,
+        14.4,
+        -33.28,
+        6.4,
+        5.12,
+        8.64
+      ],
+      "material": "armor",
+      "uv": [
+        277,
+        167
+      ]
+    },
+    {
+      "name": "nacelle_shoulder_-1",
+      "parent": "body",
+      "box": [
+        -19.04,
+        45.76,
+        -21.12,
+        15.04,
+        3.84,
+        43.04
+      ],
+      "material": "edge",
+      "uv": [
+        312,
+        167
+      ]
+    },
+    {
+      "name": "cabin_step_-1",
+      "parent": "body",
+      "box": [
+        -26.88,
+        12.0,
+        -27.2,
+        2.56,
+        2.4,
+        41.6
+      ],
+      "material": "metal",
+      "uv": [
+        435,
+        167
+      ]
+    },
+    {
+      "name": "troop_seat_-1_0",
+      "parent": "body",
+      "box": [
+        -19.2,
+        18.4,
+        -13.6,
+        12.8,
+        3.2,
+        9.6
+      ],
+      "material": "seat",
+      "uv": [
+        528,
+        167
+      ]
+    },
+    {
+      "name": "troop_seat_back_-1_0",
+      "parent": "body",
+      "box": [
+        -19.68,
+        21.6,
+        -13.6,
+        4.8,
+        10.4,
+        9.6
+      ],
+      "material": "seat",
+      "uv": [
+        577,
+        167
+      ]
+    },
+    {
+      "name": "troop_seat_-1_1",
+      "parent": "body",
+      "box": [
+        -19.2,
+        18.4,
+        -29.6,
+        12.8,
+        3.2,
+        9.6
+      ],
+      "material": "seat",
+      "uv": [
+        610,
+        167
+      ]
+    },
+    {
+      "name": "troop_seat_back_-1_1",
+      "parent": "body",
+      "box": [
+        -19.68,
+        21.6,
+        -29.6,
+        4.8,
+        10.4,
+        9.6
+      ],
+      "material": "seat",
+      "uv": [
+        659,
+        167
+      ]
+    },
+    {
+      "name": "pilot_seat_-1",
+      "parent": "body",
+      "box": [
+        -16.8,
+        18.4,
+        26.4,
+        12.8,
+        3.2,
+        10.4
+      ],
+      "material": "seat",
+      "uv": [
+        692,
+        167
+      ]
+    },
+    {
+      "name": "pilot_back_-1",
+      "parent": "body",
+      "box": [
+        -16.8,
+        21.6,
+        25.6,
+        12.8,
+        14.4,
+        3.2
+      ],
+      "material": "seat",
+      "uv": [
+        743,
+        167
+      ]
+    },
+    {
+      "name": "nav_lamp_-1",
+      "parent": "body",
+      "box": [
+        -25.76,
+        40.0,
+        -36.8,
+        1.92,
+        2.4,
+        3.52
+      ],
+      "material": "red",
+      "uv": [
+        780,
+        167
+      ]
+    },
+    {
+      "name": "unit_stripe_-1",
+      "parent": "body",
+      "box": [
+        -24.4,
+        22.4,
+        -36.32,
+        0.8,
+        14.4,
+        2.4
+      ],
+      "material": "white",
+      "uv": [
+        795,
+        167
+      ]
+    },
+    {
+      "name": "windshield_1",
+      "parent": "body",
+      "box": [
+        0.8,
+        29.6,
+        44.8,
+        20.0,
+        12.16,
+        1.28
+      ],
+      "material": "glass",
+      "rotation": {
+        "axis": "x",
+        "degrees": -22.5,
+        "origin": [
+          0,
+          2.3,
+          2.8
+        ]
+      },
+      "uv": [
+        806,
+        167
+      ]
+    },
+    {
+      "name": "nose_shoulder_1",
+      "parent": "body",
+      "box": [
+        0.8,
+        26.4,
+        41.6,
+        20.0,
+        4.0,
+        12.0
+      ],
+      "material": "armor",
+      "uv": [
+        853,
+        167
+      ]
+    },
+    {
+      "name": "windshield_pillar_1",
+      "parent": "body",
+      "box": [
+        19.84,
+        27.2,
+        41.6,
+        1.92,
+        16.0,
+        5.12
+      ],
+      "material": "edge",
+      "uv": [
+        920,
+        167
+      ]
+    },
+    {
+      "name": "cockpit_side_glass_1",
+      "parent": "cockpit_right",
+      "box": [
+        -0.64,
+        8.0,
+        -21.6,
+        1.28,
+        11.52,
+        21.6
+      ],
+      "material": "glass",
+      "uv": [
+        939,
+        167
+      ]
+    },
+    {
+      "name": "cockpit_door_lower_1",
+      "parent": "cockpit_right",
+      "box": [
+        -1.12,
+        -3.2,
+        -23.2,
+        2.24,
+        11.2,
+        23.2
+      ],
+      "material": "armor",
+      "uv": [
+        2,
+        218
+      ]
+    },
+    {
+      "name": "cockpit_door_handle_1",
+      "parent": "cockpit_right",
+      "box": [
+        0.96,
+        5.6,
+        -19.2,
+        1.28,
+        1.6,
+        5.12
+      ],
+      "material": "metal",
+      "uv": [
+        59,
+        218
+      ]
+    },
+    {
+      "name": "cabin_rear_side_1",
+      "parent": "body",
+      "box": [
+        21.6,
+        19.2,
+        -38.4,
+        2.24,
+        23.2,
+        8.8
+      ],
+      "material": "armor",
+      "uv": [
+        78,
+        218
+      ]
+    },
+    {
+      "name": "door_front_pillar_1",
+      "parent": "body",
+      "box": [
+        21.76,
+        19.2,
+        15.2,
+        2.24,
+        24.0,
+        3.2
+      ],
+      "material": "edge",
+      "uv": [
+        105,
+        218
+      ]
+    },
+    {
+      "name": "door_track_1",
+      "parent": "body",
+      "box": [
+        23.2,
+        42.24,
+        -39.2,
+        1.6,
+        2.24,
+        57.12
+      ],
+      "material": "metal",
+      "uv": [
+        122,
+        218
+      ]
+    },
+    {
+      "name": "sliding_door_lower_1",
+      "parent": "door_right",
+      "box": [
+        -0.96,
+        0.8,
+        -25.92,
+        1.92,
+        12.0,
+        44.16
+      ],
+      "material": "armor",
+      "uv": [
+        245,
+        218
+      ]
+    },
+    {
+      "name": "sliding_door_window_1",
+      "parent": "door_right",
+      "box": [
+        -0.64,
+        12.8,
+        -23.2,
+        1.28,
+        9.12,
+        37.6
+      ],
+      "material": "glass",
+      "uv": [
+        342,
+        218
+      ]
+    },
+    {
+      "name": "door_frame_1_-1.82",
+      "parent": "door_right",
+      "box": [
+        -1.12,
+        12.8,
+        -25.92,
+        2.24,
+        11.2,
+        2.56
+      ],
+      "material": "edge",
+      "uv": [
+        425,
+        218
+      ]
+    },
+    {
+      "name": "door_frame_1_0.7",
+      "parent": "door_right",
+      "box": [
+        -1.12,
+        12.8,
+        14.4,
+        2.24,
+        11.2,
+        2.56
+      ],
+      "material": "edge",
+      "uv": [
+        440,
+        218
+      ]
+    },
+    {
+      "name": "sliding_door_handle_1",
+      "parent": "door_right",
+      "box": [
+        0.96,
+        9.28,
+        12.0,
+        1.28,
+        1.92,
+        4.32
+      ],
+      "material": "white",
+      "uv": [
+        455,
+        218
+      ]
+    },
+    {
+      "name": "engine_nacelle_1",
+      "parent": "body",
+      "box": [
+        4.8,
+        46.4,
+        -20.0,
+        13.44,
+        8.8,
+        44.8
+      ],
+      "material": "armor",
+      "uv": [
+        472,
+        218
+      ]
+    },
+    {
+      "name": "engine_intake_1",
+      "parent": "body",
+      "box": [
+        5.76,
+        48.0,
+        24.8,
+        11.52,
+        5.6,
+        3.2
+      ],
+      "material": "dark",
+      "uv": [
+        593,
+        218
+      ]
+    },
+    {
+      "name": "intake_grille_1_0",
+      "parent": "body",
+      "box": [
+        6.88,
+        48.32,
+        28.0,
+        0.64,
+        4.96,
+        0.64
+      ],
+      "material": "edge",
+      "uv": [
+        628,
+        218
+      ]
+    },
+    {
+      "name": "intake_grille_1_1",
+      "parent": "body",
+      "box": [
+        9.6,
+        48.32,
+        28.0,
+        0.64,
+        4.96,
+        0.64
+      ],
+      "material": "edge",
+      "uv": [
+        635,
+        218
+      ]
+    },
+    {
+      "name": "intake_grille_1_2",
+      "parent": "body",
+      "box": [
+        12.32,
+        48.32,
+        28.0,
+        0.64,
+        4.96,
+        0.64
+      ],
+      "material": "edge",
+      "uv": [
+        642,
+        218
+      ]
+    },
+    {
+      "name": "intake_grille_1_3",
+      "parent": "body",
+      "box": [
+        15.04,
+        48.32,
+        28.0,
+        0.64,
+        4.96,
+        0.64
+      ],
+      "material": "edge",
+      "uv": [
+        649,
+        218
+      ]
+    },
+    {
+      "name": "engine_exhaust_1",
+      "parent": "body",
+      "box": [
+        6.4,
+        48.0,
+        -26.4,
+        10.24,
+        5.28,
+        6.88
+      ],
+      "material": "metal",
+      "uv": [
+        656,
+        218
+      ]
+    },
+    {
+      "name": "exhaust_bore_1",
+      "parent": "body",
+      "box": [
+        7.52,
+        48.8,
+        -27.2,
+        8.0,
+        3.68,
+        0.96
+      ],
+      "material": "dark",
+      "uv": [
+        695,
+        218
+      ]
+    },
+    {
+      "name": "landing_strut_1",
+      "parent": "body",
+      "box": [
+        16.8,
+        5.6,
+        -30.4,
+        3.2,
+        13.6,
+        3.68
+      ],
+      "material": "metal",
+      "uv": [
+        716,
+        218
+      ]
+    },
+    {
+      "name": "landing_axle_1",
+      "parent": "body",
+      "box": [
+        18.4,
+        6.08,
+        -30.72,
+        6.88,
+        2.72,
+        4.16
+      ],
+      "material": "metal",
+      "uv": [
+        735,
+        218
+      ]
+    },
+    {
+      "name": "main_tire_1_0",
+      "parent": "body",
+      "box": [
+        20.8,
+        0,
+        -32.0,
+        5.76,
+        13.6,
+        7.68
+      ],
+      "material": "rubber",
+      "uv": [
+        762,
+        218
+      ]
+    },
+    {
+      "name": "main_tire_1_1",
+      "parent": "body",
+      "box": [
+        20.8,
+        2.4,
+        -34.88,
+        5.76,
+        8.8,
+        13.44
+      ],
+      "material": "rubber",
+      "uv": [
+        793,
+        218
+      ]
+    },
+    {
+      "name": "main_wheel_hub_1",
+      "parent": "body",
+      "box": [
+        20.48,
+        4.32,
+        -31.2,
+        6.4,
+        4.8,
+        4.48
+      ],
+      "material": "metal",
+      "uv": [
+        836,
+        218
+      ]
+    },
+    {
+      "name": "step_bracket_1_0",
+      "parent": "body",
+      "box": [
+        18.72,
+        12.64,
+        -24.48,
+        6.88,
+        1.44,
+        1.44
+      ],
+      "material": "dark",
+      "uv": [
+        863,
+        218
+      ]
+    },
+    {
+      "name": "step_bracket_1_1",
+      "parent": "body",
+      "box": [
+        18.72,
+        12.64,
+        11.68,
+        6.88,
+        1.44,
+        1.44
+      ],
+      "material": "dark",
+      "uv": [
+        884,
+        218
+      ]
+    },
+    {
+      "name": "canopy_hinge_1_0",
+      "parent": "cockpit_right",
+      "box": [
+        -0.08,
+        6.72,
+        -20.48,
+        1.76,
+        2.72,
+        2.24
+      ],
+      "material": "edge",
+      "uv": [
+        905,
+        218
+      ]
+    },
+    {
+      "name": "canopy_hinge_1_1",
+      "parent": "cockpit_right",
+      "box": [
+        -0.08,
+        6.72,
+        -4.48,
+        1.76,
+        2.72,
+        2.24
+      ],
+      "material": "edge",
+      "uv": [
+        918,
+        218
+      ]
+    },
+    {
+      "name": "wheel_fairing_1",
+      "parent": "body",
+      "box": [
+        14.4,
+        14.4,
+        -33.28,
+        6.4,
+        5.12,
+        8.64
+      ],
+      "material": "armor",
+      "uv": [
+        931,
+        218
+      ]
+    },
+    {
+      "name": "nacelle_shoulder_1",
+      "parent": "body",
+      "box": [
+        4.0,
+        45.76,
+        -21.12,
+        15.04,
+        3.84,
+        43.04
+      ],
+      "material": "edge",
+      "uv": [
+        2,
+        282
+      ]
+    },
+    {
+      "name": "cabin_step_1",
+      "parent": "body",
+      "box": [
+        24.32,
+        12.0,
+        -27.2,
+        2.56,
+        2.4,
+        41.6
+      ],
+      "material": "metal",
+      "uv": [
+        125,
+        282
+      ]
+    },
+    {
+      "name": "troop_seat_1_0",
+      "parent": "body",
+      "box": [
+        6.4,
+        18.4,
+        -13.6,
+        12.8,
+        3.2,
+        9.6
+      ],
+      "material": "seat",
+      "uv": [
+        218,
+        282
+      ]
+    },
+    {
+      "name": "troop_seat_back_1_0",
+      "parent": "body",
+      "box": [
+        14.88,
+        21.6,
+        -13.6,
+        4.8,
+        10.4,
+        9.6
+      ],
+      "material": "seat",
+      "uv": [
+        267,
+        282
+      ]
+    },
+    {
+      "name": "troop_seat_1_1",
+      "parent": "body",
+      "box": [
+        6.4,
+        18.4,
+        -29.6,
+        12.8,
+        3.2,
+        9.6
+      ],
+      "material": "seat",
+      "uv": [
+        300,
+        282
+      ]
+    },
+    {
+      "name": "troop_seat_back_1_1",
+      "parent": "body",
+      "box": [
+        14.88,
+        21.6,
+        -29.6,
+        4.8,
+        10.4,
+        9.6
+      ],
+      "material": "seat",
+      "uv": [
+        349,
+        282
+      ]
+    },
+    {
+      "name": "pilot_seat_1",
+      "parent": "body",
+      "box": [
+        4.0,
+        18.4,
+        26.4,
+        12.8,
+        3.2,
+        10.4
+      ],
+      "material": "seat",
+      "uv": [
+        382,
+        282
+      ]
+    },
+    {
+      "name": "pilot_back_1",
+      "parent": "body",
+      "box": [
+        4.0,
+        21.6,
+        25.6,
+        12.8,
+        14.4,
+        3.2
+      ],
+      "material": "seat",
+      "uv": [
+        433,
+        282
+      ]
+    },
+    {
+      "name": "nav_lamp_1",
+      "parent": "body",
+      "box": [
+        23.84,
+        40.0,
+        -36.8,
+        1.92,
+        2.4,
+        3.52
+      ],
+      "material": "green",
+      "uv": [
+        470,
+        282
+      ]
+    },
+    {
+      "name": "unit_stripe_1",
+      "parent": "body",
+      "box": [
+        23.6,
+        22.4,
+        -36.32,
+        0.8,
+        14.4,
+        2.4
+      ],
+      "material": "white",
+      "uv": [
+        485,
+        282
+      ]
+    },
+    {
+      "name": "windshield_center",
+      "parent": "body",
+      "box": [
+        -1.04,
+        28.8,
+        44.32,
+        2.08,
+        13.92,
+        2.88
+      ],
+      "material": "edge",
+      "rotation": {
+        "axis": "x",
+        "degrees": -22.5,
+        "origin": [
+          0,
+          2.3,
+          2.8
+        ]
+      },
+      "uv": [
+        496,
+        282
+      ]
+    },
+    {
+      "name": "cockpit_brow",
+      "parent": "body",
+      "box": [
+        -22.4,
+        41.12,
+        40.8,
+        44.8,
+        2.56,
+        4.48
+      ],
+      "material": "edge",
+      "uv": [
+        511,
+        282
+      ]
+    },
+    {
+      "name": "main_transmission",
+      "parent": "body",
+      "box": [
+        -7.68,
+        48.8,
+        -4.8,
+        15.36,
+        10.4,
+        12.8
+      ],
+      "material": "dark",
+      "uv": [
+        614,
+        282
+      ]
+    },
+    {
+      "name": "rotor_mast",
+      "parent": "body",
+      "box": [
+        -1.92,
+        56.8,
+        -1.92,
+        3.84,
+        8.0,
+        3.84
+      ],
+      "material": "metal",
+      "uv": [
+        675,
+        282
+      ]
+    },
+    {
+      "name": "main_hub",
+      "parent": "rotor",
+      "box": [
+        -7.2,
+        -1.6,
+        -7.2,
+        14.4,
+        4.0,
+        14.4
+      ],
+      "material": "edge",
+      "uv": [
+        694,
+        282
+      ]
+    },
+    {
+      "name": "rotor_blade_0",
+      "parent": "rotor",
+      "box": [
+        5.6,
+        -0.64,
+        -2.72,
+        83.2,
+        1.28,
+        6.24
+      ],
+      "material": "dark",
+      "rotation": {
+        "axis": "y",
+        "degrees": 0
+      },
+      "uv": [
+        757,
+        282
+      ]
+    },
+    {
+      "name": "rotor_tip_0",
+      "parent": "rotor",
+      "box": [
+        88.8,
+        -0.64,
+        -2.72,
+        8.0,
+        1.28,
+        6.24
+      ],
+      "material": "white",
+      "rotation": {
+        "axis": "y",
+        "degrees": 0
+      },
+      "uv": [
+        942,
+        282
+      ]
+    },
+    {
+      "name": "rotor_pitch_link_0",
+      "parent": "rotor",
+      "box": [
+        2.4,
+        -2.4,
+        -1.28,
+        11.2,
+        1.76,
+        2.56
+      ],
+      "material": "metal",
+      "rotation": {
+        "axis": "y",
+        "degrees": 0
+      },
+      "uv": [
+        975,
+        282
+      ]
+    },
+    {
+      "name": "rotor_blade_1",
+      "parent": "rotor",
+      "box": [
+        5.6,
+        -0.64,
+        -2.72,
+        83.2,
+        1.28,
+        6.24
+      ],
+      "material": "dark",
+      "rotation": {
+        "axis": "y",
+        "degrees": 90
+      },
+      "uv": [
+        2,
+        333
+      ]
+    },
+    {
+      "name": "rotor_tip_1",
+      "parent": "rotor",
+      "box": [
+        88.8,
+        -0.64,
+        -2.72,
+        8.0,
+        1.28,
+        6.24
+      ],
+      "material": "white",
+      "rotation": {
+        "axis": "y",
+        "degrees": 90
+      },
+      "uv": [
+        187,
+        333
+      ]
+    },
+    {
+      "name": "rotor_pitch_link_1",
+      "parent": "rotor",
+      "box": [
+        2.4,
+        -2.4,
+        -1.28,
+        11.2,
+        1.76,
+        2.56
+      ],
+      "material": "metal",
+      "rotation": {
+        "axis": "y",
+        "degrees": 90
+      },
+      "uv": [
+        220,
+        333
+      ]
+    },
+    {
+      "name": "rotor_blade_2",
+      "parent": "rotor",
+      "box": [
+        5.6,
+        -0.64,
+        -2.72,
+        83.2,
+        1.28,
+        6.24
+      ],
+      "material": "dark",
+      "rotation": {
+        "axis": "y",
+        "degrees": 180
+      },
+      "uv": [
+        253,
+        333
+      ]
+    },
+    {
+      "name": "rotor_tip_2",
+      "parent": "rotor",
+      "box": [
+        88.8,
+        -0.64,
+        -2.72,
+        8.0,
+        1.28,
+        6.24
+      ],
+      "material": "white",
+      "rotation": {
+        "axis": "y",
+        "degrees": 180
+      },
+      "uv": [
+        438,
+        333
+      ]
+    },
+    {
+      "name": "rotor_pitch_link_2",
+      "parent": "rotor",
+      "box": [
+        2.4,
+        -2.4,
+        -1.28,
+        11.2,
+        1.76,
+        2.56
+      ],
+      "material": "metal",
+      "rotation": {
+        "axis": "y",
+        "degrees": 180
+      },
+      "uv": [
+        471,
+        333
+      ]
+    },
+    {
+      "name": "rotor_blade_3",
+      "parent": "rotor",
+      "box": [
+        5.6,
+        -0.64,
+        -2.72,
+        83.2,
+        1.28,
+        6.24
+      ],
+      "material": "dark",
+      "rotation": {
+        "axis": "y",
+        "degrees": 270
+      },
+      "uv": [
+        504,
+        333
+      ]
+    },
+    {
+      "name": "rotor_tip_3",
+      "parent": "rotor",
+      "box": [
+        88.8,
+        -0.64,
+        -2.72,
+        8.0,
+        1.28,
+        6.24
+      ],
+      "material": "white",
+      "rotation": {
+        "axis": "y",
+        "degrees": 270
+      },
+      "uv": [
+        689,
+        333
+      ]
+    },
+    {
+      "name": "rotor_pitch_link_3",
+      "parent": "rotor",
+      "box": [
+        2.4,
+        -2.4,
+        -1.28,
+        11.2,
+        1.76,
+        2.56
+      ],
+      "material": "metal",
+      "rotation": {
+        "axis": "y",
+        "degrees": 270
+      },
+      "uv": [
+        722,
+        333
+      ]
+    },
+    {
+      "name": "tail_boom_0",
+      "parent": "body",
+      "box": [
+        -9.92,
+        26.4,
+        -53.6,
+        19.84,
+        16.0,
+        12.8
+      ],
+      "material": "armor",
+      "uv": [
+        755,
+        333
+      ]
+    },
+    {
+      "name": "tail_boom_1",
+      "parent": "body",
+      "box": [
+        -8.16,
+        29.28,
+        -66.4,
+        16.32,
+        14.4,
+        12.8
+      ],
+      "material": "armor",
+      "uv": [
+        824,
+        333
+      ]
+    },
+    {
+      "name": "tail_boom_2",
+      "parent": "body",
+      "box": [
+        -6.4,
+        32.16,
+        -79.2,
+        12.8,
+        12.8,
+        12.8
+      ],
+      "material": "armor",
+      "uv": [
+        887,
+        333
+      ]
+    },
+    {
+      "name": "tail_boom_3",
+      "parent": "body",
+      "box": [
+        -4.64,
+        35.04,
+        -92.0,
+        9.28,
+        11.2,
+        12.8
+      ],
+      "material": "armor",
+      "uv": [
+        942,
+        333
+      ]
+    },
+    {
+      "name": "tail_root_shoulder",
+      "parent": "body",
+      "box": [
+        -14.56,
+        26.88,
+        -47.68,
+        29.12,
+        15.84,
+        8.32
+      ],
+      "material": "armor",
+      "uv": [
+        2,
+        365
+      ]
+    },
+    {
+      "name": "tail_root_crown",
+      "parent": "body",
+      "box": [
+        -10.56,
+        42.24,
+        -46.24,
+        21.12,
+        2.4,
+        6.56
+      ],
+      "material": "edge",
+      "uv": [
+        83,
+        365
+      ]
+    },
+    {
+      "name": "fin_root",
+      "parent": "body",
+      "box": [
+        -4.0,
+        38.88,
+        -95.68,
+        8.0,
+        6.4,
+        10.72
+      ],
+      "material": "armor",
+      "uv": [
+        144,
+        365
+      ]
+    },
+    {
+      "name": "mast_flange",
+      "parent": "body",
+      "box": [
+        -4.64,
+        58.4,
+        -3.84,
+        9.28,
+        1.76,
+        7.68
+      ],
+      "material": "edge",
+      "uv": [
+        185,
+        365
+      ]
+    },
+    {
+      "name": "tail_fin",
+      "parent": "body",
+      "box": [
+        -2.08,
+        33.6,
+        -100.0,
+        4.16,
+        25.92,
+        9.6
+      ],
+      "material": "armor",
+      "uv": [
+        224,
+        365
+      ]
+    },
+    {
+      "name": "tailplane",
+      "parent": "body",
+      "box": [
+        -22.4,
+        33.6,
+        -91.2,
+        44.8,
+        2.08,
+        10.4
+      ],
+      "material": "edge",
+      "uv": [
+        257,
+        365
+      ]
+    },
+    {
+      "name": "tail_rotor_hub",
+      "parent": "tail_rotor",
+      "box": [
+        -2.4,
+        -2.24,
+        -2.24,
+        5.6,
+        4.48,
+        4.48
+      ],
+      "material": "metal",
+      "uv": [
+        372,
+        365
+      ]
+    },
+    {
+      "name": "tail_rotor_blade_0",
+      "parent": "tail_rotor",
+      "box": [
+        -0.48,
+        0.48,
+        -1.6,
+        1.28,
+        15.52,
+        2.88
+      ],
+      "material": "dark",
+      "rotation": {
+        "axis": "x",
+        "degrees": 0
+      },
+      "uv": [
+        397,
+        365
+      ]
+    },
+    {
+      "name": "tail_rotor_blade_1",
+      "parent": "tail_rotor",
+      "box": [
+        -0.48,
+        0.48,
+        -1.6,
+        1.28,
+        15.52,
+        2.88
+      ],
+      "material": "dark",
+      "rotation": {
+        "axis": "x",
+        "degrees": 90
+      },
+      "uv": [
+        410,
+        365
+      ]
+    },
+    {
+      "name": "tail_rotor_blade_2",
+      "parent": "tail_rotor",
+      "box": [
+        -0.48,
+        0.48,
+        -1.6,
+        1.28,
+        15.52,
+        2.88
+      ],
+      "material": "dark",
+      "rotation": {
+        "axis": "x",
+        "degrees": 180
+      },
+      "uv": [
+        423,
+        365
+      ]
+    },
+    {
+      "name": "tail_rotor_blade_3",
+      "parent": "tail_rotor",
+      "box": [
+        -0.48,
+        0.48,
+        -1.6,
+        1.28,
+        15.52,
+        2.88
+      ],
+      "material": "dark",
+      "rotation": {
+        "axis": "x",
+        "degrees": 270
+      },
+      "uv": [
+        436,
+        365
+      ]
+    },
+    {
+      "name": "front_gear_strut",
+      "parent": "body",
+      "box": [
+        -1.44,
+        5.6,
+        36.0,
+        2.88,
+        12.8,
+        3.36
+      ],
+      "material": "metal",
+      "uv": [
+        449,
+        365
+      ]
+    },
+    {
+      "name": "front_tire",
+      "parent": "body",
+      "box": [
+        -2.88,
+        0,
+        32.8,
+        5.76,
+        11.2,
+        8.8
+      ],
+      "material": "rubber",
+      "uv": [
+        466,
+        365
+      ]
+    },
+    {
+      "name": "front_hub",
+      "parent": "body",
+      "box": [
+        -3.2,
+        3.52,
+        35.2,
+        6.4,
+        4.0,
+        4.0
+      ],
+      "material": "metal",
+      "uv": [
+        499,
+        365
+      ]
+    },
+    {
+      "name": "searchlight_body",
+      "parent": "body",
+      "box": [
+        -5.12,
+        16.48,
+        52.8,
+        10.24,
+        6.24,
+        5.76
+      ],
+      "material": "dark",
+      "uv": [
+        524,
+        365
+      ]
+    },
+    {
+      "name": "searchlight_lens",
+      "parent": "body",
+      "box": [
+        -3.84,
+        17.28,
+        58.56,
+        7.68,
+        4.48,
+        0.64
+      ],
+      "material": "white",
+      "uv": [
+        561,
+        365
+      ]
+    },
+    {
+      "name": "roof_beacon",
+      "parent": "body",
+      "box": [
+        -1.6,
+        46.4,
+        -36.8,
+        3.2,
+        3.2,
+        3.2
+      ],
+      "material": "red",
+      "uv": [
+        582,
+        365
+      ]
+    },
+    {
+      "name": "nose_sensor",
+      "parent": "body",
+      "box": [
+        -3.2,
+        28.0,
+        55.2,
+        6.4,
+        4.0,
+        4.32
+      ],
+      "material": "dark",
+      "uv": [
+        601,
+        365
+      ]
+    },
+    {
+      "name": "chin_gun_mount",
+      "parent": "body",
+      "box": [
+        -4.48,
+        13.6,
+        52.8,
+        8.96,
+        4.8,
+        6.88
+      ],
+      "material": "edge",
+      "uv": [
+        628,
+        365
+      ]
+    },
+    {
+      "name": "gun_receiver",
+      "parent": "gun",
+      "box": [
+        -3.04,
+        -3.04,
+        -0.8,
+        6.08,
+        6.08,
+        7.2
+      ],
+      "material": "dark",
+      "uv": [
+        663,
+        365
+      ]
+    },
+    {
+      "name": "gun_barrel_0",
+      "parent": "gun",
+      "box": [
+        1.12,
+        -0.56,
+        4.8,
+        1.12,
+        1.12,
+        14.4
+      ],
+      "material": "metal",
+      "uv": [
+        696,
+        365
+      ]
+    },
+    {
+      "name": "gun_barrel_1",
+      "parent": "gun",
+      "box": [
+        0.28,
+        0.8949,
+        4.8,
+        1.12,
+        1.12,
+        14.4
+      ],
+      "material": "metal",
+      "uv": [
+        733,
+        365
+      ]
+    },
+    {
+      "name": "gun_barrel_2",
+      "parent": "gun",
+      "box": [
+        -1.4,
+        0.8949,
+        4.8,
+        1.12,
+        1.12,
+        14.4
+      ],
+      "material": "metal",
+      "uv": [
+        770,
+        365
+      ]
+    },
+    {
+      "name": "gun_barrel_3",
+      "parent": "gun",
+      "box": [
+        -2.24,
+        -0.56,
+        4.8,
+        1.12,
+        1.12,
+        14.4
+      ],
+      "material": "metal",
+      "uv": [
+        807,
+        365
+      ]
+    },
+    {
+      "name": "gun_barrel_4",
+      "parent": "gun",
+      "box": [
+        -1.4,
+        -2.0149,
+        4.8,
+        1.12,
+        1.12,
+        14.4
+      ],
+      "material": "metal",
+      "uv": [
+        844,
+        365
+      ]
+    },
+    {
+      "name": "gun_barrel_5",
+      "parent": "gun",
+      "box": [
+        0.28,
+        -2.0149,
+        4.8,
+        1.12,
+        1.12,
+        14.4
+      ],
+      "material": "metal",
+      "uv": [
+        881,
+        365
+      ]
+    },
+    {
+      "name": "gun_forward_collar",
+      "parent": "gun",
+      "box": [
+        -2.56,
+        -2.56,
+        14.4,
+        5.12,
+        5.12,
+        1.76
+      ],
+      "material": "dark",
+      "uv": [
+        918,
+        365
+      ]
+    },
+    {
+      "name": "wing_spar_-1",
+      "parent": "body",
+      "box": [
+        -45.76,
+        26.88,
+        9.6,
+        24.16,
+        1.76,
+        19.2
+      ],
+      "material": "edge",
+      "uv": [
+        2,
+        404
+      ]
+    },
+    {
+      "name": "inner_pylon_-1",
+      "parent": "pod_left",
+      "box": [
+        -1.44,
+        0.96,
+        -2.88,
+        2.88,
+        4.48,
+        5.76
+      ],
+      "material": "dark",
+      "uv": [
+        95,
+        404
+      ]
+    },
+    {
+      "name": "rack_rail_-1_-0.095",
+      "parent": "pod_left",
+      "box": [
+        -1.968,
+        0.0,
+        -10.08,
+        0.896,
+        1.12,
+        20.16
+      ],
+      "material": "metal",
+      "uv": [
+        116,
+        404
+      ]
+    },
+    {
+      "name": "rack_rail_-1_0.095",
+      "parent": "pod_left",
+      "box": [
+        1.072,
+        0.0,
+        -10.08,
+        0.896,
+        1.12,
+        20.16
+      ],
+      "material": "metal",
+      "uv": [
+        163,
+        404
+      ]
+    },
+    {
+      "name": "rack_crossbeam_-1_0.88",
+      "parent": "pod_left",
+      "box": [
+        -3.1392,
+        -1.6,
+        -7.28,
+        6.2784,
+        3.2,
+        1.12
+      ],
+      "material": "edge",
+      "uv": [
+        210,
+        404
+      ]
+    },
+    {
+      "name": "rack_crossbeam_-1_1.72",
+      "parent": "pod_left",
+      "box": [
+        -3.1392,
+        -1.6,
+        6.16,
+        6.2784,
+        3.2,
+        1.12
+      ],
+      "material": "edge",
+      "uv": [
+        231,
+        404
+      ]
+    },
+    {
+      "name": "hellfire_-1_0_body",
+      "parent": "hellfire_-1_0",
+      "box": [
+        -0.88,
+        -0.88,
+        -11.6348,
+        1.76,
+        1.76,
+        19.3148
+      ],
+      "material": "armor",
+      "uv": [
+        252,
+        404
+      ]
+    },
+    {
+      "name": "hellfire_-1_0_nose_0",
+      "parent": "hellfire_-1_0",
+      "box": [
+        -0.768,
+        -0.768,
+        7.68,
+        1.536,
+        1.536,
+        1.6
+      ],
+      "material": "dark",
+      "uv": [
+        299,
+        404
+      ]
+    },
+    {
+      "name": "hellfire_-1_0_nose_1",
+      "parent": "hellfire_-1_0",
+      "box": [
+        -0.576,
+        -0.576,
+        9.28,
+        1.152,
+        1.152,
+        1.28
+      ],
+      "material": "dark",
+      "uv": [
+        310,
+        404
+      ]
+    },
+    {
+      "name": "hellfire_-1_0_nose_2",
+      "parent": "hellfire_-1_0",
+      "box": [
+        -0.32,
+        -0.32,
+        10.56,
+        0.64,
+        0.64,
+        1.0748
+      ],
+      "material": "dark",
+      "uv": [
+        321,
+        404
+      ]
+    },
+    {
+      "name": "hellfire_-1_0_band",
+      "parent": "hellfire_-1_0",
+      "box": [
+        -0.912,
+        -0.912,
+        4.0,
+        1.824,
+        1.824,
+        0.64
+      ],
+      "material": "yellow",
+      "uv": [
+        330,
+        404
+      ]
+    },
+    {
+      "name": "hellfire_-1_0_nozzle",
+      "parent": "hellfire_-1_0",
+      "box": [
+        -0.704,
+        -0.704,
+        -11.664,
+        1.408,
+        1.408,
+        0.4
+      ],
+      "material": "dark",
+      "uv": [
+        339,
+        404
+      ]
+    },
+    {
+      "name": "hellfire_-1_0_tail_horizontal",
+      "parent": "hellfire_-1_0",
+      "box": [
+        -1.7416,
+        -0.192,
+        -10.08,
+        3.4833,
+        0.384,
+        3.68
+      ],
+      "material": "edge",
+      "uv": [
+        348,
+        404
+      ]
+    },
+    {
+      "name": "hellfire_-1_0_tail_vertical",
+      "parent": "hellfire_-1_0",
+      "box": [
+        -0.192,
+        -2.2611,
+        -10.08,
+        0.384,
+        4.5222,
+        3.68
+      ],
+      "material": "edge",
+      "uv": [
+        367,
+        404
+      ]
+    },
+    {
+      "name": "hellfire_-1_0_clip_-0.3",
+      "parent": "hellfire_-1_0",
+      "box": [
+        -0.992,
+        0.832,
+        -5.28,
+        1.984,
+        0.768,
+        0.96
+      ],
+      "material": "metal",
+      "uv": [
+        380,
+        404
+      ]
+    },
+    {
+      "name": "hellfire_-1_0_clip_0.13",
+      "parent": "hellfire_-1_0",
+      "box": [
+        -0.992,
+        0.832,
+        1.6,
+        1.984,
+        0.768,
+        0.96
+      ],
+      "material": "metal",
+      "uv": [
+        389,
+        404
+      ]
+    },
+    {
+      "name": "hellfire_-1_1_body",
+      "parent": "hellfire_-1_1",
+      "box": [
+        -0.88,
+        -0.88,
+        -11.6348,
+        1.76,
+        1.76,
+        19.3148
+      ],
+      "material": "armor",
+      "uv": [
+        398,
+        404
+      ]
+    },
+    {
+      "name": "hellfire_-1_1_nose_0",
+      "parent": "hellfire_-1_1",
+      "box": [
+        -0.768,
+        -0.768,
+        7.68,
+        1.536,
+        1.536,
+        1.6
+      ],
+      "material": "dark",
+      "uv": [
+        445,
+        404
+      ]
+    },
+    {
+      "name": "hellfire_-1_1_nose_1",
+      "parent": "hellfire_-1_1",
+      "box": [
+        -0.576,
+        -0.576,
+        9.28,
+        1.152,
+        1.152,
+        1.28
+      ],
+      "material": "dark",
+      "uv": [
+        456,
+        404
+      ]
+    },
+    {
+      "name": "hellfire_-1_1_nose_2",
+      "parent": "hellfire_-1_1",
+      "box": [
+        -0.32,
+        -0.32,
+        10.56,
+        0.64,
+        0.64,
+        1.0748
+      ],
+      "material": "dark",
+      "uv": [
+        467,
+        404
+      ]
+    },
+    {
+      "name": "hellfire_-1_1_band",
+      "parent": "hellfire_-1_1",
+      "box": [
+        -0.912,
+        -0.912,
+        4.0,
+        1.824,
+        1.824,
+        0.64
+      ],
+      "material": "yellow",
+      "uv": [
+        476,
+        404
+      ]
+    },
+    {
+      "name": "hellfire_-1_1_nozzle",
+      "parent": "hellfire_-1_1",
+      "box": [
+        -0.704,
+        -0.704,
+        -11.664,
+        1.408,
+        1.408,
+        0.4
+      ],
+      "material": "dark",
+      "uv": [
+        485,
+        404
+      ]
+    },
+    {
+      "name": "hellfire_-1_1_tail_horizontal",
+      "parent": "hellfire_-1_1",
+      "box": [
+        -1.7416,
+        -0.192,
+        -10.08,
+        3.4833,
+        0.384,
+        3.68
+      ],
+      "material": "edge",
+      "uv": [
+        494,
+        404
+      ]
+    },
+    {
+      "name": "hellfire_-1_1_tail_vertical",
+      "parent": "hellfire_-1_1",
+      "box": [
+        -0.192,
+        -2.2611,
+        -10.08,
+        0.384,
+        4.5222,
+        3.68
+      ],
+      "material": "edge",
+      "uv": [
+        513,
+        404
+      ]
+    },
+    {
+      "name": "hellfire_-1_1_clip_-0.3",
+      "parent": "hellfire_-1_1",
+      "box": [
+        -0.992,
+        0.832,
+        -5.28,
+        1.984,
+        0.768,
+        0.96
+      ],
+      "material": "metal",
+      "uv": [
+        526,
+        404
+      ]
+    },
+    {
+      "name": "hellfire_-1_1_clip_0.13",
+      "parent": "hellfire_-1_1",
+      "box": [
+        -0.992,
+        0.832,
+        1.6,
+        1.984,
+        0.768,
+        0.96
+      ],
+      "material": "metal",
+      "uv": [
+        535,
+        404
+      ]
+    },
+    {
+      "name": "hellfire_-1_2_body",
+      "parent": "hellfire_-1_2",
+      "box": [
+        -0.88,
+        -0.88,
+        -11.6348,
+        1.76,
+        1.76,
+        19.3148
+      ],
+      "material": "armor",
+      "uv": [
+        544,
+        404
+      ]
+    },
+    {
+      "name": "hellfire_-1_2_nose_0",
+      "parent": "hellfire_-1_2",
+      "box": [
+        -0.768,
+        -0.768,
+        7.68,
+        1.536,
+        1.536,
+        1.6
+      ],
+      "material": "dark",
+      "uv": [
+        591,
+        404
+      ]
+    },
+    {
+      "name": "hellfire_-1_2_nose_1",
+      "parent": "hellfire_-1_2",
+      "box": [
+        -0.576,
+        -0.576,
+        9.28,
+        1.152,
+        1.152,
+        1.28
+      ],
+      "material": "dark",
+      "uv": [
+        602,
+        404
+      ]
+    },
+    {
+      "name": "hellfire_-1_2_nose_2",
+      "parent": "hellfire_-1_2",
+      "box": [
+        -0.32,
+        -0.32,
+        10.56,
+        0.64,
+        0.64,
+        1.0748
+      ],
+      "material": "dark",
+      "uv": [
+        613,
+        404
+      ]
+    },
+    {
+      "name": "hellfire_-1_2_band",
+      "parent": "hellfire_-1_2",
+      "box": [
+        -0.912,
+        -0.912,
+        4.0,
+        1.824,
+        1.824,
+        0.64
+      ],
+      "material": "yellow",
+      "uv": [
+        622,
+        404
+      ]
+    },
+    {
+      "name": "hellfire_-1_2_nozzle",
+      "parent": "hellfire_-1_2",
+      "box": [
+        -0.704,
+        -0.704,
+        -11.664,
+        1.408,
+        1.408,
+        0.4
+      ],
+      "material": "dark",
+      "uv": [
+        631,
+        404
+      ]
+    },
+    {
+      "name": "hellfire_-1_2_tail_horizontal",
+      "parent": "hellfire_-1_2",
+      "box": [
+        -1.7416,
+        -0.192,
+        -10.08,
+        3.4833,
+        0.384,
+        3.68
+      ],
+      "material": "edge",
+      "uv": [
+        640,
+        404
+      ]
+    },
+    {
+      "name": "hellfire_-1_2_tail_vertical",
+      "parent": "hellfire_-1_2",
+      "box": [
+        -0.192,
+        -2.2611,
+        -10.08,
+        0.384,
+        4.5222,
+        3.68
+      ],
+      "material": "edge",
+      "uv": [
+        659,
+        404
+      ]
+    },
+    {
+      "name": "hellfire_-1_2_clip_-0.3",
+      "parent": "hellfire_-1_2",
+      "box": [
+        -0.992,
+        0.832,
+        -5.28,
+        1.984,
+        0.768,
+        0.96
+      ],
+      "material": "metal",
+      "uv": [
+        672,
+        404
+      ]
+    },
+    {
+      "name": "hellfire_-1_2_clip_0.13",
+      "parent": "hellfire_-1_2",
+      "box": [
+        -0.992,
+        0.832,
+        1.6,
+        1.984,
+        0.768,
+        0.96
+      ],
+      "material": "metal",
+      "uv": [
+        681,
+        404
+      ]
+    },
+    {
+      "name": "hellfire_-1_3_body",
+      "parent": "hellfire_-1_3",
+      "box": [
+        -0.88,
+        -0.88,
+        -11.6348,
+        1.76,
+        1.76,
+        19.3148
+      ],
+      "material": "armor",
+      "uv": [
+        690,
+        404
+      ]
+    },
+    {
+      "name": "hellfire_-1_3_nose_0",
+      "parent": "hellfire_-1_3",
+      "box": [
+        -0.768,
+        -0.768,
+        7.68,
+        1.536,
+        1.536,
+        1.6
+      ],
+      "material": "dark",
+      "uv": [
+        737,
+        404
+      ]
+    },
+    {
+      "name": "hellfire_-1_3_nose_1",
+      "parent": "hellfire_-1_3",
+      "box": [
+        -0.576,
+        -0.576,
+        9.28,
+        1.152,
+        1.152,
+        1.28
+      ],
+      "material": "dark",
+      "uv": [
+        748,
+        404
+      ]
+    },
+    {
+      "name": "hellfire_-1_3_nose_2",
+      "parent": "hellfire_-1_3",
+      "box": [
+        -0.32,
+        -0.32,
+        10.56,
+        0.64,
+        0.64,
+        1.0748
+      ],
+      "material": "dark",
+      "uv": [
+        759,
+        404
+      ]
+    },
+    {
+      "name": "hellfire_-1_3_band",
+      "parent": "hellfire_-1_3",
+      "box": [
+        -0.912,
+        -0.912,
+        4.0,
+        1.824,
+        1.824,
+        0.64
+      ],
+      "material": "yellow",
+      "uv": [
+        768,
+        404
+      ]
+    },
+    {
+      "name": "hellfire_-1_3_nozzle",
+      "parent": "hellfire_-1_3",
+      "box": [
+        -0.704,
+        -0.704,
+        -11.664,
+        1.408,
+        1.408,
+        0.4
+      ],
+      "material": "dark",
+      "uv": [
+        777,
+        404
+      ]
+    },
+    {
+      "name": "hellfire_-1_3_tail_horizontal",
+      "parent": "hellfire_-1_3",
+      "box": [
+        -1.7416,
+        -0.192,
+        -10.08,
+        3.4833,
+        0.384,
+        3.68
+      ],
+      "material": "edge",
+      "uv": [
+        786,
+        404
+      ]
+    },
+    {
+      "name": "hellfire_-1_3_tail_vertical",
+      "parent": "hellfire_-1_3",
+      "box": [
+        -0.192,
+        -2.2611,
+        -10.08,
+        0.384,
+        4.5222,
+        3.68
+      ],
+      "material": "edge",
+      "uv": [
+        805,
+        404
+      ]
+    },
+    {
+      "name": "hellfire_-1_3_clip_-0.3",
+      "parent": "hellfire_-1_3",
+      "box": [
+        -0.992,
+        0.832,
+        -5.28,
+        1.984,
+        0.768,
+        0.96
+      ],
+      "material": "metal",
+      "uv": [
+        818,
+        404
+      ]
+    },
+    {
+      "name": "hellfire_-1_3_clip_0.13",
+      "parent": "hellfire_-1_3",
+      "box": [
+        -0.992,
+        0.832,
+        1.6,
+        1.984,
+        0.768,
+        0.96
+      ],
+      "material": "metal",
+      "uv": [
+        827,
+        404
+      ]
+    },
+    {
+      "name": "rapid_pylon_-1",
+      "parent": "rapid_left",
+      "box": [
+        -1.28,
+        1.92,
+        -3.2,
+        2.56,
+        3.68,
+        6.4
+      ],
+      "material": "dark",
+      "uv": [
+        836,
+        404
+      ]
+    },
+    {
+      "name": "rapid_core_-1",
+      "parent": "rapid_left",
+      "box": [
+        -2.72,
+        -2.72,
+        -11.968,
+        5.44,
+        5.44,
+        23.936
+      ],
+      "material": "armor",
+      "uv": [
+        859,
+        404
+      ]
+    },
+    {
+      "name": "rapid_shell_-1_0",
+      "parent": "rapid_left",
+      "box": [
+        -1.248,
+        2.8,
+        -11.968,
+        2.496,
+        0.432,
+        23.936
+      ],
+      "material": "edge",
+      "rotation": {
+        "axis": "z",
+        "degrees": 0,
+        "origin": [
+          0,
+          0,
+          0
+        ]
+      },
+      "uv": [
+        922,
+        404
+      ]
+    },
+    {
+      "name": "rapid_shell_-1_1",
+      "parent": "rapid_left",
+      "box": [
+        -1.248,
+        2.8,
+        -11.968,
+        2.496,
+        0.432,
+        23.936
+      ],
+      "material": "edge",
+      "rotation": {
+        "axis": "z",
+        "degrees": 45,
+        "origin": [
+          0,
+          0,
+          0
+        ]
+      },
+      "uv": [
+        2,
+        437
+      ]
+    },
+    {
+      "name": "rapid_shell_-1_2",
+      "parent": "rapid_left",
+      "box": [
+        -1.248,
+        2.8,
+        -11.968,
+        2.496,
+        0.432,
+        23.936
+      ],
+      "material": "edge",
+      "rotation": {
+        "axis": "z",
+        "degrees": 90,
+        "origin": [
+          0,
+          0,
+          0
+        ]
+      },
+      "uv": [
+        59,
+        437
+      ]
+    },
+    {
+      "name": "rapid_shell_-1_3",
+      "parent": "rapid_left",
+      "box": [
+        -1.248,
+        2.8,
+        -11.968,
+        2.496,
+        0.432,
+        23.936
+      ],
+      "material": "edge",
+      "rotation": {
+        "axis": "z",
+        "degrees": 135,
+        "origin": [
+          0,
+          0,
+          0
+        ]
+      },
+      "uv": [
+        116,
+        437
+      ]
+    },
+    {
+      "name": "rapid_shell_-1_4",
+      "parent": "rapid_left",
+      "box": [
+        -1.248,
+        2.8,
+        -11.968,
+        2.496,
+        0.432,
+        23.936
+      ],
+      "material": "edge",
+      "rotation": {
+        "axis": "z",
+        "degrees": 180,
+        "origin": [
+          0,
+          0,
+          0
+        ]
+      },
+      "uv": [
+        173,
+        437
+      ]
+    },
+    {
+      "name": "rapid_shell_-1_5",
+      "parent": "rapid_left",
+      "box": [
+        -1.248,
+        2.8,
+        -11.968,
+        2.496,
+        0.432,
+        23.936
+      ],
+      "material": "edge",
+      "rotation": {
+        "axis": "z",
+        "degrees": 225,
+        "origin": [
+          0,
+          0,
+          0
+        ]
+      },
+      "uv": [
+        230,
+        437
+      ]
+    },
+    {
+      "name": "rapid_shell_-1_6",
+      "parent": "rapid_left",
+      "box": [
+        -1.248,
+        2.8,
+        -11.968,
+        2.496,
+        0.432,
+        23.936
+      ],
+      "material": "edge",
+      "rotation": {
+        "axis": "z",
+        "degrees": 270,
+        "origin": [
+          0,
+          0,
+          0
+        ]
+      },
+      "uv": [
+        287,
+        437
+      ]
+    },
+    {
+      "name": "rapid_shell_-1_7",
+      "parent": "rapid_left",
+      "box": [
+        -1.248,
+        2.8,
+        -11.968,
+        2.496,
+        0.432,
+        23.936
+      ],
+      "material": "edge",
+      "rotation": {
+        "axis": "z",
+        "degrees": 315,
+        "origin": [
+          0,
+          0,
+          0
+        ]
+      },
+      "uv": [
+        344,
+        437
+      ]
+    },
+    {
+      "name": "rapid_front_recess_-1",
+      "parent": "rapid_left",
+      "box": [
+        -2.48,
+        -2.48,
+        11.984,
+        4.96,
+        4.96,
+        0.176
+      ],
+      "material": "dark",
+      "uv": [
+        401,
+        437
+      ]
+    },
+    {
+      "name": "rapid_port_lip_-1_0",
+      "parent": "rapid_left",
+      "box": [
+        -1.376,
+        -2.08,
+        12.112,
+        0.832,
+        0.832,
+        0.352
+      ],
+      "material": "metal",
+      "uv": [
+        416,
+        437
+      ]
+    },
+    {
+      "name": "rapid_port_dark_-1_0",
+      "parent": "rapid_left",
+      "box": [
+        -1.248,
+        -1.952,
+        12.464,
+        0.576,
+        0.576,
+        0.048
+      ],
+      "material": "dark",
+      "uv": [
+        423,
+        437
+      ]
+    },
+    {
+      "name": "rapid_port_lip_-1_1",
+      "parent": "rapid_left",
+      "box": [
+        -0.416,
+        -2.08,
+        12.112,
+        0.832,
+        0.832,
+        0.352
+      ],
+      "material": "metal",
+      "uv": [
+        430,
+        437
+      ]
+    },
+    {
+      "name": "rapid_port_dark_-1_1",
+      "parent": "rapid_left",
+      "box": [
+        -0.288,
+        -1.952,
+        12.464,
+        0.576,
+        0.576,
+        0.048
+      ],
+      "material": "dark",
+      "uv": [
+        437,
+        437
+      ]
+    },
+    {
+      "name": "rapid_port_lip_-1_2",
+      "parent": "rapid_left",
+      "box": [
+        0.544,
+        -2.08,
+        12.112,
+        0.832,
+        0.832,
+        0.352
+      ],
+      "material": "metal",
+      "uv": [
+        444,
+        437
+      ]
+    },
+    {
+      "name": "rapid_port_dark_-1_2",
+      "parent": "rapid_left",
+      "box": [
+        0.672,
+        -1.952,
+        12.464,
+        0.576,
+        0.576,
+        0.048
+      ],
+      "material": "dark",
+      "uv": [
+        451,
+        437
+      ]
+    },
+    {
+      "name": "rapid_port_lip_-1_3",
+      "parent": "rapid_left",
+      "box": [
+        -1.856,
+        -1.248,
+        12.112,
+        0.832,
+        0.832,
+        0.352
+      ],
+      "material": "metal",
+      "uv": [
+        458,
+        437
+      ]
+    },
+    {
+      "name": "rapid_port_dark_-1_3",
+      "parent": "rapid_left",
+      "box": [
+        -1.728,
+        -1.12,
+        12.464,
+        0.576,
+        0.576,
+        0.048
+      ],
+      "material": "dark",
+      "uv": [
+        465,
+        437
+      ]
+    },
+    {
+      "name": "rapid_port_lip_-1_4",
+      "parent": "rapid_left",
+      "box": [
+        -0.896,
+        -1.248,
+        12.112,
+        0.832,
+        0.832,
+        0.352
+      ],
+      "material": "metal",
+      "uv": [
+        472,
+        437
+      ]
+    },
+    {
+      "name": "rapid_port_dark_-1_4",
+      "parent": "rapid_left",
+      "box": [
+        -0.768,
+        -1.12,
+        12.464,
+        0.576,
+        0.576,
+        0.048
+      ],
+      "material": "dark",
+      "uv": [
+        479,
+        437
+      ]
+    },
+    {
+      "name": "rapid_port_lip_-1_5",
+      "parent": "rapid_left",
+      "box": [
+        0.064,
+        -1.248,
+        12.112,
+        0.832,
+        0.832,
+        0.352
+      ],
+      "material": "metal",
+      "uv": [
+        486,
+        437
+      ]
+    },
+    {
+      "name": "rapid_port_dark_-1_5",
+      "parent": "rapid_left",
+      "box": [
+        0.192,
+        -1.12,
+        12.464,
+        0.576,
+        0.576,
+        0.048
+      ],
+      "material": "dark",
+      "uv": [
+        493,
+        437
+      ]
+    },
+    {
+      "name": "rapid_port_lip_-1_6",
+      "parent": "rapid_left",
+      "box": [
+        1.024,
+        -1.248,
+        12.112,
+        0.832,
+        0.832,
+        0.352
+      ],
+      "material": "metal",
+      "uv": [
+        500,
+        437
+      ]
+    },
+    {
+      "name": "rapid_port_dark_-1_6",
+      "parent": "rapid_left",
+      "box": [
+        1.152,
+        -1.12,
+        12.464,
+        0.576,
+        0.576,
+        0.048
+      ],
+      "material": "dark",
+      "uv": [
+        507,
+        437
+      ]
+    },
+    {
+      "name": "rapid_port_lip_-1_7",
+      "parent": "rapid_left",
+      "box": [
+        -2.336,
+        -0.416,
+        12.112,
+        0.832,
+        0.832,
+        0.352
+      ],
+      "material": "metal",
+      "uv": [
+        514,
+        437
+      ]
+    },
+    {
+      "name": "rapid_port_dark_-1_7",
+      "parent": "rapid_left",
+      "box": [
+        -2.208,
+        -0.288,
+        12.464,
+        0.576,
+        0.576,
+        0.048
+      ],
+      "material": "dark",
+      "uv": [
+        521,
+        437
+      ]
+    },
+    {
+      "name": "rapid_port_lip_-1_8",
+      "parent": "rapid_left",
+      "box": [
+        -1.376,
+        -0.416,
+        12.112,
+        0.832,
+        0.832,
+        0.352
+      ],
+      "material": "metal",
+      "uv": [
+        528,
+        437
+      ]
+    },
+    {
+      "name": "rapid_port_dark_-1_8",
+      "parent": "rapid_left",
+      "box": [
+        -1.248,
+        -0.288,
+        12.464,
+        0.576,
+        0.576,
+        0.048
+      ],
+      "material": "dark",
+      "uv": [
+        535,
+        437
+      ]
+    },
+    {
+      "name": "rapid_port_lip_-1_9",
+      "parent": "rapid_left",
+      "box": [
+        -0.416,
+        -0.416,
+        12.112,
+        0.832,
+        0.832,
+        0.352
+      ],
+      "material": "metal",
+      "uv": [
+        542,
+        437
+      ]
+    },
+    {
+      "name": "rapid_port_dark_-1_9",
+      "parent": "rapid_left",
+      "box": [
+        -0.288,
+        -0.288,
+        12.464,
+        0.576,
+        0.576,
+        0.048
+      ],
+      "material": "dark",
+      "uv": [
+        549,
+        437
+      ]
+    },
+    {
+      "name": "rapid_port_lip_-1_10",
+      "parent": "rapid_left",
+      "box": [
+        0.544,
+        -0.416,
+        12.112,
+        0.832,
+        0.832,
+        0.352
+      ],
+      "material": "metal",
+      "uv": [
+        556,
+        437
+      ]
+    },
+    {
+      "name": "rapid_port_dark_-1_10",
+      "parent": "rapid_left",
+      "box": [
+        0.672,
+        -0.288,
+        12.464,
+        0.576,
+        0.576,
+        0.048
+      ],
+      "material": "dark",
+      "uv": [
+        563,
+        437
+      ]
+    },
+    {
+      "name": "rapid_port_lip_-1_11",
+      "parent": "rapid_left",
+      "box": [
+        1.504,
+        -0.416,
+        12.112,
+        0.832,
+        0.832,
+        0.352
+      ],
+      "material": "metal",
+      "uv": [
+        570,
+        437
+      ]
+    },
+    {
+      "name": "rapid_port_dark_-1_11",
+      "parent": "rapid_left",
+      "box": [
+        1.632,
+        -0.288,
+        12.464,
+        0.576,
+        0.576,
+        0.048
+      ],
+      "material": "dark",
+      "uv": [
+        577,
+        437
+      ]
+    },
+    {
+      "name": "rapid_port_lip_-1_12",
+      "parent": "rapid_left",
+      "box": [
+        -1.856,
+        0.416,
+        12.112,
+        0.832,
+        0.832,
+        0.352
+      ],
+      "material": "metal",
+      "uv": [
+        584,
+        437
+      ]
+    },
+    {
+      "name": "rapid_port_dark_-1_12",
+      "parent": "rapid_left",
+      "box": [
+        -1.728,
+        0.544,
+        12.464,
+        0.576,
+        0.576,
+        0.048
+      ],
+      "material": "dark",
+      "uv": [
+        591,
+        437
+      ]
+    },
+    {
+      "name": "rapid_port_lip_-1_13",
+      "parent": "rapid_left",
+      "box": [
+        -0.896,
+        0.416,
+        12.112,
+        0.832,
+        0.832,
+        0.352
+      ],
+      "material": "metal",
+      "uv": [
+        598,
+        437
+      ]
+    },
+    {
+      "name": "rapid_port_dark_-1_13",
+      "parent": "rapid_left",
+      "box": [
+        -0.768,
+        0.544,
+        12.464,
+        0.576,
+        0.576,
+        0.048
+      ],
+      "material": "dark",
+      "uv": [
+        605,
+        437
+      ]
+    },
+    {
+      "name": "rapid_port_lip_-1_14",
+      "parent": "rapid_left",
+      "box": [
+        0.064,
+        0.416,
+        12.112,
+        0.832,
+        0.832,
+        0.352
+      ],
+      "material": "metal",
+      "uv": [
+        612,
+        437
+      ]
+    },
+    {
+      "name": "rapid_port_dark_-1_14",
+      "parent": "rapid_left",
+      "box": [
+        0.192,
+        0.544,
+        12.464,
+        0.576,
+        0.576,
+        0.048
+      ],
+      "material": "dark",
+      "uv": [
+        619,
+        437
+      ]
+    },
+    {
+      "name": "rapid_port_lip_-1_15",
+      "parent": "rapid_left",
+      "box": [
+        1.024,
+        0.416,
+        12.112,
+        0.832,
+        0.832,
+        0.352
+      ],
+      "material": "metal",
+      "uv": [
+        626,
+        437
+      ]
+    },
+    {
+      "name": "rapid_port_dark_-1_15",
+      "parent": "rapid_left",
+      "box": [
+        1.152,
+        0.544,
+        12.464,
+        0.576,
+        0.576,
+        0.048
+      ],
+      "material": "dark",
+      "uv": [
+        633,
+        437
+      ]
+    },
+    {
+      "name": "rapid_port_lip_-1_16",
+      "parent": "rapid_left",
+      "box": [
+        -1.376,
+        1.248,
+        12.112,
+        0.832,
+        0.832,
+        0.352
+      ],
+      "material": "metal",
+      "uv": [
+        640,
+        437
+      ]
+    },
+    {
+      "name": "rapid_port_dark_-1_16",
+      "parent": "rapid_left",
+      "box": [
+        -1.248,
+        1.376,
+        12.464,
+        0.576,
+        0.576,
+        0.048
+      ],
+      "material": "dark",
+      "uv": [
+        647,
+        437
+      ]
+    },
+    {
+      "name": "rapid_port_lip_-1_17",
+      "parent": "rapid_left",
+      "box": [
+        -0.416,
+        1.248,
+        12.112,
+        0.832,
+        0.832,
+        0.352
+      ],
+      "material": "metal",
+      "uv": [
+        654,
+        437
+      ]
+    },
+    {
+      "name": "rapid_port_dark_-1_17",
+      "parent": "rapid_left",
+      "box": [
+        -0.288,
+        1.376,
+        12.464,
+        0.576,
+        0.576,
+        0.048
+      ],
+      "material": "dark",
+      "uv": [
+        661,
+        437
+      ]
+    },
+    {
+      "name": "rapid_port_lip_-1_18",
+      "parent": "rapid_left",
+      "box": [
+        0.544,
+        1.248,
+        12.112,
+        0.832,
+        0.832,
+        0.352
+      ],
+      "material": "metal",
+      "uv": [
+        668,
+        437
+      ]
+    },
+    {
+      "name": "rapid_port_dark_-1_18",
+      "parent": "rapid_left",
+      "box": [
+        0.672,
+        1.376,
+        12.464,
+        0.576,
+        0.576,
+        0.048
+      ],
+      "material": "dark",
+      "uv": [
+        675,
+        437
+      ]
+    },
+    {
+      "name": "wing_spar_1",
+      "parent": "body",
+      "box": [
+        21.6,
+        26.88,
+        9.6,
+        24.16,
+        1.76,
+        19.2
+      ],
+      "material": "edge",
+      "uv": [
+        682,
+        437
+      ]
+    },
+    {
+      "name": "inner_pylon_1",
+      "parent": "pod_right",
+      "box": [
+        -1.44,
+        0.96,
+        -2.88,
+        2.88,
+        4.48,
+        5.76
+      ],
+      "material": "dark",
+      "uv": [
+        775,
+        437
+      ]
+    },
+    {
+      "name": "rack_rail_1_-0.095",
+      "parent": "pod_right",
+      "box": [
+        -1.968,
+        0.0,
+        -10.08,
+        0.896,
+        1.12,
+        20.16
+      ],
+      "material": "metal",
+      "uv": [
+        796,
+        437
+      ]
+    },
+    {
+      "name": "rack_rail_1_0.095",
+      "parent": "pod_right",
+      "box": [
+        1.072,
+        0.0,
+        -10.08,
+        0.896,
+        1.12,
+        20.16
+      ],
+      "material": "metal",
+      "uv": [
+        843,
+        437
+      ]
+    },
+    {
+      "name": "rack_crossbeam_1_0.88",
+      "parent": "pod_right",
+      "box": [
+        -3.1392,
+        -1.6,
+        -7.28,
+        6.2784,
+        3.2,
+        1.12
+      ],
+      "material": "edge",
+      "uv": [
+        890,
+        437
+      ]
+    },
+    {
+      "name": "rack_crossbeam_1_1.72",
+      "parent": "pod_right",
+      "box": [
+        -3.1392,
+        -1.6,
+        6.16,
+        6.2784,
+        3.2,
+        1.12
+      ],
+      "material": "edge",
+      "uv": [
+        911,
+        437
+      ]
+    },
+    {
+      "name": "hellfire_1_0_body",
+      "parent": "hellfire_1_0",
+      "box": [
+        -0.88,
+        -0.88,
+        -11.6348,
+        1.76,
+        1.76,
+        19.3148
+      ],
+      "material": "armor",
+      "uv": [
+        932,
+        437
+      ]
+    },
+    {
+      "name": "hellfire_1_0_nose_0",
+      "parent": "hellfire_1_0",
+      "box": [
+        -0.768,
+        -0.768,
+        7.68,
+        1.536,
+        1.536,
+        1.6
+      ],
+      "material": "dark",
+      "uv": [
+        979,
+        437
+      ]
+    },
+    {
+      "name": "hellfire_1_0_nose_1",
+      "parent": "hellfire_1_0",
+      "box": [
+        -0.576,
+        -0.576,
+        9.28,
+        1.152,
+        1.152,
+        1.28
+      ],
+      "material": "dark",
+      "uv": [
+        990,
+        437
+      ]
+    },
+    {
+      "name": "hellfire_1_0_nose_2",
+      "parent": "hellfire_1_0",
+      "box": [
+        -0.32,
+        -0.32,
+        10.56,
+        0.64,
+        0.64,
+        1.0748
+      ],
+      "material": "dark",
+      "uv": [
+        1001,
+        437
+      ]
+    },
+    {
+      "name": "hellfire_1_0_band",
+      "parent": "hellfire_1_0",
+      "box": [
+        -0.912,
+        -0.912,
+        4.0,
+        1.824,
+        1.824,
+        0.64
+      ],
+      "material": "yellow",
+      "uv": [
+        1010,
+        437
+      ]
+    },
+    {
+      "name": "hellfire_1_0_nozzle",
+      "parent": "hellfire_1_0",
+      "box": [
+        -0.704,
+        -0.704,
+        -11.664,
+        1.408,
+        1.408,
+        0.4
+      ],
+      "material": "dark",
+      "uv": [
+        2,
+        465
+      ]
+    },
+    {
+      "name": "hellfire_1_0_tail_horizontal",
+      "parent": "hellfire_1_0",
+      "box": [
+        -1.7416,
+        -0.192,
+        -10.08,
+        3.4833,
+        0.384,
+        3.68
+      ],
+      "material": "edge",
+      "uv": [
+        11,
+        465
+      ]
+    },
+    {
+      "name": "hellfire_1_0_tail_vertical",
+      "parent": "hellfire_1_0",
+      "box": [
+        -0.192,
+        -2.2611,
+        -10.08,
+        0.384,
+        4.5222,
+        3.68
+      ],
+      "material": "edge",
+      "uv": [
+        30,
+        465
+      ]
+    },
+    {
+      "name": "hellfire_1_0_clip_-0.3",
+      "parent": "hellfire_1_0",
+      "box": [
+        -0.992,
+        0.832,
+        -5.28,
+        1.984,
+        0.768,
+        0.96
+      ],
+      "material": "metal",
+      "uv": [
+        43,
+        465
+      ]
+    },
+    {
+      "name": "hellfire_1_0_clip_0.13",
+      "parent": "hellfire_1_0",
+      "box": [
+        -0.992,
+        0.832,
+        1.6,
+        1.984,
+        0.768,
+        0.96
+      ],
+      "material": "metal",
+      "uv": [
+        52,
+        465
+      ]
+    },
+    {
+      "name": "hellfire_1_1_body",
+      "parent": "hellfire_1_1",
+      "box": [
+        -0.88,
+        -0.88,
+        -11.6348,
+        1.76,
+        1.76,
+        19.3148
+      ],
+      "material": "armor",
+      "uv": [
+        61,
+        465
+      ]
+    },
+    {
+      "name": "hellfire_1_1_nose_0",
+      "parent": "hellfire_1_1",
+      "box": [
+        -0.768,
+        -0.768,
+        7.68,
+        1.536,
+        1.536,
+        1.6
+      ],
+      "material": "dark",
+      "uv": [
+        108,
+        465
+      ]
+    },
+    {
+      "name": "hellfire_1_1_nose_1",
+      "parent": "hellfire_1_1",
+      "box": [
+        -0.576,
+        -0.576,
+        9.28,
+        1.152,
+        1.152,
+        1.28
+      ],
+      "material": "dark",
+      "uv": [
+        119,
+        465
+      ]
+    },
+    {
+      "name": "hellfire_1_1_nose_2",
+      "parent": "hellfire_1_1",
+      "box": [
+        -0.32,
+        -0.32,
+        10.56,
+        0.64,
+        0.64,
+        1.0748
+      ],
+      "material": "dark",
+      "uv": [
+        130,
+        465
+      ]
+    },
+    {
+      "name": "hellfire_1_1_band",
+      "parent": "hellfire_1_1",
+      "box": [
+        -0.912,
+        -0.912,
+        4.0,
+        1.824,
+        1.824,
+        0.64
+      ],
+      "material": "yellow",
+      "uv": [
+        139,
+        465
+      ]
+    },
+    {
+      "name": "hellfire_1_1_nozzle",
+      "parent": "hellfire_1_1",
+      "box": [
+        -0.704,
+        -0.704,
+        -11.664,
+        1.408,
+        1.408,
+        0.4
+      ],
+      "material": "dark",
+      "uv": [
+        148,
+        465
+      ]
+    },
+    {
+      "name": "hellfire_1_1_tail_horizontal",
+      "parent": "hellfire_1_1",
+      "box": [
+        -1.7416,
+        -0.192,
+        -10.08,
+        3.4833,
+        0.384,
+        3.68
+      ],
+      "material": "edge",
+      "uv": [
+        157,
+        465
+      ]
+    },
+    {
+      "name": "hellfire_1_1_tail_vertical",
+      "parent": "hellfire_1_1",
+      "box": [
+        -0.192,
+        -2.2611,
+        -10.08,
+        0.384,
+        4.5222,
+        3.68
+      ],
+      "material": "edge",
+      "uv": [
+        176,
+        465
+      ]
+    },
+    {
+      "name": "hellfire_1_1_clip_-0.3",
+      "parent": "hellfire_1_1",
+      "box": [
+        -0.992,
+        0.832,
+        -5.28,
+        1.984,
+        0.768,
+        0.96
+      ],
+      "material": "metal",
+      "uv": [
+        189,
+        465
+      ]
+    },
+    {
+      "name": "hellfire_1_1_clip_0.13",
+      "parent": "hellfire_1_1",
+      "box": [
+        -0.992,
+        0.832,
+        1.6,
+        1.984,
+        0.768,
+        0.96
+      ],
+      "material": "metal",
+      "uv": [
+        198,
+        465
+      ]
+    },
+    {
+      "name": "hellfire_1_2_body",
+      "parent": "hellfire_1_2",
+      "box": [
+        -0.88,
+        -0.88,
+        -11.6348,
+        1.76,
+        1.76,
+        19.3148
+      ],
+      "material": "armor",
+      "uv": [
+        207,
+        465
+      ]
+    },
+    {
+      "name": "hellfire_1_2_nose_0",
+      "parent": "hellfire_1_2",
+      "box": [
+        -0.768,
+        -0.768,
+        7.68,
+        1.536,
+        1.536,
+        1.6
+      ],
+      "material": "dark",
+      "uv": [
+        254,
+        465
+      ]
+    },
+    {
+      "name": "hellfire_1_2_nose_1",
+      "parent": "hellfire_1_2",
+      "box": [
+        -0.576,
+        -0.576,
+        9.28,
+        1.152,
+        1.152,
+        1.28
+      ],
+      "material": "dark",
+      "uv": [
+        265,
+        465
+      ]
+    },
+    {
+      "name": "hellfire_1_2_nose_2",
+      "parent": "hellfire_1_2",
+      "box": [
+        -0.32,
+        -0.32,
+        10.56,
+        0.64,
+        0.64,
+        1.0748
+      ],
+      "material": "dark",
+      "uv": [
+        276,
+        465
+      ]
+    },
+    {
+      "name": "hellfire_1_2_band",
+      "parent": "hellfire_1_2",
+      "box": [
+        -0.912,
+        -0.912,
+        4.0,
+        1.824,
+        1.824,
+        0.64
+      ],
+      "material": "yellow",
+      "uv": [
+        285,
+        465
+      ]
+    },
+    {
+      "name": "hellfire_1_2_nozzle",
+      "parent": "hellfire_1_2",
+      "box": [
+        -0.704,
+        -0.704,
+        -11.664,
+        1.408,
+        1.408,
+        0.4
+      ],
+      "material": "dark",
+      "uv": [
+        294,
+        465
+      ]
+    },
+    {
+      "name": "hellfire_1_2_tail_horizontal",
+      "parent": "hellfire_1_2",
+      "box": [
+        -1.7416,
+        -0.192,
+        -10.08,
+        3.4833,
+        0.384,
+        3.68
+      ],
+      "material": "edge",
+      "uv": [
+        303,
+        465
+      ]
+    },
+    {
+      "name": "hellfire_1_2_tail_vertical",
+      "parent": "hellfire_1_2",
+      "box": [
+        -0.192,
+        -2.2611,
+        -10.08,
+        0.384,
+        4.5222,
+        3.68
+      ],
+      "material": "edge",
+      "uv": [
+        322,
+        465
+      ]
+    },
+    {
+      "name": "hellfire_1_2_clip_-0.3",
+      "parent": "hellfire_1_2",
+      "box": [
+        -0.992,
+        0.832,
+        -5.28,
+        1.984,
+        0.768,
+        0.96
+      ],
+      "material": "metal",
+      "uv": [
+        335,
+        465
+      ]
+    },
+    {
+      "name": "hellfire_1_2_clip_0.13",
+      "parent": "hellfire_1_2",
+      "box": [
+        -0.992,
+        0.832,
+        1.6,
+        1.984,
+        0.768,
+        0.96
+      ],
+      "material": "metal",
+      "uv": [
+        344,
+        465
+      ]
+    },
+    {
+      "name": "hellfire_1_3_body",
+      "parent": "hellfire_1_3",
+      "box": [
+        -0.88,
+        -0.88,
+        -11.6348,
+        1.76,
+        1.76,
+        19.3148
+      ],
+      "material": "armor",
+      "uv": [
+        353,
+        465
+      ]
+    },
+    {
+      "name": "hellfire_1_3_nose_0",
+      "parent": "hellfire_1_3",
+      "box": [
+        -0.768,
+        -0.768,
+        7.68,
+        1.536,
+        1.536,
+        1.6
+      ],
+      "material": "dark",
+      "uv": [
+        400,
+        465
+      ]
+    },
+    {
+      "name": "hellfire_1_3_nose_1",
+      "parent": "hellfire_1_3",
+      "box": [
+        -0.576,
+        -0.576,
+        9.28,
+        1.152,
+        1.152,
+        1.28
+      ],
+      "material": "dark",
+      "uv": [
+        411,
+        465
+      ]
+    },
+    {
+      "name": "hellfire_1_3_nose_2",
+      "parent": "hellfire_1_3",
+      "box": [
+        -0.32,
+        -0.32,
+        10.56,
+        0.64,
+        0.64,
+        1.0748
+      ],
+      "material": "dark",
+      "uv": [
+        422,
+        465
+      ]
+    },
+    {
+      "name": "hellfire_1_3_band",
+      "parent": "hellfire_1_3",
+      "box": [
+        -0.912,
+        -0.912,
+        4.0,
+        1.824,
+        1.824,
+        0.64
+      ],
+      "material": "yellow",
+      "uv": [
+        431,
+        465
+      ]
+    },
+    {
+      "name": "hellfire_1_3_nozzle",
+      "parent": "hellfire_1_3",
+      "box": [
+        -0.704,
+        -0.704,
+        -11.664,
+        1.408,
+        1.408,
+        0.4
+      ],
+      "material": "dark",
+      "uv": [
+        440,
+        465
+      ]
+    },
+    {
+      "name": "hellfire_1_3_tail_horizontal",
+      "parent": "hellfire_1_3",
+      "box": [
+        -1.7416,
+        -0.192,
+        -10.08,
+        3.4833,
+        0.384,
+        3.68
+      ],
+      "material": "edge",
+      "uv": [
+        449,
+        465
+      ]
+    },
+    {
+      "name": "hellfire_1_3_tail_vertical",
+      "parent": "hellfire_1_3",
+      "box": [
+        -0.192,
+        -2.2611,
+        -10.08,
+        0.384,
+        4.5222,
+        3.68
+      ],
+      "material": "edge",
+      "uv": [
+        468,
+        465
+      ]
+    },
+    {
+      "name": "hellfire_1_3_clip_-0.3",
+      "parent": "hellfire_1_3",
+      "box": [
+        -0.992,
+        0.832,
+        -5.28,
+        1.984,
+        0.768,
+        0.96
+      ],
+      "material": "metal",
+      "uv": [
+        481,
+        465
+      ]
+    },
+    {
+      "name": "hellfire_1_3_clip_0.13",
+      "parent": "hellfire_1_3",
+      "box": [
+        -0.992,
+        0.832,
+        1.6,
+        1.984,
+        0.768,
+        0.96
+      ],
+      "material": "metal",
+      "uv": [
+        490,
+        465
+      ]
+    },
+    {
+      "name": "rapid_pylon_1",
+      "parent": "rapid_right",
+      "box": [
+        -1.28,
+        1.92,
+        -3.2,
+        2.56,
+        3.68,
+        6.4
+      ],
+      "material": "dark",
+      "uv": [
+        499,
+        465
+      ]
+    },
+    {
+      "name": "rapid_core_1",
+      "parent": "rapid_right",
+      "box": [
+        -2.72,
+        -2.72,
+        -11.968,
+        5.44,
+        5.44,
+        23.936
+      ],
+      "material": "armor",
+      "uv": [
+        522,
+        465
+      ]
+    },
+    {
+      "name": "rapid_shell_1_0",
+      "parent": "rapid_right",
+      "box": [
+        -1.248,
+        2.8,
+        -11.968,
+        2.496,
+        0.432,
+        23.936
+      ],
+      "material": "edge",
+      "rotation": {
+        "axis": "z",
+        "degrees": 0,
+        "origin": [
+          0,
+          0,
+          0
+        ]
+      },
+      "uv": [
+        585,
+        465
+      ]
+    },
+    {
+      "name": "rapid_shell_1_1",
+      "parent": "rapid_right",
+      "box": [
+        -1.248,
+        2.8,
+        -11.968,
+        2.496,
+        0.432,
+        23.936
+      ],
+      "material": "edge",
+      "rotation": {
+        "axis": "z",
+        "degrees": 45,
+        "origin": [
+          0,
+          0,
+          0
+        ]
+      },
+      "uv": [
+        642,
+        465
+      ]
+    },
+    {
+      "name": "rapid_shell_1_2",
+      "parent": "rapid_right",
+      "box": [
+        -1.248,
+        2.8,
+        -11.968,
+        2.496,
+        0.432,
+        23.936
+      ],
+      "material": "edge",
+      "rotation": {
+        "axis": "z",
+        "degrees": 90,
+        "origin": [
+          0,
+          0,
+          0
+        ]
+      },
+      "uv": [
+        699,
+        465
+      ]
+    },
+    {
+      "name": "rapid_shell_1_3",
+      "parent": "rapid_right",
+      "box": [
+        -1.248,
+        2.8,
+        -11.968,
+        2.496,
+        0.432,
+        23.936
+      ],
+      "material": "edge",
+      "rotation": {
+        "axis": "z",
+        "degrees": 135,
+        "origin": [
+          0,
+          0,
+          0
+        ]
+      },
+      "uv": [
+        756,
+        465
+      ]
+    },
+    {
+      "name": "rapid_shell_1_4",
+      "parent": "rapid_right",
+      "box": [
+        -1.248,
+        2.8,
+        -11.968,
+        2.496,
+        0.432,
+        23.936
+      ],
+      "material": "edge",
+      "rotation": {
+        "axis": "z",
+        "degrees": 180,
+        "origin": [
+          0,
+          0,
+          0
+        ]
+      },
+      "uv": [
+        813,
+        465
+      ]
+    },
+    {
+      "name": "rapid_shell_1_5",
+      "parent": "rapid_right",
+      "box": [
+        -1.248,
+        2.8,
+        -11.968,
+        2.496,
+        0.432,
+        23.936
+      ],
+      "material": "edge",
+      "rotation": {
+        "axis": "z",
+        "degrees": 225,
+        "origin": [
+          0,
+          0,
+          0
+        ]
+      },
+      "uv": [
+        870,
+        465
+      ]
+    },
+    {
+      "name": "rapid_shell_1_6",
+      "parent": "rapid_right",
+      "box": [
+        -1.248,
+        2.8,
+        -11.968,
+        2.496,
+        0.432,
+        23.936
+      ],
+      "material": "edge",
+      "rotation": {
+        "axis": "z",
+        "degrees": 270,
+        "origin": [
+          0,
+          0,
+          0
+        ]
+      },
+      "uv": [
+        927,
+        465
+      ]
+    },
+    {
+      "name": "rapid_shell_1_7",
+      "parent": "rapid_right",
+      "box": [
+        -1.248,
+        2.8,
+        -11.968,
+        2.496,
+        0.432,
+        23.936
+      ],
+      "material": "edge",
+      "rotation": {
+        "axis": "z",
+        "degrees": 315,
+        "origin": [
+          0,
+          0,
+          0
+        ]
+      },
+      "uv": [
+        2,
+        498
+      ]
+    },
+    {
+      "name": "rapid_front_recess_1",
+      "parent": "rapid_right",
+      "box": [
+        -2.48,
+        -2.48,
+        11.984,
+        4.96,
+        4.96,
+        0.176
+      ],
+      "material": "dark",
+      "uv": [
+        59,
+        498
+      ]
+    },
+    {
+      "name": "rapid_port_lip_1_0",
+      "parent": "rapid_right",
+      "box": [
+        -1.376,
+        -2.08,
+        12.112,
+        0.832,
+        0.832,
+        0.352
+      ],
+      "material": "metal",
+      "uv": [
+        74,
+        498
+      ]
+    },
+    {
+      "name": "rapid_port_dark_1_0",
+      "parent": "rapid_right",
+      "box": [
+        -1.248,
+        -1.952,
+        12.464,
+        0.576,
+        0.576,
+        0.048
+      ],
+      "material": "dark",
+      "uv": [
+        81,
+        498
+      ]
+    },
+    {
+      "name": "rapid_port_lip_1_1",
+      "parent": "rapid_right",
+      "box": [
+        -0.416,
+        -2.08,
+        12.112,
+        0.832,
+        0.832,
+        0.352
+      ],
+      "material": "metal",
+      "uv": [
+        88,
+        498
+      ]
+    },
+    {
+      "name": "rapid_port_dark_1_1",
+      "parent": "rapid_right",
+      "box": [
+        -0.288,
+        -1.952,
+        12.464,
+        0.576,
+        0.576,
+        0.048
+      ],
+      "material": "dark",
+      "uv": [
+        95,
+        498
+      ]
+    },
+    {
+      "name": "rapid_port_lip_1_2",
+      "parent": "rapid_right",
+      "box": [
+        0.544,
+        -2.08,
+        12.112,
+        0.832,
+        0.832,
+        0.352
+      ],
+      "material": "metal",
+      "uv": [
+        102,
+        498
+      ]
+    },
+    {
+      "name": "rapid_port_dark_1_2",
+      "parent": "rapid_right",
+      "box": [
+        0.672,
+        -1.952,
+        12.464,
+        0.576,
+        0.576,
+        0.048
+      ],
+      "material": "dark",
+      "uv": [
+        109,
+        498
+      ]
+    },
+    {
+      "name": "rapid_port_lip_1_3",
+      "parent": "rapid_right",
+      "box": [
+        -1.856,
+        -1.248,
+        12.112,
+        0.832,
+        0.832,
+        0.352
+      ],
+      "material": "metal",
+      "uv": [
+        116,
+        498
+      ]
+    },
+    {
+      "name": "rapid_port_dark_1_3",
+      "parent": "rapid_right",
+      "box": [
+        -1.728,
+        -1.12,
+        12.464,
+        0.576,
+        0.576,
+        0.048
+      ],
+      "material": "dark",
+      "uv": [
+        123,
+        498
+      ]
+    },
+    {
+      "name": "rapid_port_lip_1_4",
+      "parent": "rapid_right",
+      "box": [
+        -0.896,
+        -1.248,
+        12.112,
+        0.832,
+        0.832,
+        0.352
+      ],
+      "material": "metal",
+      "uv": [
+        130,
+        498
+      ]
+    },
+    {
+      "name": "rapid_port_dark_1_4",
+      "parent": "rapid_right",
+      "box": [
+        -0.768,
+        -1.12,
+        12.464,
+        0.576,
+        0.576,
+        0.048
+      ],
+      "material": "dark",
+      "uv": [
+        137,
+        498
+      ]
+    },
+    {
+      "name": "rapid_port_lip_1_5",
+      "parent": "rapid_right",
+      "box": [
+        0.064,
+        -1.248,
+        12.112,
+        0.832,
+        0.832,
+        0.352
+      ],
+      "material": "metal",
+      "uv": [
+        144,
+        498
+      ]
+    },
+    {
+      "name": "rapid_port_dark_1_5",
+      "parent": "rapid_right",
+      "box": [
+        0.192,
+        -1.12,
+        12.464,
+        0.576,
+        0.576,
+        0.048
+      ],
+      "material": "dark",
+      "uv": [
+        151,
+        498
+      ]
+    },
+    {
+      "name": "rapid_port_lip_1_6",
+      "parent": "rapid_right",
+      "box": [
+        1.024,
+        -1.248,
+        12.112,
+        0.832,
+        0.832,
+        0.352
+      ],
+      "material": "metal",
+      "uv": [
+        158,
+        498
+      ]
+    },
+    {
+      "name": "rapid_port_dark_1_6",
+      "parent": "rapid_right",
+      "box": [
+        1.152,
+        -1.12,
+        12.464,
+        0.576,
+        0.576,
+        0.048
+      ],
+      "material": "dark",
+      "uv": [
+        165,
+        498
+      ]
+    },
+    {
+      "name": "rapid_port_lip_1_7",
+      "parent": "rapid_right",
+      "box": [
+        -2.336,
+        -0.416,
+        12.112,
+        0.832,
+        0.832,
+        0.352
+      ],
+      "material": "metal",
+      "uv": [
+        172,
+        498
+      ]
+    },
+    {
+      "name": "rapid_port_dark_1_7",
+      "parent": "rapid_right",
+      "box": [
+        -2.208,
+        -0.288,
+        12.464,
+        0.576,
+        0.576,
+        0.048
+      ],
+      "material": "dark",
+      "uv": [
+        179,
+        498
+      ]
+    },
+    {
+      "name": "rapid_port_lip_1_8",
+      "parent": "rapid_right",
+      "box": [
+        -1.376,
+        -0.416,
+        12.112,
+        0.832,
+        0.832,
+        0.352
+      ],
+      "material": "metal",
+      "uv": [
+        186,
+        498
+      ]
+    },
+    {
+      "name": "rapid_port_dark_1_8",
+      "parent": "rapid_right",
+      "box": [
+        -1.248,
+        -0.288,
+        12.464,
+        0.576,
+        0.576,
+        0.048
+      ],
+      "material": "dark",
+      "uv": [
+        193,
+        498
+      ]
+    },
+    {
+      "name": "rapid_port_lip_1_9",
+      "parent": "rapid_right",
+      "box": [
+        -0.416,
+        -0.416,
+        12.112,
+        0.832,
+        0.832,
+        0.352
+      ],
+      "material": "metal",
+      "uv": [
+        200,
+        498
+      ]
+    },
+    {
+      "name": "rapid_port_dark_1_9",
+      "parent": "rapid_right",
+      "box": [
+        -0.288,
+        -0.288,
+        12.464,
+        0.576,
+        0.576,
+        0.048
+      ],
+      "material": "dark",
+      "uv": [
+        207,
+        498
+      ]
+    },
+    {
+      "name": "rapid_port_lip_1_10",
+      "parent": "rapid_right",
+      "box": [
+        0.544,
+        -0.416,
+        12.112,
+        0.832,
+        0.832,
+        0.352
+      ],
+      "material": "metal",
+      "uv": [
+        214,
+        498
+      ]
+    },
+    {
+      "name": "rapid_port_dark_1_10",
+      "parent": "rapid_right",
+      "box": [
+        0.672,
+        -0.288,
+        12.464,
+        0.576,
+        0.576,
+        0.048
+      ],
+      "material": "dark",
+      "uv": [
+        221,
+        498
+      ]
+    },
+    {
+      "name": "rapid_port_lip_1_11",
+      "parent": "rapid_right",
+      "box": [
+        1.504,
+        -0.416,
+        12.112,
+        0.832,
+        0.832,
+        0.352
+      ],
+      "material": "metal",
+      "uv": [
+        228,
+        498
+      ]
+    },
+    {
+      "name": "rapid_port_dark_1_11",
+      "parent": "rapid_right",
+      "box": [
+        1.632,
+        -0.288,
+        12.464,
+        0.576,
+        0.576,
+        0.048
+      ],
+      "material": "dark",
+      "uv": [
+        235,
+        498
+      ]
+    },
+    {
+      "name": "rapid_port_lip_1_12",
+      "parent": "rapid_right",
+      "box": [
+        -1.856,
+        0.416,
+        12.112,
+        0.832,
+        0.832,
+        0.352
+      ],
+      "material": "metal",
+      "uv": [
+        242,
+        498
+      ]
+    },
+    {
+      "name": "rapid_port_dark_1_12",
+      "parent": "rapid_right",
+      "box": [
+        -1.728,
+        0.544,
+        12.464,
+        0.576,
+        0.576,
+        0.048
+      ],
+      "material": "dark",
+      "uv": [
+        249,
+        498
+      ]
+    },
+    {
+      "name": "rapid_port_lip_1_13",
+      "parent": "rapid_right",
+      "box": [
+        -0.896,
+        0.416,
+        12.112,
+        0.832,
+        0.832,
+        0.352
+      ],
+      "material": "metal",
+      "uv": [
+        256,
+        498
+      ]
+    },
+    {
+      "name": "rapid_port_dark_1_13",
+      "parent": "rapid_right",
+      "box": [
+        -0.768,
+        0.544,
+        12.464,
+        0.576,
+        0.576,
+        0.048
+      ],
+      "material": "dark",
+      "uv": [
+        263,
+        498
+      ]
+    },
+    {
+      "name": "rapid_port_lip_1_14",
+      "parent": "rapid_right",
+      "box": [
+        0.064,
+        0.416,
+        12.112,
+        0.832,
+        0.832,
+        0.352
+      ],
+      "material": "metal",
+      "uv": [
+        270,
+        498
+      ]
+    },
+    {
+      "name": "rapid_port_dark_1_14",
+      "parent": "rapid_right",
+      "box": [
+        0.192,
+        0.544,
+        12.464,
+        0.576,
+        0.576,
+        0.048
+      ],
+      "material": "dark",
+      "uv": [
+        277,
+        498
+      ]
+    },
+    {
+      "name": "rapid_port_lip_1_15",
+      "parent": "rapid_right",
+      "box": [
+        1.024,
+        0.416,
+        12.112,
+        0.832,
+        0.832,
+        0.352
+      ],
+      "material": "metal",
+      "uv": [
+        284,
+        498
+      ]
+    },
+    {
+      "name": "rapid_port_dark_1_15",
+      "parent": "rapid_right",
+      "box": [
+        1.152,
+        0.544,
+        12.464,
+        0.576,
+        0.576,
+        0.048
+      ],
+      "material": "dark",
+      "uv": [
+        291,
+        498
+      ]
+    },
+    {
+      "name": "rapid_port_lip_1_16",
+      "parent": "rapid_right",
+      "box": [
+        -1.376,
+        1.248,
+        12.112,
+        0.832,
+        0.832,
+        0.352
+      ],
+      "material": "metal",
+      "uv": [
+        298,
+        498
+      ]
+    },
+    {
+      "name": "rapid_port_dark_1_16",
+      "parent": "rapid_right",
+      "box": [
+        -1.248,
+        1.376,
+        12.464,
+        0.576,
+        0.576,
+        0.048
+      ],
+      "material": "dark",
+      "uv": [
+        305,
+        498
+      ]
+    },
+    {
+      "name": "rapid_port_lip_1_17",
+      "parent": "rapid_right",
+      "box": [
+        -0.416,
+        1.248,
+        12.112,
+        0.832,
+        0.832,
+        0.352
+      ],
+      "material": "metal",
+      "uv": [
+        312,
+        498
+      ]
+    },
+    {
+      "name": "rapid_port_dark_1_17",
+      "parent": "rapid_right",
+      "box": [
+        -0.288,
+        1.376,
+        12.464,
+        0.576,
+        0.576,
+        0.048
+      ],
+      "material": "dark",
+      "uv": [
+        319,
+        498
+      ]
+    },
+    {
+      "name": "rapid_port_lip_1_18",
+      "parent": "rapid_right",
+      "box": [
+        0.544,
+        1.248,
+        12.112,
+        0.832,
+        0.832,
+        0.352
+      ],
+      "material": "metal",
+      "uv": [
+        326,
+        498
+      ]
+    },
+    {
+      "name": "rapid_port_dark_1_18",
+      "parent": "rapid_right",
+      "box": [
+        0.672,
+        1.376,
+        12.464,
+        0.576,
+        0.576,
+        0.048
+      ],
+      "material": "dark",
+      "uv": [
+        333,
+        498
+      ]
+    }
+  ]
+}

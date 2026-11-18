@@ -28,7 +28,8 @@ class TissueLateDevelopmentTest {
         var point=new V(4,6,2);var early=TissueEvolution.develop(body,point,third,false);var late=TissueEvolution.develop(body,point,sixth,false);
         assertTrue(late.x()>early.x()*1.1F,"fixed-scale chest silhouette must keep widening in late meals");
         assertTrue(late.z()>early.z()*1.1F,"body depth develops with width");
-        var buriedWaist=new V(4,12,2);assertEquals(buriedWaist.x(),TissueEvolution.develop(body,buriedWaist,sixth,false).x(),.0001F);
+        // The flank stays one flat block face from chest to waist.
+        var waist=new V(4,12,2);assertEquals(late.x(),TissueEvolution.develop(body,waist,sixth,false).x(),.0001F);
         assertEquals(captured,TissueEvolution.retainStronger(captured,new TissueEvolution.State(0,0,0,0,0,0)));
     }
     @Test void supportArmourContinuesFormingInRoundsFourFiveAndSixWithoutExtraBodyCopies(){

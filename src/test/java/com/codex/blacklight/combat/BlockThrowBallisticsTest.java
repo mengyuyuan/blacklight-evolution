@@ -3,6 +3,15 @@ import org.junit.jupiter.api.Test;
 import net.minecraft.world.phys.Vec3;
 import static org.junit.jupiter.api.Assertions.*;
 class BlockThrowBallisticsTest {
+ @Test void spitLowArcUsesItsOwnGravityWithoutChangingThrownBlockGravity(){
+  for(double distance:new double[]{4,9,16})for(double height:new double[]{-2,0,2}){
+   var target=new Vec3(0,height,distance);var shot=BlockThrowBallistics.solve(Vec3.ZERO,target,Vec3.ZERO,.95,.03);assertNotNull(shot);
+   double sum=(1-Math.pow(.99,shot.ticks()))/.01;
+   var at=shot.velocity().scale(sum).add(0,-.03/.01*(shot.ticks()-sum),0);
+   assertEquals(0,at.distanceTo(target),1e-7);assertEquals(.95,shot.velocity().length(),1e-6);
+  }
+  assertNull(BlockThrowBallistics.solve(Vec3.ZERO,new Vec3(0,0,4),Vec3.ZERO,.95,Double.NaN));
+ }
  @Test void predictionMatchesEveryDiscreteFlightStep(){
   var origin=new Vec3(3,72,-9);var velocity=new Vec3(1.2,.7,2.1);var p=origin;var v=velocity;
   for(int t=0;t<=100;t++){assertEquals(0,p.distanceTo(BlockThrowBallistics.at(origin,velocity,t)),1e-9);p=p.add(v);v=BlockThrowBallistics.nextVelocity(v,false);}

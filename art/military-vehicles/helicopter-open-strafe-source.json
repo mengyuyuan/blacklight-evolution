@@ -1,0 +1,749 @@
+{
+  "schema": 1,
+  "recordedLocal": "2026-11-17T02:57:33",
+  "status": "Source disassembly, code implementation and text/JSON/mirror inspection only. Compilation, unit/GameTests, native emulation and game execution remain explicitly deferred by the user. No runtime pass is claimed.",
+  "scope": "Independent TryOpenStrafeRun candidate, SimpleOpenStrafeRun approach/run/orient phases, open corridor reservation and live SIMPLE opportunity. Full native steering and full simpleEngage FIG graph are not claimed.",
+  "source": {
+    "file": "D:\\PrototypeReference\\p1\\input\\prototypeenginef.dll",
+    "sha256": "8cba8da3412df4f49cd61d02445e87a0cda551dea4f2fc1e66b19c1bfe28a760"
+  },
+  "decodedFig": {
+    "file": "D:\\PrototypeReference\\p1\\helicopter-weapons-complete.json",
+    "sha256": "70955751e9386c6b312918cc0843e6b808d1144dbede5b25181cf012314308fa"
+  },
+  "tracks": [
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 71248,
+      "payload": 71260,
+      "length": 20,
+      "type": "ConditionalExecute",
+      "kind": "TrackHash",
+      "owner": "engage_apache/engage/engage/simpleEngage",
+      "group": "TrackHash",
+      "parentOffset": 71048,
+      "treeOffset": 69504,
+      "fields": {
+        "Unknown1": 1,
+        "TimeBegin": 0,
+        "TimeEnd": -1,
+        "Branch": {
+          "name": "",
+          "index": 6
+        }
+      },
+      "schema": "ConditionalExecuteTrack",
+      "end": 71444
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 71292,
+      "payload": 71304,
+      "length": 20,
+      "type": "TargetDistance",
+      "kind": "ConditionHash",
+      "owner": "engage_apache/engage/engage/simpleEngage",
+      "group": "ConditionHash",
+      "parentOffset": 71280,
+      "treeOffset": 69504,
+      "fields": {
+        "Direction": {
+          "hash": "5772786",
+          "name": "XZ"
+        },
+        "Compare": {
+          "hash": "3935993",
+          "name": "LessThanOrEqual"
+        },
+        "Distance": 300
+      },
+      "schema": "TargetDistanceCondition",
+      "end": 71332
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 71356,
+      "payload": 71368,
+      "length": 12,
+      "type": "AbsoluteHeight",
+      "kind": "ConditionHash",
+      "owner": "engage_apache/engage/engage/simpleEngage",
+      "group": "ConditionHash",
+      "parentOffset": 71344,
+      "treeOffset": 69504,
+      "fields": {
+        "Compare": {
+          "hash": "60",
+          "name": "LessThan"
+        },
+        "Distance": 300
+      },
+      "schema": "AbsoluteHeightCondition",
+      "end": 71388
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 71404,
+      "payload": 71416,
+      "length": 4,
+      "type": "HaveStrafeRunToken",
+      "kind": "ConditionHash",
+      "owner": "engage_apache/engage/engage/simpleEngage",
+      "group": "ConditionHash",
+      "parentOffset": 71280,
+      "treeOffset": 69504,
+      "fields": {
+        "RequestIt": false
+      },
+      "schema": "HaveStrafeRunTokenCondition",
+      "end": 71428
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 71716,
+      "payload": 71728,
+      "length": 80,
+      "type": "TryOpenStrafeRun",
+      "kind": "TrackHash",
+      "owner": "engage_apache/engage/engage/simpleEngage/tryOpenStrafeRun/#b97a0756485571ea",
+      "group": "TrackHash",
+      "parentOffset": 71704,
+      "treeOffset": 69504,
+      "fields": {
+        "Unknown1": 0,
+        "TimeBegin": 0,
+        "TimeEnd": -1,
+        "MaxHeightPath": 30,
+        "MaxHeightEnd": 30,
+        "MinHeightWithTarget": 10,
+        "EndHigherThanTarget": 15,
+        "MaxHeightStartWithTarget": 27,
+        "MinHeightStartWithTarget": 15,
+        "MaxLength": 40,
+        "MinLength": 20,
+        "MinLengthAfterTarget": 6,
+        "MinLengthBeforeTarget": 0,
+        "MaxHeightToIgnoreStartLength": 200,
+        "FreeRadiusStart": 20,
+        "FreeRadiusPath": 20,
+        "FreeRadiusEnd": 20,
+        "IfFound": {
+          "name": "",
+          "index": 11
+        },
+        "Priority": 0
+      },
+      "schema": "TryOpenStrafeRunTrack",
+      "end": 71836
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 71916,
+      "payload": 71928,
+      "length": 80,
+      "type": "TryOpenStrafeRun",
+      "kind": "TrackHash",
+      "owner": "engage_apache/engage/engage/simpleEngage/tryOpenStrafeRun/#977ba3c108166ad3",
+      "group": "TrackHash",
+      "parentOffset": 71904,
+      "treeOffset": 69504,
+      "fields": {
+        "Unknown1": 0,
+        "TimeBegin": 0,
+        "TimeEnd": -1,
+        "MaxHeightPath": 30,
+        "MaxHeightEnd": 30,
+        "MinHeightWithTarget": 10,
+        "EndHigherThanTarget": 15,
+        "MaxHeightStartWithTarget": 17,
+        "MinHeightStartWithTarget": 5,
+        "MaxLength": 40,
+        "MinLength": 20,
+        "MinLengthAfterTarget": 4,
+        "MinLengthBeforeTarget": 0,
+        "MaxHeightToIgnoreStartLength": 200,
+        "FreeRadiusStart": 20,
+        "FreeRadiusPath": 20,
+        "FreeRadiusEnd": 20,
+        "IfFound": {
+          "name": "",
+          "index": 11
+        },
+        "Priority": 0
+      },
+      "schema": "TryOpenStrafeRunTrack",
+      "end": 72036
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 72536,
+      "payload": 72548,
+      "length": 0,
+      "type": "False",
+      "kind": "ConditionHash",
+      "owner": "engage_apache/engage/engage/#35d7142e4807baf2",
+      "group": "ConditionHash",
+      "parentOffset": 72524,
+      "treeOffset": 69504,
+      "fields": {},
+      "schema": "FalseCondition",
+      "end": 72556
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 72564,
+      "payload": 72576,
+      "length": 20,
+      "type": "Node",
+      "kind": "BranchHash",
+      "owner": "engage_apache/engage/engage/#35d7142e4807baf2/simpleOpenStrafeRun",
+      "group": null,
+      "parentOffset": 72496,
+      "treeOffset": 69504,
+      "branchIndex": 11,
+      "end": 72932
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 72608,
+      "payload": 72620,
+      "length": 4,
+      "type": "HaveStrafeRunToken",
+      "kind": "ConditionHash",
+      "owner": "engage_apache/engage/engage/#35d7142e4807baf2/simpleOpenStrafeRun",
+      "group": "ConditionHash",
+      "parentOffset": 72596,
+      "treeOffset": 69504,
+      "fields": {
+        "RequestIt": true
+      },
+      "schema": "HaveStrafeRunTokenCondition",
+      "end": 72632
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 72652,
+      "payload": 72664,
+      "length": 20,
+      "type": "Spawn",
+      "kind": "TrackHash",
+      "owner": "engage_apache/engage/engage/#35d7142e4807baf2/simpleOpenStrafeRun",
+      "group": "TrackHash",
+      "parentOffset": 72640,
+      "treeOffset": 69504,
+      "fields": {
+        "Unknown1": 0,
+        "TimeBegin": 0,
+        "TimeEnd": -1,
+        "BranchRef": {
+          "name": "",
+          "index": 63
+        }
+      },
+      "schema": "SpawnTrack",
+      "end": 72712
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 72712,
+      "payload": 72724,
+      "length": 12,
+      "type": "RefreshStrafeRunToken",
+      "kind": "TrackHash",
+      "owner": "engage_apache/engage/engage/#35d7142e4807baf2/simpleOpenStrafeRun",
+      "group": "TrackHash",
+      "parentOffset": 72640,
+      "treeOffset": 69504,
+      "fields": {
+        "Unknown1": 1,
+        "TimeBegin": 0,
+        "TimeEnd": -1
+      },
+      "schema": "RefreshStrafeRunTokenTrack",
+      "end": 72744
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 72804,
+      "payload": 72816,
+      "length": 28,
+      "type": "Opportunity",
+      "kind": "TrackHash",
+      "owner": "engage_apache/engage/engage/#35d7142e4807baf2/simpleOpenStrafeRun",
+      "group": "TrackHash",
+      "parentOffset": 72640,
+      "treeOffset": 69504,
+      "fields": {
+        "Unknown1": 1,
+        "TimeBegin": 0,
+        "TimeEnd": -1,
+        "TimeHook": 0,
+        "BranchRef": {
+          "name": "",
+          "index": 2
+        },
+        "Priority": 0
+      },
+      "schema": "OpportunityTrack",
+      "end": 72916
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 72856,
+      "payload": 72868,
+      "length": 0,
+      "type": "Not",
+      "kind": "ConditionHash",
+      "owner": "engage_apache/engage/engage/#35d7142e4807baf2/simpleOpenStrafeRun",
+      "group": "ConditionHash",
+      "parentOffset": 72844,
+      "treeOffset": 69504,
+      "fields": {},
+      "schema": "NotCondition",
+      "end": 72876
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 72876,
+      "payload": 72888,
+      "length": 4,
+      "type": "HaveStrafeRunToken",
+      "kind": "ConditionHash",
+      "owner": "engage_apache/engage/engage/#35d7142e4807baf2/simpleOpenStrafeRun",
+      "group": "ConditionHash",
+      "parentOffset": 72844,
+      "treeOffset": 69504,
+      "fields": {
+        "RequestIt": true
+      },
+      "schema": "HaveStrafeRunTokenCondition",
+      "end": 72900
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 80972,
+      "payload": 80984,
+      "length": 4,
+      "type": "HaveStrafeRunToken",
+      "kind": "ConditionHash",
+      "owner": "engage_apache/engage/tactics/simpleOpenStrafeRun",
+      "group": "ConditionHash",
+      "parentOffset": 80960,
+      "treeOffset": 69504,
+      "fields": {
+        "RequestIt": true
+      },
+      "schema": "HaveStrafeRunTokenCondition",
+      "end": 80996
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 81048,
+      "payload": 81060,
+      "length": 4,
+      "type": "Random",
+      "kind": "ConditionHash",
+      "owner": "engage_apache/engage/tactics/simpleOpenStrafeRun/#c9cc312cdb857e62",
+      "group": "ConditionHash",
+      "parentOffset": 81036,
+      "treeOffset": 69504,
+      "fields": {
+        "Weight": 50
+      },
+      "schema": "RandomCondition",
+      "end": 81072
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 81092,
+      "payload": 81104,
+      "length": 20,
+      "type": "Execute",
+      "kind": "TrackHash",
+      "owner": "engage_apache/engage/tactics/simpleOpenStrafeRun/#c9cc312cdb857e62",
+      "group": "TrackHash",
+      "parentOffset": 81080,
+      "treeOffset": 69504,
+      "fields": {
+        "Unknown1": 0,
+        "TimeBegin": 0,
+        "TimeEnd": -1,
+        "BranchRef": {
+          "name": "",
+          "index": 81
+        }
+      },
+      "schema": "ExecuteTrack",
+      "end": 81152
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 81552,
+      "payload": 81564,
+      "length": 20,
+      "type": "Spawn",
+      "kind": "TrackHash",
+      "owner": "engage_apache/engage/tactics/simpleOpenStrafeRun/#c9cc312cdb857e62/attack/#52c6de05d63abd86/#62f258c78dd56a2a",
+      "group": "TrackHash",
+      "parentOffset": 81540,
+      "treeOffset": 69504,
+      "fields": {
+        "Unknown1": 0,
+        "TimeBegin": 0,
+        "TimeEnd": -1,
+        "BranchRef": {
+          "name": "",
+          "index": 151
+        }
+      },
+      "schema": "SpawnTrack",
+      "end": 81612
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 81660,
+      "payload": 81672,
+      "length": 32,
+      "type": "VariableIntSet",
+      "kind": "TrackHash",
+      "owner": "engage_apache/engage/tactics/simpleOpenStrafeRun/#c9cc312cdb857e62/attack/#52c6de05d63abd86/#62f258c78dd56a2a",
+      "group": "TrackHash",
+      "parentOffset": 81540,
+      "treeOffset": 69504,
+      "fields": {
+        "Unknown1": 1,
+        "TimeBegin": 0,
+        "Variable": {
+          "hash": "11377063296380899135",
+          "name": "WeaponSelected"
+        },
+        "Operator": {
+          "hash": "61",
+          "name": "#3d"
+        },
+        "Value": 1,
+        "Persistent": false
+      },
+      "schema": "VariableIntSetTrack",
+      "end": 81712
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 82392,
+      "payload": 82404,
+      "length": 4,
+      "type": "Random",
+      "kind": "ConditionHash",
+      "owner": "engage_apache/engage/tactics/simpleOpenStrafeRun/#715f4cc657a82ff3",
+      "group": "ConditionHash",
+      "parentOffset": 82380,
+      "treeOffset": 69504,
+      "fields": {
+        "Weight": 50
+      },
+      "schema": "RandomCondition",
+      "end": 82416
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 82416,
+      "payload": 82428,
+      "length": 20,
+      "type": "VariableIntCompare",
+      "kind": "ConditionHash",
+      "owner": "engage_apache/engage/tactics/simpleOpenStrafeRun/#715f4cc657a82ff3",
+      "group": "ConditionHash",
+      "parentOffset": 82380,
+      "treeOffset": 69504,
+      "fields": {
+        "Variable": {
+          "hash": "7712363393100529610",
+          "name": "blackwatchVariety"
+        },
+        "Compare": {
+          "hash": "4001598",
+          "name": "Equal"
+        },
+        "Value": 0
+      },
+      "schema": "VariableIntCompareCondition",
+      "end": 82456
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 84004,
+      "payload": 84016,
+      "length": 56,
+      "type": "SimpleOpenStrafeRun",
+      "kind": "TrackHash",
+      "owner": "engage_apache/engage/tactics/simpleOpenStrafeRun/#e0c62934304df0f3/#eb358a47ad76a0a/hydra",
+      "group": "TrackHash",
+      "parentOffset": 83992,
+      "treeOffset": 69504,
+      "fields": {
+        "Unknown1": 0,
+        "TimeBegin": 0,
+        "TimeEnd": -1,
+        "FreeRadiusPath": 20,
+        "FreeRadiusPathToStart": 20,
+        "MinHeightStartFromTarget": 10,
+        "MinHeightGoUpStart": 4,
+        "ReserveVolumeMargin": 5,
+        "ReserveVolumeSideRadius": 8,
+        "ToleranceToStart": 3,
+        "OrientAtEnd": true,
+        "SpeedFactor": [
+          -1,
+          -1,
+          -1
+        ]
+      },
+      "schema": "SimpleOpenStrafeRunTrack",
+      "end": 84080
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 84160,
+      "payload": 84172,
+      "length": 56,
+      "type": "SimpleOpenStrafeRun",
+      "kind": "TrackHash",
+      "owner": "engage_apache/engage/tactics/simpleOpenStrafeRun/#e0c62934304df0f3/#eb358a47ad76a0a/default",
+      "group": "TrackHash",
+      "parentOffset": 84148,
+      "treeOffset": 69504,
+      "fields": {
+        "Unknown1": 0,
+        "TimeBegin": 0,
+        "TimeEnd": -1,
+        "FreeRadiusPath": 20,
+        "FreeRadiusPathToStart": 20,
+        "MinHeightStartFromTarget": 10,
+        "MinHeightGoUpStart": 4,
+        "ReserveVolumeMargin": 5,
+        "ReserveVolumeSideRadius": 8,
+        "ToleranceToStart": 3,
+        "OrientAtEnd": true,
+        "SpeedFactor": [
+          -1,
+          -1,
+          -1
+        ]
+      },
+      "schema": "SimpleOpenStrafeRunTrack",
+      "end": 84236
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 84448,
+      "payload": 84460,
+      "length": 56,
+      "type": "SimpleOpenStrafeRun",
+      "kind": "TrackHash",
+      "owner": "engage_apache/engage/tactics/simpleOpenStrafeRun/#e0c62934304df0f3/#99593456a64db9fb/hydra",
+      "group": "TrackHash",
+      "parentOffset": 84436,
+      "treeOffset": 69504,
+      "fields": {
+        "Unknown1": 0,
+        "TimeBegin": 0,
+        "TimeEnd": -1,
+        "FreeRadiusPath": 20,
+        "FreeRadiusPathToStart": 20,
+        "MinHeightStartFromTarget": 10,
+        "MinHeightGoUpStart": 4,
+        "ReserveVolumeMargin": 5,
+        "ReserveVolumeSideRadius": 8,
+        "ToleranceToStart": 3,
+        "OrientAtEnd": true,
+        "SpeedFactor": [
+          -1,
+          -1,
+          -1
+        ]
+      },
+      "schema": "SimpleOpenStrafeRunTrack",
+      "end": 84524
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 84604,
+      "payload": 84616,
+      "length": 56,
+      "type": "SimpleOpenStrafeRun",
+      "kind": "TrackHash",
+      "owner": "engage_apache/engage/tactics/simpleOpenStrafeRun/#e0c62934304df0f3/#99593456a64db9fb/default",
+      "group": "TrackHash",
+      "parentOffset": 84592,
+      "treeOffset": 69504,
+      "fields": {
+        "Unknown1": 0,
+        "TimeBegin": 0,
+        "TimeEnd": -1,
+        "FreeRadiusPath": 20,
+        "FreeRadiusPathToStart": 20,
+        "MinHeightStartFromTarget": 10,
+        "MinHeightGoUpStart": 4,
+        "ReserveVolumeMargin": 5,
+        "ReserveVolumeSideRadius": 8,
+        "ToleranceToStart": 3,
+        "OrientAtEnd": true,
+        "SpeedFactor": [
+          -1,
+          -1,
+          -1
+        ]
+      },
+      "schema": "SimpleOpenStrafeRunTrack",
+      "end": 84680
+    }
+  ],
+  "evidence": [
+    {
+      "file": "D:\\PrototypeReference\\p1\\private\\rapid-runtime-1020e9c0.txt",
+      "sha256": "04c31a383c08a907da1175b0790fb2a9e51d38381659f215faa47cec1ddf3623"
+    },
+    {
+      "file": "D:\\PrototypeReference\\p1\\private\\rapid-runtime-10210840.txt",
+      "sha256": "d37b16437b12c341a885ae6569454d91dc0f22c9c4db2e380ae80c1ebe59286c"
+    },
+    {
+      "file": "D:\\PrototypeReference\\p1\\private\\rapid-runtime-1020c010.txt",
+      "sha256": "50e447f7d6b5de06a781665509058e4a0632723a478caa10715bd0bc99db5e3e"
+    },
+    {
+      "file": "D:\\PrototypeReference\\p1\\private\\rapid-runtime-1020f950.txt",
+      "sha256": "4f748c13435c34cb935c6bcb40b9c87555b47f36af88d60f5e4ceabff5dfb4e0"
+    },
+    {
+      "file": "D:\\PrototypeReference\\p1\\private\\rapid-runtime-1020f9b0.txt",
+      "sha256": "9e90b843a41ecf9798c3215b30e4abc70b6a05583f9f40c0a7b3dbe925edde9a"
+    },
+    {
+      "file": "D:\\PrototypeReference\\p1\\private\\rapid-runtime-1020b590.txt",
+      "sha256": "f7d90a55abdb9da052d646f52ba0d02c1936c711520208053f369cdf45e9b3f3"
+    },
+    {
+      "file": "D:\\PrototypeReference\\p1\\private\\rapid-runtime-102101b0.txt",
+      "sha256": "dd36530842975e6cef20d0e156e465d18db6a833fa4ac5e42e93176f5ac77922"
+    },
+    {
+      "file": "D:\\PrototypeReference\\p1\\private\\rapid-runtime-1020ea50.txt",
+      "sha256": "2d1f75be30bf26f72c5c6b3e256e896ea6f381056d3f9137aaa6d4982893bce3"
+    },
+    {
+      "file": "D:\\PrototypeReference\\p1\\private\\rapid-runtime-102147c0.txt",
+      "sha256": "89651e12fa299b39abf771206747f0e5407013e4854d43c9bb8a861f47b7007d"
+    },
+    {
+      "file": "D:\\PrototypeReference\\p1\\private\\rapid-runtime-10214a00.txt",
+      "sha256": "f641b00e26b206a19a5c05aac1e05b581652c40c8bc9b9f099646a08d76fc843"
+    },
+    {
+      "file": "D:\\PrototypeReference\\p1\\private\\rapid-runtime-102129a0.txt",
+      "sha256": "049e33eebd2a9bd4e3ecd73569c5ad1f57b3131daf51f5c008912ad565247e49"
+    },
+    {
+      "file": "D:\\PrototypeReference\\p1\\private\\rapid-runtime-1020c960.txt",
+      "sha256": "c2e4cea943dde70b5f72fbbec98db0bf5d61d7eb0cfed0b8136c3a8697b20070"
+    },
+    {
+      "file": "D:\\PrototypeReference\\p1\\private\\rapid-runtime-1020d360.txt",
+      "sha256": "29c83cc01b782b0e388ebf6574924fe83693737a60c908b53b918e09265885f5"
+    },
+    {
+      "file": "D:\\PrototypeReference\\p1\\private\\rapid-runtime-10212bc0.txt",
+      "sha256": "8b506938dc417c4cdf883a4e8c840caca52950debe530303ee18b041b1025134"
+    },
+    {
+      "file": "D:\\PrototypeReference\\p1\\private\\rapid-runtime-1020eb30.txt",
+      "sha256": "7a626307338b638e57fa04f2fe18c4451c7aee5db847d9991e55b5aed7c86f77"
+    }
+  ],
+  "vtables": {
+    "TryOpenStrafeRunAction": {
+      "table": "10dcdea8",
+      "start": "1020e9c0",
+      "update": "10210840",
+      "finish": "1020c010"
+    },
+    "SimpleOpenStrafeRunAction": {
+      "table": "10dcded8",
+      "start": "102147c0",
+      "update": "10214a00",
+      "finish": "102129a0"
+    }
+  },
+  "candidateFieldMap": {
+    "action+3c": "end",
+    "action+48": "raised target aim",
+    "action+54": "start",
+    "config+38": "EndHigherThanTarget15",
+    "config+3c": "FreeRadiusEnd20",
+    "config+40": "FreeRadiusPath20",
+    "config+44": "FreeRadiusStart20",
+    "config+48": "MaxHeightEnd30",
+    "config+4c": "MaxHeightPath30",
+    "config+50": "MaxHeightStartWithTarget hydra27/default17",
+    "config+54": "MaxHeightToIgnoreStartLength200",
+    "config+58": "MinHeightStartWithTarget hydra15/default5",
+    "config+5c": "MinHeightWithTarget10",
+    "config+60": "MinLengthBeforeTarget0",
+    "config+6c": "MaxLength40 cells",
+    "config+70": "MinLength20 cells",
+    "config+74": "MinLengthAfterTarget hydra6/default4"
+  },
+  "candidate": [
+    "1020f9b0 copies live target and actor positions. aim.y=max(target.y+10,areaHeight(target,20)). Maximum startY is aim.y+27(hydra)/17(default); minimum is aim.y+15/5.",
+    "If abs(craft.y-maximum)>200, source may extend start behind target by MinLengthBeforeTarget only when necessary; authored MinLengthBeforeTarget is0, so no horizontal adjustment occurs. It sets Y to maximum if above it or minimum if below it. Equality200 does not trigger this correction.",
+    "Start Y is raised to its areaHeight(start,20), rejected if it exceeds the maximum, then raised to the minimum. A moderately high aircraft is rejected; an extremely high one can receive the200-threshold correction. This unusual source distinction is retained.",
+    "Normalize horizontal target-start; multiply by navigation cell size. targetCells=ceil(horizontalDistance/cellSize), confirmed import11331e98=ceil. Loop i=0..39 advances one cell BEFORE testing. Any path areaHeight20-target.y>30 rejects the whole candidate.",
+    "An end candidate is considered only if i>20 AND i>targetCells+afterTarget(6/4). End areaHeight20-target.y must be strictly<30; equality30 cannot terminate but does not fail the path scan. First valid end wins, end.y=max(aim.y+15,endArea). These are cell-count indices, not a world-distance20 cutoff.",
+    "10210840 emits event type2100f only after a candidate succeeds.1020b590 stores start/aim/end at event+18/+24/+30;1020ea50 copies them to simple action+44/+38/+2c. Candidate is fixed for the resulting action, separate from tight-run cache/copy messages."
+  ],
+  "action": {
+    "begin": "102147c0 tests full3D distance from actor to start against ToleranceToStart^2=9. If farther, issue approach movement and orient to stored aim, state1. If within3, begin run directly only when aligned; otherwise state1 aligns without a new start move. Reservation first point is stored start when farther, actual actor position when within3.",
+    "alignment": "1020d360 requests temporary target direction toward the supplied point and calls1020c960. The latter normalizes horizontal toward vector and requires source forward dot>cos(0.26F); constant10dcdc1c=.25999999046325684. This is different from tight-run0.97.",
+    "prepare": "10214b57 state1 continuously orients to stored aim and requires BOTH movement-finished103b83b0 and alignment before calling10212bc0 to start state2.",
+    "run": "10212bc0 configures native navigation with stored aim as intermediate, sets per-axis SpeedFactor(-1,-1,-1), issues movement to fixed end and enables performStafeRun.10214ad8 waits for movement completion, resets the speed message, and with authored OrientAtEnd=true enters state3. There is no return leg.",
+    "orient": "10214a90 state3 faces CURRENT target position, not the stored candidate aim, and ends when1020d360 says aligned. No movement-finished condition is required here. Invalid actor/target ends the action.",
+    "finish": "102129a0 calls103853d0(owner) to remove only the owned volume, restores navigation settings and temporary performStafeRun/speed controls. MC releases volume and resets its navigation/state; token expires naturally."
+  },
+  "reservation": {
+    "function": "1020eb30 ->10385100; called once at begin, not updated every movement tick.",
+    "shape": "Horizontal oriented box from approachStart to fixed end; centerXZ midpoint. lowY=min(start.y,aim.y,end.y), highY=max(all3), centerY=(lowY+highY)/2. Along half extent=horizontalLength/2+ReserveVolumeMargin5; Y half extent=(highY-lowY)/2+5; side half extent=ReserveVolumeSideRadius8. The target aim can set the lowest Y even when both endpoints are higher.",
+    "ownership": "Same source owned table as other volumes. Native insertion does not deny overlaps. MC replaces only this UUID previous simple hold sphere; other owners are untouched. pointAvailable uses existing exact OBB/sphere containment, with independent heightHalf added so tight-run radius semantics remain unchanged.",
+    "replacement": "MC volume kind distinguishes sphere/ReserveVolume strafe track/open action. A later same-owner strafe track replaces an open box even when its start coincides; source track start-tolerance reuse cannot leak between distinct action kinds."
+  },
+  "liveIntegration": [
+    "Within SIMPLE, check source targetXZ distance<=300 and target.y<300 and tokenAvailable(Request=false) before candidate search. Candidate success then requests the short token and starts OPEN_STRAFE; this is the direct IfFound branch11, not a new weighted top-level tactic.",
+    "Native branch11 normally sits below a False sibling parent, reached by the event. It requests the token, spawns open tactic branch63 and refreshes the token while active. MC collapses repeated same-owner begin requests into one and refreshes each active tick; denial cancels the maneuver.",
+    "OPEN_STRAFE is internally an active SIMPLE opportunity but has independent diagnostic name/stages and fixed corridor. SIMPLE10-second bank opportunity is suspended after this branch replaces it. It does not use tight-route commit or circle helpers.",
+    "Every tick issues at most one flight request. Approach faces stored aim; run uses the stored aim as an intermediate swept waypoint then fixed end; orient holds and faces current observed target. Completion/navigation failure/sight loss/interruption releases the owned volume. Save diagnostics record OPEN_STRAFE but restore intentionally requires fresh selection instead of reconstructing this shared corridor.",
+    "For this Blackwatch aircraft (nonzero blackwatchVariety), only the source open branch with chin gun is eligible. Existing firing range/muzzle/allegiance/first-obstruction checks retain authority; the variety0 rocket branch is not relabeled or substituted."
+  ],
+  "adaptationsAndLimits": [
+    "One Minecraft block per native navigation cell in live calls; reusable candidate API exposes cellSize to preserve the original cell-count semantics.",
+    "HelicopterAirspace.areaHeight reads loaded chunks only, using odd-square loaded heightmaps. Unavailable/nonfinite samples and degenerate horizontal volumes fail closed. No chunk is loaded by production candidate or movement code.",
+    "Candidate attempts are bounded to one every10 ticks while conditions permit; source TryOpen checks every update. Native map area sampling is replaced by MC loaded terrain; no native fixture/emulation was run.",
+    "Native curved path/intermediate and temporary targeting messages are adapted to existing rotor/body swept navigation, acceleration and waypoints. SpeedFactor=-1 defaults are mapped to existing MC flight envelope factor1, not asserted equivalent to native per-axis tuning.",
+    "Serialized SimpleOpen MinHeightStartFromTarget10 and MinHeightGoUpStart4 are not read by inspected constructor/begin/update helpers; no behavior was invented from their names.",
+    "Floating point and trigonometry use Java Vec3/doubles rather than bit-identical x86 SSE/x87. Native gun scheduling and the full simpleEngage reaction graph remain separate work."
+  ],
+  "unrunCases": {
+    "HelicopterOpenStrafeTest": 8,
+    "HelicopterReservationsTest": "1 added,7 total",
+    "HelicopterTacticsGameTest": "1 added airTacticsOpen,4 total. Existing bank fixture now explicitly assigns the token to another craft to isolate SIMPLE hold from the new opportunity."
+  },
+  "deferredCommands": "Existing tools/player-fix-unit.init.gradle includes Helicopter*Test. Existing helicopter GameTest source set already includes HelicopterTacticsGameTest; new batch airTacticsOpen is not executed here.",
+  "files": [
+    "src/main/java/com/codex/blacklight/military/aircraft/HelicopterOpenStrafe.java",
+    "src/main/java/com/codex/blacklight/military/aircraft/HelicopterReservations.java",
+    "src/main/java/com/codex/blacklight/military/aircraft/HelicopterAirspace.java",
+    "src/main/java/com/codex/blacklight/military/aircraft/HelicopterTactics.java",
+    "src/test/java/com/codex/blacklight/military/aircraft/HelicopterOpenStrafeTest.java",
+    "src/test/java/com/codex/blacklight/military/aircraft/HelicopterReservationsTest.java",
+    "src/helicopterTest/java/com/codex/blacklight/military/aircraft/HelicopterTacticsGameTest.java"
+  ],
+  "fullGoalComplete": false
+}

@@ -1,0 +1,341 @@
+{
+  "schema": 2,
+  "date": "2026-11-17",
+  "state": "Source parsed and ordinary plus Thermobaric1 death code authored; NOT compiled, tests/client run, native execution/emulation or media playback.",
+  "sources": {
+    "input/comparison/Hydra_fig.p3d.rz": "6a9c1ab979ee6ee36b88a8fd2d3510094dec4a5095f006667735cf0f12c5d27e",
+    "private/comparison/Hydra.p3d": "b4bd053853eeb705699a0e7e24229e5f75dcd2cd8baa0eeef0fbeb75528ad5b1"
+  },
+  "figParsing": {
+    "completeTrees": 9,
+    "records": 1652,
+    "mainTree": [
+      5624,
+      96228
+    ],
+    "mainBranchCount": 219,
+    "context": "Track/condition hashes resolved by containing property. All length-delimited trees fully consumed; unrelated PrimitiveDisplay/WorldCone opaque suffixes do not affect this death chain."
+  },
+  "normal": {
+    "conditionOffset": 5708,
+    "condition": "Health<=0 absolute; fallback after earlier Thermobaric1 reaction branch.",
+    "dieNode": 6684,
+    "puppetOffset": 6748,
+    "clip": "hyd_death",
+    "clipOffset": 922035,
+    "assetFrames": 164,
+    "fps": 30,
+    "startFrame": 0,
+    "initFrame": 0,
+    "endFrame": 98,
+    "speed": 1,
+    "timeEnd": -1,
+    "blendIn": 0,
+    "blendOut": 0.16666699945926666,
+    "sequenceOffset": 7140,
+    "sequenceReference": 4,
+    "sequenceResolvedNode": 7584,
+    "sink": {
+      "puppetOffset": 7648,
+      "clip": "hyd_exit",
+      "clipOffset": 974321,
+      "frames": 55,
+      "fps": 30,
+      "startFrame": 0,
+      "initFrame": 27,
+      "endFrame": -1,
+      "lastValidFrame": 54,
+      "speed": 1,
+      "cyclic": "HoldEndFrame",
+      "blendIn": 0.16666699945926666,
+      "blendOut": 0,
+      "deathOffset": 7900,
+      "deathTime": 1.8333300352096558,
+      "deadTemplate": null,
+      "copyDrawable": false
+    },
+    "sourceAuxiliary": "Uninterruptible ignores hits/grabs; normal Spawn6876 ref203; grab-slot detach6980; target-class7104. Original sound/effect hashes retained below, no invented audio/FX substituted."
+  },
+  "thermobaric": {
+    "nodeOffset": 5752,
+    "conditionOffset": 5852,
+    "damageType": "Thermobaric1",
+    "damageHash": "0xf95bd0315221aad5",
+    "groupOffset": 6252,
+    "groupTimeBegin": 1,
+    "groupEndOffset": 6576,
+    "nestedEffectExecute": {
+      "offset": 6316,
+      "localTime": 0,
+      "reference": 214,
+      "node": 92708
+    },
+    "nestedHideExecute": {
+      "offset": 6376,
+      "localTime": 0.16666699945926666,
+      "reference": 218,
+      "node": 95692
+    },
+    "nestedDeath": {
+      "offset": 6516,
+      "localTime": 1
+    },
+    "mcBoundary": "Only DamageSource.directEntity OrdnanceProjectile definition.kind THERMOBARIC; OrdnanceProjectile.onHit currently forwards explosion(this,getOwner()) to actual target.hurt. Other explosion tags are insufficient. Dedicated death pose/hide/delete authored; original FX/audio and Crater lifecycle still pending.",
+    "hiddenOriginalShapes": [
+      "hydra_throatShape",
+      "hydra_bodyShape",
+      "hydra_L_knuckleShape",
+      "hydra_R_knuckleShape",
+      "hydra_L_clawShape",
+      "hydra_R_clawShape",
+      "hydra_tendonShape",
+      "hydra_mouthShape",
+      "hydra_tongueShape"
+    ],
+    "clockProof": "art/hydra/thermobaric-death-source.json",
+    "sourceGlobalSeconds": {
+      "burst": 1,
+      "hide": 1.1666669994592667,
+      "delete": 2
+    },
+    "mcTicks": {
+      "burstThresholdOnly": 20,
+      "hideBody": 24,
+      "delete": 40
+    }
+  },
+  "runtime": {
+    "files": [
+      "combat/HydraDeath.java",
+      "entity/BlacklightHydra.java",
+      "client/renderer/BlacklightHydraRenderer.java",
+      "mixin/HydraDeathGuardMixin.java"
+    ],
+    "normalDieTicks": 66,
+    "normalSinkTicks": 37,
+    "normalTotalTicks": 103,
+    "timingAdapter": "20Hz, ceil each source node independently; no actionAge gameTime catch-up while unloaded. Sink blends terminal frame98 to native exit init27, then holds frame54 until its own death timer.",
+    "rootAdapter": "Existing rooted MC Hydra actor remains fixed; original Character_Root skeletal vertical translation retained. Existing authored rigid rig and horizontal-controller-travel omission remain explicit, not original weighted skin or native actor physics.",
+    "lifecycle": "HydraDeathGuardMixin checks the first LivingEntity.dead GETFIELD after the cancelable loader death event and before score/loot. Reject replaced generation, restored positive health or removal; commit selected death kind andage0 before reward callbacks can save. Same-generation recursive die is suppressed; nested new-load generation restores caller epoch on return. Post-super cleanup releases capture/cargo; expiry/load never reissues die/rewards. Tagged load resumes observed age; healthy same-object load clears state; untagged legacy corpses keep old lifetime.",
+    "experience": "Neo dropAllDeathLoot calls dropExperience at accepted die. Forge m_6667_\u2192m_6668_\u2192m_21226_ confirms same; tickDeath does not grant XP. New expiry and load never call die/drop again.",
+    "protocols": {
+      "state": "Root coordinating protocol update for extra DEATH_KIND slot; see current Network.java in each platform."
+    },
+    "saveSchema": {
+      "HydraNativeDeathAge": "INT nonnegative capped to selected branch duration; old ordinary-only tags stay ordinary.",
+      "HydraNativeDeathKind": "INT0/1. Absent kind with age means pre-change ordinary. Present invalid kind/type or negative age declines native playback, retaining legacy expiry; healthy load clears type/age/hide.",
+      "sync": "DEATH_AGE INT(-1 inactive), DEATH_KIND INT(0 ordinary,1thermal); root owns protocol update.",
+      "transaction": "Existing first-dead-GETFIELD guard commits type andage before reward callbacks. Same-generation recursive die rejected. load/expiry never reissue die or rewards. Observed tick clock only; no unloaded catch-up."
+    },
+    "thermalTicks": {
+      "hideBody": 24,
+      "total": 40
+    }
+  },
+  "pendingTests": {
+    "unit": "HydraDeathTest4 methods",
+    "entity": "HydraDeathGameTest9 methods; thermal23/24/39/40, reward snapshot type, load without reveal, legacy and invalid NBT"
+  },
+  "limits": [
+    "No Java/Gradle/unit/GameTest/game/native execution/media playback performed.",
+    "Original death FX, sound patch delivery and Crater lifetime/slot detach visuals not ported in this stage.",
+    "Existing Hydra authored proportions/retarget are retained; full source skin, native physics and procedural controllers remain outside this change.",
+    "Visual acceptance still required:0/37/180degree facing, fatal hit during attack/carry, source collapse versus exit blend, underground visibility and save/reload.",
+    "The guard rejects replacement inside LivingDeathEvent before vanilla rewards; it does not roll back arbitrary side effects after execution has already entered vanilla loot callbacks.",
+    "Thermobaric clock/hide/delete closed in thermobaric-death-source.json; original burst/audio andCrater manager behavior remain incomplete."
+  ],
+  "sourceSoundFields": [
+    {
+      "offset": 7200,
+      "fields": {
+        "Unknown1": 1,
+        "TimeBegin": 0,
+        "Patch": {
+          "hash": "7696709824372853067",
+          "name": "#6ad034ce6d00c94b"
+        },
+        "Trigger": {
+          "hash": "31616665440155042",
+          "name": "play"
+        },
+        "VolumeFactor": 1,
+        "MinDistance": 100,
+        "MaxDistance": 400,
+        "MinPitch": 0.699999988079071,
+        "MaxPitch": 0.800000011920929,
+        "CyclicPhase": 0,
+        "InstanceName": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "Frequency": 1,
+        "PolledLifetime": false,
+        "TriggerType": {
+          "hash": "6266415434618234495",
+          "name": "StopExisting"
+        }
+      }
+    },
+    {
+      "offset": 7292,
+      "fields": {
+        "Unknown1": 1,
+        "TimeBegin": 1.5,
+        "Patch": {
+          "hash": "14110809045209754445",
+          "name": "#c3d3aa107918ab4d"
+        },
+        "Trigger": {
+          "hash": "31616665440155042",
+          "name": "play"
+        },
+        "VolumeFactor": 1,
+        "MinDistance": 0,
+        "MaxDistance": 0,
+        "MinPitch": 1,
+        "MaxPitch": 1,
+        "CyclicPhase": 0,
+        "InstanceName": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "Frequency": 1,
+        "PolledLifetime": false,
+        "TriggerType": {
+          "hash": "6266415434618234495",
+          "name": "StopExisting"
+        }
+      }
+    },
+    {
+      "offset": 7384,
+      "fields": {
+        "Unknown1": 1,
+        "TimeBegin": 2,
+        "Patch": {
+          "hash": "7696709824372853067",
+          "name": "#6ad034ce6d00c94b"
+        },
+        "Trigger": {
+          "hash": "31616665440155042",
+          "name": "play"
+        },
+        "VolumeFactor": 1,
+        "MinDistance": 100,
+        "MaxDistance": 400,
+        "MinPitch": 0.6000000238418579,
+        "MaxPitch": 0.699999988079071,
+        "CyclicPhase": 0,
+        "InstanceName": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "Frequency": 1,
+        "PolledLifetime": false,
+        "TriggerType": {
+          "hash": "6266415434618234495",
+          "name": "StopExisting"
+        }
+      }
+    },
+    {
+      "offset": 7476,
+      "fields": {
+        "Unknown1": 1,
+        "TimeBegin": 3,
+        "Patch": {
+          "hash": "14110809045209754445",
+          "name": "#c3d3aa107918ab4d"
+        },
+        "Trigger": {
+          "hash": "31616665440155042",
+          "name": "play"
+        },
+        "VolumeFactor": 1,
+        "MinDistance": 0,
+        "MaxDistance": 0,
+        "MinPitch": 1,
+        "MaxPitch": 1,
+        "CyclicPhase": 0,
+        "InstanceName": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "Frequency": 1,
+        "PolledLifetime": false,
+        "TriggerType": {
+          "hash": "6266415434618234495",
+          "name": "StopExisting"
+        }
+      }
+    },
+    {
+      "offset": 7944,
+      "fields": {
+        "Unknown1": 1,
+        "TimeBegin": 0,
+        "Patch": {
+          "hash": "8649376493881069221",
+          "name": "#7808c21846650ea5"
+        },
+        "Trigger": {
+          "hash": "31616665440155042",
+          "name": "play"
+        },
+        "VolumeFactor": 1,
+        "MinDistance": 0,
+        "MaxDistance": 0,
+        "MinPitch": 0.699999988079071,
+        "MaxPitch": 0.800000011920929,
+        "CyclicPhase": 0,
+        "InstanceName": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "Frequency": 1,
+        "PolledLifetime": false,
+        "TriggerType": {
+          "hash": "13522664087197083521",
+          "name": "Retrigger"
+        }
+      }
+    },
+    {
+      "offset": 8036,
+      "fields": {
+        "Unknown1": 1,
+        "TimeBegin": 0.20000000298023224,
+        "Patch": {
+          "hash": "6342337272149414978",
+          "name": "#58048225582f9442"
+        },
+        "Trigger": {
+          "hash": "31616665440155042",
+          "name": "play"
+        },
+        "VolumeFactor": 1,
+        "MinDistance": 0,
+        "MaxDistance": 0,
+        "MinPitch": 1,
+        "MaxPitch": 1,
+        "CyclicPhase": 0,
+        "InstanceName": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "Frequency": 1,
+        "PolledLifetime": true,
+        "TriggerType": {
+          "hash": "13522664087197083521",
+          "name": "Retrigger"
+        }
+      }
+    }
+  ],
+  "deathHookEvidence": {
+    "neo": "Cached 1.21.1 LivingEntity.die: CommonHooks.onLivingDeath\u2192if(!removed&&!dead)\u2192awardKillScore\u2192dead=true\u2192dropAllDeathLoot. Inject before unique dead GETFIELD, not after super.die.",
+    "forge": "Cached joined1.20.1 SRG LivingEntity.m_6667_: GETFIELD dead offset8; awardKillScore43; PUTFIELD dead100; dropAllDeathLoot154. Loader patch inserts cancelable ForgeHooks death event before this body.",
+    "checkPoint": "First dead GETFIELD ordinal0 BEFORE in both versions, no hook-owner/remap dependency.",
+    "privateClassProof": "D:/PrototypeReference/p1/private/hydra-death-xp-forge-class.json"
+  }
+}

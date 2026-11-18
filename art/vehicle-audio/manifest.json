@@ -1,0 +1,106 @@
+{
+  "generator": "tools/build-vehicle-audio.mjs",
+  "rate": 44100,
+  "cues": [
+    {
+      "name": "truck_engine",
+      "loop": true,
+      "seconds": 4,
+      "channels": 1,
+      "decodedPeak": 0.7117290496826172,
+      "rms": 0.21716611827384083,
+      "source": "Project-authored deterministic diesel pulses, exhaust and mechanical noise",
+      "sha256": "888cc503383c40f14fb5b4649aeb139ee0e96ab31ff3b8f8bc3c456e12b40607"
+    },
+    {
+      "name": "apc_engine",
+      "loop": true,
+      "seconds": 4,
+      "channels": 1,
+      "decodedPeak": 0.7291110157966614,
+      "rms": 0.24698765715966553,
+      "source": "Project-authored deterministic diesel pulses, exhaust and mechanical noise",
+      "sha256": "138e011185ae84f7cbe0d064a6101b647949009e11bc43606803fac5be6dc69c"
+    },
+    {
+      "name": "tank_engine",
+      "loop": true,
+      "seconds": 4,
+      "channels": 1,
+      "decodedPeak": 0.7083703279495239,
+      "rms": 0.2714040429902215,
+      "source": "Project-authored deterministic diesel pulses, exhaust and mechanical noise",
+      "sha256": "30a07ac4ce8103b36c8a7c87933e98bb9538dd613dcd0fae54ddac4019afc5c9"
+    },
+    {
+      "name": "wheels",
+      "loop": true,
+      "seconds": 4,
+      "channels": 1,
+      "decodedPeak": 0.6950347423553467,
+      "rms": 0.1655356588541561,
+      "source": "Project-authored deterministic tire roll / metallic track links",
+      "sha256": "b34ea96960f0ecd811dd1527a374e9f3b80447084f78d521272c8793c6f95f9c"
+    },
+    {
+      "name": "tracks",
+      "loop": true,
+      "seconds": 4,
+      "channels": 1,
+      "decodedPeak": 0.7323203086853027,
+      "rms": 0.11590706290806993,
+      "source": "Project-authored deterministic tire roll / metallic track links",
+      "sha256": "81f7050a706eb2167f68a98ebaa3f5b815018f8a6100571894b4852fe04df733"
+    },
+    {
+      "name": "autocannon_1",
+      "loop": false,
+      "seconds": 0.65,
+      "channels": 1,
+      "decodedPeak": 0.8815903663635254,
+      "rms": 0.07730126731269706,
+      "source": "Remix of existing project firearms/cannon_1 and rifle_1",
+      "sha256": "480f8ec77ef32a1f818a60922d8a508925eb726fa4b2f4d2674c6371e4ba5154"
+    },
+    {
+      "name": "coaxial_1",
+      "loop": false,
+      "seconds": 0.32,
+      "channels": 1,
+      "decodedPeak": 0.8032978773117065,
+      "rms": 0.07296107859390662,
+      "source": "Edited existing project firearms/rifle_1",
+      "sha256": "abed909eea00eacfde3b4fa7e24cb04f018b49a8ea4a44b76347356d34fcda14"
+    },
+    {
+      "name": "autocannon_2",
+      "loop": false,
+      "seconds": 0.65,
+      "channels": 1,
+      "decodedPeak": 0.8764662146568298,
+      "rms": 0.061972493871453066,
+      "source": "Remix of existing project firearms/cannon_2 and rifle_2",
+      "sha256": "1db09f0434424fe050c0e874fe52c1f518382e419cf86b235f48a66c96b3a9eb"
+    },
+    {
+      "name": "coaxial_2",
+      "loop": false,
+      "seconds": 0.32,
+      "channels": 1,
+      "decodedPeak": 0.8661573529243469,
+      "rms": 0.041692972352406724,
+      "source": "Edited existing project firearms/rifle_2",
+      "sha256": "435db460d514407fe6933ca66268280a6ecbb5ec9953b62df0a958454ea6712e"
+    },
+    {
+      "name": "rocket",
+      "loop": false,
+      "seconds": 0.95,
+      "channels": 1,
+      "decodedPeak": 0.9098168611526489,
+      "rms": 0.1034568416449843,
+      "source": "Project-authored launch pressure burst and exhaust",
+      "sha256": "b3beb40f687727766d72eb56274c1144c784c4e368ec0c59163e9ce42d11f28b"
+    }
+  ]
+}

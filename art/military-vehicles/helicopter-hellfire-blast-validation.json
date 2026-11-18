@@ -1,0 +1,761 @@
+{
+  "schema": 1,
+  "createdLocal": "2026-11-16T20:11:43",
+  "status": "Verified staged Hellfire checkpoint; full creatures/military/models/audio objective remains active.",
+  "source": {
+    "file": "D:\\blacklight-evolution\\art\\military-vehicles\\helicopter-hellfire-blast-source.json",
+    "sha256": "04ff78c276c7aafa3b1b622d0ecf62773fc83388f4fc40bbf974a9f0eaaaa1f8"
+  },
+  "platforms": {
+    "neo": {
+      "unitTests": 51,
+      "nativeHelicopterTests": 63,
+      "nativeVehicleRegression": 29,
+      "logs": {
+        "hellfireUnit": {
+          "file": "D:\\CodexCache\\hellfire-blast-qa\\neo-hellfireUnit-passed.log",
+          "sha256": "3fd6d564b1bde6b915dde87faadff751caf6da8ae2d142e43bd47a8e26ac3173"
+        },
+        "helicopterHullServer": {
+          "file": "D:\\CodexCache\\hellfire-blast-qa\\neo-helicopterHullServer-passed.log",
+          "sha256": "f720f94d8073b03966a8bc1150e9922e3f9c60f4708c083f6b64b5df22753e62"
+        },
+        "helicopterHullRegression": {
+          "file": "D:\\CodexCache\\hellfire-blast-qa\\neo-helicopterHullRegression-passed.log",
+          "sha256": "58d5e357e2b90ca95591b9cc3789c0c28497b84a2b76f64ec4dfa4569fca750c"
+        },
+        "hellfireBlastVisual": {
+          "file": "D:\\CodexCache\\hellfire-blast-qa\\neo-hellfireBlastVisual-passed.log",
+          "sha256": "9bda36f195e0462b19dcc606eba56b9cbb742393f5cb605096572232b49ac494"
+        }
+      },
+      "unitSuites": [
+        {
+          "suite": "com.codex.blacklight.firearms.GunplayFeedbackPayloadTest",
+          "tests": 2,
+          "file": "D:\\CodexCache\\hellfire-blast-qa\\neo-unit-xml\\TEST-com.codex.blacklight.firearms.GunplayFeedbackPayloadTest.xml",
+          "sha256": "0569050e9585d5257b9a8693adf692a032d177c0d640b99617585ea2c1cbbb63"
+        },
+        {
+          "suite": "com.codex.blacklight.military.aircraft.HelicopterArmamentTest",
+          "tests": 2,
+          "file": "D:\\CodexCache\\hellfire-blast-qa\\neo-unit-xml\\TEST-com.codex.blacklight.military.aircraft.HelicopterArmamentTest.xml",
+          "sha256": "64219e500cd467556c944e28724e093bb521d17b221e2eb771ab088c1aef7b72"
+        },
+        {
+          "suite": "com.codex.blacklight.military.aircraft.HelicopterAuthorityTest",
+          "tests": 2,
+          "file": "D:\\CodexCache\\hellfire-blast-qa\\neo-unit-xml\\TEST-com.codex.blacklight.military.aircraft.HelicopterAuthorityTest.xml",
+          "sha256": "b70e53269589bc4474a91af5cc444ef358116a65b7417c343fb9a247bfb290eb"
+        },
+        {
+          "suite": "com.codex.blacklight.military.aircraft.HelicopterBlastWaveTest",
+          "tests": 4,
+          "file": "D:\\CodexCache\\hellfire-blast-qa\\neo-unit-xml\\TEST-com.codex.blacklight.military.aircraft.HelicopterBlastWaveTest.xml",
+          "sha256": "a7c346ac8f4686409c459b7a881c4b905956fb9cf3974af37085bdaa64f95a97"
+        },
+        {
+          "suite": "com.codex.blacklight.military.aircraft.HelicopterFlightTest",
+          "tests": 4,
+          "file": "D:\\CodexCache\\hellfire-blast-qa\\neo-unit-xml\\TEST-com.codex.blacklight.military.aircraft.HelicopterFlightTest.xml",
+          "sha256": "869904f994742d0894059de7b2cf2e1fcdf10730251597cff4d7427323227178"
+        },
+        {
+          "suite": "com.codex.blacklight.military.aircraft.HelicopterGunCycleTest",
+          "tests": 3,
+          "file": "D:\\CodexCache\\hellfire-blast-qa\\neo-unit-xml\\TEST-com.codex.blacklight.military.aircraft.HelicopterGunCycleTest.xml",
+          "sha256": "df0adaeb066cc8e3e20ae7e7cd5028b9cbe0bf8305cf904095a24031c72ee3a4"
+        },
+        {
+          "suite": "com.codex.blacklight.military.aircraft.HelicopterMissileFlightTest",
+          "tests": 9,
+          "file": "D:\\CodexCache\\hellfire-blast-qa\\neo-unit-xml\\TEST-com.codex.blacklight.military.aircraft.HelicopterMissileFlightTest.xml",
+          "sha256": "83ec4e23a88099421cf3c6c6db608beb6a769180bd285803cfd77d5b216451df"
+        },
+        {
+          "suite": "com.codex.blacklight.military.aircraft.HelicopterRouteTest",
+          "tests": 8,
+          "file": "D:\\CodexCache\\hellfire-blast-qa\\neo-unit-xml\\TEST-com.codex.blacklight.military.aircraft.HelicopterRouteTest.xml",
+          "sha256": "4dea57ac155baa163a2e695bd5e542570ab8c494a166d67ebdda2fe5567d56c3"
+        },
+        {
+          "suite": "com.codex.blacklight.military.vehicle.VehicleControlAuthorityTest",
+          "tests": 11,
+          "file": "D:\\CodexCache\\hellfire-blast-qa\\neo-unit-xml\\TEST-com.codex.blacklight.military.vehicle.VehicleControlAuthorityTest.xml",
+          "sha256": "60e2894df4c7504939749a68f74eb4ae6083dfd1252690971c8ebf05694b463e"
+        },
+        {
+          "suite": "com.codex.blacklight.military.vehicle.VehicleWeaponDefinitionTest",
+          "tests": 6,
+          "file": "D:\\CodexCache\\hellfire-blast-qa\\neo-unit-xml\\TEST-com.codex.blacklight.military.vehicle.VehicleWeaponDefinitionTest.xml",
+          "sha256": "2fbd5ca915e32a74630de67a50b639590ac6a736ada547827264f17772288529"
+        }
+      ],
+      "client": {
+        "frames": 362,
+        "results": [
+          {
+            "case": "crossing_close",
+            "receipts": 2,
+            "removedAt": 28,
+            "initialHealth": 5000.0,
+            "health": 4900.0,
+            "lost": false
+          },
+          {
+            "case": "crossing_impact",
+            "receipts": 2,
+            "removedAt": 28,
+            "initialHealth": 5000.0,
+            "health": 4900.0,
+            "lost": false
+          },
+          {
+            "case": "wall",
+            "receipts": 2,
+            "removedAt": 20,
+            "initialHealth": 5000.0,
+            "health": 5000.0,
+            "lost": false
+          },
+          {
+            "case": "lost_target",
+            "receipts": 1,
+            "removedAt": -1,
+            "initialHealth": 5000.0,
+            "health": 5000.0,
+            "lost": true
+          }
+        ],
+        "activeSounds": [
+          "crossing_close:blacklight:firearm.impact",
+          "crossing_close:blacklight:vehicle.rocket",
+          "crossing_impact:blacklight:firearm.impact",
+          "crossing_impact:blacklight:vehicle.rocket",
+          "lost_target:blacklight:vehicle.rocket",
+          "wall:blacklight:firearm.impact",
+          "wall:blacklight:vehicle.rocket"
+        ],
+        "observedEffectAges": {
+          "crossing_close": [
+            1.59375,
+            59.59375
+          ],
+          "crossing_impact": [
+            1.59375,
+            59.59375
+          ],
+          "wall": [
+            0.75,
+            59.28125
+          ]
+        },
+        "evidence": {
+          "file": "D:\\CodexCache\\hellfire-blast-qa\\neo-frames\\evidence.json",
+          "sha256": "cb0cbef3d45f3a3f0c0dd38dbf4e086aaf2eebc8d0a45e9f54519af0bdaab263"
+        },
+        "reviewSheet": {
+          "file": "D:\\CodexCache\\hellfire-blast-qa\\neo-blast-review.png",
+          "sha256": "29de61d8cc7b34f11d44190d3511cc15d483286ae7d013c031b3ede70b273a2d"
+        },
+        "reviewedFrames": [
+          {
+            "file": "D:\\CodexCache\\hellfire-blast-qa\\neo-frames\\crossing_close-029.png",
+            "sha256": "f1da2ffc6d6bc6af42a53017d454120a691192657968d20796de97436441dd70",
+            "case": "crossing_close",
+            "sceneAge": 29,
+            "effects": [
+              {
+                "effectAge": 1.59375,
+                "weapon": 13
+              }
+            ]
+          },
+          {
+            "file": "D:\\CodexCache\\hellfire-blast-qa\\neo-frames\\crossing_close-033.png",
+            "sha256": "868ca73c2a51212df19b4aadfac39e4e343e1179aa670e496fd20d94b2826da8",
+            "case": "crossing_close",
+            "sceneAge": 33,
+            "effects": [
+              {
+                "effectAge": 5.75,
+                "weapon": 13
+              }
+            ]
+          },
+          {
+            "file": "D:\\CodexCache\\hellfire-blast-qa\\neo-frames\\crossing_close-055.png",
+            "sha256": "a247304d2be924f46ebff6027f56799fcf7122de5e864da52fb117364e9e8198",
+            "case": "crossing_close",
+            "sceneAge": 55,
+            "effects": [
+              {
+                "effectAge": 27.59375,
+                "weapon": 13
+              }
+            ]
+          },
+          {
+            "file": "D:\\CodexCache\\hellfire-blast-qa\\neo-frames\\crossing_close-085.png",
+            "sha256": "0f59b963b071895a19bc386b733b7b5359e2aa842572f36056d0f0907edb29ec",
+            "case": "crossing_close",
+            "sceneAge": 85,
+            "effects": [
+              {
+                "effectAge": 57.71875,
+                "weapon": 13
+              }
+            ]
+          },
+          {
+            "file": "D:\\CodexCache\\hellfire-blast-qa\\neo-frames\\crossing_impact-029.png",
+            "sha256": "0de9032ae812e7ae8303a25e94c8c71b354631204ae88548a5e99d6ee14f7994",
+            "case": "crossing_impact",
+            "sceneAge": 29,
+            "effects": [
+              {
+                "effectAge": 2.90625,
+                "weapon": 13
+              }
+            ]
+          },
+          {
+            "file": "D:\\CodexCache\\hellfire-blast-qa\\neo-frames\\crossing_impact-031.png",
+            "sha256": "db17a2f0c50ce202665276f65f6265a31222620b93ee5ea21c0e07a79f63ddae",
+            "case": "crossing_impact",
+            "sceneAge": 31,
+            "effects": [
+              {
+                "effectAge": 5.1875,
+                "weapon": 13
+              }
+            ]
+          },
+          {
+            "file": "D:\\CodexCache\\hellfire-blast-qa\\neo-frames\\crossing_impact-033.png",
+            "sha256": "1b7f70140d70c15b7668ac00b8fb72f4817570015dcc43832b1d1c1bc8b19a54",
+            "case": "crossing_impact",
+            "sceneAge": 33,
+            "effects": [
+              {
+                "effectAge": 7.03125,
+                "weapon": 13
+              }
+            ]
+          },
+          {
+            "file": "D:\\CodexCache\\hellfire-blast-qa\\neo-frames\\crossing_impact-036.png",
+            "sha256": "7e9a498bbb1c7fafffc326fcb7e4f61ebc005b38cb370d3f24eec9f49fc0b7c8",
+            "case": "crossing_impact",
+            "sceneAge": 36,
+            "effects": [
+              {
+                "effectAge": 9.71875,
+                "weapon": 13
+              }
+            ]
+          },
+          {
+            "file": "D:\\CodexCache\\hellfire-blast-qa\\neo-frames\\wall-020.png",
+            "sha256": "2fb86d6b3a4bbe357a939b3040eb24394222c36933061e571e09aa902e0b8ca3",
+            "case": "wall",
+            "sceneAge": 20,
+            "effects": [
+              {
+                "effectAge": 0.75,
+                "weapon": 13
+              }
+            ]
+          },
+          {
+            "file": "D:\\CodexCache\\hellfire-blast-qa\\neo-frames\\wall-021.png",
+            "sha256": "456b07ed2ef39dd2401e4ccaf62293cc7c9973bc234e72b6fbfc636286b1b6ca",
+            "case": "wall",
+            "sceneAge": 21,
+            "effects": [
+              {
+                "effectAge": 1.8125,
+                "weapon": 13
+              }
+            ]
+          },
+          {
+            "file": "D:\\CodexCache\\hellfire-blast-qa\\neo-frames\\wall-024.png",
+            "sha256": "49c8c0595b70ecd40464c7ba6da414552a48e3f80b47dca8f699924af1833dea",
+            "case": "wall",
+            "sceneAge": 24,
+            "effects": [
+              {
+                "effectAge": 4.59375,
+                "weapon": 13
+              }
+            ]
+          },
+          {
+            "file": "D:\\CodexCache\\hellfire-blast-qa\\neo-frames\\wall-028.png",
+            "sha256": "01ff46b579599b35960a2a2d78fd4133757fb5ac9b33b242b03a857501a4632b",
+            "case": "wall",
+            "sceneAge": 28,
+            "effects": [
+              {
+                "effectAge": 8.84375,
+                "weapon": 13
+              }
+            ]
+          },
+          {
+            "file": "D:\\CodexCache\\hellfire-blast-qa\\neo-frames\\wall-049.png",
+            "sha256": "affe62b9814b1a96a30f33093eda0edfa0a86bdfa595914b752ce4629bdf9376",
+            "case": "wall",
+            "sceneAge": 49,
+            "effects": [
+              {
+                "effectAge": 31.1875,
+                "weapon": 13
+              }
+            ]
+          },
+          {
+            "file": "D:\\CodexCache\\hellfire-blast-qa\\neo-frames\\wall-070.png",
+            "sha256": "e8ff3eed7762a443b8e02ceb8a60fc69772836d3c06db76f3843359af7e22fa8",
+            "case": "wall",
+            "sceneAge": 70,
+            "effects": [
+              {
+                "effectAge": 52.4375,
+                "weapon": 13
+              }
+            ]
+          },
+          {
+            "file": "D:\\CodexCache\\hellfire-blast-qa\\neo-frames\\wall-079.png",
+            "sha256": "4558c9bd8502e0e772f8e838890f0e2fb9440e6adc3c8f5297b989c64c325065",
+            "case": "wall",
+            "sceneAge": 79,
+            "effects": []
+          },
+          {
+            "file": "D:\\CodexCache\\hellfire-blast-qa\\neo-frames\\wall-095.png",
+            "sha256": "4558c9bd8502e0e772f8e838890f0e2fb9440e6adc3c8f5297b989c64c325065",
+            "case": "wall",
+            "sceneAge": 95,
+            "effects": []
+          }
+        ]
+      },
+      "code": {
+        "src/main/java/com/codex/blacklight/military/aircraft/HelicopterBlastWave.java": "f8593b517dac7403bdbac1db355e90ea3a24ec32c90e4c109b3ad74d54d4e80c",
+        "src/main/java/com/codex/blacklight/firearms/HellfireBlastEntity.java": "025fce2fe30d70bd927956fe3a437bd2e9cd7cbc9cb9da49f68ea8bd83c2084f",
+        "src/main/java/com/codex/blacklight/firearms/VehicleOrdnanceProjectile.java": "6d7fedad6ccea70ad9fe969d41f33e4a46f718e8f68dddd0f0d822acbdb364f0",
+        "src/main/java/com/codex/blacklight/military/aircraft/HelicopterCombat.java": "49bbfc72a9ff972e24a34c648bc82042646a7d2fe9cf4c3dcc7ec2b0bcd8927f",
+        "src/main/java/com/codex/blacklight/client/renderer/GunplayVisuals.java": "a6c91ce53580bf16add01aa653523c5ec1e5653ed6f579c4cbf33db389dd9ad8",
+        "src/main/java/com/codex/blacklight/client/ClientClawEvents.java": "9745b8214592c35f059f3fed33faaca077c8fabc7eee50f0f6505fc81a223489",
+        "src/main/java/com/codex/blacklight/registry/ModEntities.java": "0429ecf90a7c91510a2eebb80d24960d17a93b63c15145147ab7cb41de94860a",
+        "src/main/java/com/codex/blacklight/network/ModNetwork.java": "f5f144663f4f9179d9c2914aafe72eb421bb81691cd7f16a88c9cd8436637cbb",
+        "src/test/java/com/codex/blacklight/military/aircraft/HelicopterBlastWaveTest.java": "8c50983ef5ef41245cab6559d02474cef4467d8d9a55b6172cb6bef19ee55101",
+        "src/helicopterTest/java/com/codex/blacklight/gametest/HelicopterBlastGameTest.java": "7fcea1182a1e735631b106a9bb2f44e42ddab8edaf7db5f54443979cb3b114c8",
+        "src/helicopterTest/java/com/codex/blacklight/gametest/HelicopterCombatGameTest.java": "d436425d4525bd145cf4647ed9603fb2e1a20dca86a42ce8dc4b7c23ed764914",
+        "src/hellfireVisual/java/com/codex/blacklight/client/HellfireVisual.java": "dba955349794847b7947bb4677e60e271d65e6b6be4e483e57b2455275cf9ac9",
+        "tools/hellfire-blast-visual.init.gradle": "921b65ea2151e13b5bb0aa71a849ead826c10e6115899b3200b9c69de56977cf",
+        "tools/helicopter-hellfire-unit.init.gradle": "91c64bac3f49b5e628686ba97f5836ee87e8737a8f61d3ee7d6402084380b403",
+        "tools/helicopter-hull-test.init.gradle": "09fe6f28473fceeea5930c76ff1e06ab4c92465ab1ccea5c66b45be87ace83b7"
+      }
+    },
+    "forge": {
+      "unitTests": 51,
+      "nativeHelicopterTests": 63,
+      "nativeVehicleRegression": 29,
+      "logs": {
+        "hellfireUnit": {
+          "file": "D:\\CodexCache\\hellfire-blast-qa\\forge-hellfireUnit-passed.log",
+          "sha256": "676c86ad4b67dd51c38c22d4ff550729d4d7b56a0c87bda82bed529b3df98c97"
+        },
+        "helicopterHullServer": {
+          "file": "D:\\CodexCache\\hellfire-blast-qa\\forge-helicopterHullServer-passed.log",
+          "sha256": "742f00b5608525f2bb9fab7bdffc7035ddaa4487640dbf314b883f27aa794b6d"
+        },
+        "helicopterHullRegression": {
+          "file": "D:\\CodexCache\\hellfire-blast-qa\\forge-helicopterHullRegression-passed.log",
+          "sha256": "54a8095eca8fb647653ccd2744074704272f834f4856a8b96069e02500e82234"
+        },
+        "hellfireBlastVisual": {
+          "file": "D:\\CodexCache\\hellfire-blast-qa\\forge-hellfireBlastVisual-passed.log",
+          "sha256": "c8d5058e6aad902fe2260d53e8bd431d1522d21f796713f8bed6b296b2c6fe54"
+        }
+      },
+      "unitSuites": [
+        {
+          "suite": "com.codex.blacklight.firearms.GunplayFeedbackPayloadTest",
+          "tests": 2,
+          "file": "D:\\CodexCache\\hellfire-blast-qa\\forge-unit-xml\\TEST-com.codex.blacklight.firearms.GunplayFeedbackPayloadTest.xml",
+          "sha256": "e2267b1129ba15b1e8ec4940fba8d3dd0202d472d46c96bc3d87c875a1749c64"
+        },
+        {
+          "suite": "com.codex.blacklight.military.aircraft.HelicopterArmamentTest",
+          "tests": 2,
+          "file": "D:\\CodexCache\\hellfire-blast-qa\\forge-unit-xml\\TEST-com.codex.blacklight.military.aircraft.HelicopterArmamentTest.xml",
+          "sha256": "fa3daf125b2d9c80c154e35c1978c96e58259a8fcd2f92764462e422b45ef513"
+        },
+        {
+          "suite": "com.codex.blacklight.military.aircraft.HelicopterAuthorityTest",
+          "tests": 2,
+          "file": "D:\\CodexCache\\hellfire-blast-qa\\forge-unit-xml\\TEST-com.codex.blacklight.military.aircraft.HelicopterAuthorityTest.xml",
+          "sha256": "fe18242780a8d4113a12772d9a8ea77afb240ffbcd572d4a2d57213f1f36825d"
+        },
+        {
+          "suite": "com.codex.blacklight.military.aircraft.HelicopterBlastWaveTest",
+          "tests": 4,
+          "file": "D:\\CodexCache\\hellfire-blast-qa\\forge-unit-xml\\TEST-com.codex.blacklight.military.aircraft.HelicopterBlastWaveTest.xml",
+          "sha256": "c17a7fb597b033b84979a8bc2fdda4e58475be9940afe00781f48687dcad6e7b"
+        },
+        {
+          "suite": "com.codex.blacklight.military.aircraft.HelicopterFlightTest",
+          "tests": 4,
+          "file": "D:\\CodexCache\\hellfire-blast-qa\\forge-unit-xml\\TEST-com.codex.blacklight.military.aircraft.HelicopterFlightTest.xml",
+          "sha256": "126482e760b6ce1dbd8843683f43abb4f7f92e088dbb37d5297dbe0a512b3332"
+        },
+        {
+          "suite": "com.codex.blacklight.military.aircraft.HelicopterGunCycleTest",
+          "tests": 3,
+          "file": "D:\\CodexCache\\hellfire-blast-qa\\forge-unit-xml\\TEST-com.codex.blacklight.military.aircraft.HelicopterGunCycleTest.xml",
+          "sha256": "f3cda4bb3e71631173dee616a978f05a59309f3206e0afc2bdfa1eadffd0a87b"
+        },
+        {
+          "suite": "com.codex.blacklight.military.aircraft.HelicopterMissileFlightTest",
+          "tests": 9,
+          "file": "D:\\CodexCache\\hellfire-blast-qa\\forge-unit-xml\\TEST-com.codex.blacklight.military.aircraft.HelicopterMissileFlightTest.xml",
+          "sha256": "eb9858efafd75a7e7572e6f428dcd849f1da0bc19671104dbc7a4c747b1c7d57"
+        },
+        {
+          "suite": "com.codex.blacklight.military.aircraft.HelicopterRouteTest",
+          "tests": 8,
+          "file": "D:\\CodexCache\\hellfire-blast-qa\\forge-unit-xml\\TEST-com.codex.blacklight.military.aircraft.HelicopterRouteTest.xml",
+          "sha256": "fca14877389a8dc5e91959329c06a4842ac6d44298da258e4ee0226530917de8"
+        },
+        {
+          "suite": "com.codex.blacklight.military.vehicle.VehicleControlAuthorityTest",
+          "tests": 11,
+          "file": "D:\\CodexCache\\hellfire-blast-qa\\forge-unit-xml\\TEST-com.codex.blacklight.military.vehicle.VehicleControlAuthorityTest.xml",
+          "sha256": "f50d004cd91aa34ff83b95e9f9b8184313df6a54cd46f7cf281a0f3a528edc9c"
+        },
+        {
+          "suite": "com.codex.blacklight.military.vehicle.VehicleWeaponDefinitionTest",
+          "tests": 6,
+          "file": "D:\\CodexCache\\hellfire-blast-qa\\forge-unit-xml\\TEST-com.codex.blacklight.military.vehicle.VehicleWeaponDefinitionTest.xml",
+          "sha256": "8489a574c70715631d17b70cb5f28d7f60c75dcfbf8ada33d96fd629692656c9"
+        }
+      ],
+      "client": {
+        "frames": 384,
+        "results": [
+          {
+            "case": "crossing_close",
+            "receipts": 2,
+            "removedAt": 28,
+            "initialHealth": 5000.0,
+            "health": 4900.0,
+            "lost": false
+          },
+          {
+            "case": "crossing_impact",
+            "receipts": 2,
+            "removedAt": 28,
+            "initialHealth": 5000.0,
+            "health": 4900.0,
+            "lost": false
+          },
+          {
+            "case": "wall",
+            "receipts": 2,
+            "removedAt": 20,
+            "initialHealth": 5000.0,
+            "health": 5000.0,
+            "lost": false
+          },
+          {
+            "case": "lost_target",
+            "receipts": 1,
+            "removedAt": -1,
+            "initialHealth": 5000.0,
+            "health": 5000.0,
+            "lost": true
+          }
+        ],
+        "activeSounds": [
+          "crossing_close:blacklight:firearm.impact",
+          "crossing_close:blacklight:vehicle.rocket",
+          "crossing_impact:blacklight:firearm.impact",
+          "crossing_impact:blacklight:vehicle.rocket",
+          "lost_target:blacklight:vehicle.rocket",
+          "wall:blacklight:firearm.impact",
+          "wall:blacklight:vehicle.rocket"
+        ],
+        "observedEffectAges": {
+          "crossing_close": [
+            0.84375,
+            59.640625
+          ],
+          "crossing_impact": [
+            0.5625,
+            59.640625
+          ],
+          "wall": [
+            0.703125,
+            59.5
+          ]
+        },
+        "evidence": {
+          "file": "D:\\CodexCache\\hellfire-blast-qa\\forge-frames\\evidence.json",
+          "sha256": "d567acf26c0ef324ba98c9743124b2ce633a7bc279968edd95c130b290953597"
+        },
+        "reviewSheet": {
+          "file": "D:\\CodexCache\\hellfire-blast-qa\\forge-blast-review.png",
+          "sha256": "f69fa8a35e9bac0e58d246131bc865a4180bdd6dcf08cb710627c1178f858cba"
+        },
+        "reviewedFrames": [
+          {
+            "file": "D:\\CodexCache\\hellfire-blast-qa\\forge-frames\\crossing_close-029.png",
+            "sha256": "c3e213c1687970146ece5e165c604788e135940474d678306cd5a6708adf511d",
+            "case": "crossing_close",
+            "sceneAge": 29,
+            "effects": [
+              {
+                "effectAge": 1.4375,
+                "weapon": 13
+              }
+            ]
+          },
+          {
+            "file": "D:\\CodexCache\\hellfire-blast-qa\\forge-frames\\crossing_close-033.png",
+            "sha256": "31997ed1777e510473deb74762b22ff845d3c2b226662c499f1e94c924672f72",
+            "case": "crossing_close",
+            "sceneAge": 33,
+            "effects": [
+              {
+                "effectAge": 5.703125,
+                "weapon": 13
+              }
+            ]
+          },
+          {
+            "file": "D:\\CodexCache\\hellfire-blast-qa\\forge-frames\\crossing_close-055.png",
+            "sha256": "f9fce3b5192c81d4368937080f72825e4f347011cc09835076a503bc5340413a",
+            "case": "crossing_close",
+            "sceneAge": 55,
+            "effects": [
+              {
+                "effectAge": 27.5,
+                "weapon": 13
+              }
+            ]
+          },
+          {
+            "file": "D:\\CodexCache\\hellfire-blast-qa\\forge-frames\\crossing_close-085.png",
+            "sha256": "f8453b2baff61b8f8e0098d47469f29757c26d1cf13f2943abe15108eb2fd3df",
+            "case": "crossing_close",
+            "sceneAge": 85,
+            "effects": [
+              {
+                "effectAge": 57.703125,
+                "weapon": 13
+              }
+            ]
+          },
+          {
+            "file": "D:\\CodexCache\\hellfire-blast-qa\\forge-frames\\crossing_impact-029.png",
+            "sha256": "7268e66d3660adc90528b64ea42511db6676061238a6a39e225f9ef3ddd5a5bf",
+            "case": "crossing_impact",
+            "sceneAge": 29,
+            "effects": [
+              {
+                "effectAge": 1.78125,
+                "weapon": 13
+              }
+            ]
+          },
+          {
+            "file": "D:\\CodexCache\\hellfire-blast-qa\\forge-frames\\crossing_impact-031.png",
+            "sha256": "11ffea6e750495aee5ebd8d046b33606b1570ea0a73a81d6e5fa3745c3bf18a9",
+            "case": "crossing_impact",
+            "sceneAge": 31,
+            "effects": [
+              {
+                "effectAge": 3.65625,
+                "weapon": 13
+              }
+            ]
+          },
+          {
+            "file": "D:\\CodexCache\\hellfire-blast-qa\\forge-frames\\crossing_impact-033.png",
+            "sha256": "f462675a358110914ed8f86c93630035c14ae252e6f3939c881433a2905204cb",
+            "case": "crossing_impact",
+            "sceneAge": 33,
+            "effects": [
+              {
+                "effectAge": 5.625,
+                "weapon": 13
+              }
+            ]
+          },
+          {
+            "file": "D:\\CodexCache\\hellfire-blast-qa\\forge-frames\\crossing_impact-036.png",
+            "sha256": "1f404b2358ecfbe7f872d34d4de73d46d779e4e7f1b54117602c81ad9ac87dbf",
+            "case": "crossing_impact",
+            "sceneAge": 36,
+            "effects": [
+              {
+                "effectAge": 8.453125,
+                "weapon": 13
+              }
+            ]
+          },
+          {
+            "file": "D:\\CodexCache\\hellfire-blast-qa\\forge-frames\\wall-020.png",
+            "sha256": "06880c913184055ce477f5b2dec8f3103cac9fa6be5a28e7364b7bd16fa43202",
+            "case": "wall",
+            "sceneAge": 20,
+            "effects": [
+              {
+                "effectAge": 0.703125,
+                "weapon": 13
+              }
+            ]
+          },
+          {
+            "file": "D:\\CodexCache\\hellfire-blast-qa\\forge-frames\\wall-022.png",
+            "sha256": "8f136b8fc6d7883f239a1b42283aa34a691e1d868ee35827b614a3da464489fc",
+            "case": "wall",
+            "sceneAge": 22,
+            "effects": [
+              {
+                "effectAge": 2.453125,
+                "weapon": 13
+              }
+            ]
+          },
+          {
+            "file": "D:\\CodexCache\\hellfire-blast-qa\\forge-frames\\wall-024.png",
+            "sha256": "fff654558642be1a0d5c1e79e69ef8d62677bc92a6e3e1d5141238364b306aca",
+            "case": "wall",
+            "sceneAge": 24,
+            "effects": [
+              {
+                "effectAge": 4.59375,
+                "weapon": 13
+              }
+            ]
+          },
+          {
+            "file": "D:\\CodexCache\\hellfire-blast-qa\\forge-frames\\wall-028.png",
+            "sha256": "2607506df46a2769b682263e29ff10b9e0bfa7f5e808f288203018e91aa6ccfd",
+            "case": "wall",
+            "sceneAge": 28,
+            "effects": [
+              {
+                "effectAge": 8.765625,
+                "weapon": 13
+              }
+            ]
+          },
+          {
+            "file": "D:\\CodexCache\\hellfire-blast-qa\\forge-frames\\wall-050.png",
+            "sha256": "ec6de37612a62928552349bd3da9e091bd5f535251a75085958490221a71cc78",
+            "case": "wall",
+            "sceneAge": 50,
+            "effects": [
+              {
+                "effectAge": 29.578125,
+                "weapon": 13
+              }
+            ]
+          },
+          {
+            "file": "D:\\CodexCache\\hellfire-blast-qa\\forge-frames\\wall-070.png",
+            "sha256": "00becf1fabadc8d3bd293e313c4c1e33d05d4bfb43b23d9df2bd9a6f4da954a2",
+            "case": "wall",
+            "sceneAge": 70,
+            "effects": [
+              {
+                "effectAge": 49.578125,
+                "weapon": 13
+              }
+            ]
+          },
+          {
+            "file": "D:\\CodexCache\\hellfire-blast-qa\\forge-frames\\wall-079.png",
+            "sha256": "e020b5e97a7f11d1a72256e425b3acfd92cb09f5a738b8fca7c1aef67dc2a5ec",
+            "case": "wall",
+            "sceneAge": 79,
+            "effects": [
+              {
+                "effectAge": 58.71875,
+                "weapon": 13
+              }
+            ]
+          },
+          {
+            "file": "D:\\CodexCache\\hellfire-blast-qa\\forge-frames\\wall-095.png",
+            "sha256": "1a32ec4a42cb0bfba2d2939d8b9fa2d01b2dd394908a82d7f3d148cddd3fe70e",
+            "case": "wall",
+            "sceneAge": 95,
+            "effects": []
+          }
+        ]
+      },
+      "code": {
+        "src/main/java/com/codex/blacklight/military/aircraft/HelicopterBlastWave.java": "bce3e979ecdd66f1eb20728550216e9a772c626a54956d9084873afbce60e54c",
+        "src/main/java/com/codex/blacklight/firearms/HellfireBlastEntity.java": "26a5771facd059d7f89448b4ad64ec216e69fa85088fbdb782d6ef95026b36fd",
+        "src/main/java/com/codex/blacklight/firearms/VehicleOrdnanceProjectile.java": "70f658e4d6d45701f2dc983cab0410d545d4dcfb5a95ff0da097a8d520917345",
+        "src/main/java/com/codex/blacklight/military/aircraft/HelicopterCombat.java": "49bbfc72a9ff972e24a34c648bc82042646a7d2fe9cf4c3dcc7ec2b0bcd8927f",
+        "src/main/java/com/codex/blacklight/client/renderer/GunplayVisuals.java": "ea68f7fd0d2f0d461289a5f470c8dcc1113efb7e0f8e9b49c12af30c6b8ef6c9",
+        "src/main/java/com/codex/blacklight/client/ClientClawEvents.java": "728ddf413971a3fda42ec24f7f7f94ba616bc7b91d7b7a97b3bbaf6135c2d12a",
+        "src/main/java/com/codex/blacklight/registry/ModEntities.java": "7e83e44727a97bc8807acd783076b80777bee93bf86558a2cf2b7a4cdf720ccb",
+        "src/main/java/com/codex/blacklight/network/ModNetwork.java": "338d7d7c0ecb816b2265d230be717c89789c72ec7ff85ff57c3bd52cb5d05c01",
+        "src/test/java/com/codex/blacklight/military/aircraft/HelicopterBlastWaveTest.java": "f8af75353fe466c1336685b4bf7725f54c3e239ae1c96a8d91ba6389982287b2",
+        "src/helicopterTest/java/com/codex/blacklight/gametest/HelicopterBlastGameTest.java": "68a5602ffc875c4a6b5e7a18e976d5815b0ae1a534573a987edb95e6c8d6fb52",
+        "src/helicopterTest/java/com/codex/blacklight/gametest/HelicopterCombatGameTest.java": "68278048b9a7eab87ba68f5464b6e41fb0362e4f01bf00b1d4b187b2aa438589",
+        "src/hellfireVisual/java/com/codex/blacklight/client/HellfireVisual.java": "80412b66933591e47f620e315dad16dc5daf9f9d945af6c188225b306be4cc7f",
+        "tools/hellfire-blast-visual.init.gradle": "34d18f057ea8eaa2dd7eb0e24de5c234e829005d27b98c04590783b25d6a7114",
+        "tools/helicopter-hellfire-unit.init.gradle": "91c64bac3f49b5e628686ba97f5836ee87e8737a8f61d3ee7d6402084380b403",
+        "tools/helicopter-hull-test.init.gradle": "09fe6f28473fceeea5930c76ff1e06ab4c92465ab1ccea5c66b45be87ace83b7"
+      }
+    }
+  },
+  "coverage": [
+    "Four source-ratio rings sampled at 20 Hz; actual infected losses 100/20/7/3/0 with hurt immunity deliberately reset every tick to expose accidental stacking.",
+    "Actual NBT restoration retains contacts; a late entrant is hit once by the active ring; stale state cannot replay old damage.",
+    "Actual bedrock blocks the outer damage; originator stays unharmed; removing damage owner cancels pending damage.",
+    "Actual oriented tank hull lies in third ring, takes 1.4 base damage times .5 armor once; allied tank and both seated crews are protected.",
+    "Server final entity remains alive at tick 59 and expires at 60. Client holds a single cosmetic explosion beyond old tick 24 and removes it by scene completion.",
+    "Existing actual helicopter attack test now recognizes the persistent blast as damage source and verifies its originator is the mounted military pilot, preserving real sortie attribution."
+  ],
+  "visualReview": {
+    "scope": "32 selected native framebuffer frames reviewed as two 16-frame contact sheets. Arrival flash, radial streaks, continuing smoke and expiration are visible; wall scenario keeps target unharmed.",
+    "method": "Actual production projectile and feedback launched directly in guarded hidden disposable clients. No composited/generated game imagery. Snapshot sampling may miss a tick; report records actual captured frames.",
+    "sound": "7 real launch/impact SoundManager.isActive observations per platform, logical volume 1 with physical OpenAL listener gain 0. No subjective listening or original waveform match claimed."
+  },
+  "rejectedAttempts": [
+    {
+      "file": "D:\\CodexCache\\hellfire-blast-qa\\neo-server-old-source-assertion.log",
+      "reason": "New staged blast tests passed; an older sortie test still expected VehicleOrdnanceProjectile as direct damage entity. Updated assertion to require HellfireBlastEntity plus actual mounted military originator and real rocket shots, then reran all 63 tests.",
+      "sha256": "08077d4ee71227fb53bf95efd7f9fd56123f0cd67f6aa103e8307184b3f7c663"
+    },
+    {
+      "file": "D:\\CodexCache\\hellfire-blast-qa\\forge-regression-1g-shutdown-oom.log",
+      "reason": "29 assertions passed, but 1 GiB test JVM exhausted heap while closing/saving its disposable world. Rejected despite normal wrapper exit. Targeted Forge regression heap raised to 2 GiB; fresh run required clean shutdown and BUILD SUCCESSFUL.",
+      "sha256": "4109aa27e0d2b5c472b41f3fe94f448a654b07e591027517aebf5c94f1a23814"
+    }
+  ],
+  "limits": [
+    "Source 500/100/35/15 values are normalized to existing Minecraft base 20/4/1.4/.6; CombatScale and armor remain downstream. This does not claim raw original game damage or original multiplier logic.",
+    "One UUID contact set is supported by static shared-history analysis; original frame scheduling and capacity are not reproduced bit-for-bit.",
+    "Three-second Destroy timing is source-derived. Original smoke identities/lifetime and sound bank are unresolved; current smoke, flashes, streaks and impact cue are authored adaptations.",
+    "Original impulse units, .433333-second camera shake/AIMessage, ThreatBall and WorldDamage semantics remain open; existing block permissions and radius 4 are retained.",
+    "Fixture does not constitute new full helicopter AI motion/manual piloting or dedicated multiplayer verification. Hover/weapon selection, separate rapid unguided rack and original player capacities remain open.",
+    "No release JAR, installation, commit or user-world changes in this checkpoint."
+  ],
+  "qaDriver": {
+    "file": "D:\\CodexCache\\creature-combat-run.ps1",
+    "sha256": "bba386bfbc391a6ab8b0725137eb9d0e629dd00cccc1684e3067fa99961221f7"
+  }
+}

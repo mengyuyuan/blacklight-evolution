@@ -1,0 +1,923 @@
+{
+  "schema": "blacklight-helicopter-gun-envelope-source-1",
+  "date": "2026-11-17",
+  "status": "Implemented both loaders; static review only. Java compile, JUnit, GameTests and player testing deferred by user.",
+  "problem": "AI chin-gun fire previously only checked common muzzle8..72-block range and .9995 aim dot with a55deg yaw/65deg pitch gimbal. This admitted shots outside the selected source gun thread body envelope.",
+  "sourceFiles": [
+    {
+      "path": "D:\\PrototypeReference\\p1\\input\\prototypeenginef.dll",
+      "sha256": "8cba8da3412df4f49cd61d02445e87a0cda551dea4f2fc1e66b19c1bfe28a760"
+    },
+    {
+      "path": "D:\\PrototypeReference\\p1\\input\\startup_fig.p3d.rz",
+      "sha256": "96d84271e461cbe4566fb984359653b164257f88392c5bceb213c30f88527779"
+    },
+    {
+      "path": "D:\\PrototypeReference\\p1\\helicopter-weapons-complete.json",
+      "sha256": "70955751e9386c6b312918cc0843e6b808d1144dbede5b25181cf012314308fa"
+    }
+  ],
+  "privateProof": "D:\\PrototypeReference\\p1\\private\\helicopter-gun-envelope-proof.json",
+  "privateProofSha256": "7966e3f8e3d0cb4a06f560c62dd310d7b1295187738e3c061ec6df3b4862a9c8",
+  "native": {
+    "conditionVtables": {
+      "FacingAngleTarget": "10dcf6b0 slot9 -> 101e5e60",
+      "TargetDistance": "10dc2e0c slot9 -> 1011e650",
+      "slot7Correction": "slot7 is scalar deleting destructor, not evaluation"
+    },
+    "facingFields": {
+      "angleRadians": "+0xc",
+      "comparison": "+0x10",
+      "type": "+0x14: yaw0/pitch1",
+      "signed": "+0x18"
+    },
+    "facingRegistration": "102234f0 property metadata; 10d4f5a0 places yaw at11254ea8 and pitch at11254eb0; 1021e8c0 converts authored degrees with float pi/180 at10d93e54.",
+    "targetReferences": "Both evaluators resolve current actor handle and 103b8af0 target handle, fail on missing/stale generation, and subtract actor GameObject matrix translation from target translation. No muzzle/skin offset in these two conditions.",
+    "worldForward": "101e5ee0..101e5f18 negates actor matrix rowZ at +24,+28,+2c (matrix begins transform+4).",
+    "yaw": "101e5f6d..101e5f79 zeroes both forward.y and targetDelta.y, then normalizes both. acos(clamped dot) at101e5fb5..101e6021.",
+    "pitch": "101e5f80 normalizes forward;101e5f8b normalizes targetDelta;101e5f90..101e5fa2 replaces targetDelta.xz with normalized forward.xz;101e5fae normalizes altered target vector; then acos(clamped dot). Signed=false bypasses101e602b..101e6070 sign logic.",
+    "pitchConsequence": "For horizontal normalized forward, pitch=atan(abs(delta.y)/length(delta)), not atan2(abs(delta.y),horizontalLength(delta)). Raw30deg boundary corresponds to a geometric elevation about35.264deg. Raw40deg corresponds about57.045deg. Actual body pitch changes this formula; source is not reduced to a fixed elevation threshold.",
+    "normalize": "107badf0 normalizes in place; squared length below float9.999999439624929e-11 becomes zero. No hypothetical vector algorithm inferred from field name.",
+    "distance": "1011e6de..1011e728 builds target-minus-actor translation,107bc530 dots it with actor matrix rows (no second translation).107de5a0 switch:0X,1Y,2Z,3XZ length,4XYZ length,5AbsX,6AbsY,7AbsZ.",
+    "comparisons": "1009e110 direct floating compare implements strict/non-strict source comparator; uses native floats. Java uses double Vec3/Math, preserving formula and operator rather than claiming bit-identical native roundoff."
+  },
+  "mapping": [
+    {
+      "mcTactic": "CIRCLE",
+      "spawn": 74252,
+      "branch": 127,
+      "weaponSelected1": 74428
+    },
+    {
+      "mcTactic": "SIMPLE without active open opportunity",
+      "spawn": 93312,
+      "branch": 127,
+      "weaponSelected1": 93420
+    },
+    {
+      "mcTactic": "STRAFE preparation",
+      "spawn": 75648,
+      "branch": 151,
+      "weaponSelected1": 75824
+    },
+    {
+      "mcTactic": "STRAFE Blackwatch run",
+      "spawn": 76988,
+      "branch": 151,
+      "weaponSelected1": 77164,
+      "condition": {
+        "offset": 76300,
+        "blackwatchVariety": "!=0"
+      }
+    },
+    {
+      "mcTactic": "OPEN_STRAFE",
+      "spawn": 81552,
+      "branch": 151,
+      "weaponSelected1": 81660,
+      "priorSourceRecord": "helicopter-open-strafe-source.json"
+    }
+  ],
+  "profiles": {
+    "127": {
+      "localXZ": {
+        "minExclusive": 1,
+        "maxInclusive": 60
+      },
+      "localY": "<0 and abs<=30",
+      "unsignedYawDegrees": "<=60",
+      "unsignedNativePitchDegrees": {
+        "helicopter": "<=40",
+        "other": "<=30"
+      }
+    },
+    "151": {
+      "localXZ": {
+        "minExclusive": 10,
+        "maxInclusive": 100
+      },
+      "unsignedYawDegrees": "<=25",
+      "unsignedNativePitchDegrees": "<45",
+      "localY": "no explicit Y/AbsY gate in this shooting condition group"
+    }
+  },
+  "rawRecords": [
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 74252,
+      "payload": 74264,
+      "length": 20,
+      "type": "Spawn",
+      "kind": "TrackHash",
+      "owner": "engage_apache/engage/tactics/circleStrafe/attack/attack/#52c6de05d63abd86/#62f258c78dd56a2a",
+      "group": "TrackHash",
+      "parentOffset": 74240,
+      "treeOffset": 69504,
+      "fields": {
+        "Unknown1": 0,
+        "TimeBegin": 0,
+        "TimeEnd": -1,
+        "BranchRef": {
+          "name": "",
+          "index": 127
+        }
+      },
+      "schema": "SpawnTrack",
+      "end": 74312
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 74428,
+      "payload": 74440,
+      "length": 32,
+      "type": "VariableIntSet",
+      "kind": "TrackHash",
+      "owner": "engage_apache/engage/tactics/circleStrafe/attack/attack/#52c6de05d63abd86/#62f258c78dd56a2a",
+      "group": "TrackHash",
+      "parentOffset": 74240,
+      "treeOffset": 69504,
+      "fields": {
+        "Unknown1": 1,
+        "TimeBegin": 0,
+        "Variable": {
+          "hash": "11377063296380899135",
+          "name": "WeaponSelected"
+        },
+        "Operator": {
+          "hash": "61",
+          "name": "#3d"
+        },
+        "Value": 1,
+        "Persistent": false
+      },
+      "schema": "VariableIntSetTrack",
+      "end": 74480
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 75648,
+      "payload": 75660,
+      "length": 20,
+      "type": "Spawn",
+      "kind": "TrackHash",
+      "owner": "engage_apache/engage/tactics/strafeRun/strafeRun/attack/#52c6de05d63abd86/#52c6de05d63abd86/normal/#62f258c78dd56a2a",
+      "group": "TrackHash",
+      "parentOffset": 75636,
+      "treeOffset": 69504,
+      "fields": {
+        "Unknown1": 0,
+        "TimeBegin": 0,
+        "TimeEnd": -1,
+        "BranchRef": {
+          "name": "",
+          "index": 151
+        }
+      },
+      "schema": "SpawnTrack",
+      "end": 75708
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 75824,
+      "payload": 75836,
+      "length": 32,
+      "type": "VariableIntSet",
+      "kind": "TrackHash",
+      "owner": "engage_apache/engage/tactics/strafeRun/strafeRun/attack/#52c6de05d63abd86/#52c6de05d63abd86/normal/#62f258c78dd56a2a",
+      "group": "TrackHash",
+      "parentOffset": 75636,
+      "treeOffset": 69504,
+      "fields": {
+        "Unknown1": 1,
+        "TimeBegin": 0,
+        "Variable": {
+          "hash": "11377063296380899135",
+          "name": "WeaponSelected"
+        },
+        "Operator": {
+          "hash": "61",
+          "name": "#3d"
+        },
+        "Value": 1,
+        "Persistent": false
+      },
+      "schema": "VariableIntSetTrack",
+      "end": 75876
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 76300,
+      "payload": 76312,
+      "length": 20,
+      "type": "VariableIntCompare",
+      "kind": "ConditionHash",
+      "owner": "engage_apache/engage/tactics/strafeRun/strafeRun/#152688dae6a3722a/#54a60aaa368b5bea",
+      "group": "ConditionHash",
+      "parentOffset": 76264,
+      "treeOffset": 69504,
+      "fields": {
+        "Variable": {
+          "hash": "7712363393100529610",
+          "name": "blackwatchVariety"
+        },
+        "Compare": {
+          "hash": "2164770",
+          "name": "NotEqual"
+        },
+        "Value": 0
+      },
+      "schema": "VariableIntCompareCondition",
+      "end": 76340
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 76988,
+      "payload": 77000,
+      "length": 20,
+      "type": "Spawn",
+      "kind": "TrackHash",
+      "owner": "engage_apache/engage/tactics/strafeRun/strafeRun/#152688dae6a3722a/#54a60aaa368b5bea/attack/#52c6de05d63abd86/#52c6de05d63abd86/normal/#62f258c78dd56a2a",
+      "group": "TrackHash",
+      "parentOffset": 76976,
+      "treeOffset": 69504,
+      "fields": {
+        "Unknown1": 0,
+        "TimeBegin": 0,
+        "TimeEnd": -1,
+        "BranchRef": {
+          "name": "",
+          "index": 151
+        }
+      },
+      "schema": "SpawnTrack",
+      "end": 77048
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 77164,
+      "payload": 77176,
+      "length": 32,
+      "type": "VariableIntSet",
+      "kind": "TrackHash",
+      "owner": "engage_apache/engage/tactics/strafeRun/strafeRun/#152688dae6a3722a/#54a60aaa368b5bea/attack/#52c6de05d63abd86/#52c6de05d63abd86/normal/#62f258c78dd56a2a",
+      "group": "TrackHash",
+      "parentOffset": 76976,
+      "treeOffset": 69504,
+      "fields": {
+        "Unknown1": 1,
+        "TimeBegin": 0,
+        "Variable": {
+          "hash": "11377063296380899135",
+          "name": "WeaponSelected"
+        },
+        "Operator": {
+          "hash": "61",
+          "name": "#3d"
+        },
+        "Value": 1,
+        "Persistent": false
+      },
+      "schema": "VariableIntSetTrack",
+      "end": 77216
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 81552,
+      "payload": 81564,
+      "length": 20,
+      "type": "Spawn",
+      "kind": "TrackHash",
+      "owner": "engage_apache/engage/tactics/simpleOpenStrafeRun/#c9cc312cdb857e62/attack/#52c6de05d63abd86/#62f258c78dd56a2a",
+      "group": "TrackHash",
+      "parentOffset": 81540,
+      "treeOffset": 69504,
+      "fields": {
+        "Unknown1": 0,
+        "TimeBegin": 0,
+        "TimeEnd": -1,
+        "BranchRef": {
+          "name": "",
+          "index": 151
+        }
+      },
+      "schema": "SpawnTrack",
+      "end": 81612
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 81660,
+      "payload": 81672,
+      "length": 32,
+      "type": "VariableIntSet",
+      "kind": "TrackHash",
+      "owner": "engage_apache/engage/tactics/simpleOpenStrafeRun/#c9cc312cdb857e62/attack/#52c6de05d63abd86/#62f258c78dd56a2a",
+      "group": "TrackHash",
+      "parentOffset": 81540,
+      "treeOffset": 69504,
+      "fields": {
+        "Unknown1": 1,
+        "TimeBegin": 0,
+        "Variable": {
+          "hash": "11377063296380899135",
+          "name": "WeaponSelected"
+        },
+        "Operator": {
+          "hash": "61",
+          "name": "#3d"
+        },
+        "Value": 1,
+        "Persistent": false
+      },
+      "schema": "VariableIntSetTrack",
+      "end": 81712
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 93312,
+      "payload": 93324,
+      "length": 20,
+      "type": "Spawn",
+      "kind": "TrackHash",
+      "owner": "engage_apache/engage/tactics/simpleEngage/attack/#52c6de05d63abd86/#62f258c78dd56a2a",
+      "group": "TrackHash",
+      "parentOffset": 93300,
+      "treeOffset": 69504,
+      "fields": {
+        "Unknown1": 0,
+        "TimeBegin": 0,
+        "TimeEnd": -1,
+        "BranchRef": {
+          "name": "",
+          "index": 127
+        }
+      },
+      "schema": "SpawnTrack",
+      "end": 93372
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 93420,
+      "payload": 93432,
+      "length": 32,
+      "type": "VariableIntSet",
+      "kind": "TrackHash",
+      "owner": "engage_apache/engage/tactics/simpleEngage/attack/#52c6de05d63abd86/#62f258c78dd56a2a",
+      "group": "TrackHash",
+      "parentOffset": 93300,
+      "treeOffset": 69504,
+      "fields": {
+        "Unknown1": 1,
+        "TimeBegin": 0,
+        "Variable": {
+          "hash": "11377063296380899135",
+          "name": "WeaponSelected"
+        },
+        "Operator": {
+          "hash": "61",
+          "name": "#3d"
+        },
+        "Value": 1,
+        "Persistent": false
+      },
+      "schema": "VariableIntSetTrack",
+      "end": 93472
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 95352,
+      "payload": 95364,
+      "length": 20,
+      "type": "TargetDistance",
+      "kind": "ConditionHash",
+      "owner": "engage_apache/engage/tactics/#ecdcb3134ef3dcd/#7cb91c66cb0b226e/control/#60e8dadce8b372e2/#60e8dadce8b372e2/shoot",
+      "group": "ConditionHash",
+      "parentOffset": 95340,
+      "treeOffset": 69504,
+      "fields": {
+        "Direction": {
+          "hash": "5772786",
+          "name": "XZ"
+        },
+        "Compare": {
+          "hash": "3935993",
+          "name": "LessThanOrEqual"
+        },
+        "Distance": 60
+      },
+      "schema": "TargetDistanceCondition",
+      "end": 95392
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 95392,
+      "payload": 95404,
+      "length": 20,
+      "type": "TargetDistance",
+      "kind": "ConditionHash",
+      "owner": "engage_apache/engage/tactics/#ecdcb3134ef3dcd/#7cb91c66cb0b226e/control/#60e8dadce8b372e2/#60e8dadce8b372e2/shoot",
+      "group": "ConditionHash",
+      "parentOffset": 95340,
+      "treeOffset": 69504,
+      "fields": {
+        "Direction": {
+          "hash": "5772786",
+          "name": "XZ"
+        },
+        "Compare": {
+          "hash": "62",
+          "name": "MoreThan"
+        },
+        "Distance": 1
+      },
+      "schema": "TargetDistanceCondition",
+      "end": 95432
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 95432,
+      "payload": 95444,
+      "length": 20,
+      "type": "TargetDistance",
+      "kind": "ConditionHash",
+      "owner": "engage_apache/engage/tactics/#ecdcb3134ef3dcd/#7cb91c66cb0b226e/control/#60e8dadce8b372e2/#60e8dadce8b372e2/shoot",
+      "group": "ConditionHash",
+      "parentOffset": 95340,
+      "treeOffset": 69504,
+      "fields": {
+        "Direction": {
+          "hash": "18348266184121449",
+          "name": "AbsY"
+        },
+        "Compare": {
+          "hash": "3935993",
+          "name": "LessThanOrEqual"
+        },
+        "Distance": 30
+      },
+      "schema": "TargetDistanceCondition",
+      "end": 95472
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 95472,
+      "payload": 95484,
+      "length": 20,
+      "type": "TargetDistance",
+      "kind": "ConditionHash",
+      "owner": "engage_apache/engage/tactics/#ecdcb3134ef3dcd/#7cb91c66cb0b226e/control/#60e8dadce8b372e2/#60e8dadce8b372e2/shoot",
+      "group": "ConditionHash",
+      "parentOffset": 95340,
+      "treeOffset": 69504,
+      "fields": {
+        "Direction": {
+          "hash": "89",
+          "name": "Y"
+        },
+        "Compare": {
+          "hash": "60",
+          "name": "LessThan"
+        },
+        "Distance": 0
+      },
+      "schema": "TargetDistanceCondition",
+      "end": 95512
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 95512,
+      "payload": 95524,
+      "length": 24,
+      "type": "FacingAngleTarget",
+      "kind": "ConditionHash",
+      "owner": "engage_apache/engage/tactics/#ecdcb3134ef3dcd/#7cb91c66cb0b226e/control/#60e8dadce8b372e2/#60e8dadce8b372e2/shoot",
+      "group": "ConditionHash",
+      "parentOffset": 95340,
+      "treeOffset": 69504,
+      "fields": {
+        "Type": {
+          "hash": "520688520109",
+          "name": "yaw"
+        },
+        "CompareTime": {
+          "hash": "3935993",
+          "name": "LessThanOrEqual"
+        },
+        "Angle": 60,
+        "Signed": false
+      },
+      "schema": "FacingAngleTargetCondition",
+      "end": 95556
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 95556,
+      "payload": 95568,
+      "length": 0,
+      "type": "ConditionGroup",
+      "kind": "ConditionHash",
+      "owner": "engage_apache/engage/tactics/#ecdcb3134ef3dcd/#7cb91c66cb0b226e/control/#60e8dadce8b372e2/#60e8dadce8b372e2/shoot",
+      "group": "ConditionHash",
+      "parentOffset": 95340,
+      "treeOffset": 69504,
+      "fields": {},
+      "schema": "ConditionGroupCondition",
+      "end": 95844
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 95568,
+      "payload": 95580,
+      "length": 0,
+      "type": "Conditions",
+      "kind": "PropertyHash",
+      "owner": "engage_apache/engage/tactics/#ecdcb3134ef3dcd/#7cb91c66cb0b226e/control/#60e8dadce8b372e2/#60e8dadce8b372e2/shoot",
+      "group": "ConditionHash",
+      "parentOffset": 95556,
+      "treeOffset": 69504,
+      "end": 95836
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 95580,
+      "payload": 95592,
+      "length": 0,
+      "type": "ConditionGroup",
+      "kind": "ConditionHash",
+      "owner": "engage_apache/engage/tactics/#ecdcb3134ef3dcd/#7cb91c66cb0b226e/control/#60e8dadce8b372e2/#60e8dadce8b372e2/shoot",
+      "group": "ConditionHash",
+      "parentOffset": 95568,
+      "treeOffset": 69504,
+      "fields": {},
+      "schema": "ConditionGroupCondition",
+      "end": 95684
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 95592,
+      "payload": 95604,
+      "length": 0,
+      "type": "Conditions",
+      "kind": "PropertyHash",
+      "owner": "engage_apache/engage/tactics/#ecdcb3134ef3dcd/#7cb91c66cb0b226e/control/#60e8dadce8b372e2/#60e8dadce8b372e2/shoot",
+      "group": "ConditionHash",
+      "parentOffset": 95580,
+      "treeOffset": 69504,
+      "end": 95676
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 95604,
+      "payload": 95616,
+      "length": 0,
+      "type": "TargetIsHelicopter",
+      "kind": "ConditionHash",
+      "owner": "engage_apache/engage/tactics/#ecdcb3134ef3dcd/#7cb91c66cb0b226e/control/#60e8dadce8b372e2/#60e8dadce8b372e2/shoot",
+      "group": "ConditionHash",
+      "parentOffset": 95592,
+      "treeOffset": 69504,
+      "fields": {},
+      "schema": "TargetIsHelicopterCondition",
+      "end": 95624
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 95624,
+      "payload": 95636,
+      "length": 24,
+      "type": "FacingAngleTarget",
+      "kind": "ConditionHash",
+      "owner": "engage_apache/engage/tactics/#ecdcb3134ef3dcd/#7cb91c66cb0b226e/control/#60e8dadce8b372e2/#60e8dadce8b372e2/shoot",
+      "group": "ConditionHash",
+      "parentOffset": 95592,
+      "treeOffset": 69504,
+      "fields": {
+        "Type": {
+          "hash": "7985452587274801402",
+          "name": "pitch"
+        },
+        "CompareTime": {
+          "hash": "3935993",
+          "name": "LessThanOrEqual"
+        },
+        "Angle": 40,
+        "Signed": false
+      },
+      "schema": "FacingAngleTargetCondition",
+      "end": 95668
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 95684,
+      "payload": 95696,
+      "length": 0,
+      "type": "Or",
+      "kind": "ConditionHash",
+      "owner": "engage_apache/engage/tactics/#ecdcb3134ef3dcd/#7cb91c66cb0b226e/control/#60e8dadce8b372e2/#60e8dadce8b372e2/shoot",
+      "group": "ConditionHash",
+      "parentOffset": 95568,
+      "treeOffset": 69504,
+      "fields": {},
+      "schema": "OrCondition",
+      "end": 95704
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 95704,
+      "payload": 95716,
+      "length": 0,
+      "type": "ConditionGroup",
+      "kind": "ConditionHash",
+      "owner": "engage_apache/engage/tactics/#ecdcb3134ef3dcd/#7cb91c66cb0b226e/control/#60e8dadce8b372e2/#60e8dadce8b372e2/shoot",
+      "group": "ConditionHash",
+      "parentOffset": 95568,
+      "treeOffset": 69504,
+      "fields": {},
+      "schema": "ConditionGroupCondition",
+      "end": 95828
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 95716,
+      "payload": 95728,
+      "length": 0,
+      "type": "Conditions",
+      "kind": "PropertyHash",
+      "owner": "engage_apache/engage/tactics/#ecdcb3134ef3dcd/#7cb91c66cb0b226e/control/#60e8dadce8b372e2/#60e8dadce8b372e2/shoot",
+      "group": "ConditionHash",
+      "parentOffset": 95704,
+      "treeOffset": 69504,
+      "end": 95820
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 95728,
+      "payload": 95740,
+      "length": 0,
+      "type": "Not",
+      "kind": "ConditionHash",
+      "owner": "engage_apache/engage/tactics/#ecdcb3134ef3dcd/#7cb91c66cb0b226e/control/#60e8dadce8b372e2/#60e8dadce8b372e2/shoot",
+      "group": "ConditionHash",
+      "parentOffset": 95716,
+      "treeOffset": 69504,
+      "fields": {},
+      "schema": "NotCondition",
+      "end": 95748
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 95748,
+      "payload": 95760,
+      "length": 0,
+      "type": "TargetIsHelicopter",
+      "kind": "ConditionHash",
+      "owner": "engage_apache/engage/tactics/#ecdcb3134ef3dcd/#7cb91c66cb0b226e/control/#60e8dadce8b372e2/#60e8dadce8b372e2/shoot",
+      "group": "ConditionHash",
+      "parentOffset": 95716,
+      "treeOffset": 69504,
+      "fields": {},
+      "schema": "TargetIsHelicopterCondition",
+      "end": 95768
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 95768,
+      "payload": 95780,
+      "length": 24,
+      "type": "FacingAngleTarget",
+      "kind": "ConditionHash",
+      "owner": "engage_apache/engage/tactics/#ecdcb3134ef3dcd/#7cb91c66cb0b226e/control/#60e8dadce8b372e2/#60e8dadce8b372e2/shoot",
+      "group": "ConditionHash",
+      "parentOffset": 95716,
+      "treeOffset": 69504,
+      "fields": {
+        "Type": {
+          "hash": "7985452587274801402",
+          "name": "pitch"
+        },
+        "CompareTime": {
+          "hash": "3935993",
+          "name": "LessThanOrEqual"
+        },
+        "Angle": 30,
+        "Signed": false
+      },
+      "schema": "FacingAngleTargetCondition",
+      "end": 95812
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 95844,
+      "payload": 95856,
+      "length": 36,
+      "type": "TargetHasLoF",
+      "kind": "ConditionHash",
+      "owner": "engage_apache/engage/tactics/#ecdcb3134ef3dcd/#7cb91c66cb0b226e/control/#60e8dadce8b372e2/#60e8dadce8b372e2/shoot",
+      "group": "ConditionHash",
+      "parentOffset": 95340,
+      "treeOffset": 69504,
+      "fields": {
+        "TimeTolerance": 0.5,
+        "DistanceTolerance": 2,
+        "CollisionFlags": {
+          "hash": "4601230196676155154",
+          "name": "collide_static_and_moving"
+        },
+        "CollideWithType": 67108865,
+        "Offset": [
+          0,
+          1,
+          0
+        ],
+        "Radius": 0.20000000298023224
+      },
+      "schema": "TargetHasLoFCondition",
+      "end": 95900
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 97472,
+      "payload": 97484,
+      "length": 0,
+      "type": "False",
+      "kind": "ConditionHash",
+      "owner": "engage_apache/engage/tactics/#ecdcb3134ef3dcd/#1f38a064ac3243dd",
+      "group": "ConditionHash",
+      "parentOffset": 97460,
+      "treeOffset": 69504,
+      "fields": {},
+      "schema": "FalseCondition",
+      "end": 97492
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 99796,
+      "payload": 99808,
+      "length": 20,
+      "type": "TargetDistance",
+      "kind": "ConditionHash",
+      "owner": "engage_apache/engage/tactics/#ecdcb3134ef3dcd/#c2e89cb9c7f836ec/control/#60e8dadce8b372e2/#60e8dadce8b372e2/shoot",
+      "group": "ConditionHash",
+      "parentOffset": 99784,
+      "treeOffset": 69504,
+      "fields": {
+        "Direction": {
+          "hash": "5772786",
+          "name": "XZ"
+        },
+        "Compare": {
+          "hash": "3935993",
+          "name": "LessThanOrEqual"
+        },
+        "Distance": 100
+      },
+      "schema": "TargetDistanceCondition",
+      "end": 99836
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 99836,
+      "payload": 99848,
+      "length": 20,
+      "type": "TargetDistance",
+      "kind": "ConditionHash",
+      "owner": "engage_apache/engage/tactics/#ecdcb3134ef3dcd/#c2e89cb9c7f836ec/control/#60e8dadce8b372e2/#60e8dadce8b372e2/shoot",
+      "group": "ConditionHash",
+      "parentOffset": 99784,
+      "treeOffset": 69504,
+      "fields": {
+        "Direction": {
+          "hash": "5772786",
+          "name": "XZ"
+        },
+        "Compare": {
+          "hash": "62",
+          "name": "MoreThan"
+        },
+        "Distance": 10
+      },
+      "schema": "TargetDistanceCondition",
+      "end": 99876
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 99876,
+      "payload": 99888,
+      "length": 24,
+      "type": "FacingAngleTarget",
+      "kind": "ConditionHash",
+      "owner": "engage_apache/engage/tactics/#ecdcb3134ef3dcd/#c2e89cb9c7f836ec/control/#60e8dadce8b372e2/#60e8dadce8b372e2/shoot",
+      "group": "ConditionHash",
+      "parentOffset": 99784,
+      "treeOffset": 69504,
+      "fields": {
+        "Type": {
+          "hash": "520688520109",
+          "name": "yaw"
+        },
+        "CompareTime": {
+          "hash": "3935993",
+          "name": "LessThanOrEqual"
+        },
+        "Angle": 25,
+        "Signed": false
+      },
+      "schema": "FacingAngleTargetCondition",
+      "end": 99920
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 99920,
+      "payload": 99932,
+      "length": 24,
+      "type": "FacingAngleTarget",
+      "kind": "ConditionHash",
+      "owner": "engage_apache/engage/tactics/#ecdcb3134ef3dcd/#c2e89cb9c7f836ec/control/#60e8dadce8b372e2/#60e8dadce8b372e2/shoot",
+      "group": "ConditionHash",
+      "parentOffset": 99784,
+      "treeOffset": 69504,
+      "fields": {
+        "Type": {
+          "hash": "7985452587274801402",
+          "name": "pitch"
+        },
+        "CompareTime": {
+          "hash": "60",
+          "name": "LessThan"
+        },
+        "Angle": 45,
+        "Signed": false
+      },
+      "schema": "FacingAngleTargetCondition",
+      "end": 99964
+    }
+  ],
+  "implementation": [
+    "HelicopterTactics selects profile from verified Spawn BranchRefs, not string-name similarity. HOVER/NONE have no gun envelope.",
+    "HelicopterCombat.fire applies only to AI !rocket, after current crew/phase/hostility/rotor checks and before effects. It uses current target root hull position when enemy rides a military vehicle/aircraft; actual ray still targets the observed skin/part point.",
+    "Distance adapter uses1MCblock/sourceUnit, already chosen for live helicopter navigation; preserves actor-local XZ and Y. Source gun envelope is separate from current MC muzzle3D range8..72: both must pass. The100-source-unit strafe maximum does not extend the existing72-block physical shot range; source1-unit minimum does not remove8-block muzzle safety.",
+    "MC body basis uses HelicopterArmament.rotate yaw+bank and authored+Z forward. Source -matrixRowZ is mapped to+Z; XZ distance is invariant to the forward sign. Native full aircraft transform/scale is not asserted reproduced.",
+    "No player manualFire/rapid, guided missile/hover, targeting permissions, wall/friendly first obstruction, ammo stores, sync fields, protocol, placement, destruction or assets are changed.",
+    "Lost observation already releases active tactics/airspace, aborts Hellfire and suppresses firing via seen gate. Removed/invalid target clears target state; persistent occlusion exits combat after100 missed updates. No duplicate loss policy added.",
+    "Source simple rocket branch140 contains False97472. This change does not invent random gun/rocket selection from a branch label or disturb existing verified hover Hellfire lifecycle."
+  ],
+  "remaining": [
+    "Full gun branch timer/aim episode lifecycles are outside this gate change; existing 80/80-tick MC gun cycle remains, so no claim of complete branch151 timer reproduction.",
+    "TargetHasLoF source cached radius0.2/offset1 query and damage-class-specific gun profiles are not implemented by this helper; current actual loaded muzzle/first-obstruction checks remain.",
+    "Native aircraft transform scale/pitch is not recreated; MC uses its existing unit yaw+bank basis and positiveZ model forward. Distances follow existing navigation adapter one block/source unit."
+  ],
+  "deferredChecks": {
+    "unit": "HelicopterGunEnvelopeTest:5 methods covering branch distances/strict bounds, body yaw, native pitch formula/target class, bank-localY and malformed/no-thread states.",
+    "game": "HelicopterGunEnvelopeGameTest:1 real registered craft/crew/radio sortie/entity tick. Aligned high-angle circle cannot shoot; shallow geometry permits actual mounted damage without player-ammo debit; target removal clears gun thread and stops shots. No direct fire/helper invocation or reflection.",
+    "commandsNotRun": [
+      "gradlew.bat --no-daemon -I tools/helicopter-hellfire-unit.init.gradle test --tests com.codex.blacklight.military.aircraft.HelicopterGunEnvelopeTest",
+      "gradlew.bat --no-daemon -I tools/helicopter-test.init.gradle runGameTestServer"
+    ],
+    "player": "Still needs live two-loader compilation and player-facing regression when user resumes tests; no game, audio or native process started."
+  },
+  "snapshots": {
+    "D:\\blacklight-evolution": [
+      {
+        "path": "src/main/java/com/codex/blacklight/military/aircraft/HelicopterGunEnvelope.java",
+        "sha256": "5a41839e088968cdf643c711e407c0d5861c32d7c9c5248b7154f31424850563"
+      },
+      {
+        "path": "src/main/java/com/codex/blacklight/military/aircraft/HelicopterTactics.java",
+        "sha256": "3c23cc1e4224cd9e595f03b9312053a672017bd8ae2c97579196fb8600feb9b3"
+      },
+      {
+        "path": "src/main/java/com/codex/blacklight/military/aircraft/HelicopterCombat.java",
+        "sha256": "04da2d3071cd8b9dfcb12fc69cda911bf6bca3f538337bd801d3516f24cd771e"
+      },
+      {
+        "path": "src/test/java/com/codex/blacklight/military/aircraft/HelicopterGunEnvelopeTest.java",
+        "sha256": "1462e3ffa841246a7f9ba859f2687825b47ee30baf41d4055ebcc51b89da8d24"
+      },
+      {
+        "path": "src/helicopterTest/java/com/codex/blacklight/gametest/HelicopterGunEnvelopeGameTest.java",
+        "sha256": "40024168f17db8d0d9079ea47a4344a0922d847067c8051518245cb532ee9a74"
+      }
+    ],
+    "D:\\blacklight-evolution-forge-1.20.1": [
+      {
+        "path": "src/main/java/com/codex/blacklight/military/aircraft/HelicopterGunEnvelope.java",
+        "sha256": "5a41839e088968cdf643c711e407c0d5861c32d7c9c5248b7154f31424850563"
+      },
+      {
+        "path": "src/main/java/com/codex/blacklight/military/aircraft/HelicopterTactics.java",
+        "sha256": "3c23cc1e4224cd9e595f03b9312053a672017bd8ae2c97579196fb8600feb9b3"
+      },
+      {
+        "path": "src/main/java/com/codex/blacklight/military/aircraft/HelicopterCombat.java",
+        "sha256": "5d72ade6a72521acaf7031b64d38d876889e1c5ce456d668bf970441c26582d4"
+      },
+      {
+        "path": "src/test/java/com/codex/blacklight/military/aircraft/HelicopterGunEnvelopeTest.java",
+        "sha256": "1462e3ffa841246a7f9ba859f2687825b47ee30baf41d4055ebcc51b89da8d24"
+      },
+      {
+        "path": "src/helicopterTest/java/com/codex/blacklight/gametest/HelicopterGunEnvelopeGameTest.java",
+        "sha256": "46830357b06d871670040f873e8c7620785c98eb5703f526b0adc839476ae648"
+      }
+    ]
+  }
+}

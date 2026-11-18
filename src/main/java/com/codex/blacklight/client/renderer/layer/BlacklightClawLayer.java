@@ -186,12 +186,13 @@ public final class BlacklightClawLayer extends net.minecraft.client.renderer.ent
         }
         boolean extendingWhip=authoritative&&!mirror&&com.codex.blacklight.client.renderer.WhipTetherRenderer.extended(player);
         float whipLimit=model.anchor("tether_R",new org.joml.Vector3f(0,.30F,.05F)).y+.02F;
-        renderMesh(model,mirror ? "Hand_L" : "Hand_R",poseStack,buffer,packedLight,morphProgress,
-                claw ? (float) ClawTransformSettings.talonLength(side) : 1,wristDelta,extendingWhip?whipLimit:Float.POSITIVE_INFINITY,hammer,surface,time);
+        try(var cutting=com.codex.blacklight.client.renderer.ConsumeBladeContact.begin(player,form,model,mirror?"Hand_L":"Hand_R",poseStack,partial)){
+            renderMesh(model,mirror ? "Hand_L" : "Hand_R",poseStack,buffer,packedLight,morphProgress,
+                    claw ? (float) ClawTransformSettings.talonLength(side) : 1,wristDelta,extendingWhip?whipLimit:Float.POSITIVE_INFINITY,hammer,surface,time);
+        }
         if(!mirror&&!extendingWhip&&form==PowerForm.WHIPFIST)
             renderMesh(model,"Tip_R",poseStack,buffer,packedLight,morphProgress,1,null,Float.POSITIVE_INFINITY,null,surface,time);
-        if(authoritative&&mirror && claw && com.codex.blacklight.registry.ModAttachments.getData(player, com.codex.blacklight.registry.ModAttachments.GRAB_STAGE)
-                ==com.codex.blacklight.combat.ConsumeVisual.HOLD)
+        if(authoritative&&mirror && claw && com.codex.blacklight.combat.ConsumeVisual.carrying(com.codex.blacklight.registry.ModAttachments.getData(player, com.codex.blacklight.registry.ModAttachments.GRAB_STAGE)))
             com.codex.blacklight.client.renderer.WhipTetherRenderer.captureGrip(player,poseStack,model.anchor("palm_L",new org.joml.Vector3f(.00267F,.32362F,.07666F)));
         if(authoritative&&!mirror && form==PowerForm.BLADE)
             com.codex.blacklight.client.renderer.WhipTetherRenderer.captureGrip(player,poseStack,model.anchor("bladeGrip_R",new org.joml.Vector3f(-.0636396F,.68F,-.0636396F)));

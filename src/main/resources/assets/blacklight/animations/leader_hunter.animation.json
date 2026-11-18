@@ -1,0 +1,30 @@
+{
+  "format_version": "1.8.0",
+  "animations": {
+    "idle": {
+      "loop": true,
+      "animation_length": 2,
+      "bones": {
+        "torso": {
+          "scale": {
+            "0": [
+              1,
+              1,
+              1
+            ],
+            "1": [
+              1.015,
+              1.008,
+              1.015
+            ],
+            "2": [
+              1,
+              1,
+              1
+            ]
+          }
+        }
+      }
+    }
+  }
+}

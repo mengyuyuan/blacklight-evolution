@@ -1,0 +1,7 @@
+allprojects { afterEvaluate {
+    sourceSets.main.java.srcDir('src/juggernautVisual/java')
+    minecraft.runs.client.property 'blacklight.test.juggernautContact',project.hasProperty('terrainFeedback')?'D:/CodexCache/creature-combat-qa/terrain-impact-frames':'D:/CodexCache/creature-combat-qa/juggernaut-source-frames'
+    if(project.hasProperty('terrainFeedback'))minecraft.runs.client.property 'blacklight.test.terrainFeedback','true'
+    minecraft.runs.client.args '--width','960','--height','640'
+    tasks.withType(Jar).configureEach { exclude 'com/codex/blacklight/client/JuggernautContactVisual*.class' }
+} }

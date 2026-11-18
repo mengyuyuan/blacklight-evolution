@@ -20,7 +20,7 @@ class ConsumeVariantTest {
         assertEquals(0,ConsumeVariant.choose(PowerForm.BLADE,false,RandomSource.create()));
     }
     @Test void selectedPairAndClockSurviveActualAttachmentEncoding(){
-        for(var form:new PowerForm[]{PowerForm.CLAWS,PowerForm.WHIPFIST})for(int variant:new int[]{0,1}) {
+        for(var form:new PowerForm[]{PowerForm.NONE,PowerForm.CLAWS,PowerForm.WHIPFIST})for(int variant:ConsumeVariant.variants(form)) {
             var data=new ConsumeVisual(7,100,ConsumeSequence.duration(form,false,variant),form.ordinal(),ConsumeVisual.CONSUME,123,new Vec3(1,2,3),variant);
             var buffer=new FriendlyByteBuf(Unpooled.buffer());
             try {
@@ -31,7 +31,7 @@ class ConsumeVariantTest {
         }
     }
     @Test void completeLegacyAndNewPairsKeepTheirOwnEventsAndPlacement(){
-        for(var form:new PowerForm[]{PowerForm.CLAWS,PowerForm.WHIPFIST})for(int variant:new int[]{0,1}) {
+        for(var form:new PowerForm[]{PowerForm.NONE,PowerForm.CLAWS,PowerForm.WHIPFIST})for(int variant:ConsumeVariant.variants(form)) {
             String key=ConsumeSequence.key(form,variant);
             assertTrue(ConsumeSequence.paired(form,false,variant),key);
             assertNotNull(ConsumeReceiverScene.profile(form,false,variant),key);

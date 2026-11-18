@@ -22,9 +22,12 @@ public final class VehicleCollisionShapes {
         if(query.equals(lastQuery)&&x==vehicle.getX()&&y==vehicle.getY()&&z==vehicle.getZ())return lastShape;
         x=vehicle.getX();y=vehicle.getY();z=vehicle.getZ();lastQuery=query;
         var local=query.move(-x,-y,-z).inflate(1e-7);
-        var grid=geometry.rasterize(new VehicleHullShape.Bounds(local.minX,local.minY,local.minZ,local.maxX,local.maxY,local.maxZ));
-        lastShape=grid.isEmpty()?Shapes.empty():new ContactGrid(grid).move(x,y,z);
+        lastShape=shape(geometry,local).move(x,y,z);
         return lastShape;
+    }
+    public static VoxelShape shape(VehicleCollisionGeometry geometry,AABB local){
+        var grid=geometry.rasterize(new VehicleHullShape.Bounds(local.minX,local.minY,local.minZ,local.maxX,local.maxY,local.maxZ));
+        return grid.isEmpty()?Shapes.empty():new ContactGrid(grid);
     }
     private static final class ContactGrid extends ArrayVoxelShape {
         ContactGrid(VehicleCollisionGeometry.Grid grid){super(voxels(grid),grid.xs(),grid.ys(),grid.zs());}

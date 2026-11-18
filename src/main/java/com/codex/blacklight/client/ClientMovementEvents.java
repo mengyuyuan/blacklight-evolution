@@ -71,7 +71,7 @@ public final class ClientMovementEvents {
     @SubscribeEvent(priority = net.minecraftforge.eventbus.api.EventPriority.LOWEST)
     public static void lockWeaponMovement(net.minecraftforge.client.event.MovementInputUpdateEvent event) {
         if(com.codex.blacklight.city.HydraTransport.active(event.getEntity())){clearWeaponTravelInput(event.getInput());return;}
-        var hop=com.codex.blacklight.registry.ModAttachments.getData(event.getEntity(),ModAttachments.PLAYER_ACTION);
+        var hop=com.codex.blacklight.registry.ModAttachments.getData(event.getEntity(), ModAttachments.PLAYER_ACTION);
         if(hop.clipId().equals("basic_dodge_roll")&&hop.active(event.getEntity().level().getGameTime())
                 &&hop.seconds(event.getEntity().level().getGameTime())<.7F){clearWeaponTravelInput(event.getInput());return;}
         if(com.codex.blacklight.movement.WingFlightSystem.eligible(event.getEntity())){
@@ -94,8 +94,8 @@ public final class ClientMovementEvents {
                     &&com.codex.blacklight.client.camera.PrototypeChaseCamera.ownsView()
                     &&(Math.abs(event.getInput().forwardImpulse)>1e-5F||Math.abs(event.getInput().leftImpulse)>1e-5F)
                     &&(com.codex.blacklight.registry.ModAttachments.getData(event.getEntity(), ModAttachments.GRAB_STAGE)==com.codex.blacklight.combat.ConsumeVisual.NONE&&!com.codex.blacklight.registry.ModAttachments.getData(event.getEntity(), ModAttachments.CONSUMING)
-                        ||com.codex.blacklight.registry.ModAttachments.getData(event.getEntity(), ModAttachments.GRAB_STAGE)==com.codex.blacklight.combat.ConsumeVisual.HOLD)) {
-                if(com.codex.blacklight.registry.ModAttachments.getData(event.getEntity(), ModAttachments.GRAB_STAGE)==com.codex.blacklight.combat.ConsumeVisual.HOLD) {
+                        ||com.codex.blacklight.combat.ConsumeVisual.carrying(com.codex.blacklight.registry.ModAttachments.getData(event.getEntity(), ModAttachments.GRAB_STAGE)))) {
+                if(com.codex.blacklight.combat.ConsumeVisual.carrying(com.codex.blacklight.registry.ModAttachments.getData(event.getEntity(), ModAttachments.GRAB_STAGE))) {
                     var input=event.getInput();var player=event.getEntity();
                     var step=com.codex.blacklight.movement.CarrySteering.steer(cameraYaw(mc),player.getYRot(),input.forwardImpulse,input.leftImpulse);
                     player.setYRot(step.yaw());player.setYHeadRot(step.yaw());player.yBodyRot=step.yaw();
@@ -297,7 +297,7 @@ public final class ClientMovementEvents {
         }
         // Hardware state and remapped KeyMappings share one input latch so visual
         // ownership does not lose releases during a combat or traversal action.
-        if (com.codex.blacklight.registry.ModAttachments.getData(minecraft.player,ModAttachments.CONSUMING)&&com.codex.blacklight.combat.ConsumeVisual.blocksInput(com.codex.blacklight.registry.ModAttachments.getData(minecraft.player,ModAttachments.GRAB_STAGE))) {
+        if (com.codex.blacklight.registry.ModAttachments.getData(minecraft.player, ModAttachments.CONSUMING)&&com.codex.blacklight.combat.ConsumeVisual.blocksInput(com.codex.blacklight.registry.ModAttachments.getData(minecraft.player, ModAttachments.GRAB_STAGE))) {
             DODGE_TAP.reset();
             lastJumpHeld=false;lastForwardHeld=false;lastMovingHeld=false;lastSprinting=false;
             lastChargingAnimation=false;clientChargeTicks=0;
@@ -314,16 +314,16 @@ public final class ClientMovementEvents {
             return;
         }
         boolean prototype = isPrototype(minecraft);
-        var hop=com.codex.blacklight.registry.ModAttachments.getData(minecraft.player,ModAttachments.PLAYER_ACTION);
+        var hop=com.codex.blacklight.registry.ModAttachments.getData(minecraft.player, ModAttachments.PLAYER_ACTION);
         boolean dodging=hop.clipId().equals("basic_dodge_roll")&&hop.active(minecraft.level.getGameTime());
-        boolean jumpHeld = minecraft.screen == null && mappingDown(minecraft, minecraft.options.keyJump)&&com.codex.blacklight.registry.ModAttachments.getData(minecraft.player,ModAttachments.GRAB_STAGE)!=com.codex.blacklight.combat.ConsumeVisual.THROW;
+        boolean jumpHeld = minecraft.screen == null && mappingDown(minecraft, minecraft.options.keyJump)&&com.codex.blacklight.registry.ModAttachments.getData(minecraft.player, ModAttachments.GRAB_STAGE)!=com.codex.blacklight.combat.ConsumeVisual.THROW;
         int forwardInput=minecraft.screen==null ? (mappingDown(minecraft,minecraft.options.keyUp)?1:0)-(mappingDown(minecraft,minecraft.options.keyDown)?1:0) : 0;
         int sidewaysInput=minecraft.screen==null ? (mappingDown(minecraft,minecraft.options.keyRight)?1:0)-(mappingDown(minecraft,minecraft.options.keyLeft)?1:0) : 0;
         boolean forwardHeld=forwardInput>0;
         boolean movingHeld=forwardInput!=0 || sidewaysInput!=0;
         boolean sprintKey=minecraft.screen==null && mappingDown(minecraft,minecraft.options.keySprint);
         boolean dodgeEligible=prototype&&minecraft.screen==null&&minecraft.player.onGround()&&!CLIENT_WALL.attached()
-                &&!dodging&&!jumpHeld&&(!weaponOwnsMovement(minecraft)||weaponRecovery(minecraft))&&com.codex.blacklight.registry.ModAttachments.getData(minecraft.player,ModAttachments.GRAB_STAGE)==0;
+                &&!dodging&&!jumpHeld&&(!weaponOwnsMovement(minecraft)||weaponRecovery(minecraft))&&com.codex.blacklight.registry.ModAttachments.getData(minecraft.player, ModAttachments.GRAB_STAGE)==0;
         boolean sprintDodge=DODGE_TAP.update(sprintKey,dodgeEligible);
         boolean dodgePressed=dodgeEligible&&(directDodge||sprintDodge);
         boolean detach=minecraft.screen==null && mappingDown(minecraft,minecraft.options.keyShift);
@@ -548,7 +548,7 @@ public final class ClientMovementEvents {
     /** Mirrors WeaponCombatSystem.cancelableRecovery from the synchronized action clock. */
     static boolean weaponRecovery(Minecraft minecraft) {
         if(minecraft.player==null||minecraft.level==null)return false;
-        var visual=com.codex.blacklight.registry.ModAttachments.getData(minecraft.player,ModAttachments.WEAPON_VISUAL);var move=visual.spec();
+        var visual=com.codex.blacklight.registry.ModAttachments.getData(minecraft.player, ModAttachments.WEAPON_VISUAL);var move=visual.spec();
         if(move==null||visual.charging()||visual.traveling()||move.landingAttack()||move.aerial()&&!move.airCombo())return false;
         return minecraft.level.getGameTime()-visual.started()>=move.end;
     }

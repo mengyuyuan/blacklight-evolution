@@ -26,7 +26,7 @@ public final class BlockThrowMotion {
  }
  public static float yaw(Player p,float partial){
   var a=com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.PLAYER_ACTION);
-  return a.clipId().endsWith("_release")?a.yaw():net.minecraft.util.Mth.rotLerp(partial,p.yRotO,p.getYRot());
+  return a.clipId().endsWith("_release")||a.clipId().endsWith("_slam")?a.yaw():net.minecraft.util.Mth.rotLerp(partial,p.yRotO,p.getYRot());
  }
  public static Vector3f palm(BlacklightPose pose,String side){
   var sk=BlacklightSkeleton.get();return sk.getBoundTransformFor(pose,sk.searchJointByName("Tool_"+side)).transformPosition(new Vector3f(0,.06F,0));
@@ -36,6 +36,7 @@ public final class BlockThrowMotion {
   return two?right.add(palm(pose,"L")).mul(.5F).add(0,.16F,0):right.add(0,.03F,-.40F);
  }
  public static Vector3f gripCenter(Player p,BlacklightPose pose,boolean two){
+  two=two||com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.PLAYER_ACTION).clipId().endsWith("_slam");
   var center=localCenter(pose,two);var held=BlockThrowSystem.held(p);
   if(held!=null&&two){var half=held.cargo().half();center.add(0,(float)(Math.max(0,half.y-.45)+.55),(float)-(Math.max(0,half.z-.45)+.8));}
   return center;
