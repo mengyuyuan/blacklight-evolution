@@ -67,7 +67,7 @@
     "Explicit bare deployTo retains legacy manual landing scenarios; old dispatched AirCombat.Enabled saves lacking AirDeployment migrate to the air route. No helicopter spawn egg exists; actual creation entrypoints are Support and owned ChassisItem."
   ],
   "mcAdapters": [
-    "Source world distances/speeds follow existing helicopter flight port 1:1 block policy, not source mesh scale. Side3.6/Y.85/Z-.5 offsets fit authored MC fuselage; original Tendril anchors ¡À1/Y.6/Z.5 remain in private source proof.",
+    "Source world distances/speeds follow existing helicopter flight port 1:1 block policy, not source mesh scale. Side3.6/Y.85/Z-.5 offsets fit authored MC fuselage; original Tendril anchors Â±1/Y.6/Z.5 remain in private source proof.",
     "Global native reservation/ShouldSpawn implementations are not fully closed. Local cap18 live MilitarySoldiers in64 blocks, target/LOS requirement, bounded loaded heightmap rings12/20/28 and40tick failed-site retry substitute for unavailable global mission policy; not an assertion of unrestricted native infinite spawning.",
     "Spawn time uses ceil at20Hz (16,19,64,67,128,131). Initial14tick detached door hold and15tick grounded settle implement clip event timing without original root/clip retargeting; authored model arms/legs and rope line are not imported original animation or rope mesh.",
     "No invulnerability is added. Wounds/grab/invalid carrier abort the controlled descent and restore ordinary gravity. Timeout200tick individual/600tick wave prevents stuck controllers; lost ground may result in normal fall damage.",
