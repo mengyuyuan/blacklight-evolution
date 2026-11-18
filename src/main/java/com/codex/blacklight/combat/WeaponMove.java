@@ -83,7 +83,9 @@ public enum WeaponMove {
     DEV_AIR_TENDRIL(PowerForm.NONE,"dev_air_tendril",120,40,85,16,7.5,360),
     DEV_CRITICAL_PAIN(PowerForm.NONE,"dev_critical_pain",120,40,85,50,50,30),
     DEV_AIR_CRITICAL_PAIN(PowerForm.NONE,"dev_air_critical_pain",120,40,85,50,50,30),
-    BULLETDIVE_DROP(PowerForm.NONE,"bulletdive_drop",90,32,40,22,6,360);
+    BULLETDIVE_DROP(PowerForm.NONE,"bulletdive_drop",90,32,40,22,6,360),
+    // Append only: existing enum ordinals are network identifiers.
+    GROUND_STOMP(PowerForm.NONE,"ground_stomp",53,27,29,12,2.6,360);
     public final PowerForm form;
     public final String id;
     public final int duration,start,end;
@@ -223,7 +225,7 @@ public enum WeaponMove {
         };
     }
     public boolean rush(){return this==BLADE_RUSH||this==HAMMER_RAM||this==WHIP_LUNGE||this==MUSCLE_RUSH;}
-    public boolean quake(){return uncharged()==HAMMER_QUAKE||uncharged()==HAMMER_COMBO_SPECIAL||this==HAMMER_DROP||this==HAMMER_RAM||this==COMBO_GROUND_POUND||this==AIR_GROUND_POUND;}
+    public boolean quake(){return this==GROUND_STOMP||uncharged()==HAMMER_QUAKE||uncharged()==HAMMER_COMBO_SPECIAL||this==HAMMER_DROP||this==HAMMER_RAM||this==COMBO_GROUND_POUND||this==AIR_GROUND_POUND;}
     public boolean frenzy(){return this==BLADE_CLEAVE;}
     public LocalWeaponMotion.ContactBounds contactBounds(int tick){
         return localMotion==null?null:localMotion.contactBounds().get(tick);

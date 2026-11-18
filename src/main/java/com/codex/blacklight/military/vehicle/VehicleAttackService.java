@@ -1,6 +1,9 @@
 package com.codex.blacklight.military.vehicle;
 
 import com.codex.blacklight.entity.MilitaryVehicle;
+import com.codex.blacklight.combat.AnimatedHurtBody;
+import com.codex.blacklight.combat.CombatTargeting;
+import com.codex.blacklight.combat.HydraHurtContact;
 import com.codex.blacklight.firearms.*;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -45,16 +48,40 @@ public final class VehicleAttackService {
         var wall=level.clip(new ClipContext(start,end,ClipContext.Block.COLLIDER,ClipContext.Fluid.NONE,actor));
         if(wall.getType()!=HitResult.Type.MISS)end=wall.getLocation();
         var mechanical=VehicleDamageBridge.nearest(level,actor,origin,start,end);
-        var living=net.minecraft.world.entity.projectile.ProjectileUtil.getEntityHitResult(level,actor,start,end,new AABB(start,end).inflate(.3),entity->entity!=actor
-                &&entity instanceof LivingEntity target&&target.isAlive()&&!(entity.getVehicle() instanceof MilitaryVehicle)&&entity.isPickable());
-        if(mechanical!=null&&(living==null||mechanical.distance()<=start.distanceTo(living.getLocation()))){
+        // Shared native picking includes animated proxies and aircraft. Protected
+        // bodies stay in the query: permission never lets a bullet pass through them.
+        var surface=FirearmsCombat.firstBulletBody(level,actor,origin,start,end,entity->
+                entity.getRootVehicle()!=origin
+                        &&!(entity.getRootVehicle() instanceof MilitaryVehicle)
+                        &&(entity instanceof com.codex.blacklight.entity.BlackwatchHelicopter
+                            ||!(entity.getRootVehicle() instanceof com.codex.blacklight.entity.BlackwatchHelicopter)));
+        if(wall.getType()==HitResult.Type.BLOCK){
+            double wallDistance=start.distanceTo(end);
+            if(surface!=null&&start.distanceTo(surface.getLocation())>=wallDistance-1e-6)surface=null;
+            if(mechanical!=null&&mechanical.distance()>=wallDistance-1e-6)mechanical=null;
+        }
+        if(mechanical!=null&&(surface==null||mechanical.distance()<=start.distanceTo(surface.getLocation()))){
             end=mechanical.point();impact=VehicleDamageBridge.hurt(actor,mechanical.vehicle(),definition,definition.damage(),null,end,direction)?0:3;
-        }else if(living!=null){
-            end=living.getLocation();impact=2;var target=(LivingEntity)living.getEntity();
-            if(!FirearmsCombat.protectedTarget(actor,target)&&(!(actor instanceof Player p)||!(target instanceof Player q)||p.canHarmPlayer(q)&&level.getServer().isPvpAllowed()))
+        }else if(surface!=null){
+            end=surface.getLocation();impact=2;var target=CombatTargeting.resolveTarget(surface.getEntity());
+            if(surface.getEntity() instanceof com.codex.blacklight.entity.BlackwatchHelicopter craft){
+                impact=3;
+                if(!VehicleDamageBridge.protectedAircraft(actor,craft))craft.hurtAt(actor.damageSources().mobProjectile(origin,actor),definition.damage(),end);
+            }else if(target!=null&&!FirearmsCombat.protectedTarget(actor,target)&&(!(actor instanceof Player p)||!(target instanceof Player q)||p.canHarmPlayer(q)&&level.getServer().isPvpAllowed()))
                 if(!(target instanceof ServerPlayer defender)||!com.codex.blacklight.power.ProjectileDefenseSystem.hitscan(defender,start,end,definition.damage(),4))
-                    target.hurt(actor.damageSources().mobProjectile(actor,actor),definition.damage());
+                    hurtContact(origin,actor,surface.getEntity(),target,start,end,definition.damage());
         }else if(wall.getType()==HitResult.Type.BLOCK){impact=1;normal=Vec3.atLowerCornerOf(wall.getDirection().getNormal());FirearmBlockDamage.bullet(actor,definition,wall);}
         GunplayEffects.shot(actor,origin,definition,start,end,impact,normal);
+    }
+    private static void hurtContact(MilitaryVehicle origin,LivingEntity actor,net.minecraft.world.entity.Entity first,
+                                    LivingEntity target,Vec3 from,Vec3 to,float damage){
+        var source=actor.damageSources().mobProjectile(origin,actor);
+        var body=AnimatedHurtBody.of(target);
+        if(body!=null){
+            // The vehicle muzzle and native narrowed surface are authoritative, not the driver's eye/look ray.
+            var contact=HydraHurtContact.ray(body.hurtRegions(0),from,to.add(to.subtract(from).normalize().scale(.0001)),
+                    com.codex.blacklight.infection.InfectedAttackStyle.PIERCE);
+            if(contact!=null)body.hurtAt(source,damage,contact);
+        }else first.hurt(source,damage);
     }
 }

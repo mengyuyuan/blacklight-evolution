@@ -10,6 +10,7 @@
     "OptionalLithiumCollisionContextMixin",
     "OptionalLithiumCollisionIteratorMixin",
     "VehicleProjectileCollisionMixin",
+    "HydraProjectileContactMixin",
     "OptionalCultivationShieldMixin",
     "OptionalCultivationPersonalShieldMixin",
     "OptionalTheBoysFakeDeathMixin",
@@ -24,6 +25,8 @@
     "ShulkerReflectionAccess",
     "ShulkerPeekAccess",
     "LivingDeathAccess",
+    "GreeneHealthFloorMixin",
+    "HydraDeathGuardMixin",
     "SaddleSteeringAccess",
     "BulletdiveBlockFeedbackMixin",
     "BulletdiveItemMergeAccess",
@@ -49,10 +52,7 @@
     "HydraServerMovementMixin",
     "NativeTissueAirMixin",
     "NativeTissueFeedingMixin",
-    "OptionalEpicFightModeMixin",
-    "HydraProjectileContactMixin",
-    "GreeneHealthFloorMixin",
-    "HydraDeathGuardMixin"
+    "OptionalEpicFightModeMixin"
   ],
   "client": [
     "client.RagdollSaddleMixin",
@@ -70,6 +70,7 @@
     "client.NativeHandRendererAccess",
     "client.LocalPlayerMixin",
     "client.PrototypeTargetLockMixin",
+    "client.HydraPickClockMixin",
     "client.PrototypeVehiclePickMixin",
     "client.TargetLockGlowMixin",
     "client.TargetLockOutlineColorMixin",
@@ -90,8 +91,7 @@
     "client.BlockCarryItemMixin",
     "client.PrototypeBodyYawMixin",
     "client.ConsumeTeleportSmoothingMixin",
-    "client.SceneClockMixin",
-    "client.HydraPickClockMixin"
+    "client.SceneClockMixin"
   ],
   "injectors": {
     "defaultRequire": 1

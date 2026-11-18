@@ -4,8 +4,6 @@ import net.neoforged.neoforge.common.ModConfigSpec;
 
 /** Server-owned simulation tuning. Combat and infection intensity are independently configurable. */
 public final class GameplayBalanceConfig {
-    public static final ModConfigSpec.IntValue GREENE_EXPOSED_TICKS;
-    public static final ModConfigSpec.BooleanValue GREENE_SOURCE_TIMER;
     public static final ModConfigSpec SPEC;
     public static final ModConfigSpec.BooleanValue CONTACT_ENABLED,LINEAGE_GUARANTEES;
     public static final ModConfigSpec.DoubleValue CONTACT_CHANCE,VIAL_RADIUS,VIAL_CENTER,VIAL_EDGE,VIAL_DIRECT;
@@ -30,6 +28,8 @@ public final class GameplayBalanceConfig {
     public static final ModConfigSpec.DoubleValue CONSUME_LAST_CHANCE_THRESHOLD;
     public static final ModConfigSpec.BooleanValue CONVERSION_ENABLED;
     public static final ModConfigSpec.IntValue CONVERSION_PER_TICK,CONVERSION_RETRY_TICKS;
+    public static final ModConfigSpec.IntValue GREENE_EXPOSED_TICKS;
+    public static final ModConfigSpec.BooleanValue GREENE_SOURCE_TIMER;
     static {
         var b=new ModConfigSpec.Builder();
         b.comment("感染传播。概率使用0～1；20 tick约1秒。仅服务端决定结果；不修改强制感染指令。").push("infection");

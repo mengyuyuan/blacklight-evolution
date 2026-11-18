@@ -17,9 +17,9 @@ public final class HitStop {
     private HitStop() { }
 
     public static void victim(LivingEntity v, int ticks) {
-        if (com.codex.blacklight.BlacklightNeoMod.LOGGER.isDebugEnabled()) com.codex.blacklight.BlacklightNeoMod.LOGGER.debug("HitStop victim {} ticks={} alive={} multipart={}", v.getType().getDescriptionId(), ticks, v.isAlive(), CombatTargeting.multipart(v));
+        if (com.codex.blacklight.BlacklightNeoMod.LOGGER.isDebugEnabled()) com.codex.blacklight.BlacklightNeoMod.LOGGER.debug("HitStop victim {} ticks={} alive={} multipart={}", v.getType().getDescriptionId(), ticks, v.isAlive(), CombatTargeting.anchoredBody(v));
         // Player movement is client-predicted; a server freeze only rubber-bands the victim.
-        if (ticks <= 0 || v.level().isClientSide || !v.isAlive() || CombatTargeting.multipart(v) || v instanceof net.minecraft.world.entity.player.Player) return;
+        if (ticks <= 0 || v.level().isClientSide || !v.isAlive() || CombatTargeting.anchoredBody(v) || v instanceof net.minecraft.world.entity.player.Player) return;
         var previous = HELD.get(v);
         // A later hit during the hold keeps the newer launch, never stacks the freeze.
         int until = Math.max(previous == null ? 0 : previous.until(), v.tickCount + ticks);

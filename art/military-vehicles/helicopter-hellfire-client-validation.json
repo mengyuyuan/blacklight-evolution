@@ -1,0 +1,388 @@
+{
+  "schema": 1,
+  "createdLocal": "2026-11-16T19:38:46",
+  "status": "Native client checkpoint; complete objective remains active",
+  "source": {
+    "file": "art/military-vehicles/helicopter-hellfire-source.json",
+    "sha256": "a1cc4729d7b0caf8de1ef7eecfbe981d999c49741e6f27fc2330a4efbd4ae6ab"
+  },
+  "changes": [
+    "Hellfire exhaust anchor now uses the same xOld/yOld/zOld interpolation baseline as the native entity renderer, rather than the future end-of-tick position.",
+    "The exhaust locator follows the synchronized missile heading at half the source-derived .52 length. Drift velocity no longer rotates the exhaust locator away from the tail.",
+    "Bounded smoke samples join consecutive tail anchors (at most 8 per client tick); a discontinuity over 16 blocks resets the segment. Existing other projectile trails are unchanged.",
+    "Opt-in hidden client fixture exercises real native projectiles, native network shot/explosion receipts, damage and sound manager activation in the guarded disposable world."
+  ],
+  "platforms": {
+    "neo": {
+      "status": "PASS: four real projectile/client scenarios with active launch and impact audio",
+      "capturedFrames": 284,
+      "nativeResults": [
+        {
+          "case": "crossing_close",
+          "receipts": 2,
+          "removedAt": 28,
+          "initialHealth": 5000.0,
+          "health": 4900.0,
+          "lost": false
+        },
+        {
+          "case": "crossing_impact",
+          "receipts": 2,
+          "removedAt": 28,
+          "initialHealth": 5000.0,
+          "health": 4900.0,
+          "lost": false
+        },
+        {
+          "case": "wall",
+          "receipts": 2,
+          "removedAt": 20,
+          "initialHealth": 5000.0,
+          "health": 5000.0,
+          "lost": false
+        },
+        {
+          "case": "lost_target",
+          "receipts": 1,
+          "removedAt": -1,
+          "initialHealth": 5000.0,
+          "health": 5000.0,
+          "lost": true
+        }
+      ],
+      "activeSounds": [
+        "crossing_close:blacklight:firearm.impact",
+        "crossing_close:blacklight:vehicle.rocket",
+        "crossing_impact:blacklight:firearm.impact",
+        "crossing_impact:blacklight:vehicle.rocket",
+        "lost_target:blacklight:vehicle.rocket",
+        "wall:blacklight:firearm.impact",
+        "wall:blacklight:vehicle.rocket"
+      ],
+      "maxObservedHeadingVelocityAngle": 6.954431906809162,
+      "evidence": {
+        "file": "D:\\CodexCache\\helicopter-hellfire-qa\\neo-frames\\evidence.json",
+        "sha256": "8b1a81f5eebfc0d87627a2192211cbeabc524b26704cd3baec2fc28989275da3"
+      },
+      "log": {
+        "file": "D:\\CodexCache\\helicopter-hellfire-qa\\neo-client-passed.log",
+        "sha256": "a92a707e53348a0faf162f02aed599fe793151fcee21d1e727db242fcc0b522d"
+      },
+      "reviewSheet": {
+        "file": "D:\\CodexCache\\helicopter-hellfire-qa\\neo-client-review.png",
+        "sha256": "c1f037c08ffbd8677de8a9b1f56720fb50a388f40df5717756c29e6ff38b34d7"
+      },
+      "selectedReviewFrames": [
+        {
+          "image": "D:\\CodexCache\\helicopter-hellfire-qa\\neo-frames\\crossing_close-001.png",
+          "sha256": "c05fc8a4ba5161ff1678d2ff9541c2c3e20f19338d8ebcb6baa897a33fd29b90",
+          "age": 1,
+          "case": "crossing_close",
+          "clientFlightAge": 0
+        },
+        {
+          "image": "D:\\CodexCache\\helicopter-hellfire-qa\\neo-frames\\crossing_close-008.png",
+          "sha256": "5c006bd2e7ffc0b15089c12fb191fa1eaaee7d8d2eacf464a533d7cea7f192a4",
+          "age": 8,
+          "case": "crossing_close",
+          "clientFlightAge": 7
+        },
+        {
+          "image": "D:\\CodexCache\\helicopter-hellfire-qa\\neo-frames\\crossing_close-011.png",
+          "sha256": "3e980b9169879f5d70145eda226270df50e8153171d7cddcf2af52a1ed3db82a",
+          "age": 11,
+          "case": "crossing_close",
+          "clientFlightAge": 10
+        },
+        {
+          "image": "D:\\CodexCache\\helicopter-hellfire-qa\\neo-frames\\crossing_close-014.png",
+          "sha256": "bb5cdc756dd608fd59dfc8f629d4940da126c5ebfcb7c2fbae1d2010e97b853c",
+          "age": 14,
+          "case": "crossing_close",
+          "clientFlightAge": 13
+        },
+        {
+          "image": "D:\\CodexCache\\helicopter-hellfire-qa\\neo-frames\\crossing_close-020.png",
+          "sha256": "023860a3606aea4945c9bb24217acba547c8dc6105f564139af7c6b4fadf80a5",
+          "age": 20,
+          "case": "crossing_close",
+          "clientFlightAge": 19
+        },
+        {
+          "image": "D:\\CodexCache\\helicopter-hellfire-qa\\neo-frames\\crossing_close-026.png",
+          "sha256": "91465a8cc6c30a80184f04f7b2ac08f0204085dc88e07fc07add561875fc38ec",
+          "age": 26,
+          "case": "crossing_close",
+          "clientFlightAge": 25
+        },
+        {
+          "image": "D:\\CodexCache\\helicopter-hellfire-qa\\neo-frames\\crossing_impact-027.png",
+          "sha256": "0165be9984b0594b528d6fa8b1b30aec2fa489f39a93e10e1fccb4eae8de58ef",
+          "age": 27,
+          "case": "crossing_impact",
+          "clientFlightAge": 26
+        },
+        {
+          "image": "D:\\CodexCache\\helicopter-hellfire-qa\\neo-frames\\crossing_impact-029.png",
+          "sha256": "07bec73bf7871b669b49409178d68b1a44f81ee4893d31d1b2549fba4f7e7b3d",
+          "age": 29,
+          "case": "crossing_impact",
+          "clientFlightAge": null
+        },
+        {
+          "image": "D:\\CodexCache\\helicopter-hellfire-qa\\neo-frames\\crossing_impact-031.png",
+          "sha256": "ef26568afafb2962d75579157c68c8df08c9391110878a3c476734aaebd214ea",
+          "age": 31,
+          "case": "crossing_impact",
+          "clientFlightAge": null
+        },
+        {
+          "image": "D:\\CodexCache\\helicopter-hellfire-qa\\neo-frames\\crossing_impact-036.png",
+          "sha256": "89a1b21012a9ea79bcb9c008231c5019e87b9ed03ac9b6e525a9d438af64a7d0",
+          "age": 36,
+          "case": "crossing_impact",
+          "clientFlightAge": null
+        },
+        {
+          "image": "D:\\CodexCache\\helicopter-hellfire-qa\\neo-frames\\wall-018.png",
+          "sha256": "7f05ad7604844cabdc74fe09f2971dcd4cba376c2c5a958df2d0bd0d982db3db",
+          "age": 18,
+          "case": "wall",
+          "clientFlightAge": 17
+        },
+        {
+          "image": "D:\\CodexCache\\helicopter-hellfire-qa\\neo-frames\\wall-021.png",
+          "sha256": "8e1ca17f49ee130a21dd17a2954a419ab7f7d3c9503f0ea1e7acef1eff50229d",
+          "age": 21,
+          "case": "wall",
+          "clientFlightAge": null
+        },
+        {
+          "image": "D:\\CodexCache\\helicopter-hellfire-qa\\neo-frames\\wall-024.png",
+          "sha256": "01734a77148eb61a9a3e214fcff7bedd013459209288db358891a8c17c28c5d8",
+          "age": 24,
+          "case": "wall",
+          "clientFlightAge": null
+        },
+        {
+          "image": "D:\\CodexCache\\helicopter-hellfire-qa\\neo-frames\\wall-030.png",
+          "sha256": "afb56001a3321213bf7b43461113ad87760d7f5651dc116e643cb398a34c2575",
+          "age": 30,
+          "case": "wall",
+          "clientFlightAge": null
+        },
+        {
+          "image": "D:\\CodexCache\\helicopter-hellfire-qa\\neo-frames\\lost_target-018.png",
+          "sha256": "7f9c706463a9aeac7671210a9bde8ba36479cfa7e1a7fdecd44bf27b6e1e0b4e",
+          "age": 18,
+          "case": "lost_target",
+          "clientFlightAge": 17
+        },
+        {
+          "image": "D:\\CodexCache\\helicopter-hellfire-qa\\neo-frames\\lost_target-026.png",
+          "sha256": "ad6b494b151ca6d7b82bd712d07feafed095de52445a0ed6e2e0a4dad359de4f",
+          "age": 26,
+          "case": "lost_target",
+          "clientFlightAge": 25
+        }
+      ],
+      "code": {
+        "src\\main\\java\\com\\codex\\blacklight\\firearms\\OrdnanceTrail.java": "a9e93cad6b76c5fb4d7ec786035010e26e993b8f94558cf52757d64c76526bdf",
+        "src\\hellfireVisual\\java\\com\\codex\\blacklight\\client\\HellfireVisual.java": "de1d61c081f5ff61b5cc33cab7cd6efff0cd2979f40a5a47c107dc0a09369c47",
+        "tools\\hellfire-visual.init.gradle": "9e226075352d42b6d1666a39b15d522d9014e45dcb2cfa78c8a97116cb1b1b2b"
+      }
+    },
+    "forge": {
+      "status": "PASS: four real projectile/client scenarios with active launch and impact audio",
+      "capturedFrames": 284,
+      "nativeResults": [
+        {
+          "case": "crossing_close",
+          "receipts": 2,
+          "removedAt": 28,
+          "initialHealth": 5000.0,
+          "health": 4900.0,
+          "lost": false
+        },
+        {
+          "case": "crossing_impact",
+          "receipts": 2,
+          "removedAt": 28,
+          "initialHealth": 5000.0,
+          "health": 4900.0,
+          "lost": false
+        },
+        {
+          "case": "wall",
+          "receipts": 2,
+          "removedAt": 20,
+          "initialHealth": 5000.0,
+          "health": 5000.0,
+          "lost": false
+        },
+        {
+          "case": "lost_target",
+          "receipts": 1,
+          "removedAt": -1,
+          "initialHealth": 5000.0,
+          "health": 5000.0,
+          "lost": true
+        }
+      ],
+      "activeSounds": [
+        "crossing_close:blacklight:firearm.impact",
+        "crossing_close:blacklight:vehicle.rocket",
+        "crossing_impact:blacklight:firearm.impact",
+        "crossing_impact:blacklight:vehicle.rocket",
+        "lost_target:blacklight:vehicle.rocket",
+        "wall:blacklight:firearm.impact",
+        "wall:blacklight:vehicle.rocket"
+      ],
+      "maxObservedHeadingVelocityAngle": 6.954431906809162,
+      "evidence": {
+        "file": "D:\\CodexCache\\helicopter-hellfire-qa\\forge-frames\\evidence.json",
+        "sha256": "2b818ada145f0f0d99c71944cb557de84da1787ce5df7bfca12c212555b638b8"
+      },
+      "log": {
+        "file": "D:\\CodexCache\\helicopter-hellfire-qa\\forge-client-passed.log",
+        "sha256": "6cc89f18c226f6f9e33d109fe983c63468a43c3189bf6444ec06bcd9e21e8e26"
+      },
+      "reviewSheet": {
+        "file": "D:\\CodexCache\\helicopter-hellfire-qa\\forge-client-review.png",
+        "sha256": "330184e5501a8876d98d7b1df64951617b2fa73415fdb61161fb20d01637b415"
+      },
+      "selectedReviewFrames": [
+        {
+          "image": "D:\\CodexCache\\helicopter-hellfire-qa\\forge-frames\\crossing_close-001.png",
+          "sha256": "257a015dd8d8d503f05c58a31c80817c0e831122dc8d42a0d35904b2ca37625c",
+          "age": 1,
+          "case": "crossing_close",
+          "clientFlightAge": 0
+        },
+        {
+          "image": "D:\\CodexCache\\helicopter-hellfire-qa\\forge-frames\\crossing_close-008.png",
+          "sha256": "a84b4487201c4d7c8c61dde08a7307257bbfb461e68abc8d5bcc96c0f9b75a60",
+          "age": 8,
+          "case": "crossing_close",
+          "clientFlightAge": 7
+        },
+        {
+          "image": "D:\\CodexCache\\helicopter-hellfire-qa\\forge-frames\\crossing_close-011.png",
+          "sha256": "3edb7ded0c70706ed76ab9f7a97c6254381dcdb9a3831c0e5ffa85d2f4dd4dc9",
+          "age": 11,
+          "case": "crossing_close",
+          "clientFlightAge": 10
+        },
+        {
+          "image": "D:\\CodexCache\\helicopter-hellfire-qa\\forge-frames\\crossing_close-014.png",
+          "sha256": "37587a2d95e3fa5c9493ca90472f293f871ababd03ad91913fcb187f2a62d112",
+          "age": 14,
+          "case": "crossing_close",
+          "clientFlightAge": 13
+        },
+        {
+          "image": "D:\\CodexCache\\helicopter-hellfire-qa\\forge-frames\\crossing_close-020.png",
+          "sha256": "63387339b53772298c5a36eefbac7531454e3e3c6e900506d3a841343582c302",
+          "age": 20,
+          "case": "crossing_close",
+          "clientFlightAge": 18
+        },
+        {
+          "image": "D:\\CodexCache\\helicopter-hellfire-qa\\forge-frames\\crossing_close-026.png",
+          "sha256": "8029b70e266234df059f2bc7576d8dd6f4c7876abc80623e0a2e3bf917723ccb",
+          "age": 26,
+          "case": "crossing_close",
+          "clientFlightAge": 25
+        },
+        {
+          "image": "D:\\CodexCache\\helicopter-hellfire-qa\\forge-frames\\crossing_impact-027.png",
+          "sha256": "8caba7e22d4569e54ee88ee8bbec68b02351fd3cd1b9950b89a148ce8db00d98",
+          "age": 27,
+          "case": "crossing_impact",
+          "clientFlightAge": 26
+        },
+        {
+          "image": "D:\\CodexCache\\helicopter-hellfire-qa\\forge-frames\\crossing_impact-029.png",
+          "sha256": "2eaa948be8146d27c414ee2d45430d68e5173cbcb4a50b18801f75fe4f3b5792",
+          "age": 29,
+          "case": "crossing_impact",
+          "clientFlightAge": null
+        },
+        {
+          "image": "D:\\CodexCache\\helicopter-hellfire-qa\\forge-frames\\crossing_impact-031.png",
+          "sha256": "e5134e7f93321800b609068a13cb12cf9c9ec33a2a2deae72e179eb690057118",
+          "age": 31,
+          "case": "crossing_impact",
+          "clientFlightAge": null
+        },
+        {
+          "image": "D:\\CodexCache\\helicopter-hellfire-qa\\forge-frames\\crossing_impact-036.png",
+          "sha256": "669fdd9a6d85e5648cd0e819ea934989453ec4fa17a2fa3f81786ada88913d0f",
+          "age": 36,
+          "case": "crossing_impact",
+          "clientFlightAge": null
+        },
+        {
+          "image": "D:\\CodexCache\\helicopter-hellfire-qa\\forge-frames\\wall-018.png",
+          "sha256": "db835865ff776c1db7c3fd69c62ed6a7fae59bf854ceb2185ea4a9d8032a69fc",
+          "age": 18,
+          "case": "wall",
+          "clientFlightAge": 17
+        },
+        {
+          "image": "D:\\CodexCache\\helicopter-hellfire-qa\\forge-frames\\wall-021.png",
+          "sha256": "17f6828dc7373dcb5283ee6c1deee3147007900bf6eb5109f1e0a1f75e751ad9",
+          "age": 21,
+          "case": "wall",
+          "clientFlightAge": null
+        },
+        {
+          "image": "D:\\CodexCache\\helicopter-hellfire-qa\\forge-frames\\wall-024.png",
+          "sha256": "d7ae0273dc2ecee506afc05b1aef491cf77b6284286e290175631fea6ed567be",
+          "age": 24,
+          "case": "wall",
+          "clientFlightAge": null
+        },
+        {
+          "image": "D:\\CodexCache\\helicopter-hellfire-qa\\forge-frames\\wall-030.png",
+          "sha256": "69ed285b0fbd53d28a727af3e2f3fba08bae6c41095dd82c7a4e177f2e1ddc4e",
+          "age": 30,
+          "case": "wall",
+          "clientFlightAge": null
+        },
+        {
+          "image": "D:\\CodexCache\\helicopter-hellfire-qa\\forge-frames\\lost_target-018.png",
+          "sha256": "6e409bbbe81b5ea20ad235a54b27827458c812b2a08eb63f58cf8e713ed20c0e",
+          "age": 18,
+          "case": "lost_target",
+          "clientFlightAge": 16
+        },
+        {
+          "image": "D:\\CodexCache\\helicopter-hellfire-qa\\forge-frames\\lost_target-026.png",
+          "sha256": "897b7a9d87fd93dd9a9bfa4d5f0ad5723555eec8baf686a8defd0b9745547006",
+          "age": 26,
+          "case": "lost_target",
+          "clientFlightAge": 24
+        }
+      ],
+      "code": {
+        "src\\main\\java\\com\\codex\\blacklight\\firearms\\OrdnanceTrail.java": "a9e93cad6b76c5fb4d7ec786035010e26e993b8f94558cf52757d64c76526bdf",
+        "src\\hellfireVisual\\java\\com\\codex\\blacklight\\client\\HellfireVisual.java": "4d246a2737fd85b8bf3da7f544186063cedab16343b49222acbb0a8cc2514f31",
+        "tools\\hellfire-visual.init.gradle": "5a370bb6b97bd8939b3f2163d4486d11f8f1f87064d89b50f4e4fbc0c2c6b1c3"
+      }
+    }
+  },
+  "limits": [
+    "Fixture launches the actual production projectile and production shot feedback directly. It does not claim a newly observed full helicopter AI launch maneuver or manual firing session; those entry paths retain the previous native tests.",
+    "Real sound events and SoundManager.isActive are checked with logical volume 1 and physical OpenAL listener gain 0. This is not a subjective listening review, and existing authored cues are not claimed identical to original audio.",
+    "Integrated local client/server only; dedicated multiplayer not covered by this checkpoint.",
+    "Lost-target coasting is observed. Later range/unloaded-chunk cleanup is not established by this short visual fixture.",
+    "Source hover/weapon selection, player source clip/rack capacities, timed impact/expiry stages, original sounds and full helicopter actions remain open.",
+    "Previous 47 unit / 57 helicopter native / 29 shared vehicle regression results per platform are historical supporting evidence, not rerun by this client-only checkpoint."
+  ],
+  "rejectedAttempts": [
+    "neo-frames-observer-too-far: first observer stood outside the launch sound packet radius; launch sound was not delivered. Observer moved into real source range, production audio unchanged.",
+    "neo-frames-pre-tail-fix: scenarios and audio passed but screenshots exposed flame ahead of the visible nose. This visual defect was fixed and the client cases rerun.",
+    "*-frames-before-camera-fix: native scenarios/audio passed, but the close camera used Entity.getPosition (xo) instead of the actual entity rendering xOld baseline; late fast-flight bodies could leave the close shot. Camera now follows actual LevelRenderer interpolation, both clients rerun."
+  ]
+}

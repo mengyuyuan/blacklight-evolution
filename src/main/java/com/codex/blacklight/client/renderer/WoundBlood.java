@@ -75,6 +75,14 @@ public final class WoundBlood {
         add(entity,region,point.add(normal.scale(.015)),normal,.8F,22,true);
         add(entity,region,point.add(normal.scale(-.015)),normal.scale(-1),.8F,22,true);
     }
+    static void meshSection(LivingEntity entity,int region,String key){
+        reset();if(scene==null||entity.level()!=scene||entity.isInvisible())return;
+        for(int side:new int[]{-1,1}){
+            if(EMITTERS.size()>=MAX_EMITTERS)EMITTERS.remove(0);
+            var emitter=new Emitter(entity,region,Vec3.ZERO,Vec3.ZERO,.8F,22,true,scene.getGameTime());
+            emitter.sectionKey=key;emitter.sectionSide=side;EMITTERS.add(emitter);
+        }
+    }
     private static void add(LivingEntity e,int region,Vec3 point,Vec3 direction,float strength,int lifetime,boolean stump){
         if(EMITTERS.size()>=MAX_EMITTERS)EMITTERS.removeFirst();
         EMITTERS.add(new Emitter(e,region,point,direction,strength,lifetime,stump,scene.getGameTime()));
@@ -115,6 +123,7 @@ public final class WoundBlood {
     }
     private static List<Anchor> anchors(Emitter emitter){
         var e=emitter.entity;
+        if(emitter.sectionKey!=null)return AdaptiveRagdoll.sectionAnchors(e,emitter.region,emitter.sectionKey,emitter.sectionSide);
         if(emitter.consumeStarted!=Long.MIN_VALUE){
             Vec3 point=com.codex.blacklight.client.animation.RagdollDrive.contact(e,emitter.region,1);
             return List.of(new Anchor(point,emitter.direction,e.getDeltaMovement()));
@@ -130,13 +139,17 @@ public final class WoundBlood {
     }
     private static final class Emitter {
         final LivingEntity entity;final int region,lifetime;final Vec3 point,direction;final float strength;final boolean stump;final long started;
-        boolean emitted;long consumeStarted=Long.MIN_VALUE;
+        boolean emitted;long consumeStarted=Long.MIN_VALUE;String sectionKey;int sectionSide;
         Emitter(LivingEntity entity,int region,Vec3 point,Vec3 direction,float strength,int lifetime,boolean stump,long started){
             this.entity=entity;this.region=region;this.point=point;this.direction=direction;this.strength=strength;this.lifetime=lifetime;this.stump=stump;this.started=started;
         }
         void tick(){
             int age=(int)(scene.getGameTime()-started);if(emitted&&age>5&&(age&1)!=0)return;
-            float decay=1-age/(float)lifetime;int count=!emitted?(stump?5:8):stump?2:1;
+            float decay=1-age/(float)lifetime;
+            // The very short blunt wound already has a weapon-shaped contact spray.
+            // Only a few secondary drops need to survive long enough to hit terrain.
+            int initialDrops=stump?5:lifetime<=6?2:8;
+            int count=emitted?(stump?2:1):initialDrops;
             for(var anchor:anchors(this)){
                 var random=scene.random;Vec3 normal=anchor.direction.normalize();
                 Vec3 tangent=normal.cross(Math.abs(normal.y)<.85?new Vec3(0,1,0):new Vec3(1,0,0)).normalize(),up=normal.cross(tangent);
@@ -166,6 +179,9 @@ public final class WoundBlood {
             var old=CONSUME_HITS.put(e,new ConsumeMark(visual.started(),elapsed));
             int previous=old!=null&&old.started==visual.started()?old.tick:elapsed-1;
             var phase=ConsumeFracture.phase(e,1);
+            // Sharp absorption emits from confirmed mesh caps. An event alone
+            // must not create an unrelated body-center spray when the blade misses.
+            if(phase.style()==ConsumeFracture.Style.SEVER&&AdaptiveRagdoll.active(e))continue;
             var profile=com.codex.blacklight.combat.ConsumeReceiverScene.profile(phase.form(),false,visual.variant());
             int fallback=Math.round(visual.duration()*com.codex.blacklight.combat.ConsumeSequence.contact(phase.form(),false))-1;
             boolean impact=false;
@@ -183,6 +199,7 @@ public final class WoundBlood {
         CONSUME_HITS.keySet().removeIf(e->!active.contains(e));
     }
     private static boolean available(Emitter emitter){
+        if(emitter.sectionKey!=null)return emitter.entity.level()==scene&&!emitter.entity.isInvisible();
         if(emitter.consumeStarted==Long.MIN_VALUE)return available(emitter.entity);
         var e=emitter.entity;var visual=e.getData(ModAttachments.CONSUME_VISUAL);
         return e.level()==scene&&!e.isInvisible()&&!e.isRemoved()&&visual.consuming()&&visual.started()==emitter.consumeStarted;
@@ -208,8 +225,14 @@ public final class WoundBlood {
             Vec3 along=axis.scale(Math.clamp(velocity.length()*.42,radius,radius*7));
             Vec3 front=point.add(along).subtract(camera),back=point.subtract(along).subtract(camera);
             int light=LevelRenderer.getLightColor(scene,BlockPos.containing(point));int alpha=(int)(230*Math.min(1,(32-age)/7F));
-            vertex(out,stack,front.subtract(across),normal,red,alpha,light);vertex(out,stack,front.add(across),normal,red,alpha,light);
-            vertex(out,stack,back.add(across.scale(.45)),normal,red,alpha/2,light);vertex(out,stack,back.subtract(across.scale(.45)),normal,red,alpha/2,light);
+            // A pointed trailing end and rounded leading edge keep close droplets
+            // readable against the sky even when their velocity is nearly horizontal.
+            var shoulder=point.subtract(camera).add(along.scale(.42));
+            var left=shoulder.subtract(across);var right=shoulder.add(across);
+            vertex(out,stack,back,normal,red,alpha/2,light);vertex(out,stack,left,normal,red,alpha,light);
+            vertex(out,stack,right,normal,red,alpha,light);vertex(out,stack,back,normal,red,alpha/2,light);
+            vertex(out,stack,left,normal,red,alpha,light);vertex(out,stack,front.subtract(across.scale(.42)),normal,red,alpha,light);
+            vertex(out,stack,front.add(across.scale(.42)),normal,red,alpha,light);vertex(out,stack,right,normal,red,alpha,light);
         }
     }
     private record Splat(Vec3 center,Vec3 normal,List<Vec3> rim,BlockPos block,int red,long started) {}

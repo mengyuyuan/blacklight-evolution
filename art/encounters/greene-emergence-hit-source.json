@@ -1,0 +1,1573 @@
+{
+  "schema": 1,
+  "date": "2026-11-17",
+  "status": "Source evidence checkpoint: authored action order, delayed first poll, fixed sphere radius, ANY-bit masks and missing-Neck root fallback are proved. No emergence Hit production integration; build/tests/game validation remain deferred.",
+  "sourceProof": {
+    "path": "D:\\PrototypeReference\\p1\\private\\greene-emergence-hit-proof.json",
+    "sha256": "0f125ef7ed9c35680147461ea06bd1e1f23fdd6251e361ed6f2ba24158fc2cfe"
+  },
+  "source": "P1 comparison/mother_fig.p3d.rz, mother_tod.p3d.rz, MotherCore META and prototypeenginef.dll; no P2 collision enum or SingleHit behavior is substituted.",
+  "hit_records": [
+    {
+      "source": "comparison/mother_fig.p3d.rz",
+      "offset": 41324,
+      "payload": 41336,
+      "length": 276,
+      "type": "Hit",
+      "kind": "TrackHash",
+      "owner": "mother_core/opening/coming_out/spawn_prop/coming_out",
+      "fields": {
+        "Unknown1": 1,
+        "BeginTime": 0.33333298563957214,
+        "EndTime": 1,
+        "UseShapecast": false,
+        "CollisionCountMax": -1,
+        "TimeBetweenHits": -1,
+        "jointName": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "jointEnd": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "OffsetX": 0,
+        "OffsetY": 0,
+        "OffsetZ": 0,
+        "Radius": 20,
+        "ArcOffset": 0,
+        "ArcRange": 0,
+        "CollideWith": 48,
+        "DamageMin": 800,
+        "DamageMax": 800,
+        "UseTransformationDamageMultiplier": true,
+        "UseWeaponDamageMultiplier": false,
+        "FriendlyFire": 0.009999999776482582,
+        "AttackType": {
+          "hash": "5116991040572361864",
+          "name": "Hydra"
+        },
+        "HitTypeName": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "DamageType": {
+          "hash": "22018610510307286",
+          "name": "None"
+        },
+        "EffectTypeName": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "ScaleX": 1,
+        "ScaleY": 1,
+        "EffectScale": 1,
+        "PropAreaEmissionScale": 0,
+        "PropAreaEmissionScaleFunction": {
+          "hash": "4206860010037910535",
+          "name": "#3a61c4e3e61b1c07"
+        },
+        "PropAreaSizeScale": 0,
+        "propAreaSizeScaleFunction": {
+          "hash": "4206860010037910535",
+          "name": "#3a61c4e3e61b1c07"
+        },
+        "ImpulseMinX": 0,
+        "ImpulseMinY": 10000,
+        "ImpulseMinZ": -5000,
+        "ImpulseMaxX": 0,
+        "ImpulseMaxY": 10000,
+        "ImpulseMaxZ": -5000,
+        "ImpulseRandomPlusMinus": 0,
+        "UseMotion": false,
+        "CollisionDirectionX": 0,
+        "CollisionDirectionY": 0,
+        "CollisionDirectionZ": 0,
+        "DeformDirStr": 1,
+        "DeformStr": 1,
+        "CollisionFlagName": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "GiverBranchRef": {
+          "name": "",
+          "index": -1
+        },
+        "ReceiverBranchRef": {
+          "name": "",
+          "index": -1
+        },
+        "UseDamageOriginator": false,
+        "SendAlert": true,
+        "SendOnlyToAIManager": false,
+        "UseOriginatorToValidate": false,
+        "IsThrown": false,
+        "MomentumDamageVelocity": 0,
+        "MomentumDamageMax": 0,
+        "TravelVelocity": 0,
+        "TravelTowardsTarget": {
+          "hash": "22018610510307286",
+          "name": "None"
+        },
+        "IgnorePowerTarget": false
+      },
+      "schema": "CollisionHitTrack",
+      "end": 41620
+    },
+    {
+      "source": "comparison/mother_fig.p3d.rz",
+      "offset": 41776,
+      "payload": 41788,
+      "length": 276,
+      "type": "Hit",
+      "kind": "TrackHash",
+      "owner": "mother_core/opening/coming_out/spawn_prop/coming_out",
+      "fields": {
+        "Unknown1": 1,
+        "BeginTime": 0,
+        "EndTime": 2.9333300590515137,
+        "UseShapecast": true,
+        "CollisionCountMax": -1,
+        "TimeBetweenHits": -1,
+        "jointName": {
+          "hash": "7838411505877751733",
+          "name": "Neck_1"
+        },
+        "jointEnd": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "OffsetX": 0,
+        "OffsetY": 0,
+        "OffsetZ": 0,
+        "Radius": 3,
+        "ArcOffset": 0,
+        "ArcRange": 0,
+        "CollideWith": 49264,
+        "DamageMin": 100,
+        "DamageMax": 100,
+        "UseTransformationDamageMultiplier": true,
+        "UseWeaponDamageMultiplier": false,
+        "FriendlyFire": 0.20000000298023224,
+        "AttackType": {
+          "hash": "18631117405142472",
+          "name": "Bare"
+        },
+        "HitTypeName": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "DamageType": {
+          "hash": "4728229139194926617",
+          "name": "Crush"
+        },
+        "EffectTypeName": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "ScaleX": 1,
+        "ScaleY": 1,
+        "EffectScale": 1,
+        "PropAreaEmissionScale": 0,
+        "PropAreaEmissionScaleFunction": {
+          "hash": "4206860010037910535",
+          "name": "#3a61c4e3e61b1c07"
+        },
+        "PropAreaSizeScale": 0,
+        "propAreaSizeScaleFunction": {
+          "hash": "4206860010037910535",
+          "name": "#3a61c4e3e61b1c07"
+        },
+        "ImpulseMinX": 2000,
+        "ImpulseMinY": 5000,
+        "ImpulseMinZ": 2000,
+        "ImpulseMaxX": 2000,
+        "ImpulseMaxY": 5000,
+        "ImpulseMaxZ": 2000,
+        "ImpulseRandomPlusMinus": 0,
+        "UseMotion": false,
+        "CollisionDirectionX": 0,
+        "CollisionDirectionY": 0,
+        "CollisionDirectionZ": 0,
+        "DeformDirStr": 1,
+        "DeformStr": 1,
+        "CollisionFlagName": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "GiverBranchRef": {
+          "name": "",
+          "index": -1
+        },
+        "ReceiverBranchRef": {
+          "name": "",
+          "index": -1
+        },
+        "UseDamageOriginator": false,
+        "SendAlert": true,
+        "SendOnlyToAIManager": false,
+        "UseOriginatorToValidate": false,
+        "IsThrown": false,
+        "MomentumDamageVelocity": 0,
+        "MomentumDamageMax": 0,
+        "TravelVelocity": 0,
+        "TravelTowardsTarget": {
+          "hash": "22018610510307286",
+          "name": "None"
+        },
+        "IgnorePowerTarget": false
+      },
+      "schema": "CollisionHitTrack",
+      "end": 42072
+    }
+  ],
+  "absent_P1_fields": {
+    "range": "1014c4c0..1014ce93",
+    "hit_payload_length": 276,
+    "all_bytes_consumed": true,
+    "absent_authored_fields": [
+      "HitID",
+      "SingleHit",
+      "ExtendedDamageType",
+      "ScaleRadiusWithActor"
+    ],
+    "note": "Absent is not a fabricated false/zero default. HitTypeName, DamageType, CollisionCountMax and TimeBetweenHits are separate actual P1 fields."
+  },
+  "collidables": {
+    "P1_source": "1014c71f..1014c742 binds the Hit collideWith property to table 11253f20, eight-byte hash entries. Static registration 10d4e3a0 onwards names the bits. These are P1 indices; P2 Health=bit6 is not applicable.",
+    "decoded_bits_used": {
+      "4": "Health",
+      "5": "HitReaction",
+      "6": "Prop",
+      "14": "PedBehaviour",
+      "15": "VehicleBehaviour",
+      "1": "SimulatedObject"
+    },
+    "R20_mask": {
+      "decimal": 48,
+      "hex": "0x30",
+      "categories": [
+        "Health",
+        "HitReaction"
+      ]
+    },
+    "R3_mask": {
+      "decimal": 49264,
+      "hex": "0xc070",
+      "categories": [
+        "Health",
+        "HitReaction",
+        "Prop",
+        "PedBehaviour",
+        "VehicleBehaviour"
+      ]
+    },
+    "boundary": "(query.mask0 & PhysicsObject[+2c]) != 0 AND (query.mask1 & PhysicsObject[+28]) != 0, then nonmatching excluded group and active object checks. 10699b61..10699b87 uses TEST/JZ per mask. Each mask accepts ANY shared bit, not ALL authored bits. P1 bit1 is SimulatedObject, not Player. Names are not a proven mapping to MC LivingEntity, Player, vehicle or prop classes. MC target providers must state their adapter mapping; this audit has not followed every game component that sets native category bits."
+  },
+  "auto_target_is_separate": {
+    "record": {
+      "source": "comparison/mother_fig.p3d.rz",
+      "offset": 41664,
+      "payload": 41676,
+      "length": 92,
+      "type": "AutoTarget",
+      "kind": "TrackHash",
+      "owner": "mother_core/opening/coming_out/spawn_prop/coming_out",
+      "fields": {
+        "Unknown1": 1,
+        "TimeBegin": 0,
+        "TimeEnd": 4,
+        "TurningVelocity": 200,
+        "UseInput": false,
+        "UseCamera": false,
+        "Direction": [
+          0,
+          0,
+          -1
+        ],
+        "Arc": 180,
+        "MaxDistance": 5,
+        "CheckArc": false,
+        "CheckDistance": false,
+        "OrientOffsetFromTarget": 0,
+        "TargetFilter": 2,
+        "TargetOverrides": 0,
+        "MinPriorityTargetClass": {
+          "hash": "16840447804245826439",
+          "name": "#e9b54a0dae945b87"
+        },
+        "MaxPriorityTargetClass": {
+          "hash": "16840447804246351257",
+          "name": "#e9b54a0dae9c5d99"
+        },
+        "Priority": -5,
+        "BlendInTime": 0,
+        "BlendOutTime": 0
+      },
+      "schema": "AutoTargetTrack",
+      "end": 41776
+    },
+    "targetFilter2": "AttackMelee: bit 1 of table 1125b420. 10142ad9..10142b04 binds the property; 10d52970..10d529e1 registers LockOn, AttackMelee, AttackRanged, Grab, Feet, AlertObject. AutoTargetTrack serialization is a bitfield.",
+    "separation": "This AutoTarget action steers orientation during 0..4 seconds. Its targetFilter is not a replacement for either Hit collideWith category mask. Priority class hashes remain unresolved."
+  },
+  "shared_victim_receipts": {
+    "owner": "The MotherCore owns proto::CollisionActionBehaviour. Both non-thrown Hit actions share this owner component, rather than independent per-track victim sets.",
+    "bind": "100a4310 binds action owner to action+20, then cat 0x1d/subtype 7 queries CollisionActionBehaviour into action+24. Handler 10064b60 returns the component. UseOriginatorToValidate=false leaves owner selection unchanged.",
+    "enable": "100aa830 is !(track+11c bit 1), i.e. !IsThrown. Both tracks serialize IsThrown=false.",
+    "active_scope": "100a4970 entry calls 10065470(true), incrementing component+c active count; 100a3780 exit calls 10065470(false). The component list is cleared when there are no active actions.",
+    "candidate_validation": "100a3810 rejects the source object and applies native receiver checks before 100654c0 checks the shared handle receipt. Additional target eligibility is not a Minecraft faction predicate.",
+    "repeat": "100654c0 permits an already-recorded handle only when TimeBetweenHits>=0 and its elapsed time reaches that interval. Both tracks serialize -1, so the same live receipt rejects repeats.",
+    "mark_timing": "10065940 records or resets the handle BEFORE the action dispatches the damage/reaction message. Swept path: 100a500f..100a503a mark, 100a504a count, 100a508c dispatch. Overlap path: 100a55b0..100a55e2 mark, 100a5605 count, 100a5627 dispatch.",
+    "rejection_boundary": "Once a candidate passes the native query and pre-hit validators and is marked, subsequent damage/reaction no-op or receiver refusal does not condition that mark on a successful hurt return. Earlier query/validator rejection does not reach mark. No Minecraft-style cancellation hook exists in this proven native layer; a future adapter must explicitly document whether its cancellation occurs before or after the source-equivalent receipt boundary.",
+    "expiry": "10065a80 increases each entry elapsed time by dt and removes it only when elapsed > 5.0 seconds (10d9486c); activeCount<=0 clears the list. Both emergence tracks finish before this 5-second expiry.",
+    "overlap_implication": "R3 begins at 0 and can consume a victim before R20 begins at 0.33333298563957214. During overlap, whichever action/candidate is processed first may suppress the other. Do not replace this with independent hit windows or Goliath strongest-window merging.",
+    "ordering_status": "Stable authored track order in the same initial ActionList. R20 (FIG41324) is processed before R3 (FIG41776) whenever both are active; activation time does not move an action to the tail or re-sort it. 1090bde0 handles engine phase4. At 1090be2b..38 it calls poll(1), then finalization. After conditional node selection, 1090bea1..b6 calls advance(2, dt), then poll(0). CollisionHitAction enter 100a4970 at 100a4977..100a498a enables 0x800 << (entryPhase-1). Mother enters with phase2, so its collision tick is poll1. A newly activated Hit is not ticked by the immediately following poll0; it first ticks on the following mother update poll1."
+  },
+  "spatial_and_shapecast": {
+    "R20": "No joint and zero local offset: current actor/root matrix translation; sphere radius 20, current overlap query, not an eye line-of-sight ray.",
+    "R3": "The prior record correctly decoded the authored hash as Neck_1 but incorrectly treated that as an existing MotherCore joint. That claim is withdrawn. The normal source MotherCore path resolves this missing name to 0xffff and R3 sweeps actor/root translation. Missing Neck_1 resolves to root. The sphere has local center0 and radius3. Prior matrix contains identity orientation plus previous root translation; current matrix is root world transform. Sweep interpolation transforms the zero center along the root translation path, with constant source radius3. No extra actor/joint scale multiplier belongs on this radius.",
+    "joint_transform": "Conditional native joint path: 100a3aa0 combines the resolved Puppet joint palette matrix (index*64) with actor world transform via 107bf620. Conditional normalization at 100a3afa..100a3b09 depends on Puppet flag 4. It then transforms the local offset and adds translation. Actual MotherCore R3 uses the missing-name root fallback documented in effective_joint_resolution.",
+    "joint_resolution": "100aa890 resolves jointName and jointEnd using 10127b00 into action+f0/+f4. Empty jointEnd is 0xffff; 100a8cb0 returns -1, so radius falls back to authored track+e4 via 100a8c90.",
+    "previous_current": "100a4970 initializes previous root translation for missing joint index0xffff.100a4190 builds identity+previous translation and current root matrix;100a5669..100a5696 saves the current root translation after update.",
+    "queries": "100a4bd0 reads UseShapecast through 100aabf0. Swept path calls 10639710 at 100a4e80..100a4e95; overlap path calls 10637060 around 100a50b2..100a5199.",
+    "radius_storage": "1014b790 writes raw radius to track+e4; 100a8c90 returns it. Sphere construction 10645a40->10645800 writes raw shape radius at +3c; 106447c0 computes center +/- radius bounds.",
+    "scale_boundary": "10634850 ->106347b0 ->10645980(type2 jump-table entry10645999) ->106446d0 transforms local sphere center by the supplied matrix, reads unchanged radius+3c, and writes center +/- that radius. It never writes radius or multiplies it by matrix scale. The separate10644820 scale operation is not on this path. R20 constructs an AABB from the local sphere, transforms that broadphase AABB by current root matrix in100a2650, and then asks each enabled target primitive for closest surface relative to current root translation. 100a5438..100a5447 compares its distance against raw action+98 radius20. Thus narrow radius is unscaled; arbitrary nonunit or skew root matrices can still alter the broadphase AABB. MotherCore authored object scale is1."
+  },
+  "damage_and_impulse": {
+    "base": "100a9819..100a983b interpolates min/max damage. Since each track has equal min/max, base damage is 800 (R20) or 100 (R3), before the enabled transformation and conditional friendliness multipliers.",
+    "multipliers": "100a9919..100a9964 sends category 0x1e/subtype 0xc for the enabled transformation multiplier. Weapon multiplier path 100a9970..100a99bb is disabled by both tracks.",
+    "friendly": "100a99c1..100a9a34 calls 103c4690 on originator/receiver when FriendlyFire<1, and on a positive result multiplies damage by the authored 0.01 or 0.2. This is not proven to be blanket ally exclusion; exact affiliation classification remains in 103c4690.",
+    "impulse_interpolation": "100a9c34..100a9cc8 interpolates min/max; equal endpoints and randomPlusMinus=0 preserve the authored vector before orientation.",
+    "impulse_orientation": "UseMotion=false takes 100a9e53..100a9e6e: ordinary direction reference is receiver root world position minus attacker root position (100a9a6f..100a9aa5); collider kind 6 uses negative collision normal instead. 10937cd0->10937c80 computes theta=atan2(-x,-z), normalized to [0,2pi), with near-zero fallback. 10937e00 applies x'=x*cos(theta)+z*sin(theta), z'=-x*sin(theta)+z*cos(theta), y unchanged.",
+    "R20_impulse": "[0,10000,-5000] therefore points upward and radially outward for the ordinary root-to-root reference.",
+    "R3_impulse": "[2000,5000,2000] retains authored lateral/back components after that rotation. It must not be replaced by a generic outward knockback vector.",
+    "collision_direction": "CollisionDirection is [0,0,0] in both tracks. Native fallback can derive collision direction from current-minus-previous contact translation after the first update. This message direction is separate from impulse rotation.",
+    "prop_velocity": "MomentumDamageVelocity=0, MomentumDamageMax=0, TravelVelocity=0, TravelTowardsTarget=None in both tracks. There is no authored additional velocity-scaled damage here. Crater debris SpawnObject velocities are a separate playback path.",
+    "deform_and_effects": "DeformDirStr=1, DeformStr=1, scaleX/Y/effectScale=1, prop area emission/size scales=0, EffectTypeName=0. Receiver-side deformation, rigid body impulse response and downstream character/vehicle differences remain unclosed; no block-breaking or vehicle damage scale is inferred. Collider mask ANY-bit matching is now confirmed in query_filters_scale_and_sampling."
+  },
+  "units_and_existing_howl": {
+    "source_length": "P1 source world units, not model pixels and not Minecraft blocks.",
+    "source_time": "Seconds. Keep the original stored float values; any 20 Hz boundary policy is an explicit future Minecraft adaptation.",
+    "source_impulse": "P1 physics impulse vector; not velocity and not Minecraft blocks per tick. Receiver mass/force/deformation conversion remains unclosed.",
+    "mother_core_meta_scale": [
+      1,
+      1,
+      1
+    ],
+    "model_pixels_per_source_unit_json": 7.167352101048183,
+    "blocks_per_source_unit_json_precision": 0.44795950631551146,
+    "source_R20_in_blocks_json_precision": 8.95919012631023,
+    "source_R3_in_blocks_json_precision": 1.3438785189465343,
+    "java_getAsFloat_pixels": 7.167352199554443,
+    "java_sourceUnitBlocks": 0.4479595124721527,
+    "java_source_R20_blocks": 8.959190249443054,
+    "java_source_R3_blocks": 1.3438785374164581,
+    "scale_evidence": "SourceBossMotion.java:28 reads getAsFloat; :48 divides pixelsPerSourceUnit by 16D. MotherCore META native scale is independent from hydraCrater001Scaled scale [3,1,3].",
+    "existing_howl_mismatch": "HISTORICAL SNAPSHOT from the first audit: SourceBossAction.Window stores raw radius/offset, radius() at line 44 returns raw radius; SourceRadialWave.java:16..20 uses raw offset/radius directly. EncounterMob.java:592 invokes it without sourceUnitBlocks conversion. encounter_source_actions.json explicitly declares its old one-source-unit-to-one-block adaptation; HOWL radii are 8,12,16,20,25,30,40 and offsetY=2. This differs from the current source motion/cycle scale. It is recorded, not fixed in this audit. FOLLOW-UP: sibling source changes now provide SourceBossAction.spatialScale/worldRadius and SourceRadialWave scaling; this historical issue is not asserted to remain in the current code."
+  },
+  "crater": {
+    "template": {
+      "name": "hydraCrater001Scaled",
+      "hash": "0xee2bcaebd123121c",
+      "source": "comparison/mother_tod.p3d.rz",
+      "object_offset": 1338,
+      "meta_data_offset": 1445,
+      "meta_length": 528,
+      "scale": [
+        3,
+        1,
+        3
+      ],
+      "scale_float_offsets": [
+        1483,
+        1487,
+        1491
+      ],
+      "physics": "HydraCraterScaledPhysicsMongo",
+      "render": "hydraCrater001",
+      "playback": "//hydraCrater001/2_states",
+      "propLogic": "//2_states"
+    },
+    "object": {
+      "name": "hydraCrater",
+      "hash": "0xbd547d1bb77b37dd",
+      "grab_slot": "Crater",
+      "grab_slot_hash": "0x314aa6574a562515"
+    },
+    "spawn": {
+      "source": "comparison/mother_fig.p3d.rz",
+      "offset": 43316,
+      "payload": 43328,
+      "length": 244,
+      "type": "SpawnObject",
+      "kind": "TrackHash",
+      "owner": "mother_core/opening/coming_out/spawn_prop/crater",
+      "fields": {
+        "Unknown1": 1,
+        "TimeBegin": 0,
+        "TemplateName": {
+          "hash": "17162033919200268828",
+          "name": "hydraCrater001Scaled"
+        },
+        "ObjectName": {
+          "hash": "13642666729207969757",
+          "name": "hydraCrater"
+        },
+        "AddSuffix": true,
+        "InitialState": "initial",
+        "SpecificPlaybackset": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "SpawnSpace": {
+          "hash": "15800074974379949085",
+          "name": "GameObjectSpace"
+        },
+        "SpawnJoint": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "Offset": [
+          0,
+          20,
+          0
+        ],
+        "Orientation": [
+          0,
+          0,
+          0
+        ],
+        "AttachToParent": true,
+        "DetachAfterSpawn": false,
+        "AICharacter": false,
+        "AutomaticTag": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "GrabSlot": {
+          "hash": "3551834149974582549",
+          "name": "Crater"
+        },
+        "CopyPose": false,
+        "InheritSpawnerVelocity": false,
+        "LinearVelocity": [
+          0,
+          0,
+          0
+        ],
+        "AngularVelocity": [
+          0,
+          0,
+          0
+        ],
+        "CollideWithSpawnerDelay": 0.5,
+        "SpawnSleeping": false,
+        "ManageLifetime": false,
+        "ManageLifetimeThrownProp": false,
+        "InheritSpawnerTarget": false,
+        "InheritSpawnerCharge": {
+          "hash": "4122290943349627157",
+          "name": "Invalid"
+        },
+        "UseParentScale": false,
+        "SetScale": false,
+        "Scale": [
+          0,
+          0,
+          0
+        ],
+        "Probability": 1,
+        "UseSpawnerAsDamageOriginator": false,
+        "DamageOriginatorFromSpawner": true,
+        "TransferTargetLocks": false,
+        "SendMessageToScenarioTree": false,
+        "ApplyColourTint": false,
+        "InheritPackage": true,
+        "TintColour": [
+          0.5019609928131104,
+          0.5019609928131104,
+          0.5019609928131104,
+          1
+        ],
+        "CacheDamageOrigionatorAsCollider": true
+      },
+      "schema": "SpawnObjectTrack",
+      "end": 43580
+    },
+    "final_trigger": {
+      "source": "comparison/mother_fig.p3d.rz",
+      "offset": 42116,
+      "payload": 42128,
+      "length": 36,
+      "type": "GrabbedPlayback",
+      "kind": "TrackHash",
+      "owner": "mother_core/opening/coming_out/spawn_prop/coming_out",
+      "fields": {
+        "Unknown1": 1,
+        "TimeBegin": 0.33333298563957214,
+        "GrabSlot": {
+          "hash": "3551834149974582549",
+          "name": "Crater"
+        },
+        "State": {
+          "hash": "7270595492042307944",
+          "name": "final"
+        },
+        "SpecificPlaybackSet": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "NotifyOnPlaybackFinished": false
+      },
+      "schema": "GrabbedPlaybackTrack",
+      "end": 42172
+    },
+    "lifecycle": "Spawn uses GameObjectSpace offset [0,20,0], AttachToParent=true, DetachAfterSpawn=false, GrabSlot=Crater, initialState=initial. UseParentScale=false and SetScale=false leave template [3,1,3] separate from MotherCore scale. ManageLifetime=false on spawn. Parent spawn_prop also requests Crater initial at 40384. Enter requests final at +0.33333298563957214. Exit ManageLifetime37984 and Detach38028 are at +3 seconds; the existing lifecycle proof explains that background tracks do not themselves prolong the 2.933-second exit clip.",
+    "initial": "Node164/AnimationControl204 frames 0..15; Sound256 starts patch 0xe7c4b89217490a3c at t0, volume/pitch1, attenuation55..250, polledLifetime=false. Six authored debris SpawnObjects occur at .3/.4/.5/.6 seconds with distinct source velocities; the exact raw fields are preserved in the private crater FIG snapshot.",
+    "final": "Node2048/AnimationControl2088 at t0 frames0..30, forward, one cycle. Sound2140 starts patch 0x7808c21846650ea5 and Sound2232 stops patch 0xe7c4b89217490a3c at t0; both stored attenuation55..155. Finish PrimitiveDisplay2344 is not decoded. AnimationControl2424 holds frame30.",
+    "no_extra_hit": "No Hit or Explosion track was found within this crater playback subtree. Debris, sound and display playback do not prove another radial damage event.",
+    "uncertainty": "The effective attachment transform during mother vertical movement, playback-transition cancellation of not-yet-fired debris, PrimitiveDisplay payloads, debris template behavior and physics response are not closed. Do not assert a stationary world crater or that all six debris tracks always fire.",
+    "selected_playback_records": [
+      {
+        "source": "comparison/mother_fig.p3d.rz",
+        "offset": 204,
+        "payload": 216,
+        "length": 32,
+        "type": "AnimationControl",
+        "kind": "TrackHash",
+        "owner": "hydraCrater001/#6d8759d639c627b3/initial",
+        "fields": {
+          "Unknown1": 0,
+          "TimeBegin": 0,
+          "StartFrame": 0,
+          "EndFrame": 15,
+          "RelativeSpeed": 1,
+          "CycleMode": {
+            "hash": "3086659247459262221",
+            "name": "AnimationDefault"
+          },
+          "NumCycles": 0
+        },
+        "schema": "AnimationControlTrack",
+        "end": 256
+      },
+      {
+        "source": "comparison/mother_fig.p3d.rz",
+        "offset": 256,
+        "payload": 268,
+        "length": 72,
+        "type": "Sound",
+        "kind": "TrackHash",
+        "owner": "hydraCrater001/#6d8759d639c627b3/initial",
+        "fields": {
+          "Unknown1": 1,
+          "TimeBegin": 0,
+          "Patch": {
+            "hash": "16700676255792040508",
+            "name": "#e7c4b89217490a3c"
+          },
+          "Trigger": {
+            "hash": "31616665440155042",
+            "name": "play"
+          },
+          "VolumeFactor": 1,
+          "MinDistance": 55,
+          "MaxDistance": 250,
+          "MinPitch": 1,
+          "MaxPitch": 1,
+          "CyclicPhase": 0,
+          "InstanceName": {
+            "hash": "0",
+            "name": "#0"
+          },
+          "Frequency": 1,
+          "PolledLifetime": false,
+          "TriggerType": {
+            "hash": "13522664087197083521",
+            "name": "Retrigger"
+          }
+        },
+        "schema": "SoundTrack",
+        "end": 348
+      },
+      {
+        "source": "comparison/mother_fig.p3d.rz",
+        "offset": 348,
+        "payload": 360,
+        "length": 244,
+        "type": "SpawnObject",
+        "kind": "TrackHash",
+        "owner": "hydraCrater001/#6d8759d639c627b3/initial",
+        "fields": {
+          "Unknown1": 0,
+          "TimeBegin": 0.5,
+          "TemplateName": {
+            "hash": "118571486427852476",
+            "name": "hydraCrater001Spawn1"
+          },
+          "ObjectName": {
+            "hash": "12091683148973342747",
+            "name": "#a7ce49c26f22001b"
+          },
+          "AddSuffix": true,
+          "InitialState": "initial",
+          "SpecificPlaybackset": {
+            "hash": "0",
+            "name": "#0"
+          },
+          "SpawnSpace": {
+            "hash": "15800074974379949085",
+            "name": "GameObjectSpace"
+          },
+          "SpawnJoint": {
+            "hash": "0",
+            "name": "#0"
+          },
+          "Offset": [
+            1.2000000476837158,
+            1,
+            0.699999988079071
+          ],
+          "Orientation": [
+            0,
+            0,
+            0
+          ],
+          "AttachToParent": false,
+          "DetachAfterSpawn": false,
+          "AICharacter": false,
+          "AutomaticTag": {
+            "hash": "0",
+            "name": "#0"
+          },
+          "GrabSlot": {
+            "hash": "0",
+            "name": "#0"
+          },
+          "CopyPose": false,
+          "InheritSpawnerVelocity": false,
+          "LinearVelocity": [
+            4,
+            7,
+            0
+          ],
+          "AngularVelocity": [
+            0,
+            0,
+            -10
+          ],
+          "CollideWithSpawnerDelay": 3,
+          "SpawnSleeping": false,
+          "ManageLifetime": true,
+          "ManageLifetimeThrownProp": false,
+          "InheritSpawnerTarget": false,
+          "InheritSpawnerCharge": {
+            "hash": "4122290943349627157",
+            "name": "Invalid"
+          },
+          "UseParentScale": false,
+          "SetScale": false,
+          "Scale": [
+            1,
+            1,
+            1
+          ],
+          "Probability": 1,
+          "UseSpawnerAsDamageOriginator": false,
+          "DamageOriginatorFromSpawner": true,
+          "TransferTargetLocks": false,
+          "SendMessageToScenarioTree": false,
+          "ApplyColourTint": false,
+          "InheritPackage": true,
+          "TintColour": [
+            0.5019609928131104,
+            0.5019609928131104,
+            0.5019609928131104,
+            1
+          ],
+          "CacheDamageOrigionatorAsCollider": true
+        },
+        "schema": "SpawnObjectTrack",
+        "end": 612
+      },
+      {
+        "source": "comparison/mother_fig.p3d.rz",
+        "offset": 612,
+        "payload": 624,
+        "length": 244,
+        "type": "SpawnObject",
+        "kind": "TrackHash",
+        "owner": "hydraCrater001/#6d8759d639c627b3/initial",
+        "fields": {
+          "Unknown1": 0,
+          "TimeBegin": 0.4000000059604645,
+          "TemplateName": {
+            "hash": "118571486427852479",
+            "name": "hydraCrater001Spawn2"
+          },
+          "ObjectName": {
+            "hash": "12091683148973539678",
+            "name": "#a7ce49c26f25015e"
+          },
+          "AddSuffix": true,
+          "InitialState": "initial",
+          "SpecificPlaybackset": {
+            "hash": "0",
+            "name": "#0"
+          },
+          "SpawnSpace": {
+            "hash": "15800074974379949085",
+            "name": "GameObjectSpace"
+          },
+          "SpawnJoint": {
+            "hash": "0",
+            "name": "#0"
+          },
+          "Offset": [
+            -1.2000000476837158,
+            1,
+            -0.699999988079071
+          ],
+          "Orientation": [
+            0,
+            0,
+            0
+          ],
+          "AttachToParent": false,
+          "DetachAfterSpawn": false,
+          "AICharacter": false,
+          "AutomaticTag": {
+            "hash": "0",
+            "name": "#0"
+          },
+          "GrabSlot": {
+            "hash": "0",
+            "name": "#0"
+          },
+          "CopyPose": false,
+          "InheritSpawnerVelocity": false,
+          "LinearVelocity": [
+            -4,
+            5,
+            0
+          ],
+          "AngularVelocity": [
+            0,
+            0,
+            10
+          ],
+          "CollideWithSpawnerDelay": 3,
+          "SpawnSleeping": false,
+          "ManageLifetime": true,
+          "ManageLifetimeThrownProp": false,
+          "InheritSpawnerTarget": false,
+          "InheritSpawnerCharge": {
+            "hash": "4122290943349627157",
+            "name": "Invalid"
+          },
+          "UseParentScale": false,
+          "SetScale": false,
+          "Scale": [
+            1,
+            1,
+            1
+          ],
+          "Probability": 1,
+          "UseSpawnerAsDamageOriginator": false,
+          "DamageOriginatorFromSpawner": true,
+          "TransferTargetLocks": false,
+          "SendMessageToScenarioTree": false,
+          "ApplyColourTint": false,
+          "InheritPackage": true,
+          "TintColour": [
+            0.5019609928131104,
+            0.5019609928131104,
+            0.5019609928131104,
+            1
+          ],
+          "CacheDamageOrigionatorAsCollider": true
+        },
+        "schema": "SpawnObjectTrack",
+        "end": 876
+      },
+      {
+        "source": "comparison/mother_fig.p3d.rz",
+        "offset": 876,
+        "payload": 888,
+        "length": 244,
+        "type": "SpawnObject",
+        "kind": "TrackHash",
+        "owner": "hydraCrater001/#6d8759d639c627b3/initial",
+        "fields": {
+          "Unknown1": 0,
+          "TimeBegin": 0.30000001192092896,
+          "TemplateName": {
+            "hash": "118571486427852478",
+            "name": "hydraCrater001Spawn3"
+          },
+          "ObjectName": {
+            "hash": "12091683148973473949",
+            "name": "#a7ce49c26f24009d"
+          },
+          "AddSuffix": true,
+          "InitialState": "initial",
+          "SpecificPlaybackset": {
+            "hash": "0",
+            "name": "#0"
+          },
+          "SpawnSpace": {
+            "hash": "15800074974379949085",
+            "name": "GameObjectSpace"
+          },
+          "SpawnJoint": {
+            "hash": "0",
+            "name": "#0"
+          },
+          "Offset": [
+            -0.8619999885559082,
+            1,
+            0.6990000009536743
+          ],
+          "Orientation": [
+            0,
+            0,
+            0
+          ],
+          "AttachToParent": false,
+          "DetachAfterSpawn": false,
+          "AICharacter": false,
+          "AutomaticTag": {
+            "hash": "0",
+            "name": "#0"
+          },
+          "GrabSlot": {
+            "hash": "0",
+            "name": "#0"
+          },
+          "CopyPose": false,
+          "InheritSpawnerVelocity": false,
+          "LinearVelocity": [
+            -2,
+            6,
+            4
+          ],
+          "AngularVelocity": [
+            5,
+            0,
+            1
+          ],
+          "CollideWithSpawnerDelay": 3,
+          "SpawnSleeping": false,
+          "ManageLifetime": true,
+          "ManageLifetimeThrownProp": false,
+          "InheritSpawnerTarget": false,
+          "InheritSpawnerCharge": {
+            "hash": "4122290943349627157",
+            "name": "Invalid"
+          },
+          "UseParentScale": false,
+          "SetScale": false,
+          "Scale": [
+            1,
+            1,
+            1
+          ],
+          "Probability": 1,
+          "UseSpawnerAsDamageOriginator": false,
+          "DamageOriginatorFromSpawner": true,
+          "TransferTargetLocks": false,
+          "SendMessageToScenarioTree": false,
+          "ApplyColourTint": false,
+          "InheritPackage": true,
+          "TintColour": [
+            0.5019609928131104,
+            0.5019609928131104,
+            0.5019609928131104,
+            1
+          ],
+          "CacheDamageOrigionatorAsCollider": true
+        },
+        "schema": "SpawnObjectTrack",
+        "end": 1140
+      },
+      {
+        "source": "comparison/mother_fig.p3d.rz",
+        "offset": 1140,
+        "payload": 1152,
+        "length": 244,
+        "type": "SpawnObject",
+        "kind": "TrackHash",
+        "owner": "hydraCrater001/#6d8759d639c627b3/initial",
+        "fields": {
+          "Unknown1": 0,
+          "TimeBegin": 0.6000000238418579,
+          "TemplateName": {
+            "hash": "118571486427852473",
+            "name": "hydraCrater001Spawn4"
+          },
+          "ObjectName": {
+            "hash": "12091683148973146072",
+            "name": "#a7ce49c26f1effd8"
+          },
+          "AddSuffix": true,
+          "InitialState": "initial",
+          "SpecificPlaybackset": {
+            "hash": "0",
+            "name": "#0"
+          },
+          "SpawnSpace": {
+            "hash": "15800074974379949085",
+            "name": "GameObjectSpace"
+          },
+          "SpawnJoint": {
+            "hash": "0",
+            "name": "#0"
+          },
+          "Offset": [
+            -0.4580000042915344,
+            1,
+            -1.6549999713897705
+          ],
+          "Orientation": [
+            0,
+            0,
+            0
+          ],
+          "AttachToParent": false,
+          "DetachAfterSpawn": false,
+          "AICharacter": false,
+          "AutomaticTag": {
+            "hash": "0",
+            "name": "#0"
+          },
+          "GrabSlot": {
+            "hash": "0",
+            "name": "#0"
+          },
+          "CopyPose": false,
+          "InheritSpawnerVelocity": false,
+          "LinearVelocity": [
+            0.23499999940395355,
+            5,
+            -6
+          ],
+          "AngularVelocity": [
+            -5,
+            0,
+            1
+          ],
+          "CollideWithSpawnerDelay": 3,
+          "SpawnSleeping": false,
+          "ManageLifetime": true,
+          "ManageLifetimeThrownProp": false,
+          "InheritSpawnerTarget": false,
+          "InheritSpawnerCharge": {
+            "hash": "4122290943349627157",
+            "name": "Invalid"
+          },
+          "UseParentScale": false,
+          "SetScale": false,
+          "Scale": [
+            1,
+            1,
+            1
+          ],
+          "Probability": 1,
+          "UseSpawnerAsDamageOriginator": false,
+          "DamageOriginatorFromSpawner": true,
+          "TransferTargetLocks": false,
+          "SendMessageToScenarioTree": false,
+          "ApplyColourTint": false,
+          "InheritPackage": true,
+          "TintColour": [
+            0.5019609928131104,
+            0.5019609928131104,
+            0.5019609928131104,
+            1
+          ],
+          "CacheDamageOrigionatorAsCollider": true
+        },
+        "schema": "SpawnObjectTrack",
+        "end": 1404
+      },
+      {
+        "source": "comparison/mother_fig.p3d.rz",
+        "offset": 1404,
+        "payload": 1416,
+        "length": 244,
+        "type": "SpawnObject",
+        "kind": "TrackHash",
+        "owner": "hydraCrater001/#6d8759d639c627b3/initial",
+        "fields": {
+          "Unknown1": 0,
+          "TimeBegin": 0.5,
+          "TemplateName": {
+            "hash": "118571486427852472",
+            "name": "hydraCrater001Spawn5"
+          },
+          "ObjectName": {
+            "hash": "12091683148973080343",
+            "name": "#a7ce49c26f1dff17"
+          },
+          "AddSuffix": true,
+          "InitialState": "initial",
+          "SpecificPlaybackset": {
+            "hash": "0",
+            "name": "#0"
+          },
+          "SpawnSpace": {
+            "hash": "15800074974379949085",
+            "name": "GameObjectSpace"
+          },
+          "SpawnJoint": {
+            "hash": "0",
+            "name": "#0"
+          },
+          "Offset": [
+            1.0859999656677246,
+            1,
+            -1.034000039100647
+          ],
+          "Orientation": [
+            0,
+            0,
+            0
+          ],
+          "AttachToParent": false,
+          "DetachAfterSpawn": false,
+          "AICharacter": false,
+          "AutomaticTag": {
+            "hash": "0",
+            "name": "#0"
+          },
+          "GrabSlot": {
+            "hash": "0",
+            "name": "#0"
+          },
+          "CopyPose": false,
+          "InheritSpawnerVelocity": false,
+          "LinearVelocity": [
+            5,
+            8,
+            -2
+          ],
+          "AngularVelocity": [
+            -2,
+            0,
+            -3
+          ],
+          "CollideWithSpawnerDelay": 3,
+          "SpawnSleeping": false,
+          "ManageLifetime": true,
+          "ManageLifetimeThrownProp": false,
+          "InheritSpawnerTarget": false,
+          "InheritSpawnerCharge": {
+            "hash": "4122290943349627157",
+            "name": "Invalid"
+          },
+          "UseParentScale": false,
+          "SetScale": false,
+          "Scale": [
+            1,
+            1,
+            1
+          ],
+          "Probability": 1,
+          "UseSpawnerAsDamageOriginator": false,
+          "DamageOriginatorFromSpawner": true,
+          "TransferTargetLocks": false,
+          "SendMessageToScenarioTree": false,
+          "ApplyColourTint": false,
+          "InheritPackage": true,
+          "TintColour": [
+            0.5019609928131104,
+            0.5019609928131104,
+            0.5019609928131104,
+            1
+          ],
+          "CacheDamageOrigionatorAsCollider": true
+        },
+        "schema": "SpawnObjectTrack",
+        "end": 1668
+      },
+      {
+        "source": "comparison/mother_fig.p3d.rz",
+        "offset": 1668,
+        "payload": 1680,
+        "length": 244,
+        "type": "SpawnObject",
+        "kind": "TrackHash",
+        "owner": "hydraCrater001/#6d8759d639c627b3/initial",
+        "fields": {
+          "Unknown1": 0,
+          "TimeBegin": 0.30000001192092896,
+          "TemplateName": {
+            "hash": "118571486427852475",
+            "name": "hydraCrater001Spawn6"
+          },
+          "ObjectName": {
+            "hash": "12091683148973277274",
+            "name": "#a7ce49c26f21005a"
+          },
+          "AddSuffix": true,
+          "InitialState": "initial",
+          "SpecificPlaybackset": {
+            "hash": "0",
+            "name": "#0"
+          },
+          "SpawnSpace": {
+            "hash": "15800074974379949085",
+            "name": "GameObjectSpace"
+          },
+          "SpawnJoint": {
+            "hash": "0",
+            "name": "#0"
+          },
+          "Offset": [
+            -0.9610000252723694,
+            1,
+            -1.2869999408721924
+          ],
+          "Orientation": [
+            0,
+            0,
+            0
+          ],
+          "AttachToParent": false,
+          "DetachAfterSpawn": false,
+          "AICharacter": false,
+          "AutomaticTag": {
+            "hash": "0",
+            "name": "#0"
+          },
+          "GrabSlot": {
+            "hash": "0",
+            "name": "#0"
+          },
+          "CopyPose": false,
+          "InheritSpawnerVelocity": false,
+          "LinearVelocity": [
+            -2.611999988555908,
+            7,
+            -2.996000051498413
+          ],
+          "AngularVelocity": [
+            -5,
+            0,
+            0
+          ],
+          "CollideWithSpawnerDelay": 3,
+          "SpawnSleeping": false,
+          "ManageLifetime": true,
+          "ManageLifetimeThrownProp": false,
+          "InheritSpawnerTarget": false,
+          "InheritSpawnerCharge": {
+            "hash": "4122290943349627157",
+            "name": "Invalid"
+          },
+          "UseParentScale": false,
+          "SetScale": false,
+          "Scale": [
+            1,
+            1,
+            1
+          ],
+          "Probability": 1,
+          "UseSpawnerAsDamageOriginator": false,
+          "DamageOriginatorFromSpawner": true,
+          "TransferTargetLocks": false,
+          "SendMessageToScenarioTree": false,
+          "ApplyColourTint": false,
+          "InheritPackage": true,
+          "TintColour": [
+            0.5019609928131104,
+            0.5019609928131104,
+            0.5019609928131104,
+            1
+          ],
+          "CacheDamageOrigionatorAsCollider": true
+        },
+        "schema": "SpawnObjectTrack",
+        "end": 1932
+      },
+      {
+        "source": "comparison/mother_fig.p3d.rz",
+        "offset": 1952,
+        "payload": 1964,
+        "length": 60,
+        "type": "PrimitiveDisplay",
+        "kind": "TrackHash",
+        "owner": "hydraCrater001/#6d8759d639c627b3/initial",
+        "decodeError": "Consumed 4/60",
+        "end": 2032
+      },
+      {
+        "source": "comparison/mother_fig.p3d.rz",
+        "offset": 2088,
+        "payload": 2100,
+        "length": 32,
+        "type": "AnimationControl",
+        "kind": "TrackHash",
+        "owner": "hydraCrater001/#6d8759d639c627b3/final",
+        "fields": {
+          "Unknown1": 0,
+          "TimeBegin": 0,
+          "StartFrame": 0,
+          "EndFrame": 30,
+          "RelativeSpeed": 1,
+          "CycleMode": {
+            "hash": "8950535410429879495",
+            "name": "Forward"
+          },
+          "NumCycles": 1
+        },
+        "schema": "AnimationControlTrack",
+        "end": 2140
+      },
+      {
+        "source": "comparison/mother_fig.p3d.rz",
+        "offset": 2140,
+        "payload": 2152,
+        "length": 72,
+        "type": "Sound",
+        "kind": "TrackHash",
+        "owner": "hydraCrater001/#6d8759d639c627b3/final",
+        "fields": {
+          "Unknown1": 1,
+          "TimeBegin": 0,
+          "Patch": {
+            "hash": "8649376493881069221",
+            "name": "#7808c21846650ea5"
+          },
+          "Trigger": {
+            "hash": "31616665440155042",
+            "name": "play"
+          },
+          "VolumeFactor": 1,
+          "MinDistance": 55,
+          "MaxDistance": 155,
+          "MinPitch": 1,
+          "MaxPitch": 1,
+          "CyclicPhase": 0,
+          "InstanceName": {
+            "hash": "0",
+            "name": "#0"
+          },
+          "Frequency": 1,
+          "PolledLifetime": false,
+          "TriggerType": {
+            "hash": "13522664087197083521",
+            "name": "Retrigger"
+          }
+        },
+        "schema": "SoundTrack",
+        "end": 2232
+      },
+      {
+        "source": "comparison/mother_fig.p3d.rz",
+        "offset": 2232,
+        "payload": 2244,
+        "length": 72,
+        "type": "Sound",
+        "kind": "TrackHash",
+        "owner": "hydraCrater001/#6d8759d639c627b3/final",
+        "fields": {
+          "Unknown1": 1,
+          "TimeBegin": 0,
+          "Patch": {
+            "hash": "16700676255792040508",
+            "name": "#e7c4b89217490a3c"
+          },
+          "Trigger": {
+            "hash": "32462977145219048",
+            "name": "stop"
+          },
+          "VolumeFactor": 1,
+          "MinDistance": 55,
+          "MaxDistance": 155,
+          "MinPitch": 1,
+          "MaxPitch": 1,
+          "CyclicPhase": 0,
+          "InstanceName": {
+            "hash": "0",
+            "name": "#0"
+          },
+          "Frequency": 1,
+          "PolledLifetime": false,
+          "TriggerType": {
+            "hash": "13522664087197083521",
+            "name": "Retrigger"
+          }
+        },
+        "schema": "SoundTrack",
+        "end": 2324
+      },
+      {
+        "source": "comparison/mother_fig.p3d.rz",
+        "offset": 2344,
+        "payload": 2356,
+        "length": 60,
+        "type": "PrimitiveDisplay",
+        "kind": "TrackHash",
+        "owner": "hydraCrater001/#6d8759d639c627b3/final",
+        "decodeError": "Consumed 4/60",
+        "end": 2424
+      },
+      {
+        "source": "comparison/mother_fig.p3d.rz",
+        "offset": 2424,
+        "payload": 2436,
+        "length": 32,
+        "type": "AnimationControl",
+        "kind": "TrackHash",
+        "owner": "hydraCrater001/#6d8759d639c627b3/final",
+        "fields": {
+          "Unknown1": 0,
+          "TimeBegin": 0,
+          "StartFrame": 30,
+          "EndFrame": 30,
+          "RelativeSpeed": 1,
+          "CycleMode": {
+            "hash": "20324833833942495",
+            "name": "Hold"
+          },
+          "NumCycles": 1
+        },
+        "schema": "AnimationControlTrack",
+        "end": 2476
+      },
+      {
+        "source": "comparison/mother_fig.p3d.rz",
+        "offset": 2704,
+        "payload": 2716,
+        "length": 28,
+        "type": "PrimitiveDisplay",
+        "kind": "TrackHash",
+        "owner": "hydraCrater001Spawn1/#47127f09a468bbc7/initial",
+        "decodeError": "Consumed 4/28",
+        "end": 2752
+      },
+      {
+        "source": "comparison/mother_fig.p3d.rz",
+        "offset": 3000,
+        "payload": 3012,
+        "length": 28,
+        "type": "PrimitiveDisplay",
+        "kind": "TrackHash",
+        "owner": "hydraCrater001Spawn2/#47127f09a468bbc7/initial",
+        "decodeError": "Consumed 4/28",
+        "end": 3048
+      },
+      {
+        "source": "comparison/mother_fig.p3d.rz",
+        "offset": 3296,
+        "payload": 3308,
+        "length": 28,
+        "type": "PrimitiveDisplay",
+        "kind": "TrackHash",
+        "owner": "hydraCrater001Spawn3/#47127f09a468bbc7/initial",
+        "decodeError": "Consumed 4/28",
+        "end": 3344
+      },
+      {
+        "source": "comparison/mother_fig.p3d.rz",
+        "offset": 3592,
+        "payload": 3604,
+        "length": 28,
+        "type": "PrimitiveDisplay",
+        "kind": "TrackHash",
+        "owner": "hydraCrater001Spawn4/#47127f09a468bbc7/initial",
+        "decodeError": "Consumed 4/28",
+        "end": 3640
+      },
+      {
+        "source": "comparison/mother_fig.p3d.rz",
+        "offset": 3888,
+        "payload": 3900,
+        "length": 28,
+        "type": "PrimitiveDisplay",
+        "kind": "TrackHash",
+        "owner": "hydraCrater001Spawn5/#47127f09a468bbc7/initial",
+        "decodeError": "Consumed 4/28",
+        "end": 3936
+      },
+      {
+        "source": "comparison/mother_fig.p3d.rz",
+        "offset": 4184,
+        "payload": 4196,
+        "length": 28,
+        "type": "PrimitiveDisplay",
+        "kind": "TrackHash",
+        "owner": "hydraCrater001Spawn6/#47127f09a468bbc7/initial",
+        "decodeError": "Consumed 4/28",
+        "end": 4232
+      }
+    ]
+  },
+  "reuse_conclusion": {
+    "SourceRadialWave": "Nearest-AABB contact math is reusable. The current scaled helper still lacks separate previous/current root sweep, native sampling, P1 categories, two-phase activation and shared victim receipts. The prior raw-unit observation is historical and separately corrected; the emergence dispatcher is still distinct.",
+    "SourceBossAction": "Its Window(begin,end,radius,joint,offset,damage) omits impulse, masks, flags and receipt semantics. Reusing it unchanged would discard required source behavior.",
+    "EncounterImpact": "May be called for Minecraft presentation after an independently confirmed hit. It does not deal damage; its LivingEntity-only signature and chosen heavy/stagger feedback do not implement vehicle/prop effects or native impulse.",
+    "implementation_boundary": "Do not add a guessed Crater AOE or strongest-window merge. Dispatch R20 then R3 with shared owner receipts and source poll/finalize/advance order. Both use actor root because MotherCore lacks the authored Neck_1 joint; scale lengths once by the project source-unit conversion. Native force/target provider/clock adaptations still need an explicit choice."
+  },
+  "remaining": [
+    {
+      "id": "native_candidate_order_adapter",
+      "question": "ActionList author order and activation phase are now proved. Decide how MC target iteration represents native SAP/collider order after the first minimum-fraction result; do not sort all candidates by damage or claim full TOI sorting.",
+      "next_native": [
+        "1066d3c0 first-result minimum swap",
+        "10670200 /106701c0 candidate collection",
+        "1066fb40 result append"
+      ],
+      "status": "Main action ordering closed; remaining native physics result ordering is an engine-adapter boundary."
+    },
+    {
+      "id": "receipt_rejection_boundary",
+      "question": "Retain source receipt-before-dispatch semantics. Candidate rejection occurs before mark; receiver no-op/immune results after mark consume it. A future MC cancellation hook must be assigned deliberately to one side of this boundary.",
+      "next_native": [
+        "100a3810 -> 100654c0 -> 10065940 -> 100a96c0",
+        "Continue receiver-message dispatch after 100aa000 for individual native refusal paths"
+      ],
+      "status": "Mark-before-dispatch is proved; no general native rollback or accepted-hurt-only receipt is observed. Minecraft event-cancel policy is not source evidence."
+    },
+    {
+      "id": "native_sampling_detail_adapter",
+      "question": "Fixed sphere radius, root fallback, mask intersection and N step count are closed. Optional deeper parity work is candidate interval construction and detailed-contact fallback. Choose explicit MC root-sweep and category provider behavior.",
+      "next_native": [
+        "1066dd70 candidate interval builder",
+        "1066fb40 contact sampling and fallback",
+        "1066f6a0 overlap;1066f800 detailed contact"
+      ],
+      "status": "No actor-scale multiplication of sphere radius; no actual MotherCore Neck_1. Full RavenPhysics collider solver is not implemented in MC."
+    },
+    {
+      "id": "native_receiver_force",
+      "question": "Determine source character/vehicle/prop damage, impulse mass scaling and deformation paths without turning raw impulses into Minecraft velocity.",
+      "next_native": [
+        "100a96c0 after 100aa000",
+        "103c4690 friendliness classifier"
+      ],
+      "status": "Authored values and yaw rotation proved; native receiver outcomes not fully closed."
+    },
+    {
+      "id": "crater_attachment_and_playback",
+      "question": "Prove effective attached crater transform and whether entering final at .333 seconds cancels initial debris tracks that have not yet fired; decode PrimitiveDisplay and spawned debris template behavior.",
+      "next_native": [
+        "Attachable tick 1082ab50/event 1082adc0 are existing attachment candidates, not yet proven reached by this scaled template",
+        "Start from SpawnObject43316 AttachToParent and GrabbedPlayback42116; resolve their track action vtables before following playback replacement",
+        "PrimitiveDisplay FIG offsets1952 and2344, each60-byte payload"
+      ],
+      "status": "Template scale/resources, spawn/final trigger and two playback track sets are closed. Exact native method for these specific playback replacement calls remains to be located."
+    },
+    {
+      "id": "minecraft_units_and_policy",
+      "question": "Implement root overlap R20 and root sweep R3 at sourceUnitBlocks scale, with original shared receipts and authored order. Choose explicit MC source-damage/force, target category and float clock policies; boundary final poll is after the End time test would normally have stopped a naive interval implementation.",
+      "next_code": [
+        "SourceBossMotion.java:48",
+        "SourceBossAction.java:13,44",
+        "SourceRadialWave.java:16..20",
+        "EncounterMob.java:592",
+        "EncounterImpact.java:13..21"
+      ],
+      "status": "No emergence Hit wired by this audit. HOWL spatial scale has been separately corrected by the sibling task; damage/faction equivalence is not inferred."
+    }
+  ],
+  "validation": {
+    "executed": [
+      "Static original payload inspection",
+      "Static x86 disassembly",
+      "JSON parsing and Neo/Forge byte-for-byte source-record mirror",
+      "Follow-up static original MotherCore skeleton hash audit and native action/query call-chain inspection"
+    ],
+    "not_executed": [
+      "Java or Gradle",
+      "unit/GameTests",
+      "game/client",
+      "original native code",
+      "audio playback"
+    ],
+    "production_java_modified": false
+  },
+  "action_order_and_clock": {
+    "result": "Stable authored track order in the same initial ActionList. R20 (FIG41324) is processed before R3 (FIG41776) whenever both are active; activation time does not move an action to the tail or re-sort it.",
+    "track_loading": "10a83240 calls 10a83130 with insertion index -1. For an initially empty track group, 10a83130 reads successive tracks and links previous+4 to the next newly read track (10a831ea..10a8320f), preserving reader/file order. This is not a claim that every later nonempty-group insertion is append-only.",
+    "creation": "Node main-list construction 10a85d20 passes node+30 to 10a834d0. That function walks Track.next at +4 and calls 10a850b0 in order. 10a850b0 invokes the track factory through 10a850a0/vslot15, adds BeginTime and EndTime-BeginTime, then calls 10a7f6c0.",
+    "append": "10a7f6c0 adds current list clock to action begin, links the previous tail.next at +8 to the new action using 10a7da60, and updates tail at list+40. Head is list+3c. There is no BeginTime or damage sorting.",
+    "activation": "10a7fc20 advances list clock (+38) by dt*speed, then walks head+3c and action.next+8. It activates an inactive action when clock>=action.begin (+10), sets active bit4, and stores pendingDelta=clock-begin in action+18. Already activated actions receive this advance dt in +18. All eligible actions on one advance retain list order.",
+    "poll": "10a7f7b0 walks the same head/next chain, calling only active, not-ended actions whose phase bit is enabled. It completes one action update before moving to the next action; candidate processing of R20 and R3 is not interleaved.",
+    "mother_tick_phases": "1090bde0 handles engine phase4. At 1090be2b..38 it calls poll(1), then finalization. After conditional node selection, 1090bea1..b6 calls advance(2, dt), then poll(0).",
+    "hit_phase_registration": "CollisionHitAction enter 100a4970 at 100a4977..100a498a enables 0x800 << (entryPhase-1). Mother enters with phase2, so its collision tick is poll1. A newly activated Hit is not ticked by the immediately following poll0; it first ticks on the following mother update poll1.",
+    "shared_receipt_implication": "R3 can mark a target before R20 starts. During overlap, an unrecorded target reached by both is offered to R20 first. An R3 receipt from an earlier update suppresses R20. Preserve the shared owner ledger; never merge overlapping windows by strongest damage."
+  },
+  "action_clock_boundaries": {
+    "native_start": "10a7fcd1..10a7fcda skips only when clock<begin. Equality activates.",
+    "native_stop": "Finalizer 10a7fe7a..10a7feb3 subtracts action.pendingDelta from remainingDuration after poll1. It ends only when the new remainingDuration<0; equality is retained. Initially negative duration is the unbounded sentinel, but these Hit durations are positive.",
+    "duration_initialization": "10a7d8e0 initializes action+10,+14,+18 to zero. 10a850b0 adds track begin to +10 and track duration (1014bf90=end-begin) to +14. On first activation pendingDelta=clock-begin; subsequent advances write dt*speed.",
+    "clock_at_collision": "The collision callback uses the previous advance pendingDelta and the pre-current-advance ActionList clock. The callback is invoked before checking expiration; duration is not an absolute EndTime check at the top of collision update.",
+    "20Hz_reference_convention": "If the MC adapter deliberately activates the t0 track at age0, uses speed1 and advances nominal clock by .05 seconds per age, R3 first collision is age1; R20 activates at age7 and first collision is age8. This age convention is an MC choice, not a native 20Hz engine claim.",
+    "20Hz_R3_end": "Under that convention R3 End=2.9333300590515137 produces a final callback at age60: after age59 finalization about .03333 seconds remain, then age60 polls before subtracting another .05 and expiring. Stopping at age59 by floor(end*20) would omit the source phase ordering.",
+    "20Hz_R20_end_boundary": "Under exact-real .05 arithmetic, age21 polls then reaches remaining==0 and is retained, so age22 is the final poll before a negative remainder. Native float accumulation/subtraction can move the zero boundary to a small negative value and expire at age21 instead. No fixed 21-versus-22 claim is made without fixing the MC numeric clock policy; original dt is variable and this audit did not execute a clock simulation.",
+    "implementation_advice": "Use a small ordered state machine with active/end flags, pendingDelta and remainingDuration: poll existing hits in authored order; subtract their pendingDelta and end on <0; then advance the shared clock and activate eligible tracks. Do not express this as age in [ceil(begin*20),floor(end*20)]. Choose and document float versus an integer/rational MC timing policy and verify its boundary cases later."
+  },
+  "effective_joint_resolution": {
+    "correction": "The prior record correctly decoded the authored hash as Neck_1 but incorrectly treated that as an existing MotherCore joint. That claim is withdrawn. The normal source MotherCore path resolves this missing name to 0xffff and R3 sweeps actor/root translation.",
+    "authored_name": "Neck_1",
+    "authored_hash": "0x6cc7a1bc232d97b5",
+    "actual_asset_binding": "MotherCore META RenderBehaviour resource mother_core at absolute META offset12657. Original mother.p3d composite chunk0x123000 at5633329 binds mother_core to mother_core_skeleton; the InnerCore, OuterCore and Spine skin headers also name this same skeleton. PuppetBehaviour has no alternate named skeleton in the inspected META.",
+    "skeleton": {
+      "name": "mother_core_skeleton",
+      "chunk_offset": 4265598,
+      "joint_count": 56,
+      "Neck_1_hash_present": false
+    },
+    "foreign_occurrence": [
+      {
+        "owner": "hydra_skeleton",
+        "offset": 4258235,
+        "hash": "0x6cc7a1bc232d97b5"
+      }
+    ],
+    "exact_lookup": "10127b00 obtains the owner pose and calls 106bd0f0 -> 106e7c60 -> 10709560. 10709560 compares the requested 64-bit name against current SkeletonData+44 entries, returns its matching index, or literal 0xffff when none matches. No traversal of unrelated skeletons or nearest-name fallback is present.",
+    "storage_and_use": "100aa98e..100aa9a9 stores jointName result into action+f0 and jointEnd into +f4. 100a8710 returns +f0; 100a4970 stores it into action+88. Empty jointEnd also prevents the joint-chain path.",
+    "fallback": "100a3aa0 first copies actor world matrix at owner+1c+4. At100a3abe it tests index==0xffff and jumps to100a3b0e, skipping Puppet palette multiplication entirely. Offset[0,0,0] leaves the root translation unchanged. Both R20 root overlap and R3 root sweep thus use the same actor origin under the inspected source asset binding.",
+    "scope": "This closes the inspected original MotherCore resource path. A hypothetical runtime replacement of its Puppet with another skeleton is not inferred. Do not invent a Neck bone or redirect this hash to Spine/Head."
+  },
+  "query_filters_scale_and_sampling": {
+    "backend_binding": "Hit calls global physics context112830a4. 107d3ba0 creates BroadPhaseDetectorSingleAxisSweepAndPrune via10698bd0, passes it to1063a3f0, and stores the resulting context at107d3bef. 1063a525 stores this detector at context+0. Its vtable10e4dd34 slot17=1069a2c0 (sweep), slot21=10699a40 (overlap).",
+    "query_mask_layout": "100a4c74 stores query+8 from100a2cb0 global10ff0ec4=0xffffffff. 100a4c84..100a4c9e stores query+c from100a8c30 -> track+118=CollideWith (with a possible StaticObject-bit removal; neither emergence mask contains that bit). Query+10 is an exclusion/group pointer from the separate source path.",
+    "broadphase_mask_predicate": "(query.mask0 & PhysicsObject[+2c]) != 0 AND (query.mask1 & PhysicsObject[+28]) != 0, then nonmatching excluded group and active object checks. 10699b61..10699b87 uses TEST/JZ per mask. Each mask accepts ANY shared bit, not ALL authored bits.",
+    "sweep_mask_levels": "10670390 obtains broadphase candidates through the same slot21. 10670259..1067026b repeats the two intersection checks at CollisionObject+5c/+60; 106702ea..106702f8 repeats them at primitive+1c/+20. It also checks object/primitive enabled flags.",
+    "overlap_mask_levels": "R20 uses the broadphase object mask predicate, then100a52a0..100a54f0 iterates enabled collision objects/primitives and checks the nearest primitive surface. Unlike the R3 sweep path, that local loop has no additional per-primitive category-mask TEST before its distance query. Preserve this distinction if modeling native collider categories.",
+    "category_values": {
+      "R20_0x30": [
+        "Health",
+        "HitReaction"
+      ],
+      "R3_0xc070": [
+        "Health",
+        "HitReaction",
+        "Prop",
+        "PedBehaviour",
+        "VehicleBehaviour"
+      ],
+      "HOWL_0x42_quick_check": [
+        "SimulatedObject",
+        "Prop"
+      ]
+    },
+    "classification_boundary": "P1 bit1 is SimulatedObject, not Player. Names are not a proven mapping to MC LivingEntity, Player, vehicle or prop classes. MC target providers must state their adapter mapping; this audit has not followed every game component that sets native category bits.",
+    "sphere_matrix_transform": "10634850 ->106347b0 ->10645980(type2 jump-table entry10645999) ->106446d0 transforms local sphere center by the supplied matrix, reads unchanged radius+3c, and writes center +/- that radius. It never writes radius or multiplies it by matrix scale. The separate10644820 scale operation is not on this path.",
+    "R3_effective_geometry": "Missing Neck_1 resolves to root. The sphere has local center0 and radius3. Prior matrix contains identity orientation plus previous root translation; current matrix is root world transform. Sweep interpolation transforms the zero center along the root translation path, with constant source radius3. No extra actor/joint scale multiplier belongs on this radius.",
+    "R20_effective_geometry": "R20 constructs an AABB from the local sphere, transforms that broadphase AABB by current root matrix in100a2650, and then asks each enabled target primitive for closest surface relative to current root translation. 100a5438..100a5447 compares its distance against raw action+98 radius20. Thus narrow radius is unscaled; arbitrary nonunit or skew root matrices can still alter the broadphase AABB. MotherCore authored object scale is1.",
+    "source_to_MC_length": "The project sourceUnitBlocks conversion is a separate retarget/unit conversion and must apply once to source radius and root displacement. It is not the native matrix-scale operation described above.",
+    "sweep_step_override": "Defaults .05 translation and .0873 angle in100a2f70 are overridden by the Hit caller:100a4ded writes query+98=1; after PUSH1 at100a4dfe,100a4e0b writes shifted stack address query+94=actionRadius. For R3 the final translation step is3 source units and angular step1 radian. These two writes must not be confused as one overwritten field.",
+    "sweep_substeps": "1066ce50 forms N=max(1,ceil(length(currentTranslation-previousTranslation)/query+94),ceil(abs(relativeQuaternionAngle)/query+98)) and stores1/N at+184. The imported function11331e98 is ceil. 107bad30 computes angle=2*atan2(length(q.xyz),q.w), with its principal-range adjustment, so the threshold is radians.",
+    "sweep_sampling": "1066fb40 advances interpolation fraction by1/N over a candidate-derived bracket (global +100..+104), interpolates translation and quaternion, constructs a rotation/translation matrix, updates the sphere and checks primitive overlaps. This is sampled shape casting, not an analytic infinite-precision segment capsule. Exact candidate bracket generation and detailed-contact fallback still belong to the native solver.",
+    "candidate_return_order": "1069a2c0 calls1066d3c0 after collection. That routine scans fraction at offset0 and swaps only the minimum result into the first slot, using strict improvement; it does not sort the entire output.100a4bd0 then walks 0x34-byte returned hits sequentially. Native collection order for remaining candidates is not MC UUID order.",
+    "implementation_boundary": "A fixed-radius sampled root sphere reproduces the confirmed geometry. An analytic MC swept sphere/capsule can be a deliberate continuous-collision adaptation but must not be described as identical to the native sampling solver. Retain complete R20-before-R3 dispatch and shared victim receipts whichever collision adapter is selected."
+  },
+  "corrections": [
+    "The prior record correctly decoded the authored hash as Neck_1 but incorrectly treated that as an existing MotherCore joint. That claim is withdrawn. The normal source MotherCore path resolves this missing name to 0xffff and R3 sweeps actor/root translation.",
+    "The former unresolved action order and radius-scaling sections are superseded by action_order_and_clock and query_filters_scale_and_sampling. No production Hit implementation was added."
+  ]
+}

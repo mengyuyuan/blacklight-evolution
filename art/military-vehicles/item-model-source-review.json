@@ -1,0 +1,942 @@
+{
+  "schemaVersion": 1,
+  "date": "2026-11-17",
+  "scope": "Read-only review of the six actual registered placement-item resources; no model regeneration, test, build or client render in this review.",
+  "decision": "Preserve existing detailed production-geometry miniatures; no demonstrated missing structural part or generic-icon fallback.",
+  "registration": "VehicleRegistry static faction/chassis loop registers ChassisItem under military|blackwatch + truck|apc|tank + _chassis; no custom item renderer override.",
+  "generator": "tools/vehicle_item_models.py: vehicle() flattens all production parts around their bone pivots and uses one uniform scale into a 14.5-pixel box. Entity UV atlas retained.",
+  "geometrySource": {
+    "path": "src/main/resources/assets/blacklight/military/vehicle-models.json",
+    "sha256": "1541230ff53b3b1809150618cebbd7b2f9596ed1d77c8ca314f496ddcd33d80a"
+  },
+  "structuralFeatures": {
+    "truck": [
+      "cab shell and windscreen frame",
+      "side glass and doors",
+      "three axle pairs with separate tires and hubs",
+      "cargo canvas ribs",
+      "grille, steps and lamps"
+    ],
+    "apc": [
+      "six road wheels per side",
+      "upper/lower tracks and individual tread links",
+      "turret ring and upper/lower turret",
+      "mantlet and main barrel",
+      "hatch and hull panels"
+    ],
+    "tank": [
+      "seven road wheels per side",
+      "track links and segmented skirts",
+      "three-level turret, ring and mantlet",
+      "main gun sleeve, barrel and muzzle",
+      "roof gun, commander hatch/scope",
+      "rear basket/stowage, engine grilles and front plough"
+    ]
+  },
+  "models": [
+    {
+      "item": "military_truck_chassis",
+      "model": "src/main/resources/assets/blacklight/models/item/military_truck_chassis.json",
+      "sha256": "3999a738dac86e2765ae95759f5fea3f3b20a22a571f0b8a8a036f5472721aff",
+      "elements": 78,
+      "allProductionPartsPreservedByName": true,
+      "parent": "minecraft:block/block",
+      "skin": "blacklight:entity/military_vehicles_military",
+      "display": {
+        "gui": {
+          "rotation": [
+            25,
+            225,
+            0
+          ],
+          "translation": [
+            0,
+            0,
+            0
+          ],
+          "scale": [
+            0.92,
+            0.92,
+            0.92
+          ]
+        },
+        "ground": {
+          "rotation": [
+            0,
+            0,
+            0
+          ],
+          "translation": [
+            0,
+            3,
+            0
+          ],
+          "scale": [
+            0.55,
+            0.55,
+            0.55
+          ]
+        },
+        "fixed": {
+          "rotation": [
+            0,
+            180,
+            0
+          ],
+          "translation": [
+            0,
+            0,
+            0
+          ],
+          "scale": [
+            0.8,
+            0.8,
+            0.8
+          ]
+        },
+        "firstperson_righthand": {
+          "rotation": [
+            0,
+            45,
+            0
+          ],
+          "translation": [
+            0,
+            2,
+            0
+          ],
+          "scale": [
+            0.65,
+            0.65,
+            0.65
+          ]
+        },
+        "firstperson_lefthand": {
+          "rotation": [
+            0,
+            225,
+            0
+          ],
+          "translation": [
+            0,
+            2,
+            0
+          ],
+          "scale": [
+            0.65,
+            0.65,
+            0.65
+          ]
+        },
+        "thirdperson_righthand": {
+          "rotation": [
+            0,
+            0,
+            0
+          ],
+          "translation": [
+            0,
+            1,
+            0
+          ],
+          "scale": [
+            0.55,
+            0.55,
+            0.55
+          ]
+        },
+        "thirdperson_lefthand": {
+          "rotation": [
+            0,
+            0,
+            0
+          ],
+          "translation": [
+            0,
+            1,
+            0
+          ],
+          "scale": [
+            0.55,
+            0.55,
+            0.55
+          ]
+        },
+        "head": {
+          "rotation": [
+            0,
+            180,
+            0
+          ],
+          "translation": [
+            0,
+            6,
+            0
+          ],
+          "scale": [
+            0.7,
+            0.7,
+            0.7
+          ]
+        }
+      },
+      "matchesPriorNativeReceipt": true,
+      "matchesForgeBytes": true
+    },
+    {
+      "item": "military_apc_chassis",
+      "model": "src/main/resources/assets/blacklight/models/item/military_apc_chassis.json",
+      "sha256": "a2f87745f5e18fa9a5ed4ab16e6e42655d538296849b8a461f60650e13ac5422",
+      "elements": 138,
+      "allProductionPartsPreservedByName": true,
+      "parent": "minecraft:block/block",
+      "skin": "blacklight:entity/military_vehicles_military",
+      "display": {
+        "gui": {
+          "rotation": [
+            25,
+            225,
+            0
+          ],
+          "translation": [
+            0,
+            0,
+            0
+          ],
+          "scale": [
+            0.92,
+            0.92,
+            0.92
+          ]
+        },
+        "ground": {
+          "rotation": [
+            0,
+            0,
+            0
+          ],
+          "translation": [
+            0,
+            3,
+            0
+          ],
+          "scale": [
+            0.55,
+            0.55,
+            0.55
+          ]
+        },
+        "fixed": {
+          "rotation": [
+            0,
+            180,
+            0
+          ],
+          "translation": [
+            0,
+            0,
+            0
+          ],
+          "scale": [
+            0.8,
+            0.8,
+            0.8
+          ]
+        },
+        "firstperson_righthand": {
+          "rotation": [
+            0,
+            45,
+            0
+          ],
+          "translation": [
+            0,
+            2,
+            0
+          ],
+          "scale": [
+            0.65,
+            0.65,
+            0.65
+          ]
+        },
+        "firstperson_lefthand": {
+          "rotation": [
+            0,
+            225,
+            0
+          ],
+          "translation": [
+            0,
+            2,
+            0
+          ],
+          "scale": [
+            0.65,
+            0.65,
+            0.65
+          ]
+        },
+        "thirdperson_righthand": {
+          "rotation": [
+            0,
+            0,
+            0
+          ],
+          "translation": [
+            0,
+            1,
+            0
+          ],
+          "scale": [
+            0.55,
+            0.55,
+            0.55
+          ]
+        },
+        "thirdperson_lefthand": {
+          "rotation": [
+            0,
+            0,
+            0
+          ],
+          "translation": [
+            0,
+            1,
+            0
+          ],
+          "scale": [
+            0.55,
+            0.55,
+            0.55
+          ]
+        },
+        "head": {
+          "rotation": [
+            0,
+            180,
+            0
+          ],
+          "translation": [
+            0,
+            6,
+            0
+          ],
+          "scale": [
+            0.7,
+            0.7,
+            0.7
+          ]
+        }
+      },
+      "matchesPriorNativeReceipt": true,
+      "matchesForgeBytes": true
+    },
+    {
+      "item": "military_tank_chassis",
+      "model": "src/main/resources/assets/blacklight/models/item/military_tank_chassis.json",
+      "sha256": "513e76f8a07e5a2d388ca98313549ef2259861223cb84ec57ef4e794f54c9a4d",
+      "elements": 161,
+      "allProductionPartsPreservedByName": true,
+      "parent": "minecraft:block/block",
+      "skin": "blacklight:entity/military_vehicles_military",
+      "display": {
+        "gui": {
+          "rotation": [
+            25,
+            225,
+            0
+          ],
+          "translation": [
+            0,
+            0,
+            0
+          ],
+          "scale": [
+            0.92,
+            0.92,
+            0.92
+          ]
+        },
+        "ground": {
+          "rotation": [
+            0,
+            0,
+            0
+          ],
+          "translation": [
+            0,
+            3,
+            0
+          ],
+          "scale": [
+            0.55,
+            0.55,
+            0.55
+          ]
+        },
+        "fixed": {
+          "rotation": [
+            0,
+            180,
+            0
+          ],
+          "translation": [
+            0,
+            0,
+            0
+          ],
+          "scale": [
+            0.8,
+            0.8,
+            0.8
+          ]
+        },
+        "firstperson_righthand": {
+          "rotation": [
+            0,
+            45,
+            0
+          ],
+          "translation": [
+            0,
+            2,
+            0
+          ],
+          "scale": [
+            0.65,
+            0.65,
+            0.65
+          ]
+        },
+        "firstperson_lefthand": {
+          "rotation": [
+            0,
+            225,
+            0
+          ],
+          "translation": [
+            0,
+            2,
+            0
+          ],
+          "scale": [
+            0.65,
+            0.65,
+            0.65
+          ]
+        },
+        "thirdperson_righthand": {
+          "rotation": [
+            0,
+            0,
+            0
+          ],
+          "translation": [
+            0,
+            1,
+            0
+          ],
+          "scale": [
+            0.55,
+            0.55,
+            0.55
+          ]
+        },
+        "thirdperson_lefthand": {
+          "rotation": [
+            0,
+            0,
+            0
+          ],
+          "translation": [
+            0,
+            1,
+            0
+          ],
+          "scale": [
+            0.55,
+            0.55,
+            0.55
+          ]
+        },
+        "head": {
+          "rotation": [
+            0,
+            180,
+            0
+          ],
+          "translation": [
+            0,
+            6,
+            0
+          ],
+          "scale": [
+            0.7,
+            0.7,
+            0.7
+          ]
+        }
+      },
+      "matchesPriorNativeReceipt": true,
+      "matchesForgeBytes": true
+    },
+    {
+      "item": "blackwatch_truck_chassis",
+      "model": "src/main/resources/assets/blacklight/models/item/blackwatch_truck_chassis.json",
+      "sha256": "d92c59dcfea45c6459303ec510cc896cb0dd7c05ffd1f801f8f173156fbf8bf3",
+      "elements": 78,
+      "allProductionPartsPreservedByName": true,
+      "parent": "minecraft:block/block",
+      "skin": "blacklight:entity/military_vehicles_blackwatch",
+      "display": {
+        "gui": {
+          "rotation": [
+            25,
+            225,
+            0
+          ],
+          "translation": [
+            0,
+            0,
+            0
+          ],
+          "scale": [
+            0.92,
+            0.92,
+            0.92
+          ]
+        },
+        "ground": {
+          "rotation": [
+            0,
+            0,
+            0
+          ],
+          "translation": [
+            0,
+            3,
+            0
+          ],
+          "scale": [
+            0.55,
+            0.55,
+            0.55
+          ]
+        },
+        "fixed": {
+          "rotation": [
+            0,
+            180,
+            0
+          ],
+          "translation": [
+            0,
+            0,
+            0
+          ],
+          "scale": [
+            0.8,
+            0.8,
+            0.8
+          ]
+        },
+        "firstperson_righthand": {
+          "rotation": [
+            0,
+            45,
+            0
+          ],
+          "translation": [
+            0,
+            2,
+            0
+          ],
+          "scale": [
+            0.65,
+            0.65,
+            0.65
+          ]
+        },
+        "firstperson_lefthand": {
+          "rotation": [
+            0,
+            225,
+            0
+          ],
+          "translation": [
+            0,
+            2,
+            0
+          ],
+          "scale": [
+            0.65,
+            0.65,
+            0.65
+          ]
+        },
+        "thirdperson_righthand": {
+          "rotation": [
+            0,
+            0,
+            0
+          ],
+          "translation": [
+            0,
+            1,
+            0
+          ],
+          "scale": [
+            0.55,
+            0.55,
+            0.55
+          ]
+        },
+        "thirdperson_lefthand": {
+          "rotation": [
+            0,
+            0,
+            0
+          ],
+          "translation": [
+            0,
+            1,
+            0
+          ],
+          "scale": [
+            0.55,
+            0.55,
+            0.55
+          ]
+        },
+        "head": {
+          "rotation": [
+            0,
+            180,
+            0
+          ],
+          "translation": [
+            0,
+            6,
+            0
+          ],
+          "scale": [
+            0.7,
+            0.7,
+            0.7
+          ]
+        }
+      },
+      "matchesPriorNativeReceipt": true,
+      "matchesForgeBytes": true
+    },
+    {
+      "item": "blackwatch_apc_chassis",
+      "model": "src/main/resources/assets/blacklight/models/item/blackwatch_apc_chassis.json",
+      "sha256": "9ebc79dedd8075cddc4c3b14bfec55fbe3bf1f664c0b6265f173bc5bfd24df94",
+      "elements": 138,
+      "allProductionPartsPreservedByName": true,
+      "parent": "minecraft:block/block",
+      "skin": "blacklight:entity/military_vehicles_blackwatch",
+      "display": {
+        "gui": {
+          "rotation": [
+            25,
+            225,
+            0
+          ],
+          "translation": [
+            0,
+            0,
+            0
+          ],
+          "scale": [
+            0.92,
+            0.92,
+            0.92
+          ]
+        },
+        "ground": {
+          "rotation": [
+            0,
+            0,
+            0
+          ],
+          "translation": [
+            0,
+            3,
+            0
+          ],
+          "scale": [
+            0.55,
+            0.55,
+            0.55
+          ]
+        },
+        "fixed": {
+          "rotation": [
+            0,
+            180,
+            0
+          ],
+          "translation": [
+            0,
+            0,
+            0
+          ],
+          "scale": [
+            0.8,
+            0.8,
+            0.8
+          ]
+        },
+        "firstperson_righthand": {
+          "rotation": [
+            0,
+            45,
+            0
+          ],
+          "translation": [
+            0,
+            2,
+            0
+          ],
+          "scale": [
+            0.65,
+            0.65,
+            0.65
+          ]
+        },
+        "firstperson_lefthand": {
+          "rotation": [
+            0,
+            225,
+            0
+          ],
+          "translation": [
+            0,
+            2,
+            0
+          ],
+          "scale": [
+            0.65,
+            0.65,
+            0.65
+          ]
+        },
+        "thirdperson_righthand": {
+          "rotation": [
+            0,
+            0,
+            0
+          ],
+          "translation": [
+            0,
+            1,
+            0
+          ],
+          "scale": [
+            0.55,
+            0.55,
+            0.55
+          ]
+        },
+        "thirdperson_lefthand": {
+          "rotation": [
+            0,
+            0,
+            0
+          ],
+          "translation": [
+            0,
+            1,
+            0
+          ],
+          "scale": [
+            0.55,
+            0.55,
+            0.55
+          ]
+        },
+        "head": {
+          "rotation": [
+            0,
+            180,
+            0
+          ],
+          "translation": [
+            0,
+            6,
+            0
+          ],
+          "scale": [
+            0.7,
+            0.7,
+            0.7
+          ]
+        }
+      },
+      "matchesPriorNativeReceipt": true,
+      "matchesForgeBytes": true
+    },
+    {
+      "item": "blackwatch_tank_chassis",
+      "model": "src/main/resources/assets/blacklight/models/item/blackwatch_tank_chassis.json",
+      "sha256": "37248e689c8db8bd6e23e1c0bf020e947339cc6a45fffaf3b4b13bf2fd3a1868",
+      "elements": 161,
+      "allProductionPartsPreservedByName": true,
+      "parent": "minecraft:block/block",
+      "skin": "blacklight:entity/military_vehicles_blackwatch",
+      "display": {
+        "gui": {
+          "rotation": [
+            25,
+            225,
+            0
+          ],
+          "translation": [
+            0,
+            0,
+            0
+          ],
+          "scale": [
+            0.92,
+            0.92,
+            0.92
+          ]
+        },
+        "ground": {
+          "rotation": [
+            0,
+            0,
+            0
+          ],
+          "translation": [
+            0,
+            3,
+            0
+          ],
+          "scale": [
+            0.55,
+            0.55,
+            0.55
+          ]
+        },
+        "fixed": {
+          "rotation": [
+            0,
+            180,
+            0
+          ],
+          "translation": [
+            0,
+            0,
+            0
+          ],
+          "scale": [
+            0.8,
+            0.8,
+            0.8
+          ]
+        },
+        "firstperson_righthand": {
+          "rotation": [
+            0,
+            45,
+            0
+          ],
+          "translation": [
+            0,
+            2,
+            0
+          ],
+          "scale": [
+            0.65,
+            0.65,
+            0.65
+          ]
+        },
+        "firstperson_lefthand": {
+          "rotation": [
+            0,
+            225,
+            0
+          ],
+          "translation": [
+            0,
+            2,
+            0
+          ],
+          "scale": [
+            0.65,
+            0.65,
+            0.65
+          ]
+        },
+        "thirdperson_righthand": {
+          "rotation": [
+            0,
+            0,
+            0
+          ],
+          "translation": [
+            0,
+            1,
+            0
+          ],
+          "scale": [
+            0.55,
+            0.55,
+            0.55
+          ]
+        },
+        "thirdperson_lefthand": {
+          "rotation": [
+            0,
+            0,
+            0
+          ],
+          "translation": [
+            0,
+            1,
+            0
+          ],
+          "scale": [
+            0.55,
+            0.55,
+            0.55
+          ]
+        },
+        "head": {
+          "rotation": [
+            0,
+            180,
+            0
+          ],
+          "translation": [
+            0,
+            6,
+            0
+          ],
+          "scale": [
+            0.7,
+            0.7,
+            0.7
+          ]
+        }
+      },
+      "matchesPriorNativeReceipt": true,
+      "matchesForgeBytes": true
+    }
+  ],
+  "historicalVisualEvidence": {
+    "path": "art/military-vehicles/previews/inventory-models.png",
+    "sha256": "e88654f8880733ec82233521522e8ff2e6ca60d357bd81e1c51652740f000323",
+    "review": "Opened the existing native-capture board. All six show distinct three-dimensional vehicle shapes and faction skins. This is evidence from the earlier capture, not a new runtime check.",
+    "receipt": "art/military-vehicles/item-model-validation.json"
+  },
+  "remainingLimits": [
+    "Actual player-arm grip and dropped-item animation remain deferred to the authorized later player test.",
+    "This review establishes preservation and structural detail, not source-identical sculpting or every original surface detail."
+  ]
+}

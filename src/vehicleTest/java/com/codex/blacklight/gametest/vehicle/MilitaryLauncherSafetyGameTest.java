@@ -68,6 +68,8 @@ public final class MilitaryLauncherSafetyGameTest {
     @GameTest(template="blackwatch_arena",batch="vehicle6_loadout",timeoutTicks=180)
     public static void actualCreativePlayerInTheShotLinePreventsBothWeaponDebits(GameTestHelper h){
         var f=new MilitaryVehicleGameTest.Fixture(h,278000);var soldier=carrier(h,f);var blocker=player(h,f,GameType.CREATIVE,8);
+        // A flanking soldier would legitimately clear this stationary blocker.
+        soldier.getAttribute(Attributes.MOVEMENT_SPEED).setBaseValue(0);
         var target=infected(f,16);soldier.setTarget(target);float health=healthFraction(target),protectedHealth=blocker.getHealth();
         h.runAfterDelay(120,()->{try(f){
             h.assertTrue(rockets(soldier)==3&&carbineRounds(soldier)==72,"actual creative body in the line prevents launcher and carbine debits");
@@ -130,6 +132,30 @@ public final class MilitaryLauncherSafetyGameTest {
             h.assertTrue(soldier.position().distanceTo(initial)<.05&&near.isAlive(),"fixture keeps the actual shooter and live obstruction in place: "+firstDebit[0]);
             h.assertTrue(rockets(soldier)==3,"first real living impact inside ten blocks prevents rocket debit despite the selected far target; "+firstDebit[0]);
             h.assertTrue(carbineRounds(soldier)<72&&healthFraction(near)<nearHealth,"production NPC goal still fires its actual carbine into the nearer legal obstruction");
+        }h.succeed();});
+    }
+    @GameTest(template="blackwatch_arena",batch="vehicle6_loadout",timeoutTicks=220)
+    public static void actualCarbineFiresPastEmptySpaceInsideAircraftBounds(GameTestHelper h){
+        var f=new MilitaryVehicleGameTest.Fixture(h,282000);
+        var soldier=carrier(h,f);
+        soldier.getAttribute(Attributes.MOVEMENT_SPEED).setBaseValue(0);
+        var target=infected(f,8);
+        var craft=ModEntities.BLACKWATCH_HELICOPTER.get().create(f.level);
+        craft.setPos(f.x+3.5,81,8);
+        f.level.addFreshEntity(craft);f.entities.add(craft);
+        var start=soldier.getEyePosition().add(0,-.18,0);
+        var end=target.getBoundingBox().getCenter();
+        try {
+            h.assertTrue(craft.getBoundingBox().clip(start,end).isPresent(),"aircraft envelope covers the fire lane");
+            h.assertTrue(com.codex.blacklight.military.aircraft.HelicopterSkinContact.raycast(craft,start,end).isEmpty(),
+                    "the same lane clears the actual fuselage");
+        } catch(RuntimeException | AssertionError failure) {
+            f.close();throw failure;
+        }
+        soldier.setTarget(target);float health=healthFraction(target);
+        h.runAfterDelay(140,()->{try(f){
+            h.assertTrue(carbineRounds(soldier)<72&&healthFraction(target)<health,
+                    "the live rifle goal fires through the clear gap past the aircraft");
         }h.succeed();});
     }
     private MilitaryLauncherSafetyGameTest(){}

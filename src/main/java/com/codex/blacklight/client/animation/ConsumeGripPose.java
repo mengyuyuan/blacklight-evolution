@@ -15,7 +15,8 @@ public final class ConsumeGripPose {
         if(actor.getData(ModAttachments.GRAB_STAGE)!=ConsumeVisual.CONSUME)return;
         var victims=actor.level().getEntitiesOfClass(LivingEntity.class,actor.getBoundingBox().inflate(5),v->{
             var scene=v.getData(ModAttachments.CONSUME_VISUAL);
-            return scene.consumerId()==actor.getId()&&scene.stage()==ConsumeVisual.CONSUME&&scene.form()==PowerForm.CLAWS.ordinal();
+            return scene.consumerId()==actor.getId()&&scene.stage()==ConsumeVisual.CONSUME
+                    &&(scene.form()==PowerForm.CLAWS.ordinal()||scene.form()==PowerForm.BLADE.ordinal());
         });
         if(victims.isEmpty())return;
         var victim=victims.getFirst();var visual=victim.getData(ModAttachments.CONSUME_VISUAL);
@@ -25,6 +26,9 @@ public final class ConsumeGripPose {
                               BlacklightPose pose,ConsumeVisual visual,float partial) {
         // A detached preview has no physical receiver to fit. Keep its authored pose.
         if(actor==null||victim==null)return;
+        if(visual.form()==PowerForm.BLADE.ordinal()){
+            BladeConsumePose.apply(actor,victim,armature,pose,visual,partial);return;
+        }
         if(!ConsumePlacementTrack.headGrip(PowerForm.CLAWS,visual.variant())){
             sweep(actor,victim,armature,pose,visual,partial);return;
         }

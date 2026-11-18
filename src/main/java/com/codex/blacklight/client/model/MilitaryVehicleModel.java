@@ -116,4 +116,20 @@ public final class MilitaryVehicleModel {
         var local=stack.last().pose().transformPosition(new Vector3f((float)point.x,(float)point.y,(float)point.z));
         return origin.add(local.x,local.y,local.z);
     }
+    /** Destruction uses the authored mesh; detached pieces never become inventory or entities. */
+    public ModelPart wreckPose(float age,float turret,float pitch,long seed){
+        pose(turret,pitch,0);float side=(seed&1)==0?1:-1;
+        bones.get("body").yScale=.82F;
+        for(String name:new String[]{"door_left","door_right","door_rear"})if(bones.containsKey(name)){
+            var part=bones.get(name);float direction=name.equals("door_left")?-1:1;
+            VehicleWreckPose.fragment(part,age,new Vec3(direction*2.1,2.9,-.7),-.45F,direction*1.1F);
+        }
+        for(String name:new String[]{"left_wheel_1","right_wheel_3"})if(bones.containsKey(name))
+            VehicleWreckPose.fragment(bones.get(name),age,new Vec3(name.startsWith("left")?-2:2,2.2,1),0,.85F);
+        if(bones.containsKey("turret_yaw"))VehicleWreckPose.fragment(bones.get("turret_yaw"),age,new Vec3(side*.9,2.5,-.5),-.18F,side*.23F);
+        for(String name:new String[]{"hatch_commander","hatch_gunner"})if(bones.containsKey(name))bones.get(name).xRot=-1.35F;
+        if(bones.containsKey("track_left")){bones.get("track_left").x-=5;bones.get("track_left").zRot=.12F;}
+        if(bones.containsKey("gun_pitch"))bones.get("gun_pitch").xRot+=.2F;
+        return root;
+    }
 }

@@ -75,7 +75,14 @@ public final class PassiveGameTests {
         var d=PassiveData.read(p); d.adaptation=99; d.regeneration=17; d.bonusHealth=60; d.save(p);
         var n=new CompoundTag(); p.saveWithoutId(n); var loaded=player(h); loaded.load(n);
         h.assertTrue(PassiveData.read(loaded).encode().equals(PassiveData.read(p).encode()),"full entity save/load");
-        var clone=player(h); PassiveEvents.clone(new PlayerEvent.Clone(clone,p,true));
+        var clone=player(h);
+        String persistedKey = net.minecraft.world.entity.player.Player.PERSISTED_NBT_TAG;
+        var destination = new CompoundTag();
+        destination.putString("fixture_other_mod", "restored");
+        clone.getPersistentData().put(persistedKey, destination);
+        PassiveEvents.clone(new PlayerEvent.Clone(clone,p,true));
+        h.assertTrue(clone.getPersistentData().getCompound(persistedKey).getString("fixture_other_mod").equals("restored"),
+                "death clone keeps data already restored by another mod");
         h.assertTrue(PassiveData.read(clone).encode().equals(PassiveData.read(p).encode()),"death clone preserves entitlement and progress");
         Items.MILK_BUCKET.finishUsingItem(new ItemStack(Items.MILK_BUCKET),h.getLevel(),clone); PassiveSystem.tick(clone);
         h.assertTrue(clone.hasEffect(PassivesMod.ADAPTATION),"milk restores marker"); near(h,PassiveData.read(clone).adaptation,99,"milk keeps layers"); h.succeed();

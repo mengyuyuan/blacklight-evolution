@@ -1,0 +1,19 @@
+// Boss source-contact changes; opt in explicitly and use a disposable GameTest world.
+allprojects { afterEvaluate {
+    sourceSets.main.java.srcDir('src/greeneTest/java')
+    sourceSets.main.java.srcDir('src/encounterTest/java')
+    sourceSets.main.resources.srcDir('src/blackwatchTest/resources')
+    sourceSets.main.java.exclude { entry -> !entry.directory
+        && entry.file.path.replace('\\','/').contains('/src/encounterTest/')
+        && !(entry.file.name in ['GoliathFrontSlamGameTest.java','GoliathChargeGameTest.java']) }
+    def stagePlayerBoss=tasks.register('stagePlayerBoss',Sync) {
+        dependsOn tasks.named('classes')
+        from sourceSets.main.output.classesDirs
+        into layout.buildDirectory.dir('player-boss-run-classes')
+    }
+    tasks.matching { it.name == 'runGameTestServer' }.configureEach {
+        dependsOn stagePlayerBoss
+        doFirst { environment 'MOD_CLASSES', [layout.buildDirectory.dir('player-boss-run-classes').get().asFile,sourceSets.main.output.resourcesDir].collect { 'blacklight%%'+it.absolutePath }.join(File.pathSeparator) }
+    }
+    tasks.withType(Jar).configureEach { doFirst {throw new GradleException('QA cannot produce a release JAR')} }
+} }

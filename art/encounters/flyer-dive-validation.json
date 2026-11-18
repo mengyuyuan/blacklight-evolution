@@ -1,0 +1,516 @@
+{
+  "status": "flyer_dive_and_contact_presentation_validated",
+  "scope": "Outgoing dive, source flight/hurt curves, terrain contact and accepted-hit presentation. Not a full original-game or whole-species completion claim.",
+  "platforms": [
+    {
+      "platform": "neo",
+      "nativeFrames": 918,
+      "maxNativeBoneError": 0.000008379046952189643,
+      "maxPresentationDelayTicks": 1.3400015830993652,
+      "maxBodyContactPresentationDistance": 0.1487385154746963,
+      "encounterGameTests": 89,
+      "encounterUnitCases": 24,
+      "focusedUnit": [
+        {
+          "name": "TEST-com.codex.blacklight.city.HydraGrowthTest.xml",
+          "tests": 4,
+          "failures": 0,
+          "errors": 0
+        },
+        {
+          "name": "TEST-com.codex.blacklight.city.HydraMotionTest.xml",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0
+        },
+        {
+          "name": "TEST-com.codex.blacklight.client.renderer.HydraWoundAnchorTest.xml",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0
+        },
+        {
+          "name": "TEST-com.codex.blacklight.combat.ContactEffectsQueueTest.xml",
+          "tests": 8,
+          "failures": 0,
+          "errors": 0
+        },
+        {
+          "name": "TEST-com.codex.blacklight.combat.HydraContactTest.xml",
+          "tests": 14,
+          "failures": 0,
+          "errors": 0
+        },
+        {
+          "name": "TEST-com.codex.blacklight.network.ContactEffectsPayloadTest.xml",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0
+        }
+      ],
+      "hits": [
+        {
+          "scene": 0,
+          "age": 33,
+          "damage": 8.05,
+          "at": {
+            "x": 0.003976716288739777,
+            "y": 82.05491336082243,
+            "z": 12.550000011920929
+          }
+        },
+        {
+          "scene": 4,
+          "age": 32,
+          "damage": 8.05,
+          "at": {
+            "x": 0.002765636966070812,
+            "y": 82.0338473620284,
+            "z": 12.569979914996294
+          }
+        }
+      ],
+      "receipts": [
+        {
+          "serial": 1,
+          "tick": 144010,
+          "shown": 144010.91999977827,
+          "kind": 1,
+          "surfaceCount": 0,
+          "soundCount": 1,
+          "scene": 0,
+          "firstImage": "0-034-1.png",
+          "firstFrameAge": 34.91999977827072,
+          "contactAge": 34
+        },
+        {
+          "serial": 2,
+          "tick": 144162,
+          "shown": 144163.3400015831,
+          "kind": 5,
+          "surfaceCount": 1,
+          "soundCount": 2,
+          "scene": 1,
+          "firstImage": "1-030-0.png",
+          "firstFrameAge": 30.340001583099365,
+          "contactAge": 29
+        },
+        {
+          "serial": 3,
+          "tick": 144637,
+          "shown": 144638.32000350952,
+          "kind": 1,
+          "surfaceCount": 0,
+          "soundCount": 1,
+          "scene": 4,
+          "firstImage": "4-034-0.png",
+          "firstFrameAge": 34.320003509521484,
+          "contactAge": 33
+        },
+        {
+          "serial": 4,
+          "tick": 144785,
+          "shown": 144785.16000449657,
+          "kind": 0,
+          "surfaceCount": 48,
+          "soundCount": 2,
+          "scene": 5,
+          "firstImage": "5-024-0.png",
+          "firstFrameAge": 24.160004496574402,
+          "contactAge": 24
+        }
+      ],
+      "frameManifestSha256": "1b2bc138096d369604abfaa68dd3c25918d53a6b08a0cee629a30b778eef0583",
+      "reviewSheets": [
+        "D:/CodexCache/creature-combat-qa/neo-flyer-frames/flyer-review-0.jpg",
+        "D:/CodexCache/creature-combat-qa/neo-flyer-frames/flyer-review-1.jpg",
+        "D:/CodexCache/creature-combat-qa/neo-flyer-frames/flyer-review-2.jpg",
+        "D:/CodexCache/creature-combat-qa/neo-flyer-frames/flyer-review-3.jpg",
+        "D:/CodexCache/creature-combat-qa/neo-flyer-frames/flyer-review-4.jpg",
+        "D:/CodexCache/creature-combat-qa/neo-flyer-frames/flyer-review-5.jpg"
+      ],
+      "files": [
+        {
+          "file": "src/main/java/com/codex/blacklight/entity/EncounterMob.java",
+          "sha256": "52730c6b838014b257ea6efdc167bf5b97283f20155aca925260018b298a2905"
+        },
+        {
+          "file": "src/main/java/com/codex/blacklight/combat/FlyerFlight.java",
+          "sha256": "4c82939c7bbac744795bb541bc00716d8c332c7bf282c44d924e91abdba02be8"
+        },
+        {
+          "file": "src/main/java/com/codex/blacklight/combat/FlyerMotion.java",
+          "sha256": "02b57ff064f19f5608b8db5a07341db62db0cc2ee7717fe1ea6a580aeb27af28"
+        },
+        {
+          "file": "src/main/java/com/codex/blacklight/combat/FlyerContact.java",
+          "sha256": "0beb7644b256275b7a975045679e3b1b1fb59a713d7ae1ce4345a66bceb4ea1e"
+        },
+        {
+          "file": "src/main/java/com/codex/blacklight/client/model/FlyerPose.java",
+          "sha256": "5717a731ace0c081235ec19e27eaf0c173d12ba8995ad1d283988cae4b174d61"
+        },
+        {
+          "file": "src/main/java/com/codex/blacklight/client/renderer/FlyerContactPresentation.java",
+          "sha256": "e9d5435a428c39b42f84a7798d4ac99e1355ef15a0bf3d0fc91543ff3986f977"
+        },
+        {
+          "file": "src/main/java/com/codex/blacklight/combat/ContactEffectsQueue.java",
+          "sha256": "5f578cc77bb267df9a9bd2e6e2b080cd08d28dc976fd8f3ccf887231569919fa"
+        },
+        {
+          "file": "src/main/java/com/codex/blacklight/client/renderer/ContactEffectsPresentation.java",
+          "sha256": "8284f6dd6839ab3f5b25e251cc1f262f1e5b453cfd1779f4886e91b0c83c5b19"
+        },
+        {
+          "file": "src/main/resources/assets/blacklight/models/encounter_flyer_source.json",
+          "sha256": "460f0a2dcca3f2707540df303d10b0a41b5f70699ff4a9b712f06961daae1497"
+        },
+        {
+          "file": "src/main/resources/assets/blacklight/geo/flyer_mc.geo.json",
+          "sha256": "5ebd9e07d19c3a9816f40e7cb12d01ac50ac96e6943a509ca39e14b18a221809"
+        }
+      ]
+    },
+    {
+      "platform": "forge",
+      "nativeFrames": 919,
+      "maxNativeBoneError": 0.00000931552166430791,
+      "maxPresentationDelayTicks": 2.0799977779388428,
+      "maxBodyContactPresentationDistance": 0.08420270960957592,
+      "encounterGameTests": 89,
+      "encounterUnitCases": 24,
+      "focusedUnit": [
+        {
+          "name": "TEST-com.codex.blacklight.city.HydraGrowthTest.xml",
+          "tests": 4,
+          "failures": 0,
+          "errors": 0
+        },
+        {
+          "name": "TEST-com.codex.blacklight.city.HydraMotionTest.xml",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0
+        },
+        {
+          "name": "TEST-com.codex.blacklight.client.renderer.HydraWoundAnchorTest.xml",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0
+        },
+        {
+          "name": "TEST-com.codex.blacklight.combat.ContactEffectsQueueTest.xml",
+          "tests": 8,
+          "failures": 0,
+          "errors": 0
+        },
+        {
+          "name": "TEST-com.codex.blacklight.combat.HydraContactTest.xml",
+          "tests": 14,
+          "failures": 0,
+          "errors": 0
+        },
+        {
+          "name": "TEST-com.codex.blacklight.network.ContactEffectsPayloadTest.xml",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0
+        }
+      ],
+      "hits": [
+        {
+          "scene": 0,
+          "age": 33,
+          "damage": 8.05,
+          "at": {
+            "x": 0.003976716288739777,
+            "y": 82.05491336082243,
+            "z": 12.550000011920929
+          }
+        },
+        {
+          "scene": 4,
+          "age": 32,
+          "damage": 8.05,
+          "at": {
+            "x": 0.002765636966070812,
+            "y": 82.0338473620284,
+            "z": 12.569979914996294
+          }
+        }
+      ],
+      "receipts": [
+        {
+          "serial": 1,
+          "tick": 76239,
+          "shown": 76241.07999777794,
+          "kind": 1,
+          "surfaceCount": 0,
+          "soundCount": 1,
+          "scene": 0,
+          "firstImage": "0-036-0.png",
+          "firstFrameAge": 36.07999777793884,
+          "contactAge": 34
+        },
+        {
+          "serial": 2,
+          "tick": 76391,
+          "shown": 76391.27999925613,
+          "kind": 5,
+          "surfaceCount": 1,
+          "soundCount": 2,
+          "scene": 1,
+          "firstImage": "1-029-0.png",
+          "firstFrameAge": 29.279999256134033,
+          "contactAge": 29
+        },
+        {
+          "serial": 3,
+          "tick": 76867,
+          "shown": 76867.98000586033,
+          "kind": 1,
+          "surfaceCount": 0,
+          "soundCount": 1,
+          "scene": 4,
+          "firstImage": "4-033-1.png",
+          "firstFrameAge": 33.980005860328674,
+          "contactAge": 33
+        },
+        {
+          "serial": 4,
+          "tick": 77015,
+          "shown": 77015.46000742912,
+          "kind": 0,
+          "surfaceCount": 48,
+          "soundCount": 2,
+          "scene": 5,
+          "firstImage": "5-024-0.png",
+          "firstFrameAge": 24.460007429122925,
+          "contactAge": 24
+        }
+      ],
+      "frameManifestSha256": "4899c8ccc410d3f0b196095fb0cf38b6fa77ab1572cfaffc28d1d7ffee6f9ee9",
+      "reviewSheets": [
+        "D:/CodexCache/creature-combat-qa/forge-flyer-frames/flyer-review-0.jpg",
+        "D:/CodexCache/creature-combat-qa/forge-flyer-frames/flyer-review-1.jpg",
+        "D:/CodexCache/creature-combat-qa/forge-flyer-frames/flyer-review-2.jpg",
+        "D:/CodexCache/creature-combat-qa/forge-flyer-frames/flyer-review-3.jpg",
+        "D:/CodexCache/creature-combat-qa/forge-flyer-frames/flyer-review-4.jpg",
+        "D:/CodexCache/creature-combat-qa/forge-flyer-frames/flyer-review-5.jpg"
+      ],
+      "files": [
+        {
+          "file": "src/main/java/com/codex/blacklight/entity/EncounterMob.java",
+          "sha256": "c93c7019aaedc515e929bf76cb9ab5d738b6e84e38cfbdf69ed92cbc6d0bdddd"
+        },
+        {
+          "file": "src/main/java/com/codex/blacklight/combat/FlyerFlight.java",
+          "sha256": "4c82939c7bbac744795bb541bc00716d8c332c7bf282c44d924e91abdba02be8"
+        },
+        {
+          "file": "src/main/java/com/codex/blacklight/combat/FlyerMotion.java",
+          "sha256": "02b57ff064f19f5608b8db5a07341db62db0cc2ee7717fe1ea6a580aeb27af28"
+        },
+        {
+          "file": "src/main/java/com/codex/blacklight/combat/FlyerContact.java",
+          "sha256": "0beb7644b256275b7a975045679e3b1b1fb59a713d7ae1ce4345a66bceb4ea1e"
+        },
+        {
+          "file": "src/main/java/com/codex/blacklight/client/model/FlyerPose.java",
+          "sha256": "5717a731ace0c081235ec19e27eaf0c173d12ba8995ad1d283988cae4b174d61"
+        },
+        {
+          "file": "src/main/java/com/codex/blacklight/client/renderer/FlyerContactPresentation.java",
+          "sha256": "e9d5435a428c39b42f84a7798d4ac99e1355ef15a0bf3d0fc91543ff3986f977"
+        },
+        {
+          "file": "src/main/java/com/codex/blacklight/combat/ContactEffectsQueue.java",
+          "sha256": "5f578cc77bb267df9a9bd2e6e2b080cd08d28dc976fd8f3ccf887231569919fa"
+        },
+        {
+          "file": "src/main/java/com/codex/blacklight/client/renderer/ContactEffectsPresentation.java",
+          "sha256": "9fb03755104fa29e12cdba50f771f99d5beedc4cc01e3ffd514a31ee30980626"
+        },
+        {
+          "file": "src/main/resources/assets/blacklight/models/encounter_flyer_source.json",
+          "sha256": "460f0a2dcca3f2707540df303d10b0a41b5f70699ff4a9b712f06961daae1497"
+        },
+        {
+          "file": "src/main/resources/assets/blacklight/geo/flyer_mc.geo.json",
+          "sha256": "5ebd9e07d19c3a9816f40e7cb12d01ac50ac96e6943a509ca39e14b18a221809"
+        }
+      ]
+    }
+  ],
+  "source": {
+    "source": "D:\\PrototypeReference\\p2\\input\\p2\\flyer.p3d",
+    "sourceSha256": "a5a528705863763c2509b1329cf3cfc8134145bc26a61dd3d2636298d21b27fc",
+    "skeleton": "flyer_skeleton",
+    "mapping": {
+      "root": "Character_Root",
+      "torso": "Spine_3",
+      "head": "Head",
+      "jaw": "Jaw",
+      "left_arm": "Shoulder_L",
+      "left_forearm": "Elbow_L",
+      "left_hand": "Wrist_L",
+      "right_arm": "Shoulder_R",
+      "right_forearm": "Elbow_R",
+      "right_hand": "Wrist_R",
+      "tail": "Tail_1",
+      "left_leg": "Knee_L",
+      "right_leg": "Knee_R"
+    },
+    "reference": "flyer_com_idle",
+    "rootMotion": "Source ground is Y=0. Motion_Root travel and heading are removed from the skin; the Minecraft server supplies actor movement. Skin retains Character_Root lean and vertical displacement.",
+    "entity": "flyer",
+    "clips": {
+      "idle": {
+        "source": "flyer_com_idle",
+        "fps": 30,
+        "seconds": 1.1
+      },
+      "flap": {
+        "source": "flyer_loco_casual_flapping",
+        "fps": 30,
+        "seconds": 1.1
+      },
+      "glide": {
+        "source": "flyer_gliding_idle",
+        "fps": 30,
+        "seconds": 2.3333333333333335
+      },
+      "boost": {
+        "source": "flyer_com_attackspeed",
+        "fps": 30,
+        "seconds": 0.6
+      },
+      "ram": {
+        "source": "flyer_com_air_ram",
+        "fps": 30,
+        "seconds": 0.9333333333333333
+      },
+      "collision": {
+        "source": "flyer_gethit_surface_collision",
+        "fps": 30,
+        "seconds": 1.6
+      },
+      "hit_front": {
+        "source": "flyer_gethit_front",
+        "fps": 30,
+        "seconds": 0.8333333333333334
+      },
+      "hit_back": {
+        "source": "flyer_gethit_behind",
+        "fps": 30,
+        "seconds": 0.8333333333333334
+      },
+      "birth": {
+        "source": "flyer_birth_from_pustule",
+        "fps": 30,
+        "seconds": 1.5
+      }
+    },
+    "outputSha256": "460f0a2dcca3f2707540df303d10b0a41b5f70699ff4a9b712f06961daae1497",
+    "geometry": "Existing authored 63 cuboids and UVs preserved; wings articulated at authored elbow/wrist endpoints.",
+    "geometrySha256": "5ebd9e07d19c3a9816f40e7cb12d01ac50ac96e6943a509ca39e14b18a221809",
+    "boundary": "Clip names/curves/skeleton verified in P2. FIG dive controller hash 3cbd105ad588347f references idle/attackspeed/air_ram; collision references surface_collision. Unknown packed controller fields are NOT labeled as decoded speed, damage or timing. Phase transition and flight steering constants are Minecraft adaptations.",
+    "controllerOffsets": [
+      984801,
+      985329,
+      985865
+    ],
+    "controllerRecords": [
+      {
+        "offset": 984801,
+        "type": "#3cbd105ad588347f",
+        "kind": "Opaque",
+        "owner": "flyer/opening/loco/dive/#714ac266014685f8/#71c366a1ebeb21f",
+        "length": 372,
+        "references": [
+          {
+            "at": 184,
+            "name": "flyer_com_idle"
+          },
+          {
+            "at": 216,
+            "name": "flyer_com_attackspeed"
+          },
+          {
+            "at": 244,
+            "name": "flyer_com_air_ram"
+          },
+          {
+            "at": 276,
+            "name": "flyer_com_air_ram"
+          }
+        ]
+      },
+      {
+        "offset": 985329,
+        "type": "#3cbd105ad588347f",
+        "kind": "Opaque",
+        "owner": "flyer/opening/loco/dive/#714ac266014685f8/default",
+        "length": 372,
+        "references": [
+          {
+            "at": 184,
+            "name": "flyer_com_idle"
+          },
+          {
+            "at": 216,
+            "name": "flyer_com_attackspeed"
+          },
+          {
+            "at": 244,
+            "name": "flyer_com_air_ram"
+          },
+          {
+            "at": 276,
+            "name": "flyer_com_air_ram"
+          }
+        ]
+      },
+      {
+        "offset": 985865,
+        "type": "AnimationP2",
+        "kind": "Track",
+        "owner": "flyer/opening/loco/dive/collision",
+        "length": 132,
+        "references": [
+          {
+            "at": 16,
+            "name": "flyer_gethit_surface_collision"
+          }
+        ]
+      }
+    ]
+  },
+  "visualReview": {
+    "reviewedSheets": 12,
+    "imagesPerSheet": 16,
+    "scenes": [
+      "accepted body hit",
+      "wall blocks target",
+      "side dodge after commitment",
+      "incoming damage interrupts dive",
+      "ground spawn takeoff",
+      "actual terrain impact"
+    ],
+    "observations": [
+      "Body contact has a continuous approach, hit and pullout; tissue and pressure effects appear at the reached target.",
+      "Wall collision interrupts movement and uses a local material effect; the protected target keeps its health.",
+      "Dodged and interrupted dives produce no successful outgoing contact effect.",
+      "Ground-spawn flight lifts into the attack; raised terrain produces grounded debris before pullout."
+    ],
+    "scope": "Manual temporal contact-sheet review plus numeric bone/contact checks on every retained frame. Not an audit of every 60-FPS output frame or audio timbre."
+  },
+  "boundaries": [
+    "Opaque original dive-controller fields remain unresolved; speed, commitment, range, damage multiplier, orbit height and recovery are MC tuning.",
+    "Birth-from-pustule clip is exported but not used for ordinary egg spawning.",
+    "Incoming wing-edge picking/weapon contact, flying ragdoll/consume frame matrix, multiplayer latency and large mod-model matrix still require dedicated acceptance.",
+    "Presentation queue verifies dispatch timing and geometry; it does not replace audio waveform/timbre listening. Vanilla hurt tint can arrive before the additional gated contact effect.",
+    "Native frames sample 1–2 images per game tick. Shared bone transforms are checked in every retained frame, with reviewed contact sheets; this is not a claim of viewing every 60-FPS display frame."
+  ]
+}

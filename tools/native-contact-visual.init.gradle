@@ -1,0 +1,21 @@
+allprojects { afterEvaluate {
+    sourceSets.main.java.srcDir('src/silentQa/java')
+    sourceSets.main.resources.srcDir('src/silentQa/resources')
+    def hunter=project.hasProperty('hunterContactQa')
+    sourceSets.main.java.srcDir(hunter?'src/hunterContactVisual/java':'src/juggernautVisual/java')
+    neoForge.runs.client {
+        systemProperty(hunter?'blacklight.test.hunterContact':'blacklight.test.juggernautContact',
+                hunter?'D:/CodexCache/creature-combat-qa/neo-hunter-frames':'D:/CodexCache/creature-combat-qa/neo-terrain-frames')
+        if(!hunter)systemProperty 'blacklight.test.terrainFeedback','true'
+        programArguments.addAll '--width','960','--height','640'
+    }
+    tasks.named('processResources').configure {
+        inputs.property('nativeSilentContactQa',true)
+        doLast {
+            def metadata=new File(destinationDir,'META-INF/neoforge.mods.toml')
+            def content=metadata.getText('UTF-8')
+            if(!content.contains('blacklight.silent-qa.mixins.json'))metadata.append('\n[[mixins]]\nconfig="blacklight.silent-qa.mixins.json"\n','UTF-8')
+        }
+    }
+    tasks.withType(Jar).configureEach { doFirst {throw new GradleException('Hidden QA profile cannot produce a release JAR')} }
+} }

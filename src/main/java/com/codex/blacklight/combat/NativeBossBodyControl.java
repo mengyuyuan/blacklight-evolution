@@ -15,8 +15,8 @@ public final class NativeBossBodyControl {
                 ||mob.kind()!=EncounterKind.ELIZABETH_GREENE&&mob.kind()!=EncounterKind.GOLIATH)return false;
         var visual=ModAttachments.peekData(entity,ModAttachments.CONSUME_VISUAL,ConsumeVisual.EMPTY);
         boolean pairedStage=ConsumeVisual.acquiring(visual.stage())||ConsumeVisual.holding(visual.stage())
-                ||ConsumeVisual.consumeStage(visual.stage())
-                ||visual.stage()==ConsumeVisual.THROW;
+                ||ConsumeVisual.consumeStage(visual.stage())||visual.stage()==ConsumeVisual.GRAB_ATTACK
+                ||visual.stage()==ConsumeVisual.THROW||visual.stage()==ConsumeVisual.AIR_THROW;
         if(visual.active()&&pairedStage&&entity.level().getEntity(visual.consumerId()) instanceof LivingEntity consumer
                 &&consumer.isAlive()&&!consumer.isRemoved())return false;
         // This checks the live absorber's victim ID and contact/attachment, not

@@ -132,7 +132,7 @@ public final class GreeneProjectile extends Projectile {
             if(target==null){var living=CombatTargeting.resolveTarget(candidate);target=living==null?candidate:living;}
             if(target==owner||!seen.add(target.getUUID())||!target.isAlive()||target.isSpectator())continue;
             if(target instanceof LivingEntity&&target.getRootVehicle()!=target
-                    &&(target.getRootVehicle() instanceof MilitaryVehicle))continue;
+                    &&(target.getRootVehicle() instanceof MilitaryVehicle||target.getRootVehicle() instanceof BlackwatchHelicopter))continue;
             if(target instanceof LivingEntity living){
                 var body=AnimatedHurtBody.of(living);
                 if(body!=null){
@@ -150,6 +150,9 @@ public final class GreeneProjectile extends Projectile {
                     var points=corners.stream().map(p->new Vec3(p.x(),p.y(),p.z())).toList();
                     var hit=ProjectileSphereContact.sweep(from,to,radius,points);if(nearer(hit,best))best=new Contact(target,hit,null);
                 }
+            }else if(target instanceof BlackwatchHelicopter h&&h.health()>0){
+                // Aircraft currently expose their yaw-dependent body envelope.
+                var hit=ProjectileSphereContact.sweep(from,to,radius,h.getBoundingBox());if(nearer(hit,best))best=new Contact(target,hit,null);
             }
         }
         return best;
@@ -168,7 +171,7 @@ public final class GreeneProjectile extends Projectile {
                 // Existing armor adapter owns mechanical scaling; keep source NPC
                 // damage here rather than fabricating a firearm definition.
                 VehicleDamageBridge.hurtPhysical(owner,hull,(float)ammo.damageOnNpc,this,damageContact);
-            }
+            }else if(target instanceof BlackwatchHelicopter h&&!VehicleDamageBridge.protectedAircraft(owner,h))h.hurt(damageSources().thrown(this,owner),(float)ammo.damageOnNpc);
             GreeneProjectileEffects.impact(this,damageContact);
         }finally{
             damageContact=null;entityData.set(FINISH_START,level().getGameTime());syncStep(Vec3.ZERO);

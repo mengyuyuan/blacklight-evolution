@@ -1,0 +1,26 @@
+{
+  "source": "D:\\PrototypeReference\\p1\\private\\comparison\\Hydra.p3d",
+  "sha256": "b4bd053853eeb705699a0e7e24229e5f75dcd2cd8baa0eeef0fbeb75528ad5b1",
+  "fps": 30,
+  "mapping": {
+    "neck_0": "full_rig_body1",
+    "neck_1": "full_rig_body2",
+    "neck_2": "full_rig_body3",
+    "neck_3": "full_rig_body4",
+    "neck_4": "full_rig_body5",
+    "neck_5": "Neck_2",
+    "neck_6": "Neck_4",
+    "head": "Head",
+    "jaw": "Gum",
+    "pincer_left": "Lip_L",
+    "pincer_right": "Lip_R",
+    "claw_left": "Claw_L",
+    "claw_right": "Claw_R"
+  },
+  "clips": {
+    "combat_pickup": 120,
+    "combat_hold": 74,
+    "combat_throw": 66
+  },
+  "adaptation": "Existing fixed-length MC combat rig. Local shortest-angle blend .3 open / .7 closed. Pickup 0..119; hold 12..85; throw 90..155. Existing combat, transport and emergence clips untouched."
+}

@@ -1,0 +1,75 @@
+{
+  "schemaVersion": 1,
+  "date": "2026-11-17",
+  "status": "Source/resources implemented, no build/install/runtime test yet.",
+  "problem": "Military vehicles creative tab registered only ground chassis; helicopter interaction refused all nonempty hands, and player weapon stores had no finite refill interface.",
+  "items": [
+    "blackwatch_helicopter_chassis",
+    "helicopter_cannon_round",
+    "helicopter_hellfire_missile",
+    "helicopter_70mm_rocket"
+  ],
+  "placement": "Actual Item.useOn -> full existing BlackwatchHelicopter.safeLanding (hull/rotor collision, loaded chunks, world border and dry support), explicit build-height/liquid check, addFreshEntity and successful one-item debit. Rear clicked anchor places center6.5 blocks forward because native MC tail envelope extends6.4 behind and otherwise overlaps a player at normal use reach. Idle, player-owned, no crew and empty real magazines.",
+  "supply": "Actual Player.interactOn -> BlackwatchHelicopter.interact -> HelicopterSupplies, before empty-hand boarding. Main hand only, matching registered item, live same-world actor/craft, owned craft, stationary lengthSquared<=0.0004, safeLanding, normal near-body distance<=4, permission and block line-of-sight. Each actual item transfers one shot to its own store. Overflow stays in hand; failed/full/moving/airborne supply spends nothing. Creative remainder uses same replacement-stack strategy as ground vehicles.",
+  "capacities": {
+    "cannon": 240,
+    "hellfire": 8,
+    "rapidLeft": 75,
+    "rapidRight": 75
+  },
+  "state": "Existing AirCombat/RapidMagazine save and Pilot CONTROL sync remain sole inventory state. Refilling preserves fire cooldown, pod alternation, shot counters and selected weapon. Both pods refill toward balanced actual counts, bounded by75 each.",
+  "input": "PrototypeSurvivalLock.placementItem delegates VehicleRegistry.isVehicleTool for existing ground chassis, new helicopter chassis and real SupplyItem instances; existing client ownership gates therefore yield to real use even in claw/blade form. No broad vanilla block interaction unlock.",
+  "sourceBoundary": "Player logistics items, rear-pad placement, empty spawn stores and item transfer are Minecraft adaptations. Existing AI infinite-ammo source policy is unchanged, not a claim of original-game pickup/refill mechanics.",
+  "art": "313 existing authored helicopter cuboids, same blackwatch_helicopter atlas, static neutral rotor/doors/pods. Bake exact90-degree geometric rotations and retain allowed residual item rotations. 3 ammo models are authored cuboid shell/missile/rocket shapes using existing authored tank_he_shell palette; neither native P1 mesh nor texture pixels copied.",
+  "modelAudit": [
+    {
+      "id": "blackwatch_helicopter_chassis",
+      "elements": 313,
+      "errors": [],
+      "sha256": "5cfeb1926139aaca675ab8ff991d4bde49ee3e129e9318603c898fde57d11406"
+    },
+    {
+      "id": "helicopter_cannon_round",
+      "elements": 84,
+      "errors": [],
+      "sha256": "39d43a9e11454393253324897b1b9fb05a0619ff5e20d2e79b86dc4738f0a3ed"
+    },
+    {
+      "id": "helicopter_hellfire_missile",
+      "elements": 84,
+      "errors": [],
+      "sha256": "54cbd9f2d9da02c38e3041afa7e3b530be8c89c1de7f8c4f6456057f5c8acd92"
+    },
+    {
+      "id": "helicopter_70mm_rocket",
+      "elements": 80,
+      "errors": [],
+      "sha256": "aeacb23877c5d7694fd10512ca6c76cc02b1183e21434b1ae780bb1e0640733d"
+    }
+  ],
+  "unrunRegression": {
+    "file": "src/helicopterTest/java/com/codex/blacklight/gametest/HelicopterLogisticsGameTest.java",
+    "methods": [
+      "realPrototypePlacementUsesOrdinaryReachAndCreatesOwnedEmptyAircraft",
+      "actualEntityInteractionTransfersEachMagazineAndPersistsExactRemainder",
+      "obstructedPlacementAndMovingResupplyKeepRealItems"
+    ],
+    "batch": "airLogistics"
+  },
+  "remaining": [
+    "No Java/Gradle or test execution performed; root compiles and schedules runtime validation.",
+    "Creative tab and /give provide these items; no new survival crafting economy introduced.",
+    "Item baking/actual hand visibility, ordinary mouse interaction and pad placement still require real client review."
+  ],
+  "forbiddenActionsNotPerformed": [
+    "game/client restart",
+    "Java/Gradle/test execution",
+    "original executable",
+    "audio/media playback"
+  ],
+  "staticPreview": {
+    "path": "art/military-vehicles/previews/helicopter-logistics-items.png",
+    "sha256": "f74fe74abc33f71915c9d52e599c382ff11c5f6e65d5979bbc3fb34f1df37a47",
+    "review": "Viewed full four-item CPU raster from actual item JSON including rotations; geometry and authored texture mapping visible. Not a game render."
+  }
+}

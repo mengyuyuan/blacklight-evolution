@@ -37,4 +37,22 @@ class RagdollJointProjectionTest {
         assertEquals(poses.get(2).position(),result.positions()[2]);
         assertArrayEquals(new int[]{0,1,1},result.components());
     }
+    @Test void sharpContactUsesTheSkinAfterJointClosureAndSupportLift(){
+        var rotation=new Quaternionf().rotationY(.35F);
+        var raw=List.of(new RagdollJointProjection.Pose(new Vec3(0,1,0),new Quaternionf(),1),
+                new RagdollJointProjection.Pose(new Vec3(5,-.5,3),rotation,1));
+        var joined=RagdollJointProjection.close(raw,List.of(new RagdollJointProjection.Link(0,1,new Vec3(0,-.5,0),new Vec3(0,.25,0))));
+        joined.lift(new double[]{0,.7});
+        var skin=FiniteMeshCutTest.box(new Vec3(-.25,-.25,-.25),new Vec3(.25,.25,.25),1).stream().flatMap(List::stream).toList();
+        var visible=new RagdollPoseHistory.Pose(2,joined.positions()[1],rotation,1);
+        var uncorrected=new RagdollPoseHistory.Pose(2,raw.get(1).position(),rotation,1);
+        var sweep=List.of(new com.codex.blacklight.network.RagdollImpactPayload.BladeSpan(List.of(new Vec3(-.5,1,-.6),new Vec3(.5,1,-.6)),1,Vec3.ZERO,180),
+                new com.codex.blacklight.network.RagdollImpactPayload.BladeSpan(List.of(new Vec3(-.5,1,.6),new Vec3(.5,1,.6)),2,Vec3.ZERO,180));
+        for(var pose:List.of(visible,uncorrected)){
+            var local=sweep.stream().map(s->new com.codex.blacklight.network.RagdollImpactPayload.BladeSpan(s.points().stream().map(p->pose.toBind(p,Vec3.ZERO)).toList(),s.time(),Vec3.ZERO,180)).toList();
+            var hit=ContactSection.contact(new SweptBladeSurface(local).triangles(),skin);
+            if(pose==visible)assertNotNull(hit,"The visible blade crosses the connected, lifted skin");
+            else assertNull(hit,"The raw simulated part is elsewhere and must not authorize this cut");
+        }
+    }
 }

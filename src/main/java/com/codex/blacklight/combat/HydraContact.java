@@ -12,18 +12,6 @@ import org.joml.Vector3f;
 /** Actual authored cuboids on the same sampled pose used by Gecko. A broad radius
  * only finds candidates; the oriented contact surfaces decide every body hit. */
 public final class HydraContact {
-    public static Vec3 nearest(AABB b,Vec3 p){return new Vec3(Math.max(b.minX,Math.min(b.maxX,p.x)),Math.max(b.minY,Math.min(b.maxY,p.y)),Math.max(b.minZ,Math.min(b.maxZ,p.z)));}
-    public static boolean capsuleTouches(AABB box,Vec3 a,Vec3 b,double radius){
-        if(!box.inflate(radius).contains(a)&&box.inflate(radius).clip(a,b).isEmpty())return false;
-        // Distance to a convex box along a segment is convex. The final Euclidean check
-        // rejects false corner hits from an inflated AABB, including stationary hands.
-        double lo=0,hi=1;
-        for(int i=0;i<24;i++){double u=(lo*2+hi)/3,v=(lo+hi*2)/3;Vec3 pu=a.lerp(b,u),pv=a.lerp(b,v);
-            if(pu.distanceToSqr(nearest(box,pu))<=pv.distanceToSqr(nearest(box,pv)))hi=v;else lo=u;
-        }
-        Vec3 p=a.lerp(b,(lo+hi)*.5);return p.distanceToSqr(nearest(box,p))<=radius*radius+1e-7;
-    }
-
     private record Cube(int bone,Vec3 center,Vec3 half) {}
     public record Sample(float age,HydraCombatAction.Window window,Box box) {}
     public record Obstacle(float safeAge,Vec3 point,AABB shape) {}
@@ -90,7 +78,7 @@ public final class HydraContact {
             var candidates=new ArrayList<Vec3>();
             for(int i=0;i<8;i++){
                 skin[i]=points.get(ids[i]);moving[i]=new Vec3((i&1)==0?cargo.minX:cargo.maxX,(i&2)==0?cargo.minY:cargo.maxY,(i&4)==0?cargo.minZ:cargo.maxZ);
-                if(HydraContact.nearest(cargo,skin[i]).distanceToSqr(skin[i])<1e-14)candidates.add(skin[i]);
+                if(HunterContactPose.nearest(cargo,skin[i]).distanceToSqr(skin[i])<1e-14)candidates.add(skin[i]);
                 if(nearest(moving[i]).distanceToSqr(moving[i])<1e-14)candidates.add(nearest(moving[i]));
             }
             for(int i=0;i<8;i++)for(int bit:new int[]{1,2,4})if((i&bit)==0){
@@ -101,7 +89,7 @@ public final class HydraContact {
             }
             var at=cargo.getCenter();var distinct=new ArrayList<Vec3>();
             for(var candidate:candidates){
-                if(HydraContact.nearest(cargo,candidate).distanceToSqr(candidate)>1e-12||nearest(candidate).distanceToSqr(candidate)>1e-12)continue;
+                if(HunterContactPose.nearest(cargo,candidate).distanceToSqr(candidate)>1e-12||nearest(candidate).distanceToSqr(candidate)>1e-12)continue;
                 if(distinct.stream().noneMatch(p->p.distanceToSqr(candidate)<1e-14))distinct.add(candidate);
             }
             // Initial complete containment has no intersecting surface features;
@@ -170,7 +158,7 @@ public final class HydraContact {
         public Vec3 contact(AABB target){
             // Alternating convex projections locates the actual shared surface, including
             // a small target beside the tip rather than the enclosing box's centre.
-            Vec3 point=target.getCenter();for(int i=0;i<8;i++)point=HydraContact.nearest(target,nearest(point));return point;
+            Vec3 point=target.getCenter();for(int i=0;i<8;i++)point=HunterContactPose.nearest(target,nearest(point));return point;
         }
         private static double clamp(double n,double h){return Math.max(-h,Math.min(h,n));}
     }

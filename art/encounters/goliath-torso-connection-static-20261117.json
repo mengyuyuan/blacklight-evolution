@@ -1,0 +1,488 @@
+{
+  "schema": 1,
+  "status": "static_geometry_only_java_and_game_pending",
+  "method": "Actual exported SourceBossMotion/Gecko RzRyRx TRS, source parent-scale compensation, cube -X/-Y/+Z Euler signs, entity yaw zero and +0.01 render offset; full affine-box separating axes, not AABB overlap. One sample at every integer source frame.",
+  "frames": 2212,
+  "clips": 17,
+  "joinsPerFrame": 5,
+  "observedDisconnections": 0,
+  "clipsDetail": [
+    {
+      "clip": "idle",
+      "sourceFrames": 86,
+      "sampleStepSourceFrames": 1,
+      "worst": {
+        "torso_lower -> torso_waist": {
+          "frame": 41,
+          "gap": -0.5470134457590734
+        },
+        "torso_waist -> torso_middle": {
+          "frame": 43,
+          "gap": -0.250122074716977
+        },
+        "torso_middle -> torso": {
+          "frame": 26,
+          "gap": -1.2498328714765417
+        },
+        "torso_lower -> left_leg": {
+          "frame": 23,
+          "gap": -0.5479579339281926
+        },
+        "torso_lower -> right_leg": {
+          "frame": 29,
+          "gap": -0.5688015684630274
+        }
+      },
+      "disconnections": []
+    },
+    {
+      "clip": "walk",
+      "sourceFrames": 44,
+      "sampleStepSourceFrames": 1,
+      "worst": {
+        "torso_lower -> torso_waist": {
+          "frame": 3,
+          "gap": -0.4458343472659956
+        },
+        "torso_waist -> torso_middle": {
+          "frame": 22,
+          "gap": -0.2469690628873854
+        },
+        "torso_middle -> torso": {
+          "frame": 32,
+          "gap": -1.2260994336522708
+        },
+        "torso_lower -> left_leg": {
+          "frame": 27,
+          "gap": -0.38907572852499284
+        },
+        "torso_lower -> right_leg": {
+          "frame": 33,
+          "gap": -0.35825749409588203
+        }
+      },
+      "disconnections": []
+    },
+    {
+      "clip": "HAMMER",
+      "sourceFrames": 89,
+      "sampleStepSourceFrames": 1,
+      "worst": {
+        "torso_lower -> torso_waist": {
+          "frame": 50,
+          "gap": -0.26326963507341494
+        },
+        "torso_waist -> torso_middle": {
+          "frame": 35,
+          "gap": -0.2460248278991059
+        },
+        "torso_middle -> torso": {
+          "frame": 68,
+          "gap": -1.018451404005885
+        },
+        "torso_lower -> left_leg": {
+          "frame": 23,
+          "gap": -0.3245926470143403
+        },
+        "torso_lower -> right_leg": {
+          "frame": 47,
+          "gap": -0.3314030784578604
+        }
+      },
+      "disconnections": []
+    },
+    {
+      "clip": "SLAM",
+      "sourceFrames": 181,
+      "sampleStepSourceFrames": 1,
+      "worst": {
+        "torso_lower -> torso_waist": {
+          "frame": 79,
+          "gap": -0.4392965914927096
+        },
+        "torso_waist -> torso_middle": {
+          "frame": 3,
+          "gap": -0.3081257113533109
+        },
+        "torso_middle -> torso": {
+          "frame": 99,
+          "gap": -0.9165232084334092
+        },
+        "torso_lower -> left_leg": {
+          "frame": 17,
+          "gap": -0.4179642808763866
+        },
+        "torso_lower -> right_leg": {
+          "frame": 81,
+          "gap": -0.2541056811245235
+        }
+      },
+      "disconnections": []
+    },
+    {
+      "clip": "CHARGE",
+      "sourceFrames": 151,
+      "sampleStepSourceFrames": 1,
+      "worst": {
+        "torso_lower -> torso_waist": {
+          "frame": 46,
+          "gap": -0.42635351391955734
+        },
+        "torso_waist -> torso_middle": {
+          "frame": 89,
+          "gap": -0.16451137214415779
+        },
+        "torso_middle -> torso": {
+          "frame": 75,
+          "gap": -1.03524084298487
+        },
+        "torso_lower -> left_leg": {
+          "frame": 69,
+          "gap": -0.2865527350930488
+        },
+        "torso_lower -> right_leg": {
+          "frame": 119,
+          "gap": -0.2943071433889848
+        }
+      },
+      "disconnections": []
+    },
+    {
+      "clip": "ERUPTION",
+      "sourceFrames": 211,
+      "sampleStepSourceFrames": 1,
+      "worst": {
+        "torso_lower -> torso_waist": {
+          "frame": 89,
+          "gap": -0.2855830611781205
+        },
+        "torso_waist -> torso_middle": {
+          "frame": 8,
+          "gap": -0.07537445655179775
+        },
+        "torso_middle -> torso": {
+          "frame": 29,
+          "gap": -0.6414133513040159
+        },
+        "torso_lower -> left_leg": {
+          "frame": 131,
+          "gap": -0.3215582196373301
+        },
+        "torso_lower -> right_leg": {
+          "frame": 42,
+          "gap": -0.28550584192801765
+        }
+      },
+      "disconnections": []
+    },
+    {
+      "clip": "exposed",
+      "sourceFrames": 291,
+      "sampleStepSourceFrames": 1,
+      "worst": {
+        "torso_lower -> torso_waist": {
+          "frame": 272,
+          "gap": -0.32545788751984384
+        },
+        "torso_waist -> torso_middle": {
+          "frame": 262,
+          "gap": -0.21136785208918196
+        },
+        "torso_middle -> torso": {
+          "frame": 259,
+          "gap": -0.8233460341215171
+        },
+        "torso_lower -> left_leg": {
+          "frame": 30,
+          "gap": -0.3540678142771059
+        },
+        "torso_lower -> right_leg": {
+          "frame": 260,
+          "gap": -0.31795000785422545
+        }
+      },
+      "disconnections": []
+    },
+    {
+      "clip": "collapse",
+      "sourceFrames": 51,
+      "sampleStepSourceFrames": 1,
+      "worst": {
+        "torso_lower -> torso_waist": {
+          "frame": 1,
+          "gap": -0.4050834461791616
+        },
+        "torso_waist -> torso_middle": {
+          "frame": 29,
+          "gap": -0.13296782890407743
+        },
+        "torso_middle -> torso": {
+          "frame": 31,
+          "gap": -0.7760274383006411
+        },
+        "torso_lower -> left_leg": {
+          "frame": 33,
+          "gap": -0.3589198376942311
+        },
+        "torso_lower -> right_leg": {
+          "frame": 35,
+          "gap": -0.31776733321257544
+        }
+      },
+      "disconnections": []
+    },
+    {
+      "clip": "crawl_idle",
+      "sourceFrames": 121,
+      "sampleStepSourceFrames": 1,
+      "worst": {
+        "torso_lower -> torso_waist": {
+          "frame": 31,
+          "gap": -0.45167826559273383
+        },
+        "torso_waist -> torso_middle": {
+          "frame": 108,
+          "gap": -0.1541058614010289
+        },
+        "torso_middle -> torso": {
+          "frame": 70,
+          "gap": -1.5143518544319212
+        },
+        "torso_lower -> left_leg": {
+          "frame": 34,
+          "gap": -0.4895234117929883
+        },
+        "torso_lower -> right_leg": {
+          "frame": 120,
+          "gap": -0.6117139598650161
+        }
+      },
+      "disconnections": []
+    },
+    {
+      "clip": "crawl",
+      "sourceFrames": 59,
+      "sampleStepSourceFrames": 1,
+      "worst": {
+        "torso_lower -> torso_waist": {
+          "frame": 28,
+          "gap": -0.2629703703454058
+        },
+        "torso_waist -> torso_middle": {
+          "frame": 20,
+          "gap": -0.1138083363288005
+        },
+        "torso_middle -> torso": {
+          "frame": 39,
+          "gap": -0.35417736782217335
+        },
+        "torso_lower -> left_leg": {
+          "frame": 13,
+          "gap": -0.3922197470457397
+        },
+        "torso_lower -> right_leg": {
+          "frame": 20,
+          "gap": -0.35761213895763116
+        }
+      },
+      "disconnections": []
+    },
+    {
+      "clip": "crawl_slam",
+      "sourceFrames": 136,
+      "sampleStepSourceFrames": 1,
+      "worst": {
+        "torso_lower -> torso_waist": {
+          "frame": 80,
+          "gap": -0.2789180816268866
+        },
+        "torso_waist -> torso_middle": {
+          "frame": 117,
+          "gap": -0.005528115063008127
+        },
+        "torso_middle -> torso": {
+          "frame": 76,
+          "gap": -0.04797707876887447
+        },
+        "torso_lower -> left_leg": {
+          "frame": 62,
+          "gap": -0.3567418680547192
+        },
+        "torso_lower -> right_leg": {
+          "frame": 9,
+          "gap": -0.29302392809192
+        }
+      },
+      "disconnections": []
+    },
+    {
+      "clip": "rise",
+      "sourceFrames": 81,
+      "sampleStepSourceFrames": 1,
+      "worst": {
+        "torso_lower -> torso_waist": {
+          "frame": 0,
+          "gap": -0.29954003035589105
+        },
+        "torso_waist -> torso_middle": {
+          "frame": 38,
+          "gap": -0.16235111028624338
+        },
+        "torso_middle -> torso": {
+          "frame": 18,
+          "gap": -0.9701876382443988
+        },
+        "torso_lower -> left_leg": {
+          "frame": 53,
+          "gap": -0.3351845287416806
+        },
+        "torso_lower -> right_leg": {
+          "frame": 44,
+          "gap": -0.37279598431491956
+        }
+      },
+      "disconnections": []
+    },
+    {
+      "clip": "death",
+      "sourceFrames": 56,
+      "sampleStepSourceFrames": 1,
+      "worst": {
+        "torso_lower -> torso_waist": {
+          "frame": 15,
+          "gap": -0.2674461336873244
+        },
+        "torso_waist -> torso_middle": {
+          "frame": 20,
+          "gap": -0.26261355311301804
+        },
+        "torso_middle -> torso": {
+          "frame": 2,
+          "gap": -1.2360770497642846
+        },
+        "torso_lower -> left_leg": {
+          "frame": 26,
+          "gap": -0.3644954157076734
+        },
+        "torso_lower -> right_leg": {
+          "frame": 6,
+          "gap": -0.5433578628417819
+        }
+      },
+      "disconnections": []
+    },
+    {
+      "clip": "CHARGE_RETURN",
+      "sourceFrames": 146,
+      "sampleStepSourceFrames": 1,
+      "worst": {
+        "torso_lower -> torso_waist": {
+          "frame": 46,
+          "gap": -0.42635351391955734
+        },
+        "torso_waist -> torso_middle": {
+          "frame": 89,
+          "gap": -0.16451137214415779
+        },
+        "torso_middle -> torso": {
+          "frame": 75,
+          "gap": -1.03524084298487
+        },
+        "torso_lower -> left_leg": {
+          "frame": 69,
+          "gap": -0.2830905478330352
+        },
+        "torso_lower -> right_leg": {
+          "frame": 101,
+          "gap": -0.3498228317447198
+        }
+      },
+      "disconnections": []
+    },
+    {
+      "clip": "TAUNT_TELL",
+      "sourceFrames": 197,
+      "sampleStepSourceFrames": 1,
+      "worst": {
+        "torso_lower -> torso_waist": {
+          "frame": 115,
+          "gap": -0.4347651194570479
+        },
+        "torso_waist -> torso_middle": {
+          "frame": 38,
+          "gap": -0.23995330541510995
+        },
+        "torso_middle -> torso": {
+          "frame": 12,
+          "gap": -1.0097888932335115
+        },
+        "torso_lower -> left_leg": {
+          "frame": 18,
+          "gap": -0.4430752262579416
+        },
+        "torso_lower -> right_leg": {
+          "frame": 76,
+          "gap": -0.3006485291073614
+        }
+      },
+      "disconnections": []
+    },
+    {
+      "clip": "TAUNT",
+      "sourceFrames": 201,
+      "sampleStepSourceFrames": 1,
+      "worst": {
+        "torso_lower -> torso_waist": {
+          "frame": 8,
+          "gap": -0.45533056588110954
+        },
+        "torso_waist -> torso_middle": {
+          "frame": 166,
+          "gap": -0.10216976647251774
+        },
+        "torso_middle -> torso": {
+          "frame": 105,
+          "gap": -0.8242257226430151
+        },
+        "torso_lower -> left_leg": {
+          "frame": 188,
+          "gap": -0.3552290140843388
+        },
+        "torso_lower -> right_leg": {
+          "frame": 169,
+          "gap": -0.2205433619849216
+        }
+      },
+      "disconnections": []
+    },
+    {
+      "clip": "TAUNT_HOWL",
+      "sourceFrames": 111,
+      "sampleStepSourceFrames": 1,
+      "worst": {
+        "torso_lower -> torso_waist": {
+          "frame": 21,
+          "gap": -0.467027664757413
+        },
+        "torso_waist -> torso_middle": {
+          "frame": 29,
+          "gap": -0.2750715416764211
+        },
+        "torso_middle -> torso": {
+          "frame": 76,
+          "gap": -1.2060939902054384
+        },
+        "torso_lower -> left_leg": {
+          "frame": 83,
+          "gap": -0.3586315455184388
+        },
+        "torso_lower -> right_leg": {
+          "frame": 27,
+          "gap": -0.33840678680646424
+        }
+      },
+      "disconnections": []
+    }
+  ],
+  "boundary": "Static source-frame connectivity does not replace renderer/game verification or guarantee arbitrary blend/partial-tick interpolation; the Java receiving-geometry regression is pending."
+}

@@ -43,6 +43,36 @@ class RagdollJointMathTest {
         var rotated=AdaptiveRagdoll.fragmentVelocity(linear,omega,new Vec3(.5,0,0),new Quaternionf().rotationZ((float)Math.PI/2));
         assertEquals(0,rotated.distanceTo(linear.add(-.2,0,0)),1e-6);
     }
+    @Test void repeatedWorldContactUsesTheSameTorqueAfterTheCorpseHasTurned(){
+        var arm=new Vec3(.5,.2,-.1);var kick=new Vec3(-.1,.3,.2);
+        var worldImpulse=arm.cross(kick);
+        var initialLocal=new Vec3(.07,-.12,.03);
+        for(var rotation:java.util.List.of(new Quaternionf(),new Quaternionf().rotationX((float)Math.PI/2),
+                new Quaternionf().rotationXYZ(.4F,-1.1F,.7F))){
+            var initialWorld=new Vec3(rotation.transform(initialLocal.toVector3f()));
+            var localAfter=initialLocal.add(AdaptiveRagdoll.localAngularImpulse(worldImpulse,rotation));
+            var worldAfter=new Vec3(rotation.transform(localAfter.toVector3f()));
+            assertEquals(0,initialWorld.add(worldImpulse).distanceTo(worldAfter),1e-6,
+                    "Changing the corpse orientation must not rotate the world's contact torque a second time");
+            assertEquals(worldImpulse.length(),AdaptiveRagdoll.localAngularImpulse(worldImpulse,rotation).length(),1e-6,
+                    "Changing coordinates must not scale the angular impulse");
+        }
+    }
+    @Test void rotatingCutSurfaceVelocityMatchesItsVisibleWorldMotion(){
+        var linear=new Vec3(.2,-.1,.05);var spin=new Vec3(.4,0,0);var localOffset=new Vec3(0,.5,0);
+        var rotation=new Quaternionf().rotationZ((float)Math.PI/2);
+        var worldSpin=new Vec3(rotation.transform(spin.toVector3f()));
+        var worldOffset=new Vec3(rotation.transform(localOffset.toVector3f()));
+        var expected=linear.add(worldSpin.cross(worldOffset));
+        var actual=AdaptiveRagdoll.fragmentVelocity(linear,spin,localOffset,rotation);
+        assertEquals(0,expected.distanceTo(actual),1e-6,
+                "A cut face and the fragment owning it share the same rigid-body velocity");
+        assertTrue(linear.add(spin.cross(worldOffset)).distanceTo(expected)>.1,
+                "This rotated contact exposes the old local-spin/world-offset mix");
+        var opposite=AdaptiveRagdoll.fragmentVelocity(linear,spin,localOffset.scale(-1),rotation);
+        assertEquals(0,actual.add(opposite).scale(.5).distanceTo(linear),1e-6,
+                "Opposite cut faces retain their common translational velocity");
+    }
     @Test void smallSettlingTorquesRemainFiniteAndTurnTowardTheJoint(){
         // Regression: this nonzero cross product is below Vec3.normalize's 1e-4 dead zone.
         var turn=AdaptiveRagdoll.jointCorrection(new Vec3(1,0,0),new Vec3(0,.00001,0));

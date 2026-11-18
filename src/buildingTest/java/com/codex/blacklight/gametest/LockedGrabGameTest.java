@@ -40,9 +40,15 @@ public final class LockedGrabGameTest {
     var wounded=new net.minecraft.nbt.CompoundTag();body.saveWithoutId(wounded);wounded.putFloat("BlacklightCoreFracture",1);body.load(wounded);body.setHealth(body.getMaxHealth()*.08F);
     CombatTargeting.requestLock(p,body.getId());ClawCombatSystem.handle(p,Action.GRAB);tick(p,ConsumeVisual.captureDuration(form));
     h.assertTrue(ConsumeSystem.holding(p),form+" evolved reaches human hold");
-    ConsumeSystem.consume(p);int duration=ConsumeSequence.completionTick(form,false);tick(p,duration+2);
+    int before = p.getData(ModAttachments.PLAYER_STATE).getEvolutionPoints();
+    ConsumeSystem.consume(p);
+    var scene = body.getData(ModAttachments.CONSUME_VISUAL);
+    h.assertTrue(scene.consuming(), form+" committed an evolved consume");
+    tick(p, ConsumeSequence.completionTick(form,false,scene.variant())+2);
     h.assertTrue(body.isRemoved()&&!p.getData(ModAttachments.CONSUMING),form+" evolved scene completes and releases both claims");
-    int awarded=p.getData(ModAttachments.PLAYER_STATE).getEvolutionPoints();tick(p,30);
+    int awarded=p.getData(ModAttachments.PLAYER_STATE).getEvolutionPoints();
+    h.assertTrue(awarded > before, form+" completed consume grants evolution points");
+    tick(p,30);
     h.assertTrue(p.getData(ModAttachments.PLAYER_STATE).getEvolutionPoints()==awarded,form+" corpse cannot award twice");
    }finally{clean(p,body);}
   }h.succeed();

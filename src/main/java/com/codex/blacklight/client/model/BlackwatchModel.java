@@ -18,6 +18,7 @@ public final class BlackwatchModel extends HumanoidModel<MilitarySoldier> {
     private final ModelPart[] equipment;
     private final ModelPart[] ranks = new ModelPart[8];
     private final ModelPart modelRoot,carry,rightForearm,leftForearm,rightShin,leftShin,rightFoot,leftFoot;
+    private final Map<ModelPart,ModelPart> ragdollOwners=new IdentityHashMap<>();
     private final Map<String,ModelPart> weapons = new LinkedHashMap<>();
     private final ModelPart[] forearmEquipment = new ModelPart[2];
     private final ModelPart[][] forearmCommands = new ModelPart[3][2];
@@ -27,7 +28,9 @@ public final class BlackwatchModel extends HumanoidModel<MilitarySoldier> {
     private static final Map<String,java.util.List<BlackwatchReferenceProfile.WeaponPart>> WEAPON_PARTS=REFERENCE.weapons();
     private static final class ActorState {
         final FirearmViewState view=new FirearmViewState();
-        double at=Double.NaN,movement,crouch,aimYaw,aimPitch,aimWeight;
+        final BlackwatchGait gait=new BlackwatchGait();
+        double at=Double.NaN,movement,crouch,aimYaw,aimPitch,aimWeight,radioWeight,radioProgress;
+        void reset(){view.reset();gait.reset();at=Double.NaN;movement=crouch=aimYaw=aimPitch=aimWeight=radioWeight=radioProgress=0;}
     }
     // Shared renderer models never share animation clocks or a strong reference to an entity.
     private final Map<MilitarySoldier,ActorState> actors=new WeakHashMap<>();
@@ -83,7 +86,13 @@ public final class BlackwatchModel extends HumanoidModel<MilitarySoldier> {
         String[] packNames={"gear_patrol_pack","gear_radio","gear_aerial","gear_supply_pack","gear_supply_lid"};
         for(int i=0;i<packNames.length;i++)
             patrolPacks[i]=equipment[1].hasChild(packNames[i])?equipment[1].getChild(packNames[i]):null;
+        // Clothing, pouches and weapon pieces are rigid skins of these authored
+        // joints. They are not extra independently colliding limbs.
+        for(var joint:List.of(head,body,rightArm,leftArm,rightLeg,leftLeg,
+                rightForearm,leftForearm,rightShin,leftShin,rightFoot,leftFoot,carry))
+            joint.getAllParts().forEach(part->ragdollOwners.put(part,joint));
     }
+    public Map<ModelPart,ModelPart> ragdollOwners(){return Collections.unmodifiableMap(ragdollOwners);}
     public static LayerDefinition layer(boolean heavy) { return layer(heavy,false); }
     public static LayerDefinition layer(boolean heavy,boolean military) {
         MeshDefinition mesh = new MeshDefinition();
@@ -464,27 +473,52 @@ public final class BlackwatchModel extends HumanoidModel<MilitarySoldier> {
         for(int i=0;i<ranks.length;i++)ranks[i].visible=entity.equipped()&&i==entity.rank().ordinal();
         var stack=entity.getMainHandItem();var gun=stack.getItem() instanceof FirearmItem item?item:null;
         var state=actors.computeIfAbsent(entity,ignored->new ActorState());
+        if(com.codex.blacklight.military.aircraft.HelicopterRappel.clientActive(entity)){
+            // Authored grip/leg pose; source zipline clip samples are not yet retargeted to this rig.
+            state.reset();body.xRot=.08F;head.xRot=.12F;
+            rightArm.setRotation(-2.35F,-.16F,.1F);leftArm.setRotation(-1.15F,.18F,-.12F);
+            rightForearm.xRot=-.6F;leftForearm.xRot=-.85F;
+            rightLeg.xRot=-.35F;leftLeg.xRot=-.6F;rightShin.xRot=.6F;leftShin.xRot=.9F;
+            return;
+        }
+        if(entity.getVehicle() instanceof com.codex.blacklight.entity.BlackwatchHelicopter aircraft){
+            state.reset();applyVehicleSeatPose(aircraft.pilot().slot(entity.getUUID())<2);
+            com.codex.blacklight.client.vehicle.HelicopterPose.apply(this,aircraft,entity,age-entity.tickCount);return;
+        }
         if(entity.getVehicle() instanceof com.codex.blacklight.entity.MilitaryVehicle vehicle){
-            state.view.reset();state.at=Double.NaN;
+            state.reset();
             String seat=vehicle.seatOf(entity.getUUID());
             applyVehicleSeatPose(vehicle.definition().seats().stream().anyMatch(s->s.id().equals(seat)&&s.job()==com.codex.blacklight.military.vehicle.VehicleDefinition.Job.DRIVER),com.codex.blacklight.client.vehicle.VehicleSeatPose.drop(vehicle.definition()));return;
         }
         if(!entity.equipped()||gun==null||com.codex.blacklight.combat.ConsumeControl.protectedEntity(entity)){
-            state.view.reset();state.at=Double.NaN;return;
+            state.reset();return;
         }
         var ammo=FirearmItem.state(stack,0);var definition=gun.definition();long tick=entity.level().getGameTime();
         state.view.observe(definition.id(),0,ammo.magazine(),ammo.readyAt(),definition.cooldownTicks(),definition.reloadTicks(),tick,true,com.codex.blacklight.firearms.FirearmReloadSystem.started(stack));
         double clock=tick+(age-Math.floor(age)),delta=Double.isFinite(state.at)?Math.min(3,Math.max(0,clock-state.at)):1;
+        var original=P1MilitaryMotion.local();double partial=Math.max(0,Math.min(1,age-entity.tickCount));
+        state.gait.update(entity.xo+(entity.getX()-entity.xo)*partial,entity.zo+(entity.getZ()-entity.zo)*partial,clock,entity.onGround(),original);
         state.at=clock;state.movement=blend(state.movement,amount,delta);
         state.crouch=entity.isCrouching()?Math.min(1,state.crouch+delta/8):Math.max(0,state.crouch-delta/8);
-        state.aimYaw=blend(state.aimYaw,Math.toRadians(yaw)*.65,delta);state.aimPitch=blend(state.aimPitch,Math.toRadians(pitch)*.75,delta);
-        state.aimWeight=blend(state.aimWeight,entity.phase()==1||entity.phase()==2?1:0,delta);
+        float gunYaw=entity.gunAimYaw((float)partial);
+        // The server's bounded bearing drives both rigid grips. Do not multiply
+        // it by .65 or smooth it again: that would disagree with its firing gate.
+        state.aimYaw=Float.isFinite(gunYaw)?Math.toRadians(net.minecraft.util.Mth.wrapDegrees(gunYaw-net.minecraft.util.Mth.rotLerp((float)partial,entity.yBodyRotO,entity.yBodyRot)))
+                :blend(state.aimYaw,Math.toRadians(yaw)*.65,delta);
+        state.aimPitch=blend(state.aimPitch,Math.toRadians(pitch)*.75,delta);
+        state.aimWeight=blend(state.aimWeight,Float.isFinite(gunYaw)||entity.phase()==1||entity.phase()==2?1:0,delta);
         double meleeAge=entity.meleeStarted()<0?Double.POSITIVE_INFINITY:(clock-entity.meleeStarted())/20;
         double reloadProgress=state.view.reloadProgress(clock);
+        state.radioWeight=blend(state.radioWeight,entity.radioStarted()>=0?1:0,delta);
+        if(entity.radioStarted()>=0)state.radioProgress=Math.max(0,Math.min(1,(clock-entity.radioStarted())/com.codex.blacklight.military.MilitaryTactics.RADIO_TICKS));
         var rigPose=BlackwatchRigPose.animated(state.aimYaw,state.aimPitch,entity.getMainArm()==net.minecraft.world.entity.HumanoidArm.LEFT,
-                state.view.reloadProgress(clock),1,age/20d,state.movement,state.crouch,state.view.shotAgeSeconds(clock),
-                meleeAge,state.aimWeight);
-        var original=P1MilitaryMotion.local();
+                state.view.reloadProgress(clock),1,age/20d,state.gait.weight()*.5,state.crouch,state.view.shotAgeSeconds(clock),
+                meleeAge,state.aimWeight,state.gait.phase(),state.gait.running());
+        P1MilitaryMotion.Frame stride=null;
+        if(original!=null&&state.gait.weight()>.001&&state.crouch<.01&&!(meleeAge>=0&&meleeAge<1)){
+            stride=original.locomotion(state.gait.phase(),state.gait.running());
+            rigPose=BlackwatchRigPose.original(rigPose,stride,state.gait.weight(),0,0,0,0);
+        }
         if(original!=null){
             String clip="aim";double frame=(age/20d*30)%original.frames(clip),influence=state.aimWeight;
             P1MilitaryMotion.Frame selected=null;
@@ -496,6 +530,15 @@ public final class BlackwatchModel extends HumanoidModel<MilitarySoldier> {
             double legInfluence=clip.equals("melee")||state.movement<.03?influence:0;
             rigPose=BlackwatchRigPose.original(rigPose,selected!=null?selected:original.sample(clip,frame),influence,reloadProgress,state.aimYaw,state.aimPitch,legInfluence);
         }
+        if(state.radioWeight>.001){
+            rigPose=original!=null&&original.hasClip("radio")
+                    ?BlackwatchRigPose.radioOriginal(rigPose,original,state.radioProgress,state.radioWeight,state.aimYaw,state.aimPitch)
+                    :BlackwatchRigPose.radio(rigPose,state.radioWeight);
+        }
+        double hitTicks=entity.hitStarted()<0?Double.POSITIVE_INFINITY:clock-entity.hitStarted();
+        if(!(meleeAge>=0&&meleeAge<1))rigPose=BlackwatchRigPose.standingHit(rigPose,hitTicks,state.aimWeight);
+        if(stride!=null)rigPose=BlackwatchLegPose.locomotion(rigPose,stride,state.gait.weight());
+        rigPose=BlackwatchLegPose.support(rigPose);
         applyReferencePose(rigPose);
         var reload=com.codex.blacklight.firearms.FirearmReloadMotion.sample(state.view.reloadProgress(clock));
         for(var entry:weapons.entrySet()){

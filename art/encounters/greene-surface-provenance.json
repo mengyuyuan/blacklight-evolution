@@ -1,0 +1,771 @@
+{
+  "revision": "supreme-style-authored-r6",
+  "method": "Named anatomical cuboids authored from the supplied reference silhouette; no copied source mesh, source textures or voxelization.",
+  "styleReference": "Existing Supreme Hunter block anatomy and its authored material atlas",
+  "styleTextureSha256": "7b36becb39f88f8cd4cf7a41ebce88300fa2cec646a9eb8c10efdff73414c24c",
+  "originalReference": "D:/PrototypeReference/p1/reference-models/mother_core/source-reference.png",
+  "geometrySha256": "57566e10ff6182291791eac59af9e5cac353baf7ff0d9cf78f6317f663552339",
+  "textureSha256": "3b16398e7882d43a86a459eabcea76feef7ee52078f195cd34010ab2518ebb01",
+  "cuboids": 148,
+  "atlasSize": 512,
+  "atlasUsedHeight": 311,
+  "authoredParts": [
+    {
+      "name": "spinal_cord",
+      "bone": "root",
+      "material": "muscle"
+    },
+    {
+      "name": "vertebra_0",
+      "bone": "root",
+      "material": "fold"
+    },
+    {
+      "name": "vertebra_front_0",
+      "bone": "root",
+      "material": "hide"
+    },
+    {
+      "name": "transverse_0_-1",
+      "bone": "root",
+      "material": "hide"
+    },
+    {
+      "name": "transverse_0_1",
+      "bone": "root",
+      "material": "hide"
+    },
+    {
+      "name": "vertebra_1",
+      "bone": "root",
+      "material": "fold"
+    },
+    {
+      "name": "vertebra_front_1",
+      "bone": "root",
+      "material": "hide"
+    },
+    {
+      "name": "transverse_1_-1",
+      "bone": "root",
+      "material": "hide"
+    },
+    {
+      "name": "transverse_1_1",
+      "bone": "root",
+      "material": "hide"
+    },
+    {
+      "name": "vertebra_2",
+      "bone": "root",
+      "material": "fold"
+    },
+    {
+      "name": "vertebra_front_2",
+      "bone": "root",
+      "material": "hide"
+    },
+    {
+      "name": "transverse_2_-1",
+      "bone": "root",
+      "material": "hide"
+    },
+    {
+      "name": "transverse_2_1",
+      "bone": "root",
+      "material": "hide"
+    },
+    {
+      "name": "vertebra_3",
+      "bone": "root",
+      "material": "fold"
+    },
+    {
+      "name": "vertebra_front_3",
+      "bone": "root",
+      "material": "hide"
+    },
+    {
+      "name": "transverse_3_-1",
+      "bone": "root",
+      "material": "hide"
+    },
+    {
+      "name": "transverse_3_1",
+      "bone": "root",
+      "material": "hide"
+    },
+    {
+      "name": "vertebra_4",
+      "bone": "root",
+      "material": "fold"
+    },
+    {
+      "name": "vertebra_front_4",
+      "bone": "root",
+      "material": "hide"
+    },
+    {
+      "name": "transverse_4_-1",
+      "bone": "root",
+      "material": "hide"
+    },
+    {
+      "name": "transverse_4_1",
+      "bone": "root",
+      "material": "hide"
+    },
+    {
+      "name": "vertebra_5",
+      "bone": "root",
+      "material": "fold"
+    },
+    {
+      "name": "vertebra_front_5",
+      "bone": "root",
+      "material": "hide"
+    },
+    {
+      "name": "transverse_5_-1",
+      "bone": "root",
+      "material": "hide"
+    },
+    {
+      "name": "transverse_5_1",
+      "bone": "root",
+      "material": "hide"
+    },
+    {
+      "name": "vertebra_6",
+      "bone": "root",
+      "material": "fold"
+    },
+    {
+      "name": "vertebra_front_6",
+      "bone": "root",
+      "material": "hide"
+    },
+    {
+      "name": "transverse_6_-1",
+      "bone": "root",
+      "material": "hide"
+    },
+    {
+      "name": "transverse_6_1",
+      "bone": "root",
+      "material": "hide"
+    },
+    {
+      "name": "rear_cranium",
+      "bone": "torso",
+      "material": "fold"
+    },
+    {
+      "name": "crown_left",
+      "bone": "torso",
+      "material": "tissue"
+    },
+    {
+      "name": "crown_right",
+      "bone": "torso",
+      "material": "tissue"
+    },
+    {
+      "name": "left_temple",
+      "bone": "torso",
+      "material": "hide"
+    },
+    {
+      "name": "left_frontal",
+      "bone": "torso",
+      "material": "scar"
+    },
+    {
+      "name": "left_cheek",
+      "bone": "torso",
+      "material": "fold"
+    },
+    {
+      "name": "left_hanging_lobe",
+      "bone": "torso",
+      "material": "hide"
+    },
+    {
+      "name": "left_lower_scar",
+      "bone": "torso",
+      "material": "muscle"
+    },
+    {
+      "name": "right_mass",
+      "bone": "torso",
+      "material": "fold"
+    },
+    {
+      "name": "right_cheek",
+      "bone": "torso",
+      "material": "tissue"
+    },
+    {
+      "name": "right_jowl",
+      "bone": "torso",
+      "material": "tissue"
+    },
+    {
+      "name": "bottom_fold",
+      "bone": "torso",
+      "material": "fold"
+    },
+    {
+      "name": "bottom_flesh",
+      "bone": "torso",
+      "material": "muscle"
+    },
+    {
+      "name": "rear_left",
+      "bone": "torso",
+      "material": "hide"
+    },
+    {
+      "name": "rear_right",
+      "bone": "torso",
+      "material": "hide"
+    },
+    {
+      "name": "rear_nape",
+      "bone": "torso",
+      "material": "scar"
+    },
+    {
+      "name": "front_left_upper",
+      "bone": "torso",
+      "material": "tissue"
+    },
+    {
+      "name": "front_left_lower",
+      "bone": "torso",
+      "material": "tissue"
+    },
+    {
+      "name": "front_right_lobe",
+      "bone": "torso",
+      "material": "tissue"
+    },
+    {
+      "name": "front_forehead",
+      "bone": "torso",
+      "material": "tissue"
+    },
+    {
+      "name": "host_recess",
+      "bone": "torso",
+      "material": "joint"
+    },
+    {
+      "name": "left_upper_fold",
+      "bone": "torso",
+      "material": "muscle"
+    },
+    {
+      "name": "left_lower_fold",
+      "bone": "torso",
+      "material": "scar"
+    },
+    {
+      "name": "right_upper_fold",
+      "bone": "torso",
+      "material": "scar"
+    },
+    {
+      "name": "right_lower_fold",
+      "bone": "torso",
+      "material": "muscle"
+    },
+    {
+      "name": "lower_fascicle_-1_0",
+      "bone": "torso",
+      "material": "muscle"
+    },
+    {
+      "name": "lower_fascicle_-1_1",
+      "bone": "torso",
+      "material": "sinew"
+    },
+    {
+      "name": "lower_fascicle_-1_2",
+      "bone": "torso",
+      "material": "muscle"
+    },
+    {
+      "name": "lower_fascicle_1_0",
+      "bone": "torso",
+      "material": "muscle"
+    },
+    {
+      "name": "lower_fascicle_1_1",
+      "bone": "torso",
+      "material": "sinew"
+    },
+    {
+      "name": "lower_fascicle_1_2",
+      "bone": "torso",
+      "material": "muscle"
+    },
+    {
+      "name": "crown_furrow_0",
+      "bone": "torso",
+      "material": "fold"
+    },
+    {
+      "name": "crown_furrow_1",
+      "bone": "torso",
+      "material": "fold"
+    },
+    {
+      "name": "crown_furrow_2",
+      "bone": "torso",
+      "material": "fold"
+    },
+    {
+      "name": "left_lobe_sinew",
+      "bone": "torso",
+      "material": "muscle"
+    },
+    {
+      "name": "right_lobe_sinew",
+      "bone": "torso",
+      "material": "sinew"
+    },
+    {
+      "name": "rear_tendon",
+      "bone": "torso",
+      "material": "muscle"
+    },
+    {
+      "name": "host_neck",
+      "bone": "head",
+      "material": "scar"
+    },
+    {
+      "name": "host_skull",
+      "bone": "head",
+      "material": "skin"
+    },
+    {
+      "name": "host_hair",
+      "bone": "head",
+      "material": "fold"
+    },
+    {
+      "name": "host_hair_back",
+      "bone": "head",
+      "material": "fold"
+    },
+    {
+      "name": "host_brow",
+      "bone": "head",
+      "material": "fold"
+    },
+    {
+      "name": "host_nose",
+      "bone": "head",
+      "material": "skin"
+    },
+    {
+      "name": "host_mouth",
+      "bone": "head",
+      "material": "joint"
+    },
+    {
+      "name": "host_ribcage",
+      "bone": "head",
+      "material": "scar"
+    },
+    {
+      "name": "host_sternum",
+      "bone": "head",
+      "material": "skin"
+    },
+    {
+      "name": "host_rib_-1_0",
+      "bone": "head",
+      "material": "skin"
+    },
+    {
+      "name": "host_rib_-1_1",
+      "bone": "head",
+      "material": "skin"
+    },
+    {
+      "name": "host_rib_-1_2",
+      "bone": "head",
+      "material": "skin"
+    },
+    {
+      "name": "host_rib_1_0",
+      "bone": "head",
+      "material": "skin"
+    },
+    {
+      "name": "host_rib_1_1",
+      "bone": "head",
+      "material": "skin"
+    },
+    {
+      "name": "host_rib_1_2",
+      "bone": "head",
+      "material": "skin"
+    },
+    {
+      "name": "host_waist",
+      "bone": "head",
+      "material": "muscle"
+    },
+    {
+      "name": "host_fused_lower",
+      "bone": "head",
+      "material": "scar"
+    },
+    {
+      "name": "host_left_upper",
+      "bone": "head",
+      "material": "skin"
+    },
+    {
+      "name": "host_left_forearm",
+      "bone": "head",
+      "material": "scar"
+    },
+    {
+      "name": "host_left_hand",
+      "bone": "head",
+      "material": "skin"
+    },
+    {
+      "name": "host_right_upper",
+      "bone": "head",
+      "material": "skin"
+    },
+    {
+      "name": "host_right_forearm",
+      "bone": "head",
+      "material": "scar"
+    },
+    {
+      "name": "host_right_hand",
+      "bone": "head",
+      "material": "skin"
+    },
+    {
+      "name": "lateral_tendril_0_0",
+      "bone": "left_arm",
+      "material": "fold"
+    },
+    {
+      "name": "tendril_tissue_0_0",
+      "bone": "left_arm",
+      "material": "muscle"
+    },
+    {
+      "name": "lateral_tendril_0_1",
+      "bone": "left_arm",
+      "material": "fold"
+    },
+    {
+      "name": "tendril_tissue_0_1",
+      "bone": "left_arm",
+      "material": "muscle"
+    },
+    {
+      "name": "lateral_tendril_0_2",
+      "bone": "left_arm",
+      "material": "fold"
+    },
+    {
+      "name": "lateral_tendril_1_0",
+      "bone": "left_arm",
+      "material": "fold"
+    },
+    {
+      "name": "tendril_tissue_1_0",
+      "bone": "left_arm",
+      "material": "muscle"
+    },
+    {
+      "name": "lateral_tendril_1_1",
+      "bone": "left_arm",
+      "material": "fold"
+    },
+    {
+      "name": "tendril_tissue_1_1",
+      "bone": "left_arm",
+      "material": "muscle"
+    },
+    {
+      "name": "lateral_tendril_1_2",
+      "bone": "left_arm",
+      "material": "fold"
+    },
+    {
+      "name": "lateral_tendril_2_0",
+      "bone": "left_arm",
+      "material": "fold"
+    },
+    {
+      "name": "tendril_tissue_2_0",
+      "bone": "left_arm",
+      "material": "muscle"
+    },
+    {
+      "name": "lateral_tendril_2_1",
+      "bone": "left_arm",
+      "material": "fold"
+    },
+    {
+      "name": "tendril_tissue_2_1",
+      "bone": "left_arm",
+      "material": "muscle"
+    },
+    {
+      "name": "lateral_tendril_2_2",
+      "bone": "left_arm",
+      "material": "fold"
+    },
+    {
+      "name": "right_drape",
+      "bone": "right_arm",
+      "material": "fold"
+    },
+    {
+      "name": "right_drape_tip",
+      "bone": "right_arm",
+      "material": "fold"
+    },
+    {
+      "name": "weak_0_base",
+      "bone": "weak_0",
+      "material": "fold"
+    },
+    {
+      "name": "weak_0_trunk",
+      "bone": "weak_0",
+      "material": "muscle"
+    },
+    {
+      "name": "weak_0_upper",
+      "bone": "weak_0",
+      "material": "scar"
+    },
+    {
+      "name": "weak_0_lower_hide_-1",
+      "bone": "weak_0",
+      "material": "hide"
+    },
+    {
+      "name": "weak_0_upper_hide_-1",
+      "bone": "weak_0",
+      "material": "hide"
+    },
+    {
+      "name": "weak_0_crown_-1",
+      "bone": "weak_0",
+      "material": "fold"
+    },
+    {
+      "name": "weak_0_crown_red_-1",
+      "bone": "weak_0",
+      "material": "sinew"
+    },
+    {
+      "name": "weak_0_lower_hide_1",
+      "bone": "weak_0",
+      "material": "hide"
+    },
+    {
+      "name": "weak_0_upper_hide_1",
+      "bone": "weak_0",
+      "material": "hide"
+    },
+    {
+      "name": "weak_0_crown_1",
+      "bone": "weak_0",
+      "material": "fold"
+    },
+    {
+      "name": "weak_0_crown_red_1",
+      "bone": "weak_0",
+      "material": "sinew"
+    },
+    {
+      "name": "weak_0_front_fold_0",
+      "bone": "weak_0",
+      "material": "fold"
+    },
+    {
+      "name": "weak_0_front_fold_1",
+      "bone": "weak_0",
+      "material": "fold"
+    },
+    {
+      "name": "weak_0_front_fold_2",
+      "bone": "weak_0",
+      "material": "fold"
+    },
+    {
+      "name": "weak_1_base",
+      "bone": "weak_1",
+      "material": "fold"
+    },
+    {
+      "name": "weak_1_trunk",
+      "bone": "weak_1",
+      "material": "muscle"
+    },
+    {
+      "name": "weak_1_upper",
+      "bone": "weak_1",
+      "material": "scar"
+    },
+    {
+      "name": "weak_1_lower_hide_-1",
+      "bone": "weak_1",
+      "material": "hide"
+    },
+    {
+      "name": "weak_1_upper_hide_-1",
+      "bone": "weak_1",
+      "material": "hide"
+    },
+    {
+      "name": "weak_1_crown_-1",
+      "bone": "weak_1",
+      "material": "fold"
+    },
+    {
+      "name": "weak_1_crown_red_-1",
+      "bone": "weak_1",
+      "material": "sinew"
+    },
+    {
+      "name": "weak_1_lower_hide_1",
+      "bone": "weak_1",
+      "material": "hide"
+    },
+    {
+      "name": "weak_1_upper_hide_1",
+      "bone": "weak_1",
+      "material": "hide"
+    },
+    {
+      "name": "weak_1_crown_1",
+      "bone": "weak_1",
+      "material": "fold"
+    },
+    {
+      "name": "weak_1_crown_red_1",
+      "bone": "weak_1",
+      "material": "sinew"
+    },
+    {
+      "name": "weak_1_front_fold_0",
+      "bone": "weak_1",
+      "material": "fold"
+    },
+    {
+      "name": "weak_1_front_fold_1",
+      "bone": "weak_1",
+      "material": "fold"
+    },
+    {
+      "name": "weak_1_front_fold_2",
+      "bone": "weak_1",
+      "material": "fold"
+    },
+    {
+      "name": "weak_2_base",
+      "bone": "weak_2",
+      "material": "fold"
+    },
+    {
+      "name": "weak_2_trunk",
+      "bone": "weak_2",
+      "material": "muscle"
+    },
+    {
+      "name": "weak_2_upper",
+      "bone": "weak_2",
+      "material": "scar"
+    },
+    {
+      "name": "weak_2_lower_hide_-1",
+      "bone": "weak_2",
+      "material": "hide"
+    },
+    {
+      "name": "weak_2_upper_hide_-1",
+      "bone": "weak_2",
+      "material": "hide"
+    },
+    {
+      "name": "weak_2_crown_-1",
+      "bone": "weak_2",
+      "material": "fold"
+    },
+    {
+      "name": "weak_2_crown_red_-1",
+      "bone": "weak_2",
+      "material": "sinew"
+    },
+    {
+      "name": "weak_2_lower_hide_1",
+      "bone": "weak_2",
+      "material": "hide"
+    },
+    {
+      "name": "weak_2_upper_hide_1",
+      "bone": "weak_2",
+      "material": "hide"
+    },
+    {
+      "name": "weak_2_crown_1",
+      "bone": "weak_2",
+      "material": "fold"
+    },
+    {
+      "name": "weak_2_crown_red_1",
+      "bone": "weak_2",
+      "material": "sinew"
+    },
+    {
+      "name": "weak_2_front_fold_0",
+      "bone": "weak_2",
+      "material": "fold"
+    },
+    {
+      "name": "weak_2_front_fold_1",
+      "bone": "weak_2",
+      "material": "fold"
+    },
+    {
+      "name": "weak_2_front_fold_2",
+      "bone": "weak_2",
+      "material": "fold"
+    }
+  ],
+  "reviewStatus": "Five client views including old Supreme comparison and five action/weakpoint scenarios reviewed (54 captured frames). User aesthetic approval remains open; source rise/burrow motion is not integrated.",
+  "review": {
+    "passed": true,
+    "scenes": 5,
+    "frames": 54,
+    "contactWindow": "Five consecutive 20 Hz game ticks around every authored strike/release, including repeated strikes",
+    "digest": "d96b3105a8f556f7308ff265b52ae0b28cb0591b1a2af6a97227595b1d48897d",
+    "failed": []
+  },
+  "reviewScope": "The existing review/scenes/digest describe only the historical geometrySha256 above. They do not accept the current native rebind.",
+  "currentRig": {
+    "geometrySha256": "ab7491c5699262c945466327078abad5fed69c148e983a5667878fe1f09a2efd",
+    "cuboids": 150,
+    "bones": 50,
+    "record": "art/encounters/greene-native-bind-correction.json",
+    "state": "Code/data only; runtime and visual acceptance deferred"
+  }
+}

@@ -20,13 +20,16 @@ public final class ModNetwork {
 
     public static void register(RegisterPayloadHandlersEvent event) {
         // Configurable ecology, consume variants and military payloads share one negotiated layout.
-        event.registrar("standalone-encounter-contact-1")
+        event.registrar("standalone-89-torso-air-cannon")
                 .playToClient(ContactEffectsPayload.TYPE,ContactEffectsPayload.STREAM_CODEC,(payload,context)->context.enqueueWork(()->com.codex.blacklight.client.renderer.ContactEffectsPresentation.accept(payload)))
+                .playToServer(ContextActionPayload.TYPE,ContextActionPayload.STREAM_CODEC,(payload,context)->context.enqueueWork(()->{if(context.player() instanceof ServerPlayer player)com.codex.blacklight.combat.ContextActionSystem.request(player);}))
                 .playToClient(RagdollImpactPayload.TYPE,RagdollImpactPayload.CODEC,(payload,context)->context.enqueueWork(()->com.codex.blacklight.client.animation.ImpactRagdoll.accept(payload)))
                 .playToServer(FirearmReloadPayload.TYPE,FirearmReloadPayload.STREAM_CODEC,(payload,context)->context.enqueueWork(()->{if(context.player() instanceof ServerPlayer player)payload.handle(player);}))
                 .playToClient(GunplayFeedbackPayload.TYPE,GunplayFeedbackPayload.STREAM_CODEC,(payload,context)->context.enqueueWork(()->com.codex.blacklight.client.renderer.GunplayVisuals.accept(payload)))
+                .playToClient(VehicleDestructionPayload.TYPE,VehicleDestructionPayload.STREAM_CODEC,(payload,context)->context.enqueueWork(()->com.codex.blacklight.client.renderer.VehicleDestructionVisuals.accept(payload)))
                 .playToClient(InfectedImpactPayload.TYPE,InfectedImpactPayload.STREAM_CODEC,(payload,context)->context.enqueueWork(()->com.codex.blacklight.client.renderer.InfectedImpactVisuals.accept(payload)))
                 .playToClient(DistrictZonePayload.TYPE,DistrictZonePayload.STREAM_CODEC,(payload,context)->context.enqueueWork(()->com.codex.blacklight.client.DistrictZoneHud.accept(payload)))
+                .playToServer(HelicopterControlPayload.TYPE,HelicopterControlPayload.STREAM_CODEC,(payload,context)->context.enqueueWork(()->{if(context.player() instanceof ServerPlayer p)payload.handle(p);}))
                 .playToServer(VehicleControlPayload.TYPE,VehicleControlPayload.STREAM_CODEC,(payload,context)->context.enqueueWork(()->{if(context.player() instanceof ServerPlayer p)payload.handle(p);}))
                 .playToServer(VehicleSeatPayload.TYPE,VehicleSeatPayload.STREAM_CODEC,(payload,context)->context.enqueueWork(()->{if(context.player() instanceof ServerPlayer p)payload.handle(p);}))
                 .playToServer(DisguiseSelectPayload.TYPE,DisguiseSelectPayload.STREAM_CODEC,(payload,context)->context.enqueueWork(()->{
@@ -194,3 +197,4 @@ public final class ModNetwork {
         player.syncData(com.codex.blacklight.registry.ModAttachments.DEVASTATOR_VISUAL);
     }
 }
+

@@ -19,7 +19,7 @@ import java.lang.Math;
 /** Sharp faces from the shipped visible mesh, sampled on the authoritative attack clock.
  * Authored combat contact authorizes damage; sharp contact separately authorizes cuts. */
 public final class WeaponCutContact {
-    public enum Kind { NONE, SLICE, PUNCTURE }
+    public enum Kind { NONE, SLICE, PUNCTURE, BLUNT }
     public record Contact(int region,String edge,Vec3 point,Vec3 travel,Vec3 normal,long stroke,List<BladeSpan> path,String receivingBone) {
         public Contact {path=List.copyOf(path);}
         public Contact(int region,String edge,Vec3 point,Vec3 travel,Vec3 normal,long stroke,List<BladeSpan> path){this(region,edge,point,travel,normal,stroke,path,null);}
@@ -75,13 +75,21 @@ public final class WeaponCutContact {
     }
     private static double bodyScale(LivingEntity v){return !RagdollImpact.legacyBody(v)||v instanceof net.minecraft.world.entity.animal.Pig?1:v.getBbHeight()/1.95;}
 
+    static Kind contactKind(WeaponMove move){
+        return switch(move.uncharged()){
+            case WHIP_LASH, WHIP_RETURN, WHIP_COMBO_C -> Kind.BLUNT;
+            case WHIP_LONGSHOT, WHIP_LUNGE -> Kind.PUNCTURE;
+            default -> Kind.SLICE;
+        };
+    }
+
     /** Created once per strike tick, shared across its victims. Nothing here trusts client hit reports. */
     public static Sweep sweep(ServerPlayer player,WeaponMove move,double from,double to,Vec3 oldFeet,float oldYaw,float yaw,WhipCurve whip){
         if(move.quake()||move.groundSpike()||!(move.form==PowerForm.CLAWS||move.form==PowerForm.BLADE||move.form==PowerForm.WHIPFIST))return Sweep.EMPTY;
         var geometry=new ArrayList<>(geometry(move.form));
         if(whip==null && (geometry.isEmpty() || MotionLibrary.find(move.id).isEmpty()))return Sweep.EMPTY;
         if(move.form==PowerForm.CLAWS||move.form==PowerForm.BLADE)geometry.addAll(bluntGeometry(move.form));
-        Kind kind=move.uncharged()==WeaponMove.WHIP_LONGSHOT||move.uncharged()==WeaponMove.WHIP_LUNGE?Kind.PUNCTURE:Kind.SLICE;
+        Kind kind=contactKind(move);
         // Eight intervals per tick plus authored whip reversals. No future/recovery frames.
         var alphas=new TreeSet<Double>();for(int i=0;i<=8;i++)alphas.add(i/8.0);
         if(whip!=null&&to>from)for(var sample:whip.samples())if(sample.time()>from&&sample.time()<to)alphas.add((sample.time()-from)/(to-from));
@@ -177,7 +185,7 @@ public final class WeaponCutContact {
             }
             return null;
         }
-        Vec3 aircraftContact(ServerPlayer actor,List<HydraContact.Box> skin,double lashRadius){
+        Vec3 hullContact(ServerPlayer actor,List<HydraContact.Box> skin,double lashRadius){
             for(var frame:frames){
                 for(int i=1;i<frame.lash.size();i++){
                     var from=frame.lash.get(i-1);
@@ -268,7 +276,7 @@ public final class WeaponCutContact {
                     }
                 }
             }
-            return found.isEmpty()?Report.NONE:new Report(sharp?kind:Kind.NONE,found.values().stream().map(c->c.path(0,sharp?path(c.edge(),victim,previousPosition):List.of())).toList());
+            return found.isEmpty()?Report.NONE:new Report(sharp?kind:Kind.NONE,found.values().stream().map(c->c.path(0,sharp&&kind==Kind.SLICE?path(c.edge(),victim,previousPosition):List.of())).toList());
         }
     }
     /** Ordinary items have no shared animated mesh: use the actual aimed contact, never a fixed limb. */

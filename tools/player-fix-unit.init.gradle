@@ -1,0 +1,31 @@
+// Pending player-reported regression batch; opt-in only, never a release gate by itself.
+allprojects { afterEvaluate {
+    tasks.named('test',Test).configure {
+        include '**/BlackwatchRagdollRigTest.class'
+        include '**/Ragdoll*Test.class'
+        include '**/CorpseFragmentMotionTest.class'
+        include '**/VehicleClientInputTest.class'
+        include '**/VehicleHudControlsTest.class'
+        include '**/VehicleHudLayoutTest.class'
+        include '**/VehicleControlAuthorityTest.class'
+        include '**/VehicleSlopeSupportTest.class'
+        include '**/HydraContactTest.class'
+        include '**/HydraDeath*Test.class'
+        include '**/OrdnanceBodyContactTest.class'
+        include '**/Greene*Test.class'
+        include '**/ProjectileSphereContactTest.class'
+        include '**/Goliath*Test.class'
+        include '**/HunterCounterTest.class'
+        include '**/HunterSoundTimelineTest.class'
+        include '**/MilitaryRiflePostureTest.class'
+        include '**/MilitaryAimControlTest.class'
+        include '**/CommonInfectedLeapTest.class'
+        include '**/CommonInfectedMotionTest.class'
+        include '**/EncounterMoveTest.class'
+        include '**/Helicopter*Test.class'
+        reports.junitXml.outputLocation=layout.buildDirectory.dir('test-results/player-fixes')
+        reports.html.outputLocation=layout.buildDirectory.dir('reports/tests/player-fixes')
+        binaryResultsDirectory=layout.buildDirectory.dir('test-results/player-fixes-binary')
+    }
+    tasks.withType(Jar).configureEach { doFirst {throw new GradleException('QA cannot produce a release JAR')} }
+} }

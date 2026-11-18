@@ -14,16 +14,16 @@ import org.joml.Vector3f;
 /** Minecraft adaptation of the P1 puppet -> unpowered -> consume-by-parent handoff.
  * Timings come from the existing paired scene. Solver gains are MC units, not P1 constants. */
 public final class RagdollDrive {
-    private static final java.util.Map<LivingEntity,Long> HURT_FLASH=new java.util.WeakHashMap<>();
+    private static final java.util.Map<LivingEntity,HurtFlashWindow> HURT_FLASH=new java.util.WeakHashMap<>();
     private RagdollDrive() {}
     public static void impactFlash(LivingEntity e,com.codex.blacklight.network.RagdollImpactPayload hit){
         // A throw release carries no wound and must not pretend another hit occurred.
-        if(!hit.refinement()&&!hit.wounds().isEmpty())HURT_FLASH.put(e,e.level().getGameTime()+10);
+        if(!hit.refinement()&&!hit.wounds().isEmpty())HURT_FLASH.put(e,new HurtFlashWindow(e.level().getGameTime(),10));
     }
     public static boolean hurtFlash(LivingEntity e){
-        // Removed corpses no longer tick hurtTime; use a world-clock deadline for them.
-        return e.level().getGameTime()<HURT_FLASH.getOrDefault(e,Long.MIN_VALUE)
-                ||!e.isDeadOrDying()&&!e.isRemoved()&&e.hurtTime>0;
+        var flash=HURT_FLASH.get(e);boolean active=flash!=null&&flash.active(e.level().getGameTime());
+        if(flash!=null&&!active)HURT_FLASH.remove(e);
+        return active||!e.isDeadOrDying()&&!e.isRemoved()&&e.hurtTime>0;
     }
     /** Short wound packets accompany an authored standing flinch. Only a knockdown,
      * death or actual sever transfers that pose to a free physical body. */
@@ -31,6 +31,9 @@ public final class RagdollDrive {
         return hit.ticks()>=12||hit.severMask()!=0||!hit.planes().isEmpty();
     }
     public static boolean captured(LivingEntity e) {
+        // A detached corpse keeps its physical skin after the entity/capability
+        // lifecycle ends. It cannot still belong to a live capture session.
+        if(e.isRemoved())return false;
         var v=e.getData(ModAttachments.CONSUME_VISUAL);
         return v.active() && !ConsumeSequence.mountedStage(v.stage())
                 && v.stage()!=ConsumeVisual.FLIGHT && v.stage()!=ConsumeVisual.NONE

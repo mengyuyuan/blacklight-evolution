@@ -1,0 +1,1076 @@
+{
+  "schemaVersion": 1,
+  "date": "2026-11-17",
+  "status": "Authored Minecraft item-geometry approximation, mirrored source/resources only; not built, installed or played.",
+  "scope": "Six existing truck/APC/tank chassis inventory/held/ground item models. Placed entity mesh, motion, collision, weapon origins and all display transforms are unchanged.",
+  "reason": "The prior fine hulls still used crossed rectangular tire blocks and flat rectangular hubs. APC/tank omitted their elevated end wheel groups; truck rear wheels were solid singles.",
+  "provenSource": [
+    {
+      "package": "apc_m2_marine.p3d.rz",
+      "sha256": "096efefc2ae57c896d44cbf77a7084ec18a256f2c5e9123602a25a5a48efffba",
+      "measurementScope": "Actual LOD0 mesh buffers and primary composite wheel-to-joint attachments; original assets remain private.",
+      "composite": [
+        {
+          "name": "apc_m2_marine",
+          "offset": 1171163,
+          "rig": "apc_m2_marine_skeleton",
+          "wheelInstances": 16,
+          "wheelBindings": [
+            {
+              "offset": 1171371,
+              "mesh": "apc_m2_marine_R1Shapetrm",
+              "jointIndex": 55,
+              "joint": "R1",
+              "worldTranslation": [
+                -1.0490000247955322,
+                0.7834770679473877,
+                -2.915621519088745
+              ]
+            },
+            {
+              "offset": 1171424,
+              "mesh": "apc_m2_marine_R2Shapetrm6",
+              "jointIndex": 54,
+              "joint": "R2",
+              "worldTranslation": [
+                -1.044000024907291,
+                0.39227622747421265,
+                -2.074276924133301
+              ]
+            },
+            {
+              "offset": 1171481,
+              "mesh": "apc_m2_marine_R2Shapetrm6",
+              "jointIndex": 53,
+              "joint": "R3",
+              "worldTranslation": [
+                -1.0490000247955322,
+                0.39227622747421265,
+                -1.347003698348999
+              ]
+            },
+            {
+              "offset": 1171538,
+              "mesh": "apc_m2_marine_R2Shapetrm6",
+              "jointIndex": 52,
+              "joint": "R4",
+              "worldTranslation": [
+                -1.0490000247955322,
+                0.39227622747421265,
+                -0.5290010571479797
+              ]
+            },
+            {
+              "offset": 1171595,
+              "mesh": "apc_m2_marine_R2Shapetrm6",
+              "jointIndex": 51,
+              "joint": "R5",
+              "worldTranslation": [
+                -1.0490000247955322,
+                0.39227622747421265,
+                0.44228556752204895
+              ]
+            },
+            {
+              "offset": 1171652,
+              "mesh": "apc_m2_marine_R2Shapetrm6",
+              "jointIndex": 50,
+              "joint": "R6",
+              "worldTranslation": [
+                -1.0490000247955322,
+                0.39227622747421265,
+                1.1984504461288452
+              ]
+            },
+            {
+              "offset": 1171709,
+              "mesh": "apc_m2_marine_R2Shapetrm6",
+              "jointIndex": 49,
+              "joint": "R7",
+              "worldTranslation": [
+                -1.0490000247955322,
+                0.39227622747421265,
+                1.9257227182388306
+              ]
+            },
+            {
+              "offset": 1171766,
+              "mesh": "apc_m2_marine_R8Shapetrm",
+              "jointIndex": 48,
+              "joint": "R8",
+              "worldTranslation": [
+                -1.0490000247955322,
+                0.7510001063346863,
+                2.611632823944092
+              ]
+            },
+            {
+              "offset": 1171819,
+              "mesh": "apc_m2_marine_L1Shapetrm",
+              "jointIndex": 47,
+              "joint": "L1",
+              "worldTranslation": [
+                1.0492056608200073,
+                0.7834770679473877,
+                -2.915621519088745
+              ]
+            },
+            {
+              "offset": 1171872,
+              "mesh": "apc_m2_marine_L2Shapetrm7",
+              "jointIndex": 46,
+              "joint": "L2",
+              "worldTranslation": [
+                1.0442818403244019,
+                0.39227622747421265,
+                -2.074276924133301
+              ]
+            },
+            {
+              "offset": 1171929,
+              "mesh": "apc_m2_marine_L2Shapetrm7",
+              "jointIndex": 45,
+              "joint": "L3",
+              "worldTranslation": [
+                1.0442818403244019,
+                0.39227622747421265,
+                -1.347003698348999
+              ]
+            },
+            {
+              "offset": 1171986,
+              "mesh": "apc_m2_marine_L2Shapetrm7",
+              "jointIndex": 44,
+              "joint": "L4",
+              "worldTranslation": [
+                1.0442818403244019,
+                0.39227622747421265,
+                -0.5290010571479797
+              ]
+            },
+            {
+              "offset": 1172043,
+              "mesh": "apc_m2_marine_L2Shapetrm7",
+              "jointIndex": 43,
+              "joint": "L5",
+              "worldTranslation": [
+                1.0442818403244019,
+                0.39227622747421265,
+                0.44228556752204895
+              ]
+            },
+            {
+              "offset": 1172100,
+              "mesh": "apc_m2_marine_L2Shapetrm7",
+              "jointIndex": 42,
+              "joint": "L6",
+              "worldTranslation": [
+                1.0442818403244019,
+                0.39227622747421265,
+                1.1984504461288452
+              ]
+            },
+            {
+              "offset": 1172157,
+              "mesh": "apc_m2_marine_L2Shapetrm7",
+              "jointIndex": 41,
+              "joint": "L7",
+              "worldTranslation": [
+                1.0442818403244019,
+                0.39227622747421265,
+                1.9257227182388306
+              ]
+            },
+            {
+              "offset": 1172214,
+              "mesh": "apc_m2_marine_L8Shapetrm",
+              "jointIndex": 56,
+              "joint": "L8",
+              "worldTranslation": [
+                1.0492056608200073,
+                0.7510001063346863,
+                2.611632823944092
+              ]
+            }
+          ]
+        }
+      ],
+      "materials": [
+        {
+          "offset": 352002,
+          "strings": [
+            " c43f0b31886021f690b8904248998bcf",
+            "env_vehicle_military",
+            " c43f0b31886021f690b8904248998bcf",
+            "camo militarytiresrivets_diffuse.dds",
+            "custom_texture0",
+            "hive_building_diffuse.dds",
+            "decals",
+            " decalsaircraft001_diffuse.dds",
+            "normal",
+            " militarytiresrivets_normal.dds",
+            "decalBias",
+            "health_percent",
+            "military",
+            "refractionAmount",
+            "roughAmount",
+            "specularAmount",
+            "tintValue"
+          ]
+        }
+      ],
+      "measuredWheelMeshes": [
+        {
+          "name": "apc_m2_marine_L1Shapetrm",
+          "offset": 1054462,
+          "bounds": [
+            [
+              -0.0015334319323301315,
+              -0.22814464569091797,
+              -0.2281448245048523
+            ],
+            [
+              0.3757053315639496,
+              0.22814467549324036,
+              0.2281448245048523
+            ]
+          ],
+          "vertices": 144,
+          "groups": [
+            {
+              "shader": "c43f0b31886021f690b8904248998bcf",
+              "primitive": 0,
+              "format": 12307,
+              "stride": 68,
+              "offset": 1054551
+            }
+          ]
+        },
+        {
+          "name": "apc_m2_marine_L2Shapetrm7",
+          "offset": 1065490,
+          "bounds": [
+            [
+              -0.0015334319323301315,
+              -0.3238890767097473,
+              -0.3238891661167145
+            ],
+            [
+              0.37570539116859436,
+              0.3238890767097473,
+              0.3238893151283264
+            ]
+          ],
+          "vertices": 144,
+          "groups": [
+            {
+              "shader": "c43f0b31886021f690b8904248998bcf",
+              "primitive": 0,
+              "format": 12307,
+              "stride": 68,
+              "offset": 1065583
+            }
+          ]
+        },
+        {
+          "name": "apc_m2_marine_L8Shapetrm",
+          "offset": 1076522,
+          "bounds": [
+            [
+              -0.0015334319323301315,
+              -0.26932114362716675,
+              -0.2693214416503906
+            ],
+            [
+              0.3757053315639496,
+              0.2693212032318115,
+              0.2693212926387787
+            ]
+          ],
+          "vertices": 144,
+          "groups": [
+            {
+              "shader": "c43f0b31886021f690b8904248998bcf",
+              "primitive": 0,
+              "format": 12307,
+              "stride": 68,
+              "offset": 1076611
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "package": "tank_ram_marine.p3d.rz",
+      "sha256": "d28e38b74b3115d42a137876516b2ddcd1f46f9dd44243d74842466d70039658",
+      "measurementScope": "Actual LOD0 mesh buffers and primary composite wheel-to-joint attachments; original assets remain private.",
+      "composite": [
+        {
+          "name": "tank_ram_marine",
+          "offset": 1305263,
+          "rig": "tank_ram_marine_skeleton",
+          "wheelInstances": 18,
+          "wheelBindings": [
+            {
+              "offset": 1305556,
+              "mesh": "tank_ram_marine_R1Shapetrm8",
+              "jointIndex": 58,
+              "joint": "R1",
+              "worldTranslation": [
+                -1.2999999523162842,
+                0.9139999747276306,
+                -3.2079997062683105
+              ]
+            },
+            {
+              "offset": 1305613,
+              "mesh": "tank_ram_marine_R1Shapetrm8",
+              "jointIndex": 52,
+              "joint": "R2",
+              "worldTranslation": [
+                -1.2999999523162842,
+                0.450478732585907,
+                -2.086199998855591
+              ]
+            },
+            {
+              "offset": 1305670,
+              "mesh": "tank_ram_marine_R1Shapetrm8",
+              "jointIndex": 50,
+              "joint": "R3",
+              "worldTranslation": [
+                -1.2999999523162842,
+                0.450478732585907,
+                -1.190000057220459
+              ]
+            },
+            {
+              "offset": 1305727,
+              "mesh": "tank_ram_marine_R1Shapetrm8",
+              "jointIndex": 48,
+              "joint": "R4",
+              "worldTranslation": [
+                -1.2999999523162842,
+                0.450478732585907,
+                -0.4720000624656677
+              ]
+            },
+            {
+              "offset": 1305784,
+              "mesh": "tank_ram_marine_R1Shapetrm8",
+              "jointIndex": 46,
+              "joint": "R5",
+              "worldTranslation": [
+                -1.2999999523162842,
+                0.450478732585907,
+                0.2659999132156372
+              ]
+            },
+            {
+              "offset": 1305841,
+              "mesh": "tank_ram_marine_R1Shapetrm8",
+              "jointIndex": 44,
+              "joint": "R6",
+              "worldTranslation": [
+                -1.2999999523162842,
+                0.450478732585907,
+                0.9879999160766602
+              ]
+            },
+            {
+              "offset": 1305898,
+              "mesh": "tank_ram_marine_R1Shapetrm8",
+              "jointIndex": 60,
+              "joint": "R7",
+              "worldTranslation": [
+                -1.2999999523162842,
+                0.450478732585907,
+                1.7249997854232788
+              ]
+            },
+            {
+              "offset": 1305955,
+              "mesh": "tank_ram_marine_R1Shapetrm8",
+              "jointIndex": 43,
+              "joint": "R8",
+              "worldTranslation": [
+                -1.2999999523162842,
+                0.450478732585907,
+                2.493999719619751
+              ]
+            },
+            {
+              "offset": 1306012,
+              "mesh": "tank_ram_marine_L1Shapetrm8",
+              "jointIndex": 45,
+              "joint": "L1",
+              "worldTranslation": [
+                1.2999999523162842,
+                0.9139999747276306,
+                -3.2079997062683105
+              ]
+            },
+            {
+              "offset": 1306069,
+              "mesh": "tank_ram_marine_L1Shapetrm8",
+              "jointIndex": 47,
+              "joint": "L2",
+              "worldTranslation": [
+                1.2999999523162842,
+                0.450478732585907,
+                -2.086199998855591
+              ]
+            },
+            {
+              "offset": 1306126,
+              "mesh": "tank_ram_marine_L1Shapetrm8",
+              "jointIndex": 53,
+              "joint": "L3",
+              "worldTranslation": [
+                1.2999999523162842,
+                0.450478732585907,
+                -1.190000057220459
+              ]
+            },
+            {
+              "offset": 1306183,
+              "mesh": "tank_ram_marine_L1Shapetrm8",
+              "jointIndex": 59,
+              "joint": "L4",
+              "worldTranslation": [
+                1.2999999523162842,
+                0.450478732585907,
+                -0.4720000624656677
+              ]
+            },
+            {
+              "offset": 1306240,
+              "mesh": "tank_ram_marine_L1Shapetrm8",
+              "jointIndex": 56,
+              "joint": "L5",
+              "worldTranslation": [
+                1.2999999523162842,
+                0.4504787027835846,
+                0.2659999132156372
+              ]
+            },
+            {
+              "offset": 1306297,
+              "mesh": "tank_ram_marine_L1Shapetrm8",
+              "jointIndex": 54,
+              "joint": "L6",
+              "worldTranslation": [
+                1.2999999523162842,
+                0.450478732585907,
+                0.9879999160766602
+              ]
+            },
+            {
+              "offset": 1306354,
+              "mesh": "tank_ram_marine_L1Shapetrm8",
+              "jointIndex": 51,
+              "joint": "L7",
+              "worldTranslation": [
+                1.2999999523162842,
+                0.450478732585907,
+                1.7249997854232788
+              ]
+            },
+            {
+              "offset": 1306411,
+              "mesh": "tank_ram_marine_L1Shapetrm8",
+              "jointIndex": 49,
+              "joint": "L8",
+              "worldTranslation": [
+                1.2999999523162842,
+                0.450478732585907,
+                2.493999719619751
+              ]
+            },
+            {
+              "offset": 1307624,
+              "mesh": "tank_ram_marine_LShape9",
+              "jointIndex": 55,
+              "joint": "L9",
+              "worldTranslation": [
+                1.348432719707489,
+                0.9150570988655318,
+                3.2216142272949355
+              ]
+            },
+            {
+              "offset": 1307677,
+              "mesh": "tank_ram_marine_RShape9",
+              "jointIndex": 57,
+              "joint": "R9",
+              "worldTranslation": [
+                -1.347999982535839,
+                0.9150570988655318,
+                3.2216142272949355
+              ]
+            }
+          ]
+        }
+      ],
+      "materials": [
+        {
+          "offset": 351183,
+          "strings": [
+            " 670d5f4885e26826130fe7e24c75d631",
+            "env_vehicle_military",
+            " 670d5f4885e26826130fe7e24c75d631",
+            "camo militarytiresrivets_diffuse.dds",
+            "custom_texture0",
+            "hive_building_diffuse.dds",
+            "decals",
+            " decalsaircraft001_diffuse.dds",
+            "normal",
+            " militarytiresrivets_normal.dds",
+            "decalBias",
+            "health_percent",
+            "military",
+            "refractionAmount",
+            "roughAmount",
+            "specularAmount",
+            "tintValue"
+          ]
+        }
+      ],
+      "measuredWheelMeshes": [
+        {
+          "name": "tank_ram_marine_L1Shapetrm8",
+          "offset": 651334,
+          "bounds": [
+            [
+              -0.16065062582492828,
+              -0.3238890767097473,
+              -0.3238891661167145
+            ],
+            [
+              0.3341149687767029,
+              0.3238890767097473,
+              0.3238891661167145
+            ]
+          ],
+          "vertices": 144,
+          "groups": [
+            {
+              "shader": "670d5f4885e26826130fe7e24c75d631",
+              "primitive": 0,
+              "format": 12307,
+              "stride": 68,
+              "offset": 651427
+            }
+          ]
+        },
+        {
+          "name": "tank_ram_marine_LShape9",
+          "offset": 662366,
+          "bounds": [
+            [
+              -0.3233066499233246,
+              -0.40700027346611023,
+              -0.4070001244544983
+            ],
+            [
+              0.32330673933029175,
+              0.40700018405914307,
+              0.4070001244544983
+            ]
+          ],
+          "vertices": 142,
+          "groups": [
+            {
+              "shader": "670d5f4885e26826130fe7e24c75d631",
+              "primitive": 0,
+              "format": 12307,
+              "stride": 68,
+              "offset": 662455
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "package": "transportTruck001.p3d.rz",
+      "sha256": "5147331602e72ae277917a7704d7d97efd5fb654ab2cdb0a04a67a1571091ace",
+      "measurementScope": "Actual LOD0 mesh buffers and primary composite wheel-to-joint attachments; original assets remain private.",
+      "composite": [
+        {
+          "name": "transportTruck001",
+          "offset": 590995,
+          "rig": "transportTruck001",
+          "wheelInstances": 6,
+          "wheelBindings": [
+            {
+              "offset": 591293,
+              "mesh": "wShape1",
+              "jointIndex": 6,
+              "joint": "w1",
+              "worldTranslation": [
+                1.0210464000701904,
+                0.5387684106826782,
+                -2.4882664680480957
+              ]
+            },
+            {
+              "offset": 591330,
+              "mesh": "wShape2",
+              "jointIndex": 10,
+              "joint": "w2",
+              "worldTranslation": [
+                -1.0209999084472656,
+                0.5387684106826782,
+                -2.4882664680480957
+              ]
+            },
+            {
+              "offset": 591367,
+              "mesh": "wShape3",
+              "jointIndex": 11,
+              "joint": "w3",
+              "worldTranslation": [
+                0.9227983355522156,
+                0.538768470287323,
+                0.9617520570755005
+              ]
+            },
+            {
+              "offset": 591404,
+              "mesh": "wShape4",
+              "jointIndex": 12,
+              "joint": "w4",
+              "worldTranslation": [
+                -0.9230000376701355,
+                0.538768470287323,
+                0.9617520570755005
+              ]
+            },
+            {
+              "offset": 591441,
+              "mesh": "wShape5",
+              "jointIndex": 13,
+              "joint": "w5",
+              "worldTranslation": [
+                0.9227983355522156,
+                0.538768470287323,
+                2.2554080486297607
+              ]
+            },
+            {
+              "offset": 591478,
+              "mesh": "wShape6",
+              "jointIndex": 14,
+              "joint": "w6",
+              "worldTranslation": [
+                -0.9230000376701355,
+                0.538768470287323,
+                2.2554080486297607
+              ]
+            }
+          ]
+        }
+      ],
+      "materials": [
+        {
+          "offset": 221362,
+          "strings": [
+            " a99eacd2d29da9f66ff8a7609e8dfadb",
+            "env_car_tire",
+            " a99eacd2d29da9f66ff8a7609e8dfadb",
+            "color",
+            " militarytiresrivets_diffuse.dds",
+            "cube_map",
+            "vehicle_reflection_map.dds",
+            "normal",
+            " militarytiresrivets_normal.dds",
+            "mip_bias",
+            "reflection",
+            "specDiameter",
+            "specDiameterFalloff",
+            "specIntensity",
+            "crush_params"
+          ]
+        }
+      ],
+      "measuredWheelMeshes": [
+        {
+          "name": "wShape1",
+          "offset": 498743,
+          "bounds": [
+            [
+              -0.18918724358081818,
+              -0.560373067855835,
+              -0.5603728890419006
+            ],
+            [
+              0.1956358253955841,
+              0.5603731274604797,
+              0.560373067855835
+            ]
+          ],
+          "vertices": 158,
+          "groups": [
+            {
+              "shader": "a99eacd2d29da9f66ff8a7609e8dfadb",
+              "primitive": 0,
+              "format": 12305,
+              "stride": 52,
+              "offset": 498816
+            }
+          ]
+        },
+        {
+          "name": "wShape2",
+          "offset": 508385,
+          "bounds": [
+            [
+              -0.1956358253955841,
+              -0.560373067855835,
+              -0.5603728890419006
+            ],
+            [
+              0.18918724358081818,
+              0.5603731274604797,
+              0.560373067855835
+            ]
+          ],
+          "vertices": 158,
+          "groups": [
+            {
+              "shader": "a99eacd2d29da9f66ff8a7609e8dfadb",
+              "primitive": 0,
+              "format": 12305,
+              "stride": 52,
+              "offset": 508458
+            }
+          ]
+        },
+        {
+          "name": "wShape3",
+          "offset": 518027,
+          "bounds": [
+            [
+              -0.32164040207862854,
+              -0.560373067855835,
+              -0.5603730082511902
+            ],
+            [
+              0.32164040207862854,
+              0.560373067855835,
+              0.5603730082511902
+            ]
+          ],
+          "vertices": 316,
+          "groups": [
+            {
+              "shader": "a99eacd2d29da9f66ff8a7609e8dfadb",
+              "primitive": 0,
+              "format": 12305,
+              "stride": 52,
+              "offset": 518100
+            }
+          ]
+        },
+        {
+          "name": "wShape4",
+          "offset": 536269,
+          "bounds": [
+            [
+              -0.3216403126716614,
+              -0.560373067855835,
+              -0.560373067855835
+            ],
+            [
+              0.3216404318809509,
+              0.560373067855835,
+              0.5603730082511902
+            ]
+          ],
+          "vertices": 316,
+          "groups": [
+            {
+              "shader": "a99eacd2d29da9f66ff8a7609e8dfadb",
+              "primitive": 0,
+              "format": 12305,
+              "stride": 52,
+              "offset": 536342
+            }
+          ]
+        },
+        {
+          "name": "wShape5",
+          "offset": 554511,
+          "bounds": [
+            [
+              -0.32164040207862854,
+              -0.560373067855835,
+              -0.560373067855835
+            ],
+            [
+              0.32164040207862854,
+              0.560373067855835,
+              0.560373067855835
+            ]
+          ],
+          "vertices": 316,
+          "groups": [
+            {
+              "shader": "a99eacd2d29da9f66ff8a7609e8dfadb",
+              "primitive": 0,
+              "format": 12305,
+              "stride": 52,
+              "offset": 554584
+            }
+          ]
+        },
+        {
+          "name": "wShape6",
+          "offset": 572753,
+          "bounds": [
+            [
+              -0.3216403126716614,
+              -0.560373067855835,
+              -0.560373067855835
+            ],
+            [
+              0.3216404318809509,
+              0.560373067855835,
+              0.560373067855835
+            ]
+          ],
+          "vertices": 316,
+          "groups": [
+            {
+              "shader": "a99eacd2d29da9f66ff8a7609e8dfadb",
+              "primitive": 0,
+              "format": 12305,
+              "stride": 52,
+              "offset": 572826
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "implemented": {
+    "truck": {
+      "beforeElements": 78,
+      "afterElements": 208,
+      "frontWheels": "One stepped tire per side. Native wShape1/2 single shoulders.",
+      "rearWheels": "Two separated tires at each of two rear axle positions on both sides. Native wShape3..6 have two distinct tread strips.",
+      "sourceUnits": {
+        "outerRadius": 0.560373,
+        "treadWidth": 0.26506,
+        "dualTreadGap": 0.05627,
+        "rimRadius": 0.302061,
+        "recessRadius": 0.170772,
+        "hubRadius": 0.075034
+      },
+      "mapping": "Source width/gap and radial ratios are scaled to existing authored truck tire radius; outer hull width, wheelbase and hub envelope are retained. Inner dual tire adds actual geometry and a gap."
+    },
+    "apc": {
+      "beforeElements": 138,
+      "afterElements": 422,
+      "perSide": "Six road wheels plus front and rear elevated wheels, matching eight composite instances.",
+      "sourceRadii": {
+        "front": 0.228145,
+        "road": 0.323889,
+        "rear": 0.269321
+      },
+      "sourceRoadCentersZ": [
+        -2.074277,
+        -1.347004,
+        -0.529001,
+        0.442286,
+        1.19845,
+        1.925723
+      ],
+      "radialRatios": [
+        0.78127,
+        0.75533,
+        0.237
+      ]
+    },
+    "tank": {
+      "beforeElements": 161,
+      "afterElements": 499,
+      "perSide": "Seven road wheels, elevated front wheel and separate rear thirteen-tooth sprocket: nine composite instances.",
+      "sourceRadii": {
+        "frontAndRoad": 0.323889,
+        "rearSprocket": 0.418979
+      },
+      "sourceRoadCentersZ": [
+        -2.0862,
+        -1.19,
+        -0.472,
+        0.266,
+        0.988,
+        1.725,
+        2.494
+      ],
+      "sprocketEvidence": "LShape9 actual position stream spans Y/Z approximately +/-0.407 and radial max0.418979. The thirteen outer tooth sectors are distinct from the approximately0.31 root ring. Declared 0x10003 bounds +/-0.269321 are stale and were not used.",
+      "sprocketApproximation": "Seven-band center and thirteen axis-aligned tooth cuboids, with authored constant angular spacing and stepped rim. A voxel representation, not copied native triangles."
+    }
+  },
+  "adaptation": [
+    "Primary measured packages are Marine APC/tank and common transportTruck001. Both existing faction item variants share authored chassis geometry, so the same evidenced wheel structure is reused with each existing faction atlas; no claim that Blackwatch-only package details were measured.",
+    "APC/tank source center Y/Z and radii use a single uniform scale fitted inside the existing authored track envelope; front -Z becomes item +Z. Track-end padding0.6 and bottom padding0.8 are authored pixels, not native constants.",
+    "Circular surfaces are seven horizontal cuboid strips; smaller rim/hub steps use five or three. Axial rim step depths are authored within the existing hub envelope, not a direct import of native surface depth.",
+    "Each new part repeats its template part's complete existing authored UV island. UV dimensions remain the original template dimensions, preventing wider geometry from reading neighboring material islands.",
+    "All source wheel materials resolve militarytiresrivets_diffuse.dds/normal.dds. This is evidence of rubber/metal wheel families only: those original texture pixels are not included. Current project military_vehicles_military/blackwatch atlases remain unchanged.",
+    "Original hull/turret/cannon cuboids are retained byte-for-byte in generated JSON, including their coordinates and UVs; only wheel elements are replaced. This task does not claim an exact whole-vehicle mesh port.",
+    "Cannon-end vertex inspection did not justify inventing a hollow tank muzzle; muzzle geometry is unchanged."
+  ],
+  "staticReview": {
+    "astParsed": [
+      "tools/vehicle_item_models.py",
+      "tools/preview_chassis_running_gear.py"
+    ],
+    "jsonAndCoordinates": {
+      "schema": 1,
+      "method": "Static AST/JSON/coordinate and UV inspection, not runtime or automated gameplay tests",
+      "items": [
+        {
+          "item": "military_truck_chassis",
+          "beforeElements": 78,
+          "afterElements": 208,
+          "preservedNonWheelElements": 60,
+          "nonGeometryMetadataUnchanged": true,
+          "sha256": "ec9983c6ad48b2e2ce35181fd7239f47000dfcc247c7438462d2f0c00149993f"
+        },
+        {
+          "item": "blackwatch_truck_chassis",
+          "beforeElements": 78,
+          "afterElements": 208,
+          "preservedNonWheelElements": 60,
+          "nonGeometryMetadataUnchanged": true,
+          "sha256": "53e60d114f5b8876eafcd6c379f769322559b55a7fbe74c24481d18fa513bb9b"
+        },
+        {
+          "item": "military_apc_chassis",
+          "beforeElements": 138,
+          "afterElements": 422,
+          "preservedNonWheelElements": 102,
+          "nonGeometryMetadataUnchanged": true,
+          "sha256": "396889824d693dff476771a703d565b58f8f37b5b2e2ca289b2dcab3b029911b"
+        },
+        {
+          "item": "blackwatch_apc_chassis",
+          "beforeElements": 138,
+          "afterElements": 422,
+          "preservedNonWheelElements": 102,
+          "nonGeometryMetadataUnchanged": true,
+          "sha256": "dcb3b2669b4f8c5856f4c4480bd4396c2aee2c5753f5a44cba149d1413ebe061"
+        },
+        {
+          "item": "military_tank_chassis",
+          "beforeElements": 161,
+          "afterElements": 499,
+          "preservedNonWheelElements": 119,
+          "nonGeometryMetadataUnchanged": true,
+          "sha256": "1d8da7c2f957ff23cb699290cf82936125d5cc4d10afb8e9858814e2a20715e2"
+        },
+        {
+          "item": "blackwatch_tank_chassis",
+          "beforeElements": 161,
+          "afterElements": 499,
+          "preservedNonWheelElements": 119,
+          "nonGeometryMetadataUnchanged": true,
+          "sha256": "5dd2372afc428a90bf201c286a8e020178ed49d72c4b96d9ff3af8347b3c49df"
+        }
+      ],
+      "errors": []
+    },
+    "visualReview": "Viewed both complete six-chassis board and three-class before/after board generated directly from shipping item JSON and current authored textures. Wheel detail, faction coloring and no obvious whole-item clipping checked.",
+    "previewLimit": "CPU orthographic approximation; does not exercise Minecraft lighting, item baking, GUI pixel sizes, hand rendering or performance. Before/after board deliberately crops upper hulls to inspect the running gear.",
+    "sourceParser": "D:/CodexCache/work/inspect_vehicle_item_source.py + record_chassis_running_gear.py; original binary decoded statically, never executed."
+  },
+  "deferred": [
+    "Minecraft item baking and both platform builds",
+    "Inventory, left/right held items, dropped-item display and six chassis placement in game",
+    "Visual and performance check at real GUI scale; up to499 cuboids per item is higher than before"
+  ],
+  "historicalRecord": "chassis-item-presentation-review-20261117.json records the previous geometry snapshot. Its display finding remains unchanged; new geometry hashes are here.",
+  "privateEvidence": [
+    {
+      "path": "D:\\PrototypeReference\\p1\\private\\chassis-running-gear-proof.json",
+      "sha256": "1a69a6d8d8f62680c0aa5018744521368d291496e9176388de4044b7cad317bd"
+    },
+    {
+      "path": "D:\\PrototypeReference\\p1\\private\\vehicle-item-detail-source-measurements.json",
+      "sha256": "b092816e81de419ebf5032fc7bcb833cd60b4761e680614c7395d03081f99218"
+    },
+    {
+      "path": "D:\\PrototypeReference\\p1\\private\\chassis-running-gear-static-audit.json",
+      "sha256": "c424301cc0449049092309f688dd331538f823ae2525e3e26cef2e911f566472"
+    }
+  ],
+  "files": [
+    {
+      "path": "tools/vehicle_item_models.py",
+      "sha256": "dac38df2cd4a51d443a120b6ddb53252c358554d8b89585c8e8bdd2e449d04a5"
+    },
+    {
+      "path": "tools/preview_chassis_running_gear.py",
+      "sha256": "be749eb71e712e18116cba5d16dd1b5b4863bbffdf3cfff8d92451ebe76aded6"
+    },
+    {
+      "path": "src/main/resources/assets/blacklight/models/item/military_truck_chassis.json",
+      "sha256": "ec9983c6ad48b2e2ce35181fd7239f47000dfcc247c7438462d2f0c00149993f"
+    },
+    {
+      "path": "src/main/resources/assets/blacklight/models/item/blackwatch_truck_chassis.json",
+      "sha256": "53e60d114f5b8876eafcd6c379f769322559b55a7fbe74c24481d18fa513bb9b"
+    },
+    {
+      "path": "src/main/resources/assets/blacklight/models/item/military_apc_chassis.json",
+      "sha256": "396889824d693dff476771a703d565b58f8f37b5b2e2ca289b2dcab3b029911b"
+    },
+    {
+      "path": "src/main/resources/assets/blacklight/models/item/blackwatch_apc_chassis.json",
+      "sha256": "dcb3b2669b4f8c5856f4c4480bd4396c2aee2c5753f5a44cba149d1413ebe061"
+    },
+    {
+      "path": "src/main/resources/assets/blacklight/models/item/military_tank_chassis.json",
+      "sha256": "1d8da7c2f957ff23cb699290cf82936125d5cc4d10afb8e9858814e2a20715e2"
+    },
+    {
+      "path": "src/main/resources/assets/blacklight/models/item/blackwatch_tank_chassis.json",
+      "sha256": "5dd2372afc428a90bf201c286a8e020178ed49d72c4b96d9ff3af8347b3c49df"
+    },
+    {
+      "path": "art/military-vehicles/previews/chassis-running-gear/military_truck_chassis.png",
+      "sha256": "a4dd9d19ca260862f03fb71fbb5ba1cc1b306b2a132372cc394b846053531173"
+    },
+    {
+      "path": "art/military-vehicles/previews/chassis-running-gear/blackwatch_truck_chassis.png",
+      "sha256": "c8ac8cad6081bf1801e4860e0780985bab99b3a63729d43c5550b488dd0eeb7f"
+    },
+    {
+      "path": "art/military-vehicles/previews/chassis-running-gear/military_apc_chassis.png",
+      "sha256": "292a9f565ae035df6199af64bd7b83b5a30bb8da8ba7420803582a66d85bf6df"
+    },
+    {
+      "path": "art/military-vehicles/previews/chassis-running-gear/blackwatch_apc_chassis.png",
+      "sha256": "803dcec4b467bf19cae2bfc0b650cdbbf97aa0074ddf00eaed5f88aea1205e46"
+    },
+    {
+      "path": "art/military-vehicles/previews/chassis-running-gear/military_tank_chassis.png",
+      "sha256": "ba015a511e46f545437e17c03520ff8d6a0ec03c32257fdba938862c8e3acaf3"
+    },
+    {
+      "path": "art/military-vehicles/previews/chassis-running-gear/blackwatch_tank_chassis.png",
+      "sha256": "a71354683396274387a4c199ded7161bfc4f885f8d93e66cd6b30f34ab3d60c6"
+    },
+    {
+      "path": "art/military-vehicles/previews/chassis-running-gear/six-chassis.png",
+      "sha256": "065703a18c37929fa48b4627a0b0d726f2a20838622fa6b95360a142c71b4139"
+    },
+    {
+      "path": "art/military-vehicles/previews/chassis-running-gear/running-gear-before-after.png",
+      "sha256": "09016ea4b83ec5d7ef5cfe2043da7979941a97190b506b2db66759d698fecbb0"
+    }
+  ],
+  "verification": "Static inspection only. No Java, Gradle, test runner, client/game, original executable, native emulation or media playback was invoked."
+}

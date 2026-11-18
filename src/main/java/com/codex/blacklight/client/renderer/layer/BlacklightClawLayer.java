@@ -192,8 +192,7 @@ public final class BlacklightClawLayer extends net.minecraft.client.renderer.ent
         }
         if(!mirror&&!extendingWhip&&form==PowerForm.WHIPFIST)
             renderMesh(model,"Tip_R",poseStack,buffer,packedLight,morphProgress,1,null,Float.POSITIVE_INFINITY,null,surface,time);
-        if(authoritative&&mirror && claw && player.getData(com.codex.blacklight.registry.ModAttachments.GRAB_STAGE)
-                ==com.codex.blacklight.combat.ConsumeVisual.HOLD)
+        if(authoritative&&mirror && claw && com.codex.blacklight.combat.ConsumeVisual.carrying(player.getData(com.codex.blacklight.registry.ModAttachments.GRAB_STAGE)))
             com.codex.blacklight.client.renderer.WhipTetherRenderer.captureGrip(player,poseStack,model.anchor("palm_L",new org.joml.Vector3f(.00267F,.32362F,.07666F)));
         if(authoritative&&!mirror && form==PowerForm.BLADE)
             com.codex.blacklight.client.renderer.WhipTetherRenderer.captureGrip(player,poseStack,model.anchor("bladeGrip_R",new org.joml.Vector3f(-.0636396F,.68F,-.0636396F)));

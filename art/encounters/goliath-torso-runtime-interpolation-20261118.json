@@ -1,0 +1,35 @@
+{
+  "schema": 1,
+  "date": "2026-11-18",
+  "status": "runtime_math_fixed_88_unit_tests_pass_both_loaders_client_acceptance_pending",
+  "trigger": "GoliathTorsoBindingTest: crawl_idle frame 0 torso_waist/torso_middle disconnected; HAMMER frame 0 torso_waist source corner mismatch, despite static full-frame proof.",
+  "cause": "The source-bound torso_waist constant inverse-bind leaf has Y=-pi/2 and X=-0.89605538. SourceBossMotion.blend always converts its quaternion back to Euler angles, even when endpoints are identical. The former independent X/Z atan2 formulas each become atan2(near-zero,near-zero) at this singularity, losing the coupled twist. Static Python matrix checks did not perform that runtime quaternion/Euler round trip.",
+  "actualJomlReproduction": {
+    "runtime": "JOML 1.10.5 with Java 21",
+    "sourceRow": [-0.89605538, -1.57079633, 0],
+    "oldResult": [3.1415927, -1.5707964, 3.1415927],
+    "oldMaximumMatrixElementError": 0.7808690667152405,
+    "fixedResult": [-0.8960554, -1.5707964, 0],
+    "fixedMaximumMatrixElementError": 0.00000011920928955078125,
+    "reproductionFile": "D:/CodexCache/work/GoliathGimbalProof.java"
+  },
+  "fix": "Keep the original shortest-path quaternion slerp. Extract Euler angles from a double-normalized quaternion matrix. atan2(-r20,hypot(r00,r10)) gives Y; when cos(Y)<1e-6 preserve the coupled X/Z twist in X and choose Z=0. Linear position and scale interpolation remain unchanged.",
+  "unchanged": ["source rig", "model geometry", "source corner fixtures", "animation data", "collision tolerances"],
+  "regressions": [
+    "SourceBossMotionBlendTest: actual constant torso inverse bind at singularity",
+    "SourceBossMotionBlendTest: unequal adjacent frames crossing both Y poles",
+    "SourceBossMotionBlendTest: 1000 ordinary orientation pairs and position/scale channels",
+    "GoliathTorsoBindingTest: independent source corners and all exported-frame seams",
+    "GoliathPoseTest, EncounterMoveTest, GoliathChargeTest, GoliathSlamTest: existing source motion/contact behavior"
+  ],
+  "regressionOracleCorrection": {
+    "cause": "The first new test rebuilt Euler results with Matrix3f.rotationZYX, whose cosFromSin shortcut loses float precision near poles. The game transform instead rotates Matrix4f through Quaternionf. Compare quaternion and Euler matrices using independent double sin/cos, and additionally check the actual game matrix path for all constant/crossing-pole cases; assertion tolerance remains 4e-6.",
+    "reportedRandomCaseWeight": 0.8651546,
+    "reportedRandomCaseErrors": {"directEulerTestMatrix": 0.00001531839370727539, "actualQuaternionMatrix": 0.00000011920928955078125, "independentDoubleEuler": 0.00000013923305997032287},
+    "reportedCrossingWeight": 0.49,
+    "reportedCrossingErrors": {"directEulerTestMatrix": 0.0000072498805820941925, "actualQuaternionMatrix": 0.0000002384185791015625, "independentDoubleEuler": 0.000000197782199062857},
+    "allPoleCrossingsMaximumActualRuntimeError": 0.000001817941665649414,
+    "thousandOrdinaryPairsMaximumIndependentDoubleError": 0.0000003323564431445547
+  },
+  "verificationBoundary": "Both loaders passed all88 selected unit tests, including the corrected independent rotation oracle and every-frame torso seam/source-corner checks. Logs: D:/CodexCache/work/air-support-corrected-neo-20261118.log and air-support-corrected-forge-20261118.log. The updated Neo client was launched, but the user stopped Computer Use before model inspection; actual visual acceptance remains pending."
+}

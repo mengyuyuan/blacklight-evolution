@@ -1,0 +1,481 @@
+{
+  "status": "object_throw_contact_checks_passed",
+  "date": "2026-11-14T16:28:32.169Z",
+  "scope": "Hydra concrete pickup, held telegraph, throw, oriented-cube impacts; gateway and prior encounter regression. This is not full creature-system acceptance.",
+  "platforms": {
+    "neo": {
+      "tests": {
+        "encounterServer": 80,
+        "hydraGateway": 11,
+        "unit": 33
+      },
+      "frameFolder": "D:/CodexCache/creature-combat-qa/neo-hydra-throw-frames",
+      "frames": 561,
+      "maxGripError": 0.00010945521177297428,
+      "maxPresentationDelay": 0.35999882221221924,
+      "evidenceSha256": "5388d0df6772f9460e8a09bbcf0ee56281fd306571987990947bebe303358c55",
+      "events": [
+        {
+          "name": "pickup_ground",
+          "scene": 0,
+          "age": 27,
+          "action": 12,
+          "actionAge": 27,
+          "health": 2000,
+          "recoil": -1
+        },
+        {
+          "name": "attach",
+          "scene": 0,
+          "age": 54,
+          "action": 12,
+          "actionAge": 54,
+          "health": 2000,
+          "recoil": -1,
+          "position": {
+            "x": -0.9409604668617249,
+            "y": 78.54524900436401,
+            "z": 6.337562561035156
+          }
+        },
+        {
+          "name": "release",
+          "scene": 0,
+          "age": 126,
+          "action": 14,
+          "actionAge": 26,
+          "health": 2000,
+          "recoil": -1,
+          "position": {
+            "x": -0.48689321030507227,
+            "y": 93.32025034255142,
+            "z": 1.9400887529362343
+          }
+        },
+        {
+          "name": "end",
+          "scene": 0,
+          "age": 170,
+          "action": 0,
+          "actionAge": 70,
+          "health": 1980.4,
+          "recoil": -1
+        },
+        {
+          "name": "pickup_ground",
+          "scene": 1,
+          "age": 27,
+          "action": 12,
+          "actionAge": 27,
+          "health": 2000,
+          "recoil": -1
+        },
+        {
+          "name": "attach",
+          "scene": 1,
+          "age": 54,
+          "action": 12,
+          "actionAge": 54,
+          "health": 2000,
+          "recoil": -1,
+          "position": {
+            "x": -0.9409604668617249,
+            "y": 78.54524900436401,
+            "z": 6.337562561035156
+          }
+        },
+        {
+          "name": "release",
+          "scene": 1,
+          "age": 126,
+          "action": 14,
+          "actionAge": 26,
+          "health": 2000,
+          "recoil": -1,
+          "position": {
+            "x": -0.48689321030507227,
+            "y": 93.32025034255142,
+            "z": 1.9400887529362343
+          }
+        },
+        {
+          "name": "end",
+          "scene": 1,
+          "age": 170,
+          "action": 0,
+          "actionAge": 70,
+          "health": 2000,
+          "recoil": -1
+        },
+        {
+          "name": "pickup_ground",
+          "scene": 2,
+          "age": 27,
+          "action": 12,
+          "actionAge": 27,
+          "health": 2000,
+          "recoil": -1
+        },
+        {
+          "name": "attach",
+          "scene": 2,
+          "age": 54,
+          "action": 12,
+          "actionAge": 54,
+          "health": 2000,
+          "recoil": -1,
+          "position": {
+            "x": -0.7527683973312378,
+            "y": 79.03619917988777,
+            "z": 5.070050239562988
+          }
+        },
+        {
+          "name": "cancel",
+          "scene": 2,
+          "age": 90,
+          "action": 13,
+          "actionAge": 10,
+          "health": 2000,
+          "recoil": 10,
+          "position": {
+            "x": -0.3476807177066803,
+            "y": 84.98834988236428,
+            "z": 3.8107566833496094
+          }
+        },
+        {
+          "name": "end",
+          "scene": 2,
+          "age": 170,
+          "action": 0,
+          "actionAge": 90,
+          "health": 2000,
+          "recoil": 10
+        }
+      ],
+      "hits": [
+        {
+          "scene": 0,
+          "age": 139,
+          "damage": 19.6,
+          "at": {
+            "x": -0.20503029638182668,
+            "y": 81.95810402728117,
+            "z": 20.55000001192093
+          }
+        }
+      ],
+      "receipts": [
+        {
+          "serial": 1,
+          "tick": 140761,
+          "shown": 140761.01999890804,
+          "kind": 0,
+          "surfaceCount": 48,
+          "soundCount": 2,
+          "scene": 0,
+          "firstImage": "0-027-0.png",
+          "firstFrameAge": 27.019998908042908,
+          "contactAge": 27
+        },
+        {
+          "serial": 2,
+          "tick": 140874,
+          "shown": 140874.31999957561,
+          "kind": 1,
+          "surfaceCount": 0,
+          "soundCount": 1,
+          "scene": 0,
+          "firstImage": "0-140-0.png",
+          "firstFrameAge": 140.31999957561493,
+          "contactAge": 140
+        },
+        {
+          "serial": 3,
+          "tick": 140968,
+          "shown": 140968.0600001812,
+          "kind": 0,
+          "surfaceCount": 48,
+          "soundCount": 2,
+          "scene": 1,
+          "firstImage": "1-027-0.png",
+          "firstFrameAge": 27.06000018119812,
+          "contactAge": 27
+        },
+        {
+          "serial": 4,
+          "tick": 141078,
+          "shown": 141078.3599988222,
+          "kind": 5,
+          "surfaceCount": 1,
+          "soundCount": 2,
+          "scene": 1,
+          "firstImage": "1-137-1.png",
+          "firstFrameAge": 137.35999882221222,
+          "contactAge": 137
+        },
+        {
+          "serial": 5,
+          "tick": 141175,
+          "shown": 141175.17999958992,
+          "kind": 0,
+          "surfaceCount": 48,
+          "soundCount": 2,
+          "scene": 2,
+          "firstImage": "2-027-0.png",
+          "firstFrameAge": 27.179999589920044,
+          "contactAge": 27
+        }
+      ],
+      "code": {
+        "combat/HydraThrow.java": "bd300e65d40bef6488b9af3840769678fd84d7ce64dbdb3bbf882accbe438711",
+        "entity/HydraDebris.java": "21668866417124d81bce3a6b606539d4b7376d7d6206184ffd4216169a2d41fe",
+        "entity/BlacklightHydra.java": "0a60bb7a671f90d29b5f26f21ed30c7d6548fcde70d538b525acc583ef5c91cf",
+        "city/HydraMotion.java": "eb7f30bf11b29fc3f36a33e8ad2eb1835620f5618b45f555fd667bb5ee451109",
+        "client/renderer/HydraDebrisRenderer.java": "cfc5bd64226c0b09fe6f7a0113005fc2342b2dd91c5859acc5c7a19cf0221db0",
+        "infection/InfectedAttackStyle.java": "1aef30426764f9b9756c4b1a209e1902b6233ac9cac322ddd192bcb733bd101d"
+      }
+    },
+    "forge": {
+      "tests": {
+        "encounterServer": 80,
+        "hydraGateway": 11,
+        "unit": 33
+      },
+      "frameFolder": "D:/CodexCache/creature-combat-qa/forge-hydra-throw-frames",
+      "frames": 559,
+      "maxGripError": 0.00031341648453308104,
+      "maxPresentationDelay": 1.1200041770935059,
+      "evidenceSha256": "ab2a23d7adf7c764bbfe656031fab15e9015e0572d0d14ce49eeccf63cda5859",
+      "events": [
+        {
+          "name": "pickup_ground",
+          "scene": 0,
+          "age": 27,
+          "action": 12,
+          "actionAge": 27,
+          "health": 2000,
+          "recoil": -1
+        },
+        {
+          "name": "attach",
+          "scene": 0,
+          "age": 54,
+          "action": 12,
+          "actionAge": 54,
+          "health": 2000,
+          "recoil": -1,
+          "position": {
+            "x": -0.9409604668617249,
+            "y": 78.54524900436401,
+            "z": 6.337562561035156
+          }
+        },
+        {
+          "name": "release",
+          "scene": 0,
+          "age": 126,
+          "action": 14,
+          "actionAge": 26,
+          "health": 2000,
+          "recoil": -1,
+          "position": {
+            "x": -0.48689321030507227,
+            "y": 93.32025034255142,
+            "z": 1.9400887529362343
+          }
+        },
+        {
+          "name": "end",
+          "scene": 0,
+          "age": 170,
+          "action": 0,
+          "actionAge": 70,
+          "health": 1980.4,
+          "recoil": -1
+        },
+        {
+          "name": "pickup_ground",
+          "scene": 1,
+          "age": 27,
+          "action": 12,
+          "actionAge": 27,
+          "health": 2000,
+          "recoil": -1
+        },
+        {
+          "name": "attach",
+          "scene": 1,
+          "age": 54,
+          "action": 12,
+          "actionAge": 54,
+          "health": 2000,
+          "recoil": -1,
+          "position": {
+            "x": -0.9409604668617249,
+            "y": 78.54524900436401,
+            "z": 6.337562561035156
+          }
+        },
+        {
+          "name": "release",
+          "scene": 1,
+          "age": 126,
+          "action": 14,
+          "actionAge": 26,
+          "health": 2000,
+          "recoil": -1,
+          "position": {
+            "x": -0.48689321030507227,
+            "y": 93.32025034255142,
+            "z": 1.9400887529362343
+          }
+        },
+        {
+          "name": "end",
+          "scene": 1,
+          "age": 170,
+          "action": 0,
+          "actionAge": 70,
+          "health": 2000,
+          "recoil": -1
+        },
+        {
+          "name": "pickup_ground",
+          "scene": 2,
+          "age": 27,
+          "action": 12,
+          "actionAge": 27,
+          "health": 2000,
+          "recoil": -1
+        },
+        {
+          "name": "attach",
+          "scene": 2,
+          "age": 54,
+          "action": 12,
+          "actionAge": 54,
+          "health": 2000,
+          "recoil": -1,
+          "position": {
+            "x": -0.7527683973312378,
+            "y": 79.03619917988777,
+            "z": 5.070050239562988
+          }
+        },
+        {
+          "name": "cancel",
+          "scene": 2,
+          "age": 90,
+          "action": 13,
+          "actionAge": 10,
+          "health": 2000,
+          "recoil": 10,
+          "position": {
+            "x": -0.3476807177066803,
+            "y": 84.98834988236428,
+            "z": 3.8107566833496094
+          }
+        },
+        {
+          "name": "end",
+          "scene": 2,
+          "age": 170,
+          "action": 0,
+          "actionAge": 90,
+          "health": 2000,
+          "recoil": 10
+        }
+      ],
+      "hits": [
+        {
+          "scene": 0,
+          "age": 139,
+          "damage": 19.6,
+          "at": {
+            "x": -0.20503029638182668,
+            "y": 81.95810402728117,
+            "z": 20.55000001192093
+          }
+        }
+      ],
+      "receipts": [
+        {
+          "serial": 1,
+          "tick": 73805,
+          "shown": 73805.220002532,
+          "kind": 0,
+          "surfaceCount": 48,
+          "soundCount": 2,
+          "scene": 0,
+          "firstImage": "0-027-0.png",
+          "firstFrameAge": 27.22000253200531,
+          "contactAge": 27
+        },
+        {
+          "serial": 2,
+          "tick": 73918,
+          "shown": 73919.1200041771,
+          "kind": 1,
+          "surfaceCount": 0,
+          "soundCount": 1,
+          "scene": 0,
+          "firstImage": "0-141-0.png",
+          "firstFrameAge": 141.1200041770935,
+          "contactAge": 140
+        },
+        {
+          "serial": 3,
+          "tick": 74012,
+          "shown": 74012.32000553608,
+          "kind": 0,
+          "surfaceCount": 48,
+          "soundCount": 2,
+          "scene": 1,
+          "firstImage": "1-027-0.png",
+          "firstFrameAge": 27.320005536079407,
+          "contactAge": 27
+        },
+        {
+          "serial": 4,
+          "tick": 74122,
+          "shown": 74122.64000725746,
+          "kind": 5,
+          "surfaceCount": 1,
+          "soundCount": 2,
+          "scene": 1,
+          "firstImage": "1-137-1.png",
+          "firstFrameAge": 137.64000725746155,
+          "contactAge": 137
+        },
+        {
+          "serial": 5,
+          "tick": 74219,
+          "shown": 74219.12000775337,
+          "kind": 0,
+          "surfaceCount": 48,
+          "soundCount": 2,
+          "scene": 2,
+          "firstImage": "2-027-0.png",
+          "firstFrameAge": 27.120007753372192,
+          "contactAge": 27
+        }
+      ],
+      "code": {
+        "combat/HydraThrow.java": "bd300e65d40bef6488b9af3840769678fd84d7ce64dbdb3bbf882accbe438711",
+        "entity/HydraDebris.java": "8ee819d60887b3d7d0cc33b5139f0ed5c4493c7f8696e296e5dff374376c07db",
+        "entity/BlacklightHydra.java": "adf46d8ce00fe9817aef60f3affbaed6e96c55d038d20792af8e4cf7a5564b37",
+        "city/HydraMotion.java": "3fde8ec7d4aacdd63b3515836d7696736655dfd5096a8ff245c2cb434bdbaa68",
+        "client/renderer/HydraDebrisRenderer.java": "cfc5bd64226c0b09fe6f7a0113005fc2342b2dd91c5859acc5c7a19cf0221db0",
+        "infection/InfectedAttackStyle.java": "5ba984624b7bb309d7a93420a77968c6b0bc7db3a6d493aa3fd7806be060d6f2"
+      }
+    }
+  },
+  "boundaries": [
+    "Throw release at 1.26667 s uses a source Spawn cue whose branch index resolution is still inferred.",
+    "Original prop templates, collision engine, target-selection tree and sound waveforms are not claimed identical.",
+    "MC uses a supported-ground visual prop, no block removal/items, 32-block range and attribute-scaled damage.",
+    "Native pose metrics cover every captured frame; review sheets sample pickup, carry, release, impact and cancellation. Full mod roster and full game-system acceptance remain pending."
+  ]
+}

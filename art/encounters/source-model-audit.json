@@ -1,0 +1,127 @@
+{
+  "date": "2026-11-14",
+  "revision": "supreme-style-authored-r6",
+  "method": "Original P1/P2 decoded previews inform silhouettes only. Greene and four monsters are individually authored cuboids using the accepted project Hunter/Supreme material style. Rejected r5 continuous Greene mesh and native texture are no longer shipped.",
+  "limitations": [
+    "Static bind-pose previews are not original gameplay screenshots or original animation verification.",
+    "Some rigid source parts are displayed in their local coordinate system.",
+    "Roland and Galloway source identity remains unconfirmed; generic evolved package names are not sufficient evidence.",
+    "A passing asset test does not establish visual fidelity or user acceptance."
+  ],
+  "entries": [
+    {
+      "entity": "leader_hunter",
+      "game": 1,
+      "package": "LeaderHunter",
+      "packageSha256": "dc6402c3a07b7a8ddfbf393754da287f6ec948c8e1f14f8ac83ef8366a67e322",
+      "archiveEntry": null,
+      "preview": "D:/PrototypeReference/p1/reference-models/LeaderHunter/source-reference.png",
+      "decodedSourceSha256": "6fd78db43b551dcfc9c84217a086f53374dd920552e881bae0b814e8d976fccf",
+      "observation": "Low grey ape silhouette, long forearms, forward knuckles and bent rear legs.",
+      "status": "r6 authored geometry: four client views and action scenes reviewed; user aesthetic approval remains open"
+    },
+    {
+      "entity": "juggernaut",
+      "game": 2,
+      "package": "infected3_hammerer",
+      "packageSha256": "67401526f28f0f1e3e8b387aa731791368b445ba18f3c67cf0c35b1f3bec2127",
+      "archiveEntry": "art/packages/missions/infected3_hammerer/infected3_hammerer.p3d",
+      "preview": "D:/PrototypeReference/p2/reference-models/infected3_hammerer/source-reference.png",
+      "observation": "Protruding belly, vertical maw, paired massive fists and dorsal growths.",
+      "status": "r6 authored geometry: four client views and action scenes reviewed; user aesthetic approval remains open"
+    },
+    {
+      "entity": "goliath",
+      "game": 2,
+      "package": "behemoth",
+      "packageSha256": "3737ff61e7042391bf12c95c2018e034f52a1945983d0a7053608a01d69240c7",
+      "archiveEntry": "art/packages/missions/behemoth/behemoth.p3d",
+      "preview": "D:/PrototypeReference/p2/reference-models/behemoth/source-reference.png",
+      "observation": "Small head, oversized chest, giant lobed right fist and opposite claw arm.",
+      "status": "r6 authored geometry: four client views and action scenes reviewed; user aesthetic approval remains open"
+    },
+    {
+      "entity": "flyer",
+      "game": 2,
+      "package": "flyer",
+      "packageSha256": "a5a528705863763c2509b1329cf3cfc8134145bc26a61dd3d2636298d21b27fc",
+      "archiveEntry": "art/packages/missions/flyer/flyer.p3d",
+      "preview": "D:/PrototypeReference/p2/reference-models/flyer/source-reference.png",
+      "observation": "Pale hooked skull, compact body and elongated wing fingers.",
+      "status": "r6 authored geometry: four client views and action scenes reviewed; user aesthetic approval remains open"
+    },
+    {
+      "entity": "elizabeth_greene",
+      "game": 1,
+      "package": "mother",
+      "packageSha256": "337de53fcaae0a4bdf55f25f117dd113407921b2d46891ff81e62f240099003a",
+      "archiveEntry": null,
+      "preview": "D:/PrototypeReference/p1/reference-models/mother_core/source-reference.png",
+      "decodedSourceSha256": "f67e081a7497191554de61995bdb75fad58cfca1cb53adeb9bd0b15ef8b97df6",
+      "observation": "Original references show an asymmetric crown, small inner human host, spine and separate slugs; these proportions inform authored cuboids.",
+      "status": "r6 authored cuboids replace rejected continuous r5. Five client views and five action/weakpoint scenarios reviewed; user aesthetic approval remains open"
+    },
+    {
+      "entity": "captain_cross",
+      "game": 1,
+      "package": "specialist",
+      "packageSha256": "7c38260ad2fe03ce8f1940fb3274a4ca420aaa8b5f10c481f2d148194be59bbb",
+      "archiveEntry": null,
+      "preview": "D:/PrototypeReference/p1/reference-models/specialist/source-reference.png",
+      "decodedSourceSha256": "cb9865baa82d299b6023d29b9e0ed0cc2d2e543d973ab70e4691bb4246a14ede",
+      "observation": "Exposed short hair, high collar, diagonal zipper, tactical pouches and forearm launcher.",
+      "status": "source-informed authored adaptation; visual fidelity review ongoing"
+    },
+    {
+      "entity": "super_soldier",
+      "game": 1,
+      "package": "SuperSoldier",
+      "packageSha256": "c1c354b9020da576f8ffdccee9ff9ed198b2fbe4ac033b613e208d9aa17a907e",
+      "archiveEntry": null,
+      "preview": "D:/PrototypeReference/p1/reference-models/SuperSoldier/source-reference.png",
+      "decodedSourceSha256": "f8c546f085c42fbc3b7e3e30be3e54b1a805ef0da0d56e04b2ba63cbdfa35e3d",
+      "observation": "Caged respirator, pale panels, dark webbing and reinforced arms.",
+      "status": "source-informed authored adaptation; visual fidelity review ongoing"
+    },
+    {
+      "entity": "archer",
+      "game": 2,
+      "package": "evolved_e3",
+      "packageSha256": "c5b611a3c62d78ca4a13d6968d686629c7f1d3ef823af060f43d0519571e8abb",
+      "archiveEntry": "art/packages/missions/evolved_e3/evolved_e3.p3d",
+      "preview": "D:/PrototypeReference/p2/reference-models/evolved_e3/source-reference.png",
+      "observation": "Archer named inside source shapes: short dark hair, long white coat, blue collar, ID and paired cleavers.",
+      "status": "source-informed authored adaptation; visual fidelity review ongoing"
+    },
+    {
+      "entity": "koenig",
+      "game": 2,
+      "package": "evolved_m1",
+      "packageSha256": "c83f0c7011bae4dd85d932b335e51a9d5f4e7db810266c5e59ac19dee396ad33",
+      "archiveEntry": "art/packages/missions/evolved_m1/evolved_m1.p3d",
+      "preview": "D:/PrototypeReference/p2/reference-models/evolved_m1/source-reference.png",
+      "observation": "Koenig named inside source shapes: balding grey beard, white coat, ID and paired cleavers.",
+      "status": "source-informed authored adaptation; visual fidelity review ongoing"
+    },
+    {
+      "entity": "recon_uav",
+      "game": 2,
+      "package": "uav",
+      "packageSha256": "a43f3a22f2ee6df4b0e3251e9e43d9b00dff461fb53121d13bfe77bf888c1715",
+      "archiveEntry": "art/packages/missions/uav/uav.p3d",
+      "preview": "D:/PrototypeReference/p2/reference-models/uav/source-reference.png",
+      "observation": "Three ducted fans, vertical post, underslung sensor; replaces invented quadcopter.",
+      "status": "source-informed authored adaptation; visual fidelity review ongoing"
+    },
+    {
+      "entity": "alex_mercer",
+      "game": 2,
+      "package": "alex_boss",
+      "packageSha256": "4918d11fe4532af83a67add69a9e3dbd236e486d6c163d50984d875486e71f6b",
+      "archiveEntry": "art/packages/missions/alex_boss/alex_boss.p3d",
+      "preview": "D:/PrototypeReference/p2/reference-models/alex_boss/source-reference.png",
+      "observation": "Original inspected; current model is still an earlier authored draft awaiting source-based revision.",
+      "status": "reference inspected, remodel pending"
+    }
+  ]
+}

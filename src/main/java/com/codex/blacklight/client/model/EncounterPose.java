@@ -69,5 +69,15 @@ public final class EncounterPose {
         if(mob.kind()==EncounterKind.FLYER){rotation(model,"right_arm",0,0,-.4F-.45F*Mth.sin((mob.tickCount+partial)*.5F));rotation(model,"left_arm",0,0,.4F+.45F*Mth.sin((mob.tickCount+partial)*.5F));}
     }
     private static void rotation(GeoModel<?> model,String name,EncounterAnatomyPose.Joint joint){rotation(model,name,joint.x(),joint.y(),joint.z());}
+    public static void drone(GeoModel<?> model,MilitaryUav drone,float partial){
+        var torso=model.getAnimationProcessor().getBone("torso");if(torso!=null){torso.setScaleX(1);torso.setScaleY(1);torso.setScaleZ(1);}
+        float time=drone.tickCount+partial;
+        if(!drone.isAlive()){float death=Math.min(15,drone.deathTime+partial);time=drone.tickCount-drone.deathTime+death-death*death/30;}
+        rotation(model,"rotor_0",0,time*1.4F,0);
+        // The original skeleton has no independent camera gimbal: the upper sensor is fixed.
+        rotation(model,"head",0,0,0);
+        String[] lamps={"lamp_green","lamp_yellow","lamp_red"};int state=drone.warningLamp();
+        for(int i=0;i<lamps.length;i++){var lamp=model.getAnimationProcessor().getBone(lamps[i]);if(lamp!=null)lamp.setHidden(i!=state);}
+    }
     private EncounterPose(){}
 }

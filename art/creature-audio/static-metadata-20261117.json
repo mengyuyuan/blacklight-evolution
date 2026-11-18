@@ -1,0 +1,88 @@
+{
+  "kind": "static-container-and-source-inspection-not-a-listening-or-game-test",
+  "audio": [
+    {
+      "file": "sounds/infection/common_attack_1.ogg",
+      "channels": 1,
+      "seconds_from_ogg_granule": 0.4410657596371882
+    },
+    {
+      "file": "sounds/infection/common_attack_2.ogg",
+      "channels": 1,
+      "seconds_from_ogg_granule": 0.42342403628117914
+    },
+    {
+      "file": "sounds/infection/common_attack_3.ogg",
+      "channels": 1,
+      "seconds_from_ogg_granule": 0.46530612244897956
+    },
+    {
+      "file": "sounds/infection/common_death_1.ogg",
+      "channels": 1,
+      "seconds_from_ogg_granule": 0.8902040816326531
+    },
+    {
+      "file": "sounds/infection/common_death_2.ogg",
+      "channels": 1,
+      "seconds_from_ogg_granule": 0.8902040816326531
+    },
+    {
+      "file": "sounds/infection/common_death_3.ogg",
+      "channels": 1,
+      "seconds_from_ogg_granule": 0.8902040816326531
+    },
+    {
+      "file": "sounds/infection/hunter_grunt_1.ogg",
+      "channels": 1,
+      "seconds_from_ogg_granule": 0.68
+    },
+    {
+      "file": "sounds/infection/hunter_grunt_2.ogg",
+      "channels": 1,
+      "seconds_from_ogg_granule": 0.68
+    },
+    {
+      "file": "sounds/infection/hunter_grunt_3.ogg",
+      "channels": 1,
+      "seconds_from_ogg_granule": 0.68
+    },
+    {
+      "file": "sounds/infection/hunter_roar_1.ogg",
+      "channels": 1,
+      "seconds_from_ogg_granule": 1.0820634920634922
+    },
+    {
+      "file": "sounds/infection/hunter_roar_2.ogg",
+      "channels": 1,
+      "seconds_from_ogg_granule": 1.0122448979591836
+    },
+    {
+      "file": "sounds/infection/hunter_roar_3.ogg",
+      "channels": 1,
+      "seconds_from_ogg_granule": 0.9509070294784581
+    },
+    {
+      "file": "sounds/infection/hunter_death_1.ogg",
+      "channels": 1,
+      "seconds_from_ogg_granule": 1.3946485260770976
+    },
+    {
+      "file": "sounds/infection/hunter_death_2.ogg",
+      "channels": 1,
+      "seconds_from_ogg_granule": 1.307482993197279
+    },
+    {
+      "file": "sounds/infection/hunter_death_3.ogg",
+      "channels": 1,
+      "seconds_from_ogg_granule": 1.2875963718820862
+    }
+  ],
+  "all_event_resources_exist": true,
+  "dual_platform_audio_byte_identical": true,
+  "source_manifest_hashes_match": true,
+  "pure_helper_and_unit_text_mirror": true,
+  "media_played": false,
+  "unit_tests_run": false,
+  "gametests_run": false,
+  "build_run": false
+}

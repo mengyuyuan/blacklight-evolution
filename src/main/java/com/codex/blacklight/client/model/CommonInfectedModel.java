@@ -38,7 +38,14 @@ public final class CommonInfectedModel extends HumanoidModel<BlacklightCommonInf
         hat.resetPose();hat.visible=true;
         float partial=Math.clamp(age-e.tickCount,0,1);
         float attack=e.attackStarted()<0?-1:(float)(e.level().getGameTime()-e.attackStarted())+partial;
-        var p=CommonInfectedMotion.sample(age,swing,amount,e.isAggressive(),attack,e.attackHand());
+        var p=attack>=0&&e.attackHand()==com.codex.blacklight.infection.CommonInfectedLeap.HAND
+                ?CommonInfectedMotion.leap(attack,e.leapPunchAge(partial),e.leapLandAge(partial))
+                :CommonInfectedMotion.sample(age,swing,amount,e.isAggressive(),attack,e.attackHand());
+        applyPose(p,yaw,pitch);
+        if(e.isPassenger()){rightLeg.xRot=leftLeg.xRot=-1.1F;rightLeg.yRot=.25F;leftLeg.yRot=-.25F;kneeR.xRot=kneeL.xRot=.5F;}
+        if(e.hurtTime>0){float flinch=(float)Math.sin((e.hurtTime-partial)*Math.PI/10)*.16F;body.xRot-=flinch;head.xRot+=flinch;}
+    }
+    public void applyPose(CommonInfectedMotion.Pose p,float yaw,float pitch){
         head.yRot=yaw*((float)Math.PI/180);head.xRot=pitch*((float)Math.PI/180)+p.head();head.zRot=p.roll();
         body.xRot=p.torso();body.yRot=p.twist();body.zRot=p.roll();
         // Shoulders follow the leaning chest, while elbows and knees retain their own local pivots.
@@ -53,8 +60,6 @@ public final class CommonInfectedModel extends HumanoidModel<BlacklightCommonInf
         elbowR.xRot=p.elbowR();elbowL.xRot=p.elbowL();
         rightLeg.xRot=p.legR();leftLeg.xRot=p.legL();kneeR.xRot=p.kneeR();kneeL.xRot=p.kneeL();
         hat.copyFrom(head);
-        if(e.isPassenger()){rightLeg.xRot=leftLeg.xRot=-1.1F;rightLeg.yRot=.25F;leftLeg.yRot=-.25F;kneeR.xRot=kneeL.xRot=.5F;}
-        if(e.hurtTime>0){float flinch=(float)Math.sin((e.hurtTime-partial)*Math.PI/10)*.16F;body.xRot-=flinch;head.xRot+=flinch;}
     }
     @Override public void translateToHand(HumanoidArm side,PoseStack stack){
         super.translateToHand(side,stack);

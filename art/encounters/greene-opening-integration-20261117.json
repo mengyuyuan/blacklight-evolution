@@ -1,0 +1,384 @@
+{
+  "schema": 1,
+  "date": "2026-11-17",
+  "state": "Initial standalone source rise wired; complete mission opening remains partial",
+  "source": {
+    "missionFile": "D:\\PrototypeReference\\p1\\input\\remote-metadata\\art\\missions\\e08m04\\e08m04_fig.p3d.rz",
+    "missionSha256": "230c93e227d1bb97bfcd28f68cf350b09a47ac7ddff0a2393857a820ec094e01",
+    "decodedLuaSha256": "8251011bc55f6ab0fd17c158e3139dde457533a8e97016ae721307d993788ed2",
+    "nativeConstructorProofSha256": "a27404a62a25f4e842afca031e3eb19aadfe1760d6c828e61b54ef98b1e4e6f7",
+    "nativeConstructor": "TunnelingBehaviour10079120 sets state+0xc=1 (Underground) at10079133. Existing100794f0 proof shows ComeOut from this state samples surface, places actor ground-depth and enters ComingOut.",
+    "entryScriptOffset": 75836,
+    "entryOrder": "MotherSpawn atpc11..14; fixed PLAYER_1 target15..18; MotherSpawnSegments19..20; attack flag setup39..53; MotherEmerge(justCore)54..56; core Damageable=false57..60; ToCombat65..67; HUD marker68..75; Wait15 only76..78 before DisplaySegHealth79..80.",
+    "emergeFunction": "Lua66452 prototype6 pc8..12 calls ai_SetUnderground(gMotherCore,false,false). Its justCore argument skips Hydra emergence in the subsequent loop. The first entry script does not call MotherSpawnHydras.",
+    "sharedRiseProof": "private/greene-submerge-emerge-lifecycle-proof.json",
+    "sharedRiseProofSha256": "9f1dab04ec4c9cdab4703946c139aae0b48afc8071b567eb733521d811a47f12",
+    "entryInstructions": [
+      {
+        "pc": 39,
+        "opcode": "GETGLOBAL",
+        "A": 4,
+        "B": 0,
+        "C": 16,
+        "constant": "go_VariableIntSet"
+      },
+      {
+        "pc": 40,
+        "opcode": "LOADK",
+        "A": 5,
+        "B": 0,
+        "C": 17,
+        "constant": "Mother_Core"
+      },
+      {
+        "pc": 41,
+        "opcode": "LOADK",
+        "A": 6,
+        "B": 0,
+        "C": 18,
+        "constant": "motherBossVomitAttack"
+      },
+      {
+        "pc": 42,
+        "opcode": "LOADK",
+        "A": 7,
+        "B": 0,
+        "C": 5,
+        "constant": 0.0
+      },
+      {
+        "pc": 43,
+        "opcode": "CALL",
+        "A": 4,
+        "B": 4,
+        "C": 1
+      },
+      {
+        "pc": 44,
+        "opcode": "GETGLOBAL",
+        "A": 4,
+        "B": 0,
+        "C": 16,
+        "constant": "go_VariableIntSet"
+      },
+      {
+        "pc": 45,
+        "opcode": "LOADK",
+        "A": 5,
+        "B": 0,
+        "C": 17,
+        "constant": "Mother_Core"
+      },
+      {
+        "pc": 46,
+        "opcode": "LOADK",
+        "A": 6,
+        "B": 0,
+        "C": 19,
+        "constant": "motherBossGibsAttack"
+      },
+      {
+        "pc": 47,
+        "opcode": "LOADK",
+        "A": 7,
+        "B": 0,
+        "C": 5,
+        "constant": 0.0
+      },
+      {
+        "pc": 48,
+        "opcode": "CALL",
+        "A": 4,
+        "B": 4,
+        "C": 1
+      },
+      {
+        "pc": 49,
+        "opcode": "GETGLOBAL",
+        "A": 4,
+        "B": 0,
+        "C": 16,
+        "constant": "go_VariableIntSet"
+      },
+      {
+        "pc": 50,
+        "opcode": "LOADK",
+        "A": 5,
+        "B": 0,
+        "C": 17,
+        "constant": "Mother_Core"
+      },
+      {
+        "pc": 51,
+        "opcode": "LOADK",
+        "A": 6,
+        "B": 0,
+        "C": 20,
+        "constant": "ForceThunderousRoar"
+      },
+      {
+        "pc": 52,
+        "opcode": "LOADK",
+        "A": 7,
+        "B": 0,
+        "C": 21,
+        "constant": 1.0
+      },
+      {
+        "pc": 53,
+        "opcode": "CALL",
+        "A": 4,
+        "B": 4,
+        "C": 1
+      },
+      {
+        "pc": 54,
+        "opcode": "GETGLOBAL",
+        "A": 4,
+        "B": 0,
+        "C": 22,
+        "constant": "MotherEmerge"
+      },
+      {
+        "pc": 55,
+        "opcode": "LOADK",
+        "A": 5,
+        "B": 0,
+        "C": 23,
+        "constant": "justCore"
+      },
+      {
+        "pc": 56,
+        "opcode": "CALL",
+        "A": 4,
+        "B": 2,
+        "C": 1
+      },
+      {
+        "pc": 57,
+        "opcode": "GETGLOBAL",
+        "A": 4,
+        "B": 0,
+        "C": 24,
+        "constant": "go_SetDamageable"
+      },
+      {
+        "pc": 58,
+        "opcode": "GETGLOBAL",
+        "A": 5,
+        "B": 0,
+        "C": 8,
+        "constant": "gMotherCore"
+      },
+      {
+        "pc": 59,
+        "opcode": "LOADBOOL",
+        "A": 6,
+        "B": 0,
+        "C": 0
+      },
+      {
+        "pc": 60,
+        "opcode": "CALL",
+        "A": 4,
+        "B": 3,
+        "C": 1
+      },
+      {
+        "pc": 61,
+        "opcode": "LOADBOOL",
+        "A": 4,
+        "B": 0,
+        "C": 0
+      },
+      {
+        "pc": 62,
+        "opcode": "SETGLOBAL",
+        "A": 4,
+        "B": 0,
+        "C": 25,
+        "constant": "hydrasDead"
+      },
+      {
+        "pc": 63,
+        "opcode": "LOADBOOL",
+        "A": 4,
+        "B": 0,
+        "C": 0
+      },
+      {
+        "pc": 64,
+        "opcode": "SETGLOBAL",
+        "A": 4,
+        "B": 0,
+        "C": 26,
+        "constant": "segmentsDead"
+      },
+      {
+        "pc": 65,
+        "opcode": "GETGLOBAL",
+        "A": 4,
+        "B": 0,
+        "C": 27,
+        "constant": "fsm_PostEventString"
+      },
+      {
+        "pc": 66,
+        "opcode": "LOADK",
+        "A": 5,
+        "B": 0,
+        "C": 28,
+        "constant": "ToCombat"
+      },
+      {
+        "pc": 67,
+        "opcode": "CALL",
+        "A": 4,
+        "B": 2,
+        "C": 1
+      },
+      {
+        "pc": 68,
+        "opcode": "GETGLOBAL",
+        "A": 4,
+        "B": 0,
+        "C": 29,
+        "constant": "local_obj_AddMissionObjectiveMarker"
+      },
+      {
+        "pc": 69,
+        "opcode": "GETGLOBAL",
+        "A": 5,
+        "B": 0,
+        "C": 8,
+        "constant": "gMotherCore"
+      },
+      {
+        "pc": 70,
+        "opcode": "LOADK",
+        "A": 6,
+        "B": 0,
+        "C": 30,
+        "constant": "KILL"
+      },
+      {
+        "pc": 71,
+        "opcode": "LOADK",
+        "A": 7,
+        "B": 0,
+        "C": 31,
+        "constant": "$elizabeth"
+      },
+      {
+        "pc": 72,
+        "opcode": "GETGLOBAL",
+        "A": 8,
+        "B": 0,
+        "C": 32,
+        "constant": "E_MAINMAP"
+      },
+      {
+        "pc": 73,
+        "opcode": "GETGLOBAL",
+        "A": 9,
+        "B": 0,
+        "C": 33,
+        "constant": "E_MINIMAP"
+      },
+      {
+        "pc": 74,
+        "opcode": "ADD",
+        "A": 8,
+        "B": 8,
+        "C": 9
+      },
+      {
+        "pc": 75,
+        "opcode": "CALL",
+        "A": 4,
+        "B": 5,
+        "C": 1
+      },
+      {
+        "pc": 76,
+        "opcode": "GETGLOBAL",
+        "A": 4,
+        "B": 0,
+        "C": 34,
+        "constant": "Wait"
+      },
+      {
+        "pc": 77,
+        "opcode": "LOADK",
+        "A": 5,
+        "B": 0,
+        "C": 35,
+        "constant": 15.0
+      },
+      {
+        "pc": 78,
+        "opcode": "CALL",
+        "A": 4,
+        "B": 2,
+        "C": 1
+      },
+      {
+        "pc": 79,
+        "opcode": "GETGLOBAL",
+        "A": 4,
+        "B": 0,
+        "C": 36,
+        "constant": "DisplaySegHealth"
+      },
+      {
+        "pc": 80,
+        "opcode": "CALL",
+        "A": 4,
+        "B": 1,
+        "C": 1
+      }
+    ]
+  },
+  "integration": {
+    "firstPlacement": "Constructor initializes a pending marker and health ownership only. First actual server tick samples down from final feet+.001, excluding overhead ceilings, and begins EMERGE_WAIT from ground minus20 source units using preserved mesh scale; no constructor-origin teleport.",
+    "time": "Same source spawn-prop gate6ticks, enter0..244/30fps, constant upward20units/1.33333s, targetability27ticks, optional eligible attack handoff80ticks and163tick uninterrupted clip as repeat rise. No added15second gameplay delay.",
+    "health": "Initial core stays guarded, all three current armor children remain at wave1, and first entry does not regenerate armor or increment waveCount. No Hunter/Hydra repeat scheduling starts.",
+    "spawnNbt": "Minimal Entity.load summon/spawn data without a GreeneBattle or any prior encounter marker schedules fresh entry. Old EncounterPhase/Broken/Armor/Cycle/Exposed records retain legacy migration and do not replay opening.",
+    "persistence": "CycleVersion4 persists OpeningPending. Version3 and older/missing markers mean an existing encounter. Active entry reuses relative phase/Hit receipts and saved root-physics lease; unloaded time does not replay first placement.",
+    "network": "standalone-85-hydra-thermal / forge-1.20.1-45-hydra-thermal; pending targetability is synchronized.",
+    "existingFixtures": "Ten damage/pose/ray fixtures explicitly load a standing existing state. They do not claim to test initial spawn. Six independent opening GameTests exercise fresh construction, real EntityType.loadEntityRecursive paths and low-ceiling floor choice."
+  },
+  "remainingAndAdaptations": [
+    "Standalone final spawn position substitutes for the TimesSquare locator. Initial cinematics, dialogue/camera gating and the full mission FSM remain unported.",
+    "Initial ForceThunderousRoar=1 and scripted attack-unlock variable progression are recorded but not integrated by this entry change; full original opening combat selection is not claimed.",
+    "The selected Minecraft target supplies Devastator context when available, rather than a globally bound native PLAYER_1 handle.",
+    "Source Crater props/audio/effects, complete native actor/physics timing, original Hit sampling and receiver semantics retain existing stated gaps.",
+    "Fresh real-client appearance, oversized skin intersecting overhead geometry, target acquisition and player-facing readability have not been observed. The low-ceiling regression checks root floor choice, not that a giant boss fits a tiny room."
+  ],
+  "validation": {
+    "type": "static source/code/schema only",
+    "compilation": "not run",
+    "unitTests": "not run",
+    "gameTests": "not run",
+    "client": "not launched",
+    "installedRelease": "none",
+    "gameTestMethodsWritten": 6
+  },
+  "snapshots": {
+    "src/main/java/com/codex/blacklight/combat/GreeneBattleCycle.java": "9a4d266318637afcfeb9427a9a44e96278ab13a3b36db884cbdcaa024d1dc82b",
+    "src/main/java/com/codex/blacklight/entity/EncounterMob.java": "d52cb5e767cfce6cc685b0204f93d68acd3d187ca2fddfba320a9de685a898fb",
+    "src/main/java/com/codex/blacklight/network/ModNetwork.java": "5a270132bec5ebdc1af420ab4e1aae6e19297f25e5ebd79b0d41aa52e3c493b0",
+    "src/greeneTest/java/com/codex/blacklight/gametest/GreeneOpeningGameTest.java": "5c6d266b9d3ce2d80b9ead6f165fdf14ea3da8dfb9bb5d5a5606d55a05a482ab",
+    "src/greeneTest/java/com/codex/blacklight/gametest/GreeneCycleGameTest.java": "0c0d0e17d981a5590e5970f1c4d9d114388b889e84154e9b51369c2bb798b185",
+    "src/greeneTest/java/com/codex/blacklight/gametest/GreeneSegmentDeathGameTest.java": "ad1527670780a151eb8d6784a4a93cc3e2e235aa4651d7255fa64a5886380038",
+    "src/greeneTest/java/com/codex/blacklight/gametest/GreeneEmergenceGameTest.java": "ac0d4ddf8cbcf59899ef2d47edcff5d48c8720987f96f2b5898a85e6d8bde46b",
+    "src/greeneTest/java/com/codex/blacklight/gametest/NativeBossBodyControlGameTest.java": "dd5bd02f875b7efe7453b0632a85a83fcfba781cbb0f2703397966d5ff380aa4",
+    "src/blackwatchTest/java/com/codex/blacklight/gametest/MilitaryBulletMultipartGameTest.java": "7a78632e2c703844ca07002fa5c65f34e67f89bb2698a034cb68ea716a94972e",
+    "src/helicopterTest/java/com/codex/blacklight/gametest/VehicleOrdnanceBodyGameTest.java": "1c996e3612118f6d28b26f42bb1cb678294fb8057ae624c4acdf238169eb9c34",
+    "src/helicopterTest/java/com/codex/blacklight/gametest/HelicopterManualBodyGameTest.java": "b5e8c1349da5080d33612956ca5fe40d94ca8eb15f8865969bf465e0419dfbb8",
+    "src/vehicleTest/java/com/codex/blacklight/gametest/vehicle/VehicleMountedBodyGameTest.java": "f94f14875e28bf099da424e476c274864c681b88a7b127e1f81ec5d365f65bb8",
+    "src/encounterTest/java/com/codex/blacklight/gametest/EncounterGameTest.java": "6256f59c6e13d0bbcffc56449ded6a047fec0e2b89b6eb187cc268c7b949e117",
+    "src/greeneVisual/java/com/codex/blacklight/client/GreeneCycleVisual.java": "8ce1990f947aab30164ecb7d25c9869953f491aa393f194ff6b797e213f85cb2"
+  },
+  "fullGoalComplete": false
+}

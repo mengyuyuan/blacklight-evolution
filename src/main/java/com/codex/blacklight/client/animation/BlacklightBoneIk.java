@@ -9,6 +9,16 @@ import org.joml.Vector3f;
 /** Original constrained CCD solver. Joint lengths and the shared bind rig remain immutable. */
 public final class BlacklightBoneIk {
     private BlacklightBoneIk() { }
+    /** Fit a rigid forearm mesh, whose contact does not follow wrist rotation. */
+    public static void reachHand(BlacklightSkeleton skeleton,BlacklightPose pose,String side,
+                                 Vector3f target,Vector3f contact,int iterations){
+        var wrist=skeleton.searchJointByName("Tool_"+side);
+        var hand=skeleton.searchJointByName("Hand_"+side);
+        if(wrist==null||hand==null)return;
+        var endpoint=new Matrix4f(skeleton.getBoundTransformFor(pose,wrist)).invert()
+                .mul(skeleton.getBoundTransformFor(pose,hand)).transformPosition(new Vector3f(contact));
+        reach(skeleton,pose,side,target,endpoint,iterations);
+    }
     /** Exact two-segment contact. Preserve the authored elbow side and both bone lengths. */
     public static void reachTwoBone(BlacklightSkeleton skeleton,BlacklightPose pose,String side,Vector3f target,Vector3f palmLocal){
         var upper=skeleton.searchJointByName("Arm_"+side);var lower=skeleton.searchJointByName("Hand_"+side);var tip=skeleton.searchJointByName("Tool_"+side);

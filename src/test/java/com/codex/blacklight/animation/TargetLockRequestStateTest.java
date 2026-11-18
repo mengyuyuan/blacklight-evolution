@@ -5,6 +5,20 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 class TargetLockRequestStateTest {
+    @Test void aircraftLockToleratesBriefCoverButExpiresOnGameTime() {
+        var state = new TargetLockRequestState();
+        state.request(17);
+        assertTrue(state.retainAircraftSight(true, 50));
+        for (int tick = 51; tick < 61; tick++) {
+            for (int frame = 0; frame < 6; frame++) assertTrue(state.retainAircraftSight(false, tick));
+        }
+        assertFalse(state.retainAircraftSight(false, 61));
+        assertTrue(state.retainAircraftSight(true, 62));
+        assertTrue(state.retainAircraftSight(false, 63));
+        state.request(18);
+        assertTrue(state.retainAircraftSight(false, 80));
+    }
+
     @Test void attachmentDelayCannotExpireAPendingLockAfterEightTicks() {
         var state=new TargetLockRequestState();int request=state.request(17);
         for(int tick=0;tick<60;tick++){assertFalse(state.observeAttachment(-1));assertEquals(17,state.desiredId());}

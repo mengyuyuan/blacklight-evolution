@@ -70,7 +70,7 @@ public final class VehicleDeformation {
     }
     /** Projects the accepted mechanical contact onto the nearest authored skin, including aimed turrets. */
     public static Dent contact(String chassis,Vec3 bodyPoint,Vec3 push,double yaw,double pitch,double damage,double maxHealth){
-        if(!finite(bodyPoint)||!finite(push)||push.lengthSqr()<1e-8||!Double.isFinite(damage)||damage<2||!Double.isFinite(maxHealth)||maxHealth<=0)return null;
+        if(!finite(bodyPoint)||!finite(push)||push.lengthSqr()<1e-8||!Double.isFinite(damage)||damage<=0||!Double.isFinite(maxHealth)||maxHealth<=0)return null;
         Skin best=null,rayBest=null;Vec3 center=null,normal=null,rayCenter=null,rayNormal=null;double score=Double.POSITIVE_INFINITY,rayScore=Double.POSITIVE_INFINITY;
         for(var skin:MODELS.get(chassis).skin){
             Vec3 p=toBone(chassis,skin.bone,bodyPoint,yaw,pitch);
@@ -97,8 +97,11 @@ public final class VehicleDeformation {
         }
         if(rayBest!=null){best=rayBest;center=rayCenter;normal=rayNormal;}
         else if(best==null||score>1.5*1.5)return null;
+        return dent(best.bone,center,normal,damage,maxHealth);
+    }
+    public static Dent dent(String bone,Vec3 point,Vec3 inward,double damage,double maxHealth){
         double severity=Math.clamp(damage/maxHealth,0,1);
-        return new Dent(best.bone,center,normal,.45+Math.min(.8,Math.sqrt(severity)*2),Math.min(.5,.035+severity*2.5));
+        return new Dent(bone,point,inward,.45+Math.min(.8,Math.sqrt(severity)*2),Math.min(.5,.035+severity*2.5));
     }
     public static List<Dent> add(List<Dent> before,Dent hit){
         if(hit==null)return before;
@@ -135,9 +138,12 @@ public final class VehicleDeformation {
             t.putDouble("Radius",d.radius);t.putDouble("Depth",d.depth);list.add(t);}return list;
     }
     public static List<Dent> read(String chassis,ListTag list){
+        return read(list,bone->MODELS.get(chassis).skin.stream().anyMatch(s->s.bone.equals(bone)));
+    }
+    public static List<Dent> read(ListTag list,java.util.function.Predicate<String> knownBone){
         var result=new ArrayList<Dent>();for(int i=0;i<Math.min(LIMIT,list.size());i++)try{
             var t=list.getCompound(i);String bone=t.getString("Bone");
-            if(MODELS.get(chassis).skin.stream().noneMatch(s->s.bone.equals(bone)))continue;
+            if(!knownBone.test(bone))continue;
             result.add(new Dent(bone,new Vec3(t.getDouble("X"),t.getDouble("Y"),t.getDouble("Z")),new Vec3(t.getDouble("NX"),t.getDouble("NY"),t.getDouble("NZ")),t.getDouble("Radius"),t.getDouble("Depth")));
         }catch(IllegalArgumentException ignored){}return List.copyOf(result);
     }

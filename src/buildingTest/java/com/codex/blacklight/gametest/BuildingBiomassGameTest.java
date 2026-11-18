@@ -133,9 +133,17 @@ public final class BuildingBiomassGameTest {
                 h.assertTrue(a!=null&&b!=null,"real facade supports every sampled site");
                 h.assertTrue(a.stems.equals(b.stems)&&a.supports.equals(b.supports),"same site keeps its anatomy");
                 h.assertTrue(a.stems.equals(BuildingBiomassPlan.load(a.save()).stems),"save preserves generated anatomy");
-                shapes.add(a.stems);counts.add(a.stems.stream().filter(s->s.parent()<0).count());
+                shapes.add(a.stems);
             }
-            h.assertTrue(shapes.size()>=5&&counts.size()>=2,"sites vary whole anatomy, including primary trunk count: "+shapes.size()+" / "+counts);
+            h.assertTrue(shapes.size()>=5,"distinct world sites vary whole anatomy: "+shapes.size());
+            // Nine adjacent positions can legitimately draw the same trunk count.
+            // Exercise one-, two-, and three-trunk seeds on the same full-height, supported facade.
+            for(long seed : new long[]{1, 4, 0}) {
+                var plan=BuildingBiomassPlan.find(f.level,f.origin,net.minecraft.core.Direction.NORTH,seed);
+                h.assertTrue(plan!=null,"full-height facade accepts seed "+seed);
+                counts.add(plan.stems.stream().filter(stem->stem.parent()<0).count());
+            }
+            h.assertTrue(counts.equals(java.util.Set.of(1L,2L,3L)),"seeded plans exercise all primary trunk counts: "+counts);
         }h.succeed();
     }
     @GameTest(template="wall_test",timeoutTicks=200,batch="biomass_brood")

@@ -1,0 +1,481 @@
+{
+  "schema": 1,
+  "createdLocal": "2026-11-16T16:45:39",
+  "status": "SOURCE AUDIO STATE MAPPING AND NATIVE CHANNEL LIFECYCLE PASSED; broader goal remains active",
+  "source": {
+    "audit": "D:\\PrototypeReference\\p1\\uav-audio-state-source.json",
+    "sha256": "9c85ce6a8c794b9137accdcc81c4245fbb0033377c3551a199c67c6eb49dc6de",
+    "sourceAudioSha256": "6c1a48ddb61fe61242ee9c5f308f6cc870e0a85a5e46da7e700a78b90a062493",
+    "sourceFigAuditSha256": "e5335f093e72d0f48a9e48cdd6ab327e0947c1cf2db8f46ee1e61c60a2b768d5",
+    "patchLoopFields": [
+      {
+        "patch": "UAV_alert",
+        "chunkOffset": 167458,
+        "loopBooleanByteOffset": 167704,
+        "loop": false,
+        "rawBooleanByte": 0
+      },
+      {
+        "patch": "UAV_idle",
+        "chunkOffset": 168238,
+        "loopBooleanByteOffset": 168483,
+        "loop": true,
+        "rawBooleanByte": 1
+      },
+      {
+        "patch": "UAV_seeing",
+        "chunkOffset": 169014,
+        "loopBooleanByteOffset": 169261,
+        "loop": true,
+        "rawBooleanByte": 1
+      },
+      {
+        "patch": "UAV_servotalk",
+        "chunkOffset": 169794,
+        "loopBooleanByteOffset": 170044,
+        "loop": false,
+        "rawBooleanByte": 0
+      }
+    ],
+    "tracks": [
+      {
+        "owner": "apache/opening/uav/#fbe03cce39b07a82/alert",
+        "offset": 25328,
+        "patch": "UAV_alert",
+        "trigger": "play",
+        "polledLifetime": false,
+        "timeBegin": 0,
+        "pitch": [
+          1,
+          1
+        ]
+      },
+      {
+        "owner": "apache/opening/uav/#fbe03cce39b07a82/alert",
+        "offset": 25420,
+        "patch": "UAV_idle",
+        "trigger": "play",
+        "polledLifetime": true,
+        "timeBegin": 0,
+        "pitch": [
+          1,
+          1
+        ]
+      },
+      {
+        "owner": "apache/opening/uav/#fbe03cce39b07a82/#920f4e626fa8456f",
+        "offset": 26840,
+        "patch": "UAV_servotalk",
+        "trigger": "play",
+        "polledLifetime": false,
+        "timeBegin": 0,
+        "pitch": [
+          1,
+          1
+        ]
+      },
+      {
+        "owner": "apache/opening/uav/#fbe03cce39b07a82/#920f4e626fa8456f",
+        "offset": 26932,
+        "patch": "UAV_seeing",
+        "trigger": "play",
+        "polledLifetime": true,
+        "timeBegin": 0,
+        "pitch": [
+          1,
+          1
+        ]
+      },
+      {
+        "owner": "apache/opening/uav/#fbe03cce39b07a82/idle",
+        "offset": 28244,
+        "patch": "UAV_idle",
+        "trigger": "play",
+        "polledLifetime": true,
+        "timeBegin": 0,
+        "pitch": [
+          1,
+          1
+        ]
+      }
+    ],
+    "mapping": {
+      "idle": [
+        "UAV_idle loop"
+      ],
+      "seeing": [
+        "UAV_servotalk entry",
+        "UAV_seeing loop"
+      ],
+      "alert": [
+        "UAV_alert entry",
+        "UAV_idle loop"
+      ]
+    },
+    "scope": "Direct fields and track roles, not engine-level detection state timing. Entry clips are non-polled; loop flag separately checked against each Patch Bool property byte."
+  },
+  "authoredAudio": {
+    "origin": "Project-authored synthesis referenced to source roles, measured durations and broad dominant frequency bands; not original recordings or a waveform reconstruction",
+    "sourceAudioPackageSha256": "6c1a48ddb61fe61242ee9c5f308f6cc870e0a85a5e46da7e700a78b90a062493",
+    "sampleRate": 48000,
+    "cues": [
+      {
+        "cue": "rotor",
+        "sourcePatch": "UAV_idle",
+        "sourceSample": "uav_idle_01",
+        "loop": true,
+        "seconds": 1.5473333333333332,
+        "decodedSamples": 74272,
+        "decodedPeak": 0.682846188545227,
+        "rms": 0.26108771562576294,
+        "loopBoundaryJump": 0.0006391312927007675,
+        "sha256": "1532c708fbfa0551abb0492f20a892c2139445bf16eee6f70ee7a59d61a53f25"
+      },
+      {
+        "cue": "seeing",
+        "sourcePatch": "UAV_seeing",
+        "sourceSample": "uav_seeing_01",
+        "loop": true,
+        "seconds": 1.0246666666666666,
+        "decodedSamples": 49184,
+        "decodedPeak": 0.688453733921051,
+        "rms": 0.3066001534461975,
+        "loopBoundaryJump": 0.006376870907843113,
+        "sha256": "78ed700da3840dbea1b830e1ca187e68e94a90b4b4b96c696b81e11ecb357f05"
+      },
+      {
+        "cue": "scan",
+        "sourcePatch": "UAV_servotalk",
+        "sourceSample": "uav_start_scan",
+        "loop": false,
+        "seconds": 0.53,
+        "decodedSamples": 25472,
+        "decodedPeak": 0.7058570981025696,
+        "rms": 0.26959946751594543,
+        "loopBoundaryJump": null,
+        "sha256": "0d0110d34611f70edf05a9870658e15a6a290647953ea10f80bd89f706884595"
+      },
+      {
+        "cue": "alert",
+        "sourcePatch": "UAV_alert",
+        "sourceSample": "uav_alerted",
+        "loop": false,
+        "seconds": 2.466,
+        "decodedSamples": 118368,
+        "decodedPeak": 0.6865028738975525,
+        "rms": 0.2533058524131775,
+        "loopBoundaryJump": null,
+        "sha256": "42db32d0172d9e2ae0b861fec2ea3ab50ccc366ed5e49a29c2bb5bdb34b7bd81"
+      }
+    ],
+    "additional": "Existing uav_break retained for accepted destruction. Legacy transmit/confirm event IDs and files retained but no longer triggered by UAV; original state cues replace the invented recurring transmission/acknowledgement beeps.",
+    "limits": [
+      "Original recording timbre is not claimed identical",
+      "Minecraft range, volume, maximum simultaneous voices and recognition clock are adaptations"
+    ]
+  },
+  "implementation": [
+    "Idle: UAV_idle authored loop. Seeing: UAV_servotalk authored entry plus UAV_seeing authored loop. Alert: UAV_alert authored entry plus UAV_idle authored loop. Native playback uses fixed pitch 1.",
+    "State entries are not retriggered while the state is unchanged. Non-polled entry clips can finish across a state change; at most two entry tails per machine.",
+    "Four client voices maximum, begin inside 40 blocks and stop outside 44; stop on silence, removal, death, level replacement or level unload. Loop can recover after sound engine reset/unmute without repeating the state entry.",
+    "Removed invented periodic transmit beep and support-acknowledgement triad from UAV gameplay. Legacy resource/event IDs remain for compatibility. Destruction break cue retained.",
+    "Silent QA now mutes only the actual OpenAL listener output. Logical master and hostile volume remain 1, so native SoundManager channel activation is genuinely tested."
+  ],
+  "protocols": {
+    "neo": "standalone-69-uav-audio",
+    "forge": "forge-1.20.1-29-uav-audio"
+  },
+  "platforms": {
+    "neo": {
+      "frames": 1034,
+      "framesByCase": {
+        "scan_and_sortie": 145,
+        "occlusion": 45,
+        "destroyed": 385,
+        "submerged_destroyed": 385,
+        "audio_limits": 61,
+        "audio_world_exit": 13
+      },
+      "checks": [
+        "alert",
+        "cap4",
+        "far",
+        "idle",
+        "reenter",
+        "removed",
+        "seeing",
+        "silent",
+        "unload"
+      ],
+      "activeLoopSamples": 276,
+      "entrySequence": [
+        {
+          "case": "scan_and_sortie",
+          "age": -21,
+          "cue": "vehicle.uav_rotor",
+          "loop": true
+        },
+        {
+          "case": "scan_and_sortie",
+          "age": 6,
+          "cue": "vehicle.uav_seeing",
+          "loop": true
+        },
+        {
+          "case": "scan_and_sortie",
+          "age": 6,
+          "cue": "vehicle.uav_scan",
+          "loop": false
+        },
+        {
+          "case": "scan_and_sortie",
+          "age": 65,
+          "cue": "vehicle.uav_rotor",
+          "loop": true
+        },
+        {
+          "case": "scan_and_sortie",
+          "age": 65,
+          "cue": "vehicle.uav_alert",
+          "loop": false
+        }
+      ],
+      "preSetupSavedWorldEvents": [
+        {
+          "case": "scan_and_sortie",
+          "age": 0,
+          "cue": "vehicle.uav_rotor",
+          "loop": true
+        },
+        {
+          "case": "scan_and_sortie",
+          "age": 0,
+          "cue": "vehicle.uav_rotor",
+          "loop": true
+        },
+        {
+          "case": "scan_and_sortie",
+          "age": 0,
+          "cue": "vehicle.uav_rotor",
+          "loop": true
+        },
+        {
+          "case": "scan_and_sortie",
+          "age": 0,
+          "cue": "vehicle.uav_rotor",
+          "loop": true
+        }
+      ],
+      "recoverySample": {
+        "image": "audio_limits-160.png",
+        "case": "audio_limits",
+        "age": 160,
+        "scan": 0,
+        "signal": 0,
+        "supportWait": 0,
+        "delivered": 0,
+        "clientScan": 0,
+        "wreck": {},
+        "audio": {
+          "voices": 4,
+          "playerPosition": {
+            "x": 3.0,
+            "y": 86.0,
+            "z": 6.0
+          },
+          "nearbyClientUavs": 6,
+          "loop": "blacklight:vehicle.uav_rotor",
+          "active": true,
+          "positionError": 0.0
+        }
+      },
+      "nativeResults": [
+        {
+          "case": "scan_and_sortie",
+          "actualCrew": 6,
+          "deliveredWithTarget": 4,
+          "cooldown": 2983
+        },
+        {
+          "case": "occlusion",
+          "preventedDispatch": true
+        },
+        {
+          "case": "destroyed",
+          "preventedDispatch": true
+        },
+        {
+          "case": "submerged_destroyed",
+          "preventedDispatch": true
+        }
+      ],
+      "evidenceSha256": "d0859d4adc9f4fab4e5e16daaeae89b94762629dad75005b36381079b551bf37",
+      "logSha256": "66b6f68f24988e898d11a6732e0ad7dc4f10d91fb9398d9e303014f9885eb0e5",
+      "maxSoundPositionError": 0.0,
+      "lampStates": [
+        "green",
+        "red",
+        "yellow"
+      ],
+      "nightRed": true,
+      "visualReview": {
+        "selectedFramesViewed": 24,
+        "reviewSha256": "70105a0c48c90801009c91192e7cb09af2b00acb58d82d9d3c23717fb75de5fc",
+        "sheetSha256": "1862a6d20ed547f50c1ff38ebcc0c9157525338435cea57d5e1bcc7fcf11db0e",
+        "finding": "Viewed green/yellow/red and night lamp, transport progression, occlusion, falling/burning/smoking/expired wreck and underwater suppression. No new presentation regression observed."
+      },
+      "files": {
+        "src/main/java/com/codex/blacklight/client/vehicle/UavAudio.java": "e002a268f7285b44edcee6b6646a2f799bc46be02f0d3df0b0ae7887656c8007",
+        "src/main/java/com/codex/blacklight/entity/MilitaryUav.java": "2daf457dc071cefe4ee45aae263489186f19d3cc07be25e699c9242fba6a6c4f",
+        "src/main/java/com/codex/blacklight/military/vehicle/VehicleSounds.java": "61b382d14ea0d0b1993572c9eef6ff20915dd08f764bae4e4b27255eed8c5321",
+        "src/main/java/com/codex/blacklight/network/ModNetwork.java": "a19b3cbd25225420665c1f66c530cd8446139458cbe75039c9fef70ac1b8981a",
+        "src/main/resources/assets/blacklight/sounds.json": "e593f20cde7bd1f2219609ee6bca6484a69fd858de416b5bd1baa1f17805183a",
+        "src/uavVisual/java/com/codex/blacklight/client/UavReconVisual.java": "42e8b4de2c1e9efe8aed92eabbb32a74ea284379c57267c6fa6c7737ee487dc7",
+        "src/silentQa/java/com/codex/blacklight/silentqa/MutedListenerMixin.java": "bb4d1d4425f163cf1a7151850c7e54d7dcf338a5e589c2a4324efcdc6b7fc80a",
+        "tools/build-uav-audio.py": "bf4370064d9762ebfa85b1d4a802379e79145d4df42b6ab79a4fd919fed22372",
+        "tools/uav-audio-visual.init.gradle": "c4d2db8399590ddeaa96ee2d1abcb16b8bcb280dbec499dd229fad67fe5c9789"
+      }
+    },
+    "forge": {
+      "frames": 1034,
+      "framesByCase": {
+        "scan_and_sortie": 145,
+        "occlusion": 45,
+        "destroyed": 385,
+        "submerged_destroyed": 385,
+        "audio_limits": 61,
+        "audio_world_exit": 13
+      },
+      "checks": [
+        "alert",
+        "cap4",
+        "far",
+        "idle",
+        "reenter",
+        "removed",
+        "seeing",
+        "silent",
+        "unload"
+      ],
+      "activeLoopSamples": 270,
+      "entrySequence": [
+        {
+          "case": "scan_and_sortie",
+          "age": -24,
+          "cue": "vehicle.uav_rotor",
+          "loop": true
+        },
+        {
+          "case": "scan_and_sortie",
+          "age": 6,
+          "cue": "vehicle.uav_seeing",
+          "loop": true
+        },
+        {
+          "case": "scan_and_sortie",
+          "age": 6,
+          "cue": "vehicle.uav_scan",
+          "loop": false
+        },
+        {
+          "case": "scan_and_sortie",
+          "age": 65,
+          "cue": "vehicle.uav_rotor",
+          "loop": true
+        },
+        {
+          "case": "scan_and_sortie",
+          "age": 65,
+          "cue": "vehicle.uav_alert",
+          "loop": false
+        }
+      ],
+      "preSetupSavedWorldEvents": [],
+      "recoverySample": {
+        "image": "audio_limits-160.png",
+        "case": "audio_limits",
+        "age": 160,
+        "scan": 0,
+        "signal": 0,
+        "supportWait": 0,
+        "delivered": 0,
+        "clientScan": 0,
+        "wreck": {},
+        "audio": {
+          "voices": 4,
+          "playerPosition": {
+            "x": 3.0,
+            "y": 86.0,
+            "z": 6.0
+          },
+          "nearbyClientUavs": 6,
+          "loop": "blacklight:vehicle.uav_rotor",
+          "active": true,
+          "positionError": 0.0
+        }
+      },
+      "nativeResults": [
+        {
+          "case": "scan_and_sortie",
+          "actualCrew": 6,
+          "deliveredWithTarget": 4,
+          "cooldown": 2983
+        },
+        {
+          "case": "occlusion",
+          "preventedDispatch": true
+        },
+        {
+          "case": "destroyed",
+          "preventedDispatch": true
+        },
+        {
+          "case": "submerged_destroyed",
+          "preventedDispatch": true
+        }
+      ],
+      "evidenceSha256": "9e3f4c921fbc0d2a1e89984fa1af11c1c0eeb8ca4aca9e39dd6bc61e66afcdf7",
+      "logSha256": "195ff11eb48c5f9ee0e1fcb34d34bff92da85a61bf1ba76093ea21229bf457c1",
+      "maxSoundPositionError": 0.0,
+      "lampStates": [
+        "green",
+        "red",
+        "yellow"
+      ],
+      "nightRed": true,
+      "visualReview": {
+        "selectedFramesViewed": 24,
+        "reviewSha256": "d636cde99483c94a60a535f65a52791b9cf0bfc3f52e1c75a7ff874f1c37c107",
+        "sheetSha256": "f468feb39cc7698cab8e45103d680b57635a34d0ac5450260163c4d747084812",
+        "finding": "Viewed green/yellow/red and night lamp, transport progression, occlusion, falling/burning/smoking/expired wreck and underwater suppression. No new presentation regression observed."
+      },
+      "files": {
+        "src/main/java/com/codex/blacklight/client/vehicle/UavAudio.java": "5cb7af5b864e62761badd9b0924e7d2cc9e47532316d9730169c6c53a40835a0",
+        "src/main/java/com/codex/blacklight/entity/MilitaryUav.java": "3aea27adb79fbffcd8bef1feb34811b41a5d39f3f3012d94c540b9899a1ede8a",
+        "src/main/java/com/codex/blacklight/military/vehicle/VehicleSounds.java": "6800100216ab030ff9168db0ea23f5e9f7945e06b88125c8aab1d3e7cba74273",
+        "src/main/java/com/codex/blacklight/network/ModNetwork.java": "1a429d8fb73aeef5e3aee43777605b1b238f799eacb3e04b89334fd17093b4fe",
+        "src/main/resources/assets/blacklight/sounds.json": "e593f20cde7bd1f2219609ee6bca6484a69fd858de416b5bd1baa1f17805183a",
+        "src/uavVisual/java/com/codex/blacklight/client/UavReconVisual.java": "b1719f3d838ca10248605da16da884f9cc007dfe72f4e16d5a33670282beb572",
+        "src/silentQa/java/com/codex/blacklight/silentqa/MutedListenerMixin.java": "bb4d1d4425f163cf1a7151850c7e54d7dcf338a5e589c2a4324efcdc6b7fc80a",
+        "tools/build-uav-audio.py": "bf4370064d9762ebfa85b1d4a802379e79145d4df42b6ab79a4fd919fed22372",
+        "tools/uav-audio-visual.init.gradle": "5aff788e9de13b595017673943001b787f01517642dbf667534744b2267e5012"
+      }
+    }
+  },
+  "limitations": [
+    "Project-authored synthesis, not redistributed source recordings; timbre identity and subjective listening have not been verified.",
+    "Range, gain, voice cap, recognition/dispatch timers and cue-tail tick deadlines are Minecraft adaptations, not proven original engine parameters.",
+    "This run verifies native loop channels and sound entry event counts. It does not measure the physical sound output; the real listener output is muted.",
+    "Original helicopter-target 20..35 standoff and complete viral recognition/strike-team engine conditions remain open, as do multiplayer, complex moving terrain, full emitter semantics and Husk final-state trigger."
+  ],
+  "engineResearch": {
+    "audit": "D:\\PrototypeReference\\p1\\uav-engine-links.json",
+    "sha256": "5b5c5914eeba8637e51f45e380abde681004f3678a431bd6cbd25ea14ee199d4",
+    "finding": "Native DLL contains uav target class, ai_patrol_AgentKilled and strike-team request/delay/meter/enabling function names. Names locate follow-up work; they do not establish complete algorithms."
+  },
+  "priorCheckpoint": {
+    "file": "art/military2/uav-source-validation.json",
+    "sha256": "6a67477834915a0210094373394c7b58276d9198e0a628882eff193d6238a47a",
+    "scope": "Historical model/lamps/wreck/server/regression result. Preserved unchanged. Old muted runs checked sound event dispatch, not actual native playback channels."
+  }
+}

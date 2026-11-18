@@ -56,6 +56,7 @@ public final class VehicleCamera {
         return from.add(delta.scale(fraction));
     }
     public static boolean apply(Camera camera,float partial) {
+        if(HelicopterView.apply(camera,partial))return true;
         var mc=Minecraft.getInstance();var player=mc.player;
         if(player==null||mc.level==null||camera.getEntity()!=player||!(player.getVehicle() instanceof MilitaryVehicle vehicle))return false;
         var seat=vehicle.seatOf(player.getUUID());

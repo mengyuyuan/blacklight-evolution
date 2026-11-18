@@ -1,0 +1,496 @@
+{
+  "auditSha256": "e5335f093e72d0f48a9e48cdd6ab327e0947c1cf2db8f46ee1e61c60a2b768d5",
+  "records": [
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 414408,
+      "payload": 414420,
+      "length": 0,
+      "type": "TargetIsHelicopter",
+      "kind": "ConditionHash",
+      "owner": "engage_uav/engage/move/#87a0a169d714644c/#2681628ed57afdfc",
+      "fields": {},
+      "schema": "TargetIsHelicopterCondition",
+      "end": 414428
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 414448,
+      "payload": 414460,
+      "length": 212,
+      "type": "CombatDestinationFind",
+      "kind": "TrackHash",
+      "owner": "engage_uav/engage/move/#87a0a169d714644c/#2681628ed57afdfc",
+      "fields": {
+        "Unknown1": 0,
+        "TimeBegin": 0,
+        "TimeEnd": -1,
+        "MinDistance": 20,
+        "MaxDistance": 35,
+        "MinAngle": -180,
+        "MaxAngle": 180,
+        "NumTries": 20,
+        "IgnoreRestrictions": false,
+        "CheckNotReserved": true,
+        "CheckCanGo": true,
+        "UseNavMeshHeight": true,
+        "HeightDifferenceCheck": {
+          "hash": "11751081574227249751",
+          "name": "Absolute"
+        },
+        "MaxHeightDifference": 5,
+        "MinHeightDifference": 1,
+        "LookJustCloser": 0,
+        "MinDistanceFromCurrent": 2,
+        "FreeRadiusAround": 0,
+        "AllowedAreas": 0,
+        "IgnoreAreasWhenAgentOutside": false,
+        "MaxDistanceToGround": 0,
+        "MaxAbsoluteHeight": 30000,
+        "ReferenceOffset": [
+          0,
+          0,
+          0
+        ],
+        "AirDestination": true,
+        "Offset": [
+          0,
+          0,
+          0
+        ],
+        "CameraVisibility": {
+          "hash": "31052086116886518",
+          "name": "none"
+        },
+        "CollisionFlagsLOF": {
+          "hash": "16259960673298584331",
+          "name": "collide_none"
+        },
+        "CollideWithTypeLOF": 0,
+        "OffsetLOF": [
+          0,
+          0,
+          0
+        ],
+        "Heuristic": {
+          "hash": "10939952618956733516",
+          "name": "lowestValid"
+        },
+        "InitialHeuristic": 0,
+        "InitialHeuristicTimer": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "InitialHeuristicMinTimer": 0,
+        "InitialHeuristicMinTimerFactor": 0,
+        "InitialHeuristicMaxTimer": 0,
+        "InitialHeuristicMaxTimerFactor": 0,
+        "ReferencePosition": {
+          "hash": "12772528083933579047",
+          "name": "target"
+        },
+        "DeadReckoningTime": 0,
+        "WhenFound": {
+          "name": "",
+          "index": 14
+        },
+        "Priority": 0
+      },
+      "schema": "CombatDestinationFindTrack",
+      "end": 414700
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 414904,
+      "payload": 414916,
+      "length": 212,
+      "type": "CombatDestinationFind",
+      "kind": "TrackHash",
+      "owner": "engage_uav/engage/move/#87a0a169d714644c/#be4fe365ad3635a2",
+      "fields": {
+        "Unknown1": 0,
+        "TimeBegin": 0,
+        "TimeEnd": -1,
+        "MinDistance": 4,
+        "MaxDistance": 10,
+        "MinAngle": -180,
+        "MaxAngle": 180,
+        "NumTries": 20,
+        "IgnoreRestrictions": false,
+        "CheckNotReserved": true,
+        "CheckCanGo": true,
+        "UseNavMeshHeight": true,
+        "HeightDifferenceCheck": {
+          "hash": "11751081574227249751",
+          "name": "Absolute"
+        },
+        "MaxHeightDifference": 5,
+        "MinHeightDifference": 1,
+        "LookJustCloser": 0,
+        "MinDistanceFromCurrent": 2,
+        "FreeRadiusAround": 0,
+        "AllowedAreas": 0,
+        "IgnoreAreasWhenAgentOutside": false,
+        "MaxDistanceToGround": 0,
+        "MaxAbsoluteHeight": 30000,
+        "ReferenceOffset": [
+          0,
+          0,
+          0
+        ],
+        "AirDestination": true,
+        "Offset": [
+          0,
+          0,
+          0
+        ],
+        "CameraVisibility": {
+          "hash": "31052086116886518",
+          "name": "none"
+        },
+        "CollisionFlagsLOF": {
+          "hash": "16259960673298584331",
+          "name": "collide_none"
+        },
+        "CollideWithTypeLOF": 0,
+        "OffsetLOF": [
+          0,
+          0,
+          0
+        ],
+        "Heuristic": {
+          "hash": "10939952618956733516",
+          "name": "lowestValid"
+        },
+        "InitialHeuristic": 0,
+        "InitialHeuristicTimer": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "InitialHeuristicMinTimer": 0,
+        "InitialHeuristicMinTimerFactor": 0,
+        "InitialHeuristicMaxTimer": 0,
+        "InitialHeuristicMaxTimerFactor": 0,
+        "ReferencePosition": {
+          "hash": "12772528083933579047",
+          "name": "target"
+        },
+        "DeadReckoningTime": 0,
+        "WhenFound": {
+          "name": "",
+          "index": 14
+        },
+        "Priority": 0
+      },
+      "schema": "CombatDestinationFindTrack",
+      "end": 415156
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 415492,
+      "payload": 415504,
+      "length": 20,
+      "type": "TargetDistance",
+      "kind": "ConditionHash",
+      "owner": "engage_uav/engage/move/inPosition/Reaction/#98dc0826bfe70e61/#4425f4ce8f33866b",
+      "fields": {
+        "Direction": {
+          "hash": "5772786",
+          "name": "XZ"
+        },
+        "Compare": {
+          "hash": "60",
+          "name": "#3c",
+          "operator": "<"
+        },
+        "Distance": 15
+      },
+      "schema": "TargetDistanceCondition",
+      "end": 415532
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 415532,
+      "payload": 415544,
+      "length": 0,
+      "type": "TargetIsHelicopter",
+      "kind": "ConditionHash",
+      "owner": "engage_uav/engage/move/inPosition/Reaction/#98dc0826bfe70e61/#4425f4ce8f33866b",
+      "fields": {},
+      "schema": "TargetIsHelicopterCondition",
+      "end": 415552
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 415700,
+      "payload": 415712,
+      "length": 20,
+      "type": "TargetDistance",
+      "kind": "ConditionHash",
+      "owner": "engage_uav/engage/move/inPosition/Reaction/#98dc0826bfe70e61/#6b0c544432c9feef",
+      "fields": {
+        "Direction": {
+          "hash": "5772786",
+          "name": "XZ"
+        },
+        "Compare": {
+          "hash": "60",
+          "name": "#3c",
+          "operator": "<"
+        },
+        "Distance": 3
+      },
+      "schema": "TargetDistanceCondition",
+      "end": 415740
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 415740,
+      "payload": 415752,
+      "length": 0,
+      "type": "Not",
+      "kind": "ConditionHash",
+      "owner": "engage_uav/engage/move/inPosition/Reaction/#98dc0826bfe70e61/#6b0c544432c9feef",
+      "fields": {},
+      "schema": "NotCondition",
+      "end": 415760
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 415760,
+      "payload": 415772,
+      "length": 0,
+      "type": "TargetIsHelicopter",
+      "kind": "ConditionHash",
+      "owner": "engage_uav/engage/move/inPosition/Reaction/#98dc0826bfe70e61/#6b0c544432c9feef",
+      "fields": {},
+      "schema": "TargetIsHelicopterCondition",
+      "end": 415780
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 415984,
+      "payload": 415996,
+      "length": 20,
+      "type": "TargetDistance",
+      "kind": "ConditionHash",
+      "owner": "engage_uav/engage/move/inPosition/Reaction/targetInRange/#4df0b21f91117d1f",
+      "fields": {
+        "Direction": {
+          "hash": "5772786",
+          "name": "XZ"
+        },
+        "Compare": {
+          "hash": "60",
+          "name": "#3c",
+          "operator": "<"
+        },
+        "Distance": 40
+      },
+      "schema": "TargetDistanceCondition",
+      "end": 416024
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 416024,
+      "payload": 416036,
+      "length": 0,
+      "type": "TargetIsHelicopter",
+      "kind": "ConditionHash",
+      "owner": "engage_uav/engage/move/inPosition/Reaction/targetInRange/#4df0b21f91117d1f",
+      "fields": {},
+      "schema": "TargetIsHelicopterCondition",
+      "end": 416044
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 416220,
+      "payload": 416232,
+      "length": 28,
+      "type": "Opportunity",
+      "kind": "TrackHash",
+      "owner": "engage_uav/engage/move/inPosition/Reaction/targetInRange/#4df0b21f91117d1f",
+      "fields": {
+        "Unknown1": 1,
+        "TimeBegin": 3,
+        "TimeEnd": -1,
+        "TimeHook": 0,
+        "BranchRef": {
+          "name": "",
+          "index": 15
+        },
+        "Priority": 0
+      },
+      "schema": "OpportunityTrack",
+      "end": 416288
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 416348,
+      "payload": 416360,
+      "length": 20,
+      "type": "TargetDistance",
+      "kind": "ConditionHash",
+      "owner": "engage_uav/engage/move/inPosition/Reaction/targetInRange/#97b7e84e28d0183",
+      "fields": {
+        "Direction": {
+          "hash": "5772786",
+          "name": "XZ"
+        },
+        "Compare": {
+          "hash": "60",
+          "name": "#3c",
+          "operator": "<"
+        },
+        "Distance": 15
+      },
+      "schema": "TargetDistanceCondition",
+      "end": 416388
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 416388,
+      "payload": 416400,
+      "length": 0,
+      "type": "Not",
+      "kind": "ConditionHash",
+      "owner": "engage_uav/engage/move/inPosition/Reaction/targetInRange/#97b7e84e28d0183",
+      "fields": {},
+      "schema": "NotCondition",
+      "end": 416408
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 416408,
+      "payload": 416420,
+      "length": 0,
+      "type": "TargetIsHelicopter",
+      "kind": "ConditionHash",
+      "owner": "engage_uav/engage/move/inPosition/Reaction/targetInRange/#97b7e84e28d0183",
+      "fields": {},
+      "schema": "TargetIsHelicopterCondition",
+      "end": 416428
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 416604,
+      "payload": 416616,
+      "length": 28,
+      "type": "Opportunity",
+      "kind": "TrackHash",
+      "owner": "engage_uav/engage/move/inPosition/Reaction/targetInRange/#97b7e84e28d0183",
+      "fields": {
+        "Unknown1": 1,
+        "TimeBegin": 3,
+        "TimeEnd": -1,
+        "TimeHook": 0,
+        "BranchRef": {
+          "name": "",
+          "index": 15
+        },
+        "Priority": 0
+      },
+      "schema": "OpportunityTrack",
+      "end": 416672
+    },
+    {
+      "source": "uav/PermanentCharactersPackage_fig.p3d.rz",
+      "offset": 26100,
+      "payload": 26112,
+      "length": 8,
+      "type": "TargetCanSee",
+      "kind": "ConditionHash",
+      "owner": "apache/opening/uav/#fbe03cce39b07a82/#920f4e626fa8456f",
+      "fields": {
+        "Seen": true,
+        "Since": 0
+      },
+      "schema": "TargetCanSeeCondition",
+      "end": 26128
+    },
+    {
+      "source": "uav/PermanentCharactersPackage_fig.p3d.rz",
+      "offset": 26128,
+      "payload": 26140,
+      "length": 0,
+      "type": "Not",
+      "kind": "ConditionHash",
+      "owner": "apache/opening/uav/#fbe03cce39b07a82/#920f4e626fa8456f",
+      "fields": {},
+      "schema": "NotCondition",
+      "end": 26148
+    },
+    {
+      "source": "uav/PermanentCharactersPackage_fig.p3d.rz",
+      "offset": 26148,
+      "payload": 26160,
+      "length": 0,
+      "type": "TargetIsHelicopter",
+      "kind": "ConditionHash",
+      "owner": "apache/opening/uav/#fbe03cce39b07a82/#920f4e626fa8456f",
+      "fields": {},
+      "schema": "TargetIsHelicopterCondition",
+      "end": 26168
+    },
+    {
+      "source": "uav/PermanentCharactersPackage_fig.p3d.rz",
+      "offset": 26168,
+      "payload": 26180,
+      "length": 0,
+      "type": "Not",
+      "kind": "ConditionHash",
+      "owner": "apache/opening/uav/#fbe03cce39b07a82/#920f4e626fa8456f",
+      "fields": {},
+      "schema": "NotCondition",
+      "end": 26188
+    },
+    {
+      "source": "uav/PermanentCharactersPackage_fig.p3d.rz",
+      "offset": 26188,
+      "payload": 26200,
+      "length": 0,
+      "type": "TargetIsTank",
+      "kind": "ConditionHash",
+      "owner": "apache/opening/uav/#fbe03cce39b07a82/#920f4e626fa8456f",
+      "fields": {},
+      "schema": "TargetIsTankCondition",
+      "end": 26208
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 413988,
+      "payload": 414000,
+      "length": 56,
+      "type": "DestinationFlyTo",
+      "kind": "TrackHash",
+      "owner": "engage_uav/engage/move/going_to_destination/going",
+      "fields": {
+        "Unknown1": 0,
+        "TimeBegin": 0,
+        "TimeEnd": -1,
+        "Tolerance": 0.5,
+        "Brake": true,
+        "IgnoreRestrictions": false,
+        "FreeArea": 0,
+        "MinHeight": 2,
+        "MaxSpeed": 1,
+        "SpeedFactor": [
+          -1,
+          -1,
+          -1
+        ],
+        "TurningFactorA": 2,
+        "TurningFactorB": 0
+      },
+      "schema": "DestinationFlyToTrack",
+      "end": 414064
+    }
+  ],
+  "mapping": "Helicopter uses 20..35 candidate distance, near/far reactions 15/40; ground uses 4..10, near/far 3/15. Seeing explicitly excludes helicopter and tank. Arrival tolerance .5, 20 candidates and three-second in-position opportunity come from the same engage_uav tree.",
+  "adaptation": "Minecraft root vehicle identifies our helicopter or explicit tank chassis. A scanner follows only the same previously confirmed infected occupant; this bridge does not claim the original engine recognition algorithm. Enclosed contact interrupts unfinished scan/transmission, cannot acquire viral identity, and cannot issue the current ground transport request.",
+  "remaining": [
+    "Native target type classification for APC and other mod vehicles",
+    "Full original strike-team/recognition engine algorithm and acquisition of already-hostile vehicles from external observers",
+    "Moving-aircraft speed matching and complex obstacle navigation"
+  ]
+}

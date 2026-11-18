@@ -1,0 +1,53 @@
+{
+  "date": "2026-11-17",
+  "scope": "Military soldier grab eligibility and layered-rig corpse/dismemberment regression",
+  "status": "Code and static review only; user deferred build and runtime tests.",
+  "evidence": [
+    {
+      "issue": "Heavy Blackwatch cannot be grabbed at full health",
+      "cause": "ConsumeSystem.healthReady used original maximum health < 50 as direct-grab tier. Blackwatch heavy is authored at 60, regular army heavy at 48. Both grab and consume confirmation use this gate.",
+      "source": [
+        "src/main/java/com/codex/blacklight/combat/ConsumeSystem.java",
+        "src/main/java/com/codex/blacklight/military/MilitaryCombatProfile.java"
+      ],
+      "change": "Uninfected MilitarySoldier keeps ordinary-human grab class regardless of health. Other eligibility, ownership, line-of-sight, ground and boss execution gates remain in effect."
+    },
+    {
+      "issue": "Layered soldier stays whole after an accepted sharp killing strike",
+      "cause": "Independent rigid body per uniform/equipment/gun mesh fills the 48-part ceiling before the first cut. applyCut/cutAt reject cuts at that same ceiling. Heavy Blackwatch has at least 50 clothing/equipment declarations before split sleeves and gun geometry.",
+      "change": "Map soldier skins onto 13 authored motion joints before rigid body construction. Keep 48 intact bones for generic models and a separate bounded 16-fragment reserve (64 total); vertex and initial scene limits are unchanged."
+    },
+    {
+      "issue": "Incorrect collider and mass after the existing generic over-budget merge",
+      "cause": "Appending tiny.mesh into owner.mesh left final center/half/invMass calculated for the old skin.",
+      "change": "Rebuild the merged Part before initial momentum/joints are created; preserve root identity and all merged skin.",
+      "limit": "This removes a concrete collision/constraint mismatch that can contribute to corpse hopping. Repeated hopping on normal terrain and steps has NOT been runtime-verified as resolved."
+    }
+  ],
+  "changedSources": [
+    "combat/ConsumeSystem.java",
+    "client/model/BlackwatchModel.java",
+    "client/renderer/AdaptiveRagdoll.java"
+  ],
+  "addedRegression": [
+    "MilitaryFactionGameTest.humanSoldiersDoNotChangeGrabClassAtFiftyHealth",
+    "MilitaryFactionGameTest.militaryHealthFixKeepsLargeTargetsAndBossGates",
+    "BlackwatchRagdollRigTest"
+  ],
+  "staticChecks": [
+    "git diff --check passed for scoped tracked sources (only line-ending notices)",
+    "Same new JUnit source SHA256 on NeoForge and Forge",
+    "Forge tick-event API matched existing LockedGrabGameTest fixture"
+  ],
+  "pendingValidation": [
+    "Compile serially on NeoForge 1.21.1 and Forge 1.20.1; no build was run by this agent.",
+    "Run new GameTests with -PblackwatchTest, plus new rig JUnit and existing RagdollTerrainSupport/JointProjection/RootSelection/CorpseFragmentMotion tests.",
+    "Player: full-health normal and heavy Blackwatch, 20/50/60/100 maximum and current 49/51, grab then confirm consume.",
+    "Player: ordinary punch death may retain a whole body; blade lethal cuts must show actual cut faces and separated skin.",
+    "Player: repeat corpses on ordinary ground, half slabs and step edges; check settled corpses do not repeatedly hop."
+  ],
+  "constraintFollowup": {
+    "record": "art/blackwatch/soldier-corpse-constraint-review-20261117.json",
+    "status": "Confirmed retained-velocity/rest-state mismatch patched in both source trees; runtime corpse stability and dismemberment remain unverified."
+  }
+}

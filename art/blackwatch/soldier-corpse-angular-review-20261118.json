@@ -1,0 +1,63 @@
+{
+  "date": "2026-11-18",
+  "scope": "Independent Blackwatch corpse contact/rest/cut review; two proven angular-coordinate defects repaired in both ports.",
+  "playerVisibleStatus": "The reported fish-like corpse hopping is not reproduced or accepted as fixed by this code-only audit.",
+  "currentPriorFixesConfirmed": [
+    "13 anatomical rigid owners and a separate 16-fragment reserve remain in place.",
+    "Post-constraint retained-velocity rejection and support-propagated sleep remain in place.",
+    "CorpseFragmentMotion.drop remains an absolute elapsed-time parabola clamped to ground."
+  ],
+  "provenDefects": [
+    {
+      "path": "AdaptiveRagdoll.Body.impulse",
+      "before": "World-space lever arm cross world-space kick was added directly to Part.spin. Part.step integrates spin in the local frame with rotation.rotateXYZ. Once a corpse part has rotated, a later hit therefore rotates the intended torque a second time.",
+      "after": "Convert the bounded world angular impulse by inverse part rotation before adding it to local spin."
+    },
+    {
+      "path": "AdaptiveRagdoll.sectionAnchors",
+      "before": "Local Part.spin was crossed with a world-space cut-face offset, giving the wrong surface velocity after corpse rotation.",
+      "after": "Use the existing fragmentVelocity local angular-cross-local offset calculation, then rotate the result once into world space."
+    }
+  ],
+  "unchanged": "No gravity, restitution, friction, sleep thresholds, support graph, cut budget, grabbing eligibility, or saved world was modified.",
+  "regressionClass": "com.codex.blacklight.client.renderer.RagdollJointMathTest",
+  "newRegressionMethods": [
+    "repeatedWorldContactUsesTheSameTorqueAfterTheCorpseHasTurned",
+    "rotatingCutSurfaceVelocityMatchesItsVisibleWorldMotion"
+  ],
+  "standaloneJomlCheck": {
+    "source": "D:/CodexCache/work/RagdollWorldFrameCheck.java",
+    "java": "D:/CodexCache/tools/jdk-17.0.21+9/bin/java.exe",
+    "joml": "1.10.5",
+    "contactOrientations": 3,
+    "fixedMaxWorldTorqueError": 3.332001e-08,
+    "oldMaxWorldTorqueError": 0.27202943,
+    "fixedCutVelocityError": 0.0,
+    "oldCutVelocityError": 0.2,
+    "limit": "Standalone coordinate math only; this does not execute Minecraft or the actual private Part/Body solver."
+  },
+  "independentContactCheck": {
+    "source": "D:/CodexCache/work/corpse-contact-independent-20261118.py",
+    "cases": 8,
+    "halfStepsPerCase": 1200,
+    "result": "All ten connected bodies reached 24 quiet half-steps in every case; final 199 half-steps had zero root-height range and zero completed movement.",
+    "limit": "A deliberately simplified two-dimensional flat-ground solver probe. It omits real Minecraft shape collision, arbitrary three-dimensional skin and live capture. It cannot rule out stair, edge or cut-specific player-visible failures."
+  },
+  "validationBoundary": "No Gradle, game launch, computer input or save access. Added JUnit cases await parent-owned execution. Actual player-view normal/heavy soldier deaths, cutting, repeated postmortem impacts and stairs/edges still require normal-client acceptance.",
+  "files": {
+    "src/main/java/com/codex/blacklight/client/renderer/AdaptiveRagdoll.java": {
+      "neoSha256": "d6eac5ff640a1ac8045e2892df0f71917eda00a12b891ea45adbbe390b23247a",
+      "forgeSha256": "d0b6dd9828edcfe90e1312e69dd37739b3f1132b0abe7b484b053d07e464490c"
+    },
+    "src/test/java/com/codex/blacklight/client/renderer/RagdollJointMathTest.java": {
+      "neoSha256": "dcd2c7c16041c6a154a207535894eb6682a5e8393575d8b6f725cb1cd982dd50",
+      "forgeSha256": "dcd2c7c16041c6a154a207535894eb6682a5e8393575d8b6f725cb1cd982dd50"
+    }
+  },
+  "parentVerification": {
+    "status": "8 RagdollJointMathTest cases passed; zero failures/errors",
+    "log": "D:/CodexCache/work/helicopter-flight-fixed-neo-20261118.log",
+    "report": "D:/blacklight-evolution/build/helicopter-flight-check/test-results/test/TEST-com.codex.blacklight.client.renderer.RagdollJointMathTest.xml",
+    "playerAcceptance": "Still pending; this does not establish that fish-like hopping is resolved."
+  }
+}

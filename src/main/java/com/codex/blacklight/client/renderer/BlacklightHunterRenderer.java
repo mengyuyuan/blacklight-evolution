@@ -23,7 +23,7 @@ public final class BlacklightHunterRenderer extends AnatomicalGeoRenderer<Blackl
         if(visual.active())stack.translate(placement.x,placement.y,placement.z);
         ConsumeFracture fragments=ConsumeFracture.visible(entity,partial)?new ConsumeFracture(entity,partial,stack,buffer,ConsumeAbsorptionFx.destination(entity,partial,placement)):null;
         if (visual.active()) com.codex.blacklight.client.animation.ConsumeVictimPose.body(entity, stack, partial);
-        else if(!com.codex.blacklight.client.animation.NativeReceiverPose.available(entity,partial))com.codex.blacklight.client.animation.HitBodyPose.apply(entity,stack,partial);
+        else if(!entity.committedAttack()&&!com.codex.blacklight.client.animation.NativeReceiverPose.available(entity,partial))com.codex.blacklight.client.animation.HitBodyPose.apply(entity,stack,partial);
         try{if(t<.995F)super.render(entity, yaw, partial, stack, fragments==null?buffer:fragments, light);if(fragments!=null)fragments.finish();}finally{stack.popPose();}
         if(owner!=null && visual.active())ConsumedMobVisuals.whip(entity,stack,buffer.getBuffer(RenderType.entityCutoutNoCull(WHITE)),light,delta,ConsumedMobVisuals.tetherProgress(entity,partial));
     }

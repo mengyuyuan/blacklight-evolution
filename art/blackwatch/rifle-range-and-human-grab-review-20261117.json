@@ -1,0 +1,340 @@
+{
+  "schema": 1,
+  "date": "2026-11-17",
+  "status": "code_and_static_review_only_tests_not_run",
+  "player_issue_review": {
+    "alive_human_grab": "The existing fix reaches ClientClawEvents rising-edge E/deferred grab -> ClawActionPayload.GRAB -> ClawCombatSystem -> ConsumeSystem.request. Both capture admission and confirm-consume use healthReady; uninfected MilitarySoldier bypasses the old originalMaximum<50 heuristic by identity.",
+    "identities": [
+      "blackwatch_soldier",
+      "blackwatch_heavy",
+      "military_soldier",
+      "military_heavy",
+      "blackwatch_team_leader",
+      "military_team_leader",
+      "blackwatch_officer",
+      "military_officer",
+      "blackwatch_commander",
+      "military_commander"
+    ],
+    "health": "All ten registry types inherit MilitarySoldier. Neither heavy identity nor command role adds another health gate. Custom finite positive maximum health does not change the human tier. Infection explicitly removes the human exemption; Hunter, Supreme Hunter, evolved hosts and large nonhuman gates remain distinct.",
+    "legitimate_rejections": [
+      "not prototype/infected player",
+      "player/target control ownership and active consume",
+      "dead/removed/invulnerable/unconsumable target",
+      "line of sight, range, airborne ordinary target",
+      "passenger/vehicle and tissue competition restrictions",
+      "existing weapon/terrain-grab action ownership"
+    ],
+    "no_new_grab_production_patch": "No second 50-HP rejection found, so the earlier identity helper was not duplicated or relaxed.",
+    "source_boundary": "Reviewed human/reaction/actual_reaction/grab dispatches a reaction event, PuppetAnimation and npc_grabbed dialogue, with no HP50 condition in that branch. This does NOT prove every native grab admission or heavy escape rule; no unproven native escape behavior has been added.",
+    "dead_body_boundary": "The existing ConsumeSystem target eligibility is alive-only; no corpse carrying was added.",
+    "existing_unrun_matrix": "MilitaryFactionGameTest.humanSoldiersDoNotChangeGrabClassAtFiftyHealth uses the real heavy identity with max20/50/60/100 and current max/49/51; actual request->holding->consume. All other type combinations remain player/runtime verification work.",
+    "corpse_status": "Earlier 13-joint skin grouping, fragment reserve and constraint-velocity/sleep fixes are unchanged/frozen. Whole-body ordinary blunt deaths remain allowed; sharp lethal cuts and terrain settling still require client verification. See soldier-grab-corpse-review-2026-11-17.json and soldier-corpse-constraint-review-20261117.json."
+  },
+  "selected_ai_gap": "FireTeamGoal unconditionally stopped ranged combat above22 blocks, even for the already-implemented source rifle/saw/sniper aiming bank whose TargetDistance condition allows Magnitude<=30.",
+  "source": {
+    "file": "input/startup_fig.p3d.rz",
+    "sha256": "96d84271e461cbe4566fb984359653b164257f88392c5bceb213c30f88527779",
+    "records": [
+      {
+        "source": "startup_fig.p3d.rz",
+        "offset": 301264,
+        "payload": 301276,
+        "length": 16,
+        "type": "Bank",
+        "kind": "BranchHash",
+        "owner": "engage_soldier/#d912518989f17d14/#d912518989f17d14/soldiers/#5d4f3bb282769c04",
+        "end": 317692
+      },
+      {
+        "source": "startup_fig.p3d.rz",
+        "offset": 301304,
+        "payload": 301316,
+        "length": 24,
+        "type": "GrabSlotClassName",
+        "kind": "ConditionHash",
+        "owner": "engage_soldier/#d912518989f17d14/#d912518989f17d14/soldiers/#5d4f3bb282769c04",
+        "fields": {
+          "GrabSlotHash": {
+            "hash": "10464599244845980941",
+            "name": "Holding"
+          },
+          "Compare": {
+            "hash": "4001598",
+            "name": "Equal"
+          },
+          "ClassnameHash": {
+            "hash": "8123004041450973238",
+            "name": "rifle"
+          }
+        },
+        "schema": "GrabSlotClassNameCondition",
+        "end": 301348
+      },
+      {
+        "source": "startup_fig.p3d.rz",
+        "offset": 301368,
+        "payload": 301380,
+        "length": 24,
+        "type": "GrabSlotClassName",
+        "kind": "ConditionHash",
+        "owner": "engage_soldier/#d912518989f17d14/#d912518989f17d14/soldiers/#5d4f3bb282769c04",
+        "fields": {
+          "GrabSlotHash": {
+            "hash": "10464599244845980941",
+            "name": "Holding"
+          },
+          "Compare": {
+            "hash": "4001598",
+            "name": "Equal"
+          },
+          "ClassnameHash": {
+            "hash": "494869147299",
+            "name": "saw"
+          }
+        },
+        "schema": "GrabSlotClassNameCondition",
+        "end": 301412
+      },
+      {
+        "source": "startup_fig.p3d.rz",
+        "offset": 301432,
+        "payload": 301444,
+        "length": 24,
+        "type": "GrabSlotClassName",
+        "kind": "ConditionHash",
+        "owner": "engage_soldier/#d912518989f17d14/#d912518989f17d14/soldiers/#5d4f3bb282769c04",
+        "fields": {
+          "GrabSlotHash": {
+            "hash": "10464599244845980941",
+            "name": "Holding"
+          },
+          "Compare": {
+            "hash": "4001598",
+            "name": "Equal"
+          },
+          "ClassnameHash": {
+            "hash": "10201727653069515053",
+            "name": "sniper"
+          }
+        },
+        "schema": "GrabSlotClassNameCondition",
+        "end": 301476
+      },
+      {
+        "source": "startup_fig.p3d.rz",
+        "offset": 315096,
+        "payload": 315108,
+        "length": 16,
+        "type": "Bank",
+        "kind": "BranchHash",
+        "owner": "engage_soldier/#d912518989f17d14/#d912518989f17d14/soldiers/#5d4f3bb282769c04/engage/#d912518989f17d14/attack/shoot/#6b1e2701259883b7",
+        "end": 317308
+      },
+      {
+        "source": "startup_fig.p3d.rz",
+        "offset": 315136,
+        "payload": 315148,
+        "length": 20,
+        "type": "TargetDistance",
+        "kind": "ConditionHash",
+        "owner": "engage_soldier/#d912518989f17d14/#d912518989f17d14/soldiers/#5d4f3bb282769c04/engage/#d912518989f17d14/attack/shoot/#6b1e2701259883b7",
+        "fields": {
+          "Direction": {
+            "hash": "2822888922154341390",
+            "name": "Magnitude"
+          },
+          "Compare": {
+            "hash": "3935993",
+            "name": "LessThanOrEqual"
+          },
+          "Distance": 30
+        },
+        "schema": "TargetDistanceCondition",
+        "end": 315176
+      },
+      {
+        "source": "startup_fig.p3d.rz",
+        "offset": 1164332,
+        "payload": 1164344,
+        "length": 16,
+        "type": "Bank",
+        "kind": "BranchHash",
+        "owner": "human/reaction/actual_reaction/grab",
+        "end": 1164980
+      },
+      {
+        "source": "startup_fig.p3d.rz",
+        "offset": 1164372,
+        "payload": 1164384,
+        "length": 12,
+        "type": "ReactionEvent",
+        "kind": "ConditionHash",
+        "owner": "human/reaction/actual_reaction/grab",
+        "fields": {
+          "IsReactionEvent": true,
+          "ReactionType": {
+            "hash": "20041939581158222",
+            "name": "#473409b158434e"
+          }
+        },
+        "schema": "ReactionEventCondition",
+        "end": 1164404
+      },
+      {
+        "source": "startup_fig.p3d.rz",
+        "offset": 1164476,
+        "payload": 1164488,
+        "length": 108,
+        "type": "PuppetAnimation",
+        "kind": "TrackHash",
+        "owner": "human/reaction/actual_reaction/grab/grab",
+        "fields": {
+          "Unknown1": 0,
+          "TimeBegin": 0,
+          "TimeEnd": -1,
+          "Animation": {
+            "hash": "14870295597942704511",
+            "name": "#ce5de70f646e097f"
+          },
+          "Speed": 1,
+          "RandomSpeedVariation": 0,
+          "InitFrame": 0,
+          "StartFrame": 0,
+          "EndFrame": -1,
+          "Cyclic": {
+            "hash": "11831687089686836166",
+            "name": "FromAnimation"
+          },
+          "SyncFrame": false,
+          "PhaseMatch": false,
+          "ReuseExistingDriver": false,
+          "SyncPhase": {
+            "hash": "3349652082457766725",
+            "name": "Legacy"
+          },
+          "SyncPhaseMinFrame": 0,
+          "SyncPhaseMaxFrame": -1,
+          "HasRootTranslation": true,
+          "HasRootRotation": true,
+          "Partition": {
+            "hash": "0",
+            "name": "#0"
+          },
+          "Weight": 1,
+          "Priority": 0,
+          "BlendInTime": 0,
+          "BlendOutTime": 0
+        },
+        "schema": "PuppetAnimationTrack",
+        "end": 1164604
+      },
+      {
+        "source": "startup_fig.p3d.rz",
+        "offset": 1164792,
+        "payload": 1164804,
+        "length": 56,
+        "type": "Dialogue",
+        "kind": "TrackHash",
+        "owner": "human/reaction/actual_reaction/grab/common/on_grab",
+        "fields": {
+          "Unknown1": 0,
+          "TimeBegin": 0,
+          "CharacterName": "",
+          "EventName": "npc_grabbed",
+          "PlayOn": "",
+          "Frequency": 1,
+          "InstanceFrequencySensitivity": 0,
+          "MinDelay": 0,
+          "MaxDelay": 0,
+          "KillOnExit": false,
+          "IfPlayerCanBeSeen": false
+        },
+        "schema": "DialogueTrack",
+        "end": 1164868
+      }
+    ],
+    "proof_files": {
+      "private/rapid-runtime-1011e650.txt": "31cad1c3786b2e1ef59cc97e544be6b83086dde36f9eecd718314928f83790fa",
+      "private/rapid-runtime-107bc530.txt": "f1b2d6a5744e871619955714dad4dd96d8c0a03eac23e4db36c13c1fcfc0daf4",
+      "private/rapid-runtime-107de5a0.txt": "16afb80d9e590c0cb0211ced29417ce42a0ae9bcf66cc84c3c1ab3c501d22ac9",
+      "private/greene-bank-reader-vtables.json": "addb7f99c71af3a254cade90a5c3ca6e16553a71142e33be1e115a161c493e8d",
+      "work/schema/TargetDistanceCondition.cs": "6f4bf5b65431ddf52dc03d71b566999eddcd44171e66cc7f0e8fd0b861bb989a"
+    },
+    "native_geometry": "TargetDistance vtable10dc2e0c slot9=1011e650 resolves actor and target, reads translation xyz at transform+34/+38/+3c (1011e6de..717), subtracts, then actor-axis dot products in107bc530 before the direction comparator. Magnitude branch107de5d6..5f2 computes sqrt(x*x+y*y+z*z), not XZ and not squared authored distance. No bone/mesh units are read on this path.",
+    "rigid_basis_boundary": "For a rigid actor basis, the local-axis magnitude is the world translation separation. Arbitrary nonuniformly scaled native actors were not audited and are not claimed."
+  },
+  "unit_adapter": {
+    "source_value": 30,
+    "source_direction": "Magnitude",
+    "source_compare": "LessThanOrEqual",
+    "mc_world_blocks_per_source_world_unit": 1,
+    "why": "Retains the existing soldier server-space adapter used for authored melee range2.5 and posture LoF offsets. It is an explicit Minecraft adaptation, not a recovered physical-meter calibration.",
+    "model_is_not_uniform_source_skin": "BlackwatchRenderer applies no full-model source scale. Retargeted source hand deltas use20/16 blocks and gait distance clock uses13/16; these differ because authored Minecraft limb lengths are fitted separately. Neither is a valid universal multiplier for actor-to-target world range.",
+    "unmodified_acquisition": "Default FOLLOW_RANGE and squad observation remain28 blocks;30 is the firing condition for a target already retained, not a newly asserted native sensing radius."
+  },
+  "implementation": [
+    "MilitaryFireControl retains source RIFLE_RANGE30 and explicit OTHER_RANGED_RANGE22.",
+    "MilitarySoldier uses the existing rifleAimBank mapping; the real FireTeamGoal and final fire path both check squared full-3D actor separation against the inclusive bound.",
+    "Out-of-range entry retains interrupt, lease release, aim/posture clearing and last-seen pursuit. Returning in range must earn the existing complete aim window. LoF, protected targets, finite ammunition and territory gates remain.",
+    "Officers/commanders and nonbullet weapon paths remain in their prior22-block envelope; this patch does not reinterpret their source banks."
+  ],
+  "new_unrun_regressions": [
+    "MilitaryRifleRangeGameTest.rifleFiresAtTwentyFiveCancelsOutsideThirtyAndResumesAtTheInclusiveBoundary: actual default target selector acquires25-block infected target; real FireTeamGoal damages with finite rifle rounds while movement speed0 prevents crossing old22 cutoff. Test-only FOLLOW_RANGE48 then isolates31-block cancellation and inclusive30-block re-entry.",
+    "MilitaryRifleRangeGameTest.heavySawUsesTheSameRifleBankBeyondTheOldTwentyTwoBlockCutoff: real registered heavy identity, default target acquisition and SAW gun at25 blocks.",
+    "Fixture forces/restores only its added chunks, uses actual stone floor/air LoF, retains all gun damage/aim/squad paths, and chooses deterministic standing posture without bypassing source range."
+  ],
+  "test_entry": "tools/player-military-regression.init.gradle whitelist includes MilitaryRifleRangeGameTest; playerMilitaryServer runner remains the queued entry. No build/test/client was run.",
+  "static_checks": [
+    "Source record offsets/fields read from local decompressed FIG evidence.",
+    "Native source only statically decoded with Capstone; no original binary executed.",
+    "Neo/Forge new test normalized text and helper sources compared.",
+    "No client screenshot, performance or in-game behavior claim."
+  ],
+  "snapshots": {
+    "neo": {
+      "src/main/java/com/codex/blacklight/entity/MilitarySoldier.java": "d92f674783761648ce3f073626a319526ba10ef0876fcb175b0fe8ea6f417168",
+      "src/main/java/com/codex/blacklight/military/MilitaryFireControl.java": "a922cbdd9edb26a1a34d23d877fc876fbd73cc4b4b55d313d59681c8f9644e26",
+      "src/blackwatchTest/java/com/codex/blacklight/gametest/MilitaryRifleRangeGameTest.java": "0d2aa1676a93cc5d3aa932b8a742d923e1e3df08023126f3a32630349dddc034",
+      "tools/player-military-regression.init.gradle": "344165b65b7717485b94cff7047458f3124df5f185fa56d6346cf770719185ab",
+      "src/main/java/com/codex/blacklight/combat/ConsumeSystem.java": "43f3474719a3aa95289a4649078a186178403455eb23e0a761a519ea98a8fff9",
+      "src/main/java/com/codex/blacklight/client/ClientClawEvents.java": "32bdb2522cfc3569757a037c2762212ac15f6a6d56e151713ad0e0aada6607b7",
+      "src/main/java/com/codex/blacklight/combat/ClawCombatSystem.java": "c52cee31f4bcc3a00c47666da71b140ef61b9656a31c4f985f629d8eef81842c",
+      "src/blackwatchTest/java/com/codex/blacklight/gametest/MilitaryFactionGameTest.java": "c154f6b6a51af059b5860d01893a78a6d8204d9763cb83bafec3ec1cebd6b2d7"
+    },
+    "forge": {
+      "src/main/java/com/codex/blacklight/entity/MilitarySoldier.java": "bdd037e1b693e1991652ccd05f38e898bc00f87ab7d17b070dcb6a5588b85672",
+      "src/main/java/com/codex/blacklight/military/MilitaryFireControl.java": "a922cbdd9edb26a1a34d23d877fc876fbd73cc4b4b55d313d59681c8f9644e26",
+      "src/blackwatchTest/java/com/codex/blacklight/gametest/MilitaryRifleRangeGameTest.java": "a237c2367bf29acf5f0372a747f6f022ab87537a48e46d9ec7e412179afeeadc",
+      "tools/player-military-regression.init.gradle": "344165b65b7717485b94cff7047458f3124df5f185fa56d6346cf770719185ab",
+      "src/main/java/com/codex/blacklight/combat/ConsumeSystem.java": "31ed1013703cbb5de7b23cb9d31f30123f4a6964a1612f2438cf91e1df845e52",
+      "src/main/java/com/codex/blacklight/client/ClientClawEvents.java": "6aaed012241323a1494d3382258476ed7b10910cdb24ab5a85037c4923872725",
+      "src/main/java/com/codex/blacklight/combat/ClawCombatSystem.java": "bdcf299c2daef54057843c1e673fc00b28488c31ec20ee6119152c653a98fecd",
+      "src/blackwatchTest/java/com/codex/blacklight/gametest/MilitaryFactionGameTest.java": "16887cd1531d34c39d9cf2e38e7d10f96a5da49c244e9b09aa63467615639f2d"
+    }
+  },
+  "pending_player_checks": [
+    "Full-health normal/heavy/leader/officer/commander soldiers across factions, including custom100HP, grab then consume; verify legitimate control/LoS rejection still works.",
+    "On normal terrain, rifles and SAWs engage an exposed acquired target between22 and28 blocks; a wall or range exit stops the burst, and reacquisition visibly reaims.",
+    "Retest corpse sharp cuts, ordinary blunt kills, slabs, steps, support removal and freefall using the separately frozen corpse changes."
+  ],
+  "fire_line_followup": {
+    "date": "2026-11-17",
+    "record": "art/blackwatch/rifle-fire-line-source-20261117.json",
+    "reason": "The same soldier subsequently gained the real firearm candidate/parent protection LoF fix. Refresh the current checkpoint fingerprints for MilitarySoldier and the military regression whitelist; the earlier rifle-range and grab conclusions are unchanged.",
+    "refreshed_files": [
+      "src/main/java/com/codex/blacklight/entity/MilitarySoldier.java",
+      "tools/player-military-regression.init.gradle"
+    ],
+    "validation": "Static hash refresh only; no Java, build, test or game executed."
+  },
+  "handheld_ordnance_qa_followup": {
+    "record": "art/blackwatch/handheld-ordnance-body-review-20261117.json",
+    "date": "2026-11-17",
+    "reason": "The military regression whitelist now also includes three real handheld projectile impact cases. Existing soldier range, human grab and fire-line conclusions and production files are unchanged.",
+    "refreshed_files": [
+      "tools/player-military-regression.init.gradle"
+    ],
+    "validation": "Static text/hash only; no Java, build, test, game or native execution."
+  }
+}

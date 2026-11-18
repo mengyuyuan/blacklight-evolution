@@ -1,0 +1,5 @@
+allprojects { afterEvaluate {
+    sourceSets.main.java.srcDir('src/spitterTest/java')
+    sourceSets.main.resources.srcDir('src/blackwatchTest/resources')
+    tasks.named('test', Test).configure { include '**/SpitterMouthTest.class','**/MutantCombatTest.class','**/BlockThrowBallisticsTest.class' }
+} }

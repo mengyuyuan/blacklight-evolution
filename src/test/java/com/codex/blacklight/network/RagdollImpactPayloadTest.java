@@ -64,6 +64,23 @@ class RagdollImpactPayloadTest {
             assertEquals(planes,received.planes());assertEquals(0,bytes.readableBytes());
         } finally {bytes.release();}
     }
+    @Test void fatalityAndOriginalContactTimeSurviveAdjacentPackets(){
+        var packets=List.of(
+                new RagdollImpactPayload(42,1,60,0,false,false,0,0,.25,0,List.of(),List.of(),List.of(),900,false),
+                new RagdollImpactPayload(42,1,60,0,false,false,0,0,.25,0,List.of(),List.of(),List.of(),901,true),
+                new RagdollImpactPayload(42,1,60,0,true,true,0,0,0,0,List.of(),List.of(),List.of(),902,true));
+        var bytes=new RegistryFriendlyByteBuf(Unpooled.buffer(),RegistryAccess.EMPTY);
+        try {
+            for(var packet:packets)RagdollImpactPayload.CODEC.encode(bytes,packet);
+            for(var packet:packets){
+                var decoded=RagdollImpactPayload.CODEC.decode(bytes);
+                assertEquals(packet,decoded);assertEquals(packet.at(),decoded.at());assertEquals(packet.fatal(),decoded.fatal());
+            }
+            assertEquals(0,bytes.readableBytes());
+        } finally {bytes.release();}
+        // Legacy constructors may be used for nonfatal feedback; long duration alone is no death proof.
+        assertFalse(new RagdollImpactPayload(42,1,60,0,false,false,0,0,0,0,List.of(),List.of(),List.of(),901).fatal());
+    }
     @Test void profilesAreBoundedAndCannotChangeTopologyMidStroke(){
         assertThrows(IllegalArgumentException.class,()->new RagdollImpactPayload.BladeSpan(List.of(Vec3.ZERO)));
         assertThrows(IllegalArgumentException.class,()->new RagdollImpactPayload.BladeSpan(java.util.Collections.nCopies(7,Vec3.ZERO)));

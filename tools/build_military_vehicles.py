@@ -163,6 +163,25 @@ def atlas(source, rectangles, faction):
                     pos = (y*ATLAS+x)*3
                     pixels[pos:pos+3] = bytes.fromhex(color[1:])
             uv_faces = faces_uv(part, (u, v))
+            for a,b,c,d in uv_faces.values():
+                left,top,right,bottom=math.ceil(a),math.ceil(b),math.floor(c)-1,math.floor(d)-1
+                if right-left<3 or bottom-top<3:continue
+                material=part["material"]
+                if material=="glass":
+                    for yy in range(top,bottom+1):
+                        for xx in range(left,right+1):
+                            # Cooler skylight at the top of cab windows and camera glass.
+                            lift=round(11-17*(yy-top)/(bottom-top))
+                            if yy-top==1+(right-xx)//5:lift+=8
+                            offset=3*(yy*ATLAS+xx)
+                            pixels[offset:offset+3]=bytes(max(0,min(255,ch+lift)) for ch in base)
+                if material=="rubber" and "wheel" in part["name"]:
+                    for xx in range(left+1,right,4):
+                        pixel(xx,top,palette["metal"])
+                if paint and right-left>=12 and bottom-top>=8:
+                    for xx in range(left+1,right):
+                        offset=3*(bottom*ATLAS+xx)
+                        pixels[offset:offset+3]=bytes(max(0,ch-9) for ch in pixels[offset:offset+3])
             if paint and any(word in part["name"] for word in ("door", "skirt", "canvas_side")):
                 for face in uv_faces.values():
                     a, b, c, d = face

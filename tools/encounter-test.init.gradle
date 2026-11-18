@@ -1,0 +1,5 @@
+allprojects { afterEvaluate {
+    sourceSets.main.java.srcDir('src/encounterTest/java')
+    sourceSets.main.resources.srcDir('src/blackwatchTest/resources')
+    tasks.withType(ProcessResources).configureEach { filteringCharset='UTF-8' }
+} }

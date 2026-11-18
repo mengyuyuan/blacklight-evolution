@@ -92,18 +92,24 @@ public final class ImpactControl {
             soldier.suspendTactics();
         return true;
     }
-    private static void publish(LivingEntity entity,HitReaction state){entity.setData(ModAttachments.HIT_REACTION,state);entity.syncData(ModAttachments.HIT_REACTION);}
+    private static void publish(LivingEntity entity,HitReaction state){
+        if(state.duration()>0&&entity instanceof com.codex.blacklight.entity.BlacklightMutant mutant&&mutant.kind()==com.codex.blacklight.entity.BlacklightMutant.Kind.BRUTE)mutant.cancelAttack();
+        entity.setData(ModAttachments.HIT_REACTION,state);entity.syncData(ModAttachments.HIT_REACTION);
+    }
     public static void cancel(LivingEntity entity){
         if(entity instanceof Mob mob)ACTIVE.remove(mob);
         if(entity.isRemoved())return;
         if(ModAttachments.peekData(entity, ModAttachments.HIT_REACTION, HitReaction.EMPTY).duration()>0)publish(entity,HitReaction.EMPTY);
     }
+    private static int controlLimit(Mob mob,Control control){return control.knockdown()&&mob instanceof com.codex.blacklight.entity.BlacklightMutant brute&&brute.kind()==com.codex.blacklight.entity.BlacklightMutant.Kind.BRUTE?BruteKnockdown.MAX_CONTROL_TICKS:80;}
     public static boolean stunned(Mob mob){
-        if(mob.level().isClientSide)return false;var control=ACTIVE.get(mob);if(control==null)return false;
+        if(mob.level().isClientSide)return false;
+        if(NativeBossBodyControl.ownsPose(mob)){cancel(mob);return false;}
+        var control=ACTIVE.get(mob);if(control==null)return false;
         var hit=ModAttachments.peekData(mob,ModAttachments.HIT_REACTION,HitReaction.EMPTY);long now=mob.level().getGameTime();
         boolean evolvedLimit=!control.consume(now)&&mob instanceof com.codex.blacklight.entity.BlacklightInfectedHost host&&host.isEvolved()
                 &&now-control.flightStarted()>=com.codex.blacklight.infection.EvolvedPoise.MAX_CONTROL_TICKS;
-        if(!mob.isAlive()||mob.isRemoved()||hit.duration()<=0||now-control.flightStarted()>80||evolvedLimit
+        if(!mob.isAlive()||mob.isRemoved()||hit.duration()<=0||now-control.flightStarted()>controlLimit(mob,control)||evolvedLimit
                 ||!control.knockdown()&&now-hit.started()>=hit.duration()&&!control.consume(now)){
             cancel(mob);return false;
         }
@@ -128,6 +134,7 @@ public final class ImpactControl {
             if(age>=hit.duration()){
                 var rise=ReceiverMotions.clip(ReceiverMotions.hitKey(mob,HitReaction.GETUP,ImpactProfile.RISE));
                 int duration=mob instanceof com.codex.blacklight.entity.BlacklightHunter&&rise!=null?Math.round(rise.seconds()*20):16;
+                if(mob instanceof com.codex.blacklight.entity.BlacklightMutant brute&&brute.kind()==com.codex.blacklight.entity.BlacklightMutant.Kind.BRUTE)duration=BruteKnockdown.GETUP_TICKS;
                 publish(mob,new HitReaction(now,duration,HitReaction.GETUP,hit.yaw(),ImpactProfile.RISE));
             }
         }else if(hit.kind()==HitReaction.GETUP){
@@ -137,7 +144,7 @@ public final class ImpactControl {
             mob.setDeltaMovement(mob.getDeltaMovement().multiply(.3,1,.3));mob.hurtMarked=true;
             mob.level().playSound(null,mob.blockPosition(),net.minecraft.sounds.SoundEvents.GENERIC_SMALL_FALL,
                     net.minecraft.sounds.SoundSource.HOSTILE,.8F,.65F);
-        }else if(age>=hit.duration()||now-control.flightStarted()>80)recover(mob,control,hit,now);
+        }else if(age>=hit.duration()||now-control.flightStarted()>controlLimit(mob,control))recover(mob,control,hit,now);
     }
     private static void recover(Mob mob,Control control,HitReaction hit,long now){
         if(!control.consume(now)){cancel(mob);return;}

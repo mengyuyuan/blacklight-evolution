@@ -1,0 +1,191 @@
+{
+  "schema": 1,
+  "createdLocal": "2026-11-17T01:48:55",
+  "scope": "Static x86 disassembly and direct-reference audit. Isolated lease helper only; no live combat integration, compilation, unit execution, native emulation or full-game execution in this investigation.",
+  "source": {
+    "file": "D:\\PrototypeReference\\p1\\input\\prototypeenginef.dll",
+    "sha256": "8cba8da3412df4f49cd61d02445e87a0cda551dea4f2fc1e66b19c1bfe28a760"
+  },
+  "decodedFig": {
+    "file": "D:\\PrototypeReference\\p1\\helicopter-weapons-complete.json",
+    "sha256": "70955751e9386c6b312918cc0843e6b808d1144dbede5b25181cf012314308fa"
+  },
+  "tools": [
+    {
+      "file": "D:\\CodexCache\\work\\inspect-helicopter-token.py",
+      "sha256": "33f9473e22e220e0601f775e4be298d9c2e7f5228613f629d27cecf417fa040d"
+    },
+    {
+      "file": "D:\\CodexCache\\work\\trace-helicopter-token-callers.py",
+      "sha256": "8f40fef7e431f79a7109a2ddf871270aed4cc1754d71cac54342dc0ba62b778c"
+    },
+    {
+      "file": "D:\\CodexCache\\work\\inspect-rapid-runtime.py",
+      "sha256": "f92fd3e0f103e774e9df62077307d356aef23bc973241d3125325f45c811eb53"
+    }
+  ],
+  "staticEvidence": [
+    {
+      "file": "D:\\PrototypeReference\\p1\\private\\rapid-runtime-10383fa0.txt",
+      "sha256": "d72636808ffa12dfb270db2f1aad36acfdca83dd4c48f7146b6e4a65356456fe"
+    },
+    {
+      "file": "D:\\PrototypeReference\\p1\\private\\rapid-runtime-10384040.txt",
+      "sha256": "4548050faa09a8890edba298d3ca51f77ce61e952c8575a8f29b37d2cdac55be"
+    },
+    {
+      "file": "D:\\PrototypeReference\\p1\\private\\rapid-runtime-101e44d0.txt",
+      "sha256": "a7a80dfb4466808426393a34bc088edcfa739792d9963f97cd13410d495b709b"
+    },
+    {
+      "file": "D:\\PrototypeReference\\p1\\private\\rapid-runtime-101e44a0.txt",
+      "sha256": "547ba7d2a674ce6d99703f9095a9e64199571559eb069baebd1a5d79a8fa1e1a"
+    },
+    {
+      "file": "D:\\PrototypeReference\\p1\\private\\rapid-runtime-101e7a20.txt",
+      "sha256": "9005a26743d686256b0bd6c4e9384de4113ffdb6ab401edb0e1c804a4933fcdf"
+    },
+    {
+      "file": "D:\\PrototypeReference\\p1\\private\\rapid-runtime-101e7a60.txt",
+      "sha256": "a60ff2237dd22dbc78efb46dd58ad5f76815ef0bf8ff59461cf1b40856daa9c9"
+    },
+    {
+      "file": "D:\\PrototypeReference\\p1\\private\\rapid-runtime-101e79f0.txt",
+      "sha256": "4d09e97dad06eb44ee9db434892757e65486710230e839c641f90fbb6ae46f12"
+    },
+    {
+      "file": "D:\\PrototypeReference\\p1\\private\\rapid-runtime-101e4d10.txt",
+      "sha256": "a7d2d212beec40393b10bfe040d62335ceed423976544a592f9a99a5ba85c0a6"
+    },
+    {
+      "file": "D:\\PrototypeReference\\p1\\private\\rapid-runtime-10382ee0.txt",
+      "sha256": "82f7fb48800a8b7778ef32650c1ae98a4357f601995745016284f981c5245adf"
+    },
+    {
+      "file": "D:\\PrototypeReference\\p1\\private\\rapid-runtime-10360a40.txt",
+      "sha256": "a6c6d76f1a8b917ef1727b6bb83119489d5e9e7181a1382f274798a6f2b54e89"
+    },
+    {
+      "file": "D:\\PrototypeReference\\p1\\private\\rapid-runtime-103854e0.txt",
+      "sha256": "db7ba420922f85c8b227ae6a5f694c73ab23783214201180a30197a582b1fcd7"
+    },
+    {
+      "file": "D:\\PrototypeReference\\p1\\private\\rapid-runtime-107dad20.txt",
+      "sha256": "de7cbf332091381d62adb2c2396827def3ba8484befb02830a7d38fcda72fa72"
+    },
+    {
+      "file": "D:\\PrototypeReference\\p1\\private\\rapid-runtime-10364980.txt",
+      "sha256": "396f495ab7aba9ad7a92c2b83c17e1d7fc31af5b01e8136f15c8ce34f14d82f2"
+    },
+    {
+      "file": "D:\\PrototypeReference\\p1\\private\\rapid-runtime-10364d20.txt",
+      "sha256": "8223a1912cbdb60a848776e739cc3696b42c4dca8d7f25dc3815a06f24d40ce9"
+    },
+    {
+      "file": "D:\\PrototypeReference\\p1\\private\\rapid-runtime-10364d90.txt",
+      "sha256": "42068c455673067ee936b0ef7fc409b86a5303a9becf4850c83aa60eeb37e96f"
+    },
+    {
+      "file": "D:\\PrototypeReference\\p1\\private\\rapid-runtime-10364b90.txt",
+      "sha256": "07280723ee77b9647b91b22337d9ee25072c856316b320d947e4c5bb37e2623d"
+    },
+    {
+      "file": "D:\\PrototypeReference\\p1\\private\\rapid-runtime-10385750.txt",
+      "sha256": "150cea25c92cbce534aeb38ea80877a0d6af9bfb7550777688da78dfd8c38930"
+    },
+    {
+      "file": "D:\\PrototypeReference\\p1\\private\\rapid-runtime-104e50b0.txt",
+      "sha256": "dc84ad61e78e0f2b960ea0b9a05f5ef9d66384b594d2001432330af4d27839b6"
+    },
+    {
+      "file": "D:\\PrototypeReference\\p1\\private\\rapid-runtime-104e5c90.txt",
+      "sha256": "742b39862f736df3de3b1a3c38ce545e3adfd6d92204502f18c225b643a24209"
+    },
+    {
+      "file": "D:\\PrototypeReference\\p1\\private\\rapid-runtime-101ed6c0.txt",
+      "sha256": "c455c6c1ee80e6e5f173894273b347d5b3d7e88b34eec9a0e15720ae659dce0a"
+    },
+    {
+      "file": "D:\\PrototypeReference\\p1\\private\\rapid-runtime-10383370.txt",
+      "sha256": "3410f5297d84f2dc1978b373d2765e6eac0d84aa4c801b717532ac5949ab3691"
+    },
+    {
+      "file": "D:\\PrototypeReference\\p1\\private\\rapid-runtime-10360ba0.txt",
+      "sha256": "b61a7b55e6357348123c69fbb3834b3c5ca2f59cacaffd98cf001f0899cb0ce7"
+    },
+    {
+      "file": "D:\\PrototypeReference\\p1\\private\\helicopter-token-fields.txt",
+      "sha256": "0c51d928c888095fe9a049b33890b975a3cd5d9cbf516345aff0f52a459164d3"
+    },
+    {
+      "file": "D:\\PrototypeReference\\p1\\private\\helicopter-token-callers-10382ee0.txt",
+      "sha256": "d87511e54ee34730fcac0c5a3db001c9dbb53bb4995783012858b1ac029d7b0b"
+    },
+    {
+      "file": "D:\\PrototypeReference\\p1\\private\\helicopter-token-callers-10364d20.txt",
+      "sha256": "3f53f97b779b4b0dd32ff654a105f8f8c418f854e60ab67be5e820b5f9dbe62f"
+    }
+  ],
+  "constantsFloat32": {
+    "10d93cc4": 0.5,
+    "10d93ff8": -1.0,
+    "10df8cf4": 2.0,
+    "10d93f78": 0.0,
+    "10df8cec": 9.999999747378752e-06
+  },
+  "fields": {
+    "globalRootPointer": "[0x11263a00]",
+    "managerPointer": "root+0x1c",
+    "managerAllocationBytes": "0x1a28",
+    "ownerHandle": "manager+0x504 (hex; decimal 1284), 16-bit index then 16-bit generation",
+    "remainingLease": "manager+0x508 (hex; decimal 1288), float seconds",
+    "entityHandleTable": "[0x11282fc4], stride 8; object pointer+0, generation+4"
+  },
+  "acquisition": [
+    "10383fa0 has a single slot (10383fe0 cmp esi,1). An index FFFF, mismatching handle-table generation, null current object pointer, or equal full requester handle reaches the available branch. A valid different handle returns false.",
+    "At 10383ff4/10383ffb only requestedSeconds > 0 writes BOTH owner and duration. A check using -1 returns availability with no writes, even when the old handle is stale. The requester handle itself is not separately validated in this function.",
+    "10384040 selects float 0.5 for Request=true and -1 for Request=false. Same-owner positive requests overwrite duration, rather than taking its maximum; a 0.5-second request can shorten an existing 2-second refresh.",
+    "Refresh action start callback 101e44a0 requests 2 seconds and returns the acquisition result. Update callback 101e7a20 returns false only if action+0x1c is null; otherwise it requests 2 seconds using owner action+0x28 and unconditionally returns AL=1, even if the manager denied acquisition."
+  ],
+  "expiry": [
+    "10382ee0 tail 1038321d..10383248: read remaining; skip if remaining<0; subtract incoming float dt; store; invalidate owner only if resulting remaining<0. Exact zero keeps ownership until a later positive dt. Clearing writes FFFF at +0x504 and zero at +0x506; negative remaining is retained.",
+    "Caller 10360a40 compares root+0 with root+4 to avoid duplicate work in one epoch. It obtains clock data through 10823430, uses float at returned object+0x30, skips zero dt, stamps root+4, then calls manager update at 10360ab5. The timer is not decremented per aircraft.",
+    "No immediate action-exit release is established: Refresh action slot6 is 101e7a60 (ret only). Its destructor 101e79f0 -> 101e4d10 detaches action state without a manager/token call. Direct +0x504/+0x508 accesses in this manager family resolve to construction, acquisition and expiry; this bounded audit does not prove absence of arbitrary indirect memory writes."
+  ],
+  "lifetime": [
+    "10364d20 allocates one 0x1060-byte root, invokes 10364980 and stores its pointer in global 11263a00. Root constructor allocates the 0x1a28 manager, constructs it via 103854e0 at 10364a09, and stores it at root+0x1c at 10364a17.",
+    "Manager constructor initializes the owner through 107dad20 (FFFF index, zero generation) at 103855af and remaining=-1 at 103855bc.",
+    "10364d90 destroys/frees the root and nulls the global. Root destructor 10364b90 calls manager cleanup 10385750 at 10364c43, frees it, and nulls root+0x1c at 10364c56.",
+    "Root creation is called by 104e50b0 at 104e51be; that surrounding routine contains Level, LOADINGSPLASH, startup assets and InGame Simulation Task setup. Teardown 104e5c90 calls root destruction at 104e62c4. Active-level/session scope is inferred from this surrounding load/teardown code; the global pointer and lack of target/team/aircraft keys are direct evidence."
+  ],
+  "navigationBoundary": [
+    "Correction:101ed6c0 removes an anonymous sphere via10383370; it is not ReserveVolumeAction finish. RTTI ReserveVolumeAction vtable10dccaa4 has finish101fedb0, which removes an owned sphere/OBB by actor handle via103853d0. Neither mechanism clears the attack token. See helicopter-strafe-cache-volume-source.json.",
+    "10383370 removes by approximate position from anonymous16-byte sphere vectors at manager+0x50c/+0x830. Real ReserveVolume uses the separate owned0x44-byte shape vector at+0xba8, owner+0x40, and a50-entry bound; do not confuse their lifecycle or conflict tests.",
+    "Air-navigation-map getter 10360ba0 returns root+0x28, distinct from the token/reservation manager at root+0x1c. Terrain corridor availability does not by itself grant this token.",
+    "Decoded strafeRun branch at FIG offset70720 uses HaveStrafeRunToken RequestIt=true; offset70824 ReserveVolume has Radius5, StrafeRun=true, TimeBegin0/TimeEnd-1; offset70864 refresh track also spans TimeBegin0/TimeEnd-1. SimpleOpenStrafeRun at offsets72608/72712 similarly requests then refreshes. Bank condition re-evaluation can therefore overwrite the same owner lease."
+  ],
+  "minecraftAdaptation": [
+    "One helper instance per ServerLevel, supplied by a future coordinator; no process-global static owner and no per-target/per-team token. This world partition is explicitly an MC adaptation, not evidence of native multiple dimensions.",
+    "UUID plus a same-world present/not-removed entity lookup substitutes for native index+generation+nonnull-pointer validity. Do not equate validity with current target, current attack action or health>0. Lookup must not force chunk loading.",
+    "Advance once per world simulation step using a float duration. Do not convert the source strict-negative boundary into an unconditional <=0 tick deadline; floating subtraction can affect exact-zero timing.",
+    "No release API is introduced. Stopping refresh leaves the token to expire naturally; entity invalidation permits another positive request; world unload discards the coordinator. Null arguments and nonfinite/negative dt are rejected as MC boundary constraints.",
+    "The helper refresh method returns actual acquisition success. Integrating the original action lifecycle must separately preserve the start-callback vs update-callback return-value difference."
+  ],
+  "files": [
+    {
+      "file": "D:\\blacklight-evolution\\src\\main\\java\\com\\codex\\blacklight\\military\\aircraft\\HelicopterAttackLease.java",
+      "sha256": "325ceba1ac1dc0a7f47a72d1eb97a81ef5853d85b62d9a60231e3b979c1abac9"
+    },
+    {
+      "file": "D:\\blacklight-evolution\\src\\test\\java\\com\\codex\\blacklight\\military\\aircraft\\HelicopterAttackLeaseTest.java",
+      "sha256": "14e9d1283762c25865cf834396fae55d357f71ffb26088e72fd9c181716bc7a0"
+    }
+  ],
+  "pending": [
+    "Compilation and eight source-derived JUnit cases intentionally not executed.",
+    "No native token emulator oracle was run.",
+    "PrepareTightStrafeRun/TightStrafeRun, corridor-volume registration and native-to-MC navigation units remain separate work.",
+    "ServerLevel token/cache/owned-volume coordinator now exists; live action integration and execution remain separately tracked."
+  ],
+  "cacheVolumeSupplement": "helicopter-strafe-cache-volume-source.json"
+}

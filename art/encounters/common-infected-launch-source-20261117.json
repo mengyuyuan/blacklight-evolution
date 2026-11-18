@@ -1,0 +1,223 @@
+{
+  "date": "2026-11-17",
+  "state": "Implemented in both source trees; static inspection only. No build, unit/GameTest or game/player validation executed.",
+  "scope": "Common infected JumpTo initial velocity and source gravity driver. Replaces fixed .45 lift and vanilla air drag during released flight, retaining existing source tracking, conditional right-wrist hit and landing states.",
+  "source": {
+    "game": "Prototype 1",
+    "fig": "D:\\PrototypeReference\\p1\\input\\comparison\\infected2_all_fig.p3d.rz",
+    "figSha256": "c6699a17e82e5940d7efd8eb6fe931f6e81c0cd4d7d9e5c7c5bafb541e7cda4f",
+    "runtime": "D:\\PrototypeReference\\p1\\input\\prototypeenginef.dll",
+    "runtimeSha256": "8cba8da3412df4f49cd61d02445e87a0cda551dea4f2fc1e66b19c1bfe28a760",
+    "trackOffset": 13028,
+    "payloadOffset": 13040,
+    "payloadBytes": 100,
+    "offsetMeaning": "decompressed FIG/P3D bytes",
+    "fieldOrderRecord": "art/encounters/common-infected-jumpto-source-20261117.json",
+    "parameters": {
+      "launchAngleDegrees": 57,
+      "minLaunchAngleDegrees": 0,
+      "gravityPerSecondSquared": 30,
+      "nearTargetSpeed": 5,
+      "maximumInitialSpeed": 17,
+      "targetDistanceWhenNoTarget": 5,
+      "useDistanceWhenUsingTarget": false,
+      "offset": [
+        0,
+        0,
+        0
+      ],
+      "blendInSeconds": 0,
+      "blendOutSeconds": 0.3333329856
+    },
+    "evidence": [
+      {
+        "file": "D:\\PrototypeReference\\p1\\private\\rapid-runtime-100e2510.txt",
+        "sha256": "9ce347951388bc46a8b9fe6ffa3bcb04605b8059afa90260491ede194dba7cac"
+      },
+      {
+        "file": "D:\\PrototypeReference\\p1\\private\\rapid-runtime-100e17a0.txt",
+        "sha256": "bbe70267f1a9ca1cb1c72b4b9d334baffebf88cd0d275dda6e7fa3cea6808079"
+      },
+      {
+        "file": "D:\\PrototypeReference\\p1\\private\\rapid-runtime-10125c60.txt",
+        "sha256": "673fd2c13fbf8313ba0a29789156cf75772614fc1fbd45526a7a2ecc5a11c46f"
+      },
+      {
+        "file": "D:\\PrototypeReference\\p1\\private\\rapid-runtime-100e1b60.txt",
+        "sha256": "37a7a5d09145a078918c1849c466eedcf986dacb2a2fb5278326684fd604a802"
+      },
+      {
+        "file": "D:\\PrototypeReference\\p1\\private\\rapid-runtime-100e0ef0.txt",
+        "sha256": "81f72d4f6c711254d90dc5890c8236c84f247e85122e1e1a4065f1329d2eb869"
+      },
+      {
+        "file": "D:\\PrototypeReference\\p1\\private\\rapid-runtime-101262f0.txt",
+        "sha256": "e337e51f9968ac6a0b0f64947b371459996736add98edddae612a9e7e2c431f4"
+      },
+      {
+        "file": "D:\\PrototypeReference\\p1\\private\\rapid-runtime-100e2990.txt",
+        "sha256": "3b3c073d0f3b3f0eaca4edcd8482218082c077e8a7d3166a3d751b40434998a8"
+      },
+      {
+        "file": "D:\\PrototypeReference\\p1\\private\\rapid-runtime-100e2b60.txt",
+        "sha256": "65f41fde7a00f35350e69adb92d1ded794e399ae0e7432b21626b6337a3459ae"
+      },
+      {
+        "file": "D:\\PrototypeReference\\p1\\private\\rapid-runtime-1093ffc0.txt",
+        "sha256": "23d599621b4d0fc5f620c5a3d0d031a25e8abd51b53e39b90d50b4e19e8aeab7"
+      },
+      {
+        "file": "D:\\PrototypeReference\\p1\\private\\rapid-runtime-10941350.txt",
+        "sha256": "e1ddf8fb9f7b0e947d892917b8bfac86bb6031ea188d39160d4f95255c844834"
+      },
+      {
+        "file": "D:\\PrototypeReference\\p1\\private\\rapid-runtime-109410c0.txt",
+        "sha256": "df2e37d84915682631d01e2709cbd9187a51080fb9a5d77f4b65c84b420313ac"
+      },
+      {
+        "file": "D:\\PrototypeReference\\p1\\private\\rapid-runtime-10941370.txt",
+        "sha256": "b75fca1f3f2b4bb725c061113c8aa79b373f8d24553bcb5a7f63a240f0e70ce1"
+      },
+      {
+        "file": "D:\\PrototypeReference\\p1\\private\\rapid-runtime-109413d0.txt",
+        "sha256": "45aeb758339d7e103d8b2422f5a198f55bec43ee7e302f480c8e1c4f51aed3d9"
+      }
+    ]
+  },
+  "runtimeProof": [
+    {
+      "address": "100e2510 / 100e2990",
+      "meaning": "Resolve retained target again at release, query its position and motion. Nonzero target motion takes 100e1b60; failure returns to 100e17a0. Thus the earlier five-tick aim cutoff does not freeze the release destination. Both charge-dependent speed bounds have equal min/max values in this FIG."
+    },
+    {
+      "address": "100e17a0 -> 10125c60",
+      "meaning": "D=target-self, R=length(D.xz), H=D.y, elevation=asin(H/length(D)). Positive elevation interpolates 57 degrees toward pi/2; negative elevation interpolates toward minLaunchAngle=0. Static branch clamps angle to +/- (pi/2-.01). Direction is the target horizontal heading at that elevation."
+    },
+    {
+      "address": "100e19a7..100e1a61",
+      "meaning": "Only R<1 AND abs(H)<1 use minInitialVelocity=5. Otherwise v=sqrt(g*R^2/[2*(cos(angle)*sin(angle)*R-cos(angle)^2*H)]) for positive denominator, else maxSpeed. Speed is capped at 17; there is no unconditional minimum-speed clamp."
+    },
+    {
+      "address": "100e1b60 -> 100e0ef0 -> 101262f0",
+      "meaning": "Moving-target search starts at the elevation-adjusted angle and maximum speed. It computes positive horizontal intercept time using horizontal speed=maxSpeed*cos(angle). Result velocity is D/t+targetVelocity with extra Y=.5*t*(targetGravity-selfGravity), selfGravity=-30. The queried target signed acceleration is clamped to [-50,50]."
+    },
+    {
+      "address": "100e1cc2..100e1e61",
+      "meaning": "At most 20 iterations. No intercept or velocity elevation below minLaunchAngle lowers angle by .1 rad; speed over current maximum raises angle. Reversing search direction multiplies angular step by .7. Intercept time <.1 seconds lowers candidate maximum speed by 2, aborting below min speed. Failed search uses static fallback; no retry loop is scheduled by this solver."
+    },
+    {
+      "address": "100e2bc1..100e2c26",
+      "meaning": "First call tracking(50 degrees/sec, dt); then velocity=direction*speed, velocity.y-=gravity*dt; normalize and store updated speed."
+    },
+    {
+      "address": "1093ffc0 / 10941350 / 109410c0, especially 10941210..1094124a",
+      "meaning": "Action writes its gravity-adjusted velocity into the root-local DeltaTransform velocity field +60 and sets +78. Driver advance multiplies each component by dt before writing translation. No .91/.98 air drag or extra constant gravity occurs in this chain."
+    },
+    {
+      "address": "10941370 / 109413d0",
+      "meaning": "The driver supplies that resulting translation to the choreo blend path. Exact original collision controller and blend-out motion are not claimed as ported."
+    }
+  ],
+  "implemented": [
+    "Static/elevation-adjusted ballistic launch and bounded moving-target intercept solver are shared pure helpers.",
+    "Native 30 units/sec^2 becomes .075 blocks/tick^2; source speeds divide by 20. Tracking precedes gravity, and the resultant velocity supplies one move in the released flight travel override.",
+    "Private leapFlight ownership is cleared through cancelAttack, goal stop/finish, landing and save-data read. Travel also checks combat availability, hurtTime, passengers, water/lava and attack validity, so a stopped/captured goal cannot keep driving native flight.",
+    "No persistent NoGravity flag, teleport movement, duplicated move, generic boss/shared motion edit or new audio/registry hook is introduced.",
+    "The untracked launch preview uses the same gravity-before-displacement order, clips the final descending sample to the expected landing height, and keeps whole-body/one-block-border loaded-chunk checks. Actual next-step track/gravity bounds are separately checked before movement.",
+    "Failed release before the first move zeros the provisional launch velocity; invalid flight targets and cover retain the existing MC cancellation gates.",
+    "Existing source approach probes still do no damage. Only the delayed rendered-right-wrist sweep can attempt damage once."
+  ],
+  "minecraftAdaptationsAndLimits": [
+    "One native length unit is mapped to one block and one tick to .05 seconds. Source continuous ballistic solution and source gravity-before-move update are retained; no distance/speed fudge is added to compensate for 20 Hz discretization.",
+    "Position query submode 2 maps to receiving AABB centers. Grounded target motion drops residual negative gravity. Neo uses target.getGravity(); Forge uses ForgeMod.ENTITY_GRAVITY; slow falling and levitation supply a local constant-acceleration estimate. Fluid/elytra/no-gravity targets use constant velocity. Native target acceleration query semantics are established by the ballistic use, not a full port of every native movement component.",
+    "Moving-target prediction deliberately does not reproduce future Minecraft target drag, steering or landing. Native solver likewise uses a single motion/acceleration sample. Its acceleration clamp remains [-50,50] source units.",
+    "Finite/near-zero and vertical-displacement fallbacks prevent NaN. The AI requires horizontal range 3..5 and vertical feet difference <=.8, so exact vertical-axis fallback does not change normal entry.",
+    "Native driver blendIn is zero. Original .333333-second blendOut and complete choreo collision blending remain unported; release ends into existing MC landing/cancel physics.",
+    "LivingEntity still performs its ordinary pre-goal tiny-component cutoff, collision/step resolution, fall damage and network interpolation. During active flight its travel movement-input/air-drag/gravity block is replaced with the source step; afterwards ordinary travel resumes.",
+    "Existing AI entry range/cooldown/timeout, target/LOS legality, loaded-chunk safety, and authored civilian skeleton are explicit adaptations. Release/land source clips remain unresolved in the currently inspected infected2_all clip package; this patch does not claim original bone animation."
+  ],
+  "pendingValidation": {
+    "unitClass": "com.codex.blacklight.infection.CommonInfectedLeapTest",
+    "newUnitMethods": [
+      "staticLaunchUsesElevationAndTheSourceBallisticEquation",
+      "fiveIsOnlyTheCloseTargetSpeedAndSeventeenIsTheCap",
+      "movingLaunchInterceptsHorizontalMotionAndRelativeGravity",
+      "sourceGravityRunsAfterTrackingAndBeforeOneUnattenuatedMove"
+    ],
+    "updatedUnitMethod": "rangedEntryIsBoundedAndDoesNotReplaceCloseMelee no longer locks the obsolete ten-step vanilla trajectory",
+    "gameClass": "com.codex.blacklight.gametest.CommonInfectedLeapGameTest",
+    "newGameMethod": "releasedFlightMovesOnceWithoutVanillaDragAndNoAiReleasesIt",
+    "entry": "Both tools/player-fix-unit.init.gradle already include CommonInfectedLeapTest; tools/player-creature-regression.init.gradle / playerCreatureServer already whitelist CommonInfectedLeapGameTest.",
+    "retainExistingCases": [
+      "actual delayed single wrist hit",
+      "moving prey sidestep remains evadable",
+      "new cover during windup/flight",
+      "low ceiling rejects without repeated jumps"
+    ],
+    "playerChecks": [
+      "Flat ground and +/-half-block elevation: confirm visible rising/descending leap with one delayed wrist strike, then walking recovery.",
+      "Sidestep during windup and in flight: release resolves current committed prey, airborne turn remains limited rather than snapping.",
+      "Grab or hit the infected in midair; enter a vehicle; add cover; move near unloaded terrain: no continued attack driver or late strike.",
+      "At slabs/stairs/low beams confirm no floor-preview false rejection, clipping, repeated leap cycle or leftover NoGravity.",
+      "Observe a network client: yaw, rendered wrist and actual damage follow one trajectory without duplicated movement."
+    ]
+  },
+  "staticValidation": [
+    "Original FIG/setter field mapping reused and source functions independently disassembled; no native code executed.",
+    "Native float constants .5, negative zero, 2/pi, angular step .1 and reduction .7 read from PE data.",
+    "Both dedicated helpers and unit files byte-identical; entity/game differences limited to existing platform APIs plus target gravity accessor.",
+    "Scoped git diff --check completed with only existing line-ending notices."
+  ],
+  "notRun": [
+    "Java",
+    "javac",
+    "Gradle",
+    "unit tests",
+    "GameTests",
+    "game/client",
+    "native DLL execution/emulation",
+    "audio/media playback"
+  ],
+  "files": {
+    "blacklight-evolution": [
+      {
+        "file": "src/main/java/com/codex/blacklight/infection/CommonInfectedLeap.java",
+        "sha256": "25aac7d1d99355dff57d5b6c3a217037cbabb21c4dd5458d8f0a69660d9b0cad"
+      },
+      {
+        "file": "src/main/java/com/codex/blacklight/entity/BlacklightCommonInfected.java",
+        "sha256": "9b8773793d5cce0a5368433a068c4220b8117fb3f3bb163e60c54b07928e2d6e"
+      },
+      {
+        "file": "src/test/java/com/codex/blacklight/infection/CommonInfectedLeapTest.java",
+        "sha256": "17290b418cf2ba253b54421ebd95e6897aea964ddde8147106f46bfbf2399138"
+      },
+      {
+        "file": "src/feedbackTest/java/com/codex/blacklight/gametest/CommonInfectedLeapGameTest.java",
+        "sha256": "1796faa8a42018e184c2b49a31f755c9427fa6295b55c09b943681848ca12256"
+      }
+    ],
+    "blacklight-evolution-forge-1.20.1": [
+      {
+        "file": "src/main/java/com/codex/blacklight/infection/CommonInfectedLeap.java",
+        "sha256": "25aac7d1d99355dff57d5b6c3a217037cbabb21c4dd5458d8f0a69660d9b0cad"
+      },
+      {
+        "file": "src/main/java/com/codex/blacklight/entity/BlacklightCommonInfected.java",
+        "sha256": "0cd517ec29e51bdfeea7fa6582b2b1fbaa3f480afcbe484945f38d37c25efddf"
+      },
+      {
+        "file": "src/test/java/com/codex/blacklight/infection/CommonInfectedLeapTest.java",
+        "sha256": "17290b418cf2ba253b54421ebd95e6897aea964ddde8147106f46bfbf2399138"
+      },
+      {
+        "file": "src/feedbackTest/java/com/codex/blacklight/gametest/CommonInfectedLeapGameTest.java",
+        "sha256": "b65e4c13a320536ad802cbafa9e57b9fbf95d1430db061b854e2609d2c459b3d"
+      }
+    ]
+  },
+  "rootExitContinuation": {
+    "record": "art/encounters/common-infected-root-exit-source-20261117.json",
+    "meaning": "Later static proof identifies .333333 as root-motion driver weight, not skeletal pose blending. Bounded horizontal MC exit now integrated; this document retains its earlier historical file snapshots."
+  }
+}

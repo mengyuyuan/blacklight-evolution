@@ -20,6 +20,11 @@ public final class GunplaySounds {
     public static void register(IEventBus bus){SOUNDS.register(bus);}
     private static SoundSource source(LivingEntity actor){return actor instanceof Player?SoundSource.PLAYERS:SoundSource.HOSTILE;}
     public static void fire(ServerLevel level,LivingEntity actor,Vec3 at,int weapon){
+        String vehicle=com.codex.blacklight.military.vehicle.VehicleSounds.shotCue(weapon);
+        if(!vehicle.isEmpty()){
+            level.playSound(null,at.x,at.y,at.z,com.codex.blacklight.military.vehicle.VehicleSounds.event(vehicle),source(actor),
+                    com.codex.blacklight.military.vehicle.VehicleSounds.shotVolume(weapon),.97F+level.random.nextFloat()*.06F);return;
+        }
         String cue=GunplayEffects.cannon(weapon)?"cannon":weapon==2||weapon==12?"heavy":GunplayEffects.bullet(weapon)?"rifle":"launcher";
         level.playSound(null,at.x,at.y,at.z,EVENTS.get(cue).get(),source(actor),cue.equals("cannon")?3.6F:1.5F,.96F+level.random.nextFloat()*.08F);
     }

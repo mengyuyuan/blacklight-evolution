@@ -1,0 +1,18 @@
+import fs from 'node:fs';
+const a='D:/blacklight-evolution/',b='D:/blacklight-evolution-forge-1.20.1/',java='src/main/java/com/codex/blacklight/';
+function adapt(s){return s.replaceAll('net.neoforged.api.distmarker.','net.minecraftforge.api.distmarker.').replaceAll('net.neoforged.neoforge.','net.minecraftforge.').replaceAll('net.neoforged.bus.api.','net.minecraftforge.eventbus.api.').replaceAll('net.neoforged.fml.common.EventBusSubscriber','net.minecraftforge.fml.common.Mod.EventBusSubscriber').replaceAll('net.minecraftforge.network.PacketDistributor','com.codex.blacklight.forge.PacketDistributor').replaceAll('net.minecraft.network.RegistryFriendlyByteBuf','net.minecraft.network.FriendlyByteBuf').replaceAll('RegistryFriendlyByteBuf','FriendlyByteBuf').replaceAll('net.minecraft.network.codec.StreamCodec','com.codex.blacklight.forge.codec.StreamCodec').replaceAll('net.minecraft.network.protocol.common.custom.CustomPacketPayload','com.codex.blacklight.forge.CustomPacketPayload').replaceAll('ResourceLocation.fromNamespaceAndPath(','new ResourceLocation(').replaceAll('Math.clamp(','net.minecraft.util.Mth.clamp(').replaceAll('.getPartialTick().getGameTimeDeltaPartialTick(false)','.getPartialTick()').replaceAll('ParticleTypes.DUST_PLUME','ParticleTypes.POOF');}
+for(const f of ['combat/ContactEffectsQueue.java','combat/ContactEffects.java','network/ContactEffectsPayload.java','client/renderer/ContactEffectsPresentation.java','client/renderer/ContactTerrainDebris.java','registry/ModInfectedSounds.java'])fs.writeFileSync(b+java+f,adapt(fs.readFileSync(a+java+f,'utf8')));
+// Preserve each renderer's version-specific vertex implementation. Only port the shared receipt entry point.
+for(const f of ['client/renderer/CombatImpactRenderer.java','client/renderer/InfectedImpactVisuals.java']){
+ const source=fs.readFileSync(a+java+f,'utf8');let dest=fs.readFileSync(b+java+f,'utf8');
+ const start=source.indexOf('    public static void accept('),end=source.indexOf('    @SubscribeEvent public static void render(',start);
+ const ds=dest.indexOf('    public static void accept('),de=dest.indexOf('    @SubscribeEvent public static void render(',ds);
+ if([start,end,ds,de].some(n=>n<0))throw Error('Missing renderer anchors '+f);
+ dest=dest.slice(0,ds)+adapt(source.slice(start,end)).replace('BURSTS.removeFirst()','BURSTS.remove(0)')+dest.slice(de);
+ dest=dest.replace('CombatImpactPayload event,long started','CombatImpactPayload event,double started').replace('double time=mc.level.getGameTime()+e.getPartialTick();','double time=com.codex.blacklight.combat.ContactEffectsQueue.renderTime(mc.level.getGameTime(),e.getPartialTick());');fs.writeFileSync(b+java+f,dest);
+}
+const f='entity/BlacklightHunter.java';let h=fs.readFileSync(b+java+f,'utf8');
+h=h.replace(/\s*(?:com\.codex\.blacklight\.registry\.)?ModInfectedSounds\.play\(this,(?:com\.codex\.blacklight\.infection\.)?InfectedSoundCue\.GROUND,groundImpact\);/g,'').replace(/\s*level\.playSound\(null,groundImpact\.x,groundImpact\.y,groundImpact\.z,state\.getSoundType\(\)\.getBreakSound\(\),net\.minecraft\.sounds\.SoundSource\.HOSTILE,[^;]+;/g,'');fs.writeFileSync(b+java+f,h);
+for(const f of ['src/test/java/com/codex/blacklight/combat/ContactEffectsQueueTest.java','tools/juggernaut-test.init.gradle'])fs.copyFileSync(a+f,b+f);
+const test='src/test/java/com/codex/blacklight/network/ContactEffectsPayloadTest.java';fs.writeFileSync(b+test,adapt(fs.readFileSync(a+test,'utf8')).replace('Unpooled.buffer(),RegistryAccess.EMPTY','Unpooled.buffer()'));
+console.log('Synced timestamped contact effects and shared presentation entry points.');

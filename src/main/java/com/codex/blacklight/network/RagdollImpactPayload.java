@@ -9,7 +9,13 @@ import java.util.*;
 
 /** Confirmed server contact; clients simulate cosmetics, never damage or loot. */
 public record RagdollImpactPayload(int entityId,int motion,int ticks,int freeze,boolean sharp,boolean refinement,int severMask,
-                                   double vx,double vy,double vz,List<CutImpulse> cuts,List<CutPlane> planes,List<Wound> wounds,long at) implements CustomPacketPayload {
+                                   double vx,double vy,double vz,List<CutImpulse> cuts,List<CutPlane> planes,List<Wound> wounds,long at,boolean fatal) implements CustomPacketPayload {
+    /** Compatibility constructors do not guess fatality from motion/ticks. Only
+     * the authoritative sender can mark an accepted death. */
+    public RagdollImpactPayload(int entityId,int motion,int ticks,int freeze,boolean sharp,boolean refinement,int severMask,
+                                double vx,double vy,double vz,List<CutImpulse> cuts,List<CutPlane> planes,List<Wound> wounds,long at){
+        this(entityId,motion,ticks,freeze,sharp,refinement,severMask,vx,vy,vz,cuts,planes,wounds,at,false);
+    }
     public RagdollImpactPayload(int entityId,int motion,int ticks,int freeze,boolean sharp,boolean refinement,int severMask,
                                 double vx,double vy,double vz,List<CutImpulse> cuts,List<CutPlane> planes,List<Wound> wounds){
         this(entityId,motion,ticks,freeze,sharp,refinement,severMask,vx,vy,vz,cuts,planes,wounds,-1);
@@ -68,7 +74,7 @@ public record RagdollImpactPayload(int entityId,int motion,int ticks,int freeze,
                         b.writeVarInt(span.points.size());for(var point:span.points)writeVector(b,point);}}
                 b.writeVarInt(p.wounds.size());
                 for(var wound:p.wounds){b.writeVarInt(wound.region);writeVector(b,wound.point);writeVector(b,wound.direction);b.writeFloat(wound.strength);}
-                b.writeLong(p.at);
+                b.writeLong(p.at);b.writeBoolean(p.fatal);
             },RagdollImpactPayload::read);
     private static RagdollImpactPayload read(RegistryFriendlyByteBuf b){
         int entity=b.readVarInt(),motion=b.readVarInt(),ticks=b.readVarInt(),freeze=b.readVarInt();boolean sharp=b.readBoolean(),refinement=b.readBoolean();int mask=b.readVarInt();
@@ -106,7 +112,7 @@ public record RagdollImpactPayload(int entityId,int motion,int ticks,int freeze,
                 throw new IllegalArgumentException("Invalid wound");
             wounds.add(new Wound(region,point,direction.normalize(),strength));
         }
-        return new RagdollImpactPayload(entity,motion,ticks,freeze,sharp,refinement,mask,x,y,z,cuts,planes,wounds,b.readLong());
+        return new RagdollImpactPayload(entity,motion,ticks,freeze,sharp,refinement,mask,x,y,z,cuts,planes,wounds,b.readLong(),b.readBoolean());
     }
     private static void writeVector(RegistryFriendlyByteBuf b,Vec3 v){b.writeFloat((float)v.x);b.writeFloat((float)v.y);b.writeFloat((float)v.z);}
     private static Vec3 readVector(RegistryFriendlyByteBuf b){return new Vec3(b.readFloat(),b.readFloat(),b.readFloat());}

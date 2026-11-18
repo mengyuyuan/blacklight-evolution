@@ -4,6 +4,14 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 class CommonInfectedMotionTest{
+    @Test void twoHandedLungeLoadsThenExtendsBothArmsAndFullyRecovers(){
+        var load=CommonInfectedMotion.sample(200,0,0,true,9,2);
+        var hit=CommonInfectedMotion.sample(200,0,0,true,14,2);
+        assertTrue(load.elbowR()<-.9&&load.elbowL()<-.9);
+        assertTrue(hit.armR()<-1.5&&hit.armL()<-1.5&&hit.elbowR()>-.2&&hit.torso()>load.torso());
+        assertEquals(14,CommonInfectedMotion.contactTick(2));assertEquals(34,CommonInfectedMotion.duration(2));
+        assertEquals(CommonInfectedMotion.sample(200,0,0,true,-1,2),CommonInfectedMotion.sample(200,0,0,true,34,2));
+    }
     @Test void sharedRendererSamplingCannotLeakBetweenCitizensOrDependOnFrameOrder(){
         var expected=CommonInfectedMotion.sample(481.25,2,.7F,true,11,1);
         for(int i=0;i<400;i++)CommonInfectedMotion.sample(i,i*.17F,.2F,false,i%27,i%2);

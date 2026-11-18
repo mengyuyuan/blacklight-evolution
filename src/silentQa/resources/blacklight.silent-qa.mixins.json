@@ -1,0 +1,8 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "com.codex.blacklight.silentqa",
+  "compatibilityLevel": "JAVA_21",
+  "client": ["HiddenWindowMixin", "NoMouseCaptureMixin", "MutedListenerMixin"],
+  "injectors": {"defaultRequire": 1}
+}

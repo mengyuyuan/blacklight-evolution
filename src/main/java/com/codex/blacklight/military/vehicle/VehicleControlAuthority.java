@@ -7,7 +7,7 @@ import java.util.ArrayDeque;
 import java.util.Objects;
 
 public final class VehicleControlAuthority {
-    public static final int PRIMARY_FIRE=1, SECONDARY_FIRE=2, NEXT_AMMUNITION=4, NEXT_SEAT=8, BRAKE=16;
+    public static final int PRIMARY_FIRE=1, SECONDARY_FIRE=2, NEXT_AMMUNITION=4, NEXT_SEAT=8, BRAKE=16, ASCEND=32, DESCEND=64;
     public record Session(UUID connectedPlayer, String dimension, UUID actualVehicle, boolean alive) {}
     public record Input(UUID vehicle, UUID lease, long sequence, double throttle, double steering,
             double aimYaw, double aimPitch, int actions) {}
@@ -16,6 +16,7 @@ public final class VehicleControlAuthority {
     private final UUID vehicle;
     private final String dimension;
     private final VehicleSeats seats;
+    private final int allowedActions;
     private final Map<UUID,Lease> leases=new HashMap<>();
     private static final class Lease {
         final UUID token=UUID.randomUUID(); final long revision;
@@ -23,7 +24,9 @@ public final class VehicleControlAuthority {
         long sequence=-1,tick=-1; State state=stopped(-1);
         Lease(long revision) { this.revision=revision; }
     }
-    public VehicleControlAuthority(UUID vehicle, String dimension, VehicleSeats seats) {
+    public VehicleControlAuthority(UUID vehicle, String dimension, VehicleSeats seats) {this(vehicle,dimension,seats,false);}
+    public VehicleControlAuthority(UUID vehicle, String dimension, VehicleSeats seats,boolean aircraft) {
+        allowedActions=aircraft?119:31;
         this.vehicle=Objects.requireNonNull(vehicle); this.dimension=Objects.requireNonNull(dimension); this.seats=Objects.requireNonNull(seats);
     }
     /** Session must be assembled from the server connection, never decoded from a client packet. */
@@ -35,11 +38,11 @@ public final class VehicleControlAuthority {
         Lease lease=current(session); if(lease==null || input==null || tick<0 || tick<lease.tick) return false;
         if(!vehicle.equals(input.vehicle()) || !lease.token.equals(input.lease()) || input.sequence()<0 || input.sequence()<=lease.sequence
                 || !unit(input.throttle()) || !unit(input.steering()) || !angle(input.aimYaw(),180) || !angle(input.aimPitch(),90)
-                || (input.actions() & ~(PRIMARY_FIRE|SECONDARY_FIRE|NEXT_AMMUNITION|NEXT_SEAT|BRAKE)) != 0) return false;
+                || (input.actions() & ~allowedActions) != 0) return false;
         var job=seats.job(session.connectedPlayer());
-        if(job!=VehicleDefinition.Job.DRIVER && (input.throttle()!=0 || input.steering()!=0)) return false;
+        if(job!=VehicleDefinition.Job.DRIVER && (input.throttle()!=0 || input.steering()!=0 || (input.actions()&(ASCEND|DESCEND))!=0)) return false;
         int actions=input.actions();
-        if(job==VehicleDefinition.Job.DRIVER && seats.hasGunner()) actions&=~(PRIMARY_FIRE|SECONDARY_FIRE);
+        if(job==VehicleDefinition.Job.DRIVER && seats.hasGunner()) actions&=~(PRIMARY_FIRE|SECONDARY_FIRE|NEXT_AMMUNITION);
         while(!lease.received.isEmpty() && tick-lease.received.peekFirst()>=20) lease.received.removeFirst();
         if(lease.received.size()>=20) return false;
         lease.received.addLast(tick); lease.tick=tick; lease.sequence=input.sequence();

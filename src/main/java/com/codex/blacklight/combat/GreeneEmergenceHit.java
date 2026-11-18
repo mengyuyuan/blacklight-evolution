@@ -1,5 +1,6 @@
 package com.codex.blacklight.combat;
 
+import com.codex.blacklight.entity.BlackwatchHelicopter;
 import com.codex.blacklight.entity.EncounterMob;
 import com.codex.blacklight.entity.GreeneProjectile;
 import com.codex.blacklight.entity.MilitaryVehicle;
@@ -60,6 +61,7 @@ public final class GreeneEmergenceHit {
             for(var entity:level.getEntities(owner,bounds,e->!e.isRemoved())){
                 var hull=VehicleDamageBridge.vehicle(entity);
                 if(hull!=null&&hull.health()>0)candidates.add(hull);
+                else if(entity instanceof BlackwatchHelicopter craft&&craft.health()>0)candidates.add(craft);
             }
             // Native only moves the earliest fraction to the front; it does
             // not globally sort. Keep MC spatial-query order for the rest.
@@ -104,7 +106,7 @@ public final class GreeneEmergenceHit {
         if(target.isRemoved()||target.level()!=owner.level())return false;
         if(target instanceof LivingEntity living)return eligibleLiving(living);
         if(target instanceof MilitaryVehicle hull)return hull.health()>0&&!VehicleDamageBridge.protectedHull(owner,hull);
-        return false;
+        return target instanceof BlackwatchHelicopter craft&&craft.health()>0&&!VehicleDamageBridge.protectedAircraft(owner,craft);
     }
     private Contact contact(Entity target,GreeneEmergenceShape.Sample sample){
         if(!eligible(target))return null;
@@ -147,6 +149,7 @@ public final class GreeneEmergenceHit {
             var point=new HydraHurtContact.Contact(contact.bone,contact.hit.point(),contact.hit.normal(),InfectedAttackStyle.CRUSH);
             owner.hurtEmergenceTarget(living,track.damage()*GreeneProjectile.LIVING_DAMAGE_ADAPTER*friendly,point);
         }else if(contact.target instanceof MilitaryVehicle hull)VehicleDamageBridge.hurtPhysical(owner,hull,track.damage(),null,contact.hit.point());
+        else if(contact.target instanceof BlackwatchHelicopter craft)craft.hurt(owner.damageSources().mobAttack(owner),track.damage());
     }
     public CompoundTag save(){
         var tag=new CompoundTag();tag.put("Clock",clock.save());var list=new ListTag();

@@ -1,0 +1,1302 @@
+{
+  "schema": 1,
+  "date": "2026-11-17",
+  "state": "P1 native semantics independently verified by static disassembly; runtime validation deferred",
+  "userConstraint": "Code and static source review only. No export invocation, compilation, tests, client, native emulation or media playback was performed by this audit.",
+  "sources": [
+    {
+      "path": "D:\\PrototypeReference\\p1\\input\\prototypeenginef.dll",
+      "sha256": "8cba8da3412df4f49cd61d02445e87a0cda551dea4f2fc1e66b19c1bfe28a760"
+    },
+    {
+      "path": "D:\\PrototypeReference\\p1\\private\\comparison\\mother.p3d",
+      "sha256": "f67e081a7497191554de61995bdb75fad58cfca1cb53adeb9bd0b15ef8b97df6"
+    }
+  ],
+  "scope": "P1 prototypeenginef.dll only. P2 semantics were not used as proof.",
+  "objectLayout": {
+    "Pose": {
+      "vtable": "0x10e50c44",
+      "poseDataOffset": "0x10",
+      "constructor": "0x106bd040"
+    },
+    "PoseData": {
+      "skeletonData": "+0x00 (Skeleton object +0x08)",
+      "quaternion": "+0x08",
+      "translation": "+0x0c",
+      "currentScale": "+0x18",
+      "localMatrices": "+0x20",
+      "worldMatrices": "+0x24",
+      "skinMatrices": "+0x28"
+    },
+    "SkeletonData": {
+      "parentIndexU16": "+0x38",
+      "matrixTypeU32": "+0x3c",
+      "segmentCompensateU8": "+0x40"
+    }
+  },
+  "evidence": [
+    {
+      "va": "0x106bde0e..0x106bde45",
+      "meaning": "Loader reads u16 matrixType and u32 flag. Stored compensation byte is true only when matrixType == 1 and flag != 0."
+    },
+    {
+      "va": "0x106e91e0",
+      "meaning": "Pose evaluation calls local evaluation 0x106e8740, then hierarchy evaluation 0x106e7c70; the Pose vtable entries themselves are reference-counting/destruction, not evaluation."
+    },
+    {
+      "va": "0x106e8746..0x106e8774",
+      "meaning": "Local update requires dirty bit 1 and spaces == 3. Extended matrix path requires state bit 4; the alternate rigid path does not evaluate scale. The inspected compensation occurs in the extended nonzero-matrixType path."
+    },
+    {
+      "va": "0x106e8790..0x106e8799",
+      "meaning": "SkeletonData matrixType zero chooses the general auxiliary-transform path; nonzero branches to 0x106e8a29."
+    },
+    {
+      "va": "0x106e8a29..0x106e8aed",
+      "meaning": "Builds quaternion rotation basis. Own scale from PoseData+0x18 is broadcast sx/sy/sz over the three stored basis rows, equivalent to S_i * R_i in native row-vector convention."
+    },
+    {
+      "va": "0x106e8af0..0x106e8afd",
+      "meaning": "Builds homogeneous translation row (tx,ty,tz,1) in xmm1 before the compensation branch."
+    },
+    {
+      "va": "0x106e8ade; 0x106e8b01..0x106e8b28",
+      "meaning": "Only i > 0 and nonzero compensation byte enter the branch. Parent index comes from SkeletonData+0x38. Parent scale is read from the CURRENT PoseData+0x18 array, not parent world-matrix length or bind scale. divps computes its reciprocal."
+    },
+    {
+      "va": "0x106e8b2b..0x106e8b4c",
+      "meaning": "Forms (1/spx,1/spy,1/spz,0), then multiplies the three basis rows componentwise. Translation xmm1 is not read or modified by this branch."
+    },
+    {
+      "va": "0x106e8b58..0x106e8b63",
+      "meaning": "Stores compensated basis at local +0/+0x10/+0x20 and unchanged translation xmm1 at +0x30."
+    },
+    {
+      "va": "0x106e7de4..0x106e7f22",
+      "meaning": "Child local rows are combined with parent world rows and stored as child world: W_i = L_i * W_parent in native row-vector notation; transposed column notation is W_parent * L_i."
+    },
+    {
+      "va": "0x10e54820; 0x10e54830; 0x10e54870",
+      "meaning": "Raw PE constants independently read as (0,0,0,0), (1,1,1,1), and (0,0,0,1), respectively."
+    }
+  ],
+  "equations": {
+    "nativeRowLinear": "B_i = S_i * R_i * inverse(S_parent) when compensation is enabled; otherwise S_i * R_i.",
+    "nativeRowTranslation": "L_i row 3 = (tx, ty, tz, 1), unchanged by inverse parent scale.",
+    "columnLinear": "B_i = inverse(S_parent) * R_i * S_i.",
+    "columnLocal": "L_i = T(t_i) * inverse(S_parent) * R_i * S_i; inverse(S_parent) here is homogeneous diagonal with bottom-right 1.",
+    "columnWorld": "W_i = W_parent * L_i.",
+    "warning": "Do not premultiply the complete already-translated local matrix by inverse(S_parent); that incorrectly scales t_i. Recompute reciprocal after channel/frame/action blending; blending precomputed reciprocals is not reciprocal of blended parent scale."
+  },
+  "motherSkeleton": {
+    "name": "mother_core_skeleton",
+    "chunkOffset": 4265598,
+    "joints": 56,
+    "typeAndFlagCounts": [
+      {
+        "matrixType": 1,
+        "flag": 1,
+        "count": 55
+      },
+      {
+        "matrixType": 0,
+        "flag": 0,
+        "count": 1
+      }
+    ],
+    "auxiliaryPatterns": [
+      {
+        "values": [
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          1.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "count": 56
+      }
+    ],
+    "jointTailFields": [
+      {
+        "name": "Motion_Root",
+        "chunkOffset": 4265647,
+        "matrixType": 1,
+        "flag": 1,
+        "auxiliary": [
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          1.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      {
+        "name": "Root_Grapple",
+        "chunkOffset": 4265794,
+        "matrixType": 1,
+        "flag": 1,
+        "auxiliary": [
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          1.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      {
+        "name": "Balance_Root",
+        "chunkOffset": 4265941,
+        "matrixType": 1,
+        "flag": 1,
+        "auxiliary": [
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          1.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      {
+        "name": "Character_Root",
+        "chunkOffset": 4266088,
+        "matrixType": 1,
+        "flag": 1,
+        "auxiliary": [
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          1.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      {
+        "name": "Spine_Base",
+        "chunkOffset": 4266239,
+        "matrixType": 1,
+        "flag": 1,
+        "auxiliary": [
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          1.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      {
+        "name": "Spine_1",
+        "chunkOffset": 4266386,
+        "matrixType": 1,
+        "flag": 1,
+        "auxiliary": [
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          1.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      {
+        "name": "Spine_2",
+        "chunkOffset": 4266529,
+        "matrixType": 1,
+        "flag": 1,
+        "auxiliary": [
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          1.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      {
+        "name": "Spine_3",
+        "chunkOffset": 4266672,
+        "matrixType": 1,
+        "flag": 1,
+        "auxiliary": [
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          1.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      {
+        "name": "Spine_4",
+        "chunkOffset": 4266815,
+        "matrixType": 1,
+        "flag": 1,
+        "auxiliary": [
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          1.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      {
+        "name": "Head",
+        "chunkOffset": 4266958,
+        "matrixType": 1,
+        "flag": 1,
+        "auxiliary": [
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          1.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      {
+        "name": "Head_End",
+        "chunkOffset": 4267097,
+        "matrixType": 1,
+        "flag": 1,
+        "auxiliary": [
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          1.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      {
+        "name": "Heart_1",
+        "chunkOffset": 4267240,
+        "matrixType": 1,
+        "flag": 1,
+        "auxiliary": [
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          1.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      {
+        "name": "Heart_2",
+        "chunkOffset": 4267383,
+        "matrixType": 1,
+        "flag": 1,
+        "auxiliary": [
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          1.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      {
+        "name": "Heart_3",
+        "chunkOffset": 4267526,
+        "matrixType": 1,
+        "flag": 1,
+        "auxiliary": [
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          1.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      {
+        "name": "Heart_4",
+        "chunkOffset": 4267669,
+        "matrixType": 1,
+        "flag": 1,
+        "auxiliary": [
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          1.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      {
+        "name": "Mouth",
+        "chunkOffset": 4267812,
+        "matrixType": 1,
+        "flag": 1,
+        "auxiliary": [
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          1.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      {
+        "name": "Heart_5",
+        "chunkOffset": 4267955,
+        "matrixType": 1,
+        "flag": 1,
+        "auxiliary": [
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          1.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      {
+        "name": "Heart_6",
+        "chunkOffset": 4268098,
+        "matrixType": 1,
+        "flag": 1,
+        "auxiliary": [
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          1.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      {
+        "name": "Heart_7",
+        "chunkOffset": 4268241,
+        "matrixType": 1,
+        "flag": 1,
+        "auxiliary": [
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          1.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      {
+        "name": "Horn",
+        "chunkOffset": 4268384,
+        "matrixType": 1,
+        "flag": 1,
+        "auxiliary": [
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          1.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      {
+        "name": "Body_Root",
+        "chunkOffset": 4268523,
+        "matrixType": 1,
+        "flag": 1,
+        "auxiliary": [
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          1.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      {
+        "name": "Body",
+        "chunkOffset": 4268670,
+        "matrixType": 1,
+        "flag": 1,
+        "auxiliary": [
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          1.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      {
+        "name": "Body_End",
+        "chunkOffset": 4268809,
+        "matrixType": 1,
+        "flag": 1,
+        "auxiliary": [
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          1.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      {
+        "name": "Chest_R",
+        "chunkOffset": 4268952,
+        "matrixType": 1,
+        "flag": 1,
+        "auxiliary": [
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          1.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      {
+        "name": "Chest_L",
+        "chunkOffset": 4269095,
+        "matrixType": 1,
+        "flag": 1,
+        "auxiliary": [
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          1.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      {
+        "name": "Motion_Root_Marker",
+        "chunkOffset": 4269238,
+        "matrixType": 0,
+        "flag": 0,
+        "auxiliary": [
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          1.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      {
+        "name": "Slug_02_Spine_Base",
+        "chunkOffset": 4269393,
+        "matrixType": 1,
+        "flag": 1,
+        "auxiliary": [
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          1.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      {
+        "name": "Slug_02_Spine_1",
+        "chunkOffset": 4269548,
+        "matrixType": 1,
+        "flag": 1,
+        "auxiliary": [
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          1.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      {
+        "name": "Slug_02_Spine_2",
+        "chunkOffset": 4269699,
+        "matrixType": 1,
+        "flag": 1,
+        "auxiliary": [
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          1.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      {
+        "name": "Slug_02_Spine_3",
+        "chunkOffset": 4269850,
+        "matrixType": 1,
+        "flag": 1,
+        "auxiliary": [
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          1.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      {
+        "name": "Slug_02_Spine_4",
+        "chunkOffset": 4270001,
+        "matrixType": 1,
+        "flag": 1,
+        "auxiliary": [
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          1.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      {
+        "name": "Slug_02_Spine_5",
+        "chunkOffset": 4270152,
+        "matrixType": 1,
+        "flag": 1,
+        "auxiliary": [
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          1.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      {
+        "name": "Slug_02_Head",
+        "chunkOffset": 4270303,
+        "matrixType": 1,
+        "flag": 1,
+        "auxiliary": [
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          1.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      {
+        "name": "Slug_02_Jaw_1",
+        "chunkOffset": 4270450,
+        "matrixType": 1,
+        "flag": 1,
+        "auxiliary": [
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          1.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      {
+        "name": "Slug_02_Jaw_2",
+        "chunkOffset": 4270601,
+        "matrixType": 1,
+        "flag": 1,
+        "auxiliary": [
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          1.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      {
+        "name": "Slug_02_Jaw_3",
+        "chunkOffset": 4270752,
+        "matrixType": 1,
+        "flag": 1,
+        "auxiliary": [
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          1.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      {
+        "name": "Slug_01_Spine_Base",
+        "chunkOffset": 4270903,
+        "matrixType": 1,
+        "flag": 1,
+        "auxiliary": [
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          1.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      {
+        "name": "Slug_01_Spine_1",
+        "chunkOffset": 4271058,
+        "matrixType": 1,
+        "flag": 1,
+        "auxiliary": [
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          1.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      {
+        "name": "Slug_01_Spine_2",
+        "chunkOffset": 4271209,
+        "matrixType": 1,
+        "flag": 1,
+        "auxiliary": [
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          1.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      {
+        "name": "Slug_01_Spine_3",
+        "chunkOffset": 4271360,
+        "matrixType": 1,
+        "flag": 1,
+        "auxiliary": [
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          1.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      {
+        "name": "Slug_01_Spine_4",
+        "chunkOffset": 4271511,
+        "matrixType": 1,
+        "flag": 1,
+        "auxiliary": [
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          1.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      {
+        "name": "Slug_01_Spine_5",
+        "chunkOffset": 4271662,
+        "matrixType": 1,
+        "flag": 1,
+        "auxiliary": [
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          1.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      {
+        "name": "Slug_01_Head",
+        "chunkOffset": 4271813,
+        "matrixType": 1,
+        "flag": 1,
+        "auxiliary": [
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          1.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      {
+        "name": "Slug_01_Jaw_1",
+        "chunkOffset": 4271960,
+        "matrixType": 1,
+        "flag": 1,
+        "auxiliary": [
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          1.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      {
+        "name": "Slug_01_Jaw_2",
+        "chunkOffset": 4272111,
+        "matrixType": 1,
+        "flag": 1,
+        "auxiliary": [
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          1.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      {
+        "name": "Slug_01_Jaw_3",
+        "chunkOffset": 4272262,
+        "matrixType": 1,
+        "flag": 1,
+        "auxiliary": [
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          1.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      {
+        "name": "Slug_03_Spine_Base",
+        "chunkOffset": 4272413,
+        "matrixType": 1,
+        "flag": 1,
+        "auxiliary": [
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          1.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      {
+        "name": "Slug_03_Spine_1",
+        "chunkOffset": 4272568,
+        "matrixType": 1,
+        "flag": 1,
+        "auxiliary": [
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          1.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      {
+        "name": "Slug_03_Spine_2",
+        "chunkOffset": 4272719,
+        "matrixType": 1,
+        "flag": 1,
+        "auxiliary": [
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          1.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      {
+        "name": "Slug_03_Spine_3",
+        "chunkOffset": 4272870,
+        "matrixType": 1,
+        "flag": 1,
+        "auxiliary": [
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          1.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      {
+        "name": "Slug_03_Spine_4",
+        "chunkOffset": 4273021,
+        "matrixType": 1,
+        "flag": 1,
+        "auxiliary": [
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          1.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      {
+        "name": "Slug_03_Spine_5",
+        "chunkOffset": 4273172,
+        "matrixType": 1,
+        "flag": 1,
+        "auxiliary": [
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          1.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      {
+        "name": "Slug_03_Head",
+        "chunkOffset": 4273323,
+        "matrixType": 1,
+        "flag": 1,
+        "auxiliary": [
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          1.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      {
+        "name": "Slug_03_Jaw_1",
+        "chunkOffset": 4273470,
+        "matrixType": 1,
+        "flag": 1,
+        "auxiliary": [
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          1.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      {
+        "name": "Slug_03_Jaw_2",
+        "chunkOffset": 4273621,
+        "matrixType": 1,
+        "flag": 1,
+        "auxiliary": [
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          1.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      {
+        "name": "Slug_03_Jaw_3",
+        "chunkOffset": 4273772,
+        "matrixType": 1,
+        "flag": 1,
+        "auxiliary": [
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          1.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ]
+      }
+    ],
+    "boundary": "All inspected auxiliary values are identity values. This audit does not assert a generalized decomposition for arbitrary nonidentity P1 pivot/shear auxiliary transforms."
+  },
+  "implementationReview": {
+    "state": "Read-only review of current Neo source snapshot; parent thread owns export and cross-platform synchronization.",
+    "files": [
+      {
+        "path": "D:\\blacklight-evolution\\tools\\rebind_greene_source.py",
+        "sha256": "74b296c87611de9890754af96a8c00472a5de584935e2a4cea9c6c6aa336880f"
+      },
+      {
+        "path": "D:\\blacklight-evolution\\src\\main\\java\\com\\codex\\blacklight\\combat\\GreeneMotion.java",
+        "sha256": "e245af38a83ac047e701f16da1eb273c1cebb87b9139e849401f4459147152d0"
+      },
+      {
+        "path": "D:\\blacklight-evolution\\src\\main\\java\\com\\codex\\blacklight\\combat\\SourceBossMotion.java",
+        "sha256": "bca30748abd9bf75fb5c66690ca18765e9fb97f41e08d89a2fa0a6571fc18bb4"
+      }
+    ],
+    "findings": [
+      "local_matrices modifies only effective[:3,:3] for compensation; its translation remains unchanged.",
+      "Exported parent -> native_child_offset(T) -> native_child_parent_scale(inverse parent S) -> native_child(R*S) matches the proven column-vector product.",
+      "Compensation helpers are required only for parents with SCL channels because this Mother skeleton has identity auxiliary scale. This is a source-specific optimization, not a general P1 rule.",
+      "GreeneMotion.sample, action, private blend, cycle and pose recompute reciprocal from final blended parent scale.",
+      "SourceBossMotion.transforms postmultiplies T/R/S after parent world, preserving helper order and inherited affine shear."
+    ],
+    "limitations": [
+      "No export was run by this audit.",
+      "No runtime visual, socket, hitbox or gameplay claim is made.",
+      "Native divps has no clamp; runtime rejects nonfinite or nonpositive scale. Reviewed positive-scale Mother data is the intended domain, not arbitrary reflected skeletons."
+    ]
+  },
+  "disassemblyArtifacts": [
+    {
+      "path": "D:\\PrototypeReference\\p1\\private\\rapid-runtime-106bdab0.txt",
+      "sha256": "4cfee3717bfa5556dc4d34a5bcf0e711efc3fc79c3c1863e559097e0d82dced8"
+    },
+    {
+      "path": "D:\\PrototypeReference\\p1\\private\\rapid-runtime-106e91e0.txt",
+      "sha256": "7d388311f28fee06dc14da326200538612b6e6e03194a58ab325f87e0e8952d7"
+    },
+    {
+      "path": "D:\\PrototypeReference\\p1\\private\\rapid-runtime-106e8740.txt",
+      "sha256": "d090a3a3b8fff9d39dfa1ea828e1ba56c6dc9b64d73bd1a6fb228887c0f99ecc"
+    },
+    {
+      "path": "D:\\PrototypeReference\\p1\\private\\rapid-runtime-106e7c70.txt",
+      "sha256": "96a97132516940b0c870f110d42d0ecaa2037d80829d8c354a8b2549e7735d41"
+    },
+    {
+      "path": "D:\\PrototypeReference\\p1\\private\\rapid-runtime-106e8110.txt",
+      "sha256": "e098d647d71089c8ac1075c5a61b78e68ef049bb89574276d032adc107b847e9"
+    }
+  ]
+}

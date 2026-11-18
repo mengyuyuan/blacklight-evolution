@@ -18,6 +18,29 @@ import net.neoforged.neoforge.gametest.*;
 @GameTestHolder("blacklight") @PrefixGameTestTemplate(false) @net.neoforged.fml.common.EventBusSubscriber(modid="blacklight")
 public final class P1MilitaryGameTest {
     private static final Map<UUID,List<Long>> HITS=new HashMap<>();
+    @GameTest(template="blackwatch_arena",batch="bothFactionAudio",timeoutTicks=30)
+    public static void bothFactionsKeepDentsAndEngineDriveState(GameTestHelper h){
+        arena(h);
+        var actor=net.neoforged.neoforge.common.util.FakePlayerFactory.get(h.getLevel(),new com.mojang.authlib.GameProfile(UUID.fromString("a183f311-eaf4-4bea-bb6d-a05929cc0372"),"BothFactionsQA"));
+        actor.setGameMode(net.minecraft.world.level.GameType.SURVIVAL);
+        for(var type:List.of(ModEntities.MILITARY_TRUCK,ModEntities.MILITARY_APC,ModEntities.MILITARY_TANK,ModEntities.BLACKWATCH_TRUCK,ModEntities.BLACKWATCH_APC,ModEntities.BLACKWATCH_TANK)){
+            var v=type.get().create(h.getLevel());v.setPos(h.absoluteVec(new Vec3(7.5,2,7.5)));h.getLevel().addFreshEntity(v);
+            h.assertTrue(!v.engineRunning(),"empty vehicle has no engine loop: "+v.getType());
+            var driver=(v.faction()==MilitaryFaction.MILITARY?ModEntities.MILITARY_SOLDIER.get():ModEntities.BLACKWATCH_SOLDIER.get()).create(h.getLevel());
+            driver.setAutomaticUnitJoin(false);driver.setPos(v.position());h.getLevel().addFreshEntity(driver);
+            h.assertTrue(driver.startRiding(v,true),"native crew occupies driver seat");
+            h.assertTrue(v.engineRunning(),"fuel-free vehicle engine follows driver for either faction");
+            var moved=v.moveVehicle(.12F,0);h.assertTrue(moved.distance()>0&&v.driveLoad()>0,"actual forward movement has rolling load");
+            var reverse=v.moveVehicle(-.12F,0);h.assertTrue(reverse.distance()<0&&v.driveLoad()>0,"reverse has rolling load");
+            var turn=v.moveVehicle(0,2);h.assertTrue(turn.yawDelta()!=0&&v.driveLoad()>0,"turning in place has track load");
+            v.moveVehicle(0,0);h.assertTrue(v.driveLoad()==0&&v.engineRunning(),"stationary occupied vehicle idles");
+            driver.stopRiding();driver.discard();h.assertTrue(!v.engineRunning(),"driver exit stops engine");
+            v.setYRot(0);var contact=v.position().add(v.definition().width()*.5,1.5,0);actor.setPos(contact.add(2,0,0));
+            h.assertTrue(VehicleDamageBridge.hurtPhysical(actor,v,20,null,contact)&&!v.dents().isEmpty(),"accepted player strike deforms both liveries: "+v.getType());
+            v.discard();
+        }
+        h.succeed();
+    }
     @GameTest(template="blackwatch_arena",batch="vehiclePlayerDents",timeoutTicks=40)
     public static void acceptedPlayerHitsPersistDentsAndRepairsRestoreSkin(GameTestHelper h){
         arena(h);var tank=ModEntities.BLACKWATCH_TANK.get().create(h.getLevel());tank.setPos(h.absoluteVec(new Vec3(7.5,2,7.5)));h.getLevel().addFreshEntity(tank);

@@ -10,6 +10,16 @@ import com.codex.blacklight.animation.BlacklightPose;
 /** Both participants sample the same synchronized server phase, including the controlling player. */
 public final class NativeConsumePose {
     private NativeConsumePose() {}
+    private static final java.util.Map<LivingEntity,CarryBlend> CARRY_BLEND=new java.util.WeakHashMap<>();
+    private static final class CarryBlend {String key="";long changed;BlacklightPose from,last;}
+    private static BlacklightPose blendCarry(LivingEntity entity,ConsumeVisual visual,String key,BlacklightPose pose,float partial){
+        if(!ConsumeVisual.holding(visual.stage())){CARRY_BLEND.remove(entity);return pose;}
+        var blend=CARRY_BLEND.computeIfAbsent(entity,ignored->new CarryBlend());
+        String identity=visual.consumerId()+":"+visual.started()+":"+key;
+        if(!blend.key.equals(identity)){blend.key=identity;blend.changed=entity.level().getGameTime();blend.from=blend.last;}
+        if(blend.from!=null)pose=BlacklightPose.interpolatePose(blend.from,pose,Math.clamp((entity.level().getGameTime()-blend.changed+partial)/3F,0,1));
+        blend.last=pose.copy();return pose;
+    }
     public static BlacklightPose sample(LivingEntity entity,ConsumeVisual visual,String role,float partial) {
         if(!visual.consuming()&&!GrappleMotion.active(visual))return null;
         var form=PowerForm.values()[Math.clamp(visual.form(),0,PowerForm.values().length-1)];
@@ -32,12 +42,12 @@ public final class NativeConsumePose {
             });
             for(String joint:new String[]{"Root","Thigh_L","Thigh_R","Leg_L","Leg_R","Knee_L","Knee_R"})copy.orElseEmpty(joint).rotation().identity();
         }
-        return copy;
+        return blendCarry(entity,visual,key,copy,partial);
     }
     public static boolean actor(LivingEntity entity,BlacklightPose pose,float partial) {
         if(recovery(entity,pose,partial,false))return true;
         int stage=entity.getData(ModAttachments.GRAB_STAGE);
-        if(stage!=ConsumeVisual.CONSUME&&stage!=ConsumeVisual.CAPTURE&&stage!=ConsumeVisual.HOLD&&!ConsumeSequence.mountedStage(stage))return false;
+        if(stage!=ConsumeVisual.CONSUME&&stage!=ConsumeVisual.CAPTURE&&stage!=ConsumeVisual.HOLD&&stage!=ConsumeVisual.AIR_HOLD&&stage!=ConsumeVisual.AIR_THROW&&stage!=ConsumeVisual.GRAB_ATTACK&&!ConsumeSequence.mountedStage(stage))return false;
         var victims=entity.level().getEntitiesOfClass(LivingEntity.class,entity.getBoundingBox().inflate(18),e->e.getData(ModAttachments.CONSUME_VISUAL).consumerId()==entity.getId());
         // The victim scene may clear one packet before CONSUMING/GRAB_STAGE; keep sampling the recovery copy.
         if(victims.isEmpty())return recovery(entity,pose,partial,true);
@@ -56,10 +66,16 @@ public final class NativeConsumePose {
             pose.orElseEmpty("Thigh_R").rotation().rotationXYZ(-1.2F+stroke,0,-.4F);
             pose.orElseEmpty("Leg_L").rotation().rotateX(1.6F);
             pose.orElseEmpty("Leg_R").rotation().rotateX(1.6F);
+            if(stage==ConsumeVisual.MOUNT_HOLD&&ConsumeSequence.bruteMount(victims.getFirst())){
+                var before=pose.copy();fitBruteRider(entity,victims.getFirst(),visual,pose,partial,false);
+                float enter=PhaseEntryBlend.CONSUME_ACTOR.weight(entity,visual.started(),stage,partial,4F);
+                pose.getJointTransformData().putAll(BlacklightPose.interpolatePose(before,pose,enter).getJointTransformData());
+            }
             return true;
         }
         BlacklightPose sample=sample(entity,visual,"actor",partial);if(sample==null)return false;
-        if(stage==ConsumeVisual.HOLD) {
+        String carryKey=GrappleMotion.sceneKey(entity,visual);
+        if(ConsumeVisual.holding(stage)&&!carryKey.equals("carry_air")&&!carryKey.equals("carry_sprint")) {
             var movement=entity.onGround()?com.codex.blacklight.animation.PlayerMotionController.locomotionPose(entity,partial):pose;
             // The paired source carry clips grip with the right hand for every form.
             sample=com.codex.blacklight.animation.CarryPoseLayer.holdCreature(sample,movement,!entity.onGround(),true);
@@ -81,7 +97,13 @@ public final class NativeConsumePose {
             sample.orElseEmpty("Leg_R").rotation().rotationXYZ(1.5F,0,0);
         }
         float enter=PhaseEntryBlend.CONSUME_ACTOR.weight(entity,visual.started(),visual.stage(),partial,4F);
-        pose.getJointTransformData().putAll(BlacklightPose.interpolatePose(pose,sample,enter).getJointTransformData());return true;
+        pose.getJointTransformData().putAll(BlacklightPose.interpolatePose(pose,sample,enter).getJointTransformData());
+        if(stage==ConsumeVisual.MOUNT_CONSUME&&ConsumeSequence.bruteMount(victims.getFirst()))fitBruteRider(entity,victims.getFirst(),visual,pose,partial,true);
+        return true;
+    }
+    private static void fitBruteRider(LivingEntity actor,LivingEntity victim,ConsumeVisual visual,BlacklightPose pose,float partial,boolean consuming){
+        BruteRiderPose.apply(pose,actor.getPosition(partial),victim.getPosition(partial),visual.facing(),
+                BruteMountedBody.pose(visual,victim.level().getGameTime(),partial,victim.tickCount),consuming,visual.motionProgress(victim.level().getGameTime(),partial),PowerForm.values()[net.minecraft.util.Mth.clamp(visual.form(),0,PowerForm.values().length-1)]);
     }
     private static boolean recovery(LivingEntity entity,BlacklightPose pose,float partial,boolean lingering) {
         var visual=entity.getData(ModAttachments.CONSUME_RECOVERY);
@@ -104,9 +126,9 @@ public final class NativeConsumePose {
         return true;
     }
     public static float facing(LivingEntity actor,float fallback,float partial){
-        if(actor.getData(ModAttachments.GRAB_STAGE)==ConsumeVisual.HOLD)
+        if(ConsumeVisual.holding(actor.getData(ModAttachments.GRAB_STAGE)))
             return net.minecraft.util.Mth.rotLerp(partial,actor.yRotO,actor.getYRot());
-        if(actor.getData(ModAttachments.GRAB_STAGE)!=ConsumeVisual.CONSUME)return fallback;
+        if(actor.getData(ModAttachments.GRAB_STAGE)!=ConsumeVisual.CONSUME&&actor.getData(ModAttachments.GRAB_STAGE)!=ConsumeVisual.AIR_THROW&&actor.getData(ModAttachments.GRAB_STAGE)!=ConsumeVisual.GRAB_ATTACK)return fallback;
         var victims=actor.level().getEntitiesOfClass(LivingEntity.class,actor.getBoundingBox().inflate(18),e->e.getData(ModAttachments.CONSUME_VISUAL).consumerId()==actor.getId());
         return victims.isEmpty()?fallback:victims.getFirst().getData(ModAttachments.CONSUME_VISUAL).facing();
     }

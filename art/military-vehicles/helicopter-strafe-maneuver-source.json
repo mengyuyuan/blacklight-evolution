@@ -1,0 +1,315 @@
+{
+  "schema": 1,
+  "createdLocal": "2026-11-17T01:56:36",
+  "status": "Code and static disassembly review only; no compilation, unit execution, native emulation or game execution. User explicitly deferred tests.",
+  "scope": "Independent original authored prepare/tight action geometry and transitions. Live HelicopterCombat still uses circle plus eligible hover; this helper is not yet called by live AI.",
+  "source": {
+    "file": "D:\\PrototypeReference\\p1\\input\\prototypeenginef.dll",
+    "sha256": "8cba8da3412df4f49cd61d02445e87a0cda551dea4f2fc1e66b19c1bfe28a760"
+  },
+  "decodedFig": {
+    "file": "D:\\PrototypeReference\\p1\\helicopter-weapons-complete.json",
+    "sha256": "70955751e9386c6b312918cc0843e6b808d1144dbede5b25181cf012314308fa"
+  },
+  "tracks": [
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 79660,
+      "type": "PrepareTightStrafeRun",
+      "owner": "engage_apache/engage/tactics/strafeRun/#e0c62934304df0f3/#c256ae6ac086ca79/hydra",
+      "fields": {
+        "Unknown1": 0,
+        "TimeBegin": 0,
+        "TimeEnd": -1,
+        "MinSpeed": 0.800000011920929,
+        "MaxSpeed": 1,
+        "DistanceTolerance": 10,
+        "HeightTolerance": 15,
+        "ExtraHeightStart": 12,
+        "LengthPostStart": 15,
+        "WaitTimeAtStart": 0.5,
+        "HeightAtTarget": 25,
+        "SpeedFactor": [
+          -1,
+          -1,
+          -1
+        ]
+      }
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 79816,
+      "type": "PrepareTightStrafeRun",
+      "owner": "engage_apache/engage/tactics/strafeRun/#e0c62934304df0f3/#c256ae6ac086ca79/default",
+      "fields": {
+        "Unknown1": 0,
+        "TimeBegin": 0,
+        "TimeEnd": -1,
+        "MinSpeed": 0.800000011920929,
+        "MaxSpeed": 1,
+        "DistanceTolerance": 10,
+        "HeightTolerance": 10,
+        "ExtraHeightStart": 12,
+        "LengthPostStart": 15,
+        "WaitTimeAtStart": 0.5,
+        "HeightAtTarget": 16,
+        "SpeedFactor": [
+          -1,
+          -1,
+          -1
+        ]
+      }
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 80104,
+      "type": "TightStrafeRun",
+      "owner": "engage_apache/engage/tactics/strafeRun/#e0c62934304df0f3/#44167b9762df84a/hydra",
+      "fields": {
+        "Unknown1": 0,
+        "TimeBegin": 0,
+        "TimeEnd": -1,
+        "Distance": 30,
+        "TurnRate": 300,
+        "MinSpeed": 0.800000011920929,
+        "MaxSpeed": 1,
+        "DistanceTolerance": 10,
+        "HeightTolerance": 15,
+        "ExtraHeightStart": 12,
+        "LengthPostStart": 15,
+        "FreeRadiusEnd": 2,
+        "GoBack": true,
+        "UseTargetIntermediate": false,
+        "GoUpSoon": true,
+        "HeightAtTarget": 25,
+        "TemporaryTarget": {
+          "hash": "3620576666240029626",
+          "name": "#323edf4b994e13ba"
+        },
+        "SpeedFactor": [
+          -1,
+          -1,
+          -1
+        ]
+      }
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 80288,
+      "type": "TightStrafeRun",
+      "owner": "engage_apache/engage/tactics/strafeRun/#e0c62934304df0f3/#44167b9762df84a/default",
+      "fields": {
+        "Unknown1": 0,
+        "TimeBegin": 0,
+        "TimeEnd": -1,
+        "Distance": 30,
+        "TurnRate": 300,
+        "MinSpeed": 0.800000011920929,
+        "MaxSpeed": 1,
+        "DistanceTolerance": 10,
+        "HeightTolerance": 10,
+        "ExtraHeightStart": 12,
+        "LengthPostStart": 15,
+        "FreeRadiusEnd": 2,
+        "GoBack": true,
+        "UseTargetIntermediate": false,
+        "GoUpSoon": true,
+        "HeightAtTarget": 16,
+        "TemporaryTarget": {
+          "hash": "3620576666240029626",
+          "name": "#323edf4b994e13ba"
+        },
+        "SpeedFactor": [
+          -1,
+          -1,
+          -1
+        ]
+      }
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 80604,
+      "type": "TightStrafeRun",
+      "owner": "engage_apache/engage/tactics/strafeRun/#e0c62934304df0f3/#5c18edc7e772893b/hydra",
+      "fields": {
+        "Unknown1": 0,
+        "TimeBegin": 0,
+        "TimeEnd": -1,
+        "Distance": 30,
+        "TurnRate": 300,
+        "MinSpeed": 0.800000011920929,
+        "MaxSpeed": 1,
+        "DistanceTolerance": 10,
+        "HeightTolerance": 15,
+        "ExtraHeightStart": 12,
+        "LengthPostStart": 15,
+        "FreeRadiusEnd": 2,
+        "GoBack": true,
+        "UseTargetIntermediate": false,
+        "GoUpSoon": true,
+        "HeightAtTarget": 25,
+        "TemporaryTarget": {
+          "hash": "1711308649420771879",
+          "name": "#17bfca2655c75227"
+        },
+        "SpeedFactor": [
+          -1,
+          -1,
+          -1
+        ]
+      }
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 80788,
+      "type": "TightStrafeRun",
+      "owner": "engage_apache/engage/tactics/strafeRun/#e0c62934304df0f3/#5c18edc7e772893b/default",
+      "fields": {
+        "Unknown1": 0,
+        "TimeBegin": 0,
+        "TimeEnd": -1,
+        "Distance": 30,
+        "TurnRate": 300,
+        "MinSpeed": 0.800000011920929,
+        "MaxSpeed": 1,
+        "DistanceTolerance": 10,
+        "HeightTolerance": 10,
+        "ExtraHeightStart": 12,
+        "LengthPostStart": 15,
+        "FreeRadiusEnd": 2,
+        "GoBack": true,
+        "UseTargetIntermediate": false,
+        "GoUpSoon": true,
+        "HeightAtTarget": 16,
+        "TemporaryTarget": {
+          "hash": "1711308649420771879",
+          "name": "#17bfca2655c75227"
+        },
+        "SpeedFactor": [
+          -1,
+          -1,
+          -1
+        ]
+      }
+    }
+  ],
+  "staticEvidence": [
+    {
+      "file": "D:\\PrototypeReference\\p1\\private\\rapid-runtime-10214080.txt",
+      "sha256": "a90340d1406abe33a0fbb39c363707bde4a66eaa3facc91275e8f2f54f2e38ad"
+    },
+    {
+      "file": "D:\\PrototypeReference\\p1\\private\\rapid-runtime-10214460.txt",
+      "sha256": "d78ea25f67bbea15d8cc09e3b2f359266f941287c8b3204aafcf536cc9524057"
+    },
+    {
+      "file": "D:\\PrototypeReference\\p1\\private\\rapid-runtime-10213620.txt",
+      "sha256": "2b9c93d169ee9ddf4603fae32e4a1247d18ffb025ff0547e0f0260dfff44c597"
+    },
+    {
+      "file": "D:\\PrototypeReference\\p1\\private\\rapid-runtime-10213c10.txt",
+      "sha256": "495a4eba9a5c83ed01967a91d5cfa98eb079821ee0c4cc2cb54f0f7b81ad1541"
+    },
+    {
+      "file": "D:\\PrototypeReference\\p1\\private\\rapid-runtime-10212670.txt",
+      "sha256": "ed18de713476ae84a4a0464778c398223bb151ef7bbfd3b352c26d18575def93"
+    },
+    {
+      "file": "D:\\PrototypeReference\\p1\\private\\rapid-runtime-10212830.txt",
+      "sha256": "2a7ccc6b771ff6d15c18ea97f5871608067c3bcd49ca2af2cb9037108efb718f"
+    },
+    {
+      "file": "D:\\PrototypeReference\\p1\\private\\rapid-runtime-102120c0.txt",
+      "sha256": "fea0de21e99797488fa1db2376c40b846046df9e015c38f30042b249bead74de"
+    },
+    {
+      "file": "D:\\PrototypeReference\\p1\\private\\rapid-runtime-102123d0.txt",
+      "sha256": "f4dee74f5c93e53c928bcb8814c552ad98aa1e910c3f7ee699e8db807352ef74"
+    },
+    {
+      "file": "D:\\PrototypeReference\\p1\\private\\rapid-runtime-1020c560.txt",
+      "sha256": "f1dc7ef1bd1d8eb73b9e351d0d9a8f403d33c24a9f30123ff3a691da6047d7b5"
+    },
+    {
+      "file": "D:\\PrototypeReference\\p1\\private\\rapid-runtime-1020e6d0.txt",
+      "sha256": "7d177edb21d6e56a5ada0571dd8f9835d1b434e638dd359ef0654ba7a1d1ac2c"
+    },
+    {
+      "file": "D:\\PrototypeReference\\p1\\private\\rapid-runtime-1020e1c0.txt",
+      "sha256": "3778723d22bfdb7ec7a02cfbaff3a392b1494e83339a53ef555110f99596d971"
+    },
+    {
+      "file": "D:\\PrototypeReference\\p1\\private\\rapid-runtime-103bbbe0.txt",
+      "sha256": "8f60299d631fa40667ccadeaddadc954a66799c7270feda072f3dfc8b1c58060"
+    },
+    {
+      "file": "D:\\PrototypeReference\\p1\\private\\rapid-runtime-103bab40.txt",
+      "sha256": "bc934dc2964942ed27f1561d375bda16d882eecb2eb3fbbea1d3c5535dee89b1"
+    },
+    {
+      "file": "D:\\PrototypeReference\\p1\\private\\rapid-runtime-103b83b0.txt",
+      "sha256": "1f7014c55de1c69bc62ef24895643f286d03095dde915df07d91e685f78dabe7"
+    },
+    {
+      "file": "D:\\PrototypeReference\\p1\\private\\rapid-runtime-107badf0.txt",
+      "sha256": "635cee90b85af08853fe7cf93c18a4be6fe86e6308efa3b9953bf594eddc94ec"
+    }
+  ],
+  "sourceConstants": {
+    "0x10da303c": 1e-10,
+    "0x10dcddcc": 0.9700000286102295,
+    "0x10dcdf0c": 40.0,
+    "0x10d967e8": 4.0
+  },
+  "runtimeFieldMap": {
+    "prepare": "action+0x30 start, +0x3c end, +0x48 target-ground/raised aim, +0x54 path relative rise, +0x68 cached original target, +0x74 intermediate, +0x80 elapsed, +0x84 sampled speed; config+0x1c distance tolerance, +0x20 extra start height, +0x24 target height, +0x28 height tolerance, +0x2c post-start length, +0x30/+0x34 speed range, +0x40 wait.",
+    "tight": "action+0x38 state, +0x3c start, +0x48 end, +0x54 raised aim, +0x60 path relative rise, +0x74 cached original target, +0x80 intermediate, +0x34 sampled speed; config+0x20 distance tolerance, +0x24 extra start height, +0x28 end terrain square size, +0x2c target height, +0x30 height tolerance, +0x34 post-start length, +0x38/+0x3c speed range, +0x50 GoBack."
+  },
+  "findings": [
+    "10214080 raises start/end/aim to max(target-column ground + authored target height, relative-rise field). It forms the length15 intermediate on the raised start-to-end line, then adds12 only to start.Y. The native comparison to relative rise is retained despite its unusual world-height behavior.",
+    "10213620 additionally raises end.Y by a Distance=30 terrain square query. Authored UseTargetIntermediate=false computes start+normalize(end-start)*15, then replaces intermediate.Y with raised aim.Y before adding12 to start.Y.",
+    "103bbbe0 uses XZ projection with epsilon1e-10: before start uses XZ squared distance, inside subtracts projected squared length, at/beyond end uses full3D squared distance. Target validity compares absolute difference of that helper for current versus cached target to10^2; height is compared separately to raisedAimY-targetHeight. It is not a movement-radius test.",
+    "Prepare tick state1 waits for movement to finish, validates and enters state2; state2 requires horizontal facing AND finished movement then validates, enters state3 and resets elapsed. State3 increments float elapsed and validates each tick; returns finished only when elapsed is strictly greater than0.5. The transition into waiting does not consume elapsed time.",
+    "Tight begin starts directly at state3 outbound, not states1/2. Outbound completion may enter state4 turn if GoBack and target validation succeed. Turn requires facing plus target validation, not another movement completion query; it enters state5 return to start through the same stored intermediate. Return completion ends the action.",
+    "While outbound is not completed,10213ef8 compares the squared helper result to literal40, not40^2. There is no matching per-tick gate on return. This is preserved; the helper is not changed to a conventional symmetric flight corridor.",
+    "103b83b0 considers only movement statuses2 and3 unfinished.103bab40 checks normalized horizontal forward dot strictly greater than float0.97. Native forward is negated actor basis; Java API accepts an already world-oriented forward vector.",
+    "Independent review found that Minecraft Vec3.normalize zeros short directions below1e-4 length, unlike107badf0 using squared epsilon approximately1e-10. Intermediate construction now explicitly divides by length and rejects nonfinite length from coordinate overflow."
+  ],
+  "implementation": {
+    "files": [
+      "src/main/java/com/codex/blacklight/military/aircraft/HelicopterStrafeManeuver.java",
+      "src/test/java/com/codex/blacklight/military/aircraft/HelicopterStrafeManeuverTest.java"
+    ],
+    "adaptations": [
+      "Vec3/double arithmetic replaces x86 float/x87 arithmetic; not claimed bit-exact.",
+      "Nonfinite inputs, degenerate route and invalid dt are rejected at the Java boundary.",
+      "READY/DONE versus ABORTED is a Java distinction; original callbacks return false for both finishing and invalidation.",
+      "Temporary target modes, source steering messages and movement statuses are not reimplemented here."
+    ],
+    "queuedRegressionCases": 6,
+    "executedRegressionCases": 0
+  },
+  "pending": [
+    "Native instruction fixtures for begin/tick helpers and float boundary comparisons.",
+    "Committed path/cache lifecycle and reserved air-space ownership.",
+    "Weighted tactic bank integration; availability/request conditions may be evaluated twice.",
+    "Actual swept-navigation adapter, original temporary look targets, firing gates and cleanup on takeover/death/save/load.",
+    "Both-platform compilation and regressions, then real-client flight and manual-control review after user lifts test deferral."
+  ],
+  "relatedRecord": "art/military-vehicles/helicopter-attack-lease-source.json",
+  "fullGoalComplete": false,
+  "sourceFiles": [
+    {
+      "file": "D:\\blacklight-evolution\\src\\main\\java\\com\\codex\\blacklight\\military\\aircraft\\HelicopterStrafeManeuver.java",
+      "sha256": "8357bf7e429dabc0ba9fe80ca83bfdbdb9d079b6d64334da047dcd56f382dfa5"
+    },
+    {
+      "file": "D:\\blacklight-evolution\\src\\test\\java\\com\\codex\\blacklight\\military\\aircraft\\HelicopterStrafeManeuverTest.java",
+      "sha256": "6ff501e3efbd2f5d66f7fed6c20f14c23f997b9ba22054e1e97ed8136f0d5047"
+    }
+  ],
+  "liveIntegrationFollowup": {
+    "record": "art/military-vehicles/helicopter-live-tactics-source.json",
+    "status": "Live integration now written; original standalone scope/pending list above describes its earlier extraction milestone. Runtime remains unverified."
+  }
+}

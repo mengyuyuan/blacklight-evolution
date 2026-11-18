@@ -1,0 +1,931 @@
+{
+  "date": "2026-11-15",
+  "status": "partial_native_flyer_handoff_checkpoint",
+  "scope": "Downed native flyer only: capture, hold, claws sweep absorption, blade absorption, claws head absorption, live release, and a last-chance save followed by a real lethal blade session. Transition frames remain unresolved; this is not full creature/mod/terrain acceptance.",
+  "fixes": [
+    "Shared native receiver pose and actual head/thorax surface grip",
+    "Torso-sized carry clearance instead of the entire wing span",
+    "Original flyer_com_idle wing fold retained instead of human arm projection; horizontal body faces its carrier",
+    "Ragdoll pose history resets on a backwards client world-clock correction instead of crashing or reusing future skin snapshots",
+    "Rigid blade grip uses the actual forearm-bound mesh anchor, preserving the original anchor before wrist-space conversion",
+    "Native receiver facing follows the paired scene before entity yaw interpolation catches up",
+    "Removed victims cannot access invalidated Forge capabilities through RagdollDrive.captured",
+    "Finite hurt-flash duration survives a client world-clock rewind without extending a corpse red overlay until the old absolute deadline",
+    "Consume cutting uses the same connected-joint projection and component support lift as the rendered skin, instead of independently interpolated bone positions",
+    "Fit the right arm using actual sharp-profile points near the authored blade marker; preserve arm length, wrist, left arm and root",
+    "One authored blade slice can be authorized by either sharp side, with independent sampled paths but a shared completion event; separate claws retain their own sections",
+    "Prefer confirmed central tissue contact over a broad wing bounding volume",
+    "Choose the physical root through mesh/bone ancestry, then prefer the trunk among sibling roots; broad child wings no longer invert their skeleton",
+    "Evaluate all visible sharp profiles before selecting the shared blade section",
+    "Use exact two-bone fitting across the actual authored slicing poses; the previous CCD candidate search failed a reachable source pose",
+    "Bind both sever blood emitters to actual cap triangles and their component motion; sharp absorption no longer substitutes a timed body-center spray"
+  ],
+  "platforms": [
+    {
+      "platform": "neo",
+      "frames": 1322,
+      "manifest": "D:/CodexCache/creature-combat-qa/neo-flyer-handoff-frames/evidence.json",
+      "manifestSha256": "3c51a01cfe0468b642571234b03b49d7f3a17a348ee7483ca61e20c9ee06ff53",
+      "cases": [
+        {
+          "scene": 0,
+          "cutQueryFrames": 43,
+          "cutQueryToDrawMax": 0,
+          "uncorrectedPoseToDrawMax": 0.22789116911381302,
+          "frames": 263,
+          "heldFrames": 11,
+          "gripMax": 0.08740115001874162,
+          "stableGripMax": 0.08740115001874162,
+          "gripOutliers": [],
+          "resampleDifferenceMax": 8.322792339446612e-7,
+          "heldLowest": 81.89264678955078,
+          "cuts": 35,
+          "components": 30,
+          "finalHealth": 230,
+          "removed": true,
+          "hurtFlashFrames": 4,
+          "lastHurtFlashAge": 40,
+          "hits": [
+            {
+              "scene": 0,
+              "age": 33,
+              "tick": 178515,
+              "damage": 70,
+              "bone": "left_hand",
+              "at": {
+                "x": 0.927463598762831,
+                "y": 85.88771994068847,
+                "z": 0.24278605941752762
+              },
+              "surfaceError": 0.07581461504680265
+            }
+          ],
+          "bladeSection": null
+        },
+        {
+          "scene": 1,
+          "cutQueryFrames": 57,
+          "cutQueryToDrawMax": 0,
+          "uncorrectedPoseToDrawMax": 0.5117162613436448,
+          "frames": 279,
+          "heldFrames": 14,
+          "gripMax": 0.07804538319608857,
+          "stableGripMax": 0.07105876646672597,
+          "gripOutliers": [],
+          "resampleDifferenceMax": 7.483368862168349e-7,
+          "heldLowest": 81.8588292833436,
+          "cuts": 6,
+          "components": 4,
+          "finalHealth": 230,
+          "removed": true,
+          "hurtFlashFrames": 6,
+          "lastHurtFlashAge": 41,
+          "hits": [
+            {
+              "scene": 1,
+              "age": 33,
+              "tick": 178817,
+              "damage": 70,
+              "bone": "left_hand",
+              "at": {
+                "x": 0.927463598762831,
+                "y": 85.88771994068847,
+                "z": 0.24278605941752762
+              },
+              "surfaceError": 0.07581461504680265
+            }
+          ],
+          "bladeSection": {
+            "firstFrame": "1-blade_absorb-124.png",
+            "seconds": 0.8359999835491181,
+            "event": "consume:178891:blade",
+            "thoraxPieces": 2,
+            "partSplits": 6,
+            "components": 4,
+            "preSeverEdgeToThoraxCenter": 0.3573982064144882,
+            "blood": {
+              "samples": 34,
+              "sides": [
+                -1,
+                1
+              ],
+              "maxCapDistance": 1.1644159385136953e-8,
+              "firstEmittedFrame": "1-blade_absorb-125.png"
+            }
+          }
+        },
+        {
+          "scene": 2,
+          "cutQueryFrames": 55,
+          "cutQueryToDrawMax": 0,
+          "uncorrectedPoseToDrawMax": 0.3110249611173188,
+          "frames": 281,
+          "heldFrames": 13,
+          "gripMax": 0.08723961330429304,
+          "stableGripMax": 0.08723961330429304,
+          "gripOutliers": [],
+          "resampleDifferenceMax": 9.68182901190715e-7,
+          "heldLowest": 82.04028050887155,
+          "cuts": 0,
+          "components": 1,
+          "finalHealth": 230,
+          "removed": true,
+          "hurtFlashFrames": 5,
+          "lastHurtFlashAge": 41,
+          "hits": [
+            {
+              "scene": 2,
+              "age": 33,
+              "tick": 179119,
+              "damage": 70,
+              "bone": "left_hand",
+              "at": {
+                "x": 0.927463598762831,
+                "y": 85.88771994068847,
+                "z": 0.24278605941752762
+              },
+              "surfaceError": 0.07581461504680265
+            }
+          ],
+          "bladeSection": null
+        },
+        {
+          "scene": 3,
+          "cutQueryFrames": 0,
+          "cutQueryToDrawMax": null,
+          "uncorrectedPoseToDrawMax": null,
+          "frames": 282,
+          "heldFrames": 13,
+          "gripMax": 0.08730755982819954,
+          "stableGripMax": 0.08730755982819954,
+          "gripOutliers": [],
+          "resampleDifferenceMax": 9.478846528017825e-7,
+          "heldLowest": 81.96978294287294,
+          "cuts": 0,
+          "components": 0,
+          "finalHealth": 230,
+          "removed": false,
+          "hurtFlashFrames": 6,
+          "lastHurtFlashAge": 41,
+          "hits": [
+            {
+              "scene": 3,
+              "age": 33,
+              "tick": 179421,
+              "damage": 70,
+              "bone": "left_hand",
+              "at": {
+                "x": 0.927463598762831,
+                "y": 85.88771994068847,
+                "z": 0.24278605941752762
+              },
+              "surfaceError": 0.07581461504680265
+            }
+          ],
+          "bladeSection": null
+        },
+        {
+          "scene": 4,
+          "cutQueryFrames": 145,
+          "cutQueryToDrawMax": 0,
+          "uncorrectedPoseToDrawMax": 0.19560535676190238,
+          "frames": 217,
+          "heldFrames": 0,
+          "gripMax": null,
+          "stableGripMax": null,
+          "gripOutliers": [],
+          "resampleDifferenceMax": null,
+          "heldLowest": null,
+          "cuts": 4,
+          "components": 5,
+          "finalHealth": 0,
+          "removed": true,
+          "hurtFlashFrames": 11,
+          "lastHurtFlashAge": 79,
+          "hits": [
+            {
+              "scene": 4,
+              "age": 33,
+              "tick": 179723,
+              "damage": 70,
+              "bone": "left_hand",
+              "at": {
+                "x": 0.927463598762831,
+                "y": 85.88771994068847,
+                "z": 0.24278605941752762
+              },
+              "surfaceError": 0.07581461504680265
+            },
+            {
+              "scene": 4,
+              "age": 71,
+              "tick": 179761,
+              "damage": 45,
+              "bone": "left_hand",
+              "at": {
+                "x": -1.1527746134214003,
+                "y": 82.07881217180875,
+                "z": -4.110591836956325
+              },
+              "surfaceError": 0.01301202030007225
+            }
+          ],
+          "bladeSection": null
+        }
+      ],
+      "units": [
+        {
+          "file": "D:/CodexCache/creature-combat-qa/neo-build/test-results/test/TEST-com.codex.blacklight.animation.BlacklightBoneIkTest.xml",
+          "tests": 2,
+          "sha256": "14ac794237318fe578d0f810dfc461430f790202e8890e20b9b92daf6ebaf0f5"
+        },
+        {
+          "file": "D:/CodexCache/creature-combat-qa/neo-build/test-results/test/TEST-com.codex.blacklight.client.animation.BlacklightBoneIkTest.xml",
+          "tests": 3,
+          "sha256": "98b55b0a3d906e778963ef5f9b3a8282484dd66baecde2ade385517a26c91795"
+        },
+        {
+          "file": "D:/CodexCache/creature-combat-qa/neo-build/test-results/test/TEST-com.codex.blacklight.client.animation.BladeConsumePoseTest.xml",
+          "tests": 3,
+          "sha256": "5eb5f27fa7b305fd8a60070984cbaacf7f3edd09c73d65a39c478375b51f028f"
+        },
+        {
+          "file": "D:/CodexCache/creature-combat-qa/neo-build/test-results/test/TEST-com.codex.blacklight.client.animation.HurtFlashWindowTest.xml",
+          "tests": 4,
+          "sha256": "48c346ba322937f8ac0a195e4ee53840d27354ef940ebb64e16ddf1913b8218f"
+        },
+        {
+          "file": "D:/CodexCache/creature-combat-qa/neo-build/test-results/test/TEST-com.codex.blacklight.client.renderer.BladeCutSequenceTest.xml",
+          "tests": 4,
+          "sha256": "1a46f354987be5ab38e8c129026e0076ddcd33177b4a896bd6131fe3ca31d91c"
+        },
+        {
+          "file": "D:/CodexCache/creature-combat-qa/neo-build/test-results/test/TEST-com.codex.blacklight.client.renderer.ContactSectionTest.xml",
+          "tests": 7,
+          "sha256": "a942cb89b8570774c870688e0c003cdc1cca6998f02b8f66378cd47d00d37d5d"
+        },
+        {
+          "file": "D:/CodexCache/creature-combat-qa/neo-build/test-results/test/TEST-com.codex.blacklight.client.renderer.RagdollJointProjectionTest.xml",
+          "tests": 3,
+          "sha256": "97e90a8e38eae9448cf4e3e31fe66f103d1be0232d5d9f49dac1c0af199be593"
+        },
+        {
+          "file": "D:/CodexCache/creature-combat-qa/neo-build/test-results/test/TEST-com.codex.blacklight.client.renderer.RagdollPoseHistoryTest.xml",
+          "tests": 7,
+          "sha256": "5baad7cbe5ea134ad5a473ad04bade11cbd338e007b38ab0b14ffce28446b910"
+        },
+        {
+          "file": "D:/CodexCache/creature-combat-qa/neo-build/test-results/test/TEST-com.codex.blacklight.client.renderer.RagdollRecoveryTest.xml",
+          "tests": 6,
+          "sha256": "28a1a25e107dd70b9d604cfd11f93a40e85130d5589288f51054470179f623b8"
+        },
+        {
+          "file": "D:/CodexCache/creature-combat-qa/neo-build/test-results/test/TEST-com.codex.blacklight.client.renderer.RagdollRootSelectionTest.xml",
+          "tests": 4,
+          "sha256": "f62901157565747174bc3f9cd7a36d4784136285912d6aebf3b04ca69fee92b5"
+        },
+        {
+          "file": "D:/CodexCache/creature-combat-qa/neo-build/test-results/test/TEST-com.codex.blacklight.client.renderer.RagdollTerrainSupportTest.xml",
+          "tests": 9,
+          "sha256": "4f032d55f4c9e53c794105ddbf9a1ed5adcb6f323a7270aa249e01ca94a85e54"
+        },
+        {
+          "file": "D:/CodexCache/creature-combat-qa/neo-build/test-results/test/TEST-com.codex.blacklight.client.renderer.SweptBladeSurfaceTest.xml",
+          "tests": 4,
+          "sha256": "d1e0c14456e3824c1ad53c1ce0ea8fa9497eea594130e698bff9be41104109e4"
+        }
+      ],
+      "sheets": [
+        {
+          "file": "D:/CodexCache/creature-combat-qa/neo-flyer-handoff-frames/handoff-review-0.jpg",
+          "sha256": "d4d79a8ace5bd1b3534710090f77edfd5bbf1c83da7a03aa7a164eeaefc29a1c"
+        },
+        {
+          "file": "D:/CodexCache/creature-combat-qa/neo-flyer-handoff-frames/handoff-review-1.jpg",
+          "sha256": "829d5e6c832d0907836519e4fbb193186bd48069e83f9bbd74af26243b377474"
+        },
+        {
+          "file": "D:/CodexCache/creature-combat-qa/neo-flyer-handoff-frames/handoff-review-2.jpg",
+          "sha256": "a98dedd351f6a02b4737bc06aaadcb7e13248c9fc561372a1fc6988757860b95"
+        },
+        {
+          "file": "D:/CodexCache/creature-combat-qa/neo-flyer-handoff-frames/handoff-review-3.jpg",
+          "sha256": "3f22a98015715a350dcd2adfd6f40bb76c5639bc073bd14553061670eb39727a"
+        },
+        {
+          "file": "D:/CodexCache/creature-combat-qa/neo-flyer-handoff-frames/handoff-review-4.jpg",
+          "sha256": "282cecca2e8313074bbeb4fe2159dc14c3b719216c16d64f5eb273d8c2ecfd8f"
+        }
+      ],
+      "files": [
+        {
+          "file": "src/main/java/com/codex/blacklight/combat/FlyerReceiverPose.java",
+          "sha256": "b51e997bd491746d033fc43f6da654ba8d8b06343594cfebedfcfc28043f2e8f"
+        },
+        {
+          "file": "src/main/java/com/codex/blacklight/combat/ConsumePlacementTrack.java",
+          "sha256": "ccb0952f78d647ccdf42b67025a495d672eda3c3c89154e7d957e9f50a5e3d97"
+        },
+        {
+          "file": "src/main/java/com/codex/blacklight/client/animation/FlyerCarryPose.java",
+          "sha256": "61b4e71bde031c6c8214c16414b9cfe48d916df4c1472397848ad801b4c9ba1f"
+        },
+        {
+          "file": "src/main/java/com/codex/blacklight/client/animation/NativeGeckoConsume.java",
+          "sha256": "304c9d610eacbb4024bb8122abfb3e0e32429392d5100577ba45a0f2f034ae4b"
+        },
+        {
+          "file": "src/main/java/com/codex/blacklight/client/animation/GrabHoldPose.java",
+          "sha256": "43ced4baf7547b0b35ecb0cc8555e55f02fc8a7493168ec512e341cac9832532"
+        },
+        {
+          "file": "src/main/java/com/codex/blacklight/client/animation/BlacklightRenderPose.java",
+          "sha256": "c219aa3310662439a2834f4bf34c5667ac4c382c13287ebfccc6fab2abebdfa1"
+        },
+        {
+          "file": "src/main/java/com/codex/blacklight/client/renderer/RagdollPoseHistory.java",
+          "sha256": "a5c7d4827a8624093b48b8ac1fe58a336e43f9c92f08b1ee59455a4da92d0b86"
+        },
+        {
+          "file": "src/test/java/com/codex/blacklight/client/renderer/RagdollPoseHistoryTest.java",
+          "sha256": "8f5a4036124fc7425ad40fb10230e552be945416c113b61b32f19f09df5c6a6b"
+        },
+        {
+          "file": "src/flyerHandoffVisual/java/com/codex/blacklight/client/FlyerHandoffVisual.java",
+          "sha256": "e4da48a27bd13e521fa7ef624b6257a0864bc103f8dc3f1012ee5a5fd7a29c9f"
+        },
+        {
+          "file": "src/main/java/com/codex/blacklight/client/animation/BlacklightBoneIk.java",
+          "sha256": "a6a542d54d02fbb78e6034b47be029892cd5616a460ee88a9bc9d0a334062318"
+        },
+        {
+          "file": "src/main/java/com/codex/blacklight/client/animation/RagdollDrive.java",
+          "sha256": "ed6b8926697027bef6bd0a643f07dfe22d89ee07274c8cd2ee9176a48c74a739"
+        },
+        {
+          "file": "src/test/java/com/codex/blacklight/client/animation/BlacklightBoneIkTest.java",
+          "sha256": "cdb3b0e066f4d4d589ecf386bd50986a1789f1c0d577a9e4fc37ba18226eea30"
+        },
+        {
+          "file": "src/flyerHandoffVisual/java/com/codex/blacklight/client/NativeGripProbe.java",
+          "sha256": "077bb4b1268e51e88c5656e6c7704facae1b51b6b5026ebea86bea43c61be9d7"
+        },
+        {
+          "file": "src/flyerHandoffVisual/java/com/codex/blacklight/client/qagrip/NativeGripProbeMixin.java",
+          "sha256": "b8a552ce68cead0b74d75db9e8f7fd00a2a428f67cce5dfcb32109cb07f67e5a"
+        },
+        {
+          "file": "src/flyerHandoffVisual/resources/blacklight.grip-qa.mixins.json",
+          "sha256": "a1897363a57594d9b7f0dcc3ccbd57db317461d0340a413e1be65c9e6e2c43c0"
+        },
+        {
+          "file": "tools/flyer-handoff-visual.init.gradle",
+          "sha256": "2f977acb6bd955b0dede5838dd0c2d91817777104945c7bbfd47502aa2ed311a"
+        },
+        {
+          "file": "src/main/java/com/codex/blacklight/client/renderer/AdaptiveRagdoll.java",
+          "sha256": "3c59818e3a259ceeb4578d699a36706122857937e0752e3cdab39f134dece4e7"
+        },
+        {
+          "file": "src/test/java/com/codex/blacklight/client/renderer/RagdollJointProjectionTest.java",
+          "sha256": "032734a5193c0277e8c46a639c4caa337a51eeb9ab0a21cd8261125a68d310a5"
+        },
+        {
+          "file": "src/main/java/com/codex/blacklight/client/animation/HurtFlashWindow.java",
+          "sha256": "91c3c88a2b8ee2b8f3f7593cdf782c94d7d04be77c969a4d4d23a5976eed88c3"
+        },
+        {
+          "file": "src/test/java/com/codex/blacklight/client/animation/HurtFlashWindowTest.java",
+          "sha256": "4ed3c50f711065066afaef92983f962dd8617337b06ed3b4dc45212809abebf1"
+        },
+        {
+          "file": "src/main/java/com/codex/blacklight/client/animation/BladeConsumePose.java",
+          "sha256": "8d4304133ccddbf98074a489dd45ea352bfd10fd42cb9865aa66fe208e344a06"
+        },
+        {
+          "file": "src/main/java/com/codex/blacklight/client/animation/ConsumeGripPose.java",
+          "sha256": "a59198123fc9462933d62b6e1f9219ec1d6593c44ae439ba85146c5f5b89ce23"
+        },
+        {
+          "file": "src/test/java/com/codex/blacklight/client/animation/BladeConsumePoseTest.java",
+          "sha256": "398ba2b7dfaac9135b58d7e1d109e142c6562a78135f74c2541df7f6c2ba1cc3"
+        },
+        {
+          "file": "src/main/java/com/codex/blacklight/client/renderer/ContactSection.java",
+          "sha256": "43129c7a8fa6153292e04933e5a20fec6bda5be849d30562edaf80c11f194bc0"
+        },
+        {
+          "file": "src/test/java/com/codex/blacklight/client/renderer/ContactSectionTest.java",
+          "sha256": "d9528085a57c66af6f475e40f1c1e5e90556e389bde74df9b342d3b627c37d22"
+        },
+        {
+          "file": "tools/flyer-handoff-test.init.gradle",
+          "sha256": "8f073e5df2ccc1448533d89aa210e32c2c8c12fcd55884f57d0b82499c673d81"
+        },
+        {
+          "file": "src/main/java/com/codex/blacklight/client/renderer/RagdollRootSelection.java",
+          "sha256": "114ebfe4b84de339f32cf29d3e76857719982f1b40d7fc8ce17ce5acfe313ff6"
+        },
+        {
+          "file": "src/test/java/com/codex/blacklight/client/renderer/RagdollRootSelectionTest.java",
+          "sha256": "6ccb055f995f3d1cd07d82cb76d53a1271ed30a77330c2d189a2c93217a6be0d"
+        },
+        {
+          "file": "src/main/java/com/codex/blacklight/client/renderer/RagdollRecovery.java",
+          "sha256": "6c54746f9dd51fa431b4b5cff7907ddffad55951f9d5239a2a13f11cbc9be41d"
+        },
+        {
+          "file": "src/test/java/com/codex/blacklight/client/renderer/RagdollRecoveryTest.java",
+          "sha256": "85339f1996405955c609e57558e653484858d9ab661bbcaa3ce17201d6380239"
+        },
+        {
+          "file": "src/main/java/com/codex/blacklight/client/renderer/RagdollTerrainSupport.java",
+          "sha256": "456e4da170f944cc2a3a14be05bbe6cb9592dadcecfcc5a91b3a8878dfe7a9f5"
+        },
+        {
+          "file": "src/test/java/com/codex/blacklight/client/renderer/RagdollTerrainSupportTest.java",
+          "sha256": "2f0815bc481125da857b3e232f1235edec123ae7920a46532e8204fd2498fb53"
+        },
+        {
+          "file": "src/main/java/com/codex/blacklight/client/renderer/ConsumeBladeContact.java",
+          "sha256": "0baee339b7fe12d67162cdeeb26cc3e638feb0b0f0040a109bac15adbfafc971"
+        },
+        {
+          "file": "src/main/java/com/codex/blacklight/client/renderer/WoundBlood.java",
+          "sha256": "34f03f19975c0adb75a6dd0d366fecce012eee492515787e3500a39f0050b5bb"
+        }
+      ]
+    },
+    {
+      "platform": "forge",
+      "frames": 1332,
+      "manifest": "D:/CodexCache/creature-combat-qa/forge-flyer-handoff-frames/evidence.json",
+      "manifestSha256": "e58860c291184cc9d7e6e54d0a86ca2c3272026a98aa02d12c6392ce5c3d7e91",
+      "cases": [
+        {
+          "scene": 0,
+          "cutQueryFrames": 50,
+          "cutQueryToDrawMax": 0,
+          "uncorrectedPoseToDrawMax": 0.3262795580368451,
+          "frames": 272,
+          "heldFrames": 13,
+          "gripMax": 0.08738004094431438,
+          "stableGripMax": 0.08738004094431438,
+          "gripOutliers": [],
+          "resampleDifferenceMax": 0.0000018372678832695318,
+          "heldLowest": 81.96875492776051,
+          "cuts": 32,
+          "components": 26,
+          "finalHealth": 230,
+          "removed": true,
+          "hurtFlashFrames": 5,
+          "lastHurtFlashAge": 41,
+          "hits": [
+            {
+              "scene": 0,
+              "age": 33,
+              "tick": 97150,
+              "damage": 70,
+              "bone": "left_hand",
+              "at": {
+                "x": 0.927463598762831,
+                "y": 85.88771994068847,
+                "z": 0.24278605941752762
+              },
+              "surfaceError": 0.07581461504680265
+            }
+          ],
+          "bladeSection": null
+        },
+        {
+          "scene": 1,
+          "cutQueryFrames": 61,
+          "cutQueryToDrawMax": 0,
+          "uncorrectedPoseToDrawMax": 0.3066097691842333,
+          "frames": 283,
+          "heldFrames": 13,
+          "gripMax": 0.08448844546154714,
+          "stableGripMax": 0.08448844546154714,
+          "gripOutliers": [],
+          "resampleDifferenceMax": 0.0000026173980040909282,
+          "heldLowest": 81.95235187625558,
+          "cuts": 4,
+          "components": 4,
+          "finalHealth": 230,
+          "removed": true,
+          "hurtFlashFrames": 6,
+          "lastHurtFlashAge": 41,
+          "hits": [
+            {
+              "scene": 1,
+              "age": 33,
+              "tick": 97452,
+              "damage": 70,
+              "bone": "left_hand",
+              "at": {
+                "x": 0.927463598762831,
+                "y": 85.88771994068847,
+                "z": 0.24278605941752762
+              },
+              "surfaceError": 0.07581461504680265
+            }
+          ],
+          "bladeSection": {
+            "firstFrame": "1-blade_absorb-124.png",
+            "seconds": 0.8649998843669892,
+            "event": "consume:97526:blade",
+            "thoraxPieces": 2,
+            "partSplits": 4,
+            "components": 4,
+            "preSeverEdgeToThoraxCenter": 0.12428345714478793,
+            "blood": {
+              "samples": 42,
+              "sides": [
+                -1,
+                1
+              ],
+              "maxCapDistance": 1.36269233113755e-8,
+              "firstEmittedFrame": "1-blade_absorb-124.png"
+            }
+          }
+        },
+        {
+          "scene": 2,
+          "cutQueryFrames": 53,
+          "cutQueryToDrawMax": 0,
+          "uncorrectedPoseToDrawMax": 0.34771734696499834,
+          "frames": 280,
+          "heldFrames": 14,
+          "gripMax": 0.08739785770095128,
+          "stableGripMax": 0.08739785770095128,
+          "gripOutliers": [],
+          "resampleDifferenceMax": 0.0000010546233828006095,
+          "heldLowest": 81.94516109361383,
+          "cuts": 0,
+          "components": 1,
+          "finalHealth": 230,
+          "removed": true,
+          "hurtFlashFrames": 5,
+          "lastHurtFlashAge": 40,
+          "hits": [
+            {
+              "scene": 2,
+              "age": 33,
+              "tick": 97754,
+              "damage": 70,
+              "bone": "left_hand",
+              "at": {
+                "x": 0.927463598762831,
+                "y": 85.88771994068847,
+                "z": 0.24278605941752762
+              },
+              "surfaceError": 0.07581461504680265
+            }
+          ],
+          "bladeSection": null
+        },
+        {
+          "scene": 3,
+          "cutQueryFrames": 0,
+          "cutQueryToDrawMax": null,
+          "uncorrectedPoseToDrawMax": null,
+          "frames": 280,
+          "heldFrames": 13,
+          "gripMax": 0.0873912495625585,
+          "stableGripMax": 0.0873912495625585,
+          "gripOutliers": [],
+          "resampleDifferenceMax": 0.000002240472098923512,
+          "heldLowest": 81.96284631660873,
+          "cuts": 0,
+          "components": 0,
+          "finalHealth": 230,
+          "removed": false,
+          "hurtFlashFrames": 5,
+          "lastHurtFlashAge": 40,
+          "hits": [
+            {
+              "scene": 3,
+              "age": 33,
+              "tick": 98057,
+              "damage": 70,
+              "bone": "left_hand",
+              "at": {
+                "x": 0.927463598762831,
+                "y": 85.88771994068847,
+                "z": 0.24278605941752762
+              },
+              "surfaceError": 0.07581461504680265
+            }
+          ],
+          "bladeSection": null
+        },
+        {
+          "scene": 4,
+          "cutQueryFrames": 146,
+          "cutQueryToDrawMax": 0,
+          "uncorrectedPoseToDrawMax": 0.2134626701600413,
+          "frames": 217,
+          "heldFrames": 0,
+          "gripMax": null,
+          "stableGripMax": null,
+          "gripOutliers": [],
+          "resampleDifferenceMax": null,
+          "heldLowest": null,
+          "cuts": 4,
+          "components": 5,
+          "finalHealth": 0,
+          "removed": true,
+          "hurtFlashFrames": 10,
+          "lastHurtFlashAge": 78,
+          "hits": [
+            {
+              "scene": 4,
+              "age": 33,
+              "tick": 98360,
+              "damage": 70,
+              "bone": "left_hand",
+              "at": {
+                "x": 0.927463598762831,
+                "y": 85.88771994068847,
+                "z": 0.24278605941752762
+              },
+              "surfaceError": 0.07581461504680265
+            },
+            {
+              "scene": 4,
+              "age": 71,
+              "tick": 98398,
+              "damage": 45,
+              "bone": "left_hand",
+              "at": {
+                "x": -1.1527746134214003,
+                "y": 82.07881217180875,
+                "z": -4.110591836956325
+              },
+              "surfaceError": 0.01301202030007225
+            }
+          ],
+          "bladeSection": null
+        }
+      ],
+      "units": [
+        {
+          "file": "D:/CodexCache/creature-combat-qa/forge-render-build/test-results/test/TEST-com.codex.blacklight.animation.BlacklightBoneIkTest.xml",
+          "tests": 2,
+          "sha256": "62debae562543a055b55ca3d65a817a5d8d9a0ae9d77fc66e46367372d658272"
+        },
+        {
+          "file": "D:/CodexCache/creature-combat-qa/forge-render-build/test-results/test/TEST-com.codex.blacklight.client.animation.BlacklightBoneIkTest.xml",
+          "tests": 3,
+          "sha256": "362d1db47781a5a12a311fe631603d4b6bdc1228dc543cbdced4d3416d8303d6"
+        },
+        {
+          "file": "D:/CodexCache/creature-combat-qa/forge-render-build/test-results/test/TEST-com.codex.blacklight.client.animation.BladeConsumePoseTest.xml",
+          "tests": 3,
+          "sha256": "6ddea4a08ac3e1609ecbf1c898ccf2a07ff4c81f95b323789772204cf8c4cc61"
+        },
+        {
+          "file": "D:/CodexCache/creature-combat-qa/forge-render-build/test-results/test/TEST-com.codex.blacklight.client.animation.HurtFlashWindowTest.xml",
+          "tests": 4,
+          "sha256": "4510874404e958c355061a1b0443fddb578d6d5794bff8f638ed02edc8f9bc8c"
+        },
+        {
+          "file": "D:/CodexCache/creature-combat-qa/forge-render-build/test-results/test/TEST-com.codex.blacklight.client.renderer.BladeCutSequenceTest.xml",
+          "tests": 4,
+          "sha256": "00fa00c92adda18126ed5a8a4877292a245b4e6af6d4adfae2caead207455291"
+        },
+        {
+          "file": "D:/CodexCache/creature-combat-qa/forge-render-build/test-results/test/TEST-com.codex.blacklight.client.renderer.ContactSectionTest.xml",
+          "tests": 7,
+          "sha256": "188a1186756b1d3dfc1d84e410d620688109890634c878559f45d8884d851e48"
+        },
+        {
+          "file": "D:/CodexCache/creature-combat-qa/forge-render-build/test-results/test/TEST-com.codex.blacklight.client.renderer.RagdollJointProjectionTest.xml",
+          "tests": 3,
+          "sha256": "5c6c93dae64cb5c959c4105d410e0dd3142e643db2db99597ff6624fc6b0c743"
+        },
+        {
+          "file": "D:/CodexCache/creature-combat-qa/forge-render-build/test-results/test/TEST-com.codex.blacklight.client.renderer.RagdollPoseHistoryTest.xml",
+          "tests": 7,
+          "sha256": "37ae1d4eb4fa156abe3d4c5fd125ae6afd324ca3adce059727bcfbc31de05a35"
+        },
+        {
+          "file": "D:/CodexCache/creature-combat-qa/forge-render-build/test-results/test/TEST-com.codex.blacklight.client.renderer.RagdollRecoveryTest.xml",
+          "tests": 6,
+          "sha256": "fec9ee2eadd34bc61c9b2c2a3b9973ced185d3d83c893240dfd8dbd474c65a75"
+        },
+        {
+          "file": "D:/CodexCache/creature-combat-qa/forge-render-build/test-results/test/TEST-com.codex.blacklight.client.renderer.RagdollRootSelectionTest.xml",
+          "tests": 4,
+          "sha256": "cb35c46e5e9a5b180d6cfe4eae26788156eb947dece884edc7f5557f758b8180"
+        },
+        {
+          "file": "D:/CodexCache/creature-combat-qa/forge-render-build/test-results/test/TEST-com.codex.blacklight.client.renderer.RagdollTerrainSupportTest.xml",
+          "tests": 9,
+          "sha256": "40f51b6547c009972becd37d27510c1401d8a2d10b9b18b141c28703f6f42b82"
+        },
+        {
+          "file": "D:/CodexCache/creature-combat-qa/forge-render-build/test-results/test/TEST-com.codex.blacklight.client.renderer.SweptBladeSurfaceTest.xml",
+          "tests": 4,
+          "sha256": "8b1493763beac435ce615247bb4f005af7a758e7b9f2d3644f20b698105ae63b"
+        }
+      ],
+      "sheets": [
+        {
+          "file": "D:/CodexCache/creature-combat-qa/forge-flyer-handoff-frames/handoff-review-0.jpg",
+          "sha256": "b45b7cbddfad8e725d5fc748592dd9b10d984efd788a52f2327852b0f3c32a9f"
+        },
+        {
+          "file": "D:/CodexCache/creature-combat-qa/forge-flyer-handoff-frames/handoff-review-1.jpg",
+          "sha256": "6ec3a67e4e7d94458b945d34989cd82a636556e246ac42591ef7989ed58e9d16"
+        },
+        {
+          "file": "D:/CodexCache/creature-combat-qa/forge-flyer-handoff-frames/handoff-review-2.jpg",
+          "sha256": "71baaee01838994ca0c5d8b95fcf01687ab66c53f3fc4fa849adaf13e53535a8"
+        },
+        {
+          "file": "D:/CodexCache/creature-combat-qa/forge-flyer-handoff-frames/handoff-review-3.jpg",
+          "sha256": "b4cc5b4504df0ef5c7d949162d4158af3577bd7cc08d731a6e35592586d75f21"
+        },
+        {
+          "file": "D:/CodexCache/creature-combat-qa/forge-flyer-handoff-frames/handoff-review-4.jpg",
+          "sha256": "75f83033eb4e8b8c3aaa278c2cd55511d1db5150231f1935cdc3b6c2ce30aa62"
+        }
+      ],
+      "files": [
+        {
+          "file": "src/main/java/com/codex/blacklight/combat/FlyerReceiverPose.java",
+          "sha256": "b51e997bd491746d033fc43f6da654ba8d8b06343594cfebedfcfc28043f2e8f"
+        },
+        {
+          "file": "src/main/java/com/codex/blacklight/combat/ConsumePlacementTrack.java",
+          "sha256": "78a6cf651859a7b05f62fd9fe9bf1de34ddd2eb9e554a148543a8e40af0280f1"
+        },
+        {
+          "file": "src/main/java/com/codex/blacklight/client/animation/FlyerCarryPose.java",
+          "sha256": "0d8812e60b037ab44b1e1a4108cdf41fca6e155f154fbb46cfc3a517d8118b85"
+        },
+        {
+          "file": "src/main/java/com/codex/blacklight/client/animation/NativeGeckoConsume.java",
+          "sha256": "66057d645a32bcf08d17d199c0714832022473e22fd3786dc6e64c894d36fbdd"
+        },
+        {
+          "file": "src/main/java/com/codex/blacklight/client/animation/GrabHoldPose.java",
+          "sha256": "9f656466757e518fe8f02537a571504518199a4232282d3e0591e52001b0e195"
+        },
+        {
+          "file": "src/main/java/com/codex/blacklight/client/animation/BlacklightRenderPose.java",
+          "sha256": "4cbe593701a533abef2ad4ab8c3587f4816258add863232fa30ab387fcab93ea"
+        },
+        {
+          "file": "src/main/java/com/codex/blacklight/client/renderer/RagdollPoseHistory.java",
+          "sha256": "4129382aa6ee469c8086b2e91ac6dcb3b4959f9673bf5ae6f2e4db8aa841e43a"
+        },
+        {
+          "file": "src/test/java/com/codex/blacklight/client/renderer/RagdollPoseHistoryTest.java",
+          "sha256": "8f5a4036124fc7425ad40fb10230e552be945416c113b61b32f19f09df5c6a6b"
+        },
+        {
+          "file": "src/flyerHandoffVisual/java/com/codex/blacklight/client/FlyerHandoffVisual.java",
+          "sha256": "02ae30439b445cb882316d6cc1557ddde94acc4bed2d6b4bf57b1172ddd99a25"
+        },
+        {
+          "file": "src/main/java/com/codex/blacklight/client/animation/BlacklightBoneIk.java",
+          "sha256": "02574067646a373d55c9c4ed69e20e10c7dead0950ed8ace9b09d79fcc38efb9"
+        },
+        {
+          "file": "src/main/java/com/codex/blacklight/client/animation/RagdollDrive.java",
+          "sha256": "f5efe358040e65f64062054e43593e58edbb128bf12e231214b5c04babf49e34"
+        },
+        {
+          "file": "src/test/java/com/codex/blacklight/client/animation/BlacklightBoneIkTest.java",
+          "sha256": "cdb3b0e066f4d4d589ecf386bd50986a1789f1c0d577a9e4fc37ba18226eea30"
+        },
+        {
+          "file": "src/flyerHandoffVisual/java/com/codex/blacklight/client/NativeGripProbe.java",
+          "sha256": "adeaa49e5f51cac59fe3936ce4185e448a56edfaf3ba5dd16b8a980f02e545be"
+        },
+        {
+          "file": "src/flyerHandoffVisual/java/com/codex/blacklight/client/qagrip/NativeGripProbeMixin.java",
+          "sha256": "b8a552ce68cead0b74d75db9e8f7fd00a2a428f67cce5dfcb32109cb07f67e5a"
+        },
+        {
+          "file": "src/flyerHandoffVisual/resources/blacklight.grip-qa.mixins.json",
+          "sha256": "21b2aecd7a098a8e2eff4a2b476d0e8df65edaa1b1db5423ef8f35724bd78eb4"
+        },
+        {
+          "file": "tools/flyer-handoff-visual.init.gradle",
+          "sha256": "334986dcfca675855804ecf02a9a421d688a3974e24d1ff6d5465e13363ec884"
+        },
+        {
+          "file": "src/main/java/com/codex/blacklight/client/renderer/AdaptiveRagdoll.java",
+          "sha256": "807f40b6d8f2713b2365f1d4ff02c32759f0be99744aa44d22bc56918f174921"
+        },
+        {
+          "file": "src/test/java/com/codex/blacklight/client/renderer/RagdollJointProjectionTest.java",
+          "sha256": "032734a5193c0277e8c46a639c4caa337a51eeb9ab0a21cd8261125a68d310a5"
+        },
+        {
+          "file": "src/main/java/com/codex/blacklight/client/animation/HurtFlashWindow.java",
+          "sha256": "91c3c88a2b8ee2b8f3f7593cdf782c94d7d04be77c969a4d4d23a5976eed88c3"
+        },
+        {
+          "file": "src/test/java/com/codex/blacklight/client/animation/HurtFlashWindowTest.java",
+          "sha256": "4ed3c50f711065066afaef92983f962dd8617337b06ed3b4dc45212809abebf1"
+        },
+        {
+          "file": "src/main/java/com/codex/blacklight/client/animation/BladeConsumePose.java",
+          "sha256": "6a13b50204e472836ae4bf806b574f7b8944999796c33c9d1c98640a2ddf3ca9"
+        },
+        {
+          "file": "src/main/java/com/codex/blacklight/client/animation/ConsumeGripPose.java",
+          "sha256": "950267f62dff26a492eb1d6879ca1a789273c54f801e5ab90649fb049d1db143"
+        },
+        {
+          "file": "src/test/java/com/codex/blacklight/client/animation/BladeConsumePoseTest.java",
+          "sha256": "398ba2b7dfaac9135b58d7e1d109e142c6562a78135f74c2541df7f6c2ba1cc3"
+        },
+        {
+          "file": "src/main/java/com/codex/blacklight/client/renderer/ContactSection.java",
+          "sha256": "488c0c498705b0bc08d7dc8893c58f20909e90b6db3b3845616ab9d323b997dc"
+        },
+        {
+          "file": "src/test/java/com/codex/blacklight/client/renderer/ContactSectionTest.java",
+          "sha256": "d9528085a57c66af6f475e40f1c1e5e90556e389bde74df9b342d3b627c37d22"
+        },
+        {
+          "file": "tools/flyer-handoff-test.init.gradle",
+          "sha256": "8f073e5df2ccc1448533d89aa210e32c2c8c12fcd55884f57d0b82499c673d81"
+        },
+        {
+          "file": "src/main/java/com/codex/blacklight/client/renderer/RagdollRootSelection.java",
+          "sha256": "114ebfe4b84de339f32cf29d3e76857719982f1b40d7fc8ce17ce5acfe313ff6"
+        },
+        {
+          "file": "src/test/java/com/codex/blacklight/client/renderer/RagdollRootSelectionTest.java",
+          "sha256": "6ccb055f995f3d1cd07d82cb76d53a1271ed30a77330c2d189a2c93217a6be0d"
+        },
+        {
+          "file": "src/main/java/com/codex/blacklight/client/renderer/RagdollRecovery.java",
+          "sha256": "6c54746f9dd51fa431b4b5cff7907ddffad55951f9d5239a2a13f11cbc9be41d"
+        },
+        {
+          "file": "src/test/java/com/codex/blacklight/client/renderer/RagdollRecoveryTest.java",
+          "sha256": "85339f1996405955c609e57558e653484858d9ab661bbcaa3ce17201d6380239"
+        },
+        {
+          "file": "src/main/java/com/codex/blacklight/client/renderer/RagdollTerrainSupport.java",
+          "sha256": "456e4da170f944cc2a3a14be05bbe6cb9592dadcecfcc5a91b3a8878dfe7a9f5"
+        },
+        {
+          "file": "src/test/java/com/codex/blacklight/client/renderer/RagdollTerrainSupportTest.java",
+          "sha256": "2f0815bc481125da857b3e232f1235edec123ae7920a46532e8204fd2498fb53"
+        },
+        {
+          "file": "src/main/java/com/codex/blacklight/client/renderer/ConsumeBladeContact.java",
+          "sha256": "75334b390738ca8247ceecf3c29512be619f6409e1e140003829ae18c1847860"
+        },
+        {
+          "file": "src/main/java/com/codex/blacklight/client/renderer/WoundBlood.java",
+          "sha256": "2ae6759638958e76319d003b520936891945ee4e4cc9854d0e74841190361d08"
+        }
+      ]
+    }
+  ],
+  "originalBladeSource": {
+    "file": "D:/PrototypeReference/p1/input/alex_fig.p3d.rz",
+    "sha256": "752d42c6a315c8f457c073367e28ee6abf3e180d644412dfdc113471e32be621",
+    "inflatedBytes": 723352,
+    "markers": [
+      {
+        "offset": 498548,
+        "payloadLength": 100,
+        "seconds": 0.8333330154418945
+      },
+      {
+        "offset": 498668,
+        "payloadLength": 100,
+        "seconds": 0.8333330154418945
+      }
+    ],
+    "boundary": "TimeBegin bytes were re-read directly. SpawnGib ownership/names use the existing reverse-engineered audit schema. Two source spawn events do not imply two full-body cutting planes or arbitrary mesh slicing."
+  },
+  "sourceBoundary": "Native P2 flyer idle wing-fold curves are reused on its existing MC rig. The P1 blade receiver split marker is verified at 0.833333 seconds. Horizontal-body carry orientation, human receiver retargeting, blade arm fitting and runtime mesh sections are MC adaptations, not a claim that an original flyer absorption sequence has been recovered.",
+  "cutCountMeaning": "cuts counts intersected model parts split by confirmed sections; it is not the number of blade strokes or unique cutting planes.",
+  "firstHoldWithinBound": true,
+  "pending": [
+    "Wrong wing-root ownership is fixed in these native cases; preSeverEdgeToThoraxCenter records the improved proximity. Retained real skin contacts still authorize sections, and continuous contact timing across varied receivers remains unaccepted.",
+    "The bounded native blade cases cut the actual thorax into two sides without duplicate blade-side sections; arbitrary receiver shapes and final section appearance still need a broader matrix",
+    "Capture/hold/consume transition continuity and skin/terrain clearance through the whole sequence",
+    "High-speed thin obstacles, uneven floors and multiplayer/crowd/mod matrix",
+    "Remaining creatures, audio and original-game combat acceptance; whole active goal remains incomplete"
+  ],
+  "measurementBoundary": "The cut-query audit compares the production connectedPose result with each same-frame rendered part position (including support lift), and reports the difference from raw interpolated physics as a diagnostic. It is not an acceptance of the receiver choreography or final topology. Receiver triangles come from native baked-mesh world matrices. A QA-only mixin records the mature weapon anchor inside BlacklightClawLayer.renderMesh using the exact draw PoseStack and blended wrist deformation; it does not re-run animation. Render-time equality and mature rigid material are asserted for every held frame. Independent post-frame pose samples remain as a diagnostic, not acceptance authority. Distances can include an anchor embedded inside the receiver surface. This does not measure liquid/growing weapons or certify every hand/receiver contact throughout consumption.",
+  "validation": "Both native clients compiled and ran five scripted gameplay scenes. Successful damage, last-chance ownership, live-body integrity, actual drawn grip-to-native-triangle distances, two-sided thorax sections, one event per authored blade slice, short hurt overlays and completion were checked. Twelve focused unit suites (56 cases per platform) cover backwards-clock invalidation, finite blade/skin intersection, delayed cut generations, connected joint projection, actual sharp-profile fitting without changing arm lengths, original split timing, hierarchy-aware root choice across sparse/forest/cyclic rigs, actual skin support on slabs/steps, connected side-wall separation, finite recovery/current joint anchors and native-renderer offset settling, and finite hit flashes across clock rewinds. Prior broad server/unit regression checkpoints are not represented as rerun by this report.",
+  "visualReview": {
+    "status": "keyframe_sheets_reviewed",
+    "sheets": 10,
+    "framesPerSheet": 16,
+    "boundary": "All frame metadata were checked; visual inspection covers the ten selected keyframe sheets, not a manual pixel review of every captured frame."
+  }
+}

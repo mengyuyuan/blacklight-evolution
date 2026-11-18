@@ -29,6 +29,10 @@ public interface VehicleEntityCollisionMixin {
     @WrapOperation(method="getEntityCollisions",at=@At(value="INVOKE",target="Lnet/minecraft/world/phys/shapes/Shapes;create(Lnet/minecraft/world/phys/AABB;)Lnet/minecraft/world/phys/shapes/VoxelShape;"))
     default VoxelShape blacklight$vehicleContact(AABB box,Operation<VoxelShape> original,
             @Local(ordinal=1) Entity other,@Local(argsOnly=true) Entity mover,@Local(argsOnly=true) AABB query){
+        if(other instanceof com.codex.blacklight.entity.BlackwatchHelicopter craft && mover instanceof net.minecraft.world.entity.LivingEntity){
+            return mover.isPassengerOfSameVehicle(craft)?Shapes.empty():
+                    com.codex.blacklight.military.aircraft.HelicopterSkinContact.walkingShape(craft,query);
+        }
         MilitaryVehicle vehicle=other instanceof MilitaryVehicle parent?parent:other instanceof VehicleHullPart part?part.getParent():null;
         if(vehicle==null)return original.call(box);
         if(mover!=null&&(mover.is(vehicle)||mover.isPassengerOfSameVehicle(vehicle)

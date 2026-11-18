@@ -1,0 +1,5 @@
+allprojects { afterEvaluate {
+    sourceSets.main.java.srcDir('src/blackwatchTest/java')
+    sourceSets.main.resources.srcDir('src/blackwatchTest/resources')
+    sourceSets.main.java.exclude { e -> !e.directory && e.file.path.replace('\\','/').contains('/src/blackwatchTest/java/') && !['BlackwatchSquadGameTest.java','MilitaryFormationGameTest.java'].contains(e.file.name) }
+} }

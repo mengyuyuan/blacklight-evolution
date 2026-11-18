@@ -1,0 +1,40 @@
+{
+  "schema": 1,
+  "date": "2026-11-18",
+  "scope": "Local P1 unpacked META/FIG and native condition disassembly; no claim of original-game runtime observation.",
+  "sources": [
+    "D:/PrototypeReference/p1/private/missile-meta-profiles.json",
+    "D:/PrototypeReference/p1/private/missile-meta-schema.json",
+    "D:/PrototypeReference/p1/private/helicopter-gun-envelope-proof.json"
+  ],
+  "original30mm": {
+    "name": "heli_gunship_30mm_ammo",
+    "recordOffset": 263192,
+    "dataOffset": 263327,
+    "fireRate": {"value": 5, "offset": 263347},
+    "damageOnPlayer": {"value": 20, "offset": 263375},
+    "damageOnNPC": {"value": 20, "offset": 263379},
+    "speed": {"value": 200, "offset": 263403},
+    "distanceToLive": {"value": 175, "offset": 263407}
+  },
+  "separateOriginalConditions": {
+    "ordinaryGun127": {"actorLocalXZ": ">1 and <=60", "absYMax": 30, "targetY": "<0", "yawMaxDegrees": 60, "nativePitchMaxGround": 30, "nativePitchMaxAircraft": 40},
+    "strafeGun151": {"actorLocalXZ": ">10 and <=100", "yawMaxDegrees": 25, "nativePitchDegrees": "<45"},
+    "circleMovementRadius": [20, 30],
+    "warning": "Movement radius, conditional AI firing distance and ammunition lifetime are distinct. Source pitch is the native altered-vector dot formula, not an ordinary atan2 elevation."
+  },
+  "minecraftImplementation": {
+    "dedicatedWeapon": "helicopter_30mm",
+    "wireId": 15,
+    "priorWireIdsPreserved": true,
+    "cooldownTicks": 4,
+    "baseDamage": 20,
+    "rangeBlocks": 175,
+    "damageMapping": "Source 20 maps to MC base damage20; existing CombatScale and target resistance still apply. Actual lost MC health is not necessarily20.",
+    "targetObservation": "Covers installed weapon range plus physical muzzle offset; this radius is an MC adapter, not a proven original acquisition setting.",
+    "slopeOrbit": "Selects the shootable subset of the source20..30 circle band; impossible terrain bands return to another tactic rather than relaxing the source gun conditions.",
+    "trace": "Cosmetic200 units/s maps to10 blocks/tick. Both muzzle and endpoint observers receive feedback.",
+    "remainingDifference": "Server cannon damage is still hitscan. The visible tracer travel does not imply original projectile flight-time damage."
+  },
+  "verification": "See subsequent integration record/logs. This source audit alone does not prove gameplay acceptance."
+}

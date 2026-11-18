@@ -1,0 +1,17 @@
+allprojects { afterEvaluate {
+    sourceSets.main.java.srcDir('src/silentQa/java')
+    sourceSets.main.resources.srcDir('src/silentQa/resources')
+    sourceSets.main.java.srcDir('src/flyerHurtVisual/java')
+    neoForge.runs.client {
+        systemProperty 'blacklight.test.flyerHurt','D:/CodexCache/creature-combat-qa/neo-flyer-hurt-frames'
+        programArguments.addAll '--width','960','--height','640'
+    }
+    tasks.named('processResources').configure {
+        inputs.property('nativeSilentHydraQa',true)
+        doLast {
+            def metadata=new File(destinationDir,'META-INF/neoforge.mods.toml')
+            if(!metadata.getText('UTF-8').contains('blacklight.silent-qa.mixins.json'))metadata.append('\n[[mixins]]\nconfig="blacklight.silent-qa.mixins.json"\n','UTF-8')
+        }
+    }
+    tasks.withType(Jar).configureEach { doFirst {throw new GradleException('Hidden QA profile cannot produce a release JAR')} }
+} }

@@ -1,0 +1,37 @@
+{
+  "origin": "Project-authored procedural synthesis; no commercial audio",
+  "cues": [
+    {
+      "cue": "rotor",
+      "seconds": 4,
+      "mono": true,
+      "decodedPeak": 0.6510863304138184,
+      "rms": 0.3897755444049835,
+      "sha256": "2b845c67ce5e1de7bf8ded9788ab9371985b8ed998b65b7bb7d50096d8d7bfd6"
+    },
+    {
+      "cue": "turbine",
+      "seconds": 4,
+      "mono": true,
+      "decodedPeak": 0.6430529356002808,
+      "rms": 0.2360721081495285,
+      "sha256": "0cf8087594423ae11959e94aabc564bcc2ecf8649305d96b0142362d72b6dc9e"
+    },
+    {
+      "cue": "door",
+      "seconds": 1.2,
+      "mono": true,
+      "decodedPeak": 0.5926073789596558,
+      "rms": 0.07051051408052444,
+      "sha256": "480cda321e5368a2a80696d89e2667abefc057f1d80ca4ddf92bc2b64a371c78"
+    },
+    {
+      "cue": "alarm",
+      "seconds": 2,
+      "mono": true,
+      "decodedPeak": 0.6738599538803101,
+      "rms": 0.24827344715595245,
+      "sha256": "22b355bf978c17363eb2c4e9a3156b3e16300ce99999b9c61af7a03835695d07"
+    }
+  ]
+}

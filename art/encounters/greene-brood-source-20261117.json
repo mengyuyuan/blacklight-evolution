@@ -1,0 +1,84 @@
+{
+  "schema": 1,
+  "date": "2026-11-17",
+  "status": "implemented with cycle integration; static unload lifecycle review complete; runtime checks deferred",
+  "sourceProof": {
+    "path": "D:\\PrototypeReference\\p1\\private\\greene-brood-source-proof.json",
+    "sha256": "83c376eb427f59a486228b9316d8c1936d43fabb0da692604ae919e78492506a"
+  },
+  "sourceFacts": {
+    "wave": "65288 initializes waveCount=1;77396 increments it on entering vulnerable, before the next submerge. Source wave is supplied by Greene cycle; Brood never increments independently.",
+    "actual_interim_budget": "79660 pc004 LOADK K4=6 and005 SETGLOBAL WAVEONETOTAL are unused by the spawn argument. pc021 min=K17(3),022 max=K17(3),023 total=K17(3);038 calls spn_NewEncounter. Thus each submerge creates exactly3 total UndergroundBrawlers, not6. This supersedes this agent's intermediate mistaken interpretation of the unused global, not the repository's existing total3 record.",
+    "interim_locators": "79660 pc007..010 sets three TimesSquare locator names; pc029 branchPath //brawler_hunter/scripted/spawn_underground, pc033 offsetY−5. No Hunter underground animation API currently exists.",
+    "hydra_indices": "168 pc028..055 constructs HYDRAS_PER_WAVE={ {}, {1,2,3,4}, {1,2,3,4}, {1,2,3,4}, {1,2,3,4} }.66452 proto3 nil arg defaults toall1..4. MotherSpawnHydras reuses valid grabbed slots; onlymissing slot creates MotherHydra. Native dead-handle lifetime is not reproduced; an accepted MC death vacates its slot.",
+    "initial": "75836 initial core spawn calls MotherSpawnSegments andMotherEmerge(justCore), but doesnot call MotherSpawnHydras. Therefore wave1 hasnone via onEmerge.",
+    "placement": "66452 proto0 angle=6.283184*index/4+.8, x/z radius12, sourceY3; MC usesloadedheightmap instead ofTimesSquare absoluteY3 andpermitsbounded nearbyclear candidates.",
+    "raise": "MotherEmerge(justCore) deliberately doesnot raiseHydras. Root outermission stages mustcallraiseHydra onexisting slots; Brood doesnot raiseall onEmerge. Hypothetical late queued spawning preserves requestedslotraise asanexplicit safe-spawn retry adaptation.",
+    "first_death": "83908 emitsHydrasDead onlyif !hydrasDead andMotherHydrasAlive()==gMotherNumHydras−1(3), then setstrue.77124 onCombat entry resetsfalse.66452 proto13 countsvalidgrabslotobjects withhealth>0. Receipt snapshots three-live condition atdeath event, then commits onlyafter accepted noncanceled death.",
+    "respawn": "168pc056..057 assigns HYDRA_RESPAWN_TIME=20.83908 schedules slot RespawnMotherHydra(indx) andMotherHydraEmerges onlywhenHydraRespawnOn atdeath.84668 enablesflag;82784 disablesoncleanup. Turningflagofflater doesnotcancelalreadyqueued schedulecalls. Ownerdeath/dispose explicitly cancelsMCpending work.",
+    "cleanup": "82784 disablesrespawn andcallsMotherCleanUp.66452proto11 buries eachvalidHydra andcallsai_DeleteWhenOffCamera(hydra,50). No immediate kill oftheownedHunters is proven inthislocalchain; broader missionencountercleanup is outsidecurrent helper.",
+    "submerge_hydras": "66452 proto10 pc017..039 loops Hydra1..gMotherNumHydras; pc033..037 calls ai_SetUnderground(hydra,true,false), pc038 writes hydra.underground=true. The mother submerge command applies to existing Hydra slots as well as the core."
+  },
+  "api": [
+    "onSubmerge(EncounterMob,int sourceWave)",
+    "onEmerge(EncounterMob,int sourceWave)",
+    "tick(EncounterMob)",
+    "onCombatStarted()",
+    "raiseHydra(EncounterMob,int oneBasedSlot)",
+    "setRespawnEnabled(boolean)",
+    "pollFirstHydraDeath():boolean",
+    "dispose(EncounterMob)",
+    "save():CompoundTag",
+    "load(CompoundTag)"
+  ],
+  "minecraft_adaptations": [
+    "UndergroundBrawler is mapped to existing BlacklightHunter, never Stalker; currently safe ground spawn without the unimplemented original underground birth animation.",
+    "Source fixed TimesSquare locators/Y3 replaced with loaded heightmap candidates. Solid support underroot, no fluid, worldborder/buildheight, root and aboveground Hydra rise envelope mustbe clear. No tickets or chunk loads requested. Obstruction retriesevery40server ticks.",
+    "Source seconds mapto20Hz MC server time:20second respawn=400ticks. Whenowner orrequiredground isunloaded, spawning waits; missing UUID doesnot implydeath.",
+    "OwnerentityNBT persistsplannedslots/raisedrequests/due time/waves. Per-dimension SavedData recordsaccepteddeath andspent Hunteridentity soowner unloaddoesnotduplicatebudget. Deathcommit rechecks cancellation andLivingDeathAccess afteralllisteners.",
+    "Source dynamic GrabSlot parent relation is represented byownerUUID,kind,index,wave tags andworldledger. Source validdeadhandle isadaptedtoaccepteddeath invalidating spawnslot.",
+    "Source offcamera deletionisadapted tocompletedexisting hyd_exit andno living non-spectator playerwithin50blocks. The native meaningofargument50/camera visibilityisnotclaimed decoded.",
+    "Onownerdeath, pendingrespawns stop; existingHydras retirethroughburrow; Hunters loseencountertagbutremainalive.Chunkunloadonlysaves. Player-planted/transportHydras cannotbeadopted.",
+    "Accepted dead Hydra bodies retain the existing Minecraft death/removal lifecycle. Source83908 also requests underground on the dead object; that corpse motion is not implemented or claimed here.",
+    "Source MotherHydraEmerges scenario broadcast is not a global MC mission event; actual slot respawn is implemented, while unrelated mission UI/camera handlers remain outside Brood.",
+    "Desired Hydra raised/buried state is persisted both in the mother slot and its per-world child ledger, reapplied during owner ticks and child join without loading chunks. An absent Raised key in older ledgers remains unknown until the owner supplies its saved slot state. Repeated commands preserve in-progress enter/exit and aboveground attacks rather than restarting them.",
+    "pollFirstHydraDeath preserves the proven task event receipt. The standalone battle cycle currently omits downstream Times Square camera/dialogue handlers; the event does not invent an extra shield gate or all-Hydras-dead requirement."
+  ],
+  "unrun_scenarios": [
+    "Firstwave1 startswithoutHydras;firstsubmergewave2 creates3Hunters and repeatedsamewave doesnotcreateextra.",
+    "Wave2 createsfourtask-owned buriedHydras; nearbyplayerdoesnot autoemerge; onlyraiseHydra3 raises slot3.",
+    "Save/load duringburrow/rise preservesowner,phaseandtime; playertransportHydras behaviorunchanged.",
+    "AcceptedfirstHydradeathwhen3remain produces one notification percombatcycle; canceled/fakedeathproducesnone.",
+    "Respawnenabledatthedeath queuesonlythat slot400ticksafterdeath andplaysrise; disabledflagdoesnotretroactivelyscheduleolddeaths.",
+    "Motherunload withchilddeath persistsreceipt; reloaddoesnotduplicate livingunloadedUUIDs, deadHunterspentbudget orclosedownerchildren.",
+    "Fullyblocked/unsupported/water/worldborder/unloadedpositions defer withoutchildbudgetconsumption orforcedchunkloading.",
+    "Ownerdeathwhilechildrenunloaded persistsretirement; returningHydra burrowsandlaterretires, Hunterownershipclears withoutkill.",
+    "Unload a buried Hydra while its mother remains loaded, raise its slot, then reload the Hydra: exactly one existing enter animation starts and no duplicate child is spawned.",
+    "Unload a surface Hydra during a mother submerge, then unload the mother before reloading the Hydra: its world ledger applies the saved buried command even without a loaded mother.",
+    "Reapply an unchanged raised command throughout enter and each surface attack/throw: action age and attacks continue; unchanged buried commands likewise do not reset exit.",
+    "Load an older ledger without Raised: child motion is not guessed or overwritten at join; a loaded owner later reconciles its persisted slot command.",
+    "Terminate the mother from a Hydra or Hunter EntityJoinLevel callback: no later slot/wave spawns, no concurrent modification, and the just-inserted child receives normal retirement/release cleanup.",
+    "Cancel that child insertion while also terminating the mother: provisional identity is removed, the unadded child is discarded, and no subsequent spawn attempts occur.",
+    "Reuse an underground mother instance with legacy NBT while its three wave2 Hunters are unloaded: old rows stay RETIRING, new wave2 receives three fresh slots, and old returning children only release their task ownership. A normal new-format reload still restores DEAD spent Hunter identities without duplicating the same wave."
+  ],
+  "files": {
+    "D:\\blacklight-evolution": {
+      "src/main/java/com/codex/blacklight/combat/GreeneBrood.java": "c5e45127e53a8fc8d0c1aa105a7b32671ba0190dc03698a69c622d458c4acffe",
+      "src/main/java/com/codex/blacklight/entity/BlacklightHydra.java": "ea718dc67d8398c61f7c6886525803243c0e65eb82a59575a40b38bbb418e8fa"
+    },
+    "D:\\blacklight-evolution-forge-1.20.1": {
+      "src/main/java/com/codex/blacklight/combat/GreeneBrood.java": "c39deab05fed0a982670efb956b86a41eac167463b5707729ece72f7cfe9aa1f",
+      "src/main/java/com/codex/blacklight/entity/BlacklightHydra.java": "867dea35b4280f8c1d26bbe4f5b3606ff59a02af305bc7baeab99e38b6277284"
+    }
+  },
+  "validation": "Source bytecode read, platform-neutral section comparison, JSON parse, and scoped whitespace/conflict/hash checks only; no compile, unit/GameTest or client executed.",
+  "staticReview": {
+    "cycle": "GreeneBattleCycle calls onSubmerge only after RISING, onEmerge after one emergence tick, and saves hydrasSpawned/nextHydra/emergeElapsed together with the nested Brood tag. Source wave increments only on DOWN entry; Brood entry guards suppress repeated identical wave callbacks.",
+    "surface": "Brood spawn candidates use only mother X/Z plus the already-loaded chunk heightmap. Mother root sinking twenty source units does not move the candidate ground Y underground.",
+    "unload_fix": "The prior implementation stored Slot.raised but called setGreeneUnderground only if the child was currently loaded; existing non-null child IDs never retried. applyHydraState now records the desired state and reconciles existing identities, and childJoined reads it even while the mother is unloaded.",
+    "idempotence": "setGreeneUnderground now treats any existing non-4/non-11 action as aboveground, preserving combat on repeated raised requests. A genuine desired buried/raised transition still cancels the old combat/motion once.",
+    "scope": "No shared EncounterMob, GreeneBattleCycle or GreeneMotion edits in this followup. No Java, compilation, automated tests, game/client or media playback.",
+    "spawn_reentrancy": "EntityJoinLevel callbacks may kill/discard the mother while addFreshEntity is still on the stack. Spawn now checks activity before and after insertion, stops its caller after a terminated-owner callback, and finishes the existing retirement policy for a child that became visible only after dispose. Pending Hunter waves iterate a snapshot, preventing disposal clearing the list from invalidating its iterator.",
+    "legacy_task_replacement": "When a reused mother instance loads legacy NBT without GreeneBattle, the cycle disposes its previous Brood before loading an empty Brood. Disposal removes DEAD receipts and marks remaining children RETIRING; new Hydra slot recovery already excludes RETIRING. Hunter recovery now also excludes RETIRING, so an unloaded old wave with the same numerical wave index cannot consume the replacement task budget. Normal same-task DEAD Hunter receipts remain valid spent identities. Retiring rows remain in the world ledger until the old child returns, preserving cleanup; they are not globally erased."
+  }
+}

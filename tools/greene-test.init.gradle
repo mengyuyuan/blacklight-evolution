@@ -1,0 +1,11 @@
+allprojects { afterEvaluate {
+    tasks.named('test',Test).configure {
+        include '**/GreeneMotionTest.class'
+        include '**/EncounterMoveTest.class'
+        include '**/HydraContactTest.class'
+        include '**/HydraWoundAnchorTest.class'
+        reports.junitXml.outputLocation=layout.buildDirectory.dir('test-results/greene-cycle')
+        reports.html.outputLocation=layout.buildDirectory.dir('reports/tests/greene-cycle')
+        binaryResultsDirectory=layout.buildDirectory.dir('test-results/greene-cycle-binary')
+    }
+} }

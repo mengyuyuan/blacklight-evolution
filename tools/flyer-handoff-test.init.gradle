@@ -1,0 +1,5 @@
+allprojects { afterEvaluate {
+    tasks.named('test', Test).configure {
+        include '**/RagdollPoseHistoryTest.class','**/SweptBladeSurfaceTest.class','**/BladeCutSequenceTest.class','**/RagdollJointProjectionTest.class','**/ConsumePlacement*Test.class','**/BlacklightBoneIkTest.class','**/HurtFlashWindowTest.class','**/BladeConsumePoseTest.class','**/ContactSectionTest.class','**/RagdollRootSelectionTest.class','**/RagdollTerrainSupportTest.class','**/RagdollRecoveryTest.class'
+    }
+} }

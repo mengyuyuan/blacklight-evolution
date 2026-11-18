@@ -1,6 +1,7 @@
 package com.codex.blacklight.gametest.vehicle;
 
 import com.codex.blacklight.city.*;
+import com.codex.blacklight.config.InfectionEcologyConfig;
 import com.codex.blacklight.entity.*;
 import com.codex.blacklight.infection.*;
 import com.codex.blacklight.military.MilitaryFaction;
@@ -27,10 +28,12 @@ public final class RedZoneVehicleSpawnGameTest {
     private static final class Rules implements AutoCloseable {
         final ServerLevel level;final boolean enabled,spawning,outbreak,patrols;final int limit,personnel,interval;
         final OutbreakData previousOutbreak;
+        final List<? extends String> excludedDimensions;
         Rules(ServerLevel level){
             this.level=level;enabled=MilitaryCampaignConfig.ENABLED.get();outbreak=OutbreakConfig.ENABLED.get();patrols=MilitaryCampaignConfig.VEHICLE_PATROLS.get();interval=MilitaryCampaignConfig.VEHICLE_PATROL_INTERVAL.get();
             previousOutbreak=OutbreakData.load(OutbreakData.get(level.getServer()).save(new net.minecraft.nbt.CompoundTag(),level.registryAccess()),level.registryAccess());
             spawning=level.getGameRules().getBoolean(GameRules.RULE_DOMOBSPAWNING);
+            excludedDimensions=InfectionEcologyConfig.EXCLUDED_DIMENSIONS.get();
             limit=MilitaryCampaignConfig.VEHICLE_PATROL_LIMIT.get();personnel=CityConfig.MILITARY_GARRISON_LIMIT.get();
             MilitaryCampaignConfig.ENABLED.set(true);MilitaryCampaignConfig.VEHICLE_PATROLS.set(true);
             OutbreakConfig.ENABLED.set(true);MilitaryCampaignConfig.VEHICLE_PATROL_LIMIT.set(8);CityConfig.MILITARY_GARRISON_LIMIT.set(200);
@@ -41,6 +44,7 @@ public final class RedZoneVehicleSpawnGameTest {
         @Override public void close(){MilitaryCampaignConfig.ENABLED.set(enabled);OutbreakConfig.ENABLED.set(outbreak);MilitaryCampaignConfig.VEHICLE_PATROLS.set(patrols);MilitaryCampaignConfig.VEHICLE_PATROL_INTERVAL.set(interval);
             MilitaryCampaignConfig.VEHICLE_PATROL_LIMIT.set(limit);CityConfig.MILITARY_GARRISON_LIMIT.set(personnel);
             level.getGameRules().getRule(GameRules.RULE_DOMOBSPAWNING).set(spawning,level.getServer());
+            InfectionEcologyConfig.EXCLUDED_DIMENSIONS.set(excludedDimensions);
             previousOutbreak.setDirty();level.getServer().overworld().getDataStorage().set("blacklight_outbreak",previousOutbreak);}
     }
     private static void collect(MilitaryVehicleGameTest.Fixture f,MilitaryVehicle vehicle){f.entities.addAll(vehicle.getPassengers());f.entities.add(vehicle);}
@@ -57,6 +61,11 @@ public final class RedZoneVehicleSpawnGameTest {
         int y=f.level.getChunkSource().getChunkNow(center.getX()>>4,8).getHeight(net.minecraft.world.level.levelgen.Heightmap.Types.MOTION_BLOCKING_NO_LEAVES,center.getX(),128)+1;
         var player=MilitaryVehicleGameTest.mockPlayer(h);f.entities.add(player);player.setPos(center.getX()+.5,y,128.5);player.setGameMode(net.minecraft.world.level.GameType.CREATIVE);
         h.assertTrue(VehicleGarageService.data(f.level).garages().stream().noneMatch(g->Math.abs(g.site().x()-center.getX())<512),"no local garage exists for this real random patrol");
+        // A visible infected makes a street patrol stop to engage. Exercise the driving branch
+        // while preserving the live outbreak, red district and actual random patrol spawner.
+        var excluded=new LinkedHashSet<String>(rules.excludedDimensions);
+        excluded.add(f.level.dimension().location().toString());
+        InfectionEcologyConfig.EXCLUDED_DIMENSIONS.set(List.copyOf(excluded));
         awaitRandom(h,f,rules,center,800);
     }
     private static void awaitRandom(GameTestHelper h,MilitaryVehicleGameTest.Fixture f,Rules rules,BlockPos center,int left){
@@ -87,7 +96,7 @@ public final class RedZoneVehicleSpawnGameTest {
             if(moved>4||left<=0){try(f;rules){
                 for(var entity:f.level.getAllEntities())if(entity instanceof MilitaryVehicle v&&v.blockPosition().distSqr(center)<256*256&&VehicleFleetSavedData.get(f.level).vehicleFleet(v.getUUID()).map(VehicleFleet::ambientPatrol).orElse(false))collect(f,v);
                 var fleet=VehicleFleetSavedData.get(f.level).vehicleFleet(vehicle.getUUID()).orElseThrow();
-                h.assertTrue(moved>4,"real registered random patrol must drive; moved="+moved+" "+VehicleFleetSystem.diagnostic(f.level,fleet.id(),vehicle.getUUID()));
+                h.assertTrue(moved>4,"real registered random patrol must drive; moved="+moved+" contacts="+fleet.contacts()+" "+VehicleFleetSystem.diagnostic(f.level,fleet.id(),vehicle.getUUID()));
                 h.assertTrue(vehicle.occupant(VehicleDefinition.Job.DRIVER) instanceof MilitarySoldier driver&&MilitaryVehicle.crewOperational(driver),"moving patrol retains an actual operational driver");
                 for(var id:crew){
                     var entity=f.level.getEntity(id);

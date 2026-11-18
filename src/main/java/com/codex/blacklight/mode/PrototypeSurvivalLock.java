@@ -18,6 +18,15 @@ public final class PrototypeSurvivalLock {
     private PrototypeSurvivalLock() {
     }
 
+    /** Explicit placement tools keep ordinary use input while Prototype combat owns empty hands. */
+    public static boolean placementItem(Player player,net.minecraft.world.item.ItemStack stack){
+        return com.codex.blacklight.military.vehicle.VehicleRegistry.isVehicleTool(stack)
+                ||player.isCreative()&&stack.getItem() instanceof net.minecraft.world.item.SpawnEggItem;
+    }
+    public static boolean holdingPlacementItem(Player player){
+        return player!=null&&(placementItem(player,player.getMainHandItem())||placementItem(player,player.getOffhandItem()));
+    }
+
     /** Disabling pickup leaves the dropped item intact; enabling it keeps vanilla ownership/delay rules. */
     @SubscribeEvent
     public static void onItemPickup(net.neoforged.neoforge.event.entity.player.ItemEntityPickupEvent.Pre event) {
@@ -37,6 +46,14 @@ public final class PrototypeSurvivalLock {
     @SubscribeEvent
     public static void onRightClickBlock(PlayerInteractEvent.RightClickBlock event) {
         if (!isLocked(event.getEntity())) return;
+        if(!event.getEntity().isSpectator()&&holdingPlacementItem(event.getEntity())){
+            if(!placementItem(event.getEntity(),event.getItemStack())){
+                // Vanilla tries the main hand first. Yield without using it so the offhand tool can run.
+                event.setCancellationResult(InteractionResult.PASS);event.setCanceled(true);return;
+            }
+            // Allow the actual item-use path, without also opening/using the clicked survival block.
+            event.setUseBlock(net.neoforged.neoforge.common.util.TriState.FALSE);return;
+        }
         if(com.codex.blacklight.firearms.FirearmsCombat.holdingFirearm(event.getEntity())){
             // Suppress block interaction while permitting vanilla's follow-up item-use path.
             event.setCancellationResult(InteractionResult.PASS);event.setCanceled(true);return;
@@ -48,6 +65,12 @@ public final class PrototypeSurvivalLock {
 
     @SubscribeEvent
     public static void onRightClickItem(PlayerInteractEvent.RightClickItem event) {
+        if(isLocked(event.getEntity())&&!event.getEntity().isSpectator()&&holdingPlacementItem(event.getEntity())){
+            if(!placementItem(event.getEntity(),event.getItemStack())){
+                event.setCancellationResult(InteractionResult.PASS);event.setCanceled(true);
+            }
+            return;
+        }
         if (event.getItemStack().getItem() instanceof com.codex.blacklight.firearms.FirearmItem) return;
         if (event.getItemStack().getItem() instanceof com.codex.blacklight.item.ParasiteSyringeItem) return;
         if (!isLocked(event.getEntity())) return;
@@ -58,6 +81,7 @@ public final class PrototypeSurvivalLock {
 
     @SubscribeEvent
     public static void onRightClickEmpty(PlayerInteractEvent.RightClickEmpty event) {
+        if(holdingPlacementItem(event.getEntity()))return;
         // RightClickEmpty is not cancellable in NeoForge 21.1; empty-hand swings
         // carry no survival interaction, so a notice is the only useful handling.
         if (!isLocked(event.getEntity())) return;
@@ -66,7 +90,7 @@ public final class PrototypeSurvivalLock {
 
     @SubscribeEvent
     public static void onEntityInteract(PlayerInteractEvent.EntityInteract event) {
-        if(com.codex.blacklight.military.vehicle.VehicleDamageBridge.vehicle(event.getTarget())!=null)return;
+        if(com.codex.blacklight.military.vehicle.VehicleDamageBridge.vehicle(event.getTarget())!=null||event.getTarget() instanceof com.codex.blacklight.entity.BlackwatchHelicopter)return;
         if(event.getItemStack().getItem() instanceof com.codex.blacklight.item.ParasiteSyringeItem)return;
         if (!isLocked(event.getEntity())) return;
         event.setCancellationResult(InteractionResult.FAIL);
@@ -76,7 +100,7 @@ public final class PrototypeSurvivalLock {
 
     @SubscribeEvent
     public static void onEntityInteractSpecific(PlayerInteractEvent.EntityInteractSpecific event) {
-        if(com.codex.blacklight.military.vehicle.VehicleDamageBridge.vehicle(event.getTarget())!=null)return;
+        if(com.codex.blacklight.military.vehicle.VehicleDamageBridge.vehicle(event.getTarget())!=null||event.getTarget() instanceof com.codex.blacklight.entity.BlackwatchHelicopter)return;
         if(event.getItemStack().getItem() instanceof com.codex.blacklight.item.ParasiteSyringeItem)return;
         if (!isLocked(event.getEntity())) return;
         event.setCancellationResult(InteractionResult.FAIL);

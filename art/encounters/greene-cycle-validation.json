@@ -1,0 +1,658 @@
+{
+  "schema": 1,
+  "recordedAt": "2026-11-16T04:08:15.125967+00:00",
+  "scope": "Greene independent appendages, collapse / configurable cyclic down / rise, exact posed receiving surfaces; not full species completion",
+  "sourceScheduling": {
+    "collapseTicks": 125,
+    "downHoldTicksDefault": 400,
+    "downHoldTicksRange": [
+      75,
+      2400
+    ],
+    "riseTicks": 50,
+    "defaultCycleTicks": 575,
+    "sourceDownFrames": [
+      60,
+      150
+    ],
+    "downLoopTicks": 75,
+    "qualification": "MC hold window is explicit balance config, not reconstructed original timer semantics. P1 TimerSet 9728 = 26.6667 s with RandomRange = 1; TimerCompare 10676 comparison hash remains unresolved. Legacy EXPOSED action table is historical one-pass evidence; GreeneMotion supplies the new state schedule."
+  },
+  "changes": [
+    "Three independent 90-point appendages and 10-tick local hit clocks; accepted limb damage does not chip body HP or share body invulnerability.",
+    "All three broken appendages cancel pending attacks and expose the body; down hit overlay does not reset the cycle.",
+    "Rise completes before defenses return; phase advances by completed cycles rather than arbitrary body-health thresholds.",
+    "Save/load preserves armor, local hit cooldowns, explicit hold duration and current cycle age without offline catch-up.",
+    "Existing 150 authored cubes drive native proxies. Nonuniform bone scale plus rotated cubes retains affine/sheared receiving surfaces.",
+    "Physics origin stays separate from animated receiving bounds; rooted Greene rejects push/knockback. Frustum bounds include posed proxies.",
+    "Accepted appendage hits use local tissue feedback; collapse/recovery invoke existing ERUPT/MEND cues. Metallic limb-break cue removed for Greene."
+  ],
+  "limits": [
+    "Entry and death choreography, source projectile sockets and wave cover validation remain pending.",
+    "No new geometry or texture was authored in this batch. Existing authored body has 150 runtime cuboids; older surface provenance describes an earlier asset revision.",
+    "Native QA uses two headings, a flat disposable arena, goals removed but physics active, six high-damage native arrows to appendages and two low-damage body arrows per loader.",
+    "Hidden muted clients verify visual/contact/state behavior; no listening assessment or dedicated multiplayer test was performed.",
+    "No user worlds, install, release JAR, commit or publication. Writes and caches remain on D:."
+  ],
+  "beforeAffine": {
+    "neo": {
+      "frames": 408,
+      "maxSkinError": 0.03850469426197694,
+      "error": null
+    },
+    "forge": {
+      "frames": 408,
+      "maxSkinError": 0.0385041917594932,
+      "error": null
+    }
+  },
+  "rejectedCases": {
+    "initialUnit": "The runtime mesh has exactly 150 cuboids; the original test mistakenly asserted >150. Corrected the test to the measured inventory.",
+    "saveReload": "Appendage health could be negative immediately after an overkill hit but was clamped to zero on load. Production subtraction now clamps at zero so save/reload is identical.",
+    "animatedMovementBox": "Replacing the parent's movement AABB with a posed body union let vanilla movement reinterpret that box as a new world origin. Receiving proxies now own animation bounds; root physics remains stable.",
+    "nativeKnockback": {
+      "failureAt": "First low-damage body arrow, after scene age 300",
+      "observedPosition": [
+        0.012021120393088483,
+        81.02080000013113,
+        -0.05878343960490262
+      ],
+      "expectedRoot": [
+        0,
+        81,
+        0
+      ],
+      "fix": "Rooted Greene rejects push and knockback; the accepted-hit body overlay still plays."
+    },
+    "affine": "A nonuniform neck bone scale followed by a rotated cube is skewed, so orthogonal projection leaked up to 0.0385047 blocks beyond the old receiver. Affine inverse basis, face normals, and closest face/edge projection now retain the rendered surface.",
+    "selfProjectile": "EncounterProjectile excluded old EncounterPart owners but omitted the new GreenePart. Once leftOwner became true outside the movement box, own appendages could pop the projectile. Explicit owning-part exclusion plus a native flying projectile test added.",
+    "fixtures": [
+      "Radio completed test now explicitly selects the UAV fallback by placing the helicopter support cooldown beyond the test. The normal Blackwatch radio prefers transport support.",
+      "The pure recharge persistence test removes AI goals while leaving entity ticks active, so autonomous goal stop/cancel cannot modify its startup cooldown."
+    ]
+  },
+  "persistedFixtureEntities": {
+    "path": "D:\\CodexCache\\greene-cycle-qa\\persisted-test-entities.json",
+    "sha256": "8190709a782e2d974b476be959b366436072585285e844293ee78a53fc236687"
+  },
+  "platforms": {
+    "neo": {
+      "sourceSha256": {
+        "src/main/java/com/codex/blacklight/combat/GreeneMotion.java": "42c0d49b0d49aad490fe156eb8a8f98c494d551ba0ac7af3a61b6ecb5281df34",
+        "src/main/java/com/codex/blacklight/combat/GreeneContact.java": "90ce404ea858b751bb2683bc662a6498af953ac321c2a419898440f10a1d303f",
+        "src/main/java/com/codex/blacklight/combat/HydraContact.java": "af1a8098b6926200a70fbd36f2c4482828ba7582c7cbd31e32066f4c8d57e431",
+        "src/main/java/com/codex/blacklight/entity/GreenePart.java": "bb57936311954905221e5130466fb2cc6719c6ba1a361125fd9c98d49bc5c0a2",
+        "src/main/java/com/codex/blacklight/entity/EncounterMob.java": "024668685d990deefcab59983f322ca5f3c76b83108335e55ce6be35124e7213",
+        "src/main/java/com/codex/blacklight/entity/EncounterProjectile.java": "ce6b97a2adbf81598cd992eb2554aaf54ad899bed2faae8c767ab35d219974c7",
+        "src/main/java/com/codex/blacklight/client/model/SourceBossPose.java": "204e3e320272208348eaa359ed5305f84c458e6e1feb1f5e32f96f317a0f2c38",
+        "src/main/java/com/codex/blacklight/mixin/HydraProjectileContactMixin.java": "1fa77f4b5f4d0e184bdf0bb97b1b408ad0b999728be0ab00900013f81688c13a",
+        "src/main/java/com/codex/blacklight/config/GameplayBalanceConfig.java": "80a67032d14178584c5c6502fb7d00aae8d90b422e84231c2f4ca16057a0daab",
+        "src/main/resources/assets/blacklight/geo/elizabeth_greene_mc.geo.json": "9056615574a24118cf0518bb32c3edc98630886e7aedb85552a319ce9a9eae1e",
+        "src/main/resources/assets/blacklight/models/encounter_elizabeth_greene_source.json": "d4ec4db521873c4bb02d50ebeb168186b4c418c6b23cb9fa3fd9f82e8b2c6888",
+        "src/main/resources/assets/blacklight/models/encounter_source_actions.json": "58e58c59bc294b1e84e35d55181d962b6de53b09069a7677980969c6d576ecb2",
+        "src/test/java/com/codex/blacklight/combat/GreeneMotionTest.java": "1e9af32f58527a01fa0b29388cc12bcd98c6771efcbc42c2cbedbdd24fe46c42",
+        "src/greeneTest/java/com/codex/blacklight/gametest/GreeneCycleGameTest.java": "437e053c51410e476d24b9ad8e08f091310fafa973e92d8e94e88989513133d1",
+        "src/greeneVisual/java/com/codex/blacklight/client/GreeneCycleVisual.java": "b8e10be7513bf8967e88f023a3e78e7bf29fa06663c97d8207ff2f204684e366",
+        "src/encounterTest/java/com/codex/blacklight/gametest/EncounterGameTest.java": "058579698c698f06d6d685989abcbe84e6d61b0c0bd639eb0ee00f0927e4bf69",
+        "tools/greene-test.init.gradle": "14d5ac06a0ba5d8e7077d2bde7c14734fa5f21fe4e4cb28005b884f15dcaad21",
+        "tools/greene-server.init.gradle": "410fd775bc9fdbbbaccad4597f641d88cdfe483aaf999e205b5671e6017ddfa2",
+        "tools/greene-visual.init.gradle": "c5ec3c02a531304607eb85fef2352d473d1e8850ccc75ef282ac540f4209da64"
+      },
+      "unit": [
+        {
+          "name": "com.codex.blacklight.client.renderer.HydraWoundAnchorTest",
+          "tests": "3",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0"
+        },
+        {
+          "name": "com.codex.blacklight.combat.EncounterMoveTest",
+          "tests": "24",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0"
+        },
+        {
+          "name": "com.codex.blacklight.combat.GreeneMotionTest",
+          "tests": "7",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0"
+        },
+        {
+          "name": "com.codex.blacklight.combat.HydraContactTest",
+          "tests": "16",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0"
+        }
+      ],
+      "servers": {
+        "greeneServer": {
+          "passed": 11,
+          "log": {
+            "path": "D:\\CodexCache\\creature-combat-neo-greeneServer.log",
+            "sha256": "1bf274107d489bf218f23b8c634484ee5daa65bc88612a0f91a97f2170af0b61"
+          }
+        },
+        "encounterServer": {
+          "passed": 100,
+          "log": {
+            "path": "D:\\CodexCache\\creature-combat-neo-encounterServer.log",
+            "sha256": "92735a67e1f32e4a42727024d5e80ee6cbdc6c4cc8deff7b841854e34a5f6dcf"
+          }
+        }
+      },
+      "native": {
+        "frames": 407,
+        "nativeArrows": 8,
+        "skinToReceiverMax": 2.533908062575487e-05,
+        "lowest": 80.53758239746094,
+        "selectedFrames": [
+          "0-000.png",
+          "0-008.png",
+          "0-020.png",
+          "0-044.png",
+          "0-068.png",
+          "0-084.png",
+          "0-124.png",
+          "0-180.png",
+          "0-240.png",
+          "0-304.png",
+          "0-312.png",
+          "0-400.png",
+          "0-580.png",
+          "0-600.png",
+          "0-624.png",
+          "0-632.png",
+          "0-636.png",
+          "0-644.png",
+          "0-660.png",
+          "0-688.png",
+          "1-000.png",
+          "1-008.png",
+          "1-020.png",
+          "1-044.png",
+          "1-068.png",
+          "1-084.png",
+          "1-124.png",
+          "1-180.png",
+          "1-240.png",
+          "1-304.png",
+          "1-312.png",
+          "1-400.png",
+          "1-580.png",
+          "1-600.png",
+          "1-624.png",
+          "1-632.png",
+          "1-636.png",
+          "1-644.png",
+          "1-660.png",
+          "1-688.png"
+        ],
+        "stages": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "evidence": {
+          "path": "D:\\CodexCache\\greene-cycle-qa\\neo-frames\\evidence.json",
+          "sha256": "8426be3118b345d0f2359fe347f76040ffa249be5f4385aa1112d93569f5e071"
+        },
+        "selectedReviewedImages": [
+          {
+            "path": "D:\\CodexCache\\greene-cycle-qa\\neo-frames\\0-000.png",
+            "sha256": "0f4d96b6753a3c45e14f8a823901cc93968c0e3fe35aa34f750355efcf8aefbd"
+          },
+          {
+            "path": "D:\\CodexCache\\greene-cycle-qa\\neo-frames\\0-008.png",
+            "sha256": "4955459ac5678ba8384105aa68e02a4404b032584a5f659def4a909f2bca4abe"
+          },
+          {
+            "path": "D:\\CodexCache\\greene-cycle-qa\\neo-frames\\0-020.png",
+            "sha256": "54343d244f28135b71fcf4c0b9d21379b2d74b8a4b24533e5cb4b30431366c6f"
+          },
+          {
+            "path": "D:\\CodexCache\\greene-cycle-qa\\neo-frames\\0-044.png",
+            "sha256": "367fc97a5ec2fd8f57e7899e33971c43b26160995b16a759f34b532aa641a4b7"
+          },
+          {
+            "path": "D:\\CodexCache\\greene-cycle-qa\\neo-frames\\0-068.png",
+            "sha256": "2fc6f0b2e246606cb754696552c1e8137a63ff92d61a58ea80b7476c84da9aa4"
+          },
+          {
+            "path": "D:\\CodexCache\\greene-cycle-qa\\neo-frames\\0-084.png",
+            "sha256": "e70f6e9ce7b90fb999824cc36604351525e2583da4ca65132080f5c7853883cd"
+          },
+          {
+            "path": "D:\\CodexCache\\greene-cycle-qa\\neo-frames\\0-124.png",
+            "sha256": "1864b00e9fef9e085fbe91fecaa267ffd851207ad96176483c0ce5de22a36c90"
+          },
+          {
+            "path": "D:\\CodexCache\\greene-cycle-qa\\neo-frames\\0-180.png",
+            "sha256": "1f64857e4fa5cea1416642523bd69d32e106722d2173dd21a2997068703079b5"
+          },
+          {
+            "path": "D:\\CodexCache\\greene-cycle-qa\\neo-frames\\0-240.png",
+            "sha256": "bd08d75adbe3ca218cb7786cb5dfd9da230908eee336885817035fa1572f16e0"
+          },
+          {
+            "path": "D:\\CodexCache\\greene-cycle-qa\\neo-frames\\0-304.png",
+            "sha256": "1c3312fa0ab41694e1c4b8224b25f1ba9b3b4ceb7d70c19f0a48647fe934360b"
+          },
+          {
+            "path": "D:\\CodexCache\\greene-cycle-qa\\neo-frames\\0-312.png",
+            "sha256": "9f698f8dd6c92727ee50c203a2d79537238042b3804c6940854dde78ba74f26b"
+          },
+          {
+            "path": "D:\\CodexCache\\greene-cycle-qa\\neo-frames\\0-400.png",
+            "sha256": "bc8aa4b4b8f58630afabc396dda6df5f5d975f2415a2bd9124102b20d554a2f1"
+          },
+          {
+            "path": "D:\\CodexCache\\greene-cycle-qa\\neo-frames\\0-580.png",
+            "sha256": "bb45d9b00251caae3b03388dfa5ebcafe76c18fe6e36148c624969ff10d16b52"
+          },
+          {
+            "path": "D:\\CodexCache\\greene-cycle-qa\\neo-frames\\0-600.png",
+            "sha256": "132c13445ea28ba6c2d97b8e8c9c9612a8fd69ad348041578181c20a424f7122"
+          },
+          {
+            "path": "D:\\CodexCache\\greene-cycle-qa\\neo-frames\\0-624.png",
+            "sha256": "8b4b20d95490e4d5a6a54e40e880731b1ae915a19ce2fbbefb8161dd89d076ef"
+          },
+          {
+            "path": "D:\\CodexCache\\greene-cycle-qa\\neo-frames\\0-632.png",
+            "sha256": "40606050fbdac4a5e07170e4468de22f2c05bc5c7bc35382defd87160f2e6d33"
+          },
+          {
+            "path": "D:\\CodexCache\\greene-cycle-qa\\neo-frames\\0-636.png",
+            "sha256": "65971079b0ab0f1fd8ae5d2d190e2a0e878333f5c250b5197959736fcc22e4bd"
+          },
+          {
+            "path": "D:\\CodexCache\\greene-cycle-qa\\neo-frames\\0-644.png",
+            "sha256": "7275e440203ce371a2bca49c6edbbb01ebe82c9fe24b461176fb3d7a675361fd"
+          },
+          {
+            "path": "D:\\CodexCache\\greene-cycle-qa\\neo-frames\\0-660.png",
+            "sha256": "90a85291173c91cd0a83802c8db1bbe1537701faff222cf703265981dcd0b3d5"
+          },
+          {
+            "path": "D:\\CodexCache\\greene-cycle-qa\\neo-frames\\0-688.png",
+            "sha256": "ef21efd5883e7b7e556c385b4e93c896049f78b8c7c674e3e9aacf7db064549f"
+          },
+          {
+            "path": "D:\\CodexCache\\greene-cycle-qa\\neo-frames\\1-000.png",
+            "sha256": "afc867d9d4dc7601ac6c09b943f7d3cf4f2f854c6a3788c0057262918f7b70ce"
+          },
+          {
+            "path": "D:\\CodexCache\\greene-cycle-qa\\neo-frames\\1-008.png",
+            "sha256": "9ad191d28138e410f5bb3db8428469d6b0ee24225ff9fc6f53547345de31a6b1"
+          },
+          {
+            "path": "D:\\CodexCache\\greene-cycle-qa\\neo-frames\\1-020.png",
+            "sha256": "a997968cc73d052eb67e2a55a00b01bb5aef5e81e1143bbbd4338621a9239e84"
+          },
+          {
+            "path": "D:\\CodexCache\\greene-cycle-qa\\neo-frames\\1-044.png",
+            "sha256": "e6b87725150e7e02909be2f350a371fc8c5b6afffdc1ec108a951e44590fbfe4"
+          },
+          {
+            "path": "D:\\CodexCache\\greene-cycle-qa\\neo-frames\\1-068.png",
+            "sha256": "1c0d1170575ad97ba70aca044859ebc3e73d86cfb796554209b89673c20b1c2b"
+          },
+          {
+            "path": "D:\\CodexCache\\greene-cycle-qa\\neo-frames\\1-084.png",
+            "sha256": "6180fba96728a769e8e8cce1a9abe2dfaab747b04f605213b00392685b0a714c"
+          },
+          {
+            "path": "D:\\CodexCache\\greene-cycle-qa\\neo-frames\\1-124.png",
+            "sha256": "1a76164a709e7224fbf0387d1886772fbba22e5ca7e6e17c603e3c50e67c5e3e"
+          },
+          {
+            "path": "D:\\CodexCache\\greene-cycle-qa\\neo-frames\\1-180.png",
+            "sha256": "0778edef9e6fb63a6506db27edf1aadb16cc13e7afab894a748d019a778ddea7"
+          },
+          {
+            "path": "D:\\CodexCache\\greene-cycle-qa\\neo-frames\\1-240.png",
+            "sha256": "1be5dfc394f810088b9bdf30c7ae116faf195619629d9a3461c898a24d57e1d4"
+          },
+          {
+            "path": "D:\\CodexCache\\greene-cycle-qa\\neo-frames\\1-304.png",
+            "sha256": "2eb583259364d43d0890905b404cdd4fd9c2707f9bf69f422400a0d5d1bc9f83"
+          },
+          {
+            "path": "D:\\CodexCache\\greene-cycle-qa\\neo-frames\\1-312.png",
+            "sha256": "3cdcfd15b40ba5738867e9c0de46a23c8e83c79c0ccf5b0f5db6b93679ac6c84"
+          },
+          {
+            "path": "D:\\CodexCache\\greene-cycle-qa\\neo-frames\\1-400.png",
+            "sha256": "07f89dabee27015ba4f47f5a1d7510057f7126bc325f015f6c3c234a9b03834e"
+          },
+          {
+            "path": "D:\\CodexCache\\greene-cycle-qa\\neo-frames\\1-580.png",
+            "sha256": "e47a08d65e17f25175c1d78c0533ad85132ad70ff01af3a2ac98bea1117e141c"
+          },
+          {
+            "path": "D:\\CodexCache\\greene-cycle-qa\\neo-frames\\1-600.png",
+            "sha256": "8476213bd789e506ffe3fa33bed8372e9ebf0d7246daf14bd9da28da6257ede7"
+          },
+          {
+            "path": "D:\\CodexCache\\greene-cycle-qa\\neo-frames\\1-624.png",
+            "sha256": "8840643d6962470e779c6d2c5fab43a41b3ef2222d379f95af639aa482353ecb"
+          },
+          {
+            "path": "D:\\CodexCache\\greene-cycle-qa\\neo-frames\\1-632.png",
+            "sha256": "5afea7635bbb81038ef90cabf3f0557fa29f1c1e8ab9728f3193fc961a5384c5"
+          },
+          {
+            "path": "D:\\CodexCache\\greene-cycle-qa\\neo-frames\\1-636.png",
+            "sha256": "bc125d5c75d1ff69e4e67d9ec11f77a36953d74c82733917d27464853aa6cdae"
+          },
+          {
+            "path": "D:\\CodexCache\\greene-cycle-qa\\neo-frames\\1-644.png",
+            "sha256": "4f4f6fd9d30304ff2408f064cabe31fd32c4acad8955fa263c947377c754854c"
+          },
+          {
+            "path": "D:\\CodexCache\\greene-cycle-qa\\neo-frames\\1-660.png",
+            "sha256": "f16c8fcfebf4e2254b26c32ff70301db8e0b95c7435566629a2d7dcf0d9cc6c8"
+          },
+          {
+            "path": "D:\\CodexCache\\greene-cycle-qa\\neo-frames\\1-688.png",
+            "sha256": "4d05ed9498b8f26457d583cb27ca6d11cee746226b9ed70b1f2e257072402933"
+          }
+        ]
+      }
+    },
+    "forge": {
+      "sourceSha256": {
+        "src/main/java/com/codex/blacklight/combat/GreeneMotion.java": "42c0d49b0d49aad490fe156eb8a8f98c494d551ba0ac7af3a61b6ecb5281df34",
+        "src/main/java/com/codex/blacklight/combat/GreeneContact.java": "90ce404ea858b751bb2683bc662a6498af953ac321c2a419898440f10a1d303f",
+        "src/main/java/com/codex/blacklight/combat/HydraContact.java": "af1a8098b6926200a70fbd36f2c4482828ba7582c7cbd31e32066f4c8d57e431",
+        "src/main/java/com/codex/blacklight/entity/GreenePart.java": "c2dc1818ee360f377afc89412fc4aa7b7b1b35066a23a1fa27ee3d72ad556698",
+        "src/main/java/com/codex/blacklight/entity/EncounterMob.java": "8037c541acbecdc5856df17f188b7247ee7ed9544999cbeea5b552f66cb61ed8",
+        "src/main/java/com/codex/blacklight/entity/EncounterProjectile.java": "7d741262120e04f41517c17a20ee01b6805dce1f0857e480f40f648b42c58649",
+        "src/main/java/com/codex/blacklight/client/model/SourceBossPose.java": "204e3e320272208348eaa359ed5305f84c458e6e1feb1f5e32f96f317a0f2c38",
+        "src/main/java/com/codex/blacklight/mixin/HydraProjectileContactMixin.java": "1fa77f4b5f4d0e184bdf0bb97b1b408ad0b999728be0ab00900013f81688c13a",
+        "src/main/java/com/codex/blacklight/config/GameplayBalanceConfig.java": "f09aecee92b059e09ed2e8e144f662dc10d1e282073e8d363c287a2b35c33dd0",
+        "src/main/resources/assets/blacklight/geo/elizabeth_greene_mc.geo.json": "9056615574a24118cf0518bb32c3edc98630886e7aedb85552a319ce9a9eae1e",
+        "src/main/resources/assets/blacklight/models/encounter_elizabeth_greene_source.json": "d4ec4db521873c4bb02d50ebeb168186b4c418c6b23cb9fa3fd9f82e8b2c6888",
+        "src/main/resources/assets/blacklight/models/encounter_source_actions.json": "58e58c59bc294b1e84e35d55181d962b6de53b09069a7677980969c6d576ecb2",
+        "src/test/java/com/codex/blacklight/combat/GreeneMotionTest.java": "1e9af32f58527a01fa0b29388cc12bcd98c6771efcbc42c2cbedbdd24fe46c42",
+        "src/greeneTest/java/com/codex/blacklight/gametest/GreeneCycleGameTest.java": "cc98e9d1959888121429ae4d8e2fe69daa8daa0b83cd6628c078a5a1b58a13f6",
+        "src/greeneVisual/java/com/codex/blacklight/client/GreeneCycleVisual.java": "ceaf4eaf454a0895d675dbbcff1a8ccdebfc612b484a5960a890c5d90a3d65fa",
+        "src/encounterTest/java/com/codex/blacklight/gametest/EncounterGameTest.java": "ed6e5f1655ce0e4c4531338e9744e89c96c7316a24403b5d9114a860ddc91f2e",
+        "tools/greene-test.init.gradle": "14d5ac06a0ba5d8e7077d2bde7c14734fa5f21fe4e4cb28005b884f15dcaad21",
+        "tools/greene-server.init.gradle": "9fd606b51253e2ca2cd37e5bd5a663781a7799aed08779fc236a910d3b536a6c",
+        "tools/greene-visual.init.gradle": "e9eed3aac9ba7dd3881e243436fa49888d6cd05b302a0eaacc6715e713867659"
+      },
+      "unit": [
+        {
+          "name": "com.codex.blacklight.client.renderer.HydraWoundAnchorTest",
+          "tests": "3",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0"
+        },
+        {
+          "name": "com.codex.blacklight.combat.EncounterMoveTest",
+          "tests": "24",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0"
+        },
+        {
+          "name": "com.codex.blacklight.combat.GreeneMotionTest",
+          "tests": "7",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0"
+        },
+        {
+          "name": "com.codex.blacklight.combat.HydraContactTest",
+          "tests": "16",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0"
+        }
+      ],
+      "servers": {
+        "greeneServer": {
+          "passed": 11,
+          "log": {
+            "path": "D:\\CodexCache\\creature-combat-forge-greeneServer.log",
+            "sha256": "d45b9658b1a44d606f7c741303557b3327cd516e205f92382b1525342d12af5d"
+          }
+        },
+        "encounterServer": {
+          "passed": 100,
+          "log": {
+            "path": "D:\\CodexCache\\creature-combat-forge-encounterServer.log",
+            "sha256": "ccc1905495e4d8694d5a3af517fdcfccb3c61647afa4a23b7f724c42fdc9b51a"
+          }
+        }
+      },
+      "native": {
+        "frames": 402,
+        "nativeArrows": 8,
+        "skinToReceiverMax": 2.7256827683913653e-05,
+        "lowest": 80.53755950927734,
+        "selectedFrames": [
+          "0-000.png",
+          "0-008.png",
+          "0-020.png",
+          "0-044.png",
+          "0-068.png",
+          "0-084.png",
+          "0-124.png",
+          "0-180.png",
+          "0-240.png",
+          "0-303.png",
+          "0-312.png",
+          "0-400.png",
+          "0-580.png",
+          "0-600.png",
+          "0-624.png",
+          "0-632.png",
+          "0-636.png",
+          "0-644.png",
+          "0-660.png",
+          "0-688.png",
+          "1-000.png",
+          "1-008.png",
+          "1-020.png",
+          "1-044.png",
+          "1-068.png",
+          "1-084.png",
+          "1-124.png",
+          "1-180.png",
+          "1-240.png",
+          "1-304.png",
+          "1-312.png",
+          "1-400.png",
+          "1-580.png",
+          "1-600.png",
+          "1-624.png",
+          "1-632.png",
+          "1-636.png",
+          "1-644.png",
+          "1-660.png",
+          "1-688.png"
+        ],
+        "stages": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "evidence": {
+          "path": "D:\\CodexCache\\greene-cycle-qa\\forge-frames\\evidence.json",
+          "sha256": "ad1d9e60519f2bbf403361a219e65e4aa4c736c813cdcd5963fe3a78b7e38871"
+        },
+        "selectedReviewedImages": [
+          {
+            "path": "D:\\CodexCache\\greene-cycle-qa\\forge-frames\\0-000.png",
+            "sha256": "5138bd81c983d7e6b7041cb0a1b3fec2c65c1c8a840679ec4f23e2c4cb7ddfc2"
+          },
+          {
+            "path": "D:\\CodexCache\\greene-cycle-qa\\forge-frames\\0-008.png",
+            "sha256": "158c5cba9a97f8d6b9a70513644a9f1fde063de4e8c192526da334883941438b"
+          },
+          {
+            "path": "D:\\CodexCache\\greene-cycle-qa\\forge-frames\\0-020.png",
+            "sha256": "06cd2e73f5775e06de677a60cc0016c8fe2074978fd4f80384f972de3a074415"
+          },
+          {
+            "path": "D:\\CodexCache\\greene-cycle-qa\\forge-frames\\0-044.png",
+            "sha256": "0dd352e7b7b8b5f4a3c7e38a8e9cc2140cbd8797b7b633f063c098a47e55a355"
+          },
+          {
+            "path": "D:\\CodexCache\\greene-cycle-qa\\forge-frames\\0-068.png",
+            "sha256": "5c4392e4c77f115692fa89a99d159096f549d1708f9455b684beaad5f30e1e01"
+          },
+          {
+            "path": "D:\\CodexCache\\greene-cycle-qa\\forge-frames\\0-084.png",
+            "sha256": "5f58e05e101d838e036dbbb24337bb3169dd384b7eb0ddfff90f0aef7eecee20"
+          },
+          {
+            "path": "D:\\CodexCache\\greene-cycle-qa\\forge-frames\\0-124.png",
+            "sha256": "b298c0b1e35dcdebd9a538e6e1ef3117ea4a1d11f9fba4db770b7211eadf6993"
+          },
+          {
+            "path": "D:\\CodexCache\\greene-cycle-qa\\forge-frames\\0-180.png",
+            "sha256": "f19475661371df519640ec61667defd5e46f9f1907083023eb411a025638a08a"
+          },
+          {
+            "path": "D:\\CodexCache\\greene-cycle-qa\\forge-frames\\0-240.png",
+            "sha256": "68dba15f3a2fdc882e798dd455147eb07cb6f5f681718be27356443a7ad35722"
+          },
+          {
+            "path": "D:\\CodexCache\\greene-cycle-qa\\forge-frames\\0-303.png",
+            "sha256": "3853641acd90a9900c207fdbc0f64bf7d498940eabc5bbdd828c9d43faaa681e"
+          },
+          {
+            "path": "D:\\CodexCache\\greene-cycle-qa\\forge-frames\\0-312.png",
+            "sha256": "7959758694800907e62f78df53afb0d885333e502838989fb9e508759db1a43f"
+          },
+          {
+            "path": "D:\\CodexCache\\greene-cycle-qa\\forge-frames\\0-400.png",
+            "sha256": "ae075ac81f58a4d1234e1f591847569506068b7d861039b37841c23da1c56fe7"
+          },
+          {
+            "path": "D:\\CodexCache\\greene-cycle-qa\\forge-frames\\0-580.png",
+            "sha256": "7d3d45ea902f1e813ee7c1dd892b1ac9da47cb925b57dab5a1f68a79df4ab1ea"
+          },
+          {
+            "path": "D:\\CodexCache\\greene-cycle-qa\\forge-frames\\0-600.png",
+            "sha256": "7976ec2b0a71b59ffb7ceb6cedff35403bb4a3e111c04339b6418f5c5a8ddf85"
+          },
+          {
+            "path": "D:\\CodexCache\\greene-cycle-qa\\forge-frames\\0-624.png",
+            "sha256": "6f8749e4445b4bc59258767da2b04d7abed18f802b151ad3dac8a4b1d356cc24"
+          },
+          {
+            "path": "D:\\CodexCache\\greene-cycle-qa\\forge-frames\\0-632.png",
+            "sha256": "52ef6c6c8ef5cba37e47bc54ed09e6774c90647b56495eb04a68575da39215da"
+          },
+          {
+            "path": "D:\\CodexCache\\greene-cycle-qa\\forge-frames\\0-636.png",
+            "sha256": "31e61d63db605da98d569b62c801cf8110c3a09e62a3629149778c87af76ab39"
+          },
+          {
+            "path": "D:\\CodexCache\\greene-cycle-qa\\forge-frames\\0-644.png",
+            "sha256": "2e81b7fe5fa93c17100ac7c7ab34c5a69500d720ef1c6c545e652f2bb5afcbfa"
+          },
+          {
+            "path": "D:\\CodexCache\\greene-cycle-qa\\forge-frames\\0-660.png",
+            "sha256": "935baf025b7f714e3baa58676eff81a9a0530b9d95592b69aea38ba45b04f80b"
+          },
+          {
+            "path": "D:\\CodexCache\\greene-cycle-qa\\forge-frames\\0-688.png",
+            "sha256": "a1a7dd08bc274c18f2b5e0b341fd81de6e1b4e3b4fa631f7594fa6e511f4ebf8"
+          },
+          {
+            "path": "D:\\CodexCache\\greene-cycle-qa\\forge-frames\\1-000.png",
+            "sha256": "6432affbe30a7e70d8c37d0ed44ca0cb1ec2b82a072b6e73c8982632425b7d20"
+          },
+          {
+            "path": "D:\\CodexCache\\greene-cycle-qa\\forge-frames\\1-008.png",
+            "sha256": "c6a2f4b14be81e8f55b2edcf130e3de7bb5d18f1088a6443b26ed7dbd99d33de"
+          },
+          {
+            "path": "D:\\CodexCache\\greene-cycle-qa\\forge-frames\\1-020.png",
+            "sha256": "84a8d7343b977a226195d73add744bb67627b5ba07137a8d9af4e08e85d7384d"
+          },
+          {
+            "path": "D:\\CodexCache\\greene-cycle-qa\\forge-frames\\1-044.png",
+            "sha256": "ff5c9ab3403ad5bff13fcd9c8e9332bc6821998f7a553928322fb4504dd7113a"
+          },
+          {
+            "path": "D:\\CodexCache\\greene-cycle-qa\\forge-frames\\1-068.png",
+            "sha256": "973c1a6cc6ecbec299cd376aceeaf1cd8a29c54e5e54e089a579d342759f58ca"
+          },
+          {
+            "path": "D:\\CodexCache\\greene-cycle-qa\\forge-frames\\1-084.png",
+            "sha256": "5bafe84607f1579fc94b702a0a63039d8bda0b609f56ecf66292c779b4fbd88f"
+          },
+          {
+            "path": "D:\\CodexCache\\greene-cycle-qa\\forge-frames\\1-124.png",
+            "sha256": "1d7438121cfc5610dc5959b747a3cc558ff670295e4931a134f2276b1edeefde"
+          },
+          {
+            "path": "D:\\CodexCache\\greene-cycle-qa\\forge-frames\\1-180.png",
+            "sha256": "cc9050daf0c2ee71906e0bd86359d2cb836a2db1d79aebe252258ed049a724c3"
+          },
+          {
+            "path": "D:\\CodexCache\\greene-cycle-qa\\forge-frames\\1-240.png",
+            "sha256": "1b8a0766fe58b3f63e050d985e434ca6bd715069b7509760baa7271bf0abff2f"
+          },
+          {
+            "path": "D:\\CodexCache\\greene-cycle-qa\\forge-frames\\1-304.png",
+            "sha256": "a02c731a9f841946ddf7d3943a76eb7148660cf8b18c17382c78d2eccddfb26c"
+          },
+          {
+            "path": "D:\\CodexCache\\greene-cycle-qa\\forge-frames\\1-312.png",
+            "sha256": "a6383141a2f659cbb3d23415414b87b4b01071967c97ccd8bc362cfd49aca72c"
+          },
+          {
+            "path": "D:\\CodexCache\\greene-cycle-qa\\forge-frames\\1-400.png",
+            "sha256": "332398e929eed71d03bf0083620a811e6fcb4a1008e484811aff8d4d5353e817"
+          },
+          {
+            "path": "D:\\CodexCache\\greene-cycle-qa\\forge-frames\\1-580.png",
+            "sha256": "aea321c77d6210218b00f447731aa2ced055043eeb28af323b723b39ca3580a3"
+          },
+          {
+            "path": "D:\\CodexCache\\greene-cycle-qa\\forge-frames\\1-600.png",
+            "sha256": "9689ed2ece6ce720c9c7ec2d0c6d064cd2f5da0c22acabef711f82c152a207a5"
+          },
+          {
+            "path": "D:\\CodexCache\\greene-cycle-qa\\forge-frames\\1-624.png",
+            "sha256": "90350cdeacb5252853edd38d480b009dbad047979fcdf11f4df2f4a018d686d2"
+          },
+          {
+            "path": "D:\\CodexCache\\greene-cycle-qa\\forge-frames\\1-632.png",
+            "sha256": "919acff6c42a47484b67a42a9e659f780f971f0fa857025e394168618f3919c8"
+          },
+          {
+            "path": "D:\\CodexCache\\greene-cycle-qa\\forge-frames\\1-636.png",
+            "sha256": "69a5cd55b319679f1c21927610aec60be85f93563194f41b68c81b121b2bd9fa"
+          },
+          {
+            "path": "D:\\CodexCache\\greene-cycle-qa\\forge-frames\\1-644.png",
+            "sha256": "19f7b27c17c8b92cc11cc5a7c8a74dcbd32fda3d1ad13b0f0757406f25e473b3"
+          },
+          {
+            "path": "D:\\CodexCache\\greene-cycle-qa\\forge-frames\\1-660.png",
+            "sha256": "e5b5f61b743005b92cef2ee9179a28d86bf669396cbf1195ba22e70720828c9c"
+          },
+          {
+            "path": "D:\\CodexCache\\greene-cycle-qa\\forge-frames\\1-688.png",
+            "sha256": "0a3a3018f98b169b1e9e054d1125f271aee163254451b457c6aba29f2fc172e4"
+          }
+        ]
+      }
+    }
+  }
+}

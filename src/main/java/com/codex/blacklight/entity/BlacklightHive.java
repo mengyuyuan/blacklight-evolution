@@ -23,12 +23,12 @@ public final class BlacklightHive extends Monster implements GeoEntity {
     private final AnimatableInstanceCache cache=GeckoLibUtil.createInstanceCache(this);
     private final ServerBossEvent boss=new ServerBossEvent(Component.translatable("entity.blacklight.blacklight_hive"),BossEvent.BossBarColor.RED,BossEvent.BossBarOverlay.NOTCHED_10);
     private int waves,cooldown=80,brood=-1;
-    private boolean rewarded;
+    private boolean rewarded,pendingHatch;
     private long nextConventionalHit;
     private static final net.minecraft.network.syncher.EntityDataAccessor<Float> GROWTH=net.minecraft.network.syncher.SynchedEntityData.defineId(BlacklightHive.class,net.minecraft.network.syncher.EntityDataSerializers.FLOAT);
     private static final net.minecraft.network.syncher.EntityDataAccessor<Long> HATCHED=net.minecraft.network.syncher.SynchedEntityData.defineId(BlacklightHive.class,net.minecraft.network.syncher.EntityDataSerializers.LONG);
     /** Ticks for a fresh hive to swell from a seed to its full size (original: it grows on Blacklight tissue). */
-    public static final int GROW_TICKS=20*20,OPEN_TICKS=20,SHRINK_TICKS=30;
+    public static final int GROW_TICKS=20*20,RELEASE_TICK=8,OPEN_TICKS=20,SHRINK_TICKS=30;
     @Override protected void defineSynchedData(net.minecraft.network.syncher.SynchedEntityData.Builder b){super.defineSynchedData(b);b.define(GROWTH,.3F);b.define(HATCHED,-1000L);}
     public float growth(){return entityData.get(GROWTH);}
     public void setGrowth(float g){entityData.set(GROWTH,Math.clamp(g,.3F,1F));refreshDimensions();}
@@ -69,7 +69,7 @@ public final class BlacklightHive extends Monster implements GeoEntity {
             if(tickCount%40==0)playSound(net.minecraft.sounds.SoundEvents.SLIME_SQUISH,1.2F,.4F+.4F*growth());
         }
         if(tickCount%50==0)spreadTissue(server);
-        if(!com.codex.blacklight.infection.WorldOutbreakSystem.active(server)){boss.removeAllPlayers();return;}
+        if(!com.codex.blacklight.infection.WorldOutbreakSystem.active(server)){cancelHatch();boss.removeAllPlayers();return;}
         boss.setProgress(getHealth()/getMaxHealth());
         if(tickCount%20==0){
             var nearby=server.getPlayers(p->p.isAlive()&&!p.isSpectator()&&p.distanceToSqr(this)<32*32);
@@ -78,19 +78,31 @@ public final class BlacklightHive extends Monster implements GeoEntity {
         }
         // The strain is fixed for life once the outbreak has reached this sac.
         if(brood<0){brood=rollBrood();applyBroodName();}
-        if(boss.getPlayers().isEmpty()||level().getDifficulty()==net.minecraft.world.Difficulty.PEACEFUL
-                ||!level().getGameRules().getBoolean(net.minecraft.world.level.GameRules.RULE_DOMOBSPAWNING))return;
+        if(boss.getPlayers().isEmpty()||isNoAi()||com.codex.blacklight.combat.ImpactControl.stunned(this)
+                ||level().getDifficulty()==net.minecraft.world.Difficulty.PEACEFUL
+                ||!level().getGameRules().getBoolean(net.minecraft.world.level.GameRules.RULE_DOMOBSPAWNING)){cancelHatch();return;}
+        if(pendingHatch){if(sinceHatch>=RELEASE_TICK)releaseBrood(server);return;}
         if(cooldown>0){cooldown--;return;}
         if(growth()<1F||sinceHatch<OPEN_TICKS+SHRINK_TICKS)return;
         // Ripe: one creature of this sac's strain per cycle, while its own brood is below the cap.
         int alive=level().getEntitiesOfClass(Mob.class,getBoundingBox().inflate(48),this::ownGuard).size();
         if(alive>=BROOD_CAP[brood]||!com.codex.blacklight.infection.WorldOutbreakSystem.broodRoom(server,blockPosition())){cooldown=40;return;}
+        pendingHatch=true;entityData.set(HATCHED,level().getGameTime());
+        playSound(net.minecraft.sounds.SoundEvents.SLIME_SQUISH,.8F,.4F);
+    }
+    private void cancelHatch(){
+        if(pendingHatch){pendingHatch=false;entityData.set(HATCHED,-1000L);cooldown=40;}
+    }
+    private void releaseBrood(ServerLevel server){
+        // Recheck live population/permission at the opened crown's release frame.
+        int alive=level().getEntitiesOfClass(Mob.class,getBoundingBox().inflate(48),this::ownGuard).size();
+        if(alive>=BROOD_CAP[brood]||!com.codex.blacklight.infection.WorldOutbreakSystem.broodRoom(server,blockPosition())){cancelHatch();return;}
         Mob mob=broodType().create(level());
-        if(mob==null||!place(mob,getBbWidth()*.5+1.2,1.5)&&!placeGuard(mob)){cooldown=20;return;}
+        if(mob==null||!place(mob,getBbWidth()*.5+1.2,1.5)&&!placeGuard(mob)){cancelHatch();return;}
         mob.setPersistenceRequired();mob.restrictTo(blockPosition(),24);
         mob.getPersistentData().putUUID("BlacklightHiveGuard",getUUID());
-        if(!com.codex.blacklight.infection.WorldOutbreakSystem.addBrood(server,mob)){cooldown=40;return;}
-        waves++;cooldown=0;entityData.set(HATCHED,level().getGameTime());
+        if(!com.codex.blacklight.infection.WorldOutbreakSystem.addBrood(server,mob)){cancelHatch();return;}
+        waves++;cooldown=0;pendingHatch=false;
         playSound(net.minecraft.sounds.SoundEvents.SNIFFER_EGG_HATCH,2F,.5F);playSound(net.minecraft.sounds.SoundEvents.SLIME_SQUISH,1.6F,.3F);
         server.sendParticles(new net.minecraft.core.particles.DustParticleOptions(new org.joml.Vector3f(.55F,.05F,.05F),2.2F),getX(),getY()+getBbHeight(),getZ(),60,.9,.4,.9,.08);
     }

@@ -1,0 +1,257 @@
+"""Static source/integration checkpoint. Does not execute Java, tests or game code."""
+from pathlib import Path
+import hashlib
+import json
+import re
+
+ROOT=Path(__file__).resolve().parents[1]
+REF=Path('D:/PrototypeReference/p1')
+def digest(path):return hashlib.sha256(path.read_bytes()).hexdigest()
+proof_path=REF/'private/greene-bank-selection-proof.json'
+proof=json.loads(proof_path.read_text(encoding='utf8'))
+selector={
+    'schema':1,'state':'source logic integrated; runtime validation deferred',
+    'source':proof['source'],'privateProofSha256':digest(proof_path),
+    'selection':proof['selection'],'gatesAndTimers':proof['gatesAndTimers'],
+    'integration':{
+        'selector':'GreeneWeaponProgram.onFoot uses XZ, strict parent <150 and the four original ordered thresholds. Exact 60/40/25 boundaries fall to the next child. <=1 has no shooting candidate.',
+        'timer':'ShotgunBlast sets the shared shooting gate to 54 server ticks from successful begin, mapping that begin to original emotional-state OnEnter. Active MOVE independently excludes overlap. Other on-foot programs add no invented reload after clip completion.',
+        'fallback':'The original fallback Opportunity begins .166667 seconds after that wait node enters. MC checks eligibility each actual server update; no universal four-tick reload is claimed. Closed shoot gates do not trigger the former distant fallback roar.',
+        'range':'Acquisition and explicit launch safety cap use existing missile displacement range175 as an MC adapter, not a recovered sensing radius. The source on-foot <150 XZ entry gate is checked separately. Old saves may retain explicitly serialized attribute overrides.',
+        'save':'Legacy round-robin tag is ignored. Existing saved EncounterRecharge countdown holds the source Shotgun gate; socket firing cooldowns are separate.',
+    },
+    'remaining':['Full forced/forbidden mission attack-flag lifecycle, parallel grab attacks and full e08m04 mission choreography are not ported. Natural close-roar scheduling, target Devastator gates and recurring cycle gates are now connected.',
+                 'Tank/aircraft acquisition and scheduling remain stated MC encounter adapters.',
+                 'Source aim-error distribution, original impulse/friendly-fire delivery, complete original audio and particle assets remain incomplete.'],
+    'validation':{'compilation':'not run','unitTests':'written only','gameTests':'written only','client':'not launched'},
+}
+(ROOT/'art/encounters/greene-selector-source-20261117.json').write_text(json.dumps(selector,indent=2)+'\n',encoding='utf8')
+
+files=[
+    'src/main/java/com/codex/blacklight/entity/EncounterMob.java',
+    'src/main/java/com/codex/blacklight/entity/GreeneProjectile.java',
+    'src/main/java/com/codex/blacklight/entity/BlacklightCommonInfected.java',
+    'src/main/java/com/codex/blacklight/infection/CommonInfectedLeap.java',
+    'src/main/java/com/codex/blacklight/client/ClientClawEvents.java',
+    'src/main/java/com/codex/blacklight/client/renderer/GreeneProjectileRenderer.java',
+    'src/main/java/com/codex/blacklight/network/ModNetwork.java',
+    'src/main/java/com/codex/blacklight/config/GameplayBalanceConfig.java',
+    'src/main/java/com/codex/blacklight/entity/MilitarySoldier.java',
+    'src/main/java/com/codex/blacklight/client/model/BlackwatchModel.java',
+    'src/main/java/com/codex/blacklight/military/MilitaryAimControl.java',
+    'src/main/java/com/codex/blacklight/client/audio/GreeneProjectileAudio.java',
+    'src/main/java/com/codex/blacklight/client/audio/GreeneProjectileAudioEvents.java',
+    *['src/main/java/com/codex/blacklight/combat/'+name+'.java' for name in
+      ['GreeneWeaponProgram','GreeneMissileFlight','GreeneProjectileAppearance','GreeneProjectileEffects','GreeneProjectileAudioState','GreeneRecoveryTiming','GreeneMotherHealth','GreeneMotion','GreeneContact','GreeneBattleCycle','GreeneBattleHealth','GreeneHealthEvents','GreeneBrood','SourceBossMotion','SourceBossAction','SourceRadialWave','GreeneEmergenceClock','GreeneEmergenceShape','GreeneEmergenceHit','GoliathCharge','GoliathTaunt','GoliathMotion','EncounterTactics']],
+    'src/main/java/com/codex/blacklight/entity/BlacklightHydra.java',
+    'src/main/java/com/codex/blacklight/entity/GreenePart.java',
+    'src/main/java/com/codex/blacklight/client/model/SourceBossPose.java',
+    'src/main/java/com/codex/blacklight/mixin/GreeneHealthFloorMixin.java',
+    'src/main/resources/blacklight.mixins.json',
+    'src/greeneVisual/java/com/codex/blacklight/client/GreeneCycleVisual.java',
+    *['src/main/resources/assets/blacklight/models/'+name+'.json' for name in
+      ['greene_weapon_programs','greene_projectile_shapes','goliath_charge','goliath_taunt','encounter_goliath_source','encounter_source_actions']],
+    'src/main/resources/assets/blacklight/geo/goliath_mc.geo.json',
+    'src/main/resources/assets/blacklight/models/encounter_elizabeth_greene_source.json',
+    'src/main/resources/assets/blacklight/geo/elizabeth_greene_mc.geo.json',
+    'src/test/resources/greene-skin-reference.json',
+    'src/test/resources/goliath-charge-reference.json',
+    'src/test/resources/goliath-skin-reference.json',
+    'src/test/resources/goliath-taunt-reference.json',
+    'src/greeneTest/java/com/codex/blacklight/gametest/GreeneCycleGameTest.java',
+    'src/greeneTest/java/com/codex/blacklight/gametest/GreeneEmergenceGameTest.java',
+    'src/greeneTest/java/com/codex/blacklight/gametest/NativeBossBodyControlGameTest.java',
+    'src/encounterTest/java/com/codex/blacklight/gametest/GoliathChargeGameTest.java',
+    'src/encounterTest/java/com/codex/blacklight/gametest/EncounterGameTest.java',
+    'src/blackwatchTest/java/com/codex/blacklight/gametest/MilitaryAimGameTest.java',
+    'src/test/java/com/codex/blacklight/military/MilitaryAimControlTest.java',
+    *['src/test/java/com/codex/blacklight/combat/'+name+'.java' for name in
+      ['GreeneWeaponProgramTest','GreeneMissileFlightTest','GreeneProjectileAppearanceTest','GreeneProjectileAudioStateTest','GreeneRecoveryTimingTest','GreeneBattleHealthTest','GreeneMotionTest','GreeneEmergenceClockTest','GreeneEmergenceShapeTest','EncounterMoveTest','GoliathChargeTest','GoliathTauntTest']],
+    'src/main/resources/assets/blacklight/sounds.json',
+    'src/main/resources/assets/blacklight/lang/zh_cn.json','src/main/resources/assets/blacklight/lang/en_us.json',
+    'src/main/resources/assets/blacklight/sounds/greene/projectile_biomass_loop.ogg',
+    'src/main/resources/assets/blacklight/sounds/greene/projectile_fire_loop.ogg',
+    'tools/export_greene_weapon_programs.py','tools/build_goliath_charge.py','tools/rebind_goliath_source.py',
+    'tools/read_goliath_charge_fig.py','tools/build_goliath_slam.py',
+    'tools/build_goliath_taunt.py',
+    'tools/player-fix-unit.init.gradle','tools/player-boss-regression.init.gradle',
+    'tools/player-military-regression.init.gradle','tools/record_greene_recovery_source.py','tools/build_greene_projectile_loops.py',
+    'art/encounters/goliath-charge-fig-control.json','art/encounters/goliath-charge-provenance.json',
+    'art/encounters/goliath-front-slam-provenance.json',
+    'art/encounters/goliath-taunt-provenance.json','art/encounters/greene-recovery-source-20261117.json',
+    'tools/record_greene_mother_health.py','art/encounters/greene-mother-health-integration-20261117.json',
+    'tools/record_greene_battle_cycle.py','art/encounters/greene-battle-cycle-integration-20261117.json',
+    'tools/record_greene_cycle.py',
+    'art/encounters/greene-health-policy-review-20261117.json','art/encounters/greene-brood-source-20261117.json',
+    'art/encounters/greene-cycle-gametest-review-20261117.json',
+    'art/encounters/greene-emergence-hit-source.json',
+    'art/encounters/greene-crater-playback-source.json',
+    'art/encounters/greene-howl-spatial-units-20261117.json',
+    'tools/export_encounter_source_actions.mjs','tools/rebind_greene_source.py',
+    'tools/record_greene_emergence_hit.py','art/encounters/greene-emergence-hit-integration-20261117.json',
+    'art/encounters/greene-native-bind-correction.json',
+    'art/encounters/greene-segment-shared-pose-source.json',
+    'art/encounters/source-motion-provenance.json','tools/author_greene_model.py',
+    'tools/inspect_goliath_actor_support.py','art/encounters/goliath-support-plane-audit.json',
+    'art/encounters/goliath-actor-pose-followup.json',
+    'tools/record_greene_segment_death.py','art/encounters/greene-segment-death-integration-20261117.json',
+    'art/blackwatch/soldier-corpse-constraint-review-20261117.json',
+    'art/blackwatch/soldier-grab-corpse-review-2026-11-17.json',
+    'art/military-vehicles/vehicle-destruction-lifecycle-review-20261117.json',
+    'tools/record_greene_opening.py','art/encounters/greene-opening-integration-20261117.json',
+    'art/military-vehicles/chassis-item-presentation-review-20261117.json',
+    'art/blackwatch/rifle-range-and-human-grab-review-20261117.json',
+    'tools/export_hydra_death.py',
+    'src/main/java/com/codex/blacklight/combat/HydraDeath.java',
+    'src/main/java/com/codex/blacklight/client/renderer/BlacklightHydraRenderer.java',
+    'src/main/java/com/codex/blacklight/mixin/HydraDeathGuardMixin.java',
+    'src/main/resources/assets/blacklight/models/hydra_death_motion.json',
+    'src/test/java/com/codex/blacklight/combat/HydraDeathTest.java',
+    'src/encounterTest/java/com/codex/blacklight/gametest/HydraDeathGameTest.java',
+    'src/test/resources/hydra-death-reference.json',
+    'art/hydra/death-motion-provenance.json','art/hydra/death-source-provenance.json',
+    'art/hydra/thermobaric-death-source.json',
+    'art/encounters/greene-natural-roar-integration-20261117.json',
+    'art/blackwatch/rifle-fire-line-source-20261117.json',
+    'art/blackwatch/handheld-ordnance-body-review-20261117.json',
+    'art/military-vehicles/helicopter-gun-envelope-source.json',
+    'art/creature-audio/hydra-death-integration-20261117.json',
+    'art/encounters/common-infected-root-exit-source-20261117.json',
+    'art/encounters/creature-gap-review-20261117.json',
+    'art/military-vehicles/chassis-running-gear-source.json',
+    'src/main/java/com/codex/blacklight/combat/HunterCounterMotion.java',
+    'src/main/java/com/codex/blacklight/combat/HunterContactPose.java',
+    'src/main/java/com/codex/blacklight/entity/BlacklightHunter.java',
+    'src/main/resources/assets/blacklight/models/hunter_counter_root.json',
+    'src/test/java/com/codex/blacklight/combat/HunterCounterTest.java',
+    'src/feedbackTest/java/com/codex/blacklight/gametest/HunterCounterGameTest.java',
+    'src/test/resources/hunter-counter-root-reference.json',
+    'tools/export_hunter_counter_root.py',
+    'art/hunter/counter-root-source-20261117.json','art/hunter/counter-chain-source-20261117.json',
+]
+# Include this batch's independent records and their reviewed file snapshots.
+segment=json.loads((ROOT/'art/encounters/greene-segment-death-integration-20261117.json').read_text(encoding='utf8'))
+corpse=json.loads((ROOT/'art/blackwatch/soldier-corpse-constraint-review-20261117.json').read_text(encoding='utf8'))
+vehicles=json.loads((ROOT/'art/military-vehicles/vehicle-destruction-lifecycle-review-20261117.json').read_text(encoding='utf8'))
+opening=json.loads((ROOT/'art/encounters/greene-opening-integration-20261117.json').read_text(encoding='utf8'))
+items=json.loads((ROOT/'art/military-vehicles/chassis-item-presentation-review-20261117.json').read_text(encoding='utf8'))
+rifles=json.loads((ROOT/'art/blackwatch/rifle-range-and-human-grab-review-20261117.json').read_text(encoding='utf8'))
+roar=json.loads((ROOT/'art/encounters/greene-natural-roar-integration-20261117.json').read_text(encoding='utf8'))
+fireline=json.loads((ROOT/'art/blackwatch/rifle-fire-line-source-20261117.json').read_text(encoding='utf8'))
+handheld=json.loads((ROOT/'art/blackwatch/handheld-ordnance-body-review-20261117.json').read_text(encoding='utf8'))
+helicopter=json.loads((ROOT/'art/military-vehicles/helicopter-gun-envelope-source.json').read_text(encoding='utf8'))
+helicopter_files=next(rows for key,rows in helicopter['snapshots'].items() if Path(key)==ROOT)
+hydra_audio=json.loads((ROOT/'art/creature-audio/hydra-death-integration-20261117.json').read_text(encoding='utf8'))
+root_exit=json.loads((ROOT/'art/encounters/common-infected-root-exit-source-20261117.json').read_text(encoding='utf8'))
+running_gear=json.loads((ROOT/'art/military-vehicles/chassis-running-gear-source.json').read_text(encoding='utf8'))
+loader='forge' if 'forge' in ROOT.name else 'neo'
+files=list(dict.fromkeys([*files,*segment['snapshots'],*corpse['files'],*vehicles['snapshots'][ROOT.as_posix()],*opening['snapshots'],*items['snapshots'],*rifles['snapshots'][loader],*roar['snapshots'],*fireline['snapshots'][loader],*handheld['snapshots'][loader],*[row['path'] for row in helicopter_files]]))
+files=list(dict.fromkeys([*files,*hydra_audio['snapshots'],*root_exit['snapshots'][loader],*[row['path'] for row in running_gear['files']]]))
+missing=[p for p in files if not (ROOT/p).is_file()]
+if missing:raise RuntimeError('Missing checkpoint dependencies: '+', '.join(missing))
+record={
+    'schema':1,'date':'2026-11-17','state':'code integrated; not compiled or runtime accepted',
+    'constraint':'User requested code first, tests later. No Java/Gradle, unit/GameTests, game/client launch, original binary execution, media playback or user-save edits.',
+    'greene':{
+        'selector':'Original ordered distance bank and Shotgun entry-relative timer replace round-robin and generic on-foot recharge.',
+        'projectile':'Distinct source template profiles, authored proportions/materials, original visibility masks, source spin and actual-displacement heading are implemented in separate rendering/flight helpers.',
+        'lifecycle':'Impact commits damage once, enters a stationary synced final state and expires at ceil(original final seconds*20). Final save/load preserves remaining time and cannot replay damage; owner loss does not skip final cleanup.',
+        'network':'Heading, accumulated flight seconds, full velocity vector and final entry clock are synced; Neo/Forge compatibility versions incremented.',
+        'effects':'Source effect families map to authored Minecraft particles and existing licensed sounds where available. No original particle meshes, audio waveforms, terrain blast or area damage is claimed.',
+        'loopAudio':'Two source-patch profiles now drive polled client loops using licensed/project Foley. Entity identity, removal, final phase, world change, mute, pause, finite voice budget and backend retry have explicit cleanup; subtitles and licensing included. Player playback is pending.',
+        'recoveryTimer':'Original signed26.6667+/-1second collapse-entry timer is sampled once per cycle. Early recovery uses26% loss from the pre-stun snapshot, including the one8.5% debit. Legacy fixed-hold configuration and save migration remain available.',
+        'motherHealth':'Core damage first distributes raw incoming / attached slots * .6. Cooling children remain in the event divisor; a rejected share is not redistributed. Core stays immune through collapse and accepts full own damage only in DOWN/RISING. Old8% chip/large-hit shortcut removed for ordinary damage.',
+        'battleCycle':'Eight stages connect real source-scaled root sinking/rising,400tick underground period including sink,27tick targetability and80tick attack handoff. Source normal outer10->19->30->38 floors and500/700/900/1000 segment progression are integrated. Brood owns3 Hunters and4 repeat-emergence Hydras with persisted death/retirement receipts.',
+        'persistence':'Phase-local clocks and pending one-shot work survive unload without catch-up. Same-object reload releases old physics ownership and preserves incoming vanilla flags. Legacy replacement retires old brood; remaining4tick emergence blend is saved relatively.',
+        'healthUnits':'Stored HealthBasis and actual max-health rebasing preserve partial armor and phase thresholds. Parts convert raw incoming once; scripted HP debit is de-scaled before ordinary hooks. Cross-basis reload and repeated same-object load have deferred fixtures.',
+        'emergenceHit':'R20/R3 use source float phase ordering, actual root fallback, source-scaled sampled spheres and one shared receipt written before hurt. Load/callback cancellation cannot repeat old hits. Native grid endpoints, impulses and category/receiver completeness remain explicit limits.',
+        'howlUnits':'Raw radius/offset values remain source units; world radius/offset/broadphase now use preserved model scale exactly once.',
+        'segmentRig':'Three arbitrary ring spikes are replaced by source Slug regions sharing matching MotherCore/segment skeleton bind and pose. Hurt proxies aggregate the articulated leaves into the same three health children; broken groups hide all their leaves.',
+        'segmentDeath':'Break snapshots source pose/root/yaw into an independent registered corpse before collapse. Original20..66..95 death curve retracts the Slug over63 observed ticks; pose blend, separate model cache, true world-facing render, posed culling and relative save/load are integrated. Native corpse physics, handle retirement and original death FX/audio remain incomplete.',
+        'opening':'Fresh construction and minimal summon data start the original first-rise sequence only after final placement. Version4 saves pending ownership; old encounter saves do not replay it. First rise keeps armor/wave1 and does not spawn repeat-wave children.',
+        'naturalRoar':'Concurrent source close<=36 dwell6s, triggerXZ<35, entry-relative15s recharge, mechanical priority and target Devastator gate replace immediate d<12 roar. Roar distances share existing model/world scale. Relative state and same-object tick receipt survive load; full cinematic ForceThunderousRoar lifecycle remains unported.',
+        'limits':'Initial forced-roar/attack flags, full mission AI/cameras, Crater, Hunter underground birth, source aim error, native impulse and remaining receiver behavior are incomplete. HOWL0x42 category membership is not equivalent to a proven all-living-target source mask. Core1400 balance, rigid Slug cuboids, immediate broken-slot detachment and10tick child cooldown remain explicit adapters.',
+    },
+    'goliath':{
+        'movement':'Source bullrush root curve is applied once per observed age through actual move collision and full swept-body loaded/border/restriction checks. Thirteen source phases cover ordinary return, taunt and howl; native repeat/exit predicates replace the old fixed96tick live move. Generic constant CHARGE drive is bypassed.',
+        'contact':'Only source active left-arm index-chain spheres and original spacing supplements can hit. Multipart proxies resolve to visible animated skin; normal targets use actual hitboxes. Surface traces and border checks enforce cover. Generic whole-body charge strike is bypassed.',
+        'rig':'The unweighted Chest_L_End Hit helper and its real ancestors/scale compensation are retained. Existing authored cubes and earlier pose rows remain unchanged.',
+        'lifecycle':'Synced phase and relative phase-start drive skin and contact. Outgoing final contact is processed before the Sequence decision; accepted Player hits stop normal reentry. Server ownership epoch and per-recipient callback guards prevent canceled/replaced attacks from writing new state or continuing stale damage. Recharge85ticks starts at actual completion.',
+        'puppetTiming':'Native positiveTimeEnd fits the source frame interval. Charge ENTER effective speed.949999547 and all five front-slam slices now use that native fitting rule, avoiding early arrival and invented held frames. Original frame-indexed reference fixtures retained.',
+        'followthrough':'Phase4+ no longer requires a living committed target. Ordinary successor58/60/61/recovery116/howl44 uses separate source window IDs and damage ratios100/750/400 over the established750 baseline. Inner/outer rings take one strongest accepted hit; Prop-only5000 does not become living-target or block damage.',
+        'tauntContact':'Source joint sweeps receive the last valid contact origin/yaw, including vanilla travel; skipped ticks or>8block relocalization reset the corridor. ChestSpine_3-to-contact, sweep-path and center-to-receiving-surface rays gate cover. Cancel/reentry guards apply before each recipient and after damage callbacks.',
+        'tauntSound':'Original two P2 sound tracks, probability and Play/Retrigger/StopOnExit=false fields retained as metadata. P2 waveforms are unavailable; no substitute creature sound is claimed as source audio.',
+        'networkCompatibility':'Both channel versions include Hydra ordinary/thermal death kind: standalone85/forge45 hydra-thermal. No installed release is produced.',
+        'supportAudit':'Static physics/choreography audit proves ordinary actor-root normalization and direct rigid-body-to-actor matrix copy; it does not justify adding a fixed6-unit offset. Contact-frame physics mode, support and skin still require deferred runtime observation.',
+        'limits':'Each phase rounds to20Hz. Source global Player maps to committed Player, onGround proxies supporting surface, unbound script ints default0. Native repeat-hit/layer blending, damaged-leg/grabbed/story taunt branches, special-exit successor, full AI, sound waveforms and giant-fist grounding remain incomplete. Damage tuning, cover policy and one accepted hit per ID/victim are explicit MC adapters.',
+    },
+    'commonInfected':'Native stationary/dynamic launch, bounded tracking then gravity30 and one displacement per released-flight tick. Source .333333 root-driver fade now blends retained horizontal motion into one ordinary travel move after landing/ordinary target loss; damage/capture/NoAI/load clear it. Generation guards prevent an old wrist-damage callback from committing new landing/root state after same-object load. Full source pose/AI and native physics remain partial.',
+    'hunterCounterRoot':'Counter and chained barrage now sample each original Motion_Root curve relative to its own clip entry, apply collision-aware travel once and keep skin/contact displacement aligned. Loaded/border/restriction gates and action-generation guards discard canceled or discontinuous motion without stored wall catch-up. Native root-velocity blending, force delivery and non-root bone scale remain incomplete.',
+    'vehicleItemGeometry':'Six chassis items now use measured P1 running-gear proportions: truck rear dual tires, APC six road wheels plus elevated ends, tank seven road wheels with distinct end wheels. Authored stepped cuboids and existing textures retained; no original mesh/material redistribution. Static preview only, highest499cuboids has no real-client performance acceptance.',
+    'hydraDeath':{
+        'ordinary':'Source hyd_death0..98 at30fps followed by hyd_exit from27, holding54 until the sink Death at1.83333s. Two20Hz node ceilings produce66+37ticks, replacing vanilla20tick retirement. Native entry blend0 and outgoing/incoming1/6s blend are retained.',
+        'lifecycle':'Hydra-only post-LivingDeathEvent guard rejects a replaced generation before vanilla score/loot and commits source age before reward callbacks can save. Recursive same-generation death is ignored. Captures/cargo are released; tagged load resumes observed progress without new rewards. Renderer avoids vanilla90degree sideways fall.',
+        'thermobaric':'Native TrackGroup child clock is closed: group1s plus local0/1-6/1s gives source burst1s, nine-skin hide1.166667s and deletion2s. Explicit THERMOBARIC projectile death now hides body at24ticks and retires at40 while continuing hyd_death, without ordinary sink. Kind/age are saved and synchronized before reward callbacks.',
+        'audio':'Normal source roar/whoosh/roar/whoosh times and polled sink-debris loop now use authored licensed Foley. Thermal outer-node roar starts at0. Late tracking, rewind, mute, pause, finite tails, voice budget and failed-start cleanup are explicit client adapters; no original waveform copied.',
+        'limits':'Thermal source burst timing is documented; original particle meshes, unresolved sink sound7944, Crater lifetime and complete native physics are not ported. Audio timbre/mix is unaccepted. Later arbitrary vanilla loot side effects cannot be rolled back.',
+    },
+    'soldierAim':{
+        'source':'P1 rifle AimingAtTarget315176/native101e5800 uses normalized XZ1-dot<=.10000000149, not a radians tolerance.',
+        'integration':'A server-owned bounded gun bearing drives the firing gate and visible two-hand rig. Losing alignment cancels the shot lease; reacquisition earns a fresh aim interval. Reload, target loss, disarm, capture and vehicle handoff clear it.',
+        'range':'The earlier22block pre-gate no longer suppresses the rifle/SAW/sniper source bank at22..30. Existing28block acquisition remains independent. Source TargetDistance uses actor XYZ length; world units map1:1 to blocks as an explicit MC adapter, not a skin-derived conversion.',
+        'fireLine':'Actual bullet candidates and existing multipart narrow phase now gate AI firing, including protected aircraft. Nearest body/hull order and parent identity avoid firing through friendly skins or rejecting a target own part. Two pending real-AI tests cover aircraft and Hydra protection.',
+        'limits':'30degree/tick turn,75degree torso traverse, MC muzzle proxy and rendered wrist/recoil delta remain adapters, not complete native IK. Both network versions advanced for the added synced float.',
+    },
+    'helicopterGun':'Actual source Spawn refs select ordinary127 or strafe151 direction gates. Native actor-local distance and normalized-vector pitch formula now gate AI gun release, alongside existing muzzle8..72, alignment, cover and first friendly obstruction. Manual control and rockets are unchanged. Complete source burst/LoF-cache behavior remains unported.',
+    'handheldBlast':'Actual handheld projectile onHit now reaches animated parts outside the parent root box through existing body candidates and exposed surfaces. Parent receipts and pre-callback spent NBT prevent duplicate debit/reloaded explosion. Radius/base damage and old owner/occupant/mechanical policies remain. Living surface falloff and cover are explicit MC changes. Shared bridge internals and vanilla remaining tick movement retain documented replacement-callback limits.',
+    'validation':{
+        'type':'static code/data/schema/provenance review only',
+        'compilation':'not run','unitTests':'not run','clientPlayerAcceptance':'not run','releaseBuildInstall':'not done',
+        'greeneGameTestMethods':len(re.findall(r'@GameTest\(', (ROOT/'src/greeneTest/java/com/codex/blacklight/gametest/GreeneCycleGameTest.java').read_text(encoding='utf8'))),
+        'greeneEmergenceGameTestMethods':len(re.findall(r'@GameTest\(', (ROOT/'src/greeneTest/java/com/codex/blacklight/gametest/GreeneEmergenceGameTest.java').read_text(encoding='utf8'))),
+        'goliathChargeGameTestMethods':len(re.findall(r'@GameTest\(', (ROOT/'src/encounterTest/java/com/codex/blacklight/gametest/GoliathChargeGameTest.java').read_text(encoding='utf8'))),
+        'militaryAimGameTestMethods':2,
+        'greeneSegmentDeathGameTestMethods':segment['validation']['gameTestMethodsWritten'],
+        'greeneSegmentDeathUnitMethods':segment['validation']['unitMethodsWritten'],
+        'corpseConstraintUnitMethods':len(corpse['regressionsWritten']),
+        'vehicleDestructionGameTestMethods':7,
+        'greeneOpeningGameTestMethods':opening['validation']['gameTestMethodsWritten'],
+        'vehicleItemPresentationTestsWritten':items['deferredValidation']['newTests'],
+        'militaryRifleRangeGameTestMethods':2,
+        'hydraDeathUnitMethods':4,'hydraDeathGameTestMethods':9,
+        'greeneRoarUnitMethods':roar['validation']['unitMethodsWritten'],
+        'greeneRoarGameTestMethods':roar['validation']['gameTestMethodsWritten'],
+        'militaryFireLineGameTestMethods':2,
+        'helicopterGunEnvelopeUnitMethods':5,'helicopterGunEnvelopeGameTestMethods':1,
+        'handheldOrdnanceGameTestMethods':3,
+        'hydraDeathAudioUnitMethodsWritten':4,
+        'hunterCounterUnitMethodsWritten':5,'hunterCounterGameTestMethodsWritten':8,
+    },
+    'sourceRecords':['art/encounters/greene-selector-source-20261117.json','art/encounters/greene-projectile-template-source.json','art/encounters/goliath-charge-provenance.json',
+                     'art/encounters/goliath-actor-pose-followup.json','art/encounters/common-infected-launch-source-20261117.json',
+                     'art/encounters/greene-recovery-source-20261117.json','art/encounters/greene-projectile-loop-audio-source.json',
+                     'art/blackwatch/rifle-aim-gate-source-20261117.json','art/encounters/goliath-charge-fig-control.json',
+                     'art/encounters/greene-mother-health-integration-20261117.json','art/encounters/goliath-taunt-provenance.json',
+                     'art/encounters/greene-battle-cycle-integration-20261117.json','art/encounters/greene-health-policy-review-20261117.json',
+                     'art/encounters/greene-brood-source-20261117.json','art/encounters/greene-cycle-gametest-review-20261117.json','art/encounters/goliath-support-plane-audit.json',
+                     'art/encounters/greene-emergence-hit-source.json',
+                     'art/encounters/greene-segment-death-integration-20261117.json',
+                     'art/blackwatch/soldier-corpse-constraint-review-20261117.json',
+                     'art/military-vehicles/vehicle-destruction-lifecycle-review-20261117.json',
+                     'art/encounters/greene-opening-integration-20261117.json',
+                     'art/military-vehicles/chassis-item-presentation-review-20261117.json',
+                     'art/blackwatch/rifle-range-and-human-grab-review-20261117.json',
+                     'art/hydra/death-source-provenance.json','art/hydra/death-motion-provenance.json',
+                     'art/hydra/thermobaric-death-source.json',
+                     'art/encounters/greene-natural-roar-integration-20261117.json',
+                     'art/blackwatch/rifle-fire-line-source-20261117.json',
+                     'art/blackwatch/handheld-ordnance-body-review-20261117.json',
+                     'art/military-vehicles/helicopter-gun-envelope-source.json',
+                     'art/hunter/counter-root-source-20261117.json',
+                     'art/encounters/common-infected-root-exit-source-20261117.json',
+                     'art/military-vehicles/chassis-running-gear-source.json',
+                     'art/creature-audio/hydra-death-integration-20261117.json'],
+    'fullGoalComplete':False,'snapshots':{p:digest(ROOT/p) for p in files},
+}
+(ROOT/'art/encounters/boss-combat-followup-20261117.json').write_text(json.dumps(record,indent=2)+'\n',encoding='utf8')
+print('Recorded selector proof and',len(files),'static integration snapshots; no Java/test execution')

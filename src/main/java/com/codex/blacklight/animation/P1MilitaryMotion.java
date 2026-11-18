@@ -84,6 +84,32 @@ public final class P1MilitaryMotion {
     }
     private static double clock(Clip clip,double frame){return Math.max(0,Math.min(clip.frames,Double.isFinite(frame)?frame:0));}
     public double frames(String name){return clips.get(name).frames;}
+    public double seconds(String name){var clip=clips.get(name);return clip.frames/clip.fps;}
+    public double rootTravel(String name){
+        var clip=clips.get(name);if(clip==null)return 0;var joint=joints.get(0);
+        var a=local(joint,clip.bones.get(joint.name),0).position;var b=local(joint,clip.bones.get(joint.name),clip.frames).position;
+        return Math.hypot(b.x-a.x,b.z-a.z);
+    }
+    /** The two source strides have opposite leading feet. Blend aligned local joints, including the loop seam. */
+    public Frame locomotion(double phase,double running){
+        if(!hasClip("walk")||!hasClip("run"))return null;
+        double weight=Double.isFinite(running)?Math.max(0,Math.min(1,running)):0;
+        var all=new ArrayList<Transform>(joints.size());var named=new HashMap<String,Transform>();
+        for(int i=0;i<joints.size();i++){
+            var joint=joints.get(i);var a=loopLocal(joint,clips.get("walk"),phase);var b=loopLocal(joint,clips.get("run"),phase+.5);
+            var position=a.position.lerp(b.position,weight);var rotation=a.rotation.slerp(b.rotation,weight).normalize();
+            if(i>0){var parent=all.get(joint.parent);parent.rotation.transform(position);position.add(parent.position);rotation.premul(parent.rotation).normalize();}
+            var value=new Transform(position,rotation);all.add(value);named.put(joint.name,value);
+        }return new Frame(Map.copyOf(named),reference);
+    }
+    private static Transform loopLocal(Joint joint,Clip clip,double phase){
+        if(!Double.isFinite(phase))phase=0;phase-=Math.floor(phase);double frame=phase*clip.frames;
+        var value=local(joint,clip.bones.get(joint.name),frame);
+        // These extracted locomotion clips are marked noncyclic and their last feet differ by up to 9 cm.
+        double blend=Math.max(0,Math.min(1,(frame-(clip.frames-2))/2));blend=blend*blend*(3-2*blend);
+        if(blend>0){var first=local(joint,clip.bones.get(joint.name),0);value.position.lerp(first.position,blend);value.rotation.slerp(first.rotation,blend).normalize();}
+        return value;
+    }
     private Map<String,Transform> sampleWorld(Clip clip,double frame){
         return sampleWorld(clip,frame,null,0,0);
     }

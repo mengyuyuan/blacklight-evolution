@@ -1,0 +1,607 @@
+{
+  "schemaVersion": 1,
+  "date": "2026-11-17",
+  "scope": "Six registered chassis item displays, with source-only placement/recovery review. Static export and parsing only; no runtime/test/render execution.",
+  "findings": {
+    "gui": "The authored vehicle front is +Z. Existing GUI yaw225 presented the rear (also visible in the historical native preview). Miniature-only yaw45 presents the cab/glacis/main gun toward the GUI camera while retaining roof visibility, scale and centering.",
+    "firstPerson": "ItemTransform.apply(leftHand) negates authored Y/Z angles. Previous right45/left225 became actual45/135; new right45/left45 becomes45/-45. Both hands now have corresponding front views. The eventual player arm transform still needs real-player verification.",
+    "geometry": "All six already contain detailed production geometry (truck78/APC138/tank161). No generic generated-icon fallback, texture lookup failure or missing body part was found. Every element, UV, skin reference and other display transform is preserved byte-for-byte at the JSON value level.",
+    "muzzle": "Current main_muzzle is a solid authored cuboid, but the available local reference records do not prove the original bore geometry, wall thickness or inner diameter. No guessed hollow-barrel geometry is introduced in this display correction."
+  },
+  "localEvidence": {
+    "coordinateContract": "art/military-vehicles/README.md: author +Z is the vehicle front; positive Y is up. Model source and production entity renderer use the same convention.",
+    "geometry": {
+      "path": "src/main/resources/assets/blacklight/military/vehicle-models.json",
+      "sha256": "1541230ff53b3b1809150618cebbd7b2f9596ed1d77c8ca314f496ddcd33d80a"
+    },
+    "historicalPreview": {
+      "path": "art/military-vehicles/previews/inventory-models.png",
+      "sha256": "e88654f8880733ec82233521522e8ff2e6ca60d357bd81e1c51652740f000323",
+      "status": "Previously rendered image inspected read-only; depicts the old yaw225 rear view. It is not a new render or acceptance result for this change."
+    },
+    "nativeSources": {
+      "archive": "D:\\CodexCache\\gradle\\caches\\neoformruntime\\intermediate_results\\sourcesWithNeoForge_4eb2b0684699affa98486018638914b3aa826cc2_output.zip",
+      "entries": {
+        "net/minecraft/client/renderer/block/model/ItemTransform.java": {
+          "sha256": "566a3af968c62eeac03490d5be07886d04d8ab48e9df5ee5e8f78185419aec0a"
+        },
+        "net/minecraft/client/gui/GuiGraphics.java": {
+          "sha256": "9779101356074e82d4ad63a0c0dff721aa7ae33613d96b7c4fb254e6b2494645"
+        }
+      },
+      "semantics": "ItemTransform applies scale then rotationXYZ; left-hand negates Y/Z and translation X. GuiGraphics GUI scale(16,-16,16) preserves the depth sign."
+    },
+    "originalReferenceBoundary": "art/military-vehicles/reference-observations.json contains the existing P1/P2 visual observations. Its ignored source-image cache is not present in this workspace. Packaged model coordinates, seats, muzzle lengths, palette and UV pixels are authored Minecraft adaptations, not extracted Prototype meshes/materials."
+  },
+  "placementReview": {
+    "entry": "VehicleRegistry.ChassisItem.useOn is reached by the actual right-click block path. PrototypeSurvivalLock preserves the chassis item use while declining block interaction, allows main-hand PASS to an offhand chassis, and client combat handlers decline attack-form capture when either hand holds a placement item.",
+    "freshState": "The six registered items create their matching faction/chassis entity. MilitaryVehicle constructor starts at definition.maxHealth; VehicleInventory starts ammunition at zero. Successful placement assigns player UUID ownership. These are fresh vehicles, not recovered vehicle snapshots.",
+    "validation": "settlePlacement checks loaded support, water, physical hull/body clearance; rejection discards the temporary entity, reports the reason and does not shrink the item. Item shrink happens only after addFreshEntity succeeds.",
+    "recovery": "No whole-vehicle packing/recovery item path or chassis ItemStack state codec exists. Shift-empty-hand is the existing hijack path; it does not pack health/ammunition/ownership into a chassis item. A damaged-vehicle recovery/replacement round trip therefore is not an implemented feature and is not claimed as verified.",
+    "sourceBoundary": "No unsupported Prototype whole-vehicle packing mechanic was added. Existing supply, repair, persistence, ownership and destruction paths remain unchanged.",
+    "existingDeferredCoverage": "VehiclePlacementInteractionGameTest includes six variants, real right-click entry, combat forms, offhand, ordinary supported ground and rejection/no-consumption cases. They were not rerun in this task."
+  },
+  "models": [
+    {
+      "item": "military_truck_chassis",
+      "path": "src/main/resources/assets/blacklight/models/item/military_truck_chassis.json",
+      "beforeSha256": "3999a738dac86e2765ae95759f5fea3f3b20a22a571f0b8a8a036f5472721aff",
+      "afterSha256": "0471afa967f6c73529f59db1f75bb47e75febf8e6b09e9c9afc93b531a442b6b",
+      "elements": 78,
+      "geometryAndUVUnchanged": true,
+      "texturesUnchanged": true,
+      "changedDisplayContexts": [
+        "gui",
+        "firstperson_lefthand"
+      ],
+      "guiBefore": {
+        "rotation": [
+          25,
+          225,
+          0
+        ],
+        "translation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          0.92,
+          0.92,
+          0.92
+        ]
+      },
+      "guiAfter": {
+        "rotation": [
+          25,
+          45,
+          0
+        ],
+        "translation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          0.92,
+          0.92,
+          0.92
+        ]
+      },
+      "leftHandBefore": {
+        "rotation": [
+          0,
+          225,
+          0
+        ],
+        "translation": [
+          0,
+          2,
+          0
+        ],
+        "scale": [
+          0.65,
+          0.65,
+          0.65
+        ]
+      },
+      "leftHandAfter": {
+        "rotation": [
+          0,
+          45,
+          0
+        ],
+        "translation": [
+          0,
+          2,
+          0
+        ],
+        "scale": [
+          0.65,
+          0.65,
+          0.65
+        ]
+      }
+    },
+    {
+      "item": "military_apc_chassis",
+      "path": "src/main/resources/assets/blacklight/models/item/military_apc_chassis.json",
+      "beforeSha256": "a2f87745f5e18fa9a5ed4ab16e6e42655d538296849b8a461f60650e13ac5422",
+      "afterSha256": "7e33e48bdc0a4100bb449f2fca05bd52f0744d5211acbeef01b60589060afd7f",
+      "elements": 138,
+      "geometryAndUVUnchanged": true,
+      "texturesUnchanged": true,
+      "changedDisplayContexts": [
+        "gui",
+        "firstperson_lefthand"
+      ],
+      "guiBefore": {
+        "rotation": [
+          25,
+          225,
+          0
+        ],
+        "translation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          0.92,
+          0.92,
+          0.92
+        ]
+      },
+      "guiAfter": {
+        "rotation": [
+          25,
+          45,
+          0
+        ],
+        "translation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          0.92,
+          0.92,
+          0.92
+        ]
+      },
+      "leftHandBefore": {
+        "rotation": [
+          0,
+          225,
+          0
+        ],
+        "translation": [
+          0,
+          2,
+          0
+        ],
+        "scale": [
+          0.65,
+          0.65,
+          0.65
+        ]
+      },
+      "leftHandAfter": {
+        "rotation": [
+          0,
+          45,
+          0
+        ],
+        "translation": [
+          0,
+          2,
+          0
+        ],
+        "scale": [
+          0.65,
+          0.65,
+          0.65
+        ]
+      }
+    },
+    {
+      "item": "military_tank_chassis",
+      "path": "src/main/resources/assets/blacklight/models/item/military_tank_chassis.json",
+      "beforeSha256": "513e76f8a07e5a2d388ca98313549ef2259861223cb84ec57ef4e794f54c9a4d",
+      "afterSha256": "66676a195946e58c9900a7fb9203d97a8f6352b260ce9b4f2947730f2130675b",
+      "elements": 161,
+      "geometryAndUVUnchanged": true,
+      "texturesUnchanged": true,
+      "changedDisplayContexts": [
+        "gui",
+        "firstperson_lefthand"
+      ],
+      "guiBefore": {
+        "rotation": [
+          25,
+          225,
+          0
+        ],
+        "translation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          0.92,
+          0.92,
+          0.92
+        ]
+      },
+      "guiAfter": {
+        "rotation": [
+          25,
+          45,
+          0
+        ],
+        "translation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          0.92,
+          0.92,
+          0.92
+        ]
+      },
+      "leftHandBefore": {
+        "rotation": [
+          0,
+          225,
+          0
+        ],
+        "translation": [
+          0,
+          2,
+          0
+        ],
+        "scale": [
+          0.65,
+          0.65,
+          0.65
+        ]
+      },
+      "leftHandAfter": {
+        "rotation": [
+          0,
+          45,
+          0
+        ],
+        "translation": [
+          0,
+          2,
+          0
+        ],
+        "scale": [
+          0.65,
+          0.65,
+          0.65
+        ]
+      }
+    },
+    {
+      "item": "blackwatch_truck_chassis",
+      "path": "src/main/resources/assets/blacklight/models/item/blackwatch_truck_chassis.json",
+      "beforeSha256": "d92c59dcfea45c6459303ec510cc896cb0dd7c05ffd1f801f8f173156fbf8bf3",
+      "afterSha256": "f8f00da5f416664a89fddbc1d6c1990c81b94a2df971317f6bfd214942922269",
+      "elements": 78,
+      "geometryAndUVUnchanged": true,
+      "texturesUnchanged": true,
+      "changedDisplayContexts": [
+        "gui",
+        "firstperson_lefthand"
+      ],
+      "guiBefore": {
+        "rotation": [
+          25,
+          225,
+          0
+        ],
+        "translation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          0.92,
+          0.92,
+          0.92
+        ]
+      },
+      "guiAfter": {
+        "rotation": [
+          25,
+          45,
+          0
+        ],
+        "translation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          0.92,
+          0.92,
+          0.92
+        ]
+      },
+      "leftHandBefore": {
+        "rotation": [
+          0,
+          225,
+          0
+        ],
+        "translation": [
+          0,
+          2,
+          0
+        ],
+        "scale": [
+          0.65,
+          0.65,
+          0.65
+        ]
+      },
+      "leftHandAfter": {
+        "rotation": [
+          0,
+          45,
+          0
+        ],
+        "translation": [
+          0,
+          2,
+          0
+        ],
+        "scale": [
+          0.65,
+          0.65,
+          0.65
+        ]
+      }
+    },
+    {
+      "item": "blackwatch_apc_chassis",
+      "path": "src/main/resources/assets/blacklight/models/item/blackwatch_apc_chassis.json",
+      "beforeSha256": "9ebc79dedd8075cddc4c3b14bfec55fbe3bf1f664c0b6265f173bc5bfd24df94",
+      "afterSha256": "6394e42f6f83f833283a6d488a65bed36ddbc568569824d660ffa4ba19be26c9",
+      "elements": 138,
+      "geometryAndUVUnchanged": true,
+      "texturesUnchanged": true,
+      "changedDisplayContexts": [
+        "gui",
+        "firstperson_lefthand"
+      ],
+      "guiBefore": {
+        "rotation": [
+          25,
+          225,
+          0
+        ],
+        "translation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          0.92,
+          0.92,
+          0.92
+        ]
+      },
+      "guiAfter": {
+        "rotation": [
+          25,
+          45,
+          0
+        ],
+        "translation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          0.92,
+          0.92,
+          0.92
+        ]
+      },
+      "leftHandBefore": {
+        "rotation": [
+          0,
+          225,
+          0
+        ],
+        "translation": [
+          0,
+          2,
+          0
+        ],
+        "scale": [
+          0.65,
+          0.65,
+          0.65
+        ]
+      },
+      "leftHandAfter": {
+        "rotation": [
+          0,
+          45,
+          0
+        ],
+        "translation": [
+          0,
+          2,
+          0
+        ],
+        "scale": [
+          0.65,
+          0.65,
+          0.65
+        ]
+      }
+    },
+    {
+      "item": "blackwatch_tank_chassis",
+      "path": "src/main/resources/assets/blacklight/models/item/blackwatch_tank_chassis.json",
+      "beforeSha256": "37248e689c8db8bd6e23e1c0bf020e947339cc6a45fffaf3b4b13bf2fd3a1868",
+      "afterSha256": "4c4f9495c2534cc0293f6155ade34c1a741602a7901e294de0ded31e470fe6cf",
+      "elements": 161,
+      "geometryAndUVUnchanged": true,
+      "texturesUnchanged": true,
+      "changedDisplayContexts": [
+        "gui",
+        "firstperson_lefthand"
+      ],
+      "guiBefore": {
+        "rotation": [
+          25,
+          225,
+          0
+        ],
+        "translation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          0.92,
+          0.92,
+          0.92
+        ]
+      },
+      "guiAfter": {
+        "rotation": [
+          25,
+          45,
+          0
+        ],
+        "translation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          0.92,
+          0.92,
+          0.92
+        ]
+      },
+      "leftHandBefore": {
+        "rotation": [
+          0,
+          225,
+          0
+        ],
+        "translation": [
+          0,
+          2,
+          0
+        ],
+        "scale": [
+          0.65,
+          0.65,
+          0.65
+        ]
+      },
+      "leftHandAfter": {
+        "rotation": [
+          0,
+          45,
+          0
+        ],
+        "translation": [
+          0,
+          2,
+          0
+        ],
+        "scale": [
+          0.65,
+          0.65,
+          0.65
+        ]
+      }
+    }
+  ],
+  "changes": [
+    "tools/vehicle_item_models.py",
+    "tools/test_vehicle_chassis_item_presentation.py",
+    "src/main/resources/assets/blacklight/models/item/military_truck_chassis.json",
+    "src/main/resources/assets/blacklight/models/item/military_apc_chassis.json",
+    "src/main/resources/assets/blacklight/models/item/military_tank_chassis.json",
+    "src/main/resources/assets/blacklight/models/item/blackwatch_truck_chassis.json",
+    "src/main/resources/assets/blacklight/models/item/blackwatch_apc_chassis.json",
+    "src/main/resources/assets/blacklight/models/item/blackwatch_tank_chassis.json"
+  ],
+  "staticReview": {
+    "scopedGitDiffCheckExitCodeBothRepositories": 0,
+    "scopedWhitespaceAndConflictMarkerIssues": 0,
+    "pythonAstParsed": true,
+    "modelJsonParsed": true,
+    "mirrorsIdentical": true,
+    "frozenDestructionSnapshotsStillMatch": {
+      "D:/blacklight-evolution": true,
+      "D:/blacklight-evolution-forge-1.20.1": true
+    },
+    "runtimeAndTestsExecuted": false,
+    "otherSupplyItems": "The five fuel/ammunition/repair items use display(False); their existing transforms and resource files were not changed."
+  },
+  "deferredValidation": {
+    "newTestFile": "tools/test_vehicle_chassis_item_presentation.py",
+    "newTests": 2,
+    "scenarios": [
+      "each actual six-item resource faces its cab/glacis +Z normal and roof toward the GUI camera",
+      "actual first-person left/right resources produce mirrored front/up vectors after native left-hand sign handling"
+    ],
+    "command": "python tools/test_vehicle_chassis_item_presentation.py",
+    "executed": false,
+    "playerReview": [
+      "inspect all six items in inventory and creative tabs",
+      "hold every chassis in main/off hand with right/left dominant hand",
+      "confirm ground/item-frame transforms remain unchanged",
+      "repeat actual supported-ground placement in armed forms and offhand"
+    ]
+  },
+  "snapshots": {
+    "tools/vehicle_item_models.py": "dac38df2cd4a51d443a120b6ddb53252c358554d8b89585c8e8bdd2e449d04a5",
+    "tools/test_vehicle_chassis_item_presentation.py": "bfc6fc0cecb923baea13f911f49a52e56982c70cf976582f82b75ff94e7b1eae",
+    "src/main/resources/assets/blacklight/models/item/military_truck_chassis.json": "ec9983c6ad48b2e2ce35181fd7239f47000dfcc247c7438462d2f0c00149993f",
+    "src/main/resources/assets/blacklight/models/item/military_apc_chassis.json": "396889824d693dff476771a703d565b58f8f37b5b2e2ca289b2dcab3b029911b",
+    "src/main/resources/assets/blacklight/models/item/military_tank_chassis.json": "1d8da7c2f957ff23cb699290cf82936125d5cc4d10afb8e9858814e2a20715e2",
+    "src/main/resources/assets/blacklight/models/item/blackwatch_truck_chassis.json": "53e60d114f5b8876eafcd6c379f769322559b55a7fbe74c24481d18fa513bb9b",
+    "src/main/resources/assets/blacklight/models/item/blackwatch_apc_chassis.json": "dcb3b2669b4f8c5856f4c4480bd4396c2aee2c5753f5a44cba149d1413ebe061",
+    "src/main/resources/assets/blacklight/models/item/blackwatch_tank_chassis.json": "5dd2372afc428a90bf201c286a8e020178ed49d72c4b96d9ff3af8347b3c49df"
+  },
+  "limits": [
+    "No build, unit test, GameTest, client, renderer or audio was run.",
+    "Previous native GUI contact sheets are historical observations only; new screenshots and actual hand visibility remain deferred.",
+    "This change improves presentation of existing detailed geometry; it does not claim new original-source meshes or a recovered-vehicle placement feature."
+  ],
+  "historicalPresentationSnapshots": {
+    "tools/vehicle_item_models.py": "356958a295727184bd4fc0cba31aa6c7b23f3c49bb3f7e0839cb38b2705e8137",
+    "tools/test_vehicle_chassis_item_presentation.py": "bfc6fc0cecb923baea13f911f49a52e56982c70cf976582f82b75ff94e7b1eae",
+    "src/main/resources/assets/blacklight/models/item/military_truck_chassis.json": "0471afa967f6c73529f59db1f75bb47e75febf8e6b09e9c9afc93b531a442b6b",
+    "src/main/resources/assets/blacklight/models/item/military_apc_chassis.json": "7e33e48bdc0a4100bb449f2fca05bd52f0744d5211acbeef01b60589060afd7f",
+    "src/main/resources/assets/blacklight/models/item/military_tank_chassis.json": "66676a195946e58c9900a7fb9203d97a8f6352b260ce9b4f2947730f2130675b",
+    "src/main/resources/assets/blacklight/models/item/blackwatch_truck_chassis.json": "f8f00da5f416664a89fddbc1d6c1990c81b94a2df971317f6bfd214942922269",
+    "src/main/resources/assets/blacklight/models/item/blackwatch_apc_chassis.json": "6394e42f6f83f833283a6d488a65bed36ddbc568569824d660ffa4ba19be26c9",
+    "src/main/resources/assets/blacklight/models/item/blackwatch_tank_chassis.json": "4c4f9495c2534cc0293f6155ade34c1a741602a7901e294de0ded31e470fe6cf"
+  },
+  "reviewBasis": "The original findings and element counts below describe the earlier display-only change. Current geometry is superseded by currentGeometryFollowup; historicalPresentationSnapshots preserve that earlier state.",
+  "currentGeometryFollowup": {
+    "record": "art/military-vehicles/chassis-running-gear-source.json",
+    "counts": {
+      "truck": 208,
+      "apc": 422,
+      "tank": 499
+    },
+    "changes": "Actual source wheel measurements now guide authored dual rear tires, stepped tire/hub profiles and distinct elevated end wheels. Non-wheel elements, texture bindings and all display transforms were preserved. No original mesh or texture is distributed.",
+    "validation": "Static preview/schema/mirror only; no client, tests or release installation."
+  }
+}

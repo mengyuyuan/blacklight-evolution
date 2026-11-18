@@ -22,8 +22,9 @@ import net.neoforged.neoforge.client.event.*;
 @EventBusSubscriber(modid="blacklight",value=Dist.CLIENT)
 public final class VehicleFeedbackVisual {
     private static final boolean DENTS=Boolean.getBoolean("blacklight.test.vehicleDents");
-    private static final String[] CASES=DENTS?new String[]{"dent_tank_side","dent_truck_front","dent_apc_side","dent_tank_turret","dent_tank_roof","dent_repair"}:new String[]{"tank_fire","apc_fire","tank_coax","tank_heavy_left","tank_bullet_right","truck_heavy_right","tank_occupant_hit","tank_shell_direct","tank_shell_blast","tank_roof_heavy"};
-    private static final int DURATION=DENTS?80:56;
+    private static final boolean AUDIO=Boolean.getBoolean("blacklight.test.vehicleAudio");
+    private static final String[] CASES=AUDIO?new String[]{"military_truck","military_apc","military_tank","blackwatch_truck","blackwatch_apc","blackwatch_tank"}:DENTS?new String[]{"dent_tank_side","dent_truck_front","dent_apc_side","dent_tank_turret","dent_tank_roof","dent_repair"}:new String[]{"tank_fire","apc_fire","tank_coax","tank_heavy_left","tank_bullet_right","truck_heavy_right","tank_occupant_hit","tank_shell_direct","tank_shell_blast","tank_roof_heavy"};
+    private static final int DURATION=AUDIO?120:DENTS?80:56;
     private static final int ONLY_SCENE=DENTS?Integer.getInteger("blacklight.test.vehicleDentScene",-1):-1;
     private static int index=Math.max(0,ONLY_SCENE),tick,last=-1,carId=-1,driverId=-1,attackerId=-1;
     private static boolean initialized,queued,done;
@@ -32,6 +33,10 @@ public final class VehicleFeedbackVisual {
     private static Path output;
     private static final JsonArray frames=new JsonArray();
     private static final List<JsonObject> receipts=new java.util.concurrent.CopyOnWriteArrayList<>();
+    private static final List<String> sounds=new java.util.concurrent.CopyOnWriteArrayList<>();
+    @SubscribeEvent public static void sound(net.neoforged.neoforge.client.event.sound.PlaySoundEvent e){
+        if(AUDIO&&initialized&&!done&&e.getName().startsWith("vehicle."))sounds.add(e.getName());
+    }
     @SubscribeEvent public static void tick(ClientTickEvent.Post e){
         if(System.getProperty("blacklight.test.vehicleFeedback","").isBlank()||done)return;
         var mc=Minecraft.getInstance();var server=mc.getSingleplayerServer();if(mc.level==null||mc.player==null||server==null)return;
@@ -46,13 +51,14 @@ public final class VehicleFeedbackVisual {
                 mc.setScreen(null);mc.getWindow().setTitle("Vehicle feedback - isolated QA");initialized=true;
             }
             for(var key:mc.options.keyMappings)key.setDown(false);mc.mouseHandler.releaseMouse();mc.getToasts().clear();
-            if(!queued){queued=true;ready=false;tick=0;last=-1;frames.asList().clear();receipts.clear();setup();return;}
+            if(!queued){queued=true;ready=false;tick=0;last=-1;frames.asList().clear();receipts.clear();sounds.clear();setup();return;}
             if(!ready)return;tick++;
             if(tick>=60&&tick<60+DURATION){
                 final int age=tick-60,scene=index;
                 server.execute(()->{
                     try{
                         var level=server.overworld();var car=(MilitaryVehicle)level.getEntity(carId);var driver=(MilitarySoldier)level.getEntity(driverId);var attacker=(LivingEntity)level.getEntity(attackerId);
+                        if(AUDIO){audioAction(age,car,driver);return;}
                         if(DENTS){dentAction(scene,age,car);return;}
                         boolean action=false;
                         if(scene<3&&(age==8||scene==1&&age>=14&&(age-14)%6==0||scene==2&&age>=12&&(age-12)%4==0))
@@ -75,6 +81,7 @@ public final class VehicleFeedbackVisual {
             }
             if(tick>=60+DURATION){
                 var gson=new GsonBuilder().setPrettyPrinting().create();Files.writeString(output.resolve(CASES[index]+"-frames.json"),gson.toJson(frames));Files.writeString(output.resolve(CASES[index]+"-server.json"),gson.toJson(receipts));
+                if(AUDIO)Files.writeString(output.resolve(CASES[index]+"-sounds.json"),gson.toJson(sounds));
                 if(++index==CASES.length||ONLY_SCENE>=0){done=true;Files.writeString(output.resolve("status.txt"),"Captured "+(ONLY_SCENE>=0?1:CASES.length)+" production-path cases; review required");mc.stop();}else queued=false;
             }
         }catch(Exception failure){done=true;com.codex.blacklight.BlacklightNeoMod.LOGGER.error("Vehicle feedback QA",failure);try{if(output!=null)Files.writeString(output.resolve("status.txt"),failure.toString());}catch(Exception ignored){}mc.stop();}
@@ -89,16 +96,18 @@ public final class VehicleFeedbackVisual {
             Vec3 camera=DENTS?new Vec3(7,84,9):new Vec3(10,84,13),look=new Vec3(0,82.6,0).subtract(camera.add(0,p.getEyeHeight(),0));
             p.connection.teleport(camera.x,camera.y,camera.z,(float)Math.toDegrees(Math.atan2(-look.x,look.z)),(float)-Math.toDegrees(Math.atan2(look.y,look.horizontalDistance())));
             var car=(DENTS?(scene==1?ModEntities.BLACKWATCH_TRUCK.get():scene==2?ModEntities.BLACKWATCH_APC.get():ModEntities.BLACKWATCH_TANK.get()):(scene==1?ModEntities.BLACKWATCH_APC.get():scene==5?ModEntities.BLACKWATCH_TRUCK.get():ModEntities.BLACKWATCH_TANK.get())).create(level);car.setPos(0,81,0);level.addFreshEntity(car);
+            if(AUDIO){car.discard();car=List.of(ModEntities.MILITARY_TRUCK,ModEntities.MILITARY_APC,ModEntities.MILITARY_TANK,ModEntities.BLACKWATCH_TRUCK,ModEntities.BLACKWATCH_APC,ModEntities.BLACKWATCH_TANK).get(scene).get().create(level);car.setPos(0,81,0);level.addFreshEntity(car);car.inventory().issueInitialLoadout();}
             var driver=ModEntities.BLACKWATCH_SOLDIER.get().create(level);driver.setPos(0,81,0);driver.setAutomaticUnitJoin(false);driver.setPersistenceRequired();level.addFreshEntity(driver);driver.startRiding(car,true);
+            if(AUDIO&&scene<3){driver.stopRiding();driver.discard();var military=ModEntities.MILITARY_SOLDIER.get().create(level);military.setPos(0,81,0);military.setAutomaticUnitJoin(false);military.setPersistenceRequired();level.addFreshEntity(military);military.startRiding(car,true);driverId=military.getId();}
             if(DENTS){driver.stopRiding();driver.discard();}
             car.inventory().addAmmunition("tank_he_shell",3);car.inventory().addAmmunition("autocannon_round",20);car.inventory().addAmmunition("machine_gun_round",40);
             var attacker=EntityType.ARMOR_STAND.create(level);attacker.setInvisible(true);attacker.setNoGravity(true);attacker.setPos(scene==3?-8:8,81,0);attacker.setInvulnerable(true);level.addFreshEntity(attacker);
-            if(!DENTS){
+            if(!DENTS&&!AUDIO){
                 if(scene==9)attacker.setPos(1.3,88,1.5);
                 if(scene==8)level.setBlock(new BlockPos(3,82,0),Blocks.OBSIDIAN.defaultBlockState(),2);
                 if(scene==6){driver.stopRiding();p.setGameMode(GameType.SURVIVAL);p.connection.teleport(0,81,0,0,0);p.startRiding(car,true);}
             }
-            carId=car.getId();driverId=driver.getId();attackerId=attacker.getId();ready=true;
+            carId=car.getId();if(!AUDIO||scene>=3)driverId=driver.getId();attackerId=attacker.getId();ready=true;
         }catch(Exception failure){error=failure.toString();}});
     }
     private static void dentAction(int scene,int age,MilitaryVehicle car){
@@ -124,11 +133,29 @@ public final class VehicleFeedbackVisual {
     }
     @SubscribeEvent public static void frame(RenderFrameEvent.Post e){
         if(!initialized||done||!ready||tick<60||tick>=60+DURATION||tick==last)return;
+        if(AUDIO&&(tick-60)%3!=0)return;
         var mc=Minecraft.getInstance();if(!(mc.level.getEntity(carId) instanceof MilitaryVehicle car))return;
         try{
             String name=CASES[index]+"-"+String.format(Locale.ROOT,"%03d",tick-60)+".png";
             try(var picture=Screenshot.takeScreenshot(mc.getMainRenderTarget())){picture.writeToFile(output.resolve(name));}
             var pose=car.feedback(mc.getTimer().getGameTimeDeltaPartialTick(false));var row=new JsonObject();row.addProperty("image",name);row.addProperty("tick",tick-60);row.addProperty("pitch",pose.pitch());row.addProperty("roll",pose.roll());row.addProperty("recoil",pose.primaryRecoil());row.addProperty("secondaryRecoil",pose.secondaryRecoil());row.addProperty("cameraPitch",mc.gameRenderer.getMainCamera().getXRot());row.addProperty("cameraRoll",mc.gameRenderer.getMainCamera().getRoll());row.addProperty("dents",car.dents().size());row.addProperty("depth",car.dents().stream().mapToDouble(VehicleDeformation.Dent::depth).max().orElse(0));frames.add(row);last=tick;
+            if(AUDIO){
+                row.addProperty("engineRunning",car.engineRunning());row.addProperty("driveLoad",car.driveLoad());
+                var field=VehicleAudio.class.getDeclaredField("LOOPS");field.setAccessible(true);var loops=(Map<?,?>)field.get(null);var pair=loops.get(car);
+                row.addProperty("loopPairs",loops.size());
+                if(pair!=null)for(String key:List.of("engine","rolling")){var method=pair.getClass().getDeclaredMethod(key);method.setAccessible(true);var sound=(net.minecraft.client.resources.sounds.SoundInstance)method.invoke(pair);row.addProperty(key+"Active",mc.getSoundManager().isActive(sound));row.addProperty(key+"Volume",sound.getVolume());row.addProperty(key+"Pitch",sound.getPitch());}
+            }
         }catch(Exception failure){error=failure.toString();}
+    }
+    private static void audioAction(int age,MilitaryVehicle car,MilitarySoldier driver){
+        if(age>=10&&age<30)car.moveVehicle(.10F,0);
+        if(age>=30&&age<50)car.moveVehicle(-.10F,0);
+        if(age>=50&&age<65)car.moveVehicle(0,2);
+        if(age==65)car.moveVehicle(0,0);
+        boolean fired=false;
+        if(age==16||age==42){String weapon=car.chassisId().equals("tank")?"tank_he":"autocannon";if(car.definition().weapons().containsKey(weapon))fired=VehicleAttackService.fire(car,driver,weapon);}
+        if(age==36||age==40||age==44){String weapon=car.chassisId().equals("tank")?"coaxial_machine_gun":"vehicle_rocket";if(car.definition().weapons().containsKey(weapon))fired=VehicleAttackService.fire(car,driver,weapon);}
+        if(age==85)driver.stopRiding();
+        var row=new JsonObject();row.addProperty("tick",age);row.addProperty("engineRunning",car.engineRunning());row.addProperty("driveLoad",car.driveLoad());row.addProperty("fired",fired);receipts.add(row);
     }
 }

@@ -171,7 +171,7 @@ public final class BlacklightHydra extends Monster implements GeoEntity,Animated
         if(incomingContact==null||amount<=0)return;
         var c=incomingContact;lastIncomingPoint=c.point();lastIncomingTick=level().getGameTime();incomingEffects++;
         var n=c.normal();var attacker=source.getEntity();
-        var tissue=new com.codex.blacklight.network.InfectedImpactPayload(attacker==null?getId():attacker.getId(),getId(),c.style().ordinal(),c.point().x,c.point().y,c.point().z,(float)n.x,(float)n.y,(float)n.z,.65F,level().getGameTime()*31+getId());
+        var tissue=new com.codex.blacklight.network.InfectedImpactPayload(attacker==null?getId():attacker.getId(),getId(),c.appearance(),c.point().x,c.point().y,c.point().z,(float)n.x,(float)n.y,(float)n.z,.65F,level().getGameTime()*31+getId());
         var sound=ModInfectedSounds.prepare(this,com.codex.blacklight.infection.InfectedSoundCue.contact(c.style()),c.point());
         ContactEffects.body(this,tissue,c.style()==InfectedAttackStyle.CRUSH,sound);
     }
@@ -573,7 +573,7 @@ public final class BlacklightHydra extends Monster implements GeoEntity,Animated
         for(var victim:level.getEntitiesOfClass(LivingEntity.class,new AABB(origin,origin).inflate(radius,.7,radius),this::combatTarget)){
             Vec3 feet=victim.position();var support=ray(feet.add(0,.08,0),feet.add(0,-.15,0));
             if(attackVictims.contains(victim.getUUID())||support.getType()!=HitResult.Type.BLOCK||support.getDirection()!=net.minecraft.core.Direction.UP)continue;
-            Vec3 at=HydraContact.nearest(victim.getBoundingBox(),origin.add(0,.1,0));
+            Vec3 at=HunterContactPose.nearest(victim.getBoundingBox(),origin.add(0,.1,0));
             if(at.subtract(origin).horizontalDistance()>radius||ray(origin.add(0,.12,0),at.add(0,.12,0)).getType()!=HitResult.Type.MISS)continue;
             strike(victim,at,w.damage()/500F,InfectedAttackStyle.CRUSH);
         }

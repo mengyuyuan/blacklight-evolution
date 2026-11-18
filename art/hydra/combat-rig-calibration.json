@@ -1,0 +1,38 @@
+{
+  "source": "D:\\PrototypeReference\\p1\\private\\comparison\\Hydra.p3d",
+  "sha256": "b4bd053853eeb705699a0e7e24229e5f75dcd2cd8baa0eeef0fbeb75528ad5b1",
+  "mapping": {
+    "neck_0": "full_rig_body1",
+    "neck_1": "full_rig_body2",
+    "neck_2": "full_rig_body3",
+    "neck_3": "full_rig_body4",
+    "neck_4": "full_rig_body5",
+    "neck_5": "Neck_2",
+    "neck_6": "Neck_4",
+    "head": "Head",
+    "jaw": "Gum",
+    "pincer_left": "Lip_L",
+    "pincer_right": "Lip_R",
+    "claw_left": "Claw_L",
+    "claw_right": "Claw_R"
+  },
+  "method": "Fixed authored segment lengths; original animated child directions with original world twist; calibrated head/jaw and pincers. Combat only. MC pivots are authoritative.",
+  "unchanged": "Authored geometry, texture, idle, capture, dive, arrival, toss, feeding and transport logic.",
+  "clips": {
+    "slam": {
+      "source": "hyd_slam",
+      "frames": 74,
+      "fps": 30.0
+    },
+    "sweep": {
+      "source": "hyd_sweep",
+      "frames": 71,
+      "fps": 30.0
+    },
+    "sidesweep": {
+      "source": "hyd_sidesweep",
+      "frames": 125,
+      "fps": 30.0
+    }
+  }
+}

@@ -1,0 +1,1236 @@
+{
+  "schema": 1,
+  "source": {
+    "file": "D:\\PrototypeReference\\p2\\input\\p2\\behemoth.p3d",
+    "sha256": "3737ff61e7042391bf12c95c2018e034f52a1945983d0a7053608a01d69240c7"
+  },
+  "runtime": {
+    "file": "D:\\PrototypeReference\\p2\\input\\prototype2engine.dll",
+    "sha256": "bfd62e944eaed5762bc791306f54ab4c2ce03705e52180f44d0da5cd7cc7e07d",
+    "machine": "x86",
+    "imageBase": "0x10000000",
+    "provenance": "D:/PrototypeReference/p2/runtime-provenance.json"
+  },
+  "characterSolver": {
+    "nodeOffset": 5702063,
+    "componentPayloadOffset": 1431,
+    "fields": [
+      {
+        "name": "class",
+        "value": "CharacterSolverBehaviour",
+        "fileOffset": 5703506,
+        "bytes": 28,
+        "encoding": "text32"
+      },
+      {
+        "name": "version",
+        "value": 1,
+        "fileOffset": 5703534,
+        "bytes": 2,
+        "encoding": "H"
+      },
+      {
+        "name": "schemaCrc",
+        "value": 2951657372,
+        "fileOffset": 5703536,
+        "bytes": 4,
+        "encoding": "I"
+      },
+      {
+        "name": "logicStateMask",
+        "value": 1,
+        "fileOffset": 5703540,
+        "bytes": 2,
+        "encoding": "H",
+        "runtimeAccessor": "Custom getter/setter; metadata descriptor offset 0 is not a direct struct member"
+      },
+      {
+        "name": "timeSliceFrameSkip",
+        "value": 0,
+        "fileOffset": 5703542,
+        "bytes": 1,
+        "encoding": "B",
+        "runtimeMemberOffset": "0x9"
+      },
+      {
+        "name": "supportingLimbs",
+        "value": "BehemothLimbs",
+        "fileOffset": 5703543,
+        "bytes": 14,
+        "encoding": "text8",
+        "runtimeMemberOffset": "0x6c"
+      },
+      {
+        "name": "limbIKEnabled",
+        "value": false,
+        "fileOffset": 5703557,
+        "bytes": 4,
+        "encoding": "bool32",
+        "runtimeMemberOffset": "0x98"
+      },
+      {
+        "name": "sweepAndClipMotion",
+        "value": 0,
+        "fileOffset": 5703561,
+        "bytes": 4,
+        "encoding": "i",
+        "runtimeMemberOffset": "0xb4"
+      },
+      {
+        "name": "supportingLimbUpdateInterval",
+        "value": 0.0,
+        "fileOffset": 5703565,
+        "bytes": 4,
+        "encoding": "f",
+        "runtimeMemberOffset": "0x80"
+      },
+      {
+        "name": "sharedProperties",
+        "value": "WallRunnerCharacterSolverProperties",
+        "fileOffset": 5703569,
+        "bytes": 36,
+        "encoding": "text8",
+        "runtimeMemberOffset": "0x94"
+      },
+      {
+        "name": "predictSupportingLimbSurfaceContact",
+        "value": true,
+        "fileOffset": 5703605,
+        "bytes": 4,
+        "encoding": "bool32",
+        "runtimeMemberOffset": "0x126"
+      },
+      {
+        "name": "stickToSupportingSurface",
+        "value": true,
+        "fileOffset": 5703609,
+        "bytes": 4,
+        "encoding": "bool32",
+        "runtimeMemberOffset": "0x68"
+      }
+    ]
+  },
+  "supportDefinition": {
+    "nodeOffset": 5701362,
+    "fields": [
+      {
+        "name": "name",
+        "value": "Ground",
+        "fileOffset": 5701382,
+        "bytes": 10,
+        "encoding": "text32",
+        "runtimeMemberOffset": "0x8"
+      },
+      {
+        "name": "sphereRadius",
+        "value": 0.10000000149011612,
+        "fileOffset": 5701392,
+        "bytes": 4,
+        "encoding": "f",
+        "runtimeMemberOffset": "0x10"
+      },
+      {
+        "name": "intersectionProperties",
+        "value": "BehemothSupportingIntersectionProperties",
+        "fileOffset": 5701396,
+        "bytes": 41,
+        "encoding": "text8",
+        "runtimeMemberOffset": "0x30"
+      },
+      {
+        "name": "origin",
+        "value": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "fileOffset": 5701437,
+        "bytes": 12,
+        "encoding": "3f",
+        "runtimeMemberOffset": "0x34"
+      },
+      {
+        "name": "direction",
+        "value": [
+          0.0,
+          -1.0,
+          0.0
+        ],
+        "fileOffset": 5701449,
+        "bytes": 12,
+        "encoding": "3f",
+        "runtimeMemberOffset": "0x40"
+      },
+      {
+        "name": "restingLength",
+        "value": 6.0,
+        "fileOffset": 5701461,
+        "bytes": 4,
+        "encoding": "f",
+        "runtimeMemberOffset": "0x4c"
+      },
+      {
+        "name": "maxLength",
+        "value": 8.0,
+        "fileOffset": 5701465,
+        "bytes": 4,
+        "encoding": "f",
+        "runtimeMemberOffset": "0x50"
+      },
+      {
+        "name": "supportAngleTolerance",
+        "value": 90.0,
+        "fileOffset": 5701469,
+        "bytes": 4,
+        "encoding": "f",
+        "runtimeAccessor": "Custom getter/setter; metadata descriptor offset 0 is not a direct struct member"
+      },
+      {
+        "name": "directionFollowsSurfaceNormal",
+        "value": false,
+        "fileOffset": 5701473,
+        "bytes": 4,
+        "encoding": "bool32",
+        "runtimeMemberOffset": "0x58"
+      },
+      {
+        "name": "forceDirectionInCharacterSpace",
+        "value": false,
+        "fileOffset": 5701477,
+        "bytes": 4,
+        "encoding": "bool32",
+        "runtimeMemberOffset": "0x59"
+      },
+      {
+        "name": "characterSurfaceOrientation",
+        "value": -1,
+        "fileOffset": 5701481,
+        "bytes": 4,
+        "encoding": "i",
+        "runtimeMemberOffset": "0x5c"
+      },
+      {
+        "name": "characterUpVectorOrientation",
+        "value": 1,
+        "fileOffset": 5701485,
+        "bytes": 4,
+        "encoding": "i",
+        "runtimeMemberOffset": "0x60"
+      },
+      {
+        "name": "smoothRestingLength",
+        "value": true,
+        "fileOffset": 5701489,
+        "bytes": 4,
+        "encoding": "bool32",
+        "runtimeMemberOffset": "0x5b"
+      },
+      {
+        "name": "smoothMaxLinearVelocity",
+        "value": 1000.0,
+        "fileOffset": 5701493,
+        "bytes": 4,
+        "encoding": "f",
+        "runtimeMemberOffset": "0x64"
+      },
+      {
+        "name": "smoothFractionalMaxLinearVelocity",
+        "value": 0.0,
+        "fileOffset": 5701497,
+        "bytes": 4,
+        "encoding": "f",
+        "runtimeMemberOffset": "0x68"
+      },
+      {
+        "name": "smoothMaxLinearVelocityMapEntryCount",
+        "value": 0,
+        "fileOffset": 5701501,
+        "bytes": 4,
+        "encoding": "I",
+        "runtimeMemberOffset": "0x6c"
+      },
+      {
+        "name": "smoothMinRestingLength",
+        "value": 0.0,
+        "fileOffset": 5701505,
+        "bytes": 4,
+        "encoding": "f",
+        "runtimeMemberOffset": "0x8c"
+      },
+      {
+        "name": "smoothMaxRestingLength",
+        "value": 20.0,
+        "fileOffset": 5701509,
+        "bytes": 4,
+        "encoding": "f",
+        "runtimeMemberOffset": "0x90"
+      },
+      {
+        "name": "smoothDirection",
+        "value": true,
+        "fileOffset": 5701513,
+        "bytes": 4,
+        "encoding": "bool32",
+        "runtimeMemberOffset": "0x5a"
+      },
+      {
+        "name": "smoothMaxAngularVelocity",
+        "value": 1.2999999523162842,
+        "fileOffset": 5701517,
+        "bytes": 4,
+        "encoding": "f",
+        "runtimeMemberOffset": "0x88"
+      },
+      {
+        "name": "secondaryCheckRadius",
+        "value": 3.0,
+        "fileOffset": 5701521,
+        "bytes": 4,
+        "encoding": "f",
+        "runtimeMemberOffset": "0x94"
+      }
+    ]
+  },
+  "supportingLimbs": {
+    "nodeOffset": 5701640,
+    "fields": [
+      {
+        "name": "count",
+        "value": 1,
+        "fileOffset": 5701660,
+        "bytes": 4,
+        "encoding": "I"
+      },
+      {
+        "name": "definition",
+        "value": "BehemothLimbGround",
+        "fileOffset": 5701664,
+        "bytes": 19,
+        "encoding": "text8"
+      }
+    ]
+  },
+  "poseFixupProperties": {
+    "nodeOffset": 5696839,
+    "strategies": [
+      [
+        {
+          "name": "strategyName",
+          "value": "joint_offset",
+          "fileOffset": 5696863,
+          "bytes": 16,
+          "encoding": "text32",
+          "runtimeMemberOffset": "0x8"
+        },
+        {
+          "name": "strategyType",
+          "value": "PoseStrategyJointOffset",
+          "fileOffset": 5696879,
+          "bytes": 27,
+          "encoding": "text32",
+          "runtimeMemberOffset": "0x10"
+        },
+        {
+          "name": "version",
+          "value": 1,
+          "fileOffset": 5696906,
+          "bytes": 2,
+          "encoding": "H"
+        },
+        {
+          "name": "schemaCrc",
+          "value": 1643746600,
+          "fileOffset": 5696908,
+          "bytes": 4,
+          "encoding": "I"
+        },
+        {
+          "name": "fixupEnabledByDefault",
+          "value": true,
+          "fileOffset": 5696912,
+          "bytes": 4,
+          "encoding": "bool32",
+          "runtimeMemberOffset": "0x14"
+        },
+        {
+          "name": "alwaysEnabledWhileRagdolling",
+          "value": true,
+          "fileOffset": 5696916,
+          "bytes": 4,
+          "encoding": "bool32",
+          "runtimeMemberOffset": "0x15"
+        }
+      ],
+      [
+        {
+          "name": "strategyName",
+          "value": "jointStuck",
+          "fileOffset": 5696920,
+          "bytes": 14,
+          "encoding": "text32",
+          "runtimeMemberOffset": "0x8"
+        },
+        {
+          "name": "strategyType",
+          "value": "PoseStrategyJointStuck",
+          "fileOffset": 5696934,
+          "bytes": 26,
+          "encoding": "text32",
+          "runtimeMemberOffset": "0x10"
+        },
+        {
+          "name": "version",
+          "value": 1,
+          "fileOffset": 5696960,
+          "bytes": 2,
+          "encoding": "H"
+        },
+        {
+          "name": "schemaCrc",
+          "value": 1643746600,
+          "fileOffset": 5696962,
+          "bytes": 4,
+          "encoding": "I"
+        },
+        {
+          "name": "fixupEnabledByDefault",
+          "value": true,
+          "fileOffset": 5696966,
+          "bytes": 4,
+          "encoding": "bool32",
+          "runtimeMemberOffset": "0x14"
+        },
+        {
+          "name": "alwaysEnabledWhileRagdolling",
+          "value": true,
+          "fileOffset": 5696970,
+          "bytes": 4,
+          "encoding": "bool32",
+          "runtimeMemberOffset": "0x15"
+        }
+      ]
+    ]
+  },
+  "runtimeEvidence": [
+    {
+      "name": "Behaviour metadata",
+      "beginVA": "0x106991a0",
+      "endExclusiveVA": "0x10699294",
+      "fileOffset": 6915488,
+      "bytes": 244,
+      "sha256": "222407901398a65fa1e004eefacddbe08ee0aad028312dccbcb65a0d5784bfa8",
+      "meaning": "logicStateMask ushort; timeSliceFrameSkip byte; transient isActive"
+    },
+    {
+      "name": "ushort binary reader",
+      "beginVA": "0x10147c00",
+      "endExclusiveVA": "0x10147c2e",
+      "fileOffset": 1339392,
+      "bytes": 46,
+      "sha256": "79bcb4abe37bef53830897e5175ff40fbf67290f51d9ff1f233d90e11f722d11",
+      "meaning": "Reads two bytes through 0x109b0770"
+    },
+    {
+      "name": "byte binary reader",
+      "beginVA": "0x103b50e0",
+      "endExclusiveVA": "0x103b510e",
+      "fileOffset": 3884256,
+      "bytes": 46,
+      "sha256": "6c857a1020ea8e1230046ddcc2e85cb6f4a7f2ccd3c3e70a665af1b289dfcea2",
+      "meaning": "Reads one byte through 0x109b0770"
+    },
+    {
+      "name": "bool binary reader",
+      "beginVA": "0x1012e0a0",
+      "endExclusiveVA": "0x1012e0d5",
+      "fileOffset": 1234080,
+      "bytes": 53,
+      "sha256": "9388ad4269166a7f8b7231821f7809882a128ddf0f804dd1f1d5191eb310ce6c",
+      "meaning": "Reads four bytes; converts nonzero to bool"
+    },
+    {
+      "name": "SupportingLimbDefinition metadata",
+      "beginVA": "0x106ce950",
+      "endExclusiveVA": "0x106cee1c",
+      "fileOffset": 7134544,
+      "bytes": 1228,
+      "sha256": "f3657d014fb6cc7d95e74ebe2f1e4e7586b1b85fdf640cfba6510eb8a25237d0",
+      "meaning": "21 ordered properties; name is a support definition identifier, no hand/finger joint field"
+    },
+    {
+      "name": "CharacterSolverBehaviour metadata",
+      "beginVA": "0x10724d90",
+      "endExclusiveVA": "0x10724fb3",
+      "fileOffset": 7487888,
+      "bytes": 547,
+      "sha256": "b9e2bf739c37db598c9fd5322cb6802684f57587976b0f5245ca3828c01c29bb",
+      "meaning": "Base Behaviour plus seven ordered properties"
+    },
+    {
+      "name": "PoseFixup strategy entry metadata",
+      "beginVA": "0x102137d0",
+      "endExclusiveVA": "0x102138d3",
+      "fileOffset": 2173904,
+      "bytes": 259,
+      "sha256": "be4aeb35410f737f236efdcddf062f707268894597f5d86390285c8d55be0160",
+      "meaning": "Name, strategy, default-enabled, enabled-while-ragdolling"
+    },
+    {
+      "name": "JointOffset state constructor",
+      "beginVA": "0x1024b8a0",
+      "endExclusiveVA": "0x1024b8c6",
+      "fileOffset": 2403488,
+      "bytes": 38,
+      "sha256": "6e3bb12fc5bff5f28faebf83bad00a0d83bcc505a594bfd51a9f170ec190e9e4",
+      "meaning": "Zero offset and invalid joint index 0xffff; enabled strategy alone does not move a joint"
+    },
+    {
+      "name": "JointOffset apply",
+      "beginVA": "0x10134410",
+      "endExclusiveVA": "0x10134580",
+      "fileOffset": 1259536,
+      "bytes": 368,
+      "sha256": "b322d4f520ed0d2f2059286c34f0758eb786decd84562869653b468f553c6a83",
+      "meaning": "Adds externally supplied local translation to selected joint; propagates pose, no terrain query"
+    },
+    {
+      "name": "JointOffsetAddAction begin",
+      "beginVA": "0x10318ae0",
+      "endExclusiveVA": "0x10318c01",
+      "fileOffset": 3243744,
+      "bytes": 289,
+      "sha256": "06ec12d873b0167ebfda38d3411b32b6ccfb5179a209662a8c0373a65888c014",
+      "meaning": "Resolves action joint, enables/queries joint_offset strategy and assigns state joint"
+    },
+    {
+      "name": "JointOffsetAddAction update",
+      "beginVA": "0x100a3050",
+      "endExclusiveVA": "0x100a34dd",
+      "fileOffset": 664656,
+      "bytes": 1165,
+      "sha256": "fe18c2a39e75f6648ab9140e191e9123c369f5a5d81ea848e56f2c43d28b78a2",
+      "meaning": "Computes configured offset and writes state; not an always-running actor grounding behaviour"
+    },
+    {
+      "name": "JointStuck state factory",
+      "beginVA": "0x10407950",
+      "endExclusiveVA": "0x10407983",
+      "fileOffset": 4222288,
+      "bytes": 51,
+      "sha256": "5dedfc2d56c78068bd96286fd54a4b20f71fbd9b59e4ac8ac9eebdb82f974d9c",
+      "meaning": "Creates state with the owning actor handle"
+    },
+    {
+      "name": "JointStuck state constructor",
+      "beginVA": "0x1002bd60",
+      "endExclusiveVA": "0x1002be58",
+      "fileOffset": 176480,
+      "bytes": 248,
+      "sha256": "eaec80972ddc377769ce01bc4f5a9d127ad94f9f7fffb063c5a9ab06b34d582b",
+      "meaning": "Owner handle, invalid joint 0xffff, capture flag false"
+    },
+    {
+      "name": "JointStuck event",
+      "beginVA": "0x10387480",
+      "endExclusiveVA": "0x103874ac",
+      "fileOffset": 3696768,
+      "bytes": 44,
+      "sha256": "fc1f8bca719d78f5309156f85bb71259790523a86f79be60009337fe617a4ef6",
+      "meaning": "Message group 0x1000 subtype 15 supplies joint index and resets captured matrix"
+    },
+    {
+      "name": "JointStuck apply",
+      "beginVA": "0x1047eca0",
+      "endExclusiveVA": "0x1047f17c",
+      "fileOffset": 4710560,
+      "bytes": 1244,
+      "sha256": "9f9bbf9098ffd554f3aded9a387de95fe38cf93888ef791098a17728a289e7f9",
+      "meaning": "Validates owner/joint, captures joint world matrix then retains world anchor as owner changes; no terrain query"
+    },
+    {
+      "name": "PoseFixupBehaviour update",
+      "beginVA": "0x10183100",
+      "endExclusiveVA": "0x101831cb",
+      "fileOffset": 1582336,
+      "bytes": 203,
+      "sha256": "5fe050475c14286f8de8369b5c9da72e8cc9f2450be0bcc1da4134868a964afc",
+      "meaning": "Iterates strategies in property-list order, with state-active or ragdoll enable gating"
+    },
+    {
+      "name": "CharacterSolverBehaviour update",
+      "beginVA": "0x10726180",
+      "endExclusiveVA": "0x107266bb",
+      "fileOffset": 7492992,
+      "bytes": 1339,
+      "sha256": "79f87bf9fd6b31c75c2dc36bec7eaf8d0f9d643eeaf6adb4b8426b79028cf48e",
+      "meaning": "Actor motion/support first; at 0x10726693 checks member +0x98 before calling limb IK 0x10722980"
+    },
+    {
+      "name": "CharacterSolver support dispatch",
+      "beginVA": "0x10721900",
+      "endExclusiveVA": "0x10721a41",
+      "fileOffset": 7474432,
+      "bytes": 321,
+      "sha256": "1cd3be5d32a7ea7857406149e5db1492e8ee7d981abe68fdca6d7ec6b51556c1",
+      "meaning": "Passes support state, entity transforms, stick/predict flags to 0x106cf5b0"
+    },
+    {
+      "name": "Supporting limb solve",
+      "beginVA": "0x106cf5b0",
+      "endExclusiveVA": "0x106cff76",
+      "fileOffset": 7137712,
+      "bytes": 2502,
+      "sha256": "294c224f3aa659e6d78767c02fe7973e8062a65d7de32f1ef67230445623f5b1",
+      "meaning": "Entity/support transforms and support surface query; separate from limb IK pose correction"
+    },
+    {
+      "name": "JointStuckTrack properties",
+      "beginVA": "0x10779e30",
+      "endExclusiveVA": "0x10779ef3",
+      "fileOffset": 7836208,
+      "bytes": 195,
+      "sha256": "3dc1df62671a8517990110a3b4fb990e992de1d37bfe06312965bf60aabaab3d",
+      "meaning": "External animation track exposes timeBegin, timeEnd, stuckJoint; no automatic contact query"
+    },
+    {
+      "name": "JointStuckTrack instance creation",
+      "beginVA": "0x107cc4c0",
+      "endExclusiveVA": "0x107cc506",
+      "fileOffset": 8173760,
+      "bytes": 70,
+      "sha256": "20ce6fc00f9cd02a2504e4a207d030654b6408b8ce2349a6b200505122c629a1",
+      "meaning": "Resolves target actor and creates track instance via 0x107cc300; participation is not established by actor META"
+    },
+    {
+      "name": "JointStuckAction constructor",
+      "beginVA": "0x107cc300",
+      "endExclusiveVA": "0x107cc338",
+      "fileOffset": 8173312,
+      "bytes": 56,
+      "sha256": "d3d3469bfc08d0cf7ce5c3a2fe4536111f84eb9699e9248e9bbea5e59c55e56c",
+      "meaning": "Instance vtable 0x10c76660; records action properties and actor handle"
+    },
+    {
+      "name": "JointStuckAction begin",
+      "beginVA": "0x107cc360",
+      "endExclusiveVA": "0x107cc415",
+      "fileOffset": 8173408,
+      "bytes": 181,
+      "sha256": "eb6ec09c7a1e06c3930ce947baa53c27777cae259e21a0c8fed6b09e81e7be88",
+      "meaning": "Resolves configured stuckJoint through actor skeleton; sends group 0x1000 subtype 15 and resolved joint index to actor dispatcher 0x10699610"
+    },
+    {
+      "name": "JointStuckAction end",
+      "beginVA": "0x107cbc00",
+      "endExclusiveVA": "0x107cbc6a",
+      "fileOffset": 8171520,
+      "bytes": 106,
+      "sha256": "f5fd1d4a7e9e76f96b66c6398e1b84bd25fb4c3b02b4f380f3626ecdb66bb821",
+      "meaning": "Sends group 0x1000 subtype 15 with invalid joint 0xffff; releases strategy anchor"
+    },
+    {
+      "name": "Pure3D skeleton loader",
+      "beginVA": "0x1086c740",
+      "endExclusiveVA": "0x1086d0ad",
+      "fileOffset": 8829760,
+      "bytes": 2413,
+      "sha256": "344a85e88f08181a6397a51d900bd6d11ec5338ad9fa20ffaaf922b6658190ff",
+      "meaning": "Loads raw joint matrix plus twelve auxiliary floats, matrixType ushort and flag uint. Stores inverse-parent-scale flag iff matrixType==1 and flag!=0"
+    },
+    {
+      "name": "Pure3D bind hierarchy and inverse bind",
+      "beginVA": "0x108a41c0",
+      "endExclusiveVA": "0x108a4334",
+      "fileOffset": 9057728,
+      "bytes": 372,
+      "sha256": "6708ea1432097a2d425972c43b79b82c311a78f62d18757a2d565347a74f030a",
+      "meaning": "Builds reference local/world transforms and inverse-world-bind palette"
+    },
+    {
+      "name": "Pure3D local pose",
+      "beginVA": "0x1088a2a0",
+      "endExclusiveVA": "0x1088a7f5",
+      "fileOffset": 8951456,
+      "bytes": 1365,
+      "sha256": "aadb42ce39e887797e39858dc9226beed2ddfc28ea2f96ef8d4e8a4089c77744",
+      "meaning": "Evaluates quaternion, translation and scale. At 0x1088a663..0x1088a6ac, flagged joint linear basis is multiplied componentwise by reciprocal parent channel scale; translation is unchanged"
+    },
+    {
+      "name": "Pure3D world pose",
+      "beginVA": "0x10889b00",
+      "endExclusiveVA": "0x10889cb6",
+      "fileOffset": 8949504,
+      "bytes": 438,
+      "sha256": "211285fd224fd32802a42aad3a951bba5425bee85bc80b7f094d9a4b0f6e4c38",
+      "meaning": "Ordinary parent-world by compensated-local accumulation; compensation already happened in local pose"
+    },
+    {
+      "name": "Pure3D world plus skin update",
+      "beginVA": "0x10889720",
+      "endExclusiveVA": "0x10889af6",
+      "fileOffset": 8948512,
+      "bytes": 982,
+      "sha256": "fcecda461b1e27dc72a090899cb4aedb2493ba91ddbaa14caf2a635638e731b1",
+      "meaning": "Updates world transforms and composes animated world with inverse raw reference world for skin"
+    },
+    {
+      "name": "Pure3D skin-only update",
+      "beginVA": "0x10889cc0",
+      "endExclusiveVA": "0x10889fa1",
+      "fileOffset": 8949952,
+      "bytes": 737,
+      "sha256": "db356d225d448cb47a90a6db175f02988653d1dee99bac965015777b9174fda8",
+      "meaning": "Composes animated world and inverse raw reference world; no additional terrain contact or wrist lift"
+    }
+  ],
+  "jointStuckTrack": {
+    "instanceVtable": "0x10c76660",
+    "begin": "0x107cc360",
+    "end": "0x107cbc00",
+    "consumer": "0x10387480",
+    "message": {
+      "group": "0x1000",
+      "subtype": 15,
+      "beginPayload": "resolved configured joint",
+      "endPayload": "0xffff"
+    },
+    "rawAssetTokens": {
+      "jointStuck": {
+        "textOffsets": [
+          5696924
+        ],
+        "hashOffsets": []
+      },
+      "JointStuck": {
+        "textOffsets": [
+          5696950
+        ],
+        "hashOffsets": []
+      },
+      "stuckJoint": {
+        "textOffsets": [],
+        "hashOffsets": []
+      },
+      "JointStuckTrack": {
+        "textOffsets": [],
+        "hashOffsets": []
+      },
+      "JointOffsetAdd": {
+        "textOffsets": [],
+        "hashOffsets": []
+      },
+      "jointOffsetAdd": {
+        "textOffsets": [],
+        "hashOffsets": []
+      },
+      "limbIKEnabled": {
+        "textOffsets": [],
+        "hashOffsets": []
+      }
+    },
+    "finding": "Producer/consumer lifecycle is resolved. Local behemoth asset contains strategy names only, not a track instance/property or activation hash. Native/external event sources remain outside this absence claim."
+  },
+  "skinTransformPipeline": {
+    "localColumnConvention": "T(channelTranslation) * inverseDiagonal(parentChannelScale) * R(channelQuaternion) * diagonal(channelScale) for matrixType=1 and flagged joints; omit inverseDiagonal when unflagged. Child translation is not compensated.",
+    "worldColumnConvention": "parentAnimatedWorld * compensatedLocal",
+    "skinColumnConvention": "animatedWorld * inverse(rawBindWorld)",
+    "flags": "82 Goliath joints have matrixType=1; 81 have inverse-parent-scale flag 1. Only unweighted Middle_Base_L has flag 0. Twelve auxiliary floats are [0,0,0,1,1,1,0,0,0,0,0,0] on all joints.",
+    "fix": "The prior Python world reader omitted SCL. Goliath-specific reader and source hierarchy now preserve SCL plus original segment-scale compensation. This is a supported pose correction, not a grounding heuristic.",
+    "detailedChecks": "goliath-bind-correction.json",
+    "limitation": "This recovers palette construction, not the final post-fixup frame inputs or actor-to-ground world transform. Giant source L arm has no SCL track; its support gap remains."
+  },
+  "fig": {
+    "index": "D:\\PrototypeReference\\p2\\creature-fig-structure.json",
+    "sha256": "3b0b4bb46e8ca5b3db7f57135b76556f70403714b9ae751a05ead8bbfe5ce91d",
+    "records": 4699,
+    "newlyResolvedTypes": {
+      "#ab8f69f149925c46": "onBegin",
+      "#cad59cd58119d93c": "executeCommandBranch",
+      "#6d5a4f2e4f16984a": "onEnd",
+      "#bbf017325b564f48": "__anchorRef",
+      "#4b95cff377cb6a2": "conditionReference",
+      "#54c1c1d48b9c37c0": "requestMove",
+      "#5f7123698c85f7e9": "angle",
+      "#f55e99665d47c7d3": "ContentNode",
+      "#828bf1df96c252ca": "weightedRandom",
+      "#bb26131e2ade7d5d": "isDismembered",
+      "#f2029d4967f4925b": "commandNode",
+      "#2a04b0f53d45dbf9": "objectConditionGroup",
+      "#889786817b90cbab": "interruptIgnore",
+      "#c67f47ab7b84407d": "physicsCopyExclusionGroup",
+      "#2e0ec4eb28b66f26": "physicsCollisionCapsule",
+      "#de6d2e3101050102": "spawnEffect",
+      "#acb646bd1d756196": "faceDirection",
+      "#a60f53d3c143f474": "RootRetargeting",
+      "#c769bfa488c39b6f": "passiveNode",
+      "#332ae1869088edab": "MoveNode",
+      "#5105f372f4391c1": "moveRequested",
+      "#e303a7c390ff7f67": "effect2",
+      "#cdb9563a4140e566": "executeOn",
+      "#3c2ac699bd77aa62": "executeOnUsingCalling",
+      "#a98e9edc2b6f4203": "interruptHandle",
+      "#e316f9a0f8f81729": "unDismember",
+      "#be717d150279a148": "reactionHitCollisionObjectName",
+      "#d1535dd2d349c46b": "cameraPassiveTarget",
+      "#10c8c45900e3a85b": "synchronizePosition",
+      "#ca2fd6d3c9e7e7cd": "smartTargetCameraForceTarget",
+      "#fe3916c53a5ab662": "moveDirection",
+      "#8e359868f1c8eb40": "clampVelocity",
+      "#dfc3e8fd668d216e": "stayOnRoofEdgeDetection",
+      "#f1fe9a4eaae6f2d1": "commandBank",
+      "#222c44f3aab9cf7c": "webReceiverCast",
+      "#fcc0872b86e9c9d1": "glowZone",
+      "#ddc1006aba8ac7ca": "lookAt"
+    },
+    "unresolvedTypes": [],
+    "groundingRelatedRecords": [
+      {
+        "type": "SupportingSurfaceStick",
+        "originalType": "SupportingSurfaceStick",
+        "offset": 5414004,
+        "owner": "behemoth/reaction/hit/player/crawl/#3d01d09ca99a570d/#7456264ab12c65"
+      },
+      {
+        "type": "RootRetargeting",
+        "originalType": "#a60f53d3c143f474",
+        "offset": 5416224,
+        "owner": "behemoth/reaction/hit/player/crawl/#3d01d09ca99a570d/#7456264ab12c65/#cfdf8a8af6ab29a4"
+      },
+      {
+        "type": "RootRetargeting",
+        "originalType": "#a60f53d3c143f474",
+        "offset": 5452080,
+        "owner": "behemoth/ground/do/biped/aggro/taunt/release/#12a8cadd2d460dba/hit/#1d9dc9d02ba0770e/#ad5cb777f58229ef/#b8e759eedc70d6c/hit/#99e446ed3fddb2b7/dismember/dismember/#2938043b939bb098/#cfdf8a8af6ab29a4"
+      },
+      {
+        "type": "RootRetargeting",
+        "originalType": "#a60f53d3c143f474",
+        "offset": 5453884,
+        "owner": "behemoth/ground/do/biped/aggro/taunt/release/#12a8cadd2d460dba/hit/#1d9dc9d02ba0770e/#ad5cb777f58229ef/#b8e759eedc70d6c/hit/#99e446ed3fddb2b7/dismember/dismember/#2f71f9428abe95bc/#cfdf8a8af6ab29a4"
+      },
+      {
+        "type": "RootRetargeting",
+        "originalType": "#a60f53d3c143f474",
+        "offset": 5457104,
+        "owner": "behemoth/ground/do/biped/aggro/taunt/release/#12a8cadd2d460dba/hit/#1d9dc9d02ba0770e/#ad5cb777f58229ef/#b8e759eedc70d6c/hit/#99e446ed3fddb2b7/dismember/dismember/#7456264ab12c65/#7456264ab12c65/#cfdf8a8af6ab29a4"
+      },
+      {
+        "type": "RootRetargeting",
+        "originalType": "#a60f53d3c143f474",
+        "offset": 5478668,
+        "owner": "behemoth/ground/do/crawl/#8eb3dde96af8ea04/#7254abeda68b22/cycle/#cfdf8a8af6ab29a4/#1780c726b53a6a1a"
+      },
+      {
+        "type": "RootRetargeting",
+        "originalType": "#a60f53d3c143f474",
+        "offset": 5479536,
+        "owner": "behemoth/ground/do/crawl/#8eb3dde96af8ea04/#7254abeda68b22/cycle/#cfdf8a8af6ab29a4/#8dbd56a17fab775e"
+      },
+      {
+        "type": "RootRetargeting",
+        "originalType": "#a60f53d3c143f474",
+        "offset": 5479864,
+        "owner": "behemoth/ground/do/crawl/#8eb3dde96af8ea04/#7254abeda68b22/cycle/#cfdf8a8af6ab29a4/#699a409c82a306d9"
+      },
+      {
+        "type": "RootRetargeting",
+        "originalType": "#a60f53d3c143f474",
+        "offset": 5482004,
+        "owner": "behemoth/ground/do/crawl/#8eb3dde96af8ea04/hold/#cfdf8a8af6ab29a4"
+      },
+      {
+        "type": "CollisionEnableFromRootJoint",
+        "originalType": "CollisionEnableFromRootJoint",
+        "offset": 5482904,
+        "owner": "behemoth/ground/do/crawl/#8eb3dde96af8ea04/release"
+      },
+      {
+        "type": "RootRetargeting",
+        "originalType": "#a60f53d3c143f474",
+        "offset": 5483600,
+        "owner": "behemoth/ground/do/crawl/#8eb3dde96af8ea04/release/#cfdf8a8af6ab29a4"
+      },
+      {
+        "type": "RootRetargeting",
+        "originalType": "#a60f53d3c143f474",
+        "offset": 5489880,
+        "owner": "behemoth/ground/do/crawl/#8eb3dde96af8ea04/recovery/#5c9ac4a27d234bcf/#cfdf8a8af6ab29a4"
+      },
+      {
+        "type": "RootRetargeting",
+        "originalType": "#a60f53d3c143f474",
+        "offset": 5505100,
+        "owner": "behemoth/ground/do/crawl/#fc2e08adadcd860c/release/#cfdf8a8af6ab29a4"
+      },
+      {
+        "type": "RootRetargeting",
+        "originalType": "#a60f53d3c143f474",
+        "offset": 5533748,
+        "owner": "behemoth/ground/do/crawl/#73fdc1970cf5ba0b/#e4aa6cbbbc3ae8f7/#cfdf8a8af6ab29a4"
+      },
+      {
+        "type": "RootRetargeting",
+        "originalType": "#a60f53d3c143f474",
+        "offset": 5535008,
+        "owner": "behemoth/ground/do/crawl/#73fdc1970cf5ba0b/#725897ce40dc28d4/#cfdf8a8af6ab29a4"
+      },
+      {
+        "type": "SupportingLimbExtraLength",
+        "originalType": "SupportingLimbExtraLength",
+        "offset": 5536592,
+        "owner": "behemoth/ground/do/crawl/#73fdc1970cf5ba0b/jump"
+      },
+      {
+        "type": "FlyingGroundAttack",
+        "originalType": "FlyingGroundAttack",
+        "offset": 5539020,
+        "owner": "behemoth/ground/do/crawl/#73fdc1970cf5ba0b/jump/#286f4eba22ae5a94/#a2cf60c89829dfea"
+      },
+      {
+        "type": "SupportingSurfaceStick",
+        "originalType": "SupportingSurfaceStick",
+        "offset": 5539272,
+        "owner": "behemoth/ground/do/crawl/#73fdc1970cf5ba0b/#8ee2436ba5b14779"
+      },
+      {
+        "type": "CollisionEnableFromRootJoint",
+        "originalType": "CollisionEnableFromRootJoint",
+        "offset": 5565432,
+        "owner": "behemoth/ground/do/common/hits/arm_left/release"
+      },
+      {
+        "type": "RootRetargeting",
+        "originalType": "#a60f53d3c143f474",
+        "offset": 5599172,
+        "owner": "behemoth/ground/loco/jump/jump/#b28e0eddddc33f2f"
+      },
+      {
+        "type": "RootRetargeting",
+        "originalType": "#a60f53d3c143f474",
+        "offset": 5601352,
+        "owner": "behemoth/common/#b28e0eddddc33f2f/#e79d1d589579c162"
+      },
+      {
+        "type": "CollisionEnableFromRootJoint",
+        "originalType": "CollisionEnableFromRootJoint",
+        "offset": 5612416,
+        "owner": "behemoth/common/#ba4f6a7745f5dbd9/arm_left"
+      },
+      {
+        "type": "CollisionEnableFromRootJoint",
+        "originalType": "CollisionEnableFromRootJoint",
+        "offset": 5612772,
+        "owner": "behemoth/common/#ba4f6a7745f5dbd9/leg_left"
+      },
+      {
+        "type": "CollisionEnableFromRootJoint",
+        "originalType": "CollisionEnableFromRootJoint",
+        "offset": 5612972,
+        "owner": "behemoth/common/#ba4f6a7745f5dbd9/leg_right"
+      },
+      {
+        "type": "CollisionEnableFromRootJoint",
+        "originalType": "CollisionEnableFromRootJoint",
+        "offset": 5683936,
+        "owner": "behemoth/common/#97e26b247b34278d/taunt"
+      },
+      {
+        "type": "CollisionEnableFromRootJoint",
+        "originalType": "CollisionEnableFromRootJoint",
+        "offset": 5693668,
+        "owner": "behemoth/common/#c9873b9ab2d54abe/#e8a68c241032307d"
+      }
+    ],
+    "frontSlamRecords": [
+      {
+        "type": "isDismembered",
+        "originalType": "#bb26131e2ade7d5d",
+        "offset": 5465352,
+        "owner": "behemoth/ground/do/biped/#6d403c0c9f819baa/#4208de8b7008996f"
+      },
+      {
+        "type": "onBegin",
+        "originalType": "#ab8f69f149925c46",
+        "offset": 5465396,
+        "owner": "behemoth/ground/do/biped/#6d403c0c9f819baa/#4208de8b7008996f"
+      },
+      {
+        "type": "Tracks",
+        "originalType": "Tracks",
+        "offset": 5465420,
+        "owner": "behemoth/ground/do/biped/#6d403c0c9f819baa/#4208de8b7008996f"
+      },
+      {
+        "type": "onEnd",
+        "originalType": "#6d5a4f2e4f16984a",
+        "offset": 5465444,
+        "owner": "behemoth/ground/do/biped/#6d403c0c9f819baa/#4208de8b7008996f"
+      },
+      {
+        "type": "ContentNode",
+        "originalType": "#f55e99665d47c7d3",
+        "offset": 5465468,
+        "owner": "behemoth/ground/do/biped/#6d403c0c9f819baa/#4208de8b7008996f/windup"
+      },
+      {
+        "type": "Conditions",
+        "originalType": "Conditions",
+        "offset": 5465500,
+        "owner": "behemoth/ground/do/biped/#6d403c0c9f819baa/#4208de8b7008996f/windup"
+      },
+      {
+        "type": "onBegin",
+        "originalType": "#ab8f69f149925c46",
+        "offset": 5465524,
+        "owner": "behemoth/ground/do/biped/#6d403c0c9f819baa/#4208de8b7008996f/windup"
+      },
+      {
+        "type": "__anchorRef",
+        "originalType": "#bbf017325b564f48",
+        "offset": 5465540,
+        "owner": "behemoth/ground/do/biped/#6d403c0c9f819baa/#4208de8b7008996f/windup"
+      },
+      {
+        "type": "Tracks",
+        "originalType": "Tracks",
+        "offset": 5465572,
+        "owner": "behemoth/ground/do/biped/#6d403c0c9f819baa/#4208de8b7008996f/windup"
+      },
+      {
+        "type": "AnimationP2",
+        "originalType": "AnimationP2",
+        "offset": 5465588,
+        "owner": "behemoth/ground/do/biped/#6d403c0c9f819baa/#4208de8b7008996f/windup"
+      },
+      {
+        "type": "AutoTarget",
+        "originalType": "AutoTarget",
+        "offset": 5465740,
+        "owner": "behemoth/ground/do/biped/#6d403c0c9f819baa/#4208de8b7008996f/windup"
+      },
+      {
+        "type": "Sequence",
+        "originalType": "Sequence",
+        "offset": 5465856,
+        "owner": "behemoth/ground/do/biped/#6d403c0c9f819baa/#4208de8b7008996f/windup"
+      },
+      {
+        "type": "__anchorRef",
+        "originalType": "#bbf017325b564f48",
+        "offset": 5465924,
+        "owner": "behemoth/ground/do/biped/#6d403c0c9f819baa/#4208de8b7008996f/windup"
+      },
+      {
+        "type": "Spawn",
+        "originalType": "Spawn",
+        "offset": 5465948,
+        "owner": "behemoth/ground/do/biped/#6d403c0c9f819baa/#4208de8b7008996f/windup"
+      },
+      {
+        "type": "onEnd",
+        "originalType": "#6d5a4f2e4f16984a",
+        "offset": 5466024,
+        "owner": "behemoth/ground/do/biped/#6d403c0c9f819baa/#4208de8b7008996f/windup"
+      },
+      {
+        "type": "ContentNode",
+        "originalType": "#f55e99665d47c7d3",
+        "offset": 5466056,
+        "owner": "behemoth/ground/do/biped/#6d403c0c9f819baa/#4208de8b7008996f/release"
+      },
+      {
+        "type": "Conditions",
+        "originalType": "Conditions",
+        "offset": 5466088,
+        "owner": "behemoth/ground/do/biped/#6d403c0c9f819baa/#4208de8b7008996f/release"
+      },
+      {
+        "type": "onBegin",
+        "originalType": "#ab8f69f149925c46",
+        "offset": 5466112,
+        "owner": "behemoth/ground/do/biped/#6d403c0c9f819baa/#4208de8b7008996f/release"
+      },
+      {
+        "type": "Tracks",
+        "originalType": "Tracks",
+        "offset": 5466136,
+        "owner": "behemoth/ground/do/biped/#6d403c0c9f819baa/#4208de8b7008996f/release"
+      },
+      {
+        "type": "AnimationP2",
+        "originalType": "AnimationP2",
+        "offset": 5466152,
+        "owner": "behemoth/ground/do/biped/#6d403c0c9f819baa/#4208de8b7008996f/release"
+      },
+      {
+        "type": "AutoTarget",
+        "originalType": "AutoTarget",
+        "offset": 5466304,
+        "owner": "behemoth/ground/do/biped/#6d403c0c9f819baa/#4208de8b7008996f/release"
+      },
+      {
+        "type": "__anchorRef",
+        "originalType": "#bbf017325b564f48",
+        "offset": 5466420,
+        "owner": "behemoth/ground/do/biped/#6d403c0c9f819baa/#4208de8b7008996f/release"
+      },
+      {
+        "type": "Sequence",
+        "originalType": "Sequence",
+        "offset": 5466444,
+        "owner": "behemoth/ground/do/biped/#6d403c0c9f819baa/#4208de8b7008996f/release"
+      },
+      {
+        "type": "Spawn",
+        "originalType": "Spawn",
+        "offset": 5466512,
+        "owner": "behemoth/ground/do/biped/#6d403c0c9f819baa/#4208de8b7008996f/release"
+      },
+      {
+        "type": "onEnd",
+        "originalType": "#6d5a4f2e4f16984a",
+        "offset": 5466588,
+        "owner": "behemoth/ground/do/biped/#6d403c0c9f819baa/#4208de8b7008996f/release"
+      },
+      {
+        "type": "ContentNode",
+        "originalType": "#f55e99665d47c7d3",
+        "offset": 5466644,
+        "owner": "behemoth/ground/do/biped/#6d403c0c9f819baa/#4208de8b7008996f/#8ee2436ba5b14779"
+      },
+      {
+        "type": "Conditions",
+        "originalType": "Conditions",
+        "offset": 5466676,
+        "owner": "behemoth/ground/do/biped/#6d403c0c9f819baa/#4208de8b7008996f/#8ee2436ba5b14779"
+      },
+      {
+        "type": "onBegin",
+        "originalType": "#ab8f69f149925c46",
+        "offset": 5466700,
+        "owner": "behemoth/ground/do/biped/#6d403c0c9f819baa/#4208de8b7008996f/#8ee2436ba5b14779"
+      },
+      {
+        "type": "Tracks",
+        "originalType": "Tracks",
+        "offset": 5466724,
+        "owner": "behemoth/ground/do/biped/#6d403c0c9f819baa/#4208de8b7008996f/#8ee2436ba5b14779"
+      },
+      {
+        "type": "AnimationP2",
+        "originalType": "AnimationP2",
+        "offset": 5466740,
+        "owner": "behemoth/ground/do/biped/#6d403c0c9f819baa/#4208de8b7008996f/#8ee2436ba5b14779"
+      },
+      {
+        "type": "AnimationP2",
+        "originalType": "AnimationP2",
+        "offset": 5466892,
+        "owner": "behemoth/ground/do/biped/#6d403c0c9f819baa/#4208de8b7008996f/#8ee2436ba5b14779"
+      },
+      {
+        "type": "__anchorRef",
+        "originalType": "#bbf017325b564f48",
+        "offset": 5467044,
+        "owner": "behemoth/ground/do/biped/#6d403c0c9f819baa/#4208de8b7008996f/#8ee2436ba5b14779"
+      },
+      {
+        "type": "Hit",
+        "originalType": "Hit",
+        "offset": 5467068,
+        "owner": "behemoth/ground/do/biped/#6d403c0c9f819baa/#4208de8b7008996f/#8ee2436ba5b14779"
+      },
+      {
+        "type": "Hit",
+        "originalType": "Hit",
+        "offset": 5467492,
+        "owner": "behemoth/ground/do/biped/#6d403c0c9f819baa/#4208de8b7008996f/#8ee2436ba5b14779"
+      },
+      {
+        "type": "Sequence",
+        "originalType": "Sequence",
+        "offset": 5467916,
+        "owner": "behemoth/ground/do/biped/#6d403c0c9f819baa/#4208de8b7008996f/#8ee2436ba5b14779"
+      },
+      {
+        "type": "TrackGroup",
+        "originalType": "TrackGroup",
+        "offset": 5467984,
+        "owner": "behemoth/ground/do/biped/#6d403c0c9f819baa/#4208de8b7008996f/#8ee2436ba5b14779"
+      },
+      {
+        "type": "onEnd",
+        "originalType": "#6d5a4f2e4f16984a",
+        "offset": 5468564,
+        "owner": "behemoth/ground/do/biped/#6d403c0c9f819baa/#4208de8b7008996f/#8ee2436ba5b14779"
+      },
+      {
+        "type": "ContentNode",
+        "originalType": "#f55e99665d47c7d3",
+        "offset": 5468596,
+        "owner": "behemoth/ground/do/biped/#6d403c0c9f819baa/#4208de8b7008996f/Transition"
+      },
+      {
+        "type": "Conditions",
+        "originalType": "Conditions",
+        "offset": 5468628,
+        "owner": "behemoth/ground/do/biped/#6d403c0c9f819baa/#4208de8b7008996f/Transition"
+      },
+      {
+        "type": "onBegin",
+        "originalType": "#ab8f69f149925c46",
+        "offset": 5468652,
+        "owner": "behemoth/ground/do/biped/#6d403c0c9f819baa/#4208de8b7008996f/Transition"
+      },
+      {
+        "type": "Tracks",
+        "originalType": "Tracks",
+        "offset": 5468676,
+        "owner": "behemoth/ground/do/biped/#6d403c0c9f819baa/#4208de8b7008996f/Transition"
+      },
+      {
+        "type": "AnimationP2",
+        "originalType": "AnimationP2",
+        "offset": 5468692,
+        "owner": "behemoth/ground/do/biped/#6d403c0c9f819baa/#4208de8b7008996f/Transition"
+      },
+      {
+        "type": "Sequence",
+        "originalType": "Sequence",
+        "offset": 5468844,
+        "owner": "behemoth/ground/do/biped/#6d403c0c9f819baa/#4208de8b7008996f/Transition"
+      },
+      {
+        "type": "onEnd",
+        "originalType": "#6d5a4f2e4f16984a",
+        "offset": 5468944,
+        "owner": "behemoth/ground/do/biped/#6d403c0c9f819baa/#4208de8b7008996f/Transition"
+      },
+      {
+        "type": "MoveNode",
+        "originalType": "#332ae1869088edab",
+        "offset": 5468984,
+        "owner": "behemoth/ground/do/biped/#6d403c0c9f819baa/#d6854f4632c232e1"
+      }
+    ],
+    "absenceScope": "All 4699 local behemoth FIG records after every unknown type hash is resolved. No JointOffsetAdd/JointStuck/EnableLimbIK record; other actors, external scripts and native event senders are not ruled out."
+  },
+  "executionOrder": {
+    "proven": [
+      "Within PoseFixup: joint_offset then jointStuck, each gated and requiring a valid joint state.",
+      "Within CharacterSolver: proposed actor motion, support/collision solve, then optional limb IK. Serialized Behemoth limbIKEnabled=false skips the final IK call unless an external message changes it."
+    ],
+    "notProven": "The global scheduler phase order between Puppet, PoseAnimation, PoseFixup and CharacterSolver is not yet recovered. Actor META listing order is not asserted to be update order."
+  },
+  "conclusion": "These installed components do not establish automatic giant-fist terrain IK. There is no proven source postprocessor to port as a wrist lift or cuboid floor clamp. Existing bare-source minY and authored excess remain descriptive shape/pose evidence, not original final rendered ground contact.",
+  "remainingEvidence": [
+    "JointStuckTrack factory/begin/end and strategy consumer are now resolved; local front-slam has no instance/activation. Remaining evidence is an actual external/native sender affecting this actor, not another metadata-name search.",
+    "Recover global animation/physics update order, final post-fixup local inputs for Wrist_L and Shield_L_1..3 at frame 48 and actual entity-to-ground transform. Skin palette math is now recovered.",
+    "Compare that final source surface against the authored knuckle row to separate its measured extra 0.933065 block extension from any intentional source penetration. Do not change wrist, scale, foot waves or collision alone."
+  ],
+  "nextStep": "For the unresolved giant-fist gap, follow actual actor/entity support transformation and global animation/fixup scheduler call sites. A post-fixup source frame-48 joint/actor snapshot is the smallest decisive evidence if static control flow cannot establish participation. Runtime capture stays deferred.",
+  "sourceGroundEffectFollowup": "goliath-ground-impact-provenance.json: forward fist cone-ray batches at source 0.033333/0.066667/0.116667 seconds after contact now drive real material feedback. Source foot/root positions constrain arbitrary mesh lifts. Effects do not establish a wrist-height correction or complete original actor/phase behaviour.",
+  "validation": "Hash-bound source parsing, exact field boundaries and static PE byte ranges only. No Gradle, Java compilation/tests, GameTests, client or source DLL execution.",
+  "runtimeChanges": "Goliath SCL and native parent-scale compensation restored using source/helper hierarchy and GoliathMotion reciprocal recomputation after blending. No wrist-height, collision-size or unsupported grounding correction introduced.",
+  "actorPoseFollowup": "goliath-actor-pose-followup.json: Puppet phase 4/0x10, extracted root delta, actor spatial setter and support output remain separate from skin correction; WorldCone uses actor spatial, not a Motion_Root joint field. Final giant-fist/support baseline remains unresolved. Verified bullrush work continues in goliath-charge-provenance.json."
+}

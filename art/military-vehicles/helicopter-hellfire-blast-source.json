@@ -1,0 +1,1469 @@
+{
+  "schema": 1,
+  "createdLocal": "2026-11-16T20:06:56",
+  "scope": "Hellfire final-state Hit tracks and shared contact history: static source analysis, with a 20 Hz Minecraft adaptation. This is not an original-engine execution trace or complete helicopter-controller reproduction.",
+  "decoder": {
+    "file": "D:\\PrototypeReference\\p1\\helicopter-weapons-complete.json",
+    "sha256": "70955751e9386c6b312918cc0843e6b808d1144dbede5b25181cf012314308fa"
+  },
+  "engine": {
+    "file": "D:\\PrototypeReference\\p1\\input\\prototypeenginef.dll",
+    "sha256": "8cba8da3412df4f49cd61d02445e87a0cda551dea4f2fc1e66b19c1bfe28a760"
+  },
+  "sources": [
+    {
+      "file": "D:\\PrototypeReference\\p1\\input\\helicopter\\heli_gunship_marine_core_fig.p3d.rz",
+      "sha256": "a69a4fa0c360fe9f686843071d1e658077c92b4229946aa5d7c77d5fb2712f82",
+      "owner": "heli_gunship_marine_hellfire_missile/default/final",
+      "typedTracks": [
+        {
+          "source": "heli_gunship_marine_core_fig.p3d.rz",
+          "offset": 3680,
+          "payload": 3692,
+          "length": 276,
+          "type": "Hit",
+          "kind": "TrackHash",
+          "owner": "heli_gunship_marine_hellfire_missile/default/final",
+          "group": "TrackHash",
+          "parentOffset": 3668,
+          "treeOffset": 76,
+          "fields": {
+            "Unknown1": 0,
+            "BeginTime": 0,
+            "EndTime": 0.03333330154418945,
+            "UseShapecast": false,
+            "CollisionCountMax": -1,
+            "TimeBetweenHits": -1,
+            "jointName": {
+              "hash": "0",
+              "name": "#0"
+            },
+            "jointEnd": {
+              "hash": "0",
+              "name": "#0"
+            },
+            "OffsetX": 0,
+            "OffsetY": 0,
+            "OffsetZ": 0,
+            "Radius": 1,
+            "ArcOffset": 0,
+            "ArcRange": 0,
+            "CollideWith": 48,
+            "DamageMin": 500,
+            "DamageMax": 500,
+            "UseTransformationDamageMultiplier": true,
+            "UseWeaponDamageMultiplier": true,
+            "FriendlyFire": 0.05000000074505806,
+            "AttackType": {
+              "hash": "9949716209054956141",
+              "name": "MissileExplosion"
+            },
+            "HitTypeName": {
+              "hash": "8994176190371311496",
+              "name": "#7cd1bb978a5baf88"
+            },
+            "DamageType": {
+              "hash": "22018610510307286",
+              "name": "None"
+            },
+            "EffectTypeName": {
+              "hash": "0",
+              "name": "#0"
+            },
+            "ScaleX": 3,
+            "ScaleY": 3,
+            "EffectScale": 1,
+            "PropAreaEmissionScale": 0,
+            "PropAreaEmissionScaleFunction": {
+              "hash": "4206860010037910535",
+              "name": "Linear"
+            },
+            "PropAreaSizeScale": 0,
+            "propAreaSizeScaleFunction": {
+              "hash": "10152029351150224597",
+              "name": "Logarithmic"
+            },
+            "ImpulseMinX": 0,
+            "ImpulseMinY": 9000,
+            "ImpulseMinZ": -10000,
+            "ImpulseMaxX": 0,
+            "ImpulseMaxY": 9000,
+            "ImpulseMaxZ": -10000,
+            "ImpulseRandomPlusMinus": 2500,
+            "UseMotion": false,
+            "CollisionDirectionX": 0,
+            "CollisionDirectionY": 0,
+            "CollisionDirectionZ": 0,
+            "DeformDirStr": 1,
+            "DeformStr": 0.9100000262260437,
+            "CollisionFlagName": {
+              "hash": "5441101953451253237",
+              "name": "#4b82ad6602255df5"
+            },
+            "GiverBranchRef": {
+              "name": "",
+              "index": -1
+            },
+            "ReceiverBranchRef": {
+              "name": "",
+              "index": -1
+            },
+            "UseDamageOriginator": true,
+            "SendAlert": true,
+            "SendOnlyToAIManager": false,
+            "UseOriginatorToValidate": false,
+            "IsThrown": false,
+            "MomentumDamageVelocity": 0,
+            "MomentumDamageMax": 0,
+            "TravelVelocity": 0,
+            "TravelTowardsTarget": {
+              "hash": "22018610510307286",
+              "name": "None"
+            },
+            "IgnorePowerTarget": false
+          },
+          "schema": "CollisionHitTrack",
+          "end": 3976
+        },
+        {
+          "source": "heli_gunship_marine_core_fig.p3d.rz",
+          "offset": 3976,
+          "payload": 3988,
+          "length": 276,
+          "type": "Hit",
+          "kind": "TrackHash",
+          "owner": "heli_gunship_marine_hellfire_missile/default/final",
+          "group": "TrackHash",
+          "parentOffset": 3668,
+          "treeOffset": 76,
+          "fields": {
+            "Unknown1": 0,
+            "BeginTime": 0.03333330154418945,
+            "EndTime": 0.10000000149011612,
+            "UseShapecast": false,
+            "CollisionCountMax": -1,
+            "TimeBetweenHits": -1,
+            "jointName": {
+              "hash": "0",
+              "name": "#0"
+            },
+            "jointEnd": {
+              "hash": "0",
+              "name": "#0"
+            },
+            "OffsetX": 0,
+            "OffsetY": 0,
+            "OffsetZ": 0,
+            "Radius": 4,
+            "ArcOffset": 0,
+            "ArcRange": 0,
+            "CollideWith": 48,
+            "DamageMin": 100,
+            "DamageMax": 100,
+            "UseTransformationDamageMultiplier": true,
+            "UseWeaponDamageMultiplier": true,
+            "FriendlyFire": 0.05000000074505806,
+            "AttackType": {
+              "hash": "9949716209054956141",
+              "name": "MissileExplosion"
+            },
+            "HitTypeName": {
+              "hash": "8994176190371311496",
+              "name": "#7cd1bb978a5baf88"
+            },
+            "DamageType": {
+              "hash": "22018610510307286",
+              "name": "None"
+            },
+            "EffectTypeName": {
+              "hash": "0",
+              "name": "#0"
+            },
+            "ScaleX": 3,
+            "ScaleY": 3,
+            "EffectScale": 1,
+            "PropAreaEmissionScale": 0,
+            "PropAreaEmissionScaleFunction": {
+              "hash": "4206860010037910535",
+              "name": "Linear"
+            },
+            "PropAreaSizeScale": 0,
+            "propAreaSizeScaleFunction": {
+              "hash": "10152029351150224597",
+              "name": "Logarithmic"
+            },
+            "ImpulseMinX": 0,
+            "ImpulseMinY": 9000,
+            "ImpulseMinZ": -10000,
+            "ImpulseMaxX": 0,
+            "ImpulseMaxY": 9000,
+            "ImpulseMaxZ": -10000,
+            "ImpulseRandomPlusMinus": 2500,
+            "UseMotion": false,
+            "CollisionDirectionX": 0,
+            "CollisionDirectionY": 0,
+            "CollisionDirectionZ": 0,
+            "DeformDirStr": 1,
+            "DeformStr": 0.9100000262260437,
+            "CollisionFlagName": {
+              "hash": "5441101953451253237",
+              "name": "#4b82ad6602255df5"
+            },
+            "GiverBranchRef": {
+              "name": "",
+              "index": -1
+            },
+            "ReceiverBranchRef": {
+              "name": "",
+              "index": -1
+            },
+            "UseDamageOriginator": true,
+            "SendAlert": true,
+            "SendOnlyToAIManager": false,
+            "UseOriginatorToValidate": false,
+            "IsThrown": false,
+            "MomentumDamageVelocity": 0,
+            "MomentumDamageMax": 0,
+            "TravelVelocity": 0,
+            "TravelTowardsTarget": {
+              "hash": "22018610510307286",
+              "name": "None"
+            },
+            "IgnorePowerTarget": false
+          },
+          "schema": "CollisionHitTrack",
+          "end": 4272
+        },
+        {
+          "source": "heli_gunship_marine_core_fig.p3d.rz",
+          "offset": 4272,
+          "payload": 4284,
+          "length": 276,
+          "type": "Hit",
+          "kind": "TrackHash",
+          "owner": "heli_gunship_marine_hellfire_missile/default/final",
+          "group": "TrackHash",
+          "parentOffset": 3668,
+          "treeOffset": 76,
+          "fields": {
+            "Unknown1": 0,
+            "BeginTime": 0.10000000149011612,
+            "EndTime": 0.20000000298023224,
+            "UseShapecast": false,
+            "CollisionCountMax": -1,
+            "TimeBetweenHits": -1,
+            "jointName": {
+              "hash": "0",
+              "name": "#0"
+            },
+            "jointEnd": {
+              "hash": "0",
+              "name": "#0"
+            },
+            "OffsetX": 0,
+            "OffsetY": 0,
+            "OffsetZ": 0,
+            "Radius": 7,
+            "ArcOffset": 0,
+            "ArcRange": 0,
+            "CollideWith": 48,
+            "DamageMin": 35,
+            "DamageMax": 35,
+            "UseTransformationDamageMultiplier": true,
+            "UseWeaponDamageMultiplier": false,
+            "FriendlyFire": 0,
+            "AttackType": {
+              "hash": "9949716209054956141",
+              "name": "MissileExplosion"
+            },
+            "HitTypeName": {
+              "hash": "0",
+              "name": "#0"
+            },
+            "DamageType": {
+              "hash": "22018610510307286",
+              "name": "None"
+            },
+            "EffectTypeName": {
+              "hash": "0",
+              "name": "#0"
+            },
+            "ScaleX": 3,
+            "ScaleY": 3,
+            "EffectScale": 1,
+            "PropAreaEmissionScale": 0,
+            "PropAreaEmissionScaleFunction": {
+              "hash": "4206860010037910535",
+              "name": "Linear"
+            },
+            "PropAreaSizeScale": 0,
+            "propAreaSizeScaleFunction": {
+              "hash": "4206860010037910535",
+              "name": "Linear"
+            },
+            "ImpulseMinX": 0,
+            "ImpulseMinY": 6000,
+            "ImpulseMinZ": -7500,
+            "ImpulseMaxX": 0,
+            "ImpulseMaxY": 6000,
+            "ImpulseMaxZ": -7500,
+            "ImpulseRandomPlusMinus": 1500,
+            "UseMotion": false,
+            "CollisionDirectionX": 0,
+            "CollisionDirectionY": 0,
+            "CollisionDirectionZ": 0,
+            "DeformDirStr": 1,
+            "DeformStr": 0.9100000262260437,
+            "CollisionFlagName": {
+              "hash": "5441101953451253237",
+              "name": "#4b82ad6602255df5"
+            },
+            "GiverBranchRef": {
+              "name": "",
+              "index": -1
+            },
+            "ReceiverBranchRef": {
+              "name": "",
+              "index": -1
+            },
+            "UseDamageOriginator": true,
+            "SendAlert": true,
+            "SendOnlyToAIManager": false,
+            "UseOriginatorToValidate": false,
+            "IsThrown": false,
+            "MomentumDamageVelocity": 0,
+            "MomentumDamageMax": 0,
+            "TravelVelocity": 0,
+            "TravelTowardsTarget": {
+              "hash": "22018610510307286",
+              "name": "None"
+            },
+            "IgnorePowerTarget": false
+          },
+          "schema": "CollisionHitTrack",
+          "end": 4568
+        },
+        {
+          "source": "heli_gunship_marine_core_fig.p3d.rz",
+          "offset": 4568,
+          "payload": 4580,
+          "length": 276,
+          "type": "Hit",
+          "kind": "TrackHash",
+          "owner": "heli_gunship_marine_hellfire_missile/default/final",
+          "group": "TrackHash",
+          "parentOffset": 3668,
+          "treeOffset": 76,
+          "fields": {
+            "Unknown1": 0,
+            "BeginTime": 0.20000000298023224,
+            "EndTime": 0.30000001192092896,
+            "UseShapecast": false,
+            "CollisionCountMax": -1,
+            "TimeBetweenHits": -1,
+            "jointName": {
+              "hash": "0",
+              "name": "#0"
+            },
+            "jointEnd": {
+              "hash": "0",
+              "name": "#0"
+            },
+            "OffsetX": 0,
+            "OffsetY": 0,
+            "OffsetZ": 0,
+            "Radius": 9,
+            "ArcOffset": 0,
+            "ArcRange": 0,
+            "CollideWith": 48,
+            "DamageMin": 15,
+            "DamageMax": 15,
+            "UseTransformationDamageMultiplier": true,
+            "UseWeaponDamageMultiplier": false,
+            "FriendlyFire": 0,
+            "AttackType": {
+              "hash": "9949716209054956141",
+              "name": "MissileExplosion"
+            },
+            "HitTypeName": {
+              "hash": "0",
+              "name": "#0"
+            },
+            "DamageType": {
+              "hash": "22018610510307286",
+              "name": "None"
+            },
+            "EffectTypeName": {
+              "hash": "0",
+              "name": "#0"
+            },
+            "ScaleX": 3,
+            "ScaleY": 3,
+            "EffectScale": 1,
+            "PropAreaEmissionScale": 0,
+            "PropAreaEmissionScaleFunction": {
+              "hash": "4206860010037910535",
+              "name": "Linear"
+            },
+            "PropAreaSizeScale": 0,
+            "propAreaSizeScaleFunction": {
+              "hash": "4206860010037910535",
+              "name": "Linear"
+            },
+            "ImpulseMinX": 0,
+            "ImpulseMinY": 3500,
+            "ImpulseMinZ": -5000,
+            "ImpulseMaxX": 0,
+            "ImpulseMaxY": 3500,
+            "ImpulseMaxZ": -5000,
+            "ImpulseRandomPlusMinus": 1000,
+            "UseMotion": false,
+            "CollisionDirectionX": 0,
+            "CollisionDirectionY": 0,
+            "CollisionDirectionZ": 0,
+            "DeformDirStr": 1,
+            "DeformStr": 0.9100000262260437,
+            "CollisionFlagName": {
+              "hash": "5441101953451253237",
+              "name": "#4b82ad6602255df5"
+            },
+            "GiverBranchRef": {
+              "name": "",
+              "index": -1
+            },
+            "ReceiverBranchRef": {
+              "name": "",
+              "index": -1
+            },
+            "UseDamageOriginator": true,
+            "SendAlert": true,
+            "SendOnlyToAIManager": false,
+            "UseOriginatorToValidate": false,
+            "IsThrown": false,
+            "MomentumDamageVelocity": 0,
+            "MomentumDamageMax": 0,
+            "TravelVelocity": 0,
+            "TravelTowardsTarget": {
+              "hash": "22018610510307286",
+              "name": "None"
+            },
+            "IgnorePowerTarget": false
+          },
+          "schema": "CollisionHitTrack",
+          "end": 4864
+        },
+        {
+          "source": "heli_gunship_marine_core_fig.p3d.rz",
+          "offset": 4864,
+          "payload": 4876,
+          "length": 40,
+          "type": "AIMessage",
+          "kind": "TrackHash",
+          "owner": "heli_gunship_marine_hellfire_missile/default/final",
+          "group": "TrackHash",
+          "parentOffset": 3668,
+          "treeOffset": 76,
+          "fields": {
+            "Unknown1": 0,
+            "TimeBegin": 0.43333300948143005,
+            "Type": {
+              "hash": "6161543670589625980",
+              "name": "MissileFire"
+            },
+            "Intensity": 55,
+            "Taker": {
+              "hash": "22018610510307286",
+              "name": "None"
+            },
+            "UseOriginator": true,
+            "GrabSlot": {
+              "hash": "0",
+              "name": "#0"
+            }
+          },
+          "schema": "AIMessageTrack",
+          "end": 4924
+        },
+        {
+          "source": "heli_gunship_marine_core_fig.p3d.rz",
+          "offset": 4924,
+          "payload": 4936,
+          "length": 24,
+          "type": "CameraShakeRequest",
+          "kind": "TrackHash",
+          "owner": "heli_gunship_marine_hellfire_missile/default/final",
+          "group": "TrackHash",
+          "parentOffset": 3668,
+          "treeOffset": 76,
+          "fields": {
+            "Unknown1": 0,
+            "BeginTime": 0.43333300948143005,
+            "Size": {
+              "hash": "17784764271712241149",
+              "name": "medium"
+            },
+            "Range": {
+              "hash": "7699058135646415813",
+              "name": "large"
+            }
+          },
+          "schema": "CameraShakeRequestTrack",
+          "end": 4968
+        },
+        {
+          "source": "heli_gunship_marine_core_fig.p3d.rz",
+          "offset": 4968,
+          "payload": 4980,
+          "length": 116,
+          "type": "WorldDamage",
+          "kind": "TrackHash",
+          "owner": "heli_gunship_marine_hellfire_missile/default/final",
+          "group": "TrackHash",
+          "parentOffset": 3668,
+          "treeOffset": 76,
+          "fields": {
+            "Unknown1": 1,
+            "TimeBegin": 0,
+            "Joint": {
+              "hash": "0",
+              "name": "#0"
+            },
+            "Position": [
+              0,
+              0,
+              -3
+            ],
+            "Direction": [
+              0,
+              0,
+              0
+            ],
+            "UseSupportingLimb": false,
+            "Distance": 6,
+            "DamageType": {
+              "hash": "13148182856864364872",
+              "name": "Missile"
+            },
+            "AttackType": {
+              "hash": "22018610510307286",
+              "name": "None"
+            },
+            "HitType": {
+              "hash": "0",
+              "name": "#0"
+            },
+            "EffectType": {
+              "hash": "0",
+              "name": "#0"
+            },
+            "ScaleX": 1,
+            "ScaleY": 1,
+            "EffectScale": 1,
+            "PropAreaEmissionScale": 0,
+            "PropAreaEmissionScaleFunction": {
+              "hash": "4206860010037910535",
+              "name": "Linear"
+            },
+            "PropAreaSizeScale": 0,
+            "PropAreaSizeScaleFunction": {
+              "hash": "4206860010037910535",
+              "name": "Linear"
+            }
+          },
+          "schema": "WorldDamageTrack",
+          "end": 5104
+        },
+        {
+          "source": "heli_gunship_marine_core_fig.p3d.rz",
+          "offset": 5104,
+          "payload": 5116,
+          "length": 48,
+          "type": "ThreatBall",
+          "kind": "TrackHash",
+          "owner": "heli_gunship_marine_hellfire_missile/default/final",
+          "group": "TrackHash",
+          "parentOffset": 3668,
+          "treeOffset": 76,
+          "fields": {
+            "Unknown1": 1,
+            "TimeBegin": 0,
+            "TimeEnd": -1,
+            "Offset": [
+              0,
+              0,
+              0
+            ],
+            "Radius": 20,
+            "TimeToLive": 0,
+            "Joint": {
+              "hash": "0",
+              "name": "#0"
+            },
+            "ThreatName": {
+              "hash": "3103612371856421129",
+              "name": "#2b123f0231027109"
+            }
+          },
+          "schema": "ThreatBallTrack",
+          "end": 5172
+        },
+        {
+          "source": "heli_gunship_marine_core_fig.p3d.rz",
+          "offset": 5172,
+          "payload": 5184,
+          "length": 72,
+          "type": "Sound",
+          "kind": "TrackHash",
+          "owner": "heli_gunship_marine_hellfire_missile/default/final",
+          "group": "TrackHash",
+          "parentOffset": 3668,
+          "treeOffset": 76,
+          "fields": {
+            "Unknown1": 0,
+            "TimeBegin": 0,
+            "Patch": {
+              "hash": "11294510414790182717",
+              "name": "#9cbe2961a184c73d"
+            },
+            "Trigger": {
+              "hash": "32462977145219048",
+              "name": "stop"
+            },
+            "VolumeFactor": 1,
+            "MinDistance": 0,
+            "MaxDistance": 0,
+            "MinPitch": 1,
+            "MaxPitch": 1,
+            "CyclicPhase": 0,
+            "InstanceName": {
+              "hash": "0",
+              "name": "#0"
+            },
+            "Frequency": 1,
+            "PolledLifetime": false,
+            "TriggerType": {
+              "hash": "13522664087197083521",
+              "name": "Retrigger"
+            }
+          },
+          "schema": "SoundTrack",
+          "end": 5264
+        },
+        {
+          "source": "heli_gunship_marine_core_fig.p3d.rz",
+          "offset": 5332,
+          "payload": 5344,
+          "length": 8,
+          "type": "Destroy",
+          "kind": "TrackHash",
+          "owner": "heli_gunship_marine_hellfire_missile/default/final",
+          "group": null,
+          "parentOffset": 5272,
+          "treeOffset": 76,
+          "fields": {
+            "Unknown1": 0,
+            "TimeBegin": 3
+          },
+          "schema": "DestroyTrack",
+          "end": 5360
+        }
+      ]
+    },
+    {
+      "file": "D:\\PrototypeReference\\p1\\input\\helicopter\\heli_bh_marine_fig.p3d.rz",
+      "sha256": "536cf415ea7b759fab6ea12a0c0b57567c834ddc541f45d791488bf30ec52dc5",
+      "owner": "heli_gunship_marine_hellfire_missile/default/final",
+      "typedTracks": [
+        {
+          "source": "heli_bh_marine_fig.p3d.rz",
+          "offset": 5792,
+          "payload": 5804,
+          "length": 276,
+          "type": "Hit",
+          "kind": "TrackHash",
+          "owner": "heli_gunship_marine_hellfire_missile/default/final",
+          "group": "TrackHash",
+          "parentOffset": 5780,
+          "treeOffset": 2188,
+          "fields": {
+            "Unknown1": 0,
+            "BeginTime": 0,
+            "EndTime": 0.03333330154418945,
+            "UseShapecast": false,
+            "CollisionCountMax": -1,
+            "TimeBetweenHits": -1,
+            "jointName": {
+              "hash": "0",
+              "name": "#0"
+            },
+            "jointEnd": {
+              "hash": "0",
+              "name": "#0"
+            },
+            "OffsetX": 0,
+            "OffsetY": 0,
+            "OffsetZ": 0,
+            "Radius": 1,
+            "ArcOffset": 0,
+            "ArcRange": 0,
+            "CollideWith": 48,
+            "DamageMin": 500,
+            "DamageMax": 500,
+            "UseTransformationDamageMultiplier": true,
+            "UseWeaponDamageMultiplier": true,
+            "FriendlyFire": 0.05000000074505806,
+            "AttackType": {
+              "hash": "9949716209054956141",
+              "name": "MissileExplosion"
+            },
+            "HitTypeName": {
+              "hash": "8994176190371311496",
+              "name": "#7cd1bb978a5baf88"
+            },
+            "DamageType": {
+              "hash": "22018610510307286",
+              "name": "None"
+            },
+            "EffectTypeName": {
+              "hash": "0",
+              "name": "#0"
+            },
+            "ScaleX": 3,
+            "ScaleY": 3,
+            "EffectScale": 1,
+            "PropAreaEmissionScale": 0,
+            "PropAreaEmissionScaleFunction": {
+              "hash": "4206860010037910535",
+              "name": "Linear"
+            },
+            "PropAreaSizeScale": 0,
+            "propAreaSizeScaleFunction": {
+              "hash": "10152029351150224597",
+              "name": "Logarithmic"
+            },
+            "ImpulseMinX": 0,
+            "ImpulseMinY": 9000,
+            "ImpulseMinZ": -10000,
+            "ImpulseMaxX": 0,
+            "ImpulseMaxY": 9000,
+            "ImpulseMaxZ": -10000,
+            "ImpulseRandomPlusMinus": 2500,
+            "UseMotion": false,
+            "CollisionDirectionX": 0,
+            "CollisionDirectionY": 0,
+            "CollisionDirectionZ": 0,
+            "DeformDirStr": 1,
+            "DeformStr": 0.9100000262260437,
+            "CollisionFlagName": {
+              "hash": "5441101953451253237",
+              "name": "#4b82ad6602255df5"
+            },
+            "GiverBranchRef": {
+              "name": "",
+              "index": -1
+            },
+            "ReceiverBranchRef": {
+              "name": "",
+              "index": -1
+            },
+            "UseDamageOriginator": true,
+            "SendAlert": true,
+            "SendOnlyToAIManager": false,
+            "UseOriginatorToValidate": false,
+            "IsThrown": false,
+            "MomentumDamageVelocity": 0,
+            "MomentumDamageMax": 0,
+            "TravelVelocity": 0,
+            "TravelTowardsTarget": {
+              "hash": "22018610510307286",
+              "name": "None"
+            },
+            "IgnorePowerTarget": false
+          },
+          "schema": "CollisionHitTrack",
+          "end": 6088
+        },
+        {
+          "source": "heli_bh_marine_fig.p3d.rz",
+          "offset": 6088,
+          "payload": 6100,
+          "length": 276,
+          "type": "Hit",
+          "kind": "TrackHash",
+          "owner": "heli_gunship_marine_hellfire_missile/default/final",
+          "group": "TrackHash",
+          "parentOffset": 5780,
+          "treeOffset": 2188,
+          "fields": {
+            "Unknown1": 0,
+            "BeginTime": 0.03333330154418945,
+            "EndTime": 0.10000000149011612,
+            "UseShapecast": false,
+            "CollisionCountMax": -1,
+            "TimeBetweenHits": -1,
+            "jointName": {
+              "hash": "0",
+              "name": "#0"
+            },
+            "jointEnd": {
+              "hash": "0",
+              "name": "#0"
+            },
+            "OffsetX": 0,
+            "OffsetY": 0,
+            "OffsetZ": 0,
+            "Radius": 4,
+            "ArcOffset": 0,
+            "ArcRange": 0,
+            "CollideWith": 48,
+            "DamageMin": 100,
+            "DamageMax": 100,
+            "UseTransformationDamageMultiplier": true,
+            "UseWeaponDamageMultiplier": true,
+            "FriendlyFire": 0.05000000074505806,
+            "AttackType": {
+              "hash": "9949716209054956141",
+              "name": "MissileExplosion"
+            },
+            "HitTypeName": {
+              "hash": "8994176190371311496",
+              "name": "#7cd1bb978a5baf88"
+            },
+            "DamageType": {
+              "hash": "22018610510307286",
+              "name": "None"
+            },
+            "EffectTypeName": {
+              "hash": "0",
+              "name": "#0"
+            },
+            "ScaleX": 3,
+            "ScaleY": 3,
+            "EffectScale": 1,
+            "PropAreaEmissionScale": 0,
+            "PropAreaEmissionScaleFunction": {
+              "hash": "4206860010037910535",
+              "name": "Linear"
+            },
+            "PropAreaSizeScale": 0,
+            "propAreaSizeScaleFunction": {
+              "hash": "10152029351150224597",
+              "name": "Logarithmic"
+            },
+            "ImpulseMinX": 0,
+            "ImpulseMinY": 9000,
+            "ImpulseMinZ": -10000,
+            "ImpulseMaxX": 0,
+            "ImpulseMaxY": 9000,
+            "ImpulseMaxZ": -10000,
+            "ImpulseRandomPlusMinus": 2500,
+            "UseMotion": false,
+            "CollisionDirectionX": 0,
+            "CollisionDirectionY": 0,
+            "CollisionDirectionZ": 0,
+            "DeformDirStr": 1,
+            "DeformStr": 0.9100000262260437,
+            "CollisionFlagName": {
+              "hash": "5441101953451253237",
+              "name": "#4b82ad6602255df5"
+            },
+            "GiverBranchRef": {
+              "name": "",
+              "index": -1
+            },
+            "ReceiverBranchRef": {
+              "name": "",
+              "index": -1
+            },
+            "UseDamageOriginator": true,
+            "SendAlert": true,
+            "SendOnlyToAIManager": false,
+            "UseOriginatorToValidate": false,
+            "IsThrown": false,
+            "MomentumDamageVelocity": 0,
+            "MomentumDamageMax": 0,
+            "TravelVelocity": 0,
+            "TravelTowardsTarget": {
+              "hash": "22018610510307286",
+              "name": "None"
+            },
+            "IgnorePowerTarget": false
+          },
+          "schema": "CollisionHitTrack",
+          "end": 6384
+        },
+        {
+          "source": "heli_bh_marine_fig.p3d.rz",
+          "offset": 6384,
+          "payload": 6396,
+          "length": 276,
+          "type": "Hit",
+          "kind": "TrackHash",
+          "owner": "heli_gunship_marine_hellfire_missile/default/final",
+          "group": "TrackHash",
+          "parentOffset": 5780,
+          "treeOffset": 2188,
+          "fields": {
+            "Unknown1": 0,
+            "BeginTime": 0.10000000149011612,
+            "EndTime": 0.20000000298023224,
+            "UseShapecast": false,
+            "CollisionCountMax": -1,
+            "TimeBetweenHits": -1,
+            "jointName": {
+              "hash": "0",
+              "name": "#0"
+            },
+            "jointEnd": {
+              "hash": "0",
+              "name": "#0"
+            },
+            "OffsetX": 0,
+            "OffsetY": 0,
+            "OffsetZ": 0,
+            "Radius": 7,
+            "ArcOffset": 0,
+            "ArcRange": 0,
+            "CollideWith": 48,
+            "DamageMin": 35,
+            "DamageMax": 35,
+            "UseTransformationDamageMultiplier": true,
+            "UseWeaponDamageMultiplier": false,
+            "FriendlyFire": 0,
+            "AttackType": {
+              "hash": "9949716209054956141",
+              "name": "MissileExplosion"
+            },
+            "HitTypeName": {
+              "hash": "0",
+              "name": "#0"
+            },
+            "DamageType": {
+              "hash": "22018610510307286",
+              "name": "None"
+            },
+            "EffectTypeName": {
+              "hash": "0",
+              "name": "#0"
+            },
+            "ScaleX": 3,
+            "ScaleY": 3,
+            "EffectScale": 1,
+            "PropAreaEmissionScale": 0,
+            "PropAreaEmissionScaleFunction": {
+              "hash": "4206860010037910535",
+              "name": "Linear"
+            },
+            "PropAreaSizeScale": 0,
+            "propAreaSizeScaleFunction": {
+              "hash": "4206860010037910535",
+              "name": "Linear"
+            },
+            "ImpulseMinX": 0,
+            "ImpulseMinY": 6000,
+            "ImpulseMinZ": -7500,
+            "ImpulseMaxX": 0,
+            "ImpulseMaxY": 6000,
+            "ImpulseMaxZ": -7500,
+            "ImpulseRandomPlusMinus": 1500,
+            "UseMotion": false,
+            "CollisionDirectionX": 0,
+            "CollisionDirectionY": 0,
+            "CollisionDirectionZ": 0,
+            "DeformDirStr": 1,
+            "DeformStr": 0.9100000262260437,
+            "CollisionFlagName": {
+              "hash": "5441101953451253237",
+              "name": "#4b82ad6602255df5"
+            },
+            "GiverBranchRef": {
+              "name": "",
+              "index": -1
+            },
+            "ReceiverBranchRef": {
+              "name": "",
+              "index": -1
+            },
+            "UseDamageOriginator": true,
+            "SendAlert": true,
+            "SendOnlyToAIManager": false,
+            "UseOriginatorToValidate": false,
+            "IsThrown": false,
+            "MomentumDamageVelocity": 0,
+            "MomentumDamageMax": 0,
+            "TravelVelocity": 0,
+            "TravelTowardsTarget": {
+              "hash": "22018610510307286",
+              "name": "None"
+            },
+            "IgnorePowerTarget": false
+          },
+          "schema": "CollisionHitTrack",
+          "end": 6680
+        },
+        {
+          "source": "heli_bh_marine_fig.p3d.rz",
+          "offset": 6680,
+          "payload": 6692,
+          "length": 276,
+          "type": "Hit",
+          "kind": "TrackHash",
+          "owner": "heli_gunship_marine_hellfire_missile/default/final",
+          "group": "TrackHash",
+          "parentOffset": 5780,
+          "treeOffset": 2188,
+          "fields": {
+            "Unknown1": 0,
+            "BeginTime": 0.20000000298023224,
+            "EndTime": 0.30000001192092896,
+            "UseShapecast": false,
+            "CollisionCountMax": -1,
+            "TimeBetweenHits": -1,
+            "jointName": {
+              "hash": "0",
+              "name": "#0"
+            },
+            "jointEnd": {
+              "hash": "0",
+              "name": "#0"
+            },
+            "OffsetX": 0,
+            "OffsetY": 0,
+            "OffsetZ": 0,
+            "Radius": 9,
+            "ArcOffset": 0,
+            "ArcRange": 0,
+            "CollideWith": 48,
+            "DamageMin": 15,
+            "DamageMax": 15,
+            "UseTransformationDamageMultiplier": true,
+            "UseWeaponDamageMultiplier": false,
+            "FriendlyFire": 0,
+            "AttackType": {
+              "hash": "9949716209054956141",
+              "name": "MissileExplosion"
+            },
+            "HitTypeName": {
+              "hash": "0",
+              "name": "#0"
+            },
+            "DamageType": {
+              "hash": "22018610510307286",
+              "name": "None"
+            },
+            "EffectTypeName": {
+              "hash": "0",
+              "name": "#0"
+            },
+            "ScaleX": 3,
+            "ScaleY": 3,
+            "EffectScale": 1,
+            "PropAreaEmissionScale": 0,
+            "PropAreaEmissionScaleFunction": {
+              "hash": "4206860010037910535",
+              "name": "Linear"
+            },
+            "PropAreaSizeScale": 0,
+            "propAreaSizeScaleFunction": {
+              "hash": "4206860010037910535",
+              "name": "Linear"
+            },
+            "ImpulseMinX": 0,
+            "ImpulseMinY": 3500,
+            "ImpulseMinZ": -5000,
+            "ImpulseMaxX": 0,
+            "ImpulseMaxY": 3500,
+            "ImpulseMaxZ": -5000,
+            "ImpulseRandomPlusMinus": 1000,
+            "UseMotion": false,
+            "CollisionDirectionX": 0,
+            "CollisionDirectionY": 0,
+            "CollisionDirectionZ": 0,
+            "DeformDirStr": 1,
+            "DeformStr": 0.9100000262260437,
+            "CollisionFlagName": {
+              "hash": "5441101953451253237",
+              "name": "#4b82ad6602255df5"
+            },
+            "GiverBranchRef": {
+              "name": "",
+              "index": -1
+            },
+            "ReceiverBranchRef": {
+              "name": "",
+              "index": -1
+            },
+            "UseDamageOriginator": true,
+            "SendAlert": true,
+            "SendOnlyToAIManager": false,
+            "UseOriginatorToValidate": false,
+            "IsThrown": false,
+            "MomentumDamageVelocity": 0,
+            "MomentumDamageMax": 0,
+            "TravelVelocity": 0,
+            "TravelTowardsTarget": {
+              "hash": "22018610510307286",
+              "name": "None"
+            },
+            "IgnorePowerTarget": false
+          },
+          "schema": "CollisionHitTrack",
+          "end": 6976
+        },
+        {
+          "source": "heli_bh_marine_fig.p3d.rz",
+          "offset": 6976,
+          "payload": 6988,
+          "length": 40,
+          "type": "AIMessage",
+          "kind": "TrackHash",
+          "owner": "heli_gunship_marine_hellfire_missile/default/final",
+          "group": "TrackHash",
+          "parentOffset": 5780,
+          "treeOffset": 2188,
+          "fields": {
+            "Unknown1": 0,
+            "TimeBegin": 0.43333300948143005,
+            "Type": {
+              "hash": "6161543670589625980",
+              "name": "MissileFire"
+            },
+            "Intensity": 55,
+            "Taker": {
+              "hash": "22018610510307286",
+              "name": "None"
+            },
+            "UseOriginator": true,
+            "GrabSlot": {
+              "hash": "0",
+              "name": "#0"
+            }
+          },
+          "schema": "AIMessageTrack",
+          "end": 7036
+        },
+        {
+          "source": "heli_bh_marine_fig.p3d.rz",
+          "offset": 7036,
+          "payload": 7048,
+          "length": 24,
+          "type": "CameraShakeRequest",
+          "kind": "TrackHash",
+          "owner": "heli_gunship_marine_hellfire_missile/default/final",
+          "group": "TrackHash",
+          "parentOffset": 5780,
+          "treeOffset": 2188,
+          "fields": {
+            "Unknown1": 0,
+            "BeginTime": 0.43333300948143005,
+            "Size": {
+              "hash": "17784764271712241149",
+              "name": "medium"
+            },
+            "Range": {
+              "hash": "7699058135646415813",
+              "name": "large"
+            }
+          },
+          "schema": "CameraShakeRequestTrack",
+          "end": 7080
+        },
+        {
+          "source": "heli_bh_marine_fig.p3d.rz",
+          "offset": 7080,
+          "payload": 7092,
+          "length": 116,
+          "type": "WorldDamage",
+          "kind": "TrackHash",
+          "owner": "heli_gunship_marine_hellfire_missile/default/final",
+          "group": "TrackHash",
+          "parentOffset": 5780,
+          "treeOffset": 2188,
+          "fields": {
+            "Unknown1": 1,
+            "TimeBegin": 0,
+            "Joint": {
+              "hash": "0",
+              "name": "#0"
+            },
+            "Position": [
+              0,
+              0,
+              -3
+            ],
+            "Direction": [
+              0,
+              0,
+              0
+            ],
+            "UseSupportingLimb": false,
+            "Distance": 6,
+            "DamageType": {
+              "hash": "13148182856864364872",
+              "name": "Missile"
+            },
+            "AttackType": {
+              "hash": "22018610510307286",
+              "name": "None"
+            },
+            "HitType": {
+              "hash": "0",
+              "name": "#0"
+            },
+            "EffectType": {
+              "hash": "0",
+              "name": "#0"
+            },
+            "ScaleX": 1,
+            "ScaleY": 1,
+            "EffectScale": 1,
+            "PropAreaEmissionScale": 0,
+            "PropAreaEmissionScaleFunction": {
+              "hash": "4206860010037910535",
+              "name": "Linear"
+            },
+            "PropAreaSizeScale": 0,
+            "PropAreaSizeScaleFunction": {
+              "hash": "4206860010037910535",
+              "name": "Linear"
+            }
+          },
+          "schema": "WorldDamageTrack",
+          "end": 7216
+        },
+        {
+          "source": "heli_bh_marine_fig.p3d.rz",
+          "offset": 7216,
+          "payload": 7228,
+          "length": 48,
+          "type": "ThreatBall",
+          "kind": "TrackHash",
+          "owner": "heli_gunship_marine_hellfire_missile/default/final",
+          "group": "TrackHash",
+          "parentOffset": 5780,
+          "treeOffset": 2188,
+          "fields": {
+            "Unknown1": 1,
+            "TimeBegin": 0,
+            "TimeEnd": -1,
+            "Offset": [
+              0,
+              0,
+              0
+            ],
+            "Radius": 20,
+            "TimeToLive": 0,
+            "Joint": {
+              "hash": "0",
+              "name": "#0"
+            },
+            "ThreatName": {
+              "hash": "3103612371856421129",
+              "name": "#2b123f0231027109"
+            }
+          },
+          "schema": "ThreatBallTrack",
+          "end": 7284
+        },
+        {
+          "source": "heli_bh_marine_fig.p3d.rz",
+          "offset": 7284,
+          "payload": 7296,
+          "length": 72,
+          "type": "Sound",
+          "kind": "TrackHash",
+          "owner": "heli_gunship_marine_hellfire_missile/default/final",
+          "group": "TrackHash",
+          "parentOffset": 5780,
+          "treeOffset": 2188,
+          "fields": {
+            "Unknown1": 0,
+            "TimeBegin": 0,
+            "Patch": {
+              "hash": "11294510414790182717",
+              "name": "#9cbe2961a184c73d"
+            },
+            "Trigger": {
+              "hash": "32462977145219048",
+              "name": "stop"
+            },
+            "VolumeFactor": 1,
+            "MinDistance": 0,
+            "MaxDistance": 0,
+            "MinPitch": 1,
+            "MaxPitch": 1,
+            "CyclicPhase": 0,
+            "InstanceName": {
+              "hash": "0",
+              "name": "#0"
+            },
+            "Frequency": 1,
+            "PolledLifetime": false,
+            "TriggerType": {
+              "hash": "13522664087197083521",
+              "name": "Retrigger"
+            }
+          },
+          "schema": "SoundTrack",
+          "end": 7376
+        },
+        {
+          "source": "heli_bh_marine_fig.p3d.rz",
+          "offset": 7444,
+          "payload": 7456,
+          "length": 8,
+          "type": "Destroy",
+          "kind": "TrackHash",
+          "owner": "heli_gunship_marine_hellfire_missile/default/final",
+          "group": null,
+          "parentOffset": 7384,
+          "treeOffset": 2188,
+          "fields": {
+            "Unknown1": 0,
+            "TimeBegin": 3
+          },
+          "schema": "DestroyTrack",
+          "end": 7472
+        }
+      ]
+    }
+  ],
+  "staticEvidence": [
+    {
+      "file": "D:\\PrototypeReference\\p1\\private\\hit-runtime-vtables.json",
+      "sha256": "9672665aa38908a1af590d793632482a796793c58e4835591d8270984f1f371a"
+    },
+    {
+      "file": "D:\\PrototypeReference\\p1\\private\\hit-runtime-100aace0.txt",
+      "sha256": "3923cc2d7d2a0e578173e1d63ad42ad257844ebb660992e0794e61670faa3117"
+    },
+    {
+      "file": "D:\\PrototypeReference\\p1\\private\\hit-runtime-100aa890.txt",
+      "sha256": "13dea29930f6849c5c55acadf7636a41e9c7dc3dad02b5b396618523f3e90584"
+    },
+    {
+      "file": "D:\\PrototypeReference\\p1\\private\\hit-runtime-100a3810.txt",
+      "sha256": "eaf5e2a0270f83dcc68d6a57951d2e37851f1f391fc0d1559eeaef04573bf1d3"
+    },
+    {
+      "file": "D:\\PrototypeReference\\p1\\private\\hit-runtime-100654c0.txt",
+      "sha256": "2c117f3747bcb879468a489a333301cc61be3a0818c276f5b05c2355a091d758"
+    },
+    {
+      "file": "D:\\PrototypeReference\\p1\\private\\hit-runtime-10065870.txt",
+      "sha256": "f3626acdbfa5fe3fa1a037d666cc80a9c14189f288b4cd30cccf92eb72935b58"
+    },
+    {
+      "file": "D:\\PrototypeReference\\p1\\private\\hit-runtime-10065810.txt",
+      "sha256": "0ad7565b8dccde766e43ea7c71b7f36172c3c72c5bce4bb55ee2d2bd129e0fed"
+    },
+    {
+      "file": "D:\\PrototypeReference\\p1\\private\\hit-runtime-1014bba0.txt",
+      "sha256": "0a583f1628d5f59eae99f74b1cf605cbb5ec3c22a39fc96d07d341e42b2f729d"
+    }
+  ],
+  "analysisTool": {
+    "file": "D:\\CodexCache\\work\\inspect-hit-runtime.py",
+    "sha256": "3b61505c115f5e74297b796c2b02f62e30a1c032355935ddbc6cf4b47937e2a4"
+  },
+  "runtimeLinks": [
+    {
+      "function": "0x100aace0",
+      "finding": "CollisionHitTrack factory allocates CollisionHitAction; constructor 0x100aa890 installs vtable 0x10d9c5ec and stores the track at action+0x9c."
+    },
+    {
+      "function": "0x1014bf80 / 0x1014bf90",
+      "finding": "Track begin is +0xf0; duration is end(+0xf8) minus begin. Source contiguous intervals cover 0 through approximately 0.3 seconds."
+    },
+    {
+      "function": "0x1014bba0 / 0x1014bb20 / 0x1014b740 / 0x1014b720",
+      "finding": "Resolved registration setters identify useOriginatorToValidate as flag 0x40 at track+0x11c, useDamageOriginator as flag 0x10, timeBetweenHits at +0xf4, collisionCountMax at +0x104. Validation origin and damage origin are separate settings."
+    },
+    {
+      "function": "0x100a4310",
+      "finding": "Binds validation entity and CollisionActionBehaviour to action+0x20/+0x24. Only action+0x29 (useOriginatorToValidate) requests originator substitution. These four source tracks set it false, so validation history belongs to the missile, while damage attribution still uses its originator."
+    },
+    {
+      "function": "0x100a3810 / 0x100a8ca0 / 0x100aa830",
+      "finding": "Eligibility queries shared CollisionActionBehaviour with target handle and timeBetweenHits; the latter getter reads track+0xf4. Source SendOnlyToAIManager=false leaves history checks enabled."
+    },
+    {
+      "function": "0x100654c0",
+      "finding": "IsValidCollision (message type 0x1d/subtype 3) scans target-handle/age entries. New target is allowed while active count > 0. An existing target is rejected when timeBetweenHits < 0; otherwise its age must reach the requested interval."
+    },
+    {
+      "function": "0x100a4bd0",
+      "finding": "Update checks eligibility/arc and registers the contact at 0x100a500f..0x100a503a BEFORE applying damage via virtual call at 0x100a508c. A canceled hurt does not automatically permit a later ring retry."
+    },
+    {
+      "function": "0x10065940 / 0x10065870",
+      "finding": "RegisterCollision (type 0x1d/subtype 6) resets an existing age or appends target/zero age. Storage is bounded and can evict an oldest record; exact configured capacity remains undecoded."
+    },
+    {
+      "function": "0x100a4970 / 0x100a3780 / 0x10065470",
+      "finding": "Track start/end change shared active count. Ending a track does not itself immediately clear history."
+    },
+    {
+      "function": "0x10065a80",
+      "finding": "CollisionActionBehaviour update ages records, expires entries after 5 seconds (constant 0x10d9486c), and clears when active count is no longer positive."
+    }
+  ],
+  "interpretation": {
+    "sharedHistory": "The four contiguous Hit tracks bind to one missile CollisionActionBehaviour, have timeBetweenHits=-1, and contain no explicit final-state ClearCollisionRecord track. Static evidence supports one recorded contact per target across this burst. Minecraft uses a shared UUID contact set across all stages. Original frame scheduling and bounded-history capacity have not been executed/decoded.",
+    "duration": "Destroy track at 3 seconds supports retaining the final-state lifetime. It does not by itself prove an original three-second smoke effect; the Minecraft cosmetic fade is authored to this lifetime.",
+    "sound": "The final Sound track is at time 0 with trigger stop and patch #9cbe2961a184c73d. It is not evidence for playing that patch as an impact sound; the existing Minecraft impact cue remains an adaptation.",
+    "undecoded": "Unknown1 values and numeric CollideWith=48 are preserved, without inventing enabled/disabled semantics or category labels."
+  },
+  "minecraftMapping": {
+    "damageStages": [
+      {
+        "tickRange": [
+          0,
+          0
+        ],
+        "radius": 1,
+        "sourceDamage": 500,
+        "mcBaseDamage": 20
+      },
+      {
+        "tickRange": [
+          1,
+          1
+        ],
+        "radius": 4,
+        "sourceDamage": 100,
+        "mcBaseDamage": 4
+      },
+      {
+        "tickRange": [
+          2,
+          3
+        ],
+        "radius": 7,
+        "sourceDamage": 35,
+        "mcBaseDamage": 1.4
+      },
+      {
+        "tickRange": [
+          4,
+          5
+        ],
+        "radius": 9,
+        "sourceDamage": 15,
+        "mcBaseDamage": 0.6
+      }
+    ],
+    "timing": "20 Hz quantization of intended 0, 1/30, .1, .2, .3 seconds. It is not bit-exact float scheduling of the original frame engine. Damage stops at tick 6; persistent final entity expires at tick 60.",
+    "damage": "Preserves source 500:100:35:15 ratios around the existing Minecraft base direct damage 20. Actual infected loss also uses existing CombatScale; heavy vehicle armor applies its existing multiplier. Original transformation/weapon multipliers and friendly-fire factors are not ported.",
+    "contact": "Record UUID before hurt, across all rings, persistent through NBT reload. Existing enemy/owner/crew/PvP checks, hull armor, event cancellation and loaded-world ray obstruction remain authoritative.",
+    "save": "Version 1, age 0..60, strict UUID list with 4096-record save guard. This guard is not claimed to match original CollisionActionBehaviour capacity. Elapsed unloaded world time skips old stages instead of replaying damage; rollback/stale/malformed state expires.",
+    "presentation": "One initial production explosion receipt and impact cue. Interpolated radial streaks follow radius knots 1/4/7/9; smoke fades for 60 ticks. Source effect identities are not decoded; existing procedural flashes, debris and smoke remain authored Minecraft visuals.",
+    "aiClearance": "Expands the existing aircraft explosive safety candidate region to MAX_RADIUS+2 = 11, accounting for the new outer ring.",
+    "worldDamage": "Existing permission-controlled block blast runs once at existing radius 4. Original WorldDamage and ThreatBall records remain evidence, not new permission or block-destruction authority."
+  },
+  "remaining": [
+    "Original impulse units (9000/-10000, 6000/-7500, 3500/-5000 and random terms) are recorded but not guessed into Minecraft knockback.",
+    "Original effect identities, sound-bank patch resolution, .433333-second AIMessage/camera shake, and full threat/world damage behavior remain open.",
+    "Hover/weapon selection, independent rapid unguided rack, original player capacities, full helicopter motion/actions and dedicated multiplayer remain open."
+  ]
+}

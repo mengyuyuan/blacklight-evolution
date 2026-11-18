@@ -1,0 +1,87 @@
+// Disposable player-feedback batch: 3 rappel + 3 logistics + 8 explicit-lock cases.
+// Do not combine with -PfeedbackTest or other broad test init scripts.
+// Existing build.gradle supplies -PgameTestRunDirectory and -PgameTestMaxHeap.
+allprojects {
+    // Keep the currently running player's loose classes/resources untouched.
+    layout.buildDirectory.set(file('build/player-feedback-check'))
+    afterEvaluate {
+    def selected = [
+        'src/helicopterTest/java/com/codex/blacklight/gametest/HelicopterRappelGameTest.java',
+        'src/helicopterTest/java/com/codex/blacklight/gametest/HelicopterLogisticsGameTest.java',
+        'src/gunplayTest/java/com/codex/blacklight/gametest/ExplicitTargetLockGameTest.java'
+    ]
+    def helper = file('src/helicopterTest/java/com/codex/blacklight/gametest/HelicopterPilotGameTest.java')
+    def structureFolder = plugins.hasPlugin('net.neoforged.moddev') ? 'structure' : 'structures'
+    def structures = [
+        "src/helicopterTest/resources/data/blacklight/${structureFolder}/helicopter_arena.nbt",
+        "src/blackwatchTest/resources/data/blacklight/${structureFolder}/blackwatch_arena.nbt"
+    ]
+    def generatedJava = layout.buildDirectory.dir('generated/playerFeedback/java')
+    def generatedResources = layout.buildDirectory.dir('generated/playerFeedback/resources')
+    def prepare = tasks.register('preparePlayerFeedbackSources') {
+        inputs.files(selected.collect { file(it) } + [helper] + structures.collect { file(it) })
+        outputs.dir(generatedJava)
+        outputs.dir(generatedResources)
+        doLast {
+            def packageDirectory = new File(generatedJava.get().asFile, 'com/codex/blacklight/gametest')
+            packageDirectory.mkdirs()
+            selected.each { path ->
+                def original = file(path)
+                new File(packageDirectory, original.name).setText(original.getText('UTF-8'), 'UTF-8')
+            }
+            // Both new helicopter suites use this existing fixture/player helper.
+            // Copying its whole class would silently register the old Pilot suite.
+            def text = helper.getText('UTF-8').replace('\r\n', '\n')
+            def boundary = text.indexOf('\n    @GameTest(')
+            if (boundary < 0) throw new GradleException('Pilot fixture boundary changed; review the narrow helper extraction')
+            def fixture = text.substring(0, boundary)
+                .replace('@GameTestHolder("blacklight") @PrefixGameTestTemplate(false)', '') + '\n}\n'
+            if (!fixture.contains('static ServerPlayer player(') || !fixture.contains('static final class Fixture'))
+                throw new GradleException('Required helicopter player/fixture helpers were not found')
+            new File(packageDirectory, helper.name).setText(fixture, 'UTF-8')
+            structures.each { path ->
+                def original = file(path)
+                def target = new File(generatedResources.get().asFile, "data/blacklight/${structureFolder}/${original.name}")
+                target.parentFile.mkdirs()
+                target.bytes = original.bytes
+            }
+        }
+    }
+    sourceSets.main.java.srcDir(generatedJava)
+    sourceSets.main.resources.srcDir(generatedResources)
+    // This init adds generated copies only; do not inherit optional broad fixture sources.
+    sourceSets.main.java.exclude { entry ->
+        if (entry.directory) return false
+        def path = entry.file.absolutePath.replace('\\', '/')
+        def sourceRoot = file('src').absolutePath.replace('\\', '/') + '/'
+        path.startsWith(sourceRoot) && !path.startsWith(sourceRoot + 'main/java/')
+    }
+    tasks.named('test', Test).configure {
+        include '**/GreeneMotionTest.class', '**/GreeneSegmentDeathTest.class', '**/GreeneMouthTest.class', '**/EncounterMoveTest.class', '**/TargetLockRequestStateTest.class', '**/HydraHurtContactTest.class'
+    }
+    tasks.named('compileJava').configure { dependsOn prepare }
+    tasks.named('processResources').configure { dependsOn prepare }
+    def stage = tasks.register('stagePlayerFeedbackClasses', Sync) {
+        dependsOn tasks.named('classes')
+        from(sourceSets.main.output.classesDirs) {
+            // A previous broad QA compilation may have left loose classes behind.
+            // Stage only actual production sources and this exact generated fixture set.
+            exclude { entry ->
+                if (entry.directory || !entry.path.endsWith('.class')) return false
+                def source = entry.path.replaceFirst(/\$.*\.class$/, '.class').replaceFirst(/\.class$/, '.java')
+                !file('src/main/java/' + source).isFile() && !new File(generatedJava.get().asFile, source).isFile()
+            }
+        }
+        into layout.buildDirectory.dir('player-feedback-run-classes')
+    }
+    tasks.matching { it.name == 'runGameTestServer' }.configureEach {
+        dependsOn stage
+        doFirst {
+            if (!project.hasProperty('gameTestRunDirectory'))
+                throw new GradleException('Set -PgameTestRunDirectory to a disposable feedback world directory')
+            environment 'MOD_CLASSES', [layout.buildDirectory.dir('player-feedback-run-classes').get().asFile, sourceSets.main.output.resourcesDir]
+                .collect { 'blacklight%%' + it.absolutePath }.join(File.pathSeparator)
+        }
+    }
+    tasks.withType(Jar).configureEach { doFirst { throw new GradleException('QA cannot produce a release JAR') } }
+} }

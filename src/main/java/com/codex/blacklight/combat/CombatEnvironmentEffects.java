@@ -65,7 +65,7 @@ public final class CombatEnvironmentEffects {
             var velocity=normal.scale(heavy?.22:.13).add((p.getRandom().nextDouble()-.5)*.15,.08+p.getRandom().nextDouble()*.12,(p.getRandom().nextDouble()-.5)*.15);
             p.serverLevel().sendParticles(new BlockParticleOption(ParticleTypes.BLOCK,block),at.x,at.y,at.z,0,velocity.x,velocity.y,velocity.z,1);
         }
-        if(hit.getDirection()==Direction.UP)p.serverLevel().sendParticles(ParticleTypes.DUST_PLUME,at.x,at.y,at.z,heavy?2:1,.15,.04,.15,.025);
+        if(hit.getDirection()==Direction.UP)p.serverLevel().sendParticles(com.codex.blacklight.registry.ModParticles.CONTACT_DUST.get(),at.x,at.y,at.z,heavy?2:1,.15,.04,.15,.025);
         if(touched.size()<=3){
             float size=heavy?.30F:.16F;
             LandingDebrisSystem.fragment(p.serverLevel(),at.add(normal.scale(size*.6)),block,normal.scale(.12).add(0,heavy?.27:.18,0),size,heavy?13:9);

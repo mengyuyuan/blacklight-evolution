@@ -156,6 +156,43 @@ public final class MilitaryFactionGameTest {
             ConsumeSystem.cancel(player); player.discard(); h.succeed();
         });
     }
+    @GameTest(template = "blackwatch_arena", timeoutTicks = 40)
+    public static void humanSoldiersDoNotChangeGrabClassAtFiftyHealth(GameTestHelper h) {
+        arena(h);
+        for (float maximum : new float[]{20, 50, 60, 100}) {
+            for (float current : new float[]{maximum, Math.min(maximum, 49), Math.min(maximum, 51)}) {
+                var member = soldier(h, 6, 5, false, true);
+                member.setNoAi(true); member.getAttribute(Attributes.MAX_HEALTH).setBaseValue(maximum); member.setHealth(current);
+                var player = player(h, member, false);
+                try {
+                    h.assertTrue(ConsumeSystem.healthReady(player, member), "human grab class survives max=" + maximum + " current=" + current);
+                    ConsumeSystem.request(player);
+                    h.assertTrue(member.getData(ModAttachments.CONSUME_VISUAL).active(), "actual grab claims the human at max=" + maximum + " current=" + current);
+                    for (int i = 0; i < ConsumeVisual.captureDuration(com.codex.blacklight.power.PowerForm.NONE) + 2; i++) {
+                        player.tickCount++; ConsumeSystem.tick(new net.neoforged.neoforge.event.tick.PlayerTickEvent.Post(player));
+                    }
+                    h.assertTrue(ConsumeSystem.holding(player), "capture reaches holding before consume confirmation");
+                    ConsumeSystem.consume(player);
+                    h.assertTrue(member.getData(ModAttachments.CONSUME_VISUAL).consuming(), "same human identity also permits confirmed consume");
+                } finally { ConsumeSystem.cancel(player); player.discard(); member.discard(); }
+            }
+        }
+        h.succeed();
+    }
+    @GameTest(template = "blackwatch_arena", timeoutTicks = 30)
+    public static void militaryHealthFixKeepsLargeTargetsAndBossGates(GameTestHelper h) {
+        var hunter = ModEntities.BLACKLIGHT_HUNTER.get().create(h.getLevel());
+        hunter.getAttribute(Attributes.MAX_HEALTH).setBaseValue(100); hunter.setHealth(100);
+        h.assertTrue(!ConsumeSystem.healthReady(hunter), "full-health Hunter is not an ordinary soldier");
+        hunter.setHealth(49); h.assertTrue(!ConsumeSystem.healthReady(hunter), "crossing below fifty current health does not bypass its weakening fraction");
+        hunter.setHealth(15); h.assertTrue(ConsumeSystem.healthReady(hunter), "Hunter still opens its normal weakening window");
+        var boss = ModEntities.SUPREME_HUNTER.get().create(h.getLevel()); boss.setHealth(1);
+        h.assertTrue(!ConsumeSystem.healthReady(boss), "low health alone does not bypass Supreme Hunter's authored execution state");
+        var golem = EntityType.IRON_GOLEM.create(h.getLevel()); golem.setHealth(golem.getMaxHealth());
+        h.assertTrue(!ConsumeSystem.healthReady(golem), "large vanilla creatures retain their existing weakening rule");
+        golem.setHealth(1); h.assertTrue(ConsumeSystem.healthReady(golem), "weakened large creatures remain grabbable");
+        h.succeed();
+    }
     @GameTest(template = "blackwatch_arena", timeoutTicks = 30)
     public static void actualImpactImmediatelyPausesMilitaryAim(GameTestHelper h) {
         arena(h); var army = soldier(h, 6, 3, true, false); army.setTarget(target(h));

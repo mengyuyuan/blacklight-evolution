@@ -1,0 +1,197 @@
+{
+  "status": "Static DLL/source inspection and implementation only; no compilation, JUnit execution, native emulation or game launch in this phase.",
+  "input": {
+    "file": "D:\\PrototypeReference\\p1\\input\\prototypeenginef.dll",
+    "sha256": "8cba8da3412df4f49cd61d02445e87a0cda551dea4f2fc1e66b19c1bfe28a760"
+  },
+  "evidence": [
+    {
+      "file": "D:\\PrototypeReference\\p1\\private\\rapid-runtime-103e1850.txt",
+      "sha256": "b3c59925383d57d688f5e8fa94c2693cc74327f65eaf007844f7e2a95171c066"
+    },
+    {
+      "file": "D:\\PrototypeReference\\p1\\private\\rapid-runtime-103dde40.txt",
+      "sha256": "d4a55b7fc15e758586d822479347eea1615501f9b81cc0ec8332f818b3231321"
+    },
+    {
+      "file": "D:\\PrototypeReference\\p1\\private\\rapid-runtime-103e3160.txt",
+      "sha256": "860ead65f1aed216914d1f6b75c69fe95ac79368949d021460dd10afeff37f22"
+    },
+    {
+      "file": "D:\\PrototypeReference\\p1\\private\\rapid-runtime-103e3350.txt",
+      "sha256": "6c49c97fc14ec10c60a266bef5298f018b138bcc07ec3d63db5ae2dc6e3e147d"
+    },
+    {
+      "file": "D:\\PrototypeReference\\p1\\private\\rapid-runtime-1020bef0.txt",
+      "sha256": "8583fa428c40f0fa3c0da2bebc2b48742b7516e5cc00832974c1a38393097ed3"
+    },
+    {
+      "file": "D:\\PrototypeReference\\p1\\private\\rapid-runtime-103e1cc0.txt",
+      "sha256": "10f5f3673e85066e649b094a66db2146c11650d4f709b7ca22b8b80c59c8fb41"
+    },
+    {
+      "file": "D:\\PrototypeReference\\p1\\private\\rapid-runtime-10204220.txt",
+      "sha256": "5c2938ee001ab88bfa0e09417c263a601c0b1049c04f3a7ce3c060649dee299e"
+    },
+    {
+      "file": "D:\\PrototypeReference\\p1\\private\\rapid-runtime-10202c90.txt",
+      "sha256": "2562fa55063cd001ae56fd18451f0f5ca742086899ef7927ac8a65053bb97e25"
+    },
+    {
+      "file": "D:\\PrototypeReference\\p1\\private\\rapid-runtime-101fedb0.txt",
+      "sha256": "b53ab2303f930cd482e37376fa9d6421f92501b5a9d298411dfd30fb11d0e0e8"
+    },
+    {
+      "file": "D:\\PrototypeReference\\p1\\private\\rapid-runtime-10202aa0.txt",
+      "sha256": "a906cf2c043534826178c5da7b081d51955244d82e0a9215073d92df232620f6"
+    },
+    {
+      "file": "D:\\PrototypeReference\\p1\\private\\rapid-runtime-101fed60.txt",
+      "sha256": "a8f65103026c1547edbc23e013bccc65d9905c33aa2966639549ab47cc777ae8"
+    },
+    {
+      "file": "D:\\PrototypeReference\\p1\\private\\rapid-runtime-101fec10.txt",
+      "sha256": "1020544fe19678d3bead8b8cbc872cb6384686c53cc05e623122b38db9845e4c"
+    },
+    {
+      "file": "D:\\PrototypeReference\\p1\\private\\rapid-runtime-101fff90.txt",
+      "sha256": "6426a835e5a45be06de61b19ab2614a61ef0bfd91e7383eb0a8de7c8e9f4e498"
+    },
+    {
+      "file": "D:\\PrototypeReference\\p1\\private\\rapid-runtime-10385060.txt",
+      "sha256": "5c42e1c8c3e385a5e506113fc94ce48bc88697a2fd421e2941dc3fc7c05b7b6e"
+    },
+    {
+      "file": "D:\\PrototypeReference\\p1\\private\\rapid-runtime-10385100.txt",
+      "sha256": "d652bed919750f96cbeb194c7a962dd1747cfbd775ef927de4cd6efbe46e4ea0"
+    },
+    {
+      "file": "D:\\PrototypeReference\\p1\\private\\rapid-runtime-103853d0.txt",
+      "sha256": "c7c0bb39f8c34322b43e032eca6f2d76064d347a59c257b4f4605a53ea55fb03"
+    },
+    {
+      "file": "D:\\PrototypeReference\\p1\\private\\rapid-runtime-10384ea0.txt",
+      "sha256": "9c9ac611793b0d2710fcce4ad103a11e8f67dbab11db214d4432f13cb21b218d"
+    },
+    {
+      "file": "D:\\PrototypeReference\\p1\\private\\rapid-runtime-10384f30.txt",
+      "sha256": "f343fd25ed2e9e9fa9b858cbebb753eff783d791a6fdb60ad37b317564d49d3a"
+    },
+    {
+      "file": "D:\\PrototypeReference\\p1\\private\\rapid-runtime-10382830.txt",
+      "sha256": "e1c0a12f19874049e9ac0d01cf5c986300be0c0fb0a73302ae237c2a01a84e29"
+    },
+    {
+      "file": "D:\\PrototypeReference\\p1\\private\\rapid-runtime-103824e0.txt",
+      "sha256": "c007b290af9ad303d9793dbbd50c19e8b8020eaef7a6a7bc6854358107bc619d"
+    },
+    {
+      "file": "D:\\PrototypeReference\\p1\\private\\rapid-runtime-107c1050.txt",
+      "sha256": "79628ef49c7b353c321040b5fec9a8b89ecfbd5f3739839aea79f2f3c15c369c"
+    },
+    {
+      "file": "D:\\PrototypeReference\\p1\\private\\rapid-runtime-107c6e30.txt",
+      "sha256": "50020515635cb3258dc66eb4a80088a4457378d973d27433683b5b174de1d3f6"
+    },
+    {
+      "file": "D:\\PrototypeReference\\p1\\private\\rapid-runtime-10070b60.txt",
+      "sha256": "f84e86ffc02d5424a3b2c4383b4793b5999201a341db5ce4ee7b4b0f617c4ce1"
+    },
+    {
+      "file": "D:\\PrototypeReference\\p1\\private\\rapid-runtime-10383370.txt",
+      "sha256": "3410f5297d84f2dc1978b373d2765e6eac0d84aa4c801b717532ac5949ab3691"
+    },
+    {
+      "file": "D:\\PrototypeReference\\p1\\private\\rapid-runtime-101ed6c0.txt",
+      "sha256": "c455c6c1ee80e6e5f173894273b347d5b3d7e88b34eec9a0e15720ae659dce0a"
+    },
+    {
+      "file": "D:\\PrototypeReference\\p1\\private\\helicopter-strafe-cache-fields.txt",
+      "sha256": "2fd6ce17d222d9efa4a46ad4c5d5e24484d75aae189678d02075f5d8caf7043e"
+    }
+  ],
+  "correction": "The earlier token record incorrectly named101ed6c0 ReserveVolumeAction cleanup. It removes anonymous positional spheres; the RTTI-confirmed ReserveVolumeAction finish is101fedb0 and removes owned volume records by handle through103853d0.",
+  "reserveVolumeRtti": {
+    "type": ".?AVReserveVolumeAction@ai@fightitems@proto@@",
+    "descriptor": "0x110438c4",
+    "vtable": "0x10dccaa4",
+    "start": "0x10204220",
+    "update": "0x10202c90",
+    "finish": "0x101fedb0",
+    "destructor": "0x10202a70"
+  },
+  "cacheFieldsHex": {
+    "candidateStart": "0x54c",
+    "candidateEnd": "0x558",
+    "candidateTargetGround": "0x564",
+    "relativeRise": "0x570",
+    "age": "0x574",
+    "minimum": "0x578",
+    "maximum": "0x57c",
+    "valid": "0x580",
+    "targetAtPlan": "0x584",
+    "committedRecord": "0x590",
+    "recordBytes": "0x44"
+  },
+  "cacheSemantics": [
+    "103e1850 initializes candidate and committed geometry to zero, age=-1, min=5, max=40, valid=false. 103dde40 at103de050..103de072 adds its float simulation delta only when candidate age>-0.5. Committed age is not incremented.",
+    "103e3160 first resolves the current target handle. A missing/stale/null target clears only candidate.valid and copies the candidate result without resetting age or geometry.",
+    "A query refreshes when age<0, age>requested maximum age, a non--1 minimum differs, or squared3D distance from cached targetGround to the current target exceeds requestedMovement squared. Comparisons at equal tolerances reuse. targetAtPlan is NOT this movement-test origin.",
+    "Maximum and farthest are not reuse keys. When a refresh actually occurs, negative minimum/maximum reuse their previous stored values; the new nonnegative values are stored, targetAtPlan captures the current target,103e1cc0 runs, valid stores its result, and age resets to0 even on failure.",
+    "Failed search can write targetGround before reporting failure. The Java search result preserves this output independently from valid path geometry; an initial failed relocation can retain the previous ground output. Native failed start/end writes are not exposed as usable flight geometry by the adapter.",
+    "103e3350 message0x32 subtype0 invokes the candidate query. Subtype1 copies committed+0x590 into the message. Subtype2 copies the entire0x44-byte candidate record from+0x54c to+0x590 via1020bef0; it does not recompute, select or validate. Subsequent candidate changes and age do not mutate the committed copy.",
+    "PrepareTightStrafeRun start10214080 queries candidate with both tolerances Float.MAX_VALUE, then commits through subtype2 only after preparing and validating its route. TightStrafeRun start10213620 retrieves subtype1. A cache query can be evaluated repeatedly during weighted bank selection without becoming a commitment."
+  ],
+  "volumeSemantics": [
+    "RTTI ReserveVolumeAction start10204220 and update10202c90 branch on track+0x1c(StrafeRun). True resolves its actor and queries subtype0 candidate using Float.MAX_VALUE for both tolerances and -1/-1 scan limits (101fec10 defaults). This is not a committed-route query.",
+    "10202aa0 constructs an OBB from raw candidate endpoints: center=(start+end)/2 including Y; along=normalize((end-start).xz); side=(-along.z,0,along.x); up=(0,1,0); half extents=(horizontalLength/2,Radius,Radius). It is not a capsule, sloped box, aircraft footprint or complete raised flight route.",
+    "Strafe update101fed60 compares only the new candidate start to action+0x2c, component by component with inclusive tolerance1. Endpoint-only changes or radius changes do not rebuild it. If a start component changes by>1,10202c90 removes the owner record and inserts the new OBB;10202aa0 stores the new start.",
+    "StrafeRun=false uses101fff90: query navigation message0x26 subtype1; when both response flags are true, take its position, otherwise take the actor position. It inserts a sphere with track Radius. Update10070b60 uses the same componentwise inclusive1 tolerance before owner removal and replacement.",
+    "Manager+0xba8 contains up to50 owned records of0x44 bytes; end pointer+0x18f0. Shape type+0x3c distinguishes sphere0 and OBB1; owner handle is+0x40. Insertion10385060/10385100 has no overlap denial and silently skips at capacity. Finish101fedb0 calls103853d0 with action owner handle. Removal finds that exact handle and swap-removes the record, with shape lifecycle callbacks. This does not release the separate attack token.",
+    "Conflict query10382830(point,queryRadius,exceptOwner) checks103824e0 then ignores matches belonging to exceptOwner. Sphere contact is inclusive distance <= (reservedRadius+queryRadius)^2. For abs(queryRadius)<=float1e-5, it instead uses point containment. OBB point boundaries are inclusive (107c1050); nonzero query spheres use the strict nearest-OBB distance squared < radius squared (107c6e30), so exact external tangency is free.",
+    "Anonymous spheres at+0x50c/+0x830, insertion10384410 and positional removal10383370, are a different subsystem. 10382680 checks those points with strict distance<radiusSquared. They must not be substituted for the owned ReserveVolume table or its owner-based cleanup."
+  ],
+  "minecraftAdaptations": [
+    "HelicopterAirspace is isolated per ServerLevel through a WeakHashMap whose value only weakly references the level. UUID plus same-world loaded entity presence substitutes for handle index/generation; removal/world departure discards stale caches and volumes without loading entities.",
+    "The coordinator advances once per observed gameTime, not per aircraft call. Standard ticks use float0.05 seconds. Lazy catch-up advances at most41 lease steps because all request durations are<=2 seconds, and adds elapsed seconds to candidate age. No token release is added to volume cleanup or cache invalidation.",
+    "One active volume per aircraft is the MC action model; native storage can append duplicate owner handles. Replacing one UUID cannot overwrite a different owner. Registration returns false for invalid geometry/capacity rather than silently claiming success. It retains native separation of insertion from pointAvailable conflict queries.",
+    "One MC block per source grid cell, local origin and MOTION_BLOCKING_NO_LEAVES heightmap are explicit adapters, not decoded original navigation units. groundAt uses getChunkNow plus loaded chunk height+1; unavailable or out-of-border cells returnNaN. No getChunk/getHeight call on Level can request a new chunk.",
+    "areaHeight uses upward-rounded odd width (30=>31,60=>61 cells), with work bound257. Any missing sample fails closed. The path search likewise rejects missing terrain rather than native zero-height fallback. Source-bound candidate geometry can remain cached until its documented age/movement invalidation.",
+    "Finite inputs and positive horizontal OBB length are required; a failed candidate cannot reserve a zero/uninitialized corridor. Callers own lifecycle: reserveSource while track active, releaseVolume on end, and clearCache/forget on MC capture/interruption/world departure as required by live combat."
+  ],
+  "files": [
+    {
+      "file": "D:\\blacklight-evolution\\src\\main\\java\\com\\codex\\blacklight\\military\\aircraft\\HelicopterStrafePath.java",
+      "sha256": "69475b8f462137b36bf284e3e4a8a35f5a9ae0db4bc48fcea9d2859333d13f87"
+    },
+    {
+      "file": "D:\\blacklight-evolution\\src\\main\\java\\com\\codex\\blacklight\\military\\aircraft\\HelicopterStrafeCache.java",
+      "sha256": "f9d16b4fa044507db4fdf830a5bef4318d96a1120972dcdf0907fb58851a85ef"
+    },
+    {
+      "file": "D:\\blacklight-evolution\\src\\main\\java\\com\\codex\\blacklight\\military\\aircraft\\HelicopterReservations.java",
+      "sha256": "e37541329017aa7fd03ae0d7a6949741a05df07b0000a612c48ba269a6dc907b"
+    },
+    {
+      "file": "D:\\blacklight-evolution\\src\\main\\java\\com\\codex\\blacklight\\military\\aircraft\\HelicopterAirspace.java",
+      "sha256": "8ffe0e070425a3583ef428275636520848a0fd74da39f84deccf3da05b130c38"
+    },
+    {
+      "file": "D:\\blacklight-evolution\\src\\test\\java\\com\\codex\\blacklight\\military\\aircraft\\HelicopterStrafeCacheTest.java",
+      "sha256": "af86907caba42bd99616f0cb6d530ac29f48580782f80be5ebb0def584ec9742"
+    },
+    {
+      "file": "D:\\blacklight-evolution\\src\\test\\java\\com\\codex\\blacklight\\military\\aircraft\\HelicopterReservationsTest.java",
+      "sha256": "486112f907a009f9d3333dd4878b143d633ecf86f1914c8ad586d367de88c87e"
+    }
+  ],
+  "pending": [
+    "Seven cache and six volume JUnit cases have been written but not run.",
+    "ServerLevel loaded-terrain/world-clock behavior has not been run.",
+    "Live bank/track caller integration is owned by the main task and is separate from these helper implementations."
+  ],
+  "openRunExtension": {
+    "record": "art/military-vehicles/helicopter-open-strafe-source.json",
+    "note": "SimpleOpen action uses the same owner table with independent vertical extent and a one-time begin reservation. ReserveVolume track refresh and tight candidate/committed cache semantics are unchanged."
+  }
+}

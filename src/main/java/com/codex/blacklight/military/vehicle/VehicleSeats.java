@@ -10,7 +10,8 @@ public final class VehicleSeats {
     private final Map<String, VehicleDefinition.Seat> definitions = new LinkedHashMap<>();
     private final Map<String, UUID> occupants = new LinkedHashMap<>();
     private long revision;
-    public VehicleSeats(VehicleDefinition definition) { definition.seats().forEach(s -> definitions.put(s.id(),s)); }
+    public VehicleSeats(VehicleDefinition definition) { this(definition.seats()); }
+    public VehicleSeats(java.util.List<VehicleDefinition.Seat> seats) { seats.forEach(s -> definitions.put(s.id(),s)); }
     public boolean board(UUID occupant, String seatId, Set<UUID> actualPassengers) {
         if (occupant == null || !definitions.containsKey(seatId) || !actualPassengers.contains(occupant)
                 || occupants.containsKey(seatId) || seatOf(occupant) != null) return false;
