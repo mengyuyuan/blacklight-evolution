@@ -47,6 +47,7 @@ public final class BlacklightNeoMod {
         NeoForge.EVENT_BUS.register(com.codex.blacklight.city.CityTravel.class);
         ModAttachments.register(modBus);
         ModEntities.register(modBus);
+        com.codex.blacklight.registry.EncounterEntities.register(modBus);
         ModEffects.register(modBus);
         ModItems.register(modBus);
         com.codex.blacklight.military.vehicle.VehicleRegistry.register(modBus);

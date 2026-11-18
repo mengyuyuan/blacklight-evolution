@@ -71,12 +71,21 @@ public final class NativeRootMotion {
         if (!move.rush() && !move.quake()) {
             var target = player.level().getEntity(visual.targetId());
             if (target instanceof LivingEntity living && living.isAlive()) {
-                var delta = living.position().subtract(player.position());
-                double spacing = Math.max(.8, (player.getBbWidth() + living.getBbWidth()) * .5 + .15);
-                step = standOff(step, delta, Math.max(0, delta.horizontalDistance() - spacing));
+                step = targetStandOff(player, living, step);
             }
         }
         apply(player, step);
+    }
+
+    /** A regional lock already names a receiving surface. Parent width belongs
+     * to a root-to-root separation and must not be subtracted from that surface
+     * again. This only limits the existing Coord step; it adds no travel/reach. */
+    public static Vec3 targetStandOff(ServerPlayer player, LivingEntity target, Vec3 step) {
+        boolean multipart=CombatTargeting.multipart(target);
+        var destination=multipart?CombatTargeting.aimPoint(player,player.getEyePosition(),target):target.position();
+        var delta=destination.subtract(player.position());
+        double spacing=Math.max(.8,(player.getBbWidth()+(multipart?0:target.getBbWidth()))*.5+.15);
+        return standOff(step,delta,Math.max(0,delta.horizontalDistance()-spacing));
     }
 
     public static float weaponClock(int elapsedTick,float offset,float transition) {
@@ -98,9 +107,7 @@ public final class NativeRootMotion {
         player.hurtMarked=true;
         var step=direction.scale(distance);
         if (target!=null && target.isAlive() && target.level()==player.level()) {
-            var delta=target.position().subtract(player.position()).multiply(1,0,1);
-            double spacing=Math.max(.8,(player.getBbWidth()+target.getBbWidth())*.5+.15);
-            step=standOff(step,delta,Math.max(0,delta.length()-spacing));
+            step=targetStandOff(player,target,step);
         }
         apply(player,step);
     }
@@ -112,9 +119,7 @@ public final class NativeRootMotion {
         var step = direction.normalize().scale(distance);
         var target = CombatTargeting.locked(player);
         if (target != null && target.isAlive()) {
-            var delta = target.position().subtract(player.position());
-            double spacing = Math.max(.8, (player.getBbWidth() + target.getBbWidth()) * .5 + .15);
-            step = standOff(step, delta, Math.max(0, delta.horizontalDistance() - spacing));
+            step=targetStandOff(player,target,step);
         }
         // Legacy claws keep the live walk/run beneath their additive authored lunge.
         // Since this window suppresses stale absolute packets, its ordinary step is owned here too.

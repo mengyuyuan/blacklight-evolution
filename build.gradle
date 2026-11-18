@@ -271,6 +271,11 @@ if (project.hasProperty('gunplayTest')) {
 if (project.hasProperty('releaseAuditTest')) {
     sourceSets.main.java.srcDir('src/releaseAuditTest/java')
 }
+if (project.hasProperty('encounterContactTest')) {
+    sourceSets.main.java.srcDir('src/encounterTest/java')
+    sourceSets.main.resources.srcDir('src/blackwatchTest/resources')
+}
+
 if (project.hasProperty('cityTest')) {
     sourceSets.main.java.srcDir('src/cityTest/java')
     sourceSets.main.resources.srcDir('src/cityTest/resources')

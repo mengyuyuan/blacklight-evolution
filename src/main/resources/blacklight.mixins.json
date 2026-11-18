@@ -49,7 +49,10 @@
     "HydraServerMovementMixin",
     "NativeTissueAirMixin",
     "NativeTissueFeedingMixin",
-    "OptionalEpicFightModeMixin"
+    "OptionalEpicFightModeMixin",
+    "HydraProjectileContactMixin",
+    "GreeneHealthFloorMixin",
+    "HydraDeathGuardMixin"
   ],
   "client": [
     "client.RagdollSaddleMixin",
@@ -87,7 +90,8 @@
     "client.BlockCarryItemMixin",
     "client.PrototypeBodyYawMixin",
     "client.ConsumeTeleportSmoothingMixin",
-    "client.SceneClockMixin"
+    "client.SceneClockMixin",
+    "client.HydraPickClockMixin"
   ],
   "injectors": {
     "defaultRequire": 1

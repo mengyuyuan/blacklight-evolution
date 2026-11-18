@@ -18,6 +18,7 @@ public final class ImpactControl {
     private ImpactControl(){}
     /** A confirmed low-health consume opening; uses the existing transient AI and hit-pose controller. */
     public static boolean consumeOpening(Mob mob,float yaw){
+        if(NativeBossBodyControl.ownsPose(mob)){if(!mob.level().isClientSide)cancel(mob);return false;}
         if(mob.level().isClientSide||!mob.isAlive()||mob.isRemoved()||mob instanceof com.codex.blacklight.entity.BlacklightHive
                 ||ConsumeSystem.grappleProtected(mob)||ModAttachments.peekData(mob,ModAttachments.CONSUME_VISUAL,ConsumeVisual.EMPTY).active())return false;
         long now=mob.level().getGameTime();
@@ -33,6 +34,7 @@ public final class ImpactControl {
         publish(mob,new HitReaction(now,40,HitReaction.STAGGER,yaw,ImpactProfile.BODY));return true;
     }
     public static boolean begin(LivingEntity entity,ImpactProfile profile,float yaw){
+        if(NativeBossBodyControl.ownsPose(entity)){if(!entity.level().isClientSide)cancel(entity);return false;}
         if(entity.isRemoved()){if(entity instanceof Mob mob)ACTIVE.remove(mob);return false;}
         if(entity instanceof com.codex.blacklight.entity.BlacklightHive){cancel(entity);return false;}
         if(ConsumeSystem.grappleProtected(entity)||ModAttachments.peekData(entity, ModAttachments.CONSUME_VISUAL, ConsumeVisual.EMPTY).active())return false;
@@ -109,6 +111,7 @@ public final class ImpactControl {
     }
     @SubscribeEvent public static void tick(EntityTickEvent.Post event){
         if(!(event.getEntity() instanceof Mob mob)||mob.level().isClientSide)return;
+        if(NativeBossBodyControl.ownsPose(mob)){cancel(mob);return;}
         if(mob.isRemoved()){ACTIVE.remove(mob);return;}
         var control=ACTIVE.get(mob);if(control==null)return;
         if(!mob.onGround()&&!control.airborne()){control=new Control(control.knockdown(),control.flightStarted(),true,control.consumeUntil());ACTIVE.put(mob,control);}

@@ -53,6 +53,11 @@ public final class ModAttachments {
             "target_lock_id", () -> AttachmentType.builder(() -> -1)
                     .sync(net.minecraft.network.codec.ByteBufCodecs.VAR_INT).build());
 
+    /** Logical boss health region; -1 means the whole selectable actor/core. Not saved across lives. */
+    public static final Supplier<AttachmentType<Integer>> TARGET_LOCK_REGION = ATTACHMENTS.register(
+            "target_lock_region", () -> AttachmentType.builder(() -> -1)
+                    .sync(net.minecraft.network.codec.ByteBufCodecs.VAR_INT).build());
+
     /** Short-lived glide visual lease; expires on interruption, logout or dimension change. */
     public static final Supplier<AttachmentType<Long>> GLIDE_UNTIL = ATTACHMENTS.register(
             "glide_until", () -> AttachmentType.builder(() -> -1L)
