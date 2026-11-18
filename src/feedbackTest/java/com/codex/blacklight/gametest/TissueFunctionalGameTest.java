@@ -73,7 +73,7 @@ public final class TissueFunctionalGameTest {
         });
     }
     private static BlacklightInfectedHost actor(GameTestHelper h,TissueCore core){
-        for(int x=1;x<=13;x++)for(int z=1;z<12;z++){
+        for(int x=0;x<10;x++)for(int z=0;z<10;z++){
             h.setBlock(new BlockPos(x,1,z),Blocks.STONE);for(int y=2;y<12;y++)h.setBlock(new BlockPos(x,y,z),Blocks.AIR);
         }
         var host=ModEntities.INFECTED_HOST.get().create(h.getLevel());host.inherit(EntityType.COW.create(h.getLevel()));
@@ -105,14 +105,53 @@ public final class TissueFunctionalGameTest {
         h.runAfterDelay(6,()->h.assertTrue(target.getHealth()==1000,"windup cannot deal contact damage"));
         h.runAfterDelay(38,()->{
             try{h.assertTrue(target.getHealth()<1000,"contact must really remove health for "+core+", health="+target.getHealth());
-                if(core==TissueCore.TENDON||core==TissueCore.HORN)h.assertTrue(host.getX()>originalX+.5,"launch must change the actual server position");
+                if(core==TissueCore.TENDON)h.assertTrue(host.getX()>originalX+.5,"launch must change the actual server position");
                 h.assertTrue(host.tissueTentacles()==0,"new grip organs preserve native walking support");
             }finally{host.discard();target.discard();}h.succeed();
         });
     }
     @GameTest(template="wall_test",timeoutTicks=65,batch="tissue_functional") public static void elasticTendonLoadsThenPounces(GameTestHelper h){attack(h,TissueCore.TENDON,4);}
     @GameTest(template="wall_test",timeoutTicks=65,batch="tissue_functional") public static void hydraulicLimbActuallyExtendsAndHits(GameTestHelper h){attack(h,TissueCore.HYDRAULIC,3);}
-    @GameTest(template="wall_test",timeoutTicks=65,batch="tissue_functional") public static void hornChargeMovesAndDealsContactDamage(GameTestHelper h){attack(h,TissueCore.HORN,9);}
+    @GameTest(template="wall_test",timeoutTicks=65,batch="tissue_functional")
+    public static void hornChargeMovesAndDealsContactDamage(GameTestHelper h){hornCharge(h,false);}
+    @GameTest(template="wall_test",timeoutTicks=65,batch="tissue_functional")
+    public static void hornChargeStopsAtASolidWall(GameTestHelper h){hornCharge(h,true);}
+
+    private static void hornCharge(GameTestHelper h,boolean blocked){
+        // The 9.2-block diagonal fits both bodies and the entire charge inside wall_test's 10x10 floor.
+        var host=actor(h,TissueCore.HORN);
+        host.setPos(net.minecraft.world.phys.Vec3.atBottomCenterOf(h.absolutePos(new BlockPos(1,2,1))));
+        var target=victim(h,8,7);
+        var origin=host.position();
+        var direction=target.position().subtract(origin).normalize();
+        var cycle=TissueOrganCycle.cycle(TissueCore.HORN);
+        start(h,host,target,TissueCore.HORN);
+        var touchedWall=new java.util.concurrent.atomic.AtomicBoolean();
+        h.onEachTick(()->{
+            if(host.organActionCore()==TissueCore.HORN&&host.horizontalCollision)touchedWall.set(true);
+        });
+        h.runAfterDelay(cycle.windup()-1,()->{
+            h.assertTrue(target.getHealth()==1000,"the windup must leave the target unharmed");
+            if(blocked){
+                for(int z=1;z<=8;z++)for(int y=2;y<=6;y++)h.setBlock(new BlockPos(5,y,z),Blocks.STONE);
+            }
+        });
+        h.runAfterDelay(cycle.retract()+2,()->{
+            try{
+                double advance=host.position().subtract(origin).dot(direction);
+                h.assertTrue(advance>.5,"the charge must move the actual body toward the committed target; advance="+advance);
+                h.assertTrue(host.tissueTentacles()==0,"the horn uses the host's native walking support");
+                if(blocked){
+                    h.assertTrue(touchedWall.get()&&target.getHealth()==1000,"a real wall must stop the charge before it damages the target");
+                }else{
+                    var source=target.getLastDamageSource();
+                    h.assertTrue(target.getHealth()<1000&&source instanceof TissueAttackSource&&source.getEntity()==host,
+                            "the charging host's organ must damage its target; advance="+advance+" health="+target.getHealth());
+                }
+            }finally{host.discard();target.discard();}
+            h.succeed();
+        });
+    }
     private static void grip(GameTestHelper h,TissueCore core){
         var host=actor(h,core);var target=victim(h,6,5);start(h,host,target,core);
         h.runAfterDelay(TissueOrganCycle.cycle(core).contact()+2,()->h.assertTrue(TissueGrapples.owner(target)==host,"closed organ owns a real short tether for "+core));
@@ -128,7 +167,7 @@ public final class TissueFunctionalGameTest {
     @GameTest(template="wall_test",timeoutTicks=65,batch="tissue_functional") public static void aquaticHydrostatReallyGripsWithoutNeedingGroundContact(GameTestHelper h){
         var host=actor(h,TissueCore.HYDROSTAT);var tag=new CompoundTag();host.saveWithoutId(tag);
         tag.getCompound("BlacklightHost").putString("Family","water");host.readAdditionalSaveData(tag);host.setNoGravity(true);
-        for(int x=2;x<=11;x++)for(int z=2;z<=10;z++)for(int y=2;y<=5;y++)h.setBlock(new BlockPos(x,y,z),Blocks.WATER);
+        for(int x=2;x<10;x++)for(int z=2;z<10;z++)for(int y=2;y<=5;y++)h.setBlock(new BlockPos(x,y,z),Blocks.WATER);
         host.setPos(net.minecraft.world.phys.Vec3.atBottomCenterOf(h.absolutePos(new BlockPos(4,3,5))));host.setOnGround(false);
         var target=victim(h,6,5);target.setNoGravity(true);target.setPos(net.minecraft.world.phys.Vec3.atBottomCenterOf(h.absolutePos(new BlockPos(6,3,5))));
         host.setTarget(target);
