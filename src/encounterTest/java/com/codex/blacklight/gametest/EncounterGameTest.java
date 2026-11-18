@@ -188,7 +188,46 @@ public final class EncounterGameTest {
             complete[0]=true;drones.forEach(Entity::discard);done(h,soldier,m);
         });
     }
-    @GameTest(template="blackwatch_arena",batch="e_radio_lost",timeoutTicks=145)public static void lostTargetCancelsRadio(GameTestHelper h){arena(h);var soldier=ModEntities.BLACKWATCH_OFFICER.get().create(h.getLevel());soldier.setPos(h.absoluteVec(new Vec3(8,2,3)));h.getLevel().addFreshEntity(soldier);var m=hunter(h);m.setPos(soldier.position().add(0,0,11));m.setNoAi(true);soldier.setTarget(m);h.runAfterDelay(20,()->{h.assertTrue(soldier.radioStarted()>=0,"radio started before target loss");m.discard();});h.runAfterDelay(28,()->h.assertTrue(soldier.radioStarted()<0,"lost target clears radio pose and timer"));h.runAfterDelay(110,()->{h.assertTrue(h.getLevel().getEntitiesOfClass(MilitaryUav.class,soldier.getBoundingBox().inflate(35)).isEmpty(),"lost target cannot produce delayed deployment");done(h,soldier);});}
+    @GameTest(template="blackwatch_arena",batch="e_radio_lost",timeoutTicks=145)
+    public static void lostTargetCancelsRadio(GameTestHelper h) {
+        arena(h);
+        var soldier=ModEntities.BLACKWATCH_OFFICER.get().create(h.getLevel());
+        soldier.setPos(h.absoluteVec(new Vec3(8,2,3)));
+        soldier.targetSelector.removeAllGoals(goal->true);
+        soldier.getPersistentData().putLong("AirSupportReady",h.getLevel().getGameTime()+300);
+        h.getLevel().addFreshEntity(soldier);
+        var first=hunter(h);
+        first.setPos(soldier.position().add(0,0,11));
+        soldier.setTarget(first);
+        h.runAfterDelay(20,()->{
+            long firstStart=soldier.radioStarted();
+            long switched=h.getLevel().getGameTime();
+            h.assertTrue(firstStart>=0&&soldier.getTarget()==first,"officer has a call in progress for its first contact");
+            soldier.setTarget(first);
+            h.assertTrue(soldier.radioStarted()==firstStart,"reconfirming the same contact preserves its call");
+            var next=hunter(h);
+            next.setPos(first.position());
+            first.discard();
+            soldier.setTarget(next);
+            h.assertTrue(soldier.getTarget()==next&&soldier.radioStarted()<0,"replacing a lost contact cancels the original radio timer");
+            h.runAfterDelay(8,()->h.assertTrue(soldier.getTarget()==next&&soldier.radioStarted()>=switched,
+                    "the replacement contact starts a fresh call"));
+            long originalDeadline=firstStart+com.codex.blacklight.military.MilitaryTactics.RADIO_TICKS;
+            h.runAfterDelay(originalDeadline-switched+1,()->{
+                var area=soldier.getBoundingBox().inflate(40);
+                h.assertTrue(h.getLevel().getEntitiesOfClass(MilitaryUav.class,area,d->soldier.getUUID().equals(d.owner())).isEmpty(),
+                        "the replacement cannot deploy on the original call's deadline");
+                next.discard();
+                soldier.setTarget(null);
+                h.assertTrue(soldier.radioStarted()<0,"losing the remaining contact clears the radio timer");
+                h.runAfterDelay(30,()->{
+                    h.assertTrue(h.getLevel().getEntitiesOfClass(MilitaryUav.class,area,d->soldier.getUUID().equals(d.owner())).isEmpty(),
+                            "neither interrupted call leaves a delayed deployment");
+                    done(h,soldier);
+                });
+            });
+        });
+    }
     @GameTest(template="blackwatch_arena",batch="e_weapon_part",timeoutTicks=45)public static void weaponContactSelectsOneWeakpoint(GameTestHelper h){arena(h);var m=actor(h,EncounterKind.ELIZABETH_GREENE);var v=target(h,9);h.runAfterDelay(3,()->{var box=m.hurtRegions(0).stream().filter(r->r.bone().equals("weak_1")).findFirst().orElseThrow().boxes().get(0);var contact=new WeaponCutContact.Contact(32,"qa-edge",box.center,new Vec3(0,0,.3),new Vec3(1,0,0));h.assertTrue(m.hurtWeapon(m.damageSources().mobAttack(v),m.greeneSegmentMaximum()+1,new WeaponCutContact.Report(WeaponCutContact.Kind.SLICE,List.of(contact)),b->false),"blade contact accepted");h.assertTrue(!m.broken(0)&&m.broken(1)&&!m.broken(2)&&!m.exposed(),"only contacted current-wave armor breaks");done(h,m,v);});}
     @GameTest(template="blackwatch_arena",batch="e_drone_wall",timeoutTicks=120)public static void droneCannotFinishThroughWall(GameTestHelper h){arena(h);var drone=EncounterEntities.UAV.get().create(h.getLevel());drone.setPos(h.absoluteVec(new Vec3(3,5,3)));h.getLevel().addFreshEntity(drone);var infected=hunter(h);infected.setNoAi(true);infected.setPos(h.absoluteVec(new Vec3(12,2,12)));h.runAfterDelay(24,()->{for(int y=2;y<20;y++)for(int n=10;n<=14;n++){h.setBlock(10,y,n,Blocks.STONE);h.setBlock(14,y,n,Blocks.STONE);h.setBlock(n,y,10,Blocks.STONE);h.setBlock(n,y,14,Blocks.STONE);}for(int x=10;x<=14;x++)for(int z=10;z<=14;z++)h.setBlock(x,20,z,Blocks.STONE);});h.runAfterDelay(85,()->{h.assertTrue(!drone.hasLineOfSight(infected),"fixture fully occludes intended target");h.assertTrue(drone.scanTargetId()!=infected.getId()||drone.scanProgress()==0,"occlusion cancels this target; reacquiring another visible target is allowed");done(h,drone,infected);});}
 }

@@ -4,12 +4,14 @@ import com.codex.blacklight.combat.HydraDeath;
 import com.codex.blacklight.entity.BlacklightHydra;
 import com.codex.blacklight.firearms.OrdnanceProjectile;
 import com.codex.blacklight.firearms.WeaponDefinition;
+import com.codex.blacklight.mixin.LivingDeathAccess;
 import com.codex.blacklight.registry.ModEntities;
 import java.util.Arrays;
 import net.minecraft.gametest.framework.*;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
@@ -24,6 +26,9 @@ public final class HydraDeathGameTest {
     private static BlacklightHydra repeated,replaced,recordDrops;
     private static CompoundTag replacement,dropSnapshot;
     private static int repeatedEvents,dropEvents;
+    private static boolean deathAccepted(LivingEntity entity){
+        return ((LivingDeathAccess)entity).blacklight$deathAccepted();
+    }
     @SubscribeEvent public static void cancelFixtureDeath(LivingDeathEvent event){
         if(event.getEntity()==canceled)event.setCanceled(true);
         if(event.getEntity()==repeated){repeatedEvents++;if(repeatedEvents==1)repeated.die(event.getSource());}
@@ -108,7 +113,7 @@ public final class HydraDeathGameTest {
         try{
             hydra.hurt(hydra.damageSources().genericKill(),10000);
             h.assertTrue(replaced==null&&hydra.isAlive()&&!hydra.nativeDying(),"event callback restored the same object without canceling the event");
-            h.assertTrue(!((com.codex.blacklight.mixin.LivingDeathAccess)hydra).blacklight$deathAccepted()&&dropEvents==0,"post-event guard prevents stale dead flag, kill score and reward body");
+            h.assertTrue(!deathAccepted(hydra)&&dropEvents==0,"post-event guard prevents stale dead flag, kill score and reward body");
             hydra.invulnerableTime=0;kill(h,hydra);
             h.assertTrue(dropEvents==1,"the loaded living generation can subsequently accept one actual death");h.succeed();
         }finally{replaced=recordDrops=null;replacement=null;hydra.discard();}
@@ -121,7 +126,7 @@ public final class HydraDeathGameTest {
             h.assertTrue(dropEvents==1&&dropSnapshot!=null&&dropSnapshot.contains("HydraNativeDeathAge",3),"reward callback sees the committed source clock, not an untagged legacy corpse");
             restored=ModEntities.BLACKLIGHT_HYDRA.get().create(h.getLevel());restored.load(dropSnapshot.copy());
             h.assertTrue(restored.nativeDying()&&restored.nativeDeathAge(0)==0&&!restored.isAlive(),"snapshot taken inside accepted rewards resumes the complete source death chain");
-            h.assertTrue(((com.codex.blacklight.mixin.LivingDeathAccess)restored).blacklight$deathAccepted()&&dropEvents==1,"restore does not invoke another reward transaction");h.succeed();
+            h.assertTrue(deathAccepted(restored)&&dropEvents==1,"restore does not invoke another reward transaction");h.succeed();
         }finally{recordDrops=null;hydra.discard();if(restored!=null)restored.discard();}
     }
     @GameTest(template="blackwatch_facility_arena",timeoutTicks=65)
