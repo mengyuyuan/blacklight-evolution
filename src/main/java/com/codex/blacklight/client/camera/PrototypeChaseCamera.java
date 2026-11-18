@@ -259,7 +259,7 @@ public final class PrototypeChaseCamera {
                     &&player.hasLineOfSight(living))target=living;
         }
         if(target!=null&&(!target.isAlive()||target.level()!=player.level()))target=null;
-        var pose=orbit.update(player,state,anchor,distance,elevation,target,dt);
+        var pose=orbit.update(player,state,anchor,distance,elevation,target,partial,dt);
         float yaw=pose.yaw(),pitch=pose.pitch();
         boolean manual=orbit.manual();
         // Source look-ahead uses normalized movement and camera axes (0x10342c0b).

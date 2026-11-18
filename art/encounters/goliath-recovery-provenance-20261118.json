@@ -1,0 +1,179 @@
+{
+  "schema": 1,
+  "source": "D:/PrototypeReference/p2/input/p2/behemoth.p3d",
+  "sourceSha256": "3737ff61e7042391bf12c95c2018e034f52a1945983d0a7053608a01d69240c7",
+  "clip": {
+    "name": "behemoth_com_biped_leg_stun_to_biped",
+    "ptrnOffset": 2299815,
+    "fps": 30,
+    "frames": 291,
+    "firstFrame": 0,
+    "lastFrame": 290,
+    "asset": "assets/blacklight/models/encounter_goliath_source.json",
+    "assetClip": "exposed"
+  },
+  "relatedFigTracks": [
+    {
+      "offset": 5439124,
+      "frames": [
+        25,
+        218
+      ],
+      "seconds": 10,
+      "payloadSha256": "2e91e709a212bee982f361e965b8d799f7c28e706f2c907f257c72a46854122f"
+    },
+    {
+      "offset": 5440708,
+      "branch": "fall",
+      "frames": [
+        218,
+        230
+      ],
+      "seconds": 0.33333298563957214,
+      "payloadSha256": "fc19dffe319ba28ead5da193dc2d1aaca109e434114d787e08a3c923c3de5019"
+    },
+    {
+      "offset": 5441316,
+      "branch": "hit_ground",
+      "frames": [
+        230,
+        242
+      ],
+      "seconds": 0.4000000059604645,
+      "payloadSha256": "3f9c4146a22fca150da4e1b5da4f785f399d858bf970b582cdda24a538c79818"
+    },
+    {
+      "offset": 5441928,
+      "frames": [
+        242,
+        250
+      ],
+      "seconds": 0.2666670083999634,
+      "payloadSha256": "59056bbc8340c8d5cd7684506c2e9f4d132917d7e0b42110cbfc7c90e6d83aff"
+    },
+    {
+      "offset": 5442448,
+      "branch": "windup",
+      "frames": [
+        250,
+        257
+      ],
+      "seconds": 0.33333298563957214,
+      "payloadSha256": "15beb7259f0a28a5952480b35c850c04177359ce031bfaa6dede404007629a67"
+    }
+  ],
+  "sourceBoundary": "The decoded fall and hit_ground records belong to a leg-stun reaction under the aggro hit branch. Native charge wall triggers and an original weakness timer are unverified. The subsequent FIG hold at 5442968 references behemoth_com_prone_slam_360; the separately sourced prone-to-biped clip is an adaptation for the wall reaction.",
+  "minecraftAdaptation": {
+    "newWallTicks": 56,
+    "phases": [
+      {
+        "ticks": [
+          0,
+          7
+        ],
+        "sourceFrames": [
+          218,
+          230
+        ],
+        "purpose": "fall"
+      },
+      {
+        "ticks": [
+          7,
+          15
+        ],
+        "sourceFrames": [
+          230,
+          242
+        ],
+        "purpose": "ground contact"
+      },
+      {
+        "ticks": [
+          15,
+          32
+        ],
+        "sourceFrames": [
+          242,
+          242
+        ],
+        "purpose": "hold"
+      },
+      {
+        "ticks": [
+          32,
+          56
+        ],
+        "clip": "rise",
+        "sourceFrames": [
+          16,
+          80
+        ],
+        "purpose": "get up without replaying the biped leg-stun windup or prone counterattack"
+      }
+    ],
+    "legacy40TickExposure": "Keep the absolute start and end. Keep both fall slices and shorten the hold and exit to fit the legacy duration.",
+    "otherExposure": "Keep the 70- and 140-tick combat windows. Play the early biped stumble/brace at normal source cadence and blend to live idle during the final 12 ticks. The late counterattack arc belongs to a different action.",
+    "collision": "Render and receiving hit Regions both call GoliathMotion.pose. Defense UI and attack eligibility use EXPOSED_START/EXPOSED game time. No recovery root displacement, committed charge Hit, or prone attack is emitted.",
+    "wallAudio": "Vanilla Minecraft stone impact at charge cancellation.",
+    "transitionBlends": {
+      "entry": "6 ticks from the sampled outgoing charge phase to the fall",
+      "exit": "6 ticks from the end of the rise clip to the live idle pose",
+      "sampler": "SourceBossMotion.blend plus reciprocal parent scale compensation, shared by rendering and hurt regions",
+      "persistence": "Packed impact phase and source phase age are synchronized and saved with the active exposure.",
+      "rise": "8 ticks from the biped leg-stun ground-contact pose into the prone-to-biped clip"
+    },
+    "geometryScale": 1.375
+  },
+  "riseClip": {
+    "name": "behemoth_com_prone_to_biped",
+    "assetClip": "rise",
+    "frames": 81,
+    "fps": 30,
+    "usedFrames": [
+      16,
+      80
+    ],
+    "ptrnOffset": 2869533
+  },
+  "headContinuity": {
+    "neckMesh": "Three overlapping authored sections bind to source_Spine_3, source_Neck and source_Neck_2. Their endpoints use the exported local joint offsets. The client and receiving collision read the same geometry resource.",
+    "spike": "The active Minecraft ground spike retains its hit tick and uses the referenced preparation/release/recovery slices of behemoth_com_crawl_front_spike with a Minecraft blend between source frames 24 and 90.",
+    "spikeFigureTracks": [
+      {
+        "offset": 5522156,
+        "frames": [
+          0,
+          24
+        ],
+        "payloadSha256": "074bd2b71db9b0805a399d11ff6597087f203672269231a5c23dd791d2f16554"
+      },
+      {
+        "offset": 5484920,
+        "frames": [
+          90,
+          118
+        ],
+        "payloadSha256": "8b8e2d2801a7d9234f144ddc9b82016ec4a76e9136774c5d004e92bb21b208b7"
+      },
+      {
+        "offset": 5486976,
+        "frames": [
+          118,
+          165
+        ],
+        "payloadSha256": "37f0f961dfa8050e596757d589cfc0d2f900d8b4644178710b11fa24884dd145"
+      },
+      {
+        "offset": 5490220,
+        "frames": [
+          165,
+          195
+        ],
+        "payloadSha256": "ff8993383c61e12bbde918dfa7a104f532c20008b6c591109935a1fb49be282b"
+      }
+    ],
+    "gait": "The walking phase and blend are driven by real horizontal travel. The vanilla hit-reaction write to WalkAnimationState speed does not select gait.",
+    "verification": "Head joint sampled at 1/8 game-tick intervals. 70-tick exposure maximum 12.67 to 8.97, 140-tick exposure 12.68 to 9.08, active spike 11.22 to 7.47, all in rig blocks before the uniform 1.375 presentation scale."
+  }
+}

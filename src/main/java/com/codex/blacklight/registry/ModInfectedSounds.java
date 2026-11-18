@@ -22,18 +22,36 @@ public final class ModInfectedSounds {
     static {for(var cue:InfectedSoundCue.values()){String id="infection."+cue.id;EVENTS.put(cue,SOUNDS.register(id,()->SoundEvent.createVariableRangeEvent(new ResourceLocation("blacklight",id))));}}
     private ModInfectedSounds(){}
     public static void register(IEventBus bus){SOUNDS.register(bus);}
+    /** Vanilla owns accepted hurt/death playback and its immunity/death deduplication. */
+    public static SoundEvent event(InfectedSoundCue cue){return EVENTS.get(cue).get();}
     public static void play(Entity actor,InfectedSoundCue cue){play(actor,cue,actor.getBoundingBox().getCenter());}
     public static void play(Entity actor,InfectedSoundCue cue,Vec3 at){
-        if(!(actor.level() instanceof ServerLevel level)||actor.isSilent()||!Double.isFinite(at.x+at.y+at.z))return;
+        var sound=prepare(actor,cue,at);if(sound!=null)playPrepared(actor,sound,at);
+    }
+    public static void play(Entity actor,InfectedSoundCue cue,Vec3 at,float gain,float minPitch,float maxPitch){
+        var sound=prepare(actor,cue,at,gain,minPitch,maxPitch);if(sound!=null)playPrepared(actor,sound,at);
+    }
+    public record Prepared(SoundEvent event,float volume,float pitch){}
+    public static void playPrepared(Entity actor,Prepared sound,Vec3 at){
+        if(actor.level() instanceof ServerLevel level)level.playSound(null,at.x,at.y,at.z,sound.event,SoundSource.HOSTILE,sound.volume,sound.pitch);
+    }
+    /** Reserve the original actor/spatial budget now; presentation may wait for its render frame. */
+    public static Prepared prepare(Entity actor,InfectedSoundCue cue,Vec3 at){
+        return prepare(actor,cue,at,1,.96F,1.04F);
+    }
+    private static Prepared prepare(Entity actor,InfectedSoundCue cue,Vec3 at,float gain,float minPitch,float maxPitch){
+        if(!Float.isFinite(gain)||gain<=0||gain>3||!Float.isFinite(minPitch)||!Float.isFinite(maxPitch)
+                ||minPitch<.5F||maxPitch>2||minPitch>maxPitch)return null;
+        if(!(actor.level() instanceof ServerLevel level)||actor.isSilent()||!Double.isFinite(at.x+at.y+at.z))return null;
         long now=level.getGameTime();var clocks=ACTORS.computeIfAbsent(actor,k->new EnumMap<>(InfectedSoundCue.Group.class));
         Long last=clocks.get(cue.group);int gap=cue.group==InfectedSoundCue.Group.CONTACT?4:3;
-        if(last!=null&&now>=last&&now-last<gap)return;
+        if(last!=null&&now>=last&&now-last<gap)return null;
         var area=LEVELS.computeIfAbsent(level,k->new Area());
         // Expired areas cannot accumulate forever as players explore cities.
         if(now<area.cleanup||now-area.cleanup>=40){area.cells.clear();area.cleanup=now;}
         int x=(int)Math.floor(at.x/32),z=(int)Math.floor(at.z/32);long key=((long)x<<32)^(z&0xffffffffL);
-        if(!area.cells.computeIfAbsent(key,k->new InfectedSoundBudget()).accept(now))return;
+        if(!area.cells.computeIfAbsent(key,k->new InfectedSoundBudget()).accept(now))return null;
         clocks.put(cue.group,now);
-        level.playSound(null,at.x,at.y,at.z,EVENTS.get(cue).get(),SoundSource.HOSTILE,cue.volume,.96F+level.random.nextFloat()*.08F);
+        return new Prepared(EVENTS.get(cue).get(),cue.volume*gain,minPitch+level.random.nextFloat()*(maxPitch-minPitch));
     }
 }

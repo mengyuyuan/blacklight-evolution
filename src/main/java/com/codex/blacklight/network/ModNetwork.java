@@ -19,7 +19,7 @@ import net.minecraftforge.network.NetworkRegistry;
 import net.minecraftforge.network.simple.SimpleChannel;
 
 public final class ModNetwork {
-    private static final String PROTOCOL = "forge-1.20.1-18-full-sync";
+    private static final String PROTOCOL = "forge-1.20.1-encounter-contact-1";
     private static final SimpleChannel CHANNEL = NetworkRegistry.newSimpleChannel(
             new ResourceLocation(BlacklightNeoMod.MOD_ID, "main"), () -> PROTOCOL, PROTOCOL::equals, PROTOCOL::equals);
     private static boolean registered;
@@ -33,6 +33,7 @@ public final class ModNetwork {
         registered=true;
         // Configurable ecology, consume variants and military payloads share one negotiated layout.
         new ForgePayloadRegistrar(CHANNEL)
+                .playToClient(ContactEffectsPayload.class,ContactEffectsPayload.STREAM_CODEC,(payload,context)->context.enqueueWork(()->com.codex.blacklight.client.renderer.ContactEffectsPresentation.accept(payload)))
                 .playToServer(FirearmReloadPayload.class,FirearmReloadPayload.STREAM_CODEC,(payload,context)->context.enqueueWork(()->{if(context.player() instanceof ServerPlayer player)payload.handle(player);}))
                 .playToClient(GunplayFeedbackPayload.class,GunplayFeedbackPayload.STREAM_CODEC,(payload,context)->context.enqueueWork(()->com.codex.blacklight.client.renderer.GunplayVisuals.accept(payload)))
                 .playToClient(InfectedImpactPayload.class,InfectedImpactPayload.STREAM_CODEC,(payload,context)->context.enqueueWork(()->com.codex.blacklight.client.renderer.InfectedImpactVisuals.accept(payload)))
@@ -77,9 +78,9 @@ public final class ModNetwork {
                 .playToServer(TargetLockPayload.class,TargetLockPayload.STREAM_CODEC,(payload,context)->
                     context.enqueueWork(()->{
                         if(context.player() instanceof ServerPlayer player){
-                            com.codex.blacklight.combat.CombatTargeting.requestLock(player,payload.entityId());
+                            com.codex.blacklight.combat.CombatTargeting.requestLock(player,payload.entityId(),payload.region());
                             PacketDistributor.sendToPlayer(player,new TargetLockAckPayload(payload.requestId(),
-                                    com.codex.blacklight.registry.ModAttachments.getData(player, com.codex.blacklight.registry.ModAttachments.TARGET_LOCK_ID)));
+                                    com.codex.blacklight.registry.ModAttachments.getData(player, com.codex.blacklight.registry.ModAttachments.TARGET_LOCK_ID),com.codex.blacklight.registry.ModAttachments.getData(player, com.codex.blacklight.registry.ModAttachments.TARGET_LOCK_REGION)));
                         }
                     }))
                 .playToClient(TargetLockAckPayload.class,TargetLockAckPayload.STREAM_CODEC,(payload,context)->

@@ -44,6 +44,25 @@ public final class VehicleHullShape {
     }
     /** Hull-local boxes (body first, then barrels); oriented by body yaw for exact terrain tests. */
     public List<Bounds> localParts() { return parts; }
+    /** Exact articulated cuboid corners, x/y/z signs encoded in bits 0/1/2.
+     * Unlike localParts(), this keeps each barrel's oriented hit geometry. */
+    public List<List<Vec3>> worldCorners(Vec3 origin,double yaw) {
+        VehicleDefinition.finiteAngle(yaw);
+        var result=new ArrayList<List<Vec3>>(hitParts.size());
+        for(var part:hitParts){
+            var corners=new ArrayList<Vec3>(8);var b=part.localBounds;
+            for(int bits=0;bits<8;bits++){
+                double x=(bits&1)==0?b.minX:b.maxX,y=(bits&2)==0?b.minY:b.maxY,z=(bits&4)==0?b.minZ:b.maxZ;
+                var local=new Vec3(part.origin.x()+part.right.x()*x+part.up.x()*y+part.forward.x()*z,
+                    part.origin.y()+part.right.y()*x+part.up.y()*y+part.forward.y()*z,
+                    part.origin.z()+part.right.z()*x+part.up.z()*y+part.forward.z()*z);
+                var rotated=VehicleDefinition.rotateYaw(local,yaw);
+                corners.add(new Vec3(origin.x()+rotated.x(),origin.y()+rotated.y(),origin.z()+rotated.z()));
+            }
+            result.add(List.copyOf(corners));
+        }
+        return List.copyOf(result);
+    }
     public double radius() { return radius; }
     /** Hull-local articulation sweep: the fixed body once, then each segment's swept barrel boxes. */
     public static List<Bounds> sweepArticulationLocal(VehicleDefinition definition,

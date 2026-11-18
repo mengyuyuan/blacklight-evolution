@@ -1,0 +1,198 @@
+{
+  "schema": 1,
+  "state": "source-decoded horizontal movement integration pending compile/runtime/player validation",
+  "source": "D:\\PrototypeReference\\p2\\input\\p2\\behemoth.p3d",
+  "sourceSha256": "3737ff61e7042391bf12c95c2018e034f52a1945983d0a7053608a01d69240c7",
+  "animationChunkOffset": 2256349,
+  "records": [
+    {
+      "offset": 5465588,
+      "payloadBytes": 132,
+      "payloadSha256": "94d1637153db4d9bf87129ac9d208fe09a9b5122eb9db743cd55137475ae4df2",
+      "rootFields80_84_88_92": [
+        1,
+        1,
+        1,
+        1
+      ],
+      "frames": [
+        0.0,
+        42.0
+      ]
+    },
+    {
+      "offset": 5466152,
+      "payloadBytes": 132,
+      "payloadSha256": "f078bdd93b970bd5c7f17ce66576ffcb3bcb766bf7fb8d3cca19de7d59e15057",
+      "rootFields80_84_88_92": [
+        1,
+        1,
+        1,
+        1
+      ],
+      "frames": [
+        42.0,
+        48.0
+      ]
+    },
+    {
+      "offset": 5466740,
+      "payloadBytes": 132,
+      "payloadSha256": "505dd5ebc9201cf45aec530c2355e862e73d9c47a41f7bc3486964ff8a13f6db",
+      "rootFields80_84_88_92": [
+        1,
+        1,
+        1,
+        1
+      ],
+      "frames": [
+        48.0,
+        52.0
+      ]
+    },
+    {
+      "offset": 5466892,
+      "payloadBytes": 132,
+      "payloadSha256": "bebe32168691c55ff49f3a6bc2462506055ff4676526052a61b4842796f761b3",
+      "rootFields80_84_88_92": [
+        1,
+        1,
+        1,
+        1
+      ],
+      "frames": [
+        52.0,
+        60.0
+      ]
+    },
+    {
+      "offset": 5468692,
+      "payloadBytes": 132,
+      "payloadSha256": "a3ab6d11613ad1a4d8619af70579a10a9163f05765975078089a5e6aecd19190",
+      "rootFields80_84_88_92": [
+        1,
+        1,
+        1,
+        1
+      ],
+      "frames": [
+        60.0,
+        -1.0
+      ]
+    }
+  ],
+  "runtimeEvidence": "Existing goliath-charge-provenance.json AnimationTrack metadata10271610..10271b56; root translation setter100706c0..100706d8; no original binary execution",
+  "curveEvidence": "Independent P2 TRS+segment-compensation reader agrees with all89 preexisting front-slam Motion_Root matrices to1e-7 source units. Root rotation is identity; Y=6 for allframes.",
+  "mcScale": 0.7562671743552288,
+  "criticalSamples": [
+    {
+      "frame": 0,
+      "source": [
+        0.0,
+        6.0,
+        0.0
+      ],
+      "horizontalOffsetYaw0": [
+        0.0,
+        0,
+        -0.0
+      ]
+    },
+    {
+      "frame": 10,
+      "source": [
+        -0.2313232421875,
+        6.0,
+        0.953125
+      ],
+      "horizontalOffsetYaw0": [
+        -0.17494217473183088,
+        0,
+        -0.7208171505573275
+      ]
+    },
+    {
+      "frame": 18,
+      "source": [
+        -1.2666015625,
+        6.0,
+        5.21875
+      ],
+      "horizontalOffsetYaw0": [
+        -0.9578891847057928,
+        0,
+        -3.9467693161663506
+      ]
+    },
+    {
+      "frame": 28,
+      "source": [
+        -1.2666015625,
+        6.0,
+        5.21875
+      ],
+      "horizontalOffsetYaw0": [
+        -0.9578891847057928,
+        0,
+        -3.9467693161663506
+      ]
+    },
+    {
+      "frame": 42,
+      "source": [
+        -1.2666015625,
+        6.0,
+        5.21875
+      ],
+      "horizontalOffsetYaw0": [
+        -0.9578891847057928,
+        0,
+        -3.9467693161663506
+      ]
+    },
+    {
+      "frame": 48,
+      "source": [
+        0.0,
+        6.0,
+        0.0
+      ],
+      "horizontalOffsetYaw0": [
+        0.0,
+        0,
+        -0.0
+      ]
+    },
+    {
+      "frame": 88,
+      "source": [
+        0.0,
+        6.0,
+        0.0
+      ],
+      "horizontalOffsetYaw0": [
+        0.0,
+        0,
+        -0.0
+      ]
+    }
+  ],
+  "implementation": "GoliathSlamMotion consumes consecutive action-age differences from the existing SourceBossAction HAMMER clock; source root remains stripped from visual pose, so entity movement delivers it once. No absolute-origin chasing. Skipped ages discard historical delta. Collision clips each requested movement; safety failures cancel. Lifecycle reset on begin/cancel/load/finish.",
+  "unchanged": [
+    "Original3.9-second action clock and tick38 Hit",
+    "Hit radii,damage,world-effect windows",
+    "source pose/hand geometry,physicalY/root gravity,layer blending"
+  ],
+  "boundary": [
+    "Horizontal root delivery is a Minecraft movement adapter using proven source channels; exact native root layer-weight mixing is not reproduced",
+    "No final P2 actor/physics-support state has been captured; fist penetration remains unresolved",
+    "Terrain clipping may leave an actor away from the original start because rejected movement is consumed, never repaid"
+  ],
+  "validation": {
+    "sourceParsing": "completed; no native code executed",
+    "javaBuild": "not run",
+    "unitTests": "written only",
+    "gameTests": "written only",
+    "playerVisual": "pending root"
+  }
+}

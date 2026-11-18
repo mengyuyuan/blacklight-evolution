@@ -1,0 +1,76 @@
+{
+  "schema": 1,
+  "date": "2026-11-17",
+  "scope": "Authored Foley, not original Prototype waveforms; duration metadata only is referenced.",
+  "license": "CC BY-SA 3.0, existing Socapex attribution in art/weapon-audio/README.md and Socapex-LICENSES.txt applies to these derived audio files.",
+  "sourceArchiveSha256": "613765eeb67a2a50bec26b669b37840533ad7299aa1ddee55370892c3773d98c",
+  "sources": {
+    "Monster_Hurt": {
+      "archiveEntry": "Socapex - Evol Online SFX - Punches and hits/Socapex - Monster_Hurt.wav",
+      "seconds": 0.6275963718820862,
+      "sha256": "14571074f3f7c49024e1f2f3064e3977e5d6237ce2944534fc846446b1d84b82"
+    },
+    "slow squish": {
+      "archiveEntry": "Socapex - Evol Online SFX - Punches and hits/Socapex - slow squish.wav",
+      "seconds": 1.127596371882086,
+      "sha256": "7832909ef8657e85ac667623e8adda1a3c261d35e76000dc7ef635b97ea2f85b"
+    }
+  },
+  "assets": [
+    {
+      "file": "sounds/hydra/death_roar_1.ogg",
+      "seconds": 2.798,
+      "voiceRate": 0.48,
+      "sha256": "3c4dbbd7398844836216080c669f32dd12aae98a35e80a8f74858b5dde9822d4",
+      "bytes": 28547
+    },
+    {
+      "file": "sounds/hydra/death_roar_2.ogg",
+      "seconds": 3.275333333333333,
+      "voiceRate": 0.51,
+      "sha256": "02826f405bb9234c2986d67647703abdf995f6d860d79e824bf4d44a23eb824d",
+      "bytes": 32981
+    },
+    {
+      "file": "sounds/hydra/death_roar_3.ogg",
+      "seconds": 2.8726666666666665,
+      "voiceRate": 0.46,
+      "sha256": "48f51ffa796928f2629bd6f7d8377e94d3b7c6b9b6ccd7f19778f632daecbdaa",
+      "bytes": 28038
+    },
+    {
+      "file": "sounds/hydra/death_debris_loop.ogg",
+      "seconds": 1.944671201814059,
+      "groundSource": "sounds/infection/ground_1.ogg",
+      "groundSha256": "b11d2a4fb450a74a85bcd89e881190daae73d8dc6f41898990c198e4438ec708",
+      "sha256": "7bb282ffdfb0f3c727626f175582f81c41a80fbc26ced64300d4f9cd99a72396",
+      "bytes": 23484
+    }
+  ],
+  "events": {
+    "hydra.death_roar": {
+      "subtitle": "subtitle.blacklight.hydra.death_roar",
+      "sounds": [
+        "blacklight:hydra/death_roar_1",
+        "blacklight:hydra/death_roar_2",
+        "blacklight:hydra/death_roar_3"
+      ]
+    },
+    "hydra.death_whoosh": {
+      "subtitle": "subtitle.blacklight.hydra.death_whoosh",
+      "sounds": [
+        "blacklight:infection/swing_1",
+        "blacklight:infection/swing_2",
+        "blacklight:infection/swing_3"
+      ]
+    },
+    "hydra.death_debris": {
+      "subtitle": "subtitle.blacklight.hydra.death_debris",
+      "sounds": [
+        "blacklight:hydra/death_debris_loop"
+      ]
+    }
+  },
+  "changes": "Recorded voice resampling/time stretching; recorded wet/ground Foley layers; mono44100Hz, filters, bounded fades, limiting and Vorbis. No playback, no timbre-match claim.",
+  "pending": "Listening, real client SoundManager lifecycle and player loudness/identity acceptance."
+}

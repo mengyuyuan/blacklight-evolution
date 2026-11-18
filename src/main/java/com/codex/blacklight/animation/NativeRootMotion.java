@@ -28,7 +28,7 @@ public final class NativeRootMotion {
                 || com.codex.blacklight.registry.ModAttachments.getData(player, ModAttachments.CONSUMING)) return false;
         var visual = com.codex.blacklight.registry.ModAttachments.getData(player, ModAttachments.WEAPON_VISUAL);
         var move = visual.spec();
-        if (move != null) return !move.aerial() && !visual.traveling() && move != WeaponMove.BLADE_RUSH
+        if (move != null) return !move.aerial() && !visual.traveling()
                 && player.level().getGameTime() - visual.started() <= (visual.charging() ? 180 : move.duration);
         return switch (com.codex.blacklight.registry.ModAttachments.getData(player, ModAttachments.CLAW_COMBAT).action()) {
             case AUTO_1, AUTO_2, AUTO_3 -> true;
@@ -70,17 +70,45 @@ public final class NativeRootMotion {
         if (!move.rush() && !move.quake()) {
             var target = player.level().getEntity(visual.targetId());
             if (target instanceof LivingEntity living && living.isAlive()) {
-                var delta = living.position().subtract(player.position());
-                double spacing = Math.max(.8, (player.getBbWidth() + living.getBbWidth()) * .5 + .15);
-                step = standOff(step, delta, Math.max(0, delta.horizontalDistance() - spacing));
+                step = targetStandOff(player, living, step);
             }
         }
         apply(player, step);
     }
 
+    /** A regional lock already names a receiving surface. Parent width belongs
+     * to a root-to-root separation and must not be subtracted from that surface
+     * again. This only limits the existing Coord step; it adds no travel/reach. */
+    public static Vec3 targetStandOff(ServerPlayer player, LivingEntity target, Vec3 step) {
+        boolean multipart=CombatTargeting.multipart(target);
+        var destination=multipart?CombatTargeting.aimPoint(player,player.getEyePosition(),target):target.position();
+        var delta=destination.subtract(player.position());
+        double spacing=Math.max(.8,(player.getBbWidth()+(multipart?0:target.getBbWidth()))*.5+.15);
+        return standOff(step,delta,Math.max(0,delta.horizontalDistance()-spacing));
+    }
+
     public static float weaponClock(int elapsedTick,float offset,float transition) {
         float correction=offset-Math.round(offset*20)/20F;
         return Math.max(offset,elapsedTick/20F-transition+correction);
+    }
+
+    /** The displacement callback owns the same tick as its sharp-edge sweep.
+     * A velocity packet lets client frame/packet timing move this attack an extra
+     * tick, changing which tissue the otherwise identical ribbon intersects. */
+    public static void bladeRush(ServerPlayer player,Vec3 direction,double distance) {
+        bladeRush(player,direction,distance,null);
+    }
+
+    /** A committed rush closes the gap to its own receiver and stops at blade spacing;
+     * it never phases the actor through a living body it is about to cut. */
+    public static void bladeRush(ServerPlayer player,Vec3 direction,double distance,LivingEntity target) {
+        player.setDeltaMovement(0,player.getDeltaMovement().y,0);
+        player.hurtMarked=true;
+        var step=direction.scale(distance);
+        if (target!=null && target.isAlive() && target.level()==player.level()) {
+            step=targetStandOff(player,target,step);
+        }
+        apply(player,step);
     }
 
     public static void claw(ServerPlayer player, ClawCombatState combat) {
@@ -90,9 +118,7 @@ public final class NativeRootMotion {
         var step = direction.normalize().scale(distance);
         var target = CombatTargeting.locked(player);
         if (target != null && target.isAlive()) {
-            var delta = target.position().subtract(player.position());
-            double spacing = Math.max(.8, (player.getBbWidth() + target.getBbWidth()) * .5 + .15);
-            step = standOff(step, delta, Math.max(0, delta.horizontalDistance() - spacing));
+            step=targetStandOff(player,target,step);
         }
         // Legacy claws keep the live walk/run beneath their additive authored lunge.
         // Since this window suppresses stale absolute packets, its ordinary step is owned here too.

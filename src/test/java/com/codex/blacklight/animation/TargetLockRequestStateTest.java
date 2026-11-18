@@ -25,4 +25,18 @@ class TargetLockRequestStateTest {
         int oldLife=state.request(22);state.resetOwner();int newLife=state.request(31);
         assertFalse(state.acknowledge(oldLife,22));assertTrue(state.acknowledge(newLife,31));
     }
+    @Test void sameParentRegionSwitchRequiresItsOwnAcknowledgement() {
+        var state=new TargetLockRequestState();int first=state.request(17,0),second=state.request(17,2);
+        assertFalse(state.acknowledge(first,17,0));assertEquals(2,state.desiredRegion());
+        assertFalse(state.observeAttachment(17,0));assertTrue(state.pending());
+        assertTrue(state.acknowledge(second,17,2));assertFalse(state.observeAttachment(17,0));
+        assertEquals(2,state.desiredRegion());assertFalse(state.observeAttachment(17,2));
+        assertTrue(state.observeAttachment(-1,-1));assertEquals(-1,state.desiredRegion());
+    }
+    @Test void invalidRegionCannotBecomeAPredictedOrAcknowledgedSelection() {
+        var state=new TargetLockRequestState();assertThrows(IllegalArgumentException.class,()->state.request(17,3));
+        assertThrows(IllegalArgumentException.class,()->state.request(-1,0));int request=state.request(17,1);
+        assertFalse(state.acknowledge(request,17,8));assertTrue(state.pending());
+        assertTrue(state.acknowledge(request,-1,-1));assertEquals(-1,state.desiredId());
+    }
 }

@@ -1,0 +1,4228 @@
+{
+  "schema": 1,
+  "status": "Source audit and independent MC module/clip export; Java, tests, game and original native code were not executed.",
+  "sourceHashes": {
+    "input\\startup_fig.p3d.rz": "96d84271e461cbe4566fb984359653b164257f88392c5bceb213c30f88527779",
+    "input\\comparison\\mother_fig.p3d.rz": "f446c9299ac8f06022b907e0c62b9b75e82f1def2729dc0da90a6f92f8043167",
+    "private\\comparison\\mother.p3d": "f67e081a7497191554de61995bdb75fad58cfca1cb53adeb9bd0b15ef8b97df6",
+    "input\\prototypeenginef.dll": "8cba8da3412df4f49cd61d02445e87a0cda551dea4f2fc1e66b19c1bfe28a760"
+  },
+  "identity": {
+    "input": "RightBumper e505977f863e94bb, Pressed 1696ae9aaaedd5da",
+    "clips": {
+      "left": "mother_slug_hit_left ba4b9940b9fff8b1",
+      "right": "mother_slug_hit_right 5c276e28303a13f0"
+    },
+    "notGrab": "GrabSlot tests whether a MotherCore child is attached; neither branch grabs the player.",
+    "leftTip": "Slug_02_Spine_5 3cece9c73ab2dbe6",
+    "rightTip": "Slug_01_Spine_5 0f78a1667d5bb7f1"
+  },
+  "admission": {
+    "source": "startup268248: XZ<25, countdown timer==0, Segment1 OR Segment2 attached. Button pressed0..0.666667 plus Attack action.",
+    "motion": "mother28404 and30660 BOTH have Segment1=true; exact raw bytes44ad392298321a7901000000. Each has Random weight10. This asymmetry is preserved, not repaired based on side names.",
+    "cooldown": "TimerSet268672 writes2sec on entry. It is not an extra post-animation cooldown. Close-wait reset node269400 resets timer0 when targetXZ>=17.",
+    "parallel": "AI parent267820 Spawn267924 close(index15) and267984 shoot(index22). Motion parent20276 Spawn20340 shoot(index32),20400 close(index42). Close must not cancel shooting.",
+    "units": "25/17 are original source distance units. Convert once using the accepted Greene model pixels/source-unit divided16 and current presentation scale, not 25/17 literal blocks."
+  },
+  "animation": {
+    "header": "Both PTRN original clips have76 frames,24fps,loop0; offsets4139859/4164126 in private/comparison/mother.p3d.",
+    "segments": [
+      {
+        "begin": 0,
+        "end": 1,
+        "from": 0,
+        "to": 30,
+        "authoredSpeed": 1,
+        "effectiveSpeed": 1.25,
+        "blendIn": 0.33333298563957214,
+        "blendOut": 0.06666669994592667
+      },
+      {
+        "begin": 1,
+        "end": 1.3333300352096558,
+        "from": 30,
+        "to": 34,
+        "authoredSpeed": 1,
+        "effectiveSpeedFormula": "4/(24*(end-begin))",
+        "blendIn": 0.06666669994592667,
+        "blendOut": 0.06666669994592667
+      },
+      {
+        "begin": 1.3333300352096558,
+        "end": -1,
+        "from": 34,
+        "to": 75,
+        "authoredSpeed": 0.800000011920929,
+        "blendIn": 0.06666669994592667,
+        "blendOut": 0.16666699945926666
+      }
+    ],
+    "speedProof": "108da7cc..108da7fb supplies track duration/speed/start/end to10941ca0. Positive duration and noncyclic driver:10941cd7..10941d38 fits signed clip seconds to duration using109416d0; negative end-time keeps speed at10941d3a. EndFrame=-1 becomes frameCount-1 and clamp. Tail41/(24*.8)=2.1354166sec, whole nominal3.4687467sec.",
+    "completion": "10941b40 checks noncyclic current>=end;108daca0 polls completion;10a7f7b0 ends action;10a7f600 invokes enabled Sequence end callbacks. This is not a fixed2sec animation.",
+    "partitions": "Each segment duplicates default priority1 and slug02(left)/slug01(right) priority-1. Shoot default priority0. 108da9fa/108daaee supplies priority;109392bc..c0 stores it at entry+18. Dirty-list sort1093b370->1093b340->1093b1e0/1093aeb0 uses10939150: this.priority>other.priority returns true, i.e. descending priority list. This proves sorting direction, not the final mixer overwrite/weight evaluation order; do not infer that a larger or smaller number wins visually yet.",
+    "MCmixer": "Standalone helper retains source frames. While shooting, selected native_Slug_0N chain overlays the same shooting base used by render/contact; otherwise source close supplies whole pose. Piecewise frame fitting is proved; partition precedence/linear crossfades and the fade envelope are explicit MC adapters."
+  },
+  "lifecycle": {
+    "event": "AITreeEventSend29248/31504 payload flags1,begin0,end-1,event665691b9b2771fc4. Action enter101f0c30 sends cat2b/subtype9 withphase0; exit101f0cf0 sameeventphase1. Event spelling is unresolved.",
+    "AIwait": "startup268596 OnEvent mask524288 can enter hit/wait268788, whose eventOnEnter is6656... . Opportunity268888 listens to eventOnExit for0..5sec; Sequence268992 returnsclosebank. Native hash event means actual action lifecycle, not HIT damage success.",
+    "motionSequence": "left30356/right32612 register Sequence→index42 closebank. Wait32880 temporarily marks idle and polls input event after.166667sec.",
+    "MCclock": "Observed20Hz poll-before-finalize-before-advance. Every Hit is activated after the current poll; fixed float priorDelta and strict remaining<0 preserved. begin has no hits; firstTIP is following activation. Caller must dedupe same worldtick; reload never catches up.",
+    "MCcompletion": "Clip total computed from proved timing; terminate at first observed .05s clock reaching nominal duration, not an assertion of original engine phase coincidence. Stage/target replacement cancels session. Frame identity/revision prevents stale callback continuation."
+  },
+  "hits": {
+    "order": "TIP first in authored list, thenINNER thenOUTER; no strongest-window reduction.",
+    "common": "UseShapecast=false; CollisionCountMax=-1; TimeBetweenHits=-1; IsThrown=false; UseOriginatorToValidate=false; CollideWith0xc030; transform multipliertrue, weaponfalse; SendAlerttrue. Raw full tracks follow below.",
+    "mask": "P1 bits4Health,5HitReaction,14PedBehaviour,15VehicleBehaviour, ANY-bit intersection (11253f20 registration,10699b61..87). This mask does not contain Prop bit6. MC entity/category correspondence remains an adapter.",
+    "receipts": "Same MotherCore CollisionActionBehaviour,100a4310 bind and100a4970/100a3780 active-count lifetime.10065940 marks BEFORE damage dispatch; a receiver refusing damage still consumes this live receipt. Shared active-scope and>5sec expiry per10065a80. Do not use per-window sets.",
+    "shape": "Current-position sphere, joint-local offset. TIP uses actually present Slug_02/01_Spine_5 with[-2,0,0],radius4; rootwindows Motion_Root[0,0,-6],radius5/7. No capsule/sweep/path from previous pose. Source sphere radius fixed through shape transform; accepted model units/presentation convert once.",
+    "damage": "500/500/200 source damage; firstFriendlyFire.2 then0/0. These are not Minecraft hearts. Native force/mass, friendliness classification, collision direction and HitType reaction implementation are not reconstructed by these geometry helpers.",
+    "MCsafety": "Use same composed pose as renderer, actual victim body boxes/hulls, loaded and border checks. Current-sphere-to-contact block occlusion is an explicit MC wall-protection adapter absent from the proven native overlap layer. No fallback damage if actual geometry misses."
+  },
+  "otherTracks": {
+    "turning": "Both sides spawn bank59 for0..2sec. It uses target-facing bands<10,<30,<120,else; AutoTarget rates3/70/150degsec with hysteresis10/15 at the first band. Root steering integration remains separate.",
+    "camera": "LeftExecute30236 at1.666669965 /right32492 at1.700000048→index48 CameraShakeRequest Large/Large.",
+    "sound": "Patch a2bde1c6dd816e0b unresolved name. Left1.200000048 and1.799999952; right1 and1.666669965. StopExisting,vol1,pitch1,minDistance25/max55. No original waveform imported/played.",
+    "fx": "BothSpawn at1.666669965→effectsindex120. Two shockWave001(03501dfbdb799756) tracks70140/70624, root local[0,1,-10],JointSpace emit/WorldSpaceattach. Firstwindow .0333333..1 withlifeBias2,size2,speed.7; second0...666667 lifeBias.5,size1.5,speed3. Emission windows are not particle lifetimes. No arbitrary white flash/ring is inferred."
+  },
+  "remaining": [
+    "Priority DESCENDING sort is proved; final evaluation/overwrite direction and complete partition mixer, including concurrent default and partition weight normalization, remain unclosed.",
+    "Exact action/puppet phase completion coincidence beyond the proven clip time; MC uses a stated20Hz completion gate.",
+    "Names/receiver implementation of HitType919001ca3cc2c137 and5da4043435eaeeac, event665691b9b2771fc4 and soundpatcha2bd....",
+    "Puppet flag4 conditional joint basis normalization at100a3afa and actual MotherCore flag value; shared mesh basis remains the explicit MC contact geometry contract.",
+    "Native physics impulse/mass response and exact target-category mapping. No source numerical damage is presented as MC balance.",
+    "Live world/renderer/phase interruption acceptance is deferred; independent tests were authored, not run."
+  ],
+  "records": [
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 267820,
+      "payload": 267832,
+      "length": 20,
+      "type": "Node",
+      "kind": "BranchHash",
+      "owner": "engage_mother/mother_core/engage/engage/#d21eea72961db6e0/attack/#fc7f04ceefd03173",
+      "end": 272736
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 267852,
+      "payload": 267864,
+      "length": 0,
+      "type": "Conditions",
+      "kind": "PropertyHash",
+      "owner": "engage_mother/mother_core/engage/engage/#d21eea72961db6e0/attack/#fc7f04ceefd03173",
+      "end": 267912
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 267864,
+      "payload": 267876,
+      "length": 20,
+      "type": "TargetDistance",
+      "kind": "ConditionHash",
+      "owner": "engage_mother/mother_core/engage/engage/#d21eea72961db6e0/attack/#fc7f04ceefd03173",
+      "fields": {
+        "Direction": {
+          "hash": "5772786",
+          "name": "XZ"
+        },
+        "Compare": {
+          "hash": "60",
+          "name": "LessThan"
+        },
+        "Distance": 150
+      },
+      "schema": "TargetDistanceCondition",
+      "end": 267904
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 267912,
+      "payload": 267924,
+      "length": 0,
+      "type": "Tracks",
+      "kind": "PropertyHash",
+      "owner": "engage_mother/mother_core/engage/engage/#d21eea72961db6e0/attack/#fc7f04ceefd03173",
+      "end": 268200
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 267924,
+      "payload": 267936,
+      "length": 20,
+      "type": "Spawn",
+      "kind": "TrackHash",
+      "owner": "engage_mother/mother_core/engage/engage/#d21eea72961db6e0/attack/#fc7f04ceefd03173",
+      "fields": {
+        "Unknown1": 0,
+        "TimeBegin": 0,
+        "TimeEnd": -1,
+        "BranchRef": {
+          "name": "",
+          "index": 15
+        }
+      },
+      "schema": "SpawnTrack",
+      "end": 267984
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 267956,
+      "payload": 267968,
+      "length": 0,
+      "type": "Conditions",
+      "kind": "PropertyHash",
+      "owner": "engage_mother/mother_core/engage/engage/#d21eea72961db6e0/attack/#fc7f04ceefd03173",
+      "end": 267976
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 267984,
+      "payload": 267996,
+      "length": 20,
+      "type": "Spawn",
+      "kind": "TrackHash",
+      "owner": "engage_mother/mother_core/engage/engage/#d21eea72961db6e0/attack/#fc7f04ceefd03173",
+      "fields": {
+        "Unknown1": 0,
+        "TimeBegin": 0,
+        "TimeEnd": -1,
+        "BranchRef": {
+          "name": "",
+          "index": 22
+        }
+      },
+      "schema": "SpawnTrack",
+      "end": 268044
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 268016,
+      "payload": 268028,
+      "length": 0,
+      "type": "Conditions",
+      "kind": "PropertyHash",
+      "owner": "engage_mother/mother_core/engage/engage/#d21eea72961db6e0/attack/#fc7f04ceefd03173",
+      "end": 268036
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 268044,
+      "payload": 268056,
+      "length": 28,
+      "type": "Opportunity",
+      "kind": "TrackHash",
+      "owner": "engage_mother/mother_core/engage/engage/#d21eea72961db6e0/attack/#fc7f04ceefd03173",
+      "fields": {
+        "Unknown1": 1,
+        "TimeBegin": 0,
+        "TimeEnd": -1,
+        "TimeHook": 0,
+        "BranchRef": {
+          "name": "",
+          "index": 8
+        },
+        "Priority": 0
+      },
+      "schema": "OpportunityTrack",
+      "end": 268192
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 268084,
+      "payload": 268096,
+      "length": 0,
+      "type": "Conditions",
+      "kind": "PropertyHash",
+      "owner": "engage_mother/mother_core/engage/engage/#d21eea72961db6e0/attack/#fc7f04ceefd03173",
+      "end": 268184
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 268096,
+      "payload": 268108,
+      "length": 20,
+      "type": "VariableIntCompare",
+      "kind": "ConditionHash",
+      "owner": "engage_mother/mother_core/engage/engage/#d21eea72961db6e0/attack/#fc7f04ceefd03173",
+      "fields": {
+        "Variable": {
+          "hash": "10253442148402101001",
+          "name": "#8e4b8b4f14867b09"
+        },
+        "Compare": {
+          "hash": "4001598",
+          "name": "Equal"
+        },
+        "Value": 1
+      },
+      "schema": "VariableIntCompareCondition",
+      "end": 268136
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 268136,
+      "payload": 268148,
+      "length": 20,
+      "type": "VariableIntCompare",
+      "kind": "ConditionHash",
+      "owner": "engage_mother/mother_core/engage/engage/#d21eea72961db6e0/attack/#fc7f04ceefd03173",
+      "fields": {
+        "Variable": {
+          "hash": "15144834989994929014",
+          "name": "#d22d432ec08deb76"
+        },
+        "Compare": {
+          "hash": "4001598",
+          "name": "Equal"
+        },
+        "Value": 1
+      },
+      "schema": "VariableIntCompareCondition",
+      "end": 268176
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 268200,
+      "payload": 268212,
+      "length": 16,
+      "type": "Bank",
+      "kind": "BranchHash",
+      "owner": "engage_mother/mother_core/engage/engage/#d21eea72961db6e0/attack/#fc7f04ceefd03173/#c110956176ae50cb",
+      "end": 269808
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 268228,
+      "payload": 268240,
+      "length": 0,
+      "type": "Conditions",
+      "kind": "PropertyHash",
+      "owner": "engage_mother/mother_core/engage/engage/#d21eea72961db6e0/attack/#fc7f04ceefd03173/#c110956176ae50cb",
+      "end": 268248
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 268248,
+      "payload": 268260,
+      "length": 20,
+      "type": "Node",
+      "kind": "BranchHash",
+      "owner": "engage_mother/mother_core/engage/engage/#d21eea72961db6e0/attack/#fc7f04ceefd03173/#c110956176ae50cb/hit",
+      "end": 269076
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 268280,
+      "payload": 268292,
+      "length": 0,
+      "type": "Conditions",
+      "kind": "PropertyHash",
+      "owner": "engage_mother/mother_core/engage/engage/#d21eea72961db6e0/attack/#fc7f04ceefd03173/#c110956176ae50cb/hit",
+      "end": 268504
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 268292,
+      "payload": 268304,
+      "length": 20,
+      "type": "TargetDistance",
+      "kind": "ConditionHash",
+      "owner": "engage_mother/mother_core/engage/engage/#d21eea72961db6e0/attack/#fc7f04ceefd03173/#c110956176ae50cb/hit",
+      "fields": {
+        "Direction": {
+          "hash": "5772786",
+          "name": "XZ"
+        },
+        "Compare": {
+          "hash": "60",
+          "name": "LessThan"
+        },
+        "Distance": 25
+      },
+      "schema": "TargetDistanceCondition",
+      "end": 268332
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 268332,
+      "payload": 268344,
+      "length": 20,
+      "type": "TimerCompare",
+      "kind": "ConditionHash",
+      "owner": "engage_mother/mother_core/engage/engage/#d21eea72961db6e0/attack/#fc7f04ceefd03173/#c110956176ae50cb/hit",
+      "fields": {
+        "Timer": {
+          "hash": "7126733602096152457",
+          "name": "#62e73e73b9c7ff89"
+        },
+        "Compare": {
+          "hash": "4001598",
+          "name": "Equal"
+        },
+        "Time": 0
+      },
+      "schema": "TimerCompareCondition",
+      "end": 268372
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 268372,
+      "payload": 268384,
+      "length": 0,
+      "type": "ConditionGroup",
+      "kind": "ConditionHash",
+      "owner": "engage_mother/mother_core/engage/engage/#d21eea72961db6e0/attack/#fc7f04ceefd03173/#c110956176ae50cb/hit",
+      "fields": {},
+      "schema": "ConditionGroupCondition",
+      "end": 268496
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 268384,
+      "payload": 268396,
+      "length": 0,
+      "type": "Conditions",
+      "kind": "PropertyHash",
+      "owner": "engage_mother/mother_core/engage/engage/#d21eea72961db6e0/attack/#fc7f04ceefd03173/#c110956176ae50cb/hit",
+      "end": 268488
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 268396,
+      "payload": 268408,
+      "length": 12,
+      "type": "GrabSlot",
+      "kind": "ConditionHash",
+      "owner": "engage_mother/mother_core/engage/engage/#d21eea72961db6e0/attack/#fc7f04ceefd03173/#c110956176ae50cb/hit",
+      "fields": {
+        "GrabSlotHash": {
+          "hash": "8726342856974380356",
+          "name": "#791a32982239ad44"
+        },
+        "IsGrabbing": true
+      },
+      "schema": "GrabSlotCondition",
+      "end": 268428
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 268428,
+      "payload": 268440,
+      "length": 0,
+      "type": "Or",
+      "kind": "ConditionHash",
+      "owner": "engage_mother/mother_core/engage/engage/#d21eea72961db6e0/attack/#fc7f04ceefd03173/#c110956176ae50cb/hit",
+      "fields": {},
+      "schema": "OrCondition",
+      "end": 268448
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 268448,
+      "payload": 268460,
+      "length": 12,
+      "type": "GrabSlot",
+      "kind": "ConditionHash",
+      "owner": "engage_mother/mother_core/engage/engage/#d21eea72961db6e0/attack/#fc7f04ceefd03173/#c110956176ae50cb/hit",
+      "fields": {
+        "GrabSlotHash": {
+          "hash": "8726342856974380359",
+          "name": "#791a32982239ad47"
+        },
+        "IsGrabbing": true
+      },
+      "schema": "GrabSlotCondition",
+      "end": 268480
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 268504,
+      "payload": 268516,
+      "length": 0,
+      "type": "Tracks",
+      "kind": "PropertyHash",
+      "owner": "engage_mother/mother_core/engage/engage/#d21eea72961db6e0/attack/#fc7f04ceefd03173/#c110956176ae50cb/hit",
+      "end": 268788
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 268516,
+      "payload": 268528,
+      "length": 20,
+      "type": "Action",
+      "kind": "TrackHash",
+      "owner": "engage_mother/mother_core/engage/engage/#d21eea72961db6e0/attack/#fc7f04ceefd03173/#c110956176ae50cb/hit",
+      "fields": {
+        "Unknown1": 0,
+        "TimeBegin": 0,
+        "TimeEnd": 0.6666669845581055,
+        "Button": {
+          "hash": "16502762983537939643",
+          "name": "#e505977f863e94bb"
+        }
+      },
+      "schema": "ActionTrack",
+      "end": 268556
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 268556,
+      "payload": 268568,
+      "length": 20,
+      "type": "Action",
+      "kind": "TrackHash",
+      "owner": "engage_mother/mother_core/engage/engage/#d21eea72961db6e0/attack/#fc7f04ceefd03173/#c110956176ae50cb/hit",
+      "fields": {
+        "Unknown1": 1,
+        "TimeBegin": 0,
+        "TimeEnd": -1,
+        "Button": {
+          "hash": "17648781240126830036",
+          "name": "Attack"
+        }
+      },
+      "schema": "ActionTrack",
+      "end": 268596
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 268596,
+      "payload": 268608,
+      "length": 36,
+      "type": "OnEvent",
+      "kind": "TrackHash",
+      "owner": "engage_mother/mother_core/engage/engage/#d21eea72961db6e0/attack/#fc7f04ceefd03173/#c110956176ae50cb/hit",
+      "fields": {
+        "Unknown1": 1,
+        "BeginTime": 0,
+        "EndTime": -1,
+        "HookTime": 0,
+        "EventMask": 524288,
+        "InitialTest": true,
+        "BranchRef": {
+          "name": "",
+          "index": 17
+        },
+        "Priority": 0
+      },
+      "schema": "OnEventTrack",
+      "end": 268672
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 268644,
+      "payload": 268656,
+      "length": 0,
+      "type": "Conditions",
+      "kind": "PropertyHash",
+      "owner": "engage_mother/mother_core/engage/engage/#d21eea72961db6e0/attack/#fc7f04ceefd03173/#c110956176ae50cb/hit",
+      "end": 268664
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 268672,
+      "payload": 268684,
+      "length": 28,
+      "type": "TimerSet",
+      "kind": "TrackHash",
+      "owner": "engage_mother/mother_core/engage/engage/#d21eea72961db6e0/attack/#fc7f04ceefd03173/#c110956176ae50cb/hit",
+      "fields": {
+        "Unknown1": 1,
+        "TimeBegin": 0,
+        "Timer": {
+          "hash": "7126733602096152457",
+          "name": "#62e73e73b9c7ff89"
+        },
+        "Time": 2,
+        "Incrementing": false,
+        "RandomRange": 0
+      },
+      "schema": "TimerSetTrack",
+      "end": 268720
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 268720,
+      "payload": 268732,
+      "length": 20,
+      "type": "Sequence",
+      "kind": "TrackHash",
+      "owner": "engage_mother/mother_core/engage/engage/#d21eea72961db6e0/attack/#fc7f04ceefd03173/#c110956176ae50cb/hit",
+      "fields": {
+        "Unknown1": 1,
+        "TimeBegin": 0,
+        "BranchRef": {
+          "name": "",
+          "index": 15
+        },
+        "Priority": 1
+      },
+      "schema": "SequenceTrack",
+      "end": 268780
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 268752,
+      "payload": 268764,
+      "length": 0,
+      "type": "Conditions",
+      "kind": "PropertyHash",
+      "owner": "engage_mother/mother_core/engage/engage/#d21eea72961db6e0/attack/#fc7f04ceefd03173/#c110956176ae50cb/hit",
+      "end": 268772
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 268788,
+      "payload": 268800,
+      "length": 20,
+      "type": "Node",
+      "kind": "BranchHash",
+      "owner": "engage_mother/mother_core/engage/engage/#d21eea72961db6e0/attack/#fc7f04ceefd03173/#c110956176ae50cb/hit/wait",
+      "end": 269068
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 268820,
+      "payload": 268832,
+      "length": 0,
+      "type": "Conditions",
+      "kind": "PropertyHash",
+      "owner": "engage_mother/mother_core/engage/engage/#d21eea72961db6e0/attack/#fc7f04ceefd03173/#c110956176ae50cb/hit/wait",
+      "end": 268876
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 268832,
+      "payload": 268844,
+      "length": 16,
+      "type": "Event",
+      "kind": "ConditionHash",
+      "owner": "engage_mother/mother_core/engage/engage/#d21eea72961db6e0/attack/#fc7f04ceefd03173/#c110956176ae50cb/hit/wait",
+      "fields": {
+        "Event": {
+          "hash": "7374241666614894532",
+          "name": "#665691b9b2771fc4"
+        },
+        "When": {
+          "hash": "4674110501632545327",
+          "name": "OnEnter"
+        }
+      },
+      "schema": "EventCondition",
+      "end": 268868
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 268876,
+      "payload": 268888,
+      "length": 0,
+      "type": "Tracks",
+      "kind": "PropertyHash",
+      "owner": "engage_mother/mother_core/engage/engage/#d21eea72961db6e0/attack/#fc7f04ceefd03173/#c110956176ae50cb/hit/wait",
+      "end": 269060
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 268888,
+      "payload": 268900,
+      "length": 28,
+      "type": "Opportunity",
+      "kind": "TrackHash",
+      "owner": "engage_mother/mother_core/engage/engage/#d21eea72961db6e0/attack/#fc7f04ceefd03173/#c110956176ae50cb/hit/wait",
+      "fields": {
+        "Unknown1": 0,
+        "TimeBegin": 0,
+        "TimeEnd": 5,
+        "TimeHook": 0,
+        "BranchRef": {
+          "name": "",
+          "index": 15
+        },
+        "Priority": 0
+      },
+      "schema": "OpportunityTrack",
+      "end": 268992
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 268928,
+      "payload": 268940,
+      "length": 0,
+      "type": "Conditions",
+      "kind": "PropertyHash",
+      "owner": "engage_mother/mother_core/engage/engage/#d21eea72961db6e0/attack/#fc7f04ceefd03173/#c110956176ae50cb/hit/wait",
+      "end": 268984
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 268940,
+      "payload": 268952,
+      "length": 16,
+      "type": "Event",
+      "kind": "ConditionHash",
+      "owner": "engage_mother/mother_core/engage/engage/#d21eea72961db6e0/attack/#fc7f04ceefd03173/#c110956176ae50cb/hit/wait",
+      "fields": {
+        "Event": {
+          "hash": "7374241666614894532",
+          "name": "#665691b9b2771fc4"
+        },
+        "When": {
+          "hash": "10613578434616600639",
+          "name": "OnExit"
+        }
+      },
+      "schema": "EventCondition",
+      "end": 268976
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 268992,
+      "payload": 269004,
+      "length": 20,
+      "type": "Sequence",
+      "kind": "TrackHash",
+      "owner": "engage_mother/mother_core/engage/engage/#d21eea72961db6e0/attack/#fc7f04ceefd03173/#c110956176ae50cb/hit/wait",
+      "fields": {
+        "Unknown1": 1,
+        "TimeBegin": 0,
+        "BranchRef": {
+          "name": "",
+          "index": 15
+        },
+        "Priority": 1
+      },
+      "schema": "SequenceTrack",
+      "end": 269052
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 269024,
+      "payload": 269036,
+      "length": 0,
+      "type": "Conditions",
+      "kind": "PropertyHash",
+      "owner": "engage_mother/mother_core/engage/engage/#d21eea72961db6e0/attack/#fc7f04ceefd03173/#c110956176ae50cb/hit/wait",
+      "end": 269044
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 269076,
+      "payload": 269088,
+      "length": 20,
+      "type": "Node",
+      "kind": "BranchHash",
+      "owner": "engage_mother/mother_core/engage/engage/#d21eea72961db6e0/attack/#fc7f04ceefd03173/#c110956176ae50cb/wait",
+      "end": 269800
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 269108,
+      "payload": 269120,
+      "length": 0,
+      "type": "Conditions",
+      "kind": "PropertyHash",
+      "owner": "engage_mother/mother_core/engage/engage/#d21eea72961db6e0/attack/#fc7f04ceefd03173/#c110956176ae50cb/wait",
+      "end": 269128
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 269128,
+      "payload": 269140,
+      "length": 0,
+      "type": "Tracks",
+      "kind": "PropertyHash",
+      "owner": "engage_mother/mother_core/engage/engage/#d21eea72961db6e0/attack/#fc7f04ceefd03173/#c110956176ae50cb/wait",
+      "end": 269352
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 269140,
+      "payload": 269152,
+      "length": 56,
+      "type": "VariableIntTemporarySet",
+      "kind": "TrackHash",
+      "owner": "engage_mother/mother_core/engage/engage/#d21eea72961db6e0/attack/#fc7f04ceefd03173/#c110956176ae50cb/wait",
+      "fields": {
+        "Unknown1": 0,
+        "TimeBegin": 0,
+        "TimeEnd": -1,
+        "Variable": {
+          "hash": "10253442148402101001",
+          "name": "#8e4b8b4f14867b09"
+        },
+        "GrabSlot": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "UseGrabber": false,
+        "OperatorBegin": {
+          "hash": "61",
+          "name": "#3d"
+        },
+        "OperatorEnd": {
+          "hash": "61",
+          "name": "#3d"
+        },
+        "BeginValue": 1,
+        "EndValue": 0
+      },
+      "schema": "VariableIntTemporarySetTrack",
+      "end": 269216
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 269216,
+      "payload": 269228,
+      "length": 28,
+      "type": "Opportunity",
+      "kind": "TrackHash",
+      "owner": "engage_mother/mother_core/engage/engage/#d21eea72961db6e0/attack/#fc7f04ceefd03173/#c110956176ae50cb/wait",
+      "fields": {
+        "Unknown1": 0,
+        "TimeBegin": 0,
+        "TimeEnd": -1,
+        "TimeHook": 0,
+        "BranchRef": {
+          "name": "",
+          "index": 15
+        },
+        "Priority": 0
+      },
+      "schema": "OpportunityTrack",
+      "end": 269284
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 269256,
+      "payload": 269268,
+      "length": 0,
+      "type": "Conditions",
+      "kind": "PropertyHash",
+      "owner": "engage_mother/mother_core/engage/engage/#d21eea72961db6e0/attack/#fc7f04ceefd03173/#c110956176ae50cb/wait",
+      "end": 269276
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 269284,
+      "payload": 269296,
+      "length": 20,
+      "type": "Spawn",
+      "kind": "TrackHash",
+      "owner": "engage_mother/mother_core/engage/engage/#d21eea72961db6e0/attack/#fc7f04ceefd03173/#c110956176ae50cb/wait",
+      "fields": {
+        "Unknown1": 1,
+        "TimeBegin": 0,
+        "TimeEnd": -1,
+        "BranchRef": {
+          "name": "",
+          "index": 19
+        }
+      },
+      "schema": "SpawnTrack",
+      "end": 269344
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 269316,
+      "payload": 269328,
+      "length": 0,
+      "type": "Conditions",
+      "kind": "PropertyHash",
+      "owner": "engage_mother/mother_core/engage/engage/#d21eea72961db6e0/attack/#fc7f04ceefd03173/#c110956176ae50cb/wait",
+      "end": 269336
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 269352,
+      "payload": 269364,
+      "length": 16,
+      "type": "Bank",
+      "kind": "BranchHash",
+      "owner": "engage_mother/mother_core/engage/engage/#d21eea72961db6e0/attack/#fc7f04ceefd03173/#c110956176ae50cb/wait/#b727857c778ea507",
+      "end": 269792
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 269380,
+      "payload": 269392,
+      "length": 0,
+      "type": "Conditions",
+      "kind": "PropertyHash",
+      "owner": "engage_mother/mother_core/engage/engage/#d21eea72961db6e0/attack/#fc7f04ceefd03173/#c110956176ae50cb/wait/#b727857c778ea507",
+      "end": 269400
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 269400,
+      "payload": 269412,
+      "length": 20,
+      "type": "Node",
+      "kind": "BranchHash",
+      "owner": "engage_mother/mother_core/engage/engage/#d21eea72961db6e0/attack/#fc7f04ceefd03173/#c110956176ae50cb/wait/#b727857c778ea507/reset",
+      "end": 269636
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 269432,
+      "payload": 269444,
+      "length": 0,
+      "type": "Conditions",
+      "kind": "PropertyHash",
+      "owner": "engage_mother/mother_core/engage/engage/#d21eea72961db6e0/attack/#fc7f04ceefd03173/#c110956176ae50cb/wait/#b727857c778ea507/reset",
+      "end": 269492
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 269444,
+      "payload": 269456,
+      "length": 20,
+      "type": "TargetDistance",
+      "kind": "ConditionHash",
+      "owner": "engage_mother/mother_core/engage/engage/#d21eea72961db6e0/attack/#fc7f04ceefd03173/#c110956176ae50cb/wait/#b727857c778ea507/reset",
+      "fields": {
+        "Direction": {
+          "hash": "5772786",
+          "name": "XZ"
+        },
+        "Compare": {
+          "hash": "4067199",
+          "name": "MoreThanOrEqual"
+        },
+        "Distance": 17
+      },
+      "schema": "TargetDistanceCondition",
+      "end": 269484
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 269492,
+      "payload": 269504,
+      "length": 0,
+      "type": "Tracks",
+      "kind": "PropertyHash",
+      "owner": "engage_mother/mother_core/engage/engage/#d21eea72961db6e0/attack/#fc7f04ceefd03173/#c110956176ae50cb/wait/#b727857c778ea507/reset",
+      "end": 269628
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 269504,
+      "payload": 269516,
+      "length": 28,
+      "type": "TimerSet",
+      "kind": "TrackHash",
+      "owner": "engage_mother/mother_core/engage/engage/#d21eea72961db6e0/attack/#fc7f04ceefd03173/#c110956176ae50cb/wait/#b727857c778ea507/reset",
+      "fields": {
+        "Unknown1": 1,
+        "TimeBegin": 0,
+        "Timer": {
+          "hash": "7126733602096152457",
+          "name": "#62e73e73b9c7ff89"
+        },
+        "Time": 0,
+        "Incrementing": false,
+        "RandomRange": 0
+      },
+      "schema": "TimerSetTrack",
+      "end": 269552
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 269552,
+      "payload": 269564,
+      "length": 28,
+      "type": "Opportunity",
+      "kind": "TrackHash",
+      "owner": "engage_mother/mother_core/engage/engage/#d21eea72961db6e0/attack/#fc7f04ceefd03173/#c110956176ae50cb/wait/#b727857c778ea507/reset",
+      "fields": {
+        "Unknown1": 0,
+        "TimeBegin": 0,
+        "TimeEnd": -1,
+        "TimeHook": 0,
+        "BranchRef": {
+          "name": "",
+          "index": 19
+        },
+        "Priority": 0
+      },
+      "schema": "OpportunityTrack",
+      "end": 269620
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 269592,
+      "payload": 269604,
+      "length": 0,
+      "type": "Conditions",
+      "kind": "PropertyHash",
+      "owner": "engage_mother/mother_core/engage/engage/#d21eea72961db6e0/attack/#fc7f04ceefd03173/#c110956176ae50cb/wait/#b727857c778ea507/reset",
+      "end": 269612
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 269636,
+      "payload": 269648,
+      "length": 20,
+      "type": "Node",
+      "kind": "BranchHash",
+      "owner": "engage_mother/mother_core/engage/engage/#d21eea72961db6e0/attack/#fc7f04ceefd03173/#c110956176ae50cb/wait/#b727857c778ea507/default",
+      "end": 269784
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 269668,
+      "payload": 269680,
+      "length": 0,
+      "type": "Conditions",
+      "kind": "PropertyHash",
+      "owner": "engage_mother/mother_core/engage/engage/#d21eea72961db6e0/attack/#fc7f04ceefd03173/#c110956176ae50cb/wait/#b727857c778ea507/default",
+      "end": 269688
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 269688,
+      "payload": 269700,
+      "length": 0,
+      "type": "Tracks",
+      "kind": "PropertyHash",
+      "owner": "engage_mother/mother_core/engage/engage/#d21eea72961db6e0/attack/#fc7f04ceefd03173/#c110956176ae50cb/wait/#b727857c778ea507/default",
+      "end": 269776
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 269700,
+      "payload": 269712,
+      "length": 28,
+      "type": "Opportunity",
+      "kind": "TrackHash",
+      "owner": "engage_mother/mother_core/engage/engage/#d21eea72961db6e0/attack/#fc7f04ceefd03173/#c110956176ae50cb/wait/#b727857c778ea507/default",
+      "fields": {
+        "Unknown1": 0,
+        "TimeBegin": 0,
+        "TimeEnd": -1,
+        "TimeHook": 0,
+        "BranchRef": {
+          "name": "",
+          "index": 19
+        },
+        "Priority": 0
+      },
+      "schema": "OpportunityTrack",
+      "end": 269768
+    },
+    {
+      "source": "startup_fig.p3d.rz",
+      "offset": 269740,
+      "payload": 269752,
+      "length": 0,
+      "type": "Conditions",
+      "kind": "PropertyHash",
+      "owner": "engage_mother/mother_core/engage/engage/#d21eea72961db6e0/attack/#fc7f04ceefd03173/#c110956176ae50cb/wait/#b727857c778ea507/default",
+      "end": 269760
+    },
+    {
+      "source": "comparison/mother_fig.p3d.rz",
+      "offset": 20276,
+      "payload": 20288,
+      "length": 20,
+      "type": "Node",
+      "kind": "BranchHash",
+      "owner": "mother_core/opening/Outside/attacks/#fc7f04ceefd03173",
+      "end": 33436
+    },
+    {
+      "source": "comparison/mother_fig.p3d.rz",
+      "offset": 20308,
+      "payload": 20320,
+      "length": 0,
+      "type": "Conditions",
+      "kind": "PropertyHash",
+      "owner": "mother_core/opening/Outside/attacks/#fc7f04ceefd03173",
+      "end": 20328
+    },
+    {
+      "source": "comparison/mother_fig.p3d.rz",
+      "offset": 20328,
+      "payload": 20340,
+      "length": 0,
+      "type": "Tracks",
+      "kind": "PropertyHash",
+      "owner": "mother_core/opening/Outside/attacks/#fc7f04ceefd03173",
+      "end": 20692
+    },
+    {
+      "source": "comparison/mother_fig.p3d.rz",
+      "offset": 20340,
+      "payload": 20352,
+      "length": 20,
+      "type": "Spawn",
+      "kind": "TrackHash",
+      "owner": "mother_core/opening/Outside/attacks/#fc7f04ceefd03173",
+      "fields": {
+        "Unknown1": 0,
+        "TimeBegin": 0,
+        "TimeEnd": -1,
+        "BranchRef": {
+          "name": "",
+          "index": 32
+        }
+      },
+      "schema": "SpawnTrack",
+      "end": 20400
+    },
+    {
+      "source": "comparison/mother_fig.p3d.rz",
+      "offset": 20372,
+      "payload": 20384,
+      "length": 0,
+      "type": "Conditions",
+      "kind": "PropertyHash",
+      "owner": "mother_core/opening/Outside/attacks/#fc7f04ceefd03173",
+      "end": 20392
+    },
+    {
+      "source": "comparison/mother_fig.p3d.rz",
+      "offset": 20400,
+      "payload": 20412,
+      "length": 20,
+      "type": "Spawn",
+      "kind": "TrackHash",
+      "owner": "mother_core/opening/Outside/attacks/#fc7f04ceefd03173",
+      "fields": {
+        "Unknown1": 0,
+        "TimeBegin": 0,
+        "TimeEnd": -1,
+        "BranchRef": {
+          "name": "",
+          "index": 42
+        }
+      },
+      "schema": "SpawnTrack",
+      "end": 20460
+    },
+    {
+      "source": "comparison/mother_fig.p3d.rz",
+      "offset": 20432,
+      "payload": 20444,
+      "length": 0,
+      "type": "Conditions",
+      "kind": "PropertyHash",
+      "owner": "mother_core/opening/Outside/attacks/#fc7f04ceefd03173",
+      "end": 20452
+    },
+    {
+      "source": "comparison/mother_fig.p3d.rz",
+      "offset": 20460,
+      "payload": 20472,
+      "length": 36,
+      "type": "OnEvent",
+      "kind": "TrackHash",
+      "owner": "mother_core/opening/Outside/attacks/#fc7f04ceefd03173",
+      "fields": {
+        "Unknown1": 1,
+        "BeginTime": 0,
+        "EndTime": -1,
+        "HookTime": 0,
+        "EventMask": 263172,
+        "InitialTest": true,
+        "BranchRef": {
+          "name": "",
+          "index": 12
+        },
+        "Priority": 0
+      },
+      "schema": "OnEventTrack",
+      "end": 20536
+    },
+    {
+      "source": "comparison/mother_fig.p3d.rz",
+      "offset": 20508,
+      "payload": 20520,
+      "length": 0,
+      "type": "Conditions",
+      "kind": "PropertyHash",
+      "owner": "mother_core/opening/Outside/attacks/#fc7f04ceefd03173",
+      "end": 20528
+    },
+    {
+      "source": "comparison/mother_fig.p3d.rz",
+      "offset": 20536,
+      "payload": 20548,
+      "length": 28,
+      "type": "Opportunity",
+      "kind": "TrackHash",
+      "owner": "mother_core/opening/Outside/attacks/#fc7f04ceefd03173",
+      "fields": {
+        "Unknown1": 1,
+        "TimeBegin": 0,
+        "TimeEnd": -1,
+        "TimeHook": 0,
+        "BranchRef": {
+          "name": "",
+          "index": 10
+        },
+        "Priority": 0
+      },
+      "schema": "OpportunityTrack",
+      "end": 20684
+    },
+    {
+      "source": "comparison/mother_fig.p3d.rz",
+      "offset": 20576,
+      "payload": 20588,
+      "length": 0,
+      "type": "Conditions",
+      "kind": "PropertyHash",
+      "owner": "mother_core/opening/Outside/attacks/#fc7f04ceefd03173",
+      "end": 20676
+    },
+    {
+      "source": "comparison/mother_fig.p3d.rz",
+      "offset": 20588,
+      "payload": 20600,
+      "length": 20,
+      "type": "VariableIntCompare",
+      "kind": "ConditionHash",
+      "owner": "mother_core/opening/Outside/attacks/#fc7f04ceefd03173",
+      "fields": {
+        "Variable": {
+          "hash": "8807688422555611136",
+          "name": "#7a3b31f486bf7000"
+        },
+        "Compare": {
+          "hash": "2164770",
+          "name": "NotEqual"
+        },
+        "Value": 0
+      },
+      "schema": "VariableIntCompareCondition",
+      "end": 20628
+    },
+    {
+      "source": "comparison/mother_fig.p3d.rz",
+      "offset": 20628,
+      "payload": 20640,
+      "length": 20,
+      "type": "VariableIntCompare",
+      "kind": "ConditionHash",
+      "owner": "mother_core/opening/Outside/attacks/#fc7f04ceefd03173",
+      "fields": {
+        "Variable": {
+          "hash": "14611053639986884603",
+          "name": "#cac4e3df7598affb"
+        },
+        "Compare": {
+          "hash": "2164770",
+          "name": "NotEqual"
+        },
+        "Value": 0
+      },
+      "schema": "VariableIntCompareCondition",
+      "end": 20668
+    },
+    {
+      "source": "comparison/mother_fig.p3d.rz",
+      "offset": 28204,
+      "payload": 28216,
+      "length": 16,
+      "type": "Bank",
+      "kind": "BranchHash",
+      "owner": "mother_core/opening/Outside/attacks/#fc7f04ceefd03173/#7354cfd1302e71",
+      "end": 33428
+    },
+    {
+      "source": "comparison/mother_fig.p3d.rz",
+      "offset": 28232,
+      "payload": 28244,
+      "length": 0,
+      "type": "Conditions",
+      "kind": "PropertyHash",
+      "owner": "mother_core/opening/Outside/attacks/#fc7f04ceefd03173/#7354cfd1302e71",
+      "end": 28252
+    },
+    {
+      "source": "comparison/mother_fig.p3d.rz",
+      "offset": 28252,
+      "payload": 28264,
+      "length": 16,
+      "type": "Bank",
+      "kind": "BranchHash",
+      "owner": "mother_core/opening/Outside/attacks/#fc7f04ceefd03173/#7354cfd1302e71/hit",
+      "end": 32880
+    },
+    {
+      "source": "comparison/mother_fig.p3d.rz",
+      "offset": 28280,
+      "payload": 28292,
+      "length": 0,
+      "type": "Conditions",
+      "kind": "PropertyHash",
+      "owner": "mother_core/opening/Outside/attacks/#fc7f04ceefd03173/#7354cfd1302e71/hit",
+      "end": 28360
+    },
+    {
+      "source": "comparison/mother_fig.p3d.rz",
+      "offset": 28292,
+      "payload": 28304,
+      "length": 40,
+      "type": "Input",
+      "kind": "ConditionHash",
+      "owner": "mother_core/opening/Outside/attacks/#fc7f04ceefd03173/#7354cfd1302e71/hit",
+      "fields": {
+        "Button": {
+          "hash": "16502762983537939643",
+          "name": "#e505977f863e94bb"
+        },
+        "ButtonState": {
+          "hash": "1627680294656923098",
+          "name": "#1696ae9aaaedd5da"
+        },
+        "CompareTime": {
+          "hash": "4067199",
+          "name": "MoreThanOrEqual"
+        },
+        "Time": 0,
+        "CompareValue": {
+          "hash": "4067199",
+          "name": "MoreThanOrEqual"
+        },
+        "Value": 0
+      },
+      "schema": "InputCondition",
+      "end": 28352
+    },
+    {
+      "source": "comparison/mother_fig.p3d.rz",
+      "offset": 28360,
+      "payload": 28372,
+      "length": 20,
+      "type": "Node",
+      "kind": "BranchHash",
+      "owner": "mother_core/opening/Outside/attacks/#fc7f04ceefd03173/#7354cfd1302e71/hit/left",
+      "end": 30616
+    },
+    {
+      "source": "comparison/mother_fig.p3d.rz",
+      "offset": 28392,
+      "payload": 28404,
+      "length": 0,
+      "type": "Conditions",
+      "kind": "PropertyHash",
+      "owner": "mother_core/opening/Outside/attacks/#fc7f04ceefd03173/#7354cfd1302e71/hit/left",
+      "end": 28468
+    },
+    {
+      "source": "comparison/mother_fig.p3d.rz",
+      "offset": 28404,
+      "payload": 28416,
+      "length": 12,
+      "type": "GrabSlot",
+      "kind": "ConditionHash",
+      "owner": "mother_core/opening/Outside/attacks/#fc7f04ceefd03173/#7354cfd1302e71/hit/left",
+      "fields": {
+        "GrabSlotHash": {
+          "hash": "8726342856974380356",
+          "name": "#791a32982239ad44"
+        },
+        "IsGrabbing": true
+      },
+      "schema": "GrabSlotCondition",
+      "end": 28436,
+      "rawPayloadHex": "44ad392298321a7901000000"
+    },
+    {
+      "source": "comparison/mother_fig.p3d.rz",
+      "offset": 28436,
+      "payload": 28448,
+      "length": 4,
+      "type": "Random",
+      "kind": "ConditionHash",
+      "owner": "mother_core/opening/Outside/attacks/#fc7f04ceefd03173/#7354cfd1302e71/hit/left",
+      "fields": {
+        "Weight": 10
+      },
+      "schema": "RandomCondition",
+      "end": 28460
+    },
+    {
+      "source": "comparison/mother_fig.p3d.rz",
+      "offset": 28468,
+      "payload": 28480,
+      "length": 0,
+      "type": "Tracks",
+      "kind": "PropertyHash",
+      "owner": "mother_core/opening/Outside/attacks/#fc7f04ceefd03173/#7354cfd1302e71/hit/left",
+      "end": 30608
+    },
+    {
+      "source": "comparison/mother_fig.p3d.rz",
+      "offset": 28480,
+      "payload": 28492,
+      "length": 108,
+      "type": "PuppetAnimation",
+      "kind": "TrackHash",
+      "owner": "mother_core/opening/Outside/attacks/#fc7f04ceefd03173/#7354cfd1302e71/hit/left",
+      "fields": {
+        "Unknown1": 0,
+        "TimeBegin": 0,
+        "TimeEnd": 1,
+        "Animation": {
+          "hash": "13423991617585412273",
+          "name": "#ba4b9940b9fff8b1"
+        },
+        "Speed": 1,
+        "RandomSpeedVariation": 0,
+        "InitFrame": 0,
+        "StartFrame": 0,
+        "EndFrame": 30,
+        "Cyclic": {
+          "hash": "11831687089686836166",
+          "name": "FromAnimation"
+        },
+        "SyncFrame": false,
+        "PhaseMatch": false,
+        "ReuseExistingDriver": false,
+        "SyncPhase": {
+          "hash": "3349652082457766725",
+          "name": "Legacy"
+        },
+        "SyncPhaseMinFrame": 0,
+        "SyncPhaseMaxFrame": -1,
+        "HasRootTranslation": true,
+        "HasRootRotation": true,
+        "Partition": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "Weight": 1,
+        "Priority": 1,
+        "BlendInTime": 0.33333298563957214,
+        "BlendOutTime": 0.06666669994592667
+      },
+      "schema": "PuppetAnimationTrack",
+      "end": 28608
+    },
+    {
+      "source": "comparison/mother_fig.p3d.rz",
+      "offset": 28608,
+      "payload": 28620,
+      "length": 108,
+      "type": "PuppetAnimation",
+      "kind": "TrackHash",
+      "owner": "mother_core/opening/Outside/attacks/#fc7f04ceefd03173/#7354cfd1302e71/hit/left",
+      "fields": {
+        "Unknown1": 0,
+        "TimeBegin": 0,
+        "TimeEnd": 1,
+        "Animation": {
+          "hash": "13423991617585412273",
+          "name": "#ba4b9940b9fff8b1"
+        },
+        "Speed": 1,
+        "RandomSpeedVariation": 0,
+        "InitFrame": 0,
+        "StartFrame": 0,
+        "EndFrame": 30,
+        "Cyclic": {
+          "hash": "11831687089686836166",
+          "name": "FromAnimation"
+        },
+        "SyncFrame": false,
+        "PhaseMatch": false,
+        "ReuseExistingDriver": false,
+        "SyncPhase": {
+          "hash": "3349652082457766725",
+          "name": "Legacy"
+        },
+        "SyncPhaseMinFrame": 0,
+        "SyncPhaseMaxFrame": -1,
+        "HasRootTranslation": true,
+        "HasRootRotation": true,
+        "Partition": {
+          "hash": "10056272032532664819",
+          "name": "#8b8f0e2217ce11f3"
+        },
+        "Weight": 1,
+        "Priority": -1,
+        "BlendInTime": 0.33333298563957214,
+        "BlendOutTime": 0.06666669994592667
+      },
+      "schema": "PuppetAnimationTrack",
+      "end": 28736
+    },
+    {
+      "source": "comparison/mother_fig.p3d.rz",
+      "offset": 28736,
+      "payload": 28748,
+      "length": 108,
+      "type": "PuppetAnimation",
+      "kind": "TrackHash",
+      "owner": "mother_core/opening/Outside/attacks/#fc7f04ceefd03173/#7354cfd1302e71/hit/left",
+      "fields": {
+        "Unknown1": 0,
+        "TimeBegin": 1,
+        "TimeEnd": 1.3333300352096558,
+        "Animation": {
+          "hash": "13423991617585412273",
+          "name": "#ba4b9940b9fff8b1"
+        },
+        "Speed": 1,
+        "RandomSpeedVariation": 0,
+        "InitFrame": 0,
+        "StartFrame": 30,
+        "EndFrame": 34,
+        "Cyclic": {
+          "hash": "11831687089686836166",
+          "name": "FromAnimation"
+        },
+        "SyncFrame": false,
+        "PhaseMatch": false,
+        "ReuseExistingDriver": false,
+        "SyncPhase": {
+          "hash": "3349652082457766725",
+          "name": "Legacy"
+        },
+        "SyncPhaseMinFrame": 0,
+        "SyncPhaseMaxFrame": -1,
+        "HasRootTranslation": true,
+        "HasRootRotation": true,
+        "Partition": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "Weight": 1,
+        "Priority": 1,
+        "BlendInTime": 0.06666669994592667,
+        "BlendOutTime": 0.06666669994592667
+      },
+      "schema": "PuppetAnimationTrack",
+      "end": 28864
+    },
+    {
+      "source": "comparison/mother_fig.p3d.rz",
+      "offset": 28864,
+      "payload": 28876,
+      "length": 108,
+      "type": "PuppetAnimation",
+      "kind": "TrackHash",
+      "owner": "mother_core/opening/Outside/attacks/#fc7f04ceefd03173/#7354cfd1302e71/hit/left",
+      "fields": {
+        "Unknown1": 0,
+        "TimeBegin": 1,
+        "TimeEnd": 1.3333300352096558,
+        "Animation": {
+          "hash": "13423991617585412273",
+          "name": "#ba4b9940b9fff8b1"
+        },
+        "Speed": 1,
+        "RandomSpeedVariation": 0,
+        "InitFrame": 0,
+        "StartFrame": 30,
+        "EndFrame": 34,
+        "Cyclic": {
+          "hash": "11831687089686836166",
+          "name": "FromAnimation"
+        },
+        "SyncFrame": false,
+        "PhaseMatch": false,
+        "ReuseExistingDriver": false,
+        "SyncPhase": {
+          "hash": "3349652082457766725",
+          "name": "Legacy"
+        },
+        "SyncPhaseMinFrame": 0,
+        "SyncPhaseMaxFrame": -1,
+        "HasRootTranslation": true,
+        "HasRootRotation": true,
+        "Partition": {
+          "hash": "10056272032532664819",
+          "name": "#8b8f0e2217ce11f3"
+        },
+        "Weight": 1,
+        "Priority": -1,
+        "BlendInTime": 0.06666669994592667,
+        "BlendOutTime": 0.06666669994592667
+      },
+      "schema": "PuppetAnimationTrack",
+      "end": 28992
+    },
+    {
+      "source": "comparison/mother_fig.p3d.rz",
+      "offset": 28992,
+      "payload": 29004,
+      "length": 108,
+      "type": "PuppetAnimation",
+      "kind": "TrackHash",
+      "owner": "mother_core/opening/Outside/attacks/#fc7f04ceefd03173/#7354cfd1302e71/hit/left",
+      "fields": {
+        "Unknown1": 0,
+        "TimeBegin": 1.3333300352096558,
+        "TimeEnd": -1,
+        "Animation": {
+          "hash": "13423991617585412273",
+          "name": "#ba4b9940b9fff8b1"
+        },
+        "Speed": 0.800000011920929,
+        "RandomSpeedVariation": 0,
+        "InitFrame": 0,
+        "StartFrame": 34,
+        "EndFrame": -1,
+        "Cyclic": {
+          "hash": "11831687089686836166",
+          "name": "FromAnimation"
+        },
+        "SyncFrame": false,
+        "PhaseMatch": false,
+        "ReuseExistingDriver": false,
+        "SyncPhase": {
+          "hash": "3349652082457766725",
+          "name": "Legacy"
+        },
+        "SyncPhaseMinFrame": 0,
+        "SyncPhaseMaxFrame": -1,
+        "HasRootTranslation": true,
+        "HasRootRotation": true,
+        "Partition": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "Weight": 1,
+        "Priority": 1,
+        "BlendInTime": 0.06666669994592667,
+        "BlendOutTime": 0.16666699945926666
+      },
+      "schema": "PuppetAnimationTrack",
+      "end": 29120
+    },
+    {
+      "source": "comparison/mother_fig.p3d.rz",
+      "offset": 29120,
+      "payload": 29132,
+      "length": 108,
+      "type": "PuppetAnimation",
+      "kind": "TrackHash",
+      "owner": "mother_core/opening/Outside/attacks/#fc7f04ceefd03173/#7354cfd1302e71/hit/left",
+      "fields": {
+        "Unknown1": 0,
+        "TimeBegin": 1.3333300352096558,
+        "TimeEnd": -1,
+        "Animation": {
+          "hash": "13423991617585412273",
+          "name": "#ba4b9940b9fff8b1"
+        },
+        "Speed": 0.800000011920929,
+        "RandomSpeedVariation": 0,
+        "InitFrame": 0,
+        "StartFrame": 34,
+        "EndFrame": -1,
+        "Cyclic": {
+          "hash": "11831687089686836166",
+          "name": "FromAnimation"
+        },
+        "SyncFrame": false,
+        "PhaseMatch": false,
+        "ReuseExistingDriver": false,
+        "SyncPhase": {
+          "hash": "3349652082457766725",
+          "name": "Legacy"
+        },
+        "SyncPhaseMinFrame": 0,
+        "SyncPhaseMaxFrame": -1,
+        "HasRootTranslation": true,
+        "HasRootRotation": true,
+        "Partition": {
+          "hash": "10056272032532664819",
+          "name": "#8b8f0e2217ce11f3"
+        },
+        "Weight": 1,
+        "Priority": -1,
+        "BlendInTime": 0.06666669994592667,
+        "BlendOutTime": 0.16666699945926666
+      },
+      "schema": "PuppetAnimationTrack",
+      "end": 29248
+    },
+    {
+      "source": "comparison/mother_fig.p3d.rz",
+      "offset": 29248,
+      "payload": 29260,
+      "length": 20,
+      "type": "AITreeEventSend",
+      "kind": "TrackHash",
+      "owner": "mother_core/opening/Outside/attacks/#fc7f04ceefd03173/#7354cfd1302e71/hit/left",
+      "end": 29288,
+      "rawPayloadHex": "0100000000000000000080bfc41f77b2b9915666"
+    },
+    {
+      "source": "comparison/mother_fig.p3d.rz",
+      "offset": 29288,
+      "payload": 29300,
+      "length": 20,
+      "type": "Spawn",
+      "kind": "TrackHash",
+      "owner": "mother_core/opening/Outside/attacks/#fc7f04ceefd03173/#7354cfd1302e71/hit/left",
+      "fields": {
+        "Unknown1": 1,
+        "TimeBegin": 0,
+        "TimeEnd": 2,
+        "BranchRef": {
+          "name": "",
+          "index": 59
+        }
+      },
+      "schema": "SpawnTrack",
+      "end": 29348
+    },
+    {
+      "source": "comparison/mother_fig.p3d.rz",
+      "offset": 29320,
+      "payload": 29332,
+      "length": 0,
+      "type": "Conditions",
+      "kind": "PropertyHash",
+      "owner": "mother_core/opening/Outside/attacks/#fc7f04ceefd03173/#7354cfd1302e71/hit/left",
+      "end": 29340
+    },
+    {
+      "source": "comparison/mother_fig.p3d.rz",
+      "offset": 29348,
+      "payload": 29360,
+      "length": 276,
+      "type": "Hit",
+      "kind": "TrackHash",
+      "owner": "mother_core/opening/Outside/attacks/#fc7f04ceefd03173/#7354cfd1302e71/hit/left",
+      "fields": {
+        "Unknown1": 1,
+        "BeginTime": 1.3333300352096558,
+        "EndTime": 1.5666699409484863,
+        "UseShapecast": false,
+        "CollisionCountMax": -1,
+        "TimeBetweenHits": -1,
+        "jointName": {
+          "hash": "4390140778671954918",
+          "name": "#3cece9c73ab2dbe6"
+        },
+        "jointEnd": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "OffsetX": -2,
+        "OffsetY": 0,
+        "OffsetZ": 0,
+        "Radius": 4,
+        "ArcOffset": 0,
+        "ArcRange": 0,
+        "CollideWith": 49200,
+        "DamageMin": 500,
+        "DamageMax": 500,
+        "UseTransformationDamageMultiplier": true,
+        "UseWeaponDamageMultiplier": false,
+        "FriendlyFire": 0.20000000298023224,
+        "AttackType": {
+          "hash": "5116991040572361864",
+          "name": "Hydra"
+        },
+        "HitTypeName": {
+          "hash": "10488885500260303159",
+          "name": "#919001ca3cc2c137"
+        },
+        "DamageType": {
+          "hash": "22018610510307286",
+          "name": "None"
+        },
+        "EffectTypeName": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "ScaleX": 1,
+        "ScaleY": 1,
+        "EffectScale": 1,
+        "PropAreaEmissionScale": 0,
+        "PropAreaEmissionScaleFunction": {
+          "hash": "4206860010037910535",
+          "name": "#3a61c4e3e61b1c07"
+        },
+        "PropAreaSizeScale": 0,
+        "propAreaSizeScaleFunction": {
+          "hash": "4206860010037910535",
+          "name": "#3a61c4e3e61b1c07"
+        },
+        "ImpulseMinX": 1500,
+        "ImpulseMinY": 5000,
+        "ImpulseMinZ": -3000,
+        "ImpulseMaxX": 1500,
+        "ImpulseMaxY": 5000,
+        "ImpulseMaxZ": -3000,
+        "ImpulseRandomPlusMinus": 0,
+        "UseMotion": false,
+        "CollisionDirectionX": 0,
+        "CollisionDirectionY": 0,
+        "CollisionDirectionZ": 0,
+        "DeformDirStr": 1,
+        "DeformStr": 1,
+        "CollisionFlagName": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "GiverBranchRef": {
+          "name": "",
+          "index": -1
+        },
+        "ReceiverBranchRef": {
+          "name": "",
+          "index": -1
+        },
+        "UseDamageOriginator": false,
+        "SendAlert": true,
+        "SendOnlyToAIManager": false,
+        "UseOriginatorToValidate": false,
+        "IsThrown": false,
+        "MomentumDamageVelocity": 0,
+        "MomentumDamageMax": 0,
+        "TravelVelocity": 0,
+        "TravelTowardsTarget": {
+          "hash": "22018610510307286",
+          "name": "None"
+        },
+        "IgnorePowerTarget": false
+      },
+      "schema": "CollisionHitTrack",
+      "end": 29644
+    },
+    {
+      "source": "comparison/mother_fig.p3d.rz",
+      "offset": 29644,
+      "payload": 29656,
+      "length": 276,
+      "type": "Hit",
+      "kind": "TrackHash",
+      "owner": "mother_core/opening/Outside/attacks/#fc7f04ceefd03173/#7354cfd1302e71/hit/left",
+      "fields": {
+        "Unknown1": 1,
+        "BeginTime": 1.5666699409484863,
+        "EndTime": 1.7333300113677979,
+        "UseShapecast": false,
+        "CollisionCountMax": -1,
+        "TimeBetweenHits": -1,
+        "jointName": {
+          "hash": "10135106878356211485",
+          "name": "Motion_Root"
+        },
+        "jointEnd": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "OffsetX": 0,
+        "OffsetY": 0,
+        "OffsetZ": -6,
+        "Radius": 5,
+        "ArcOffset": 0,
+        "ArcRange": 0,
+        "CollideWith": 49200,
+        "DamageMin": 500,
+        "DamageMax": 500,
+        "UseTransformationDamageMultiplier": true,
+        "UseWeaponDamageMultiplier": false,
+        "FriendlyFire": 0,
+        "AttackType": {
+          "hash": "5116991040572361864",
+          "name": "Hydra"
+        },
+        "HitTypeName": {
+          "hash": "6747522763997245100",
+          "name": "#5da4043435eaeeac"
+        },
+        "DamageType": {
+          "hash": "4728229139194926617",
+          "name": "#419e0b59d25d5619"
+        },
+        "EffectTypeName": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "ScaleX": 1,
+        "ScaleY": 1,
+        "EffectScale": 1,
+        "PropAreaEmissionScale": 0,
+        "PropAreaEmissionScaleFunction": {
+          "hash": "4206860010037910535",
+          "name": "#3a61c4e3e61b1c07"
+        },
+        "PropAreaSizeScale": 0,
+        "propAreaSizeScaleFunction": {
+          "hash": "4206860010037910535",
+          "name": "#3a61c4e3e61b1c07"
+        },
+        "ImpulseMinX": 1500,
+        "ImpulseMinY": 4000,
+        "ImpulseMinZ": -2000,
+        "ImpulseMaxX": 2000,
+        "ImpulseMaxY": 4000,
+        "ImpulseMaxZ": -2000,
+        "ImpulseRandomPlusMinus": 0,
+        "UseMotion": false,
+        "CollisionDirectionX": 0,
+        "CollisionDirectionY": 0,
+        "CollisionDirectionZ": 0,
+        "DeformDirStr": 1,
+        "DeformStr": 1,
+        "CollisionFlagName": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "GiverBranchRef": {
+          "name": "",
+          "index": -1
+        },
+        "ReceiverBranchRef": {
+          "name": "",
+          "index": -1
+        },
+        "UseDamageOriginator": false,
+        "SendAlert": true,
+        "SendOnlyToAIManager": false,
+        "UseOriginatorToValidate": false,
+        "IsThrown": false,
+        "MomentumDamageVelocity": 0,
+        "MomentumDamageMax": 0,
+        "TravelVelocity": 0,
+        "TravelTowardsTarget": {
+          "hash": "22018610510307286",
+          "name": "None"
+        },
+        "IgnorePowerTarget": false
+      },
+      "schema": "CollisionHitTrack",
+      "end": 29940
+    },
+    {
+      "source": "comparison/mother_fig.p3d.rz",
+      "offset": 29940,
+      "payload": 29952,
+      "length": 276,
+      "type": "Hit",
+      "kind": "TrackHash",
+      "owner": "mother_core/opening/Outside/attacks/#fc7f04ceefd03173/#7354cfd1302e71/hit/left",
+      "fields": {
+        "Unknown1": 1,
+        "BeginTime": 1.7333300113677979,
+        "EndTime": 1.899999976158142,
+        "UseShapecast": false,
+        "CollisionCountMax": -1,
+        "TimeBetweenHits": -1,
+        "jointName": {
+          "hash": "10135106878356211485",
+          "name": "Motion_Root"
+        },
+        "jointEnd": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "OffsetX": 0,
+        "OffsetY": 0,
+        "OffsetZ": -6,
+        "Radius": 7,
+        "ArcOffset": 0,
+        "ArcRange": 0,
+        "CollideWith": 49200,
+        "DamageMin": 200,
+        "DamageMax": 200,
+        "UseTransformationDamageMultiplier": true,
+        "UseWeaponDamageMultiplier": false,
+        "FriendlyFire": 0,
+        "AttackType": {
+          "hash": "5116991040572361864",
+          "name": "Hydra"
+        },
+        "HitTypeName": {
+          "hash": "6747522763997245100",
+          "name": "#5da4043435eaeeac"
+        },
+        "DamageType": {
+          "hash": "4728229139194926617",
+          "name": "#419e0b59d25d5619"
+        },
+        "EffectTypeName": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "ScaleX": 1,
+        "ScaleY": 1,
+        "EffectScale": 1,
+        "PropAreaEmissionScale": 0,
+        "PropAreaEmissionScaleFunction": {
+          "hash": "4206860010037910535",
+          "name": "#3a61c4e3e61b1c07"
+        },
+        "PropAreaSizeScale": 0,
+        "propAreaSizeScaleFunction": {
+          "hash": "4206860010037910535",
+          "name": "#3a61c4e3e61b1c07"
+        },
+        "ImpulseMinX": 1500,
+        "ImpulseMinY": 3000,
+        "ImpulseMinZ": -1500,
+        "ImpulseMaxX": 1500,
+        "ImpulseMaxY": 3000,
+        "ImpulseMaxZ": -1500,
+        "ImpulseRandomPlusMinus": 0,
+        "UseMotion": false,
+        "CollisionDirectionX": 0,
+        "CollisionDirectionY": 0,
+        "CollisionDirectionZ": 0,
+        "DeformDirStr": 1,
+        "DeformStr": 1,
+        "CollisionFlagName": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "GiverBranchRef": {
+          "name": "",
+          "index": -1
+        },
+        "ReceiverBranchRef": {
+          "name": "",
+          "index": -1
+        },
+        "UseDamageOriginator": false,
+        "SendAlert": true,
+        "SendOnlyToAIManager": false,
+        "UseOriginatorToValidate": false,
+        "IsThrown": false,
+        "MomentumDamageVelocity": 0,
+        "MomentumDamageMax": 0,
+        "TravelVelocity": 0,
+        "TravelTowardsTarget": {
+          "hash": "22018610510307286",
+          "name": "None"
+        },
+        "IgnorePowerTarget": false
+      },
+      "schema": "CollisionHitTrack",
+      "end": 30236
+    },
+    {
+      "source": "comparison/mother_fig.p3d.rz",
+      "offset": 30236,
+      "payload": 30248,
+      "length": 20,
+      "type": "Execute",
+      "kind": "TrackHash",
+      "owner": "mother_core/opening/Outside/attacks/#fc7f04ceefd03173/#7354cfd1302e71/hit/left",
+      "fields": {
+        "Unknown1": 1,
+        "TimeBegin": 1.6666699647903442,
+        "TimeEnd": -1,
+        "BranchRef": {
+          "name": "",
+          "index": 48
+        }
+      },
+      "schema": "ExecuteTrack",
+      "end": 30296
+    },
+    {
+      "source": "comparison/mother_fig.p3d.rz",
+      "offset": 30268,
+      "payload": 30280,
+      "length": 0,
+      "type": "Conditions",
+      "kind": "PropertyHash",
+      "owner": "mother_core/opening/Outside/attacks/#fc7f04ceefd03173/#7354cfd1302e71/hit/left",
+      "end": 30288
+    },
+    {
+      "source": "comparison/mother_fig.p3d.rz",
+      "offset": 30296,
+      "payload": 30308,
+      "length": 20,
+      "type": "Spawn",
+      "kind": "TrackHash",
+      "owner": "mother_core/opening/Outside/attacks/#fc7f04ceefd03173/#7354cfd1302e71/hit/left",
+      "fields": {
+        "Unknown1": 1,
+        "TimeBegin": 1.6666699647903442,
+        "TimeEnd": -1,
+        "BranchRef": {
+          "name": "",
+          "index": 120
+        }
+      },
+      "schema": "SpawnTrack",
+      "end": 30356
+    },
+    {
+      "source": "comparison/mother_fig.p3d.rz",
+      "offset": 30328,
+      "payload": 30340,
+      "length": 0,
+      "type": "Conditions",
+      "kind": "PropertyHash",
+      "owner": "mother_core/opening/Outside/attacks/#fc7f04ceefd03173/#7354cfd1302e71/hit/left",
+      "end": 30348
+    },
+    {
+      "source": "comparison/mother_fig.p3d.rz",
+      "offset": 30356,
+      "payload": 30368,
+      "length": 20,
+      "type": "Sequence",
+      "kind": "TrackHash",
+      "owner": "mother_core/opening/Outside/attacks/#fc7f04ceefd03173/#7354cfd1302e71/hit/left",
+      "fields": {
+        "Unknown1": 1,
+        "TimeBegin": 0,
+        "BranchRef": {
+          "name": "",
+          "index": 42
+        },
+        "Priority": 1
+      },
+      "schema": "SequenceTrack",
+      "end": 30416
+    },
+    {
+      "source": "comparison/mother_fig.p3d.rz",
+      "offset": 30388,
+      "payload": 30400,
+      "length": 0,
+      "type": "Conditions",
+      "kind": "PropertyHash",
+      "owner": "mother_core/opening/Outside/attacks/#fc7f04ceefd03173/#7354cfd1302e71/hit/left",
+      "end": 30408
+    },
+    {
+      "source": "comparison/mother_fig.p3d.rz",
+      "offset": 30416,
+      "payload": 30428,
+      "length": 72,
+      "type": "Sound",
+      "kind": "TrackHash",
+      "owner": "mother_core/opening/Outside/attacks/#fc7f04ceefd03173/#7354cfd1302e71/hit/left",
+      "fields": {
+        "Unknown1": 1,
+        "TimeBegin": 1.2000000476837158,
+        "Patch": {
+          "hash": "11726777248978660875",
+          "name": "#a2bde1c6dd816e0b"
+        },
+        "Trigger": {
+          "hash": "31616665440155042",
+          "name": "play"
+        },
+        "VolumeFactor": 1,
+        "MinDistance": 25,
+        "MaxDistance": 55,
+        "MinPitch": 1,
+        "MaxPitch": 1,
+        "CyclicPhase": 0,
+        "InstanceName": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "Frequency": 1,
+        "PolledLifetime": false,
+        "TriggerType": {
+          "hash": "6266415434618234495",
+          "name": "StopExisting"
+        }
+      },
+      "schema": "SoundTrack",
+      "end": 30508
+    },
+    {
+      "source": "comparison/mother_fig.p3d.rz",
+      "offset": 30508,
+      "payload": 30520,
+      "length": 72,
+      "type": "Sound",
+      "kind": "TrackHash",
+      "owner": "mother_core/opening/Outside/attacks/#fc7f04ceefd03173/#7354cfd1302e71/hit/left",
+      "fields": {
+        "Unknown1": 1,
+        "TimeBegin": 1.7999999523162842,
+        "Patch": {
+          "hash": "11726777248978660875",
+          "name": "#a2bde1c6dd816e0b"
+        },
+        "Trigger": {
+          "hash": "31616665440155042",
+          "name": "play"
+        },
+        "VolumeFactor": 1,
+        "MinDistance": 25,
+        "MaxDistance": 55,
+        "MinPitch": 1,
+        "MaxPitch": 1,
+        "CyclicPhase": 0,
+        "InstanceName": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "Frequency": 1,
+        "PolledLifetime": false,
+        "TriggerType": {
+          "hash": "6266415434618234495",
+          "name": "StopExisting"
+        }
+      },
+      "schema": "SoundTrack",
+      "end": 30600
+    },
+    {
+      "source": "comparison/mother_fig.p3d.rz",
+      "offset": 30616,
+      "payload": 30628,
+      "length": 20,
+      "type": "Node",
+      "kind": "BranchHash",
+      "owner": "mother_core/opening/Outside/attacks/#fc7f04ceefd03173/#7354cfd1302e71/hit/right",
+      "end": 32872
+    },
+    {
+      "source": "comparison/mother_fig.p3d.rz",
+      "offset": 30648,
+      "payload": 30660,
+      "length": 0,
+      "type": "Conditions",
+      "kind": "PropertyHash",
+      "owner": "mother_core/opening/Outside/attacks/#fc7f04ceefd03173/#7354cfd1302e71/hit/right",
+      "end": 30724
+    },
+    {
+      "source": "comparison/mother_fig.p3d.rz",
+      "offset": 30660,
+      "payload": 30672,
+      "length": 12,
+      "type": "GrabSlot",
+      "kind": "ConditionHash",
+      "owner": "mother_core/opening/Outside/attacks/#fc7f04ceefd03173/#7354cfd1302e71/hit/right",
+      "fields": {
+        "GrabSlotHash": {
+          "hash": "8726342856974380356",
+          "name": "#791a32982239ad44"
+        },
+        "IsGrabbing": true
+      },
+      "schema": "GrabSlotCondition",
+      "end": 30692,
+      "rawPayloadHex": "44ad392298321a7901000000"
+    },
+    {
+      "source": "comparison/mother_fig.p3d.rz",
+      "offset": 30692,
+      "payload": 30704,
+      "length": 4,
+      "type": "Random",
+      "kind": "ConditionHash",
+      "owner": "mother_core/opening/Outside/attacks/#fc7f04ceefd03173/#7354cfd1302e71/hit/right",
+      "fields": {
+        "Weight": 10
+      },
+      "schema": "RandomCondition",
+      "end": 30716
+    },
+    {
+      "source": "comparison/mother_fig.p3d.rz",
+      "offset": 30724,
+      "payload": 30736,
+      "length": 0,
+      "type": "Tracks",
+      "kind": "PropertyHash",
+      "owner": "mother_core/opening/Outside/attacks/#fc7f04ceefd03173/#7354cfd1302e71/hit/right",
+      "end": 32864
+    },
+    {
+      "source": "comparison/mother_fig.p3d.rz",
+      "offset": 30736,
+      "payload": 30748,
+      "length": 108,
+      "type": "PuppetAnimation",
+      "kind": "TrackHash",
+      "owner": "mother_core/opening/Outside/attacks/#fc7f04ceefd03173/#7354cfd1302e71/hit/right",
+      "fields": {
+        "Unknown1": 0,
+        "TimeBegin": 0,
+        "TimeEnd": 1,
+        "Animation": {
+          "hash": "6640397294467945456",
+          "name": "#5c276e28303a13f0"
+        },
+        "Speed": 1,
+        "RandomSpeedVariation": 0,
+        "InitFrame": 0,
+        "StartFrame": 0,
+        "EndFrame": 30,
+        "Cyclic": {
+          "hash": "11831687089686836166",
+          "name": "FromAnimation"
+        },
+        "SyncFrame": false,
+        "PhaseMatch": false,
+        "ReuseExistingDriver": false,
+        "SyncPhase": {
+          "hash": "3349652082457766725",
+          "name": "Legacy"
+        },
+        "SyncPhaseMinFrame": 0,
+        "SyncPhaseMaxFrame": -1,
+        "HasRootTranslation": true,
+        "HasRootRotation": true,
+        "Partition": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "Weight": 1,
+        "Priority": 1,
+        "BlendInTime": 0.33333298563957214,
+        "BlendOutTime": 0.06666669994592667
+      },
+      "schema": "PuppetAnimationTrack",
+      "end": 30864
+    },
+    {
+      "source": "comparison/mother_fig.p3d.rz",
+      "offset": 30864,
+      "payload": 30876,
+      "length": 108,
+      "type": "PuppetAnimation",
+      "kind": "TrackHash",
+      "owner": "mother_core/opening/Outside/attacks/#fc7f04ceefd03173/#7354cfd1302e71/hit/right",
+      "fields": {
+        "Unknown1": 0,
+        "TimeBegin": 0,
+        "TimeEnd": 1,
+        "Animation": {
+          "hash": "6640397294467945456",
+          "name": "#5c276e28303a13f0"
+        },
+        "Speed": 1,
+        "RandomSpeedVariation": 0,
+        "InitFrame": 0,
+        "StartFrame": 0,
+        "EndFrame": 30,
+        "Cyclic": {
+          "hash": "11831687089686836166",
+          "name": "FromAnimation"
+        },
+        "SyncFrame": false,
+        "PhaseMatch": false,
+        "ReuseExistingDriver": false,
+        "SyncPhase": {
+          "hash": "3349652082457766725",
+          "name": "Legacy"
+        },
+        "SyncPhaseMinFrame": 0,
+        "SyncPhaseMaxFrame": -1,
+        "HasRootTranslation": true,
+        "HasRootRotation": true,
+        "Partition": {
+          "hash": "10056272032532664816",
+          "name": "#8b8f0e2217ce11f0"
+        },
+        "Weight": 1,
+        "Priority": -1,
+        "BlendInTime": 0.33333298563957214,
+        "BlendOutTime": 0.06666669994592667
+      },
+      "schema": "PuppetAnimationTrack",
+      "end": 30992
+    },
+    {
+      "source": "comparison/mother_fig.p3d.rz",
+      "offset": 30992,
+      "payload": 31004,
+      "length": 108,
+      "type": "PuppetAnimation",
+      "kind": "TrackHash",
+      "owner": "mother_core/opening/Outside/attacks/#fc7f04ceefd03173/#7354cfd1302e71/hit/right",
+      "fields": {
+        "Unknown1": 0,
+        "TimeBegin": 1,
+        "TimeEnd": 1.3333300352096558,
+        "Animation": {
+          "hash": "6640397294467945456",
+          "name": "#5c276e28303a13f0"
+        },
+        "Speed": 1,
+        "RandomSpeedVariation": 0,
+        "InitFrame": 0,
+        "StartFrame": 30,
+        "EndFrame": 34,
+        "Cyclic": {
+          "hash": "11831687089686836166",
+          "name": "FromAnimation"
+        },
+        "SyncFrame": false,
+        "PhaseMatch": false,
+        "ReuseExistingDriver": false,
+        "SyncPhase": {
+          "hash": "3349652082457766725",
+          "name": "Legacy"
+        },
+        "SyncPhaseMinFrame": 0,
+        "SyncPhaseMaxFrame": -1,
+        "HasRootTranslation": true,
+        "HasRootRotation": true,
+        "Partition": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "Weight": 1,
+        "Priority": 1,
+        "BlendInTime": 0.06666669994592667,
+        "BlendOutTime": 0.06666669994592667
+      },
+      "schema": "PuppetAnimationTrack",
+      "end": 31120
+    },
+    {
+      "source": "comparison/mother_fig.p3d.rz",
+      "offset": 31120,
+      "payload": 31132,
+      "length": 108,
+      "type": "PuppetAnimation",
+      "kind": "TrackHash",
+      "owner": "mother_core/opening/Outside/attacks/#fc7f04ceefd03173/#7354cfd1302e71/hit/right",
+      "fields": {
+        "Unknown1": 0,
+        "TimeBegin": 1,
+        "TimeEnd": 1.3333300352096558,
+        "Animation": {
+          "hash": "6640397294467945456",
+          "name": "#5c276e28303a13f0"
+        },
+        "Speed": 1,
+        "RandomSpeedVariation": 0,
+        "InitFrame": 0,
+        "StartFrame": 30,
+        "EndFrame": 34,
+        "Cyclic": {
+          "hash": "11831687089686836166",
+          "name": "FromAnimation"
+        },
+        "SyncFrame": false,
+        "PhaseMatch": false,
+        "ReuseExistingDriver": false,
+        "SyncPhase": {
+          "hash": "3349652082457766725",
+          "name": "Legacy"
+        },
+        "SyncPhaseMinFrame": 0,
+        "SyncPhaseMaxFrame": -1,
+        "HasRootTranslation": true,
+        "HasRootRotation": true,
+        "Partition": {
+          "hash": "10056272032532664816",
+          "name": "#8b8f0e2217ce11f0"
+        },
+        "Weight": 1,
+        "Priority": -1,
+        "BlendInTime": 0.06666669994592667,
+        "BlendOutTime": 0.06666669994592667
+      },
+      "schema": "PuppetAnimationTrack",
+      "end": 31248
+    },
+    {
+      "source": "comparison/mother_fig.p3d.rz",
+      "offset": 31248,
+      "payload": 31260,
+      "length": 108,
+      "type": "PuppetAnimation",
+      "kind": "TrackHash",
+      "owner": "mother_core/opening/Outside/attacks/#fc7f04ceefd03173/#7354cfd1302e71/hit/right",
+      "fields": {
+        "Unknown1": 0,
+        "TimeBegin": 1.3333300352096558,
+        "TimeEnd": -1,
+        "Animation": {
+          "hash": "6640397294467945456",
+          "name": "#5c276e28303a13f0"
+        },
+        "Speed": 0.800000011920929,
+        "RandomSpeedVariation": 0,
+        "InitFrame": 0,
+        "StartFrame": 34,
+        "EndFrame": -1,
+        "Cyclic": {
+          "hash": "11831687089686836166",
+          "name": "FromAnimation"
+        },
+        "SyncFrame": false,
+        "PhaseMatch": false,
+        "ReuseExistingDriver": false,
+        "SyncPhase": {
+          "hash": "3349652082457766725",
+          "name": "Legacy"
+        },
+        "SyncPhaseMinFrame": 0,
+        "SyncPhaseMaxFrame": -1,
+        "HasRootTranslation": true,
+        "HasRootRotation": true,
+        "Partition": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "Weight": 1,
+        "Priority": 1,
+        "BlendInTime": 0.06666669994592667,
+        "BlendOutTime": 0.16666699945926666
+      },
+      "schema": "PuppetAnimationTrack",
+      "end": 31376
+    },
+    {
+      "source": "comparison/mother_fig.p3d.rz",
+      "offset": 31376,
+      "payload": 31388,
+      "length": 108,
+      "type": "PuppetAnimation",
+      "kind": "TrackHash",
+      "owner": "mother_core/opening/Outside/attacks/#fc7f04ceefd03173/#7354cfd1302e71/hit/right",
+      "fields": {
+        "Unknown1": 0,
+        "TimeBegin": 1.3333300352096558,
+        "TimeEnd": -1,
+        "Animation": {
+          "hash": "6640397294467945456",
+          "name": "#5c276e28303a13f0"
+        },
+        "Speed": 0.800000011920929,
+        "RandomSpeedVariation": 0,
+        "InitFrame": 0,
+        "StartFrame": 34,
+        "EndFrame": -1,
+        "Cyclic": {
+          "hash": "11831687089686836166",
+          "name": "FromAnimation"
+        },
+        "SyncFrame": false,
+        "PhaseMatch": false,
+        "ReuseExistingDriver": false,
+        "SyncPhase": {
+          "hash": "3349652082457766725",
+          "name": "Legacy"
+        },
+        "SyncPhaseMinFrame": 0,
+        "SyncPhaseMaxFrame": -1,
+        "HasRootTranslation": true,
+        "HasRootRotation": true,
+        "Partition": {
+          "hash": "10056272032532664816",
+          "name": "#8b8f0e2217ce11f0"
+        },
+        "Weight": 1,
+        "Priority": -1,
+        "BlendInTime": 0.06666669994592667,
+        "BlendOutTime": 0.16666699945926666
+      },
+      "schema": "PuppetAnimationTrack",
+      "end": 31504
+    },
+    {
+      "source": "comparison/mother_fig.p3d.rz",
+      "offset": 31504,
+      "payload": 31516,
+      "length": 20,
+      "type": "AITreeEventSend",
+      "kind": "TrackHash",
+      "owner": "mother_core/opening/Outside/attacks/#fc7f04ceefd03173/#7354cfd1302e71/hit/right",
+      "end": 31544,
+      "rawPayloadHex": "0100000000000000000080bfc41f77b2b9915666"
+    },
+    {
+      "source": "comparison/mother_fig.p3d.rz",
+      "offset": 31544,
+      "payload": 31556,
+      "length": 20,
+      "type": "Spawn",
+      "kind": "TrackHash",
+      "owner": "mother_core/opening/Outside/attacks/#fc7f04ceefd03173/#7354cfd1302e71/hit/right",
+      "fields": {
+        "Unknown1": 1,
+        "TimeBegin": 0,
+        "TimeEnd": 2,
+        "BranchRef": {
+          "name": "",
+          "index": 59
+        }
+      },
+      "schema": "SpawnTrack",
+      "end": 31604
+    },
+    {
+      "source": "comparison/mother_fig.p3d.rz",
+      "offset": 31576,
+      "payload": 31588,
+      "length": 0,
+      "type": "Conditions",
+      "kind": "PropertyHash",
+      "owner": "mother_core/opening/Outside/attacks/#fc7f04ceefd03173/#7354cfd1302e71/hit/right",
+      "end": 31596
+    },
+    {
+      "source": "comparison/mother_fig.p3d.rz",
+      "offset": 31604,
+      "payload": 31616,
+      "length": 276,
+      "type": "Hit",
+      "kind": "TrackHash",
+      "owner": "mother_core/opening/Outside/attacks/#fc7f04ceefd03173/#7354cfd1302e71/hit/right",
+      "fields": {
+        "Unknown1": 1,
+        "BeginTime": 1.3333300352096558,
+        "EndTime": 1.5666699409484863,
+        "UseShapecast": false,
+        "CollisionCountMax": -1,
+        "TimeBetweenHits": -1,
+        "jointName": {
+          "hash": "1114818369336096753",
+          "name": "#f78a1667d5bb7f1"
+        },
+        "jointEnd": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "OffsetX": -2,
+        "OffsetY": 0,
+        "OffsetZ": 0,
+        "Radius": 4,
+        "ArcOffset": 0,
+        "ArcRange": 0,
+        "CollideWith": 49200,
+        "DamageMin": 500,
+        "DamageMax": 500,
+        "UseTransformationDamageMultiplier": true,
+        "UseWeaponDamageMultiplier": false,
+        "FriendlyFire": 0.20000000298023224,
+        "AttackType": {
+          "hash": "5116991040572361864",
+          "name": "Hydra"
+        },
+        "HitTypeName": {
+          "hash": "10488885500260303159",
+          "name": "#919001ca3cc2c137"
+        },
+        "DamageType": {
+          "hash": "22018610510307286",
+          "name": "None"
+        },
+        "EffectTypeName": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "ScaleX": 1,
+        "ScaleY": 1,
+        "EffectScale": 1,
+        "PropAreaEmissionScale": 0,
+        "PropAreaEmissionScaleFunction": {
+          "hash": "4206860010037910535",
+          "name": "#3a61c4e3e61b1c07"
+        },
+        "PropAreaSizeScale": 0,
+        "propAreaSizeScaleFunction": {
+          "hash": "4206860010037910535",
+          "name": "#3a61c4e3e61b1c07"
+        },
+        "ImpulseMinX": 1500,
+        "ImpulseMinY": 5000,
+        "ImpulseMinZ": -3000,
+        "ImpulseMaxX": 1500,
+        "ImpulseMaxY": 5000,
+        "ImpulseMaxZ": -3000,
+        "ImpulseRandomPlusMinus": 0,
+        "UseMotion": false,
+        "CollisionDirectionX": 0,
+        "CollisionDirectionY": 0,
+        "CollisionDirectionZ": 0,
+        "DeformDirStr": 1,
+        "DeformStr": 1,
+        "CollisionFlagName": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "GiverBranchRef": {
+          "name": "",
+          "index": -1
+        },
+        "ReceiverBranchRef": {
+          "name": "",
+          "index": -1
+        },
+        "UseDamageOriginator": false,
+        "SendAlert": true,
+        "SendOnlyToAIManager": false,
+        "UseOriginatorToValidate": false,
+        "IsThrown": false,
+        "MomentumDamageVelocity": 0,
+        "MomentumDamageMax": 0,
+        "TravelVelocity": 0,
+        "TravelTowardsTarget": {
+          "hash": "22018610510307286",
+          "name": "None"
+        },
+        "IgnorePowerTarget": false
+      },
+      "schema": "CollisionHitTrack",
+      "end": 31900
+    },
+    {
+      "source": "comparison/mother_fig.p3d.rz",
+      "offset": 31900,
+      "payload": 31912,
+      "length": 276,
+      "type": "Hit",
+      "kind": "TrackHash",
+      "owner": "mother_core/opening/Outside/attacks/#fc7f04ceefd03173/#7354cfd1302e71/hit/right",
+      "fields": {
+        "Unknown1": 1,
+        "BeginTime": 1.5666699409484863,
+        "EndTime": 1.7333300113677979,
+        "UseShapecast": false,
+        "CollisionCountMax": -1,
+        "TimeBetweenHits": -1,
+        "jointName": {
+          "hash": "10135106878356211485",
+          "name": "Motion_Root"
+        },
+        "jointEnd": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "OffsetX": 0,
+        "OffsetY": 0,
+        "OffsetZ": -6,
+        "Radius": 5,
+        "ArcOffset": 0,
+        "ArcRange": 0,
+        "CollideWith": 49200,
+        "DamageMin": 500,
+        "DamageMax": 500,
+        "UseTransformationDamageMultiplier": true,
+        "UseWeaponDamageMultiplier": false,
+        "FriendlyFire": 0,
+        "AttackType": {
+          "hash": "5116991040572361864",
+          "name": "Hydra"
+        },
+        "HitTypeName": {
+          "hash": "6747522763997245100",
+          "name": "#5da4043435eaeeac"
+        },
+        "DamageType": {
+          "hash": "4728229139194926617",
+          "name": "#419e0b59d25d5619"
+        },
+        "EffectTypeName": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "ScaleX": 1,
+        "ScaleY": 1,
+        "EffectScale": 1,
+        "PropAreaEmissionScale": 0,
+        "PropAreaEmissionScaleFunction": {
+          "hash": "4206860010037910535",
+          "name": "#3a61c4e3e61b1c07"
+        },
+        "PropAreaSizeScale": 0,
+        "propAreaSizeScaleFunction": {
+          "hash": "4206860010037910535",
+          "name": "#3a61c4e3e61b1c07"
+        },
+        "ImpulseMinX": 1500,
+        "ImpulseMinY": 4000,
+        "ImpulseMinZ": -2000,
+        "ImpulseMaxX": 2000,
+        "ImpulseMaxY": 4000,
+        "ImpulseMaxZ": -2000,
+        "ImpulseRandomPlusMinus": 0,
+        "UseMotion": false,
+        "CollisionDirectionX": 0,
+        "CollisionDirectionY": 0,
+        "CollisionDirectionZ": 0,
+        "DeformDirStr": 1,
+        "DeformStr": 1,
+        "CollisionFlagName": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "GiverBranchRef": {
+          "name": "",
+          "index": -1
+        },
+        "ReceiverBranchRef": {
+          "name": "",
+          "index": -1
+        },
+        "UseDamageOriginator": false,
+        "SendAlert": true,
+        "SendOnlyToAIManager": false,
+        "UseOriginatorToValidate": false,
+        "IsThrown": false,
+        "MomentumDamageVelocity": 0,
+        "MomentumDamageMax": 0,
+        "TravelVelocity": 0,
+        "TravelTowardsTarget": {
+          "hash": "22018610510307286",
+          "name": "None"
+        },
+        "IgnorePowerTarget": false
+      },
+      "schema": "CollisionHitTrack",
+      "end": 32196
+    },
+    {
+      "source": "comparison/mother_fig.p3d.rz",
+      "offset": 32196,
+      "payload": 32208,
+      "length": 276,
+      "type": "Hit",
+      "kind": "TrackHash",
+      "owner": "mother_core/opening/Outside/attacks/#fc7f04ceefd03173/#7354cfd1302e71/hit/right",
+      "fields": {
+        "Unknown1": 1,
+        "BeginTime": 1.7333300113677979,
+        "EndTime": 1.899999976158142,
+        "UseShapecast": false,
+        "CollisionCountMax": -1,
+        "TimeBetweenHits": -1,
+        "jointName": {
+          "hash": "10135106878356211485",
+          "name": "Motion_Root"
+        },
+        "jointEnd": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "OffsetX": 0,
+        "OffsetY": 0,
+        "OffsetZ": -6,
+        "Radius": 7,
+        "ArcOffset": 0,
+        "ArcRange": 0,
+        "CollideWith": 49200,
+        "DamageMin": 200,
+        "DamageMax": 200,
+        "UseTransformationDamageMultiplier": true,
+        "UseWeaponDamageMultiplier": false,
+        "FriendlyFire": 0,
+        "AttackType": {
+          "hash": "5116991040572361864",
+          "name": "Hydra"
+        },
+        "HitTypeName": {
+          "hash": "6747522763997245100",
+          "name": "#5da4043435eaeeac"
+        },
+        "DamageType": {
+          "hash": "4728229139194926617",
+          "name": "#419e0b59d25d5619"
+        },
+        "EffectTypeName": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "ScaleX": 1,
+        "ScaleY": 1,
+        "EffectScale": 1,
+        "PropAreaEmissionScale": 0,
+        "PropAreaEmissionScaleFunction": {
+          "hash": "4206860010037910535",
+          "name": "#3a61c4e3e61b1c07"
+        },
+        "PropAreaSizeScale": 0,
+        "propAreaSizeScaleFunction": {
+          "hash": "4206860010037910535",
+          "name": "#3a61c4e3e61b1c07"
+        },
+        "ImpulseMinX": 1500,
+        "ImpulseMinY": 3000,
+        "ImpulseMinZ": -1500,
+        "ImpulseMaxX": 1500,
+        "ImpulseMaxY": 3000,
+        "ImpulseMaxZ": -1500,
+        "ImpulseRandomPlusMinus": 0,
+        "UseMotion": false,
+        "CollisionDirectionX": 0,
+        "CollisionDirectionY": 0,
+        "CollisionDirectionZ": 0,
+        "DeformDirStr": 1,
+        "DeformStr": 1,
+        "CollisionFlagName": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "GiverBranchRef": {
+          "name": "",
+          "index": -1
+        },
+        "ReceiverBranchRef": {
+          "name": "",
+          "index": -1
+        },
+        "UseDamageOriginator": false,
+        "SendAlert": true,
+        "SendOnlyToAIManager": false,
+        "UseOriginatorToValidate": false,
+        "IsThrown": false,
+        "MomentumDamageVelocity": 0,
+        "MomentumDamageMax": 0,
+        "TravelVelocity": 0,
+        "TravelTowardsTarget": {
+          "hash": "22018610510307286",
+          "name": "None"
+        },
+        "IgnorePowerTarget": false
+      },
+      "schema": "CollisionHitTrack",
+      "end": 32492
+    },
+    {
+      "source": "comparison/mother_fig.p3d.rz",
+      "offset": 32492,
+      "payload": 32504,
+      "length": 20,
+      "type": "Execute",
+      "kind": "TrackHash",
+      "owner": "mother_core/opening/Outside/attacks/#fc7f04ceefd03173/#7354cfd1302e71/hit/right",
+      "fields": {
+        "Unknown1": 1,
+        "TimeBegin": 1.7000000476837158,
+        "TimeEnd": -1,
+        "BranchRef": {
+          "name": "",
+          "index": 48
+        }
+      },
+      "schema": "ExecuteTrack",
+      "end": 32552
+    },
+    {
+      "source": "comparison/mother_fig.p3d.rz",
+      "offset": 32524,
+      "payload": 32536,
+      "length": 0,
+      "type": "Conditions",
+      "kind": "PropertyHash",
+      "owner": "mother_core/opening/Outside/attacks/#fc7f04ceefd03173/#7354cfd1302e71/hit/right",
+      "end": 32544
+    },
+    {
+      "source": "comparison/mother_fig.p3d.rz",
+      "offset": 32552,
+      "payload": 32564,
+      "length": 20,
+      "type": "Spawn",
+      "kind": "TrackHash",
+      "owner": "mother_core/opening/Outside/attacks/#fc7f04ceefd03173/#7354cfd1302e71/hit/right",
+      "fields": {
+        "Unknown1": 1,
+        "TimeBegin": 1.6666699647903442,
+        "TimeEnd": -1,
+        "BranchRef": {
+          "name": "",
+          "index": 120
+        }
+      },
+      "schema": "SpawnTrack",
+      "end": 32612
+    },
+    {
+      "source": "comparison/mother_fig.p3d.rz",
+      "offset": 32584,
+      "payload": 32596,
+      "length": 0,
+      "type": "Conditions",
+      "kind": "PropertyHash",
+      "owner": "mother_core/opening/Outside/attacks/#fc7f04ceefd03173/#7354cfd1302e71/hit/right",
+      "end": 32604
+    },
+    {
+      "source": "comparison/mother_fig.p3d.rz",
+      "offset": 32612,
+      "payload": 32624,
+      "length": 20,
+      "type": "Sequence",
+      "kind": "TrackHash",
+      "owner": "mother_core/opening/Outside/attacks/#fc7f04ceefd03173/#7354cfd1302e71/hit/right",
+      "fields": {
+        "Unknown1": 1,
+        "TimeBegin": 0,
+        "BranchRef": {
+          "name": "",
+          "index": 42
+        },
+        "Priority": 1
+      },
+      "schema": "SequenceTrack",
+      "end": 32672
+    },
+    {
+      "source": "comparison/mother_fig.p3d.rz",
+      "offset": 32644,
+      "payload": 32656,
+      "length": 0,
+      "type": "Conditions",
+      "kind": "PropertyHash",
+      "owner": "mother_core/opening/Outside/attacks/#fc7f04ceefd03173/#7354cfd1302e71/hit/right",
+      "end": 32664
+    },
+    {
+      "source": "comparison/mother_fig.p3d.rz",
+      "offset": 32672,
+      "payload": 32684,
+      "length": 72,
+      "type": "Sound",
+      "kind": "TrackHash",
+      "owner": "mother_core/opening/Outside/attacks/#fc7f04ceefd03173/#7354cfd1302e71/hit/right",
+      "fields": {
+        "Unknown1": 1,
+        "TimeBegin": 1,
+        "Patch": {
+          "hash": "11726777248978660875",
+          "name": "#a2bde1c6dd816e0b"
+        },
+        "Trigger": {
+          "hash": "31616665440155042",
+          "name": "play"
+        },
+        "VolumeFactor": 1,
+        "MinDistance": 25,
+        "MaxDistance": 55,
+        "MinPitch": 1,
+        "MaxPitch": 1,
+        "CyclicPhase": 0,
+        "InstanceName": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "Frequency": 1,
+        "PolledLifetime": false,
+        "TriggerType": {
+          "hash": "6266415434618234495",
+          "name": "StopExisting"
+        }
+      },
+      "schema": "SoundTrack",
+      "end": 32764
+    },
+    {
+      "source": "comparison/mother_fig.p3d.rz",
+      "offset": 32764,
+      "payload": 32776,
+      "length": 72,
+      "type": "Sound",
+      "kind": "TrackHash",
+      "owner": "mother_core/opening/Outside/attacks/#fc7f04ceefd03173/#7354cfd1302e71/hit/right",
+      "fields": {
+        "Unknown1": 1,
+        "TimeBegin": 1.6666699647903442,
+        "Patch": {
+          "hash": "11726777248978660875",
+          "name": "#a2bde1c6dd816e0b"
+        },
+        "Trigger": {
+          "hash": "31616665440155042",
+          "name": "play"
+        },
+        "VolumeFactor": 1,
+        "MinDistance": 25,
+        "MaxDistance": 55,
+        "MinPitch": 1,
+        "MaxPitch": 1,
+        "CyclicPhase": 0,
+        "InstanceName": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "Frequency": 1,
+        "PolledLifetime": false,
+        "TriggerType": {
+          "hash": "6266415434618234495",
+          "name": "StopExisting"
+        }
+      },
+      "schema": "SoundTrack",
+      "end": 32856
+    },
+    {
+      "source": "comparison/mother_fig.p3d.rz",
+      "offset": 32880,
+      "payload": 32892,
+      "length": 20,
+      "type": "Node",
+      "kind": "BranchHash",
+      "owner": "mother_core/opening/Outside/attacks/#fc7f04ceefd03173/#7354cfd1302e71/wait",
+      "end": 33240
+    },
+    {
+      "source": "comparison/mother_fig.p3d.rz",
+      "offset": 32912,
+      "payload": 32924,
+      "length": 0,
+      "type": "Conditions",
+      "kind": "PropertyHash",
+      "owner": "mother_core/opening/Outside/attacks/#fc7f04ceefd03173/#7354cfd1302e71/wait",
+      "end": 32932
+    },
+    {
+      "source": "comparison/mother_fig.p3d.rz",
+      "offset": 32932,
+      "payload": 32944,
+      "length": 0,
+      "type": "Tracks",
+      "kind": "PropertyHash",
+      "owner": "mother_core/opening/Outside/attacks/#fc7f04ceefd03173/#7354cfd1302e71/wait",
+      "end": 33232
+    },
+    {
+      "source": "comparison/mother_fig.p3d.rz",
+      "offset": 32944,
+      "payload": 32956,
+      "length": 56,
+      "type": "VariableIntTemporarySet",
+      "kind": "TrackHash",
+      "owner": "mother_core/opening/Outside/attacks/#fc7f04ceefd03173/#7354cfd1302e71/wait",
+      "fields": {
+        "Unknown1": 0,
+        "TimeBegin": 0,
+        "TimeEnd": -1,
+        "Variable": {
+          "hash": "14611053639986884603",
+          "name": "#cac4e3df7598affb"
+        },
+        "GrabSlot": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "UseGrabber": false,
+        "OperatorBegin": {
+          "hash": "61",
+          "name": "#3d"
+        },
+        "OperatorEnd": {
+          "hash": "61",
+          "name": "#3d"
+        },
+        "BeginValue": 1,
+        "EndValue": 0
+      },
+      "schema": "VariableIntTemporarySetTrack",
+      "end": 33020
+    },
+    {
+      "source": "comparison/mother_fig.p3d.rz",
+      "offset": 33020,
+      "payload": 33032,
+      "length": 108,
+      "type": "PuppetAnimation",
+      "kind": "TrackHash",
+      "owner": "mother_core/opening/Outside/attacks/#fc7f04ceefd03173/#7354cfd1302e71/wait",
+      "fields": {
+        "Unknown1": 1,
+        "TimeBegin": 0,
+        "TimeEnd": -1,
+        "Animation": {
+          "hash": "9962493821129289553",
+          "name": "#8a41e358c56f6f51"
+        },
+        "Speed": 1,
+        "RandomSpeedVariation": 0,
+        "InitFrame": 0,
+        "StartFrame": 0,
+        "EndFrame": -1,
+        "Cyclic": {
+          "hash": "2735456161976044165",
+          "name": "Cyclic"
+        },
+        "SyncFrame": false,
+        "PhaseMatch": false,
+        "ReuseExistingDriver": false,
+        "SyncPhase": {
+          "hash": "3349652082457766725",
+          "name": "Legacy"
+        },
+        "SyncPhaseMinFrame": 0,
+        "SyncPhaseMaxFrame": -1,
+        "HasRootTranslation": true,
+        "HasRootRotation": true,
+        "Partition": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "Weight": 1,
+        "Priority": 9,
+        "BlendInTime": 0.20000000298023224,
+        "BlendOutTime": 0.20000000298023224
+      },
+      "schema": "PuppetAnimationTrack",
+      "end": 33148
+    },
+    {
+      "source": "comparison/mother_fig.p3d.rz",
+      "offset": 33148,
+      "payload": 33160,
+      "length": 36,
+      "type": "OnEvent",
+      "kind": "TrackHash",
+      "owner": "mother_core/opening/Outside/attacks/#fc7f04ceefd03173/#7354cfd1302e71/wait",
+      "fields": {
+        "Unknown1": 0,
+        "BeginTime": 0.16666699945926666,
+        "EndTime": -1,
+        "HookTime": 0,
+        "EventMask": 1,
+        "InitialTest": true,
+        "BranchRef": {
+          "name": "",
+          "index": 42
+        },
+        "Priority": 0
+      },
+      "schema": "OnEventTrack",
+      "end": 33224
+    },
+    {
+      "source": "comparison/mother_fig.p3d.rz",
+      "offset": 33196,
+      "payload": 33208,
+      "length": 0,
+      "type": "Conditions",
+      "kind": "PropertyHash",
+      "owner": "mother_core/opening/Outside/attacks/#fc7f04ceefd03173/#7354cfd1302e71/wait",
+      "end": 33216
+    },
+    {
+      "source": "comparison/mother_fig.p3d.rz",
+      "offset": 33240,
+      "payload": 33252,
+      "length": 16,
+      "type": "Store",
+      "kind": "BranchHash",
+      "owner": "mother_core/opening/Outside/attacks/#fc7f04ceefd03173/#7354cfd1302e71/camera_shake",
+      "end": 33420
+    },
+    {
+      "source": "comparison/mother_fig.p3d.rz",
+      "offset": 33268,
+      "payload": 33280,
+      "length": 0,
+      "type": "Conditions",
+      "kind": "PropertyHash",
+      "owner": "mother_core/opening/Outside/attacks/#fc7f04ceefd03173/#7354cfd1302e71/camera_shake",
+      "end": 33288
+    },
+    {
+      "source": "comparison/mother_fig.p3d.rz",
+      "offset": 33288,
+      "payload": 33300,
+      "length": 20,
+      "type": "Node",
+      "kind": "BranchHash",
+      "owner": "mother_core/opening/Outside/attacks/#fc7f04ceefd03173/#7354cfd1302e71/camera_shake/camera_shake",
+      "end": 33412
+    },
+    {
+      "source": "comparison/mother_fig.p3d.rz",
+      "offset": 33320,
+      "payload": 33332,
+      "length": 0,
+      "type": "Conditions",
+      "kind": "PropertyHash",
+      "owner": "mother_core/opening/Outside/attacks/#fc7f04ceefd03173/#7354cfd1302e71/camera_shake/camera_shake",
+      "end": 33340
+    },
+    {
+      "source": "comparison/mother_fig.p3d.rz",
+      "offset": 33340,
+      "payload": 33352,
+      "length": 0,
+      "type": "Tracks",
+      "kind": "PropertyHash",
+      "owner": "mother_core/opening/Outside/attacks/#fc7f04ceefd03173/#7354cfd1302e71/camera_shake/camera_shake",
+      "end": 33404
+    },
+    {
+      "source": "comparison/mother_fig.p3d.rz",
+      "offset": 33352,
+      "payload": 33364,
+      "length": 24,
+      "type": "CameraShakeRequest",
+      "kind": "TrackHash",
+      "owner": "mother_core/opening/Outside/attacks/#fc7f04ceefd03173/#7354cfd1302e71/camera_shake/camera_shake",
+      "fields": {
+        "Unknown1": 0,
+        "BeginTime": 0,
+        "Size": {
+          "hash": "7699058135646415813",
+          "name": "Large"
+        },
+        "Range": {
+          "hash": "7699058135646415813",
+          "name": "Large"
+        }
+      },
+      "schema": "CameraShakeRequestTrack",
+      "end": 33396
+    },
+    {
+      "source": "comparison/mother_fig.p3d.rz",
+      "offset": 36040,
+      "payload": 36052,
+      "length": 16,
+      "type": "Bank",
+      "kind": "BranchHash",
+      "owner": "mother_core/opening/Outside/turning/#7354cfd1302e71",
+      "end": 37364
+    },
+    {
+      "source": "comparison/mother_fig.p3d.rz",
+      "offset": 36068,
+      "payload": 36080,
+      "length": 0,
+      "type": "Conditions",
+      "kind": "PropertyHash",
+      "owner": "mother_core/opening/Outside/turning/#7354cfd1302e71",
+      "end": 36088
+    },
+    {
+      "source": "comparison/mother_fig.p3d.rz",
+      "offset": 36088,
+      "payload": 36100,
+      "length": 20,
+      "type": "Node",
+      "kind": "BranchHash",
+      "owner": "mother_core/opening/Outside/turning/#7354cfd1302e71/#114ae6baff1b28df",
+      "end": 36324
+    },
+    {
+      "source": "comparison/mother_fig.p3d.rz",
+      "offset": 36120,
+      "payload": 36132,
+      "length": 0,
+      "type": "Conditions",
+      "kind": "PropertyHash",
+      "owner": "mother_core/opening/Outside/turning/#7354cfd1302e71/#114ae6baff1b28df",
+      "end": 36184
+    },
+    {
+      "source": "comparison/mother_fig.p3d.rz",
+      "offset": 36132,
+      "payload": 36144,
+      "length": 24,
+      "type": "FacingAngleTarget",
+      "kind": "ConditionHash",
+      "owner": "mother_core/opening/Outside/turning/#7354cfd1302e71/#114ae6baff1b28df",
+      "fields": {
+        "Type": {
+          "hash": "520688520109",
+          "name": "Yaw"
+        },
+        "CompareTime": {
+          "hash": "60",
+          "name": "LessThan"
+        },
+        "Angle": 10,
+        "Signed": false
+      },
+      "schema": "FacingAngleTargetCondition",
+      "end": 36176
+    },
+    {
+      "source": "comparison/mother_fig.p3d.rz",
+      "offset": 36184,
+      "payload": 36196,
+      "length": 0,
+      "type": "Tracks",
+      "kind": "PropertyHash",
+      "owner": "mother_core/opening/Outside/turning/#7354cfd1302e71/#114ae6baff1b28df",
+      "end": 36316
+    },
+    {
+      "source": "comparison/mother_fig.p3d.rz",
+      "offset": 36196,
+      "payload": 36208,
+      "length": 28,
+      "type": "Opportunity",
+      "kind": "TrackHash",
+      "owner": "mother_core/opening/Outside/turning/#7354cfd1302e71/#114ae6baff1b28df",
+      "fields": {
+        "Unknown1": 0,
+        "TimeBegin": 0,
+        "TimeEnd": -1,
+        "TimeHook": 0,
+        "BranchRef": {
+          "name": "",
+          "index": 59
+        },
+        "Priority": 0
+      },
+      "schema": "OpportunityTrack",
+      "end": 36308
+    },
+    {
+      "source": "comparison/mother_fig.p3d.rz",
+      "offset": 36236,
+      "payload": 36248,
+      "length": 0,
+      "type": "Conditions",
+      "kind": "PropertyHash",
+      "owner": "mother_core/opening/Outside/turning/#7354cfd1302e71/#114ae6baff1b28df",
+      "end": 36300
+    },
+    {
+      "source": "comparison/mother_fig.p3d.rz",
+      "offset": 36248,
+      "payload": 36260,
+      "length": 24,
+      "type": "FacingAngleTarget",
+      "kind": "ConditionHash",
+      "owner": "mother_core/opening/Outside/turning/#7354cfd1302e71/#114ae6baff1b28df",
+      "fields": {
+        "Type": {
+          "hash": "520688520109",
+          "name": "Yaw"
+        },
+        "CompareTime": {
+          "hash": "62",
+          "name": "MoreThan"
+        },
+        "Angle": 15,
+        "Signed": false
+      },
+      "schema": "FacingAngleTargetCondition",
+      "end": 36292
+    },
+    {
+      "source": "comparison/mother_fig.p3d.rz",
+      "offset": 36324,
+      "payload": 36336,
+      "length": 20,
+      "type": "Node",
+      "kind": "BranchHash",
+      "owner": "mother_core/opening/Outside/turning/#7354cfd1302e71/#687d807980a5915f",
+      "end": 36628
+    },
+    {
+      "source": "comparison/mother_fig.p3d.rz",
+      "offset": 36356,
+      "payload": 36368,
+      "length": 0,
+      "type": "Conditions",
+      "kind": "PropertyHash",
+      "owner": "mother_core/opening/Outside/turning/#7354cfd1302e71/#687d807980a5915f",
+      "end": 36420
+    },
+    {
+      "source": "comparison/mother_fig.p3d.rz",
+      "offset": 36368,
+      "payload": 36380,
+      "length": 24,
+      "type": "FacingAngleTarget",
+      "kind": "ConditionHash",
+      "owner": "mother_core/opening/Outside/turning/#7354cfd1302e71/#687d807980a5915f",
+      "fields": {
+        "Type": {
+          "hash": "520688520109",
+          "name": "Yaw"
+        },
+        "CompareTime": {
+          "hash": "60",
+          "name": "LessThan"
+        },
+        "Angle": 30,
+        "Signed": false
+      },
+      "schema": "FacingAngleTargetCondition",
+      "end": 36412
+    },
+    {
+      "source": "comparison/mother_fig.p3d.rz",
+      "offset": 36420,
+      "payload": 36432,
+      "length": 0,
+      "type": "Tracks",
+      "kind": "PropertyHash",
+      "owner": "mother_core/opening/Outside/turning/#7354cfd1302e71/#687d807980a5915f",
+      "end": 36620
+    },
+    {
+      "source": "comparison/mother_fig.p3d.rz",
+      "offset": 36432,
+      "payload": 36444,
+      "length": 28,
+      "type": "Opportunity",
+      "kind": "TrackHash",
+      "owner": "mother_core/opening/Outside/turning/#7354cfd1302e71/#687d807980a5915f",
+      "fields": {
+        "Unknown1": 0,
+        "TimeBegin": 0,
+        "TimeEnd": -1,
+        "TimeHook": 0,
+        "BranchRef": {
+          "name": "",
+          "index": 59
+        },
+        "Priority": 0
+      },
+      "schema": "OpportunityTrack",
+      "end": 36500
+    },
+    {
+      "source": "comparison/mother_fig.p3d.rz",
+      "offset": 36472,
+      "payload": 36484,
+      "length": 0,
+      "type": "Conditions",
+      "kind": "PropertyHash",
+      "owner": "mother_core/opening/Outside/turning/#7354cfd1302e71/#687d807980a5915f",
+      "end": 36492
+    },
+    {
+      "source": "comparison/mother_fig.p3d.rz",
+      "offset": 36500,
+      "payload": 36512,
+      "length": 92,
+      "type": "AutoTarget",
+      "kind": "TrackHash",
+      "owner": "mother_core/opening/Outside/turning/#7354cfd1302e71/#687d807980a5915f",
+      "fields": {
+        "Unknown1": 1,
+        "TimeBegin": 0,
+        "TimeEnd": -1,
+        "TurningVelocity": 3,
+        "UseInput": false,
+        "UseCamera": false,
+        "Direction": [
+          0,
+          0,
+          -1
+        ],
+        "Arc": 180,
+        "MaxDistance": 5,
+        "CheckArc": false,
+        "CheckDistance": false,
+        "OrientOffsetFromTarget": 0,
+        "TargetFilter": 2,
+        "TargetOverrides": 0,
+        "MinPriorityTargetClass": {
+          "hash": "16840447804245826439",
+          "name": "#e9b54a0dae945b87"
+        },
+        "MaxPriorityTargetClass": {
+          "hash": "16840447804246351257",
+          "name": "#e9b54a0dae9c5d99"
+        },
+        "Priority": -6,
+        "BlendInTime": 0,
+        "BlendOutTime": 0
+      },
+      "schema": "AutoTargetTrack",
+      "end": 36612
+    },
+    {
+      "source": "comparison/mother_fig.p3d.rz",
+      "offset": 36628,
+      "payload": 36640,
+      "length": 20,
+      "type": "Node",
+      "kind": "BranchHash",
+      "owner": "mother_core/opening/Outside/turning/#7354cfd1302e71/#8b95128d2caaa3f2",
+      "end": 36992
+    },
+    {
+      "source": "comparison/mother_fig.p3d.rz",
+      "offset": 36660,
+      "payload": 36672,
+      "length": 0,
+      "type": "Conditions",
+      "kind": "PropertyHash",
+      "owner": "mother_core/opening/Outside/turning/#7354cfd1302e71/#8b95128d2caaa3f2",
+      "end": 36724
+    },
+    {
+      "source": "comparison/mother_fig.p3d.rz",
+      "offset": 36672,
+      "payload": 36684,
+      "length": 24,
+      "type": "FacingAngleTarget",
+      "kind": "ConditionHash",
+      "owner": "mother_core/opening/Outside/turning/#7354cfd1302e71/#8b95128d2caaa3f2",
+      "fields": {
+        "Type": {
+          "hash": "520688520109",
+          "name": "Yaw"
+        },
+        "CompareTime": {
+          "hash": "60",
+          "name": "LessThan"
+        },
+        "Angle": 120,
+        "Signed": false
+      },
+      "schema": "FacingAngleTargetCondition",
+      "end": 36716
+    },
+    {
+      "source": "comparison/mother_fig.p3d.rz",
+      "offset": 36724,
+      "payload": 36736,
+      "length": 0,
+      "type": "Tracks",
+      "kind": "PropertyHash",
+      "owner": "mother_core/opening/Outside/turning/#7354cfd1302e71/#8b95128d2caaa3f2",
+      "end": 36984
+    },
+    {
+      "source": "comparison/mother_fig.p3d.rz",
+      "offset": 36736,
+      "payload": 36748,
+      "length": 28,
+      "type": "Opportunity",
+      "kind": "TrackHash",
+      "owner": "mother_core/opening/Outside/turning/#7354cfd1302e71/#8b95128d2caaa3f2",
+      "fields": {
+        "Unknown1": 0,
+        "TimeBegin": 0,
+        "TimeEnd": -1,
+        "TimeHook": 0,
+        "BranchRef": {
+          "name": "",
+          "index": 59
+        },
+        "Priority": 0
+      },
+      "schema": "OpportunityTrack",
+      "end": 36804
+    },
+    {
+      "source": "comparison/mother_fig.p3d.rz",
+      "offset": 36776,
+      "payload": 36788,
+      "length": 0,
+      "type": "Conditions",
+      "kind": "PropertyHash",
+      "owner": "mother_core/opening/Outside/turning/#7354cfd1302e71/#8b95128d2caaa3f2",
+      "end": 36796
+    },
+    {
+      "source": "comparison/mother_fig.p3d.rz",
+      "offset": 36804,
+      "payload": 36816,
+      "length": 20,
+      "type": "Spawn",
+      "kind": "TrackHash",
+      "owner": "mother_core/opening/Outside/turning/#7354cfd1302e71/#8b95128d2caaa3f2",
+      "fields": {
+        "Unknown1": 1,
+        "TimeBegin": 0,
+        "TimeEnd": -1,
+        "BranchRef": {
+          "name": "",
+          "index": 137
+        }
+      },
+      "schema": "SpawnTrack",
+      "end": 36864
+    },
+    {
+      "source": "comparison/mother_fig.p3d.rz",
+      "offset": 36836,
+      "payload": 36848,
+      "length": 0,
+      "type": "Conditions",
+      "kind": "PropertyHash",
+      "owner": "mother_core/opening/Outside/turning/#7354cfd1302e71/#8b95128d2caaa3f2",
+      "end": 36856
+    },
+    {
+      "source": "comparison/mother_fig.p3d.rz",
+      "offset": 36864,
+      "payload": 36876,
+      "length": 92,
+      "type": "AutoTarget",
+      "kind": "TrackHash",
+      "owner": "mother_core/opening/Outside/turning/#7354cfd1302e71/#8b95128d2caaa3f2",
+      "fields": {
+        "Unknown1": 1,
+        "TimeBegin": 0,
+        "TimeEnd": -1,
+        "TurningVelocity": 70,
+        "UseInput": false,
+        "UseCamera": false,
+        "Direction": [
+          0,
+          0,
+          -1
+        ],
+        "Arc": 180,
+        "MaxDistance": 5,
+        "CheckArc": false,
+        "CheckDistance": false,
+        "OrientOffsetFromTarget": 0,
+        "TargetFilter": 2,
+        "TargetOverrides": 0,
+        "MinPriorityTargetClass": {
+          "hash": "16840447804245826439",
+          "name": "#e9b54a0dae945b87"
+        },
+        "MaxPriorityTargetClass": {
+          "hash": "16840447804246351257",
+          "name": "#e9b54a0dae9c5d99"
+        },
+        "Priority": -6,
+        "BlendInTime": 0,
+        "BlendOutTime": 0
+      },
+      "schema": "AutoTargetTrack",
+      "end": 36976
+    },
+    {
+      "source": "comparison/mother_fig.p3d.rz",
+      "offset": 36992,
+      "payload": 37004,
+      "length": 20,
+      "type": "Node",
+      "kind": "BranchHash",
+      "owner": "mother_core/opening/Outside/turning/#7354cfd1302e71/#3d0f042a68db1870",
+      "end": 37356
+    },
+    {
+      "source": "comparison/mother_fig.p3d.rz",
+      "offset": 37024,
+      "payload": 37036,
+      "length": 0,
+      "type": "Conditions",
+      "kind": "PropertyHash",
+      "owner": "mother_core/opening/Outside/turning/#7354cfd1302e71/#3d0f042a68db1870",
+      "end": 37044
+    },
+    {
+      "source": "comparison/mother_fig.p3d.rz",
+      "offset": 37044,
+      "payload": 37056,
+      "length": 0,
+      "type": "Tracks",
+      "kind": "PropertyHash",
+      "owner": "mother_core/opening/Outside/turning/#7354cfd1302e71/#3d0f042a68db1870",
+      "end": 37348
+    },
+    {
+      "source": "comparison/mother_fig.p3d.rz",
+      "offset": 37056,
+      "payload": 37068,
+      "length": 28,
+      "type": "Opportunity",
+      "kind": "TrackHash",
+      "owner": "mother_core/opening/Outside/turning/#7354cfd1302e71/#3d0f042a68db1870",
+      "fields": {
+        "Unknown1": 0,
+        "TimeBegin": 0,
+        "TimeEnd": -1,
+        "TimeHook": 0,
+        "BranchRef": {
+          "name": "",
+          "index": 59
+        },
+        "Priority": 0
+      },
+      "schema": "OpportunityTrack",
+      "end": 37168
+    },
+    {
+      "source": "comparison/mother_fig.p3d.rz",
+      "offset": 37096,
+      "payload": 37108,
+      "length": 0,
+      "type": "Conditions",
+      "kind": "PropertyHash",
+      "owner": "mother_core/opening/Outside/turning/#7354cfd1302e71/#3d0f042a68db1870",
+      "end": 37160
+    },
+    {
+      "source": "comparison/mother_fig.p3d.rz",
+      "offset": 37108,
+      "payload": 37120,
+      "length": 24,
+      "type": "FacingAngleTarget",
+      "kind": "ConditionHash",
+      "owner": "mother_core/opening/Outside/turning/#7354cfd1302e71/#3d0f042a68db1870",
+      "fields": {
+        "Type": {
+          "hash": "520688520109",
+          "name": "Yaw"
+        },
+        "CompareTime": {
+          "hash": "60",
+          "name": "LessThan"
+        },
+        "Angle": 10,
+        "Signed": false
+      },
+      "schema": "FacingAngleTargetCondition",
+      "end": 37152
+    },
+    {
+      "source": "comparison/mother_fig.p3d.rz",
+      "offset": 37168,
+      "payload": 37180,
+      "length": 20,
+      "type": "Spawn",
+      "kind": "TrackHash",
+      "owner": "mother_core/opening/Outside/turning/#7354cfd1302e71/#3d0f042a68db1870",
+      "fields": {
+        "Unknown1": 1,
+        "TimeBegin": 0,
+        "TimeEnd": -1,
+        "BranchRef": {
+          "name": "",
+          "index": 137
+        }
+      },
+      "schema": "SpawnTrack",
+      "end": 37228
+    },
+    {
+      "source": "comparison/mother_fig.p3d.rz",
+      "offset": 37200,
+      "payload": 37212,
+      "length": 0,
+      "type": "Conditions",
+      "kind": "PropertyHash",
+      "owner": "mother_core/opening/Outside/turning/#7354cfd1302e71/#3d0f042a68db1870",
+      "end": 37220
+    },
+    {
+      "source": "comparison/mother_fig.p3d.rz",
+      "offset": 37228,
+      "payload": 37240,
+      "length": 92,
+      "type": "AutoTarget",
+      "kind": "TrackHash",
+      "owner": "mother_core/opening/Outside/turning/#7354cfd1302e71/#3d0f042a68db1870",
+      "fields": {
+        "Unknown1": 1,
+        "TimeBegin": 0,
+        "TimeEnd": -1,
+        "TurningVelocity": 150,
+        "UseInput": false,
+        "UseCamera": false,
+        "Direction": [
+          0,
+          0,
+          -1
+        ],
+        "Arc": 180,
+        "MaxDistance": 5,
+        "CheckArc": false,
+        "CheckDistance": false,
+        "OrientOffsetFromTarget": 0,
+        "TargetFilter": 2,
+        "TargetOverrides": 0,
+        "MinPriorityTargetClass": {
+          "hash": "16840447804245826439",
+          "name": "#e9b54a0dae945b87"
+        },
+        "MaxPriorityTargetClass": {
+          "hash": "16840447804246351257",
+          "name": "#e9b54a0dae9c5d99"
+        },
+        "Priority": -6,
+        "BlendInTime": 0,
+        "BlendOutTime": 0
+      },
+      "schema": "AutoTargetTrack",
+      "end": 37340
+    },
+    {
+      "source": "comparison/mother_fig.p3d.rz",
+      "offset": 70076,
+      "payload": 70088,
+      "length": 20,
+      "type": "Node",
+      "kind": "BranchHash",
+      "owner": "mother_core/effects/moves/#256904d70f10bc90",
+      "end": 73856
+    },
+    {
+      "source": "comparison/mother_fig.p3d.rz",
+      "offset": 70108,
+      "payload": 70120,
+      "length": 0,
+      "type": "Conditions",
+      "kind": "PropertyHash",
+      "owner": "mother_core/effects/moves/#256904d70f10bc90",
+      "end": 70128
+    },
+    {
+      "source": "comparison/mother_fig.p3d.rz",
+      "offset": 70128,
+      "payload": 70140,
+      "length": 0,
+      "type": "Tracks",
+      "kind": "PropertyHash",
+      "owner": "mother_core/effects/moves/#256904d70f10bc90",
+      "end": 73768
+    },
+    {
+      "source": "comparison/mother_fig.p3d.rz",
+      "offset": 70140,
+      "payload": 70152,
+      "length": 444,
+      "type": "Effect",
+      "kind": "TrackHash",
+      "owner": "mother_core/effects/moves/#256904d70f10bc90",
+      "fields": {
+        "Unknown1": 0,
+        "TimeBegin": 0.03333330154418945,
+        "TimeEnd": 1,
+        "EffectName": {
+          "hash": "238723747806811990",
+          "name": "#3501dfbdb799756"
+        },
+        "ParentObjectName": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "EmitSpace": {
+          "hash": "17857802742059722934",
+          "name": "JointSpace"
+        },
+        "EmitJoint": {
+          "hash": "10135106878356211485",
+          "name": "Motion_Root"
+        },
+        "Offset": [
+          0,
+          1,
+          -10
+        ],
+        "Orientation": [
+          0,
+          0,
+          0
+        ],
+        "AttachSpace": {
+          "hash": "5062814898204701870",
+          "name": "WorldSpace"
+        },
+        "AttachJoint": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "AbortWhenInterrupted": false,
+        "SlotName": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "AbortBelowJointScale": -1,
+        "FadeTime": 0,
+        "EffectController": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "EffectStore": {
+          "hash": "1312132684818588012",
+          "name": "General"
+        },
+        "HighPriority": false,
+        "Scale": 1,
+        "Collides": false,
+        "Restitution": 0.5,
+        "Friction": 1,
+        "RenderOffset": 0,
+        "UsePropScaling": true,
+        "CloneName": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "CloneTint": [
+          1,
+          1,
+          1,
+          1
+        ],
+        "Biases": [
+          1,
+          0,
+          0,
+          0
+        ],
+        "BiasesEmissionRate": 1,
+        "BiasesEmissionRateAreaScale": 0,
+        "BiasesEmissionRateScaleFunction": {
+          "hash": "4206860010037910535",
+          "name": "#3a61c4e3e61b1c07"
+        },
+        "BiasesLifeSpan": 2,
+        "BiasesLifeSpanVariance": 1,
+        "BiasesSpeed": 0.699999988079071,
+        "BiasesSpeedVariance": 1,
+        "BiasesSize1D": 2,
+        "BiasesSize1DVariance": 2,
+        "BiasesSize1DAreaScale": 0,
+        "BiasesSize1DScaleFunction": {
+          "hash": "4206860010037910535",
+          "name": "#3a61c4e3e61b1c07"
+        },
+        "BiasesSpin1D": 1,
+        "BiasesSpin1DVariance": 1,
+        "BiasesWeight": 1,
+        "BiasesWeightVariance": 1,
+        "BiasesAngle": 1,
+        "BiasesAngleVariance": 1,
+        "BiasesGravity": 1,
+        "BiasesDrag": 1,
+        "BiasesColourRed": 1,
+        "BiasesColourGreen": 1,
+        "BiasesColourBlue": 1,
+        "BiasesAlpha": 1,
+        "BiasesColourOverLifeRed": 1,
+        "BiasesColourOverLifeGreen": 1,
+        "BiasesColourOverLifeBlue": 1,
+        "BiasesAlphaOverLife": 1,
+        "BiasesColourVariance": 1,
+        "BiasesAlphaVariance": 1,
+        "BiasesGeneratorRadius": 1,
+        "BiasesGeneratorRadial": 1,
+        "BiasesGeneratorHorizSpread": 1,
+        "BiasesGeneratorVertSpread": 1,
+        "BiasesGeneratorWidth": 1,
+        "BiasesGeneratorHeight": 1,
+        "BiasesMeshGeneratorScale": [
+          1,
+          1,
+          1
+        ],
+        "Overrides": [
+          1,
+          0,
+          0,
+          0
+        ],
+        "OverridesEmissionRate": -1,
+        "OverridesEmissionRatePerMeter": -1,
+        "OverridesMaxParticles": -1,
+        "OverridesParticleAllocation": -1,
+        "OverridesLifeSpan": -1,
+        "OverridesLifeSpanVariance": -1,
+        "OverridesSpeed": -1,
+        "OverridesSpeedVariance": -1,
+        "OverridesSize1D": -1,
+        "OverridesSize1DVariance": -1,
+        "OverridesSpin1D": -1,
+        "OverridesSpin1DVariance": -1,
+        "OverridesWeight": -1,
+        "OverridesWeightVariance": -1,
+        "OverridesAngle": -1,
+        "OverridesAngleVariance": -1,
+        "OverridesGravity": -1,
+        "OverridesDrag": -1,
+        "OverridesColourRed": -1,
+        "OverridesColourGreen": -1,
+        "OverridesColourBlue": -1,
+        "OverridesAlpha": -1,
+        "OverridesColourVariance": -1,
+        "OverridesAlphaVariance": -1,
+        "OverridesGeneratorWidth": -1,
+        "OverridesGeneratorHeight": -1
+      },
+      "schema": "EffectTrack",
+      "end": 70624
+    },
+    {
+      "source": "comparison/mother_fig.p3d.rz",
+      "offset": 70596,
+      "payload": 70608,
+      "length": 0,
+      "type": "Lods",
+      "kind": "PropertyHash",
+      "owner": "mother_core/effects/moves/#256904d70f10bc90",
+      "end": 70616
+    },
+    {
+      "source": "comparison/mother_fig.p3d.rz",
+      "offset": 70624,
+      "payload": 70636,
+      "length": 444,
+      "type": "Effect",
+      "kind": "TrackHash",
+      "owner": "mother_core/effects/moves/#256904d70f10bc90",
+      "fields": {
+        "Unknown1": 0,
+        "TimeBegin": 0,
+        "TimeEnd": 0.6666669845581055,
+        "EffectName": {
+          "hash": "238723747806811990",
+          "name": "#3501dfbdb799756"
+        },
+        "ParentObjectName": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "EmitSpace": {
+          "hash": "17857802742059722934",
+          "name": "JointSpace"
+        },
+        "EmitJoint": {
+          "hash": "10135106878356211485",
+          "name": "Motion_Root"
+        },
+        "Offset": [
+          0,
+          1,
+          -10
+        ],
+        "Orientation": [
+          0,
+          0,
+          0
+        ],
+        "AttachSpace": {
+          "hash": "5062814898204701870",
+          "name": "WorldSpace"
+        },
+        "AttachJoint": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "AbortWhenInterrupted": false,
+        "SlotName": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "AbortBelowJointScale": -1,
+        "FadeTime": 0,
+        "EffectController": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "EffectStore": {
+          "hash": "1312132684818588012",
+          "name": "General"
+        },
+        "HighPriority": false,
+        "Scale": 1,
+        "Collides": false,
+        "Restitution": 0.5,
+        "Friction": 1,
+        "RenderOffset": 0,
+        "UsePropScaling": true,
+        "CloneName": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "CloneTint": [
+          1,
+          1,
+          1,
+          1
+        ],
+        "Biases": [
+          1,
+          0,
+          0,
+          0
+        ],
+        "BiasesEmissionRate": 0.5,
+        "BiasesEmissionRateAreaScale": 0,
+        "BiasesEmissionRateScaleFunction": {
+          "hash": "4206860010037910535",
+          "name": "#3a61c4e3e61b1c07"
+        },
+        "BiasesLifeSpan": 0.5,
+        "BiasesLifeSpanVariance": 0.5,
+        "BiasesSpeed": 3,
+        "BiasesSpeedVariance": 1,
+        "BiasesSize1D": 1.5,
+        "BiasesSize1DVariance": 1,
+        "BiasesSize1DAreaScale": 0,
+        "BiasesSize1DScaleFunction": {
+          "hash": "4206860010037910535",
+          "name": "#3a61c4e3e61b1c07"
+        },
+        "BiasesSpin1D": 1,
+        "BiasesSpin1DVariance": 1,
+        "BiasesWeight": 1,
+        "BiasesWeightVariance": 1,
+        "BiasesAngle": 1,
+        "BiasesAngleVariance": 1,
+        "BiasesGravity": 1,
+        "BiasesDrag": 1,
+        "BiasesColourRed": 1,
+        "BiasesColourGreen": 1,
+        "BiasesColourBlue": 1,
+        "BiasesAlpha": 1,
+        "BiasesColourOverLifeRed": 1,
+        "BiasesColourOverLifeGreen": 1,
+        "BiasesColourOverLifeBlue": 1,
+        "BiasesAlphaOverLife": 0.5,
+        "BiasesColourVariance": 1,
+        "BiasesAlphaVariance": 1,
+        "BiasesGeneratorRadius": 1,
+        "BiasesGeneratorRadial": 1,
+        "BiasesGeneratorHorizSpread": 1,
+        "BiasesGeneratorVertSpread": 1,
+        "BiasesGeneratorWidth": 1,
+        "BiasesGeneratorHeight": 1,
+        "BiasesMeshGeneratorScale": [
+          1,
+          1,
+          1
+        ],
+        "Overrides": [
+          1,
+          0,
+          0,
+          0
+        ],
+        "OverridesEmissionRate": -1,
+        "OverridesEmissionRatePerMeter": -1,
+        "OverridesMaxParticles": -1,
+        "OverridesParticleAllocation": -1,
+        "OverridesLifeSpan": -1,
+        "OverridesLifeSpanVariance": -1,
+        "OverridesSpeed": -1,
+        "OverridesSpeedVariance": -1,
+        "OverridesSize1D": -1,
+        "OverridesSize1DVariance": -1,
+        "OverridesSpin1D": -1,
+        "OverridesSpin1DVariance": -1,
+        "OverridesWeight": -1,
+        "OverridesWeightVariance": -1,
+        "OverridesAngle": -1,
+        "OverridesAngleVariance": -1,
+        "OverridesGravity": -1,
+        "OverridesDrag": -1,
+        "OverridesColourRed": -1,
+        "OverridesColourGreen": -1,
+        "OverridesColourBlue": -1,
+        "OverridesAlpha": -1,
+        "OverridesColourVariance": -1,
+        "OverridesAlphaVariance": -1,
+        "OverridesGeneratorWidth": -1,
+        "OverridesGeneratorHeight": -1
+      },
+      "schema": "EffectTrack",
+      "end": 71108
+    },
+    {
+      "source": "comparison/mother_fig.p3d.rz",
+      "offset": 71080,
+      "payload": 71092,
+      "length": 0,
+      "type": "Lods",
+      "kind": "PropertyHash",
+      "owner": "mother_core/effects/moves/#256904d70f10bc90",
+      "end": 71100
+    }
+  ],
+  "implementationFiles": [
+    "combat/GreeneCloseAttack.java",
+    "combat/GreeneCloseContact.java",
+    "models/greene_close_source.json",
+    "tools/export_greene_close.py"
+  ]
+}

@@ -26,6 +26,8 @@ public final class BlacklightCreatureModel<T extends LivingEntity & GeoEntity> e
         super.setCustomAnimations(entity,instance,state);
         com.codex.blacklight.client.animation.NativeReceiverPose.resetRoot(this);
         if(entity instanceof com.codex.blacklight.entity.BlacklightHive hive){hive(hive,state.getPartialTick());return;}
+        if(entity instanceof com.codex.blacklight.entity.EncounterMob mob)EncounterPose.apply(this,mob,state.getPartialTick());
+        if(entity instanceof com.codex.blacklight.entity.EncounterMob mob&&mob.sourcePoseCommitted())return;
         if(com.codex.blacklight.client.animation.NativeReceiverPose.apply(this,entity,state.getPartialTick()))return;
         var visual=com.codex.blacklight.registry.ModAttachments.getData(entity, com.codex.blacklight.registry.ModAttachments.CONSUME_VISUAL);
         if(!visual.active()){

@@ -17,6 +17,7 @@ public final class ClientParticleEvents {
 
     @SubscribeEvent
     public static void registerParticleProviders(RegisterParticleProvidersEvent event) {
+        event.registerSpriteSet(ModParticles.CONTACT_DUST.get(), com.codex.blacklight.client.particle.ContactDustParticle.Provider::new);
         event.registerSpriteSet(ModParticles.BIOMASS_SLASH.get(),
                 ExpandingImpactParticle.SlashProvider::new);
         event.registerSpriteSet(ModParticles.DESTRUCTION_BURST.get(),
